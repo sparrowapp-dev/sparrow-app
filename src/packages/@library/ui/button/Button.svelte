@@ -19,6 +19,7 @@
     | "danger"
     | "violet"
     | "transparent"
+    | "teritiary"
     | "other"
     | "icon" = "other";
   enum BtnType {
@@ -29,6 +30,7 @@
     TRANSPARENT = "transparent",
     OTHER = "other",
     ICON = "icon",
+    TERITIARY = "teritiary",
   }
 
   // define button variants
@@ -51,6 +53,9 @@
       break;
     case BtnType.ICON:
       btnClass = "sparrow-icon-btn";
+      break;
+    case BtnType.TERITIARY:
+      btnClass = "custom-btn-teritiary";
       break;
     default:
       btnClass = "";
@@ -108,7 +113,7 @@
     color: var(--white-color);
   }
   .custom-btn-dark {
-    background-color: var(--bg-tertiary-300);
+    background-color: var(  --bg-tertiary-300 );
     color: var(--white-color);
   }
   .custom-btn-violet {
@@ -119,8 +124,12 @@
     background-color: var(--bg-primary-250);
     color: var(--white-color);
   }
+  .custom-btn-primary:active {
+    background-color: var(  --bg-primary-600);
+    color: var(--white-color);
+  }
   .custom-btn-dark:hover {
-    background-color: var(--bg-tertiary-500);
+    background-color: var(--bg-tertiary-100);
   }
   .custom-btn-danger {
     background-color: var(--dangerColor);
@@ -134,5 +143,14 @@
     color: var(--white-color);
   }
   .custom-btn-transparent:hover {
+  }
+  .custom-btn-teritiary{
+    color: var(--text-primary-300); 
+    border: 1px solid var(--border-primary-200) !important;
+  }
+  .custom-btn-teritiary:hover{
+    color: var(--white-color); 
+    background-color: var(--bg-primary-300 );
+    border: 1px solid var(--border-primary-200) !important;
   }
 </style>

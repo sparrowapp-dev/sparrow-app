@@ -11,7 +11,7 @@
   export let onUpdateEnvironment;
 </script>
 
-<div class="pb-3 ps-1 pe-1 w-100 h-100">
+<div class="d-flex flex-column w-100 h-100">
   <div class="pb-2" style="font-size: 12px; font-weight:500;">
     <div class="">
       <span class="d-flex">
@@ -47,7 +47,7 @@
       </span>
     </div>
   </div>
-  <section class="w-100" style="height: calc(100% - 60px); overflow-y: scroll;">
+  <section class="w-100" style="flex:1; overflow:auto;">
     {#if requestStateAuth === AuthType.NO_AUTH}
       <NoAuth />
     {:else if requestStateAuth === AuthType.API_KEY}

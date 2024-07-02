@@ -520,7 +520,7 @@
       }}
       placeholder="Example - OpenAPI JSON text or http://localhost:8080/api-docs"
       bind:value={importData}
-      class="mb-0 border-0 text-fs-12 rounded bg-tertiary-300 pe-4 ps-2 pb-2 pt-2"
+      class="text-area mb-0 border-0 text-fs-12 rounded bg-tertiary-300 pe-4 ps-2 pb-2 pt-2"
       style={!isValidServerDeployedURL &&
       !isValidServerJSON &&
       !isValidServerURL &&
@@ -544,15 +544,9 @@
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
       Please paste your OpenAPI specification text or Swagger/localhost link.
     </p>
-  {:else if (!isimportDataLoading && isValidClientURL && !isValidServerURL && isInputDataTouched) || (!isimportDataLoading && isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
+  {:else if (!isimportDataLoading && isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched) || (!isimportDataLoading && isValidClientURL && !isValidServerURL && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-      Unable to process the specified Swagger link. Please verify the URL for
-      accuracy and accessibility. If the problem persists, contact the API
-      provider for assistance.
-    </p>
-  {:else if (!isTextEmpty && !isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
-    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-      We have identified that text you pasted is not written in Open API
+      We have identified that the text you have pasted is not written in OpenAPI
       Specification (OAS). Please visit https://swagger.io/specification/ for
       more information on OAS.
     </p>
@@ -779,6 +773,9 @@
 </div>
 
 <style lang="scss">
+  .text-area::placeholder{
+    color: var( --text-tertiary-100);
+  }
   #file-input {
     display: none;
   }
@@ -974,10 +971,33 @@
     content: "";
     height: 16px;
     width: 16px;
-    background-color: white;
+    background-color: var(--bg-secondary-100);
     transition: 200ms;
   }
-
+  .form-check-input{
+    border: 1px solid var(--border-secondary-100);
+    background-color:  var(--bg-tertiary-300) !important;
+    background-image: none !important;
+  }
+  .form-check-input:checked:hover{
+    border: 3px solid var(--border-primary-300 ) ;
+    background-color: var(--bg-tertiary-300);
+    outline :5px solid var(--border-tertiary-300);
+    outline-offset: -1px;
+  }
+  .form-check-input:hover{
+    border: 3px solid var(--border-primary-300 ) ;
+    background-color: var(--bg-tertiary-300);
+    outline :5px solid var(--border-tertiary-300);
+    outline-offset: -1px;
+  }
+  .form-check-input:checked{
+    background-color: var(--bg-tertiary-250) !important;
+    border: 4.5px solid var(--border-primary-300 ) !important;
+  }
+  .form-check-label{
+    color: var(--text-secondary-100);
+  }
   input:checked + .slider {
     background-color: var(--sparrow-input-slider-button);
   }
