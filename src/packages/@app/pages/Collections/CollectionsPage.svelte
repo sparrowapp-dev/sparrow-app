@@ -17,6 +17,7 @@
     RestExplorerPage,
     CollectionExplorerPage,
     FolderExplorerPage,
+    WorkspaceExplorerPage
   } from "../";
   import {
     TabBar,
@@ -53,6 +54,13 @@
   import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
   import { isGuestUserActive } from "$lib/store";
   import { pagesMotion } from "@app/constants";
+ import { user } from "$lib/store";
+
+  export let modifiedUser;
+  user.subscribe((value) => {
+    modifiedUser = value;
+  });
+  export let handleChange;
 
   const _viewModel = new CollectionsViewModel();
 
@@ -278,6 +286,16 @@
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <FolderExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
+                  {:else if $activeTab?.type === ItemType.WORKSPACE}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div use:motion>
+                      <WorkspaceExplorerPage
+                        {collectionList}
+                        {modifiedUser}
+                        tab={$activeTab}
+                      />
                     </div>
                   </Motion>
                 {:else if !$tabList?.length}

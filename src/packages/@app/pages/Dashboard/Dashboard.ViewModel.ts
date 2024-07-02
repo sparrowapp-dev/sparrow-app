@@ -21,6 +21,7 @@ import { FeatureSwitchService } from "@app/services/feature-switch.service";
 import { FeatureSwitchRepository } from "@app/repositories/feature-switch.repository";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { v4 as uuidv4 } from "uuid";
+import { TeamAdapter } from "@app/adapter";
 
 export class DashboardViewModel {
   constructor() {}
@@ -115,39 +116,8 @@ export class DashboardViewModel {
     const response = await this.teamService.fetchTeams(userId);
     if (response?.isSuccessful && response?.data?.data) {
       const data = response.data.data.map((elem) => {
-        const {
-          _id,
-          name,
-          users,
-          logo,
-          workspaces,
-          owner,
-          admins,
-          createdAt,
-          createdBy,
-          updatedAt,
-          updatedBy,
-          isNewInvite,
-        } = elem;
-        const updatedWorkspaces = workspaces.map((workspace) => ({
-          workspaceId: workspace.id,
-          name: workspace.name,
-        }));
-        return {
-          teamId: _id,
-          name,
-          users,
-          logo,
-          workspaces: updatedWorkspaces,
-          owner,
-          admins,
-          isActiveTeam: false,
-          createdAt,
-          createdBy,
-          updatedAt,
-          updatedBy,
-          isNewInvite,
-        };
+        const teamAdapter = new TeamAdapter();
+        return teamAdapter.adapt(elem).getValue();
       });
       if (openTeamId) {
         data.forEach((elem) => {
