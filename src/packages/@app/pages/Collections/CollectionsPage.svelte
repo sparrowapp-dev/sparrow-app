@@ -248,6 +248,7 @@
         <section class="d-flex flex-column h-100">
           <TabBar
             tabList={$tabList}
+            {isGuestUser}
             onNewTabRequested={_viewModel.createNewTab}
             onTabClosed={closeTab}
             onDropEvent={_viewModel.onDropEvent}
