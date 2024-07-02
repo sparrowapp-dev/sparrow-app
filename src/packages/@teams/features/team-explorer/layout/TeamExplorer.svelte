@@ -1,25 +1,14 @@
 <script lang="ts">
   import table from "$lib/assets/table.svg";
   import hamburger from "$lib/assets/hamburger.svg";
-  //   import AllWorkspace from "$lib/components/dashboard/workspaces/AllWorkspace.svelte";
   import { workspaceView } from "$lib/store";
-  //   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
-  import Members from "$lib/components/workspace/members/Members.svelte";
-  import { notifications } from "@library/ui/toast/Toast";
-  import { onDestroy, onMount } from "svelte";
-  import type {
-    CurrentTeam,
-    Team,
-    TeamRepositoryMethods,
-    TeamServiceMethods,
-  } from "$lib/utils/interfaces";
+  import { onDestroy } from "svelte";
   import { SearchIcon } from "$lib/assets/app.asset";
-  //   import TeamInvite from "./team-invite/TeamInvite.svelte";
   import { base64ToURL } from "$lib/utils/helpers";
-  import { PeopleIcon, ShowMoreIcon } from "$lib/assets/app.asset";
+  import { PeopleIcon } from "$lib/assets/app.asset";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { TeamRole } from "$lib/utils/enums";
-  import { Button, Tooltip } from "@library/ui";
+  import { Button } from "@library/ui";
   import TeamNavigator from "../components/team-navigator/TeamNavigator.svelte";
   import {
     TeamTabsEnum,
@@ -27,33 +16,36 @@
   } from "@teams/common/constants/TeamTabs.constants";
   import { WorkspaceListView } from "../components";
   import WorkspaceGridView from "../components/workspace-grid-view/WorkspaceGridView.svelte";
-  //   import Settings from "./settings/Settings.svelte";
-  //   import Button from "../../../@library/ui/button/Button.svelte";
-  //   import ModalWrapperV1 from "../../../@library/ui/modal/Modal.svelte";
+  /**
+   * user ID
+   */
   export let userId: string;
-  // export let data: any;
-  // export let loaderColor = "default";
-  // export let handleWorkspaceSwitch: any;
-  // export let handleWorkspaceTab: any;
-  // export let activeSideBarTabMethods: any;
+  /**
+   * Open team details which is active
+   */
   export let openTeam: TeamDocument;
+  /**
+   * All the workspaces from local db
+   */
   export let workspaces: WorkspaceDocument[] = [];
+  /**
+   * Active Tab in team
+   */
   export let activeTeamTab: string;
+  /**
+   * Callback for updating active tab in team
+   */
   export let onUpdateActiveTab;
-  // export let currentTeam: CurrentTeam;
-  // export let handleCreateWorkspace: any,
-  //   teamServiceMethods: TeamServiceMethods,
-  //   teamRepositoryMethods: TeamRepositoryMethods,
-  //   workspaces;
-  // export let handleLeaveTeamModal: () => void;
-  // export let handleOnShowMoreClick: () => void;
-  // export let handleCloseShowMoreClick: () => void;
-  // export let isShowMoreVisible: boolean = false;
-  // export let workspaceUnderCreation = false;
-  // export let teams;
+  /**
+   * Callback For creating workspace
+   */
+  export let onCreateWorkspace: (id: string) => void;
+  /**
+   * Callback for switching workspace
+   */
+  export let onSwitchWorkspace: (id: string) => void;
 
-  let selectedTab = "all-workspace";
-  let selectedView: string;
+  let selectedView: string = "Grid";
 
   const selectedViewSubscribe = workspaceView.subscribe((value) => {
     selectedView = value;
@@ -61,17 +53,12 @@
 
   let userRole: string;
   const findUserType = () => {
-    console.log("in func");
     openTeam?.users.forEach((user) => {
-      console.log("user", user);
       if (user.id === userId) {
-        console.log("userrole", user.role);
         userRole = user.role;
       }
     });
   };
-
-  let previousTeamId: string;
 
   const refreshTabs = () => {
     return [
@@ -79,19 +66,22 @@
         name: "Workspaces",
         id: TeamTabsEnum.WORKSPACES,
         count: openTeam.workspaces?.length,
-        enable: true,
+        visible: true,
+        disabled: false,
       },
       {
         name: "Members",
         id: TeamTabsEnum.MEMBERS,
         count: openTeam.users?.length,
-        enable: true,
+        visible: true,
+        disabled: true,
       },
       {
         name: "Settings",
         id: TeamTabsEnum.SETTINGS,
         count: 0,
-        enable: openTeam?.owner === userId,
+        visible: openTeam?.owner === userId,
+        disabled: true,
       },
     ];
   };
@@ -105,17 +95,16 @@
     if (openTeam) {
       findUserType();
       teamTabs = refreshTabs();
-      // if (previousTeamId !== openTeam?.teamId) {
-      //   selectedTab = "all-workspace";
-      // }
-      // previousTeamId = openTeam?.teamId;
     }
   }
+
+  const handleCreateNewWorkspace = () => {
+    onCreateWorkspace(openTeam.teamId);
+  };
 
   onDestroy(() => {
     selectedViewSubscribe();
   });
-  let teamInvitePopup = false;
 </script>
 
 {#if openTeam}
@@ -180,6 +169,7 @@
                     textStyleProp={"font-size: var(--small-text)"}
                     buttonClassProp={`my-auto`}
                     buttonStyleProp={`height: 30px;`}
+                    onClick={handleCreateNewWorkspace}
                   />
                 {/if}
               </div>
@@ -237,13 +227,6 @@
               class={`bg-transparent w-100 border-0 my-auto`}
               placeholder="Search workspaces in {openTeam?.name}"
             />
-            <!-- {#if filterText !== ""}
-          <button
-            class="border-0 bg-transparent ms-2"
-          >
-            <CrossIcon color="#45494D" />
-          </button>
-        {/if} -->
           </div>
         </div>
       {/if}
@@ -256,19 +239,8 @@
           }) || []}
           userType={userRole}
           {userId}
+          {onSwitchWorkspace}
         />
-        <!-- <AllWorkspace
-          {userId}
-          data={workspaces?.filter((elem) => {
-            return elem?.team?.teamId === openTeam?.teamId;
-          }) || []}
-          {selectedTab}
-          {handleWorkspaceSwitch}
-          {handleWorkspaceTab}
-          {activeSideBarTabMethods}
-          {openTeam}
-          {userType}
-        /> -->
       {:else if selectedView == TeamViewEnum.GRID && activeTeamTab === TeamTabsEnum.WORKSPACES}
         <WorkspaceGridView
           {openTeam}
@@ -276,20 +248,10 @@
           workspaces={workspaces?.filter((elem) => {
             return elem?.team?.teamId === openTeam?.teamId;
           }) || []}
+          onCreateNewWorkspace={handleCreateNewWorkspace}
+          {onSwitchWorkspace}
         />
-        <!-- <WorkspaceCardList
-          {userId}
-          {handleCreateWorkspace}
-          {openTeam}
-          currActiveTeam={currentTeam}
-          workspaces={workspaces?.filter((elem) => {
-            return elem?.team?.teamId === openTeam?.teamId;
-          }) || []}
-          {handleWorkspaceSwitch}
-          {handleWorkspaceTab}
-          {activeSideBarTabMethods}
-          {workspaceUnderCreation}
-        /> -->
+        <!--Enabled in next phase-->
         <!-- {:else if selectedTab === "members"}
         <Members
           {userId}

@@ -2,7 +2,6 @@
   import type { Observable } from "rxjs";
   import { TeamExplorer } from "@teams/features";
   import { TeamExplorerPageViewModel } from "./TeamExplorerPage.ViewModel";
-  //   import type { Observable } from "rxjs";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { user } from "$lib/store";
   const _viewModel = new TeamExplorerPageViewModel();
@@ -23,4 +22,6 @@
   workspaces={$workspaces}
   activeTeamTab={$activeTeamTab}
   onUpdateActiveTab={_viewModel.updateActiveTeamTab}
+  onCreateWorkspace={_viewModel.handleCreateWorkspace}
+  onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
 />
