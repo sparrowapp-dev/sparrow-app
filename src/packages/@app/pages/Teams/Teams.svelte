@@ -23,8 +23,8 @@
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
   const collectionList = _viewModel.collection;
-  const collectionsMethods = _viewModel.activeWorkspace;
   const onApiClick = _viewModel.handleApiClick
+  const OnWorkspaceSwitch = _viewModel.handleSwitchWorkspace
   
 
   let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
@@ -83,9 +83,9 @@
         handleCollapseCollectionList,
       }}
        collectionList={$collectionList}
-      {collectionsMethods}
       {openTeam}
       {onApiClick}
+      {OnWorkspaceSwitch}
     />
   </Pane>
   <Pane

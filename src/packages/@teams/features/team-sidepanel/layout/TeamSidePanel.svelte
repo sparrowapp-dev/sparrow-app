@@ -5,17 +5,16 @@
   import { base64ToURL } from "$lib/utils/helpers";
   import { List } from "@library/ui";
   import { PeopleIcon } from "$lib/assets/app.asset";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
   import { version } from "../../../../../../src-tauri/tauri.conf.json";
-  import constants from "$lib/utils/constants";
   export let teamList: TeamDocument[] = [];
   export let tabList: TabDocument[] = [];
   export let data: any;
   export let collectionList;
   export let openTeam;
-  export let collectionsMethods;
   export let onApiClick;
   export let githubRepo;
+  export let OnWorkspaceSwitch;
+
   export let leftPanelController: {
     leftPanelCollapse: boolean;
     handleCollapseCollectionList: () => void;
@@ -38,9 +37,10 @@
   let isGithubStarHover = false;
 
   let activeIndex = 0;
-  function handleTeamClick(index) {
-    activeIndex = index;
-  }
+  
+  const handleTeamClick = (index) => {
+  activeIndex = index;
+};
 
   import { DoubleArrowIcon, GithubIcon } from "@library/icons";
   import WithButton from "@workspaces/common/hoc/WithButton.svelte";
@@ -167,7 +167,7 @@
         {data}
         {collectionList}
         {onApiClick}
-        {collectionsMethods}
+      
       />
 
       <hr class="mb-0 pb-0" />
@@ -182,7 +182,8 @@
     {activeSideBarTabMethods}
   />  -->
 
-      <RecentWorkspace {data} {openTeam} />
+      <RecentWorkspace {data} {openTeam}
+      {OnWorkspaceSwitch} />
     </div>
 
     <!-- github repo section -->
@@ -265,10 +266,6 @@
   }
   .new-team-btn:hover {
     background-color: var(--border-color);
-  }
-  .new-team-btn > img:hover {
-    filter: invert(86%) sepia(37%) saturate(4292%) hue-rotate(180deg)
-      brightness(101%) contrast(100%);
   }
   .teams-outer:hover {
     background-color: var(--bg-tertiary-250);

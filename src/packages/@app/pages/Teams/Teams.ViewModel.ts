@@ -39,18 +39,29 @@ export class TeamsViewModel {
     return this.teamRepository.getOpenTeam();
   }
 
+   /**
+   * Getting all workspace data
+   */
   public get workspaces() {
     return this.workspaceRepository.getWorkspaces();
   }
 
-  get activeWorkspace() {
-    return this.workspaceRepository.getActiveWorkspace();
-  }
-
+ 
+    /**
+   * Getting all the collection
+   */
   public get collection() {
     return this.collectionRepository.getCollection();
   }
 
+    /**
+   * Switch from one workspace to another
+   * @param id - Workspace id
+   */
+    public handleSwitchWorkspace = async (id: string) => {
+      await this.workspaceRepository.setActiveWorkspace(id);
+      navigate("/dashboard/collections");
+    };
 
   public handleApiClick = (api: any): void => {
    

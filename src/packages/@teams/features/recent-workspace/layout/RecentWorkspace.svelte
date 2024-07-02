@@ -4,26 +4,27 @@
   import constants from "$lib/utils/constants";
   export let data;
   export let openTeam;
+  export let OnWorkspaceSwitch;
 
-  console.log("Hello ji");
 </script>
 
 <section>
   <div class="d-flex justify-content-between p-3 pb-0">
-    <h6 class="teams-heading">Recent Workspaces</h6>
+    <h6 class="workspace-heading">Recent Workspaces</h6>
   </div>
-  <div class="sidebar-teams-list">
+  <div class="sidebar-workspace-list">
     {#if $data}
-      <List max-height={"calc((100vh - 350px) / 3)"} classProps={"px-2 py-0"}>
+      <List height={"calc((100vh - 350px) / 3)"} classProps={"px-1 py-0"}>
         {#each $data.slice().reverse() as list, index}
           {#if index < constants.WORKSPACE_LIMIT}
-            <!-- <div class="pb-0" on:click={() => handleOpenCollection(list)}> -->
+            <div class="recentWorkspace-tab"
+            on:click={() => OnWorkspaceSwitch(list._id)}>
             <div
-              class=" py-2 px-3 overflow-hidden rounded justify-content-between d-flex"
+              class=" w-100 py-2 px-3 overflow-hidden rounded justify-content-between d-flex workspace-list-data"
             >
               <div
-                class="overflow-hidden ellipsis"
-                style="width: calc(100% - 30px);"
+                class="overflow-hidden ellipsis  rounded"
+                style="width: 100%;"
               >
                 <p
                   class="mb-0 ellipsis overflow-hidden ellipsis"
@@ -39,7 +40,7 @@
                   {list?.team?.teamName}
                 </p>
               </div>
-
+              
               <PeopleIcon
                 color={openTeam?.teamId !== list.team.teamId
                   ? "var(--sparrow-text-color)"
@@ -48,10 +49,43 @@
               />
             </div>
 
-            <!-- </div> -->
+            </div>
           {/if}
         {/each}
       </List>
     {/if}
   </div>
 </section>
+
+
+<style>
+  .sidebar {
+    height: calc(100vh - 44px);
+  }
+  .workspace-heading {
+    margin-left: 5px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 21px;
+  }
+  .sidebar-workspace-list {
+    max-height: 30vh;
+  }
+
+  .workspace-list-data:hover{
+    background-color:var(--bg-tertiary-750);
+    cursor: pointer;
+
+  }
+  .workspace-list-data:active{
+    background-color:var( --bg-secondary-320) ;
+    cursor: pointer;
+
+  }
+
+  .title {
+    width: calc(100% - 40px);
+    text-align: left;
+  }
+
+</style>

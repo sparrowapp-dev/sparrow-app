@@ -5,7 +5,6 @@
   import constants from "$lib/utils/constants";
   export let tabList = [];
   export let collectionList;
-  export let collectionsMethods;
   export let data;
   export let onApiClick;
 </script>
@@ -24,7 +23,6 @@
             <ApiListItem
               {api}
               {data}
-              {collectionsMethods}
               {onApiClick}
               {collectionList}
             />
@@ -53,18 +51,7 @@
     font-weight: 700;
     line-height: 21px;
   }
-  
-  .new-team-btn {
-    background-color: transparent;
-  }
-  .new-team-btn:hover {
-    background-color: var(--border-color);
-  }
-  .new-team-btn > img:hover {
-    filter: invert(86%) sepia(37%) saturate(4292%) hue-rotate(180deg)
-      brightness(101%) contrast(100%);
-  }
- 
+   
   .sidebar-teams-list {
     max-height: 30vh;
   }

@@ -4,7 +4,6 @@
   export let api: any;
   export let data: any;
   export let collectionList;
-  export let collectionsMethods, activeSideBarTabMethods;
   export let onApiClick;
 
   const handleApiClick = (api) => {
@@ -76,13 +75,19 @@
 <style>
   .helper-container:hover,
   .helper-container:hover .api-type {
-    /* background-color: var(--border-color); */
-    background-color: #1c1d2b;
+    background-color: var(--bg-tertiary-750);
     cursor: pointer;
   }
+
+  .helper-container:active,
+  .helper-container:active .api-type {
+    background-color:var( --bg-secondary-320) ;
+    cursor: pointer;
+  }
+
+
   .api-type {
     display: flex;
-
     height: 34px;
     width: 56px;
     margin-right: 5px;
