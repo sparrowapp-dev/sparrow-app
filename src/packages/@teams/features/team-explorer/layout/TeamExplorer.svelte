@@ -361,7 +361,17 @@
     width: 27vw;
     font-size: 12px;
     position: relative;
+    border: 1px solid transparent;
   }
+  .search-input-container:hover {
+    border: 1px solid var(--border-primary-300);
+    caret-color: var(  --border-primary-300);
+   }
+
+   .search-input-container:focus-within {
+  border-color: var(--border-primary-300); 
+  caret-color: var( --border-primary-300);
+}
 
   #search-input:focus {
     outline: none;
