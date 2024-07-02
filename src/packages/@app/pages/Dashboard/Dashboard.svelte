@@ -25,6 +25,7 @@
   import Updater from "../../../@common/components/updater/Updater.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import Teams from "../Teams/Teams.svelte";
 
   const _viewModel = new DashboardViewModel();
   const userUnsubscribe = user.subscribe(async (value) => {
@@ -217,8 +218,8 @@
         <CollectionsPage />
       </Route>
 
-      <!-- Route for Workspaces -->
-      <!-- <Route path="/workspaces/*"><Collections /></Route> -->
+      <!-- Route for Team and workspaces - Home Tab -->
+      <Route path="/home/*"><Teams /></Route>
 
       <!-- Route for Mock -->
       <Route path="/mock/*"><Mock /></Route>

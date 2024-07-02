@@ -32,7 +32,7 @@ export class TeamRepository {
    * get all teams observable of user
    */
   public getTeams = (): Observable<TeamDocument[]> => {
-    return RxDB.getInstance().rxdb.team.find().$;
+    return RxDB.getInstance().rxdb.team.find().sort({ index: "asc" }).$;
   };
 
   /**

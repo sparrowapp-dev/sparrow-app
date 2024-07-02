@@ -2,15 +2,15 @@
   import { ThreeDotIcon } from "$lib/assets/app.asset";
   import { formatDateInString } from "$lib/utils/workspacetimeUtils";
   import { onDestroy } from "svelte";
-  import Card from "../card/Card.svelte";
-  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
-
+  // import Card from "../card/Card.svelte";
+  import { Card } from "..";
+  import MenuView from "../menu-view/MenuView.svelte";
   /**
    * Data of single workspace
    */
   export let workspace: any;
   /**
-   * User is admin or onwer
+   * User is admin or onwerc
    */
   export let isAdminOrOwner: boolean;
   /**
@@ -88,14 +88,7 @@
   on:contextmenu|preventDefault={closeRightClickContextMenu}
 />
 {#if showMenu}
-  <RightOption
-    xAxis={pos.x}
-    yAxis={pos.y}
-    {noOfRows}
-    {noOfColumns}
-    {menuItems}
-    w
-  />
+  <MenuView xAxis={pos.x} yAxis={pos.y} {noOfRows} {noOfColumns} {menuItems} />
 {/if}
 
 <div class="workspace-card-outer w-100">
