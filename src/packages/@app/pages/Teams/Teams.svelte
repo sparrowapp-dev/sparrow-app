@@ -23,6 +23,7 @@
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
+  const setOpenTeam = _viewModel.setOpenTeam;
 
   let isCreateTeamModalOpen: boolean = false;
   const collectionList = _viewModel.collection;
@@ -70,9 +71,10 @@
   }}
 >
   <Pane
+  
     size={$leftPanelCollapse ? 0 : $leftPanelWidth}
     minSize={20}
-    class="bg-secondary-900-important"
+    class="bg-secondary-900-important sidebar-left-panel"
   >
     <TeamSidePanel
       bind:isCreateTeamModalOpen
@@ -85,14 +87,15 @@
         handleCollapseCollectionList,
       }}
       collectionList={$collectionList}
-      {openTeam}
+      openTeam={$openTeam}
       {onApiClick}
       {OnWorkspaceSwitch}
+      {setOpenTeam}
     />
   </Pane>
   <Pane
     size={$leftPanelCollapse ? 100 : $rightPanelWidth}
-    minSize={20}
+    minSize={60}
     class="bg-secondary-800-important"
   >
     <TeamExplorerPage />
