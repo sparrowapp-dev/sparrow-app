@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { SearchIcon, CrossIcon } from "$lib/assets/app.asset";
+  import { SearchIcon } from "$lib/assets/app.asset";
+  import { CrossIcon } from "@library/icons";
   import { Member } from "../components";
   export let openTeam;
   export let workspaces = [];
@@ -64,70 +65,76 @@
   }
 </script>
 
-<section>
-  <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
-    <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
-    <input
-      type="text"
-      id="search-input-team-member"
-      class={`bg-transparent w-100 border-0 my-auto`}
-      placeholder="Search people in {openTeam?.name}"
-      bind:value={filterText}
-    />
-    {#if filterText !== ""}
-      <button class="border-0 bg-transparent ms-2" on:click={handleEraseSearch}>
-        <CrossIcon color="#45494D" />
-      </button>
+<div class="px-2 pt-2">
+  <section>
+    <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
+      <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
+      <input
+        type="text"
+        id="search-input-team-member"
+        class={`bg-transparent w-100 border-0 my-auto`}
+        placeholder="Search people in {openTeam?.name}"
+        bind:value={filterText}
+      />
+      {#if filterText !== ""}
+        <div class="clear-icon" on:click={handleEraseSearch}>
+          <CrossIcon
+            height="16px"
+            width="12px"
+            color="var(--icon-secondary-300)"
+          />
+        </div>
+      {/if}
+    </div>
+  </section>
+  <section class="member-list">
+    {#if filteredUser}
+      {#each filteredUser as user}
+        {#if user.id === userId}
+          <Member
+            owner={true}
+            {user}
+            {userType}
+            {openTeam}
+            workspaces={workspaces.filter((elem) => {
+              return elem?.team?.teamId === openTeam?.teamId;
+            })}
+            {userId}
+            {onRemoveMembersAtTeam}
+            {onDemoteToMemberAtTeam}
+            {onPromoteToAdminAtTeam}
+            {onPromoteToOwnerAtTeam}
+            {onRemoveUserFromWorkspace}
+            {onChangeUserRoleAtWorkspace}
+          />
+          <hr />
+        {/if}
+      {/each}
+      {#each filteredUser as user}
+        {#if user.id !== userId}
+          <Member
+            {user}
+            {userType}
+            {openTeam}
+            workspaces={workspaces.filter((elem) => {
+              return elem?.team?.teamId === openTeam?.teamId;
+            })}
+            {userId}
+            {onRemoveMembersAtTeam}
+            {onDemoteToMemberAtTeam}
+            {onPromoteToAdminAtTeam}
+            {onPromoteToOwnerAtTeam}
+            {onRemoveUserFromWorkspace}
+            {onChangeUserRoleAtWorkspace}
+          />
+        {/if}
+      {/each}
     {/if}
-  </div>
-</section>
-<section class="member-list">
-  {#if filteredUser}
-    {#each filteredUser as user}
-      {#if user.id === userId}
-        <Member
-          owner={true}
-          {user}
-          {userType}
-          {openTeam}
-          workspaces={workspaces.filter((elem) => {
-            return elem?.team?.teamId === openTeam?.teamId;
-          })}
-          {userId}
-          {onRemoveMembersAtTeam}
-          {onDemoteToMemberAtTeam}
-          {onPromoteToAdminAtTeam}
-          {onPromoteToOwnerAtTeam}
-          {onRemoveUserFromWorkspace}
-          {onChangeUserRoleAtWorkspace}
-        />
-        <hr />
-      {/if}
-    {/each}
-    {#each filteredUser as user}
-      {#if user.id !== userId}
-        <Member
-          {user}
-          {userType}
-          {openTeam}
-          workspaces={workspaces.filter((elem) => {
-            return elem?.team?.teamId === openTeam?.teamId;
-          })}
-          {userId}
-          {onRemoveMembersAtTeam}
-          {onDemoteToMemberAtTeam}
-          {onPromoteToAdminAtTeam}
-          {onPromoteToOwnerAtTeam}
-          {onRemoveUserFromWorkspace}
-          {onChangeUserRoleAtWorkspace}
-        />
-      {/if}
-    {/each}
-  {/if}
-  {#if !filteredUser?.length}
-    <p class="not-found-text mt-3">No results found.</p>
-  {/if}
-</section>
+    {#if !filteredUser?.length}
+      <p class="not-found-text mt-3">No results found.</p>
+    {/if}
+  </section>
+</div>
 
 <style>
   .tile {
@@ -152,16 +159,28 @@
 
   .search-input-container {
     border: 1px solid var(--border-color);
-    background: var(--background-color);
+    background: var(--bg-tertiary-400);
     width: 27vw;
     font-size: 12px;
+    position: relative;
+    border: 1px solid transparent;
   }
+
   .search-input-container > input:focus {
     outline: none;
     caret-color: var(--workspace-hover-color);
   }
   .search-input-container:focus-within {
     border: 1px solid var(--workspace-hover-color);
+  }
+
+  .search-input-container:hover {
+    border: 1px solid var(--border-primary-300);
+    caret-color: var(--border-primary-300);
+  }
+  .search-input-container:focus-within {
+    border-color: var(--border-primary-300);
+    caret-color: var(--border-primary-300);
   }
   .not-found-text {
     color: var(--request-arc);
@@ -172,5 +191,13 @@
   .member-list {
     height: calc(100vh - 310px);
     overflow-y: auto;
+  }
+  .clear-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
   }
 </style>

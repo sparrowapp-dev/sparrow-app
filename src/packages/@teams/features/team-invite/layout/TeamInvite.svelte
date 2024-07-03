@@ -20,6 +20,7 @@
   export let userId;
 
   import closeIconWhite from "$lib/assets/close-icon-white.svg";
+  import { Select } from "@library/forms";
   let emailstoBeSentArr: string[] = [];
   let isAllSelectedCheck = false;
   let teamSpecificWorkspace = workspaces.map((elem) => {
@@ -244,62 +245,54 @@
     />
   </div>
   {#if emailError && invalidEmails.length}
-    <p class="error-text sparrow-fs-12">One or more Email IDs are invalid</p>
+    <p class="error-text sparrow-fs-12">
+      Invalid email address, please check and enter correct email address.
+    </p>
   {:else if emailError && emailstoBeSentArr.length === 0}
-    <p class="error-text">Email ID cannot be Empty.</p>
+    <p class="error-text">Email ID cannot be empty.</p>
   {/if}
 </div>
 
 <div class="mt-4">
   <p class="role-title mb-1">Role<span class="asterik">*</span></p>
-  <Dropdown
-    dropDownType={{ type: "text", title: selectedRole ? selectedRole : "" }}
-    dropdownId="invite-team"
+  <Select
+    id="invite-team"
+    titleId={selectedRole ? selectedRole : ""}
     data={[
       {
         name: "Select",
         id: "select",
         description: "Select role",
-        dynamicClasses: "text-whiteColor",
         hide: true,
       },
       {
         name: "Admin",
         id: WorkspaceRole.WORKSPACE_ADMIN,
         description:
-          "Add & edit resources within a workspace,add & remove members to workspace",
-        dynamicClasses: "text-whiteColor",
+          "Add & edit resources within a workspace, add & remove members to a workspace.",
       },
-      {
-        name: "Editor",
-        id: WorkspaceRole.WORKSPACE_EDITOR,
-        description: "Add & edit resources within a workspace",
-        dynamicClasses: "text-whiteColor",
-      },
-      {
-        name: "Viewer",
-        id: WorkspaceRole.WORKSPACE_VIEWER,
-        description: "View Resources within a workspace.",
-        dynamicClasses: "text-whiteColor",
-      },
+      // {
+      //   name: "Editor",
+      //   id: WorkspaceRole.WORKSPACE_EDITOR,
+      //   description: "Add & edit resources within a workspace",
+      // },
+      // {
+      //   name: "Viewer",
+      //   id: WorkspaceRole.WORKSPACE_VIEWER,
+      //   description: "View Resources within a workspace.",
+      // },
     ]}
     onclick={handleDropdown}
-    staticClasses={[
-      {
-        id: `invite-team-dropdown-${selectedRole}`,
-        classToAdd: ["border", "rounded", "py-1"],
-      },
-      {
-        id: "invite-team-options-container",
-        classToAdd: ["end-0", "start-0"],
-      },
-    ]}
-  ></Dropdown>
+    position={"absolute"}
+    menuItem={"v2"}
+    bodyTheme={"violet"}
+    headerTheme={"violet2"}
+    borderRounded={"4px"}
+  />
 </div>
 {#if selectedRole === TeamRole.TEAM_ADMIN}
   <p class="invite-subheader text-textColor mt-1 mb-1">
-    Admins will get access to all the current workspaces as well as any future
-    workspaces in the team.
+    Admins will have access to all current and future team workspaces.
   </p>
 {/if}
 {#if roleError && selectedRole === "select"}

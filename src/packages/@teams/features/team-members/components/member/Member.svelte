@@ -536,7 +536,7 @@
         headerTheme={"transparent"}
         borderType={"none"}
         headerFontSize={"10px"}
-        disabled={false}
+        disabled={true}
       />
     {:else if userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN}
       <Select
@@ -547,7 +547,7 @@
         menuItem={"v2"}
         headerTheme={"transparent"}
         borderType={"none"}
-        disabled={false}
+        disabled={true}
         headerFontSize={"10px"}
       />
     {:else}

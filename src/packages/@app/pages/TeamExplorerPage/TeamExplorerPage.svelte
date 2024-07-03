@@ -57,5 +57,5 @@
     handleModalState={(flag) => {
       isTeamInviteModalOpen = flag;
     }}
-  /></Modal
->
+  />
+</Modal>

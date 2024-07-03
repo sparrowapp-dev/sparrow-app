@@ -277,6 +277,12 @@ export class TeamExplorerPageViewModel {
     navigate("/dashboard/collections");
   };
 
+  /**
+   * Invites new user to the team
+   * @param _teamId - Team id in which users are invited.
+   * @param _inviteBody - New team meta data.
+   * @param _userId - Used id to be invited.
+   */
   public handleTeamInvite = async (
     _teamId: string,
     _inviteBody: InviteBody,
@@ -312,6 +318,13 @@ export class TeamExplorerPageViewModel {
     return response;
   };
 
+  /**
+   * Removess a user from a specified team.
+   * @param _teamId - The ID of the team.
+   * @param _teamName - The name of the team.
+   * @param _userId - The ID of the user.
+   * @param _userName - The name of the user.
+   */
   public removeMembersAtTeam = async (
     _teamId: string,
     _teamName: string,
@@ -333,6 +346,13 @@ export class TeamExplorerPageViewModel {
     return response;
   };
 
+  /**
+   * Demoted a user to member status in a specified team.
+   * @param _teamId - The ID of the team.
+   * @param _teamName - The name of the team.
+   * @param _userId - The ID of the user.
+   * @param _userName - The name of the user.
+   */
   public demoteToMemberAtTeam = async (
     _teamId: string,
     _teamName: string,
@@ -356,6 +376,13 @@ export class TeamExplorerPageViewModel {
     return response;
   };
 
+  /**
+   * Promotes a user to admin status in a specified team.
+   * @param _teamId - The ID of the team.
+   * @param _teamName - The name of the team.
+   * @param _userId - The ID of the user.
+   * @param _userName - The name of the user.
+   */
   public promoteToAdminAtTeam = async (
     _teamId: string,
     _teamName: string,
@@ -379,6 +406,13 @@ export class TeamExplorerPageViewModel {
     return response;
   };
 
+  /**
+   * Promotes a user to owner status in a specified team.
+   * @param _teamId - The ID of the team.
+   * @param _teamName - The name of the team.
+   * @param _userId - The ID of the user.
+   * @param _userName - The name of the user.
+   */
   public promoteToOwnerAtTeam = async (
     _teamId: string,
     _teamName: string,
@@ -404,6 +438,13 @@ export class TeamExplorerPageViewModel {
     return response;
   };
 
+  /**
+   * Removes a user from a workspace.
+   * @param _workspaceId - The ID of the workspace where remove user is to take place.
+   * @param _workspaceName - The name of the workspace where remove user is to take place.
+   * @param _userId - The ID of the user who is being removed.
+   * @param _userName - The name of the user who is being removed.
+   */
   public removeUserFromWorkspace = async (
     _workspaceId: string,
     _workspaceName: string,
@@ -424,6 +465,14 @@ export class TeamExplorerPageViewModel {
     }
   };
 
+  /**
+   * Change the role of a user in a workspace.
+   * @param _workspaceId - The ID of the workspace where the role change is to take place.
+   * @param _workspaceName - The name of the workspace where the role change is to take place.
+   * @param _userId - The ID of the user whose role is being changed.
+   * @param _userName - The name of the user whose role is being changed.
+   * @param _body - Users role at workspace level example => editor or viewer.
+   */
   public changeUserRoleAtWorkspace = async (
     _workspaceId: string,
     _workspaceName: string,
