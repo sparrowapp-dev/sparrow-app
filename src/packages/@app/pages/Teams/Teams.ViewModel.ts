@@ -11,6 +11,7 @@ import { GithubRepoReposistory } from "@app/repositories/github-repo.repository"
 import { GithubService } from "@app/services/github.service";
 import { moveNavigation } from "$lib/utils/helpers";
 import { navigate } from "svelte-navigator";
+import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
 export class TeamsViewModel {
   constructor() {}
   private teamRepository = new TeamRepository();
@@ -135,6 +136,11 @@ export class TeamsViewModel {
    */
   public handleSwitchWorkspace = async (id: string) => {
     await this.workspaceRepository.setActiveWorkspace(id);
+    const res = await this.workspaceRepository.readWorkspace(id);
+    const initWorkspaceTab = new InitWorkspaceTab(id, id);
+    initWorkspaceTab.updateId(id);
+    initWorkspaceTab.updateName(res.name);
+    this.tabRepository.createTab(initWorkspaceTab.getValue());
     navigate("/dashboard/collections");
   };
 

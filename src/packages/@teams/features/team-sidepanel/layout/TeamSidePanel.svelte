@@ -247,6 +247,10 @@
   .teams-outer:hover {
     background-color: var(--bg-tertiary-250);
   }
+
+  .teams-outer:active {
+    background-color: var(--bg-secondary-320);
+  }
   .teams-outer img {
     width: 25px;
     height: 25px;
