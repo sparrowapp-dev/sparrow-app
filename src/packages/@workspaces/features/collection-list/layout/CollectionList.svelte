@@ -94,6 +94,7 @@
   let collectionListDocument: CollectionDocument[];
   let searchData: string = "";
   let addButtonMenu: boolean = false;
+  let activeWorkspace: WorkspaceDocument;
 
   export let scrollList;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
@@ -151,7 +152,27 @@
   const handleSearch = () => {
     collectionFilter = searchCollection(searchData, collectionListDocument);
   };
-
+  $: {
+    if (currentWorkspace) {
+      currentWorkspace.subscribe((value) => {
+        activeWorkspace = value;
+        collectionListDocument = collectionListDocument?.filter(
+          (value) => value.workspaceId === activeWorkspace?._id,
+        );
+      });
+    }
+  }
+  $: {
+    if (collectionList) {
+      collectionList.subscribe((value) => {
+        collectionListDocument = value;
+        collectionListDocument = collectionListDocument?.filter(
+          (value) => value.workspaceId === activeWorkspace?._id,
+        );
+        collectionFilter = searchCollection(searchData, collectionListDocument);
+      });
+    }
+  }
   collectionList?.subscribe((value) => {
     if (value) {
       collectionListDocument = value;

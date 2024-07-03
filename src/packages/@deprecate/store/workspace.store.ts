@@ -2,7 +2,7 @@ import type { CurrentWorkspace } from "$lib/utils/interfaces/workspace.interface
 import { writable } from "svelte/store";
 export const isWorkspaceCreatedFirstTime = writable(false);
 export const isWorkspaceLoaded = writable(true);
-export const workspaceView = writable("GRID");
+export const workspaceView = writable("Grid");
 
 export const workspaceLeftPanelWidth = writable(20);
 export const workspaceRightPanelWidth = writable(80);

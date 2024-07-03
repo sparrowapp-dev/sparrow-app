@@ -25,18 +25,24 @@
   import Updater from "../../../@common/components/updater/Updater.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import Teams from "../Teams/Teams.svelte";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import CreateWorkspace from "@teams/features/create-workspace/layout/CreateWorkspace.svelte";
 
   const _viewModel = new DashboardViewModel();
+  let userId;
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
       // await _viewModel.refreshTeams(value._id);
       // await _viewModel.refreshWorkspaces(value._id);
+      userId - value?._id;
       await _viewModel.refreshTeamsWorkspaces(value._id);
     }
   });
   const refreshEnv = _viewModel.refreshEnvironment;
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.getActiveWorkspace();
+  let workspaceDocuments;
 
   let currentEnvironment = {
     id: "none",
@@ -46,6 +52,7 @@
   let isPopupOpen = false;
   let isLoginBannerActive = false;
   let isGuestUser = false;
+  let isWorkspaceModalOpen = false;
 
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
@@ -53,12 +60,16 @@
 
   let currentWorkspaceId = "";
   let currentWorkspaceName = "";
+  let currentTeamName = "";
+  let currentTeamId = "";
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
         currentWorkspaceId = activeWorkspaceRxDoc._id;
         currentWorkspaceName = activeWorkspaceRxDoc.name;
+        currentTeamName = activeWorkspaceRxDoc.team?.teamName;
+        currentTeamId = activeWorkspaceRxDoc.team?.teamId;
         refreshEnv(activeWorkspaceRxDoc?._id);
         const envIdInitiatedToWorkspace =
           activeWorkspaceRxDoc.get("environmentId");
@@ -97,6 +108,7 @@
     await _viewModel.updateGuestBannerState();
     isLoginBannerActive = false;
   };
+  let teamDocuments;
 
   onMount(async () => {
     _viewModel.getAllFeatures();
@@ -105,6 +117,8 @@
     if (guestUser?.isBannerActive) {
       isLoginBannerActive = guestUser?.isBannerActive;
     }
+    workspaceDocuments = await _viewModel.workspaces();
+    teamDocuments = await _viewModel.getTeamData();
   });
 
   onDestroy(() => {
@@ -172,9 +186,14 @@
     onInitActiveEnvironmentToWorkspace={_viewModel.initActiveEnvironmentToWorkspace}
     {currentWorkspaceId}
     {currentWorkspaceName}
+    {currentTeamName}
+    {currentTeamId}
     {isGuestUser}
     {isLoginBannerActive}
     onLoginUser={handleGuestLogin}
+    {workspaceDocuments}
+    onCreateWorkspace={() => (isWorkspaceModalOpen = true)}
+    onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
   />
 
   <!--
@@ -217,8 +236,8 @@
         <CollectionsPage />
       </Route>
 
-      <!-- Route for Workspaces -->
-      <!-- <Route path="/workspaces/*"><Collections /></Route> -->
+      <!-- Route for Team and workspaces - Home Tab -->
+      <Route path="/home/*"><Teams /></Route>
 
       <!-- Route for Mock -->
       <Route path="/mock/*"><Mock /></Route>
@@ -254,3 +273,23 @@
   title={"Confirm Login?"}
   description={"After continuing your data will be lost, do you want to continue?"}
 />
+
+<ModalWrapperV1
+  title={"New Workspace"}
+  type={"primary"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isWorkspaceModalOpen}
+  handleModalState={(flag) => {
+    isWorkspaceModalOpen = flag;
+  }}
+>
+  <CreateWorkspace
+    {teamDocuments}
+    {userId}
+    handleModalState={(flag = false) => {
+      isWorkspaceModalOpen = flag;
+    }}
+    onCreateWorkspace={_viewModel.handleCreateWorkspace}
+  />
+</ModalWrapperV1>
