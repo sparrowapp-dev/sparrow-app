@@ -26,19 +26,6 @@ export default class WorkspaceExplorerViewModel {
   };
 
   /**
-   * Handles the creation of a new workspace tab.
-   * @returns A promise that resolves when the workspace tab has been created.
-   */
-
-  public handleCreateWorkspace = async () => {
-    const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
-
-    // this.tabRepository.createTab(
-    //   new InitWorkspaceTab("UNTRAvdcdcCKED-" + uuidv4(), ws._id).getValue(),
-    // );
-  };
-
-  /**
    * Updates the name of a workspace and reflects the changes in the associated tab.
    * @param - The ID of the workspace to be updated.
    * @param - The new name for the workspace.
