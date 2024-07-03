@@ -135,7 +135,7 @@
         isDropIconFilled={true}
         borderType={"none"}
         borderActiveType={"none"}
-        headerHighlight={""}
+        headerHighlight={"hover-active"}
         headerTheme={"transparent"}
         menuItem={"v2"}
         headerFontSize={"12px"}
