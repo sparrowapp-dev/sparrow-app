@@ -60,29 +60,25 @@
 
     const emailDiv: HTMLElement = createDynamicComponents(
       "div",
-      `d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center ${
-        !isValidEmail ? "border border-danger" : ""
+      `d-flex  email-container-item ps-2 me-1 justify-content-center rounded-1 align-items-center ${
+        !isValidEmail
+          ? "email-container-item-invalid"
+          : "email-container-item-valid"
       }`,
     );
-    const emailContentSpan = createDynamicComponents("span", "");
-    const closeIconBtn = createDynamicComponents("img", "bg-transparent", [
-      { eventType: "click", eventHandler: removeElement },
-      {
-        eventType: "mouseleave",
-        eventHandler: () => {
-          closeIconBtn.src = closeIcon;
-        },
-      },
-      {
-        eventType: "mouseenter",
-        eventHandler: () => {
-          closeIconBtn.src = closeIconWhite;
-        },
-      },
-    ]) as HTMLImageElement;
+    const emailContentSpan = createDynamicComponents("span", `text-fs-12`);
+    const closeIconBtn = createDynamicComponents(
+      "img",
+      `bg-transparent email-container-img ${
+        !isValidEmail
+          ? "email-container-img-invalid"
+          : "email-container-img-valid"
+      }`,
+      [{ eventType: "click", eventHandler: removeElement }],
+    ) as HTMLImageElement;
     emailDiv.id = email;
     closeIconBtn.id = email;
-    closeIconBtn.src = closeIcon;
+    closeIconBtn.src = closeIconWhite;
     emailContentSpan.innerHTML = email;
     emailDiv.appendChild(emailContentSpan);
     emailDiv.appendChild(closeIconBtn);
@@ -156,7 +152,7 @@
                 };
               }),
           };
-          const response = await onInviteClick(teamId, data, userId);
+          const response = await onInviteClick(teamId, teamName, data, userId);
           if (response.isSuccessful) {
             handleModalState(false);
           }
@@ -167,7 +163,7 @@
           role: selectedRole,
           teamId: teamId,
         };
-        const response = await onInviteClick(teamId, data, userId);
+        const response = await onInviteClick(teamId, teamName, data, userId);
         if (response.isSuccessful) {
           handleModalState(false);
         }
@@ -200,15 +196,16 @@
   };
 </script>
 
-<div class="d-flex flex-column">
-  <p class="invite-header mb-0">
-    Invite By Email<span class="asterik">*</span>
+<div class="d-flex flex-column pt-2">
+  <p class="invite-header text-secondary-1000 mb-0">
+    Invite by Email<span class="asterik">*</span>
   </p>
-  <p class="invite-subheader text-textColor mt-0 mb-1">
-    Use commas to separate emails
+  <p class="invite-subheader text-secondary-200 mt-0 mb-1">
+    Use comma to separate emails.
   </p>
   <div
-    class="email-container rounded {emailError && emailstoBeSentArr.length === 0
+    class="email-container rounded {(emailError && invalidEmails.length) ||
+    (emailError && emailstoBeSentArr.length === 0)
       ? 'isError'
       : ''}"
   >
@@ -220,7 +217,7 @@
       autocapitalize="none"
       style="outline:none;border:none;flex-grow:1; background:transparent;"
       bind:value={currentEmailEntered}
-      class="input-container mt-2"
+      class="input-container text-fs-12"
       on:keyup={(event) => {
         if (
           (event.key === "," || event.key === "Enter" || event.key === " ") &&
@@ -252,7 +249,9 @@
 </div>
 
 <div class="mt-4">
-  <p class="role-title mb-1">Role<span class="asterik">*</span></p>
+  <p class="role-title text-fs-14 text-secondary-1000 mb-1">
+    Role<span class="asterik">*</span>
+  </p>
   <Select
     id="invite-team"
     titleId={selectedRole ? selectedRole : ""}
@@ -286,6 +285,7 @@
     bodyTheme={"violet"}
     headerTheme={"violet2"}
     borderRounded={"4px"}
+    isError={roleError && selectedRole === "select"}
   />
 </div>
 {#if selectedRole === TeamRole.TEAM_ADMIN}
@@ -363,7 +363,7 @@
   .email-container {
     display: flex;
     flex-wrap: wrap;
-    background-color: transparent;
+    background-color: var(--bg-tertiary-300);
     border: 1px solid;
     padding: 3px 8px 3px 8px;
     border: 1px solid var(--border-color);
@@ -386,5 +386,42 @@
   }
   .isError {
     border: 1px solid var(--error--color) !important;
+  }
+  :global(.email-container-item) {
+    height: 26px;
+    border: 1px solid transparent;
+    background-color: var(--bg-tertiary-750);
+  }
+  :global(.email-container-item-invalid) {
+    color: var(--text-danger-200);
+  }
+  :global(.email-container-item-invalid:hover) {
+    border: 1px solid var(--text-danger-200);
+    background-color: var(--bg-tertiary-600);
+  }
+  :global(.email-container-item-valid) {
+    color: var(--text-secondary-100);
+  }
+  :global(.email-container-item-valid:hover) {
+    background-color: var(--bg-tertiary-600);
+  }
+  input::placeholder {
+    color: var(--text-secondary-200);
+  }
+  .email-container:hover {
+    border: 1px solid var(--bg-primary-300);
+  }
+  :global(.email-container-img-invalid) {
+    filter: brightness(0) saturate(100%) invert(60%) sepia(64%) saturate(544%)
+      hue-rotate(308deg) brightness(109%) contrast(99%);
+  }
+  :global(.email-container-img-valid) {
+    filter: brightness(0) saturate(100%) invert(65%) sepia(13%) saturate(217%)
+      hue-rotate(166deg) brightness(87%) contrast(85%);
+  }
+  :global(.email-container-img) {
+    height: 22px;
+    width: 22px;
+    cursor: pointer;
   }
 </style>

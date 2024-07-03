@@ -512,7 +512,7 @@
   <div
     class="info d-flex align-items-center"
     on:click={() => {
-      memberPopObj.isMemberInfoPopup = true;
+      // memberPopObj.isMemberInfoPopup = true;
     }}
   >
     <div class="icon d-flex align-items-center justify-content-center">
@@ -568,13 +568,17 @@
 
 <style lang="scss">
   .tile:hover {
-    background-color: var(--background-light) !important;
+    background-color: var(--bg-tertiary-600) !important;
+    .name span:nth-child(1) {
+      color: var(--text-primary-300) !important;
+    }
   }
   .icon {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-secondary-300);
+    background-color: var(--bg-tertiary-750);
   }
   .info {
     width: calc(100% - 120px);
