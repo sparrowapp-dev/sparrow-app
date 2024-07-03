@@ -46,59 +46,6 @@
   export let workspaceDocuments: WorkspaceDocument[] = [];
 
   export let onCreateWorkspace;
-
-  let workspaceData;
-
-  // function createSetFromArray(arr, key) {
-  //   const seen = new Set();
-  //   return arr.filter((obj) => {
-  //     if (!obj.hasOwnProperty(key)) {
-  //       throw new Error(`Object does not have key "${key}"`);
-  //     }
-  //     const keyValue = obj[key];
-  //     return !seen.has(keyValue) && seen.add(keyValue);
-  //   });
-  // }
-
-  // const calculateLimitedWorkspace = () => {
-  //   let workspaces = workspaceDocuments
-  //     .filter((elem) => {
-  //       if (currentTeam?.id === elem?.team?.teamId) return true;
-  //       return false;
-  //     })
-  //     .reverse()
-  //     .slice(0, constants.WORKSPACE_LIMIT)
-  //     .map((workspace) => {
-  //       const workspaceObj = {
-  //         id: workspace._id,
-  //         name: workspace.name,
-  //         description: workspace.team?.teamName,
-  //       };
-  //       return workspaceObj;
-  //     });
-  //   workspaces.push({
-  //     id: currentWorkspaceId,
-  //     name: currentWorkspaceName,
-  //     description: currentTeam?.name,
-  //   });
-  //   const res = createSetFromArray(workspaces, "name");
-  //   if (res.length > constants.WORKSPACE_LIMIT) {
-  //     res.shift();
-  //   }
-  //   workspaceData = res;
-  //   return;
-  // };
-
-  $: {
-    if (currentWorkspaceId || currentTeam) {
-      // calculateLimitedWorkspace();
-    }
-  }
-  $: {
-    if (workspaceDocuments) {
-      console.log("--->workspacedocs", workspaceDocuments);
-    }
-  }
 </script>
 
 <header
