@@ -1,11 +1,17 @@
 <script lang="ts">
   import { Tooltip } from "@library/ui/tooltip";
   import plus from "$lib/assets/plus.svg";
+  import { DoubleArrowIcon, GithubIcon } from "@library/icons";
+  import WithButton from "@workspaces/common/hoc/WithButton.svelte";
+  import type { TabDocument, TeamDocument } from "@app/database/database";
+  import RecentApi from "@teams/features/recent-apis/layout/RecentApi.svelte";
+  import RecentWorkspace from "@teams/features/recent-workspace/layout/RecentWorkspace.svelte";
 
   import { base64ToURL } from "$lib/utils/helpers";
   import { List } from "@library/ui";
   import { PeopleIcon } from "$lib/assets/app.asset";
   import { version } from "../../../../../../src-tauri/tauri.conf.json";
+    import constants from "$lib/utils/constants";
   export let teamList: TeamDocument[] = [];
   export let tabList: TabDocument[] = [];
   export let isCreateTeamModalOpen;
@@ -14,41 +20,31 @@
   export let openTeam;
   export let onApiClick;
   export let githubRepo;
+  export let setOpenTeam;
   export let OnWorkspaceSwitch;
+
+  const externalSparrowGithub = constants.SPARROW_GITHUB;
+
 
   export let leftPanelController: {
     leftPanelCollapse: boolean;
     handleCollapseCollectionList: () => void;
   };
 
-  //this is dummy data for teting ui the atual data will be from  TeamList which is comment above
-  // let teamList = [
-  //   { teamId: 1, name: "Team Alpha", logo: "", isNewInvite: true },
-  //   { teamId: 2, name: "Team Beta", logo: "", isNewInvite: false },
-  //   { teamId: 3, name: "Team Gamma", logo: "", isNewInvite: true },
-  //   { teamId: 4, name: "Team Delta", logo: "", isNewInvite: false },
-  //   { teamId: 5, name: "Team Epsilon", logo: "", isNewInvite: true },
-  //   { teamId: 6, name: "Team Zeta", logo: "", isNewInvite: false },
-  //   { teamId: 6, name: "Team Zeta", logo: "", isNewInvite: false },
-
-  // ];
-
-  import { navigate } from "svelte-navigator";
-
   let isGithubStarHover = false;
 
-  let activeIndex = 0;
+  let activeIndex ;
 
-  const handleTeamClick = (index) => {
-    activeIndex = index;
+  const handleTeamClick = (id) => {
+    setOpenTeam(id);
+    activeIndex = id;
   };
 
-  import { DoubleArrowIcon, GithubIcon } from "@library/icons";
-  import WithButton from "@workspaces/common/hoc/WithButton.svelte";
-  import ApiListItem from "@teams/common/components/api-list-items/ApiListItem.svelte";
-  import type { TabDocument, TeamDocument } from "@app/database/database";
-  import RecentApi from "@teams/features/recent-apis/layout/RecentApi.svelte";
-  import RecentWorkspace from "@teams/features/recent-workspace/layout/RecentWorkspace.svelte";
+  $: {
+    if (openTeam) {
+      activeIndex = openTeam.teamId;
+    }
+  }
 </script>
 
 {#if leftPanelController.leftPanelCollapse}
@@ -114,9 +110,9 @@
               <button
                 class={`d-flex w-100 mb-1 
             px-3 align-items-center justify-content-between rounded teams-outer border-0 ${
-              index === activeIndex ? "active" : ""
+              team.teamId === activeIndex ? "active" : ""
             }`}
-                on:click={() => handleTeamClick(index)}
+                on:click={() => handleTeamClick(team.teamId)}
               >
                 <div class=" d-flex w-100 overflow-hidden">
                   {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
@@ -141,8 +137,8 @@
                     NEW INVITE
                   </p>
                 {:else}
-                  <PeopleIcon
-                    color={index === activeIndex
+                       <PeopleIcon
+                    color={team.teamId === activeIndex
                       ? "var(--sparrow-text-color)"
                       : "var(--defaultcolor)"}
                     classProp={team.users?.length <= 1 && "d-none"}
@@ -154,31 +150,15 @@
         </div>
       </section>
 
-      <!-- Recent APIs-->
       <hr class="mb-0 pb-0" />
 
-      <!-- //deprecate -->
-      <!-- <RecentApi
-    {tabList}
-    {data}
-    {collectionList}
-    {collectionsMethods}
-    {activeSideBarTabMethods}
-  /> -->
+      <!-- Recent APIs-->
 
       <RecentApi {tabList} {data} {collectionList} {onApiClick} />
 
       <hr class="mb-0 pb-0" />
 
       <!-- Recent Workspace Section -->
-
-      <!-- <RecentWorkspace
-    {data}
-    {openTeam}
-    {handleWorkspaceSwitch}
-    {handleWorkspaceTab}
-    {activeSideBarTabMethods}
-  />  -->
 
       <RecentWorkspace {data} {openTeam} {OnWorkspaceSwitch} />
     </div>
