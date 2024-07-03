@@ -8,11 +8,9 @@
     createDynamicComponents,
     validateEmail,
   } from "$lib/utils/helpers";
-  import { notifications } from "@library/ui/toast/Toast";
 
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@library/ui";
 
   export let onInviteClick;
   export let workspaces;
@@ -307,59 +305,6 @@
     <p class="invite-subheader text-textColor mt-0 mb-1">
       Select workspaces you would want to give access to.
     </p>
-    <!-- <CheckSelectDropdown
-        isError={workspaceError && !countCheckedList(teamSpecificWorkspace)}
-        id={"check-select-workspace"}
-        list={teamSpecificWorkspace}
-        onclick={handleCheckSelectDropdown}
-      /> -->
-    <Dropdown
-      dropDownType={{ type: "checkbox", title: "select" }}
-      dropdownId="check-select-workspace"
-      data={[
-        {
-          name: "Select",
-          id: "select",
-          dynamicClasses: "text-whiteColor",
-          hide: true,
-        },
-        {
-          name: "Select All",
-          id: "select-all",
-          dynamicClasses: "text-whiteColor",
-          isInvalidOption: true,
-          checked: isAllSelectedCheck,
-        },
-        ...teamSpecificWorkspace,
-      ]}
-      onclick={handleCheckSelectDropdown}
-      staticClasses={[
-        {
-          id: `check-select-workspace-dropdown-select`,
-          classToAdd: ["border", "rounded", "py-1"],
-        },
-        {
-          id: "check-select-workspace-options-container",
-          classToAdd: ["end-0", "start-0"],
-        },
-        {
-          id: "check-select-workspace-btn-div",
-          classToAdd: ["flex-wrap", "overflow-auto"],
-        },
-      ]}
-      staticCustomStyles={[
-        {
-          id: "check-select-workspace-options-container",
-          styleKey: "overflow",
-          styleValue: "auto",
-        },
-        {
-          id: "check-select-workspace-options-container",
-          styleKey: "max-height",
-          styleValue: "calc(30vh)",
-        },
-      ]}
-    ></Dropdown>
   </div>
   {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}
     <p class="error-text">
