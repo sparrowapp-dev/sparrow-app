@@ -668,12 +668,12 @@
 
   .select-active-border-all {
     border: none;
-    border: 1px solid var(--send-button);
+    border: 1px solid var(--bg-primary-300);
   }
 
   .select-active-border-bottom {
     border: none;
-    border-bottom: 1px solid var(--send-button);
+    border-bottom: 1px solid var(--bg-primary-300);
   }
 
   .select-error-border-none {

@@ -16,6 +16,7 @@
   } from "@teams/common/constants/TeamTabs.constants";
   import { WorkspaceListView } from "../components";
   import WorkspaceGridView from "../components/workspace-grid-view/WorkspaceGridView.svelte";
+  import { TeamMembers } from "@teams/features";
   import { CrossIcon } from "@library/icons";
   /**
    * user ID
@@ -37,6 +38,12 @@
    * Callback for updating active tab in team
    */
   export let onUpdateActiveTab;
+
+  /**
+   * Invite team toggler
+   */
+  export let isTeamInviteModalOpen;
+
   /**
    * Callback For creating workspace
    */
@@ -45,6 +52,30 @@
    * Callback for switching workspace
    */
   export let onSwitchWorkspace: (id: string) => void;
+  /**
+   * function to remove members from team
+   */
+  export let onRemoveMembersAtTeam;
+  /**
+   * function to demote admins at team
+   */
+  export let onDemoteToMemberAtTeam;
+  /**
+   * function to promote to admin at team
+   */
+  export let onPromoteToAdminAtTeam;
+  /**
+   * function to promote to owner at team
+   */
+  export let onPromoteToOwnerAtTeam;
+  /**
+   * function to remove member from workspace
+   */
+  export let onRemoveUserFromWorkspace;
+  /**
+   * function to change user role at workspace
+   */
+  export let onChangeUserRoleAtWorkspace;
 
   let selectedView: string = "Grid";
 
@@ -75,7 +106,7 @@
         id: TeamTabsEnum.MEMBERS,
         count: openTeam.users?.length,
         visible: true,
-        disabled: true,
+        disabled: false,
       },
       {
         name: "Settings",
@@ -163,18 +194,16 @@
                   </p>
                 {/if}
                 {#if userRole && userRole !== TeamRole.TEAM_MEMBER}
-                  <!--Enable in next phase-->
-                  <!-- <Button
+                  <Button
                     title={`Invite`}
                     type={`dark`}
                     textStyleProp={"font-size: var(--small-text)"}
                     onClick={() => {
-                      teamInvitePopup = true;
+                      isTeamInviteModalOpen = true;
                     }}
                     buttonClassProp={`my-auto px-3 pt-1 me-4`}
                     buttonStyleProp={`height: 30px;`}
-                    disable={true}
-                  /> -->
+                  />
                   <Button
                     title={`New Workspace`}
                     type={`primary`}
@@ -230,7 +259,7 @@
           </div>
         </div>
       </div>
-      {#if openTeam && openTeam?.workspaces?.length > 0}
+      {#if openTeam && openTeam?.workspaces?.length > 0 && activeTeamTab === TeamTabsEnum.WORKSPACES}
         <div class="ps-2 pt-2">
           <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
             <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
@@ -283,15 +312,19 @@
           {onSwitchWorkspace}
         />
         <!--Enabled in next phase-->
-        <!-- {:else if selectedTab === "members"}
-        <Members
+      {:else if activeTeamTab === TeamTabsEnum.MEMBERS}
+        <TeamMembers
           {userId}
-          {userType}
+          userType={userRole}
           {openTeam}
-          {teamServiceMethods}
           {workspaces}
-          {teamRepositoryMethods}
-        /> -->
+          {onRemoveMembersAtTeam}
+          {onDemoteToMemberAtTeam}
+          {onPromoteToAdminAtTeam}
+          {onPromoteToOwnerAtTeam}
+          {onRemoveUserFromWorkspace}
+          {onChangeUserRoleAtWorkspace}
+        />
         <!-- {:else if selectedTab === "settings" && userType === "owner"}
         <Settings
           openTeam={openTeam?.toMutableJSON()}

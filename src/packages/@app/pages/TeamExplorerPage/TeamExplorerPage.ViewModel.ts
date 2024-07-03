@@ -1,5 +1,6 @@
 import { user } from "$lib/store";
-import { UntrackedItems } from "$lib/utils/enums";
+import type { InviteBody } from "$lib/utils/dto/team-dto";
+import { UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
 import type { WorkspaceDocument } from "@app/database/database";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
@@ -221,6 +222,10 @@ export class TeamExplorerPageViewModel {
         data.push(item);
       }
       await this.workspaceRepository.bulkInsertData(data);
+      if (!isAnyWorkspaceActive) {
+        await this.workspaceRepository.activateInitialWorkspace();
+        return;
+      } else this.workspaceRepository.setActiveWorkspace(isAnyWorkspaceActive);
       return;
     }
   };
@@ -281,5 +286,231 @@ export class TeamExplorerPageViewModel {
     initWorkspaceTab.updateName(res.name);
     this.tabRepository.createTab(initWorkspaceTab.getValue());
     navigate("/dashboard/collections");
+  };
+
+  /**
+   * Invites new user to the team
+   * @param _teamId - Team id in which users are invited.
+   * @param _inviteBody - New team meta data.
+   * @param _userId - Used id to be invited.
+   */
+  public handleTeamInvite = async (
+    _teamId: string,
+    _inviteBody: InviteBody,
+    _userId: string,
+  ) => {
+    const response = await this.teamService.inviteMembersAtTeam(
+      _teamId,
+      _inviteBody,
+    );
+    if (response.isSuccessful) {
+      const responseData = response.data.data;
+      await this.refreshWorkspaces(_userId);
+      await this.teamRepository.modifyTeam(_teamId, responseData);
+      if (responseData?.nonExistingUsers?.length > 0) {
+        responseData.nonExistingUsers.forEach((elem) => {
+          notifications.error(`${elem} doesn't exist.`);
+        });
+      }
+      if (responseData?.alreadyTeamMember?.length > 0) {
+        responseData.alreadyTeamMember.forEach((elem) => {
+          notifications.error(`${elem} already in team.`);
+        });
+      }
+      if (
+        !responseData?.nonExistingUsers?.length &&
+        !responseData?.alreadyTeamMember?.length
+      ) {
+        notifications.success("Invite sent.");
+      }
+    } else {
+      notifications.error("Failed to sent invite. Please try again.");
+    }
+    return response;
+  };
+
+  /**
+   * Removess a user from a specified team.
+   * @param _teamId - The ID of the team.
+   * @param _teamName - The name of the team.
+   * @param _userId - The ID of the user.
+   * @param _userName - The name of the user.
+   */
+  public removeMembersAtTeam = async (
+    _teamId: string,
+    _teamName: string,
+    _userId: string,
+    _userName: string,
+  ) => {
+    const response = await this.teamService.removeMembersAtTeam(
+      _teamId,
+      _userId,
+    );
+    if (response.isSuccessful) {
+      const responseData = response.data.data;
+      await this.teamRepository.modifyTeam(_teamId, responseData);
+      await this.refreshWorkspaces(_userId);
+      notifications.success(`${_userName} is removed from ${_teamName}`);
+    } else {
+      notifications.error(`Failed to remove ${_userName} from ${_teamName}`);
+    }
+    return response;
+  };
+
+  /**
+   * Demoted a user to member status in a specified team.
+   * @param _teamId - The ID of the team.
+   * @param _teamName - The name of the team.
+   * @param _userId - The ID of the user.
+   * @param _userName - The name of the user.
+   */
+  public demoteToMemberAtTeam = async (
+    _teamId: string,
+    _teamName: string,
+    _userId: string,
+    _userName: string,
+  ) => {
+    const response = await this.teamService.demoteToMemberAtTeam(
+      _teamId,
+      _userId,
+    );
+    if (response.isSuccessful === true) {
+      const responseData = response.data.data;
+      await this.teamRepository.modifyTeam(_teamId, responseData);
+      await this.refreshWorkspaces(_userId);
+      notifications.success(`${_userName} is now a member`);
+    } else {
+      notifications.error(
+        `Failed to change role for ${_userName}. Please try again.`,
+      );
+    }
+    return response;
+  };
+
+  /**
+   * Promotes a user to admin status in a specified team.
+   * @param _teamId - The ID of the team.
+   * @param _teamName - The name of the team.
+   * @param _userId - The ID of the user.
+   * @param _userName - The name of the user.
+   */
+  public promoteToAdminAtTeam = async (
+    _teamId: string,
+    _teamName: string,
+    _userId: string,
+    _userName: string,
+  ) => {
+    const response = await this.teamService.promoteToAdminAtTeam(
+      _teamId,
+      _userId,
+    );
+    if (response.isSuccessful) {
+      const responseData = response.data.data;
+      await this.teamRepository.modifyTeam(_teamId, responseData);
+      await this.refreshWorkspaces(_userId);
+      notifications.success(`${_userName} is now an admin`);
+    } else {
+      notifications.error(
+        `Failed to change role for ${_userName}. Please try again.`,
+      );
+    }
+    return response;
+  };
+
+  /**
+   * Promotes a user to owner status in a specified team.
+   * @param _teamId - The ID of the team.
+   * @param _teamName - The name of the team.
+   * @param _userId - The ID of the user.
+   * @param _userName - The name of the user.
+   */
+  public promoteToOwnerAtTeam = async (
+    _teamId: string,
+    _teamName: string,
+    _userId: string,
+    _userName: string,
+  ) => {
+    const response = await this.teamService.promoteToOwnerAtTeam(
+      _teamId,
+      _userId,
+    );
+    if (response.isSuccessful === true) {
+      const responseData = response.data.data;
+      await this.teamRepository.modifyTeam(_teamId, responseData);
+      await this.refreshWorkspaces(_userId);
+      notifications.success(
+        `${_userName} is now the new Owner of ${_teamName}.`,
+      );
+    } else {
+      notifications.error(
+        `Failed to update access of Owner. Please try again.`,
+      );
+    }
+    return response;
+  };
+
+  /**
+   * Removes a user from a workspace.
+   * @param _workspaceId - The ID of the workspace where remove user is to take place.
+   * @param _workspaceName - The name of the workspace where remove user is to take place.
+   * @param _userId - The ID of the user who is being removed.
+   * @param _userName - The name of the user who is being removed.
+   */
+  public removeUserFromWorkspace = async (
+    _workspaceId: string,
+    _workspaceName: string,
+    _userId: string,
+    _userName: string,
+  ) => {
+    const response = await this.workspaceService.removeUserFromWorkspace(
+      _workspaceId,
+      _userId,
+    );
+    if (response.isSuccessful === true) {
+      await this.refreshWorkspaces(_userId);
+      notifications.success(`${_userName} is removed from ${_workspaceName}`);
+    } else {
+      notifications.error(
+        `Failed to remove ${_userName} from ${_workspaceName}`,
+      );
+    }
+  };
+
+  /**
+   * Change the role of a user in a workspace.
+   * @param _workspaceId - The ID of the workspace where the role change is to take place.
+   * @param _workspaceName - The name of the workspace where the role change is to take place.
+   * @param _userId - The ID of the user whose role is being changed.
+   * @param _userName - The name of the user whose role is being changed.
+   * @param _body - Users role at workspace level example => editor or viewer.
+   */
+  public changeUserRoleAtWorkspace = async (
+    _workspaceId: string,
+    _workspaceName: string,
+    _userId: string,
+    _userName: string,
+    _body: WorkspaceRole,
+  ) => {
+    const response = await this.workspaceService.changeUserRoleAtWorkspace(
+      _workspaceId,
+      _userId,
+      _body,
+    );
+    if (response.isSuccessful) {
+      await this.refreshWorkspaces(_userId);
+      if (_body === WorkspaceRole.WORKSPACE_VIEWER) {
+        notifications.success(
+          `${_userName} is now a viewer on ${_workspaceName}`,
+        );
+      } else if (_body === WorkspaceRole.WORKSPACE_EDITOR) {
+        notifications.success(
+          `${_userName} is now a editor on ${_workspaceName}`,
+        );
+      }
+    } else {
+      notifications.error(
+        `Failed to change role for ${_userName}. Please try again.`,
+      );
+    }
   };
 }
