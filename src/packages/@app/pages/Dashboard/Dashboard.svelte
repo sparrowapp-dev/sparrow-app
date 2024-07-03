@@ -60,14 +60,16 @@
 
   let currentWorkspaceId = "";
   let currentWorkspaceName = "";
-  let currentTeam;
+  let currentTeamName = "";
+  let currentTeamId = "";
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
         currentWorkspaceId = activeWorkspaceRxDoc._id;
         currentWorkspaceName = activeWorkspaceRxDoc.name;
-        currentTeam = activeWorkspaceRxDoc.team;
+        currentTeamName = activeWorkspaceRxDoc.team?.teamName;
+        currentTeamId = activeWorkspaceRxDoc.team?.teamId;
         refreshEnv(activeWorkspaceRxDoc?._id);
         const envIdInitiatedToWorkspace =
           activeWorkspaceRxDoc.get("environmentId");
@@ -184,12 +186,14 @@
     onInitActiveEnvironmentToWorkspace={_viewModel.initActiveEnvironmentToWorkspace}
     {currentWorkspaceId}
     {currentWorkspaceName}
-    {currentTeam}
+    {currentTeamName}
+    {currentTeamId}
     {isGuestUser}
     {isLoginBannerActive}
     onLoginUser={handleGuestLogin}
     {workspaceDocuments}
     onCreateWorkspace={() => (isWorkspaceModalOpen = true)}
+    onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
   />
 
   <!--

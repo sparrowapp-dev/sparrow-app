@@ -23,6 +23,7 @@ import { FeatureSwitchRepository } from "@app/repositories/feature-switch.reposi
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { v4 as uuidv4 } from "uuid";
 import { TeamAdapter } from "@app/adapter";
+import { navigate } from "svelte-navigator";
 
 export class DashboardViewModel {
   constructor() {}
@@ -326,7 +327,6 @@ export class DashboardViewModel {
     workspaceName: string,
     teamId: string,
   ) => {
-    console.log("inside view model", workspaceName, teamId);
     const response = await this.workspaceService.createWorkspace({
       name: workspaceName,
       id: teamId,
@@ -347,5 +347,14 @@ export class DashboardViewModel {
       notifications.success("New Workspace Created");
     }
     return response;
+  };
+
+  /**
+   * Switch from one workspace to another
+   * @param id - Workspace id
+   */
+  public handleSwitchWorkspace = async (id: string) => {
+    await this.workspaceRepository.setActiveWorkspace(id);
+    navigate("/dashboard/collections");
   };
 }

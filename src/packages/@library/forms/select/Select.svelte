@@ -135,6 +135,7 @@
   export let disabled = false;
   export let position: "absolute" | "fixed" = "fixed";
   export let placeholderText = "";
+  export let isHeaderCombined = false;
 
   let selectHeaderWrapper: HTMLElement;
   let selectBodyWrapper: HTMLElement;
@@ -420,6 +421,15 @@
 
         {#if placeholderText && !selectedRequest}
           {placeholderText}
+        {:else if isHeaderCombined}
+          <span
+            class="ellipsis me-3 {selectedRequest?.default
+              ? 'text-textColor'
+              : getTextColor(selectedRequest?.color)}"
+            style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+          >
+            {selectedRequest?.description}/{selectedRequest?.name}
+          </span>
         {:else}
           <span
             class="ellipsis me-3 {selectedRequest?.default

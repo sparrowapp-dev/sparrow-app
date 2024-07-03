@@ -163,7 +163,7 @@
                 {#if openTeam?.logo?.size}
                   <img
                     class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
-                    style="width: 60px !important; height: 60px !important; padding-top: 2px; display: flex; border-radius: 50%;"
+                    style="width: 40px !important; height: 40px !important; padding-top: 2px; display: flex; border-radius: 50%;"
                     src={base64ToURL(openTeam?.logo)}
                     alt=""
                   />{:else}
