@@ -38,6 +38,8 @@ export class TeamsViewModel {
     return tabs;
   }
 
+
+
   /**
    * @description - get open team from local db
    */
@@ -135,12 +137,22 @@ export class TeamsViewModel {
     await this.workspaceRepository.setActiveWorkspace(id);
     navigate("/dashboard/collections");
   };
+
+ /**
+   * Switch from one team to another
+   * @param id - team id
+   */
+ public setOpenTeam = async (id: string) => {
+  await this.teamRepository.setOpenTeam(id);
+};
+
+
   /**
    * Switch to latest tab on Api Click
    * @param id - Api id
    */
   public handleApiClick = (api: any): void => {
-    //set new active api req functionality is reamaining
+   this.tabRepository.activeTab(api.id)
     moveNavigation("right");
     navigate("/dashboard/collections");
   };
