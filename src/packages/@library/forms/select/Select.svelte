@@ -6,6 +6,7 @@
   import { GitBranchIcon, DownArrowIcon } from "$lib/assets/icons";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
   import { ArrowIcon } from "@library/icons";
+  import MenuItemsV3 from "./menu-items/MenuItemsV3.svelte";
   /**
    * Determines id of the menu item.
    */
@@ -133,6 +134,7 @@
    */
   export let disabled = false;
   export let position: "absolute" | "fixed" = "fixed";
+  export let placeholderText = "";
 
   let selectHeaderWrapper: HTMLElement;
   let selectBodyWrapper: HTMLElement;
@@ -159,6 +161,7 @@
     hide?: boolean;
     disabled?: boolean;
     display?: string;
+    logo?: string;
   };
 
   let selectBorderClass = "";
@@ -414,14 +417,19 @@
             /></span
           >
         {/if}
-        <span
-          class="ellipsis me-3 {selectedRequest?.default
-            ? 'text-textColor'
-            : getTextColor(selectedRequest?.color)}"
-          style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
-        >
-          {selectedRequest?.name}
-        </span>
+
+        {#if placeholderText && !selectedRequest}
+          {placeholderText}
+        {:else}
+          <span
+            class="ellipsis me-3 {selectedRequest?.default
+              ? 'text-textColor'
+              : getTextColor(selectedRequest?.color)}"
+            style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+          >
+            {selectedRequest?.name}
+          </span>
+        {/if}
       </p>
       <span class="d-flex ps-2" class:select-logo-active={isOpen}>
         {#if isDropIconFilled}
@@ -513,6 +521,8 @@
               {getTextColor}
               {highlightTickedItem}
             />
+          {:else if menuItem === "v3"}
+            <MenuItemsV3 {list} {selectedRequest} {tickIcon} {getTextColor} />
           {/if}
         </div>
       {/each}

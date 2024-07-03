@@ -16,6 +16,7 @@
   } from "@teams/common/constants/TeamTabs.constants";
   import { WorkspaceListView } from "../components";
   import WorkspaceGridView from "../components/workspace-grid-view/WorkspaceGridView.svelte";
+  import { CrossIcon } from "@library/icons";
   /**
    * user ID
    */
@@ -102,6 +103,18 @@
     onCreateWorkspace(openTeam.teamId);
   };
   
+  let searchQuery = "";
+  let hasText = false;
+
+  const handleSearchInput = (event) => {
+    searchQuery = event.target.value.toLowerCase();
+    hasText = searchQuery.length > 0;
+  };
+  const clearSearchInput = () => {
+    searchQuery = "";
+    hasText = false;
+  };
+
   onDestroy(() => {
     selectedViewSubscribe();
   });
@@ -226,7 +239,17 @@
               id="search-input"
               class={`bg-transparent w-100 border-0 my-auto`}
               placeholder="Search workspaces in {openTeam?.name}"
+              on:input={handleSearchInput}
+              bind:value={searchQuery}
             />
+
+            {#if hasText}
+              <div  class="clear-icon" on:click={clearSearchInput}>
+                <CrossIcon
+                height="16px" width="12px" color="var(--icon-secondary-300)" />
+              </div>
+            
+            {/if}
           </div>
         </div>
       {/if}
@@ -234,8 +257,11 @@
       {#if selectedView === TeamViewEnum.LIST && activeTeamTab === TeamTabsEnum.WORKSPACES}
         <WorkspaceListView
           {openTeam}
-          data={workspaces?.filter((elem) => {
-            return elem?.team?.teamId === openTeam?.teamId;
+          data={workspaces.filter((elem) => {
+            return (
+              elem?.team?.teamId === openTeam?.teamId &&
+              elem?.name?.toLowerCase().includes(searchQuery)
+            );
           }) || []}
           userType={userRole}
           {userId}
@@ -245,8 +271,11 @@
         <WorkspaceGridView
           {openTeam}
           {userId}
-          workspaces={workspaces?.filter((elem) => {
-            return elem?.team?.teamId === openTeam?.teamId;
+          workspaces={workspaces.filter((elem) => {
+            return (
+              elem?.team?.teamId === openTeam?.teamId &&
+              elem?.name?.toLowerCase().includes(searchQuery)
+            );
           }) || []}
           onCreateNewWorkspace={handleCreateNewWorkspace}
           {onSwitchWorkspace}
@@ -332,11 +361,31 @@
     background: var(--bg-tertiary-400);
     width: 27vw;
     font-size: 12px;
+    position: relative;
+    border: 1px solid transparent;
   }
+  .search-input-container:hover {
+    border: 1px solid var(--border-primary-300);
+    caret-color: var(  --border-primary-300);
+   }
+
+   .search-input-container:focus-within {
+  border-color: var(--border-primary-300); 
+  caret-color: var( --border-primary-300);
+}
 
   #search-input:focus {
     outline: none;
     border: none;
     box-shadow: none;
+  }
+
+  .clear-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
   }
 </style>
