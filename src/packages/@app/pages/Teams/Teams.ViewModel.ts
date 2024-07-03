@@ -140,7 +140,7 @@ export class TeamsViewModel {
 
  /**
    * Switch from one team to another
-   * @param id - Workspace id
+   * @param id - team id
    */
  public setOpenTeam = async (id: string) => {
   await this.teamRepository.setOpenTeam(id);
