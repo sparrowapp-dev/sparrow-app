@@ -62,7 +62,7 @@
       </tbody>
     </Table>
 
-    {#if data && data.slice().filter.length == 0}
+    {#if data && data?.length === 0}
       <p class="not-found-text mt-3">Add Workspaces to this team</p>
     {:else if filterText !== "" && data
         .slice()
@@ -173,7 +173,7 @@
 
 <style>
   .not-found-text {
-    color: var(--request-arc);
+    color: var(--text-secondary-200);
     font-size: 16px;
     font-weight: 400;
     text-align: center;

@@ -132,7 +132,7 @@
                 {#if openTeam?.logo?.size}
                   <img
                     class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
-                    style="width: 60px !important; height: 60px !important; padding-top: 2px; display: flex; border-radius: 50%;"
+                    style="width: 40px !important; height: 40px !important; padding-top: 2px; display: flex; border-radius: 50%;"
                     src={base64ToURL(openTeam?.logo)}
                     alt=""
                   />{:else}
@@ -243,11 +243,13 @@
             />
 
             {#if hasText}
-              <div  class="clear-icon" on:click={clearSearchInput}>
+              <div class="clear-icon" on:click={clearSearchInput}>
                 <CrossIcon
-                height="16px" width="12px" color="var(--icon-secondary-300)" />
+                  height="16px"
+                  width="12px"
+                  color="var(--icon-secondary-300)"
+                />
               </div>
-            
             {/if}
           </div>
         </div>
@@ -365,13 +367,13 @@
   }
   .search-input-container:hover {
     border: 1px solid var(--border-primary-300);
-    caret-color: var(  --border-primary-300);
-   }
+    caret-color: var(--border-primary-300);
+  }
 
-   .search-input-container:focus-within {
-  border-color: var(--border-primary-300); 
-  caret-color: var( --border-primary-300);
-}
+  .search-input-container:focus-within {
+    border-color: var(--border-primary-300);
+    caret-color: var(--border-primary-300);
+  }
 
   #search-input:focus {
     outline: none;
