@@ -373,6 +373,7 @@
   input {
     margin-bottom: 4px !important;
     margin-top: 4px !important;
+    caret-color: var(--text-primary-300);
   }
   #input-email {
     display: flex;
