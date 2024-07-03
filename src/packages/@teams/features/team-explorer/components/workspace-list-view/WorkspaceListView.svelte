@@ -25,7 +25,6 @@
     "Last Updated",
     "",
   ];
-  console.log("data--->", data);
 </script>
 
 <div class="ps-2">

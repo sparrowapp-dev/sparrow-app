@@ -598,12 +598,12 @@ export default class CollectionsViewModel {
     await collection
       .subscribe((collections) => (collectionList = collections))
       .unsubscribe();
-    collectionList.filter(
+    const updatedCollectionList = collectionList.filter(
       (collection) => collection.workspaceId === workspaceId,
     );
     const newCollection = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
-      name: this.getNextCollection(collectionList, "New Collection"),
+      name: this.getNextCollection(updatedCollectionList, "New Collection"),
       items: [],
       createdAt: new Date().toISOString(),
     };

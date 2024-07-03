@@ -234,10 +234,12 @@ export class TeamExplorerPageViewModel {
     await workspaces
       .subscribe((workspace) => (workspaceList = workspace))
       .unsubscribe();
-    workspaceList.filter((workspace) => workspace.team?.teamId === teamId);
+    const updatgedWorkspaceList = workspaceList.filter(
+      (workspace) => workspace.team?.teamId === teamId,
+    );
     const newWorkspace = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
-      name: this.getNextWorkspace(workspaceList, "My Workspace"),
+      name: this.getNextWorkspace(updatgedWorkspaceList, "My Workspace"),
       items: [],
       createdAt: new Date().toISOString(),
     };
