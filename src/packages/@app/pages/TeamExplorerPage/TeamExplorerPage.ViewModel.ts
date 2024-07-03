@@ -6,6 +6,7 @@ import { TeamRepository } from "@app/repositories/team.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { TeamService } from "@app/services/team.service";
 import { WorkspaceService } from "@app/services/workspace.service";
+import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
 import { notifications } from "@library/ui/toast/Toast";
 import { BehaviorSubject, Observable } from "rxjs";
 import { navigate } from "svelte-navigator";
@@ -260,6 +261,9 @@ export class TeamExplorerPageViewModel {
         }
       });
       await this.workspaceRepository.setActiveWorkspace(res._id);
+      const initWorkspaceTab = new InitWorkspaceTab(res._id, res._id);
+      initWorkspaceTab.updateName(res.name);
+      this.tabRepository.createTab(initWorkspaceTab.getValue());
       navigate("/dashboard/collections");
       notifications.success("New Workspace Created");
     }
@@ -271,6 +275,11 @@ export class TeamExplorerPageViewModel {
    */
   public handleSwitchWorkspace = async (id: string) => {
     await this.workspaceRepository.setActiveWorkspace(id);
+    const res = await this.workspaceRepository.readWorkspace(id);
+    const initWorkspaceTab = new InitWorkspaceTab(id, id);
+    initWorkspaceTab.updateId(id);
+    initWorkspaceTab.updateName(res.name);
+    this.tabRepository.createTab(initWorkspaceTab.getValue());
     navigate("/dashboard/collections");
   };
 }

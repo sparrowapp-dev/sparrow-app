@@ -26,19 +26,6 @@ export default class WorkspaceExplorerViewModel {
   };
 
   /**
-   * Handles the creation of a new workspace tab.
-   * @returns A promise that resolves when the workspace tab has been created.
-   */
-
-  public handleCreateWorkspace = async () => {
-    const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
-
-    this.tabRepository.createTab(
-      new InitWorkspaceTab("UNTRAvdcdcCKED-" + uuidv4(), ws._id).getValue(),
-    );
-  };
-
-  /**
    * Updates the name of a workspace and reflects the changes in the associated tab.
    * @param - The ID of the workspace to be updated.
    * @param - The new name for the workspace.
@@ -48,7 +35,7 @@ export default class WorkspaceExplorerViewModel {
     const response = await this.workspaceService.updateWorkspace(workspaceId, {
       name: newName,
     });
-
+    
     if (response) {
       const updatedata = {
         name: newName,
@@ -58,7 +45,7 @@ export default class WorkspaceExplorerViewModel {
       await this.getActiveTab().subscribe((tab: any) => {
         tabId = tab.tabId;
       });
-      await this.tabRepository.updateTab(tabId, updatedata);
+      await this.tabRepository.updateTab(tabId, updatedata);      
       const initWorkspaceTab = new InitWorkspaceTab(
         response.data.data._id,
         workspaceId,
@@ -86,10 +73,11 @@ export default class WorkspaceExplorerViewModel {
     if (response) {
       const updatedata = {
         description: newDescription,
-      };
-      let tabId = "";
+      };      
       await this.workspaceRepository.updateWorkspace(workspaceId, updatedata);
-      await this.getActiveTab().subscribe((tab: any) => {
+      let tabId = "";
+      const res =  await this.getActiveTab()
+      res.subscribe((tab: any) => {
         tabId = tab.tabId;
       });
       await this.tabRepository.updateTab(tabId, updatedata);

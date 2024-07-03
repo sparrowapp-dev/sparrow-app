@@ -102,6 +102,7 @@
   const handleCreateNewWorkspace = () => {
     onCreateWorkspace(openTeam.teamId);
   };
+  
   let searchQuery = "";
   let hasText = false;
 
