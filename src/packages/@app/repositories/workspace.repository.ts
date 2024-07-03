@@ -55,18 +55,6 @@ export class WorkspaceRepository {
     }).$;
   };
 
-  /**
-   * get active workspace id of the user.
-   */
-  public getActiveWorkspaceById = (id: any): WorkspaceDocument => {
-    return RxDB.getInstance()
-      .rxdb.workspace.findOne({
-        selector: {
-          _id: id,
-        },
-      })
-      .exec();
-  };
 
   /**
    * get active workspace of the user.

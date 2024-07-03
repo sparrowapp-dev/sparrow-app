@@ -224,13 +224,6 @@ export class TeamExplorerPageViewModel {
       return;
     }
   };
-  /**
-   * Get active tab(if any)
-   * @returns :Observable<any> | undefined - active tab
-   */
-  public getActiveTab = () => {
-    return this.tabRepository.getTab();
-  };
 
   /**
    * Create workspace in the team
@@ -280,7 +273,7 @@ export class TeamExplorerPageViewModel {
    */
   public handleSwitchWorkspace = async (id: string) => {
     await this.workspaceRepository.setActiveWorkspace(id);
-    const res = await this.workspaceRepository.getActiveWorkspaceById(id);
+    const res = await this.workspaceRepository.readWorkspace(id);
     const initWorkspaceTab = new InitWorkspaceTab(id, id);
     initWorkspaceTab.updateId(id);
     initWorkspaceTab.updateName(res.name);
