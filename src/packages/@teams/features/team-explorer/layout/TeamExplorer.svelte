@@ -101,7 +101,7 @@
   const handleCreateNewWorkspace = () => {
     onCreateWorkspace(openTeam.teamId);
   };
-
+  
   onDestroy(() => {
     selectedViewSubscribe();
   });

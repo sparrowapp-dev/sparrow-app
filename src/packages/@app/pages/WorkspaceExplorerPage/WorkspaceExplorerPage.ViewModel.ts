@@ -33,9 +33,9 @@ export default class WorkspaceExplorerViewModel {
   public handleCreateWorkspace = async () => {
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
 
-    this.tabRepository.createTab(
-      new InitWorkspaceTab("UNTRAvdcdcCKED-" + uuidv4(), ws._id).getValue(),
-    );
+    // this.tabRepository.createTab(
+    //   new InitWorkspaceTab("UNTRAvdcdcCKED-" + uuidv4(), ws._id).getValue(),
+    // );
   };
 
   /**
@@ -48,7 +48,7 @@ export default class WorkspaceExplorerViewModel {
     const response = await this.workspaceService.updateWorkspace(workspaceId, {
       name: newName,
     });
-
+    
     if (response) {
       const updatedata = {
         name: newName,
@@ -58,7 +58,7 @@ export default class WorkspaceExplorerViewModel {
       await this.getActiveTab().subscribe((tab: any) => {
         tabId = tab.tabId;
       });
-      await this.tabRepository.updateTab(tabId, updatedata);
+      await this.tabRepository.updateTab(tabId, updatedata);      
       const initWorkspaceTab = new InitWorkspaceTab(
         response.data.data._id,
         workspaceId,
@@ -86,10 +86,11 @@ export default class WorkspaceExplorerViewModel {
     if (response) {
       const updatedata = {
         description: newDescription,
-      };
-      let tabId = "";
+      };      
       await this.workspaceRepository.updateWorkspace(workspaceId, updatedata);
-      await this.getActiveTab().subscribe((tab: any) => {
+      let tabId = "";
+      const res =  await this.getActiveTab()
+      res.subscribe((tab: any) => {
         tabId = tab.tabId;
       });
       await this.tabRepository.updateTab(tabId, updatedata);
