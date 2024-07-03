@@ -9,6 +9,7 @@
   import { SparrowIcon } from "@library/icons";
   import constants from "$lib/utils/constants";
   import type { WorkspaceDocument } from "@app/database/database";
+  import { PlusIcon } from "@library/icons";
   /**
    * environment list
    */
@@ -43,6 +44,8 @@
   export let currentTeam;
 
   export let workspaceDocuments: WorkspaceDocument[] = [];
+
+  export let onCreateWorkspace;
 
   let workspaceData;
 
@@ -121,7 +124,7 @@
         ]}
         titleId={`${currentWorkspaceName}`}
         onclick={handleDropdown}
-        minHeaderWidth={"auto"}
+        minHeaderWidth={"155px"}
         iconRequired={false}
         isDropIconFilled={true}
         borderType={"none"}
@@ -136,11 +139,24 @@
         borderRounded={"2px"}
         position={"absolute"}
       >
-        <div slot="pre-select" class="d-none">
-          <hr class="mb-2 mt-2" />
-          <p class="sparrow-fs-12 text-textColor mb-2 ps-2 pe-2">
-            View all Branches
-          </p>
+        <div slot="pre-select" style="justify-content:space-between">
+          <div class="create-new-workspace" on:click={onCreateWorkspace}>
+            <span>Create New Workspace</span>
+            <div style="align-content: flex-end;">
+              <PlusIcon
+                height="16px"
+                width="16px"
+                color="var(--icon-primary-300)"
+              />
+            </div>
+          </div>
+          <div class="underline"></div>
+        </div>
+        <div slot="post-select" style="justify-content: center;">
+          <div class="view-all-workspace">
+            <span>View all Workspaces</span>
+          </div>
+          <div class="underline"></div>
         </div>
       </Select>
     </div>
@@ -221,5 +237,37 @@
   }
   .app-header {
     border-bottom: 2px solid var(--border-secondary-900);
+  }
+  .create-new-workspace {
+    display: flex;
+    align-items: center;
+    color: var(--text-primary-300); /* Blue color */
+    cursor: pointer;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .create-new-workspace:hover {
+    text-decoration: underline;
+  }
+
+  .underline {
+    width: 90%;
+    height: 1px;
+    background-color: var(--bg-tertiary-300); /* Dark background */
+    margin-top: 3px;
+    margin-left: 5px;
+    align-self: center;
+  }
+
+  .view-all-workspace {
+    display: flex;
+    align-items: center;
+    color: var(--text-secondary-200); /* Blue color */
+    cursor: pointer;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 400;
   }
 </style>

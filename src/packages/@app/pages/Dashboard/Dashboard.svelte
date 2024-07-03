@@ -26,12 +26,16 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import Teams from "../Teams/Teams.svelte";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import CreateWorkspace from "@teams/features/create-workspace/layout/CreateWorkspace.svelte";
 
   const _viewModel = new DashboardViewModel();
+  let userId;
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
       // await _viewModel.refreshTeams(value._id);
       // await _viewModel.refreshWorkspaces(value._id);
+      userId - value?._id;
       await _viewModel.refreshTeamsWorkspaces(value._id);
     }
   });
@@ -48,6 +52,7 @@
   let isPopupOpen = false;
   let isLoginBannerActive = false;
   let isGuestUser = false;
+  let isWorkspaceModalOpen = false;
 
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
@@ -101,6 +106,7 @@
     await _viewModel.updateGuestBannerState();
     isLoginBannerActive = false;
   };
+  let teamDocuments;
 
   onMount(async () => {
     _viewModel.getAllFeatures();
@@ -110,6 +116,7 @@
       isLoginBannerActive = guestUser?.isBannerActive;
     }
     workspaceDocuments = await _viewModel.workspaces();
+    teamDocuments = await _viewModel.getTeamData();
   });
 
   onDestroy(() => {
@@ -182,6 +189,7 @@
     {isLoginBannerActive}
     onLoginUser={handleGuestLogin}
     {workspaceDocuments}
+    onCreateWorkspace={() => (isWorkspaceModalOpen = true)}
   />
 
   <!--
@@ -261,3 +269,23 @@
   title={"Confirm Login?"}
   description={"After continuing your data will be lost, do you want to continue?"}
 />
+
+<ModalWrapperV1
+  title={"New Workspace"}
+  type={"primary"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isWorkspaceModalOpen}
+  handleModalState={(flag) => {
+    isWorkspaceModalOpen = flag;
+  }}
+>
+  <CreateWorkspace
+    {teamDocuments}
+    {userId}
+    handleModalState={(flag = false) => {
+      isWorkspaceModalOpen = flag;
+    }}
+    onCreateWorkspace={_viewModel.handleCreateWorkspace}
+  />
+</ModalWrapperV1>

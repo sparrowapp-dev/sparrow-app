@@ -11,6 +11,7 @@ import {
   isLoggout,
   isResponseError,
   setUser,
+  user,
 } from "$lib/store/auth.store";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { RxDB } from "@app/database/database";
@@ -315,5 +316,36 @@ export class DashboardViewModel {
   public findUser = async (data) => {
     const res = await this.guestUserRepository.findOne(data);
     return res;
+  };
+
+  /**
+   * Create workspace in the team
+   * @param teamId ID of team where workspace need to be created
+   */
+  public handleCreateWorkspace = async (
+    workspaceName: string,
+    teamId: string,
+  ) => {
+    console.log("inside view model", workspaceName, teamId);
+    const response = await this.workspaceService.createWorkspace({
+      name: workspaceName,
+      id: teamId,
+    });
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+      await this.workspaceRepository.addWorkspace({
+        ...res,
+        id: res._id,
+      });
+      user.subscribe(async (value) => {
+        if (value) {
+          await this.refreshTeams(value._id);
+          await this.refreshWorkspaces(value._id);
+        }
+      });
+      await this.workspaceRepository.setActiveWorkspace(res._id);
+      notifications.success("New Workspace Created");
+    }
+    return response;
   };
 }
