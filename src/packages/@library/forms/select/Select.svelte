@@ -422,14 +422,24 @@
         {#if placeholderText && !selectedRequest}
           {placeholderText}
         {:else if isHeaderCombined}
-          <span
-            class="ellipsis me-3 {selectedRequest?.default
-              ? 'text-textColor'
-              : getTextColor(selectedRequest?.color)}"
-            style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
-          >
-            {selectedRequest?.description}/{selectedRequest?.name}
-          </span>
+          <div class="d-flex ellipsis">
+            <span
+              class="ellipsis {selectedRequest?.default
+                ? 'text-textColor'
+                : getTextColor(selectedRequest?.color)}"
+              style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+            >
+              {selectedRequest?.description}
+            </span>
+            <span
+              class="ellipsis me-3 {selectedRequest?.default
+                ? 'text-textColor'
+                : getTextColor(selectedRequest?.color)}"
+              style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+            >
+              /{selectedRequest?.name}
+            </span>
+          </div>
         {:else}
           <span
             class="ellipsis me-3 {selectedRequest?.default
