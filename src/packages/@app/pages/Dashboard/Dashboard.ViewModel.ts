@@ -14,7 +14,11 @@ import {
   user,
 } from "$lib/store/auth.store";
 import { TabRepository } from "@app/repositories/tab.repository";
-import { RxDB } from "@app/database/database";
+import {
+  RxDB,
+  type TeamDocument,
+  type WorkspaceDocument,
+} from "@app/database/database";
 import { currentMonitor, getCurrent } from "@tauri-apps/api/window";
 import { clearAuthJwt } from "$lib/utils/jwt";
 import { userLogout } from "@app/services/auth.service";
@@ -24,6 +28,7 @@ import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { v4 as uuidv4 } from "uuid";
 import { TeamAdapter } from "@app/adapter";
 import { navigate } from "svelte-navigator";
+import type { Observable } from "rxjs";
 
 export class DashboardViewModel {
   constructor() {}
@@ -64,9 +69,16 @@ export class DashboardViewModel {
   /**
    * @description - get workspace list from local db
    */
-  public workspaces = async () => {
-    const workspaces = await this.workspaceRepository.getWorkspacesDocs();
+  public workspaces = async (): Promise<Observable<WorkspaceDocument[]>> => {
+    const workspaces = await this.workspaceRepository.getWorkspaces();
     return workspaces;
+  };
+
+  /**
+   * @description - get observalble team list from local db
+   */
+  public getTeams = async (): Promise<Observable<TeamDocument[]>> => {
+    return await this.teamRepository.getTeams();
   };
 
   /**
