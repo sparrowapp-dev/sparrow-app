@@ -71,7 +71,6 @@
   }}
 >
   <Pane
-  
     size={$leftPanelCollapse ? 0 : $leftPanelWidth}
     minSize={20}
     class="bg-secondary-900-important sidebar-left-panel"
@@ -126,9 +125,6 @@
     font-size: 14px;
     font-weight: 400;
     line-height: 150%;
-  }
-  :global(.splitter-sidebar.splitpanes) {
-    width: calc(100vw - 72px);
   }
   :global(.team-splitter .splitpanes__splitter) {
     width: 6px !important;
