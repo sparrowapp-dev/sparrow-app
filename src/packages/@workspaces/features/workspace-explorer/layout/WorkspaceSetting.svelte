@@ -75,7 +75,7 @@
         </div>
       </div>
       <div
-        style="color: var(--text-secondary-100); padding:1px; font-size:12px;"
+        style="color: var(--text-secondary-100); marging-left:auto; font-size:12px;"
       >
         Owner
       </div>
@@ -86,7 +86,7 @@
     <img
       src={Shimmer}
       alt="shimmer effect"
-      width="610px"
+      width="100%"
       height="100%"
       style="margin-left: -5px; margin-top:8px;"
     />

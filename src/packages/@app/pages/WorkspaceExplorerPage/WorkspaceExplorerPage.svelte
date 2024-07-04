@@ -63,7 +63,7 @@
   };
 </script>
 
-<div class="d-flex" style="width: 100%;">
+<div class="d-flex" style="width: 100%; height:100dvh;">
   <div
     style="border-right:2px solid #000000; width: calc(100% - 280px);  padding:24px;"
   >
@@ -166,7 +166,7 @@
     <div
       style="border-bottom:1px solid #2A2C3C; margin-top:16px; margin-bottom:8px;"
     ></div>
-    <div class="d-flex flex-column" style="gap: 8px; height:430px;">
+    <div class="d-flex flex-column" style="gap: 8px; height:430px; flex-grow:1 !important;">
       <div
         class="ps-0"
         style="color: var( --text-secondary-200); font-weight:700; font-size:12px; padding:8px; "
@@ -187,7 +187,7 @@
         </div>
       </div>
     </div>
-    <div class="d-flex gap-1" style=" ">
+    <div class="d-flex gap-1" style="margin-bottom:70px !important; ">
       <span style="color: var(--text-primary-300) ;">{collectionLength}</span
       ><span
         style="color: var(--text-secondary-300); font-size:12px; font-weight:700; margin-top:5px !important;"
