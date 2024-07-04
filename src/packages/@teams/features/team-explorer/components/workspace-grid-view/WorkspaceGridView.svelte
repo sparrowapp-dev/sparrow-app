@@ -12,6 +12,7 @@
 
 
   export let searchQuery
+  let filterText =""
 
   /**
    * Id of current user
@@ -48,7 +49,7 @@
             .reverse()
             .filter((item) => item.name
                 .toLowerCase()
-                .includes(searchQuery.toLowerCase())).length == 0}
+                .includes(filterText.toLowerCase())).length == 0}
           <span class="not-found-text mx-auto ellipsis">No results found.</span>
         {/if}
         {#each workspaces
@@ -56,7 +57,7 @@
           .reverse()
           .filter((item) => typeof item.name === "string" && item.name
                 .toLowerCase()
-                .includes(searchQuery.toLowerCase()))
+                .includes(filterText.toLowerCase()))
           .sort((a, b) => a.name.localeCompare(b.name))
           .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
           <WorkspaceGrid
@@ -82,7 +83,7 @@
         .reverse()
         .filter((item) => typeof item.name === "string" && item.name
               .toLowerCase()
-              .includes(searchQuery.toLowerCase())).length > 0}
+              .includes(filterText.toLowerCase())).length > 0}
       <div class="justify-content-between bottom-0 w-75 d-flex">
         <div class="tab-head">
           Showing {(currPage - 1) * workspacePerPage + (currPage == 1 ? 1 : 0)} -
@@ -94,7 +95,7 @@
               ?.filter(
                 (item) =>
                   typeof item.name === "string" &&
-                  item.name.toLowerCase().startsWith(searchQuery.toLowerCase()),
+                  item.name.toLowerCase().startsWith(filterText.toLowerCase()),
               ).length,
           )} of {workspaces
             .slice()
@@ -102,7 +103,7 @@
             ?.filter(
               (item) =>
                 typeof item.name === "string" &&
-                item.name?.toLowerCase().startsWith(searchQuery.toLowerCase()),
+                item.name?.toLowerCase().startsWith(filterText.toLowerCase()),
             ).length}
         </div>
         <div class="tab-head tab-change">
@@ -133,7 +134,7 @@
               ?.filter(
                 (item) =>
                   typeof item.name === "string" &&
-                  item.name?.toLowerCase().startsWith(searchQuery.toLowerCase()),
+                  item.name?.toLowerCase().startsWith(filterText.toLowerCase()),
               ).length %
               6 ===
               0 &&
@@ -147,7 +148,7 @@
                       typeof item.name === "string" &&
                       item.name
                         .toLowerCase()
-                        .startsWith(searchQuery.toLowerCase()),
+                        .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
               )
               ? true
@@ -164,7 +165,7 @@
                         typeof item.name === "string" &&
                         item.name
                           .toLowerCase()
-                          .startsWith(searchQuery.toLowerCase()),
+                          .startsWith(filterText.toLowerCase()),
                     ).length / workspacePerPage,
                 )
               )
@@ -183,7 +184,7 @@
                       typeof item.name === "string" &&
                       item.name
                         .toLowerCase()
-                        .startsWith(searchQuery.toLowerCase()),
+                        .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
               )
                 ? "var(--border-secondary-200)"
@@ -201,7 +202,7 @@
                       typeof item.name === "string" &&
                       item.name
                         .toLowerCase()
-                        .startsWith(searchQuery.toLowerCase()),
+                        .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
               );
               if (
@@ -213,7 +214,7 @@
                       typeof item.name === "string" &&
                       item.name
                         ?.toLowerCase()
-                        .startsWith(searchQuery.toLowerCase()),
+                        .startsWith(filterText.toLowerCase()),
                   ).length %
                   6 !==
                 0
@@ -231,7 +232,7 @@
                         typeof item.name === "string" &&
                         item.name
                           .toLowerCase()
-                          .startsWith(searchQuery.toLowerCase()),
+                          .startsWith(filterText.toLowerCase()),
                     ).length / workspacePerPage,
                 )
               ) {
@@ -250,7 +251,7 @@
                       typeof item.name === "string" &&
                       item.name
                         .toLowerCase()
-                        .startsWith(searchQuery.toLowerCase()),
+                        .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
               )
                 ? "var(--border-secondary-200)"

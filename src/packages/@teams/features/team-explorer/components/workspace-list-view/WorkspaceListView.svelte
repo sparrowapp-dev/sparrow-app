@@ -17,6 +17,8 @@
 
   export let searchQuery;
 
+  let filterText = "";
+
   let workspacePerPage: number = 10,
     currPage = 1;
   const tableHeaderContent = [
@@ -48,7 +50,7 @@
             .reverse()
             .filter((item) => item.name
                 .toLowerCase()
-                .startsWith(searchQuery.toLowerCase()))
+                .startsWith(filterText.toLowerCase()))
             .sort((a, b) => a.name.localeCompare(b.name))
             .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
             <Rows
@@ -63,14 +65,14 @@
       </tbody>
     </Table>
 
-    {#if  searchQuery == "" && data && data?.length === 0}
+    {#if  filterText == "" && data && data?.length === 0}
       <p class="not-found-text mt-3">Add Workspaces to this team</p>
     {:else if searchQuery !== "" && data
         .slice()
         .reverse()
         .filter((item) => item.name
             .toLowerCase()
-            .startsWith(searchQuery.toLowerCase()))
+            .startsWith(filterText.toLowerCase()))
         .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length == 0}
       <p class="not-found-text mt-3">No results found.</p>
     {/if}
@@ -81,7 +83,7 @@
     .reverse()
     .filter((item) => item.name
         .toLowerCase()
-        .startsWith(searchQuery.toLowerCase()))
+        .startsWith(filterText.toLowerCase()))
     .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0}
     <table class="w-75 bottom-0">
       <tfoot>
@@ -90,10 +92,10 @@
             >Showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
               currPage * workspacePerPage,
               data?.filter((item) =>
-                item.name.toLowerCase().startsWith(searchQuery.toLowerCase()),
+                item.name.toLowerCase().startsWith(filterText.toLowerCase()),
               ).length,
             )} of {data?.filter((item) =>
-              item.name.toLowerCase().startsWith(searchQuery.toLowerCase()),
+              item.name.toLowerCase().startsWith(filterText.toLowerCase()),
             ).length}
           </th>
           <th class="tab-head tab-change" style="">
@@ -121,7 +123,7 @@
                     data?.filter((item) =>
                       item.name
                         .toLowerCase()
-                        .startsWith(searchQuery.toLowerCase()),
+                        .startsWith(filterText.toLowerCase()),
                     ).length / workspacePerPage,
                   )
                 )
@@ -134,7 +136,7 @@
                   data?.filter((item) =>
                     item.name
                       .toLowerCase()
-                      .startsWith(searchQuery.toLowerCase()),
+                      .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
                 )
                   ? "var(--border-secondary-200)"
@@ -147,7 +149,7 @@
                   data?.filter((item) =>
                     item.name
                       .toLowerCase()
-                      .startsWith(searchQuery.toLowerCase()),
+                      .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
                 ))}
               class="bg-transparent border-0"
@@ -157,7 +159,7 @@
                   data?.filter((item) =>
                     item.name
                       .toLowerCase()
-                      .startsWith(searchQuery.toLowerCase()),
+                      .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
                 )
                   ? "var(--border-secondary-200)"
