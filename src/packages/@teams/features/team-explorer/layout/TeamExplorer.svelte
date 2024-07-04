@@ -133,7 +133,7 @@
   const handleCreateNewWorkspace = () => {
     onCreateWorkspace(openTeam.teamId);
   };
-  
+
   let searchQuery = "";
   let hasText = false;
 
@@ -183,7 +183,7 @@
               </h2>
 
               <div class="d-flex align-items-end justify-content-end">
-                {#if openTeam?.users?.length > 0}
+                {#if openTeam?.users?.length > 1}
                   <p class="d-flex my-auto ms-1 me-4 sparrow-fs-12">
                     <PeopleIcon
                       color={"var(--sparrow-text-color)"}

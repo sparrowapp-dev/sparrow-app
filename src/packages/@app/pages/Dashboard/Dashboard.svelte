@@ -11,6 +11,7 @@
   import { onDestroy, onMount } from "svelte";
   import type {
     EnvironmentDocument,
+    TeamDocument,
     WorkspaceDocument,
   } from "@app/database/database";
   import type { Observable } from "rxjs";
@@ -42,7 +43,7 @@
   const refreshEnv = _viewModel.refreshEnvironment;
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.getActiveWorkspace();
-  let workspaceDocuments;
+  let workspaceDocuments: Observable<WorkspaceDocument[]>;
 
   let currentEnvironment = {
     id: "none",
@@ -108,7 +109,7 @@
     await _viewModel.updateGuestBannerState();
     isLoginBannerActive = false;
   };
-  let teamDocuments;
+  let teamDocuments: Observable<TeamDocument[]>;
 
   onMount(async () => {
     _viewModel.getAllFeatures();
@@ -118,7 +119,7 @@
       isLoginBannerActive = guestUser?.isBannerActive;
     }
     workspaceDocuments = await _viewModel.workspaces();
-    teamDocuments = await _viewModel.getTeamData();
+    teamDocuments = await _viewModel.getTeams();
   });
 
   onDestroy(() => {
@@ -191,7 +192,7 @@
     {isGuestUser}
     {isLoginBannerActive}
     onLoginUser={handleGuestLogin}
-    {workspaceDocuments}
+    workspaceDocuments={$workspaceDocuments}
     onCreateWorkspace={() => (isWorkspaceModalOpen = true)}
     onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
   />
@@ -285,7 +286,7 @@
   }}
 >
   <CreateWorkspace
-    {teamDocuments}
+    teamDocuments={$teamDocuments}
     {userId}
     handleModalState={(flag = false) => {
       isWorkspaceModalOpen = flag;

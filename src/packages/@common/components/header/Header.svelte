@@ -103,12 +103,12 @@
   };
 
   $: {
-    if (currentWorkspaceId || currentTeamName) {
+    if (currentWorkspaceName || currentTeamName) {
       calculateLimitedWorkspace();
     }
   }
   const handleViewWorkspaces = () => {
-    navigate("/home");
+    navigate("/app/home");
   };
 </script>
 
