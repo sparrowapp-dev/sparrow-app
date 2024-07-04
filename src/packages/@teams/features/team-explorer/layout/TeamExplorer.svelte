@@ -298,6 +298,7 @@
             <div style="flex:1; overflow:auto;">
               {#if selectedView === TeamViewEnum.LIST}
                 <WorkspaceListView
+                {searchQuery}
                   {openTeam}
                   data={workspaces.filter((elem) => {
                     return (
@@ -311,6 +312,7 @@
                 />
               {:else if selectedView == TeamViewEnum.GRID}
                 <WorkspaceGridView
+                {searchQuery}
                   {openTeam}
                   {userId}
                   workspaces={workspaces.filter((elem) => {

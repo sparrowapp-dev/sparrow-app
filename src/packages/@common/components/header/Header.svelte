@@ -137,7 +137,7 @@
         data={workspaceData}
         titleId={`${currentWorkspaceId}`}
         onclick={handleWorkspaceDropdown}
-        minHeaderWidth={"135px"}
+        minHeaderWidth={"185px"}
         iconRequired={false}
         isDropIconFilled={true}
         borderType={"none"}

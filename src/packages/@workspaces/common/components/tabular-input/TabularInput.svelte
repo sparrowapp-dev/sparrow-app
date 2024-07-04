@@ -184,9 +184,16 @@
 
   const handleBulkTextarea = (event) => {
     bulkText = event.detail;
+
+    // remove all empty lines
     const res = bulkText.split("\n").filter((line) => line.trim() !== "");
+
+    // Pushing a blank string to add a blank key value at the end
+    res.push("");
+
+
     pairs = res.map((elem) => {
-      if (elem) {
+      if (elem.length) {
         const firstColonIndex = elem.indexOf(":");
         let key, value;
 
@@ -211,9 +218,6 @@
         };
       }
     });
-    if (pairs.length === 0) {
-      pairs.unshift({ key: "", value: "", checked: false });
-    }
     callback(pairs);
   };
 

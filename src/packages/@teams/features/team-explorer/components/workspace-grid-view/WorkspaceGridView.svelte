@@ -10,6 +10,10 @@
   import Button from "@library/ui/button/Button.svelte";
   import { WorkspaceGrid } from "@teams/common/compopnents";
 
+
+  export let searchQuery
+  let filterText =""
+
   /**
    * Id of current user
    */
@@ -31,7 +35,6 @@
    */
   export let onSwitchWorkspace: (id: string) => void;
 
-  let filterText = "";
   let workspacePerPage = 5;
   let currPage = 1;
   let isAdminOrOwner: boolean;
@@ -41,7 +44,7 @@
   <div class="d-flex flex-column h-100">
     <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
       <div class="d-flex flex-wrap gap-5 justify-content-between row-gap-0">
-        {#if filterText !== "" && workspaces
+        {#if searchQuery !== "" && workspaces
             .slice()
             .reverse()
             .filter((item) => item.name
@@ -63,7 +66,7 @@
             isAdminOrOwner={true}
           />
         {/each}
-        {#if currPage === 1 && filterText === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
+        {#if currPage === 1 && searchQuery === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
           <Button
             title={`+ Add New Workspace`}
             type="other"

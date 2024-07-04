@@ -285,6 +285,7 @@
     bodyTheme={"violet"}
     headerTheme={"violet2"}
     borderRounded={"4px"}
+    headerFontWeight={400}
     isError={roleError && selectedRole === "select"}
   />
 </div>

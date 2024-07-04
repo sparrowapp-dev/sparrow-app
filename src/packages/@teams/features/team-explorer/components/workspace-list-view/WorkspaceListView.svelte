@@ -15,9 +15,12 @@
   export let openTeam: TeamDocument;
   export let onSwitchWorkspace: (id: string) => void;
 
+  export let searchQuery;
+
+  let filterText = "";
+
   let workspacePerPage: number = 10,
     currPage = 1;
-  let filterText: string = "";
   const tableHeaderContent = [
     "Workspace",
     "Collections",
@@ -62,9 +65,9 @@
       </tbody>
     </Table>
 
-    {#if data && data?.length === 0}
+    {#if  filterText == "" && data && data?.length === 0}
       <p class="not-found-text mt-3">Add Workspaces to this team</p>
-    {:else if filterText !== "" && data
+    {:else if searchQuery !== "" && data
         .slice()
         .reverse()
         .filter((item) => item.name
