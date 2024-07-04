@@ -152,188 +152,197 @@
 </script>
 
 {#if openTeam}
-  <div class="teams-content bg-secondary-850">
-    <div class="content-teams px-md-1 px-lg-3 px-3 pt-5">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-12 pb-3">
-            <div
-              class="team-heading d-flex justify-content-between position-relative"
-            >
-              <h2 class="d-flex ellipsis overflow-visible team-title">
-                {#if openTeam?.logo?.size}
-                  <img
-                    class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
-                    style="width: 40px !important; height: 40px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-                    src={base64ToURL(openTeam?.logo)}
-                    alt=""
-                  />{:else}
-                  <p
-                    class={`text-defaultColor w-25 text-center my-auto align-items-center justify-content-center profile-circle bg-tertiary-750 border-secondary-300 border-2`}
-                    style={`font-size: 24px; padding-top: 2px; width: 40px !important; height: 40px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
-                  >
-                    {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
-                  </p>
-                {/if}
-                <span
-                  class="ms-3 my-auto ellipsis overflow-hidden heading"
-                  style="font-size: 24px;"
-                  >{openTeam?.name || ""}
-                </span>
-              </h2>
+  <div class="teams-content h-100 bg-secondary-850">
+    <div
+      class="content-teams d-flex flex-column h-100 px-md-1 px-lg-3 px-3 pt-5"
+    >
+      <div class="">
+        <div
+          class="team-heading d-flex justify-content-between position-relative"
+        >
+          <h2 class="d-flex ellipsis overflow-visible team-title">
+            {#if openTeam?.logo?.size}
+              <img
+                class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
+                style="width: 40px !important; height: 40px !important; padding-top: 2px; display: flex; border-radius: 50%;"
+                src={base64ToURL(openTeam?.logo)}
+                alt=""
+              />{:else}
+              <p
+                class={`text-defaultColor w-25 text-center my-auto align-items-center justify-content-center profile-circle bg-tertiary-750 border-secondary-300 border-2`}
+                style={`font-size: 24px; padding-top: 2px; width: 40px !important; height: 40px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
+              >
+                {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
+              </p>
+            {/if}
+            <span
+              class="ms-3 my-auto ellipsis overflow-hidden heading"
+              style="font-size: 24px;"
+              >{openTeam?.name || ""}
+            </span>
+          </h2>
 
-              <div class="d-flex align-items-end justify-content-end">
-                {#if openTeam?.users?.length > 1}
-                  <p class="d-flex my-auto ms-1 me-4 sparrow-fs-12">
-                    <PeopleIcon
-                      color={"var(--sparrow-text-color)"}
-                      classProp="mx-2 my-auto d-flex"
-                    />
-                    <span class="my-auto">{openTeam?.users.length} Members</span
-                    >
-                  </p>
-                {/if}
-                {#if userRole && userRole !== TeamRole.TEAM_MEMBER}
-                  <Button
-                    title={`Invite`}
-                    type={`dark`}
-                    textStyleProp={"font-size: var(--small-text)"}
-                    onClick={() => {
-                      isTeamInviteModalOpen = true;
-                    }}
-                    buttonClassProp={`my-auto px-3 pt-1 me-4`}
-                    buttonStyleProp={`height: 30px;`}
-                  />
-                  <Button
-                    title={`New Workspace`}
-                    type={`primary`}
-                    loaderSize={17}
-                    textStyleProp={"font-size: var(--small-text)"}
-                    buttonClassProp={`my-auto`}
-                    buttonStyleProp={`height: 30px;`}
-                    onClick={handleCreateNewWorkspace}
-                  />
-                {/if}
-              </div>
-            </div>
-          </div>
-        </div>
-        <!--Workspace, setting and members tab-->
-        <div class="row">
-          <div class="col-12">
-            <div
-              class="teams-menu d-flex justify-content-between align-items-center"
-            >
-              <div class="teams-menu__left gap-4 align-items-center">
-                <TeamNavigator
-                  tabs={teamTabs}
-                  {onUpdateActiveTab}
-                  {activeTeamTab}
+          <div class="d-flex align-items-end justify-content-end">
+            {#if openTeam?.users?.length > 1}
+              <p class="d-flex my-auto ms-1 me-4 sparrow-fs-12">
+                <PeopleIcon
+                  color={"var(--sparrow-text-color)"}
+                  classProp="mx-2 my-auto d-flex"
                 />
-              </div>
-              <div class="teams-menu__right">
-                {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
-                  <span class="mx-3" style="cursor:pointer;">
-                    <img
-                      on:click={() => {
-                        workspaceView.set(TeamViewEnum.GRID);
-                      }}
-                      class:view-active={selectedView === TeamViewEnum.GRID}
-                      src={table}
-                      alt=""
-                    />
-                  </span>
-                  <span style="cursor:pointer;">
-                    <img
-                      on:click={() => {
-                        workspaceView.set(TeamViewEnum.LIST);
-                      }}
-                      class:view-active={selectedView === TeamViewEnum.LIST}
-                      src={hamburger}
-                      alt=""
-                    />
-                  </span>
-                {/if}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {#if openTeam && openTeam?.workspaces?.length > 0 && activeTeamTab === TeamTabsEnum.WORKSPACES}
-        <div class="ps-2 pt-2">
-          <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
-            <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
-            <input
-              type="text"
-              id="search-input"
-              class={`bg-transparent w-100 border-0 my-auto`}
-              placeholder="Search workspaces in {openTeam?.name}"
-              on:input={handleSearchInput}
-              bind:value={searchQuery}
-            />
-
-            {#if hasText}
-              <div class="clear-icon" on:click={clearSearchInput}>
-                <CrossIcon
-                  height="16px"
-                  width="12px"
-                  color="var(--icon-secondary-300)"
-                />
-              </div>
+                <span class="my-auto">{openTeam?.users.length} Members</span>
+              </p>
+            {/if}
+            {#if userRole && userRole !== TeamRole.TEAM_MEMBER}
+              <Button
+                title={`Invite`}
+                type={`dark`}
+                textStyleProp={"font-size: var(--small-text)"}
+                onClick={() => {
+                  isTeamInviteModalOpen = true;
+                }}
+                buttonClassProp={`my-auto px-3 pt-1 me-4`}
+                buttonStyleProp={`height: 30px;`}
+              />
+              <Button
+                title={`New Workspace`}
+                type={`primary`}
+                loaderSize={17}
+                textStyleProp={"font-size: var(--small-text)"}
+                buttonClassProp={`my-auto`}
+                buttonStyleProp={`height: 30px;`}
+                onClick={handleCreateNewWorkspace}
+              />
             {/if}
           </div>
         </div>
-      {/if}
 
-      {#if selectedView === TeamViewEnum.LIST && activeTeamTab === TeamTabsEnum.WORKSPACES}
-        <WorkspaceListView
-        {searchQuery}
-          {openTeam}
-          data={workspaces.filter((elem) => {
-            return (
-              elem?.team?.teamId === openTeam?.teamId &&
-              elem?.name?.toLowerCase().includes(searchQuery)
-            );
-          }) || []}
-          userType={userRole}
-          {userId}
-          {onSwitchWorkspace}
-        />
-      {:else if selectedView == TeamViewEnum.GRID && activeTeamTab === TeamTabsEnum.WORKSPACES}
-        <WorkspaceGridView
-        {searchQuery}
-          {openTeam}
-          {userId}
-          workspaces={workspaces.filter((elem) => {
-            return (
-              elem?.team?.teamId === openTeam?.teamId &&
-              elem?.name?.toLowerCase().includes(searchQuery)
-            );
-          }) || []}
-          onCreateNewWorkspace={handleCreateNewWorkspace}
-          {onSwitchWorkspace}
-        />
-        <!--Enabled in next phase-->
-      {:else if activeTeamTab === TeamTabsEnum.MEMBERS}
-        <TeamMembers
-          {userId}
-          userType={userRole}
-          {openTeam}
-          {workspaces}
-          {onRemoveMembersAtTeam}
-          {onDemoteToMemberAtTeam}
-          {onPromoteToAdminAtTeam}
-          {onPromoteToOwnerAtTeam}
-          {onRemoveUserFromWorkspace}
-          {onChangeUserRoleAtWorkspace}
-        />
-        <!-- {:else if selectedTab === "settings" && userType === "owner"}
-        <Settings
-          openTeam={openTeam?.toMutableJSON()}
-          {teamServiceMethods}
-          {teamRepositoryMethods}
-        ></Settings> -->
-      {/if}
+        <!--Workspace, setting and members tab-->
+
+        <div
+          class="teams-menu d-flex justify-content-between align-items-center"
+        >
+          <div class="teams-menu__left gap-4 align-items-center">
+            <TeamNavigator
+              tabs={teamTabs}
+              {onUpdateActiveTab}
+              {activeTeamTab}
+            />
+          </div>
+          <div class="teams-menu__right">
+            {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
+              <span class="mx-3" style="cursor:pointer;">
+                <img
+                  on:click={() => {
+                    workspaceView.set(TeamViewEnum.GRID);
+                  }}
+                  class:view-active={selectedView === TeamViewEnum.GRID}
+                  src={table}
+                  alt=""
+                />
+              </span>
+              <span style="cursor:pointer;">
+                <img
+                  on:click={() => {
+                    workspaceView.set(TeamViewEnum.LIST);
+                  }}
+                  class:view-active={selectedView === TeamViewEnum.LIST}
+                  src={hamburger}
+                  alt=""
+                />
+              </span>
+            {/if}
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:1; overflow:auto;">
+        {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
+          <div class="h-100 d-flex flex-column">
+            {#if openTeam && openTeam?.workspaces?.length > 0}
+              <div class="pt-2">
+                <div
+                  class={`d-flex search-input-container rounded py-2 px-2 mb-4`}
+                >
+                  <SearchIcon
+                    width={14}
+                    height={14}
+                    classProp={`my-auto me-3`}
+                  />
+                  <input
+                    type="text"
+                    id="search-input"
+                    class={`bg-transparent w-100 border-0 my-auto`}
+                    placeholder="Search workspaces in {openTeam?.name}"
+                    on:input={handleSearchInput}
+                    bind:value={searchQuery}
+                  />
+
+                  {#if hasText}
+                    <div class="clear-icon" on:click={clearSearchInput}>
+                      <CrossIcon
+                        height="16px"
+                        width="12px"
+                        color="var(--icon-secondary-300)"
+                      />
+                    </div>
+                  {/if}
+                </div>
+              </div>
+            {/if}
+            <div style="flex:1; overflow:auto;">
+              {#if selectedView === TeamViewEnum.LIST}
+                <WorkspaceListView
+                {searchQuery}
+                  {openTeam}
+                  data={workspaces.filter((elem) => {
+                    return (
+                      elem?.team?.teamId === openTeam?.teamId &&
+                      elem?.name?.toLowerCase().includes(searchQuery)
+                    );
+                  }) || []}
+                  userType={userRole}
+                  {userId}
+                  {onSwitchWorkspace}
+                />
+              {:else if selectedView == TeamViewEnum.GRID}
+                <WorkspaceGridView
+                {searchQuery}
+                  {openTeam}
+                  {userId}
+                  workspaces={workspaces.filter((elem) => {
+                    return (
+                      elem?.team?.teamId === openTeam?.teamId &&
+                      elem?.name?.toLowerCase().includes(searchQuery)
+                    );
+                  }) || []}
+                  onCreateNewWorkspace={handleCreateNewWorkspace}
+                  {onSwitchWorkspace}
+                />
+                <!--Enabled in next phase-->
+              {/if}
+            </div>
+          </div>
+        {:else if activeTeamTab === TeamTabsEnum.MEMBERS}
+          <TeamMembers
+            {userId}
+            userType={userRole}
+            {openTeam}
+            {workspaces}
+            {onRemoveMembersAtTeam}
+            {onDemoteToMemberAtTeam}
+            {onPromoteToAdminAtTeam}
+            {onPromoteToOwnerAtTeam}
+            {onRemoveUserFromWorkspace}
+            {onChangeUserRoleAtWorkspace}
+          />
+          <!-- {:else if selectedTab === "settings" && userType === "owner"}
+          <Settings
+            openTeam={openTeam?.toMutableJSON()}
+            {teamServiceMethods}
+            {teamRepositoryMethods}
+          ></Settings> -->
+        {/if}
+      </div>
     </div>
   </div>
 {/if}
@@ -341,10 +350,6 @@
 <style>
   .custom-tooltip {
     --bs-tooltip-bg: var(--bs-primary);
-  }
-
-  .teams-content {
-    height: calc(100vh - 44px);
   }
   @media only screen and (max-width: 1000px) {
     .team-heading {

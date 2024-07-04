@@ -39,40 +39,43 @@
   let isAdminOrOwner: boolean;
 </script>
 
-<div class="p-2">
-  <div>
-    <div
-      class="d-flex flex-wrap gap-5 row-gap-0 overflow-y-auto sparrow-thin-scrollbar"
-      style="max-height: calc(100vh - 350px); height: auto;"
-    >
-      {#if searchQuery !=="" && workspaces
+<div class="h-100 pb-2">
+  <div class="d-flex flex-column h-100">
+    <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
+      <div class="d-flex flex-wrap gap-5 justify-content-between row-gap-0">
+        {#if searchQuery !== "" && workspaces
+            .slice()
+            .reverse()
+            .filter((item) => item.name
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase())).length == 0}
+          <span class="not-found-text mx-auto ellipsis">No results found.</span>
+        {/if}
+        {#each workspaces
           .slice()
           .reverse()
-          .filter((item) => item.name
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase())).length == 0}
-        <span class="not-found-text mx-auto ellipsis">No results found.</span>
-      {/if}
-      {#each workspaces
-        .slice()
-        .reverse()
-        .filter((item) => typeof item.name === "string" && item.name
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase()))
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
-        <WorkspaceGrid {workspace} {onSwitchWorkspace} isAdminOrOwner={true} />
-      {/each}
-      {#if currPage === 1 && searchQuery=="" &&  searchQuery === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
-        <Button
-          title={`+ Add New Workspace`}
-          type="other"
-          buttonClassProp={`sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace`}
-          buttonStyleProp={"min-height: 132px;"}
-          onClick={onCreateNewWorkspace}
-        />
-        <!-- update later the above width -->
-      {/if}
+          .filter((item) => typeof item.name === "string" && item.name
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()))
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
+          <WorkspaceGrid
+            {workspace}
+            {onSwitchWorkspace}
+            isAdminOrOwner={true}
+          />
+        {/each}
+        {#if currPage === 1 && searchQuery === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
+          <Button
+            title={`+ Add New Workspace`}
+            type="other"
+            buttonClassProp={`sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace`}
+            buttonStyleProp={"min-height: 132px;"}
+            onClick={onCreateNewWorkspace}
+          />
+          <!-- update later the above width -->
+        {/if}
+      </div>
     </div>
     {#if !workspaces || workspaces
         .slice()

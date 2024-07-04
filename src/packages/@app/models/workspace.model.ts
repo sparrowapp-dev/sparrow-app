@@ -8,7 +8,7 @@ export const workspaceSchemaLiteral = {
   title: "workspace",
   primaryKey: "_id",
   type: "object",
-  version: 7,
+  version: 8,
   properties: {
     _id: {
       type: "string",

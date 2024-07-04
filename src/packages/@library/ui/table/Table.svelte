@@ -38,7 +38,7 @@
     font-weight: 700;
     line-height: var(--medium-text);
     color: var(--sparrow-text-color);
-    background-color: transparent;
+    background-color: var(--bg-secondary-850);
     z-index: 999 !important;
   }
 </style>
