@@ -296,6 +296,7 @@ export class TeamExplorerPageViewModel {
    */
   public handleTeamInvite = async (
     _teamId: string,
+    _teamName: string,
     _inviteBody: InviteBody,
     _userId: string,
   ) => {
@@ -307,24 +308,11 @@ export class TeamExplorerPageViewModel {
       const responseData = response.data.data;
       await this.refreshWorkspaces(_userId);
       await this.teamRepository.modifyTeam(_teamId, responseData);
-      if (responseData?.nonExistingUsers?.length > 0) {
-        responseData.nonExistingUsers.forEach((elem) => {
-          notifications.error(`${elem} doesn't exist.`);
-        });
-      }
-      if (responseData?.alreadyTeamMember?.length > 0) {
-        responseData.alreadyTeamMember.forEach((elem) => {
-          notifications.error(`${elem} already in team.`);
-        });
-      }
-      if (
-        !responseData?.nonExistingUsers?.length &&
-        !responseData?.alreadyTeamMember?.length
-      ) {
-        notifications.success("Invite sent.");
-      }
+      notifications.success(
+        `Invite sent to ${_inviteBody.users.length} people for ${_teamName}.`,
+      );
     } else {
-      notifications.error("Failed to sent invite. Please try again.");
+      notifications.error("Failed to send invite. Please try again.");
     }
     return response;
   };
