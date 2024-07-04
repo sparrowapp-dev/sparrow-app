@@ -5,9 +5,10 @@
 
   let search = "";
   export let modifiedUser;
+  export let workspaceName;
 </script>
 
-<div class="workspace-setting" style="padding:24px;">
+<div class="workspace-setting" style="padding:24px;  height:100dvh;">
   <div
     class="d-flex"
     style=" justify-content:space-between; gap:15px; height:30px;"
@@ -15,7 +16,7 @@
     <div
       style="font-weight: 700; font-size:18px; color:var(--text-secondary-100);"
     >
-      My Workspace
+      {workspaceName}
     </div>
     <div class="d-flex gap-2">
       <Tooltip title={"Coming Soon"} placement={"bottom"} distance={10}>
@@ -74,7 +75,7 @@
         </div>
       </div>
       <div
-        style="color: var(--text-secondary-100); padding:1px; font-size:12px;"
+        style="color: var(--text-secondary-100); marging-left:auto; font-size:12px;"
       >
         Owner
       </div>
@@ -85,7 +86,7 @@
     <img
       src={Shimmer}
       alt="shimmer effect"
-      width="610px"
+      width="100%"
       height="100%"
       style="margin-left: -5px; margin-top:8px;"
     />
