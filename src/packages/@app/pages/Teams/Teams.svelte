@@ -19,6 +19,7 @@
   import { TeamsViewModel } from "./Teams.ViewModel";
   import { Modal } from "@library/ui/modal";
   import { CreateTeam } from "@teams/features";
+  import { pagesMotion } from "@app/constants";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
@@ -33,6 +34,7 @@
   let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
   import { onMount } from "svelte";
+  import { Motion } from "svelte-motion";
 
   let githubRepoData: GithubRepoDocType;
 
@@ -62,44 +64,48 @@
   }
 </script>
 
-<Splitpanes
-  class="team-splitter h-100"
-  style="width: calc(100vw - 54px)"
-  on:resize={(e) => {
-    leftPanelWidth.set(e.detail[0].size);
-    rightPanelWidth.set(e.detail[1].size);
-  }}
->
-  <Pane
-    size={$leftPanelCollapse ? 0 : $leftPanelWidth}
-    minSize={20}
-    class="bg-secondary-900-important sidebar-left-panel"
-  >
-    <TeamSidePanel
-      bind:isCreateTeamModalOpen
-      teamList={$teamList}
-      tabList={$tabList}
-      data={workspaces}
-      githubRepo={githubRepoData}
-      leftPanelController={{
-        leftPanelCollapse: $leftPanelCollapse,
-        handleCollapseCollectionList,
+<Motion {...pagesMotion} let:motion>
+  <div class="h-100" use:motion>
+    <Splitpanes
+      class="team-splitter h-100"
+      style="width: calc(100vw - 54px)"
+      on:resize={(e) => {
+        leftPanelWidth.set(e.detail[0].size);
+        rightPanelWidth.set(e.detail[1].size);
       }}
-      collectionList={$collectionList}
-      openTeam={$openTeam}
-      {onApiClick}
-      {OnWorkspaceSwitch}
-      {setOpenTeam}
-    />
-  </Pane>
-  <Pane
-    size={$leftPanelCollapse ? 100 : $rightPanelWidth}
-    minSize={60}
-    class="bg-secondary-800-important"
-  >
-    <TeamExplorerPage />
-  </Pane>
-</Splitpanes>
+    >
+      <Pane
+        size={$leftPanelCollapse ? 0 : $leftPanelWidth}
+        minSize={20}
+        class="bg-secondary-900-important sidebar-left-panel"
+      >
+        <TeamSidePanel
+          bind:isCreateTeamModalOpen
+          teamList={$teamList}
+          tabList={$tabList}
+          data={workspaces}
+          githubRepo={githubRepoData}
+          leftPanelController={{
+            leftPanelCollapse: $leftPanelCollapse,
+            handleCollapseCollectionList,
+          }}
+          collectionList={$collectionList}
+          openTeam={$openTeam}
+          {onApiClick}
+          {OnWorkspaceSwitch}
+          {setOpenTeam}
+        />
+      </Pane>
+      <Pane
+        size={$leftPanelCollapse ? 100 : $rightPanelWidth}
+        minSize={60}
+        class="bg-secondary-800-important"
+      >
+        <TeamExplorerPage />
+      </Pane>
+    </Splitpanes>
+  </div>
+</Motion>
 
 <Modal
   title={"New Team"}

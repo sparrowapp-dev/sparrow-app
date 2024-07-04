@@ -123,7 +123,7 @@
       onOpenCollection(list._id);
     }}
     class="tab-data py-3"
-    >{calculateTimeDifferenceInDays(new Date(), new Date(list?.createdAt))}</td
+    >{calculateTimeDifferenceInDays(new Date(), new Date(list?.updatedAt))}</td
   >
   <td class="tab-data rounded-end py-3">
     <button

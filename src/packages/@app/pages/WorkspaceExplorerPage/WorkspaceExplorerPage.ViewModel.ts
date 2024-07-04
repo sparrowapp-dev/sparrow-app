@@ -35,17 +35,18 @@ export default class WorkspaceExplorerViewModel {
     const response = await this.workspaceService.updateWorkspace(workspaceId, {
       name: newName,
     });
-    
+
     if (response) {
       const updatedata = {
         name: newName,
+        updatedAt: response.data.data.updatedAt,
       };
       let tabId = "";
       await this.workspaceRepository.updateWorkspace(workspaceId, updatedata);
       await this.getActiveTab().subscribe((tab: any) => {
         tabId = tab.tabId;
       });
-      await this.tabRepository.updateTab(tabId, updatedata);      
+      await this.tabRepository.updateTab(tabId, updatedata);
       const initWorkspaceTab = new InitWorkspaceTab(
         response.data.data._id,
         workspaceId,
@@ -73,10 +74,10 @@ export default class WorkspaceExplorerViewModel {
     if (response) {
       const updatedata = {
         description: newDescription,
-      };      
+      };
       await this.workspaceRepository.updateWorkspace(workspaceId, updatedata);
       let tabId = "";
-      const res =  await this.getActiveTab()
+      const res = await this.getActiveTab();
       res.subscribe((tab: any) => {
         tabId = tab.tabId;
       });

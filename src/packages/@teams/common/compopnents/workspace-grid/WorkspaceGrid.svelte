@@ -133,7 +133,7 @@
           showMenu ? "color: var(--sparrow-text-color) !important;" : null
         }`}
       >
-        Last updated on <span>{formatDateInString(workspace?.createdAt)}</span>
+        Last updated on <span>{formatDateInString(workspace?.updatedAt)}</span>
       </p>
     </div>
   </Card>

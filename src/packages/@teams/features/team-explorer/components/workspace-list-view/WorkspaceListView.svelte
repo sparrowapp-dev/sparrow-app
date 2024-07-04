@@ -27,10 +27,10 @@
   ];
 </script>
 
-<div class="ps-2">
+<div class=" h-100 d-flex flex-column pb-2">
   <div
     class="table-container sparrow-thin-scrollbar overflow-y-auto"
-    style="max-height: calc(100vh - 355px); height: auto;"
+    style="flex:1; overflow:auto;"
   >
     <Table
       tableClassProps="table p-0 table-responsive w-100"
@@ -164,7 +164,8 @@
               /></button
             >
           </th>
-          <th class="tab-head px-5 ms-5"></th>
+          <!-- <th class="tab-head px-0 ms-0"></th> -->
+          <div></div>
         </tr>
       </tfoot>
     </table>
