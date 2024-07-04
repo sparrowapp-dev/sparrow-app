@@ -11,7 +11,7 @@
   import { List } from "@library/ui";
   import { PeopleIcon } from "$lib/assets/app.asset";
   import { version } from "../../../../../../src-tauri/tauri.conf.json";
-    import constants from "$lib/utils/constants";
+  import constants from "$lib/utils/constants";
   export let teamList: TeamDocument[] = [];
   export let tabList: TabDocument[] = [];
   export let isCreateTeamModalOpen;
@@ -25,7 +25,6 @@
 
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
-
   export let leftPanelController: {
     leftPanelCollapse: boolean;
     handleCollapseCollectionList: () => void;
@@ -33,7 +32,7 @@
 
   let isGithubStarHover = false;
 
-  let activeIndex ;
+  let activeIndex;
 
   const handleTeamClick = (id) => {
     setOpenTeam(id);
@@ -78,11 +77,11 @@
 
 {#if !leftPanelController.leftPanelCollapse}
   <div
-    class="sidebar d-flex flex-column justify-content-between bg-secondary-900"
+    class="d-flex flex-column sidebar h-100 d-flex flex-column justify-content-between bg-secondary-900"
   >
-    <div>
+    <div style="flex:1; overflow:auto;">
       <!--Teams list-->
-      <section>
+      <section class="d-flex flex-column" style="max-height:33%;">
         <div
           class="sidebar-teams-header d-flex justify-content-between p-3 pb-0"
         >
@@ -104,8 +103,8 @@
             </Tooltip>
           </div>
         </div>
-        <div class="sidebar-teams-list">
-          <List height={"calc((100vh - 230px) / 3)"} classProps={"px-2 py-1"}>
+        <div class="sidebar-teams-list" style="flex:1; overflow:auto;">
+          <List height={"100%"} overflowY={"auto"} classProps={"px-2 py-1"}>
             {#each teamList as team, index}
               <button
                 class={`d-flex w-100 mb-1 
@@ -137,7 +136,7 @@
                     NEW INVITE
                   </p>
                 {:else}
-                       <PeopleIcon
+                  <PeopleIcon
                     color={team.teamId === activeIndex
                       ? "var(--sparrow-text-color)"
                       : "var(--defaultcolor)"}
@@ -148,19 +147,19 @@
             {/each}
           </List>
         </div>
+        <hr class="mb-0 pb-0" />
       </section>
-
-      <hr class="mb-0 pb-0" />
 
       <!-- Recent APIs-->
 
-      <RecentApi {tabList} {data} {collectionList} {onApiClick} />
-
-      <hr class="mb-0 pb-0" />
+      <section class="d-flex flex-column" style="max-height:33%;">
+        <RecentApi {tabList} {data} {collectionList} {onApiClick} />
+      </section>
 
       <!-- Recent Workspace Section -->
-
-      <RecentWorkspace {data} {openTeam} {OnWorkspaceSwitch} />
+      <section class="d-flex flex-column" style="max-height:33%;">
+        <RecentWorkspace {data} {openTeam} {OnWorkspaceSwitch} />
+      </section>
     </div>
 
     <!-- github repo section -->
@@ -221,9 +220,6 @@
 {/if}
 
 <style>
-  .sidebar {
-    height: calc(100vh - 44px);
-  }
   .teams-heading {
     margin-left: 5px;
     font-size: 14px;
