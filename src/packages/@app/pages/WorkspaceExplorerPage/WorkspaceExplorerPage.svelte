@@ -114,7 +114,7 @@
       </div>
     {/if}
     {#if showWorkspaceSettings}
-      <WorkspaceSetting {modifiedUser} />
+      <WorkspaceSetting {workspaceName} {modifiedUser} />
     {/if}
   </div>
 
