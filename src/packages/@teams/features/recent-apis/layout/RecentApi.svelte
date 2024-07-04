@@ -15,12 +15,22 @@
 </div>
 
 <div class="sidebar-recentapi-list" style="flex:1; overflow: auto;">
-  {#if tabList?.slice()?.reverse()?.length}
+  {#if tabList?.filter((tab) => {
+    if (tab.type === ItemType.REQUEST) {
+      return true;
+    } else {
+      return false;
+    }
+  })?.length}
     <List height={"100%"} overflowY={"auto"} classProps={"px-2 py-0"}>
-      {#each tabList.slice().reverse() as api, index}
-        {#if api.type === ItemType.REQUEST && !api.id.startsWith("UNTRACKED") && index < constants.API_LIMIT}
-          <ApiListItem {api} {data} {onApiClick} {collectionList} />
-        {/if}
+      {#each tabList?.filter((tab) => {
+        if (tab.type === ItemType.REQUEST) {
+          return true;
+        } else {
+          return false;
+        }
+      }) as api, index}
+        <ApiListItem {api} {data} {onApiClick} {collectionList} />
       {/each}
     </List>
   {:else}
