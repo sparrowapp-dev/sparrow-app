@@ -9,60 +9,34 @@
   export let onApiClick;
 </script>
 
-<section>
-  <div class="d-flex justify-content-between p-3 pb-0">
-    <h6 class="teams-heading ms-2">Recent APIs</h6>
-  </div>
+<!-- <section class="d-flex flex-columh-100"> -->
+<div class="d-flex justify-content-between p-3 pb-0">
+  <h6 class="teams-heading ms-2">Recent APIs</h6>
+</div>
 
-  <div class="sidebar-recentapi-list"
-  style="overflow-y: auto;">
-    {#if tabList?.slice()?.reverse()?.length}
-      <List height={"calc((100vh - 230px) / 3)"} classProps={"px-2 py-0"}>
-        {#each tabList.slice().reverse() as api, index}
-          {#if api.type === ItemType.REQUEST && !api.id.startsWith("UNTRACKED") && index < constants.API_LIMIT}
-            <ApiListItem
-              {api}
-              {data}
-              {onApiClick}
-              {collectionList}
-            />
-          {/if}
-        {/each}
-      </List>
-    {/if}
+<div class="sidebar-recentapi-list" style="flex:1; overflow: auto;">
+  {#if tabList?.slice()?.reverse()?.length}
+    <List height={"100%"} overflowY={"auto"} classProps={"px-2 py-0"}>
+      {#each tabList.slice().reverse() as api, index}
+        {#if api.type === ItemType.REQUEST && !api.id.startsWith("UNTRACKED") && index < constants.API_LIMIT}
+          <ApiListItem {api} {data} {onApiClick} {collectionList} />
+        {/if}
+      {/each}
+    </List>
+  {:else}
+    <p class="not-found-text px-2 ms-3">Recently opened APIs show up here.</p>
+  {/if}
+</div>
+<hr class="mb-0 pb-0" />
 
-    {#if !tabList.find((api) => api.type === ItemType.REQUEST && !api.id.startsWith("UNTRACKED"))}
-      <p class="not-found-text px-2 ms-3">Recently opened APIs show up here.</p>
-    {/if}
-  </div>
-</section>
+<!-- </section> -->
 
 <style>
-  .sidebar-recentapi-list {
-    max-height: 30vh;
-  }
-
-  .sidebar {
-    height: calc(100vh - 44px);
-  }
   .teams-heading {
     margin-left: 5px;
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
-  }
-   
-  .sidebar-teams-list {
-    max-height: 30vh;
-  }
-
-  .sidebar-recentapi-list {
-    max-height: 30vh;
-  }
-
-  .sidebar-recentapi-list::-webkit-scrollbar {
-    width: 11px;
-    display: none; /* Hide scrollbar for WebKit browsers (Safari, Chrome) */
   }
 
   .not-found-text {
