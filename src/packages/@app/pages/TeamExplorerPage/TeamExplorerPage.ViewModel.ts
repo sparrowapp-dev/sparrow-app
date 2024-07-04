@@ -199,6 +199,8 @@ export class TeamExplorerPageViewModel {
           createdAt,
           createdBy,
           collection,
+          updatedAt,
+          updatedBy,
         } = elem;
         const isActiveWorkspace =
           await this.workspaceRepository.checkActiveWorkspace(_id);
@@ -218,6 +220,8 @@ export class TeamExplorerPageViewModel {
           isActiveWorkspace: isActiveWorkspace,
           createdAt,
           createdBy,
+          updatedAt,
+          updatedBy,
         };
         data.push(item);
       }
