@@ -90,7 +90,7 @@
             <Tooltip
               title="New Team"
               placement={"bottom"}
-              styleProp={"left: -50%"} 
+              distance={10} 
             >
               <button
                 class="new-team-btn rounded border-0"
