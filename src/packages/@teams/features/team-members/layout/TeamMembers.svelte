@@ -65,7 +65,7 @@
   }
 </script>
 
-<div class="px-2 pt-2">
+<div class="py-2 h-100 d-flex flex-column">
   <section>
     <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
       <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
@@ -87,7 +87,7 @@
       {/if}
     </div>
   </section>
-  <section class="member-list">
+  <section style="flex:1; overflow:auto;">
     {#if filteredUser}
       {#each filteredUser as user}
         {#if user.id === userId}
@@ -187,10 +187,6 @@
     font-size: 16px;
     font-weight: 400;
     text-align: center;
-  }
-  .member-list {
-    height: calc(100vh - 310px);
-    overflow-y: auto;
   }
   .clear-icon {
     position: absolute;
