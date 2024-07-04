@@ -10,6 +10,9 @@
   import Button from "@library/ui/button/Button.svelte";
   import { WorkspaceGrid } from "@teams/common/compopnents";
 
+
+  export let searchQuery
+
   /**
    * Id of current user
    */
@@ -31,7 +34,6 @@
    */
   export let onSwitchWorkspace: (id: string) => void;
 
-  let filterText = "";
   let workspacePerPage = 5;
   let currPage = 1;
   let isAdminOrOwner: boolean;
@@ -43,12 +45,12 @@
       class="d-flex flex-wrap gap-5 row-gap-0 overflow-y-auto sparrow-thin-scrollbar"
       style="max-height: calc(100vh - 350px); height: auto;"
     >
-      {#if filterText !== "" && workspaces
+      {#if searchQuery !=="" && workspaces
           .slice()
           .reverse()
           .filter((item) => item.name
               .toLowerCase()
-              .includes(filterText.toLowerCase())).length == 0}
+              .includes(searchQuery.toLowerCase())).length == 0}
         <span class="not-found-text mx-auto ellipsis">No results found.</span>
       {/if}
       {#each workspaces
@@ -56,12 +58,12 @@
         .reverse()
         .filter((item) => typeof item.name === "string" && item.name
               .toLowerCase()
-              .includes(filterText.toLowerCase()))
+              .includes(searchQuery.toLowerCase()))
         .sort((a, b) => a.name.localeCompare(b.name))
         .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
         <WorkspaceGrid {workspace} {onSwitchWorkspace} isAdminOrOwner={true} />
       {/each}
-      {#if currPage === 1 && filterText === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
+      {#if currPage === 1 && searchQuery=="" &&  searchQuery === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
         <Button
           title={`+ Add New Workspace`}
           type="other"
@@ -77,7 +79,7 @@
         .reverse()
         .filter((item) => typeof item.name === "string" && item.name
               .toLowerCase()
-              .includes(filterText.toLowerCase())).length > 0}
+              .includes(searchQuery.toLowerCase())).length > 0}
       <div class="justify-content-between bottom-0 w-75 d-flex">
         <div class="tab-head">
           Showing {(currPage - 1) * workspacePerPage + (currPage == 1 ? 1 : 0)} -
@@ -89,7 +91,7 @@
               ?.filter(
                 (item) =>
                   typeof item.name === "string" &&
-                  item.name.toLowerCase().startsWith(filterText.toLowerCase()),
+                  item.name.toLowerCase().startsWith(searchQuery.toLowerCase()),
               ).length,
           )} of {workspaces
             .slice()
@@ -97,7 +99,7 @@
             ?.filter(
               (item) =>
                 typeof item.name === "string" &&
-                item.name?.toLowerCase().startsWith(filterText.toLowerCase()),
+                item.name?.toLowerCase().startsWith(searchQuery.toLowerCase()),
             ).length}
         </div>
         <div class="tab-head tab-change">
@@ -128,7 +130,7 @@
               ?.filter(
                 (item) =>
                   typeof item.name === "string" &&
-                  item.name?.toLowerCase().startsWith(filterText.toLowerCase()),
+                  item.name?.toLowerCase().startsWith(searchQuery.toLowerCase()),
               ).length %
               6 ===
               0 &&
@@ -142,7 +144,7 @@
                       typeof item.name === "string" &&
                       item.name
                         .toLowerCase()
-                        .startsWith(filterText.toLowerCase()),
+                        .startsWith(searchQuery.toLowerCase()),
                   ).length / workspacePerPage,
               )
               ? true
@@ -159,7 +161,7 @@
                         typeof item.name === "string" &&
                         item.name
                           .toLowerCase()
-                          .startsWith(filterText.toLowerCase()),
+                          .startsWith(searchQuery.toLowerCase()),
                     ).length / workspacePerPage,
                 )
               )
@@ -178,7 +180,7 @@
                       typeof item.name === "string" &&
                       item.name
                         .toLowerCase()
-                        .startsWith(filterText.toLowerCase()),
+                        .startsWith(searchQuery.toLowerCase()),
                   ).length / workspacePerPage,
               )
                 ? "var(--border-secondary-200)"
@@ -196,7 +198,7 @@
                       typeof item.name === "string" &&
                       item.name
                         .toLowerCase()
-                        .startsWith(filterText.toLowerCase()),
+                        .startsWith(searchQuery.toLowerCase()),
                   ).length / workspacePerPage,
               );
               if (
@@ -208,7 +210,7 @@
                       typeof item.name === "string" &&
                       item.name
                         ?.toLowerCase()
-                        .startsWith(filterText.toLowerCase()),
+                        .startsWith(searchQuery.toLowerCase()),
                   ).length %
                   6 !==
                 0
@@ -226,7 +228,7 @@
                         typeof item.name === "string" &&
                         item.name
                           .toLowerCase()
-                          .startsWith(filterText.toLowerCase()),
+                          .startsWith(searchQuery.toLowerCase()),
                     ).length / workspacePerPage,
                 )
               ) {
@@ -245,7 +247,7 @@
                       typeof item.name === "string" &&
                       item.name
                         .toLowerCase()
-                        .startsWith(filterText.toLowerCase()),
+                        .startsWith(searchQuery.toLowerCase()),
                   ).length / workspacePerPage,
               )
                 ? "var(--border-secondary-200)"

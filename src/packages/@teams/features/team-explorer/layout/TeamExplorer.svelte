@@ -287,6 +287,7 @@
 
       {#if selectedView === TeamViewEnum.LIST && activeTeamTab === TeamTabsEnum.WORKSPACES}
         <WorkspaceListView
+        {searchQuery}
           {openTeam}
           data={workspaces.filter((elem) => {
             return (
@@ -300,6 +301,7 @@
         />
       {:else if selectedView == TeamViewEnum.GRID && activeTeamTab === TeamTabsEnum.WORKSPACES}
         <WorkspaceGridView
+        {searchQuery}
           {openTeam}
           {userId}
           workspaces={workspaces.filter((elem) => {

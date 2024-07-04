@@ -15,9 +15,10 @@
   export let openTeam: TeamDocument;
   export let onSwitchWorkspace: (id: string) => void;
 
+  export let searchQuery;
+
   let workspacePerPage: number = 10,
     currPage = 1;
-  let filterText: string = "";
   const tableHeaderContent = [
     "Workspace",
     "Collections",
@@ -47,7 +48,7 @@
             .reverse()
             .filter((item) => item.name
                 .toLowerCase()
-                .startsWith(filterText.toLowerCase()))
+                .startsWith(searchQuery.toLowerCase()))
             .sort((a, b) => a.name.localeCompare(b.name))
             .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
             <Rows
@@ -62,14 +63,14 @@
       </tbody>
     </Table>
 
-    {#if data && data?.length === 0}
+    {#if  searchQuery == "" && data && data?.length === 0}
       <p class="not-found-text mt-3">Add Workspaces to this team</p>
-    {:else if filterText !== "" && data
+    {:else if searchQuery !== "" && data
         .slice()
         .reverse()
         .filter((item) => item.name
             .toLowerCase()
-            .startsWith(filterText.toLowerCase()))
+            .startsWith(searchQuery.toLowerCase()))
         .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length == 0}
       <p class="not-found-text mt-3">No results found.</p>
     {/if}
@@ -80,7 +81,7 @@
     .reverse()
     .filter((item) => item.name
         .toLowerCase()
-        .startsWith(filterText.toLowerCase()))
+        .startsWith(searchQuery.toLowerCase()))
     .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0}
     <table class="w-75 bottom-0">
       <tfoot>
@@ -89,10 +90,10 @@
             >Showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
               currPage * workspacePerPage,
               data?.filter((item) =>
-                item.name.toLowerCase().startsWith(filterText.toLowerCase()),
+                item.name.toLowerCase().startsWith(searchQuery.toLowerCase()),
               ).length,
             )} of {data?.filter((item) =>
-              item.name.toLowerCase().startsWith(filterText.toLowerCase()),
+              item.name.toLowerCase().startsWith(searchQuery.toLowerCase()),
             ).length}
           </th>
           <th class="tab-head tab-change" style="">
@@ -120,7 +121,7 @@
                     data?.filter((item) =>
                       item.name
                         .toLowerCase()
-                        .startsWith(filterText.toLowerCase()),
+                        .startsWith(searchQuery.toLowerCase()),
                     ).length / workspacePerPage,
                   )
                 )
@@ -133,7 +134,7 @@
                   data?.filter((item) =>
                     item.name
                       .toLowerCase()
-                      .startsWith(filterText.toLowerCase()),
+                      .startsWith(searchQuery.toLowerCase()),
                   ).length / workspacePerPage,
                 )
                   ? "var(--border-secondary-200)"
@@ -146,7 +147,7 @@
                   data?.filter((item) =>
                     item.name
                       .toLowerCase()
-                      .startsWith(filterText.toLowerCase()),
+                      .startsWith(searchQuery.toLowerCase()),
                   ).length / workspacePerPage,
                 ))}
               class="bg-transparent border-0"
@@ -156,7 +157,7 @@
                   data?.filter((item) =>
                     item.name
                       .toLowerCase()
-                      .startsWith(filterText.toLowerCase()),
+                      .startsWith(searchQuery.toLowerCase()),
                   ).length / workspacePerPage,
                 )
                   ? "var(--border-secondary-200)"
