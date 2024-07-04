@@ -90,7 +90,7 @@
             <Tooltip
               title="New Team"
               placement={"bottom"}
-              styleProp={"left: -50%"}
+              distance={10} 
             >
               <button
                 class="new-team-btn rounded border-0"
@@ -104,8 +104,8 @@
           </div>
         </div>
         <div class="sidebar-teams-list" style="flex:1; overflow:auto;">
-          <List height={"100%"} overflowY={"auto"} classProps={"px-2 py-1"}>
-            {#each teamList as team, index}
+          <List height={"100%"} overflowY={"auto"} classProps={"px-2 py-1"}>     
+            {#each teamList.slice().reverse() as team, index}
               <button
                 class={`d-flex w-100 mb-1 
             px-3 align-items-center justify-content-between rounded teams-outer border-0 ${

@@ -1,5 +1,5 @@
 export const ICON_CONFIG = {
-  TITLE: `Icon`,
+  TITLE: `Logo`,
   DESCRIPTION: `Drag and drop your image. We recommend that you upload an image with
       square aspect ratio.The image size should not be more than 2 MB. Supported
       formats are .jpg, .jpeg, .png`,

@@ -156,9 +156,10 @@
     <div
       class="content-teams d-flex flex-column h-100 px-md-1 px-lg-3 px-3 pt-5"
     >
-      <div class="">
+      <div class="" style="padding-left: 14px; padding-right:14px">
         <div
           class="team-heading d-flex justify-content-between position-relative"
+          style="padding-bottom: 10px;"
         >
           <h2 class="d-flex ellipsis overflow-visible team-title">
             {#if openTeam?.logo?.size}
@@ -221,7 +222,10 @@
         <div
           class="teams-menu d-flex justify-content-between align-items-center"
         >
-          <div class="teams-menu__left gap-4 align-items-center">
+          <div
+            class="teams-menu__left gap-4 align-items-center"
+            style="padding-bottom: 4px;"
+          >
             <TeamNavigator
               tabs={teamTabs}
               {onUpdateActiveTab}
@@ -255,7 +259,9 @@
         </div>
       </div>
 
-      <div style="flex:1; overflow:auto;">
+      <div
+        style="flex:1; overflow:auto; padding-left: 14px; padding-right:14px"
+      >
         {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
           <div class="h-100 d-flex flex-column">
             {#if openTeam && openTeam?.workspaces?.length > 0}

@@ -51,6 +51,13 @@
    */
   let handleDropdown = (tabId: string) => {
     onInitActiveEnvironmentToWorkspace(currentWorkspaceId, tabId);
+  };
+
+  /**
+   * callback for workspace Select component
+   * @param tabId - selected option id
+   */
+  let handleWorkspaceDropdown = (tabId: string) => {
     onSwitchWorkspace(tabId);
   };
 
@@ -129,7 +136,7 @@
         id={"workspace-dropdown"}
         data={workspaceData}
         titleId={`${currentWorkspaceId}`}
-        onclick={handleDropdown}
+        onclick={handleWorkspaceDropdown}
         minHeaderWidth={"185px"}
         iconRequired={false}
         isDropIconFilled={true}
