@@ -74,6 +74,12 @@ export const workspaceSchemaLiteral = {
     createdBy: {
       type: "string",
     },
+    updatedAt: {
+      type: "string",
+    },
+    updatedBy: {
+      type: "string",
+    },
     isActiveWorkspace: {
       type: "boolean",
       default: false,

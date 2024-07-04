@@ -103,7 +103,7 @@
   };
 
   $: {
-    if (currentTeamName) {
+    if (currentWorkspaceName || currentTeamName) {
       calculateLimitedWorkspace();
     }
   }

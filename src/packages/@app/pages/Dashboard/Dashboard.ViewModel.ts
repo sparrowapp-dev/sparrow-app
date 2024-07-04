@@ -193,6 +193,8 @@ export class DashboardViewModel {
           createdAt,
           createdBy,
           collection,
+          updatedAt,
+          updatedBy,
         } = elem;
         const isActiveWorkspace = await this.checkActiveWorkspace(_id);
         if (isActiveWorkspace) isAnyWorkspaceActive = _id;
@@ -211,6 +213,8 @@ export class DashboardViewModel {
           isActiveWorkspace: isActiveWorkspace,
           createdAt,
           createdBy,
+          updatedAt,
+          updatedBy,
         };
         data.push(item);
       }
