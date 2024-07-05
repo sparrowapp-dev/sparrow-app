@@ -18,6 +18,11 @@
   import WorkspaceGridView from "../components/workspace-grid-view/WorkspaceGridView.svelte";
   import { TeamMembers } from "@teams/features";
   import { CrossIcon } from "@library/icons";
+  import MoreOptions from "@workspaces/features/tab-bar/assets/MoreOptions.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import Dropdown from "$lib/assets/dropdown.svelte";
+  import MenuView from "@teams/common/compopnents/menu-view/MenuView.svelte";
+  import Showmore from "$lib/assets/showmore.svelte";
   /**
    * user ID
    */
@@ -43,6 +48,8 @@
    * Invite team toggler
    */
   export let isTeamInviteModalOpen;
+
+  export let isLeaveTeamModelOpen;
 
   /**
    * Callback For creating workspace
@@ -137,6 +144,11 @@
   let searchQuery = "";
   let hasText = false;
 
+  const handleDelteteam = () => {
+    isLeaveTeamModelOpen = true;
+    console.log("inside handlete Delte", isLeaveTeamModelOpen);
+  };
+
   const handleSearchInput = (event) => {
     searchQuery = event.target.value.toLowerCase();
     hasText = searchQuery.length > 0;
@@ -149,7 +161,49 @@
   onDestroy(() => {
     selectedViewSubscribe();
   });
+
+  let showMenu = false;
+
+  let viewChange: boolean = true;
+  let menuItems = [];
+
+  const rightClickContextMenu = (e) => {
+    console.log("Inside right clikc context menu");
+    e.preventDefault();
+    setTimeout(() => {
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      pos = { x: mouseX, y: mouseY };
+      showMenu = true;
+    }, 100);
+  };
+
+  $: {
+    menuItems = [
+      {
+        onClick: () => {
+          handleDelteteam();
+        },
+        displayText: "Leave Team",
+        disabled: false,
+      },
+    ];
+  }
+
+  let pos = { x: 0, y: 0 };
+
+  function closeRightClickContextMenu() {
+    showMenu = false;
+  }
+
+  let noOfColumns = 180;
+  let noOfRows = 3;
 </script>
+
+<svelte:window
+  on:click={closeRightClickContextMenu}
+  on:contextmenu|preventDefault={closeRightClickContextMenu}
+/>
 
 {#if openTeam}
   <div class="teams-content h-100 bg-secondary-850">
@@ -181,6 +235,27 @@
               style="font-size: 24px;"
               >{openTeam?.name || ""}
             </span>
+
+            {#if showMenu}
+              <MenuView
+                xAxis={pos.x}
+                yAxis={pos.y}
+                {noOfRows}
+                {noOfColumns}
+                {menuItems}
+              />
+            {/if}
+
+            <Tooltip title="Leave Team" placement={"bottom"} distance={10}>
+              <div
+                class="ms-2 d-flex justify-content-center align-items-center mt-2 moreOption-icon rounded"
+                on:click={(e) => {
+                  rightClickContextMenu(e);
+                }}
+              >
+                <MoreOptions height="15px" width="5px" color="White" />
+              </div>
+            </Tooltip>
           </h2>
 
           <div class="d-flex align-items-end justify-content-end">
@@ -298,7 +373,7 @@
             <div style="flex:1; overflow:auto;">
               {#if selectedView === TeamViewEnum.LIST}
                 <WorkspaceListView
-                {searchQuery}
+                  {searchQuery}
                   {openTeam}
                   data={workspaces.filter((elem) => {
                     return (
@@ -312,7 +387,7 @@
                 />
               {:else if selectedView == TeamViewEnum.GRID}
                 <WorkspaceGridView
-                {searchQuery}
+                  {searchQuery}
                   {openTeam}
                   {userId}
                   workspaces={workspaces.filter((elem) => {
@@ -435,5 +510,13 @@
     transform: translateY(-50%);
     cursor: pointer;
     font-size: 16px;
+  }
+
+  .moreOption-icon {
+    height: 24px;
+    width: 24px;
+  }
+  .moreOption-icon:hover {
+    background-color: var(--bg-tertiary-190);
   }
 </style>

@@ -5,7 +5,17 @@
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { user } from "$lib/store";
   import { Modal } from "@library/ui";
+    import LeaveTeam from "@teams/features/leave-team/layout/LeaveTeam.svelte";
+    import { notifications } from "@library/ui/toast/Toast";
+    import TeamActions from "@teams/features/create-team/components/team-actions/TeamActions.svelte";
+  import { TeamViewModel } from "../Teams/Teams.ViewModel.old";
+    import TeamDescription from "@teams/features/create-team/components/team-description/TeamDescription.svelte";
+    import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+    const _viewModelWorkspace = new HeaderDashboardViewModel();
+
   const _viewModel = new TeamExplorerPageViewModel();
+  const _viewModel1 = new TeamViewModel();
+
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
@@ -16,11 +26,45 @@
     }
   });
   let isTeamInviteModalOpen = false;
+  let isLeaveTeamModelOpen=false;
+
+
+  const handleLeaveTeam = async () => {
+    if (!$activeTeam?.teamId) return;
+    const teamId = $activeTeam?.teamId;
+    const response = await _viewModel1.leaveTeam($activeTeam?.teamId);
+    if (response.isSuccessful) {
+      setTimeout(async () => {
+        const activeTeam = await _viewModel1.checkActiveTeam();
+        if (activeTeam) {
+          const teamIdToActivate = await _viewModel1.activateInitialWorkspace();
+          if (teamIdToActivate) {
+            await _viewModel1.activateTeam(teamIdToActivate);
+          }
+        }
+        setTimeout(async () => {
+          await _viewModel1.refreshTeams(userId);
+          await _viewModelWorkspace.refreshWorkspaces(userId);
+          notifications.success("You left a team.");
+        
+        }, 500);
+      }, 500);
+    } else {
+      notifications.error(
+        response.message ?? "Failed to leave the team. Please try again.",
+      );
+  
+    }
+  };
+
+
+
 </script>
 
 <TeamExplorer
   bind:userId
-  bind:isTeamInviteModalOpen
+  bind:isTeamInviteModalOpen 
+  bind:isLeaveTeamModelOpen
   openTeam={$activeTeam}
   workspaces={$workspaces}
   activeTeamTab={$activeTeamTab}
@@ -58,4 +102,23 @@
       isTeamInviteModalOpen = flag;
     }}
   />
+</Modal>
+
+<Modal
+  title={"Leave Team?"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  
+  
+  isOpen={isLeaveTeamModelOpen}
+  handleModalState={(flag) => {
+    isLeaveTeamModelOpen = flag;
+  }}
+>
+<LeaveTeam openTeam={$activeTeam } {handleLeaveTeam}
+
+handleModalState={(flag) => {
+  isLeaveTeamModelOpen = flag;
+}}/>
 </Modal>
