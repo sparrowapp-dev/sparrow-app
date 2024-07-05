@@ -29,10 +29,19 @@ export class TeamRepository {
   };
 
   /**
+   * Adds a new team.
+   * @params - Team data to be inserted
+   */
+  public insert = async (team: any) => {
+    await RxDB.getInstance().rxdb.team.insert(team);
+    return;
+  };
+
+  /**
    * get all teams observable of user
    */
   public getTeams = (): Observable<TeamDocument[]> => {
-    return RxDB.getInstance().rxdb.team.find().$;
+    return RxDB.getInstance().rxdb.team.find().sort({ index: "asc" }).$;
   };
 
   /**

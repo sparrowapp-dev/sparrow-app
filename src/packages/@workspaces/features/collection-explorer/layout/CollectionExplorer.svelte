@@ -132,7 +132,7 @@
   };
 </script>
 
-<div class="main-container d-flex">
+<div class="main-container d-flex h-100" style="overflow:auto;">
   <ModalWrapperV1
     title={"Switch Branch?"}
     type={"danger"}
@@ -441,11 +441,6 @@
 </div>
 
 <style>
-  .main-container {
-    height: calc(100vh - 80px);
-    /* background-color: var(--background-color); */
-  }
-
   .my-collection {
     padding: 10px;
   }

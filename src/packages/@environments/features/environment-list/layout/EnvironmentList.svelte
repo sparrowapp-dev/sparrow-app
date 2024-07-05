@@ -89,7 +89,7 @@
 </script>
 
 <div
-  class={` env-sidebar bg-secondary-900 px-2 py-3`}
+  class={`d-flex flex-column env-sidebar bg-secondary-900 h-100 px-2 pt-3 pb-2`}
   style="font-weight: 500;"
 >
   <div
@@ -98,19 +98,19 @@
     <p class={`mb-0 text-secondary-170 ellipsis text-fs-16`}>
       {currentWorkspace?.name || ""}
     </p>
-    <Tooltip placement="right" title="Add Environment" distance={13}>
-    <WithButtonV2
-      icon={PlusIcon}
-      disable={!hasWorkpaceLevelPermission(
-        loggedUserRoleInWorkspace,
-        workspaceLevelPermissions.ADD_ENVIRONMENT,
-      )}
-      onClick={async () => {
-        await onCreateEnvironment(localEnvironment);
-        scrollList("bottom");
-      }}
-      loader={false}
-    />
+    <Tooltip placement="bottom" title="Add Environment" distance={13}>
+      <WithButtonV2
+        icon={PlusIcon}
+        disable={!hasWorkpaceLevelPermission(
+          loggedUserRoleInWorkspace,
+          workspaceLevelPermissions.ADD_ENVIRONMENT,
+        )}
+        onClick={async () => {
+          await onCreateEnvironment(localEnvironment);
+          scrollList("bottom");
+        }}
+        loader={false}
+      />
     </Tooltip>
   </div>
 
@@ -167,33 +167,30 @@
       </div>
     {/if}
     {#if localEnvironment && localEnvironment.length > 0}
-      <ul class={`env-side-tab-list p-0`}>
-        <List
-          bind:scrollList
-          height={"calc(100vh - 195px)"}
-          classProps={"pb-2 pe-2"}
-        >
-          {#each localEnvironment as env}
-            <ListItem
-              {env}
-              {currentWorkspace}
-              {currentEnvironment}
-              {onDeleteEnvironment}
-              {onUpdateEnvironment}
-              {onOpenEnvironment}
-              {onSelectEnvironment}
-            />
-          {/each}
-        </List>
-      </ul>
+      <List
+        bind:scrollList
+        height={"auto"}
+        overflowY={"auto"}
+        classProps={"pe-1"}
+        style={"flex:1;"}
+      >
+        {#each localEnvironment as env}
+          <ListItem
+            {env}
+            {currentWorkspace}
+            {currentEnvironment}
+            {onDeleteEnvironment}
+            {onUpdateEnvironment}
+            {onOpenEnvironment}
+            {onSelectEnvironment}
+          />
+        {/each}
+      </List>
     {/if}
   {/if}
 </div>
 
 <style lang="scss">
-  .env-sidebar {
-    height: calc(100vh - 44px);
-  }
   .curr-workspace {
     max-height: 20vw;
   }
@@ -245,7 +242,7 @@
     border-radius: 2px;
     height: 32px;
   }
-  .add-environment:hover{
+  .add-environment:hover {
     border: 1px solid var(--border-primary-300);
     border-radius: 2px;
   }

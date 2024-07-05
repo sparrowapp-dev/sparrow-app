@@ -91,6 +91,7 @@ import { GithubRepoReposistory } from "@app/repositories/github-repo.repository"
 import { RequestTabAdapter } from "@app/adapter/request-tab";
 import { FeatureSwitchRepository } from "@app/repositories/feature-switch.repository";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
+import { WorkspaceService } from "@app/services/workspace.service";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -99,6 +100,7 @@ export default class CollectionsViewModel {
   private environmentRepository = new EnvironmentRepository();
   private githhubRepoRepository = new GithubRepoReposistory();
   private collectionService = new CollectionService();
+  private workspaceService = new WorkspaceService();
   private githubService = new GithubService();
   private guideRepository = new GuideRepository();
 
@@ -596,12 +598,12 @@ export default class CollectionsViewModel {
     await collection
       .subscribe((collections) => (collectionList = collections))
       .unsubscribe();
-    collectionList.filter(
+    const updatedCollectionList = collectionList.filter(
       (collection) => collection.workspaceId === workspaceId,
     );
     const newCollection = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
-      name: this.getNextCollection(collectionList, "New Collection"),
+      name: this.getNextCollection(updatedCollectionList, "New Collection"),
       items: [],
       createdAt: new Date().toISOString(),
     };

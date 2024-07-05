@@ -1,29 +1,35 @@
 <script lang="ts">
-    import { Ellipse } from "@library/icons";
+  import { Ellipse } from "@library/icons";
   export let data = [];
   let stepData = data[0];
   let currentStep = 0;
   let n = data.length;
- export let handleClosePopup: (flag: boolean) => void;
+  export let handleClosePopup: (flag: boolean) => void;
 
-  function navigateStep(direction) {
-  if (direction === 'next' && currentStep < n - 1) {
-    currentStep += 1;
-  } else if (direction === 'prev' && currentStep > 0) {
-    currentStep -= 1;
-  }
-  stepData = data[currentStep];
-}
+  const navigateStep = (direction) => {
+    if (direction === "next" && currentStep < n - 1) {
+      currentStep += 1;
+    } else if (direction === "prev" && currentStep > 0) {
+      currentStep -= 1;
+    }
+    stepData = data[currentStep];
+  };
 </script>
 
 <div style="max-height: 509px;">
   <div class=" d-flex flex-column" style="gap:19.72px;">
     <div style="height: 276px; padding:auto; padding-top:4px;">
-      <img
-    style="height: 276px; width:100%; border-radius:4px;" 
-        src="{stepData?.gif}"
-        alt="Description of the GIF"
-      />
+      {#if !navigator.onLine}
+        <div class="fallback-message">
+          Failed to load Media, Please check your internet connection
+        </div>
+      {:else}
+        <img
+          style="height: 276px; width:100%; border-radius:4px;"
+          src={stepData?.gif}
+          alt="Description of the GIF"
+        />
+      {/if}
     </div>
     <div class="d-flex flex-column" style=" gap:19.72px;">
       <div class="d-flex flex-row justify-content-center" style="gap:5.48px;">
@@ -54,7 +60,9 @@
             <button
               class="btn border-0"
               style=" background-color: var(--bg-primary-300) ; padding:3px 19px 3px 20px; border-radius:4.78px; outline:none; "
-              on:click={()=>{navigateStep('prev')}}>Previous</button
+              on:click={() => {
+                navigateStep("prev");
+              }}>Previous</button
             >
           {/if}
         </div>
@@ -72,7 +80,9 @@
           <button
             class=" btn border-0"
             style="background-color: var(--bg-primary-300); padding:3px 19px 3px 20px; border-radius:4.78px; outline:none;"
-            on:click={()=>{navigateStep('next')}}
+            on:click={() => {
+              navigateStep("next");
+            }}
           >
             Next
           </button>
@@ -81,11 +91,23 @@
     </div>
   </div>
 </div>
+
 <style>
-  .btn:hover{
+  .btn:hover {
     background-color: var(--bg-primary-250) !important;
   }
-  .btn:active{
-    background-color: var(  --bg-primary-500) !important;
+  .btn:active {
+    background-color: var(--bg-primary-500) !important;
+  }
+
+  .fallback-message {
+    height: 276px;
+    width: 100%;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    color: #333;
   }
 </style>

@@ -94,6 +94,7 @@
   let collectionListDocument: CollectionDocument[];
   let searchData: string = "";
   let addButtonMenu: boolean = false;
+  let activeWorkspace: WorkspaceDocument;
 
   export let scrollList;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
@@ -152,13 +153,32 @@
     collectionFilter = searchCollection(searchData, collectionListDocument);
   };
   $: {
+    if (currentWorkspace) {
+      currentWorkspace.subscribe((value) => {
+        activeWorkspace = value;
+        collectionListDocument = collectionListDocument?.filter(
+          (value) => value.workspaceId === activeWorkspace?._id,
+        );
+      });
+    }
+  }
+  $: {
     if (collectionList) {
       collectionList.subscribe((value) => {
         collectionListDocument = value;
+        collectionListDocument = collectionListDocument?.filter(
+          (value) => value.workspaceId === activeWorkspace?._id,
+        );
         collectionFilter = searchCollection(searchData, collectionListDocument);
       });
     }
   }
+  collectionList?.subscribe((value) => {
+    if (value) {
+      collectionListDocument = value;
+      collectionFilter = searchCollection(searchData, collectionListDocument);
+    }
+  });
 
   let isGithubStarHover = false;
   onDestroy(() => {});
@@ -236,11 +256,7 @@
 {#if !leftPanelController.leftPanelCollapse}
   <div
     style="overflow-x: auto; overflow-y: auto"
-    class={`sidebar ${
-      leftPanelController.leftPanelCollapse
-        ? runAnimation && "decrease-width"
-        : runAnimation && " increase-width"
-    } d-flex flex-column bg-secondary-900 scroll`}
+    class={`sidebar h-100 d-flex flex-column bg-secondary-900 scroll`}
   >
     <div
       class="d-flex justify-content-between align-items-center align-self-stretch px-0 pt-3 d-none"
@@ -307,8 +323,9 @@
       >
         <Tooltip
           title={"Add Options"}
-          placement={"right"}
+          placement={"bottom"}
           distance={12}
+          show={!addButtonMenu}
           zIndex={10}
         >
           <button
@@ -325,16 +342,17 @@
     </div>
     <div
       class="d-flex flex-column collections-list"
-      style="overflow:hidden; margin-top:5px;"
+      style="overflow:hidden; margin-top:5px; flex:1;"
     >
-      <div class="d-flex flex-column justify-content-center ps-2 pe-1 pt-2">
+      <div class="d-flex h-100 flex-column ps-2 pe-2 pt-2">
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
             {#if collectionFilter.length > 0}
               <List
                 bind:scrollList
-                height={"calc(100vh - 160px)"}
-                classProps={"pb-2 pe-1"}
+                height={"auto"}
+                overflowY={"auto"}
+                classProps={"pe-1"}
               >
                 {#each collectionFilter as col}
                   <Collection
@@ -355,8 +373,9 @@
             {:else}
               <List
                 bind:scrollList
-                height={"calc(100vh - 160px)"}
-                classProps={"pb-2 pe-1"}
+                height={"auto"}
+                overflowY={"auto"}
+                classProps={"pe-1"}
               >
                 <p
                   class="not-found-text text-fs-12 text-center mx-auto ellipsis"
@@ -368,8 +387,9 @@
           {:else}
             <List
               bind:scrollList
-              height={"calc(100vh - 160px)"}
-              classProps={"pb-2 pe-1"}
+              height={"auto"}
+              overflowY={"auto"}
+              classProps={"pe-1"}
             >
               {#each collectionListDocument as col}
                 <Collection
@@ -397,59 +417,59 @@
           />
         {/if}
       </div>
-      <div
-        class="p-3 d-flex align-items-center justify-content-between"
-        style="z-index: 4;"
-      >
-        <Tooltip title={"Star Us On GitHub"} placement={"top"}>
-          <div
-            class="px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
-              ? 'bg-secondary-600'
-              : ''}"
-            role="button"
-            on:mouseenter={() => {
-              isGithubStarHover = true;
-            }}
-            on:mouseleave={() => {
-              isGithubStarHover = false;
-            }}
-            on:click={async () => {
-              await open(externalSparrowGithub);
-            }}
-          >
-            <GithubIcon
-              height={"18px"}
-              width={"18px"}
-              color={isGithubStarHover
-                ? "var(--bg-secondary-100)"
-                : "var(--bg-secondary-200)"}
-            />
-            <span
-              class="ps-2 text-fs-14 {isGithubStarHover
-                ? 'text-secondary-100'
-                : 'text-secondary-200'}"
-            >
-              {githubRepo?.stargazers_count || ""}
-            </span>
-          </div>
-        </Tooltip>
-
-        <div class="d-flex align-items-center">
-          <!--Disabling the version feature switch as it was just for testing purpose, can be used for implementation example-->
-          <!-- {#if isAppVersionVisible} -->
-          <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
-          <!-- {/if} -->
-          <WithButton
-            icon={DoubleArrowIcon}
-            onClick={() => {
-              leftPanelController.leftPanelCollapse =
-                !leftPanelController.leftPanelCollapse;
-              leftPanelController.handleCollapseCollectionList();
-            }}
-            disable={false}
-            loader={false}
+    </div>
+    <div
+      class="p-3 d-flex align-items-center justify-content-between"
+      style="z-index: 4;"
+    >
+      <Tooltip title={"Star Us On GitHub"} placement={"top"}>
+        <div
+          class="px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
+            ? 'bg-secondary-600'
+            : ''}"
+          role="button"
+          on:mouseenter={() => {
+            isGithubStarHover = true;
+          }}
+          on:mouseleave={() => {
+            isGithubStarHover = false;
+          }}
+          on:click={async () => {
+            await open(externalSparrowGithub);
+          }}
+        >
+          <GithubIcon
+            height={"18px"}
+            width={"18px"}
+            color={isGithubStarHover
+              ? "var(--bg-secondary-100)"
+              : "var(--bg-secondary-200)"}
           />
+          <span
+            class="ps-2 text-fs-14 {isGithubStarHover
+              ? 'text-secondary-100'
+              : 'text-secondary-200'}"
+          >
+            {githubRepo?.stargazers_count || ""}
+          </span>
         </div>
+      </Tooltip>
+
+      <div class="d-flex align-items-center">
+        <!--Disabling the version feature switch as it was just for testing purpose, can be used for implementation example-->
+        <!-- {#if isAppVersionVisible} -->
+        <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
+        <!-- {/if} -->
+        <WithButton
+          icon={DoubleArrowIcon}
+          onClick={() => {
+            leftPanelController.leftPanelCollapse =
+              !leftPanelController.leftPanelCollapse;
+            leftPanelController.handleCollapseCollectionList();
+          }}
+          disable={false}
+          loader={false}
+        />
       </div>
     </div>
   </div>
@@ -499,10 +519,6 @@
 
   .angleButton:active {
     background-color: var(--button-pressed);
-  }
-  .sidebar {
-    height: calc(100vh - 44px);
-    overflow-y: auto;
   }
 
   /* 

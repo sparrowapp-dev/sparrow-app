@@ -6,7 +6,7 @@
 </script>
 
 <div
-  class="label d-flex align-items-center justify-content-center "
+  class="label d-flex align-items-center justify-content-center"
   style="height: {size}; width: {size}; background-color:{backgroundColor};"
 >
   <p class="mb-0 fw-bold sparrow-fs-10" style="color:{textColor};">{number}</p>

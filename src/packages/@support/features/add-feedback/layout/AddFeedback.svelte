@@ -100,16 +100,16 @@
 </script>
 
 <div class="pb-3 w-100">
-  <Tooltip title="Feedback" placement="top" distance={13} >
-  <button
-    on:click={() => {
-      const res = onAddFeedback();
-      isExposeFeedbackForm = res;
-    }}
-    class="add-feedback w-100 outline-none border-0 border-radius-4 text-fs-14 fw-normal"
-  >
-    +Add Feedback
-  </button>
+  <Tooltip title="Feedback" placement="top" distance={13}>
+    <button
+      on:click={() => {
+        const res = onAddFeedback();
+        isExposeFeedbackForm = res;
+      }}
+      class="add-feedback w-100 outline-none border-0 border-radius-4 text-fs-14 fw-normal"
+    >
+      +Add Feedback
+    </button>
   </Tooltip>
 </div>
 <div class="position-relative">
@@ -308,6 +308,7 @@
         />
         <hr class="mt-1 mb-2" />
         <Textarea
+          id="feedback-description"
           width={"100%"}
           height={"120px"}
           bind:value={feedbackDescription}

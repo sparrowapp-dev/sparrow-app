@@ -66,6 +66,8 @@
 
   export let onChangeViewInRequest: (view: string) => void;
 
+  export let isGuestUser = false;
+
   $: {
     if (tabList) {
       scrolable = tabList.length * 182 >= scrollerParent;
@@ -187,8 +189,8 @@
     <div class="d-inline-flex" style="height:35px; width:35px;">
       <Tooltip
         title={"Add Request"}
-        placement={"right"}
-        distance={2}
+        placement={"bottom"}
+        distance={10}
         zIndex={20}
       >
         <button
@@ -212,51 +214,53 @@
     </div>
     <div class=" d-flex ms-auto my-auto me-2">
       <!--Disabling the Quick Help feature, will be taken up in next release-->
-      <!-- <div>
-        <button
-          role="button"
-          class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
-          on:click={async () => {
-            const event = await onFetchCollectionGuide({
-              id: "collection-guide",
-            });
-            const guideData = event?.getLatest().toMutableJSON();
-            if (guideData?.isActive === false) {
-              onUpdateCollectionGuide(
-                {
-                  id: "collection-guide",
-                },
-                true,
-              );
-            } else {
-              onUpdateCollectionGuide(
-                {
-                  id: "collection-guide",
-                },
-                false,
-              );
-            }
-          }}
-        >
-          <Tooltip
-            title={"Quick Help"}
-            distance={10}
-            placement={"bottom"}
-            zIndex={10}
+      {#if !isGuestUser}
+        <div>
+          <button
+            role="button"
+            class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
+            on:click={async () => {
+              const event = await onFetchCollectionGuide({
+                id: "collection-guide",
+              });
+              const guideData = event?.getLatest().toMutableJSON();
+              if (guideData?.isActive === false) {
+                onUpdateCollectionGuide(
+                  {
+                    id: "collection-guide",
+                  },
+                  true,
+                );
+              } else {
+                onUpdateCollectionGuide(
+                  {
+                    id: "collection-guide",
+                  },
+                  false,
+                );
+              }
+            }}
           >
-            <div
-              class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
-              style="height: 24px; width:24px;"
+            <Tooltip
+              title={"Quick Help"}
+              distance={10}
+              placement={"bottom"}
+              zIndex={10}
             >
-              <HelpIcon
-                height={"16px"}
-                width={"16px"}
-                color={"var(--text-secondary-200)"}
-              />
-            </div>
-          </Tooltip>
-        </button>
-      </div> -->
+              <div
+                class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
+                style="height: 24px; width:24px;"
+              >
+                <HelpIcon
+                  height={"16px"}
+                  width={"16px"}
+                  color={"var(--text-secondary-200)"}
+                />
+              </div>
+            </Tooltip>
+          </button>
+        </div>
+      {/if}
       <div class="layout ms-auto mt-1" style="height: 24px; ">
         <Dropdown
           buttonId="viewChange"
@@ -278,8 +282,9 @@
         >
           <Tooltip
             title={"Layout"}
-            placement={"bottom"}
+            placement={"left"}
             distance={12}
+            show={!viewChange}
             zIndex={10}
           >
             <button

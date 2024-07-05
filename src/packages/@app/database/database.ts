@@ -146,6 +146,9 @@ export class RxDB {
           7: function (oldDoc: WorkspaceDocument) {
             return oldDoc;
           },
+          8: function (oldDoc: WorkspaceDocument) {
+            return oldDoc;
+          },
         },
       },
       tab: {
@@ -174,6 +177,11 @@ export class RxDB {
             return oldDoc;
           },
           8: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          9: function (oldDoc: TabDocument) {
+            oldDoc.property.request.state.isHeaderBulkEditActive = false;
+            oldDoc.property.request.state.isParameterBulkEditActive = false;
             return oldDoc;
           },
         },

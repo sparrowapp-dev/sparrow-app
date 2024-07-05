@@ -2,11 +2,11 @@
   /**
    * list height
    */
-  export let height = "100%";
+  export let height = "auto";
   /**
    * handles overflow vertically
    */
-  export let overflowY = "scroll";
+  export let overflowY = "auto";
   /**
    * handles overflow horizontally
    */
@@ -15,7 +15,7 @@
    * additional classes
    */
   export let classProps = "";
-
+  export let style = "";
   /**
    * binds scroll function to the parent component
    */
@@ -48,7 +48,7 @@
 <div
   bind:this={listContainer}
   class={`list-container gap-2 ${classProps}`}
-  style={`height: ${height}; overflow-y: ${overflowY}; overflow-x: ${overflowX};`}
+  style="{style} height: {height}; overflow-y: {overflowY}; overflow-x: {overflowX}; "
 >
   <div class="list-body">
     <slot />
