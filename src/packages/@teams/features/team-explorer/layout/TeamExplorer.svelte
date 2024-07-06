@@ -20,9 +20,8 @@
   import { CrossIcon } from "@library/icons";
   import MoreOptions from "@workspaces/features/tab-bar/assets/MoreOptions.svelte";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-  import Dropdown from "$lib/assets/dropdown.svelte";
-  import MenuView from "@teams/common/compopnents/menu-view/MenuView.svelte";
-  import Showmore from "$lib/assets/showmore.svelte";
+  import { Dropdown } from "@library/ui";
+
   /**
    * user ID
    */
@@ -98,6 +97,7 @@
       }
     });
   };
+  import plusIcon from "$lib/assets/plus-white.svg";
 
   const refreshTabs = () => {
     return [
@@ -143,8 +143,9 @@
 
   let searchQuery = "";
   let hasText = false;
-
+  let leaveButtonMenu: boolean = false;
   const handleDelteteam = () => {
+    leaveButtonMenu = !leaveButtonMenu;
     isLeaveTeamModelOpen = true;
     console.log("inside handlete Delte", isLeaveTeamModelOpen);
   };
@@ -164,46 +165,16 @@
 
   let showMenu = false;
 
-  let viewChange: boolean = true;
-  let menuItems = [];
+  import CreateRequest from "$lib/assets/create_request.svg";
 
-  const rightClickContextMenu = (e) => {
-    console.log("Inside right clikc context menu");
-    e.preventDefault();
-    setTimeout(() => {
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-      pos = { x: mouseX, y: mouseY };
-      showMenu = true;
-    }, 100);
-  };
-
-  $: {
-    menuItems = [
-      {
-        onClick: () => {
-          handleDelteteam();
-        },
-        displayText: "Leave Team",
-        disabled: false,
-      },
-    ];
-  }
-
-  let pos = { x: 0, y: 0 };
-
-  function closeRightClickContextMenu() {
-    showMenu = false;
-  }
-
-  let noOfColumns = 180;
-  let noOfRows = 3;
+  const addButtonData = [
+    {
+      name: "Leave Team",
+      icon: CreateRequest,
+      onclick: () => handleDelteteam(),
+    },
+  ];
 </script>
-
-<svelte:window
-  on:click={closeRightClickContextMenu}
-  on:contextmenu|preventDefault={closeRightClickContextMenu}
-/>
 
 {#if openTeam}
   <div class="teams-content h-100 bg-secondary-850">
@@ -236,27 +207,34 @@
               >{openTeam?.name || ""}
             </span>
 
-            {#if showMenu}
-              <MenuView
-                xAxis={pos.x}
-                yAxis={pos.y}
-                {noOfRows}
-                {noOfColumns}
-                {menuItems}
-              />
-            {/if}
-
-            <Tooltip title="Leave Team" placement={"bottom"} distance={10}>
-              <div
-                class="ms-2 d-flex justify-content-center align-items-center mt-2 moreOption-icon rounded"
-                on:click={(e) => {
-                  rightClickContextMenu(e);
-                }}
+            <div
+              class="ms-2 d-flex justify-content-center align-items-center mt-2 moreOption-icon rounded"
+              on:click={() => {
+                leaveButtonMenu = !leaveButtonMenu;
+              }}
+            >
+              <Dropdown
+                zIndex={600}
+                buttonId="leaveButton"
+                bind:isMenuOpen={leaveButtonMenu}
+                options={addButtonData}
               >
-                <MoreOptions height="15px" width="5px" color="White" />
-              </div>
-            </Tooltip>
+                <Tooltip
+                  title={"Leave Team"}
+                  placement={"bottom"}
+                  distance={12}
+                  show={leaveButtonMenu}
+                  zIndex={10}
+                >
+                  <div id="leaveButton">
+                    <MoreOptions height="15px" width="5px" color="White" />
+                  </div>
+                </Tooltip>
+              </Dropdown>
+            </div>
           </h2>
+
+          <div></div>
 
           <div class="d-flex align-items-end justify-content-end">
             {#if openTeam?.users?.length > 1}

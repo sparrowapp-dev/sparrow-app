@@ -3,8 +3,8 @@
 
   export let openTeam;
   export let handleLeaveTeam;
-   
-    export let  handleModalState
+
+  export let handleModalState;
 
   import Button from "@library/ui/button/Button.svelte";
   import { onMount } from "svelte";
@@ -12,12 +12,11 @@
 
 <section>
   <div>
-    <p class="lightGray"
-    style="color:lightGray ; ">
+    <p class="lightGray" style="color:lightGray ; ">
       Are you sure do you want to leave the team <span
-      style="font-weight:700; 
-      ">"{openTeam?.name || ""}"</span> You will
-      loose acces to all the resources in this team
+        style="font-weight:700; 
+      ">"{openTeam?.name || ""}"</span
+      > You will loose acces to all the resources in this team
     </p>
   </div>
   <div class="d-flex justify-content-end">
@@ -27,7 +26,7 @@
         textClassProp={"fs-6"}
         type={"dark"}
         onClick={() => {
-           handleModalState(false);
+          handleModalState(false);
         }}
       />
     </span>
