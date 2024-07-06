@@ -245,7 +245,7 @@
     {#if path.length > 0}
       {#each path as elem, index}
         <span class="text-secondary-200">/</span>
-        <span
+        <span 
           on:click={() => {
             navigateToDirectory(elem);
           }}
@@ -536,8 +536,7 @@
             -->
           {#if col.type === ItemType.FOLDER}
             <!-- {#if col.source === "USER"} -->
-            <div
-              class="item ps-2"
+            <div class="item ps-2"
               on:click={() => {
                 navigateToDirectory(col);
               }}
@@ -552,8 +551,7 @@
               type={ItemType.REQUEST}
             />
           {:else}
-            <div
-              class="item ps-2"
+            <div class="item ps-2"
               on:click={() => {
                 navigateToDirectory(col);
               }}
@@ -982,7 +980,7 @@
     background-color: var(--bg-tertiary-650) !important;
   }
   .instruction-btn:active {
-    background-color: var(--bg-primary-400) !important;
+    background-color:var(--bg-primary-400) !important;
   }
   .edit-input {
     padding: 0 8px !important;
@@ -1006,14 +1004,11 @@
   .item-header:hover .edit-pencil {
     display: inline-block !important;
   }
-  .item:hover {
-    background-color: var(--bg-tertiary-300) !important ;
+  .item:hover{
+    background-color: var(--bg-tertiary-300)  !important ;
   }
 
-  ::-webkit-scrollbar {
-    background: no repeat;
-    position: fixed;
-  }
+
   ::-webkit-scrollbar-thumb {
     background-color: var(--bg-tertiary-100);
   }
