@@ -59,6 +59,15 @@
 <!-- </section> -->
 
 <style>
+  .sidebar-workspace-list::-webkit-scrollbar-thumb {
+    background-color: var(--bg-secondary-330);
+    /* background-color: red; */
+  }
+
+  .sidebar-workspace-list::-webkit-scrollbar-button {
+   color: var(--bg-secondary-330);
+  } 
+  
   .workspace-heading {
     margin-left: 5px;
     font-size: 14px;

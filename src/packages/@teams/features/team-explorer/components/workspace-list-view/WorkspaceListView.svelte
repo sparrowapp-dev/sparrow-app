@@ -65,7 +65,7 @@
       </tbody>
     </Table>
 
-    {#if  filterText == "" && data && data?.length === 0}
+    {#if  searchQuery == "" && data && data?.length === 0}
       <p class="not-found-text mt-3">Add Workspaces to this team</p>
     {:else if searchQuery !== "" && data
         .slice()

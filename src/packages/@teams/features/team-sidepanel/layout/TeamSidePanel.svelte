@@ -81,17 +81,16 @@
   >
     <div style="flex:1; overflow:auto;">
       <!--Teams list-->
-      <section class="d-flex flex-column" style="max-height:33%;">
+      <section
+        class="d-flex flex-column"
+        style="max-height:33%;"
+      >
         <div
-          class="sidebar-teams-header d-flex justify-content-between p-3 pb-0"
+          class="sidebar-teams-header  d-flex justify-content-between p-3 pb-0"
         >
           <h6 class="teams-heading ms-2 px-1">Teams</h6>
           <div>
-            <Tooltip
-              title="New Team"
-              placement={"bottom"}
-              distance={10} 
-            >
+            <Tooltip title="New Team" placement={"bottom"} distance={10}>
               <button
                 class="new-team-btn rounded border-0"
                 on:click={() => {
@@ -103,8 +102,8 @@
             </Tooltip>
           </div>
         </div>
-        <div class="sidebar-teams-list" style="flex:1; overflow:auto;">
-          <List height={"100%"} overflowY={"auto"} classProps={"px-2 py-1"}>     
+        <div class="sidebar-teams-list " style="flex:1; overflow:auto;">
+          <List height={"100%"} overflowY={"auto"} classProps={"px-2 py-1"}>
             {#each teamList.slice().reverse() as team, index}
               <button
                 class={`d-flex w-100 mb-1 
@@ -220,6 +219,14 @@
 {/if}
 
 <style>
+  .sidebar-teams-list::-webkit-scrollbar-thumb {
+    background-color: var(--bg-secondary-330);
+    /* background-color: red; */
+  }
+
+  .sidebar-teams-list::-webkit-scrollbar-button {
+   color: var(--bg-secondary-330);
+  }
   .teams-heading {
     margin-left: 5px;
     font-size: 14px;
