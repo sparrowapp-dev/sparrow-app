@@ -1,14 +1,10 @@
 <script lang="ts">
   import { ICON_CONFIG } from "../../../../constants";
   import { IconUploader } from "..";
-  export let uploadTeamIcon;
-  export let onUpdateTeam;
-
-  enum TeamProperty {
-    IMAGE = "image",
-    NAME = "name",
-    DESCRIPTION = "description",
-  }
+  import { TeamPropertyEnum } from "../../../../types";
+  import type { UpdateTeamIcon as IUpdateTeamIcon } from "../../../../types";
+  export let uploadTeamIcon: IUpdateTeamIcon;
+  export let onUpdateTeam: (property: TeamPropertyEnum) => void;
 
   /**
    * Handles the change event for the logo input.
@@ -54,7 +50,7 @@
     uploadTeamIcon.file.showFileTypeError = false;
     uploadTeamIcon.file.invalid = false;
     uploadTeamIcon.file.value = targetFile && targetFile[0];
-    onUpdateTeam(TeamProperty.IMAGE);
+    onUpdateTeam(TeamPropertyEnum.IMAGE);
   };
 
   /**
@@ -69,7 +65,7 @@
       showFileSizeError: false,
       showFileTypeError: false,
     };
-    onUpdateTeam(TeamProperty.IMAGE);
+    onUpdateTeam(TeamPropertyEnum.IMAGE);
   };
 
   /**

@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { TeamPropertyEnum } from "../../../../types";
   import { NAME_CONFIG } from "../../../../constants";
 
   export let teamName: string;
-  export let onUpdateTeam;
+  export let onUpdateTeam: (property: TeamPropertyEnum) => void;
 
   const inputId = "input-team-name";
   const blurInputField = (event: KeyboardEvent) => {
@@ -34,7 +35,7 @@
         blurInputField(e);
       }}
       on:blur={() => {
-        onUpdateTeam("name");
+        onUpdateTeam(TeamPropertyEnum.NAME);
       }}
     />
   </div>
