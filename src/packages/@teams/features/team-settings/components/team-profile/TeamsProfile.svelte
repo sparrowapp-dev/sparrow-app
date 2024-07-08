@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { DragDrop } from "@library/ui";
+  import {
+    TeamOwner,
+    UpdateTeamIcon,
+    UpdateTeamName,
+  } from "./sub-team-profile";
+  import UpdateTeamDescription from "./sub-team-profile/update-team-description/UpdateTeamDescription.svelte";
 
   export let openTeam;
   export let onUpdateTeam;
@@ -25,14 +30,20 @@
     uploadTeamIcon.file.value = openTeam?.logo;
   }
 
-  let ownerDetails;
-  openTeam?.users.forEach((element) => {
-    if (element.id === openTeam.owner) {
-      ownerDetails = element;
-    }
-  });
+  let ownerDetails = {
+    id: "",
+    name: "",
+    email: "",
+  };
+  openTeam?.users.forEach(
+    (element: { id: string; name: string; email: string }) => {
+      if (element.id === openTeam.owner) {
+        ownerDetails = element;
+      }
+    },
+  );
 
-  const handleUpdateTeam = async (property) => {
+  const handleUpdateTeam = async (property: TeamProperty) => {
     const blankFile = new File([""], "blank.jpg", {
       type: "",
       lastModified: 1706698162061,
@@ -60,181 +71,22 @@
 
     await onUpdateTeam(openTeam.teamId, data);
   };
-
-  const handleLogoInputChange = (
-    e: any,
-    maxSize: number,
-    supportedFileTypes: string[],
-  ) => {
-    const targetFile = e?.target?.files;
-    const dataTransferFile = e?.dataTransfer?.files;
-    if (
-      (targetFile && targetFile[0].size > maxSize * 1024) ||
-      (dataTransferFile && dataTransferFile[0].size > maxSize * 1024)
-    ) {
-      uploadTeamIcon.file.showFileSizeError = true;
-      uploadTeamIcon.file.showFileTypeError = false;
-      uploadTeamIcon.file.invalid = true;
-      return;
-    }
-    const fileType = `.${(
-      (targetFile && targetFile[0]?.name) ||
-      (dataTransferFile && dataTransferFile[0]?.name)
-    )
-      .split(".")
-      .pop()
-      .toLowerCase()}`;
-    if (!supportedFileTypes.includes(fileType)) {
-      uploadTeamIcon.file.showFileTypeError = true;
-      uploadTeamIcon.file.showFileSizeError = false;
-      uploadTeamIcon.file.invalid = true;
-      return;
-    }
-    uploadTeamIcon.file.showFileSizeError = false;
-    uploadTeamIcon.file.showFileTypeError = false;
-    uploadTeamIcon.file.invalid = false;
-    uploadTeamIcon.file.value =
-      (targetFile && targetFile[0]) ||
-      (dataTransferFile && dataTransferFile[0]);
-    handleUpdateTeam(TeamProperty.IMAGE);
-  };
-  const handleLogoReset = (e: any) => {
-    uploadTeamIcon.file = {
-      value: [],
-      invalid: false,
-      showFileSizeError: false,
-      showFileTypeError: false,
-    };
-    handleUpdateTeam(TeamProperty.IMAGE);
-  };
-  const handleLogoEdit = (e: any) => {
-    const uploadFileInput = document.getElementById(
-      "upload-team-icon-file-input",
-    );
-    uploadFileInput.click();
-  };
-
-  const blurInputField = (event, inputId) => {
-    if (event.key === "Enter") {
-      const inputField = document.getElementById(inputId) as HTMLInputElement;
-      inputField.blur();
-    }
-  };
 </script>
 
 <div class="settings-content h-100">
   <div class="row px-3 pb-3">
-    <div class="col-12">
-      <div>
-        <DragDrop
-          value={uploadTeamIcon.file.value}
-          maxFileSize={2048}
-          onChange={handleLogoInputChange}
-          iconHeight={30}
-          iconWidth={30}
-          resetValue={handleLogoReset}
-          editValue={handleLogoEdit}
-          labelText=""
-          labelDescription="Drag and drop your image. We recommend that you upload an image with square aspect ratio.The image size should not be more than 2 MB. Supported formats are .jpg, .jpeg, .png"
-          labelDescriptionSize={"14px"}
-          inputId="upload-team-icon-file-input"
-          inputPlaceholder="Drag and Drop or"
-          isRequired={false}
-          supportedFileTypes={[".png", ".jpg", ".jpeg"]}
-          showFileSizeError={uploadTeamIcon.file.showFileSizeError}
-          showFileTypeError={uploadTeamIcon.file.showFileTypeError}
-          fileTypeError="This file type is not supported. Please reupload in any of the following file formats."
-          fileSizeError="The size of the file you are trying to upload is more than 100 KB."
-          width={"80px"}
-          height={"80px"}
-        />
-      </div>
-    </div>
+    <UpdateTeamIcon bind:uploadTeamIcon onUpdateTeam={handleUpdateTeam} />
   </div>
   <div class="row px-3 pb-3">
-    <div class="title-width">
-      <p class="team-title fs-12 text-textColor">Team Name</p>
-    </div>
-    <div class="col-10">
-      <input
-        required
-        type="text"
-        id="input-team-name"
-        placeholder=""
-        class="settings-team-name w-100 fs-12 border-0 p-3 rounded"
-        autocomplete="off"
-        spellcheck="false"
-        autocorrect="off"
-        autocapitalize="off"
-        bind:value={teamName}
-        on:keydown={(e) => {
-          blurInputField(e, "input-team-name");
-        }}
-        on:blur={() => {
-          handleUpdateTeam("name");
-        }}
-      />
-    </div>
+    <UpdateTeamName bind:teamName onUpdateTeam={handleUpdateTeam} />
   </div>
   <div class="row px-3 pb-3">
-    <div class="title-width">
-      <p class="team-title fs-12 text-textColor">Owner</p>
-    </div>
-    <div class="col-10">
-      <p class="ps-3">
-        {ownerDetails.name} <span class="text-textColor px-2">|</span>
-        {ownerDetails.email}
-      </p>
-    </div>
+    <TeamOwner {ownerDetails} />
   </div>
   <div class="row px-3 pb-3">
-    <div class="title-width">
-      <p class="team-title fs-12 text-textColor">About</p>
-    </div>
-    <div class="col-10">
-      <textarea
-        required
-        type="text"
-        id="input-team-description"
-        placeholder="Add teams's description"
-        class="settings-team-description w-100 fs-12 border-0 p-3 rounded"
-        autocomplete="off"
-        spellcheck="false"
-        autocorrect="off"
-        autocapitalize="off"
-        bind:value={teamDescription}
-        on:keydown={(e) => {
-          blurInputField(e, "input-team-description");
-        }}
-        on:blur={() => {
-          handleUpdateTeam("description");
-        }}
-      />
-    </div>
+    <UpdateTeamDescription
+      bind:teamDescription
+      onUpdateTeam={handleUpdateTeam}
+    />
   </div>
 </div>
-
-<style>
-  .settings-team-description {
-    height: calc(150px) !important;
-  }
-  .settings-team-name,
-  .settings-team-description {
-    background-color: transparent !important;
-    margin-top: -18px;
-  }
-  .settings-team-name:hover,
-  .settings-team-description:hover {
-    outline: 1px solid var(--send-button);
-  }
-  .settings-team-name:focus,
-  .settings-team-description:focus {
-    outline: 1px solid var(--send-button);
-  }
-  .fs-12 {
-    font-size: 12px;
-  }
-  .title-width {
-    width: 90px;
-  }
-</style>
