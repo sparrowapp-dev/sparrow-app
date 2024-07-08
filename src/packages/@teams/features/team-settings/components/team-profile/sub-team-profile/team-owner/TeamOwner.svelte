@@ -3,14 +3,16 @@
   export let ownerDetails;
 </script>
 
-<div class="title-width">
-  <p class="team-title fs-12 text-textColor">{OWNER_CONFIG.TITLE}</p>
-</div>
-<div class="col-10">
-  <p class="ps-3 text-fs-12">
-    {ownerDetails.name} <span class="text-textColor px-2">|</span>
-    {ownerDetails.email}
-  </p>
+<div class="d-flex pb-3">
+  <div class="title-width">
+    <p class="team-title mb-0 fs-12 text-textColor">{OWNER_CONFIG.TITLE}</p>
+  </div>
+  <div class="container-width">
+    <p class="ps-3 mb-0 text-fs-12">
+      {ownerDetails.name} <span class="text-textColor px-2">|</span>
+      {ownerDetails.email}
+    </p>
+  </div>
 </div>
 
 <style>
@@ -19,5 +21,8 @@
   }
   .title-width {
     width: 90px;
+  }
+  .container-width {
+    width: calc(100% - 90px);
   }
 </style>

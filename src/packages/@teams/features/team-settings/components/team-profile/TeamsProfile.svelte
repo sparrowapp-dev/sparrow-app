@@ -74,19 +74,11 @@
 </script>
 
 <div class="settings-content h-100">
-  <div class="row px-3 pb-3">
-    <UpdateTeamIcon bind:uploadTeamIcon onUpdateTeam={handleUpdateTeam} />
-  </div>
-  <div class="row px-3 pb-3">
-    <UpdateTeamName bind:teamName onUpdateTeam={handleUpdateTeam} />
-  </div>
-  <div class="row px-3 pb-3">
-    <TeamOwner {ownerDetails} />
-  </div>
-  <div class="row px-3 pb-3">
-    <UpdateTeamDescription
-      bind:teamDescription
-      onUpdateTeam={handleUpdateTeam}
-    />
-  </div>
+  <UpdateTeamIcon bind:uploadTeamIcon onUpdateTeam={handleUpdateTeam} />
+
+  <UpdateTeamName bind:teamName onUpdateTeam={handleUpdateTeam} />
+
+  <TeamOwner {ownerDetails} />
+
+  <UpdateTeamDescription bind:teamDescription onUpdateTeam={handleUpdateTeam} />
 </div>

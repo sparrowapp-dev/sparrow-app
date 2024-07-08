@@ -13,29 +13,31 @@
   };
 </script>
 
-<div class="title-width">
-  <p class="team-title fs-12 text-textColor">{NAME_CONFIG.TITLE}</p>
-</div>
-<div class="col-10">
-  <input
-    required
-    type="text"
-    id={inputId}
-    placeholder={NAME_CONFIG.PLACEHOLDER}
-    class="settings-team-name w-100 fs-12 border-0 p-3 rounded"
-    autocomplete="off"
-    spellcheck="false"
-    autocorrect="off"
-    autocapitalize="off"
-    maxlength={NAME_CONFIG.MAX_TEXT_SIZE}
-    bind:value={teamName}
-    on:keydown={(e) => {
-      blurInputField(e);
-    }}
-    on:blur={() => {
-      onUpdateTeam("name");
-    }}
-  />
+<div class="d-flex pb-3">
+  <div class="title-width">
+    <p class="team-title mt-1 fs-12 text-textColor">{NAME_CONFIG.TITLE}</p>
+  </div>
+  <div class="container-width">
+    <input
+      required
+      type="text"
+      id={inputId}
+      placeholder={NAME_CONFIG.PLACEHOLDER}
+      class="settings-team-name w-100 fs-12 border-0 p-3 rounded"
+      autocomplete="off"
+      spellcheck="false"
+      autocorrect="off"
+      autocapitalize="off"
+      maxlength={NAME_CONFIG.MAX_TEXT_SIZE}
+      bind:value={teamName}
+      on:keydown={(e) => {
+        blurInputField(e);
+      }}
+      on:blur={() => {
+        onUpdateTeam("name");
+      }}
+    />
+  </div>
 </div>
 
 <style>
@@ -54,5 +56,8 @@
   }
   .title-width {
     width: 90px;
+  }
+  .container-width {
+    width: calc(100% - 90px);
   }
 </style>

@@ -85,7 +85,7 @@
   };
 </script>
 
-<div class="col-12">
+<div class="pb-3">
   <div>
     <!-- IconUploader component for uploading team icons -->
     <IconUploader

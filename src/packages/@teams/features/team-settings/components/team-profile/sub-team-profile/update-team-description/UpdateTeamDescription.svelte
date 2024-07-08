@@ -13,28 +13,32 @@
   };
 </script>
 
-<div class="title-width">
-  <p class="team-title fs-12 text-textColor">{DESCRIPTION_CONFIG.TITLE}</p>
-</div>
-<div class="col-10">
-  <textarea
-    required
-    id={inputId}
-    placeholder={DESCRIPTION_CONFIG.PLACEHOLDER}
-    class="settings-team-description w-100 fs-12 border-0 p-3 rounded"
-    autocomplete="off"
-    spellcheck="false"
-    autocorrect="off"
-    autocapitalize="off"
-    maxlength={DESCRIPTION_CONFIG.MAX_TEXT_SIZE}
-    bind:value={teamDescription}
-    on:keydown={(e) => {
-      blurInputField(e);
-    }}
-    on:blur={() => {
-      onUpdateTeam("description");
-    }}
-  />
+<div class="d-flex pb-3">
+  <div class="title-width">
+    <p class="team-title mt-3 fs-12 text-textColor">
+      {DESCRIPTION_CONFIG.TITLE}
+    </p>
+  </div>
+  <div class="container-width">
+    <textarea
+      required
+      id={inputId}
+      placeholder={DESCRIPTION_CONFIG.PLACEHOLDER}
+      class="settings-team-description w-100 fs-12 border-0 p-3 rounded"
+      autocomplete="off"
+      spellcheck="false"
+      autocorrect="off"
+      autocapitalize="off"
+      maxlength={DESCRIPTION_CONFIG.MAX_TEXT_SIZE}
+      bind:value={teamDescription}
+      on:keydown={(e) => {
+        blurInputField(e);
+      }}
+      on:blur={() => {
+        onUpdateTeam("description");
+      }}
+    />
+  </div>
 </div>
 
 <style>
@@ -44,7 +48,6 @@
 
   .settings-team-description {
     background-color: transparent !important;
-    margin-top: -18px;
   }
   .settings-team-description:hover {
     outline: 1px solid var(--border-primary-300);
@@ -57,5 +60,8 @@
   }
   .title-width {
     width: 90px;
+  }
+  .container-width {
+    width: calc(100% - 90px);
   }
 </style>
