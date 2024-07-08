@@ -97,7 +97,6 @@
       }
     });
   };
-  import plusIcon from "$lib/assets/plus-white.svg";
 
   const refreshTabs = () => {
     return [
@@ -145,10 +144,9 @@
   let hasText = false;
   let leaveButtonMenu: boolean = false;
 
-  const handleDelteteam = () => {
+  const handleLeaveTeam = () => {
     leaveButtonMenu = !leaveButtonMenu;
     isLeaveTeamModelOpen = true;
-    console.log("inside handlete Delte", isLeaveTeamModelOpen);
   };
 
   const handleSearchInput = (event) => {
@@ -167,7 +165,7 @@
   const addButtonData = [
     {
       name: "Leave Team",
-      onclick: () => handleDelteteam(),
+      onclick: () => handleLeaveTeam(),
     },
   ];
 </script>
@@ -203,31 +201,34 @@
               >{openTeam?.name || ""}
             </span>
 
-            <div
-              class="ms-2 d-flex justify-content-center align-items-center mt-2 moreOption-icon rounded"
-              on:click={() => {
-                leaveButtonMenu = !leaveButtonMenu;
-              }}
-            >
-              <Dropdown
-                zIndex={600}
-                buttonId="leaveButton"
-                bind:isMenuOpen={leaveButtonMenu}
-                options={addButtonData}
+            <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
+            {#if openTeam.isNewInvite}
+              <div
+                class="ms-2 d-flex justify-content-center align-items-center mt-2 moreOption-icon rounded"
+                on:click={() => {
+                  leaveButtonMenu = !leaveButtonMenu;
+                }}
               >
-                <Tooltip
-                  title={"Leave Team"}
-                  placement={"bottom"}
-                  distance={12}
-                  show={leaveButtonMenu}
-                  zIndex={10}
+                <Dropdown
+                  zIndex={600}
+                  buttonId="leaveButton"
+                  bind:isMenuOpen={leaveButtonMenu}
+                  options={addButtonData}
                 >
-                  <div id="leaveButton">
-                    <MoreOptions height="15px" width="5px" color="White" />
-                  </div>
-                </Tooltip>
-              </Dropdown>
-            </div>
+                  <Tooltip
+                    title={"Leave Team"}
+                    placement={"bottom"}
+                    distance={12}
+                    show={leaveButtonMenu}
+                    zIndex={10}
+                  >
+                    <div id="leaveButton">
+                      <MoreOptions height="15px" width="5px" color="White" />
+                    </div>
+                  </Tooltip>
+                </Dropdown>
+              </div>
+            {/if}
           </h2>
 
           <div></div>
