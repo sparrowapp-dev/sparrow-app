@@ -28,33 +28,53 @@
   let isTeamInviteModalOpen = false;
   let isLeaveTeamModelOpen = false;
 
+
+  //old Function
+
+  // const handleLeaveTeam = async () => {
+  //   if (!$openTeam?.teamId) return;
+  //   isLeavingTeam = true;
+  //   const teamId = $openTeam?.teamId;
+  //   const response = await _viewModel.leaveTeam($openTeam?.teamId);
+  //   if (response.isSuccessful) {
+  //     setTimeout(async () => {
+  //       const activeTeam = await _viewModel.checkActiveTeam();
+  //       if (activeTeam) {
+  //         const teamIdToActivate = await _viewModel.activateInitialWorkspace();
+  //         if (teamIdToActivate) {
+  //           await _viewModel.activateTeam(teamIdToActivate);
+  //         }
+  //       }
+  //       setTimeout(async () => {
+  //         await _viewModel.refreshTeams(userId);
+  //         await _viewModelWorkspace.refreshWorkspaces(userId);
+  //         notifications.success("You left a team.");
+  //         handleLeaveTeamModal();
+  //         isShowMoreVisible = false;
+  //         isLeavingTeam = false;
+  //       }, 500);
+  //     }, 500);
+  //   } else {
+  //     notifications.error(
+  //       response.message ?? "Failed to leave the team. Please try again.",
+  //     );
+  //     isShowMoreVisible = false;
+  //     isLeavingTeam = false;
+  //     handleLeaveTeamModal();
+  //   }
+  // };
+
+
+  // New function works only sometime
+
   const handleLeaveTeam = async () => {
     if (!$activeTeam?.teamId) return;
     const teamId = $activeTeam?.teamId;
     const response = await _viewModel1.leaveTeam($activeTeam?.teamId);
     if (response.isSuccessful) {
-      // setTimeout(async () => {
-      //   const activeTeam = await _viewModel1.checkActiveTeam(
-      //     $activeTeam?.teamId,
-      //   );
-      //   console.log("After checkActive team 1");
-      //   if (activeTeam) {
-      //     const teamIdToActivate = await _viewModel1.activateInitialWorkspace();
-      //     console.log("After active initalworkdsapce 2 ");
-      //     if (teamIdToActivate) {
-      //       await _viewModel1.activateTeam(teamIdToActivate);
-      //       console.log("After active team ast last 3");
-      //     }
-      //   }
-      //   setTimeout(async () => {
-      //     await _viewModel1.refreshTeams(userId);
-      //     console.log("After refresh tema 4");
-      //     await _viewModelWorkspace.refreshWorkspaces(userId);
-      //     console.log("After refresh worksapece 5 ");
-      //     notifications.success("You left a team.");
-      //   }, 500);
-      // }, 500);
-      
+      await _viewModel1.refreshTeams(userId);
+      await _viewModelWorkspace.refreshWorkspaces(userId);
+      notifications.success("You left a team.");
       isLeaveTeamModelOpen = false;
     } else {
       notifications.error(

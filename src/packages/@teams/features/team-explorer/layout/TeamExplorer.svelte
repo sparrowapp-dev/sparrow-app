@@ -144,6 +144,7 @@
   let searchQuery = "";
   let hasText = false;
   let leaveButtonMenu: boolean = false;
+
   const handleDelteteam = () => {
     leaveButtonMenu = !leaveButtonMenu;
     isLeaveTeamModelOpen = true;
@@ -163,14 +164,9 @@
     selectedViewSubscribe();
   });
 
-  let showMenu = false;
-
-  import CreateRequest from "$lib/assets/create_request.svg";
-
   const addButtonData = [
     {
       name: "Leave Team",
-      icon: CreateRequest,
       onclick: () => handleDelteteam(),
     },
   ];
