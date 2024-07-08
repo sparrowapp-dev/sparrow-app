@@ -135,7 +135,7 @@
         <div
           class="sparrow-choose-file-input-button d-flex justify-content-center my-4"
         >
-          <label for={inputId}>
+          <label for={inputId} role="button">
             <UploadIcon
               classProp="my-auto"
               width={iconWidth}

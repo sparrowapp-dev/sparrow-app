@@ -15,7 +15,7 @@
 
 <div class="d-flex pb-3">
   <div class="title-width">
-    <p class="team-title mt-1 fs-12 text-textColor">{NAME_CONFIG.TITLE}</p>
+    <p class="team-title mt-2 mb-0 fs-12 text-textColor">{NAME_CONFIG.TITLE}</p>
   </div>
   <div class="container-width">
     <input
@@ -23,7 +23,7 @@
       type="text"
       id={inputId}
       placeholder={NAME_CONFIG.PLACEHOLDER}
-      class="settings-team-name w-100 fs-12 border-0 p-3 rounded"
+      class="settings-team-name w-100 fs-12 border-0 p-2 rounded"
       autocomplete="off"
       spellcheck="false"
       autocorrect="off"
@@ -43,7 +43,6 @@
 <style>
   .settings-team-name {
     background-color: transparent !important;
-    margin-top: -18px;
   }
   .settings-team-name:hover {
     outline: 1px solid var(--border-primary-300);
@@ -55,9 +54,9 @@
     font-size: 12px;
   }
   .title-width {
-    width: 90px;
+    width: 98px;
   }
   .container-width {
-    width: calc(100% - 90px);
+    width: calc(100% - 98px);
   }
 </style>

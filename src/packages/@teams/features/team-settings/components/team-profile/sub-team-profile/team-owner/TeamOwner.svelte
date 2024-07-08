@@ -8,7 +8,7 @@
     <p class="team-title mb-0 fs-12 text-textColor">{OWNER_CONFIG.TITLE}</p>
   </div>
   <div class="container-width">
-    <p class="ps-3 mb-0 text-fs-12">
+    <p class="ps-2 mb-0 text-fs-12">
       {ownerDetails.name} <span class="text-textColor px-2">|</span>
       {ownerDetails.email}
     </p>
@@ -20,9 +20,9 @@
     font-size: 12px;
   }
   .title-width {
-    width: 90px;
+    width: 98px;
   }
   .container-width {
-    width: calc(100% - 90px);
+    width: calc(100% - 98px);
   }
 </style>

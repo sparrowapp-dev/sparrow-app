@@ -64,7 +64,7 @@
           <LockIcon
             height={"14px"}
             width={"14px"}
-            color={"var(--icon-secondary-300)"}
+            color={"var(--icon-secondary-400)"}
           />
         {/if}
       </button>

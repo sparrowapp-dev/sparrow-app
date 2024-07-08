@@ -75,10 +75,7 @@
 
 <div class="settings-content h-100">
   <UpdateTeamIcon bind:uploadTeamIcon onUpdateTeam={handleUpdateTeam} />
-
   <UpdateTeamName bind:teamName onUpdateTeam={handleUpdateTeam} />
-
   <TeamOwner {ownerDetails} />
-
   <UpdateTeamDescription bind:teamDescription onUpdateTeam={handleUpdateTeam} />
 </div>

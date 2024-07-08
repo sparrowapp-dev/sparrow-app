@@ -15,7 +15,7 @@
 
 <div class="d-flex pb-3">
   <div class="title-width">
-    <p class="team-title mt-3 fs-12 text-textColor">
+    <p class="team-title mt-2 fs-12 text-textColor">
       {DESCRIPTION_CONFIG.TITLE}
     </p>
   </div>
@@ -24,7 +24,7 @@
       required
       id={inputId}
       placeholder={DESCRIPTION_CONFIG.PLACEHOLDER}
-      class="settings-team-description w-100 fs-12 border-0 p-3 rounded"
+      class="settings-team-description w-100 fs-12 border-0 p-2 rounded"
       autocomplete="off"
       spellcheck="false"
       autocorrect="off"
@@ -59,9 +59,9 @@
     font-size: 12px;
   }
   .title-width {
-    width: 90px;
+    width: 98px;
   }
   .container-width {
-    width: calc(100% - 90px);
+    width: calc(100% - 98px);
   }
 </style>
