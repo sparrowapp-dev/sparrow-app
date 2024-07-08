@@ -16,7 +16,7 @@
   } from "@teams/common/constants/TeamTabs.constants";
   import { WorkspaceListView } from "../components";
   import WorkspaceGridView from "../components/workspace-grid-view/WorkspaceGridView.svelte";
-  import { TeamMembers } from "@teams/features";
+  import { TeamMembers, TeamSettings } from "@teams/features";
   import { CrossIcon } from "@library/icons";
   /**
    * user ID
@@ -77,6 +77,11 @@
    */
   export let onChangeUserRoleAtWorkspace;
 
+  /**
+   * function to update team details
+   */
+  export let onUpdateTeam;
+
   let selectedView: string = "Grid";
 
   const selectedViewSubscribe = workspaceView.subscribe((value) => {
@@ -113,7 +118,7 @@
         id: TeamTabsEnum.SETTINGS,
         count: 0,
         visible: openTeam?.owner === userId,
-        disabled: true,
+        disabled: false,
       },
     ];
   };
@@ -123,10 +128,15 @@
       findUserType();
     }
   }
+  let previousTeamId = "";
   $: {
     if (openTeam) {
       findUserType();
       teamTabs = refreshTabs();
+      if (previousTeamId !== openTeam?.teamId) {
+        onUpdateActiveTab(TeamTabsEnum.WORKSPACES);
+      }
+      previousTeamId = openTeam?.teamId;
     }
   }
 
@@ -339,12 +349,8 @@
             {onRemoveUserFromWorkspace}
             {onChangeUserRoleAtWorkspace}
           />
-          <!-- {:else if selectedTab === "settings" && userType === "owner"}
-          <Settings
-            openTeam={openTeam?.toMutableJSON()}
-            {teamServiceMethods}
-            {teamRepositoryMethods}
-          ></Settings> -->
+        {:else if activeTeamTab === TeamTabsEnum.SETTINGS && userRole === "owner"}
+          <TeamSettings openTeam={openTeam?.toMutableJSON()} {onUpdateTeam} />
         {/if}
       </div>
     </div>
