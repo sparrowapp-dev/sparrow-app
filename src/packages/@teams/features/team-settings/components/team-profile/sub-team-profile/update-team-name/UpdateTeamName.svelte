@@ -44,10 +44,10 @@
     margin-top: -18px;
   }
   .settings-team-name:hover {
-    outline: 1px solid var(--send-button);
+    outline: 1px solid var(--border-primary-300);
   }
   .settings-team-name:focus {
-    outline: 1px solid var(--send-button);
+    outline: 1px solid var(--border-primary-300);
   }
   .fs-12 {
     font-size: 12px;

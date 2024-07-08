@@ -109,14 +109,14 @@
 </script>
 
 <div class="sparrow-text-input-container mb-2">
-  <div class="d-flex">
+  <div class="d-flex align-items-center">
     {#if value.length == 0 || value.size === 0}
       <!-- Icon Uploader only shows when no file uploaded -->
       <div
         style="width:{width} !important; height:{height} !important;  border: 3px dashed {showFileTypeError ||
         showFileSizeError
           ? 'var(--border-danger-200)'
-          : 'var(--request-arc)'}; border-width: 2px;"
+          : 'var(--border-secondary-300)'}; border-width: 2px;"
         class="sparrow-file-input w-100 px-auto {isDragOver &&
           'opacity-75 bg-lightBackground'}"
         on:dragover={(e) => {
@@ -209,7 +209,7 @@
     font-size: var(--base-text);
   }
   .sparrow-input-label-desc {
-    color: var(--request-arc);
+    color: var(--text-secondary-350);
     font-size: var(--small-text);
   }
   .sparrow-file-input-placeholder {

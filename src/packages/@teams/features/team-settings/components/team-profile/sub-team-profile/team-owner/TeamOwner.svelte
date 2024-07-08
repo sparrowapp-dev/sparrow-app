@@ -7,7 +7,7 @@
   <p class="team-title fs-12 text-textColor">{OWNER_CONFIG.TITLE}</p>
 </div>
 <div class="col-10">
-  <p class="ps-3">
+  <p class="ps-3 text-fs-12">
     {ownerDetails.name} <span class="text-textColor px-2">|</span>
     {ownerDetails.email}
   </p>

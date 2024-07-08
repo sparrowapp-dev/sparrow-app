@@ -47,10 +47,10 @@
     margin-top: -18px;
   }
   .settings-team-description:hover {
-    outline: 1px solid var(--send-button);
+    outline: 1px solid var(--border-primary-300);
   }
   .settings-team-description:focus {
-    outline: 1px solid var(--send-button);
+    outline: 1px solid var(--border-primary-300);
   }
   .fs-12 {
     font-size: 12px;
