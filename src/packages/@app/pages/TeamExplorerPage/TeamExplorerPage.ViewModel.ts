@@ -507,6 +507,13 @@ export class TeamExplorerPageViewModel {
     }
   };
 
+  /**
+   * Delete the workspace and update the local DB as per changes
+   * Updates workspace, team, and tab repository.
+   * Also updates active workspace state, if active workspace is deleted
+   * @param workspace - workspace document
+   * @returns - A promise that resolves when the delete workspace is complete.
+   */
   public handleDeleteWorkspace = async (
     workspace: WorkspaceDocument,
   ): Promise<MakeRequestResponse> => {
@@ -538,23 +545,4 @@ export class TeamExplorerPageViewModel {
     }
     return response;
   };
-
-  // public removeWorkspace = async (workspaceId: string) => {
-  //   return await this.workspaceRepository.deleteWorkspace(workspaceId);
-  // };
-
-  // public deleteWorkspace = async (
-  //   workspaceId: string,
-  // ): Promise<MakeRequestResponse> => {
-  //   return await this.workspaceService.deleteWorkspace(workspaceId);
-  // };
-
-  // public handleWorkspaceDeletion = async (
-  //   teamId: string,
-  //   workspaceId: string,
-  // ): Promise<void> => {
-  //   await this.removeWorkspace(workspaceId);
-  //   await this.teamRepository.removeWorkspaceFromTeam(teamId, workspaceId);
-  //   return;
-  // };
 }
