@@ -344,9 +344,9 @@
     handlePopup(flag, "isMemberDemotePopup");
   }}
 >
-  <div style="font-size: 14px;" class="text-lightGray mb-1">
-    <div class="d-flex tile rounded mb-3">
-      <div class="info d-flex align-items-center">
+  <div style="font-size: 14px;" class="text-lightGray mb-1 mt-2">
+    <div class="d-flex  rounded mb-3">
+      <div class=" d-flex align-items-center">
         <div
           class="d-flex align-items-center justify-content-center"
           style="width: 36px;
@@ -367,22 +367,36 @@
       </div>
     </div>
 
-    <p style="font-size:12px;" class="text-textColor">
+    <p style="font-size:12px; color:var(--text-secondary-1000) !important;">
       Upon transitioning an Admin to a Member, 'Edit' access will be
       automatically provided for all assigned workspaces.
     </p>
   </div>
   <div
     class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
-    style="font-size: 16px;"
+    style="font-size: 16px; padding-top:16px; padding-bottom:0px;"
   >
-    <div class="d-flex align-items-center ellipsis">
+    <div class="d-flex align-items-center ellipsis gap-2">
       {#if openTeam?.logo}
-        <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
+      <img
+                class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
+                style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
+                src={base64ToURL(openTeam?.logo)}
+                alt=""/>
+      {:else}
+        <div
+          class="d-flex align-items-center justify-content-center"
+          style="width: 36px;
+        border: 1px solid var(--border-color);
+        height: 36px;
+        border-radius: 50%;"
+        >
+          <span>{openTeam?.name[0].toUpperCase()}</span>
+        </div>
       {/if}
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
-
+<div>
     <Button
       disable={memberDemotePopupLoader}
       title={"Update Access"}
@@ -394,7 +408,8 @@
         handleMemberDemotePopUpSuccess();
       }}
     />
-  </div></ModalWrapperV1
+  </div>
+  </ModalWrapperV1
 >
 
 <ModalWrapperV1
