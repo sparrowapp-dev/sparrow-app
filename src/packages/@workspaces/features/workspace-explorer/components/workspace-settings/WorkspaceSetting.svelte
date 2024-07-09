@@ -1,48 +1,14 @@
 <script lang="ts">
   import { Input } from "@library/forms";
-  import { Button, Tooltip } from "@library/ui";
-  import { Shimmer } from "../images";
+  import { Shimmer } from "../../images";
 
   let search = "";
   export let modifiedUser;
-  export let workspaceName;
 </script>
 
-<div class="workspace-setting" style="padding:24px;  height:100dvh;">
-  <div
-    class="d-flex"
-    style=" justify-content:space-between; gap:15px; height:30px;"
-  >
-    <div
-      style="font-weight: 700; font-size:18px; color:var(--text-secondary-100);"
-    >
-      {workspaceName}
-    </div>
-    <div class="d-flex gap-2">
-      <Tooltip title={"Coming Soon"} placement={"bottom"} distance={10}>
-        <Button
-          type={"dark"}
-          title={"Delete Workspace"}
-          textClassProp={"fs-12 "}
-          textStyleProp={"font-weight:400; font-size:12px;"}
-          disable={"true"}>Delete Workspace</Button
-        >
-      </Tooltip>
-
-      <Tooltip title={"Coming Soon"} placement={"bottom"} distance={10}>
-        <Button
-          type={"primary"}
-          title={"Invite"}
-          textClassProp={""}
-          textStyleProp={"font-weight:400; font-size:12px;"}
-          disable={"true"}>Invite</Button
-        >
-      </Tooltip>
-    </div>
-  </div>
-
+<div class="workspace-setting h-100" style="padding:24px; padding-top:0;">
   <div class="d-flex flex-column" style="">
-    <div class="pt-2">
+    <div class="">
       <Input
         class="search-area text-fs-12 rounded p-2"
         type="search"

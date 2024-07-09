@@ -1,16 +1,15 @@
-import { CollectionRepository } from "@app/repositories/collection.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
+import { TeamRepository } from "@app/repositories/team.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { CollectionService } from "@app/services/collection.service";
 import { WorkspaceService } from "@app/services/workspace.service";
 import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
-//-----
-import { v4 as uuidv4 } from "uuid";
 
 export default class WorkspaceExplorerViewModel {
   // Private Repositories
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
+  private teamRepository = new TeamRepository();
 
   // Private Services
   private collectionService = new CollectionService();
@@ -25,6 +24,13 @@ export default class WorkspaceExplorerViewModel {
     return this.tabRepository.getTab();
   };
 
+  get activeWorkspace() {
+    return this.workspaceRepository.getActiveWorkspace();
+  }
+
+  public readTeam = async (teamId: string) => {
+    return await this.teamRepository.getTeam(teamId);
+  };
   /**
    * Updates the name of a workspace and reflects the changes in the associated tab.
    * @param - The ID of the workspace to be updated.

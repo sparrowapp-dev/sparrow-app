@@ -21,11 +21,13 @@ export class TeamRepository {
   public getTeam = async (
     teamId: string,
   ): Promise<Observable<TeamDocument>> => {
-    return RxDB.getInstance().rxdb.team.findOne({
-      selector: {
-        teamId: teamId,
-      },
-    }).$;
+    return RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          teamId: teamId,
+        },
+      })
+      .exec();
   };
 
   /**

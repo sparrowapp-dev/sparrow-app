@@ -18,7 +18,8 @@
   export let userId;
 
   import closeIconWhite from "$lib/assets/close-icon-white.svg";
-  import { Select } from "@library/forms";
+  import { MultiSelect, Select } from "@library/forms";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   let emailstoBeSentArr: string[] = [];
   let isAllSelectedCheck = false;
   let teamSpecificWorkspace = workspaces.map((elem) => {
@@ -176,23 +177,15 @@
     selectedRole = id;
   };
   const handleCheckSelectDropdown = (id: string) => {
-    if (id === "select-all") {
-      isAllSelectedCheck = !isAllSelectedCheck;
-      teamSpecificWorkspace.forEach((elem: any) => {
-        elem.checked = isAllSelectedCheck;
-      });
-      checkInviteValidation();
-    } else {
-      teamSpecificWorkspace = teamSpecificWorkspace.map((elem) => {
-        if (elem?.id === id) {
-          elem.checked = !elem.checked;
-        }
-        return elem;
-      });
-      isAllSelectedCheck = teamSpecificWorkspace.every((item) => {
-        return item.checked;
-      });
-    }
+    teamSpecificWorkspace = teamSpecificWorkspace.map((elem) => {
+      if (elem?.id === id) {
+        elem.checked = !elem.checked;
+      }
+      return elem;
+    });
+    isAllSelectedCheck = teamSpecificWorkspace.every((item) => {
+      return item.checked;
+    });
   };
 </script>
 
@@ -268,16 +261,16 @@
         description:
           "Add & edit resources within a workspace, add & remove members to a workspace.",
       },
-      // {
-      //   name: "Editor",
-      //   id: WorkspaceRole.WORKSPACE_EDITOR,
-      //   description: "Add & edit resources within a workspace",
-      // },
-      // {
-      //   name: "Viewer",
-      //   id: WorkspaceRole.WORKSPACE_VIEWER,
-      //   description: "View Resources within a workspace.",
-      // },
+      {
+        name: "Editor",
+        id: WorkspaceRole.WORKSPACE_EDITOR,
+        description: "Add & edit resources within a workspace",
+      },
+      {
+        name: "Viewer",
+        id: WorkspaceRole.WORKSPACE_VIEWER,
+        description: "View Resources within a workspace.",
+      },
     ]}
     onclick={handleDropdown}
     position={"absolute"}
@@ -307,6 +300,61 @@
       Select workspaces you would want to give access to.
     </p>
   </div>
+
+  <!-- workspace selector -->
+
+  <MultiSelect
+    list={[...teamSpecificWorkspace]}
+    id={"ututyfu"}
+    onclick={handleCheckSelectDropdown}
+  />
+  <Dropdown
+    dropDownType={{ type: "checkbox", title: "select" }}
+    dropdownId="check-select-workspace"
+    data={[
+      {
+        name: "Select",
+        id: "select",
+        dynamicClasses: "text-whiteColor",
+        hide: true,
+      },
+      {
+        name: "Select All",
+        id: "select-all",
+        dynamicClasses: "text-whiteColor",
+        isInvalidOption: true,
+        checked: isAllSelectedCheck,
+      },
+      ...teamSpecificWorkspace,
+    ]}
+    onclick={handleCheckSelectDropdown}
+    staticClasses={[
+      {
+        id: `check-select-workspace-dropdown-select`,
+        classToAdd: ["border", "rounded", "py-1"],
+      },
+      {
+        id: "check-select-workspace-options-container",
+        classToAdd: ["end-0", "start-0"],
+      },
+      {
+        id: "check-select-workspace-btn-div",
+        classToAdd: ["flex-wrap", "overflow-auto"],
+      },
+    ]}
+    staticCustomStyles={[
+      {
+        id: "check-select-workspace-options-container",
+        styleKey: "overflow",
+        styleValue: "auto",
+      },
+      {
+        id: "check-select-workspace-options-container",
+        styleKey: "max-height",
+        styleValue: "calc(30vh)",
+      },
+    ]}
+  ></Dropdown>
   {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}
     <p class="error-text">
       You need to select at least one workspace. If you wish to give access to
