@@ -45,7 +45,6 @@
 
 .sidebar-recentapi-list::-webkit-scrollbar-thumb {
     background-color: var(--bg-secondary-330);
-    /* background-color: red; */
   }
 
   .sidebar-recentapi-list::-webkit-scrollbar-button {

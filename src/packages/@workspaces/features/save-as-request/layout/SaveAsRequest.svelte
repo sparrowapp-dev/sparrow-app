@@ -245,7 +245,7 @@
     {#if path.length > 0}
       {#each path as elem, index}
         <span class="text-secondary-200">/</span>
-        <span 
+        <span
           on:click={() => {
             navigateToDirectory(elem);
           }}
@@ -285,7 +285,7 @@
     --  left panel
     --
     -->
-    <div class="ps-3" style="height: 430px; overflow:auto;">
+    <div class="ps-3 row-left-section" style="height: 430px; overflow:auto;">
       <!-- 
               --
               shows current directory 
@@ -536,7 +536,8 @@
             -->
           {#if col.type === ItemType.FOLDER}
             <!-- {#if col.source === "USER"} -->
-            <div class="item ps-2"
+            <div
+              class="item ps-2"
               on:click={() => {
                 navigateToDirectory(col);
               }}
@@ -551,7 +552,8 @@
               type={ItemType.REQUEST}
             />
           {:else}
-            <div class="item ps-2"
+            <div
+              class="item ps-2"
               on:click={() => {
                 navigateToDirectory(col);
               }}
@@ -980,7 +982,7 @@
     background-color: var(--bg-tertiary-650) !important;
   }
   .instruction-btn:active {
-    background-color:var(--bg-primary-400) !important;
+    background-color: var(--bg-primary-400) !important;
   }
   .edit-input {
     padding: 0 8px !important;
@@ -1004,16 +1006,15 @@
   .item-header:hover .edit-pencil {
     display: inline-block !important;
   }
-  .item:hover{
-    background-color: var(--bg-tertiary-300)  !important ;
+  .item:hover {
+    background-color: var(--bg-tertiary-300) !important ;
   }
 
-
-  ::-webkit-scrollbar-thumb {
+  .row-left-section::-webkit-scrollbar-thumb {
     background-color: var(--bg-tertiary-100);
   }
 
-  ::-webkit-scrollbar-button {
-    color: var(----bg-tertiary-100);
+  .row-left-section::-webkit-scrollbar-button {
+    color: var(--bg-tertiary-100);
   }
 </style>

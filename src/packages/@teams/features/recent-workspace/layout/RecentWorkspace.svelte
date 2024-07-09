@@ -61,7 +61,6 @@
 <style>
   .sidebar-workspace-list::-webkit-scrollbar-thumb {
     background-color: var(--bg-secondary-330);
-    /* background-color: red; */
   }
 
   .sidebar-workspace-list::-webkit-scrollbar-button {
