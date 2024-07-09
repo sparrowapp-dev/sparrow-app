@@ -512,7 +512,7 @@
   <div
     class="info d-flex align-items-center"
     on:click={() => {
-      // memberPopObj.isMemberInfoPopup = true;
+      memberPopObj.isMemberInfoPopup = true;
     }}
   >
     <div class="icon d-flex align-items-center justify-content-center">

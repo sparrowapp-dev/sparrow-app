@@ -102,6 +102,7 @@ $theme-grey-888888: #888888;
 $theme-grey-83899F: #83899F;
 $theme-grey-808080: #808080;
 $theme-grey-636566: #636566;
+$theme-grey-60616B: #60616B;
 $theme-grey-484848: #484848;
 $theme-grey-4D4D4D: #4D4D4D;
 $theme-grey-45494D: #45494D;
@@ -263,6 +264,7 @@ $theme-red-230408: #230408;
   --text-secondary-290 : #{$theme-grey-484848};
   --text-secondary-300 : #{$theme-grey-45494D};
   --text-secondary-350 : #{$theme-grey-636566};
+  --text-secondary-370 : #{$theme-grey-60616B};
   --text-secondary-400 : #{$theme-grey-313233};
   --text-secondary-450 : #{$theme-grey-191919};
   --text-secondary-500 : #{$theme-grey-272727};
@@ -564,6 +566,7 @@ $sparrow-text-colors: (
   secondary-170 : $theme-grey-C4CBDA,
   secondary-200 : $theme-grey-8A9299,
   secondary-250 : $theme-grey-636566,
+  secondary-270 : $theme-grey-60616B,
   secondary-290 : $theme-grey-484848,
   secondary-300 : $theme-grey-45494D,
   secondary-400 : $theme-grey-313233,
