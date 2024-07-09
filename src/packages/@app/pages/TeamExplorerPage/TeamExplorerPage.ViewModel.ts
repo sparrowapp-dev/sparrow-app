@@ -1,6 +1,7 @@
 import { user } from "$lib/store";
 import type { InviteBody } from "$lib/utils/dto/team-dto";
 import { UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
+import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 import type { WorkspaceDocument } from "@app/database/database";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
@@ -505,4 +506,55 @@ export class TeamExplorerPageViewModel {
       );
     }
   };
+
+  public handleDeleteWorkspace = async (
+    workspace: WorkspaceDocument,
+  ): Promise<MakeRequestResponse> => {
+    const isActiveWorkspace =
+      await this.workspaceRepository.checkActiveWorkspace(workspace._id);
+    const workspaces = await this.workspaceRepository.getWorkspacesDocs();
+    if (isActiveWorkspace && workspaces.length === 1) {
+      notifications.error(
+        "Failed to delete the last workspace. Please create a new workspace before deleting this workspace.",
+      );
+    }
+    const response = await this.workspaceService.deleteWorkspace(workspace._id);
+    if (response.isSuccessful) {
+      await this.workspaceRepository.deleteWorkspace(workspace._id);
+      if (isActiveWorkspace) {
+        await this.workspaceRepository.activateInitialWorkspace();
+      }
+      await this.teamRepository.removeWorkspaceFromTeam(
+        workspace.team?.teamId,
+        workspace._id,
+      );
+      notifications.success(
+        `${workspace.name} is removed from ${workspace?.team?.teamName}.`,
+      );
+    } else {
+      notifications.error(
+        `Failed to remove ${workspace.name} from ${workspace?.team?.teamName}. Please try again.`,
+      );
+    }
+    return response;
+  };
+
+  // public removeWorkspace = async (workspaceId: string) => {
+  //   return await this.workspaceRepository.deleteWorkspace(workspaceId);
+  // };
+
+  // public deleteWorkspace = async (
+  //   workspaceId: string,
+  // ): Promise<MakeRequestResponse> => {
+  //   return await this.workspaceService.deleteWorkspace(workspaceId);
+  // };
+
+  // public handleWorkspaceDeletion = async (
+  //   teamId: string,
+  //   workspaceId: string,
+  // ): Promise<void> => {
+  //   await this.removeWorkspace(workspaceId);
+  //   await this.teamRepository.removeWorkspaceFromTeam(teamId, workspaceId);
+  //   return;
+  // };
 }

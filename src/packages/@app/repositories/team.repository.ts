@@ -29,6 +29,19 @@ export class TeamRepository {
   };
 
   /**
+   * Get team document by id (not observable)
+   */
+  public getTeamDoc = async (teamId: string): Promise<TeamDocument> => {
+    return RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          teamId: teamId,
+        },
+      })
+      .exec();
+  };
+
+  /**
    * Adds a new team.
    * @params - Team data to be inserted
    */

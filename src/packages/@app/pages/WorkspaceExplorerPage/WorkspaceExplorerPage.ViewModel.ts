@@ -1,9 +1,12 @@
+import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
 import { CollectionRepository } from "@app/repositories/collection.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
+import { TeamRepository } from "@app/repositories/team.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { CollectionService } from "@app/services/collection.service";
 import { WorkspaceService } from "@app/services/workspace.service";
 import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
+import { notifications } from "@library/ui/toast/Toast";
 //-----
 import { v4 as uuidv4 } from "uuid";
 
@@ -11,6 +14,7 @@ export default class WorkspaceExplorerViewModel {
   // Private Repositories
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
+  private teamRepository = new TeamRepository();
 
   // Private Services
   private collectionService = new CollectionService();
@@ -88,5 +92,63 @@ export default class WorkspaceExplorerViewModel {
       );
       return initWorkspaceTab.updateName(newDescription);
     }
+  };
+
+  /**
+   * Returns a workspace document
+   * @param workspaceId - workspace id
+   * @returns - workspace document
+   */
+  public getWorkspaceById = async (
+    workspaceId: string,
+  ): Promise<WorkspaceDocument> => {
+    return await this.workspaceRepository.readWorkspace(workspaceId);
+  };
+
+  /**
+   * Return a team document
+   * @param teamId - team id
+   * @returns = team document
+   */
+  public getTeamById = async (teamId: string): Promise<TeamDocument> => {
+    return await this.teamRepository.getTeamDoc(teamId);
+  };
+
+  /**
+   * Delete the workspace and update the local DB as per changes
+   * Updates workspace, team, and tab repository.
+   * Also updates active workspace state, if active workspace is deleted
+   * @param workspace - workspace document
+   * @returns - A promise that resolves when the delete workspace is complete.
+   */
+  public handleDeleteWorkspace = async (workspace: WorkspaceDocument) => {
+    const isActiveWorkspace =
+      await this.workspaceRepository.checkActiveWorkspace(workspace._id);
+    const workspaces = await this.workspaceRepository.getWorkspacesDocs();
+    if (isActiveWorkspace && workspaces.length === 1) {
+      notifications.error(
+        "Failed to delete the last workspace. Please create a new workspace before deleting this workspace.",
+      );
+    }
+    const response = await this.workspaceService.deleteWorkspace(workspace._id);
+    if (response.isSuccessful) {
+      await this.workspaceRepository.deleteWorkspace(workspace._id);
+      if (isActiveWorkspace) {
+        await this.workspaceRepository.activateInitialWorkspace();
+      }
+      await this.teamRepository.removeWorkspaceFromTeam(
+        workspace.team?.teamId,
+        workspace._id,
+      );
+      await this.tabRepository.removeTab(workspace._id);
+      notifications.success(
+        `${workspace.name} is removed from ${workspace?.team?.teamName}.`,
+      );
+    } else {
+      notifications.error(
+        `Failed to remove ${workspace.name} from ${workspace?.team?.teamName}. Please try again.`,
+      );
+    }
+    return response;
   };
 }
