@@ -416,31 +416,39 @@ export class TeamExplorerPageViewModel {
    * @param _userId - The ID of the user.
    * @param _userName - The name of the user.
    */
-  public promoteToOwnerAtTeam = async (
+   public promoteToOwnerAtTeam = async (
     _teamId: string,
     _teamName: string,
     _userId: string,
     _userName: string,
   ) => {
-    const response = await this.teamService.promoteToOwnerAtTeam(
-      _teamId,
-      _userId,
-    );
-    if (response.isSuccessful === true) {
-      const responseData = response.data.data;
-      await this.teamRepository.modifyTeam(_teamId, responseData);
-      await this.refreshWorkspaces(_userId);
-      notifications.success(
-        `${_userName} is now the new Owner of ${_teamName}.`,
+    const res = await this.teamRepository.getTeamData();
+    console.log("This is res", res.length);
+ 
+    if (res.length > 1) {
+      const response = await this.teamService.promoteToOwnerAtTeam(
+        _teamId,
+        _userId,
       );
+ 
+      if (response.isSuccessful === true) {
+        const responseData = response.data.data;
+        await this.teamRepository.modifyTeam(_teamId, responseData);
+        await this.refreshWorkspaces(_userId);
+        notifications.success(
+          `${_userName} is now the new Owner of ${_teamName}.`,
+        );
+      } else {
+        notifications.error(
+          `Failed to update access of Owner. Please try again.`,
+        );
+      }
+      return response;
     } else {
-      notifications.error(
-        `Failed to update access of Owner. Please try again.`,
-      );
+      notifications.error("You need more than one team to transfer ownership");
+      return;
     }
-    return response;
   };
-
   /**
    * Removes a user from a workspace.
    * @param _workspaceId - The ID of the workspace where remove user is to take place.

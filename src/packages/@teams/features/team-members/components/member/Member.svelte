@@ -141,20 +141,23 @@
       user.id,
       user.name,
     );
-    if (response.isSuccessful) {
+    if (response?.isSuccessful) {
       memberPopObj.isMemberOwnershipPopup = false;
     }
     memberOwnershipPopupLoader = false;
+    memberPopObj.isMemberOwnershipPopup = false;
   };
   export let getPermissionsData = () => {
     const commonPermissions = [
       {
         name: "Admin",
         id: TeamRole.TEAM_ADMIN,
+        color: "light",
       },
       {
         name: "Member",
         id: TeamRole.TEAM_MEMBER,
+        color: "light",
       },
     ];
     if (
@@ -167,6 +170,7 @@
         {
           name: "Remove",
           id: "remove",
+          color: "danger",
         },
       ];
     } else if (
@@ -177,11 +181,13 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
+          color: "light",
         },
         ...commonPermissions,
         {
           name: "Remove",
           id: "remove",
+          color: "danger",
         },
       ];
     } else {
@@ -189,6 +195,7 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
+          color: "light",
         },
         ...commonPermissions,
       ];
@@ -296,10 +303,20 @@
     class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
     style="font-size: 16px;"
   >
-    <div class="d-flex align-items-center ellipsis">
+    <div class="d-flex align-items-center ellipsis gap-2">
       {#if openTeam?.logo}
-        <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
-      {/if}
+      <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
+    {:else}
+      <div
+        class="d-flex align-items-center justify-content-center"
+        style="width: 36px;
+      border: 1px solid var(--border-color);
+      height: 36px;
+      border-radius: 50%;"
+      >
+        <span>{openTeam?.name[0].toUpperCase()}</span>
+      </div>
+    {/if}
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
 
@@ -391,8 +408,8 @@
   }}
 >
   <div style="font-size: 14px;" class="text-lightGray mb-1">
-    <div class="d-flex tile rounded mb-3">
-      <div class="info d-flex align-items-center">
+    <div class="d-flex rounded mb-3" style="padding-left: 0px !important;">
+      <div class="d-flex align-items-center">
         <div
           class="d-flex align-items-center justify-content-center"
           style="width: 36px;
@@ -413,14 +430,19 @@
       </div>
     </div>
 
-    <p style="font-size:12px;" class="text-textColor">
+    <p
+      style="font-size:12px; color:var(--text-secondary-1000); font-weight:400;"
+    >
       You are assigning the role of <span class="text-whiteColor">‘Owner’</span>
       to {user.name}. All the Owner’s access will be transferred to {user.name}
       and you will be demoted to Admin. This action cannot be undone.
     </p>
   </div>
 
-  <p class="confirm-header mb-0 sparrow-fs-14">
+  <p
+    class="confirm-header mb-0 sparrow-fs-14"
+    style="color: var(--text-secondary-200);"
+  >
     Enter team name to confirm<span class="asterik ms-1">*</span>
   </p>
   <input
@@ -429,7 +451,7 @@
     autocomplete="off"
     autocapitalize="none"
     autofocus
-    style="outline:none;border:none;flex-grow:1;"
+    style="outline:none;border:none;flex-grow:1; background-color: var(--bg-tertiary-300);"
     bind:value={confirmationText}
     on:input={() => {
       confirmationError = "";
@@ -444,12 +466,26 @@
   <br />
 
   <div
-    class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
-    style="font-size: 16px;"
+    class="d-flex align-items-center justify-content-between gap-3 pb-3 mb-0 rounded"
+    style="font-size: 16px; margin-top:16px;  padding-bottom:0px !important;"
   >
-    <div class="d-flex align-items-center ellipsis">
+    <div class="d-flex align-items-center ellipsis gap-2">
       {#if openTeam?.logo}
-        <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
+      <img
+                class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
+                style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
+                src={base64ToURL(openTeam?.logo)}
+                alt=""/>
+      {:else}
+        <div
+          class="d-flex align-items-center justify-content-center"
+          style="width: 36px;
+        border: 1px solid var(--border-color);
+        height: 36px;
+        border-radius: 50%;"
+        >
+          <span>{openTeam?.name[0].toUpperCase()}</span>
+        </div>
       {/if}
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
@@ -545,10 +581,12 @@
         titleId={user.role ? user.role : ""}
         onclick={handleDropdown}
         menuItem={"v2"}
-        headerTheme={"transparent"}
+        headerTheme={"blur"}
+        bodyTheme={"violet"}
         borderType={"none"}
-        disabled={true}
+        disabled={false}
         headerFontSize={"10px"}
+        borderRounded={"4px"}
       />
     {:else}
       <Select

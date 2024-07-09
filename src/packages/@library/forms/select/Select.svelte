@@ -107,7 +107,7 @@
   /**
    * Determines the z-index of Select.
    */
-  export let zIndex = 1;
+  export let zIndex = 1; 
   /**
    * Determines versions of the Select menu.
    */
@@ -366,7 +366,7 @@
 <div
   class="parent-select display-inline-block cursor-pointer"
   bind:this={selectHeaderWrapper}
-  style=" position: relative; z-index:{zIndex}; {disabled
+  style=" position: relative; {disabled
     ? 'pointer-events: none;'
     : ''}"
   id={`color-select-${id}`}
