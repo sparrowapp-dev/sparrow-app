@@ -133,23 +133,16 @@
       width: 24px;
     }
     .asterik {
-      color: var(--dangerColor);
+      color: var(--icon-danger-200);
       margin-left: 4px;
-    }
-    .input-container {
-      background-color: var(--background-dropdown);
-      padding: 8px;
-      border-radius: 4px;
-      border: 1px solid var(--border-color) !important;
-      width: 100%;
     }
     .error-text {
       margin-top: 2px;
       margin-bottom: 0 !important;
-      color: var(--error--color);
+      color: var(--text-danger-200);
     }
     .error-border {
-      border: 1px solid var(--error--color) !important;
+      border: 1px solid var(--border-danger-200) !important;
     }
   }
 </style>
