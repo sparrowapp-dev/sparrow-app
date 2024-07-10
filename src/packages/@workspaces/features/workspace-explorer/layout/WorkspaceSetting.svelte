@@ -6,6 +6,7 @@
   let search = "";
   export let modifiedUser;
   export let workspaceName;
+  export let onDeleteWorkspace;
 </script>
 
 <div class="workspace-setting" style="padding:24px;  height:100dvh;">
@@ -19,15 +20,13 @@
       {workspaceName}
     </div>
     <div class="d-flex gap-2">
-      <Tooltip title={"Coming Soon"} placement={"bottom"} distance={10}>
-        <Button
-          type={"dark"}
-          title={"Delete Workspace"}
-          textClassProp={"fs-12 "}
-          textStyleProp={"font-weight:400; font-size:12px;"}
-          disable={"true"}>Delete Workspace</Button
-        >
-      </Tooltip>
+      <Button
+        type={"dark"}
+        title={"Delete Workspace"}
+        textClassProp={"fs-12 "}
+        textStyleProp={"font-weight:400; font-size:12px;"}
+        onClick={onDeleteWorkspace}
+      />
 
       <Tooltip title={"Coming Soon"} placement={"bottom"} distance={10}>
         <Button

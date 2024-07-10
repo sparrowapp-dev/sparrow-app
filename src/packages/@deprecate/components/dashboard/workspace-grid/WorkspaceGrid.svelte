@@ -23,7 +23,6 @@
 
   let menuItems = [];
   const handleOpenWorkspace = async () => {
-    console.log("onworkspace click--->", workspace);
     onSwitchWorkspace(workspace._id);
   };
 

@@ -484,7 +484,6 @@
   </ModalWrapperV1>
 {/if}
 
-<!--Disabling the Quick Help feature, will be taken up in next release-->
 <Modal
   title={""}
   type={"dark"}
