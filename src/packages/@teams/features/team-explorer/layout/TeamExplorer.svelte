@@ -16,7 +16,7 @@
   } from "@teams/common/constants/TeamTabs.constants";
   import { WorkspaceListView } from "../components";
   import WorkspaceGridView from "../components/workspace-grid-view/WorkspaceGridView.svelte";
-  import { TeamMembers } from "@teams/features";
+  import { TeamMembers, TeamSettings } from "@teams/features";
   import { CrossIcon } from "@library/icons";
   /**
    * user ID
@@ -76,6 +76,15 @@
    * function to change user role at workspace
    */
   export let onChangeUserRoleAtWorkspace;
+  /**
+   * function to delete workspace
+   */
+  export let onDeleteWorkspace;
+
+  /**
+   * function to update team details
+   */
+  export let onUpdateTeam;
 
   let selectedView: string = "Grid";
 
@@ -113,7 +122,7 @@
         id: TeamTabsEnum.SETTINGS,
         count: 0,
         visible: openTeam?.owner === userId,
-        disabled: true,
+        disabled: false,
       },
     ];
   };
@@ -123,10 +132,15 @@
       findUserType();
     }
   }
+  let previousTeamId = "";
   $: {
     if (openTeam) {
       findUserType();
       teamTabs = refreshTabs();
+      if (previousTeamId !== openTeam?.teamId) {
+        onUpdateActiveTab(TeamTabsEnum.WORKSPACES);
+      }
+      previousTeamId = openTeam?.teamId;
     }
   }
 
@@ -298,7 +312,7 @@
             <div style="flex:1; overflow:auto;">
               {#if selectedView === TeamViewEnum.LIST}
                 <WorkspaceListView
-                {searchQuery}
+                  {searchQuery}
                   {openTeam}
                   data={workspaces.filter((elem) => {
                     return (
@@ -309,10 +323,12 @@
                   userType={userRole}
                   {userId}
                   {onSwitchWorkspace}
+                  {onDeleteWorkspace}
                 />
               {:else if selectedView == TeamViewEnum.GRID}
                 <WorkspaceGridView
-                {searchQuery}
+                  {onDeleteWorkspace}
+                  {searchQuery}
                   {openTeam}
                   {userId}
                   workspaces={workspaces.filter((elem) => {
@@ -341,12 +357,8 @@
             {onRemoveUserFromWorkspace}
             {onChangeUserRoleAtWorkspace}
           />
-          <!-- {:else if selectedTab === "settings" && userType === "owner"}
-          <Settings
-            openTeam={openTeam?.toMutableJSON()}
-            {teamServiceMethods}
-            {teamRepositoryMethods}
-          ></Settings> -->
+        {:else if activeTeamTab === TeamTabsEnum.SETTINGS && userRole === "owner"}
+          <TeamSettings openTeam={openTeam?.toMutableJSON()} {onUpdateTeam} />
         {/if}
       </div>
     </div>

@@ -7,20 +7,24 @@
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { WorkspaceSetting } from "@workspaces/features";
   import WorkspaceExplorerViewModel from "./WorkspaceExplorerPage.ViewModel";
+  import { Modal } from "@library/ui";
+  import { DeleteWorkspace } from "@common/features";
+  import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
 
   export let modifiedUser;
   export let collectionList;
   export let tab;
-  
 
   let showAbout = true;
   let showWorkspaceSettings = false;
   let workspaceName = tab.name;
   let collectionLength = 0;
   let workspaceDescription = tab.description;
-  let workspaceID = tab._data.path.workspaceId ;
-  const _viewModel = new  WorkspaceExplorerViewModel();
-
+  let workspaceID = tab._data.path.workspaceId;
+  let isDeleteWorkspaceModalOpen = false;
+  let selectedWorkspace: WorkspaceDocument;
+  let selectedTeam: TeamDocument;
+  const _viewModel = new WorkspaceExplorerViewModel();
 
   $: {
     if (collectionList) {
@@ -29,10 +33,20 @@
       });
     }
   }
-  
-    const onUpdateWorkspaceName = async (newName) => {
+
+  const updateSelectedWorkspace = async () => {
+    selectedWorkspace = await _viewModel.getWorkspaceById(workspaceID);
+  };
+
+  $: {
+    if (workspaceID) {
+      updateSelectedWorkspace();
+    }
+  }
+
+  const onUpdateWorkspaceName = async (newName) => {
     const handleUpdateWorkspace = await _viewModel.updateWorkspaceName(
-      workspaceID ,
+      workspaceID,
       newName,
     );
   };
@@ -46,20 +60,24 @@
 
   const saveValue = () => {
     onUpdateWorkspaceDesc(workspaceDescription);
-
   };
 
   const toggleSection = (section: string) => {
     showAbout = section === "about";
     showWorkspaceSettings = section === "workspaceSetting";
   };
- 
+
   const getvalue = () => {
     if (workspaceName != "") {
       onUpdateWorkspaceName(workspaceName);
     } else {
       notifications.error("Please Enter A Workspace Name");
     }
+  };
+  const handleDeleteWorkspace = async () => {
+    selectedWorkspace = await _viewModel.getWorkspaceById(workspaceID);
+    selectedTeam = await _viewModel.getTeamById(selectedWorkspace.team?.teamId);
+    isDeleteWorkspaceModalOpen = true;
   };
 </script>
 
@@ -114,7 +132,11 @@
       </div>
     {/if}
     {#if showWorkspaceSettings}
-      <WorkspaceSetting {workspaceName} {modifiedUser} />
+      <WorkspaceSetting
+        {workspaceName}
+        {modifiedUser}
+        onDeleteWorkspace={handleDeleteWorkspace}
+      />
     {/if}
   </div>
 
@@ -166,7 +188,10 @@
     <div
       style="border-bottom:1px solid #2A2C3C; margin-top:16px; margin-bottom:8px;"
     ></div>
-    <div class="d-flex flex-column" style="gap: 8px; height:430px; flex-grow:1 !important;">
+    <div
+      class="d-flex flex-column"
+      style="gap: 8px; height:430px; flex-grow:1 !important;"
+    >
       <div
         class="ps-0"
         style="color: var( --text-secondary-200); font-weight:700; font-size:12px; padding:8px; "
@@ -188,7 +213,8 @@
       </div>
     </div>
     <div class="d-flex gap-1" style="margin-bottom:70px !important; ">
-      <span style="color: var(--text-primary-300) ;">{collectionLength}</span
+      <span style="color: var(--text-primary-300) ;"
+        >{selectedWorkspace?.collections?.length ?? ""}</span
       ><span
         style="color: var(--text-secondary-300); font-size:12px; font-weight:700; margin-top:5px !important;"
         >COLLECTIONS</span
@@ -196,6 +222,30 @@
     </div>
   </div>
 </div>
+
+<Modal
+  title={"Delete Workspace?"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isDeleteWorkspaceModalOpen}
+  handleModalState={(flag) => {
+    isDeleteWorkspaceModalOpen = flag;
+  }}
+>
+  <DeleteWorkspace
+    bind:isDeleteWorkspaceModalOpen
+    workspace={selectedWorkspace}
+    openTeam={selectedTeam}
+    onDeleteWorkspace={async () => {
+      const response =
+        await _viewModel.handleDeleteWorkspace(selectedWorkspace);
+      if (response?.isSuccessful) {
+        isDeleteWorkspaceModalOpen = false;
+      }
+    }}
+  />
+</Modal>
 
 <style>
   .text-area::placeholder {

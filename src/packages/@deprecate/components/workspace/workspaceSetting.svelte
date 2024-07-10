@@ -232,7 +232,6 @@
       <span class="not-found-text mx-auto ellipsis">No results found.</span>
     {/if}
   </div>
-
   <ModalWrapperV1
     title={"Delete Workspace?"}
     type={"danger"}

@@ -10,7 +10,7 @@ export interface TeamForm {
     invalid: boolean;
   };
   file: {
-    value: any;
+    value: File[];
     invalid: boolean;
     showFileTypeError: boolean;
     showFileSizeError: boolean;
