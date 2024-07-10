@@ -172,4 +172,35 @@ export default class WorkspaceExplorerViewModel {
     }
     return response;
   };
+
+  /**
+   * Invites users to a workspace.
+   * @param currentWorkspaceDetails The details of the current workspace.
+   * @param data The payload containing users and their roles.
+   * @param emailstoBeSentArr The array of email addresses to send invitations to.
+   * @returns A promise resolving to the response from the invitation operation.
+   */
+  public inviteUserToWorkspace = async (
+    currentWorkspaceDetails,
+    data,
+    emailstoBeSentArr,
+  ) => {
+    const response = await this.workspaceService.addUsersInWorkspace(
+      currentWorkspaceDetails.id,
+      data,
+    );
+    if (response?.data?.data) {
+      const newTeam = response.data.data.users;
+      this.workspaceRepository.addUserInWorkspace(
+        currentWorkspaceDetails.id,
+        newTeam,
+      );
+      notifications.success(
+        `Invite Sent to ${emailstoBeSentArr.length} for ${currentWorkspaceDetails.name}`,
+      );
+    } else {
+      notifications.error(`Failed to sent invites, please try again`);
+    }
+    return response;
+  };
 }

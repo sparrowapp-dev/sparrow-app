@@ -43,6 +43,11 @@
    */
   export let onDeleteWorkspace;
 
+  /**
+   * The current active workspace object.
+   */
+  export let currentWorkspace;
+
   let workspaceName = tab.name;
   let collectionLength = 0;
   let workspaceDescription = tab.description;
@@ -79,7 +84,7 @@
           {workspaceID}
         />
       {:else if workspaceNavigatorId === "settings"}
-        <WorkspaceSetting {modifiedUser} />
+        <WorkspaceSetting users={currentWorkspace?.users} {workspaceName} />
       {/if}
     </section>
   </div>

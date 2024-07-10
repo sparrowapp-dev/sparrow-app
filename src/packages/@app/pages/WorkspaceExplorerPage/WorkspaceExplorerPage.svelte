@@ -75,6 +75,7 @@
   onDeleteWorkspace={handleDeleteWorkspace}
   onUpdateWorkspaceDescription={_viewModel.updateWorkspaceDescription}
   onUpdateWorkspaceName={_viewModel.updateWorkspaceName}
+  {currentWorkspace}
 />
 
 <Modal
@@ -94,8 +95,7 @@
     currentWorkspaceDetails={currentWorkspace}
     users={currentTeam?.users}
     teamName={currentTeam?.name}
-    addUsersInWorkspace={() => {}}
-    addUsersInWorkspaceInRxDB={() => {}}
+    onInviteUserToWorkspace={_viewModel.inviteUserToWorkspace}
   />
 </Modal>
 

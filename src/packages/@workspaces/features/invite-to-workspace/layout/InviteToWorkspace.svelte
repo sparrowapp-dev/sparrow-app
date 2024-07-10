@@ -1,9 +1,5 @@
 <script lang="ts">
-  import type {
-    addUsersInWorkspace,
-    addUsersInWorkspacePayload,
-  } from "$lib/utils/dto";
-  import { notifications } from "@library/ui/toast/Toast";
+  import type { addUsersInWorkspacePayload } from "$lib/utils/dto";
   import { WorkspaceRole } from "$lib/utils/enums";
   import { Button } from "@library/ui";
   import { InviteUserPicker } from "../components";
@@ -26,24 +22,15 @@
   export let users;
 
   /**
-   * Function to add users to the workspace.
-   * @param  id - The ID of the workspace.
-   * @param  data - The data containing users and role to add to the workspace.
-   */
-  export let addUsersInWorkspace: (
-    id: string,
-    data: addUsersInWorkspacePayload,
-  ) => Promise<any>;
-
-  /**
    * Function to add users to the local RxDB.
    * @param id - The ID of the workspace.
    * @param data - The array of users to add to the workspace in RxDB.
    */
-  export let addUsersInWorkspaceInRxDB: (
-    id: string,
-    data: addUsersInWorkspace[],
-  ) => Promise<void>;
+  export let onInviteUserToWorkspace: (
+    currenWorkspaceDetails: any,
+    data: any,
+    emailstoBeSentArr: string[],
+  ) => Promise<any>;
 
   /**
    * Details of the current workspace.
@@ -83,24 +70,13 @@
       selectedRole &&
       selectedRole != defaultRole
     ) {
-      const response = await addUsersInWorkspace(
-        currentWorkspaceDetails.id,
+      const response = await onInviteUserToWorkspace(
+        currentWorkspaceDetails,
         data,
+        emailstoBeSentArr,
       );
-      if (response?.data?.data) {
-        const newTeam: addUsersInWorkspace[] = response.data.data.users;
-        addUsersInWorkspaceInRxDB(currentWorkspaceDetails.id, newTeam);
-        notifications.success(
-          `Invite Sent to ${emailstoBeSentArr.length} for ${currentWorkspaceDetails.name}`,
-        );
-        loader = false;
+      if (response.isSuccessful) {
         handleInvitePopup(false);
-      } else if (response.message === "Network Error") {
-        handleInvitePopup(false);
-        notifications.error(response.message);
-      } else {
-        loader = false;
-        notifications.error(`Failed to sent invites, please try again`);
       }
     }
     loader = false;
