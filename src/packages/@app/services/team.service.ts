@@ -82,7 +82,6 @@ export class TeamService {
   };
 
   public promoteToAdminAtTeam = async (teamId: string, userId: string) => {
-    console.log("Insisde promote to admin api call ");
     const response = await makeRequest(
       "POST",
       `${apiUrl}/api/team/${teamId}/admin/${userId}`,
@@ -90,12 +89,10 @@ export class TeamService {
         headers: getAuthHeaders(),
       },
     );
-    console.log("This is the api response of promote to admin---", response);
     return response;
   };
 
   public demoteToMemberAtTeam = async (teamId: string, userId: string) => {
-    console.log("Insisde demote  api call ");
     const response = await makeRequest(
       "PUT",
       `${apiUrl}/api/team/${teamId}/admin/${userId}`,
@@ -103,9 +100,7 @@ export class TeamService {
         headers: getAuthHeaders(),
       },
     );
-    console.log("This is the api response of demote to member", response);
-
-    return response;
+       return response;
   };
 
   public promoteToOwnerAtTeam = async (teamId: string, userId: string) => {
