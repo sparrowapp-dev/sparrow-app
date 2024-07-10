@@ -1,4 +1,7 @@
 <script lang="ts">
+  /**
+   * The last modified user of the workspace.
+   */
   export let modifiedUser;
 </script>
 

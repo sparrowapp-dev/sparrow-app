@@ -1,30 +1,53 @@
 <script lang="ts">
-  import dropdown from "$lib/assets/dropdown.svg";
-  import checkIcon from "$lib/assets/check.svg";
   import closeIcon from "$lib/assets/close-icon-normal.svg";
   import closeIconWhite from "$lib/assets/close-icon-white.svg";
   import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
-  import { validateEmail } from "$lib/utils/helpers";
   import { onDestroy, onMount } from "svelte";
-  import { fade, fly, slide } from "svelte/transition";
+  import { slide } from "svelte/transition";
+
+  /**
+   * Interface representing a user in the list.
+   */
+  interface List {
+    email: string;
+    name: string;
+  }
+
+  /**
+   *  List of users
+   * */
+  export let list: List[] = [];
+
+  /**
+   * Unique identifier for the component
+   * */
+  export let id: string = "";
+
+  /**
+   * Callback function to notify parent component of email changes
+   */
+  export let onChange: (emails: string[]) => void;
+
+  // State variables
   let isOpen = false;
-  export let isError = false;
-  export let list = [];
-  export let showErrors;
-  export let id;
-  export let onChange;
   let data = list;
   let emailstoBeSentArr: string[] = [];
+  let currentEmailEntered = "";
 
-  function handleDropdownClick(event: MouseEvent) {
+  /**
+   * Handles click events outside the dropdown to close it.
+   * @param event - The mouse event.
+   */
+  const handleDropdownClick = (event: MouseEvent) => {
     const dropdownElement = document.getElementById(`input-select-list-${id}`);
     if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
       setTimeout(() => {
         isOpen = false;
       }, 100);
     }
-  }
+  };
 
+  // Lifecycle hook to add and remove event listeners
   onDestroy(() => {
     window.removeEventListener("click", handleDropdownClick);
   });
@@ -32,8 +55,10 @@
   onMount(() => {
     window.addEventListener("click", handleDropdownClick);
   });
-  let currentEmailEntered = "";
 
+  /**
+   * Filters the user list based on the current input and already selected emails.
+   */
   const filterUser = () => {
     data = list
       .filter((element) => {
@@ -54,6 +79,11 @@
         return true;
       });
   };
+
+  /**
+   * Handles the addition of an email to the list of emails to be sent.
+   * @param email - The email to be added.
+   */
   const handleEmailOnAdd = (email: string) => {
     email = email.replace(",", "");
     email = email.trim();
@@ -93,8 +123,12 @@
     currentEmailEntered = "";
   };
 
-  function removeElement(event: Event): void {
-    const email = event.target?.id;
+  /**
+   * Removes an email from the list of emails to be sent.
+   * @param  event - The event triggered by clicking the remove button.
+   */
+  const removeElement = (event: Event) => {
+    const email = (event.target as HTMLElement)?.id;
     const removeElement = document.getElementById(email) as HTMLElement;
     const emailContainer = document.getElementById(
       "input-email",
@@ -103,7 +137,7 @@
     emailstoBeSentArr = emailstoBeSentArr?.filter((e) => e != email);
     onChange(emailstoBeSentArr);
     filterUser();
-  }
+  };
 </script>
 
 <div on:click={handleDropdownClick}>

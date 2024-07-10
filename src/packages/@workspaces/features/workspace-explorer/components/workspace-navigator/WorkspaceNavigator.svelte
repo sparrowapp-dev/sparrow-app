@@ -1,6 +1,9 @@
 <script lang="ts">
   import { InformationIcon, SettingIcon } from "@library/icons";
 
+  /**
+   * The ID of the currently selected workspace navigator item.
+   */
   export let workspaceNavigatorId: string = "";
 </script>
 

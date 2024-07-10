@@ -26,10 +26,21 @@ export default class WorkspaceExplorerViewModel {
     return this.tabRepository.getTab();
   };
 
+  /**
+   * Get the active workspace from the workspace repository.
+   *
+   * @returns The active workspace object.
+   */
   get activeWorkspace() {
     return this.workspaceRepository.getActiveWorkspace();
   }
 
+  /**
+   * Read the team document from the team repository.
+   *
+   * @param teamId - The ID of the team to be read.
+   * @returns A promise that resolves to the team document.
+   */
   public readTeam = async (teamId: string) => {
     return await this.teamRepository.getTeamDoc(teamId);
   };

@@ -16,11 +16,6 @@
     _viewModel.activeWorkspace;
 
   let isWorkspaceInviteModalOpen: boolean = false;
-  let currentWorkspaceDetails = {
-    id: "",
-    name: "",
-    users: [],
-  };
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
   let selectedTeam: TeamDocument;
@@ -37,10 +32,19 @@
   }
 
   let currentTeam;
+  let currentWorkspace = {
+    id: "",
+    name: "",
+    users: [],
+  };
+  /**
+   * Subscribes to the active workspace and updates the current workspace details
+   * and also updates current team details associated with that workspace.
+   */
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value) {
-        currentWorkspaceDetails = {
+        currentWorkspace = {
           id: value._data._id,
           name: value._data.name,
           users: value._data.users,
@@ -52,19 +56,6 @@
       }
     },
   );
-
-  // const activeTeamsSubscribe = activeTeam.subscribe(
-  //   async (team: TeamDocument) => {
-  //     if (team) {
-  //       currentActiveTeam = team;
-  //       team._data.users.forEach((user) => {
-  //         // if (user.id === loggedInUser?.id) {
-  //         //   loggedUserRole = user.role as TeamRole;
-  //         // }
-  //       });
-  //     }
-  //   },
-  // );
 
   const handleDeleteWorkspace = async () => {
     selectedWorkspace = await _viewModel.getWorkspaceById(workspaceID);
@@ -100,7 +91,7 @@
     handleInvitePopup={(flag = false) => {
       isWorkspaceInviteModalOpen = flag;
     }}
-    {currentWorkspaceDetails}
+    currentWorkspaceDetails={currentWorkspace}
     users={currentTeam?.users}
     teamName={currentTeam?.name}
     addUsersInWorkspace={() => {}}

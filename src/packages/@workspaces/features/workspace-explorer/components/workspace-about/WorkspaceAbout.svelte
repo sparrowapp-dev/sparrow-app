@@ -1,11 +1,28 @@
 <script lang="ts">
+  /**
+   * The description of the workspace.
+   */
   export let workspaceDescription: string = "";
+
+  /**
+   * The ID of the workspace.
+   */
   export let workspaceID: string = "";
+
+  /**
+   * Function to update the workspace description.
+   * @param workspaceId - The ID of the workspace.
+   * @param workspaceDescription - The updated description of the workspace.
+   */
   export let onUpdateWorkspaceDescription: (
     workspaceId: string,
     workspaceDescription: string,
   ) => void;
 
+  /**
+   * Handles the update of workspace description.
+   * Calls with current workspaceID and workspaceDescription.
+   */
   const handleWorkspaceDescription = async () => {
     await onUpdateWorkspaceDescription(workspaceID, workspaceDescription);
   };

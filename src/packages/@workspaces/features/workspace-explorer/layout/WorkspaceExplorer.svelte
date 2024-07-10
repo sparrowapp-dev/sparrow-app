@@ -8,12 +8,39 @@
     WorkspaceUpdates,
   } from "../components";
 
+  /**
+   * The object representing the last modified user of the workspace.
+   */
   export let modifiedUser;
+
+  /**
+   * The list of collections related to the workspace.
+   */
   export let collectionList;
+
+  /**
+   * The current active tab or section within the workspace.
+   */
   export let tab;
+
+  /**
+   * Function to update the workspace name.
+   */
   export let onUpdateWorkspaceName;
+
+  /**
+   * Function to update the workspace description.
+   */
   export let onUpdateWorkspaceDescription;
+
+  /**
+   * Boolean flag to indicate if the workspace invite modal is open.
+   */
   export let isWorkspaceInviteModalOpen: boolean = false;
+
+  /**
+   * Function to delete the workspace.
+   */
   export let onDeleteWorkspace;
 
   let workspaceName = tab.name;

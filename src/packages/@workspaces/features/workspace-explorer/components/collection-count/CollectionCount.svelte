@@ -1,4 +1,7 @@
 <script lang="ts">
+  /**
+   * The length of the collection to display.
+   */
   export let collectionLength;
 </script>
 

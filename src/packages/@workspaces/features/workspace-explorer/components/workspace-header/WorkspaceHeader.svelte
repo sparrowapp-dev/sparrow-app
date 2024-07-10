@@ -1,17 +1,43 @@
 <script lang="ts">
   import { Input } from "@library/forms";
-  import { Button, Tooltip } from "@library/ui";
+  import { Button } from "@library/ui";
   import { notifications } from "@library/ui/toast/Toast";
+
+  /**
+   * The name of the workspace.
+   */
   export let workspaceName: string = "";
+
+  /**
+   * The ID of the workspace.
+   */
   export let workspaceID: string = "";
+
+  /**
+   * Boolean flag to indicate if the workspace invite modal is open.
+   */
   export let isWorkspaceInviteModalOpen: boolean;
-  export let isDeleteWorkspaceModalOpen: boolean;
+
+  /**
+   * Function to handle deletion of the workspace.
+   */
   export let onDeleteWorkspace;
+
+  /**
+   * Function to update the workspace name.
+   * @param workspaceID - The ID of the workspace.
+   * @param workspaceName - The updated name of the workspace.
+   */
   export let onUpdateWorkspaceName: (
     workspaceID: string,
     workspaceName: string,
   ) => void;
 
+  /**
+   * Handles the update of workspace name.
+   * Calls onUpdateWorkspaceName with current workspaceID and workspaceName.
+   * Shows an error notification if workspaceName is empty.
+   */
   const handleWorkspaceName = async () => {
     if (workspaceName != "") {
       await onUpdateWorkspaceName(workspaceID, workspaceName);
@@ -45,25 +71,26 @@
           placeholder="My Workspace"
         />
       </div>
-
-      <Button
-        type={"dark"}
-        title={"Delete Workspace"}
-        textClassProp={"fs-12 "}
-        textStyleProp={"font-weight:400; font-size:12px;"}
-        onClick={() => {
-          onDeleteWorkspace();
-        }}
-      />
-      <Button
-        type={"primary"}
-        title={"Invite"}
-        textClassProp={"fs-12"}
-        textStyleProp={"font-weight:400; font-size:12px;"}
-        onClick={() => {
-          isWorkspaceInviteModalOpen = true;
-        }}
-      ></Button>
+      <div class="d-flex gap-2">
+        <Button
+          type={"dark"}
+          title={"Delete Workspace"}
+          textClassProp={"fs-12 "}
+          textStyleProp={"font-weight:400; font-size:12px;"}
+          onClick={() => {
+            onDeleteWorkspace();
+          }}
+        />
+        <Button
+          type={"primary"}
+          title={"Invite"}
+          textClassProp={"fs-12"}
+          textStyleProp={"font-weight:400; font-size:12px;"}
+          onClick={() => {
+            isWorkspaceInviteModalOpen = true;
+          }}
+        ></Button>
+      </div>
     </div>
   </div>
 </section>

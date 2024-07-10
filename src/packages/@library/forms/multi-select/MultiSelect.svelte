@@ -1,33 +1,54 @@
 <script lang="ts">
-  /**
-   * @deprecated please do not use this file
-   * Instead of this we can use src\lib\components\dropdown\Dropdown
-   * **/
   import dropdown from "$lib/assets/dropdown.svg";
-  import checkIcon from "$lib/assets/check.svg";
   import { onDestroy, onMount } from "svelte";
-  import { fade, fly, slide } from "svelte/transition";
+  import { slide } from "svelte/transition";
   import closeIcon from "$lib/assets/close.svg";
-  let isOpen: boolean = false;
+
+  interface Data {
+    name: string;
+    id: string;
+    checked: boolean;
+  }
+  /**
+   * Indicates if there is an error.
+   */
   export let isError: boolean = false;
-  export let onclick: (tab) => void;
-  export let id;
+  /**
+   * Callback function to handle click events on a tab.
+   */
+  export let onclick: (list: Data[]) => void;
+  /**
+   * The ID of the multi select.
+   */
+  export let id: string;
+  /**
+   * The data for the multi select.
+   */
   export let data: Array<{
     name: string;
     id: string;
     checked: boolean;
   }>;
-  let list;
+
+  let isOpen: boolean = false;
+  let list: Data[];
   if (data && data.length > 0) {
     list = data;
   } else {
     list = [];
   }
 
+  /**
+   * Toggles the multi select open state.
+   */
   const toggleDropdown = () => {
     isOpen = !isOpen;
   };
 
+  /**
+   * Handles clicks outside the dropdown to close it.
+   * @param  event - The mouse event.
+   */
   function handleDropdownClick(event: MouseEvent) {
     const dropdownElement = document.getElementById(`check-dropdown-${id}`);
     if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
@@ -54,6 +75,11 @@
       }
     }
   }
+
+  /**
+   * Updates the checked status of a dropdown item.
+   * @param index - The index of the item to update.
+   */
   const updateCheck = (index: number): void => {
     let filteredCheckSelect = list.map((elem, i) => {
       if (i === index) {
@@ -65,6 +91,9 @@
     onclick(list);
   };
 
+  /**
+   * Handles the "Select All" checkbox functionality.
+   */
   const handleCheckAll = (): void => {
     let flag: boolean;
     if (controller === true) {
@@ -80,7 +109,12 @@
     onclick(list);
   };
 
-  const countCheckedList = (ls) => {
+  /**
+   * Counts the number of checked items in the list.
+   * @param  ls - The list of items.
+   * @returns  The count of checked items.
+   */
+  const countCheckedList = (ls: Data[]) => {
     let count = 0;
     ls.forEach((element) => {
       if (element.checked) {

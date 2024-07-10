@@ -1,34 +1,74 @@
 <script lang="ts">
-  export let handleInvitePopup: (flag: boolean) => void;
-  export let teamName: string;
   import type {
     addUsersInWorkspace,
     addUsersInWorkspacePayload,
   } from "$lib/utils/dto";
   import { notifications } from "@library/ui/toast/Toast";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@library/ui";
   import { InviteUserPicker } from "../components";
   import { Select } from "@library/forms";
-  let loader = false;
-  let emailstoBeSentArr: string[] = [];
+
+  /**
+   * Controls the visibility of the invite popup.
+   * @param isInviteContainerOpened - Determines whether to show or hide the invite popup.
+   */
+  export let handleInvitePopup: (isInviteContainerOpened: boolean) => void;
+
+  /**
+   * The name of the team to which users are being invited.
+   */
+  export let teamName: string;
+
+  /**
+   * List of users available for invitation.
+   */
   export let users;
+
+  /**
+   * Function to add users to the workspace.
+   * @param  id - The ID of the workspace.
+   * @param  data - The data containing users and role to add to the workspace.
+   */
   export let addUsersInWorkspace: (
     id: string,
     data: addUsersInWorkspacePayload,
   ) => Promise<any>;
+
+  /**
+   * Function to add users to the local RxDB.
+   * @param id - The ID of the workspace.
+   * @param data - The array of users to add to the workspace in RxDB.
+   */
   export let addUsersInWorkspaceInRxDB: (
     id: string,
     data: addUsersInWorkspace[],
   ) => Promise<void>;
-  export let currentWorkspaceDetails: { id: string; name: string };
-  let showErrors = false;
-  const defaultRole = "select";
-  let selectedRole = defaultRole;
+
+  /**
+   * Details of the current workspace.
+   */
+  export let currentWorkspaceDetails: {
+    id: string;
+    name: string;
+    users: {
+      email: string;
+    }[];
+  };
+
+  /**
+   * state variables
+   */
+  const defaultRole: string = "select";
+  let loader: boolean = false;
+  let emailstoBeSentArr: string[] = [];
+  let showErrors: boolean = false;
+  let selectedRole: string = defaultRole;
   let invalidEmails: string[] = [];
 
+  /**
+   * Handles the invite action. Sends the invite to the specified emails with the selected role.
+   */
   const handleInvite = async () => {
     loader = true;
     showErrors = true;
@@ -65,6 +105,11 @@
     }
     loader = false;
   };
+
+  /**
+   * Handles the role selection from the dropdown.
+   * @param role - The selected role.
+   */
   const handleDropdown = (role: string) => {
     selectedRole = role as WorkspaceRole;
   };
@@ -87,7 +132,6 @@
       }
       return true;
     })}
-    {showErrors}
     id={"input-select2"}
     onChange={(items) => {
       emailstoBeSentArr = items;
@@ -169,13 +213,6 @@
   .asterik {
     color: var(--dangerColor);
     margin-left: 4px;
-  }
-  .invite-btn {
-    background-color: var(--primary-btn-color);
-  }
-  .invite-btn:hover {
-    background: var(--send1-hoverbutton);
-    color: var(--white-color);
   }
   .error-text {
     margin-top: 4px;
