@@ -129,6 +129,7 @@ export default class WorkspaceExplorerViewModel {
       notifications.error(
         "Failed to delete the last workspace. Please create a new workspace before deleting this workspace.",
       );
+      return;
     }
     const response = await this.workspaceService.deleteWorkspace(workspace._id);
     if (response.isSuccessful) {
@@ -140,7 +141,12 @@ export default class WorkspaceExplorerViewModel {
         workspace.team?.teamId,
         workspace._id,
       );
-      await this.tabRepository.removeTab(workspace._id);
+      await this.tabRepository.removeTabsByQuery({
+        selector: {
+          "path.workspaceId": workspace._id,
+        },
+      });
+      await this.tabRepository.activateInitialTab();
       notifications.success(
         `${workspace.name} is removed from ${workspace?.team?.teamName}.`,
       );

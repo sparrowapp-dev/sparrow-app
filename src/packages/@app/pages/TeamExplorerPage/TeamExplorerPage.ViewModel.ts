@@ -1,7 +1,6 @@
 import { user } from "$lib/store";
 import type { InviteBody } from "$lib/utils/dto/team-dto";
 import { UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
-import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 import type { WorkspaceDocument } from "@app/database/database";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
@@ -514,9 +513,7 @@ export class TeamExplorerPageViewModel {
    * @param workspace - workspace document
    * @returns - A promise that resolves when the delete workspace is complete.
    */
-  public handleDeleteWorkspace = async (
-    workspace: WorkspaceDocument,
-  ): Promise<MakeRequestResponse> => {
+  public handleDeleteWorkspace = async (workspace: WorkspaceDocument) => {
     const isActiveWorkspace =
       await this.workspaceRepository.checkActiveWorkspace(workspace._id);
     const workspaces = await this.workspaceRepository.getWorkspacesDocs();
@@ -524,6 +521,7 @@ export class TeamExplorerPageViewModel {
       notifications.error(
         "Failed to delete the last workspace. Please create a new workspace before deleting this workspace.",
       );
+      return;
     }
     const response = await this.workspaceService.deleteWorkspace(workspace._id);
     if (response.isSuccessful) {
@@ -535,6 +533,15 @@ export class TeamExplorerPageViewModel {
         workspace.team?.teamId,
         workspace._id,
       );
+      await this.tabRepository.removeTabsByQuery({
+        selector: {
+          "path.workspaceId": workspace._id,
+        },
+      });
+      const tabs = await this.tabRepository.getTabDocs();
+      if (!tabs) {
+        await this.tabRepository.activateInitialTab();
+      }
       notifications.success(
         `${workspace.name} is removed from ${workspace?.team?.teamName}.`,
       );

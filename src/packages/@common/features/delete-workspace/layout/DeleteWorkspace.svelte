@@ -41,13 +41,13 @@
     style="outline:none;"
     defaultBorderColor={inputNameError
       ? "var(--border-danger-200)"
-      : "var(--bg-secondary-400)"}
+      : "var(--border-secondary-400)"}
     hoveredBorderColor={inputNameError
       ? "var(--border-danger-200)"
-      : "var(--bg-secondary-400)"}
+      : "var(--border-secondary-400)"}
     focusedBorderColor={inputNameError
       ? "var(--border-danger-200)"
-      : "var(--bg-secondary-400)"}
+      : "var(--border-secondary-400)"}
     isEditIconRequired={false}
     type={"text"}
     placeholderColor={"var(--text-secondary-200)"}
@@ -121,6 +121,7 @@
           }
           loader = false;
         }}
+        disable={loader}
       />
     </div>
   </div>
@@ -133,7 +134,7 @@
       width: 24px;
     }
     .asterik {
-      color: var(--icon-danger-200);
+      color: var(--text-danger-200);
       margin-left: 4px;
     }
     .error-text {

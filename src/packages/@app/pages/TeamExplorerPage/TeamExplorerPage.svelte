@@ -5,7 +5,7 @@
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { user } from "$lib/store";
   import { Modal } from "@library/ui";
-  import { DeleteWorkspace } from "@common/features/delete-workspace/layout";
+  import { DeleteWorkspace } from "@common/features";
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
   const _viewModel = new TeamExplorerPageViewModel();
@@ -85,7 +85,7 @@
     onDeleteWorkspace={async () => {
       const response =
         await _viewModel.handleDeleteWorkspace(selectedWorkspace);
-      if (response.isSuccessful) {
+      if (response?.isSuccessful) {
         isDeleteWorkspaceModalOpen = false;
       }
     }}
