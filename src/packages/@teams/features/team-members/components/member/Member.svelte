@@ -118,7 +118,7 @@
     if (response.isSuccessful) {
       memberPopObj.isMemberDemotePopup = false;
     }
-    memberDemotePopupLoader = true;
+    memberDemotePopupLoader = false;
   };
   export const handleMemberPromotePopUpSuccess = async () => {
     memberPromotePopupLoader = true;

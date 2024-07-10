@@ -366,7 +366,7 @@
 <div
   class="parent-select display-inline-block cursor-pointer"
   bind:this={selectHeaderWrapper}
-  style=" position: relative; {disabled
+  style=" position: relative;{disabled
     ? 'pointer-events: none;'
     : ''}"
   id={`color-select-${id}`}

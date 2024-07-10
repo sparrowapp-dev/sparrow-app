@@ -123,15 +123,16 @@
           borderType={"none"}
           disabled={true}
           headerFontSize={"10px"}
-          placeholderText={user.role ? user.role.toUpperCase() : ""}
         />
       {/if}
     </div>
   </div>
 </div>
 
+
 <hr
-style="color: red; margin-bottom:4px" />
+style="color: var(--text-secondary-400 ); margin-bottom:4px" />
+
 
 <div class="team-workspace mb-1 sparrow-fs-14">
   {#each workspaces as workspace}

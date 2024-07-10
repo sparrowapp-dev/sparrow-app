@@ -33,6 +33,11 @@
     out:scale={{ start: 0.8, duration: 300 }}
   >
     <div
+      on:click={canClose ? handleModalState(false) : null}
+      class="testing-desgin"
+    ></div>
+
+    <div
       class="sparrow-modal-container-data p-4 gap-2"
       style={`z-index: ${zIndex + 2}; width: ${width}`}
     >
@@ -59,10 +64,18 @@
         <slot />
       </div>
     </div>
+    
   </div>
 {/if}
 
 <style lang="scss">
+  .testing-desgin {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
   .sparrow-modal-bg-overlay {
     position: fixed;
     top: 0;
@@ -74,10 +87,6 @@
     backdrop-filter: blur(3px);
   }
 
-  .sparrow-modal-container-data {
-    background-color: var(--bg-tertiary-400);
-    border-radius: 6px;
-  }
   .sparrow-modal-container {
     position: fixed;
     height: auto;
@@ -89,6 +98,11 @@
     align-items: center;
     justify-content: center;
     /* background-color: var(--bg-tertiary-400); */
+    border-radius: 6px;
+  }
+
+  .sparrow-modal-container-data {
+    background-color: var(--bg-tertiary-400);
     border-radius: 6px;
   }
   .sparrow-modal-heading {
