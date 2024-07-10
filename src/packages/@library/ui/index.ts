@@ -12,3 +12,4 @@ export * from "./modal";
 export * from "./popover";
 export * from "./carousel";
 export * from "./table";
+export * from "./icon-fallback";

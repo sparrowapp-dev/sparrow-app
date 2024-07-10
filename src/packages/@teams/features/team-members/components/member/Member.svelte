@@ -11,6 +11,7 @@
   import Button from "@library/ui/button/Button.svelte";
   import { Profile } from "..";
   import { Select } from "@library/forms";
+  import { IconFallback } from "@library/ui";
   export let user: userDetails;
   export let userType: TeamRole;
   export let openTeam;
@@ -265,9 +266,9 @@
     handlePopup(flag, "isMemberPromotePopup");
   }}
 >
-  <div style="font-size: 14px;" class="text-lightGray mb-1">
-    <div class="d-flex tile rounded mb-3">
-      <div class="info d-flex align-items-center">
+  <div style="font-size: 14px;" class="text-lightGray ">
+    <div class="d-flex rounded" style=" margin-top:16px !important; margin-bottom:16px !important;">
+      <div class="d-flex align-items-center">
         <div
           class="d-flex align-items-center justify-content-center"
           style="width: 36px;
@@ -288,35 +289,27 @@
       </div>
     </div>
 
-    <p style="font-size:12px;" class="text-textColor">
-      You are assigning the role of an '<span class="text-whiteColor"
+    <p style="font-size:12px; color:var( --text-secondary-1000); font-weight:400;" >
+      You are assigning the role of an '<span class="text-whiteColor" style=" font-weight:700;"
         >Admin</span
       >' to {user.name}. Following access will be provided to {user.name}:
     </p>
-    <ul class="ps-4 text-textColor" style="font-size:12px;">
+    <ul class="ps-4 " style="font-size:12px; color:var( --text-secondary-1000);">
       {#each AdminLevelPermission as permission}
         <li>{permission}</li>
       {/each}
     </ul>
   </div>
   <div
-    class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
+    class="d-flex align-items-center justify-content-between gap-3 mt-1 pt-2 mb-0 rounded"
     style="font-size: 16px;"
   >
     <div class="d-flex align-items-center ellipsis gap-2">
       {#if openTeam?.logo}
-      <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
-    {:else}
-      <div
-        class="d-flex align-items-center justify-content-center"
-        style="width: 36px;
-      border: 1px solid var(--border-color);
-      height: 36px;
-      border-radius: 50%;"
-      >
-        <span>{openTeam?.name[0].toUpperCase()}</span>
-      </div>
-    {/if}
+        <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
+      {:else}
+        <IconFallback role={openTeam?.name[0]} />
+      {/if}
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
 
@@ -374,42 +367,35 @@
   </div>
   <div
     class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
-    style="font-size: 16px; padding-top:16px; padding-bottom:0px;"
+    style="font-size: 16px; padding-top:16px; padding-bottom:0px !important; "
   >
     <div class="d-flex align-items-center ellipsis gap-2">
       {#if openTeam?.logo}
-      <img
-                class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
-                style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-                src={base64ToURL(openTeam?.logo)}
-                alt=""/>
+        <img
+          class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
+          style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
+          src={base64ToURL(openTeam?.logo)}
+          alt=""
+        />
       {:else}
-        <div
-          class="d-flex align-items-center justify-content-center"
-          style="width: 36px;
-        border: 1px solid var(--border-color);
-        height: 36px;
-        border-radius: 50%;"
-        >
-          <span>{openTeam?.name[0].toUpperCase()}</span>
-        </div>
+      <IconFallback role={openTeam?.name[0]} />
       {/if}
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
-<div>
-    <Button
-      disable={memberDemotePopupLoader}
-      title={"Update Access"}
-      textStyleProp={"font-size: var(--base-text)"}
-      loaderSize={18}
-      type={"primary"}
-      loader={memberDemotePopupLoader}
-      onClick={() => {
-        handleMemberDemotePopUpSuccess();
-      }}
-    />
-  </div>
-  </ModalWrapperV1
+    <div>
+      <Button
+        disable={memberDemotePopupLoader}
+        title={"Update Access"}
+        textStyleProp={"font-size: var(--base-text)"}
+        loaderSize={18}
+        type={"primary"}
+        loader={memberDemotePopupLoader}
+        onClick={() => {
+          handleMemberDemotePopUpSuccess();
+        }}
+      />
+    </div>
+  </div></ModalWrapperV1
 >
 
 <ModalWrapperV1
@@ -486,21 +472,14 @@
   >
     <div class="d-flex align-items-center ellipsis gap-2">
       {#if openTeam?.logo}
-      <img
-                class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
-                style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-                src={base64ToURL(openTeam?.logo)}
-                alt=""/>
+        <img
+          class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
+          style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
+          src={base64ToURL(openTeam?.logo)}
+          alt=""
+        />
       {:else}
-        <div
-          class="d-flex align-items-center justify-content-center"
-          style="width: 36px;
-        border: 1px solid var(--border-color);
-        height: 36px;
-        border-radius: 50%;"
-        >
-          <span>{openTeam?.name[0].toUpperCase()}</span>
-        </div>
+      <IconFallback role={openTeam?.name[0]} />
       {/if}
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
@@ -584,10 +563,12 @@
         titleId={user.role ? user.role : ""}
         onclick={handleDropdown}
         menuItem={"v2"}
-        headerTheme={"transparent"}
+        headerTheme={"blur"}
+        bodyTheme={"violet"}
         borderType={"none"}
         headerFontSize={"10px"}
-        disabled={true}
+        disabled={false}
+        borderRounded={"4px"}
       />
     {:else if userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN}
       <Select

@@ -416,21 +416,34 @@ export class TeamExplorerPageViewModel {
    * @param _userId - The ID of the user.
    * @param _userName - The name of the user.
    */
-   public promoteToOwnerAtTeam = async (
+  public promoteToOwnerAtTeam = async (
     _teamId: string,
     _teamName: string,
     _userId: string,
     _userName: string,
   ) => {
+    let userId;
+    user.subscribe(async (value) => {
+      if (value) {
+        userId = value._id;
+      }
+    });
     const res = await this.teamRepository.getTeamData();
-    console.log("This is res", res.length);
- 
-    if (res.length > 1) {
+    let count = 0;
+    for (let index = 0; index < res.length; index++) {
+      let ownerId = res[index]._data.owner;
+    
+      if (ownerId === userId) {
+        count++;
+      }
+    }
+    
+    if (count > 1) {
       const response = await this.teamService.promoteToOwnerAtTeam(
         _teamId,
         _userId,
       );
- 
+
       if (response.isSuccessful === true) {
         const responseData = response.data.data;
         await this.teamRepository.modifyTeam(_teamId, responseData);
