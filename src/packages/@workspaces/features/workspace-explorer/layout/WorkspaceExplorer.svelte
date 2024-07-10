@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Modal } from "@library/ui";
   import {
     CollectionCount,
     WorkspaceAbout,
@@ -15,6 +14,7 @@
   export let onUpdateWorkspaceName;
   export let onUpdateWorkspaceDescription;
   export let isWorkspaceInviteModalOpen: boolean = false;
+  export let onDeleteWorkspace;
 
   let workspaceName = tab.name;
   let collectionLength = 0;
@@ -39,6 +39,7 @@
   >
     <WorkspaceHeader
       bind:isWorkspaceInviteModalOpen
+      {onDeleteWorkspace}
       {onUpdateWorkspaceName}
       {workspaceName}
       {workspaceID}

@@ -38,3 +38,4 @@ export { default as Ellipse } from "./Ellipse.svelte";
 export { default as SettingIcon } from "./Setting.svelte";
 export { default as HelpCenterIcon } from "./HelpCenter.svelte";
 export { default as InformationIcon } from "./Information.svelte";
+export { default as LockIcon } from "./Lock.svelte";

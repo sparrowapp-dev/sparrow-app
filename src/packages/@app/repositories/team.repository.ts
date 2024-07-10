@@ -21,6 +21,17 @@ export class TeamRepository {
   public getTeam = async (
     teamId: string,
   ): Promise<Observable<TeamDocument>> => {
+    return RxDB.getInstance().rxdb.team.findOne({
+      selector: {
+        teamId: teamId,
+      },
+    }).$;
+  };
+
+  /**
+   * Get team document by id (not observable)
+   */
+  public getTeamDoc = async (teamId: string): Promise<TeamDocument> => {
     return RxDB.getInstance()
       .rxdb.team.findOne({
         selector: {

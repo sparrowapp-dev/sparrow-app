@@ -2,9 +2,10 @@
   import { InviteToWorkspace, WorkspaceExplorer } from "@workspaces/features";
   import WorkspaceExplorerViewModel from "./WorkspaceExplorerPage.ViewModel";
   import { Modal } from "@library/ui";
-  import type { WorkspaceDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { onDestroy } from "svelte";
+  import { DeleteWorkspace } from "@common/features";
+  import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
 
   export let modifiedUser;
   export let collectionList;
@@ -20,6 +21,20 @@
     name: "",
     users: [],
   };
+  let isDeleteWorkspaceModalOpen = false;
+  let selectedWorkspace: WorkspaceDocument;
+  let selectedTeam: TeamDocument;
+  let workspaceID = tab._data.path.workspaceId;
+
+  const updateSelectedWorkspace = async () => {
+    selectedWorkspace = await _viewModel.getWorkspaceById(workspaceID);
+  };
+
+  $: {
+    if (workspaceID) {
+      updateSelectedWorkspace();
+    }
+  }
 
   let currentTeam;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
@@ -50,6 +65,12 @@
   //     }
   //   },
   // );
+
+  const handleDeleteWorkspace = async () => {
+    selectedWorkspace = await _viewModel.getWorkspaceById(workspaceID);
+    selectedTeam = await _viewModel.getTeamById(selectedWorkspace.team?.teamId);
+    isDeleteWorkspaceModalOpen = true;
+  };
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
@@ -60,6 +81,7 @@
   {modifiedUser}
   {collectionList}
   bind:isWorkspaceInviteModalOpen
+  onDeleteWorkspace={handleDeleteWorkspace}
   onUpdateWorkspaceDescription={_viewModel.updateWorkspaceDescription}
   onUpdateWorkspaceName={_viewModel.updateWorkspaceName}
 />
@@ -83,5 +105,29 @@
     teamName={currentTeam?.name}
     addUsersInWorkspace={() => {}}
     addUsersInWorkspaceInRxDB={() => {}}
+  />
+</Modal>
+
+<Modal
+  title={"Delete Workspace?"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isDeleteWorkspaceModalOpen}
+  handleModalState={(flag) => {
+    isDeleteWorkspaceModalOpen = flag;
+  }}
+>
+  <DeleteWorkspace
+    bind:isDeleteWorkspaceModalOpen
+    workspace={selectedWorkspace}
+    openTeam={selectedTeam}
+    onDeleteWorkspace={async () => {
+      const response =
+        await _viewModel.handleDeleteWorkspace(selectedWorkspace);
+      if (response?.isSuccessful) {
+        isDeleteWorkspaceModalOpen = false;
+      }
+    }}
   />
 </Modal>

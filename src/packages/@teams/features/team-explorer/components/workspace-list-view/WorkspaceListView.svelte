@@ -17,6 +17,8 @@
 
   export let searchQuery;
 
+  export let onDeleteWorkspace;
+
   let filterText = "";
 
   let workspacePerPage: number = 10,
@@ -59,13 +61,14 @@
               onOpenCollection={onSwitchWorkspace}
               {calculateTimeDifferenceInDays}
               {userType}
+              {onDeleteWorkspace}
             />
           {/each}
         {/if}
       </tbody>
     </Table>
 
-    {#if  filterText == "" && data && data?.length === 0}
+    {#if filterText == "" && data && data?.length === 0}
       <p class="not-found-text mt-3">Add Workspaces to this team</p>
     {:else if searchQuery !== "" && data
         .slice()

@@ -5,6 +5,8 @@
   export let workspaceName: string = "";
   export let workspaceID: string = "";
   export let isWorkspaceInviteModalOpen: boolean;
+  export let isDeleteWorkspaceModalOpen: boolean;
+  export let onDeleteWorkspace;
   export let onUpdateWorkspaceName: (
     workspaceID: string,
     workspaceName: string,
@@ -43,6 +45,16 @@
           placeholder="My Workspace"
         />
       </div>
+
+      <Button
+        type={"dark"}
+        title={"Delete Workspace"}
+        textClassProp={"fs-12 "}
+        textStyleProp={"font-weight:400; font-size:12px;"}
+        onClick={() => {
+          onDeleteWorkspace();
+        }}
+      />
       <Button
         type={"primary"}
         title={"Invite"}
