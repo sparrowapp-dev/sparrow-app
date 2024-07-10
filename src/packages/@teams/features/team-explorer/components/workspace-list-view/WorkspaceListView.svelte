@@ -17,6 +17,8 @@
 
   export let searchQuery;
 
+  export let onDeleteWorkspace;
+
   let filterText = "";
 
   let workspacePerPage: number = 10,
@@ -59,6 +61,7 @@
               onOpenCollection={onSwitchWorkspace}
               {calculateTimeDifferenceInDays}
               {userType}
+              {onDeleteWorkspace}
             />
           {/each}
         {/if}

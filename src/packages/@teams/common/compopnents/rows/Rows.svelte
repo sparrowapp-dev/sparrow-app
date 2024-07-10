@@ -9,6 +9,7 @@
   export let onOpenCollection: (id: string) => void;
   export let calculateTimeDifferenceInDays;
   export let userType = "";
+  export let onDeleteWorkspace;
 
   let pos = { x: 0, y: 0 };
   let showMenu = false;
@@ -36,13 +37,13 @@
           disabled: false,
         },
         // Will be enabled in next phase
-        // {
-        //   onClick: (e) => {
-        //     e.stopPropagation();
-        //   },
-        //   displayText: "Delete Workspace",
-        //   disabled: false,
-        // },
+        {
+          onClick: () => {
+            onDeleteWorkspace(list);
+          },
+          displayText: "Delete Workspace",
+          disabled: false,
+        },
       ];
     } else {
       menuItems = [

@@ -422,25 +422,46 @@ export class TeamExplorerPageViewModel {
     _userId: string,
     _userName: string,
   ) => {
-    const response = await this.teamService.promoteToOwnerAtTeam(
-      _teamId,
-      _userId,
-    );
-    if (response.isSuccessful === true) {
-      const responseData = response.data.data;
-      await this.teamRepository.modifyTeam(_teamId, responseData);
-      await this.refreshWorkspaces(_userId);
-      notifications.success(
-        `${_userName} is now the new Owner of ${_teamName}.`,
-      );
-    } else {
-      notifications.error(
-        `Failed to update access of Owner. Please try again.`,
-      );
+    let userId;
+    user.subscribe(async (value) => {
+      if (value) {
+        userId = value._id;
+      }
+    });
+    const res = await this.teamRepository.getTeamData();
+    let count = 0;
+    for (let index = 0; index < res.length; index++) {
+      let ownerId = res[index]._data.owner;
+    
+      if (ownerId === userId) {
+        count++;
+      }
     }
-    return response;
-  };
+    
+    if (count > 1) {
+      const response = await this.teamService.promoteToOwnerAtTeam(
+        _teamId,
+        _userId,
+      );
 
+      if (response.isSuccessful === true) {
+        const responseData = response.data.data;
+        await this.teamRepository.modifyTeam(_teamId, responseData);
+        await this.refreshWorkspaces(_userId);
+        notifications.success(
+          `${_userName} is now the new Owner of ${_teamName}.`,
+        );
+      } else {
+        notifications.error(
+          `Failed to update access of Owner. Please try again.`,
+        );
+      }
+      return response;
+    } else {
+      notifications.error("You must be owner of at least one other team to transfer ownership");
+      return;
+    }
+  };
   /**
    * Removes a user from a workspace.
    * @param _workspaceId - The ID of the workspace where remove user is to take place.
@@ -503,6 +524,66 @@ export class TeamExplorerPageViewModel {
       notifications.error(
         `Failed to change role for ${_userName}. Please try again.`,
       );
+    }
+  };
+
+  /**
+   * Delete the workspace and update the local DB as per changes
+   * Updates workspace, team, and tab repository.
+   * Also updates active workspace state, if active workspace is deleted
+   * @param workspace - workspace document
+   * @returns - A promise that resolves when the delete workspace is complete.
+   */
+  public handleDeleteWorkspace = async (workspace: WorkspaceDocument) => {
+    const isActiveWorkspace =
+      await this.workspaceRepository.checkActiveWorkspace(workspace._id);
+    const workspaces = await this.workspaceRepository.getWorkspacesDocs();
+    if (isActiveWorkspace && workspaces.length === 1) {
+      notifications.error(
+        "Failed to delete the last workspace. Please create a new workspace before deleting this workspace.",
+      );
+      return;
+    }
+    const response = await this.workspaceService.deleteWorkspace(workspace._id);
+    if (response.isSuccessful) {
+      await this.workspaceRepository.deleteWorkspace(workspace._id);
+      if (isActiveWorkspace) {
+        await this.workspaceRepository.activateInitialWorkspace();
+      }
+      await this.tabRepository.removeTabsByQuery({
+        selector: {
+          "path.workspaceId": workspace._id,
+        },
+      });
+      await this.teamRepository.removeWorkspaceFromTeam(
+        workspace.team?.teamId,
+        workspace._id,
+      );
+      const tabs = await this.tabRepository.getTabDocs();
+      if (!tabs) {
+        await this.tabRepository.activateInitialTab();
+      }
+      notifications.success(
+        `${workspace.name} is removed from ${workspace?.team?.teamName}.`,
+      );
+    } else {
+      notifications.error(
+        `Failed to remove ${workspace.name} from ${workspace?.team?.teamName}. Please try again.`,
+      );
+    }
+    return response;
+  };
+
+  /*
+   * updates the team details
+   * @param _teamId - team id to be updated
+   * @param _teamData - team data that will be override
+   */
+  public updateTeam = async (_teamId: string, _teamData: any) => {
+    const response = await this.teamService.updateTeam(_teamId, _teamData);
+    if (response.isSuccessful) {
+      delete response?._id;
+      this.teamRepository.modifyTeam(_teamId, response.data.data);
     }
   };
 }
