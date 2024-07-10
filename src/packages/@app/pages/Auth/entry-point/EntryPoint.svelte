@@ -21,6 +21,7 @@
   import { isGuestUserActive, navigationState } from "$lib/store";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import Button from "@library/ui/button/Button.svelte";
   let isEntry = false;
 
   let isHover = false;
@@ -111,7 +112,7 @@
     >
       Welcome to <span class="text-primary-300">Sparrow!</span>
     </p>
-    <div class="mb-1">
+    <div class="mb-1" style="height:40px;">
       <button
         class="btn btn-primary mb-3 w-100 text-whiteColor border-0"
         on:click={() => {
@@ -123,15 +124,32 @@
       >
     </div>
     <div class="mb-1">
-      <span
-        class="btn-guest"
-        on:click={() => {
-          skipLoginHandler();
-        }}
+      <div
+        class="mb-2"
+        style="text-align:center; font-size:12px; color:var(  --text-secondary-350);"
       >
-        Continue without Registration</span
-      >
+        or
+      </div>
+      <div style="height:32px;">
+        <Button
+          onClick={() => {
+            skipLoginHandler();
+          }}
+          title={"Try Sparrow Edge"}
+          buttonClassProp={"btn mb-2"}
+          type={"teritiary"}
+          buttonStyleProp={"height:32px; weight:126px; border-color:var( --border-primary-300) !important; font-size:13px; "}
+        />
+      </div>
     </div>
+    <div
+      class="mb-2 mt-2"
+      style="text-align:center; font-size:12px; color:var(  --text-secondary-350);"
+    >
+      Sparrow Edge: Your instant, no-signup API testing tool stripped down to
+      the essentials.
+    </div>
+
     <div class="w-100 mb-3 d-flex align-items-center justify-content-center">
       {#if os === "windows"}
         <a
