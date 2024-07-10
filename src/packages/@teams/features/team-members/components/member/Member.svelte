@@ -117,7 +117,7 @@
     if (response.isSuccessful) {
       memberPopObj.isMemberDemotePopup = false;
     }
-    memberDemotePopupLoader = true;
+    memberDemotePopupLoader = false;
   };
   export const handleMemberPromotePopUpSuccess = async () => {
     memberPromotePopupLoader = true;
@@ -512,7 +512,7 @@
   <div
     class="info d-flex align-items-center"
     on:click={() => {
-      // memberPopObj.isMemberInfoPopup = true;
+      memberPopObj.isMemberInfoPopup = true;
     }}
   >
     <div class="icon d-flex align-items-center justify-content-center">

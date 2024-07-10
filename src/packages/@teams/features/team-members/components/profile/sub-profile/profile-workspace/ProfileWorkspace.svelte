@@ -85,7 +85,7 @@
           menuItem={"v2"}
           headerTheme={"transparent"}
           borderType={"none"}
-          disabled={true}
+          disabled={false}
           headerFontSize={"10px"}
           position={"absolute"}
         />

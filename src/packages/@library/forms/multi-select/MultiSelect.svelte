@@ -12,16 +12,16 @@
   export let isError: boolean = false;
   export let onclick: (tab) => void;
   export let id;
-  export let list: Array<{
+  export let data: Array<{
     name: string;
     id: string;
     checked: boolean;
   }>;
-  let data;
-  if (list && list.length > 0) {
-    data = list;
+  let list;
+  if (data && data.length > 0) {
+    list = data;
   } else {
-    data = [];
+    list = [];
   }
 
   const toggleDropdown = () => {
@@ -36,15 +36,15 @@
   }
   let controller: boolean = false;
   $: {
-    if (list) {
-      data = list;
+    if (data) {
+      list = data;
       let flag: boolean = false;
-      for (let i = 0; i < data.length - 1; i++) {
-        if (data[i].checked === false) {
+      for (let i = 0; i < list.length - 1; i++) {
+        if (list[i].checked === false) {
           flag = true;
         }
       }
-      if (data[data?.length - 1]?.checked === false) {
+      if (list[list?.length - 1]?.checked === false) {
         flag = true;
       }
       if (flag) {
@@ -55,14 +55,14 @@
     }
   }
   const updateCheck = (index: number): void => {
-    let filteredCheckSelect = data.map((elem, i) => {
+    let filteredCheckSelect = list.map((elem, i) => {
       if (i === index) {
         elem.checked = !elem.checked;
       }
       return elem;
     });
-    data = filteredCheckSelect;
-    onclick(data);
+    list = filteredCheckSelect;
+    onclick(list);
   };
 
   const handleCheckAll = (): void => {
@@ -72,12 +72,12 @@
     } else {
       flag = true;
     }
-    let filteredCheckSelect = data.map((elem, i) => {
+    let filteredCheckSelect = list.map((elem, i) => {
       elem.checked = flag;
       return elem;
     });
-    data = filteredCheckSelect;
-    onclick(data);
+    list = filteredCheckSelect;
+    onclick(list);
   };
 
   const countCheckedList = (ls) => {
@@ -111,25 +111,25 @@
           : ''}"
         class:dropdown-btn-active={isOpen}
       >
-        {#if !countCheckedList(data)}
+        {#if !countCheckedList(list)}
           <span>Select</span>
         {:else}
           <div class="me-4 navigator">
-            {#each data as element}
+            {#each list as element}
               {#if element.checked}
                 <span class="bg-backgroundDropdown p-1 ps-2 pe-0 rounded me-2"
                   >{element.name}
                   <img
                     src={closeIcon}
                     on:click={() => {
-                      const filteredData = data.map((elem) => {
+                      const filteredData = list.map((elem) => {
                         if (elem.id === element.id) {
                           elem.checked = false;
                         }
                         return elem;
                       });
-                      data = filteredData;
-                      onclick(data);
+                      list = filteredData;
+                      onclick(list);
                     }}
                   /></span
                 >
@@ -166,22 +166,22 @@
             Select All
           </p>
         </div>
-        {#each data as list, index}
+        {#each list as item, index}
           <div class="d-flex px-2 py-2 highlight">
             <input
               class="form-check-input"
               type="checkbox"
-              bind:checked={list.checked}
+              bind:checked={item.checked}
               on:input={() => {
                 updateCheck(index);
               }}
             />
             <p class="m-0 ps-2 p-0 text-whiteColor" style="font-size: 12px;">
-              {list.name}
+              {item.name}
             </p>
           </div>
         {/each}
-        {#if !data?.length}
+        {#if !list?.length}
           <p
             class="m-0 ps-2 p-0 pt-1 pb-1 text-whiteColor"
             style="font-size: 12px;"

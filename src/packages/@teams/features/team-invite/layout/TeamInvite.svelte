@@ -2,7 +2,6 @@
   export let handleModalState: (flag: boolean) => void;
   export let teamName: string = "";
   export let teamId: string = "";
-  import closeIcon from "$lib/assets/close.svg";
   import {
     base64ToURL,
     createDynamicComponents,
@@ -19,9 +18,8 @@
 
   import closeIconWhite from "$lib/assets/close-icon-white.svg";
   import { MultiSelect, Select } from "@library/forms";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+
   let emailstoBeSentArr: string[] = [];
-  let isAllSelectedCheck = false;
   let teamSpecificWorkspace = workspaces.map((elem) => {
     return {
       id: elem._id,
@@ -30,7 +28,8 @@
       checked: false,
     };
   });
-  let selectedRole: string = "select";
+  const defaultRole = "select";
+  let selectedRole: string = defaultRole;
   let currentEmailEntered: string;
 
   let emailError: boolean = false;
@@ -110,7 +109,7 @@
     if (emailstoBeSentArr?.length === 0) {
       emailError = true;
     }
-    if (!selectedRole || selectedRole === "select") {
+    if (!selectedRole || selectedRole === defaultRole) {
       roleError = true;
     }
     if (!teamSpecificWorkspace || !countCheckedList(teamSpecificWorkspace)) {
@@ -128,7 +127,7 @@
       emailstoBeSentArr.length > 0 &&
       !invalidEmails.length &&
       selectedRole &&
-      selectedRole != "select"
+      selectedRole != defaultRole
     ) {
       if (
         selectedRole === WorkspaceRole.WORKSPACE_EDITOR ||
@@ -176,16 +175,8 @@
   const handleDropdown = (id) => {
     selectedRole = id;
   };
-  const handleCheckSelectDropdown = (id: string) => {
-    teamSpecificWorkspace = teamSpecificWorkspace.map((elem) => {
-      if (elem?.id === id) {
-        elem.checked = !elem.checked;
-      }
-      return elem;
-    });
-    isAllSelectedCheck = teamSpecificWorkspace.every((item) => {
-      return item.checked;
-    });
+  const handleCheckSelectDropdown = (items: any[]) => {
+    teamSpecificWorkspace = items;
   };
 </script>
 
@@ -251,7 +242,7 @@
     data={[
       {
         name: "Select",
-        id: "select",
+        id: defaultRole,
         description: "Select role",
         hide: true,
       },
@@ -279,7 +270,7 @@
     headerTheme={"violet2"}
     borderRounded={"4px"}
     headerFontWeight={400}
-    isError={roleError && selectedRole === "select"}
+    isError={roleError && selectedRole === defaultRole}
   />
 </div>
 {#if selectedRole === TeamRole.TEAM_ADMIN}
@@ -287,7 +278,7 @@
     Admins will have access to all current and future team workspaces.
   </p>
 {/if}
-{#if roleError && selectedRole === "select"}
+{#if roleError && selectedRole === defaultRole}
   <p class="error-text">Role cannot be empty.</p>
 {/if}
 
@@ -304,57 +295,11 @@
   <!-- workspace selector -->
 
   <MultiSelect
-    list={[...teamSpecificWorkspace]}
-    id={"ututyfu"}
+    data={[...teamSpecificWorkspace]}
+    id={"team-invite-multiple-workspace-selector"}
     onclick={handleCheckSelectDropdown}
   />
-  <Dropdown
-    dropDownType={{ type: "checkbox", title: "select" }}
-    dropdownId="check-select-workspace"
-    data={[
-      {
-        name: "Select",
-        id: "select",
-        dynamicClasses: "text-whiteColor",
-        hide: true,
-      },
-      {
-        name: "Select All",
-        id: "select-all",
-        dynamicClasses: "text-whiteColor",
-        isInvalidOption: true,
-        checked: isAllSelectedCheck,
-      },
-      ...teamSpecificWorkspace,
-    ]}
-    onclick={handleCheckSelectDropdown}
-    staticClasses={[
-      {
-        id: `check-select-workspace-dropdown-select`,
-        classToAdd: ["border", "rounded", "py-1"],
-      },
-      {
-        id: "check-select-workspace-options-container",
-        classToAdd: ["end-0", "start-0"],
-      },
-      {
-        id: "check-select-workspace-btn-div",
-        classToAdd: ["flex-wrap", "overflow-auto"],
-      },
-    ]}
-    staticCustomStyles={[
-      {
-        id: "check-select-workspace-options-container",
-        styleKey: "overflow",
-        styleValue: "auto",
-      },
-      {
-        id: "check-select-workspace-options-container",
-        styleKey: "max-height",
-        styleValue: "calc(30vh)",
-      },
-    ]}
-  ></Dropdown>
+
   {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}
     <p class="error-text">
       You need to select at least one workspace. If you wish to give access to

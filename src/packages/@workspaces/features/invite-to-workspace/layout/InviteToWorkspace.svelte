@@ -11,6 +11,7 @@
 
   import Button from "@library/ui/button/Button.svelte";
   import { InviteUserPicker } from "../components";
+  import { Select } from "@library/forms";
   let loader = false;
   let emailstoBeSentArr: string[] = [];
   export let users;
@@ -24,7 +25,7 @@
   ) => Promise<void>;
   export let currentWorkspaceDetails: { id: string; name: string };
   let showErrors = false;
-  let defaultRole = "select";
+  const defaultRole = "select";
   let selectedRole = defaultRole;
   let invalidEmails: string[] = [];
 
@@ -40,7 +41,7 @@
       emailstoBeSentArr.length > 0 &&
       !invalidEmails.length &&
       selectedRole &&
-      selectedRole != "select"
+      selectedRole != defaultRole
     ) {
       const response = await addUsersInWorkspace(
         currentWorkspaceDetails.id,
@@ -98,50 +99,39 @@
 </div>
 <div class="mt-4">
   <p class="role-title mb-1">Role<span class="asterik">*</span></p>
-  <Dropdown
-    dropDownType={{ type: "text", title: selectedRole ? selectedRole : "" }}
-    dropdownId="workspaceInvite"
+
+  <Select
+    id="invite-workspace-role"
+    titleId={selectedRole ? selectedRole : ""}
     data={[
       {
         name: "Select",
         id: defaultRole,
         description: "Select role",
-        dynamicClasses: "whiteColor",
         hide: true,
       },
-      // {
-      //   name: "Admin",
-      //   id: WorkspaceRole.WORKSPACE_ADMIN,
-      //   description:
-      //     "Add & edit resources within a workspace,add & remove members to workspace",
-      //   dynamicClasses: "whiteColor",
-      // },
       {
         name: "Editor",
         id: WorkspaceRole.WORKSPACE_EDITOR,
         description: "Add & edit resources within a workspace",
-        dynamicClasses: "whiteColor",
       },
       {
         name: "Viewer",
         id: WorkspaceRole.WORKSPACE_VIEWER,
         description: "View Resources within a workspace.",
-        dynamicClasses: "whiteColor",
       },
     ]}
     onclick={handleDropdown}
-    staticClasses={[
-      {
-        id: `workspaceInvite-dropdown-${selectedRole}`,
-        classToAdd: ["border", "rounded", "py-1"],
-      },
-      {
-        id: "workspaceInvite-options-container",
-        classToAdd: ["end-0", "start-0"],
-      },
-    ]}
+    position={"absolute"}
+    menuItem={"v2"}
+    bodyTheme={"violet"}
+    headerTheme={"violet2"}
+    borderRounded={"4px"}
+    headerFontWeight={400}
+    headerFontSize={"12px"}
+    isError={showErrors && selectedRole === defaultRole}
   />
-  {#if showErrors && selectedRole === "select"}
+  {#if showErrors && selectedRole === defaultRole}
     <p class="error-text sparrow-fs-12">Role Cannot Be Empty</p>
   {/if}
 </div>
