@@ -76,6 +76,10 @@
    * function to change user role at workspace
    */
   export let onChangeUserRoleAtWorkspace;
+  /**
+   * function to delete workspace
+   */
+  export let onDeleteWorkspace;
 
   /**
    * function to update team details
@@ -308,7 +312,7 @@
             <div style="flex:1; overflow:auto;">
               {#if selectedView === TeamViewEnum.LIST}
                 <WorkspaceListView
-                {searchQuery}
+                  {searchQuery}
                   {openTeam}
                   data={workspaces.filter((elem) => {
                     return (
@@ -319,10 +323,12 @@
                   userType={userRole}
                   {userId}
                   {onSwitchWorkspace}
+                  {onDeleteWorkspace}
                 />
               {:else if selectedView == TeamViewEnum.GRID}
                 <WorkspaceGridView
-                {searchQuery}
+                  {onDeleteWorkspace}
+                  {searchQuery}
                   {openTeam}
                   {userId}
                   workspaces={workspaces.filter((elem) => {

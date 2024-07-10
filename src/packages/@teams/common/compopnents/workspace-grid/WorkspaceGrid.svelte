@@ -17,13 +17,16 @@
    * Callback for switching workspace
    */
   export let onSwitchWorkspace: (id: string) => void;
+  /**
+   * function to delete workspace
+   */
+  export let onDeleteWorkspace;
 
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
 
   let menuItems = [];
   const handleOpenWorkspace = async () => {
-    console.log("onworkspace click--->", workspace);
     onSwitchWorkspace(workspace._id);
   };
 
@@ -56,15 +59,13 @@
           disabled: false,
         },
         // Will be enabled in next phase
-        // {
-        //   onClick: async (e) => {
-        //     handleDeletePopup(true);
-        //   },
-        //   displayText: "Delete Workspace",
-        //   disabled: !(
-        //     openTeam?.admins?.includes(userId) || openTeam?.owner == userId
-        //   ),
-        // },
+        {
+          onClick: () => {
+            onDeleteWorkspace(workspace);
+          },
+          displayText: "Delete Workspace",
+          disabled: !isAdminOrOwner,
+        },
       ];
     } else {
       menuItems = [

@@ -10,9 +10,8 @@
   import Button from "@library/ui/button/Button.svelte";
   import { WorkspaceGrid } from "@teams/common/compopnents";
 
-
-  export let searchQuery
-  let filterText =""
+  export let searchQuery;
+  let filterText = "";
 
   /**
    * Id of current user
@@ -34,6 +33,10 @@
    * Callback for switching the workspace
    */
   export let onSwitchWorkspace: (id: string) => void;
+  /**
+   * function to delete workspace
+   */
+  export let onDeleteWorkspace;
 
   let workspacePerPage = 5;
   let currPage = 1;
@@ -64,6 +67,7 @@
             {workspace}
             {onSwitchWorkspace}
             isAdminOrOwner={true}
+            {onDeleteWorkspace}
           />
         {/each}
         {#if currPage === 1 && searchQuery === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}

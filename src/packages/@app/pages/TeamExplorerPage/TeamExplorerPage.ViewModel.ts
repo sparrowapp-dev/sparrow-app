@@ -507,6 +507,53 @@ export class TeamExplorerPageViewModel {
   };
 
   /**
+   * Delete the workspace and update the local DB as per changes
+   * Updates workspace, team, and tab repository.
+   * Also updates active workspace state, if active workspace is deleted
+   * @param workspace - workspace document
+   * @returns - A promise that resolves when the delete workspace is complete.
+   */
+  public handleDeleteWorkspace = async (workspace: WorkspaceDocument) => {
+    const isActiveWorkspace =
+      await this.workspaceRepository.checkActiveWorkspace(workspace._id);
+    const workspaces = await this.workspaceRepository.getWorkspacesDocs();
+    if (isActiveWorkspace && workspaces.length === 1) {
+      notifications.error(
+        "Failed to delete the last workspace. Please create a new workspace before deleting this workspace.",
+      );
+      return;
+    }
+    const response = await this.workspaceService.deleteWorkspace(workspace._id);
+    if (response.isSuccessful) {
+      await this.workspaceRepository.deleteWorkspace(workspace._id);
+      if (isActiveWorkspace) {
+        await this.workspaceRepository.activateInitialWorkspace();
+      }
+      await this.tabRepository.removeTabsByQuery({
+        selector: {
+          "path.workspaceId": workspace._id,
+        },
+      });
+      await this.teamRepository.removeWorkspaceFromTeam(
+        workspace.team?.teamId,
+        workspace._id,
+      );
+      const tabs = await this.tabRepository.getTabDocs();
+      if (!tabs) {
+        await this.tabRepository.activateInitialTab();
+      }
+      notifications.success(
+        `${workspace.name} is removed from ${workspace?.team?.teamName}.`,
+      );
+    } else {
+      notifications.error(
+        `Failed to remove ${workspace.name} from ${workspace?.team?.teamName}. Please try again.`,
+      );
+    }
+    return response;
+  };
+
+  /*
    * updates the team details
    * @param _teamId - team id to be updated
    * @param _teamData - team data that will be override
