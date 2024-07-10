@@ -529,15 +529,15 @@ export class TeamExplorerPageViewModel {
       if (isActiveWorkspace) {
         await this.workspaceRepository.activateInitialWorkspace();
       }
-      await this.teamRepository.removeWorkspaceFromTeam(
-        workspace.team?.teamId,
-        workspace._id,
-      );
       await this.tabRepository.removeTabsByQuery({
         selector: {
           "path.workspaceId": workspace._id,
         },
       });
+      await this.teamRepository.removeWorkspaceFromTeam(
+        workspace.team?.teamId,
+        workspace._id,
+      );
       const tabs = await this.tabRepository.getTabDocs();
       if (!tabs) {
         await this.tabRepository.activateInitialTab();
