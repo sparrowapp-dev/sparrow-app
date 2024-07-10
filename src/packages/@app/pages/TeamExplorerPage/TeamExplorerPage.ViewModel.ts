@@ -552,4 +552,17 @@ export class TeamExplorerPageViewModel {
     }
     return response;
   };
+
+  /*
+   * updates the team details
+   * @param _teamId - team id to be updated
+   * @param _teamData - team data that will be override
+   */
+  public updateTeam = async (_teamId: string, _teamData: any) => {
+    const response = await this.teamService.updateTeam(_teamId, _teamData);
+    if (response.isSuccessful) {
+      delete response?._id;
+      this.teamRepository.modifyTeam(_teamId, response.data.data);
+    }
+  };
 }

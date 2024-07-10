@@ -41,6 +41,7 @@
   onPromoteToOwnerAtTeam={_viewModel.promoteToOwnerAtTeam}
   onRemoveUserFromWorkspace={_viewModel.removeUserFromWorkspace}
   onChangeUserRoleAtWorkspace={_viewModel.changeUserRoleAtWorkspace}
+  onUpdateTeam={_viewModel.updateTeam}
 />
 
 <Modal
