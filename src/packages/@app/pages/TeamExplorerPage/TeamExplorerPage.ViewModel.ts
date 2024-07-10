@@ -458,7 +458,7 @@ export class TeamExplorerPageViewModel {
       }
       return response;
     } else {
-      notifications.error("You need more than one team to transfer ownership");
+      notifications.error("You must be owner of at least one other team to transfer ownership");
       return;
     }
   };
