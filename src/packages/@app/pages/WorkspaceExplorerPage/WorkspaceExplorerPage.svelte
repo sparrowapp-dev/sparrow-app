@@ -15,7 +15,7 @@
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.activeWorkspace;
 
-  let isWorkspaceInviteModalOpen: boolean = false;
+  let isWorkspaceInviteModalOpen = false;
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
   let selectedTeam: TeamDocument;

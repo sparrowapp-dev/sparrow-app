@@ -27,9 +27,10 @@
    * @param data - The array of users to add to the workspace in RxDB.
    */
   export let onInviteUserToWorkspace: (
-    currenWorkspaceDetails: any,
+    workspaceId: string,
+    workspaceName: string,
     data: any,
-    emailstoBeSentArr: string[],
+    invitedUserCount: number,
   ) => Promise<any>;
 
   /**
@@ -71,9 +72,10 @@
       selectedRole != defaultRole
     ) {
       const response = await onInviteUserToWorkspace(
-        currentWorkspaceDetails,
+        currentWorkspaceDetails.id,
+        currentWorkspaceDetails.name,
         data,
-        emailstoBeSentArr,
+        emailstoBeSentArr?.length,
       );
       if (response.isSuccessful) {
         handleInvitePopup(false);
@@ -193,11 +195,11 @@
 
 <style>
   .asterik {
-    color: var(--dangerColor);
+    color: var(--text-danger-200);
     margin-left: 4px;
   }
   .error-text {
     margin-top: 4px;
-    color: var(--error--color);
+    color: var(--text-danger-200);
   }
 </style>

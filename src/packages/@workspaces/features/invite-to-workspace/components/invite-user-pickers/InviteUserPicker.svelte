@@ -4,14 +4,7 @@
   import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
   import { onDestroy, onMount } from "svelte";
   import { slide } from "svelte/transition";
-
-  /**
-   * Interface representing a user in the list.
-   */
-  interface List {
-    email: string;
-    name: string;
-  }
+  import type { List } from "../../types";
 
   /**
    *  List of users
@@ -230,7 +223,7 @@
     background-color: var(--bg-tertiary-300);
     border: 1px solid;
     padding: 3px 8px 3px 8px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-secondary-400);
     max-height: calc(100px);
     overflow-y: auto;
   }

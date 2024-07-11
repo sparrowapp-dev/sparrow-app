@@ -1,3 +1,4 @@
+import type { addUsersInWorkspacePayload } from "$lib/utils/dto";
 import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
@@ -175,28 +176,27 @@ export default class WorkspaceExplorerViewModel {
 
   /**
    * Invites users to a workspace.
-   * @param currentWorkspaceDetails The details of the current workspace.
-   * @param data The payload containing users and their roles.
-   * @param emailstoBeSentArr The array of email addresses to send invitations to.
+   * @param _workspaceId current workspace Id.
+   * @param _workspaceName current workspace name.
+   * @param _data The payload containing users and their roles.
+   * @param _invitedUserCount count of users to be invited.
    * @returns A promise resolving to the response from the invitation operation.
    */
   public inviteUserToWorkspace = async (
-    currentWorkspaceDetails,
-    data,
-    emailstoBeSentArr,
+    _workspaceId: string,
+    _workspaceName: string,
+    _data: addUsersInWorkspacePayload,
+    _invitedUserCount: number,
   ) => {
     const response = await this.workspaceService.addUsersInWorkspace(
-      currentWorkspaceDetails.id,
-      data,
+      _workspaceId,
+      _data,
     );
     if (response?.data?.data) {
       const newTeam = response.data.data.users;
-      this.workspaceRepository.addUserInWorkspace(
-        currentWorkspaceDetails.id,
-        newTeam,
-      );
+      this.workspaceRepository.addUserInWorkspace(_workspaceId, newTeam);
       notifications.success(
-        `Invite sent to ${emailstoBeSentArr.length} people for ${currentWorkspaceDetails.name}.`,
+        `Invite sent to ${_invitedUserCount} people for ${_workspaceName}.`,
       );
     } else {
       notifications.error(`Failed to sent invite. Please try again.`);

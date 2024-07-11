@@ -3,12 +3,8 @@
   import { onDestroy, onMount } from "svelte";
   import { slide } from "svelte/transition";
   import closeIcon from "$lib/assets/close.svg";
+  import type { Data } from "./types";
 
-  interface Data {
-    name: string;
-    id: string;
-    checked: boolean;
-  }
   /**
    * Indicates if there is an error.
    */
@@ -24,11 +20,7 @@
   /**
    * The data for the multi select.
    */
-  export let data: Array<{
-    name: string;
-    id: string;
-    checked: boolean;
-  }>;
+  export let data: Data[];
 
   let isOpen: boolean = false;
   let list: Data[];
@@ -49,12 +41,12 @@
    * Handles clicks outside the dropdown to close it.
    * @param  event - The mouse event.
    */
-  function handleDropdownClick(event: MouseEvent) {
+  const handleDropdownClick = (event: MouseEvent) => {
     const dropdownElement = document.getElementById(`check-dropdown-${id}`);
     if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
       isOpen = false;
     }
-  }
+  };
   let controller: boolean = false;
   $: {
     if (data) {
@@ -273,10 +265,10 @@
     cursor: pointer;
   }
   .dropdown-btn-active {
-    border: 1px solid var(--send-button);
+    border: 1px solid var(--border-primary-300);
   }
   .isError {
-    border: 1px solid var(--error--color) !important;
+    border: 1px solid var(--border-danger-200) !important;
   }
   .navigator {
     white-space: nowrap;
