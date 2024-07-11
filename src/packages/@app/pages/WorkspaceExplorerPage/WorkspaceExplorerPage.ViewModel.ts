@@ -1,5 +1,5 @@
+import type { addUsersInWorkspacePayload } from "$lib/utils/dto";
 import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
-import { CollectionRepository } from "@app/repositories/collection.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
@@ -7,8 +7,6 @@ import { CollectionService } from "@app/services/collection.service";
 import { WorkspaceService } from "@app/services/workspace.service";
 import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
 import { notifications } from "@library/ui/toast/Toast";
-//-----
-import { v4 as uuidv4 } from "uuid";
 
 export default class WorkspaceExplorerViewModel {
   // Private Repositories
@@ -29,6 +27,24 @@ export default class WorkspaceExplorerViewModel {
     return this.tabRepository.getTab();
   };
 
+  /**
+   * Get the active workspace from the workspace repository.
+   *
+   * @returns The active workspace object.
+   */
+  get activeWorkspace() {
+    return this.workspaceRepository.getActiveWorkspace();
+  }
+
+  /**
+   * Read the team document from the team repository.
+   *
+   * @param teamId - The ID of the team to be read.
+   * @returns A promise that resolves to the team document.
+   */
+  public readTeam = async (teamId: string) => {
+    return await this.teamRepository.getTeamDoc(teamId);
+  };
   /**
    * Updates the name of a workspace and reflects the changes in the associated tab.
    * @param - The ID of the workspace to be updated.
@@ -154,6 +170,36 @@ export default class WorkspaceExplorerViewModel {
       notifications.error(
         `Failed to remove ${workspace.name} from ${workspace?.team?.teamName}. Please try again.`,
       );
+    }
+    return response;
+  };
+
+  /**
+   * Invites users to a workspace.
+   * @param _workspaceId current workspace Id.
+   * @param _workspaceName current workspace name.
+   * @param _data The payload containing users and their roles.
+   * @param _invitedUserCount count of users to be invited.
+   * @returns A promise resolving to the response from the invitation operation.
+   */
+  public inviteUserToWorkspace = async (
+    _workspaceId: string,
+    _workspaceName: string,
+    _data: addUsersInWorkspacePayload,
+    _invitedUserCount: number,
+  ) => {
+    const response = await this.workspaceService.addUsersInWorkspace(
+      _workspaceId,
+      _data,
+    );
+    if (response?.data?.data) {
+      const newTeam = response.data.data.users;
+      this.workspaceRepository.addUserInWorkspace(_workspaceId, newTeam);
+      notifications.success(
+        `Invite sent to ${_invitedUserCount} people for ${_workspaceName}.`,
+      );
+    } else {
+      notifications.error(`Failed to sent invite. Please try again.`);
     }
     return response;
   };

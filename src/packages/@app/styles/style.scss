@@ -95,9 +95,8 @@ $theme-grey-F5F5F5: #F5F5F5;
 $theme-grey-e5e5e5: #e5e5e5;
 $theme-grey-C4CBDA: #C4CBDA;
 $theme-grey-8A9299: #8A9299;
-$theme-grey-CCCCCC : #CCCCCC;
 $theme-grey-999999: #999999;
-$theme-grey-CCCCCC : #CCCCCC;
+$theme-grey-CCCCCC :#CCCCCC;
 $theme-grey-888888: #888888;
 $theme-grey-83899F: #83899F;
 $theme-grey-808080: #808080;
@@ -623,7 +622,7 @@ $sparrow-bg-colors: (
   secondary-850 : $theme-grey-121212,
   secondary-900 : $theme-grey-000000,
   secondary-1000 : $theme-grey-CCCCCC,
-
+  
   tertiary-100 : $theme-violet-676A80,
   tertiary-190 : $theme-violet-37394E,
   tertiary-300 : $theme-violet-2A2C3C,
@@ -774,7 +773,6 @@ span {
 
 
 .ellipsis {
-  color: inherit;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

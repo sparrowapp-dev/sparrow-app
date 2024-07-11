@@ -118,7 +118,7 @@
     if (response.isSuccessful) {
       memberPopObj.isMemberDemotePopup = false;
     }
-    memberDemotePopupLoader = true;
+    memberDemotePopupLoader = false;
   };
   export const handleMemberPromotePopUpSuccess = async () => {
     memberPromotePopupLoader = true;
@@ -266,8 +266,11 @@
     handlePopup(flag, "isMemberPromotePopup");
   }}
 >
-  <div style="font-size: 14px;" class="text-lightGray ">
-    <div class="d-flex rounded" style=" margin-top:16px !important; margin-bottom:16px !important;">
+  <div style="font-size: 14px;" class="text-lightGray">
+    <div
+      class="d-flex rounded"
+      style=" margin-top:16px !important; margin-bottom:16px !important;"
+    >
       <div class="d-flex align-items-center">
         <div
           class="d-flex align-items-center justify-content-center"
@@ -289,12 +292,15 @@
       </div>
     </div>
 
-    <p style="font-size:12px; color:var( --text-secondary-1000); font-weight:400;" >
-      You are assigning the role of an '<span class="text-whiteColor" style=" font-weight:700;"
-        >Admin</span
+    <p
+      style="font-size:12px; color:var( --text-secondary-1000); font-weight:400;"
+    >
+      You are assigning the role of an '<span
+        class="text-whiteColor"
+        style=" font-weight:700;">Admin</span
       >' to {user.name}. Following access will be provided to {user.name}:
     </p>
-    <ul class="ps-4 " style="font-size:12px; color:var( --text-secondary-1000);">
+    <ul class="ps-4" style="font-size:12px; color:var( --text-secondary-1000);">
       {#each AdminLevelPermission as permission}
         <li>{permission}</li>
       {/each}
@@ -338,7 +344,7 @@
   }}
 >
   <div style="font-size: 14px;" class="text-lightGray mb-1 mt-2">
-    <div class="d-flex  rounded mb-3">
+    <div class="d-flex rounded mb-3">
       <div class=" d-flex align-items-center">
         <div
           class="d-flex align-items-center justify-content-center"
@@ -378,7 +384,7 @@
           alt=""
         />
       {:else}
-      <IconFallback role={openTeam?.name[0]} />
+        <IconFallback role={openTeam?.name[0]} />
       {/if}
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
@@ -479,7 +485,7 @@
           alt=""
         />
       {:else}
-      <IconFallback role={openTeam?.name[0]} />
+        <IconFallback role={openTeam?.name[0]} />
       {/if}
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
@@ -542,7 +548,7 @@
   <div
     class="info d-flex align-items-center"
     on:click={() => {
-      // memberPopObj.isMemberInfoPopup = true;
+      memberPopObj.isMemberInfoPopup = true;
     }}
   >
     <div class="icon d-flex align-items-center justify-content-center">

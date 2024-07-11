@@ -290,7 +290,7 @@
                   </Motion>
                 {:else if $activeTab?.type === ItemType.WORKSPACE}
                   <Motion {...scaleMotionProps} let:motion>
-                    <div use:motion>
+                    <div class="h-100" use:motion>
                       <WorkspaceExplorerPage
                         {collectionList}
                         {modifiedUser}

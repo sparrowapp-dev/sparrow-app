@@ -89,8 +89,9 @@
           menuItem={"v2"}
           headerTheme={"transparent"}
           borderType={"none"}
-          disabled={true}
+          disabled={false}
           headerFontSize={"10px"}
+          position={"absolute"}
         />
       {:else if userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN}
         <Select
@@ -101,8 +102,9 @@
           menuItem={"v2"}
           headerTheme={"transparent"}
           borderType={"none"}
-          disabled={true}
+          disabled={false}
           headerFontSize={"10px"}
+          position={"absolute"}
         />
       {:else}
         <Select
@@ -115,6 +117,7 @@
           borderType={"none"}
           disabled={true}
           headerFontSize={"10px"}
+          position={"absolute"}
         />
       {/if}
     </div>
