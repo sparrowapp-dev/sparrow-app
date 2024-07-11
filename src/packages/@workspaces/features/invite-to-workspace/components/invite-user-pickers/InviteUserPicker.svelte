@@ -28,6 +28,11 @@
    */
   export let onChange: (emails: string[]) => void;
 
+  /**
+   * shows picker in error state
+   */
+  export let isError: boolean = false;
+
   // State variables
   let isOpen = false;
   let data = list;
@@ -92,7 +97,7 @@
 
     const emailDiv: HTMLElement = createDynamicComponents(
       "div",
-      `d-flex bg-emailInviteBackgroundColor sparrow-fs-12 gx-1 px-1 justify-content-center rounded-1 align-items-center`,
+      `d-flex bg-tertiary-750 sparrow-fs-12 gx-1 px-1 justify-content-center ps-2 me-1 rounded-1 align-items-center`,
     );
     const emailContentSpan = createDynamicComponents("span", "");
     const closeIconBtn = createDynamicComponents("img", "bg-transparent", [
@@ -143,7 +148,11 @@
 <div on:click={handleDropdownClick}>
   <div
     id={`input-select-list-${id}`}
-    class="parent-dropdown display-inline-block z-1"
+    class="parent-dropdown display-inline-block z-1 border-radius-4 {isError
+      ? 'selectErrorBorderClass'
+      : ''}
+    
+    "
     style=" position: relative;"
   >
     <div>
@@ -167,7 +176,7 @@
           on:focus={() => {
             isOpen = true;
           }}
-          class="input-container mt-2 sparrow-fs-12 my-1"
+          class="input-container mt-1 sparrow-fs-12 my-1"
         />
       </div>
     </div>
@@ -198,7 +207,7 @@
                   <span class="sparrow-fs-12 text-whiteColor w-100 ellipsis"
                     >{user.name || ""}</span
                   ><br />
-                  <span class="sparrow-fs-12 text-textColor w-100 ellipsis"
+                  <span class="sparrow-fs-12 text-secondary-200 w-100 ellipsis"
                     >{user.email}</span
                   >
                 </div>
@@ -218,7 +227,7 @@
 
 <style>
   .email-container {
-    background-color: transparent;
+    background-color: var(--bg-tertiary-300);
     border: 1px solid;
     padding: 3px 8px 3px 8px;
     border: 1px solid var(--border-color);
@@ -226,10 +235,10 @@
     overflow-y: auto;
   }
   .select-data {
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: var(--bg-tertiary-300);
     color: white;
     position: absolute;
-    bottom: 0px;
+    bottom: -5px;
     left: 0;
     right: 0;
     transform: translateY(100%);
@@ -238,6 +247,9 @@
     overflow-y: auto;
     -webkit-backdrop-filter: blur(10px); /* For some older versions of Safari */
     backdrop-filter: blur(10px);
+    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
   }
   .select-active {
     display: block !important;
@@ -246,18 +258,25 @@
     cursor: pointer;
   }
   .highlight:hover {
-    background-color: var(--dull-background-color);
+    background-color: var(--bg-tertiary-400);
   }
 
   .icon {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: 1px solid var(--border-color) !important;
+    border: 1px solid var(--border-secondary-300) !important;
+    background-color: var(--bg-tertiary-250);
   }
   .info {
     width: calc(100% - 120px);
     height: 48px;
     padding: 8px !important;
+  }
+  input::placeholder {
+    color: var(--text-secondary-200);
+  }
+  .selectErrorBorderClass {
+    border: 1px solid var(--border-danger-200) !important;
   }
 </style>

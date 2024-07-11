@@ -196,10 +196,10 @@ export default class WorkspaceExplorerViewModel {
         newTeam,
       );
       notifications.success(
-        `Invite Sent to ${emailstoBeSentArr.length} for ${currentWorkspaceDetails.name}`,
+        `Invite sent to ${emailstoBeSentArr.length} people for ${currentWorkspaceDetails.name}.`,
       );
     } else {
-      notifications.error(`Failed to sent invites, please try again`);
+      notifications.error(`Failed to sent invite. Please try again.`);
     }
     return response;
   };

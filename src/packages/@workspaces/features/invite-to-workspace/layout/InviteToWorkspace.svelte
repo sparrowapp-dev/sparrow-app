@@ -91,9 +91,12 @@
   };
 </script>
 
-<div class="d-flex flex-column">
-  <p class="invite-header mb-2 sparrow-fs-14">
-    Invite By Email<span class="asterik">*</span>
+<div class="d-flex flex-column pt-3">
+  <p class="invite-header text-secondary-1000 mb-0 sparrow-fs-14">
+    Invite by Email<span class="asterik">*</span>
+  </p>
+  <p class="text-fs-12 mb-2 text-secondary-200">
+    Use comma to separate emails.
   </p>
   <InviteUserPicker
     list={users?.filter((element) => {
@@ -112,13 +115,16 @@
     onChange={(items) => {
       emailstoBeSentArr = items;
     }}
+    isError={showErrors && emailstoBeSentArr.length === 0}
   />
   {#if showErrors && emailstoBeSentArr.length === 0}
-    <p class="error-text sparrow-fs-12">Email ID cannot be Empty.</p>
+    <p class="error-text mb-0 sparrow-fs-12">Email ID cannot be Empty.</p>
   {/if}
 </div>
 <div class="mt-4">
-  <p class="role-title mb-1">Role<span class="asterik">*</span></p>
+  <p class="role-title text-secondary-1000 text-fs-14 mb-1">
+    Role<span class="asterik">*</span>
+  </p>
 
   <Select
     id="invite-workspace-role"
@@ -155,19 +161,19 @@
     <p class="error-text sparrow-fs-12">Role Cannot Be Empty</p>
   {/if}
 </div>
-<div class="text-textColor mt-2 sparrow-fs-12">
-  You can invite your team members or external collaborators to a this
-  workspace. Invited people will have access to only the <span
-    style="color:white">{currentWorkspaceDetails.name}</span
+<div class="text-secondary-200 mt-2 sparrow-fs-12">
+  You can invite your team members or external collaborators to this workspace.
+  Invited people will have access to only the <span style="color:white"
+    >{currentWorkspaceDetails.name}</span
   > workspace.
 </div>
-<div class="d-flex align-items-center justify-content-between">
-  <div class="description mt-4 sparrow-fs-12 ellipsis">
-    <p class="mb-0 text-textColor ellipsis">
+<div class="d-flex align-items-center justify-content-between pt-3">
+  <div class="description sparrow-fs-12 ellipsis">
+    <p class="mb-0 text-secondary-200 ellipsis">
       Workspace<span style="color:white">: {currentWorkspaceDetails.name}</span>
     </p>
-    <p class="text-textColor ellipsis">
-      Team:<span style="color:white">: {teamName}</span>
+    <p class="text-secondary-200 mb-0 ellipsis">
+      Team: <span style="color:white"> {teamName}</span>
     </p>
   </div>
   <div>
