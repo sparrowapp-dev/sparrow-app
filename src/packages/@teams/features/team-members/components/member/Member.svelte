@@ -311,10 +311,10 @@
     style="font-size: 16px;"
   >
     <div class="d-flex align-items-center ellipsis gap-2">
-      {#if openTeam?.logo}
+      {#if openTeam?.logo?.size}
         <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
       {:else}
-        <IconFallback role={openTeam?.name[0]} />
+        <IconFallback character={openTeam?.name[0]} />
       {/if}
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
@@ -376,7 +376,7 @@
     style="font-size: 16px; padding-top:16px; padding-bottom:0px !important; "
   >
     <div class="d-flex align-items-center ellipsis gap-2">
-      {#if openTeam?.logo}
+      {#if openTeam?.logo?.size}
         <img
           class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
           style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
@@ -384,7 +384,7 @@
           alt=""
         />
       {:else}
-        <IconFallback role={openTeam?.name[0]} />
+        <IconFallback character={openTeam?.name[0]} />
       {/if}
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
@@ -477,7 +477,7 @@
     style="font-size: 16px; margin-top:16px;  padding-bottom:0px !important;"
   >
     <div class="d-flex align-items-center ellipsis gap-2">
-      {#if openTeam?.logo}
+      {#if openTeam?.logo?.size}
         <img
           class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
           style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
@@ -485,7 +485,7 @@
           alt=""
         />
       {:else}
-        <IconFallback role={openTeam?.name[0]} />
+        <IconFallback character={openTeam?.name[0]} />
       {/if}
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
