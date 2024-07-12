@@ -123,6 +123,7 @@
           borderType={"none"}
           disabled={true}
           headerFontSize={"10px"}
+          position={"absolute"}
         />
       {/if}
     </div>
