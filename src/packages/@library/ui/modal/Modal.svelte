@@ -34,7 +34,7 @@
   >
     <div
       on:click={canClose ? handleModalState(false) : null}
-      class="testing-desgin"
+      class="sparrow-modal-container-firstChild"
     ></div>
 
     <div
@@ -64,12 +64,11 @@
         <slot />
       </div>
     </div>
-    
   </div>
 {/if}
 
 <style lang="scss">
-  .testing-desgin {
+  .sparrow-modal-container-firstChild {
     position: absolute;
     top: 0;
     left: 0;
@@ -97,7 +96,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    /* background-color: var(--bg-tertiary-400); */
     border-radius: 6px;
   }
 

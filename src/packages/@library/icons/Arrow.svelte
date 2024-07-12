@@ -1,8 +1,8 @@
 <script>
-  export let width = 14;
-  export let height = 16;
-  export let color = "white";
-</script>
+    export let height = "24px";
+    export let width = "24px";
+    export let color = "grey";
+  </script>
 
 <svg
   {width}

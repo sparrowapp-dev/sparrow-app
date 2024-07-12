@@ -457,18 +457,18 @@
       <span class="d-flex ps-2" class:select-logo-active={isOpen}>
         {#if isDropIconFilled}
           <ArrowIcon
-          width={12}
-          height={14}
+          width={"12"}
+          height={"12"}
             color={disabled || selectedRequest?.hide
-              ? "var(--text-secondary-370)"
+              ? "var( --icon-secondary-220)"
               : "var(--sparrow-text-color)"}
           />
         {:else}
           <DownArrowIcon
-            width={12}
-            height={14}
+            width={"12"}
+            height={"12"}
             color={disabled || selectedRequest?.hide
-              ? "var(--text-secondary-370)"
+              ? "var( --icon-secondary-220)"
               : "var(--sparrow-text-color)"}
           />
         {/if}
