@@ -37,6 +37,7 @@
   export let isBulkEditActive;
   export let onToggleBulkEdit;
   export let isBulkEditRequired = false;
+  export let isBulkEditHeaderInfoRequired = false;
 
   export let bulkEditPlaceholder = "";
 
@@ -597,7 +598,7 @@ const handleBulkTextUpdate = () => {
               Bulk Edit
             </div>
             <div>
-              {#if bulkEditPlaceholder.includes("Headers")}
+              {#if isBulkEditHeaderInfoRequired}
                 <div
                   class="d-flex align-items-center rounded-1 justify-content-center position-relative"
                   style="height: 18px; width:18px; "
