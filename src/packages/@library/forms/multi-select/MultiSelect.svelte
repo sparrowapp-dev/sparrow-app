@@ -4,6 +4,8 @@
   import { slide } from "svelte/transition";
   import closeIcon from "$lib/assets/close.svg";
   import type { Data } from "./types";
+  import { ArrowIcon } from "@library/icons";
+  import { DownArrowIcon } from "$lib/assets/icons";
 
   /**
    * Indicates if there is an error.
@@ -127,7 +129,7 @@
 <div on:click={handleDropdownClick}>
   <div
     id={`check-dropdown-${id}`}
-    class="parent-dropdown display-inline-block z-1"
+    class="parent-dropdown display-inline-block"
     style=" position: relative;"
   >
     <div on:click={toggleDropdown}>
@@ -138,12 +140,12 @@
         class:dropdown-btn-active={isOpen}
       >
         {#if !countCheckedList(list)}
-          <span>Select</span>
+          <span class="text-fs-12 text-secondary-200"> Select</span>
         {:else}
           <div class="me-4 navigator">
             {#each list as element}
               {#if element.checked}
-                <span class="bg-backgroundDropdown p-1 ps-2 pe-0 rounded me-2"
+                <span class="header-item text-fs-12 p-2 rounded me-2"
                   >{element.name}
                   <img
                     src={closeIcon}
@@ -164,14 +166,13 @@
           </div>
         {/if}
 
-        <span class="d-flex" class:dropdown-logo-active={isOpen}
-          ><img
-            style="height:12px; width:12px;"
-            class="ms-2"
-            src={dropdown}
-            alt=""
-          /></span
-        >
+        <span class="d-flex" class:dropdown-logo-active={isOpen}>
+          <DownArrowIcon
+            width={12}
+            height={14}
+            color={"var(--sparrow-text-color)"}
+          />
+        </span>
       </div>
     </div>
 
@@ -183,28 +184,35 @@
       >
         <div class="d-flex px-2 py-1 highlight">
           <input
-            class="form-check-input"
+            id="select-all-{id}"
+            class="form-check-input mt-0"
             type="checkbox"
             bind:checked={controller}
             on:input={handleCheckAll}
           />
-          <p class="m-0 ps-2 p-0 text-whiteColor" style="font-size: 12px;">
-            Select All
-          </p>
+          <label
+            for="select-all-{id}"
+            class="text-fs-12 m-0 ps-2 p-0 text-whiteColor w-100"
+            >Select All</label
+          >
         </div>
         {#each list as item, index}
-          <div class="d-flex px-2 py-2 highlight">
+          <div class="d-flex align-items-center px-2 py-2 highlight">
             <input
-              class="form-check-input"
+              id="multi-select-item-{index}-{id}"
+              class="form-check-input mt-0"
               type="checkbox"
               bind:checked={item.checked}
               on:input={() => {
                 updateCheck(index);
               }}
             />
-            <p class="m-0 ps-2 p-0 text-whiteColor" style="font-size: 12px;">
+            <label
+              for="multi-select-item-{index}-{id}"
+              class="text-fs-12 m-0 ps-2 p-0 text-whiteColor w-100"
+            >
               {item.name}
-            </p>
+            </label>
           </div>
         {/each}
         {#if !list?.length}
@@ -225,17 +233,19 @@
     background: none;
     outline: none;
     border: none;
-    height: 34px;
+    height: 38px;
     width: auto;
     padding: 0 10px;
+    background-color: var(--header-background-color, black);
   }
   .dropdown-data {
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: var(--body-background-color, black);
     color: white;
     position: absolute;
-    top: 40px;
+    bottom: -5px;
     left: 0;
     right: 0;
+    transform: translateY(100%);
     border: 1px solid rgb(44, 44, 44);
     max-height: 200px;
     overflow-y: auto;
@@ -255,10 +265,9 @@
   }
   .highlight {
     border-radius: 4px;
-    cursor: pointer;
   }
   .highlight:hover {
-    background-color: #232424;
+    background-color: transparent;
   }
   .dropdown-btn {
     border: 1px solid #313233;
@@ -273,5 +282,9 @@
   .navigator {
     white-space: nowrap;
     overflow: hidden;
+  }
+  .header-item {
+    height: 16px;
+    background-color: var(--header-item-background-color, black);
   }
 </style>
