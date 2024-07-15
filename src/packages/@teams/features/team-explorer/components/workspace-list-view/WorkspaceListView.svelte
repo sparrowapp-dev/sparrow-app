@@ -21,7 +21,7 @@
   /**
    * Checks if the current user has admin or owner privileges.
    */
-  export let isAdminOrOwner;
+  export let isAdminOrOwner: boolean;
 
   let filterText = "";
 
