@@ -15,9 +15,7 @@
   import { Tooltip } from "@library/ui";
   import SliderSwitch from "@library/forms/SliderSwitch/SliderSwitch.svelte";
 
-
-  import { ErrorIcon } from "@library/ui/toast/icons";
-  import Information from "@library/icons/Information.svelte";
+  import { ErrorInfoIcon, Information } from "@library/icons";
 
   type Mode = "READ" | "WRITE";
 
@@ -177,33 +175,32 @@
     callback(pairs);
   };
 
-
- /**
- * Updates the bulk text based on the key-value pairs.
- */
-const handleBulkTextUpdate = () => {
+  /**
+   * Updates the bulk text based on the key-value pairs.
+   */
+  const handleBulkTextUpdate = () => {
     // Define the syntax validation regex pattern (key:value)
     const syntaxPattern = /^[^:]+:.+$/;
 
     // Map each pair to a formatted line (key:value), validate syntax, and filter out invalid lines
     const res = pairs
-        .map((elem) => {
-            // Create a line from key and value, or empty string if both are empty
-            const line = elem.key || elem.value ? `${elem.key}:${elem.value}` : "";
+      .map((elem) => {
+        // Create a line from key and value, or empty string if both are empty
+        const line = elem.key || elem.value ? `${elem.key}:${elem.value}` : "";
 
-            // Validate syntax for each non-empty line
-            if (line && !syntaxPattern.test(line)) {
-                isValidSyntax = false;
-            }
+        // Validate syntax for each non-empty line
+        if (line && !syntaxPattern.test(line)) {
+          isValidSyntax = false;
+        }
 
-            return line;
-        })
-        .filter((item) => item) // Filter out empty lines
-        .join("\n"); // Join lines with newline characters
+        return line;
+      })
+      .filter((item) => item) // Filter out empty lines
+      .join("\n"); // Join lines with newline characters
 
     // Update the bulkText with the formatted and validated text
     bulkText = res;
-};
+  };
 
   const handleBulkTextarea = (event) => {
     bulkText = event.detail;
@@ -664,7 +661,7 @@ const handleBulkTextUpdate = () => {
                     on:mouseleave={handleErrorHover}
                     style="cursor: pointer;"
                   >
-                    <ErrorIcon
+                    <ErrorInfoIcon
                       height={"12px"}
                       width={"12px"}
                       color={"var(--dangerColor)"}
@@ -681,7 +678,7 @@ const handleBulkTextUpdate = () => {
                           class="pb-1 d-flex align-items-center justify-content-start"
                         >
                           <span>
-                            <ErrorIcon
+                            <ErrorInfoIcon
                               height={"12px"}
                               width={"12px"}
                               color={"var(--dangerColor)"}
@@ -742,7 +739,6 @@ const handleBulkTextUpdate = () => {
   .bulkEdit-btn-div {
     margin-right: 16px;
   }
-
 
   .keyValuePair {
     background-color: transparent;
