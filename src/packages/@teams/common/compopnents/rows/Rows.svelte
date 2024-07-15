@@ -8,6 +8,9 @@
   export let activeTeam;
   export let onOpenCollection: (id: string) => void;
   export let calculateTimeDifferenceInDays;
+  /**
+   * Checks if the current user has admin or owner privileges.
+   */
   export let isAdminOrOwner;
   export let onDeleteWorkspace;
 
@@ -36,7 +39,6 @@
           displayText: "Open Workspace",
           disabled: false,
         },
-        // Will be enabled in next phase
         {
           onClick: () => {
             onDeleteWorkspace(list);

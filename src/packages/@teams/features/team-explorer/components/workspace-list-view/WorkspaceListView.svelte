@@ -18,6 +18,9 @@
 
   export let onDeleteWorkspace;
 
+  /**
+   * Checks if the current user has admin or owner privileges.
+   */
   export let isAdminOrOwner;
 
   let filterText = "";

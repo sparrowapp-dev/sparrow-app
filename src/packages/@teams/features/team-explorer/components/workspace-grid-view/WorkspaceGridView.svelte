@@ -30,10 +30,13 @@
    * function to delete workspace
    */
   export let onDeleteWorkspace;
+  /**
+   * Checks if the current user has admin or owner privileges.
+   */
+  export let isAdminOrOwner: boolean;
 
   let workspacePerPage = 5;
   let currPage = 1;
-  export let isAdminOrOwner: boolean;
 </script>
 
 <div class="h-100 pb-2">

@@ -10,7 +10,7 @@
    */
   export let workspace: any;
   /**
-   * User is admin or onwerc
+   * Checks if the current user has admin or owner privileges.
    */
   export let isAdminOrOwner: boolean;
   /**
@@ -58,7 +58,6 @@
           displayText: "Open Workspace",
           disabled: false,
         },
-        // Will be enabled in next phase
         {
           onClick: () => {
             onDeleteWorkspace(workspace);
