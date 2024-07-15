@@ -245,8 +245,6 @@
             {/if}
           </h2>
 
-          <div></div>
-
           <div class="d-flex align-items-end justify-content-end">
             {#if openTeam?.users?.length > 1}
               <p class="d-flex my-auto ms-4 sparrow-fs-12">

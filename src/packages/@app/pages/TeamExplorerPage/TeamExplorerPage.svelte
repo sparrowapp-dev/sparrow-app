@@ -6,18 +6,12 @@
   import { user } from "$lib/store";
   import { Modal } from "@library/ui";
   import LeaveTeam from "@teams/features/leave-team/layout/LeaveTeam.svelte";
-  import { notifications } from "@library/ui/toast/Toast";
-  import TeamActions from "@teams/features/create-team/components/team-actions/TeamActions.svelte";
-  import { TeamViewModel } from "../Teams/Teams.ViewModel.old";
-  import TeamDescription from "@teams/features/create-team/components/team-description/TeamDescription.svelte";
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-  const _viewModelWorkspace = new HeaderDashboardViewModel();
+  
 
   import { DeleteWorkspace } from "@common/features";
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
   const _viewModel = new TeamExplorerPageViewModel();
-  const _viewModel1 = new TeamViewModel();
 
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
@@ -34,8 +28,6 @@
 
   let isLeavingTeam = false;
 
-
-  
   const handleLeaveTeam = async () => {
     if (!$activeTeam?.teamId) return;
     isLeavingTeam = true;
@@ -46,11 +38,12 @@
       isLeaveTeamModelOpen = false;
       isLeavingTeam = false;
     }
-  }
+  };
+
   const handleDeleteWorkspace = (workspace: WorkspaceDocument) => {
     selectedWorkspace = workspace;
     isDeleteWorkspaceModalOpen = true;
-  }
+  };
 </script>
 
 <TeamExplorer
