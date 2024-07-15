@@ -199,7 +199,7 @@
 
           <div class="d-flex align-items-end justify-content-end">
             {#if openTeam?.users?.length > 1}
-              <p class="d-flex my-auto ms-1 me-4 sparrow-fs-12">
+              <p class="d-flex my-auto ms-4 sparrow-fs-12">
                 <PeopleIcon
                   color={"var(--sparrow-text-color)"}
                   classProp="mx-2 my-auto d-flex"
@@ -207,7 +207,7 @@
                 <span class="my-auto">{openTeam?.users.length} Members</span>
               </p>
             {/if}
-            {#if userRole && userRole !== TeamRole.TEAM_MEMBER}
+            {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER}
               <Button
                 title={`Invite`}
                 type={`dark`}
@@ -215,7 +215,7 @@
                 onClick={() => {
                   isTeamInviteModalOpen = true;
                 }}
-                buttonClassProp={`my-auto px-3 pt-1 me-4`}
+                buttonClassProp={`my-auto px-3 pt-1 ms-4`}
                 buttonStyleProp={`height: 30px;`}
               />
               <Button
@@ -223,7 +223,7 @@
                 type={`primary`}
                 loaderSize={17}
                 textStyleProp={"font-size: var(--small-text)"}
-                buttonClassProp={`my-auto`}
+                buttonClassProp={`my-auto ms-4`}
                 buttonStyleProp={`height: 30px;`}
                 onClick={handleCreateNewWorkspace}
               />
@@ -320,17 +320,15 @@
                       elem?.name?.toLowerCase().includes(searchQuery)
                     );
                   }) || []}
-                  userType={userRole}
-                  {userId}
                   {onSwitchWorkspace}
                   {onDeleteWorkspace}
+                  isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
+                    userRole === TeamRole.TEAM_OWNER}
                 />
               {:else if selectedView == TeamViewEnum.GRID}
                 <WorkspaceGridView
                   {onDeleteWorkspace}
                   {searchQuery}
-                  {openTeam}
-                  {userId}
                   workspaces={workspaces.filter((elem) => {
                     return (
                       elem?.team?.teamId === openTeam?.teamId &&
@@ -339,6 +337,8 @@
                   }) || []}
                   onCreateNewWorkspace={handleCreateNewWorkspace}
                   {onSwitchWorkspace}
+                  isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
+                    userRole === TeamRole.TEAM_OWNER}
                 />
                 <!--Enabled in next phase-->
               {/if}

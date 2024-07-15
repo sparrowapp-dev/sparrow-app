@@ -14,20 +14,13 @@
   let filterText = "";
 
   /**
-   * Id of current user
-   */
-  export let userId: string;
-  /**
    * Array of all the workspaces from local DB
    */
   export let workspaces: WorkspaceDocument[] = [];
   /**
    * Currently active team
    */
-  export let openTeam: Team;
-  /**
-   * Callback for creating new workspace
-   */
+
   export let onCreateNewWorkspace;
   /**
    * Callback for switching the workspace
@@ -40,7 +33,7 @@
 
   let workspacePerPage = 5;
   let currPage = 1;
-  let isAdminOrOwner: boolean;
+  export let isAdminOrOwner: boolean;
 </script>
 
 <div class="h-100 pb-2">
@@ -66,11 +59,11 @@
           <WorkspaceGrid
             {workspace}
             {onSwitchWorkspace}
-            isAdminOrOwner={true}
+            {isAdminOrOwner}
             {onDeleteWorkspace}
           />
         {/each}
-        {#if currPage === 1 && searchQuery === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
+        {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
           <Button
             title={`+ Add New Workspace`}
             type="other"

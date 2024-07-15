@@ -64,7 +64,7 @@
             onDeleteWorkspace(workspace);
           },
           displayText: "Delete Workspace",
-          disabled: !isAdminOrOwner,
+          disabled: false,
         },
       ];
     } else {
