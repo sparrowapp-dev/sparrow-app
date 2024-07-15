@@ -9,7 +9,7 @@
   } from "$lib/utils/helpers";
 
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
-  import { Button } from "@library/ui";
+  import { Button, IconFallback } from "@library/ui";
 
   export let onInviteClick;
   export let workspaces;
@@ -310,8 +310,12 @@
 <div class="d-flex align-items-center justify-content-between mt-4">
   <div class="description ellipsis">
     <div class="d-flex align-items-center ellipsis">
-      {#if teamLogo}
+      {#if teamLogo?.size}
         <img class="team-icon me-2" src={base64ToURL(teamLogo)} alt="" />
+      {:else}
+        <span class="me-2">
+          <IconFallback character={teamName[0]} />
+        </span>
       {/if}
       <p style="font-size:16px;" class="mb-0 ellipsis">{teamName}</p>
     </div>
