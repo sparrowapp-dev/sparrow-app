@@ -287,6 +287,7 @@ export class TeamExplorerPageViewModel {
     const res = await this.workspaceRepository.readWorkspace(id);
     const initWorkspaceTab = new InitWorkspaceTab(id, id);
     initWorkspaceTab.updateId(id);
+    leaveTeam;
     initWorkspaceTab.updateName(res.name);
     this.tabRepository.createTab(initWorkspaceTab.getValue());
     navigate("/dashboard/collections");
@@ -504,5 +505,39 @@ export class TeamExplorerPageViewModel {
         `Failed to change role for ${_userName}. Please try again.`,
       );
     }
+  };
+
+  /**
+   * Leaving a team 
+   * @param teamId - The ID of the team where the user is trying to left.
+
+   * @param _userId - The ID of the user who  is leaving the team.
+  
+   */
+  public leaveTeam = async (userId: string, teamId: string) => {
+    const response = await this.teamService.leaveTeam(teamId);
+
+    if (response.isSuccessful) {
+      setTimeout(async () => {
+        const activeTeam = await this.teamRepository.checkActiveTeam();
+        if (activeTeam) {
+          const teamIdToActivate =
+            await this.workspaceRepository.activateInitialWorkspace();
+          if (teamIdToActivate) {
+            await this.teamRepository.setActiveTeam(teamIdToActivate);
+          }
+        }
+        setTimeout(async () => {
+          await this.refreshTeams(userId);
+          await this.refreshWorkspaces(userId);
+          notifications.success("You left a team.");
+        }, 500);
+      }, 500);
+    } else {
+      notifications.error(
+        response.message ?? "Failed to leave the team. Please try again.",
+      );
+    }
+    return response;
   };
 }

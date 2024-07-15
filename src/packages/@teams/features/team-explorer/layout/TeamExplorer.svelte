@@ -219,7 +219,7 @@
                     title={"Leave Team"}
                     placement={"bottom"}
                     distance={12}
-                    show={leaveButtonMenu}
+                    show={!leaveButtonMenu}
                     zIndex={10}
                   >
                     <div id="leaveButton">

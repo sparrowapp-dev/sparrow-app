@@ -19,6 +19,7 @@
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
+  const leaveTeam = _viewModel.leaveTeam;
   let userId = "";
   user.subscribe(async (value) => {
     if (value) {
@@ -28,59 +29,19 @@
   let isTeamInviteModalOpen = false;
   let isLeaveTeamModelOpen = false;
 
-
-  //old Function
-
-  // const handleLeaveTeam = async () => {
-  //   if (!$openTeam?.teamId) return;
-  //   isLeavingTeam = true;
-  //   const teamId = $openTeam?.teamId;
-  //   const response = await _viewModel.leaveTeam($openTeam?.teamId);
-  //   if (response.isSuccessful) {
-  //     setTimeout(async () => {
-  //       const activeTeam = await _viewModel.checkActiveTeam();
-  //       if (activeTeam) {
-  //         const teamIdToActivate = await _viewModel.activateInitialWorkspace();
-  //         if (teamIdToActivate) {
-  //           await _viewModel.activateTeam(teamIdToActivate);
-  //         }
-  //       }
-  //       setTimeout(async () => {
-  //         await _viewModel.refreshTeams(userId);
-  //         await _viewModelWorkspace.refreshWorkspaces(userId);
-  //         notifications.success("You left a team.");
-  //         handleLeaveTeamModal();
-  //         isShowMoreVisible = false;
-  //         isLeavingTeam = false;
-  //       }, 500);
-  //     }, 500);
-  //   } else {
-  //     notifications.error(
-  //       response.message ?? "Failed to leave the team. Please try again.",
-  //     );
-  //     isShowMoreVisible = false;
-  //     isLeavingTeam = false;
-  //     handleLeaveTeamModal();
-  //   }
-  // };
+  let isLeavingTeam = false;
 
 
-  // New function works only sometime
-
+  
   const handleLeaveTeam = async () => {
     if (!$activeTeam?.teamId) return;
+    isLeavingTeam = true;
     const teamId = $activeTeam?.teamId;
-    const response = await _viewModel1.leaveTeam($activeTeam?.teamId);
+
+    const response = await leaveTeam(userId, teamId);
     if (response.isSuccessful) {
-      await _viewModel1.refreshTeams(userId);
-      await _viewModelWorkspace.refreshWorkspaces(userId);
-      notifications.success("You left a team.");
       isLeaveTeamModelOpen = false;
-    } else {
-      notifications.error(
-        response.message ?? "Failed to leave the team. Please try again.",
-      );
-      isLeaveTeamModelOpen = false;
+      isLeavingTeam = false;
     }
   };
 </script>
@@ -139,6 +100,7 @@
   }}
 >
   <LeaveTeam
+    {isLeavingTeam}
     openTeam={$activeTeam}
     {handleLeaveTeam}
     handleModalState={(flag) => {
