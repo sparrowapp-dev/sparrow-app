@@ -5,7 +5,7 @@
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   // ---- library
   import { Input } from "@library/forms";
-  import { Button } from "@library/ui";
+  import { Button, IconFallback } from "@library/ui";
   export let isDeleteWorkspaceModalOpen = false;
   export let workspace: WorkspaceDocument;
   export let openTeam: TeamDocument;
@@ -62,22 +62,17 @@
     style="font-size: 16px;"
   >
     <div class="d-flex">
-      {#if base64ToURL(openTeam?.logo) == "" || base64ToURL(openTeam?.logo) == undefined}
-        <p
-          class={`m-0 sparrow-fs-15 text-defaultColor me-2 align-items-center justify-content-center bg-transparent border-defaultColor `}
-          style={`padding-top: 2px; width: 25px !important; height: 25px !important; display: flex; border: 1px solid var(--defaultcolor); border-radius: 50%;  font-weight:700;`}
-        >
-          {workspace.team?.teamName[0]
-            ? workspace.team?.teamName[0].toUpperCase()
-            : ""}
-        </p>
-      {:else}
+      {#if openTeam?.logo?.size}
         <img
           class="text-center w-25 align-items-center me-2 justify-content-center profile-circle bg-dullBackground"
           style="width: 25px !important; height: 25px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-          src={base64ToURL(openTeam.logo)}
+          src={base64ToURL(openTeam?.logo)}
           alt=""
         />
+      {:else}
+        <span class="me-2">
+          <IconFallback character={workspace?.team?.teamName[0] || ""} />
+        </span>
       {/if}
       <div class="d-flex align-items-center ellipsis">
         <p
