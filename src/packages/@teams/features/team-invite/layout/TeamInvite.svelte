@@ -2,7 +2,6 @@
   export let handleModalState: (flag: boolean) => void;
   export let teamName: string = "";
   export let teamId: string = "";
-  import closeIcon from "$lib/assets/close.svg";
   import {
     base64ToURL,
     createDynamicComponents,
@@ -10,7 +9,7 @@
   } from "$lib/utils/helpers";
 
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
-  import { Button } from "@library/ui";
+  import { Button, IconFallback } from "@library/ui";
 
   export let onInviteClick;
   export let workspaces;
@@ -18,9 +17,9 @@
   export let userId;
 
   import closeIconWhite from "$lib/assets/close-icon-white.svg";
-  import { Select } from "@library/forms";
+  import { MultiSelect, Select } from "@library/forms";
+
   let emailstoBeSentArr: string[] = [];
-  let isAllSelectedCheck = false;
   let teamSpecificWorkspace = workspaces.map((elem) => {
     return {
       id: elem._id,
@@ -29,7 +28,8 @@
       checked: false,
     };
   });
-  let selectedRole: string = "select";
+  const defaultRole = "select";
+  let selectedRole: string = defaultRole;
   let currentEmailEntered: string;
 
   let emailError: boolean = false;
@@ -109,7 +109,7 @@
     if (emailstoBeSentArr?.length === 0) {
       emailError = true;
     }
-    if (!selectedRole || selectedRole === "select") {
+    if (!selectedRole || selectedRole === defaultRole) {
       roleError = true;
     }
     if (!teamSpecificWorkspace || !countCheckedList(teamSpecificWorkspace)) {
@@ -127,7 +127,7 @@
       emailstoBeSentArr.length > 0 &&
       !invalidEmails.length &&
       selectedRole &&
-      selectedRole != "select"
+      selectedRole != defaultRole
     ) {
       if (
         selectedRole === WorkspaceRole.WORKSPACE_EDITOR ||
@@ -175,24 +175,8 @@
   const handleDropdown = (id) => {
     selectedRole = id;
   };
-  const handleCheckSelectDropdown = (id: string) => {
-    if (id === "select-all") {
-      isAllSelectedCheck = !isAllSelectedCheck;
-      teamSpecificWorkspace.forEach((elem: any) => {
-        elem.checked = isAllSelectedCheck;
-      });
-      checkInviteValidation();
-    } else {
-      teamSpecificWorkspace = teamSpecificWorkspace.map((elem) => {
-        if (elem?.id === id) {
-          elem.checked = !elem.checked;
-        }
-        return elem;
-      });
-      isAllSelectedCheck = teamSpecificWorkspace.every((item) => {
-        return item.checked;
-      });
-    }
+  const handleCheckSelectDropdown = (items: any[]) => {
+    teamSpecificWorkspace = items;
   };
 </script>
 
@@ -258,7 +242,7 @@
     data={[
       {
         name: "Select",
-        id: "select",
+        id: defaultRole,
         description: "Select role",
         hide: true,
       },
@@ -268,16 +252,16 @@
         description:
           "Add & edit resources within a workspace, add & remove members to a workspace.",
       },
-      // {
-      //   name: "Editor",
-      //   id: WorkspaceRole.WORKSPACE_EDITOR,
-      //   description: "Add & edit resources within a workspace",
-      // },
-      // {
-      //   name: "Viewer",
-      //   id: WorkspaceRole.WORKSPACE_VIEWER,
-      //   description: "View Resources within a workspace.",
-      // },
+      {
+        name: "Editor",
+        id: WorkspaceRole.WORKSPACE_EDITOR,
+        description: "Add & edit resources within a workspace",
+      },
+      {
+        name: "Viewer",
+        id: WorkspaceRole.WORKSPACE_VIEWER,
+        description: "View Resources within a workspace.",
+      },
     ]}
     onclick={handleDropdown}
     position={"absolute"}
@@ -286,7 +270,7 @@
     headerTheme={"violet2"}
     borderRounded={"4px"}
     headerFontWeight={400}
-    isError={roleError && selectedRole === "select"}
+    isError={roleError && selectedRole === defaultRole}
   />
 </div>
 {#if selectedRole === TeamRole.TEAM_ADMIN}
@@ -294,7 +278,7 @@
     Admins will have access to all current and future team workspaces.
   </p>
 {/if}
-{#if roleError && selectedRole === "select"}
+{#if roleError && selectedRole === defaultRole}
   <p class="error-text">Role cannot be empty.</p>
 {/if}
 
@@ -307,6 +291,15 @@
       Select workspaces you would want to give access to.
     </p>
   </div>
+
+  <!-- workspace selector -->
+
+  <MultiSelect
+    data={[...teamSpecificWorkspace]}
+    id={"team-invite-multiple-workspace-selector"}
+    onclick={handleCheckSelectDropdown}
+  />
+
   {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}
     <p class="error-text">
       You need to select at least one workspace. If you wish to give access to
@@ -317,8 +310,12 @@
 <div class="d-flex align-items-center justify-content-between mt-4">
   <div class="description ellipsis">
     <div class="d-flex align-items-center ellipsis">
-      {#if teamLogo}
+      {#if teamLogo?.size}
         <img class="team-icon me-2" src={base64ToURL(teamLogo)} alt="" />
+      {:else}
+        <span class="me-2">
+          <IconFallback character={teamName[0]} />
+        </span>
       {/if}
       <p style="font-size:16px;" class="mb-0 ellipsis">{teamName}</p>
     </div>

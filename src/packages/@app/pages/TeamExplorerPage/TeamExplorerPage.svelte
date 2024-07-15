@@ -13,6 +13,9 @@
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   const _viewModelWorkspace = new HeaderDashboardViewModel();
 
+  import { DeleteWorkspace } from "@common/features";
+  let isDeleteWorkspaceModalOpen = false;
+  let selectedWorkspace: WorkspaceDocument;
   const _viewModel = new TeamExplorerPageViewModel();
   const _viewModel1 = new TeamViewModel();
 
@@ -43,7 +46,11 @@
       isLeaveTeamModelOpen = false;
       isLeavingTeam = false;
     }
-  };
+  }
+  const handleDeleteWorkspace = (workspace: WorkspaceDocument) => {
+    selectedWorkspace = workspace;
+    isDeleteWorkspaceModalOpen = true;
+  }
 </script>
 
 <TeamExplorer
@@ -53,6 +60,7 @@
   openTeam={$activeTeam}
   workspaces={$workspaces}
   activeTeamTab={$activeTeamTab}
+  onDeleteWorkspace={handleDeleteWorkspace}
   onUpdateActiveTab={_viewModel.updateActiveTeamTab}
   onCreateWorkspace={_viewModel.handleCreateWorkspace}
   onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
@@ -62,6 +70,7 @@
   onPromoteToOwnerAtTeam={_viewModel.promoteToOwnerAtTeam}
   onRemoveUserFromWorkspace={_viewModel.removeUserFromWorkspace}
   onChangeUserRoleAtWorkspace={_viewModel.changeUserRoleAtWorkspace}
+  onUpdateTeam={_viewModel.updateTeam}
 />
 
 <Modal
@@ -85,6 +94,30 @@
     })}
     handleModalState={(flag) => {
       isTeamInviteModalOpen = flag;
+    }}
+  />
+</Modal>
+
+<Modal
+  title={"Delete Workspace?"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isDeleteWorkspaceModalOpen}
+  handleModalState={(flag) => {
+    isDeleteWorkspaceModalOpen = flag;
+  }}
+>
+  <DeleteWorkspace
+    bind:isDeleteWorkspaceModalOpen
+    workspace={selectedWorkspace}
+    openTeam={$activeTeam}
+    onDeleteWorkspace={async () => {
+      const response =
+        await _viewModel.handleDeleteWorkspace(selectedWorkspace);
+      if (response?.isSuccessful) {
+        isDeleteWorkspaceModalOpen = false;
+      }
     }}
   />
 </Modal>

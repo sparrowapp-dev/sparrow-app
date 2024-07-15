@@ -11,11 +11,17 @@
   import { Rows } from "@teams/common/compopnents";
 
   export let data: any;
-  export let userType = "";
   export let openTeam: TeamDocument;
   export let onSwitchWorkspace: (id: string) => void;
 
   export let searchQuery;
+
+  export let onDeleteWorkspace;
+
+  /**
+   * Checks if the current user has admin or owner privileges.
+   */
+  export let isAdminOrOwner: boolean;
 
   let filterText = "";
 
@@ -58,14 +64,15 @@
               activeTeam={openTeam}
               onOpenCollection={onSwitchWorkspace}
               {calculateTimeDifferenceInDays}
-              {userType}
+              {isAdminOrOwner}
+              {onDeleteWorkspace}
             />
           {/each}
         {/if}
       </tbody>
     </Table>
 
-    {#if  filterText == "" && data && data?.length === 0}
+    {#if searchQuery == "" && data && data?.length === 0}
       <p class="not-found-text mt-3">Add Workspaces to this team</p>
     {:else if searchQuery !== "" && data
         .slice()

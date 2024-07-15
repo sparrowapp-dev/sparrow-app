@@ -10,14 +10,9 @@
   import Button from "@library/ui/button/Button.svelte";
   import { WorkspaceGrid } from "@teams/common/compopnents";
 
+  export let searchQuery;
+  let filterText = "";
 
-  export let searchQuery
-  let filterText =""
-
-  /**
-   * Id of current user
-   */
-  export let userId: string;
   /**
    * Array of all the workspaces from local DB
    */
@@ -25,19 +20,23 @@
   /**
    * Currently active team
    */
-  export let openTeam: Team;
-  /**
-   * Callback for creating new workspace
-   */
+
   export let onCreateNewWorkspace;
   /**
    * Callback for switching the workspace
    */
   export let onSwitchWorkspace: (id: string) => void;
+  /**
+   * function to delete workspace
+   */
+  export let onDeleteWorkspace;
+  /**
+   * Checks if the current user has admin or owner privileges.
+   */
+  export let isAdminOrOwner: boolean;
 
   let workspacePerPage = 5;
   let currPage = 1;
-  let isAdminOrOwner: boolean;
 </script>
 
 <div class="h-100 pb-2">
@@ -63,10 +62,11 @@
           <WorkspaceGrid
             {workspace}
             {onSwitchWorkspace}
-            isAdminOrOwner={true}
+            {isAdminOrOwner}
+            {onDeleteWorkspace}
           />
         {/each}
-        {#if currPage === 1 && searchQuery === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
+        {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
           <Button
             title={`+ Add New Workspace`}
             type="other"
