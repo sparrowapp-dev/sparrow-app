@@ -22,20 +22,10 @@
       userId = value._id;
     }
   });
+  
   let isTeamInviteModalOpen = false;
   let isLeaveTeamModelOpen = false;
 
-  // const handleLeaveTeam = async () => {
-  //   if (!$activeTeam?.teamId) return;
-  //   isLeavingTeam = true;
-  //   const teamId = $activeTeam?.teamId;
-
-  //   const response = await leaveTeam(userId, teamId);
-  //   if (response.isSuccessful) {
-  //     isLeaveTeamModelOpen = false;
-  //     isLeavingTeam = false;
-  //   }
-  // };
 
   const handleDeleteWorkspace = (workspace: WorkspaceDocument) => {
     selectedWorkspace = workspace;

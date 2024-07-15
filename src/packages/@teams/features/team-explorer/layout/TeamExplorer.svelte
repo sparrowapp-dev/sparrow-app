@@ -17,9 +17,8 @@
   import { WorkspaceListView } from "../components";
   import WorkspaceGridView from "../components/workspace-grid-view/WorkspaceGridView.svelte";
   import { TeamMembers, TeamSettings } from "@teams/features";
-  import { CrossIcon , MoreOptions } from "@library/icons";
-  import { Tooltip } from "@library/ui";
-  import { Dropdown } from "@library/ui";
+  import { CrossIcon, MoreOptions } from "@library/icons";
+  import { Tooltip, Dropdown } from "@library/ui";
 
   /**
    * user ID
