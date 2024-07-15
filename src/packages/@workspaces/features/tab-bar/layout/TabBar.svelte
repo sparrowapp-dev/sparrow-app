@@ -1,6 +1,6 @@
 <script lang="ts">
   // ---- SVG
-  import MoreOptions from "@workspaces/features/tab-bar/assets/MoreOptions.svelte";
+  import MoreOptions from "@library/icons";
   import ViewGrid from "@workspaces/features/tab-bar/assets/ViewGrid.svelte";
   import VerticalGrid from "@library/icons/VerticalGrid.svelte";
   import SplitVerital from "@workspaces/features/tab-bar/assets/SplitVertical.svg";

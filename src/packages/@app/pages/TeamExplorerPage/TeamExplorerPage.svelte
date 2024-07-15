@@ -5,8 +5,7 @@
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { user } from "$lib/store";
   import { Modal } from "@library/ui";
-  import LeaveTeam from "@teams/features/leave-team/layout/LeaveTeam.svelte";
-  
+  import { LeaveTeam } from "@teams/features";
 
   import { DeleteWorkspace } from "@common/features";
   let isDeleteWorkspaceModalOpen = false;
@@ -16,7 +15,7 @@
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
-  const leaveTeam = _viewModel.leaveTeam;
+  const OnleaveTeam = _viewModel.leaveTeam;
   let userId = "";
   user.subscribe(async (value) => {
     if (value) {
@@ -26,19 +25,17 @@
   let isTeamInviteModalOpen = false;
   let isLeaveTeamModelOpen = false;
 
-  let isLeavingTeam = false;
+  // const handleLeaveTeam = async () => {
+  //   if (!$activeTeam?.teamId) return;
+  //   isLeavingTeam = true;
+  //   const teamId = $activeTeam?.teamId;
 
-  const handleLeaveTeam = async () => {
-    if (!$activeTeam?.teamId) return;
-    isLeavingTeam = true;
-    const teamId = $activeTeam?.teamId;
-
-    const response = await leaveTeam(userId, teamId);
-    if (response.isSuccessful) {
-      isLeaveTeamModelOpen = false;
-      isLeavingTeam = false;
-    }
-  };
+  //   const response = await leaveTeam(userId, teamId);
+  //   if (response.isSuccessful) {
+  //     isLeaveTeamModelOpen = false;
+  //     isLeavingTeam = false;
+  //   }
+  // };
 
   const handleDeleteWorkspace = (workspace: WorkspaceDocument) => {
     selectedWorkspace = workspace;
@@ -126,9 +123,10 @@
   }}
 >
   <LeaveTeam
-    {isLeavingTeam}
+    {userId}
+    {OnleaveTeam}
+    bind:isLeaveTeamModelOpen
     openTeam={$activeTeam}
-    {handleLeaveTeam}
     handleModalState={(flag) => {
       isLeaveTeamModelOpen = flag;
     }}

@@ -1,13 +1,30 @@
 <script>
   // Props passed to the component
   export let openTeam; // The team that is currently open
-  export let handleLeaveTeam; // Function to handle leaving the team
   export let handleModalState; // Function to handle the modal state
-  export let isLeavingTeam;
+  export let isLeaveTeamModelOpen;
+  export let OnleaveTeam;
+  export let userId;
 
   // Importing a Button component from the UI library
   import Button from "@library/ui/button/Button.svelte";
   import { notifications } from "@library/ui/toast/Toast";
+
+  let isLeavingTeam = false;
+
+  
+
+  const handleLeaveTeam = async () => {
+    if (!openTeam) return;
+    isLeavingTeam = true;
+    const teamId = openTeam?.teamId;
+
+    const response = await OnleaveTeam(userId, teamId);
+    if (response.isSuccessful) {
+      isLeaveTeamModelOpen = false;
+      isLeavingTeam = false;
+    }
+  };
 </script>
 
 <!-- Section for the modal content -->
