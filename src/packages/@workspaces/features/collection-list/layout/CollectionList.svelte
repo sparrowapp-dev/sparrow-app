@@ -173,12 +173,6 @@
       });
     }
   }
-  collectionList?.subscribe((value) => {
-    if (value) {
-      collectionListDocument = value;
-      collectionFilter = searchCollection(searchData, collectionListDocument);
-    }
-  });
 
   let isGithubStarHover = false;
   onDestroy(() => {});

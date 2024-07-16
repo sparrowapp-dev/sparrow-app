@@ -70,7 +70,9 @@
 <WorkspaceExplorer
   {tab}
   {modifiedUser}
-  {collectionList}
+  collectionLength={$collectionList?.filter(
+    (value) => value.workspaceId === currentWorkspace?.id,
+  )?.length}
   bind:isWorkspaceInviteModalOpen
   onDeleteWorkspace={handleDeleteWorkspace}
   onUpdateWorkspaceDescription={_viewModel.updateWorkspaceDescription}
