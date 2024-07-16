@@ -270,6 +270,7 @@
     headerTheme={"violet2"}
     borderRounded={"4px"}
     headerFontWeight={400}
+    headerFontSize={"12px"}
     isError={roleError && selectedRole === defaultRole}
   />
 </div>
@@ -284,7 +285,7 @@
 
 {#if selectedRole === WorkspaceRole.WORKSPACE_EDITOR || selectedRole === WorkspaceRole.WORKSPACE_VIEWER}
   <div class="mt-4">
-    <p class="role-title mb-0">
+    <p class="role-title text-fs-12 text-secondary-1000 mb-0">
       Specify Workspace<span class="asterik">*</span>
     </p>
     <p class="invite-subheader text-textColor mt-0 mb-1">
@@ -298,6 +299,9 @@
     data={[...teamSpecificWorkspace]}
     id={"team-invite-multiple-workspace-selector"}
     onclick={handleCheckSelectDropdown}
+    --body-background-color="var(--bg-tertiary-400)"
+    --header-background-color="var(--bg-tertiary-300)"
+    --header-item-background-color="var(--bg-tertiary-250)"
   />
 
   {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}

@@ -3,9 +3,10 @@
   import WorkspaceExplorerViewModel from "./WorkspaceExplorerPage.ViewModel";
   import { Modal } from "@library/ui";
   import type { Observable } from "rxjs";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { DeleteWorkspace } from "@common/features";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
+  import type { UpdatesDocType } from "@app/models/updates.model";
 
   export let modifiedUser;
   export let collectionList;
@@ -25,6 +26,8 @@
   let selectedWorkspace: WorkspaceDocument;
   let selectedTeam: TeamDocument;
   let workspaceID = tab._data.path.workspaceId;
+  const workspaceUpdatesList: Observable<UpdatesDocType[]> =
+    _viewModel.getWorkspaceUpdatesList(workspaceID);
 
   const updateSelectedWorkspace = async () => {
     selectedWorkspace = await _viewModel.getWorkspaceById(workspaceID);
@@ -67,19 +70,31 @@
     selectedTeam = await _viewModel.getTeamById(selectedWorkspace.team?.teamId);
     isDeleteWorkspaceModalOpen = true;
   };
+
+  const handleWorkspaceUpdatesScroll = () => {
+    _viewModel.refetchPreviousUpdates(workspaceID);
+  };
+
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
+  });
+  onMount(async () => {
+    await _viewModel.fetchWorkspaceUpdates(workspaceID);
   });
 </script>
 
 <WorkspaceExplorer
   {tab}
   {modifiedUser}
-  {collectionList}
+  {workspaceUpdatesList}
+  collectionLength={$collectionList?.filter(
+    (value) => value.workspaceId === currentWorkspace?.id,
+  )?.length}
   bind:isWorkspaceInviteModalOpen
   onDeleteWorkspace={handleDeleteWorkspace}
   onUpdateWorkspaceDescription={_viewModel.updateWorkspaceDescription}
   onUpdateWorkspaceName={_viewModel.updateWorkspaceName}
+  onWorkspaceUpdateScroll={handleWorkspaceUpdatesScroll}
   {currentWorkspace}
   {onRemoveUserFromWorkspace}
   {onChangeUserRoleAtWorkspace}

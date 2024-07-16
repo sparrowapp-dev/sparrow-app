@@ -1,23 +1,30 @@
 import type { addUsersInWorkspacePayload } from "$lib/utils/dto";
 import { WorkspaceRole } from "$lib/utils/enums";
+import { throttle } from "$lib/utils/throttle";
 import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
+import type { UpdatesDocType } from "@app/models/updates.model";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
+import { UpdatesRepository } from "@app/repositories/updates.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { CollectionService } from "@app/services/collection.service";
+import { UpdatesService } from "@app/services/updates.service";
 import { WorkspaceService } from "@app/services/workspace.service";
 import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
 import { notifications } from "@library/ui/toast/Toast";
+import type { Observable } from "rxjs";
 
 export default class WorkspaceExplorerViewModel {
   // Private Repositories
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
   private teamRepository = new TeamRepository();
+  private updatesRepository = new UpdatesRepository();
 
   // Private Services
   private collectionService = new CollectionService();
   private workspaceService = new WorkspaceService();
+  private updatesService = new UpdatesService();
   constructor() {}
 
   /**
@@ -206,6 +213,74 @@ export default class WorkspaceExplorerViewModel {
   };
 
   /**
+   * Fetches updates for a specified workspace and inserts them into the repository if successful.
+   *
+   * @param workspaceId - The ID of the workspace to fetch updates for.
+   */
+  public fetchWorkspaceUpdates = async (workspaceId: string) => {
+    const response = await this.updatesService.getUpdates(workspaceId, "1");
+    if (response.isSuccessful) {
+      await this.updatesRepository.insertUpdates(
+        response.data.data,
+        workspaceId,
+      );
+    }
+  };
+
+  /**
+   * Retrieves a list of workspace updates as an observable.
+   *
+   * @param workspaceId - The ID of the workspace to retrieve updates for.
+   * @returns An observable emitting updates for the specified workspace.
+   */
+  public getWorkspaceUpdatesList = (
+    workspaceId: string,
+  ): Observable<UpdatesDocType[]> => {
+    return this.updatesRepository.getUpdatesObservable(workspaceId);
+  };
+
+  /**
+   * Fetches previous updates for a specified workspace and inserts them into the repository if conditions are met.
+   *
+   * @param workspaceId - The ID of the workspace to fetch previous updates for.
+   */
+  private fetchPreviousUpdates = async (workspaceId: string) => {
+    const exisitingUpdates =
+      await this.updatesRepository.getUpdatesObservableDocs(workspaceId);
+    // Check if existing updates exist and the number of updates is a multiple of 20
+    if (exisitingUpdates && exisitingUpdates[0]?.updates?.length % 20 === 0) {
+      const page = (parseInt(exisitingUpdates[0]?.pageNumber) + 1).toString();
+      const response = await this.updatesService.getUpdates(workspaceId, page);
+      console.log("response", response);
+      if (response.isSuccessful) {
+        await this.updatesRepository.insertUpdates(
+          response.data.data,
+          workspaceId,
+        );
+      }
+    }
+  };
+
+  /**
+   * Throttled function to fetch previous updates for a specified workspace and insert them into the repository if conditions are met.
+   * Throttling ensures that the function is not called more frequently than once every 2000 milliseconds (2 seconds).
+   */
+  private refetchPreviousUpdatesThrotller = throttle(
+    this.fetchPreviousUpdates,
+    2000,
+  );
+
+  /**
+   * Initiates a throttled fetch of previous updates for a specified workspace.
+   *
+   * @param workspaceId - The ID of the workspace for which previous updates are to be refetched.
+   */
+  public refetchPreviousUpdates = async (workspaceId: string) => {
+    this.refetchPreviousUpdatesThrotller(workspaceId);
+  };
+
+
+  /**
    * sync workspace data with backend server
    * @param userId User id
    */
@@ -334,4 +409,7 @@ export default class WorkspaceExplorerViewModel {
     }
     return response;
   };
+
+
+
 }

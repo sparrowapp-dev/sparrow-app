@@ -39,5 +39,6 @@ export { default as SettingIcon } from "./Setting.svelte";
 export { default as HelpCenterIcon } from "./HelpCenter.svelte";
 export { default as InformationIcon } from "./Information.svelte";
 export { default as LockIcon } from "./Lock.svelte";
+export { default as DownArrowIcon } from "./DownArrow.svelte";
 export { default as ErrorInfoIcon } from "./Error.svelte";
 export { default as Information } from "./Information.svelte";
