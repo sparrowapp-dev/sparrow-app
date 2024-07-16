@@ -1,4 +1,5 @@
 import type { addUsersInWorkspacePayload } from "$lib/utils/dto";
+import { WorkspaceRole } from "$lib/utils/enums";
 import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
@@ -200,6 +201,136 @@ export default class WorkspaceExplorerViewModel {
       );
     } else {
       notifications.error(`Failed to sent invite. Please try again.`);
+    }
+    return response;
+  };
+
+  /**
+   * sync workspace data with backend server
+   * @param userId User id
+   */
+  public refreshWorkspaces = async (userId: string): Promise<void> => {
+    const workspaces = await this.workspaceRepository.getWorkspacesDocs();
+    const idToEnvironmentMap = {};
+    workspaces.forEach((element) => {
+      idToEnvironmentMap[element._id] = element?.environmentId;
+    });
+    const response = await this.workspaceService.fetchWorkspaces(userId);
+    let isAnyWorkspaceActive: undefined | string = undefined;
+    const data = [];
+    const isSuccessful = response?.isSuccessful;
+    const res = response?.data?.data;
+    if (isSuccessful && res) {
+      for (const elem of res) {
+        const {
+          _id,
+          name,
+          description,
+          users,
+          admins,
+          team,
+          createdAt,
+          createdBy,
+          collection,
+          updatedAt,
+          updatedBy,
+        } = elem;
+        const isActiveWorkspace =
+          await this.workspaceRepository.checkActiveWorkspace(_id);
+        if (isActiveWorkspace) isAnyWorkspaceActive = _id;
+        const item = {
+          _id,
+          name,
+          description,
+          users,
+          collections: collection ? collection : [],
+          admins: admins,
+          team: {
+            teamId: team.id,
+            teamName: team.name,
+          },
+          environmentId: idToEnvironmentMap[_id],
+          isActiveWorkspace: isActiveWorkspace,
+          createdAt,
+          createdBy,
+          updatedAt,
+          updatedBy,
+        };
+        data.push(item);
+      }
+      await this.workspaceRepository.bulkInsertData(data);
+      if (!isAnyWorkspaceActive) {
+        await this.workspaceRepository.activateInitialWorkspace();
+        return;
+      } else this.workspaceRepository.setActiveWorkspace(isAnyWorkspaceActive);
+      return;
+    }
+  };
+
+  /**
+   * Removes a user from a workspace.
+   * @param _workspaceId - The ID of the workspace where remove user is to take place.
+   * @param _workspaceName - The name of the workspace where remove user is to take place.
+   * @param _userId - The ID of the user who is being removed.
+   * @param _userName - The name of the user who is being removed.
+   */
+  public removeUserFromWorkspace = async (
+    _workspaceId: string,
+    _workspaceName: string,
+    _userId: string,
+    _userName: string,
+  ) => {
+    const response = await this.workspaceService.removeUserFromWorkspace(
+      _workspaceId,
+      _userId,
+    );
+    if (response.isSuccessful === true) {
+      await this.refreshWorkspaces(_userId);
+      notifications.success(`${_userName} is removed from ${_workspaceName}`);
+    } else {
+      notifications.error(
+        `Failed to remove ${_userName} from ${_workspaceName}`,
+      );
+    }
+
+    return response;
+  };
+
+  /**
+   * Change the role of a user in a workspace.
+   * @param _workspaceId - The ID of the workspace where the role change is to take place.
+   * @param _workspaceName - The name of the workspace where the role change is to take place.
+   * @param _userId - The ID of the user whose role is being changed.
+   * @param _userName - The name of the user whose role is being changed.
+   * @param _body - Users role at workspace level example => editor or viewer.
+   */
+  public changeUserRoleAtWorkspace = async (
+    _workspaceId: string,
+    _workspaceName: string,
+    _userId: string,
+    _userName: string,
+    _body: WorkspaceRole,
+  ) => {
+    const response = await this.workspaceService.changeUserRoleAtWorkspace(
+      _workspaceId,
+      _userId,
+      _body,
+    );
+    if (response.isSuccessful) {
+      await this.refreshWorkspaces(_userId);
+      if (_body === WorkspaceRole.WORKSPACE_VIEWER) {
+        notifications.success(
+          `${_userName} is now a viewer on ${_workspaceName}`,
+        );
+      } else if (_body === WorkspaceRole.WORKSPACE_EDITOR) {
+        notifications.success(
+          `${_userName} is now a editor on ${_workspaceName}`,
+        );
+      }
+    } else {
+      notifications.error(
+        `Failed to change role for ${_userName}. Please try again.`,
+      );
     }
     return response;
   };
