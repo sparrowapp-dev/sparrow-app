@@ -100,7 +100,7 @@ export class TeamService {
         headers: getAuthHeaders(),
       },
     );
-    return response;
+       return response;
   };
 
   public promoteToOwnerAtTeam = async (teamId: string, userId: string) => {

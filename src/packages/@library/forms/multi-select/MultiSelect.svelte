@@ -1,9 +1,9 @@
 <script lang="ts">
-  import dropdown from "$lib/assets/dropdown.svg";
   import { onDestroy, onMount } from "svelte";
   import { slide } from "svelte/transition";
   import closeIcon from "$lib/assets/close.svg";
   import type { Data } from "./types";
+  import { DownArrowIcon } from "@library/icons";
 
   /**
    * Indicates if there is an error.
@@ -127,7 +127,7 @@
 <div on:click={handleDropdownClick}>
   <div
     id={`check-dropdown-${id}`}
-    class="parent-dropdown display-inline-block z-1"
+    class="parent-dropdown display-inline-block"
     style=" position: relative;"
   >
     <div on:click={toggleDropdown}>
@@ -138,12 +138,12 @@
         class:dropdown-btn-active={isOpen}
       >
         {#if !countCheckedList(list)}
-          <span>Select</span>
+          <span class="text-fs-12 text-secondary-200"> Select</span>
         {:else}
           <div class="me-4 navigator">
             {#each list as element}
               {#if element.checked}
-                <span class="bg-backgroundDropdown p-1 ps-2 pe-0 rounded me-2"
+                <span class="header-item text-fs-12 py-2 ps-2 pe-0 rounded me-2"
                   >{element.name}
                   <img
                     src={closeIcon}
@@ -164,14 +164,13 @@
           </div>
         {/if}
 
-        <span class="d-flex" class:dropdown-logo-active={isOpen}
-          ><img
-            style="height:12px; width:12px;"
-            class="ms-2"
-            src={dropdown}
-            alt=""
-          /></span
-        >
+        <span class="d-flex" class:dropdown-logo-active={isOpen}>
+          <DownArrowIcon
+            width={12}
+            height={14}
+            color={"var(--icon-secondary-200)"}
+          />
+        </span>
       </div>
     </div>
 
@@ -181,30 +180,46 @@
         class:dropdown-active={isOpen}
         transition:slide={{ duration: 100 }}
       >
-        <div class="d-flex px-2 py-1 highlight">
-          <input
-            class="form-check-input"
-            type="checkbox"
-            bind:checked={controller}
-            on:input={handleCheckAll}
-          />
-          <p class="m-0 ps-2 p-0 text-whiteColor" style="font-size: 12px;">
-            Select All
-          </p>
-        </div>
-        {#each list as item, index}
-          <div class="d-flex px-2 py-2 highlight">
+        <div class="d-flex align-items-center px-2 py-2 highlight">
+          <label class="check-box">
             <input
-              class="form-check-input"
+              id="select-all-{id}"
+              class="form-check-input mt-0"
               type="checkbox"
-              bind:checked={item.checked}
-              on:input={() => {
-                updateCheck(index);
-              }}
+              bind:checked={controller}
+              on:input={handleCheckAll}
             />
-            <p class="m-0 ps-2 p-0 text-whiteColor" style="font-size: 12px;">
+            <span class="checkmark"></span>
+          </label>
+          <label
+            for="select-all-{id}"
+            role="button"
+            class="text-fs-12 m-0 ps-2 p-0 text-whiteColor w-100"
+            >Select All</label
+          >
+        </div>
+        <hr class="mt-0 mb-1 text-secondary-250" />
+        {#each list as item, index}
+          <div class="d-flex align-items-center px-2 py-2 highlight">
+            <label class="check-box">
+              <input
+                id="multi-select-item-{index}-{id}"
+                class="form-check-input mt-0"
+                type="checkbox"
+                bind:checked={item.checked}
+                on:input={() => {
+                  updateCheck(index);
+                }}
+              />
+              <span class="checkmark"></span>
+            </label>
+            <label
+              for="multi-select-item-{index}-{id}"
+              role="button"
+              class="text-fs-12 m-0 ps-2 p-0 text-whiteColor w-100"
+            >
               {item.name}
-            </p>
+            </label>
           </div>
         {/each}
         {#if !list?.length}
@@ -225,24 +240,26 @@
     background: none;
     outline: none;
     border: none;
-    height: 34px;
+    height: 38px;
     width: auto;
     padding: 0 10px;
+    background-color: var(--header-background-color, black);
   }
   .dropdown-data {
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: var(--body-background-color, black);
     color: white;
     position: absolute;
-    top: 40px;
+    bottom: -5px;
     left: 0;
     right: 0;
+    transform: translateY(100%);
     border: 1px solid rgb(44, 44, 44);
     max-height: 200px;
     overflow-y: auto;
     -webkit-backdrop-filter: blur(10px); /* For some older versions of Safari */
     backdrop-filter: blur(10px);
   }
-  .dropdown-btn p,
+
   .dropdown-data p {
     font-size: 12px;
     font-weight: 400;
@@ -255,10 +272,9 @@
   }
   .highlight {
     border-radius: 4px;
-    cursor: pointer;
   }
   .highlight:hover {
-    background-color: #232424;
+    background-color: transparent;
   }
   .dropdown-btn {
     border: 1px solid #313233;
@@ -273,5 +289,76 @@
   .navigator {
     white-space: nowrap;
     overflow: hidden;
+  }
+  .header-item {
+    height: 16px;
+    background-color: var(--header-item-background-color, black);
+  }
+
+  .check-box {
+    display: block;
+    position: relative;
+    padding-left: 15px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Hide the browser's default checkbox */
+  .check-box input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+    background-color: transparent;
+    border: 2px solid var(--border-secondary-500);
+  }
+
+  /* Create a custom checkbox */
+  .check-box .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 12px;
+    width: 12px;
+    border-radius: 3px;
+    background-color: transparent;
+    border: 1px solid var(--border-secondary-100);
+  }
+
+  /* When the checkbox is checked, add a blue background */
+  .check-box input:checked ~ .checkmark {
+    border: none;
+    background-color: var(--bg-primary-300);
+  }
+
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .check-box .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+
+  /* Show the checkmark when checked */
+  .check-box input:checked ~ .checkmark:after {
+    display: block;
+  }
+
+  /* Style the checkmark/indicator */
+  .check-box .checkmark:after {
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid var(--border-secondary-800);
+    border-width: 0 2px 2px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
   }
 </style>

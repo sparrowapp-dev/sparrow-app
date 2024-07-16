@@ -16,9 +16,9 @@
   export let modifiedUser;
 
   /**
-   * The list of collections related to the workspace.
+   * The length of collections related to the workspace.
    */
-  export let collectionList;
+  export let collectionLength = 0;
 
   /**
    * The current active tab or section within the workspace.
@@ -61,17 +61,8 @@
   export let onWorkspaceUpdateScroll;
 
   let workspaceName = tab.name;
-  let collectionLength = 0;
   let workspaceDescription = tab.description;
   let workspaceID = tab._data.path.workspaceId;
-
-  $: {
-    if (collectionList) {
-      collectionList.subscribe((value) => {
-        collectionLength = value.length;
-      });
-    }
-  }
 
   let workspaceNavigatorId: string = "about";
 </script>

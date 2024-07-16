@@ -20,7 +20,10 @@
         {:else if data.type === "warning"}
           <WarningIcon />
         {:else if data.type === "error"}
-          <ErrorIcon />
+          <ErrorIcon 
+          height={"16px"}
+          width={"16px"}
+          color={"var(--dangerColor)"}/>
         {:else}
           <InfoIcon />
         {/if}
