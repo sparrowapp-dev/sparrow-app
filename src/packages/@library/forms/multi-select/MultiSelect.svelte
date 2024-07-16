@@ -1,11 +1,9 @@
 <script lang="ts">
-  import dropdown from "$lib/assets/dropdown.svg";
   import { onDestroy, onMount } from "svelte";
   import { slide } from "svelte/transition";
   import closeIcon from "$lib/assets/close.svg";
   import type { Data } from "./types";
-  import { ArrowIcon } from "@library/icons";
-  import { DownArrowIcon } from "$lib/assets/icons";
+  import { DownArrowIcon } from "@library/icons";
 
   /**
    * Indicates if there is an error.
@@ -170,7 +168,7 @@
           <DownArrowIcon
             width={12}
             height={14}
-            color={"var(--sparrow-text-color)"}
+            color={"var(--icon-secondary-200)"}
           />
         </span>
       </div>
@@ -182,7 +180,7 @@
         class:dropdown-active={isOpen}
         transition:slide={{ duration: 100 }}
       >
-        <div class="d-flex align-items-center px-2 py-1 highlight">
+        <div class="d-flex align-items-center px-2 py-2 highlight">
           <label class="check-box">
             <input
               id="select-all-{id}"
@@ -200,6 +198,7 @@
             >Select All</label
           >
         </div>
+        <hr class="mt-0 mb-1 text-secondary-250" />
         {#each list as item, index}
           <div class="d-flex align-items-center px-2 py-2 highlight">
             <label class="check-box">
@@ -260,7 +259,7 @@
     -webkit-backdrop-filter: blur(10px); /* For some older versions of Safari */
     backdrop-filter: blur(10px);
   }
-  .dropdown-btn p,
+
   .dropdown-data p {
     font-size: 12px;
     font-weight: 400;
@@ -300,7 +299,7 @@
     display: block;
     position: relative;
     padding-left: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     cursor: pointer;
     font-size: 22px;
     -webkit-user-select: none;
@@ -325,17 +324,12 @@
     position: absolute;
     top: 0;
     left: 0;
-    height: 14px;
-    width: 14px;
+    height: 12px;
+    width: 12px;
     border-radius: 3px;
     background-color: transparent;
     border: 1px solid var(--border-secondary-100);
   }
-
-  /* On mouse-over, add a grey background color */
-  /* .container:hover input ~ .checkmark {
-    background-color: #ccc;
-  } */
 
   /* When the checkbox is checked, add a blue background */
   .check-box input:checked ~ .checkmark {
@@ -357,8 +351,8 @@
 
   /* Style the checkmark/indicator */
   .check-box .checkmark:after {
-    left: 5px;
-    top: 2px;
+    left: 4px;
+    top: 1px;
     width: 4px;
     height: 8px;
     border: solid var(--border-secondary-800);
