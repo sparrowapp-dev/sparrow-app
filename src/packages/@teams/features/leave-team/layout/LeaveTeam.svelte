@@ -12,8 +12,6 @@
 
   let isLeavingTeam = false;
 
-  
-
   const handleLeaveTeam = async () => {
     if (!openTeam) return;
     isLeavingTeam = true;
@@ -22,8 +20,8 @@
     const response = await OnleaveTeam(userId, teamId);
     if (response.isSuccessful) {
       isLeaveTeamModelOpen = false;
-      isLeavingTeam = false;
     }
+    isLeavingTeam = false;
   };
 </script>
 

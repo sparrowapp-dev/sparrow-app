@@ -1,6 +1,6 @@
 <script lang="ts">
   // ---- SVG
-  import MoreOptions from "@library/icons/MoreOptions.svelte";
+
   import ViewGrid from "@workspaces/features/tab-bar/assets/ViewGrid.svelte";
   import VerticalGrid from "@library/icons/VerticalGrid.svelte";
   import SplitVerital from "@workspaces/features/tab-bar/assets/SplitVertical.svg";
@@ -27,6 +27,7 @@
   import Button from "@library/ui/button/Button.svelte";
   import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
   import { HelpIcon } from "$lib/assets/app.asset";
+  import { MoreOptions } from "@library/icons";
 
   // ------ Props ------
   /**
