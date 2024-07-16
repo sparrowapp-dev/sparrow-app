@@ -145,7 +145,7 @@
           <div class="me-4 navigator">
             {#each list as element}
               {#if element.checked}
-                <span class="header-item text-fs-12 p-2 rounded me-2"
+                <span class="header-item text-fs-12 py-2 ps-2 pe-0 rounded me-2"
                   >{element.name}
                   <img
                     src={closeIcon}
@@ -182,33 +182,41 @@
         class:dropdown-active={isOpen}
         transition:slide={{ duration: 100 }}
       >
-        <div class="d-flex px-2 py-1 highlight">
-          <input
-            id="select-all-{id}"
-            class="form-check-input mt-0"
-            type="checkbox"
-            bind:checked={controller}
-            on:input={handleCheckAll}
-          />
+        <div class="d-flex align-items-center px-2 py-1 highlight">
+          <label class="check-box">
+            <input
+              id="select-all-{id}"
+              class="form-check-input mt-0"
+              type="checkbox"
+              bind:checked={controller}
+              on:input={handleCheckAll}
+            />
+            <span class="checkmark"></span>
+          </label>
           <label
             for="select-all-{id}"
+            role="button"
             class="text-fs-12 m-0 ps-2 p-0 text-whiteColor w-100"
             >Select All</label
           >
         </div>
         {#each list as item, index}
           <div class="d-flex align-items-center px-2 py-2 highlight">
-            <input
-              id="multi-select-item-{index}-{id}"
-              class="form-check-input mt-0"
-              type="checkbox"
-              bind:checked={item.checked}
-              on:input={() => {
-                updateCheck(index);
-              }}
-            />
+            <label class="check-box">
+              <input
+                id="multi-select-item-{index}-{id}"
+                class="form-check-input mt-0"
+                type="checkbox"
+                bind:checked={item.checked}
+                on:input={() => {
+                  updateCheck(index);
+                }}
+              />
+              <span class="checkmark"></span>
+            </label>
             <label
               for="multi-select-item-{index}-{id}"
+              role="button"
               class="text-fs-12 m-0 ps-2 p-0 text-whiteColor w-100"
             >
               {item.name}
@@ -286,5 +294,77 @@
   .header-item {
     height: 16px;
     background-color: var(--header-item-background-color, black);
+  }
+
+  .check-box {
+    display: block;
+    position: relative;
+    padding-left: 15px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Hide the browser's default checkbox */
+  .check-box input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+    background-color: transparent;
+    border: 2px solid var(--border-secondary-500);
+  }
+
+  /* Create a custom checkbox */
+  .check-box .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 14px;
+    width: 14px;
+    border-radius: 3px;
+    background-color: transparent;
+    border: 1px solid var(--border-secondary-100);
+  }
+
+  /* On mouse-over, add a grey background color */
+  /* .container:hover input ~ .checkmark {
+    background-color: #ccc;
+  } */
+
+  /* When the checkbox is checked, add a blue background */
+  .check-box input:checked ~ .checkmark {
+    border: none;
+    background-color: var(--bg-primary-300);
+  }
+
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .check-box .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+
+  /* Show the checkmark when checked */
+  .check-box input:checked ~ .checkmark:after {
+    display: block;
+  }
+
+  /* Style the checkmark/indicator */
+  .check-box .checkmark:after {
+    left: 5px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border: solid var(--border-secondary-800);
+    border-width: 0 2px 2px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
   }
 </style>

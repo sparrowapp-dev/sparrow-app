@@ -299,9 +299,9 @@
     data={[...teamSpecificWorkspace]}
     id={"team-invite-multiple-workspace-selector"}
     onclick={handleCheckSelectDropdown}
-    --body-background-color="#22232E"
-    --header-background-color="#2A2C3C"
-    --header-item-background-color="#1C1D2B"
+    --body-background-color="var(--bg-tertiary-400)"
+    --header-background-color="var(--bg-tertiary-300)"
+    --header-item-background-color="var(--bg-tertiary-250)"
   />
 
   {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}
