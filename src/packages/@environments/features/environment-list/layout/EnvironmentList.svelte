@@ -101,10 +101,7 @@
     <Tooltip placement="bottom" title="Add Environment" distance={13}>
       <WithButtonV2
         icon={PlusIcon}
-        disable={!hasWorkpaceLevelPermission(
-          loggedUserRoleInWorkspace,
-          workspaceLevelPermissions.ADD_ENVIRONMENT,
-        )}
+        disable={false}
         onClick={async () => {
           await onCreateEnvironment(localEnvironment);
           scrollList("bottom");

@@ -58,14 +58,16 @@
 
   const skipLoginHandler = async () => {
     // Save Guest User in local DB
-    await _viewModel.addGuestUser();
     const response = await _viewModel.findUser({ name: "guestUser" });
-    await _viewModel.createGuestUserTeamWorkspace();
-    isGuestUserActive.set(true);
-    navigate("/init/collections");
-    MixpanelEvent(Events.CONTINUE_WITHOUT_SIGNUP, {
-      source: "Entry Page",
-    });
+    if (!response) {
+      await _viewModel.addGuestUser();
+      await _viewModel.createGuestUserTeamWorkspace();
+      isGuestUserActive.set(true);
+      navigate("/guest/collections");
+      MixpanelEvent(Events.CONTINUE_WITHOUT_SIGNUP, {
+        source: "Entry Page",
+      });
+    }
   };
 </script>
 

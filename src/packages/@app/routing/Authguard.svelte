@@ -6,15 +6,16 @@
   import { GuestUserRepository } from "@app/repositories/guest-user.repository";
   const guestUserRepository = new GuestUserRepository();
   let isGuestUser = false;
+  let isGuestUserSub;
   onMount(async () => {
     const token = getUserToken();
     if (token) {
       const userData = jwtDecode(token);
       setUser(userData);
     }
-    const response = await guestUserRepository.findOne({ name: "guestUser" });
-    if (response) {
-      isGuestUser = response?.getLatest().toMutableJSON().isGuestUser;
+    isGuestUserSub = await guestUserRepository.findOne({ name: "guestUser" });
+    isGuestUser = isGuestUserSub?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
       isGuestUserActive.set(true);
     }
   });
@@ -23,12 +24,13 @@
 
   user.subscribe((value) => {
     currentUser = value;
+    console.log(currentUser);
   });
 </script>
 
 {#if currentUser}
   <slot name="loggedIn" />
-{:else if isGuestUser}
+{:else if $isGuestUserActive}
   <slot name="guestUser" />
 {:else}
   <slot name="unauthorized" />
