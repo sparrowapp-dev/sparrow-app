@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Observable } from "rxjs";
   import {
     CollectionCount,
     WorkspaceAbout,
@@ -7,6 +8,7 @@
     WorkspaceSetting,
     WorkspaceUpdates,
   } from "../components";
+  import type { UpdatesDocType } from "@app/models/updates.model";
 
   /**
    * The object representing the last modified user of the workspace.
@@ -48,6 +50,16 @@
    */
   export let currentWorkspace;
 
+  /**
+   * List of updates of a workspace
+   */
+  export let workspaceUpdatesList: Observable<UpdatesDocType[]>;
+
+  /**
+   * Function to be called on end of scroll
+   */
+  export let onWorkspaceUpdateScroll;
+
   let workspaceName = tab.name;
   let workspaceDescription = tab.description;
   let workspaceID = tab._data.path.workspaceId;
@@ -85,9 +97,10 @@
     style=" width:280px; padding: 24px 16px 24px 16px ;"
   >
     <WorkspaceNavigator bind:workspaceNavigatorId />
-    <div style="flex:1; overflow:auto;">
-      <WorkspaceUpdates {modifiedUser} />
-    </div>
+    <WorkspaceUpdates
+      workspaceUpdatesList={$workspaceUpdatesList}
+      {onWorkspaceUpdateScroll}
+    />
     <CollectionCount {collectionLength} />
   </div>
 </div>
