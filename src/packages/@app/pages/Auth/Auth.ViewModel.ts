@@ -1,6 +1,7 @@
 import { EnvironmentTabRepository } from "@app/repositories/environment-tab.repository";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
+import { GuideRepository } from "@app/repositories/guide.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { InitTab } from "@common/factory";
@@ -14,6 +15,7 @@ export class AuthViewModel {
   private environmentRepository = new EnvironmentRepository();
   private environmentTabRepository = new EnvironmentTabRepository();
   private initTab = new InitTab();
+  private guideRepository = new GuideRepository();
 
   /**
    * Insert the guestr user in local DB
@@ -103,10 +105,15 @@ export class AuthViewModel {
       environmentId,
       workspaceId,
     );
-    initEnvironmentTab.setName("Global Variables").setIsActive(true);
+    initEnvironmentTab
+      .setName("Global Variables")
+      .setType("GLOBAL")
+      .setIsActive(true);
     this.environmentTabRepository.createTab(
       initEnvironmentTab.getValue(),
       workspaceId,
     );
+    this.guideRepository.insert({ isActive: true, id: "environment-guide" });
+    this.guideRepository.insert({ isActive: true, id: "collection-guide" });
   };
 }

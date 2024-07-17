@@ -99,7 +99,7 @@ export class EnvironmentExplorerViewModel {
       ..._data,
     };
     this.tab = progressiveTab;
-    this.environmentTabRepository.updateEnvironmentTab(
+    await this.environmentTabRepository.updateEnvironmentTab(
       progressiveTab.id,
       progressiveTab,
     );
@@ -113,7 +113,7 @@ export class EnvironmentExplorerViewModel {
     const activeWorkspace = await this.workspaceRepository.readWorkspace(
       currentEnvironment.workspaceId,
     );
-
+    await this.setEnvironmentTabProperty({ isSaveInProgress: true });
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
@@ -136,7 +136,7 @@ export class EnvironmentExplorerViewModel {
 
       return;
     }
-    await this.setEnvironmentTabProperty({ isSaveInProgress: true });
+
     const response = await this.environmentService.updateEnvironment(
       activeWorkspace._id,
       currentEnvironment.id,
