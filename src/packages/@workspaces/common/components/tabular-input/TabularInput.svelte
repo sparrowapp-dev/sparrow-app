@@ -42,7 +42,7 @@
 
   export let bulkEditPlaceholder = "";
 
-  let bulkText = "THIS IS TESTING ";
+  let bulkText = "";
   let bulkToggle = isBulkEditActive;
 
   let isErrorIconHovered = false;
@@ -724,8 +724,7 @@
         </div>
 
         <!-- Bulk Edit TextArea starts -->
-        <div style="height:100%"
-        >
+        <div style="height:100%">
           {#if isBulkEditLoaded}
             <Editor
               bind:value={bulkText}
@@ -743,8 +742,6 @@
 </div>
 
 <style>
-
-
   .bulkEdit-btn-div {
     margin-right: 16px;
   }
