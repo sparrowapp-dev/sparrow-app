@@ -334,6 +334,11 @@ export class TeamExplorerPageViewModel {
     _userId: string,
     _userName: string,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      console.log("val", value);
+      loggedInUserId = value._id;
+    });
     const response = await this.teamService.removeMembersAtTeam(
       _teamId,
       _userId,
@@ -341,7 +346,7 @@ export class TeamExplorerPageViewModel {
     if (response.isSuccessful) {
       const responseData = response.data.data;
       await this.teamRepository.modifyTeam(_teamId, responseData);
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       notifications.success(`${_userName} is removed from ${_teamName}`);
     } else {
       notifications.error(`Failed to remove ${_userName} from ${_teamName}`);
@@ -362,6 +367,10 @@ export class TeamExplorerPageViewModel {
     _userId: string,
     _userName: string,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      loggedInUserId = value._id;
+    });
     const response = await this.teamService.demoteToMemberAtTeam(
       _teamId,
       _userId,
@@ -369,7 +378,7 @@ export class TeamExplorerPageViewModel {
     if (response.isSuccessful === true) {
       const responseData = response.data.data;
       await this.teamRepository.modifyTeam(_teamId, responseData);
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       notifications.success(`${_userName} is now a member`);
     } else {
       notifications.error(
@@ -392,6 +401,11 @@ export class TeamExplorerPageViewModel {
     _userId: string,
     _userName: string,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      console.log("val", value);
+      loggedInUserId = value._id;
+    });
     const response = await this.teamService.promoteToAdminAtTeam(
       _teamId,
       _userId,
@@ -399,7 +413,7 @@ export class TeamExplorerPageViewModel {
     if (response.isSuccessful) {
       const responseData = response.data.data;
       await this.teamRepository.modifyTeam(_teamId, responseData);
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       notifications.success(`${_userName} is now an admin`);
     } else {
       notifications.error(
@@ -447,7 +461,7 @@ export class TeamExplorerPageViewModel {
       if (response.isSuccessful === true) {
         const responseData = response.data.data;
         await this.teamRepository.modifyTeam(_teamId, responseData);
-        await this.refreshWorkspaces(_userId);
+        await this.refreshWorkspaces(userId);
         notifications.success(
           `${_userName} is now the new Owner of ${_teamName}.`,
         );
@@ -477,12 +491,17 @@ export class TeamExplorerPageViewModel {
     _userId: string,
     _userName: string,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      console.log("val", value);
+      loggedInUserId = value._id;
+    });
     const response = await this.workspaceService.removeUserFromWorkspace(
       _workspaceId,
       _userId,
     );
     if (response.isSuccessful === true) {
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       notifications.success(`${_userName} is removed from ${_workspaceName}`);
     } else {
       notifications.error(
@@ -506,13 +525,18 @@ export class TeamExplorerPageViewModel {
     _userName: string,
     _body: WorkspaceRole,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      console.log("val", value);
+      loggedInUserId = value._id;
+    });
     const response = await this.workspaceService.changeUserRoleAtWorkspace(
       _workspaceId,
       _userId,
       _body,
     );
     if (response.isSuccessful) {
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       if (_body === WorkspaceRole.WORKSPACE_VIEWER) {
         notifications.success(
           `${_userName} is now a viewer on ${_workspaceName}`,
@@ -588,8 +612,6 @@ export class TeamExplorerPageViewModel {
       this.teamRepository.modifyTeam(_teamId, response.data.data);
     }
   };
-
-  
 
   /**
    * Leaving a team 

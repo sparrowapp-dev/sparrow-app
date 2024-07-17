@@ -1,3 +1,4 @@
+import { user } from "$lib/store";
 import type { addUsersInWorkspacePayload } from "$lib/utils/dto";
 import { WorkspaceRole } from "$lib/utils/enums";
 import { throttle } from "$lib/utils/throttle";
@@ -279,7 +280,6 @@ export default class WorkspaceExplorerViewModel {
     this.refetchPreviousUpdatesThrotller(workspaceId);
   };
 
-
   /**
    * sync workspace data with backend server
    * @param userId User id
@@ -355,12 +355,18 @@ export default class WorkspaceExplorerViewModel {
     _userId: string,
     _userName: string,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      console.log("val", value);
+      loggedInUserId = value._id;
+    });
+
     const response = await this.workspaceService.removeUserFromWorkspace(
       _workspaceId,
       _userId,
     );
     if (response.isSuccessful === true) {
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       notifications.success(`${_userName} is removed from ${_workspaceName}`);
     } else {
       notifications.error(
@@ -386,13 +392,18 @@ export default class WorkspaceExplorerViewModel {
     _userName: string,
     _body: WorkspaceRole,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      console.log("val", value);
+      loggedInUserId = value._id;
+    });
     const response = await this.workspaceService.changeUserRoleAtWorkspace(
       _workspaceId,
       _userId,
       _body,
     );
     if (response.isSuccessful) {
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       if (_body === WorkspaceRole.WORKSPACE_VIEWER) {
         notifications.success(
           `${_userName} is now a viewer on ${_workspaceName}`,
@@ -409,7 +420,4 @@ export default class WorkspaceExplorerViewModel {
     }
     return response;
   };
-
-
-
 }
