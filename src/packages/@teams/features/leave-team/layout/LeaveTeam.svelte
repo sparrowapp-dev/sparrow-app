@@ -1,14 +1,13 @@
 <script>
+  import { Button } from "@library/ui";
+  import { notifications } from "@library/ui/toast/Toast";
+
   // Props passed to the component
   export let openTeam; // The team that is currently open
   export let handleModalState; // Function to handle the modal state
   export let isLeaveTeamModelOpen;
   export let OnleaveTeam;
   export let userId;
-
-  // Importing a Button component from the UI library
-  import Button from "@library/ui/button/Button.svelte";
-  import { notifications } from "@library/ui/toast/Toast";
 
   let isLeavingTeam = false;
 
