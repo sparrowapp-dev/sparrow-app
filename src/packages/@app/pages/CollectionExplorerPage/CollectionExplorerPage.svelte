@@ -46,7 +46,9 @@
       userId = value._id;
     }
   });
-
+  /**
+   * Find the role of user in active workspace
+   */
   const findUserRole = async () => {
     const workspace: WorkspaceDocument = await _viewModel.getWorkspaceById(
       tab.path.workspaceId,
