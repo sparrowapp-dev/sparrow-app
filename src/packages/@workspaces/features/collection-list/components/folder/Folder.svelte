@@ -82,6 +82,10 @@
   export let folder: Folder | null = null;
   export let activeTabId: string;
   export let searchData: string;
+  /**
+   * Role of user in active workspace
+   */
+  export let userRole;
 
   let expand: boolean = false;
   let showFolderAPIButtons: boolean = true;
@@ -394,7 +398,7 @@
 
         {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
           <Spinner size={"15px"} />
-        {:else}
+        {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
           <Tooltip
             title={"Add Request"}
             placement={"bottom"}
@@ -445,6 +449,7 @@
         <div class="sub-files">
           {#each explorer.items as exp}
             <svelte:self
+              bind:userRole
               {onItemCreated}
               {onItemDeleted}
               {onItemRenamed}
@@ -495,6 +500,7 @@
     {:else if explorer.type === "REQUEST"}
       <div style="cursor:pointer;">
         <Request
+          bind:userRole
           api={explorer}
           {onItemRenamed}
           {onItemDeleted}

@@ -14,7 +14,7 @@
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
   import { Carousel, Modal, Popover } from "@library/ui";
-  import { environmentType } from "$lib/utils/enums";
+  import { environmentType, WorkspaceRole } from "$lib/utils/enums";
   import {
     CreateENV,
     IntroToEnvironment,
@@ -40,6 +40,7 @@
 
   export let onFetchEnvironmentGuide: (query) => void;
   export let onUpdateEnvironmentGuide: (query, isActive) => void;
+  export let userRole;
   let isPopoverContainer = false;
 
   let quickHelp: boolean = false;
@@ -134,7 +135,8 @@
           focusedBorderColor={"var(--border-primary-300)"}
           class="text-fs-18 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;"
-          disabled={$currentEnvironment?.type == "GLOBAL"}
+          disabled={$currentEnvironment?.type == "GLOBAL" ||
+            userRole === WorkspaceRole.WORKSPACE_VIEWER}
           placeholder=""
         />
         <div class={`d-flex env-btn-container`}>
@@ -163,7 +165,8 @@
                 icon={SaveIcon}
                 onClick={onSaveEnvironment}
                 disable={$currentEnvironment.isSaveInProgress ||
-                  $currentEnvironment.isSave}
+                  $currentEnvironment.isSave ||
+                  userRole === WorkspaceRole.WORKSPACE_VIEWER}
                 loader={$currentEnvironment.isSaveInProgress}
               />
             </Tooltip>
@@ -209,7 +212,7 @@
       </div>
       <section class={`var-value-container pe-1`} style="flex:1;">
         <TabularInput
-          loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
+          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
           keyValue={$currentEnvironment.variable}
           callback={handleCurrentEnvironmentKeyValuePairChange}
           {search}
