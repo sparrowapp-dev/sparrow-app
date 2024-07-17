@@ -13,12 +13,11 @@
 
   export let isBulkEditActive;
 
-  let bulkEditParamsPlaceholder = `Usage: Use bulk edit to manage multiple parameters quickly.Separate each entry with a new line.
-Format: Parameter-Key: Parameter-Value
-Example: userID: Sparrow12 `;
+//   let bulkEditParamsPlaceholder = `Usage: Use bulk edit to manage multiple parameters quickly.Separate each entry with a new line.
+// Format: Parameter-Key: Parameter-Value
+// Example: userID: Sparrow12 `;
 
-// let bulkEditParamsPlaceholder = "Format: Parameter-Key: Parameter-Value Example: userID: Sparrow12 ";
-
+let bulkEditParamsPlaceholder = "Usage - Manage multiple parameters.  Format - Key: Value"
 
   const handleParamsChange = (pairs: KeyValuePair[]): void => {
     onUpdateRequestParams(pairs);
