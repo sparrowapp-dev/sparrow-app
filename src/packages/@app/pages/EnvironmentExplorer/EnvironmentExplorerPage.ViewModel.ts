@@ -9,7 +9,7 @@ import { createDeepCopy } from "$lib/utils/helpers";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { BehaviorSubject, type Observable } from "rxjs";
 import { GuideRepository } from "@app/repositories/guide.repository";
-import Parameters from "$lib/components/collections/req-res-section/sub-components/request-parameter-section/Parameters.svelte";
+import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -17,7 +17,7 @@ export class EnvironmentExplorerViewModel {
   private environmentTabRepository = new EnvironmentTabRepository();
   private environmentService = new EnvironmentService();
   private guideRepository = new GuideRepository();
-
+  private guestUserRepository = new GuestUserRepository();
   private _tab: BehaviorSubject<any> = new BehaviorSubject({});
 
   public constructor(doc) {
@@ -99,7 +99,7 @@ export class EnvironmentExplorerViewModel {
       ..._data,
     };
     this.tab = progressiveTab;
-    this.environmentTabRepository.updateEnvironmentTab(
+    await this.environmentTabRepository.updateEnvironmentTab(
       progressiveTab.id,
       progressiveTab,
     );
@@ -114,6 +114,29 @@ export class EnvironmentExplorerViewModel {
       currentEnvironment.workspaceId,
     );
     await this.setEnvironmentTabProperty({ isSaveInProgress: true });
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      await this.environmentRepository.updateEnvironment(
+        currentEnvironment.id,
+        {
+          name: currentEnvironment.name,
+          variable: currentEnvironment.variable,
+        },
+      );
+      await this.setEnvironmentTabProperty({
+        isSaveInProgress: false,
+        isSave: true,
+      });
+      notifications.success(
+        `Changes saved for ${currentEnvironment.name} environment.`,
+      );
+
+      return;
+    }
+
     const response = await this.environmentService.updateEnvironment(
       activeWorkspace._id,
       currentEnvironment.id,
@@ -156,27 +179,26 @@ export class EnvironmentExplorerViewModel {
       });
     }
   };
-/**
- * Fetches an environment guide based on the provided query.
- * 
- * @param query - The query object used to find the environment guide.
- * @returns - A promise that resolves to the environment guide found by the query.
- */
- public fetchEnvironmentGuide = async (query) => {
-  return this.guideRepository.findOne(query);
-};
+  /**
+   * Fetches an environment guide based on the provided query.
+   *
+   * @param query - The query object used to find the environment guide.
+   * @returns - A promise that resolves to the environment guide found by the query.
+   */
+  public fetchEnvironmentGuide = async (query) => {
+    return this.guideRepository.findOne(query);
+  };
 
-/**
-* Updates the environment guide to set its active status.
-* 
-* @param query - The query object used to find the environment guide to update.
-* @param isActive - The new active status to set for the environment guide.
-* @returns - A promise that resolves when the update operation is complete.
-*/
-public updateEnvironmentGuide = async (query, isActive) => {
-  await this.guideRepository.update(query, {
+  /**
+   * Updates the environment guide to set its active status.
+   *
+   * @param query - The query object used to find the environment guide to update.
+   * @param isActive - The new active status to set for the environment guide.
+   * @returns - A promise that resolves when the update operation is complete.
+   */
+  public updateEnvironmentGuide = async (query, isActive) => {
+    await this.guideRepository.update(query, {
       isActive: isActive,
-  });
-};
-
+    });
+  };
 }

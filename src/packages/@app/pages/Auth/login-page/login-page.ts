@@ -81,7 +81,7 @@ export async function handleLoginV2(url: string) {
     if (event === "register") {
       navigate("/app/collections?first=true");
       _guideRepository.insert({ isActive: true, id: "environment-guide" });
-      _guideRepository.insert({ isActive: false, id: "collection-guide" });
+      _guideRepository.insert({ isActive: true, id: "collection-guide" });
     } else {
       navigate("/app/collections?first=false");
 

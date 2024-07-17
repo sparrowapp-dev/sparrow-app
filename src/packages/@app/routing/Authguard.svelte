@@ -5,16 +5,16 @@
   import { onMount } from "svelte";
   import { GuestUserRepository } from "@app/repositories/guest-user.repository";
   const guestUserRepository = new GuestUserRepository();
-  let isGuestUser = false;
+
   onMount(async () => {
     const token = getUserToken();
     if (token) {
       const userData = jwtDecode(token);
       setUser(userData);
     }
-    const response = await guestUserRepository.findOne({ name: "guestUser" });
-    if (response) {
-      isGuestUser = response?.getLatest().toMutableJSON().isGuestUser;
+    const guestUser = await guestUserRepository.findOne({ name: "guestUser" });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
       isGuestUserActive.set(true);
     }
   });
@@ -28,7 +28,7 @@
 
 {#if currentUser}
   <slot name="loggedIn" />
-{:else if isGuestUser}
+{:else if $isGuestUserActive}
   <slot name="guestUser" />
 {:else}
   <slot name="unauthorized" />

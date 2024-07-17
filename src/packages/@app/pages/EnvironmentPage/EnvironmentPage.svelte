@@ -36,7 +36,7 @@
       const activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
         value._data.users.forEach((user) => {
-          if (user.id === $user._id) {
+          if (user.id === $user?._id) {
             userWorkspaceLevelRole.set(user.role);
           }
         });

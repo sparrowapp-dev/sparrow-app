@@ -9,13 +9,14 @@ import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { InitTab } from "@common/factory";
 import { v4 as uuidv4 } from "uuid";
 import { GuideRepository } from "@app/repositories/guide.repository";
+import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 
 export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
   private environmentTabRepository = new EnvironmentTabRepository();
   private environmentService = new EnvironmentService();
-  private guideRepository = new GuideRepository();
+  private guestUserRepository = new GuestUserRepository();
   private initTab = new InitTab();
 
   constructor() {}
@@ -50,6 +51,13 @@ export class EnvironmentViewModel {
    * @returns
    */
   public refreshEnvironment = async (workspaceId: string) => {
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      return;
+    }
     const activeTab =
       await this.environmentTabRepository.getActiveEnvironmentTab(workspaceId);
     const response =
@@ -160,6 +168,25 @@ export class EnvironmentViewModel {
       createdAt: new Date().toISOString(),
     };
 
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      newEnvironment.id = uuidv4();
+      await this.environmentRepository.addEnvironment(newEnvironment);
+      const initEnvironmentTab = this.initTab.environment(
+        newEnvironment.id,
+        currentWorkspace._id,
+      );
+      initEnvironmentTab.setName(newEnvironment.name).setIsActive(true);
+      this.environmentTabRepository.createTab(
+        initEnvironmentTab.getValue(),
+        currentWorkspace._id,
+      );
+      notifications.success("New Environment Created!");
+      return;
+    }
     this.environmentRepository.addEnvironment(newEnvironment);
     const response = await this.environmentService.addEnvironment({
       name: newEnvironment.name,
@@ -192,6 +219,7 @@ export class EnvironmentViewModel {
       this.environmentRepository.removeEnvironment(newEnvironment.id);
       notifications.error("Failed to create environment. Please try again.");
     }
+
     MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
     return;
   };
@@ -225,6 +253,21 @@ export class EnvironmentViewModel {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       env.workspaceId,
     );
+
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      this.environmentRepository.removeEnvironment(env.id);
+      this.deleteEnvironmentTab(env.id);
+      notifications.success(
+        `${env.name} environment is removed from ${currentWorkspace.name}.`,
+      );
+      return {
+        isSuccessful: true,
+      };
+    }
     const response = await this.environmentService.deleteEnvironment(
       currentWorkspace._id,
       env.id,
@@ -254,6 +297,19 @@ export class EnvironmentViewModel {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       env.workspaceId,
     );
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      this.environmentRepository.updateEnvironment(env.id, {
+        name: newEnvironmentName,
+      });
+      this.environmentTabRepository.updateEnvironmentTab(env.id, {
+        name: newEnvironmentName,
+      });
+      return;
+    }
     const response = await this.environmentService.updateEnvironment(
       currentWorkspace._id,
       env.id,
