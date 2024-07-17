@@ -80,6 +80,8 @@ import { RequestTabAdapter } from "@app/adapter/request-tab";
 import { GuideRepository } from "@app/repositories/guide.repository";
 import { CollectionService } from "@app/services/collection.service";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
+import { isGuestUserActive } from "$lib/store/auth.store";
+import { v4 as uuidv4 } from "uuid";
 
 class RestExplorerViewModel
   implements
@@ -701,6 +703,48 @@ class RestExplorerViewModel
       type: ItemType.REQUEST,
     };
 
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser === true) {
+      const res =
+        await this.collectionRepository.readRequestOrFolderInCollection(
+          collectionId,
+          _id,
+        );
+
+      if (res) {
+        const progressiveTab = this._tab.getValue();
+        progressiveTab.isSaved = true;
+        this.tab = progressiveTab;
+        this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+        if (!folderId) {
+          this.collectionRepository.updateRequestOrFolderInCollection(
+            collectionId,
+            _id,
+            res,
+          );
+        } else {
+          this.collectionRepository.updateRequestInFolder(
+            collectionId,
+            folderId,
+            _id,
+            res,
+          );
+        }
+        return {
+          status: "success",
+          message: "success",
+        };
+      } else {
+        return {
+          status: "error",
+          message: "error",
+        };
+      }
+      return;
+    }
     const res = await updateCollectionRequest(_id, folderId, collectionId, {
       collectionId: collectionId,
       workspaceId: workspaceId,
@@ -711,6 +755,8 @@ class RestExplorerViewModel
         request: unadaptedRequest,
       },
     });
+    console.log(res);
+
     if (res.isSuccessful) {
       const progressiveTab = this._tab.getValue();
       progressiveTab.isSaved = true;
@@ -825,6 +871,19 @@ class RestExplorerViewModel
     if (path.length > 0) {
       const requestTabAdapter = new RequestTabAdapter();
       const unadaptedRequest = requestTabAdapter.unadapt(componentData);
+      let req = {
+        id: uuidv4(),
+        name: tabName,
+        description,
+        type: ItemType.REQUEST,
+        request: unadaptedRequest,
+        source: "USER",
+        isDeleted: false,
+        createdBy: "Guest User",
+        updatedBy: "Guest User",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
       if (path[path.length - 1].type === ItemType.COLLECTION) {
         /**
          * handle request at collection level
@@ -835,6 +894,61 @@ class RestExplorerViewModel
             currentBranch: _collection?.currentBranch,
             source: "USER",
           };
+        }
+        let isGuestUser;
+        isGuestUserActive.subscribe((value) => {
+          isGuestUser = value;
+        });
+
+        if (isGuestUser == true) {
+          this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
+          const expectedPath = {
+            folderId: "",
+            folderName: "",
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+          };
+          if (
+            !componentData.path.workspaceId ||
+            !componentData.path.collectionId
+          ) {
+            /**
+             * Update existing request
+             */
+            this.updateRequestName(req.name);
+            this.updateRequestDescription(req.description);
+            this.updateRequestPath(expectedPath);
+            this.updateRequestId(req.id);
+            const progressiveTab = this._tab.getValue();
+            progressiveTab.isSaved = true;
+            this.tab = progressiveTab;
+            this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+          } else {
+            /**
+             * Create new copy of the existing request
+             */
+            const initRequestTab = new InitRequestTab(req.id, "UNTRACKED-");
+            initRequestTab.updateName(req.name);
+            initRequestTab.updateDescription(req.description);
+            initRequestTab.updatePath(expectedPath);
+            initRequestTab.updateUrl(req.request.url);
+            initRequestTab.updateMethod(req.request.method);
+            initRequestTab.updateBody(req.request.body);
+            initRequestTab.updateQueryParams(req.request.queryParams);
+            initRequestTab.updateAuth(req.request.auth);
+            initRequestTab.updateHeaders(req.request.headers);
+
+            this.tabRepository.createTab(initRequestTab.getValue());
+            moveNavigation("right");
+          }
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+          return;
         }
         const res = await insertCollectionRequest({
           collectionId: path[path.length - 1].id,
@@ -917,6 +1031,54 @@ class RestExplorerViewModel
             currentBranch: _collection?.currentBranch,
             source: "USER",
           };
+        }
+        let isGuestUser;
+        isGuestUserActive.subscribe((value) => {
+          isGuestUser = value;
+        });
+
+        if (isGuestUser == true) {
+          this.addRequestInFolder(path[0].id, path[path.length - 1].id, req);
+          const expectedPath = {
+            folderId: path[path.length - 1].id,
+            folderName: path[path.length - 1].name,
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+          };
+          if (
+            !componentData.path.workspaceId ||
+            !componentData.path.collectionId
+          ) {
+            this.updateRequestName(req.name);
+            this.updateRequestDescription(req.description);
+            this.updateRequestPath(expectedPath);
+            this.updateRequestId(req.id);
+            const progressiveTab = this._tab.getValue();
+            progressiveTab.isSaved = true;
+            this.tab = progressiveTab;
+            this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+          } else {
+            const initRequestTab = new InitRequestTab(req.id, "UNTRACKED-");
+            initRequestTab.updateName(req.name);
+            initRequestTab.updateDescription(req.description);
+            initRequestTab.updatePath(expectedPath);
+            initRequestTab.updateUrl(req.request.url);
+            initRequestTab.updateMethod(req.request.method);
+            initRequestTab.updateBody(req.request.body);
+            initRequestTab.updateQueryParams(req.request.queryParams);
+            initRequestTab.updateAuth(req.request.auth);
+            initRequestTab.updateHeaders(req.request.headers);
+            this.tabRepository.createTab(initRequestTab.getValue());
+            moveNavigation("right");
+          }
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+          return;
         }
         const res = await insertCollectionRequest({
           collectionId: path[0].id,
@@ -1131,22 +1293,37 @@ class RestExplorerViewModel
     collectionId: string,
     newCollectionName: string,
   ) => {
-    if (newCollectionName) {
-      const response = await this.collectionService.updateCollectionData(
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser !== true) {
+      if (newCollectionName) {
+        const response = await this.collectionService.updateCollectionData(
+          collectionId,
+          workspaceId,
+          { name: newCollectionName },
+        );
+        if (response.isSuccessful) {
+          this.collectionRepository.updateCollection(
+            collectionId,
+            response.data.data,
+          );
+          notifications.success("Collection renamed successfully!");
+        } else if (response.message === "Network Error") {
+          notifications.error(response.message);
+        } else {
+          notifications.error("Failed to rename collection!");
+        }
+        return response;
+      }
+    } else {
+      const response = await this.collectionRepository.updateCollection(
         collectionId,
-        workspaceId,
-        { name: newCollectionName },
+        newCollectionName,
       );
       if (response.isSuccessful) {
-        this.collectionRepository.updateCollection(
-          collectionId,
-          response.data.data,
-        );
-        notifications.success("Collection renamed successfully!");
-      } else if (response.message === "Network Error") {
-        notifications.error(response.message);
-      } else {
-        notifications.error("Failed to rename collection!");
+        notifications.success("New Collection Created");
       }
       return response;
     }
@@ -1182,6 +1359,26 @@ class RestExplorerViewModel
             : collection.primaryBranch,
           source: "USER",
         };
+      }
+      let isGuestUser;
+      isGuestUserActive.subscribe((value) => {
+        isGuestUser = value;
+      });
+      if (isGuestUser === true) {
+        this.tabRepository.updateTab(folderId, { name: newFolderName });
+        const res =
+          await this.collectionRepository.readRequestOrFolderInCollection(
+            collectionId,
+            folderId,
+          );
+        res.name = newFolderName;
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          folderId,
+          res,
+        );
+        notifications.success("Folder renamed successfully!");
+        return;
       }
       const response = await this.collectionService.updateFolderInCollection(
         workspaceId,

@@ -34,6 +34,7 @@ import { InitRequestTab } from "@common/utils";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { notifications } from "@library/ui/toast/Toast";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
+import { isGuestUserActive } from "$lib/store/auth.store";
 // import { generateSampleRequest } from "$lib/utils/sample";
 // import type { Folder, Path } from "$lib/utils/interfaces/request.interface";
 // import { InitRequestTab } from "@common/utils";
@@ -144,6 +145,26 @@ class FolderExplorerPage {
           source: "USER",
         };
       }
+      let isGuestUser;
+      isGuestUserActive.subscribe((value) => {
+        isGuestUser = value;
+      });
+      if (isGuestUser === true) {
+        this.updateTab(folder.id, { name: newFolderName });
+        const res =
+          await this.collectionRepository.readRequestOrFolderInCollection(
+            collection.id,
+            folder.id,
+          );
+        res.name = newFolderName;
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collection.id,
+          folder.id,
+          res,
+        );
+        notifications.success("Folder renamed successfully!");
+        return;
+      }
       const response = await this.collectionService.updateFolderInCollection(
         collection.workspaceId,
         collection.id,
@@ -153,6 +174,7 @@ class FolderExplorerPage {
           name: newFolderName,
         },
       );
+
       if (response.isSuccessful) {
         this.updateTab(folder.id, { name: newFolderName });
         this.collectionRepository.updateRequestOrFolderInCollection(
@@ -248,6 +270,40 @@ class FolderExplorerPage {
       },
     };
 
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser === true) {
+      // const res = await this.collectionRepository.readRequestInFolder(
+      //   requestObj.collectionId,
+      //   requestObj.folderId,
+      //    uuid ,
+      // );
+
+      // console.log(res);
+      
+      // await this.collectionRepository.addRequestInFolder(
+      //   requestObj.collectionId,
+      //   requestObj.folderId,
+      //   res,
+      // );
+      // initRequestTab.updateId(res.id);
+      // initRequestTab.updatePath({
+      //   workspaceId: collection.workspaceId,
+      //   collectionId: collection.id,
+      //   folderId: folder.id,
+      // });
+      // initRequestTab.updateIsSave(true);
+      // // this.handleOpenRequest(collection, folder, sampleRequest);
+      // this.tabRepository.createTab(initRequestTab.getValue());
+      // moveNavigation("right");
+      // MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
+      //   source: "Side Panel Dropdown",
+      // });
+      return;
+    }
+
     const response =
       await this.collectionService.addRequestInCollection(requestObj);
     if (response.isSuccessful && response.data.data) {
@@ -310,6 +366,26 @@ class FolderExplorerPage {
         source: "USER",
       };
     }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser === true) {
+      const res =
+        await this.collectionRepository.readRequestOrFolderInCollection(
+          tab.path.collectionId,
+          tab.path.folderId,
+        );
+      res.description = newDescription;
+      await this.collectionRepository.updateRequestOrFolderInCollection(
+        tab.path.collectionId,
+        tab.path.folderId,
+        res,
+      );
+      notifications.success("Description updated successfully!");
+      return;
+    }
+
     const updateFolderElement =
       await this.collectionService.updateFolderInCollection(
         tab.path.workspaceId,

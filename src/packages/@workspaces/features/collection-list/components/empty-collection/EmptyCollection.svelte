@@ -19,6 +19,15 @@
    * Role of user in active workspace
    */
   export let userRole;
+  export let isGuestUser;
+  export let currentWorkspace;
+  export let onItemCreated;
+
+  let currentWorkspaceId;
+  currentWorkspace.subscribe((value) => {
+    currentWorkspaceId = value._data._id;
+  });
+  export let collectionList;
 </script>
 
 <div class="d-flex flex-column align-items-center px-3">
@@ -29,11 +38,6 @@
     </p>
     <div class="w-100 mt-3">
       {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-        <Tooltip
-          show={isAddCollectionDisabled}
-          placement="bottom"
-          title={isAddCollectionDisabled ? "Please Login to Use" : ""}
-        >
           <p
             class="add-collection d-flex justify-content-center align-items-center border-radius-2 {isAddCollectionDisabled
               ? 'disabled'
@@ -41,9 +45,14 @@
             style="color: var(--text-secondary-100);"
             role="button"
             on:click={() => {
-              if (!isAddCollectionDisabled) {
-                onImportCollectionPopup();
-              }
+              if (isGuestUser === true) {
+            onItemCreated("collection", {
+              workspaceId: currentWorkspaceId,
+              collection: collectionList,
+            });
+          } else {
+            onImportCollectionPopup();
+          }
             }}
           >
             <PlusIcon
@@ -56,7 +65,6 @@
               class="ps-2 fw-bold text-fs-12">Add Collection</span
             >
           </p>
-        </Tooltip>
       {/if}
 
       <p

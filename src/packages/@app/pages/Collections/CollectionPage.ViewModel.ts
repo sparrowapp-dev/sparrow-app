@@ -92,6 +92,7 @@ import { RequestTabAdapter } from "@app/adapter/request-tab";
 import { FeatureSwitchRepository } from "@app/repositories/feature-switch.repository";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { WorkspaceService } from "@app/services/workspace.service";
+import { isGuestUserActive } from "$lib/store/auth.store";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -128,16 +129,22 @@ export default class CollectionsViewModel {
   public fetchCollections = async (workspaceId: string) => {
     const isGuestUser = await this.getGuestUserState();
     if (workspaceId && !isGuestUser) {
-      const res = await this.collectionService.fetchCollection(workspaceId);
-      if (res.isSuccessful) {
-        this.collectionRepository.bulkInsertData(
-          res.data.data.map((collection) => {
-            collection["workspaceId"] = workspaceId;
-            return collection;
-          }),
-        );
-      } else {
-        notifications.error("Failed to fetch collections!");
+      let isGuestUser;
+      isGuestUserActive.subscribe((value) => {
+        isGuestUser = value;
+      });
+      if (isGuestUser !== true) {
+        const res = await this.collectionService.fetchCollection(workspaceId);
+        if (res.isSuccessful) {
+          this.collectionRepository.bulkInsertData(
+            res.data.data.map((collection) => {
+              collection["workspaceId"] = workspaceId;
+              return collection;
+            }),
+          );
+        } else {
+          notifications.error("Failed to fetch collections!");
+        }
       }
     }
   };
@@ -485,19 +492,25 @@ export default class CollectionsViewModel {
         };
       }
       const workspaceId = activeWorkspace?._id;
-      const response =
-        await this.collectionService.fetchCollection(workspaceId);
-      if (response.isSuccessful && response.data.data) {
-        const collections = response.data.data;
-        collections.forEach((collection: CollectionDocument) => {
-          collection.workspaceId = workspaceId;
-        });
-        this.collectionRepository.bulkInsertData(collections);
-      } else {
-        notifications.error(response.message);
+      let isGuestUser;
+      isGuestUserActive.subscribe((value) => {
+        isGuestUser = value;
+      });
+      if (isGuestUser !== true) {
+        const response =
+          await this.collectionService.fetchCollection(workspaceId);
+        if (response.isSuccessful && response.data.data) {
+          const collections = response.data.data;
+          collections.forEach((collection: CollectionDocument) => {
+            collection.workspaceId = workspaceId;
+          });
+          this.collectionRepository.bulkInsertData(collections);
+        } else {
+          notifications.error(response.message);
+        }
       }
+      return currentEnvironment;
     }
-    return currentEnvironment;
   };
 
   /**
@@ -607,8 +620,12 @@ export default class CollectionsViewModel {
       items: [],
       createdAt: new Date().toISOString(),
     };
-    const isGuestUser = await this.getGuestUserState();
+    // const isGuestUser = await this.getGuestUserState();
     let response;
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
     if (isGuestUser !== true) {
       response = await this.collectionService.addCollection({
         name: newCollection.name,
@@ -677,6 +694,7 @@ export default class CollectionsViewModel {
     } else {
       await this.addCollection({
         id: newCollection.id,
+        name: newCollection.name,
         workspaceId: workspaceId,
         items: [],
         createdAt: newCollection.createdAt,
@@ -905,36 +923,42 @@ export default class CollectionsViewModel {
     workspaceId: string,
     importCurl: string,
   ) => {
-    const response =
-      await this.collectionService.importCollectionFromCurl(importCurl);
-    if (response.isSuccessful) {
-      const requestTabAdapter = new RequestTabAdapter();
-      const tabId = UntrackedItems.UNTRACKED + uuidv4();
-      const adaptedRequest = requestTabAdapter.adapt(
-        workspaceId || "",
-        "",
-        "",
-        {
-          ...response.data.data,
-          id: tabId,
-        },
-      );
-      adaptedRequest.isSaved = false;
-      await this.tabRepository.createTab(adaptedRequest);
-      moveNavigation("right");
-
-      notifications.success("cURL imported successfully.");
-    } else {
-      if (response.message === "Network Error") {
-        notifications.error(response.message);
-      } else {
-        notifications.error("Failed to import cURL. Please try again");
-      }
-    }
-    MixpanelEvent(Events.IMPORT_API_VIA_CURL, {
-      source: "curl import popup",
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
     });
-    return response;
+    if (isGuestUser !== true) {
+      const response =
+        await this.collectionService.importCollectionFromCurl(importCurl);
+      if (response.isSuccessful) {
+        const requestTabAdapter = new RequestTabAdapter();
+        const tabId = UntrackedItems.UNTRACKED + uuidv4();
+        const adaptedRequest = requestTabAdapter.adapt(
+          workspaceId || "",
+          "",
+          "",
+          {
+            ...response.data.data,
+            id: tabId,
+          },
+        );
+        adaptedRequest.isSaved = false;
+        await this.tabRepository.createTab(adaptedRequest);
+        moveNavigation("right");
+
+        notifications.success("cURL imported successfully.");
+      } else {
+        if (response.message === "Network Error") {
+          notifications.error(response.message);
+        } else {
+          notifications.error("Failed to import cURL. Please try again");
+        }
+      }
+      MixpanelEvent(Events.IMPORT_API_VIA_CURL, {
+        source: "curl import popup",
+      });
+      return response;
+    }
   };
 
   /**
@@ -942,12 +966,18 @@ export default class CollectionsViewModel {
    * @param importCurl: string - Curl string
    */
   public handleValidateCurl = async (importCurl: string) => {
-    const response =
-      await this.collectionService.importCollectionFromCurl(importCurl);
-    if (response.isSuccessful) {
-      return true;
-    } else {
-      return false;
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser !== true) {
+      const response =
+        await this.collectionService.importCollectionFromCurl(importCurl);
+      if (response.isSuccessful) {
+        return true;
+      } else {
+        return false;
+      }
     }
   };
 
@@ -972,73 +1002,81 @@ export default class CollectionsViewModel {
         importData.includes("://localhost")
       ) {
         isValidClientURL = true;
+        let isGuestUser;
+        isGuestUserActive.subscribe((value) => {
+          isGuestUser = value;
+        });
+        if (isGuestUser !== true) {
+          const response =
+            await this.collectionService.validateImportCollectionURL(
+              importData.replace("localhost", "127.0.0.1") + "-json",
+            );
+          if (response?.data?.status === ResponseStatusCode.OK) {
+            try {
+              const res =
+                await this.collectionService.validateImportCollectionInput(
+                  "",
+                  JSON.parse(response?.data?.response),
+                );
+              if (res.isSuccessful) {
+                isValidServerURL = true;
+              } else {
+                notifications.error(res.message);
+              }
+            } catch (e) {}
+          }
+        } else {
+          isValidClientDeployedURL = true;
+          const response =
+            await this.collectionService.validateImportCollectionURL(
+              importData,
+            );
+          if (response?.data?.status === ResponseStatusCode.OK) {
+            try {
+              const res =
+                await this.collectionService.validateImportCollectionInput(
+                  "",
+                  JSON.parse(response?.data?.response),
+                );
+              if (res.isSuccessful) {
+                isValidServerDeployedURL = true;
+              }
+            } catch (e) {}
+          }
+        }
+      } else if (validateClientJSON(importData)) {
+        isValidClientJSON = true;
         const response =
-          await this.collectionService.validateImportCollectionURL(
-            importData.replace("localhost", "127.0.0.1") + "-json",
+          await this.collectionService.validateImportCollectionInput(
+            "",
+            importData,
           );
-        if (response?.data?.status === ResponseStatusCode.OK) {
-          try {
-            const res =
-              await this.collectionService.validateImportCollectionInput(
-                "",
-                JSON.parse(response?.data?.response),
-              );
-            if (res.isSuccessful) {
-              isValidServerURL = true;
-            } else {
-              notifications.error(res.message);
-            }
-          } catch (e) {}
+        if (response.isSuccessful) {
+          isValidServerJSON = true;
         }
-      } else {
-        isValidClientDeployedURL = true;
+      } else if (validateClientXML(importData)) {
         const response =
-          await this.collectionService.validateImportCollectionURL(importData);
-        if (response?.data?.status === ResponseStatusCode.OK) {
-          try {
-            const res =
-              await this.collectionService.validateImportCollectionInput(
-                "",
-                JSON.parse(response?.data?.response),
-              );
-            if (res.isSuccessful) {
-              isValidServerDeployedURL = true;
-            }
-          } catch (e) {}
+          await this.collectionService.validateImportCollectionInput(
+            "",
+            importData,
+          );
+        if (response.isSuccessful) {
+          isValidClientXML = true;
+          isValidServerXML = true;
         }
       }
-    } else if (validateClientJSON(importData)) {
-      isValidClientJSON = true;
-      const response =
-        await this.collectionService.validateImportCollectionInput(
-          "",
-          importData,
-        );
-      if (response.isSuccessful) {
-        isValidServerJSON = true;
-      }
-    } else if (validateClientXML(importData)) {
-      const response =
-        await this.collectionService.validateImportCollectionInput(
-          "",
-          importData,
-        );
-      if (response.isSuccessful) {
-        isValidClientXML = true;
-        isValidServerXML = true;
-      }
-    }
 
-    return {
-      isValidClientURL,
-      isValidClientJSON,
-      isValidClientXML,
-      isValidServerURL,
-      isValidServerJSON,
-      isValidServerXML,
-      isValidClientDeployedURL,
-      isValidServerDeployedURL,
-    };
+      return {
+        isValidClientURL,
+        isValidClientJSON,
+        isValidClientXML,
+        isValidServerURL,
+        isValidServerJSON,
+        isValidServerXML,
+        isValidClientDeployedURL,
+        isValidServerDeployedURL,
+      };
+    }
   };
 
   /**
@@ -1129,10 +1167,45 @@ export default class CollectionsViewModel {
         },
       },
     };
-    this.collectionRepository.addRequestOrFolderInCollection(collection.id, {
-      ...requestObj.items,
-      id: request.getValue().id,
+    await this.collectionRepository.addRequestOrFolderInCollection(
+      collection.id,
+      {
+        ...requestObj.items,
+        id: request.getValue().id,
+      },
+    );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
     });
+
+    if (isGuestUser == true) {
+      const res =
+        await this.collectionRepository.readRequestOrFolderInCollection(
+          requestObj.collectionId,
+          request.getValue().id,
+        );
+
+      res.id = uuidv4();
+      await this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        request.getValue().id,
+        res,
+      );
+
+      request.updateId(res.id);
+      request.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+      });
+      request.updateIsSave(true);
+      await this.tabRepository.createTab(request.getValue());
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    }
     const response =
       await this.collectionService.addRequestInCollection(requestObj);
     if (response.isSuccessful && response.data.data) {
@@ -1236,7 +1309,7 @@ export default class CollectionsViewModel {
       },
     };
 
-    this.collectionRepository.addRequestInFolder(
+    await this.collectionRepository.addRequestInFolder(
       requestObj.collectionId,
       requestObj.folderId,
       {
@@ -1244,6 +1317,40 @@ export default class CollectionsViewModel {
         id: sampleRequest.getValue().id,
       },
     );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser == true) {
+      const res = await this.collectionRepository.readRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        sampleRequest.getValue().id,
+      );
+      res.id = uuidv4();
+      this.collectionRepository.updateRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        sampleRequest.getValue().id,
+        res,
+      );
+
+      sampleRequest.updateId(res.id);
+      sampleRequest.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: explorer.id,
+      });
+      sampleRequest.updateIsSave(true);
+      this.tabRepository.createTab(sampleRequest.getValue());
+
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    }
     const response =
       await this.collectionService.addRequestInCollection(requestObj);
     if (response.isSuccessful && response.data.data) {
@@ -1256,13 +1363,6 @@ export default class CollectionsViewModel {
         request,
       );
 
-      // sampleRequest.id = request.id;
-      // sampleRequest.path.workspaceId = workspaceId;
-      // sampleRequest.path.collectionId = collection.id;
-      // sampleRequest.path.folderId = explorer.id;
-      // sampleRequest.path.folderName = explorer.name;
-      // sampleRequest.property.request.save.api = true;
-      // sampleRequest.property.request.save.description = true;
       sampleRequest.updateId(request.id);
       sampleRequest.updatePath({
         workspaceId: workspaceId,
@@ -1271,7 +1371,7 @@ export default class CollectionsViewModel {
       });
       sampleRequest.updateIsSave(true);
       this.tabRepository.createTab(sampleRequest.getValue());
-      // this.handleOpenRequest(workspaceId, collection, explorer, request);
+
       moveNavigation("right");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
@@ -1314,12 +1414,10 @@ export default class CollectionsViewModel {
       type: ItemType.FOLDER,
       items: [],
     };
-
-    // Add the new folder to the collection locally
-    await this.collectionRepository.addRequestOrFolderInCollection(
-      collection.id,
-      folder,
-    );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
 
     // Determine the user source based on collection's active synchronization
     let userSource = {};
@@ -1330,6 +1428,52 @@ export default class CollectionsViewModel {
           : collection?.primaryBranch,
         source: "USER",
       };
+    }
+
+    if (isGuestUser === true) {
+      const data = {
+        id: uuidv4(),
+        name: this.getNextName(collection.items, ItemType.FOLDER, "New Folder"),
+        description: "",
+        type: ItemType.FOLDER,
+        items: [],
+      };
+
+      // Add the new folder to the collection locally
+      const response =
+        await this.collectionRepository.addRequestOrFolderInCollection(
+          collection.id,
+          data,
+        );
+
+      const path: Path = {
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: data.id,
+        folderName: data.name,
+      };
+
+      const sampleFolder = new InitFolderTab(data.id, collection.workspaceId);
+
+      sampleFolder.updateName(data.name);
+      sampleFolder.updatePath(path);
+      sampleFolder.updateIsSave(true);
+
+      this.handleCreateTab(sampleFolder.getValue());
+      moveNavigation("right");
+
+      // Update the locally added folder with server response
+      const folderObj = data;
+      await this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        folder.id,
+        folderObj,
+      );
+
+      MixpanelEvent(Events.CREATE_FOLDER, {
+        source: "Collection list",
+      });
+      return;
     }
 
     // Add the folder in the collection on the Database
@@ -1396,30 +1540,52 @@ export default class CollectionsViewModel {
     collection: CollectionDocument,
     newCollectionName: string,
   ) => {
-    if (newCollectionName) {
-      const response = await this.collectionService.updateCollectionData(
-        collection.id,
-        workspaceId,
-        { name: newCollectionName },
-      );
-      if (response.isSuccessful) {
-        this.collectionRepository.updateCollection(
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser !== true) {
+      if (newCollectionName) {
+        const response = await this.collectionService.updateCollectionData(
           collection.id,
-          response.data.data,
+          workspaceId,
+          { name: newCollectionName },
         );
-        this.updateTab(collection.id, {
-          name: newCollectionName,
-        });
-        MixpanelEvent(Events.RENAME_COLLECTION, {
-          source: "Collection list",
-        });
-      } else if (response.message === "Network Error") {
-        notifications.error(response.message);
+        if (response.isSuccessful) {
+          this.collectionRepository.updateCollection(
+            collection.id,
+            response.data.data,
+          );
+          this.updateTab(collection.id, {
+            name: newCollectionName,
+          });
+          MixpanelEvent(Events.RENAME_COLLECTION, {
+            source: "Collection list",
+          });
+        } else if (response.message === "Network Error") {
+          notifications.error(response.message);
+        } else {
+          notifications.error("Failed to rename collection!");
+        }
+      }
+    } else {
+      if (newCollectionName) {
+        const response = {
+          data: {
+            name: newCollectionName,
+          },
+        };
+        await this.collectionRepository.updateCollection(
+          collection.id,
+          response.data,
+        );
+        this.updateTab(collection.id, { name: newCollectionName });
+        notifications.success("Collection renamed successfully!");
       } else {
         notifications.error("Failed to rename collection!");
       }
     }
-    newCollectionName = "";
   };
 
   /**
@@ -1445,21 +1611,50 @@ export default class CollectionsViewModel {
           source: "USER",
         };
       }
-      const response = await this.collectionService.updateFolderInCollection(
-        workspaceId,
-        collection.id,
-        explorer.id,
-        {
-          ...userSource,
-          name: newFolderName,
-        },
-      );
-      if (response.isSuccessful) {
+      let isGuestUser;
+      isGuestUserActive.subscribe((value) => {
+        isGuestUser = value;
+      });
+
+      if (isGuestUser !== true) {
+        const response = await this.collectionService.updateFolderInCollection(
+          workspaceId,
+          collection.id,
+          explorer.id,
+          {
+            ...userSource,
+            name: newFolderName,
+          },
+        );
+        if (response.isSuccessful) {
+          this.collectionRepository.updateRequestOrFolderInCollection(
+            collection.id,
+            explorer.id,
+            response.data.data,
+          );
+
+          this.updateTab(explorer.id, {
+            name: newFolderName,
+          });
+          MixpanelEvent(Events.RENAME_FOLDER, {
+            source: "Collection list",
+          });
+        }
+      } else {
+        this.updateTab(collection.id, { name: newFolderName });
+        const res =
+          await this.collectionRepository.readRequestOrFolderInCollection(
+            collection.id,
+            explorer.id,
+          );
+        res.name = newFolderName;
         this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           explorer.id,
-          response.data.data,
+          res,
         );
+        notifications.success("Folder renamed successfully!");
+
         this.updateTab(explorer.id, {
           name: newFolderName,
         });
@@ -1573,6 +1768,48 @@ export default class CollectionsViewModel {
         source: "USER",
       };
     }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser == true) {
+      const response =
+        await this.collectionRepository.readRequestOrFolderInCollection(
+          collection.id,
+          request.id,
+        );
+      if (collection.id && workspaceId && !folder.id) {
+        let storage: any = request;
+        storage.name = newRequestName;
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collection.id,
+          request.id,
+          response,
+        );
+        this.updateTab(request.id, {
+          name: newRequestName,
+        });
+        MixpanelEvent(Events.RENAME_REQUEST, {
+          source: "Collection list",
+        });
+      } else if (collection.id && workspaceId && folder.id) {
+        let storage = request;
+        storage.name = newRequestName;
+        this.collectionRepository.updateRequestInFolder(
+          collection.id,
+          folder.id,
+          request.id,
+          response,
+        );
+        this.updateTab(request.id, {
+          name: newRequestName,
+        });
+        MixpanelEvent(Events.RENAME_REQUEST, {
+          source: "Collection list",
+        });
+      }
+    }
     if (newRequestName) {
       if (collection.id && workspaceId && !folder.id) {
         let storage: any = request;
@@ -1648,28 +1885,34 @@ export default class CollectionsViewModel {
     const detectBranch = collection?.currentBranch
       ? collection?.currentBranch
       : collection?.primaryBranch;
-    const response = await this.collectionService.switchCollectionBranch(
-      collection.id,
-      detectBranch,
-    );
-    await setTimeout(async () => {
-      if (response.isSuccessful) {
-        await this.collectionRepository.updateCollection(collection.id, {
-          currentBranch: detectBranch,
-          items: response.data.data.items,
-        });
-        result.activeSyncLoad = true;
-        result.isBranchSynced = true;
-      } else {
-        await this.collectionRepository.updateCollection(collection.id, {
-          currentBranch: detectBranch,
-          items: [],
-        });
-        result.activeSyncLoad = true;
-        result.isBranchSynced = false;
-      }
-    }, 500);
-    return result;
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser !== true) {
+      const response = await this.collectionService.switchCollectionBranch(
+        collection.id,
+        detectBranch,
+      );
+      await setTimeout(async () => {
+        if (response.isSuccessful) {
+          await this.collectionRepository.updateCollection(collection.id, {
+            currentBranch: detectBranch,
+            items: response.data.data.items,
+          });
+          result.activeSyncLoad = true;
+          result.isBranchSynced = true;
+        } else {
+          await this.collectionRepository.updateCollection(collection.id, {
+            currentBranch: detectBranch,
+            items: [],
+          });
+          result.activeSyncLoad = true;
+          result.isBranchSynced = false;
+        }
+      }, 500);
+      return result;
+    }
   };
 
   /**
@@ -1683,6 +1926,21 @@ export default class CollectionsViewModel {
     collection: CollectionDocument,
     deletedIds: string[] | [],
   ) => {
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser == true) {
+      this.collectionRepository.deleteCollection(collection.id);
+      this.deleteCollectioninWorkspace(workspaceId, collection.id);
+      notifications.success(`"${collection.name}" Collection deleted.`);
+      this.removeMultipleTabs(deletedIds);
+      MixpanelEvent(Events.DELETE_COLLECTION, {
+        source: "Collection list",
+      });
+      return;
+    }
     const response = await this.collectionService.deleteCollection(
       workspaceId,
       collection.id,
@@ -1723,6 +1981,24 @@ export default class CollectionsViewModel {
           ? collection.currentBranch
           : collection.primaryBranch,
       };
+    }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser == true) {
+      this.collectionRepository.deleteRequestOrFolderInCollection(
+        collection.id,
+        explorer.id,
+      );
+
+      notifications.success(`"${explorer.name}" Folder deleted.`);
+      this.removeMultipleTabs(requestIds);
+      MixpanelEvent(Events.DELETE_FOLDER, {
+        source: "Collection list",
+      });
+      return;
     }
     const response = await this.collectionService.deleteFolderInCollection(
       workspaceId,
@@ -1782,6 +2058,27 @@ export default class CollectionsViewModel {
         folderId: folder.id,
       };
     }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser == true) {
+      if (folder) {
+        await this.collectionRepository.deleteRequestInFolder(
+          collection.id,
+          folder.id,
+          request.id,
+        );
+      } else {
+        await this.collectionRepository.deleteRequestOrFolderInCollection(
+          collection.id,
+          request.id,
+        );
+      }
+
+      return true;
+    }
     const response = await this.collectionService.deleteRequestInCollection(
       request.id,
       requestObject,
@@ -1836,40 +2133,48 @@ export default class CollectionsViewModel {
       notifications.error(errMessage);
       return;
     }
-    const responseJSON =
-      await this.collectionService.validateImportCollectionURL(
-        collection.activeSyncUrl,
-      );
-    if (responseJSON?.data?.status === ResponseStatusCode.OK) {
-      const response = await this.importCollectionData(
-        workspaceId,
-        {
-          url: collection.activeSyncUrl,
-          urlData: {
-            data: JSON.parse(responseJSON.data.response),
-            headers: responseJSON.data.headers,
-          },
-          primaryBranch: collection?.primaryBranch,
-          currentBranch: collection?.currentBranch
-            ? collection?.currentBranch
-            : collection?.primaryBranch,
-        },
-        collection.activeSync,
-      );
-
-      if (response.isSuccessful) {
-        this.collectionRepository.updateCollection(
-          collection.id,
-          response.data.data.collection,
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser !== true) {
+      const responseJSON =
+        await this.collectionService.validateImportCollectionURL(
+          collection.activeSyncUrl,
         );
-        notifications.success("Collection synced.");
+      if (responseJSON?.data?.status === ResponseStatusCode.OK) {
+        const response = await this.importCollectionData(
+          workspaceId,
+          {
+            url: collection.activeSyncUrl,
+            urlData: {
+              data: JSON.parse(responseJSON.data.response),
+              headers: responseJSON.data.headers,
+            },
+            primaryBranch: collection?.primaryBranch,
+            currentBranch: collection?.currentBranch
+              ? collection?.currentBranch
+              : collection?.primaryBranch,
+          },
+          collection.activeSync,
+        );
+
+        if (response.isSuccessful) {
+          this.collectionRepository.updateCollection(
+            collection.id,
+            response.data.data.collection,
+          );
+          notifications.success("Collection synced.");
+        } else {
+          notifications.error(
+            "Failed to sync the collection. Please try again.",
+          );
+        }
       } else {
-        notifications.error("Failed to sync the collection. Please try again.");
+        notifications.error(
+          `Unable to detect ${collection.activeSyncUrl.replace("-json", "")}.`,
+        );
       }
-    } else {
-      notifications.error(
-        `Unable to detect ${collection.activeSyncUrl.replace("-json", "")}.`,
-      );
     }
   };
 
@@ -2264,100 +2569,112 @@ export default class CollectionsViewModel {
     importJSON,
     contentType,
   ) => {
-    const response =
-      await this.collectionService.importCollectionFromJsonObject(
-        currentWorkspaceId,
-        importJSON,
-        contentType,
-      );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser !== true) {
+      const response =
+        await this.collectionService.importCollectionFromJsonObject(
+          currentWorkspaceId,
+          importJSON,
+          contentType,
+        );
 
-    if (response.isSuccessful) {
-      const path = {
-        workspaceId: currentWorkspaceId,
-        collectionId: response.data.data._id,
-      };
-      this.collectionRepository.addCollection({
-        ...response.data.data,
-        id: response.data.data._id,
-        workspaceId: currentWorkspaceId,
-      });
-      const initCollectionTab = new InitCollectionTab(
-        response.data.data._id,
-        currentWorkspaceId,
-      );
-      initCollectionTab.updatePath(path);
-      initCollectionTab.updateName(response.data.data.name);
-      initCollectionTab.updateDescription(response.data.data.description);
-      initCollectionTab.updateIsSave(true);
+      if (response.isSuccessful) {
+        const path = {
+          workspaceId: currentWorkspaceId,
+          collectionId: response.data.data._id,
+        };
+        this.collectionRepository.addCollection({
+          ...response.data.data,
+          id: response.data.data._id,
+          workspaceId: currentWorkspaceId,
+        });
+        const initCollectionTab = new InitCollectionTab(
+          response.data.data._id,
+          currentWorkspaceId,
+        );
+        initCollectionTab.updatePath(path);
+        initCollectionTab.updateName(response.data.data.name);
+        initCollectionTab.updateDescription(response.data.data.description);
+        initCollectionTab.updateIsSave(true);
 
-      this.tabRepository.createTab(initCollectionTab.getValue());
-      moveNavigation("right");
+        this.tabRepository.createTab(initCollectionTab.getValue());
+        moveNavigation("right");
 
       this.workspaceRepository.updateCollectionInWorkspace(currentWorkspaceId, {
-        id: initCollectionTab.getValue().id,
-        name: initCollectionTab.getValue().name,
+            id: initCollectionTab.getValue().id,
+            name: initCollectionTab.getValue().name,
       });
-      MixpanelEvent(Events.IMPORT_COLLECTION, {
-        collectionName: response.data.data.name,
-        collectionId: response.data.data._id,
-        importThrough: "ByObject",
-      });
-      notifications.success("Collection imported successfully.");
-    } else {
-      notifications.error("Failed to import collection. Please try again.");
+        MixpanelEvent(Events.IMPORT_COLLECTION, {
+          collectionName: response.data.data.name,
+          collectionId: response.data.data._id,
+          importThrough: "ByObject",
+        });
+        notifications.success("Collection imported successfully.");
+      } else {
+        notifications.error("Failed to import collection. Please try again.");
+      }
+      return response;
     }
-    return response;
   };
 
   public collectionFileUpload = async (currentWorkspaceId, file) => {
-    const response = await this.collectionService.importCollectionFromFile(
-      currentWorkspaceId,
-      file,
-    );
-    if (response.isSuccessful) {
-      let path = {
-        workspaceId: currentWorkspaceId,
-        collectionId: response.data.data._id,
-      };
-
-      this.collectionRepository.addCollection({
-        ...response.data.data,
-        id: response.data.data._id,
-        workspaceId: currentWorkspaceId,
-      });
-
-      const initCollectionTab = new InitCollectionTab(
-        response.data.data._id,
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser !== true) {
+      const response = await this.collectionService.importCollectionFromFile(
         currentWorkspaceId,
+        file,
       );
+      if (response.isSuccessful) {
+        let path = {
+          workspaceId: currentWorkspaceId,
+          collectionId: response.data.data._id,
+        };
 
-      initCollectionTab.updatePath(path);
-      initCollectionTab.updateName(response.data.data.name);
-      initCollectionTab.updateDescription(response.data.data.description);
-      initCollectionTab.updateIsSave(true);
-      // Samplecollection.id = response.data.data._id;
-      // Samplecollection.path = path;
-      // Samplecollection.name = response.data.data.name;
-      // Samplecollection.save = true;
-      // collectionsMethods.handleCreateTab(Samplecollection);
-      // moveNavigation("right");
-      this.tabRepository.createTab(initCollectionTab.getValue());
-      moveNavigation("right");
+        this.collectionRepository.addCollection({
+          ...response.data.data,
+          id: response.data.data._id,
+          workspaceId: currentWorkspaceId,
+        });
+
+        const initCollectionTab = new InitCollectionTab(
+          response.data.data._id,
+          currentWorkspaceId,
+        );
+
+        initCollectionTab.updatePath(path);
+        initCollectionTab.updateName(response.data.data.name);
+        initCollectionTab.updateDescription(response.data.data.description);
+        initCollectionTab.updateIsSave(true);
+        // Samplecollection.id = response.data.data._id;
+        // Samplecollection.path = path;
+        // Samplecollection.name = response.data.data.name;
+        // Samplecollection.save = true;
+        // collectionsMethods.handleCreateTab(Samplecollection);
+        // moveNavigation("right");
+        this.tabRepository.createTab(initCollectionTab.getValue());
+        moveNavigation("right");
 
       this.workspaceRepository.updateCollectionInWorkspace(currentWorkspaceId, {
-        id: initCollectionTab.getValue().id,
-        name: initCollectionTab.getValue().name,
+            id: initCollectionTab.getValue().id,
+            name: initCollectionTab.getValue().name,
       });
-      notifications.success("Collection imported successfully.");
-      MixpanelEvent(Events.IMPORT_COLLECTION, {
-        collectionName: response.data.data.name,
-        collectionId: response.data.data._id,
-        importThrough: "ByFile",
-      });
-    } else {
-      notifications.error("Failed to import collection. Please try again.");
+        notifications.success("Collection imported successfully.");
+        MixpanelEvent(Events.IMPORT_COLLECTION, {
+          collectionName: response.data.data.name,
+          collectionId: response.data.data._id,
+          importThrough: "ByFile",
+        });
+      } else {
+        notifications.error("Failed to import collection. Please try again.");
+      }
+      return response;
     }
-    return response;
   };
 
   public importCollectionURL = async (
@@ -2365,79 +2682,85 @@ export default class CollectionsViewModel {
     requestBody,
     activeSync,
   ) => {
-    const response = await this.collectionService.importCollection(
-      currentWorkspaceId,
-      requestBody,
-      activeSync,
-    );
-
-    if (response.isSuccessful) {
-      let path: Path = {
-        workspaceId: currentWorkspaceId,
-        collectionId: response.data.data.collection._id,
-      };
-
-      const initCollectionTab = new InitCollectionTab(
-        response.data.data._id,
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser !== true) {
+      const response = await this.collectionService.importCollection(
         currentWorkspaceId,
+        requestBody,
+        activeSync,
       );
 
-      // const Samplecollection = generateSampleCollection(
-      //   response.data.data._id,
-      //   new Date().toString(),
-      // );
+      if (response.isSuccessful) {
+        let path: Path = {
+          workspaceId: currentWorkspaceId,
+          collectionId: response.data.data.collection._id,
+        };
 
-      // Samplecollection.id = response.data.data.collection._id;
-      initCollectionTab.updatePath(path);
-      // Samplecollection.path = path;
-      initCollectionTab.updateName(response.data.data.collection.name);
-      initCollectionTab.updateDescription(
-        response.data.data.collection.description,
-      );
-      // Samplecollection.name = response.data.data.collection.name;
-      initCollectionTab.updateIsSave(true);
-      // Samplecollection.save = true;
-      if (response.data.data.existingCollection) {
-        this.collectionRepository.updateCollection(
-          response.data.data.collection._id,
-          {
+        const initCollectionTab = new InitCollectionTab(
+          response.data.data._id,
+          currentWorkspaceId,
+        );
+
+        // const Samplecollection = generateSampleCollection(
+        //   response.data.data._id,
+        //   new Date().toString(),
+        // );
+
+        // Samplecollection.id = response.data.data.collection._id;
+        initCollectionTab.updatePath(path);
+        // Samplecollection.path = path;
+        initCollectionTab.updateName(response.data.data.collection.name);
+        initCollectionTab.updateDescription(
+          response.data.data.collection.description,
+        );
+        // Samplecollection.name = response.data.data.collection.name;
+        initCollectionTab.updateIsSave(true);
+        // Samplecollection.save = true;
+        if (response.data.data.existingCollection) {
+          this.collectionRepository.updateCollection(
+            response.data.data.collection._id,
+            {
+              ...response.data.data.collection,
+              id: response.data.data.collection._id,
+              currentBranch: requestBody.currentBranch,
+            },
+          );
+          notifications.error("Collection already exists.");
+        } else {
+          this.collectionRepository.addCollection({
             ...response.data.data.collection,
             id: response.data.data.collection._id,
             currentBranch: requestBody.currentBranch,
-          },
-        );
-        notifications.error("Collection already exists.");
-      } else {
-        this.collectionRepository.addCollection({
-          ...response.data.data.collection,
-          id: response.data.data.collection._id,
-          currentBranch: requestBody.currentBranch,
-          workspaceId: currentWorkspaceId,
+            workspaceId: currentWorkspaceId,
+          });
+          this.workspaceRepository.updateCollectionInWorkspace(
+            currentWorkspaceId,
+            {
+              id: initCollectionTab.getValue().id,
+              name: initCollectionTab.getValue().name,
+            },
+          );
+          notifications.success("Collection imported successfully.");
+        }
+        // collectionsMethods.handleCreateTab(Samplecollection);
+        // moveNavigation("right");
+
+        this.tabRepository.createTab(initCollectionTab.getValue());
+        moveNavigation("right");
+
+        MixpanelEvent(Events.IMPORT_COLLECTION, {
+          collectionName: response.data.data.collection.name,
+          collectionId: response.data.data.collection._id,
+          importThrough: "ByObject",
         });
-        this.workspaceRepository.updateCollectionInWorkspace(
-          currentWorkspaceId,
-          {
-            id: initCollectionTab.getValue().id,
-            name: initCollectionTab.getValue().name,
-          },
-        );
-        notifications.success("Collection imported successfully.");
+      } else {
+        notifications.error("Failed to import collection. Please try again.");
       }
-      // collectionsMethods.handleCreateTab(Samplecollection);
-      // moveNavigation("right");
-
-      this.tabRepository.createTab(initCollectionTab.getValue());
-      moveNavigation("right");
-
-      MixpanelEvent(Events.IMPORT_COLLECTION, {
-        collectionName: response.data.data.collection.name,
-        collectionId: response.data.data.collection._id,
-        importThrough: "ByObject",
-      });
-    } else {
-      notifications.error("Failed to import collection. Please try again.");
+      return response;
     }
-    return response;
   };
 
   /**
@@ -2472,24 +2795,30 @@ export default class CollectionsViewModel {
     collectionId: string,
     newCollectionName: string,
   ) => {
-    if (newCollectionName) {
-      const response = await this.collectionService.updateCollectionData(
-        collectionId,
-        workspaceId,
-        { name: newCollectionName },
-      );
-      if (response.isSuccessful) {
-        this.collectionRepository.updateCollection(
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser !== true) {
+      if (newCollectionName) {
+        const response = await this.collectionService.updateCollectionData(
           collectionId,
-          response.data.data,
+          workspaceId,
+          { name: newCollectionName },
         );
-        notifications.success("Collection renamed successfully!");
-      } else if (response.message === "Network Error") {
-        notifications.error(response.message);
-      } else {
-        notifications.error("Failed to rename collection!");
+        if (response.isSuccessful) {
+          this.collectionRepository.updateCollection(
+            collectionId,
+            response.data.data,
+          );
+          notifications.success("Collection renamed successfully!");
+        } else if (response.message === "Network Error") {
+          notifications.error(response.message);
+        } else {
+          notifications.error("Failed to rename collection!");
+        }
+        return response;
       }
-      return response;
     }
   };
 
@@ -2523,6 +2852,26 @@ export default class CollectionsViewModel {
             : collection.primaryBranch,
           source: "USER",
         };
+      }
+      let isGuestUser;
+      isGuestUserActive.subscribe((value) => {
+        isGuestUser = value;
+      });
+      if (isGuestUser === true) {
+        this.updateTab(folderId, { name: newFolderName });
+        const res =
+          await this.collectionRepository.readRequestOrFolderInCollection(
+            collection.id,
+            folderId,
+          );
+        res.name = newFolderName;
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collection.id,
+          folderId,
+          res,
+        );
+        notifications.success("Folder renamed successfully!");
+        return;
       }
       const response = await this.collectionService.updateFolderInCollection(
         workspaceId,

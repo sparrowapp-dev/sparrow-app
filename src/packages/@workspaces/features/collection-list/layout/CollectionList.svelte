@@ -34,6 +34,10 @@
     handleCollapseCollectionList: () => void;
   };
   export let githubRepo;
+  let currentWorkspaceId;
+  currentWorkspace.subscribe((value) => {
+    currentWorkspaceId = value._data._id;
+  });
   /**
    * Flag to show app version
    */
@@ -188,6 +192,16 @@
           name: "Add New API",
           icon: CreateRequest,
           onclick: () => onItemCreated("request", {}),
+        },
+        {
+          name: "Add Collection",
+          icon: CreateCollection,
+          onclick: () => {
+            onItemCreated("collection", {
+              workspaceId: currentWorkspaceId,
+              collection: collectionList,
+            });
+          },
         },
         {
           name: "Import cURL",
@@ -413,11 +427,15 @@
         {:else}
           <EmptyCollection
             bind:userRole
+            {onItemCreated}
+            {collectionList}
             {userRoleInWorkspace}
+            {currentWorkspace}
             handleCreateApiRequest={() => onItemCreated("request", {})}
             onImportCollectionPopup={showImportCollectionPopup}
             isAddCollectionDisabled={isGuestUser}
             onImportCurlPopup={showImportCurlPopup}
+            {isGuestUser}
           />
         {/if}
       </div>

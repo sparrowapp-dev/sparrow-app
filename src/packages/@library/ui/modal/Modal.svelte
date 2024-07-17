@@ -52,10 +52,11 @@
         </div>
         {#if canClose}
           <button
-            class="sparrow-modal-close-icon-btn border-0"
+            class="sparrow-modal-close-icon-btn border-0 d-flex justify-content-center align-items-center " 
+            style="height: 20px; width:20px; "
             on:click={handleModalState(false)}
           >
-            <CrossIcon />
+            <CrossIcon color={"var( --icon-secondary-100)"}  />
           </button>
         {/if}
       </div>
@@ -110,4 +111,11 @@
   .sparrow-modal-close-icon-btn {
     background-color: transparent;
   }
+  .sparrow-modal-close-icon-btn:hover{
+    background-color: var(--bg-tertiary-300);
+  }
+  .sparrow-modal-close-icon-btn:active{
+    background-color: var(--bg-danger-200);
+  }
+
 </style>

@@ -313,9 +313,14 @@
 {/if}
 <div class="d-flex align-items-center justify-content-between mt-4">
   <div class="description ellipsis">
-    <div class="d-flex align-items-center ellipsis">
+    <div class="d-flex gap-2 align-items-center ellipsis">
       {#if teamLogo?.size}
-        <img class="team-icon me-2" src={base64ToURL(teamLogo)} alt="" />
+      <img
+      class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
+      style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
+      src={base64ToURL(teamLogo)}
+      alt=""
+    />
       {:else}
         <span class="me-2">
           <IconFallback character={teamName[0]} />

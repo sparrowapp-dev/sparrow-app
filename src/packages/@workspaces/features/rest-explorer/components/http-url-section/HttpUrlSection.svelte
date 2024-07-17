@@ -178,7 +178,7 @@
     }}
   /> -->
   <Tooltip
-    title={isGuestUser ? "Login to Save" : "Save"}
+    title={"Save"}
     placement={"bottom"}
     distance={12}
     zIndex={10}
@@ -189,7 +189,6 @@
       on:mouseenter={handleMouseEnter}
       on:mouseleave={handleMouseLeave}
       disabled={isSave ||
-      isGuestUser ||
       userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
         : false}
