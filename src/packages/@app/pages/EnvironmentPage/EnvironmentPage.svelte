@@ -28,6 +28,7 @@
 
   let trackWorkspaceId;
   let isEnvLoading = false;
+  let userRole = "";
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
 
@@ -37,7 +38,7 @@
       if (activeWorkspaceRxDoc) {
         value._data.users.forEach((user) => {
           if (user.id === $user?._id) {
-            userWorkspaceLevelRole.set(user.role);
+            userRole = user.role;
           }
         });
         const workspaceId = activeWorkspaceRxDoc.get("_id");
@@ -73,7 +74,7 @@
         class="bg-secondary-900-important"
       >
         <EnvironmentList
-          loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
+          loggedUserRoleInWorkspace={userRole}
           onCreateEnvironment={_viewModel.onCreateEnvironment}
           onOpenGlobalEnvironment={_viewModel.onOpenGlobalEnvironment}
           onDeleteEnvironment={_viewModel.onDeleteEnvironment}

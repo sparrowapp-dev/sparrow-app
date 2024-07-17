@@ -98,6 +98,10 @@
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
   export let onUpdateCollectionGuide: (query, isActive) => void;
+  /**
+   * Role of user in active workspace
+   */
+  export let userRole;
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -216,6 +220,7 @@
       <HttpUrlSection
         class=""
         isSave={$tab.isSaved}
+        bind:userRole
         requestUrl={$tab.property.request.url}
         httpMethod={$tab.property.request.method}
         isSendRequestInProgress={$tab.property.request?.state

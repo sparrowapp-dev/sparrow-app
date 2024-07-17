@@ -7,6 +7,7 @@
   import { DeleteWorkspace } from "@common/features";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import type { UpdatesDocType } from "@app/models/updates.model";
+  import { user } from "$lib/store";
 
   export let modifiedUser;
   export let collectionList;
@@ -16,10 +17,8 @@
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.activeWorkspace;
 
-
-    const onRemoveUserFromWorkspace = _viewModel.removeUserFromWorkspace;
-    const onChangeUserRoleAtWorkspace = _viewModel.changeUserRoleAtWorkspace;
-
+  const onRemoveUserFromWorkspace = _viewModel.removeUserFromWorkspace;
+  const onChangeUserRoleAtWorkspace = _viewModel.changeUserRoleAtWorkspace;
 
   let isWorkspaceInviteModalOpen = false;
   let isDeleteWorkspaceModalOpen = false;
@@ -45,6 +44,8 @@
     name: "",
     users: [],
   };
+  let userId = "";
+  let userRole = "";
   /**
    * Subscribes to the active workspace and updates the current workspace details
    * and also updates current team details associated with that workspace.
@@ -75,15 +76,37 @@
     _viewModel.refetchPreviousUpdates(workspaceID);
   };
 
+  user.subscribe((value) => {
+    if (value) {
+      userId = value._id;
+    }
+  });
+
+  /**
+   * Find the role of user in active workspace
+   */
+  const findUserRole = async () => {
+    const workspace: WorkspaceDocument = await _viewModel.getWorkspaceById(
+      tab.path.workspaceId,
+    );
+    workspace.users?.forEach((value) => {
+      if (value.id === userId) {
+        userRole = value.role;
+      }
+    });
+  };
+
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
   onMount(async () => {
     await _viewModel.fetchWorkspaceUpdates(workspaceID);
+    findUserRole();
   });
 </script>
 
 <WorkspaceExplorer
+  bind:userRole
   {tab}
   {modifiedUser}
   {workspaceUpdatesList}

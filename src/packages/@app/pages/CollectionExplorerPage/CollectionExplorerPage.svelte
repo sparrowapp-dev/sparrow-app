@@ -1,6 +1,10 @@
 <script lang="ts">
   // Document
-  import type { CollectionDocument, TabDocument } from "@app/database/database";
+  import type {
+    CollectionDocument,
+    TabDocument,
+    WorkspaceDocument,
+  } from "@app/database/database";
   import { onDestroy, onMount } from "svelte";
 
   // ---- View Model
@@ -9,12 +13,16 @@
   // Component
   import { CollectionExplorer } from "@workspaces/features";
   import type { Observable } from "rxjs";
+  import { user } from "$lib/store";
 
   // Exports
   export let tab: TabDocument;
 
   // ViewModel initialization
   const _viewModel = new CollectionExplorerPage(tab);
+
+  let userId = "";
+  let userRole = "";
 
   // Local variables
   let collection: CollectionDocument;
@@ -32,9 +40,30 @@
     );
     userRoleInWorkspace = await _viewModel.getUserRoleInWorspace();
   });
+
+  user.subscribe((value) => {
+    if (value) {
+      userId = value._id;
+    }
+  });
+
+  const findUserRole = async () => {
+    const workspace: WorkspaceDocument = await _viewModel.getWorkspaceById(
+      tab.path.workspaceId,
+    );
+    workspace.users?.forEach((value) => {
+      if (value.id === userId) {
+        userRole = value.role;
+      }
+    });
+  };
+  onMount(() => {
+    findUserRole();
+  });
 </script>
 
 <CollectionExplorer
+  bind:userRole
   bind:tab
   bind:collection
   bind:userRoleInWorkspace

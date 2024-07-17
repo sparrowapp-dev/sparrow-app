@@ -201,4 +201,12 @@ export class EnvironmentExplorerViewModel {
       isActive: isActive,
     });
   };
+
+  /**
+   * Get workspace data of active workspace
+   * @returns - workspace document
+   */
+  public getWorkspace = async () => {
+    return await this.workspaceRepository.getActiveWorkspaceDoc();
+  };
 }

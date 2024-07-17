@@ -1,7 +1,9 @@
-<script>
+<script lang="ts">
   import { EnvironmentExplorer } from "@environments/features";
   import { EnvironmentExplorerViewModel } from "./EnvironmentExplorerPage.ViewModel";
   import { Debounce } from "@common/utils";
+  import { user } from "$lib/store";
+  import type { WorkspaceDocument } from "@app/database/database";
   /**
    * environment opened tab object
    */
@@ -11,6 +13,23 @@
     _viewModel.updateNameWithEnvironmentList,
     1000,
   );
+
+  let userId = "";
+  let userRole = "";
+
+  user.subscribe((value) => {
+    if (value) {
+      userId = value._id;
+    }
+  });
+  const findUserRole = async () => {
+    const workspace: WorkspaceDocument = await _viewModel.getWorkspace();
+    workspace.users?.forEach((value) => {
+      if (value.id === userId) {
+        userRole = value.role;
+      }
+    });
+  };
   let prevTabName = "";
   $: {
     if (tab) {
@@ -19,11 +38,13 @@
         renameWithEnvironmentList(tab.name);
       }
       prevTabName = tab.name;
+      findUserRole();
     }
   }
 </script>
 
 <EnvironmentExplorer
+  bind:userRole
   bind:currentEnvironment={_viewModel.tab}
   onUpdateName={_viewModel.updateName}
   onUpdateVariable={_viewModel.updateVariables}

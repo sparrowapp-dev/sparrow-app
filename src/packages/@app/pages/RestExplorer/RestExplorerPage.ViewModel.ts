@@ -429,7 +429,6 @@ class RestExplorerViewModel
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
-
   /**
    * @description clear response of a request
    */
@@ -1205,6 +1204,15 @@ class RestExplorerViewModel
       }
       return response;
     }
+  };
+
+  /**
+   * Get workspace data through workspace id
+   * @param workspaceId - id of workspace
+   * @returns - workspace document
+   */
+  public getWorkspaceById = async (workspaceId: string) => {
+    return await this.workspaceRepository.readWorkspace(workspaceId);
   };
 }
 
