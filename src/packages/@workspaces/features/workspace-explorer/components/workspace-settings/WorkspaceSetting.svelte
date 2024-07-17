@@ -14,6 +14,11 @@
    */
   export let workspaceName: string = "";
 
+  export let currentWorkspace;
+
+  export let onChangeUserRoleAtWorkspace;
+  export let onRemoveUserFromWorkspace;
+
   let search: string = "";
   let activeUser;
   let filteredUser;
@@ -63,7 +68,14 @@
     {:else}
       {#each filteredUser as user}
         {#if user.email.includes(search) || user.name.includes(search) || user.role.includes(search)}
-          <Member {user} isActiveUser={false} />
+          <Member
+            {user}
+            {activeUser}
+            isActiveUser={false}
+            {currentWorkspace}
+            {onChangeUserRoleAtWorkspace}
+            {onRemoveUserFromWorkspace}
+          />
         {/if}
       {/each}
     {/if}

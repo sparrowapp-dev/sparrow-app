@@ -49,6 +49,10 @@
    * The current active workspace object.
    */
   export let currentWorkspace;
+  
+
+  export let onRemoveUserFromWorkspace;
+  export let onChangeUserRoleAtWorkspace;
 
   /**
    * List of updates of a workspace
@@ -87,7 +91,12 @@
           {workspaceID}
         />
       {:else if workspaceNavigatorId === "settings"}
-        <WorkspaceSetting users={currentWorkspace?.users} {workspaceName} />
+        <WorkspaceSetting
+          users={currentWorkspace?.users}
+          {currentWorkspace}
+          {onRemoveUserFromWorkspace}
+          {onChangeUserRoleAtWorkspace}
+        />
       {/if}
     </section>
   </div>

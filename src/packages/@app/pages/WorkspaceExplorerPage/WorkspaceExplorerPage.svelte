@@ -16,6 +16,11 @@
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.activeWorkspace;
 
+
+    const onRemoveUserFromWorkspace = _viewModel.removeUserFromWorkspace;
+    const onChangeUserRoleAtWorkspace = _viewModel.changeUserRoleAtWorkspace;
+
+
   let isWorkspaceInviteModalOpen = false;
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
@@ -91,6 +96,8 @@
   onUpdateWorkspaceName={_viewModel.updateWorkspaceName}
   onWorkspaceUpdateScroll={handleWorkspaceUpdatesScroll}
   {currentWorkspace}
+  {onRemoveUserFromWorkspace}
+  {onChangeUserRoleAtWorkspace}
 />
 
 <Modal
