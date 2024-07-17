@@ -17,6 +17,9 @@
 Format: Parameter-Key: Parameter-Value
 Example: userID: Sparrow12 `;
 
+// let bulkEditParamsPlaceholder = "Format: Parameter-Key: Parameter-Value Example: userID: Sparrow12 ";
+
+
   const handleParamsChange = (pairs: KeyValuePair[]): void => {
     onUpdateRequestParams(pairs);
   };

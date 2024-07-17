@@ -834,6 +834,14 @@ span {
   background-position: center;
 }
 
+.key-highlight {
+  color: var(--text-primary-150);
+}
+ 
+.value-highlight {
+  color: var(--white-color);
+}
+ 
 
 .env-highlight {
 

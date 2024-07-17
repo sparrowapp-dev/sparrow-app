@@ -17,6 +17,9 @@
 
   import { ErrorInfoIcon, Information } from "@library/icons";
 
+  let enableKeyValueHighlighting = true;
+  import { Editor } from "@library/forms";
+
   type Mode = "READ" | "WRITE";
 
   export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
@@ -39,7 +42,7 @@
 
   export let bulkEditPlaceholder = "";
 
-  let bulkText = "";
+  let bulkText = "THIS IS TESTING ";
   let bulkToggle = isBulkEditActive;
 
   let isErrorIconHovered = false;
@@ -175,6 +178,8 @@
     callback(pairs);
   };
 
+  let isBulkEditLoaded = false;
+
   /**
    * Updates the bulk text based on the key-value pairs.
    */
@@ -200,6 +205,7 @@
 
     // Update the bulkText with the formatted and validated text
     bulkText = res;
+    isBulkEditLoaded = true;
   };
 
   const handleBulkTextarea = (event) => {
@@ -718,16 +724,17 @@
         </div>
 
         <!-- Bulk Edit TextArea starts -->
-        <div style="">
-          <Textarea
-            maxlength="2000"
-            height={"200px"}
-            class="text-area h-100 w-100 border-0 m fs-12 bulkEditTextarea"
-            style="background-color:transparent; height:400px; outline:none; padding-top:4px; padding-left:18px;"
-            placeholder={bulkEditPlaceholder}
-            bind:value={bulkText}
-            on:input={handleBulkTextarea}
-          />
+        <div style="height:100%"
+        >
+          {#if isBulkEditLoaded}
+            <Editor
+              bind:value={bulkText}
+              on:change={handleBulkTextarea}
+              {enableKeyValueHighlighting}
+              class={`px-2 sparrow-fs-18 outline-none`}
+              placeholder={bulkEditPlaceholder}
+            />
+          {/if}
         </div>
         <!-- Bulk Edit TextArea end -->
       </div>
@@ -736,6 +743,8 @@
 </div>
 
 <style>
+
+
   .bulkEdit-btn-div {
     margin-right: 16px;
   }
