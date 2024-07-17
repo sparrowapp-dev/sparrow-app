@@ -252,7 +252,6 @@ export default class WorkspaceExplorerViewModel {
     if (exisitingUpdates && exisitingUpdates[0]?.updates?.length % 20 === 0) {
       const page = (parseInt(exisitingUpdates[0]?.pageNumber) + 1).toString();
       const response = await this.updatesService.getUpdates(workspaceId, page);
-      console.log("response", response);
       if (response.isSuccessful) {
         await this.updatesRepository.insertUpdates(
           response.data.data,
@@ -357,7 +356,6 @@ export default class WorkspaceExplorerViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      console.log("val", value);
       loggedInUserId = value._id;
     });
 
@@ -394,7 +392,6 @@ export default class WorkspaceExplorerViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      console.log("val", value);
       loggedInUserId = value._id;
     });
     const response = await this.workspaceService.changeUserRoleAtWorkspace(
