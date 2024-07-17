@@ -5,16 +5,15 @@
   import { onMount } from "svelte";
   import { GuestUserRepository } from "@app/repositories/guest-user.repository";
   const guestUserRepository = new GuestUserRepository();
-  let isGuestUser = false;
-  let isGuestUserSub;
+
   onMount(async () => {
     const token = getUserToken();
     if (token) {
       const userData = jwtDecode(token);
       setUser(userData);
     }
-    isGuestUserSub = await guestUserRepository.findOne({ name: "guestUser" });
-    isGuestUser = isGuestUserSub?.getLatest().toMutableJSON().isGuestUser;
+    const guestUser = await guestUserRepository.findOne({ name: "guestUser" });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
     if (isGuestUser) {
       isGuestUserActive.set(true);
     }
@@ -24,7 +23,6 @@
 
   user.subscribe((value) => {
     currentUser = value;
-    console.log(currentUser);
   });
 </script>
 

@@ -77,7 +77,6 @@ export class EnvironmentTabRepository {
    * updates existing environment.
    */
   public updateEnvironmentTab = async (uuid: string, data) => {
-    // debugger;
     const environment = await RxDB.getInstance()
       .rxdb.environmenttab.findOne({
         selector: {
