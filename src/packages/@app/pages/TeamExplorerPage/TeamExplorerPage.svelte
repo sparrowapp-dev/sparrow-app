@@ -5,20 +5,28 @@
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { user } from "$lib/store";
   import { Modal } from "@library/ui";
+  import { LeaveTeam } from "@teams/features";
+
   import { DeleteWorkspace } from "@common/features";
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
   const _viewModel = new TeamExplorerPageViewModel();
+
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
+  const OnleaveTeam = _viewModel.leaveTeam;
   let userId = "";
   user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
     }
   });
+  
   let isTeamInviteModalOpen = false;
+  let isLeaveTeamModelOpen = false;
+
+
   const handleDeleteWorkspace = (workspace: WorkspaceDocument) => {
     selectedWorkspace = workspace;
     isDeleteWorkspaceModalOpen = true;
@@ -28,6 +36,7 @@
 <TeamExplorer
   bind:userId
   bind:isTeamInviteModalOpen
+  bind:isLeaveTeamModelOpen
   openTeam={$activeTeam}
   workspaces={$workspaces}
   activeTeamTab={$activeTeamTab}
@@ -89,6 +98,27 @@
       if (response?.isSuccessful) {
         isDeleteWorkspaceModalOpen = false;
       }
+    }}
+  />
+</Modal>
+
+<Modal
+  title={"Leave Team?"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isLeaveTeamModelOpen}
+  handleModalState={(flag) => {
+    isLeaveTeamModelOpen = flag;
+  }}
+>
+  <LeaveTeam
+    {userId}
+    {OnleaveTeam}
+    bind:isLeaveTeamModelOpen
+    openTeam={$activeTeam}
+    handleModalState={(flag) => {
+      isLeaveTeamModelOpen = flag;
     }}
   />
 </Modal>

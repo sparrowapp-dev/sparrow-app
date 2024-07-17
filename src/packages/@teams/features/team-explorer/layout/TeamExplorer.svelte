@@ -17,7 +17,9 @@
   import { WorkspaceListView } from "../components";
   import WorkspaceGridView from "../components/workspace-grid-view/WorkspaceGridView.svelte";
   import { TeamMembers, TeamSettings } from "@teams/features";
-  import { CrossIcon } from "@library/icons";
+  import { CrossIcon, MoreOptions } from "@library/icons";
+  import { Tooltip, Dropdown } from "@library/ui";
+
   /**
    * user ID
    */
@@ -43,6 +45,8 @@
    * Invite team toggler
    */
   export let isTeamInviteModalOpen;
+
+  export let isLeaveTeamModelOpen;
 
   /**
    * Callback For creating workspace
@@ -150,6 +154,12 @@
 
   let searchQuery = "";
   let hasText = false;
+  let leaveButtonMenu: boolean = false;
+
+  const handleLeaveTeam = () => {
+    leaveButtonMenu = !leaveButtonMenu;
+    isLeaveTeamModelOpen = true;
+  };
 
   const handleSearchInput = (event) => {
     searchQuery = event.target.value.toLowerCase();
@@ -163,6 +173,13 @@
   onDestroy(() => {
     selectedViewSubscribe();
   });
+
+  const addButtonData = [
+    {
+      name: "Leave Team",
+      onclick: () => handleLeaveTeam(),
+    },
+  ];
 </script>
 
 {#if openTeam}
@@ -195,6 +212,35 @@
               style="font-size: 24px;"
               >{openTeam?.name || ""}
             </span>
+
+            <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
+            {#if userRole !== "owner"}
+              <div
+                class="ms-2 d-flex justify-content-center align-items-center mt-2 moreOption-icon rounded"
+                on:click={() => {
+                  leaveButtonMenu = !leaveButtonMenu;
+                }}
+              >
+                <Dropdown
+                  zIndex={600}
+                  buttonId="leaveButton"
+                  bind:isMenuOpen={leaveButtonMenu}
+                  options={addButtonData}
+                >
+                  <Tooltip
+                    title={"Leave Team"}
+                    placement={"bottom"}
+                    distance={12}
+                    show={!leaveButtonMenu}
+                    zIndex={10}
+                  >
+                    <div id="leaveButton">
+                      <MoreOptions height="15px" width="5px" color="White" />
+                    </div>
+                  </Tooltip>
+                </Dropdown>
+              </div>
+            {/if}
           </h2>
 
           <div class="d-flex align-items-end justify-content-end">
@@ -447,5 +493,13 @@
     transform: translateY(-50%);
     cursor: pointer;
     font-size: 16px;
+  }
+
+  .moreOption-icon {
+    height: 24px;
+    width: 24px;
+  }
+  .moreOption-icon:hover {
+    background-color: var(--bg-tertiary-190);
   }
 </style>

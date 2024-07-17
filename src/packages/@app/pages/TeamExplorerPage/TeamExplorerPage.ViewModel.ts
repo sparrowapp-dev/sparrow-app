@@ -432,12 +432,12 @@ export class TeamExplorerPageViewModel {
     let count = 0;
     for (let index = 0; index < res.length; index++) {
       let ownerId = res[index]._data.owner;
-    
+
       if (ownerId === userId) {
         count++;
       }
     }
-    
+
     if (count > 1) {
       const response = await this.teamService.promoteToOwnerAtTeam(
         _teamId,
@@ -458,7 +458,9 @@ export class TeamExplorerPageViewModel {
       }
       return response;
     } else {
-      notifications.error("You must be owner of at least one other team to transfer ownership");
+      notifications.error(
+        "You must be owner of at least one other team to transfer ownership",
+      );
       return;
     }
   };
@@ -585,5 +587,40 @@ export class TeamExplorerPageViewModel {
       delete response?._id;
       this.teamRepository.modifyTeam(_teamId, response.data.data);
     }
+  };
+
+  
+
+  /**
+   * Leaving a team 
+   * @param teamId - The ID of the team where the user is trying to left.
+   * @param _userId - The ID of the user who  is leaving the team.
+  
+   */
+  public leaveTeam = async (userId: string, teamId: string) => {
+    const response = await this.teamService.leaveTeam(teamId);
+
+    if (response.isSuccessful) {
+      setTimeout(async () => {
+        const activeTeam = await this.teamRepository.checkActiveTeam();
+        if (activeTeam) {
+          const teamIdToActivate =
+            await this.workspaceRepository.activateInitialWorkspace();
+          if (teamIdToActivate) {
+            await this.teamRepository.setActiveTeam(teamIdToActivate);
+          }
+        }
+        setTimeout(async () => {
+          await this.refreshTeams(userId);
+          await this.refreshWorkspaces(userId);
+          notifications.success("You left a team.");
+        }, 500);
+      }, 500);
+    } else {
+      notifications.error(
+        response.message ?? "Failed to leave the team. Please try again.",
+      );
+    }
+    return response;
   };
 }
