@@ -60,6 +60,7 @@
       onClick={() => {
         handleLeaveTeam(); // Execute the leave team function
       }}
+      loader={isLeavingTeam}
     />
   </div>
 </section>

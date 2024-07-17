@@ -618,31 +618,46 @@ export class TeamExplorerPageViewModel {
    * @param teamId - The ID of the team where the user is trying to left.
    * @param _userId - The ID of the user who  is leaving the team.
   
-   */
-  public leaveTeam = async (userId: string, teamId: string) => {
-    const response = await this.teamService.leaveTeam(teamId);
+**/
 
-    if (response.isSuccessful) {
-      setTimeout(async () => {
-        const activeTeam = await this.teamRepository.checkActiveTeam();
-        if (activeTeam) {
-          const teamIdToActivate =
-            await this.workspaceRepository.activateInitialWorkspace();
-          if (teamIdToActivate) {
-            await this.teamRepository.setActiveTeam(teamIdToActivate);
+  public leaveTeam = async (userId: string, teamId: string) => {
+    try {
+      const response = await this.teamService.leaveTeam(teamId);
+
+      if (!response.isSuccessful) {
+        notifications.error(
+          response.message ?? "Failed to leave the team. Please try again.",
+        );
+        return response;
+      }
+
+      await new Promise<void>((resolve) =>
+        setTimeout(async () => {
+          const activeTeam = await this.teamRepository.checkActiveTeam();
+          if (activeTeam) {
+            const teamIdToActivate =
+              await this.workspaceRepository.activateInitialWorkspace();
+            if (teamIdToActivate) {
+              await this.teamRepository.setActiveTeam(teamIdToActivate);
+            }
           }
-        }
+          resolve();
+        }, 500),
+      );
+
+      await new Promise<void>((resolve) =>
         setTimeout(async () => {
           await this.refreshTeams(userId);
           await this.refreshWorkspaces(userId);
           notifications.success("You left a team.");
-        }, 500);
-      }, 500);
-    } else {
-      notifications.error(
-        response.message ?? "Failed to leave the team. Please try again.",
+          resolve();
+        }, 500),
       );
+
+      return response;
+    } catch (error) {
+      notifications.error("An unexpected error occurred. Please try again.");
+      throw error;
     }
-    return response;
   };
 }
