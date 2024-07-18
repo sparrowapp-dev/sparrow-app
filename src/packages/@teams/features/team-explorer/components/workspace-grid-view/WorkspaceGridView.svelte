@@ -35,194 +35,123 @@
    */
   export let isAdminOrOwner: boolean;
 
+  /**
+   * Flag to check if user is guest user
+   */
+  export let isGuestUser = false;
+
   let workspacePerPage = 5;
   let currPage = 1;
 </script>
 
 <div class="h-100 pb-2">
   <div class="d-flex flex-column h-100">
-    <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
-      <div class="d-flex flex-wrap gap-5 justify-content-between row-gap-0">
-        {#if searchQuery !== "" && workspaces
+    {#if !isGuestUser}
+      <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
+        <div class="d-flex flex-wrap gap-5 justify-content-between row-gap-0">
+          {#if searchQuery !== "" && workspaces
+              .slice()
+              .reverse()
+              .filter((item) => item.name
+                  .toLowerCase()
+                  .includes(filterText.toLowerCase())).length == 0}
+            <span class="not-found-text mx-auto ellipsis"
+              >No results found.</span
+            >
+          {/if}
+          {#each workspaces
             .slice()
             .reverse()
-            .filter((item) => item.name
-                .toLowerCase()
-                .includes(filterText.toLowerCase())).length == 0}
-          <span class="not-found-text mx-auto ellipsis">No results found.</span>
-        {/if}
-        {#each workspaces
+            .filter((item) => typeof item.name === "string" && item.name
+                  .toLowerCase()
+                  .includes(filterText.toLowerCase()))
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
+            <WorkspaceGrid
+              {workspace}
+              {onSwitchWorkspace}
+              {isAdminOrOwner}
+              {onDeleteWorkspace}
+            />
+          {/each}
+          {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
+            <Button
+              title={`+ Add New Workspace`}
+              type="other"
+              buttonClassProp={`sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace`}
+              buttonStyleProp={"min-height: 132px;"}
+              onClick={onCreateNewWorkspace}
+            />
+            <!-- update later the above width -->
+          {/if}
+        </div>
+      </div>
+      {#if !workspaces || workspaces
           .slice()
           .reverse()
           .filter((item) => typeof item.name === "string" && item.name
                 .toLowerCase()
-                .includes(filterText.toLowerCase()))
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
-          <WorkspaceGrid
-            {workspace}
-            {onSwitchWorkspace}
-            {isAdminOrOwner}
-            {onDeleteWorkspace}
-          />
-        {/each}
-        {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
-          <Button
-            title={`+ Add New Workspace`}
-            type="other"
-            buttonClassProp={`sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace`}
-            buttonStyleProp={"min-height: 132px;"}
-            onClick={onCreateNewWorkspace}
-          />
-          <!-- update later the above width -->
-        {/if}
-      </div>
-    </div>
-    {#if !workspaces || workspaces
-        .slice()
-        .reverse()
-        .filter((item) => typeof item.name === "string" && item.name
-              .toLowerCase()
-              .includes(filterText.toLowerCase())).length > 0}
-      <div class="justify-content-between bottom-0 w-75 d-flex">
-        <div class="tab-head">
-          Showing {(currPage - 1) * workspacePerPage + (currPage == 1 ? 1 : 0)} -
-          {Math.min(
-            currPage * workspacePerPage - (currPage > 1 ? 1 : 0),
-            workspaces
-              .slice()
-              .reverse()
-              ?.filter(
-                (item) =>
-                  typeof item.name === "string" &&
-                  item.name.toLowerCase().startsWith(filterText.toLowerCase()),
-              ).length,
-          )} of {workspaces
-            .slice()
-            .reverse()
-            ?.filter(
-              (item) =>
-                typeof item.name === "string" &&
-                item.name?.toLowerCase().startsWith(filterText.toLowerCase()),
-            ).length}
-        </div>
-        <div class="tab-head tab-change">
-          <button
-            on:click={() => (
-              (currPage = 1),
-              (workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5)
-            )}
-            class="bg-transparent border-0"
-            ><DoubleLeftIcon
-              color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
-            /></button
-          >
-          <button
-            on:click={() => {
-              if (currPage > 1) currPage -= 1;
-              workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5;
-            }}
-            class="bg-transparent border-0"
-            ><LeftIcon
-              color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
-            /></button
-          >
-          <button
-            disabled={workspaces
+                .includes(filterText.toLowerCase())).length > 0}
+        <div class="justify-content-between bottom-0 w-75 d-flex">
+          <div class="tab-head">
+            Showing {(currPage - 1) * workspacePerPage +
+              (currPage == 1 ? 1 : 0)} -
+            {Math.min(
+              currPage * workspacePerPage - (currPage > 1 ? 1 : 0),
+              workspaces
+                .slice()
+                .reverse()
+                ?.filter(
+                  (item) =>
+                    typeof item.name === "string" &&
+                    item.name
+                      .toLowerCase()
+                      .startsWith(filterText.toLowerCase()),
+                ).length,
+            )} of {workspaces
               .slice()
               .reverse()
               ?.filter(
                 (item) =>
                   typeof item.name === "string" &&
                   item.name?.toLowerCase().startsWith(filterText.toLowerCase()),
-              ).length %
-              6 ===
-              0 &&
-            currPage ===
-              Math.ceil(
-                workspaces
-                  .slice()
-                  .reverse()
-                  ?.filter(
-                    (item) =>
-                      typeof item.name === "string" &&
-                      item.name
-                        .toLowerCase()
-                        .startsWith(filterText.toLowerCase()),
-                  ).length / workspacePerPage,
-              )
-              ? true
-              : false}
-            on:click={() => {
-              if (
-                currPage <
-                Math.ceil(
-                  workspaces
-                    .slice()
-                    .reverse()
-                    ?.filter(
-                      (item) =>
-                        typeof item.name === "string" &&
-                        item.name
-                          .toLowerCase()
-                          .startsWith(filterText.toLowerCase()),
-                    ).length / workspacePerPage,
-                )
-              )
-                currPage += 1;
-              workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5;
-            }}
-            class="bg-transparent border-0"
-            ><RightIcon
-              color={currPage ===
-              Math.ceil(
-                workspaces
-                  .slice()
-                  .reverse()
-                  ?.filter(
-                    (item) =>
-                      typeof item.name === "string" &&
-                      item.name
-                        .toLowerCase()
-                        .startsWith(filterText.toLowerCase()),
-                  ).length / workspacePerPage,
-              )
-                ? "var(--border-secondary-200)"
-                : "white"}
-            /></button
-          >
-          <button
-            on:click={() => {
-              currPage = Math.ceil(
-                workspaces
-                  .slice()
-                  .reverse()
-                  ?.filter(
-                    (item) =>
-                      typeof item.name === "string" &&
-                      item.name
-                        .toLowerCase()
-                        .startsWith(filterText.toLowerCase()),
-                  ).length / workspacePerPage,
-              );
-              if (
-                workspaces
-                  .slice()
-                  .reverse()
-                  ?.filter(
-                    (item) =>
-                      typeof item.name === "string" &&
-                      item.name
-                        ?.toLowerCase()
-                        .startsWith(filterText.toLowerCase()),
-                  ).length %
-                  6 !==
-                0
-              ) {
+              ).length}
+          </div>
+          <div class="tab-head tab-change">
+            <button
+              on:click={() => (
+                (currPage = 1),
+                (workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5)
+              )}
+              class="bg-transparent border-0"
+              ><DoubleLeftIcon
+                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
+              /></button
+            >
+            <button
+              on:click={() => {
+                if (currPage > 1) currPage -= 1;
                 workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5;
-              }
-              if (
-                currPage - 1 ===
+              }}
+              class="bg-transparent border-0"
+              ><LeftIcon
+                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
+              /></button
+            >
+            <button
+              disabled={workspaces
+                .slice()
+                .reverse()
+                ?.filter(
+                  (item) =>
+                    typeof item.name === "string" &&
+                    item.name
+                      ?.toLowerCase()
+                      .startsWith(filterText.toLowerCase()),
+                ).length %
+                6 ===
+                0 &&
+              currPage ===
                 Math.ceil(
                   workspaces
                     .slice()
@@ -235,32 +164,117 @@
                           .startsWith(filterText.toLowerCase()),
                     ).length / workspacePerPage,
                 )
-              ) {
-                currPage -= 1;
-              }
-            }}
-            class="bg-transparent border-0"
-            ><DoubleRightIcon
-              color={currPage ===
-              Math.ceil(
-                workspaces
-                  .slice()
-                  .reverse()
-                  ?.filter(
-                    (item) =>
-                      typeof item.name === "string" &&
-                      item.name
-                        .toLowerCase()
-                        .startsWith(filterText.toLowerCase()),
-                  ).length / workspacePerPage,
-              )
-                ? "var(--border-secondary-200)"
-                : "white"}
-            /></button
-          >
+                ? true
+                : false}
+              on:click={() => {
+                if (
+                  currPage <
+                  Math.ceil(
+                    workspaces
+                      .slice()
+                      .reverse()
+                      ?.filter(
+                        (item) =>
+                          typeof item.name === "string" &&
+                          item.name
+                            .toLowerCase()
+                            .startsWith(filterText.toLowerCase()),
+                      ).length / workspacePerPage,
+                  )
+                )
+                  currPage += 1;
+                workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5;
+              }}
+              class="bg-transparent border-0"
+              ><RightIcon
+                color={currPage ===
+                Math.ceil(
+                  workspaces
+                    .slice()
+                    .reverse()
+                    ?.filter(
+                      (item) =>
+                        typeof item.name === "string" &&
+                        item.name
+                          .toLowerCase()
+                          .startsWith(filterText.toLowerCase()),
+                    ).length / workspacePerPage,
+                )
+                  ? "var(--border-secondary-200)"
+                  : "white"}
+              /></button
+            >
+            <button
+              on:click={() => {
+                currPage = Math.ceil(
+                  workspaces
+                    .slice()
+                    .reverse()
+                    ?.filter(
+                      (item) =>
+                        typeof item.name === "string" &&
+                        item.name
+                          .toLowerCase()
+                          .startsWith(filterText.toLowerCase()),
+                    ).length / workspacePerPage,
+                );
+                if (
+                  workspaces
+                    .slice()
+                    .reverse()
+                    ?.filter(
+                      (item) =>
+                        typeof item.name === "string" &&
+                        item.name
+                          ?.toLowerCase()
+                          .startsWith(filterText.toLowerCase()),
+                    ).length %
+                    6 !==
+                  0
+                ) {
+                  workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5;
+                }
+                if (
+                  currPage - 1 ===
+                  Math.ceil(
+                    workspaces
+                      .slice()
+                      .reverse()
+                      ?.filter(
+                        (item) =>
+                          typeof item.name === "string" &&
+                          item.name
+                            .toLowerCase()
+                            .startsWith(filterText.toLowerCase()),
+                      ).length / workspacePerPage,
+                  )
+                ) {
+                  currPage -= 1;
+                }
+              }}
+              class="bg-transparent border-0"
+              ><DoubleRightIcon
+                color={currPage ===
+                Math.ceil(
+                  workspaces
+                    .slice()
+                    .reverse()
+                    ?.filter(
+                      (item) =>
+                        typeof item.name === "string" &&
+                        item.name
+                          .toLowerCase()
+                          .startsWith(filterText.toLowerCase()),
+                    ).length / workspacePerPage,
+                )
+                  ? "var(--border-secondary-200)"
+                  : "white"}
+              /></button
+            >
+          </div>
+          <div></div>
         </div>
-        <div></div>
-      </div>
+      {/if}
     {/if}
   </div>
 </div>

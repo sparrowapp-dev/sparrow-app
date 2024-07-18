@@ -22,6 +22,7 @@
   export let githubRepo;
   export let setOpenTeam;
   export let OnWorkspaceSwitch;
+  export let isGuestUser = false;
 
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
@@ -93,6 +94,7 @@
                 on:click={() => {
                   isCreateTeamModalOpen = true;
                 }}
+                disabled={isGuestUser}
               >
                 <img src={plus} alt="" />
               </button>
@@ -147,15 +149,16 @@
       </section>
 
       <!-- Recent APIs-->
+      {#if !isGuestUser}
+        <section class="d-flex flex-column" style="max-height:33%;">
+          <RecentApi {tabList} {data} {collectionList} {onApiClick} />
+        </section>
 
-      <section class="d-flex flex-column" style="max-height:33%;">
-        <RecentApi {tabList} {data} {collectionList} {onApiClick} />
-      </section>
-
-      <!-- Recent Workspace Section -->
-      <section class="d-flex flex-column" style="max-height:33%;">
-        <RecentWorkspace {data} {openTeam} {OnWorkspaceSwitch} />
-      </section>
+        <!-- Recent Workspace Section -->
+        <section class="d-flex flex-column" style="max-height:33%;">
+          <RecentWorkspace {data} {openTeam} {OnWorkspaceSwitch} />
+        </section>
+      {/if}
     </div>
 
     <!-- github repo section -->
