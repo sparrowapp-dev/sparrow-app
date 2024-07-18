@@ -126,4 +126,12 @@
     height: 100%;
     margin-right: 1%;
   }
+
+  :global(.key-highlight) {
+    color: var(--text-primary-150);
+  }
+
+  :global(.value-highlight) {
+    color: var(--white-color);
+  }
 </style>
