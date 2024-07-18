@@ -136,8 +136,6 @@ export default class CollectionsViewModel {
             return collection;
           }),
         );
-      } else {
-        notifications.error("Failed to fetch collections!");
       }
     }
   };

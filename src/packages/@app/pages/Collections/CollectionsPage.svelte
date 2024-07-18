@@ -190,7 +190,7 @@
   currentWorkspace.subscribe((value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
-        _viewModel.fetchCollections($currentWorkspace?._id);
+        _viewModel.fetchCollections(value?._id);
       }
       prevWorkspaceId = value._id;
       if (count == 0) {
