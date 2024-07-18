@@ -90,6 +90,11 @@
    */
   export let onUpdateTeam;
 
+  /**
+   * Flag to check if user is guest user
+   */
+  export let isGuestUser = false;
+
   let selectedView: string = "Grid";
 
   const selectedViewSubscribe = workspaceView.subscribe((value) => {
@@ -110,23 +115,23 @@
       {
         name: "Workspaces",
         id: TeamTabsEnum.WORKSPACES,
-        count: openTeam.workspaces?.length,
+        count: openTeam?.workspaces?.length,
         visible: true,
-        disabled: false,
+        disabled: isGuestUser === true ? true : false,
       },
       {
         name: "Members",
         id: TeamTabsEnum.MEMBERS,
-        count: openTeam.users?.length,
+        count: openTeam?.users?.length,
         visible: true,
-        disabled: false,
+        disabled: isGuestUser === true ? true : false,
       },
       {
         name: "Settings",
         id: TeamTabsEnum.SETTINGS,
         count: 0,
         visible: openTeam?.owner === userId,
-        disabled: false,
+        disabled: isGuestUser === true ? true : false,
       },
     ];
   };
@@ -180,6 +185,11 @@
       onclick: () => handleLeaveTeam(),
     },
   ];
+  $: {
+    if (isGuestUser) {
+      teamTabs = refreshTabs();
+    }
+  }
 </script>
 
 {#if openTeam}
@@ -214,37 +224,39 @@
             </span>
 
             <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
-            {#if userRole !== "owner"}
-              <div
-                class="ms-2 d-flex justify-content-center align-items-center mt-2 moreOption-icon rounded"
-                on:click={() => {
-                  leaveButtonMenu = !leaveButtonMenu;
-                }}
-              >
-                <Dropdown
-                  zIndex={600}
-                  buttonId="leaveButton"
-                  bind:isMenuOpen={leaveButtonMenu}
-                  options={addButtonData}
+            {#if !isGuestUser}
+              {#if userRole !== "owner"}
+                <div
+                  class="ms-2 d-flex justify-content-center align-items-center mt-2 moreOption-icon rounded"
+                  on:click={() => {
+                    leaveButtonMenu = !leaveButtonMenu;
+                  }}
                 >
-                  <Tooltip
-                    title={"Leave Team"}
-                    placement={"bottom"}
-                    distance={12}
-                    show={!leaveButtonMenu}
-                    zIndex={10}
+                  <Dropdown
+                    zIndex={600}
+                    buttonId="leaveButton"
+                    bind:isMenuOpen={leaveButtonMenu}
+                    options={addButtonData}
                   >
-                    <div id="leaveButton">
-                      <MoreOptions height="15px" width="5px" color="White" />
-                    </div>
-                  </Tooltip>
-                </Dropdown>
-              </div>
+                    <Tooltip
+                      title={"Leave Team"}
+                      placement={"bottom"}
+                      distance={12}
+                      show={!leaveButtonMenu}
+                      zIndex={10}
+                    >
+                      <div id="leaveButton">
+                        <MoreOptions height="15px" width="5px" color="White" />
+                      </div>
+                    </Tooltip>
+                  </Dropdown>
+                </div>
+              {/if}
             {/if}
           </h2>
 
           <div class="d-flex align-items-end justify-content-end">
-            {#if openTeam?.users?.length > 1}
+            {#if openTeam?.users?.length > 1 && !isGuestUser}
               <p class="d-flex my-auto ms-4 sparrow-fs-12">
                 <PeopleIcon
                   color={"var(--sparrow-text-color)"}
@@ -263,6 +275,7 @@
                 }}
                 buttonClassProp={`my-auto px-3 pt-1 ms-4`}
                 buttonStyleProp={`height: 30px;`}
+                disable={isGuestUser}
               />
               <Button
                 title={`New Workspace`}
@@ -272,6 +285,7 @@
                 buttonClassProp={`my-auto ms-4`}
                 buttonStyleProp={`height: 30px;`}
                 onClick={handleCreateNewWorkspace}
+                disable={isGuestUser}
               />
             {/if}
           </div>
@@ -324,7 +338,7 @@
       >
         {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
           <div class="h-100 d-flex flex-column">
-            {#if openTeam && openTeam?.workspaces?.length > 0}
+            {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
               <div class="pt-2">
                 <div
                   class={`d-flex search-input-container rounded py-2 px-2 mb-4`}
@@ -358,6 +372,7 @@
             <div style="flex:1; overflow:auto;">
               {#if selectedView === TeamViewEnum.LIST}
                 <WorkspaceListView
+                  bind:isGuestUser
                   {searchQuery}
                   {openTeam}
                   data={workspaces.filter((elem) => {
@@ -373,6 +388,7 @@
                 />
               {:else if selectedView == TeamViewEnum.GRID}
                 <WorkspaceGridView
+                  bind:isGuestUser
                   {onDeleteWorkspace}
                   {searchQuery}
                   workspaces={workspaces.filter((elem) => {

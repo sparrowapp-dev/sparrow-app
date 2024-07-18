@@ -12,6 +12,7 @@ import { GithubService } from "@app/services/github.service";
 import { moveNavigation } from "$lib/utils/helpers";
 import { navigate } from "svelte-navigator";
 import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
+import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 export class TeamsViewModel {
   constructor() {}
   private teamRepository = new TeamRepository();
@@ -20,6 +21,7 @@ export class TeamsViewModel {
   private teamService = new TeamService();
   private githhubRepoRepository = new GithubRepoReposistory();
   private githubService = new GithubService();
+  private guestUserRepository = new GuestUserRepository();
 
   private collectionRepository = new CollectionRepository();
 
@@ -38,8 +40,6 @@ export class TeamsViewModel {
     const tabs = this.tabRepository.getTabList();
     return tabs;
   }
-
-
 
   /**
    * @description - get open team from local db
@@ -144,21 +144,20 @@ export class TeamsViewModel {
     navigate("/dashboard/collections");
   };
 
- /**
+  /**
    * Switch from one team to another
    * @param id - team id
    */
- public setOpenTeam = async (id: string) => {
-  await this.teamRepository.setOpenTeam(id);
-};
-
+  public setOpenTeam = async (id: string) => {
+    await this.teamRepository.setOpenTeam(id);
+  };
 
   /**
    * Switch to latest tab on Api Click
    * @param id - Api id
    */
   public handleApiClick = (api: any): void => {
-   this.tabRepository.activeTab(api.id)
+    this.tabRepository.activeTab(api.id);
     moveNavigation("right");
     navigate("/dashboard/collections");
   };
@@ -203,5 +202,17 @@ export class TeamsViewModel {
       }
       return response.data;
     }
+  };
+
+  /**
+   * Fetch guest user state
+   * @returns boolean for is user guest user or not
+   */
+  public getGuestUser = async () => {
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    return isGuestUser;
   };
 }

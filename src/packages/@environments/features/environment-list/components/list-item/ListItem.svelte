@@ -7,6 +7,7 @@
   import Button from "@library/ui/button/Button.svelte";
   import { Options } from "@library/ui";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { WorkspaceRole } from "$lib/utils/enums";
 
   /**
    * current workspace to identify the selected environment
@@ -39,6 +40,11 @@
    * selects the environment
    */
   export let onSelectEnvironment;
+
+  /**
+   * Role of user in workspace
+   */
+  export let loggedUserRoleInWorkspace;
 
   let showMenu: boolean = false;
   let isEnvironmentPopup: boolean = false;
@@ -286,6 +292,8 @@
           on:click={(e) => {
             rightClickContextMenu(e);
           }}
+          disabled={loggedUserRoleInWorkspace ===
+            WorkspaceRole.WORKSPACE_VIEWER}
         >
           <img src={threedotIcon} alt="threedotIcon" />
         </button>

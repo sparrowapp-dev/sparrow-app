@@ -1,6 +1,10 @@
 <script lang="ts">
   // Document
-  import type { CollectionDocument, TabDocument } from "@app/database/database";
+  import type {
+    CollectionDocument,
+    TabDocument,
+    WorkspaceDocument,
+  } from "@app/database/database";
   import { onMount } from "svelte";
 
   // ---- View Model
@@ -9,6 +13,7 @@
   // Component
   import { FolderExplorer } from "@workspaces/features";
   import type { Folder } from "@common/types/workspace";
+  import { user } from "$lib/store";
 
   /**
    * folder tab document
@@ -17,6 +22,9 @@
 
   // ViewModel initialization
   const _viewModel = new FolderExplorerPage();
+
+  let userId = "";
+  let userRole = "";
 
   // Local variables
   let collection: CollectionDocument;
@@ -31,9 +39,32 @@
     });
     userRoleInWorkspace = await _viewModel.getUserRoleInWorspace();
   });
+
+  user.subscribe((value) => {
+    if (value) {
+      userId = value._id;
+    }
+  });
+  /**
+   * Find the role of user in active workspace
+   */
+  const findUserRole = async () => {
+    const workspace: WorkspaceDocument = await _viewModel.getWorkspaceById(
+      tab.path.workspaceId,
+    );
+    workspace.users?.forEach((value) => {
+      if (value.id === userId) {
+        userRole = value.role;
+      }
+    });
+  };
+  onMount(() => {
+    findUserRole();
+  });
 </script>
 
 <FolderExplorer
+  bind:userRole
   bind:tab
   bind:folder
   bind:collection

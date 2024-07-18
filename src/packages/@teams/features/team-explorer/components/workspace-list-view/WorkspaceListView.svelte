@@ -23,6 +23,8 @@
    */
   export let isAdminOrOwner: boolean;
 
+  export let isGuestUser = false;
+
   let filterText = "";
 
   let workspacePerPage: number = 10,
@@ -49,39 +51,43 @@
       contributorsCount={openTeam?.users?.length}
       headerObject={tableHeaderContent}
     >
-      <tbody class="overflow-y-auto position-relative z-0">
-        {#if data}
-          {#each data
-            .slice()
-            .reverse()
-            .filter((item) => item.name
-                .toLowerCase()
-                .startsWith(filterText.toLowerCase()))
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
-            <Rows
-              {list}
-              activeTeam={openTeam}
-              onOpenCollection={onSwitchWorkspace}
-              {calculateTimeDifferenceInDays}
-              {isAdminOrOwner}
-              {onDeleteWorkspace}
-            />
-          {/each}
-        {/if}
-      </tbody>
+      {#if !isGuestUser}
+        <tbody class="overflow-y-auto position-relative z-0">
+          {#if data}
+            {#each data
+              .slice()
+              .reverse()
+              .filter((item) => item.name
+                  .toLowerCase()
+                  .startsWith(filterText.toLowerCase()))
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
+              <Rows
+                {list}
+                activeTeam={openTeam}
+                onOpenCollection={onSwitchWorkspace}
+                {calculateTimeDifferenceInDays}
+                {isAdminOrOwner}
+                {onDeleteWorkspace}
+              />
+            {/each}
+          {/if}
+        </tbody>
+      {/if}
     </Table>
 
-    {#if searchQuery == "" && data && data?.length === 0}
-      <p class="not-found-text mt-3">Add Workspaces to this team</p>
-    {:else if searchQuery !== "" && data
-        .slice()
-        .reverse()
-        .filter((item) => item.name
-            .toLowerCase()
-            .startsWith(filterText.toLowerCase()))
-        .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length == 0}
-      <p class="not-found-text mt-3">No results found.</p>
+    {#if !isGuestUser}
+      {#if searchQuery == "" && data && data?.length === 0}
+        <p class="not-found-text mt-3">Add Workspaces to this team</p>
+      {:else if searchQuery !== "" && data
+          .slice()
+          .reverse()
+          .filter((item) => item.name
+              .toLowerCase()
+              .startsWith(filterText.toLowerCase()))
+          .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length == 0}
+        <p class="not-found-text mt-3">No results found.</p>
+      {/if}
     {/if}
   </div>
 
@@ -91,7 +97,7 @@
     .filter((item) => item.name
         .toLowerCase()
         .startsWith(filterText.toLowerCase()))
-    .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0}
+    .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0 && !isGuestUser}
     <table class="w-75 bottom-0">
       <tfoot>
         <tr class="d-flex justify-content-between">

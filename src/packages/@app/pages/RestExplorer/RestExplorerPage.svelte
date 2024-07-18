@@ -6,7 +6,7 @@
   import RestExplorerViewModel from "./RestExplorerPage.ViewModel";
   import { RestExplorer } from "@workspaces/features";
   import { Debounce } from "@common/utils";
-  import { isGuestUserActive } from "$lib/store";
+  import { isGuestUserActive, user } from "$lib/store";
   import { onMount } from "svelte";
   export let tab;
   let isLoginBannerActive = false;
@@ -14,9 +14,17 @@
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
   let isGuestUser = false;
+  let userId = "";
+  let userRole = "";
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
+  });
+
+  user.subscribe((value) => {
+    if (value) {
+      userId = value._id;
+    }
   });
 
   const renameWithCollectionList = new Debounce().debounce(
@@ -24,12 +32,26 @@
     1000,
   );
   let prevTabName = "";
+  /**
+   * Find the role of user in active workspace
+   */
+  const findUserRole = async () => {
+    const workspace: WorkspaceDocument = await _viewModel.getWorkspaceById(
+      tab.path.workspaceId,
+    );
+    workspace.users?.forEach((value) => {
+      if (value.id === userId) {
+        userRole = value.role;
+      }
+    });
+  };
   $: {
     if (tab) {
       if (tab?.name && prevTabName !== tab.name) {
         renameWithCollectionList(tab.name);
       }
       prevTabName = tab.name;
+      findUserRole();
     }
   }
 
@@ -112,6 +134,7 @@
   bind:tab={_viewModel.tab}
   bind:requestAuthHeader={_viewModel.authHeader}
   bind:requestAuthParameter={_viewModel.authParameter}
+  bind:userRole
   {environmentVariables}
   {isGuestUser}
   {isLoginBannerActive}
