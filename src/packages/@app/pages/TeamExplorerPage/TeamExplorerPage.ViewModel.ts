@@ -7,6 +7,7 @@ import { TabRepository } from "@app/repositories/tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { TeamService } from "@app/services/team.service";
+import { UserService } from "@app/services/user.service";
 import { WorkspaceService } from "@app/services/workspace.service";
 import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
 import { notifications } from "@library/ui/toast/Toast";
@@ -22,6 +23,7 @@ export class TeamExplorerPageViewModel {
   private workspaceService = new WorkspaceService();
   private teamService = new TeamService();
   private guestUserRepository = new GuestUserRepository();
+  private userService = new UserService();
 
   private _activeTeamTab: BehaviorSubject<string> = new BehaviorSubject(
     "Workspaces",
@@ -622,40 +624,39 @@ export class TeamExplorerPageViewModel {
 **/
 
   public leaveTeam = async (userId: string, teamId: string) => {
-      const response = await this.teamService.leaveTeam(teamId);
+    const response = await this.teamService.leaveTeam(teamId);
 
-      if (!response.isSuccessful) {
-        notifications.error(
-          response.message ?? "Failed to leave the team. Please try again.",
-        );
-        return response;
-      }
-
-      await new Promise<void>((resolve) =>
-        setTimeout(async () => {
-          const activeTeam = await this.teamRepository.checkActiveTeam();
-          if (activeTeam) {
-            const teamIdToActivate =
-              await this.workspaceRepository.activateInitialWorkspace();
-            if (teamIdToActivate) {
-              await this.teamRepository.setActiveTeam(teamIdToActivate);
-            }
-          }
-          resolve();
-        }, 500),
+    if (!response.isSuccessful) {
+      notifications.error(
+        response.message ?? "Failed to leave the team. Please try again.",
       );
-
-      await new Promise<void>((resolve) =>
-        setTimeout(async () => {
-          await this.refreshTeams(userId);
-          await this.refreshWorkspaces(userId);
-          notifications.success("You left a team.");
-          resolve();
-        }, 500),
-      );
-
       return response;
-    
+    }
+
+    await new Promise<void>((resolve) =>
+      setTimeout(async () => {
+        const activeTeam = await this.teamRepository.checkActiveTeam();
+        if (activeTeam) {
+          const teamIdToActivate =
+            await this.workspaceRepository.activateInitialWorkspace();
+          if (teamIdToActivate) {
+            await this.teamRepository.setActiveTeam(teamIdToActivate);
+          }
+        }
+        resolve();
+      }, 500),
+    );
+
+    await new Promise<void>((resolve) =>
+      setTimeout(async () => {
+        await this.refreshTeams(userId);
+        await this.refreshWorkspaces(userId);
+        notifications.success("You left a team.");
+        resolve();
+      }, 500),
+    );
+
+    return response;
   };
 
   /**
@@ -668,5 +669,22 @@ export class TeamExplorerPageViewModel {
     });
     const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
     return isGuestUser;
+  };
+
+  /**
+   * Validates the user email by making a GET request to the server.
+   *
+   * @param  email - The email address to be validated.
+   * @returns A promise that resolves to the server's response.
+   */
+  public validateUserEmail = async (email: string) => {
+    const response = await this.userService.validateUserEmail(email);
+    if (response.isSuccessful) {
+      if (response?.data?.data?.registeredWith === "unknown") {
+        return false;
+      }
+      return true;
+    }
+    return false;
   };
 }

@@ -75,6 +75,7 @@
     teamLogo={$activeTeam?.logo}
     onInviteClick={_viewModel.handleTeamInvite}
     teamName={$activeTeam?.name}
+    users={$activeTeam?.users}
     teamId={$activeTeam?.teamId}
     workspaces={$workspaces.filter((elem) => {
       return elem?.team?.teamId === $activeTeam?.teamId;
@@ -82,6 +83,7 @@
     handleModalState={(flag) => {
       isTeamInviteModalOpen = flag;
     }}
+    onValidateEmail={_viewModel.validateUserEmail}
   />
 </Modal>
 

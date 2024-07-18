@@ -15,4 +15,21 @@ export class UserService {
     );
     return response;
   };
+
+  /**
+   * Validates the user email by making a GET request to the server.
+   *
+   * @param email - The email address to be validated.
+   * @return A promise that resolves to the server's response.
+   */
+  public validateUserEmail = async (email: string) => {
+    const response: MakeRequestResponse = await makeRequest(
+      "GET",
+      `${apiUrl}/api/user/email/${email}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }
