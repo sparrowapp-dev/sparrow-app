@@ -115,14 +115,14 @@
       {
         name: "Workspaces",
         id: TeamTabsEnum.WORKSPACES,
-        count: openTeam.workspaces?.length,
+        count: openTeam?.workspaces?.length,
         visible: true,
         disabled: isGuestUser === true ? true : false,
       },
       {
         name: "Members",
         id: TeamTabsEnum.MEMBERS,
-        count: openTeam.users?.length,
+        count: openTeam?.users?.length,
         visible: true,
         disabled: isGuestUser === true ? true : false,
       },
@@ -185,6 +185,11 @@
       onclick: () => handleLeaveTeam(),
     },
   ];
+  $: {
+    if (isGuestUser) {
+      teamTabs = refreshTabs();
+    }
+  }
 </script>
 
 {#if openTeam}
