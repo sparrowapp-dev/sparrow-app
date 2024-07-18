@@ -356,7 +356,7 @@ export default class WorkspaceExplorerViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      loggedInUserId = value._id;
+      loggedInUserId = value?._id;
     });
 
     const response = await this.workspaceService.removeUserFromWorkspace(
@@ -392,7 +392,7 @@ export default class WorkspaceExplorerViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      loggedInUserId = value._id;
+      loggedInUserId = value?._id;
     });
     const response = await this.workspaceService.changeUserRoleAtWorkspace(
       _workspaceId,

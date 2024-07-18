@@ -343,7 +343,7 @@ export class TeamExplorerPageViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      loggedInUserId = value._id;
+      loggedInUserId = value?._id;
     });
     const response = await this.teamService.removeMembersAtTeam(
       _teamId,
@@ -375,7 +375,7 @@ export class TeamExplorerPageViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      loggedInUserId = value._id;
+      loggedInUserId = value?._id;
     });
     const response = await this.teamService.demoteToMemberAtTeam(
       _teamId,
@@ -409,7 +409,7 @@ export class TeamExplorerPageViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      loggedInUserId = value._id;
+      loggedInUserId = value?._id;
     });
     const response = await this.teamService.promoteToAdminAtTeam(
       _teamId,
@@ -498,7 +498,7 @@ export class TeamExplorerPageViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      loggedInUserId = value._id;
+      loggedInUserId = value?._id;
     });
     const response = await this.workspaceService.removeUserFromWorkspace(
       _workspaceId,
@@ -531,7 +531,7 @@ export class TeamExplorerPageViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      loggedInUserId = value._id;
+      loggedInUserId = value?._id;
     });
     const response = await this.workspaceService.changeUserRoleAtWorkspace(
       _workspaceId,
