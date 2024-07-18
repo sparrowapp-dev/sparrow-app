@@ -103,14 +103,14 @@
     </section>
     <section slot="guestUser">
       <Route path="/guest/*" component={Dashboard} />
-      <Route path="/*"><Navigate to="/guest" /></Route>
+      <Route path="/*"><Navigate to="/guest/" /></Route>
     </section>
     <section slot="unauthorized">
       {#if 1}
         <Route path="/init" component={EntryPoint} />
         <Route path="/init/*" component={Dashboard} />
         <Route path="/*"><Navigate to="/init" /></Route>
-    {:else}
+      {:else}
         <Route path="/login" component={LoginPage} />
         <Route path="/register" component={RegisterPage} />
         <Route path="/*"><Navigate to="/login" /></Route>

@@ -1,6 +1,10 @@
+import { EnvironmentTabRepository } from "@app/repositories/environment-tab.repository";
+import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
+import { GuideRepository } from "@app/repositories/guide.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
+import { InitTab } from "@common/factory";
 import { v4 as uuidv4 } from "uuid";
 
 export class AuthViewModel {
@@ -8,6 +12,10 @@ export class AuthViewModel {
   private guestUserRepository = new GuestUserRepository();
   private teamRepository = new TeamRepository();
   private workspaceRepository = new WorkspaceRepository();
+  private environmentRepository = new EnvironmentRepository();
+  private environmentTabRepository = new EnvironmentTabRepository();
+  private initTab = new InitTab();
+  private guideRepository = new GuideRepository();
 
   /**
    * Insert the guestr user in local DB
@@ -71,5 +79,41 @@ export class AuthViewModel {
       collections: [],
     };
     await this.workspaceRepository.addWorkspace(dummyWorkspace);
+    const environmentId = uuidv4();
+    const newEnvironment = {
+      id: environmentId,
+      name: "Global Variables",
+      variable: [
+        {
+          key: "",
+          value: "",
+          checked: true,
+        },
+      ],
+      isActive: false,
+      type: "GLOBAL",
+      workspaceId: workspaceId,
+      createdAt: new Date().toISOString(),
+      createdBy: "username",
+      updatedBy: "username",
+      updatedAt: "2024-07-16T11:12:55.920Z",
+    };
+
+    this.environmentRepository.addEnvironment(newEnvironment);
+
+    const initEnvironmentTab = this.initTab.environment(
+      environmentId,
+      workspaceId,
+    );
+    initEnvironmentTab
+      .setName("Global Variables")
+      .setType("GLOBAL")
+      .setIsActive(true);
+    this.environmentTabRepository.createTab(
+      initEnvironmentTab.getValue(),
+      workspaceId,
+    );
+    this.guideRepository.insert({ isActive: true, id: "environment-guide" });
+    this.guideRepository.insert({ isActive: true, id: "collection-guide" });
   };
 }

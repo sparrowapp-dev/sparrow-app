@@ -46,30 +46,30 @@
 
   let sidebarItems: SidebarItemObj[] = [
     {
-      route: "/app/home",
+      route: !isGuestUser ? "/app/home" : "/guest/home",
       heading: "Home",
       defaultLogo: home,
       hoveredLogo: hoveredHome,
       selectedLogo: selectedHome,
-      disabled: isGuestUser ?? false,
+      disabled: false,
       position: "primary",
     },
     {
-      route: "/app/collections",
+      route: !isGuestUser ? "/app/collections" : "/guest/collections",
       heading: "Collections",
       defaultLogo: collections,
       hoveredLogo: hoveredCollections,
       selectedLogo: selectedCollections,
-      disabled: isGuestUser ?? false,
+      disabled: false,
       position: "primary",
     },
     {
-      route: "/app/environment",
+      route: !isGuestUser ? "/app/environment" : "/guest/environment",
       heading: "Environment",
       defaultLogo: environment,
       hoveredLogo: hoveredEnvironment,
       selectedLogo: selectedEnvironment,
-      disabled: isGuestUser ?? false,
+      disabled: false,
       position: "primary",
     },
     {
@@ -100,6 +100,7 @@
       position: "secondary",
     },
   ];
+
   let sidebarModalItem: SidebarProfileObj = {
     heading: "Profile",
     defaultLogo: profile,

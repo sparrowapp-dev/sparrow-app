@@ -49,7 +49,6 @@
    * The current active workspace object.
    */
   export let currentWorkspace;
-  
 
   export let onRemoveUserFromWorkspace;
   export let onChangeUserRoleAtWorkspace;
@@ -64,6 +63,11 @@
    */
   export let onWorkspaceUpdateScroll;
 
+  /**
+   * Role of user in active workspace
+   */
+  export let userRole;
+
   let workspaceName = tab.name;
   let workspaceDescription = tab.description;
   let workspaceID = tab._data.path.workspaceId;
@@ -77,6 +81,7 @@
     style="border-right:2px solid #000000; width: calc(100% - 280px);  padding:24px;"
   >
     <WorkspaceHeader
+      bind:userRole
       bind:isWorkspaceInviteModalOpen
       {onDeleteWorkspace}
       {onUpdateWorkspaceName}
@@ -86,6 +91,7 @@
     <section style="flex:1; overflow:auto;">
       {#if workspaceNavigatorId === "about"}
         <WorkspaceAbout
+          bind:userRole
           {onUpdateWorkspaceDescription}
           {workspaceDescription}
           {workspaceID}
@@ -105,7 +111,7 @@
     class="d-flex flex-column h-100"
     style=" width:280px; padding: 24px 16px 24px 16px ;"
   >
-    <WorkspaceNavigator bind:workspaceNavigatorId />
+    <WorkspaceNavigator bind:workspaceNavigatorId bind:userRole />
     <WorkspaceUpdates
       workspaceUpdatesList={$workspaceUpdatesList}
       {onWorkspaceUpdateScroll}

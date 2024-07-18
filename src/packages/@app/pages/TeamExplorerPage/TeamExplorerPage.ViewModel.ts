@@ -2,6 +2,7 @@ import { user } from "$lib/store";
 import type { InviteBody } from "$lib/utils/dto/team-dto";
 import { UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
 import type { WorkspaceDocument } from "@app/database/database";
+import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
@@ -20,6 +21,7 @@ export class TeamExplorerPageViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private workspaceService = new WorkspaceService();
   private teamService = new TeamService();
+  private guestUserRepository = new GuestUserRepository();
 
   private _activeTeamTab: BehaviorSubject<string> = new BehaviorSubject(
     "Workspaces",
@@ -334,6 +336,11 @@ export class TeamExplorerPageViewModel {
     _userId: string,
     _userName: string,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      console.log("val", value);
+      loggedInUserId = value._id;
+    });
     const response = await this.teamService.removeMembersAtTeam(
       _teamId,
       _userId,
@@ -341,7 +348,7 @@ export class TeamExplorerPageViewModel {
     if (response.isSuccessful) {
       const responseData = response.data.data;
       await this.teamRepository.modifyTeam(_teamId, responseData);
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       notifications.success(`${_userName} is removed from ${_teamName}`);
     } else {
       notifications.error(`Failed to remove ${_userName} from ${_teamName}`);
@@ -362,6 +369,10 @@ export class TeamExplorerPageViewModel {
     _userId: string,
     _userName: string,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      loggedInUserId = value._id;
+    });
     const response = await this.teamService.demoteToMemberAtTeam(
       _teamId,
       _userId,
@@ -369,7 +380,7 @@ export class TeamExplorerPageViewModel {
     if (response.isSuccessful === true) {
       const responseData = response.data.data;
       await this.teamRepository.modifyTeam(_teamId, responseData);
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       notifications.success(`${_userName} is now a member`);
     } else {
       notifications.error(
@@ -392,6 +403,11 @@ export class TeamExplorerPageViewModel {
     _userId: string,
     _userName: string,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      console.log("val", value);
+      loggedInUserId = value._id;
+    });
     const response = await this.teamService.promoteToAdminAtTeam(
       _teamId,
       _userId,
@@ -399,7 +415,7 @@ export class TeamExplorerPageViewModel {
     if (response.isSuccessful) {
       const responseData = response.data.data;
       await this.teamRepository.modifyTeam(_teamId, responseData);
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       notifications.success(`${_userName} is now an admin`);
     } else {
       notifications.error(
@@ -447,7 +463,7 @@ export class TeamExplorerPageViewModel {
       if (response.isSuccessful === true) {
         const responseData = response.data.data;
         await this.teamRepository.modifyTeam(_teamId, responseData);
-        await this.refreshWorkspaces(_userId);
+        await this.refreshWorkspaces(userId);
         notifications.success(
           `${_userName} is now the new Owner of ${_teamName}.`,
         );
@@ -477,12 +493,17 @@ export class TeamExplorerPageViewModel {
     _userId: string,
     _userName: string,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      console.log("val", value);
+      loggedInUserId = value._id;
+    });
     const response = await this.workspaceService.removeUserFromWorkspace(
       _workspaceId,
       _userId,
     );
     if (response.isSuccessful === true) {
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       notifications.success(`${_userName} is removed from ${_workspaceName}`);
     } else {
       notifications.error(
@@ -506,13 +527,18 @@ export class TeamExplorerPageViewModel {
     _userName: string,
     _body: WorkspaceRole,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      console.log("val", value);
+      loggedInUserId = value._id;
+    });
     const response = await this.workspaceService.changeUserRoleAtWorkspace(
       _workspaceId,
       _userId,
       _body,
     );
     if (response.isSuccessful) {
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       if (_body === WorkspaceRole.WORKSPACE_VIEWER) {
         notifications.success(
           `${_userName} is now a viewer on ${_workspaceName}`,
@@ -589,38 +615,59 @@ export class TeamExplorerPageViewModel {
     }
   };
 
-  
-
   /**
    * Leaving a team 
    * @param teamId - The ID of the team where the user is trying to left.
    * @param _userId - The ID of the user who  is leaving the team.
   
-   */
-  public leaveTeam = async (userId: string, teamId: string) => {
-    const response = await this.teamService.leaveTeam(teamId);
+**/
 
-    if (response.isSuccessful) {
-      setTimeout(async () => {
-        const activeTeam = await this.teamRepository.checkActiveTeam();
-        if (activeTeam) {
-          const teamIdToActivate =
-            await this.workspaceRepository.activateInitialWorkspace();
-          if (teamIdToActivate) {
-            await this.teamRepository.setActiveTeam(teamIdToActivate);
+  public leaveTeam = async (userId: string, teamId: string) => {
+      const response = await this.teamService.leaveTeam(teamId);
+
+      if (!response.isSuccessful) {
+        notifications.error(
+          response.message ?? "Failed to leave the team. Please try again.",
+        );
+        return response;
+      }
+
+      await new Promise<void>((resolve) =>
+        setTimeout(async () => {
+          const activeTeam = await this.teamRepository.checkActiveTeam();
+          if (activeTeam) {
+            const teamIdToActivate =
+              await this.workspaceRepository.activateInitialWorkspace();
+            if (teamIdToActivate) {
+              await this.teamRepository.setActiveTeam(teamIdToActivate);
+            }
           }
-        }
+          resolve();
+        }, 500),
+      );
+
+      await new Promise<void>((resolve) =>
         setTimeout(async () => {
           await this.refreshTeams(userId);
           await this.refreshWorkspaces(userId);
           notifications.success("You left a team.");
-        }, 500);
-      }, 500);
-    } else {
-      notifications.error(
-        response.message ?? "Failed to leave the team. Please try again.",
+          resolve();
+        }, 500),
       );
-    }
-    return response;
+
+      return response;
+    
+  };
+
+  /**
+   * Fetch guest user state
+   * @returns boolean for is user guest user or not
+   */
+  public getGuestUser = async () => {
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    return isGuestUser;
   };
 }

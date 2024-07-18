@@ -78,6 +78,12 @@
    */
   import { PERMISSION_NOT_FOUND_TEXT } from "$lib/utils/constants/permissions.constant";
   import type { CollectionDocument, TabDocument } from "@app/database/database";
+  import { WorkspaceRole } from "$lib/utils/enums";
+
+  /**
+   * Role of user in active workspace
+   */
+  export let userRole;
 
   /**
    * Local variables
@@ -186,7 +192,8 @@
             id="renameInputFieldCollection"
             value={collection?.name}
             class="bg-transparent input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"
-            disabled={!userRoleInWorkspace || tab?.activeSync}
+            disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+              tab?.activeSync}
             on:blur={(event) => {
               const newValue = event?.target?.value;
               const previousValue = tab.name;
@@ -331,7 +338,7 @@
           <div class="d-flex flex-column justify-content-center">
             {#if !collection?.activeSync || isSynced}
               <button
-                disabled={!userRoleInWorkspace}
+                disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
                 class="btn add-button rounded m-1 border-0 text-align-right py-1"
                 style="max-height:60px; width:200px;"
                 on:click={() => onCreateAPIRequest(collection)}
@@ -400,7 +407,8 @@
       </div>
       <div class="d-flex align-items-start ps-0 h-100">
         <textarea
-          disabled={!userRoleInWorkspace || collection?.activeSync}
+          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+            collection?.activeSync}
           id="updateCollectionDescField"
           style="font-size: 12px;"
           value={collection?.description || ""}

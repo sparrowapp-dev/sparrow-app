@@ -16,7 +16,7 @@
     Folder,
     Path,
   } from "$lib/utils/interfaces/request.interface";
-  import { UntrackedItems } from "$lib/utils/enums";
+  import { UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
 
   // --- SVG
   import threedotIcon from "$lib/assets/3dot.svg";
@@ -59,6 +59,11 @@
    * Current Tab Path
    */
   export let activeTabId: string;
+
+  /**
+   * Role of user in workspace
+   */
+  export let userRole;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -296,7 +301,7 @@
 
   {#if api.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
-  {:else}
+  {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
     <Tooltip
       title={"More"}
       show={!showMenu}

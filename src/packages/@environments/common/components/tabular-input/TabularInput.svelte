@@ -21,6 +21,11 @@
    * search text to filter the pairs
    */
   export let search: string;
+
+  /**
+   * disabled flag to disable the input, delete, and checkbox
+   */
+  export let disabled = false;
   let pairs: KeyValueChecked[] = keyValue;
   let controller: boolean = false;
 
@@ -138,7 +143,7 @@
       >
         <input
           type="checkbox"
-          disabled={pairs.length === 1}
+          disabled={pairs.length === 1 || disabled}
           bind:checked={controller}
           on:input={handleCheckAll}
         />
@@ -209,6 +214,7 @@
                       on:input={() => {
                         updateCheck(index);
                       }}
+                      {disabled}
                     />
                     <span class="checkmark"></span>
                   </label>
@@ -225,6 +231,7 @@
                     }}
                     placeholder="Add Variable"
                     class="w-100 text-fs-12 placeholder-color"
+                    {disabled}
                   />
                 </div>
 
@@ -237,10 +244,11 @@
                     }}
                     placeholder={"Add Value"}
                     class="w-100 text-fs-12 placeholder-color"
+                    {disabled}
                   />
                 </div>
               </div>
-              {#if pairs.length - 1 != index}
+              {#if pairs.length - 1 != index || !disabled}
                 <div class="h-75 pe-1">
                   <button
                     class="bg-secondary-700 border-0"

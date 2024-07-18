@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { RequestMethod } from "$lib/utils/enums";
+  import { RequestMethod, WorkspaceRole } from "$lib/utils/enums";
 
   import { Select } from "@library/forms";
   import type {
@@ -29,6 +29,10 @@
   export let onUpdateEnvironment;
   export let isSave;
   export let isGuestUser = false;
+  /**
+   * Role of user in active workspace
+   */
+  export let userRole;
 
   const theme = new UrlInputTheme().build();
   const handleDropdown = (tab: string) => {
@@ -184,7 +188,11 @@
       on:click={handleSaveRequest}
       on:mouseenter={handleMouseEnter}
       on:mouseleave={handleMouseLeave}
-      disabled={isSave || isGuestUser ? true : false}
+      disabled={isSave ||
+      isGuestUser ||
+      userRole === WorkspaceRole.WORKSPACE_VIEWER
+        ? true
+        : false}
     >
       <DiskIcon
         height={22}
