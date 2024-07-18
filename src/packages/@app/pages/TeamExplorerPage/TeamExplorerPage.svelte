@@ -8,6 +8,7 @@
   import { LeaveTeam } from "@teams/features";
 
   import { DeleteWorkspace } from "@common/features";
+    import { onMount } from "svelte";
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
   const _viewModel = new TeamExplorerPageViewModel();
@@ -31,6 +32,11 @@
     selectedWorkspace = workspace;
     isDeleteWorkspaceModalOpen = true;
   };
+
+  onMount(()=>{
+    _viewModel.refreshTeams(userId);
+    _viewModel.refreshWorkspaces(userId);
+  });
 </script>
 
 <TeamExplorer
