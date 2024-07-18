@@ -282,7 +282,7 @@
         alt="Team-Skelton"
         width="96%"
         height="90%"
-        style="padding-bottom:120px;"
+        style="padding-bottom:100px;"
       />
     {/if}
   </div>
