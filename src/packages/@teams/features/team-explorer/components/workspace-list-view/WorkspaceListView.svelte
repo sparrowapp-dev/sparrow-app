@@ -9,6 +9,7 @@
   import { calculateTimeDifferenceInDays } from "$lib/utils/workspacetimeUtils";
   import { Table } from "@library/ui";
   import { Rows } from "@teams/common/compopnents";
+  import { TeamSkeleton } from "../../images";
 
   export let data: any;
   export let openTeam: TeamDocument;
@@ -43,15 +44,15 @@
     class="table-container sparrow-thin-scrollbar overflow-y-auto"
     style="flex:1; overflow:auto;"
   >
-    <Table
-      tableClassProps="table p-0 table-responsive w-100"
-      tableStyleProp="max-height: 100%;"
-      dataSearch="true"
-      tableHeaderClassProp="position-sticky top-0 z-2"
-      contributorsCount={openTeam?.users?.length}
-      headerObject={tableHeaderContent}
-    >
-      {#if !isGuestUser}
+    {#if !isGuestUser}
+      <Table
+        tableClassProps="table p-0 table-responsive w-100"
+        tableStyleProp="max-height: 100%;"
+        dataSearch="true"
+        tableHeaderClassProp="position-sticky top-0 z-2"
+        contributorsCount={openTeam?.users?.length}
+        headerObject={tableHeaderContent}
+      >
         <tbody class="overflow-y-auto position-relative z-0">
           {#if data}
             {#each data
@@ -73,8 +74,29 @@
             {/each}
           {/if}
         </tbody>
-      {/if}
-    </Table>
+      </Table>
+    {/if}
+    {#if isGuestUser}
+      <table
+        class={`table p-0 table-responsive w-100`}
+        style={`max-height: 100%;`}
+      >
+        <thead class={`position-sticky top-0 z-2`}>
+          <tr>
+            {#each tableHeaderContent as heading}
+              <th class={`tab-head`}>{heading}</th>
+            {/each}
+          </tr>
+        </thead>
+      </table>
+      <img
+        src={TeamSkeleton}
+        alt="Team-Skelton"
+        width="96%"
+        height="90%"
+        style="padding-bottom:120px;"
+      />
+    {/if}
 
     {#if !isGuestUser}
       {#if searchQuery == "" && data && data?.length === 0}

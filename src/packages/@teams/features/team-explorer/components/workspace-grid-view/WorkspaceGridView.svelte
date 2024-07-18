@@ -9,6 +9,7 @@
   import type { WorkspaceDocument } from "@app/database/database";
   import Button from "@library/ui/button/Button.svelte";
   import { WorkspaceGrid } from "@teams/common/compopnents";
+  import { TeamSkeleton } from "../../images";
 
   export let searchQuery;
   let filterText = "";
@@ -275,6 +276,14 @@
           <div></div>
         </div>
       {/if}
+    {:else}
+      <img
+        src={TeamSkeleton}
+        alt="Team-Skelton"
+        width="96%"
+        height="90%"
+        style="padding-bottom:100px;"
+      />
     {/if}
   </div>
 </div>
