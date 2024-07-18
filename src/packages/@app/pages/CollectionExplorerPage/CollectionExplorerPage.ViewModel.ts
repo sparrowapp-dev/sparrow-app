@@ -105,7 +105,9 @@ class CollectionExplorerPage {
       isGuestUser = value;
     });
 
-    if (isGuestUser !== true) {
+    if (isGuestUser === true) {
+      return;
+    }
       if (newCollectionName) {
         const response = await this.collectionService.updateCollectionData(
           collection.id,
@@ -125,7 +127,7 @@ class CollectionExplorerPage {
           notifications.error("Failed to rename collection!");
         }
       }
-    } else {
+   
       if (newCollectionName) {
         const response = {
           data: {
@@ -141,7 +143,7 @@ class CollectionExplorerPage {
       } else {
         notifications.error("Failed to rename collection!");
       }
-    }
+    
   };
 
   /**
@@ -157,7 +159,9 @@ class CollectionExplorerPage {
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
-    if (isGuestUser !== true) {
+    if (isGuestUser === true) {
+      return;
+    }
       const response = await this.collectionService.switchCollectionBranch(
         collection.id,
         newBranch,
@@ -175,7 +179,7 @@ class CollectionExplorerPage {
       }
       await this.tabRepository.clearTabs();
       notifications.success("Branch switched successfully.");
-    }
+    
   };
 
   /**
@@ -220,7 +224,9 @@ class CollectionExplorerPage {
       isGuestUserActive.subscribe((value) => {
         isGuestUser = value;
       });
-      if (isGuestUser !== true) {
+      if (isGuestUser === true) {
+        return;
+      }
         const response = await this.collectionService.importCollection(
           collection.workspaceId,
           {
@@ -248,11 +254,11 @@ class CollectionExplorerPage {
             "Failed to sync the collection. Please try again.",
           );
         }
-      } else {
+       
         notifications.error(
           `Unable to detect ${collection.activeSyncUrl.replace("-json", "")}.`,
         );
-      }
+      
     }
   };
 
@@ -296,7 +302,9 @@ class CollectionExplorerPage {
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
-    if (isGuestUser !== true) {
+    if (isGuestUser === true) {
+      return;
+    }
       if (responseJSON?.data?.status === ResponseStatusCode.OK) {
         const response = await this.collectionService.importCollection(
           collection.workspaceId,
@@ -331,7 +339,7 @@ class CollectionExplorerPage {
         );
         return false;
       }
-    }
+    
   };
 
   /**
@@ -375,12 +383,14 @@ class CollectionExplorerPage {
       isGuestUser = value;
     });
     let response;
-    if (isGuestUser !== true) {
+    if (isGuestUser === true) {
+      return;
+    }
       response = await this.collectionService.switchCollectionBranch(
         collection?.id,
         collection?.currentBranch,
       );
-    }
+    
     if (response && response.isSuccessful) {
       isSynced = true;
     } else {
@@ -529,7 +539,7 @@ class CollectionExplorerPage {
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
-    if (isGuestUser !== true) {
+    if (isGuestUser == true) {return;}
       const response = await this.collectionService.updateCollectionData(
         collection.id,
         collection.workspaceId,
@@ -546,7 +556,7 @@ class CollectionExplorerPage {
       } else {
         notifications.error("Failed to update description!");
       }
-    } else {
+  
       if (newDescription) {
         const response = {
           data: { description: newDescription },
@@ -559,7 +569,7 @@ class CollectionExplorerPage {
       } else {
         notifications.error("Failed to update description!");
       }
-    }
+    
   };
 
   /**
