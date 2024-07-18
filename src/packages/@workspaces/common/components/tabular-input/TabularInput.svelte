@@ -19,6 +19,7 @@
 
   let enableKeyValueHighlighting = true;
   import { Editor } from "@library/forms";
+    import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
 
   type Mode = "READ" | "WRITE";
 
@@ -725,14 +726,13 @@
 
         <!-- Bulk Edit TextArea starts -->
         <div style="height:100%">
-          {#if isBulkEditLoaded}
-            <Editor
-              bind:value={bulkText}
-              on:change={handleBulkTextarea}
-              {enableKeyValueHighlighting}
-              class={`px-2 sparrow-fs-18 outline-none`}
-              placeholder={bulkEditPlaceholder}
-            />
+          {#if isBulkEditLoaded}           
+            <BulkEditEditor
+            bind:value={bulkText}
+            on:change={handleBulkTextarea}
+            {enableKeyValueHighlighting}
+            class={`px-2 sparrow-fs-18 outline-none`}
+            placeholder={bulkEditPlaceholder}/>
           {/if}
         </div>
         <!-- Bulk Edit TextArea end -->
