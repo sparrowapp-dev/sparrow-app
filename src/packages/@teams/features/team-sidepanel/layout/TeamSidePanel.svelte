@@ -24,6 +24,9 @@
   export let OnWorkspaceSwitch;
   export let isGuestUser = false;
 
+  export let disableNewInviteTag;
+  export let modifyTeam;
+
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   export let leftPanelController: {
@@ -34,11 +37,6 @@
   let isGithubStarHover = false;
 
   let activeIndex;
-
-  const handleTeamClick = (id) => {
-    setOpenTeam(id);
-    activeIndex = id;
-  };
 
   $: {
     if (openTeam) {
@@ -109,7 +107,17 @@
             px-3 align-items-center justify-content-between rounded teams-outer border-0 ${
               team.teamId === activeIndex ? "active" : ""
             }`}
-                on:click={() => handleTeamClick(team.teamId)}
+                on:click={async () => {
+                  await setOpenTeam(team.teamId);
+                  activeIndex = team.teamId;
+                  if (team.isNewInvite) {
+                    let data = await disableNewInviteTag(team.teamId);
+                    if (data) {
+                      data.isNewInvite = false;
+                      modifyTeam(team.teamId, data);
+                    }
+                  }
+                }}
               >
                 <div class=" d-flex w-100 overflow-hidden">
                   {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}

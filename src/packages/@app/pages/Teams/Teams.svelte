@@ -25,6 +25,8 @@
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
   const setOpenTeam = _viewModel.setOpenTeam;
+  const disableNewInviteTag=  _viewModel.disableNewInviteTag
+  const modifyTeam=  _viewModel.modifyTeam
 
   let isCreateTeamModalOpen: boolean = false;
   const collectionList = _viewModel.collection;
@@ -97,6 +99,8 @@
           {onApiClick}
           {OnWorkspaceSwitch}
           {setOpenTeam}
+          {disableNewInviteTag}
+          {modifyTeam}
         />
       </Pane>
       <Pane
