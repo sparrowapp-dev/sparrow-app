@@ -15,9 +15,15 @@
   export let workspaces;
   export let teamLogo;
   export let userId;
+  export let users;
+  /**
+   * Validates the user email.
+   */
+  export let onValidateEmail;
 
   import closeIconWhite from "$lib/assets/close-icon-white.svg";
   import { MultiSelect, Select } from "@library/forms";
+  import { notifications } from "@library/ui/toast/Toast";
 
   let emailstoBeSentArr: string[] = [];
   let teamSpecificWorkspace = workspaces.map((elem) => {
@@ -48,10 +54,34 @@
     invalidEmails = invalidEmails.filter((e) => e != email);
   }
 
-  const handleEmailOnAdd = (email: string) => {
+  /**
+   * Checks if user already exist in team
+   * @param email - email input
+   */
+  const isEmailAlreadyExistInTeam = (email: string) => {
+    for (let i = 0; i < users.length; i++) {
+      if (email === users[i].email) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const handleEmailOnAdd = async (email: string) => {
     email = email.replace(",", "");
     email = email.trim();
-    const isValidEmail = validateEmail(email);
+
+    const isEmailAlreadyExist = isEmailAlreadyExistInTeam(email);
+    if (isEmailAlreadyExist) {
+      notifications.error("User already in team!");
+    }
+    const isUserExist = await onValidateEmail(email); // checks if user exist on server
+    if (!isUserExist) {
+      notifications.error("User doesn't exist on sparrow!");
+    }
+    const isValidEmail =
+      validateEmail(email) && !isEmailAlreadyExist && isUserExist;
+
     if (!isValidEmail) {
       invalidEmails.push(email);
     } else {
