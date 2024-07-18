@@ -15,6 +15,10 @@
   export let handleCreateApiRequest: () => void;
   export let isAddCollectionDisabled = false;
   export let onImportCurlPopup: () => void;
+  /**
+   * Role of user in active workspace
+   */
+  export let userRole;
 </script>
 
 <div class="d-flex flex-column align-items-center px-3">
@@ -24,34 +28,37 @@
       request directly
     </p>
     <div class="w-100 mt-3">
-      <Tooltip
-        show={isAddCollectionDisabled}
-        placement="bottom"
-        title={isAddCollectionDisabled ? "Please Login to Use" : ""}
-      >
-        <p
-          class="add-collection d-flex justify-content-center align-items-center border-radius-2 {isAddCollectionDisabled
-            ? 'disabled'
-            : ''}"
-          style="color: var(--text-secondary-100);"
-          role="button"
-          on:click={() => {
-            if (!isAddCollectionDisabled) {
-              onImportCollectionPopup();
-            }
-          }}
+      {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+        <Tooltip
+          show={isAddCollectionDisabled}
+          placement="bottom"
+          title={isAddCollectionDisabled ? "Please Login to Use" : ""}
         >
-          <PlusIcon
-            height={"22px"}
-            width={"22px"}
-            color={"var(--text-secondary-200)"}
-          />
-          <span
-            style="color: var(--text-secondary-200)"
-            class="ps-2 fw-bold text-fs-12">Add Collection</span
+          <p
+            class="add-collection d-flex justify-content-center align-items-center border-radius-2 {isAddCollectionDisabled
+              ? 'disabled'
+              : ''}"
+            style="color: var(--text-secondary-100);"
+            role="button"
+            on:click={() => {
+              if (!isAddCollectionDisabled) {
+                onImportCollectionPopup();
+              }
+            }}
           >
-        </p>
-      </Tooltip>
+            <PlusIcon
+              height={"22px"}
+              width={"22px"}
+              color={"var(--text-secondary-200)"}
+            />
+            <span
+              style="color: var(--text-secondary-200)"
+              class="ps-2 fw-bold text-fs-12">Add Collection</span
+            >
+          </p>
+        </Tooltip>
+      {/if}
+
       <p
         class="import-curl d-flex justify-content-center align-items-center border-radius-2"
         style="color: var(--text-secondary-100);"
@@ -92,6 +99,6 @@
     background-color: var(--bg-primary-250);
   }
   .import-curl:active {
-    background-color: var( --bg-primary-500);
+    background-color: var(--bg-primary-500);
   }
 </style>

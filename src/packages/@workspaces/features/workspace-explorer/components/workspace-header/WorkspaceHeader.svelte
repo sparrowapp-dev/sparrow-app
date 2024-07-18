@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { WorkspaceRole } from "$lib/utils/enums";
   import { Input } from "@library/forms";
   import { Button } from "@library/ui";
   import { notifications } from "@library/ui/toast/Toast";
@@ -32,6 +33,11 @@
     workspaceID: string,
     workspaceName: string,
   ) => void;
+
+  /**
+   * Role of user in active workspace
+   */
+  export let userRole;
 
   /**
    * Handles the update of workspace name.
@@ -69,6 +75,7 @@
           class="text-fs-18 bg-transparent  "
           style="outline:none; font-weight:700;"
           placeholder="My Workspace"
+          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
         />
       </div>
       <div class="d-flex gap-2">
@@ -80,6 +87,7 @@
           onClick={() => {
             onDeleteWorkspace();
           }}
+          disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
         />
         <Button
           type={"primary"}
@@ -89,6 +97,7 @@
           onClick={() => {
             isWorkspaceInviteModalOpen = true;
           }}
+          disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
         ></Button>
       </div>
     </div>

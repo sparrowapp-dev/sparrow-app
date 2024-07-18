@@ -28,11 +28,13 @@ import { userWorkspaceLevelRole } from "$lib/store";
 import { generateSampleRequest } from "$lib/utils/sample";
 import type { Folder, Path } from "$lib/utils/interfaces/request.interface";
 import { InitRequestTab } from "@common/utils";
+import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 
 class CollectionExplorerPage {
   // Private Repositories
   private collectionRepository = new CollectionRepository();
   private tabRepository = new TabRepository();
+  private workspaceRepository = new WorkspaceRepository();
 
   // Private Services
   private collectionService = new CollectionService();
@@ -443,6 +445,15 @@ class CollectionExplorerPage {
     } else {
       notifications.error("Failed to update description!");
     }
+  };
+
+  /**
+   * Get workspace data through workspace id
+   * @param workspaceId - id of workspace
+   * @returns - workspace document
+   */
+  public getWorkspaceById = async (workspaceId: string) => {
+    return await this.workspaceRepository.readWorkspace(workspaceId);
   };
 }
 

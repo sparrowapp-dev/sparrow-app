@@ -33,6 +33,7 @@ import type { CreateApiRequestPostBody } from "$lib/utils/dto";
 import { InitRequestTab } from "@common/utils";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { notifications } from "@library/ui/toast/Toast";
+import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 // import { generateSampleRequest } from "$lib/utils/sample";
 // import type { Folder, Path } from "$lib/utils/interfaces/request.interface";
 // import { InitRequestTab } from "@common/utils";
@@ -41,6 +42,7 @@ class FolderExplorerPage {
   // Private Repositories
   private collectionRepository = new CollectionRepository();
   private tabRepository = new TabRepository();
+  private workspaceRepository = new WorkspaceRepository();
 
   // Private Services
   private collectionService = new CollectionService();
@@ -343,6 +345,15 @@ class FolderExplorerPage {
       totalRequests = folder.items.length;
     }
     return totalRequests;
+  };
+
+  /**
+   * Get workspace data through workspace id
+   * @param workspaceId - id of workspace
+   * @returns - workspace document
+   */
+  public getWorkspaceById = async (workspaceId: string) => {
+    return await this.workspaceRepository.readWorkspace(workspaceId);
   };
 }
 
