@@ -182,6 +182,7 @@
   const addButtonData = [
     {
       name: "Leave Team",
+      color: "var(--dangerColor)",
       onclick: () => handleLeaveTeam(),
     },
   ];
