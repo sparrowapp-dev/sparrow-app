@@ -54,6 +54,10 @@
     invalidEmails = invalidEmails.filter((e) => e != email);
   }
 
+  /**
+   * Checks if user already exist in team
+   * @param email - email input
+   */
   const isEmailAlreadyExistInTeam = (email: string) => {
     for (let i = 0; i < users.length; i++) {
       if (email === users[i].email) {
