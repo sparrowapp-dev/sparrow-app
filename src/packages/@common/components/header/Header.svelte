@@ -11,6 +11,7 @@
   import type { WorkspaceDocument } from "@app/database/database";
   import { PlusIcon } from "@library/icons";
   import { navigate } from "svelte-navigator";
+  import PopupHint from "./sub-component/PopupHint.svelte";
   /**
    * environment list
    */
@@ -197,21 +198,16 @@
     </div>
   </div>
 
-  <div class="d-flex align-items-center">
+  <div class="d-flex align-items-center" style="position: relative;">
     {#if isGuestUser && isLoginBannerActive === false}
-      <Tooltip title={"Reconnect to explore more features!"} placement="bottom">
-        <CloudOffIcon
-          height="19px"
-          width="23px"
-          color="var(--icon-secondary-290)"
-        />
-      </Tooltip>
+      <PopupHint />
+
       <div
         style="background-color:#313233; justify-content:center; align-items:center; margin-right:10px; margin-left:10px; border-radius:2px"
         class="join-container"
         on:click={onLoginUser}
       >
-        <span class="join-txt"> Join the Experience </span>
+        <span class="join-txt"> Sign In for Enhanced Experience</span>
       </div>
     {/if}
 
@@ -262,10 +258,13 @@
   }
   .join-txt {
     font-size: 12px;
-    padding-left: 16px;
+    padding-left: 12px;
     padding-right: 16px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .join-container {
     cursor: pointer;

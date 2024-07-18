@@ -44,3 +44,4 @@ export { default as DownArrowIcon } from "./DownArrow.svelte";
 export { default as ErrorInfoIcon } from "./Error.svelte";
 export { default as Information } from "./Information.svelte";
 export { default as SparrowEdgeIcon} from "./SparrowEdge.svelte";
+export { default as CrossIconRounded } from "./CrossIconRounded.svelte";

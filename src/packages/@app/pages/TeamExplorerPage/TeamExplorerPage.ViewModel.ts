@@ -2,10 +2,12 @@ import { user } from "$lib/store";
 import type { InviteBody } from "$lib/utils/dto/team-dto";
 import { UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
 import type { WorkspaceDocument } from "@app/database/database";
+import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { TeamService } from "@app/services/team.service";
+import { UserService } from "@app/services/user.service";
 import { WorkspaceService } from "@app/services/workspace.service";
 import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
 import { notifications } from "@library/ui/toast/Toast";
@@ -20,6 +22,8 @@ export class TeamExplorerPageViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private workspaceService = new WorkspaceService();
   private teamService = new TeamService();
+  private guestUserRepository = new GuestUserRepository();
+  private userService = new UserService();
 
   private _activeTeamTab: BehaviorSubject<string> = new BehaviorSubject(
     "Workspaces",
@@ -113,6 +117,8 @@ export class TeamExplorerPageViewModel {
    * @param userId User id
    */
   public refreshTeams = async (userId: string): Promise<void> => {
+    if (!userId) return;
+
     let openTeamId: string = "";
     const teamsData = await this.teamRepository.getTeamData();
     teamsData.forEach((element) => {
@@ -126,6 +132,7 @@ export class TeamExplorerPageViewModel {
           _id,
           name,
           users,
+          description,
           logo,
           workspaces,
           owner,
@@ -144,6 +151,7 @@ export class TeamExplorerPageViewModel {
           teamId: _id,
           name,
           users,
+          description,
           logo,
           workspaces: updatedWorkspaces,
           owner,
@@ -177,6 +185,7 @@ export class TeamExplorerPageViewModel {
    * @param userId User id
    */
   public refreshWorkspaces = async (userId: string): Promise<void> => {
+    if (!userId) return;
     const workspaces = await this.workspaceRepository.getWorkspacesDocs();
     const idToEnvironmentMap = {};
     workspaces.forEach((element) => {
@@ -336,8 +345,7 @@ export class TeamExplorerPageViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      console.log("val", value);
-      loggedInUserId = value._id;
+      loggedInUserId = value?._id;
     });
     const response = await this.teamService.removeMembersAtTeam(
       _teamId,
@@ -369,7 +377,7 @@ export class TeamExplorerPageViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      loggedInUserId = value._id;
+      loggedInUserId = value?._id;
     });
     const response = await this.teamService.demoteToMemberAtTeam(
       _teamId,
@@ -403,8 +411,7 @@ export class TeamExplorerPageViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      console.log("val", value);
-      loggedInUserId = value._id;
+      loggedInUserId = value?._id;
     });
     const response = await this.teamService.promoteToAdminAtTeam(
       _teamId,
@@ -493,8 +500,7 @@ export class TeamExplorerPageViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      console.log("val", value);
-      loggedInUserId = value._id;
+      loggedInUserId = value?._id;
     });
     const response = await this.workspaceService.removeUserFromWorkspace(
       _workspaceId,
@@ -527,8 +533,7 @@ export class TeamExplorerPageViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      console.log("val", value);
-      loggedInUserId = value._id;
+      loggedInUserId = value?._id;
     });
     const response = await this.workspaceService.changeUserRoleAtWorkspace(
       _workspaceId,
@@ -618,11 +623,19 @@ export class TeamExplorerPageViewModel {
    * @param teamId - The ID of the team where the user is trying to left.
    * @param _userId - The ID of the user who  is leaving the team.
   
-   */
+**/
+
   public leaveTeam = async (userId: string, teamId: string) => {
     const response = await this.teamService.leaveTeam(teamId);
 
-    if (response.isSuccessful) {
+    if (!response.isSuccessful) {
+      notifications.error(
+        response.message ?? "Failed to leave the team. Please try again.",
+      );
+      return response;
+    }
+
+    await new Promise<void>((resolve) =>
       setTimeout(async () => {
         const activeTeam = await this.teamRepository.checkActiveTeam();
         if (activeTeam) {
@@ -632,17 +645,48 @@ export class TeamExplorerPageViewModel {
             await this.teamRepository.setActiveTeam(teamIdToActivate);
           }
         }
-        setTimeout(async () => {
-          await this.refreshTeams(userId);
-          await this.refreshWorkspaces(userId);
-          notifications.success("You left a team.");
-        }, 500);
-      }, 500);
-    } else {
-      notifications.error(
-        response.message ?? "Failed to leave the team. Please try again.",
-      );
-    }
+        resolve();
+      }, 500),
+    );
+
+    await new Promise<void>((resolve) =>
+      setTimeout(async () => {
+        await this.refreshTeams(userId);
+        await this.refreshWorkspaces(userId);
+        notifications.success("You left a team.");
+        resolve();
+      }, 500),
+    );
+
     return response;
+  };
+
+  /**
+   * Fetch guest user state
+   * @returns boolean for is user guest user or not
+   */
+  public getGuestUser = async () => {
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    return isGuestUser;
+  };
+
+  /**
+   * Validates the user email by making a GET request to the server.
+   *
+   * @param  email - The email address to be validated.
+   * @returns A promise that resolves to the server's response.
+   */
+  public validateUserEmail = async (email: string) => {
+    const response = await this.userService.validateUserEmail(email);
+    if (response.isSuccessful) {
+      if (response?.data?.data?.registeredWith === "unknown") {
+        return false;
+      }
+      return true;
+    }
+    return false;
   };
 }

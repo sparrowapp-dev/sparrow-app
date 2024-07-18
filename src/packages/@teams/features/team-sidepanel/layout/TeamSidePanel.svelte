@@ -22,6 +22,10 @@
   export let githubRepo;
   export let setOpenTeam;
   export let OnWorkspaceSwitch;
+  export let isGuestUser = false;
+
+  export let disableNewInviteTag;
+  export let modifyTeam;
 
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
@@ -33,11 +37,6 @@
   let isGithubStarHover = false;
 
   let activeIndex;
-
-  const handleTeamClick = (id) => {
-    setOpenTeam(id);
-    activeIndex = id;
-  };
 
   $: {
     if (openTeam) {
@@ -93,6 +92,7 @@
                 on:click={() => {
                   isCreateTeamModalOpen = true;
                 }}
+                disabled={isGuestUser}
               >
                 <img src={plus} alt="" />
               </button>
@@ -107,7 +107,17 @@
             px-3 align-items-center justify-content-between rounded teams-outer border-0 ${
               team.teamId === activeIndex ? "active" : ""
             }`}
-                on:click={() => handleTeamClick(team.teamId)}
+                on:click={async () => {
+                  await setOpenTeam(team.teamId);
+                  activeIndex = team.teamId;
+                  if (team.isNewInvite) {
+                    let data = await disableNewInviteTag(team.teamId);
+                    if (data) {
+                      data.isNewInvite = false;
+                      modifyTeam(team.teamId, data);
+                    }
+                  }
+                }}
               >
                 <div class=" d-flex w-100 overflow-hidden">
                   {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
@@ -147,15 +157,16 @@
       </section>
 
       <!-- Recent APIs-->
+      {#if !isGuestUser}
+        <section class="d-flex flex-column" style="max-height:33%;">
+          <RecentApi {tabList} {data} {collectionList} {onApiClick} />
+        </section>
 
-      <section class="d-flex flex-column" style="max-height:33%;">
-        <RecentApi {tabList} {data} {collectionList} {onApiClick} />
-      </section>
-
-      <!-- Recent Workspace Section -->
-      <section class="d-flex flex-column" style="max-height:33%;">
-        <RecentWorkspace {data} {openTeam} {OnWorkspaceSwitch} />
-      </section>
+        <!-- Recent Workspace Section -->
+        <section class="d-flex flex-column" style="max-height:33%;">
+          <RecentWorkspace {data} {openTeam} {OnWorkspaceSwitch} />
+        </section>
+      {/if}
     </div>
 
     <!-- github repo section -->

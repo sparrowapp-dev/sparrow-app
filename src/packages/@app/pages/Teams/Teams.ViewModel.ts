@@ -12,6 +12,11 @@ import { GithubService } from "@app/services/github.service";
 import { moveNavigation } from "$lib/utils/helpers";
 import { navigate } from "svelte-navigator";
 import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
+import { GuestUserRepository } from "@app/repositories/guest-user.repository";
+import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
+import type { Team } from "$lib/utils/interfaces";
+import { UserService } from "@app/services/user.service";
+
 export class TeamsViewModel {
   constructor() {}
   private teamRepository = new TeamRepository();
@@ -20,8 +25,10 @@ export class TeamsViewModel {
   private teamService = new TeamService();
   private githhubRepoRepository = new GithubRepoReposistory();
   private githubService = new GithubService();
+  private guestUserRepository = new GuestUserRepository();
 
   private collectionRepository = new CollectionRepository();
+  private userService = new UserService();
 
   /**
    * @description - get environment list from local db
@@ -38,8 +45,6 @@ export class TeamsViewModel {
     const tabs = this.tabRepository.getTabList();
     return tabs;
   }
-
-
 
   /**
    * @description - get open team from local db
@@ -144,21 +149,20 @@ export class TeamsViewModel {
     navigate("/dashboard/collections");
   };
 
- /**
+  /**
    * Switch from one team to another
    * @param id - team id
    */
- public setOpenTeam = async (id: string) => {
-  await this.teamRepository.setOpenTeam(id);
-};
-
+  public setOpenTeam = async (id: string) => {
+    await this.teamRepository.setOpenTeam(id);
+  };
 
   /**
    * Switch to latest tab on Api Click
    * @param id - Api id
    */
   public handleApiClick = (api: any): void => {
-   this.tabRepository.activeTab(api.id)
+    this.tabRepository.activeTab(api.id);
     moveNavigation("right");
     navigate("/dashboard/collections");
   };
@@ -204,4 +208,47 @@ export class TeamsViewModel {
       return response.data;
     }
   };
+
+  /**
+   * Fetch guest user state
+   * @returns boolean for is user guest user or not
+   */
+  public getGuestUser = async () => {
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    return isGuestUser;
+  };
+
+  /**
+   * Disable the new invite tag for a user in a specific team.
+   * @param teamId - The ID of the team for which the new invite tag should be disabled.
+   * @returns A Promise that resolves to the updated Team object if successful, otherwise undefined.
+   */
+  public disableNewInviteTag = async (
+    teamId: string,
+  ): Promise<Team | undefined> => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      loggedInUserId = value?._id;
+    });
+    const response: MakeRequestResponse =
+      await this.userService.disableNewInviteTag(loggedInUserId, teamId);
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  /**
+   * Modify a team's details.
+   * @param teamId - The ID of the team to modify.
+   * @param team - An object containing the updated team details.
+   * @returns A Promise that resolves when the team modification is complete.
+   */
+  public modifyTeam = async (teamId: string, team: any): Promise<void> => {
+    await this.teamRepository.modifyTeam(teamId, team);
+  };
+
 }

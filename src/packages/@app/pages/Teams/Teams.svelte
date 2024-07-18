@@ -25,6 +25,8 @@
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
   const setOpenTeam = _viewModel.setOpenTeam;
+  const disableNewInviteTag=  _viewModel.disableNewInviteTag
+  const modifyTeam=  _viewModel.modifyTeam
 
   let isCreateTeamModalOpen: boolean = false;
   const collectionList = _viewModel.collection;
@@ -37,6 +39,7 @@
   import { Motion } from "svelte-motion";
 
   let githubRepoData: GithubRepoDocType;
+  let isGuestUser = false;
 
   onMount(async () => {
     let githubRepo = await _viewModel.getGithubRepo();
@@ -46,6 +49,7 @@
     await _viewModel.fetchGithubRepo();
     githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
+    isGuestUser = await _viewModel.getGuestUser();
   });
 
   let splitter: HTMLElement | null;
@@ -80,6 +84,7 @@
         class="bg-secondary-900-important sidebar-left-panel"
       >
         <TeamSidePanel
+          bind:isGuestUser
           bind:isCreateTeamModalOpen
           teamList={$teamList}
           tabList={$tabList}
@@ -94,6 +99,8 @@
           {onApiClick}
           {OnWorkspaceSwitch}
           {setOpenTeam}
+          {disableNewInviteTag}
+          {modifyTeam}
         />
       </Pane>
       <Pane

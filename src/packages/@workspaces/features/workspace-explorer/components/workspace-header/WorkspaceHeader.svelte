@@ -78,28 +78,30 @@
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
         />
       </div>
-      <div class="d-flex gap-2">
-        <Button
-          type={"dark"}
-          title={"Delete Workspace"}
-          textClassProp={"fs-12 "}
-          textStyleProp={"font-weight:400; font-size:12px;"}
-          onClick={() => {
-            onDeleteWorkspace();
-          }}
-          disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
-        />
-        <Button
-          type={"primary"}
-          title={"Invite"}
-          textClassProp={"fs-12"}
-          textStyleProp={"font-weight:400; font-size:12px;"}
-          onClick={() => {
-            isWorkspaceInviteModalOpen = true;
-          }}
-          disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
-        ></Button>
-      </div>
+      {#if userRole === WorkspaceRole.WORKSPACE_ADMIN}
+        <div class="d-flex gap-2">
+          <Button
+            type={"dark"}
+            title={"Delete Workspace"}
+            textClassProp={"fs-12 "}
+            textStyleProp={"font-weight:400; font-size:12px;"}
+            onClick={() => {
+              onDeleteWorkspace();
+            }}
+            disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
+          />
+          <Button
+            type={"primary"}
+            title={"Invite"}
+            textClassProp={"fs-12"}
+            textStyleProp={"font-weight:400; font-size:12px;"}
+            onClick={() => {
+              isWorkspaceInviteModalOpen = true;
+            }}
+            disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
+          ></Button>
+        </div>
+      {/if}
     </div>
   </div>
 </section>

@@ -8,6 +8,7 @@
   import { LeaveTeam } from "@teams/features";
 
   import { DeleteWorkspace } from "@common/features";
+  import { onMount } from "svelte";
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
   const _viewModel = new TeamExplorerPageViewModel();
@@ -22,18 +23,24 @@
       userId = value._id;
     }
   });
-  
+
   let isTeamInviteModalOpen = false;
   let isLeaveTeamModelOpen = false;
-
+  let isGuestUser;
 
   const handleDeleteWorkspace = (workspace: WorkspaceDocument) => {
     selectedWorkspace = workspace;
     isDeleteWorkspaceModalOpen = true;
   };
+  onMount(async () => {
+    _viewModel.refreshTeams(userId);
+    _viewModel.refreshWorkspaces(userId);
+    isGuestUser = await _viewModel.getGuestUser();
+  });
 </script>
 
 <TeamExplorer
+  bind:isGuestUser
   bind:userId
   bind:isTeamInviteModalOpen
   bind:isLeaveTeamModelOpen
@@ -68,6 +75,7 @@
     teamLogo={$activeTeam?.logo}
     onInviteClick={_viewModel.handleTeamInvite}
     teamName={$activeTeam?.name}
+    users={$activeTeam?.users}
     teamId={$activeTeam?.teamId}
     workspaces={$workspaces.filter((elem) => {
       return elem?.team?.teamId === $activeTeam?.teamId;
@@ -75,6 +83,7 @@
     handleModalState={(flag) => {
       isTeamInviteModalOpen = flag;
     }}
+    onValidateEmail={_viewModel.validateUserEmail}
   />
 </Modal>
 

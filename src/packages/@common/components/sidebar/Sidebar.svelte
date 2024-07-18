@@ -46,12 +46,12 @@
 
   let sidebarItems: SidebarItemObj[] = [
     {
-      route: "/app/home",
+      route: !isGuestUser ? "/app/home" : "/guest/home",
       heading: "Home",
       defaultLogo: home,
       hoveredLogo: hoveredHome,
       selectedLogo: selectedHome,
-      disabled: isGuestUser ?? false,
+      disabled: false,
       position: "primary",
     },
     {

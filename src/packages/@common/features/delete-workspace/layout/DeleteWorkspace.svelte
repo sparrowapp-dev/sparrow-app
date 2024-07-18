@@ -20,7 +20,7 @@
   <div class="text-lightGray mb-2 mt-2 sparrow-fs-14">
     <p class="text-secondary-1000 sparrow-fs-14">
       Everything in <span class="text-secondary-100" style="font-weight: 500;"
-        >{workspace.name}</span
+        >"{workspace.name}"</span
       > will be permanently removed, and all contributors will lose access. This
       action cannot be undone.
     </p>
