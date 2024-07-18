@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Select } from "@library/forms";
-  import { CloudOffIcon, StackIcon } from "@library/icons";
+  import { CloudOffIcon, SparrowEdgeIcon, StackIcon } from "@library/icons";
   import { environmentType } from "$lib/utils/enums";
   import { ArrowIcon } from "@library/icons";
   import { DownArrowIcon } from "$lib/assets/icons";
@@ -124,6 +124,17 @@
   class="app-header ps-1 pe-3 d-flex align-items-center justify-content-between"
 >
   <div class="d-flex ms-3 justify-content-cdenter align-items-center">
+    {#if isGuestUser}
+    <div>
+      <SparrowEdgeIcon
+        height="25px"
+        width="24px"
+        color="var(--primary-btn-color)"
+      />
+    </div>
+
+
+    {:else}
     <div>
       <SparrowIcon
         height="17px"
@@ -131,7 +142,7 @@
         color="var(--primary-btn-color)"
       />
     </div>
-
+{/if}
     <div class="ms-3">
       <Select
         id={"workspace-dropdown"}

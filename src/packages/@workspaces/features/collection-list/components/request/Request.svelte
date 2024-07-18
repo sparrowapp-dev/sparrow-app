@@ -24,6 +24,7 @@
 
   // ---- DB
   import type { CollectionDocument } from "@app/database/database";
+  import { isGuestUserActive } from "$lib/store";
 
   /**
    * Callback for Item Deleted
@@ -71,6 +72,11 @@
   let inputField: HTMLInputElement;
   let isRenaming = false;
   let deleteLoader: boolean = false;
+
+  let isGuestUser;
+  isGuestUserActive.subscribe((value) => {
+    isGuestUser = value;
+  });
 
   let requestTabWrapper: HTMLElement;
 
@@ -299,7 +305,7 @@
     {/if}
   </button>
 
-  {#if api.id?.includes(UntrackedItems.UNTRACKED)}
+  {#if api.id?.includes(UntrackedItems.UNTRACKED) && !isGuestUser}
     <Spinner size={"15px"} />
   {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
     <Tooltip

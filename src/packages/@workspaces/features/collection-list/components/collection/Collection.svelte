@@ -47,6 +47,7 @@
     RequestIcon,
   } from "@library/icons";
   import { Options } from "@library/ui";
+    import { isGuestUserActive } from "$lib/store";
 
   let deletedIds: [string] | [] = [];
   let requestCount = 0;
@@ -68,6 +69,10 @@
   let noOfRows = 5;
   let inputField: HTMLInputElement;
   let collectionTabWrapper: HTMLElement;
+  let isGuestUser: boolean ;
+    isGuestUserActive.subscribe((value)=>{
+       isGuestUser = value
+    })
 
   /**
    * Handle position of the context menu
@@ -188,7 +193,7 @@
   let refreshCollectionLoader = false;
   let newCollectionName: string = "";
 
-  const handleRenameInput = (event) => {
+  const handleRenameInput = (event: { target: { value: string; }; }) => {
     newCollectionName = event.target.value;
   };
 
@@ -204,7 +209,7 @@
     newCollectionName = "";
   };
 
-  const onRenameInputKeyPress = (event) => {
+  const onRenameInputKeyPress = (event: { key: string; }) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
         "renameInputFieldCollection",
@@ -442,7 +447,7 @@
         style="height: 32px; text-align: left;"
       >
         <p class="ellipsis w-100 mb-0 text-fs-12">
-          {collection.name}
+          {collection.name} 
         </p>
         {#if collection.activeSync}
           <span
@@ -462,8 +467,8 @@
       </div>
     {/if}
   </button>
-  {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
-    <Spinner size={"15px"} />
+  {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED) && !isGuestUser}
+    <Spinner size={"15px"} /> 
   {:else}
     <!-- <Tooltip
       placement="bottom"

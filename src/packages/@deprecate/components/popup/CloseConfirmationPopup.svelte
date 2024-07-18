@@ -49,7 +49,7 @@
         />
       </span>
       <Button
-        disable={isSaveDisabled || isGuestUser}
+        disable={isSaveDisabled}
         title={"Save Changes"}
         textClassProp={"fs-6"}
         type={"primary"}
