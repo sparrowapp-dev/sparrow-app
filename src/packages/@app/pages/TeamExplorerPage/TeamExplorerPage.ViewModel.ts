@@ -621,7 +621,6 @@ export class TeamExplorerPageViewModel {
 **/
 
   public leaveTeam = async (userId: string, teamId: string) => {
-    try {
       const response = await this.teamService.leaveTeam(teamId);
 
       if (!response.isSuccessful) {
@@ -655,9 +654,6 @@ export class TeamExplorerPageViewModel {
       );
 
       return response;
-    } catch (error) {
-      notifications.error("An unexpected error occurred. Please try again.");
-      throw error;
-    }
+    
   };
 }
