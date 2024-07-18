@@ -269,38 +269,47 @@ class FolderExplorerPage {
         },
       },
     };
+    await this.collectionRepository.addRequestInFolder(
+      requestObj.collectionId,
+      requestObj.folderId,
+      {
+        ...requestObj.items.items,
+        id: initRequestTab.getValue().id,
+      },
+    );
 
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
     if (isGuestUser === true) {
-      // const res = await this.collectionRepository.readRequestInFolder(
-      //   requestObj.collectionId,
-      //   requestObj.folderId,
-      //    uuid ,
-      // );
+      const res = await this.collectionRepository.readRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        initRequestTab?.getValue().id,
+      );
 
-      // console.log(res);
-      
-      // await this.collectionRepository.addRequestInFolder(
-      //   requestObj.collectionId,
-      //   requestObj.folderId,
-      //   res,
-      // );
-      // initRequestTab.updateId(res.id);
-      // initRequestTab.updatePath({
-      //   workspaceId: collection.workspaceId,
-      //   collectionId: collection.id,
-      //   folderId: folder.id,
-      // });
-      // initRequestTab.updateIsSave(true);
-      // // this.handleOpenRequest(collection, folder, sampleRequest);
-      // this.tabRepository.createTab(initRequestTab.getValue());
-      // moveNavigation("right");
-      // MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
-      //   source: "Side Panel Dropdown",
-      // });
+      res.id = uuidv4();
+      await this.collectionRepository.updateRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        initRequestTab.getValue().id,
+        res,
+      );
+
+      initRequestTab.updateId(res.id);
+      initRequestTab.updatePath({
+        workspaceId: collection.workspaceId,
+        collectionId: collection.id,
+        folderId: folder.id,
+      });
+      initRequestTab.updateIsSave(true);
+      // this.handleOpenRequest(collection, folder, sampleRequest);
+      await this.tabRepository.createTab(initRequestTab.getValue());
+      moveNavigation("right");
+      MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
+        source: "Side Panel Dropdown",
+      });
       return;
     }
 

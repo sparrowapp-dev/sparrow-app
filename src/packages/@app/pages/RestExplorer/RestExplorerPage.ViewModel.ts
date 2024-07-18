@@ -587,6 +587,41 @@ class RestExplorerViewModel
       description: "",
       ...userSource,
     };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser == true) {
+      const data = {
+        id: uuidv4(),
+        name: _folderName,
+        description: "",
+        type: "FOLDER",
+        source: "USER",
+        isDeleted: false,
+        items: [],
+        createdBy: "Guest User",
+        updatedBy: "Guest User",
+        createdAt: "",
+        updatedAt: "",
+      };
+
+      const latestRoute = {
+        id: data.id,
+      };
+      return {
+        status: "success",
+        data: {
+          latestRoute,
+          collectionId: _collectionId,
+          data: data,
+          addRequestOrFolderInCollection: this.addRequestOrFolderInCollection,
+        },
+      };
+    }
+
     const res = await insertCollectionDirectory(
       _workspaceMeta.id,
       _collectionId,
@@ -630,6 +665,48 @@ class RestExplorerViewModel
       name: _collectionName,
       workspaceId: _workspaceMeta.id,
     };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser == true) {
+      const data = {
+        _id: uuidv4(),
+        name: _collectionName,
+        totalRequests: 0,
+        createdBy: "Guest User",
+        items: [],
+        updatedBy: "Guest User",
+        // createdAt: new Date().toISOString,
+        // updatedAt: new Date().toISOString,
+        createdAt: "",
+        createdby: "",
+      };
+      const latestRoute = {
+        id: data._id,
+      };
+      const storage = data;
+      const _id = data._id;
+      delete storage._id;
+      storage.id = _id;
+      storage.workspaceId = _workspaceMeta.id;
+      MixpanelEvent(Events.CREATE_COLLECTION, {
+        source: "SaveRequest",
+        collectionName: data.name,
+        collectionId: data._id,
+      });
+      return {
+        status: "success",
+        data: {
+          latestRoute,
+          storage,
+          addCollection: this.addCollection,
+        },
+      };
+    }
+
     const res = await insertCollection(newCollection);
     if (res.isSuccessful) {
       const latestRoute = {
@@ -708,42 +785,38 @@ class RestExplorerViewModel
       isGuestUser = value;
     });
     if (isGuestUser === true) {
-      const res =
-        await this.collectionRepository.readRequestOrFolderInCollection(
+      const progressiveTab = this._tab.getValue();
+      const data = {
+        id: progressiveTab.id,
+        name: requestMetaData.name,
+        description: requestMetaData.description,
+        type: "REQUEST",
+        request: unadaptedRequest,
+        updatedAt: "",
+        updatedBy: "Guest User",
+      };
+
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+      this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
           collectionId,
           _id,
+          data,
         );
-
-      if (res) {
-        const progressiveTab = this._tab.getValue();
-        progressiveTab.isSaved = true;
-        this.tab = progressiveTab;
-        this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-        if (!folderId) {
-          this.collectionRepository.updateRequestOrFolderInCollection(
-            collectionId,
-            _id,
-            res,
-          );
-        } else {
-          this.collectionRepository.updateRequestInFolder(
-            collectionId,
-            folderId,
-            _id,
-            res,
-          );
-        }
-        return {
-          status: "success",
-          message: "success",
-        };
       } else {
-        return {
-          status: "error",
-          message: "error",
-        };
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          _id,
+          data,
+        );
       }
-      return;
+      return {
+        status: "success",
+        message: "",
+      };
     }
     const res = await updateCollectionRequest(_id, folderId, collectionId, {
       collectionId: collectionId,
@@ -755,7 +828,6 @@ class RestExplorerViewModel
         request: unadaptedRequest,
       },
     });
-    console.log(res);
 
     if (res.isSuccessful) {
       const progressiveTab = this._tab.getValue();
@@ -1297,33 +1369,30 @@ class RestExplorerViewModel
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
-    if (isGuestUser !== true) {
-      if (newCollectionName) {
-        const response = await this.collectionService.updateCollectionData(
-          collectionId,
-          workspaceId,
-          { name: newCollectionName },
-        );
-        if (response.isSuccessful) {
-          this.collectionRepository.updateCollection(
-            collectionId,
-            response.data.data,
-          );
-          notifications.success("Collection renamed successfully!");
-        } else if (response.message === "Network Error") {
-          notifications.error(response.message);
-        } else {
-          notifications.error("Failed to rename collection!");
-        }
-        return response;
+    if (newCollectionName) {
+      if (isGuestUser == true) {
+        let col = await this.collectionRepository.readCollection(collectionId);
+        col = col.toMutableJSON();
+        col.name = newCollectionName;
+        this.collectionRepository.updateCollection(collectionId, col);
+        notifications.success("Collection renamed successfully!");
+        return;
       }
-    } else {
-      const response = await this.collectionRepository.updateCollection(
+      const response = await this.collectionService.updateCollectionData(
         collectionId,
-        newCollectionName,
+        workspaceId,
+        { name: newCollectionName },
       );
       if (response.isSuccessful) {
-        notifications.success("New Collection Created");
+        this.collectionRepository.updateCollection(
+          collectionId,
+          response.data.data,
+        );
+        notifications.success("Collection renamed successfully!");
+      } else if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error("Failed to rename collection!");
       }
       return response;
     }
@@ -1365,13 +1434,14 @@ class RestExplorerViewModel
         isGuestUser = value;
       });
       if (isGuestUser === true) {
-        this.tabRepository.updateTab(folderId, { name: newFolderName });
+
         const res =
           await this.collectionRepository.readRequestOrFolderInCollection(
             collectionId,
             folderId,
           );
-        res.name = newFolderName;
+          res.name = newFolderName;
+          
         this.collectionRepository.updateRequestOrFolderInCollection(
           collectionId,
           folderId,

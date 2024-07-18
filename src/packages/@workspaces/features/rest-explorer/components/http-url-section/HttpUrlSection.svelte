@@ -177,19 +177,13 @@
       onUpdateRequestState({ requestSplitterDirection: e.detail });
     }}
   /> -->
-  <Tooltip
-    title={"Save"}
-    placement={"bottom"}
-    distance={12}
-    zIndex={10}
-  >
+  <Tooltip title={"Save"} placement={"bottom"} distance={12} zIndex={10}>
     <button
       class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
       on:click={handleSaveRequest}
       on:mouseenter={handleMouseEnter}
       on:mouseleave={handleMouseLeave}
-      disabled={isSave ||
-      userRole === WorkspaceRole.WORKSPACE_VIEWER
+      disabled={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
         : false}
     >
