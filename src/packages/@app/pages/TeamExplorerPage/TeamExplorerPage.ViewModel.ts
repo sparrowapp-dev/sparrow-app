@@ -115,6 +115,8 @@ export class TeamExplorerPageViewModel {
    * @param userId User id
    */
   public refreshTeams = async (userId: string): Promise<void> => {
+    if (!userId) return;
+
     let openTeamId: string = "";
     const teamsData = await this.teamRepository.getTeamData();
     teamsData.forEach((element) => {
@@ -179,6 +181,7 @@ export class TeamExplorerPageViewModel {
    * @param userId User id
    */
   public refreshWorkspaces = async (userId: string): Promise<void> => {
+    if (!userId) return;
     const workspaces = await this.workspaceRepository.getWorkspacesDocs();
     const idToEnvironmentMap = {};
     workspaces.forEach((element) => {
@@ -338,7 +341,6 @@ export class TeamExplorerPageViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      console.log("val", value);
       loggedInUserId = value._id;
     });
     const response = await this.teamService.removeMembersAtTeam(
@@ -405,7 +407,6 @@ export class TeamExplorerPageViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      console.log("val", value);
       loggedInUserId = value._id;
     });
     const response = await this.teamService.promoteToAdminAtTeam(
@@ -495,7 +496,6 @@ export class TeamExplorerPageViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      console.log("val", value);
       loggedInUserId = value._id;
     });
     const response = await this.workspaceService.removeUserFromWorkspace(
@@ -529,7 +529,6 @@ export class TeamExplorerPageViewModel {
   ) => {
     let loggedInUserId = "";
     user.subscribe((value) => {
-      console.log("val", value);
       loggedInUserId = value._id;
     });
     const response = await this.workspaceService.changeUserRoleAtWorkspace(
