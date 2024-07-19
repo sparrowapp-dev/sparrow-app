@@ -10,20 +10,23 @@
    */
   export let workspace: any;
   /**
-   * User is admin or onwerc
+   * Checks if the current user has admin or owner privileges.
    */
   export let isAdminOrOwner: boolean;
   /**
    * Callback for switching workspace
    */
   export let onSwitchWorkspace: (id: string) => void;
+  /**
+   * function to delete workspace
+   */
+  export let onDeleteWorkspace;
 
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
 
   let menuItems = [];
   const handleOpenWorkspace = async () => {
-    console.log("onworkspace click--->", workspace);
     onSwitchWorkspace(workspace._id);
   };
 
@@ -55,16 +58,13 @@
           displayText: "Open Workspace",
           disabled: false,
         },
-        // Will be enabled in next phase
-        // {
-        //   onClick: async (e) => {
-        //     handleDeletePopup(true);
-        //   },
-        //   displayText: "Delete Workspace",
-        //   disabled: !(
-        //     openTeam?.admins?.includes(userId) || openTeam?.owner == userId
-        //   ),
-        // },
+        {
+          onClick: () => {
+            onDeleteWorkspace(workspace);
+          },
+          displayText: "Delete Workspace",
+          disabled: false,
+        },
       ];
     } else {
       menuItems = [

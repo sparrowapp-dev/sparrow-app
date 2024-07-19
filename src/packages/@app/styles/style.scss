@@ -95,18 +95,18 @@ $theme-grey-F5F5F5: #F5F5F5;
 $theme-grey-e5e5e5: #e5e5e5;
 $theme-grey-C4CBDA: #C4CBDA;
 $theme-grey-8A9299: #8A9299;
-$theme-grey-CCCCCC : #CCCCCC;
 $theme-grey-999999: #999999;
-$theme-grey-CCCCCC : #CCCCCC;
+$theme-grey-CCCCCC :#CCCCCC;
 $theme-grey-888888: #888888;
 $theme-grey-83899F: #83899F;
 $theme-grey-808080: #808080;
 $theme-grey-636566: #636566;
+$theme-grey-60616B: #60616B;
 $theme-grey-484848: #484848;
 $theme-grey-4D4D4D: #4D4D4D;
 $theme-grey-45494D: #45494D;
 $theme-grey-353646: #353646;
-
+$theme-grey-333333: #333333;
 $theme-grey-313233: #313233;
 
 $theme-grey-272727: #272727;
@@ -117,6 +117,7 @@ $theme-grey-151515: #151515;
 $theme-grey-000000: #000000;
 $theme-grey-191919: #191919;
 $theme-grey-121212: #121212;
+
 
 $theme-blue-F5F6F8: #F5F6F8;
 $theme-blue-B0B0B0: #b0b0b0;
@@ -263,6 +264,7 @@ $theme-red-230408: #230408;
   --text-secondary-290 : #{$theme-grey-484848};
   --text-secondary-300 : #{$theme-grey-45494D};
   --text-secondary-350 : #{$theme-grey-636566};
+  --text-secondary-370 : #{$theme-grey-60616B};
   --text-secondary-400 : #{$theme-grey-313233};
   --text-secondary-450 : #{$theme-grey-191919};
   --text-secondary-500 : #{$theme-grey-272727};
@@ -318,6 +320,7 @@ $theme-red-230408: #230408;
   --bg-secondary-290 : #{$theme-grey-484848};
   --bg-secondary-300 : #{$theme-grey-45494D};
   --bg-secondary-320 : #{$theme-grey-353646};
+  --bg-secondary-330 : #{$theme-grey-333333};
   --bg-secondary-350 : #{$theme-grey-888888};
   --bg-secondary-400 : #{$theme-grey-313233};
   --bg-secondary-450 : #{$theme-grey-191919};
@@ -420,6 +423,7 @@ $theme-red-230408: #230408;
   --icon-secondary-110 : #{$theme-grey-F5F5F5};
   --icon-secondary-150 : #{$theme-grey-e5e5e5};
   --icon-secondary-200 : #{$theme-grey-8A9299};
+  --icon-secondary-220 : #{$theme-grey-60616B};
   --icon-secondary-290 : #{$theme-grey-484848};
   --icon-secondary-300 : #{$theme-grey-45494D};
   --icon-secondary-400 : #{$theme-grey-313233};
@@ -430,6 +434,7 @@ $theme-red-230408: #230408;
   --icon-secondary-800 : #{$theme-grey-151515};
   --icon-secondary-900 : #{$theme-grey-000000};
   --icon-secondary-950 : #{$theme-grey-808080};
+  --icon-secondary-1000 : #{$theme-grey-CCCCCC};
 
 
   --icon-tertiary-100 : #{$theme-violet-676A80};
@@ -564,6 +569,7 @@ $sparrow-text-colors: (
   secondary-170 : $theme-grey-C4CBDA,
   secondary-200 : $theme-grey-8A9299,
   secondary-250 : $theme-grey-636566,
+  secondary-270 : $theme-grey-60616B,
   secondary-290 : $theme-grey-484848,
   secondary-300 : $theme-grey-45494D,
   secondary-400 : $theme-grey-313233,
@@ -620,7 +626,7 @@ $sparrow-bg-colors: (
   secondary-850 : $theme-grey-121212,
   secondary-900 : $theme-grey-000000,
   secondary-1000 : $theme-grey-CCCCCC,
-
+  
   tertiary-100 : $theme-violet-676A80,
   tertiary-190 : $theme-violet-37394E,
   tertiary-300 : $theme-violet-2A2C3C,
@@ -771,7 +777,6 @@ span {
 
 
 .ellipsis {
-  color: inherit;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -828,6 +833,7 @@ span {
   background-size:12px;
   background-position: center;
 }
+
 
 
 .env-highlight {

@@ -3,7 +3,7 @@
   import { Tooltip } from "@library/ui";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import List from "@library/ui/list/List.svelte";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import { WorkspaceRole } from "$lib/utils/enums";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
@@ -101,10 +101,7 @@
     <Tooltip placement="bottom" title="Add Environment" distance={13}>
       <WithButtonV2
         icon={PlusIcon}
-        disable={!hasWorkpaceLevelPermission(
-          loggedUserRoleInWorkspace,
-          workspaceLevelPermissions.ADD_ENVIRONMENT,
-        )}
+        disable={loggedUserRoleInWorkspace === WorkspaceRole.WORKSPACE_VIEWER}
         onClick={async () => {
           await onCreateEnvironment(localEnvironment);
           scrollList("bottom");
@@ -146,24 +143,26 @@
           Add Environments to your Workspace to test your APIs with the relevant
           set of resources and constraints.
         </p>
-        <p
-          class="mx-4 add-environment d-flex justify-content-center align-items-center border-radius-2"
-          style="color: var(--text-secondary-100);"
-          role="button"
-          on:click={() => {
-            onCreateEnvironment(localEnvironment);
-          }}
-        >
-          <PlusIcon
-            height={"22px"}
-            width={"22px"}
-            color={"var(--text-secondary-200)"}
-          />
-          <span
-            style="color: var(--text-secondary-200)"
-            class="ps-2 fw-bold text-fs-12">Add Environment</span
+        {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
+          <p
+            class="mx-4 add-environment d-flex justify-content-center align-items-center border-radius-2"
+            style="color: var(--text-secondary-100);"
+            role="button"
+            on:click={() => {
+              onCreateEnvironment(localEnvironment);
+            }}
           >
-        </p>
+            <PlusIcon
+              height={"22px"}
+              width={"22px"}
+              color={"var(--text-secondary-200)"}
+            />
+            <span
+              style="color: var(--text-secondary-200)"
+              class="ps-2 fw-bold text-fs-12">Add Environment</span
+            >
+          </p>
+        {/if}
       </div>
     {/if}
     {#if localEnvironment && localEnvironment.length > 0}
@@ -176,6 +175,7 @@
       >
         {#each localEnvironment as env}
           <ListItem
+            bind:loggedUserRoleInWorkspace
             {env}
             {currentWorkspace}
             {currentEnvironment}

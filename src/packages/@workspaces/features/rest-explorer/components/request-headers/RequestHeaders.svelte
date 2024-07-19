@@ -16,10 +16,14 @@
   export let isBulkEditActive
   export let onUpdateRequestState
    let isBulkEditRequired=true;
+   let isBulkEditHeaderInfoRequired=true;
 
-  let placeholderHeader=`Usage: Use bulk edit to manage multiple Headers quickly. Separate each entry with a new line.
-Format: Header-Key: Header-Value
-Example: userID: Sparrow12`
+//   let placeholderHeader=`Usage: Use bulk edit to manage multiple Headers quickly. Separate each entry with a new line.
+// Format: Header-Key: Header-Value
+// Example: userID: Sparrow12`
+
+let placeholderHeader = "Usage - Manage multiple headers.  Format - Key: Value"
+
 
 
   let showGeneratedHeader: boolean = false;
@@ -42,6 +46,7 @@ Example: userID: Sparrow12`
   <TabularInput
   isBulkEditRequired={isBulkEditRequired}
   bulkEditPlaceholder={placeholderHeader}
+  isBulkEditHeaderInfoRequired={isBulkEditHeaderInfoRequired}
   {isBulkEditActive}
       onToggleBulkEdit={toggleBulkEdit}
     keyValue={createDeepCopy(headers)}

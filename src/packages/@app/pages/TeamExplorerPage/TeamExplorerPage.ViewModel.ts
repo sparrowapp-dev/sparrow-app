@@ -2,10 +2,12 @@ import { user } from "$lib/store";
 import type { InviteBody } from "$lib/utils/dto/team-dto";
 import { UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
 import type { WorkspaceDocument } from "@app/database/database";
+import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { TeamService } from "@app/services/team.service";
+import { UserService } from "@app/services/user.service";
 import { WorkspaceService } from "@app/services/workspace.service";
 import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
 import { notifications } from "@library/ui/toast/Toast";
@@ -20,6 +22,8 @@ export class TeamExplorerPageViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private workspaceService = new WorkspaceService();
   private teamService = new TeamService();
+  private guestUserRepository = new GuestUserRepository();
+  private userService = new UserService();
 
   private _activeTeamTab: BehaviorSubject<string> = new BehaviorSubject(
     "Workspaces",
@@ -113,6 +117,8 @@ export class TeamExplorerPageViewModel {
    * @param userId User id
    */
   public refreshTeams = async (userId: string): Promise<void> => {
+    if (!userId) return;
+
     let openTeamId: string = "";
     const teamsData = await this.teamRepository.getTeamData();
     teamsData.forEach((element) => {
@@ -126,6 +132,7 @@ export class TeamExplorerPageViewModel {
           _id,
           name,
           users,
+          description,
           logo,
           workspaces,
           owner,
@@ -144,6 +151,7 @@ export class TeamExplorerPageViewModel {
           teamId: _id,
           name,
           users,
+          description,
           logo,
           workspaces: updatedWorkspaces,
           owner,
@@ -177,6 +185,7 @@ export class TeamExplorerPageViewModel {
    * @param userId User id
    */
   public refreshWorkspaces = async (userId: string): Promise<void> => {
+    if (!userId) return;
     const workspaces = await this.workspaceRepository.getWorkspacesDocs();
     const idToEnvironmentMap = {};
     workspaces.forEach((element) => {
@@ -334,6 +343,10 @@ export class TeamExplorerPageViewModel {
     _userId: string,
     _userName: string,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      loggedInUserId = value?._id;
+    });
     const response = await this.teamService.removeMembersAtTeam(
       _teamId,
       _userId,
@@ -341,7 +354,7 @@ export class TeamExplorerPageViewModel {
     if (response.isSuccessful) {
       const responseData = response.data.data;
       await this.teamRepository.modifyTeam(_teamId, responseData);
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       notifications.success(`${_userName} is removed from ${_teamName}`);
     } else {
       notifications.error(`Failed to remove ${_userName} from ${_teamName}`);
@@ -362,6 +375,10 @@ export class TeamExplorerPageViewModel {
     _userId: string,
     _userName: string,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      loggedInUserId = value?._id;
+    });
     const response = await this.teamService.demoteToMemberAtTeam(
       _teamId,
       _userId,
@@ -369,7 +386,7 @@ export class TeamExplorerPageViewModel {
     if (response.isSuccessful === true) {
       const responseData = response.data.data;
       await this.teamRepository.modifyTeam(_teamId, responseData);
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       notifications.success(`${_userName} is now a member`);
     } else {
       notifications.error(
@@ -392,6 +409,10 @@ export class TeamExplorerPageViewModel {
     _userId: string,
     _userName: string,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      loggedInUserId = value?._id;
+    });
     const response = await this.teamService.promoteToAdminAtTeam(
       _teamId,
       _userId,
@@ -399,7 +420,7 @@ export class TeamExplorerPageViewModel {
     if (response.isSuccessful) {
       const responseData = response.data.data;
       await this.teamRepository.modifyTeam(_teamId, responseData);
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       notifications.success(`${_userName} is now an admin`);
     } else {
       notifications.error(
@@ -422,25 +443,48 @@ export class TeamExplorerPageViewModel {
     _userId: string,
     _userName: string,
   ) => {
-    const response = await this.teamService.promoteToOwnerAtTeam(
-      _teamId,
-      _userId,
-    );
-    if (response.isSuccessful === true) {
-      const responseData = response.data.data;
-      await this.teamRepository.modifyTeam(_teamId, responseData);
-      await this.refreshWorkspaces(_userId);
-      notifications.success(
-        `${_userName} is now the new Owner of ${_teamName}.`,
+    let userId;
+    user.subscribe(async (value) => {
+      if (value) {
+        userId = value._id;
+      }
+    });
+    const res = await this.teamRepository.getTeamData();
+    let count = 0;
+    for (let index = 0; index < res.length; index++) {
+      let ownerId = res[index]._data.owner;
+
+      if (ownerId === userId) {
+        count++;
+      }
+    }
+
+    if (count > 1) {
+      const response = await this.teamService.promoteToOwnerAtTeam(
+        _teamId,
+        _userId,
       );
+
+      if (response.isSuccessful === true) {
+        const responseData = response.data.data;
+        await this.teamRepository.modifyTeam(_teamId, responseData);
+        await this.refreshWorkspaces(userId);
+        notifications.success(
+          `${_userName} is now the new Owner of ${_teamName}.`,
+        );
+      } else {
+        notifications.error(
+          `Failed to update access of Owner. Please try again.`,
+        );
+      }
+      return response;
     } else {
       notifications.error(
-        `Failed to update access of Owner. Please try again.`,
+        "You must be owner of at least one other team to transfer ownership",
       );
+      return;
     }
-    return response;
   };
-
   /**
    * Removes a user from a workspace.
    * @param _workspaceId - The ID of the workspace where remove user is to take place.
@@ -454,12 +498,16 @@ export class TeamExplorerPageViewModel {
     _userId: string,
     _userName: string,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      loggedInUserId = value?._id;
+    });
     const response = await this.workspaceService.removeUserFromWorkspace(
       _workspaceId,
       _userId,
     );
     if (response.isSuccessful === true) {
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       notifications.success(`${_userName} is removed from ${_workspaceName}`);
     } else {
       notifications.error(
@@ -483,13 +531,17 @@ export class TeamExplorerPageViewModel {
     _userName: string,
     _body: WorkspaceRole,
   ) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      loggedInUserId = value?._id;
+    });
     const response = await this.workspaceService.changeUserRoleAtWorkspace(
       _workspaceId,
       _userId,
       _body,
     );
     if (response.isSuccessful) {
-      await this.refreshWorkspaces(_userId);
+      await this.refreshWorkspaces(loggedInUserId);
       if (_body === WorkspaceRole.WORKSPACE_VIEWER) {
         notifications.success(
           `${_userName} is now a viewer on ${_workspaceName}`,
@@ -504,5 +556,137 @@ export class TeamExplorerPageViewModel {
         `Failed to change role for ${_userName}. Please try again.`,
       );
     }
+  };
+
+  /**
+   * Delete the workspace and update the local DB as per changes
+   * Updates workspace, team, and tab repository.
+   * Also updates active workspace state, if active workspace is deleted
+   * @param workspace - workspace document
+   * @returns - A promise that resolves when the delete workspace is complete.
+   */
+  public handleDeleteWorkspace = async (workspace: WorkspaceDocument) => {
+    const isActiveWorkspace =
+      await this.workspaceRepository.checkActiveWorkspace(workspace._id);
+    const workspaces = await this.workspaceRepository.getWorkspacesDocs();
+    if (isActiveWorkspace && workspaces.length === 1) {
+      notifications.error(
+        "Failed to delete the last workspace. Please create a new workspace before deleting this workspace.",
+      );
+      return;
+    }
+    const response = await this.workspaceService.deleteWorkspace(workspace._id);
+    if (response.isSuccessful) {
+      await this.workspaceRepository.deleteWorkspace(workspace._id);
+      if (isActiveWorkspace) {
+        await this.workspaceRepository.activateInitialWorkspace();
+      }
+      await this.tabRepository.removeTabsByQuery({
+        selector: {
+          "path.workspaceId": workspace._id,
+        },
+      });
+      await this.teamRepository.removeWorkspaceFromTeam(
+        workspace.team?.teamId,
+        workspace._id,
+      );
+      const tabs = await this.tabRepository.getTabDocs();
+      if (!tabs) {
+        await this.tabRepository.activateInitialTab();
+      }
+      notifications.success(
+        `${workspace.name} is removed from ${workspace?.team?.teamName}.`,
+      );
+    } else {
+      notifications.error(
+        `Failed to remove ${workspace.name} from ${workspace?.team?.teamName}. Please try again.`,
+      );
+    }
+    return response;
+  };
+
+  /*
+   * updates the team details
+   * @param _teamId - team id to be updated
+   * @param _teamData - team data that will be override
+   */
+  public updateTeam = async (_teamId: string, _teamData: any) => {
+    const response = await this.teamService.updateTeam(_teamId, _teamData);
+    if (response.isSuccessful) {
+      delete response?._id;
+      this.teamRepository.modifyTeam(_teamId, response.data.data);
+    }
+  };
+
+  /**
+   * Leaving a team 
+   * @param teamId - The ID of the team where the user is trying to left.
+   * @param _userId - The ID of the user who  is leaving the team.
+  
+**/
+
+  public leaveTeam = async (userId: string, teamId: string) => {
+    const response = await this.teamService.leaveTeam(teamId);
+
+    if (!response.isSuccessful) {
+      notifications.error(
+        response.message ?? "Failed to leave the team. Please try again.",
+      );
+      return response;
+    }
+
+    await new Promise<void>((resolve) =>
+      setTimeout(async () => {
+        const activeTeam = await this.teamRepository.checkActiveTeam();
+        if (activeTeam) {
+          const teamIdToActivate =
+            await this.workspaceRepository.activateInitialWorkspace();
+          if (teamIdToActivate) {
+            await this.teamRepository.setActiveTeam(teamIdToActivate);
+          }
+        }
+        resolve();
+      }, 500),
+    );
+
+    await new Promise<void>((resolve) =>
+      setTimeout(async () => {
+        await this.refreshTeams(userId);
+        await this.refreshWorkspaces(userId);
+        notifications.success("You left a team.");
+        resolve();
+      }, 500),
+    );
+
+    return response;
+  };
+
+  /**
+   * Fetch guest user state
+   * @returns boolean for is user guest user or not
+   */
+  public getGuestUser = async () => {
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    return isGuestUser;
+  };
+
+  /**
+   * Validates the user email by making a GET request to the server.
+   *
+   * @param  email - The email address to be validated.
+   * @returns A promise that resolves to the server's response.
+   */
+  public validateUserEmail = async (email: string) => {
+    const response = await this.userService.validateUserEmail(email);
+    if (response.isSuccessful) {
+      if (response?.data?.data?.registeredWith === "unknown") {
+        return false;
+      }
+      return true;
+    }
+    return false;
   };
 }

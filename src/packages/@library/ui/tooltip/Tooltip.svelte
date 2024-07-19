@@ -87,7 +87,7 @@
       : ''} tooltip-text invisible m-auto text-center bg-tertiary-700 text-lightGray position-fixed justify-content-center align-items-center opacity-0
  {placement.toString()} "
     style="top: {top}; left: {left}; right: {right}; bottom: {bottom}; transition: {transitionTime} ; padding:{spacing}; font-size:{fontSize}; z-index : {zIndex} ; border-radius: {borderRadius}; {styleProp}"
-    >{title}
+  >{@html title}
     {#if placement === "left"}
       <span
         class="position-absolute tooltip-square border-radius-2"

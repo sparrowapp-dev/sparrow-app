@@ -47,6 +47,11 @@
   ) => Promise<number>;
 
   /**
+   * Role of user in active workspace
+   */
+  export let userRole;
+
+  /**
    * Components
    */
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
@@ -61,6 +66,7 @@
    * Constants
    */
   import { PERMISSION_NOT_FOUND_TEXT } from "$lib/utils/constants/permissions.constant";
+  import { WorkspaceRole } from "$lib/utils/enums";
 
   /**
    * Local variables
@@ -115,7 +121,8 @@
           required
           id="renameInputFieldFolder"
           value={folder?.name}
-          disabled={tab?.source === "SPEC"}
+          disabled={tab?.source === "SPEC" ||
+            userRole === WorkspaceRole.WORKSPACE_VIEWER}
           class="bg-transparent input-outline border-0 text-left w-100 ps-2 py-0 fs-5"
           maxlength={100}
           on:blur={(event) => {
@@ -135,7 +142,8 @@
         />
 
         <button
-          disabled={!userRoleInWorkspace || tab?.source === "SPEC"}
+          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+            tab?.source === "SPEC"}
           class="btn btn-primary rounded m-1 border-0 text-align-right py-1"
           style="width:200px;"
           on:click={() => {
@@ -153,7 +161,8 @@
     </div>
     <div class="d-flex align-items-start ps-0 h-100">
       <textarea
-        disabled={!userRoleInWorkspace || tab?.source === "SPEC"}
+        disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+          tab?.source === "SPEC"}
         id="updateFolderDescField"
         style="font-size: 14px; "
         class="form-control bg-transparent border-0 text-textColor fs-6 h-50 input-outline shadow-none"

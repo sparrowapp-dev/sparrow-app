@@ -67,11 +67,12 @@
 </script>
 
 <div>
-  <div class="d-flex tile">
-    <div class="info d-flex">
+  <div class="d-flex tile align-items-center justify-content-center">
+    <div class="info d-flex align-items-center mt-2">
       <div class="icon d-flex align-items-center justify-content-center">
-        <span>{user.name[0].toUpperCase()}</span>
+        <span style="mt-2">{user.name[0].toUpperCase()}</span>
       </div>
+
       <div class="name px-2">
         <span class="text-whiteColor sparrow-fs-12"
           >{user.name} {owner ? "(You)" : ""}</span
@@ -79,7 +80,8 @@
         <span class="text-textColor sparrow-fs-12">{user.email}</span>
       </div>
     </div>
-    <div class="position">
+
+    <div class="position mt-3">
       {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}
         <Select
           id={"profile" + user.id}
@@ -87,22 +89,28 @@
           titleId={user.role ? user.role : ""}
           onclick={handleDropdown}
           menuItem={"v2"}
-          headerTheme={"transparent"}
+          bodyTheme={"violet"}
+          headerTheme={"violet"}
           borderType={"none"}
-          disabled={true}
+          disabled={false}
           headerFontSize={"10px"}
+          headerFontWeight={400}
+          borderRounded={"4px"}
         />
-      {:else if userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN}
+      {:else if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_ADMIN)}
         <Select
           id={"profile" + user.id}
           data={getPermissionsData()}
           titleId={user.role ? user.role : ""}
           onclick={handleDropdown}
           menuItem={"v2"}
-          headerTheme={"transparent"}
+          headerTheme={"violet"}
+          bodyTheme={"violet"}
           borderType={"none"}
-          disabled={true}
+          disabled={false}
           headerFontSize={"10px"}
+          headerFontWeight={400}
+          borderRounded={"4px"}
         />
       {:else}
         <Select
@@ -115,12 +123,15 @@
           borderType={"none"}
           disabled={true}
           headerFontSize={"10px"}
+          position={"absolute"}
         />
       {/if}
     </div>
   </div>
 </div>
-<hr />
+
+<hr style="color: var(--text-secondary-400 ); margin-bottom:4px" />
+
 <div class="team-workspace mb-1 sparrow-fs-14">
   {#each workspaces as workspace}
     {#if workspace.position}
@@ -138,6 +149,7 @@
     {/if}
   {/each}
 </div>
+
 <div
   class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
   style="font-size: 16px;"

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Select } from "@library/forms";
-  import { CloudOffIcon, StackIcon } from "@library/icons";
+  import { CloudOffIcon, SparrowEdgeIcon, StackIcon } from "@library/icons";
   import { environmentType } from "$lib/utils/enums";
   import { ArrowIcon } from "@library/icons";
   import { DownArrowIcon } from "$lib/assets/icons";
@@ -11,6 +11,7 @@
   import type { WorkspaceDocument } from "@app/database/database";
   import { PlusIcon } from "@library/icons";
   import { navigate } from "svelte-navigator";
+  import PopupHint from "./sub-component/PopupHint.svelte";
   /**
    * environment list
    */
@@ -123,6 +124,17 @@
   class="app-header ps-1 pe-3 d-flex align-items-center justify-content-between"
 >
   <div class="d-flex ms-3 justify-content-cdenter align-items-center">
+    {#if isGuestUser}
+    <div>
+      <SparrowEdgeIcon
+        height="25px"
+        width="24px"
+        color="var(--primary-btn-color)"
+      />
+    </div>
+
+
+    {:else}
     <div>
       <SparrowIcon
         height="17px"
@@ -130,7 +142,7 @@
         color="var(--primary-btn-color)"
       />
     </div>
-
+{/if}
     <div class="ms-3">
       <Select
         id={"workspace-dropdown"}
@@ -186,21 +198,16 @@
     </div>
   </div>
 
-  <div class="d-flex align-items-center">
+  <div class="d-flex align-items-center" style="position: relative;">
     {#if isGuestUser && isLoginBannerActive === false}
-      <Tooltip title={"Reconnect to explore more features!"} placement="bottom">
-        <CloudOffIcon
-          height="19px"
-          width="23px"
-          color="var(--icon-secondary-290)"
-        />
-      </Tooltip>
+      <PopupHint />
+
       <div
         style="background-color:#313233; justify-content:center; align-items:center; margin-right:10px; margin-left:10px; border-radius:2px"
         class="join-container"
         on:click={onLoginUser}
       >
-        <span class="join-txt"> Join the Experience </span>
+        <span class="join-txt"> Sign In for Enhanced Experience</span>
       </div>
     {/if}
 
@@ -251,10 +258,13 @@
   }
   .join-txt {
     font-size: 12px;
-    padding-left: 16px;
+    padding-left: 12px;
     padding-right: 16px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .join-container {
     cursor: pointer;

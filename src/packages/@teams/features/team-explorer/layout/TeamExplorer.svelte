@@ -16,8 +16,10 @@
   } from "@teams/common/constants/TeamTabs.constants";
   import { WorkspaceListView } from "../components";
   import WorkspaceGridView from "../components/workspace-grid-view/WorkspaceGridView.svelte";
-  import { TeamMembers } from "@teams/features";
-  import { CrossIcon } from "@library/icons";
+  import { TeamMembers, TeamSettings } from "@teams/features";
+  import { CrossIcon, MoreOptions } from "@library/icons";
+  import { Tooltip, Dropdown } from "@library/ui";
+
   /**
    * user ID
    */
@@ -43,6 +45,8 @@
    * Invite team toggler
    */
   export let isTeamInviteModalOpen;
+
+  export let isLeaveTeamModelOpen;
 
   /**
    * Callback For creating workspace
@@ -76,6 +80,20 @@
    * function to change user role at workspace
    */
   export let onChangeUserRoleAtWorkspace;
+  /**
+   * function to delete workspace
+   */
+  export let onDeleteWorkspace;
+
+  /**
+   * function to update team details
+   */
+  export let onUpdateTeam;
+
+  /**
+   * Flag to check if user is guest user
+   */
+  export let isGuestUser = false;
 
   let selectedView: string = "Grid";
 
@@ -97,23 +115,23 @@
       {
         name: "Workspaces",
         id: TeamTabsEnum.WORKSPACES,
-        count: openTeam.workspaces?.length,
+        count: openTeam?.workspaces?.length,
         visible: true,
-        disabled: false,
+        disabled: isGuestUser === true ? true : false,
       },
       {
         name: "Members",
         id: TeamTabsEnum.MEMBERS,
-        count: openTeam.users?.length,
+        count: openTeam?.users?.length,
         visible: true,
-        disabled: false,
+        disabled: isGuestUser === true ? true : false,
       },
       {
         name: "Settings",
         id: TeamTabsEnum.SETTINGS,
         count: 0,
         visible: openTeam?.owner === userId,
-        disabled: true,
+        disabled: isGuestUser === true ? true : false,
       },
     ];
   };
@@ -123,10 +141,15 @@
       findUserType();
     }
   }
+  let previousTeamId = "";
   $: {
     if (openTeam) {
       findUserType();
       teamTabs = refreshTabs();
+      if (previousTeamId !== openTeam?.teamId) {
+        onUpdateActiveTab(TeamTabsEnum.WORKSPACES);
+      }
+      previousTeamId = openTeam?.teamId;
     }
   }
 
@@ -136,6 +159,12 @@
 
   let searchQuery = "";
   let hasText = false;
+  let leaveButtonMenu: boolean = false;
+
+  const handleLeaveTeam = () => {
+    leaveButtonMenu = !leaveButtonMenu;
+    isLeaveTeamModelOpen = true;
+  };
 
   const handleSearchInput = (event) => {
     searchQuery = event.target.value.toLowerCase();
@@ -149,6 +178,19 @@
   onDestroy(() => {
     selectedViewSubscribe();
   });
+
+  const addButtonData = [
+    {
+      name: "Leave Team",
+      color: "var(--dangerColor)",
+      onclick: () => handleLeaveTeam(),
+    },
+  ];
+  $: {
+    if (isGuestUser) {
+      teamTabs = refreshTabs();
+    }
+  }
 </script>
 
 {#if openTeam}
@@ -181,11 +223,42 @@
               style="font-size: 24px;"
               >{openTeam?.name || ""}
             </span>
+
+            <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
+            {#if !isGuestUser}
+              {#if userRole !== "owner"}
+                <div
+                  class="ms-2 d-flex justify-content-center align-items-center mt-2 moreOption-icon rounded"
+                  on:click={() => {
+                    leaveButtonMenu = !leaveButtonMenu;
+                  }}
+                >
+                  <Dropdown
+                    zIndex={600}
+                    buttonId="leaveButton"
+                    bind:isMenuOpen={leaveButtonMenu}
+                    options={addButtonData}
+                  >
+                    <Tooltip
+                      title={"Leave Team"}
+                      placement={"bottom"}
+                      distance={12}
+                      show={!leaveButtonMenu}
+                      zIndex={10}
+                    >
+                      <div id="leaveButton">
+                        <MoreOptions height="15px" width="5px" color="White" />
+                      </div>
+                    </Tooltip>
+                  </Dropdown>
+                </div>
+              {/if}
+            {/if}
           </h2>
 
           <div class="d-flex align-items-end justify-content-end">
-            {#if openTeam?.users?.length > 1}
-              <p class="d-flex my-auto ms-1 me-4 sparrow-fs-12">
+            {#if openTeam?.users?.length > 1 && !isGuestUser}
+              <p class="d-flex my-auto ms-4 sparrow-fs-12">
                 <PeopleIcon
                   color={"var(--sparrow-text-color)"}
                   classProp="mx-2 my-auto d-flex"
@@ -193,7 +266,7 @@
                 <span class="my-auto">{openTeam?.users.length} Members</span>
               </p>
             {/if}
-            {#if userRole && userRole !== TeamRole.TEAM_MEMBER}
+            {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER}
               <Button
                 title={`Invite`}
                 type={`dark`}
@@ -201,17 +274,19 @@
                 onClick={() => {
                   isTeamInviteModalOpen = true;
                 }}
-                buttonClassProp={`my-auto px-3 pt-1 me-4`}
+                buttonClassProp={`my-auto px-3 pt-1 ms-4`}
                 buttonStyleProp={`height: 30px;`}
+                disable={isGuestUser}
               />
               <Button
                 title={`New Workspace`}
                 type={`primary`}
                 loaderSize={17}
                 textStyleProp={"font-size: var(--small-text)"}
-                buttonClassProp={`my-auto`}
+                buttonClassProp={`my-auto ms-4`}
                 buttonStyleProp={`height: 30px;`}
                 onClick={handleCreateNewWorkspace}
+                disable={isGuestUser}
               />
             {/if}
           </div>
@@ -264,7 +339,7 @@
       >
         {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
           <div class="h-100 d-flex flex-column">
-            {#if openTeam && openTeam?.workspaces?.length > 0}
+            {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
               <div class="pt-2">
                 <div
                   class={`d-flex search-input-container rounded py-2 px-2 mb-4`}
@@ -298,7 +373,8 @@
             <div style="flex:1; overflow:auto;">
               {#if selectedView === TeamViewEnum.LIST}
                 <WorkspaceListView
-                {searchQuery}
+                  bind:isGuestUser
+                  {searchQuery}
                   {openTeam}
                   data={workspaces.filter((elem) => {
                     return (
@@ -306,15 +382,16 @@
                       elem?.name?.toLowerCase().includes(searchQuery)
                     );
                   }) || []}
-                  userType={userRole}
-                  {userId}
                   {onSwitchWorkspace}
+                  {onDeleteWorkspace}
+                  isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
+                    userRole === TeamRole.TEAM_OWNER}
                 />
               {:else if selectedView == TeamViewEnum.GRID}
                 <WorkspaceGridView
-                {searchQuery}
-                  {openTeam}
-                  {userId}
+                  bind:isGuestUser
+                  {onDeleteWorkspace}
+                  {searchQuery}
                   workspaces={workspaces.filter((elem) => {
                     return (
                       elem?.team?.teamId === openTeam?.teamId &&
@@ -323,6 +400,8 @@
                   }) || []}
                   onCreateNewWorkspace={handleCreateNewWorkspace}
                   {onSwitchWorkspace}
+                  isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
+                    userRole === TeamRole.TEAM_OWNER}
                 />
                 <!--Enabled in next phase-->
               {/if}
@@ -341,12 +420,8 @@
             {onRemoveUserFromWorkspace}
             {onChangeUserRoleAtWorkspace}
           />
-          <!-- {:else if selectedTab === "settings" && userType === "owner"}
-          <Settings
-            openTeam={openTeam?.toMutableJSON()}
-            {teamServiceMethods}
-            {teamRepositoryMethods}
-          ></Settings> -->
+        {:else if activeTeamTab === TeamTabsEnum.SETTINGS && userRole === "owner"}
+          <TeamSettings openTeam={openTeam?.toMutableJSON()} {onUpdateTeam} />
         {/if}
       </div>
     </div>
@@ -435,5 +510,13 @@
     transform: translateY(-50%);
     cursor: pointer;
     font-size: 16px;
+  }
+
+  .moreOption-icon {
+    height: 24px;
+    width: 24px;
+  }
+  .moreOption-icon:hover {
+    background-color: var(--bg-tertiary-190);
   }
 </style>

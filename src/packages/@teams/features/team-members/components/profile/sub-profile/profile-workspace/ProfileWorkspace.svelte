@@ -59,8 +59,9 @@
 </script>
 
 <section>
-  <div class="d-flex justify-content-between align-items-center">
-    <span style="font-size:12px;" class="text-whiteColor">{workspace.name}</span
+  <div class="d-flex justify-content-between align-items-center mb-1"
+  style="height: 34px; ">
+    <span style="font-size:12px; font-weight:400; " class="text-whiteColor">{workspace.name}</span
     >
     <div class="dropdown-workspace-access">
       {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}
@@ -79,15 +80,17 @@
             {
               name: "Remove",
               id: "remove",
+              color:"danger",
             },
           ]}
           onclick={handleDropdown}
           menuItem={"v2"}
-          headerTheme={"transparent"}
+          headerTheme={"violet"}
           borderType={"none"}
-          disabled={true}
+          disabled={false}
+          bodyTheme={"violet"}
           headerFontSize={"10px"}
-          position={"absolute"}
+          borderRounded={"4px"}
         />
       {:else}
         <Select
@@ -112,16 +115,17 @@
             {
               name: "Remove",
               id: "remove",
+              color:"danger",
             },
           ]}
           titleId={workspace.position ? workspace.position : ""}
           onclick={handleDropdown}
           menuItem={"v2"}
           headerTheme={"transparent"}
+          bodyTheme={"violet"}
           borderType={"none"}
           disabled={true}
           headerFontSize={"10px"}
-          position={"absolute"}
         />
       {/if}
     </div>

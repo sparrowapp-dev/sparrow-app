@@ -2,7 +2,6 @@
   export let handleModalState: (flag: boolean) => void;
   export let teamName: string = "";
   export let teamId: string = "";
-  import closeIcon from "$lib/assets/close.svg";
   import {
     base64ToURL,
     createDynamicComponents,
@@ -10,17 +9,23 @@
   } from "$lib/utils/helpers";
 
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
-  import { Button } from "@library/ui";
+  import { Button, IconFallback } from "@library/ui";
 
   export let onInviteClick;
   export let workspaces;
   export let teamLogo;
   export let userId;
+  export let users;
+  /**
+   * Validates the user email.
+   */
+  export let onValidateEmail;
 
   import closeIconWhite from "$lib/assets/close-icon-white.svg";
-  import { Select } from "@library/forms";
+  import { MultiSelect, Select } from "@library/forms";
+  import { notifications } from "@library/ui/toast/Toast";
+
   let emailstoBeSentArr: string[] = [];
-  let isAllSelectedCheck = false;
   let teamSpecificWorkspace = workspaces.map((elem) => {
     return {
       id: elem._id,
@@ -29,7 +34,8 @@
       checked: false,
     };
   });
-  let selectedRole: string = "select";
+  const defaultRole = "select";
+  let selectedRole: string = defaultRole;
   let currentEmailEntered: string;
 
   let emailError: boolean = false;
@@ -48,10 +54,34 @@
     invalidEmails = invalidEmails.filter((e) => e != email);
   }
 
-  const handleEmailOnAdd = (email: string) => {
+  /**
+   * Checks if user already exist in team
+   * @param email - email input
+   */
+  const isEmailAlreadyExistInTeam = (email: string) => {
+    for (let i = 0; i < users.length; i++) {
+      if (email === users[i].email) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const handleEmailOnAdd = async (email: string) => {
     email = email.replace(",", "");
     email = email.trim();
-    const isValidEmail = validateEmail(email);
+
+    const isEmailAlreadyExist = isEmailAlreadyExistInTeam(email);
+    if (isEmailAlreadyExist) {
+      notifications.error("User already in team!");
+    }
+    const isUserExist = await onValidateEmail(email); // checks if user exist on server
+    if (!isUserExist) {
+      notifications.error("User doesn't exist on sparrow!");
+    }
+    const isValidEmail =
+      validateEmail(email) && !isEmailAlreadyExist && isUserExist;
+
     if (!isValidEmail) {
       invalidEmails.push(email);
     } else {
@@ -109,7 +139,7 @@
     if (emailstoBeSentArr?.length === 0) {
       emailError = true;
     }
-    if (!selectedRole || selectedRole === "select") {
+    if (!selectedRole || selectedRole === defaultRole) {
       roleError = true;
     }
     if (!teamSpecificWorkspace || !countCheckedList(teamSpecificWorkspace)) {
@@ -127,7 +157,7 @@
       emailstoBeSentArr.length > 0 &&
       !invalidEmails.length &&
       selectedRole &&
-      selectedRole != "select"
+      selectedRole != defaultRole
     ) {
       if (
         selectedRole === WorkspaceRole.WORKSPACE_EDITOR ||
@@ -175,24 +205,8 @@
   const handleDropdown = (id) => {
     selectedRole = id;
   };
-  const handleCheckSelectDropdown = (id: string) => {
-    if (id === "select-all") {
-      isAllSelectedCheck = !isAllSelectedCheck;
-      teamSpecificWorkspace.forEach((elem: any) => {
-        elem.checked = isAllSelectedCheck;
-      });
-      checkInviteValidation();
-    } else {
-      teamSpecificWorkspace = teamSpecificWorkspace.map((elem) => {
-        if (elem?.id === id) {
-          elem.checked = !elem.checked;
-        }
-        return elem;
-      });
-      isAllSelectedCheck = teamSpecificWorkspace.every((item) => {
-        return item.checked;
-      });
-    }
+  const handleCheckSelectDropdown = (items: any[]) => {
+    teamSpecificWorkspace = items;
   };
 </script>
 
@@ -241,7 +255,7 @@
   </div>
   {#if emailError && invalidEmails.length}
     <p class="error-text sparrow-fs-12">
-      Invalid email address, please check and enter correct email address.
+      Please check and enter correct email address.
     </p>
   {:else if emailError && emailstoBeSentArr.length === 0}
     <p class="error-text">Email ID cannot be empty.</p>
@@ -258,7 +272,7 @@
     data={[
       {
         name: "Select",
-        id: "select",
+        id: defaultRole,
         description: "Select role",
         hide: true,
       },
@@ -268,16 +282,16 @@
         description:
           "Add & edit resources within a workspace, add & remove members to a workspace.",
       },
-      // {
-      //   name: "Editor",
-      //   id: WorkspaceRole.WORKSPACE_EDITOR,
-      //   description: "Add & edit resources within a workspace",
-      // },
-      // {
-      //   name: "Viewer",
-      //   id: WorkspaceRole.WORKSPACE_VIEWER,
-      //   description: "View Resources within a workspace.",
-      // },
+      {
+        name: "Editor",
+        id: WorkspaceRole.WORKSPACE_EDITOR,
+        description: "Add & edit resources within a workspace",
+      },
+      {
+        name: "Viewer",
+        id: WorkspaceRole.WORKSPACE_VIEWER,
+        description: "View Resources within a workspace.",
+      },
     ]}
     onclick={handleDropdown}
     position={"absolute"}
@@ -286,7 +300,8 @@
     headerTheme={"violet2"}
     borderRounded={"4px"}
     headerFontWeight={400}
-    isError={roleError && selectedRole === "select"}
+    headerFontSize={"12px"}
+    isError={roleError && selectedRole === defaultRole}
   />
 </div>
 {#if selectedRole === TeamRole.TEAM_ADMIN}
@@ -294,19 +309,31 @@
     Admins will have access to all current and future team workspaces.
   </p>
 {/if}
-{#if roleError && selectedRole === "select"}
+{#if roleError && selectedRole === defaultRole}
   <p class="error-text">Role cannot be empty.</p>
 {/if}
 
 {#if selectedRole === WorkspaceRole.WORKSPACE_EDITOR || selectedRole === WorkspaceRole.WORKSPACE_VIEWER}
   <div class="mt-4">
-    <p class="role-title mb-0">
+    <p class="role-title text-fs-12 text-secondary-1000 mb-0">
       Specify Workspace<span class="asterik">*</span>
     </p>
     <p class="invite-subheader text-textColor mt-0 mb-1">
       Select workspaces you would want to give access to.
     </p>
   </div>
+
+  <!-- workspace selector -->
+
+  <MultiSelect
+    data={[...teamSpecificWorkspace]}
+    id={"team-invite-multiple-workspace-selector"}
+    onclick={handleCheckSelectDropdown}
+    --body-background-color="var(--bg-tertiary-400)"
+    --header-background-color="var(--bg-tertiary-300)"
+    --header-item-background-color="var(--bg-tertiary-250)"
+  />
+
   {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}
     <p class="error-text">
       You need to select at least one workspace. If you wish to give access to
@@ -316,9 +343,18 @@
 {/if}
 <div class="d-flex align-items-center justify-content-between mt-4">
   <div class="description ellipsis">
-    <div class="d-flex align-items-center ellipsis">
-      {#if teamLogo}
-        <img class="team-icon me-2" src={base64ToURL(teamLogo)} alt="" />
+    <div class="d-flex gap-2 align-items-center ellipsis">
+      {#if teamLogo?.size}
+        <img
+          class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
+          style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
+          src={base64ToURL(teamLogo)}
+          alt=""
+        />
+      {:else}
+        <span class="me-2">
+          <IconFallback character={teamName[0]} />
+        </span>
       {/if}
       <p style="font-size:16px;" class="mb-0 ellipsis">{teamName}</p>
     </div>

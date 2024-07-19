@@ -34,6 +34,10 @@
     handleCollapseCollectionList: () => void;
   };
   export let githubRepo;
+  let currentWorkspaceId;
+  currentWorkspace.subscribe((value) => {
+    currentWorkspaceId = value._data._id;
+  });
   /**
    * Flag to show app version
    */
@@ -43,6 +47,11 @@
    * Flag to check is user iu guest user
    */
   export let isGuestUser = false;
+
+  /**
+   * Role of user in active workspace
+   */
+  export let userRole;
 
   import {
     Collection,
@@ -173,12 +182,6 @@
       });
     }
   }
-  collectionList?.subscribe((value) => {
-    if (value) {
-      collectionListDocument = value;
-      collectionFilter = searchCollection(searchData, collectionListDocument);
-    }
-  });
 
   let isGithubStarHover = false;
   onDestroy(() => {});
@@ -189,6 +192,16 @@
           name: "Add New API",
           icon: CreateRequest,
           onclick: () => onItemCreated("request", {}),
+        },
+        {
+          name: "Add Collection",
+          icon: CreateCollection,
+          onclick: () => {
+            onItemCreated("collection", {
+              workspaceId: currentWorkspaceId,
+              collection: collectionList,
+            });
+          },
         },
         {
           name: "Import cURL",
@@ -315,30 +328,32 @@
       <!--  
         New dropdown button for adding new api, collection and import Curl
       -->
-      <Dropdown
-        zIndex={600}
-        buttonId="addButton"
-        bind:isMenuOpen={addButtonMenu}
-        options={addButtonData}
-      >
-        <Tooltip
-          title={"Add Options"}
-          placement={"bottom"}
-          distance={12}
-          show={!addButtonMenu}
-          zIndex={10}
+      {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+        <Dropdown
+          zIndex={600}
+          buttonId="addButton"
+          bind:isMenuOpen={addButtonMenu}
+          options={addButtonData}
         >
-          <button
-            id="addButton"
-            class="border-0 p-1 border-radius-2 add-button"
-            on:click={() => {
-              addButtonMenu = !addButtonMenu;
-            }}
+          <Tooltip
+            title={"Add Options"}
+            placement={"bottom"}
+            distance={12}
+            show={!addButtonMenu}
+            zIndex={10}
           >
-            <img src={plusIcon} alt="" />
-          </button>
-        </Tooltip>
-      </Dropdown>
+            <button
+              id="addButton"
+              class="border-0 p-1 border-radius-2 add-button"
+              on:click={() => {
+                addButtonMenu = !addButtonMenu;
+              }}
+            >
+              <img src={plusIcon} alt="" />
+            </button>
+          </Tooltip>
+        </Dropdown>
+      {/if}
     </div>
     <div
       class="d-flex flex-column collections-list"
@@ -356,6 +371,7 @@
               >
                 {#each collectionFilter as col}
                   <Collection
+                    bind:userRole
                     {onItemCreated}
                     {onItemDeleted}
                     {onItemRenamed}
@@ -393,6 +409,7 @@
             >
               {#each collectionListDocument as col}
                 <Collection
+                  bind:userRole
                   {onItemCreated}
                   {onItemDeleted}
                   {onItemRenamed}
@@ -409,11 +426,16 @@
           {/if}
         {:else}
           <EmptyCollection
+            bind:userRole
+            {onItemCreated}
+            {collectionList}
             {userRoleInWorkspace}
+            {currentWorkspace}
             handleCreateApiRequest={() => onItemCreated("request", {})}
             onImportCollectionPopup={showImportCollectionPopup}
             isAddCollectionDisabled={isGuestUser}
             onImportCurlPopup={showImportCurlPopup}
+            {isGuestUser}
           />
         {/if}
       </div>

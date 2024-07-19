@@ -22,6 +22,10 @@
   export let githubRepo;
   export let setOpenTeam;
   export let OnWorkspaceSwitch;
+  export let isGuestUser = false;
+
+  export let disableNewInviteTag;
+  export let modifyTeam;
 
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
@@ -33,11 +37,6 @@
   let isGithubStarHover = false;
 
   let activeIndex;
-
-  const handleTeamClick = (id) => {
-    setOpenTeam(id);
-    activeIndex = id;
-  };
 
   $: {
     if (openTeam) {
@@ -87,16 +86,13 @@
         >
           <h6 class="teams-heading ms-2 px-1">Teams</h6>
           <div>
-            <Tooltip
-              title="New Team"
-              placement={"bottom"}
-              distance={10} 
-            >
+            <Tooltip title="New Team" placement={"bottom"} distance={10}>
               <button
                 class="new-team-btn rounded border-0"
                 on:click={() => {
                   isCreateTeamModalOpen = true;
                 }}
+                disabled={isGuestUser}
               >
                 <img src={plus} alt="" />
               </button>
@@ -104,14 +100,24 @@
           </div>
         </div>
         <div class="sidebar-teams-list" style="flex:1; overflow:auto;">
-          <List height={"100%"} overflowY={"auto"} classProps={"px-2 py-1"}>     
+          <List height={"100%"} overflowY={"auto"} classProps={"px-2 py-1"}>
             {#each teamList.slice().reverse() as team, index}
               <button
                 class={`d-flex w-100 mb-1 
             px-3 align-items-center justify-content-between rounded teams-outer border-0 ${
               team.teamId === activeIndex ? "active" : ""
             }`}
-                on:click={() => handleTeamClick(team.teamId)}
+                on:click={async () => {
+                  await setOpenTeam(team.teamId);
+                  activeIndex = team.teamId;
+                  if (team.isNewInvite) {
+                    let data = await disableNewInviteTag(team.teamId);
+                    if (data) {
+                      data.isNewInvite = false;
+                      modifyTeam(team.teamId, data);
+                    }
+                  }
+                }}
               >
                 <div class=" d-flex w-100 overflow-hidden">
                   {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
@@ -151,15 +157,16 @@
       </section>
 
       <!-- Recent APIs-->
+      {#if !isGuestUser}
+        <section class="d-flex flex-column" style="max-height:33%;">
+          <RecentApi {tabList} {data} {collectionList} {onApiClick} />
+        </section>
 
-      <section class="d-flex flex-column" style="max-height:33%;">
-        <RecentApi {tabList} {data} {collectionList} {onApiClick} />
-      </section>
-
-      <!-- Recent Workspace Section -->
-      <section class="d-flex flex-column" style="max-height:33%;">
-        <RecentWorkspace {data} {openTeam} {OnWorkspaceSwitch} />
-      </section>
+        <!-- Recent Workspace Section -->
+        <section class="d-flex flex-column" style="max-height:33%;">
+          <RecentWorkspace {data} {openTeam} {OnWorkspaceSwitch} />
+        </section>
+      {/if}
     </div>
 
     <!-- github repo section -->
@@ -220,6 +227,13 @@
 {/if}
 
 <style>
+  .sidebar-teams-list::-webkit-scrollbar-thumb {
+    background-color: var(--bg-secondary-330);
+  }
+
+  .sidebar-teams-list::-webkit-scrollbar-button {
+    color: var(--bg-secondary-330);
+  }
   .teams-heading {
     margin-left: 5px;
     font-size: 14px;

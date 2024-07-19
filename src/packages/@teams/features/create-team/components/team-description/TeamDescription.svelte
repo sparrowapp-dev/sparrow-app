@@ -36,9 +36,19 @@
   <!-- 
     -- Description 
   -->
-  <p class="mb-2 text-fs-12 text-secondary-200">
-    {DESCRIPTION_CONFIG.DESCRIPTION}
-  </p>
+  {#if !teamForm?.description?.value?.length}
+    <p class="mb-2 text-fs-12 text-secondary-200">
+      {DESCRIPTION_CONFIG.DESCRIPTION}
+    </p>
+  {:else}
+    <p class="mb-2 text-fs-12 text-secondary-200">
+      {DESCRIPTION_CONFIG.MAX_TEXT_SIZE - teamForm?.description?.value?.length <
+      0
+        ? 0
+        : DESCRIPTION_CONFIG.MAX_TEXT_SIZE -
+          teamForm?.description?.value?.length} characters left
+    </p>
+  {/if}
 
   <!-- 
     -- Textarea 

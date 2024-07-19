@@ -17,7 +17,7 @@
     RestExplorerPage,
     CollectionExplorerPage,
     FolderExplorerPage,
-    WorkspaceExplorerPage
+    WorkspaceExplorerPage,
   } from "../";
   import {
     TabBar,
@@ -54,12 +54,10 @@
   import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
   import { isGuestUserActive } from "$lib/store";
   import { pagesMotion } from "@app/constants";
- import { user } from "$lib/store";
+  import { user } from "$lib/store";
 
   export let modifiedUser;
-  user.subscribe((value) => {
-    modifiedUser = value;
-  });
+
   export let handleChange;
 
   const _viewModel = new CollectionsViewModel();
@@ -80,9 +78,16 @@
   let isExposeSaveAsRequest: boolean = false;
   let isAppVersionVisible = true;
   let isGuestUser = false;
+  let userId = "";
+  let userRole = "";
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
+  });
+
+  user.subscribe((value) => {
+    modifiedUser = value;
+    userId = value?._id;
   });
 
   /**
@@ -185,7 +190,7 @@
   currentWorkspace.subscribe((value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
-        _viewModel.fetchCollections($currentWorkspace?._id);
+        _viewModel.fetchCollections(value?._id);
       }
       prevWorkspaceId = value._id;
       if (count == 0) {
@@ -195,6 +200,11 @@
         if (isNew === "true") _viewModel.createNewTab();
         count = count + 1;
       }
+      value.users?.forEach((user) => {
+        if (user.id === userId) {
+          userRole = user.role;
+        }
+      });
     }
   });
 
@@ -225,6 +235,7 @@
       >
         <CollectionList
           bind:scrollList
+          bind:userRole
           {collectionList}
           {currentWorkspace}
           {isAppVersionVisible}
@@ -288,9 +299,9 @@
                       <FolderExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                  {:else if $activeTab?.type === ItemType.WORKSPACE}
+                {:else if $activeTab?.type === ItemType.WORKSPACE}
                   <Motion {...scaleMotionProps} let:motion>
-                    <div use:motion>
+                    <div class="h-100" use:motion>
                       <WorkspaceExplorerPage
                         {collectionList}
                         {modifiedUser}

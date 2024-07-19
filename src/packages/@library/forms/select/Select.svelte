@@ -366,9 +366,7 @@
 <div
   class="parent-select display-inline-block cursor-pointer"
   bind:this={selectHeaderWrapper}
-  style=" position: relative; z-index:{zIndex}; {disabled
-    ? 'pointer-events: none;'
-    : ''}"
+  style=" position: relative;{disabled ? 'pointer-events: none;' : ''}"
   id={`color-select-${id}`}
 >
   <div
@@ -429,7 +427,7 @@
                 : getTextColor(selectedRequest?.color)}"
               style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
             >
-              {selectedRequest?.description}
+              {selectedRequest?.description ?? ""}
             </span>
             <span
               class="ellipsis me-3 {selectedRequest?.default
@@ -437,7 +435,7 @@
                 : getTextColor(selectedRequest?.color)}"
               style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
             >
-              /{selectedRequest?.name}
+              /{selectedRequest?.name ?? ""}
             </span>
           </div>
         {:else}
@@ -445,7 +443,10 @@
             class="ellipsis me-3 {selectedRequest?.default
               ? 'text-textColor'
               : getTextColor(selectedRequest?.color)}"
-            style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+            style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; {disabled ||
+            selectedRequest?.hide
+              ? 'color:var(--text-secondary-370) !important'
+              : ''}"
           >
             {selectedRequest?.name}
           </span>
@@ -453,12 +454,20 @@
       </p>
       <span class="d-flex ps-2" class:select-logo-active={isOpen}>
         {#if isDropIconFilled}
-          <ArrowIcon />
+          <ArrowIcon
+            width={"12"}
+            height={"12"}
+            color={disabled || selectedRequest?.hide
+              ? "var( --icon-secondary-220)"
+              : "var(--sparrow-text-color)"}
+          />
         {:else}
           <DownArrowIcon
-            width={12}
-            height={14}
-            color={"var(--sparrow-text-color)"}
+            width={"12"}
+            height={"12"}
+            color={disabled || selectedRequest?.hide
+              ? "var( --icon-secondary-220)"
+              : "var(--sparrow-text-color)"}
           />
         {/if}
       </span>

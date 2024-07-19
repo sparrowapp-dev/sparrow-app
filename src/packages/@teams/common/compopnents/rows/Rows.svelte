@@ -8,7 +8,11 @@
   export let activeTeam;
   export let onOpenCollection: (id: string) => void;
   export let calculateTimeDifferenceInDays;
-  export let userType = "";
+  /**
+   * Checks if the current user has admin or owner privileges.
+   */
+  export let isAdminOrOwner: boolean;
+  export let onDeleteWorkspace;
 
   let pos = { x: 0, y: 0 };
   let showMenu = false;
@@ -26,7 +30,7 @@
     }, 100);
   };
   $: {
-    if (userType === TeamRole.TEAM_OWNER || userType === TeamRole.TEAM_ADMIN) {
+    if (isAdminOrOwner) {
       menuItems = [
         {
           onClick: () => {
@@ -35,14 +39,13 @@
           displayText: "Open Workspace",
           disabled: false,
         },
-        // Will be enabled in next phase
-        // {
-        //   onClick: (e) => {
-        //     e.stopPropagation();
-        //   },
-        //   displayText: "Delete Workspace",
-        //   disabled: false,
-        // },
+        {
+          onClick: () => {
+            onDeleteWorkspace(list);
+          },
+          displayText: "Delete Workspace",
+          disabled: false,
+        },
       ];
     } else {
       menuItems = [
