@@ -1,6 +1,7 @@
 <script>
   import { Button } from "@library/ui";
   import { notifications } from "@library/ui/toast/Toast";
+  import { onMount } from "svelte";
 
   // Props passed to the component
   export let openTeam; // The team that is currently open
@@ -10,6 +11,7 @@
   export let userId;
 
   let isLeavingTeam = false;
+  let teamName = "";
 
   const handleLeaveTeam = async () => {
     if (!openTeam) return;
@@ -22,6 +24,12 @@
     }
     isLeavingTeam = false;
   };
+
+  onMount(() => {
+    if (openTeam) {
+      teamName = openTeam?.name;
+    }
+  });
 </script>
 
 <!-- Section for the modal content -->
@@ -31,7 +39,7 @@
     <p class="lightGray" style="color: lightGray;">
       Are you sure you want to leave the team
       <span style="font-weight: 700;">
-        "{openTeam?.name || ""}"
+        "{teamName || ""}"
       </span>? You will lose access to all the resources in this team.
     </p>
   </div>
@@ -47,7 +55,6 @@
         type={"dark"}
         onClick={() => {
           handleModalState(false); // Close the modal
-          notifications.error("Failed to leave the team. Please try again.");
         }}
       />
     </span>

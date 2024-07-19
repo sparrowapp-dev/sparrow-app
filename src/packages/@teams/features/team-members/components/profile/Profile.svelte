@@ -81,7 +81,7 @@
       </div>
     </div>
 
-    <div class="position mt-3 ">
+    <div class="position mt-3">
       {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}
         <Select
           id={"profile" + user.id}
@@ -97,7 +97,7 @@
           headerFontWeight={400}
           borderRounded={"4px"}
         />
-      {:else if userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN}
+      {:else if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_ADMIN)}
         <Select
           id={"profile" + user.id}
           data={getPermissionsData()}
@@ -130,10 +130,7 @@
   </div>
 </div>
 
-
-<hr
-style="color: var(--text-secondary-400 ); margin-bottom:4px" />
-
+<hr style="color: var(--text-secondary-400 ); margin-bottom:4px" />
 
 <div class="team-workspace mb-1 sparrow-fs-14">
   {#each workspaces as workspace}
