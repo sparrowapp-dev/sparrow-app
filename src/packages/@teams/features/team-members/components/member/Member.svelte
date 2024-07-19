@@ -191,6 +191,18 @@
           color: "danger",
         },
       ];
+    } else if (
+      userType === TeamRole.TEAM_ADMIN &&
+      user.role === TeamRole.TEAM_ADMIN
+    ) {
+      return [
+        ...commonPermissions,
+        {
+          name: "Remove",
+          id: "remove",
+          color: "danger",
+        },
+      ];
     } else {
       return [
         {
@@ -573,10 +585,10 @@
         bodyTheme={"violet"}
         borderType={"none"}
         headerFontSize={"10px"}
-        disabled={false}
+        disabled={owner}
         borderRounded={"4px"}
       />
-    {:else if userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN}
+    {:else if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_ADMIN)}
       <Select
         id={user.id}
         data={getPermissionsData()}
@@ -586,7 +598,7 @@
         headerTheme={"blur"}
         bodyTheme={"violet"}
         borderType={"none"}
-        disabled={false}
+        disabled={owner}
         headerFontSize={"10px"}
         borderRounded={"4px"}
       />
