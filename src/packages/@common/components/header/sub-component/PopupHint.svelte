@@ -11,7 +11,7 @@
     //  showMessage = true;
     setTimeout(() => {
       showMessage = false;
-    }, 100077770); // 10 seconds
+    }, 10000); // 10 seconds
   });
 
   const hideMessage = () => {
