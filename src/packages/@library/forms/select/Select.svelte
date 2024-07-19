@@ -107,7 +107,7 @@
   /**
    * Determines the z-index of Select.
    */
-  export let zIndex = 1; 
+  export let zIndex = 1;
   /**
    * Determines versions of the Select menu.
    */
@@ -366,9 +366,7 @@
 <div
   class="parent-select display-inline-block cursor-pointer"
   bind:this={selectHeaderWrapper}
-  style=" position: relative;{disabled
-    ? 'pointer-events: none;'
-    : ''}"
+  style=" position: relative;{disabled ? 'pointer-events: none;' : ''}"
   id={`color-select-${id}`}
 >
   <div
@@ -429,7 +427,7 @@
                 : getTextColor(selectedRequest?.color)}"
               style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
             >
-              {selectedRequest?.description}
+              {selectedRequest?.description ?? ""}
             </span>
             <span
               class="ellipsis me-3 {selectedRequest?.default
@@ -437,7 +435,7 @@
                 : getTextColor(selectedRequest?.color)}"
               style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
             >
-              /{selectedRequest?.name}
+              /{selectedRequest?.name ?? ""}
             </span>
           </div>
         {:else}
@@ -457,8 +455,8 @@
       <span class="d-flex ps-2" class:select-logo-active={isOpen}>
         {#if isDropIconFilled}
           <ArrowIcon
-          width={"12"}
-          height={"12"}
+            width={"12"}
+            height={"12"}
             color={disabled || selectedRequest?.hide
               ? "var( --icon-secondary-220)"
               : "var(--sparrow-text-color)"}
