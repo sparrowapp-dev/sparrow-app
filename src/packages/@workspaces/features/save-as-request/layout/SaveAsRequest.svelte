@@ -191,7 +191,7 @@
   };
 
   const handleCreateCollection = async (collectionName: string) => {
-    createDirectoryLoader = true;
+    createDirectoryLoader = true;     
     const res = await onCreateCollection(workspaceMeta, collectionName);
     if (res.status === "success") {
       latestRoute = res.data.latestRoute;

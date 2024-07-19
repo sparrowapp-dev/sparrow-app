@@ -197,7 +197,7 @@ export class CollectionRepository {
         },
       })
       .exec();
-    collection.incrementalPatch({
+    await collection.incrementalPatch({
       items: [...collection.items, items],
       totalRequests:
         items.type === ItemType.REQUEST
@@ -295,7 +295,7 @@ export class CollectionRepository {
       }
       return element;
     });
-    collection.incrementalModify((value) => {
+    await collection.incrementalModify((value) => {
       value.items = [...updatedItems];
       return value;
     });

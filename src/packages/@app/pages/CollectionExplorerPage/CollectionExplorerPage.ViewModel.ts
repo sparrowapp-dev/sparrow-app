@@ -29,6 +29,7 @@ import { generateSampleRequest } from "$lib/utils/sample";
 import type { Folder, Path } from "$lib/utils/interfaces/request.interface";
 import { InitRequestTab } from "@common/utils";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
+import { isGuestUserActive } from "$lib/store/auth.store";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -99,25 +100,50 @@ class CollectionExplorerPage {
     collection: CollectionDocument,
     newCollectionName: string,
   ) => {
-    if (newCollectionName) {
-      const response = await this.collectionService.updateCollectionData(
-        collection.id,
-        collection.workspaceId,
-        { name: newCollectionName },
-      );
-      if (response.isSuccessful) {
-        this.collectionRepository.updateCollection(
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      return;
+    }
+      if (newCollectionName) {
+        const response = await this.collectionService.updateCollectionData(
           collection.id,
-          response.data.data,
+          collection.workspaceId,
+          { name: newCollectionName },
+        );
+        if (response.isSuccessful) {
+          this.collectionRepository.updateCollection(
+            collection.id,
+            response.data.data,
+          );
+          this.updateTab(this.tab.tabId, { name: newCollectionName });
+          notifications.success("Collection renamed successfully!");
+        } else if (response.message === "Network Error") {
+          notifications.error(response.message);
+        } else {
+          notifications.error("Failed to rename collection!");
+        }
+      }
+   
+      if (newCollectionName) {
+        const response = {
+          data: {
+            name: newCollectionName,
+          },
+        };
+        await this.collectionRepository.updateCollection(
+          collection.id,
+          response.data,
         );
         this.updateTab(this.tab.tabId, { name: newCollectionName });
         notifications.success("Collection renamed successfully!");
-      } else if (response.message === "Network Error") {
-        notifications.error(response.message);
       } else {
         notifications.error("Failed to rename collection!");
       }
-    }
+    
   };
 
   /**
@@ -129,23 +155,31 @@ class CollectionExplorerPage {
     collection: CollectionDocument,
     newBranch: string,
   ) => {
-    const response = await this.collectionService.switchCollectionBranch(
-      collection.id,
-      newBranch,
-    );
-    if (response.isSuccessful) {
-      this.collectionRepository.updateCollection(collection?.id, {
-        currentBranch: newBranch,
-        items: response.data.data.items,
-      });
-    } else {
-      this.collectionRepository.updateCollection(collection?.id, {
-        currentBranch: newBranch,
-        items: [],
-      });
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser === true) {
+      return;
     }
-    await this.tabRepository.clearTabs();
-    notifications.success("Branch switched successfully.");
+      const response = await this.collectionService.switchCollectionBranch(
+        collection.id,
+        newBranch,
+      );
+      if (response.isSuccessful) {
+        this.collectionRepository.updateCollection(collection?.id, {
+          currentBranch: newBranch,
+          items: response.data.data.items,
+        });
+      } else {
+        this.collectionRepository.updateCollection(collection?.id, {
+          currentBranch: newBranch,
+          items: [],
+        });
+      }
+      await this.tabRepository.clearTabs();
+      notifications.success("Branch switched successfully.");
+    
   };
 
   /**
@@ -186,35 +220,45 @@ class CollectionExplorerPage {
         collection.activeSyncUrl,
       );
     if (responseJSON?.data?.status === ResponseStatusCode.OK) {
-      const response = await this.collectionService.importCollection(
-        collection.workspaceId,
-        {
-          url: collection.activeSyncUrl,
-          urlData: {
-            data: JSON.parse(responseJSON.data.response),
-            headers: responseJSON.data.headers,
-          },
-          primaryBranch: collection?.primaryBranch,
-          currentBranch: collection?.currentBranch
-            ? collection?.currentBranch
-            : collection?.primaryBranch,
-        },
-        collection.activeSync,
-      );
-
-      if (response.isSuccessful) {
-        this.collectionRepository.updateCollection(
-          collection.id,
-          response.data.data.collection,
-        );
-        notifications.success("Collection synced.");
-      } else {
-        notifications.error("Failed to sync the collection. Please try again.");
+      let isGuestUser;
+      isGuestUserActive.subscribe((value) => {
+        isGuestUser = value;
+      });
+      if (isGuestUser === true) {
+        return;
       }
-    } else {
-      notifications.error(
-        `Unable to detect ${collection.activeSyncUrl.replace("-json", "")}.`,
-      );
+        const response = await this.collectionService.importCollection(
+          collection.workspaceId,
+          {
+            url: collection.activeSyncUrl,
+            urlData: {
+              data: JSON.parse(responseJSON.data.response),
+              headers: responseJSON.data.headers,
+            },
+            primaryBranch: collection?.primaryBranch,
+            currentBranch: collection?.currentBranch
+              ? collection?.currentBranch
+              : collection?.primaryBranch,
+          },
+          collection.activeSync,
+        );
+
+        if (response.isSuccessful) {
+          this.collectionRepository.updateCollection(
+            collection.id,
+            response.data.data.collection,
+          );
+          notifications.success("Collection synced.");
+        } else {
+          notifications.error(
+            "Failed to sync the collection. Please try again.",
+          );
+        }
+       
+        notifications.error(
+          `Unable to detect ${collection.activeSyncUrl.replace("-json", "")}.`,
+        );
+      
     }
   };
 
@@ -254,38 +298,48 @@ class CollectionExplorerPage {
       await this.collectionService.validateImportCollectionURL(
         collection.activeSyncUrl,
       );
-    if (responseJSON?.data?.status === ResponseStatusCode.OK) {
-      const response = await this.collectionService.importCollection(
-        collection.workspaceId,
-        {
-          url: collection?.activeSyncUrl,
-          urlData: {
-            data: JSON.parse(responseJSON.data.response),
-            headers: responseJSON.data.headers,
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser === true) {
+      return;
+    }
+      if (responseJSON?.data?.status === ResponseStatusCode.OK) {
+        const response = await this.collectionService.importCollection(
+          collection.workspaceId,
+          {
+            url: collection?.activeSyncUrl,
+            urlData: {
+              data: JSON.parse(responseJSON.data.response),
+              headers: responseJSON.data.headers,
+            },
+            primaryBranch: collection?.primaryBranch,
+            currentBranch: collection?.currentBranch,
           },
-          primaryBranch: collection?.primaryBranch,
-          currentBranch: collection?.currentBranch,
-        },
-        collection.activeSync,
-      );
-
-      if (response.isSuccessful) {
-        await this.collectionRepository.updateCollection(
-          collection?.id,
-          response.data.data.collection,
+          collection.activeSync,
         );
-        notifications.success("Collection synced.");
-        return true;
+
+        if (response.isSuccessful) {
+          await this.collectionRepository.updateCollection(
+            collection?.id,
+            response.data.data.collection,
+          );
+          notifications.success("Collection synced.");
+          return true;
+        } else {
+          notifications.error(
+            "Failed to sync the collection. Please try again.",
+          );
+          return false;
+        }
       } else {
-        notifications.error("Failed to sync the collection. Please try again.");
+        notifications.error(
+          `Unable to detect ${collection?.activeSyncUrl.replace("-json", "")}.`,
+        );
         return false;
       }
-    } else {
-      notifications.error(
-        `Unable to detect ${collection?.activeSyncUrl.replace("-json", "")}.`,
-      );
-      return false;
-    }
+    
   };
 
   /**
@@ -324,11 +378,20 @@ class CollectionExplorerPage {
         totalRequests += collectionItem.items.length;
       }
     });
-    const response = await this.collectionService.switchCollectionBranch(
-      collection?.id,
-      collection?.currentBranch,
-    );
-    if (response.isSuccessful) {
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    let response;
+    if (isGuestUser === true) {
+      return;
+    }
+      response = await this.collectionService.switchCollectionBranch(
+        collection?.id,
+        collection?.currentBranch,
+      );
+    
+    if (response && response.isSuccessful) {
       isSynced = true;
     } else {
       isSynced = false;
@@ -382,10 +445,27 @@ class CollectionExplorerPage {
       },
     };
 
-    const response =
-      await this.collectionService.addRequestInCollection(requestObj);
-    if (response.isSuccessful && response.data.data) {
-      const res = response.data.data;
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    let response;
+    if (isGuestUser == true) {
+      const res = {
+        id: uuidv4(),
+        name: "API Request Name",
+        type: "REQUEST",
+        description: "",
+        source: "USER",
+        isDeleted: false,
+        createdBy: "Guest User",
+        updatedBy: "Guest User",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        request: {
+          method: "GET",
+        },
+      };
       this.collectionRepository.addRequestOrFolderInCollection(
         collection.id,
         res,
@@ -403,20 +483,46 @@ class CollectionExplorerPage {
         collectionId: collection.id,
       });
       initRequestTab.updateIsSave(true);
-      // this.handleOpenRequest(
-      //   collection.workspaceId,
-      //   collection,
-      //   {
-      //     id: "",
-      //     name: "",
-      //   },
-      //   request,
-      // );
       this.tabRepository.createTab(initRequestTab.getValue());
       moveNavigation("right");
       return;
     } else {
-      notifications.error(response.message);
+      response =
+        await this.collectionService.addRequestInCollection(requestObj);
+      if (response.isSuccessful && response.data.data) {
+        const res = response.data.data;
+        this.collectionRepository.addRequestOrFolderInCollection(
+          collection.id,
+          res,
+        );
+
+        // request.id = res.id;
+        // request.path.workspaceId = collection.workspaceId;
+        // request.path.collectionId = collection.id;
+        // request.property.request.save.api = true;
+        // request.property.request.save.description = true;
+
+        initRequestTab.updateId(res.id);
+        initRequestTab.updatePath({
+          workspaceId: collection.workspaceId,
+          collectionId: collection.id,
+        });
+        initRequestTab.updateIsSave(true);
+        // this.handleOpenRequest(
+        //   collection.workspaceId,
+        //   collection,
+        //   {
+        //     id: "",
+        //     name: "",
+        //   },
+        //   request,
+        // );
+        this.tabRepository.createTab(initRequestTab.getValue());
+        moveNavigation("right");
+        return;
+      } else {
+        notifications.error(response.message);
+      }
     }
   };
 
@@ -429,22 +535,41 @@ class CollectionExplorerPage {
     collection: CollectionDocument,
     newDescription: string,
   ) => {
-    const response = await this.collectionService.updateCollectionData(
-      collection.id,
-      collection.workspaceId,
-      { description: newDescription },
-    );
-    if (response.isSuccessful) {
-      this.collectionRepository.updateCollection(
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser == true) {return;}
+      const response = await this.collectionService.updateCollectionData(
         collection.id,
-        response.data.data,
+        collection.workspaceId,
+        { description: newDescription },
       );
-      notifications.success("Description updated successfully!");
-    } else if (response.message === "Network Error") {
-      notifications.error(response.message);
-    } else {
-      notifications.error("Failed to update description!");
-    }
+      if (response.isSuccessful) {
+        this.collectionRepository.updateCollection(
+          collection.id,
+          response.data.data,
+        );
+        notifications.success("Description updated successfully!");
+      } else if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error("Failed to update description!");
+      }
+  
+      if (newDescription) {
+        const response = {
+          data: { description: newDescription },
+        };
+        await this.collectionRepository.updateCollection(
+          collection.id,
+          response.data,
+        );
+        notifications.success("Description updated successfully!");
+      } else {
+        notifications.error("Failed to update description!");
+      }
+    
   };
 
   /**
