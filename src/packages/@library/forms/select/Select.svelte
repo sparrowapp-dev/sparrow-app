@@ -6,6 +6,7 @@
   import { GitBranchIcon, DownArrowIcon } from "$lib/assets/icons";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
   import { ArrowIcon } from "@library/icons";
+  import MenuItemsV3 from "./menu-items/MenuItemsV3.svelte";
   /**
    * Determines id of the menu item.
    */
@@ -133,6 +134,8 @@
    */
   export let disabled = false;
   export let position: "absolute" | "fixed" = "fixed";
+  export let placeholderText = "";
+  export let isHeaderCombined = false;
 
   let selectHeaderWrapper: HTMLElement;
   let selectBodyWrapper: HTMLElement;
@@ -159,6 +162,7 @@
     hide?: boolean;
     disabled?: boolean;
     display?: string;
+    logo?: string;
   };
 
   let selectBorderClass = "";
@@ -362,9 +366,7 @@
 <div
   class="parent-select display-inline-block cursor-pointer"
   bind:this={selectHeaderWrapper}
-  style=" position: relative; z-index:{zIndex}; {disabled
-    ? 'pointer-events: none;'
-    : ''}"
+  style=" position: relative;{disabled ? 'pointer-events: none;' : ''}"
   id={`color-select-${id}`}
 >
   <div
@@ -414,23 +416,58 @@
             /></span
           >
         {/if}
-        <span
-          class="ellipsis me-3 {selectedRequest?.default
-            ? 'text-textColor'
-            : getTextColor(selectedRequest?.color)}"
-          style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
-        >
-          {selectedRequest?.name}
-        </span>
+
+        {#if placeholderText && !selectedRequest}
+          {placeholderText}
+        {:else if isHeaderCombined}
+          <div class="d-flex ellipsis">
+            <span
+              class="ellipsis {selectedRequest?.default
+                ? 'text-textColor'
+                : getTextColor(selectedRequest?.color)}"
+              style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+            >
+              {selectedRequest?.description ?? ""}
+            </span>
+            <span
+              class="ellipsis me-3 {selectedRequest?.default
+                ? 'text-textColor'
+                : getTextColor(selectedRequest?.color)}"
+              style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+            >
+              /{selectedRequest?.name ?? ""}
+            </span>
+          </div>
+        {:else}
+          <span
+            class="ellipsis me-3 {selectedRequest?.default
+              ? 'text-textColor'
+              : getTextColor(selectedRequest?.color)}"
+            style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; {disabled ||
+            selectedRequest?.hide
+              ? 'color:var(--text-secondary-370) !important'
+              : ''}"
+          >
+            {selectedRequest?.name}
+          </span>
+        {/if}
       </p>
       <span class="d-flex ps-2" class:select-logo-active={isOpen}>
         {#if isDropIconFilled}
-          <ArrowIcon />
+          <ArrowIcon
+            width={"12"}
+            height={"12"}
+            color={disabled || selectedRequest?.hide
+              ? "var( --icon-secondary-220)"
+              : "var(--sparrow-text-color)"}
+          />
         {:else}
           <DownArrowIcon
-            width={12}
-            height={14}
-            color={"var(--sparrow-text-color)"}
+            width={"12"}
+            height={"12"}
+            color={disabled || selectedRequest?.hide
+              ? "var( --icon-secondary-220)"
+              : "var(--sparrow-text-color)"}
           />
         {/if}
       </span>
@@ -513,6 +550,8 @@
               {getTextColor}
               {highlightTickedItem}
             />
+          {:else if menuItem === "v3"}
+            <MenuItemsV3 {list} {selectedRequest} {tickIcon} {getTextColor} />
           {/if}
         </div>
       {/each}
@@ -648,12 +687,12 @@
 
   .select-active-border-all {
     border: none;
-    border: 1px solid var(--send-button);
+    border: 1px solid var(--bg-primary-300);
   }
 
   .select-active-border-bottom {
     border: none;
-    border-bottom: 1px solid var(--send-button);
+    border-bottom: 1px solid var(--bg-primary-300);
   }
 
   .select-error-border-none {

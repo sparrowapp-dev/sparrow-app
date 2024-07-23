@@ -28,6 +28,7 @@
 
   let trackWorkspaceId;
   let isEnvLoading = false;
+  let userRole = "";
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
 
@@ -36,8 +37,8 @@
       const activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
         value._data.users.forEach((user) => {
-          if (user.id === $user._id) {
-            userWorkspaceLevelRole.set(user.role);
+          if (user.id === $user?._id) {
+            userRole = user.role;
           }
         });
         const workspaceId = activeWorkspaceRxDoc.get("_id");
@@ -58,9 +59,9 @@
 </script>
 
 <Motion {...pagesMotion} let:motion>
-  <div use:motion>
+  <div class="h-100" use:motion>
     <Splitpanes
-      class="environment-splitter"
+      class="environment-splitter h-100"
       style="width: calc(100vw - 54px);"
       on:resize={(e) => {
         environmentLeftPanelWidth.set(e.detail[0].size);
@@ -73,7 +74,7 @@
         class="bg-secondary-900-important"
       >
         <EnvironmentList
-          loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
+          loggedUserRoleInWorkspace={userRole}
           onCreateEnvironment={_viewModel.onCreateEnvironment}
           onOpenGlobalEnvironment={_viewModel.onOpenGlobalEnvironment}
           onDeleteEnvironment={_viewModel.onDeleteEnvironment}
@@ -94,7 +95,7 @@
           {#if true}
             {#if $activeEnvironment}
               <Motion {...scaleMotionProps} let:motion>
-                <div use:motion>
+                <div class="h-100" use:motion>
                   <EnvironmentExplorerPage tab={$activeEnvironment} />
                 </div>
               </Motion>

@@ -1,25 +1,14 @@
 <script lang="ts">
   import table from "$lib/assets/table.svg";
   import hamburger from "$lib/assets/hamburger.svg";
-  //   import AllWorkspace from "$lib/components/dashboard/workspaces/AllWorkspace.svelte";
   import { workspaceView } from "$lib/store";
-  //   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
-  import Members from "$lib/components/workspace/members/Members.svelte";
-  import { notifications } from "@library/ui/toast/Toast";
-  import { onDestroy, onMount } from "svelte";
-  import type {
-    CurrentTeam,
-    Team,
-    TeamRepositoryMethods,
-    TeamServiceMethods,
-  } from "$lib/utils/interfaces";
+  import { onDestroy } from "svelte";
   import { SearchIcon } from "$lib/assets/app.asset";
-  //   import TeamInvite from "./team-invite/TeamInvite.svelte";
   import { base64ToURL } from "$lib/utils/helpers";
-  import { PeopleIcon, ShowMoreIcon } from "$lib/assets/app.asset";
+  import { PeopleIcon } from "$lib/assets/app.asset";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { TeamRole } from "$lib/utils/enums";
-  import { Button, Tooltip } from "@library/ui";
+  import { Button } from "@library/ui";
   import TeamNavigator from "../components/team-navigator/TeamNavigator.svelte";
   import {
     TeamTabsEnum,
@@ -27,33 +16,86 @@
   } from "@teams/common/constants/TeamTabs.constants";
   import { WorkspaceListView } from "../components";
   import WorkspaceGridView from "../components/workspace-grid-view/WorkspaceGridView.svelte";
-  //   import Settings from "./settings/Settings.svelte";
-  //   import Button from "../../../@library/ui/button/Button.svelte";
-  //   import ModalWrapperV1 from "../../../@library/ui/modal/Modal.svelte";
-  export let userId: string;
-  // export let data: any;
-  // export let loaderColor = "default";
-  // export let handleWorkspaceSwitch: any;
-  // export let handleWorkspaceTab: any;
-  // export let activeSideBarTabMethods: any;
-  export let openTeam: TeamDocument;
-  export let workspaces: WorkspaceDocument[] = [];
-  export let activeTeamTab: string;
-  export let onUpdateActiveTab;
-  // export let currentTeam: CurrentTeam;
-  // export let handleCreateWorkspace: any,
-  //   teamServiceMethods: TeamServiceMethods,
-  //   teamRepositoryMethods: TeamRepositoryMethods,
-  //   workspaces;
-  // export let handleLeaveTeamModal: () => void;
-  // export let handleOnShowMoreClick: () => void;
-  // export let handleCloseShowMoreClick: () => void;
-  // export let isShowMoreVisible: boolean = false;
-  // export let workspaceUnderCreation = false;
-  // export let teams;
+  import { TeamMembers, TeamSettings } from "@teams/features";
+  import { CrossIcon, MoreOptions } from "@library/icons";
+  import { Tooltip, Dropdown } from "@library/ui";
 
-  let selectedTab = "all-workspace";
-  let selectedView: string;
+  /**
+   * user ID
+   */
+  export let userId: string;
+  /**
+   * Open team details which is active
+   */
+  export let openTeam: TeamDocument;
+  /**
+   * All the workspaces from local db
+   */
+  export let workspaces: WorkspaceDocument[] = [];
+  /**
+   * Active Tab in team
+   */
+  export let activeTeamTab: string;
+  /**
+   * Callback for updating active tab in team
+   */
+  export let onUpdateActiveTab;
+
+  /**
+   * Invite team toggler
+   */
+  export let isTeamInviteModalOpen;
+
+  export let isLeaveTeamModelOpen;
+
+  /**
+   * Callback For creating workspace
+   */
+  export let onCreateWorkspace: (id: string) => void;
+  /**
+   * Callback for switching workspace
+   */
+  export let onSwitchWorkspace: (id: string) => void;
+  /**
+   * function to remove members from team
+   */
+  export let onRemoveMembersAtTeam;
+  /**
+   * function to demote admins at team
+   */
+  export let onDemoteToMemberAtTeam;
+  /**
+   * function to promote to admin at team
+   */
+  export let onPromoteToAdminAtTeam;
+  /**
+   * function to promote to owner at team
+   */
+  export let onPromoteToOwnerAtTeam;
+  /**
+   * function to remove member from workspace
+   */
+  export let onRemoveUserFromWorkspace;
+  /**
+   * function to change user role at workspace
+   */
+  export let onChangeUserRoleAtWorkspace;
+  /**
+   * function to delete workspace
+   */
+  export let onDeleteWorkspace;
+
+  /**
+   * function to update team details
+   */
+  export let onUpdateTeam;
+
+  /**
+   * Flag to check if user is guest user
+   */
+  export let isGuestUser = false;
+
+  let selectedView: string = "Grid";
 
   const selectedViewSubscribe = workspaceView.subscribe((value) => {
     selectedView = value;
@@ -61,37 +103,35 @@
 
   let userRole: string;
   const findUserType = () => {
-    console.log("in func");
     openTeam?.users.forEach((user) => {
-      console.log("user", user);
       if (user.id === userId) {
-        console.log("userrole", user.role);
         userRole = user.role;
       }
     });
   };
-
-  let previousTeamId: string;
 
   const refreshTabs = () => {
     return [
       {
         name: "Workspaces",
         id: TeamTabsEnum.WORKSPACES,
-        count: openTeam.workspaces?.length,
-        enable: true,
+        count: openTeam?.workspaces?.length,
+        visible: true,
+        disabled: isGuestUser === true ? true : false,
       },
       {
         name: "Members",
         id: TeamTabsEnum.MEMBERS,
-        count: openTeam.users?.length,
-        enable: true,
+        count: openTeam?.users?.length,
+        visible: true,
+        disabled: isGuestUser === true ? true : false,
       },
       {
         name: "Settings",
         id: TeamTabsEnum.SETTINGS,
         count: 0,
-        enable: openTeam?.owner === userId,
+        visible: openTeam?.owner === userId,
+        disabled: isGuestUser === true ? true : false,
       },
     ];
   };
@@ -101,211 +141,289 @@
       findUserType();
     }
   }
+  let previousTeamId = "";
   $: {
     if (openTeam) {
       findUserType();
       teamTabs = refreshTabs();
-      // if (previousTeamId !== openTeam?.teamId) {
-      //   selectedTab = "all-workspace";
-      // }
-      // previousTeamId = openTeam?.teamId;
+      if (previousTeamId !== openTeam?.teamId) {
+        onUpdateActiveTab(TeamTabsEnum.WORKSPACES);
+      }
+      previousTeamId = openTeam?.teamId;
     }
   }
+
+  const handleCreateNewWorkspace = () => {
+    onCreateWorkspace(openTeam.teamId);
+  };
+
+  let searchQuery = "";
+  let hasText = false;
+  let leaveButtonMenu: boolean = false;
+
+  const handleLeaveTeam = () => {
+    leaveButtonMenu = !leaveButtonMenu;
+    isLeaveTeamModelOpen = true;
+  };
+
+  const handleSearchInput = (event) => {
+    searchQuery = event.target.value.toLowerCase();
+    hasText = searchQuery.length > 0;
+  };
+  const clearSearchInput = () => {
+    searchQuery = "";
+    hasText = false;
+  };
 
   onDestroy(() => {
     selectedViewSubscribe();
   });
-  let teamInvitePopup = false;
+
+  const addButtonData = [
+    {
+      name: "Leave Team",
+      color: "var(--dangerColor)",
+      onclick: () => handleLeaveTeam(),
+    },
+  ];
+  $: {
+    if (isGuestUser) {
+      teamTabs = refreshTabs();
+    }
+  }
 </script>
 
 {#if openTeam}
-  <div class="teams-content bg-secondary-850">
-    <div class="content-teams px-md-1 px-lg-3 px-3 pt-5">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-12 pb-3">
-            <div
-              class="team-heading d-flex justify-content-between position-relative"
-            >
-              <h2 class="d-flex ellipsis overflow-visible team-title">
-                {#if openTeam?.logo?.size}
-                  <img
-                    class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
-                    style="width: 60px !important; height: 60px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-                    src={base64ToURL(openTeam?.logo)}
-                    alt=""
-                  />{:else}
-                  <p
-                    class={`text-defaultColor w-25 text-center my-auto align-items-center justify-content-center profile-circle bg-tertiary-750 border-secondary-300 border-2`}
-                    style={`font-size: 24px; padding-top: 2px; width: 40px !important; height: 40px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
-                  >
-                    {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
-                  </p>
-                {/if}
-                <span
-                  class="ms-3 my-auto ellipsis overflow-hidden heading"
-                  style="font-size: 24px;"
-                  >{openTeam?.name || ""}
-                </span>
-              </h2>
+  <div class="teams-content h-100 bg-secondary-850">
+    <div
+      class="content-teams d-flex flex-column h-100 px-md-1 px-lg-3 px-3 pt-5"
+    >
+      <div class="" style="padding-left: 14px; padding-right:14px">
+        <div
+          class="team-heading d-flex justify-content-between position-relative"
+          style="padding-bottom: 10px;"
+        >
+          <h2 class="d-flex ellipsis overflow-visible team-title">
+            {#if openTeam?.logo?.size}
+              <img
+                class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
+                style="width: 40px !important; height: 40px !important; padding-top: 2px; display: flex; border-radius: 50%;"
+                src={base64ToURL(openTeam?.logo)}
+                alt=""
+              />{:else}
+              <p
+                class={`text-defaultColor w-25 text-center my-auto align-items-center justify-content-center profile-circle bg-tertiary-750 border-secondary-300 border-2`}
+                style={`font-size: 24px; padding-top: 2px; width: 40px !important; height: 40px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
+              >
+                {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
+              </p>
+            {/if}
+            <span
+              class="ms-3 my-auto ellipsis overflow-hidden heading"
+              style="font-size: 24px;"
+              >{openTeam?.name || ""}
+            </span>
 
-              <div class="d-flex align-items-end justify-content-end">
-                {#if openTeam?.users?.length > 0}
-                  <p class="d-flex my-auto ms-1 me-4 sparrow-fs-12">
-                    <PeopleIcon
-                      color={"var(--sparrow-text-color)"}
-                      classProp="mx-2 my-auto d-flex"
-                    />
-                    <span class="my-auto">{openTeam?.users.length} Members</span
+            <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
+            {#if !isGuestUser}
+              {#if userRole !== "owner"}
+                <div
+                  class="ms-2 d-flex justify-content-center align-items-center mt-2 moreOption-icon rounded"
+                  on:click={() => {
+                    leaveButtonMenu = !leaveButtonMenu;
+                  }}
+                >
+                  <Dropdown
+                    zIndex={600}
+                    buttonId="leaveButton"
+                    bind:isMenuOpen={leaveButtonMenu}
+                    options={addButtonData}
+                  >
+                    <Tooltip
+                      title={"Leave Team"}
+                      placement={"bottom"}
+                      distance={12}
+                      show={!leaveButtonMenu}
+                      zIndex={10}
                     >
-                  </p>
-                {/if}
-                {#if userRole && userRole !== TeamRole.TEAM_MEMBER}
-                  <!--Enable in next phase-->
-                  <!-- <Button
-                    title={`Invite`}
-                    type={`dark`}
-                    textStyleProp={"font-size: var(--small-text)"}
-                    onClick={() => {
-                      teamInvitePopup = true;
-                    }}
-                    buttonClassProp={`my-auto px-3 pt-1 me-4`}
-                    buttonStyleProp={`height: 30px;`}
-                    disable={true}
-                  /> -->
-                  <Button
-                    title={`New Workspace`}
-                    type={`primary`}
-                    loaderSize={17}
-                    textStyleProp={"font-size: var(--small-text)"}
-                    buttonClassProp={`my-auto`}
-                    buttonStyleProp={`height: 30px;`}
-                  />
-                {/if}
-              </div>
-            </div>
+                      <div id="leaveButton">
+                        <MoreOptions height="15px" width="5px" color="White" />
+                      </div>
+                    </Tooltip>
+                  </Dropdown>
+                </div>
+              {/if}
+            {/if}
+          </h2>
+
+          <div class="d-flex align-items-end justify-content-end">
+            {#if openTeam?.users?.length > 1 && !isGuestUser}
+              <p class="d-flex my-auto ms-4 sparrow-fs-12">
+                <PeopleIcon
+                  color={"var(--sparrow-text-color)"}
+                  classProp="mx-2 my-auto d-flex"
+                />
+                <span class="my-auto">{openTeam?.users.length} Members</span>
+              </p>
+            {/if}
+            {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER}
+              <Button
+                title={`Invite`}
+                type={`dark`}
+                textStyleProp={"font-size: var(--small-text)"}
+                onClick={() => {
+                  isTeamInviteModalOpen = true;
+                }}
+                buttonClassProp={`my-auto px-3 pt-1 ms-4`}
+                buttonStyleProp={`height: 30px;`}
+                disable={isGuestUser}
+              />
+              <Button
+                title={`New Workspace`}
+                type={`primary`}
+                loaderSize={17}
+                textStyleProp={"font-size: var(--small-text)"}
+                buttonClassProp={`my-auto ms-4`}
+                buttonStyleProp={`height: 30px;`}
+                onClick={handleCreateNewWorkspace}
+                disable={isGuestUser}
+              />
+            {/if}
           </div>
         </div>
+
         <!--Workspace, setting and members tab-->
-        <div class="row">
-          <div class="col-12">
-            <div
-              class="teams-menu d-flex justify-content-between align-items-center"
-            >
-              <div class="teams-menu__left gap-4 align-items-center">
-                <TeamNavigator
-                  tabs={teamTabs}
-                  {onUpdateActiveTab}
-                  {activeTeamTab}
+
+        <div
+          class="teams-menu d-flex justify-content-between align-items-center"
+        >
+          <div
+            class="teams-menu__left gap-4 align-items-center"
+            style="padding-bottom: 4px;"
+          >
+            <TeamNavigator
+              tabs={teamTabs}
+              {onUpdateActiveTab}
+              {activeTeamTab}
+            />
+          </div>
+          <div class="teams-menu__right">
+            {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
+              <span class="mx-3" style="cursor:pointer;">
+                <img
+                  on:click={() => {
+                    workspaceView.set(TeamViewEnum.GRID);
+                  }}
+                  class:view-active={selectedView === TeamViewEnum.GRID}
+                  src={table}
+                  alt=""
                 />
-              </div>
-              <div class="teams-menu__right">
-                {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
-                  <span class="mx-3" style="cursor:pointer;">
-                    <img
-                      on:click={() => {
-                        workspaceView.set(TeamViewEnum.GRID);
-                      }}
-                      class:view-active={selectedView === TeamViewEnum.GRID}
-                      src={table}
-                      alt=""
-                    />
-                  </span>
-                  <span style="cursor:pointer;">
-                    <img
-                      on:click={() => {
-                        workspaceView.set(TeamViewEnum.LIST);
-                      }}
-                      class:view-active={selectedView === TeamViewEnum.LIST}
-                      src={hamburger}
-                      alt=""
-                    />
-                  </span>
-                {/if}
-              </div>
-            </div>
+              </span>
+              <span style="cursor:pointer;">
+                <img
+                  on:click={() => {
+                    workspaceView.set(TeamViewEnum.LIST);
+                  }}
+                  class:view-active={selectedView === TeamViewEnum.LIST}
+                  src={hamburger}
+                  alt=""
+                />
+              </span>
+            {/if}
           </div>
         </div>
       </div>
-      {#if openTeam && openTeam?.workspaces?.length > 0}
-        <div class="ps-2 pt-2">
-          <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
-            <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
-            <input
-              type="text"
-              id="search-input"
-              class={`bg-transparent w-100 border-0 my-auto`}
-              placeholder="Search workspaces in {openTeam?.name}"
-            />
-            <!-- {#if filterText !== ""}
-          <button
-            class="border-0 bg-transparent ms-2"
-          >
-            <CrossIcon color="#45494D" />
-          </button>
-        {/if} -->
-          </div>
-        </div>
-      {/if}
 
-      {#if selectedView === TeamViewEnum.LIST && activeTeamTab === TeamTabsEnum.WORKSPACES}
-        <WorkspaceListView
-          {openTeam}
-          data={workspaces?.filter((elem) => {
-            return elem?.team?.teamId === openTeam?.teamId;
-          }) || []}
-          userType={userRole}
-          {userId}
-        />
-        <!-- <AllWorkspace
-          {userId}
-          data={workspaces?.filter((elem) => {
-            return elem?.team?.teamId === openTeam?.teamId;
-          }) || []}
-          {selectedTab}
-          {handleWorkspaceSwitch}
-          {handleWorkspaceTab}
-          {activeSideBarTabMethods}
-          {openTeam}
-          {userType}
-        /> -->
-      {:else if selectedView == TeamViewEnum.GRID && activeTeamTab === TeamTabsEnum.WORKSPACES}
-        <WorkspaceGridView
-          {openTeam}
-          {userId}
-          workspaces={workspaces?.filter((elem) => {
-            return elem?.team?.teamId === openTeam?.teamId;
-          }) || []}
-        />
-        <!-- <WorkspaceCardList
-          {userId}
-          {handleCreateWorkspace}
-          {openTeam}
-          currActiveTeam={currentTeam}
-          workspaces={workspaces?.filter((elem) => {
-            return elem?.team?.teamId === openTeam?.teamId;
-          }) || []}
-          {handleWorkspaceSwitch}
-          {handleWorkspaceTab}
-          {activeSideBarTabMethods}
-          {workspaceUnderCreation}
-        /> -->
-        <!-- {:else if selectedTab === "members"}
-        <Members
-          {userId}
-          {userType}
-          {openTeam}
-          {teamServiceMethods}
-          {workspaces}
-          {teamRepositoryMethods}
-        /> -->
-        <!-- {:else if selectedTab === "settings" && userType === "owner"}
-        <Settings
-          openTeam={openTeam?.toMutableJSON()}
-          {teamServiceMethods}
-          {teamRepositoryMethods}
-        ></Settings> -->
-      {/if}
+      <div
+        style="flex:1; overflow:auto; padding-left: 14px; padding-right:14px"
+      >
+        {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
+          <div class="h-100 d-flex flex-column">
+            {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
+              <div class="pt-2">
+                <div
+                  class={`d-flex search-input-container rounded py-2 px-2 mb-4`}
+                >
+                  <SearchIcon
+                    width={14}
+                    height={14}
+                    classProp={`my-auto me-3`}
+                  />
+                  <input
+                    type="text"
+                    id="search-input"
+                    class={`bg-transparent w-100 border-0 my-auto`}
+                    placeholder="Search workspaces in {openTeam?.name}"
+                    on:input={handleSearchInput}
+                    bind:value={searchQuery}
+                  />
+
+                  {#if hasText}
+                    <div class="clear-icon" on:click={clearSearchInput}>
+                      <CrossIcon
+                        height="16px"
+                        width="12px"
+                        color="var(--icon-secondary-300)"
+                      />
+                    </div>
+                  {/if}
+                </div>
+              </div>
+            {/if}
+            <div style="flex:1; overflow:auto;">
+              {#if selectedView === TeamViewEnum.LIST}
+                <WorkspaceListView
+                  bind:isGuestUser
+                  {searchQuery}
+                  {openTeam}
+                  data={workspaces.filter((elem) => {
+                    return (
+                      elem?.team?.teamId === openTeam?.teamId &&
+                      elem?.name?.toLowerCase().includes(searchQuery)
+                    );
+                  }) || []}
+                  {onSwitchWorkspace}
+                  {onDeleteWorkspace}
+                  isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
+                    userRole === TeamRole.TEAM_OWNER}
+                />
+              {:else if selectedView == TeamViewEnum.GRID}
+                <WorkspaceGridView
+                  bind:isGuestUser
+                  {onDeleteWorkspace}
+                  {searchQuery}
+                  workspaces={workspaces.filter((elem) => {
+                    return (
+                      elem?.team?.teamId === openTeam?.teamId &&
+                      elem?.name?.toLowerCase().includes(searchQuery)
+                    );
+                  }) || []}
+                  onCreateNewWorkspace={handleCreateNewWorkspace}
+                  {onSwitchWorkspace}
+                  isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
+                    userRole === TeamRole.TEAM_OWNER}
+                />
+                <!--Enabled in next phase-->
+              {/if}
+            </div>
+          </div>
+        {:else if activeTeamTab === TeamTabsEnum.MEMBERS}
+          <TeamMembers
+            {userId}
+            userType={userRole}
+            {openTeam}
+            {workspaces}
+            {onRemoveMembersAtTeam}
+            {onDemoteToMemberAtTeam}
+            {onPromoteToAdminAtTeam}
+            {onPromoteToOwnerAtTeam}
+            {onRemoveUserFromWorkspace}
+            {onChangeUserRoleAtWorkspace}
+          />
+        {:else if activeTeamTab === TeamTabsEnum.SETTINGS && userRole === "owner"}
+          <TeamSettings openTeam={openTeam?.toMutableJSON()} {onUpdateTeam} />
+        {/if}
+      </div>
     </div>
   </div>
 {/if}
@@ -313,10 +431,6 @@
 <style>
   .custom-tooltip {
     --bs-tooltip-bg: var(--bs-primary);
-  }
-
-  .teams-content {
-    height: calc(100vh - 44px);
   }
   @media only screen and (max-width: 1000px) {
     .team-heading {
@@ -370,11 +484,39 @@
     background: var(--bg-tertiary-400);
     width: 27vw;
     font-size: 12px;
+    position: relative;
+    border: 1px solid transparent;
+  }
+  .search-input-container:hover {
+    border: 1px solid var(--border-primary-300);
+    caret-color: var(--border-primary-300);
+  }
+
+  .search-input-container:focus-within {
+    border-color: var(--border-primary-300);
+    caret-color: var(--border-primary-300);
   }
 
   #search-input:focus {
     outline: none;
     border: none;
     box-shadow: none;
+  }
+
+  .clear-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .moreOption-icon {
+    height: 24px;
+    width: 24px;
+  }
+  .moreOption-icon:hover {
+    background-color: var(--bg-tertiary-190);
   }
 </style>

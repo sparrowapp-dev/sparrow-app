@@ -13,6 +13,10 @@
   export let userRoleInWorkspace: WorkspaceRole;
   export let collection: CollectionDocument;
   export let searchData = "";
+  /**
+   * Role of user in active workspace
+   */
+  export let userRole;
   import angleRight from "$lib/assets/angle-right-v2.svg";
   import threedotIcon from "$lib/assets/3dot.svg";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
@@ -43,6 +47,7 @@
     RequestIcon,
   } from "@library/icons";
   import { Options } from "@library/ui";
+    import { isGuestUserActive } from "$lib/store";
 
   let deletedIds: [string] | [] = [];
   let requestCount = 0;
@@ -64,6 +69,10 @@
   let noOfRows = 5;
   let inputField: HTMLInputElement;
   let collectionTabWrapper: HTMLElement;
+  let isGuestUser: boolean ;
+    isGuestUserActive.subscribe((value)=>{
+       isGuestUser = value
+    })
 
   /**
    * Handle position of the context menu
@@ -184,7 +193,7 @@
   let refreshCollectionLoader = false;
   let newCollectionName: string = "";
 
-  const handleRenameInput = (event) => {
+  const handleRenameInput = (event: { target: { value: string; }; }) => {
     newCollectionName = event.target.value;
   };
 
@@ -200,7 +209,7 @@
     newCollectionName = "";
   };
 
-  const onRenameInputKeyPress = (event) => {
+  const onRenameInputKeyPress = (event: { key: string; }) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
         "renameInputFieldCollection",
@@ -438,7 +447,7 @@
         style="height: 32px; text-align: left;"
       >
         <p class="ellipsis w-100 mb-0 text-fs-12">
-          {collection.name}
+          {collection.name} 
         </p>
         {#if collection.activeSync}
           <span
@@ -458,55 +467,58 @@
       </div>
     {/if}
   </button>
-  {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
-    <Spinner size={"15px"} />
+  {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED) && !isGuestUser}
+    <Spinner size={"15px"} /> 
   {:else}
     <!-- <Tooltip
       placement="bottom"
       title="More options"
       styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
     > -->
-    <Tooltip
-      title={"Add Options"}
-      placement={"bottom"}
-      distance={13}
-      show={!showAddItemMenu}
-      zIndex={701}
-    >
-      <button
-        id={`add-item-collection-${collection.id}`}
-        class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center {showAddItemMenu
-          ? 'add-item-active'
-          : ''}"
-        on:click={(e) => {
-          rightClickContextMenu2(e);
-        }}
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+      <Tooltip
+        title={"Add Options"}
+        placement={"bottom"}
+        distance={13}
+        show={!showAddItemMenu}
+        zIndex={701}
       >
-        <img src={AddIcon} alt="AddIcon" />
-      </button>
-    </Tooltip>
+        <button
+          id={`add-item-collection-${collection.id}`}
+          class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center {showAddItemMenu
+            ? 'add-item-active'
+            : ''}"
+          on:click={(e) => {
+            rightClickContextMenu2(e);
+          }}
+        >
+          <img src={AddIcon} alt="AddIcon" />
+        </button>
+      </Tooltip>
 
-    <Tooltip
-      title={"More"}
-      placement={"bottom"}
-      distance={17}
-      zIndex={701}
-      show={!showMenu}
-    >
-      <button
-        id={`show-more-collection-${collection.id}`}
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
-        style=""
-        on:click={(e) => {
-          rightClickContextMenu(e);
-        }}
+      <Tooltip
+        title={"More"}
+        placement={"bottom"}
+        distance={17}
+        zIndex={701}
+        show={!showMenu}
       >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
-      <!-- </Tooltip> -->
-    </Tooltip>
+        <button
+          id={`show-more-collection-${collection.id}`}
+          class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+            ? 'threedot-active'
+            : ''}"
+          style=""
+          on:click={(e) => {
+            rightClickContextMenu(e);
+          }}
+        >
+          <img src={threedotIcon} alt="threedotIcon" />
+        </button>
+        <!-- </Tooltip> -->
+      </Tooltip>
+    {/if}
+
     {#if isActiveSyncEnabled && collection?.activeSync}
       <Tooltip placement="bottom" title="Sync" styleProp="left: 25%;">
         <button
@@ -547,6 +559,7 @@
       <div class="sub-folders ps-0">
         {#each collection.items as explorer}
           <Folder
+            bind:userRole
             {onItemCreated}
             {onItemDeleted}
             {onItemRenamed}
@@ -566,45 +579,47 @@
         {/if}
 
         <div class="d-flex gap-2 ms-1">
-          <Tooltip title={"Add Folder"} placement={"bottom"} distance={12}>
-            <div
-              class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-              style="height: 24px; width: 24px; "
-              role="button"
-              on:click={() => {
-                onItemCreated("folder", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                });
-              }}
-            >
-              <FolderPlusIcon
-                height="16px"
-                width="16px"
-                color="var(--request-arc)"
-              />
-            </div>
-          </Tooltip>
+          {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+            <Tooltip title={"Add Folder"} placement={"bottom"} distance={12}>
+              <div
+                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+                style="height: 24px; width: 24px; "
+                role="button"
+                on:click={() => {
+                  onItemCreated("folder", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                  });
+                }}
+              >
+                <FolderPlusIcon
+                  height="16px"
+                  width="16px"
+                  color="var(--request-arc)"
+                />
+              </div>
+            </Tooltip>
 
-          <Tooltip title={"Add Request"} placement={"bottom"} distance={12}>
-            <div
-              class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-              style="height: 24px; width: 24px;"
-              role="button"
-              on:click={() => {
-                onItemCreated("requestCollection", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                });
-              }}
-            >
-              <RequestIcon
-                height="16px"
-                width="16px"
-                color="var(--request-arc)"
-              />
-            </div>
-          </Tooltip>
+            <Tooltip title={"Add Request"} placement={"bottom"} distance={12}>
+              <div
+                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+                style="height: 24px; width: 24px;"
+                role="button"
+                on:click={() => {
+                  onItemCreated("requestCollection", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                  });
+                }}
+              >
+                <RequestIcon
+                  height="16px"
+                  width="16px"
+                  color="var(--request-arc)"
+                />
+              </div>
+            </Tooltip>
+          {/if}
         </div>
         <!-- {#if showFolderAPIButtons}
           <div class="mt-2 mb-2 d-flex">

@@ -3,38 +3,134 @@
   import type { TabDocument, TeamDocument } from "@app/database/database";
 
   import {
-    workspaceLeftPanelWidth,
-    workspaceRightPanelWidth,
-  } from "$lib/store";
+    isWorkspaceCreatedFirstTime,
+    isWorkspaceLoaded,
+  } from "$lib/store/workspace.store";
+
+  import {
+    leftPanelWidth,
+    rightPanelWidth,
+    leftPanelCollapse,
+  } from "@teams/common/stores";
+
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import TeamExplorerPage from "../TeamExplorerPage/TeamExplorerPage.svelte";
   import TeamSidePanel from "@teams/features/team-sidepanel/layout/TeamSidePanel.svelte";
   import { TeamsViewModel } from "./Teams.ViewModel";
+  import { Modal } from "@library/ui/modal";
+  import { CreateTeam } from "@teams/features";
+  import { pagesMotion } from "@app/constants";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
+  const setOpenTeam = _viewModel.setOpenTeam;
+  const disableNewInviteTag=  _viewModel.disableNewInviteTag
+  const modifyTeam=  _viewModel.modifyTeam
+
+  let isCreateTeamModalOpen: boolean = false;
+  const collectionList = _viewModel.collection;
+  const onApiClick = _viewModel.handleApiClick;
+  const OnWorkspaceSwitch = _viewModel.handleSwitchWorkspace;
+
+  let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
+  const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
+  import { onMount } from "svelte";
+  import { Motion } from "svelte-motion";
+
+  let githubRepoData: GithubRepoDocType;
+  let isGuestUser = false;
+
+  onMount(async () => {
+    let githubRepo = await _viewModel.getGithubRepo();
+    githubRepoData = githubRepo?.getLatest().toMutableJSON();
+    splitter = document.querySelector(".team-splitter .splitpanes__splitter");
+
+    await _viewModel.fetchGithubRepo();
+    githubRepo = await _viewModel.getGithubRepo();
+    githubRepoData = githubRepo?.getLatest().toMutableJSON();
+    isGuestUser = await _viewModel.getGuestUser();
+  });
+
+  let splitter: HTMLElement | null;
+
+  const handleCollapseCollectionList = () => {
+    leftPanelCollapse.set(!$leftPanelCollapse);
+  };
+
+  $: {
+    if (splitter && $leftPanelCollapse === true) {
+      splitter.style.display = "none";
+    }
+    if (splitter && $leftPanelCollapse === false) {
+      splitter.style.display = "unset";
+    }
+  }
 </script>
 
-<Splitpanes
-  class="team-splitter h-100"
-  style="width: calc(100vw - 54px)"
-  on:resize={(e) => {
-    workspaceLeftPanelWidth.set(e.detail[0].size);
-    workspaceRightPanelWidth.set(e.detail[1].size);
+<Motion {...pagesMotion} let:motion>
+  <div class="h-100" use:motion>
+    <Splitpanes
+      class="team-splitter h-100"
+      style="width: calc(100vw - 54px)"
+      on:resize={(e) => {
+        leftPanelWidth.set(e.detail[0].size);
+        rightPanelWidth.set(e.detail[1].size);
+      }}
+    >
+      <Pane
+        size={$leftPanelCollapse ? 0 : $leftPanelWidth}
+        minSize={20}
+        class="bg-secondary-900-important sidebar-left-panel"
+      >
+        <TeamSidePanel
+          bind:isGuestUser
+          bind:isCreateTeamModalOpen
+          teamList={$teamList}
+          tabList={$tabList}
+          data={workspaces}
+          githubRepo={githubRepoData}
+          leftPanelController={{
+            leftPanelCollapse: $leftPanelCollapse,
+            handleCollapseCollectionList,
+          }}
+          collectionList={$collectionList}
+          openTeam={$openTeam}
+          {onApiClick}
+          {OnWorkspaceSwitch}
+          {setOpenTeam}
+          {disableNewInviteTag}
+          {modifyTeam}
+        />
+      </Pane>
+      <Pane
+        size={$leftPanelCollapse ? 100 : $rightPanelWidth}
+        minSize={60}
+        class="bg-secondary-800-important"
+      >
+        <TeamExplorerPage />
+      </Pane>
+    </Splitpanes>
+  </div>
+</Motion>
+
+<Modal
+  title={"New Team"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isCreateTeamModalOpen}
+  handleModalState={(flag) => {
+    isCreateTeamModalOpen = flag;
   }}
 >
-  <Pane class="sidebar-left-panel" minSize={20} size={$workspaceLeftPanelWidth}>
-    <TeamSidePanel teamList={$teamList} tabList={$tabList} />
-  </Pane>
-  <Pane
-    class="sidebar-right-panel"
-    minSize={60}
-    size={$workspaceRightPanelWidth}
-  >
-    <TeamExplorerPage />
-  </Pane>
-</Splitpanes>
+  <CreateTeam
+    handleModalState={(flag = false) => {
+      isCreateTeamModalOpen = flag;
+    }}
+    onCreateTeam={_viewModel.createTeam}
+  />
+</Modal>
 
 <style>
   .warning-text {
@@ -42,9 +138,6 @@
     font-size: 14px;
     font-weight: 400;
     line-height: 150%;
-  }
-  :global(.splitter-sidebar.splitpanes) {
-    width: calc(100vw - 72px);
   }
   :global(.team-splitter .splitpanes__splitter) {
     width: 6px !important;

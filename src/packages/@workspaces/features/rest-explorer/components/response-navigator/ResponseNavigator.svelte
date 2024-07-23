@@ -65,15 +65,17 @@
 
 <style>
   .navigation__link {
-    color: var(--text-secondary-300);
+    color: var(--text-secondary-100);
     background-color: transparent;
     border-bottom: 2px transparent;
+    padding: 2px;
   }
   .navigation__link:hover {
-    color: var(--text-secondary-100);
+  background-color: var(--text-secondary-500);
+  border-radius: 2px;
   }
   .tab-active {
     color: var(--text-secondary-100);
-    border-bottom: 2px solid var(--border-primary-200) !important;
+    border-bottom: 2px solid var(--border-primary-300 ) !important;
   }
 </style>

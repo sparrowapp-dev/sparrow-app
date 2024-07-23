@@ -17,6 +17,7 @@
     RestExplorerPage,
     CollectionExplorerPage,
     FolderExplorerPage,
+    WorkspaceExplorerPage,
   } from "../";
   import {
     TabBar,
@@ -53,6 +54,11 @@
   import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
   import { isGuestUserActive } from "$lib/store";
   import { pagesMotion } from "@app/constants";
+  import { user } from "$lib/store";
+
+  export let modifiedUser;
+
+  export let handleChange;
 
   const _viewModel = new CollectionsViewModel();
 
@@ -72,9 +78,16 @@
   let isExposeSaveAsRequest: boolean = false;
   let isAppVersionVisible = true;
   let isGuestUser = false;
+  let userId = "";
+  let userRole = "";
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
+  });
+
+  user.subscribe((value) => {
+    modifiedUser = value;
+    userId = value?._id;
   });
 
   /**
@@ -177,7 +190,7 @@
   currentWorkspace.subscribe((value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
-        _viewModel.fetchCollections($currentWorkspace?._id);
+        _viewModel.fetchCollections(value?._id);
       }
       prevWorkspaceId = value._id;
       if (count == 0) {
@@ -187,6 +200,11 @@
         if (isNew === "true") _viewModel.createNewTab();
         count = count + 1;
       }
+      value.users?.forEach((user) => {
+        if (user.id === userId) {
+          userRole = user.role;
+        }
+      });
     }
   });
 
@@ -217,6 +235,7 @@
       >
         <CollectionList
           bind:scrollList
+          bind:userRole
           {collectionList}
           {currentWorkspace}
           {isAppVersionVisible}
@@ -245,50 +264,67 @@
         minSize={60}
         class="bg-secondary-800-important"
       >
-        <TabBar
-          tabList={$tabList}
-          onNewTabRequested={_viewModel.createNewTab}
-          onTabClosed={closeTab}
-          onDropEvent={_viewModel.onDropEvent}
-          onDragStart={_viewModel.handleDropOnStart}
-          onDropOver={_viewModel.handleDropOnEnd}
-          onTabSelected={_viewModel.handleActiveTab}
-          onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
-          onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
-          onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
-        />
-        <Route>
-          {#if true}
-            {#if $activeTab?.type === ItemType.REQUEST}
-              <Motion {...scaleMotionProps} let:motion>
-                <div use:motion>
-                  <RestExplorerPage tab={$activeTab} />
-                </div>
-              </Motion>
-            {:else if $activeTab?.type === ItemType.COLLECTION}
-              <Motion {...scaleMotionProps} let:motion>
-                <div use:motion>
-                  <CollectionExplorerPage tab={$activeTab} />
-                </div>
-              </Motion>
-            {:else if $activeTab?.type === ItemType.FOLDER}
-              <Motion {...scaleMotionProps} let:motion>
-                <div use:motion>
-                  <FolderExplorerPage tab={$activeTab} />
-                </div>
-              </Motion>
-            {:else if !$tabList?.length}
-              <Motion {...scaleMotionProps} let:motion>
-                <WorkspaceDefault
-                  showImportCollectionPopup={() =>
-                    (isImportCollectionPopup = true)}
-                  onItemCreated={_viewModel.handleCreateItem}
-                  {isGuestUser}
-                />
-              </Motion>
-            {/if}
-          {/if}
-        </Route>
+        <section class="d-flex flex-column h-100">
+          <TabBar
+            tabList={$tabList}
+            {isGuestUser}
+            onNewTabRequested={_viewModel.createNewTab}
+            onTabClosed={closeTab}
+            onDropEvent={_viewModel.onDropEvent}
+            onDragStart={_viewModel.handleDropOnStart}
+            onDropOver={_viewModel.handleDropOnEnd}
+            onTabSelected={_viewModel.handleActiveTab}
+            onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
+            onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
+            onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
+          />
+          <div style="flex:1; overflow: hidden;">
+            <Route>
+              {#if true}
+                {#if $activeTab?.type === ItemType.REQUEST}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <RestExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
+                {:else if $activeTab?.type === ItemType.COLLECTION}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <CollectionExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
+                {:else if $activeTab?.type === ItemType.FOLDER}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <FolderExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
+                {:else if $activeTab?.type === ItemType.WORKSPACE}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <WorkspaceExplorerPage
+                        {collectionList}
+                        {modifiedUser}
+                        tab={$activeTab}
+                      />
+                    </div>
+                  </Motion>
+                {:else if !$tabList?.length}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <WorkspaceDefault
+                        showImportCollectionPopup={() =>
+                          (isImportCollectionPopup = true)}
+                        onItemCreated={_viewModel.handleCreateItem}
+                        {isGuestUser}
+                      />
+                    </div>
+                  </Motion>
+                {/if}
+              {/if}
+            </Route>
+          </div>
+        </section>
       </Pane>
     </Splitpanes>
   </div>

@@ -14,7 +14,7 @@
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
   import { Carousel, Modal, Popover } from "@library/ui";
-  import { environmentType } from "$lib/utils/enums";
+  import { environmentType, WorkspaceRole } from "$lib/utils/enums";
   import {
     CreateENV,
     IntroToEnvironment,
@@ -40,6 +40,7 @@
 
   export let onFetchEnvironmentGuide: (query) => void;
   export let onUpdateEnvironmentGuide: (query, isActive) => void;
+  export let userRole;
   let isPopoverContainer = false;
 
   let quickHelp: boolean = false;
@@ -80,8 +81,12 @@
 </script>
 
 {#if $currentEnvironment?.environmentId}
-  <div class={`env-panel d-flex`}>
-    <div class="env-parent w-100 {quickHelp ? 'quick-help-active' : ''}">
+  <div class={`h-100 env-panel d-flex`}>
+    <div
+      class="d-flex flex-column h-100 env-parent w-100 {quickHelp
+        ? 'quick-help-active'
+        : ''}"
+    >
       <header
         class={`env-header justify-content-between d-flex`}
         style="position: relative ;"
@@ -130,7 +135,8 @@
           focusedBorderColor={"var(--border-primary-300)"}
           class="text-fs-18 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;"
-          disabled={$currentEnvironment?.type == "GLOBAL"}
+          disabled={$currentEnvironment?.type == "GLOBAL" ||
+            userRole === WorkspaceRole.WORKSPACE_VIEWER}
           placeholder=""
         />
         <div class={`d-flex env-btn-container`}>
@@ -160,10 +166,7 @@
                 onClick={onSaveEnvironment}
                 disable={$currentEnvironment.isSaveInProgress ||
                   $currentEnvironment.isSave ||
-                  !hasWorkpaceLevelPermission(
-                    $userWorkspaceLevelRole,
-                    workspaceLevelPermissions.ADD_ENVIRONMENT,
-                  )}
+                  userRole === WorkspaceRole.WORKSPACE_VIEWER}
                 loader={$currentEnvironment.isSaveInProgress}
               />
             </Tooltip>
@@ -207,9 +210,9 @@
           >
         {/if}
       </div>
-      <section class={`var-value-container`}>
+      <section class={`var-value-container pe-1`} style="flex:1;">
         <TabularInput
-          loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
+          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
           keyValue={$currentEnvironment.variable}
           callback={handleCurrentEnvironmentKeyValuePairChange}
           {search}
@@ -217,7 +220,7 @@
       </section>
     </div>
     {#if quickHelp}
-      <div class="quick-help">
+      <div class="quick-help h-100">
         <QuickHelp
           closeQuickHelp={() => {
             quickHelp = false;
@@ -274,7 +277,6 @@
 <style lang="scss">
   .env-panel {
     background-color: var(--bg-secondary-850);
-    height: calc(100vh - 44px);
   }
   .env-header {
     padding: 20px 0px 10px 6px;
@@ -332,12 +334,10 @@
   }
   .var-value-container {
     width: 100%;
-    height: calc(100vh - 130px);
     overflow-y: auto;
   }
   .quick-help {
     width: 280px;
-    overflow-y: auto;
   }
   .env-parent {
     padding: 10px;

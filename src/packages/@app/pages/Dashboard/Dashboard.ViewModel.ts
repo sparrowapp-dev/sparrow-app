@@ -11,9 +11,14 @@ import {
   isLoggout,
   isResponseError,
   setUser,
+  user,
 } from "$lib/store/auth.store";
 import { TabRepository } from "@app/repositories/tab.repository";
-import { RxDB } from "@app/database/database";
+import {
+  RxDB,
+  type TeamDocument,
+  type WorkspaceDocument,
+} from "@app/database/database";
 import { currentMonitor, getCurrent } from "@tauri-apps/api/window";
 import { clearAuthJwt } from "$lib/utils/jwt";
 import { userLogout } from "@app/services/auth.service";
@@ -21,6 +26,9 @@ import { FeatureSwitchService } from "@app/services/feature-switch.service";
 import { FeatureSwitchRepository } from "@app/repositories/feature-switch.repository";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { v4 as uuidv4 } from "uuid";
+import { TeamAdapter } from "@app/adapter";
+import { navigate } from "svelte-navigator";
+import type { Observable } from "rxjs";
 
 export class DashboardViewModel {
   constructor() {}
@@ -57,6 +65,21 @@ export class DashboardViewModel {
   get environments() {
     return this.environmentRepository.getEnvironment();
   }
+
+  /**
+   * @description - get workspace list from local db
+   */
+  public workspaces = async (): Promise<Observable<WorkspaceDocument[]>> => {
+    const workspaces = await this.workspaceRepository.getWorkspaces();
+    return workspaces;
+  };
+
+  /**
+   * @description - get observalble team list from local db
+   */
+  public getTeams = async (): Promise<Observable<TeamDocument[]>> => {
+    return await this.teamRepository.getTeams();
+  };
 
   /**
    *
@@ -107,39 +130,8 @@ export class DashboardViewModel {
     const response = await this.teamService.fetchTeams(userId);
     if (response?.isSuccessful && response?.data?.data) {
       const data = response.data.data.map((elem) => {
-        const {
-          _id,
-          name,
-          users,
-          logo,
-          workspaces,
-          owner,
-          admins,
-          createdAt,
-          createdBy,
-          updatedAt,
-          updatedBy,
-          isNewInvite,
-        } = elem;
-        const updatedWorkspaces = workspaces.map((workspace) => ({
-          workspaceId: workspace.id,
-          name: workspace.name,
-        }));
-        return {
-          teamId: _id,
-          name,
-          users,
-          logo,
-          workspaces: updatedWorkspaces,
-          owner,
-          admins,
-          isActiveTeam: false,
-          createdAt,
-          createdBy,
-          updatedAt,
-          updatedBy,
-          isNewInvite,
-        };
+        const teamAdapter = new TeamAdapter();
+        return teamAdapter.adapt(elem).getValue();
       });
       if (openTeamId) {
         data.forEach((elem) => {
@@ -201,6 +193,8 @@ export class DashboardViewModel {
           createdAt,
           createdBy,
           collection,
+          updatedAt,
+          updatedBy,
         } = elem;
         const isActiveWorkspace = await this.checkActiveWorkspace(_id);
         if (isActiveWorkspace) isAnyWorkspaceActive = _id;
@@ -219,6 +213,8 @@ export class DashboardViewModel {
           isActiveWorkspace: isActiveWorkspace,
           createdAt,
           createdBy,
+          updatedAt,
+          updatedBy,
         };
         data.push(item);
       }
@@ -337,5 +333,44 @@ export class DashboardViewModel {
   public findUser = async (data) => {
     const res = await this.guestUserRepository.findOne(data);
     return res;
+  };
+
+  /**
+   * Create workspace in the team
+   * @param teamId ID of team where workspace need to be created
+   */
+  public handleCreateWorkspace = async (
+    workspaceName: string,
+    teamId: string,
+  ) => {
+    const response = await this.workspaceService.createWorkspace({
+      name: workspaceName,
+      id: teamId,
+    });
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+      await this.workspaceRepository.addWorkspace({
+        ...res,
+        id: res._id,
+      });
+      user.subscribe(async (value) => {
+        if (value) {
+          await this.refreshTeams(value._id);
+          await this.refreshWorkspaces(value._id);
+        }
+      });
+      await this.workspaceRepository.setActiveWorkspace(res._id);
+      notifications.success("New Workspace Created");
+    }
+    return response;
+  };
+
+  /**
+   * Switch from one workspace to another
+   * @param id - Workspace id
+   */
+  public handleSwitchWorkspace = async (id: string) => {
+    await this.workspaceRepository.setActiveWorkspace(id);
+    navigate("/dashboard/collections");
   };
 }

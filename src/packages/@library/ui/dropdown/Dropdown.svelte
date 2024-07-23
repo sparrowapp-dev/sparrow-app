@@ -17,6 +17,7 @@
   export let options: {
     name: String;
     icon: any;
+    color:String
     onclick: () => void;
   }[];
 
@@ -95,6 +96,8 @@
       {#each options as item}
         <button
           class="border-0 d-flex p-2 rounded-1 w-100 option-button"
+   style="color: {item.color};"
+ 
           on:click={() => item.onclick()}
         >
           {#if item.icon}

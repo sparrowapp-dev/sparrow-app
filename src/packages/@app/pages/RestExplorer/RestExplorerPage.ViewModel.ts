@@ -79,6 +79,9 @@ import { notifications } from "@library/ui/toast/Toast";
 import { RequestTabAdapter } from "@app/adapter/request-tab";
 import { GuideRepository } from "@app/repositories/guide.repository";
 import { CollectionService } from "@app/services/collection.service";
+import { GuestUserRepository } from "@app/repositories/guest-user.repository";
+import { isGuestUserActive } from "$lib/store/auth.store";
+import { v4 as uuidv4 } from "uuid";
 
 class RestExplorerViewModel
   implements
@@ -116,6 +119,7 @@ class RestExplorerViewModel
   private tabRepository = new TabRepository();
   private environmentTabRepository = new EnvironmentTabRepository();
   private guideRepository = new GuideRepository();
+  private guestUserRepository = new GuestUserRepository();
 
   /**
    * Service
@@ -194,6 +198,17 @@ class RestExplorerViewModel
 
   /**
    *
+   * @returns guest user
+   */
+  public getGuestUser = async () => {
+    const response = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    return response?.getLatest().toMutableJSON();
+  };
+
+  /**
+   *
    * @param _url - request url
    * @param _effectQueryParams  - flag that effect request query parameter
    */
@@ -250,7 +265,6 @@ class RestExplorerViewModel
     this.tab = progressiveTab;
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-      notifications.success("Documentation updated");
     } catch (error) {
       notifications.error(
         "Failed to update the documentation. Please try again",
@@ -573,6 +587,41 @@ class RestExplorerViewModel
       description: "",
       ...userSource,
     };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser == true) {
+      const data = {
+        id: uuidv4(),
+        name: _folderName,
+        description: "",
+        type: "FOLDER",
+        source: "USER",
+        isDeleted: false,
+        items: [],
+        createdBy: "Guest User",
+        updatedBy: "Guest User",
+        createdAt: "",
+        updatedAt: "",
+      };
+
+      const latestRoute = {
+        id: data.id,
+      };
+      return {
+        status: "success",
+        data: {
+          latestRoute,
+          collectionId: _collectionId,
+          data: data,
+          addRequestOrFolderInCollection: this.addRequestOrFolderInCollection,
+        },
+      };
+    }
+
     const res = await insertCollectionDirectory(
       _workspaceMeta.id,
       _collectionId,
@@ -616,6 +665,48 @@ class RestExplorerViewModel
       name: _collectionName,
       workspaceId: _workspaceMeta.id,
     };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser == true) {
+      const data = {
+        _id: uuidv4(),
+        name: _collectionName,
+        totalRequests: 0,
+        createdBy: "Guest User",
+        items: [],
+        updatedBy: "Guest User",
+        // createdAt: new Date().toISOString,
+        // updatedAt: new Date().toISOString,
+        createdAt: "",
+        createdby: "",
+      };
+      const latestRoute = {
+        id: data._id,
+      };
+      const storage = data;
+      const _id = data._id;
+      delete storage._id;
+      storage.id = _id;
+      storage.workspaceId = _workspaceMeta.id;
+      MixpanelEvent(Events.CREATE_COLLECTION, {
+        source: "SaveRequest",
+        collectionName: data.name,
+        collectionId: data._id,
+      });
+      return {
+        status: "success",
+        data: {
+          latestRoute,
+          storage,
+          addCollection: this.addCollection,
+        },
+      };
+    }
+
     const res = await insertCollection(newCollection);
     if (res.isSuccessful) {
       const latestRoute = {
@@ -689,6 +780,44 @@ class RestExplorerViewModel
       type: ItemType.REQUEST,
     };
 
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser === true) {
+      const progressiveTab = this._tab.getValue();
+      const data = {
+        id: progressiveTab.id,
+        name: requestMetaData.name,
+        description: requestMetaData.description,
+        type: "REQUEST",
+        request: unadaptedRequest,
+        updatedAt: "",
+        updatedBy: "Guest User",
+      };
+
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+      this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          _id,
+          data,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          _id,
+          data,
+        );
+      }
+      return {
+        status: "success",
+        message: "",
+      };
+    }
     const res = await updateCollectionRequest(_id, folderId, collectionId, {
       collectionId: collectionId,
       workspaceId: workspaceId,
@@ -699,6 +828,7 @@ class RestExplorerViewModel
         request: unadaptedRequest,
       },
     });
+
     if (res.isSuccessful) {
       const progressiveTab = this._tab.getValue();
       progressiveTab.isSaved = true;
@@ -813,6 +943,19 @@ class RestExplorerViewModel
     if (path.length > 0) {
       const requestTabAdapter = new RequestTabAdapter();
       const unadaptedRequest = requestTabAdapter.unadapt(componentData);
+      let req = {
+        id: uuidv4(),
+        name: tabName,
+        description,
+        type: ItemType.REQUEST,
+        request: unadaptedRequest,
+        source: "USER",
+        isDeleted: false,
+        createdBy: "Guest User",
+        updatedBy: "Guest User",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
       if (path[path.length - 1].type === ItemType.COLLECTION) {
         /**
          * handle request at collection level
@@ -823,6 +966,61 @@ class RestExplorerViewModel
             currentBranch: _collection?.currentBranch,
             source: "USER",
           };
+        }
+        let isGuestUser;
+        isGuestUserActive.subscribe((value) => {
+          isGuestUser = value;
+        });
+
+        if (isGuestUser == true) {
+          this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
+          const expectedPath = {
+            folderId: "",
+            folderName: "",
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+          };
+          if (
+            !componentData.path.workspaceId ||
+            !componentData.path.collectionId
+          ) {
+            /**
+             * Update existing request
+             */
+            this.updateRequestName(req.name);
+            this.updateRequestDescription(req.description);
+            this.updateRequestPath(expectedPath);
+            this.updateRequestId(req.id);
+            const progressiveTab = this._tab.getValue();
+            progressiveTab.isSaved = true;
+            this.tab = progressiveTab;
+            this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+          } else {
+            /**
+             * Create new copy of the existing request
+             */
+            const initRequestTab = new InitRequestTab(req.id, "UNTRACKED-");
+            initRequestTab.updateName(req.name);
+            initRequestTab.updateDescription(req.description);
+            initRequestTab.updatePath(expectedPath);
+            initRequestTab.updateUrl(req.request.url);
+            initRequestTab.updateMethod(req.request.method);
+            initRequestTab.updateBody(req.request.body);
+            initRequestTab.updateQueryParams(req.request.queryParams);
+            initRequestTab.updateAuth(req.request.auth);
+            initRequestTab.updateHeaders(req.request.headers);
+
+            this.tabRepository.createTab(initRequestTab.getValue());
+            moveNavigation("right");
+          }
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+          return;
         }
         const res = await insertCollectionRequest({
           collectionId: path[path.length - 1].id,
@@ -905,6 +1103,54 @@ class RestExplorerViewModel
             currentBranch: _collection?.currentBranch,
             source: "USER",
           };
+        }
+        let isGuestUser;
+        isGuestUserActive.subscribe((value) => {
+          isGuestUser = value;
+        });
+
+        if (isGuestUser == true) {
+          this.addRequestInFolder(path[0].id, path[path.length - 1].id, req);
+          const expectedPath = {
+            folderId: path[path.length - 1].id,
+            folderName: path[path.length - 1].name,
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+          };
+          if (
+            !componentData.path.workspaceId ||
+            !componentData.path.collectionId
+          ) {
+            this.updateRequestName(req.name);
+            this.updateRequestDescription(req.description);
+            this.updateRequestPath(expectedPath);
+            this.updateRequestId(req.id);
+            const progressiveTab = this._tab.getValue();
+            progressiveTab.isSaved = true;
+            this.tab = progressiveTab;
+            this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+          } else {
+            const initRequestTab = new InitRequestTab(req.id, "UNTRACKED-");
+            initRequestTab.updateName(req.name);
+            initRequestTab.updateDescription(req.description);
+            initRequestTab.updatePath(expectedPath);
+            initRequestTab.updateUrl(req.request.url);
+            initRequestTab.updateMethod(req.request.method);
+            initRequestTab.updateBody(req.request.body);
+            initRequestTab.updateQueryParams(req.request.queryParams);
+            initRequestTab.updateAuth(req.request.auth);
+            initRequestTab.updateHeaders(req.request.headers);
+            this.tabRepository.createTab(initRequestTab.getValue());
+            moveNavigation("right");
+          }
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+          return;
         }
         const res = await insertCollectionRequest({
           collectionId: path[0].id,
@@ -1119,7 +1365,19 @@ class RestExplorerViewModel
     collectionId: string,
     newCollectionName: string,
   ) => {
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
     if (newCollectionName) {
+      if (isGuestUser == true) {
+        let col = await this.collectionRepository.readCollection(collectionId);
+        col = col.toMutableJSON();
+        col.name = newCollectionName;
+        this.collectionRepository.updateCollection(collectionId, col);
+        notifications.success("Collection renamed successfully!");
+        return;
+      }
       const response = await this.collectionService.updateCollectionData(
         collectionId,
         workspaceId,
@@ -1171,6 +1429,27 @@ class RestExplorerViewModel
           source: "USER",
         };
       }
+      let isGuestUser;
+      isGuestUserActive.subscribe((value) => {
+        isGuestUser = value;
+      });
+      if (isGuestUser === true) {
+
+        const res =
+          await this.collectionRepository.readRequestOrFolderInCollection(
+            collectionId,
+            folderId,
+          );
+          res.name = newFolderName;
+          
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          folderId,
+          res,
+        );
+        notifications.success("Folder renamed successfully!");
+        return;
+      }
       const response = await this.collectionService.updateFolderInCollection(
         workspaceId,
         collectionId,
@@ -1192,6 +1471,15 @@ class RestExplorerViewModel
       }
       return response;
     }
+  };
+
+  /**
+   * Get workspace data through workspace id
+   * @param workspaceId - id of workspace
+   * @returns - workspace document
+   */
+  public getWorkspaceById = async (workspaceId: string) => {
+    return await this.workspaceRepository.readWorkspace(workspaceId);
   };
 }
 

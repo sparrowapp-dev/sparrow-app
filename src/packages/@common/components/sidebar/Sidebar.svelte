@@ -46,30 +46,30 @@
 
   let sidebarItems: SidebarItemObj[] = [
     {
-      route: "/app/home",
+      route: !isGuestUser ? "/app/home" : "/guest/home",
       heading: "Home",
       defaultLogo: home,
       hoveredLogo: hoveredHome,
       selectedLogo: selectedHome,
-      disabled: isGuestUser ?? false,
+      disabled: false,
       position: "primary",
     },
     {
-      route: "/app/collections",
+      route: !isGuestUser ? "/app/collections" : "/guest/collections",
       heading: "Collections",
       defaultLogo: collections,
       hoveredLogo: hoveredCollections,
       selectedLogo: selectedCollections,
-      disabled: isGuestUser ?? false,
+      disabled: false,
       position: "primary",
     },
     {
-      route: "/app/environment",
+      route: !isGuestUser ? "/app/environment" : "/guest/environment",
       heading: "Environment",
       defaultLogo: environment,
       hoveredLogo: hoveredEnvironment,
       selectedLogo: selectedEnvironment,
-      disabled: isGuestUser ?? false,
+      disabled: false,
       position: "primary",
     },
     {
@@ -100,6 +100,7 @@
       position: "secondary",
     },
   ];
+
   let sidebarModalItem: SidebarProfileObj = {
     heading: "Profile",
     defaultLogo: profile,
@@ -117,41 +118,33 @@
   );
 </script>
 
-<div class="sidebar-global">
-  <div class={`sidebar ${componentClass}`}>
-    <div class="primary-sidebar-items">
-      {#each primarySidebarItems as item (item.route)}
-        <SidebarItem {item} />
-      {/each}
-    </div>
-    <div class="secondary-sidebar-items">
-      {#each secondarySidebarItems as item (item.route)}
-        <SidebarItem {item} />
-      {/each}
-      {#if !isGuestUser}
-        <Tooltip
-          title="User Profile"
-          placement="right"
-          distance={20}
-          zIndex={5}
-        >
-          <SidebarProfileModal item={sidebarModalItem} {onLogout} />
-        </Tooltip>
-      {/if}
-    </div>
+<div class={`sidebar ${componentClass}`}>
+  <div class="primary-sidebar-items">
+    {#each primarySidebarItems as item (item.route)}
+      <SidebarItem {item} />
+    {/each}
+  </div>
+  <div class="secondary-sidebar-items">
+    {#each secondarySidebarItems as item (item.route)}
+      <SidebarItem {item} />
+    {/each}
+    {#if !isGuestUser}
+      <Tooltip title="User Profile" placement="right" distance={20} zIndex={5}>
+        <SidebarProfileModal item={sidebarModalItem} {onLogout} />
+      </Tooltip>
+    {/if}
   </div>
 </div>
 
 <style>
   .sidebar {
-    height: calc(100vh - 44px);
+    overflow: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
     width: 54px;
     background-color: var(--bg-secondary-850);
-    margin-right: 1px;
     padding: 5px 0px 10px 0px;
   }
 </style>

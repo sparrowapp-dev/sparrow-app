@@ -4,6 +4,7 @@
    * placeholder - dummy text
    */
   export let placeholder = "placeholder";
+  export let placeholderColor = "gray";
   /**
    * height
    */
@@ -40,7 +41,15 @@
   export let hoveredBorderColor = "red";
   export let focusedBorderColor = "green";
 
+  /**
+   * max length that textarea holds
+   */
   export let maxlength = 500;
+
+  /**
+   * unique textarea id
+   */
+  export let id = "";
 
   /**
    * input states
@@ -87,10 +96,11 @@
     }}
     class="w-100 {componentClass}"
     {placeholder}
+    {id}
     style=" {componentStyle} height: 100%;  border-color:{extractBorderHighlight(
       isHovered,
       isFocused,
-    )};"
+    )}; --placeholder-color: {placeholderColor};"
     {disabled}
     {maxlength}
   />
@@ -98,7 +108,11 @@
 
 <style>
   textarea {
+    scrollbar-width: none;
     caret-color: var(--border-primary-300);
     border: 1px solid transparent;
+  }
+  textarea::placeholder {
+    color: var(--placeholder-color);
   }
 </style>

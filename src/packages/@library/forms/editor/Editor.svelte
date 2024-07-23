@@ -6,6 +6,7 @@
   import { EditorView } from "codemirror";
   import { createEventDispatcher } from "svelte";
 
+
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" = "Text";
   export let value = "";
   export let isEditable = true;
@@ -20,12 +21,14 @@
   const languageConf = new Compartment();
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
+  
 
   // Function to update the editor view when changes occur
   const updateExtensionView = EditorView.updateListener.of((update) => {
     const userInput = update.state.doc.toString();
     dispatch("change", userInput);
   });
+
 
   function initalizeCodeMirrorEditor(value: string) {
     let extensions: Extension[];
@@ -37,7 +40,7 @@
       EditorView.lineWrapping, // Enable line wrapping
       EditorState.readOnly.of(!isEditable ? true : false),
     ];
-
+   
     let state = EditorState.create({
       doc: value,
       extensions: extensions,

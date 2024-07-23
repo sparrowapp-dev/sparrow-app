@@ -16,7 +16,7 @@
     Folder,
     Path,
   } from "$lib/utils/interfaces/request.interface";
-  import { UntrackedItems } from "$lib/utils/enums";
+  import { UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
 
   // --- SVG
   import threedotIcon from "$lib/assets/3dot.svg";
@@ -24,6 +24,7 @@
 
   // ---- DB
   import type { CollectionDocument } from "@app/database/database";
+  import { isGuestUserActive } from "$lib/store";
 
   /**
    * Callback for Item Deleted
@@ -60,12 +61,22 @@
    */
   export let activeTabId: string;
 
+  /**
+   * Role of user in workspace
+   */
+  export let userRole;
+
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
   let noOfColumns = 180;
   let inputField: HTMLInputElement;
   let isRenaming = false;
   let deleteLoader: boolean = false;
+
+  let isGuestUser;
+  isGuestUserActive.subscribe((value) => {
+    isGuestUser = value;
+  });
 
   let requestTabWrapper: HTMLElement;
 
@@ -294,9 +305,9 @@
     {/if}
   </button>
 
-  {#if api.id?.includes(UntrackedItems.UNTRACKED)}
+  {#if api.id?.includes(UntrackedItems.UNTRACKED) && !isGuestUser}
     <Spinner size={"15px"} />
-  {:else}
+  {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
     <Tooltip
       title={"More"}
       show={!showMenu}

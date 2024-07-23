@@ -54,6 +54,7 @@ import {
   guestUserSchema,
   type GuestUserDocType,
 } from "@app/models/guest-user.model";
+import { updatesSchema, type UpdatesDocType } from "@app/models/updates.model";
 // import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 // addRxPlugin(RxDBDevModePlugin);
 
@@ -75,6 +76,7 @@ export type ReleaseDocument = RxDocument<ReleaseDocType>;
 export type GuideDocumnet = RxDocument<GuideDocType>;
 export type FeatureDocument = RxDocument<FeatureSwitchDocType>;
 export type GuestDocument = RxDocument<GuestUserDocType>;
+export type UpdatesDocument = RxDocument<UpdatesDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -146,6 +148,9 @@ export class RxDB {
           7: function (oldDoc: WorkspaceDocument) {
             return oldDoc;
           },
+          8: function (oldDoc: WorkspaceDocument) {
+            return oldDoc;
+          },
         },
       },
       tab: {
@@ -174,6 +179,11 @@ export class RxDB {
             return oldDoc;
           },
           8: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          9: function (oldDoc: TabDocument) {
+            oldDoc.property.request.state.isHeaderBulkEditActive = false;
+            oldDoc.property.request.state.isParameterBulkEditActive = false;
             return oldDoc;
           },
         },
@@ -267,6 +277,9 @@ export class RxDB {
       },
       guestuser: {
         schema: guestUserSchema,
+      },
+      updates: {
+        schema: updatesSchema,
       },
     });
     return { rxdb: this.rxdb };

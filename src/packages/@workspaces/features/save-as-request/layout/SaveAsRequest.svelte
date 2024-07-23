@@ -191,7 +191,7 @@
   };
 
   const handleCreateCollection = async (collectionName: string) => {
-    createDirectoryLoader = true;
+    createDirectoryLoader = true;     
     const res = await onCreateCollection(workspaceMeta, collectionName);
     if (res.status === "success") {
       latestRoute = res.data.latestRoute;
@@ -285,7 +285,7 @@
     --  left panel
     --
     -->
-    <div class="ps-3" style="height: 430px; overflow:auto;">
+    <div class="ps-3 row-left-section" style="height: 430px; overflow:auto;">
       <!-- 
               --
               shows current directory 
@@ -537,6 +537,7 @@
           {#if col.type === ItemType.FOLDER}
             <!-- {#if col.source === "USER"} -->
             <div
+              class="item ps-2"
               on:click={() => {
                 navigateToDirectory(col);
               }}
@@ -552,6 +553,7 @@
             />
           {:else}
             <div
+              class="item ps-2"
               on:click={() => {
                 navigateToDirectory(col);
               }}
@@ -841,7 +843,8 @@
         }}
         title={"+ Collection"}
         buttonClassProp={"btn mb-2"}
-        buttonStyleProp={"color: var(--text-primary-300); font-size: var(--base-text); border: 1px solid var(--border-primary-200);"}
+        type={"teritiary"}
+        buttonStyleProp={"font-size: var(--base-text);"}
       />
     {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
       <Button
@@ -850,7 +853,8 @@
         }}
         title={"+ Folder"}
         buttonClassProp={"btn mb-2"}
-        buttonStyleProp={"color: var(--text-primary-300); font-size: var(--base-text); border: 1px solid var(--border-primary-200);"}
+        type={"teritiary"}
+        buttonStyleProp={"font-size: var(--base-text);"}
       />
     {/if}
   </div>
@@ -977,6 +981,9 @@
   .instruction-btn:hover {
     background-color: var(--bg-tertiary-650) !important;
   }
+  .instruction-btn:active {
+    background-color: var(--bg-primary-400) !important;
+  }
   .edit-input {
     padding: 0 8px !important;
     font-size: 14px;
@@ -998,5 +1005,16 @@
   }
   .item-header:hover .edit-pencil {
     display: inline-block !important;
+  }
+  .item:hover {
+    background-color: var(--bg-tertiary-300) !important ;
+  }
+
+  .row-left-section::-webkit-scrollbar-thumb {
+    background-color: var(--bg-tertiary-100);
+  }
+
+  .row-left-section::-webkit-scrollbar-button {
+    color: var(--bg-tertiary-100);
   }
 </style>

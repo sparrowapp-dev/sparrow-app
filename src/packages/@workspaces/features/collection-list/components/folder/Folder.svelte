@@ -38,6 +38,7 @@
   // ---- DB
   import type { CollectionDocument } from "@app/database/database";
   import { of } from "rxjs";
+    import { isGuestUserActive } from "$lib/store";
 
   /**
    * Callback for Item created
@@ -82,6 +83,10 @@
   export let folder: Folder | null = null;
   export let activeTabId: string;
   export let searchData: string;
+  /**
+   * Role of user in active workspace
+   */
+  export let userRole;
 
   let expand: boolean = false;
   let showFolderAPIButtons: boolean = true;
@@ -93,6 +98,10 @@
   let requestCount: number;
   let requestIds: [string] | [] = [];
   let folderTabWrapper: HTMLElement;
+  let isGuestUser: boolean ;
+    isGuestUserActive.subscribe((value)=>{
+       isGuestUser = value
+    })
 
   $: {
     if (searchData) {
@@ -108,7 +117,7 @@
       requestCount = 0;
       requestCount = explorer?.items?.length;
       if (explorer?.items) {
-        requestIds = explorer?.items?.map((element) => {
+        requestIds = explorer?.items?.map((element: { id: any; }) => {
           return element.id;
         });
       }
@@ -142,7 +151,7 @@
   }
 
   let newFolderName: string = "";
-  const handleRenameInput = (event) => {
+  const handleRenameInput = (event: { target: { value: string; }; }) => {
     newFolderName = event.target.value;
   };
 
@@ -159,7 +168,7 @@
     newFolderName = "";
   };
 
-  const onRenameInputKeyPress = (event) => {
+  const onRenameInputKeyPress = (event: { key: string; }) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
         "renameInputFieldFolder",
@@ -392,9 +401,9 @@
           {/if}
         </button>
 
-        {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
+        {#if explorer.id.includes(UntrackedItems.UNTRACKED) && !isGuestUser}
           <Spinner size={"15px"} />
-        {:else}
+        {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
           <Tooltip
             title={"Add Request"}
             placement={"bottom"}
@@ -445,6 +454,7 @@
         <div class="sub-files">
           {#each explorer.items as exp}
             <svelte:self
+              bind:userRole
               {onItemCreated}
               {onItemDeleted}
               {onItemRenamed}
@@ -495,6 +505,7 @@
     {:else if explorer.type === "REQUEST"}
       <div style="cursor:pointer;">
         <Request
+          bind:userRole
           api={explorer}
           {onItemRenamed}
           {onItemDeleted}

@@ -1,1 +1,1 @@
-export { default as UpdateToast } from "./UpdateToast.svelte";
+export { default as ReleaseNotes } from "./UpdateToast.svelte";
