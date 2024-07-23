@@ -345,7 +345,10 @@ class RestExplorerViewModel
       const reducedURL = new ReduceRequestURL(
         progressiveTab.property.request?.url,
       );
-      if (/^(\$|=)&?(=&?)*$/.test(reducedQueryParams.getValue())) {
+      if (
+        reducedQueryParams.getValue() === "" ||
+        reducedQueryParams.getValue() === "="
+      ) {
         this.updateRequestUrl(reducedURL.getHost(), false);
       } else {
         this.updateRequestUrl(
@@ -1442,14 +1445,13 @@ class RestExplorerViewModel
         isGuestUser = value;
       });
       if (isGuestUser === true) {
-
         const res =
           await this.collectionRepository.readRequestOrFolderInCollection(
             collectionId,
             folderId,
           );
-          res.name = newFolderName;
-          
+        res.name = newFolderName;
+
         this.collectionRepository.updateRequestOrFolderInCollection(
           collectionId,
           folderId,

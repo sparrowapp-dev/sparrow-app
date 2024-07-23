@@ -83,7 +83,7 @@
         workspaceId,
         importCurl,
       });
-      if (response.isSuccessful) {
+      if (response?.isSuccessful) {
         onClosePopup();
       }
     }

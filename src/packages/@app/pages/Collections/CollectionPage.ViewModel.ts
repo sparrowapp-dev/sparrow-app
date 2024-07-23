@@ -142,8 +142,6 @@ export default class CollectionsViewModel {
               return collection;
             }),
           );
-        } else {
-          notifications.error("Failed to fetch collections!");
         }
       }
     }
@@ -954,42 +952,36 @@ export default class CollectionsViewModel {
     workspaceId: string,
     importCurl: string,
   ) => {
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
-    if (isGuestUser !== true) {
-      const response =
-        await this.collectionService.importCollectionFromCurl(importCurl);
-      if (response.isSuccessful) {
-        const requestTabAdapter = new RequestTabAdapter();
-        const tabId = UntrackedItems.UNTRACKED + uuidv4();
-        const adaptedRequest = requestTabAdapter.adapt(
-          workspaceId || "",
-          "",
-          "",
-          {
-            ...response.data.data,
-            id: tabId,
-          },
-        );
-        adaptedRequest.isSaved = false;
-        await this.tabRepository.createTab(adaptedRequest);
-        moveNavigation("right");
+    const response =
+      await this.collectionService.importCollectionFromCurl(importCurl);
+    if (response.isSuccessful) {
+      const requestTabAdapter = new RequestTabAdapter();
+      const tabId = UntrackedItems.UNTRACKED + uuidv4();
+      const adaptedRequest = requestTabAdapter.adapt(
+        workspaceId || "",
+        "",
+        "",
+        {
+          ...response.data.data,
+          id: tabId,
+        },
+      );
+      adaptedRequest.isSaved = false;
+      await this.tabRepository.createTab(adaptedRequest);
+      moveNavigation("right");
 
-        notifications.success("cURL imported successfully.");
+      notifications.success("cURL imported successfully.");
+    } else {
+      if (response.message === "Network Error") {
+        notifications.error(response.message);
       } else {
-        if (response.message === "Network Error") {
-          notifications.error(response.message);
-        } else {
-          notifications.error("Failed to import cURL. Please try again");
-        }
+        notifications.error("Failed to import cURL. Please try again");
       }
-      MixpanelEvent(Events.IMPORT_API_VIA_CURL, {
-        source: "curl import popup",
-      });
-      return response;
     }
+    MixpanelEvent(Events.IMPORT_API_VIA_CURL, {
+      source: "curl import popup",
+    });
+    return response;
   };
 
   /**
@@ -997,18 +989,12 @@ export default class CollectionsViewModel {
    * @param importCurl: string - Curl string
    */
   public handleValidateCurl = async (importCurl: string) => {
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
-    if (isGuestUser !== true) {
-      const response =
-        await this.collectionService.importCollectionFromCurl(importCurl);
-      if (response.isSuccessful) {
-        return true;
-      } else {
-        return false;
-      }
+    const response =
+      await this.collectionService.importCollectionFromCurl(importCurl);
+    if (response.isSuccessful) {
+      return true;
+    } else {
+      return false;
     }
   };
 

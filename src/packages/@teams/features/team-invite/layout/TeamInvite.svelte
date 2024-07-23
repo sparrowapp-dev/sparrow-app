@@ -255,7 +255,7 @@
   </div>
   {#if emailError && invalidEmails.length}
     <p class="error-text sparrow-fs-12">
-      Invalid email address, please check and enter correct email address.
+      Please check and enter correct email address.
     </p>
   {:else if emailError && emailstoBeSentArr.length === 0}
     <p class="error-text">Email ID cannot be empty.</p>
@@ -345,12 +345,12 @@
   <div class="description ellipsis">
     <div class="d-flex gap-2 align-items-center ellipsis">
       {#if teamLogo?.size}
-      <img
-      class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
-      style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-      src={base64ToURL(teamLogo)}
-      alt=""
-    />
+        <img
+          class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
+          style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
+          src={base64ToURL(teamLogo)}
+          alt=""
+        />
       {:else}
         <span class="me-2">
           <IconFallback character={teamName[0]} />
