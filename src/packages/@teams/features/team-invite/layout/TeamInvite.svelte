@@ -331,7 +331,7 @@
     onclick={handleCheckSelectDropdown}
     --body-background-color="var(--bg-tertiary-400)"
     --header-background-color="var(--bg-tertiary-300)"
-    --header-item-background-color="var(--bg-tertiary-250)"
+    --header-item-background-color="var(--bg-tertiary-750)"
   />
 
   {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}
