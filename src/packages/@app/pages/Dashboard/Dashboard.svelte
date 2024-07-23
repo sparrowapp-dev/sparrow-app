@@ -195,6 +195,7 @@
     workspaceDocuments={$workspaceDocuments}
     onCreateWorkspace={() => (isWorkspaceModalOpen = true)}
     onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
+    onClick={handleGuestLogin}
   />
 
   <!--

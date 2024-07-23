@@ -24,6 +24,7 @@
 
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
+  let workspaceTabWrapper: HTMLElement;
 
   let menuItems = [];
   const handleOpenWorkspace = async () => {
@@ -42,8 +43,8 @@
   const rightClickContextMenu = (e) => {
     e.preventDefault();
     setTimeout(() => {
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
+      const mouseX = workspaceTabWrapper.getBoundingClientRect().right - 15;
+      const mouseY = workspaceTabWrapper.getBoundingClientRect().top + 28;
       pos = { x: mouseX, y: mouseY };
       showMenu = true;
     }, 100);
@@ -97,6 +98,7 @@
     cardStyleProp={"max-width: 47.5%; max-height: 32%;"}
   >
     <button
+      bind:this={workspaceTabWrapper}
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
         ? 'threedot-active'
         : ''}"

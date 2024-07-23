@@ -46,6 +46,8 @@
 
   export let onSwitchWorkspace;
 
+  export let onClick;
+
   /**
    * callback for Select component
    * @param tabId - selected option id
@@ -62,6 +64,13 @@
     onSwitchWorkspace(tabId);
   };
 
+  let guestData = [
+    // {
+    //   // id: currentWorkspaceId,
+    //   // name: "hhh",
+    //   // description: "",
+    // }
+  ];
   let workspaceData = [
     {
       id: currentWorkspaceId,
@@ -125,76 +134,121 @@
 >
   <div class="d-flex ms-3 justify-content-cdenter align-items-center">
     {#if isGuestUser}
-    <div>
-      <SparrowEdgeIcon
-        height="25px"
-        width="24px"
-        color="var(--primary-btn-color)"
-      />
-    </div>
-
-
+      <div>
+        <SparrowEdgeIcon
+          height="25px"
+          width="24px"
+          color="var(--primary-btn-color)"
+        />
+      </div>
     {:else}
-    <div>
-      <SparrowIcon
-        height="17px"
-        width="17px"
-        color="var(--primary-btn-color)"
-      />
-    </div>
-{/if}
+      <div>
+        <SparrowIcon
+          height="17px"
+          width="17px"
+          color="var(--primary-btn-color)"
+        />
+      </div>
+    {/if}
     <div class="ms-3">
-      <Select
-        id={"workspace-dropdown"}
-        data={workspaceData}
-        titleId={`${currentWorkspaceId}`}
-        onclick={handleWorkspaceDropdown}
-        minHeaderWidth={"185px"}
-        iconRequired={false}
-        isDropIconFilled={true}
-        borderType={"none"}
-        borderActiveType={"none"}
-        headerHighlight={"hover-active"}
-        headerTheme={"transparent"}
-        menuItem={"v2"}
-        headerFontSize={"12px"}
-        maxHeaderWidth={"215px"}
-        zIndex={200}
-        bodyTheme={"violet"}
-        borderRounded={"2px"}
-        position={"absolute"}
-        isHeaderCombined={true}
-        maxBodyHeight={"300px"}
-      >
-        <div slot="pre-select" class="pre-dropdown">
-          <div class="create-new-workspace" on:click={onCreateWorkspace}>
-            <span>Create New Workspace</span>
-            <div style="align-content: flex-end;">
-              <PlusIcon
-                height="16px"
-                width="16px"
-                color="var(--icon-primary-300)"
-              />
-            </div>
-          </div>
-          <div class="upper-underline"></div>
-        </div>
-        <div
-          slot="post-select"
-          class="post-dropdown"
-          style="justify-content: center; align-items:center;"
+      {#if isGuestUser}
+        <Select
+          id={"workspace-dropdown"}
+          data={guestData}
+          titleId={`${currentWorkspaceId}`}
+          onclick={() => {}}
+          minHeaderWidth={"185px"}
+          iconRequired={false}
+          isDropIconFilled={true}
+          borderType={"none"}
+          borderActiveType={"none"}
+          headerHighlight={"hover-active"}
+          headerTheme={"transparent"}
+          menuItem={"v2"}
+          headerFontSize={"12px"}
+          maxHeaderWidth={"215px"}
+          zIndex={200}
+          bodyTheme={"violet"}
+          borderRounded={"2px"}
+          position={"absolute"}
+          isHeaderCombined={true}
+          maxBodyHeight={"300px"}
+          placeholderText="Guest User's Team / Guest User's Workspace"
         >
-          {#if workspaceData.length < 5}
-            <div class="recent-text-btn">
-              You will see your five most recent workspaces here.
+          <div slot="pre-select" class="mb-2 px-1">
+            <div class="guest-user-text">
+              <span
+                >This version has limited features. Get started and unlock the
+                complete package.</span
+              >
             </div>
-          {/if}
-          <div class="lower-underline"></div>
-          <div class="view-all-workspace" on:click={handleViewWorkspaces}>
-            <span>View all Workspaces</span>
+            <div
+              on:click={onClick}
+              class="btn d-flex justify-content-center align-items-center"
+              style="width:100%; height:26px; background-color:var(--bg-primary-300);"
+            >
+              <button
+                class="mb-1"
+                style="width:100%; height:100%; text-decoration:none; outline:none !important; background-color:transparent;  border:none; font-size:12px;"
+              >
+                Create an account or Sign In
+              </button>
+            </div>
           </div>
-        </div>
-      </Select>
+        </Select>
+      {:else}
+        <Select
+          id={"workspace-dropdown"}
+          data={workspaceData}
+          titleId={`${currentWorkspaceId}`}
+          onclick={handleWorkspaceDropdown}
+          minHeaderWidth={"185px"}
+          iconRequired={false}
+          isDropIconFilled={true}
+          borderType={"none"}
+          borderActiveType={"none"}
+          headerHighlight={"hover-active"}
+          headerTheme={"transparent"}
+          menuItem={"v2"}
+          headerFontSize={"12px"}
+          maxHeaderWidth={"215px"}
+          zIndex={200}
+          bodyTheme={"violet"}
+          borderRounded={"2px"}
+          position={"absolute"}
+          isHeaderCombined={true}
+          maxBodyHeight={"300px"}
+        >
+          <div slot="pre-select" class="pre-dropdown">
+            <div class="create-new-workspace" on:click={onCreateWorkspace}>
+              <span>Create New Workspace</span>
+              <div style="align-content: flex-end;">
+                <PlusIcon
+                  height="16px"
+                  width="16px"
+                  color="var(--icon-primary-300)"
+                />
+              </div>
+            </div>
+            <div class="upper-underline"></div>
+          </div>
+          <div
+            slot="post-select"
+            class="post-dropdown"
+            style="justify-content: center; align-items:center;"
+          >
+            {#if workspaceData.length < 5}
+              <div class="recent-text-btn">
+                You will see your fzzzzive most recent workspaces here.
+              </div>
+            {/if}
+            <div class="lower-underline"></div>
+            <div class="view-all-workspace" on:click={handleViewWorkspaces}>
+              <span>View all Workspaces</span>
+            </div>
+          </div>
+        </Select>
+      {/if}
     </div>
   </div>
 
@@ -272,6 +326,20 @@
   .app-header {
     border-bottom: 2px solid var(--border-secondary-900);
   }
+
+  .guest-user-text {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    color: var(--text-secondary-550);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 10px;
+    text-align: center;
+  }
+
   .create-new-workspace {
     display: flex;
     align-items: center;

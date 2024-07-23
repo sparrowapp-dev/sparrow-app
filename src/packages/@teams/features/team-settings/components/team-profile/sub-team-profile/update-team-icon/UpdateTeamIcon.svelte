@@ -85,6 +85,7 @@
   <div>
     <!-- IconUploader component for uploading team icons -->
     <IconUploader
+    
       value={uploadTeamIcon.file.value}
       maxFileSize={ICON_CONFIG.MAX_FILE_SIZE_KB}
       onChange={handleLogoInputChange}
