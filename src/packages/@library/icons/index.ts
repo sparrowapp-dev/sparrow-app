@@ -43,5 +43,7 @@ export { default as MoreOptions } from "./MoreOptions.svelte";
 export { default as DownArrowIcon } from "./DownArrow.svelte";
 export { default as ErrorInfoIcon } from "./Error.svelte";
 export { default as Information } from "./Information.svelte";
-export { default as SparrowEdgeIcon} from "./SparrowEdge.svelte";
+export { default as SparrowEdgeIcon } from "./SparrowEdge.svelte";
 export { default as CrossIconRounded } from "./CrossIconRounded.svelte";
+export { default as SparrowChatBotIcon } from "./SparrowChatBot.svelte";
+export { default as SparrowAIIcon } from "./SparrowAI.svelte";
