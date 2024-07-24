@@ -16,6 +16,8 @@ import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 import type { Team } from "$lib/utils/interfaces";
 import { UserService } from "@app/services/user.service";
+import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { Events } from "$lib/utils/enums";
 
 export class TeamsViewModel {
   constructor() {}
@@ -119,6 +121,9 @@ export class TeamsViewModel {
     } else {
       notifications.error("Failed to create a new team. Please try again.");
     }
+    MixpanelEvent(Events.CREATE_NEW_TEAM, {
+      source: "create new team",
+    });
     return response;
   };
   /**
@@ -250,5 +255,4 @@ export class TeamsViewModel {
   public modifyTeam = async (teamId: string, team: any): Promise<void> => {
     await this.teamRepository.modifyTeam(teamId, team);
   };
-
 }

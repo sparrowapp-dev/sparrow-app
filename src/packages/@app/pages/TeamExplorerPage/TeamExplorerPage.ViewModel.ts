@@ -1,6 +1,7 @@
 import { user } from "$lib/store";
 import type { InviteBody } from "$lib/utils/dto/team-dto";
-import { UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
+import { Events, UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
+import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import type { WorkspaceDocument } from "@app/database/database";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
@@ -359,6 +360,9 @@ export class TeamExplorerPageViewModel {
     } else {
       notifications.error(`Failed to remove ${_userName} from ${_teamName}`);
     }
+    MixpanelEvent(Events.Remove_User_Team, {
+      source: "remove user from team",
+    });
     return response;
   };
 
@@ -556,6 +560,9 @@ export class TeamExplorerPageViewModel {
         `Failed to change role for ${_userName}. Please try again.`,
       );
     }
+    MixpanelEvent(Events.Teams_Role_Changed, {
+      source: "workspace role changed",
+    });
   };
 
   /**
@@ -602,6 +609,9 @@ export class TeamExplorerPageViewModel {
         `Failed to remove ${workspace.name} from ${workspace?.team?.teamName}. Please try again.`,
       );
     }
+    MixpanelEvent(Events.Delete_Workspace, {
+      source: "delete workspace",
+    });
     return response;
   };
 
@@ -657,7 +667,9 @@ export class TeamExplorerPageViewModel {
         resolve();
       }, 500),
     );
-
+    MixpanelEvent(Events.Leave_Team, {
+      source: "leave team",
+    });
     return response;
   };
 

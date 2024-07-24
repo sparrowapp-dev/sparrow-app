@@ -1,6 +1,7 @@
 import { user } from "$lib/store";
 import type { addUsersInWorkspacePayload } from "$lib/utils/dto";
-import { WorkspaceRole } from "$lib/utils/enums";
+import { Events, WorkspaceRole } from "$lib/utils/enums";
+import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { throttle } from "$lib/utils/throttle";
 import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
 import type { UpdatesDocType } from "@app/models/updates.model";
@@ -180,6 +181,9 @@ export default class WorkspaceExplorerViewModel {
         `Failed to remove ${workspace.name} from ${workspace?.team?.teamName}. Please try again.`,
       );
     }
+    MixpanelEvent(Events.Delete_Workspace, {
+      source: "delete workspace",
+    });
     return response;
   };
 
@@ -415,6 +419,9 @@ export default class WorkspaceExplorerViewModel {
         `Failed to change role for ${_userName}. Please try again.`,
       );
     }
+    MixpanelEvent(Events.Workspace_Role_Changed, {
+      source: "workspace role changed",
+    });
     return response;
   };
 }

@@ -24,8 +24,9 @@ import type {
   addUsersInWorkspace,
   addUsersInWorkspacePayload,
 } from "$lib/utils/dto/workspace-dto";
-import { type WorkspaceRole } from "$lib/utils/enums";
+import { Events, type WorkspaceRole } from "$lib/utils/enums";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
+import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
 export class HeaderDashboardViewModel {
   constructor() {}
@@ -258,6 +259,9 @@ export class HeaderDashboardViewModel {
       userId,
       role,
     );
+    MixpanelEvent(Events.Workspace_Role_Changed, {
+      source: "workspace role changed",
+    });
     return response;
   };
   public updateUserRoleInWorkspaceInRXDB = async (

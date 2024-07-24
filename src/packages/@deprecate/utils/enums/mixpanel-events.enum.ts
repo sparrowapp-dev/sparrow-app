@@ -33,4 +33,10 @@ export enum Events {
   IMPORT_API_VIA_CURL = "Import_API_Via_cURL",
   CONTINUE_WITHOUT_SIGNUP = "User_Continue_Without_Signup",
   LOCAL_SIGNUP = "User_LocalSignup",
+  CREATE_NEW_TEAM = "Create_New_Team",
+  Delete_Workspace = "Delete_Workspace",
+  Leave_Team = "Leave_Team",
+  Workspace_Role_Changed = "Workspace_Role_Changed",
+  Teams_Role_Changed = "Teams_Role_Changed",
+  Remove_User_Team = "Remove_User_Team",
 }
