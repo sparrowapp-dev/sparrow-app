@@ -108,6 +108,7 @@ $theme-grey-45494D: #45494D;
 $theme-grey-353646: #353646;
 $theme-grey-333333: #333333;
 $theme-grey-313233: #313233;
+$theme-grey-2B343D: #2B343D;
 
 $theme-grey-272727: #272727;
 $theme-grey-212222: #212222;
@@ -275,6 +276,7 @@ $theme-red-230408: #230408;
   --text-secondary-850 : #{$theme-grey-121212};
   --text-secondary-900 : #{$theme-grey-000000};
   --text-secondary-1000: #{$theme-grey-CCCCCC};
+  --text-secondary-1100 : #{$theme-grey-2B343D};
 
   --text-tertiary-100 : #{$theme-violet-676A80};
   --text-tertiary-190 : #{$theme-violet-37394E};
@@ -334,6 +336,7 @@ $theme-red-230408: #230408;
   --bg-secondary-900 : #{$theme-grey-000000};
   --bg-secondary-950 : #{$theme-grey-808080};
   --bg-secondary-1000 : #{$theme-grey-CCCCCC};
+  --bg-secondary-1100 : #{$theme-grey-2B343D};
 
   --bg-tertiary-100 : #{$theme-violet-676A80};
   --bg-tertiary-190 : #{$theme-violet-37394E};
@@ -384,6 +387,7 @@ $theme-red-230408: #230408;
   --border-secondary-800 : #{$theme-grey-151515};
   --border-secondary-900 : #{$theme-grey-000000};
   --border-secondary-950 : #{$theme-grey-808080};
+  --border-secondary-1100 : #{$theme-grey-2B343D};
 
 
   --border-tertiary-100 : #{$theme-violet-676A80};
@@ -433,6 +437,7 @@ $theme-red-230408: #230408;
   --icon-secondary-900 : #{$theme-grey-000000};
   --icon-secondary-950 : #{$theme-grey-808080};
   --icon-secondary-1000 : #{$theme-grey-CCCCCC};
+  --icon-secondary-1100 : #{$theme-grey-2B343D};
 
 
   --icon-tertiary-100 : #{$theme-violet-676A80};
@@ -579,6 +584,7 @@ $sparrow-text-colors: (
   secondary-850 : $theme-grey-121212,
   secondary-900 : $theme-grey-000000,
   secondary-1000: $theme-grey-CCCCCC,
+  secondary-1100 : $theme-grey-2B343D,
 
   tertiary-100 : $theme-violet-676A80,
   tertiary-190 : $theme-violet-37394E,
@@ -624,6 +630,7 @@ $sparrow-bg-colors: (
   secondary-850 : $theme-grey-121212,
   secondary-900 : $theme-grey-000000,
   secondary-1000 : $theme-grey-CCCCCC,
+  secondary-1100 : $theme-grey-2B343D,
   
   tertiary-100 : $theme-violet-676A80,
   tertiary-190 : $theme-violet-37394E,
@@ -670,6 +677,7 @@ $sparrow-border-colors: (
   secondary-800 : $theme-grey-151515,
   secondary-900 : $theme-grey-000000,
   secondary-1000 : $theme-grey-CCCCCC,
+  secondary-1100 : $theme-grey-2B343D,
 
   tertiary-100 : $theme-violet-676A80,
   tertiary-190 : $theme-violet-37394E,

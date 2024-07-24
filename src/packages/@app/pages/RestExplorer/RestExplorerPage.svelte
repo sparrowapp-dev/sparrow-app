@@ -164,4 +164,9 @@
   onRenameFolder={_viewModel.handleRenameFolder}
 />
 
-<ChatBot />
+<ChatBot
+  bind:tab={_viewModel.tab}
+  onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
+  onUpdateAiConversation={_viewModel.updateRequestAIConversation}
+  onUpdateRequestState={_viewModel.updateRequestState}
+/>

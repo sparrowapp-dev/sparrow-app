@@ -1,10 +1,17 @@
-<script>
+<script lang="ts">
+  import type { Observable } from "rxjs";
   import {
     AIChatInterface,
     AiChatToggler,
     AISuggestionBox,
   } from "../components";
+  import type { RequestTab } from "@common/types/workspace";
   let isChatBoxOpen = false;
+
+  export let tab: Observable<RequestTab>;
+  export let onUpdateAiPrompt;
+  export let onUpdateAiConversation;
+  export let onUpdateRequestState;
 </script>
 
 <div
@@ -16,8 +23,13 @@
    width: 320px;
    "
 >
-  {#if isChatBoxOpen}
-    <AIChatInterface />
+  {#if $tab?.property?.request?.state?.isChatbotActive}
+    <AIChatInterface
+      conversations={$tab?.property?.request?.ai?.conversations}
+      prompt={$tab?.property?.request?.ai?.prompt}
+      {onUpdateAiPrompt}
+      {onUpdateAiConversation}
+    />
   {/if}
 </div>
 <div
@@ -28,7 +40,7 @@
    width: 200px;
    "
 >
-  {#if !isChatBoxOpen}
+  {#if !$tab?.property?.request?.state?.isChatbotActive}
     <AISuggestionBox title="Generate Curl" />
     <AISuggestionBox title="Generate Documentation" />
     <AISuggestionBox title="Generate Mock data" />
@@ -43,9 +55,17 @@
   <div
     class="sparrow-ai-icon"
     role="button"
-    on:click={() => (isChatBoxOpen = !isChatBoxOpen)}
+    on:click={() => {
+      onUpdateRequestState({
+        isChatbotActive: !$tab?.property?.request?.state?.isChatbotActive,
+      });
+    }}
   >
-    <AiChatToggler height="42px" width="42px" {isChatBoxOpen} />
+    <AiChatToggler
+      height="42px"
+      width="42px"
+      isChatBoxOpen={$tab?.property?.request?.state?.isChatbotActive}
+    />
   </div>
 </div>
 

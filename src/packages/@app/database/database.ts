@@ -186,6 +186,12 @@ export class RxDB {
             oldDoc.property.request.state.isParameterBulkEditActive = false;
             return oldDoc;
           },
+          10: function (oldDoc: TabDocument) {
+            oldDoc.property.request.ai.conversations = [];
+            oldDoc.property.request.ai.prompt = "";
+            oldDoc.property.request.state.isChatbotActive = false;
+            return oldDoc;
+          },
         },
       },
       collection: {

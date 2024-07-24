@@ -1,10 +1,16 @@
-<script>
+<script lang="ts">
   import { AISparkle } from "../../assests";
 
   export let title = "";
+  export let onClick: (text: string) => void = () => {};
 </script>
 
-<div class="generate-curl-button">
+<div
+  class="generate-curl-button"
+  on:click={() => {
+    onClick(title);
+  }}
+>
   <AISparkle />
   <span class="title-txt">{title}</span>
 </div>

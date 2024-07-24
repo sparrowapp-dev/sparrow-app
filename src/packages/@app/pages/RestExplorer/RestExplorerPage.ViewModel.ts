@@ -298,6 +298,28 @@ class RestExplorerViewModel
 
   /**
    *
+   * @param _name - request name
+   */
+  public updateRequestAIPrompt = async (_prompt: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.ai.prompt = _prompt;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
+  /**
+   *
+   * @param _name - request name
+   */
+  public updateRequestAIConversation = async (_conversations: string[]) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.ai.conversations = _conversations;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
+  /**
+   *
    * @param method request method
    */
   public updateRequestMethod = async (method: string) => {

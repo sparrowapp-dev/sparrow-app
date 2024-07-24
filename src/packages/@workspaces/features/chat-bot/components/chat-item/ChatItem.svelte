@@ -2,17 +2,17 @@
   import { AISparkle } from "../../assests";
 
   export let message;
-  export let sender;
+  export let type;
 </script>
 
-{#if sender === "you"}
+{#if type === "SENDER"}
   <div class="send-item">
-    <p class="my-4 px-3">{message}</p>
+    <p class="my-4 px-3 text-fs-12">{message}</p>
   </div>
 {:else}
   <div class="recieve-item">
     <AISparkle />
-    <p class=" px-2">{message}</p>
+    <p class=" px-2 text-fs-12">{message}</p>
   </div>
 {/if}
 

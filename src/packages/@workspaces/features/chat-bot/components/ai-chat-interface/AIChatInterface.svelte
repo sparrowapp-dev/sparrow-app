@@ -3,18 +3,24 @@
   import { AISuggestionBox, PromptInput, ChatItem } from "../";
   import { AISparkle } from "../../assests";
 
-  let chats: {
-    text: string;
-    sender: string;
-  }[] = [];
+  export let conversations = [];
+  export let prompt = "";
+  export let onUpdateAiPrompt;
+  export let onUpdateAiConversation;
+
   const sendPrompt = (text: string) => {
-    chats = [
-      ...chats,
-      {
-        text: text,
-        sender: "you",
-      },
-    ];
+    if (text) {
+      onUpdateAiConversation([
+        ...conversations,
+        {
+          message: text,
+          messageId: "",
+          type: "SENDER",
+          isLiked: false,
+          isDisliked: false,
+        },
+      ]);
+    }
   };
 </script>
 
@@ -29,7 +35,7 @@
         <div
           class="d-flex flex-column h-100 align-items-center justify-content-center"
         >
-          {#if !chats?.length}
+          {#if !conversations?.length}
             <div
               class="h-100 p-3 w-100 d-flex flex-column justify-content-between"
             >
@@ -42,15 +48,30 @@
                 </p>
               </div>
               <div class="d-flex flex-column align-items-end">
-                <AISuggestionBox title="Generate Curl" />
-                <AISuggestionBox title="Generate Documentation" />
-                <AISuggestionBox title="Generate Mock data" />
+                <AISuggestionBox
+                  onClick={(text = "") => {
+                    sendPrompt(text);
+                  }}
+                  title="Generate Curl"
+                />
+                <AISuggestionBox
+                  onClick={(text = "") => {
+                    sendPrompt(text);
+                  }}
+                  title="Generate Documentation"
+                />
+                <AISuggestionBox
+                  onClick={(text = "") => {
+                    sendPrompt(text);
+                  }}
+                  title="Generate Mock data"
+                />
               </div>
             </div>
           {:else}
             <div class="h-100 w-100">
-              {#each chats as chat}
-                <ChatItem message={chat.text} sender={chat.sender} />
+              {#each conversations as chat}
+                <ChatItem message={chat.message} type={chat.type} />
               {/each}
             </div>
           {/if}
@@ -59,7 +80,12 @@
     </div>
   </div>
   <div>
-    <PromptInput placeholder={"How can I help you?"} {sendPrompt} />
+    <PromptInput
+      {prompt}
+      {onUpdateAiPrompt}
+      placeholder={"How can I help you?"}
+      {sendPrompt}
+    />
   </div>
 </div>
 
