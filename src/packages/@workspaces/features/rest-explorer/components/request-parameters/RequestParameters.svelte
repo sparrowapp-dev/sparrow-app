@@ -2,6 +2,8 @@
   import { TabularInput } from "@workspaces/common/components";
   import { createDeepCopy } from "$lib/utils/helpers";
   import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums";
   export let params;
   export let onUpdateRequestParams;
   export let environmentVariables = [];
@@ -13,17 +15,21 @@
 
   export let isBulkEditActive;
 
-//   let bulkEditParamsPlaceholder = `Usage: Use bulk edit to manage multiple parameters quickly.Separate each entry with a new line.
-// Format: Parameter-Key: Parameter-Value
-// Example: userID: Sparrow12 `;
+  //   let bulkEditParamsPlaceholder = `Usage: Use bulk edit to manage multiple parameters quickly.Separate each entry with a new line.
+  // Format: Parameter-Key: Parameter-Value
+  // Example: userID: Sparrow12 `;
 
-let bulkEditParamsPlaceholder = "Usage - Manage multiple parameters.  Format - Key: Value"
+  let bulkEditParamsPlaceholder =
+    "Usage - Manage multiple parameters.  Format - Key: Value";
 
   const handleParamsChange = (pairs: KeyValuePair[]): void => {
     onUpdateRequestParams(pairs);
   };
 
   const toggleBulkEdit = (value) => {
+    MixpanelEvent(Events.Bulk_Edit_Parameters, {
+      source: "bulk edit parameters",
+    });
     onUpdateRequestState({ isParameterBulkEditActive: value });
   };
 </script>

@@ -29,6 +29,8 @@ import { v4 as uuidv4 } from "uuid";
 import { TeamAdapter } from "@app/adapter";
 import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
+import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { Events } from "$lib/utils/enums";
 
 export class DashboardViewModel {
   constructor() {}
@@ -362,6 +364,10 @@ export class DashboardViewModel {
       await this.workspaceRepository.setActiveWorkspace(res._id);
       notifications.success("New Workspace Created");
     }
+    MixpanelEvent(Events.Create_New_Workspace_TopBar, {
+      source: "create new workspace from top bar",
+    });
+
     return response;
   };
 

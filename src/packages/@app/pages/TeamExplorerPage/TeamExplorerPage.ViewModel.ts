@@ -285,6 +285,9 @@ export class TeamExplorerPageViewModel {
       this.tabRepository.createTab(initWorkspaceTab.getValue());
       navigate("/dashboard/collections");
       notifications.success("New Workspace Created");
+      MixpanelEvent(Events.Create_New_Workspace_TeamPage, {
+        source: "create new workspace from team page",
+      });
     }
   };
 
@@ -397,6 +400,9 @@ export class TeamExplorerPageViewModel {
         `Failed to change role for ${_userName}. Please try again.`,
       );
     }
+    MixpanelEvent(Events.Invite_To_Team_Member, {
+      source: "invite to team member",
+    });
     return response;
   };
 
@@ -431,6 +437,9 @@ export class TeamExplorerPageViewModel {
         `Failed to change role for ${_userName}. Please try again.`,
       );
     }
+    MixpanelEvent(Events.Invite_To_Team_Admin, {
+      source: "invite to team admin",
+    });
     return response;
   };
 
@@ -481,6 +490,9 @@ export class TeamExplorerPageViewModel {
           `Failed to update access of Owner. Please try again.`,
         );
       }
+      MixpanelEvent(Events.Team_Ownership_Transferred, {
+        source: "team ownership transferred",
+      });
       return response;
     } else {
       notifications.error(
@@ -518,6 +530,9 @@ export class TeamExplorerPageViewModel {
         `Failed to remove ${_userName} from ${_workspaceName}`,
       );
     }
+    MixpanelEvent(Events.Remove_User_Workspace, {
+      source: "remove user from workspace",
+    });
   };
 
   /**

@@ -214,6 +214,16 @@ export default class WorkspaceExplorerViewModel {
     } else {
       notifications.error(`Failed to sent invite. Please try again.`);
     }
+    if (_data.role === WorkspaceRole.WORKSPACE_VIEWER) {
+      MixpanelEvent(Events.Invite_To_Workspace_Viewer, {
+        source: "invite to workspace as viewer",
+      });
+    } else if (_data.role === WorkspaceRole.WORKSPACE_EDITOR) {
+      MixpanelEvent(Events.Invite_To_Workspace_Editor, {
+        source: "invite to workspace as editor",
+      });
+    }
+
     return response;
   };
 
@@ -375,7 +385,9 @@ export default class WorkspaceExplorerViewModel {
         `Failed to remove ${_userName} from ${_workspaceName}`,
       );
     }
-
+    MixpanelEvent(Events.Remove_User_Workspace, {
+      source: "remove user from workspace",
+    });
     return response;
   };
 
