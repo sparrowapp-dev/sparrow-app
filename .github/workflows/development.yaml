@@ -54,8 +54,8 @@ jobs:
       - name: Build Tauri App
         run: |
           yarn cache clean
-          npm install -g pnpm
-          yarn install
+          # npm install -g pnpm
+          yarn install --network-timeout 1000000000
           yarn tauri build --debug
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
