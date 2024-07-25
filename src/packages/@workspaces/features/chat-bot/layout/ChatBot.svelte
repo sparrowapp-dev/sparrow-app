@@ -12,6 +12,7 @@
   export let onUpdateAiPrompt;
   export let onUpdateAiConversation;
   export let onUpdateRequestState;
+  export let onGenerateAiResponse;
 </script>
 
 <div
@@ -29,6 +30,7 @@
       prompt={$tab?.property?.request?.ai?.prompt}
       {onUpdateAiPrompt}
       {onUpdateAiConversation}
+      {onGenerateAiResponse}
     />
   {/if}
 </div>

@@ -169,4 +169,5 @@
   onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
   onUpdateRequestState={_viewModel.updateRequestState}
+  onGenerateAiResponse={_viewModel.generateAiResponse}
 />

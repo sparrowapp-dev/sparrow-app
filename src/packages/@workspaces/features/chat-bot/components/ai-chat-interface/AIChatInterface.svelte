@@ -7,8 +7,9 @@
   export let prompt = "";
   export let onUpdateAiPrompt;
   export let onUpdateAiConversation;
+  export let onGenerateAiResponse;
 
-  const sendPrompt = (text: string) => {
+  const sendPrompt = async (text: string) => {
     if (text) {
       onUpdateAiConversation([
         ...conversations,
@@ -20,6 +21,7 @@
           isDisliked: false,
         },
       ]);
+      const response = await onGenerateAiResponse(text, "", "");
     }
   };
 </script>

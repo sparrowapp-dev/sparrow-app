@@ -82,6 +82,7 @@ import { CollectionService } from "@app/services/collection.service";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
+import { AiAssistantService } from "@app/services/ai-assistant.service";
 
 class RestExplorerViewModel
   implements
@@ -126,6 +127,7 @@ class RestExplorerViewModel
    */
   private environmentService = new EnvironmentService();
   private collectionService = new CollectionService();
+  private aiAssistentService = new AiAssistantService();
   /**
    * Utils
    */
@@ -303,6 +305,17 @@ class RestExplorerViewModel
   public updateRequestAIPrompt = async (_prompt: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.ai.prompt = _prompt;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
+  /**
+   *
+   * @param _name - request name
+   */
+  public updateRequestAIThread = async (_threadId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.ai.threadId = _threadId;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
@@ -1504,6 +1517,31 @@ class RestExplorerViewModel
    */
   public getWorkspaceById = async (workspaceId: string) => {
     return await this.workspaceRepository.readWorkspace(workspaceId);
+  };
+
+  public generateAiResponse = async (prompt = "") => {
+    const componentData = this._tab.getValue();
+    const response = await this.aiAssistentService.generateAiResponse({
+      text: prompt,
+      instructions: `you are an API instructor and you have to work around this API request data \n ${JSON.stringify(
+        componentData?.property?.request,
+      )}.`,
+      threadId: componentData?.property?.request?.ai?.threadId,
+    });
+    if (response.isSuccessful) {
+      const data = response.data.data;
+      this.updateRequestAIThread(data.threadId);
+      this.updateRequestAIConversation([
+        ...componentData?.property?.request?.ai?.conversations,
+        {
+          message: data.result,
+          messageId: "",
+          type: "RECEIVER",
+          isLiked: false,
+          isDisliked: false,
+        },
+      ]);
+    }
   };
 }
 

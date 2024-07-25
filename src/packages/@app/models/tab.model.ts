@@ -271,6 +271,9 @@ export const tabSchemaLiteral = {
                 prompt: {
                   type: "string",
                 },
+                threadId: {
+                  type: "string",
+                },
                 conversations: {
                   type: "array",
                   items: {

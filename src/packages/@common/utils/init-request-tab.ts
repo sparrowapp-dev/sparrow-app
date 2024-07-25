@@ -130,6 +130,7 @@ class InitRequestTab {
           ai: {
             prompt: "",
             conversations: [],
+            threadId: "",
           },
           response: {
             headers: [],

@@ -312,8 +312,14 @@ export interface Conversation
 export interface ConversationsWrapper {
   conversations: Conversation[];
 }
+export interface ThreadIdWrapper {
+  threadId: string;
+}
 
-export interface Ai extends PromptWrapper, ConversationsWrapper {}
+export interface Ai
+  extends PromptWrapper,
+    ConversationsWrapper,
+    ThreadIdWrapper {}
 export interface AiWrapper {
   ai: Ai;
 }
