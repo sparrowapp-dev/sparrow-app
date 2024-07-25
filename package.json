@@ -50,7 +50,6 @@
     "svelte-jsoneditor": "^0.18.9",
     "svelte-motion": "^0.11.5",
     "svelte-navigator": "^3.2.2",
-    "svelte-sortablejs": "^0.2.0",
     "svelte-split-pane": "^0.1.2",
     "svelte-splitpanes": "^0.8.0",
     "svelte-toasts": "^1.1.2",
