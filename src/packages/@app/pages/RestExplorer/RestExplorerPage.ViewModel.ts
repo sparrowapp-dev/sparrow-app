@@ -82,6 +82,7 @@ import { CollectionService } from "@app/services/collection.service";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
+import { AiAssistantService } from "@app/services/ai-assistant.service";
 
 class RestExplorerViewModel
   implements
@@ -126,6 +127,7 @@ class RestExplorerViewModel
    */
   private environmentService = new EnvironmentService();
   private collectionService = new CollectionService();
+  private aiAssistentService = new AiAssistantService();
   /**
    * Utils
    */
@@ -298,6 +300,39 @@ class RestExplorerViewModel
 
   /**
    *
+   * @param _name - request name
+   */
+  public updateRequestAIPrompt = async (_prompt: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.ai.prompt = _prompt;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
+  /**
+   *
+   * @param _name - request name
+   */
+  public updateRequestAIThread = async (_threadId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.ai.threadId = _threadId;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
+  /**
+   *
+   * @param _name - request name
+   */
+  public updateRequestAIConversation = async (_conversations: string[]) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.ai.conversations = _conversations;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
+  /**
+   *
    * @param method request method
    */
   public updateRequestMethod = async (method: string) => {
@@ -345,7 +380,10 @@ class RestExplorerViewModel
       const reducedURL = new ReduceRequestURL(
         progressiveTab.property.request?.url,
       );
-      if (/^(\$|=)&?(=&?)*$/.test(reducedQueryParams.getValue())) {
+      if (
+        reducedQueryParams.getValue() === "" ||
+        reducedQueryParams.getValue() === "="
+      ) {
         this.updateRequestUrl(reducedURL.getHost(), false);
       } else {
         this.updateRequestUrl(
@@ -1434,14 +1472,13 @@ class RestExplorerViewModel
         isGuestUser = value;
       });
       if (isGuestUser === true) {
-
         const res =
           await this.collectionRepository.readRequestOrFolderInCollection(
             collectionId,
             folderId,
           );
-          res.name = newFolderName;
-          
+        res.name = newFolderName;
+
         this.collectionRepository.updateRequestOrFolderInCollection(
           collectionId,
           folderId,
@@ -1480,6 +1517,29 @@ class RestExplorerViewModel
    */
   public getWorkspaceById = async (workspaceId: string) => {
     return await this.workspaceRepository.readWorkspace(workspaceId);
+  };
+
+  public generateAiResponse = async (prompt = "") => {
+    const componentData = this._tab.getValue();
+    const response = await this.aiAssistentService.generateAiResponse({
+      text: prompt,
+      instructions: `you are an API instructor and always gives the response in markdown string. always color the code part`,
+      threadId: componentData?.property?.request?.ai?.threadId,
+    });
+    if (response.isSuccessful) {
+      const data = response.data.data;
+      this.updateRequestAIThread(data.threadId);
+      this.updateRequestAIConversation([
+        ...componentData?.property?.request?.ai?.conversations,
+        {
+          message: data.result,
+          messageId: uuidv4(),
+          type: "RECEIVER",
+          isLiked: false,
+          isDisliked: false,
+        },
+      ]);
+    }
   };
 }
 
