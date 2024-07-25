@@ -72,7 +72,6 @@
 
     setTimeout(() => {
       const wrappers = document.querySelectorAll(`.copy-code-${messageId}`);
-      console.log(wrappers, "rw");
       cleanUpListeners = () => {
         wrappers.forEach((wrapper) => {
           wrapper.removeEventListener("click", handleCopyClick);

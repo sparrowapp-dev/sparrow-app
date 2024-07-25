@@ -9,8 +9,10 @@
   export let onUpdateAiConversation;
   export let onGenerateAiResponse;
 
+  let isResponseGenerating = false;
   const sendPrompt = async (text: string) => {
     if (text) {
+      isResponseGenerating = true;
       onUpdateAiConversation([
         ...conversations,
         {
@@ -22,6 +24,7 @@
         },
       ]);
       const response = await onGenerateAiResponse(text, "", "");
+      isResponseGenerating = false;
     }
   };
 </script>
@@ -79,6 +82,9 @@
                   type={chat.type}
                 />
               {/each}
+              {#if isResponseGenerating}
+                <p class="p-3 text-primary-300">... Generating</p>
+              {/if}
             </div>
           {/if}
         </div>
@@ -89,6 +95,7 @@
     <PromptInput
       {prompt}
       {onUpdateAiPrompt}
+      {isResponseGenerating}
       placeholder={"How can I help you?"}
       {sendPrompt}
     />

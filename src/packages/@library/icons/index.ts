@@ -47,3 +47,4 @@ export { default as SparrowEdgeIcon } from "./SparrowEdge.svelte";
 export { default as CrossIconRounded } from "./CrossIconRounded.svelte";
 export { default as SparrowAIIcon } from "./SparrowAI.svelte";
 export { default as SendIcon } from "./Send.svelte";
+export { default as GenerateIcon } from "./Generate.svelte";
