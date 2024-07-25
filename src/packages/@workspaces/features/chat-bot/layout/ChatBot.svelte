@@ -15,16 +15,16 @@
   export let onGenerateAiResponse;
 </script>
 
-<div
-  style="position: fixed;
+{#if $tab?.property?.request?.state?.isChatbotActive}
+  <div
+    style="position: fixed;
   top:200px;
    bottom: 80px;
    right:18px;
    z-index: 200;
    width: 320px;
    "
->
-  {#if $tab?.property?.request?.state?.isChatbotActive}
+  >
     <AIChatInterface
       conversations={$tab?.property?.request?.ai?.conversations}
       prompt={$tab?.property?.request?.ai?.prompt}
@@ -32,22 +32,22 @@
       {onUpdateAiConversation}
       {onGenerateAiResponse}
     />
-  {/if}
-</div>
-<div
-  style="position: fixed;
+  </div>
+{/if}
+{#if !$tab?.property?.request?.state?.isChatbotActive}
+  <div
+    style="position: fixed;
    bottom: 80px;
    right:18px;
    z-index: 200;
    width: 200px;
    "
->
-  {#if !$tab?.property?.request?.state?.isChatbotActive}
+  >
     <AISuggestionBox title="Generate Curl" />
     <AISuggestionBox title="Generate Documentation" />
     <AISuggestionBox title="Generate Mock data" />
-  {/if}
-</div>
+  </div>
+{/if}
 <div
   style="position: fixed;
    bottom: 22px;

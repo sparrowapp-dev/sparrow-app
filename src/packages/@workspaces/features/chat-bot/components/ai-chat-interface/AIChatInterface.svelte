@@ -73,7 +73,11 @@
           {:else}
             <div class="h-100 w-100">
               {#each conversations as chat}
-                <ChatItem message={chat.message} type={chat.type} />
+                <ChatItem
+                  message={chat.message}
+                  messageId={chat.messageId}
+                  type={chat.type}
+                />
               {/each}
             </div>
           {/if}

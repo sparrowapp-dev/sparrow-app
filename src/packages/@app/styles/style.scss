@@ -794,12 +794,14 @@ span {
 /* Set the width of the scrollbar */
 ::-webkit-scrollbar {
   width: 11px; 
+  height: 11px;
 }
 
 /* Make the scrollbar track (background) transparent */
 ::-webkit-scrollbar-track {
   background: transparent;
   width: 5px;
+  height: 5px;
 }
 
 /* Customize the scrollbar thumb (the draggable part) */
@@ -809,6 +811,7 @@ span {
   border: 3px solid transparent; 
   background-clip: content-box; 
   width: 5px !important;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-corner {

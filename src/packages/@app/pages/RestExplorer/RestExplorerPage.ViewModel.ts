@@ -1523,9 +1523,7 @@ class RestExplorerViewModel
     const componentData = this._tab.getValue();
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
-      instructions: `you are an API instructor and you have to work around this API request data \n ${JSON.stringify(
-        componentData?.property?.request,
-      )}.`,
+      instructions: `you are an API instructor and always gives the response in markdown string. always color the code part`,
       threadId: componentData?.property?.request?.ai?.threadId,
     });
     if (response.isSuccessful) {
@@ -1535,7 +1533,7 @@ class RestExplorerViewModel
         ...componentData?.property?.request?.ai?.conversations,
         {
           message: data.result,
-          messageId: "",
+          messageId: uuidv4(),
           type: "RECEIVER",
           isLiked: false,
           isDisliked: false,

@@ -7,7 +7,6 @@
       {
         "center": true,
         "decorations": true,
-        "fileDropEnabled": false,
         "fullscreen": false,
         "label": "main",
         "minHeight": 700,
