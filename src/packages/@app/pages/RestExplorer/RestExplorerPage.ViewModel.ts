@@ -1540,6 +1540,7 @@ class RestExplorerViewModel
         },
       ]);
     }
+    return response;
   };
 }
 
