@@ -6,24 +6,8 @@
   export let conversations = [];
   export let prompt = "";
   export let onUpdateAiPrompt;
-  export let onUpdateAiConversation;
-  export let onGenerateAiResponse;
-
-  const sendPrompt = async (text: string) => {
-    if (text) {
-      onUpdateAiConversation([
-        ...conversations,
-        {
-          message: text,
-          messageId: "",
-          type: "SENDER",
-          isLiked: false,
-          isDisliked: false,
-        },
-      ]);
-      const response = await onGenerateAiResponse(text, "", "");
-    }
-  };
+  export let sendPrompt;
+  export let isResponseGenerating;
 </script>
 
 <div class="d-flex flex-column h-100 chat-box">
@@ -66,7 +50,7 @@
                   onClick={(text = "") => {
                     sendPrompt(text);
                   }}
-                  title="Generate Mock data"
+                  title="Generate Mock Parameter Data"
                 />
               </div>
             </div>
@@ -79,6 +63,9 @@
                   type={chat.type}
                 />
               {/each}
+              {#if isResponseGenerating}
+                <p class="p-3 text-primary-300">... Generating</p>
+              {/if}
             </div>
           {/if}
         </div>
@@ -89,6 +76,7 @@
     <PromptInput
       {prompt}
       {onUpdateAiPrompt}
+      {isResponseGenerating}
       placeholder={"How can I help you?"}
       {sendPrompt}
     />
