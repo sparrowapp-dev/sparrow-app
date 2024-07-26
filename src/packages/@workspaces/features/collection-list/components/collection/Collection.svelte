@@ -292,7 +292,7 @@
   <Options
     xAxis={collectionTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      collectionTabWrapper.getBoundingClientRect().top - 5,
+        collectionTabWrapper.getBoundingClientRect().top + 10,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={700}

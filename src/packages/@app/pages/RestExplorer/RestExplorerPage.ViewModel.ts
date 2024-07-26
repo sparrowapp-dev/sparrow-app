@@ -1266,6 +1266,14 @@ class RestExplorerViewModel
           checked: false,
         },
       ];
+
+      let isGuestUser;
+      isGuestUserActive.subscribe((value) => {
+        isGuestUser = value;
+      });
+      if(isGuestUser === true){
+        return;
+      }
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
         environmentVariables.global.id,
