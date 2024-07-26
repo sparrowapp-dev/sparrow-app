@@ -19,4 +19,25 @@ export class AiAssistantService {
 
     return response;
   };
+
+  public updateAiStats = async (
+    _threadId: string,
+    _messageId: string,
+    _isLiked: boolean,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/chatbotstats/feedback`,
+      {
+        body: {
+          threadId: _threadId,
+          messageId: _messageId,
+          like: _isLiked,
+        },
+        headers: getAuthHeaders(),
+      },
+    );
+
+    return response;
+  };
 }

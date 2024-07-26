@@ -8,6 +8,8 @@
   export let onUpdateAiPrompt;
   export let sendPrompt;
   export let isResponseGenerating;
+  export let onToggleLike;
+  export let regenerateAiResponse;
 </script>
 
 <div class="d-flex flex-column h-100 chat-box">
@@ -56,11 +58,18 @@
             </div>
           {:else}
             <div class="h-100 w-100">
-              {#each conversations as chat}
+              {#each conversations as chat, index}
                 <ChatItem
                   message={chat.message}
                   messageId={chat.messageId}
                   type={chat.type}
+                  isLiked={chat.isLiked}
+                  isDisliked={chat.isDisliked}
+                  {onToggleLike}
+                  {regenerateAiResponse}
+                  isLastRecieverMessage={conversations.length - 1 === index
+                    ? true
+                    : false}
                 />
               {/each}
               {#if isResponseGenerating}

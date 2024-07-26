@@ -170,4 +170,5 @@
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
   onUpdateRequestState={_viewModel.updateRequestState}
   onGenerateAiResponse={_viewModel.generateAiResponse}
+  onToggleLike={_viewModel.toggleChatMessageLike}
 />

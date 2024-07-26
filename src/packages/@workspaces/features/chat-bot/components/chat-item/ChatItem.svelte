@@ -7,12 +7,18 @@
 
   import hljs from "highlight.js";
   import "highlight.js/styles/atom-one-dark.css";
+  import { DislikeIcon, LikeIcon, RefreshIcon } from "@library/icons";
 
   export let message;
   export let messageId;
   export let type;
+  export let isLiked;
+  export let isDisliked;
+  export let onToggleLike;
+  export let regenerateAiResponse;
+  export let isLastRecieverMessage;
 
-  const decode = (htmlString) => {
+  const decode = (htmlString: string) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, "text/html");
 
@@ -31,7 +37,7 @@
     <div class="code-header bg-tertiary-300 px-3 py-2 d-flex justify-content-between"
     
     style="">
-      <span>${lang.split("-")[1]}</span>
+      <span>${lang?.split("-")[1]}</span>
       <span role="button" class="copy-code-${messageId}">
       <img src=${copyIcon}>
       </span>
@@ -98,8 +104,45 @@
     </div>
   {:else}
     <div class="recieve-item p-3">
-      <AISparkle />
+      <div class="d-flex justify-content-between">
+        <AISparkle />
+        <div class="d-flex gap-2">
+          <span
+            on:click={() => {
+              onToggleLike(messageId, true);
+            }}
+          >
+            <LikeIcon
+              height={"16px"}
+              width={"16px"}
+              color={isLiked ? "white" : "transparent"}
+            />
+          </span>
+          <span
+            on:click={() => {
+              onToggleLike(messageId, false);
+            }}
+          >
+            <DislikeIcon
+              height={"16px"}
+              width={"16px"}
+              color={isDisliked ? "white" : "transparent"}
+            />
+          </span>
+        </div>
+      </div>
       <div class="markdown">{@html extractedMessage}</div>
+      <div>
+        <span
+          on:click={() => {
+            regenerateAiResponse();
+          }}
+        >
+          {#if isLastRecieverMessage}
+            <RefreshIcon height={"16px"} width={"16px"} />
+          {/if}
+        </span>
+      </div>
     </div>
   {/if}
 </div>

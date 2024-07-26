@@ -6,13 +6,13 @@
     AISuggestionBox,
   } from "../components";
   import type { RequestTab } from "@common/types/workspace";
-  let isChatBoxOpen = false;
 
   export let tab: Observable<RequestTab>;
   export let onUpdateAiPrompt;
   export let onUpdateAiConversation;
   export let onUpdateRequestState;
   export let onGenerateAiResponse;
+  export let onToggleLike;
 
   let isResponseGenerating = false;
   const sendPrompt = async (text: string) => {
@@ -32,6 +32,17 @@
       isResponseGenerating = false;
     }
   };
+
+  const regenerateAiResponse = async () => {
+    isResponseGenerating = true;
+    const regenerateConversation =
+      $tab?.property?.request?.ai?.conversations.slice(0, -1);
+    onUpdateAiConversation(regenerateConversation);
+    const response = await onGenerateAiResponse(
+      regenerateConversation[regenerateConversation.length - 1].message,
+    );
+    isResponseGenerating = false;
+  };
 </script>
 
 {#if $tab?.property?.request?.state?.isChatbotActive}
@@ -50,6 +61,8 @@
       {onUpdateAiPrompt}
       {sendPrompt}
       {isResponseGenerating}
+      {onToggleLike}
+      {regenerateAiResponse}
     />
   </div>
 {/if}
