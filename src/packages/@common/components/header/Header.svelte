@@ -46,8 +46,6 @@
 
   export let onSwitchWorkspace;
 
-  export let onClick;
-
   /**
    * callback for Select component
    * @param tabId - selected option id
@@ -177,7 +175,7 @@
               >
             </div>
             <div
-              on:click={onClick}
+              on:click={onLoginUser}
               class="btn d-flex justify-content-center align-items-center"
               style="width:100%; height:26px; background-color:var(--bg-primary-300);"
             >
