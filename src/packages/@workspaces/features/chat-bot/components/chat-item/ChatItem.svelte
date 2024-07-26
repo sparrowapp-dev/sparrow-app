@@ -31,7 +31,7 @@
     <div class="code-header bg-tertiary-300 px-3 py-2 d-flex justify-content-between"
     
     style="">
-      <span>${lang.split("-")[1]}</span>
+      <span>${lang?.split("-")[1] ?? ""}</span>
       <span role="button" class="copy-code-${messageId}">
       <img src=${copyIcon}>
       </span>

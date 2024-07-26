@@ -6,6 +6,7 @@
     AISuggestionBox,
   } from "../components";
   import type { RequestTab } from "@common/types/workspace";
+  import { CloseIcon } from "../assests";
   let isChatBoxOpen = false;
 
   export let tab: Observable<RequestTab>;
@@ -50,10 +51,11 @@
       {onUpdateAiPrompt}
       {sendPrompt}
       {isResponseGenerating}
+      {onUpdateRequestState}
     />
   </div>
 {/if}
-{#if !$tab?.property?.request?.state?.isChatbotActive}
+{#if !$tab?.property?.request?.state?.isChatbotActive && $tab?.property?.request?.state?.isChatbotSuggestionsActive}
   <div
     style="position: fixed;
    bottom: 80px;
@@ -62,6 +64,19 @@
    width: 200px;
    "
   >
+    <div
+      style="position: relative; left:186px; bottom:6px; cursor:pointer;"
+      on:click={() =>
+        onUpdateRequestState({
+          isChatbotSuggestionsActive: false,
+        })}
+    >
+      <CloseIcon
+        height={"10px"}
+        width={"10px"}
+        color="var(--icon-primary-300)"
+      />
+    </div>
     <AISuggestionBox
       onClick={(text = "") => {
         if (!isResponseGenerating) {
@@ -93,7 +108,7 @@
           });
         }
       }}
-      title="Generate Mock Parameter Data"
+      title="Generate Mock Data"
     />
   </div>
 {/if}

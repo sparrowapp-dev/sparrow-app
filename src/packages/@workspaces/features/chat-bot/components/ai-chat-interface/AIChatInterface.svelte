@@ -1,21 +1,36 @@
 <script lang="ts">
   import { SparrowAIIcon } from "@library/icons";
   import { AISuggestionBox, PromptInput, ChatItem } from "../";
-  import { AISparkle } from "../../assests";
+  import { AISparkle, CloseIcon } from "../../assests";
 
   export let conversations = [];
   export let prompt = "";
   export let onUpdateAiPrompt;
   export let sendPrompt;
   export let isResponseGenerating;
+  export let onUpdateRequestState;
 </script>
 
 <div class="d-flex flex-column h-100 chat-box">
   <div style="flex:1; overflow:auto;">
     <div class="d-flex h-100 flex-column">
-      <div class="p-2">
-        <SparrowAIIcon />
-        <span class="gradient-text">SparrowAI</span>
+      <div
+        class="d-flex"
+        style="justify-content: space-between; align-items:center"
+      >
+        <div class="p-2">
+          <SparrowAIIcon />
+          <span class="gradient-text">SparrowAI</span>
+        </div>
+        <div
+          on:click={() =>
+            onUpdateRequestState({
+              isChatbotActive: false,
+            })}
+          class="close-btn"
+        >
+          <CloseIcon color={"#8A9299"} />
+        </div>
       </div>
       <div style="flex:1; overflow:auto;">
         <div
@@ -97,5 +112,17 @@
     font-size: 16px;
     font-weight: 600;
     padding-left: 8px;
+  }
+
+  .close-btn {
+    cursor: pointer;
+    margin-right: 10px;
+    padding-left: 6px;
+    padding-right: 6px;
+    border-radius: 4px;
+  }
+  .close-btn:hover {
+    cursor: pointer;
+    background-color: #37394e;
   }
 </style>

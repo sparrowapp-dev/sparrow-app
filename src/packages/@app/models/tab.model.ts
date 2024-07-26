@@ -230,6 +230,9 @@ export const tabSchemaLiteral = {
                 isChatbotActive: {
                   type: "boolean",
                 },
+                isChatbotSuggestionsActive: {
+                  type: "boolean",
+                },
               },
             },
             auth: {
