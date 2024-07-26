@@ -51,3 +51,4 @@ export { default as GenerateIcon } from "./Generate.svelte";
 export { default as LikeIcon } from "./Like.svelte";
 export { default as DislikeIcon } from "./Dislike.svelte";
 export { default as RefreshIcon } from "./Refresh.svelte";
+export { default as CopyIcon2 } from "./Copy2.svelte";

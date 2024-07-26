@@ -1539,6 +1539,17 @@ class RestExplorerViewModel
           isDisliked: false,
         },
       ]);
+    } else {
+      this.updateRequestAIConversation([
+        ...componentData?.property?.request?.ai?.conversations,
+        {
+          message: "Something went wrong! Please try again.",
+          messageId: uuidv4(),
+          type: "RECEIVER",
+          isLiked: false,
+          isDisliked: false,
+        },
+      ]);
     }
     return response;
   };

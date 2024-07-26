@@ -7,7 +7,12 @@
 
   import hljs from "highlight.js";
   import "highlight.js/styles/atom-one-dark.css";
-  import { DislikeIcon, LikeIcon, RefreshIcon } from "@library/icons";
+  import {
+    CopyIcon2,
+    DislikeIcon,
+    LikeIcon,
+    RefreshIcon,
+  } from "@library/icons";
 
   export let message;
   export let messageId;
@@ -23,10 +28,17 @@
     const doc = parser.parseFromString(htmlString, "text/html");
 
     // Select all <pre> elements
-    const preElements = doc.querySelectorAll("pre");
+    const codeElements = doc.querySelectorAll("pre > code");
+    const preElements = Array.from(codeElements)
+      .filter((elem) => {
+        if (elem.innerHTML.trim()) return true;
+        return false;
+      })
+      .map((codeElem) => codeElem.parentElement);
 
     // Iterate over each <pre> element
     preElements.forEach((pre) => {
+      console.log(pre);
       // Create a new container div
       const container = document.createElement("div");
       container.className = "wrapper";
@@ -69,6 +81,18 @@
     }
   };
 
+  const handleCopyResponse = () => {
+    const response = message;
+    navigator.clipboard
+      .writeText(response)
+      .then(() => {
+        notifications.success("Response copied to clipboard!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy code: ", err);
+      });
+  };
+
   let cleanUpListeners;
 
   let extractedMessage = "";
@@ -106,8 +130,9 @@
     <div class="recieve-item p-3">
       <div class="d-flex justify-content-between">
         <AISparkle />
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 pb-2">
           <span
+            role="button"
             on:click={() => {
               onToggleLike(messageId, true);
             }}
@@ -119,6 +144,7 @@
             />
           </span>
           <span
+            role="button"
             on:click={() => {
               onToggleLike(messageId, false);
             }}
@@ -132,15 +158,24 @@
         </div>
       </div>
       <div class="markdown">{@html extractedMessage}</div>
-      <div>
+      <div class="d-flex gap-2">
+        {#if isLastRecieverMessage}
+          <span
+            role="button"
+            on:click={() => {
+              regenerateAiResponse();
+            }}
+          >
+            <RefreshIcon height={"16px"} width={"16px"} />
+          </span>
+        {/if}
         <span
+          role="button"
           on:click={() => {
-            regenerateAiResponse();
+            handleCopyResponse();
           }}
         >
-          {#if isLastRecieverMessage}
-            <RefreshIcon height={"16px"} width={"16px"} />
-          {/if}
+          <CopyIcon2 height={"14px"} width={"14px"} />
         </span>
       </div>
     </div>
@@ -148,12 +183,11 @@
 </div>
 
 <style>
-  .send-item {
-    border-bottom: 1px solid grey;
-  }
+  .send-item,
   .recieve-item {
-    border-bottom: 1px solid grey;
+    border-bottom: 1px solid var(--border-secondary-320);
   }
+
   :global(
       .message-wrapper .markdown p,
       .message-wrapper .markdown li,
@@ -164,7 +198,7 @@
     font-size: 12px;
   }
   :global(.message-wrapper .markdown pre) {
-    background-color: black;
+    /* background-color: black; */
     /* padding: 10px; */
     margin-bottom: 0;
   }
