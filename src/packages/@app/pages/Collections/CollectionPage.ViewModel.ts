@@ -1218,9 +1218,7 @@ export default class CollectionsViewModel {
       request.updateIsSave(true);
       await this.tabRepository.createTab(request.getValue());
       moveNavigation("right");
-      MixpanelEvent(Events.CREATE_REQUEST, {
-        source: "Collection list",
-      });
+      MixpanelEvent(Events.CREATE_REQUEST);
       return;
     }
     const response =
@@ -1256,9 +1254,7 @@ export default class CollectionsViewModel {
       // );
       this.tabRepository.createTab(request.getValue());
       moveNavigation("right");
-      MixpanelEvent(Events.CREATE_REQUEST, {
-        source: "Collection list",
-      });
+      MixpanelEvent(Events.CREATE_REQUEST);
       return;
     } else {
       this.collectionRepository.deleteRequestOrFolderInCollection(
@@ -1363,9 +1359,7 @@ export default class CollectionsViewModel {
       this.tabRepository.createTab(sampleRequest.getValue());
 
       moveNavigation("right");
-      MixpanelEvent(Events.CREATE_REQUEST, {
-        source: "Collection list",
-      });
+      MixpanelEvent(Events.CREATE_REQUEST);
       return;
     }
     const response =
@@ -1390,9 +1384,7 @@ export default class CollectionsViewModel {
       this.tabRepository.createTab(sampleRequest.getValue());
 
       moveNavigation("right");
-      MixpanelEvent(Events.CREATE_REQUEST, {
-        source: "Collection list",
-      });
+      MixpanelEvent(Events.CREATE_REQUEST);
       return;
     } else {
       this.collectionRepository.deleteRequestInFolder(
@@ -1485,9 +1477,7 @@ export default class CollectionsViewModel {
         folderObj,
       );
 
-      MixpanelEvent(Events.CREATE_FOLDER, {
-        source: "Collection list",
-      });
+      MixpanelEvent(Events.CREATE_FOLDER);
       return;
     }
 
