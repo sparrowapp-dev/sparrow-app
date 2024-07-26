@@ -38,9 +38,7 @@
   };
 
   const toggleBulkEdit = (value) => {
-    MixpanelEvent(Events.Bulk_Edit_Headers, {
-      source: "bulk edit headers",
-    });
+    MixpanelEvent(Events.Bulk_Edit_Headers);
 
     onUpdateRequestState({ isHeaderBulkEditActive: value });
   };

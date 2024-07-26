@@ -385,9 +385,7 @@ export default class WorkspaceExplorerViewModel {
         `Failed to remove ${_userName} from ${_workspaceName}`,
       );
     }
-    MixpanelEvent(Events.Remove_User_Workspace, {
-      source: "remove user from workspace",
-    });
+    MixpanelEvent(Events.Remove_User_Workspace);
     return response;
   };
 
@@ -431,9 +429,7 @@ export default class WorkspaceExplorerViewModel {
         `Failed to change role for ${_userName}. Please try again.`,
       );
     }
-    MixpanelEvent(Events.Workspace_Role_Changed, {
-      source: "workspace role changed",
-    });
+    MixpanelEvent(Events.Workspace_Role_Changed);
     return response;
   };
 }

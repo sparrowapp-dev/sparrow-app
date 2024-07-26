@@ -259,9 +259,7 @@ export class HeaderDashboardViewModel {
       userId,
       role,
     );
-    MixpanelEvent(Events.Workspace_Role_Changed, {
-      source: "workspace role changed",
-    });
+    MixpanelEvent(Events.Workspace_Role_Changed);
     return response;
   };
   public updateUserRoleInWorkspaceInRXDB = async (

@@ -364,9 +364,7 @@ export class DashboardViewModel {
       await this.workspaceRepository.setActiveWorkspace(res._id);
       notifications.success("New Workspace Created");
     }
-    MixpanelEvent(Events.Create_New_Workspace_TopBar, {
-      source: "create new workspace from top bar",
-    });
+    MixpanelEvent(Events.Create_New_Workspace_TopBar);
 
     return response;
   };

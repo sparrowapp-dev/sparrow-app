@@ -121,9 +121,7 @@ export class TeamsViewModel {
     } else {
       notifications.error("Failed to create a new team. Please try again.");
     }
-    MixpanelEvent(Events.CREATE_NEW_TEAM, {
-      source: "create new team",
-    });
+    MixpanelEvent(Events.CREATE_NEW_TEAM);
     return response;
   };
   /**

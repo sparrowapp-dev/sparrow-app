@@ -27,9 +27,7 @@
   };
 
   const toggleBulkEdit = (value) => {
-    MixpanelEvent(Events.Bulk_Edit_Parameters, {
-      source: "bulk edit parameters",
-    });
+    MixpanelEvent(Events.Bulk_Edit_Parameters);
     onUpdateRequestState({ isParameterBulkEditActive: value });
   };
 </script>

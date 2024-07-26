@@ -285,9 +285,7 @@ export class TeamExplorerPageViewModel {
       this.tabRepository.createTab(initWorkspaceTab.getValue());
       navigate("/dashboard/collections");
       notifications.success("New Workspace Created");
-      MixpanelEvent(Events.Create_New_Workspace_TeamPage, {
-        source: "create new workspace from team page",
-      });
+      MixpanelEvent(Events.Create_New_Workspace_TeamPage);
     }
   };
 
@@ -363,9 +361,7 @@ export class TeamExplorerPageViewModel {
     } else {
       notifications.error(`Failed to remove ${_userName} from ${_teamName}`);
     }
-    MixpanelEvent(Events.Remove_User_Team, {
-      source: "remove user from team",
-    });
+    MixpanelEvent(Events.Remove_User_Team);
     return response;
   };
 
@@ -400,9 +396,7 @@ export class TeamExplorerPageViewModel {
         `Failed to change role for ${_userName}. Please try again.`,
       );
     }
-    MixpanelEvent(Events.Invite_To_Team_Member, {
-      source: "invite to team member",
-    });
+    MixpanelEvent(Events.Invite_To_Team_Member);
     return response;
   };
 
@@ -437,9 +431,7 @@ export class TeamExplorerPageViewModel {
         `Failed to change role for ${_userName}. Please try again.`,
       );
     }
-    MixpanelEvent(Events.Invite_To_Team_Admin, {
-      source: "invite to team admin",
-    });
+    MixpanelEvent(Events.Invite_To_Team_Admin);
     return response;
   };
 
@@ -490,9 +482,7 @@ export class TeamExplorerPageViewModel {
           `Failed to update access of Owner. Please try again.`,
         );
       }
-      MixpanelEvent(Events.Team_Ownership_Transferred, {
-        source: "team ownership transferred",
-      });
+      MixpanelEvent(Events.Team_Ownership_Transferred);
       return response;
     } else {
       notifications.error(
@@ -530,9 +520,7 @@ export class TeamExplorerPageViewModel {
         `Failed to remove ${_userName} from ${_workspaceName}`,
       );
     }
-    MixpanelEvent(Events.Remove_User_Workspace, {
-      source: "remove user from workspace",
-    });
+    MixpanelEvent(Events.Remove_User_Workspace);
   };
 
   /**
@@ -575,9 +563,7 @@ export class TeamExplorerPageViewModel {
         `Failed to change role for ${_userName}. Please try again.`,
       );
     }
-    MixpanelEvent(Events.Teams_Role_Changed, {
-      source: "workspace role changed",
-    });
+    MixpanelEvent(Events.Teams_Role_Changed);
   };
 
   /**
@@ -624,9 +610,7 @@ export class TeamExplorerPageViewModel {
         `Failed to remove ${workspace.name} from ${workspace?.team?.teamName}. Please try again.`,
       );
     }
-    MixpanelEvent(Events.Delete_Workspace, {
-      source: "delete workspace",
-    });
+    MixpanelEvent(Events.Delete_Workspace);
     return response;
   };
 
@@ -682,9 +666,7 @@ export class TeamExplorerPageViewModel {
         resolve();
       }, 500),
     );
-    MixpanelEvent(Events.Leave_Team, {
-      source: "leave team",
-    });
+    MixpanelEvent(Events.Leave_Team);
     return response;
   };
 
