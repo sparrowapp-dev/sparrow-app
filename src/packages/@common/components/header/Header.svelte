@@ -64,13 +64,7 @@
     onSwitchWorkspace(tabId);
   };
 
-  let guestData = [
-    // {
-    //   // id: currentWorkspaceId,
-    //   // name: "hhh",
-    //   // description: "",
-    // }
-  ];
+  let guestData = [];
   let workspaceData = [
     {
       id: currentWorkspaceId,
