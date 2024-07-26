@@ -20,7 +20,7 @@
       style="border:1px solid grey; outline: none; background-color: var(--bg-secondary-1100); border: 1px solid var(--border-tertiary-190); "
       {placeholder}
       on:keydown={(event) => {
-        if (event.key === "Enter" && prompt) {
+        if (event.key === "Enter" && prompt && !isResponseGenerating) {
           sendPrompt(prompt);
           onUpdateAiPrompt("");
         }
@@ -35,7 +35,7 @@
         on:click={() => {
           if (prompt) {
             sendPrompt(prompt);
-            prompt = "";
+            onUpdateAiPrompt("");
           }
         }}
       >

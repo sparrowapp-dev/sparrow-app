@@ -13,6 +13,25 @@
   export let onUpdateAiConversation;
   export let onUpdateRequestState;
   export let onGenerateAiResponse;
+
+  let isResponseGenerating = false;
+  const sendPrompt = async (text: string) => {
+    if (text) {
+      isResponseGenerating = true;
+      onUpdateAiConversation([
+        ...$tab?.property?.request?.ai?.conversations,
+        {
+          message: text,
+          messageId: "",
+          type: "SENDER",
+          isLiked: false,
+          isDisliked: false,
+        },
+      ]);
+      const response = await onGenerateAiResponse(text, "", "");
+      isResponseGenerating = false;
+    }
+  };
 </script>
 
 {#if $tab?.property?.request?.state?.isChatbotActive}
@@ -29,8 +48,8 @@
       conversations={$tab?.property?.request?.ai?.conversations}
       prompt={$tab?.property?.request?.ai?.prompt}
       {onUpdateAiPrompt}
-      {onUpdateAiConversation}
-      {onGenerateAiResponse}
+      {sendPrompt}
+      {isResponseGenerating}
     />
   </div>
 {/if}
@@ -43,9 +62,39 @@
    width: 200px;
    "
   >
-    <AISuggestionBox title="Generate Curl" />
-    <AISuggestionBox title="Generate Documentation" />
-    <AISuggestionBox title="Generate Mock data" />
+    <AISuggestionBox
+      onClick={(text = "") => {
+        if (!isResponseGenerating) {
+          sendPrompt(text);
+          onUpdateRequestState({
+            isChatbotActive: true,
+          });
+        }
+      }}
+      title="Generate Curl"
+    />
+    <AISuggestionBox
+      onClick={(text = "") => {
+        if (!isResponseGenerating) {
+          sendPrompt(text);
+          onUpdateRequestState({
+            isChatbotActive: true,
+          });
+        }
+      }}
+      title="Generate Documentation"
+    />
+    <AISuggestionBox
+      onClick={(text = "") => {
+        if (!isResponseGenerating) {
+          sendPrompt(text);
+          onUpdateRequestState({
+            isChatbotActive: true,
+          });
+        }
+      }}
+      title="Generate Mock Parameter Data"
+    />
   </div>
 {/if}
 <div
