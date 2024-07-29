@@ -233,6 +233,9 @@ export const tabSchemaLiteral = {
                 isChatbotSuggestionsActive: {
                   type: "boolean",
                 },
+                isChatbotGeneratingResponse: {
+                  type: "boolean",
+                },
               },
             },
             auth: {
@@ -295,6 +298,9 @@ export const tabSchemaLiteral = {
                         type: "boolean",
                       },
                       isDisliked: {
+                        type: "boolean",
+                      },
+                      status: {
                         type: "boolean",
                       },
                     },

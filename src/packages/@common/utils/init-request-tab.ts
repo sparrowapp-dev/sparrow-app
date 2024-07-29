@@ -115,6 +115,7 @@ class InitRequestTab {
             isHeaderBulkEditActive: false,
             isChatbotActive: false,
             isChatbotSuggestionsActive: true,
+            isChatbotGeneratingResponse: false,
           },
           auth: {
             bearerToken: "",

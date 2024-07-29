@@ -16,10 +16,8 @@
   export let onGenerateAiResponse;
   export let onToggleLike;
 
-  let isResponseGenerating = false;
   const sendPrompt = async (text: string) => {
     if (text) {
-      isResponseGenerating = true;
       onUpdateAiConversation([
         ...$tab?.property?.request?.ai?.conversations,
         {
@@ -28,22 +26,20 @@
           type: "SENDER",
           isLiked: false,
           isDisliked: false,
+          status: true,
         },
       ]);
       const response = await onGenerateAiResponse(text, "", "");
-      isResponseGenerating = false;
     }
   };
 
   const regenerateAiResponse = async () => {
-    isResponseGenerating = true;
     const regenerateConversation =
       $tab?.property?.request?.ai?.conversations.slice(0, -1);
     onUpdateAiConversation(regenerateConversation);
     const response = await onGenerateAiResponse(
       regenerateConversation[regenerateConversation.length - 1].message,
     );
-    isResponseGenerating = false;
   };
 </script>
 
@@ -62,7 +58,8 @@
       prompt={$tab?.property?.request?.ai?.prompt}
       {onUpdateAiPrompt}
       {sendPrompt}
-      {isResponseGenerating}
+      isResponseGenerating={$tab?.property?.request?.state
+        ?.isChatbotGeneratingResponse}
       {onToggleLike}
       {regenerateAiResponse}
       {onUpdateRequestState}
@@ -99,7 +96,7 @@
     > -->
       <AISuggestionBox
         onClick={(text = "") => {
-          if (!isResponseGenerating) {
+          if (!$tab?.property?.request?.state?.isChatbotGeneratingResponse) {
             sendPrompt(text);
             onUpdateRequestState({
               isChatbotActive: true,
@@ -110,7 +107,7 @@
       />
       <AISuggestionBox
         onClick={(text = "") => {
-          if (!isResponseGenerating) {
+          if (!$tab?.property?.request?.state?.isChatbotGeneratingResponse) {
             sendPrompt(text);
             onUpdateRequestState({
               isChatbotActive: true,
@@ -121,7 +118,7 @@
       />
       <AISuggestionBox
         onClick={(text = "") => {
-          if (!isResponseGenerating) {
+          if (!$tab?.property?.request?.state?.isChatbotGeneratingResponse) {
             sendPrompt(text);
             onUpdateRequestState({
               isChatbotActive: true,

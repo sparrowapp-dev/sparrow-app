@@ -3,6 +3,7 @@
   import { AISuggestionBox, PromptInput, ChatItem } from "../";
   import { AISparkle, CloseIcon } from "../../assests";
   import { cubicOut } from "svelte/easing";
+  import { generatingImage } from "@common/images";
 
   export let conversations = [];
   export let prompt = "";
@@ -101,6 +102,7 @@
                   message={chat.message}
                   messageId={chat.messageId}
                   type={chat.type}
+                  status={chat.status}
                   isLiked={chat.isLiked}
                   isDisliked={chat.isDisliked}
                   {onToggleLike}
@@ -111,7 +113,9 @@
                 />
               {/each}
               {#if isResponseGenerating}
-                <p class="p-3 text-primary-300">... Generating</p>
+                <p class="p-3 text-primary-300">
+                  <img src={generatingImage} style="width: 118px;" alt="" />
+                </p>
               {/if}
             </div>
           {/if}
