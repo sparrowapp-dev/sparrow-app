@@ -102,8 +102,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Rust setup
-        uses: dtolnay/rust-toolchain@stable
+      # - name: Rust setup
+      #   uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust 1.76.0
+        run: |
+         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+         rustup install 1.76.0
+         rustup default 1.76.0
 
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
