@@ -8,6 +8,7 @@
   } from "../components";
   import type { RequestTab } from "@common/types/workspace";
   import { CloseIcon } from "../assests";
+  import { onMount } from "svelte";
 
   export let tab: Observable<RequestTab>;
   export let onUpdateAiPrompt;
@@ -15,6 +16,8 @@
   export let onUpdateRequestState;
   export let onGenerateAiResponse;
   export let onToggleLike;
+
+  let scrollList;
 
   const sendPrompt = async (text: string) => {
     if (text) {
@@ -29,9 +32,21 @@
           status: true,
         },
       ]);
+      setTimeout(() => {
+        scrollList("bottom", -1, "smooth");
+      }, 10);
       const response = await onGenerateAiResponse(text, "", "");
+      setTimeout(() => {
+        scrollList("bottom", -1, "smooth");
+      }, 10);
     }
   };
+
+  onMount(() => {
+    setTimeout(() => {
+      scrollList("bottom", -1, "auto");
+    }, 10);
+  });
 
   const regenerateAiResponse = async () => {
     const regenerateConversation =
@@ -63,6 +78,7 @@
       {onToggleLike}
       {regenerateAiResponse}
       {onUpdateRequestState}
+      bind:scrollList
     />
   </div>
 {/if}
