@@ -1533,6 +1533,17 @@ class RestExplorerViewModel
         ...componentData?.property?.request?.ai?.conversations,
         {
           message: data.result,
+          messageId: data.messageId,
+          type: "RECEIVER",
+          isLiked: false,
+          isDisliked: false,
+        },
+      ]);
+    } else {
+      this.updateRequestAIConversation([
+        ...componentData?.property?.request?.ai?.conversations,
+        {
+          message: "Something went wrong! Please try again.",
           messageId: uuidv4(),
           type: "RECEIVER",
           isLiked: false,
@@ -1541,6 +1552,25 @@ class RestExplorerViewModel
       ]);
     }
     return response;
+  };
+
+  public toggleChatMessageLike = (_messageId: string, _flag: boolean) => {
+    const componentData = this._tab.getValue();
+    const data = componentData?.property?.request?.ai;
+    this.aiAssistentService.updateAiStats(data.threadId, _messageId, _flag);
+    const convo = data?.conversations?.map((elem) => {
+      if (elem.messageId === _messageId) {
+        if (_flag) {
+          elem.isLiked = true;
+          elem.isDisliked = false;
+        } else {
+          elem.isLiked = false;
+          elem.isDisliked = true;
+        }
+      }
+      return elem;
+    });
+    this.updateRequestAIConversation(convo);
   };
 }
 

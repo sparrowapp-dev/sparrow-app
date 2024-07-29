@@ -17,6 +17,7 @@
         onUpdateAiPrompt(prompt);
       }}
       class="w-100 pe-5 py-2 ps-2 border-radius-6 text-fs-12"
+      autofocus
       style="border:1px solid grey; outline: none; background-color: var(--bg-secondary-1100); border: 1px solid var(--border-tertiary-190); "
       {placeholder}
       on:keydown={(event) => {
@@ -65,5 +66,12 @@
 <style>
   input::placeholder {
     color: var(--text-secondary-250);
+  }
+  input {
+    border: 1px solid transparent;
+  }
+  input:focus {
+    outline: none;
+    border: 1px solid var(--border-primary-300) !important;
   }
 </style>

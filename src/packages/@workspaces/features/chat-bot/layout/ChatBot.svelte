@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Observable } from "rxjs";
+  // import { fade } from "svelte/transition";
   import {
     AIChatInterface,
     AiChatToggler,
@@ -7,13 +8,13 @@
   } from "../components";
   import type { RequestTab } from "@common/types/workspace";
   import { CloseIcon } from "../assests";
-  let isChatBoxOpen = false;
 
   export let tab: Observable<RequestTab>;
   export let onUpdateAiPrompt;
   export let onUpdateAiConversation;
   export let onUpdateRequestState;
   export let onGenerateAiResponse;
+  export let onToggleLike;
 
   let isResponseGenerating = false;
   const sendPrompt = async (text: string) => {
@@ -33,6 +34,17 @@
       isResponseGenerating = false;
     }
   };
+
+  const regenerateAiResponse = async () => {
+    isResponseGenerating = true;
+    const regenerateConversation =
+      $tab?.property?.request?.ai?.conversations.slice(0, -1);
+    onUpdateAiConversation(regenerateConversation);
+    const response = await onGenerateAiResponse(
+      regenerateConversation[regenerateConversation.length - 1].message,
+    );
+    isResponseGenerating = false;
+  };
 </script>
 
 {#if $tab?.property?.request?.state?.isChatbotActive}
@@ -51,6 +63,8 @@
       {onUpdateAiPrompt}
       {sendPrompt}
       {isResponseGenerating}
+      {onToggleLike}
+      {regenerateAiResponse}
       {onUpdateRequestState}
     />
   </div>
@@ -77,39 +91,46 @@
         color="var(--icon-primary-300)"
       />
     </div>
-    <AISuggestionBox
-      onClick={(text = "") => {
-        if (!isResponseGenerating) {
-          sendPrompt(text);
-          onUpdateRequestState({
-            isChatbotActive: true,
-          });
-        }
-      }}
-      title="Generate Curl"
-    />
-    <AISuggestionBox
-      onClick={(text = "") => {
-        if (!isResponseGenerating) {
-          sendPrompt(text);
-          onUpdateRequestState({
-            isChatbotActive: true,
-          });
-        }
-      }}
-      title="Generate Documentation"
-    />
-    <AISuggestionBox
-      onClick={(text = "") => {
-        if (!isResponseGenerating) {
-          sendPrompt(text);
-          onUpdateRequestState({
-            isChatbotActive: true,
-          });
-        }
-      }}
-      title="Generate Mock Data"
-    />
+    <div class="d-flex flex-column align-items-end">
+      <!-- <div
+      class="d-flex flex-column align-items-end"
+      in:fade={{ duration: 200 }}
+      out:fade={{ duration: 200 }}
+    > -->
+      <AISuggestionBox
+        onClick={(text = "") => {
+          if (!isResponseGenerating) {
+            sendPrompt(text);
+            onUpdateRequestState({
+              isChatbotActive: true,
+            });
+          }
+        }}
+        title="Generate Curl"
+      />
+      <AISuggestionBox
+        onClick={(text = "") => {
+          if (!isResponseGenerating) {
+            sendPrompt(text);
+            onUpdateRequestState({
+              isChatbotActive: true,
+            });
+          }
+        }}
+        title="Generate Documentation"
+      />
+      <AISuggestionBox
+        onClick={(text = "") => {
+          if (!isResponseGenerating) {
+            sendPrompt(text);
+            onUpdateRequestState({
+              isChatbotActive: true,
+            });
+          }
+        }}
+        title="Generate Mock Data"
+      />
+    </div>
   </div>
 {/if}
 <div
