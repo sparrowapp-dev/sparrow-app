@@ -3,7 +3,7 @@ name: Development release
 on:
   push:
     branches:
-      - development
+      - pratik/development
   workflow_dispatch:
 
 env: 
@@ -51,52 +51,52 @@ jobs:
           Set-Content -Path src-tauri/tauri.conf.json -Value $newContent
         shell: pwsh
 
-      - name: Build Tauri App
-        run: |
-          yarn cache clean
-          npm install -g pnpm
-          yarn install
-          yarn tauri build --debug
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+      # - name: Build Tauri App
+      #   run: |
+      #     yarn cache clean
+      #     npm install -g pnpm
+      #     yarn install
+      #     yarn tauri build --debug
+      #   env:
+      #     TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+      #     TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+      #     GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
-      - name: msi sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.sig
+      # - name: msi sig
+      #   run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.sig
   
-      - name: nsis sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis\*.sig
+      # - name: nsis sig
+      #   run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis\*.sig
 
-      - name: sign msi
-        run: |
-           $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
-           $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
-           $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
-           Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
-           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.msi"
+      # - name: sign msi
+      #   run: |
+      #      $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
+      #      $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
+      #      $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
+      #      Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
+      #      & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.msi"
       
 
-      - name: Install AWS CLI
-        uses: chrislennon/action-aws-cli@v1.1
-        with:
-          version: latest
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # - name: Install AWS CLI
+      #   uses: chrislennon/action-aws-cli@v1.1
+      #   with:
+      #     version: latest
+      #     aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
    
-      - name: Upload files to S3
-        run: |
-          aws s3 sync D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # - name: Upload files to S3
+      #   run: |
+      #     aws s3 sync D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
            
 
 
   release_macos:
     runs-on: macos-latest
     environment: development
-    needs: release_win
+    # needs: release_win
     
     steps:
       - name: Checkout Repository
@@ -119,6 +119,7 @@ jobs:
 
       - name: Build Tauri App
         run: |
+          yarn cache clean
           yarn install
           yarn tauri build --debug
         env:
