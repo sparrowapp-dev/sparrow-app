@@ -114,6 +114,23 @@
     }, 200);
   });
 
+  $: {
+    if (message) {
+      extractedMessage = decode(marked(message));
+      setTimeout(() => {
+        const wrappers = document.querySelectorAll(`.copy-code-${messageId}`);
+        cleanUpListeners = () => {
+          wrappers.forEach((wrapper) => {
+            wrapper.removeEventListener("click", handleCopyClick);
+          });
+        };
+        wrappers.forEach((wrapper) => {
+          wrapper.addEventListener("click", handleCopyClick);
+        });
+      }, 300);
+    }
+  }
+
   onDestroy(() => {
     // Clean up event listeners
     if (cleanUpListeners) {

@@ -47,7 +47,8 @@
         />
       </div>
     {:else}
-      <div
+      <!--Disabling it for now, will take stop generation when data streaming will be enabled.-->
+      <!-- <div
         style="position:absolute; right:12px ; top: 50%; 
     transform : translateY(-60%);
   "
@@ -58,7 +59,7 @@
           width={"20px"}
           color={"var(--icon-secondary-100)"}
         />
-      </div>
+      </div> -->
     {/if}
   </div>
 </div>

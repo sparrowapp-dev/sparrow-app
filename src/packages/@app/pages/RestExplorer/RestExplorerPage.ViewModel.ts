@@ -1511,6 +1511,40 @@ class RestExplorerViewModel
   };
 
   /**
+   * Updates the message property of the last conversation in chunks.
+   *
+   * This function takes a string `data`, divides it into chunks of size `chunkSize`,
+   * and appends each chunk to the last conversation message in the component's data.
+   * The chunks are appended at intervals specified by `delay`.
+   *
+   * @param data - The string data to be displayed in chunks.
+   * @param chunkSize - The number of characters per chunk.
+   * @param delay - The delay in milliseconds between each chunk display.
+   */
+  private displayDataInChunks = (data, chunkSize, delay) => {
+    let index = 0;
+
+    const displayNextChunk = () => {
+      if (index < data.length) {
+        const chunk = data.slice(index, index + chunkSize);
+        const componentData = this._tab.getValue();
+        const length =
+          componentData?.property?.request?.ai?.conversations.length;
+        componentData.property.request.ai.conversations[length - 1].message =
+          componentData.property.request.ai.conversations[length - 1].message +
+          chunk;
+        this.updateRequestAIConversation([
+          ...componentData.property.request.ai.conversations,
+        ]);
+        index += chunkSize;
+        setTimeout(displayNextChunk, delay);
+      }
+    };
+
+    displayNextChunk();
+  };
+
+  /**
    * Get workspace data through workspace id
    * @param workspaceId - id of workspace
    * @returns - workspace document
@@ -1532,13 +1566,14 @@ class RestExplorerViewModel
       this.updateRequestAIConversation([
         ...componentData?.property?.request?.ai?.conversations,
         {
-          message: data.result,
+          message: "",
           messageId: data.messageId,
           type: "RECEIVER",
           isLiked: false,
           isDisliked: false,
         },
       ]);
+      this.displayDataInChunks(data.result, 100, 300);
     } else {
       this.updateRequestAIConversation([
         ...componentData?.property?.request?.ai?.conversations,
