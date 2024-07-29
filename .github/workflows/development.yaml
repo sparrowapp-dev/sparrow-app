@@ -106,7 +106,7 @@ jobs:
       #   uses: dtolnay/rust-toolchain@stable
       - name: Install Rust 1.76.0
         run: |
-         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -y
+         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
          rustup install 1.76.0
          rustup default 1.76.0
 
