@@ -361,6 +361,8 @@ export class DashboardViewModel {
       });
       await this.workspaceRepository.setActiveWorkspace(res._id);
       notifications.success("New Workspace Created");
+    } else {
+      notifications.error(response?.message);
     }
     return response;
   };
