@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import { AISparkle } from "../../assests";
   import { marked } from "marked";
   import { notifications } from "@library/ui/toast/Toast";
   import { copyIcon } from "../../assests";
@@ -14,7 +13,6 @@
     RefreshIcon,
     SparrowAIIcon,
   } from "@library/icons";
-  import { WithButton } from "@workspaces/common/hoc";
   import { Tooltip } from "@library/ui";
 
   export let message;

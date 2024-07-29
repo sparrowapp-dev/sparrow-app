@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Observable } from "rxjs";
+  // import { fade } from "svelte/transition";
   import {
     AIChatInterface,
     AiChatToggler,
@@ -90,39 +91,46 @@
         color="var(--icon-primary-300)"
       />
     </div>
-    <AISuggestionBox
-      onClick={(text = "") => {
-        if (!isResponseGenerating) {
-          sendPrompt(text);
-          onUpdateRequestState({
-            isChatbotActive: true,
-          });
-        }
-      }}
-      title="Generate Curl"
-    />
-    <AISuggestionBox
-      onClick={(text = "") => {
-        if (!isResponseGenerating) {
-          sendPrompt(text);
-          onUpdateRequestState({
-            isChatbotActive: true,
-          });
-        }
-      }}
-      title="Generate Documentation"
-    />
-    <AISuggestionBox
-      onClick={(text = "") => {
-        if (!isResponseGenerating) {
-          sendPrompt(text);
-          onUpdateRequestState({
-            isChatbotActive: true,
-          });
-        }
-      }}
-      title="Generate Mock Data"
-    />
+    <div class="d-flex flex-column align-items-end">
+      <!-- <div
+      class="d-flex flex-column align-items-end"
+      in:fade={{ duration: 200 }}
+      out:fade={{ duration: 200 }}
+    > -->
+      <AISuggestionBox
+        onClick={(text = "") => {
+          if (!isResponseGenerating) {
+            sendPrompt(text);
+            onUpdateRequestState({
+              isChatbotActive: true,
+            });
+          }
+        }}
+        title="Generate Curl"
+      />
+      <AISuggestionBox
+        onClick={(text = "") => {
+          if (!isResponseGenerating) {
+            sendPrompt(text);
+            onUpdateRequestState({
+              isChatbotActive: true,
+            });
+          }
+        }}
+        title="Generate Documentation"
+      />
+      <AISuggestionBox
+        onClick={(text = "") => {
+          if (!isResponseGenerating) {
+            sendPrompt(text);
+            onUpdateRequestState({
+              isChatbotActive: true,
+            });
+          }
+        }}
+        title="Generate Mock Data"
+      />
+    </div>
   </div>
 {/if}
 <div
