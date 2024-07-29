@@ -4,7 +4,7 @@
 
   // ---- View Model
   import RestExplorerViewModel from "./RestExplorerPage.ViewModel";
-  import { RestExplorer } from "@workspaces/features";
+  import { RestExplorer, ChatBot } from "@workspaces/features";
   import { Debounce } from "@common/utils";
   import { isGuestUserActive, user } from "$lib/store";
   import { onMount } from "svelte";
@@ -162,4 +162,12 @@
   onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
   onRenameCollection={_viewModel.handleRenameCollection}
   onRenameFolder={_viewModel.handleRenameFolder}
+/>
+
+<ChatBot
+  bind:tab={_viewModel.tab}
+  onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
+  onUpdateAiConversation={_viewModel.updateRequestAIConversation}
+  onUpdateRequestState={_viewModel.updateRequestState}
+  onGenerateAiResponse={_viewModel.generateAiResponse}
 />

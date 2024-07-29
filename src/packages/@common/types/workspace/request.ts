@@ -50,6 +50,12 @@ export enum RequestSectionEnum {
   REQUEST_BODY = "Request Body",
   DOCUMENTATION = "Description",
 }
+
+export enum MessageTypeEnum {
+  SENDER = "Sender",
+  RECEIVER = "Receiver",
+}
+
 export enum ResponseFormatterEnum {
   PRETTY = "Pretty",
   RAW = "Raw",
@@ -140,10 +146,15 @@ export interface IsSaveRequestInProgressWrapper {
 export interface IsBulkHeaderWrapper {
   isHeaderBulkEditActive: boolean;
 }
+export interface IsChatbotActive {
+  isChatbotActive: boolean;
+}
+export interface IsChatbotSuggestionsActive {
+  isChatbotSuggestionsActive: boolean;
+}
 export interface IsBulkParameterWrapper {
   isParameterBulkEditActive: boolean;
 }
-
 
 export interface UsernameWrapper {
   username: string;
@@ -249,7 +260,9 @@ export interface State
     IsSaveDescriptionInProgressWrapper,
     IsSaveRequestInProgressWrapper,
     IsBulkParameterWrapper,
-    IsBulkHeaderWrapper {}
+    IsBulkHeaderWrapper,
+    IsChatbotActive,
+    IsChatbotSuggestionsActive {}
 
 export interface StatePartial
   extends Partial<RequestBodyLanguageWrapper>,
@@ -267,10 +280,53 @@ export interface StatePartial
     Partial<IsSaveDescriptionInProgressWrapper>,
     Partial<IsSaveRequestInProgressWrapper>,
     Partial<IsBulkParameterWrapper>,
-    Partial<IsBulkHeaderWrapper> {}
+    Partial<IsBulkHeaderWrapper>,
+    Partial<IsChatbotActive>,
+    Partial<IsChatbotSuggestionsActive> {}
 
 export interface StateWrapper {
   state: State;
+}
+
+export interface PromptWrapper {
+  prompt: string;
+}
+
+export interface TypeWrapper3 {
+  type: MessageTypeEnum;
+}
+export interface MessageIdWrapper {
+  messageId: string;
+}
+export interface MessageWrapper {
+  message: string;
+}
+export interface IsLikedWrapper {
+  isLiked: boolean;
+}
+export interface IsDislikedWrapper {
+  isDisliked: boolean;
+}
+
+export interface Conversation
+  extends TypeWrapper3,
+    MessageIdWrapper,
+    MessageWrapper,
+    IsLikedWrapper,
+    IsDislikedWrapper {}
+export interface ConversationsWrapper {
+  conversations: Conversation[];
+}
+export interface ThreadIdWrapper {
+  threadId: string;
+}
+
+export interface Ai
+  extends PromptWrapper,
+    ConversationsWrapper,
+    ThreadIdWrapper {}
+export interface AiWrapper {
+  ai: Ai;
 }
 
 export interface BasicAuth extends UsernameWrapper, PasswordWrapper {}
@@ -319,6 +375,7 @@ export interface Request
     ResponseWrapper,
     AuthWrapper,
     UrlWrapper,
+    AiWrapper,
     HeadersWrapper {}
 
 export interface RequestTab

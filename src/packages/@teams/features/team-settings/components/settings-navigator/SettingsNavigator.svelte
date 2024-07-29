@@ -82,6 +82,6 @@
     background-color: transparent;
   }
   .settings-tab-active {
-    background-color: var(--bg-tertiary-250);
+    background-color: var(--bg-tertiary-750);
   }
 </style>

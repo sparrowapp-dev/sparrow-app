@@ -255,7 +255,7 @@
     background-color: var(--border-color);
   }
   .teams-outer:hover {
-    background-color: var(--bg-tertiary-250);
+    background-color: var(--bg-tertiary-750);
   }
 
   .teams-outer:active {

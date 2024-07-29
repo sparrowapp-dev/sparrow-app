@@ -108,6 +108,7 @@ $theme-grey-45494D: #45494D;
 $theme-grey-353646: #353646;
 $theme-grey-333333: #333333;
 $theme-grey-313233: #313233;
+$theme-grey-2B343D: #2B343D;
 
 $theme-grey-272727: #272727;
 $theme-grey-212222: #212222;
@@ -275,6 +276,7 @@ $theme-red-230408: #230408;
   --text-secondary-850 : #{$theme-grey-121212};
   --text-secondary-900 : #{$theme-grey-000000};
   --text-secondary-1000: #{$theme-grey-CCCCCC};
+  --text-secondary-1100 : #{$theme-grey-2B343D};
 
   --text-tertiary-100 : #{$theme-violet-676A80};
   --text-tertiary-190 : #{$theme-violet-37394E};
@@ -334,10 +336,10 @@ $theme-red-230408: #230408;
   --bg-secondary-900 : #{$theme-grey-000000};
   --bg-secondary-950 : #{$theme-grey-808080};
   --bg-secondary-1000 : #{$theme-grey-CCCCCC};
+  --bg-secondary-1100 : #{$theme-grey-2B343D};
 
   --bg-tertiary-100 : #{$theme-violet-676A80};
   --bg-tertiary-190 : #{$theme-violet-37394E};
-  --bg-tertiary-250 : #{$theme-violet-1C1D2B};
   --bg-tertiary-300 : #{$theme-violet-2A2C3C};
   --bg-tertiary-400 : #{$theme-violet-22232E};
   --bg-tertiary-500 : #{$theme-violet-272831};
@@ -385,11 +387,11 @@ $theme-red-230408: #230408;
   --border-secondary-800 : #{$theme-grey-151515};
   --border-secondary-900 : #{$theme-grey-000000};
   --border-secondary-950 : #{$theme-grey-808080};
+  --border-secondary-1100 : #{$theme-grey-2B343D};
 
 
   --border-tertiary-100 : #{$theme-violet-676A80};
   --border-tertiary-190 : #{$theme-violet-37394E};
-  --border-tertiary-250 : #{$theme-violet-1C1D2B};
   --border-tertiary-300 : #{$theme-violet-2A2C3C};
   --border-tertiary-400 : #{$theme-violet-22232E};
   --border-tertiary-500 : #{$theme-violet-272831};
@@ -435,6 +437,7 @@ $theme-red-230408: #230408;
   --icon-secondary-900 : #{$theme-grey-000000};
   --icon-secondary-950 : #{$theme-grey-808080};
   --icon-secondary-1000 : #{$theme-grey-CCCCCC};
+  --icon-secondary-1100 : #{$theme-grey-2B343D};
 
 
   --icon-tertiary-100 : #{$theme-violet-676A80};
@@ -581,6 +584,7 @@ $sparrow-text-colors: (
   secondary-850 : $theme-grey-121212,
   secondary-900 : $theme-grey-000000,
   secondary-1000: $theme-grey-CCCCCC,
+  secondary-1100 : $theme-grey-2B343D,
 
   tertiary-100 : $theme-violet-676A80,
   tertiary-190 : $theme-violet-37394E,
@@ -626,6 +630,7 @@ $sparrow-bg-colors: (
   secondary-850 : $theme-grey-121212,
   secondary-900 : $theme-grey-000000,
   secondary-1000 : $theme-grey-CCCCCC,
+  secondary-1100 : $theme-grey-2B343D,
   
   tertiary-100 : $theme-violet-676A80,
   tertiary-190 : $theme-violet-37394E,
@@ -672,6 +677,7 @@ $sparrow-border-colors: (
   secondary-800 : $theme-grey-151515,
   secondary-900 : $theme-grey-000000,
   secondary-1000 : $theme-grey-CCCCCC,
+  secondary-1100 : $theme-grey-2B343D,
 
   tertiary-100 : $theme-violet-676A80,
   tertiary-190 : $theme-violet-37394E,
@@ -788,12 +794,14 @@ span {
 /* Set the width of the scrollbar */
 ::-webkit-scrollbar {
   width: 11px; 
+  height: 11px;
 }
 
 /* Make the scrollbar track (background) transparent */
 ::-webkit-scrollbar-track {
   background: transparent;
   width: 5px;
+  height: 5px;
 }
 
 /* Customize the scrollbar thumb (the draggable part) */
@@ -803,6 +811,7 @@ span {
   border: 3px solid transparent; 
   background-clip: content-box; 
   width: 5px !important;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-corner {

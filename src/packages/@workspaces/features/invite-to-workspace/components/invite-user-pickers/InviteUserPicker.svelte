@@ -259,7 +259,7 @@
     height: 36px;
     border-radius: 50%;
     border: 1px solid var(--border-secondary-300) !important;
-    background-color: var(--bg-tertiary-250);
+    background-color: var(--bg-tertiary-750);
   }
   .info {
     width: calc(100% - 120px);
