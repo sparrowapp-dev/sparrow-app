@@ -112,7 +112,7 @@
     const event = await onFetchCollectionGuide({
       id: "collection-guide",
     });
-    event.$.subscribe((e) => {
+    event?.$.subscribe((e) => {
       if (e.isActive === false) {
         isPopoverContainer = false;
       } else {

@@ -155,6 +155,9 @@ export interface IsChatbotSuggestionsActive {
 export interface IsBulkParameterWrapper {
   isParameterBulkEditActive: boolean;
 }
+export interface IsChatbotGeneratingResponse {
+  isChatbotGeneratingResponse: boolean;
+}
 
 export interface UsernameWrapper {
   username: string;
@@ -262,7 +265,8 @@ export interface State
     IsBulkParameterWrapper,
     IsBulkHeaderWrapper,
     IsChatbotActive,
-    IsChatbotSuggestionsActive {}
+    IsChatbotSuggestionsActive,
+    IsChatbotGeneratingResponse {}
 
 export interface StatePartial
   extends Partial<RequestBodyLanguageWrapper>,
@@ -282,7 +286,8 @@ export interface StatePartial
     Partial<IsBulkParameterWrapper>,
     Partial<IsBulkHeaderWrapper>,
     Partial<IsChatbotActive>,
-    Partial<IsChatbotSuggestionsActive> {}
+    Partial<IsChatbotSuggestionsActive>,
+    Partial<IsChatbotGeneratingResponse> {}
 
 export interface StateWrapper {
   state: State;
@@ -307,13 +312,17 @@ export interface IsLikedWrapper {
 export interface IsDislikedWrapper {
   isDisliked: boolean;
 }
+export interface StatusWrapper2 {
+  status: boolean;
+}
 
 export interface Conversation
   extends TypeWrapper3,
     MessageIdWrapper,
     MessageWrapper,
     IsLikedWrapper,
-    IsDislikedWrapper {}
+    IsDislikedWrapper,
+    StatusWrapper2 {}
 export interface ConversationsWrapper {
   conversations: Conversation[];
 }

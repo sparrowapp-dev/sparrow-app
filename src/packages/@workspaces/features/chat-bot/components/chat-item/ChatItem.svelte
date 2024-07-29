@@ -14,6 +14,7 @@
     SparrowAIIcon,
   } from "@library/icons";
   import { Tooltip } from "@library/ui";
+  import P from "@library/typography/p/P.svelte";
 
   export let message;
   export let messageId;
@@ -23,6 +24,7 @@
   export let onToggleLike;
   export let regenerateAiResponse;
   export let isLastRecieverMessage;
+  export let status;
 
   const decode = (htmlString: string) => {
     const parser = new DOMParser();
@@ -149,39 +151,49 @@
       <div class="d-flex justify-content-between">
         <SparrowAIIcon height={"20px"} width={"20px"} />
         <div class="d-flex gap-1 pb-2">
-          <Tooltip placement="top" title="Like" distance={13}>
-            <span
-              role="button"
-              class="action-button d-flex align-items-center justify-content-center border-radius-4"
-              on:click={() => {
-                onToggleLike(messageId, true);
-              }}
-            >
-              <LikeIcon
-                height={"16px"}
-                width={"16px"}
-                color={isLiked ? "white" : "transparent"}
-              />
-            </span>
-          </Tooltip>
-          <Tooltip placement="top" title="Dislike" distance={13}>
-            <span
-              class="action-button d-flex align-items-center justify-content-center border-radius-4"
-              role="button"
-              on:click={() => {
-                onToggleLike(messageId, false);
-              }}
-            >
-              <DislikeIcon
-                height={"16px"}
-                width={"16px"}
-                color={isDisliked ? "white" : "transparent"}
-              />
-            </span>
-          </Tooltip>
+          {#if status}
+            <Tooltip placement="top" title="Like" distance={13}>
+              <span
+                role="button"
+                class="action-button d-flex align-items-center justify-content-center border-radius-4"
+                on:click={() => {
+                  onToggleLike(messageId, true);
+                }}
+              >
+                <LikeIcon
+                  height={"16px"}
+                  width={"16px"}
+                  color={isLiked ? "white" : "transparent"}
+                />
+              </span>
+            </Tooltip>
+            <Tooltip placement="top" title="Dislike" distance={13}>
+              <span
+                class="action-button d-flex align-items-center justify-content-center border-radius-4"
+                role="button"
+                on:click={() => {
+                  onToggleLike(messageId, false);
+                }}
+              >
+                <DislikeIcon
+                  height={"16px"}
+                  width={"16px"}
+                  color={isDisliked ? "white" : "transparent"}
+                />
+              </span>
+            </Tooltip>
+          {/if}
         </div>
       </div>
-      <div class="markdown">{@html extractedMessage}</div>
+      {#if status}
+        <div class="markdown">
+          {@html extractedMessage}
+        </div>
+      {:else}
+        <div class="markdown error-message p-2 border-radius-4 mb-2 mt-3">
+          <p class="mb-0">{message}</p>
+        </div>
+      {/if}
       <div class="d-flex gap-1">
         {#if isLastRecieverMessage}
           <span
@@ -243,5 +255,9 @@
   }
   :global(.action-button:hover) {
     background-color: var(--bg-tertiary-190);
+  }
+  .error-message {
+    background-color: var(--bg-danger-1200);
+    border: 0.2px solid var(--border-danger-200);
   }
 </style>

@@ -8,6 +8,7 @@
   } from "../components";
   import type { RequestTab } from "@common/types/workspace";
   import { CloseIcon } from "../assests";
+  import { onMount } from "svelte";
 
   export let tab: Observable<RequestTab>;
   export let onUpdateAiPrompt;
@@ -16,10 +17,10 @@
   export let onGenerateAiResponse;
   export let onToggleLike;
 
-  let isResponseGenerating = false;
+  let scrollList;
+
   const sendPrompt = async (text: string) => {
     if (text) {
-      isResponseGenerating = true;
       onUpdateAiConversation([
         ...$tab?.property?.request?.ai?.conversations,
         {
@@ -28,22 +29,32 @@
           type: "SENDER",
           isLiked: false,
           isDisliked: false,
+          status: true,
         },
       ]);
+      setTimeout(() => {
+        scrollList("bottom", -1, "smooth");
+      }, 10);
       const response = await onGenerateAiResponse(text, "", "");
-      isResponseGenerating = false;
+      setTimeout(() => {
+        scrollList("bottom", -1, "smooth");
+      }, 10);
     }
   };
 
+  onMount(() => {
+    setTimeout(() => {
+      scrollList("bottom", -1, "auto");
+    }, 10);
+  });
+
   const regenerateAiResponse = async () => {
-    isResponseGenerating = true;
     const regenerateConversation =
       $tab?.property?.request?.ai?.conversations.slice(0, -1);
     onUpdateAiConversation(regenerateConversation);
     const response = await onGenerateAiResponse(
       regenerateConversation[regenerateConversation.length - 1].message,
     );
-    isResponseGenerating = false;
   };
 </script>
 
@@ -62,10 +73,12 @@
       prompt={$tab?.property?.request?.ai?.prompt}
       {onUpdateAiPrompt}
       {sendPrompt}
-      {isResponseGenerating}
+      isResponseGenerating={$tab?.property?.request?.state
+        ?.isChatbotGeneratingResponse}
       {onToggleLike}
       {regenerateAiResponse}
       {onUpdateRequestState}
+      bind:scrollList
     />
   </div>
 {/if}
@@ -99,7 +112,7 @@
     > -->
       <AISuggestionBox
         onClick={(text = "") => {
-          if (!isResponseGenerating) {
+          if (!$tab?.property?.request?.state?.isChatbotGeneratingResponse) {
             sendPrompt(text);
             onUpdateRequestState({
               isChatbotActive: true,
@@ -110,7 +123,7 @@
       />
       <AISuggestionBox
         onClick={(text = "") => {
-          if (!isResponseGenerating) {
+          if (!$tab?.property?.request?.state?.isChatbotGeneratingResponse) {
             sendPrompt(text);
             onUpdateRequestState({
               isChatbotActive: true,
@@ -121,7 +134,7 @@
       />
       <AISuggestionBox
         onClick={(text = "") => {
-          if (!isResponseGenerating) {
+          if (!$tab?.property?.request?.state?.isChatbotGeneratingResponse) {
             sendPrompt(text);
             onUpdateRequestState({
               isChatbotActive: true,

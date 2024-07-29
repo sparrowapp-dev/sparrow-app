@@ -83,6 +83,7 @@ import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
 import { AiAssistantService } from "@app/services/ai-assistant.service";
+import { progressiveTab } from "$lib/store";
 
 class RestExplorerViewModel
   implements
@@ -1554,6 +1555,7 @@ class RestExplorerViewModel
   };
 
   public generateAiResponse = async (prompt = "") => {
+    await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
@@ -1571,6 +1573,7 @@ class RestExplorerViewModel
           type: "RECEIVER",
           isLiked: false,
           isDisliked: false,
+          status: true,
         },
       ]);
       this.displayDataInChunks(data.result, 100, 300);
@@ -1583,9 +1586,11 @@ class RestExplorerViewModel
           type: "RECEIVER",
           isLiked: false,
           isDisliked: false,
+          status: false,
         },
       ]);
     }
+    await this.updateRequestState({ isChatbotGeneratingResponse: false });
     return response;
   };
 
@@ -1606,6 +1611,33 @@ class RestExplorerViewModel
       return elem;
     });
     this.updateRequestAIConversation(convo);
+  };
+
+  public refreshTabData = (tab) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (progressiveTab?.property?.request?.ai?.conversations) {
+      const AiConversationClient =
+        progressiveTab?.property?.request?.ai.conversations;
+      const AiConversationServer = tab.property.request.ai.conversations;
+      if (AiConversationServer.length > AiConversationClient.length) {
+        progressiveTab.property.request.ai.conversations =
+          tab.property.request.ai.conversations;
+        this.tab = progressiveTab;
+      }
+    }
+    if (progressiveTab?.property?.request?.state) {
+      const isChatbotGeneratingResponseClient =
+        progressiveTab?.property?.request?.state?.isChatbotGeneratingResponse;
+      const isChatbotGeneratingResponseServer =
+        tab.property.request.state.isChatbotGeneratingResponse;
+      if (
+        isChatbotGeneratingResponseServer !== isChatbotGeneratingResponseClient
+      ) {
+        progressiveTab.property.request.state.isChatbotGeneratingResponse =
+          tab.property.request.state.isChatbotGeneratingResponse;
+        this.tab = progressiveTab;
+      }
+    }
   };
 }
 

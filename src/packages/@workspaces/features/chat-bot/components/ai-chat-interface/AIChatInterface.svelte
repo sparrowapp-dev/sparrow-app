@@ -3,6 +3,8 @@
   import { AISuggestionBox, PromptInput, ChatItem } from "../";
   import { AISparkle, CloseIcon } from "../../assests";
   import { cubicOut } from "svelte/easing";
+  import { generatingImage } from "@common/images";
+  import { onMount } from "svelte";
 
   export let conversations = [];
   export let prompt = "";
@@ -12,6 +14,7 @@
   export let onToggleLike;
   export let regenerateAiResponse;
   export let onUpdateRequestState;
+  export let scrollList;
 
   const slide = (node, { duration }) => {
     return {
@@ -26,6 +29,26 @@
       },
     };
   };
+
+  let chatContainer: HTMLElement;
+  /**
+   * @description - scrolls the list container to top or bottom
+   * @param position - decides the direction to scroll
+   */
+  const scroll = (_position: "bottom", _pixels: number, _behaviour: string) => {
+    if (_position === "bottom") {
+      chatContainer.scrollTo({
+        top: _pixels === -1 ? chatContainer.scrollHeight : _pixels,
+        behavior: _behaviour,
+      });
+    }
+  };
+
+  /**
+   * @description - triggers child function from parent component
+   */
+  $: scrollList = (_param: "bottom", _pixels, _behaviour) =>
+    scroll(_param, _pixels, _behaviour);
 </script>
 
 <div class="d-flex flex-column h-100 chat-box">
@@ -53,7 +76,8 @@
           <CloseIcon color={"#8A9299"} />
         </div>
       </div>
-      <div style="flex:1; overflow:auto;">
+
+      <div bind:this={chatContainer} style="flex:1; overflow:auto;">
         <div
           class="d-flex flex-column h-100 align-items-center justify-content-center"
         >
@@ -101,6 +125,7 @@
                   message={chat.message}
                   messageId={chat.messageId}
                   type={chat.type}
+                  status={chat.status}
                   isLiked={chat.isLiked}
                   isDisliked={chat.isDisliked}
                   {onToggleLike}
@@ -111,7 +136,9 @@
                 />
               {/each}
               {#if isResponseGenerating}
-                <p class="p-3 text-primary-300">... Generating</p>
+                <p class="p-3 text-primary-300">
+                  <img src={generatingImage} style="width: 118px;" alt="" />
+                </p>
               {/if}
             </div>
           {/if}

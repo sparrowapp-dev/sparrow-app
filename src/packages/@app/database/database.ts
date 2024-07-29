@@ -192,6 +192,7 @@ export class RxDB {
             oldDoc.property.request.ai.threadId = "";
             oldDoc.property.request.state.isChatbotActive = false;
             oldDoc.property.request.state.isChatbotSuggestionsActive = true;
+            oldDoc.property.request.state.isChatbotGeneratingResponse = false;
             return oldDoc;
           },
         },
