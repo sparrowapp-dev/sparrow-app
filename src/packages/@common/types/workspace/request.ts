@@ -149,6 +149,9 @@ export interface IsBulkHeaderWrapper {
 export interface IsChatbotActive {
   isChatbotActive: boolean;
 }
+export interface IsChatbotSuggestionsActive {
+  isChatbotSuggestionsActive: boolean;
+}
 export interface IsBulkParameterWrapper {
   isParameterBulkEditActive: boolean;
 }
@@ -258,7 +261,8 @@ export interface State
     IsSaveRequestInProgressWrapper,
     IsBulkParameterWrapper,
     IsBulkHeaderWrapper,
-    IsChatbotActive {}
+    IsChatbotActive,
+    IsChatbotSuggestionsActive {}
 
 export interface StatePartial
   extends Partial<RequestBodyLanguageWrapper>,
@@ -277,7 +281,8 @@ export interface StatePartial
     Partial<IsSaveRequestInProgressWrapper>,
     Partial<IsBulkParameterWrapper>,
     Partial<IsBulkHeaderWrapper>,
-    Partial<IsChatbotActive> {}
+    Partial<IsChatbotActive>,
+    Partial<IsChatbotSuggestionsActive> {}
 
 export interface StateWrapper {
   state: State;

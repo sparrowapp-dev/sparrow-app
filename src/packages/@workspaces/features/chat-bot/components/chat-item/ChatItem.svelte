@@ -52,7 +52,7 @@
     <div class="code-header bg-tertiary-300 ps-3 pe-2 py-1 d-flex align-items-center justify-content-between"
     
     style="">
-      <span>${lang?.split("-")[1]}</span>
+      <span>${lang?.split("-")[1] ?? ""}</span>
       <span role="button" class="copy-code-${messageId} action-button d-flex align-items-center justify-content-center border-radius-4">
       <img src=${copyIcon}>
       </span>

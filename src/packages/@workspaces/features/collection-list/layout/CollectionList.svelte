@@ -1,64 +1,9 @@
 <script lang="ts">
-  export let collectionList: Observable<CollectionDocument[]>;
-  export let showImportCollectionPopup: () => void;
-  export let showImportCurlPopup: () => void;
-  export let onItemCreated: (entityType: string, args: any) => void;
-  export let onItemDeleted: (entityType: string, args: any) => void;
-  export let onItemRenamed: (entityType: string, args: any) => void;
-  export let onItemOpened: (entityType: string, args: any) => void;
-  export let onSearchCollection: (
-    collection: CollectionDocument[],
-    searchData: string,
-  ) => {
-    filteredCollection: CollectionDocument[];
-    filteredFile: RequestType[];
-    filteredFolder: Folder[];
-  };
-  export let onBranchSwitched: (collection: CollectionDocument) => void;
-  export let onRefetchCollection: (
-    workspaceId: string,
-    collection: CollectionDocument,
-  ) => void;
-  /**
-   * path of the active tab - collection id, folder id, workspace id
-   */
-  export let activeTabPath;
-  /**
-   * id of the active tab
-   */
-  export let activeTabId;
-  export let userRoleInWorkspace: WorkspaceRole;
-  export let currentWorkspace: Observable<WorkspaceDocument>;
-  export let leftPanelController: {
-    leftPanelCollapse: boolean;
-    handleCollapseCollectionList: () => void;
-  };
-  export let githubRepo;
-  let currentWorkspaceId;
-  currentWorkspace.subscribe((value) => {
-    currentWorkspaceId = value._data._id;
-  });
-  /**
-   * Flag to show app version
-   */
-  export let isAppVersionVisible = true;
-
-  /**
-   * Flag to check is user iu guest user
-   */
-  export let isGuestUser = false;
-
-  /**
-   * Role of user in active workspace
-   */
-  export let userRole;
-
   import {
     Collection,
     EmptyCollection,
     SearchTree,
   } from "@workspaces/features/collection-list/components";
-
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
   import doubleangleRight from "$lib/assets/doubleangleRight.svg";
   import SearchIcon from "$lib/assets/search.svelte";
@@ -98,14 +43,72 @@
   import constants from "$lib/utils/constants";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+
+  export let collectionList: Observable<CollectionDocument[]>;
+  export let showImportCollectionPopup: () => void;
+  export let showImportCurlPopup: () => void;
+  export let onItemCreated: (entityType: string, args: any) => void;
+  export let onItemDeleted: (entityType: string, args: any) => void;
+  export let onItemRenamed: (entityType: string, args: any) => void;
+  export let onItemOpened: (entityType: string, args: any) => void;
+  export let onSearchCollection: (
+    collection: CollectionDocument[],
+    searchData: string,
+  ) => {
+    filteredCollection: CollectionDocument[];
+    filteredFile: RequestType[];
+    filteredFolder: Folder[];
+  };
+  export let onBranchSwitched: (collection: CollectionDocument) => void;
+  export let onRefetchCollection: (
+    workspaceId: string,
+    collection: CollectionDocument,
+  ) => void;
+  /**
+   * path of the active tab - collection id, folder id, workspace id
+   */
+  export let activeTabPath;
+  /**
+   * id of the active tab
+   */
+  export let activeTabId;
+  export let userRoleInWorkspace: WorkspaceRole;
+  export let currentWorkspace: Observable<WorkspaceDocument>;
+  export let leftPanelController: {
+    leftPanelCollapse: boolean;
+    handleCollapseCollectionList: () => void;
+  };
+  export let githubRepo;
+  /**
+   * Flag to show app version
+   */
+  export let isAppVersionVisible = true;
+
+  /**
+   * Flag to check is user iu guest user
+   */
+  export let isGuestUser = false;
+
+  /**
+   * Role of user in active workspace
+   */
+  export let userRole;
+
+  export let scrollList;
+
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
   let searchData: string = "";
   let addButtonMenu: boolean = false;
   let activeWorkspace: WorkspaceDocument;
+  let currentWorkspaceId;
+  currentWorkspace.subscribe((value) => {
+    if (value?._data) {
+      currentWorkspaceId = value._data._id;
+    }
+  });
 
-  export let scrollList;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   let collectionFilter: any = [];

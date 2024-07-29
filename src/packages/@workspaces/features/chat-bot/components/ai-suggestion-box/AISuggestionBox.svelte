@@ -44,6 +44,6 @@
 
   .generate-curl-button:hover {
     background-color: #1e2a47; /* Slightly lighter dark blue on hover */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 2px 2px 12px 0.5px #3670f7;
   }
 </style>
