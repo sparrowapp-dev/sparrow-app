@@ -12,7 +12,10 @@
     DislikeIcon,
     LikeIcon,
     RefreshIcon,
+    SparrowAIIcon,
   } from "@library/icons";
+  import { WithButton } from "@workspaces/common/hoc";
+  import { Tooltip } from "@library/ui";
 
   export let message;
   export let messageId;
@@ -46,11 +49,11 @@
       hljs.highlightBlock(pre.querySelector("code"));
       // Add content or value to the container div
       container.innerHTML = `
-    <div class="code-header bg-tertiary-300 px-3 py-2 d-flex justify-content-between"
+    <div class="code-header bg-tertiary-300 ps-3 pe-2 py-1 d-flex align-items-center justify-content-between"
     
     style="">
       <span>${lang?.split("-")[1]}</span>
-      <span role="button" class="copy-code-${messageId}">
+      <span role="button" class="copy-code-${messageId} action-button d-flex align-items-center justify-content-center border-radius-4">
       <img src=${copyIcon}>
       </span>
     </div>
@@ -129,39 +132,46 @@
   {:else}
     <div class="recieve-item p-3">
       <div class="d-flex justify-content-between">
-        <AISparkle />
-        <div class="d-flex gap-2 pb-2">
-          <span
-            role="button"
-            on:click={() => {
-              onToggleLike(messageId, true);
-            }}
-          >
-            <LikeIcon
-              height={"16px"}
-              width={"16px"}
-              color={isLiked ? "white" : "transparent"}
-            />
-          </span>
-          <span
-            role="button"
-            on:click={() => {
-              onToggleLike(messageId, false);
-            }}
-          >
-            <DislikeIcon
-              height={"16px"}
-              width={"16px"}
-              color={isDisliked ? "white" : "transparent"}
-            />
-          </span>
+        <SparrowAIIcon height={"20px"} width={"20px"} />
+        <div class="d-flex gap-1 pb-2">
+          <Tooltip placement="top" title="Like" distance={13}>
+            <span
+              role="button"
+              class="action-button d-flex align-items-center justify-content-center border-radius-4"
+              on:click={() => {
+                onToggleLike(messageId, true);
+              }}
+            >
+              <LikeIcon
+                height={"16px"}
+                width={"16px"}
+                color={isLiked ? "white" : "transparent"}
+              />
+            </span>
+          </Tooltip>
+          <Tooltip placement="top" title="Dislike" distance={13}>
+            <span
+              class="action-button d-flex align-items-center justify-content-center border-radius-4"
+              role="button"
+              on:click={() => {
+                onToggleLike(messageId, false);
+              }}
+            >
+              <DislikeIcon
+                height={"16px"}
+                width={"16px"}
+                color={isDisliked ? "white" : "transparent"}
+              />
+            </span>
+          </Tooltip>
         </div>
       </div>
       <div class="markdown">{@html extractedMessage}</div>
-      <div class="d-flex gap-2">
+      <div class="d-flex gap-1">
         {#if isLastRecieverMessage}
           <span
             role="button"
+            class="action-button d-flex align-items-center justify-content-center border-radius-4"
             on:click={() => {
               regenerateAiResponse();
             }}
@@ -171,6 +181,7 @@
         {/if}
         <span
           role="button"
+          class="action-button d-flex align-items-center justify-content-center border-radius-4"
           on:click={() => {
             handleCopyResponse();
           }}
@@ -210,5 +221,12 @@
   }
   :global(.message-wrapper .hljs) {
     background: #000 !important;
+  }
+  :global(.action-button) {
+    height: 30px;
+    width: 30px;
+  }
+  :global(.action-button:hover) {
+    background-color: var(--bg-tertiary-190);
   }
 </style>

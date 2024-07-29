@@ -16,7 +16,7 @@
   <div style="flex:1; overflow:auto;">
     <div class="d-flex h-100 flex-column">
       <div class="p-2">
-        <SparrowAIIcon />
+        <SparrowAIIcon height={"28px"} width={"28px"}/>
         <span class="gradient-text">SparrowAI</span>
       </div>
       <div style="flex:1; overflow:auto;">
