@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AISparkle } from "../../assests";
+  import { AISparkle } from "@library/icons";
 
   export let title = "";
   export let onClick: (text: string) => void = () => {};
@@ -11,7 +11,7 @@
     onClick(title);
   }}
 >
-  <AISparkle />
+  <AISparkle height={"20px"} width={"20px"} color={"var(--icon-primary-300)"} />
   <span class="title-txt">{title}</span>
 </div>
 

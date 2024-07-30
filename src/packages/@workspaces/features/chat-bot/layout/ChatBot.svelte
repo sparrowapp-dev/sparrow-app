@@ -6,8 +6,8 @@
     AiChatToggler,
     AISuggestionBox,
   } from "../components";
-  import type { RequestTab } from "@common/types/workspace";
-  import { CloseIcon } from "../assests";
+  import { MessageTypeEnum, type RequestTab } from "@common/types/workspace";
+  import { CrossIcon } from "@library/icons";
   import { onMount } from "svelte";
 
   export let tab: Observable<RequestTab>;
@@ -26,7 +26,7 @@
         {
           message: text,
           messageId: "",
-          type: "SENDER",
+          type: MessageTypeEnum.SENDER,
           isLiked: false,
           isDisliked: false,
           status: true,
@@ -98,9 +98,9 @@
           isChatbotSuggestionsActive: false,
         })}
     >
-      <CloseIcon
-        height={"10px"}
-        width={"10px"}
+      <CrossIcon
+        height={"18px"}
+        width={"18px"}
         color="var(--icon-primary-300)"
       />
     </div>
