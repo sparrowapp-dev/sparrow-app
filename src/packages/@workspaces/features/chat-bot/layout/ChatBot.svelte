@@ -8,6 +8,7 @@
   import { MessageTypeEnum, type RequestTab } from "@common/types/workspace";
   import { CrossIcon } from "@library/icons";
   import { onMount } from "svelte";
+  import type { ScrollList } from "../types";
 
   export let tab: Observable<RequestTab>;
   export let onUpdateAiPrompt;
@@ -16,7 +17,7 @@
   export let onGenerateAiResponse;
   export let onToggleLike;
 
-  let scrollList;
+  let scrollList: ScrollList;
 
   const sendPrompt = async (text: string) => {
     if (text) {
@@ -167,6 +168,3 @@
     />
   </div>
 </div>
-
-<style>
-</style>
