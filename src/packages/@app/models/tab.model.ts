@@ -236,6 +236,12 @@ export const tabSchemaLiteral = {
                 isChatbotGeneratingResponse: {
                   type: "boolean",
                 },
+                isDocAlreadyGenerated: {
+                  type: "boolean",
+                },
+                isDocGenerating: {
+                  type: "boolean",
+                },
               },
             },
             auth: {

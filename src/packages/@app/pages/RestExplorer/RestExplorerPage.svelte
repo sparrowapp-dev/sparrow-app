@@ -53,7 +53,6 @@
       prevTabName = tab.name;
       findUserRole();
       setTimeout(() => {
-        
         _viewModel?.refreshTabData(tab);
       }, 2000);
     }
@@ -166,6 +165,9 @@
   onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
   onRenameCollection={_viewModel.handleRenameCollection}
   onRenameFolder={_viewModel.handleRenameFolder}
+  onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
+  onUpdateAiConversation={_viewModel.updateRequestAIConversation}
+  onGenerateDocumentation={_viewModel.generateDocumentation}
 />
 
 <ChatBot

@@ -159,6 +159,13 @@ export interface IsChatbotGeneratingResponse {
   isChatbotGeneratingResponse: boolean;
 }
 
+export interface IsDocGenerating {
+  isDocGenerating: boolean;
+}
+export interface IsDocAlreadyGenerated {
+  isDocAlreadyGenerated: boolean;
+}
+
 export interface UsernameWrapper {
   username: string;
 }
@@ -266,6 +273,8 @@ export interface State
     IsBulkHeaderWrapper,
     IsChatbotActive,
     IsChatbotSuggestionsActive,
+    IsDocGenerating,
+    IsDocAlreadyGenerated,
     IsChatbotGeneratingResponse {}
 
 export interface StatePartial
@@ -287,7 +296,9 @@ export interface StatePartial
     Partial<IsBulkHeaderWrapper>,
     Partial<IsChatbotActive>,
     Partial<IsChatbotSuggestionsActive>,
-    Partial<IsChatbotGeneratingResponse> {}
+    Partial<IsChatbotGeneratingResponse>,
+    Partial<IsDocAlreadyGenerated>,
+    Partial<IsDocGenerating> {}
 
 export interface StateWrapper {
   state: State;

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { Events } from "$lib/utils/enums";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { GenerateIcon, SendIcon } from "@library/icons";
 
   export let placeholder = "";
@@ -37,6 +39,7 @@
           if (prompt) {
             sendPrompt(prompt);
             onUpdateAiPrompt("");
+            MixpanelEvent(Events.AI_Initiate_Response);
           }
         }}
       >

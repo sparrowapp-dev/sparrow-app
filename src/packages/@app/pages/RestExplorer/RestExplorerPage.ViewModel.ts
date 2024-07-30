@@ -427,7 +427,7 @@ class RestExplorerViewModel
       ..._state,
     };
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
   /**
@@ -1316,7 +1316,7 @@ class RestExplorerViewModel
       isGuestUserActive.subscribe((value) => {
         isGuestUser = value;
       });
-      if(isGuestUser === true){
+      if (isGuestUser === true) {
         return;
       }
       const response = await this.environmentService.updateEnvironment(
@@ -1621,6 +1621,32 @@ class RestExplorerViewModel
     }
     // Set the request state to indicate that the response generation is complete
     await this.updateRequestState({ isChatbotGeneratingResponse: false });
+    return response;
+  };
+
+  /**
+   * Generates documentation for the particular API Request Tab.
+   *
+   * @param prompt - The prompt to be used for generating the documentation.
+   * @returns - The response from the AI assistant service.
+   */
+
+  public generateDocumentation = async (prompt = "") => {
+    await this.updateRequestState({ isDocGenerating: true });
+    const componentData = this._tab.getValue();
+    const response = await this.aiAssistentService.generateAiResponse({
+      text: prompt,
+      instructions: `you are an API instructor, send response only in text format`,
+      threadId: componentData?.property?.request?.ai?.threadId,
+    });
+    if (response.isSuccessful) {
+      await this.updateRequestDescription(response.data.data.result);
+      await this.updateRequestState({
+        isDocAlreadyGenerated: true,
+      });
+    }
+
+    await this.updateRequestState({ isDocGenerating: false });
     return response;
   };
 

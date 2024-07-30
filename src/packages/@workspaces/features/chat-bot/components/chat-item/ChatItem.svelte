@@ -14,6 +14,8 @@
   } from "@library/icons";
   import { SparrowAIIcon } from "@common/icons";
   import { Tooltip } from "@library/ui";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums";
   import { MessageTypeEnum } from "@common/types/workspace";
 
   export let message: string;
@@ -118,6 +120,7 @@
       .catch((err) => {
         console.error("Failed to copy code: ", err);
       });
+    MixpanelEvent(Events.AI_Copy_Response);
   };
 
   let cleanUpListeners: () => void = () => {};
@@ -201,6 +204,7 @@
                 class="action-button d-flex align-items-center justify-content-center border-radius-4"
                 on:click={() => {
                   onToggleLike(messageId, true);
+                  MixpanelEvent(Events.AI_Like_Response);
                 }}
               >
                 <LikeIcon
@@ -216,6 +220,7 @@
                 role="button"
                 on:click={() => {
                   onToggleLike(messageId, false);
+                  MixpanelEvent(Events.AI_Dislike_Response);
                 }}
               >
                 <DislikeIcon

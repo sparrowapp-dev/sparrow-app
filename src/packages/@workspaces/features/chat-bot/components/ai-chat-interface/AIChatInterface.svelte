@@ -4,6 +4,9 @@
   import { AISparkle, CrossIcon } from "@library/icons";
   import { cubicOut } from "svelte/easing";
   import { generatingImage } from "@common/images";
+  import { onMount } from "svelte";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums";
   import type { Conversation } from "@common/types/workspace";
 
   export let conversations: Conversation[] = [];
@@ -118,18 +121,21 @@
                 <AISuggestionBox
                   onClick={(text = "") => {
                     sendPrompt(text);
+                    MixpanelEvent(Events.AI_Int_Gen_Curl_Prompt);
                   }}
                   title="Generate Curl"
                 />
                 <AISuggestionBox
                   onClick={(text = "") => {
                     sendPrompt(text);
+                    MixpanelEvent(Events.AI_Int_Gen_Doc_Prompt);
                   }}
                   title="Generate Documentation"
                 />
                 <AISuggestionBox
                   onClick={(text = "") => {
                     sendPrompt(text);
+                    MixpanelEvent(Events.AI_Int_Gen_Mock_Prompt);
                   }}
                   title="Generate Mock Parameter Data"
                 />

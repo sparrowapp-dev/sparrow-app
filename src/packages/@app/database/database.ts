@@ -193,6 +193,8 @@ export class RxDB {
             oldDoc.property.request.state.isChatbotActive = false;
             oldDoc.property.request.state.isChatbotSuggestionsActive = true;
             oldDoc.property.request.state.isChatbotGeneratingResponse = false;
+            oldDoc.property.request.state.isDocGenerating = false;
+            oldDoc.property.request.state.isDocAlreadyGenerated = false;
             return oldDoc;
           },
         },
