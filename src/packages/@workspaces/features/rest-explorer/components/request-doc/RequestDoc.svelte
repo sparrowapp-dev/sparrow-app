@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { generatingImage } from "@common/images";
   import { notifications } from "@library/ui/toast/Toast";
   import { AISuggestionBox } from "@workspaces/features/chat-bot/components";
   import { onMount } from "svelte";
@@ -59,11 +60,14 @@
       <div style=" width:176px; ">
         {#if isResponseGenerating}
           <div
-            class="text-primary-300"
+            class="text-primary-300 mt-1"
             style="font-size: 14px; height: 20px; width:150px;"
           >
-            <span class="mb-2">...</span>
-            <span> Generating </span>
+            <img
+              style="height: 30px; width:auto;"
+              src={generatingImage}
+              alt="generating"
+            />
           </div>
         {:else}
           <AISuggestionBox
