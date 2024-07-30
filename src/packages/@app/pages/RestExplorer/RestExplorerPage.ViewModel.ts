@@ -427,7 +427,7 @@ class RestExplorerViewModel
       ..._state,
     };
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
   /**
