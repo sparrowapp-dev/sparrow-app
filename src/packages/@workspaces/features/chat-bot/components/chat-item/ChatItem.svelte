@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
+  import { onDestroy } from "svelte";
   import { marked } from "marked";
   import { notifications } from "@library/ui/toast/Toast";
   import { copyIcon } from "../../assests";
@@ -17,8 +17,9 @@
   import P from "@library/typography/p/P.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums";
+  import { MessageTypeEnum } from "@common/types/workspace";
 
-  export let message;
+  export let message: string;
   export let messageId;
   export let type;
   export let isLiked;
@@ -28,7 +29,15 @@
   export let isLastRecieverMessage;
   export let status;
 
-  const decode = (htmlString: string) => {
+  /**
+   * Decodes an HTML string by parsing it, processing <pre><code> elements, and wrapping them
+   * in custom containers with additional copy paste functionality.
+   *
+   * @param htmlString - The HTML string to decode and process.
+   * @returns The processed HTML string.
+   */
+
+  const decodeMessage = (htmlString: string): string => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, "text/html");
 
@@ -43,26 +52,28 @@
 
     // Iterate over each <pre> element
     preElements.forEach((pre) => {
-      // Create a new container div
-      const container = document.createElement("div");
-      container.className = "wrapper";
-      const lang = pre.querySelector("code").getAttribute("class");
-      hljs.highlightBlock(pre.querySelector("code"));
-      // Add content or value to the container div
-      container.innerHTML = `
-    <div class="code-header bg-tertiary-300 ps-3 pe-2 py-1 d-flex align-items-center justify-content-between"
-    
-    style="">
-      <span>${lang?.split("-")[1] ?? ""}</span>
-      <span role="button" class="copy-code-${messageId} action-button d-flex align-items-center justify-content-center border-radius-4">
-      <img src=${copyIcon}>
-      </span>
-    </div>
-      `;
+      if (pre) {
+        // Create a new container div
+        const container = document.createElement("div");
+        container.className = "wrapper";
+        const lang = pre.querySelector("code")?.getAttribute("class");
+        hljs.highlightBlock(pre.querySelector("code"));
+        // Add content or value to the container div
+        container.innerHTML = `
+      <div class="code-header bg-tertiary-300 ps-3 pe-2 py-1 d-flex align-items-center justify-content-between"
+      
+      style="">
+        <span>${lang?.split("-")[1] ?? ""}</span>
+        <span role="button" class="copy-code-${messageId} action-button d-flex align-items-center justify-content-center border-radius-4">
+        <img src=${copyIcon}>
+        </span>
+      </div>
+        `;
 
-      // Move the <pre> element into the new container
-      pre.parentNode.insertBefore(container, pre);
-      container.appendChild(pre);
+        // Move the <pre> element into the new container
+        pre.parentNode?.insertBefore(container, pre);
+        container.appendChild(pre);
+      }
     });
 
     // Serialize the DOM back into a string
@@ -70,21 +81,36 @@
     return serializer.serializeToString(doc);
   };
 
-  const handleCopyClick = (event) => {
-    const target = event.target.closest(".wrapper");
+  /**
+   * Handles the click event to copy code from a specified wrapper to the clipboard.
+   *
+   * @param event - The mouse event triggered by clicking on the wrapper.
+   */
+  const handleCopyCode = (event: MouseEvent) => {
+    const target = (event.target as HTMLElement).closest(
+      ".wrapper",
+    ) as HTMLElement | null;
     if (target) {
-      const code = target.querySelector("pre code").textContent;
-      navigator.clipboard
-        .writeText(code)
-        .then(() => {
-          notifications.success("Code copied to clipboard!");
-        })
-        .catch((err) => {
-          console.error("Failed to copy code: ", err);
-        });
+      const codeElement = target.querySelector(
+        "pre code",
+      ) as HTMLElement | null;
+      if (codeElement) {
+        const code = codeElement.textContent || "";
+        navigator.clipboard
+          .writeText(code)
+          .then(() => {
+            notifications.success("Code copied to clipboard!");
+          })
+          .catch((err) => {
+            console.error("Failed to copy code: ", err);
+          });
+      }
     }
   };
 
+  /**
+   * Handles the response copy to clipboard functionality.
+   */
   const handleCopyResponse = () => {
     const response = message;
     navigator.clipboard
@@ -98,45 +124,49 @@
     MixpanelEvent(Events.AI_Copy_Response);
   };
 
-  let cleanUpListeners;
+  let cleanUpListeners: () => void = () => {};
 
   let extractedMessage = "";
-  onMount(() => {
-    extractedMessage = decode(marked(message));
+
+  /**
+   * Embeds click listeners to copy code from dynamically inserted wrappers.
+   * @returns A promise that resolves when the listeners are embedded.
+   */
+  const embedListenerToCopyCode = async () => {
+    extractedMessage = decodeMessage(await marked(message));
     // Add event listeners to all dynamically inserted wrappers
 
     setTimeout(() => {
       const wrappers = document.querySelectorAll(`.copy-code-${messageId}`);
+
+      // Remove previous event listeners
+      cleanUpListeners();
+
       cleanUpListeners = () => {
         wrappers.forEach((wrapper) => {
-          wrapper.removeEventListener("click", handleCopyClick);
+          wrapper.removeEventListener("click", handleCopyCode);
         });
       };
       wrappers.forEach((wrapper) => {
-        wrapper.addEventListener("click", handleCopyClick);
+        wrapper.addEventListener("click", handleCopyCode);
       });
     }, 200);
-  });
+  };
 
+  /**
+   * Reactive statement to embed listeners for copying code when the message changes.
+   */
   $: {
     if (message) {
-      extractedMessage = decode(marked(message));
-      setTimeout(() => {
-        const wrappers = document.querySelectorAll(`.copy-code-${messageId}`);
-        cleanUpListeners = () => {
-          wrappers.forEach((wrapper) => {
-            wrapper.removeEventListener("click", handleCopyClick);
-          });
-        };
-        wrappers.forEach((wrapper) => {
-          wrapper.addEventListener("click", handleCopyClick);
-        });
-      }, 300);
+      embedListenerToCopyCode();
     }
   }
 
+  /**
+   * Cleanup function to remove event listeners when the component is destroyed.
+   */
   onDestroy(() => {
-    // Clean up event listeners
+    // Clean up event listeners to destroy copy code element
     if (cleanUpListeners) {
       cleanUpListeners();
     }
@@ -144,16 +174,31 @@
 </script>
 
 <div class="message-wrapper">
-  {#if type === "SENDER"}
+  {#if type === MessageTypeEnum.SENDER}
+    <!--
+    -- 
+    -- SENDER
+    -- 
+    -->
     <div class="send-item">
       <p class="my-4 px-3 text-fs-12">{@html message}</p>
     </div>
   {:else}
+    <!--
+    -- 
+    -- RECIEVER
+    -- 
+    -->
     <div class="recieve-item p-3">
       <div class="d-flex justify-content-between">
         <SparrowAIIcon height={"20px"} width={"20px"} />
         <div class="d-flex gap-1 pb-2">
           {#if status}
+            <!--
+            -- 
+            -- LIKE / DISLIKE
+            -- 
+            -->
             <Tooltip placement="top" title="Like" distance={13}>
               <span
                 role="button"
@@ -199,6 +244,11 @@
         </div>
       {/if}
       <div class="d-flex gap-1">
+        <!--
+        -- 
+        -- REGENERATE / COPY
+        -- 
+        -->
         {#if isLastRecieverMessage}
           <span
             role="button"

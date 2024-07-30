@@ -7,8 +7,9 @@
   import { onMount } from "svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums";
+  import type { Conversation } from "@common/types/workspace";
 
-  export let conversations = [];
+  export let conversations: Conversation[] = [];
   export let prompt = "";
   export let onUpdateAiPrompt;
   export let sendPrompt;
@@ -18,10 +19,16 @@
   export let onUpdateRequestState;
   export let scrollList;
 
-  const slide = (node, { duration }) => {
+  /**
+   * A Svelte transition function that animates elements sliding in and out.
+   *
+   * @param node - The DOM element to apply the transition to.
+   * @param params - Configuration object for the transition.
+   */
+  const slide = (node: HTMLElement, { duration }: { duration: number }) => {
     return {
       duration,
-      css: (t) => {
+      css: (t: number) => {
         const easing = cubicOut(t);
         const translateY = (1 - easing) * 20;
         return `
@@ -37,7 +44,11 @@
    * @description - scrolls the list container to top or bottom
    * @param position - decides the direction to scroll
    */
-  const scroll = (_position: "bottom", _pixels: number, _behaviour: string) => {
+  const scroll = (
+    _position: "bottom",
+    _pixels: number,
+    _behaviour: ScrollBehavior,
+  ) => {
     if (_position === "bottom") {
       chatContainer.scrollTo({
         top: _pixels === -1 ? chatContainer.scrollHeight : _pixels,
@@ -49,8 +60,11 @@
   /**
    * @description - triggers child function from parent component
    */
-  $: scrollList = (_param: "bottom", _pixels, _behaviour) =>
-    scroll(_param, _pixels, _behaviour);
+  $: scrollList = (
+    _param: "bottom",
+    _pixels: number,
+    _behaviour: ScrollBehavior,
+  ) => scroll(_param, _pixels, _behaviour);
 </script>
 
 <div class="d-flex flex-column h-100 chat-box">
@@ -175,6 +189,7 @@
 
   .gradient-text {
     background: linear-gradient(to right, #158ff1, #5751fd);
+    background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
     font-size: 16px;

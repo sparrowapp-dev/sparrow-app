@@ -10,6 +10,7 @@
   import { onMount } from "svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums";
+  import type { ScrollList } from "../types";
 
   export let tab: Observable<RequestTab>;
   export let onUpdateAiPrompt;
@@ -18,7 +19,7 @@
   export let onGenerateAiResponse;
   export let onToggleLike;
 
-  let scrollList;
+  let scrollList: ScrollList;
 
   const sendPrompt = async (text: string) => {
     if (text) {
@@ -174,6 +175,3 @@
     />
   </div>
 </div>
-
-<style>
-</style>
