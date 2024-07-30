@@ -241,6 +241,7 @@ export const tabSchemaLiteral = {
                 },
                 isDocGenerating: {
                   type: "boolean",
+                },
               },
             },
             auth: {
