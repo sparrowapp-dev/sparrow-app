@@ -1576,7 +1576,9 @@ class RestExplorerViewModel
     // Call the AI assistant service to generate a response
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
-      instructions: `you are an API instructor and always gives the response in markdown string. always color the code part`,
+      instructions: `You are an AI Assistant, responsible for answering API related queries. Give response only in markdown string and color the code part. Only answers questions related to API and API Managememnt. Now here is the data which you can use to answer the queries related to APIs. ${JSON.stringify(
+        componentData?.property?.request,
+      )}`,
       threadId: componentData?.property?.request?.ai?.threadId,
     });
     if (response.isSuccessful) {
