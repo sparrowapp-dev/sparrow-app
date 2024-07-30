@@ -239,6 +239,8 @@ export const tabSchemaLiteral = {
                 isDocAlreadyGenerated: {
                   type: "boolean",
                 },
+                isDocGenerating: {
+                  type: "boolean",
               },
             },
             auth: {
