@@ -1624,6 +1624,13 @@ class RestExplorerViewModel
     return response;
   };
 
+  /**
+   * Generates documentation for the particular API Request Tab.
+   *
+   * @param prompt - The prompt to be used for generating the documentation.
+   * @returns - The response from the AI assistant service.
+   */
+
   public generateDocumentation = async (prompt = "") => {
     await this.updateRequestState({ isDocGenerating: true });
     const componentData = this._tab.getValue();
