@@ -29,6 +29,8 @@ import { v4 as uuidv4 } from "uuid";
 import { TeamAdapter } from "@app/adapter";
 import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
+import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { Events } from "$lib/utils/enums";
 
 export class DashboardViewModel {
   constructor() {}
@@ -364,6 +366,8 @@ export class DashboardViewModel {
     } else {
       notifications.error(response?.message);
     }
+    MixpanelEvent(Events.Create_New_Workspace_TopBar);
+
     return response;
   };
 

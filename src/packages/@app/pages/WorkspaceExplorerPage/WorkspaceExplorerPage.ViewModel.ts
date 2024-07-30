@@ -1,6 +1,7 @@
 import { user } from "$lib/store";
 import type { addUsersInWorkspacePayload } from "$lib/utils/dto";
-import { WorkspaceRole } from "$lib/utils/enums";
+import { Events, WorkspaceRole } from "$lib/utils/enums";
+import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { throttle } from "$lib/utils/throttle";
 import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
 import type { UpdatesDocType } from "@app/models/updates.model";
@@ -180,6 +181,9 @@ export default class WorkspaceExplorerViewModel {
         `Failed to remove ${workspace.name} from ${workspace?.team?.teamName}. Please try again.`,
       );
     }
+    MixpanelEvent(Events.Delete_Workspace, {
+      source: "delete workspace",
+    });
     return response;
   };
 
@@ -210,6 +214,16 @@ export default class WorkspaceExplorerViewModel {
     } else {
       notifications.error(`Failed to sent invite. Please try again.`);
     }
+    if (_data.role === WorkspaceRole.WORKSPACE_VIEWER) {
+      MixpanelEvent(Events.Invite_To_Workspace_Viewer, {
+        source: "invite to workspace as viewer",
+      });
+    } else if (_data.role === WorkspaceRole.WORKSPACE_EDITOR) {
+      MixpanelEvent(Events.Invite_To_Workspace_Editor, {
+        source: "invite to workspace as editor",
+      });
+    }
+
     return response;
   };
 
@@ -371,7 +385,7 @@ export default class WorkspaceExplorerViewModel {
         `Failed to remove ${_userName} from ${_workspaceName}`,
       );
     }
-
+    MixpanelEvent(Events.Remove_User_Workspace);
     return response;
   };
 
@@ -415,6 +429,7 @@ export default class WorkspaceExplorerViewModel {
         `Failed to change role for ${_userName}. Please try again.`,
       );
     }
+    MixpanelEvent(Events.Workspace_Role_Changed);
     return response;
   };
 }
