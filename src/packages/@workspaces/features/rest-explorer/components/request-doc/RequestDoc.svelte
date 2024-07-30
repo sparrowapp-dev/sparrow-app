@@ -61,7 +61,7 @@
               text =
                 "Re-Generate Documentation for api request, don't give response in markdown format. Make it better.";
               sendPrompt(text);
-              MixpanelEvent(Events.AI_Generate_Doc);
+              MixpanelEvent(Events.AI_Regenerate_Doc);
             }}
             title={"Regenerate"}
           />

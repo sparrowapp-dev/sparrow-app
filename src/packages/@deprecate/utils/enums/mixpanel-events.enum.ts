@@ -62,4 +62,5 @@ export enum Events {
   AI_Like_Response = "AI_Like_Response",
   AI_Dislike_Response = "AI_Dislike_Response",
   AI_Generate_Doc = "AI_Generate_Doc",
+  AI_Regenerate_Doc = "AI_Regenerate_Doc",
 }

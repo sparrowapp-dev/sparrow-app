@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { AISparkle } from "../../assests";
+  import { AISparkle } from "@library/icons";
 
   export let title = "";
   export let onClick: (text: string) => void = () => {};
 </script>
 
 <div
-  class="generate-curl-button"
+  class="suggestion-button"
   on:click={() => {
     onClick(title);
   }}
 >
-  <AISparkle />
+  <AISparkle height={"20px"} width={"20px"} color={"var(--icon-primary-300)"} />
   <span class="title-txt">{title}</span>
 </div>
 
@@ -22,12 +22,12 @@
     color: var(--text-secondary-100);
     padding: 5px;
   }
-  .generate-curl-button {
+  .suggestion-button {
     display: flex;
     align-items: center;
     justify-content: end;
-    background-color: var(--bg-primary-700); /* Dark blue background color */
-    border: 1px solid var(--border-primary-300); /* Blue border color */
+    background-color: var(--bg-primary-700);
+    border: 1px solid var(--border-primary-300);
     border-radius: 4px;
     padding: 5px;
     height: 28px;
@@ -38,12 +38,10 @@
       box-shadow 0.3s;
     margin-bottom: 8px;
     right: 0;
-    /* width: fit-content; */
-    /* text-align: right; */
   }
 
-  .generate-curl-button:hover {
-    background-color: #1e2a47; /* Slightly lighter dark blue on hover */
-    box-shadow: 2px 2px 12px 0.5px #3670f7;
+  .suggestion-button:hover {
+    background-color: #1e2a47;
+    box-shadow: 2px 2px 12px 0.5px var(--bg-primary-300);
   }
 </style>

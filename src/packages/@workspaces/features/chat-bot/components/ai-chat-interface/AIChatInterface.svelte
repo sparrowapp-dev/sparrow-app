@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { SparrowAIIcon } from "@library/icons";
+  import { SparrowAIIcon } from "@common/icons";
   import { AISuggestionBox, PromptInput, ChatItem } from "../";
-  import { AISparkle, CloseIcon } from "../../assests";
+  import { AISparkle, CrossIcon } from "@library/icons";
   import { cubicOut } from "svelte/easing";
   import { generatingImage } from "@common/images";
   import { onMount } from "svelte";
@@ -75,7 +75,7 @@
             })}
           class="close-btn d-flex align-items-center justify-content-center"
         >
-          <CloseIcon color={"#8A9299"} />
+          <CrossIcon height={"18px"} width={"18px"} color={"#8A9299"} />
         </div>
       </div>
 
@@ -90,7 +90,11 @@
               <div></div>
               <div class="d-flex flex-column align-items-center">
                 <span class="pb-3">
-                  <AISparkle />
+                  <AISparkle
+                    height={"20px"}
+                    width={"20px"}
+                    color={"var(--icon-primary-300)"}
+                  />
                 </span>
                 <p class="text-fs-16 mb-1 text-secondary-180">
                   Ask anything or write with AI

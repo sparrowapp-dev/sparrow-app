@@ -11,8 +11,8 @@
     DislikeIcon,
     LikeIcon,
     RefreshIcon,
-    SparrowAIIcon,
   } from "@library/icons";
+  import { SparrowAIIcon } from "@common/icons";
   import { Tooltip } from "@library/ui";
   import P from "@library/typography/p/P.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
@@ -43,7 +43,6 @@
 
     // Iterate over each <pre> element
     preElements.forEach((pre) => {
-      console.log(pre);
       // Create a new container div
       const container = document.createElement("div");
       container.className = "wrapper";
@@ -241,8 +240,6 @@
     font-size: 12px;
   }
   :global(.message-wrapper .markdown pre) {
-    /* background-color: black; */
-    /* padding: 10px; */
     margin-bottom: 0;
   }
 
