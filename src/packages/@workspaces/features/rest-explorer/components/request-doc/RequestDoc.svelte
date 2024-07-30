@@ -6,7 +6,7 @@
   export let onUpdateRequestDescription;
   export let isDocGenerating = false;
   export let isDocAlreadyGenerated = false;
-  export let requestDoc: any;
+  export let requestDoc: string;
   export let onGenerateDocumentation;
 
   const sendPrompt = async (text: string) => {

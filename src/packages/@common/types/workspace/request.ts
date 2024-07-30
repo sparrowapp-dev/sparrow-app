@@ -296,7 +296,9 @@ export interface StatePartial
     Partial<IsBulkHeaderWrapper>,
     Partial<IsChatbotActive>,
     Partial<IsChatbotSuggestionsActive>,
-    Partial<IsChatbotGeneratingResponse> {}
+    Partial<IsChatbotGeneratingResponse>,
+    Partial<IsDocAlreadyGenerated>,
+    Partial<IsDocGenerating> {}
 
 export interface StateWrapper {
   state: State;

@@ -14,7 +14,6 @@
   } from "@library/icons";
   import { SparrowAIIcon } from "@common/icons";
   import { Tooltip } from "@library/ui";
-  import P from "@library/typography/p/P.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums";
   import { MessageTypeEnum } from "@common/types/workspace";
