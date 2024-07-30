@@ -1581,11 +1581,19 @@ class RestExplorerViewModel
     // Set the request state to indicate that a response is being generated
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
+    const apiData = {
+      body: componentData.property.request.body,
+      headers: componentData.property.request.headers,
+      method: componentData.property.request.method,
+      queryParams: componentData.property.request.queryParams,
+      url: componentData.property.request.url,
+      auth: componentData.property.request.auth,
+    };
     // Call the AI assistant service to generate a response
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
       instructions: `You are an AI Assistant, responsible for answering API related queries. Give response only in markdown string and color the code part. Only answers questions related to API and API Managememnt. Now here is the data which you can use to answer the queries related to APIs. ${JSON.stringify(
-        componentData?.property?.request,
+        apiData,
       )}`,
       threadId: componentData?.property?.request?.ai?.threadId,
     });
@@ -1634,9 +1642,19 @@ class RestExplorerViewModel
   public generateDocumentation = async (prompt = "") => {
     await this.updateRequestState({ isDocGenerating: true });
     const componentData = this._tab.getValue();
+    const apiData = {
+      body: componentData.property.request.body,
+      headers: componentData.property.request.headers,
+      method: componentData.property.request.method,
+      queryParams: componentData.property.request.queryParams,
+      url: componentData.property.request.url,
+      auth: componentData.property.request.auth,
+    };
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
-      instructions: `you are an API instructor, send response only in text format`,
+      instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown. Now here is the data which you can use to generate the documentation ${JSON.stringify(
+        apiData,
+      )}`,
       threadId: componentData?.property?.request?.ai?.threadId,
     });
     if (response.isSuccessful) {
