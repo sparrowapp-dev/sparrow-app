@@ -235,8 +235,6 @@
     font-size: 12px;
   }
   :global(.message-wrapper .markdown pre) {
-    /* background-color: black; */
-    /* padding: 10px; */
     margin-bottom: 0;
   }
 
