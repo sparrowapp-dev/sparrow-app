@@ -1306,7 +1306,7 @@ class RestExplorerViewModel
       isGuestUserActive.subscribe((value) => {
         isGuestUser = value;
       });
-      if(isGuestUser === true){
+      if (isGuestUser === true) {
         return;
       }
       const response = await this.environmentService.updateEnvironment(
@@ -1548,6 +1548,16 @@ class RestExplorerViewModel
         },
       ]);
     }
+    return response;
+  };
+
+  public generateDocumentation = async (prompt = "") => {
+    const componentData = this._tab.getValue();
+    const response = await this.aiAssistentService.generateAiResponse({
+      text: prompt,
+      instructions: `you are an API instructor, send response only in text format`,
+      threadId: componentData?.property?.request?.ai?.threadId,
+    });
     return response;
   };
 }

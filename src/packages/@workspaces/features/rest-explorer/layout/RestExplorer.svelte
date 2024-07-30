@@ -98,6 +98,9 @@
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
   export let onUpdateCollectionGuide: (query, isActive) => void;
+  export let onUpdateAiPrompt;
+  export let onUpdateAiConversation;
+  export let onGenerateDocumentation;
   /**
    * Role of user in active workspace
    */
@@ -351,6 +354,10 @@
                     />
                   {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                     <RequestDoc
+                      {onGenerateDocumentation}
+                      {onUpdateAiPrompt}
+                      {onUpdateAiConversation}
+                      {onUpdateRequestState}
                       {onUpdateRequestDescription}
                       requestStateDoc={$tab.description}
                     />

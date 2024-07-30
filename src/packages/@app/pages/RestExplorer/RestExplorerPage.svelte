@@ -162,6 +162,9 @@
   onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
   onRenameCollection={_viewModel.handleRenameCollection}
   onRenameFolder={_viewModel.handleRenameFolder}
+  onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
+  onUpdateAiConversation={_viewModel.updateRequestAIConversation}
+  onGenerateDocumentation={_viewModel.generateDocumentation}
 />
 
 <ChatBot
