@@ -83,6 +83,7 @@ import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
 import { AiAssistantService } from "@app/services/ai-assistant.service";
+import { progressiveTab } from "$lib/store";
 
 class RestExplorerViewModel
   implements
@@ -1519,6 +1520,40 @@ class RestExplorerViewModel
   };
 
   /**
+   * Updates the message property of the last conversation in chunks.
+   *
+   * This function takes a string `data`, divides it into chunks of size `chunkSize`,
+   * and appends each chunk to the last conversation message in the component's data.
+   * The chunks are appended at intervals specified by `delay`.
+   *
+   * @param data - The string data to be displayed in chunks.
+   * @param chunkSize - The number of characters per chunk.
+   * @param delay - The delay in milliseconds between each chunk display.
+   */
+  private displayDataInChunks = (data, chunkSize, delay) => {
+    let index = 0;
+
+    const displayNextChunk = () => {
+      if (index < data.length) {
+        const chunk = data.slice(index, index + chunkSize);
+        const componentData = this._tab.getValue();
+        const length =
+          componentData?.property?.request?.ai?.conversations.length;
+        componentData.property.request.ai.conversations[length - 1].message =
+          componentData.property.request.ai.conversations[length - 1].message +
+          chunk;
+        this.updateRequestAIConversation([
+          ...componentData.property.request.ai.conversations,
+        ]);
+        index += chunkSize;
+        setTimeout(displayNextChunk, delay);
+      }
+    };
+
+    displayNextChunk();
+  };
+
+  /**
    * Get workspace data through workspace id
    * @param workspaceId - id of workspace
    * @returns - workspace document
@@ -1528,6 +1563,7 @@ class RestExplorerViewModel
   };
 
   public generateAiResponse = async (prompt = "") => {
+    await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
@@ -1540,14 +1576,29 @@ class RestExplorerViewModel
       this.updateRequestAIConversation([
         ...componentData?.property?.request?.ai?.conversations,
         {
-          message: data.result,
+          message: "",
+          messageId: data.messageId,
+          type: "RECEIVER",
+          isLiked: false,
+          isDisliked: false,
+          status: true,
+        },
+      ]);
+      this.displayDataInChunks(data.result, 100, 300);
+    } else {
+      this.updateRequestAIConversation([
+        ...componentData?.property?.request?.ai?.conversations,
+        {
+          message: "Something went wrong! Please try again.",
           messageId: uuidv4(),
           type: "RECEIVER",
           isLiked: false,
           isDisliked: false,
+          status: false,
         },
       ]);
     }
+    await this.updateRequestState({ isChatbotGeneratingResponse: false });
     return response;
   };
 
@@ -1559,6 +1610,51 @@ class RestExplorerViewModel
       threadId: componentData?.property?.request?.ai?.threadId,
     });
     return response;
+  };
+  public toggleChatMessageLike = (_messageId: string, _flag: boolean) => {
+    const componentData = this._tab.getValue();
+    const data = componentData?.property?.request?.ai;
+    this.aiAssistentService.updateAiStats(data.threadId, _messageId, _flag);
+    const convo = data?.conversations?.map((elem) => {
+      if (elem.messageId === _messageId) {
+        if (_flag) {
+          elem.isLiked = true;
+          elem.isDisliked = false;
+        } else {
+          elem.isLiked = false;
+          elem.isDisliked = true;
+        }
+      }
+      return elem;
+    });
+    this.updateRequestAIConversation(convo);
+  };
+
+  public refreshTabData = (tab) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (progressiveTab?.property?.request?.ai?.conversations) {
+      const AiConversationClient =
+        progressiveTab?.property?.request?.ai.conversations;
+      const AiConversationServer = tab.property.request.ai.conversations;
+      if (AiConversationServer.length > AiConversationClient.length) {
+        progressiveTab.property.request.ai.conversations =
+          tab.property.request.ai.conversations;
+        this.tab = progressiveTab;
+      }
+    }
+    if (progressiveTab?.property?.request?.state) {
+      const isChatbotGeneratingResponseClient =
+        progressiveTab?.property?.request?.state?.isChatbotGeneratingResponse;
+      const isChatbotGeneratingResponseServer =
+        tab.property.request.state.isChatbotGeneratingResponse;
+      if (
+        isChatbotGeneratingResponseServer !== isChatbotGeneratingResponseClient
+      ) {
+        progressiveTab.property.request.state.isChatbotGeneratingResponse =
+          tab.property.request.state.isChatbotGeneratingResponse;
+        this.tab = progressiveTab;
+      }
+    }
   };
 }
 

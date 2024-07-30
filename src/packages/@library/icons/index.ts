@@ -48,3 +48,7 @@ export { default as CrossIconRounded } from "./CrossIconRounded.svelte";
 export { default as SparrowAIIcon } from "./SparrowAI.svelte";
 export { default as SendIcon } from "./Send.svelte";
 export { default as GenerateIcon } from "./Generate.svelte";
+export { default as LikeIcon } from "./Like.svelte";
+export { default as DislikeIcon } from "./Dislike.svelte";
+export { default as RefreshIcon } from "./Refresh.svelte";
+export { default as CopyIcon2 } from "./Copy2.svelte";

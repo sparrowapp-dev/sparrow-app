@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Observable } from "rxjs";
+  // import { fade } from "svelte/transition";
   import {
     AIChatInterface,
     AiChatToggler,
@@ -7,18 +8,19 @@
   } from "../components";
   import type { RequestTab } from "@common/types/workspace";
   import { CloseIcon } from "../assests";
-  let isChatBoxOpen = false;
+  import { onMount } from "svelte";
 
   export let tab: Observable<RequestTab>;
   export let onUpdateAiPrompt;
   export let onUpdateAiConversation;
   export let onUpdateRequestState;
   export let onGenerateAiResponse;
+  export let onToggleLike;
 
-  let isResponseGenerating = false;
+  let scrollList;
+
   const sendPrompt = async (text: string) => {
     if (text) {
-      isResponseGenerating = true;
       onUpdateAiConversation([
         ...$tab?.property?.request?.ai?.conversations,
         {
@@ -27,11 +29,32 @@
           type: "SENDER",
           isLiked: false,
           isDisliked: false,
+          status: true,
         },
       ]);
+      setTimeout(() => {
+        scrollList("bottom", -1, "smooth");
+      }, 10);
       const response = await onGenerateAiResponse(text, "", "");
-      isResponseGenerating = false;
+      setTimeout(() => {
+        scrollList("bottom", -1, "smooth");
+      }, 10);
     }
+  };
+
+  onMount(() => {
+    setTimeout(() => {
+      scrollList("bottom", -1, "auto");
+    }, 10);
+  });
+
+  const regenerateAiResponse = async () => {
+    const regenerateConversation =
+      $tab?.property?.request?.ai?.conversations.slice(0, -1);
+    onUpdateAiConversation(regenerateConversation);
+    const response = await onGenerateAiResponse(
+      regenerateConversation[regenerateConversation.length - 1].message,
+    );
   };
 </script>
 
@@ -50,8 +73,12 @@
       prompt={$tab?.property?.request?.ai?.prompt}
       {onUpdateAiPrompt}
       {sendPrompt}
-      {isResponseGenerating}
+      isResponseGenerating={$tab?.property?.request?.state
+        ?.isChatbotGeneratingResponse}
+      {onToggleLike}
+      {regenerateAiResponse}
       {onUpdateRequestState}
+      bind:scrollList
     />
   </div>
 {/if}
@@ -77,40 +104,46 @@
         color="var(--icon-primary-300)"
       />
     </div>
-    <AISuggestionBox
-      onClick={(text = "") => {
-        if (!isResponseGenerating) {
-          sendPrompt(text);
-          onUpdateRequestState({
-            isChatbotActive: true,
-          });
-        }
-      }}
-      title="Generate Curl"
-    />
-    <AISuggestionBox
-      onClick={(text = "") => {
-        if (!isResponseGenerating) {
-          sendPrompt(text);
-          onUpdateRequestState({
-            isChatbotActive: true,
-          });
-        }
-      }}
-      title="Generate Documentation"
-    />
-    <!-- commmet -->
-    <AISuggestionBox
-      onClick={(text = "") => {
-        if (!isResponseGenerating) {
-          sendPrompt(text);
-          onUpdateRequestState({
-            isChatbotActive: true,
-          });
-        }
-      }}
-      title="Generate Mock Data"
-    />
+    <div class="d-flex flex-column align-items-end">
+      <!-- <div
+      class="d-flex flex-column align-items-end"
+      in:fade={{ duration: 200 }}
+      out:fade={{ duration: 200 }}
+    > -->
+      <AISuggestionBox
+        onClick={(text = "") => {
+          if (!$tab?.property?.request?.state?.isChatbotGeneratingResponse) {
+            sendPrompt(text);
+            onUpdateRequestState({
+              isChatbotActive: true,
+            });
+          }
+        }}
+        title="Generate Curl"
+      />
+      <AISuggestionBox
+        onClick={(text = "") => {
+          if (!$tab?.property?.request?.state?.isChatbotGeneratingResponse) {
+            sendPrompt(text);
+            onUpdateRequestState({
+              isChatbotActive: true,
+            });
+          }
+        }}
+        title="Generate Documentation"
+      />
+      <AISuggestionBox
+        onClick={(text = "") => {
+          if (!$tab?.property?.request?.state?.isChatbotGeneratingResponse) {
+            sendPrompt(text);
+            onUpdateRequestState({
+              isChatbotActive: true,
+            });
+          }
+        }}
+        title="Generate Mock Data"
+      />
+    </div>
   </div>
 {/if}
 <div

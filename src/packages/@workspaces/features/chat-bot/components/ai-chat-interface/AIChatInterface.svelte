@@ -2,16 +2,60 @@
   import { SparrowAIIcon } from "@library/icons";
   import { AISuggestionBox, PromptInput, ChatItem } from "../";
   import { AISparkle, CloseIcon } from "../../assests";
+  import { cubicOut } from "svelte/easing";
+  import { generatingImage } from "@common/images";
+  import { onMount } from "svelte";
 
   export let conversations = [];
   export let prompt = "";
   export let onUpdateAiPrompt;
   export let sendPrompt;
   export let isResponseGenerating;
+  export let onToggleLike;
+  export let regenerateAiResponse;
   export let onUpdateRequestState;
+  export let scrollList;
+
+  const slide = (node, { duration }) => {
+    return {
+      duration,
+      css: (t) => {
+        const easing = cubicOut(t);
+        const translateY = (1 - easing) * 20;
+        return `
+          transform: translateY(${translateY}%);
+
+        `;
+      },
+    };
+  };
+
+  let chatContainer: HTMLElement;
+  /**
+   * @description - scrolls the list container to top or bottom
+   * @param position - decides the direction to scroll
+   */
+  const scroll = (_position: "bottom", _pixels: number, _behaviour: string) => {
+    if (_position === "bottom") {
+      chatContainer.scrollTo({
+        top: _pixels === -1 ? chatContainer.scrollHeight : _pixels,
+        behavior: _behaviour,
+      });
+    }
+  };
+
+  /**
+   * @description - triggers child function from parent component
+   */
+  $: scrollList = (_param: "bottom", _pixels, _behaviour) =>
+    scroll(_param, _pixels, _behaviour);
 </script>
 
 <div class="d-flex flex-column h-100 chat-box">
+  <!-- <div
+  class="d-flex flex-column h-100 chat-box"
+  transition:slide={{ duration: 400 }}
+> -->
   <div style="flex:1; overflow:auto;">
     <div class="d-flex h-100 flex-column">
       <div
@@ -19,7 +63,7 @@
         style="justify-content: space-between; align-items:center"
       >
         <div class="p-2">
-          <SparrowAIIcon />
+          <SparrowAIIcon height={"28px"} width={"28px"} />
           <span class="gradient-text">SparrowAI</span>
         </div>
         <div
@@ -27,12 +71,13 @@
             onUpdateRequestState({
               isChatbotActive: false,
             })}
-          class="close-btn"
+          class="close-btn d-flex align-items-center justify-content-center"
         >
           <CloseIcon color={"#8A9299"} />
         </div>
       </div>
-      <div style="flex:1; overflow:auto;">
+
+      <div bind:this={chatContainer} style="flex:1; overflow:auto;">
         <div
           class="d-flex flex-column h-100 align-items-center justify-content-center"
         >
@@ -42,9 +87,13 @@
             >
               <div></div>
               <div class="d-flex flex-column align-items-center">
-                <AISparkle />
-                <p class="text-fs-16 mb-1">Ask anything or write with AI</p>
-                <p class="text-fs-12">
+                <span class="pb-3">
+                  <AISparkle />
+                </span>
+                <p class="text-fs-16 mb-1 text-secondary-180">
+                  Ask anything or write with AI
+                </p>
+                <p class="text-fs-12 text-secondary-250">
                   Use AI to Quickly search for any Information
                 </p>
               </div>
@@ -71,15 +120,25 @@
             </div>
           {:else}
             <div class="h-100 w-100">
-              {#each conversations as chat}
+              {#each conversations as chat, index}
                 <ChatItem
                   message={chat.message}
                   messageId={chat.messageId}
                   type={chat.type}
+                  status={chat.status}
+                  isLiked={chat.isLiked}
+                  isDisliked={chat.isDisliked}
+                  {onToggleLike}
+                  {regenerateAiResponse}
+                  isLastRecieverMessage={conversations.length - 1 === index
+                    ? true
+                    : false}
                 />
               {/each}
               {#if isResponseGenerating}
-                <p class="p-3 text-primary-300">... Generating</p>
+                <p class="p-3 text-primary-300">
+                  <img src={generatingImage} style="width: 118px;" alt="" />
+                </p>
               {/if}
             </div>
           {/if}
@@ -117,8 +176,8 @@
   .close-btn {
     cursor: pointer;
     margin-right: 10px;
-    padding-left: 6px;
-    padding-right: 6px;
+    height: 30px;
+    width: 30px;
     border-radius: 4px;
   }
   .close-btn:hover {
