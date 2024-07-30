@@ -74,6 +74,8 @@ import {
   type KeyValue,
   type RequestTab,
   type StatePartial,
+  type Conversation,
+  MessageTypeEnum,
 } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
 import { RequestTabAdapter } from "@app/adapter/request-tab";
@@ -83,7 +85,6 @@ import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
 import { AiAssistantService } from "@app/services/ai-assistant.service";
-import { progressiveTab } from "$lib/store";
 
 class RestExplorerViewModel
   implements
@@ -300,8 +301,10 @@ class RestExplorerViewModel
   };
 
   /**
+   * Updates the AI prompt in the request property of the current tab.
    *
-   * @param _name - request name
+   * @param  _prompt - The new AI prompt to set.
+   * @returns A promise that resolves when the update is complete.
    */
   public updateRequestAIPrompt = async (_prompt: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
@@ -311,8 +314,10 @@ class RestExplorerViewModel
   };
 
   /**
+   * Updates the AI thread ID in the request property of the current tab.
    *
-   * @param _name - request name
+   * @param _threadId - The new AI thread ID to set.
+   * @returns A promise that resolves when the update is complete.
    */
   public updateRequestAIThread = async (_threadId: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
@@ -322,10 +327,14 @@ class RestExplorerViewModel
   };
 
   /**
+   * Updates the AI conversations in the request property of the current tab.
    *
-   * @param _name - request name
+   * @param _conversations - The new AI conversations to set.
+   * @returns  A promise that resolves when the update is complete.
    */
-  public updateRequestAIConversation = async (_conversations: string[]) => {
+  public updateRequestAIConversation = async (
+    _conversations: Conversation[],
+  ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.ai.conversations = _conversations;
     this.tab = progressiveTab;
@@ -1554,9 +1563,17 @@ class RestExplorerViewModel
     return await this.workspaceRepository.readWorkspace(workspaceId);
   };
 
+  /**
+   * Generates an AI response based on the given prompt.
+   *
+   * @param prompt - The prompt to send to the AI assistant service.
+   * @returns A promise that resolves to the response from the AI assistant service.
+   */
   public generateAiResponse = async (prompt = "") => {
+    // Set the request state to indicate that a response is being generated
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
+    // Call the AI assistant service to generate a response
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
       instructions: `you are an API instructor and always gives the response in markdown string. always color the code part`,
@@ -1564,13 +1581,14 @@ class RestExplorerViewModel
     });
     if (response.isSuccessful) {
       const data = response.data.data;
+      // Update the AI thread ID and conversation with the new data
       this.updateRequestAIThread(data.threadId);
       this.updateRequestAIConversation([
         ...componentData?.property?.request?.ai?.conversations,
         {
           message: "",
           messageId: data.messageId,
-          type: "RECEIVER",
+          type: MessageTypeEnum.RECEIVER,
           isLiked: false,
           isDisliked: false,
           status: true,
@@ -1578,26 +1596,36 @@ class RestExplorerViewModel
       ]);
       this.displayDataInChunks(data.result, 100, 300);
     } else {
+      // Update the conversation with an error message
       this.updateRequestAIConversation([
         ...componentData?.property?.request?.ai?.conversations,
         {
           message: "Something went wrong! Please try again.",
           messageId: uuidv4(),
-          type: "RECEIVER",
+          type: MessageTypeEnum.RECEIVER,
           isLiked: false,
           isDisliked: false,
           status: false,
         },
       ]);
     }
+    // Set the request state to indicate that the response generation is complete
     await this.updateRequestState({ isChatbotGeneratingResponse: false });
     return response;
   };
 
+  /**
+   * Toggles the like or dislike status of a chat message.
+   *
+   * @param _messageId - The ID of the message to update.
+   * @param  _flag - The flag indicating whether the message is liked (true) or disliked (false).
+   */
   public toggleChatMessageLike = (_messageId: string, _flag: boolean) => {
     const componentData = this._tab.getValue();
     const data = componentData?.property?.request?.ai;
     this.aiAssistentService.updateAiStats(data.threadId, _messageId, _flag);
+
+    // Map through the conversations and update the like or dislike status of the specified message
     const convo = data?.conversations?.map((elem) => {
       if (elem.messageId === _messageId) {
         if (_flag) {
@@ -1613,7 +1641,12 @@ class RestExplorerViewModel
     this.updateRequestAIConversation(convo);
   };
 
-  public refreshTabData = (tab) => {
+  /**
+   * Refreshes the tab data by updating conversations and chatbot state from the server.
+   *
+   * @param tab - The tab data from the server to refresh the current tab data with.
+   */
+  public refreshTabData = (tab: RequestTab) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     if (progressiveTab?.property?.request?.ai?.conversations) {
       const AiConversationClient =

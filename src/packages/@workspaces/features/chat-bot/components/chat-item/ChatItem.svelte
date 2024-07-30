@@ -11,8 +11,8 @@
     DislikeIcon,
     LikeIcon,
     RefreshIcon,
-    SparrowAIIcon,
   } from "@library/icons";
+  import { SparrowAIIcon } from "@common/icons";
   import { Tooltip } from "@library/ui";
   import P from "@library/typography/p/P.svelte";
 
@@ -41,7 +41,6 @@
 
     // Iterate over each <pre> element
     preElements.forEach((pre) => {
-      console.log(pre);
       // Create a new container div
       const container = document.createElement("div");
       container.className = "wrapper";
