@@ -9,6 +9,8 @@
   import type { RequestTab } from "@common/types/workspace";
   import { CloseIcon } from "../assests";
   import { onMount } from "svelte";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums";
 
   export let tab: Observable<RequestTab>;
   export let onUpdateAiPrompt;
@@ -54,6 +56,7 @@
     onUpdateAiConversation(regenerateConversation);
     const response = await onGenerateAiResponse(
       regenerateConversation[regenerateConversation.length - 1].message,
+      MixpanelEvent(Events.AI_Regenerate_Response),
     );
   };
 </script>
@@ -118,6 +121,7 @@
               isChatbotActive: true,
             });
           }
+          MixpanelEvent(Events.AI_Ext_Gen_Curl_Prompt);
         }}
         title="Generate Curl"
       />
@@ -129,6 +133,7 @@
               isChatbotActive: true,
             });
           }
+          MixpanelEvent(Events.AI_Ext_Gen_Doc_Prompt);
         }}
         title="Generate Documentation"
       />
@@ -140,6 +145,7 @@
               isChatbotActive: true,
             });
           }
+          MixpanelEvent(Events.AI_Ext_Gen_Mock_Prompt);
         }}
         title="Generate Mock Data"
       />
@@ -159,6 +165,7 @@
       onUpdateRequestState({
         isChatbotActive: !$tab?.property?.request?.state?.isChatbotActive,
       });
+      MixpanelEvent(Events.AI_Chat_Initiation);
     }}
   >
     <AiChatToggler

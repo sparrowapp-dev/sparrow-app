@@ -1603,14 +1603,24 @@ class RestExplorerViewModel
   };
 
   public generateDocumentation = async (prompt = "") => {
+    await this.updateRequestState({ isDocGenerating: true });
     const componentData = this._tab.getValue();
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
       instructions: `you are an API instructor, send response only in text format`,
       threadId: componentData?.property?.request?.ai?.threadId,
     });
+    if (response.isSuccessful) {
+      await this.updateRequestDescription(response.data.data.result);
+      await this.updateRequestState({
+        isDocAlreadyGenerated: true,
+      });
+    }
+
+    await this.updateRequestState({ isDocGenerating: false });
     return response;
   };
+
   public toggleChatMessageLike = (_messageId: string, _flag: boolean) => {
     const componentData = this._tab.getValue();
     const data = componentData?.property?.request?.ai;

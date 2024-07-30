@@ -1,41 +1,17 @@
 <script lang="ts">
+  import { Events } from "$lib/utils/enums";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { generatingImage } from "@common/images";
-  import { notifications } from "@library/ui/toast/Toast";
   import { AISuggestionBox } from "@workspaces/features/chat-bot/components";
-  import { onMount } from "svelte";
   export let onUpdateRequestDescription;
+  export let isDocGenerating = false;
+  export let isDocAlreadyGenerated = false;
+  export let requestDoc: any;
   export let onGenerateDocumentation;
-  export let requestStateDoc;
-  let textareaRef: HTMLTextAreaElement | null = null;
-  let docValue = "";
-  let description: string = "";
-  let isResponseGenerating = false;
-
-  onMount(() => {
-    docValue = requestStateDoc;
-  });
 
   const sendPrompt = async (text: string) => {
     if (text) {
-      isResponseGenerating = true;
       const response = await onGenerateDocumentation(text, "", "");
-      if (response?.status == "success") {
-        docValue = response.data?.data?.result;
-        onUpdateRequestDescription(docValue);
-      } else {
-        notifications.error("Failed to generate documentation");
-        docValue = "Failed to generate documentation";
-      }
-    }
-    isResponseGenerating = false;
-    return docValue;
-  };
-
-  const handleSaveChanges = () => {
-    if (textareaRef) {
-      description = textareaRef.value;
-      onUpdateRequestDescription(description);
-      notifications.success("Documentation updated successfully");
     }
   };
 </script>
@@ -46,9 +22,10 @@
   </div>
   <div style="height: 160px !important; " class="area">
     <textarea
-      bind:this={textareaRef}
-      on:blur={handleSaveChanges}
-      value={docValue}
+      bind:value={requestDoc}
+      on:input={() => {
+        onUpdateRequestDescription(requestDoc);
+      }}
       class="text-fs-12 w-100 border-0"
       style="height:120px !important; font-weight:400; background-color:transparent; outline: none;   padding-bottom:5px; padding-top: 8px; padding-left: 12px; padding-right: 12px;"
       placeholder="Add Documentation"
@@ -57,11 +34,11 @@
       class=""
       style="height: 42px; width: 100%;margin-top:-6px; padding-bottom:8px; padding-left:8px; "
     >
-      <div style=" width:176px; ">
-        {#if isResponseGenerating}
+      <div style="width:fit-content; margin-top:6px; ">
+        {#if isDocGenerating == true}
           <div
             class="text-primary-300 mt-1"
-            style="font-size: 14px; height: 20px; width:150px;"
+            style="font-size: 14px; height: 20px; width:auto;"
           >
             <img
               style="height: 30px; width:auto;"
@@ -69,16 +46,24 @@
               alt="generating"
             />
           </div>
-        {:else}
+        {:else if isDocAlreadyGenerated == false}
           <AISuggestionBox
             onClick={(text = "") => {
-              if (!isResponseGenerating) {
-                text =
-                  "Generate Documentation for api request, don't give response in markdown format";
-                sendPrompt(text);
-              }
+              ("Generate Documentation for api request, don't give response in markdown format");
+              sendPrompt(text);
+              MixpanelEvent(Events.AI_Generate_Doc);
             }}
-            title="Generate Documentation"
+            title={"Generate Documentation"}
+          />
+        {:else if isDocAlreadyGenerated == true}
+          <AISuggestionBox
+            onClick={(text = "") => {
+              text =
+                "Re-Generate Documentation for api request, don't give response in markdown format. Make it better.";
+              sendPrompt(text);
+              MixpanelEvent(Events.AI_Generate_Doc);
+            }}
+            title={"Regenerate"}
           />
         {/if}
       </div>

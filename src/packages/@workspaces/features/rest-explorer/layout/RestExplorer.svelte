@@ -354,12 +354,13 @@
                     />
                   {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                     <RequestDoc
+                      isDocGenerating={$tab.property.request?.state
+                        ?.isDocGenerating}
+                      isDocAlreadyGenerated={$tab.property.request?.state
+                        ?.isDocAlreadyGenerated}
                       {onGenerateDocumentation}
-                      {onUpdateAiPrompt}
-                      {onUpdateAiConversation}
-                      {onUpdateRequestState}
                       {onUpdateRequestDescription}
-                      requestStateDoc={$tab.description}
+                      requestDoc={$tab.description}
                     />
                   {/if}
                 </div>

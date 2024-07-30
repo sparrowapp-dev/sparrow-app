@@ -15,6 +15,8 @@
   } from "@library/icons";
   import { Tooltip } from "@library/ui";
   import P from "@library/typography/p/P.svelte";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums";
 
   export let message;
   export let messageId;
@@ -94,6 +96,7 @@
       .catch((err) => {
         console.error("Failed to copy code: ", err);
       });
+    MixpanelEvent(Events.AI_Copy_Response);
   };
 
   let cleanUpListeners;
@@ -158,6 +161,7 @@
                 class="action-button d-flex align-items-center justify-content-center border-radius-4"
                 on:click={() => {
                   onToggleLike(messageId, true);
+                  MixpanelEvent(Events.AI_Like_Response);
                 }}
               >
                 <LikeIcon
@@ -173,6 +177,7 @@
                 role="button"
                 on:click={() => {
                   onToggleLike(messageId, false);
+                  MixpanelEvent(Events.AI_Dislike_Response);
                 }}
               >
                 <DislikeIcon
