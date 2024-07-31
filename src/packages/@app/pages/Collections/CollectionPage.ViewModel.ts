@@ -649,7 +649,6 @@ export default class CollectionsViewModel {
       items: [],
       createdAt: new Date().toISOString(),
     };
-    // const isGuestUser = await this.getGuestUserState();
     let response;
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
