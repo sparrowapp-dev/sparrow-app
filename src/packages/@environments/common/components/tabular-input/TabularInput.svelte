@@ -248,7 +248,7 @@
                   />
                 </div>
               </div>
-              {#if pairs.length - 1 != index || !disabled}
+              {#if pairs.length - 1 != index && !disabled}
                 <div class="h-75 pe-1">
                   <button
                     class="bg-secondary-700 border-0"

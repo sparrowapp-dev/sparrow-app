@@ -31,6 +31,10 @@
     _viewModel.updateNameWithCollectionList,
     1000,
   );
+  const debouncedAPIUpdater = new Debounce().debounce(
+    _viewModel?.refreshTabData,
+    1000,
+  );
   let prevTabName = "";
   /**
    * Find the role of user in active workspace
@@ -52,9 +56,10 @@
       }
       prevTabName = tab.name;
       findUserRole();
-      setTimeout(() => {
-        _viewModel?.refreshTabData(tab);
-      }, 2000);
+      // setTimeout(() => {
+      //   _viewModel?.refreshTabData(tab);
+      // }, 2000);
+      debouncedAPIUpdater(tab);
     }
   }
 

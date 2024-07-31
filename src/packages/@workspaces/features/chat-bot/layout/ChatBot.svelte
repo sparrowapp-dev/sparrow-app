@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Observable } from "rxjs";
+  // import { fade } from "svelte/transition";
   import {
     AIChatInterface,
     AiChatToggler,
