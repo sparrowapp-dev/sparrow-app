@@ -1702,7 +1702,9 @@ class RestExplorerViewModel
    */
   public refreshTabData = (tab: RequestTab) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
+
     if (progressiveTab?.property?.request?.ai?.conversations) {
+      // Handles AiConversationClient state
       const AiConversationClient =
         progressiveTab?.property?.request?.ai.conversations;
       const AiConversationServer = tab.property.request.ai.conversations;
@@ -1713,6 +1715,7 @@ class RestExplorerViewModel
       }
     }
     if (progressiveTab?.property?.request?.state) {
+      // Handles isChatbotGeneratingResponseClient state
       const isChatbotGeneratingResponseClient =
         progressiveTab?.property?.request?.state?.isChatbotGeneratingResponse;
       const isChatbotGeneratingResponseServer =
@@ -1722,6 +1725,34 @@ class RestExplorerViewModel
       ) {
         progressiveTab.property.request.state.isChatbotGeneratingResponse =
           tab.property.request.state.isChatbotGeneratingResponse;
+        this.tab = progressiveTab;
+      }
+      // Handles isDocGenerating state
+      const isDocGeneratingClient =
+        progressiveTab?.property?.request?.state?.isDocGenerating;
+      const isDocGeneratingServer = tab.property.request.state.isDocGenerating;
+      if (isDocGeneratingServer !== isDocGeneratingClient) {
+        progressiveTab.property.request.state.isDocGenerating =
+          tab.property.request.state.isDocGenerating;
+        this.tab = progressiveTab;
+      }
+      // Handles isDocAlreadyGeneratedClient state
+      const isDocAlreadyGeneratedClient =
+        progressiveTab?.property?.request?.state?.isDocAlreadyGenerated;
+      const isDocAlreadyGeneratedServer =
+        tab.property.request.state.isDocAlreadyGenerated;
+      if (isDocAlreadyGeneratedServer !== isDocAlreadyGeneratedClient) {
+        progressiveTab.property.request.state.isDocAlreadyGenerated =
+          tab.property.request.state.isDocAlreadyGenerated;
+        this.tab = progressiveTab;
+      }
+    }
+    if (progressiveTab) {
+      // Handles apiDescriptionClient state
+      const apiDescriptionClient = progressiveTab?.description;
+      const apiDescriptionServer = tab.description;
+      if (apiDescriptionServer !== apiDescriptionClient) {
+        progressiveTab.description = tab.description;
         this.tab = progressiveTab;
       }
     }
