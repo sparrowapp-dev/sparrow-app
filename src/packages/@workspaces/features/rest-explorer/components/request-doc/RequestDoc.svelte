@@ -3,7 +3,6 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { generatingImage } from "@common/images";
   import { AISuggestionBox } from "@workspaces/features/chat-bot/components";
-  import { tick } from "svelte";
   export let onUpdateRequestDescription;
   export let isDocGenerating = false;
   export let isDocAlreadyGenerated = false;
