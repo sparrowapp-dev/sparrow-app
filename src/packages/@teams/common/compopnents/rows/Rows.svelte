@@ -8,6 +8,9 @@
   export let activeTeam;
   export let onOpenCollection: (id: string) => void;
   export let calculateTimeDifferenceInDays;
+
+  export let getWorkspaceDetails;
+
   /**
    * Checks if the current user has admin or owner privileges.
    */
@@ -17,7 +20,6 @@
   let pos = { x: 0, y: 0 };
   let showMenu = false;
   let workspaceTabWrapper: HTMLElement;
-
 
   let menuItems = [];
   let noOfColumns = 180;
@@ -39,6 +41,17 @@
             onOpenCollection(list._id);
           },
           displayText: "Open Workspace",
+          disabled: false,
+        },
+        {
+          onClick: () => {
+            getWorkspaceDetails({
+              workspaceID: list._id,
+              workspaceName: list.name,
+              users: list.users,
+            });
+          },
+          displayText: "Add Members",
           disabled: false,
         },
         {
@@ -132,7 +145,7 @@
   >
   <td class="tab-data rounded-end py-3">
     <button
-    bind:this={workspaceTabWrapper}
+      bind:this={workspaceTabWrapper}
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-relative {showMenu
         ? 'threedot-active'
         : ''}"

@@ -95,6 +95,9 @@
    */
   export let isGuestUser = false;
 
+
+   export let getWorkspaceDetails;
+
   let selectedView: string = "Grid";
 
   const selectedViewSubscribe = workspaceView.subscribe((value) => {
@@ -373,6 +376,7 @@
             <div style="flex:1; overflow:auto;">
               {#if selectedView === TeamViewEnum.LIST}
                 <WorkspaceListView
+                {getWorkspaceDetails}
                   bind:isGuestUser
                   {searchQuery}
                   {openTeam}
