@@ -361,6 +361,7 @@
                       {onGenerateDocumentation}
                       {onUpdateRequestDescription}
                       requestDoc={$tab.description}
+                      {isGuestUser}
                     />
                   {/if}
                 </div>
