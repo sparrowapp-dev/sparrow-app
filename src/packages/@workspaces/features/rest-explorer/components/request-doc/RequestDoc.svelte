@@ -3,12 +3,29 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { generatingImage } from "@common/images";
   import { AISuggestionBox } from "@workspaces/features/chat-bot/components";
+  import { tick } from "svelte";
   export let onUpdateRequestDescription;
   export let isDocGenerating = false;
   export let isDocAlreadyGenerated = false;
   export let requestDoc: string;
   export let onGenerateDocumentation;
+  let lastKeyPressed = "";
 
+  $: {
+    if (lastKeyPressed) {
+      console.log("Last key pressed:", lastKeyPressed);
+      // Your UI update logic here
+    }
+  }
+
+  function handleKeyDown(event: KeyboardEvent) {
+    lastKeyPressed = event.key;
+  }
+  async function handleKeyUp(event: KeyboardEvent) {
+    console.log("Key up:", event.key);
+    // Your key up logic here
+    await tick();
+  }
   const sendPrompt = async (text: string) => {
     if (text) {
       const response = await onGenerateDocumentation(text, "", "");
@@ -21,15 +38,21 @@
     <div style="font-weight: 600; margin-bottom:8px;">Documentation</div>
   </div>
   <div style="height: 160px !important; " class="area">
-    <textarea
-      bind:value={requestDoc}
-      on:input={() => {
-        onUpdateRequestDescription(requestDoc);
-      }}
-      class="text-fs-12 w-100 border-0"
-      style="height:120px !important; font-weight:400; background-color:transparent; outline: none;   padding-bottom:5px; padding-top: 8px; padding-left: 12px; padding-right: 12px;"
-      placeholder="Add Documentation"
-    ></textarea>
+    <div
+      on:keydown|stopPropagation={handleKeyDown}
+      on:keyup|stopPropagation={handleKeyUp}
+    >
+      <textarea
+        bind:value={requestDoc}
+        on:input={() => {
+          onUpdateRequestDescription(requestDoc);
+        }}
+        class="text-fs-12 w-100 border-0"
+        style="height:120px !important; font-weight:400; background-color:transparent; outline: none;   padding-bottom:5px; padding-top: 8px; padding-left: 12px; padding-right: 12px;"
+        placeholder="Add Documentation"
+      ></textarea>
+      <!-- rest of your component -->
+    </div>
     <div
       class=""
       style="height: 42px; width: 100%;margin-top:-6px; padding-bottom:8px; padding-left:8px; "

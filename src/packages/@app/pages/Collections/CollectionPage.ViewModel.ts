@@ -721,8 +721,9 @@ export default class CollectionsViewModel {
         notifications.error(response.message ?? "Failed to create collection!");
       }
     } else {
+      const collectionId = uuidv4();
       await this.addCollection({
-        id: newCollection.id,
+        id: collectionId,
         name: newCollection.name,
         workspaceId: workspaceId,
         items: [],
@@ -734,13 +735,13 @@ export default class CollectionsViewModel {
       });
       let path = {
         workspaceId: workspaceId,
-        collectionId: newCollection.id,
+        collectionId: collectionId,
       };
       const initCollectionTab = new InitCollectionTab(
-        newCollection.id,
+        collectionId,
         workspaceId,
       );
-      initCollectionTab.updateId(newCollection.id);
+      initCollectionTab.updateId(collectionId);
       initCollectionTab.updatePath(path);
       initCollectionTab.updateName(newCollection.name);
       this.tabRepository.createTab(initCollectionTab.getValue());
@@ -1730,6 +1731,8 @@ export default class CollectionsViewModel {
     workspaceId: string,
     collection: CollectionDocument,
   ) => {
+    console.log("collection opened");
+
     let totalFolder: number = 0;
     let totalRequest: number = 0;
     if (collection.items) {
