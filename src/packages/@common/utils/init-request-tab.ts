@@ -113,6 +113,11 @@ class InitRequestTab {
             isSaveRequestInProgress: false,
             isParameterBulkEditActive: false,
             isHeaderBulkEditActive: false,
+            isChatbotActive: false,
+            isChatbotSuggestionsActive: true,
+            isChatbotGeneratingResponse: false,
+            isDocGenerating: false,
+            isDocAlreadyGenerated: false,
           },
           auth: {
             bearerToken: "",
@@ -125,6 +130,11 @@ class InitRequestTab {
               authValue: "",
               addTo: AuthSectionEnum.HEADER,
             },
+          },
+          ai: {
+            prompt: "",
+            conversations: [],
+            threadId: "",
           },
           response: {
             headers: [],

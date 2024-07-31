@@ -74,6 +74,8 @@ import {
   type KeyValue,
   type RequestTab,
   type StatePartial,
+  type Conversation,
+  MessageTypeEnum,
 } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
 import { RequestTabAdapter } from "@app/adapter/request-tab";
@@ -82,6 +84,7 @@ import { CollectionService } from "@app/services/collection.service";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
+import { AiAssistantService } from "@app/services/ai-assistant.service";
 
 class RestExplorerViewModel
   implements
@@ -126,6 +129,7 @@ class RestExplorerViewModel
    */
   private environmentService = new EnvironmentService();
   private collectionService = new CollectionService();
+  private aiAssistentService = new AiAssistantService();
   /**
    * Utils
    */
@@ -297,6 +301,47 @@ class RestExplorerViewModel
   };
 
   /**
+   * Updates the AI prompt in the request property of the current tab.
+   *
+   * @param  _prompt - The new AI prompt to set.
+   * @returns A promise that resolves when the update is complete.
+   */
+  public updateRequestAIPrompt = async (_prompt: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.ai.prompt = _prompt;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
+  /**
+   * Updates the AI thread ID in the request property of the current tab.
+   *
+   * @param _threadId - The new AI thread ID to set.
+   * @returns A promise that resolves when the update is complete.
+   */
+  public updateRequestAIThread = async (_threadId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.ai.threadId = _threadId;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
+  /**
+   * Updates the AI conversations in the request property of the current tab.
+   *
+   * @param _conversations - The new AI conversations to set.
+   * @returns  A promise that resolves when the update is complete.
+   */
+  public updateRequestAIConversation = async (
+    _conversations: Conversation[],
+  ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.ai.conversations = _conversations;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
+  /**
    *
    * @param method request method
    */
@@ -382,7 +427,7 @@ class RestExplorerViewModel
       ..._state,
     };
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
   /**
@@ -1271,7 +1316,7 @@ class RestExplorerViewModel
       isGuestUserActive.subscribe((value) => {
         isGuestUser = value;
       });
-      if(isGuestUser === true){
+      if (isGuestUser === true) {
         return;
       }
       const response = await this.environmentService.updateEnvironment(
@@ -1484,12 +1529,233 @@ class RestExplorerViewModel
   };
 
   /**
+   * Updates the message property of the last conversation in chunks.
+   *
+   * This function takes a string `data`, divides it into chunks of size `chunkSize`,
+   * and appends each chunk to the last conversation message in the component's data.
+   * The chunks are appended at intervals specified by `delay`.
+   *
+   * @param data - The string data to be displayed in chunks.
+   * @param chunkSize - The number of characters per chunk.
+   * @param delay - The delay in milliseconds between each chunk display.
+   */
+  private displayDataInChunks = (data, chunkSize, delay) => {
+    let index = 0;
+
+    const displayNextChunk = () => {
+      if (index < data.length) {
+        const chunk = data.slice(index, index + chunkSize);
+        const componentData = this._tab.getValue();
+        const length =
+          componentData?.property?.request?.ai?.conversations.length;
+        componentData.property.request.ai.conversations[length - 1].message =
+          componentData.property.request.ai.conversations[length - 1].message +
+          chunk;
+        this.updateRequestAIConversation([
+          ...componentData.property.request.ai.conversations,
+        ]);
+        index += chunkSize;
+        setTimeout(displayNextChunk, delay);
+      }
+    };
+
+    displayNextChunk();
+  };
+
+  /**
    * Get workspace data through workspace id
    * @param workspaceId - id of workspace
    * @returns - workspace document
    */
   public getWorkspaceById = async (workspaceId: string) => {
     return await this.workspaceRepository.readWorkspace(workspaceId);
+  };
+
+  /**
+   * Generates an AI response based on the given prompt.
+   *
+   * @param prompt - The prompt to send to the AI assistant service.
+   * @returns A promise that resolves to the response from the AI assistant service.
+   */
+  public generateAiResponse = async (prompt = "") => {
+    // Set the request state to indicate that a response is being generated
+    await this.updateRequestState({ isChatbotGeneratingResponse: true });
+    const componentData = this._tab.getValue();
+    const apiData = {
+      body: componentData.property.request.body,
+      headers: componentData.property.request.headers,
+      method: componentData.property.request.method,
+      queryParams: componentData.property.request.queryParams,
+      url: componentData.property.request.url,
+      auth: componentData.property.request.auth,
+    };
+    // Call the AI assistant service to generate a response
+    const response = await this.aiAssistentService.generateAiResponse({
+      text: prompt,
+      instructions: `You are an AI Assistant, responsible for answering API related queries. Give response only in markdown string and color the code part. Only answers questions related to API and API Managememnt. Now here is the data which you can use to answer the queries related to APIs. ${JSON.stringify(
+        apiData,
+      )}`,
+      threadId: componentData?.property?.request?.ai?.threadId,
+    });
+    if (response.isSuccessful) {
+      const data = response.data.data;
+      // Update the AI thread ID and conversation with the new data
+      this.updateRequestAIThread(data.threadId);
+      this.updateRequestAIConversation([
+        ...componentData?.property?.request?.ai?.conversations,
+        {
+          message: "",
+          messageId: data.messageId,
+          type: MessageTypeEnum.RECEIVER,
+          isLiked: false,
+          isDisliked: false,
+          status: true,
+        },
+      ]);
+      this.displayDataInChunks(data.result, 100, 300);
+    } else {
+      // Update the conversation with an error message
+      this.updateRequestAIConversation([
+        ...componentData?.property?.request?.ai?.conversations,
+        {
+          message: "Something went wrong! Please try again.",
+          messageId: uuidv4(),
+          type: MessageTypeEnum.RECEIVER,
+          isLiked: false,
+          isDisliked: false,
+          status: false,
+        },
+      ]);
+    }
+    // Set the request state to indicate that the response generation is complete
+    await this.updateRequestState({ isChatbotGeneratingResponse: false });
+    return response;
+  };
+
+  /**
+   * Generates documentation for the particular API Request Tab.
+   *
+   * @param prompt - The prompt to be used for generating the documentation.
+   * @returns - The response from the AI assistant service.
+   */
+
+  public generateDocumentation = async (prompt = "") => {
+    await this.updateRequestState({ isDocGenerating: true });
+    const componentData = this._tab.getValue();
+    const apiData = {
+      body: componentData.property.request.body,
+      headers: componentData.property.request.headers,
+      method: componentData.property.request.method,
+      queryParams: componentData.property.request.queryParams,
+      url: componentData.property.request.url,
+      auth: componentData.property.request.auth,
+    };
+    const response = await this.aiAssistentService.generateAiResponse({
+      text: prompt,
+      instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown. Now here is the data which you can use to generate the documentation ${JSON.stringify(
+        apiData,
+      )}`,
+      threadId: componentData?.property?.request?.ai?.threadId,
+    });
+    if (response.isSuccessful) {
+      await this.updateRequestDescription(response.data.data.result);
+      await this.updateRequestState({
+        isDocAlreadyGenerated: true,
+      });
+    }
+
+    await this.updateRequestState({ isDocGenerating: false });
+    return response;
+  };
+
+  /**
+   * Toggles the like or dislike status of a chat message.
+   *
+   * @param _messageId - The ID of the message to update.
+   * @param  _flag - The flag indicating whether the message is liked (true) or disliked (false).
+   */
+  public toggleChatMessageLike = (_messageId: string, _flag: boolean) => {
+    const componentData = this._tab.getValue();
+    const data = componentData?.property?.request?.ai;
+    this.aiAssistentService.updateAiStats(data.threadId, _messageId, _flag);
+
+    // Map through the conversations and update the like or dislike status of the specified message
+    const convo = data?.conversations?.map((elem) => {
+      if (elem.messageId === _messageId) {
+        if (_flag) {
+          elem.isLiked = true;
+          elem.isDisliked = false;
+        } else {
+          elem.isLiked = false;
+          elem.isDisliked = true;
+        }
+      }
+      return elem;
+    });
+    this.updateRequestAIConversation(convo);
+  };
+
+  /**
+   * Refreshes the tab data by updating conversations and chatbot state from the server.
+   *
+   * @param tab - The tab data from the server to refresh the current tab data with.
+   */
+  public refreshTabData = (tab: RequestTab) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+
+    if (progressiveTab?.property?.request?.ai?.conversations) {
+      // Handles AiConversationClient state
+      const AiConversationClient =
+        progressiveTab?.property?.request?.ai.conversations;
+      const AiConversationServer = tab.property.request.ai.conversations;
+      if (AiConversationServer.length > AiConversationClient.length) {
+        progressiveTab.property.request.ai.conversations =
+          tab.property.request.ai.conversations;
+        this.tab = progressiveTab;
+      }
+    }
+    if (progressiveTab?.property?.request?.state) {
+      // Handles isChatbotGeneratingResponseClient state
+      const isChatbotGeneratingResponseClient =
+        progressiveTab?.property?.request?.state?.isChatbotGeneratingResponse;
+      const isChatbotGeneratingResponseServer =
+        tab.property.request.state.isChatbotGeneratingResponse;
+      if (
+        isChatbotGeneratingResponseServer !== isChatbotGeneratingResponseClient
+      ) {
+        progressiveTab.property.request.state.isChatbotGeneratingResponse =
+          tab.property.request.state.isChatbotGeneratingResponse;
+        this.tab = progressiveTab;
+      }
+      // Handles isDocGenerating state
+      const isDocGeneratingClient =
+        progressiveTab?.property?.request?.state?.isDocGenerating;
+      const isDocGeneratingServer = tab.property.request.state.isDocGenerating;
+      if (isDocGeneratingServer !== isDocGeneratingClient) {
+        progressiveTab.property.request.state.isDocGenerating =
+          tab.property.request.state.isDocGenerating;
+        this.tab = progressiveTab;
+      }
+      // Handles isDocAlreadyGeneratedClient state
+      const isDocAlreadyGeneratedClient =
+        progressiveTab?.property?.request?.state?.isDocAlreadyGenerated;
+      const isDocAlreadyGeneratedServer =
+        tab.property.request.state.isDocAlreadyGenerated;
+      if (isDocAlreadyGeneratedServer !== isDocAlreadyGeneratedClient) {
+        progressiveTab.property.request.state.isDocAlreadyGenerated =
+          tab.property.request.state.isDocAlreadyGenerated;
+        this.tab = progressiveTab;
+      }
+    }
+    if (progressiveTab) {
+      // Handles apiDescriptionClient state
+      const apiDescriptionClient = progressiveTab?.description;
+      const apiDescriptionServer = tab.description;
+      if (apiDescriptionServer !== apiDescriptionClient) {
+        progressiveTab.description = tab.description;
+        this.tab = progressiveTab;
+      }
+    }
   };
 }
 
