@@ -106,6 +106,21 @@ class CollectionExplorerPage {
     });
 
     if (isGuestUser === true) {
+      if (newCollectionName) {
+        const response = {
+          data: {
+            name: newCollectionName,
+          },
+        };
+        await this.collectionRepository.updateCollection(
+          collection.id,
+          response.data,
+        );
+        this.updateTab(this.tab.tabId, { name: newCollectionName });
+        notifications.success("Collection renamed successfully!");
+      } else {
+        notifications.error("Failed to rename collection!");
+      }
       return;
     }
     if (newCollectionName) {
@@ -126,22 +141,6 @@ class CollectionExplorerPage {
       } else {
         notifications.error("Failed to rename collection!");
       }
-    }
-
-    if (newCollectionName) {
-      const response = {
-        data: {
-          name: newCollectionName,
-        },
-      };
-      await this.collectionRepository.updateCollection(
-        collection.id,
-        response.data,
-      );
-      this.updateTab(this.tab.tabId, { name: newCollectionName });
-      notifications.success("Collection renamed successfully!");
-    } else {
-      notifications.error("Failed to rename collection!");
     }
   };
 

@@ -9,23 +9,7 @@
   export let isDocAlreadyGenerated = false;
   export let requestDoc: string;
   export let onGenerateDocumentation;
-  let lastKeyPressed = "";
 
-  $: {
-    if (lastKeyPressed) {
-      console.log("Last key pressed:", lastKeyPressed);
-      // Your UI update logic here
-    }
-  }
-
-  function handleKeyDown(event: KeyboardEvent) {
-    lastKeyPressed = event.key;
-  }
-  async function handleKeyUp(event: KeyboardEvent) {
-    console.log("Key up:", event.key);
-    // Your key up logic here
-    await tick();
-  }
   const sendPrompt = async (text: string) => {
     if (text) {
       const response = await onGenerateDocumentation(text, "", "");
@@ -38,10 +22,7 @@
     <div style="font-weight: 600; margin-bottom:8px;">Documentation</div>
   </div>
   <div style="height: 160px !important; " class="area">
-    <div
-      on:keydown|stopPropagation={handleKeyDown}
-      on:keyup|stopPropagation={handleKeyUp}
-    >
+    <div on:keydown|stopPropagation on:keyup|stopPropagation>
       <textarea
         bind:value={requestDoc}
         on:input={() => {
