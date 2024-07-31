@@ -56,9 +56,6 @@
       }
       prevTabName = tab.name;
       findUserRole();
-      // setTimeout(() => {
-      //   _viewModel?.refreshTabData(tab);
-      // }, 2000);
       debouncedAPIUpdater(tab);
     }
   }

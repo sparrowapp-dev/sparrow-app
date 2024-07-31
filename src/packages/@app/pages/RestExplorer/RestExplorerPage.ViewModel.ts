@@ -1703,8 +1703,8 @@ class RestExplorerViewModel
   public refreshTabData = (tab: RequestTab) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
 
-    // Handles AiConversationClient state
     if (progressiveTab?.property?.request?.ai?.conversations) {
+      // Handles AiConversationClient state
       const AiConversationClient =
         progressiveTab?.property?.request?.ai.conversations;
       const AiConversationServer = tab.property.request.ai.conversations;
