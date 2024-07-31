@@ -201,6 +201,11 @@ class RestExplorerViewModel
     this._authParameter.next(value);
   }
 
+  /**
+   * Compares the current request tab with the server version and updates the saved status accordingly.
+   * This method is debounced to reduce the number of server requests.
+   * @return A promise that resolves when the comparison is complete.
+   */
   private compareRequestWithServerDebounced = async () => {
     let result = true;
     const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
@@ -221,57 +226,76 @@ class RestExplorerViewModel
         );
     }
     if (!requestServer) result = false;
+    // description
     else if (requestServer.description !== progressiveTab.description) {
       result = false;
-    } else if (requestServer.name !== progressiveTab.name) {
+    }
+    // name
+    else if (requestServer.name !== progressiveTab.name) {
       result = false;
-    } else if (
+    }
+    // url
+    else if (
       requestServer.request.url !== progressiveTab.property.request.url
     ) {
       result = false;
-    } else if (
+    }
+    // method
+    else if (
       requestServer.request.method !== progressiveTab.property.request.method
     ) {
       result = false;
-    } else if (
+    }
+    // auth key
+    else if (
       requestServer.request.auth.apiKey.authKey !==
       progressiveTab.property.request.auth.apiKey.authKey
     ) {
       result = false;
-    } else if (
+    }
+    // auth value
+    else if (
       requestServer.request.auth.apiKey.authValue !==
       progressiveTab.property.request.auth.apiKey.authValue
     ) {
       result = false;
-    } else if (
+    }
+    // addTo
+    else if (
       requestServer.request.auth.apiKey.addTo !==
       progressiveTab.property.request.auth.apiKey.addTo
     ) {
       result = false;
-    } else if (
+    }
+    // username
+    else if (
       requestServer.request.auth.basicAuth.username !==
       progressiveTab.property.request.auth.basicAuth.username
     ) {
       result = false;
-    } else if (
+    }
+    // password
+    else if (
       requestServer.request.auth.basicAuth.password !==
       progressiveTab.property.request.auth.basicAuth.password
     ) {
       result = false;
-    } else if (
+    }
+    // bearer tokem
+    else if (
       requestServer.request.auth.bearerToken !==
       progressiveTab.property.request.auth.bearerToken
     ) {
       result = false;
     }
-    ///////////// raw
+    // raw code
     else if (
       requestServer.request.body.raw !==
       progressiveTab.property.request.body.raw
     ) {
       result = false;
     }
-    ///////// url encode
+    // url encode
     else if (
       !this.compareArray.init(
         requestServer.request.body.urlencoded,
@@ -280,7 +304,7 @@ class RestExplorerViewModel
     ) {
       result = false;
     }
-    ////////// form data
+    // form data
     else if (
       !this.compareArray.init(
         requestServer.request.body.formdata.text,
@@ -296,7 +320,7 @@ class RestExplorerViewModel
     ) {
       result = false;
     }
-    ////////////////////////
+    // headers
     else if (
       !this.compareArray.init(
         requestServer.request.headers,
@@ -312,6 +336,7 @@ class RestExplorerViewModel
     ) {
       result = false;
     }
+    // result
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: true,
@@ -327,6 +352,9 @@ class RestExplorerViewModel
     }
   };
 
+  /**
+   * Debounced method to compare the current request tab with the server version.
+   */
   private compareRequestWithServer = new Debounce().debounce(
     this.compareRequestWithServerDebounced,
     1000,
