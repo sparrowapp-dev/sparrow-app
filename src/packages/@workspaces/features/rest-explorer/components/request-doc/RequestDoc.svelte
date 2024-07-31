@@ -8,6 +8,7 @@
   export let isDocAlreadyGenerated = false;
   export let requestDoc: string;
   export let onGenerateDocumentation;
+  export let isGuestUser;
 
   const sendPrompt = async (text: string) => {
     if (text) {
@@ -30,44 +31,46 @@
       style="height:120px !important; font-weight:400; background-color:transparent; outline: none;   padding-bottom:5px; padding-top: 8px; padding-left: 12px; padding-right: 12px;"
       placeholder="Add Documentation"
     ></textarea>
-    <div
-      class=""
-      style="height: 42px; width: 100%;margin-top:-6px; padding-bottom:8px; padding-left:8px; "
-    >
-      <div style="width:fit-content; margin-top:6px; ">
-        {#if isDocGenerating == true}
-          <div
-            class="text-primary-300 mt-1"
-            style="font-size: 14px; height: 20px; width:auto;"
-          >
-            <img
-              style="height: 30px; width:auto;"
-              src={generatingImage}
-              alt="generating"
+    {#if !isGuestUser}
+      <div
+        class=""
+        style="height: 42px; width: 100%;margin-top:-6px; padding-bottom:8px; padding-left:8px; "
+      >
+        <div style="width:fit-content; margin-top:6px; ">
+          {#if isDocGenerating == true}
+            <div
+              class="text-primary-300 mt-1"
+              style="font-size: 14px; height: 20px; width:auto;"
+            >
+              <img
+                style="height: 30px; width:auto;"
+                src={generatingImage}
+                alt="generating"
+              />
+            </div>
+          {:else if isDocAlreadyGenerated == false}
+            <AISuggestionBox
+              onClick={(text = "") => {
+                ("Generate Documentation for api request, don't give response in markdown format");
+                sendPrompt(text);
+                MixpanelEvent(Events.AI_Generate_Doc);
+              }}
+              title={"Generate Documentation"}
             />
-          </div>
-        {:else if isDocAlreadyGenerated == false}
-          <AISuggestionBox
-            onClick={(text = "") => {
-              ("Generate Documentation for api request, don't give response in markdown format");
-              sendPrompt(text);
-              MixpanelEvent(Events.AI_Generate_Doc);
-            }}
-            title={"Generate Documentation"}
-          />
-        {:else if isDocAlreadyGenerated == true}
-          <AISuggestionBox
-            onClick={(text = "") => {
-              text =
-                "Re-Generate Documentation for api request, don't give response in markdown format. Make it better.";
-              sendPrompt(text);
-              MixpanelEvent(Events.AI_Regenerate_Doc);
-            }}
-            title={"Regenerate"}
-          />
-        {/if}
+          {:else if isDocAlreadyGenerated == true}
+            <AISuggestionBox
+              onClick={(text = "") => {
+                text =
+                  "Re-Generate Documentation for api request, don't give response in markdown format. Make it better.";
+                sendPrompt(text);
+                MixpanelEvent(Events.AI_Regenerate_Doc);
+              }}
+              title={"Regenerate"}
+            />
+          {/if}
+        </div>
       </div>
-    </div>
+    {/if}
   </div>
 </div>
 
