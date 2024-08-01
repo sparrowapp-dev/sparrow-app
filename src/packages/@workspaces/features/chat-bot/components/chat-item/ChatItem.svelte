@@ -63,8 +63,12 @@
       
       style="">
         <span>${lang?.split("-")[1] ?? ""}</span>
-        <span role="button" class="copy-code-${messageId} action-button d-flex align-items-center justify-content-center border-radius-4">
+        <span role="button" class="position-relative copy-code-${messageId} action-button copy-code-selector d-flex align-items-center justify-content-center border-radius-4">
         <img src=${copyIcon}>
+        <span class="copy-code-tooltip z-1 d-flex align-items-center justify-content-center position-absolute invisible text-fs-12">Copy
+        
+        <div class="copy-code-tooltip-square"></div>
+        </copy>
         </span>
       </div>
         `;
@@ -249,25 +253,29 @@
         -- 
         -->
         {#if isLastRecieverMessage}
+          <Tooltip placement="top" title="Regenerate" distance={13}>
+            <span
+              role="button"
+              class="action-button d-flex align-items-center justify-content-center border-radius-4"
+              on:click={() => {
+                regenerateAiResponse();
+              }}
+            >
+              <RefreshIcon height={"16px"} width={"16px"} />
+            </span>
+          </Tooltip>
+        {/if}
+        <Tooltip placement="top" title="Copy" distance={13}>
           <span
             role="button"
             class="action-button d-flex align-items-center justify-content-center border-radius-4"
             on:click={() => {
-              regenerateAiResponse();
+              handleCopyResponse();
             }}
           >
-            <RefreshIcon height={"16px"} width={"16px"} />
+            <CopyIcon2 height={"14px"} width={"14px"} />
           </span>
-        {/if}
-        <span
-          role="button"
-          class="action-button d-flex align-items-center justify-content-center border-radius-4"
-          on:click={() => {
-            handleCopyResponse();
-          }}
-        >
-          <CopyIcon2 height={"14px"} width={"14px"} />
-        </span>
+        </Tooltip>
       </div>
     </div>
   {/if}
@@ -310,5 +318,36 @@
   .error-message {
     background-color: var(--bg-danger-1200);
     border: 0.2px solid var(--border-danger-200);
+  }
+  :global(.copy-code-tooltip) {
+    transition: 0.3s ease;
+    font-weight: 400;
+    gap: 6px;
+    top: 40px;
+    border-radius: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    position: absolute;
+    padding: 4px 8px;
+    background-color: var(--bg-tertiary-700);
+    opacity: 0;
+    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+  }
+  :global(.copy-code-tooltip-square) {
+    z-index: 0;
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    border-radius: 2px;
+    height: 10px;
+    width: 10px;
+    background-color: var(--bg-tertiary-700);
+    transform: translateX(-38%) rotate(45deg); /* Rotate 45 degrees */
+  }
+  :global(.copy-code-selector:hover .copy-code-tooltip) {
+    visibility: visible !important;
+    opacity: 1;
   }
 </style>

@@ -497,7 +497,7 @@ class RestExplorerViewModel
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.ai.conversations = _conversations;
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
   /**
@@ -1706,10 +1706,11 @@ class RestExplorerViewModel
    * @param chunkSize - The number of characters per chunk.
    * @param delay - The delay in milliseconds between each chunk display.
    */
-  private displayDataInChunks = (data, chunkSize, delay) => {
+  private displayDataInChunks = async (data, chunkSize, delay) => {
     let index = 0;
 
-    const displayNextChunk = () => {
+    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    const displayNextChunk =async () => {
       if (index < data.length) {
         const chunk = data.slice(index, index + chunkSize);
         const componentData = this._tab.getValue();
@@ -1718,15 +1719,16 @@ class RestExplorerViewModel
         componentData.property.request.ai.conversations[length - 1].message =
           componentData.property.request.ai.conversations[length - 1].message +
           chunk;
-        this.updateRequestAIConversation([
+        await this.updateRequestAIConversation([
           ...componentData.property.request.ai.conversations,
         ]);
         index += chunkSize;
-        setTimeout(displayNextChunk, delay);
+        await sleep(delay);
+        await displayNextChunk();
       }
     };
 
-    displayNextChunk();
+    await displayNextChunk();
   };
 
   /**
@@ -1766,8 +1768,8 @@ class RestExplorerViewModel
     if (response.isSuccessful) {
       const data = response.data.data;
       // Update the AI thread ID and conversation with the new data
-      this.updateRequestAIThread(data.threadId);
-      this.updateRequestAIConversation([
+      await this.updateRequestAIThread(data.threadId);
+      await this.updateRequestAIConversation([
         ...componentData?.property?.request?.ai?.conversations,
         {
           message: "",
@@ -1778,7 +1780,7 @@ class RestExplorerViewModel
           status: true,
         },
       ]);
-      this.displayDataInChunks(data.result, 100, 300);
+      await this.displayDataInChunks(data.result, 100, 300);
     } else {
       // Update the conversation with an error message
       this.updateRequestAIConversation([
