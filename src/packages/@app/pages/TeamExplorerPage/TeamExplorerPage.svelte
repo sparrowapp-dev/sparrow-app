@@ -9,9 +9,13 @@
 
   import { DeleteWorkspace } from "@common/features";
   import { onMount } from "svelte";
+  import { InviteToWorkspace } from "@workspaces/features";
+
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
   const _viewModel = new TeamExplorerPageViewModel();
+
+  let isWorkspaceInviteModalOpen = false;
 
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
@@ -21,6 +25,18 @@
   user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
+    }
+  });
+
+  let currentTeam = {
+    name: "",
+    users: [],
+  };
+
+  activeTeam.subscribe((value) => {
+    if (value) {
+      currentTeam.name = value.name;
+      currentTeam.users = value.users;
     }
   });
 
@@ -37,6 +53,19 @@
     _viewModel.refreshWorkspaces(userId);
     isGuestUser = await _viewModel.getGuestUser();
   });
+
+  let workspaceDetails = {
+    id: "",
+    name: "",
+    users: [],
+  };
+
+  const handleWorkspaceDetails = ({ workspaceID, workspaceName, users }) => {
+    workspaceDetails.id = workspaceID;
+    workspaceDetails.name = workspaceName;
+    workspaceDetails.users = users;
+    isWorkspaceInviteModalOpen = true;
+  };
 </script>
 
 <TeamExplorer
@@ -44,6 +73,7 @@
   bind:userId
   bind:isTeamInviteModalOpen
   bind:isLeaveTeamModelOpen
+  onAddMember={handleWorkspaceDetails}
   openTeam={$activeTeam}
   workspaces={$workspaces}
   activeTeamTab={$activeTeamTab}
@@ -129,5 +159,26 @@
     handleModalState={(flag) => {
       isLeaveTeamModelOpen = flag;
     }}
+  />
+</Modal>
+
+<Modal
+  title={"Invite to Workspace"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isWorkspaceInviteModalOpen}
+  handleModalState={(flag = false) => {
+    isWorkspaceInviteModalOpen = flag;
+  }}
+>
+  <InviteToWorkspace
+    handleInvitePopup={(flag = false) => {
+      isWorkspaceInviteModalOpen = flag;
+    }}
+    currentWorkspaceDetails={workspaceDetails}
+    users={currentTeam?.users}
+    teamName={currentTeam?.name}
+    onInviteUserToWorkspace={_viewModel.inviteUserToWorkspace}
   />
 </Modal>
