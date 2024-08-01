@@ -1730,8 +1730,6 @@ export default class CollectionsViewModel {
     workspaceId: string,
     collection: CollectionDocument,
   ) => {
-    console.log("collection opened");
-
     let totalFolder: number = 0;
     let totalRequest: number = 0;
     if (collection.items) {
