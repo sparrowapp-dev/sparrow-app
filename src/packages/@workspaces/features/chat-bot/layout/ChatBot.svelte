@@ -67,7 +67,7 @@
     style="position: fixed;
   top:200px;
    bottom: 80px;
-   right:18px;
+   right:28px;
    z-index: 200;
    width: 320px;
    "
@@ -90,7 +90,7 @@
   <div
     style="position: fixed;
    bottom: 80px;
-   right:18px;
+   right:28px;
    z-index: 200;
    width: 200px;
    "
@@ -156,7 +156,7 @@
 <div
   style="position: fixed;
    bottom: 22px;
-   right:18px;
+   right:28px;
    z-index: 200;"
 >
   <div
