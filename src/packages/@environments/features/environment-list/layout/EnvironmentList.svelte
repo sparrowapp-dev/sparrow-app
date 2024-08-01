@@ -134,7 +134,7 @@
     <p class="fw-normal text-fs-12 rounded my-3" style="padding-left: 12px;">
       Environment Variables
     </p>
-    {#if localEnvironment && localEnvironment.length === 0}
+    {#if localEnvironment && localEnvironment.length === 0 && loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
       <div class={`pb-2`}>
         <p
           class={`mx-4 add-env-desc-text mb-3 text-fs-12 mb-0 fw-normal text-center`}
@@ -143,26 +143,24 @@
           Add Environments to your Workspace to test your APIs with the relevant
           set of resources and constraints.
         </p>
-        {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
-          <p
-            class="mx-4 add-environment d-flex justify-content-center align-items-center border-radius-2"
-            style="color: var(--text-secondary-100);"
-            role="button"
-            on:click={() => {
-              onCreateEnvironment(localEnvironment);
-            }}
+        <p
+          class="mx-4 add-environment d-flex justify-content-center align-items-center border-radius-2"
+          style="color: var(--text-secondary-100);"
+          role="button"
+          on:click={() => {
+            onCreateEnvironment(localEnvironment);
+          }}
+        >
+          <PlusIcon
+            height={"22px"}
+            width={"22px"}
+            color={"var(--text-secondary-200)"}
+          />
+          <span
+            style="color: var(--text-secondary-200)"
+            class="ps-2 fw-bold text-fs-12">Add Environment</span
           >
-            <PlusIcon
-              height={"22px"}
-              width={"22px"}
-              color={"var(--text-secondary-200)"}
-            />
-            <span
-              style="color: var(--text-secondary-200)"
-              class="ps-2 fw-bold text-fs-12">Add Environment</span
-            >
-          </p>
-        {/if}
+        </p>
       </div>
     {/if}
     {#if localEnvironment && localEnvironment.length > 0}
