@@ -14,7 +14,7 @@
   export let searchQuery;
   let filterText = "";
 
-  export let getWorkspaceDetails;
+  export let onAddMember;
 
   /**
    * Array of all the workspaces from local DB
@@ -71,7 +71,7 @@
             .sort((a, b) => a.name.localeCompare(b.name))
             .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
             <WorkspaceGrid
-            {getWorkspaceDetails}
+            {onAddMember}
               {workspace}
               {onSwitchWorkspace}
               {isAdminOrOwner}

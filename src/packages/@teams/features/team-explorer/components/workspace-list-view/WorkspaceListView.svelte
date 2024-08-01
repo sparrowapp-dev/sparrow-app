@@ -26,7 +26,7 @@
 
   export let isGuestUser = false;
 
-  export let getWorkspaceDetails;
+  export let onAddMember;
 
 
   let filterText = "";
@@ -67,7 +67,7 @@
               .sort((a, b) => a.name.localeCompare(b.name))
               .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
               <Rows 
-               {getWorkspaceDetails}
+               {onAddMember}
                 {list}
                 activeTeam={openTeam}
                 onOpenCollection={onSwitchWorkspace}

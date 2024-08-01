@@ -60,7 +60,7 @@
     users: [],
   };
 
-  const getWorkspaceDetails = ({ workspaceID, workspaceName, users }) => {
+  const handleWorkspaceDetails = ({ workspaceID, workspaceName, users }) => {
     workspaceDetails.id = workspaceID;
     workspaceDetails.name = workspaceName;
     workspaceDetails.users = users;
@@ -73,7 +73,7 @@
   bind:userId
   bind:isTeamInviteModalOpen
   bind:isLeaveTeamModelOpen
-  {getWorkspaceDetails}
+  onAddMember={handleWorkspaceDetails}
   openTeam={$activeTeam}
   workspaces={$workspaces}
   activeTeamTab={$activeTeamTab}

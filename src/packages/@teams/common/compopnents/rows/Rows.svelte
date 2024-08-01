@@ -9,7 +9,7 @@
   export let onOpenCollection: (id: string) => void;
   export let calculateTimeDifferenceInDays;
 
-  export let getWorkspaceDetails;
+  export let onAddMember;
 
   /**
    * Checks if the current user has admin or owner privileges.
@@ -45,7 +45,7 @@
         },
         {
           onClick: () => {
-            getWorkspaceDetails({
+            onAddMember({
               workspaceID: list._id,
               workspaceName: list.name,
               users: list.users,

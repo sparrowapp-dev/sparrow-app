@@ -23,7 +23,7 @@
   export let onDeleteWorkspace;
 
 
-  export let getWorkspaceDetails;
+  export let onAddMember;
 
 
   let pos = { x: 0, y: 0 };
@@ -65,7 +65,7 @@
         },
         {
           onClick: () => {
-            getWorkspaceDetails({
+            onAddMember({
               workspaceID: workspace._id,
               workspaceName: workspace.name,
               users: workspace.users,
