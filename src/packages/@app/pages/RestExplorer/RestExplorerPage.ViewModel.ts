@@ -1454,6 +1454,10 @@ class RestExplorerViewModel
     environmentVariables,
     newVariableObj: KeyValue,
   ) => {
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
     if (isGlobalVariable) {
       // api payload
       let payload = {
@@ -1479,12 +1483,21 @@ class RestExplorerViewModel
         },
       ];
 
-      let isGuestUser;
-      isGuestUserActive.subscribe((value) => {
-        isGuestUser = value;
-      });
       if (isGuestUser === true) {
-        return;
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
+          environmentVariables.global.id,
+          payload,
+        );
+        // updates environment tab
+        await this.environmentTabRepository.updateEnvironmentTab(
+          environmentVariables.global.id,
+          { variable: payload.variable, isSave: true },
+        );
+        notifications.success("Environment Variable Added");
+        return {
+          isSuccessful: true,
+        };
       }
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
@@ -1531,6 +1544,22 @@ class RestExplorerViewModel
           checked: false,
         },
       ];
+      if (isGuestUser) {
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
+          environmentVariables.local.id,
+          payload,
+        );
+        // updates environment tab
+        await this.environmentTabRepository.updateEnvironmentTab(
+          environmentVariables.local.id,
+          { variable: payload.variable, isSave: true },
+        );
+        notifications.success("Environment Variable Added");
+        return {
+          isSuccessful: true,
+        };
+      }
       // api response
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
@@ -1709,8 +1738,9 @@ class RestExplorerViewModel
   private displayDataInChunks = async (data, chunkSize, delay) => {
     let index = 0;
 
-    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-    const displayNextChunk =async () => {
+    const sleep = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
+    const displayNextChunk = async () => {
       if (index < data.length) {
         const chunk = data.slice(index, index + chunkSize);
         const componentData = this._tab.getValue();

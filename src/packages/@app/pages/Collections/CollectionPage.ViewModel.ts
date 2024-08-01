@@ -734,7 +734,6 @@ export default class CollectionsViewModel {
       });
       let path = {
         workspaceId: workspaceId,
-        collectionId: collectionId,
       };
       const initCollectionTab = new InitCollectionTab(
         collectionId,
