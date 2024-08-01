@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { isGuestUserActive } from "$lib/store";
   import { DangerIcon } from "@library/icons";
   import { onDestroy, onMount } from "svelte";
 
@@ -25,10 +24,6 @@
    */
   export let onUpdateEnvironment;
   export let environmentVariables;
-  let isGuestUser;
-  isGuestUserActive.subscribe((value) => {
-    isGuestUser = value;
-  });
   let count = 0;
   function handleSelectClicked(event: MouseEvent) {
     const selectElement = document.getElementById(`env-not-found-${id}`);
@@ -123,9 +118,6 @@
         {/if}
         <div
           class="prevent-default text-fs-12 text-center border-radius-2 p-2 bg-primary-300"
-          style="background-color: {isGuestUser
-            ? 'var(  --bg-primary-250)'
-            : 'var(--bg-primary-300)'};"
           on:click={async (e) => {
             const response = await onUpdateEnvironment(
               isGlobalVariable,
