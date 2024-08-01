@@ -18,7 +18,6 @@
   let showMenu = false;
   let workspaceTabWrapper: HTMLElement;
 
-
   let menuItems = [];
   let noOfColumns = 180;
   let noOfRows = 3;
@@ -87,8 +86,14 @@
     }}
     style="max-width: 15vw; padding-right: 10px;"
     class="tab-data rounded-start py-3 overflow-hidden ellipsis"
-    >{list?.name}</td
-  >
+    >{list?.name}
+    {#if list?.isNewInvite}
+      <span
+        style="font-size:12px; font-weight:700; color:var(--text-primary-300); margin-left:6px"
+        >NEW</span
+      >
+    {/if}
+  </td>
 
   <td
     on:click={(e) => {
@@ -132,7 +137,7 @@
   >
   <td class="tab-data rounded-end py-3">
     <button
-    bind:this={workspaceTabWrapper}
+      bind:this={workspaceTabWrapper}
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-relative {showMenu
         ? 'threedot-active'
         : ''}"

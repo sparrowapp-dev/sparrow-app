@@ -1,6 +1,7 @@
 import { user } from "$lib/store";
 import type { InviteBody } from "$lib/utils/dto/team-dto";
 import { Events, UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
+import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import type { WorkspaceDocument } from "@app/database/database";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
@@ -211,6 +212,7 @@ export class TeamExplorerPageViewModel {
           collection,
           updatedAt,
           updatedBy,
+          isNewInvite,
         } = elem;
         const isActiveWorkspace =
           await this.workspaceRepository.checkActiveWorkspace(_id);
@@ -232,6 +234,7 @@ export class TeamExplorerPageViewModel {
           createdBy,
           updatedAt,
           updatedBy,
+          isNewInvite,
         };
         data.push(item);
       }
@@ -290,10 +293,37 @@ export class TeamExplorerPageViewModel {
   };
 
   /**
+   * disable the invite tag in user's workspace
+   * @param workspaceId id of workspace
+   */
+  private handleDisableWorkspaceInviteTag = async (workspaceId: string) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      loggedInUserId = value?._id;
+    });
+    const response: MakeRequestResponse =
+      await this.userService.disableWorkspaceNewInviteTag(
+        loggedInUserId,
+        workspaceId,
+      );
+    if (response.isSuccessful === true) {
+      await this.workspaceRepository.updateWorkspace(workspaceId, {
+        isNewInvite: false,
+      });
+      return response.data.data;
+    }
+    return;
+  };
+
+  /**
    * Switch from one workspace to another
    * @param id - Workspace id
    */
   public handleSwitchWorkspace = async (id: string) => {
+    const prevWorkspace = await this.workspaceRepository.readWorkspace(id);
+    if (prevWorkspace?.isNewInvite) {
+      await this.handleDisableWorkspaceInviteTag(id);
+    }
     await this.workspaceRepository.setActiveWorkspace(id);
     const res = await this.workspaceRepository.readWorkspace(id);
     const initWorkspaceTab = new InitWorkspaceTab(id, id);
