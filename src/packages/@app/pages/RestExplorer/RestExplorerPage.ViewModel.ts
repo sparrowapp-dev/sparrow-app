@@ -1589,12 +1589,11 @@ class RestExplorerViewModel
       url: componentData.property.request.url,
       auth: componentData.property.request.auth,
     };
+    prompt += `. Utilize the provided api data ${JSON.stringify(apiData)}`;
     // Call the AI assistant service to generate a response
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
-      instructions: `You are an AI Assistant, responsible for answering API related queries. Give response only in markdown string and color the code part. Only answers questions related to API and API Managememnt. Now here is the data which you can use to answer the queries related to APIs. ${JSON.stringify(
-        apiData,
-      )}`,
+      instructions: `You are an AI Assistant, responsible for answering API related queries. Give response only in markdown string. Only answer questions related to the provided API data and API Management. Give to the point and concise responses, only give explanations when they are asked for. Always follow best practices for REST API and answer accordingly.`,
       threadId: componentData?.property?.request?.ai?.threadId,
     });
     if (response.isSuccessful) {
@@ -1650,12 +1649,10 @@ class RestExplorerViewModel
       url: componentData.property.request.url,
       auth: componentData.property.request.auth,
     };
+    prompt += `. Utilize the provided api data ${JSON.stringify(apiData)}`;
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
-      instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown. Now here is the data which you can use to generate the documentation ${JSON.stringify(
-        apiData,
-      )}`,
-      threadId: componentData?.property?.request?.ai?.threadId,
+      instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown.`,
     });
     if (response.isSuccessful) {
       await this.updateRequestDescription(response.data.data.result);
