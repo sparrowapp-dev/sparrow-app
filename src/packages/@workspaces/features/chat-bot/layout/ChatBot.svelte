@@ -36,18 +36,18 @@
         },
       ]);
       setTimeout(() => {
-        scrollList("bottom", -1, "smooth");
+        if (scrollList) scrollList("bottom", -1, "smooth");
       }, 10);
       const response = await onGenerateAiResponse(text, "", "");
       setTimeout(() => {
-        scrollList("bottom", -1, "smooth");
+        if (scrollList) scrollList("bottom", -1, "smooth");
       }, 10);
     }
   };
 
   onMount(() => {
     setTimeout(() => {
-      scrollList("bottom", -1, "auto");
+      if (scrollList) scrollList("bottom", -1, "auto");
     }, 10);
   });
 
