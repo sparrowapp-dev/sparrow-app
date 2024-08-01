@@ -649,7 +649,6 @@ export default class CollectionsViewModel {
       items: [],
       createdAt: new Date().toISOString(),
     };
-    // const isGuestUser = await this.getGuestUserState();
     let response;
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -721,8 +720,9 @@ export default class CollectionsViewModel {
         notifications.error(response.message ?? "Failed to create collection!");
       }
     } else {
+      const collectionId = uuidv4();
       await this.addCollection({
-        id: newCollection.id,
+        id: collectionId,
         name: newCollection.name,
         workspaceId: workspaceId,
         items: [],
@@ -734,13 +734,12 @@ export default class CollectionsViewModel {
       });
       let path = {
         workspaceId: workspaceId,
-        collectionId: newCollection.id,
       };
       const initCollectionTab = new InitCollectionTab(
-        newCollection.id,
+        collectionId,
         workspaceId,
       );
-      initCollectionTab.updateId(newCollection.id);
+      initCollectionTab.updateId(collectionId);
       initCollectionTab.updatePath(path);
       initCollectionTab.updateName(newCollection.name);
       this.tabRepository.createTab(initCollectionTab.getValue());

@@ -168,10 +168,10 @@
     color: white;
   }
 
-  .add-btn:hover{
+  .add-btn:hover {
     background: var(--button-active);
   }
-  .add-btn:active{
-    background: var( --bg-primary-300);
+  .add-btn:active {
+    background: var(--bg-primary-300);
   }
 </style>

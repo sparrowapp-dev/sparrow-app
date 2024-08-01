@@ -4,7 +4,6 @@
   import { AISparkle, CrossIcon } from "@library/icons";
   import { cubicOut } from "svelte/easing";
   import { generatingImage } from "@common/images";
-  import { onMount } from "svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums";
   import type { Conversation } from "@common/types/workspace";
@@ -67,11 +66,11 @@
   ) => scroll(_param, _pixels, _behaviour);
 </script>
 
-<div class="d-flex flex-column h-100 chat-box">
-  <!-- <div
+<!-- <div class="d-flex flex-column h-100 chat-box"> -->
+<div
   class="d-flex flex-column h-100 chat-box"
   transition:slide={{ duration: 400 }}
-> -->
+>
   <div style="flex:1; overflow:auto;">
     <div class="d-flex h-100 flex-column">
       <div

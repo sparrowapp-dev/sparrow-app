@@ -8,6 +8,9 @@
   export let activeTeam;
   export let onOpenCollection: (id: string) => void;
   export let calculateTimeDifferenceInDays;
+
+  export let onAddMember;
+
   /**
    * Checks if the current user has admin or owner privileges.
    */
@@ -38,6 +41,17 @@
             onOpenCollection(list._id);
           },
           displayText: "Open Workspace",
+          disabled: false,
+        },
+        {
+          onClick: () => {
+            onAddMember({
+              workspaceID: list._id,
+              workspaceName: list.name,
+              users: list.users,
+            });
+          },
+          displayText: "Add Members",
           disabled: false,
         },
         {
