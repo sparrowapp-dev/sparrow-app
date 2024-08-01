@@ -44,6 +44,13 @@ jobs:
         with:
           dotnet-version: 3.1
 
+      - name: Install Rust 1.76.0
+        run: |
+            Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
+            .\rustup-init.exe -y
+            rustup install 1.76.0
+            rustup default 1.76.0
+
       - name: Update updater endpoint in tauri.conf.json file
         run: |
           $content = Get-Content src-tauri/tauri.conf.json -Raw
@@ -102,8 +109,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      # - name: Rust setup
-      #   uses: dtolnay/rust-toolchain@stable
       - name: Install Rust 1.76.0
         run: |
          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
