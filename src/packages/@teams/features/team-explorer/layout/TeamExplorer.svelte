@@ -393,6 +393,7 @@
                 />
               {:else if selectedView == TeamViewEnum.GRID}
                 <WorkspaceGridView
+                {getWorkspaceDetails}
                   bind:isGuestUser
                   {onDeleteWorkspace}
                   {searchQuery}
