@@ -128,7 +128,6 @@
       callback(pairs);
       updateParam(index);
     }
-    console.log(pairs);
   };
 
   const removeFormFile = (index) => {

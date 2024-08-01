@@ -34,7 +34,6 @@
   };
 
   activeTeam.subscribe((value) => {
-    console.log("THis is users", value.users);
     if (value) {
       currentTeam.name = value.name;
       currentTeam.users = value.users;
