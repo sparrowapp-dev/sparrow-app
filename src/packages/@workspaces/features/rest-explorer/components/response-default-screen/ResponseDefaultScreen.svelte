@@ -45,7 +45,7 @@
       </div>
     </div>
   </div>
-  <div class={"d-flex flex-wrap  justify-content-center px-5 mt-auto"}>
+  <div class={"d-flex flex-wrap justify-content-center mt-auto"}>
     {#each Object.entries(ctrlCommands) as [key, value]}
       {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
         <!-- <span class="me-3"></span> -->

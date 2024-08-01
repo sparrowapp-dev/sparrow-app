@@ -1,5 +1,5 @@
 export interface PromptDto {
   text: string;
-  threadId: string;
+  threadId?: string;
   instructions: string;
 }

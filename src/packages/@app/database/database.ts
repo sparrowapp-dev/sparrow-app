@@ -187,9 +187,12 @@ export class RxDB {
             return oldDoc;
           },
           10: function (oldDoc: TabDocument) {
-            oldDoc.property.request.ai.conversations = [];
-            oldDoc.property.request.ai.prompt = "";
-            oldDoc.property.request.ai.threadId = "";
+            const ai = {
+              conversations: [],
+              prompt: "",
+              threadId: "",
+            };
+            oldDoc.property.request.ai = ai;
             oldDoc.property.request.state.isChatbotActive = false;
             oldDoc.property.request.state.isChatbotSuggestionsActive = true;
             oldDoc.property.request.state.isChatbotGeneratingResponse = false;

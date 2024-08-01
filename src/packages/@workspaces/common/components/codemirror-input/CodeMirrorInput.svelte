@@ -5,6 +5,7 @@
   import { v4 as uuidv4 } from "uuid";
   import { CodeMirrorHandler } from "./sub-input";
   import { EnvironmentPicker, MissedEnvironment, ReviewEnvironment } from "../";
+  import { WorkspaceRole } from "$lib/utils/enums";
 
   /**
    * environment events
@@ -28,6 +29,7 @@
   export let codeId = "";
   let componentClass = "";
   export { componentClass as class };
+  export let userRole;
 
   const environmentHelper = new EnvironmentHeper();
   let trackParanthesis: unknown[] = [];
@@ -126,7 +128,7 @@
     }}
     {handleInputValue}
   />
-{:else if dialogType === "env-not-found"}
+{:else if dialogType === "env-not-found" && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <MissedEnvironment
     {environmentAxisX}
     {environmentAxisY}

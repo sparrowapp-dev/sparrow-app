@@ -22,6 +22,10 @@
    */
   export let onDeleteWorkspace;
 
+
+  export let onAddMember;
+
+
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
   let workspaceTabWrapper: HTMLElement;
@@ -57,6 +61,17 @@
             handleOpenWorkspace();
           },
           displayText: "Open Workspace",
+          disabled: false,
+        },
+        {
+          onClick: () => {
+            onAddMember({
+              workspaceID: workspace._id,
+              workspaceName: workspace.name,
+              users: workspace.users,
+            });
+          },
+          displayText: "Add Members",
           disabled: false,
         },
         {

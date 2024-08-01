@@ -7,7 +7,7 @@ import {
   ReduceAuthParameter,
 } from "@workspaces/features/rest-explorer/utils";
 import { createDeepCopy, moveNavigation } from "$lib/utils/helpers";
-import { InitRequestTab } from "@common/utils";
+import { CompareArray, Debounce, InitRequestTab } from "@common/utils";
 
 // ---- DB
 import type {
@@ -123,6 +123,7 @@ class RestExplorerViewModel
   private environmentTabRepository = new EnvironmentTabRepository();
   private guideRepository = new GuideRepository();
   private guestUserRepository = new GuestUserRepository();
+  private compareArray = new CompareArray();
 
   /**
    * Service
@@ -201,6 +202,164 @@ class RestExplorerViewModel
   }
 
   /**
+   * Compares the current request tab with the server version and updates the saved status accordingly.
+   * This method is debounced to reduce the number of server requests.
+   * @return A promise that resolves when the comparison is complete.
+   */
+  private compareRequestWithServerDebounced = async () => {
+    let result = true;
+    const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
+    const requestTabAdapter = new RequestTabAdapter();
+    const unadaptedRequest = requestTabAdapter.unadapt(progressiveTab);
+    let requestServer;
+    if (progressiveTab.path.folderId) {
+      requestServer = await this.collectionRepository.readRequestInFolder(
+        progressiveTab.path.collectionId,
+        progressiveTab.path.folderId,
+        progressiveTab.id,
+      );
+    } else {
+      requestServer =
+        await this.collectionRepository.readRequestOrFolderInCollection(
+          progressiveTab.path.collectionId,
+          progressiveTab.id,
+        );
+    }
+    if (!requestServer) result = false;
+    // description
+    else if (requestServer.description !== progressiveTab.description) {
+      result = false;
+    }
+    // name
+    else if (requestServer.name !== progressiveTab.name) {
+      result = false;
+    }
+    // url
+    else if (
+      requestServer.request.url !== progressiveTab.property.request.url
+    ) {
+      result = false;
+    }
+    // method
+    else if (
+      requestServer.request.method !== progressiveTab.property.request.method
+    ) {
+      result = false;
+    }
+    // auth key
+    else if (
+      requestServer.request.auth.apiKey.authKey !==
+      progressiveTab.property.request.auth.apiKey.authKey
+    ) {
+      result = false;
+    }
+    // auth value
+    else if (
+      requestServer.request.auth.apiKey.authValue !==
+      progressiveTab.property.request.auth.apiKey.authValue
+    ) {
+      result = false;
+    }
+    // addTo
+    else if (
+      requestServer.request.auth.apiKey.addTo !==
+      progressiveTab.property.request.auth.apiKey.addTo
+    ) {
+      result = false;
+    }
+    // username
+    else if (
+      requestServer.request.auth.basicAuth.username !==
+      progressiveTab.property.request.auth.basicAuth.username
+    ) {
+      result = false;
+    }
+    // password
+    else if (
+      requestServer.request.auth.basicAuth.password !==
+      progressiveTab.property.request.auth.basicAuth.password
+    ) {
+      result = false;
+    }
+    // bearer tokem
+    else if (
+      requestServer.request.auth.bearerToken !==
+      progressiveTab.property.request.auth.bearerToken
+    ) {
+      result = false;
+    }
+    // raw code
+    else if (
+      requestServer.request.body.raw !==
+      progressiveTab.property.request.body.raw
+    ) {
+      result = false;
+    }
+    // url encode
+    else if (
+      !this.compareArray.init(
+        requestServer.request.body.urlencoded,
+        progressiveTab.property.request.body.urlencoded,
+      )
+    ) {
+      result = false;
+    }
+    // form data
+    else if (
+      !this.compareArray.init(
+        requestServer.request.body.formdata.text,
+        unadaptedRequest.body.formdata.text,
+      )
+    ) {
+      result = false;
+    } else if (
+      !this.compareArray.init(
+        requestServer.request.body.formdata.file,
+        unadaptedRequest.body.formdata.file,
+      )
+    ) {
+      result = false;
+    }
+    // headers
+    else if (
+      !this.compareArray.init(
+        requestServer.request.headers,
+        progressiveTab.property.request.headers,
+      )
+    ) {
+      result = false;
+    } else if (
+      !this.compareArray.init(
+        requestServer.request.queryParams,
+        progressiveTab.property.request.queryParams,
+      )
+    ) {
+      result = false;
+    }
+    // result
+    if (result) {
+      this.tabRepository.updateTab(progressiveTab.tabId, {
+        isSaved: true,
+      });
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+    } else {
+      this.tabRepository.updateTab(progressiveTab.tabId, {
+        isSaved: false,
+      });
+      progressiveTab.isSaved = false;
+      this.tab = progressiveTab;
+    }
+  };
+
+  /**
+   * Debounced method to compare the current request tab with the server version.
+   */
+  private compareRequestWithServer = new Debounce().debounce(
+    this.compareRequestWithServerDebounced,
+    1000,
+  );
+  /**
    *
    * @returns guest user
    */
@@ -225,13 +384,13 @@ class RestExplorerViewModel
       return;
     }
     progressiveTab.property.request.url = _url;
-    progressiveTab.isSaved = false;
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     if (_effectQueryParams) {
       const reducedURL = new ReduceRequestURL(_url);
-      this.updateParams(reducedURL.getQueryParameters(), false);
+      await this.updateParams(reducedURL.getQueryParameters(), false);
     }
+    this.compareRequestWithServer();
   };
 
   /**
@@ -241,9 +400,9 @@ class RestExplorerViewModel
   private updateRequestPath = async (_path: Path) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.path = _path;
-    progressiveTab.isSaved = false;
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
   };
 
   /**
@@ -253,9 +412,9 @@ class RestExplorerViewModel
   private updateRequestId = async (_id: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.id = _id;
-    progressiveTab.isSaved = false;
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
   };
 
   /**
@@ -265,7 +424,6 @@ class RestExplorerViewModel
   public updateRequestDescription = async (_description: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.description = _description;
-    progressiveTab.isSaved = false;
     this.tab = progressiveTab;
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
@@ -274,6 +432,7 @@ class RestExplorerViewModel
         "Failed to update the documentation. Please try again",
       );
     }
+    this.compareRequestWithServer();
   };
 
   /**
@@ -295,9 +454,9 @@ class RestExplorerViewModel
   public updateRequestName = async (_name: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.name = _name;
-    progressiveTab.isSaved = false;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
   };
 
   /**
@@ -338,7 +497,7 @@ class RestExplorerViewModel
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.ai.conversations = _conversations;
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
   /**
@@ -348,9 +507,9 @@ class RestExplorerViewModel
   public updateRequestMethod = async (method: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.method = method;
-    progressiveTab.isSaved = false;
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
   };
 
   /**
@@ -360,9 +519,9 @@ class RestExplorerViewModel
   public updateHeaders = async (_headers: KeyValueChecked[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.headers = _headers;
-    progressiveTab.isSaved = false;
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
   };
 
   /**
@@ -382,7 +541,6 @@ class RestExplorerViewModel
       return;
     }
     progressiveTab.property.request.queryParams = _params;
-    progressiveTab.isSaved = false;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     if (_effectURL) {
@@ -394,14 +552,15 @@ class RestExplorerViewModel
         reducedQueryParams.getValue() === "" ||
         reducedQueryParams.getValue() === "="
       ) {
-        this.updateRequestUrl(reducedURL.getHost(), false);
+        await this.updateRequestUrl(reducedURL.getHost(), false);
       } else {
-        this.updateRequestUrl(
+        await this.updateRequestUrl(
           reducedURL.getHost() + "?" + reducedQueryParams.getValue(),
           false,
         );
       }
     }
+    this.compareRequestWithServer();
   };
 
   /**
@@ -411,7 +570,6 @@ class RestExplorerViewModel
   public updateAutoGeneratedHeaders = async (headers: KeyValueChecked[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.autoGeneratedHeaders = headers;
-    progressiveTab.isSaved = false;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
@@ -440,9 +598,8 @@ class RestExplorerViewModel
       ...progressiveTab.property.request.auth,
       ..._auth,
     };
-    progressiveTab.isSaved = false;
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.authHeader = new ReduceAuthHeader(
       progressiveTab.property.request.state,
       progressiveTab.property.request.auth,
@@ -451,6 +608,7 @@ class RestExplorerViewModel
       progressiveTab.property.request.state,
       progressiveTab.property.request.auth,
     ).getValue();
+    this.compareRequestWithServer();
   };
 
   /**
@@ -463,9 +621,9 @@ class RestExplorerViewModel
       ...progressiveTab.property.request.body,
       ..._body,
     };
-    progressiveTab.isSaved = false;
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
   };
 
   /**
@@ -794,6 +952,7 @@ class RestExplorerViewModel
   public saveRequest = async () => {
     const componentData: RequestTab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
+
     if (!workspaceId || !collectionId) {
       return {
         status: "error",
@@ -846,7 +1005,7 @@ class RestExplorerViewModel
 
       progressiveTab.isSaved = true;
       this.tab = progressiveTab;
-      this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       if (!folderId) {
         this.collectionRepository.updateRequestOrFolderInCollection(
           collectionId,
@@ -881,7 +1040,7 @@ class RestExplorerViewModel
       const progressiveTab = this._tab.getValue();
       progressiveTab.isSaved = true;
       this.tab = progressiveTab;
-      this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       if (!folderId) {
         this.collectionRepository.updateRequestOrFolderInCollection(
           collectionId,
@@ -1042,7 +1201,10 @@ class RestExplorerViewModel
             const progressiveTab = this._tab.getValue();
             progressiveTab.isSaved = true;
             this.tab = progressiveTab;
-            this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+            await this.tabRepository.updateTab(
+              progressiveTab.tabId,
+              progressiveTab,
+            );
           } else {
             /**
              * Create new copy of the existing request
@@ -1099,14 +1261,17 @@ class RestExplorerViewModel
             /**
              * Update existing request
              */
-            this.updateRequestName(res.data.data.name);
-            this.updateRequestDescription(res.data.data.description);
-            this.updateRequestPath(expectedPath);
-            this.updateRequestId(res.data.data.id);
+            await this.updateRequestName(res.data.data.name);
+            await this.updateRequestDescription(res.data.data.description);
+            await this.updateRequestPath(expectedPath);
+            await this.updateRequestId(res.data.data.id);
             const progressiveTab = this._tab.getValue();
             progressiveTab.isSaved = true;
             this.tab = progressiveTab;
-            this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+            await this.tabRepository.updateTab(
+              progressiveTab.tabId,
+              progressiveTab,
+            );
           } else {
             /**
              * Create new copy of the existing request
@@ -1169,14 +1334,17 @@ class RestExplorerViewModel
             !componentData.path.workspaceId ||
             !componentData.path.collectionId
           ) {
-            this.updateRequestName(req.name);
-            this.updateRequestDescription(req.description);
-            this.updateRequestPath(expectedPath);
-            this.updateRequestId(req.id);
+            await this.updateRequestName(req.name);
+            await this.updateRequestDescription(req.description);
+            await this.updateRequestPath(expectedPath);
+            await this.updateRequestId(req.id);
             const progressiveTab = this._tab.getValue();
             progressiveTab.isSaved = true;
             this.tab = progressiveTab;
-            this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+            await this.tabRepository.updateTab(
+              progressiveTab.tabId,
+              progressiveTab,
+            );
           } else {
             const initRequestTab = new InitRequestTab(req.id, "UNTRACKED-");
             initRequestTab.updateName(req.name);
@@ -1198,7 +1366,6 @@ class RestExplorerViewModel
               id: req.id,
             },
           };
-          return;
         }
         const res = await insertCollectionRequest({
           collectionId: path[0].id,
@@ -1539,10 +1706,11 @@ class RestExplorerViewModel
    * @param chunkSize - The number of characters per chunk.
    * @param delay - The delay in milliseconds between each chunk display.
    */
-  private displayDataInChunks = (data, chunkSize, delay) => {
+  private displayDataInChunks = async (data, chunkSize, delay) => {
     let index = 0;
 
-    const displayNextChunk = () => {
+    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    const displayNextChunk =async () => {
       if (index < data.length) {
         const chunk = data.slice(index, index + chunkSize);
         const componentData = this._tab.getValue();
@@ -1551,15 +1719,16 @@ class RestExplorerViewModel
         componentData.property.request.ai.conversations[length - 1].message =
           componentData.property.request.ai.conversations[length - 1].message +
           chunk;
-        this.updateRequestAIConversation([
+        await this.updateRequestAIConversation([
           ...componentData.property.request.ai.conversations,
         ]);
         index += chunkSize;
-        setTimeout(displayNextChunk, delay);
+        await sleep(delay);
+        await displayNextChunk();
       }
     };
 
-    displayNextChunk();
+    await displayNextChunk();
   };
 
   /**
@@ -1589,19 +1758,18 @@ class RestExplorerViewModel
       url: componentData.property.request.url,
       auth: componentData.property.request.auth,
     };
+    prompt += `. Utilize the provided api data ${JSON.stringify(apiData)}`;
     // Call the AI assistant service to generate a response
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
-      instructions: `You are an AI Assistant, responsible for answering API related queries. Give response only in markdown string and color the code part. Only answers questions related to API and API Managememnt. Now here is the data which you can use to answer the queries related to APIs. ${JSON.stringify(
-        apiData,
-      )}`,
+      instructions: `You are an AI Assistant, responsible for answering API related queries. Give response only in markdown string. Only answer questions related to the provided API data and API Management. Give to the point and concise responses, only give explanations when they are asked for. Always follow best practices for REST API and answer accordingly.`,
       threadId: componentData?.property?.request?.ai?.threadId,
     });
     if (response.isSuccessful) {
       const data = response.data.data;
       // Update the AI thread ID and conversation with the new data
-      this.updateRequestAIThread(data.threadId);
-      this.updateRequestAIConversation([
+      await this.updateRequestAIThread(data.threadId);
+      await this.updateRequestAIConversation([
         ...componentData?.property?.request?.ai?.conversations,
         {
           message: "",
@@ -1612,7 +1780,7 @@ class RestExplorerViewModel
           status: true,
         },
       ]);
-      this.displayDataInChunks(data.result, 100, 300);
+      await this.displayDataInChunks(data.result, 100, 300);
     } else {
       // Update the conversation with an error message
       this.updateRequestAIConversation([
@@ -1650,12 +1818,10 @@ class RestExplorerViewModel
       url: componentData.property.request.url,
       auth: componentData.property.request.auth,
     };
+    prompt += `. Utilize the provided api data ${JSON.stringify(apiData)}`;
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
-      instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown. Now here is the data which you can use to generate the documentation ${JSON.stringify(
-        apiData,
-      )}`,
-      threadId: componentData?.property?.request?.ai?.threadId,
+      instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown.`,
     });
     if (response.isSuccessful) {
       await this.updateRequestDescription(response.data.data.result);

@@ -171,12 +171,13 @@
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
   onGenerateDocumentation={_viewModel.generateDocumentation}
 />
-
-<ChatBot
-  bind:tab={_viewModel.tab}
-  onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
-  onUpdateAiConversation={_viewModel.updateRequestAIConversation}
-  onUpdateRequestState={_viewModel.updateRequestState}
-  onGenerateAiResponse={_viewModel.generateAiResponse}
-  onToggleLike={_viewModel.toggleChatMessageLike}
-/>
+{#if !isGuestUser}
+  <ChatBot
+    bind:tab={_viewModel.tab}
+    onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
+    onUpdateAiConversation={_viewModel.updateRequestAIConversation}
+    onUpdateRequestState={_viewModel.updateRequestState}
+    onGenerateAiResponse={_viewModel.generateAiResponse}
+    onToggleLike={_viewModel.toggleChatMessageLike}
+  />
+{/if}
