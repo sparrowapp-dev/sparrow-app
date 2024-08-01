@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Observable } from "rxjs";
-  // import { fade } from "svelte/transition";
+  import { fade } from "svelte/transition";
   import {
     AIChatInterface,
     AiChatToggler,
@@ -108,12 +108,12 @@
         color="var(--icon-primary-300)"
       />
     </div>
-    <div class="d-flex flex-column align-items-end">
-      <!-- <div
+    <!-- <div class="d-flex flex-column align-items-end"> -->
+    <div
       class="d-flex flex-column align-items-end"
       in:fade={{ duration: 200 }}
       out:fade={{ duration: 200 }}
-    > -->
+    >
       <AISuggestionBox
         onClick={(text = "") => {
           if (!$tab?.property?.request?.state?.isChatbotGeneratingResponse) {
