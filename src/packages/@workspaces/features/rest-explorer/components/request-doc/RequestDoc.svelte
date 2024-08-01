@@ -22,15 +22,17 @@
     <div style="font-weight: 600; margin-bottom:8px;">Documentation</div>
   </div>
   <div style="height: 160px !important; " class="area">
-    <textarea
-      bind:value={requestDoc}
-      on:input={() => {
-        onUpdateRequestDescription(requestDoc);
-      }}
-      class="text-fs-12 w-100 border-0"
-      style="height:120px !important; font-weight:400; background-color:transparent; outline: none;   padding-bottom:5px; padding-top: 8px; padding-left: 12px; padding-right: 12px;"
-      placeholder="Add Documentation"
-    ></textarea>
+    <div on:keydown|stopPropagation on:keyup|stopPropagation>
+      <textarea
+        bind:value={requestDoc}
+        on:input={() => {
+          onUpdateRequestDescription(requestDoc);
+        }}
+        class="text-fs-12 w-100 border-0"
+        style="height:120px !important; font-weight:400; background-color:transparent; outline: none;   padding-bottom:5px; padding-top: 8px; padding-left: 12px; padding-right: 12px;"
+        placeholder="Add Documentation"
+      ></textarea>
+    </div>
     {#if !isGuestUser}
       <div
         class=""

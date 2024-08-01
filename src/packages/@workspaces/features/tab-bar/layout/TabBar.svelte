@@ -242,23 +242,25 @@
               }
             }}
           >
-            <Tooltip
-              title={"Quick Help"}
-              distance={10}
-              placement={"bottom"}
-              zIndex={10}
-            >
-              <div
-                class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
-                style="height: 24px; width:24px;"
+            {#if tabList.length !== 0}
+              <Tooltip
+                title={"Quick Help"}
+                distance={10}
+                placement={"bottom"}
+                zIndex={10}
               >
-                <HelpIcon
-                  height={"16px"}
-                  width={"16px"}
-                  color={"var(--text-secondary-200)"}
-                />
-              </div>
-            </Tooltip>
+                <div
+                  class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
+                  style="height: 24px; width:24px;"
+                >
+                  <HelpIcon
+                    height={"16px"}
+                    width={"16px"}
+                    color={"var(--text-secondary-200)"}
+                  />
+                </div>
+              </Tooltip>
+            {/if}
           </button>
         </div>
       {/if}

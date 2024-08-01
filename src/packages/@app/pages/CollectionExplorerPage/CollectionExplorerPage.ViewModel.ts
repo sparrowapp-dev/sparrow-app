@@ -106,28 +106,6 @@ class CollectionExplorerPage {
     });
 
     if (isGuestUser === true) {
-      return;
-    }
-      if (newCollectionName) {
-        const response = await this.collectionService.updateCollectionData(
-          collection.id,
-          collection.workspaceId,
-          { name: newCollectionName },
-        );
-        if (response.isSuccessful) {
-          this.collectionRepository.updateCollection(
-            collection.id,
-            response.data.data,
-          );
-          this.updateTab(this.tab.tabId, { name: newCollectionName });
-          notifications.success("Collection renamed successfully!");
-        } else if (response.message === "Network Error") {
-          notifications.error(response.message);
-        } else {
-          notifications.error("Failed to rename collection!");
-        }
-      }
-   
       if (newCollectionName) {
         const response = {
           data: {
@@ -143,7 +121,27 @@ class CollectionExplorerPage {
       } else {
         notifications.error("Failed to rename collection!");
       }
-    
+      return;
+    }
+    if (newCollectionName) {
+      const response = await this.collectionService.updateCollectionData(
+        collection.id,
+        collection.workspaceId,
+        { name: newCollectionName },
+      );
+      if (response.isSuccessful) {
+        this.collectionRepository.updateCollection(
+          collection.id,
+          response.data.data,
+        );
+        this.updateTab(this.tab.tabId, { name: newCollectionName });
+        notifications.success("Collection renamed successfully!");
+      } else if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error("Failed to rename collection!");
+      }
+    }
   };
 
   /**
@@ -162,24 +160,23 @@ class CollectionExplorerPage {
     if (isGuestUser === true) {
       return;
     }
-      const response = await this.collectionService.switchCollectionBranch(
-        collection.id,
-        newBranch,
-      );
-      if (response.isSuccessful) {
-        this.collectionRepository.updateCollection(collection?.id, {
-          currentBranch: newBranch,
-          items: response.data.data.items,
-        });
-      } else {
-        this.collectionRepository.updateCollection(collection?.id, {
-          currentBranch: newBranch,
-          items: [],
-        });
-      }
-      await this.tabRepository.clearTabs();
-      notifications.success("Branch switched successfully.");
-    
+    const response = await this.collectionService.switchCollectionBranch(
+      collection.id,
+      newBranch,
+    );
+    if (response.isSuccessful) {
+      this.collectionRepository.updateCollection(collection?.id, {
+        currentBranch: newBranch,
+        items: response.data.data.items,
+      });
+    } else {
+      this.collectionRepository.updateCollection(collection?.id, {
+        currentBranch: newBranch,
+        items: [],
+      });
+    }
+    await this.tabRepository.clearTabs();
+    notifications.success("Branch switched successfully.");
   };
 
   /**
@@ -227,38 +224,35 @@ class CollectionExplorerPage {
       if (isGuestUser === true) {
         return;
       }
-        const response = await this.collectionService.importCollection(
-          collection.workspaceId,
-          {
-            url: collection.activeSyncUrl,
-            urlData: {
-              data: JSON.parse(responseJSON.data.response),
-              headers: responseJSON.data.headers,
-            },
-            primaryBranch: collection?.primaryBranch,
-            currentBranch: collection?.currentBranch
-              ? collection?.currentBranch
-              : collection?.primaryBranch,
+      const response = await this.collectionService.importCollection(
+        collection.workspaceId,
+        {
+          url: collection.activeSyncUrl,
+          urlData: {
+            data: JSON.parse(responseJSON.data.response),
+            headers: responseJSON.data.headers,
           },
-          collection.activeSync,
-        );
+          primaryBranch: collection?.primaryBranch,
+          currentBranch: collection?.currentBranch
+            ? collection?.currentBranch
+            : collection?.primaryBranch,
+        },
+        collection.activeSync,
+      );
 
-        if (response.isSuccessful) {
-          this.collectionRepository.updateCollection(
-            collection.id,
-            response.data.data.collection,
-          );
-          notifications.success("Collection synced.");
-        } else {
-          notifications.error(
-            "Failed to sync the collection. Please try again.",
-          );
-        }
-       
-        notifications.error(
-          `Unable to detect ${collection.activeSyncUrl.replace("-json", "")}.`,
+      if (response.isSuccessful) {
+        this.collectionRepository.updateCollection(
+          collection.id,
+          response.data.data.collection,
         );
-      
+        notifications.success("Collection synced.");
+      } else {
+        notifications.error("Failed to sync the collection. Please try again.");
+      }
+
+      notifications.error(
+        `Unable to detect ${collection.activeSyncUrl.replace("-json", "")}.`,
+      );
     }
   };
 
@@ -305,41 +299,38 @@ class CollectionExplorerPage {
     if (isGuestUser === true) {
       return;
     }
-      if (responseJSON?.data?.status === ResponseStatusCode.OK) {
-        const response = await this.collectionService.importCollection(
-          collection.workspaceId,
-          {
-            url: collection?.activeSyncUrl,
-            urlData: {
-              data: JSON.parse(responseJSON.data.response),
-              headers: responseJSON.data.headers,
-            },
-            primaryBranch: collection?.primaryBranch,
-            currentBranch: collection?.currentBranch,
+    if (responseJSON?.data?.status === ResponseStatusCode.OK) {
+      const response = await this.collectionService.importCollection(
+        collection.workspaceId,
+        {
+          url: collection?.activeSyncUrl,
+          urlData: {
+            data: JSON.parse(responseJSON.data.response),
+            headers: responseJSON.data.headers,
           },
-          collection.activeSync,
-        );
+          primaryBranch: collection?.primaryBranch,
+          currentBranch: collection?.currentBranch,
+        },
+        collection.activeSync,
+      );
 
-        if (response.isSuccessful) {
-          await this.collectionRepository.updateCollection(
-            collection?.id,
-            response.data.data.collection,
-          );
-          notifications.success("Collection synced.");
-          return true;
-        } else {
-          notifications.error(
-            "Failed to sync the collection. Please try again.",
-          );
-          return false;
-        }
-      } else {
-        notifications.error(
-          `Unable to detect ${collection?.activeSyncUrl.replace("-json", "")}.`,
+      if (response.isSuccessful) {
+        await this.collectionRepository.updateCollection(
+          collection?.id,
+          response.data.data.collection,
         );
+        notifications.success("Collection synced.");
+        return true;
+      } else {
+        notifications.error("Failed to sync the collection. Please try again.");
         return false;
       }
-    
+    } else {
+      notifications.error(
+        `Unable to detect ${collection?.activeSyncUrl.replace("-json", "")}.`,
+      );
+      return false;
+    }
   };
 
   /**
@@ -386,11 +377,11 @@ class CollectionExplorerPage {
     if (isGuestUser === true) {
       return;
     }
-      response = await this.collectionService.switchCollectionBranch(
-        collection?.id,
-        collection?.currentBranch,
-      );
-    
+    response = await this.collectionService.switchCollectionBranch(
+      collection?.id,
+      collection?.currentBranch,
+    );
+
     if (response && response.isSuccessful) {
       isSynced = true;
     } else {
@@ -539,37 +530,37 @@ class CollectionExplorerPage {
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
-    if (isGuestUser == true) {return;}
-      const response = await this.collectionService.updateCollectionData(
+    if (isGuestUser == true) {
+      return;
+    }
+    const response = await this.collectionService.updateCollectionData(
+      collection.id,
+      collection.workspaceId,
+      { description: newDescription },
+    );
+    if (response.isSuccessful) {
+      this.collectionRepository.updateCollection(
         collection.id,
-        collection.workspaceId,
-        { description: newDescription },
+        response.data.data,
       );
-      if (response.isSuccessful) {
-        this.collectionRepository.updateCollection(
-          collection.id,
-          response.data.data,
-        );
-        notifications.success("Description updated successfully!");
-      } else if (response.message === "Network Error") {
-        notifications.error(response.message);
-      } else {
-        notifications.error("Failed to update description!");
-      }
-  
-      if (newDescription) {
-        const response = {
-          data: { description: newDescription },
-        };
-        await this.collectionRepository.updateCollection(
-          collection.id,
-          response.data,
-        );
-        notifications.success("Description updated successfully!");
-      } else {
-        notifications.error("Failed to update description!");
-      }
-    
+    } else if (response.message === "Network Error") {
+      notifications.error(response.message);
+    } else {
+      notifications.error("Failed to update description!");
+    }
+
+    if (newDescription) {
+      const response = {
+        data: { description: newDescription },
+      };
+      await this.collectionRepository.updateCollection(
+        collection.id,
+        response.data,
+      );
+      notifications.success("Description updated successfully!");
+    } else {
+      notifications.error("Failed to update description!");
+    }
   };
 
   /**
