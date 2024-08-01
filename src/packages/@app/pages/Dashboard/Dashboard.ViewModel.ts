@@ -197,6 +197,7 @@ export class DashboardViewModel {
           collection,
           updatedAt,
           updatedBy,
+          isNewInvite,
         } = elem;
         const isActiveWorkspace = await this.checkActiveWorkspace(_id);
         if (isActiveWorkspace) isAnyWorkspaceActive = _id;
@@ -217,6 +218,7 @@ export class DashboardViewModel {
           createdBy,
           updatedAt,
           updatedBy,
+          isNewInvite,
         };
         data.push(item);
       }

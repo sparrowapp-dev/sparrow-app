@@ -322,6 +322,7 @@ export default class WorkspaceExplorerViewModel {
           collection,
           updatedAt,
           updatedBy,
+          isNewInvite,
         } = elem;
         const isActiveWorkspace =
           await this.workspaceRepository.checkActiveWorkspace(_id);
@@ -343,6 +344,7 @@ export default class WorkspaceExplorerViewModel {
           createdBy,
           updatedAt,
           updatedBy,
+          isNewInvite,
         };
         data.push(item);
       }
