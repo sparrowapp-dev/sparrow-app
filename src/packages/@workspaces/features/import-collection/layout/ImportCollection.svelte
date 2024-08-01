@@ -573,13 +573,13 @@
     />
   </div>
   <div>
-    {#if isInputDataTouched && uploadCollection.file.invalid && (uploadCollection.file.showFileSizeError || uploadCollection.file.showFileTypeError)}
-      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-        Invalid file format. Please upload an OAS file in YAML or JSON format.
-      </p>
-    {:else if isInputDataTouched && isFileEmpty}
+    {#if isInputDataTouched && uploadCollection.file.invalid && isFileEmpty}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         Please upload a file to import collection.
+      </p>
+    {:else if isInputDataTouched && uploadCollection.file.invalid}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        Invalid file format. Please upload an OAS file in YAML or JSON format.
       </p>
     {/if}
   </div>
