@@ -100,8 +100,14 @@
     }}
     style="max-width: 15vw; padding-right: 10px;"
     class="tab-data rounded-start py-3 overflow-hidden ellipsis"
-    >{list?.name}</td
-  >
+    >{list?.name}
+    {#if list?.isNewInvite}
+      <span
+        style="font-size:12px; font-weight:700; color:var(--text-primary-300); margin-left:6px"
+        >NEW</span
+      >
+    {/if}
+  </td>
 
   <td
     on:click={(e) => {

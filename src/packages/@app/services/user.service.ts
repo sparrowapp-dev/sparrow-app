@@ -17,6 +17,27 @@ export class UserService {
   };
 
   /**
+   * Disables the new invite tag for a user in a workspace.
+   *
+   * @param userId - The ID of the user for whom the new invite tag should be disabled.
+   * @param workspaceId - The ID of the workspace.
+   * @returns A promise that resolves to the response of the request.
+   */
+  public disableWorkspaceNewInviteTag = async (
+    userId: string,
+    workspaceId: string,
+  ) => {
+    const response: MakeRequestResponse = await makeRequest(
+      "GET",
+      `${apiUrl}/api/workspace/${workspaceId}/user/${userId}/disableWorkspaceNewInvite`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  /**
    * Validates the user email by making a GET request to the server.
    *
    * @param email - The email address to be validated.
