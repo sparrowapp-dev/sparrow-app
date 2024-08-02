@@ -231,7 +231,7 @@
           >
             {#if workspaceData.length < 5}
               <div class="recent-text-btn">
-                You will see your fzzzzive most recent workspaces here.
+                You will see your five most recent workspaces here.
               </div>
             {/if}
             <div class="lower-underline"></div>
