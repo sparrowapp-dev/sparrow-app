@@ -98,6 +98,9 @@
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
   export let onUpdateCollectionGuide: (query, isActive) => void;
+  export let onUpdateAiPrompt;
+  export let onUpdateAiConversation;
+  export let onGenerateDocumentation;
   /**
    * Role of user in active workspace
    */
@@ -112,7 +115,7 @@
     const event = await onFetchCollectionGuide({
       id: "collection-guide",
     });
-    event.$.subscribe((e) => {
+    event?.$.subscribe((e) => {
       if (e.isActive === false) {
         isPopoverContainer = false;
       } else {
@@ -351,8 +354,14 @@
                     />
                   {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                     <RequestDoc
+                      isDocGenerating={$tab.property.request?.state
+                        ?.isDocGenerating}
+                      isDocAlreadyGenerated={$tab.property.request?.state
+                        ?.isDocAlreadyGenerated}
+                      {onGenerateDocumentation}
                       {onUpdateRequestDescription}
-                      requestStateDoc={$tab.description}
+                      requestDoc={$tab.description}
+                      {isGuestUser}
                     />
                   {/if}
                 </div>

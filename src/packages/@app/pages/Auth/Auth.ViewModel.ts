@@ -75,6 +75,7 @@ export class AuthViewModel {
       createdAt: new Date().toISOString(),
       createdBy: user.id,
       isActiveWorkspace: true,
+      isNewInvite: false,
       environmentId: "",
       collections: [],
     };

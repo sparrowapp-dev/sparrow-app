@@ -1,6 +1,9 @@
 import { user } from "$lib/store";
+import type { addUsersInWorkspacePayload } from "$lib/utils/dto";
 import type { InviteBody } from "$lib/utils/dto/team-dto";
-import { UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
+import { Events, UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
+import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
+import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import type { WorkspaceDocument } from "@app/database/database";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
@@ -210,6 +213,7 @@ export class TeamExplorerPageViewModel {
           collection,
           updatedAt,
           updatedBy,
+          isNewInvite,
         } = elem;
         const isActiveWorkspace =
           await this.workspaceRepository.checkActiveWorkspace(_id);
@@ -231,6 +235,7 @@ export class TeamExplorerPageViewModel {
           createdBy,
           updatedAt,
           updatedBy,
+          isNewInvite,
         };
         data.push(item);
       }
@@ -284,7 +289,31 @@ export class TeamExplorerPageViewModel {
       this.tabRepository.createTab(initWorkspaceTab.getValue());
       navigate("/dashboard/collections");
       notifications.success("New Workspace Created");
+      MixpanelEvent(Events.Create_New_Workspace_TeamPage);
     }
+  };
+
+  /**
+   * disable the invite tag in user's workspace
+   * @param workspaceId id of workspace
+   */
+  private handleDisableWorkspaceInviteTag = async (workspaceId: string) => {
+    let loggedInUserId = "";
+    user.subscribe((value) => {
+      loggedInUserId = value?._id;
+    });
+    const response: MakeRequestResponse =
+      await this.userService.disableWorkspaceNewInviteTag(
+        loggedInUserId,
+        workspaceId,
+      );
+    if (response.isSuccessful === true) {
+      await this.workspaceRepository.updateWorkspace(workspaceId, {
+        isNewInvite: false,
+      });
+      return response.data.data;
+    }
+    return;
   };
 
   /**
@@ -292,6 +321,10 @@ export class TeamExplorerPageViewModel {
    * @param id - Workspace id
    */
   public handleSwitchWorkspace = async (id: string) => {
+    const prevWorkspace = await this.workspaceRepository.readWorkspace(id);
+    if (prevWorkspace?.isNewInvite) {
+      await this.handleDisableWorkspaceInviteTag(id);
+    }
     await this.workspaceRepository.setActiveWorkspace(id);
     const res = await this.workspaceRepository.readWorkspace(id);
     const initWorkspaceTab = new InitWorkspaceTab(id, id);
@@ -359,6 +392,7 @@ export class TeamExplorerPageViewModel {
     } else {
       notifications.error(`Failed to remove ${_userName} from ${_teamName}`);
     }
+    MixpanelEvent(Events.Remove_User_Team);
     return response;
   };
 
@@ -393,6 +427,7 @@ export class TeamExplorerPageViewModel {
         `Failed to change role for ${_userName}. Please try again.`,
       );
     }
+    MixpanelEvent(Events.Invite_To_Team_Member);
     return response;
   };
 
@@ -427,6 +462,7 @@ export class TeamExplorerPageViewModel {
         `Failed to change role for ${_userName}. Please try again.`,
       );
     }
+    MixpanelEvent(Events.Invite_To_Team_Admin);
     return response;
   };
 
@@ -477,6 +513,7 @@ export class TeamExplorerPageViewModel {
           `Failed to update access of Owner. Please try again.`,
         );
       }
+      MixpanelEvent(Events.Team_Ownership_Transferred);
       return response;
     } else {
       notifications.error(
@@ -514,6 +551,7 @@ export class TeamExplorerPageViewModel {
         `Failed to remove ${_userName} from ${_workspaceName}`,
       );
     }
+    MixpanelEvent(Events.Remove_User_Workspace);
   };
 
   /**
@@ -556,6 +594,7 @@ export class TeamExplorerPageViewModel {
         `Failed to change role for ${_userName}. Please try again.`,
       );
     }
+    MixpanelEvent(Events.Teams_Role_Changed);
   };
 
   /**
@@ -602,6 +641,7 @@ export class TeamExplorerPageViewModel {
         `Failed to remove ${workspace.name} from ${workspace?.team?.teamName}. Please try again.`,
       );
     }
+    MixpanelEvent(Events.Delete_Workspace);
     return response;
   };
 
@@ -657,7 +697,7 @@ export class TeamExplorerPageViewModel {
         resolve();
       }, 500),
     );
-
+    MixpanelEvent(Events.Leave_Team);
     return response;
   };
 
@@ -688,5 +728,47 @@ export class TeamExplorerPageViewModel {
       return true;
     }
     return false;
+  };
+
+
+  
+  /**
+   * Invites users to a workspace.
+   * @param _workspaceId current workspace Id.
+   * @param _workspaceName current workspace name.
+   * @param _data The payload containing users and their roles.
+   * @param _invitedUserCount count of users to be invited.
+   * @returns A promise resolving to the response from the invitation operation.
+   */
+  public inviteUserToWorkspace = async (
+    _workspaceId: string,
+    _workspaceName: string,
+    _data: addUsersInWorkspacePayload,
+    _invitedUserCount: number,
+  ) => {
+    const response = await this.workspaceService.addUsersInWorkspace(
+      _workspaceId,
+      _data,
+    );
+    if (response?.data?.data) {
+      const newTeam = response.data.data.users;
+      this.workspaceRepository.addUserInWorkspace(_workspaceId, newTeam);
+      notifications.success(
+        `Invite sent to ${_invitedUserCount} people for ${_workspaceName}.`,
+      );
+    } else {
+      notifications.error(`Failed to sent invite. Please try again.`);
+    }
+    if (_data.role === WorkspaceRole.WORKSPACE_VIEWER) {
+      MixpanelEvent(Events.Invite_To_Workspace_Viewer, {
+        source: "invite to workspace as viewer",
+      });
+    } else if (_data.role === WorkspaceRole.WORKSPACE_EDITOR) {
+      MixpanelEvent(Events.Invite_To_Workspace_Editor, {
+        source: "invite to workspace as editor",
+      });
+    }
+
+    return response;
   };
 }

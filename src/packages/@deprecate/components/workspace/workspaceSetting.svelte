@@ -1,7 +1,7 @@
 <script lang="ts">
   import { SearchIcon } from "$lib/assets/app.asset";
   import WorkspaceUserInfo from "./workspaceUserInfo.svelte";
-  import { TeamRole } from "$lib/utils/enums";
+  import { Events, TeamRole } from "$lib/utils/enums";
   import type {
     CollectionsMethods,
     TeamRepositoryMethods,
@@ -17,6 +17,7 @@
   import { HeaderDashboardViewModel } from "../header/header-dashboard/HeaderDashboard.ViewModel";
   import Dropdown from "../dropdown/Dropdown.svelte";
   import { requestResponseStore } from "$lib/store";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   export let currentTeamworkspaces: WorkspaceDocument[];
   export let currentWorkspaceDetails: { id: string; name: string };
   export let currentTeamDetails: { id: string; name: string };
@@ -123,6 +124,9 @@
         `Failed to remove ${currentWorkspaceDetails.name} from ${currentTeamDetails.name}. Please try again`,
       );
     }
+    MixpanelEvent(Events.Delete_Workspace, {
+      source: "delete workspace",
+    });
     handleDeletePopup(false);
   };
   let confirmationText: string = "";

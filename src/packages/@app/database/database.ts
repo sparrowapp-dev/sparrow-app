@@ -151,6 +151,9 @@ export class RxDB {
           8: function (oldDoc: WorkspaceDocument) {
             return oldDoc;
           },
+          9: function (oldDoc: WorkspaceDocument) {
+            return oldDoc;
+          },
         },
       },
       tab: {
@@ -184,6 +187,20 @@ export class RxDB {
           9: function (oldDoc: TabDocument) {
             oldDoc.property.request.state.isHeaderBulkEditActive = false;
             oldDoc.property.request.state.isParameterBulkEditActive = false;
+            return oldDoc;
+          },
+          10: function (oldDoc: TabDocument) {
+            const ai = {
+              conversations: [],
+              prompt: "",
+              threadId: "",
+            };
+            oldDoc.property.request.ai = ai;
+            oldDoc.property.request.state.isChatbotActive = false;
+            oldDoc.property.request.state.isChatbotSuggestionsActive = true;
+            oldDoc.property.request.state.isChatbotGeneratingResponse = false;
+            oldDoc.property.request.state.isDocGenerating = false;
+            oldDoc.property.request.state.isDocAlreadyGenerated = false;
             return oldDoc;
           },
         },

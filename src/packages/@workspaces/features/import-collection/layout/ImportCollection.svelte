@@ -573,13 +573,13 @@
     />
   </div>
   <div>
-    {#if isInputDataTouched && uploadCollection.file.invalid && (uploadCollection.file.showFileSizeError || uploadCollection.file.showFileTypeError)}
-      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-        Invalid file format. Please upload an OAS file in YAML or JSON format.
-      </p>
-    {:else if isInputDataTouched && isFileEmpty}
+    {#if isInputDataTouched && uploadCollection.file.invalid && isFileEmpty}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         Please upload a file to import collection.
+      </p>
+    {:else if isInputDataTouched && uploadCollection.file.invalid}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        Invalid file format. Please upload an OAS file in YAML or JSON format.
       </p>
     {/if}
   </div>
@@ -773,8 +773,8 @@
 </div>
 
 <style lang="scss">
-  .text-area::placeholder{
-    color: var( --text-tertiary-100);
+  .text-area::placeholder {
+    color: var(--text-tertiary-100);
   }
   #file-input {
     display: none;
@@ -974,28 +974,28 @@
     background-color: var(--bg-secondary-100);
     transition: 200ms;
   }
-  .form-check-input{
+  .form-check-input {
     border: 1px solid var(--border-secondary-100);
-    background-color:  var(--bg-tertiary-300) !important;
+    background-color: var(--bg-tertiary-300) !important;
     background-image: none !important;
   }
-  .form-check-input:checked:hover{
-    border: 3px solid var(--border-primary-300 ) ;
+  .form-check-input:checked:hover {
+    border: 3px solid var(--border-primary-300);
     background-color: var(--bg-tertiary-300);
-    outline :5px solid var(--border-tertiary-300);
+    outline: 5px solid var(--border-tertiary-300);
     outline-offset: -1px;
   }
-  .form-check-input:hover{
-    border: 3px solid var(--border-primary-300 ) ;
+  .form-check-input:hover {
+    border: 3px solid var(--border-primary-300);
     background-color: var(--bg-tertiary-300);
-    outline :5px solid var(--border-tertiary-300);
+    outline: 5px solid var(--border-tertiary-300);
     outline-offset: -1px;
   }
-  .form-check-input:checked{
-    background-color: var(--bg-tertiary-250) !important;
-    border: 4.5px solid var(--border-primary-300 ) !important;
+  .form-check-input:checked {
+    background-color: var(--bg-tertiary-750) !important;
+    border: 4.5px solid var(--border-primary-300) !important;
   }
-  .form-check-label{
+  .form-check-label {
     color: var(--text-secondary-100);
   }
   input:checked + .slider {

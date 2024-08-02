@@ -9,3 +9,4 @@ export * from "./tab-bar";
 export * from "./workspace-default";
 export * from "./workspace-explorer";
 export * from "./invite-to-workspace";
+export * from "./chat-bot";

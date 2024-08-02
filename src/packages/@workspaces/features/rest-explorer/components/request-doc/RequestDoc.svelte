@@ -1,112 +1,86 @@
 <script lang="ts">
-  import { DiskIcon, EditIcon } from "@library/icons";
-    import { notifications } from "@library/ui/toast/Toast";
-  import { onMount } from "svelte";
-  let description: string = "";
-  let editing = false;
+  import { Events } from "$lib/utils/enums";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { generatingImage } from "@common/images";
+  import { AISuggestionBox } from "@workspaces/features/chat-bot/components";
   export let onUpdateRequestDescription;
-  export let requestStateDoc;
-  let textareaRef: HTMLTextAreaElement | null = null;
-  let docValue = "";
+  export let isDocGenerating = false;
+  export let isDocAlreadyGenerated = false;
+  export let requestDoc: string;
+  export let onGenerateDocumentation;
+  export let isGuestUser;
 
-  const toggleEditMode = () => {
-    editing = !editing;
-    if (editing && textareaRef) {
-      focusTextarea();
-      setTimeout(() => {
-        textareaRef.focus();
-      }, 0);
-    }
-  };
-  onMount(() => {
-    docValue = requestStateDoc;
-  });
-
-  const handleFocus = () => {
-    if (!editing) {
-      toggleEditMode();
-    }
-  };
-  const focusTextarea = () => {
-    if (textareaRef) {
-      textareaRef.focus();
-    }
-  };
-
-  const handleSaveChanges = () => {
-    if (textareaRef) {
-      description = textareaRef.value;
-      onUpdateRequestDescription(description);
+  const sendPrompt = async (text: string) => {
+    if (text) {
+      const response = await onGenerateDocumentation(text, "", "");
     }
   };
 </script>
 
-<div class="d-flex flex-column text-fs-14" style="gap: 8px;">
+<div class=" text-fs-14">
   <div class="d-flex" style="justify-content: space-between;">
-    <div style="font-weight: 600;">Documentation</div>
-    {#if !editing}
-      <div
-        class="edit-btn d-flex align-items-center pe-4 ps-4"
-        style="gap: 3px; border-radius: 2px; cursor: pointer;"
-        on:click={() => {
-          toggleEditMode();
-          focusTextarea();
+    <div style="font-weight: 600; margin-bottom:8px;">Documentation</div>
+  </div>
+  <div style="height: 160px !important; " class="area">
+    <div on:keydown|stopPropagation on:keyup|stopPropagation>
+      <textarea
+        bind:value={requestDoc}
+        on:input={() => {
+          onUpdateRequestDescription(requestDoc);
         }}
-      >
-        <div class="mb-1">
-          <EditIcon
-            height="10.56px"
-            width="10.56px"
-            color="var(--icon-primary-300)"
-          />
-        </div>
-        <p class="edit-txt mb-0 text-fs-12">Edit</p>
-      </div>
-    {:else}
+        class="text-fs-12 w-100 border-0"
+        style="height:120px !important; font-weight:400; background-color:transparent; outline: none;   padding-bottom:5px; padding-top: 8px; padding-left: 12px; padding-right: 12px;"
+        placeholder="Add Documentation"
+      ></textarea>
+    </div>
+    {#if !isGuestUser}
       <div
-        class="edit-btn d-flex align-items-center"
-        style="gap: 3px; padding-left: 4px; padding-right: 4px; border-radius: 2px; cursor: pointer;"
-        on:click={() => {
-          handleSaveChanges();
-          notifications.success("Documentation updated");
-          toggleEditMode();
-        }}
+        class=""
+        style="height: 42px; width: 100%;margin-top:-6px; padding-bottom:8px; padding-left:8px; "
       >
-        <div class="mb-1">
-          <DiskIcon
-            height={15}
-            width={15}
-            color={"var(  --text-primary-300)"}
-          />
+        <div style="width:fit-content; margin-top:6px; ">
+          {#if isDocGenerating == true}
+            <div
+              class="text-primary-300 mt-1"
+              style="font-size: 14px; height: 20px; width:auto;"
+            >
+              <img
+                style="height: 30px; width:auto;"
+                src={generatingImage}
+                alt="generating"
+              />
+            </div>
+          {:else if isDocAlreadyGenerated == false}
+            <AISuggestionBox
+              onClick={(text = "") => {
+                ("Generate Documentation for api request, don't give response in markdown format");
+                sendPrompt(text);
+                MixpanelEvent(Events.AI_Generate_Doc);
+              }}
+              title={"Generate Documentation"}
+            />
+          {:else if isDocAlreadyGenerated == true}
+            <AISuggestionBox
+              onClick={(text = "") => {
+                text =
+                  "Re-Generate Documentation for api request, don't give response in markdown format. Make it better.";
+                sendPrompt(text);
+                MixpanelEvent(Events.AI_Regenerate_Doc);
+              }}
+              title={"Regenerate"}
+            />
+          {/if}
         </div>
-        <p class="edit-txt mb-0 text-fs-12">Save Changes</p>
       </div>
     {/if}
-  </div>
-  <div style="height: 225px;">
-    <textarea
-      bind:this={textareaRef}
-      on:input={handleFocus}
-      value={docValue}
-      class="text-area text-fs-12 h-100 w-100 border-0"
-      style="font-weight:400; background-color:transparent; outline: none; border-radius: 2px; padding-bottom:20px; padding-top: 8px; padding-left: 12px; padding-right: 12px;"
-      placeholder="Add Documentation"
-    ></textarea>
   </div>
 </div>
 
 <style>
-  .edit-btn:hover {
-    background-color: var(--bg-primary-700);
-    color: var(--text-secondary-100) !important;
-  }
-  .edit-btn {
-    color: var(--text-primary-300);
-  }
-  .text-area:focus {
+  .area:focus-within {
     border: 1px solid var(--border-primary-300) !important;
   }
-  .text-area:hover {
+  .area:hover {
     background-color: var(--bg-secondary-450) !important;
   }
 </style>

@@ -4,7 +4,7 @@
 
   // ---- View Model
   import RestExplorerViewModel from "./RestExplorerPage.ViewModel";
-  import { RestExplorer } from "@workspaces/features";
+  import { RestExplorer, ChatBot } from "@workspaces/features";
   import { Debounce } from "@common/utils";
   import { isGuestUserActive, user } from "$lib/store";
   import { onMount } from "svelte";
@@ -31,6 +31,10 @@
     _viewModel.updateNameWithCollectionList,
     1000,
   );
+  const debouncedAPIUpdater = new Debounce().debounce(
+    _viewModel?.refreshTabData,
+    1000,
+  );
   let prevTabName = "";
   /**
    * Find the role of user in active workspace
@@ -52,6 +56,7 @@
       }
       prevTabName = tab.name;
       findUserRole();
+      debouncedAPIUpdater(tab);
     }
   }
 
@@ -162,4 +167,17 @@
   onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
   onRenameCollection={_viewModel.handleRenameCollection}
   onRenameFolder={_viewModel.handleRenameFolder}
+  onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
+  onUpdateAiConversation={_viewModel.updateRequestAIConversation}
+  onGenerateDocumentation={_viewModel.generateDocumentation}
 />
+{#if !isGuestUser}
+  <ChatBot
+    bind:tab={_viewModel.tab}
+    onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
+    onUpdateAiConversation={_viewModel.updateRequestAIConversation}
+    onUpdateRequestState={_viewModel.updateRequestState}
+    onGenerateAiResponse={_viewModel.generateAiResponse}
+    onToggleLike={_viewModel.toggleChatMessageLike}
+  />
+{/if}

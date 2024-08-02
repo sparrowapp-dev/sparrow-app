@@ -48,7 +48,7 @@
         bind:value={search}
         on:input={() => {}}
         width={"300px"}
-        style="outline:none; width:358px; font-size:12px !important; height:32px; border:none; background-color: var(--bg-tertiary-250); border-radius:4px;"
+        style="outline:none; width:358px; font-size:12px !important; height:32px; border:none; background-color: var(--bg-tertiary-750); border-radius:4px;"
         placeholder={`Search People in ${workspaceName}`}
         defaultBorderColor="transparent"
         hoveredBorderColor={"var(--border-primary-300)"}

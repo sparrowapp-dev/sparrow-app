@@ -13,7 +13,7 @@ export const tabSchemaLiteral = {
   // separator: "|",
   // },
   type: "object",
-  version: 9,
+  version: 10,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -227,6 +227,21 @@ export const tabSchemaLiteral = {
                 isHeaderBulkEditActive: {
                   type: "boolean",
                 },
+                isChatbotActive: {
+                  type: "boolean",
+                },
+                isChatbotSuggestionsActive: {
+                  type: "boolean",
+                },
+                isChatbotGeneratingResponse: {
+                  type: "boolean",
+                },
+                isDocAlreadyGenerated: {
+                  type: "boolean",
+                },
+                isDocGenerating: {
+                  type: "boolean",
+                },
               },
             },
             auth: {
@@ -257,6 +272,43 @@ export const tabSchemaLiteral = {
                     },
                     addTo: {
                       type: "string",
+                    },
+                  },
+                },
+              },
+            },
+            ai: {
+              type: "object",
+              properties: {
+                prompt: {
+                  type: "string",
+                },
+                threadId: {
+                  type: "string",
+                },
+                conversations: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      messageId: {
+                        type: "string",
+                      },
+                      message: {
+                        type: "string",
+                      },
+                      type: {
+                        type: "string",
+                      },
+                      isLiked: {
+                        type: "boolean",
+                      },
+                      isDisliked: {
+                        type: "boolean",
+                      },
+                      status: {
+                        type: "boolean",
+                      },
                     },
                   },
                 },

@@ -94,6 +94,7 @@ $theme-grey-ffffff: #FFFFFF;
 $theme-grey-F5F5F5: #F5F5F5;
 $theme-grey-e5e5e5: #e5e5e5;
 $theme-grey-C4CBDA: #C4CBDA;
+$theme-grey-B6B5B5: #B6B5B5;
 $theme-grey-8A9299: #8A9299;
 $theme-grey-999999: #999999;
 $theme-grey-CCCCCC :#CCCCCC;
@@ -108,6 +109,7 @@ $theme-grey-45494D: #45494D;
 $theme-grey-353646: #353646;
 $theme-grey-333333: #333333;
 $theme-grey-313233: #313233;
+$theme-grey-2B343D: #2B343D;
 
 $theme-grey-272727: #272727;
 $theme-grey-212222: #212222;
@@ -156,6 +158,7 @@ $theme-red-fe2e2e: #fe2e2e;
 $theme-red-6f2828: #6f2828;
 $theme-red-312325: #312325;
 $theme-red-230408: #230408;
+$theme-red-2B1C1D: #2B1C1D;
 
 
 
@@ -275,6 +278,7 @@ $theme-red-230408: #230408;
   --text-secondary-850 : #{$theme-grey-121212};
   --text-secondary-900 : #{$theme-grey-000000};
   --text-secondary-1000: #{$theme-grey-CCCCCC};
+  --text-secondary-1100 : #{$theme-grey-2B343D};
 
   --text-tertiary-100 : #{$theme-violet-676A80};
   --text-tertiary-190 : #{$theme-violet-37394E};
@@ -297,6 +301,7 @@ $theme-red-230408: #230408;
   --text-danger-850 : #{$theme-red-6f2828};
   --text-danger-900 : #{$theme-red-fe2e2e};
   --text-danger-1000 : #{$theme-red-312325};
+  --text-danger-1200 : #{$theme-red-2B1C1D};
 
   //
   //
@@ -334,10 +339,10 @@ $theme-red-230408: #230408;
   --bg-secondary-900 : #{$theme-grey-000000};
   --bg-secondary-950 : #{$theme-grey-808080};
   --bg-secondary-1000 : #{$theme-grey-CCCCCC};
+  --bg-secondary-1100 : #{$theme-grey-2B343D};
 
   --bg-tertiary-100 : #{$theme-violet-676A80};
   --bg-tertiary-190 : #{$theme-violet-37394E};
-  --bg-tertiary-250 : #{$theme-violet-1C1D2B};
   --bg-tertiary-300 : #{$theme-violet-2A2C3C};
   --bg-tertiary-400 : #{$theme-violet-22232E};
   --bg-tertiary-500 : #{$theme-violet-272831};
@@ -358,6 +363,7 @@ $theme-red-230408: #230408;
   --bg-danger-900 : #{$theme-red-fe2e2e};
   --bg-danger-1000 : #{$theme-red-312325};
   --bg-danger-1100 : #{$theme-red-230408};
+  --bg-danger-1200 : #{$theme-red-2B1C1D};
 
 
   //
@@ -377,6 +383,7 @@ $theme-red-230408: #230408;
   --border-secondary-200 : #{$theme-grey-8A9299};
   --border-secondary-290 : #{$theme-grey-484848};
   --border-secondary-300 : #{$theme-grey-45494D};
+  --border-secondary-320 : #{$theme-grey-353646};
   --border-secondary-400 : #{$theme-grey-313233};
   --border-secondary-450 : #{$theme-grey-191919};
   --border-secondary-500 : #{$theme-grey-272727};
@@ -385,11 +392,11 @@ $theme-red-230408: #230408;
   --border-secondary-800 : #{$theme-grey-151515};
   --border-secondary-900 : #{$theme-grey-000000};
   --border-secondary-950 : #{$theme-grey-808080};
+  --border-secondary-1100 : #{$theme-grey-2B343D};
 
 
   --border-tertiary-100 : #{$theme-violet-676A80};
   --border-tertiary-190 : #{$theme-violet-37394E};
-  --border-tertiary-250 : #{$theme-violet-1C1D2B};
   --border-tertiary-300 : #{$theme-violet-2A2C3C};
   --border-tertiary-400 : #{$theme-violet-22232E};
   --border-tertiary-500 : #{$theme-violet-272831};
@@ -407,6 +414,7 @@ $theme-red-230408: #230408;
   --border-danger-800 : #{$theme-red-f33346};
   --border-danger-900 : #{$theme-red-fe2e2e};
   --border-danger-1000 : #{$theme-red-312325};
+  --border-danger-1200 : #{$theme-red-2B1C1D};
   
   //
   //
@@ -435,6 +443,7 @@ $theme-red-230408: #230408;
   --icon-secondary-900 : #{$theme-grey-000000};
   --icon-secondary-950 : #{$theme-grey-808080};
   --icon-secondary-1000 : #{$theme-grey-CCCCCC};
+  --icon-secondary-1100 : #{$theme-grey-2B343D};
 
 
   --icon-tertiary-100 : #{$theme-violet-676A80};
@@ -567,6 +576,7 @@ $sparrow-text-colors: (
   secondary-110 : $theme-grey-F5F5F5,
   secondary-150 : $theme-grey-e5e5e5,
   secondary-170 : $theme-grey-C4CBDA,
+  secondary-180 : $theme-grey-B6B5B5,
   secondary-200 : $theme-grey-8A9299,
   secondary-250 : $theme-grey-636566,
   secondary-270 : $theme-grey-60616B,
@@ -581,6 +591,7 @@ $sparrow-text-colors: (
   secondary-850 : $theme-grey-121212,
   secondary-900 : $theme-grey-000000,
   secondary-1000: $theme-grey-CCCCCC,
+  secondary-1100 : $theme-grey-2B343D,
 
   tertiary-100 : $theme-violet-676A80,
   tertiary-190 : $theme-violet-37394E,
@@ -614,6 +625,7 @@ $sparrow-bg-colors: (
   secondary-110 : $theme-grey-F5F5F5,
   secondary-150 : $theme-grey-e5e5e5,
   secondary-170 : $theme-grey-C4CBDA,
+  secondary-180 : $theme-grey-B6B5B5,
   secondary-200 : $theme-grey-8A9299,
   secondary-290 : $theme-grey-484848,
   secondary-300 : $theme-grey-45494D,
@@ -626,6 +638,7 @@ $sparrow-bg-colors: (
   secondary-850 : $theme-grey-121212,
   secondary-900 : $theme-grey-000000,
   secondary-1000 : $theme-grey-CCCCCC,
+  secondary-1100 : $theme-grey-2B343D,
   
   tertiary-100 : $theme-violet-676A80,
   tertiary-190 : $theme-violet-37394E,
@@ -661,6 +674,7 @@ $sparrow-border-colors: (
   secondary-110 : $theme-grey-F5F5F5,
   secondary-150 : $theme-grey-e5e5e5,
   secondary-170 : $theme-grey-C4CBDA,
+  secondary-180 : $theme-grey-B6B5B5,
   secondary-200 : $theme-grey-8A9299,
   secondary-290 : $theme-grey-484848,
   secondary-300 : $theme-grey-45494D,
@@ -672,6 +686,7 @@ $sparrow-border-colors: (
   secondary-800 : $theme-grey-151515,
   secondary-900 : $theme-grey-000000,
   secondary-1000 : $theme-grey-CCCCCC,
+  secondary-1100 : $theme-grey-2B343D,
 
   tertiary-100 : $theme-violet-676A80,
   tertiary-190 : $theme-violet-37394E,
@@ -788,12 +803,14 @@ span {
 /* Set the width of the scrollbar */
 ::-webkit-scrollbar {
   width: 11px; 
+  height: 11px;
 }
 
 /* Make the scrollbar track (background) transparent */
 ::-webkit-scrollbar-track {
   background: transparent;
   width: 5px;
+  height: 5px;
 }
 
 /* Customize the scrollbar thumb (the draggable part) */
@@ -803,6 +820,7 @@ span {
   border: 3px solid transparent; 
   background-clip: content-box; 
   width: 5px !important;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-corner {

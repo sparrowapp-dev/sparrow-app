@@ -136,6 +136,7 @@
     {environmentVariables}
     codeId={"url"}
     class={"input-url"}
+    {userRole}
   />
 
   <!-- Send button -->

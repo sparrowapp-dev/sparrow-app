@@ -260,6 +260,9 @@ export class EnvironmentViewModel {
     const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
     if (isGuestUser) {
       this.environmentRepository.removeEnvironment(env.id);
+      this.workspaceRepository.updateWorkspace(currentWorkspace._id, {
+        environmentId: "none",
+      });
       this.deleteEnvironmentTab(env.id);
       notifications.success(
         `${env.name} environment is removed from ${currentWorkspace.name}.`,
@@ -274,6 +277,9 @@ export class EnvironmentViewModel {
     );
     if (response.isSuccessful) {
       this.environmentRepository.removeEnvironment(env.id);
+      this.workspaceRepository.updateWorkspace(currentWorkspace._id, {
+        environmentId: "none",
+      });
       this.deleteEnvironmentTab(env.id);
       notifications.success(
         `${env.name} environment is removed from ${currentWorkspace.name}.`,

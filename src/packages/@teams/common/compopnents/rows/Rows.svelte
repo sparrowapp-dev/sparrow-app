@@ -8,6 +8,9 @@
   export let activeTeam;
   export let onOpenCollection: (id: string) => void;
   export let calculateTimeDifferenceInDays;
+
+  export let onAddMember;
+
   /**
    * Checks if the current user has admin or owner privileges.
    */
@@ -16,6 +19,7 @@
 
   let pos = { x: 0, y: 0 };
   let showMenu = false;
+  let workspaceTabWrapper: HTMLElement;
 
   let menuItems = [];
   let noOfColumns = 180;
@@ -23,8 +27,8 @@
   const rightClickContextMenu = (e) => {
     e.preventDefault();
     setTimeout(() => {
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
+      const mouseX = workspaceTabWrapper.getBoundingClientRect().right - 15;
+      const mouseY = workspaceTabWrapper.getBoundingClientRect().top + 28;
       pos = { x: mouseX, y: mouseY };
       showMenu = true;
     }, 100);
@@ -37,6 +41,17 @@
             onOpenCollection(list._id);
           },
           displayText: "Open Workspace",
+          disabled: false,
+        },
+        {
+          onClick: () => {
+            onAddMember({
+              workspaceID: list._id,
+              workspaceName: list.name,
+              users: list.users,
+            });
+          },
+          displayText: "Add Members",
           disabled: false,
         },
         {
@@ -85,8 +100,14 @@
     }}
     style="max-width: 15vw; padding-right: 10px;"
     class="tab-data rounded-start py-3 overflow-hidden ellipsis"
-    >{list?.name}</td
-  >
+    >{list?.name}
+    {#if list?.isNewInvite}
+      <span
+        style="font-size:12px; font-weight:700; color:var(--text-primary-300); margin-left:6px"
+        >NEW</span
+      >
+    {/if}
+  </td>
 
   <td
     on:click={(e) => {
@@ -130,6 +151,7 @@
   >
   <td class="tab-data rounded-end py-3">
     <button
+      bind:this={workspaceTabWrapper}
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-relative {showMenu
         ? 'threedot-active'
         : ''}"
