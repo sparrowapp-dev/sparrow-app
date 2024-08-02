@@ -1,3 +1,11 @@
+## [2.4.1](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.4.0...v2.4.1) (2024-08-02)
+
+
+### Bug Fixes
+
+* fixed typos [] ([cee3d2b](https://github.com/sparrowapp-dev/sparrow-app/commit/cee3d2bfff62ebcd6fe33de836393d18ef1be19c))
+* hot fix sparrow 2.4.1 [] ([a72696f](https://github.com/sparrowapp-dev/sparrow-app/commit/a72696ff71196cc01e05ad2900623f1647871f70))
+
 # [2.4.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.3.0...v2.4.0) (2024-08-02)
 
 
