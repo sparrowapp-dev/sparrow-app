@@ -169,7 +169,6 @@
       setTimeout(() => {
         scrollList("bottom", -1, "auto");
       }, 0);
-
       MixpanelEvent(Events.AI_Chat_Initiation);
     }}
   >
