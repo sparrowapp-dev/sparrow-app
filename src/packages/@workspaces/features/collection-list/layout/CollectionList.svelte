@@ -238,6 +238,11 @@
             showImportCurlPopup();
           },
         },
+        {
+          name: "Add WebSocket",
+          icon: CreateCollection,
+          onclick: () => onItemCreated("web-socket", {}),
+        },
       ];
 </script>
 

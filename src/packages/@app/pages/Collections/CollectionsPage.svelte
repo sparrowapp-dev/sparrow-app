@@ -55,6 +55,7 @@
   import { isGuestUserActive } from "$lib/store";
   import { pagesMotion } from "@app/constants";
   import { user } from "$lib/store";
+  import WebSocketExplorerPage from "../WebSocketExplorerPage/WebSocketExplorerPage.svelte";
 
   export let modifiedUser;
 
@@ -307,6 +308,12 @@
                         {modifiedUser}
                         tab={$activeTab}
                       />
+                    </div>
+                  </Motion>
+                {:else if $activeTab?.type === ItemType.WEB_SOCKET}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <WebSocketExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
                 {:else if !$tabList?.length}

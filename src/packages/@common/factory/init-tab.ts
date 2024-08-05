@@ -3,9 +3,9 @@ import {
   InitEnvironmentTab,
   InitFolderTab,
   InitRequestTab,
-  
+  InitWebSocketTab,
 } from "@common/utils";
-import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
+// import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
 
 class InitTab {
   constructor() {}
@@ -15,6 +15,13 @@ class InitTab {
    */
   public environment = (_id: string, _workspaceId: string) => {
     return new InitEnvironmentTab(_id, _workspaceId);
+  };
+  /**
+   * @param _id - environment mongo document id
+   * @param _workspaceId - Workspace mongo id to which environment belongs to
+   */
+  public webSocket = (_id: string, _workspaceId: string) => {
+    return new InitWebSocketTab(_id, _workspaceId);
   };
   /**
    * @param _id - request mongo document id

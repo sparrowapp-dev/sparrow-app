@@ -203,6 +203,9 @@ export class RxDB {
             oldDoc.property.request.state.isDocAlreadyGenerated = false;
             return oldDoc;
           },
+          11: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       collection: {

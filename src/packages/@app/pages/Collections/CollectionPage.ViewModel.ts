@@ -93,6 +93,7 @@ import { FeatureSwitchRepository } from "@app/repositories/feature-switch.reposi
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { WorkspaceService } from "@app/services/workspace.service";
 import { isGuestUserActive } from "$lib/store/auth.store";
+import { InitTab } from "@common/factory";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -249,6 +250,27 @@ export default class CollectionsViewModel {
     } else {
       setTimeout(() => {
         this.createNewTab(_limit - 1);
+      }, 2000);
+    }
+  };
+
+  private initTab = new InitTab();
+  /**
+   * Create web socket new tab with untracked id
+   */
+  private createWebSocketNewTab = async (_limit = 5) => {
+    if (_limit === 0) return;
+    const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
+    isApiCreatedFirstTime.set(true);
+    if (ws) {
+      this.tabRepository.createTab(
+        this.initTab.webSocket("UNTRACKED-" + uuidv4(), ws._id).getValue(),
+      );
+      moveNavigation("right");
+      MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
+    } else {
+      setTimeout(() => {
+        this.createWebSocketNewTab(_limit - 1);
       }, 2000);
     }
   };
@@ -2595,6 +2617,9 @@ export default class CollectionsViewModel {
           args.collection,
           args.folder,
         );
+        break;
+      case "web-socket":
+        await this.createWebSocketNewTab();
         break;
     }
     return response;
