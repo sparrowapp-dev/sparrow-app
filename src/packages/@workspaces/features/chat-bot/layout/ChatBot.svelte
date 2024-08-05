@@ -65,12 +65,12 @@
 {#if $tab?.property?.request?.state?.isChatbotActive}
   <div
     style="position: fixed;
-  top:200px;
-   bottom: 80px;
-   right:28px;
-   z-index: 200;
-   width: 320px;
-   "
+    top:200px;
+    bottom: 80px;
+    right:28px;
+    z-index: 200;
+    width: 320px;
+    "
   >
     <AIChatInterface
       conversations={$tab?.property?.request?.ai?.conversations}
@@ -111,8 +111,8 @@
     <!-- <div class="d-flex flex-column align-items-end"> -->
     <div
       class="d-flex flex-column align-items-end"
-      in:fade={{ duration: 200 }}
-      out:fade={{ duration: 200 }}
+      in:fade={{ duration: 400 }}
+      out:fade={{ duration: 100 }}
     >
       <AISuggestionBox
         onClick={(text = "") => {
@@ -166,6 +166,10 @@
       onUpdateRequestState({
         isChatbotActive: !$tab?.property?.request?.state?.isChatbotActive,
       });
+      setTimeout(() => {
+        scrollList("bottom", -1, "auto");
+      }, 0);
+
       MixpanelEvent(Events.AI_Chat_Initiation);
     }}
   >

@@ -69,7 +69,7 @@
 <!-- <div class="d-flex flex-column h-100 chat-box"> -->
 <div
   class="d-flex flex-column h-100 chat-box"
-  transition:slide={{ duration: 400 }}
+  transition:slide={{ duration: 200 }}
 >
   <div style="flex:1; overflow:auto;">
     <div class="d-flex h-100 flex-column">
