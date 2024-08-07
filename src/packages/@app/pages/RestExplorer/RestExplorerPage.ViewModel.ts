@@ -973,19 +973,33 @@ class RestExplorerViewModel
     const unadaptedRequest = requestTabAdapter.unadapt(componentData);
     // Save overall api
 
-    let folderSource;
-    if (folderId) {
-      folderSource = {
-        folderId: folderId,
-      };
-    }
-
     const requestMetaData = {
       id: _id,
       name: componentData?.name,
       description: componentData?.description,
       type: ItemType.REQUEST,
     };
+
+    let folderSource;
+    let itemSource;
+    if (folderId) {
+      folderSource = {
+        folderId: folderId,
+      };
+      itemSource = {
+        id: folderId,
+        type: ItemType.FOLDER,
+        items: {
+          ...requestMetaData,
+          request: unadaptedRequest,
+        },
+      };
+    } else {
+      itemSource = {
+        ...requestMetaData,
+        request: unadaptedRequest,
+      };
+    }
 
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -1030,10 +1044,7 @@ class RestExplorerViewModel
       workspaceId: workspaceId,
       ...folderSource,
       ...userSource,
-      items: {
-        ...requestMetaData,
-        request: unadaptedRequest,
-      },
+      items: itemSource,
     });
 
     if (res.isSuccessful) {

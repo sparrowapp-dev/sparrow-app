@@ -4,7 +4,7 @@ export enum ItemType {
   COLLECTION = "COLLECTION",
   WORKSPACE = "WORKSPACE",
   PERSONAL = "PERSONAL",
-  WEB_SOCKET = "WEB_SOCKET",
+  WEB_SOCKET = "WEBSOCKET",
 }
 
 export enum UntrackedItems {

@@ -400,19 +400,33 @@ export default class CollectionsViewModel {
     const unadaptedRequest = requestTabAdapter.unadapt(componentData);
     // Save overall api
 
-    let folderSource;
-    if (folderId) {
-      folderSource = {
-        folderId: folderId,
-      };
-    }
-
     const requestMetaData = {
       id: _id,
       name: componentData?.name,
       description: componentData?.description,
       type: ItemType.REQUEST,
     };
+
+    let folderSource;
+    let itemSource;
+    if (folderId) {
+      folderSource = {
+        folderId: folderId,
+      };
+      itemSource = {
+        id: folderId,
+        type: ItemType.FOLDER,
+        items: {
+          ...requestMetaData,
+          request: unadaptedRequest,
+        },
+      };
+    } else {
+      itemSource = {
+        ...requestMetaData,
+        request: unadaptedRequest,
+      };
+    }
 
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -450,10 +464,7 @@ export default class CollectionsViewModel {
       workspaceId: workspaceId,
       ...folderSource,
       ...userSource,
-      items: {
-        ...requestMetaData,
-        request: unadaptedRequest,
-      },
+      items: itemSource,
     });
     if (res.isSuccessful) {
       if (!folderId) {
@@ -2129,6 +2140,26 @@ export default class CollectionsViewModel {
     );
 
     if (response.isSuccessful) {
+      if (
+        requestObject.folderId &&
+        requestObject.collectionId &&
+        requestObject.workspaceId
+      ) {
+        await this.collectionRepository.deleteRequestInFolder(
+          requestObject.collectionId,
+          requestObject.folderId,
+          request.id,
+        );
+      } else if (
+        requestObject.workspaceId &&
+        requestObject.collectionId
+      ) {
+        await this.collectionRepository.deleteRequestOrFolderInCollection(
+          requestObject.collectionId,
+          request.id,
+        );
+      }
+
       notifications.success(`"${request.name}" Request deleted.`);
       this.removeMultipleTabs([request.id]);
       MixpanelEvent(Events.DELETE_REQUEST, {

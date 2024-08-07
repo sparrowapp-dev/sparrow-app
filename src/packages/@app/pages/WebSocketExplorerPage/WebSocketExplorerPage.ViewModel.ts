@@ -4,7 +4,12 @@ import {
   ReduceQueryParams,
 } from "@workspaces/features/rest-explorer/utils";
 import { createDeepCopy, moveNavigation } from "$lib/utils/helpers";
-import { CompareArray, Debounce, InitRequestTab } from "@common/utils";
+import {
+  CompareArray,
+  Debounce,
+  InitRequestTab,
+  InitWebSocketTab,
+} from "@common/utils";
 
 // ---- DB
 import type {
@@ -42,11 +47,11 @@ import {
   type Tab,
 } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
-import { RequestTabAdapter } from "@app/adapter/request-tab";
 import { CollectionService } from "@app/services/collection.service";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
+import { SocketTabAdapter } from "@app/adapter/socket-tab";
 
 class RestExplorerViewModel {
   /**
@@ -107,8 +112,6 @@ class RestExplorerViewModel {
   private compareRequestWithServerDebounced = async () => {
     let result = true;
     const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
-    // const requestTabAdapter = new RequestTabAdapter();
-    // const unadaptedRequest = requestTabAdapter.unadapt(progressiveTab);
     let requestServer;
     if (progressiveTab.path.folderId) {
       requestServer = await this.collectionRepository.readRequestInFolder(
@@ -610,7 +613,6 @@ class RestExplorerViewModel {
    * @returns save status
    */
   public saveSocket = async () => {
-    // return;
     const componentData: Tab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
 
@@ -630,23 +632,37 @@ class RestExplorerViewModel {
     }
     const _id = componentData.id;
 
-    const requestTabAdapter = new RequestTabAdapter();
-    const unadaptedRequest = requestTabAdapter.unadapt(componentData);
+    const socketTabAdapter = new SocketTabAdapter();
+    const unadaptedSocket = socketTabAdapter.unadapt(componentData);
     // Save overall api
 
+    const socketMetaData = {
+      id: _id,
+      name: componentData?.name,
+      description: componentData?.description,
+      type: ItemType.WEB_SOCKET,
+    };
+
     let folderSource;
+    let itemSource;
     if (folderId) {
       folderSource = {
         folderId: folderId,
       };
+      itemSource = {
+        id: folderId,
+        type: ItemType.FOLDER,
+        items: {
+          ...socketMetaData,
+          websocket: unadaptedSocket,
+        },
+      };
+    } else {
+      itemSource = {
+        ...socketMetaData,
+        websocket: unadaptedSocket,
+      };
     }
-
-    const requestMetaData = {
-      id: _id,
-      name: componentData?.name,
-      description: componentData?.description,
-      type: ItemType.REQUEST,
-    };
 
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -656,10 +672,10 @@ class RestExplorerViewModel {
       const progressiveTab = this._tab.getValue();
       const data = {
         id: progressiveTab.id,
-        name: requestMetaData.name,
-        description: requestMetaData.description,
-        type: "REQUEST",
-        request: unadaptedRequest,
+        name: socketMetaData.name,
+        description: socketMetaData.description,
+        type: ItemType.WEB_SOCKET,
+        websocket: unadaptedSocket,
         updatedAt: "",
         updatedBy: "Guest User",
       };
@@ -686,15 +702,12 @@ class RestExplorerViewModel {
         message: "",
       };
     }
-    const res = await updateCollectionRequest(_id, folderId, collectionId, {
+    const res = await this.collectionService.updateSocketInCollection(_id, {
       collectionId: collectionId,
       workspaceId: workspaceId,
       ...folderSource,
       ...userSource,
-      items: {
-        ...requestMetaData,
-        request: unadaptedRequest,
-      },
+      items: itemSource,
     });
 
     if (res.isSuccessful) {
@@ -808,14 +821,14 @@ class RestExplorerViewModel {
     let userSource = {};
     // const _id = componentData.id;
     if (path.length > 0) {
-      const requestTabAdapter = new RequestTabAdapter();
-      const unadaptedRequest = requestTabAdapter.unadapt(componentData);
+      const socketTabAdapter = new SocketTabAdapter();
+      const unadaptedSocket = socketTabAdapter.unadapt(componentData);
       const req = {
         id: uuidv4(),
         name: tabName,
         description,
-        type: ItemType.REQUEST,
-        request: unadaptedRequest,
+        type: ItemType.WEB_SOCKET,
+        websocket: unadaptedSocket,
         source: "USER",
         isDeleted: false,
         createdBy: "Guest User",
@@ -874,10 +887,8 @@ class RestExplorerViewModel {
             initRequestTab.updateDescription(req.description);
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(req.websocket.url);
-            initRequestTab.updateMethod(req.websocket.method);
-            initRequestTab.updateBody(req.websocket.body);
+            initRequestTab.updateMethod(req.websocket.message);
             initRequestTab.updateQueryParams(req.websocket.queryParams);
-            initRequestTab.updateAuth(req.websocket.auth);
             initRequestTab.updateHeaders(req.websocket.headers);
 
             this.tabRepository.createTab(initRequestTab.getValue());
@@ -890,17 +901,16 @@ class RestExplorerViewModel {
               id: req.id,
             },
           };
-          return;
         }
-        const res = await insertCollectionRequest({
+        const res = await this.collectionService.addSocketInCollection({
           collectionId: path[path.length - 1].id,
           workspaceId: _workspaceMeta.id,
           ...userSource,
           items: {
             name: tabName,
             description,
-            type: ItemType.REQUEST,
-            request: unadaptedRequest,
+            type: ItemType.WEB_SOCKET,
+            websocket: unadaptedSocket,
           },
         });
         if (res.isSuccessful) {
@@ -936,23 +946,21 @@ class RestExplorerViewModel {
             /**
              * Create new copy of the existing request
              */
-            const initRequestTab = new InitRequestTab(
+            const initSocketTab = new InitWebSocketTab(
               res.data.data.id,
               "UNTRACKED-",
             );
-            initRequestTab.updateName(res.data.data.name);
-            initRequestTab.updateDescription(res.data.data.description);
-            initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(res.data.data.websocket.url);
-            initRequestTab.updateMethod(res.data.data.websocket.method);
-            initRequestTab.updateBody(res.data.data.websocket.body);
-            initRequestTab.updateQueryParams(
+            initSocketTab.updateName(res.data.data.name);
+            initSocketTab.updateDescription(res.data.data.description);
+            initSocketTab.updatePath(expectedPath);
+            initSocketTab.updateUrl(res.data.data.websocket.url);
+            initSocketTab.updateMessage(res.data.data.websocket.message);
+            initSocketTab.updateQueryParams(
               res.data.data.websocket.queryParams,
             );
-            initRequestTab.updateAuth(res.data.data.websocket.auth);
-            initRequestTab.updateHeaders(res.data.data.websocket.headers);
+            initSocketTab.updateHeaders(res.data.data.websocket.headers);
 
-            this.tabRepository.createTab(initRequestTab.getValue());
+            this.tabRepository.createTab(initSocketTab.getValue());
             moveNavigation("right");
           }
           return {
@@ -1008,17 +1016,15 @@ class RestExplorerViewModel {
               progressiveTab,
             );
           } else {
-            const initRequestTab = new InitRequestTab(req.id, "UNTRACKED-");
-            initRequestTab.updateName(req.name);
-            initRequestTab.updateDescription(req.description);
-            initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(req.websocket.url);
-            initRequestTab.updateMethod(req.websocket.method);
-            initRequestTab.updateBody(req.websocket.body);
-            initRequestTab.updateQueryParams(req.websocket.queryParams);
-            initRequestTab.updateAuth(req.websocket.auth);
-            initRequestTab.updateHeaders(req.websocket.headers);
-            this.tabRepository.createTab(initRequestTab.getValue());
+            const initSocketTab = new InitWebSocketTab(req.id, "UNTRACKED-");
+            initSocketTab.updateName(req.name);
+            initSocketTab.updateDescription(req.description);
+            initSocketTab.updatePath(expectedPath);
+            initSocketTab.updateUrl(req.websocket.url);
+            initSocketTab.updateMessage(req.websocket.message);
+            initSocketTab.updateQueryParams(req.websocket.queryParams);
+            initSocketTab.updateHeaders(req.websocket.headers);
+            this.tabRepository.createTab(initSocketTab.getValue());
             moveNavigation("right");
           }
           return {
@@ -1029,7 +1035,7 @@ class RestExplorerViewModel {
             },
           };
         }
-        const res = await insertCollectionRequest({
+        const res = await this.collectionService.addSocketInCollection({
           collectionId: path[0].id,
           workspaceId: _workspaceMeta.id,
           folderId: path[path.length - 1].id,
@@ -1040,8 +1046,8 @@ class RestExplorerViewModel {
             items: {
               name: tabName,
               description,
-              type: ItemType.REQUEST,
-              request: unadaptedRequest,
+              type: ItemType.WEB_SOCKET,
+              websocket: unadaptedSocket,
             },
           },
         });
@@ -1070,22 +1076,20 @@ class RestExplorerViewModel {
             this.tab = progressiveTab;
             this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
           } else {
-            const initRequestTab = new InitRequestTab(
+            const initSocketTab = new InitWebSocketTab(
               res.data.data.id,
               "UNTRACKED-",
             );
-            initRequestTab.updateName(res.data.data.name);
-            initRequestTab.updateDescription(res.data.data.description);
-            initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(res.data.data.websocket.url);
-            initRequestTab.updateMethod(res.data.data.websocket.method);
-            initRequestTab.updateBody(res.data.data.websocket.body);
-            initRequestTab.updateQueryParams(
+            initSocketTab.updateName(res.data.data.name);
+            initSocketTab.updateDescription(res.data.data.description);
+            initSocketTab.updatePath(expectedPath);
+            initSocketTab.updateUrl(res.data.data.websocket.url);
+            initSocketTab.updateMessage(res.data.data.websocket.message);
+            initSocketTab.updateQueryParams(
               res.data.data.websocket.queryParams,
             );
-            initRequestTab.updateAuth(res.data.data.websocket.auth);
-            initRequestTab.updateHeaders(res.data.data.websocket.headers);
-            this.tabRepository.createTab(initRequestTab.getValue());
+            initSocketTab.updateHeaders(res.data.data.websocket.headers);
+            this.tabRepository.createTab(initSocketTab.getValue());
             moveNavigation("right");
           }
           return {
