@@ -320,14 +320,14 @@
       <div
         bind:this={folderTabWrapper}
         style="height:32px;"
-        class="d-flex align-items-center mb-1 justify-content-between my-button btn-primary {explorer.id ===
+        class="d-flex ps-3 align-items-center mb-1 justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
           : ''}"
       >
         <button
           style="padding-left: 30px;"
-          class="main-folder d-flex align-items-center pe-0 border-0 bg-transparent"
+          class="main-folder pe-2 d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
           on:click|preventDefault={() => {
             if (!isRenaming) {

@@ -1,6 +1,6 @@
 export * from "./rest-explorer";
 export * from "./save-as-request";
-export * from "./collection-list";
+export * from "./workspace-actions";
 export * from "./import-collection";
 export * from "./import-curl";
 export * from "./collection-explorer";
@@ -10,3 +10,5 @@ export * from "./workspace-default";
 export * from "./workspace-explorer";
 export * from "./invite-to-workspace";
 export * from "./chat-bot";
+export * from "./environment-list";
+export * from "./environment-explorer";

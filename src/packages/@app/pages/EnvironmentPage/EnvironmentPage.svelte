@@ -29,8 +29,10 @@
   let trackWorkspaceId;
   let isEnvLoading = false;
   let userRole = "";
+
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
+
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
