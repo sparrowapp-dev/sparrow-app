@@ -94,6 +94,7 @@ $theme-grey-ffffff: #FFFFFF;
 $theme-grey-F5F5F5: #F5F5F5;
 $theme-grey-e5e5e5: #e5e5e5;
 $theme-grey-C4CBDA: #C4CBDA;
+$theme-grey-A5B5CA: #A5B5CA;
 $theme-grey-B6B5B5: #B6B5B5;
 $theme-grey-8A9299: #8A9299;
 $theme-grey-999999: #999999;
@@ -108,9 +109,9 @@ $theme-grey-4D4D4D: #4D4D4D;
 $theme-grey-45494D: #45494D;
 $theme-grey-353646: #353646;
 $theme-grey-333333: #333333;
+$theme-grey-3E415A: #3E415A;
 $theme-grey-313233: #313233;
 $theme-grey-2B343D: #2B343D;
-
 $theme-grey-272727: #272727;
 $theme-grey-212222: #212222;
 $theme-grey-1A1A1A: #1A1A1A;
@@ -119,6 +120,12 @@ $theme-grey-151515: #151515;
 $theme-grey-000000: #000000;
 $theme-grey-191919: #191919;
 $theme-grey-121212: #121212;
+
+
+
+
+
+
 
 
 $theme-blue-F5F6F8: #F5F6F8;
@@ -328,6 +335,7 @@ $theme-red-2B1C1D: #2B1C1D;
   --bg-secondary-330 : #{$theme-grey-333333};
   --bg-secondary-350 : #{$theme-grey-888888};
   --bg-secondary-400 : #{$theme-grey-313233};
+  --bg-secondary-420 : #{$theme-grey-3E415A};
   --bg-secondary-450 : #{$theme-grey-191919};
   --bg-secondary-500 : #{$theme-grey-272727};
   --bg-secondary-550 : #{$theme-grey-1A1A1A};
@@ -429,6 +437,7 @@ $theme-red-2B1C1D: #2B1C1D;
 
   --icon-secondary-100 : #{$theme-grey-ffffff};
   --icon-secondary-110 : #{$theme-grey-F5F5F5};
+  --icon-secondary-130 : #{$theme-grey-A5B5CA};
   --icon-secondary-150 : #{$theme-grey-e5e5e5};
   --icon-secondary-200 : #{$theme-grey-8A9299};
   --icon-secondary-220 : #{$theme-grey-60616B};

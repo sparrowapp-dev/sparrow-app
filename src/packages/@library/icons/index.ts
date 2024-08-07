@@ -52,3 +52,5 @@ export { default as DislikeIcon } from "./Dislike.svelte";
 export { default as RefreshIcon } from "./Refresh.svelte";
 export { default as CopyIcon2 } from "./Copy2.svelte";
 export { default as AISparkle } from "./AiSparkle.svelte";
+export { default as StackFilled } from "./StackFilled.svelte";
+
