@@ -7,26 +7,21 @@
   // ---- SVG
   import collectionAsset from "$lib/assets/collection-nodes.svg";
   import folderTab from "$lib/assets/folder-tab.svg";
-  // ----
-
-  // ---- Enum
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
-  // ----
 
   // ---- helper functions
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   // ----
 
   // ---- Interface
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import { SocketIcon } from "@library/icons";
+  import { TabTypeEnum, type Tab } from "@common/types/workspace";
   // ----
 
   // ------ Props ------
   /**
    * New tab with details
-   * @type {NewTab}
    */
-  export let tab: NewTab;
+  export let tab: Tab;
   /**
    * Width of each tab
    */
@@ -45,7 +40,7 @@
    * @param id - Tab ID
    * @param tab - New Tab
    */
-  export let onTabClosed: (id: string, tab: NewTab) => void;
+  export let onTabClosed: (id: string, tab: Tab) => void;
   /**
    * Callback function for drag start from a index
    * @param index - Index of Tab
@@ -57,7 +52,7 @@
    */
   export let onDropOver: (index: number) => void;
 
-  function handleMouseDown(event) {
+  function handleMouseDown(event: MouseEvent) {
     if (event.button === 1) {
       // Check if the middle button is pressed (button code 1)
       onTabClosed(tab.id, tab);
@@ -95,15 +90,15 @@
       style="width: 100%;
         text-align: left; font-weight:700; background-color:transparent;"
     >
-      {#if tab.type === ItemType.REQUEST}
-        <span class="text-{getMethodStyle(tab.property.request.method)}">
+      {#if tab.type === TabTypeEnum.REQUEST}
+        <span class="text-{getMethodStyle(tab?.property?.request?.method)}">
           <span
             class={!tab.isActive ? "request-icon" : ""}
             style="font-size: 11px; height: 31px; font-weight: 500;"
-            >{tab.property.request.method || ""}</span
+            >{tab?.property?.request?.method || ""}</span
           >
         </span>
-      {:else if tab.type === ItemType.FOLDER}
+      {:else if tab.type === TabTypeEnum.FOLDER}
         <span>
           <img
             src={folderTab}
@@ -111,7 +106,7 @@
             style="width: 30px;heigh:24px;margin-right:5px;"
           /></span
         >
-      {:else if tab.type === ItemType.COLLECTION}
+      {:else if tab.type === TabTypeEnum.COLLECTION}
         <span>
           <img
             src={collectionAsset}
@@ -119,23 +114,34 @@
             style="width: 19px;heigh:19px;margin-right:5px;"
           />
         </span>
-      {:else if tab.type === ItemType.WORKSPACE}
+      {:else if tab.type === TabTypeEnum.WORKSPACE}
         <span>
           <BookIcon />
         </span>
+      {:else if tab.type === TabTypeEnum.WEB_SOCKET}
+        <span>
+          <SocketIcon
+            height={"12px"}
+            width={"16px"}
+            color={"var(--icon-primary-300)"}
+          />
+        </span>
       {/if}
       <span
-        class="font-weight-normal ms-1 text-fs-12 {!tab.isActive ? 'request-text' : ''}"
+        class="font-weight-normal ms-1 text-fs-12 {!tab.isActive
+          ? 'request-text'
+          : ''}"
         style={`color:  var(--text-secondary-100)`}
       >
         {tab.name}
       </span>
     </button>
     <!-- {console.log(tab?.property?.request, !tab?.isSaved)} -->
-    {#if tab?.property?.request && !tab?.isSaved}
+    {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET) && !tab?.isSaved}
       {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
         <span
-          class="my-auto mx-1 opacity-{tab?.property?.request &&
+          class="my-auto mx-1 opacity-{(tab?.type === TabTypeEnum.REQUEST ||
+            tab?.type === TabTypeEnum.WEB_SOCKET) &&
           !tab?.isSaved &&
           (tab?.source !== 'SPEC' || !tab?.activeSync || tab?.isDeleted)
             ? '1'
@@ -146,9 +152,13 @@
     {/if}
 
     <button
-      class="cross-icon-btn {!(tab?.property?.request && !tab?.isSaved) && !tab.isActive
+      class="cross-icon-btn {!(
+        (tab?.type === TabTypeEnum.REQUEST ||
+          tab?.type === TabTypeEnum.WEB_SOCKET) &&
+        !tab?.isSaved
+      ) && !tab.isActive
         ? 'inactive-close-btn'
-        : ''} btn  d-flex align-items-center px-1"
+        : ''} btn d-flex align-items-center px-1"
       on:click={() => {
         onTabClosed(tab.id, tab);
       }}
@@ -156,12 +166,12 @@
     >
       <Crossicon />
     </button>
-  {#if !tab.isActive}
-    <div
-      class="position-absolute"
-      style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
-    />
-  {/if}
+    {#if !tab.isActive}
+      <div
+        class="position-absolute"
+        style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
+      />
+    {/if}
   </div></button
 >
 
@@ -194,14 +204,14 @@
     color: var(--text-secondary-100) !important;
   }
 
-  .cross-icon-btn:hover{
+  .cross-icon-btn:hover {
     background-color: var(--text-tertiary-300);
     border-radius: 2px;
   }
-  .ellipsis{
-    color: var(--text-secondary-100) ;
+  .ellipsis {
+    color: var(--text-secondary-100);
   }
-  .ellipsis:hover{
-    color: var( --text-secondary-100) ;
+  .ellipsis:hover {
+    color: var(--text-secondary-100);
   }
 </style>

@@ -17,13 +17,12 @@
   let componentClass = "";
   export { componentClass as class };
 
-  export let requestUrl: string;
+  export let requestUrl: string | undefined;
   export let isSendRequestInProgress: boolean;
   export let onSendButtonClicked: SendRequestType;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
-  export let onUpdateRequestMethod: UpdateRequestMethodType;
   export let toggleSaveRequest: (flag: boolean) => void;
-  export let onSaveRequest: SaveRequestType;
+  export let onSaveSocket: SaveRequestType;
   export let environmentVariables;
   export let onUpdateEnvironment;
   export let isSave;
@@ -34,14 +33,11 @@
   export let userRole;
 
   const theme = new UrlInputTheme().build();
-  const handleDropdown = (tab: string) => {
-    onUpdateRequestMethod(tab);
-  };
   /**
    * @description - save request handler
    */
   const handleSaveRequest = async () => {
-    const x = await onSaveRequest();
+    const x = await onSaveSocket();
     if (
       x.status === "error" &&
       x.message === "request is not a part of any workspace or collection"

@@ -1,10 +1,10 @@
+import { AuthTypeEnum } from "@common/types/workspace";
 import { AuthSection, AuthType } from "../enums/authorization.enum";
 import {
   ContentTypeEnum,
   RequestDataType,
   RequestDataset,
 } from "../enums/request.enum";
-import type { NewTab } from "../interfaces/request.interface";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const findAuthHeader = (
   request: any,
@@ -146,19 +146,19 @@ const setAuthType = (auth: string) => {
   return { requestAuthNavigation };
 };
 
-const unsetAuthType = (auth: string) => {
+const unsetAuthType = (auth: AuthTypeEnum | undefined) => {
   let authType = AuthType.NO_AUTH;
   switch (auth) {
-    case AuthType.NO_AUTH:
+    case AuthTypeEnum.NO_AUTH:
       authType = AuthType.NO_AUTH;
       break;
-    case AuthType.API_KEY:
+    case AuthTypeEnum.API_KEY:
       authType = AuthType.API_KEY;
       break;
-    case AuthType.BASIC_AUTH:
+    case AuthTypeEnum.BASIC_AUTH:
       authType = AuthType.BASIC_AUTH;
       break;
-    case AuthType.BEARER_TOKEN:
+    case AuthTypeEnum.BEARER_TOKEN:
       authType = AuthType.BEARER_TOKEN;
       break;
   }

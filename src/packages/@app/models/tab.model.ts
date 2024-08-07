@@ -382,9 +382,34 @@ export const tabSchemaLiteral = {
                 },
               },
             },
+            message: {
+              type: "string",
+            },
             state: {
               type: "object",
-              properties: {},
+              properties: {
+                socketNavigation: {
+                  type: "string",
+                },
+                socketMessageLanguage: {
+                  type: "string",
+                },
+                socketLeftSplitterWidthPercentage: {
+                  type: "string",
+                },
+                socketRightSplitterWidthPercentage: {
+                  type: "string",
+                },
+                isSaveSocketInProgress: {
+                  type: "string",
+                },
+                isParameterBulkEditActive: {
+                  type: "string",
+                },
+                isHeaderBulkEditActive: {
+                  type: "string",
+                },
+              },
             },
           },
         },

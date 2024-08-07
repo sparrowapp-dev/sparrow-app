@@ -25,6 +25,7 @@
     ImportCollection,
     ImportCurl,
     WorkspaceDefault,
+    SaveAsCollectionItem,
   } from "@workspaces/features";
   import CloseConfirmationPopup from "$lib/components/popup/CloseConfirmationPopup.svelte";
   import { notifications } from "@library/ui/toast/Toast";
@@ -56,6 +57,12 @@
   import { pagesMotion } from "@app/constants";
   import { user } from "$lib/store";
   import WebSocketExplorerPage from "../WebSocketExplorerPage/WebSocketExplorerPage.svelte";
+  import {
+    TabTypeEnum,
+    type RequestTab,
+    type Tab,
+  } from "@common/types/workspace";
+  import type { WebSocketTab } from "@common/types/workspace/web-socket";
 
   export let modifiedUser;
 
@@ -70,7 +77,7 @@
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
   const activeTab: Observable<TabDocument> = _viewModel.getActiveTab();
 
-  let removeTab: NewTab;
+  let removeTab: Tab;
   let isPopupClosed: boolean = false;
   let isImportCollectionPopup: boolean = false;
   let isImportCurlPopup: boolean = false;
@@ -104,8 +111,8 @@
   /**
    * Handle close tab functionality in tab bar list
    */
-  const closeTab = (id: string, tab: TabDocument) => {
-    if (tab?.property?.request && !tab?.isSaved) {
+  const closeTab = (id: string, tab: Tab) => {
+    if (tab?.type === TabTypeEnum.REQUEST && !tab?.isSaved) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
         removeTab = tab;
         isPopupClosed = true;
@@ -471,7 +478,7 @@
     isExposeSaveAsRequest = flag;
   }}
 >
-  <SaveAsRequest
+  <SaveAsCollectionItem
     onClick={(flag = false) => {
       isExposeSaveAsRequest = flag;
     }}
@@ -482,13 +489,7 @@
     requestPath={removeTab.path}
     collections={$collectionList}
     readWorkspace={_viewModel.readWorkspace}
-    onSaveAsRequest={async (
-      _workspaceMeta,
-      path,
-      tabName,
-      description,
-      type,
-    ) => {
+    onSave={async (_workspaceMeta, path, tabName, description, type) => {
       const res = await _viewModel.saveAsRequest(
         _workspaceMeta,
         path,
@@ -497,7 +498,7 @@
         type,
         removeTab,
       );
-      if (res.status === "success") {
+      if (res?.status === "success") {
         _viewModel.handleRemoveTab(removeTab.id);
       }
       return res;

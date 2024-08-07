@@ -2,6 +2,7 @@ import type { CollectionWrapper } from "./collection";
 import type { RequestWrapper } from "./request";
 import type { FolderWrapper } from "./folder";
 import type { WorkspaceWrapper } from "./workspace";
+import type { WebSocketWrapper } from "./web-socket";
 
 import type {
   ActiveSyncWrapper,
@@ -23,7 +24,8 @@ export interface Property
   extends Partial<RequestWrapper>,
     Partial<FolderWrapper>,
     Partial<CollectionWrapper>,
-    Partial<WorkspaceWrapper> {}
+    Partial<WorkspaceWrapper>,
+    Partial<WebSocketWrapper> {}
 
 export interface PropertyWrapper {
   property: Property;

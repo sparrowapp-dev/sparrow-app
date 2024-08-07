@@ -38,8 +38,8 @@ import {
   type KeyValueChecked,
   type Path,
   type KeyValue,
-  type RequestTab,
   type StatePartial,
+  type Tab,
 } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
 import { RequestTabAdapter } from "@app/adapter/request-tab";
@@ -47,7 +47,6 @@ import { CollectionService } from "@app/services/collection.service";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
-import type { WebSocketTab } from "@common/types/workspace/web-socket";
 
 class RestExplorerViewModel {
   /**
@@ -71,7 +70,7 @@ class RestExplorerViewModel {
    * Utils
    */
 
-  private _tab: BehaviorSubject<WebSocketTab> = new BehaviorSubject({});
+  private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
 
   public constructor(doc: TabDocument) {
     if (doc?.isActive) {
@@ -91,11 +90,11 @@ class RestExplorerViewModel {
     return this.environmentRepository.getEnvironment();
   }
 
-  public get tab(): Observable<RequestTab> {
+  public get tab(): Observable<Tab> {
     return this._tab.asObservable();
   }
 
-  private set tab(value: RequestTab) {
+  private set tab(value: Tab) {
     this._tab.next(value);
   }
 
@@ -106,11 +105,10 @@ class RestExplorerViewModel {
    */
 
   private compareRequestWithServerDebounced = async () => {
-    return;
     let result = true;
-    const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
-    const requestTabAdapter = new RequestTabAdapter();
-    const unadaptedRequest = requestTabAdapter.unadapt(progressiveTab);
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    // const requestTabAdapter = new RequestTabAdapter();
+    // const unadaptedRequest = requestTabAdapter.unadapt(progressiveTab);
     let requestServer;
     if (progressiveTab.path.folderId) {
       requestServer = await this.collectionRepository.readRequestInFolder(
@@ -136,103 +134,30 @@ class RestExplorerViewModel {
     }
     // url
     else if (
-      requestServer.websocket.url !== progressiveTab.property.websocket.url
+      requestServer.websocket.url !== progressiveTab.property.websocket?.url
     ) {
       result = false;
     }
-    // method
+    // message
     else if (
-      requestServer.websocket.method !==
-      progressiveTab.property.websocket.method
+      requestServer.websocket.message !==
+      progressiveTab.property.websocket?.message
     ) {
       result = false;
     }
-    // auth key
-    else if (
-      requestServer.websocket.auth.apiKey.authKey !==
-      progressiveTab.property.websocket.auth.apiKey.authKey
-    ) {
-      result = false;
-    }
-    // auth value
-    else if (
-      requestServer.websocket.auth.apiKey.authValue !==
-      progressiveTab.property.websocket.auth.apiKey.authValue
-    ) {
-      result = false;
-    }
-    // addTo
-    else if (
-      requestServer.websocket.auth.apiKey.addTo !==
-      progressiveTab.property.websocket.auth.apiKey.addTo
-    ) {
-      result = false;
-    }
-    // username
-    else if (
-      requestServer.websocket.auth.basicAuth.username !==
-      progressiveTab.property.websocket.auth.basicAuth.username
-    ) {
-      result = false;
-    }
-    // password
-    else if (
-      requestServer.websocket.auth.basicAuth.password !==
-      progressiveTab.property.websocket.auth.basicAuth.password
-    ) {
-      result = false;
-    }
-    // bearer tokem
-    else if (
-      requestServer.websocket.auth.bearerToken !==
-      progressiveTab.property.websocket.auth.bearerToken
-    ) {
-      result = false;
-    }
-    // raw code
-    else if (
-      requestServer.websocket.body.raw !==
-      progressiveTab.property.websocket.body.raw
-    ) {
-      result = false;
-    }
-    // url encode
-    else if (
-      !this.compareArray.init(
-        requestServer.websocket.body.urlencoded,
-        progressiveTab.property.websocket.body.urlencoded,
-      )
-    ) {
-      result = false;
-    }
-    // form data
-    else if (
-      !this.compareArray.init(
-        requestServer.websocket.body.formdata.text,
-        unadaptedRequest.body.formdata.text,
-      )
-    ) {
-      result = false;
-    } else if (
-      !this.compareArray.init(
-        requestServer.websocket.body.formdata.file,
-        unadaptedRequest.body.formdata.file,
-      )
-    ) {
-      result = false;
-    }
+
     // headers
     else if (
       !this.compareArray.init(
         requestServer.websocket.headers,
-        progressiveTab.property.websocket.headers,
+        progressiveTab.property.websocket?.headers,
       )
     ) {
       result = false;
     } else if (
       !this.compareArray.init(
         requestServer.websocket.queryParams,
-        progressiveTab.property.websocket.queryParams,
+        progressiveTab.property.websocket?.queryParams,
       )
     ) {
       result = false;
@@ -280,11 +205,13 @@ class RestExplorerViewModel {
     _url: string,
     _effectQueryParams: boolean = true,
   ) => {
-    const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
-    if (_url === progressiveTab.property.websocket.url) {
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    if (_url === progressiveTab.property.websocket?.url) {
       return;
     }
-    progressiveTab.property.websocket.url = _url;
+    if (progressiveTab?.property?.websocket) {
+      progressiveTab.property.websocket.url = _url;
+    }
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     if (_effectQueryParams) {
@@ -337,6 +264,21 @@ class RestExplorerViewModel {
   };
 
   /**
+   *
+   * @param _message - socket message
+   */
+  public updateMessage = async (_message: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (_message === progressiveTab.property.websocket.message) {
+      return;
+    }
+    progressiveTab.property.websocket.message = _message;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
+  /**
    * @description - updates request tab name
    * @param _name - new request name
    */
@@ -381,20 +323,22 @@ class RestExplorerViewModel {
     _params: KeyValueChecked[],
     _effectURL: boolean = true,
   ) => {
-    const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
     if (
       JSON.stringify(_params) ===
-      JSON.stringify(progressiveTab.property.websocket.queryParams)
+      JSON.stringify(progressiveTab.property.websocket?.queryParams)
     ) {
       return;
     }
-    progressiveTab.property.websocket.queryParams = _params;
+    if (progressiveTab.property?.websocket) {
+      progressiveTab.property.websocket.queryParams = _params;
+    }
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     if (_effectURL) {
       const reducedQueryParams = new ReduceQueryParams(_params);
       const reducedURL = new ReduceRequestURL(
-        progressiveTab.property.websocket?.url,
+        progressiveTab.property?.websocket?.url as string,
       );
       if (
         reducedQueryParams.getValue() === "" ||
@@ -665,8 +609,9 @@ class RestExplorerViewModel {
    * @param saveDescriptionOnly - refers save overall request data or only description as a documentation purpose.
    * @returns save status
    */
-  public saveRequest = async () => {
-    const componentData: RequestTab = this._tab.getValue();
+  public saveSocket = async () => {
+    // return;
+    const componentData: Tab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
 
     if (!workspaceId || !collectionId) {
@@ -845,7 +790,7 @@ class RestExplorerViewModel {
    * @param description - request description
    * @param type - save over all request or description only
    */
-  public saveAsRequest = async (
+  public saveAsSocket = async (
     _workspaceMeta: {
       id: string;
       name: string;
@@ -858,13 +803,14 @@ class RestExplorerViewModel {
     tabName: string,
     description: string,
   ) => {
+    // return;
     const componentData = this._tab.getValue();
     let userSource = {};
-    const _id = componentData.id;
+    // const _id = componentData.id;
     if (path.length > 0) {
       const requestTabAdapter = new RequestTabAdapter();
       const unadaptedRequest = requestTabAdapter.unadapt(componentData);
-      let req = {
+      const req = {
         id: uuidv4(),
         name: tabName,
         description,

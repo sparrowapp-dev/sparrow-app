@@ -1,6 +1,6 @@
 import { writable } from "svelte/store";
 
-const user = writable(null);
+const user = writable<{ _id: string } | null>(null);
 export const username = writable("");
 export const isLoading = writable(false);
 export const isResponseError = writable(false);

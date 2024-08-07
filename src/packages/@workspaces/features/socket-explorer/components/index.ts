@@ -7,3 +7,4 @@ export { default as SocketNavigator } from "./socket-navigator/SocketNavigator.s
 export { default as ResponseDefaultScreen } from "./response-default-screen/ResponseDefaultScreen.svelte";
 export { default as ResponseErrorScreen } from "./response-error-screen/ResponseErrorScreen.svelte";
 export { default as SocketName } from "./socket-name/SocketName.svelte";
+export { default as SocketMessage } from "./request-body/SocketMessage.svelte";

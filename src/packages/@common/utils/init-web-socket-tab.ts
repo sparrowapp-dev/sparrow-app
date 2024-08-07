@@ -2,13 +2,12 @@ import {
   type Path,
   type KeyValueChecked,
   TabTypeEnum,
-  type StatePartial,
 } from "@common/types/workspace";
 import {
-  RequestDataTypeEnum,
-  RequestSectionEnum,
-  ResponseSectionEnum,
+  SocketDataTypeEnum,
+  SocketSectionEnum,
   WebSocketDefault,
+  type StateWrapper,
   type WebSocketTab,
 } from "@common/types/workspace/web-socket";
 import { v4 as uuidv4 } from "uuid";
@@ -70,9 +69,10 @@ class InitWebSocketTab {
               checked: true,
             },
           ],
+          message: "",
           state: {
-            socketBodyLanguage: RequestDataTypeEnum.TEXT,
-            socketNavigation: RequestSectionEnum.PARAMETERS,
+            socketNavigation: SocketSectionEnum.MESSAGE,
+            socketMessageLanguage: SocketDataTypeEnum.TEXT,
             socketLeftSplitterWidthPercentage: 50,
             socketRightSplitterWidthPercentage: 50,
             isSaveSocketInProgress: false,
@@ -131,7 +131,7 @@ class InitWebSocketTab {
   public updateIsSave(_isSave: boolean) {
     this._tab.isSaved = _isSave;
   }
-  public updateState(_state: StatePartial) {
+  public updateState(_state: StateWrapper) {
     this._tab.property.websocket.state = {
       ...this._tab.property.websocket.state,
       ..._state,

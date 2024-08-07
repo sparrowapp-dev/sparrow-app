@@ -260,7 +260,10 @@
         </button>
       </div>
 
-      <div class="layout ms-auto mt-1" style="height: 24px; ">
+      <div
+        class="layout d-flex align-items-center ms-auto mt-1"
+        style="height: 24px; "
+      >
         <Dropdown
           buttonId="viewChange"
           bind:isMenuOpen={viewChange}

@@ -94,6 +94,7 @@ import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { WorkspaceService } from "@app/services/workspace.service";
 import { isGuestUserActive } from "$lib/store/auth.store";
 import { InitTab } from "@common/factory";
+import type { RequestTab, Tab } from "@common/types/workspace";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -377,7 +378,7 @@ export default class CollectionsViewModel {
    * @param saveDescriptionOnly
    * @returns
    */
-  public saveAPIRequest = async (componentData: NewTab) => {
+  public saveAPIRequest = async (componentData: Tab) => {
     const { folderId, collectionId, workspaceId } = componentData.path;
     if (!workspaceId || !collectionId) {
       return {

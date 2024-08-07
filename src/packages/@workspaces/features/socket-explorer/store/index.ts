@@ -1,1 +1,0 @@
-export { webSocketSplitterDirection } from "./splitpanes";

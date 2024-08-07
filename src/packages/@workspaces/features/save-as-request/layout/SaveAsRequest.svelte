@@ -24,16 +24,16 @@
   } from "$lib/utils/constants/request.constant";
   import {
     CollectionIcon,
-    FolderIcon,
     FolderIcon2,
     PencilIcon2,
+    SocketIcon,
     WorkspaceIcon,
   } from "@library/icons";
 
   export let onClick;
   export let onFinish = (id: string) => {};
   export let type: "SAVE_DESCRIPTION" | "SAVE_API" = "SAVE_API";
-  export let onSaveAsRequest;
+  export let onSave;
   export let collections: CollectionDocument[];
   export let readWorkspace;
   export let onCreateFolder;
@@ -191,7 +191,7 @@
   };
 
   const handleCreateCollection = async (collectionName: string) => {
-    createDirectoryLoader = true;     
+    createDirectoryLoader = true;
     const res = await onCreateCollection(workspaceMeta, collectionName);
     if (res.status === "success") {
       latestRoute = res.data.latestRoute;
@@ -759,11 +759,21 @@
         valueClassProp=
         
       /> -->
-      <span
-        class={`text-fs-12 me-3 fw-bold text-${getMethodStyle(
-          componentData?.property.request.method,
-        )}`}>{componentData?.property.request.method}</span
-      >
+      {#if componentData?.property.request.method === "WEB_SOCKET"}
+        <span class={`text-fs-12 me-3 fw-bold `}
+          ><SocketIcon
+            height={"12px"}
+            width={"16px"}
+            color={"var(--icon-primary-300)"}
+          /></span
+        >
+      {:else}
+        <span
+          class={`text-fs-12 me-3 fw-bold text-${getMethodStyle(
+            componentData?.property.request.method,
+          )}`}>{componentData?.property.request.method}</span
+        >
+      {/if}
       <p class="api-url">{componentData?.property.request.url}</p>
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>
@@ -879,7 +889,7 @@
           isSaveTouched = true;
           if (path.length > 0 && tabName.length > 0) {
             isLoading = true;
-            const res = await onSaveAsRequest(
+            const res = await onSave(
               workspaceMeta,
               path,
               tabName,
