@@ -21,7 +21,7 @@
   } from "../";
   import {
     TabBar,
-    CollectionList,
+    WorkspaceActions,
     ImportCollection,
     ImportCurl,
     WorkspaceDefault,
@@ -37,6 +37,7 @@
 
   // ---- View Model
   import CollectionsViewModel from "./CollectionPage.ViewModel";
+  
 
   // ---- helpers
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
@@ -69,6 +70,8 @@
   export let handleChange;
 
   const _viewModel = new CollectionsViewModel();
+
+
 
   let currentWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
@@ -241,7 +244,7 @@
         minSize={20}
         class="bg-secondary-900-important"
       >
-        <CollectionList
+        <WorkspaceActions
           bind:scrollList
           bind:userRole
           {collectionList}

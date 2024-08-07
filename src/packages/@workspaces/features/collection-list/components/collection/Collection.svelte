@@ -393,7 +393,7 @@
 <button
   bind:this={collectionTabWrapper}
   style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
-  class="btn-primary mb-1 d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
+  class="btn-primary  ps-4 mb-1 d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
     : ''}"
@@ -573,12 +573,12 @@
           />
         {/each}
         {#if !collection?.items?.length}
-          <p class="text-fs-10 ps-4 my-2 text-secondary-300">
+          <p class="text-fs-10 ps-4 ms-2 my-2 text-secondary-300">
             This collection is empty
           </p>
         {/if}
 
-        <div class="d-flex gap-2 ms-1">
+        <div class="d-flex gap-2 ps-1 ms-4">
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
             <Tooltip title={"Add Folder"} placement={"bottom"} distance={12}>
               <div
