@@ -3,7 +3,7 @@
   import folder from "$lib/assets/folder.svg";
   import collection from "$lib/assets/collection.svg";
   import { ItemType, RequestMethod } from "$lib/utils/enums";
-  import { CollectionIcon } from "@library/icons";
+  import { CollectionIcon, SocketIcon } from "@library/icons";
   export let type: ItemType = ItemType.REQUEST;
   export let name = "";
   export let method = RequestMethod.GET;
@@ -23,18 +23,28 @@
       <p class="ellipsis mb-0">{name}</p>
     </div>
   </div>
-{:else if type === ItemType.FOLDER || type === ItemType.COLLECTION}
+{:else if type === ItemType.FOLDER || type === ItemType.COLLECTION || type === ItemType.WEB_SOCKET}
   <div style="height:36px;" class="d-flex align-items-center">
     {#if type === ItemType.FOLDER}
       <div style="width: 40px;">
         <img src={folder} alt="" />
       </div>
     {:else if type === ItemType.COLLECTION}
-      <CollectionIcon
-        height={"15px"}
-        width={"15px"}
-        color={"var(--icon-secondary-100)"}
-      />
+      <div style="width: 40px;">
+        <CollectionIcon
+          height={"15px"}
+          width={"15px"}
+          color={"var(--icon-secondary-100)"}
+        />
+      </div>
+    {:else if type === ItemType.WEB_SOCKET}
+      <div style="width: 40px;">
+        <SocketIcon
+          height={"14px"}
+          width={"18px"}
+          color={"var(--icon-primary-300)"}
+        />
+      </div>
     {/if}
     <span
       class="ellipsis sparrow-fs-12 fw-normal ps-2"

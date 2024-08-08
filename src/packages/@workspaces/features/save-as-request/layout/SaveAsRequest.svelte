@@ -546,11 +546,17 @@
             </div>
             <!-- {/if} -->
           {:else if col.type === ItemType.REQUEST}
-            <FileType
-              name={col.name}
-              method={col.request.method}
-              type={ItemType.REQUEST}
-            />
+            <div class=" ps-2">
+              <FileType
+                name={col.name}
+                method={col.request.method}
+                type={ItemType.REQUEST}
+              />
+            </div>
+          {:else if col.type === ItemType.WEB_SOCKET}
+            <div class=" ps-2">
+              <FileType name={col.name} type={ItemType.WEB_SOCKET} />
+            </div>
           {:else}
             <div
               class="item ps-2"
