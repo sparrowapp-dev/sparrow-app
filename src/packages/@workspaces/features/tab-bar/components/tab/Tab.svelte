@@ -19,6 +19,7 @@
 
   // ---- Interface
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
+    import { StackIcon } from "@library/icons";
   // ----
 
   // ------ Props ------
@@ -122,6 +123,11 @@
       {:else if tab.type === ItemType.WORKSPACE}
         <span>
           <BookIcon />
+        </span>
+        {:else if tab.type === ItemType.ENVIRONMENT}
+        <span>
+          <StackIcon 
+          height={"14px"} width={"14px"} color={"var(--icon-secondary-130)"} />
         </span>
       {/if}
       <span

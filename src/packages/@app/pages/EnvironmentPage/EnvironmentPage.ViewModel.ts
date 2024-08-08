@@ -10,6 +10,7 @@ import { InitTab } from "@common/factory";
 import { v4 as uuidv4 } from "uuid";
 import { GuideRepository } from "@app/repositories/guide.repository";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
+import { TabRepository } from "@app/repositories/tab.repository";
 
 export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -17,6 +18,7 @@ export class EnvironmentViewModel {
   private environmentTabRepository = new EnvironmentTabRepository();
   private environmentService = new EnvironmentService();
   private guestUserRepository = new GuestUserRepository();
+  private tabRepository =  new TabRepository;
   private initTab = new InitTab();
 
   constructor() {}
@@ -74,7 +76,7 @@ export class EnvironmentViewModel {
             );
             initEnvironmentTab
               .setName(environment.name)
-              .setIsActive(true)
+              // .setIsActive(true)
               .setType(environmentType.GLOBAL)
               .setVariable(environment.variable);
 
@@ -106,7 +108,7 @@ export class EnvironmentViewModel {
       );
       initEnvironmentTab
         .setName(globalEnvironment.name)
-        .setIsActive(true)
+        // .setIsActive(true)
         .setType(environmentType.GLOBAL)
         .setVariable(globalEnvironment.variable);
 
@@ -179,7 +181,9 @@ export class EnvironmentViewModel {
         newEnvironment.id,
         currentWorkspace._id,
       );
-      initEnvironmentTab.setName(newEnvironment.name).setIsActive(true);
+      initEnvironmentTab.setName(newEnvironment.name)
+      // .setIsActive(true)
+      ;
       this.environmentTabRepository.createTab(
         initEnvironmentTab.getValue(),
         currentWorkspace._id,
@@ -200,7 +204,10 @@ export class EnvironmentViewModel {
         res._id,
         currentWorkspace._id,
       );
-      initEnvironmentTab.setName(res.name).setIsActive(true);
+      initEnvironmentTab.setName(res.name)
+      // .
+      // setIsActive(true)
+      ;
       this.environmentTabRepository.createTab(
         initEnvironmentTab.getValue(),
         currentWorkspace._id,
@@ -235,10 +242,10 @@ export class EnvironmentViewModel {
     );
     initEnvironmentTab
       .setName(environment?.name)
-      .setIsActive(true)
+      // .setIsActive(true)
       .setType(environmentType.GLOBAL)
       .setVariable(environment?.variable);
-    this.environmentTabRepository.createTab(
+    this.tabRepository.createTab(
       initEnvironmentTab.getValue(),
       environment.workspaceId,
     );
@@ -352,10 +359,9 @@ export class EnvironmentViewModel {
     );
     initEnvironmentTab
       .setName(env.name)
-      .setIsActive(true)
       .setVariable(env.variable);
 
-    this.environmentTabRepository.createTab(
+    this.tabRepository.createTab(
       initEnvironmentTab.getValue(),
       currentWorkspace._id,
     );

@@ -4,9 +4,6 @@
   import hoveredCollections from "$lib/assets/collections-hovered.svg";
   import selectedCollections from "$lib/assets/collections-selected.svg";
 
-  import environment from "$lib/assets/environment.svg";
-  import hoveredEnvironment from "$lib/assets/environment-hovered.svg";
-  import selectedEnvironment from "$lib/assets/environment-selected.svg";
 
   import more from "$lib/assets/more.svg";
   import hoveredMore from "$lib/assets/more-hovered.svg";
@@ -64,15 +61,6 @@
       position: "primary",
     },
     {
-      route: !isGuestUser ? "/app/environment" : "/guest/environment",
-      heading: "Environment",
-      defaultLogo: environment,
-      hoveredLogo: hoveredEnvironment,
-      selectedLogo: selectedEnvironment,
-      disabled: false,
-      position: "primary",
-    },
-    {
       route: "/app/help",
       heading: "Help",
       defaultLogo: help,
@@ -81,15 +69,15 @@
       disabled: isGuestUser ?? false,
       position: "secondary",
     },
-    {
-      route: "/app/more",
-      heading: "More",
-      defaultLogo: more,
-      hoveredLogo: hoveredMore,
-      selectedLogo: selectedMore,
-      disabled: true,
-      position: "primary",
-    },
+    // {
+    //   route: "/app/more",
+    //   heading: "More",
+    //   defaultLogo: more,
+    //   hoveredLogo: hoveredMore,
+    //   selectedLogo: selectedMore,
+    //   disabled: true,
+    //   position: "primary",
+    // },
     {
       route: "/app/setting",
       heading: "Setting",
