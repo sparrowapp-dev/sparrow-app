@@ -14,14 +14,20 @@
   let isCurlValid = false;
   let isCurlDataLoading = false;
   let isLoading = false;
+  let isMethodWrong = false;
 
   const handleInputField = async () => {
     isCurlDataLoading = true;
     isCurlValid = false;
+    isMethodWrong = false;
 
     const response = await onValidateCurl(importCurl);
-    if (response) {
-      isCurlValid = true;
+    if (response.isSuccessful) {
+      if (response.method === "INVALID") {
+        isMethodWrong = true;
+      } else {
+        isCurlValid = true;
+      }
     }
     isCurlDataLoading = false;
   };
@@ -64,6 +70,10 @@
   {#if isInputTouched && !isCurlDataLoading && importCurl === ""}
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
       Please paste your cURL command here.
+    </p>
+  {:else if isInputTouched && !isCurlDataLoading && isMethodWrong}
+    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+      The specified HTTP method is currently not supported.
     </p>
   {:else if isInputTouched && !isCurlDataLoading && !isCurlValid}
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
