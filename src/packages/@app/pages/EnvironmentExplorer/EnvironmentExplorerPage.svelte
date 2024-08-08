@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EnvironmentExplorer } from "@environments/features";
+  import { EnvironmentExplorer } from "@workspaces/features";
   import { EnvironmentExplorerViewModel } from "./EnvironmentExplorerPage.ViewModel";
   import { Debounce } from "@common/utils";
   import { user } from "$lib/store";

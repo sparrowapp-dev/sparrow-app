@@ -59,6 +59,8 @@
 
   export let toggleExpandEnvironment;
 
+  export let activeTabId
+
   let scrollList;
   let localEnvironment;
   let globalEnvironment;
@@ -100,6 +102,7 @@
       workspaceLevelPermissions.ADD_ENVIRONMENT,
     );
   }
+  
 
   async function handleCreateEnvironment() {
     if (!isExpandEnvironment) {
@@ -187,7 +190,7 @@
       <p
         role="button"
         class={`fw-normal mb-1  ps-5 env-item text-fs-12 border-radius-2 my-1 ${
-          globalEnvironment[0]?.id === currentEnvironment?.id && "active"
+          globalEnvironment[0]?.id === activeTabId && "active"
         }`}
         on:click={() => {
           onOpenGlobalEnvironment(globalEnvironment[0]);
@@ -262,6 +265,7 @@
           {onUpdateEnvironment}
           {onOpenEnvironment}
           {onSelectEnvironment}
+          {activeTabId}
         />
       {/each}
     </List>
@@ -292,6 +296,14 @@
   }
 
   .env-item:hover .icon-hover {
+    display: inline;
+  }
+
+  .env-item.active .icon-default {
+    display: none;
+  }
+
+  .env-item.active .icon-hover {
     display: inline;
   }
 
@@ -332,6 +344,7 @@
   .env-item.active {
     background-color: var(--bg-tertiary-600);
   }
+ 
   .env-side-tab-list {
     list-style: none;
     overflow: none;

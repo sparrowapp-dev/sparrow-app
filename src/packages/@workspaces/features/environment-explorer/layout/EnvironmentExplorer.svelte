@@ -80,7 +80,7 @@
   });
 </script>
 
-{#if $currentEnvironment?.environmentId}
+{#if $currentEnvironment?.tabId}
   <div class={`h-100 env-panel d-flex`}>
     <div
       class="d-flex flex-column h-100 env-parent w-100 {quickHelp
@@ -157,7 +157,7 @@
           </div>
 
           <div class="position-relative">
-            {#if !$currentEnvironment.isSave}
+            {#if !$currentEnvironment.isSaved}
               <div class="badge-data d-block"></div>
             {/if}
             <Tooltip title="Save" placement="bottom" distance={10}>
@@ -165,7 +165,7 @@
                 icon={SaveIcon}
                 onClick={onSaveEnvironment}
                 disable={$currentEnvironment.isSaveInProgress ||
-                  $currentEnvironment.isSave ||
+                  $currentEnvironment.isSaved ||
                   userRole === WorkspaceRole.WORKSPACE_VIEWER}
                 loader={$currentEnvironment.isSaveInProgress}
               />
@@ -213,7 +213,7 @@
       <section class={`var-value-container pe-1`} style="flex:1;">
         <TabularInput
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          keyValue={$currentEnvironment.variable}
+          keyValue={$currentEnvironment.property.environment.variable}
           callback={handleCurrentEnvironmentKeyValuePairChange}
           {search}
         />

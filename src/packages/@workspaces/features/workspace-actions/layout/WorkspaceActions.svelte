@@ -424,6 +424,7 @@
           environments={$environments}
           currentEnvironment={$activeEnvironment}
           {searchData}
+           {activeTabId}
           {toggleExpandEnvironment}
           bind:isExpandEnvironment
         />

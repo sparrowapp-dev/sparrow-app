@@ -66,14 +66,11 @@ export class EnvironmentExplorerViewModel {
       );
       progressiveTab.name = data.name;
     } else if (event === "") {
-      // progressiveTab.isSave = false;
       progressiveTab.name = _name;
     }
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    console.log("Inside updateName function  and before comparerequest serve fucntion call")
     this.compareRequestWithServer();
-    console.log("Inside updateName function  and after compare request server fucntion call")
 
   };
 
@@ -105,23 +102,17 @@ export class EnvironmentExplorerViewModel {
         progressiveTab.id,
       );
 
-    console.log("THis is request server", requestServer)
 
     if (!requestServer) {
-      console.log("No request server is present")
       result = false;
     }
     // // description
     // else if (requestServer.description !== progressiveTab.description) {
-    //   console.log("This is inside request description check ")
     //   result = false;
     // }
     // name
     else if (requestServer.name !== progressiveTab.name) {
       result = false;
-      console.log("Inside name check ")
-      console.log("This is requestServe Name", requestServer.name)
-      console.log("This is progeressive tab Name", progressiveTab.name)
     }
 
     // variable
@@ -131,8 +122,6 @@ export class EnvironmentExplorerViewModel {
         progressiveTab.property.environment.variable,
       )
     ) {
-      console.log("This is inside request variable check ")
-
       result = false;
     }
     // result

@@ -41,6 +41,8 @@
    */
   export let onSelectEnvironment;
 
+  export let activeTabId
+
   /**
    * Role of user in workspace
    */
@@ -225,7 +227,7 @@
   <button
     style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
     class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 my-button {env?.id ===
-    currentEnvironment?.id
+    activeTabId
       ? 'active-collection-tab'
       : ''}"
   >
