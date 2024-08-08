@@ -166,9 +166,7 @@ export class CollectionService {
     return response;
   };
 
-  public addSocketInCollection = async (
-    apiRequest: CreateApiRequestPostBody,
-  ) => {
+  public addSocketInCollection = async (apiRequest) => {
     const response = await makeRequest(
       "POST",
       `${this.apiUrl}/api/collection/websocket`,
@@ -180,10 +178,7 @@ export class CollectionService {
     return response;
   };
 
-  public updateSocketInCollection = async (
-    requestId: string,
-    requestBody: CreateApiRequestPostBody,
-  ) => {
+  public updateSocketInCollection = async (requestId: string, requestBody) => {
     const response = await makeRequest(
       "PUT",
       `${this.apiUrl}/api/collection/websocket/${requestId}`,
@@ -198,7 +193,7 @@ export class CollectionService {
 
   public deleteSocketInCollection = async (
     requestId: string,
-    deleteRequestBody: DeleteRequestName,
+    deleteRequestBody,
   ) => {
     const response = await makeRequest(
       "DELETE",

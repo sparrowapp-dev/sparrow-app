@@ -37,7 +37,6 @@
 
   // ---- View Model
   import CollectionsViewModel from "./CollectionPage.ViewModel";
-  
 
   // ---- helpers
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
@@ -70,8 +69,6 @@
   export let handleChange;
 
   const _viewModel = new CollectionsViewModel();
-
-
 
   let currentWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();

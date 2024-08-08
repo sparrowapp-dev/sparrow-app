@@ -47,7 +47,7 @@ import {
 import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
 import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
 import { type CreateApiRequestPostBody } from "$lib/utils/dto";
-import type { CreateDirectoryPostBody } from "$lib/utils/dto";
+import type { CreateDirectoryPostBody, ImportBodyUrl } from "$lib/utils/dto";
 //-----
 
 //-----
@@ -94,8 +94,18 @@ import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { WorkspaceService } from "@app/services/workspace.service";
 import { isGuestUserActive } from "$lib/store/auth.store";
 import { InitTab } from "@common/factory";
-import type { RequestTab, Tab } from "@common/types/workspace";
+import type {
+  CollectionArgsDto,
+  CollectionDto,
+  CollectionItemsDto,
+  RequestTab,
+  Tab,
+  WebsocketDto,
+} from "@common/types/workspace";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
+import type { CollectionDocType } from "@app/models/collection.model";
+import type { GuideQuery } from "@app/types/user-guide";
+import type { FeatureQuery } from "@app/types/feature-switch";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -107,6 +117,7 @@ export default class CollectionsViewModel {
   private workspaceService = new WorkspaceService();
   private githubService = new GithubService();
   private guideRepository = new GuideRepository();
+  private initTab = new InitTab();
 
   private featureSwitchRepository = new FeatureSwitchRepository();
   private guestUserRepository = new GuestUserRepository();
@@ -256,12 +267,10 @@ export default class CollectionsViewModel {
     }
   };
 
-  private initTab = new InitTab();
   /**
    * Create web socket new tab with untracked id
    */
-  private createWebSocketNewTab = async (_limit = 5) => {
-    if (_limit === 0) return;
+  private createWebSocketNewTab = async () => {
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
     isApiCreatedFirstTime.set(true);
     if (ws) {
@@ -271,9 +280,7 @@ export default class CollectionsViewModel {
       moveNavigation("right");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
     } else {
-      setTimeout(() => {
-        this.createWebSocketNewTab(_limit - 1);
-      }, 2000);
+      console.error("No active workspace found!");
     }
   };
 
@@ -1306,11 +1313,11 @@ export default class CollectionsViewModel {
   /**
    * Handle creating a new web socket in a collection
    * @param workspaceId
-   * @param collection - the collection in which new request is going to be created
+   * @param collection - the collection in which new web socket is going to be created
    */
   private handleCreateWebSocketInCollection = async (
     workspaceId: string,
-    collection: CollectionDocument,
+    collection: CollectionDto,
   ) => {
     if (
       !hasWorkpaceLevelPermission(
@@ -1320,10 +1327,7 @@ export default class CollectionsViewModel {
     ) {
       return;
     }
-    // const request = generateSampleRequest(
-    //   UntrackedItems.UNTRACKED + uuidv4(),
-    //   new Date().toString(),
-    // );
+
     const websocket = new InitWebSocketTab(
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
@@ -1338,7 +1342,7 @@ export default class CollectionsViewModel {
         source: "USER",
       };
     }
-    const requestObj = {
+    const websocketObj = {
       collectionId: collection.id,
       workspaceId: workspaceId,
       ...userSource,
@@ -1346,15 +1350,13 @@ export default class CollectionsViewModel {
         name: websocket.getValue().name,
         type: websocket.getValue().type,
         description: "",
-        websocket: {
-          // method: request?.getValue().property?.request?.method,
-        },
+        websocket: {},
       },
     };
     await this.collectionRepository.addRequestOrFolderInCollection(
-      collection.id,
+      collection.id as string,
       {
-        ...requestObj.items,
+        ...websocketObj.items,
         id: websocket.getValue().id,
       },
     );
@@ -1366,13 +1368,13 @@ export default class CollectionsViewModel {
     if (isGuestUser === true) {
       const res =
         await this.collectionRepository.readRequestOrFolderInCollection(
-          requestObj.collectionId,
+          websocketObj.collectionId as string,
           websocket.getValue().id,
         );
 
       res.id = uuidv4();
       await this.collectionRepository.updateRequestOrFolderInCollection(
-        collection.id,
+        collection.id as string,
         websocket.getValue().id,
         res,
       );
@@ -1381,6 +1383,7 @@ export default class CollectionsViewModel {
       websocket.updatePath({
         workspaceId: workspaceId,
         collectionId: collection.id,
+        folderId: "",
       });
       websocket.updateIsSave(true);
       await this.tabRepository.createTab(websocket.getValue());
@@ -1391,12 +1394,12 @@ export default class CollectionsViewModel {
       return;
     }
     const response =
-      await this.collectionService.addSocketInCollection(requestObj);
+      await this.collectionService.addSocketInCollection(websocketObj);
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
 
       this.collectionRepository.updateRequestOrFolderInCollection(
-        collection.id,
+        collection.id as string,
         websocket.getValue().id,
         res,
       );
@@ -1405,6 +1408,7 @@ export default class CollectionsViewModel {
       websocket.updatePath({
         workspaceId: workspaceId,
         collectionId: collection.id,
+        folderId: "",
       });
       websocket.updateIsSave(true);
 
@@ -1469,6 +1473,7 @@ export default class CollectionsViewModel {
       items: {
         name: explorer.name,
         type: ItemType.FOLDER,
+        id: explorer.id,
         items: {
           name: sampleRequest.getValue().name,
           type: sampleRequest.getValue().type,
@@ -1558,15 +1563,14 @@ export default class CollectionsViewModel {
   };
 
   /**
-   * Handles creating a new request in a folder
-   * @param workspaceId :string
-   * @param collection :CollectionDocument - the collection in which new request is going to be created
-   * @param explorer : - the folder in which new request is going to be created
-   * @returns :void
+   * Handles creating a new web socket in a folder
+   * @param workspaceId - the workspace id in which new web socket is going to be created
+   * @param collection - the collection in which new web socket is going to be created
+   * @param explorer - the folder in which new web socket is going to be created
    */
   private handleCreateWebSocketInFolder = async (
     workspaceId: string,
-    collection: CollectionDocument,
+    collection: CollectionDto,
     explorer: Folder,
   ) => {
     if (
@@ -1591,7 +1595,7 @@ export default class CollectionsViewModel {
         source: "USER",
       };
     }
-    const requestObj: CreateApiRequestPostBody = {
+    const requestObj = {
       collectionId: collection.id,
       workspaceId: workspaceId,
       ...userSource,
@@ -1599,6 +1603,7 @@ export default class CollectionsViewModel {
       items: {
         name: explorer.name,
         type: ItemType.FOLDER,
+        id: explorer.id,
         items: {
           name: websocket.getValue().name,
           type: websocket.getValue().type,
@@ -1622,11 +1627,11 @@ export default class CollectionsViewModel {
     });
 
     if (isGuestUser === true) {
-      const res = await this.collectionRepository.readRequestInFolder(
+      const res = (await this.collectionRepository.readRequestInFolder(
         requestObj.collectionId,
         requestObj.folderId,
         websocket.getValue().id,
-      );
+      )) as CollectionItemsDto;
       res.id = uuidv4();
       this.collectionRepository.updateRequestInFolder(
         requestObj.collectionId,
@@ -1969,9 +1974,9 @@ export default class CollectionsViewModel {
    */
   public handleOpenRequest = (
     workspaceId: string,
-    collection: CollectionDocument,
-    folder: any,
-    request: Request,
+    collection: CollectionDto,
+    folder: CollectionItemsDto,
+    request: CollectionItemsDto,
   ) => {
     const requestTabAdapter = new RequestTabAdapter();
     const adaptedRequest = requestTabAdapter.adapt(
@@ -1991,9 +1996,9 @@ export default class CollectionsViewModel {
    */
   public handleOpenWebSocket = (
     workspaceId: string,
-    collection: CollectionDocument,
-    folder: any,
-    websocket: Request,
+    collection: CollectionDto,
+    folder: CollectionItemsDto,
+    websocket: CollectionItemsDto,
   ) => {
     const socketTabAdapter = new SocketTabAdapter();
     const adaptedSocket = socketTabAdapter.adapt(
@@ -2011,14 +2016,17 @@ export default class CollectionsViewModel {
     collection: CollectionDocument,
     folder: Folder,
   ) => {
-    const path: Path = {
+    const path = {
       workspaceId: workspaceId,
       collectionId: collection.id ?? "",
       folderId: folder?.id,
       folderName: folder.name,
     };
 
-    const sampleFolder = new InitFolderTab(folder.id, collection.workspaceId);
+    const sampleFolder = new InitFolderTab(
+      folder.id,
+      collection.workspaceId as string,
+    );
     sampleFolder.updateName(folder.name);
     sampleFolder.updatePath(path);
     sampleFolder.updateIsSave(true);
@@ -2032,23 +2040,24 @@ export default class CollectionsViewModel {
 
   public handleOpenCollection = (
     workspaceId: string,
-    collection: CollectionDocument,
+    collection: CollectionDto,
   ) => {
     let totalFolder: number = 0;
     let totalRequest: number = 0;
     if (collection.items) {
-      collection.items.map((item) => {
+      collection.items.map((item: CollectionItemsDto) => {
         if (item.type === ItemType.REQUEST) {
           totalRequest++;
         } else {
           totalFolder++;
-          totalRequest += item.items.length;
+          totalRequest += item?.items?.length;
         }
       });
     }
     const path = {
       workspaceId: workspaceId,
       collectionId: collection.id ?? "",
+      folderId: "",
     };
 
     const _collection = new InitCollectionTab(collection.id, workspaceId);
@@ -2074,8 +2083,8 @@ export default class CollectionsViewModel {
   private handleRenameRequest = async (
     workspaceId: string,
     collection: CollectionDocument,
-    folder: Folder,
-    request: Request,
+    folder: CollectionItemsDto,
+    request: CollectionItemsDto,
     newRequestName: string,
   ) => {
     let userSource = {};
@@ -2099,7 +2108,7 @@ export default class CollectionsViewModel {
             collection.id,
             request.id,
           );
-        let storage: any = request;
+        const storage = request;
         storage.name = newRequestName;
         await this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
@@ -2118,7 +2127,7 @@ export default class CollectionsViewModel {
           folder.id,
           request.id,
         );
-        let storage = request;
+        const storage = request;
         storage.name = newRequestName;
         await this.collectionRepository.updateRequestInFolder(
           collection.id,
@@ -2138,7 +2147,7 @@ export default class CollectionsViewModel {
 
     if (newRequestName) {
       if (collection.id && workspaceId && !folder.id) {
-        let storage: any = request;
+        const storage = request;
         storage.name = newRequestName;
         const response = await this.collectionService.updateRequestInCollection(
           request.id,
@@ -2163,7 +2172,7 @@ export default class CollectionsViewModel {
           });
         }
       } else if (collection.id && workspaceId && folder.id) {
-        let storage = request;
+        const storage = request;
         storage.name = newRequestName;
         const response = await this.collectionService.updateRequestInCollection(
           request.id,
@@ -2208,9 +2217,9 @@ export default class CollectionsViewModel {
    */
   private handleRenameWebSocket = async (
     workspaceId: string,
-    collection: CollectionDocument,
-    folder: Folder,
-    websocket,
+    collection: CollectionDto,
+    folder: CollectionItemsDto,
+    websocket: CollectionItemsDto,
     newWebSocketName: string,
   ) => {
     let userSource = {};
@@ -2234,7 +2243,7 @@ export default class CollectionsViewModel {
             collection.id,
             websocket.id,
           );
-        let storage: any = websocket;
+        const storage = websocket;
         storage.name = newWebSocketName;
         await this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
@@ -2253,7 +2262,7 @@ export default class CollectionsViewModel {
           folder.id,
           websocket.id,
         );
-        let storage = websocket;
+        const storage = websocket;
         storage.name = newWebSocketName;
         await this.collectionRepository.updateRequestInFolder(
           collection.id,
@@ -2273,7 +2282,7 @@ export default class CollectionsViewModel {
 
     if (newWebSocketName) {
       if (collection.id && workspaceId && !folder.id) {
-        let storage: any = websocket;
+        const storage = websocket;
         storage.name = newWebSocketName;
         const response = await this.collectionService.updateSocketInCollection(
           websocket.id,
@@ -2298,7 +2307,7 @@ export default class CollectionsViewModel {
           });
         }
       } else if (collection.id && workspaceId && folder.id) {
-        let storage = websocket;
+        const storage = websocket;
         storage.name = newWebSocketName;
         const response = await this.collectionService.updateSocketInCollection(
           websocket.id,
@@ -2338,7 +2347,7 @@ export default class CollectionsViewModel {
    * @param collection :CollectionDocument
    * @returns :{ activeSyncLoad: boolean; isBranchSynced: boolean }
    */
-  public handleBranchSwitch = async (collection: CollectionDocument) => {
+  public handleBranchSwitch = async (collection: CollectionDto) => {
     const result: { activeSyncLoad: boolean; isBranchSynced: boolean } = {
       activeSyncLoad: true,
       isBranchSynced: true,
@@ -2384,7 +2393,7 @@ export default class CollectionsViewModel {
    */
   private handleDeleteCollection = async (
     workspaceId: string,
-    collection: CollectionDocument,
+    collection: CollectionDto,
     deletedIds: string[] | [],
   ) => {
     let isGuestUser;
@@ -2431,7 +2440,7 @@ export default class CollectionsViewModel {
    */
   private handleDeleteFolder = async (
     workspaceId: string,
-    collection: CollectionDocument,
+    collection: CollectionDto,
     explorer: Folder,
     requestIds: [string],
   ) => {
@@ -2496,9 +2505,9 @@ export default class CollectionsViewModel {
    */
   private handleDeleteRequest = async (
     workspaceId: string,
-    collection: CollectionDocument,
-    request: Request,
-    folder: Folder,
+    collection: CollectionDto,
+    request: CollectionItemsDto,
+    folder: CollectionItemsDto,
   ): Promise<boolean> => {
     let userSource = {};
     if (collection.activeSync) {
@@ -2507,9 +2516,10 @@ export default class CollectionsViewModel {
       };
     }
 
-    let requestObject: any = {
+    let requestObject = {
       collectionId: collection.id,
       workspaceId: workspaceId,
+      folderId: "",
       ...userSource,
     };
 
@@ -2585,8 +2595,8 @@ export default class CollectionsViewModel {
    */
   private handleDeleteWebSocket = async (
     workspaceId: string,
-    collection: CollectionDocument,
-    websocket: Request,
+    collection: CollectionDto,
+    websocket: CollectionItemsDto,
     folder: Folder,
   ): Promise<boolean> => {
     let userSource = {};
@@ -2596,9 +2606,10 @@ export default class CollectionsViewModel {
       };
     }
 
-    let requestObject: any = {
+    let requestObject = {
       collectionId: collection.id,
       workspaceId: workspaceId,
+      folderId: "",
       ...userSource,
     };
 
@@ -2680,7 +2691,7 @@ export default class CollectionsViewModel {
         path: collection?.localRepositoryPath,
       });
       if (activeResponse) {
-        const currentBranch: any = activeResponse;
+        const currentBranch = activeResponse;
         if (collection?.currentBranch) {
           if (currentBranch !== collection?.currentBranch) {
             notifications.error(errMessage);
@@ -2962,13 +2973,13 @@ export default class CollectionsViewModel {
     tabName: string,
     description: string,
     type: string,
-    componentData,
+    componentData: Tab,
   ) => {
     let userSource = {};
     if (path.length > 0) {
       const requestTabAdapter = new RequestTabAdapter();
       const unadaptedRequest = requestTabAdapter.unadapt(componentData);
-      let req = {
+      const req = {
         id: uuidv4(),
         name: tabName,
         description,
@@ -3111,13 +3122,16 @@ export default class CollectionsViewModel {
    * @param entityType :string - type of entity, collection, folder or request
    * @param args :object - arguments depending on entity type
    */
-  public handleCreateItem = async (entityType: string, args: any) => {
+  public handleCreateItem = async (
+    entityType: string,
+    args: CollectionArgsDto,
+  ) => {
     let response;
     switch (entityType) {
       case "collection":
         response = await this.handleCreateCollection(
           args.workspaceId,
-          args.collection,
+          args.collection as CollectionDto,
         );
         break;
       case "folder":
@@ -3264,7 +3278,10 @@ export default class CollectionsViewModel {
     return response;
   };
 
-  public handleOpenItem = async (entitytype: string, args: any) => {
+  public handleOpenItem = async (
+    entitytype: string,
+    args: CollectionArgsDto,
+  ) => {
     switch (entitytype) {
       case "collection":
         this.handleOpenCollection(args.workspaceId, args.collection);
@@ -3283,9 +3300,9 @@ export default class CollectionsViewModel {
       case "websocket":
         this.handleOpenWebSocket(
           args.workspaceId,
-          args.collection,
-          args.folder,
-          args.websocket,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.websocket as CollectionItemsDto,
         );
         break;
     }
@@ -3296,7 +3313,7 @@ export default class CollectionsViewModel {
   };
 
   public importJSONObject = async (
-    currentWorkspaceId,
+    currentWorkspaceId: string,
     importJSON,
     contentType,
   ) => {
@@ -3316,6 +3333,7 @@ export default class CollectionsViewModel {
         const path = {
           workspaceId: currentWorkspaceId,
           collectionId: response.data.data._id,
+          folderId: "",
         };
         this.collectionRepository.addCollection({
           ...response.data.data,
@@ -3354,7 +3372,10 @@ export default class CollectionsViewModel {
     }
   };
 
-  public collectionFileUpload = async (currentWorkspaceId, file) => {
+  public collectionFileUpload = async (
+    currentWorkspaceId: string,
+    file: File,
+  ) => {
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
@@ -3365,9 +3386,10 @@ export default class CollectionsViewModel {
         file,
       );
       if (response.isSuccessful) {
-        let path = {
+        const path = {
           workspaceId: currentWorkspaceId,
           collectionId: response.data.data._id,
+          folderId: "",
         };
 
         this.collectionRepository.addCollection({
@@ -3385,12 +3407,7 @@ export default class CollectionsViewModel {
         initCollectionTab.updateName(response.data.data.name);
         initCollectionTab.updateDescription(response.data.data.description);
         initCollectionTab.updateIsSave(true);
-        // Samplecollection.id = response.data.data._id;
-        // Samplecollection.path = path;
-        // Samplecollection.name = response.data.data.name;
-        // Samplecollection.save = true;
-        // collectionsMethods.handleCreateTab(Samplecollection);
-        // moveNavigation("right");
+
         this.tabRepository.createTab(initCollectionTab.getValue());
         moveNavigation("right");
 
@@ -3415,9 +3432,9 @@ export default class CollectionsViewModel {
   };
 
   public importCollectionURL = async (
-    currentWorkspaceId,
-    requestBody,
-    activeSync,
+    currentWorkspaceId: string,
+    requestBody: ImportBodyUrl,
+    activeSync: boolean,
   ) => {
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -3431,9 +3448,10 @@ export default class CollectionsViewModel {
       );
 
       if (response.isSuccessful) {
-        let path: Path = {
+        const path = {
           workspaceId: currentWorkspaceId,
           collectionId: response.data.data.collection._id,
+          folderId: "",
         };
 
         const initCollectionTab = new InitCollectionTab(
@@ -3441,21 +3459,14 @@ export default class CollectionsViewModel {
           currentWorkspaceId,
         );
 
-        // const Samplecollection = generateSampleCollection(
-        //   response.data.data._id,
-        //   new Date().toString(),
-        // );
-
-        // Samplecollection.id = response.data.data.collection._id;
         initCollectionTab.updatePath(path);
-        // Samplecollection.path = path;
+
         initCollectionTab.updateName(response.data.data.collection.name);
         initCollectionTab.updateDescription(
           response.data.data.collection.description,
         );
-        // Samplecollection.name = response.data.data.collection.name;
+
         initCollectionTab.updateIsSave(true);
-        // Samplecollection.save = true;
         if (response.data.data.existingCollection) {
           this.collectionRepository.updateCollection(
             response.data.data.collection._id,
@@ -3482,8 +3493,6 @@ export default class CollectionsViewModel {
           );
           notifications.success("Collection imported successfully.");
         }
-        // collectionsMethods.handleCreateTab(Samplecollection);
-        // moveNavigation("right");
 
         this.tabRepository.createTab(initCollectionTab.getValue());
         moveNavigation("right");
@@ -3505,7 +3514,7 @@ export default class CollectionsViewModel {
    *
    * @returns - A promise that resolves to the collection guide document.
    */
-  public fetchCollectionGuide = async (query) => {
+  public fetchCollectionGuide = async (query: GuideQuery) => {
     const data = await this.guideRepository.findOne(query);
     return data;
   };
@@ -3516,7 +3525,10 @@ export default class CollectionsViewModel {
    * @param isActive - The new active status to set for the collection guide.
    * @returns - A promise that resolves when the update is complete.
    */
-  public updateCollectionGuide = async (query, isActive: boolean) => {
+  public updateCollectionGuide = async (
+    query: GuideQuery,
+    isActive: boolean,
+  ) => {
     await this.guideRepository.update(query, {
       isActive: isActive,
     });
@@ -3538,8 +3550,9 @@ export default class CollectionsViewModel {
         isGuestUser = value;
       });
       if (isGuestUser === true) {
-        let col = await this.collectionRepository.readCollection(collectionId);
-        col = col.toMutableJSON();
+        const colData =
+          await this.collectionRepository.readCollection(collectionId);
+        const col: CollectionDocType = colData.toMutableJSON();
         col.name = newCollectionName;
         this.collectionRepository.updateCollection(collectionId, col);
         notifications.success("Collection renamed successfully!");
@@ -3642,7 +3655,7 @@ export default class CollectionsViewModel {
   /**
    * Fetch a specific feature data
    */
-  public getFeatureStatus = async (query) => {
+  public getFeatureStatus = async (query: FeatureQuery) => {
     return await this.featureSwitchRepository.findOne(query);
   };
 }

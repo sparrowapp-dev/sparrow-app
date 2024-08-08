@@ -1,3 +1,4 @@
+import type { RequestDto } from "@common/types/workspace";
 import type { ContentTypeEnum } from "../enums/request.enum";
 import type { Auth, KeyValuePair } from "../interfaces/request.interface";
 
@@ -65,29 +66,13 @@ export interface CreateApiRequestPostBody {
     name: string;
     type: string;
     description?: string;
-    request?: {
-      method: string;
-      url?: string;
-      body?: {
-        type: ContentTypeEnum;
-      };
-      headers?: KeyValuePair[];
-      queryParams?: KeyValuePair[];
-      auth?: Auth;
-    };
+    request?: RequestDto;
     items?: {
       id?: string;
       name: string;
       type: string;
       description?: string;
-      request: {
-        method: string;
-        url?: string;
-        body?: unknown;
-        headers?: KeyValuePair[];
-        queryParams?: KeyValuePair[];
-        auth?: Auth;
-      };
+      request: RequestDto;
     };
   };
 }
