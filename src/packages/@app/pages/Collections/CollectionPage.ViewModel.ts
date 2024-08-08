@@ -78,7 +78,7 @@ import { GuideRepository } from "@app/repositories/guide.repository";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { type Observable } from "rxjs";
-import { InitRequestTab } from "@common/utils";
+import { InitRequestTab, InitWebSocketTab } from "@common/utils";
 import { InitCollectionTab } from "@common/utils";
 import { InitFolderTab } from "@common/utils/init-folder-tab";
 import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
@@ -95,6 +95,7 @@ import { WorkspaceService } from "@app/services/workspace.service";
 import { isGuestUserActive } from "$lib/store/auth.store";
 import { InitTab } from "@common/factory";
 import type { RequestTab, Tab } from "@common/types/workspace";
+import { SocketTabAdapter } from "@app/adapter/socket-tab";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -1303,6 +1304,126 @@ export default class CollectionsViewModel {
   };
 
   /**
+   * Handle creating a new web socket in a collection
+   * @param workspaceId
+   * @param collection - the collection in which new request is going to be created
+   */
+  private handleCreateWebSocketInCollection = async (
+    workspaceId: string,
+    collection: CollectionDocument,
+  ) => {
+    if (
+      !hasWorkpaceLevelPermission(
+        this.getUserRoleInWorspace(),
+        workspaceLevelPermissions.SAVE_REQUEST,
+      )
+    ) {
+      return;
+    }
+    // const request = generateSampleRequest(
+    //   UntrackedItems.UNTRACKED + uuidv4(),
+    //   new Date().toString(),
+    // );
+    const websocket = new InitWebSocketTab(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      workspaceId,
+    );
+
+    let userSource = {};
+    if (collection?.activeSync) {
+      userSource = {
+        currentBranch: collection?.currentBranch
+          ? collection?.currentBranch
+          : collection?.primaryBranch,
+        source: "USER",
+      };
+    }
+    const requestObj = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      ...userSource,
+      items: {
+        name: websocket.getValue().name,
+        type: websocket.getValue().type,
+        description: "",
+        websocket: {
+          // method: request?.getValue().property?.request?.method,
+        },
+      },
+    };
+    await this.collectionRepository.addRequestOrFolderInCollection(
+      collection.id,
+      {
+        ...requestObj.items,
+        id: websocket.getValue().id,
+      },
+    );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      const res =
+        await this.collectionRepository.readRequestOrFolderInCollection(
+          requestObj.collectionId,
+          websocket.getValue().id,
+        );
+
+      res.id = uuidv4();
+      await this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        websocket.getValue().id,
+        res,
+      );
+
+      websocket.updateId(res.id);
+      websocket.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+      });
+      websocket.updateIsSave(true);
+      await this.tabRepository.createTab(websocket.getValue());
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    }
+    const response =
+      await this.collectionService.addSocketInCollection(requestObj);
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+
+      this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        websocket.getValue().id,
+        res,
+      );
+
+      websocket.updateId(res.id);
+      websocket.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+      });
+      websocket.updateIsSave(true);
+
+      this.tabRepository.createTab(websocket.getValue());
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    } else {
+      this.collectionRepository.deleteRequestOrFolderInCollection(
+        collection.id,
+        websocket.getValue().id,
+      );
+      notifications.error(response.message);
+    }
+  };
+
+  /**
    * Handles creating a new request in a folder
    * @param workspaceId :string
    * @param collection :CollectionDocument - the collection in which new request is going to be created
@@ -1432,6 +1553,134 @@ export default class CollectionsViewModel {
         requestObj.collectionId,
         requestObj.folderId,
         sampleRequest.getValue().id,
+      );
+    }
+  };
+
+  /**
+   * Handles creating a new request in a folder
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @param explorer : - the folder in which new request is going to be created
+   * @returns :void
+   */
+  private handleCreateWebSocketInFolder = async (
+    workspaceId: string,
+    collection: CollectionDocument,
+    explorer: Folder,
+  ) => {
+    if (
+      !hasWorkpaceLevelPermission(
+        this.getUserRoleInWorspace(),
+        workspaceLevelPermissions.SAVE_REQUEST,
+      )
+    ) {
+      return;
+    }
+    const websocket = new InitWebSocketTab(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      workspaceId,
+    );
+
+    let userSource = {};
+    if (collection.activeSync && explorer?.source === "USER") {
+      userSource = {
+        currentBranch: collection.currentBranch
+          ? collection.currentBranch
+          : collection.primaryBranch,
+        source: "USER",
+      };
+    }
+    const requestObj: CreateApiRequestPostBody = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      ...userSource,
+      folderId: explorer.id,
+      items: {
+        name: explorer.name,
+        type: ItemType.FOLDER,
+        items: {
+          name: websocket.getValue().name,
+          type: websocket.getValue().type,
+          description: "",
+          websocket: {},
+        },
+      },
+    };
+
+    await this.collectionRepository.addRequestInFolder(
+      requestObj.collectionId,
+      requestObj.folderId,
+      {
+        ...requestObj.items.items,
+        id: websocket.getValue().id,
+      },
+    );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      const res = await this.collectionRepository.readRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        websocket.getValue().id,
+      );
+      res.id = uuidv4();
+      this.collectionRepository.updateRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        websocket.getValue().id,
+        res,
+      );
+
+      websocket.updateId(res.id);
+      websocket.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: explorer.id,
+      });
+      websocket.updateIsSave(true);
+      this.tabRepository.createTab(websocket.getValue());
+
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    }
+    const response =
+      await this.collectionService.addSocketInCollection(requestObj);
+    if (response.isSuccessful && response.data.data) {
+      const request = response.data.data;
+
+      this.collectionRepository.updateRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        websocket.getValue().id,
+        request,
+      );
+
+      websocket.updateId(request.id);
+      websocket.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: explorer.id,
+      });
+      websocket.updateIsSave(true);
+      this.tabRepository.createTab(websocket.getValue());
+
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    } else {
+      this.collectionRepository.deleteRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        websocket.getValue().id,
       );
     }
   };
@@ -1735,6 +1984,28 @@ export default class CollectionsViewModel {
     moveNavigation("right");
   };
 
+  /**
+   * Handles opening a request on a tab
+   * @param request : - The request going to be opened on tab
+   * @param path : - The path to the request
+   */
+  public handleOpenWebSocket = (
+    workspaceId: string,
+    collection: CollectionDocument,
+    folder: any,
+    websocket: Request,
+  ) => {
+    const socketTabAdapter = new SocketTabAdapter();
+    const adaptedSocket = socketTabAdapter.adapt(
+      workspaceId || "",
+      collection?.id || "",
+      folder?.id || "",
+      websocket,
+    );
+    this.tabRepository.createTab(adaptedSocket);
+    moveNavigation("right");
+  };
+
   public handleOpenFolder = (
     workspaceId: string,
     collection: CollectionDocument,
@@ -1918,6 +2189,141 @@ export default class CollectionsViewModel {
           );
           this.updateTab(request.id, {
             name: newRequestName,
+          });
+          MixpanelEvent(Events.RENAME_REQUEST, {
+            source: "Collection list",
+          });
+        }
+      }
+    }
+  };
+
+  /**
+   * Handles renaming a web socket
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which the request is saved
+   * @param folder : - the folder in which the request is saved(if request if saved inside a folder)
+   * @param request : - the request which is going to be renamed
+   * @param newRequestName : - the new name of the request
+   */
+  private handleRenameWebSocket = async (
+    workspaceId: string,
+    collection: CollectionDocument,
+    folder: Folder,
+    websocket,
+    newWebSocketName: string,
+  ) => {
+    let userSource = {};
+    if (websocket.source === "USER") {
+      userSource = {
+        currentBranch: collection.currentBranch
+          ? collection.currentBranch
+          : collection.primaryBranch,
+        source: "USER",
+      };
+    }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (collection.id && workspaceId && !folder.id) {
+        const response =
+          await this.collectionRepository.readRequestOrFolderInCollection(
+            collection.id,
+            websocket.id,
+          );
+        let storage: any = websocket;
+        storage.name = newWebSocketName;
+        await this.collectionRepository.updateRequestOrFolderInCollection(
+          collection.id,
+          websocket.id,
+          response,
+        );
+        this.updateTab(websocket.id, {
+          name: newWebSocketName,
+        });
+        MixpanelEvent(Events.RENAME_REQUEST, {
+          source: "Collection list",
+        });
+      } else if (collection.id && workspaceId && folder.id) {
+        const response = await this.collectionRepository.readRequestInFolder(
+          collection.id,
+          folder.id,
+          websocket.id,
+        );
+        let storage = websocket;
+        storage.name = newWebSocketName;
+        await this.collectionRepository.updateRequestInFolder(
+          collection.id,
+          folder.id,
+          websocket.id,
+          response,
+        );
+        this.updateTab(websocket.id, {
+          name: newWebSocketName,
+        });
+        MixpanelEvent(Events.RENAME_REQUEST, {
+          source: "Collection list",
+        });
+      }
+      return;
+    }
+
+    if (newWebSocketName) {
+      if (collection.id && workspaceId && !folder.id) {
+        let storage: any = websocket;
+        storage.name = newWebSocketName;
+        const response = await this.collectionService.updateSocketInCollection(
+          websocket.id,
+          {
+            collectionId: collection.id,
+            workspaceId: workspaceId,
+            ...userSource,
+            items: storage,
+          },
+        );
+        if (response.isSuccessful) {
+          this.collectionRepository.updateRequestOrFolderInCollection(
+            collection.id,
+            websocket.id,
+            response.data.data,
+          );
+          this.updateTab(websocket.id, {
+            name: newWebSocketName,
+          });
+          MixpanelEvent(Events.RENAME_REQUEST, {
+            source: "Collection list",
+          });
+        }
+      } else if (collection.id && workspaceId && folder.id) {
+        let storage = websocket;
+        storage.name = newWebSocketName;
+        const response = await this.collectionService.updateSocketInCollection(
+          websocket.id,
+          {
+            collectionId: collection.id,
+            workspaceId: workspaceId,
+            ...userSource,
+            folderId: folder.id,
+            items: {
+              name: folder.name,
+              id: folder.id,
+              type: ItemType.FOLDER,
+              items: storage,
+            },
+          },
+        );
+        if (response.isSuccessful) {
+          this.collectionRepository.updateRequestInFolder(
+            collection.id,
+            folder.id,
+            websocket.id,
+            response.data.data,
+          );
+          this.updateTab(websocket.id, {
+            name: newWebSocketName,
           });
           MixpanelEvent(Events.RENAME_REQUEST, {
             source: "Collection list",
@@ -2150,10 +2556,7 @@ export default class CollectionsViewModel {
           requestObject.folderId,
           request.id,
         );
-      } else if (
-        requestObject.workspaceId &&
-        requestObject.collectionId
-      ) {
+      } else if (requestObject.workspaceId && requestObject.collectionId) {
         await this.collectionRepository.deleteRequestOrFolderInCollection(
           requestObject.collectionId,
           request.id,
@@ -2168,6 +2571,95 @@ export default class CollectionsViewModel {
       return true;
     } else {
       notifications.error("Failed to delete the Request.");
+      return false;
+    }
+  };
+
+  /**
+   * Handle deleting request from repository as well as backend
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - The collection in which the request is saved
+   * @param request : - The request to be deleted
+   * @param folder : - The folder in which the request is saved(if is saved in a folder)
+   * @returns :void
+   */
+  private handleDeleteWebSocket = async (
+    workspaceId: string,
+    collection: CollectionDocument,
+    websocket: Request,
+    folder: Folder,
+  ): Promise<boolean> => {
+    let userSource = {};
+    if (collection.activeSync) {
+      userSource = {
+        currentBranch: collection.currentBranch,
+      };
+    }
+
+    let requestObject: any = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      ...userSource,
+    };
+
+    if (folder && collection.id && workspaceId) {
+      requestObject = {
+        ...requestObject,
+        folderId: folder.id,
+      };
+    }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (folder) {
+        await this.collectionRepository.deleteRequestInFolder(
+          collection.id,
+          folder.id,
+          websocket.id,
+        );
+      } else {
+        await this.collectionRepository.deleteRequestOrFolderInCollection(
+          collection.id,
+          websocket.id,
+        );
+      }
+
+      return true;
+    }
+    const response = await this.collectionService.deleteSocketInCollection(
+      websocket.id,
+      requestObject,
+    );
+
+    if (response.isSuccessful) {
+      if (
+        requestObject.folderId &&
+        requestObject.collectionId &&
+        requestObject.workspaceId
+      ) {
+        await this.collectionRepository.deleteRequestInFolder(
+          requestObject.collectionId,
+          requestObject.folderId,
+          websocket.id,
+        );
+      } else if (requestObject.workspaceId && requestObject.collectionId) {
+        await this.collectionRepository.deleteRequestOrFolderInCollection(
+          requestObject.collectionId,
+          websocket.id,
+        );
+      }
+
+      notifications.success(`"${websocket.name}" Web Socket deleted.`);
+      this.removeMultipleTabs([websocket.id]);
+      MixpanelEvent(Events.DELETE_REQUEST, {
+        source: "Collection list",
+      });
+      return true;
+    } else {
+      notifications.error("Failed to delete the Web Socket.");
       return false;
     }
   };
@@ -2653,6 +3145,19 @@ export default class CollectionsViewModel {
       case "web-socket":
         await this.createWebSocketNewTab();
         break;
+      case "websocketCollection":
+        await this.handleCreateWebSocketInCollection(
+          args.workspaceId,
+          args.collection,
+        );
+        break;
+      case "websocketFolder":
+        await this.handleCreateWebSocketInFolder(
+          args.workspaceId,
+          args.collection,
+          args.folder,
+        );
+        break;
     }
     return response;
   };
@@ -2687,6 +3192,14 @@ export default class CollectionsViewModel {
           args.folder,
         );
         break;
+      case "websocket":
+        this.handleDeleteWebSocket(
+          args.workspaceId,
+          args.collection,
+          args.websocket,
+          args.folder,
+        );
+        break;
     }
   };
 
@@ -2718,6 +3231,15 @@ export default class CollectionsViewModel {
           args.collection,
           args.folder,
           args.request,
+          args.newName,
+        );
+        break;
+      case "web-socket":
+        this.handleRenameWebSocket(
+          args.workspaceId,
+          args.collection,
+          args.folder,
+          args.websocket,
           args.newName,
         );
         break;
@@ -2756,6 +3278,14 @@ export default class CollectionsViewModel {
           args.collection,
           args.folder,
           args.request,
+        );
+        break;
+      case "websocket":
+        this.handleOpenWebSocket(
+          args.workspaceId,
+          args.collection,
+          args.folder,
+          args.websocket,
         );
         break;
     }

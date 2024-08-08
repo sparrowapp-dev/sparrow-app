@@ -1384,6 +1384,7 @@ class RestExplorerViewModel
           folderId: path[path.length - 1].id,
           ...userSource,
           items: {
+            id: path[path.length - 1].id,
             name: path[path.length - 1].name,
             type: ItemType.FOLDER,
             items: {
