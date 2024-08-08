@@ -4,7 +4,7 @@
   import {
     environmentDropdown,
     environmentPicker,
-  } from "@environments/common/images";
+  } from "@workspaces/common/images";
   /**
    * callback which closes the quick help dialog
    */

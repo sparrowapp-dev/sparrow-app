@@ -10,7 +10,7 @@
   } from "$lib/utils/constants/permissions.constant";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { userWorkspaceLevelRole } from "$lib/store";
-  import { TabularInput } from "@workspaces/common/components";
+  import { TabularInputEnvironment } from "@workspaces/common/components";
   import { WithButton } from "@workspaces/common/hoc";
   import { Input } from "@library/forms";
   import { Carousel, Modal, Popover } from "@library/ui";
@@ -211,7 +211,7 @@
         {/if}
       </div>
       <section class={`var-value-container pe-1`} style="flex:1;">
-        <TabularInput
+        <TabularInputEnvironment
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
           keyValue={$currentEnvironment.property.environment.variable}
           callback={handleCurrentEnvironmentKeyValuePairChange}

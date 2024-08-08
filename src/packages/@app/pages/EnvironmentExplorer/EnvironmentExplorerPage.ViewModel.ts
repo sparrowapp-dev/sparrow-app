@@ -1,5 +1,4 @@
 import { notifications } from "@library/ui/toast/Toast";
-import { EnvironmentTabRepository } from "@app/repositories/environment-tab.repository";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { EnvironmentService } from "@app/services/environment.service";
@@ -16,7 +15,6 @@ import { Debounce, CompareArray } from "@common/utils";
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
-  private environmentTabRepository = new EnvironmentTabRepository();
   private environmentService = new EnvironmentService();
   private guideRepository = new GuideRepository();
   private guestUserRepository = new GuestUserRepository();

@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "$lib/utils/animations";
   import { EnvironmentList } from "@environments/features";
@@ -125,4 +125,4 @@
     ) {
     background-color: var(--bg-primary-200) !important;
   }
-</style>
+</style> -->
