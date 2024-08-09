@@ -36,19 +36,22 @@ import { invoke } from "@tauri-apps/api/core";
 
 //Utils
 
-import type { CreateDirectoryPostBody, ImportBodyUrl } from "$lib/utils/dto";
+import type {
+  CreateApiRequestPostBody,
+  CreateDirectoryPostBody,
+  ImportBodyUrl,
+} from "$lib/utils/dto";
 //-----
 
 //-----
 //Interfaces
 import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
-import type { Request, Folder } from "$lib/utils/interfaces/request.interface";
+import type { Folder } from "$lib/utils/interfaces/request.interface";
 //-----
 
 //-----
 //Emuns
 
-import { RequestDataType, RequestDataset } from "$lib/utils/enums";
 import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
 import { ContentTypeEnum, ResponseStatusCode } from "$lib/utils/enums";
 //-----
@@ -146,18 +149,6 @@ export default class CollectionsViewModel {
   public readWorkspace = (uuid: string): Promise<WorkspaceDocument> => {
     return this.workspaceRepository.readWorkspace(uuid);
   };
-
-  /**
-   * Syncs tabs with repository
-   */
-  // public syncTabWithStore = () => {
-  //   this.tabRepository.syncTabsWithStore(tabs);
-  // };
-
-  /**
-   * Prevent syncTabWithStore() to be called multiple times in 2 seconds
-   */
-  // debouncedTab = new Debounce().debounce(this.syncTabWithStore, 2000);
 
   /**
    * Return current tabs list of top tab bar component
@@ -634,12 +625,11 @@ export default class CollectionsViewModel {
    * Handle create empty collection
    * @param workspaceId :string
    */
-  public handleCreateCollection = async (
-    workspaceId: string,
-    collection: Observable<CollectionDocument[]>,
-  ) => {
+  public handleCreateCollection = async (workspaceId: string) => {
     let collectionList: CollectionDto[] = [];
-    await collection
+
+    await this.collectionRepository
+      .getCollection()
       .subscribe(
         (collections) =>
           (collectionList = collections as unknown as CollectionDto[]),
@@ -746,54 +736,6 @@ export default class CollectionsViewModel {
       notifications.success("New Collection Created");
     }
     return response;
-  };
-
-  /**
-   * Import collection from giver data
-   * @param workspaceId: string - the workspace id in which the collection is going to be imported
-   * @param url: string - the url of the swagger
-   * @param activeSync: boolean - if the active sync is enabled
-   * @returns
-   */
-  private importCollectionData = async (
-    workspaceId: string,
-    url: ImportBodyUrl,
-    activeSync: boolean,
-  ) => {
-    return await this.collectionService.importCollection(
-      workspaceId,
-      url,
-      activeSync,
-    );
-  };
-
-  /**
-   * Import collection from file
-   * @param workspaceId: string - workspace id in which the collection is going to be imported
-   * @param file: Request - the file to be imported
-   * @returns
-   */
-  private importCollectionFile = async (workspaceId: string, file: Request) => {
-    return await this.collectionService.importCollectionFile(workspaceId, file);
-  };
-
-  /**
-   * Check body type of curl
-   * @param type: string: type string to be checked from enum
-   * @returns Request Body Type
-   */
-  private checkBodyType = (type: string) => {
-    const contentTypeMapping: { [key: string]: string } = {
-      "application/json": RequestDataType.JSON,
-      "application/xml": RequestDataType.XML,
-      "application/x-www-form-urlencoded": RequestDataset.URLENCODED,
-      "multipart/form-data": RequestDataset.FORMDATA,
-      "application/javascript": RequestDataType.JAVASCRIPT,
-      "text/plain": RequestDataType.TEXT,
-      "text/html": RequestDataType.HTML,
-    };
-
-    return contentTypeMapping[type] || RequestDataset.NONE;
   };
 
   /**
@@ -1690,9 +1632,6 @@ export default class CollectionsViewModel {
     sampleFolder.updateName(folder.name);
     sampleFolder.updatePath(path);
     sampleFolder.updateIsSave(true);
-    // sampleFolder.updateActiveSync(collection.activeSync);
-    // sampleFolder.updateSource(!folder?.source ? "SPEC" : folder.source);
-    // sampleFolder.updateIsDeleted(folder?.isDeleted);
 
     this.handleCreateTab(sampleFolder.getValue());
     moveNavigation("right");
@@ -1742,7 +1681,7 @@ export default class CollectionsViewModel {
    */
   private handleRenameRequest = async (
     workspaceId: string,
-    collection: CollectionDocument,
+    collection: CollectionDto,
     folder: CollectionItemsDto,
     request: CollectionItemsDto,
     newRequestName: string,
@@ -1847,7 +1786,7 @@ export default class CollectionsViewModel {
               type: ItemType.FOLDER,
               items: storage,
             },
-          },
+          } as CreateApiRequestPostBody,
         );
         if (response.isSuccessful) {
           this.collectionRepository.updateRequestInFolder(
@@ -2022,7 +1961,7 @@ export default class CollectionsViewModel {
     if (isGuestUser !== true) {
       const response = await this.collectionService.switchCollectionBranch(
         collection.id,
-        detectBranch,
+        detectBranch as string,
       );
       await setTimeout(async () => {
         if (response.isSuccessful) {
@@ -2102,7 +2041,7 @@ export default class CollectionsViewModel {
     workspaceId: string,
     collection: CollectionDto,
     explorer: Folder,
-    requestIds: [string],
+    requestIds: string[],
   ) => {
     let userSource = {};
     if (collection.activeSync && explorer?.source === "USER") {
@@ -2342,7 +2281,7 @@ export default class CollectionsViewModel {
    */
   public handleRefetchCollection = async (
     workspaceId: string,
-    collection: CollectionDocument,
+    collection: CollectionDto,
   ) => {
     const errMessage = `Failed to sync the collection. Local reposisitory branch is not set to ${collection?.currentBranch}.`;
 
@@ -2377,23 +2316,30 @@ export default class CollectionsViewModel {
     });
     if (isGuestUser !== true) {
       const responseJSON =
-        await this.collectionService.validateImportCollectionURL(
+        (await this.collectionService.validateImportCollectionURL(
           collection.activeSyncUrl,
-        );
+        )) as {
+          data: {
+            headers: string;
+            response: string;
+            status: string;
+          };
+        };
+      const dt = {
+        url: collection.activeSyncUrl as string,
+        urlData: {
+          data: JSON.parse(responseJSON.data.response) as string,
+          headers: responseJSON.data.headers as string,
+        },
+        primaryBranch: collection?.primaryBranch as string,
+        currentBranch: collection?.currentBranch
+          ? (collection?.currentBranch as string)
+          : (collection?.primaryBranch as string),
+      };
       if (responseJSON?.data?.status === ResponseStatusCode.OK) {
-        const response = await this.importCollectionData(
+        const response = await this.collectionService.importCollection(
           workspaceId,
-          {
-            url: collection.activeSyncUrl,
-            urlData: {
-              data: JSON.parse(responseJSON.data.response),
-              headers: responseJSON.data.headers,
-            },
-            primaryBranch: collection?.primaryBranch,
-            currentBranch: collection?.currentBranch
-              ? collection?.currentBranch
-              : collection?.primaryBranch,
-          },
+          dt,
           collection.activeSync,
         );
 
@@ -2410,7 +2356,10 @@ export default class CollectionsViewModel {
         }
       } else {
         notifications.error(
-          `Unable to detect ${collection.activeSyncUrl.replace("-json", "")}.`,
+          `Unable to detect ${collection?.activeSyncUrl?.replace(
+            "-json",
+            "",
+          )}.`,
         );
       }
     }
@@ -2546,30 +2495,38 @@ export default class CollectionsViewModel {
     });
 
     if (isGuestUser === true) {
-      const data = {
-        _id: uuidv4(),
+      const data: {
+        id?: string;
+        name: string;
+        totalRequests: number;
+        createdBy: string;
+        items?: CollectionItemsDto[];
+        updatedBy: string;
+        createdAt: string;
+        updatedAt: string;
+        workspaceId?: string;
+      } = {
+        id: uuidv4(),
         name: _collectionName,
         totalRequests: 0,
-        createdBy: "Guest User",
         items: [],
-        updatedBy: "Guest User",
         // createdAt: new Date().toISOString,
-        // updatedAt: new Date().toISOString,
         createdAt: "",
-        createdby: "",
+        createdBy: "Guest User",
+        // updatedAt: new Date().toISOString,
+        updatedAt: "",
+        updatedBy: "Guest User",
       };
       const latestRoute = {
-        id: data._id,
+        id: data.id,
       };
       const storage = data;
-      const _id = data._id;
-      delete storage._id;
-      storage.id = _id;
+
       storage.workspaceId = _workspaceMeta.id;
       MixpanelEvent(Events.CREATE_COLLECTION, {
         source: "SaveRequest",
         collectionName: data.name,
-        collectionId: data._id,
+        collectionId: data.id,
       });
       return {
         status: "success",
@@ -2789,10 +2746,7 @@ export default class CollectionsViewModel {
     let response;
     switch (entityType) {
       case "collection":
-        response = await this.handleCreateCollection(
-          args.workspaceId,
-          args.collection as CollectionDto,
-        );
+        response = await this.handleCreateCollection(args.workspaceId);
         break;
       case "folder":
         await this.handleCreateFolderInCollection(
@@ -2841,37 +2795,40 @@ export default class CollectionsViewModel {
    * @param entityType :srting - type of entity, collection, folder or request
    * @param args :object - arguments depending on entity type
    */
-  public handleDeleteItem = async (entityType: string, args: any) => {
+  public handleDeleteItem = async (
+    entityType: string,
+    args: CollectionArgsDto,
+  ) => {
     switch (entityType) {
       case "collection":
         this.handleDeleteCollection(
           args.workspaceId,
-          args.collection,
-          args.deletedIds,
+          args.collection as CollectionDto,
+          args.deletedIds as string[],
         );
         break;
       case "folder":
         this.handleDeleteFolder(
           args.workspaceId,
-          args.collection,
-          args.folder,
-          args.requestIds,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.requestIds as string[],
         );
         break;
       case "request":
         this.handleDeleteRequest(
           args.workspaceId,
-          args.collection,
-          args.request,
-          args.folder,
+          args.collection as CollectionDto,
+          args.request as CollectionItemsDto,
+          args.folder as CollectionItemsDto,
         );
         break;
       case "websocket":
         this.handleDeleteWebSocket(
           args.workspaceId,
-          args.collection,
-          args.websocket,
-          args.folder,
+          args.collection as CollectionDto,
+          args.websocket as CollectionItemsDto,
+          args.folder as CollectionItemsDto,
         );
         break;
     }
@@ -2882,39 +2839,42 @@ export default class CollectionsViewModel {
    * @param entityType :string - type of entity, collection, folder or request
    * @param args :object - arguments depending on entity type
    */
-  public handleRenameItem = async (entityType: string, args: any) => {
+  public handleRenameItem = async (
+    entityType: string,
+    args: CollectionArgsDto,
+  ) => {
     switch (entityType) {
       case "collection":
         this.handleRenameCollection(
           args.workspaceId,
-          args.collection,
-          args.newName,
+          args.collection as CollectionDto,
+          args.newName as string,
         );
         break;
       case "folder":
         this.handleRenameFolder(
           args.workspaceId,
-          args.collection,
-          args.folder,
-          args.newName,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.newName as string,
         );
         break;
       case "request":
         this.handleRenameRequest(
           args.workspaceId,
-          args.collection,
-          args.folder,
-          args.request,
-          args.newName,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.request as CollectionItemsDto,
+          args.newName as string,
         );
         break;
       case "web-socket":
         this.handleRenameWebSocket(
           args.workspaceId,
-          args.collection,
-          args.folder,
-          args.websocket,
-          args.newName,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.websocket as CollectionItemsDto,
+          args.newName as string,
         );
         break;
     }
@@ -2925,13 +2885,16 @@ export default class CollectionsViewModel {
    * @param entityType :string - type of entity, collection, folder or request
    * @param args :object - arguments depending on entity type
    */
-  public handleImportItem = async (entityType: string, args: any) => {
+  public handleImportItem = async (
+    entityType: string,
+    args: CollectionArgsDto,
+  ) => {
     let response;
     switch (entityType) {
       case "curl":
         response = await this.handleImportCurl(
           args.workspaceId,
-          args.importCurl,
+          args.importCurl as string,
         );
         break;
     }
@@ -3223,7 +3186,9 @@ export default class CollectionsViewModel {
         col.name = newCollectionName;
         this.collectionRepository.updateCollection(collectionId, col);
         notifications.success("Collection renamed successfully!");
-        return;
+        return {
+          isSuccessful: true,
+        };
       }
       const response = await this.collectionService.updateCollectionData(
         collectionId,
@@ -3294,7 +3259,9 @@ export default class CollectionsViewModel {
           res,
         );
         notifications.success("Folder renamed successfully!");
-        return;
+        return {
+          isSuccessful: true,
+        };
       }
       const response = await this.collectionService.updateFolderInCollection(
         workspaceId,

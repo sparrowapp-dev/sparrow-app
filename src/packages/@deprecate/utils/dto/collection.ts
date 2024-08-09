@@ -52,17 +52,23 @@ export interface ImportCollectionBody {}
 
 export interface ImportBodyUrl {
   url: string;
-  urlData: string;
+  urlData: {
+    data: string;
+    headers: string;
+  };
   primaryBranch: string;
   currentBranch: string;
 }
 
 interface CollectionItemsPayload {
-  name: string;
-  type: string;
+  name?: string;
+  type?: string;
+  id?: string;
+  description?: string;
   request?: {
     method: string;
   };
+  items?: CollectionItemsPayload;
 }
 
 export interface CreateApiRequestPostBody {

@@ -140,4 +140,8 @@ export interface CollectionArgsDto {
   folder?: CollectionItemsDto;
   request?: CollectionItemsDto;
   websocket?: CollectionItemsDto;
+  newName?: string;
+  importCurl?: string;
+  deletedIds?: string[];
+  requestIds?: string[];
 }
