@@ -71,15 +71,17 @@
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
       Please paste your cURL command here.
     </p>
-  {:else if isInputTouched && !isCurlDataLoading && isMethodWrong}
-    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-      The specified HTTP method is currently not supported.
-    </p>
-  {:else if isInputTouched && !isCurlDataLoading && !isCurlValid}
-    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-      The cURL command format appears to be incorrect, make sure it is in the
-      correct format.
-    </p>
+  {:else if isInputTouched && !isCurlDataLoading}
+    {#if isMethodWrong}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        The specified HTTP method is currently not supported.
+      </p>
+    {:else if !isCurlValid}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        The cURL command format appears to be incorrect, make sure it is in the
+        correct format.
+      </p>
+    {/if}
   {/if}
 </div>
 <button

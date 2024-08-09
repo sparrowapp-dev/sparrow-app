@@ -990,8 +990,8 @@ export default class CollectionsViewModel {
   public handleValidateCurl = async (importCurl: string) => {
     const response =
       await this.collectionService.importCollectionFromCurl(importCurl);
-    const method = await response?.data?.data?.request?.method;
     if (response.isSuccessful) {
+      const method = await response?.data?.data?.request?.method;
       const isSuccessful = response.isSuccessful;
       return {
         isSuccessful: isSuccessful,
@@ -1000,7 +1000,6 @@ export default class CollectionsViewModel {
     } else {
       return {
         isSuccessful: false,
-        method: method,
       };
     }
   };
