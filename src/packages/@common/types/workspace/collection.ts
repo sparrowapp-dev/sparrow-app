@@ -114,20 +114,20 @@ interface Branch {
 }
 
 export interface CollectionDto {
-  collectionId: string;
+  collectionId?: string;
   id: string;
   name: string;
   totalRequests: number;
   description: string;
   items: CollectionItemsDto[];
-  uuid: string;
-  activeSync: boolean;
-  activeSyncUrl: string;
-  localRepositoryPath: string;
+  uuid?: string;
+  activeSync?: boolean;
+  activeSyncUrl?: string;
+  localRepositoryPath?: string;
   workspaceId: string;
-  branches: Branch[];
-  primaryBranch: string;
-  currentBranch: string;
+  branches?: Branch[];
+  primaryBranch?: string;
+  currentBranch?: string;
   createdAt: string;
   updatedAt: string;
   createdBy: string;

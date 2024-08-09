@@ -7,7 +7,6 @@ import type {
 
 //-----
 // Stores
-import { userWorkspaceLevelRole } from "$lib/store";
 import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
 //-----
 
@@ -37,8 +36,6 @@ import { invoke } from "@tauri-apps/api/core";
 
 //Utils
 
-import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
 import type { CreateDirectoryPostBody, ImportBodyUrl } from "$lib/utils/dto";
 //-----
 
@@ -53,11 +50,7 @@ import type { Request, Folder } from "$lib/utils/interfaces/request.interface";
 
 import { RequestDataType, RequestDataset } from "$lib/utils/enums";
 import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-import {
-  WorkspaceRole,
-  ContentTypeEnum,
-  ResponseStatusCode,
-} from "$lib/utils/enums";
+import { ContentTypeEnum, ResponseStatusCode } from "$lib/utils/enums";
 //-----
 
 import { moveNavigation } from "$lib/utils/helpers/navigation";
@@ -436,13 +429,14 @@ export default class CollectionsViewModel {
       return true;
     }
 
-    const res = await updateCollectionRequest(_id, folderId, collectionId, {
+    const dt = {
       collectionId: collectionId,
       workspaceId: workspaceId,
       ...folderSource,
       ...userSource,
-      items: itemSource,
-    });
+      items: itemSource as unknown as CollectionItemsDto,
+    };
+    const res = await updateCollectionRequest(_id, folderId, collectionId, dt);
     if (res.isSuccessful) {
       if (!folderId) {
         this.collectionRepository.updateRequestOrFolderInCollection(
@@ -516,7 +510,7 @@ export default class CollectionsViewModel {
   public syncCollectionsWithBackend = async (
     activeWorkspace: WorkspaceDocument,
   ) => {
-    let currentEnvironment: any;
+    let currentEnvironment: object;
     if (activeWorkspace) {
       // await refreshEnv(activeWorkspaceRxDoc?._id);
       const env: EnvironmentDocument =
@@ -686,26 +680,16 @@ export default class CollectionsViewModel {
           collectionId: response.data.data._id,
           folderId: "",
         };
-        // const Samplecollection = generateSampleCollection(
-        //   response.data.data._id,
-        //   new Date().toString(),
-        // );
+
         const initCollectionTab = new InitCollectionTab(
           response.data.data._id,
           workspaceId,
         );
 
-        // Samplecollection.id = response.data.data._id;
-        // Samplecollection.path = path;
-        // Samplecollection.name = response.data.data.name;
-        // Samplecollection.property.collection.requestCount = totalRequest;
-        // Samplecollection.property.collection.folderCount = totalFolder;
-
         initCollectionTab.updateId(response.data.data._id);
         initCollectionTab.updatePath(path);
         initCollectionTab.updateName(response.data.data.name);
 
-        // this.handleOpenCollection(workspaceId, Samplecollection);
         this.tabRepository.createTab(initCollectionTab.getValue());
         moveNavigation("right");
 
@@ -732,6 +716,7 @@ export default class CollectionsViewModel {
         name: newCollection.name,
         workspaceId: workspaceId,
         items: [],
+        description: "",
         createdAt: newCollection.createdAt,
         createdBy: "guestUser",
         totalRequests: 0,

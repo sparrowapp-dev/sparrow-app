@@ -1,4 +1,4 @@
-import type { RequestDto } from "@common/types/workspace";
+import type { CollectionItemsDto, RequestDto } from "@common/types/workspace";
 import type { ContentTypeEnum } from "../enums/request.enum";
 import type { Auth, KeyValuePair } from "../interfaces/request.interface";
 
@@ -57,22 +57,17 @@ export interface ImportBodyUrl {
   currentBranch: string;
 }
 
+interface CollectionItemsPayload {
+  name: string;
+  type: string;
+  request?: {
+    method: string;
+  };
+}
+
 export interface CreateApiRequestPostBody {
   collectionId: string;
   workspaceId: string;
   folderId?: string;
-  items: {
-    id?: string;
-    name: string;
-    type: string;
-    description?: string;
-    request?: RequestDto;
-    items?: {
-      id?: string;
-      name: string;
-      type: string;
-      description?: string;
-      request: RequestDto;
-    };
-  };
+  items?: CollectionItemsPayload;
 }
