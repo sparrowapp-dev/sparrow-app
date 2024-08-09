@@ -65,6 +65,19 @@ use tauri::Window;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
 use utils::response_decoder::decode_response_body;
+
+// New
+
+use futures::{SinkExt, StreamExt};
+// use http::header::HeaderValue;
+use http::header::HeaderValue;
+use native_tls::TlsConnector;
+use std::sync::Arc;
+use tauri::AppHandle;
+use tokio::sync::mpsc::{self, UnboundedSender};
+use tokio::sync::Mutex;
+use tokio_tungstenite::tungstenite::protocol::Message;
+use tokio_tungstenite::{connect_async, tungstenite::handshake::client::Request, Connector};
 #[cfg(target_os = "macos")]
 #[macro_use]
 extern crate objc;
@@ -460,6 +473,121 @@ struct SingleInstancePayload {
     args: Vec<String>,
     cwd: String,
 }
+
+#[derive(Clone)]
+struct TabConnection {
+    sender: UnboundedSender<String>,
+}
+
+#[tauri::command]
+async fn connect_websocket(
+    url: String,
+    tabid: String,
+    headers: String, // Stringified JSON headers
+    state: tauri::State<'_, Arc<AppState>>,
+    app_handle: tauri::AppHandle,
+) -> Result<(), String> {
+    println!("inside the websocket");
+
+    // Deserialize the JSON string into a Vec<KeyValue>
+    let headers_key_values: Vec<KeyValue> =
+        serde_json::from_str(&headers).map_err(|e| format!("Failed to parse headers: {}", e))?;
+
+    // Create a HashMap to store key-value pairs
+    let mut headers_key_value_map: HashMap<String, String> = HashMap::new();
+
+    // Iterate over key_values and add key-value pairs to the map
+    for kv in headers_key_values {
+        headers_key_value_map.insert(kv.key, kv.value);
+    }
+
+    // Create request builder with URL
+    let mut request = Request::builder().uri(&url);
+
+    // Add all headers to the request builder
+    for (key, value) in headers_key_value_map.iter() {
+        request = request.header(
+            key,
+            HeaderValue::from_str(value).map_err(|e| format!("Invalid header value: {}", e))?,
+        );
+    }
+
+    // // Connect to the WebSocket
+    let (ws_stream, _) = connect_async(request.body(()).unwrap())
+        .await
+        .map_err(|e| format!("Failed to connect: {}", e))?;
+
+    let (mut write, mut read) = ws_stream.split();
+
+    let (tx, mut rx) = mpsc::unbounded_channel::<String>();
+
+    state
+        .connections
+        .lock()
+        .await
+        .insert(tabid.clone(), TabConnection { sender: tx });
+
+    let svelte_tabid = tabid.clone();
+    tokio::spawn(async move {
+        while let Some(message) = read.next().await {
+            if let Ok(msg) = message {
+                if let Message::Text(text) = msg {
+                    app_handle
+                        .emit(&format!("ws_message_{}", svelte_tabid), text)
+                        .unwrap();
+                }
+            }
+        }
+    });
+
+    tokio::spawn(async move {
+        while let Some(msg) = rx.recv().await {
+            write
+                .send(Message::Text(msg))
+                .await
+                .map_err(|e| format!("Failed to send message: {}", e))
+                .unwrap();
+        }
+    });
+
+    Ok(())
+}
+
+#[tauri::command]
+async fn send_websocket_message(
+    tabid: String,
+    message: String,
+    state: tauri::State<'_, Arc<AppState>>,
+) -> Result<(), String> {
+    // Parse the stringified JSON into a serde_json::Value
+    let json_message: Value = serde_json::from_str(&message)
+        .map_err(|e| format!("Failed to parse JSON message: {}", e))?;
+
+    // Re-serialize the JSON message into a string to send over WebSocket
+    let serialized_message = serde_json::to_string(&json_message)
+        .map_err(|e| format!("Failed to serialize JSON message: {}", e))?;
+    if let Some(connection) = state.connections.lock().await.get(&tabid) {
+        connection
+            .sender
+            .send(serialized_message)
+            .map_err(|e| format!("Failed to send message: {}", e))?;
+    }
+    Ok(())
+}
+
+#[tauri::command]
+async fn disconnect_websocket(
+    tabid: String,
+    state: tauri::State<'_, Arc<AppState>>,
+) -> Result<(), String> {
+    state.connections.lock().await.remove(&tabid);
+    Ok(())
+}
+
+struct AppState {
+    connections: Mutex<std::collections::HashMap<String, TabConnection>>,
+}
+
 // Driver Function
 fn main() {
     // Initiate Tauri Runtime
@@ -494,6 +622,10 @@ fn main() {
             #[cfg(desktop)]
             app.handle()
                 .plugin(tauri_plugin_updater::Builder::new().build())?;
+            let app_handle = app.handle().clone();
+            app.manage(Arc::new(AppState {
+                connections: Mutex::new(std::collections::HashMap::new()),
+            }));
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -506,6 +638,9 @@ fn main() {
             make_http_request,
             zoom_window,
             make_http_request_v2,
+            connect_websocket,
+            send_websocket_message,
+            disconnect_websocket
         ])
         .on_page_load(|wry_window, _payload| {
             if wry_window.url().host_str() == Some("www.google.com") {

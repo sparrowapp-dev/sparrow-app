@@ -8,6 +8,7 @@
   import { Debounce } from "@common/utils";
   import { isGuestUserActive, user } from "$lib/store";
   import { onMount } from "svelte";
+  import { listen } from "@tauri-apps/api/event";
   export let tab;
   let isLoginBannerActive = false;
   const _viewModel = new RestExplorerViewModel(tab);
@@ -131,6 +132,16 @@
     if (guestUser?.isBannerActive) {
       isLoginBannerActive = guestUser?.isBannerActive;
     }
+  });
+  onMount(() => {
+    // const unlisten = listen(`ws_message_unique-tab-id`, (event) => {
+    //   console.log("event new------>", event);
+    // });
+
+    return () => {
+      // unlisten();
+      // disconnect();
+    };
   });
 </script>
 
