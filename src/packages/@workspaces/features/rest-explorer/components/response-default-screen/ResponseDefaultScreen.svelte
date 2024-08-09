@@ -57,7 +57,7 @@
             keyClassProp={"text-secondary-200"}
             valueClassProp={"bg-secondary-400 text-secondary-150"}
             keyStyleProp={"width: 100px;"}
-            valueStyleProp={"width: 90px"}
+            valueStyleProp={"max-width: fit-content;"}
             type="combo"
           />
         </div>

@@ -28,7 +28,6 @@
 
   export let onAddMember;
 
-
   let filterText = "";
 
   let workspacePerPage: number = 10,
@@ -66,8 +65,8 @@
                   .startsWith(filterText.toLowerCase()))
               .sort((a, b) => a.name.localeCompare(b.name))
               .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
-              <Rows 
-               {onAddMember}
+              <Rows
+                {onAddMember}
                 {list}
                 activeTeam={openTeam}
                 onOpenCollection={onSwitchWorkspace}
@@ -127,7 +126,7 @@
     <table class="w-75 bottom-0">
       <tfoot>
         <tr class="d-flex justify-content-between">
-          <th class="tab-head"
+          <th class="tab-head" style="width: 1;"
             >Showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
               currPage * workspacePerPage,
               data?.filter((item) =>
@@ -137,7 +136,7 @@
               item.name.toLowerCase().startsWith(filterText.toLowerCase()),
             ).length}
           </th>
-          <th class="tab-head tab-change" style="">
+          <th class="tab-head tab-change" style="width:189.46px;">
             <button
               on:click={() => (currPage = 1)}
               class="bg-transparent border-0"
@@ -237,7 +236,7 @@
     background-color: transparent;
   }
   .tab-change {
-    margin-left: 170px;
+    margin-left: 203px;
   }
   table {
     background-color: transparent;
