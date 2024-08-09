@@ -32,7 +32,7 @@
 
   // ---- Interface, enum & constants
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import type { WorkspaceRole } from "$lib/utils/enums/team.enum";
+  import { WorkspaceRole } from "$lib/utils/enums/team.enum";
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
 
   // ---- View Model
@@ -253,7 +253,9 @@
             handleCollapseCollectionList,
           }}
           githubRepo={githubRepoData}
-          userRoleInWorkspace={_viewModel.getUserRoleInWorspace()}
+          userRoleInWorkspace={() => {
+            return WorkspaceRole.WORKSPACE_ADMIN;
+          }}
           activeTabPath={$activeTab?.path}
           activeTabId={$activeTab?.id}
           showImportCollectionPopup={() => (isImportCollectionPopup = true)}
@@ -264,7 +266,6 @@
           onItemOpened={_viewModel.handleOpenItem}
           onBranchSwitched={_viewModel.handleBranchSwitch}
           onRefetchCollection={_viewModel.handleRefetchCollection}
-          onSearchCollection={_viewModel.handleSearchCollection}
         />
       </Pane>
       <Pane
@@ -351,7 +352,7 @@
   onCancel={handleClosePopupBackdrop}
   onDiscard={handlePopupDiscard}
   isSaveDisabled={!hasWorkpaceLevelPermission(
-    _viewModel.getUserRoleInWorspace(),
+    WorkspaceRole.WORKSPACE_ADMIN,
     workspaceLevelPermissions.SAVE_REQUEST,
   )}
   {loader}

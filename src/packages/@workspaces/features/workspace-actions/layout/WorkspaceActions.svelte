@@ -39,14 +39,6 @@
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
-  export let onSearchCollection: (
-    collection: CollectionDocument[],
-    searchData: string,
-  ) => {
-    filteredCollection: CollectionDocument[];
-    filteredFile: RequestType[];
-    filteredFolder: Folder[];
-  };
   export let onBranchSwitched: (collection: CollectionDocument) => void;
   export let onRefetchCollection: (
     workspaceId: string,
@@ -60,7 +52,7 @@
    * id of the active tab
    */
   export let activeTabId;
-  export let userRoleInWorkspace: WorkspaceRole;
+  export let userRoleInWorkspace;
   export let currentWorkspace: Observable<WorkspaceDocument>;
   export let leftPanelController: {
     leftPanelCollapse: boolean;
