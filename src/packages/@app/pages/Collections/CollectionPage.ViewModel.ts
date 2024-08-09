@@ -269,7 +269,7 @@ export default class CollectionsViewModel {
       return tab;
     });
     updatedTabList.sort((a, b) => {
-      return b.index - a.index;
+      return (b.index as number) - (a.index as number);
     });
   };
 
@@ -1649,7 +1649,8 @@ export default class CollectionsViewModel {
           totalRequest++;
         } else {
           totalFolder++;
-          totalRequest += item?.items?.length;
+          totalRequest += (item?.items as unknown as CollectionItemsDto[])
+            ?.length;
         }
       });
     }
