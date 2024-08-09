@@ -7,6 +7,8 @@ import {
   SocketDataTypeEnum,
   SocketSectionEnum,
   WebSocketDefault,
+  type State,
+  type StatePartial,
   type StateWrapper,
   type WebSocketTab,
 } from "@common/types/workspace/web-socket";
@@ -134,7 +136,7 @@ class InitWebSocketTab {
   public updateIsSave(_isSave: boolean) {
     this._tab.isSaved = _isSave;
   }
-  public updateState(_state: StateWrapper) {
+  public updateState(_state: Partial<State>) {
     this._tab.property.websocket.state = {
       ...this._tab.property.websocket.state,
       ..._state,

@@ -45,7 +45,6 @@ import type {
 
 //-----
 //Interfaces
-import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
 import type { Folder } from "$lib/utils/interfaces/request.interface";
 //-----
 
@@ -314,11 +313,11 @@ export default class CollectionsViewModel {
    * @param uuid
    * @returns
    */
-  private readRequestOrFolderInCollection = (
+  private readRequestOrFolderInCollection = async (
     collectionId: string,
     uuid: string,
-  ): Promise<CollectionItem> => {
-    return this.collectionRepository.readRequestOrFolderInCollection(
+  ): Promise<CollectionItemsDto | undefined> => {
+    return await this.collectionRepository.readRequestOrFolderInCollection(
       collectionId,
       uuid,
     );
@@ -879,15 +878,16 @@ export default class CollectionsViewModel {
           requestObj.collectionId,
           request.getValue().id,
         );
-
-      res.id = uuidv4();
+      if (res) {
+        res.id = uuidv4();
+      }
       await this.collectionRepository.updateRequestOrFolderInCollection(
         collection.id,
         request.getValue().id,
         res,
       );
 
-      request.updateId(res.id);
+      request.updateId(res?.id as string);
       request.updatePath({
         workspaceId: workspaceId,
         collectionId: collection.id,
@@ -1000,15 +1000,16 @@ export default class CollectionsViewModel {
           websocketObj.collectionId as string,
           websocket.getValue().id,
         );
-
-      res.id = uuidv4();
+      if (res) {
+        res.id = uuidv4();
+      }
       await this.collectionRepository.updateRequestOrFolderInCollection(
         collection.id as string,
         websocket.getValue().id,
         res,
       );
 
-      websocket.updateId(res.id);
+      websocket.updateId(res?.id as string);
       websocket.updatePath({
         workspaceId: workspaceId,
         collectionId: collection.id,
@@ -1551,7 +1552,9 @@ export default class CollectionsViewModel {
             collection.id,
             explorer.id,
           );
-        res.name = newFolderName;
+        if (res) {
+          res.name = newFolderName;
+        }
         this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           explorer.id,
@@ -3252,7 +3255,9 @@ export default class CollectionsViewModel {
             collectionId,
             folderId,
           );
-        res.name = newFolderName;
+        if (res) {
+          res.name = newFolderName;
+        }
 
         this.collectionRepository.updateRequestOrFolderInCollection(
           collectionId,

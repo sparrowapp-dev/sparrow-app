@@ -255,7 +255,7 @@ export class CollectionRepository {
   public readRequestOrFolderInCollection = async (
     collectionId: string,
     uuid: string,
-  ): Promise<CollectionItem> => {
+  ): Promise<CollectionItemsDto | undefined> => {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
@@ -263,8 +263,8 @@ export class CollectionRepository {
         },
       })
       .exec();
-    let response: CollectionItem;
-    collection?.toJSON().items.forEach((element) => {
+    let response: CollectionItemsDto | undefined;
+    collection?.toJSON().items.forEach((element: CollectionItemsDto) => {
       if (element.id === uuid) {
         response = element;
         return;

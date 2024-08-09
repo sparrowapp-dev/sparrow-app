@@ -1,24 +1,63 @@
+import { ContentTypeEnum } from "$lib/utils/enums";
+import { createDeepCopy } from "$lib/utils/helpers";
 import {
-  createDeepCopy,
-  setAuthType,
-  setBodyType,
-  unsetAuthType,
-  unsetBodyType,
-} from "$lib/utils/helpers";
-import {
-  RequestDatasetEnum,
-  type FormData,
+  RequestDataTypeEnum,
+  type CollectionItemsDto,
   type Path,
-  type RequestTab,
   type Tab,
 } from "@common/types/workspace";
-import { InitRequestTab, InitWebSocketTab } from "@common/utils";
+import { SocketDataTypeEnum } from "@common/types/workspace/web-socket";
+import { InitWebSocketTab } from "@common/utils";
 
 /**
  * @class - this class makes request tab compatible with backend server
  */
 export class SocketTabAdapter {
   constructor() {}
+
+  private setMessageType = (input: string) => {
+    let result = SocketDataTypeEnum.TEXT;
+    switch (input) {
+      case ContentTypeEnum["application/json"]:
+        result = SocketDataTypeEnum.JSON;
+        break;
+      case ContentTypeEnum["application/xml"]:
+        result = SocketDataTypeEnum.XML;
+        break;
+      case ContentTypeEnum["application/javascript"]:
+        result = SocketDataTypeEnum.JAVASCRIPT;
+        break;
+      case ContentTypeEnum["text/plain"]:
+        result = SocketDataTypeEnum.TEXT;
+        break;
+      case ContentTypeEnum["text/html"]:
+        result = SocketDataTypeEnum.HTML;
+        break;
+    }
+    return result;
+  };
+
+  unsetMessageType = (input: string) => {
+    let contentType: ContentTypeEnum = ContentTypeEnum["text/plain"];
+    switch (input) {
+      case RequestDataTypeEnum.JSON:
+        contentType = ContentTypeEnum["application/json"];
+        break;
+      case RequestDataTypeEnum.XML:
+        contentType = ContentTypeEnum["application/xml"];
+        break;
+      case RequestDataTypeEnum.HTML:
+        contentType = ContentTypeEnum["text/html"];
+        break;
+      case RequestDataTypeEnum.JAVASCRIPT:
+        contentType = ContentTypeEnum["application/javascript"];
+        break;
+      case RequestDataTypeEnum.TEXT:
+        contentType = ContentTypeEnum["text/plain"];
+        break;
+    }
+    return contentType;
+  };
 
   /**
    * @description - parse backend data to frontend compatible
@@ -32,7 +71,7 @@ export class SocketTabAdapter {
     workspaceId: string,
     collectionId: string,
     folderId: string,
-    _socket: any,
+    _socket: CollectionItemsDto,
   ): Tab {
     const socket = createDeepCopy(_socket);
     const adaptedSocket = new InitWebSocketTab(socket.id, workspaceId);
@@ -49,6 +88,15 @@ export class SocketTabAdapter {
     adaptedSocket.updateMessage(socket.websocket?.message);
     adaptedSocket.updatePath(path);
 
+    // parsing message type
+    const selectedSocketBodyType = socket.websocket?.selectedWebSocketBodyType;
+    if (selectedSocketBodyType) {
+      const messageType = this.setMessageType(selectedSocketBodyType);
+      adaptedSocket.updateState({
+        socketMessageLanguage: messageType,
+      });
+    }
+
     return adaptedSocket.getValue();
   }
 
@@ -59,11 +107,14 @@ export class SocketTabAdapter {
    */
   public unadapt(_tab: Tab) {
     const socketTab = createDeepCopy(_tab);
+    const messageType =
+      socketTab.property.websocket.state.socketMessageLanguage;
     return {
       url: socketTab.property.websocket?.url,
       message: socketTab.property.websocket?.message,
       headers: socketTab.property.websocket?.headers,
       queryParams: socketTab.property.websocket?.queryParams,
+      selectedWebSocketBodyType: this.unsetMessageType(messageType),
     };
   }
 }

@@ -4,12 +4,7 @@ import {
   ReduceQueryParams,
 } from "@workspaces/features/rest-explorer/utils";
 import { createDeepCopy, moveNavigation } from "$lib/utils/helpers";
-import {
-  CompareArray,
-  Debounce,
-  InitRequestTab,
-  InitWebSocketTab,
-} from "@common/utils";
+import { CompareArray, Debounce, InitWebSocketTab } from "@common/utils";
 
 // ---- DB
 import type {
@@ -32,8 +27,6 @@ import type { CreateDirectoryPostBody } from "$lib/utils/dto";
 import {
   insertCollection,
   insertCollectionDirectory,
-  insertCollectionRequest,
-  updateCollectionRequest,
 } from "@app/services/collection";
 import { EnvironmentService } from "@app/services/environment.service";
 
@@ -45,6 +38,7 @@ import {
   type KeyValue,
   type StatePartial,
   type Tab,
+  type CollectionItemsDto,
 } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
 import { CollectionService } from "@app/services/collection.service";
@@ -52,6 +46,7 @@ import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
+import type { CollectionDocType } from "@app/models/collection.model";
 
 class RestExplorerViewModel {
   /**
@@ -112,19 +107,19 @@ class RestExplorerViewModel {
   private compareRequestWithServerDebounced = async () => {
     let result = true;
     const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
-    let requestServer;
+    let requestServer: CollectionItemsDto;
     if (progressiveTab.path.folderId) {
-      requestServer = await this.collectionRepository.readRequestInFolder(
+      requestServer = (await this.collectionRepository.readRequestInFolder(
         progressiveTab.path.collectionId,
         progressiveTab.path.folderId,
         progressiveTab.id,
-      );
+      )) as CollectionItemsDto;
     } else {
       requestServer =
-        await this.collectionRepository.readRequestOrFolderInCollection(
+        (await this.collectionRepository.readRequestOrFolderInCollection(
           progressiveTab.path.collectionId,
           progressiveTab.id,
-        );
+        )) as CollectionItemsDto;
     }
     if (!requestServer) result = false;
     // description
@@ -136,35 +131,38 @@ class RestExplorerViewModel {
       result = false;
     }
     // url
-    else if (
-      requestServer.websocket.url !== progressiveTab.property.websocket?.url
-    ) {
-      result = false;
-    }
-    // message
-    else if (
-      requestServer.websocket.message !==
-      progressiveTab.property.websocket?.message
-    ) {
-      result = false;
+    else if (requestServer?.websocket) {
+      if (
+        requestServer.websocket.url !== progressiveTab.property.websocket?.url
+      ) {
+        result = false;
+      }
+      // message
+      else if (
+        requestServer.websocket.message !==
+        progressiveTab.property.websocket?.message
+      ) {
+        result = false;
+      }
+
+      // headers
+      else if (
+        !this.compareArray.init(
+          requestServer.websocket.headers,
+          progressiveTab.property.websocket?.headers,
+        )
+      ) {
+        result = false;
+      } else if (
+        !this.compareArray.init(
+          requestServer.websocket.queryParams,
+          progressiveTab.property.websocket?.queryParams,
+        )
+      ) {
+        result = false;
+      }
     }
 
-    // headers
-    else if (
-      !this.compareArray.init(
-        requestServer.websocket.headers,
-        progressiveTab.property.websocket?.headers,
-      )
-    ) {
-      result = false;
-    } else if (
-      !this.compareArray.init(
-        requestServer.websocket.queryParams,
-        progressiveTab.property.websocket?.queryParams,
-      )
-    ) {
-      result = false;
-    }
     // result
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
@@ -398,11 +396,11 @@ class RestExplorerViewModel {
    * @param uuid - request or folder id
    * @returns - request document
    */
-  public readRequestOrFolderInCollection = (
+  public readRequestOrFolderInCollection = async (
     collectionId: string,
     uuid: string,
-  ): Promise<object> => {
-    return this.collectionRepository.readRequestOrFolderInCollection(
+  ): Promise<CollectionItemsDto | undefined> => {
+    return await this.collectionRepository.readRequestOrFolderInCollection(
       collectionId,
       uuid,
     );
@@ -541,8 +539,18 @@ class RestExplorerViewModel {
     });
 
     if (isGuestUser == true) {
-      const data = {
-        _id: uuidv4(),
+      const data: {
+        id?: string;
+        name: string;
+        totalRequests: number;
+        createdBy: string;
+        items?: CollectionItemsDto[];
+        updatedBy: string;
+        createdAt: string;
+        updatedAt: string;
+        workspaceId?: string;
+      } = {
+        id: uuidv4(),
         name: _collectionName,
         totalRequests: 0,
         createdBy: "Guest User",
@@ -551,20 +559,18 @@ class RestExplorerViewModel {
         // createdAt: new Date().toISOString,
         // updatedAt: new Date().toISOString,
         createdAt: "",
-        createdby: "",
+        updatedAt: "",
       };
       const latestRoute = {
-        id: data._id,
+        id: data.id,
       };
       const storage = data;
-      const _id = data._id;
-      delete storage._id;
-      storage.id = _id;
+
       storage.workspaceId = _workspaceMeta.id;
       MixpanelEvent(Events.CREATE_COLLECTION, {
         source: "SaveRequest",
         collectionName: data.name,
-        collectionId: data._id,
+        collectionId: data.id,
       });
       return {
         status: "success",
@@ -882,16 +888,15 @@ class RestExplorerViewModel {
             /**
              * Create new copy of the existing request
              */
-            const initRequestTab = new InitRequestTab(req.id, "UNTRACKED-");
-            initRequestTab.updateName(req.name);
-            initRequestTab.updateDescription(req.description);
-            initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(req.websocket.url);
-            initRequestTab.updateMethod(req.websocket.message);
-            initRequestTab.updateQueryParams(req.websocket.queryParams);
-            initRequestTab.updateHeaders(req.websocket.headers);
+            const initWebSocketTab = new InitWebSocketTab(req.id, "UNTRACKED-");
+            initWebSocketTab.updateName(req.name);
+            initWebSocketTab.updateDescription(req.description);
+            initWebSocketTab.updatePath(expectedPath);
+            initWebSocketTab.updateUrl(req.websocket.url);
+            initWebSocketTab.updateQueryParams(req.websocket.queryParams);
+            initWebSocketTab.updateHeaders(req.websocket.headers);
 
-            this.tabRepository.createTab(initRequestTab.getValue());
+            this.tabRepository.createTab(initWebSocketTab.getValue());
             moveNavigation("right");
           }
           return {
@@ -1120,7 +1125,18 @@ class RestExplorerViewModel {
    */
   public updateEnvironment = async (
     isGlobalVariable: boolean,
-    environmentVariables,
+    environmentVariables: {
+      local: {
+        id: string;
+        name: string;
+        variable: KeyValueChecked[];
+      };
+      global: {
+        id: string;
+        name: string;
+        variable: KeyValueChecked[];
+      };
+    },
     newVariableObj: KeyValue,
   ) => {
     let isGuestUser;
@@ -1129,7 +1145,7 @@ class RestExplorerViewModel {
     });
     if (isGlobalVariable) {
       // api payload
-      let payload = {
+      const payload = {
         name: environmentVariables.global.name,
         variable: [
           ...environmentVariables.global.variable,
@@ -1270,12 +1286,16 @@ class RestExplorerViewModel {
     });
     if (newCollectionName) {
       if (isGuestUser == true) {
-        let col = await this.collectionRepository.readCollection(collectionId);
-        col = col.toMutableJSON();
+        const colData = (await this.collectionRepository.readCollection(
+          collectionId,
+        )) as CollectionDocument;
+        const col = colData.toMutableJSON() as CollectionDocType;
         col.name = newCollectionName;
         this.collectionRepository.updateCollection(collectionId, col);
         notifications.success("Collection renamed successfully!");
-        return;
+        return {
+          isSuccessful: true,
+        };
       }
       const response = await this.collectionService.updateCollectionData(
         collectionId,
@@ -1338,7 +1358,9 @@ class RestExplorerViewModel {
             collectionId,
             folderId,
           );
-        res.name = newFolderName;
+        if (res) {
+          res.name = newFolderName;
+        }
 
         this.collectionRepository.updateRequestOrFolderInCollection(
           collectionId,
@@ -1346,7 +1368,9 @@ class RestExplorerViewModel {
           res,
         );
         notifications.success("Folder renamed successfully!");
-        return;
+        return {
+          isSuccessful: true,
+        };
       }
       const response = await this.collectionService.updateFolderInCollection(
         workspaceId,

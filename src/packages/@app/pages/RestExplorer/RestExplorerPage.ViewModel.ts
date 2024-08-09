@@ -85,6 +85,7 @@ import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
 import { AiAssistantService } from "@app/services/ai-assistant.service";
+import type { GuideQuery } from "@app/types/user-guide";
 
 class RestExplorerViewModel
   implements
@@ -1602,7 +1603,7 @@ class RestExplorerViewModel
    * @param query - The query object used to find the collection guide.
    * @returns - A promise that resolves to the collection guide found by the query.
    */
-  public fetchCollectionGuide = async (query) => {
+  public fetchCollectionGuide = async (query: GuideQuery) => {
     return await this.guideRepository.findOne(query);
   };
 
@@ -1613,7 +1614,10 @@ class RestExplorerViewModel
    * @param  isActive - The new active status to set for the collection guide.
    * @returns - A promise that resolves when the update operation is complete.
    */
-  public updateCollectionGuide = async (query, isActive) => {
+  public updateCollectionGuide = async (
+    query: GuideQuery,
+    isActive: boolean,
+  ) => {
     await this.guideRepository.update(query, {
       isActive: isActive,
     });
@@ -1640,7 +1644,9 @@ class RestExplorerViewModel
         col.name = newCollectionName;
         this.collectionRepository.updateCollection(collectionId, col);
         notifications.success("Collection renamed successfully!");
-        return;
+        return {
+          isSuccessful: true,
+        };
       }
       const response = await this.collectionService.updateCollectionData(
         collectionId,
@@ -1711,7 +1717,9 @@ class RestExplorerViewModel
           res,
         );
         notifications.success("Folder renamed successfully!");
-        return;
+        return {
+          isSuccessful: true,
+        };
       }
       const response = await this.collectionService.updateFolderInCollection(
         workspaceId,
