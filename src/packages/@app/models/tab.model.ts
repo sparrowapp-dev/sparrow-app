@@ -13,7 +13,7 @@ export const tabSchemaLiteral = {
   // separator: "|",
   // },
   type: "object",
-  version: 10,
+  version: 11,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -314,6 +314,7 @@ export const tabSchemaLiteral = {
                 },
               },
             },
+            
           },
         },
         folder: {
@@ -325,6 +326,42 @@ export const tabSchemaLiteral = {
         workspace: {
           type: "string",
         },
+        environment: {
+          type: "object",
+          properties: {
+            variable: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  key: {
+                    type: "string"
+                  },
+                  value: {
+                    type: "string"
+                  },
+                  checked: {
+                    type: "boolean",
+                  }
+                },
+                required: ["key", "value", "checked"]
+              }
+            },
+            type: {
+              type: "string",
+            },
+            state: {
+              type: "object",
+              properties: {
+                isSaveInProgress: {
+                  type: "boolean",
+                }
+              },
+              required: ["isSaveInProgress"]
+            }
+          },
+          required: ["variable", "type", "state"]
+        }
       },
     },
     isActive: {

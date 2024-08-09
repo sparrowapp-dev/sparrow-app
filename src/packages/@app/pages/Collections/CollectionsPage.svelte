@@ -56,6 +56,7 @@
   import { isGuestUserActive } from "$lib/store";
   import { pagesMotion } from "@app/constants";
   import { user } from "$lib/store";
+    import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
 
   export let modifiedUser;
 
@@ -302,6 +303,15 @@
                       <FolderExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
+                  {:else if $activeTab?.type === ItemType.ENVIRONMENT}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <!-- <FolderExplorerPage tab={$activeTab} /> -->
+                      <EnvironmentExplorerPage tab={$activeTab} />
+                        
+                    </div>
+                  </Motion>
+                  
                 {:else if $activeTab?.type === ItemType.WORKSPACE}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>

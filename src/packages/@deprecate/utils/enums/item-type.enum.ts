@@ -4,6 +4,7 @@ export enum ItemType {
   COLLECTION = "COLLECTION",
   WORKSPACE = "WORKSPACE",
   PERSONAL = "PERSONAL",
+  ENVIRONMENT="ENVIRONMENT"
 }
 
 export enum UntrackedItems {

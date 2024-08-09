@@ -32,7 +32,7 @@
       getProps={({ isCurrent, isPartiallyCurrent }) => {
         isRouteActive = isCurrent || isPartiallyCurrent;
         return {
-          class: `d-flex flex-column text-decoration-none align-items-center justify-content-center ${
+          class: `d-flex mb-1 flex-column text-decoration-none align-items-center justify-content-center ${
             item.disabled ? "disabled" : ""
           }`,
         };

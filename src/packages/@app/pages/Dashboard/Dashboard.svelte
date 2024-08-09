@@ -6,11 +6,9 @@
   import { DashboardViewModel } from "./Dashboard.ViewModel";
   import { navigationState, user } from "$lib/store";
   import Mock from "../Mock/Mock.svelte";
-  import Environment from "../EnvironmentPage/EnvironmentPage.svelte";
   import Header from "@common/components/header/Header.svelte";
   import { onDestroy, onMount } from "svelte";
   import type {
-    EnvironmentDocument,
     TeamDocument,
     WorkspaceDocument,
   } from "@app/database/database";
@@ -243,8 +241,6 @@
       <!-- Route for Mock -->
       <Route path="/mock/*"><Mock /></Route>
 
-      <!-- Route for Environment -->
-      <Route path="/environment/*"><Environment /></Route>
 
       <!-- Route for Help -->
       <Route path="/help/*"><HelpPage /></Route>

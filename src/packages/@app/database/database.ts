@@ -103,7 +103,7 @@ export type DatabaseType = RxDatabase<DatabaseCollections>;
 export class RxDB {
   private static instance: RxDB | null = null;
   public rxdb = null;
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): RxDB {
     if (!RxDB.instance?.rxdb) {
@@ -201,6 +201,9 @@ export class RxDB {
             oldDoc.property.request.state.isChatbotGeneratingResponse = false;
             oldDoc.property.request.state.isDocGenerating = false;
             oldDoc.property.request.state.isDocAlreadyGenerated = false;
+            return oldDoc;
+          },
+          11: function (oldDoc: TabDocument) {
             return oldDoc;
           },
         },

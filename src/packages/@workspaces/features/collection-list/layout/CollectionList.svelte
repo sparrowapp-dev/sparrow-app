@@ -248,7 +248,8 @@
           class="add-icon-container border-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
             ? 'collections-active'
             : 'collections-inactive'}"
-          on:click|stopPropagation={showImportCollectionPopup}
+          on:click={showImportCollectionPopup}
+          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
         >
           <PlusIcon
             height={"18px"}
@@ -261,7 +262,7 @@
 
     {#if isExpandCollection}
       <div
-        class="overflow-auto d-flex flex-column ms-2 me-2 pt-2 mb-2 "
+        class="overflow-auto d-flex flex-column ms-2  pt-2 mb-2 "
       >
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
