@@ -22,7 +22,7 @@
   /**
    * opened environment
    */
-  export let currentEnvironment;
+
   /**
    * workspace access permission
    */
@@ -59,7 +59,7 @@
 
   export let toggleExpandEnvironment;
 
-  export let activeTabId
+  export let activeTabId;
 
   let scrollList;
   let localEnvironment;
@@ -102,7 +102,6 @@
       workspaceLevelPermissions.ADD_ENVIRONMENT,
     );
   }
-  
 
   async function handleCreateEnvironment() {
     if (!isExpandEnvironment) {
@@ -126,7 +125,7 @@
 </script>
 
 <div
-  class={`d-flex flex-column h-100 env-sidebar mt-1 bg-secondary-900   pt-0`}
+  class={`d-flex flex-column  h-100 env-sidebar mt-1 bg-secondary-900   pt-0`}
   style="font-weight: 500;"
 >
   <div
@@ -184,101 +183,100 @@
   </div>
 
   {#if isExpandEnvironment}
-   <div class="overflow-auto h-100">
-    {#if filteredGlobalEnvironment && filteredGlobalEnvironment.length > 0}
-    <div class="mb-0 ">
-      <p
-        role="button"
-        class={`fw-normal mb-1  ps-5 env-item text-fs-12 border-radius-2 my-1 ${
-          globalEnvironment[0]?.id === activeTabId && "active"
-        }`}
-        on:click={() => {
-          onOpenGlobalEnvironment(globalEnvironment[0]);
-        }}
-      >
-        <span class="icon-default">
-          <StackIcon
-            height={"12px"}
-            width={"12px"}
-            color={"var(--icon-secondary-130)"}
-          />
-        </span>
-        <span class="icon-hover">
-          <StackFilled
-            height={"12px"}
-            width={"12px"}
-            color={"var(--icon-secondary-130)"}
-          />
-        </span>
-        <span class="ms-1">{globalEnvironment[0]?.name}</span>
-      </p>
-    </div>
-  {/if}
+    <div class="overflow-auto h-100 mb-2">
+      {#if filteredGlobalEnvironment && filteredGlobalEnvironment.length > 0}
+        <div class="mb-0">
+          <p
+            role="button"
+            class={`fw-normal mb-1  ps-5 env-item text-fs-12 border-radius-2 my-1 ${
+              globalEnvironment[0]?.id === activeTabId && "active"
+            }`}
+            on:click={() => {
+              onOpenGlobalEnvironment(globalEnvironment[0]);
+            }}
+          >
+            <span class="icon-default">
+              <StackIcon
+                height={"12px"}
+                width={"12px"}
+                color={"var(--icon-secondary-130)"}
+              />
+            </span>
+            <span class="icon-hover">
+              <StackFilled
+                height={"12px"}
+                width={"12px"}
+                color={"var(--icon-secondary-130)"}
+              />
+            </span>
+            <span class="ms-1">{globalEnvironment[0]?.name}</span>
+          </p>
+        </div>
+      {/if}
 
-  {#if filteredLocalEnvironment && localEnvironment.length === 0 && loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
-    <div class={`pb-2`}>
-      <p
-        class={`mx-1 add-env-desc-text mb-3 text-fs-12 mb-0 fw-normal text-center`}
-        style="color: var(--text-secondary-50)"
-      >
-        Add Environments in your Workspace for precise API testing with
-        relevant resources and constraints.
-      </p>
-      <p
-        class="mx-2 add-environment d-flex justify-content-center align-items-center border-radius-2"
-        style="color: var(--text-secondary-100);"
-        role="button"
-        on:click={() => {
-          onCreateEnvironment(localEnvironment);
-        }}
-      >
-        <PlusIcon
-          height={"22px"}
-          width={"22px"}
-          color={"var(--text-secondary-200)"}
-        />
-        <span
-          style="color: var(--text-secondary-200)"
-          class="ps-2 fw-bold text-fs-12">Add Environment</span
+      {#if filteredLocalEnvironment && localEnvironment.length === 0 && loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
+        <div class={`pb-2`}>
+          <p
+            class={`mx-1 add-env-desc-text mb-3 text-fs-12 mb-0 fw-normal text-center`}
+            style="color: var(--text-secondary-50)"
+          >
+            Add Environments in your Workspace for precise API testing with
+            relevant resources and constraints.
+          </p>
+          <p
+            class="mx-2 add-environment d-flex justify-content-center align-items-center border-radius-2"
+            style="color: var(--text-secondary-100);"
+            role="button"
+            on:click={() => {
+              onCreateEnvironment(localEnvironment);
+            }}
+          >
+            <PlusIcon
+              height={"22px"}
+              width={"22px"}
+              color={"var(--text-secondary-200)"}
+            />
+            <span
+              style="color: var(--text-secondary-200)"
+              class="ps-2 fw-bold text-fs-12">Add Environment</span
+            >
+          </p>
+        </div>
+      {/if}
+
+      {#if filteredLocalEnvironment && filteredLocalEnvironment.length > 0}
+        <hr class="mb-1 mt-1 ms-5 me-2" />
+        <!-- <div class="mb-1 mt-0 ms-5 me-2" style="height: 1px; background-color:white"></div> -->
+        <List
+          bind:scrollList
+          height={"auto"}
+          overflowY={"auto"}
+          classProps={"pe-1"}
+          style={"flex:1;"}
         >
-      </p>
+          {#each filteredLocalEnvironment as env}
+            <ListItem
+              bind:loggedUserRoleInWorkspace
+              {env}
+              {currentWorkspace}
+              {onDeleteEnvironment}
+              {onUpdateEnvironment}
+              {onOpenEnvironment}
+              {onSelectEnvironment}
+              {activeTabId}
+            />
+          {/each}
+        </List>
+      {/if}
+      {#if filteredGlobalEnvironment?.length === 0 && filteredLocalEnvironment?.length === 0}
+        <p
+          class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
+          style="color: var(--text-secondary-550);  font-weight:300; letter-spacing: 0.5px;"
+        >
+          No Result Found
+        </p>
+      {/if}
     </div>
-  {/if}
-
-  {#if filteredLocalEnvironment && filteredLocalEnvironment.length > 0}
-    <hr class="mb-1 mt-1 ms-5 me-2" />
-     <!-- <div class="mb-1 mt-0 ms-5 me-2" style="height: 1px; background-color:white"></div> -->
-    <List
-      bind:scrollList
-      height={"auto"}
-      overflowY={"auto"}
-      classProps={"pe-1"}
-      style={"flex:1;"}
-    >
-      {#each filteredLocalEnvironment as env}
-        <ListItem
-          bind:loggedUserRoleInWorkspace
-          {env}
-          {currentWorkspace}
-          {currentEnvironment}
-          {onDeleteEnvironment}
-          {onUpdateEnvironment}
-          {onOpenEnvironment}
-          {onSelectEnvironment}
-          {activeTabId}
-        />
-      {/each}
-    </List>
-  {/if}
-  {#if filteredGlobalEnvironment?.length === 0 && filteredLocalEnvironment?.length === 0}
-    <p
-      class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
-      style="color: var(--text-secondary-550);  font-weight:300; letter-spacing: 0.5px;"
-    >
-      No Result Found
-    </p>
-  {/if}
-   </div>
   {/if}
 </div>
 
@@ -344,7 +342,7 @@
   .env-item.active {
     background-color: var(--bg-tertiary-600);
   }
- 
+
   .env-side-tab-list {
     list-style: none;
     overflow: none;

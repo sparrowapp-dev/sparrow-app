@@ -11,7 +11,6 @@
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { userWorkspaceLevelRole } from "$lib/store";
   import { TabularInputEnvironment } from "@workspaces/common/components";
-  import { WithButton } from "@workspaces/common/hoc";
   import { Input } from "@library/forms";
   import { Carousel, Modal, Popover } from "@library/ui";
   import { environmentType, WorkspaceRole } from "$lib/utils/enums";
@@ -20,6 +19,7 @@
     IntroToEnvironment,
     SearchVariable,
   } from "@workspaces/common/constants";
+    import WithButtonEnvironment from "@workspaces/common/hoc/WithButtonEnvironment.svelte";
 
   /**
    * selected environmet to be shown on API
@@ -92,7 +92,7 @@
         style="position: relative ;"
       >
         <!--Disabling the Quick Help feature, will be taken up in next release-->
-        {#if $currentEnvironment?.type === environmentType.GLOBAL}
+        {#if $currentEnvironment.property.environment.type === environmentType.GLOBAL}
           <button
             class="btn p-0"
             style="position: absolute; left:150px;  top:22.5px; border:none; z-index:5; curser:pointer;"
@@ -135,7 +135,7 @@
           focusedBorderColor={"var(--border-primary-300)"}
           class="text-fs-18 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;"
-          disabled={$currentEnvironment?.type == "GLOBAL" ||
+          disabled={$currentEnvironment.property.environment.type == "GLOBAL" ||
             userRole === WorkspaceRole.WORKSPACE_VIEWER}
           placeholder=""
         />
@@ -161,10 +161,10 @@
               <div class="badge-data d-block"></div>
             {/if}
             <Tooltip title="Save" placement="bottom" distance={10}>
-              <WithButton
+              <WithButtonEnvironment
                 icon={SaveIcon}
                 onClick={onSaveEnvironment}
-                disable={$currentEnvironment.isSaveInProgress ||
+                disable={$currentEnvironment.property.environment.isSaveInProgress ||
                   $currentEnvironment.isSaved ||
                   userRole === WorkspaceRole.WORKSPACE_VIEWER}
                 loader={$currentEnvironment.isSaveInProgress}
@@ -173,7 +173,7 @@
           </div>
           <span>
             <Tooltip title="Help" placement="bottom" distance={10}>
-              <WithButton
+              <WithButtonEnvironment
                 icon={HelpIcon}
                 onClick={() => {
                   quickHelp = true;
@@ -187,7 +187,7 @@
       </header>
       <!--Disabling the Quick Help feature, will be taken up in next release-->
       <div>
-        {#if isPopoverContainer && $currentEnvironment?.type === environmentType.GLOBAL}
+        {#if isPopoverContainer && $currentEnvironment.property.environment.type === environmentType.GLOBAL}
           <Popover
             heading={`Welcome to Environments!`}
             text={` `}

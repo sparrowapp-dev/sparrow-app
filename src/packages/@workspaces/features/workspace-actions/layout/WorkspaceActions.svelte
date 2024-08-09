@@ -99,7 +99,6 @@
     }
   });
 
-  let activeEnvironment = _viewModel.getactiveEnvironmentTab("");
 
   let isExpandCollection = false;
   let isExpandEnvironment = false;
@@ -371,7 +370,7 @@
 
     <!-- LHS Side of Collection Enivironment & Test Flows -->
     <div
-      class="d-flex flex-column collections-list"
+      class="d-flex flex-column collections-list mb-2 "
       style="overflow:hidden; margin-top:5px;  flex:1;"
     >
       <!-----Collection Section------>
@@ -422,7 +421,6 @@
           onSelectEnvironment={_viewModel.onSelectEnvironment}
           currentWorkspace={activeWorkspace}
           environments={$environments}
-          currentEnvironment={$activeEnvironment}
           {searchData}
            {activeTabId}
           {toggleExpandEnvironment}
@@ -495,10 +493,10 @@
 
 <style>
   .full-height {
-    height: 90%;
+    height: 100%;
   }
   .half-height {
-    height: 50%;
+    height: 49%;
   }
 
   .add-button {

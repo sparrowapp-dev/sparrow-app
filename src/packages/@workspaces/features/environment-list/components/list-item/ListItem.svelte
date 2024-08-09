@@ -19,10 +19,6 @@
    */
   export let env;
 
-  /**
-   * openend environment
-   */
-  export let currentEnvironment;
 
   /**
    * deletes the environment

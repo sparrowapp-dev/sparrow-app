@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type TabDocument } from "@app/database/database";
+import type { TabDocType } from "@app/models/tab.model";
 import type { Observable } from "rxjs";
 
 export class TabRepository {
-  constructor() {}
+  constructor() { }
 
   /**
    * Retrieves all tab documents from the RxDB database.
@@ -478,7 +479,7 @@ export class TabRepository {
    * };
    * await updateTab(tabId, updatedProperties);
    */
-  public updateTab = async (tabId, tab): Promise<void> => {
+  public updateTab = async (tabId: string, tab: TabDocType): Promise<void> => {
     const query = await RxDB.getInstance()
       .rxdb.tab.findOne({
         selector: {
@@ -489,6 +490,17 @@ export class TabRepository {
     await query.incrementalModify((value) => {
       return { ...value, ...tab };
     });
+  };
+
+  public getTabById = async (id: string): Promise<TabDocument> => {
+    return await RxDB.getInstance()
+      .rxdb.tab.findOne({
+        selector: {
+          id,
+        },
+      })
+      .exec();
+
   };
 
   /**
