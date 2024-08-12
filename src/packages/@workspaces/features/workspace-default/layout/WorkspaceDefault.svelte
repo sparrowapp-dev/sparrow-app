@@ -1,9 +1,19 @@
-<script>
-  import { VectorIcon, LibraryIcon } from "@library/icons";
+<script lang="ts">
+  import type { WorkspaceDocument } from "@app/database/database";
+  import { VectorIcon, LibraryIcon, SocketIcon } from "@library/icons";
   import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
+  import type { Observable } from "rxjs";
   export let showImportCollectionPopup;
   export let onItemCreated;
   export let isGuestUser = false;
+
+  export let currentWorkspace: Observable<WorkspaceDocument>;
+  let currentWorkspaceId: string;
+  currentWorkspace.subscribe((value) => {
+    if (value?._data) {
+      currentWorkspaceId = value._data._id;
+    }
+  });
 </script>
 
 <div
@@ -14,37 +24,41 @@
     <SparrowLogo />
   </div>
   <div class="d-flex" style="gap: 19px;">
-    {#if isGuestUser !== true}
-      <div
-        class=""
-        style="height: 120px; width:120px; border: 0.5px solid var(--text-tertiary-400 ); border-radius : 4px;"
-        role="button"
-        on:click={() => {
+    <div
+      class=""
+      style="height: 120px; width:130px; border: 0.5px solid var(--text-tertiary-400 ); border-radius : 4px;"
+      role="button"
+      on:click={() => {
+        if (isGuestUser) {
+          onItemCreated("collection", {
+            workspaceId: currentWorkspaceId,
+          });
+        } else {
           showImportCollectionPopup();
-        }}
+        }
+      }}
+    >
+      <div
+        class="d-flex justify-content-center align-items-center"
+        style="height: 79px"
       >
-        <div
-          class="d-flex justify-content-center align-items-center"
-          style="height: 79px"
-        >
-          <LibraryIcon
-            width="24px"
-            height="24px"
-            color=" var( --text-primary-300)"
-          />
-        </div>
-        <div
-          class="d-flex justify-content-center align-items-center"
-          style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px; "
-        >
-          Add Collection
-        </div>
+        <LibraryIcon
+          width="24px"
+          height="24px"
+          color=" var( --text-primary-300)"
+        />
       </div>
-    {/if}
+      <div
+        class="d-flex justify-content-center align-items-center"
+        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px; "
+      >
+        Add Collection
+      </div>
+    </div>
 
     <div
       class=" "
-      style="height: 120px; width:120px; border: 0.5px solid var(--text-tertiary-400 );  border-radius : 4px; "
+      style="height: 120px; width:130px; border: 0.5px solid var(--text-tertiary-400 );  border-radius : 4px; "
       role="button"
       on:click={() => {
         onItemCreated("request", {});
@@ -65,6 +79,32 @@
         style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px;  "
       >
         Add Request
+      </div>
+    </div>
+
+    <div
+      class=" "
+      style="height: 120px; width:130px; border: 0.5px solid var(--text-tertiary-400 );  border-radius : 4px; "
+      role="button"
+      on:click={() => {
+        onItemCreated("web-socket", {});
+      }}
+    >
+      <div
+        class="d-flex justify-content-center align-items-center"
+        style="height: 79px"
+      >
+        <SocketIcon
+          width="24px"
+          height="24px"
+          color=" var( --text-primary-300)"
+        />
+      </div>
+      <div
+        class="d-flex justify-content-center align-items-center"
+        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px;  "
+      >
+        Add WebSocket
       </div>
     </div>
   </div>

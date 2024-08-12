@@ -344,6 +344,7 @@
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WorkspaceDefault
+                        {currentWorkspace}
                         showImportCollectionPopup={() =>
                           (isImportCollectionPopup = true)}
                         onItemCreated={_viewModel.handleCreateItem}
