@@ -13,6 +13,7 @@ import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 import type { Response } from "$lib/utils/interfaces/request.interface";
+import { listen } from "@tauri-apps/api/event";
 
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
@@ -176,6 +177,75 @@ const makeHttpRequest = async (
     });
 };
 
+function generateWebSocketKey() {
+  const array = new Uint8Array(16);
+  window.crypto.getRandomValues(array);
+  return btoa(String.fromCharCode.apply(null, array));
+}
+
+const sendMessage = async (tab_id: string, message: string) => {
+  invoke("send_websocket_message", { tabid: tab_id, message: message })
+    .then(async (data: string) => {
+      try {
+        // Logic to handle response
+        console.log("sent", data);
+      } catch (e) {
+        console.error(e);
+        return error("error");
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+      return error("error");
+    });
+};
+
+const disconnectWebSocket = async (tab_id: string) => {
+  invoke("disconnect_websocket", { tabid: tab_id })
+    .then(async (data: string) => {
+      try {
+        // Logic to handle response
+        console.log("disconnected", data);
+      } catch (e) {
+        console.error(e);
+        return error("error");
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+      return error("error");
+    });
+};
+
+const connectWebSocket = async (
+  url: string,
+  tabId: string,
+  requestHeaders: string,
+) => {
+  invoke("connect_websocket", {
+    url: url,
+    tabid: tabId,
+    headers: requestHeaders,
+  })
+    .then(async (data: string) => {
+      try {
+        // Logic to handle response
+        console.log("connected", data);
+        // All the response of particular web socket can be listened here. (Can be shifted to another place)
+        listen(`ws_message_${tabId}`, (event) => {
+          console.log("event---->", event);
+        });
+      } catch (e) {
+        console.error(e);
+        return error("error");
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+      return error("error");
+    });
+};
+
 /**
  * Invoke RPC Communication
  * @param url - Request URL
@@ -231,5 +301,8 @@ export {
   makeHttpRequest,
   getMultipartAuthHeaders,
   makeHttpRequestV2,
+  connectWebSocket,
+  sendMessage,
+  disconnectWebSocket,
   // getHeaders,
 };

@@ -477,6 +477,19 @@ struct SingleInstancePayload {
 #[derive(Clone)]
 struct TabConnection {
     sender: UnboundedSender<String>,
+    disconnect_handle: Arc<Mutex<Option<tokio::sync::oneshot::Sender<()>>>>,
+}
+
+struct AppState {
+    connections: Mutex<std::collections::HashMap<String, TabConnection>>,
+}
+
+#[derive(Serialize)]
+struct WebSocketResponse {
+    is_successful: bool,
+    status_code: u16,
+    message: String,
+    headers: Option<HashMap<String, String>>,
 }
 
 #[tauri::command]
@@ -486,7 +499,7 @@ async fn connect_websocket(
     headers: String, // Stringified JSON headers
     state: tauri::State<'_, Arc<AppState>>,
     app_handle: tauri::AppHandle,
-) -> Result<(), String> {
+) -> Result<String, String> {
     println!("inside the websocket");
 
     // Deserialize the JSON string into a Vec<KeyValue>
@@ -512,31 +525,53 @@ async fn connect_websocket(
         );
     }
 
-    // // Connect to the WebSocket
-    let (ws_stream, _) = connect_async(request.body(()).unwrap())
+    // Connect to the WebSocket
+    let (ws_stream, response) = connect_async(request.body(()).unwrap())
         .await
         .map_err(|e| format!("Failed to connect: {}", e))?;
+
+    // Extract headers from the response
+    let mut response_headers = HashMap::new();
+    for (key, value) in response.headers() {
+        if let Ok(header_value) = value.to_str() {
+            response_headers.insert(key.as_str().to_string(), header_value.to_string());
+        }
+    }
 
     let (mut write, mut read) = ws_stream.split();
 
     let (tx, mut rx) = mpsc::unbounded_channel::<String>();
 
-    state
-        .connections
-        .lock()
-        .await
-        .insert(tabid.clone(), TabConnection { sender: tx });
+    let (disconnect_tx, disconnect_rx) = tokio::sync::oneshot::channel();
+    let disconnect_handle = Arc::new(Mutex::new(Some(disconnect_tx)));
+
+    state.connections.lock().await.insert(
+        tabid.clone(),
+        TabConnection {
+            sender: tx,
+            disconnect_handle: disconnect_handle.clone(),
+        },
+    );
 
     let svelte_tabid = tabid.clone();
+    let app_handle_clone = app_handle.clone();
     tokio::spawn(async move {
-        while let Some(message) = read.next().await {
-            if let Ok(msg) = message {
-                if let Message::Text(text) = msg {
-                    app_handle
-                        .emit(&format!("ws_message_{}", svelte_tabid), text)
-                        .unwrap();
-                }
+        tokio::select! {
+            _ = disconnect_rx => {
+                // Handle disconnection here
+                println!("WebSocket connection closed for tab: {}", svelte_tabid);
             }
+            _ = async {
+                while let Some(message) = read.next().await {
+                    if let Ok(msg) = message {
+                        if let Message::Text(text) = msg {
+                            app_handle_clone
+                                .emit(&format!("ws_message_{}", svelte_tabid), text)
+                                .unwrap();
+                        }
+                    }
+                }
+            } => {}
         }
     });
 
@@ -550,7 +585,20 @@ async fn connect_websocket(
         }
     });
 
-    Ok(())
+    // Create a success response
+    let response = WebSocketResponse {
+        is_successful: true,
+        status_code: 200,
+        message: "Connected Successfully".to_string(),
+        headers: Some(response_headers),
+        // initial_data: Some(initial_data),
+    };
+
+    // Serialize the response to a JSON string and return it
+    let response_json = serde_json::to_string(&response)
+        .map_err(|e| format!("Failed to serialize response: {}", e))?;
+
+    Ok(response_json)
 }
 
 #[tauri::command]
@@ -558,34 +606,81 @@ async fn send_websocket_message(
     tabid: String,
     message: String,
     state: tauri::State<'_, Arc<AppState>>,
-) -> Result<(), String> {
-    // Parse the stringified JSON into a serde_json::Value
-    let json_message: Value = serde_json::from_str(&message)
-        .map_err(|e| format!("Failed to parse JSON message: {}", e))?;
-
-    // Re-serialize the JSON message into a string to send over WebSocket
-    let serialized_message = serde_json::to_string(&json_message)
-        .map_err(|e| format!("Failed to serialize JSON message: {}", e))?;
+) -> Result<String, String> {
     if let Some(connection) = state.connections.lock().await.get(&tabid) {
         connection
             .sender
-            .send(serialized_message)
+            .send(message)
             .map_err(|e| format!("Failed to send message: {}", e))?;
+    } else {
+        return Err("Connection not found".to_string());
     }
-    Ok(())
+
+    // Create a success response
+    let response = WebSocketResponse {
+        is_successful: true,
+        status_code: 200,
+        message: "Message sent successfully".to_string(),
+        headers: None, // Set headers to None or provide actual headers if needed
+    };
+
+    // Serialize the response to a JSON string and return it
+    let response_json = serde_json::to_string(&response)
+        .map_err(|e| format!("Failed to serialize response: {}", e))?;
+
+    Ok(response_json)
+}
+
+#[derive(Serialize)]
+struct DisconnectResponse {
+    is_successful: bool,
+    status_code: u16,
+    message: String,
 }
 
 #[tauri::command]
 async fn disconnect_websocket(
     tabid: String,
     state: tauri::State<'_, Arc<AppState>>,
-) -> Result<(), String> {
-    state.connections.lock().await.remove(&tabid);
-    Ok(())
-}
+) -> Result<String, String> {
+    let mut connections = state.connections.lock().await;
 
-struct AppState {
-    connections: Mutex<std::collections::HashMap<String, TabConnection>>,
+    if let Some(connection) = connections.remove(&tabid) {
+        // Access the disconnect handle
+        let mut handle_lock = connection.disconnect_handle.lock().await;
+
+        // Check if there is a Sender inside the Option
+        if let Some(sender) = std::mem::take(&mut *handle_lock) {
+            // Send the signal to close the WebSocket connection
+            let _ = sender.send(());
+        }
+
+        // Create a success response
+        let response = DisconnectResponse {
+            is_successful: true,
+            status_code: 200,
+            message: "WebSocket connection disconnected successfully".to_string(),
+        };
+
+        // Serialize the response to a JSON string and return it
+        let response_json = serde_json::to_string(&response)
+            .map_err(|e| format!("Failed to serialize response: {}", e))?;
+
+        return Ok(response_json);
+    } else {
+        // Return an error if the connection was not found
+        let response = DisconnectResponse {
+            is_successful: false,
+            status_code: 404,
+            message: "WebSocket connection not found".to_string(),
+        };
+
+        // Serialize the error response to a JSON string and return it
+        let response_json = serde_json::to_string(&response)
+            .map_err(|e| format!("Failed to serialize response: {}", e))?;
+
+        return Err(response_json);
+    }
 }
 
 // Driver Function
