@@ -8,7 +8,6 @@
   import { Debounce } from "@common/utils";
   import { isGuestUserActive, user } from "$lib/store";
   import { onMount } from "svelte";
-  import { listen } from "@tauri-apps/api/event";
   export let tab;
   let isLoginBannerActive = false;
   const _viewModel = new RestExplorerViewModel(tab);
