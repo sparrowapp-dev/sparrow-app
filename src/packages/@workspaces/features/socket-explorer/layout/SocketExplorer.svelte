@@ -19,7 +19,7 @@
     UpdateParamsType,
     UpdateRequestUrlType,
   } from "@workspaces/common/type";
-  import { type Tab } from "@common/types/workspace";
+  import { TabTypeEnum, type Tab } from "@common/types/workspace";
 
   import {
     HttpUrlSection,
@@ -204,7 +204,7 @@
       onClick={(flag = false) => {
         isExposeSaveAsSocket = flag;
       }}
-      requestMethod={"WEB_SOCKET"}
+      requestMethod={TabTypeEnum.WEB_SOCKET}
       requestUrl={$tab.property.websocket?.url}
       requestName={$tab.name}
       requestDescription={$tab.description}

@@ -2593,7 +2593,6 @@ export default class CollectionsViewModel {
     }[],
     tabName: string,
     description: string,
-    type: string,
     componentData: Tab,
   ) => {
     let userSource = {};
@@ -3297,5 +3296,307 @@ export default class CollectionsViewModel {
    */
   public getFeatureStatus = async (query: FeatureQuery) => {
     return await this.featureSwitchRepository.findOne(query);
+  };
+
+  /**
+   *
+   * @param _workspaceMeta - workspace meta data
+   * @param path - request stack path
+   * @param tabName - request name
+   * @param description - request description
+   * @param type - save over all request or description only
+   */
+  public saveAsSocket = async (
+    _workspaceMeta: {
+      id: string;
+      name: string;
+    },
+    path: {
+      name: string;
+      id: string;
+      type: string;
+    }[],
+    tabName: string,
+    description: string,
+    componentData: Tab,
+  ) => {
+    let userSource = {};
+    // const _id = componentData.id;
+    if (path.length > 0) {
+      const socketTabAdapter = new SocketTabAdapter();
+      const unadaptedSocket = socketTabAdapter.unadapt(componentData);
+      const req = {
+        id: uuidv4(),
+        name: tabName,
+        description,
+        type: ItemType.WEB_SOCKET,
+        websocket: unadaptedSocket,
+        source: "USER",
+        isDeleted: false,
+        createdBy: "Guest User",
+        updatedBy: "Guest User",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      if (path[path.length - 1].type === ItemType.COLLECTION) {
+        /**
+         * handle request at collection level
+         */
+        const _collection = await this.readCollection(path[path.length - 1].id);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
+        let isGuestUser;
+        isGuestUserActive.subscribe((value) => {
+          isGuestUser = value;
+        });
+
+        if (isGuestUser == true) {
+          this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+        }
+        const res = await this.collectionService.addSocketInCollection({
+          collectionId: path[path.length - 1].id,
+          workspaceId: _workspaceMeta.id,
+          ...userSource,
+          items: {
+            name: tabName,
+            description,
+            type: ItemType.WEB_SOCKET,
+            websocket: unadaptedSocket,
+          },
+        });
+        if (res.isSuccessful) {
+          this.addRequestOrFolderInCollection(
+            path[path.length - 1].id,
+            res.data.data,
+          );
+          return {
+            status: "success",
+            message: res.message,
+            data: {
+              id: res.data.data.id,
+            },
+          };
+        } else {
+          return {
+            status: "error",
+            message: res.message,
+          };
+        }
+      } else if (path[path.length - 1].type === ItemType.FOLDER) {
+        /**
+         * handle request at folder level
+         */
+        const _collection = await this.readCollection(path[0].id);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
+        let isGuestUser;
+        isGuestUserActive.subscribe((value) => {
+          isGuestUser = value;
+        });
+
+        if (isGuestUser == true) {
+          this.collectionRepository.addRequestInFolder(
+            path[0].id,
+            path[path.length - 1].id,
+            req,
+          );
+
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+        }
+        const res = await this.collectionService.addSocketInCollection({
+          collectionId: path[0].id,
+          workspaceId: _workspaceMeta.id,
+          folderId: path[path.length - 1].id,
+          ...userSource,
+          items: {
+            id: path[path.length - 1].id,
+            name: path[path.length - 1].name,
+            type: ItemType.FOLDER,
+            items: {
+              name: tabName,
+              description,
+              type: ItemType.WEB_SOCKET,
+              websocket: unadaptedSocket,
+            },
+          },
+        });
+        if (res.isSuccessful) {
+          this.collectionRepository.addRequestInFolder(
+            path[0].id,
+            path[path.length - 1].id,
+            res.data.data,
+          );
+
+          return {
+            status: "success",
+            message: res.message,
+            data: {
+              id: res.data.data.id,
+            },
+          };
+        } else {
+          return {
+            status: "error",
+            message: res.message,
+          };
+        }
+      }
+      MixpanelEvent(Events.SAVE_API_REQUEST);
+    }
+  };
+
+  /**
+   * Save Request
+   * @param saveDescriptionOnly - refers save overall request data or only description as a documentation purpose.
+   * @returns save status
+   */
+  public saveSocket = async (_componentData: Tab) => {
+    const componentData: Tab = _componentData;
+    const { folderId, collectionId, workspaceId } = componentData.path;
+
+    if (!workspaceId || !collectionId) {
+      return {
+        status: "error",
+        message: "web socket is not a part of any workspace or collection",
+      };
+    }
+    const _collection = await this.readCollection(collectionId);
+    let userSource = {};
+    if (_collection?.activeSync && componentData?.source === "USER") {
+      userSource = {
+        currentBranch: _collection?.currentBranch,
+        source: "USER",
+      };
+    }
+    const _id = componentData.id;
+
+    const socketTabAdapter = new SocketTabAdapter();
+    const unadaptedSocket = socketTabAdapter.unadapt(componentData);
+    // Save overall api
+
+    const socketMetaData = {
+      id: _id,
+      name: componentData?.name,
+      description: componentData?.description,
+      type: ItemType.WEB_SOCKET,
+    };
+
+    let folderSource;
+    let itemSource;
+    if (folderId) {
+      folderSource = {
+        folderId: folderId,
+      };
+      itemSource = {
+        id: folderId,
+        type: ItemType.FOLDER,
+        items: {
+          ...socketMetaData,
+          websocket: unadaptedSocket,
+        },
+      };
+    } else {
+      itemSource = {
+        ...socketMetaData,
+        websocket: unadaptedSocket,
+      };
+    }
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser === true) {
+      const progressiveTab = _componentData;
+      const data = {
+        id: progressiveTab.id,
+        name: socketMetaData.name,
+        description: socketMetaData.description,
+        type: ItemType.WEB_SOCKET,
+        websocket: unadaptedSocket,
+        updatedAt: "",
+        updatedBy: "Guest User",
+      };
+
+      // progressiveTab.isSaved = true;
+      // this.tab = progressiveTab;
+      // await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          _id,
+          data,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          _id,
+          data,
+        );
+      }
+      return {
+        status: "success",
+        message: "",
+      };
+    }
+    const res = await this.collectionService.updateSocketInCollection(_id, {
+      collectionId: collectionId,
+      workspaceId: workspaceId,
+      ...folderSource,
+      ...userSource,
+      items: itemSource,
+    });
+
+    if (res.isSuccessful) {
+      // const progressiveTab = _componentData;
+      // progressiveTab.isSaved = true;
+      // this.tab = progressiveTab;
+      // await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          _id,
+          res.data.data,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          _id,
+          res.data.data,
+        );
+      }
+      return {
+        status: "success",
+        message: res.message,
+      };
+    } else {
+      return {
+        status: "error",
+        message: res.message,
+      };
+    }
   };
 }

@@ -63,6 +63,7 @@
     type Tab,
   } from "@common/types/workspace";
   import type { WebSocketTab } from "@common/types/workspace/web-socket";
+  import { TeamProfile } from "@teams/features/team-settings/components";
 
   export let modifiedUser;
 
@@ -112,7 +113,11 @@
    * Handle close tab functionality in tab bar list
    */
   const closeTab = (id: string, tab: Tab) => {
-    if (tab?.type === TabTypeEnum.REQUEST && !tab?.isSaved) {
+    if (
+      (tab?.type === TabTypeEnum.REQUEST ||
+        tab?.type === TabTypeEnum.WEB_SOCKET) &&
+      !tab?.isSaved
+    ) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
         removeTab = tab;
         isPopupClosed = true;
@@ -140,12 +145,23 @@
     if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
       const id = removeTab?.id;
       loader = true;
-      const res = await _viewModel.saveAPIRequest(removeTab);
-      if (res) {
-        loader = false;
-        _viewModel.handleRemoveTab(id);
-        isPopupClosed = false;
-        notifications.success("API request saved");
+
+      if (removeTab.type === TabTypeEnum.REQUEST) {
+        const res = await _viewModel.saveAPIRequest(removeTab);
+        if (res) {
+          loader = false;
+          _viewModel.handleRemoveTab(id);
+          isPopupClosed = false;
+          notifications.success("API request saved");
+        }
+      } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
+        const res = await _viewModel.saveSocket(removeTab);
+        if (res) {
+          loader = false;
+          _viewModel.handleRemoveTab(id);
+          isPopupClosed = false;
+          notifications.success("WebSocket request saved");
+        }
       }
       loader = false;
     } else {
@@ -483,26 +499,47 @@
     onClick={(flag = false) => {
       isExposeSaveAsRequest = flag;
     }}
-    requestMethod={removeTab.property.request?.method}
-    requestUrl={removeTab.property.request?.url}
+    requestMethod={removeTab.type === TabTypeEnum.REQUEST
+      ? removeTab.property.request?.method
+      : removeTab.type === TabTypeEnum.WEB_SOCKET
+      ? TabTypeEnum.WEB_SOCKET
+      : ""}
+    requestUrl={removeTab.type === TabTypeEnum.REQUEST
+      ? removeTab.property.request?.url
+      : removeTab.type === TabTypeEnum.WEB_SOCKET
+      ? removeTab?.property?.websocket?.url
+      : ""}
     requestName={removeTab.name}
     requestDescription={removeTab.description}
     requestPath={removeTab.path}
     collections={$collectionList}
     readWorkspace={_viewModel.readWorkspace}
     onSave={async (_workspaceMeta, path, tabName, description, type) => {
-      const res = await _viewModel.saveAsRequest(
-        _workspaceMeta,
-        path,
-        tabName,
-        description,
-        type,
-        removeTab,
-      );
-      if (res?.status === "success") {
-        _viewModel.handleRemoveTab(removeTab.id);
+      if (removeTab.type === TabTypeEnum.REQUEST) {
+        const res = await _viewModel.saveAsRequest(
+          _workspaceMeta,
+          path,
+          tabName,
+          description,
+          removeTab,
+        );
+        if (res?.status === "success") {
+          _viewModel.handleRemoveTab(removeTab.id);
+        }
+        return res;
+      } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
+        const res = await _viewModel.saveAsSocket(
+          _workspaceMeta,
+          path,
+          tabName,
+          description,
+          removeTab,
+        );
+        if (res?.status === "success") {
+          _viewModel.handleRemoveTab(removeTab.id);
+        }
+        return res;
       }
-      return res;
     }}
     onCreateFolder={_viewModel.createFolderFromSaveAs}
     onCreateCollection={_viewModel.createCollectionFromSaveAs}

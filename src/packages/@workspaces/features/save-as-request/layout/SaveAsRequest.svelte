@@ -29,6 +29,7 @@
     SocketIcon,
     WorkspaceIcon,
   } from "@library/icons";
+  import { TabTypeEnum } from "@common/types/workspace";
 
   export let onClick;
   export let onFinish = (id: string) => {};
@@ -765,7 +766,7 @@
         valueClassProp=
         
       /> -->
-      {#if componentData?.property.request.method === "WEB_SOCKET"}
+      {#if componentData?.property.request.method === TabTypeEnum.WEB_SOCKET}
         <span class={`text-fs-12 me-3 fw-bold `}
           ><SocketIcon
             height={"12px"}

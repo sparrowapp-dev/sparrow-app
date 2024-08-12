@@ -136,27 +136,18 @@
         {tab.name}
       </span>
     </button>
-    <!-- {console.log(tab?.property?.request, !tab?.isSaved)} -->
     {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET) && !tab?.isSaved}
       {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
         <span
-          class="my-auto mx-1 opacity-{(tab?.type === TabTypeEnum.REQUEST ||
-            tab?.type === TabTypeEnum.WEB_SOCKET) &&
-          !tab?.isSaved &&
-          (tab?.source !== 'SPEC' || !tab?.activeSync || tab?.isDeleted)
-            ? '1'
-            : '0'}"
+          class="my-auto mx-1 opacity-1"
           style="height: 6px; aspect-ratio: 1; background-color: var(--tab-unsave-icon); border-radius: 50%;"
         />
       {/if}
     {/if}
 
     <button
-      class="cross-icon-btn {!(
-        (tab?.type === TabTypeEnum.REQUEST ||
-          tab?.type === TabTypeEnum.WEB_SOCKET) &&
-        !tab?.isSaved
-      ) && !tab.isActive
+      class="cross-icon-btn {// toggle cross icon for inactive tabs
+      !tab.isActive
         ? 'inactive-close-btn'
         : ''} btn d-flex align-items-center px-1"
       on:click={() => {
