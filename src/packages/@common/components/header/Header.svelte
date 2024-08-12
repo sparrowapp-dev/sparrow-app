@@ -281,6 +281,7 @@
       minHeaderWidth={"185px"}
       iconRequired={true}
       icon={StackIcon}
+      iconColor={"var(--dropdown-button)"}
       isDropIconFilled={true}
       borderType={"none"}
       borderActiveType={"none"}

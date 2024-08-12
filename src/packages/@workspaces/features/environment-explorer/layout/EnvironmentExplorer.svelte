@@ -10,7 +10,7 @@
   } from "$lib/utils/constants/permissions.constant";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { userWorkspaceLevelRole } from "$lib/store";
-  import { TabularInputEnvironment } from "@workspaces/common/components";
+  import {  TabularInputV2 } from "@workspaces/common/components";
   import { Input } from "@library/forms";
   import { Carousel, Modal, Popover } from "@library/ui";
   import { environmentType, WorkspaceRole } from "$lib/utils/enums";
@@ -19,7 +19,7 @@
     IntroToEnvironment,
     SearchVariable,
   } from "@workspaces/common/constants";
-    import WithButtonEnvironment from "@workspaces/common/hoc/WithButtonEnvironment.svelte";
+    import WithButtonV3 from "@workspaces/common/hoc/WithButtonV3.svelte";
 
   /**
    * selected environmet to be shown on API
@@ -161,7 +161,7 @@
               <div class="badge-data d-block"></div>
             {/if}
             <Tooltip title="Save" placement="bottom" distance={10}>
-              <WithButtonEnvironment
+              <WithButtonV3
                 icon={SaveIcon}
                 onClick={onSaveEnvironment}
                 disable={$currentEnvironment.property.environment.isSaveInProgress ||
@@ -173,7 +173,7 @@
           </div>
           <span>
             <Tooltip title="Help" placement="bottom" distance={10}>
-              <WithButtonEnvironment
+              <WithButtonV3
                 icon={HelpIcon}
                 onClick={() => {
                   quickHelp = true;
@@ -211,7 +211,7 @@
         {/if}
       </div>
       <section class={`var-value-container pe-1`} style="flex:1;">
-        <TabularInputEnvironment
+        <TabularInputV2
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
           keyValue={$currentEnvironment.property.environment.variable}
           callback={handleCurrentEnvironmentKeyValuePairChange}

@@ -28,9 +28,10 @@
   import constants from "$lib/utils/constants";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { CollectionList } from "@workspaces/features/collection-list";
+  import { EnvironmentList } from "@workspaces/features/environment-list";
+
   import { EnvironmentViewModel } from "@app/pages/EnvironmentPage/EnvironmentPage.ViewModel";
-  import EnvironmentList from "@workspaces/features/environment-list/layout/EnvironmentList.svelte";
-  import CollectionList from "@workspaces/features/collection-list/layout/CollectionList.svelte";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -84,7 +85,19 @@
 
   export let scrollList;
 
-  const _viewModel = new EnvironmentViewModel();
+  export let environments;
+
+  export let onCreateEnvironment;
+
+  export let onOpenGlobalEnvironment;
+
+  export let onDeleteEnvironment;
+
+  export let onUpdateEnvironment;
+
+  export let onOpenEnvironment;
+
+  export let onSelectEnvironment;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -99,9 +112,8 @@
     }
   });
 
-
-  let isExpandCollection = false;
-  let isExpandEnvironment = false;
+  export let isExpandCollection = false;
+  export let isExpandEnvironment = false;
 
   let isGithubStarHover = false;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
@@ -200,6 +212,7 @@
               workspaceId: currentWorkspaceId,
               collection: collectionList,
             });
+            isExpandCollection = true;
           },
         },
         {
@@ -222,7 +235,10 @@
         {
           name: "Add Collection",
           icon: CreateCollection,
-          onclick: showImportCollectionPopup,
+          onclick: () => {
+            showImportCollectionPopup();
+            isExpandCollection = true;
+          },
         },
         {
           name: "Import cURL",
@@ -235,8 +251,6 @@
           },
         },
       ];
-
-  const environments = _viewModel.environments;
 
   const toggleExpandCollection = () => {
     isExpandCollection = !isExpandCollection;
@@ -310,8 +324,8 @@
         bind:value={searchData}
         on:input={(e) => {
           handleSearch();
-         isExpandCollection=true;
-         isExpandEnvironment=true;
+          isExpandCollection = true;
+          isExpandEnvironment = true;
         }}
         defaultBorderColor="transparent"
         hoveredBorderColor="var(--border-primary-300)"
@@ -370,7 +384,7 @@
 
     <!-- LHS Side of Collection Enivironment & Test Flows -->
     <div
-      class="d-flex flex-column collections-list mb-2 "
+      class="d-flex flex-column collections-list mb-2"
       style="overflow:hidden; margin-top:5px;  flex:1;"
     >
       <!-----Collection Section------>
@@ -413,16 +427,16 @@
       >
         <EnvironmentList
           loggedUserRoleInWorkspace={userRole}
-          onCreateEnvironment={_viewModel.onCreateEnvironment}
-          onOpenGlobalEnvironment={_viewModel.onOpenGlobalEnvironment}
-          onDeleteEnvironment={_viewModel.onDeleteEnvironment}
-          onUpdateEnvironment={_viewModel.onUpdateEnvironment}
-          onOpenEnvironment={_viewModel.onOpenEnvironment}
-          onSelectEnvironment={_viewModel.onSelectEnvironment}
+          {onCreateEnvironment}
+          {onOpenGlobalEnvironment}
+          {onDeleteEnvironment}
+          {onUpdateEnvironment}
+          {onOpenEnvironment}
+          {onSelectEnvironment}
           currentWorkspace={activeWorkspace}
           environments={$environments}
           {searchData}
-           {activeTabId}
+          {activeTabId}
           {toggleExpandEnvironment}
           bind:isExpandEnvironment
         />

@@ -36,7 +36,7 @@
 
   // ---- View Model
   import CollectionsViewModel from "./CollectionPage.ViewModel";
-  
+  import { EnvironmentViewModel } from "@app/pages/EnvironmentPage/EnvironmentPage.ViewModel";
 
   // ---- helpers
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
@@ -56,7 +56,7 @@
   import { isGuestUserActive } from "$lib/store";
   import { pagesMotion } from "@app/constants";
   import { user } from "$lib/store";
-    import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
+  import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
 
   export let modifiedUser;
 
@@ -64,7 +64,7 @@
 
   const _viewModel = new CollectionsViewModel();
 
-
+  const _viewModel2 = new EnvironmentViewModel();
 
   let currentWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
@@ -84,6 +84,12 @@
   let isGuestUser = false;
   let userId = "";
   let userRole = "";
+
+
+ let isExpandCollection = false;
+   let isExpandEnvironment = false;
+
+
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
@@ -261,6 +267,15 @@
           onBranchSwitched={_viewModel.handleBranchSwitch}
           onRefetchCollection={_viewModel.handleRefetchCollection}
           onSearchCollection={_viewModel.handleSearchCollection}
+          environments={_viewModel2.environments}
+          onCreateEnvironment={_viewModel2.onCreateEnvironment}
+          onOpenGlobalEnvironment={_viewModel2.onOpenGlobalEnvironment}
+          onDeleteEnvironment={_viewModel2.onDeleteEnvironment}
+          onUpdateEnvironment={_viewModel2.onUpdateEnvironment}
+          onOpenEnvironment={_viewModel2.onOpenEnvironment}
+          onSelectEnvironment={_viewModel2.onSelectEnvironment}
+          bind:isExpandCollection
+          bind:isExpandEnvironment
         />
       </Pane>
       <Pane
@@ -303,13 +318,12 @@
                       <FolderExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                  {:else if $activeTab?.type === ItemType.ENVIRONMENT}
+                {:else if $activeTab?.type === ItemType.ENVIRONMENT}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <EnvironmentExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                  
                 {:else if $activeTab?.type === ItemType.WORKSPACE}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>

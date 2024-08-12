@@ -9,25 +9,6 @@ class InitEnvironmentTab {
    * @param _workspaceId - Workspace mongo id to which Environment belongs to
    */
   constructor(_id: string, _workspaceId: string) {
-    // this._tab = {
-    //   id: _id,
-    //   tabId: uuidv4(),
-    //   name: "New Environment",
-    //   description: "",
-    //   variable: [
-    //     {
-    //       key: "",
-    //       value: "",
-    //       checked: true,
-    //     },
-    //   ],
-    //   isActive: false,
-    //   type: "LOCAL",
-    //   isSave: true,
-    //   isSaveInProgress: false,
-    //   workspaceId: _workspaceId,
-    //   timestamp: new Date().toString(),
-    // };
     this._tab = {
       id: _id,
       tabId: uuidv4(),
@@ -92,16 +73,7 @@ class InitEnvironmentTab {
     return this;
   }
 
-  // public setIsSave(_isSave: boolean) {
-  //   this._tab.isSave = _isSave;
-  //   return this;
-  // }
-
-  // public setIsActive(_isActive: boolean) {
-  //   this._tab.isActive = _isActive;
-  //   return this;
-  // }
-
+  
   public setType(_type: string) {
     this._tab.property.environment.type = _type;
     return this;
