@@ -19,7 +19,11 @@
   } from "$lib/utils/interfaces/request.interface";
 
   import { onDestroy } from "svelte";
-  import { DoubleArrowIcon, GithubIcon } from "@library/icons";
+  import {
+    DoubleArrowIcon,
+    GithubIcon,
+    socketDeprecateIcon,
+  } from "@library/icons";
   import { WithButton } from "@workspaces/common/hoc";
   import { version } from "../../../../../../src-tauri/tauri.conf.json";
   import { createDeepCopy } from "$lib/utils/helpers";
@@ -207,7 +211,7 @@
         },
         {
           name: "Add WebSocket",
-          icon: CreateCollection,
+          icon: socketDeprecateIcon,
           onclick: () => onItemCreated("web-socket", {}),
         },
       ]
@@ -234,7 +238,7 @@
         },
         {
           name: "Add WebSocket",
-          icon: CreateCollection,
+          icon: socketDeprecateIcon,
           onclick: () => onItemCreated("web-socket", {}),
         },
       ];

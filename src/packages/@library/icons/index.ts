@@ -54,4 +54,5 @@ export { default as CopyIcon2 } from "./Copy2.svelte";
 export { default as AISparkle } from "./AiSparkle.svelte";
 export { default as CleanerIcon } from "./Cleaner.svelte";
 export { default as SocketIcon } from "./Socket.svelte";
+export { default as socketDeprecateIcon } from "./Socket.svg";
 export { default as StackFilled } from "./StackFilled.svelte";
