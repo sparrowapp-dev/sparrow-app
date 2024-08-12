@@ -129,7 +129,7 @@
   style="font-weight: 500;"
 >
   <div
-    class="d-flex align-items-center p-2 rounded-1 me-0"
+    class="d-flex align-items-center p-2 rounded-1 me-0 mb-1"
     style="cursor:pointer; justify-content: space-between; height:32px;
       background-color: {isHovered
       ? 'var(--dropdown-option-hover)'

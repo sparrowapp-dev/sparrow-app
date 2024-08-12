@@ -384,7 +384,7 @@
 
     <!-- LHS Side of Collection Enivironment & Test Flows -->
     <div
-      class="d-flex flex-column collections-list mb-2 test"
+      class="d-flex flex-column collections-list mb-2"
       style="overflow:hidden; margin-top:5px;  flex:1; "
     >
       <!-----Collection Section------>
@@ -394,7 +394,7 @@
         class:half-height={isExpandCollection && isExpandEnvironment}
       >
         <CollectionList
-          {scrollList}
+         {scrollList}
           bind:userRole
           {onRefetchCollection}
           {showImportCurlPopup}
@@ -506,12 +506,9 @@
 {/if}
 
 <style>
-
-  .test{
-    height: calc(100%-30px);
-  }
+ 
   .full-height {
-    height:calc(100vh - 192px);
+    height: calc(100vh - 192px);
   }
   .half-height {
     height: 49%;
