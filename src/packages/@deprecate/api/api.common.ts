@@ -13,6 +13,7 @@ import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 import type { Response } from "$lib/utils/interfaces/request.interface";
+import { listen } from "@tauri-apps/api/event";
 
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
@@ -177,6 +178,92 @@ const makeHttpRequest = async (
 };
 
 /**
+ * Sends a WebSocket message to a specific tab and handles the response.
+ *
+ * @param tab_id - The ID of the tab to which the message should be sent.
+ * @param message - The message to be sent to the web socket.
+ *
+ */
+const sendMessage = async (tab_id: string, message: string) => {
+  await invoke("send_websocket_message", { tabid: tab_id, message: message })
+    .then(async (data: string) => {
+      try {
+        // Logic to handle response
+        console.log("sent", data);
+      } catch (e) {
+        console.error(e);
+        return error("error");
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+      return error("error");
+    });
+};
+
+/**
+ * Disconnects a WebSocket connection for a specific tab and handles the response.
+ *
+ * @param tab_id - The ID of the tab for which the WebSocket connection should be disconnected.
+ *
+ */
+const disconnectWebSocket = async (tab_id: string) => {
+  await invoke("disconnect_websocket", { tabid: tab_id })
+    .then(async (data: string) => {
+      try {
+        // Logic to handle response
+        console.log("disconnected", data);
+      } catch (e) {
+        console.error(e);
+        return error("error");
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+      return error("error");
+    });
+};
+
+/**
+ * Connects to a WebSocket at a specified URL for a specific tab and handles the response.
+ *
+ * @param {string} url - The WebSocket server URL to connect to.
+ * @param {string} tabId - The ID of the tab for which the WebSocket connection should be established.
+ * @param {string} requestHeaders - The request headers to be sent with the WebSocket connection.
+ *
+ * @description
+ * The function also sets up a listener for messages from the WebSocket connection.
+ */
+const connectWebSocket = async (
+  url: string,
+  tabId: string,
+  requestHeaders: string,
+) => {
+  await invoke("connect_websocket", {
+    url: url,
+    tabid: tabId,
+    headers: requestHeaders,
+  })
+    .then(async (data: string) => {
+      try {
+        // Logic to handle response
+        console.log("connected", data);
+        // All the response of particular web socket can be listened here. (Can be shifted to another place)
+        listen(`ws_message_${tabId}`, (event) => {
+          console.log("event---->", event);
+        });
+      } catch (e) {
+        console.error(e);
+        return error("error");
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+      return error("error");
+    });
+};
+
+/**
  * Invoke RPC Communication
  * @param url - Request URL
  * @param method - Request Method
@@ -231,5 +318,8 @@ export {
   makeHttpRequest,
   getMultipartAuthHeaders,
   makeHttpRequestV2,
+  connectWebSocket,
+  sendMessage,
+  disconnectWebSocket,
   // getHeaders,
 };
