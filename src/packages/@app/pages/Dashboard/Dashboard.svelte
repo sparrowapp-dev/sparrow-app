@@ -193,6 +193,8 @@
     workspaceDocuments={$workspaceDocuments}
     onCreateWorkspace={() => (isWorkspaceModalOpen = true)}
     onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
+    {user} 
+    onLogout={_viewModel.handleLogout}
   />
 
   <!--

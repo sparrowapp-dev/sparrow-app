@@ -28,7 +28,7 @@
   let modalElement: HTMLDivElement;
   let buttonPosition: DOMRect;
   let modalPostion: DOMRect;
-  let showModal = false;
+  export let showProfileModal = false;
   let user: { name: string; email: string };
 
   const getbuttonPosition = () => {
@@ -57,7 +57,7 @@
 
     document.addEventListener("click", (e) => {
       if (buttonElement && !buttonElement.contains(e.target as Node)) {
-        showModal = false;
+        showProfileModal = false;
       }
     });
 
@@ -80,30 +80,26 @@
   on:mouseenter={() => (isHovered = true)}
   on:mouseleave={() => (isHovered = false)}
   on:click={(e) => {
-    showModal = !showModal;
+    showProfileModal = !showProfileModal;
   }}
 >
-  <div class="d-flex align-iems-center justify-content-center">
-    {#if isHovered && item.hoveredLogo && !item.disabled}
-      <img src={item.hoveredLogo} alt={item.heading} />
-    {:else if isRouteActive && item.selectedLogo}
-      <img src={item.selectedLogo} alt={item.heading} />
-    {:else}
-      <img src={item.defaultLogo} alt={item.heading} />
-    {/if}
-  </div>
+<div class="d-flex align-iems-center justify-content-center">
+  {#if isHovered && item.hoveredLogo && !item.disabled}
+    <img src={item.hoveredLogo} alt={item.heading} />
+  {:else if isRouteActive && item.selectedLogo}
+    <img src={item.selectedLogo} alt={item.heading} />
+  {:else}
+    <img src={item.defaultLogo} alt={item.heading} />
+  {/if}
+</div>
 </button>
 
 <div
   bind:this={modalElement}
-  class="position-fixed d-flex flex-column modal-background ps-2 pe-2 pt-3 pb-2 {showModal
+  class=" position-fixed d-flex flex-column modal-background ps-2 pe-2 pt-3 pb-2 {showProfileModal
     ? ''
     : 'd-none'}"
-  style="top: {buttonPosition?.top -
-    modalPostion?.height +
-    45}px; left: {buttonPosition?.left +
-    buttonPosition?.width +
-    10}px; font-size: 12px; font-weight: 400; min-width: 200px; z-index: 500;"
+  style="right:10px; top:45px; font-size: 12px; font-weight: 400; min-width: 200px; z-index: 500;"
 >
   <div class="d-flex align-items-center mb-2 px-1">
     <div
@@ -121,6 +117,7 @@
       </div>
     </div>
   </div>
+  
   <button
     class="border-0 bg-transparent d-flex align-items-center px-2 py-1 sign-out-button"
     style="border-radius: 3px;"

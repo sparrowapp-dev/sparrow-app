@@ -116,11 +116,6 @@
     {#each secondarySidebarItems as item (item.route)}
       <SidebarItem {item} />
     {/each}
-    {#if !isGuestUser}
-      <Tooltip title="User Profile" placement="right" distance={20} zIndex={5}>
-        <SidebarProfileModal item={sidebarModalItem} {onLogout} />
-      </Tooltip>
-    {/if}
   </div>
 </div>
 

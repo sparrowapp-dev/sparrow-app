@@ -12,6 +12,9 @@
   import { PlusIcon } from "@library/icons";
   import { navigate } from "svelte-navigator";
   import PopupHint from "./sub-component/PopupHint.svelte";
+  import SidebarProfileModal, {
+    type SidebarProfileObj,
+  } from "../sidebar/SidebarProfileModal.svelte";
   /**
    * environment list
    */
@@ -119,6 +122,23 @@
   const handleViewWorkspaces = () => {
     navigate("/app/home");
   };
+  export let user;
+  export let onLogout;
+
+  import profile from "$lib/assets/profileTab.svg";
+  import hoveredProfile from "$lib/assets/profile-hovered.svg";
+  import selectedProfile from "$lib/assets/profile-selected.svg";
+
+  let sidebarModalItem: SidebarProfileObj = {
+    heading: "Profile",
+    defaultLogo: profile,
+    hoveredLogo: hoveredProfile,
+    selectedLogo: selectedProfile,
+    disabled: isGuestUser ?? false,
+    user,
+  };
+
+  let showProfileModal = false;
 </script>
 
 <header
@@ -295,6 +315,15 @@
       borderRounded={"2px"}
       position={"absolute"}
     />
+
+
+    {#if !isGuestUser}
+     <div class="ms-4 me-2">
+      <Tooltip title="User Profile" placement="bottom" distance={20} zIndex={5} show={!showProfileModal}>
+        <SidebarProfileModal item={sidebarModalItem} {onLogout} bind:showProfileModal/>
+      </Tooltip>
+     </div>
+    {/if}
   </div>
 </header>
 
