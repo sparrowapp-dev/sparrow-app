@@ -66,10 +66,9 @@ use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
 use utils::response_decoder::decode_response_body;
 
-// New
 
+// Web socket imports 
 use futures::{SinkExt, StreamExt};
-// use http::header::HeaderValue;
 use http::header::HeaderValue;
 use native_tls::TlsConnector;
 use std::sync::Arc;

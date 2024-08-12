@@ -133,16 +133,6 @@
       isLoginBannerActive = guestUser?.isBannerActive;
     }
   });
-  onMount(() => {
-    // const unlisten = listen(`ws_message_unique-tab-id`, (event) => {
-    //   console.log("event new------>", event);
-    // });
-
-    return () => {
-      // unlisten();
-      // disconnect();
-    };
-  });
 </script>
 
 <RestExplorer

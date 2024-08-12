@@ -177,12 +177,6 @@ const makeHttpRequest = async (
     });
 };
 
-function generateWebSocketKey() {
-  const array = new Uint8Array(16);
-  window.crypto.getRandomValues(array);
-  return btoa(String.fromCharCode.apply(null, array));
-}
-
 const sendMessage = async (tab_id: string, message: string) => {
   invoke("send_websocket_message", { tabid: tab_id, message: message })
     .then(async (data: string) => {
