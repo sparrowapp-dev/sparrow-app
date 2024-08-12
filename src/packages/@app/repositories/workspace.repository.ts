@@ -182,6 +182,8 @@ export class WorkspaceRepository {
     return;
   };
 
+  //This is pending task------
+
   /**
    * remove workspaces by teamId
    */
@@ -318,6 +320,8 @@ export class WorkspaceRepository {
       users: [...workspace.users],
     });
   };
+
+
   public deleteWorkspace = async (workspaceId: string): Promise<any> => {
     const workspace = await RxDB.getInstance()
       .rxdb.workspace.findOne({
@@ -328,7 +332,6 @@ export class WorkspaceRepository {
       .exec();
     await this.collectionRepository.removeCollections(workspaceId);
     await this.environmentRepository.removeEnvironments(workspaceId);
-    // await this.environmentTabRepository.removeEnvironmentTabs(workspaceId);
     return await workspace.remove();
   };
   public addUserInWorkspace = async (

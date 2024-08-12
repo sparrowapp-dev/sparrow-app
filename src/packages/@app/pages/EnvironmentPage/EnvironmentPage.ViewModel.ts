@@ -75,7 +75,6 @@ export class EnvironmentViewModel {
       );
       initEnvironmentTab
         .setName(globalEnvironment.name)
-        // .setIsActive(true)
         .setType(environmentType.GLOBAL)
         .setVariable(globalEnvironment.variable);
 
@@ -146,7 +145,6 @@ export class EnvironmentViewModel {
         currentWorkspace._id,
       );
       initEnvironmentTab.setName(newEnvironment.name)
-        // .setIsActive(true)
         ;
       this.tabRepository.createTab(initEnvironmentTab.getValue())
       notifications.success("New Environment Created!");
@@ -165,10 +163,7 @@ export class EnvironmentViewModel {
         res._id,
         currentWorkspace._id,
       );
-      initEnvironmentTab.setName(res.name)
-        // .
-        // setIsActive(true)
-        ;
+      initEnvironmentTab.setName(res.name);
       this.tabRepository.createTab(initEnvironmentTab.getValue())
       this.environmentRepository.removeEnvironment(newEnvironment.id);
 
@@ -200,7 +195,6 @@ export class EnvironmentViewModel {
     );
     initEnvironmentTab
       .setName(environment?.name)
-      // .setIsActive(true)
       .setType(environmentType.GLOBAL)
       .setVariable(environment?.variable);
     this.tabRepository.createTab(
@@ -276,8 +270,10 @@ export class EnvironmentViewModel {
       this.environmentRepository.updateEnvironment(env.id, {
         name: newEnvironmentName,
       });
-      let currenttab = await this.tabRepository.getTabById(env.id)
-      await this.tabRepository.updateTab(currenttab.tabId, { name: newEnvironmentName })
+      let currentTab = await this.tabRepository.getTabById(env.id)
+      if (currentTab) {
+        await this.tabRepository.updateTab(currentTab?.tabId as string, { name: newEnvironmentName })
+      }
       return;
     }
     const response = await this.environmentService.updateEnvironment(
@@ -291,8 +287,10 @@ export class EnvironmentViewModel {
       this.environmentRepository.updateEnvironment(env.id, {
         name: newEnvironmentName,
       });
-      let currenttab = await this.tabRepository.getTabById(env.id)
-      await this.tabRepository.updateTab(currenttab.tabId, { name: newEnvironmentName })
+      let currentTab = await this.tabRepository.getTabById(env.id)
+      if (currentTab) {
+        await this.tabRepository.updateTab(currentTab.tabId as string, { name: newEnvironmentName })
+      }
 
     } else if (response.message === "Network Error") {
       notifications.error(response.message);

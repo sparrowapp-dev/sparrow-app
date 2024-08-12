@@ -117,7 +117,6 @@ class RestExplorerViewModel
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
   private tabRepository = new TabRepository();
-  // private environmentTabRepository = new EnvironmentTabRepository();
   private guideRepository = new GuideRepository();
   private guestUserRepository = new GuestUserRepository();
   private compareArray = new CompareArray();

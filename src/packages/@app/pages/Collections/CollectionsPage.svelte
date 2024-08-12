@@ -306,9 +306,7 @@
                   {:else if $activeTab?.type === ItemType.ENVIRONMENT}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
-                      <!-- <FolderExplorerPage tab={$activeTab} /> -->
                       <EnvironmentExplorerPage tab={$activeTab} />
-                        
                     </div>
                   </Motion>
                   

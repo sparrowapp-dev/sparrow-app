@@ -189,7 +189,6 @@ export class EnvironmentExplorerViewModel {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       await this.updateRequestState({
         isSaveInProgress: false,
-        // isSave: true,
       });
       notifications.success(
         `Changes saved for ${currentEnvironment.name} environment.`,
