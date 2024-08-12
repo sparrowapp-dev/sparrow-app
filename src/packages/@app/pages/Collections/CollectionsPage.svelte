@@ -85,11 +85,65 @@
   let userId = "";
   let userRole = "";
 
+  let isExpandCollection = false;
+  let isExpandEnvironment = false;
+  
+  let localEnvironment;
+  let globalEnvironment;
 
- let isExpandCollection = false;
-   let isExpandEnvironment = false;
+  let environments = _viewModel2.environments;
+
+  let environmentsValues;
+  let currentWOrkspaceValue: Observable<WorkspaceDocument>;
 
 
+  environments.subscribe((value) => {
+    if (value) {
+      environmentsValues = value;
+    }
+  });
+
+  currentWorkspace.subscribe((value) => {
+    if (value) {
+      currentWOrkspaceValue = value;
+    }
+  });
+
+  const mapEnvironmentToWorkspace = (_env, _workspaceId) => {
+    if (_env && _workspaceId) {
+      localEnvironment = [];
+      globalEnvironment = [];
+      environmentsValues
+        .filter((element) => {
+          return element.workspaceId === _workspaceId;
+        })
+        .forEach((element) => {
+          const _element = element.toMutableJSON();
+          if (_element.type === "GLOBAL") {
+            globalEnvironment.push(_element);
+          } else if (_element.type === "LOCAL") {
+            localEnvironment.push(_element);
+          }
+        });
+    }
+  };
+
+  $: {
+    if (environmentsValues || currentWOrkspaceValue?._id) {
+      mapEnvironmentToWorkspace(environmentsValues, currentWOrkspaceValue?._id);
+    }
+  }
+
+  let onCreateEnvironment = _viewModel2.onCreateEnvironment;
+
+  async function handleCreateEnvironment() {
+    if (!isExpandEnvironment) {
+      isExpandEnvironment = !isExpandEnvironment;
+    }
+
+    await onCreateEnvironment(localEnvironment);
+    scrollList("bottom");
+  }
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
@@ -338,6 +392,7 @@
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WorkspaceDefault
+                        {handleCreateEnvironment}
                         showImportCollectionPopup={() =>
                           (isImportCollectionPopup = true)}
                         onItemCreated={_viewModel.handleCreateItem}

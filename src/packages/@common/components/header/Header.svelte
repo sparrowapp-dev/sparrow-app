@@ -203,7 +203,7 @@
                 class="mb-1"
                 style="width:100%; height:100%; text-decoration:none; outline:none !important; background-color:transparent;  border:none; font-size:12px;"
               >
-                Create an account or Sign In
+                Create an Account or Sign In
               </button>
             </div>
           </div>
@@ -316,13 +316,22 @@
       position={"absolute"}
     />
 
-
     {#if !isGuestUser}
-     <div class="ms-4 me-2">
-      <Tooltip title="User Profile" placement="bottom" distance={20} zIndex={5} show={!showProfileModal}>
-        <SidebarProfileModal item={sidebarModalItem} {onLogout} bind:showProfileModal/>
-      </Tooltip>
-     </div>
+      <div class="ms-4 me-2">
+        <Tooltip
+          title="User Profile"
+          placement="bottom"
+          distance={20}
+          zIndex={5}
+          show={!showProfileModal}
+        >
+          <SidebarProfileModal
+            item={sidebarModalItem}
+            {onLogout}
+            bind:showProfileModal
+          />
+        </Tooltip>
+      </div>
     {/if}
   </div>
 </header>

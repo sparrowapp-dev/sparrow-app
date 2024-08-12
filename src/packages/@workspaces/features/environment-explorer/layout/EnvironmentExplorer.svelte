@@ -193,8 +193,8 @@
             text={` `}
             onClose={closeEnvHelpText}
             ><p>
-              Environments allow you to manage different sets of confirguration
-              variables for various stages of your application (e.g.,
+              Environments allow you to manage different sets of configuration
+              variables for various stages of your application (e.g.
               Development, Staging, Production). This helps in organizing and
               isolating settings, making testing and deployment easier and more
               efficient.
