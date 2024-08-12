@@ -4,7 +4,6 @@
   export let showImportCollectionPopup;
   export let onItemCreated;
   export let isGuestUser = false;
-  export let onCreateEnvironment;
 </script>
 
 <div
@@ -66,30 +65,6 @@
         style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px;  "
       >
         Add Request
-      </div>
-    </div>
-
-    <div
-      class=" "
-      style="height: 120px; width:120px; border: 0.5px solid var(--text-tertiary-400 );  border-radius : 4px; "
-      role="button"
-      on:click={onCreateEnvironment}
-    >
-      <div
-        class="d-flex justify-content-center align-items-center"
-        style="height: 79px"
-      >
-        <VectorIcon
-          width="24px"
-          height="24px"
-          color=" var( --text-primary-300)"
-        />
-      </div>
-      <div
-        class="d-flex justify-content-center align-items-center"
-        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px;  "
-      >
-        <span class="me-2">+</span> Environment
       </div>
     </div>
   </div>
