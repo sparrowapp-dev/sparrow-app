@@ -63,23 +63,7 @@ export class EnvironmentViewModel {
    * @param environmentId - environment id needs to be deleted
    */
   private deleteEnvironmentTab = async (environmentId: string) => {
-    const flag =
-      await this.tabRepository.removeTab(environmentId);
-    if (flag[0]) {
-      const globalEnvironment =
-        await this.environmentRepository.getGlobalEnvironment(flag[1]);
-
-      const initEnvironmentTab = this.initTab.environment(
-        globalEnvironment.id,
-        globalEnvironment.workspaceId,
-      );
-      initEnvironmentTab
-        .setName(globalEnvironment.name)
-        .setType(environmentType.GLOBAL)
-        .setVariable(globalEnvironment.variable);
-
-      this.tabRepository.createTab(initEnvironmentTab.getValue())
-    }
+        await this.tabRepository.removeTab(environmentId);
   };
 
   /**
