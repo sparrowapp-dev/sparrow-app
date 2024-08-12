@@ -10,6 +10,7 @@
   import { onMount } from "svelte";
   import type { Tab } from "@common/types/workspace";
   import type { TabDocument, WorkspaceDocument } from "@app/database/database";
+  import { webSocketDataStore } from "@workspaces/features/socket-explorer/store";
   export let tab: TabDocument;
   let isLoginBannerActive = false;
   const _viewModel = new WebSocketViewModel(tab);
@@ -120,12 +121,19 @@
       isLoginBannerActive = guestUser?.isBannerActive;
     }
   });
+
+  let webSocketData;
+  webSocketDataStore.subscribe((webSocketMap) => {
+    webSocketData = webSocketMap.get(tab.tabId);
+    console.log(webSocketData);
+  });
 </script>
 
 <SocketExplorer
   collections={_viewModel.collection}
   bind:tab={_viewModel.tab}
   bind:userRole
+  webSocket={webSocketData}
   {environmentVariables}
   {isGuestUser}
   {isLoginBannerActive}
@@ -147,4 +155,7 @@
   onUpdateEnvironment={_viewModel.updateEnvironment}
   onRenameCollection={_viewModel.handleRenameCollection}
   onRenameFolder={_viewModel.handleRenameFolder}
+  onConnect={_viewModel.connectWebsocket}
+  onDisconnect={_viewModel.disconnectWebsocket}
+  onSendMessage={_viewModel.sendMessageWebsocket}
 />

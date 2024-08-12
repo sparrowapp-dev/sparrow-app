@@ -8,13 +8,16 @@ import {
   SocketSectionEnum,
   WebSocketDefault,
   type State,
-  type StatePartial,
-  type StateWrapper,
   type WebSocketTab,
 } from "@common/types/workspace/web-socket";
 import { v4 as uuidv4 } from "uuid";
 
 class InitWebSocketTab {
+  private generateWebSocketKey() {
+    const array = new Uint8Array(16);
+    window.crypto.getRandomValues(array);
+    return btoa(String.fromCharCode.apply(null, array as unknown as number[]));
+  }
   private _tab: WebSocketTab;
   /**
    *
@@ -56,7 +59,7 @@ class InitWebSocketTab {
             },
             {
               key: "Sec-WebSocket-Key",
-              value: uuidv4(),
+              value: this.generateWebSocketKey(),
               checked: true,
             },
             {

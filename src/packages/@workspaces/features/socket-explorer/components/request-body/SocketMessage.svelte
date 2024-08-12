@@ -10,6 +10,7 @@
   const updateBeautifiedState = (value: boolean) => {
     isBodyBeautified = value;
   };
+  export let onSendMessage;
 </script>
 
 <div class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative">
@@ -17,6 +18,7 @@
     {onUpdateRequestState}
     {requestState}
     {updateBeautifiedState}
+    {onSendMessage}
   />
   <div style="flex:1; overflow:auto;">
     <div class="d-flex flex-column h-100">

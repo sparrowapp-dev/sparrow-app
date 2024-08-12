@@ -19,7 +19,6 @@
 
   export let requestUrl: string | undefined;
   export let isSendRequestInProgress: boolean;
-  export let onSendButtonClicked: SendRequestType;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
   export let toggleSaveRequest: (flag: boolean) => void;
   export let onSaveSocket: SaveRequestType;
@@ -27,6 +26,9 @@
   export let onUpdateEnvironment;
   export let isSave;
   export let isGuestUser = false;
+  export let onConnect;
+  export let webSocket;
+  export let onDisconnect;
   /**
    * Role of user in active workspace
    */
@@ -45,18 +47,6 @@
       toggleSaveRequest(true);
     } else if (x.status === "success") {
       notifications.success("API request saved");
-    }
-  };
-
-  /**
-   * @description - handles different key press
-   * @param event - keyboard events
-   */
-  const handleKeyPress = (event: KeyboardEvent) => {
-    if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
-      handleSaveRequest();
-    } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
-      onSendButtonClicked(environmentVariables);
     }
   };
 
@@ -87,9 +77,10 @@
   <!-- Send button -->
   <span class="ps-2"></span>
   <DropButton
-    title="Connect"
+    title={webSocket?.status === "connected" ? "Disconnect" : "Connect"}
     type="default"
-    disable={isSendRequestInProgress ? true : false}
+    loader={webSocket?.status === "inprogress"}
+    disable={webSocket?.status === "inprogress"}
     onClick={() => {
       if (requestUrl === "") {
         const codeMirrorElement = document.querySelector(
@@ -99,7 +90,11 @@
           codeMirrorElement.classList.add("url-red-border");
         }
       } else {
-        onSendButtonClicked(environmentVariables);
+        if (webSocket?.status === "connected") {
+          onDisconnect();
+        } else if (webSocket?.status === "disconnected" || !webSocket?.status) {
+          onConnect();
+        }
       }
     }}
   />
@@ -123,7 +118,8 @@
     </button>
   </Tooltip>
 </div>
-<svelte:window on:keydown={handleKeyPress} />
+
+<!-- <svelte:window on:keydown={handleKeyPress} /> -->
 
 <style>
   .save-disk {

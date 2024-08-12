@@ -30,6 +30,7 @@
     SocketParameters,
   } from "../components";
   import { SocketSectionEnum } from "@common/types/workspace/web-socket";
+  import ResponseData from "../components/response-data/ResponseData.svelte";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -54,6 +55,10 @@
   export let userRole: string;
   export let onRenameCollection;
   export let onRenameFolder;
+  export let onConnect;
+  export let onSendMessage;
+  export let webSocket;
+  export let onDisconnect;
 
   let isExposeSaveAsSocket = false;
   // let isLoading = false;
@@ -78,13 +83,15 @@
         requestUrl={$tab.property.websocket?.url}
         isSendRequestInProgress={$tab.property.websocket?.state
           ?.isSendRequestInProgress}
-        onSendButtonClicked={onSendRequest}
         {onUpdateEnvironment}
         {environmentVariables}
         {onUpdateRequestUrl}
         {toggleSaveRequest}
         {onSaveSocket}
         {isGuestUser}
+        {onConnect}
+        {webSocket}
+        {onDisconnect}
       />
 
       <div class="pt-2"></div>
@@ -131,6 +138,7 @@
                     requestState={$tab.property.websocket.state}
                     {onUpdateMessage}
                     {onUpdateRequestState}
+                    {onSendMessage}
                   />
                 {:else if $tab.property.websocket?.state?.socketNavigation === SocketSectionEnum.PARAMETERS}
                   <SocketParameters
@@ -169,15 +177,12 @@
             <div class="d-flex flex-column h-100 ps-2" style="overflow:auto;">
               <div class="h-100 d-flex flex-column">
                 <div style="flex:1; overflow:auto;">
-                  {#if $tab.property.websocket?.state?.isSendRequestInProgress}
+                  {#if !webSocket}
                     <ResponseDefaultScreen />
-                    <div
-                      style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
-                    >
-                      <Loader loaderSize={"20px"} />
-                    </div>
                   {:else}
-                    <ResponseDefaultScreen />
+                    <!-- response sttaus implementation -->
+                    <ResponseData {webSocket} />
+                    <!-- response body implementation -->
                   {/if}
                 </div>
               </div>

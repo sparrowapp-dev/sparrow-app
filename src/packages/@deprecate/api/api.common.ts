@@ -14,6 +14,7 @@ import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 import type { Response } from "$lib/utils/interfaces/request.interface";
 import { listen } from "@tauri-apps/api/event";
+import { webSocketDataStore } from "@workspaces/features/socket-explorer/store";
 
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
@@ -177,6 +178,19 @@ const makeHttpRequest = async (
     });
 };
 
+function formatTime(date) {
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const seconds = date.getSeconds();
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  const minutesStr = minutes < 10 ? "0" + minutes : minutes;
+  const secondsStr = seconds < 10 ? "0" + seconds : seconds;
+
+  return `${hours}:${minutesStr}:${secondsStr} ${ampm}`;
+}
+
 /**
  * Sends a WebSocket message to a specific tab and handles the response.
  *
@@ -185,11 +199,34 @@ const makeHttpRequest = async (
  *
  */
 const sendMessage = async (tab_id: string, message: string) => {
+  // debugger;
   await invoke("send_websocket_message", { tabid: tab_id, message: message })
     .then(async (data: string) => {
       try {
         // Logic to handle response
-        console.log("sent", data);
+        console.log("sent", JSON.parse(data));
+
+        // const wsData = webSocketDataMap.get(tab_id);
+        // if (wsData) {
+        //   wsData.messages.push({
+        //     data: message,
+        //     transmitter: "sender",
+        //     timestamp: new Date(),
+        //   });
+        // }
+
+        webSocketDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tab_id);
+          if (wsData) {
+            wsData.messages.push({
+              data: message,
+              transmitter: "sender",
+              timestamp: formatTime(new Date()),
+            });
+            webSocketDataMap.set(tab_id, wsData);
+          }
+          return webSocketDataMap;
+        });
       } catch (e) {
         console.error(e);
         return error("error");
@@ -208,11 +245,32 @@ const sendMessage = async (tab_id: string, message: string) => {
  *
  */
 const disconnectWebSocket = async (tab_id: string) => {
+  webSocketDataStore.update((webSocketDataMap) => {
+    const wsData = webSocketDataMap.get(tab_id);
+    if (wsData) {
+      wsData.status = "inprogress";
+      webSocketDataMap.set(tab_id, wsData);
+    }
+    return webSocketDataMap;
+  });
   await invoke("disconnect_websocket", { tabid: tab_id })
     .then(async (data: string) => {
       try {
         // Logic to handle response
         console.log("disconnected", data);
+        webSocketDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tab_id);
+          if (wsData) {
+            wsData.messages.push({
+              data: "Disconnected",
+              transmitter: "disconnector",
+              timestamp: formatTime(new Date()),
+            });
+            wsData.status = "disconnected";
+            webSocketDataMap.set(tab_id, wsData);
+          }
+          return webSocketDataMap;
+        });
       } catch (e) {
         console.error(e);
         return error("error");
@@ -239,6 +297,17 @@ const connectWebSocket = async (
   tabId: string,
   requestHeaders: string,
 ) => {
+  // debugger;
+  webSocketDataStore.update((webSocketDataMap) => {
+    // const wsData = webSocketDataMap.get(tabId);
+
+    webSocketDataMap.set(tabId, {
+      messages: [],
+      status: "inprogress",
+    });
+
+    return webSocketDataMap;
+  });
   await invoke("connect_websocket", {
     url: url,
     tabid: tabId,
@@ -247,10 +316,51 @@ const connectWebSocket = async (
     .then(async (data: string) => {
       try {
         // Logic to handle response
-        console.log("connected", data);
+        if (data) {
+          const dt = JSON.parse(data);
+          console.log(dt);
+        }
+        // Store the WebSocket and initialize data
+        webSocketDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tabId);
+          if (wsData) {
+            // webSocketDataMap.set(tabId, {
+            //   messages: [
+            //     {
+            //       data: `Connected from ${url}`,
+            //       transmitter: "connecter",
+            //       timestamp: new Date(),
+            //     },
+            //   ],
+            //   status: "connected",
+            // });
+            wsData.messages.push({
+              data: `Connected from ${url}`,
+              transmitter: "connecter",
+              timestamp: formatTime(new Date()),
+            });
+            wsData.status = "connected";
+            webSocketDataMap.set(tabId, wsData);
+          }
+          return webSocketDataMap;
+        });
+
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
         listen(`ws_message_${tabId}`, (event) => {
           console.log("event---->", event);
+
+          webSocketDataStore.update((webSocketDataMap) => {
+            const wsData = webSocketDataMap.get(tabId);
+            if (wsData) {
+              wsData.messages.push({
+                data: event.payload,
+                transmitter: "receiver",
+                timestamp: formatTime(new Date()),
+              });
+              webSocketDataMap.set(tabId, wsData);
+            }
+            return webSocketDataMap;
+          });
         });
       } catch (e) {
         console.error(e);

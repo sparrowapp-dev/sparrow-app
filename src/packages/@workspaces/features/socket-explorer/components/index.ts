@@ -8,3 +8,4 @@ export { default as ResponseDefaultScreen } from "./response-default-screen/Resp
 export { default as ResponseErrorScreen } from "./response-error-screen/ResponseErrorScreen.svelte";
 export { default as SocketName } from "./socket-name/SocketName.svelte";
 export { default as SocketMessage } from "./request-body/SocketMessage.svelte";
+export { default as ResposneData } from "./response-data/ResponseData.svelte";

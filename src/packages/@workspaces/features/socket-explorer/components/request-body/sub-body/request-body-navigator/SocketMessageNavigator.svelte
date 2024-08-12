@@ -5,8 +5,8 @@
   import { notifications } from "@library/ui/toast/Toast";
   import { WithSelect } from "@workspaces/common/hoc";
   export let onUpdateRequestState;
-  export let updateBeautifiedState: (value: boolean) => void;
   export let requestState;
+  export let onSendMessage;
 
   let handleRawDropDown = (tab: string) => {
     onUpdateRequestState({ socketMessageLanguage: tab });
@@ -45,42 +45,5 @@
       disabled={false}
     />
   </div>
-  <!-- <div>
-    <div
-      on:click={() => {
-        updateBeautifiedState(true);
-        notifications.success("Code formatted successfully!");
-      }}
-      role="button"
-      class="icon-container d-flex align-items-center justify-content-center border-radius-2"
-    >
-      <img src={BeautifyIcon} style="height:10px; width:10px;" />
-    </div>
-  </div> -->
-  <Button title="Send" onClick={() => {}}
-    type={"primary"} />
+  <Button title="Send" onClick={onSendMessage} type={"primary"} />
 </div>
-
-<style>
-  .error-message {
-    background-color: #11253a;
-  }
-  .error-message small {
-    font-size: 12px;
-  }
-  .info-button,
-  .cross-button {
-    width: 36px;
-  }
-
-  .icon-container {
-    height: 24px;
-    width: 24px;
-  }
-  .icon-container:hover {
-    background-color: var(--bg-secondary-550);
-  }
-  .icon-container:active {
-    background-color: var(--bg-secondary-600);
-  }
-</style>
