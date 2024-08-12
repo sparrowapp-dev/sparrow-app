@@ -177,8 +177,15 @@ const makeHttpRequest = async (
     });
 };
 
+/**
+ * Sends a WebSocket message to a specific tab and handles the response.
+ *
+ * @param tab_id - The ID of the tab to which the message should be sent.
+ * @param message - The message to be sent to the web socket.
+ *
+ */
 const sendMessage = async (tab_id: string, message: string) => {
-  invoke("send_websocket_message", { tabid: tab_id, message: message })
+  await invoke("send_websocket_message", { tabid: tab_id, message: message })
     .then(async (data: string) => {
       try {
         // Logic to handle response
@@ -194,8 +201,14 @@ const sendMessage = async (tab_id: string, message: string) => {
     });
 };
 
+/**
+ * Disconnects a WebSocket connection for a specific tab and handles the response.
+ *
+ * @param tab_id - The ID of the tab for which the WebSocket connection should be disconnected.
+ *
+ */
 const disconnectWebSocket = async (tab_id: string) => {
-  invoke("disconnect_websocket", { tabid: tab_id })
+  await invoke("disconnect_websocket", { tabid: tab_id })
     .then(async (data: string) => {
       try {
         // Logic to handle response
@@ -211,12 +224,22 @@ const disconnectWebSocket = async (tab_id: string) => {
     });
 };
 
+/**
+ * Connects to a WebSocket at a specified URL for a specific tab and handles the response.
+ *
+ * @param {string} url - The WebSocket server URL to connect to.
+ * @param {string} tabId - The ID of the tab for which the WebSocket connection should be established.
+ * @param {string} requestHeaders - The request headers to be sent with the WebSocket connection.
+ *
+ * @description
+ * The function also sets up a listener for messages from the WebSocket connection.
+ */
 const connectWebSocket = async (
   url: string,
   tabId: string,
   requestHeaders: string,
 ) => {
-  invoke("connect_websocket", {
+  await invoke("connect_websocket", {
     url: url,
     tabid: tabId,
     headers: requestHeaders,
