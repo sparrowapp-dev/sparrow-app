@@ -17,7 +17,6 @@
   <SocketMessageNavigator
     {onUpdateRequestState}
     {requestState}
-    {updateBeautifiedState}
     {onSendMessage}
   />
   <div style="flex:1; overflow:auto;">

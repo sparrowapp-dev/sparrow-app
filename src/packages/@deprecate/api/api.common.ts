@@ -15,6 +15,8 @@ import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface
 import type { Response } from "$lib/utils/interfaces/request.interface";
 import { listen } from "@tauri-apps/api/event";
 import { webSocketDataStore } from "@workspaces/features/socket-explorer/store";
+import { v4 as uuidv4 } from "uuid";
+import { RequestDataTypeEnum } from "@common/types/workspace";
 
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
@@ -206,15 +208,6 @@ const sendMessage = async (tab_id: string, message: string) => {
         // Logic to handle response
         console.log("sent", JSON.parse(data));
 
-        // const wsData = webSocketDataMap.get(tab_id);
-        // if (wsData) {
-        //   wsData.messages.push({
-        //     data: message,
-        //     transmitter: "sender",
-        //     timestamp: new Date(),
-        //   });
-        // }
-
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
@@ -222,6 +215,7 @@ const sendMessage = async (tab_id: string, message: string) => {
               data: message,
               transmitter: "sender",
               timestamp: formatTime(new Date()),
+              uuid: uuidv4(),
             });
             webSocketDataMap.set(tab_id, wsData);
           }
@@ -244,7 +238,7 @@ const sendMessage = async (tab_id: string, message: string) => {
  * @param tab_id - The ID of the tab for which the WebSocket connection should be disconnected.
  *
  */
-const disconnectWebSocket = async (tab_id: string) => {
+const disconnectWebSocket = async (tab_id: string, _url: string) => {
   webSocketDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
     if (wsData) {
@@ -262,9 +256,10 @@ const disconnectWebSocket = async (tab_id: string) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
             wsData.messages.push({
-              data: "Disconnected",
+              data: `Disconnected from ${_url}`,
               transmitter: "disconnector",
               timestamp: formatTime(new Date()),
+              uuid: uuidv4(),
             });
             wsData.status = "disconnected";
             webSocketDataMap.set(tab_id, wsData);
@@ -299,11 +294,12 @@ const connectWebSocket = async (
 ) => {
   // debugger;
   webSocketDataStore.update((webSocketDataMap) => {
-    // const wsData = webSocketDataMap.get(tabId);
-
     webSocketDataMap.set(tabId, {
       messages: [],
       status: "inprogress",
+      search: "",
+      contentType: RequestDataTypeEnum.TEXT,
+      body: "asif",
     });
 
     return webSocketDataMap;
@@ -324,20 +320,11 @@ const connectWebSocket = async (
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tabId);
           if (wsData) {
-            // webSocketDataMap.set(tabId, {
-            //   messages: [
-            //     {
-            //       data: `Connected from ${url}`,
-            //       transmitter: "connecter",
-            //       timestamp: new Date(),
-            //     },
-            //   ],
-            //   status: "connected",
-            // });
             wsData.messages.push({
               data: `Connected from ${url}`,
               transmitter: "connecter",
               timestamp: formatTime(new Date()),
+              uuid: uuidv4(),
             });
             wsData.status = "connected";
             webSocketDataMap.set(tabId, wsData);
@@ -356,6 +343,7 @@ const connectWebSocket = async (
                 data: event.payload,
                 transmitter: "receiver",
                 timestamp: formatTime(new Date()),
+                uuid: uuidv4(),
               });
               webSocketDataMap.set(tabId, wsData);
             }

@@ -158,4 +158,8 @@
   onConnect={_viewModel.connectWebsocket}
   onDisconnect={_viewModel.disconnectWebsocket}
   onSendMessage={_viewModel.sendMessageWebsocket}
+  onSearchMessage={_viewModel.searchMessages}
+  onDeleteMessage={_viewModel.deleteMessages}
+  onUpdateContentType={_viewModel.updateContentType}
+  onUpdateMessageBody={_viewModel.updateMessageBody}
 />

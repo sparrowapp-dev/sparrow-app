@@ -9,3 +9,5 @@ export { default as ResponseErrorScreen } from "./response-error-screen/Response
 export { default as SocketName } from "./socket-name/SocketName.svelte";
 export { default as SocketMessage } from "./request-body/SocketMessage.svelte";
 export { default as ResposneData } from "./response-data/ResponseData.svelte";
+export { default as ResponsePreview } from "./response-preview/ResponsePreview.svelte";
+export { default as ResponsePreviewNavigator } from "./response-preview-navigator/ResponsePreviewNavigator.svelte";

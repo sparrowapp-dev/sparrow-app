@@ -56,3 +56,7 @@ export { default as CleanerIcon } from "./Cleaner.svelte";
 export { default as SocketIcon } from "./Socket.svelte";
 export { default as socketDeprecateIcon } from "./Socket.svg";
 export { default as StackFilled } from "./StackFilled.svelte";
+export { default as ArrowOutwardIcon } from "./ArrowOutward.svelte";
+export { default as ArrowInsertIcon } from "./ArrowInsert.svelte";
+export { default as SuccessInfoIcon } from "./SuccessInfo.svelte";
+export { default as DustbinIcon } from "./Dustbin.svelte";

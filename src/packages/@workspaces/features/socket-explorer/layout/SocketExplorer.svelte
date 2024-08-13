@@ -24,6 +24,8 @@
   import {
     HttpUrlSection,
     ResponseDefaultScreen,
+    ResponsePreview,
+    ResponsePreviewNavigator,
     SocketHeaders,
     SocketMessage,
     SocketNavigator,
@@ -59,6 +61,10 @@
   export let onSendMessage;
   export let webSocket;
   export let onDisconnect;
+  export let onSearchMessage;
+  export let onDeleteMessage;
+  export let onUpdateMessageBody;
+  export let onUpdateContentType;
 
   let isExposeSaveAsSocket = false;
   // let isLoading = false;
@@ -181,8 +187,19 @@
                     <ResponseDefaultScreen />
                   {:else}
                     <!-- response sttaus implementation -->
-                    <ResponseData {webSocket} />
+                    <ResponseData
+                      {webSocket}
+                      {onSearchMessage}
+                      {onDeleteMessage}
+                      {onUpdateMessageBody}
+                      {onUpdateContentType}
+                    />
                     <!-- response body implementation -->
+                    <ResponsePreviewNavigator
+                      {webSocket}
+                      {onUpdateContentType}
+                    />
+                    <ResponsePreview {webSocket} />
                   {/if}
                 </div>
               </div>

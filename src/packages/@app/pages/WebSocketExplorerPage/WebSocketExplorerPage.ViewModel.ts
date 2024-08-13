@@ -48,6 +48,7 @@ import { v4 as uuidv4 } from "uuid";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
 import type { CollectionDocType } from "@app/models/collection.model";
 import { WebSocketService } from "@app/services/web-socket.service";
+import { webSocketDataStore } from "@workspaces/features/socket-explorer/store";
 
 class RestExplorerViewModel {
   /**
@@ -1426,6 +1427,7 @@ class RestExplorerViewModel {
     const websocketData = this._tab.getValue();
     return await this.webSocketService.disconnectWebsocket(
       websocketData?.tabId,
+      websocketData.property?.websocket?.url as string,
     );
   };
   public sendMessageWebsocket = async () => {
@@ -1434,6 +1436,55 @@ class RestExplorerViewModel {
       websocketData.tabId,
       websocketData.property.websocket?.message as string,
     );
+  };
+
+  public searchMessages = async (_search: string) => {
+    const websocketData = this._tab.getValue();
+    webSocketDataStore.update((webSocketDataMap) => {
+      const wsData = webSocketDataMap.get(websocketData.tabId);
+      if (wsData) {
+        wsData.search = _search;
+        webSocketDataMap.set(websocketData.tabId, wsData);
+      }
+      return webSocketDataMap;
+    });
+  };
+
+  public deleteMessages = async (_search: string) => {
+    const websocketData = this._tab.getValue();
+    webSocketDataStore.update((webSocketDataMap) => {
+      const wsData = webSocketDataMap.get(websocketData.tabId);
+      if (wsData) {
+        wsData.search = "";
+        wsData.messages = [];
+        webSocketDataMap.set(websocketData.tabId, wsData);
+      }
+      return webSocketDataMap;
+    });
+  };
+
+  public updateContentType = async (_contentType: string) => {
+    const websocketData = this._tab.getValue();
+    webSocketDataStore.update((webSocketDataMap) => {
+      const wsData = webSocketDataMap.get(websocketData.tabId);
+      if (wsData) {
+        wsData.contentType = _contentType;
+        webSocketDataMap.set(websocketData.tabId, wsData);
+      }
+      return webSocketDataMap;
+    });
+  };
+
+  public updateMessageBody = async (_body: string) => {
+    const websocketData = this._tab.getValue();
+    webSocketDataStore.update((webSocketDataMap) => {
+      const wsData = webSocketDataMap.get(websocketData.tabId);
+      if (wsData) {
+        wsData.body = _body;
+        webSocketDataMap.set(websocketData.tabId, wsData);
+      }
+      return webSocketDataMap;
+    });
   };
 }
 
