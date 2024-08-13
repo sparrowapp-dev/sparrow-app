@@ -78,7 +78,6 @@ export class EnvironmentExplorerViewModel {
    */
   public updateVariables = async (_variable: any) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    // progressiveTab.isSave = false;
     progressiveTab.variable = _variable;
     progressiveTab.property.environment.variable = _variable;
     this.tab = progressiveTab;
@@ -99,7 +98,6 @@ export class EnvironmentExplorerViewModel {
       await this.environmentRepository.readEnvironment(
         progressiveTab.id,
       );
-
 
     if (!requestServer) {
       result = false;
@@ -216,7 +214,6 @@ export class EnvironmentExplorerViewModel {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       await this.updateRequestState({
         isSaveInProgress: false,
-        // isSave: true,
       });
       notifications.success(
         `Changes saved for ${currentEnvironment.name} environment.`,

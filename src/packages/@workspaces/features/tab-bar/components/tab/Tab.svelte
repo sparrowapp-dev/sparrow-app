@@ -19,7 +19,7 @@
 
   // ---- Interface
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-    import { StackIcon } from "@library/icons";
+  import { StackIcon } from "@library/icons";
   // ----
 
   // ------ Props ------
@@ -124,24 +124,30 @@
         <span>
           <BookIcon />
         </span>
-        {:else if tab.type === ItemType.ENVIRONMENT}
+      {:else if tab.type === ItemType.ENVIRONMENT}
         <span>
-          <StackIcon 
-          height={"14px"} width={"14px"} color={"var(--icon-secondary-130)"} />
+          <StackIcon
+            height={"14px"}
+            width={"14px"}
+            color={"var(--icon-secondary-130)"}
+          />
         </span>
       {/if}
       <span
-        class="font-weight-normal ms-1 text-fs-12 {!tab.isActive ? 'request-text' : ''}"
+        class="font-weight-normal ms-1 text-fs-12 {!tab.isActive
+          ? 'request-text'
+          : ''}"
         style={`color:  var(--text-secondary-100)`}
       >
         {tab.name}
       </span>
     </button>
     <!-- {console.log(tab?.property?.request, !tab?.isSaved)} -->
-    {#if tab?.property?.request && !tab?.isSaved}
+    {#if (tab?.property?.request || tab?.property?.environment) && !tab?.isSaved}
       {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
         <span
-          class="my-auto mx-1 opacity-{tab?.property?.request &&
+          class="my-auto mx-1 opacity-{(tab?.property?.request ||
+            tab?.property?.environment) &&
           !tab?.isSaved &&
           (tab?.source !== 'SPEC' || !tab?.activeSync || tab?.isDeleted)
             ? '1'
@@ -152,9 +158,10 @@
     {/if}
 
     <button
-      class="cross-icon-btn {!(tab?.property?.request && !tab?.isSaved) && !tab.isActive
+      class="cross-icon-btn {!(tab?.property?.request && !tab?.isSaved) &&
+      !tab.isActive
         ? 'inactive-close-btn'
-        : ''} btn  d-flex align-items-center px-1"
+        : ''} btn d-flex align-items-center px-1"
       on:click={() => {
         onTabClosed(tab.id, tab);
       }}
@@ -162,12 +169,12 @@
     >
       <Crossicon />
     </button>
-  {#if !tab.isActive}
-    <div
-      class="position-absolute"
-      style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
-    />
-  {/if}
+    {#if !tab.isActive}
+      <div
+        class="position-absolute"
+        style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
+      />
+    {/if}
   </div></button
 >
 
@@ -200,14 +207,14 @@
     color: var(--text-secondary-100) !important;
   }
 
-  .cross-icon-btn:hover{
+  .cross-icon-btn:hover {
     background-color: var(--text-tertiary-300);
     border-radius: 2px;
   }
-  .ellipsis{
-    color: var(--text-secondary-100) ;
+  .ellipsis {
+    color: var(--text-secondary-100);
   }
-  .ellipsis:hover{
-    color: var( --text-secondary-100) ;
+  .ellipsis:hover {
+    color: var(--text-secondary-100);
   }
 </style>

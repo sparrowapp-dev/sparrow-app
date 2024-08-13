@@ -157,9 +157,6 @@
           </div>
 
           <div class="position-relative">
-            {#if !$currentEnvironment.isSaved}
-              <div class="badge-data d-block"></div>
-            {/if}
             <Tooltip title="Save" placement="bottom" distance={10}>
               <WithButtonV3
                 icon={SaveIcon}

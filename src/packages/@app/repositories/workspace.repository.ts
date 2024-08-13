@@ -184,8 +184,6 @@ export class WorkspaceRepository {
     return;
   };
 
-  //This is pending task------
-
   /**
    * remove workspaces by teamId
    */
