@@ -108,7 +108,9 @@
       isExpandEnvironment = !isExpandEnvironment;
     }
     await onCreateEnvironment(localEnvironment);
-    scrollList("bottom");
+    setTimeout(() => {
+      scrollToBottom();
+    }, 1000);
   }
 
   $: filteredLocalEnvironment = searchData
@@ -122,6 +124,17 @@
         env.name.toLowerCase().includes(searchData.toLowerCase()),
       )
     : globalEnvironment;
+
+  let scrollDiv;
+
+  function scrollToBottom() {
+    if (scrollDiv) {
+      scrollDiv.scrollTo({
+        top: scrollDiv.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }
 </script>
 
 <div
@@ -129,7 +142,7 @@
   style="font-weight: 500;"
 >
   <div
-    class="d-flex align-items-center p-2 rounded-1 me-0 mb-1"
+    class="d-flex align-items-center p-2 rounded-1 me-0 mb-0"
     style="cursor:pointer; justify-content: space-between; height:32px;
       background-color: {isHovered
       ? 'var(--dropdown-option-hover)'
@@ -183,38 +196,37 @@
   </div>
 
   {#if isExpandEnvironment}
-    <div class="overflow-auto h-100 mb-2">
-      {#if filteredGlobalEnvironment && filteredGlobalEnvironment.length > 0}
-        <div class="mb-0">
-          <p
-            role="button"
-            class={`fw-normal mb-1  ps-5 env-item text-fs-12 border-radius-2 my-1 ${
-              globalEnvironment[0]?.id === activeTabId && "active"
-            }`}
-            on:click={() => {
-              onOpenGlobalEnvironment(globalEnvironment[0]);
-            }}
-          >
-            <span class="icon-default">
-              <StackIcon
-                height={"12px"}
-                width={"12px"}
-                color={"var(--icon-secondary-130)"}
-              />
-            </span>
-            <span class="icon-hover">
-              <StackFilled
-                height={"12px"}
-                width={"12px"}
-                color={"var(--icon-secondary-130)"}
-              />
-            </span>
-            <span class="ms-1">{globalEnvironment[0]?.name}</span>
-          </p>
-        </div>
-      {/if}
-
+    <div class="overflow-auto h-100 mb-2" bind:this={scrollDiv}>
       {#if filteredLocalEnvironment && localEnvironment.length === 0 && loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
+        {#if filteredGlobalEnvironment && filteredGlobalEnvironment.length > 0}
+          <div class="mb-0">
+            <p
+              role="button"
+              class={`fw-normal mb-1  ps-5 env-item text-fs-12 border-radius-2 my-1 ${
+                globalEnvironment[0]?.id === activeTabId && "active"
+              }`}
+              on:click={() => {
+                onOpenGlobalEnvironment(globalEnvironment[0]);
+              }}
+            >
+              <span class="icon-default">
+                <StackIcon
+                  height={"12px"}
+                  width={"12px"}
+                  color={"var(--icon-secondary-130)"}
+                />
+              </span>
+              <span class="icon-hover">
+                <StackFilled
+                  height={"12px"}
+                  width={"12px"}
+                  color={"var(--icon-secondary-130)"}
+                />
+              </span>
+              <span class="ms-1">{globalEnvironment[0]?.name}</span>
+            </p>
+          </div>
+        {/if}
         <div class={`pb-2`}>
           <p
             class={`mx-1 add-env-desc-text mb-3 text-fs-12 mb-0 fw-normal text-center`}
@@ -245,7 +257,6 @@
       {/if}
 
       {#if filteredLocalEnvironment && filteredLocalEnvironment.length > 0}
-        <hr class="mb-1 mt-1 ms-5 me-2" />
         <!-- <div class="mb-1 mt-0 ms-5 me-2" style="height: 1px; background-color:white"></div> -->
         <List
           bind:scrollList
@@ -254,6 +265,37 @@
           classProps={"pe-1"}
           style={"flex:1;"}
         >
+          {#if filteredGlobalEnvironment && filteredGlobalEnvironment.length > 0}
+            <div class="mb-0">
+              <p
+                role="button"
+                class={`fw-normal mb-1  ps-5 env-item text-fs-12 border-radius-2 my-1 ${
+                  globalEnvironment[0]?.id === activeTabId && "active"
+                }`}
+                on:click={() => {
+                  onOpenGlobalEnvironment(globalEnvironment[0]);
+                }}
+              >
+                <span class="icon-default">
+                  <StackIcon
+                    height={"12px"}
+                    width={"12px"}
+                    color={"var(--icon-secondary-130)"}
+                  />
+                </span>
+                <span class="icon-hover">
+                  <StackFilled
+                    height={"12px"}
+                    width={"12px"}
+                    color={"var(--icon-secondary-130)"}
+                  />
+                </span>
+                <span class="ms-1">{globalEnvironment[0]?.name}</span>
+              </p>
+            </div>
+            <hr class="mb-1 mt-1 ms-5 me-2" />
+          {/if}
+
           {#each filteredLocalEnvironment as env}
             <ListItem
               bind:loggedUserRoleInWorkspace

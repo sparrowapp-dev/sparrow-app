@@ -27,11 +27,13 @@
    */
   const findUserRole = async () => {
     const workspace: WorkspaceDocument = await _viewModel.getWorkspace();
-    workspace.users?.forEach((value) => {
-      if (value.id === userId) {
-        userRole = value.role;
-      }
-    });
+    if (workspace) {
+      workspace.users?.forEach((value) => {
+        if (value.id === userId) {
+          userRole = value.role;
+        }
+      });
+    }
   };
   let prevTabName = "";
   $: {

@@ -1486,13 +1486,23 @@ class RestExplorerViewModel
           payload,
         );
 
-        //this is pending 
+        let currentTab = await this.tabRepository.getTabById(environmentVariables.global.id);
+        if(currentTab){
+          let currentTabId= currentTab.tabId
+          let data = {
+            property: {
+              environment : {
+                variable: payload.variable,
+                state:{
+                  isSaveInProgress:true
+                }
+                  
+              }
+            }
+          }
+          await this.tabRepository.updateTab(currentTabId as string, data)
+        }
 
-        // updates environment tab
-        // await this.environmentTabRepository.updateEnvironmentTab(
-        //   environmentVariables.global.id,
-        //   { variable: payload.variable, isSave: true },
-        // );
         notifications.success("Environment Variable Added");
         return {
           isSuccessful: true,
@@ -1510,13 +1520,23 @@ class RestExplorerViewModel
           response.data.data,
         );
 
-        //this is pending 
+        let currentTab = await this.tabRepository.getTabById(response.data.data._id);
+        if(currentTab){
+          let currentTabId= currentTab.tabId
+          let data = {
+            property: {
+              environment : {
+                variable: response.data.data.variable,
+                state:{
+                  isSaveInProgress:true
+                }
+                  
+              }
+            }
+          }
+          await this.tabRepository.updateTab(currentTabId as string, data)
+        }
 
-        // updates environment tab
-        // await this.environmentTabRepository.updateEnvironmentTab(
-        //   response.data.data._id,
-        //   { variable: response.data.data.variable, isSave: true },
-        // );
         notifications.success("Environment Variable Added");
       } else {
         notifications.error("Failed to add Environment Variable");
@@ -1553,13 +1573,23 @@ class RestExplorerViewModel
           payload,
         );
 
-        //this is pending 
+        let currentTab = await this.tabRepository.getTabById(environmentVariables.local.id);
+        if(currentTab){
+          let currentTabId= currentTab.tabId
+          let data = {
+            property: {
+              environment : {
+                variable: payload.variable,
+                state:{
+                  isSaveInProgress:true
+                }
+                  
+              }
+            }
+          }
+          await this.tabRepository.updateTab(currentTabId as string, data)
+        }
 
-        // updates environment tab
-        // await this.environmentTabRepository.updateEnvironmentTab(
-        //   environmentVariables.local.id,
-        //   { variable: payload.variable, isSave: true },
-        // );
         notifications.success("Environment Variable Added");
         return {
           isSuccessful: true,
@@ -1578,12 +1608,23 @@ class RestExplorerViewModel
           response.data.data,
         );
 
-        //This is pending
-        // updates environment tab
-        // await this.environmentTabRepository.updateEnvironmentTab(
-        //   response.data.data._id,
-        //   { variable: response.data.data.variable, isSave: true },
-        // );
+        let currentTab = await this.tabRepository.getTabById(response.data.data._id);
+        if(currentTab){
+          let currentTabId= currentTab.tabId
+          let data = {
+            property: {
+              environment : {
+                variable: response.data.data.variable,
+                state:{
+                  isSaveInProgress:true
+                }
+                  
+              }
+            }
+          }
+          await this.tabRepository.updateTab(currentTabId as string, data)
+        }
+
         notifications.success("Environment Variable Added");
       } else {
         notifications.error("Failed to add Environment Variable");

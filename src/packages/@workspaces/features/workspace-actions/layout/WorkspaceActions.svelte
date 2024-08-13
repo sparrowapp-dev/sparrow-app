@@ -390,11 +390,12 @@
       <!-----Collection Section------>
       <div
         class="ps-1"
+        class:not-opened-any={!isExpandCollection && !isExpandEnvironment}
         class:full-height={isExpandCollection && !isExpandEnvironment}
         class:half-height={isExpandCollection && isExpandEnvironment}
       >
         <CollectionList
-         {scrollList}
+          bind:scrollList
           bind:userRole
           {onRefetchCollection}
           {showImportCurlPopup}
@@ -422,6 +423,7 @@
 
       <div
         class="ps-1"
+        class:not-opened-any={!isExpandCollection && !isExpandEnvironment}
         class:full-height={isExpandEnvironment && !isExpandCollection}
         class:half-height={isExpandCollection && isExpandEnvironment}
       >
@@ -506,10 +508,13 @@
 {/if}
 
 <style>
- 
-  .full-height {
-    height: calc(100vh - 192px);
+  .not-opened-any {
+    height: 37px;
   }
+  .full-height {
+    height: calc(100% - 40px);
+  }
+
   .half-height {
     height: 49%;
   }

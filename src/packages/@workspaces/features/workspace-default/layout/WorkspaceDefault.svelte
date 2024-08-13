@@ -10,7 +10,7 @@
 
 <div
   class="d-flex flex-column align-items-center h-100 "
-  style="padding-top: 124px; padding-right:325px; padding-left:325px; padding-bottom: 24px; overflow:auto;"
+  style="padding-top: 124px; padding-right:325px; padding-left:325px; padding-bottom: 24px;"
 >
   <div style="height: 176px; width: 175px; margin-bottom: 24px;">
     <SparrowLogo />

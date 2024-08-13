@@ -250,7 +250,7 @@
             : 'collections-inactive'}"
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
           on:click|stopPropagation={() => {
-           isExpandCollection=true;
+            isExpandCollection=true;
             isGuestUser 
               ? onItemCreated("collection", {
                   workspaceId: currentWorkspaceId,
