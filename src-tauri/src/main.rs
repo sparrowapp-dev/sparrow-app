@@ -65,6 +65,18 @@ use tauri::Window;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
 use utils::response_decoder::decode_response_body;
+
+
+// Web socket imports 
+use futures::{SinkExt, StreamExt};
+use http::header::HeaderValue;
+use native_tls::TlsConnector;
+use std::sync::Arc;
+use tauri::AppHandle;
+use tokio::sync::mpsc::{self, UnboundedSender};
+use tokio::sync::Mutex;
+use tokio_tungstenite::tungstenite::protocol::Message;
+use tokio_tungstenite::{connect_async, tungstenite::handshake::client::Request, Connector};
 #[cfg(target_os = "macos")]
 #[macro_use]
 extern crate objc;
@@ -460,6 +472,216 @@ struct SingleInstancePayload {
     args: Vec<String>,
     cwd: String,
 }
+
+#[derive(Clone)]
+struct TabConnection {
+    sender: UnboundedSender<String>,
+    disconnect_handle: Arc<Mutex<Option<tokio::sync::oneshot::Sender<()>>>>,
+}
+
+struct AppState {
+    connections: Mutex<std::collections::HashMap<String, TabConnection>>,
+}
+
+#[derive(Serialize)]
+struct WebSocketResponse {
+    is_successful: bool,
+    status_code: u16,
+    message: String,
+    headers: Option<HashMap<String, String>>,
+}
+
+#[tauri::command]
+async fn connect_websocket(
+    url: String,
+    tabid: String,
+    headers: String, // Stringified JSON headers
+    state: tauri::State<'_, Arc<AppState>>,
+    app_handle: tauri::AppHandle,
+) -> Result<String, String> {
+    println!("inside the websocket");
+
+    // Deserialize the JSON string into a Vec<KeyValue>
+    let headers_key_values: Vec<KeyValue> =
+        serde_json::from_str(&headers).map_err(|e| format!("Failed to parse headers: {}", e))?;
+
+    // Create a HashMap to store key-value pairs
+    let mut headers_key_value_map: HashMap<String, String> = HashMap::new();
+
+    // Iterate over key_values and add key-value pairs to the map
+    for kv in headers_key_values {
+        headers_key_value_map.insert(kv.key, kv.value);
+    }
+
+    // Create request builder with URL
+    let mut request = Request::builder().uri(&url);
+
+    // Add all headers to the request builder
+    for (key, value) in headers_key_value_map.iter() {
+        request = request.header(
+            key,
+            HeaderValue::from_str(value).map_err(|e| format!("Invalid header value: {}", e))?,
+        );
+    }
+
+    // Connect to the WebSocket
+    let (ws_stream, response) = connect_async(request.body(()).unwrap())
+        .await
+        .map_err(|e| format!("Failed to connect: {}", e))?;
+
+    // Extract headers from the response
+    let mut response_headers = HashMap::new();
+    for (key, value) in response.headers() {
+        if let Ok(header_value) = value.to_str() {
+            response_headers.insert(key.as_str().to_string(), header_value.to_string());
+        }
+    }
+
+    let (mut write, mut read) = ws_stream.split();
+
+    let (tx, mut rx) = mpsc::unbounded_channel::<String>();
+
+    let (disconnect_tx, disconnect_rx) = tokio::sync::oneshot::channel();
+    let disconnect_handle = Arc::new(Mutex::new(Some(disconnect_tx)));
+
+    state.connections.lock().await.insert(
+        tabid.clone(),
+        TabConnection {
+            sender: tx,
+            disconnect_handle: disconnect_handle.clone(),
+        },
+    );
+
+    let svelte_tabid = tabid.clone();
+    let app_handle_clone = app_handle.clone();
+    tokio::spawn(async move {
+        tokio::select! {
+            _ = disconnect_rx => {
+                // Handle disconnection here
+                println!("WebSocket connection closed for tab: {}", svelte_tabid);
+            }
+            _ = async {
+                while let Some(message) = read.next().await {
+                    if let Ok(msg) = message {
+                        if let Message::Text(text) = msg {
+                            app_handle_clone
+                                .emit(&format!("ws_message_{}", svelte_tabid), text)
+                                .unwrap();
+                        }
+                    }
+                }
+            } => {}
+        }
+    });
+
+    tokio::spawn(async move {
+        while let Some(msg) = rx.recv().await {
+            write
+                .send(Message::Text(msg))
+                .await
+                .map_err(|e| format!("Failed to send message: {}", e))
+                .unwrap();
+        }
+    });
+
+    // Create a success response
+    let response = WebSocketResponse {
+        is_successful: true,
+        status_code: 200,
+        message: "Connected Successfully".to_string(),
+        headers: Some(response_headers),
+        // initial_data: Some(initial_data),
+    };
+
+    // Serialize the response to a JSON string and return it
+    let response_json = serde_json::to_string(&response)
+        .map_err(|e| format!("Failed to serialize response: {}", e))?;
+
+    Ok(response_json)
+}
+
+#[tauri::command]
+async fn send_websocket_message(
+    tabid: String,
+    message: String,
+    state: tauri::State<'_, Arc<AppState>>,
+) -> Result<String, String> {
+    if let Some(connection) = state.connections.lock().await.get(&tabid) {
+        connection
+            .sender
+            .send(message)
+            .map_err(|e| format!("Failed to send message: {}", e))?;
+    } else {
+        return Err("Connection not found".to_string());
+    }
+
+    // Create a success response
+    let response = WebSocketResponse {
+        is_successful: true,
+        status_code: 200,
+        message: "Message sent successfully".to_string(),
+        headers: None, // Set headers to None or provide actual headers if needed
+    };
+
+    // Serialize the response to a JSON string and return it
+    let response_json = serde_json::to_string(&response)
+        .map_err(|e| format!("Failed to serialize response: {}", e))?;
+
+    Ok(response_json)
+}
+
+#[derive(Serialize)]
+struct DisconnectResponse {
+    is_successful: bool,
+    status_code: u16,
+    message: String,
+}
+
+#[tauri::command]
+async fn disconnect_websocket(
+    tabid: String,
+    state: tauri::State<'_, Arc<AppState>>,
+) -> Result<String, String> {
+    let mut connections = state.connections.lock().await;
+
+    if let Some(connection) = connections.remove(&tabid) {
+        // Access the disconnect handle
+        let mut handle_lock = connection.disconnect_handle.lock().await;
+
+        // Check if there is a Sender inside the Option
+        if let Some(sender) = std::mem::take(&mut *handle_lock) {
+            // Send the signal to close the WebSocket connection
+            let _ = sender.send(());
+        }
+
+        // Create a success response
+        let response = DisconnectResponse {
+            is_successful: true,
+            status_code: 200,
+            message: "WebSocket connection disconnected successfully".to_string(),
+        };
+
+        // Serialize the response to a JSON string and return it
+        let response_json = serde_json::to_string(&response)
+            .map_err(|e| format!("Failed to serialize response: {}", e))?;
+
+        return Ok(response_json);
+    } else {
+        // Return an error if the connection was not found
+        let response = DisconnectResponse {
+            is_successful: false,
+            status_code: 404,
+            message: "WebSocket connection not found".to_string(),
+        };
+
+        // Serialize the error response to a JSON string and return it
+        let response_json = serde_json::to_string(&response)
+            .map_err(|e| format!("Failed to serialize response: {}", e))?;
+
+        return Err(response_json);
+    }
+}
+
 // Driver Function
 fn main() {
     // Initiate Tauri Runtime
@@ -494,6 +716,10 @@ fn main() {
             #[cfg(desktop)]
             app.handle()
                 .plugin(tauri_plugin_updater::Builder::new().build())?;
+            let app_handle = app.handle().clone();
+            app.manage(Arc::new(AppState {
+                connections: Mutex::new(std::collections::HashMap::new()),
+            }));
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -506,6 +732,9 @@ fn main() {
             make_http_request,
             zoom_window,
             make_http_request_v2,
+            connect_websocket,
+            send_websocket_message,
+            disconnect_websocket
         ])
         .on_page_load(|wry_window, _payload| {
             if wry_window.url().host_str() == Some("www.google.com") {
