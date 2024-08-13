@@ -191,7 +191,7 @@
   };
 
   const handleCreateCollection = async (collectionName: string) => {
-    createDirectoryLoader = true;     
+    createDirectoryLoader = true;
     const res = await onCreateCollection(workspaceMeta, collectionName);
     if (res.status === "success") {
       latestRoute = res.data.latestRoute;
@@ -774,7 +774,7 @@
         rows="5"
         maxlength="1024"
         placeholder="Give a description to help people know about this request"
-        bind:value={description}
+        disabled={true}
       />
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>

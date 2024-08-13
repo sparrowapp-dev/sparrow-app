@@ -806,6 +806,137 @@ span {
   text-overflow: ellipsis;
 }
 
+// Customization for the markdown editor
+
+.ce-toolbar__actions.ce-toolbar__actions--opened{
+ right: 116%;
+}
+.codex-editor__redactor{
+ border: none;
+ overflow-y: scroll;
+ padding-left: 16px;
+ padding-top: 10px;
+ height: 160px !important;
+  padding-bottom: 30px !important;
+  border: 1px solid transparent;
+
+}
+
+.codex-editor__redactor::selection{
+  background-color: var(--bg-primary-300) !important;
+  color: white !important;
+}
+.ce-paragraph::selection{
+  background-color: var(--bg-primary-300) !important;
+  color: white !important;
+}
+
+.ce-block__content{
+  background: transparent !important;
+  color: white !important;
+}
+
+.ce-block__content::selection{
+  background-color: var(--bg-primary-300) !important;
+  color: white !important;
+}
+
+.cdx-block::selection{
+  background-color: var(--bg-primary-300) !important;
+  color: white !important;
+}
+
+.ce-block::selection{
+  background-color: var(--bg-primary-300)  !important;
+  color: white !important;
+}
+
+
+.ce-toolbar__settings-btn{
+  display: none;
+  right:147% !important;
+
+}
+.ce-toolbar__plus{
+  position: absolute;
+  right:147% !important;
+  display: none;
+
+}
+
+.ce-block__content{
+  max-width: none !important;
+}
+.cdx-block{
+  padding:0px;
+  width: 100%;  
+}
+
+.ce-popover{
+  position: absolute;
+  z-index: 10001 !important;
+
+  left: -91px;
+  top: 19px;
+  background-color: #262626;
+} 
+.ce-popover__container{
+  background-color: #262626;
+  left: -50px;
+  z-index: 1001 !important;
+  border: none !important;
+  width: 70px !important;
+}
+
+.inline-code{
+  background-color: #242426 !important ;
+  color: #D35354;
+}
+
+ .ce-popover__search{
+   background-color: transparent;
+}
+.ce-block--selected{
+  background-color: transparent !important;
+  color: transparent !important;  
+  background: transparent;
+}
+
+ .ce-inline-tool { 
+  color: #8E91A4;
+
+  background-color: #262626;
+}
+
+.ce-inline-tool:hover { 
+  color: #8E91A4;
+  background-color: #313233;
+}
+
+.ce-code__textarea.cdx-input{
+  background-color: #242426;
+  color: #ffffff ;
+  border: none;
+}
+.ce-inline-tool--italic:hover{
+  background-color: #313233 !important;
+  color: #8E91A4;
+}
+
+.ce-popover-item-separator{
+  display: none !important;
+}
+.ce-inline-tool--italic{
+  color: #8E91A4;
+}
+.ce-popover-item{
+  color: #8E91A4;
+}
+
+.ce-popover-item:hover{
+  background-color: #313233 !important;
+  color: #8E91A4;
+}
 
 /* Customize scrollbar for WebKit browsers */
 

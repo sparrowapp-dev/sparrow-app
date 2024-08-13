@@ -3,42 +3,39 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { generatingImage } from "@common/images";
   import { AISuggestionBox } from "@workspaces/features/chat-bot/components";
+  import Markdown from "./Markdown.svelte";
+
   export let onUpdateRequestDescription;
   export let isDocGenerating = false;
   export let isDocAlreadyGenerated = false;
-  export let requestDoc: string;
   export let onGenerateDocumentation;
   export let isGuestUser;
+  export let requestDoc;
+  let response;
 
   const sendPrompt = async (text: string) => {
     if (text) {
-      const response = await onGenerateDocumentation(text, "", "");
+      response = await onGenerateDocumentation(text, "", "");
     }
   };
 </script>
 
 <div class=" text-fs-14">
-  <div class="d-flex" style="justify-content: space-between;">
+  <div class="d-flex" style="justify-content: space-between; margin-top: 10px;">
     <div style="font-weight: 600; margin-bottom:8px;">Documentation</div>
   </div>
-  <div style="height: 160px !important; " class="area">
+  <div style="height: 210px !important; " class="area">
     <div on:keydown|stopPropagation on:keyup|stopPropagation>
-      <textarea
-        bind:value={requestDoc}
-        on:input={() => {
-          onUpdateRequestDescription(requestDoc);
-        }}
-        class="text-fs-12 w-100 border-0"
-        style="height:120px !important; font-weight:400; background-color:transparent; outline: none;   padding-bottom:5px; padding-top: 8px; padding-left: 12px; padding-right: 12px;"
-        placeholder="Add Documentation"
-      ></textarea>
+      <div>
+        <Markdown bind:response {onUpdateRequestDescription} {requestDoc} />
+      </div>
     </div>
     {#if !isGuestUser}
       <div
         class=""
-        style="height: 42px; width: 100%;margin-top:-6px; padding-bottom:8px; padding-left:8px; "
+        style="height: 42px; width: 100%; padding-bottom:8px; padding-left:16px; "
       >
-        <div style="width:fit-content; margin-top:6px; ">
+        <div style="width:fit-content;] ">
           {#if isDocGenerating == true}
             <div
               class="text-primary-300 mt-1"
@@ -73,14 +70,18 @@
         </div>
       </div>
     {/if}
+    <div></div>
   </div>
 </div>
 
 <style>
-  .area:focus-within {
+  .area:hover {
     border: 1px solid var(--border-primary-300) !important;
   }
   .area:hover {
     background-color: var(--bg-secondary-450) !important;
+  }
+  .area::selection {
+    background-color: black !important;
   }
 </style>
