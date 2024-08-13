@@ -37,6 +37,7 @@
    * Flag to check if user is guest user
    */
   export let isGuestUser = false;
+  let workspacePerPage = 5;
   let filterText = "";
   let currPage = 1;
 
