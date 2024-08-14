@@ -43,8 +43,18 @@
       }
     });
   };
+
+  const renameWithCollectionList = new Debounce().debounce(
+    _viewModel.updateNameWithCollectionList,
+    1000,
+  );
+  let prevTabName = "";
   $: {
     if (tab) {
+      if (tab?.name && prevTabName !== tab.name) {
+        renameWithCollectionList(tab.name);
+      }
+      prevTabName = tab.name;
       findUserRole();
     }
   }

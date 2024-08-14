@@ -285,13 +285,13 @@ class RestExplorerViewModel {
    * @description - updates request tab name
    * @param _name - new request name
    */
-  //   public updateNameWithCollectionList = async (_name: string) => {
-  //     const progressiveTab = createDeepCopy(this._tab.getValue());
-  //     if (_name !== progressiveTab.name) {
-  //       progressiveTab.name = _name;
-  //     }
-  //     this.tab = progressiveTab;
-  //   };
+  public updateNameWithCollectionList = async (_name: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (_name !== progressiveTab.name) {
+      progressiveTab.name = _name;
+    }
+    this.tab = progressiveTab;
+  };
 
   /**
    *
