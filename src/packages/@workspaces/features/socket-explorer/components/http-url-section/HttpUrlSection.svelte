@@ -1,11 +1,8 @@
 <script lang="ts">
-  import { RequestMethod, WorkspaceRole } from "$lib/utils/enums";
+  import { WorkspaceRole } from "$lib/utils/enums";
 
-  import { Select } from "@library/forms";
   import type {
     SaveRequestType,
-    SendRequestType,
-    UpdateRequestMethodType,
     UpdateRequestUrlType,
   } from "@workspaces/common/type";
   import { notifications } from "@library/ui/toast/Toast";
@@ -94,7 +91,7 @@
         if (webSocket?.status === "connected") {
           onDisconnect();
         } else if (webSocket?.status === "disconnected" || !webSocket?.status) {
-          onConnect();
+          onConnect(environmentVariables);
         }
       }
     }}
