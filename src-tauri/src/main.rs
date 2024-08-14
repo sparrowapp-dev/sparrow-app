@@ -524,8 +524,13 @@ async fn connect_websocket(
         );
     }
 
+    // Create the request with a potential error handling
+    let request = request
+        .body(())
+        .map_err(|e| format!("Failed to build request: {}", e))?;
+
     // Connect to the WebSocket
-    let (ws_stream, response) = connect_async(request.body(()).unwrap())
+    let (ws_stream, response) = connect_async(request)
         .await
         .map_err(|e| format!("Failed to connect: {}", e))?;
 
