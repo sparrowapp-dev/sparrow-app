@@ -4,13 +4,14 @@ export type WebSocketData = {
   messages: {
     data: string;
     transmitter: string;
-    timestamp: Date;
+    timestamp: string;
     uuid: string;
   }[];
   status: "connected" | "disconnected" | "connecting" | "disconnecting";
   search: string;
   body: string;
   contentType: string;
+  url: string;
 };
 
 export const webSocketDataStore = writable<Map<string, WebSocketData>>(

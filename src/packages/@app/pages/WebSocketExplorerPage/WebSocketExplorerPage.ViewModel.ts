@@ -1428,7 +1428,6 @@ class RestExplorerViewModel {
     const websocketData = this._tab.getValue();
     return await this.webSocketService.disconnectWebsocket(
       websocketData?.tabId,
-      websocketData.property?.websocket?.url as string,
     );
   };
   public sendMessageWebsocket = async () => {
@@ -1458,6 +1457,7 @@ class RestExplorerViewModel {
       if (wsData) {
         wsData.search = "";
         wsData.messages = [];
+        wsData.body = "";
         webSocketDataMap.set(websocketData.tabId, wsData);
       }
       return webSocketDataMap;

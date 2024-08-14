@@ -12,8 +12,8 @@ export class WebSocketService {
   ) => {
     return connectWebSocket(_url, _tabId, _headers);
   };
-  public disconnectWebsocket = async (_tabId: string, _url: string) => {
-    return disconnectWebSocket(_tabId, _url);
+  public disconnectWebsocket = async (_tabId: string) => {
+    return disconnectWebSocket(_tabId);
   };
   public sendMessageWebsocket = async (_tabId: string, _message: string) => {
     return sendMessage(_tabId, _message);

@@ -239,11 +239,14 @@ const sendMessage = async (tab_id: string, message: string) => {
  * @param tab_id - The ID of the tab for which the WebSocket connection should be disconnected.
  *
  */
-const disconnectWebSocket = async (tab_id: string, _url: string) => {
+const disconnectWebSocket = async (tab_id: string) => {
+  let url = "";
   webSocketDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
     if (wsData) {
+      url = wsData.url;
       wsData.status = "disconnecting";
+      wsData.url = "";
       webSocketDataMap.set(tab_id, wsData);
     }
     return webSocketDataMap;
@@ -257,7 +260,7 @@ const disconnectWebSocket = async (tab_id: string, _url: string) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
             wsData.messages.push({
-              data: `Disconnected from ${_url}`,
+              data: `Disconnected from ${url}`,
               transmitter: "disconnector",
               timestamp: formatTime(new Date()),
               uuid: uuidv4(),
@@ -306,6 +309,7 @@ const connectWebSocket = async (
       search: "",
       contentType: RequestDataTypeEnum.TEXT,
       body: "",
+      url: url,
     });
 
     return webSocketDataMap;
