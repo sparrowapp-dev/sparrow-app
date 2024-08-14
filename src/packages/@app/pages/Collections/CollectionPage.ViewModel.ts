@@ -991,9 +991,16 @@ export default class CollectionsViewModel {
     const response =
       await this.collectionService.importCollectionFromCurl(importCurl);
     if (response.isSuccessful) {
-      return true;
+      const method = await response?.data?.data?.request?.method;
+      const isSuccessful = response.isSuccessful;
+      return {
+        isSuccessful: isSuccessful,
+        method: method,
+      };
     } else {
-      return false;
+      return {
+        isSuccessful: false,
+      };
     }
   };
 
