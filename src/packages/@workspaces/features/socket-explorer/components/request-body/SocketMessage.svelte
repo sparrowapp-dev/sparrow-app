@@ -11,6 +11,7 @@
     isBodyBeautified = value;
   };
   export let onSendMessage;
+  export let onClearInput;
 </script>
 
 <div class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative">
@@ -24,7 +25,7 @@
       <div style="flex:1; overflow:auto;">
         <Raw
           onUpdateRequestBody={onUpdateMessage}
-          lang={requestState.socketMessageLanguage}
+          lang={requestState?.socketMessageLanguage}
           value={body}
           {isBodyBeautified}
           {updateBeautifiedState}
@@ -39,6 +40,9 @@
           <span
             class="input-cleaner px-2 border-radius-2 py-1 text-fs-12 text-secondary-200"
             role="button"
+            on:click={() => {
+              onClearInput();
+            }}
           >
             <span class="me-2"
               ><CleanerIcon

@@ -125,7 +125,6 @@
   let webSocketData;
   webSocketDataStore.subscribe((webSocketMap) => {
     webSocketData = webSocketMap.get(tab.tabId);
-    console.log(webSocketData);
   });
 </script>
 
@@ -162,4 +161,5 @@
   onDeleteMessage={_viewModel.deleteMessages}
   onUpdateContentType={_viewModel.updateContentType}
   onUpdateMessageBody={_viewModel.updateMessageBody}
+  onClearInput={_viewModel.clearInput}
 />

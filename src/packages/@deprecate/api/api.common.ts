@@ -17,6 +17,7 @@ import { listen } from "@tauri-apps/api/event";
 import { webSocketDataStore } from "@workspaces/features/socket-explorer/store";
 import { v4 as uuidv4 } from "uuid";
 import { RequestDataTypeEnum } from "@common/types/workspace";
+import { notifications } from "@library/ui/toast/Toast";
 
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
@@ -242,7 +243,7 @@ const disconnectWebSocket = async (tab_id: string, _url: string) => {
   webSocketDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
     if (wsData) {
-      wsData.status = "inprogress";
+      wsData.status = "disconnecting";
       webSocketDataMap.set(tab_id, wsData);
     }
     return webSocketDataMap;
@@ -266,13 +267,18 @@ const disconnectWebSocket = async (tab_id: string, _url: string) => {
           }
           return webSocketDataMap;
         });
+        notifications.success("WebSocket disconnected successfully.");
       } catch (e) {
         console.error(e);
+        notifications.error(
+          "Failed to disconnect WebSocket. Please try again.",
+        );
         return error("error");
       }
     })
     .catch((e) => {
       console.error(e);
+      notifications.error("Failed to disconnect WebSocket. Please try again.");
       return error("error");
     });
 };
@@ -296,10 +302,10 @@ const connectWebSocket = async (
   webSocketDataStore.update((webSocketDataMap) => {
     webSocketDataMap.set(tabId, {
       messages: [],
-      status: "inprogress",
+      status: "connecting",
       search: "",
       contentType: RequestDataTypeEnum.TEXT,
-      body: "asif",
+      body: "",
     });
 
     return webSocketDataMap;
@@ -331,6 +337,7 @@ const connectWebSocket = async (
           }
           return webSocketDataMap;
         });
+        notifications.success("WebSocket connected successfully");
 
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
         listen(`ws_message_${tabId}`, (event) => {
@@ -352,11 +359,19 @@ const connectWebSocket = async (
         });
       } catch (e) {
         console.error(e);
+        notifications.error(
+          "Failed to fetch WebSocket response. Please try again.",
+        );
         return error("error");
       }
     })
     .catch((e) => {
       console.error(e);
+      webSocketDataStore.update((webSocketDataMap) => {
+        webSocketDataMap.delete(tabId);
+        return webSocketDataMap;
+      });
+      notifications.error("Failed to connect WebSocket. Please try again.");
       return error("error");
     });
 };

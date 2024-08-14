@@ -36,7 +36,7 @@
 
   const handleCopy = async () => {
     await copyToClipBoard(formatCode(webSocket?.body));
-    notifications.success("Copied to Clipboard");
+    notifications.success("Copied to clipboard");
     MixpanelEvent(Events.COPY_API_RESPONSE);
   };
 
@@ -84,17 +84,20 @@
     // write our file
     await writableStream.write(formatCode(webSocket?.body));
     await writableStream.close();
-    notifications.success("Response downloaded");
+    notifications.success("Exported successfully.");
     MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
   };
 </script>
 
-<div class="d-flex flex-column align-items-start justify-content-between w-100">
+<div
+  class="d-flex flex-column align-items-start justify-content-between w-100 bg-tertiary-300 px-3 pt-1"
+>
   <div
     class="response-container d-flex align-items-center pb-1 px-0 justify-content-between w-100 z-1 position-sticky"
     style="top:55.4px;  margin-top: -1px;"
   >
     <div class="d-flex gap-3 align-items-center justify-content-center">
+      <span class="text-fs-12">Received </span>
       <span class="">
         <WithSelect
           id={"hashdew565"}
@@ -129,14 +132,6 @@
     </div>
 
     <div class="d-flex align-items-center gap-2">
-      <!-- Download button -->
-      <div
-        on:click={handleDownloaded}
-        role="button"
-        class="icon-container d-flex align-items-center justify-content-center border-radius-2"
-      >
-        <img src={downloadIcon} style="height:12px; width:12px;" />
-      </div>
       <!-- Copy button -->
       <div
         on:click={handleCopy}
@@ -144,6 +139,14 @@
         class="icon-container d-flex align-items-center justify-content-center border-radius-2"
       >
         <img src={copyIcon} style="height:12px; width:12px;" />
+      </div>
+      <!-- Download button -->
+      <div
+        on:click={handleDownloaded}
+        role="button"
+        class="icon-container d-flex align-items-center justify-content-center border-radius-2"
+      >
+        <img src={downloadIcon} style="height:12px; width:12px;" />
       </div>
     </div>
   </div>

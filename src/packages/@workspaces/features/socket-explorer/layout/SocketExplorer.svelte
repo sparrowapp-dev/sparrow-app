@@ -65,14 +65,9 @@
   export let onDeleteMessage;
   export let onUpdateMessageBody;
   export let onUpdateContentType;
+  export let onClearInput;
 
   let isExposeSaveAsSocket = false;
-  // let isLoading = false;
-  //   $: {
-  //     if ($tab?.property?.request?.url?.length > 0) {
-  //       isLoading = false;
-  //     }
-  //   }
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsSocket = flag;
   };
@@ -87,8 +82,6 @@
         isSave={$tab.isSaved}
         bind:userRole
         requestUrl={$tab.property.websocket?.url}
-        isSendRequestInProgress={$tab.property.websocket?.state
-          ?.isSendRequestInProgress}
         {onUpdateEnvironment}
         {environmentVariables}
         {onUpdateRequestUrl}
@@ -140,11 +133,12 @@
               <div style="flex:1; overflow:auto;" class="p-0">
                 {#if $tab.property.websocket?.state?.socketNavigation === SocketSectionEnum.MESSAGE}
                   <SocketMessage
-                    body={$tab.property.websocket.message}
-                    requestState={$tab.property.websocket.state}
+                    body={$tab?.property?.websocket?.message}
+                    requestState={$tab?.property?.websocket?.state}
                     {onUpdateMessage}
                     {onUpdateRequestState}
                     {onSendMessage}
+                    {onClearInput}
                   />
                 {:else if $tab.property.websocket?.state?.socketNavigation === SocketSectionEnum.PARAMETERS}
                   <SocketParameters
@@ -186,20 +180,29 @@
                   {#if !webSocket}
                     <ResponseDefaultScreen />
                   {:else}
-                    <!-- response sttaus implementation -->
-                    <ResponseData
-                      {webSocket}
-                      {onSearchMessage}
-                      {onDeleteMessage}
-                      {onUpdateMessageBody}
-                      {onUpdateContentType}
-                    />
-                    <!-- response body implementation -->
-                    <ResponsePreviewNavigator
-                      {webSocket}
-                      {onUpdateContentType}
-                    />
-                    <ResponsePreview {webSocket} />
+                    <div class="h-100 flex-column">
+                      <div style="overflow:auto; height:50%;">
+                        <ResponseData
+                          {webSocket}
+                          {onSearchMessage}
+                          {onDeleteMessage}
+                          {onUpdateMessageBody}
+                          {onUpdateContentType}
+                        />
+                      </div>
+                      <div style="overflow:auto; height:50%;">
+                        <div class="h-100 d-flex flex-column">
+                          <ResponsePreviewNavigator
+                            {webSocket}
+                            {onUpdateContentType}
+                          />
+                          <div class="pt-2"></div>
+                          <div style="flex:1; overflow:auto;">
+                            <ResponsePreview {webSocket} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   {/if}
                 </div>
               </div>

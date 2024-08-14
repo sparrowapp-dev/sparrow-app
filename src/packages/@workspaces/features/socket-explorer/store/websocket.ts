@@ -7,7 +7,7 @@ export type WebSocketData = {
     timestamp: Date;
     uuid: string;
   }[];
-  status: "connected" | "disconnected" | "inprogress";
+  status: "connected" | "disconnected" | "connecting" | "disconnecting";
   search: string;
   body: string;
   contentType: string;

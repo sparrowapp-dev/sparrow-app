@@ -49,6 +49,7 @@ import { SocketTabAdapter } from "@app/adapter/socket-tab";
 import type { CollectionDocType } from "@app/models/collection.model";
 import { WebSocketService } from "@app/services/web-socket.service";
 import { webSocketDataStore } from "@workspaces/features/socket-explorer/store";
+import { InitTab } from "@common/factory";
 
 class RestExplorerViewModel {
   /**
@@ -277,6 +278,8 @@ class RestExplorerViewModel {
       return;
     }
     progressiveTab.property.websocket.message = _message;
+    // message
+    debugger;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -1485,6 +1488,15 @@ class RestExplorerViewModel {
       }
       return webSocketDataMap;
     });
+  };
+
+  public clearInput = async () => {
+    const initWebSocketTab = new InitTab()
+      .webSocket("_id", "_websocketId")
+      .getValue();
+    await this.updateMessage("");
+    await this.updateHeaders(initWebSocketTab.property.websocket.headers);
+    await this.updateParams(initWebSocketTab.property.websocket.queryParams);
   };
 }
 

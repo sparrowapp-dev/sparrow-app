@@ -25,6 +25,7 @@
     on:change={() => {}}
     isEditable={false}
     isFormatted={true}
+    placeholder={"Select a request to get detail"}
   />
 </div>
 

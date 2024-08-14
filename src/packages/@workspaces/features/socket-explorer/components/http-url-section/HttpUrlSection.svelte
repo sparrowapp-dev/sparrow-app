@@ -18,7 +18,6 @@
   export { componentClass as class };
 
   export let requestUrl: string | undefined;
-  export let isSendRequestInProgress: boolean;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
   export let toggleSaveRequest: (flag: boolean) => void;
   export let onSaveSocket: SaveRequestType;
@@ -79,8 +78,10 @@
   <DropButton
     title={webSocket?.status === "connected" ? "Disconnect" : "Connect"}
     type="default"
-    loader={webSocket?.status === "inprogress"}
-    disable={webSocket?.status === "inprogress"}
+    loader={webSocket?.status === "connecting" ||
+      webSocket?.status === "disconnecting"}
+    disable={webSocket?.status === "connecting" ||
+      webSocket?.status === "disconnecting"}
     onClick={() => {
       if (requestUrl === "") {
         const codeMirrorElement = document.querySelector(
