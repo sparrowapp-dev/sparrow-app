@@ -13,8 +13,9 @@
   // ----
 
   // ---- Interface
-  import { SocketIcon } from "@library/icons";
+  import { SocketIcon, StackIcon } from "@library/icons";
   import { TabTypeEnum, type Tab } from "@common/types/workspace";
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
   // ----
 
   // ------ Props ------
@@ -126,6 +127,14 @@
             color={"var(--icon-primary-300)"}
           />
         </span>
+      {:else if tab.type === TabTypeEnum.ENVIRONMENT}
+        <span>
+          <StackIcon
+            height={"14px"}
+            width={"14px"}
+            color={"var(--icon-secondary-130)"}
+          />
+        </span>
       {/if}
       <span
         class="font-weight-normal ms-1 text-fs-12 {!tab.isActive
@@ -136,7 +145,7 @@
         {tab.name}
       </span>
     </button>
-    {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET) && !tab?.isSaved}
+    {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.ENVIRONMENT) && !tab?.isSaved}
       {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
         <span
           class="my-auto mx-1 opacity-1"

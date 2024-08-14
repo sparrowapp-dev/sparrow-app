@@ -33,6 +33,8 @@
     display?: string;
   }>;
 
+  export let iconColor="grey";
+
   /**
    * Callback to parent component.
    */
@@ -410,9 +412,9 @@
         {#if iconRequired}
           <span class="me-2" style="margin-top: -2px;"
             ><Icon
-              height={12}
-              width={12}
-              color={"var(--sparrow-text-color)"}
+              height={14}
+              width={14}
+              color={iconColor}
             /></span
           >
         {/if}

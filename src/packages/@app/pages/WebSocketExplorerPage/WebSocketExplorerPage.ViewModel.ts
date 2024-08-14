@@ -18,7 +18,6 @@ import { TabRepository } from "@app/repositories/tab.repository";
 import { CollectionRepository } from "@app/repositories/collection.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
-import { EnvironmentTabRepository } from "@app/repositories/environment-tab.repository";
 
 import { BehaviorSubject, Observable } from "rxjs";
 import { Events, ItemType } from "$lib/utils/enums";
@@ -59,7 +58,6 @@ class RestExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
   private tabRepository = new TabRepository();
-  private environmentTabRepository = new EnvironmentTabRepository();
   private guestUserRepository = new GuestUserRepository();
   private compareArray = new CompareArray();
   private webSocketService = new WebSocketService();
@@ -1143,135 +1141,134 @@ class RestExplorerViewModel {
     },
     newVariableObj: KeyValue,
   ) => {
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
-    if (isGlobalVariable) {
-      // api payload
-      const payload = {
-        name: environmentVariables.global.name,
-        variable: [
-          ...environmentVariables.global.variable,
-          {
-            key: newVariableObj.key,
-            value: newVariableObj.value,
-            checked: true,
-          },
-        ],
-      };
-      // removes blank key value pairs
-      payload.variable = [
-        ...payload.variable.filter((variable) => {
-          return variable.key.length > 0;
-        }),
-        {
-          key: "",
-          value: "",
-          checked: false,
-        },
-      ];
-
-      if (isGuestUser === true) {
-        // updates environment list
-        this.environmentRepository.updateEnvironment(
-          environmentVariables.global.id,
-          payload,
-        );
-        // updates environment tab
-        await this.environmentTabRepository.updateEnvironmentTab(
-          environmentVariables.global.id,
-          { variable: payload.variable, isSave: true },
-        );
-        notifications.success("Environment Variable Added");
-        return {
-          isSuccessful: true,
-        };
-      }
-      const response = await this.environmentService.updateEnvironment(
-        this._tab.getValue().path.workspaceId,
-        environmentVariables.global.id,
-        payload,
-      );
-      if (response.isSuccessful) {
-        // updates environment list
-        this.environmentRepository.updateEnvironment(
-          response.data.data._id,
-          response.data.data,
-        );
-        // updates environment tab
-        await this.environmentTabRepository.updateEnvironmentTab(
-          response.data.data._id,
-          { variable: response.data.data.variable, isSave: true },
-        );
-        notifications.success("Environment Variable Added");
-      } else {
-        notifications.error("Failed to add Environment Variable");
-      }
-      return response;
-    } else {
-      // api payload
-      const payload = {
-        name: environmentVariables.local.name,
-        variable: [
-          ...environmentVariables.local.variable,
-          {
-            key: newVariableObj.key,
-            value: newVariableObj.value,
-            checked: true,
-          },
-        ],
-      };
-      // removes blank key value pairs
-      payload.variable = [
-        ...payload.variable.filter((variable) => {
-          return variable.key.length > 0;
-        }),
-        {
-          key: "",
-          value: "",
-          checked: false,
-        },
-      ];
-      if (isGuestUser) {
-        // updates environment list
-        this.environmentRepository.updateEnvironment(
-          environmentVariables.local.id,
-          payload,
-        );
-        // updates environment tab
-        await this.environmentTabRepository.updateEnvironmentTab(
-          environmentVariables.local.id,
-          { variable: payload.variable, isSave: true },
-        );
-        notifications.success("Environment Variable Added");
-        return {
-          isSuccessful: true,
-        };
-      }
-      // api response
-      const response = await this.environmentService.updateEnvironment(
-        this._tab.getValue().path.workspaceId,
-        environmentVariables.local.id,
-        payload,
-      );
-      if (response.isSuccessful) {
-        // updates environment list
-        this.environmentRepository.updateEnvironment(
-          response.data.data._id,
-          response.data.data,
-        );
-        // updates environment tab
-        await this.environmentTabRepository.updateEnvironmentTab(
-          response.data.data._id,
-          { variable: response.data.data.variable, isSave: true },
-        );
-        notifications.success("Environment Variable Added");
-      } else {
-        notifications.error("Failed to add Environment Variable");
-      }
-      return response;
-    }
+    // let isGuestUser;
+    // isGuestUserActive.subscribe((value) => {
+    //   isGuestUser = value;
+    // });
+    // if (isGlobalVariable) {
+    //   // api payload
+    //   const payload = {
+    //     name: environmentVariables.global.name,
+    //     variable: [
+    //       ...environmentVariables.global.variable,
+    //       {
+    //         key: newVariableObj.key,
+    //         value: newVariableObj.value,
+    //         checked: true,
+    //       },
+    //     ],
+    //   };
+    //   // removes blank key value pairs
+    //   payload.variable = [
+    //     ...payload.variable.filter((variable) => {
+    //       return variable.key.length > 0;
+    //     }),
+    //     {
+    //       key: "",
+    //       value: "",
+    //       checked: false,
+    //     },
+    //   ];
+    //   if (isGuestUser === true) {
+    //     // updates environment list
+    //     this.environmentRepository.updateEnvironment(
+    //       environmentVariables.global.id,
+    //       payload,
+    //     );
+    //     // updates environment tab
+    //     await this.environmentTabRepository.updateEnvironmentTab(
+    //       environmentVariables.global.id,
+    //       { variable: payload.variable, isSave: true },
+    //     );
+    //     notifications.success("Environment Variable Added");
+    //     return {
+    //       isSuccessful: true,
+    //     };
+    //   }
+    //   const response = await this.environmentService.updateEnvironment(
+    //     this._tab.getValue().path.workspaceId,
+    //     environmentVariables.global.id,
+    //     payload,
+    //   );
+    //   if (response.isSuccessful) {
+    //     // updates environment list
+    //     this.environmentRepository.updateEnvironment(
+    //       response.data.data._id,
+    //       response.data.data,
+    //     );
+    //     // updates environment tab
+    //     await this.environmentTabRepository.updateEnvironmentTab(
+    //       response.data.data._id,
+    //       { variable: response.data.data.variable, isSave: true },
+    //     );
+    //     notifications.success("Environment Variable Added");
+    //   } else {
+    //     notifications.error("Failed to add Environment Variable");
+    //   }
+    //   return response;
+    // } else {
+    //   // api payload
+    //   const payload = {
+    //     name: environmentVariables.local.name,
+    //     variable: [
+    //       ...environmentVariables.local.variable,
+    //       {
+    //         key: newVariableObj.key,
+    //         value: newVariableObj.value,
+    //         checked: true,
+    //       },
+    //     ],
+    //   };
+    //   // removes blank key value pairs
+    //   payload.variable = [
+    //     ...payload.variable.filter((variable) => {
+    //       return variable.key.length > 0;
+    //     }),
+    //     {
+    //       key: "",
+    //       value: "",
+    //       checked: false,
+    //     },
+    //   ];
+    //   if (isGuestUser) {
+    //     // updates environment list
+    //     this.environmentRepository.updateEnvironment(
+    //       environmentVariables.local.id,
+    //       payload,
+    //     );
+    //     // updates environment tab
+    //     await this.environmentTabRepository.updateEnvironmentTab(
+    //       environmentVariables.local.id,
+    //       { variable: payload.variable, isSave: true },
+    //     );
+    //     notifications.success("Environment Variable Added");
+    //     return {
+    //       isSuccessful: true,
+    //     };
+    //   }
+    //   // api response
+    //   const response = await this.environmentService.updateEnvironment(
+    //     this._tab.getValue().path.workspaceId,
+    //     environmentVariables.local.id,
+    //     payload,
+    //   );
+    //   if (response.isSuccessful) {
+    //     // updates environment list
+    //     this.environmentRepository.updateEnvironment(
+    //       response.data.data._id,
+    //       response.data.data,
+    //     );
+    //     // updates environment tab
+    //     await this.environmentTabRepository.updateEnvironmentTab(
+    //       response.data.data._id,
+    //       { variable: response.data.data.variable, isSave: true },
+    //     );
+    //     notifications.success("Environment Variable Added");
+    //   } else {
+    //     notifications.error("Failed to add Environment Variable");
+    //   }
+    //   return response;
+    // }
   };
 
   /**

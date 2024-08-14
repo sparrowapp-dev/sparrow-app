@@ -74,9 +74,11 @@ export default class WorkspaceExplorerViewModel {
       let tabId = "";
       await this.workspaceRepository.updateWorkspace(workspaceId, updatedata);
       await this.getActiveTab().subscribe((tab: any) => {
-        tabId = tab.tabId;
+        tabId = tab?.tabId;
       });
-      await this.tabRepository.updateTab(tabId, updatedata);
+      if(tabId){
+        await this.tabRepository.updateTab(tabId, updatedata);
+      }
       const initWorkspaceTab = new InitWorkspaceTab(
         response.data.data._id,
         workspaceId,

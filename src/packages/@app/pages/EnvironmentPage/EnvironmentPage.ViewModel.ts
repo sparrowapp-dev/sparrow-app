@@ -1,5 +1,4 @@
 import { notifications } from "@library/ui/toast/Toast";
-import { EnvironmentTabRepository } from "@app/repositories/environment-tab.repository";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { EnvironmentService } from "@app/services/environment.service";
@@ -10,16 +9,17 @@ import { InitTab } from "@common/factory";
 import { v4 as uuidv4 } from "uuid";
 import { GuideRepository } from "@app/repositories/guide.repository";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
+import { TabRepository } from "@app/repositories/tab.repository";
 
 export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
-  private environmentTabRepository = new EnvironmentTabRepository();
   private environmentService = new EnvironmentService();
   private guestUserRepository = new GuestUserRepository();
+  private tabRepository = new TabRepository;
   private initTab = new InitTab();
 
-  constructor() {}
+  constructor() { }
 
   /**
    * @description - fetches environment list
@@ -27,15 +27,6 @@ export class EnvironmentViewModel {
   public get environments() {
     return this.environmentRepository.getEnvironment();
   }
-
-  /**
-   * @description - fetches active environment
-   * @param workspaceId - workspace Id to which environment belongs
-   * @returns
-   */
-  public getactiveEnvironmentTab = (workspaceId: string) => {
-    return this.environmentTabRepository.getEnvironmentTab(workspaceId);
-  };
 
   /**
    * @description - fetches active workspace
@@ -58,33 +49,11 @@ export class EnvironmentViewModel {
     if (isGuestUser) {
       return;
     }
-    const activeTab =
-      await this.environmentTabRepository.getActiveEnvironmentTab(workspaceId);
     const response =
       await this.environmentService.fetchAllEnvironments(workspaceId);
     if (response.isSuccessful && response.data.data) {
       const environments = response.data.data;
       this.environmentRepository.refreshEnvironment(environments, workspaceId);
-      if (!activeTab) {
-        environments.forEach((environment) => {
-          if (environment.type === environmentType.GLOBAL) {
-            const initEnvironmentTab = this.initTab.environment(
-              environment.id,
-              workspaceId,
-            );
-            initEnvironmentTab
-              .setName(environment.name)
-              .setIsActive(true)
-              .setType(environmentType.GLOBAL)
-              .setVariable(environment.variable);
-
-            this.environmentTabRepository.createTab(
-              initEnvironmentTab.getValue(),
-              workspaceId,
-            );
-          }
-        });
-      }
     }
     return;
   };
@@ -94,27 +63,7 @@ export class EnvironmentViewModel {
    * @param environmentId - environment id needs to be deleted
    */
   private deleteEnvironmentTab = async (environmentId: string) => {
-    const flag =
-      await this.environmentTabRepository.deleteEnvironmentTab(environmentId);
-    if (flag[0]) {
-      const globalEnvironment =
-        await this.environmentRepository.getGlobalEnvironment(flag[1]);
-
-      const initEnvironmentTab = this.initTab.environment(
-        globalEnvironment.id,
-        globalEnvironment.workspaceId,
-      );
-      initEnvironmentTab
-        .setName(globalEnvironment.name)
-        .setIsActive(true)
-        .setType(environmentType.GLOBAL)
-        .setVariable(globalEnvironment.variable);
-
-      this.environmentTabRepository.createTab(
-        initEnvironmentTab.getValue(),
-        initEnvironmentTab.getValue().workspaceId,
-      );
-    }
+        await this.tabRepository.removeTab(environmentId);
   };
 
   /**
@@ -179,11 +128,9 @@ export class EnvironmentViewModel {
         newEnvironment.id,
         currentWorkspace._id,
       );
-      initEnvironmentTab.setName(newEnvironment.name).setIsActive(true);
-      this.environmentTabRepository.createTab(
-        initEnvironmentTab.getValue(),
-        currentWorkspace._id,
-      );
+      initEnvironmentTab.setName(newEnvironment.name)
+        ;
+      this.tabRepository.createTab(initEnvironmentTab.getValue())
       notifications.success("New Environment Created!");
       return;
     }
@@ -200,11 +147,8 @@ export class EnvironmentViewModel {
         res._id,
         currentWorkspace._id,
       );
-      initEnvironmentTab.setName(res.name).setIsActive(true);
-      this.environmentTabRepository.createTab(
-        initEnvironmentTab.getValue(),
-        currentWorkspace._id,
-      );
+      initEnvironmentTab.setName(res.name);
+      this.tabRepository.createTab(initEnvironmentTab.getValue())
       this.environmentRepository.removeEnvironment(newEnvironment.id);
 
       this.environmentRepository.addEnvironment({
@@ -235,13 +179,9 @@ export class EnvironmentViewModel {
     );
     initEnvironmentTab
       .setName(environment?.name)
-      .setIsActive(true)
       .setType(environmentType.GLOBAL)
       .setVariable(environment?.variable);
-    this.environmentTabRepository.createTab(
-      initEnvironmentTab.getValue(),
-      environment.workspaceId,
-    );
+    this.tabRepository.createTab(initEnvironmentTab.getValue());
   };
 
   /**
@@ -311,9 +251,10 @@ export class EnvironmentViewModel {
       this.environmentRepository.updateEnvironment(env.id, {
         name: newEnvironmentName,
       });
-      this.environmentTabRepository.updateEnvironmentTab(env.id, {
-        name: newEnvironmentName,
-      });
+      let currentTab = await this.tabRepository.getTabById(env.id)
+      if (currentTab) {
+        await this.tabRepository.updateTab(currentTab?.tabId as string, { name: newEnvironmentName })
+      }
       return;
     }
     const response = await this.environmentService.updateEnvironment(
@@ -327,9 +268,11 @@ export class EnvironmentViewModel {
       this.environmentRepository.updateEnvironment(env.id, {
         name: newEnvironmentName,
       });
-      this.environmentTabRepository.updateEnvironmentTab(env.id, {
-        name: newEnvironmentName,
-      });
+      let currentTab = await this.tabRepository.getTabById(env.id)
+      if (currentTab) {
+        await this.tabRepository.updateTab(currentTab.tabId as string, { name: newEnvironmentName })
+      }
+
     } else if (response.message === "Network Error") {
       notifications.error(response.message);
     } else {
@@ -352,13 +295,10 @@ export class EnvironmentViewModel {
     );
     initEnvironmentTab
       .setName(env.name)
-      .setIsActive(true)
       .setVariable(env.variable);
 
-    this.environmentTabRepository.createTab(
-      initEnvironmentTab.getValue(),
-      currentWorkspace._id,
-    );
+    this.tabRepository.createTab(
+      initEnvironmentTab.getValue() );
   };
 
   /**

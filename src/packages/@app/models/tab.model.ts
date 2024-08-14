@@ -13,7 +13,7 @@ export const tabSchemaLiteral = {
   // separator: "|",
   // },
   type: "object",
-  version: 11,
+  version: 12,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -324,6 +324,42 @@ export const tabSchemaLiteral = {
         },
         workspace: {
           type: "string",
+        },
+        environment: {
+          type: "object",
+          properties: {
+            variable: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  key: {
+                    type: "string",
+                  },
+                  value: {
+                    type: "string",
+                  },
+                  checked: {
+                    type: "boolean",
+                  },
+                },
+                required: ["key", "value", "checked"],
+              },
+            },
+            type: {
+              type: "string",
+            },
+            state: {
+              type: "object",
+              properties: {
+                isSaveInProgress: {
+                  type: "boolean",
+                },
+              },
+              required: ["isSaveInProgress"],
+            },
+          },
+          required: ["variable", "type", "state"],
         },
         webcocket: {
           type: "object",

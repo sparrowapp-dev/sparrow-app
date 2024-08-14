@@ -12,6 +12,9 @@
   import { PlusIcon } from "@library/icons";
   import { navigate } from "svelte-navigator";
   import PopupHint from "./sub-component/PopupHint.svelte";
+  import UserProfileModal, {
+    type UserProfileObj,
+  } from "./sub-component/UserProfileModal.svelte";
   /**
    * environment list
    */
@@ -119,6 +122,23 @@
   const handleViewWorkspaces = () => {
     navigate("/app/home");
   };
+  export let user;
+  export let onLogout;
+
+  import profile from "$lib/assets/profileTab.svg";
+  import hoveredProfile from "$lib/assets/profile-hovered.svg";
+  import selectedProfile from "$lib/assets/profile-selected.svg";
+
+  let sidebarModalItem: UserProfileObj = {
+    heading: "Profile",
+    defaultLogo: profile,
+    hoveredLogo: hoveredProfile,
+    selectedLogo: selectedProfile,
+    disabled: isGuestUser ?? false,
+    user,
+  };
+
+  let showProfileModal = false;
 </script>
 
 <header
@@ -183,7 +203,7 @@
                 class="mb-1"
                 style="width:100%; height:100%; text-decoration:none; outline:none !important; background-color:transparent;  border:none; font-size:12px;"
               >
-                Create an account or Sign In
+                Create an Account or Sign In
               </button>
             </div>
           </div>
@@ -281,6 +301,7 @@
       minHeaderWidth={"185px"}
       iconRequired={true}
       icon={StackIcon}
+      iconColor={"var(--icon-primary-300)"}
       isDropIconFilled={true}
       borderType={"none"}
       borderActiveType={"none"}
@@ -294,6 +315,15 @@
       borderRounded={"2px"}
       position={"absolute"}
     />
+
+    <div class="ms-2 me-1">
+      <UserProfileModal
+        {isGuestUser}
+        item={sidebarModalItem}
+        {onLogout}
+        bind:showProfileModal
+      />
+    </div>
   </div>
 </header>
 

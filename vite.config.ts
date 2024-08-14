@@ -13,7 +13,6 @@ export default defineConfig(async () => ({
       "@common": path.resolve("./src/packages/@common"),
       "@teams": path.resolve("./src/packages/@teams"),
       "@workspaces": path.resolve("./src/packages/@workspaces"),
-      "@environments": path.resolve("./src/packages/@environments"),
       "@support": path.resolve("./src/packages/@support"),
     },
   },

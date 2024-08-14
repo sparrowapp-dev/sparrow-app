@@ -31,7 +31,7 @@
 </script>
 
 <div class="d-flex flex-column align-items-center">
-  <List height={"calc(100vh - 160px)"} classProps={"pb-2 p-1"}>
+  <List  classProps={"pb-2 p-1"}>
     <p class="text-fs-12 text-center" style="color: var(--text-secondary-50)">
       Add Collections to your Workspace to group your requests or send an API
       request directly

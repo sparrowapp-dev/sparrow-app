@@ -5,17 +5,13 @@
     LeftIcon,
     RightIcon,
   } from "$lib/assets/app.asset";
-  import type { Team } from "$lib/utils/interfaces";
   import type { WorkspaceDocument } from "@app/database/database";
   import Button from "@library/ui/button/Button.svelte";
   import { WorkspaceGrid } from "@teams/common/compopnents";
   import { TeamSkeleton } from "../../images";
 
-  export let searchQuery;
-  let filterText = "";
-
+  export let searchQuery = "";
   export let onAddMember;
-
   /**
    * Array of all the workspaces from local DB
    */
@@ -23,7 +19,6 @@
   /**
    * Currently active team
    */
-
   export let onCreateNewWorkspace;
   /**
    * Callback for switching the workspace
@@ -42,9 +37,45 @@
    * Flag to check if user is guest user
    */
   export let isGuestUser = false;
-
   let workspacePerPage = 5;
+  let filterText = "";
   let currPage = 1;
+
+  // filters the workspaces based on the search query
+  $: filteredWorkspaces = workspaces
+    .filter(
+      (item) =>
+        typeof item.name === "string" &&
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    )
+    .sort((a, b) => a.name.localeCompare(b.name)); // will arrange workspace aplhabetically
+
+  // This will split workspaces into pages
+  $: paginatedWorkspaces = (() => {
+    if (currPage === 1) {
+      return filteredWorkspaces.slice(0, 5);
+    } else {
+      const startIndex = 5 + (currPage - 2) * 6;
+      return filteredWorkspaces.slice(startIndex, startIndex + 6); //will check the start index based on current page
+    }
+  })();
+
+  // This will calculate the total number of pages
+  $: totalPages = (() => {
+    const total = filteredWorkspaces.length;
+    if (total <= 5) return 1;
+    return Math.ceil((total - 5) / 6) + 1;
+  })();
+
+  $: startIndex = currPage === 1 ? 1 : 5 + (currPage - 2) * 6 + 1;
+  $: endIndex = Math.min(
+    currPage === 1 ? 5 : startIndex + 5,
+    filteredWorkspaces.length,
+  );
+
+  const setPageWithinBounds = (newPage: number) => {
+    currPage = Math.max(1, Math.min(newPage, totalPages));
+  };
 </script>
 
 <div class="h-100 pb-2">
@@ -52,229 +83,73 @@
     {#if !isGuestUser}
       <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
         <div class="d-flex flex-wrap gap-5 justify-content-between row-gap-0">
-          {#if searchQuery !== "" && workspaces
-              .slice()
-              .reverse()
-              .filter((item) => item.name
-                  .toLowerCase()
-                  .includes(filterText.toLowerCase())).length == 0}
+          {#if searchQuery !== "" && filteredWorkspaces.length === 0}
             <span class="not-found-text mx-auto ellipsis"
               >No results found.</span
             >
           {/if}
-          {#each workspaces
-            .slice()
-            .reverse()
-            .filter((item) => typeof item.name === "string" && item.name
-                  .toLowerCase()
-                  .includes(filterText.toLowerCase()))
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
+          {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
+            <Button
+              title="+ Add New Workspace"
+              type="other"
+              buttonClassProp="sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace"
+              buttonStyleProp="min-height: 132px;"
+              onClick={onCreateNewWorkspace}
+            />
+          {/if}
+          {#each paginatedWorkspaces as workspace}
             <WorkspaceGrid
-            {onAddMember}
+              {onAddMember}
               {workspace}
               {onSwitchWorkspace}
               {isAdminOrOwner}
               {onDeleteWorkspace}
             />
           {/each}
-          {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
-            <Button
-              title={`+ Add New Workspace`}
-              type="other"
-              buttonClassProp={`sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace`}
-              buttonStyleProp={"min-height: 132px;"}
-              onClick={onCreateNewWorkspace}
-            />
-            <!-- update later the above width -->
-          {/if}
         </div>
       </div>
-      {#if !workspaces || workspaces
-          .slice()
-          .reverse()
-          .filter((item) => typeof item.name === "string" && item.name
-                .toLowerCase()
-                .includes(filterText.toLowerCase())).length > 0}
+      {#if filteredWorkspaces.length > 0}
         <div class="justify-content-between bottom-0 w-75 d-flex">
-          <div class="tab-head">
-            Showing {(currPage - 1) * workspacePerPage +
-              (currPage == 1 ? 1 : 0)} -
-            {Math.min(
-              currPage * workspacePerPage - (currPage > 1 ? 1 : 0),
-              workspaces
-                .slice()
-                .reverse()
-                ?.filter(
-                  (item) =>
-                    typeof item.name === "string" &&
-                    item.name
-                      .toLowerCase()
-                      .startsWith(filterText.toLowerCase()),
-                ).length,
-            )} of {workspaces
-              .slice()
-              .reverse()
-              ?.filter(
-                (item) =>
-                  typeof item.name === "string" &&
-                  item.name?.toLowerCase().startsWith(filterText.toLowerCase()),
-              ).length}
+          <div class="tab-head" style="width: 189.46px;">
+            Showing {startIndex} - {endIndex} of {filteredWorkspaces.length}
           </div>
           <div class="tab-head tab-change">
             <button
-              on:click={() => (
-                (currPage = 1),
-                (workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5)
-              )}
+              on:click={() => setPageWithinBounds(1)}
               class="bg-transparent border-0"
-              ><DoubleLeftIcon
-                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
-              /></button
             >
-            <button
-              on:click={() => {
-                if (currPage > 1) currPage -= 1;
-                workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5;
-              }}
-              class="bg-transparent border-0"
-              ><LeftIcon
+              <DoubleLeftIcon
                 color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
-              /></button
-            >
+              />
+            </button>
             <button
-              disabled={workspaces
-                .slice()
-                .reverse()
-                ?.filter(
-                  (item) =>
-                    typeof item.name === "string" &&
-                    item.name
-                      ?.toLowerCase()
-                      .startsWith(filterText.toLowerCase()),
-                ).length %
-                6 ===
-                0 &&
-              currPage ===
-                Math.ceil(
-                  workspaces
-                    .slice()
-                    .reverse()
-                    ?.filter(
-                      (item) =>
-                        typeof item.name === "string" &&
-                        item.name
-                          .toLowerCase()
-                          .startsWith(filterText.toLowerCase()),
-                    ).length / workspacePerPage,
-                )
-                ? true
-                : false}
-              on:click={() => {
-                if (
-                  currPage <
-                  Math.ceil(
-                    workspaces
-                      .slice()
-                      .reverse()
-                      ?.filter(
-                        (item) =>
-                          typeof item.name === "string" &&
-                          item.name
-                            .toLowerCase()
-                            .startsWith(filterText.toLowerCase()),
-                      ).length / workspacePerPage,
-                  )
-                )
-                  currPage += 1;
-                workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5;
-              }}
+              on:click={() => setPageWithinBounds(currPage - 1)}
               class="bg-transparent border-0"
-              ><RightIcon
-                color={currPage ===
-                Math.ceil(
-                  workspaces
-                    .slice()
-                    .reverse()
-                    ?.filter(
-                      (item) =>
-                        typeof item.name === "string" &&
-                        item.name
-                          .toLowerCase()
-                          .startsWith(filterText.toLowerCase()),
-                    ).length / workspacePerPage,
-                )
+            >
+              <LeftIcon
+                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
+              />
+            </button>
+            <button
+              on:click={() => setPageWithinBounds(currPage + 1)}
+              class="bg-transparent border-0"
+            >
+              <RightIcon
+                color={currPage === totalPages
                   ? "var(--border-secondary-200)"
                   : "white"}
-              /></button
-            >
+              />
+            </button>
             <button
-              on:click={() => {
-                currPage = Math.ceil(
-                  workspaces
-                    .slice()
-                    .reverse()
-                    ?.filter(
-                      (item) =>
-                        typeof item.name === "string" &&
-                        item.name
-                          .toLowerCase()
-                          .startsWith(filterText.toLowerCase()),
-                    ).length / workspacePerPage,
-                );
-                if (
-                  workspaces
-                    .slice()
-                    .reverse()
-                    ?.filter(
-                      (item) =>
-                        typeof item.name === "string" &&
-                        item.name
-                          ?.toLowerCase()
-                          .startsWith(filterText.toLowerCase()),
-                    ).length %
-                    6 !==
-                  0
-                ) {
-                  workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5;
-                }
-                if (
-                  currPage - 1 ===
-                  Math.ceil(
-                    workspaces
-                      .slice()
-                      .reverse()
-                      ?.filter(
-                        (item) =>
-                          typeof item.name === "string" &&
-                          item.name
-                            .toLowerCase()
-                            .startsWith(filterText.toLowerCase()),
-                      ).length / workspacePerPage,
-                  )
-                ) {
-                  currPage -= 1;
-                }
-              }}
+              on:click={() => setPageWithinBounds(totalPages)}
               class="bg-transparent border-0"
-              ><DoubleRightIcon
-                color={currPage ===
-                Math.ceil(
-                  workspaces
-                    .slice()
-                    .reverse()
-                    ?.filter(
-                      (item) =>
-                        typeof item.name === "string" &&
-                        item.name
-                          .toLowerCase()
-                          .startsWith(filterText.toLowerCase()),
-                    ).length / workspacePerPage,
-                )
+            >
+              <DoubleRightIcon
+                color={currPage === totalPages
                   ? "var(--border-secondary-200)"
                   : "white"}
-              /></button
-            >
+              />
+            </button>
           </div>
           <div></div>
         </div>
@@ -301,7 +176,7 @@
     background-color: transparent;
   }
   .tab-change {
-    margin-left: 170px;
+    margin-left: 40px;
   }
 
   :global(.add-new-workspace) {
