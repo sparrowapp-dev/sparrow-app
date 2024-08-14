@@ -7,27 +7,22 @@
   // ---- SVG
   import collectionAsset from "$lib/assets/collection-nodes.svg";
   import folderTab from "$lib/assets/folder-tab.svg";
-  // ----
-
-  // ---- Enum
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
-  // ----
 
   // ---- helper functions
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   // ----
 
   // ---- Interface
+  import { SocketIcon, StackIcon } from "@library/icons";
+  import { TabTypeEnum, type Tab } from "@common/types/workspace";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { StackIcon } from "@library/icons";
   // ----
 
   // ------ Props ------
   /**
    * New tab with details
-   * @type {NewTab}
    */
-  export let tab: NewTab;
+  export let tab: Tab;
   /**
    * Width of each tab
    */
@@ -46,7 +41,7 @@
    * @param id - Tab ID
    * @param tab - New Tab
    */
-  export let onTabClosed: (id: string, tab: NewTab) => void;
+  export let onTabClosed: (id: string, tab: Tab) => void;
   /**
    * Callback function for drag start from a index
    * @param index - Index of Tab
@@ -58,7 +53,7 @@
    */
   export let onDropOver: (index: number) => void;
 
-  function handleMouseDown(event) {
+  function handleMouseDown(event: MouseEvent) {
     if (event.button === 1) {
       // Check if the middle button is pressed (button code 1)
       onTabClosed(tab.id, tab);
@@ -96,15 +91,15 @@
       style="width: 100%;
         text-align: left; font-weight:700; background-color:transparent;"
     >
-      {#if tab.type === ItemType.REQUEST}
-        <span class="text-{getMethodStyle(tab.property.request.method)}">
+      {#if tab.type === TabTypeEnum.REQUEST}
+        <span class="text-{getMethodStyle(tab?.property?.request?.method)}">
           <span
             class={!tab.isActive ? "request-icon" : ""}
             style="font-size: 11px; height: 31px; font-weight: 500;"
-            >{tab.property.request.method || ""}</span
+            >{tab?.property?.request?.method || ""}</span
           >
         </span>
-      {:else if tab.type === ItemType.FOLDER}
+      {:else if tab.type === TabTypeEnum.FOLDER}
         <span>
           <img
             src={folderTab}
@@ -112,7 +107,7 @@
             style="width: 30px;heigh:24px;margin-right:5px;"
           /></span
         >
-      {:else if tab.type === ItemType.COLLECTION}
+      {:else if tab.type === TabTypeEnum.COLLECTION}
         <span>
           <img
             src={collectionAsset}
@@ -120,11 +115,19 @@
             style="width: 19px;heigh:19px;margin-right:5px;"
           />
         </span>
-      {:else if tab.type === ItemType.WORKSPACE}
+      {:else if tab.type === TabTypeEnum.WORKSPACE}
         <span>
           <BookIcon />
         </span>
-      {:else if tab.type === ItemType.ENVIRONMENT}
+      {:else if tab.type === TabTypeEnum.WEB_SOCKET}
+        <span>
+          <SocketIcon
+            height={"12px"}
+            width={"16px"}
+            color={"var(--icon-primary-300)"}
+          />
+        </span>
+      {:else if tab.type === TabTypeEnum.ENVIRONMENT}
         <span>
           <StackIcon
             height={"14px"}
@@ -142,23 +145,17 @@
         {tab.name}
       </span>
     </button>
-    <!-- {console.log(tab?.property?.request, !tab?.isSaved)} -->
-    {#if (tab?.property?.request || tab?.property?.environment) && !tab?.isSaved}
+    {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.ENVIRONMENT) && !tab?.isSaved}
       {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
         <span
-          class="my-auto mx-1 opacity-{(tab?.property?.request ||
-            tab?.property?.environment) &&
-          !tab?.isSaved &&
-          (tab?.source !== 'SPEC' || !tab?.activeSync || tab?.isDeleted)
-            ? '1'
-            : '0'}"
+          class="my-auto mx-1 opacity-1"
           style="height: 6px; aspect-ratio: 1; background-color: var(--tab-unsave-icon); border-radius: 50%;"
         />
       {/if}
     {/if}
 
     <button
-      class="cross-icon-btn {!(tab?.property?.request && !tab?.isSaved) &&
+      class="cross-icon-btn {// toggle cross icon for inactive tabs
       !tab.isActive
         ? 'inactive-close-btn'
         : ''} btn d-flex align-items-center px-1"

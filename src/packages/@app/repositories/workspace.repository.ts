@@ -7,14 +7,12 @@ import type { Observable } from "rxjs";
 import { CollectionRepository } from "./collection.repository";
 import { EnvironmentRepository } from "./environment.repository";
 import { TabRepository } from "./tab.repository";
-// import { EnvironmentTabRepository } from "./environment-tab.repository";
 
 export class WorkspaceRepository {
-  constructor() { }
+  constructor() {}
   private collectionRepository = new CollectionRepository();
   private environmentRepository = new EnvironmentRepository();
   private tabRepository = new TabRepository();
-  // private environmentTabRepository = new EnvironmentTabRepository();
   /**
    * extracts RxDocument of workspace.
    */
@@ -327,7 +325,6 @@ export class WorkspaceRepository {
       users: [...workspace.users],
     });
   };
-
 
   public deleteWorkspace = async (workspaceId: string): Promise<any> => {
     const workspace = await RxDB.getInstance()

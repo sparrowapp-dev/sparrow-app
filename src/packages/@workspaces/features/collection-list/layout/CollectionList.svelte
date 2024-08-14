@@ -250,8 +250,8 @@
             : 'collections-inactive'}"
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
           on:click|stopPropagation={() => {
-            isExpandCollection=true;
-            isGuestUser 
+            isExpandCollection = true;
+            isGuestUser
               ? onItemCreated("collection", {
                   workspaceId: currentWorkspaceId,
                   collection: collectionList,
@@ -269,7 +269,7 @@
     </div>
 
     {#if isExpandCollection}
-      <div class="overflow-auto d-flex flex-column ms-2 pt-2 mb-2">
+      <div class="overflow-auto d-flex flex-column ms-2 me-0 pt-2 mb-2">
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
             {#if collectionFilter.length > 0}

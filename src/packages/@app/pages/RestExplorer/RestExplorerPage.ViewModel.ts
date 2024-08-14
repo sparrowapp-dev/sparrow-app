@@ -83,6 +83,7 @@ import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
 import { AiAssistantService } from "@app/services/ai-assistant.service";
+import type { GuideQuery } from "@app/types/user-guide";
 
 class RestExplorerViewModel
   implements
@@ -969,19 +970,33 @@ class RestExplorerViewModel
     const unadaptedRequest = requestTabAdapter.unadapt(componentData);
     // Save overall api
 
-    let folderSource;
-    if (folderId) {
-      folderSource = {
-        folderId: folderId,
-      };
-    }
-
     const requestMetaData = {
       id: _id,
       name: componentData?.name,
       description: componentData?.description,
       type: ItemType.REQUEST,
     };
+
+    let folderSource;
+    let itemSource;
+    if (folderId) {
+      folderSource = {
+        folderId: folderId,
+      };
+      itemSource = {
+        id: folderId,
+        type: ItemType.FOLDER,
+        items: {
+          ...requestMetaData,
+          request: unadaptedRequest,
+        },
+      };
+    } else {
+      itemSource = {
+        ...requestMetaData,
+        request: unadaptedRequest,
+      };
+    }
 
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -1026,10 +1041,7 @@ class RestExplorerViewModel
       workspaceId: workspaceId,
       ...folderSource,
       ...userSource,
-      items: {
-        ...requestMetaData,
-        request: unadaptedRequest,
-      },
+      items: itemSource,
     });
 
     if (res.isSuccessful) {
@@ -1369,6 +1381,7 @@ class RestExplorerViewModel
           folderId: path[path.length - 1].id,
           ...userSource,
           items: {
+            id: path[path.length - 1].id,
             name: path[path.length - 1].name,
             type: ItemType.FOLDER,
             items: {
@@ -1622,7 +1635,7 @@ class RestExplorerViewModel
    * @param query - The query object used to find the collection guide.
    * @returns - A promise that resolves to the collection guide found by the query.
    */
-  public fetchCollectionGuide = async (query) => {
+  public fetchCollectionGuide = async (query: GuideQuery) => {
     return await this.guideRepository.findOne(query);
   };
 
@@ -1633,7 +1646,10 @@ class RestExplorerViewModel
    * @param  isActive - The new active status to set for the collection guide.
    * @returns - A promise that resolves when the update operation is complete.
    */
-  public updateCollectionGuide = async (query, isActive) => {
+  public updateCollectionGuide = async (
+    query: GuideQuery,
+    isActive: boolean,
+  ) => {
     await this.guideRepository.update(query, {
       isActive: isActive,
     });
@@ -1660,7 +1676,9 @@ class RestExplorerViewModel
         col.name = newCollectionName;
         this.collectionRepository.updateCollection(collectionId, col);
         notifications.success("Collection renamed successfully!");
-        return;
+        return {
+          isSuccessful: true,
+        };
       }
       const response = await this.collectionService.updateCollectionData(
         collectionId,
@@ -1731,7 +1749,9 @@ class RestExplorerViewModel
           res,
         );
         notifications.success("Folder renamed successfully!");
-        return;
+        return {
+          isSuccessful: true,
+        };
       }
       const response = await this.collectionService.updateFolderInCollection(
         workspaceId,
@@ -1823,7 +1843,7 @@ class RestExplorerViewModel
     // Call the AI assistant service to generate a response
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
-      instructions: `You are an AI Assistant, responsible for answering API related queries. Give response only in markdown string. Only answer questions related to the provided API data and API Management. Give to the point and concise responses, only give explanations when they are asked for. Always follow best practices for REST API and answer accordingly. Utilize the provided api data ${JSON.stringify(
+      instructions: `You are an AI Assistant, responsible for answering API related queries. Give the response only in markdown format. Only answer questions related to the provided API data and API Management. Give to the point and concise responses, only give explanations when they are asked for. Always follow best practices for REST API and answer accordingly. Utilize the provided api data ${JSON.stringify(
         apiData,
       )}. Never return the result same as prompt.`,
       threadId: componentData?.property?.request?.ai?.threadId,

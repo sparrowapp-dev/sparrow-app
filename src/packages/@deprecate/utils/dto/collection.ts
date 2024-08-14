@@ -1,3 +1,4 @@
+import type { CollectionItemsDto, RequestDto } from "@common/types/workspace";
 import type { ContentTypeEnum } from "../enums/request.enum";
 import type { Auth, KeyValuePair } from "../interfaces/request.interface";
 
@@ -51,43 +52,28 @@ export interface ImportCollectionBody {}
 
 export interface ImportBodyUrl {
   url: string;
-  urlData: string;
+  urlData: {
+    data: string;
+    headers: string;
+  };
   primaryBranch: string;
   currentBranch: string;
+}
+
+interface CollectionItemsPayload {
+  name?: string;
+  type?: string;
+  id?: string;
+  description?: string;
+  request?: {
+    method: string;
+  };
+  items?: CollectionItemsPayload;
 }
 
 export interface CreateApiRequestPostBody {
   collectionId: string;
   workspaceId: string;
   folderId?: string;
-  items: {
-    id?: string;
-    name: string;
-    type: string;
-    description?: string;
-    request?: {
-      method: string;
-      url?: string;
-      body?: {
-        type: ContentTypeEnum;
-      };
-      headers?: KeyValuePair[];
-      queryParams?: KeyValuePair[];
-      auth?: Auth;
-    };
-    items?: {
-      id?: string;
-      name: string;
-      type: string;
-      description?: string;
-      request: {
-        method: string;
-        url?: string;
-        body?: unknown;
-        headers?: KeyValuePair[];
-        queryParams?: KeyValuePair[];
-        auth?: Auth;
-      };
-    };
-  };
+  items?: CollectionItemsPayload;
 }

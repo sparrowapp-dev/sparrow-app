@@ -19,7 +19,11 @@
   } from "$lib/utils/interfaces/request.interface";
 
   import { onDestroy } from "svelte";
-  import { DoubleArrowIcon, GithubIcon } from "@library/icons";
+  import {
+    DoubleArrowIcon,
+    GithubIcon,
+    socketDeprecateIcon,
+  } from "@library/icons";
   import { WithButton } from "@workspaces/common/hoc";
   import { version } from "../../../../../../src-tauri/tauri.conf.json";
   import { createDeepCopy } from "$lib/utils/helpers";
@@ -38,14 +42,6 @@
   export let onItemRenamed: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
 
-  export let onSearchCollection: (
-    collection: CollectionDocument[],
-    searchData: string,
-  ) => {
-    filteredCollection: CollectionDocument[];
-    filteredFile: RequestType[];
-    filteredFolder: Folder[];
-  };
   export let onBranchSwitched: (collection: CollectionDocument) => void;
   export let onRefetchCollection: (
     workspaceId: string,
@@ -59,7 +55,7 @@
    * id of the active tab
    */
   export let activeTabId;
-  export let userRoleInWorkspace: WorkspaceRole;
+  export let userRoleInWorkspace;
   export let currentWorkspace: Observable<WorkspaceDocument>;
   export let leftPanelController: {
     leftPanelCollapse: boolean;
@@ -223,6 +219,11 @@
             showImportCurlPopup();
           },
         },
+        {
+          name: "Add WebSocket",
+          icon: socketDeprecateIcon,
+          onclick: () => onItemCreated("web-socket", {}),
+        },
       ]
     : [
         {
@@ -247,6 +248,11 @@
             });
             showImportCurlPopup();
           },
+        },
+        {
+          name: "Add WebSocket",
+          icon: socketDeprecateIcon,
+          onclick: () => onItemCreated("web-socket", {}),
         },
       ];
 

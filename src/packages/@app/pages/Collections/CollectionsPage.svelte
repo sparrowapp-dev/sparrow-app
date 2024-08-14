@@ -25,13 +25,14 @@
     ImportCollection,
     ImportCurl,
     WorkspaceDefault,
+    SaveAsCollectionItem,
   } from "@workspaces/features";
   import CloseConfirmationPopup from "$lib/components/popup/CloseConfirmationPopup.svelte";
   import { notifications } from "@library/ui/toast/Toast";
 
   // ---- Interface, enum & constants
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import type { WorkspaceRole } from "$lib/utils/enums/team.enum";
+  import { WorkspaceRole } from "$lib/utils/enums/team.enum";
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
 
   // ---- View Model
@@ -56,6 +57,14 @@
   import { isGuestUserActive } from "$lib/store";
   import { pagesMotion } from "@app/constants";
   import { user } from "$lib/store";
+  import WebSocketExplorerPage from "../WebSocketExplorerPage/WebSocketExplorerPage.svelte";
+  import {
+    TabTypeEnum,
+    type RequestTab,
+    type Tab,
+  } from "@common/types/workspace";
+  import type { WebSocketTab } from "@common/types/workspace/web-socket";
+  import { TeamProfile } from "@teams/features/team-settings/components";
   import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
 
   export let modifiedUser;
@@ -73,7 +82,7 @@
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
   const activeTab: Observable<TabDocument> = _viewModel.getActiveTab();
 
-  let removeTab: NewTab;
+  let removeTab: Tab;
   let isPopupClosed: boolean = false;
   let isImportCollectionPopup: boolean = false;
   let isImportCurlPopup: boolean = false;
@@ -166,8 +175,12 @@
   /**
    * Handle close tab functionality in tab bar list
    */
-  const closeTab = (id: string, tab: TabDocument) => {
-    if (tab?.property?.request && !tab?.isSaved) {
+  const closeTab = (id: string, tab: Tab) => {
+    if (
+      (tab?.type === TabTypeEnum.REQUEST ||
+        tab?.type === TabTypeEnum.WEB_SOCKET) &&
+      !tab?.isSaved
+    ) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
         removeTab = tab;
         isPopupClosed = true;
@@ -195,12 +208,23 @@
     if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
       const id = removeTab?.id;
       loader = true;
-      const res = await _viewModel.saveAPIRequest(removeTab);
-      if (res) {
-        loader = false;
-        _viewModel.handleRemoveTab(id);
-        isPopupClosed = false;
-        notifications.success("API request saved");
+
+      if (removeTab.type === TabTypeEnum.REQUEST) {
+        const res = await _viewModel.saveAPIRequest(removeTab);
+        if (res) {
+          loader = false;
+          _viewModel.handleRemoveTab(id);
+          isPopupClosed = false;
+          notifications.success("API request saved");
+        }
+      } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
+        const res = await _viewModel.saveSocket(removeTab);
+        if (res) {
+          loader = false;
+          _viewModel.handleRemoveTab(id);
+          isPopupClosed = false;
+          notifications.success("WebSocket request saved");
+        }
       }
       loader = false;
     } else {
@@ -308,7 +332,9 @@
             handleCollapseCollectionList,
           }}
           githubRepo={githubRepoData}
-          userRoleInWorkspace={_viewModel.getUserRoleInWorspace()}
+          userRoleInWorkspace={() => {
+            return WorkspaceRole.WORKSPACE_ADMIN;
+          }}
           activeTabPath={$activeTab?.path}
           activeTabId={$activeTab?.id}
           showImportCollectionPopup={() => (isImportCollectionPopup = true)}
@@ -387,10 +413,17 @@
                       />
                     </div>
                   </Motion>
+                {:else if $activeTab?.type === ItemType.WEB_SOCKET}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <WebSocketExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
                 {:else if !$tabList?.length}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WorkspaceDefault
+                        {currentWorkspace}
                         {handleCreateEnvironment}
                         showImportCollectionPopup={() =>
                           (isImportCollectionPopup = true)}
@@ -416,7 +449,7 @@
   onCancel={handleClosePopupBackdrop}
   onDiscard={handlePopupDiscard}
   isSaveDisabled={!hasWorkpaceLevelPermission(
-    _viewModel.getUserRoleInWorspace(),
+    WorkspaceRole.WORKSPACE_ADMIN,
     workspaceLevelPermissions.SAVE_REQUEST,
   )}
   {loader}
@@ -544,36 +577,51 @@
     isExposeSaveAsRequest = flag;
   }}
 >
-  <SaveAsRequest
+  <SaveAsCollectionItem
     onClick={(flag = false) => {
       isExposeSaveAsRequest = flag;
     }}
-    requestMethod={removeTab.property.request?.method}
-    requestUrl={removeTab.property.request?.url}
+    requestMethod={removeTab.type === TabTypeEnum.REQUEST
+      ? removeTab.property.request?.method
+      : removeTab.type === TabTypeEnum.WEB_SOCKET
+      ? TabTypeEnum.WEB_SOCKET
+      : ""}
+    requestUrl={removeTab.type === TabTypeEnum.REQUEST
+      ? removeTab.property.request?.url
+      : removeTab.type === TabTypeEnum.WEB_SOCKET
+      ? removeTab?.property?.websocket?.url
+      : ""}
     requestName={removeTab.name}
     requestDescription={removeTab.description}
     requestPath={removeTab.path}
     collections={$collectionList}
     readWorkspace={_viewModel.readWorkspace}
-    onSaveAsRequest={async (
-      _workspaceMeta,
-      path,
-      tabName,
-      description,
-      type,
-    ) => {
-      const res = await _viewModel.saveAsRequest(
-        _workspaceMeta,
-        path,
-        tabName,
-        description,
-        type,
-        removeTab,
-      );
-      if (res.status === "success") {
-        _viewModel.handleRemoveTab(removeTab.id);
+    onSave={async (_workspaceMeta, path, tabName, description, type) => {
+      if (removeTab.type === TabTypeEnum.REQUEST) {
+        const res = await _viewModel.saveAsRequest(
+          _workspaceMeta,
+          path,
+          tabName,
+          description,
+          removeTab,
+        );
+        if (res?.status === "success") {
+          _viewModel.handleRemoveTab(removeTab.id);
+        }
+        return res;
+      } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
+        const res = await _viewModel.saveAsSocket(
+          _workspaceMeta,
+          path,
+          tabName,
+          description,
+          removeTab,
+        );
+        if (res?.status === "success") {
+          _viewModel.handleRemoveTab(removeTab.id);
+        }
+        return res;
       }
-      return res;
     }}
     onCreateFolder={_viewModel.createFolderFromSaveAs}
     onCreateCollection={_viewModel.createCollectionFromSaveAs}

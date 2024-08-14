@@ -45,7 +45,7 @@
     );
     workspace.users?.forEach((value) => {
       if (value.id === userId) {
-        userRole = value.role;
+        userRole = value.role as string;
       }
     });
   };
