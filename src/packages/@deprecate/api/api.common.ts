@@ -303,6 +303,7 @@ const connectWebSocket = async (
   requestHeaders: string,
 ) => {
   // debugger;
+  console.table({ url, tabId, requestHeaders });
   webSocketDataStore.update((webSocketDataMap) => {
     webSocketDataMap.set(tabId, {
       messages: [],
