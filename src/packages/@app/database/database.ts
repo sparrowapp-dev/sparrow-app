@@ -185,8 +185,10 @@ export class RxDB {
             return oldDoc;
           },
           9: function (oldDoc: TabDocument) {
-            oldDoc.property.request.state.isHeaderBulkEditActive = false;
-            oldDoc.property.request.state.isParameterBulkEditActive = false;
+            if (oldDoc?.property?.request?.state) {
+              oldDoc.property.request.state.isHeaderBulkEditActive = false;
+              oldDoc.property.request.state.isParameterBulkEditActive = false;
+            }
             return oldDoc;
           },
           10: function (oldDoc: TabDocument) {
@@ -195,12 +197,16 @@ export class RxDB {
               prompt: "",
               threadId: "",
             };
-            oldDoc.property.request.ai = ai;
-            oldDoc.property.request.state.isChatbotActive = false;
-            oldDoc.property.request.state.isChatbotSuggestionsActive = true;
-            oldDoc.property.request.state.isChatbotGeneratingResponse = false;
-            oldDoc.property.request.state.isDocGenerating = false;
-            oldDoc.property.request.state.isDocAlreadyGenerated = false;
+            if (oldDoc?.property?.request) {
+              oldDoc.property.request.ai = ai;
+            }
+            if (oldDoc?.property?.request?.state) {
+              oldDoc.property.request.state.isChatbotActive = false;
+              oldDoc.property.request.state.isChatbotSuggestionsActive = true;
+              oldDoc.property.request.state.isChatbotGeneratingResponse = false;
+              oldDoc.property.request.state.isDocGenerating = false;
+              oldDoc.property.request.state.isDocAlreadyGenerated = false;
+            }
             return oldDoc;
           },
           11: function (oldDoc: TabDocument) {
@@ -228,6 +234,9 @@ export class RxDB {
             return oldDoc;
           },
           6: function (oldDoc: CollectionDocument) {
+            return oldDoc;
+          },
+          7: function (oldDoc: CollectionDocument) {
             return oldDoc;
           },
         },
