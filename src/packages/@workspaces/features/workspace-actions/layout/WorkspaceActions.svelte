@@ -19,7 +19,11 @@
   } from "$lib/utils/interfaces/request.interface";
 
   import { onDestroy } from "svelte";
-  import { DoubleArrowIcon, GithubIcon } from "@library/icons";
+  import {
+    DoubleArrowIcon,
+    GithubIcon,
+    socketDeprecateIcon,
+  } from "@library/icons";
   import { WithButton } from "@workspaces/common/hoc";
   import { version } from "../../../../../../src-tauri/tauri.conf.json";
   import { createDeepCopy } from "$lib/utils/helpers";
@@ -28,9 +32,7 @@
   import constants from "$lib/utils/constants";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { EnvironmentViewModel } from "@app/pages/EnvironmentPage/EnvironmentPage.ViewModel";
-  import EnvironmentList from "@workspaces/features/environment-list/layout/EnvironmentList.svelte";
-  import CollectionList from "@workspaces/features/collection-list/layout/CollectionList.svelte";
+  import { CollectionList, EnvironmentList } from "@workspaces/features";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -39,14 +41,7 @@
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
-  export let onSearchCollection: (
-    collection: CollectionDocument[],
-    searchData: string,
-  ) => {
-    filteredCollection: CollectionDocument[];
-    filteredFile: RequestType[];
-    filteredFolder: Folder[];
-  };
+
   export let onBranchSwitched: (collection: CollectionDocument) => void;
   export let onRefetchCollection: (
     workspaceId: string,
@@ -60,7 +55,7 @@
    * id of the active tab
    */
   export let activeTabId;
-  export let userRoleInWorkspace: WorkspaceRole;
+  export let userRoleInWorkspace;
   export let currentWorkspace: Observable<WorkspaceDocument>;
   export let leftPanelController: {
     leftPanelCollapse: boolean;
@@ -84,7 +79,19 @@
 
   export let scrollList;
 
-  const _viewModel = new EnvironmentViewModel();
+  export let environments;
+
+  export let onCreateEnvironment;
+
+  export let onOpenGlobalEnvironment;
+
+  export let onDeleteEnvironment;
+
+  export let onUpdateEnvironment;
+
+  export let onOpenEnvironment;
+
+  export let onSelectEnvironment;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -99,10 +106,8 @@
     }
   });
 
-  let activeEnvironment = _viewModel.getactiveEnvironmentTab("");
-
-  let isExpandCollection = false;
-  let isExpandEnvironment = false;
+  export let isExpandCollection = false;
+  export let isExpandEnvironment = false;
 
   let isGithubStarHover = false;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
@@ -201,6 +206,7 @@
               workspaceId: currentWorkspaceId,
               collection: collectionList,
             });
+            isExpandCollection = true;
           },
         },
         {
@@ -212,6 +218,11 @@
             });
             showImportCurlPopup();
           },
+        },
+        {
+          name: "Add WebSocket",
+          icon: socketDeprecateIcon,
+          onclick: () => onItemCreated("web-socket", {}),
         },
       ]
     : [
@@ -223,7 +234,10 @@
         {
           name: "Add Collection",
           icon: CreateCollection,
-          onclick: showImportCollectionPopup,
+          onclick: () => {
+            showImportCollectionPopup();
+            isExpandCollection = true;
+          },
         },
         {
           name: "Import cURL",
@@ -235,9 +249,12 @@
             showImportCurlPopup();
           },
         },
+        {
+          name: "Add WebSocket",
+          icon: socketDeprecateIcon,
+          onclick: () => onItemCreated("web-socket", {}),
+        },
       ];
-
-  const environments = _viewModel.environments;
 
   const toggleExpandCollection = () => {
     isExpandCollection = !isExpandCollection;
@@ -308,11 +325,12 @@
         width={"100%"}
         height={"33px"}
         type="search"
+        searchIconColor={"var(--icon-secondary-170 )"}
         bind:value={searchData}
         on:input={(e) => {
           handleSearch();
-         isExpandCollection=true;
-         isExpandEnvironment=true;
+          isExpandCollection = true;
+          isExpandEnvironment = true;
         }}
         defaultBorderColor="transparent"
         hoveredBorderColor="var(--border-primary-300)"
@@ -371,17 +389,18 @@
 
     <!-- LHS Side of Collection Enivironment & Test Flows -->
     <div
-      class="d-flex flex-column collections-list"
-      style="overflow:hidden; margin-top:5px;  flex:1;"
+      class="d-flex flex-column collections-list mb-2"
+      style="overflow:hidden; margin-top:5px;  flex:1; "
     >
       <!-----Collection Section------>
       <div
         class="ps-1"
+        class:not-opened-any={!isExpandCollection && !isExpandEnvironment}
         class:full-height={isExpandCollection && !isExpandEnvironment}
         class:half-height={isExpandCollection && isExpandEnvironment}
       >
         <CollectionList
-          {scrollList}
+          bind:scrollList
           bind:userRole
           {onRefetchCollection}
           {showImportCurlPopup}
@@ -409,21 +428,22 @@
 
       <div
         class="ps-1"
+        class:not-opened-any={!isExpandCollection && !isExpandEnvironment}
         class:full-height={isExpandEnvironment && !isExpandCollection}
         class:half-height={isExpandCollection && isExpandEnvironment}
       >
         <EnvironmentList
           loggedUserRoleInWorkspace={userRole}
-          onCreateEnvironment={_viewModel.onCreateEnvironment}
-          onOpenGlobalEnvironment={_viewModel.onOpenGlobalEnvironment}
-          onDeleteEnvironment={_viewModel.onDeleteEnvironment}
-          onUpdateEnvironment={_viewModel.onUpdateEnvironment}
-          onOpenEnvironment={_viewModel.onOpenEnvironment}
-          onSelectEnvironment={_viewModel.onSelectEnvironment}
+          {onCreateEnvironment}
+          {onOpenGlobalEnvironment}
+          {onDeleteEnvironment}
+          {onUpdateEnvironment}
+          {onOpenEnvironment}
+          {onSelectEnvironment}
           currentWorkspace={activeWorkspace}
           environments={$environments}
-          currentEnvironment={$activeEnvironment}
           {searchData}
+          {activeTabId}
           {toggleExpandEnvironment}
           bind:isExpandEnvironment
         />
@@ -493,11 +513,15 @@
 {/if}
 
 <style>
-  .full-height {
-    height: 90%;
+  .not-opened-any {
+    height: 37px;
   }
+  .full-height {
+    height: calc(100% - 40px);
+  }
+
   .half-height {
-    height: 50%;
+    height: 49%;
   }
 
   .add-button {

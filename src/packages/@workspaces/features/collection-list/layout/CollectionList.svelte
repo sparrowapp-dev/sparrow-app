@@ -248,7 +248,16 @@
           class="add-icon-container border-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
             ? 'collections-active'
             : 'collections-inactive'}"
-          on:click|stopPropagation={showImportCollectionPopup}
+          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+          on:click|stopPropagation={() => {
+            isExpandCollection = true;
+            isGuestUser
+              ? onItemCreated("collection", {
+                  workspaceId: currentWorkspaceId,
+                  collection: collectionList,
+                })
+              : showImportCollectionPopup();
+          }}
         >
           <PlusIcon
             height={"18px"}
@@ -260,9 +269,7 @@
     </div>
 
     {#if isExpandCollection}
-      <div
-        class="overflow-auto d-flex flex-column ms-2 me-2 pt-2 mb-2 "
-      >
+      <div class="overflow-auto d-flex flex-column ms-2 me-0 pt-2 mb-2">
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
             {#if collectionFilter.length > 0}

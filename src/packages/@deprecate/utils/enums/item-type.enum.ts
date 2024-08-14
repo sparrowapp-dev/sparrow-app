@@ -4,6 +4,8 @@ export enum ItemType {
   COLLECTION = "COLLECTION",
   WORKSPACE = "WORKSPACE",
   PERSONAL = "PERSONAL",
+  WEB_SOCKET = "WEBSOCKET",
+  ENVIRONMENT = "ENVIRONMENT",
 }
 
 export enum UntrackedItems {

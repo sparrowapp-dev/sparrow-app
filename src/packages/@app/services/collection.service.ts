@@ -163,27 +163,46 @@ export class CollectionService {
         headers: getAuthHeaders(),
       },
     );
-    if (response.isSuccessful) {
-      if (
-        deleteRequestBody.folderId &&
-        deleteRequestBody.collectionId &&
-        deleteRequestBody.workspaceId
-      ) {
-        await this.collectionRepository.deleteRequestInFolder(
-          deleteRequestBody.collectionId,
-          deleteRequestBody.folderId,
-          requestId,
-        );
-      } else if (
-        deleteRequestBody.workspaceId &&
-        deleteRequestBody.collectionId
-      ) {
-        await this.collectionRepository.deleteRequestOrFolderInCollection(
-          deleteRequestBody.collectionId,
-          requestId,
-        );
-      }
-    }
+    return response;
+  };
+
+  public addSocketInCollection = async (apiRequest) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/collection/websocket`,
+      {
+        body: apiRequest,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateSocketInCollection = async (requestId: string, requestBody) => {
+    const response = await makeRequest(
+      "PUT",
+      `${this.apiUrl}/api/collection/websocket/${requestId}`,
+      {
+        body: requestBody,
+        headers: getAuthHeaders(),
+      },
+    );
+
+    return response;
+  };
+
+  public deleteSocketInCollection = async (
+    requestId: string,
+    deleteRequestBody,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${this.apiUrl}/api/collection/websocket/${requestId}`,
+      {
+        body: deleteRequestBody,
+        headers: getAuthHeaders(),
+      },
+    );
     return response;
   };
 

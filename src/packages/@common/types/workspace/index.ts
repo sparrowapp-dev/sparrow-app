@@ -37,6 +37,14 @@ export type {
   Conversation,
 } from "./request";
 
+export type {
+  CollectionDto,
+  RequestDto,
+  WebsocketDto,
+  CollectionItemsDto,
+  CollectionArgsDto,
+} from "./collection";
+
 export type { Folder, FolderTab } from "./folder";
 
 export type { Collection, CollectionTab } from "./collection";
