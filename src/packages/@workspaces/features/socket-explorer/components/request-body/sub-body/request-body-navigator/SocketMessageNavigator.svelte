@@ -7,6 +7,8 @@
   export let onUpdateRequestState;
   export let requestState;
   export let onSendMessage;
+  export let webSocket;
+  export let body;
 
   let handleRawDropDown = (tab: string) => {
     onUpdateRequestState({ socketMessageLanguage: tab });
@@ -19,20 +21,16 @@
       id={"hash9872"}
       data={[
         {
-          name: "HTML",
-          id: RequestDataType.HTML,
+          name: "Text",
+          id: RequestDataType.TEXT,
         },
         {
           name: "JSON",
           id: RequestDataType.JSON,
         },
         {
-          name: "JavaScript",
-          id: RequestDataType.JAVASCRIPT,
-        },
-        {
-          name: "Text",
-          id: RequestDataType.TEXT,
+          name: "HTML",
+          id: RequestDataType.HTML,
         },
         {
           name: "XML",
@@ -45,5 +43,12 @@
       disabled={false}
     />
   </div>
-  <Button title="Send" onClick={onSendMessage} type={"primary"} />
+  <Button
+    title="Send"
+    disable={webSocket?.status !== "connected" || !body}
+    onClick={() => {
+      onSendMessage();
+    }}
+    type={"primary"}
+  />
 </div>

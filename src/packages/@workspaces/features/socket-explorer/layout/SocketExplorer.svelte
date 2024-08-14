@@ -37,7 +37,6 @@
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
-  export let onSendRequest: SendRequestType;
   export let onUpdateRequestParams: UpdateParamsType;
   export let onUpdateMessage;
   export let onUpdateHeaders: UpdateHeadersType;
@@ -122,8 +121,6 @@
                 requestStateSection={$tab.property.websocket?.state
                   ?.socketNavigation}
                 {onUpdateRequestState}
-                authParameterLength={0}
-                authHeaderLength={0}
                 paramsLength={$tab.property?.websocket?.queryParams?.length ||
                   0}
                 headersLength={$tab.property?.websocket?.headers?.length || 0}
@@ -139,6 +136,7 @@
                     {onUpdateRequestState}
                     {onSendMessage}
                     {onClearInput}
+                    {webSocket}
                   />
                 {:else if $tab.property.websocket?.state?.socketNavigation === SocketSectionEnum.PARAMETERS}
                   <SocketParameters

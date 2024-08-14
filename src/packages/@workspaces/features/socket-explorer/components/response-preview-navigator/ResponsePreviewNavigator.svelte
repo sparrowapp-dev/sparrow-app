@@ -12,7 +12,13 @@
   import { ResponseFormatterEnum } from "@common/types/workspace";
   import BeautifyIcon from "$lib/assets/beautify.svg";
   import js_beautify, { html_beautify } from "js-beautify";
-  import { WithSelect } from "@workspaces/common/hoc";
+  import {
+    WithButtonV4,
+    WithSelect,
+    WithSelectV2,
+  } from "@workspaces/common/hoc";
+  import { Tooltip } from "@library/ui";
+  import { CopyIcon, DownloadIcon } from "@library/icons";
 
   export let webSocket;
   export let onUpdateContentType;
@@ -54,8 +60,6 @@
         fileExtension = "html";
       } else if (webSocket?.contentType === RequestDataType.TEXT) {
         fileExtension = "txt";
-      } else if (webSocket?.contentType === RequestDataType.JAVASCRIPT) {
-        fileExtension = "js";
       }
     }
   }
@@ -99,28 +103,24 @@
     <div class="d-flex gap-3 align-items-center justify-content-center">
       <span class="text-fs-12">Received </span>
       <span class="">
-        <WithSelect
+        <WithSelectV2
           id={"hashdew565"}
           data={[
             {
-              name: "JSON",
-              id: RequestDataType.JSON,
+              name: "Text",
+              id: RequestDataType.TEXT,
             },
             {
-              name: "XML",
-              id: RequestDataType.XML,
+              name: "JSON",
+              id: RequestDataType.JSON,
             },
             {
               name: "HTML",
               id: RequestDataType.HTML,
             },
             {
-              name: "Javascript",
-              id: RequestDataType.JAVASCRIPT,
-            },
-            {
-              name: "Text",
-              id: RequestDataType.TEXT,
+              name: "XML",
+              id: RequestDataType.XML,
             },
           ]}
           titleId={webSocket?.contentType}
@@ -133,21 +133,30 @@
 
     <div class="d-flex align-items-center gap-2">
       <!-- Copy button -->
-      <div
-        on:click={handleCopy}
-        role="button"
-        class="icon-container d-flex align-items-center justify-content-center border-radius-2"
-      >
-        <img src={copyIcon} style="height:12px; width:12px;" />
-      </div>
+      <Tooltip title={"Copy"}>
+        <!-- <div
+          on:click={handleCopy}
+          role="button"
+          class="icon-container d-flex align-items-center justify-content-center border-radius-2"
+        >
+          <img src={copyIcon} style="height:12px; width:12px;" />
+        </div> -->
+        <WithButtonV4
+          icon={CopyIcon}
+          onClick={handleCopy}
+          disable={false}
+          loader={false}
+        />
+      </Tooltip>
       <!-- Download button -->
-      <div
-        on:click={handleDownloaded}
-        role="button"
-        class="icon-container d-flex align-items-center justify-content-center border-radius-2"
-      >
-        <img src={downloadIcon} style="height:12px; width:12px;" />
-      </div>
+      <Tooltip title={"Download"}>
+        <WithButtonV4
+          icon={DownloadIcon}
+          onClick={handleDownloaded}
+          disable={false}
+          loader={false}
+        />
+      </Tooltip>
     </div>
   </div>
 </div>
@@ -156,30 +165,5 @@
   .response-container {
     flex-wrap: wrap;
     background-color: transparent;
-  }
-  .btn-formatter {
-    outline: none;
-    border: none;
-  }
-
-  .clear-button {
-    color: var(--workspace-hover-color);
-    font-family: Roboto;
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 18px;
-    letter-spacing: 0em;
-    text-align: center;
-    padding: 4px 8px 4px 8px;
-  }
-  .icon-container {
-    height: 24px;
-    width: 24px;
-  }
-  .icon-container:hover {
-    background-color: var(--bg-secondary-550);
-  }
-  .icon-container:active {
-    background-color: var(--bg-secondary-600);
   }
 </style>

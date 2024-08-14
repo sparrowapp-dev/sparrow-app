@@ -62,30 +62,39 @@
   });
 
   // Run whenever component state changes
-  // afterUpdate(() => {
-  //   handleCodeMirrorSyntaxFormat(
-  //     codeMirrorView,
-  //     languageConf,
-  //     lang,
-  //     isFormatted,
-  //     value,
-  //     beautifySyntaxCallback,
-  //   );
-  // });
+  afterUpdate(() => {
+    if (value?.toString() !== codeMirrorView.state.doc?.toString()) {
+      codeMirrorView.dispatch({
+        changes: {
+          from: 0,
+          to: codeMirrorView.state.doc.length,
+          insert: value,
+        },
+      });
+    }
+    handleCodeMirrorSyntaxFormat(
+      codeMirrorView,
+      languageConf,
+      lang,
+      isFormatted,
+      value,
+      beautifySyntaxCallback,
+    );
+  });
 
   // Run whenever isBodyBeautified changes to format request body syntax
-  // $: {
-  //   if (isBodyBeautified) {
-  //     handleCodeMirrorSyntaxFormat(
-  //       codeMirrorView,
-  //       languageConf,
-  //       lang,
-  //       true,
-  //       value,
-  //       beautifySyntaxCallback,
-  //     );
-  //   }
-  // }
+  $: {
+    if (isBodyBeautified) {
+      handleCodeMirrorSyntaxFormat(
+        codeMirrorView,
+        languageConf,
+        lang,
+        true,
+        value,
+        beautifySyntaxCallback,
+      );
+    }
+  }
 
   onDestroy(() => {
     destroyCodeMirrorEditor(); // Call destroyCodeMirrorEditor when component is being destroyed

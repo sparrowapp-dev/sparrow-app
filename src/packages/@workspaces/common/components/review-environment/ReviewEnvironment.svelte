@@ -97,7 +97,7 @@
               notifications.success("Copied to Clipboard");
             }}
           >
-            <CopyIcon height="12px" width="12px"   />
+            <CopyIcon height={"12px"} width={"12px"}  color={"#8A9299"} />
           </div>
         </div>
       </div>

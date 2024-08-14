@@ -278,8 +278,6 @@ class RestExplorerViewModel {
       return;
     }
     progressiveTab.property.websocket.message = _message;
-    // message
-    debugger;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -1453,7 +1451,7 @@ class RestExplorerViewModel {
     });
   };
 
-  public deleteMessages = async (_search: string) => {
+  public deleteMessages = async () => {
     const websocketData = this._tab.getValue();
     webSocketDataStore.update((webSocketDataMap) => {
       const wsData = webSocketDataMap.get(websocketData.tabId);
@@ -1464,6 +1462,7 @@ class RestExplorerViewModel {
       }
       return webSocketDataMap;
     });
+    notifications.success("All responses are cleared successfully.");
   };
 
   public updateContentType = async (_contentType: string) => {
@@ -1497,6 +1496,7 @@ class RestExplorerViewModel {
     await this.updateMessage("");
     await this.updateHeaders(initWebSocketTab.property.websocket.headers);
     await this.updateParams(initWebSocketTab.property.websocket.queryParams);
+    notifications.success("Cleared all inputs successfully.");
   };
 }
 

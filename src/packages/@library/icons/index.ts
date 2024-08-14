@@ -62,3 +62,4 @@ export { default as SuccessInfoIcon } from "./SuccessInfo.svelte";
 export { default as DustbinIcon } from "./Dustbin.svelte";
 export { default as ArrowUpward } from "./ArrowUpward.svelte";
 export { default as ArrowDownward } from "./ArrowDownward.svelte";
+export { default as DownloadIcon } from "./Download.svelte";
