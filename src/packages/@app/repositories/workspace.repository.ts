@@ -6,13 +6,15 @@ import type { CollectionItem } from "$lib/utils/interfaces/collection.interface"
 import type { Observable } from "rxjs";
 import { CollectionRepository } from "./collection.repository";
 import { EnvironmentRepository } from "./environment.repository";
-import { EnvironmentTabRepository } from "./environment-tab.repository";
+import { TabRepository } from "./tab.repository";
+// import { EnvironmentTabRepository } from "./environment-tab.repository";
 
 export class WorkspaceRepository {
-  constructor() {}
+  constructor() { }
   private collectionRepository = new CollectionRepository();
   private environmentRepository = new EnvironmentRepository();
-  private environmentTabRepository = new EnvironmentTabRepository();
+  private tabRepository = new TabRepository();
+  // private environmentTabRepository = new EnvironmentTabRepository();
   /**
    * extracts RxDocument of workspace.
    */
@@ -195,9 +197,16 @@ export class WorkspaceRepository {
     for (let i = 0; i < workspaceDoc.length; i++) {
       await this.collectionRepository.removeCollections(workspaceDoc[i]._id);
       await this.environmentRepository.removeEnvironments(workspaceDoc[i]._id);
-      await this.environmentTabRepository.removeEnvironmentTabs(
-        workspaceDoc[i]._id,
-      );
+      await this.tabRepository.removeTabsByQuery({
+        selector: {
+          "path.workspaceId": workspaceDoc[i]._id,
+        },
+      });
+
+      const tabs = await this.tabRepository.getTabDocs();
+      if (!tabs) {
+        await this.tabRepository.activateInitialTab();
+      }
     }
     return await workspaces.remove();
   };
@@ -318,6 +327,8 @@ export class WorkspaceRepository {
       users: [...workspace.users],
     });
   };
+
+
   public deleteWorkspace = async (workspaceId: string): Promise<any> => {
     const workspace = await RxDB.getInstance()
       .rxdb.workspace.findOne({
@@ -328,7 +339,6 @@ export class WorkspaceRepository {
       .exec();
     await this.collectionRepository.removeCollections(workspaceId);
     await this.environmentRepository.removeEnvironments(workspaceId);
-    await this.environmentTabRepository.removeEnvironmentTabs(workspaceId);
     return await workspace.remove();
   };
   public addUserInWorkspace = async (

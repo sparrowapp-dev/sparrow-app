@@ -11,4 +11,5 @@ export * from "./workspace-explorer";
 export * from "./invite-to-workspace";
 export * from "./chat-bot";
 export * from "./environment-list";
+export * from "./collection-list";
 export * from "./environment-explorer";

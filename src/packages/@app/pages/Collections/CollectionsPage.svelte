@@ -36,7 +36,7 @@
 
   // ---- View Model
   import CollectionsViewModel from "./CollectionPage.ViewModel";
-  
+  import { EnvironmentViewModel } from "@app/pages/EnvironmentPage/EnvironmentPage.ViewModel";
 
   // ---- helpers
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
@@ -56,6 +56,7 @@
   import { isGuestUserActive } from "$lib/store";
   import { pagesMotion } from "@app/constants";
   import { user } from "$lib/store";
+  import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
 
   export let modifiedUser;
 
@@ -63,7 +64,7 @@
 
   const _viewModel = new CollectionsViewModel();
 
-
+  const _viewModel2 = new EnvironmentViewModel();
 
   let currentWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
@@ -83,6 +84,65 @@
   let isGuestUser = false;
   let userId = "";
   let userRole = "";
+
+  let isExpandCollection = false;
+  let isExpandEnvironment = false;
+
+  let localEnvironment;
+  let globalEnvironment;
+
+  let environments = _viewModel2.environments;
+
+  let environmentsValues;
+  let currentWOrkspaceValue: Observable<WorkspaceDocument>;
+
+  environments.subscribe((value) => {
+    if (value) {
+      environmentsValues = value;
+    }
+  });
+
+  currentWorkspace.subscribe((value) => {
+    if (value) {
+      currentWOrkspaceValue = value;
+    }
+  });
+
+  const mapEnvironmentToWorkspace = (_env, _workspaceId) => {
+    if (_env && _workspaceId) {
+      localEnvironment = [];
+      globalEnvironment = [];
+      environmentsValues
+        .filter((element) => {
+          return element.workspaceId === _workspaceId;
+        })
+        .forEach((element) => {
+          const _element = element.toMutableJSON();
+          if (_element.type === "GLOBAL") {
+            globalEnvironment.push(_element);
+          } else if (_element.type === "LOCAL") {
+            localEnvironment.push(_element);
+          }
+        });
+    }
+  };
+
+  $: {
+    if (environmentsValues || currentWOrkspaceValue?._id) {
+      mapEnvironmentToWorkspace(environmentsValues, currentWOrkspaceValue?._id);
+    }
+  }
+
+  let onCreateEnvironment = _viewModel2.onCreateEnvironment;
+
+  async function handleCreateEnvironment() {
+    if (!isExpandEnvironment) {
+      isExpandEnvironment = !isExpandEnvironment;
+    }
+
+    await onCreateEnvironment(localEnvironment);
+    scrollList("bottom");
+  }
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
@@ -260,6 +320,15 @@
           onBranchSwitched={_viewModel.handleBranchSwitch}
           onRefetchCollection={_viewModel.handleRefetchCollection}
           onSearchCollection={_viewModel.handleSearchCollection}
+          environments={_viewModel2.environments}
+          onCreateEnvironment={_viewModel2.onCreateEnvironment}
+          onOpenGlobalEnvironment={_viewModel2.onOpenGlobalEnvironment}
+          onDeleteEnvironment={_viewModel2.onDeleteEnvironment}
+          onUpdateEnvironment={_viewModel2.onUpdateEnvironment}
+          onOpenEnvironment={_viewModel2.onOpenEnvironment}
+          onSelectEnvironment={_viewModel2.onSelectEnvironment}
+          bind:isExpandCollection
+          bind:isExpandEnvironment
         />
       </Pane>
       <Pane
@@ -302,6 +371,12 @@
                       <FolderExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
+                {:else if $activeTab?.type === ItemType.ENVIRONMENT}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <EnvironmentExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
                 {:else if $activeTab?.type === ItemType.WORKSPACE}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
@@ -316,6 +391,7 @@
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WorkspaceDefault
+                        {handleCreateEnvironment}
                         showImportCollectionPopup={() =>
                           (isImportCollectionPopup = true)}
                         onItemCreated={_viewModel.handleCreateItem}
@@ -388,6 +464,7 @@
       if (response.isSuccessful) {
         setTimeout(() => {
           scrollList("bottom");
+          isExpandCollection = true;
         }, 1000);
       }
     }}

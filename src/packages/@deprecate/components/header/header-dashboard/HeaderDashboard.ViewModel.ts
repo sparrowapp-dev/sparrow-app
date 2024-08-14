@@ -18,7 +18,6 @@ import { requestResponseStore } from "$lib/store/request-response-section";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { EnvironmentService } from "@app/services/environment.service";
 import type { Observable } from "rxjs";
-import { EnvironmentTabRepository } from "@app/repositories/environment-tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
 import type {
   addUsersInWorkspace,
@@ -29,13 +28,12 @@ import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
 export class HeaderDashboardViewModel {
-  constructor() {}
+  constructor() { }
   private workspaceRepository = new WorkspaceRepository();
   private teamRepository = new TeamRepository();
   private workspaceService = new WorkspaceService();
   private environmentRepository = new EnvironmentRepository();
   private environmentService = new EnvironmentService();
-  private environmentTabRepository = new EnvironmentTabRepository();
 
   public getWorkspaceDocument = (elem: WorkspaceDocument) => {
     return {

@@ -10,8 +10,7 @@
   } from "$lib/utils/constants/permissions.constant";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { userWorkspaceLevelRole } from "$lib/store";
-  import { TabularInput } from "@workspaces/common/components";
-  import { WithButton } from "@workspaces/common/hoc";
+  import { TabularInputV2 } from "@workspaces/common/components";
   import { Input } from "@library/forms";
   import { Carousel, Modal, Popover } from "@library/ui";
   import { environmentType, WorkspaceRole } from "$lib/utils/enums";
@@ -20,6 +19,7 @@
     IntroToEnvironment,
     SearchVariable,
   } from "@workspaces/common/constants";
+  import { WithButtonV3 } from "@workspaces/common/hoc";
 
   /**
    * selected environmet to be shown on API
@@ -80,7 +80,7 @@
   });
 </script>
 
-{#if $currentEnvironment?.environmentId}
+{#if $currentEnvironment?.tabId}
   <div class={`h-100 env-panel d-flex`}>
     <div
       class="d-flex flex-column h-100 env-parent w-100 {quickHelp
@@ -92,7 +92,7 @@
         style="position: relative ;"
       >
         <!--Disabling the Quick Help feature, will be taken up in next release-->
-        {#if $currentEnvironment?.type === environmentType.GLOBAL}
+        {#if $currentEnvironment?.property?.environment?.type === environmentType.GLOBAL}
           <button
             class="btn p-0"
             style="position: absolute; left:150px;  top:22.5px; border:none; z-index:5; curser:pointer;"
@@ -135,8 +135,8 @@
           focusedBorderColor={"var(--border-primary-300)"}
           class="text-fs-18 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;"
-          disabled={$currentEnvironment?.type == "GLOBAL" ||
-            userRole === WorkspaceRole.WORKSPACE_VIEWER}
+          disabled={$currentEnvironment?.property?.environment?.type ==
+            "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
           placeholder=""
         />
         <div class={`d-flex env-btn-container`}>
@@ -157,23 +157,21 @@
           </div>
 
           <div class="position-relative">
-            {#if !$currentEnvironment.isSave}
-              <div class="badge-data d-block"></div>
-            {/if}
             <Tooltip title="Save" placement="bottom" distance={10}>
-              <WithButton
+              <WithButtonV3
                 icon={SaveIcon}
                 onClick={onSaveEnvironment}
-                disable={$currentEnvironment.isSaveInProgress ||
-                  $currentEnvironment.isSave ||
+                disable={$currentEnvironment?.property?.environment?.state?.isSaveInProgress ||
+                  $currentEnvironment?.isSaved ||
                   userRole === WorkspaceRole.WORKSPACE_VIEWER}
-                loader={$currentEnvironment.isSaveInProgress}
+                loader={$currentEnvironment?.property?.environment?.state
+                  ?.isSaveInProgress}
               />
             </Tooltip>
           </div>
           <span>
             <Tooltip title="Help" placement="bottom" distance={10}>
-              <WithButton
+              <WithButtonV3
                 icon={HelpIcon}
                 onClick={() => {
                   quickHelp = true;
@@ -187,14 +185,14 @@
       </header>
       <!--Disabling the Quick Help feature, will be taken up in next release-->
       <div>
-        {#if isPopoverContainer && $currentEnvironment?.type === environmentType.GLOBAL}
+        {#if isPopoverContainer && $currentEnvironment?.property?.environment?.type === environmentType.GLOBAL}
           <Popover
             heading={`Welcome to Environments!`}
             text={` `}
             onClose={closeEnvHelpText}
             ><p>
-              Environments allow you to manage different sets of confirguration
-              variables for various stages of your application (e.g.,
+              Environments allow you to manage different sets of configuration
+              variables for various stages of your application (e.g.
               Development, Staging, Production). This helps in organizing and
               isolating settings, making testing and deployment easier and more
               efficient.
@@ -211,9 +209,9 @@
         {/if}
       </div>
       <section class={`var-value-container pe-1`} style="flex:1;">
-        <TabularInput
+        <TabularInputV2
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          keyValue={$currentEnvironment.variable}
+          keyValue={$currentEnvironment?.property?.environment?.variable}
           callback={handleCurrentEnvironmentKeyValuePairChange}
           {search}
         />
