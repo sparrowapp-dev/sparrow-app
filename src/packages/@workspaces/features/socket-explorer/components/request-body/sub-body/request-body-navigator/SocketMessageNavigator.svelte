@@ -4,6 +4,8 @@
   import { Button } from "@library/ui";
   import { notifications } from "@library/ui/toast/Toast";
   import { WithSelect } from "@workspaces/common/hoc";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   export let onUpdateRequestState;
   export let requestState;
   export let onSendMessage;
@@ -48,6 +50,8 @@
     disable={webSocket?.status !== "connected" || !body}
     onClick={() => {
       onSendMessage();
+      MixpanelEvent(Events.Send_WebSocket_Request);
+
     }}
     type={"primary"}
   />

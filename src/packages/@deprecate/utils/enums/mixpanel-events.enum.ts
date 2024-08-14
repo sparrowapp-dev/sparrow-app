@@ -63,4 +63,10 @@ export enum Events {
   AI_Dislike_Response = "AI_Dislike_Response",
   AI_Generate_Doc = "AI_Generate_Doc",
   AI_Regenerate_Doc = "AI_Regenerate_Doc",
+  WebSocket_Button="WebSocket_Button",
+  Add_WebSocket="Add_WebSocket",
+  Collection_WebSocket="Collection_WebSocket",
+  WebSocket_Connected="WebSocket_Connected",
+  WebSocket_Disconnected="WebSocket_Disconnected",
+  Send_WebSocket_Request="Send_WebSocket_Request"
 }

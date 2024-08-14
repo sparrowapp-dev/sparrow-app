@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { WorkspaceDocument } from "@app/database/database";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import {
     VectorIcon,
     LibraryIcon,
@@ -119,6 +121,7 @@
       role="button"
       on:click={() => {
         onItemCreated("web-socket", {});
+        MixpanelEvent(Events.WebSocket_Button);
       }}
     >
       <div
