@@ -1,4 +1,7 @@
 <script lang="ts">
+    import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+    import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+
   export let onItemCreated: (entityType: string, args: any) => void;
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
@@ -657,6 +660,7 @@
                     workspaceId: collection.workspaceId,
                     collection,
                   });
+                  MixpanelEvent(Events.Collection_WebSocket);
                 }}
               >
                 <SocketIcon

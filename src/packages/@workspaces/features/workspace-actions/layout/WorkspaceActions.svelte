@@ -222,7 +222,10 @@
         {
           name: "Add WebSocket",
           icon: socketDeprecateIcon,
-          onclick: () => onItemCreated("web-socket", {}),
+          onclick: () => {
+            onItemCreated("web-socket", {})
+            MixpanelEvent(Events.Add_WebSocket);
+          },
         },
       ]
     : [
