@@ -28,10 +28,8 @@
   import constants from "$lib/utils/constants";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { CollectionList } from "@workspaces/features/collection-list";
-  import { EnvironmentList } from "@workspaces/features/environment-list";
-
-  import { EnvironmentViewModel } from "@app/pages/EnvironmentPage/EnvironmentPage.ViewModel";
+  import { CollectionList } from "@workspaces/features";
+  import { EnvironmentList } from "@workspaces/features";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -40,6 +38,7 @@
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
+
   export let onSearchCollection: (
     collection: CollectionDocument[],
     searchData: string,
@@ -321,6 +320,7 @@
         width={"100%"}
         height={"33px"}
         type="search"
+        searchIconColor={"var(--icon-secondary-170 )"}
         bind:value={searchData}
         on:input={(e) => {
           handleSearch();

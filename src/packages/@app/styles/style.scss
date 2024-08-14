@@ -98,6 +98,7 @@ $theme-grey-A5B5CA: #A5B5CA;
 $theme-grey-B6B5B5: #B6B5B5;
 $theme-grey-8A9299: #8A9299;
 $theme-grey-999999: #999999;
+$theme-grey-9CA0B2: #9CA0B2;
 $theme-grey-CCCCCC :#CCCCCC;
 $theme-grey-888888: #888888;
 $theme-grey-83899F: #83899F;
@@ -120,6 +121,8 @@ $theme-grey-151515: #151515;
 $theme-grey-000000: #000000;
 $theme-grey-191919: #191919;
 $theme-grey-121212: #121212;
+
+
 
 
 
@@ -358,7 +361,7 @@ $theme-red-2B1C1D: #2B1C1D;
   --bg-tertiary-650 : #{$theme-violet-323548};
   --bg-tertiary-700 : #{$theme-violet-1c1d27};
   --bg-tertiary-750 : #{$theme-violet-1C1D2B};
-  
+
 
   --bg-danger-100 : #{$theme-red-e5acb2};
   --bg-danger-200 : #{$theme-red-fe8c98};
@@ -421,9 +424,9 @@ $theme-red-2B1C1D: #2B1C1D;
   --border-danger-700 : #{$theme-red-f34b5c};
   --border-danger-800 : #{$theme-red-f33346};
   --border-danger-900 : #{$theme-red-fe2e2e};
-  --border-danger-1000 : #{$theme-red-312325};
+  --border-danger-170 : #{$theme-red-312325};
   --border-danger-1200 : #{$theme-red-2B1C1D};
-  
+
   //
   //
   // Sets icon color
@@ -435,10 +438,13 @@ $theme-red-2B1C1D: #2B1C1D;
   --icon-primary-400 : #{$theme-blue-0B5ED7};
   --icon-primary-900 : #{$theme-blue-303F4F};
 
+
+
   --icon-secondary-100 : #{$theme-grey-ffffff};
   --icon-secondary-110 : #{$theme-grey-F5F5F5};
   --icon-secondary-130 : #{$theme-grey-A5B5CA};
   --icon-secondary-150 : #{$theme-grey-e5e5e5};
+  --icon-secondary-170 : #{$theme-grey-9CA0B2};
   --icon-secondary-200 : #{$theme-grey-8A9299};
   --icon-secondary-220 : #{$theme-grey-60616B};
   --icon-secondary-290 : #{$theme-grey-484848};
@@ -648,7 +654,7 @@ $sparrow-bg-colors: (
   secondary-900 : $theme-grey-000000,
   secondary-1000 : $theme-grey-CCCCCC,
   secondary-1100 : $theme-grey-2B343D,
-  
+
   tertiary-100 : $theme-violet-676A80,
   tertiary-190 : $theme-violet-37394E,
   tertiary-300 : $theme-violet-2A2C3C,
@@ -811,7 +817,7 @@ span {
 
 /* Set the width of the scrollbar */
 ::-webkit-scrollbar {
-  width: 11px; 
+  width: 11px;
   height: 11px;
 }
 
@@ -824,40 +830,41 @@ span {
 
 /* Customize the scrollbar thumb (the draggable part) */
 ::-webkit-scrollbar-thumb {
-  background-color: var( --bg-secondary-350 );  
-  border-radius: 10px;     
-  border: 3px solid transparent; 
-  background-clip: content-box; 
+  background-color: var(--bg-secondary-350);
+  border-radius: 10px;
+  border: 3px solid transparent;
+  background-clip: content-box;
   width: 5px !important;
   height: 5px;
 }
 
 ::-webkit-scrollbar-corner {
-  background: transparent; 
+  background: transparent;
 }
 
 /* Customize the scrollbar buttons (arrows) */
 ::-webkit-scrollbar-button {
-  border: none;          
-  height: 8px;           
-  width: 5px;     
+  border: none;
+  height: 8px;
+  width: 5px;
 }
 
- 
+
 /* Up arrow */
 ::-webkit-scrollbar-button:vertical:start:decrement {
   background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgdmlld0JveD0iMCAwIDEwIDYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik01LjU4ODc4IDAuNzQ0MTQxQzUuMjYzMjYgMC40MTg2MiA0LjczNDYxIDAuNDE4NjIgNC40MDkwOSAwLjc0NDE0MUwxLjA3NTc2IDQuMDc3NDdDMC44MzYxNzMgNC4zMTcwNiAwLjc2NTg2IDQuNjczODMgMC44OTYwNjggNC45ODYzM0MxLjAyNjI4IDUuMjk4ODMgMS4zMjgzNiA1LjUwMTk1IDEuNjY2OTAgNS41MDE5NUg4LjMzMzU3QzguNjY5NTEgNS41MDE5NSA4Ljk3NDE5IDUuMjk4ODMgOS4xMDQwIDQuOTg2MzNDOS4yMzQ2MSA0LjY3MzgzIDkuMTYxNjkgNC4zMTcwNiA4LjkyNDcyIDQuMDc3NDdMNS41OTEzOCAwLjc0NDE0MUg1LjU4ODc4WiIgZmlsbD0iIzY3NkE4MCIvPgo8L3N2Zz4K');
   display: block;
-  background-size: 12px; 
-  background-position: center;/* Adjusted size */
- 
+  background-size: 12px;
+  background-position: center;
+  /* Adjusted size */
+
 }
- 
+
 /* Down arrow */
 ::-webkit-scrollbar-button:vertical:end:increment {
   background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTQiIHZpZXdCb3g9IjAgMCAxMCAxNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzYxNTVfMjEyMzkpIj4KPHBhdGggZD0iTTQuNDExNjEgOS4yNTc4MUM0LjczNzEzIDkuNTgzMzMgNS4yNjU3NyA5LjU4MzMzIDUuNTkxMjkgOS4yNTc4MUw4LjkyNDYzIDUuOTI0NDhDOS4xNjQyMSA1LjY4NDkgOS4yMzQ1MiA1LjMyODEzIDkuMTA0MzEgNS4wMTU2M0M4Ljk3NDExIDQuNzAzMTMgOC42NzIwMiA0LjUgOC4zMzM0OCA0LjVMMDEuNjY2ODEgNC41MDI2MEMxLjMzMDg4IDQuNTAyNiAxLjAyNjE5IDQuNzA1NzMgMC44OTU5ODEgNS4wMTgyM0MwLjc2NTc3MyA1LjMzMDczIDAuODM4Njg5IDUuNjg3NSAxLjA3NTY3IDUuOTI3MDhMNC40MDkwMDkgOS4yNjA0Mkw0LjQxMTYxIDkuMjU3ODFaIiBmaWxsPSIjNjc2QTgwIi8+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfNjE1NV8yMTIzOSI+CjxyZWN0IHdpZHRoPSI4LjMzMzMzIiBoZWlnaHQ9IjEzLjMzMzMiIGZpbGw9IndoaXRlIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjgzMzQ5NiAwLjMzMzk4NCkiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K');
   display: block;
-  background-size:12px;
+  background-size: 12px;
   background-position: center;
 }
 
@@ -899,4 +906,3 @@ span {
 textarea {
   resize: none;
 }
-

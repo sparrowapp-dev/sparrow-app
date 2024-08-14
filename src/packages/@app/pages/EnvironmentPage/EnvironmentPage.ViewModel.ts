@@ -181,10 +181,7 @@ export class EnvironmentViewModel {
       .setName(environment?.name)
       .setType(environmentType.GLOBAL)
       .setVariable(environment?.variable);
-    this.tabRepository.createTab(
-      initEnvironmentTab.getValue(),
-      environment.workspaceId,
-    );
+    this.tabRepository.createTab(initEnvironmentTab.getValue());
   };
 
   /**
@@ -301,9 +298,7 @@ export class EnvironmentViewModel {
       .setVariable(env.variable);
 
     this.tabRepository.createTab(
-      initEnvironmentTab.getValue(),
-      currentWorkspace._id,
-    );
+      initEnvironmentTab.getValue() );
   };
 
   /**

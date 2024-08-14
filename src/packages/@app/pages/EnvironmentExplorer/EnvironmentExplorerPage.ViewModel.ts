@@ -86,35 +86,35 @@ export class EnvironmentExplorerViewModel {
   };
 
   /**
-  * Compares the current request tab with the server version and updates the saved status accordingly.
+  * Compares the current environment tab with the server version and updates the saved status accordingly.
   * This method is debounced to reduce the number of server requests.
   * @return A promise that resolves when the comparison is complete.
   */
-  private compareRequestWithServerDebounced = async () => {
+  private compareEnvironmentWithServerDebounced = async () => {
     let result = true;
     const progressiveTab = createDeepCopy(this._tab.getValue());
 
-    let requestServer =
+    let environmentServer =
       await this.environmentRepository.readEnvironment(
         progressiveTab.id,
       );
 
-    if (!requestServer) {
+    if (!environmentServer) {
       result = false;
     }
     // // description
-    // else if (requestServer.description !== progressiveTab.description) {
+    // else if (environmentServer.description !== progressiveTab.description) {
     //   result = false;
     // }
     // name
-    else if (requestServer.name !== progressiveTab.name) {
+    else if (environmentServer.name !== progressiveTab.name) {
       result = false;
     }
 
     // variable
     else if (
       !this.compareArray.init(
-        requestServer.variable,
+        environmentServer.variable,
         progressiveTab.property.environment.variable,
       )
     ) {
@@ -140,7 +140,7 @@ export class EnvironmentExplorerViewModel {
    * Debounced method to compare the current request tab with the server version.
    */
   private compareRequestWithServer = new Debounce().debounce(
-    this.compareRequestWithServerDebounced,
+    this.compareEnvironmentWithServerDebounced,
     1000,
   );
 
@@ -148,7 +148,7 @@ export class EnvironmentExplorerViewModel {
  *
  * @param _state - request state
  */
-  public updateRequestState = async (_state) => {
+  public updateEnvironmentState = async (_state) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.environment.state = {
       ...progressiveTab.property.environment.state,
@@ -168,7 +168,7 @@ export class EnvironmentExplorerViewModel {
     const activeWorkspace = await this.workspaceRepository.readWorkspace(
       currentEnvironment.workspaceId,
     );
-    await this.updateRequestState({ isSaveInProgress: true });
+    await this.updateEnvironmentState({ isSaveInProgress: true });
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
@@ -185,7 +185,7 @@ export class EnvironmentExplorerViewModel {
       progressiveTab.isSaved = true;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-      await this.updateRequestState({
+      await this.updateEnvironmentState({
         isSaveInProgress: false,
       });
       notifications.success(
@@ -212,14 +212,14 @@ export class EnvironmentExplorerViewModel {
       progressiveTab.isSaved = true;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-      await this.updateRequestState({
+      await this.updateEnvironmentState({
         isSaveInProgress: false,
       });
       notifications.success(
         `Changes saved for ${currentEnvironment.name} environment.`,
       );
     } else {
-      await this.updateRequestState({ isSaveInProgress: false });
+      await this.updateEnvironmentState({ isSaveInProgress: false });
       if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {

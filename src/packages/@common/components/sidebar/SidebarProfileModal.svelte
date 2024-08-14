@@ -134,8 +134,8 @@
 
   .sidebar-item {
     position: relative;
-    height: 44px;
-    width: 44px;
+    height: 41px;
+    width: 41px;
   }
 
   .sidebar-item:hover {
