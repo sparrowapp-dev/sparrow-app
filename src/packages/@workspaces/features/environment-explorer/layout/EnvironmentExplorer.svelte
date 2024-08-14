@@ -19,7 +19,7 @@
     IntroToEnvironment,
     SearchVariable,
   } from "@workspaces/common/constants";
-  import {WithButtonV3} from "@workspaces/common/hoc";
+  import { WithButtonV3 } from "@workspaces/common/hoc";
 
   /**
    * selected environmet to be shown on API
@@ -161,11 +161,11 @@
               <WithButtonV3
                 icon={SaveIcon}
                 onClick={onSaveEnvironment}
-                disable={$currentEnvironment?.property?.environment?.state
-                  .isSaveInProgress ||
+                disable={$currentEnvironment?.property?.environment?.state?.isSaveInProgress ||
                   $currentEnvironment?.isSaved ||
                   userRole === WorkspaceRole.WORKSPACE_VIEWER}
-                loader={$currentEnvironment?.environment?.state?.isSaveInProgress}
+                loader={$currentEnvironment?.property?.environment?.state
+                  ?.isSaveInProgress}
               />
             </Tooltip>
           </div>

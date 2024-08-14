@@ -15,10 +15,7 @@
 <script lang="ts">
   import { SignOutIcon } from "@library/icons";
   import { afterUpdate, onMount } from "svelte";
-  import ShowMore from "$lib/components/dropdown/ShowMore.svelte";
-  import Showmore from "$lib/assets/showmore.svelte";
-    import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-
+  import { Tooltip } from "@library/ui";
   /**
    * List of side bar Items
    */

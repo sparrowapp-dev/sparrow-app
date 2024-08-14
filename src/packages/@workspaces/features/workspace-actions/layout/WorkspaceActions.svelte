@@ -28,8 +28,7 @@
   import constants from "$lib/utils/constants";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { CollectionList } from "@workspaces/features";
-  import { EnvironmentList } from "@workspaces/features";
+  import { CollectionList, EnvironmentList } from "@workspaces/features";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
