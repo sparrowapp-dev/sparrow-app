@@ -319,4 +319,77 @@ export class EnvironmentViewModel {
       });
     }
   };
+
+    /**
+   * @description - saves environment to the mongo server
+   */
+    public saveEnvironment = async (_tab) => {
+      const currentEnvironment = _tab;
+      const activeWorkspace = await this.workspaceRepository.readWorkspace(
+        currentEnvironment.workspaceId,
+      );
+      const guestUser = await this.guestUserRepository.findOne({
+        name: "guestUser",
+      });
+      const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+      if (isGuestUser) {
+        await this.environmentRepository.updateEnvironment(
+          currentEnvironment.id,
+          {
+            name: currentEnvironment.name,
+            variable: currentEnvironment?.property?.environment?.variable,
+          },
+        );
+        notifications.success(
+          `Changes saved for ${currentEnvironment.name} environment.`,
+        );
+   
+        return true;
+      }
+   
+      const response = await this.environmentService.updateEnvironment(
+        activeWorkspace._id,
+        currentEnvironment.id,
+        {
+          name: currentEnvironment.name,
+          variable: currentEnvironment?.property?.environment?.variable,
+        },
+        );
+      if (response.isSuccessful) {
+        this.environmentRepository.updateEnvironment(
+          response.data.data._id,
+          response.data.data,
+        );
+     
+        notifications.success(
+          `Changes saved for ${currentEnvironment.name} environment.`,
+        );
+        return true;
+      } else {
+   
+        if (response.message === "Network Error") {
+          notifications.error(response.message);
+        } else {
+          notifications.error(
+            `Failed to save changes for ${currentEnvironment.name} environment.`,
+          );
+        }
+      }
+      if (currentEnvironment.type === environmentType.GLOBAL) {
+        MixpanelEvent(Events.SAVE_GLOBAL_ENVIRONMENT_VARIABLES, {
+          environmentName: currentEnvironment.name,
+          environmanetId: currentEnvironment.id,
+        });
+      } else {
+        MixpanelEvent(Events.SAVE_LOCAL_ENVIRONMENT_VARIABLES, {
+          environmentName: currentEnvironment.name,
+          environmanetId: currentEnvironment.id,
+        });
+      }
+
+      return false;
+    };
+
+
+
 }

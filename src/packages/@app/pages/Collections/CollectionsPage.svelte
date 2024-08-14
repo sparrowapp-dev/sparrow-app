@@ -178,7 +178,8 @@
   const closeTab = (id: string, tab: Tab) => {
     if (
       (tab?.type === TabTypeEnum.REQUEST ||
-        tab?.type === TabTypeEnum.WEB_SOCKET) &&
+        tab?.type === TabTypeEnum.WEB_SOCKET ||
+        tab?.type === TabTypeEnum.ENVIRONMENT) &&
       !tab?.isSaved
     ) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
@@ -205,11 +206,32 @@
    * Handle save functionality on close confirmation popup
    */
   const handlePopupSave = async () => {
-    if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
+    if (
+      removeTab.type === TabTypeEnum.ENVIRONMENT &&
+      removeTab?.path.workspaceId
+    ) {
+      const id = removeTab?.id;
+      loader = true;
+      console.log("insde handle pop for env");
+      const res = await _viewModel2.saveEnvironment(removeTab);
+      if (res) {
+        loader = false;
+        _viewModel.handleRemoveTab(id);
+        isPopupClosed = false;
+      }
+      loader = false;
+    } else if (
+      (removeTab.type === TabTypeEnum.REQUEST ||
+        removeTab.type === TabTypeEnum.WEB_SOCKET) &&
+      removeTab?.path.collectionId &&
+      removeTab?.path.workspaceId
+    ) {
       const id = removeTab?.id;
       loader = true;
 
       if (removeTab.type === TabTypeEnum.REQUEST) {
+        console.log("insde handle pop for request");
+
         const res = await _viewModel.saveAPIRequest(removeTab);
         if (res) {
           loader = false;
