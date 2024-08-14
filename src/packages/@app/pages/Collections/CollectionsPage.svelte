@@ -206,52 +206,49 @@
    * Handle save functionality on close confirmation popup
    */
   const handlePopupSave = async () => {
-    if (
-      removeTab.type === TabTypeEnum.ENVIRONMENT &&
-      removeTab?.path.workspaceId
-    ) {
-      const id = removeTab?.id;
-      loader = true;
-      console.log("insde handle pop for env");
-      const res = await _viewModel2.saveEnvironment(removeTab);
-      if (res) {
+    if (removeTab.type === TabTypeEnum.ENVIRONMENT) {
+      if (removeTab?.path.workspaceId) {
+        const id = removeTab?.id;
+        loader = true;
+
+        const res = await _viewModel2.saveEnvironment(removeTab);
+        if (res) {
+          loader = false;
+          _viewModel.handleRemoveTab(id);
+          isPopupClosed = false;
+        }
         loader = false;
-        _viewModel.handleRemoveTab(id);
-        isPopupClosed = false;
       }
-      loader = false;
     } else if (
-      (removeTab.type === TabTypeEnum.REQUEST ||
-        removeTab.type === TabTypeEnum.WEB_SOCKET) &&
-      removeTab?.path.collectionId &&
-      removeTab?.path.workspaceId
+      removeTab.type === TabTypeEnum.REQUEST ||
+      removeTab.type === TabTypeEnum.WEB_SOCKET
     ) {
-      const id = removeTab?.id;
-      loader = true;
+      if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
+        const id = removeTab?.id;
+        loader = true;
 
-      if (removeTab.type === TabTypeEnum.REQUEST) {
-        console.log("insde handle pop for request");
-
-        const res = await _viewModel.saveAPIRequest(removeTab);
-        if (res) {
-          loader = false;
-          _viewModel.handleRemoveTab(id);
-          isPopupClosed = false;
-          notifications.success("API request saved");
+        if (removeTab.type === TabTypeEnum.REQUEST) {
+          const res = await _viewModel.saveAPIRequest(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+            notifications.success("API request saved");
+          }
+        } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
+          const res = await _viewModel.saveSocket(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+            notifications.success("WebSocket request saved");
+          }
         }
-      } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
-        const res = await _viewModel.saveSocket(removeTab);
-        if (res) {
-          loader = false;
-          _viewModel.handleRemoveTab(id);
-          isPopupClosed = false;
-          notifications.success("WebSocket request saved");
-        }
+        loader = false;
+      } else {
+        isPopupClosed = false;
+        isExposeSaveAsRequest = true;
       }
-      loader = false;
-    } else {
-      isPopupClosed = false;
-      isExposeSaveAsRequest = true;
     }
   };
 
