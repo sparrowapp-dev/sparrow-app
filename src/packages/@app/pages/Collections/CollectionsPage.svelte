@@ -87,7 +87,7 @@
 
   let isExpandCollection = false;
   let isExpandEnvironment = false;
-  
+
   let localEnvironment;
   let globalEnvironment;
 
@@ -95,7 +95,6 @@
 
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
-
 
   environments.subscribe((value) => {
     if (value) {
@@ -467,6 +466,7 @@
           scrollList("bottom");
         }, 1000);
       }
+      isExpandCollection = true;
     }}
     currentWorkspaceId={$currentWorkspace?._id}
     onImportJSONObject={async (currentWorkspaceId, importJSON, contentType) => {

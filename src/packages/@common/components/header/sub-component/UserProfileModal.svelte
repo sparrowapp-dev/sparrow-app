@@ -109,7 +109,7 @@
       class=" position-fixed d-flex flex-column modal-background ps-2 pe-2 pt-3 pb-2 {showProfileModal
         ? ''
         : 'd-none'}"
-      style="right:10px; top:45px; font-size: 12px; font-weight: 400; min-width: 200px; z-index: 500;"
+      style="right:10px; top:47px; font-size: 12px; font-weight: 400; min-width: 200px; z-index: 500;"
     >
       <div class="d-flex align-items-center mb-2 px-1">
         <div
