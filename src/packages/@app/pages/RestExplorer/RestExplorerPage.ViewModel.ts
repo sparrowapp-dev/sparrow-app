@@ -1488,20 +1488,16 @@ class RestExplorerViewModel
 
         let currentTab = await this.tabRepository.getTabById(environmentVariables.global.id);
         if(currentTab){
-          let currentTabId= currentTab.tabId
-          let data = {
-            property: {
-              environment : {
-                variable: payload.variable,
-                state:{
-                  isSaveInProgress:true
-                }
-                  
-              }
-            }
-          }
-          await this.tabRepository.updateTab(currentTabId as string, data)
-        }
+          let currentTabId= currentTab.tabId;
+         const envTab = createDeepCopy(currentTab);
+         envTab.property.environment.variable = payload.variable;
+         envTab.isSaved = true;
+         await this.tabRepository.updateTab(currentTabId as string, {
+           property: envTab.property,
+           isSaved : envTab.isSaved
+         })
+       }
+
 
         notifications.success("Environment Variable Added");
         return {
@@ -1521,21 +1517,18 @@ class RestExplorerViewModel
         );
 
         let currentTab = await this.tabRepository.getTabById(response.data.data._id);
+        
         if(currentTab){
-          let currentTabId= currentTab.tabId
-          let data = {
-            property: {
-              environment : {
-                variable: response.data.data.variable,
-                state:{
-                  isSaveInProgress:true
-                }
-                  
-              }
-            }
-          }
-          await this.tabRepository.updateTab(currentTabId as string, data)
+           let currentTabId= currentTab.tabId;
+          const envTab = createDeepCopy(currentTab);
+          envTab.property.environment.variable = response.data.data.variable;
+          envTab.isSaved = true;
+          await this.tabRepository.updateTab(currentTabId as string, {
+            property: envTab.property,
+            isSaved : envTab.isSaved
+          })
         }
+
 
         notifications.success("Environment Variable Added");
       } else {
@@ -1574,20 +1567,16 @@ class RestExplorerViewModel
         );
 
         let currentTab = await this.tabRepository.getTabById(environmentVariables.local.id);
+      
         if(currentTab){
-          let currentTabId= currentTab.tabId
-          let data = {
-            property: {
-              environment : {
-                variable: payload.variable,
-                state:{
-                  isSaveInProgress:true
-                }
-                  
-              }
-            }
-          }
-          await this.tabRepository.updateTab(currentTabId as string, data)
+          let currentTabId= currentTab.tabId;
+          const envTab = createDeepCopy(currentTab);
+          envTab.property.environment.variable = payload.variable;
+          envTab.isSaved = true;
+          await this.tabRepository.updateTab(currentTabId as string, {
+            property: envTab.property,
+            isSaved : envTab.isSaved
+          })
         }
 
         notifications.success("Environment Variable Added");
@@ -1610,19 +1599,14 @@ class RestExplorerViewModel
 
         let currentTab = await this.tabRepository.getTabById(response.data.data._id);
         if(currentTab){
-          let currentTabId= currentTab.tabId
-          let data = {
-            property: {
-              environment : {
-                variable: response.data.data.variable,
-                state:{
-                  isSaveInProgress:true
-                }
-                  
-              }
-            }
-          }
-          await this.tabRepository.updateTab(currentTabId as string, data)
+          let currentTabId= currentTab.tabId;
+          const envTab = createDeepCopy(currentTab);
+          envTab.property.environment.variable = response.data.data.variable;
+          envTab.isSaved = true;
+          await this.tabRepository.updateTab(currentTabId as string, {
+            property: envTab.property,
+            isSaved : envTab.isSaved
+          })
         }
 
         notifications.success("Environment Variable Added");

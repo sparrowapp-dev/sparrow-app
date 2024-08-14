@@ -12,9 +12,9 @@
   import { PlusIcon } from "@library/icons";
   import { navigate } from "svelte-navigator";
   import PopupHint from "./sub-component/PopupHint.svelte";
-  import SidebarProfileModal, {
-    type SidebarProfileObj,
-  } from "../sidebar/SidebarProfileModal.svelte";
+  import UserProfileModal, {
+    type UserProfileObj,
+  } from "./sub-component/UserProfileModal.svelte";
   /**
    * environment list
    */
@@ -129,7 +129,7 @@
   import hoveredProfile from "$lib/assets/profile-hovered.svg";
   import selectedProfile from "$lib/assets/profile-selected.svg";
 
-  let sidebarModalItem: SidebarProfileObj = {
+  let sidebarModalItem: UserProfileObj = {
     heading: "Profile",
     defaultLogo: profile,
     hoveredLogo: hoveredProfile,
@@ -301,7 +301,7 @@
       minHeaderWidth={"185px"}
       iconRequired={true}
       icon={StackIcon}
-      iconColor={"var(--dropdown-button)"}
+      iconColor={"var(--icon-primary-300)"}
       isDropIconFilled={true}
       borderType={"none"}
       borderActiveType={"none"}
@@ -316,23 +316,14 @@
       position={"absolute"}
     />
 
-    {#if !isGuestUser}
-      <div class="ms-4 me-2">
-        <Tooltip
-          title="User Profile"
-          placement="bottom"
-          distance={20}
-          zIndex={5}
-          show={!showProfileModal}
-        >
-          <SidebarProfileModal
-            item={sidebarModalItem}
-            {onLogout}
-            bind:showProfileModal
-          />
-        </Tooltip>
-      </div>
-    {/if}
+    <div class="ms-2 me-1">
+      <UserProfileModal
+        {isGuestUser}
+        item={sidebarModalItem}
+        {onLogout}
+        bind:showProfileModal
+      />
+    </div>
   </div>
 </header>
 

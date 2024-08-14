@@ -4,7 +4,7 @@ export enum TabTypeEnum {
   COLLECTION = "COLLECTION",
   WORKSPACE = "WORKSPACE",
   PERSONAL = "PERSONAL",
-   ENVIRONMENT="ENVIRONMENT"
+  ENVIRONMENT="ENVIRONMENT"
 }
 export interface WorkspaceIdWrapper {
   workspaceId: string;
