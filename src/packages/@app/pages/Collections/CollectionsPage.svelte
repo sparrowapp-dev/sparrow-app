@@ -464,9 +464,9 @@
       if (response.isSuccessful) {
         setTimeout(() => {
           scrollList("bottom");
+          isExpandCollection = true;
         }, 1000);
       }
-      isExpandCollection = true;
     }}
     currentWorkspaceId={$currentWorkspace?._id}
     onImportJSONObject={async (currentWorkspaceId, importJSON, contentType) => {
