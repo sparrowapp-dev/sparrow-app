@@ -78,7 +78,6 @@ export class EnvironmentExplorerViewModel {
    */
   public updateVariables = async (_variable: any) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.variable = _variable;
     progressiveTab.property.environment.variable = _variable;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
@@ -178,7 +177,7 @@ export class EnvironmentExplorerViewModel {
         currentEnvironment.id,
         {
           name: currentEnvironment.name,
-          variable: currentEnvironment.variable,
+          variable: currentEnvironment?.property?.environment?.variable,
         },
       );
       const progressiveTab = this._tab.getValue();
@@ -200,7 +199,7 @@ export class EnvironmentExplorerViewModel {
       currentEnvironment.id,
       {
         name: currentEnvironment.name,
-        variable: currentEnvironment.variable,
+        variable: currentEnvironment?.property?.environment?.variable,
       },
     );
     if (response.isSuccessful) {
