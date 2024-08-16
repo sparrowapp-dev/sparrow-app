@@ -198,8 +198,13 @@
               isFilterDropdownActive = !isFilterDropdownActive;
             }}
           >
-            <span class="text-fs-12 pe-2">Filter Message</span>
-            <DownArrowIcon height={"16px"} width={"16px"} />
+            <span class="text-fs-12 pe-2 text-tertiary-100">Filter Message</span
+            >
+            <DownArrowIcon
+              height={"16px"}
+              width={"16px"}
+              color={"var(--text-tertiary-100)"}
+            />
           </button>
           <!-- </Tooltip> -->
         </Dropdown>
@@ -270,6 +275,6 @@
 <style>
   .timestamp {
     color: var(--text-secondary-550);
-    width: 130px;
+    width: 110px;
   }
 </style>
