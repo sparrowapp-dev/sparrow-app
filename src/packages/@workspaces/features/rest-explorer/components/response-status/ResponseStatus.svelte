@@ -37,6 +37,8 @@
                   response.status === ResponseStatusCode.CREATED
                     ? "var(--success-color)"
                     : "var(--request-delete)"}
+                    height={"6px"}
+                    width={"6px"}
                 />
               </span>
               {response.status.split(" ")[0]}</span

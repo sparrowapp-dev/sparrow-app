@@ -212,7 +212,7 @@ const sendMessage = async (tab_id: string, message: string) => {
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
-            wsData.messages.push({
+            wsData.messages.unshift({
               data: message,
               transmitter: "sender",
               timestamp: formatTime(new Date()),
@@ -259,7 +259,7 @@ const disconnectWebSocket = async (tab_id: string) => {
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
-            wsData.messages.push({
+            wsData.messages.unshift({
               data: `Disconnected from ${url}`,
               transmitter: "disconnector",
               timestamp: formatTime(new Date()),
@@ -310,6 +310,7 @@ const connectWebSocket = async (
       search: "",
       contentType: RequestDataTypeEnum.TEXT,
       body: "",
+      filter: "All messages",
       url: url,
     });
 
@@ -331,7 +332,7 @@ const connectWebSocket = async (
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tabId);
           if (wsData) {
-            wsData.messages.push({
+            wsData.messages.unshift({
               data: `Connected from ${url}`,
               transmitter: "connecter",
               timestamp: formatTime(new Date()),
@@ -351,7 +352,7 @@ const connectWebSocket = async (
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
-              wsData.messages.push({
+              wsData.messages.unshift({
                 data: event.payload,
                 transmitter: "receiver",
                 timestamp: formatTime(new Date()),
