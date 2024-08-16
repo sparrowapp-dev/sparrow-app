@@ -286,6 +286,21 @@ const disconnectWebSocket = async (tab_id: string) => {
     });
 };
 
+const convertWebSocketUrl = (url: string) => {
+  // Check if the URL starts with 'wss://'
+  if (url.startsWith("wss://")) {
+    return "https:/" + url.slice(5); // Replace 'wss://' with 'https://'
+  }
+
+  // Check if the URL starts with 'ws://'
+  if (url.startsWith("ws://")) {
+    return "http:/" + url.slice(4); // Replace 'ws://' with 'http://'
+  }
+
+  // If the URL does not start with 'wss://' or 'ws://', return it unchanged
+  return url;
+};
+
 /**
  * Connects to a WebSocket at a specified URL for a specific tab and handles the response.
  *
@@ -302,7 +317,8 @@ const connectWebSocket = async (
   requestHeaders: string,
 ) => {
   // debugger;
-  console.table({ url, tabId, requestHeaders });
+  const httpurl = convertWebSocketUrl(url);
+  console.table({ url, httpurl, tabId, requestHeaders });
   webSocketDataStore.update((webSocketDataMap) => {
     webSocketDataMap.set(tabId, {
       messages: [],
@@ -318,6 +334,7 @@ const connectWebSocket = async (
   });
   await invoke("connect_websocket", {
     url: url,
+    httpurl: httpurl,
     tabid: tabId,
     headers: requestHeaders,
   })

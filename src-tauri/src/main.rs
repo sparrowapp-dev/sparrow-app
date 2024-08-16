@@ -66,17 +66,25 @@ use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
 use utils::response_decoder::decode_response_body;
 
-
-// Web socket imports 
-use futures::{SinkExt, StreamExt};
-use http::header::HeaderValue;
+// Web socket imports
+use futures_util::{SinkExt, StreamExt};
+use http::header;
+use hyper::client::HttpConnector;
+use hyper::header::HeaderValue;
+use hyper::header::{CONNECTION, UPGRADE};
+use hyper::{Client as OtherClient, Request};
+use hyper_tls::HttpsConnector;
 use native_tls::TlsConnector;
 use std::sync::Arc;
 use tauri::AppHandle;
+use tauri::State;
 use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::sync::Mutex;
+use tokio_tungstenite::client_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
-use tokio_tungstenite::{connect_async, tungstenite::handshake::client::Request, Connector};
+use tokio_tungstenite::tungstenite::protocol::WebSocketConfig;
+use tokio_tungstenite::WebSocketStream;
+use tokio_tungstenite::{connect_async, Connector};
 #[cfg(target_os = "macos")]
 #[macro_use]
 extern crate objc;
@@ -494,6 +502,7 @@ struct WebSocketResponse {
 #[tauri::command]
 async fn connect_websocket(
     url: String,
+    httpurl: String,
     tabid: String,
     headers: String, // Stringified JSON headers
     state: tauri::State<'_, Arc<AppState>>,
@@ -513,24 +522,42 @@ async fn connect_websocket(
         headers_key_value_map.insert(kv.key, kv.value);
     }
 
-    // Create request builder with URL
-    let mut request = Request::builder().uri(&url);
+    // Create an HTTPS connector and client
+    let https = HttpsConnector::new();
+    let client: OtherClient<_, hyper::Body> = OtherClient::builder().build::<_, hyper::Body>(https);
 
-    // Add all headers to the request builder
+    // Build the HTTP request to upgrade to WebSocket
+    let mut req_builder = Request::builder()
+        .uri(&httpurl)
+        .header(UPGRADE, "websocket")
+        .header(CONNECTION, "Upgrade");
+
+        // Add custom headers to the request
     for (key, value) in headers_key_value_map.iter() {
-        request = request.header(
+        req_builder = req_builder.header(
             key,
             HeaderValue::from_str(value).map_err(|e| format!("Invalid header value: {}", e))?,
         );
     }
-
-    // Create the request with a potential error handling
-    let request = request
-        .body(())
+   
+    // Unwrap the body
+    let req = req_builder
+        .body(hyper::Body::empty())
         .map_err(|e| format!("Failed to build request: {}", e))?;
 
-    // Connect to the WebSocket
-    let (ws_stream, response) = connect_async(request)
+    // Send the HTTP request and await the response to check if upgrade to websocket is possible or not. 
+    let response = client
+        .request(req)
+        .await
+        .map_err(|e| format!("Failed to request: {}", e))?;
+
+    // Check if the upgrade to WebSocket was successful
+    if response.status() != 101 {
+        return Err(format!("Failed to upgrade: {:?}", response.status()));
+    }
+
+    // Establish the WebSocket connection and convert the response into a WebSocket stream
+    let (ws_stream, response) = connect_async(url)
         .await
         .map_err(|e| format!("Failed to connect: {}", e))?;
 
@@ -542,6 +569,7 @@ async fn connect_websocket(
         }
     }
 
+    // Split the WebSocket stream into read and write halves
     let (mut write, mut read) = ws_stream.split();
 
     let (tx, mut rx) = mpsc::unbounded_channel::<String>();
