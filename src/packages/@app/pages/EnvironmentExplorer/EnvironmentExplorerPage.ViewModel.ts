@@ -1,5 +1,4 @@
 import { notifications } from "@library/ui/toast/Toast";
-import { EnvironmentTabRepository } from "@app/repositories/environment-tab.repository";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { EnvironmentService } from "@app/services/environment.service";
@@ -10,15 +9,18 @@ import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { BehaviorSubject, type Observable } from "rxjs";
 import { GuideRepository } from "@app/repositories/guide.repository";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
+import { TabRepository } from "@app/repositories/tab.repository";
+import { Debounce, CompareArray } from "@common/utils";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
-  private environmentTabRepository = new EnvironmentTabRepository();
   private environmentService = new EnvironmentService();
   private guideRepository = new GuideRepository();
   private guestUserRepository = new GuestUserRepository();
   private _tab: BehaviorSubject<any> = new BehaviorSubject({});
+  private tabRepository = new TabRepository();
+  private compareArray = new CompareArray();
 
   public constructor(doc) {
     if (doc?.isActive) {
@@ -62,14 +64,11 @@ export class EnvironmentExplorerViewModel {
       );
       progressiveTab.name = data.name;
     } else if (event === "") {
-      progressiveTab.isSave = false;
       progressiveTab.name = _name;
     }
     this.tab = progressiveTab;
-    this.environmentTabRepository.updateEnvironmentTab(
-      progressiveTab.id,
-      progressiveTab,
-    );
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
   };
 
   /**
@@ -78,31 +77,82 @@ export class EnvironmentExplorerViewModel {
    */
   public updateVariables = async (_variable: any) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.isSave = false;
-    progressiveTab.variable = _variable;
+    progressiveTab.property.environment.variable = _variable;
     this.tab = progressiveTab;
-    this.environmentTabRepository.updateEnvironmentTab(
-      progressiveTab.id,
-      progressiveTab,
-    );
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
   };
 
   /**
-   * @description - updates environment properties
-   * @param _data - new environment properties
+   * Compares the current environment tab with the server version and updates the saved status accordingly.
+   * This method is debounced to reduce the number of server requests.
+   * @return A promise that resolves when the comparison is complete.
    */
-  public setEnvironmentTabProperty = async (_data) => {
-    let progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.isSave = false;
-    progressiveTab = {
-      ...progressiveTab,
-      ..._data,
+  private compareEnvironmentWithServerDebounced = async () => {
+    let result = true;
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+
+    let environmentServer = await this.environmentRepository.readEnvironment(
+      progressiveTab.id,
+    );
+
+    if (!environmentServer) {
+      result = false;
+    }
+    // // description
+    // else if (environmentServer.description !== progressiveTab.description) {
+    //   result = false;
+    // }
+    // name
+    else if (environmentServer.name !== progressiveTab.name) {
+      result = false;
+    }
+
+    // variable
+    else if (
+      !this.compareArray.init(
+        environmentServer.variable,
+        progressiveTab.property.environment.variable,
+      )
+    ) {
+      result = false;
+    }
+    // result
+    if (result) {
+      this.tabRepository.updateTab(progressiveTab.tabId, {
+        isSaved: true,
+      });
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+    } else {
+      this.tabRepository.updateTab(progressiveTab.tabId, {
+        isSaved: false,
+      });
+      progressiveTab.isSaved = false;
+      this.tab = progressiveTab;
+    }
+  };
+
+  /**
+   * Debounced method to compare the current request tab with the server version.
+   */
+  private compareRequestWithServer = new Debounce().debounce(
+    this.compareEnvironmentWithServerDebounced,
+    1000,
+  );
+
+  /**
+   *
+   * @param _state - request state
+   */
+  public updateEnvironmentState = async (_state) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.environment.state = {
+      ...progressiveTab.property.environment.state,
+      ..._state,
     };
     this.tab = progressiveTab;
-    await this.environmentTabRepository.updateEnvironmentTab(
-      progressiveTab.id,
-      progressiveTab,
-    );
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
   /**
@@ -111,9 +161,9 @@ export class EnvironmentExplorerViewModel {
   public saveEnvironment = async () => {
     const currentEnvironment = this._tab.getValue();
     const activeWorkspace = await this.workspaceRepository.readWorkspace(
-      currentEnvironment.workspaceId,
+      currentEnvironment.path.workspaceId,
     );
-    await this.setEnvironmentTabProperty({ isSaveInProgress: true });
+    await this.updateEnvironmentState({ isSaveInProgress: true });
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
@@ -123,12 +173,15 @@ export class EnvironmentExplorerViewModel {
         currentEnvironment.id,
         {
           name: currentEnvironment.name,
-          variable: currentEnvironment.variable,
+          variable: currentEnvironment?.property?.environment?.variable,
         },
       );
-      await this.setEnvironmentTabProperty({
+      const progressiveTab = this._tab.getValue();
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      await this.updateEnvironmentState({
         isSaveInProgress: false,
-        isSave: true,
       });
       notifications.success(
         `Changes saved for ${currentEnvironment.name} environment.`,
@@ -142,7 +195,7 @@ export class EnvironmentExplorerViewModel {
       currentEnvironment.id,
       {
         name: currentEnvironment.name,
-        variable: currentEnvironment.variable,
+        variable: currentEnvironment?.property?.environment?.variable,
       },
     );
     if (response.isSuccessful) {
@@ -150,15 +203,18 @@ export class EnvironmentExplorerViewModel {
         response.data.data._id,
         response.data.data,
       );
-      await this.setEnvironmentTabProperty({
+      const progressiveTab = this._tab.getValue();
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      await this.updateEnvironmentState({
         isSaveInProgress: false,
-        isSave: true,
       });
       notifications.success(
         `Changes saved for ${currentEnvironment.name} environment.`,
       );
     } else {
-      await this.setEnvironmentTabProperty({ isSaveInProgress: false });
+      await this.updateEnvironmentState({ isSaveInProgress: false });
       if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {

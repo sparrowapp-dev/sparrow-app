@@ -1,38 +1,21 @@
 <script lang="ts">
   // ---- Icons ----
-  import collections from "$lib/assets/collections.svg";
-  import hoveredCollections from "$lib/assets/collections-hovered.svg";
-  import selectedCollections from "$lib/assets/collections-selected.svg";
-
-  import environment from "$lib/assets/environment.svg";
-  import hoveredEnvironment from "$lib/assets/environment-hovered.svg";
-  import selectedEnvironment from "$lib/assets/environment-selected.svg";
-
-  import more from "$lib/assets/more.svg";
-  import hoveredMore from "$lib/assets/more-hovered.svg";
-  import selectedMore from "$lib/assets/more-selected.svg";
-
-  import help from "$lib/assets/help.svg";
-  import hoveredHelp from "$lib/assets/help-hovered.svg";
-  import selectedHelp from "$lib/assets/help-selected.svg";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-
-  import settings from "$lib/assets/settings.svg";
-  import hoveredSettings from "$lib/assets/settings-hovered.svg";
-  import selectedSettings from "$lib/assets/settings-selected.svg";
-
-  import profile from "$lib/assets/profileTab.svg";
-  import hoveredProfile from "$lib/assets/profile-hovered.svg";
-  import selectedProfile from "$lib/assets/profile-selected.svg";
-
-  import home from "$lib/assets/home-icon.svg";
-  import hoveredHome from "$lib/assets/home-hovered.svg";
-  import selectedHome from "$lib/assets/home-selected.svg";
+  import {
+    home,
+    hoveredHome,
+    selectedHome,
+    settings,
+    selectedSettings,
+    hoveredSettings,
+    collections,
+    hoveredCollections,
+    selectedCollections,
+    help,
+    hoveredHelp,
+    selectedHelp,
+  } from "./common";
 
   import SidebarItem, { type SidebarItemObj } from "./SidebarItem.svelte";
-  import SidebarProfileModal, {
-    type SidebarProfileObj,
-  } from "./SidebarProfileModal.svelte";
   import { isGuestUserActive } from "$lib/store";
 
   let componentClass = "";
@@ -64,15 +47,6 @@
       position: "primary",
     },
     {
-      route: !isGuestUser ? "/app/environment" : "/guest/environment",
-      heading: "Environment",
-      defaultLogo: environment,
-      hoveredLogo: hoveredEnvironment,
-      selectedLogo: selectedEnvironment,
-      disabled: false,
-      position: "primary",
-    },
-    {
       route: "/app/help",
       heading: "Help",
       defaultLogo: help,
@@ -80,15 +54,6 @@
       selectedLogo: selectedHelp,
       disabled: isGuestUser ?? false,
       position: "secondary",
-    },
-    {
-      route: "/app/more",
-      heading: "More",
-      defaultLogo: more,
-      hoveredLogo: hoveredMore,
-      selectedLogo: selectedMore,
-      disabled: true,
-      position: "primary",
     },
     {
       route: "/app/setting",
@@ -100,15 +65,6 @@
       position: "secondary",
     },
   ];
-
-  let sidebarModalItem: SidebarProfileObj = {
-    heading: "Profile",
-    defaultLogo: profile,
-    hoveredLogo: hoveredProfile,
-    selectedLogo: selectedProfile,
-    disabled: isGuestUser ?? false,
-    user,
-  };
 
   let primarySidebarItems = sidebarItems.filter(
     (item) => item.position === "primary",
@@ -128,11 +84,6 @@
     {#each secondarySidebarItems as item (item.route)}
       <SidebarItem {item} />
     {/each}
-    {#if !isGuestUser}
-      <Tooltip title="User Profile" placement="right" distance={20} zIndex={5}>
-        <SidebarProfileModal item={sidebarModalItem} {onLogout} />
-      </Tooltip>
-    {/if}
   </div>
 </div>
 

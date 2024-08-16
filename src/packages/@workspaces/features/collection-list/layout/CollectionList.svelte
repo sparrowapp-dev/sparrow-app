@@ -5,17 +5,8 @@
     SearchTree,
   } from "@workspaces/features/collection-list/components";
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
-  import doubleangleRight from "$lib/assets/doubleangleRight.svg";
-  import SearchIcon from "$lib/assets/search.svelte";
-  import FilterIcon from "$lib/assets/filter.svelte";
-  import plusIcon from "$lib/assets/plus-white.svg";
-  import CreateRequest from "$lib/assets/create_request.svg";
-  import BubbleIcon from "@library/icons/Bubble.svg";
-  import CreateCollection from "$lib/assets/collections-faded.svg";
-
-  import { Events, WorkspaceRole } from "$lib/utils/enums";
-  import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
-  import { Dropdown } from "@library/ui";
+  import angleRight from "$lib/assets/angle-right-v2.svg";
+  import { WorkspaceRole } from "$lib/utils/enums";
   import List from "@library/ui/list/List.svelte";
   import type { Observable } from "rxjs";
   import type {
@@ -29,20 +20,12 @@
     Path,
     Request as RequestType,
   } from "$lib/utils/interfaces/request.interface";
-  import {
-    selectMethodsStore,
-    selectedMethodsCollectionStore,
-  } from "$lib/store";
   import { onDestroy } from "svelte";
-  import { DoubleArrowIcon, GithubIcon } from "@library/icons";
-  import { WithButton } from "@workspaces/common/hoc";
-  import { version } from "../../../../../../src-tauri/tauri.conf.json";
+  import { CollectionIcon } from "@library/icons";
   import { createDeepCopy } from "$lib/utils/helpers";
-  import { Input } from "@library/forms";
-  import { open } from "@tauri-apps/plugin-shell";
   import constants from "$lib/utils/constants";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { PlusIcon } from "@library/icons";
+  import { Tooltip } from "@library/ui";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -78,11 +61,6 @@
     leftPanelCollapse: boolean;
     handleCollapseCollectionList: () => void;
   };
-  export let githubRepo;
-  /**
-   * Flag to show app version
-   */
-  export let isAppVersionVisible = true;
 
   /**
    * Flag to check is user iu guest user
@@ -96,11 +74,14 @@
 
   export let scrollList;
 
-  let runAnimation: boolean = true;
-  let showfilterDropdown: boolean = false;
+  export let searchData: string = "";
+
+  export let isExpandCollection;
+
+  export let toggleExpandCollection;
+
   let collectionListDocument: CollectionDocument[];
-  let searchData: string = "";
-  let addButtonMenu: boolean = false;
+
   let activeWorkspace: WorkspaceDocument;
   let currentWorkspaceId;
   currentWorkspace.subscribe((value) => {
@@ -109,7 +90,7 @@
     }
   });
 
-  const externalSparrowGithub = constants.SPARROW_GITHUB;
+  let isHovered = false;
 
   let collectionFilter: any = [];
   /**
@@ -186,183 +167,109 @@
     }
   }
 
-  let isGithubStarHover = false;
   onDestroy(() => {});
 
-  const addButtonData = isGuestUser
-    ? [
-        {
-          name: "Add New API",
-          icon: CreateRequest,
-          onclick: () => onItemCreated("request", {}),
-        },
-        {
-          name: "Add Collection",
-          icon: CreateCollection,
-          onclick: () => {
-            onItemCreated("collection", {
-              workspaceId: currentWorkspaceId,
-              collection: collectionList,
-            });
-          },
-        },
-        {
-          name: "Import cURL",
-          icon: BubbleIcon,
-          onclick: () => {
-            MixpanelEvent(Events.IMPORT_CURL, {
-              source: "curl import popup",
-            });
-            showImportCurlPopup();
-          },
-        },
-      ]
-    : [
-        {
-          name: "Add New API",
-          icon: CreateRequest,
-          onclick: () => onItemCreated("request", {}),
-        },
-        {
-          name: "Add Collection",
-          icon: CreateCollection,
-          onclick: showImportCollectionPopup,
-        },
-        {
-          name: "Import cURL",
-          icon: BubbleIcon,
-          onclick: () => {
-            MixpanelEvent(Events.IMPORT_CURL, {
-              source: "curl import popup",
-            });
-            showImportCurlPopup();
-          },
-        },
-      ];
+  const handleMouseOver = () => {
+    isHovered = true;
+  };
+
+  const handleMouseOut = () => {
+    isHovered = false;
+  };
 </script>
 
-{#if leftPanelController.leftPanelCollapse}
-  <div>
+<div
+  style="height:100%; overflow:hidden"
+  class={`sidebar d-flex flex-column bg-secondary-900 scroll `}
+>
+  <div
+    class="d-flex justify-content-between align-items-center align-self-stretch px-0 pt-3 d-none"
+  >
+    <p class="mb-0 text-whiteColor ellipsis text-fs-16">
+      {$currentWorkspace?.name || ""}
+    </p>
     <button
-      class="d-flex align-items-center justify-content-center border-0 angleRight w-16 position-absolute {leftPanelController.leftPanelCollapse
-        ? 'd-block'
-        : 'd-none'}"
-      style="left:52px; bottom: 20px; width: 20px; height:20px; z-index: {leftPanelController.leftPanelCollapse
-        ? '2'
-        : '0'}"
+      class=" border-0 rounded px-2 angleButton"
       on:click={() => {
         leftPanelController.leftPanelCollapse =
           !leftPanelController.leftPanelCollapse;
         leftPanelController.handleCollapseCollectionList();
       }}
+      id="doubleAngleButton"
     >
-      <span
-        style="transform: rotate(180deg);"
-        class="position-relative d-flex align-items-center justify-content-center"
-      >
-        <DoubleArrowIcon
-          height={"10px"}
-          width={"10px"}
-          color={"var(--text-primary-200)"}
-        />
-      </span>
+      <img src={doubleangleLeft} alt="" class="filter-green" />
     </button>
   </div>
-{/if}
-{#if !leftPanelController.leftPanelCollapse}
+
   <div
-    style="overflow-x: auto; overflow-y: auto"
-    class={`sidebar h-100 d-flex flex-column bg-secondary-900 scroll`}
+    class="d-flex flex-column collections-list h-100"
+    style="margin-top:5px; flex:1;"
   >
     <div
-      class="d-flex justify-content-between align-items-center align-self-stretch px-0 pt-3 d-none"
+      class="d-flex align-items-center p-2 rounded-1"
+      style="cursor:pointer; justify-content: space-between; height:32px;
+      background-color: {isHovered
+        ? 'var(--dropdown-option-hover)'
+        : 'transparent'};"
+      on:mouseover={handleMouseOver}
+      on:mouseout={handleMouseOut}
+      on:click={toggleExpandCollection}
     >
-      <p class="mb-0 text-whiteColor ellipsis text-fs-16">
-        {$currentWorkspace?.name || ""}
-      </p>
-      <button
-        class=" border-0 rounded px-2 angleButton"
-        on:click={() => {
-          leftPanelController.leftPanelCollapse =
-            !leftPanelController.leftPanelCollapse;
-          leftPanelController.handleCollapseCollectionList();
-        }}
-        id="doubleAngleButton"
-      >
-        <img src={doubleangleLeft} alt="" class="filter-green" />
-      </button>
-    </div>
-    <div
-      class="d-flex align-items-center justify-content-between px-2 pt-3 gap-1"
-    >
-      <Input
-        id="collection-list-search"
-        width={"100%"}
-        height={"33px"}
-        type="search"
-        bind:value={searchData}
-        on:input={(e) => {
-          handleSearch();
-        }}
-        defaultBorderColor="transparent"
-        hoveredBorderColor="var(--border-primary-300)"
-        focusedBorderColor={"var(--border-primary-300)"}
-        class="text-fs-12 bg-tertiary-400 border-radius-2 ellipsis fw-normal px-2"
-        style="outline:none;"
-        placeholder="Search"
-      />
-      <div class="d-flex align-items-center justify-content-center">
-        <button
-          id="filter-btn"
-          class="filter-btn btn bg-backgroundDark d-flex align-items-center justify-content-center p-2 d-none
-          {showfilterDropdown ? 'filter-active' : ''}"
-          style="width: 32px; height:32px; position:relative"
-          on:click={() => (showfilterDropdown = !showfilterDropdown)}
-        >
-          <FilterIcon width={300} height={30} color="gray" />
-          {#if showfilterDropdown}
-            <span
-              class="position-absolute"
-              style="right:4px; top:5px; height:4px; width:4px; background-color:#FF7878; border-radius: 50%;"
-            />
-          {/if}
-        </button>
+      <div class="d-flex align-items-center ps-2">
+        <img
+          src={angleRight}
+          class="me-3"
+          style="height:8px; width:4px; margin-right:8px; {isExpandCollection
+            ? 'transform:rotate(90deg);'
+            : 'transform:rotate(0deg);'}"
+          alt="angleRight"
+        />
+
+        <CollectionIcon
+          height={"12px"}
+          width={"12px"}
+          color={"var(--icon-secondary-130)"}
+        />
+
+        <p class="ms-2 mb-0 sparrow-fs-13" style="font-weight: 500;">
+          Collections
+        </p>
       </div>
-      <!--  
-        New dropdown button for adding new api, collection and import Curl
-      -->
-      {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-        <Dropdown
-          zIndex={600}
-          buttonId="addButton"
-          bind:isMenuOpen={addButtonMenu}
-          options={addButtonData}
+
+      <Tooltip
+        title={"Add Collection"}
+        placement={"bottom"}
+        distance={13}
+        show={isHovered}
+        zIndex={701}
+      >
+        <button
+          style="height: 24px; width:24px;"
+          class="add-icon-container border-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
+            ? 'collections-active'
+            : 'collections-inactive'}"
+          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+          on:click|stopPropagation={() => {
+            isExpandCollection = true;
+            isGuestUser
+              ? onItemCreated("collection", {
+                  workspaceId: currentWorkspaceId,
+                  collection: collectionList,
+                })
+              : showImportCollectionPopup();
+          }}
         >
-          <Tooltip
-            title={"Add Options"}
-            placement={"bottom"}
-            distance={12}
-            show={!addButtonMenu}
-            zIndex={10}
-          >
-            <button
-              id="addButton"
-              class="border-0 p-1 border-radius-2 add-button"
-              on:click={() => {
-                addButtonMenu = !addButtonMenu;
-              }}
-            >
-              <img src={plusIcon} alt="" />
-            </button>
-          </Tooltip>
-        </Dropdown>
-      {/if}
+          <PlusIcon
+            height={"18px"}
+            width={"18px"}
+            color={"var(--white-color)"}
+          />
+        </button>
+      </Tooltip>
     </div>
-    <div
-      class="d-flex flex-column collections-list"
-      style="overflow:hidden; margin-top:5px; flex:1;"
-    >
-      <div class="d-flex h-100 flex-column ps-2 pe-2 pt-2">
+
+    {#if isExpandCollection}
+      <div class="overflow-auto d-flex flex-column ms-2 me-0 pt-2 mb-2">
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
             {#if collectionFilter.length > 0}
@@ -397,9 +304,10 @@
                 classProps={"pe-1"}
               >
                 <p
-                  class="not-found-text text-fs-12 text-center mx-auto ellipsis"
+                  class="mx-1 text-fs-12 mb-0 text-center"
+                  style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
                 >
-                  No results found
+                  No Result Found
                 </p>
               </List>
             {/if}
@@ -442,65 +350,28 @@
           />
         {/if}
       </div>
-    </div>
-    <div
-      class="p-3 d-flex align-items-center justify-content-between"
-      style="z-index: 4;"
-    >
-      <Tooltip title={"Star Us On GitHub"} placement={"top"}>
-        <div
-          class="px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
-            ? 'bg-secondary-600'
-            : ''}"
-          role="button"
-          on:mouseenter={() => {
-            isGithubStarHover = true;
-          }}
-          on:mouseleave={() => {
-            isGithubStarHover = false;
-          }}
-          on:click={async () => {
-            await open(externalSparrowGithub);
-          }}
-        >
-          <GithubIcon
-            height={"18px"}
-            width={"18px"}
-            color={isGithubStarHover
-              ? "var(--bg-secondary-100)"
-              : "var(--bg-secondary-200)"}
-          />
-          <span
-            class="ps-2 text-fs-14 {isGithubStarHover
-              ? 'text-secondary-100'
-              : 'text-secondary-200'}"
-          >
-            {githubRepo?.stargazers_count || ""}
-          </span>
-        </div>
-      </Tooltip>
-
-      <div class="d-flex align-items-center">
-        <!--Disabling the version feature switch as it was just for testing purpose, can be used for implementation example-->
-        <!-- {#if isAppVersionVisible} -->
-        <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
-        <!-- {/if} -->
-        <WithButton
-          icon={DoubleArrowIcon}
-          onClick={() => {
-            leftPanelController.leftPanelCollapse =
-              !leftPanelController.leftPanelCollapse;
-            leftPanelController.handleCollapseCollectionList();
-          }}
-          disable={false}
-          loader={false}
-        />
-      </div>
-    </div>
+    {/if}
   </div>
-{/if}
+</div>
 
 <style>
+  .collections-inactive {
+    visibility: hidden;
+  }
+  .collections-active {
+    visibility: visible;
+    background-color: transparent;
+  }
+  .collections-active:hover {
+    visibility: visible;
+    background-color: var(--bg-secondary-420);
+  }
+
+  .collections-active:active {
+    visibility: visible;
+    background-color: var(--bg-tertiary-190);
+  }
+
   .add-button {
     background-color: var(--dropdown-button);
   }
@@ -546,24 +417,24 @@
     background-color: var(--button-pressed);
   }
 
-  /* 
-  @keyframes increaseWidth {
-    0% {
-      width: 0;
+  /*
+    @keyframes increaseWidth {
+      0% {
+        width: 0;
+      }
+   
+      100% {
+        width: 280px;
+      }
     }
-
-    100% {
-      width: 280px;
-    }
-  }
-  @keyframes decreaseWidth {
-    0% {
-      width: 280px;
-    }
-    100% {
-      width: 0px;
-    }
-  } */
+    @keyframes decreaseWidth {
+      0% {
+        width: 280px;
+      }
+      100% {
+        width: 0px;
+      }
+    } */
 
   .decrease-width {
     animation: decreaseWidth 0.3s;

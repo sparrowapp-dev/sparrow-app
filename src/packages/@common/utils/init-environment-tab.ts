@@ -1,3 +1,4 @@
+import { TabTypeEnum } from "@common/types/workspace";
 import { v4 as uuidv4 } from "uuid";
 
 class InitEnvironmentTab {
@@ -10,21 +11,36 @@ class InitEnvironmentTab {
   constructor(_id: string, _workspaceId: string) {
     this._tab = {
       id: _id,
-      environmentId: uuidv4(),
+      tabId: uuidv4(),
       name: "New Environment",
+      type: TabTypeEnum.ENVIRONMENT,
       description: "",
-      variable: [
-        {
-          key: "",
-          value: "",
-          checked: true,
-        },
-      ],
-      isActive: false,
-      type: "LOCAL",
-      isSave: true,
-      isSaveInProgress: false,
-      workspaceId: _workspaceId,
+      source: "USER",
+      isDeleted: false,
+      activeSync: false,
+      property: {
+        environment:{
+          variable: [
+                {
+                  key: "",
+                  value: "",
+                  checked: true,
+                },
+              ],
+                 type: "LOCAL",
+                 state: {
+                  isSaveInProgress: false,
+                 }
+        }
+      },
+      path: {
+        workspaceId: _workspaceId,
+        collectionId: "",
+        folderId: "",
+      },
+      isSaved: true,
+      index: 0,
+      isActive: true,
       timestamp: new Date().toString(),
     };
     if (!_id || !_workspaceId) {
@@ -41,7 +57,7 @@ class InitEnvironmentTab {
     return this;
   }
   public setEnvironmentId(_id: string) {
-    this._tab.environmentId = _id;
+    this._tab.id = _id;
     return this;
   }
   public setName(_name: string) {
@@ -53,22 +69,13 @@ class InitEnvironmentTab {
     return this;
   }
   public setVariable(_variable) {
-    this._tab.variable = _variable;
+    this._tab.property.environment.variable = _variable;
     return this;
   }
 
-  public setIsSave(_isSave: boolean) {
-    this._tab.isSave = _isSave;
-    return this;
-  }
-
-  public setIsActive(_isActive: boolean) {
-    this._tab.isActive = _isActive;
-    return this;
-  }
-
+  
   public setType(_type: string) {
-    this._tab.type = _type;
+    this._tab.property.environment.type = _type;
     return this;
   }
 }

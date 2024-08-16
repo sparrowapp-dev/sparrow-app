@@ -10,6 +10,7 @@ import {
   type FormData,
   type Path,
   type RequestTab,
+  type Tab,
 } from "@common/types/workspace";
 import { InitRequestTab } from "@common/utils";
 
@@ -125,7 +126,7 @@ export class RequestTabAdapter {
    * @param requestTab - request backend data
    * @returns
    */
-  public unadapt(requestTab: RequestTab) {
+  public unadapt(requestTab: Tab) {
     requestTab = createDeepCopy(requestTab);
     const bodyType =
       requestTab.property.request.state.requestBodyNavigation ===

@@ -4,6 +4,7 @@ import { ItemType } from "$lib/utils/enums/item-type.enum";
 import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
 import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
 import type { Observable } from "rxjs";
+import type { CollectionItemsDto } from "@common/types/workspace";
 export class CollectionRepository {
   constructor() {}
 
@@ -254,7 +255,7 @@ export class CollectionRepository {
   public readRequestOrFolderInCollection = async (
     collectionId: string,
     uuid: string,
-  ): Promise<CollectionItem> => {
+  ): Promise<CollectionItemsDto | undefined> => {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
@@ -262,8 +263,8 @@ export class CollectionRepository {
         },
       })
       .exec();
-    let response: CollectionItem;
-    collection?.toJSON().items.forEach((element) => {
+    let response: CollectionItemsDto | undefined;
+    collection?.toJSON().items.forEach((element: CollectionItemsDto) => {
       if (element.id === uuid) {
         response = element;
         return;
@@ -344,7 +345,7 @@ export class CollectionRepository {
     collectionId: string,
     folderId: string,
     uuid: string,
-  ): Promise<unknown> => {
+  ): Promise<CollectionItemsDto | undefined> => {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
@@ -352,7 +353,7 @@ export class CollectionRepository {
         },
       })
       .exec();
-    let response;
+    let response: CollectionItemsDto | undefined;
     collection.toJSON().items.forEach((element) => {
       if (element.id === folderId) {
         for (let i = 0; i < element.items.length; i++) {

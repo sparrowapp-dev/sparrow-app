@@ -21,7 +21,6 @@
       "@common/*": ["./src/packages/@common/*"],
       "@teams/*": ["./src/packages/@teams/*"],
       "@workspaces/*": ["./src/packages/@workspaces/*"],
-      "@environments/*": ["./src/packages/@environments/*"],
       "@support/*": ["./src/packages/@support/*"]
     }
   },

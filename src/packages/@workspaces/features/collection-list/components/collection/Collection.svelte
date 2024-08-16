@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+
   export let onItemCreated: (entityType: string, args: any) => void;
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
@@ -45,6 +48,7 @@
     SyncIcon,
     FolderPlusIcon,
     RequestIcon,
+    SocketIcon,
   } from "@library/icons";
   import { Options } from "@library/ui";
   import { isGuestUserActive } from "$lib/store";
@@ -331,6 +335,16 @@
       },
       {
         onClick: () =>
+          onItemCreated("websocketCollection", {
+            workspaceId: collection.workspaceId,
+            collection,
+          }),
+        displayText: "Add New Web Socket",
+        disabled: false,
+        hidden: false,
+      },
+      {
+        onClick: () =>
           onItemCreated("folder", {
             workspaceId: collection.workspaceId,
             collection,
@@ -385,6 +399,18 @@
         hidden: false,
         icon: SyncIcon,
       },
+      {
+        onClick: () => {
+          onItemCreated("websocketCollection", {
+            workspaceId: collection.workspaceId,
+            collection,
+          });
+        },
+        displayText: "Add New Web Socket",
+        disabled: false,
+        hidden: false,
+        icon: SocketIcon,
+      },
     ]}
     {noOfColumns}
   />
@@ -393,7 +419,7 @@
 <button
   bind:this={collectionTabWrapper}
   style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
-  class="btn-primary mb-1 d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
+  class="btn-primary ps-4 mb-1 d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
     : ''}"
@@ -573,12 +599,12 @@
           />
         {/each}
         {#if !collection?.items?.length}
-          <p class="text-fs-10 ps-4 my-2 text-secondary-300">
+          <p class="text-fs-10 ps-4 ms-2 my-2 text-secondary-300">
             This collection is empty
           </p>
         {/if}
 
-        <div class="d-flex gap-2 ms-1">
+        <div class="d-flex gap-2 ps-1 ms-4">
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
             <Tooltip title={"Add Folder"} placement={"bottom"} distance={12}>
               <div
@@ -614,6 +640,31 @@
               >
                 <RequestIcon
                   height="16px"
+                  width="16px"
+                  color="var(--request-arc)"
+                />
+              </div>
+            </Tooltip>
+
+            <Tooltip
+              title={"Add Web Socket"}
+              placement={"bottom"}
+              distance={12}
+            >
+              <div
+                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+                style="height: 24px; width: 24px;"
+                role="button"
+                on:click={() => {
+                  onItemCreated("websocketCollection", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                  });
+                  MixpanelEvent(Events.Collection_WebSocket);
+                }}
+              >
+                <SocketIcon
+                  height="12px"
                   width="16px"
                   color="var(--request-arc)"
                 />
