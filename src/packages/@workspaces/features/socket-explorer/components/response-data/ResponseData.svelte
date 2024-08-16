@@ -75,6 +75,21 @@
   };
 
   let isFilterDropdownActive = false;
+
+  /**
+   * @description - Highlights the searched text
+   * @param text - The text to be highlighted
+   * @param search - The search term
+   * @returns - The HTML string with highlighted text
+   */
+  const highlightSearchText = (text: string, search: string): string => {
+    if (!search) return text;
+    const regex = new RegExp(`(${search})`, "gi");
+    return text.replace(
+      regex,
+      `<span class="highlight-websocket-message-search">$1</span>`,
+    );
+  };
 </script>
 
 <div class="h-100 d-flex flex-column">
@@ -259,7 +274,10 @@
           <span class="text-fs-12 py-2 px-3 timestamp">
             {message?.timestamp}
           </span>
-          <p class="ellipsis py-2 text-fs-12 mb-0">{message?.data}</p>
+          <p class="ellipsis py-2 text-fs-12 mb-0">
+            <!-- {message?.data} -->
+            {@html highlightSearchText(message?.data, searchData)}
+          </p>
         </div>
       {/each}
       {#if !filteredWebsocketMessage?.length && (searchData || webSocket.filter !== "All messages")}
@@ -276,5 +294,8 @@
   .timestamp {
     color: var(--text-secondary-550);
     width: 110px;
+  }
+  :global(.highlight-websocket-message-search) {
+    background-color: #1e354d;
   }
 </style>
