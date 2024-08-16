@@ -10,26 +10,43 @@
     DustbinIcon,
     ArrowUpward,
     ArrowDownward,
+    DownArrowIcon,
   } from "@library/icons";
-  import { Tooltip } from "@library/ui";
+  import { Dropdown, Tooltip } from "@library/ui";
   import { WithButtonV4 } from "@workspaces/common/hoc";
+  import { arrowInsert, arrowOutward, blank } from "../../icons";
 
   export let webSocket;
   export let onSearchMessage;
   export let onDeleteMessage;
   export let onUpdateMessageBody;
   export let onUpdateContentType;
+  export let onUpdateFilterType;
   let searchData = webSocket.search;
 
   let filteredWebsocketMessage = [];
   const filterWebsocketResponse = () => {
-    filteredWebsocketMessage = webSocket.messages.filter((messages) => {
-      if (messages.data.includes(searchData)) return true;
-      return false;
-    });
+    filteredWebsocketMessage = webSocket.messages
+      .filter((message) => {
+        if (message.data.toLowerCase().includes(searchData.toLowerCase())) {
+          return true;
+        }
+        return false;
+      })
+      .filter((message) => {
+        if (
+          webSocket.filter === "All messages" ||
+          (message.transmitter === "sender" && webSocket.filter === "Sent") ||
+          (message.transmitter === "receiver" &&
+            webSocket.filter === "Received")
+        ) {
+          return true;
+        }
+        return false;
+      });
   };
   $: {
-    if (searchData !== undefined || searchData !== null || webSocket) {
+    if (webSocket) {
       filterWebsocketResponse();
     }
   }
@@ -56,6 +73,8 @@
       });
     }
   };
+
+  let isFilterDropdownActive = false;
 </script>
 
 <div class="h-100 d-flex flex-column">
@@ -73,6 +92,8 @@
                 webSocket.status === "disconnecting"
               ? "#FBA574"
               : "#FBA574"}
+            height={"8px"}
+            width={"8px"}
           />
           <span class="text-fs-12 px-2">
             {webSocket.status === "connected"
@@ -88,15 +109,6 @@
         </span>
         <span class="d-flex">
           <Tooltip title={"Scroll to top"}>
-            <!-- <span
-              role="button"
-              on:click={() => {
-                scroll("top");
-              }}
-            >
-              <ArrowUpward height={"12px"} width={"12px"} color={"grey"} />
-            </span> -->
-
             <WithButtonV4
               icon={ArrowUpward}
               onClick={() => {
@@ -107,14 +119,6 @@
             />
           </Tooltip>
           <Tooltip title={"Scroll to bottom"}>
-            <!-- <span
-              role="button"
-              on:click={() => {
-                scroll("bottom");
-              }}
-            >
-              <ArrowDownward height={"12px"} width={"12px"} color={"grey"} />
-            </span> -->
             <WithButtonV4
               icon={ArrowDownward}
               onClick={() => {
@@ -125,9 +129,6 @@
             />
           </Tooltip>
           <Tooltip title={"Delete"}>
-            <!-- <span on:click={onDeleteMessage} role="button">
-              <DustbinIcon height={"12px"} width={"12px"} color={"grey"} />
-            </span> -->
             <WithButtonV4
               icon={DustbinIcon}
               onClick={() => {
@@ -140,23 +141,74 @@
         </span>
       </div>
     </div>
-    <div>
-      <Input
-        id="websocket-list-search"
-        width={"100%"}
-        height={"33px"}
-        type="search"
-        bind:value={searchData}
-        on:input={(e) => {
-          onSearchMessage(searchData);
-        }}
-        defaultBorderColor="transparent"
-        hoveredBorderColor="var(--border-primary-300)"
-        focusedBorderColor={"var(--border-primary-300)"}
-        class="text-fs-12 bg-tertiary-400 border-radius-2 ellipsis fw-normal px-2"
-        style="outline:none;"
-        placeholder="Search"
-      />
+    <div class="d-flex {webSocket?.messages?.length ? 'visible' : 'invisible'}">
+      <div class="w-100" style="margin-right:60px;">
+        <Input
+          id="websocket-list-search"
+          width={"100%"}
+          height={"33px"}
+          type="search"
+          bind:value={searchData}
+          on:input={(e) => {
+            onSearchMessage(searchData);
+          }}
+          defaultBorderColor="transparent"
+          hoveredBorderColor="var(--border-primary-300)"
+          focusedBorderColor={"var(--border-primary-300)"}
+          class="text-fs-12 bg-tertiary-400 border-radius-2 ellipsis fw-normal px-2"
+          style="outline:none;"
+          placeholder="Search"
+        />
+      </div>
+      <div>
+        <Dropdown
+          buttonId="filtermessage"
+          bind:isMenuOpen={isFilterDropdownActive}
+          horizontalPosition="left"
+          minWidth={175}
+          options={[
+            {
+              name: "All messages",
+              icon: blank,
+              onclick: () => {
+                onUpdateFilterType("All messages");
+              },
+            },
+            {
+              name: "Sent",
+              icon: arrowOutward,
+              onclick: () => {
+                onUpdateFilterType("Sent");
+              },
+            },
+            {
+              name: "Received",
+              icon: arrowInsert,
+              onclick: () => {
+                onUpdateFilterType("Received");
+              },
+            },
+          ]}
+        >
+          <button
+            id="filtermessage"
+            class="h-100 border-0 bg-transparent py-2 rounded d-flex justify-content-end align-items-center"
+            style="width:130px;"
+            on:click={() => {
+              isFilterDropdownActive = !isFilterDropdownActive;
+            }}
+          >
+            <span class="text-fs-12 pe-2 text-tertiary-100">Filter Message</span
+            >
+            <DownArrowIcon
+              height={"16px"}
+              width={"16px"}
+              color={"var(--text-tertiary-100)"}
+            />
+          </button>
+          <!-- </Tooltip> -->
+        </Dropdown>
+      </div>
     </div>
   </div>
   <div class="pt-2"></div>
@@ -177,7 +229,7 @@
             }
           }}
         >
-          <span class="p-2 d-flex align-items-center" style="width:24px;">
+          <span class="p-2 d-flex align-items-center" style="width:35px;">
             {#if message?.transmitter === "sender"}
               <ArrowOutwardIcon
                 height={"10px"}
@@ -210,7 +262,7 @@
           <p class="ellipsis py-2 text-fs-12 mb-0">{message?.data}</p>
         </div>
       {/each}
-      {#if !filteredWebsocketMessage?.length && searchData}
+      {#if !filteredWebsocketMessage?.length && (searchData || webSocket.filter !== "All messages")}
         <p class="text-fs-16 text-center text-secondary-200">
           No results found.
         </p>
@@ -223,5 +275,6 @@
 <style>
   .timestamp {
     color: var(--text-secondary-550);
+    width: 110px;
   }
 </style>

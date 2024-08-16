@@ -12,6 +12,7 @@ export type WebSocketData = {
   body: string;
   contentType: string;
   url: string;
+  filter: "All messages" | "Sent" | "Received";
 };
 
 export const webSocketDataStore = writable<Map<string, WebSocketData>>(
