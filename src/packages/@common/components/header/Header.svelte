@@ -316,14 +316,16 @@
       position={"absolute"}
     />
 
-    <div class="ms-2 me-1">
-      <UserProfileModal
-        {isGuestUser}
-        item={sidebarModalItem}
-        {onLogout}
-        bind:showProfileModal
-      />
-    </div>
+    {#if !isGuestUser}
+      <div class="ms-2 me-1">
+        <UserProfileModal
+          {isGuestUser}
+          item={sidebarModalItem}
+          {onLogout}
+          bind:showProfileModal
+        />
+      </div>
+    {/if}
   </div>
 </header>
 

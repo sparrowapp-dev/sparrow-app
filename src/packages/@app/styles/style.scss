@@ -825,7 +825,6 @@ span {
 ::-webkit-scrollbar-track {
   background: transparent;
   width: 5px;
-  height: 5px;
 }
 
 /* Customize the scrollbar thumb (the draggable part) */
@@ -835,7 +834,6 @@ span {
   border: 3px solid transparent;
   background-clip: content-box;
   width: 5px !important;
-  height: 5px;
 }
 
 ::-webkit-scrollbar-corner {
