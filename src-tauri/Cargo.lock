@@ -3655,6 +3655,8 @@ dependencies = [
  "futures",
  "futures-util",
  "http",
+ "hyper",
+ "hyper-tls",
  "json",
  "native-tls",
  "nfd",
