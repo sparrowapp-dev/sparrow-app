@@ -28,6 +28,7 @@
     <div on:keydown|stopPropagation on:keyup|stopPropagation>
       <div id="editor2">
         <Markdown
+          placeholder={"Add documentation; insert / to see all the options."}
           id={"editor2"}
           bind:response
           {onUpdateRequestDescription}

@@ -776,6 +776,7 @@
       style="width:100%; overflow-y:hidden; margin:0px !important; "
     >
       <Markdown
+        placeholder={"Add a description to help people know about this request."}
         isReadOnly={true}
         id={"editor1"}
         {requestDoc}

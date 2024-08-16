@@ -13,6 +13,7 @@
   export let response;
   export let id;
   export let isReadOnly;
+  export let placeholder;
 
   let parsedValue;
   let editor;
@@ -55,7 +56,7 @@
         },
       },
       readOnly: isReadOnly,
-      placeholder: "Add Documentation",
+      placeholder: placeholder,
       data: {
         blocks: parsedValue,
       },
@@ -85,3 +86,6 @@
 </script>
 
 <div style="margin-bottom:10px;" on:input={saveContent} id="editorjs"></div>
+
+<style>
+</style>

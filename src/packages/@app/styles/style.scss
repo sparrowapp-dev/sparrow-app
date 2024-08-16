@@ -882,11 +882,10 @@ span {
   background-color: var(--bg-primary-300) !important;
   color: white !important;
 }
-
+.ce-inline-tool--link{
+  display: none;
+}
 .ce-popover{
-  
-    clip-path: polygon(1, 0, 0 0, 0 0, 0 0);
-  
   position: absolute;
   left: -91px;
   top: 19px;
