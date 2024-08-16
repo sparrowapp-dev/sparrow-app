@@ -69,7 +69,11 @@
         ? "global-base text-fs-10"
         : "local-base text-fs-10"}
     >
-      <DotIcon color={reviewEnv?.type === "G" ? "#3670f7" : "#69d696"} /> baseURL
+      <DotIcon
+        color={reviewEnv?.type === "G" ? "#3670f7" : "#69d696"}
+        height={"6px"}
+        width={"6px"}
+      /> baseURL
     </p>
     <div class="d-flex">
       <span class="text-secondary-200 text-fs-11" style="width:55px;"
@@ -97,7 +101,7 @@
               notifications.success("Copied to Clipboard");
             }}
           >
-            <CopyIcon height={"12px"} width={"12px"}  color={"#8A9299"} />
+            <CopyIcon height={"12px"} width={"12px"} color={"#8A9299"} />
           </div>
         </div>
       </div>
@@ -129,15 +133,15 @@
     text-overflow: ellipsis;
     white-space: normal; /* Use 'normal' instead of 'nowrap' */
   }
-  .copyIcon{
+  .copyIcon {
     width: 24px;
     height: 24px;
     display: flex;
     justify-content: center;
-    align-items:center;
+    align-items: center;
     border-radius: 3px;
   }
-  .copyIcon:hover{
+  .copyIcon:hover {
     background: var(--bg-tertiary-300);
   }
 </style>
