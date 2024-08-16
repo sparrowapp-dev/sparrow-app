@@ -242,10 +242,17 @@
           isValidSyntax = false;
         }
 
+        // Preserve the checked state from the original pair if it exists and was false
+        const existingPair = pairs.find(
+          (p) => p.key === key && p.value === value,
+        );
+        const checked =
+          existingPair && existingPair.checked === false ? false : true;
+
         return {
           key: key,
           value: value,
-          checked: true,
+          checked: checked,
         };
       } else {
         return {
@@ -255,6 +262,7 @@
         };
       }
     });
+
     callback(pairs);
   };
 
