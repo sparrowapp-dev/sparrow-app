@@ -316,6 +316,7 @@
       position={"absolute"}
     />
 
+    {#if !isGuestUser}
     <div class="ms-2 me-1">
       <UserProfileModal
         {isGuestUser}
@@ -324,6 +325,7 @@
         bind:showProfileModal
       />
     </div>
+    {/if}
   </div>
 </header>
 

@@ -19,7 +19,7 @@
 
   let enableKeyValueHighlighting = true;
   import { Editor } from "@library/forms";
-    import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
+  import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
 
   type Mode = "READ" | "WRITE";
 
@@ -329,7 +329,7 @@
             Value
           </p>
 
-          {#if bulkEditPlaceholder}
+          {#if isBulkEditRequired}
             <div class="me-3">
               <button class="bg-transparent border-0 mt-1 d-flex" style="">
                 <p
@@ -664,7 +664,7 @@
           </div>
 
           <!-- Bulk Edit Button -->
-          {#if bulkEditPlaceholder}
+          {#if isBulkEditRequired}
             <div class="pe-0 d-flex align-items-center gap-1 bulkEdit-btn-div">
               {#if !isValidSyntax}
                 <div
