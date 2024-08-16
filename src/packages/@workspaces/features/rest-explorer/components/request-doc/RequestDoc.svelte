@@ -26,8 +26,14 @@
   </div>
   <div style="height: 210px !important; " class="area">
     <div on:keydown|stopPropagation on:keyup|stopPropagation>
-      <div>
-        <Markdown bind:response {onUpdateRequestDescription} {requestDoc} />
+      <div id="editor2">
+        <Markdown
+          id={"editor2"}
+          bind:response
+          {onUpdateRequestDescription}
+          {requestDoc}
+          isReadOnly={false}
+        />
       </div>
     </div>
     {#if !isGuestUser}

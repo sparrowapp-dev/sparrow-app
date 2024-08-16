@@ -29,6 +29,7 @@
     PencilIcon2,
     WorkspaceIcon,
   } from "@library/icons";
+  import Markdown from "@workspaces/features/rest-explorer/components/request-doc/Markdown.svelte";
 
   export let onClick;
   export let onFinish = (id: string) => {};
@@ -45,6 +46,8 @@
   export let requestPath;
   export let onRenameCollection;
   export let onRenameFolder;
+  export let requestDoc;
+  export let onUpdateRequestDescription;
 
   interface Path {
     name: string;
@@ -767,14 +770,16 @@
       <p class="api-url">{componentData?.property.request.url}</p>
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>
-    <div class="pb-1">
-      <textarea
-        style="width: 100%; resize:none; border: 1px solid var(--border-secondary-400);"
-        class="py-2 px-3 bg-tertiary-300 border-radius-2 sparrow-fs-12"
-        rows="5"
-        maxlength="1024"
-        placeholder="Give a description to help people know about this request"
-        disabled={true}
+    <div
+      class="pb-1 bg-tertiary-300"
+      id="editor1"
+      style="width:100%; overflow-y:hidden; margin:0px !important; "
+    >
+      <Markdown
+        isReadOnly={true}
+        id={"editor1"}
+        {requestDoc}
+        {onUpdateRequestDescription}
       />
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>

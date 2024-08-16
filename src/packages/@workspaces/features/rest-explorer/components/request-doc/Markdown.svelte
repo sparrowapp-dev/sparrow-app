@@ -11,6 +11,8 @@
   export let requestDoc;
   export let onUpdateRequestDescription;
   export let response;
+  export let id;
+  export let isReadOnly;
 
   let parsedValue;
   let editor;
@@ -18,17 +20,14 @@
   const parser = new edjsParser();
   onMount(() => {
     if (requestDoc) {
-      console.log("requestDoc", requestDoc);
-
       parsedValue = JSON.parse(requestDoc);
-      console.log("parsedValue", parsedValue);
     } else {
       parsedValue = [];
     }
     editor = new EditorJS({
       inlineToolbar: ["bold", "italic", "underline"],
       inlineToolbar: true,
-      holder: "editorjs",
+      holder: id,
       tools: {
         list: {
           class: List,
@@ -51,10 +50,11 @@
         underline: Underline,
         paragraph: {
           class: Paragraph,
-          inlineToolbar: ["bold", "italic", "underline", "inlineCode", "list"],
+          // inlineToolbar: ["bold", "italic", "underline", "inlineCode", "list"],
           inlineToolbar: true,
         },
       },
+      readOnly: isReadOnly,
       placeholder: "Add Documentation",
       data: {
         blocks: parsedValue,
@@ -76,7 +76,9 @@
   };
   $: {
     if (response) {
-      editor.blocks.clear();
+      if (editor.blocks) {
+        editor.blocks.clear();
+      }
       editor.blocks.render(response);
     }
   }

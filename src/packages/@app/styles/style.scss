@@ -822,6 +822,12 @@ span {
 
 }
 
+@media (min-width: 651px) {
+  .codex-editor--narrow .codex-editor__redactor {
+      margin-right: 0px;
+  }
+}
+
 .codex-editor__redactor::selection{
   background-color: var(--bg-primary-300) !important;
   color: white !important;
@@ -872,10 +878,16 @@ span {
   width: 100%;  
 }
 
-.ce-popover{
-  position: absolute;
-  z-index: 10001 !important;
+.ce-header::selection{
+  background-color: var(--bg-primary-300) !important;
+  color: white !important;
+}
 
+.ce-popover{
+  
+    clip-path: polygon(1, 0, 0 0, 0 0, 0 0);
+  
+  position: absolute;
   left: -91px;
   top: 19px;
   background-color: #262626;
@@ -883,10 +895,11 @@ span {
 .ce-popover__container{
   background-color: #262626;
   left: -50px;
-  z-index: 1001 !important;
   border: none !important;
   width: 70px !important;
 }
+
+
 
 .inline-code{
   background-color: #242426 !important ;
