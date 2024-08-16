@@ -50,7 +50,7 @@
         underline: Underline,
         paragraph: {
           class: Paragraph,
-          // inlineToolbar: ["bold", "italic", "underline", "inlineCode", "list"],
+          inlineToolbar: ["bold", "italic", "underline", "inlineCode", "list"],
           inlineToolbar: true,
         },
       },
