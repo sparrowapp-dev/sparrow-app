@@ -65,16 +65,14 @@ class HelpPageViewModel {
     return;
   };
 
-   /**
+  /**
    * Navigates to web flow to git hub release of sparrow
    * @returns void
    */
-   public learnMore = async () => {
-    await open(LearnMoreURL);
+  public learnMore = async (version) => {
+    await open(`${LearnMoreURL}/tag/${version}`);
     return;
   };
-
-
 
   /**
    * opens 'add feedback' modal to fill the form
@@ -87,7 +85,6 @@ class HelpPageViewModel {
     return true;
   };
 
-  
   /**
    * Fetch release notes data from the backend
    * @returns Promise<any> - Promise resolving to the fetched release notes data
@@ -126,9 +123,6 @@ class HelpPageViewModel {
       .reverse();
     return response;
   };
- 
-  
 }
-
 
 export default HelpPageViewModel;

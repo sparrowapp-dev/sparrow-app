@@ -70,7 +70,7 @@
                     class="d-flex align-items-center gap-3"
                     style="color: var(--text-primary-300); font-weight: 400; font-size: 16px; cursor: pointer;"
                     on:click={async () => {
-                      onLearnMore();
+                      onLearnMore(item.versionName);
                     }}
                   >
                     Learn more
