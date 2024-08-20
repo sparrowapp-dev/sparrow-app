@@ -88,4 +88,14 @@
 <div style="margin-bottom:10px;" on:input={saveContent} id="editorjs"></div>
 
 <style>
+  :global(.ce-popover__container) {
+    position: absolute;
+    left: 90px;
+    right: 90px;
+  }
+  :global(.ce-popover--nested) {
+    position: absolute;
+    left: 90px;
+    right: 90px;
+  }
 </style>

@@ -813,7 +813,7 @@ span {
 }
 .codex-editor__redactor{
  border: none;
- overflow-y: scroll;
+ overflow-y: auto;
  padding-left: 16px;
  padding-top: 10px;
  height: 160px !important;
@@ -843,6 +843,16 @@ span {
 }
 
 .ce-block__content::selection{
+  background-color: var(--bg-primary-300) !important;
+  color: white !important;
+}
+
+.cdx-underline::selection{
+  background-color: var(--bg-primary-300) !important;
+  color: white !important;
+}
+
+.inline-code::selection{
   background-color: var(--bg-primary-300) !important;
   color: white !important;
 }
@@ -877,7 +887,27 @@ span {
   padding:0px;
   width: 100%;  
 }
+.code::selection{
+  background-color: var(--bg-primary-300) !important;
+  color: white !important;
+}
+.cdx-list__item::selection{
+  background-color: var(--bg-primary-300) !important;
+  color: white !important;
+}
 
+.ce-popover-item--active{
+  background-color: transparent;
+}
+
+.ce-block i::selection{
+  background-color: var(--bg-primary-300) !important;
+  color: white !important;
+}
+  .ce-block b::selection{
+  background-color: var(--bg-primary-300) !important;
+  color: white !important;
+}
 .ce-header::selection{
   background-color: var(--bg-primary-300) !important;
   color: white !important;
