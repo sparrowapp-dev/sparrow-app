@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { WorkspaceDocument } from "@app/database/database";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import {
     VectorIcon,
     LibraryIcon,
@@ -119,6 +121,7 @@
       role="button"
       on:click={() => {
         onItemCreated("web-socket", {});
+        MixpanelEvent(Events.WebSocket_Button);
       }}
     >
       <div
@@ -135,7 +138,7 @@
         class="d-flex justify-content-center align-items-center"
         style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px;  "
       >
-        Add WebSocket
+        <span><PlusIcon color={"var(--white-color)"} /></span> WebSocket
       </div>
     </div>
   </div>

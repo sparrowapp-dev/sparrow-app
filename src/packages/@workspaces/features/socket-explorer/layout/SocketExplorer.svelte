@@ -65,6 +65,7 @@
   export let onUpdateMessageBody;
   export let onUpdateContentType;
   export let onClearInput;
+  export let onUpdateFilterType;
 
   let isExposeSaveAsSocket = false;
   const toggleSaveRequest = (flag: boolean): void => {
@@ -186,6 +187,7 @@
                           {onDeleteMessage}
                           {onUpdateMessageBody}
                           {onUpdateContentType}
+                          {onUpdateFilterType}
                         />
                       </div>
                       <div style="overflow:auto; height:50%;">

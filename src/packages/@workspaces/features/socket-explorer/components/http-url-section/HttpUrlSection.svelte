@@ -11,6 +11,8 @@
   import { UrlInputTheme } from "../../../../common/utils/";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { DiskIcon } from "@library/icons";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   let componentClass = "";
   export { componentClass as class };
 
@@ -42,7 +44,7 @@
     ) {
       toggleSaveRequest(true);
     } else if (x.status === "success") {
-      notifications.success("API request saved");
+      notifications.success("WebSocket request saved");
     }
   };
 
@@ -90,8 +92,10 @@
       } else {
         if (webSocket?.status === "connected") {
           onDisconnect();
+          MixpanelEvent(Events.WebSocket_Disconnected);
         } else if (webSocket?.status === "disconnected" || !webSocket?.status) {
           onConnect(environmentVariables);
+          MixpanelEvent(Events.WebSocket_Connected);
         }
       }
     }}

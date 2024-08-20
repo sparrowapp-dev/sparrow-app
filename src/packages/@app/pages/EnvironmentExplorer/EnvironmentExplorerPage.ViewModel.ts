@@ -19,7 +19,7 @@ export class EnvironmentExplorerViewModel {
   private guideRepository = new GuideRepository();
   private guestUserRepository = new GuestUserRepository();
   private _tab: BehaviorSubject<any> = new BehaviorSubject({});
-  private tabRepository = new TabRepository;
+  private tabRepository = new TabRepository();
   private compareArray = new CompareArray();
 
   public constructor(doc) {
@@ -69,7 +69,6 @@ export class EnvironmentExplorerViewModel {
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
-
   };
 
   /**
@@ -78,7 +77,6 @@ export class EnvironmentExplorerViewModel {
    */
   public updateVariables = async (_variable: any) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.variable = _variable;
     progressiveTab.property.environment.variable = _variable;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
@@ -86,18 +84,17 @@ export class EnvironmentExplorerViewModel {
   };
 
   /**
-  * Compares the current environment tab with the server version and updates the saved status accordingly.
-  * This method is debounced to reduce the number of server requests.
-  * @return A promise that resolves when the comparison is complete.
-  */
+   * Compares the current environment tab with the server version and updates the saved status accordingly.
+   * This method is debounced to reduce the number of server requests.
+   * @return A promise that resolves when the comparison is complete.
+   */
   private compareEnvironmentWithServerDebounced = async () => {
     let result = true;
     const progressiveTab = createDeepCopy(this._tab.getValue());
 
-    let environmentServer =
-      await this.environmentRepository.readEnvironment(
-        progressiveTab.id,
-      );
+    let environmentServer = await this.environmentRepository.readEnvironment(
+      progressiveTab.id,
+    );
 
     if (!environmentServer) {
       result = false;
@@ -145,9 +142,9 @@ export class EnvironmentExplorerViewModel {
   );
 
   /**
- *
- * @param _state - request state
- */
+   *
+   * @param _state - request state
+   */
   public updateEnvironmentState = async (_state) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.environment.state = {
@@ -156,9 +153,7 @@ export class EnvironmentExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-
   };
-
 
   /**
    * @description - saves environment to the mongo server
@@ -166,7 +161,7 @@ export class EnvironmentExplorerViewModel {
   public saveEnvironment = async () => {
     const currentEnvironment = this._tab.getValue();
     const activeWorkspace = await this.workspaceRepository.readWorkspace(
-      currentEnvironment.workspaceId,
+      currentEnvironment.path.workspaceId,
     );
     await this.updateEnvironmentState({ isSaveInProgress: true });
     const guestUser = await this.guestUserRepository.findOne({
@@ -178,7 +173,7 @@ export class EnvironmentExplorerViewModel {
         currentEnvironment.id,
         {
           name: currentEnvironment.name,
-          variable: currentEnvironment.variable,
+          variable: currentEnvironment?.property?.environment?.variable,
         },
       );
       const progressiveTab = this._tab.getValue();
@@ -200,7 +195,7 @@ export class EnvironmentExplorerViewModel {
       currentEnvironment.id,
       {
         name: currentEnvironment.name,
-        variable: currentEnvironment.variable,
+        variable: currentEnvironment?.property?.environment?.variable,
       },
     );
     if (response.isSuccessful) {
