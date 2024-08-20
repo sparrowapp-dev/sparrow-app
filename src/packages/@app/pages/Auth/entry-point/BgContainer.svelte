@@ -7,7 +7,7 @@
 >
   <div
     class="position-relative overflow-hidden m-4 rounded-4 container d-flex flex-column align-items-center justify-content-center w-100"
-    style="border: 1px solid var(--bg-container-border); max-width: 404px; padding: 80px 48px;"
+    style="border: 1px solid var(--bg-container-border); max-width: 404px; padding: 31px 9px;"
   >
     <div
       style="position:absolute; top:0;
