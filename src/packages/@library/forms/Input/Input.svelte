@@ -52,6 +52,8 @@
 
   export let maxlength = 500;
 
+  export let searchIconColor = "var(--defaultcolor)";
+
   /**
    * Unique id for input
    */
@@ -141,7 +143,7 @@
       class="position-absolute"
       style="top: 50%; left: 10px; transform: translateY(-50%);"
     >
-      <SearchIcon height={14} width={14} color={"var(--defaultcolor)"} />
+      <SearchIcon height={14} width={14} color={searchIconColor} />
     </span>
   {/if}
   {#if type === "text" && isHovered && isEditIconRequired && !disabled}

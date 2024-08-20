@@ -25,7 +25,7 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import { SaveAsRequest } from "../../../../features";
+  // import { SaveAsRequest } from "../../../../features";
   /////////////////////////////////////////////////////////////////
   export let onSaveAsRequest;
   export let onSaveRequest;
@@ -265,7 +265,7 @@
   </div>
 </div>
 
-<ModalWrapperV1
+<!-- <ModalWrapperV1
   title={"Save Request"}
   type={"dark"}
   width={"55%"}
@@ -293,7 +293,7 @@
     {onCreateCollection}
     type="SAVE_DESCRIPTION"
   />
-</ModalWrapperV1>
+</ModalWrapperV1> -->
 
 <style>
   .sidebar-right {

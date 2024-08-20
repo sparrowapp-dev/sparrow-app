@@ -19,7 +19,7 @@
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
 
   // ---- Enum, Constants and Interface
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import {
     workspaceLevelPermissions,
@@ -38,7 +38,8 @@
   // ---- DB
   import type { CollectionDocument } from "@app/database/database";
   import { of } from "rxjs";
-    import { isGuestUserActive } from "$lib/store";
+  import { isGuestUserActive } from "$lib/store";
+  import { WebSocket } from "..";
 
   /**
    * Callback for Item created
@@ -98,10 +99,10 @@
   let requestCount: number;
   let requestIds: [string] | [] = [];
   let folderTabWrapper: HTMLElement;
-  let isGuestUser: boolean ;
-    isGuestUserActive.subscribe((value)=>{
-       isGuestUser = value
-    })
+  let isGuestUser: boolean;
+  isGuestUserActive.subscribe((value) => {
+    isGuestUser = value;
+  });
 
   $: {
     if (searchData) {
@@ -117,7 +118,7 @@
       requestCount = 0;
       requestCount = explorer?.items?.length;
       if (explorer?.items) {
-        requestIds = explorer?.items?.map((element: { id: any; }) => {
+        requestIds = explorer?.items?.map((element: { id: any }) => {
           return element.id;
         });
       }
@@ -151,7 +152,7 @@
   }
 
   let newFolderName: string = "";
-  const handleRenameInput = (event: { target: { value: string; }; }) => {
+  const handleRenameInput = (event: { target: { value: string } }) => {
     newFolderName = event.target.value;
   };
 
@@ -168,7 +169,7 @@
     newFolderName = "";
   };
 
-  const onRenameInputKeyPress = (event: { key: string; }) => {
+  const onRenameInputKeyPress = (event: { key: string }) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
         "renameInputFieldFolder",
@@ -291,6 +292,22 @@
             });
           },
           displayText: "Add New API",
+          disabled: false,
+          hidden:
+            !collection.activeSync ||
+            (explorer?.source === "USER" && collection.activeSync)
+              ? false
+              : true,
+        },
+        {
+          onClick: () => {
+            onItemCreated("websocketFolder", {
+              workspaceId: collection.workspaceId,
+              collection,
+              folder: explorer,
+            });
+          },
+          displayText: "Add New Web Socket",
           disabled: false,
           hidden:
             !collection.activeSync ||
@@ -505,6 +522,20 @@
     {:else if explorer.type === "REQUEST"}
       <div style="cursor:pointer;">
         <Request
+          bind:userRole
+          api={explorer}
+          {onItemRenamed}
+          {onItemDeleted}
+          {onItemOpened}
+          {folder}
+          {collection}
+          {activeTabId}
+          {activeTabPath}
+        />
+      </div>
+    {:else if explorer.type === ItemType.WEB_SOCKET}
+      <div style="cursor:pointer;">
+        <WebSocket
           bind:userRole
           api={explorer}
           {onItemRenamed}

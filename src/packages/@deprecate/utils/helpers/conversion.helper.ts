@@ -1,23 +1,23 @@
-import { RequestMethod } from "../enums/request.enum";
+import { RequestMethodEnum } from "@common/types/workspace";
 
 const createDeepCopy = (data) => {
   return JSON.parse(JSON.stringify(data));
 };
 
-const getMethodStyle = (method: string) => {
-  if (method === RequestMethod.GET) {
+const getMethodStyle = (method: RequestMethodEnum | undefined) => {
+  if (method === RequestMethodEnum.GET) {
     return "getColor";
-  } else if (method === RequestMethod.DELETE) {
+  } else if (method === RequestMethodEnum.DELETE) {
     return "deleteColor";
-  } else if (method === RequestMethod.HEAD) {
+  } else if (method === RequestMethodEnum.HEAD) {
     return "headColor";
-  } else if (method === RequestMethod.OPTIONS) {
+  } else if (method === RequestMethodEnum.OPTIONS) {
     return "optionsColor";
-  } else if (method === RequestMethod.PATCH) {
+  } else if (method === RequestMethodEnum.PATCH) {
     return "patchColor";
-  } else if (method === RequestMethod.POST) {
+  } else if (method === RequestMethodEnum.POST) {
     return "postColor";
-  } else if (method === RequestMethod.PUT) {
+  } else if (method === RequestMethodEnum.PUT) {
     return "putColor";
   } else {
     return "";

@@ -172,7 +172,7 @@
     <!-- github repo section -->
     <section>
       <div
-        class="p-3 d-flex align-items-center justify-content-between"
+        class="p-2 d-flex align-items-center justify-content-between"
         style="z-index: 4;"
       >
         <Tooltip title={"Star Us On GitHub"} placement={"top"}>

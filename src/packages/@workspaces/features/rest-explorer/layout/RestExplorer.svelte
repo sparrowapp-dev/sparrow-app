@@ -29,7 +29,7 @@
 
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import { SaveAsRequest } from "@workspaces/features";
+  import { SaveAsCollectionItem } from "@workspaces/features";
   import type {
     ClearResponseType,
     CreateCollectionType,
@@ -94,12 +94,12 @@
   export let onUpdateEnvironment;
   export let environmentVariables;
   export let isGuestUser = false;
-  export let isLoginBannerActive = false;
+  // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
   export let onUpdateCollectionGuide: (query, isActive) => void;
-  export let onUpdateAiPrompt;
-  export let onUpdateAiConversation;
+  // export let onUpdateAiPrompt;
+  // export let onUpdateAiConversation;
   export let onGenerateDocumentation;
   /**
    * Role of user in active workspace
@@ -478,7 +478,7 @@
       isExposeSaveAsRequest = flag;
     }}
   >
-    <SaveAsRequest
+    <SaveAsCollectionItem
       onClick={(flag = false) => {
         isExposeSaveAsRequest = flag;
       }}
@@ -489,7 +489,7 @@
       requestPath={$tab.path}
       collections={$collections}
       {readWorkspace}
-      {onSaveAsRequest}
+      onSave={onSaveAsRequest}
       {onCreateFolder}
       {onCreateCollection}
       {onRenameCollection}

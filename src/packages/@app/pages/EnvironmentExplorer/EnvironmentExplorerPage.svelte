@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EnvironmentExplorer } from "@environments/features";
+  import { EnvironmentExplorer } from "@workspaces/features";
   import { EnvironmentExplorerViewModel } from "./EnvironmentExplorerPage.ViewModel";
   import { Debounce } from "@common/utils";
   import { user } from "$lib/store";
@@ -27,11 +27,13 @@
    */
   const findUserRole = async () => {
     const workspace: WorkspaceDocument = await _viewModel.getWorkspace();
-    workspace.users?.forEach((value) => {
-      if (value.id === userId) {
-        userRole = value.role;
-      }
-    });
+    if (workspace) {
+      workspace.users?.forEach((value) => {
+        if (value.id === userId) {
+          userRole = value.role;
+        }
+      });
+    }
   };
   let prevTabName = "";
   $: {
