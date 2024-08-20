@@ -1517,6 +1517,18 @@ class RestExplorerViewModel {
     });
   };
 
+  public updateFilterType = async (_filterType: string) => {
+    const websocketData = this._tab.getValue();
+    webSocketDataStore.update((webSocketDataMap) => {
+      const wsData = webSocketDataMap.get(websocketData.tabId);
+      if (wsData) {
+        wsData.filter = _filterType;
+        webSocketDataMap.set(websocketData.tabId, wsData);
+      }
+      return webSocketDataMap;
+    });
+  };
+
   public clearInput = async () => {
     const initWebSocketTab = new InitTab()
       .webSocket("_id", "_websocketId")

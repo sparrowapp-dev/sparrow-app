@@ -172,4 +172,5 @@
   onUpdateContentType={_viewModel.updateContentType}
   onUpdateMessageBody={_viewModel.updateMessageBody}
   onClearInput={_viewModel.clearInput}
+  onUpdateFilterType={_viewModel.updateFilterType}
 />

@@ -81,7 +81,12 @@
               : ""}
           >
             <span class="me-2">
-              <svelte:component this={item.icon} />
+              <svelte:component
+                this={item.icon}
+                height={"12px"}
+                width={"12px"}
+                color={"#A5B5CA"}
+              />
             </span>
             <span>
               {item.displayText}

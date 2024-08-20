@@ -62,16 +62,6 @@ class InitWebSocketTab {
               value: this.generateWebSocketKey(),
               checked: true,
             },
-            {
-              key: "Connection",
-              value: "Upgrade",
-              checked: true,
-            },
-            {
-              key: "Upgrade",
-              value: "websocket",
-              checked: true,
-            },
           ],
           message: "",
           state: {

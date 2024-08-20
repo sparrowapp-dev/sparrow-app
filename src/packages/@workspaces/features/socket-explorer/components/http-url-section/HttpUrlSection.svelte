@@ -44,7 +44,7 @@
     ) {
       toggleSaveRequest(true);
     } else if (x.status === "success") {
-      notifications.success("API request saved");
+      notifications.success("WebSocket request saved");
     }
   };
 
@@ -93,7 +93,6 @@
         if (webSocket?.status === "connected") {
           onDisconnect();
           MixpanelEvent(Events.WebSocket_Disconnected);
-
         } else if (webSocket?.status === "disconnected" || !webSocket?.status) {
           onConnect(environmentVariables);
           MixpanelEvent(Events.WebSocket_Connected);

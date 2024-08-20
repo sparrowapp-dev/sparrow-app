@@ -16,10 +16,10 @@ export class EnvironmentViewModel {
   private environmentRepository = new EnvironmentRepository();
   private environmentService = new EnvironmentService();
   private guestUserRepository = new GuestUserRepository();
-  private tabRepository = new TabRepository;
+  private tabRepository = new TabRepository();
   private initTab = new InitTab();
 
-  constructor() { }
+  constructor() {}
 
   /**
    * @description - fetches environment list
@@ -63,7 +63,7 @@ export class EnvironmentViewModel {
    * @param environmentId - environment id needs to be deleted
    */
   private deleteEnvironmentTab = async (environmentId: string) => {
-        await this.tabRepository.removeTab(environmentId);
+    await this.tabRepository.removeTab(environmentId);
   };
 
   /**
@@ -128,9 +128,8 @@ export class EnvironmentViewModel {
         newEnvironment.id,
         currentWorkspace._id,
       );
-      initEnvironmentTab.setName(newEnvironment.name)
-        ;
-      this.tabRepository.createTab(initEnvironmentTab.getValue())
+      initEnvironmentTab.setName(newEnvironment.name);
+      this.tabRepository.createTab(initEnvironmentTab.getValue());
       notifications.success("New Environment Created!");
       return;
     }
@@ -148,7 +147,7 @@ export class EnvironmentViewModel {
         currentWorkspace._id,
       );
       initEnvironmentTab.setName(res.name);
-      this.tabRepository.createTab(initEnvironmentTab.getValue())
+      this.tabRepository.createTab(initEnvironmentTab.getValue());
       this.environmentRepository.removeEnvironment(newEnvironment.id);
 
       this.environmentRepository.addEnvironment({
@@ -251,9 +250,11 @@ export class EnvironmentViewModel {
       this.environmentRepository.updateEnvironment(env.id, {
         name: newEnvironmentName,
       });
-      let currentTab = await this.tabRepository.getTabById(env.id)
+      let currentTab = await this.tabRepository.getTabById(env.id);
       if (currentTab) {
-        await this.tabRepository.updateTab(currentTab?.tabId as string, { name: newEnvironmentName })
+        await this.tabRepository.updateTab(currentTab?.tabId as string, {
+          name: newEnvironmentName,
+        });
       }
       return;
     }
@@ -268,11 +269,12 @@ export class EnvironmentViewModel {
       this.environmentRepository.updateEnvironment(env.id, {
         name: newEnvironmentName,
       });
-      let currentTab = await this.tabRepository.getTabById(env.id)
+      let currentTab = await this.tabRepository.getTabById(env.id);
       if (currentTab) {
-        await this.tabRepository.updateTab(currentTab.tabId as string, { name: newEnvironmentName })
+        await this.tabRepository.updateTab(currentTab.tabId as string, {
+          name: newEnvironmentName,
+        });
       }
-
     } else if (response.message === "Network Error") {
       notifications.error(response.message);
     } else {
@@ -293,12 +295,9 @@ export class EnvironmentViewModel {
       env.id,
       currentWorkspace._id,
     );
-    initEnvironmentTab
-      .setName(env.name)
-      .setVariable(env.variable);
+    initEnvironmentTab.setName(env.name).setVariable(env.variable);
 
-    this.tabRepository.createTab(
-      initEnvironmentTab.getValue() );
+    this.tabRepository.createTab(initEnvironmentTab.getValue());
   };
 
   /**
@@ -320,76 +319,72 @@ export class EnvironmentViewModel {
     }
   };
 
-    /**
+  /**
    * @description - saves environment to the mongo server
    */
-    public saveEnvironment = async (_tab) => {
-      const currentEnvironment = _tab;
-      const activeWorkspace = await this.workspaceRepository.readWorkspace(
-        currentEnvironment.workspaceId,
-      );
-      const guestUser = await this.guestUserRepository.findOne({
-        name: "guestUser",
-      });
-      const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
-      if (isGuestUser) {
-        await this.environmentRepository.updateEnvironment(
-          currentEnvironment.id,
-          {
-            name: currentEnvironment.name,
-            variable: currentEnvironment?.property?.environment?.variable,
-          },
-        );
-        notifications.success(
-          `Changes saved for ${currentEnvironment.name} environment.`,
-        );
-   
-        return true;
-      }
-   
-      const response = await this.environmentService.updateEnvironment(
-        activeWorkspace._id,
+  public saveEnvironment = async (_tab) => {
+    const currentEnvironment = _tab;
+    const activeWorkspace = await this.workspaceRepository.readWorkspace(
+      currentEnvironment.path.workspaceId,
+    );
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      await this.environmentRepository.updateEnvironment(
         currentEnvironment.id,
         {
           name: currentEnvironment.name,
           variable: currentEnvironment?.property?.environment?.variable,
         },
-        );
-      if (response.isSuccessful) {
-        this.environmentRepository.updateEnvironment(
-          response.data.data._id,
-          response.data.data,
-        );
-     
-        notifications.success(
-          `Changes saved for ${currentEnvironment.name} environment.`,
-        );
-        return true;
+      );
+      notifications.success(
+        `Changes saved for ${currentEnvironment.name} environment.`,
+      );
+
+      return true;
+    }
+
+    const response = await this.environmentService.updateEnvironment(
+      activeWorkspace._id,
+      currentEnvironment.id,
+      {
+        name: currentEnvironment.name,
+        variable: currentEnvironment?.property?.environment?.variable,
+      },
+    );
+    if (response.isSuccessful) {
+      this.environmentRepository.updateEnvironment(
+        response.data.data._id,
+        response.data.data,
+      );
+
+      notifications.success(
+        `Changes saved for ${currentEnvironment.name} environment.`,
+      );
+      return true;
+    } else {
+      if (response.message === "Network Error") {
+        notifications.error(response.message);
       } else {
-   
-        if (response.message === "Network Error") {
-          notifications.error(response.message);
-        } else {
-          notifications.error(
-            `Failed to save changes for ${currentEnvironment.name} environment.`,
-          );
-        }
+        notifications.error(
+          `Failed to save changes for ${currentEnvironment.name} environment.`,
+        );
       }
-      if (currentEnvironment.type === environmentType.GLOBAL) {
-        MixpanelEvent(Events.SAVE_GLOBAL_ENVIRONMENT_VARIABLES, {
-          environmentName: currentEnvironment.name,
-          environmanetId: currentEnvironment.id,
-        });
-      } else {
-        MixpanelEvent(Events.SAVE_LOCAL_ENVIRONMENT_VARIABLES, {
-          environmentName: currentEnvironment.name,
-          environmanetId: currentEnvironment.id,
-        });
-      }
+    }
+    if (currentEnvironment.type === environmentType.GLOBAL) {
+      MixpanelEvent(Events.SAVE_GLOBAL_ENVIRONMENT_VARIABLES, {
+        environmentName: currentEnvironment.name,
+        environmanetId: currentEnvironment.id,
+      });
+    } else {
+      MixpanelEvent(Events.SAVE_LOCAL_ENVIRONMENT_VARIABLES, {
+        environmentName: currentEnvironment.name,
+        environmanetId: currentEnvironment.id,
+      });
+    }
 
-      return false;
-    };
-
-
-
+    return false;
+  };
 }
