@@ -1929,7 +1929,6 @@ class RestExplorerViewModel
         componentData = this._tab.getValue();
         const existingMessageIndex =
           componentData.property.request.ai.conversations.findIndex((conv) => {
-            // console.log("Comparing", conv.messageId, "with", response.messageId); // Debugging line
             return conv.messageId === response.messageId;
           });
         if (existingMessageIndex === -1 && response?.status) {

@@ -22,9 +22,7 @@ export class AiAssistantWebSocketService {
       transports: ["websocket"], // Forces WebSocket transport
       auth: getAuthHeaders(),
     });
-    socket.on("connect", () => {
-      console.log("Connected to WebSocket server");
-    });
+    socket.on("connect", () => {});
     socketStore.set(socket);
   };
 
