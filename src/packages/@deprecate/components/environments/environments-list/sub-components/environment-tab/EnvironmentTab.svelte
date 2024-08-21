@@ -10,7 +10,6 @@
   import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
   import { notifications } from "@library/ui/toast/Toast";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import { boolean } from "yup";
   import Button from "@library/ui/button/Button.svelte";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
 
@@ -191,7 +190,7 @@
   isOpen={isEnvironmentPopup}
   handleModalState={handleEnvironmentPopUpCancel}
 >
-  <div class="text-lightGray mb-1 sparrow-fs-14">
+  <div class="mb-1 sparrow-fs-14" style="color: #ccc;">
     <p>
       Are you sure you want to delete this Environment? <span
         style="font-weight:700;"

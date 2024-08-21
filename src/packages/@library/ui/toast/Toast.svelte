@@ -9,9 +9,10 @@
   } from "./icons";
 </script>
 
-<ToastContainer let:data>
+<ToastContainer width={"fit-content"} let:data>
   <div
-    class="w-100 d-flex border-radius-4 position-relati custom-toast custom-toast-{data.type}"
+    class=" d-flex border-radius-4 position-relati custom-toast custom-toast-{data.type}"
+    style="width: 100%; min-width: 30vw;"
   >
     <div class="w-100" style="">
       <span class="p-1">
@@ -20,10 +21,11 @@
         {:else if data.type === "warning"}
           <WarningIcon />
         {:else if data.type === "error"}
-          <ErrorIcon 
-          height={"16px"}
-          width={"16px"}
-          color={"var(--dangerColor)"}/>
+          <ErrorIcon
+            height={"16px"}
+            width={"16px"}
+            color={"var(--dangerColor)"}
+          />
         {:else}
           <InfoIcon />
         {/if}
