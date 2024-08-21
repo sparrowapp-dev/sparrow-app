@@ -2,13 +2,26 @@
   import { Editor } from "@library/forms";
 
   export let webSocket;
-
+  let uuid;
+  let Message;
   let language = webSocket.contentType;
   $: {
     if (webSocket) {
       language = webSocket.contentType;
+      uuid = webSocket?.body;
+      Message = currentMessage(uuid);
     }
   }
+
+  const currentMessage = (uuid) => {
+    if (webSocket) {
+      const message = webSocket.messages.find(
+        (message) => message.uuid === uuid,
+      );
+      return message?.data;
+    }
+    return null;
+  };
 </script>
 
 <div
@@ -21,7 +34,7 @@
         -->
   <Editor
     bind:lang={language}
-    bind:value={webSocket.body}
+    bind:value={Message}
     on:change={() => {}}
     isEditable={false}
     isFormatted={true}
