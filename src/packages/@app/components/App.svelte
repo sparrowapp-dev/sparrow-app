@@ -21,6 +21,7 @@
   import LoginPage from "@app/pages/Auth/login-page/LoginPage.svelte";
   import RegisterPage from "@app/pages/Auth/register-page/RegisterPage.svelte";
   import { singleInstanceHandler } from "$lib/utils/singleinstance/app.singleinstance";
+  import { AiAssistantWebSocketService } from "@app/services/ai-assistant.ws.service";
 
   export let url = "/";
   // const tabRepository = new TabRepository();
@@ -70,6 +71,9 @@
     user.subscribe((value) => {
       isloggedIn = value;
     });
+    // Connect WebSocket
+    const wsService = new AiAssistantWebSocketService();
+    wsService.connectWebSocket();
 
     resizeWindowOnLogin();
     window.addEventListener(
