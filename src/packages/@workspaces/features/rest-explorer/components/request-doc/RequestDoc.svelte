@@ -16,6 +16,7 @@
   const sendPrompt = async (text: string) => {
     if (text) {
       response = await onGenerateDocumentation(text, "", "");
+      console.log(response, "after clicking send prompt");
     }
   };
 </script>
@@ -24,16 +25,15 @@
   <div class="d-flex" style="justify-content: space-between; margin-top: 10px;">
     <div style="font-weight: 600; margin-bottom:8px;">Documentation</div>
   </div>
-  <div style="height: 210px !important; " class="area">
+  <div style="height: 100%; min-height:160px; " class="area">
     <div on:keydown|stopPropagation on:keyup|stopPropagation>
       <div id="editor2">
         <Markdown
           placeholder={"Add documentation; insert / to see all the options."}
           id={"editor2"}
-          bind:response
           {onUpdateRequestDescription}
           {requestDoc}
-          isReadOnly={false}
+          isReadOnly={isDocGenerating ? true : false}
         />
       </div>
     </div>

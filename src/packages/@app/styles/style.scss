@@ -822,7 +822,8 @@ span {
  overflow-y: auto;
  padding-left: 16px;
  padding-top: 10px;
- height: 160px !important;
+ min-height: 150px;
+//  height: 100% !important;
   padding-bottom: 30px !important;
   border: 1px solid transparent;
 

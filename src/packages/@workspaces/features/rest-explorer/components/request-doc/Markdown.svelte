@@ -8,11 +8,11 @@
   import Paragraph from "@editorjs/paragraph";
   import edjsParser from "editorjs-parser";
   import { onMount } from "svelte";
-  export let requestDoc;
+  export let requestDoc = "[]";
   export let onUpdateRequestDescription;
-  export let response;
+  // export let response;
   export let id;
-  export let isReadOnly;
+  export let isReadOnly = false;
   export let placeholder;
 
   let parsedValue;
@@ -21,9 +21,10 @@
   const parser = new edjsParser();
   onMount(() => {
     if (requestDoc) {
+      console.log(requestDoc, "requestDoc on mount");
+
       parsedValue = JSON.parse(requestDoc);
-    } else {
-      parsedValue = [];
+      console.log(parsedValue, "parsedValue of requestDoc on mount");
     }
     editor = new EditorJS({
       inlineToolbar: ["bold", "italic", "underline"],
@@ -70,17 +71,27 @@
     if (editor) {
       editor.save().then((changedData) => {
         const data = JSON.stringify(changedData.blocks);
+        console.log(data, "data on save content");
+
         onUpdateRequestDescription(data);
-        let parsedValue = JSON.parse(data);
+        // parsedValue = JSON.parse(data);
       });
     }
   };
   $: {
-    if (response) {
-      if (editor.blocks) {
+    if (requestDoc && isReadOnly) {
+      if (editor?.blocks) {
+        console.log(editor.blocks, "editor blocks");
         editor.blocks.clear();
+        console.log("editor blocks cleared");
+        editor.render({
+          blocks: JSON.parse(requestDoc),
+        });
+        console.log(editor.blocks, "editor blocks rendered");
       }
-      editor.blocks.render(response);
+    }
+    if (editor?.readOnly && typeof isReadOnly === "boolean") {
+      editor.readOnly.toggle(isReadOnly);
     }
   }
 </script>
