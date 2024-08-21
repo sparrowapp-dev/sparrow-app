@@ -419,30 +419,6 @@ const makeHttpRequestV2 = async (
 ) => {
   // create a race condition between the timeout and the api call
   console.table({ url, method, headers, body, request });
-  // const socket = io("ws://127.0.0.1:9000/ai-assistant");
-  const socket = io("http://localhost:9000/ai-assistant", {
-    transports: ["websocket"], // Forces WebSocket transport
-  });
-
-  socket.on("connect", () => {
-    console.log("Connected to WebSocket server");
-
-    // Send a message to the server
-    socket.emit("sendPrompt", {
-      text: "hello ai" + url,
-      tabId: url,
-    });
-    // setTimeout(() => {
-    //   socket.emit("stopPrompt", {
-    //     runId: "",
-    //     threadId: "thread_p6Dn39AOw7aw5zNZUMQDghXs",
-    //   });
-    // }, 3000);
-  });
-
-  socket.on(`aiResponse_${url}`, (response) => {
-    console.log("Received AI Response:", response);
-  });
 
   return Promise.race([
     timeout(apiTimeOut),
