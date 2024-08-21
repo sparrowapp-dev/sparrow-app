@@ -51,21 +51,69 @@
         const decorations: Range<Decoration>[] = [];
         for (let { from, to } of view.visibleRanges) {
           let text = view.state.doc.sliceString(from, to);
-          let match;
-          while ((match = KEY_VALUE_REGEX.exec(text)) !== null) {
-            const start = from + match.index;
-            const end = start + match[0].length;
-            const keyEnd = start + match[1].length;
+          let lines = text.split("\n");
+          let lineStart = from;
 
-            decorations.push(
-              Decoration.mark({ class: "key-highlight" }).range(start, keyEnd),
-            );
-            decorations.push(
-              Decoration.mark({ class: "value-highlight" }).range(
-                keyEnd + 1,
-                end,
-              ),
-            );
+          for (let line of lines) {
+            if (line.startsWith("//")) {
+              // Highlight the "//" in red
+              decorations.push(
+                Decoration.mark({ class: "comment-highlight" }).range(
+                  lineStart,
+                  lineStart + 2, // Only color the "//"
+                ),
+              );
+
+              // Process the rest of the line as a key-value pair
+              const trimmedLine = line.slice(2).replace(/^\s+/, ""); // Skip "//" and remove leading spaces
+              const trimmedStart = lineStart + 2; // Adjust start position for key-value pairs
+
+              let match;
+              while ((match = KEY_VALUE_REGEX.exec(trimmedLine)) !== null) {
+                const start = trimmedStart + match.index;
+                const keyEnd = start + match[1].length;
+                const end = start + match[0].length;
+
+                // Apply key-value highlighting
+                decorations.push(
+                  Decoration.mark({ class: "key-highlight" }).range(
+                    start,
+                    keyEnd,
+                  ),
+                );
+                decorations.push(
+                  Decoration.mark({ class: "value-highlight" }).range(
+                    keyEnd + 1,
+                    end,
+                  ),
+                );
+              }
+            } else {
+              // Regular key-value pair highlighting for lines without "//"
+              let match;
+              while ((match = KEY_VALUE_REGEX.exec(line)) !== null) {
+                const start = lineStart + match.index;
+                const keyEnd = start + match[1].length;
+                const end = start + match[0].length;
+
+                // Apply key-value highlighting
+                decorations.push(
+                  Decoration.mark({ class: "key-highlight" }).range(
+                    start,
+                    keyEnd,
+                  ),
+                );
+                decorations.push(
+                  Decoration.mark({ class: "value-highlight" }).range(
+                    keyEnd + 1,
+                    end,
+                  ),
+                );
+              }
+            }
+
+            // Move to the next line, accounting for the newline character
+            lineStart += line.length + 1;
           }
         }
         return Decoration.set(decorations);
@@ -133,5 +181,9 @@
 
   :global(.value-highlight) {
     color: var(--white-color);
+  }
+
+  :global(.comment-highlight) {
+    color: red;
   }
 </style>

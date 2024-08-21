@@ -188,18 +188,25 @@
     // Define the syntax validation regex pattern (key:value)
     const syntaxPattern = /^[^:]+:.+$/;
 
-    // Map each pair to a formatted line (key:value), validate syntax, and filter out invalid lines
     const res = pairs
       .map((elem) => {
-        // Create a line from key and value, or empty string if both are empty
+        // Only add "//" for unchecked pairs that have both key and value
         const line = elem.key || elem.value ? `${elem.key}:${elem.value}` : "";
 
-        // Validate syntax for each non-empty line
-        if (line && !syntaxPattern.test(line)) {
+        // Add "//" if the element is unchecked and has both key and value
+        const formattedLine =
+          elem.checked === false && line ? `//${line}` : line;
+
+        // Validate syntax for each non-empty line that is not commented out
+        if (
+          formattedLine &&
+          !formattedLine.startsWith("//") &&
+          !syntaxPattern.test(formattedLine)
+        ) {
           isValidSyntax = false;
         }
 
-        return line;
+        return formattedLine;
       })
       .filter((item) => item) // Filter out empty lines
       .join("\n"); // Join lines with newline characters
@@ -212,7 +219,7 @@
   const handleBulkTextarea = (event) => {
     bulkText = event.detail;
 
-    // remove all empty lines
+    // Remove all empty lines
     const res = bulkText.split("\n").filter((line) => line.trim() !== "");
 
     // Pushing a blank string to add a blank key value at the end
@@ -225,46 +232,39 @@
     isValidSyntax = true;
 
     pairs = res.map((elem) => {
-      if (elem.length) {
-        const firstColonIndex = elem.indexOf(":");
-        let key, value;
+      // Check if the line starts with "//", indicating it was unchecked
+      const isCommented = elem.startsWith("//");
+      const cleanLine = isCommented ? elem.substring(2).trim() : elem.trim(); // Remove "//" from commented lines
 
-        if (firstColonIndex !== -1) {
-          key = elem.substring(0, firstColonIndex).trim();
-          value = elem.substring(firstColonIndex + 1).trim();
-        } else {
-          key = elem.trim();
-          value = "";
-        }
+      // Find the index of the first colon
+      const firstColonIndex = cleanLine.indexOf(":");
+      let key, value;
 
-        // Validate syntax for each non-empty line
-        if (elem && !syntaxPattern.test(elem)) {
-          isValidSyntax = false;
-        }
-
-        // Preserve the checked state from the original pair if it exists and was false
-        const existingPair = pairs.find(
-          (p) => p.key === key && p.value === value,
-        );
-        const checked =
-          existingPair && existingPair.checked === false ? false : true;
-
-        return {
-          key: key,
-          value: value,
-          checked: checked,
-        };
+      if (firstColonIndex !== -1) {
+        key = cleanLine.substring(0, firstColonIndex).trim();
+        value = cleanLine.substring(firstColonIndex + 1).trim();
       } else {
-        return {
-          key: "",
-          value: "",
-          checked: false,
-        };
+        key = cleanLine.trim();
+        value = "";
       }
+
+      // Validate syntax for each non-empty line that is not commented out
+      if (cleanLine && !syntaxPattern.test(cleanLine)) {
+        isValidSyntax = false;
+      }
+
+      // Return the parsed key-value pair with the checked state based on the presence of "//"
+      return {
+        key: key,
+        value: value,
+        checked: isCommented ? false : true, // Set `checked: false` if it was commented out, `true` otherwise
+      };
     });
 
     callback(pairs);
   };
+
+
 
   const handleErrorHover = () => {
     isErrorIconHovered = !isErrorIconHovered;
@@ -734,13 +734,14 @@
 
         <!-- Bulk Edit TextArea starts -->
         <div style="height:100%">
-          {#if isBulkEditLoaded}           
+          {#if isBulkEditLoaded}
             <BulkEditEditor
-            bind:value={bulkText}
-            on:change={handleBulkTextarea}
-            {enableKeyValueHighlighting}
-            class={`px-2 sparrow-fs-18 outline-none`}
-            placeholder={bulkEditPlaceholder}/>
+              bind:value={bulkText}
+              on:change={handleBulkTextarea}
+              {enableKeyValueHighlighting}
+              class={`px-2 sparrow-fs-18 outline-none`}
+              placeholder={bulkEditPlaceholder}
+            />
           {/if}
         </div>
         <!-- Bulk Edit TextArea end -->
