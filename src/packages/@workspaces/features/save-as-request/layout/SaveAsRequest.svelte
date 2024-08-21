@@ -790,15 +790,15 @@
     <div
       class="pb-1 bg-tertiary-300"
       id="editor1"
-      style="width:100%; overflow-y:hidden; margin:0px !important; "
+      style="width:100%; height:170px ; overflow-y:auto; margin:0px !important; "
     >
-      <!-- <Markdown
+      <Markdown
         placeholder={"Add a description to help people know about this request."}
         isReadOnly={true}
         id={"editor1"}
         {requestDoc}
         {onUpdateRequestDescription}
-      /> -->
+      />
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>
     {#if path.length === 0}
