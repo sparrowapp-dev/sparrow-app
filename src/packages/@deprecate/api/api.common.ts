@@ -14,7 +14,6 @@ import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 import type { Response } from "$lib/utils/interfaces/request.interface";
 import { listen } from "@tauri-apps/api/event";
-import { io } from "socket.io-client";
 import { webSocketDataStore } from "@workspaces/features/socket-explorer/store";
 import { v4 as uuidv4 } from "uuid";
 import { RequestDataTypeEnum } from "@common/types/workspace";
