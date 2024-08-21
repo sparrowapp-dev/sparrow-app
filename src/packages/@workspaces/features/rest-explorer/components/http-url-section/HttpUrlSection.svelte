@@ -137,6 +137,7 @@
     codeId={"url"}
     class={"input-url"}
     {userRole}
+    isFocusedOnMount={true}
   />
 
   <!-- Send button -->
