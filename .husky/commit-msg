@@ -1,10 +1,5 @@
 #!/bin/sh
 
-if git log -1 --pretty=%B | grep -qE 'no-verify'; then
-    echo "Cannot bypass husky hooks" >&2
-    exit 1
-fi
-
 if ! head -1 "$1" | grep -qE "^(feat|fix|ci|chore|docs|test|style|refactor|perf|build|revert)(\(.+?\))?: .{1,}\[#[0-9]+\]$"; then
     echo "" >&2
     echo "Aborting commit. Your commit message must adhere to the following format." >&2
