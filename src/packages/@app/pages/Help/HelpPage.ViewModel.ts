@@ -69,7 +69,10 @@ class HelpPageViewModel {
    * Navigates to web flow to git hub release of sparrow
    * @returns void
    */
-  public learnMore = async (version) => {
+  public learnMore = async (version: string) => {
+    if (version == "undefined" || !version) {
+      return;
+    }
     await open(`${LearnMoreURL}/tag/${version}`);
     return;
   };
