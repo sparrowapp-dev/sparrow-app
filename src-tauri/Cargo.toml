@@ -9,11 +9,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "2.0.0-beta", features = [] }
+tauri-build = { version = "2.0.0-rc", features = [] }
 
 [dependencies]
-tauri = { version = "2.0.0-beta", features = [] }
-tauri-plugin-deep-link = "2.0.0-beta"
+tauri = { version = "2.0.0-rc", features = [] }
+tauri-plugin-deep-link = "2.0.0-rc"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 json = "0.12.4"
@@ -40,11 +40,11 @@ native-tls = "0.2"
 tungstenite = "0.20.1"
 url = "2.2"
 futures = "0.3"
-tauri-plugin-os = "2.0.0-beta.0"
-tauri-plugin-updater = "2.0.0-beta"
-tauri-plugin-process = "2.0.0-beta"
-tauri-plugin-single-instance = "2.0.0-beta.2"
-tauri-plugin-shell = "2.0.0-beta.1"
+tauri-plugin-os = "2.0.0-rc"
+tauri-plugin-updater = "2.0.0-rc"
+tauri-plugin-process = "2.0.0-rc"
+tauri-plugin-single-instance = "2.0.0-rc"
+tauri-plugin-shell = "2.0.0-rc"
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = "0.2"
 
