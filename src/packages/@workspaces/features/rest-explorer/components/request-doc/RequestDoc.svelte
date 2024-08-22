@@ -16,7 +16,6 @@
   const sendPrompt = async (text: string) => {
     if (text) {
       response = await onGenerateDocumentation(text, "", "");
-      console.log(response, "after clicking send prompt");
     }
   };
 </script>
