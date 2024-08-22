@@ -179,7 +179,6 @@
   const handleCreateFolder = async (folderName: string): Promise<void> => {
     createDirectoryLoader = true;
     const res = await onCreateFolder(workspaceMeta, path[0].id, folderName);
-    console.log("res", res);
     if (res.status === "success") {
       latestRoute = res.data.latestRoute;
       res.data.addRequestOrFolderInCollection(
