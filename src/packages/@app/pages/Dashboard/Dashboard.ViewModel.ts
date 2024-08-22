@@ -31,6 +31,7 @@ import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums";
+import { AiAssistantWebSocketService } from "@app/services/ai-assistant.ws.service";
 
 export class DashboardViewModel {
   constructor() {}
@@ -44,6 +45,7 @@ export class DashboardViewModel {
   private featureSwitchService = new FeatureSwitchService();
   private featureSwitchRepository = new FeatureSwitchRepository();
   private guestUserRepository = new GuestUserRepository();
+  private aiAssistantWebSocketService = new AiAssistantWebSocketService();
 
   public getTeamData = async () => {
     return await this.teamRepository.getTeamData();
@@ -380,5 +382,12 @@ export class DashboardViewModel {
   public handleSwitchWorkspace = async (id: string) => {
     await this.workspaceRepository.setActiveWorkspace(id);
     navigate("/dashboard/collections");
+  };
+
+  /**
+   * Connect the web socket on login
+   */
+  public connectWebSocket = async () => {
+    await this.aiAssistantWebSocketService.connectWebSocket();
   };
 }

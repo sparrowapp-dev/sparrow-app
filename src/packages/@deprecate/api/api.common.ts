@@ -212,7 +212,7 @@ const sendMessage = async (tab_id: string, message: string) => {
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
-            wsData.messages.push({
+            wsData.messages.unshift({
               data: message,
               transmitter: "sender",
               timestamp: formatTime(new Date()),
@@ -259,7 +259,7 @@ const disconnectWebSocket = async (tab_id: string) => {
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
-            wsData.messages.push({
+            wsData.messages.unshift({
               data: `Disconnected from ${url}`,
               transmitter: "disconnector",
               timestamp: formatTime(new Date()),
@@ -286,6 +286,21 @@ const disconnectWebSocket = async (tab_id: string) => {
     });
 };
 
+const convertWebSocketUrl = (url: string) => {
+  // Check if the URL starts with 'wss://'
+  if (url.startsWith("wss://")) {
+    return "https:/" + url.slice(5); // Replace 'wss://' with 'https://'
+  }
+
+  // Check if the URL starts with 'ws://'
+  if (url.startsWith("ws://")) {
+    return "http:/" + url.slice(4); // Replace 'ws://' with 'http://'
+  }
+
+  // If the URL does not start with 'wss://' or 'ws://', return it unchanged
+  return url;
+};
+
 /**
  * Connects to a WebSocket at a specified URL for a specific tab and handles the response.
  *
@@ -302,6 +317,8 @@ const connectWebSocket = async (
   requestHeaders: string,
 ) => {
   // debugger;
+  const httpurl = convertWebSocketUrl(url);
+  console.table({ url, httpurl, tabId, requestHeaders });
   webSocketDataStore.update((webSocketDataMap) => {
     webSocketDataMap.set(tabId, {
       messages: [],
@@ -309,6 +326,7 @@ const connectWebSocket = async (
       search: "",
       contentType: RequestDataTypeEnum.TEXT,
       body: "",
+      filter: "All messages",
       url: url,
     });
 
@@ -316,6 +334,7 @@ const connectWebSocket = async (
   });
   await invoke("connect_websocket", {
     url: url,
+    httpurl: httpurl,
     tabid: tabId,
     headers: requestHeaders,
   })
@@ -330,7 +349,7 @@ const connectWebSocket = async (
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tabId);
           if (wsData) {
-            wsData.messages.push({
+            wsData.messages.unshift({
               data: `Connected from ${url}`,
               transmitter: "connecter",
               timestamp: formatTime(new Date()),
@@ -350,7 +369,7 @@ const connectWebSocket = async (
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
-              wsData.messages.push({
+              wsData.messages.unshift({
                 data: event.payload,
                 transmitter: "receiver",
                 timestamp: formatTime(new Date()),

@@ -3,7 +3,7 @@
   "private": true,
   "author": "Sparrow",
   "description": "The Sparrow App is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and making you a better programmer.",
-  "version": "2.4.1",
+  "version": "2.5.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -47,6 +47,7 @@
     "path": "^0.12.7",
     "rxdb": "^14.17.1",
     "rxjs": "^7.8.1",
+    "socket.io-client": "^4.7.5",
     "svelte-agnostic-draggable": "^0.2.0",
     "svelte-file-dropzone": "^2.0.2",
     "svelte-jsoneditor": "^0.18.9",
@@ -114,19 +115,19 @@
           "assets": [
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/*.dmg",
-              "label": "Sparrow_2.4.1.dmg"
+              "label": "Sparrow_2.5.0.dmg"
             },
             {
               "path": "msi_files/*.exe",
-              "label": "Sparrow_2.4.1.exe"
+              "label": "Sparrow_2.5.0.exe"
             },
             {
               "path": "msi_files/*.msi",
-              "label": "Sparrow_2.4.1.msi"
+              "label": "Sparrow_2.5.0.msi"
             },
             {
               "path": "msi_files/*.zip",
-              "label": "Sparrow_2.4.1_x64_en-US.msi.zip"
+              "label": "Sparrow_2.5.0_x64_en-US.msi.zip"
             },
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz",

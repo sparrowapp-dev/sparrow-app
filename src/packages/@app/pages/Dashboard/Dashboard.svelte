@@ -8,10 +8,7 @@
   import Mock from "../Mock/Mock.svelte";
   import Header from "@common/components/header/Header.svelte";
   import { onDestroy, onMount } from "svelte";
-  import type {
-    TeamDocument,
-    WorkspaceDocument,
-  } from "@app/database/database";
+  import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import HelpPage from "../Help/HelpPage.svelte";
   import constants from "$lib/utils/constants";
@@ -118,6 +115,7 @@
     }
     workspaceDocuments = await _viewModel.workspaces();
     teamDocuments = await _viewModel.getTeams();
+    await _viewModel.connectWebSocket();
   });
 
   onDestroy(() => {
@@ -193,7 +191,7 @@
     workspaceDocuments={$workspaceDocuments}
     onCreateWorkspace={() => (isWorkspaceModalOpen = true)}
     onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
-    {user} 
+    {user}
     onLogout={_viewModel.handleLogout}
   />
 
@@ -242,7 +240,6 @@
 
       <!-- Route for Mock -->
       <Route path="/mock/*"><Mock /></Route>
-
 
       <!-- Route for Help -->
       <Route path="/help/*"><HelpPage /></Route>

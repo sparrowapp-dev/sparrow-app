@@ -907,13 +907,13 @@
               onFinish(res.data.id);
               onClick(false);
               if (type !== saveType.SAVE_DESCRIPTION) {
-                notifications.success("API request is saved successfully");
+                notifications.success("Request is saved successfully");
               } else {
-                notifications.success("API documentation saved");
+                notifications.success("Request documentation saved");
               }
             } else {
               notifications.error(
-                "Failed to save the API request. Please try again",
+                "Failed to save the request. Please try again",
               );
             }
             isLoading = false;
