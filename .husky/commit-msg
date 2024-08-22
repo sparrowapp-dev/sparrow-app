@@ -1,9 +1,25 @@
 #!/bin/sh
-if ! head -1 "$1" | grep -qE "^(feat|fix|ci|chore|docs|test|style|refactor|perf|build|revert)(\(.+?\))?: .{1,}\[.{0,10}\]$"; then
-    echo "Aborting commit. Your commit message is invalid." >&2
+
+if git log -1 --pretty=%B | grep -qE 'no-verify'; then
+    echo "Cannot bypass husky hooks" >&2
     exit 1
 fi
-if ! head -1 "$1" | grep -qE "^.{1,88}$"; then
-    echo "Aborting commit. Your commit message is too long." >&2
+
+if ! head -1 "$1" | grep -qE "^(feat|fix|ci|chore|docs|test|style|refactor|perf|build|revert)(\(.+?\))?: .{1,}\[#[0-9]+\]$"; then
+    echo "" >&2
+    echo "Aborting commit. Your commit message must adhere to the following format." >&2
+    echo "  <type>: <subject> [#<number>]" >&2
+    echo "" >&2
+    echo "Where:" >&2
+    echo "  <type>      - Type of the change (e.g., feat, fix, ci, chore, docs, test, style, refactor, perf, build, revert)." >&2
+    echo "  <subject>   - Brief description of the change." >&2
+    echo "  [#<number>] - Github issue # enclosed in square brackets." >&2
+    echo "" >&2
+    echo "Example:" >&2
+    echo "  feat: add authentication to the login endpoint [#1234]" >&2
+    exit 1
+fi
+if ! head -1 "$1" | grep -qE "^.{1,200}$"; then
+    echo "Aborting commit. Your commit message must be under 200 characters." >&2
     exit 1
 fi
