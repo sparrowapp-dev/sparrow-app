@@ -22,7 +22,7 @@
 
   export let webSocket;
   export let onUpdateContentType;
-  let uuid;
+  let uuid = "";
   let fileExtension: string;
   let MessageTransmitter;
 
@@ -94,8 +94,6 @@
   };
   const currentTransmitter = (uuid) => {
     if (webSocket) {
-      console.log(uuid);
-
       const message = webSocket.messages.find(
         (message) => message.uuid === uuid,
       );
@@ -107,13 +105,12 @@
         return "Received";
       }
     }
-    return null;
+    return "Type";
   };
 
   $: {
     uuid = webSocket?.body;
     MessageTransmitter = currentTransmitter(uuid);
-    console.log(MessageTransmitter);
   }
 </script>
 

@@ -3,13 +3,13 @@
 
   export let webSocket;
   let uuid;
-  let Message;
+  let message;
   let language = webSocket.contentType;
   $: {
     if (webSocket) {
       language = webSocket.contentType;
       uuid = webSocket?.body;
-      Message = currentMessage(uuid);
+      message = currentMessage(uuid);
     }
   }
 
@@ -20,7 +20,7 @@
       );
       return message?.data;
     }
-    return null;
+    return "";
   };
 </script>
 
@@ -34,7 +34,7 @@
         -->
   <Editor
     bind:lang={language}
-    bind:value={Message}
+    bind:value={message}
     on:change={() => {}}
     isEditable={false}
     isFormatted={true}
