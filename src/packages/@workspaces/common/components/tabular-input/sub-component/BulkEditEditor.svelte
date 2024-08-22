@@ -184,6 +184,6 @@
   }
 
   :global(.comment-highlight) {
-    color: red;
+    color: var(--text-secondary-200);
   }
 </style>
