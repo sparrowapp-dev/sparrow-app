@@ -19,11 +19,13 @@
   } from "@workspaces/common/hoc";
   import { Tooltip } from "@library/ui";
   import { CopyIcon, DownloadIcon } from "@library/icons";
+  import type { WebSocketMessage } from "../../store/websocket";
 
   export let webSocket;
   export let onUpdateContentType;
 
   let fileExtension: string;
+  let MessageTransmitter = "Type";
 
   /**
    * @description - formats the code
@@ -91,6 +93,26 @@
     notifications.success("Exported successfully.");
     MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
   };
+  const currentTransmitter = (uuid: string) => {
+    if (webSocket) {
+      const message = webSocket.messages.find(
+        (message: WebSocketMessage) => message.uuid === uuid,
+      );
+      if (message?.transmitter === "sender") {
+        return "Sent";
+      } else if (message?.transmitter === "connecter") {
+        return "Received";
+      } else {
+        return "Received";
+      }
+    }
+    return "Type";
+  };
+
+  $: {
+    let uuid = webSocket?.body;
+    MessageTransmitter = currentTransmitter(uuid);
+  }
 </script>
 
 <div
@@ -101,7 +123,7 @@
     style="top:55.4px;  margin-top: -1px;"
   >
     <div class="d-flex gap-3 align-items-center justify-content-center">
-      <span class="text-fs-12">Received </span>
+      <span class="text-fs-12"> {MessageTransmitter} </span>
       <span class="">
         <WithSelectV2
           id={"hashdew565"}
