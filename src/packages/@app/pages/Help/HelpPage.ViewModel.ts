@@ -70,7 +70,7 @@ class HelpPageViewModel {
    * @returns void
    */
   public learnMore = async (version: string) => {
-    if (version == "undefined" || !version) {
+    if (!version) {
       return;
     }
     await open(`${LearnMoreURL}/tag/${version}`);
