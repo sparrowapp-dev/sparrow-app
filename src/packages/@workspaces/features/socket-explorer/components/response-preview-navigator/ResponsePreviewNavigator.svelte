@@ -22,7 +22,7 @@
 
   export let webSocket;
   export let onUpdateContentType;
-  let uuid = "";
+
   let fileExtension: string;
   let MessageTransmitter;
 
@@ -109,7 +109,7 @@
   };
 
   $: {
-    uuid = webSocket?.body;
+    let uuid = webSocket?.body;
     MessageTransmitter = currentTransmitter(uuid);
   }
 </script>
