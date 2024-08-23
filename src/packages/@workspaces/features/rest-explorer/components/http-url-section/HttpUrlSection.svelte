@@ -38,6 +38,7 @@
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
   };
+
   /**
    * @description - save request handler
    */
@@ -68,6 +69,7 @@
   let isHovered = false;
 
   function handleMouseEnter() {
+    if (requestUrl === "") return;
     isHovered = true;
   }
 
@@ -179,13 +181,21 @@
       onUpdateRequestState({ requestSplitterDirection: e.detail });
     }}
   /> -->
-  <Tooltip title={"Save"} placement={"bottom"} distance={12} zIndex={10}>
+  <Tooltip
+    title={requestUrl === "" ? "" : isGuestUser ? "Login to save" : "Save"}
+    placement={"bottom-left"}
+    distance={12}
+    zIndex={10}
+  >
     <button
       class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
       on:click={handleSaveRequest}
       on:mouseenter={handleMouseEnter}
       on:mouseleave={handleMouseLeave}
-      disabled={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
+      disabled={isSave ||
+      requestUrl === "" ||
+      userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+      isGuestUser
         ? true
         : false}
     >
@@ -194,6 +204,8 @@
         width={22}
         color={isHovered && !isSave && !isGuestUser
           ? "var(--icon-primary-200)"
+          : isGuestUser || requestUrl === ""
+          ? "var(--icon-disabled-100)"
           : "var(--icon-secondary-100)"}
       />
     </button>
@@ -205,6 +217,10 @@
   .save-disk {
     padding: 7px;
     background-color: var(--bg-secondary-400);
+  }
+
+  .save-disk:disabled {
+    background-color: var(--bg-secondary-550);
   }
   :global(.url-red-border) {
     border: 1px solid var(--border-danger-200) !important;
