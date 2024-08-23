@@ -52,15 +52,10 @@
             <div class="d-flex mt-3">
               <div class="details d-flex flex-column gap-0">
                 <p class="text-primary">{item.dateCreated}</p>
-                {#if index === 0}
-                  <p class="version-name fs-8 fw-semibold">
-                    Latest Version: {item.versionName}
-                  </p>
-                {:else}
-                  <p class="version-name fs-8 fw-semibold">
-                    Version: {item.versionName}
-                  </p>
-                {/if}
+                <p class="version-name fs-8 fw-semibold">
+                  {index === 0 ? "Latest Version:" : "Version:"}
+                  {item.versionName}
+                </p>
               </div>
 
               <div class="features">
