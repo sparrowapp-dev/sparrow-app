@@ -24,7 +24,7 @@
   export let onUpdateContentType;
 
   let fileExtension: string;
-  let MessageTransmitter;
+  let MessageTransmitter = "Type";
 
   /**
    * @description - formats the code
