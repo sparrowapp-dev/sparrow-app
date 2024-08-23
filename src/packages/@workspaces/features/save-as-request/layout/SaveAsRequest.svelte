@@ -795,8 +795,8 @@
         placeholder={"Add a description to help people know about this request."}
         isReadOnly={true}
         id={"editor1"}
-        {requestDoc}
-        {onUpdateRequestDescription}
+        value={requestDoc}
+        onInput={onUpdateRequestDescription}
       />
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>
