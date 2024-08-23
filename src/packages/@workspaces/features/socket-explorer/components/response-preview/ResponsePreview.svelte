@@ -1,22 +1,22 @@
 <script lang="ts">
   import { Editor } from "@library/forms";
+  import type { WebSocketMessage } from "../../store/websocket";
 
   export let webSocket;
-  let uuid;
-  let message;
+  let message = "";
   let language = webSocket.contentType;
   $: {
     if (webSocket) {
       language = webSocket.contentType;
-      uuid = webSocket?.body;
+      let uuid = webSocket?.body;
       message = currentMessage(uuid);
     }
   }
 
-  const currentMessage = (uuid) => {
+  const currentMessage = (uuid: string) => {
     if (webSocket) {
       const message = webSocket.messages.find(
-        (message) => message.uuid === uuid,
+        (message: WebSocketMessage) => message.uuid === uuid,
       );
       return message?.data;
     }

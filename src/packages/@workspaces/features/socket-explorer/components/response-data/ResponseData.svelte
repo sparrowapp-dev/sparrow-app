@@ -253,9 +253,12 @@
                 width={"10px"}
                 color={"#69D696"}
               />
+              <!-- senderIcon -->
             {:else if message?.transmitter === "disconnector"}
+              <!-- DisconnectIcon -->
               <ErrorInfoIcon height={"12px"} width={"12px"} color={"#FE8C98"} />
             {:else if message?.transmitter === "connecter"}
+              <!-- ConnectIcon -->
               <SuccessInfoIcon
                 height={"14px"}
                 width={"14px"}
