@@ -38,7 +38,7 @@
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
   };
-  const handleRedirect = (value: any) => {
+  const handleRedirect = (value: boolean) => {
     isEntry = value;
   };
   let os = "";
@@ -144,7 +144,7 @@
     </div>
     <div
       class="mb-2 mt-2 w-[266px]"
-      style="text-align:center; font-size:12px; color:var(  --text-secondary-350); padding: 12px 0px ; width: 266px;
+      style="text-align:center; font-size:12px; color:var(  --text-secondary-350); padding: 5% 0px; width: 80%;
       font-size: 12px;
       "
     >

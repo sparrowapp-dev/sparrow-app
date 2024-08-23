@@ -190,7 +190,7 @@
   isOpen={isEnvironmentPopup}
   handleModalState={handleEnvironmentPopUpCancel}
 >
-  <div class="mb-1 sparrow-fs-14" style="color: #ccc;">
+  <div class="mb-1 sparrow-fs-14">
     <p>
       Are you sure you want to delete this Environment? <span
         style="font-weight:700;"

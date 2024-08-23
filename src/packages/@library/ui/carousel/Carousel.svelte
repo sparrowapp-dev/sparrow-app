@@ -1,6 +1,7 @@
 <script lang="ts">
+  import type { CarouselDataType } from "$lib/utils/types/carousel-data.type";
   import { Ellipse } from "@library/icons";
-  export let data: any[] = [];
+  export let data: CarouselDataType[] = [];
   let stepData = data[0];
   let currentStep = 0;
   let n = data.length;
