@@ -2,8 +2,8 @@
   import { Events } from "$lib/utils/enums";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { generatingImage } from "@common/images";
+  import { TextEditor } from "@library/forms";
   import { AISuggestionBox } from "@workspaces/features/chat-bot/components";
-  import Markdown from "./Markdown.svelte";
 
   export let onUpdateRequestDescription;
   export let isDocGenerating = false;
@@ -27,11 +27,11 @@
   <div style="height: 100%; min-height:160px; " class="area">
     <div on:keydown|stopPropagation on:keyup|stopPropagation>
       <div id="editor2">
-        <Markdown
+        <TextEditor
           placeholder={"Add documentation; insert / to see all the options."}
           id={"editor2"}
-          {onUpdateRequestDescription}
-          {requestDoc}
+          onInput={onUpdateRequestDescription}
+          value={requestDoc}
           isReadOnly={isDocGenerating ? true : false}
         />
       </div>

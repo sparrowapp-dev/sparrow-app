@@ -29,8 +29,8 @@
     SocketIcon,
     WorkspaceIcon,
   } from "@library/icons";
-  import Markdown from "@workspaces/features/rest-explorer/components/request-doc/Markdown.svelte";
   import { TabTypeEnum } from "@common/types/workspace";
+  import { TextEditor } from "@library/forms";
 
   export let onClick;
   export let onFinish = (id: string) => {};
@@ -47,8 +47,6 @@
   export let requestPath;
   export let onRenameCollection;
   export let onRenameFolder;
-  export let requestDoc;
-  export let onUpdateRequestDescription;
 
   interface Path {
     name: string;
@@ -791,12 +789,11 @@
       id="editor1"
       style="width:100%; height:170px ; overflow-y:auto; margin:0px !important; "
     >
-      <Markdown
+      <TextEditor
         placeholder={"Add a description to help people know about this request."}
         isReadOnly={true}
         id={"editor1"}
-        value={requestDoc}
-        onInput={onUpdateRequestDescription}
+        value={description}
       />
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>
