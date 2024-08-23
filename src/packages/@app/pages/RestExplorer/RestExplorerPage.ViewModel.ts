@@ -86,6 +86,7 @@ import { AiAssistantService } from "@app/services/ai-assistant.service";
 import type { GuideQuery } from "@app/types/user-guide";
 import { AiAssistantWebSocketService } from "@app/services/ai-assistant.ws.service";
 import type { Socket } from "socket.io-client";
+import MarkdownFormatter from "@common/utils/parse-markdown-to-texteditor";
 
 class RestExplorerViewModel
   implements
@@ -2110,9 +2111,11 @@ class RestExplorerViewModel
       text: prompt,
       instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown.`,
     });
-    let formattedData;
+    const formatter = new MarkdownFormatter();
     if (response.isSuccessful) {
-      formattedData = await this.FormatData(response.data.data.result);
+      const formattedData = await formatter.FormatData(
+        response.data.data.result,
+      );
       const stringifyData = JSON.stringify(formattedData.blocks);
       await this.updateRequestDescription(stringifyData);
       await this.updateRequestState({
