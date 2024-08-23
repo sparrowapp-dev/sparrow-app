@@ -84,6 +84,8 @@ import { isGuestUserActive } from "$lib/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
 import { AiAssistantService } from "@app/services/ai-assistant.service";
 import type { GuideQuery } from "@app/types/user-guide";
+import { AiAssistantWebSocketService } from "@app/services/ai-assistant.ws.service";
+import type { Socket } from "socket.io-client";
 
 class RestExplorerViewModel
   implements
@@ -129,6 +131,7 @@ class RestExplorerViewModel
   private environmentService = new EnvironmentService();
   private collectionService = new CollectionService();
   private aiAssistentService = new AiAssistantService();
+  private aiAssistentWebSocketService = new AiAssistantWebSocketService();
   /**
    * Utils
    */
@@ -1847,6 +1850,7 @@ class RestExplorerViewModel
       url: componentData.property.request.url,
       auth: componentData.property.request.auth,
     };
+
     // Call the AI assistant service to generate a response
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
@@ -1993,6 +1997,94 @@ class RestExplorerViewModel
       blocks: blocks,
       version: "2.30.4",
     };
+  };
+  /*
+   * Generates stream wise an AI response based on the given prompt.
+   *
+   * @param prompt - The prompt to send to the AI assistant service.
+   * @returns A promise that resolves to the response from the AI assistant service.
+   */
+  public generateStreamAiResponse = async (prompt = "") => {
+    // Set the request state to indicate that a response is being generated
+    await this.updateRequestState({ isChatbotGeneratingResponse: true });
+    let componentData = this._tab.getValue();
+    const apiData = {
+      body: componentData.property.request.body,
+      headers: componentData.property.request.headers,
+      method: componentData.property.request.method,
+      queryParams: componentData.property.request.queryParams,
+      url: componentData.property.request.url,
+      auth: componentData.property.request.auth,
+    };
+    const socketValue: Socket =
+      await this.aiAssistentWebSocketService.sendPromptMessage({
+        text: prompt,
+        instructions: `You are an AI Assistant, responsible for answering API related queries. Give the response only in markdown format. Only answer questions related to the provided API data and API Management. Give to the point and concise responses, only give explanations when they are asked for. Always follow best practices for REST API and answer accordingly. Utilize the provided api data ${JSON.stringify(
+          apiData,
+        )}. Never return the result same as prompt.`,
+        tabId: componentData.tabId,
+        threadId: componentData?.property?.request?.ai?.threadId,
+      });
+    let updatePromise = Promise.resolve(); // Initialize a promise chain
+    socketValue.off(`aiResponse_${componentData.tabId}`);
+    socketValue?.on(`aiResponse_${componentData.tabId}`, async (response) => {
+      updatePromise = updatePromise.then(async () => {
+        // Check if the conversation already contains the messageId
+        componentData = this._tab.getValue();
+        const existingMessageIndex =
+          componentData.property.request.ai.conversations.findIndex((conv) => {
+            return conv.messageId === response.messageId;
+          });
+        if (existingMessageIndex === -1 && response?.status) {
+          // If the messageId does not exist, add a new message entry
+
+          await this.updateRequestAIThread(response.threadId);
+          await this.updateRequestAIConversation([
+            ...componentData.property.request.ai.conversations,
+            {
+              messageId: response.messageId,
+              message: response.result,
+              type: MessageTypeEnum.RECEIVER,
+              isLiked: false,
+              isDisliked: false,
+              status: true,
+            },
+          ]);
+        } else if (response?.status) {
+          componentData.property.request.ai.conversations[
+            existingMessageIndex
+          ].message =
+            componentData.property.request.ai.conversations[
+              existingMessageIndex
+            ].message + response.result;
+          await this.updateRequestAIConversation([
+            ...componentData.property.request.ai.conversations,
+          ]);
+        }
+        if (response?.status === "Completed") {
+          await this.updateRequestState({
+            isChatbotGeneratingResponse: false,
+          });
+        }
+        if (response?.status === "Failed") {
+          await this.updateRequestState({
+            isChatbotGeneratingResponse: false,
+          });
+          // Update the conversation with an error message
+          this.updateRequestAIConversation([
+            ...componentData?.property?.request?.ai?.conversations,
+            {
+              message: "Something went wrong! Please try again.",
+              messageId: uuidv4(),
+              type: MessageTypeEnum.RECEIVER,
+              isLiked: false,
+              isDisliked: false,
+              status: false,
+            },
+          ]);
+        }
+      });
+    });
   };
 
   /**
