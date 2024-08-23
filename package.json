@@ -22,6 +22,7 @@
     "@codemirror/language": "^6.10.0",
     "@codemirror/state": "^6.4.0",
     "@lezer/highlight": "^1.2.0",
+    "@microsoft/applicationinsights-web": "^3.3.1",
     "@tauri-apps/api": "^2.0.0-beta.0",
     "@tauri-apps/cli": "^2.0.0-beta.1",
     "@tauri-apps/plugin-deep-link": "^2.0.0-beta.0",

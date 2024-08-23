@@ -24,6 +24,30 @@
   import Teams from "../Teams/Teams.svelte";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import CreateWorkspace from "@teams/features/create-workspace/layout/CreateWorkspace.svelte";
+  // Import the Application Insights SDK
+  import { ApplicationInsights } from "@microsoft/applicationinsights-web";
+
+  // Initialize Application Insights
+  const appInsights = new ApplicationInsights({
+    config: {
+      // instrumentationKey: "a1a41bff-dd46-494c-8da5-16deca5daf32", // Replace with your Application Insights instrumentation key
+      enableAutoRouteTracking: true, // Optionally track route changes (useful for SPA)
+      /* Other configuration options */
+    },
+  });
+
+  appInsights.loadAppInsights();
+
+  // Optionally, track a page view manually
+  appInsights.trackPageView();
+
+  function logCustomEvent() {
+    console.log("inside", appInsights);
+    appInsights.trackEvent({
+      name: "CustomEvent",
+      properties: { customProperty: "value" },
+    });
+  }
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -265,7 +289,7 @@
   onCancel={() => {
     isPopupOpen = false;
   }}
-  onContinue={handleLogin}
+  onContinue={logCustomEvent}
   title={"Confirm Login?"}
   description={"After continuing your data will be lost, do you want to continue?"}
 />
