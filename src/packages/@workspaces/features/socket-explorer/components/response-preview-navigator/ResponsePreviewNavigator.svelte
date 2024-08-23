@@ -19,6 +19,7 @@
   } from "@workspaces/common/hoc";
   import { Tooltip } from "@library/ui";
   import { CopyIcon, DownloadIcon } from "@library/icons";
+  import type { WebSocketMessage } from "../../store/websocket";
 
   export let webSocket;
   export let onUpdateContentType;
@@ -92,10 +93,10 @@
     notifications.success("Exported successfully.");
     MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
   };
-  const currentTransmitter = (uuid) => {
+  const currentTransmitter = (uuid: string) => {
     if (webSocket) {
       const message = webSocket.messages.find(
-        (message) => message.uuid === uuid,
+        (message: WebSocketMessage) => message.uuid === uuid,
       );
       if (message?.transmitter === "sender") {
         return "Sent";
