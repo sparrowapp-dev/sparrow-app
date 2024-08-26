@@ -98,15 +98,21 @@
       const message = webSocket.messages.find(
         (message: WebSocketMessage) => message.uuid === uuid,
       );
-      if (message?.transmitter === "sender") {
-        return "Sent";
-      } else if (message?.transmitter === "connecter") {
+      console.log(message);
+
+      if (message?.data?.startsWith("Connected")) {
+        return "Connected";
+      } else if (message?.data?.startsWith("Disconnected")) {
+        return "Disconnected";
+      } else if (message?.transmitter === "receiver") {
         return "Received";
+      } else if (message?.transmitter === "sender") {
+        return "Send";
       } else {
-        return "Received";
+        return "Type";
       }
+      return "Type";
     }
-    return "Type";
   };
 
   $: {
