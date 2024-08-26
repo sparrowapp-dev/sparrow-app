@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type TabDocument } from "@app/database/database";
-import type { TabDocType } from "@app/models/tab.model";
+import type { Tab } from "@common/types/workspace";
 import type { Observable } from "rxjs";
 
 export class TabRepository {
-  constructor() { }
+  private rxdb = RxDB?.getInstance()?.rxdb?.tab;
+  constructor() {}
 
   /**
    * Retrieves all tab documents from the RxDB database.
@@ -20,10 +21,7 @@ export class TabRepository {
    * console.log('Retrieved tab documents:', tabDocuments);
    */
   public getDocuments = async (): Promise<TabDocument[]> => {
-    return await RxDB.getInstance()
-      .rxdb.tab.find()
-      .sort({ index: "asc" })
-      .exec();
+    return await this.rxdb?.find().sort({ index: "asc" }).exec();
   };
 
   /**
@@ -48,8 +46,8 @@ export class TabRepository {
    * await createTab(newTab);
    */
   public createTab = async (tab: any): Promise<void> => {
-    const _tab = await RxDB.getInstance()
-      .rxdb.tab.findOne({
+    const _tab = await this.rxdb
+      ?.findOne({
         selector: {
           id: tab.id,
         },
@@ -59,8 +57,8 @@ export class TabRepository {
       await this.activeTab(tab.id);
       return;
     }
-    const activeTab = await RxDB.getInstance()
-      .rxdb.tab.findOne({
+    const activeTab = await this.rxdb
+      ?.findOne({
         selector: {
           isActive: true,
         },
@@ -69,9 +67,9 @@ export class TabRepository {
     if (activeTab) {
       await activeTab.incrementalUpdate({ $set: { isActive: false } });
     }
-    const lastIndex = (await RxDB.getInstance().rxdb.tab.find().exec()).length;
+    const lastIndex = (await this.rxdb?.find().exec())?.length;
     tab.index = lastIndex;
-    await RxDB.getInstance().rxdb.tab.insert(tab);
+    await this.rxdb?.insert(tab);
   };
 
   /**
@@ -101,8 +99,8 @@ export class TabRepository {
         }
       }
     }
-    const selectedTab = await RxDB.getInstance()
-      .rxdb.tab.findOne({
+    const selectedTab = await this.rxdb
+      ?.findOne({
         selector: {
           id,
         },
@@ -110,9 +108,9 @@ export class TabRepository {
       .exec();
     if (selectedTab) {
       doc.forEach(async (tab) => {
-        if (tab.index > selectedTab.index) {
+        if ((tab?.index as number) > selectedTab.index) {
           await tab.incrementalPatch({
-            index: tab.index - 1,
+            index: (tab?.index as number) - 1,
           });
         }
       });
@@ -136,8 +134,8 @@ export class TabRepository {
    * await activeTab(tabIdToActivate);
    */
   public activeTab = async (id: string): Promise<void> => {
-    const deselectedTab = await RxDB.getInstance()
-      .rxdb.tab.findOne({
+    const deselectedTab = await this.rxdb
+      ?.findOne({
         selector: {
           isActive: true,
         },
@@ -147,8 +145,8 @@ export class TabRepository {
       if (deselectedTab.id === id) return;
       await deselectedTab.incrementalUpdate({ $set: { isActive: false } });
     }
-    const selectedTab = await RxDB.getInstance()
-      .rxdb.tab.findOne({
+    const selectedTab = await this.rxdb
+      ?.findOne({
         selector: {
           id,
         },
@@ -175,7 +173,7 @@ export class TabRepository {
    * });
    */
   public getTab = (): Observable<TabDocument> => {
-    return RxDB.getInstance().rxdb.tab.findOne({
+    return this.rxdb?.findOne({
       selector: {
         isActive: true,
       },
@@ -198,7 +196,7 @@ export class TabRepository {
    * });
    */
   public getTabList = (): Observable<TabDocument[]> => {
-    return RxDB.getInstance().rxdb.tab.find().sort({ index: "asc" }).$;
+    return this.rxdb?.find().sort({ index: "asc" }).$;
   };
 
   /**
@@ -214,11 +212,8 @@ export class TabRepository {
    * const tabs = getTabLs();
    * console.log('Tabs:', tabs);
    */
-  public getTabLs = async (): TabDocument[] => {
-    return await RxDB.getInstance()
-      .rxdb.tab.find()
-      .sort({ index: "asc" })
-      .exec();
+  public getTabLs = async (): Promise<TabDocument[]> => {
+    return await this.rxdb?.find().sort({ index: "asc" }).exec();
   };
 
   /**
@@ -237,22 +232,21 @@ export class TabRepository {
    * const requestData = { url: 'https://api.example.com', method: 'GET' };
    * await setRequestProperty(requestData, 'url');
    */
-  public setRequestProperty = async (
-    data: any,
-    route: string,
-  ): Promise<void> => {
-    const query = RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    (await query).incrementalModify((value) => {
-      value.property.request[route] = data;
-      return value;
-    });
-  };
+  // public setRequestProperty = async (
+  //   data: any,
+  //   route: string,
+  // ): Promise<void> => {
+  //   const query = this.rxdb?.findOne({
+  //       selector: {
+  //         isActive: true,
+  //       },
+  //     })
+  //     .exec();
+  //   (await query).incrementalModify((value) => {
+  //     value.property.request[route] = data;
+  //     return value;
+  //   });
+  // };
 
   /**
    * Sets a specific property of the request state for the active tab in the RxDB database such as raw, dataset, auth, section.
@@ -272,19 +266,18 @@ export class TabRepository {
    * const requestStateRoute = 'requestBodyLanguage'; // Updating the 'requestBodyLanguage' property of the request state
    * await setRequestState(requestStateData, requestStateRoute);
    */
-  public setRequestState = async (data: any, route: string): Promise<void> => {
-    const query = RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    (await query).incrementalModify((value) => {
-      value.property.request.state[route] = data;
-      return value;
-    });
-  };
+  // public setRequestState = async (data: any, route: string): Promise<void> => {
+  //   const query = this.rxdb?.findOne({
+  //       selector: {
+  //         isActive: true,
+  //       },
+  //     })
+  //     .exec();
+  //   (await query).incrementalModify((value) => {
+  //     value.property.request.state[route] = data;
+  //     return value;
+  //   });
+  // };
 
   /**
    * Sets a specific property of the request authentication for the active tab in the RxDB database like API key, bearer token, basic auth.
@@ -304,19 +297,18 @@ export class TabRepository {
    * const requestAuthRoute = 'bearerToken'; // Updating the 'bearerToken' property of the request authentication
    * await setRequestAuth(requestAuthData, requestAuthRoute);
    */
-  public setRequestAuth = async (data: any, route: string): Promise<void> => {
-    const query = RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    (await query).incrementalModify((value) => {
-      value.property.request.auth[route] = data;
-      return value;
-    });
-  };
+  // public setRequestAuth = async (data: any, route: string): Promise<void> => {
+  //   const query = this.rxdb?.findOne({
+  //       selector: {
+  //         isActive: true,
+  //       },
+  //     })
+  //     .exec();
+  //   (await query).incrementalModify((value) => {
+  //     value.property.request.auth[route] = data;
+  //     return value;
+  //   });
+  // };
 
   /**
    * Sets a specific property of the request body for the active tab in the RxDB database such as form data, url encoded, raw.
@@ -336,19 +328,18 @@ export class TabRepository {
    * const requestBodyRoute = 'raw'; // Assuming updating the 'raw' property of the request body
    * await setRequestBody(requestBodyData, requestBodyRoute);
    */
-  public setRequestBody = async (data: any, route: string): Promise<void> => {
-    const query = RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    (await query).incrementalModify((value) => {
-      value.property.request.body[route] = data;
-      return value;
-    });
-  };
+  // public setRequestBody = async (data: any, route: string): Promise<void> => {
+  //   const query = this.rxdb?.findOne({
+  //       selector: {
+  //         isActive: true,
+  //       },
+  //     })
+  //     .exec();
+  //   (await query).incrementalModify((value) => {
+  //     value.property.request.body[route] = data;
+  //     return value;
+  //   });
+  // };
 
   /**
    * Sets the form data of the request body for the active tab in the RxDB database.
@@ -368,22 +359,21 @@ export class TabRepository {
    * const formDataRoute = '0'; // Assuming updating the first item in the form data array
    * await setRequestBodyFormData(formData, formDataRoute);
    */
-  public setRequestBodyFormData = async (
-    data: any,
-    route: string,
-  ): Promise<void> => {
-    const query = RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    (await query).incrementalModify((value) => {
-      value.property.request.body.formdata[route] = data;
-      return value;
-    });
-  };
+  // public setRequestBodyFormData = async (
+  //   data: any,
+  //   route: string,
+  // ): Promise<void> => {
+  //   const query = this.rxdb?.findOne({
+  //       selector: {
+  //         isActive: true,
+  //       },
+  //     })
+  //     .exec();
+  //   (await query).incrementalModify((value) => {
+  //     value.property.request.body.formdata[route] = data;
+  //     return value;
+  //   });
+  // };
 
   /**
    * Sets a specific property of the active tab in the RxDB database.
@@ -403,19 +393,18 @@ export class TabRepository {
    * const propertyRoute = 'property.subProperty';
    * await setTabProperty(propertyData, propertyRoute);
    */
-  public setTabProperty = async (data: any, route: string): Promise<void> => {
-    const query = RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    (await query).incrementalModify((value) => {
-      value[route] = data;
-      return value;
-    });
-  };
+  // public setTabProperty = async (data: any, route: string): Promise<void> => {
+  //   const query = this.rxdb?.findOne({
+  //       selector: {
+  //         isActive: true,
+  //       },
+  //     })
+  //     .exec();
+  //   (await query).incrementalModify((value) => {
+  //     value[route] = data;
+  //     return value;
+  //   });
+  // };
 
   /**
    * Clears all tab documents from the RxDB database.
@@ -430,7 +419,7 @@ export class TabRepository {
    * await clearTabs();
    */
   public clearTabs = async (): Promise<any> => {
-    return RxDB.getInstance().rxdb.tab.find().remove();
+    return this.rxdb?.find().remove();
   };
 
   /**
@@ -449,13 +438,13 @@ export class TabRepository {
    * const tabData$ = getTabDataObservable(); // An observable emitting tab documents
    * await syncTabsWithStore(tabData$);
    */
-  public syncTabsWithStore = async (data) => {
-    await this.clearTabs();
-    const sub = data.subscribe((docs) => {
-      RxDB.getInstance().rxdb.tab.bulkUpsert(docs);
-    });
-    sub();
-  };
+  // public syncTabsWithStore = async (data) => {
+  //   await this.clearTabs();
+  //   const sub = data.subscribe((docs) => {
+  //     this.rxdb?.bulkUpsert(docs);
+  //   });
+  //   sub();
+  // };
 
   /**
    * Updates a tab document in the RxDB database.
@@ -479,40 +468,38 @@ export class TabRepository {
    * };
    * await updateTab(tabId, updatedProperties);
    */
-  public updateTab = async (tabId: string, tab: TabDocType): Promise<void> => {
-    const query = await RxDB.getInstance()
-      .rxdb.tab.findOne({
+  public updateTab = async (tabId: string, tab: Tab): Promise<void> => {
+    const query = await this.rxdb
+      ?.findOne({
         selector: {
           tabId,
         },
       })
       .exec();
-    await query.incrementalModify((value) => {
+    await query.incrementalModify((value: Tab) => {
       return { ...value, ...tab };
     });
   };
 
-
   /**
- * Retrieves a tab by its unique identifier.
- * 
- * This function searches for a tab within the provided array of tabs based on the given `tabId`. 
- * If a tab with the matching ID is found, it is returned; otherwise, the function returns `undefined`.
- * 
- * @param {Array<{ id: string, [key: string]: any }>} tabs - An array of tab objects, where each tab contains at least an `id` property.
- * @param {string} tabId - The unique identifier of the tab to retrieve.
- * @returns {{ id: string, [key: string]: any } | undefined} - The tab object with the matching `tabId`.
- */
+   * Retrieves a tab by its unique identifier.
+   *
+   * This function searches for a tab within the provided array of tabs based on the given `tabId`.
+   * If a tab with the matching ID is found, it is returned; otherwise, the function returns `undefined`.
+   *
+   * @param {Array<{ id: string, [key: string]: any }>} tabs - An array of tab objects, where each tab contains at least an `id` property.
+   * @param {string} tabId - The unique identifier of the tab to retrieve.
+   * @returns {{ id: string, [key: string]: any } | undefined} - The tab object with the matching `tabId`.
+   */
 
   public getTabById = async (id: string): Promise<TabDocument> => {
-    return await RxDB.getInstance()
-      .rxdb.tab.findOne({
+    return await this.rxdb
+      ?.findOne({
         selector: {
           id,
         },
       })
       .exec();
-
   };
 
   /**
@@ -543,7 +530,7 @@ export class TabRepository {
    * // This will remove all tabs with the workspaceId 'workspace123'.
    */
   public removeTabsByQuery = async (query: any): Promise<void> => {
-    await RxDB.getInstance().rxdb.tab.find(query).remove();
+    await this.rxdb?.find(query).remove();
     return;
   };
 
@@ -564,11 +551,11 @@ export class TabRepository {
    * }
    */
   public activateInitialTab = async (): Promise<string> => {
-    const tab: TabDocument = await RxDB.getInstance().rxdb.tab.findOne().exec();
+    const tab: TabDocument = await this.rxdb?.findOne().exec();
     if (tab) {
       const rxDoc = tab.toMutableJSON();
       rxDoc.isActive = true;
-      await RxDB.getInstance().rxdb.tab.upsert(rxDoc);
+      await this.rxdb?.upsert(rxDoc);
       return tab.id;
     } else {
       return "";
@@ -592,8 +579,8 @@ export class TabRepository {
    * }
    */
   public getTabDocs = (): Promise<TabDocument> => {
-    return RxDB.getInstance()
-      .rxdb.tab.findOne({
+    return this.rxdb
+      ?.findOne({
         selector: {
           isActive: true,
         },
