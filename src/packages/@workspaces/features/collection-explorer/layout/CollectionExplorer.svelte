@@ -102,10 +102,12 @@
    */
   const updateLastUpdateAndCount = async () => {
     const res = await getLastUpdatedAndCount(collection);
-    isSynced = res.isSynced;
-    lastUpdated = res.lastUpdated;
-    totalFolders = res.totalFolders;
-    totalRequests = res.totalRequests;
+    if (res) {
+      isSynced = res.isSynced;
+      lastUpdated = res.lastUpdated;
+      totalFolders = res.totalFolders;
+      totalRequests = res.totalRequests;
+    }
   };
 
   /**

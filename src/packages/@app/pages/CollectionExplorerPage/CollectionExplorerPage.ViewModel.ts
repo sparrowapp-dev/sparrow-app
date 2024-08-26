@@ -25,11 +25,10 @@ import { v4 as uuidv4 } from "uuid";
 
 // Stores
 import { userWorkspaceLevelRole } from "$lib/store";
-import { generateSampleRequest } from "$lib/utils/sample";
-import type { Folder, Path } from "$lib/utils/interfaces/request.interface";
 import { InitRequestTab } from "@common/utils";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";
+import type { CollectionDto, CollectionItemsDto } from "@common/types/workspace";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -63,7 +62,7 @@ class CollectionExplorerPage {
   public getUserRoleInWorspace = async () => {
     let role: WorkspaceRole;
     const userWorkspaceLevelRoleSubscribe = userWorkspaceLevelRole.subscribe(
-      (value: any) => {
+      (value) => {
         role = WorkspaceRole.WORKSPACE_ADMIN;
       },
     );
@@ -338,8 +337,8 @@ class CollectionExplorerPage {
    * @param collection Collection in which folder and request will be counted
    * @returns isSynced, totalRequests, totalFolders, lastUpdated
    */
-  public getLastUpdatedAndCount = async (collection: CollectionDocument) => {
-    let isSynced: boolean;
+  public getLastUpdatedAndCount = async (collection: CollectionDto) => {
+    let isSynced = false;
     const monthNamesAbbreviated = [
       "Jan",
       "Feb",
@@ -359,25 +358,36 @@ class CollectionExplorerPage {
     } ${new Date(collection?.updatedAt).getDate()}, ${new Date(
       collection?.updatedAt,
     ).getFullYear()}`;
-    let totalRequests: number = 0;
-    let totalFolders: number = 0;
-    collection?.items.forEach((collectionItem: CollectionDocument) => {
-      if (collectionItem.type === ItemType.REQUEST) {
-        totalRequests++;
-      } else {
-        totalFolders++;
-        totalRequests += collectionItem.items.length;
-      }
-    });
+    let totalRequests = 0;
+    let totalFolders = 0;
+    if(collection?.items){
+      collection?.items.forEach((collectionItem: CollectionItemsDto) => {
+        if (collectionItem.type === ItemType.REQUEST) {
+          totalRequests++;
+        } else if(collectionItem.type === ItemType.FOLDER) {
+          totalFolders++;
+          if(collectionItem?.items)
+          collectionItem.items.forEach( (item : CollectionItemsDto) => {
+            if(item.type === ItemType.REQUEST){
+              totalRequests++;
+            }
+          });
+        }
+      });
+    }
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
-    let response;
     if (isGuestUser === true) {
-      return;
+      return {
+        isSynced,
+        totalFolders,
+        totalRequests,
+        lastUpdated,
+      };
     }
-    response = await this.collectionService.switchCollectionBranch(
+    const response = await this.collectionService.switchCollectionBranch(
       collection?.id,
       collection?.currentBranch,
     );
@@ -531,6 +541,10 @@ class CollectionExplorerPage {
       isGuestUser = value;
     });
     if (isGuestUser == true) {
+      await this.collectionRepository.updateCollection(collection.id as string ,{
+        description: newDescription
+      });
+      notifications.success("Description updated successfully!");
       return;
     }
     const response = await this.collectionService.updateCollectionData(
@@ -543,21 +557,16 @@ class CollectionExplorerPage {
         collection.id,
         response.data.data,
       );
-    } else if (response.message === "Network Error") {
-      notifications.error(response.message);
-    } else {
-      notifications.error("Failed to update description!");
-    }
-
-    if (newDescription) {
-      const response = {
+      const res = {
         data: { description: newDescription },
       };
       await this.collectionRepository.updateCollection(
         collection.id,
-        response.data,
+        res.data,
       );
       notifications.success("Description updated successfully!");
+    } else if (response.message === "Network Error") {
+      notifications.error(response.message);
     } else {
       notifications.error("Failed to update description!");
     }
