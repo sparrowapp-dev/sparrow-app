@@ -379,24 +379,26 @@ class CollectionExplorerPage {
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
-    if (isGuestUser === true) {
-      return {
-        isSynced,
-        totalFolders,
-        totalRequests,
-        lastUpdated,
-      };
-    }
-    const response = await this.collectionService.switchCollectionBranch(
-      collection?.id,
-      collection?.currentBranch,
-    );
 
-    if (response && response.isSuccessful) {
-      isSynced = true;
-    } else {
-      isSynced = false;
-    }
+    // active sync endpoint currently not in use
+    // if (isGuestUser === true) {
+    //   return {
+    //     isSynced,
+    //     totalFolders,
+    //     totalRequests,
+    //     lastUpdated,
+    //   };
+    // }
+    // const response = await this.collectionService.switchCollectionBranch(
+    //   collection?.id,
+    //   collection?.currentBranch,
+    // );
+
+    // if (response && response.isSuccessful) {
+    //   isSynced = true;
+    // } else {
+    //   isSynced = false;
+    // }
     return {
       isSynced,
       totalFolders,
