@@ -16,13 +16,11 @@
    */
   export let onCollectionSynced: (
     collection: CollectionDocument,
-  ) => Promise<boolean>;
+  ) => Promise<boolean | undefined>;
   /**
    * Callback to get last updated and total number of folders and requests in collection
    */
-  export let getLastUpdatedAndCount: (
-    collection: CollectionDocument,
-  ) => Promise<{
+  export let getLastUpdatedAndCount: (collection: CollectionDto) => Promise<{
     isSynced: boolean;
     totalFolders: number;
     totalRequests: number;
@@ -54,10 +52,6 @@
    * The collection
    */
   export let collection: CollectionDocument;
-  /**
-   * User role in the workspace
-   */
-  export let userRoleInWorkspace: boolean;
 
   /**
    * Icons and images
@@ -79,6 +73,7 @@
   import { PERMISSION_NOT_FOUND_TEXT } from "$lib/utils/constants/permissions.constant";
   import type { CollectionDocument, TabDocument } from "@app/database/database";
   import { WorkspaceRole } from "$lib/utils/enums";
+  import type { CollectionDto } from "@common/types/workspace";
 
   /**
    * Role of user in active workspace
@@ -184,7 +179,10 @@
     class="my-collection d-flex flex-column w-100 z-3"
     style="margin-top: 15px; min-width: 450px"
   >
-    <Tooltip title={PERMISSION_NOT_FOUND_TEXT} show={!userRoleInWorkspace}>
+    <Tooltip
+      title={PERMISSION_NOT_FOUND_TEXT}
+      show={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+    >
       <div class="d-flex align-items-center gap-2 mb-4">
         <div class="d-flex flex-column flex-grow-1">
           <input
@@ -319,7 +317,8 @@
           {#if collection?.activeSync}
             <div class="d-flex flex-column justify-content-center">
               <Button
-                disable={!userRoleInWorkspace || refreshCollectionLoader}
+                disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+                  refreshCollectionLoader}
                 title={`Sync Collection`}
                 type="dark"
                 loader={refreshCollectionLoader}
@@ -378,7 +377,8 @@
             </li>
           </ol>
           <Button
-            disable={!userRoleInWorkspace || refreshCollectionLoader}
+            disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+              refreshCollectionLoader}
             title={`Sync Collection`}
             type="primary"
             loader={refreshCollectionLoader}

@@ -11,22 +11,19 @@ import type {
   // CollectionDocument,
   TabDocument,
 } from "@app/database/database";
-import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
 
 // Utils
-import { hasWorkpaceLevelPermission, moveNavigation } from "$lib/utils/helpers";
+import { moveNavigation } from "$lib/utils/helpers";
 import {
   Events,
   ItemType,
   // ResponseStatusCode,
   UntrackedItems,
-  WorkspaceRole,
 } from "$lib/utils/enums";
 // import { invoke } from "@tauri-apps/api/core";
 import { v4 as uuidv4 } from "uuid";
 
 // Stores
-import { userWorkspaceLevelRole } from "$lib/store";
 import type { CollectionItemsDto, Folder, Tab } from "@common/types/workspace";
 import type { CreateApiRequestPostBody } from "$lib/utils/dto";
 import { InitRequestTab } from "@common/utils";
@@ -65,24 +62,6 @@ class FolderExplorerPage {
         });
       })
       .unsubscribe();
-  };
-
-  /**
-   *
-   * @returns boolean - if user have permission to update the folder
-   */
-  public getUserRoleInWorspace = async () => {
-    let role: WorkspaceRole;
-    const userWorkspaceLevelRoleSubscribe = userWorkspaceLevelRole.subscribe(
-      (value) => {
-        role = WorkspaceRole.WORKSPACE_ADMIN;
-      },
-    );
-    userWorkspaceLevelRoleSubscribe();
-    return await hasWorkpaceLevelPermission(
-      role,
-      workspaceLevelPermissions.SAVE_REQUEST,
-    );
   };
 
   /**
@@ -228,9 +207,6 @@ class FolderExplorerPage {
     collection: CollectionDocument,
     folder: Folder,
   ) => {
-    if (!(await this.getUserRoleInWorspace())) {
-      return;
-    }
     // const sampleRequest = generateSampleRequest(
     //   UntrackedItems.UNTRACKED + uuidv4(),
     //   new Date().toString(),
@@ -426,8 +402,8 @@ class FolderExplorerPage {
     let totalRequests = 0;
     const folder = await this.getFolder(collection, tab.id);
     if (folder?.items) {
-      folder.items.forEach( (item : CollectionItemsDto) => {
-        if(item.type === ItemType.REQUEST){
+      folder.items.forEach((item: CollectionItemsDto) => {
+        if (item.type === ItemType.REQUEST) {
           totalRequests++;
         }
       });

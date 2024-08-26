@@ -7,28 +7,24 @@ import { CollectionService } from "@app/services/collection.service";
 
 // Types
 import type { CollectionDocument, TabDocument } from "@app/database/database";
-import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
 
 // Notification
 import { notifications } from "@library/ui/toast/Toast";
 
 // Utils
-import { hasWorkpaceLevelPermission, moveNavigation } from "$lib/utils/helpers";
-import {
-  ItemType,
-  ResponseStatusCode,
-  UntrackedItems,
-  WorkspaceRole,
-} from "$lib/utils/enums";
+import { moveNavigation } from "$lib/utils/helpers";
+import { ItemType, ResponseStatusCode, UntrackedItems } from "$lib/utils/enums";
 import { invoke } from "@tauri-apps/api/core";
 import { v4 as uuidv4 } from "uuid";
 
 // Stores
-import { userWorkspaceLevelRole } from "$lib/store";
 import { InitRequestTab } from "@common/utils";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";
-import type { CollectionDto, CollectionItemsDto } from "@common/types/workspace";
+import type {
+  CollectionDto,
+  CollectionItemsDto,
+} from "@common/types/workspace";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -53,24 +49,6 @@ class CollectionExplorerPage {
    */
   private updateTab = async (_id: string, data: TabDocument) => {
     this.tabRepository.updateTab(_id, data);
-  };
-
-  /**
-   *
-   * @returns {boolean} if user have permission to update
-   */
-  public getUserRoleInWorspace = async () => {
-    let role: WorkspaceRole;
-    const userWorkspaceLevelRoleSubscribe = userWorkspaceLevelRole.subscribe(
-      (value) => {
-        role = WorkspaceRole.WORKSPACE_ADMIN;
-      },
-    );
-    userWorkspaceLevelRoleSubscribe();
-    return await hasWorkpaceLevelPermission(
-      role,
-      workspaceLevelPermissions.SAVE_REQUEST,
-    );
   };
 
   /**
@@ -338,7 +316,7 @@ class CollectionExplorerPage {
    * @returns isSynced, totalRequests, totalFolders, lastUpdated
    */
   public getLastUpdatedAndCount = async (collection: CollectionDto) => {
-    let isSynced = false;
+    const isSynced = false;
     const monthNamesAbbreviated = [
       "Jan",
       "Feb",
@@ -360,25 +338,25 @@ class CollectionExplorerPage {
     ).getFullYear()}`;
     let totalRequests = 0;
     let totalFolders = 0;
-    if(collection?.items){
+    if (collection?.items) {
       collection?.items.forEach((collectionItem: CollectionItemsDto) => {
         if (collectionItem.type === ItemType.REQUEST) {
           totalRequests++;
-        } else if(collectionItem.type === ItemType.FOLDER) {
+        } else if (collectionItem.type === ItemType.FOLDER) {
           totalFolders++;
-          if(collectionItem?.items)
-          collectionItem.items.forEach( (item : CollectionItemsDto) => {
-            if(item.type === ItemType.REQUEST){
-              totalRequests++;
-            }
-          });
+          if (collectionItem?.items)
+            collectionItem.items.forEach((item: CollectionItemsDto) => {
+              if (item.type === ItemType.REQUEST) {
+                totalRequests++;
+              }
+            });
         }
       });
     }
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
+    // let isGuestUser;
+    // isGuestUserActive.subscribe((value) => {
+    //   isGuestUser = value;
+    // });
 
     // active sync endpoint currently not in use
     // if (isGuestUser === true) {
@@ -413,9 +391,6 @@ class CollectionExplorerPage {
    * @returns
    */
   public handleCreateRequest = async (collection: CollectionDocument) => {
-    if (!(await this.getUserRoleInWorspace())) {
-      return;
-    }
     // const request = generateSampleRequest(
     //   UntrackedItems.UNTRACKED + uuidv4(),
     //   new Date().toString(),
@@ -543,9 +518,12 @@ class CollectionExplorerPage {
       isGuestUser = value;
     });
     if (isGuestUser == true) {
-      await this.collectionRepository.updateCollection(collection.id as string ,{
-        description: newDescription
-      });
+      await this.collectionRepository.updateCollection(
+        collection.id as string,
+        {
+          description: newDescription,
+        },
+      );
       notifications.success("Description updated successfully!");
       return;
     }
@@ -562,10 +540,7 @@ class CollectionExplorerPage {
       const res = {
         data: { description: newDescription },
       };
-      await this.collectionRepository.updateCollection(
-        collection.id,
-        res.data,
-      );
+      await this.collectionRepository.updateCollection(collection.id, res.data);
       notifications.success("Description updated successfully!");
     } else if (response.message === "Network Error") {
       notifications.error(response.message);
