@@ -19,7 +19,6 @@ import {
   type TeamDocument,
   type WorkspaceDocument,
 } from "@app/database/database";
-import { currentMonitor, getCurrent } from "@tauri-apps/api/window";
 import { clearAuthJwt } from "$lib/utils/jwt";
 import { userLogout } from "@app/services/auth.service";
 import { FeatureSwitchService } from "@app/services/feature-switch.service";
@@ -323,7 +322,7 @@ export class DashboardViewModel {
    * add guest user in local db
    */
   public addGuestUser = async () => {
-    const data = await this.guestUserRepository.insert({
+    await this.guestUserRepository.insert({
       id: uuidv4(),
       name: "guestUser",
       isGuestUser: true,
