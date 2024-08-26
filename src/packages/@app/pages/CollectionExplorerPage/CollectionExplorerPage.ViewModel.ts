@@ -7,29 +7,24 @@ import { CollectionService } from "@app/services/collection.service";
 
 // Types
 import type { CollectionDocument, TabDocument } from "@app/database/database";
-import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
 
 // Notification
 import { notifications } from "@library/ui/toast/Toast";
 
 // Utils
-import { hasWorkpaceLevelPermission, moveNavigation } from "$lib/utils/helpers";
-import {
-  ItemType,
-  ResponseStatusCode,
-  UntrackedItems,
-  WorkspaceRole,
-} from "$lib/utils/enums";
+import { moveNavigation } from "$lib/utils/helpers";
+import { ItemType, ResponseStatusCode, UntrackedItems } from "$lib/utils/enums";
 import { invoke } from "@tauri-apps/api/core";
 import { v4 as uuidv4 } from "uuid";
 
 // Stores
-import { userWorkspaceLevelRole } from "$lib/store";
-import { generateSampleRequest } from "$lib/utils/sample";
-import type { Folder, Path } from "$lib/utils/interfaces/request.interface";
 import { InitRequestTab } from "@common/utils";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";
+import type {
+  CollectionDto,
+  CollectionItemsDto,
+} from "@common/types/workspace";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -54,24 +49,6 @@ class CollectionExplorerPage {
    */
   private updateTab = async (_id: string, data: TabDocument) => {
     this.tabRepository.updateTab(_id, data);
-  };
-
-  /**
-   *
-   * @returns {boolean} if user have permission to update
-   */
-  public getUserRoleInWorspace = async () => {
-    let role: WorkspaceRole;
-    const userWorkspaceLevelRoleSubscribe = userWorkspaceLevelRole.subscribe(
-      (value: any) => {
-        role = WorkspaceRole.WORKSPACE_ADMIN;
-      },
-    );
-    userWorkspaceLevelRoleSubscribe();
-    return await hasWorkpaceLevelPermission(
-      role,
-      workspaceLevelPermissions.SAVE_REQUEST,
-    );
   };
 
   /**
@@ -338,8 +315,8 @@ class CollectionExplorerPage {
    * @param collection Collection in which folder and request will be counted
    * @returns isSynced, totalRequests, totalFolders, lastUpdated
    */
-  public getLastUpdatedAndCount = async (collection: CollectionDocument) => {
-    let isSynced: boolean;
+  public getLastUpdatedAndCount = async (collection: CollectionDto) => {
+    const isSynced = false;
     const monthNamesAbbreviated = [
       "Jan",
       "Feb",
@@ -359,34 +336,47 @@ class CollectionExplorerPage {
     } ${new Date(collection?.updatedAt).getDate()}, ${new Date(
       collection?.updatedAt,
     ).getFullYear()}`;
-    let totalRequests: number = 0;
-    let totalFolders: number = 0;
-    collection?.items.forEach((collectionItem: CollectionDocument) => {
-      if (collectionItem.type === ItemType.REQUEST) {
-        totalRequests++;
-      } else {
-        totalFolders++;
-        totalRequests += collectionItem.items.length;
-      }
-    });
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
-    let response;
-    if (isGuestUser === true) {
-      return;
+    let totalRequests = 0;
+    let totalFolders = 0;
+    if (collection?.items) {
+      collection?.items.forEach((collectionItem: CollectionItemsDto) => {
+        if (collectionItem.type === ItemType.REQUEST) {
+          totalRequests++;
+        } else if (collectionItem.type === ItemType.FOLDER) {
+          totalFolders++;
+          if (collectionItem?.items)
+            collectionItem.items.forEach((item: CollectionItemsDto) => {
+              if (item.type === ItemType.REQUEST) {
+                totalRequests++;
+              }
+            });
+        }
+      });
     }
-    response = await this.collectionService.switchCollectionBranch(
-      collection?.id,
-      collection?.currentBranch,
-    );
+    // let isGuestUser;
+    // isGuestUserActive.subscribe((value) => {
+    //   isGuestUser = value;
+    // });
 
-    if (response && response.isSuccessful) {
-      isSynced = true;
-    } else {
-      isSynced = false;
-    }
+    // active sync endpoint currently not in use
+    // if (isGuestUser === true) {
+    //   return {
+    //     isSynced,
+    //     totalFolders,
+    //     totalRequests,
+    //     lastUpdated,
+    //   };
+    // }
+    // const response = await this.collectionService.switchCollectionBranch(
+    //   collection?.id,
+    //   collection?.currentBranch,
+    // );
+
+    // if (response && response.isSuccessful) {
+    //   isSynced = true;
+    // } else {
+    //   isSynced = false;
+    // }
     return {
       isSynced,
       totalFolders,
@@ -401,9 +391,6 @@ class CollectionExplorerPage {
    * @returns
    */
   public handleCreateRequest = async (collection: CollectionDocument) => {
-    if (!(await this.getUserRoleInWorspace())) {
-      return;
-    }
     // const request = generateSampleRequest(
     //   UntrackedItems.UNTRACKED + uuidv4(),
     //   new Date().toString(),
@@ -531,6 +518,13 @@ class CollectionExplorerPage {
       isGuestUser = value;
     });
     if (isGuestUser == true) {
+      await this.collectionRepository.updateCollection(
+        collection.id as string,
+        {
+          description: newDescription,
+        },
+      );
+      notifications.success("Description updated successfully!");
       return;
     }
     const response = await this.collectionService.updateCollectionData(
@@ -543,21 +537,13 @@ class CollectionExplorerPage {
         collection.id,
         response.data.data,
       );
-    } else if (response.message === "Network Error") {
-      notifications.error(response.message);
-    } else {
-      notifications.error("Failed to update description!");
-    }
-
-    if (newDescription) {
-      const response = {
+      const res = {
         data: { description: newDescription },
       };
-      await this.collectionRepository.updateCollection(
-        collection.id,
-        response.data,
-      );
+      await this.collectionRepository.updateCollection(collection.id, res.data);
       notifications.success("Description updated successfully!");
+    } else if (response.message === "Network Error") {
+      notifications.error(response.message);
     } else {
       notifications.error("Failed to update description!");
     }
