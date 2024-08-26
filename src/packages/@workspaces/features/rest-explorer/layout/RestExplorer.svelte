@@ -494,8 +494,6 @@
       {onCreateCollection}
       {onRenameCollection}
       {onRenameFolder}
-      requestDoc={$tab.description}
-      {onUpdateRequestDescription}
     />
   </ModalWrapperV1>
 {/if}

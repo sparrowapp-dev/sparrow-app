@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import EditorJS from "@editorjs/editorjs";
   import Header from "@editorjs/header";
   import List from "@editorjs/list";
@@ -8,17 +8,39 @@
   import Paragraph from "@editorjs/paragraph";
   import edjsParser from "editorjs-parser";
   import { onMount } from "svelte";
+  /**
+   * add commments like this
+   */
+  /**
+   * JSON string representing the initial value of the Editor.js instance
+   */
   export let value = "[]";
-  export let onInput;
-  export let id;
-  export let isReadOnly = false;
-  export let placeholder;
 
-  let parsedValue;
-  let editor;
+  /**
+   *function to handle input changes in the editor
+   */
+  export let onInput = () => {};
+
+  /**
+   * ID of the DOM element that will serve as the container for the editor
+   */
+  export let id = "";
+
+  /**
+   * Boolean flag to determine if the editor should be in read-only mode
+   */
+  export let isReadOnly = false;
+
+  /**
+   * Placeholder text to display when the editor is empty
+   */
+  export let placeholder = "";
+
+  let editor: EditorJS;
 
   const parser = new edjsParser();
   onMount(() => {
+    let parsedValue = [];
     if (value) {
       parsedValue = JSON.parse(value);
     }
@@ -63,6 +85,10 @@
     });
   });
 
+  /**
+   * Saves the current content of the editor and triggers the onInput callback
+   * with the updated content.
+   */
   const saveContent = () => {
     if (editor) {
       editor.save().then((changedData) => {
@@ -71,6 +97,8 @@
       });
     }
   };
+
+  // Reactive statement to update the editor when certain conditions change - When doc is generating.
   $: {
     if (value && isReadOnly) {
       if (editor?.blocks) {
@@ -80,7 +108,7 @@
         });
       }
     }
-
+    // Toggle the editor's read-only mode if the isReadOnly state changes
     if (
       editor?.readOnly &&
       typeof isReadOnly === "boolean" &&

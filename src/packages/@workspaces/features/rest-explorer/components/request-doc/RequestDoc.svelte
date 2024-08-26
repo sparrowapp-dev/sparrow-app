@@ -10,12 +10,11 @@
   export let isDocAlreadyGenerated = false;
   export let onGenerateDocumentation;
   export let isGuestUser;
-  export let requestDoc;
-  let response;
+  export let requestDoc: string;
 
   const sendPrompt = async (text: string) => {
     if (text) {
-      response = await onGenerateDocumentation(text, "", "");
+      await onGenerateDocumentation(text, "", "");
     }
   };
 </script>

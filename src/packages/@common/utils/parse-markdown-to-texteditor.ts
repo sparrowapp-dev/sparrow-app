@@ -1,122 +1,154 @@
+interface Block {
+  id: string;
+  type: string;
+  data: {
+    text?: string;
+    style?: string;
+    items?: string[];
+    code?: string;
+  };
+  level?: number;
+}
+
 class MarkdownFormatter {
   /**
    * FormatData function to format the markdown string to the required format.
    * @param string - The markdown string to format.
    * @returns A promise that resolves to the formatted data.
    */
+  // Define the blocks array to hold the formatted blocks.
+  private blocks: Block[] = [];
+
+  // Define the currentBlock that will be manipulated during processing.
+  private currentBlock: Block | null = null;
+
+  // Adds the current block to the blocks array and resets the currentBlock.
+  private pushCurrentBlock = () => {
+    if (this.currentBlock) {
+      this.currentBlock.id = Math.random().toString(36).substr(2, 9);
+      this.blocks.push(this.currentBlock);
+      this.currentBlock = null;
+    }
+  };
+
+  // Creates a paragraph block with the given text.
+  private createParagraph = (text: string) => {
+    return {
+      type: "paragraph",
+      data: { text: text },
+    };
+  };
+
+  // Processes inline markdown syntax in a string.
+  // Replaces markdown for bold, italic, and code with corresponding HTML tags.
+  private processInlineMarkdown = (text: string) => {
+    // Handle bold
+    text = text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+    // Handle italic
+    text = text.replace(/\*(.*?)\*/g, "<i>$1</i>");
+    // Handle code
+    text = text.replace(/`(.*?)`/g, "<code>$1</code>");
+    return text;
+  };
+
   public async FormatData(markdownString: string) {
     const lines = markdownString.split("\n");
-    const blocks: Block[] = [];
-
-    interface Block {
-      id: string;
-      type: string;
-      data: {
-        text?: string;
-        style?: string;
-        items?: string[];
-        code?: string;
-      };
-      level?: number;
-    }
-    let currentBlock: Block | null = null;
-
-    function pushCurrentBlock() {
-      if (currentBlock) {
-        currentBlock.id = Math.random().toString(36).substr(2, 9);
-        blocks.push(currentBlock);
-        currentBlock = null;
-      }
-    }
-
-    function createParagraph(text: string) {
-      return {
-        type: "paragraph",
-        data: { text: text },
-      };
-    }
-
-    function processInlineMarkdown(text: string) {
-      // Handle bold
-      text = text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
-      // Handle italic
-      text = text.replace(/\*(.*?)\*/g, "<i>$1</i>");
-      // Handle code
-      text = text.replace(/`(.*?)`/g, "<code>$1</code>");
-      return text;
-    }
+    this.blocks = []; // Reset blocks array before processing
+    this.currentBlock = null; // Reset currentBlock before processing
 
     lines.forEach((line, index) => {
       line = line.trim();
 
       if (line === "") {
-        pushCurrentBlock();
+        // If the line is empty, push the current block to the blocks array
+        this.pushCurrentBlock();
       } else if (line.startsWith("#")) {
-        pushCurrentBlock();
+        // If the line starts with a heading marker (#), process it as a header
+        this.pushCurrentBlock();
         const level = line.split(" ")[0].length;
         if (level <= 6) {
-          currentBlock = {
+          // If the heading level is 6 or less, create a header block
+          this.currentBlock = {
             type: "header",
             data: {
-              text: processInlineMarkdown(line.substring(level + 1)),
+              text: this.processInlineMarkdown(line.substring(level + 1)),
               level: level,
             },
           };
         } else {
-          currentBlock = createParagraph(processInlineMarkdown(line));
+          // If the heading level is more than 6, treat it as a paragraph
+          this.currentBlock = this.createParagraph(
+            this.processInlineMarkdown(line),
+          );
         }
       } else if (line.startsWith("- ") || line.startsWith("* ")) {
-        if (!currentBlock || currentBlock.type !== "list") {
-          pushCurrentBlock();
-          currentBlock = {
+        // If the line starts with an unordered list marker (- or *), process it as a list
+        if (!this.currentBlock || this.currentBlock.type !== "list") {
+          // Start a new unordered list block if not already in one
+          this.pushCurrentBlock();
+          this.currentBlock = {
             type: "list",
             data: { style: "unordered", items: [] },
           };
         }
-        currentBlock.data.items.push(processInlineMarkdown(line.substring(2)));
+        // Add the list item to the current block
+
+        this.currentBlock.data.items!.push(
+          this.processInlineMarkdown(line.substring(2)),
+        );
       } else if (line.match(/^\d+\. /)) {
-        if (!currentBlock || currentBlock.type !== "list") {
-          pushCurrentBlock();
-          currentBlock = {
+        // If the line starts with an ordered list marker (e.g., 1.), process it as a list
+        if (!this.currentBlock || this.currentBlock.type !== "list") {
+          // Start a new ordered list block if not already in one
+          this.pushCurrentBlock();
+          this.currentBlock = {
             type: "list",
             data: { style: "ordered", items: [] },
           };
         }
-        currentBlock.data.items.push(
-          processInlineMarkdown(line.substring(line.indexOf(" ") + 1)),
+        // Add the list item to the current block
+        this.currentBlock.data.items!.push(
+          this.processInlineMarkdown(line.substring(line.indexOf(" ") + 1)),
         );
       } else if (line.startsWith("```")) {
-        if (currentBlock && currentBlock.type === "code") {
-          pushCurrentBlock();
+        // If the line starts with a code block marker (```), process it as a code block
+        if (this.currentBlock && this.currentBlock.type === "code") {
+          // If already in a code block, close it
+          this.pushCurrentBlock();
         } else {
-          pushCurrentBlock();
-          currentBlock = {
+          this.pushCurrentBlock();
+          this.currentBlock = {
             type: "code",
             data: { code: "" },
           };
         }
-      } else if (currentBlock && currentBlock.type === "code") {
-        currentBlock.data.code += (currentBlock.data.code ? "\n" : "") + line;
+      } else if (this.currentBlock && this.currentBlock.type === "code") {
+        // If inside a code block, append the line to the code content
+        this.currentBlock.data.code! +=
+          (this.currentBlock.data.code ? "\n" : "") + line;
       } else {
-        if (!currentBlock || currentBlock.type !== "paragraph") {
-          pushCurrentBlock();
-          currentBlock = createParagraph("");
+        if (!this.currentBlock || this.currentBlock.type !== "paragraph") {
+          // Otherwise, treat the line as part of a paragraph
+          this.pushCurrentBlock();
+          this.currentBlock = this.createParagraph("");
         }
-        currentBlock.data.text +=
-          (currentBlock.data.text ? "<br>" : "") + processInlineMarkdown(line);
+        // Append the line to the paragraph content, using <br> for new lines
+        this.currentBlock.data.text! +=
+          (this.currentBlock.data.text ? "<br>" : "") +
+          this.processInlineMarkdown(line);
       }
-
+      // Push the final block when processing the last line
       if (index === lines.length - 1) {
-        pushCurrentBlock();
+        this.pushCurrentBlock();
       }
     });
 
     return {
       time: Date.now(),
-      blocks: blocks,
+      blocks: this.blocks,
       version: "2.30.4",
     };
   }
 }
 
-export default MarkdownFormatter;
+export { MarkdownFormatter };

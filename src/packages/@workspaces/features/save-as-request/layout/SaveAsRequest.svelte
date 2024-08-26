@@ -69,7 +69,7 @@
   let componentData = {
     path: requestPath,
     name: requestName,
-    description: requestDescription,
+    // description: requestDescription,
     property: {
       request: {
         method: requestMethod,
@@ -88,7 +88,8 @@
   let path: Path[] = [];
 
   let tabName: string;
-  let description: string;
+  // let description: string;
+
   let latestRoute: {
     id: string;
   } = {
@@ -115,12 +116,14 @@
     // Setting save request name and description on load
     if (!componentData.path.workspaceId || !componentData.path.collectionId) {
       tabName = componentData.name;
-      description = componentData.description;
+      // description = componentData.description;
     } else {
       tabName = componentData.name + " Copy";
-      description = componentData.description + " Copy";
+      // description = componentData.description + " Copy";
     }
   });
+
+  // console.log(description, "description");
 
   const getFilteredCollection = async (value: CollectionDocument[]) => {
     const _workspace = await readWorkspace(componentData?.path?.workspaceId);
@@ -793,7 +796,7 @@
         placeholder={"Add a description to help people know about this request."}
         isReadOnly={true}
         id={"editor1"}
-        value={description}
+        value={requestDescription}
       />
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>
@@ -902,7 +905,7 @@
               workspaceMeta,
               path,
               tabName,
-              description,
+              requestDescription,
               type,
             );
             if (res.status === "success") {
