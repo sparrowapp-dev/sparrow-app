@@ -467,10 +467,7 @@
   onSave={handlePopupSave}
   onCancel={handleClosePopupBackdrop}
   onDiscard={handlePopupDiscard}
-  isSaveDisabled={!hasWorkpaceLevelPermission(
-    WorkspaceRole.WORKSPACE_ADMIN,
-    workspaceLevelPermissions.SAVE_REQUEST,
-  )}
+  isSaveDisabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
   {loader}
   {isGuestUser}
 />
