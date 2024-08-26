@@ -46,7 +46,6 @@
     }
     editor = new EditorJS({
       inlineToolbar: ["bold", "italic", "underline"],
-      inlineToolbar: true,
       holder: id,
       tools: {
         list: {
@@ -56,7 +55,7 @@
         header: {
           class: Header,
           inlineToolbar: ["bold", "italic", "underline", "inlineCode"],
-          inlineToolbar: true,
+
           config: {
             levels: [2, 3, 4],
             defaultLevel: 3,
@@ -71,7 +70,6 @@
         paragraph: {
           class: Paragraph,
           inlineToolbar: ["bold", "italic", "underline", "inlineCode", "list"],
-          inlineToolbar: true,
         },
       },
       readOnly: isReadOnly,
