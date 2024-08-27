@@ -116,6 +116,7 @@
     }
     workspaceDocuments = await _viewModel.workspaces();
     teamDocuments = await _viewModel.getTeams();
+    await _viewModel.connectWebSocket();
   });
 
   onDestroy(() => {
@@ -191,7 +192,7 @@
     workspaceDocuments={$workspaceDocuments}
     onCreateWorkspace={() => (isWorkspaceModalOpen = true)}
     onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
-    {user} 
+    {user}
     onLogout={_viewModel.handleLogout}
   />
 
@@ -240,7 +241,6 @@
 
       <!-- Route for Mock -->
       <Route path="/mock/*"><Mock /></Route>
-
 
       <!-- Route for Help -->
       <Route path="/help/*"><HelpPage /></Route>

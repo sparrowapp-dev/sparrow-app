@@ -19,7 +19,6 @@ import {
   type TeamDocument,
   type WorkspaceDocument,
 } from "@app/database/database";
-import { currentMonitor, getCurrent } from "@tauri-apps/api/window";
 import { clearAuthJwt } from "$lib/utils/jwt";
 import { userLogout } from "@app/services/auth.service";
 import { FeatureSwitchService } from "@app/services/feature-switch.service";
@@ -31,6 +30,7 @@ import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums";
+import { AiAssistantWebSocketService } from "@app/services/ai-assistant.ws.service";
 
 export class DashboardViewModel {
   constructor() {}
@@ -44,6 +44,7 @@ export class DashboardViewModel {
   private featureSwitchService = new FeatureSwitchService();
   private featureSwitchRepository = new FeatureSwitchRepository();
   private guestUserRepository = new GuestUserRepository();
+  private aiAssistantWebSocketService = new AiAssistantWebSocketService();
 
   public getTeamData = async () => {
     return await this.teamRepository.getTeamData();
@@ -321,7 +322,7 @@ export class DashboardViewModel {
    * add guest user in local db
    */
   public addGuestUser = async () => {
-    const data = await this.guestUserRepository.insert({
+    await this.guestUserRepository.insert({
       id: uuidv4(),
       name: "guestUser",
       isGuestUser: true,
@@ -380,5 +381,12 @@ export class DashboardViewModel {
   public handleSwitchWorkspace = async (id: string) => {
     await this.workspaceRepository.setActiveWorkspace(id);
     navigate("/dashboard/collections");
+  };
+
+  /**
+   * Connect the web socket on login
+   */
+  public connectWebSocket = async () => {
+    await this.aiAssistantWebSocketService.connectWebSocket();
   };
 }
