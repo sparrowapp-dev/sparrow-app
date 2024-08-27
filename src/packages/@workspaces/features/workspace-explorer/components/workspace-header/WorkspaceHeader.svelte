@@ -39,17 +39,18 @@
    */
   export let userRole;
 
-  /**
-   * Handles the update of workspace name.
-   * Calls onUpdateWorkspaceName with current workspaceID and workspaceName.
-   * Shows an error notification if workspaceName is empty.
-   */
-  const handleWorkspaceName = async () => {
-    if (workspaceName != "") {
-      await onUpdateWorkspaceName(workspaceID, workspaceName);
-    } else {
-      notifications.error("Please Enter A Workspace Name");
-    }
+  const onRenameInputKeyPress = () => {
+    const inputField = document.getElementById(
+      "renameInputFieldWorkspace",
+    ) as HTMLInputElement;
+    inputField.blur();
+  };
+
+  const resetInputField = () => {
+    const inputField = document.getElementById(
+      "renameInputFieldWorkspace",
+    ) as HTMLInputElement;
+    inputField.value = workspaceName;
   };
 </script>
 
@@ -63,19 +64,28 @@
         class="ellipsis"
         style="font-weight: 700; font-size:18px; color:var(--text-secondary-100);"
       >
-        <Input
-          bind:value={workspaceName}
-          on:blur={handleWorkspaceName}
-          id={"workspace-name"}
-          width={"300px"}
+        <input
+          on:blur={(event) => {
+            const newValue = event.target.value;
+            const previousValue = workspaceName;
+            if (event.target.value === "") {
+              resetInputField();
+            } else if (newValue !== previousValue) {
+              onUpdateWorkspaceName(workspaceID, newValue);
+            }
+          }}
+          on:keydown={(event) => {
+            if (event.key === "Enter") {
+              onRenameInputKeyPress();
+            }
+          }}
           type="text"
-          defaultBorderColor="Transparent"
-          hoveredBorderColor={"var(--border-primary-300)"}
-          focusedBorderColor={"var(--border-primary-300)"}
-          class="text-fs-18 bg-transparent  "
-          style="outline:none; font-weight:700;"
-          placeholder="My Workspace"
+          required
+          id="renameInputFieldWorkspace"
+          value={workspaceName}
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+          class="bg-transparent input-outline border-0 text-left w-100 ps-2 py-0 fs-5"
+          maxlength={100}
         />
       </div>
       {#if userRole === WorkspaceRole.WORKSPACE_ADMIN}

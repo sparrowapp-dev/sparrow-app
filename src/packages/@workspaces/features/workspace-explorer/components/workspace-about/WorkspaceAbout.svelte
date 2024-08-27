@@ -26,12 +26,11 @@
    */
   export let userRole;
 
-  /**
-   * Handles the update of workspace description.
-   * Calls with current workspaceID and workspaceDescription.
-   */
-  const handleWorkspaceDescription = async () => {
-    await onUpdateWorkspaceDescription(workspaceID, workspaceDescription);
+  const onRenameTextareaKeyPress = () => {
+    const inputField = document.getElementById(
+      "updateWorkspaceDescField",
+    ) as HTMLInputElement;
+    inputField.blur();
   };
 </script>
 
@@ -41,13 +40,23 @@
 >
   <div>
     <textarea
-      bind:value={workspaceDescription}
-      on:blur={handleWorkspaceDescription}
       disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-      class="text-area w-100"
-      style="height: 121px; background-color:transparent; border:none;"
-      placeholder="This is your personal workspace. Describe the objectives of the workspace and how it is meant to be used. Or create a comprehensive API documentation by including links to your collections and requests. Start typing. "
-    ></textarea>
+      id="updateWorkspaceDescField"
+      style="font-size: 14px; "
+      class="form-control bg-transparent border-0 text-textColor fs-6 h-50 input-outline shadow-none"
+      value={workspaceDescription || ""}
+      placeholder="This is your personal workspace. Describe the objectives of the workspace and how it is meant to be used. Or create a comprehensive API documentation by including links to your collections and requests. Start typing."
+      on:blur={(event) => {
+        if (workspaceDescription !== event.target.value) {
+          onUpdateWorkspaceDescription(workspaceID, event.target.value);
+        }
+      }}
+      on:keydown={(event) => {
+        if (event.key === "Enter") {
+          onRenameTextareaKeyPress();
+        }
+      }}
+    />
   </div>
 </div>
 

@@ -67,10 +67,6 @@
   import { TeamProfile } from "@teams/features/team-settings/components";
   import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
 
-  export let modifiedUser;
-
-  export let handleChange;
-
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -156,7 +152,6 @@
   });
 
   user.subscribe((value) => {
-    modifiedUser = value;
     userId = value?._id;
   });
 
@@ -431,7 +426,6 @@
                     <div class="h-100" use:motion>
                       <WorkspaceExplorerPage
                         {collectionList}
-                        {modifiedUser}
                         tab={$activeTab}
                       />
                     </div>

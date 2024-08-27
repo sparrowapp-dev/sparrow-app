@@ -9,7 +9,6 @@
   import type { UpdatesDocType } from "@app/models/updates.model";
   import { user } from "$lib/store";
 
-  export let modifiedUser;
   export let collectionList;
   export let tab;
 
@@ -43,6 +42,7 @@
     id: "",
     name: "",
     users: [],
+    description: "",
   };
   let userId = "";
   let userRole = "";
@@ -57,6 +57,7 @@
           id: value._data._id,
           name: value._data.name,
           users: value._data.users,
+          description: value.description,
         };
         const currentTeamDetails = {
           id: value._data?.team.teamId,
@@ -108,7 +109,6 @@
 <WorkspaceExplorer
   bind:userRole
   {tab}
-  {modifiedUser}
   {workspaceUpdatesList}
   collectionLength={$collectionList?.filter(
     (value) => value.workspaceId === currentWorkspace?.id,
