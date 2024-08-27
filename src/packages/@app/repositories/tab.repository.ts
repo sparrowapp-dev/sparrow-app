@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type TabDocument } from "@app/database/database";
-import type { TabDocType } from "@app/models/tab.model";
+import type { Tab } from "@common/types/workspace";
 import type { Observable } from "rxjs";
 
 export class TabRepository {
-  constructor() { }
+  constructor() {}
 
   /**
    * Retrieves all tab documents from the RxDB database.
@@ -479,7 +479,7 @@ export class TabRepository {
    * };
    * await updateTab(tabId, updatedProperties);
    */
-  public updateTab = async (tabId: string, tab: TabDocType): Promise<void> => {
+  public updateTab = async (tabId: string, tab: Tab): Promise<void> => {
     const query = await RxDB.getInstance()
       .rxdb.tab.findOne({
         selector: {
@@ -487,22 +487,21 @@ export class TabRepository {
         },
       })
       .exec();
-    await query.incrementalModify((value) => {
+    await query.incrementalModify((value: Tab) => {
       return { ...value, ...tab };
     });
   };
 
-
   /**
- * Retrieves a tab by its unique identifier.
- * 
- * This function searches for a tab within the provided array of tabs based on the given `tabId`. 
- * If a tab with the matching ID is found, it is returned; otherwise, the function returns `undefined`.
- * 
- * @param {Array<{ id: string, [key: string]: any }>} tabs - An array of tab objects, where each tab contains at least an `id` property.
- * @param {string} tabId - The unique identifier of the tab to retrieve.
- * @returns {{ id: string, [key: string]: any } | undefined} - The tab object with the matching `tabId`.
- */
+   * Retrieves a tab by its unique identifier.
+   *
+   * This function searches for a tab within the provided array of tabs based on the given `tabId`.
+   * If a tab with the matching ID is found, it is returned; otherwise, the function returns `undefined`.
+   *
+   * @param {Array<{ id: string, [key: string]: any }>} tabs - An array of tab objects, where each tab contains at least an `id` property.
+   * @param {string} tabId - The unique identifier of the tab to retrieve.
+   * @returns {{ id: string, [key: string]: any } | undefined} - The tab object with the matching `tabId`.
+   */
 
   public getTabById = async (id: string): Promise<TabDocument> => {
     return await RxDB.getInstance()
@@ -512,7 +511,6 @@ export class TabRepository {
         },
       })
       .exec();
-
   };
 
   /**

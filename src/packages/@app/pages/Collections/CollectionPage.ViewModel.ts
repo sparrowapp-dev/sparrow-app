@@ -460,7 +460,7 @@ export default class CollectionsViewModel {
       .subscribe((tabs) => {
         tabs.forEach((tab) => {
           if (tab.id === _id) {
-            this.tabRepository.updateTab(tab.tabId, data);
+            this.tabRepository.updateTab(tab?.tabId as string, data as Tab);
           }
         });
       })

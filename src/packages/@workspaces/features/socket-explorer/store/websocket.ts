@@ -1,12 +1,13 @@
 import { writable } from "svelte/store";
 
+export type WebSocketMessage = {
+  data: string;
+  transmitter: string;
+  timestamp: string;
+  uuid: string;
+};
 export type WebSocketData = {
-  messages: {
-    data: string;
-    transmitter: string;
-    timestamp: string;
-    uuid: string;
-  }[];
+  messages: WebSocketMessage[];
   status: "connected" | "disconnected" | "connecting" | "disconnecting";
   search: string;
   body: string;
