@@ -169,7 +169,7 @@
           data={guestData}
           titleId={`${currentWorkspaceId}`}
           onclick={() => {}}
-          minHeaderWidth={"185px"}
+          minHeaderWidth={"195px"}
           iconRequired={false}
           isDropIconFilled={true}
           borderType={"none"}
@@ -185,7 +185,7 @@
           position={"absolute"}
           isHeaderCombined={true}
           maxBodyHeight={"300px"}
-          placeholderText="Guest User's Team / Guest User's Workspace"
+          placeholderText=" Team / Workspace  "
         >
           <div slot="pre-select" class="mb-2 px-1">
             <div class="guest-user-text">
