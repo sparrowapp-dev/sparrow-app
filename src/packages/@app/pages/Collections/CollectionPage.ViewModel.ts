@@ -156,7 +156,6 @@ export default class CollectionsViewModel {
     return this.tabRepository.getTabList();
   }
   public getTabListWithWorkspaceId(workspaceId: string) {
-    // debugger;
     return this.tabRepository.getTabListWithWorkspaceId(workspaceId);
   }
 

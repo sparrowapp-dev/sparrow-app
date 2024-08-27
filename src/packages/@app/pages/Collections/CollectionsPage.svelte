@@ -289,7 +289,6 @@
     if (value) {
       if (prevWorkspaceId !== value._id) {
         _viewModel.fetchCollections(value?._id);
-        // tabList = _viewModel.tabs;
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
         activeTab?.subscribe((value: TabDocument) => {

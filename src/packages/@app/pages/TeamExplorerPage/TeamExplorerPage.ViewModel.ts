@@ -322,19 +322,17 @@ export class TeamExplorerPageViewModel {
    */
   public handleSwitchWorkspace = async (id: string) => {
     if (!id) return;
-    await this.workspaceRepository.setActiveWorkspace(id);
     const prevWorkspace = await this.workspaceRepository.readWorkspace(id);
     if (prevWorkspace?.isNewInvite) {
       await this.handleDisableWorkspaceInviteTag(id);
     }
+    await this.workspaceRepository.setActiveWorkspace(id);
     const res = await this.workspaceRepository.readWorkspace(id);
     const initWorkspaceTab = new InitWorkspaceTab(id, id);
     initWorkspaceTab.updateId(id);
     initWorkspaceTab.updateName(res.name);
-    // setTimeout(async () => {
     await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
     navigate("/dashboard/collections");
-    // }, 200);
   };
 
   /**
