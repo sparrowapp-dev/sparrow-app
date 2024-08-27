@@ -182,7 +182,8 @@
     }}
   /> -->
   <Tooltip
-    title={requestUrl === "" ? "" : isGuestUser ? "Login to save" : "Save"}
+    title={isGuestUser ? "Login to save" : "Save"}
+    show={requestUrl !== ""}
     placement={"bottom-left"}
     distance={12}
     zIndex={10}

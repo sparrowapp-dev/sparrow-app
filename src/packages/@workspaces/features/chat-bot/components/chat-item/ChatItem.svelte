@@ -32,27 +32,35 @@
   export let status;
 
   let showTickIcon: boolean = false;
-  let showMyTickIcon: {
-    [key: string]: boolean;
-  } = {};
 
+  /**
+   * Decodes an HTML string by parsing it, processing <pre><code> elements, and wrapping them
+   * in custom containers with additional copy paste functionality.
+   *
+   * @param htmlString - The HTML string to decode and process.
+   * @returns The processed HTML string.
+   */
   const decodeMessage = (htmlString: string): string => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, "text/html");
 
+    // Select all <pre> elements
     const codeElements = doc.querySelectorAll("pre > code");
     const preElements = Array.from(codeElements)
-      .filter((elem) => elem.innerHTML.trim())
+      .filter((elem) => {
+        if (elem.innerHTML.trim()) return true;
+        return false;
+      })
       .map((codeElem) => codeElem.parentElement);
 
     preElements.forEach((pre, index) => {
       if (pre) {
-        showMyTickIcon[String(index)] = false;
+        // Create a new container div
         const container = document.createElement("div");
         container.className = "wrapper";
         const lang = pre.querySelector("code")?.getAttribute("class");
         hljs.highlightBlock(pre.querySelector("code"));
-
+        // Add content or value to the container div
         container.innerHTML = `
       <div class="code-header bg-tertiary-300 ps-3 pe-2 py-1 d-flex align-items-center justify-content-between">
         <span>${lang?.split("-")[1] ?? ""}</span>
@@ -74,20 +82,20 @@
     return serializer.serializeToString(doc);
   };
 
+  /**
+   * Handles the click event to copy code from a specified wrapper to the clipboard.
+   *
+   * @param event - The mouse event triggered by clicking on the wrapper.
+   */
   const handleCopyCode = async (event: MouseEvent) => {
     const id = (event.target as HTMLElement).id;
     const targetElement = event.target as
       | HTMLImageElement
       | HTMLButtonElement
       | any;
-    console.log("target", targetElement);
-    const parentElement = targetElement.parentElement;
     const firstChild = targetElement.children[0];
     const tagName = targetElement.tagName;
-    console.log("firstChild", firstChild);
-    console.log("parentElement", parentElement);
-    console.log("Tag name:", tagName);
-    if (tagName === "IMG" && parentElement) {
+    if (tagName === "IMG") {
       const originalSrc = targetElement?.src;
       targetElement.src = tickIcon;
       targetElement.classList.add("tick-icon");
@@ -124,6 +132,9 @@
     }
   };
 
+  /**
+   * Handles the response copy to clipboard functionality.
+   */
   const handleCopyResponse = async () => {
     try {
       await navigator.clipboard.writeText(message);
@@ -143,12 +154,18 @@
 
   let extractedMessage = "";
 
+  /**
+   * Embeds click listeners to copy code from dynamically inserted wrappers.
+   * @returns A promise that resolves when the listeners are embedded.
+   */
   const embedListenerToCopyCode = async () => {
     extractedMessage = decodeMessage(await marked(message));
+    // Add event listeners to all dynamically inserted wrappers
 
     setTimeout(() => {
       const wrappers = document.querySelectorAll(`.copy-code-${messageId}`);
 
+      // Remove previous event listeners
       cleanUpListeners();
 
       cleanUpListeners = () => {
@@ -162,13 +179,20 @@
     }, 200);
   };
 
+  /**
+   * Reactive statement to embed listeners for copying code when the message changes.
+   */
   $: {
     if (message) {
       embedListenerToCopyCode();
     }
   }
 
+  /**
+   * Cleanup function to remove event listeners when the component is destroyed.
+   */
   onDestroy(() => {
+    // Clean up event listeners to destroy copy code element
     if (cleanUpListeners) {
       cleanUpListeners();
     }
@@ -176,16 +200,31 @@
 </script>
 
 <div class="message-wrapper">
+  <!--
+    -- 
+    -- SENDER
+    -- 
+    -->
   {#if type === MessageTypeEnum.SENDER}
     <div class="send-item">
       <p class="my-4 px-3 text-fs-12">{@html message}</p>
     </div>
   {:else}
+    <!--
+    -- 
+    -- RECIEVER
+    -- 
+    -->
     <div class="recieve-item p-3">
       <div class="d-flex justify-content-between">
         <SparrowAIIcon height={"20px"} width={"20px"} />
         <div class="d-flex gap-1 pb-2">
           {#if status}
+            <!--
+            -- 
+            -- LIKE / DISLIKE
+            -- 
+            -->
             <Tooltip placement="top" title="Like" distance={13}>
               <span
                 role="button"
@@ -231,6 +270,11 @@
         </div>
       {/if}
       <div class="d-flex gap-1">
+        <!--
+        -- 
+        -- REGENERATE / COPY
+        -- 
+        -->
         {#if isLastRecieverMessage}
           <Tooltip placement="top" title="Regenerate" distance={13}>
             <button
