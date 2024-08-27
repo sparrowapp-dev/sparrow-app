@@ -16,6 +16,8 @@ const constants = {
   RELEASE_NOTES_PAT_TOKEN: import.meta.env.VITE_RELEASE_NOTES_PAT_TOKEN,
   RELEASE_NOTES_API: import.meta.env.VITE_RELEASE_NOTES_API,
   AZURE_CDN_URL: import.meta.env.VITE_AZURE_CDN_URL,
+  AZURE_INSIGHTS_CONNECTION_STRING: import.meta.env
+    .VITE_AZURE_INSIGHTS_CONNECTION_STRING,
 };
 
 export default constants;
