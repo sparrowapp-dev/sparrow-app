@@ -576,7 +576,7 @@ export class TabRepository {
 
   public updateTabByMongoId = async (
     _mongoId: string,
-    tab: Tab,
+    tab: Partial<Tab>,
   ): Promise<void> => {
     const query = await this.rxdb
       ?.findOne({
