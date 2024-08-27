@@ -31,7 +31,7 @@
 <div
   class="{isMainScreen
     ? 'pt-5 pb-3'
-    : ''} response-default h-100 d-flex flex-column justify-content-between align-items-center"
+    : ''} response-default h-100 d-flex flex-column justify-content-between align-items-center overflow-show-on-hover"
 >
   <div class="">
     <div class="d-flex align-items-center flex-column justify-content-center">
@@ -111,5 +111,16 @@
 <style>
   .cursor-pointer {
     cursor: pointer;
+  }
+
+  .overflow-show-on-hover {
+    overflow-y: hidden;
+    transition: overflow 0.3s ease-in-out;
+    padding-right: 10px;
+  }
+
+  .overflow-show-on-hover:hover {
+    padding-right: 0;
+    overflow-y: auto;
   }
 </style>
