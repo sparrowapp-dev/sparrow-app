@@ -152,8 +152,12 @@ export default class CollectionsViewModel {
   /**
    * Return current tabs list of top tab bar component
    */
-  get tabs() {
+  public tabs() {
     return this.tabRepository.getTabList();
+  }
+  public getTabListWithWorkspaceId(workspaceId: string) {
+    // debugger;
+    return this.tabRepository.getTabListWithWorkspaceId(workspaceId);
   }
 
   /**
@@ -179,8 +183,8 @@ export default class CollectionsViewModel {
    * Get active tab(if any)
    * @returns :Observable<any> | undefined - active tab
    */
-  public getActiveTab = () => {
-    return this.tabRepository.getTab();
+  public getActiveTab = (workspaceId: string) => {
+    return this.tabRepository.getTabWithWorkspaceId(workspaceId);
   };
 
   /**
@@ -455,16 +459,7 @@ export default class CollectionsViewModel {
    * @param _id :string - if of the tab
    */
   public updateTab = async (_id: string, data: Partial<Tab>) => {
-    this.tabRepository
-      .getTabList()
-      .subscribe((tabs) => {
-        tabs.forEach((tab) => {
-          if (tab.id === _id) {
-            this.tabRepository.updateTab(tab.tabId, data);
-          }
-        });
-      })
-      .unsubscribe();
+    this.tabRepository.updateTabByMongoId(_id, data);
   };
 
   /**

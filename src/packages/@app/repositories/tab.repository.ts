@@ -21,7 +21,22 @@ export class TabRepository {
    * console.log('Retrieved tab documents:', tabDocuments);
    */
   public getDocuments = async (): Promise<TabDocument[]> => {
-    return await this.rxdb?.find().sort({ index: "asc" }).exec();
+    const activeWorkspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          isActiveWorkspace: true,
+        },
+      })
+      .exec();
+    const workspaceId = activeWorkspace.toMutableJSON()._id;
+    return await this.rxdb
+      ?.find({
+        selector: {
+          "path.workspaceId": workspaceId,
+        },
+      })
+      .sort({ index: "asc" })
+      .exec();
   };
 
   /**
@@ -45,21 +60,38 @@ export class TabRepository {
    * };
    * await createTab(newTab);
    */
-  public createTab = async (tab: any): Promise<void> => {
+  public createTab = async (tab: any, wsId = ""): Promise<void> => {
+    let workspaceId;
+    if (wsId) {
+      workspaceId = wsId;
+    } else {
+      const activeWorkspace = await RxDB.getInstance()
+        .rxdb.workspace.findOne({
+          selector: {
+            isActiveWorkspace: true,
+          },
+        })
+        .exec();
+
+      workspaceId = activeWorkspace.toMutableJSON()._id;
+    }
+
     const _tab = await this.rxdb
       ?.findOne({
         selector: {
+          "path.workspaceId": workspaceId,
           id: tab.id,
         },
       })
       .exec();
     if (_tab) {
-      await this.activeTab(tab.id);
+      await this.activeTab(tab.id, workspaceId);
       return;
     }
     const activeTab = await this.rxdb
       ?.findOne({
         selector: {
+          "path.workspaceId": workspaceId,
           isActive: true,
         },
       })
@@ -67,7 +99,15 @@ export class TabRepository {
     if (activeTab) {
       await activeTab.incrementalUpdate({ $set: { isActive: false } });
     }
-    const lastIndex = (await this.rxdb?.find().exec())?.length;
+    const lastIndex = (
+      await this.rxdb
+        ?.find({
+          selector: {
+            "path.workspaceId": workspaceId,
+          },
+        })
+        .exec()
+    )?.length;
     tab.index = lastIndex;
     await this.rxdb?.insert(tab);
   };
@@ -89,6 +129,14 @@ export class TabRepository {
    * await removeTab(tabIdToRemove);
    */
   public removeTab = async (id: string): Promise<void> => {
+    const activeWorkspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          isActiveWorkspace: true,
+        },
+      })
+      .exec();
+    const workspaceId = activeWorkspace.toMutableJSON()._id;
     const doc = await this.getDocuments();
     for (let i = 0; i < doc.length; i++) {
       if (doc[i].get("id") === id) {
@@ -102,6 +150,7 @@ export class TabRepository {
     const selectedTab = await this.rxdb
       ?.findOne({
         selector: {
+          "path.workspaceId": workspaceId,
           id,
         },
       })
@@ -133,10 +182,24 @@ export class TabRepository {
    * const tabIdToActivate = 'tab3';
    * await activeTab(tabIdToActivate);
    */
-  public activeTab = async (id: string): Promise<void> => {
+  public activeTab = async (id: string, wsId = ""): Promise<void> => {
+    let workspaceId: string;
+    if (wsId) {
+      workspaceId = wsId;
+    } else {
+      const activeWorkspace = await RxDB.getInstance()
+        .rxdb.workspace.findOne({
+          selector: {
+            isActiveWorkspace: true,
+          },
+        })
+        .exec();
+      workspaceId = activeWorkspace.toMutableJSON()._id;
+    }
     const deselectedTab = await this.rxdb
       ?.findOne({
         selector: {
+          "path.workspaceId": workspaceId,
           isActive: true,
         },
       })
@@ -148,6 +211,7 @@ export class TabRepository {
     const selectedTab = await this.rxdb
       ?.findOne({
         selector: {
+          "path.workspaceId": workspaceId,
           id,
         },
       })
@@ -180,6 +244,17 @@ export class TabRepository {
     }).$;
   };
 
+  public getTabWithWorkspaceId = (
+    workspaceId: string,
+  ): Observable<TabDocument> => {
+    return this.rxdb?.findOne({
+      selector: {
+        "path.workspaceId": workspaceId,
+        isActive: true,
+      },
+    }).$;
+  };
+
   /**
    * Retrieves a list of all tab documents as an observable, sorted in ascending order by index.
    *
@@ -197,6 +272,18 @@ export class TabRepository {
    */
   public getTabList = (): Observable<TabDocument[]> => {
     return this.rxdb?.find().sort({ index: "asc" }).$;
+  };
+
+  public getTabListWithWorkspaceId = (
+    workspaceId: string,
+  ): Observable<TabDocument[]> => {
+    return this.rxdb
+      ?.find({
+        selector: {
+          "path.workspaceId": workspaceId,
+        },
+      })
+      .sort({ index: "asc" }).$;
   };
 
   /**
@@ -473,6 +560,22 @@ export class TabRepository {
       ?.findOne({
         selector: {
           tabId,
+        },
+      })
+      .exec();
+    await query.incrementalModify((value: Tab) => {
+      return { ...value, ...tab };
+    });
+  };
+
+  public updateTabByMongoId = async (
+    _mongoId: string,
+    tab: Tab,
+  ): Promise<void> => {
+    const query = await this.rxdb
+      ?.findOne({
+        selector: {
+          id: _mongoId,
         },
       })
       .exec();

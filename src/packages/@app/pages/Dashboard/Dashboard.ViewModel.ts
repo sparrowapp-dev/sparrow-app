@@ -32,6 +32,7 @@ import type { Observable } from "rxjs";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums";
 import { AiAssistantWebSocketService } from "@app/services/ai-assistant.ws.service";
+import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
 
 export class DashboardViewModel {
   constructor() {}
@@ -366,6 +367,10 @@ export class DashboardViewModel {
         }
       });
       await this.workspaceRepository.setActiveWorkspace(res._id);
+      const initWorkspaceTab = new InitWorkspaceTab(res._id, res._id);
+      initWorkspaceTab.updateName(res.name);
+      this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
+      navigate("/dashboard/collections");
       notifications.success("New Workspace Created");
     } else {
       notifications.error(response?.message);
@@ -380,7 +385,14 @@ export class DashboardViewModel {
    * @param id - Workspace id
    */
   public handleSwitchWorkspace = async (id: string) => {
+    if (!id) return;
+    const ws = await this.workspaceRepository.readWorkspace(id);
+    if (!ws) return;
     await this.workspaceRepository.setActiveWorkspace(id);
+
+    const initWorkspaceTab = new InitWorkspaceTab(id, id);
+    initWorkspaceTab.updateName(ws.name);
+    this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
     navigate("/dashboard/collections");
   };
 
