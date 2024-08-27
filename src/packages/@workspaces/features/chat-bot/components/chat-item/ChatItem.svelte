@@ -2,7 +2,8 @@
   import { onDestroy } from "svelte";
   import { marked } from "marked";
   import { notifications } from "@library/ui/toast/Toast";
-  import { copyIcon, tickIcon } from "../../assests";
+  import { copyIcon } from "../../assests";
+  import tickIcon from "../../assests/tick.png";
   import { tick } from "svelte";
 
   import hljs from "highlight.js";
@@ -56,9 +57,7 @@
       <div class="code-header bg-tertiary-300 ps-3 pe-2 py-1 d-flex align-items-center justify-content-between">
         <span>${lang?.split("-")[1] ?? ""}</span>
         <button role="button" class="position-relative copy-code-${messageId} action-button copy-code-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
-          <img src="${showMyTickIcon[index] ? tickIcon : copyIcon}" class="${
-            showMyTickIcon[index] ? "tick-icon" : ""
-          }" id="${index}">
+          <img src="${copyIcon}" id="${index}">
           <button class="copy-code-tooltip z-1 d-flex align-items-center justify-content-center position-absolute invisible text-fs-12">Copy
             <div class="copy-code-tooltip-square"></div>
           </button>
@@ -76,18 +75,36 @@
   };
 
   const handleCopyCode = async (event: MouseEvent) => {
-    // const id = (event.target as HTMLElement).id;
-    // const targetElement = event.target as HTMLElement;
-    // console.log("target", targetElement);
-    // const parentElement = targetElement.parentElement;
-    // const firstChild = targetElement.children[0];
-    // const tagName = targetElement.tagName;
-    // console.log("firstChild", firstChild);
-    // console.log("parentElement", parentElement);
-    // console.log("Tag name:", tagName);
-    // if(tagName === "IMG") {
-    //   parentElement
-    // }
+    const id = (event.target as HTMLElement).id;
+    const targetElement = event.target as
+      | HTMLImageElement
+      | HTMLButtonElement
+      | any;
+    console.log("target", targetElement);
+    const parentElement = targetElement.parentElement;
+    const firstChild = targetElement.children[0];
+    const tagName = targetElement.tagName;
+    console.log("firstChild", firstChild);
+    console.log("parentElement", parentElement);
+    console.log("Tag name:", tagName);
+    if (tagName === "IMG" && parentElement) {
+      const originalSrc = targetElement?.src;
+      targetElement.src = tickIcon;
+      targetElement.classList.add("tick-icon");
+      setTimeout(() => {
+        targetElement.src = originalSrc;
+        targetElement.classList.remove("tick-icon");
+      }, 5000);
+    }
+    if (tagName === "BUTTON" && firstChild) {
+      const originalSrc = firstChild?.src;
+      firstChild.src = tickIcon;
+      firstChild.classList.add("tick-icon");
+      setTimeout(() => {
+        firstChild.src = originalSrc;
+        firstChild.classList.remove("tick-icon");
+      }, 5000);
+    }
     const target = (event.target as HTMLElement).closest(
       ".wrapper",
     ) as HTMLElement | null;
@@ -100,13 +117,6 @@
         try {
           await navigator.clipboard.writeText(code);
           notifications.success("Code copied to clipboard!");
-          // if (id) {
-          //   showMyTickIcon[id] = true;
-          //   await tick();
-          //   setTimeout(() => {
-          //     showMyTickIcon[id] = false;
-          //   }, 5000);
-          // }
         } catch (err) {
           console.error("Failed to copy code: ", err);
         }
@@ -299,6 +309,11 @@
     background-color: var(--bg-danger-1200);
     border: 0.2px solid var(--border-danger-200);
   }
+
+  :global(.tick-icon) {
+    height: 16px;
+  }
+
   :global(.copy-code-tooltip) {
     transition: 0.3s ease;
     font-weight: 400;
