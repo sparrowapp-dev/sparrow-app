@@ -158,8 +158,8 @@
   isOpen={isEnvironmentPopup}
   handleModalState={handleEnvironmentPopUpCancel}
 >
-  <div class="text-lightGray mb-1 sparrow-fs-14 text-fs-14">
-    <p style="font-weight: 400;">
+  <div class="text-lightGray mb-1 sparrow-fs-14">
+    <p style="font-weight: 400;" class="text-fs-14">
       Are you sure you want to delete this Environment? <span
         style="font-weight:700;"
         class="">"{env.name}"</span
