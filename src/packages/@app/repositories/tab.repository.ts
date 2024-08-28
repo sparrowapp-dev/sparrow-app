@@ -231,6 +231,42 @@ export class TabRepository {
   };
 
   /**
+   * reorder the tabs on drag and drop
+   * @param startIndex - denotes index from which element removed
+   * @param endIndex - denotes index at which element pushed
+   */
+  public rearrangeTab = async (startIndex: number, endIndex: number) => {
+    const activeWorkspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          isActiveWorkspace: true,
+        },
+      })
+      .exec();
+    const workspaceId = activeWorkspace.toMutableJSON()._id;
+
+    const tabDocuments = await this.rxdb
+      ?.find({
+        selector: {
+          "path.workspaceId": workspaceId,
+        },
+      })
+      .sort({ index: "asc" })
+      .exec();
+    // removes the element
+    const element = tabDocuments.splice(startIndex, 1)[0];
+    // pushes the element
+    tabDocuments.splice(endIndex, 0, element);
+    const response = tabDocuments.map((tab: TabDocument, index: number) => {
+      const res = tab.toMutableJSON();
+      // refreshing indexes
+      res.index = index;
+      return res;
+    });
+    await this.rxdb.bulkUpsert(response);
+  };
+
+  /**
    * Retrieves a list of all tab documents as an observable, sorted in ascending order by index.
    *
    * This function retrieves all tab documents from the RxDB database and returns them as an observable.
@@ -256,7 +292,7 @@ export class TabRepository {
   public getTabListWithWorkspaceId = (
     workspaceId: string,
   ): Observable<TabDocument[]> => {
-    const test = this.rxdb
+    this.rxdb
       ?.find({
         selector: {
           "path.workspaceId": workspaceId,

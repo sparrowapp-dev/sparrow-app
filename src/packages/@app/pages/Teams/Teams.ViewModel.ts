@@ -143,12 +143,12 @@ export class TeamsViewModel {
    * @param id - Workspace id
    */
   public handleSwitchWorkspace = async (id: string) => {
-    await this.workspaceRepository.setActiveWorkspace(id);
     const res = await this.workspaceRepository.readWorkspace(id);
     const initWorkspaceTab = new InitWorkspaceTab(id, id);
     initWorkspaceTab.updateId(id);
     initWorkspaceTab.updateName(res.name);
-    this.tabRepository.createTab(initWorkspaceTab.getValue());
+    await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
+    await this.workspaceRepository.setActiveWorkspace(id);
     navigate("/dashboard/collections");
   };
 
@@ -164,8 +164,9 @@ export class TeamsViewModel {
    * Switch to latest tab on Api Click
    * @param id - Api id
    */
-  public handleApiClick = (api: any): void => {
-    this.tabRepository.activeTab(api.id);
+  public handleApiClick = async (api: any): void => {
+    await this.tabRepository.activeTab(api.id, api.path.workspaceId);
+    await this.workspaceRepository.setActiveWorkspace(api.path.workspaceId);
     moveNavigation("right");
     navigate("/dashboard/collections");
   };
