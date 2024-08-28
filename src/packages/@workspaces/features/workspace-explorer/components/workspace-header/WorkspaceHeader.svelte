@@ -57,11 +57,11 @@
 <section>
   <div
     class="About d-flex flex-column h-100"
-    style="padding:24px; gap:16px !important; "
+    style="padding-bottom:24px; gap:16px !important; "
   >
     <div class="d-flex" style="justify-content: space-between;">
       <div
-        class="ellipsis"
+        class="ellipsis w-100"
         style="font-weight: 700; font-size:18px; color:var(--text-secondary-100);"
       >
         <input
@@ -89,7 +89,7 @@
         />
       </div>
       {#if userRole === WorkspaceRole.WORKSPACE_ADMIN}
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 ms-3">
           <Button
             type={"dark"}
             title={"Delete Workspace"}
@@ -115,3 +115,13 @@
     </div>
   </div>
 </section>
+
+<style>
+  input {
+    outline: none;
+    border: 1px solid transparent !important;
+  }
+  input:focus {
+    border: 1px solid var(--border-primary-300) !important;
+  }
+</style>
