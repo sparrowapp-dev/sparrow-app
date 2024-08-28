@@ -7,7 +7,12 @@ import {
   ReduceAuthParameter,
 } from "@workspaces/features/rest-explorer/utils";
 import { createDeepCopy, moveNavigation } from "$lib/utils/helpers";
-import { CompareArray, Debounce, InitRequestTab } from "@common/utils";
+import {
+  CompareArray,
+  Debounce,
+  InitRequestTab,
+  MarkdownFormatter,
+} from "@common/utils";
 
 // ---- DB
 import type {
@@ -1894,7 +1899,7 @@ class RestExplorerViewModel
     return response;
   };
 
-  /**
+  /*
    * Generates stream wise an AI response based on the given prompt.
    *
    * @param prompt - The prompt to send to the AI assistant service.
@@ -2007,14 +2012,20 @@ class RestExplorerViewModel
       instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown.`,
     });
     if (response.isSuccessful) {
-      await this.updateRequestDescription(response.data.data.result);
+      const formatter = new MarkdownFormatter();
+      const formattedData = await formatter.FormatData(
+        response.data.data.result,
+      );
+      const stringifyData = JSON.stringify(formattedData.blocks);
+      await this.updateRequestDescription(stringifyData);
       await this.updateRequestState({
         isDocAlreadyGenerated: true,
       });
     }
-
-    await this.updateRequestState({ isDocGenerating: false });
-    return response;
+    setTimeout(async () => {
+      // renders response before disabling the editor
+      await this.updateRequestState({ isDocGenerating: false });
+    }, 1000);
   };
 
   /**

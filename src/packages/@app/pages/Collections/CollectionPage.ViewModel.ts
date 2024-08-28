@@ -1,7 +1,6 @@
 import type {
   CollectionDocument,
   EnvironmentDocument,
-  TabDocument,
   WorkspaceDocument,
 } from "@app/database/database";
 
@@ -156,7 +155,6 @@ export default class CollectionsViewModel {
     return this.tabRepository.getTabList();
   }
   public getTabListWithWorkspaceId(workspaceId: string) {
-    // debugger;
     return this.tabRepository.getTabListWithWorkspaceId(workspaceId);
   }
 
@@ -254,26 +252,10 @@ export default class CollectionsViewModel {
    */
   public onDropEvent = (event: Event) => {
     event.preventDefault();
-    // TODO - Parse this.tabs observable to RxDoc (Remove these code)
-    const tabList = this.tabs;
-    /////////////////////////////////////////////////////////////////////
-    let updatedTabList: TabDocument[] = [];
-    tabList
-      .subscribe((value) => {
-        updatedTabList = value;
-      })
-      .unsubscribe();
-    const element = updatedTabList.splice(this.movedTabStartIndex, 1);
-    updatedTabList.splice(this.movedTabEndIndex, 0, element[0]);
-    updatedTabList = updatedTabList.map((tab, index) => {
-      tab.patch({
-        index: index,
-      });
-      return tab;
-    });
-    updatedTabList.sort((a, b) => {
-      return (b.index as number) - (a.index as number);
-    });
+    this.tabRepository.rearrangeTab(
+      this.movedTabStartIndex,
+      this.movedTabEndIndex,
+    );
   };
 
   /**

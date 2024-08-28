@@ -12,6 +12,7 @@
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "$lib/utils/animations";
 
+  import { onDestroy } from "svelte";
   // ---- Components
   import {
     RestExplorerPage,
@@ -249,10 +250,6 @@
     leftPanelCollapse.set(!$leftPanelCollapse);
   };
 
-  // Rerender animation on tab switch
-  let prevTabId: string = "";
-  let tabPath: Path;
-
   let scrollList;
 
   let githubRepoData: GithubRepoDocType;
@@ -280,22 +277,12 @@
   let activeTab;
   let prevWorkspaceId = "";
   let count = 0;
-  currentWorkspace.subscribe((value) => {
+  const cw = currentWorkspace.subscribe((value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
         _viewModel.fetchCollections(value?._id);
-        // tabList = _viewModel.tabs;
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
-        activeTab?.subscribe((value: TabDocument) => {
-          if (value) {
-            if (prevTabId !== value.tabId) {
-              tabPath = value.path;
-              tabPath["requestId"] = value.id;
-            }
-            prevTabId = value.tabId;
-          } else tabPath = {};
-        });
       }
       prevWorkspaceId = value._id;
       if (count == 0) {
@@ -321,6 +308,10 @@
       splitter.style.display = "unset";
     }
   }
+
+  onDestroy(() => {
+    cw.unsubscribe();
+  });
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -465,10 +456,7 @@
   onSave={handlePopupSave}
   onCancel={handleClosePopupBackdrop}
   onDiscard={handlePopupDiscard}
-  isSaveDisabled={!hasWorkpaceLevelPermission(
-    WorkspaceRole.WORKSPACE_ADMIN,
-    workspaceLevelPermissions.SAVE_REQUEST,
-  )}
+  isSaveDisabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
   {loader}
   {isGuestUser}
 />

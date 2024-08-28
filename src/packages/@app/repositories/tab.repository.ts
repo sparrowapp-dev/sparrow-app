@@ -8,38 +8,6 @@ export class TabRepository {
   constructor() {}
 
   /**
-   * Retrieves all tab documents from the RxDB database.
-   *
-   * This function retrieves all tab documents from the RxDB database, sorted in ascending order
-   * by their `index` property.
-   *
-   * @returns {Promise<TabDocument[]>} - A promise that resolves with an array of all tab documents.
-   *
-   * @example
-   * // Example usage:
-   * const tabDocuments = await getDocuments();
-   * console.log('Retrieved tab documents:', tabDocuments);
-   */
-  public getDocuments = async (): Promise<TabDocument[]> => {
-    const activeWorkspace = await RxDB.getInstance()
-      .rxdb.workspace.findOne({
-        selector: {
-          isActiveWorkspace: true,
-        },
-      })
-      .exec();
-    const workspaceId = activeWorkspace.toMutableJSON()._id;
-    return await this.rxdb
-      ?.find({
-        selector: {
-          "path.workspaceId": workspaceId,
-        },
-      })
-      .sort({ index: "asc" })
-      .exec();
-  };
-
-  /**
    * Creates a new tab document in the RxDB database.
    *
    * This function checks if a tab with the provided `id` already exists in the database.
@@ -137,7 +105,14 @@ export class TabRepository {
       })
       .exec();
     const workspaceId = activeWorkspace.toMutableJSON()._id;
-    const doc = await this.getDocuments();
+    const doc = await this.rxdb
+      ?.find({
+        selector: {
+          "path.workspaceId": workspaceId,
+        },
+      })
+      .sort({ index: "asc" })
+      .exec();
     for (let i = 0; i < doc.length; i++) {
       if (doc[i].get("id") === id) {
         if (doc[i + 1]) {
@@ -256,6 +231,42 @@ export class TabRepository {
   };
 
   /**
+   * reorder the tabs on drag and drop
+   * @param startIndex - denotes index from which element removed
+   * @param endIndex - denotes index at which element pushed
+   */
+  public rearrangeTab = async (startIndex: number, endIndex: number) => {
+    const activeWorkspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          isActiveWorkspace: true,
+        },
+      })
+      .exec();
+    const workspaceId = activeWorkspace.toMutableJSON()._id;
+
+    const tabDocuments = await this.rxdb
+      ?.find({
+        selector: {
+          "path.workspaceId": workspaceId,
+        },
+      })
+      .sort({ index: "asc" })
+      .exec();
+    // removes the element
+    const element = tabDocuments.splice(startIndex, 1)[0];
+    // pushes the element
+    tabDocuments.splice(endIndex, 0, element);
+    const response = tabDocuments.map((tab: TabDocument, index: number) => {
+      const res = tab.toMutableJSON();
+      // refreshing indexes
+      res.index = index;
+      return res;
+    });
+    await this.rxdb.bulkUpsert(response);
+  };
+
+  /**
    * Retrieves a list of all tab documents as an observable, sorted in ascending order by index.
    *
    * This function retrieves all tab documents from the RxDB database and returns them as an observable.
@@ -274,9 +285,37 @@ export class TabRepository {
     return this.rxdb?.find().sort({ index: "asc" }).$;
   };
 
+  /**
+   * Retrieves a list of all tab documents as an observable by workspaceId, sorted in ascending order by index.
+   * @param workspaceId - workspaceId
+   */
   public getTabListWithWorkspaceId = (
     workspaceId: string,
   ): Observable<TabDocument[]> => {
+    this.rxdb
+      ?.find({
+        selector: {
+          "path.workspaceId": workspaceId,
+        },
+      })
+      .exec()
+      .then((tabs: Tab[]) => {
+        // elects a new active tab if no tabs is active
+        if (tabs?.length > 0) {
+          let activeTabsCount = 0;
+          let nextElectedTabId = "";
+          tabs.forEach((tab: Tab, index: number) => {
+            if (!index) {
+              nextElectedTabId = tab.tabId;
+            }
+            if (tab.isActive) activeTabsCount++;
+          });
+          if (!activeTabsCount) {
+            this.updateTab(nextElectedTabId, { isActive: true });
+          }
+        }
+      });
+
     return this.rxdb
       ?.find({
         selector: {
@@ -555,7 +594,10 @@ export class TabRepository {
    * };
    * await updateTab(tabId, updatedProperties);
    */
-  public updateTab = async (tabId: string, tab: Tab): Promise<void> => {
+  public updateTab = async (
+    tabId: string,
+    tab: Partial<Tab>,
+  ): Promise<void> => {
     const query = await this.rxdb
       ?.findOne({
         selector: {
@@ -570,7 +612,7 @@ export class TabRepository {
 
   public updateTabByMongoId = async (
     _mongoId: string,
-    tab: Tab,
+    tab: Partial<Tab>,
   ): Promise<void> => {
     const query = await this.rxdb
       ?.findOne({
