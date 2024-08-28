@@ -365,10 +365,10 @@ export class DashboardViewModel {
           await this.refreshWorkspaces(value._id);
         }
       });
-      await this.workspaceRepository.setActiveWorkspace(res._id);
       const initWorkspaceTab = new InitWorkspaceTab(res._id, res._id);
       initWorkspaceTab.updateName(res.name);
-      this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
+      await this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
+      await this.workspaceRepository.setActiveWorkspace(res._id);
       navigate("/dashboard/collections");
       notifications.success("New Workspace Created");
     } else {
@@ -387,11 +387,11 @@ export class DashboardViewModel {
     if (!id) return;
     const ws = await this.workspaceRepository.readWorkspace(id);
     if (!ws) return;
-    await this.workspaceRepository.setActiveWorkspace(id);
 
     const initWorkspaceTab = new InitWorkspaceTab(id, id);
     initWorkspaceTab.updateName(ws.name);
-    this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
+    await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
+    await this.workspaceRepository.setActiveWorkspace(id);
     navigate("/dashboard/collections");
   };
 
