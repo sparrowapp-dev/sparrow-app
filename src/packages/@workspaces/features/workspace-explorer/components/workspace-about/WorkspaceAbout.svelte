@@ -39,7 +39,6 @@
       value={workspaceDescription || ""}
       placeholder="This is your personal workspace. Describe the objectives of the workspace and how it is meant to be used. Or create a comprehensive API documentation by including links to your collections and requests. Start typing."
       on:blur={(event) => {
-        console.log(workspaceDescription, event.target.value);
         if (workspaceDescription !== event.target.value) {
           onUpdateWorkspaceDescription(workspaceID, event.target.value);
         }
@@ -51,7 +50,7 @@
 <style>
   textarea {
     outline: none;
-    height: calc(100% - 10px);
+    height: 300px;
     border: 1px solid transparent !important;
   }
   textarea:focus,
