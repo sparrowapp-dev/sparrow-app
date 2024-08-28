@@ -1,6 +1,8 @@
+import { user } from "$lib/store";
 import { Events } from "$lib/utils/enums";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { ReleaseRepository } from "@app/repositories/release.repository";
+import { CannyIoService } from "@app/services/canny-io";
 import { FeedbackService } from "@app/services/feedback.service";
 import { ReleaseService } from "@app/services/release.service";
 import { notifications } from "@library/ui/toast/Toast";
@@ -10,6 +12,7 @@ import { open } from "@tauri-apps/plugin-shell";
 
 class HelpPageViewModel {
   // Private Services
+  private cannyService = new CannyIoService();
   private feedbackService = new FeedbackService();
   private releaseService = new ReleaseService();
   private releaseRepository = new ReleaseRepository();
@@ -124,6 +127,54 @@ class HelpPageViewModel {
         return value.toMutableJSON();
       })
       .reverse();
+    return response;
+  };
+
+  /**
+   * Creates a user in canny service .
+   *
+   * @returns Promise<any[]> with the authorID.
+   */
+  public createUser = async () => {
+    let userInfo;
+    await user.subscribe((value) => {
+      userInfo = value;
+    });
+    const response = await this.cannyService.createUser({
+      name: userInfo?.name,
+      email: userInfo?.email,
+      userID: userInfo?._id,
+    });
+    return response;
+  };
+
+  /**
+   * Retrieves the list of boards from the Canny dashboard.
+   *
+   * @returns {Promise<Object>} The response from the Canny service containing boards list.
+   */
+  public RetrieveBoards = async () => {
+    const response = await this.cannyService.fetchBoards();
+    return response;
+  };
+
+  /**
+   * Creates a post on the feedback board retrieved from Canny service with the given title and description.
+   *
+   * @param  title - The title of the post.
+   * @param  description - The description of the post.
+   * @returns Promise<Object> The response from the Canny service after creating the post.
+   */
+  public createPost = async (title: string, description: string) => {
+    const res = await this.createUser();
+    const boards = await this.RetrieveBoards();
+    const boardID = boards?.data?.boards[0]?.id;
+    const response = await this.cannyService.createPost({
+      boardID: boardID,
+      title: title,
+      details: description,
+      authorID: res?.data?.id,
+    });
     return response;
   };
 }

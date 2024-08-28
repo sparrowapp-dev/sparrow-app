@@ -2,6 +2,7 @@
   import {
     AddFeedback,
     DiscordCard,
+    FeedbackSection,
     FeedbackToast,
     ReleaseNotes,
   } from "@support/features";
@@ -15,7 +16,7 @@
 
   document.addEventListener("contextmenu", (event) => event.preventDefault());
 
-  let activeTab = "feeback";
+  let activeTab = "feedback";
 
   function setActiveTab(tab) {
     if (tab !== "faq") {
@@ -51,12 +52,12 @@
         >
           Feedback
         </div>
-        <div
+        <!-- <div
           class="tab {activeTab === 'updates' ? 'active' : ''}"
           on:click={() => setActiveTab("updates")}
         >
           Updates
-        </div>
+        </div> -->
       </div>
       <!--
         -- Help Body 
@@ -71,13 +72,14 @@
         >
           <div class="h-100 pe-2" style="overflow:auto;">
             {#if activeTab === "feedback"}
-              <FeedbackToast />
-              <DiscordPost />
+              <!-- <FeedbackToast />
+              <DiscordPost /> -->
+              <FeedbackSection onInputFeedback={_viewModel.createPost} />
             {:else if activeTab === "updates"}
-              <ReleaseNotes
+              <!-- <ReleaseNotes
                 {releaseNotesData}
                 onLearnMore={_viewModel.learnMore}
-              />
+              /> -->
             {/if}
           </div>
         </div>
@@ -85,6 +87,7 @@
           <div class="h-100 pe-2" style="overflow:auto;">
             <div>
               <AddFeedback
+                onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
                 onSendFeedback={_viewModel.sendFeedback}
               />
