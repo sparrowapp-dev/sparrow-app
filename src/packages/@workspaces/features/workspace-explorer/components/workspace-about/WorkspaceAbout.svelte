@@ -54,7 +54,8 @@
     height: calc(100% - 10px);
     border: 1px solid transparent !important;
   }
-  textarea:focus {
+  textarea:focus,
+  textarea:hover {
     border: 1px solid var(--border-primary-300) !important;
   }
 </style>

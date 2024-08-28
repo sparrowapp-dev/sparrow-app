@@ -62,7 +62,7 @@
     <div class="d-flex" style="justify-content: space-between;">
       <div
         class="ellipsis w-100"
-        style="font-weight: 700; font-size:18px; color:var(--text-secondary-100);"
+        style="font-weight: 700; color:var(--text-secondary-100);"
       >
         <input
           on:blur={(event) => {
@@ -84,7 +84,7 @@
           id="renameInputFieldWorkspace"
           value={workspaceName}
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          class="bg-transparent input-outline border-0 text-left w-100 ps-2 py-0 fs-5"
+          class="bg-transparent input-outline border-0 text-fs-18 text-left w-100 ps-2 py-0"
           maxlength={100}
         />
       </div>
@@ -121,7 +121,8 @@
     outline: none;
     border: 1px solid transparent !important;
   }
-  input:focus {
+  input:focus,
+  input:hover {
     border: 1px solid var(--border-primary-300) !important;
   }
 </style>
