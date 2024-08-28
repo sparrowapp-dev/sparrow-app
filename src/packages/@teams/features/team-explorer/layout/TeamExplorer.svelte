@@ -95,8 +95,7 @@
    */
   export let isGuestUser = false;
 
-
-   export let onAddMember;
+  export let onAddMember;
 
   let selectedView: string = "Grid";
 
@@ -156,8 +155,11 @@
     }
   }
 
-  const handleCreateNewWorkspace = () => {
-    onCreateWorkspace(openTeam.teamId);
+  let isWorkspaceCreationInProgress = false;
+  const handleCreateNewWorkspace = async () => {
+    isWorkspaceCreationInProgress = true;
+    await onCreateWorkspace(openTeam.teamId);
+    isWorkspaceCreationInProgress = false;
   };
 
   let searchQuery = "";
@@ -288,8 +290,11 @@
                 textStyleProp={"font-size: var(--small-text)"}
                 buttonClassProp={`my-auto ms-4`}
                 buttonStyleProp={`height: 30px;`}
-                onClick={handleCreateNewWorkspace}
-                disable={isGuestUser}
+                onClick={async () => {
+                  await handleCreateNewWorkspace();
+                }}
+                loader={isWorkspaceCreationInProgress}
+                disable={isGuestUser || isWorkspaceCreationInProgress}
               />
             {/if}
           </div>
@@ -376,7 +381,7 @@
             <div style="flex:1; overflow:auto;">
               {#if selectedView === TeamViewEnum.LIST}
                 <WorkspaceListView
-                {onAddMember}
+                  {onAddMember}
                   bind:isGuestUser
                   {searchQuery}
                   {openTeam}
@@ -393,7 +398,7 @@
                 />
               {:else if selectedView == TeamViewEnum.GRID}
                 <WorkspaceGridView
-                {onAddMember}
+                  {onAddMember}
                   bind:isGuestUser
                   {onDeleteWorkspace}
                   {searchQuery}
@@ -405,6 +410,7 @@
                   }) || []}
                   onCreateNewWorkspace={handleCreateNewWorkspace}
                   {onSwitchWorkspace}
+                  bind:isWorkspaceCreationInProgress
                   isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
                     userRole === TeamRole.TEAM_OWNER}
                 />

@@ -106,7 +106,7 @@
       name: currentWorkspaceName,
       description: currentTeamName,
     });
-    const res = createSetFromArray(workspaces, "name");
+    const res = createSetFromArray(workspaces, "id");
     if (res.length > constants.WORKSPACE_LIMIT) {
       res.shift();
     }
@@ -115,7 +115,7 @@
   };
 
   $: {
-    if (currentWorkspaceName || currentTeamName) {
+    if (currentWorkspaceId) {
       calculateLimitedWorkspace();
     }
   }
@@ -208,7 +208,7 @@
             </div>
           </div>
         </Select>
-      {:else}
+      {:else if currentWorkspaceId}
         <Select
           id={"workspace-dropdown"}
           data={workspaceData}

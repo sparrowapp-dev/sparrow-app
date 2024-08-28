@@ -37,6 +37,8 @@
    * Flag to check if user is guest user
    */
   export let isGuestUser = false;
+
+  export let isWorkspaceCreationInProgress = false;
   let workspacePerPage = 5;
   let filterText = "";
   let currPage = 1;
@@ -92,9 +94,15 @@
             <Button
               title="+ Add New Workspace"
               type="other"
+              loader={isWorkspaceCreationInProgress}
+              disable={isWorkspaceCreationInProgress}
               buttonClassProp="sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace"
               buttonStyleProp="min-height: 132px;"
-              onClick={onCreateNewWorkspace}
+              onClick={async () => {
+                isWorkspaceCreationInProgress = true;
+                await onCreateNewWorkspace();
+                isWorkspaceCreationInProgress = false;
+              }}
             />
           {/if}
           {#each paginatedWorkspaces as workspace}
@@ -176,7 +184,7 @@
     background-color: transparent;
   }
   .tab-change {
-    margin-left: 40px;
+    margin-left: 26px;
   }
 
   :global(.add-new-workspace) {
