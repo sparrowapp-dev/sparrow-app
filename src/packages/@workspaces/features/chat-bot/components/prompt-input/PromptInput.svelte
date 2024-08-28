@@ -8,6 +8,16 @@
   export let prompt: string = "";
   export let onUpdateAiPrompt;
   export let isResponseGenerating;
+
+  let isHovered = false;
+
+  function handleMouseEnter() {
+    isHovered = true;
+  }
+
+  function handleMouseLeave() {
+    isHovered = false;
+  }
 </script>
 
 <div class="d-flex prompt-input p-3">
@@ -42,11 +52,15 @@
             MixpanelEvent(Events.AI_Initiate_Response);
           }
         }}
+        on:mouseenter={handleMouseEnter}
+        on:mouseleave={handleMouseLeave}
       >
         <SendIcon
           height={"16px"}
           width={"16px"}
-          color={"var(--icon-secondary-100)"}
+          color={isHovered
+            ? "var(--icon-primary-300)"
+            : "var(--icon-secondary-100)"}
         />
       </div>
     {:else}

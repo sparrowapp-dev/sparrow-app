@@ -157,18 +157,18 @@
                     : false}
                 />
               {/each}
-              {#if isResponseGenerating}
-                <p class="p-3 text-primary-300">
-                  <img src={generatingImage} style="width: 118px;" alt="" />
-                </p>
-              {/if}
             </div>
           {/if}
         </div>
       </div>
     </div>
   </div>
-  <div>
+  <div class="input-parent">
+    {#if conversations?.length && isResponseGenerating}
+      <p class="p-3 text-primary-300 generating-img">
+        <img src={generatingImage} style="width: 118px;" alt="" />
+      </p>
+    {/if}
     <PromptInput
       {prompt}
       {onUpdateAiPrompt}
@@ -206,5 +206,16 @@
   .close-btn:hover {
     cursor: pointer;
     background-color: #37394e;
+  }
+
+  .input-parent {
+    position: relative;
+  }
+
+  .generating-img {
+    position: absolute;
+    top: -70%;
+    background-color: var(--bg-tertiary-750);
+    width: 100%;
   }
 </style>
