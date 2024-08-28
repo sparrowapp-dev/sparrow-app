@@ -18,6 +18,8 @@ const constants = {
   AZURE_CDN_URL: import.meta.env.VITE_AZURE_CDN_URL,
   CANNY_API: import.meta.env.VITE_CANNY_API,
   CANNY_URL: import.meta.env.VITE_CANNY_URL,
+  AZURE_INSIGHTS_CONNECTION_STRING: import.meta.env
+    .VITE_AZURE_INSIGHTS_CONNECTION_STRING,
 };
 
 export default constants;

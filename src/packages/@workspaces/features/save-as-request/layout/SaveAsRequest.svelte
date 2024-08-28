@@ -30,6 +30,7 @@
     WorkspaceIcon,
   } from "@library/icons";
   import { TabTypeEnum } from "@common/types/workspace";
+  import { TextEditor } from "@library/forms";
 
   export let onClick;
   export let onFinish = (id: string) => {};
@@ -68,7 +69,7 @@
   let componentData = {
     path: requestPath,
     name: requestName,
-    description: requestDescription,
+    // description: requestDescription,
     property: {
       request: {
         method: requestMethod,
@@ -87,7 +88,8 @@
   let path: Path[] = [];
 
   let tabName: string;
-  let description: string;
+  // let description: string;
+
   let latestRoute: {
     id: string;
   } = {
@@ -114,12 +116,14 @@
     // Setting save request name and description on load
     if (!componentData.path.workspaceId || !componentData.path.collectionId) {
       tabName = componentData.name;
-      description = componentData.description;
+      // description = componentData.description;
     } else {
       tabName = componentData.name + " Copy";
-      description = componentData.description + " Copy";
+      // description = componentData.description + " Copy";
     }
   });
+
+  // console.log(description, "description");
 
   const getFilteredCollection = async (value: CollectionDocument[]) => {
     const _workspace = await readWorkspace(componentData?.path?.workspaceId);
@@ -176,7 +180,6 @@
   const handleCreateFolder = async (folderName: string): Promise<void> => {
     createDirectoryLoader = true;
     const res = await onCreateFolder(workspaceMeta, path[0].id, folderName);
-    console.log("res", res);
     if (res.status === "success") {
       latestRoute = res.data.latestRoute;
       res.data.addRequestOrFolderInCollection(
@@ -784,14 +787,16 @@
       <p class="api-url">{componentData?.property.request.url}</p>
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>
-    <div class="pb-1">
-      <textarea
-        style="width: 100%; resize:none; border: 1px solid var(--border-secondary-400);"
-        class="py-2 px-3 bg-tertiary-300 border-radius-2 sparrow-fs-12"
-        rows="5"
-        maxlength="1024"
-        placeholder="Give a description to help people know about this request"
-        bind:value={description}
+    <div
+      class="pb-1 bg-tertiary-300"
+      id="editor1"
+      style="width:100%; height:170px ; overflow-y:auto; margin:0px !important; "
+    >
+      <TextEditor
+        placeholder={"Add a description to help people know about this request."}
+        isReadOnly={true}
+        id={"editor1"}
+        value={requestDescription}
       />
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>
@@ -900,7 +905,7 @@
               workspaceMeta,
               path,
               tabName,
-              description,
+              requestDescription,
               type,
             );
             if (res.status === "success") {

@@ -286,7 +286,7 @@ export class TeamExplorerPageViewModel {
       await this.workspaceRepository.setActiveWorkspace(res._id);
       const initWorkspaceTab = new InitWorkspaceTab(res._id, res._id);
       initWorkspaceTab.updateName(res.name);
-      this.tabRepository.createTab(initWorkspaceTab.getValue());
+      this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
       navigate("/dashboard/collections");
       notifications.success("New Workspace Created");
       MixpanelEvent(Events.Create_New_Workspace_TeamPage);
@@ -321,6 +321,7 @@ export class TeamExplorerPageViewModel {
    * @param id - Workspace id
    */
   public handleSwitchWorkspace = async (id: string) => {
+    if (!id) return;
     const prevWorkspace = await this.workspaceRepository.readWorkspace(id);
     if (prevWorkspace?.isNewInvite) {
       await this.handleDisableWorkspaceInviteTag(id);
@@ -330,7 +331,7 @@ export class TeamExplorerPageViewModel {
     const initWorkspaceTab = new InitWorkspaceTab(id, id);
     initWorkspaceTab.updateId(id);
     initWorkspaceTab.updateName(res.name);
-    this.tabRepository.createTab(initWorkspaceTab.getValue());
+    await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
     navigate("/dashboard/collections");
   };
 
@@ -730,8 +731,6 @@ export class TeamExplorerPageViewModel {
     return false;
   };
 
-
-  
   /**
    * Invites users to a workspace.
    * @param _workspaceId current workspace Id.

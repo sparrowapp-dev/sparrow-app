@@ -19,7 +19,6 @@ import {
   type TeamDocument,
   type WorkspaceDocument,
 } from "@app/database/database";
-import { currentMonitor, getCurrent } from "@tauri-apps/api/window";
 import { clearAuthJwt } from "$lib/utils/jwt";
 import { userLogout } from "@app/services/auth.service";
 import { FeatureSwitchService } from "@app/services/feature-switch.service";
@@ -32,6 +31,7 @@ import type { Observable } from "rxjs";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums";
 import { AiAssistantWebSocketService } from "@app/services/ai-assistant.ws.service";
+import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
 
 export class DashboardViewModel {
   constructor() {}
@@ -323,7 +323,7 @@ export class DashboardViewModel {
    * add guest user in local db
    */
   public addGuestUser = async () => {
-    const data = await this.guestUserRepository.insert({
+    await this.guestUserRepository.insert({
       id: uuidv4(),
       name: "guestUser",
       isGuestUser: true,
@@ -366,6 +366,10 @@ export class DashboardViewModel {
         }
       });
       await this.workspaceRepository.setActiveWorkspace(res._id);
+      const initWorkspaceTab = new InitWorkspaceTab(res._id, res._id);
+      initWorkspaceTab.updateName(res.name);
+      this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
+      navigate("/dashboard/collections");
       notifications.success("New Workspace Created");
     } else {
       notifications.error(response?.message);
@@ -380,7 +384,14 @@ export class DashboardViewModel {
    * @param id - Workspace id
    */
   public handleSwitchWorkspace = async (id: string) => {
+    if (!id) return;
+    const ws = await this.workspaceRepository.readWorkspace(id);
+    if (!ws) return;
     await this.workspaceRepository.setActiveWorkspace(id);
+
+    const initWorkspaceTab = new InitWorkspaceTab(id, id);
+    initWorkspaceTab.updateName(ws.name);
+    this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
     navigate("/dashboard/collections");
   };
 

@@ -13,10 +13,6 @@
    */
   export let collection: CollectionDocument;
   /**
-   * The role of user in workspace, if have permission to update
-   */
-  export let userRoleInWorkspace: boolean;
-  /**
    * Callback to rename folder
    */
   export let onRename: (
@@ -114,7 +110,10 @@
     class="my-collection d-flex flex-column w-100 z-3"
     style="margin-top: 15px;"
   >
-    <Tooltip title={PERMISSION_NOT_FOUND_TEXT} show={!userRoleInWorkspace}>
+    <Tooltip
+      title={PERMISSION_NOT_FOUND_TEXT}
+      show={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+    >
       <div class="d-flex aling-items-center justify-content-between gap-2 mb-4">
         <input
           type="text"
