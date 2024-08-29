@@ -77,12 +77,12 @@
 <div class={`sidebar ${componentClass}`}>
   <div class="primary-sidebar-items">
     {#each primarySidebarItems as item (item.route)}
-      <SidebarItem {item} />
+      <SidebarItem {item} {isGuestUser}/>
     {/each}
   </div>
   <div class="secondary-sidebar-items">
     {#each secondarySidebarItems as item (item.route)}
-      <SidebarItem {item} />
+      <SidebarItem {item} {isGuestUser} />
     {/each}
   </div>
 </div>

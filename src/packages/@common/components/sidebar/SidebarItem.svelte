@@ -18,6 +18,8 @@
    * List of side bar Items
    */
   export let item: SidebarItemObj;
+  export let isGuestUser;
+
   let isRouteActive = false;
 </script>
 
@@ -25,6 +27,10 @@
   placement="right"
   title={item.disabled ? "Coming Soon" : item.heading}
   zIndex={600}
+  show={!(
+    isGuestUser &&
+    (item.heading === "Setting" || item.heading === "Help")
+  )}
 >
   <div class="sidebar-item-parent" class:disabled={item.disabled}>
     <Link

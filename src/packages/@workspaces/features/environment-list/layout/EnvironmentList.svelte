@@ -256,8 +256,40 @@
         </div>
       {/if}
 
+      {#if filteredGlobalEnvironment && filteredGlobalEnvironment.length > 0  && localEnvironment.length !== 0 }
+        <div class="mb-0">
+          <p
+            role="button"
+            class={`fw-normal mb-1  ps-5 env-item text-fs-12 border-radius-2 my-1 ${
+              globalEnvironment[0]?.id === activeTabId && "active"
+            }`}
+            on:click={() => {
+              onOpenGlobalEnvironment(globalEnvironment[0]);
+            }}
+          >
+            <span class="icon-default">
+              <StackIcon
+                height={"12px"}
+                width={"12px"}
+                color={"var(--icon-secondary-130)"}
+              />
+            </span>
+            <span class="icon-hover">
+              <StackFilled
+                height={"12px"}
+                width={"12px"}
+                color={"var(--icon-secondary-130)"}
+              />
+            </span>
+            <span class="ms-1">{globalEnvironment[0]?.name}</span>
+          </p>
+        </div>
+        <hr class="mb-1 mt-1 ms-5 me-2" />
+      {/if}
+
       {#if filteredLocalEnvironment && filteredLocalEnvironment.length > 0}
         <!-- <div class="mb-1 mt-0 ms-5 me-2" style="height: 1px; background-color:white"></div> -->
+
         <List
           bind:scrollList
           height={"auto"}
@@ -265,37 +297,6 @@
           classProps={"pe-1"}
           style={"flex:1;"}
         >
-          {#if filteredGlobalEnvironment && filteredGlobalEnvironment.length > 0}
-            <div class="mb-0">
-              <p
-                role="button"
-                class={`fw-normal mb-1  ps-5 env-item text-fs-12 border-radius-2 my-1 ${
-                  globalEnvironment[0]?.id === activeTabId && "active"
-                }`}
-                on:click={() => {
-                  onOpenGlobalEnvironment(globalEnvironment[0]);
-                }}
-              >
-                <span class="icon-default">
-                  <StackIcon
-                    height={"12px"}
-                    width={"12px"}
-                    color={"var(--icon-secondary-130)"}
-                  />
-                </span>
-                <span class="icon-hover">
-                  <StackFilled
-                    height={"12px"}
-                    width={"12px"}
-                    color={"var(--icon-secondary-130)"}
-                  />
-                </span>
-                <span class="ms-1">{globalEnvironment[0]?.name}</span>
-              </p>
-            </div>
-            <hr class="mb-1 mt-1 ms-5 me-2" />
-          {/if}
-
           {#each filteredLocalEnvironment as env}
             <ListItem
               bind:loggedUserRoleInWorkspace

@@ -10,12 +10,7 @@
   <div class="d-flex mb-2">
     {#each tabs as tab}
       {#if tab?.visible}
-        <Tooltip
-          show={tab.disabled}
-          title={"Coming Soon"}
-          placement="bottom"
-          zIndex={10}
-        >
+       
           <button
             class="navigation__link border-0 sparrow-fs-12 request-tab me-3 {tab.id ===
             activeTeamTab
@@ -42,7 +37,6 @@
               {/if}
             </span>
           </button>
-        </Tooltip>
       {/if}
     {/each}
   </div>

@@ -28,6 +28,7 @@
   import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
   import { HelpIcon } from "$lib/assets/app.asset";
   import { MoreOptions } from "@library/icons";
+    import { TabTypeEnum } from "@common/types/workspace";
 
   // ------ Props ------
   /**
@@ -67,11 +68,28 @@
 
   export let onChangeViewInRequest: (view: string) => void;
 
+  let isTabSaved:boolean;
+
   export let isGuestUser = false;
+
+  let activeTabType:string;
+
+  const getActiveTabType = (tabList) => {
+    for (const tab of tabList) {
+      if (tab.isActive) {
+        activeTabType = tab.type;
+        isTabSaved = tab?.isSaved; // Assign the type to the variable
+        break; // Exit loop since we found the active tab
+      }
+    }
+    return activeTabType;
+  };
+
 
   $: {
     if (tabList) {
       scrolable = tabList.length * 182 >= scrollerParent;
+      getActiveTabType(tabList);
     }
   }
 
@@ -214,6 +232,9 @@
       </Tooltip>
     </div>
     <div class=" d-flex ms-auto my-auto me-2 {!tabList.length ? 'd-none' : ''}">
+    
+     {#if activeTabType === TabTypeEnum.REQUEST }
+      <!-- QuickHelp Button -->
       <div>
         <button
           role="button"
@@ -260,87 +281,90 @@
         </button>
       </div>
 
-      <div
-        class="layout d-flex align-items-center ms-auto mt-1"
-        style="height: 24px; "
-      >
-        <Dropdown
-          buttonId="viewChange"
-          bind:isMenuOpen={viewChange}
-          horizontalPosition="left"
-          minWidth={175}
-          options={[
-            {
-              name: "Split Vertically",
-              icon: SplitVerital,
-              onclick: () => onChangeViewInRequest("vertical"),
-            },
-            {
-              name: "Split Horizontally",
-              icon: SplitHorizontal,
-              onclick: () => onChangeViewInRequest("horizontal"),
-            },
-          ]}
+      <!-- Split button -->
+        <div
+          class="layout d-flex align-items-center ms-auto mt-1"
+          style="height: 24px; "
         >
-          <Tooltip
-            title={"Layout"}
-            placement={"left"}
-            distance={12}
-            show={!viewChange}
-            zIndex={10}
+          <Dropdown
+            buttonId="viewChange"
+            bind:isMenuOpen={viewChange}
+            horizontalPosition="left"
+            minWidth={175}
+            options={[
+              {
+                name: "Split Vertically",
+                icon: SplitVerital,
+                onclick: () => onChangeViewInRequest("vertical"),
+              },
+              {
+                name: "Split Horizontally",
+                icon: SplitHorizontal,
+                onclick: () => onChangeViewInRequest("horizontal"),
+              },
+            ]}
+          >
+            <Tooltip
+              title={"Layout"}
+              placement={"left"}
+              distance={12}
+              show={!viewChange}
+              zIndex={10}
+            >
+              <button
+                id="viewChange"
+                class="border-0 bg-transparent pt-0 rounded"
+                on:click={() => {
+                  viewChange = !viewChange;
+                }}
+              >
+                {#if $requestSplitterDirection === "horizontal"}
+                  <ViewGrid color={"var(--icon-secondary-200)"} height={13} />
+                {:else}
+                  <VerticalGrid height={13} color="var(--icon-secondary-200)" />
+                {/if}
+              </button>
+            </Tooltip>
+          </Dropdown>
+
+          <Dropdown
+            buttonId="moreOptions"
+            bind:isMenuOpen={moreOption}
+            horizontalPosition="left"
+            minWidth={150}
+            options={[
+              {
+                name: "Close all Tabs",
+                icon: "",
+                onclick: () => {
+                  tabList.map((tab) => {
+                    onTabClosed(tab.id, tab);
+                  });
+                },
+              },
+
+              {
+                name: "Close Selected Tab",
+                icon: "",
+                onclick: () => {
+                  let activeTab = tabList.filter((tab) => tab.isActive)[0];
+                  onTabClosed(activeTab.id, activeTab);
+                },
+              },
+            ]}
           >
             <button
-              id="viewChange"
-              class="border-0 bg-transparent pt-0 rounded"
+              id="moreOptions"
+              class="border-0 bg-transparent pt-1 rounded d-none"
               on:click={() => {
-                viewChange = !viewChange;
+                moreOption = !moreOption;
               }}
             >
-              {#if $requestSplitterDirection === "horizontal"}
-                <ViewGrid color={"var(--icon-secondary-200)"} height={13} />
-              {:else}
-                <VerticalGrid height={13} color="var(--icon-secondary-200)" />
-              {/if}
+              <MoreOptions height={15} />
             </button>
-          </Tooltip>
-        </Dropdown>
-        <Dropdown
-          buttonId="moreOptions"
-          bind:isMenuOpen={moreOption}
-          horizontalPosition="left"
-          minWidth={150}
-          options={[
-            {
-              name: "Close all Tabs",
-              icon: "",
-              onclick: () => {
-                tabList.map((tab) => {
-                  onTabClosed(tab.id, tab);
-                });
-              },
-            },
-
-            {
-              name: "Close Selected Tab",
-              icon: "",
-              onclick: () => {
-                let activeTab = tabList.filter((tab) => tab.isActive)[0];
-                onTabClosed(activeTab.id, activeTab);
-              },
-            },
-          ]}
-        >
-          <button
-            id="moreOptions"
-            class="border-0 bg-transparent pt-1 rounded d-none"
-            on:click={() => {
-              moreOption = !moreOption;
-            }}
-          >
-            <MoreOptions height={15} />
-          </button>
-        </Dropdown>
-      </div>
+          </Dropdown>
+        </div>
+      {/if}
     </div>
   </div>
 </button>

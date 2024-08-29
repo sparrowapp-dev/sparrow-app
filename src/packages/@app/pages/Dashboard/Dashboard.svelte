@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Sidebar, LoginBanner } from "@common/components";
+  import { Sidebar, LoginBanner, LoginSignupConfirmation } from "@common/components";
   import { Route, navigate } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
@@ -24,6 +24,7 @@
   import Teams from "../Teams/Teams.svelte";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import CreateWorkspace from "@teams/features/create-workspace/layout/CreateWorkspace.svelte";
+  import { Modal } from "@library/ui";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -259,16 +260,20 @@
   </div>
 </div>
 
-<LoginPopup
+
+<Modal
+  title={"Confirm SignUp / Login?"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
   isOpen={isPopupOpen}
-  {onModalStateChanged}
-  onCancel={() => {
-    isPopupOpen = false;
+  handleModalState={(flag) => {
+    isPopupOpen = flag;
   }}
-  onContinue={handleLogin}
-  title={"Confirm Login?"}
-  description={"After continuing your data will be lost, do you want to continue?"}
-/>
+>
+  <LoginSignupConfirmation {handleLogin} bind:isPopupOpen />
+
+</Modal>
 
 <ModalWrapperV1
   title={"New Workspace"}
