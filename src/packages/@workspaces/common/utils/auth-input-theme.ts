@@ -64,7 +64,7 @@ export class AuthInputTheme {
         fontWeight: 400,
       },
       "&.cm-editor.cm-focused": {
-        border: "1px solid var(--border-primary-900)",
+        border: "1px solid var(--border-primary-300)",
         borderRadius: "4px",
       },
       ".cm-scroller::-webkit-scrollbar": {
