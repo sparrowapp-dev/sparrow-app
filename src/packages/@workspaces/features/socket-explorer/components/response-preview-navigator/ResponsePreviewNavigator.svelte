@@ -98,12 +98,16 @@
       const message = webSocket.messages.find(
         (message: WebSocketMessage) => message.uuid === uuid,
       );
-      if (message?.transmitter === "sender") {
-        return "Sent";
-      } else if (message?.transmitter === "connecter") {
+      if (message?.transmitter === "connecter") {
+        return "Connected";
+      } else if (message?.transmitter === "disconnector") {
+        return "Disconnected";
+      } else if (message?.transmitter === "receiver") {
         return "Received";
+      } else if (message?.transmitter === "sender") {
+        return "Send";
       } else {
-        return "Received";
+        return "Type";
       }
     }
     return "Type";
