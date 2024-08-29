@@ -189,7 +189,7 @@
       {/if}
     </div>
     {#if apiState.responseBodyFormatter !== ResponseFormatterEnum.PREVIEW}
-      <div class="d-flex align-items-center gap-2">
+      <div class="d-flex align-items-center gap-3" style=" height: 32px;">
         <!-- insert controller here -->
         <div class="d-flex gap-2">
           <button
@@ -210,16 +210,18 @@
           on:click={handleDownloaded}
           role="button"
           class="icon-container d-flex align-items-center justify-content-center border-radius-2"
+          style="height: 32px; width: 32px;"
         >
-          <img src={downloadIcon} style="height:12px; width:12px;" />
+          <img src={downloadIcon} style="height:18px; width:18px;" />
         </div>
         <!-- Copy button -->
         <div
           on:click={handleCopy}
           role="button"
           class="icon-container d-flex align-items-center justify-content-center border-radius-2"
+          style="height: 32px; width: 32px;"
         >
-          <img src={copyIcon} style="height:12px; width:12px;" />
+          <img src={copyIcon} style="height:18px; width:18px;" />
         </div>
         <!-- Prettier button -->
         <div
@@ -228,8 +230,9 @@
           }}
           role="button"
           class="icon-container d-flex align-items-center justify-content-center border-radius-2"
+          style="margin-right: 16px; height: 32px; width: 32px;"
         >
-          <img src={BeautifyIcon} style="height:10px; width:10px;" />
+          <img src={BeautifyIcon} style="height:16px; width:16px;" />
         </div>
       </div>
     {/if}

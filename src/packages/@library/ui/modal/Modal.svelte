@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CrossIcon } from "$lib/assets/app.asset";
+  import { CrossIcon } from "@library/icons";
 
   import { scale, fade } from "svelte/transition";
   import warningIcon from "$lib/assets/download-warning.svg";
@@ -38,7 +38,7 @@
     ></div>
 
     <div
-      class="sparrow-modal-container-data p-4 gap-2"
+      class="sparrow-modal-container-data gap-2"
       style={`z-index: ${zIndex + 2}; width: ${width}`}
     >
       <div
@@ -48,15 +48,17 @@
           {#if icon === "warning"}
             <img src={warningIcon} height="26px" class="me-2" alt="" />
           {/if}
-          <h3 class="sparrow-modal-heading fw-normal ellipsis">{title}</h3>
+          {#if title}
+            <h3 class="sparrow-modal-heading fw-normal ellipsis">{title}</h3>
+          {/if}
         </div>
         {#if canClose}
           <button
-            class="sparrow-modal-close-icon-btn border-0 d-flex justify-content-center align-items-center " 
-            style="height: 20px; width:20px; "
+            class="sparrow-modal-close-icon-btn border-0 d-flex justify-content-center align-items-center"
+            style="height: 30px; width:30px; "
             on:click={handleModalState(false)}
           >
-            <CrossIcon color={"var( --icon-secondary-100)"}  />
+            <CrossIcon width="17px" height="17px" />
           </button>
         {/if}
       </div>
@@ -103,19 +105,24 @@
   .sparrow-modal-container-data {
     background-color: var(--bg-tertiary-400);
     border-radius: 6px;
+    padding: 30px 30px 20px 30px;
+    position: relative;
   }
   .sparrow-modal-heading {
     font-size: 20px;
+    color: white;
   }
 
   .sparrow-modal-close-icon-btn {
     background-color: transparent;
+    position: absolute;
+    top: 2px;
+    right: 2px;
   }
-  .sparrow-modal-close-icon-btn:hover{
+  .sparrow-modal-close-icon-btn:hover {
     background-color: var(--bg-tertiary-300);
   }
-  .sparrow-modal-close-icon-btn:active{
+  .sparrow-modal-close-icon-btn:active {
     background-color: var(--bg-danger-200);
   }
-
 </style>

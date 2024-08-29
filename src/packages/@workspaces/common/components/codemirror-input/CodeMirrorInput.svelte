@@ -30,6 +30,7 @@
   let componentClass = "";
   export { componentClass as class };
   export let userRole;
+  export let isFocusedOnMount = false;
 
   const environmentHelper = new EnvironmentHeper();
   let trackParanthesis: unknown[] = [];
@@ -113,6 +114,7 @@
   {disabled}
   {id}
   {componentClass}
+  {isFocusedOnMount}
 />
 
 {#if trackParanthesis.length === 2 && filterData.length > 0}

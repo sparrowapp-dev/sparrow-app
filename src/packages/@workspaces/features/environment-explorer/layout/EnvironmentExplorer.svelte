@@ -161,7 +161,8 @@
               <WithButtonV3
                 icon={SaveIcon}
                 onClick={onSaveEnvironment}
-                disable={$currentEnvironment?.property?.environment?.state?.isSaveInProgress ||
+                disable={$currentEnvironment?.property?.environment?.state
+                  ?.isSaveInProgress ||
                   $currentEnvironment?.isSaved ||
                   userRole === WorkspaceRole.WORKSPACE_VIEWER}
                 loader={$currentEnvironment?.property?.environment?.state

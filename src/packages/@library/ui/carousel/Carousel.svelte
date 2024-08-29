@@ -1,12 +1,13 @@
 <script lang="ts">
+  import type { CarouselDataType } from "./types/carousel-data.type";
   import { Ellipse } from "@library/icons";
-  export let data = [];
+  export let data: CarouselDataType[] = [];
   let stepData = data[0];
   let currentStep = 0;
   let n = data.length;
   export let handleClosePopup: (flag: boolean) => void;
 
-  const navigateStep = (direction) => {
+  const navigateStep = (direction: string) => {
     if (direction === "next" && currentStep < n - 1) {
       currentStep += 1;
     } else if (direction === "prev" && currentStep > 0) {
@@ -18,7 +19,7 @@
 
 <div style="max-height: 509px;">
   <div class=" d-flex flex-column" style="gap:19.72px;">
-    <div style="height: 276px; padding:auto; padding-top:4px;">
+    <div style="height: 276px; padding:auto; padding-top:0px;">
       {#if !navigator.onLine}
         <div class="fallback-message">
           Failed to load Media, Please check your internet connection
@@ -34,11 +35,20 @@
     <div class="d-flex flex-column" style=" gap:19.72px;">
       <div class="d-flex flex-row justify-content-center" style="gap:5.48px;">
         {#each data as element, index}
-          <Ellipse
-            color={index === currentStep
-              ? "var(--text-primary-300)"
-              : "var(--text-tertiary-200)"}
-          />
+          <button
+            class="border-0"
+            style="background-color:transparent; outline:none;"
+            on:click={() => {
+              currentStep = index;
+              stepData = data[currentStep];
+            }}
+          >
+            <Ellipse
+              color={index === currentStep
+                ? "var(--text-primary-300)"
+                : "var(--text-tertiary-200)"}
+            />
+          </button>
         {/each}
       </div>
       <div style=" padding-left: 12.88px; padding-right: 12.88px;">
@@ -79,7 +89,7 @@
         {:else}
           <button
             class=" btn border-0"
-            style="background-color: var(--bg-primary-300); padding:3px 19px 3px 20px; border-radius:4.78px; outline:none;"
+            style="background-color: var(--bg-primary-300); padding:3px 19px 3px 20px; border-radius:4.78px; outline:none; "
             on:click={() => {
               navigateStep("next");
             }}

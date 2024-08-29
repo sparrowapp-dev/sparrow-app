@@ -59,6 +59,7 @@
    */
   export let id;
   export let componentClass;
+  export let isFocusedOnMount = false;
 
   let inputWrapper: HTMLElement;
   let localEnvKey = "";
@@ -321,6 +322,7 @@
   }
   onMount(() => {
     initalizeCodeMirrorEditor(rawValue);
+    if (isFocusedOnMount) codeMirrorView.focus();
   });
 
   afterUpdate(() => {
