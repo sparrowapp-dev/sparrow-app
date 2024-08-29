@@ -73,7 +73,7 @@
 
 <div
   class="position-relative"
-  style="height:{height}; width: {width}; !important"
+  style="height:{height}; width: {width}; !important word-wrap: break-word;"
 >
   <textarea
     on:mouseenter={() => {
@@ -97,7 +97,9 @@
     class="w-100 {componentClass}"
     {placeholder}
     {id}
-    style=" {componentStyle} height: 100%;  border-color:{extractBorderHighlight(
+    style=" {componentStyle} height: 100%;
+       word-wrap: break-word;
+      overflow-wrap: break-word;  border-color:{extractBorderHighlight(
       isHovered,
       isFocused,
     )}; --placeholder-color: {placeholderColor};"

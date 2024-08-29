@@ -29,7 +29,6 @@
   let isDescriptionEmpty = false;
   let isSubjectEmpty = false;
   let isTextArea = false;
-  let noCatergorySelected = false;
 
   const handleLogoInputChange = (e: any) => {
     const errorMessage =
@@ -145,7 +144,6 @@
         titleId={type}
         onclick={(id = "") => {
           type = id;
-          noCatergorySelected = false;
         }}
         disabled={false}
         borderType={"none"}
@@ -155,7 +153,7 @@
         headerHeight={"36px"}
         minBodyWidth={"150px"}
         minHeaderWidth={"128px"}
-        maxHeaderWidth={"150px"}
+        maxHeaderWidth={"200px"}
         borderRounded={"4px"}
         headerTheme={"violet2"}
         bodyTheme={"violet"}
@@ -202,6 +200,7 @@
         />
         <hr style="margin:0px; padding-bottom:8px;" />
         <Textarea
+          width={"100%"}
           on:input={() => {
             if (feedbackDescription.length > 0) {
               isDescriptionEmpty = false;
@@ -209,37 +208,30 @@
             }
           }}
           id="feedback-description"
-          width={"100%"}
           height={"90px"}
           bind:value={feedbackDescription}
           defaultBorderColor="transparent"
           hoveredBorderColor="transparent"
           focusedBorderColor={"transparent"}
           class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
-          style="outline:none;"
+          style="outline:none;
+           "
           disabled={false}
           placeholder="Add short description"
           maxlength={200}
         />
       </div>
-      {#if noCatergorySelected}
+
+      {#if isSubjectEmpty}
+        <p class="error-message">Enter a relevant subject for feedback.</p>
+      {/if}
+      {#if isDescriptionEmpty}
+        <p class="error-message">Enter a relevant description for feedback.</p>
+      {/if}
+      {#if isTextArea}
         <p class="error-message">
-          Choose an appropriate category for the feedback.
+          Please enter subject and description for adding a feedback.
         </p>
-      {:else}
-        {#if isSubjectEmpty}
-          <p class="error-message">Enter a relevant subject for feedback.</p>
-        {/if}
-        {#if isDescriptionEmpty}
-          <p class="error-message">
-            Enter a relevant description for feedback.
-          </p>
-        {/if}
-        {#if isTextArea}
-          <p class="error-message">
-            Please enter subject and description for adding a feedback.
-          </p>
-        {/if}
       {/if}
 
       <div class="drop-box mb-2" style="">
@@ -252,7 +244,7 @@
           inputPlaceholder="Drag and Drop or"
           supportedFileTypes={[".png", ".jpg", ".jpeg", ".svg"]}
           height={"80px"}
-          infoMessage={"Images: SVG, PNG, JPG, JPEG<br/> (limit 8MB)<br/> No video files, only images <br/> are accepted"}
+          infoMessage={"Images: SVG, PNG, JPG, JPEG <br/> (limit 8MB)<br/> No video files, only images <br/> are accepted"}
         />
         <div class="d-flex justify-content-between">
           <div></div>
@@ -310,10 +302,8 @@
           loader={isLoading}
           onClick={async () => {
             isLoading = true;
+
             if (!feedbackDescription || !feedbackSubject) {
-              if (!type) {
-                noCatergorySelected = true;
-              }
               if (!feedbackDescription && !feedbackSubject) {
                 isTextArea = true;
                 isSubjectEmpty = isDescriptionEmpty = false;
@@ -324,15 +314,12 @@
               }
               isLoading = false;
             } else {
-              isSubjectEmpty =
-                isDescriptionEmpty =
-                isTextArea =
-                noCatergorySelected =
-                  false;
+              isSubjectEmpty = isDescriptionEmpty = isTextArea = false;
               const res = await onInputFeedback(
                 feedbackSubject,
                 feedbackDescription,
                 type,
+                uploadFeedback,
               );
               if (res.isSuccessful) {
                 isExposeFeedbackForm = false;

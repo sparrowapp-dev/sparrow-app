@@ -1,4 +1,4 @@
-import { makeRequest } from "$lib/api/api.common";
+import { makeHttpRequestV2, makeRequest } from "$lib/api/api.common";
 import { ContentTypeEnum } from "$lib/utils/enums";
 import constants from "$lib/utils/constants";
 
@@ -14,8 +14,7 @@ export class CannyIoService {
         apiKey: this.apiKey,
       },
       headers: {
-        // Authorization: `Bearer ${"6cf07696-102e-8227-8155-d32f585642dc"}`, // Assuming Authorization is used
-        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"], // Ensure this matches the expected header format
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
       },
     });
     return response;
@@ -34,13 +33,8 @@ export class CannyIoService {
     });
     return response;
   };
-  /**
-   * Fetches the list of categories available for a specific board.
-   *
-   * @param boardID - The ID of the board.
-   * @returns  - returns the list of category objects.
-   */
 
+  // Fetches the list of categories available for a specific board.
   public listCategories = async (boardID: string) => {
     const response = await makeRequest(
       "POST",
@@ -78,15 +72,16 @@ export class CannyIoService {
 
   // creates a new post in the board
   public createPost = async (body: object) => {
-    const response = await makeRequest("POST", `${this.apiUrl}/posts/create`, {
-      body: {
+    const response = await makeHttpRequestV2(
+      `${this.apiUrl}/posts/create`,
+      "POST",
+      JSON.stringify([]),
+      JSON.stringify({
         apiKey: this.apiKey,
         ...body,
-      },
-      headers: {
-        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
-      },
-    });
+      }),
+      ContentTypeEnum["application/json"],
+    );
     return response;
   };
 }

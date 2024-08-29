@@ -7,7 +7,7 @@
   export let onInputFeedback;
   export let onAddFeedback;
   export let onSendFeedback;
-  let userInfo;
+  let userInfo: any = {};
   user.subscribe((value) => {
     userInfo = value;
   });

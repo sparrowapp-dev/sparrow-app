@@ -2,7 +2,7 @@ import { user } from "$lib/store";
 import { Events } from "$lib/utils/enums";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { ReleaseRepository } from "@app/repositories/release.repository";
-import { CannyIoService } from "@app/services/canny-io";
+import { CannyIoService } from "@app/services/canny.service";
 import { FeedbackService } from "@app/services/feedback.service";
 import { ReleaseService } from "@app/services/release.service";
 import { notifications } from "@library/ui/toast/Toast";
@@ -158,12 +158,25 @@ class HelpPageViewModel {
     return response;
   };
 
+  /**
+   * Retrieves the list of posts from the Canny dashboard.
+   *
+   * @param  boardID - The ID of the board from which the posts are to be retrieved.
+   * @returns A list of posts.
+   */
   private getCategoryID = async (boardID: string) => {
     const response = await this.cannyService.listCategories(boardID);
     return response;
   };
 
-  private getCategoryIDbyName = async (categoryName) => {
+  /**
+   * Retrieves the category ID from the Canny dashboard.
+   *
+   * @param  categoryName - The name of the category for which the ID is to be retrieved.
+   * @returns The category
+   * */
+
+  private getCategoryIDbyName = async (categoryName: string) => {
     const boards = await this.RetrieveBoards();
 
     const boardID = boards?.data?.boards[0]?.id;
@@ -173,7 +186,8 @@ class HelpPageViewModel {
     const categories = categoriesResponse?.data?.categories;
 
     const categoryID = categories?.find(
-      (category) => category.name.toLowerCase() === categoryName.toLowerCase(),
+      (category) =>
+        category?.name?.toLowerCase() === categoryName?.toLowerCase(),
     )?.id;
     return categoryID;
   };
@@ -189,7 +203,19 @@ class HelpPageViewModel {
     title: string,
     description: string,
     categoryName: string,
+    uploadFeedback: {
+      file: {
+        value: File[];
+      };
+    },
   ) => {
+    const files = Array.from(uploadFeedback?.file?.value);
+    const formData = new FormData();
+    files.forEach((file) => formData.append("files", file));
+    const imageURLs = await this.feedbackService.fetchuploads(formData);
+    const images = imageURLs?.data?.data?.map(
+      (file: { fileUrl: string }) => file?.fileUrl,
+    );
     const categoryID = await this.getCategoryIDbyName(categoryName);
     const res = await this.createUser();
     const boards = await this.RetrieveBoards();
@@ -200,7 +226,13 @@ class HelpPageViewModel {
       details: description,
       authorID: res?.data?.id,
       categoryID: categoryID,
+      imageURLs: images,
     });
+    if (response.isSuccessful) {
+      notifications.success("Feedback added successfully");
+    } else {
+      notifications.error("Feedback submission failed. Please try again.");
+    }
     return response;
   };
 }
