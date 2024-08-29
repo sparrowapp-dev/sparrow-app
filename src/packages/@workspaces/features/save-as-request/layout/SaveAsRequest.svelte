@@ -718,7 +718,7 @@
             <QuestionIcon color={"var(--sparrow-text-color)"} />
           </span>
           {#if instructionEnabled}
-            <div class="bg-tertiary-300 api-name-usage p-3">
+            <div style="z-index: 10;" class="bg-tertiary-300 api-name-usage p-3">
               <div class="d-flex justify-content-between">
                 <p class="text-whiteColor">Best Practices</p>
                 <img
