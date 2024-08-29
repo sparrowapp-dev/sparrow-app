@@ -98,8 +98,6 @@
       const message = webSocket.messages.find(
         (message: WebSocketMessage) => message.uuid === uuid,
       );
-      console.log(message?.transmitter, "transssssssssss");
-
       if (message?.transmitter === "connecter") {
         return "Connected";
       } else if (message?.transmitter === "disconnector") {
@@ -112,6 +110,7 @@
         return "Type";
       }
     }
+    return "Type";
   };
 
   $: {
