@@ -104,7 +104,7 @@
               <span class="ps-2 text-fs-12 text-primary-300">Information</span>
             </div>
             <p class="mb-0">
-              {infoMessage}
+              {@html infoMessage}
             </p>
           </div>
         {/if}
