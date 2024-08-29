@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Sidebar, LoginBanner, LoginSignupConfirmationPopup } from "@common/components";
+  import { Sidebar, LoginBanner, LoginSignupConfirmation } from "@common/components";
   import { Route, navigate } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
@@ -262,7 +262,7 @@
 
 
 <Modal
-  title={"Confirm SignUp/Login?"}
+  title={"Confirm SignUp / Login?"}
   type={"dark"}
   width={"35%"}
   zIndex={1000}
@@ -271,7 +271,7 @@
     isPopupOpen = flag;
   }}
 >
-  <LoginSignupConfirmationPopup {handleLogin} bind:isPopupOpen />
+  <LoginSignupConfirmation {handleLogin} bind:isPopupOpen />
 
 </Modal>
 
