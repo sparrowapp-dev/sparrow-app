@@ -3,7 +3,10 @@
   import type { userDetails } from "$lib/utils/interfaces";
   import { Button } from "@library/ui";
   import IconFallback from "@library/ui/icon-fallback/IconFallback.svelte";
+  import AddFeedback from "@support/features/add-feedback/layout/AddFeedback.svelte";
   export let onInputFeedback;
+  export let onAddFeedback;
+  export let onSendFeedback;
   let userInfo;
   user.subscribe((value) => {
     userInfo = value;
@@ -31,10 +34,6 @@
     </div>
   </div>
   <div style=" ">
-    <Button
-      title="+ Add Feedback"
-      type="primary"
-      buttonStyleProp="width:240px; height:40px; align-items:center; justify-content:center; font-weight:600px; font-size:14px;"
-    />
+    <AddFeedback {onInputFeedback} {onAddFeedback} {onSendFeedback} />
   </div>
 </div>

@@ -74,7 +74,11 @@
             {#if activeTab === "feedback"}
               <!-- <FeedbackToast />
               <DiscordPost /> -->
-              <FeedbackSection onInputFeedback={_viewModel.createPost} />
+              <FeedbackSection
+                onInputFeedback={_viewModel.createPost}
+                onAddFeedback={_viewModel.addFeedback}
+                onSendFeedback={_viewModel.sendFeedback}
+              />
             {:else if activeTab === "updates"}
               <!-- <ReleaseNotes
                 {releaseNotesData}
