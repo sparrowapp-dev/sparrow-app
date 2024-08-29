@@ -7,6 +7,7 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums";
   import type { Conversation } from "@common/types/workspace";
+  import { fade, fly } from "svelte/transition";
 
   export let conversations: Conversation[] = [];
   export let prompt = "";
@@ -17,26 +18,6 @@
   export let regenerateAiResponse;
   export let onUpdateRequestState;
   export let scrollList;
-
-  /**
-   * A Svelte transition function that animates elements sliding in and out.
-   *
-   * @param node - The DOM element to apply the transition to.
-   * @param params - Configuration object for the transition.
-   */
-  const slide = (node: HTMLElement, { duration }: { duration: number }) => {
-    return {
-      duration,
-      css: (t: number) => {
-        const easing = cubicOut(t);
-        const translateY = (1 - easing) * 20;
-        return `
-          transform: translateY(${translateY}%);
-
-        `;
-      },
-    };
-  };
 
   let chatContainer: HTMLElement;
   /**
@@ -69,13 +50,15 @@
 <!-- <div class="d-flex flex-column h-100 chat-box"> -->
 <div
   class="d-flex flex-column h-100 chat-box"
-  transition:slide={{ duration: 200 }}
+  in:fly={{ y: 50, duration: 300, easing: cubicOut }}
+  out:fly={{ y: 50, duration: 300, easing: cubicOut }}
 >
   <div style="flex:1; overflow:auto;">
     <div class="d-flex h-100 flex-column">
       <div
         class="d-flex"
         style="justify-content: space-between; align-items:center"
+        in:fade={{ duration: 200 }}
       >
         <div class="p-2">
           <SparrowAIIcon height={"28px"} width={"28px"} />
@@ -99,6 +82,7 @@
           {#if !conversations?.length}
             <div
               class="h-100 p-3 w-100 d-flex flex-column justify-content-between"
+              in:fade={{ duration: 300 }}
             >
               <div></div>
               <div class="d-flex flex-column align-items-center">
@@ -143,19 +127,21 @@
           {:else}
             <div class="h-100 w-100">
               {#each conversations as chat, index}
-                <ChatItem
-                  message={chat.message}
-                  messageId={chat.messageId}
-                  type={chat.type}
-                  status={chat.status}
-                  isLiked={chat.isLiked}
-                  isDisliked={chat.isDisliked}
-                  {onToggleLike}
-                  {regenerateAiResponse}
-                  isLastRecieverMessage={conversations.length - 1 === index
-                    ? true
-                    : false}
-                />
+                <div in:fade={{ duration: 200, delay: index * 50 }}>
+                  <ChatItem
+                    message={chat.message}
+                    messageId={chat.messageId}
+                    type={chat.type}
+                    status={chat.status}
+                    isLiked={chat.isLiked}
+                    isDisliked={chat.isDisliked}
+                    {onToggleLike}
+                    {regenerateAiResponse}
+                    isLastRecieverMessage={conversations.length - 1 === index
+                      ? true
+                      : false}
+                  />
+                </div>
               {/each}
             </div>
           {/if}
@@ -165,7 +151,10 @@
   </div>
   <div class="input-parent">
     {#if conversations?.length && isResponseGenerating}
-      <p class="p-3 text-primary-300 generating-img">
+      <p
+        class="p-3 text-primary-300 generating-img"
+        in:fade={{ duration: 200 }}
+      >
         <img src={generatingImage} style="width: 118px;" alt="" />
       </p>
     {/if}
@@ -202,6 +191,7 @@
     height: 30px;
     width: 30px;
     border-radius: 4px;
+    transition: background-color 0.2s ease;
   }
   .close-btn:hover {
     cursor: pointer;
