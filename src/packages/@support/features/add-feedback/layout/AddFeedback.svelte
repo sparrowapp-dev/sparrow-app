@@ -13,7 +13,7 @@
     FEATURE_REQUEST = "Feature Request",
     UI_IMPROVEMENT = "UI Improvement",
     BUG = "Bug",
-    ALL_CATEGORY = "All Categories",
+    ALL_CATEGORY = "Uncategorized",
   }
 
   let type: FeedbackType;
@@ -92,7 +92,7 @@
   };
 </script>
 
-<div class="pb-3 w-100">
+<div class=" w-100">
   <Tooltip title="Feedback" placement="top" distance={13}>
     <button
       on:click={() => {
@@ -332,6 +332,7 @@
               const res = await onInputFeedback(
                 feedbackSubject,
                 feedbackDescription,
+                type,
               );
               if (res.isSuccessful) {
                 isExposeFeedbackForm = false;

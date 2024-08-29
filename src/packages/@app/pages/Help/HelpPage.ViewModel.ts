@@ -158,6 +158,26 @@ class HelpPageViewModel {
     return response;
   };
 
+  private getCategoryID = async (boardID: string) => {
+    const response = await this.cannyService.listCategories(boardID);
+    return response;
+  };
+
+  private getCategoryIDbyName = async (categoryName) => {
+    const boards = await this.RetrieveBoards();
+
+    const boardID = boards?.data?.boards[0]?.id;
+
+    const categoriesResponse = await this.getCategoryID(boardID);
+
+    const categories = categoriesResponse?.data?.categories;
+
+    const categoryID = categories?.find(
+      (category) => category.name.toLowerCase() === categoryName.toLowerCase(),
+    )?.id;
+    return categoryID;
+  };
+
   /**
    * Creates a post on the feedback board retrieved from Canny service with the given title and description.
    *
@@ -165,7 +185,12 @@ class HelpPageViewModel {
    * @param  description - The description of the post.
    * @returns Promise<Object> The response from the Canny service after creating the post.
    */
-  public createPost = async (title: string, description: string) => {
+  public createPost = async (
+    title: string,
+    description: string,
+    categoryName: string,
+  ) => {
+    const categoryID = await this.getCategoryIDbyName(categoryName);
     const res = await this.createUser();
     const boards = await this.RetrieveBoards();
     const boardID = boards?.data?.boards[0]?.id;
@@ -174,6 +199,7 @@ class HelpPageViewModel {
       title: title,
       details: description,
       authorID: res?.data?.id,
+      categoryID: categoryID,
     });
     return response;
   };

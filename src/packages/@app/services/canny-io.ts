@@ -34,6 +34,29 @@ export class CannyIoService {
     });
     return response;
   };
+  /**
+   * Fetches the list of categories available for a specific board.
+   *
+   * @param boardID - The ID of the board.
+   * @returns  - returns the list of category objects.
+   */
+
+  public listCategories = async (boardID: string) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/categories/list`,
+      {
+        body: {
+          apiKey: this.apiKey,
+          boardID,
+        },
+        headers: {
+          "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+        },
+      },
+    );
+    return response;
+  };
 
   // creates a new user , as in order to create post we need userid
   public createUser = async (body: object) => {

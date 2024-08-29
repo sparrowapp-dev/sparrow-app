@@ -23,7 +23,7 @@
 </div>
 <div
   class="d-flex flex-row align-items-center"
-  style="height:80px; background-color:#151515; margin-left:30px; padding:20px; justify-content: space-between !important;  "
+  style="height:80px; background-color:#151515; margin-left:30px; padding:12px; justify-content: space-between !important;  "
 >
   <div class="d-flex flex-row align-items-center" style="gap:20px;">
     <div class="" style="">
@@ -33,7 +33,7 @@
       Hey {userInfo?.name}, share your feedback
     </div>
   </div>
-  <div style=" ">
+  <div style="width:calc(100% - 72.5% );  ">
     <AddFeedback {onInputFeedback} {onAddFeedback} {onSendFeedback} />
   </div>
 </div>
