@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CrossIcon } from "$lib/assets/app.asset";
+  import { CrossIcon } from "@library/icons";
 
   import { scale, fade } from "svelte/transition";
   import warningIcon from "$lib/assets/download-warning.svg";
@@ -58,7 +58,7 @@
             style="height: 30px; width:30px; "
             on:click={handleModalState(false)}
           >
-            <CrossIcon />
+            <CrossIcon width="17px" height="17px" />
           </button>
         {/if}
       </div>

@@ -221,11 +221,6 @@
         >
           Version {version}
         </p>
-        <p
-          class=" cursor-pointer check-for-update text-center sparrow-fs-12 mb-5"
-        >
-          Check for Update
-        </p>
       </div>
     </div>
   </BgContainer>

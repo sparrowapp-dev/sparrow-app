@@ -11,11 +11,6 @@
   import type { UpdatesDocType } from "@app/models/updates.model";
 
   /**
-   * The object representing the last modified user of the workspace.
-   */
-  export let modifiedUser;
-
-  /**
    * The length of collections related to the workspace.
    */
   export let collectionLength = 0;
@@ -85,7 +80,7 @@
       bind:isWorkspaceInviteModalOpen
       {onDeleteWorkspace}
       {onUpdateWorkspaceName}
-      {workspaceName}
+      workspaceName={currentWorkspace.name}
       {workspaceID}
     />
     <section style="flex:1; overflow:auto;">
@@ -93,7 +88,7 @@
         <WorkspaceAbout
           bind:userRole
           {onUpdateWorkspaceDescription}
-          {workspaceDescription}
+          workspaceDescription={currentWorkspace.description}
           {workspaceID}
         />
       {:else if workspaceNavigatorId === "settings"}

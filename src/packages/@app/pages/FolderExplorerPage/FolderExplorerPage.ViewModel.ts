@@ -11,24 +11,20 @@ import type {
   // CollectionDocument,
   TabDocument,
 } from "@app/database/database";
-import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
 
 // Utils
-import { hasWorkpaceLevelPermission, moveNavigation } from "$lib/utils/helpers";
+import { moveNavigation } from "$lib/utils/helpers";
 import {
   Events,
   ItemType,
   // ResponseStatusCode,
   UntrackedItems,
-  WorkspaceRole,
 } from "$lib/utils/enums";
 // import { invoke } from "@tauri-apps/api/core";
 import { v4 as uuidv4 } from "uuid";
 
 // Stores
-import { userWorkspaceLevelRole } from "$lib/store";
-import type { Folder } from "@common/types/workspace";
-import { generateSampleRequest } from "$lib/utils/sample";
+import type { CollectionItemsDto, Folder, Tab } from "@common/types/workspace";
 import type { CreateApiRequestPostBody } from "$lib/utils/dto";
 import { InitRequestTab } from "@common/utils";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
@@ -55,35 +51,17 @@ class FolderExplorerPage {
    * @param _id - Id of the tab going to be updated
    * @param data - Data to be updated on tab
    */
-  private updateTab = async (_id: string, data: any) => {
+  private updateTab = async (_id: string, data: Tab) => {
     this.tabRepository
       .getTabList()
       .subscribe((tabList) => {
         tabList.forEach((tab) => {
           if (tab.id === _id) {
-            this.tabRepository.updateTab(tab.tabId, data);
+            this.tabRepository.updateTab(tab?.tabId as string, data);
           }
         });
       })
       .unsubscribe();
-  };
-
-  /**
-   *
-   * @returns boolean - if user have permission to update the folder
-   */
-  public getUserRoleInWorspace = async () => {
-    let role: WorkspaceRole;
-    const userWorkspaceLevelRoleSubscribe = userWorkspaceLevelRole.subscribe(
-      (value: any) => {
-        role = WorkspaceRole.WORKSPACE_ADMIN;
-      },
-    );
-    userWorkspaceLevelRoleSubscribe();
-    return await hasWorkpaceLevelPermission(
-      role,
-      workspaceLevelPermissions.SAVE_REQUEST,
-    );
   };
 
   /**
@@ -229,9 +207,6 @@ class FolderExplorerPage {
     collection: CollectionDocument,
     folder: Folder,
   ) => {
-    if (!(await this.getUserRoleInWorspace())) {
-      return;
-    }
     // const sampleRequest = generateSampleRequest(
     //   UntrackedItems.UNTRACKED + uuidv4(),
     //   new Date().toString(),
@@ -424,10 +399,14 @@ class FolderExplorerPage {
     collection: CollectionDocument,
     tab: TabDocument,
   ) => {
-    let totalRequests: number = 0;
+    let totalRequests = 0;
     const folder = await this.getFolder(collection, tab.id);
-    if (folder) {
-      totalRequests = folder.items.length;
+    if (folder?.items) {
+      folder.items.forEach((item: CollectionItemsDto) => {
+        if (item.type === ItemType.REQUEST) {
+          totalRequests++;
+        }
+      });
     }
     return totalRequests;
   };

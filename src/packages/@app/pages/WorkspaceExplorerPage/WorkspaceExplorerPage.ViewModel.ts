@@ -62,28 +62,20 @@ export default class WorkspaceExplorerViewModel {
    * @returns  A promise that resolves when the workspace name is updated.
    */
   public updateWorkspaceName = async (workspaceId: string, newName: string) => {
+    if (!newName) return;
     const response = await this.workspaceService.updateWorkspace(workspaceId, {
       name: newName,
     });
 
-    if (response) {
+    if (response.isSuccessful) {
       const updatedata = {
         name: newName,
         updatedAt: response.data.data.updatedAt,
       };
-      let tabId = "";
       await this.workspaceRepository.updateWorkspace(workspaceId, updatedata);
-      await this.getActiveTab().subscribe((tab: any) => {
-        tabId = tab?.tabId;
-      });
-      if(tabId){
-        await this.tabRepository.updateTab(tabId, updatedata);
-      }
-      const initWorkspaceTab = new InitWorkspaceTab(
-        response.data.data._id,
-        workspaceId,
-      );
-      return initWorkspaceTab.updateName(newName);
+      await this.tabRepository.updateTabByMongoId(workspaceId, updatedata);
+      notifications.success("Workspace renamed successfully!");
+      return;
     }
   };
 
@@ -103,22 +95,13 @@ export default class WorkspaceExplorerViewModel {
       description: newDescription,
     });
 
-    if (response) {
+    if (response.isSuccessful) {
       const updatedata = {
         description: newDescription,
       };
+      notifications.success("Description updated successfully!");
       await this.workspaceRepository.updateWorkspace(workspaceId, updatedata);
-      let tabId = "";
-      const res = await this.getActiveTab();
-      res.subscribe((tab: any) => {
-        tabId = tab.tabId;
-      });
-      await this.tabRepository.updateTab(tabId, updatedata);
-      const initWorkspaceTab = new InitWorkspaceTab(
-        response.data.data._id,
-        workspaceId,
-      );
-      return initWorkspaceTab.updateName(newDescription);
+      return;
     }
   };
 

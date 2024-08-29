@@ -107,6 +107,7 @@
             px-3 align-items-center justify-content-between rounded teams-outer border-0 ${
               team.teamId === activeIndex ? "active" : ""
             }`}
+                style={!isGuestUser ? "" : "pointer-events: none;"}
                 on:click={async () => {
                   await setOpenTeam(team.teamId);
                   activeIndex = team.teamId;
@@ -245,8 +246,7 @@
     background-color: transparent;
   }
   .teams-outer.active {
-    /* background-color: var(--border-color); */
-    background-color: #1c1d2b;
+    background-color: var(--text-tertiary-750);
   }
   .new-team-btn {
     background-color: transparent;

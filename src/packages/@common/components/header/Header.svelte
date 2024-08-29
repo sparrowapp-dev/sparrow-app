@@ -106,7 +106,7 @@
       name: currentWorkspaceName,
       description: currentTeamName,
     });
-    const res = createSetFromArray(workspaces, "name");
+    const res = createSetFromArray(workspaces, "id");
     if (res.length > constants.WORKSPACE_LIMIT) {
       res.shift();
     }
@@ -115,7 +115,7 @@
   };
 
   $: {
-    if (currentWorkspaceName || currentTeamName) {
+    if (currentWorkspaceId) {
       calculateLimitedWorkspace();
     }
   }
@@ -169,7 +169,7 @@
           data={guestData}
           titleId={`${currentWorkspaceId}`}
           onclick={() => {}}
-          minHeaderWidth={"185px"}
+          minHeaderWidth={"195px"}
           iconRequired={false}
           isDropIconFilled={true}
           borderType={"none"}
@@ -185,7 +185,7 @@
           position={"absolute"}
           isHeaderCombined={true}
           maxBodyHeight={"300px"}
-          placeholderText="Guest User's Team / Guest User's Workspace"
+          placeholderText=" Team / Workspace  "
         >
           <div slot="pre-select" class="mb-2 px-1">
             <div class="guest-user-text">
@@ -208,7 +208,7 @@
             </div>
           </div>
         </Select>
-      {:else}
+      {:else if currentWorkspaceId}
         <Select
           id={"workspace-dropdown"}
           data={workspaceData}

@@ -5,7 +5,7 @@
     TabDocument,
     WorkspaceDocument,
   } from "@app/database/database";
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
 
   // ---- View Model
   import CollectionExplorerPage from "./CollectionExplorerPage.ViewModel";
@@ -26,7 +26,6 @@
 
   // Local variables
   let collection: CollectionDocument;
-  let userRoleInWorkspace: boolean;
 
   // Initialization of collection and userRoleInWorkspace
   onMount(async () => {
@@ -38,7 +37,6 @@
         }
       },
     );
-    userRoleInWorkspace = await _viewModel.getUserRoleInWorspace();
   });
 
   user.subscribe((value) => {
@@ -55,7 +53,7 @@
     );
     workspace.users?.forEach((value) => {
       if (value.id === userId) {
-        userRole = value.role;
+        userRole = value.role as string;
       }
     });
   };
@@ -65,10 +63,9 @@
 </script>
 
 <CollectionExplorer
-  bind:userRole
+  {userRole}
   bind:tab
   bind:collection
-  bind:userRoleInWorkspace
   onUpdateDescription={_viewModel.handleUpdateDescription}
   onCreateAPIRequest={_viewModel.handleCreateRequest}
   onCollectionSynced={_viewModel.handleSyncCollection}

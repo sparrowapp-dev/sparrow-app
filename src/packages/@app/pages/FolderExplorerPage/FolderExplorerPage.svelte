@@ -29,7 +29,6 @@
   // Local variables
   let collection: CollectionDocument;
   let folder: Folder;
-  let userRoleInWorkspace: boolean;
 
   // Initialization of collection, folder and userRoleInWorkspace
   onMount(async () => {
@@ -37,7 +36,6 @@
       collection = await _viewModel.getCollection(tab.path?.collectionId);
       folder = await _viewModel.getFolder(collection, tab.id);
     });
-    userRoleInWorkspace = await _viewModel.getUserRoleInWorspace();
   });
 
   user.subscribe((value) => {
@@ -72,5 +70,4 @@
   onCreateAPIRequest={_viewModel.handleCreateAPIRequest}
   onUpdateDescription={_viewModel.handleUpdateDescription}
   getTotalRequests={_viewModel.getTotalRequests}
-  userRoleInWorkspace
 />

@@ -9,7 +9,6 @@
   import type { UpdatesDocType } from "@app/models/updates.model";
   import { user } from "$lib/store";
 
-  export let modifiedUser;
   export let collectionList;
   export let tab;
 
@@ -37,15 +36,31 @@
       updateSelectedWorkspace();
     }
   }
+  let userId = "";
+  let userRole = "";
+  user.subscribe((value) => {
+    if (value) {
+      userId = value._id;
+    }
+  });
+  /**
+   * Find the role of user in active workspace
+   */
+  const findUserRole = async () => {
+    currentWorkspace?.users?.forEach((value) => {
+      if (value.id === userId) {
+        userRole = value.role;
+      }
+    });
+  };
 
   let currentTeam;
   let currentWorkspace = {
     id: "",
     name: "",
     users: [],
+    description: "",
   };
-  let userId = "";
-  let userRole = "";
   /**
    * Subscribes to the active workspace and updates the current workspace details
    * and also updates current team details associated with that workspace.
@@ -57,10 +72,12 @@
           id: value._data._id,
           name: value._data.name,
           users: value._data.users,
+          description: value._data.description,
         };
         const currentTeamDetails = {
           id: value._data?.team.teamId,
         };
+        findUserRole();
         currentTeam = await _viewModel.readTeam(currentTeamDetails.id);
       }
     },
@@ -76,39 +93,21 @@
     _viewModel.refetchPreviousUpdates(workspaceID);
   };
 
-  user.subscribe((value) => {
-    if (value) {
-      userId = value._id;
-    }
-  });
-
-  /**
-   * Find the role of user in active workspace
-   */
-  const findUserRole = async () => {
-    const workspace: WorkspaceDocument = await _viewModel.getWorkspaceById(
-      tab.path.workspaceId,
-    );
-    workspace.users?.forEach((value) => {
-      if (value.id === userId) {
-        userRole = value.role;
-      }
-    });
-  };
-
+  // $:{
+  //   if(userId )
+  // }
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
   onMount(async () => {
     await _viewModel.fetchWorkspaceUpdates(workspaceID);
-    findUserRole();
+    // findUserRole();
   });
 </script>
 
 <WorkspaceExplorer
   bind:userRole
   {tab}
-  {modifiedUser}
   {workspaceUpdatesList}
   collectionLength={$collectionList?.filter(
     (value) => value.workspaceId === currentWorkspace?.id,

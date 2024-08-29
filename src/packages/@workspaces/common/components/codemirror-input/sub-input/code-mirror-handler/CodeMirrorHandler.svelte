@@ -206,6 +206,7 @@
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
       event.preventDefault();
     } else if (event.altKey && event.code === "KeyL" && id.includes("url")) {
+      event.preventDefault();
       codeMirrorView?.focus();
     }
   };

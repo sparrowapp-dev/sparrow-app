@@ -1,7 +1,6 @@
 import type {
   CollectionDocument,
   EnvironmentDocument,
-  TabDocument,
   WorkspaceDocument,
 } from "@app/database/database";
 
@@ -152,8 +151,11 @@ export default class CollectionsViewModel {
   /**
    * Return current tabs list of top tab bar component
    */
-  get tabs() {
+  public tabs() {
     return this.tabRepository.getTabList();
+  }
+  public getTabListWithWorkspaceId(workspaceId: string) {
+    return this.tabRepository.getTabListWithWorkspaceId(workspaceId);
   }
 
   /**
@@ -179,8 +181,8 @@ export default class CollectionsViewModel {
    * Get active tab(if any)
    * @returns :Observable<any> | undefined - active tab
    */
-  public getActiveTab = () => {
-    return this.tabRepository.getTab();
+  public getActiveTab = (workspaceId: string) => {
+    return this.tabRepository.getTabWithWorkspaceId(workspaceId);
   };
 
   /**
@@ -250,26 +252,10 @@ export default class CollectionsViewModel {
    */
   public onDropEvent = (event: Event) => {
     event.preventDefault();
-    // TODO - Parse this.tabs observable to RxDoc (Remove these code)
-    const tabList = this.tabs;
-    /////////////////////////////////////////////////////////////////////
-    let updatedTabList: TabDocument[] = [];
-    tabList
-      .subscribe((value) => {
-        updatedTabList = value;
-      })
-      .unsubscribe();
-    const element = updatedTabList.splice(this.movedTabStartIndex, 1);
-    updatedTabList.splice(this.movedTabEndIndex, 0, element[0]);
-    updatedTabList = updatedTabList.map((tab, index) => {
-      tab.patch({
-        index: index,
-      });
-      return tab;
-    });
-    updatedTabList.sort((a, b) => {
-      return (b.index as number) - (a.index as number);
-    });
+    this.tabRepository.rearrangeTab(
+      this.movedTabStartIndex,
+      this.movedTabEndIndex,
+    );
   };
 
   /**
@@ -455,16 +441,7 @@ export default class CollectionsViewModel {
    * @param _id :string - if of the tab
    */
   public updateTab = async (_id: string, data: Partial<Tab>) => {
-    this.tabRepository
-      .getTabList()
-      .subscribe((tabs) => {
-        tabs.forEach((tab) => {
-          if (tab.id === _id) {
-            this.tabRepository.updateTab(tab.tabId, data);
-          }
-        });
-      })
-      .unsubscribe();
+    this.tabRepository.updateTabByMongoId(_id, data);
   };
 
   /**

@@ -51,13 +51,13 @@
         <!-- <span class="me-3"></span> -->
         <div class="px-4">
           <ComboText
-            comboContainerClassProp={"d-flex align-items-center justify-content-between gap-4 mb-3"}
+            comboContainerClassProp={"d-flex align-items-center justify-content-between gap-2 mb-3"}
             {key}
             {value}
             keyClassProp={"text-secondary-200"}
             valueClassProp={"bg-secondary-400 text-secondary-150"}
             keyStyleProp={"width: 100px;"}
-            valueStyleProp={"max-width: fit-content;"}
+            valueStyleProp={"width: 110px"}
             type="combo"
           />
         </div>
@@ -69,13 +69,13 @@
         <!-- <span class="me-3"></span> -->
         <div class="px-4">
           <ComboText
-            comboContainerClassProp={"d-flex align-items-center justify-content-between gap-4 mb-3"}
+            comboContainerClassProp={"d-flex align-items-center justify-content-between gap-1 mb-3"}
             {key}
             {value}
             keyClassProp={"text-secondary-200"}
             valueClassProp={"bg-secondary-400 text-secondary-150"}
             keyStyleProp={"width: 100px;"}
-            valueStyleProp={"width: 90px"}
+            valueStyleProp={"width: 110px"}
             type="combo"
           />
         </div>

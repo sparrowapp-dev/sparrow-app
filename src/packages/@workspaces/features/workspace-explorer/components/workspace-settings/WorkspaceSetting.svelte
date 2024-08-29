@@ -39,7 +39,7 @@
   }
 </script>
 
-<div class="workspace-setting h-100" style="padding:24px; padding-top:0;">
+<div class="workspace-setting h-100" style="padding-top:0;">
   <div class="d-flex flex-column" style="">
     <div class="pb-3">
       <Input
@@ -63,7 +63,7 @@
         alt="shimmer effect"
         width="100%"
         height="100%"
-        style="margin-left: -5px; margin-top:8px;"
+        style="margin-top:8px;"
       />
     {:else}
       {#each filteredUser as user}

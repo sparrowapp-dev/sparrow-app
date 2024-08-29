@@ -16,13 +16,11 @@
    */
   export let onCollectionSynced: (
     collection: CollectionDocument,
-  ) => Promise<boolean>;
+  ) => Promise<boolean | undefined>;
   /**
    * Callback to get last updated and total number of folders and requests in collection
    */
-  export let getLastUpdatedAndCount: (
-    collection: CollectionDocument,
-  ) => Promise<{
+  export let getLastUpdatedAndCount: (collection: CollectionDto) => Promise<{
     isSynced: boolean;
     totalFolders: number;
     totalRequests: number;
@@ -54,10 +52,6 @@
    * The collection
    */
   export let collection: CollectionDocument;
-  /**
-   * User role in the workspace
-   */
-  export let userRoleInWorkspace: boolean;
 
   /**
    * Icons and images
@@ -79,6 +73,7 @@
   import { PERMISSION_NOT_FOUND_TEXT } from "$lib/utils/constants/permissions.constant";
   import type { CollectionDocument, TabDocument } from "@app/database/database";
   import { WorkspaceRole } from "$lib/utils/enums";
+  import type { CollectionDto } from "@common/types/workspace";
 
   /**
    * Role of user in active workspace
@@ -102,10 +97,12 @@
    */
   const updateLastUpdateAndCount = async () => {
     const res = await getLastUpdatedAndCount(collection);
-    isSynced = res.isSynced;
-    lastUpdated = res.lastUpdated;
-    totalFolders = res.totalFolders;
-    totalRequests = res.totalRequests;
+    if (res) {
+      isSynced = res.isSynced;
+      lastUpdated = res.lastUpdated;
+      totalFolders = res.totalFolders;
+      totalRequests = res.totalRequests;
+    }
   };
 
   /**
@@ -120,12 +117,6 @@
   const onRenameInputKeyPress = () => {
     const inputField = document.getElementById(
       "renameInputFieldCollection",
-    ) as HTMLInputElement;
-    inputField.blur();
-  };
-  const onRenameTextareaKeyPress = () => {
-    const inputField = document.getElementById(
-      "updateCollectionDescField",
     ) as HTMLInputElement;
     inputField.blur();
   };
@@ -180,10 +171,13 @@
   </ModalWrapperV1>
   <div
     class="my-collection d-flex flex-column w-100 z-3"
-    style="margin-top: 15px; min-width: 450px"
+    style=" min-width: 450px"
   >
-    <Tooltip title={PERMISSION_NOT_FOUND_TEXT} show={!userRoleInWorkspace}>
-      <div class="d-flex align-items-center gap-2 mb-4">
+    <Tooltip
+      title={PERMISSION_NOT_FOUND_TEXT}
+      show={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+    >
+      <div class="d-flex gap-2 mb-4">
         <div class="d-flex flex-column flex-grow-1">
           <input
             type="text"
@@ -191,7 +185,7 @@
             maxlength={100}
             id="renameInputFieldCollection"
             value={collection?.name}
-            class="bg-transparent input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"
+            class="bg-transparent input-outline text-fs-18 border-0 text-left w-100 ps-2 py-0"
             disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
               tab?.activeSync}
             on:blur={(event) => {
@@ -317,7 +311,8 @@
           {#if collection?.activeSync}
             <div class="d-flex flex-column justify-content-center">
               <Button
-                disable={!userRoleInWorkspace || refreshCollectionLoader}
+                disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+                  refreshCollectionLoader}
                 title={`Sync Collection`}
                 type="dark"
                 loader={refreshCollectionLoader}
@@ -339,8 +334,8 @@
             {#if !collection?.activeSync || isSynced}
               <button
                 disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-                class="btn add-button rounded m-1 border-0 text-align-right py-1"
-                style="max-height:60px; width:200px;"
+                class="btn add-button rounded mx-1 border-0 text-align-right py-1"
+                style="max-height:60px; width:200px; margin-top: -2px;"
                 on:click={() => onCreateAPIRequest(collection)}
                 >New Request</button
               >
@@ -376,7 +371,8 @@
             </li>
           </ol>
           <Button
-            disable={!userRoleInWorkspace || refreshCollectionLoader}
+            disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+              refreshCollectionLoader}
             title={`Sync Collection`}
             type="primary"
             loader={refreshCollectionLoader}
@@ -410,18 +406,12 @@
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
             collection?.activeSync}
           id="updateCollectionDescField"
-          style="font-size: 12px;"
           value={collection?.description || ""}
-          class="form-control bg-transparent border-0 text-textColor fs-6 collection-area input-outline"
+          class="bg-transparent border-0 text-textColor text-fs-12 collection-area input-outline w-100 p-2"
           placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
           on:blur={(event) => {
             if (collection?.description !== event.target.value) {
               onUpdateDescription(collection, event.target.value);
-            }
-          }}
-          on:keydown={(event) => {
-            if (event.key === "Enter") {
-              onRenameTextareaKeyPress();
             }
           }}
         />
@@ -450,19 +440,22 @@
 
 <style>
   .my-collection {
-    padding: 10px;
+    padding: 24px;
   }
 
   .input-outline {
     border-radius: 0%;
   }
+  textarea {
+    outline: none;
+  }
   textarea::placeholder {
-    font-size: 12px;
     color: var(--text-color);
   }
 
-  .input-outline:focus {
-    outline: 2px solid var(--sparrow-blue);
+  .input-outline:focus,
+  .input-outline:hover {
+    outline: 1px solid var(--sparrow-blue);
   }
 
   .add-button {
