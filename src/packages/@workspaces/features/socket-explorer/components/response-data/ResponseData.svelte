@@ -277,8 +277,8 @@
           </span>
           <!-- <div class="d-flex align-items-center"> -->
           <span
-            class="text-fs-12 py-2 px-3"
-            style="white-space: nowrap; line-height: 1; width: 110px;"
+            class="text-fs-12 py-2 px-3 timestamp"
+            style="white-space: nowrap; line-height: 1;"
           >
             {message?.timestamp}
           </span>
@@ -305,7 +305,7 @@
 <style>
   .timestamp {
     color: var(--text-secondary-550);
-    width: 120px;
+    width: 110px;
   }
   :global(.highlight-websocket-message-search) {
     background-color: #1e354d;
