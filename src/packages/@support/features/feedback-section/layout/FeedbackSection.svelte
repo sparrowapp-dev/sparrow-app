@@ -15,7 +15,9 @@
 <div
   style="height: 89px; padding-left:34px; padding-top:8px !important; padding-bottom:21px;"
 >
-  <div style="font-weight: 700; font-size:20px; ">Feedbacks</div>
+  <div style="font-weight: 700; font-size:20px; margin-bottom:12px;  ">
+    Feedbacks
+  </div>
   <p style="font-size: 14px; color:#999999;">
     Share your feedback to help us refine and enhance your experience.
   </p>
