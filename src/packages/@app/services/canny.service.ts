@@ -34,7 +34,7 @@ export class CannyIoService {
     return response;
   };
 
-  // Fetches the list of categories available for a specific board.
+  // Fetches the list of categories available for a specific board from canny.
   public listCategories = async (boardID: string) => {
     const response = await makeRequest(
       "POST",
