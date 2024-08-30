@@ -25,20 +25,20 @@
             style="font-size: 12px;"
           >
             <span
-              class="ellipsis"
+              class="ellipsis d-flex align-items-center"
               style="color:{response.status === ResponseStatusCode.OK ||
               response.status === ResponseStatusCode.CREATED
-                ? 'var(--success-color)'
+                ? 'var(--request-get)'
                 : 'var(--request-delete)'};"
             >
-              <span class="me-1">
+              <span class="me-2 d-flex">
                 <DotIcon
                   color={response.status === ResponseStatusCode.OK ||
                   response.status === ResponseStatusCode.CREATED
-                    ? "var(--success-color)"
+                    ? "var(--request-get)"
                     : "var(--request-delete)"}
-                    height={"6px"}
-                    width={"6px"}
+                  height={"6px"}
+                  width={"6px"}
                 />
               </span>
               {response.status.split(" ")[0]}</span
@@ -55,10 +55,10 @@
             class="d-flex align-items-center ps-1 pe-1 border-0 justify-content-center rounded text-backgroundColor gap-1 time-primary1"
             style="font-size: 12px;"
           >
+            <span class="me-1 d-flex">
+              <ClockIcon />
+            </span>
             <span>
-              <span class="me-1">
-                <ClockIcon />
-              </span>
               {response.time}
             </span>
             <p class="mb-0" style="font-size: 12px;">ms</p>
@@ -74,12 +74,10 @@
             class="d-flex align-items-center ps-1 pe-1 justify-content-center rounded border-0 text-backgroundColor gap-1 size-primary1"
             style="font-size: 12px;"
           >
-            <span>
-              <span class="me-1">
-                <BoxIcon />
-              </span>
-              {response.size?.toFixed(2)}
+            <span class="me-1 d-flex">
+              <BoxIcon />
             </span>
+            {response.size?.toFixed(2)}
             <p class="mb-0" style="font-size: 12px;">KB</p>
           </span>
         </Tooltip>
@@ -95,7 +93,7 @@
   }
 
   .time-primary1 {
-    color: var(--success-color) !important;
+    color: var(--request-get) !important;
     background-color: transparent;
   }
   .size-primary1 {
