@@ -12,7 +12,7 @@ import { html_beautify, js_beautify } from "js-beautify";
  * @param code - text that should be shown on code mirror view
  * @returns - plain text code without indentation
  */
-const removeIndentation = (str: string) => {
+const removeIndentation = (str: string = "") => {
   // Split the code into lines
   const lines = str.split("\n");
   // Remove leading whitespace from each line
