@@ -12,6 +12,7 @@
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "$lib/utils/animations";
 
+  import { onDestroy } from "svelte";
   // ---- Components
   import {
     RestExplorerPage,
@@ -67,10 +68,6 @@
   import { TeamProfile } from "@teams/features/team-settings/components";
   import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
 
-  export let modifiedUser;
-
-  export let handleChange;
-
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -79,8 +76,6 @@
     _viewModel.getActiveWorkspace();
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
-  const tabList: Observable<TabDocument[]> = _viewModel.tabs;
-  const activeTab: Observable<TabDocument> = _viewModel.getActiveTab();
 
   let removeTab: Tab;
   let isPopupClosed: boolean = false;
@@ -158,7 +153,6 @@
   });
 
   user.subscribe((value) => {
-    modifiedUser = value;
     userId = value?._id;
   });
 
@@ -256,18 +250,6 @@
     leftPanelCollapse.set(!$leftPanelCollapse);
   };
 
-  // Rerender animation on tab switch
-  let prevTabId: string = "";
-  let tabPath: Path;
-  activeTab.subscribe((value: TabDocument) => {
-    if (value) {
-      if (prevTabId !== value.tabId) {
-        tabPath = value.path;
-        tabPath["requestId"] = value.id;
-      }
-      prevTabId = value.tabId;
-    } else tabPath = {};
-  });
   let scrollList;
 
   let githubRepoData: GithubRepoDocType;
@@ -291,12 +273,16 @@
   /**
    * Refreshing collection whenever workspace switches
    */
+  let tabList;
+  let activeTab;
   let prevWorkspaceId = "";
   let count = 0;
-  currentWorkspace.subscribe((value) => {
+  const cw = currentWorkspace.subscribe((value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
         _viewModel.fetchCollections(value?._id);
+        tabList = _viewModel.getTabListWithWorkspaceId(value._id);
+        activeTab = _viewModel.getActiveTab(value._id);
       }
       prevWorkspaceId = value._id;
       if (count == 0) {
@@ -308,7 +294,7 @@
       }
       value.users?.forEach((user) => {
         if (user.id === userId) {
-          userRole = user.role;
+          userRole = user.role as string;
         }
       });
     }
@@ -322,6 +308,10 @@
       splitter.style.display = "unset";
     }
   }
+
+  onDestroy(() => {
+    cw.unsubscribe();
+  });
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -427,7 +417,6 @@
                     <div class="h-100" use:motion>
                       <WorkspaceExplorerPage
                         {collectionList}
-                        {modifiedUser}
                         tab={$activeTab}
                       />
                     </div>
@@ -467,10 +456,7 @@
   onSave={handlePopupSave}
   onCancel={handleClosePopupBackdrop}
   onDiscard={handlePopupDiscard}
-  isSaveDisabled={!hasWorkpaceLevelPermission(
-    WorkspaceRole.WORKSPACE_ADMIN,
-    workspaceLevelPermissions.SAVE_REQUEST,
-  )}
+  isSaveDisabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
   {loader}
   {isGuestUser}
 />

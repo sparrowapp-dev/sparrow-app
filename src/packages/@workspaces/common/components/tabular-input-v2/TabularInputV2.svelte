@@ -230,7 +230,7 @@
                       updatePairs(index);
                     }}
                     placeholder="Add Variable"
-                    class="w-100 text-fs-12 placeholder-color"
+                    class="table-input-v2 w-100 text-fs-12 placeholder-color"
                     {disabled}
                   />
                 </div>
@@ -376,10 +376,11 @@
     padding-right: 8px;
   }
   input[type="text"]:focus {
-    background-color: var(--bg-secondary-550);
+    background-color: var(--bg-secondary-500);
+    outline: 1px solid var(--border-primary-300);
   }
 
   .placeholder-color::placeholder {
-    color: var(--text-secondary-400);
+    color: var(--text-secondary-300);
   }
 </style>

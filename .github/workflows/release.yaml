@@ -6,7 +6,7 @@ on:
       - main
   workflow_dispatch:
 
-env: 
+env:
   VITE_API_URL: ${{vars.VITE_API_URL}}
   VITE_MIX_PANEL_TOKEN: ${{vars.VITE_MIX_PANEL_TOKEN}}
   VITE_ENABLE_MIX_PANEL: ${{vars.VITE_ENABLE_MIX_PANEL}}
@@ -18,13 +18,16 @@ env:
   VITE_RELEASE_NOTES_PAT_TOKEN: ${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}
   VITE_RELEASE_NOTES_API: ${{ vars.VITE_RELEASE_NOTES_API }}
   VITE_AZURE_CDN_URL: ${{ vars.VITE_AZURE_CDN_URL }}
+  VITE_AZURE_INSIGHTS_CONNECTION_STRING: ${{ vars.VITE_AZURE_INSIGHTS_CONNECTION_STRING }}
+  VITE_CANNY_API: ${{ vars.VITE_CANNY_API }}
+  VITE_CANNY_URL: ${{ vars.VITE_CANNY_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
   release_win:
     runs-on: windows-latest
     environment: production
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -32,7 +35,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '20.8'
+          node-version: "20.8"
 
       - name: Install Windows SDK
         run: Invoke-WebRequest -Uri https://aka.ms/winsdk/10/latest/SdkSetup.exe -OutFile $env:TEMP\SdkSetup.exe
@@ -45,10 +48,10 @@ jobs:
 
       - name: Install Rust 1.76.0
         run: |
-            Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
-            .\rustup-init.exe -y
-            rustup install 1.76.0
-            rustup default 1.76.0
+          Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
+          .\rustup-init.exe -y
+          rustup install 1.76.0
+          rustup default 1.76.0
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
@@ -70,17 +73,17 @@ jobs:
 
       - name: msi sig
         run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.sig
-  
+
       - name: nsis sig
         run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis\*.sig
 
       - name: sign msi
         run: |
-           $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
-           $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
-           $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
-           Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
-           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.msi"
+          $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
+          $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
+          $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
+          Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.msi"
 
       - name: Install AWS CLI
         uses: chrislennon/action-aws-cli@v1.1
@@ -88,7 +91,7 @@ jobs:
           version: latest
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  
+
       - name: Upload files to S3
         run: |
           aws s3 sync D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-prod --exclude "*" --include "*.zip" --include "*.msi"
@@ -96,29 +99,26 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          
-
-
 
   release_macos:
     runs-on: macos-latest
     environment: production
     needs: release_win
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
       - name: Install Rust 1.76.0
         run: |
-         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-         rustup install 1.76.0
-         rustup default 1.76.0
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          rustup install 1.76.0
+          rustup default 1.76.0
 
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
         with:
-          node-version: '20.8'
+          node-version: "20.8"
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
@@ -134,7 +134,7 @@ jobs:
         env:
           APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
           APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
-          APPLE_CERTIFICATE_PASSWORD: "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" 
+          APPLE_CERTIFICATE_PASSWORD: "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}"
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
@@ -153,7 +153,7 @@ jobs:
       - name: Upload & File to S3
         run: |
           aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*.gz"
-          
+
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -164,9 +164,8 @@ jobs:
           aws s3 cp s3://sparrow-release-assests-prod/ msi_files/ --recursive --exclude "*" --include "*.msi" --include "*.exe" --include "*.zip"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}       
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-          
       - name: Fetch Version from package.json
         id: fetch-version
         run: echo "::set-output name=version::$(jq -r .version package.json)"
@@ -175,5 +174,3 @@ jobs:
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-          
-          

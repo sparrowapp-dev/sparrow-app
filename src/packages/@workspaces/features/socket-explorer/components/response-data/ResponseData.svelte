@@ -231,9 +231,11 @@
     <div>
       {#each filteredWebsocketMessage as message}
         <div
-          class="d-flex"
+          class="response-message d-flex align-items-center"
+          style="cursor: pointer;"
           on:click={() => {
-            onUpdateMessageBody(message.data);
+            onUpdateMessageBody(message.uuid);
+
             try {
               if (message.data) {
                 JSON.parse(message.data);
@@ -244,7 +246,10 @@
             }
           }}
         >
-          <span class="p-2 d-flex align-items-center" style="width:35px;">
+          <span
+            class="p-2 d-flex align-items-center"
+            style="width: 35px !important;"
+          >
             {#if message?.transmitter === "sender"}
               <ArrowOutwardIcon
                 height={"10px"}
@@ -263,7 +268,6 @@
                 color={"#69D696"}
               />
             {:else if message?.transmitter === "receiver"}
-              <!-- RecieveIcon -->
               <ArrowInsertIcon
                 height={"10px"}
                 width={"10px"}
@@ -271,15 +275,23 @@
               />
             {/if}
           </span>
-          <span class="text-fs-12 py-2 px-3 timestamp">
+          <!-- <div class="d-flex align-items-center"> -->
+          <span
+            class="text-fs-12 py-2 px-3 timestamp"
+            style="white-space: nowrap; line-height: 1;"
+          >
             {message?.timestamp}
           </span>
-          <p class="ellipsis py-2 text-fs-12 mb-0">
-            <!-- {message?.data} -->
+          <p
+            class="ellipsis text-fs-12 mb-0"
+            style="margin-left: 8px; line-height: 1; width: calc(100% - 145px);"
+          >
             {@html highlightSearchText(message?.data, searchData)}
           </p>
+          <!-- </div> -->
         </div>
       {/each}
+
       {#if !filteredWebsocketMessage?.length && (searchData || webSocket.filter !== "All messages")}
         <p class="text-fs-16 text-center text-secondary-200">
           No results found.
@@ -297,5 +309,8 @@
   }
   :global(.highlight-websocket-message-search) {
     background-color: #1e354d;
+  }
+  .response-message:hover {
+    background-color: #2e2f3d;
   }
 </style>

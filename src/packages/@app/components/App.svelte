@@ -92,6 +92,9 @@
       doOnlineCheck();
     }, 5000);
   });
+  window.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+  });
 </script>
 
 <AutoUpdateDialog />

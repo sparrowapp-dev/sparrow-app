@@ -30,6 +30,7 @@
     WorkspaceIcon,
   } from "@library/icons";
   import { TabTypeEnum } from "@common/types/workspace";
+  import { TextEditor } from "@library/forms";
 
   export let onClick;
   export let onFinish = (id: string) => {};
@@ -68,7 +69,7 @@
   let componentData = {
     path: requestPath,
     name: requestName,
-    description: requestDescription,
+    // description: requestDescription,
     property: {
       request: {
         method: requestMethod,
@@ -87,7 +88,8 @@
   let path: Path[] = [];
 
   let tabName: string;
-  let description: string;
+  // let description: string;
+
   let latestRoute: {
     id: string;
   } = {
@@ -114,12 +116,14 @@
     // Setting save request name and description on load
     if (!componentData.path.workspaceId || !componentData.path.collectionId) {
       tabName = componentData.name;
-      description = componentData.description;
+      // description = componentData.description;
     } else {
       tabName = componentData.name + " Copy";
-      description = componentData.description + " Copy";
+      // description = componentData.description + " Copy";
     }
   });
+
+  // console.log(description, "description");
 
   const getFilteredCollection = async (value: CollectionDocument[]) => {
     const _workspace = await readWorkspace(componentData?.path?.workspaceId);
@@ -176,7 +180,6 @@
   const handleCreateFolder = async (folderName: string): Promise<void> => {
     createDirectoryLoader = true;
     const res = await onCreateFolder(workspaceMeta, path[0].id, folderName);
-    console.log("res", res);
     if (res.status === "success") {
       latestRoute = res.data.latestRoute;
       res.data.addRequestOrFolderInCollection(
@@ -715,7 +718,10 @@
             <QuestionIcon color={"var(--sparrow-text-color)"} />
           </span>
           {#if instructionEnabled}
-            <div class="bg-tertiary-300 api-name-usage p-3">
+            <div
+              style="z-index: 10;"
+              class="bg-tertiary-300 api-name-usage p-3"
+            >
               <div class="d-flex justify-content-between">
                 <p class="text-whiteColor">Best Practices</p>
                 <img
@@ -784,15 +790,19 @@
       <p class="api-url">{componentData?.property.request.url}</p>
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>
-    <div class="pb-1">
-      <textarea
-        style="width: 100%; resize:none; border: 1px solid var(--border-secondary-400);"
-        class="py-2 px-3 bg-tertiary-300 border-radius-2 sparrow-fs-12"
-        rows="5"
-        maxlength="1024"
-        placeholder="Give a description to help people know about this request"
-        bind:value={description}
-      />
+    <div style="height:170px; overflow:auto !important;">
+      <div
+        class="pb-1 bg-tertiary-300"
+        id="editor1"
+        style="width:100%;  margin:0px !important; pointer-events: none !important;"
+      >
+        <TextEditor
+          placeholder={"Add a description to help people know about this request."}
+          isReadOnly={true}
+          id={"editor1"}
+          value={requestDescription}
+        />
+      </div>
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>
     {#if path.length === 0}
@@ -900,7 +910,7 @@
               workspaceMeta,
               path,
               tabName,
-              description,
+              requestDescription,
               type,
             );
             if (res.status === "success") {

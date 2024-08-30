@@ -52,8 +52,9 @@
             <div class="d-flex mt-3">
               <div class="details d-flex flex-column gap-0">
                 <p class="text-primary">{item.dateCreated}</p>
-                <p class="fs-8 fw-semibold">
-                  Latest Version: {item.versionName}
+                <p class="version-name fs-8 fw-semibold">
+                  {index === 0 ? "Latest Version:" : "Version:"}
+                  {item.versionName}
                 </p>
               </div>
 
@@ -70,7 +71,7 @@
                     class="d-flex align-items-center gap-3"
                     style="color: var(--text-primary-300); font-weight: 400; font-size: 16px; cursor: pointer;"
                     on:click={async () => {
-                      onLearnMore();
+                      onLearnMore(item.versionName);
                     }}
                   >
                     Learn more

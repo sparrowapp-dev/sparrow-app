@@ -19,7 +19,6 @@
    */
   export let env;
 
-
   /**
    * deletes the environment
    */
@@ -37,7 +36,7 @@
    */
   export let onSelectEnvironment;
 
-  export let activeTabId
+  export let activeTabId;
 
   /**
    * Role of user in workspace
@@ -160,7 +159,7 @@
   handleModalState={handleEnvironmentPopUpCancel}
 >
   <div class="text-lightGray mb-1 sparrow-fs-14">
-    <p>
+    <p style="font-weight: 400;" class="text-fs-14">
       Are you sure you want to delete this Environment? <span
         style="font-weight:700;"
         class="">"{env.name}"</span

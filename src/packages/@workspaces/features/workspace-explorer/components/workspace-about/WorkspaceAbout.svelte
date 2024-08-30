@@ -25,38 +25,36 @@
    * Role of user in active workspace
    */
   export let userRole;
-
-  /**
-   * Handles the update of workspace description.
-   * Calls with current workspaceID and workspaceDescription.
-   */
-  const handleWorkspaceDescription = async () => {
-    await onUpdateWorkspaceDescription(workspaceID, workspaceDescription);
-  };
 </script>
 
 <div
   class="About d-flex flex-column h-100"
-  style="padding:24px; padding-top:0; gap:16px !important; "
+  style="padding-top:0; gap:16px !important; "
 >
-  <div>
+  <div class="h-100">
     <textarea
-      bind:value={workspaceDescription}
-      on:blur={handleWorkspaceDescription}
       disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-      class="text-area w-100"
-      style="height: 121px; background-color:transparent; border:none;"
-      placeholder="This is your personal workspace. Describe the objectives of the workspace and how it is meant to be used. Or create a comprehensive API documentation by including links to your collections and requests. Start typing. "
-    ></textarea>
+      id="updateWorkspaceDescField"
+      class="bg-transparent border-0 text-textColor text-fs-12 input-outline shadow-none w-100 p-2"
+      value={workspaceDescription || ""}
+      placeholder="This is your personal workspace. Describe the objectives of the workspace and how it is meant to be used. Or create a comprehensive API documentation by including links to your collections and requests. Start typing."
+      on:blur={(event) => {
+        if (workspaceDescription !== event.target.value) {
+          onUpdateWorkspaceDescription(workspaceID, event.target.value);
+        }
+      }}
+    />
   </div>
 </div>
 
 <style>
-  .text-area::placeholder {
-    font-size: 12px;
-    color: var(--bg-secondary-950);
-  }
-  .text-area {
+  textarea {
     outline: none;
+    height: 300px;
+    border: 1px solid transparent !important;
+  }
+  textarea:focus,
+  textarea:hover {
+    border: 1px solid var(--border-primary-300) !important;
   }
 </style>

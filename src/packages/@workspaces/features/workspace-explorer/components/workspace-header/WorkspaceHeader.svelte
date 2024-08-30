@@ -39,47 +39,57 @@
    */
   export let userRole;
 
-  /**
-   * Handles the update of workspace name.
-   * Calls onUpdateWorkspaceName with current workspaceID and workspaceName.
-   * Shows an error notification if workspaceName is empty.
-   */
-  const handleWorkspaceName = async () => {
-    if (workspaceName != "") {
-      await onUpdateWorkspaceName(workspaceID, workspaceName);
-    } else {
-      notifications.error("Please Enter A Workspace Name");
-    }
+  const onRenameInputKeyPress = () => {
+    const inputField = document.getElementById(
+      "renameInputFieldWorkspace",
+    ) as HTMLInputElement;
+    inputField.blur();
+  };
+
+  const resetInputField = () => {
+    const inputField = document.getElementById(
+      "renameInputFieldWorkspace",
+    ) as HTMLInputElement;
+    inputField.value = workspaceName;
   };
 </script>
 
 <section>
   <div
     class="About d-flex flex-column h-100"
-    style="padding:24px; gap:16px !important; "
+    style="padding-bottom:24px; gap:16px !important; "
   >
     <div class="d-flex" style="justify-content: space-between;">
       <div
-        class="ellipsis"
-        style="font-weight: 700; font-size:18px; color:var(--text-secondary-100);"
+        class="ellipsis w-100"
+        style="font-weight: 700; color:var(--text-secondary-100);"
       >
-        <Input
-          bind:value={workspaceName}
-          on:blur={handleWorkspaceName}
-          id={"workspace-name"}
-          width={"300px"}
+        <input
+          on:blur={(event) => {
+            const newValue = event.target.value;
+            const previousValue = workspaceName;
+            if (event.target.value === "") {
+              resetInputField();
+            } else if (newValue !== previousValue) {
+              onUpdateWorkspaceName(workspaceID, newValue);
+            }
+          }}
+          on:keydown={(event) => {
+            if (event.key === "Enter") {
+              onRenameInputKeyPress();
+            }
+          }}
           type="text"
-          defaultBorderColor="Transparent"
-          hoveredBorderColor={"var(--border-primary-300)"}
-          focusedBorderColor={"var(--border-primary-300)"}
-          class="text-fs-18 bg-transparent  "
-          style="outline:none; font-weight:700;"
-          placeholder="My Workspace"
+          required
+          id="renameInputFieldWorkspace"
+          value={workspaceName}
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+          class="bg-transparent input-outline border-0 text-fs-18 text-left w-100 ps-2 py-0"
+          maxlength={100}
         />
       </div>
       {#if userRole === WorkspaceRole.WORKSPACE_ADMIN}
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 ms-3">
           <Button
             type={"dark"}
             title={"Delete Workspace"}
@@ -105,3 +115,14 @@
     </div>
   </div>
 </section>
+
+<style>
+  input {
+    outline: none;
+    border: 1px solid transparent !important;
+  }
+  input:focus,
+  input:hover {
+    border: 1px solid var(--border-primary-300) !important;
+  }
+</style>

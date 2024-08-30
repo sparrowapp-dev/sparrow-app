@@ -18,6 +18,7 @@ import { webSocketDataStore } from "@workspaces/features/socket-explorer/store";
 import { v4 as uuidv4 } from "uuid";
 import { RequestDataTypeEnum } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
+import { appInsights } from "@app/logger";
 
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
@@ -95,6 +96,7 @@ const makeRequest = async (
   includeAxiosData?: boolean,
 ) => {
   isLoading.set(true);
+  const startTime = performance.now();
   try {
     const response = await axios({
       method: method,
@@ -102,17 +104,60 @@ const makeRequest = async (
       data: requestData?.body,
       headers: requestData?.headers,
     });
+    const endTime = performance.now(); // End timing
+    const duration = endTime - startTime; // Calculate duration in milliseconds
 
     if (response.status === 201 || response.status === 200) {
+      appInsights.trackDependencyData({
+        id: uuidv4(),
+        target: url,
+        name: `${method} ${url}`,
+        duration,
+        success: true,
+        responseCode: response.status,
+        properties: {
+          message: response?.data?.message,
+          source: "frontend",
+          type: "HTTP",
+        },
+      });
       if (includeAxiosData) {
         return success(response, "");
       } else {
         return success(response.data, "");
       }
     } else {
+      appInsights.trackDependencyData({
+        id: uuidv4(),
+        target: url,
+        name: `${method} ${url}`,
+        duration,
+        success: false,
+        responseCode: response.status,
+        properties: {
+          message: response?.data?.message,
+          source: "frontend",
+          type: "HTTP",
+        },
+      });
       return error(response.data.message);
     }
   } catch (e) {
+    const endTime = performance.now(); // End timing
+    const duration = endTime - startTime; // Calculate duration in milliseconds
+    appInsights.trackDependencyData({
+      id: uuidv4(),
+      target: url,
+      name: `${method} ${url}`,
+      duration,
+      success: false,
+      responseCode: e?.response?.status || 400,
+      properties: {
+        message: e?.response?.data?.message,
+        source: "frontend",
+        type: "HTTP",
+      },
+    });
     if (
       e.response?.data?.statusCode === 401 &&
       e.response?.data?.message === ErrorMessages.ExpiredToken
@@ -418,7 +463,7 @@ const makeHttpRequestV2 = async (
 ) => {
   // create a race condition between the timeout and the api call
   console.table({ url, method, headers, body, request });
-
+  const startTime = performance.now();
   return Promise.race([
     timeout(apiTimeOut),
     // Invoke communication
@@ -431,17 +476,54 @@ const makeHttpRequestV2 = async (
     }),
   ])
     .then(async (data: string) => {
+      const endTime = performance.now();
+      const duration = endTime - startTime;
       try {
         const responseBody = JSON.parse(data);
         const apiResponse: Response = JSON.parse(responseBody.body) as Response;
         console.table(apiResponse);
+        appInsights.trackDependencyData({
+          id: uuidv4(),
+          name: "RPC Duration Metric",
+          duration,
+          success: true,
+          responseCode: parseInt(apiResponse.status),
+          properties: {
+            source: "frontend",
+            type: "RPC_HTTP",
+          },
+        });
         return success(apiResponse);
       } catch (e) {
         console.error(e);
+        appInsights.trackDependencyData({
+          id: uuidv4(),
+          name: "RPC Duration Metric",
+          duration,
+          success: false,
+          responseCode: 400,
+          properties: {
+            source: "frontend",
+            type: "RPC_HTTP",
+          },
+        });
         return error("error");
       }
     })
     .catch((e) => {
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+      appInsights.trackDependencyData({
+        id: uuidv4(),
+        name: "RPC Duration Metric",
+        duration,
+        success: false,
+        responseCode: 400,
+        properties: {
+          source: "frontend",
+          type: "RPC_HTTP",
+        },
+      });
       console.error(e);
       return error("error");
     });

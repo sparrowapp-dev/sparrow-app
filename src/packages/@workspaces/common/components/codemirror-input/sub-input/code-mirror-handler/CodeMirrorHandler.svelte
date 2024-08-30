@@ -59,6 +59,7 @@
    */
   export let id;
   export let componentClass;
+  export let isFocusedOnMount = false;
 
   let inputWrapper: HTMLElement;
   let localEnvKey = "";
@@ -205,6 +206,7 @@
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
       event.preventDefault();
     } else if (event.altKey && event.code === "KeyL" && id.includes("url")) {
+      event.preventDefault();
       codeMirrorView?.focus();
     }
   };
@@ -320,6 +322,7 @@
   }
   onMount(() => {
     initalizeCodeMirrorEditor(rawValue);
+    if (isFocusedOnMount) codeMirrorView.focus();
   });
 
   afterUpdate(() => {

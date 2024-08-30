@@ -3,7 +3,7 @@
   "private": true,
   "author": "Sparrow",
   "description": "The Sparrow App is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and making you a better programmer.",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -21,7 +21,15 @@
     "@codemirror/lang-xml": "^6.0.2",
     "@codemirror/language": "^6.10.0",
     "@codemirror/state": "^6.4.0",
+    "@editorjs/code": "^2.9.0",
+    "@editorjs/editorjs": "^2.30.4",
+    "@editorjs/header": "^2.8.7",
+    "@editorjs/inline-code": "^1.5.1",
+    "@editorjs/list": "^1.10.0",
+    "@editorjs/paragraph": "^2.11.6",
+    "@editorjs/underline": "^1.1.0",
     "@lezer/highlight": "^1.2.0",
+    "@microsoft/applicationinsights-web": "^3.3.1",
     "@tauri-apps/api": "^2.0.0-beta.0",
     "@tauri-apps/cli": "^2.0.0-beta.1",
     "@tauri-apps/plugin-deep-link": "^2.0.0-beta.0",
@@ -36,6 +44,7 @@
     "btoa": "^1.2.1",
     "codemirror": "^6.0.1",
     "codemirror-json-schema": "^0.6.1",
+    "editorjs-parser": "^1.5.3",
     "font-awesome": "^4.7.0",
     "highlight.js": "^11.10.0",
     "js-beautify": "^1.15.1",
@@ -47,6 +56,7 @@
     "path": "^0.12.7",
     "rxdb": "^14.17.1",
     "rxjs": "^7.8.1",
+    "socket.io-client": "^4.7.5",
     "svelte-agnostic-draggable": "^0.2.0",
     "svelte-file-dropzone": "^2.0.2",
     "svelte-jsoneditor": "^0.18.9",
@@ -114,19 +124,19 @@
           "assets": [
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/*.dmg",
-              "label": "Sparrow_2.5.0.dmg"
+              "label": "Sparrow_2.6.0.dmg"
             },
             {
               "path": "msi_files/*.exe",
-              "label": "Sparrow_2.5.0.exe"
+              "label": "Sparrow_2.6.0.exe"
             },
             {
               "path": "msi_files/*.msi",
-              "label": "Sparrow_2.5.0.msi"
+              "label": "Sparrow_2.6.0.msi"
             },
             {
               "path": "msi_files/*.zip",
-              "label": "Sparrow_2.5.0_x64_en-US.msi.zip"
+              "label": "Sparrow_2.6.0_x64_en-US.msi.zip"
             },
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz",

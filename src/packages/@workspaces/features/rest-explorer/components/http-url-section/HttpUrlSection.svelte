@@ -130,13 +130,14 @@
   <CodeMirrorInput
     bind:value={requestUrl}
     onUpdateInput={onUpdateRequestUrl}
-    placeholder={"Enter an URL"}
+    placeholder={"Enter a URL"}
     {theme}
     {onUpdateEnvironment}
     {environmentVariables}
     codeId={"url"}
     class={"input-url"}
     {userRole}
+    isFocusedOnMount={true}
   />
 
   <!-- Send button -->
@@ -187,11 +188,14 @@
       disabled={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
         : false}
+         style="background-color: {isSave ? 'var(--icon-secondary-550)' : 'var(--bg-secondary-400)'}; color: white;"
     >
       <DiskIcon
         height={22}
         width={22}
-        color={isHovered && !isSave && !isGuestUser
+        color={isSave
+          ? "var(--icon-secondary-380)"
+          : isHovered && !isSave && !isGuestUser
           ? "var(--icon-primary-200)"
           : "var(--icon-secondary-100)"}
       />

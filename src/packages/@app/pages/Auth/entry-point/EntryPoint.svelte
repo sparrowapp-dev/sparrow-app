@@ -3,8 +3,6 @@
   import sparrowicon from "@library/icons/logoSparrowSquare.svg";
   import Redirect from "../redirect/Redirect.svelte";
   import constants from "$lib/utils/constants";
-  import Header from "$lib/components/header/Header.svelte";
-  import star from "$lib/assets/star.svg";
   import StarIcon from "../../../../@library/icons/Star.svelte";
   import StarFilled from "@library/icons/StarFilled.svelte";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
@@ -40,7 +38,7 @@
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
   };
-  const handleRedirect = (value) => {
+  const handleRedirect = (value: boolean) => {
     isEntry = value;
   };
   let os = "";
@@ -145,14 +143,16 @@
       </div>
     </div>
     <div
-      class="mb-2 mt-2"
-      style="text-align:center; font-size:12px; color:var(  --text-secondary-350);"
+      class="mb-2 mt-2 w-[266px]"
+      style="text-align:center; font-size:12px; color:var(  --text-secondary-350); padding: 5% 0px; width: 80%;
+      font-size: 12px;
+      "
     >
       Sparrow Edge: Your instant, no-signup API testing tool stripped down to
       the essentials.
     </div>
 
-    <div class="w-100 mb-3 d-flex align-items-center justify-content-center">
+    <div class="w-100 d-flex align-items-center justify-content-center">
       {#if os === "windows"}
         <a
           href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
@@ -220,11 +220,6 @@
           class=" cursor-pointer text-center text-secondary-250 sparrow-fs-14 m-1"
         >
           Version {version}
-        </p>
-        <p
-          class=" cursor-pointer check-for-update text-center sparrow-fs-12 mb-5"
-        >
-          Check for Update
         </p>
       </div>
     </div>
