@@ -1,3 +1,11 @@
+## [2.6.1](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.6.0...v2.6.1) (2024-08-30)
+
+
+### Bug Fixes
+
+* added comment for pipeling run [] ([c8e996c](https://github.com/sparrowapp-dev/sparrow-app/commit/c8e996cff6d22aa8984eaf3a54139b018a88e896))
+* mergee pull changes [] ([b566a99](https://github.com/sparrowapp-dev/sparrow-app/commit/b566a99df702ec0c36f2b6d113fd1fc0fcef55c3))
+
 # [2.6.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.5.0...v2.6.0) (2024-08-30)
 
 
