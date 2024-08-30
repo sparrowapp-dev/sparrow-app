@@ -199,7 +199,9 @@
       isGuestUser
         ? true
         : false}
-         style="background-color: {isSave ? 'var(--icon-secondary-550)' : 'var(--bg-secondary-400)'}; color: white;"
+      style="background-color: {isSave
+        ? 'var(--icon-secondary-550)'
+        : 'var(--bg-secondary-400)'}; color: white;"
     >
       <DiskIcon
         height={22}
@@ -209,7 +211,7 @@
           : isHovered && !isSave && !isGuestUser
           ? "var(--icon-primary-200)"
           : isGuestUser || requestUrl === ""
-          ? "var(--icon-disabled-100)"
+          ? "var(--icon-secondary-380)"
           : "var(--icon-secondary-100)"}
       />
     </button>
