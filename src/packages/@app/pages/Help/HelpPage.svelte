@@ -52,12 +52,12 @@
         >
           Feedback
         </div>
-        <!-- <div
+        <div
           class="tab {activeTab === 'updates' ? 'active' : ''}"
           on:click={() => setActiveTab("updates")}
         >
           Updates
-        </div> -->
+        </div>
       </div>
       <!--
         -- Help Body 
@@ -80,10 +80,10 @@
                 onSendFeedback={_viewModel.sendFeedback}
               />
             {:else if activeTab === "updates"}
-              <!-- <ReleaseNotes
+              <ReleaseNotes
                 {releaseNotesData}
                 onLearnMore={_viewModel.learnMore}
-              /> -->
+              />
             {/if}
           </div>
         </div>
