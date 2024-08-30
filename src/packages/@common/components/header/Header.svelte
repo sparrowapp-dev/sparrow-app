@@ -169,7 +169,7 @@
           data={guestData}
           titleId={`${currentWorkspaceId}`}
           onclick={() => {}}
-          minHeaderWidth={"195px"}
+          minHeaderWidth={"205px"}
           iconRequired={false}
           isDropIconFilled={true}
           borderType={"none"}
