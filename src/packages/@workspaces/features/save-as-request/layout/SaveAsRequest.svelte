@@ -718,7 +718,10 @@
             <QuestionIcon color={"var(--sparrow-text-color)"} />
           </span>
           {#if instructionEnabled}
-            <div style="z-index: 10;" class="bg-tertiary-300 api-name-usage p-3">
+            <div
+              style="z-index: 10;"
+              class="bg-tertiary-300 api-name-usage p-3"
+            >
               <div class="d-flex justify-content-between">
                 <p class="text-whiteColor">Best Practices</p>
                 <img
@@ -787,17 +790,19 @@
       <p class="api-url">{componentData?.property.request.url}</p>
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>
-    <div
-      class="pb-1 bg-tertiary-300"
-      id="editor1"
-      style="width:100%; height:170px ; overflow-y:auto; margin:0px !important; "
-    >
-      <TextEditor
-        placeholder={"Add a description to help people know about this request."}
-        isReadOnly={true}
-        id={"editor1"}
-        value={requestDescription}
-      />
+    <div style="height:170px; overflow:auto !important;">
+      <div
+        class="pb-1 bg-tertiary-300"
+        id="editor1"
+        style="width:100%;  margin:0px !important; pointer-events: none !important;"
+      >
+        <TextEditor
+          placeholder={"Add a description to help people know about this request."}
+          isReadOnly={true}
+          id={"editor1"}
+          value={requestDescription}
+        />
+      </div>
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>
     {#if path.length === 0}
