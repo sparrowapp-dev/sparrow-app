@@ -3072,10 +3072,9 @@ export default class CollectionsViewModel {
         };
 
         const initCollectionTab = new InitCollectionTab(
-          response.data.data._id,
+          response.data.data.collection._id,
           currentWorkspaceId,
         );
-
         initCollectionTab.updatePath(path);
 
         initCollectionTab.updateName(response.data.data.collection.name);
