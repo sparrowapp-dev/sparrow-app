@@ -11,6 +11,7 @@
   import { onMount } from "svelte";
   import { Motion } from "svelte-motion";
   import { pagesMotion } from "@app/constants";
+  import { Community } from "@support/features/community";
 
   const _viewModel = new HelpPageViewModel();
 
@@ -52,12 +53,18 @@
         >
           Feedback
         </div>
-        <!-- <div
+        <div
           class="tab {activeTab === 'updates' ? 'active' : ''}"
           on:click={() => setActiveTab("updates")}
         >
           Updates
-        </div> -->
+        </div>
+        <div
+        class="tab {activeTab === 'community' ? 'active' : ''}"
+        on:click={() => setActiveTab("community")}
+      >
+        Community
+      </div>
       </div>
       <!--
         -- Help Body 
@@ -72,18 +79,21 @@
         >
           <div class="h-100 pe-2" style="overflow:auto;">
             {#if activeTab === "feedback"}
-              <!-- <FeedbackToast />
-              <DiscordPost /> -->
+             
               <FeedbackSection
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
                 onSendFeedback={_viewModel.sendFeedback}
               />
             {:else if activeTab === "updates"}
-              <!-- <ReleaseNotes
+              <ReleaseNotes
                 {releaseNotesData}
                 onLearnMore={_viewModel.learnMore}
-              /> -->
+              />
+
+              {:else if activeTab === "community"}
+              <Community/>
+              <DiscordPost />
             {/if}
           </div>
         </div>
