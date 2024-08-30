@@ -185,28 +185,13 @@ export class WorkspaceRepository {
   /**
    * remove workspaces by teamId
    */
-  public removeWorkspaces = async (teamId: string): Promise<any> => {
+  public findWorkspaceByTeamId = async (teamId: string): Promise<any> => {
     const workspaces = await RxDB.getInstance().rxdb.workspace.find({
       selector: {
         "team.teamId": teamId,
       },
     });
-    const workspaceDoc = await workspaces.exec();
-    for (let i = 0; i < workspaceDoc.length; i++) {
-      await this.collectionRepository.removeCollections(workspaceDoc[i]._id);
-      await this.environmentRepository.removeEnvironments(workspaceDoc[i]._id);
-      await this.tabRepository.removeTabsByQuery({
-        selector: {
-          "path.workspaceId": workspaceDoc[i]._id,
-        },
-      });
-
-      const tabs = await this.tabRepository.getTabDocs();
-      if (!tabs) {
-        await this.tabRepository.activateInitialTab();
-      }
-    }
-    return await workspaces.remove();
+    return await workspaces.exec();
   };
 
   /**
@@ -335,8 +320,8 @@ export class WorkspaceRepository {
         },
       })
       .exec();
-    await this.collectionRepository.removeCollections(workspaceId);
-    await this.environmentRepository.removeEnvironments(workspaceId);
+    // await this.collectionRepository.removeCollections(workspaceId);
+    // await this.environmentRepository.removeEnvironments(workspaceId);
     return await workspace.remove();
   };
   public addUserInWorkspace = async (

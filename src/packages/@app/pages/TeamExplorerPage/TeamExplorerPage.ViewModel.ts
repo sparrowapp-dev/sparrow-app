@@ -5,6 +5,8 @@ import { Events, UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import type { WorkspaceDocument } from "@app/database/database";
+import { CollectionRepository } from "@app/repositories/collection.repository";
+import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
@@ -23,6 +25,8 @@ export class TeamExplorerPageViewModel {
   private teamRepository = new TeamRepository();
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
+  private collectionRepository = new CollectionRepository();
+  private environmentRepository = new EnvironmentRepository();
   private workspaceService = new WorkspaceService();
   private teamService = new TeamService();
   private guestUserRepository = new GuestUserRepository();
@@ -626,14 +630,13 @@ export class TeamExplorerPageViewModel {
           "path.workspaceId": workspace._id,
         },
       });
+      await this.collectionRepository.removeCollections(workspace._id);
+      await this.environmentRepository.removeEnvironments(workspace._id);
+
       await this.teamRepository.removeWorkspaceFromTeam(
         workspace.team?.teamId,
         workspace._id,
       );
-      const tabs = await this.tabRepository.getTabDocs();
-      if (!tabs) {
-        await this.tabRepository.activateInitialTab();
-      }
       notifications.success(
         `${workspace.name} is removed from ${workspace?.team?.teamName}.`,
       );
@@ -674,6 +677,19 @@ export class TeamExplorerPageViewModel {
         response.message ?? "Failed to leave the team. Please try again.",
       );
       return response;
+    }
+    await this.teamRepository.removeTeam(teamId);
+    const workspaceDoc =
+      await this.workspaceRepository.findWorkspaceByTeamId(teamId);
+    for (let i = 0; i < workspaceDoc.length; i++) {
+      await this.collectionRepository.removeCollections(workspaceDoc[i]._id);
+      await this.environmentRepository.removeEnvironments(workspaceDoc[i]._id);
+      await this.workspaceRepository.deleteWorkspace(workspaceDoc[i]._id);
+      await this.tabRepository.removeTabsByQuery({
+        selector: {
+          "path.workspaceId": workspaceDoc[i]._id,
+        },
+      });
     }
 
     await new Promise<void>((resolve) =>

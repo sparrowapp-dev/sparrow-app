@@ -1992,7 +1992,14 @@ export default class CollectionsViewModel {
       this.collectionRepository.deleteCollection(collection.id);
       this.deleteCollectioninWorkspace(workspaceId, collection.id);
       notifications.success(`"${collection.name}" Collection deleted.`);
-      this.removeMultipleTabs(deletedIds);
+      // this.removeMultipleTabs(deletedIds);
+      await this.tabRepository.removeTabsByQuery({
+        selector: {
+          "path.collectionId": collection.id,
+        },
+      });
+      ////////////////////////////////////////////////
+      // active any tab random tab here
       MixpanelEvent(Events.DELETE_COLLECTION, {
         source: "Collection list",
       });

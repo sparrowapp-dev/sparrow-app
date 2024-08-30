@@ -266,7 +266,7 @@ export class TeamRepository {
         },
       })
       .exec();
-    await this.workspaceRepository.removeWorkspaces(teamId);
+
     return await team.remove();
   };
 
