@@ -656,6 +656,20 @@ export class TeamExplorerPageViewModel {
     if (response.isSuccessful) {
       delete response?._id;
       this.teamRepository.modifyTeam(_teamId, response.data.data);
+      if (_teamData?.name) {
+        const ws = await this.workspaceRepository.getWorkspacesDocs();
+        for (let i = 0; i < ws.length; i++) {
+          const data = ws[i].toMutableJSON();
+          if (data.team?.teamId === _teamId) {
+            await this.workspaceRepository.updateWorkspace(data._id, {
+              team: {
+                teamId: _teamId,
+                teamName: _teamData.name,
+              },
+            });
+          }
+        }
+      }
     }
   };
 
