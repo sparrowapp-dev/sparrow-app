@@ -4,90 +4,7 @@
   import Input from "@library/forms/Input/Input.svelte";
   import { CategoryIcon, CrossIcon, StackIcon } from "@library/icons";
   import HelpInfoCard from "@support/common/components/HelpInfo-Card/HelpInfoCard.svelte";
-
-  const productStatus = [
-    {
-      status: "Under Review",
-      products: [
-        {
-          title: "Awesome Product",
-          category: "featureRequest",
-          votes: 21,
-          link: "https://example.com",
-        },
-        {
-          title: "Another Great Product",
-          category: "uxImprovement",
-          votes: 19,
-          link: "https://example.com/another",
-        },
-        {
-          title: "Must-Have Item",
-          category: "bugs",
-          votes: 15,
-          link: "https://example.com/must-have",
-        },
-        {
-          title: "Unique Tool",
-          category: "featureRequest",
-          votes: 12,
-          link: "https://example.com/unique-tool",
-        },
-        {
-          title: "Necessary Fix",
-          category: "bugs",
-          votes: 18,
-          link: "https://example.com/necessary-fix",
-        },
-      ],
-    },
-    {
-      status: "In Progress",
-      products: [
-        {
-          title: "Revamped UI",
-          category: "uxImprovement",
-          votes: 40,
-          link: "https://example.com/revamped-ui",
-        },
-        {
-          title: "New Feature",
-          category: "featureRequest",
-          votes: 32,
-          link: "https://example.com/new-feature",
-        },
-        {
-          title: "Critical Bug Fix",
-          category: "bugs",
-          votes: 27,
-          link: "https://example.com/critical-bug-fix",
-        },
-      ],
-    },
-    {
-      status: "Planned",
-      products: [
-        {
-          title: "Future Enhancement",
-          category: "featureRequest",
-          votes: 50,
-          link: "https://example.com/future-enhancement",
-        },
-        {
-          title: "Improved UX",
-          category: "uxImprovement",
-          votes: 38,
-          link: "https://example.com/improved-ux",
-        },
-        {
-          title: "Minor Bug Fixes",
-          category: "bugs",
-          votes: 22,
-          link: "https://example.com/minor-bug-fixes",
-        },
-      ],
-    },
-  ];
+  import { onMount } from "svelte";
 
   function getColor(status) {
     if (status === "Under Review") return "white";
@@ -105,14 +22,70 @@
 
   let searchTerm = "";
 
+  // $: filteredProductStatus = productStatus.map((status) => ({
+  //   ...status,
+  //   products:
+  //     searchTerm.trim().length > 0
+  //       ? status.products.filter((product) =>
+  //           product.title
+  //             .toLowerCase()
+  //             .includes(searchTerm.trim().toLowerCase()),
+  //         )
+  //       : status.products,
+  // }));
+
+  export let fetchPosts;
+  let productStatus = [];
+
+  onMount(async () => {
+    const response = await fetchPosts();
+    if (response?.data?.posts) {
+      transformPostsToProductStatus(response.data.posts);
+    }
+    console.log("THis is response", response);
+  });
+
+  // function transformPostsToProductStatus(posts) {
+  //   const statusMap = {};
+
+  //   posts.forEach((post) => {
+  //     const { status } = post;
+  //     if (!statusMap[status]) {
+  //       statusMap[status] = { status, products: [] };
+  //     }
+  //     statusMap[status].products.push(post);
+  //   });
+
+  //   productStatus = Object.values(statusMap);
+  // }
+
+  function transformPostsToProductStatus(posts) {
+    const statusMap = {
+      "under review": { status: "Under Review", products: [] },
+      complete: { status: "In Progress", products: [] },
+      open: { status: "Planned", products: [] },
+    };
+
+    posts.forEach((post) => {
+      // Map "open" status to "Under Review"
+      let mappedStatus = post.status; // === "open" ? "Under Review" : post.status;
+
+      // Check if mappedStatus exists in statusMap, if not, use it as it is
+      if (statusMap[mappedStatus]) {
+        statusMap[mappedStatus].products.push(post);
+      }
+    });
+
+    // Convert the statusMap object to an array suitable for rendering in Svelte
+    productStatus = Object.values(statusMap);
+  }
+
   $: filteredProductStatus = productStatus.map((status) => ({
     ...status,
-    products:
+    filteredProducts:
       searchTerm.trim().length > 0
         ? status.products.filter((product) =>
-            product.title
-              .toLowerCase()
-              .includes(searchTerm.trim().toLowerCase()),
+            product.title.toLowerCase().includes(searchTerm.toLowerCase()),
           )
         : status.products,
   }));
@@ -200,7 +173,7 @@
       class="d-flex justify-content-between gap-2 update-state-section"
       style="width:100%;"
     >
-      {#each filteredProductStatus as { status, products }}
+      {#each filteredProductStatus as { status, products, filteredProducts }}
         <div
           class="rounded-2"
           style="width:100%; background-color: #151515; overflow: hidden;"
@@ -213,17 +186,26 @@
             {status}
           </div>
           <div class="p-2">
-            {#if products.length > 0}
-              <HelpInfoCard status={products} />
-            {:else}
+            {#if products.length === 0}
               <p
                 class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
                 style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
               >
-                No results found
+                No Data is there.
               </p>
+            {:else}
+              <HelpInfoCard status={filteredProducts} />
             {/if}
           </div>
+
+          {#if filteredProductStatus.length == 0 && searchTerm.length >= 0}
+            <p
+              class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
+              style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
+            >
+              No results found.
+            </p>
+          {/if}
         </div>
       {/each}
     </div>

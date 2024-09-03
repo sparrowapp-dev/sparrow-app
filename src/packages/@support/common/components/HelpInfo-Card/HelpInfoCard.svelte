@@ -1,6 +1,6 @@
 <script>
   import angleRight from "$lib/assets/angle-right-v2.svg";
-  import { TraingleIcon } from "@library/icons";
+  import { TriangleIcon } from "@library/icons";
 
   export let status;
 </script>
@@ -20,7 +20,7 @@
           class="px-2 py-2 rounded-1"
           style="display:flex; flex-direction:column; align-items:center; border:1px solid #8A9299; cursor:pointer;"
         >
-          <TraingleIcon
+          <TriangleIcon
             height={"10px"}
             width={"10px"}
             color={"var(--white-color)"}
