@@ -13,7 +13,7 @@
   // ----
 
   // ---- Interface
-  import { SocketIcon, StackIcon } from "@library/icons";
+  import { SocketIcon, StackIcon, TreeIcon } from "@library/icons";
   import { TabTypeEnum, type Tab } from "@common/types/workspace";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   // ----
@@ -130,6 +130,14 @@
       {:else if tab.type === TabTypeEnum.ENVIRONMENT}
         <span>
           <StackIcon
+            height={"14px"}
+            width={"14px"}
+            color={"var(--icon-secondary-130)"}
+          />
+        </span>
+      {:else if tab.type === TabTypeEnum.TESTFLOW}
+        <span>
+          <TreeIcon
             height={"14px"}
             width={"14px"}
             color={"var(--icon-secondary-130)"}

@@ -67,6 +67,7 @@
   import type { WebSocketTab } from "@common/types/workspace/web-socket";
   import { TeamProfile } from "@teams/features/team-settings/components";
   import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
+  import TestFlowExplorerPage from "../TestflowExplorerPage/TestflowExplorerPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -425,6 +426,12 @@
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WebSocketExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
+                {:else if $activeTab?.type === ItemType.TESTFLOW}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <TestFlowExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
                 {:else if !$tabList?.length}

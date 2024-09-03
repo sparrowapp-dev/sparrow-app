@@ -59,7 +59,11 @@ import { GuideRepository } from "@app/repositories/guide.repository";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { type Observable } from "rxjs";
-import { InitRequestTab, InitWebSocketTab } from "@common/utils";
+import {
+  InitRequestTab,
+  InitTestflowTab,
+  InitWebSocketTab,
+} from "@common/utils";
 import { InitCollectionTab } from "@common/utils";
 import { InitFolderTab } from "@common/utils/init-folder-tab";
 import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
@@ -209,8 +213,11 @@ export default class CollectionsViewModel {
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
     isApiCreatedFirstTime.set(true);
     if (ws) {
+      // this.tabRepository.createTab(
+      //   new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
+      // );
       this.tabRepository.createTab(
-        new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
+        new InitTestflowTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
       );
       moveNavigation("right");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
