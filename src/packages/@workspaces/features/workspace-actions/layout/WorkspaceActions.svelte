@@ -3,7 +3,6 @@
   import FilterIcon from "$lib/assets/filter.svelte";
   import plusIcon from "$lib/assets/plus-white.svg";
   import CreateRequest from "$lib/assets/create_request.svg";
-  import BubbleIcon from "@library/icons/Bubble.svg";
   import CreateCollection from "$lib/assets/collections-faded.svg";
 
   import { Events, WorkspaceRole } from "$lib/utils/enums";
@@ -20,9 +19,13 @@
 
   import { onDestroy } from "svelte";
   import {
+    CollectionIcon,
     DoubleArrowIcon,
     GithubIcon,
-    socketDeprecateIcon,
+    SocketIcon,
+    TreeIcon,
+    VectorIcon,
+    BubbleIcon,
   } from "@library/icons";
   import { WithButton } from "@workspaces/common/hoc";
   import { version } from "../../../../../../src-tauri/tauri.conf.json";
@@ -195,12 +198,16 @@
     ? [
         {
           name: "Add New API",
-          icon: CreateRequest,
+          icon: VectorIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "12px",
           onclick: () => onItemCreated("request", {}),
         },
         {
           name: "Add Collection",
-          icon: CreateCollection,
+          icon: CollectionIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "13px",
           onclick: () => {
             onItemCreated("collection", {
               workspaceId: currentWorkspaceId,
@@ -212,6 +219,8 @@
         {
           name: "Import cURL",
           icon: BubbleIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
           onclick: () => {
             MixpanelEvent(Events.IMPORT_CURL, {
               source: "curl import popup",
@@ -221,22 +230,35 @@
         },
         {
           name: "Add WebSocket",
-          icon: socketDeprecateIcon,
+          icon: SocketIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
           onclick: () => {
-            onItemCreated("web-socket", {})
+            onItemCreated("web-socket", {});
             MixpanelEvent(Events.Add_WebSocket);
           },
+        },
+        {
+          name: "Add Test Flows",
+          icon: TreeIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => onItemCreated("testflow", {}),
         },
       ]
     : [
         {
           name: "Add New API",
-          icon: CreateRequest,
+          icon: VectorIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "12px",
           onclick: () => onItemCreated("request", {}),
         },
         {
           name: "Add Collection",
-          icon: CreateCollection,
+          icon: CollectionIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "13px",
           onclick: () => {
             showImportCollectionPopup();
             isExpandCollection = true;
@@ -245,6 +267,8 @@
         {
           name: "Import cURL",
           icon: BubbleIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
           onclick: () => {
             MixpanelEvent(Events.IMPORT_CURL, {
               source: "curl import popup",
@@ -254,8 +278,17 @@
         },
         {
           name: "Add WebSocket",
-          icon: socketDeprecateIcon,
+          icon: SocketIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
           onclick: () => onItemCreated("web-socket", {}),
+        },
+        {
+          name: "Add Test Flows",
+          icon: TreeIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => onItemCreated("testflow", {}),
         },
       ];
 
