@@ -11,6 +11,8 @@
   import { onMount } from "svelte";
   import { Motion } from "svelte-motion";
   import { pagesMotion } from "@app/constants";
+    import Roadmap from "@support/features/roadmap/layout/Roadmap.svelte";
+    import { StackIcon } from "@library/icons";
 
   const _viewModel = new HelpPageViewModel();
 
@@ -58,6 +60,16 @@
         >
           Updates
         </div>
+        <div
+        class="tab d-flex align-items-center gap-2 {activeTab === 'roadmap' ? 'active' : ''}"
+        on:click={() => setActiveTab("roadmap")}
+      >
+      <StackIcon
+      height={"12px"}
+      width={"12px"}
+      color={"var(--white-color)"}/>
+        Roadmap
+      </div>
       </div>
       <!--
         -- Help Body 
@@ -83,6 +95,8 @@
                 {releaseNotesData}
                 onLearnMore={_viewModel.learnMore}
               />
+              {:else if activeTab === "roadmap"}
+              <Roadmap />
             {/if}
           </div>
         </div>

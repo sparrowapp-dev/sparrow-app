@@ -65,3 +65,4 @@ export { default as ArrowDownward } from "./ArrowDownward.svelte";
 export { default as DownloadIcon } from "./Download.svelte";
 export { default as Help } from "./Help.svelte";
 export { default as CategoryIcon } from "./Category.svelte";
+export { default as TraingleIcon } from "./TraingleIcon.svelte";
