@@ -657,6 +657,7 @@ export class TeamExplorerPageViewModel {
       delete response?._id;
       this.teamRepository.modifyTeam(_teamId, response.data.data);
       if (_teamData?.name) {
+        // updates the workspace document with updated team name
         const ws = await this.workspaceRepository.getWorkspacesDocs();
         for (let i = 0; i < ws.length; i++) {
           const data = ws[i].toMutableJSON();
