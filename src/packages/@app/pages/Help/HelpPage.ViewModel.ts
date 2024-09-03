@@ -191,11 +191,9 @@ class HelpPageViewModel {
     )?.id;
     return categoryID;
   };
-
+  // write js docs
   retrievePostData = async (postID: string) => {
     const response = await this.cannyService.retrievePost(postID);
-    console.log(response, "response");
-
     return response;
   };
 

@@ -1,11 +1,6 @@
 <script lang="ts">
   import { user } from "$lib/store";
-  import {
-    CategoryIcon,
-    CommentIcon,
-    SortIcon,
-    TriangleIcon,
-  } from "@library/icons";
+  import { CommentIcon, SortIcon } from "@library/icons";
   import { UpvoteIcon } from "@support/common/components";
   import FeedbackPost from "./FeedbackPost.svelte";
   import FeedbackDefault from "./FeedbackDefault.svelte";
@@ -21,7 +16,7 @@
   user.subscribe((value) => {
     userInfo = value;
   });
-  let id;
+  let id = "";
   onMount(async () => {
     const start = performance.now();
     const listPosts = await fetchPosts();

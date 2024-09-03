@@ -20,6 +20,7 @@ export class CannyIoService {
     return response;
   };
 
+  // returns the post data for a specific post
   retrievePost = async (postID: string) => {
     const response = await makeRequest(
       "POST",
