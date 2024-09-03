@@ -45,7 +45,6 @@
       parsedValue = JSON.parse(value);
     }
     editor = new EditorJS({
-      inlineToolbar: ["bold", "italic", "underline"],
       holder: id,
       tools: {
         list: {
@@ -54,7 +53,8 @@
         },
         header: {
           class: Header,
-          inlineToolbar: ["bold", "italic", "underline", "inlineCode"],
+          inlineToolbar: ["bold", "italic", "underline", "inlineCode", "list"],
+          inlineToolbar: true,
 
           config: {
             levels: [2, 3, 4],
@@ -70,6 +70,7 @@
         paragraph: {
           class: Paragraph,
           inlineToolbar: ["bold", "italic", "underline", "inlineCode", "list"],
+          inlineToolbar: true,
         },
       },
       readOnly: isReadOnly,
@@ -99,25 +100,21 @@
   // Reactive statement to update the editor when certain conditions change - When doc is generating.
   $: {
     if (value && isReadOnly) {
-      if (editor?.blocks) {
-        editor.blocks.clear();
-        editor.render({
-          blocks: JSON.parse(value),
-        });
+      if (editor) {
+        if (editor?.blocks) {
+          editor.blocks.clear();
+        }
+        if (editor?.render) {
+          editor.render({
+            blocks: JSON.parse(value),
+          });
+        }
       }
-    }
-    // Toggle the editor's read-only mode if the isReadOnly state changes
-    if (
-      editor?.readOnly &&
-      typeof isReadOnly === "boolean" &&
-      editor?.readOnly?.isEnabled !== isReadOnly
-    ) {
-      editor.readOnly.toggle(isReadOnly);
     }
   }
 </script>
 
-<div style="margin-bottom:10px;" on:input={saveContent} id="editorjs"></div>
+<div on:input={saveContent} id="editorjs"></div>
 
 <style>
   :global(.ce-popover__container) {
@@ -125,13 +122,13 @@
     border: none !important;
     width: 70px !important;
     position: absolute;
-    left: 90px;
+    left: 90px !important;
     right: 90px;
   }
   :global(.ce-popover--nested) {
     position: absolute;
-    left: 90px;
-    right: 90px;
+    left: 0px !important;
+    right: 10px !important;
   }
   :global(.ce-toolbar__actions.ce-toolbar__actions--opened) {
     right: 116%;
@@ -243,7 +240,7 @@
   }
 
   :global(.ce-inline-tool--link) {
-    display: none;
+    display: none !important ;
   }
 
   :global(.ce-popover) {
