@@ -192,6 +192,21 @@ class HelpPageViewModel {
     return categoryID;
   };
 
+  retrievePostData = async (postID: string) => {
+    const response = await this.cannyService.retrievePost(postID);
+    console.log(response, "response");
+
+    return response;
+  };
+
+  public getListOfPOsts = async () => {
+    const boards = await this.RetrieveBoards();
+
+    const boardID = boards?.data?.boards[0]?.id;
+    const response = await this.cannyService.listPosts(boardID);
+    return response;
+  };
+
   /**
    * Creates a post on the feedback board retrieved from Canny service with the given title and description.
    *

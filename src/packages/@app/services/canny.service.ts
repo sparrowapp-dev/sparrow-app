@@ -20,6 +20,23 @@ export class CannyIoService {
     return response;
   };
 
+  retrievePost = async (postID: string) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/posts/retrieve`,
+      {
+        body: {
+          apiKey: this.apiKey,
+          id: postID,
+        },
+        headers: {
+          "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+        },
+      },
+    );
+    return response;
+  };
+
   // returns the list of posts available
   public listPosts = async (boardID: string) => {
     const response = await makeRequest("POST", `${this.apiUrl}/posts/list`, {
