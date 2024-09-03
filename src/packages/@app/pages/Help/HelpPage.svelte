@@ -89,6 +89,8 @@
               <FeedbackSection
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
+                fetchPosts={_viewModel.getListOfPOsts}
+                onRetrievePost={_viewModel.retrievePostData}
               />
             {:else if activeTab === "updates"}
               <ReleaseNotes
