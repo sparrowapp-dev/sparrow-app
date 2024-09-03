@@ -213,11 +213,8 @@ export default class CollectionsViewModel {
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
     isApiCreatedFirstTime.set(true);
     if (ws) {
-      // this.tabRepository.createTab(
-      //   new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
-      // );
       this.tabRepository.createTab(
-        new InitTestflowTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
+        new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
       );
       moveNavigation("right");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
@@ -243,6 +240,17 @@ export default class CollectionsViewModel {
     } else {
       console.error("No active workspace found!");
     }
+  };
+
+  /**
+   * Create web socket new tab with untracked id
+   */
+  private createTestflowNewTab = async (_workspaceId: string) => {
+    this.tabRepository.createTab(
+      this.initTab.testflow("UNTRACKED-" + uuidv4(), _workspaceId).getValue(),
+    );
+    moveNavigation("right");
+    // MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
   };
 
   /**
@@ -2779,6 +2787,9 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
         );
+        break;
+      case "testflow":
+        await this.createTestflowNewTab(args.workspaceId);
         break;
     }
     return response;
