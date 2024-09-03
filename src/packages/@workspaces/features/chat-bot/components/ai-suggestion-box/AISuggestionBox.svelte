@@ -41,7 +41,7 @@
   }
 
   .suggestion-button:hover {
-    background-color: #1e2a47;
-    box-shadow: 2px 2px 12px 0.5px var(--bg-primary-300);
+    background-color: var(--bg-primary-800);
+    box-shadow: 0px 0px 6px 0px var(--bg-primary-300);
   }
 </style>

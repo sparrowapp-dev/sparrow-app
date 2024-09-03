@@ -209,31 +209,40 @@ class HelpPageViewModel {
       };
     },
   ) => {
+    const errorMessage = "Feedback submission failed. Please try again.";
     const files = Array.from(uploadFeedback?.file?.value);
     const formData = new FormData();
     files.forEach((file) => formData.append("files", file));
-    const imageURLs = await this.feedbackService.fetchuploads(formData);
-    const images = imageURLs?.data?.data?.map(
-      (file: { fileUrl: string }) => file?.fileUrl,
-    );
-    const categoryID = await this.getCategoryIDbyName(categoryName);
-    const res = await this.createUser();
-    const boards = await this.RetrieveBoards();
-    const boardID = boards?.data?.boards[0]?.id;
-    const response = await this.cannyService.createPost({
-      boardID: boardID,
-      title: title,
-      details: description,
-      authorID: res?.data?.id,
-      categoryID: categoryID,
-      imageURLs: images,
-    });
-    if (response.isSuccessful) {
-      notifications.success("Feedback added successfully");
+    const imageResponse = await this.feedbackService.fetchuploads(formData);
+    if (imageResponse?.isSuccessful) {
+      const images = imageResponse?.data?.data?.map(
+        (file: { fileUrl: string }) => file?.fileUrl,
+      );
+      try {
+        const categoryID = await this.getCategoryIDbyName(categoryName);
+        const userResponse = await this.createUser();
+        const boards = await this.RetrieveBoards();
+        const boardID = boards?.data?.boards[0]?.id;
+        const response = await this.cannyService.createPost({
+          boardID: boardID,
+          title: title,
+          details: description,
+          authorID: userResponse?.data?.id,
+          categoryID: categoryID,
+          imageURLs: images,
+        });
+        if (response.isSuccessful) {
+          notifications.success("Feedback added successfully");
+        } else {
+          notifications.error(errorMessage);
+        }
+        return response;
+      } catch (e) {
+        notifications.error(errorMessage);
+      }
     } else {
-      notifications.error("Feedback submission failed. Please try again.");
+      notifications.error(errorMessage);
     }
-    return response;
   };
 }
 

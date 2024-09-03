@@ -243,7 +243,10 @@
           icon: TreeIcon,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "15px",
-          onclick: () => onItemCreated("testflow", {}),
+          onclick: () =>
+            onItemCreated("testflow", {
+              workspaceId: currentWorkspaceId,
+            }),
         },
       ]
     : [
@@ -288,7 +291,11 @@
           icon: TreeIcon,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "15px",
-          onclick: () => onItemCreated("testflow", {}),
+          onclick: () =>
+            onItemCreated("testflow", {
+              workspaceId: currentWorkspaceId,
+              collection: collectionList,
+            }),
         },
       ];
 

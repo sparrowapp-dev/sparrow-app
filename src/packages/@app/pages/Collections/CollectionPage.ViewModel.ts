@@ -59,11 +59,7 @@ import { GuideRepository } from "@app/repositories/guide.repository";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { type Observable } from "rxjs";
-import {
-  InitRequestTab,
-  InitTestflowTab,
-  InitWebSocketTab,
-} from "@common/utils";
+import { InitRequestTab, InitWebSocketTab } from "@common/utils";
 import { InitCollectionTab } from "@common/utils";
 import { InitFolderTab } from "@common/utils/init-folder-tab";
 import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
@@ -3090,10 +3086,9 @@ export default class CollectionsViewModel {
         };
 
         const initCollectionTab = new InitCollectionTab(
-          response.data.data._id,
+          response.data.data.collection._id,
           currentWorkspaceId,
         );
-
         initCollectionTab.updatePath(path);
 
         initCollectionTab.updateName(response.data.data.collection.name);
