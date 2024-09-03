@@ -447,7 +447,9 @@
     border-radius: 0%;
   }
   textarea {
-    outline: none;
+    outline-color: var(--sparrow-blue);
+    border: none;
+    border-radius: 8px !important;
   }
   textarea::placeholder {
     color: var(--text-color);
@@ -467,5 +469,9 @@
   }
   .collection-area {
     height: 300px;
+  }
+
+  .text-plusButton {
+    color: var(--sparrow-blue) !important;
   }
 </style>
