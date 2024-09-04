@@ -197,11 +197,11 @@ class HelpPageViewModel {
     return response;
   };
 
-  public getListOfPOsts = async () => {
+  public getListOfPOsts = async (sort) => {
     const boards = await this.RetrieveBoards();
 
     const boardID = boards?.data?.boards[0]?.id;
-    const response = await this.cannyService.listPosts(boardID);
+    const response = await this.cannyService.listPosts(boardID, sort);
     return response;
   };
 
@@ -212,6 +212,7 @@ class HelpPageViewModel {
    * @param  description - The description of the post.
    * @returns Promise<Object> The response from the Canny service after creating the post.
    */
+
   public createPost = async (
     title: string,
     description: string,
@@ -256,6 +257,11 @@ class HelpPageViewModel {
     } else {
       notifications.error(errorMessage);
     }
+  };
+
+  public updatePost = async (postID) => {
+    const response = await this.cannyService.updatePost(postID, {});
+    return response;
   };
 }
 

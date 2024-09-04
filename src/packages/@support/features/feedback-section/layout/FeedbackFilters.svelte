@@ -1,10 +1,10 @@
 <script>
   import { SearchIcon } from "$lib/assets/app.asset";
-
   import { Select } from "@library/forms";
-  import { CategoryIcon } from "@library/icons";
+  import { CategoryIcon, StatusIcon } from "@library/icons";
   import { FeedbackType } from "@support/common/types/feedback";
   export let type = FeedbackType.ALL_CATEGORY;
+  export let posts = [];
 </script>
 
 <div class="d-flex" style=" margin-top:38px; justify-content: space-between;">
@@ -61,7 +61,7 @@
         borderRounded={"2px"}
         headerTheme={"violet2"}
         bodyTheme={"violet"}
-        placeholderText={"Category"}
+        placeholderText={"Categories"}
         menuItem={"v2"}
         headerFontSize={"10px"}
         isDropIconFilled={true}
@@ -70,12 +70,31 @@
     </div>
     <div>
       <Select
-        data={[]}
-        placeholderText={"Category"}
+        data={[
+          {
+            name: "Feature Request",
+            id: FeedbackType.FEATURE_REQUEST,
+          },
+          {
+            name: "UX Improvement",
+            id: FeedbackType.UI_IMPROVEMENT,
+          },
+          {
+            name: "Bugs",
+            id: FeedbackType.BUG,
+          },
+          {
+            name: "All Categories",
+            id: FeedbackType.ALL_CATEGORY,
+          },
+        ]}
+        placeholderText={"Status"}
         id={"feeds"}
         zIndex={499}
         onclick={() => {}}
         disabled={false}
+        iconRequired={true}
+        icon={StatusIcon}
         borderType={"none"}
         borderActiveType={"none"}
         borderHighlight={"hover-active"}
@@ -97,8 +116,6 @@
 </div>
 
 <style>
-  .sort-buttons:active {
-  }
   .search-input-container {
     /* border: 1px solid var(--border-color); */
     background: var(--bg-tertiary-400);
