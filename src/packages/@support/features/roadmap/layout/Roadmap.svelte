@@ -135,6 +135,7 @@
           }}
           titleId={type}
           minHeaderWidth={"185px"}
+          headerHeight={"26px"}
           iconRequired={true}
           icon={CategoryIcon}
           iconColor={"var(--icon-primary-300)"}
