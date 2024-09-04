@@ -77,7 +77,7 @@
           style="width: calc(100% - 274px );"
           class="ps-3 pe-2 pt-3 pb-2 h-100"
         >
-          <div class="h-100 pe-2" style="overflow:auto;">
+          <div class=" h-100 pe-2" style="margin-left:34px; overflow:auto;">
             {#if activeTab === "feedback"}
              
               <FeedbackSection
