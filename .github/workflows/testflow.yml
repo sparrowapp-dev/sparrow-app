@@ -1,4 +1,4 @@
-name: Development release
+name: Testflow release
 
 on:
   push:
