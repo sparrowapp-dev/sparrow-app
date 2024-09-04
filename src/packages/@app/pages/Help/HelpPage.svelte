@@ -25,6 +25,7 @@
       activeTab = tab;
     }
   }
+  
 
   let releaseNotesData = [];
 
