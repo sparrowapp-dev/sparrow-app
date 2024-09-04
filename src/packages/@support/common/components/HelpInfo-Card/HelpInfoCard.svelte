@@ -1,6 +1,7 @@
 <script>
   import angleRight from "$lib/assets/angle-right-v2.svg";
   import { TriangleIcon } from "@library/icons";
+  import Upvote from "../Upvote.svelte";
 
   export let status;
   console.log("This is status ", status);
@@ -17,17 +18,7 @@
           <span class="category">{status.category.name}</span>
         </div>
 
-        <div
-          class="px-2 py-2 rounded-1"
-          style="display:flex; flex-direction:column; align-items:center; border:1px solid #8A9299; cursor:pointer;"
-        >
-          <TriangleIcon
-            height={"10px"}
-            width={"10px"}
-            color={"var(--white-color)"}
-          />
-          <span class="votes mt-1">{status.score}</span>
-        </div>
+        <Upvote score={status.score} />
       </div>
     </div>
   {/each}
@@ -55,7 +46,7 @@
 
   .category {
     background-color: #333;
-    padding: 4px 8px;
+    padding: 2px 5px 2px 5px;
     border-radius: 4px;
     font-size: 12px;
   }

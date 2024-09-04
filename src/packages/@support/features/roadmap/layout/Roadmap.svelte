@@ -6,6 +6,12 @@
   import HelpInfoCard from "@support/common/components/HelpInfo-Card/HelpInfoCard.svelte";
   import { onMount } from "svelte";
 
+  export let fetchPosts;
+
+  let productStatus = [];
+
+  let searchTerm = "";
+
   function getColor(status) {
     if (status === "Under Review") return "white";
     if (status === "In Progress") return "#DF77F9";
@@ -20,45 +26,6 @@
     return "white"; // Default border color
   }
 
-  let searchTerm = "";
-
-  // $: filteredProductStatus = productStatus.map((status) => ({
-  //   ...status,
-  //   products:
-  //     searchTerm.trim().length > 0
-  //       ? status.products.filter((product) =>
-  //           product.title
-  //             .toLowerCase()
-  //             .includes(searchTerm.trim().toLowerCase()),
-  //         )
-  //       : status.products,
-  // }));
-
-  export let fetchPosts;
-  let productStatus = [];
-
-  onMount(async () => {
-    const response = await fetchPosts();
-    if (response?.data?.posts) {
-      transformPostsToProductStatus(response.data.posts);
-    }
-    console.log("THis is response", response);
-  });
-
-  // function transformPostsToProductStatus(posts) {
-  //   const statusMap = {};
-
-  //   posts.forEach((post) => {
-  //     const { status } = post;
-  //     if (!statusMap[status]) {
-  //       statusMap[status] = { status, products: [] };
-  //     }
-  //     statusMap[status].products.push(post);
-  //   });
-
-  //   productStatus = Object.values(statusMap);
-  // }
-
   function transformPostsToProductStatus(posts) {
     const statusMap = {
       "under review": { status: "Under Review", products: [] },
@@ -67,9 +34,7 @@
     };
 
     posts.forEach((post) => {
-      // Map "open" status to "Under Review"
-      let mappedStatus = post.status; // === "open" ? "Under Review" : post.status;
-
+      let mappedStatus = post.status;
       // Check if mappedStatus exists in statusMap, if not, use it as it is
       if (statusMap[mappedStatus]) {
         statusMap[mappedStatus].products.push(post);
@@ -82,13 +47,34 @@
 
   $: filteredProductStatus = productStatus.map((status) => ({
     ...status,
-    filteredProducts:
-      searchTerm.trim().length > 0
-        ? status.products.filter((product) =>
-            product.title.toLowerCase().includes(searchTerm.toLowerCase()),
-          )
-        : status.products,
+    filteredProducts: status.products.filter((product) => {
+      // Filter by search term
+      const matchesSearchTerm =
+        searchTerm.trim().length === 0 ||
+        product.title.toLowerCase().includes(searchTerm.toLowerCase());
+
+      // Filter by category
+      const matchesCategory =
+        type === "allCategories" ||
+        (type === "featureRequest" &&
+          product.category.name === "Feature Request") ||
+        (type === "UI Improvement" &&
+          product.category.name === "UI Improvement") ||
+        (type === "bug" && product.category.name === "Bug");
+
+      return matchesSearchTerm && matchesCategory;
+    }),
   }));
+
+  onMount(async () => {
+    const response = await fetchPosts();
+    console.log("Thisis respoines", response);
+    if (response?.data?.posts) {
+      transformPostsToProductStatus(response.data.posts);
+    }
+  });
+
+  let type = "allCategories";
 </script>
 
 <div style="height:100%; width:100%;">
@@ -102,7 +88,7 @@
     </div>
 
     <div class="d-flex justify-content-between page-funationality">
-      <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
+      <div style="margin-bottom: 37px;" class={`d-flex search-input-container rounded py-1 px-2 `}>
         <SearchIcon
           width={14}
           height={14}
@@ -139,15 +125,15 @@
       <div class="filter">
         <Select
           data={[
-            { name: "Feature Request", id: "featureRequest" },
-            { name: "UX Improvement", id: "uxImprovement" },
-            { name: "Bugs", id: "bugs" },
             { name: "All Categories", id: "allCategories" },
+            { name: "Feature Request", id: "featureRequest" },
+            { name: "UI Improvement", id: "UI Improvement" },
+            { name: "Bug", id: "bug" },
           ]}
           onclick={(id = "") => {
             type = id;
-            console.log("Hello world");
           }}
+          titleId={type}
           minHeaderWidth={"185px"}
           iconRequired={true}
           icon={CategoryIcon}
@@ -195,7 +181,7 @@
               </p>
             {/if}
 
-            {#if filteredProducts?.length == 0 && searchTerm.length > 0}
+            {#if (filteredProducts?.length == 0 && searchTerm.length > 0) || filteredProducts?.length == 0}
               <p
                 class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
                 style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
@@ -224,7 +210,7 @@
   .search-input-container {
     border: 1px solid var(--border-color);
     background: var(--bg-tertiary-400);
-    width: 27vw;
+    width: 24vw;
     font-size: 12px;
     position: relative;
     border: 1px solid transparent;

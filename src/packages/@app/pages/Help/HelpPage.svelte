@@ -69,7 +69,9 @@
           <StackIcon
             height={"12px"}
             width={"12px"}
-            color={"var(--white-color)"}
+            color={activeTab === "roadmap"
+              ? "var(--text-primary-300)"
+              : "var( --white-color )"}
           />
           Roadmap
         </div>
