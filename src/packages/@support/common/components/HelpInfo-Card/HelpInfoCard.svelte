@@ -3,6 +3,7 @@
   import { TriangleIcon } from "@library/icons";
 
   export let status;
+  console.log("This is status ", status);
 </script>
 
 <div>
@@ -13,7 +14,7 @@
           <p class="card-title pb-0 mb-0" style="font-weight: 500; ">
             {status.title}
           </p>
-          <span class="category">{status.category}</span>
+          <span class="category">{status.category.name}</span>
         </div>
 
         <div
@@ -25,7 +26,7 @@
             width={"10px"}
             color={"var(--white-color)"}
           />
-          <span class="votes mt-1">{status.votes}</span>
+          <span class="votes mt-1">{status.score}</span>
         </div>
       </div>
     </div>

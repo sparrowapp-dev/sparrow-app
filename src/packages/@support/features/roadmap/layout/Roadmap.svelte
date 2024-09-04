@@ -62,8 +62,8 @@
   function transformPostsToProductStatus(posts) {
     const statusMap = {
       "under review": { status: "Under Review", products: [] },
-      complete: { status: "In Progress", products: [] },
-      open: { status: "Planned", products: [] },
+      "in progress": { status: "In Progress", products: [] },
+      planned: { status: "Planned", products: [] },
     };
 
     posts.forEach((post) => {
@@ -186,14 +186,22 @@
             {status}
           </div>
           <div class="p-2">
-            {#if products.length === 0}
+            {#if !(filteredProducts?.length == 0 && searchTerm.length > 0) && products.length === 0}
               <p
                 class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
                 style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
               >
                 No Data is there.
               </p>
-            {:else}
+            {/if}
+
+            {#if filteredProducts?.length == 0 && searchTerm.length > 0}
+              <p
+                class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
+                style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
+              >
+                No Result Found.
+              </p>{:else}
               <HelpInfoCard status={filteredProducts} />
             {/if}
           </div>
