@@ -2,7 +2,8 @@
   import { onDestroy } from "svelte";
   import { marked } from "marked";
   import { notifications } from "@library/ui/toast/Toast";
-  import { copyIcon } from "../../assests";
+  import { copyIcon, tickIcon } from "../../assests";
+  import { tick } from "svelte";
 
   import hljs from "highlight.js";
   import "highlight.js/styles/atom-one-dark.css";
@@ -11,6 +12,7 @@
     DislikeIcon,
     LikeIcon,
     RefreshIcon,
+    TickIcon,
   } from "@library/icons";
   import { SparrowAIIcon } from "@common/icons";
   import { Tooltip } from "@library/ui";
@@ -19,7 +21,7 @@
   import { MessageTypeEnum } from "@common/types/workspace";
 
   export let message: string;
-  export let messageId;
+  export let messageId: string;
   export let type;
   export let isLiked;
   export let isDisliked;
@@ -28,6 +30,8 @@
   export let isLastRecieverMessage;
   export let status;
 
+  let showTickIcon: boolean = false;
+
   /**
    * Decodes an HTML string by parsing it, processing <pre><code> elements, and wrapping them
    * in custom containers with additional copy paste functionality.
@@ -35,7 +39,6 @@
    * @param htmlString - The HTML string to decode and process.
    * @returns The processed HTML string.
    */
-
   const decodeMessage = (htmlString: string): string => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, "text/html");
@@ -49,8 +52,7 @@
       })
       .map((codeElem) => codeElem.parentElement);
 
-    // Iterate over each <pre> element
-    preElements.forEach((pre) => {
+    preElements.forEach((pre, index) => {
       if (pre) {
         // Create a new container div
         const container = document.createElement("div");
@@ -59,27 +61,22 @@
         hljs.highlightBlock(pre.querySelector("code"));
         // Add content or value to the container div
         container.innerHTML = `
-      <div class="code-header bg-tertiary-300 ps-3 pe-2 py-1 d-flex align-items-center justify-content-between"
-      
-      style="">
+      <div class="code-header bg-tertiary-300 ps-3 pe-2 py-1 d-flex align-items-center justify-content-between">
         <span>${lang?.split("-")[1] ?? ""}</span>
-        <span role="button" class="position-relative copy-code-${messageId} action-button copy-code-selector d-flex align-items-center justify-content-center border-radius-4">
-        <img src=${copyIcon}>
-        <span class="copy-code-tooltip z-1 d-flex align-items-center justify-content-center position-absolute invisible text-fs-12">Copy
-        
-        <div class="copy-code-tooltip-square"></div>
-        </copy>
-        </span>
+        <button role="button" class="position-relative copy-code-${messageId} action-button copy-code-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
+          <img src="${copyIcon}" id="${index}">
+          <button class="copy-code-tooltip z-1 d-flex align-items-center justify-content-center position-absolute invisible text-fs-12">Copy
+            <div class="copy-code-tooltip-square"></div>
+          </button>
+        </button>
       </div>
         `;
 
-        // Move the <pre> element into the new container
         pre.parentNode?.insertBefore(container, pre);
         container.appendChild(pre);
       }
     });
 
-    // Serialize the DOM back into a string
     const serializer = new XMLSerializer();
     return serializer.serializeToString(doc);
   };
@@ -89,7 +86,32 @@
    *
    * @param event - The mouse event triggered by clicking on the wrapper.
    */
-  const handleCopyCode = (event: MouseEvent) => {
+  const handleCopyCode = async (event: MouseEvent) => {
+    const id = (event.target as HTMLElement).id;
+    const targetElement = event.target as
+      | HTMLImageElement
+      | HTMLButtonElement
+      | any;
+    const firstChild = targetElement.children[0];
+    const tagName = targetElement.tagName;
+    if (tagName === "IMG") {
+      const originalSrc = targetElement?.src;
+      targetElement.src = tickIcon;
+      targetElement.classList.add("tick-icon");
+      setTimeout(() => {
+        targetElement.src = originalSrc;
+        targetElement.classList.remove("tick-icon");
+      }, 5000);
+    }
+    if (tagName === "BUTTON" && firstChild) {
+      const originalSrc = firstChild?.src;
+      firstChild.src = tickIcon;
+      firstChild.classList.add("tick-icon");
+      setTimeout(() => {
+        firstChild.src = originalSrc;
+        firstChild.classList.remove("tick-icon");
+      }, 5000);
+    }
     const target = (event.target as HTMLElement).closest(
       ".wrapper",
     ) as HTMLElement | null;
@@ -99,14 +121,12 @@
       ) as HTMLElement | null;
       if (codeElement) {
         const code = codeElement.textContent || "";
-        navigator.clipboard
-          .writeText(code)
-          .then(() => {
-            notifications.success("Code copied to clipboard!");
-          })
-          .catch((err) => {
-            console.error("Failed to copy code: ", err);
-          });
+        try {
+          await navigator.clipboard.writeText(code);
+          notifications.success("Code copied to clipboard!");
+        } catch (err) {
+          console.error("Failed to copy code: ", err);
+        }
       }
     }
   };
@@ -114,17 +134,19 @@
   /**
    * Handles the response copy to clipboard functionality.
    */
-  const handleCopyResponse = () => {
-    const response = message;
-    navigator.clipboard
-      .writeText(response)
-      .then(() => {
-        notifications.success("Response copied to clipboard!");
-      })
-      .catch((err) => {
-        console.error("Failed to copy code: ", err);
-      });
-    MixpanelEvent(Events.AI_Copy_Response);
+  const handleCopyResponse = async () => {
+    try {
+      await navigator.clipboard.writeText(message);
+      notifications.success("Response copied to clipboard!");
+      showTickIcon = true;
+      await tick();
+      setTimeout(() => {
+        showTickIcon = false;
+      }, 5000);
+      MixpanelEvent(Events.AI_Copy_Response);
+    } catch (err) {
+      console.error("Failed to copy response: ", err);
+    }
   };
 
   let cleanUpListeners: () => void = () => {};
@@ -177,12 +199,12 @@
 </script>
 
 <div class="message-wrapper">
-  {#if type === MessageTypeEnum.SENDER}
-    <!--
+  <!--
     -- 
     -- SENDER
     -- 
     -->
+  {#if type === MessageTypeEnum.SENDER}
     <div class="send-item">
       <p class="my-4 px-3 text-fs-12">{@html message}</p>
     </div>
@@ -254,27 +276,30 @@
         -->
         {#if isLastRecieverMessage}
           <Tooltip placement="top" title="Regenerate" distance={13}>
-            <span
-              role="button"
+            <button
               class="action-button d-flex align-items-center justify-content-center border-radius-4"
-              on:click={() => {
-                regenerateAiResponse();
-              }}
+              on:click={regenerateAiResponse}
             >
               <RefreshIcon height={"16px"} width={"16px"} />
-            </span>
+            </button>
           </Tooltip>
         {/if}
-        <Tooltip placement="top" title="Copy" distance={13}>
-          <span
-            role="button"
+        <Tooltip
+          placement="top"
+          title={showTickIcon ? "Copied" : "Copy"}
+          distance={13}
+        >
+          <button
+            disabled={showTickIcon}
             class="action-button d-flex align-items-center justify-content-center border-radius-4"
-            on:click={() => {
-              handleCopyResponse();
-            }}
+            on:click={handleCopyResponse}
           >
-            <CopyIcon2 height={"14px"} width={"14px"} />
-          </span>
+            {#if showTickIcon}
+              <TickIcon height={"14px"} width={"14px"} color={"grey"} />
+            {:else}
+              <CopyIcon2 height={"14px"} width={"14px"} />
+            {/if}
+          </button>
         </Tooltip>
       </div>
     </div>
@@ -310,15 +335,28 @@
   }
   :global(.action-button) {
     height: 30px;
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
     width: 30px;
   }
   :global(.action-button:hover) {
     background-color: var(--bg-tertiary-190);
   }
+
+  button:disabled {
+    background-color: inherit;
+  }
+
   .error-message {
     background-color: var(--bg-danger-1200);
     border: 0.2px solid var(--border-danger-200);
   }
+
+  :global(.tick-icon) {
+    height: 16px;
+  }
+
   :global(.copy-code-tooltip) {
     transition: 0.3s ease;
     font-weight: 400;

@@ -65,6 +65,7 @@
       >
         Community
       </div>
+
       </div>
       <!--
         -- Help Body 
@@ -83,7 +84,6 @@
               <FeedbackSection
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
-                onSendFeedback={_viewModel.sendFeedback}
               />
             {:else if activeTab === "updates"}
               <ReleaseNotes
@@ -94,6 +94,7 @@
               {:else if activeTab === "community"}
               <Community/>
               <DiscordPost />
+
             {/if}
           </div>
         </div>
