@@ -1,8 +1,14 @@
+<script lang="ts">
+  export let width = "24";
+  export let height = "24";
+  export let color = "grey";
+</script>
+
 <svg
-  width="14"
-  height="13"
+  {width}
+  {height}
   viewBox="0 0 14 13"
-  fill="none"
+  fill={color}
   xmlns="http://www.w3.org/2000/svg"
 >
   <path

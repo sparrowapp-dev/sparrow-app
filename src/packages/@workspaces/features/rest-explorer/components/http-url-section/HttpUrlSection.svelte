@@ -38,6 +38,7 @@
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
   };
+
   /**
    * @description - save request handler
    */
@@ -188,7 +189,9 @@
       disabled={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
         : false}
-         style="background-color: {isSave ? 'var(--icon-secondary-550)' : 'var(--bg-secondary-400)'}; color: white;"
+      style="background-color: {isSave
+        ? 'var(--icon-secondary-550)'
+        : 'var(--bg-secondary-400)'}; color: white;"
     >
       <DiskIcon
         height={22}
@@ -208,6 +211,10 @@
   .save-disk {
     padding: 7px;
     background-color: var(--bg-secondary-400);
+  }
+
+  .save-disk:disabled {
+    background-color: var(--bg-secondary-550);
   }
   :global(.url-red-border) {
     border: 1px solid var(--border-danger-200) !important;

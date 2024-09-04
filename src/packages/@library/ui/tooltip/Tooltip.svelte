@@ -2,7 +2,13 @@
   export let title = "Tooltip";
   export let styleProp = "";
   export let show = true;
-  export let placement: "left" | "right" | "top" | "bottom" = "bottom";
+  export let placement:
+    | "left"
+    | "right"
+    | "top"
+    | "bottom"
+    | "bottom-right"
+    | "bottom-left" = "bottom";
   export let zIndex = 1;
   export let transitionTime = "0.3s";
   export let spacing = "4px 10px";
@@ -76,6 +82,20 @@
         "px";
       bottom = "unset";
       right = "unset";
+    } else if (placement === "bottom-left") {
+      left = tooltipWrapper.getBoundingClientRect().right.toString() + "px";
+      top =
+        (tooltipWrapper.getBoundingClientRect().bottom + distance).toString() +
+        "px";
+      bottom = "unset";
+      right = "unset";
+    } else if (placement === "bottom-right") {
+      left = tooltipWrapper.getBoundingClientRect().left.toString() + "px";
+      top =
+        (tooltipWrapper.getBoundingClientRect().bottom + distance).toString() +
+        "px";
+      bottom = "unset";
+      right = "unset";
     }
   };
 </script>
@@ -86,8 +106,8 @@
       ? `tooltip-text-hover ${'tooltip-text-hover-' + placement.toString()}`
       : ''} tooltip-text invisible m-auto text-center bg-tertiary-700 text-lightGray position-fixed justify-content-center align-items-center opacity-0
  {placement.toString()} "
-    style="top: {top}; left: {left}; right: {right}; bottom: {bottom}; transition: {transitionTime} ; padding:{spacing}; font-size:{fontSize}; z-index : {zIndex} ; border-radius: {borderRadius}; {styleProp}"
-  >{@html title}
+    style="top: {top}; left: {left}; right: {right}; bottom: {bottom}; transition: {transitionTime} ; padding:{spacing}; font-size:{fontSize}; z-index : {zIndex} ; border-radius: {borderRadius}; {styleProp} width: fit-content;"
+    >{@html title}
     {#if placement === "left"}
       <span
         class="position-absolute tooltip-square border-radius-2"
@@ -110,6 +130,18 @@
       <span
         class="position-absolute tooltip-square border-radius-2"
         style="top:5px; left:50%; transform: translateX(-50%) translateY(-100%) rotate(45deg); "
+      >
+      </span>
+    {:else if placement === "bottom-left"}
+      <span
+        class="position-absolute tooltip-square border-radius-2"
+        style="top:5px; right:10px; transform: translateY(-100%) rotate(45deg);"
+      >
+      </span>
+    {:else if placement === "bottom-right"}
+      <span
+        class="position-absolute tooltip-square border-radius-2"
+        style="top:5px; left:10px; transform: translateY(-100%) rotate(45deg);"
       >
       </span>
     {/if}
@@ -148,6 +180,21 @@
   }
   .bottom {
     transform: translateX(-50%) scale(0.5);
+  }
+  .bottom-left {
+    transform: translateX(-100%) scale(0.5);
+  }
+
+  .tooltip-text-hover-bottom-left {
+    transform: translateX(-100%) scale(1);
+  }
+
+  .bottom-right {
+    transform: translateX(0) scale(0.5);
+  }
+
+  .tooltip-text-hover-bottom-right {
+    transform: translateX(0) scale(1);
   }
   .tooltip-text {
     transform-origin: center;

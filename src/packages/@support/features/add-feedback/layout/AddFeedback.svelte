@@ -1,12 +1,11 @@
 <script lang="ts">
   import { Input, Select, Textarea } from "@library/forms";
-  import { AttachmentIcon, Category, CrossIcon } from "@library/icons";
+  import { AttachmentIcon, CategoryIcon, CrossIcon } from "@library/icons";
   import { Button, Modal } from "@library/ui";
   import Drop from "../components/Drop/Drop.svelte";
   import { notifications } from "@library/ui/toast/Toast";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
 
-  export let onSendFeedback;
   export let onAddFeedback;
   export let onInputFeedback;
   enum FeedbackType {
@@ -14,9 +13,10 @@
     UI_IMPROVEMENT = "UI Improvement",
     BUG = "Bug",
     ALL_CATEGORY = "Uncategorized",
+    CATEGORY = "Category",
   }
 
-  let type: FeedbackType;
+  let type: FeedbackType = FeedbackType.CATEGORY;
   let feedbackDescription = "";
   let feedbackSubject = "";
   let uploadFeedback = {
@@ -42,31 +42,40 @@
     if (targetFile?.length === 0) {
       return;
     }
+    // let vedioCount = 0;
+    // const maxVedioSize = 20971520; // 20 MB
     let isErrorThrown = false;
     const selectedFiles = targetFile.filter((file) => {
       const fileType = `.${(file?.name).split(".").pop().toLowerCase()}`;
 
-      if (fileType === ".jpg" || fileType === ".jpeg" || fileType === ".png") {
+      if (
+        fileType === ".jpg" ||
+        fileType === ".jpeg" ||
+        fileType === ".png" ||
+        fileType === ".svg"
+      ) {
         if (file.size > maxImageSize) {
           // image size exceeded
           isErrorThrown = true;
           return false;
         }
         return true;
-      } else if (fileType === ".mp4") {
-        vedioCount = vedioCount + 1;
-        if (vedioCount >= 2) {
-          // vedio limit exceeded
-          isErrorThrown = true;
-          return false;
-        }
-        if (file.size > maxVedioSize) {
-          // vedio size exceeded
-          isErrorThrown = true;
-          return false;
-        }
-        return true;
-      } else {
+      }
+      // else if (fileType === ".mp4") {
+      //   vedioCount = vedioCount + 1;
+      //   if (vedioCount >= 2) {
+      //     // vedio limit exceeded
+      //     isErrorThrown = true;
+      //     return false;
+      //   }
+      //   if (file.size > maxVedioSize) {
+      //     // vedio size exceeded
+      //     isErrorThrown = true;
+      //     return false;
+      //   }
+      //   return true;
+      // }
+      else {
         isErrorThrown = true;
         return false;
       }
@@ -100,7 +109,7 @@
       }}
       class="add-feedback w-100 outline-none border-0 border-radius-4 text-fs-14 fw-normal"
     >
-      +Add Feedback
+      + <span class="px-2"> Add Feedback</span>
     </button>
   </Tooltip>
 </div>
@@ -113,6 +122,14 @@
     isOpen={isExposeFeedbackForm}
     handleModalState={(flag = false) => {
       isExposeFeedbackForm = flag;
+      feedbackDescription = "";
+      feedbackSubject = "";
+      type = FeedbackType.CATEGORY;
+      uploadFeedback = {
+        file: {
+          value: [],
+        },
+      };
     }}
   >
     <div class="pt-2"></div>
@@ -137,7 +154,7 @@
           },
         ]}
         iconRequired={true}
-        icon={Category}
+        icon={CategoryIcon}
         placeholderText={"Category"}
         id={"feeds"}
         zIndex={499}
@@ -244,7 +261,7 @@
           inputPlaceholder="Drag and Drop or"
           supportedFileTypes={[".png", ".jpg", ".jpeg", ".svg"]}
           height={"80px"}
-          infoMessage={"Images: SVG, PNG, JPG, JPEG <br/> (limit 8MB)<br/> No video files, only images <br/> are accepted"}
+          infoMessage={"Images: SVG, PNG, JPG, JPEG <br/> (limit 2MB each)<br/> No video files, only images <br/> are accepted"}
         />
         <div class="d-flex justify-content-between">
           <div></div>
@@ -294,6 +311,14 @@
           buttonClassProp={"me-2"}
           onClick={async () => {
             isExposeFeedbackForm = false;
+            feedbackDescription = "";
+            feedbackSubject = "";
+            type = FeedbackType.CATEGORY;
+            uploadFeedback = {
+              file: {
+                value: [],
+              },
+            };
           }}
         />
         <Button
@@ -318,12 +343,14 @@
               const res = await onInputFeedback(
                 feedbackSubject,
                 feedbackDescription,
-                type,
+                type === FeedbackType.CATEGORY
+                  ? FeedbackType.ALL_CATEGORY
+                  : type,
                 uploadFeedback,
               );
-              if (res.isSuccessful) {
+              if (res?.isSuccessful) {
                 isExposeFeedbackForm = false;
-                // type = FeedbackType.FEEDBACK;
+                type = FeedbackType.CATEGORY;
                 feedbackDescription = "";
                 feedbackSubject = "";
                 uploadFeedback = {

@@ -6,7 +6,6 @@
   import AddFeedback from "@support/features/add-feedback/layout/AddFeedback.svelte";
   export let onInputFeedback;
   export let onAddFeedback;
-  export let onSendFeedback;
   let userInfo: any = {};
   user.subscribe((value) => {
     userInfo = value;
@@ -16,7 +15,9 @@
 <div
   style="height: 89px; padding-left:34px; padding-top:8px !important; padding-bottom:21px;"
 >
-  <div style="font-weight: 700; font-size:20px; ">Feedbacks</div>
+  <div style="font-weight: 700; font-size:20px; margin-bottom:12px;  ">
+    Feedbacks
+  </div>
   <p style="font-size: 14px; color:#999999;">
     Share your feedback to help us refine and enhance your experience.
   </p>
@@ -34,6 +35,6 @@
     </div>
   </div>
   <div style="width:calc(100% - 72.5% );  ">
-    <AddFeedback {onInputFeedback} {onAddFeedback} {onSendFeedback} />
+    <AddFeedback {onInputFeedback} {onAddFeedback} />
   </div>
 </div>
