@@ -99,6 +99,12 @@
 
   export let onCreateTestflow;
 
+  export let testflows;
+
+  export let onDeleteTestflow;
+  export let onUpdateTestflow;
+  export let onOpenTestflow;
+
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
@@ -247,10 +253,9 @@
           icon: TreeIcon,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "15px",
-          onclick: () =>
-            onItemCreated("testflow", {
-              workspaceId: currentWorkspaceId,
-            }),
+          onclick: () => {
+            onCreateTestflow();
+          },
         },
       ]
     : [
@@ -295,11 +300,9 @@
           icon: TreeIcon,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "15px",
-          onclick: () =>
-            onItemCreated("testflow", {
-              workspaceId: currentWorkspaceId,
-              collection: collectionList,
-            }),
+          onclick: () => {
+            onCreateTestflow();
+          },
         },
       ];
 
@@ -504,15 +507,14 @@
         style=" overflow:auto; {isExpandTestflow ? 'flex:1;' : ''}"
       >
         <TestflowList
+          testflows={$testflows}
           loggedUserRoleInWorkspace={userRole}
           {onCreateTestflow}
-          {onOpenGlobalEnvironment}
-          {onDeleteEnvironment}
-          {onUpdateEnvironment}
-          {onOpenEnvironment}
-          {onSelectEnvironment}
+          {onDeleteTestflow}
+          {onUpdateTestflow}
+          {onOpenTestflow}
           currentWorkspace={activeWorkspace}
-          environments={$environments}
+          flows={$testflows}
           {searchData}
           {activeTabId}
           {toggleExpandTestflow}

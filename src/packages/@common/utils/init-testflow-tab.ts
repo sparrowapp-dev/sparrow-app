@@ -23,7 +23,16 @@ class InitTestflowTab {
         activeSync: false,
         property: {
           testflow: {
-            nodes: [],
+            nodes: [
+              {
+                id: "1",
+                type: "startBlock",
+                data: {
+                  label: "Start",
+                },
+                position: { x: 100, y: 350 },
+              },
+            ],
             edges: [],
           },
         },

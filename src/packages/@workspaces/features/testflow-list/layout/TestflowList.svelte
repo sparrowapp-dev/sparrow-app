@@ -10,6 +10,7 @@
   //   import { ListItem } from "../components";
   import angleRight from "$lib/assets/angle-right-v2.svg";
   import { Tooltip } from "@library/ui";
+  import { TestflowListItem } from "../components";
 
   /**
    * current workspace
@@ -211,39 +212,17 @@
           classProps={"pe-1"}
           style={"flex:1;"}
         >
-          <!-- {#each filteredLocalEnvironment as } -->
-          <!-- <ListItem
+          {#each filteredflows as flow}
+            <TestflowListItem
               bind:loggedUserRoleInWorkspace
-              {env}
+              {flow}
               {currentWorkspace}
-              {onDeleteEnvironment}
-              {onUpdateEnvironment}
-              {onOpenEnvironment}
-              {onSelectEnvironment}
+              {onDeleteTestflow}
+              {onUpdateTestflow}
+              {onOpenTestflow}
               {activeTabId}
-            /> -->
-          <!-- {/each} -->
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
-          <p>Techdome flows</p>
+            />
+          {/each}
         </List>
       {/if}
       {#if filteredflows?.length === 0 && searchData}

@@ -26,43 +26,49 @@ export const TestflowSchemaLiteral = {
       type: "string",
     },
 
-    canvas: {
-      type: "object",
-      properties: {
-        nodes: {
-          type: "array",
-          default: [],
-          items: {
+    nodes: {
+      type: "array",
+      default: [],
+      items: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+          },
+          type: {
+            type: "string",
+          },
+          data: {
+            type: "object",
+          },
+          position: {
             type: "object",
             properties: {
-              id: {
-                type: "string",
+              x: {
+                type: "number",
               },
-              type: {
-                type: "string",
-              },
-              data: {
-                type: "object",
+              y: {
+                type: "number",
               },
             },
           },
         },
-        edges: {
-          type: "array",
-          default: [],
-          items: {
-            type: "object",
-            properties: {
-              id: {
-                type: "string",
-              },
-              source: {
-                type: "string",
-              },
-              target: {
-                type: "boolean",
-              },
-            },
+      },
+    },
+    edges: {
+      type: "array",
+      default: [],
+      items: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+          },
+          source: {
+            type: "string",
+          },
+          target: {
+            type: "boolean",
           },
         },
       },

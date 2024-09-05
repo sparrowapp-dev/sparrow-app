@@ -68,11 +68,12 @@
   import { TeamProfile } from "@teams/features/team-settings/components";
   import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
   import TestFlowExplorerPage from "../TestflowExplorerPage/TestflowExplorerPage.svelte";
+  import { TestflowViewModel } from "./Testflow.ViewModel";
 
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
-  const _viewModel3 = new 
+  const _viewModel3 = new TestflowViewModel();
 
   let currentWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
@@ -366,6 +367,10 @@
           onOpenEnvironment={_viewModel2.onOpenEnvironment}
           onSelectEnvironment={_viewModel2.onSelectEnvironment}
           onCreateTestflow={_viewModel3.handleCreateTestflow}
+          testflows={_viewModel3.testflows}
+          onDeleteTestflow={_viewModel3.handleDeleteTestflow}
+          onUpdateTestflow={_viewModel3.handleUpdateTestflow}
+          onOpenTestflow={_viewModel3.handleOpenTestflow}
           bind:isExpandCollection
           bind:isExpandEnvironment
           bind:isExpandTestflow
