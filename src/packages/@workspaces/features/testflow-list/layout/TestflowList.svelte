@@ -7,7 +7,7 @@
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import { ListItem } from "../components";
+  //   import { ListItem } from "../components";
   import angleRight from "$lib/assets/angle-right-v2.svg";
   import { Tooltip } from "@library/ui";
 
@@ -18,7 +18,7 @@
   /**
    * environment list
    */
-  export let environments;
+  export let testflows = [];
   /**
    * opened environment
    */
@@ -31,39 +31,29 @@
   /**
    * creates the environment
    */
-  export let onCreateEnvironment;
+  export let onCreateTestflow;
   /**
    * opens the global environment
    */
-  export let onOpenGlobalEnvironment;
+  export let onOpenTestflow;
   /**
    * deletes the environment
    */
-  export let onDeleteEnvironment;
+  export let onDeleteTestflow;
   /**
    * updates the environment
    */
-  export let onUpdateEnvironment;
-  /**
-   * opens the local environment
-   */
-  export let onOpenEnvironment;
-  /**
-   * selects the environment
-   */
-  export let onSelectEnvironment;
+  export let onUpdateTestflow;
 
-  export let searchData;
+  export let searchData = "";
 
-  export let isExpandEnvironment = false;
+  export let isExpandTestflow = false;
 
-  export let toggleExpandEnvironment;
+  export let toggleExpandTestflow;
 
   export let activeTabId;
 
   let scrollList;
-  let localEnvironment;
-  let globalEnvironment;
   let addEnvDisabled = false;
   let isHovered = false;
 
@@ -75,27 +65,17 @@
     isHovered = false;
   };
 
+  let flows = [];
   const mapEnvironmentToWorkspace = (_env, _workspaceId) => {
     if (_env && _workspaceId) {
-      localEnvironment = [];
-      globalEnvironment = [];
-      environments
-        .filter((element) => {
-          return element.workspaceId === _workspaceId;
-        })
-        .forEach((element) => {
-          const _element = element.toMutableJSON();
-          if (_element.type === "GLOBAL") {
-            globalEnvironment.push(_element);
-          } else if (_element.type === "LOCAL") {
-            localEnvironment.push(_element);
-          }
-        });
+      flows = testflows.filter((element) => {
+        return element.workspaceId === _workspaceId;
+      });
     }
   };
   $: {
-    if (environments || currentWorkspace?._id) {
-      mapEnvironmentToWorkspace(environments, currentWorkspace?._id);
+    if (testflows || currentWorkspace?._id) {
+      mapEnvironmentToWorkspace(testflows, currentWorkspace?._id);
     }
     addEnvDisabled = !hasWorkpaceLevelPermission(
       loggedUserRoleInWorkspace,
@@ -103,27 +83,21 @@
     );
   }
 
-  async function handleCreateEnvironment() {
-    if (!isExpandEnvironment) {
-      isExpandEnvironment = !isExpandEnvironment;
+  async function handleCreateTestflow() {
+    if (!isExpandTestflow) {
+      isExpandTestflow = !isExpandTestflow;
     }
-    await onCreateEnvironment(localEnvironment);
+    await onCreateTestflow();
     setTimeout(() => {
       scrollToBottom();
     }, 1000);
   }
 
-  $: filteredLocalEnvironment = searchData
-    ? localEnvironment.filter((env) =>
-        env.name.toLowerCase().includes(searchData.toLowerCase()),
+  $: filteredflows = searchData
+    ? testflows.filter((flow) =>
+        flow.name.toLowerCase().includes(searchData.toLowerCase()),
       )
-    : localEnvironment;
-
-  $: filteredGlobalEnvironment = searchData
-    ? globalEnvironment.filter((env) =>
-        env.name.toLowerCase().includes(searchData.toLowerCase()),
-      )
-    : globalEnvironment;
+    : testflows;
 
   let scrollDiv;
 
@@ -144,18 +118,18 @@
   <div
     class="d-flex align-items-center p-2 rounded-1 me-0 mb-0"
     style="cursor:pointer; justify-content: space-between; height:32px;
-      background-color: {isHovered
+        background-color: {isHovered
       ? 'var(--dropdown-option-hover)'
       : 'transparent'}; "
     on:mouseover={handleMouseOver}
     on:mouseout={handleMouseOut}
-    on:click={toggleExpandEnvironment}
+    on:click={toggleExpandTestflow}
   >
     <div class="d-flex align-items-center ps-2">
       <img
         src={angleRight}
         class="me-3"
-        style="height:8px; width:4px; margin-right:8px; {isExpandEnvironment
+        style="height:8px; width:4px; margin-right:8px; {isExpandTestflow
           ? 'transform:rotate(90deg);'
           : 'transform:rotate(0deg);'}"
         alt="angleRight"
@@ -168,12 +142,12 @@
       />
 
       <p class="ms-2 mb-0 sparrow-fs-13" style="font-weight: 500;">
-        Environment
+        Test Flows
       </p>
     </div>
 
     <Tooltip
-      title={"Add Environment"}
+      title={"Add New Flow"}
       placement={"bottom"}
       distance={13}
       show={isHovered}
@@ -184,7 +158,7 @@
         class="add-icon-container border-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
           ? 'environment-active'
           : 'environment-inactive'}"
-        on:click|stopPropagation={handleCreateEnvironment}
+        on:click|stopPropagation={handleCreateTestflow}
       >
         <PlusIcon
           height={"18px"}
@@ -195,52 +169,23 @@
     </Tooltip>
   </div>
 
-  {#if isExpandEnvironment}
+  {#if isExpandTestflow}
     <div class="overflow-auto h-100 mb-2" bind:this={scrollDiv}>
-      {#if filteredLocalEnvironment && localEnvironment.length === 0 && loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
-        {#if filteredGlobalEnvironment && filteredGlobalEnvironment.length > 0}
-          <div class="mb-0">
-            <p
-              role="button"
-              class={`fw-normal mb-1  ps-5 env-item text-fs-12 border-radius-2 my-1 ${
-                globalEnvironment[0]?.id === activeTabId && "active"
-              }`}
-              on:click={() => {
-                onOpenGlobalEnvironment(globalEnvironment[0]);
-              }}
-            >
-              <span class="icon-default">
-                <StackIcon
-                  height={"12px"}
-                  width={"12px"}
-                  color={"var(--icon-secondary-130)"}
-                />
-              </span>
-              <span class="icon-hover">
-                <StackFilled
-                  height={"12px"}
-                  width={"12px"}
-                  color={"var(--icon-secondary-130)"}
-                />
-              </span>
-              <span class="ms-1">{globalEnvironment[0]?.name}</span>
-            </p>
-          </div>
-        {/if}
+      {#if filteredflows && flows.length === 0 && loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
         <div class={`pb-2`}>
           <p
             class={`mx-1 add-env-desc-text mb-3 text-fs-12 mb-0 fw-normal text-center`}
             style="color: var(--text-secondary-50)"
           >
-            Add Environments in your Workspace for precise API testing with
-            relevant resources and constraints.
+            Start with basic test cases to check core functions and build a
+            strong testing foundation.
           </p>
           <p
             class="mx-2 add-environment d-flex justify-content-center align-items-center border-radius-2"
             style="color: var(--text-secondary-100);"
             role="button"
-            on:click={() => {
-              onCreateEnvironment(localEnvironment);
+            on:click={async () => {
+              await onCreateTestflow();
             }}
           >
             <PlusIcon
@@ -250,44 +195,13 @@
             />
             <span
               style="color: var(--text-secondary-200)"
-              class="ps-2 fw-bold text-fs-12">Add Environment</span
+              class="ps-2 fw-bold text-fs-12">Add New Flow</span
             >
           </p>
         </div>
       {/if}
 
-      {#if filteredGlobalEnvironment && filteredGlobalEnvironment.length > 0 && localEnvironment.length !== 0}
-        <div class="mb-0">
-          <p
-            role="button"
-            class={`fw-normal mb-1  ps-5 env-item text-fs-12 border-radius-2 my-1 ${
-              globalEnvironment[0]?.id === activeTabId && "active"
-            }`}
-            on:click={() => {
-              onOpenGlobalEnvironment(globalEnvironment[0]);
-            }}
-          >
-            <span class="icon-default">
-              <StackIcon
-                height={"12px"}
-                width={"12px"}
-                color={"var(--icon-secondary-130)"}
-              />
-            </span>
-            <span class="icon-hover">
-              <StackFilled
-                height={"12px"}
-                width={"12px"}
-                color={"var(--icon-secondary-130)"}
-              />
-            </span>
-            <span class="ms-1">{globalEnvironment[0]?.name}</span>
-          </p>
-        </div>
-        <hr class="mb-1 mt-1 ms-5 me-2" />
-      {/if}
-
-      {#if filteredLocalEnvironment && filteredLocalEnvironment.length > 0}
+      {#if filteredflows?.length > 0}
         <!-- <div class="mb-1 mt-0 ms-5 me-2" style="height: 1px; background-color:white"></div> -->
 
         <List
@@ -297,8 +211,8 @@
           classProps={"pe-1"}
           style={"flex:1;"}
         >
-          {#each filteredLocalEnvironment as env}
-            <ListItem
+          <!-- {#each filteredLocalEnvironment as } -->
+          <!-- <ListItem
               bind:loggedUserRoleInWorkspace
               {env}
               {currentWorkspace}
@@ -307,11 +221,32 @@
               {onOpenEnvironment}
               {onSelectEnvironment}
               {activeTabId}
-            />
-          {/each}
+            /> -->
+          <!-- {/each} -->
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
+          <p>Techdome flows</p>
         </List>
       {/if}
-      {#if filteredGlobalEnvironment?.length === 0 && filteredLocalEnvironment?.length === 0}
+      {#if filteredflows?.length === 0 && searchData}
         <p
           class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
           style="color: var(--text-secondary-550);  font-weight:300; letter-spacing: 0.5px;"

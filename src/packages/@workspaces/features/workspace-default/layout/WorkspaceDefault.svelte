@@ -97,9 +97,8 @@
   }
 
   .logo {
-    height: 176px;
     width: 175px;
-    margin-bottom: 24px;
+    padding-bottom: 60px;
   }
 
   .cards {

@@ -55,6 +55,7 @@ import {
   type GuestUserDocType,
 } from "@app/models/guest-user.model";
 import { updatesSchema, type UpdatesDocType } from "@app/models/updates.model";
+import { TestflowSchema } from "@app/models/testflow.model";
 // import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 // addRxPlugin(RxDBDevModePlugin);
 
@@ -279,6 +280,9 @@ export class RxDB {
             return oldDoc;
           },
         },
+      },
+      testflow: {
+        schema: TestflowSchema,
       },
       environmenttab: {
         schema: environmentTabSchema,

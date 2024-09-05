@@ -72,6 +72,7 @@
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
+  const _viewModel3 = new 
 
   let currentWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
@@ -92,6 +93,7 @@
 
   let isExpandCollection = false;
   let isExpandEnvironment = false;
+  let isExpandTestflow = false;
 
   let localEnvironment;
   let globalEnvironment;
@@ -363,8 +365,10 @@
           onUpdateEnvironment={_viewModel2.onUpdateEnvironment}
           onOpenEnvironment={_viewModel2.onOpenEnvironment}
           onSelectEnvironment={_viewModel2.onSelectEnvironment}
+          onCreateTestflow={_viewModel3.handleCreateTestflow}
           bind:isExpandCollection
           bind:isExpandEnvironment
+          bind:isExpandTestflow
         />
       </Pane>
       <Pane

@@ -36,6 +36,7 @@
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { CollectionList, EnvironmentList } from "@workspaces/features";
+  import { TestflowList } from "@workspaces/features/testflow-list";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -96,6 +97,8 @@
 
   export let onSelectEnvironment;
 
+  export let onCreateTestflow;
+
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
@@ -111,6 +114,7 @@
 
   export let isExpandCollection = false;
   export let isExpandEnvironment = false;
+  export let isExpandTestflow = false;
 
   let isGithubStarHover = false;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
@@ -306,6 +310,9 @@
   const toggleExpandEnvironment = () => {
     isExpandEnvironment = !isExpandEnvironment;
   };
+  const toggleExpandTestflow = () => {
+    isExpandTestflow = !isExpandTestflow;
+  };
 </script>
 
 {#if leftPanelController.leftPanelCollapse}
@@ -432,15 +439,13 @@
 
     <!-- LHS Side of Collection Enivironment & Test Flows -->
     <div
-      class="d-flex flex-column collections-list mb-2"
+      class="d-flex flex-column collections-list"
       style="overflow:hidden; margin-top:5px;  flex:1; "
     >
       <!-----Collection Section------>
       <div
         class="ps-1"
-        class:not-opened-any={!isExpandCollection && !isExpandEnvironment}
-        class:full-height={isExpandCollection && !isExpandEnvironment}
-        class:half-height={isExpandCollection && isExpandEnvironment}
+        style=" overflow:auto; {isExpandCollection ? 'flex:1;' : ''}"
       >
         <CollectionList
           bind:scrollList
@@ -465,15 +470,13 @@
         />
       </div>
 
-      <hr class="mt-1 mb-0 ms-1 me-0" />
+      <hr class="my-1 ms-1 me-0" />
 
       <!-- Environment Section -->
 
       <div
         class="ps-1"
-        class:not-opened-any={!isExpandCollection && !isExpandEnvironment}
-        class:full-height={isExpandEnvironment && !isExpandCollection}
-        class:half-height={isExpandCollection && isExpandEnvironment}
+        style=" overflow:auto; {isExpandEnvironment ? 'flex:1;' : ''}"
       >
         <EnvironmentList
           loggedUserRoleInWorkspace={userRole}
@@ -492,12 +495,37 @@
         />
       </div>
 
+      <hr class="my-1 ms-1 me-0" />
+
+      <!-- Testflow Section -->
+
+      <div
+        class="ps-1"
+        style=" overflow:auto; {isExpandTestflow ? 'flex:1;' : ''}"
+      >
+        <TestflowList
+          loggedUserRoleInWorkspace={userRole}
+          {onCreateTestflow}
+          {onOpenGlobalEnvironment}
+          {onDeleteEnvironment}
+          {onUpdateEnvironment}
+          {onOpenEnvironment}
+          {onSelectEnvironment}
+          currentWorkspace={activeWorkspace}
+          environments={$environments}
+          {searchData}
+          {activeTabId}
+          {toggleExpandTestflow}
+          bind:isExpandTestflow
+        />
+      </div>
+      <hr class="my-1 ms-1 me-0" />
       <!-- <hr class="mt-1 mb-0 ms-1 me-0" /> -->
     </div>
 
     <!-- Github Data footer -->
 
-    <hr class="ms-2 me-2 mb-0 mt-0" />
+    <!-- <hr class="ms-2 me-2 mb-0 mt-0" /> -->
     <div
       class="p-2 d-flex align-items-center justify-content-between"
       style="z-index: 4;"
@@ -557,14 +585,17 @@
 
 <style>
   .not-opened-any {
-    height: 37px;
+    height: 40px;
   }
   .full-height {
-    height: calc(100% - 40px);
+    height: calc(100% - 80px);
   }
 
   .half-height {
-    height: 49%;
+    height: 33%;
+  }
+  .half-height2 {
+    height: calc((100% - 40px) / 2);
   }
 
   .add-button {
