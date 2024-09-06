@@ -1,27 +1,26 @@
 <script lang="ts">
-  import { PlusIcon, StackIcon, StackFilled } from "@library/icons";
+  import { PlusIcon, StackIcon, StackFilled, TreeIcon } from "@library/icons";
   import List from "@library/ui/list/List.svelte";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import {
-    PERMISSION_NOT_FOUND_TEXT,
-    workspaceLevelPermissions,
-  } from "$lib/utils/constants/permissions.constant";
+  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   //   import { ListItem } from "../components";
   import angleRight from "$lib/assets/angle-right-v2.svg";
   import { Tooltip } from "@library/ui";
   import { TestflowListItem } from "../components";
+  import type { TFJSONDocType } from "@common/models/testflow";
+  import type { ScrollList } from "@library/ui/list/types";
 
   /**
    * current workspace
    */
   export let currentWorkspace;
   /**
-   * environment list
+   * testflow list
    */
-  export let testflows = [];
+  export let testflows: TFJSONDocType[] = [];
   /**
-   * opened environment
+   * opened testflow
    */
 
   /**
@@ -30,19 +29,19 @@
   export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   /**
-   * creates the environment
+   * creates the testflow
    */
-  export let onCreateTestflow;
+  export let onCreateTestflow: any;
   /**
-   * opens the global environment
+   * opens the global testflow
    */
   export let onOpenTestflow;
   /**
-   * deletes the environment
+   * deletes the testflow
    */
   export let onDeleteTestflow;
   /**
-   * updates the environment
+   * updates the testflow
    */
   export let onUpdateTestflow;
 
@@ -54,8 +53,7 @@
 
   export let activeTabId;
 
-  let scrollList;
-  let addEnvDisabled = false;
+  let scrollList: ScrollList;
   let isHovered = false;
 
   const handleMouseOver = () => {
@@ -67,21 +65,20 @@
   };
 
   let flows = [];
-  const mapEnvironmentToWorkspace = (_env, _workspaceId) => {
-    if (_env && _workspaceId) {
-      flows = testflows.filter((element) => {
+  const filterTestflowToWorkspace = (
+    _testflows: TFJSONDocType[],
+    _workspaceId: string,
+  ) => {
+    if (_testflows && _workspaceId) {
+      flows = _testflows.filter((element: TFJSONDocType) => {
         return element.workspaceId === _workspaceId;
       });
     }
   };
   $: {
     if (testflows || currentWorkspace?._id) {
-      mapEnvironmentToWorkspace(testflows, currentWorkspace?._id);
+      filterTestflowToWorkspace(testflows, currentWorkspace?._id);
     }
-    addEnvDisabled = !hasWorkpaceLevelPermission(
-      loggedUserRoleInWorkspace,
-      workspaceLevelPermissions.ADD_ENVIRONMENT,
-    );
   }
 
   async function handleCreateTestflow() {
@@ -100,7 +97,7 @@
       )
     : testflows;
 
-  let scrollDiv;
+  let scrollDiv: HTMLElement;
 
   function scrollToBottom() {
     if (scrollDiv) {
@@ -116,6 +113,9 @@
   class={`d-flex flex-column  h-100 env-sidebar bg-secondary-900   pt-0`}
   style="font-weight: 500;"
 >
+  <!-- 
+  --  Testflow Header 
+  -->
   <div
     class="d-flex align-items-center p-2 rounded-1 me-0 mb-0"
     style="cursor:pointer; justify-content: space-between; height:32px;
@@ -135,8 +135,7 @@
           : 'transform:rotate(0deg);'}"
         alt="angleRight"
       />
-
-      <StackIcon
+      <TreeIcon
         height={"12px"}
         width={"12px"}
         color={"var(--icon-secondary-130)"}
@@ -157,8 +156,8 @@
       <button
         style="height: 24px; width:24px;"
         class="add-icon-container border-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
-          ? 'environment-active'
-          : 'environment-inactive'}"
+          ? 'testflow-active'
+          : 'testflow-inactive'}"
         on:click|stopPropagation={handleCreateTestflow}
       >
         <PlusIcon
@@ -171,7 +170,10 @@
   </div>
 
   {#if isExpandTestflow}
-    <div class="overflow-auto h-100 mb-2" bind:this={scrollDiv}>
+    <div class="overflow-auto h-100 mt-1" bind:this={scrollDiv}>
+      <!-- 
+  --  Testflow Empty screen 
+  -->
       {#if filteredflows && flows.length === 0 && loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
         <div class={`pb-2`}>
           <p
@@ -182,7 +184,7 @@
             strong testing foundation.
           </p>
           <p
-            class="mx-2 add-environment d-flex justify-content-center align-items-center border-radius-2"
+            class="mx-2 add-testflow d-flex justify-content-center align-items-center border-radius-2"
             style="color: var(--text-secondary-100);"
             role="button"
             on:click={async () => {
@@ -202,9 +204,10 @@
         </div>
       {/if}
 
+      <!-- 
+  --  Testflow List 
+  -->
       {#if filteredflows?.length > 0}
-        <!-- <div class="mb-1 mt-0 ms-5 me-2" style="height: 1px; background-color:white"></div> -->
-
         <List
           bind:scrollList
           height={"auto"}
@@ -262,19 +265,19 @@
     display: inline;
   }
 
-  .environment-inactive {
+  .testflow-inactive {
     visibility: hidden;
   }
-  .environment-active {
+  .testflow-active {
     visibility: visible;
     background-color: transparent;
   }
 
-  .environment-active:hover {
+  .testflow-active:hover {
     visibility: visible;
     background-color: var(--bg-tertiary-190);
   }
-  .environment-active:active {
+  .testflow-active:active {
     visibility: visible;
     background-color: var(--bg-secondary-420);
   }
@@ -326,12 +329,12 @@
     background-color: var(--border-color);
     border-bottom: 1px solid #85c2ff !important;
   }
-  .add-environment {
+  .add-testflow {
     border: 1px solid var(--text-secondary-300);
     border-radius: 2px;
     height: 32px;
   }
-  .add-environment:hover {
+  .add-testflow:hover {
     border: 1px solid var(--border-primary-300);
     border-radius: 2px;
   }

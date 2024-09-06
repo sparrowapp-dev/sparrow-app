@@ -5,8 +5,8 @@
   export let menuItems: Array<{
     onClick: () => void;
     displayText: string;
-    disabled: boolean;
-    hidden: boolean;
+    disabled?: boolean;
+    hidden?: boolean;
     icon?: any;
   }> = [];
   export let noOfColumns = 0;

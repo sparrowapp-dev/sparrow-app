@@ -19,6 +19,7 @@
   export let isGuestUser = false;
   export let currentWorkspace: Observable<WorkspaceDocument>;
   export let handleCreateEnvironment;
+  export let onCreateTestflow;
 
   let currentWorkspaceId: string;
 
@@ -72,9 +73,7 @@
       iconColor="var(--text-primary-300)"
       iconSize={"18px"}
       onClick={() => {
-        onItemCreated("testflow", {
-          workspaceId: currentWorkspaceId,
-        });
+        onCreateTestflow();
       }}
     />
     <Card

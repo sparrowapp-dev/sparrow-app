@@ -239,17 +239,6 @@ export default class CollectionsViewModel {
   };
 
   /**
-   * Create web socket new tab with untracked id
-   */
-  private createTestflowNewTab = async (_workspaceId: string) => {
-    this.tabRepository.createTab(
-      this.initTab.testflow("UNTRACKED-" + uuidv4(), _workspaceId).getValue(),
-    );
-    moveNavigation("right");
-    // MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
-  };
-
-  /**
    * Set active tab in store
    * @param id - tab id
    */
@@ -2783,9 +2772,6 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
         );
-        break;
-      case "testflow":
-        await this.createTestflowNewTab(args.workspaceId);
         break;
     }
     return response;

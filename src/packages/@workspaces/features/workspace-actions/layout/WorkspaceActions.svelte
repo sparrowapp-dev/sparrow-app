@@ -514,7 +514,6 @@
           {onUpdateTestflow}
           {onOpenTestflow}
           currentWorkspace={activeWorkspace}
-          flows={$testflows}
           {searchData}
           {activeTabId}
           {toggleExpandTestflow}
