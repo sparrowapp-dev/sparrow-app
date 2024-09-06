@@ -1,7 +1,6 @@
 <script>
   import { SearchIcon } from "$lib/assets/icons";
   import { Select } from "@library/forms";
-  import Input from "@library/forms/Input/Input.svelte";
   import { CategoryIcon, CrossIcon, StackIcon } from "@library/icons";
   import HelpInfoCard from "@support/common/components/HelpInfo-Card/HelpInfoCard.svelte";
   import { onMount } from "svelte";
@@ -9,21 +8,14 @@
   export let fetchPosts;
 
   let productStatus = [];
-
+  let type = "allCategories";
   let searchTerm = "";
 
   function getColor(status) {
     if (status === "Under Review") return "white";
     if (status === "In Progress") return "#DF77F9";
     if (status === "Planned") return "#FFE47E";
-    return "white"; // Default color
-  }
-
-  function getBorderColor(status) {
-    if (status === "Under Review") return "white";
-    if (status === "In Progress") return "#DF77F9";
-    if (status === "Planned") return "#FFE47E";
-    return "white"; // Default border color
+    return "white";
   }
 
   function transformPostsToProductStatus(posts) {
@@ -57,10 +49,10 @@
       const matchesCategory =
         type === "allCategories" ||
         (type === "featureRequest" &&
-          product.category.name === "Feature Request") ||
+          product?.category?.name === "Feature Request") ||
         (type === "UI Improvement" &&
-          product.category.name === "UI Improvement") ||
-        (type === "bug" && product.category.name === "Bug");
+          product?.category?.name === "UI Improvement") ||
+        (type === "bug" && product?.category?.name === "Bug");
 
       return matchesSearchTerm && matchesCategory;
     }),
@@ -68,31 +60,31 @@
 
   onMount(async () => {
     const response = await fetchPosts();
-    console.log("Thisis respoines", response);
     if (response?.data?.posts) {
       transformPostsToProductStatus(response.data.posts);
     }
   });
-
-  let type = "allCategories";
 </script>
 
 <div style="height:100%; width:100%;">
   <div class="container-data" style="padding: 20px;">
     <div class="headerq">
       <p style="font-size: 20px; font-weight:700;">Roadmap</p>
-      <p style="color: #999999; font-size;14px;">
+      <p style="color: var(--text-secondary-50); font-size;14px;">
         Stay updated with all feedback, from planning to progress, on a single
         roadmap.
       </p>
     </div>
 
     <div class="d-flex justify-content-between page-funationality">
-      <div style="margin-bottom: 37px;" class={`d-flex search-input-container rounded py-1 px-2 `}>
+      <div
+        style="margin-bottom: 37px;"
+        class={`d-flex search-input-container rounded py-1 px-2 `}
+      >
         <SearchIcon
           width={14}
           height={14}
-          color={"#8A9299"}
+          color={"var(--icon-secondary-200)"}
           classProp={`my-auto me-3`}
         />
         <input
@@ -163,12 +155,12 @@
       {#each filteredProductStatus as { status, products, filteredProducts }}
         <div
           class="rounded-2"
-          style="width:100%; background-color: #151515; overflow: hidden;"
+          style="width:100%; background-color: var(--bg-secondary-800); overflow: hidden;"
         >
           <div
-            style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:#1D1D20; height:32px;  color:{getColor(
+            style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-secondary-870); height:32px;  color:{getColor(
               status,
-            )}; border-bottom:1px solid {getBorderColor(status)};"
+            )}; border-bottom:1px solid {getColor(status)};"
           >
             {status}
           </div>

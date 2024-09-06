@@ -1,10 +1,7 @@
 <script>
-  import angleRight from "$lib/assets/angle-right-v2.svg";
-  import { TriangleIcon } from "@library/icons";
   import Upvote from "../Upvote.svelte";
 
   export let status;
-  console.log("This is status ", status);
 </script>
 
 <div>
@@ -15,7 +12,7 @@
           <p class="card-title pb-0 mb-0" style="font-weight: 500; ">
             {status.title}
           </p>
-          <span class="category">{status.category.name}</span>
+          <span class="category">{status?.category?.name}</span>
         </div>
 
         <Upvote score={status.score} />
@@ -26,6 +23,7 @@
 
 <style>
   .card-title {
+    font-size: 13px;
     cursor: pointer;
   }
   .card-title:hover {
@@ -34,25 +32,21 @@
   }
   .review-card {
     height: 62px;
-    background-color: #1e1e1e;
+    background-color: var(  --background-dark);
     color: #fff;
     margin: 10px 0;
     border-radius: 3px;
-    border: 0.5px solid #4e4e4e;
+    border: 0.5px solid var(--bg-secondary-315);
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
 
   .category {
-    background-color: #333;
+    background-color: var(--bg-secondary-330);
     padding: 2px 5px 2px 5px;
     border-radius: 4px;
     font-size: 12px;
   }
 
-  .votes {
-    color: white;
-    font-size: 12px;
-  }
 </style>
