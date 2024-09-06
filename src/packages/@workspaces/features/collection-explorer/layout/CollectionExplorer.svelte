@@ -457,7 +457,7 @@
 
   .input-outline:focus,
   .input-outline:hover {
-    outline: 1px solid var(--sparrow-blue);
+    outline: 1px solid var(--text-primary-600);
   }
 
   .add-button {
@@ -472,6 +472,6 @@
   }
 
   .text-plusButton {
-    color: var(--sparrow-blue) !important;
+    color: var(--text-primary-600) !important;
   }
 </style>
