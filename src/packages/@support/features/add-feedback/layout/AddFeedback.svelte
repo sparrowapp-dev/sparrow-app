@@ -1,32 +1,23 @@
 <script lang="ts">
   import { Input, Select, Textarea } from "@library/forms";
-  import { AttachmentIcon, CrossIcon, PlusIcon } from "@library/icons";
+  import { AttachmentIcon, CategoryIcon, CrossIcon } from "@library/icons";
   import { Button, Modal } from "@library/ui";
   import Drop from "../components/Drop/Drop.svelte";
   import { notifications } from "@library/ui/toast/Toast";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
 
-  export let onSendFeedback;
   export let onAddFeedback;
+  export let onInputFeedback;
   enum FeedbackType {
-    FEEDBACK = "Feedback",
-    BUG = "Bug",
     FEATURE_REQUEST = "Feature Request",
+    UI_IMPROVEMENT = "UI Improvement",
+    BUG = "Bug",
+    ALL_CATEGORY = "Uncategorized",
+    CATEGORY = "Category",
   }
 
-  enum FeedbackSubCategory {
-    USABILITY = "Usability",
-    DOCUMENTATION = "Documentation",
-    PERFORMANCE = "Performance",
-    LOW = "Low",
-    MEDIUM = "Medium",
-    HIGH = "High",
-    CRITICAL = "Critical",
-  }
-
-  let type: FeedbackType = FeedbackType.FEEDBACK;
+  let type: FeedbackType = FeedbackType.CATEGORY;
   let feedbackDescription = "";
-  let subCategory: FeedbackSubCategory = FeedbackSubCategory.USABILITY;
   let feedbackSubject = "";
   let uploadFeedback = {
     file: {
@@ -35,6 +26,9 @@
   };
   let isExposeFeedbackForm = false;
   let isLoading = false;
+  let isDescriptionEmpty = false;
+  let isSubjectEmpty = false;
+  let isTextArea = false;
 
   const handleLogoInputChange = (e: any) => {
     const errorMessage =
@@ -44,37 +38,44 @@
       ...uploadFeedback.file.value,
       ...(e?.target?.files || e?.dataTransfer?.files),
     ];
-    const maxVedioSize = 10485760; // 10 MB
     const maxImageSize = 2097152; // 2 MB
     if (targetFile?.length === 0) {
       return;
     }
-    let vedioCount = 0;
+    // let vedioCount = 0;
+    // const maxVedioSize = 20971520; // 20 MB
     let isErrorThrown = false;
     const selectedFiles = targetFile.filter((file) => {
       const fileType = `.${(file?.name).split(".").pop().toLowerCase()}`;
 
-      if (fileType === ".jpg" || fileType === ".jpeg" || fileType === ".png") {
+      if (
+        fileType === ".jpg" ||
+        fileType === ".jpeg" ||
+        fileType === ".png" ||
+        fileType === ".svg"
+      ) {
         if (file.size > maxImageSize) {
           // image size exceeded
           isErrorThrown = true;
           return false;
         }
         return true;
-      } else if (fileType === ".mp4") {
-        vedioCount = vedioCount + 1;
-        if (vedioCount >= 2) {
-          // vedio limit exceeded
-          isErrorThrown = true;
-          return false;
-        }
-        if (file.size > maxVedioSize) {
-          // vedio size exceeded
-          isErrorThrown = true;
-          return false;
-        }
-        return true;
-      } else {
+      }
+      // else if (fileType === ".mp4") {
+      //   vedioCount = vedioCount + 1;
+      //   if (vedioCount >= 2) {
+      //     // vedio limit exceeded
+      //     isErrorThrown = true;
+      //     return false;
+      //   }
+      //   if (file.size > maxVedioSize) {
+      //     // vedio size exceeded
+      //     isErrorThrown = true;
+      //     return false;
+      //   }
+      //   return true;
+      // }
+      else {
         isErrorThrown = true;
         return false;
       }
@@ -99,7 +100,7 @@
   };
 </script>
 
-<div class="pb-3 w-100">
+<div class=" w-100">
   <Tooltip title="Feedback" placement="top" distance={13}>
     <button
       on:click={() => {
@@ -108,7 +109,7 @@
       }}
       class="add-feedback w-100 outline-none border-0 border-radius-4 text-fs-14 fw-normal"
     >
-      +Add Feedback
+      + <span class="px-2"> Add Feedback</span>
     </button>
   </Tooltip>
 </div>
@@ -121,37 +122,45 @@
     isOpen={isExposeFeedbackForm}
     handleModalState={(flag = false) => {
       isExposeFeedbackForm = flag;
+      feedbackDescription = "";
+      feedbackSubject = "";
+      type = FeedbackType.CATEGORY;
+      uploadFeedback = {
+        file: {
+          value: [],
+        },
+      };
     }}
   >
     <div class="pt-2"></div>
     <div class="d-flex pb-2">
       <Select
-        id={"feeds"}
         data={[
-          {
-            name: "Feedback",
-            id: FeedbackType.FEEDBACK,
-          },
-          {
-            name: "Bug",
-            id: FeedbackType.BUG,
-          },
           {
             name: "Feature Request",
             id: FeedbackType.FEATURE_REQUEST,
           },
+          {
+            name: "UX Improvement",
+            id: FeedbackType.UI_IMPROVEMENT,
+          },
+          {
+            name: "Bugs",
+            id: FeedbackType.BUG,
+          },
+          {
+            name: "All Categories",
+            id: FeedbackType.ALL_CATEGORY,
+          },
         ]}
+        iconRequired={true}
+        icon={CategoryIcon}
+        placeholderText={"Category"}
+        id={"feeds"}
         zIndex={499}
         titleId={type}
         onclick={(id = "") => {
           type = id;
-          if (type === FeedbackType.FEEDBACK) {
-            subCategory = FeedbackSubCategory.USABILITY;
-          } else if (type === FeedbackType.BUG) {
-            subCategory = FeedbackSubCategory.LOW;
-          } else {
-            subCategory = "";
-          }
         }}
         disabled={false}
         borderType={"none"}
@@ -161,7 +170,7 @@
         headerHeight={"36px"}
         minBodyWidth={"150px"}
         minHeaderWidth={"128px"}
-        maxHeaderWidth={"150px"}
+        maxHeaderWidth={"200px"}
         borderRounded={"4px"}
         headerTheme={"violet2"}
         bodyTheme={"violet"}
@@ -171,127 +180,27 @@
         position={"absolute"}
       />
     </div>
-    {#if type === "Feedback" || type === "Bug"}
-      <p class="text-fs-14">Category</p>
-      <div class="d-flex gap-1 pb-4">
-        <!-- subCategory  starts-->
-        {#if type === "Feedback"}
-          <input
-            type="radio"
-            id={FeedbackSubCategory.USABILITY}
-            name="option"
-            value={FeedbackSubCategory.USABILITY}
-            bind:group={subCategory}
-          />
-          <label
-            for={FeedbackSubCategory.USABILITY}
-            class="text-fs-12 border-radius-4 {subCategory ===
-            FeedbackSubCategory.USABILITY
-              ? 'label-active'
-              : ''}">Usability</label
-          ><br />
-          <input
-            type="radio"
-            id={FeedbackSubCategory.DOCUMENTATION}
-            name="option"
-            value={FeedbackSubCategory.DOCUMENTATION}
-            bind:group={subCategory}
-          />
-          <label
-            for={FeedbackSubCategory.DOCUMENTATION}
-            class="text-fs-12 border-radius-4 {subCategory ===
-            FeedbackSubCategory.DOCUMENTATION
-              ? 'label-active'
-              : ''}">Documentation</label
-          ><br />
-          <input
-            type="radio"
-            id={FeedbackSubCategory.PERFORMANCE}
-            name="option"
-            value={FeedbackSubCategory.PERFORMANCE}
-            bind:group={subCategory}
-          />
-          <label
-            for={FeedbackSubCategory.PERFORMANCE}
-            class="text-fs-12 border-radius-4 {subCategory ===
-            FeedbackSubCategory.PERFORMANCE
-              ? 'label-active'
-              : ''}">Performance</label
-          ><br />
-        {/if}
-
-        {#if type === "Bug"}
-          <input
-            type="radio"
-            id={FeedbackSubCategory.LOW}
-            name="option"
-            value={FeedbackSubCategory.LOW}
-            bind:group={subCategory}
-          />
-          <label
-            for={FeedbackSubCategory.LOW}
-            class="text-fs-12 border-radius-4 {subCategory ===
-            FeedbackSubCategory.LOW
-              ? 'label-active'
-              : ''}">Low</label
-          ><br />
-          <input
-            type="radio"
-            id={FeedbackSubCategory.MEDIUM}
-            name="option"
-            value={FeedbackSubCategory.MEDIUM}
-            bind:group={subCategory}
-          />
-          <label
-            for={FeedbackSubCategory.MEDIUM}
-            class="text-fs-12 border-radius-4 {subCategory ===
-            FeedbackSubCategory.MEDIUM
-              ? 'label-active'
-              : ''}">Medium</label
-          ><br />
-          <input
-            type="radio"
-            id={FeedbackSubCategory.HIGH}
-            name="option"
-            value={FeedbackSubCategory.HIGH}
-            bind:group={subCategory}
-          />
-          <label
-            for={FeedbackSubCategory.HIGH}
-            class="text-fs-12 border-radius-4 {subCategory ===
-            FeedbackSubCategory.HIGH
-              ? 'label-active'
-              : ''}">High</label
-          ><br />
-          <input
-            type="radio"
-            id={FeedbackSubCategory.CRITICAL}
-            name="option"
-            value={FeedbackSubCategory.CRITICAL}
-            bind:group={subCategory}
-          />
-          <label
-            for={FeedbackSubCategory.CRITICAL}
-            class="text-fs-12 border-radius-4 {subCategory ===
-            FeedbackSubCategory.CRITICAL
-              ? 'label-active'
-              : ''}">Critical</label
-          ><br />
-        {/if}
-
-        <!-- subCategory ends -->
-      </div>
-    {/if}
-    <div>
+    <div style="">
       <p class="text-fs-14 mb-0 text-secondary-150">Description</p>
-      <p class="text-fs-12 text-secondary-200">
-        {500 - feedbackDescription.length < 0
-          ? 0
-          : 500 - feedbackDescription.length} characters left
+      <p class="text-fs-12 text-secondary-200 mb-0">
+        {feedbackDescription.length} / 200
       </p>
 
-      <div class="p-2 bg-tertiary-300 mb-3">
+      <div
+        class="p-2 bg-tertiary-300 {isDescriptionEmpty ||
+        isSubjectEmpty ||
+        isTextArea
+          ? 'empty-data-error mb-0'
+          : 'mb-3'}"
+        style="height: 137px; border-radius: 4px; color:#676A80; "
+      >
         <Input
+          on:input={() => {
+            if (feedbackSubject.length > 0) {
+              isSubjectEmpty = false;
+              isTextArea = false;
+            }
+          }}
           id="feedback-subject"
           width={"100%"}
           type="text"
@@ -304,35 +213,55 @@
           style="outline:none;"
           disabled={false}
           placeholder="Subject"
-          maxlength={500}
+          maxlength={200}
         />
-        <hr class="mt-1 mb-2" />
+        <hr style="margin:0px; padding-bottom:8px;" />
         <Textarea
-          id="feedback-description"
           width={"100%"}
-          height={"120px"}
+          on:input={() => {
+            if (feedbackDescription.length > 0) {
+              isDescriptionEmpty = false;
+              isTextArea = false;
+            }
+          }}
+          id="feedback-description"
+          height={"90px"}
           bind:value={feedbackDescription}
           defaultBorderColor="transparent"
           hoveredBorderColor="transparent"
           focusedBorderColor={"transparent"}
           class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
-          style="outline:none;"
+          style="outline:none;
+           "
           disabled={false}
-          placeholder="Add description..."
-          maxlength={500}
+          placeholder="Add short description"
+          maxlength={200}
         />
       </div>
 
-      <div class="drop-box mb-2">
+      {#if isSubjectEmpty}
+        <p class="error-message">Enter a relevant subject for feedback.</p>
+      {/if}
+      {#if isDescriptionEmpty}
+        <p class="error-message">Enter a relevant description for feedback.</p>
+      {/if}
+      {#if isTextArea}
+        <p class="error-message">
+          Please enter subject and description for adding a feedback.
+        </p>
+      {/if}
+
+      <div class="drop-box mb-2" style="">
         <Drop
+          styleProp={""}
           maxFileSize={2048}
           onChange={handleLogoInputChange}
-          labelDescription="Choose an image or video, or drag and drop it here."
+          labelDescription="Choose an image or drag and drop it here."
           inputId="upload--feedback-file-input"
           inputPlaceholder="Drag and Drop or"
-          supportedFileTypes={[".png", ".jpg", ".jpeg", ".mp4"]}
+          supportedFileTypes={[".png", ".jpg", ".jpeg", ".svg"]}
           height={"80px"}
-          infoMessage={"Images: PNG, JPEG (Max 2 MB each). Video: MP4 (Max 10 MB, only 1 video allowed)"}
+          infoMessage={"Images: SVG, PNG, JPG, JPEG <br/> (limit 2MB each)<br/> No video files, only images <br/> are accepted"}
         />
         <div class="d-flex justify-content-between">
           <div></div>
@@ -382,6 +311,14 @@
           buttonClassProp={"me-2"}
           onClick={async () => {
             isExposeFeedbackForm = false;
+            feedbackDescription = "";
+            feedbackSubject = "";
+            type = FeedbackType.CATEGORY;
+            uploadFeedback = {
+              file: {
+                value: [],
+              },
+            };
           }}
         />
         <Button
@@ -390,26 +327,40 @@
           loader={isLoading}
           onClick={async () => {
             isLoading = true;
-            const res = await onSendFeedback(
-              uploadFeedback,
-              type,
-              feedbackSubject,
-              feedbackDescription,
-              subCategory,
-            );
-            isLoading = false;
-            if (res.isSuccessful) {
-              isExposeFeedbackForm = false;
-              type = FeedbackType.FEEDBACK;
-              feedbackDescription = "";
-              subCategory = FeedbackSubCategory.USABILITY;
-              feedbackSubject = "";
-              uploadFeedback = {
-                file: {
-                  value: [],
-                },
-              };
+
+            if (!feedbackDescription || !feedbackSubject) {
+              if (!feedbackDescription && !feedbackSubject) {
+                isTextArea = true;
+                isSubjectEmpty = isDescriptionEmpty = false;
+              } else {
+                isTextArea = false;
+                isSubjectEmpty = !feedbackSubject;
+                isDescriptionEmpty = !feedbackDescription;
+              }
+              isLoading = false;
+            } else {
+              isSubjectEmpty = isDescriptionEmpty = isTextArea = false;
+              const res = await onInputFeedback(
+                feedbackSubject,
+                feedbackDescription,
+                type === FeedbackType.CATEGORY
+                  ? FeedbackType.ALL_CATEGORY
+                  : type,
+                uploadFeedback,
+              );
+              if (res?.isSuccessful) {
+                isExposeFeedbackForm = false;
+                type = FeedbackType.CATEGORY;
+                feedbackDescription = "";
+                feedbackSubject = "";
+                uploadFeedback = {
+                  file: {
+                    value: [],
+                  },
+                };
+              }
             }
+            isLoading = false;
           }}
         />
       </div>
@@ -428,20 +379,15 @@
   .add-feedback:active {
     background-color: var(--bg-primary-500);
   }
-  input[type="radio"] {
-    display: none;
-  }
-  label {
-    border: 1px solid var(--border-primary-300);
-    padding: 2px 8px 2px 8px;
-    color: var(--text-secondary-200);
-    cursor: pointer;
-  }
-  .label-active {
-    background-color: var(--bg-primary-300);
-    color: var(--text-secondary-100);
-  }
   .file-scroller::-webkit-scrollbar {
     display: none;
+  }
+  .empty-data-error {
+    border: 1px solid var(--error--color);
+  }
+  .error-message {
+    color: var(--error--color);
+    font-size: 12px;
+    margin-bottom: 20px;
   }
 </style>

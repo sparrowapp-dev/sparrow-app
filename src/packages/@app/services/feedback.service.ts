@@ -11,4 +11,16 @@ export class FeedbackService {
     });
     return response;
   };
+
+  public fetchuploads = async (feedback) => {
+    const response = await makeRequest(
+      "POST",
+      `${apiUrl}/api/feedback/uploads`,
+      {
+        body: feedback,
+        headers: getMultipartAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

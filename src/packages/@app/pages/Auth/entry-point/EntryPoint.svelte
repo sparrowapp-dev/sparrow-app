@@ -119,6 +119,7 @@
           handleRedirect(true);
           openDefaultBrowser();
         }}
+        id="create_account_or_sign_in"
       >
         Create an Account or Sign In</button
       >
@@ -132,6 +133,7 @@
       </div>
       <div style="height:32px;">
         <Button
+          id="try_sparrow_edge"
           onClick={() => {
             skipLoginHandler();
           }}

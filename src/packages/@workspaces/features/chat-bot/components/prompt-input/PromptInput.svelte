@@ -9,15 +9,15 @@
   export let onUpdateAiPrompt;
   export let isResponseGenerating;
 
-  let isHovered = false;
+  let isSendButtonHovered = false;
 
-  function handleMouseEnter() {
-    isHovered = true;
-  }
+  const handleMouseEnter = () => {
+    isSendButtonHovered = true;
+  };
 
-  function handleMouseLeave() {
-    isHovered = false;
-  }
+  const handleMouseLeave = () => {
+    isSendButtonHovered = false;
+  };
 </script>
 
 <div class="d-flex prompt-input p-3">
@@ -58,7 +58,7 @@
         <SendIcon
           height={"16px"}
           width={"16px"}
-          color={isHovered
+          color={isSendButtonHovered
             ? "var(--icon-primary-300)"
             : "var(--icon-secondary-100)"}
         />

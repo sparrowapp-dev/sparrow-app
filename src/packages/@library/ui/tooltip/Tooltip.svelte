@@ -26,11 +26,6 @@
   let isDelayed = false;
 
   const toggleTooltip = () => {
-    if (title === "") {
-      show = false;
-    } else {
-      show = true;
-    }
     if (placement === "right") {
       top =
         (

@@ -2,8 +2,7 @@
   import { onDestroy } from "svelte";
   import { marked } from "marked";
   import { notifications } from "@library/ui/toast/Toast";
-  import { copyIcon } from "../../assests";
-  import tickIcon from "../../assests/tick.png";
+  import { copyIcon, tickIcon } from "../../assests";
   import { tick } from "svelte";
 
   import hljs from "highlight.js";

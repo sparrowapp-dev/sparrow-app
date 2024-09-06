@@ -69,7 +69,6 @@
   let isHovered = false;
 
   function handleMouseEnter() {
-    if (requestUrl === "") return;
     isHovered = true;
   }
 
@@ -181,25 +180,18 @@
       onUpdateRequestState({ requestSplitterDirection: e.detail });
     }}
   /> -->
-  <Tooltip
-    title={isGuestUser ? "Login to save" : "Save"}
-    show={requestUrl !== ""}
-    placement={"bottom-left"}
-    distance={12}
-    zIndex={10}
-  >
+  <Tooltip title={"Save"} placement={"bottom"} distance={12} zIndex={10}>
     <button
       class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
       on:click={handleSaveRequest}
       on:mouseenter={handleMouseEnter}
       on:mouseleave={handleMouseLeave}
-      disabled={isSave ||
-      requestUrl === "" ||
-      userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-      isGuestUser
+      disabled={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
         : false}
-         style="background-color: {isSave ? 'var(--icon-secondary-550)' : 'var(--bg-secondary-400)'}; color: white;"
+      style="background-color: {isSave
+        ? 'var(--icon-secondary-550)'
+        : 'var(--bg-secondary-400)'}; color: white;"
     >
       <DiskIcon
         height={22}
@@ -208,8 +200,6 @@
           ? "var(--icon-secondary-380)"
           : isHovered && !isSave && !isGuestUser
           ? "var(--icon-primary-200)"
-          : isGuestUser || requestUrl === ""
-          ? "var(--icon-disabled-100)"
           : "var(--icon-secondary-100)"}
       />
     </button>
