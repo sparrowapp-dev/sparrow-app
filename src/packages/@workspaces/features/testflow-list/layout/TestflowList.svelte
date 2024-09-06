@@ -156,7 +156,9 @@
     >
       <button
         style="height: 24px; width:24px;"
-        class="add-icon-container border-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
+        class="{loggedUserRoleInWorkspace === WorkspaceRole.WORKSPACE_VIEWER
+          ? 'd-none'
+          : ''} add-icon-container border-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
           ? 'testflow-active'
           : 'testflow-inactive'}"
         on:click|stopPropagation={handleCreateTestflow}
@@ -175,19 +177,20 @@
       <!-- 
   --  Testflow Empty screen 
   -->
-      {#if filteredflows && flows.length === 0 && loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
-        <div class={`pb-2`}>
+      {#if filteredflows && flows.length === 0}
+        <div class={`pb-2 px-2`}>
           <p
-            class={`mx-1 add-env-desc-text mb-3 text-fs-12 mb-0 fw-normal text-center`}
+            class={`add-env-desc-text mb-3 text-fs-12 mb-0 fw-normal text-center`}
             style="color: var(--text-secondary-50)"
           >
             Start with basic test cases to check core functions and build a
             strong testing foundation.
           </p>
-          <p
-            class="mx-2 add-testflow d-flex justify-content-center align-items-center border-radius-2"
+          <button
+            class=" w-100 add-testflow bg-transparent d-flex justify-content-center align-items-center border-radius-2"
             style="color: var(--text-secondary-100);"
-            role="button"
+            disabled={loggedUserRoleInWorkspace ===
+              WorkspaceRole.WORKSPACE_VIEWER}
             on:click={async () => {
               await onCreateTestflow();
             }}
@@ -202,7 +205,7 @@
               class="ps-2 fw-bold text-fs-12"
               >Add New {TestflowDefault.NAME}</span
             >
-          </p>
+          </button>
         </div>
       {/if}
 
@@ -339,5 +342,8 @@
   .add-testflow:hover {
     border: 1px solid var(--border-primary-300);
     border-radius: 2px;
+  }
+  button:disabled {
+    pointer-events: none !important;
   }
 </style>
