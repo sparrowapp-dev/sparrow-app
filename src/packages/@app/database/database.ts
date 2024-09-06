@@ -55,7 +55,7 @@ import {
   type GuestUserDocType,
 } from "@app/models/guest-user.model";
 import { updatesSchema, type UpdatesDocType } from "@app/models/updates.model";
-import { TestflowSchema } from "@app/models/testflow.model";
+import { TestflowSchema, type TFContainerType } from "@common/models/testflow";
 // import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 // addRxPlugin(RxDBDevModePlugin);
 
@@ -95,6 +95,7 @@ export type DatabaseCollections = {
   activesidebartab: ActiveSideBarTabContainer;
   windowSettings: WindowSettingsContainer;
   team: TeamContainer;
+  testflow: TFContainerType;
 };
 
 // define the Rx database type
@@ -103,7 +104,7 @@ export type DatabaseType = RxDatabase<DatabaseCollections>;
 //RxDB Class
 export class RxDB {
   private static instance: RxDB | null = null;
-  public rxdb = null;
+  public rxdb: DatabaseType | null = null;
   private constructor() {}
 
   public static getInstance(): RxDB {

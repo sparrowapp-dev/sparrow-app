@@ -1,41 +1,50 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { RxDB, type EnvironmentDocument } from "@app/database/database";
-import { environmentType } from "$lib/utils/enums/environment.enum";
+import { RxDB } from "@app/database/database";
+import type { TFJSONDocType, TFObsDocType } from "@common/models/testflow";
 import type { Observable } from "rxjs";
 
 export class TestflowRepository {
+  private rxdb = RxDB.getInstance()?.rxdb?.testflow;
   constructor() {}
   /**
-   * @description
-   * Adds a new environment to workspace.
+   * Adds a new test flow document to the database.
+   *
+   * @param _testflow - The test flow document to be inserted into the database.
+   * @returns  A promise that resolves when the test flow has been added.
    */
-  public addTestflow = async (_testflow) => {
-    await RxDB.getInstance().rxdb.testflow.insert(_testflow);
-    return;
-  };
-
-  public getTestflow = (): Observable<EnvironmentDocument[]> => {
-    return RxDB.getInstance().rxdb.testflow.find().sort({ createdAt: "asc" }).$;
+  public addTestflow = async (_testflow: TFJSONDocType): Promise<void> => {
+    await this.rxdb?.insert(_testflow);
   };
 
   /**
-   * @description
-   * updates existing environment.
+   * Retrieves an observable that emits the list of test flow documents from the database.
+   *
+   * @returns An observable that emits an array of test flow documents, sorted by their creation date in ascending order.
    */
-  public updateTestflow = async (uuid: string, data) => {
-    const testflow = await RxDB.getInstance()
-      .rxdb.testflow.findOne({
+  public getTestflowsObserver = (): Observable<TFObsDocType[]> | undefined => {
+    return this.rxdb?.find().sort({ createdAt: "asc" }).$;
+  };
+
+  /**
+   * Updates a test flow with the provided data.
+   *
+   * @param uuid - The unique identifier of the test flow (reference to mongoId).
+   * @param data - The data object containing updates to be applied to the test flow.
+   * @returns A promise that resolves when the test flow is updated.
+   */
+  public updateTestflow = async (
+    uuid: string,
+    data: Partial<TFJSONDocType>,
+  ): Promise<void> => {
+    const testflow = await this.rxdb
+      ?.findOne({
         selector: {
-          id: uuid,
+          _id: uuid,
         },
       })
       .exec();
-    testflow.incrementalModify((value) => {
-      if (data._id) value.id = data._id;
+    testflow?.incrementalModify((value: TFJSONDocType) => {
       if (data.name) value.name = data.name;
       if (data.workspaceId) value.workspaceId = data.workspaceId;
-      // if (data.nodes) value.type = data.type;
-      // if (data.edges) value.variable = data.variable;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;
       if (data.createdBy) value.createdBy = data.createdBy;
@@ -43,15 +52,39 @@ export class TestflowRepository {
     });
   };
 
-  public removeTestflow = async (testflowId: string) => {
-    const testflow = await RxDB.getInstance()
-      .rxdb.testflow.findOne({
+  /**
+   * Removes a test flow document from the database by its ID.
+   *
+   * @param  _testflowId - The unique identifier of the test flow to be removed.
+   * @returns A promise that resolves when the test flow has been successfully removed.
+   */
+  public removeTestflow = async (_testflowId: string): Promise<void> => {
+    const testflow = await this.rxdb
+      ?.findOne({
         selector: {
-          id: testflowId,
+          _id: _testflowId,
         },
       })
       .exec();
 
-    await testflow.remove();
+    await testflow?.remove();
+  };
+
+  /**
+   * Retrieves an array of test flow documents by their workspace ID.
+   *
+   * @param  _workspaceId - The unique identifier of the workspace to filter the test flows.
+   * @returns A promise that resolves to an array of test flow documents associated with the given workspace ID.
+   */
+  public getTestflowByWorkspaceId = async (
+    _workspaceId: string,
+  ): Promise<TFJSONDocType[] | undefined> => {
+    return await this.rxdb
+      ?.find({
+        selector: {
+          workspaceId: _workspaceId,
+        },
+      })
+      .exec();
   };
 }

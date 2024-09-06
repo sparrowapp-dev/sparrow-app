@@ -55,7 +55,7 @@
 
   function handleSelectClick(event: MouseEvent) {
     const selectElement = document.getElementById(
-      `show-more-environment-${flow?.id}`,
+      `show-more-environment-${flow?._id}`,
     );
     if (selectElement && !selectElement.contains(event.target as Node)) {
       showMenu = false;
@@ -206,7 +206,7 @@
 <div style="" class="environment-tab mb-1" bind:this={environmentTabWrapper}>
   <button
     style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
-    class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 my-button {flow?.id ===
+    class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 my-button {flow?._id ===
     activeTabId
       ? 'active-collection-tab'
       : ''}"
@@ -218,7 +218,7 @@
       }}
       on:click|preventDefault={() => {
         if (!isRenaming) {
-          if (!flow.id.includes(UntrackedItems.UNTRACKED)) {
+          if (!flow._id.includes(UntrackedItems.UNTRACKED)) {
             openTestflow();
           }
         }
@@ -251,12 +251,12 @@
         </div>
       {/if}
     </div>
-    {#if flow.id.includes(UntrackedItems.UNTRACKED)}
+    {#if flow._id.includes(UntrackedItems.UNTRACKED)}
       <Spinner size={"15px"} />
     {:else}
       <Tooltip placement="bottom" title="More" distance={17} show={!showMenu}>
         <button
-          id={`show-more-environment-${flow?.id}`}
+          id={`show-more-environment-${flow?._id}`}
           class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
             ? 'threedot-active'
             : ''}"

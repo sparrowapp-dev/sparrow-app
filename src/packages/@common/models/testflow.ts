@@ -1,20 +1,18 @@
 import {
   toTypedRxJsonSchema,
   type ExtractDocumentTypeFromTypedRxJsonSchema,
+  type RxCollection,
+  type RxDocument,
   type RxJsonSchema,
 } from "rxdb";
 
-export const TestflowSchemaLiteral = {
+const TestflowSchemaLiteral = {
   title: "Testflow",
-  primaryKey: "id",
+  primaryKey: "_id",
   type: "object",
   version: 0,
   properties: {
-    id: {
-      type: "string",
-      maxLength: 100,
-    },
-    TestflowId: {
+    _id: {
       type: "string",
       maxLength: 100,
     },
@@ -51,8 +49,10 @@ export const TestflowSchemaLiteral = {
                 type: "number",
               },
             },
+            required: ["x", "y"],
           },
         },
+        required: ["id", "type", "data", "position"],
       },
     },
     edges: {
@@ -68,16 +68,11 @@ export const TestflowSchemaLiteral = {
             type: "string",
           },
           target: {
-            type: "boolean",
+            type: "string",
           },
         },
+        required: ["id", "source", "target"],
       },
-    },
-    type: {
-      type: "string",
-    },
-    isActive: {
-      type: "boolean",
     },
     createdAt: {
       type: "string",
@@ -92,12 +87,28 @@ export const TestflowSchemaLiteral = {
       type: "string",
     },
   },
+  required: [
+    "_id",
+    "workspaceId",
+    "name",
+    "nodes",
+    "edges",
+    "createdAt",
+    "updatedAt",
+    "createdBy",
+    "updatedBy",
+  ],
 } as const;
 
 const schemaTyped = toTypedRxJsonSchema(TestflowSchemaLiteral);
-export type TestflowDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
+export type TFJSONDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
   typeof schemaTyped
 >;
+// export type PickedProperties = Pick<TFDocType, "nodes">;
+export type TFNodesType = TFJSONDocType["nodes"][number];
+export type TFEdgesType = TFJSONDocType["edges"][number];
+export type TFObsDocType = RxDocument<TFJSONDocType>;
+export type TFContainerType = RxCollection<TFJSONDocType>;
 
-export const TestflowSchema: RxJsonSchema<TestflowDocType> =
+export const TestflowSchema: RxJsonSchema<TFJSONDocType> =
   TestflowSchemaLiteral;
