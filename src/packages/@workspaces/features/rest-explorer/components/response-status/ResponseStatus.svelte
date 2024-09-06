@@ -28,14 +28,14 @@
               class="ellipsis d-flex align-items-center"
               style="color:{response.status === ResponseStatusCode.OK ||
               response.status === ResponseStatusCode.CREATED
-                ? 'var(--request-get)'
+                ? 'var(--icon-success-100)'
                 : 'var(--request-delete)'};"
             >
               <span class="me-2 d-flex">
                 <DotIcon
                   color={response.status === ResponseStatusCode.OK ||
                   response.status === ResponseStatusCode.CREATED
-                    ? "var(--request-get)"
+                    ? "var(--icon-success-100)"
                     : "var(--request-delete)"}
                   height={"6px"}
                   width={"6px"}
@@ -93,7 +93,7 @@
   }
 
   .time-primary1 {
-    color: var(--request-get) !important;
+    color: var(--icon-success-100) !important;
     background-color: transparent;
   }
   .size-primary1 {
