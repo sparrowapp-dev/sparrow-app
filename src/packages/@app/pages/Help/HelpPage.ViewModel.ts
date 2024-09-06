@@ -197,11 +197,10 @@ class HelpPageViewModel {
     return response;
   };
 
-  public getListOfPOsts = async (sort) => {
+  public getListOfPOsts = async (sort:string,search:string, status: string) => {
     const boards = await this.RetrieveBoards();
-
     const boardID = boards?.data?.boards[0]?.id;
-    const response = await this.cannyService.listPosts(boardID, sort);
+    const response = await this.cannyService.listPosts(boardID, sort, search,status );
     return response;
   };
 
