@@ -9,6 +9,7 @@
   import { WorkspaceRole } from "$lib/utils/enums";
   import { TreeIcon } from "@library/icons";
   import type { TFJSONDocType } from "@common/models/testflow";
+  import { TestflowDefault } from "@common/types/workspace/testflow";
 
   /**
    * current workspace to identify the selected testflow
@@ -119,7 +120,7 @@
       menuItems = [
         {
           onClick: openTestflow,
-          displayText: "Open Flow",
+          displayText: `Open ${TestflowDefault.NAME}`,
           disabled: false,
         },
         {
@@ -141,7 +142,7 @@
 </script>
 
 <ModalWrapperV1
-  title={"Delete Flow?"}
+  title={`Delete ${TestflowDefault.NAME}?`}
   type={"danger"}
   width={"35%"}
   zIndex={1000}
@@ -150,10 +151,8 @@
 >
   <div class="text-lightGray mb-1 sparrow-fs-14">
     <p style="font-weight: 400;" class="text-fs-14">
-      Are you sure you want to delete this Test Flow? <span
-        style="font-weight:700;"
-        class="">"{flow.name}"</span
-      >
+      Are you sure you want to delete this {TestflowDefault.FULL_NAME}?
+      <span style="font-weight:700;" class="">"{flow.name}"</span>
       and all its variables will be removed and cannot be restored.
     </p>
   </div>

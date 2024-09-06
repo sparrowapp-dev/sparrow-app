@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TestflowRepository } from "@app/repositories/testflow.repository";
 import type { TFJSONDocType } from "@common/models/testflow";
+import { TestflowDefault } from "@common/types/workspace/testflow";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -15,17 +16,21 @@ export class TestflowViewModel {
   constructor() {}
 
   /**
-   * @description - fetches environment list
+   * Retrieves an observable of the current Testflows from the repository.
+   *
+   * @returns An observable that provides the current list of Testflows.
    */
   public get testflows() {
     return this.testflowRepository.getTestflowsObserver();
   }
 
   /**
-   * @description - finds next environment name to be created
-   * @param list - previous environment list
-   * @param name - sample environment name
-   * @returns
+   * Generates the next available name for a new Testflow by checking the existing list
+   * of Testflows and appending a number if necessary.
+   *
+   * @param list - The list of existing Testflow documents.
+   * @param name - The base name for the new Testflow.
+   * @returns The next available name for the new Testflow.
    */
   private getNextTestflow: (list: TFJSONDocType[], name: string) => string = (
     list,
@@ -49,9 +54,11 @@ export class TestflowViewModel {
   };
 
   /**
-   * @description - creates new environment
-   * @param localEnvironment - new environment data
-   * @returns
+   * Creates a new Testflow in the active workspace, initializes a tab for the new Testflow,
+   * and displays a success notification.
+   *
+   * @returns A promise that resolves when the Testflow has been created, added to the repository,
+   * and the corresponding tab has been initialized.
    */
   public handleCreateTestflow = async () => {
     const currentWorkspace =
@@ -59,9 +66,10 @@ export class TestflowViewModel {
     const testflows = (await this.testflowRepository.getTestflowByWorkspaceId(
       currentWorkspace._id,
     )) as TFJSONDocType[];
+    const testFLowId = uuidv4();
     const newTestflow: TFJSONDocType = {
-      _id: uuidv4(),
-      name: this.getNextTestflow(testflows, "New Flow"),
+      _id: testFLowId,
+      name: this.getNextTestflow(testflows, `New ${TestflowDefault.NAME}`),
       nodes: [
         {
           id: "1",
@@ -80,21 +88,22 @@ export class TestflowViewModel {
       updatedAt: "",
       updatedBy: "",
     };
-    await this.testflowRepository.addTestflow(newTestflow);
     const initTestflowTab = this.initTab.testflow(
-      newTestflow._id,
+      testFLowId,
       currentWorkspace._id,
     );
+    await this.testflowRepository.addTestflow(newTestflow);
     initTestflowTab.updateName(newTestflow.name);
     this.tabRepository.createTab(initTestflowTab.getValue());
-    notifications.success("New Testflow Created!");
-    return;
+    notifications.success(`New ${TestflowDefault.NAME} Created!`);
   };
 
   /**
-   * @description - deletes environment from mongo server
-   * @param env - environment needs to be deleted
-   * @returns
+   * Deletes the specified Testflow from the repository and removes the associated tab.
+   * Displays a success notification upon completion.
+   *
+   * @param testflow - The Testflow document to be deleted.
+   * @returns An object indicating whether the operation was successful.
    */
   public handleDeleteTestflow = async (testflow: TFJSONDocType) => {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
@@ -104,7 +113,7 @@ export class TestflowViewModel {
     this.testflowRepository.removeTestflow(testflow._id);
     await this.tabRepository.removeTab(testflow._id);
     notifications.success(
-      `${testflow.name} testflow is removed from ${currentWorkspace.name}.`,
+      `${testflow.name} ${TestflowDefault.NAME} is removed from ${currentWorkspace.name}.`,
     );
     return {
       isSuccessful: true,
@@ -112,14 +121,17 @@ export class TestflowViewModel {
   };
 
   /**
-   * @description - updates the environment
-   * @param env  - environment that need to be updated
-   * @param newEnvironmentName - new environment data
+   * Updates the Testflow's name in the repository and reflects the change
+   * in the corresponding tab if it exists.
+   *
+   * @param testflow - The Testflow document to be updated.
+   * @param newTestflowName - The new name to update the Testflow with.
+   * @returns A promise that resolves when the Testflow and tab (if present) have been updated.
    */
   public handleUpdateTestflow = async (
     testflow: TFJSONDocType,
     newTestflowName: string,
-  ) => {
+  ): Promise<void> => {
     this.testflowRepository.updateTestflow(testflow._id, {
       name: newTestflowName,
     });
@@ -129,25 +141,27 @@ export class TestflowViewModel {
         name: newTestflowName,
       });
     }
-    return;
   };
 
   /**
-   * @description - creates new local environment tab
-   * @param env - environment that needs to be opened
+   * Handles the opening of a Testflow by reading the associated workspace,
+   * initializing a new Testflow tab, and creating the tab in the repository.
+   *
+   * @param _testflow - The Testflow document containing the workspace and flow data.
+   * @returns - A promise that resolves when the Testflow has been opened and the tab created.
    */
-  public handleOpenTestflow = async (testflow: TFJSONDocType) => {
+  public handleOpenTestflow = async (
+    _testflow: TFJSONDocType,
+  ): Promise<void> => {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
-      testflow.workspaceId,
+      _testflow.workspaceId,
     );
 
     const initTestflowTab = this.initTab.testflow(
-      testflow._id,
+      _testflow._id,
       currentWorkspace._id,
     );
-    initTestflowTab.updateName(testflow.name);
-    // .setVariable(env.variable);
-
+    initTestflowTab.updateName(_testflow.name);
     this.tabRepository.createTab(initTestflowTab.getValue());
   };
 }

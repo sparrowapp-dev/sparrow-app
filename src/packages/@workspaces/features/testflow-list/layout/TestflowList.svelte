@@ -10,6 +10,7 @@
   import { TestflowListItem } from "../components";
   import type { TFJSONDocType } from "@common/models/testflow";
   import type { ScrollList } from "@library/ui/list/types";
+  import { TestflowDefault } from "@common/types/workspace/testflow";
 
   /**
    * current workspace
@@ -147,7 +148,7 @@
     </div>
 
     <Tooltip
-      title={"Add New Flow"}
+      title={`Add New ${TestflowDefault.NAME}`}
       placement={"bottom"}
       distance={13}
       show={isHovered}
@@ -198,7 +199,8 @@
             />
             <span
               style="color: var(--text-secondary-200)"
-              class="ps-2 fw-bold text-fs-12">Add New Flow</span
+              class="ps-2 fw-bold text-fs-12"
+              >Add New {TestflowDefault.NAME}</span
             >
           </p>
         </div>

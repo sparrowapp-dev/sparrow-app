@@ -13,6 +13,7 @@
   import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
   import type { Observable } from "rxjs";
   import { Card } from "../components";
+  import { TestflowDefault } from "@common/types/workspace/testflow";
 
   export let showImportCollectionPopup;
   export let onItemCreated;
@@ -69,7 +70,7 @@
     />
     <Card
       icon={TreeIcon}
-      label="Test Flows"
+      label={`${TestflowDefault.FULL_NAME}`}
       iconColor="var(--text-primary-300)"
       iconSize={"18px"}
       onClick={() => {

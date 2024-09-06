@@ -16,7 +16,8 @@ export interface EdgesWrapper {
 export interface Testflow extends NodesWrapper, EdgesWrapper {}
 
 export enum TestflowDefault {
-  NAME = "New Flow",
+  FULL_NAME = "Test Flow",
+  NAME = "Flow",
 }
 
 export interface TestflowWrapper {
