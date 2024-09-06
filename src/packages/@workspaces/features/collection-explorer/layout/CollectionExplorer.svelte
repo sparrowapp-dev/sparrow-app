@@ -447,7 +447,7 @@
     border-radius: 0%;
   }
   textarea {
-    outline-color: var(--sparrow-blue);
+    outline-color: var(--text-primary-600);
     border: none;
     border-radius: 8px !important;
   }
