@@ -53,7 +53,6 @@
             x: nodes[n - 1].position.x + 200,
             y: nodes[n - 1].position.y,
           },
-          //   measured: { width: 400, height: 18 },
         },
       ];
     });
@@ -69,23 +68,24 @@
     });
   };
 
-  const nodes = writable([
-    {
-      id: "1",
-      type: "startBlock",
-      data: {
-        color: writable("#ff4000"),
-        onClick: function (_id: string) {
-          createNewNode(_id);
-        },
-        onCheckEdges: function (_id: string) {
-          return checkIfEdgesExist(_id);
-        },
-        label: "Start",
-      },
-      position: { x: 100, y: 350 },
-    },
-  ]);
+  // const nodes = writable([
+  //   {
+  //     id: "1",
+  //     type: "startBlock",
+  //     data: {
+  //       color: writable("#ff4000"),
+  //       onClick: function (_id: string) {
+  //         createNewNode(_id);
+  //       },
+  //       onCheckEdges: function (_id: string) {
+  //         return checkIfEdgesExist(_id);
+  //       },
+  //       label: "Start",
+  //     },
+  //     position: { x: 100, y: 350 },
+  //   },
+  // ]);
+  const nodes = writable([]);
 
   const edges = writable([]);
 
@@ -93,8 +93,6 @@
     startBlock: StartBlock,
   };
 
-  $: colorA = $nodes[0].data.color;
-  //   $: colorB = $nodes[1].data.color;
   nodes.subscribe((val) => {
     console.log("nodes", val);
   });
@@ -105,7 +103,12 @@
 
 <div class="h-100">
   <SvelteFlow {nodes} {edges} {nodeTypes}>
-    <Background />
-    <Controls />
+    <Background bgColor={"var(--bg-secondary-850)"} />
   </SvelteFlow>
 </div>
+
+<style>
+  :global(.svelte-flow__attribution) {
+    display: none;
+  }
+</style>

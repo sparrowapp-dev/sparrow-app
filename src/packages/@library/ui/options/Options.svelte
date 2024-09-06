@@ -67,7 +67,7 @@
     style={`width: ${noOfColumns}px`}
     class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column border-radius-2 align-items-start justify-content-start text-whiteColor bg-tertiary-400"
   >
-    <ul class="p-2 w-100 mb-0">
+    <ul class="p-1 w-100 mb-0">
       {#each menuItems as item}
         <li class="align-items-center {item.hidden ? 'd-none' : 'd-block'}">
           <button
