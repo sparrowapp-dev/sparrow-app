@@ -217,6 +217,9 @@ export class RxDB {
           12: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          13: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       collection: {
@@ -322,9 +325,12 @@ export class RxDB {
     return { rxdb: this.rxdb };
   }
 
+  /**
+   * Destroys the RXDB Instance from the client
+   */
   public async destroyDb(): Promise<void> {
-    await this.rxdb.destroy();
-    await this.rxdb.remove();
+    await this.rxdb?.destroy();
+    await this.rxdb?.remove();
     this.rxdb = null;
     return;
   }

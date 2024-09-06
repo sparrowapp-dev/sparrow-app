@@ -6,12 +6,12 @@ class InitTestflowTab {
   private _tab: Tab = {};
   /**
    *
-   * @param _id - Collection mongo id
+   * @param _id - Test Flow mongo id
    * @param _workspaceId - Workspace Id to which Collection belongs to
    */
   constructor(_id: string, _workspaceId: string) {
     if (!_id || !_workspaceId) {
-      console.error("invalid id or workspace id on create new tab request!");
+      console.error("invalid id or workspace id on create new tab test flow!");
     } else {
       this._tab = {
         id: _id,

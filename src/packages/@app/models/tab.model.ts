@@ -13,7 +13,7 @@ export const tabSchemaLiteral = {
   // separator: "|",
   // },
   type: "object",
-  version: 12,
+  version: 13,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -445,6 +445,61 @@ export const tabSchemaLiteral = {
                 isHeaderBulkEditActive: {
                   type: "string",
                 },
+              },
+            },
+          },
+        },
+        testflow: {
+          type: "object",
+          properties: {
+            nodes: {
+              type: "array",
+              default: [],
+              items: {
+                type: "object",
+                properties: {
+                  id: {
+                    type: "string",
+                  },
+                  type: {
+                    type: "string",
+                  },
+                  data: {
+                    type: "object",
+                  },
+                  position: {
+                    type: "object",
+                    properties: {
+                      x: {
+                        type: "number",
+                      },
+                      y: {
+                        type: "number",
+                      },
+                    },
+                    required: ["x", "y"],
+                  },
+                },
+                required: ["id", "type", "data", "position"],
+              },
+            },
+            edges: {
+              type: "array",
+              default: [],
+              items: {
+                type: "object",
+                properties: {
+                  id: {
+                    type: "string",
+                  },
+                  source: {
+                    type: "string",
+                  },
+                  target: {
+                    type: "string",
+                  },
+                },
+                required: ["id", "source", "target"],
               },
             },
           },
