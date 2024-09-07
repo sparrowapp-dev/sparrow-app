@@ -18,7 +18,6 @@
 //   Collection,
 //   RequestBody,
 // } from "$lib/utils/interfaces/request.interface";
-// import { EnvironmentService } from "$lib/services-v2/environment.service";
 // import type { UpdateEnvironmentPostBody } from "$lib/utils/dto";
 // import { CollectionService } from "$lib/services/collection.service";
 // import { setContentTypeHeader } from "$lib/utils/helpers";
