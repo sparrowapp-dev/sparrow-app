@@ -1,16 +1,6 @@
 <script lang="ts">
   import { notifications } from "@library/ui/toast/Toast";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
-  import ProgressBar from "@library/ui/progress/Progress.svelte";
-  import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import DragDrop from "@library/ui/dragdrop/DragDrop.svelte";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import { CollectionService } from "@app/services/collection.service";
   import { Select } from "@library/forms";
   import {
