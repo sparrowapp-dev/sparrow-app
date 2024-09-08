@@ -320,8 +320,6 @@ export class WorkspaceRepository {
         },
       })
       .exec();
-    // await this.collectionRepository.removeCollections(workspaceId);
-    // await this.environmentRepository.removeEnvironments(workspaceId);
     return await workspace.remove();
   };
   public addUserInWorkspace = async (
