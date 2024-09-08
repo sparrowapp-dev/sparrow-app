@@ -42,7 +42,7 @@
   /**
    * @description - triggers child function from parent component
    */
-  $: scrollList = (param: "bottom") => scroll(param);
+  $: scrollList = (position: "bottom") => scroll(position);
 </script>
 
 <div

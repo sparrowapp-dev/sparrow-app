@@ -3,7 +3,6 @@
   import FilterIcon from "$lib/assets/filter.svelte";
   import plusIcon from "$lib/assets/plus-white.svg";
   import CreateRequest from "$lib/assets/create_request.svg";
-  import BubbleIcon from "@library/icons/Bubble.svg";
   import CreateCollection from "$lib/assets/collections-faded.svg";
 
   import { Events, WorkspaceRole } from "$lib/utils/enums";
@@ -20,9 +19,13 @@
 
   import { onDestroy } from "svelte";
   import {
+    CollectionIcon,
     DoubleArrowIcon,
     GithubIcon,
-    socketDeprecateIcon,
+    SocketIcon,
+    TreeIcon,
+    VectorIcon,
+    BubbleIcon,
   } from "@library/icons";
   import { WithButton } from "@workspaces/common/hoc";
   import { version } from "../../../../../../src-tauri/tauri.conf.json";
@@ -33,6 +36,8 @@
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { CollectionList, EnvironmentList } from "@workspaces/features";
+  import { TestflowList } from "@workspaces/features/testflow-list";
+  import { TestflowDefault } from "@common/types/workspace/testflow";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -93,6 +98,14 @@
 
   export let onSelectEnvironment;
 
+  export let onCreateTestflow;
+
+  export let testflows;
+
+  export let onDeleteTestflow;
+  export let onUpdateTestflow;
+  export let onOpenTestflow;
+
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
@@ -108,6 +121,7 @@
 
   export let isExpandCollection = false;
   export let isExpandEnvironment = false;
+  export let isExpandTestflow = false;
 
   let isGithubStarHover = false;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
@@ -195,12 +209,16 @@
     ? [
         {
           name: "Add New API",
-          icon: CreateRequest,
+          icon: VectorIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "12px",
           onclick: () => onItemCreated("request", {}),
         },
         {
           name: "Add Collection",
-          icon: CreateCollection,
+          icon: CollectionIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "13px",
           onclick: () => {
             onItemCreated("collection", {
               workspaceId: currentWorkspaceId,
@@ -212,6 +230,8 @@
         {
           name: "Import cURL",
           icon: BubbleIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
           onclick: () => {
             MixpanelEvent(Events.IMPORT_CURL, {
               source: "curl import popup",
@@ -221,22 +241,37 @@
         },
         {
           name: "Add WebSocket",
-          icon: socketDeprecateIcon,
+          icon: SocketIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
           onclick: () => {
-            onItemCreated("web-socket", {})
+            onItemCreated("web-socket", {});
             MixpanelEvent(Events.Add_WebSocket);
+          },
+        },
+        {
+          name: `Add ${TestflowDefault.NAME}`,
+          icon: TreeIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            onCreateTestflow();
           },
         },
       ]
     : [
         {
           name: "Add New API",
-          icon: CreateRequest,
+          icon: VectorIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "12px",
           onclick: () => onItemCreated("request", {}),
         },
         {
           name: "Add Collection",
-          icon: CreateCollection,
+          icon: CollectionIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "13px",
           onclick: () => {
             showImportCollectionPopup();
             isExpandCollection = true;
@@ -245,6 +280,8 @@
         {
           name: "Import cURL",
           icon: BubbleIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
           onclick: () => {
             MixpanelEvent(Events.IMPORT_CURL, {
               source: "curl import popup",
@@ -254,8 +291,19 @@
         },
         {
           name: "Add WebSocket",
-          icon: socketDeprecateIcon,
+          icon: SocketIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
           onclick: () => onItemCreated("web-socket", {}),
+        },
+        {
+          name: `Add ${TestflowDefault.NAME}`,
+          icon: TreeIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            onCreateTestflow();
+          },
         },
       ];
 
@@ -265,6 +313,9 @@
 
   const toggleExpandEnvironment = () => {
     isExpandEnvironment = !isExpandEnvironment;
+  };
+  const toggleExpandTestflow = () => {
+    isExpandTestflow = !isExpandTestflow;
   };
 </script>
 
@@ -392,15 +443,13 @@
 
     <!-- LHS Side of Collection Enivironment & Test Flows -->
     <div
-      class="d-flex flex-column collections-list mb-2"
+      class="d-flex flex-column collections-list"
       style="overflow:hidden; margin-top:5px;  flex:1; "
     >
       <!-----Collection Section------>
       <div
         class="ps-1"
-        class:not-opened-any={!isExpandCollection && !isExpandEnvironment}
-        class:full-height={isExpandCollection && !isExpandEnvironment}
-        class:half-height={isExpandCollection && isExpandEnvironment}
+        style=" overflow:auto; {isExpandCollection ? 'flex:1;' : ''}"
       >
         <CollectionList
           bind:scrollList
@@ -425,15 +474,13 @@
         />
       </div>
 
-      <hr class="mt-1 mb-0 ms-1 me-0" />
+      <hr class="my-1 ms-1 me-0" />
 
       <!-- Environment Section -->
 
       <div
         class="ps-1"
-        class:not-opened-any={!isExpandCollection && !isExpandEnvironment}
-        class:full-height={isExpandEnvironment && !isExpandCollection}
-        class:half-height={isExpandCollection && isExpandEnvironment}
+        style=" overflow:auto; {isExpandEnvironment ? 'flex:1;' : ''}"
       >
         <EnvironmentList
           loggedUserRoleInWorkspace={userRole}
@@ -452,12 +499,35 @@
         />
       </div>
 
+      <hr class="my-1 ms-1 me-0" />
+
+      <!-- Testflow Section -->
+
+      <div
+        class="ps-1"
+        style=" overflow:auto; {isExpandTestflow ? 'flex:1;' : ''}"
+      >
+        <TestflowList
+          testflows={$testflows}
+          loggedUserRoleInWorkspace={userRole}
+          {onCreateTestflow}
+          {onDeleteTestflow}
+          {onUpdateTestflow}
+          {onOpenTestflow}
+          currentWorkspace={activeWorkspace}
+          {searchData}
+          {activeTabId}
+          {toggleExpandTestflow}
+          bind:isExpandTestflow
+        />
+      </div>
+      <hr class="my-1 ms-1 me-0" />
       <!-- <hr class="mt-1 mb-0 ms-1 me-0" /> -->
     </div>
 
     <!-- Github Data footer -->
 
-    <hr class="ms-2 me-2 mb-0 mt-0" />
+    <!-- <hr class="ms-2 me-2 mb-0 mt-0" /> -->
     <div
       class="p-2 d-flex align-items-center justify-content-between"
       style="z-index: 4;"
@@ -517,14 +587,17 @@
 
 <style>
   .not-opened-any {
-    height: 37px;
+    height: 40px;
   }
   .full-height {
-    height: calc(100% - 40px);
+    height: calc(100% - 80px);
   }
 
   .half-height {
-    height: 49%;
+    height: 33%;
+  }
+  .half-height2 {
+    height: calc((100% - 40px) / 2);
   }
 
   .add-button {

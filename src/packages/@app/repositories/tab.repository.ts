@@ -221,7 +221,7 @@ export class TabRepository {
 
   public getTabWithWorkspaceId = (
     workspaceId: string,
-  ): Observable<TabDocument> => {
+  ): Observable<TabDocument> | undefined => {
     return this.rxdb?.findOne({
       selector: {
         "path.workspaceId": workspaceId,

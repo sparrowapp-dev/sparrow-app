@@ -55,6 +55,7 @@ import {
   type GuestUserDocType,
 } from "@app/models/guest-user.model";
 import { updatesSchema, type UpdatesDocType } from "@app/models/updates.model";
+import { TestflowSchema, type TFContainerType } from "@common/models/testflow";
 // import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 // addRxPlugin(RxDBDevModePlugin);
 
@@ -94,6 +95,7 @@ export type DatabaseCollections = {
   activesidebartab: ActiveSideBarTabContainer;
   windowSettings: WindowSettingsContainer;
   team: TeamContainer;
+  testflow: TFContainerType;
 };
 
 // define the Rx database type
@@ -102,7 +104,7 @@ export type DatabaseType = RxDatabase<DatabaseCollections>;
 //RxDB Class
 export class RxDB {
   private static instance: RxDB | null = null;
-  public rxdb = null;
+  public rxdb: DatabaseType | null = null;
   private constructor() {}
 
   public static getInstance(): RxDB {
@@ -215,6 +217,9 @@ export class RxDB {
           12: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          13: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       collection: {
@@ -280,6 +285,9 @@ export class RxDB {
           },
         },
       },
+      testflow: {
+        schema: TestflowSchema,
+      },
       environmenttab: {
         schema: environmentTabSchema,
         migrationStrategies: {
@@ -317,9 +325,12 @@ export class RxDB {
     return { rxdb: this.rxdb };
   }
 
+  /**
+   * Destroys the RXDB Instance from the client
+   */
   public async destroyDb(): Promise<void> {
-    await this.rxdb.destroy();
-    await this.rxdb.remove();
+    await this.rxdb?.destroy();
+    await this.rxdb?.remove();
     this.rxdb = null;
     return;
   }

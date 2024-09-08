@@ -1,6 +1,5 @@
 <script lang="ts">
   import threedotIcon from "$lib/assets/3dot.svg";
-  import { SelectIcon } from "$lib/assets/app.asset";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
@@ -8,33 +7,32 @@
   import { Options } from "@library/ui";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { WorkspaceRole } from "$lib/utils/enums";
+  import { TreeIcon } from "@library/icons";
+  import type { TFJSONDocType } from "@common/models/testflow";
+  import { TestflowDefault } from "@common/types/workspace/testflow";
 
   /**
-   * current workspace to identify the selected environment
+   * current workspace to identify the selected testflow
    */
   export let currentWorkspace;
 
   /**
-   * individual environment
+   * individual testflow
    */
-  export let env;
+  export let flow: TFJSONDocType;
 
   /**
-   * deletes the environment
+   * deletes the testflow
    */
-  export let onDeleteEnvironment;
+  export let onDeleteTestflow;
   /**
-   * updates the environment
+   * updates the testflow
    */
-  export let onUpdateEnvironment;
+  export let onUpdateTestflow;
   /**
-   * opens the environment
+   * opens the testflow
    */
-  export let onOpenEnvironment;
-  /**
-   * selects the environment
-   */
-  export let onSelectEnvironment;
+  export let onOpenTestflow;
 
   export let activeTabId;
 
@@ -44,102 +42,95 @@
   export let loggedUserRoleInWorkspace;
 
   let showMenu: boolean = false;
-  let isEnvironmentPopup: boolean = false;
-  let newEnvironmentName: string = "";
+  let isTestflowPopup: boolean = false;
+  let newTestflowName: string = "";
   let isRenaming = false;
 
   let noOfColumns = 180;
-  let noOfRows = 4;
-  function rightClickContextMenu(e) {
+
+  const rightClickContextMenu = () => {
     setTimeout(() => {
       showMenu = !showMenu;
     }, 100);
-  }
+  };
 
-  function handleSelectClick(event: MouseEvent) {
+  const handleSelectClick = (event: MouseEvent) => {
     const selectElement = document.getElementById(
-      `show-more-environment-${env?.id}`,
+      `show-more-testflow-${flow?._id}`,
     );
     if (selectElement && !selectElement.contains(event.target as Node)) {
       showMenu = false;
     }
-  }
-
-  const handleEnvironmentPopUpCancel = (flag) => {
-    isEnvironmentPopup = flag;
   };
 
-  const handleEnvironmentPopUpSuccess = async () => {
-    const response = await onDeleteEnvironment(env);
+  const handleTestflowPopUpCancel = (flag: boolean) => {
+    isTestflowPopup = flag;
+  };
+
+  const handleTestflowPopUpSuccess = async () => {
+    const response = await onDeleteTestflow(flow);
     if (response.isSuccessful) {
-      handleEnvironmentPopUpCancel(false);
+      handleTestflowPopUpCancel(false);
     }
   };
 
-  //open environment
-  function openEnvironment() {
-    onOpenEnvironment(env);
+  //open testflow
+  const openTestflow = () => {
+    onOpenTestflow(flow);
     showMenu = false;
-  }
+  };
 
-  const handleRenameInput = (event) => {
-    newEnvironmentName = event.target.value;
+  const handleRenameInput = (event: Event) => {
+    const inputElement = event.target as HTMLInputElement;
+    newTestflowName = inputElement.value;
   };
 
   const onRenameBlur = async () => {
-    if (newEnvironmentName.trim()) {
-      const response = await onUpdateEnvironment(env, newEnvironmentName);
+    if (newTestflowName.trim()) {
+      const response = await onUpdateTestflow(flow, newTestflowName);
     }
     isRenaming = false;
-    newEnvironmentName = "";
+    newTestflowName = "";
   };
 
-  const handleSelectEnvironment = async () => {
-    onSelectEnvironment(env);
-  };
-
-  //rename environment name
-  const renameEnvironment = () => {
+  //rename testflow name
+  const renameTestflow = () => {
     isRenaming = true;
     showMenu = false;
   };
 
-  const onRenameInputKeyPress = (event) => {
-    if (event.key === "Enter") {
+  const onRenameInputKeyPress = (event: KeyboardEvent) => {
+    if (event?.key === "Enter") {
       const inputField = document.getElementById(
-        "renameInputFieldEnvironment",
+        "renameInputFieldTestflow",
       ) as HTMLInputElement;
       inputField.blur();
     }
   };
 
-  let menuItems = [];
-  let environmentTabWrapper: HTMLElement;
+  let menuItems: {
+    onClick: () => void;
+    displayText: string;
+    disabled: boolean;
+  }[] = [];
+  let testflowTabWrapper: HTMLElement;
 
   $: {
     if (currentWorkspace) {
       menuItems = [
         {
-          onClick: openEnvironment,
-          displayText: "Open Environment",
+          onClick: openTestflow,
+          displayText: `Open ${TestflowDefault.NAME}`,
           disabled: false,
         },
         {
-          onClick: renameEnvironment,
+          onClick: renameTestflow,
           displayText: "Rename",
           disabled: false,
         },
         {
-          onClick: handleSelectEnvironment,
-          displayText:
-            currentWorkspace?.environmentId === env.id
-              ? "Unselect Environment"
-              : "Select Environment",
-          disabled: false,
-        },
-        {
           onClick: () => {
-            handleEnvironmentPopUpCancel(true);
+            handleTestflowPopUpCancel(true);
           },
           displayText: "Delete",
           disabled: false,
@@ -147,25 +138,22 @@
       ];
     }
   }
-  let deleteEnvironmentLoader: boolean = false;
+  let deleteTestflowLoader: boolean = false;
 </script>
 
 <ModalWrapperV1
-  title={"Delete Environment?"}
+  title={`Delete ${TestflowDefault.NAME}?`}
   type={"danger"}
   width={"35%"}
   zIndex={1000}
-  isOpen={isEnvironmentPopup}
-  handleModalState={handleEnvironmentPopUpCancel}
+  isOpen={isTestflowPopup}
+  handleModalState={handleTestflowPopUpCancel}
 >
   <div class="text-lightGray mb-1 sparrow-fs-14">
     <p style="font-weight: 400;" class="text-fs-14">
-      Are you sure you want to delete this Environment? <span
-        style="font-weight:700;"
-        class="">"{env.name}"</span
-      >
-      and all its variables will be removed and cannot be restored. It will also
-      impact all the API requests that use the variables in this environment.
+      Are you sure you want to delete this {TestflowDefault.FULL_NAME}?
+      <span style="font-weight:700;" class="">"{flow.name}"</span>
+      and all its variables will be removed and cannot be restored.
     </p>
   </div>
 
@@ -174,27 +162,27 @@
     style="font-size: 16px;"
   >
     <Button
-      disable={deleteEnvironmentLoader}
+      disable={deleteTestflowLoader}
       title={"Cancel"}
       textStyleProp={"font-size: var(--base-text)"}
       type={"dark"}
       loader={false}
       onClick={() => {
-        handleEnvironmentPopUpCancel(false);
+        handleTestflowPopUpCancel(false);
       }}
     />
 
     <Button
-      disable={deleteEnvironmentLoader}
+      disable={deleteTestflowLoader}
       title={"Delete"}
       textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
-      loader={deleteEnvironmentLoader}
+      loader={deleteTestflowLoader}
       onClick={async () => {
-        deleteEnvironmentLoader = true;
-        await handleEnvironmentPopUpSuccess();
-        deleteEnvironmentLoader = false;
+        deleteTestflowLoader = true;
+        await handleTestflowPopUpSuccess();
+        deleteTestflowLoader = false;
       }}
     />
   </div></ModalWrapperV1
@@ -202,10 +190,10 @@
 
 {#if showMenu}
   <Options
-    xAxis={environmentTabWrapper.getBoundingClientRect().right - 30}
+    xAxis={testflowTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      environmentTabWrapper.getBoundingClientRect().top - 5,
-      environmentTabWrapper.getBoundingClientRect().bottom + 5,
+      testflowTabWrapper.getBoundingClientRect().top - 5,
+      testflowTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
     {menuItems}
@@ -218,10 +206,10 @@
   on:contextmenu|preventDefault={handleSelectClick}
 />
 
-<div style="" class="environment-tab mb-1" bind:this={environmentTabWrapper}>
+<div style="" class="testflow-tab mb-1" bind:this={testflowTabWrapper}>
   <button
     style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
-    class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 my-button {env?.id ===
+    class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 my-button {flow?._id ===
     activeTabId
       ? 'active-collection-tab'
       : ''}"
@@ -233,31 +221,25 @@
       }}
       on:click|preventDefault={() => {
         if (!isRenaming) {
-          if (!env.id.includes(UntrackedItems.UNTRACKED)) {
-            openEnvironment();
+          if (!flow._id.includes(UntrackedItems.UNTRACKED)) {
+            openTestflow();
           }
         }
       }}
     >
-      <button
-        class="p-0 m-0 ms-1 ps-4 me-2 border-0 bg-transparent"
-        on:click|stopPropagation={() => {
-          handleSelectEnvironment();
-        }}
-      >
-        <SelectIcon
-          classProp={`my-auto`}
-          width={20}
-          height={20}
-          selected={currentWorkspace?.environmentId === env.id}
+      <button class="p-0 m-0 ms-1 ps-4 me-2 border-0 bg-transparent">
+        <TreeIcon
+          width={"12px"}
+          height={"12px"}
+          color={"var(--icon-secondary-130)"}
         />
       </button>
       {#if isRenaming}
         <input
           class="py-0 renameInputFieldCollection text-fs-12 w-100"
-          id="renameInputFieldEnvironment"
+          id="renameInputFieldTestflow"
           type="text"
-          value={env.name}
+          value={flow.name}
           autofocus
           maxlength={100}
           on:click|stopPropagation={() => {}}
@@ -271,23 +253,23 @@
           style="height: 36px;"
         >
           <p class="ellipsis w-100 me-4 mb-0 text-fs-12">
-            {env.name}
+            {flow.name}
           </p>
         </div>
       {/if}
     </div>
-    {#if env.id.includes(UntrackedItems.UNTRACKED)}
+    {#if flow._id.includes(UntrackedItems.UNTRACKED)}
       <Spinner size={"15px"} />
     {:else}
       <Tooltip placement="bottom" title="More" distance={17} show={!showMenu}>
         <button
-          id={`show-more-environment-${env?.id}`}
+          id={`show-more-testflow-${flow?._id}`}
           class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
             ? 'threedot-active'
             : ''}"
           style="transform: rotate(90deg);"
           on:click={(e) => {
-            rightClickContextMenu(e);
+            rightClickContextMenu();
           }}
           disabled={loggedUserRoleInWorkspace ===
             WorkspaceRole.WORKSPACE_VIEWER}
@@ -300,7 +282,7 @@
 </div>
 
 <style lang="scss">
-  .environment-tab {
+  .testflow-tab {
     .my-button:hover .threedot-icon-container {
       visibility: visible;
     }

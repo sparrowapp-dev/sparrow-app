@@ -172,44 +172,7 @@
             }}
           />
 
-          <span class="position-relative" style="width:35px;">
-            <Dropdown
-              disabled={false}
-              dropdownId={"saveAsDropdown"}
-              dropDownType={{ type: "img", title: angleDown }}
-              data={[
-                {
-                  name: "Save As",
-                  id: "collection",
-                  dynamicClasses: "text-whiteColor",
-                },
-              ]}
-              onclick={() => {
-                isExposeSaveAsRequest = true;
-              }}
-              staticCustomStyles={[
-                {
-                  id: "saveAsDropdown-options-container",
-                  styleKey: "minWidth",
-                  styleValue: "180px",
-                },
-              ]}
-              staticClasses={[
-                {
-                  id: "saveAsDropdown-img",
-                  classToAdd: ["btn", "bg-dullBackground", "px-2", "py-1"],
-                },
-                {
-                  id: "saveAsDropdown-options-name",
-                  classToAdd: ["fs-6"],
-                },
-                {
-                  id: "saveAsDropdown-options-container",
-                  classToAdd: ["end-0", "mt-1", "rounded"],
-                },
-              ]}
-            ></Dropdown>
-          </span>
+          <span class="position-relative" style="width:35px;"> </span>
           <Button
             title="Share"
             type="dark"

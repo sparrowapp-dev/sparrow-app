@@ -138,7 +138,7 @@
 </script>
 
 <div
-  class={`d-flex flex-column  h-100 env-sidebar mt-1 bg-secondary-900   pt-0`}
+  class={`d-flex flex-column  h-100 env-sidebar bg-secondary-900   pt-0`}
   style="font-weight: 500;"
 >
   <div
@@ -256,7 +256,7 @@
         </div>
       {/if}
 
-      {#if filteredGlobalEnvironment && filteredGlobalEnvironment.length > 0  && localEnvironment.length !== 0 }
+      {#if filteredGlobalEnvironment && filteredGlobalEnvironment.length > 0 && localEnvironment.length !== 0}
         <div class="mb-0">
           <p
             role="button"
