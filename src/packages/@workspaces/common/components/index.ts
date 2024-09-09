@@ -4,4 +4,6 @@ export { default as TabularInputFormData } from "./tabular-input/TabularInputFor
 export { default as EnvironmentPicker } from "./environment-picker/EnvironmentPicker.svelte";
 export { default as MissedEnvironment } from "./missed-environment/MissedEnvironment.svelte";
 export { default as ReviewEnvironment } from "./review-environment/ReviewEnvironment.svelte";
-export { default as TabularInputV2 } from "./tabular-input-v2/TabularInputV2.svelte"
+export { default as TabularInputV2 } from "./tabular-input-v2/TabularInputV2.svelte";
+export { default as DropButton } from "./drop-button/DropButton.svelte";
+export { default as ComboText } from "./combo-text/ComboText.svelte";

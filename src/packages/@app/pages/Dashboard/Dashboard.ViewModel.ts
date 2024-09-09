@@ -287,7 +287,7 @@ export class DashboardViewModel {
     return response?.getLatest().toMutableJSON();
   };
 
-  private clientLogout = async (): Promise<void> => {
+  public clientLogout = async (): Promise<void> => {
     setUser(null);
     await this.tabRepository.clearTabs();
     await RxDB.getInstance().destroyDb();
