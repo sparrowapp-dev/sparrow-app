@@ -250,7 +250,7 @@
           },
         },
         {
-          name: `Add ${TestflowDefault.NAME}`,
+          name: `Add ${TestflowDefault.FULL_NAME}`,
           icon: TreeIcon,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "15px",
@@ -297,7 +297,7 @@
           onclick: () => onItemCreated("web-socket", {}),
         },
         {
-          name: `Add ${TestflowDefault.NAME}`,
+          name: `Add ${TestflowDefault.FULL_NAME}`,
           icon: TreeIcon,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "15px",

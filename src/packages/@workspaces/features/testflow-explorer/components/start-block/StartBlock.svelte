@@ -2,13 +2,17 @@
   import type { Writable } from "svelte/store";
   import { Handle, Position, type NodeProps } from "@xyflow/svelte";
   import { ArrowIcon } from "../../icons";
+  import { PlayArrow } from "@library/icons";
 
   // type $$Props = NodeProps;
 
-  export let data: { color: Writable<string> };
+  export let data: {
+    onCheckEdges: (id: string) => boolean;
+    label: string;
+    onClick: (id: string) => void;
+  };
   export let id;
 
-  const { color } = data;
   let isAddBlockVisible = false;
 </script>
 
@@ -19,23 +23,29 @@
   }}
 >
   <Handle type="target" position={Position.Left} />
-  <span class="text-fs-12">{data.label}</span>
-  <Handle type="source" position={Position.Right} />
-  {#if isAddBlockVisible}
-    <div class="add-block-btn" style="position: absolute;   ">
-      <div class="arrow">
-        <ArrowIcon />
+  <span
+    ><PlayArrow
+      height={"14px"}
+      width={"12px"}
+      color={"var(--icon-primary-300)"}
+    /><span class="ms-3 text-fs-12">Start</span>
+    <Handle type="source" position={Position.Right} />
+    {#if isAddBlockVisible}
+      <div class="add-block-btn" style="position: absolute;   ">
+        <div class="arrow">
+          <ArrowIcon />
+        </div>
+        <span
+          on:click={() => {
+            data.onClick(id);
+            isAddBlockVisible = false;
+          }}
+        >
+          <span class="btnc py-2 px-3"> + Add Block </span>
+        </span>
       </div>
-      <span
-        on:click={() => {
-          data.onClick(id);
-          isAddBlockVisible = false;
-        }}
-      >
-        <span class="btnc py-2 px-3"> + Add Block </span>
-      </span>
-    </div>
-  {/if}
+    {/if}
+  </span>
 </div>
 
 <style lang="scss">
