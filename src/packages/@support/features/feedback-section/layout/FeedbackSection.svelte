@@ -330,11 +330,11 @@
     font-size: 18px;
     font-weight: 700;
     margin-bottom: 5px;
-    color: #3670f7;
   }
   .title:hover {
     text-decoration: underline;
     cursor: pointer;
+    color: #3670f7;
   }
 
   .category {
