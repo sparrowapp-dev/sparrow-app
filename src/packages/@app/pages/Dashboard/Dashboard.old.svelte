@@ -1,15 +1,11 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import { Route, navigate } from "svelte-navigator";
-  import Sidebar from "$lib/components/sidebar/Sidebar.old.svelte";
   import Navigate from "../../routing/Navigate.svelte";
-  import HeaderDashboard from "$lib/components/header/header-dashboard/HeaderDashboard.svelte";
   import CollectionsHome from "../Collections/Collections.old.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
   import { onDestroy, onMount } from "svelte";
   import ActiveSideBarTabViewModel from "./ActiveSideBarTab.ViewModel";
-  import { CollectionsViewModel } from "../Collections/Collections.ViewModel.old";
   import Mock from "../Mock/Mock.svelte";
-  import Environment from "../EnvironmentPage/EnvironmentPage.svelte";
   import Teams from "../Teams/Teams.svelte";
   import {
     type ActiveSideBarTabDocument,
@@ -17,14 +13,13 @@
     type WorkspaceDocument,
   } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import {
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
   } from "$lib/store/workspace.store";
-  import { TeamViewModel } from "../Teams/team.viewModel";
+  
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
   import { user, userWorkspaceLevelRole } from "$lib/store";
@@ -33,24 +28,24 @@
   import type { WorkspaceRole } from "$lib/utils/enums";
 
   const _dashboardViewModel = new DashboardViewModel();
-  const _viewModelWorkspace = new HeaderDashboardViewModel();
+  // const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
-  const collectionsMethods = new CollectionsViewModel();
-  const _viewModelHome = new TeamViewModel();
-  const activeWorkspaceRxDoc: Observable<WorkspaceDocument> =
-    _viewModelHome.activeWorkspace;
-  const activeTeamRxDoc: Observable<TeamDocument> = _viewModelHome.activeTeam;
-  const activeWorkspace: Observable<WorkspaceDocument> =
-    collectionsMethods.getActiveWorkspace();
-  const teams: Observable<TeamDocument[]> = _viewModelHome.teams;
+  // const collectionsMethods = new CollectionsViewModel();
+  // // const _viewModelHome = new TeamViewModel();
+  // const activeWorkspaceRxDoc: Observable<WorkspaceDocument> =
+  //   _viewModelHome.activeWorkspace;
+  // const activeTeamRxDoc: Observable<TeamDocument> = _viewModelHome.activeTeam;
+  // const activeWorkspace: Observable<WorkspaceDocument> =
+  //   collectionsMethods.getActiveWorkspace();
+  // const teams: Observable<TeamDocument[]> = _viewModelHome.teams;
   let loggedInUserId: string;
   let currentWorkspaceId: string;
   let currentWorkspaceName: string;
   let currentTeam: CurrentTeam;
   let currentWorkspace: CurrentWorkspace;
   let activeSidebarTabName: string;
-  let workspaces: Observable<WorkspaceDocument[]> =
-    _viewModelWorkspace.workspaces;
+  // let workspaces: Observable<WorkspaceDocument[]> =
+  //   _viewModelWorkspace.workspaces;
   let activeSidebarTab: Observable<ActiveSideBarTabDocument> =
     _viewModel.getActiveTab();
   let activeSidbarTabRxDoc: ActiveSideBarTabDocument;
@@ -230,10 +225,10 @@
     activeWorkspaceSubscribe.unsubscribe();
     activeSidbarTabSubscribe.unsubscribe();
   });
-</script>
+</script> -->
 
-<div class="dashboard">
-  <!-- <HeaderDashboard
+<!-- <div class="dashboard"> -->
+<!-- <HeaderDashboard
     {currentWorkspace}
     {currentTeam}
     {collectionsMethods}
@@ -241,7 +236,7 @@
     {activeSideBarTabMethods}
     {teams}
   /> -->
-  <div class="dashboard-teams d-flex">
+<!-- <div class="dashboard-teams d-flex">
     {#if activeSidebarTabName}
       <Sidebar
         {activeSideBarTabMethods}
@@ -283,4 +278,4 @@
       </Route>
     </section>
   </div>
-</div>
+</div> -->

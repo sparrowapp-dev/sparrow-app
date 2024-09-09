@@ -9,7 +9,7 @@
     UpdateRequestUrlType,
   } from "@workspaces/common/type";
   import { notifications } from "@library/ui/toast/Toast";
-  import DropButton from "$lib/components/buttons/DropButton.svelte";
+  import { DropButton } from "@workspaces/common/components";
   import { CodeMirrorInput } from "../../../../common/components";
   import { UrlInputTheme } from "../../../../common/utils/";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";

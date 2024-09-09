@@ -10,8 +10,6 @@
     TeamServiceMethods,
   } from "$lib/utils/interfaces";
   import type { Path } from "$lib/utils/interfaces/request.interface";
-  import WorkspaceContent from "../../lib/components/workspace/WorkspaceContent.svelte";
-  import WorkspaceList from "../../lib/components/workspace/workspace-list/WorkspaceList.svelte";
   import { TeamViewModel } from "./Teams.ViewModel.old";
   import { scaleMotionProps } from "$lib/utils/animations";
   import { Motion } from "svelte-motion";
@@ -38,11 +36,10 @@
   import { moveNavigation } from "$lib/utils/helpers";
   import { navigate } from "svelte-navigator";
   import { notifications } from "@library/ui/toast/Toast";
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+
   import { v4 as uuidv4 } from "uuid";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import Button from "@library/ui/button/Button.svelte";
-  import Input from "$lib/components/inputs/Input.svelte";
   import DragDrop from "@library/ui/dragdrop/DragDrop.svelte";
   import { Pane, Splitpanes } from "svelte-splitpanes";
 
@@ -81,7 +78,7 @@
   };
 
   const _viewModel = new TeamViewModel();
-  const _viewModelWorkspace = new HeaderDashboardViewModel();
+  // const _viewModelWorkspace = new HeaderDashboardViewModel();
   const teams: Observable<TeamDocument[]> = _viewModel.teams;
   const activeTeam: Observable<TeamDocument> = _viewModel.activeTeam;
   const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
@@ -92,23 +89,23 @@
   const workspaceMethods: WorkspaceMethods = {
     handleCreateTab: _viewModel.handleCreateTab,
   };
-  const teamRepositoryMethods: TeamRepositoryMethods = {
-    modifyTeam: _viewModel.modifyTeam,
-    setOpenTeam: _viewModel.setOpenTeam,
-    getTeam: _viewModel.getTeam,
-  };
-  const teamServiceMethods: TeamServiceMethods = {
-    inviteMembersAtTeam: _viewModel.inviteMembersAtTeam,
-    removeMembersAtTeam: _viewModel.removeMembersAtTeam,
-    promoteToAdminAtTeam: _viewModel.promoteToAdminAtTeam,
-    demoteToMemberAtTeam: _viewModel.demoteToMemberAtTeam,
-    promoteToOwnerAtTeam: _viewModel.promoteToOwnerAtTeam,
-    refreshWorkspace: _viewModelWorkspace.refreshWorkspaces,
-    changeUserRoleAtWorkspace: _viewModel.changeUserRoleAtWorkspace,
-    removeUserFromWorkspace: _viewModel.removeUserFromWorkspace,
-    disableNewInviteTag: _viewModel.disableNewInviteTag,
-    updateTeam: _viewModel.updateTeam,
-  };
+  // const teamRepositoryMethods: TeamRepositoryMethods = {
+  //   modifyTeam: _viewModel.modifyTeam,
+  //   setOpenTeam: _viewModel.setOpenTeam,
+  //   getTeam: _viewModel.getTeam,
+  // };
+  // const teamServiceMethods: TeamServiceMethods = {
+  //   inviteMembersAtTeam: _viewModel.inviteMembersAtTeam,
+  //   removeMembersAtTeam: _viewModel.removeMembersAtTeam,
+  //   promoteToAdminAtTeam: _viewModel.promoteToAdminAtTeam,
+  //   demoteToMemberAtTeam: _viewModel.demoteToMemberAtTeam,
+  //   promoteToOwnerAtTeam: _viewModel.promoteToOwnerAtTeam,
+  //   refreshWorkspace: _viewModelWorkspace.refreshWorkspaces,
+  //   changeUserRoleAtWorkspace: _viewModel.changeUserRoleAtWorkspace,
+  //   removeUserFromWorkspace: _viewModel.removeUserFromWorkspace,
+  //   disableNewInviteTag: _viewModel.disableNewInviteTag,
+  //   updateTeam: _viewModel.updateTeam,
+  // };
 
   const userSubscribe = user.subscribe(async (value) => {
     if (value) {
@@ -175,13 +172,13 @@
     if (response.isSuccessful) {
       let totalRequest: number = 0;
       const responseData = response.data?.data;
-      $data.map((item) => {
-        if (item) {
-          if (item._data._id !== responseData._id) {
-            totalRequest = 0;
-          }
-        }
-      });
+      // $data.map((item) => {
+      //   if (item) {
+      //     if (item._data._id !== responseData._id) {
+      //       totalRequest = 0;
+      //     }
+      //   }
+      // });
 
       let path: Path = {
         workspaceId: responseData._id,
@@ -219,7 +216,7 @@
       delete newWorkspace.team.name;
       if (userId) await _viewModel.refreshTeams(userId);
       await _viewModel.addWorkspace(newWorkspace);
-      await _viewModelWorkspace.activateWorkspace(newWorkspace._id);
+      // await _viewModelWorkspace.activateWorkspace(newWorkspace._id);
 
       activeSideBarTabMethods.updateActiveTab("collections");
       navigate("/dashboard/collections");
@@ -250,7 +247,7 @@
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
       await _viewModel.refreshTeams(userId);
-      await teamRepositoryMethods.setOpenTeam(response.data.data?._id);
+      // await teamRepositoryMethods.setOpenTeam(response.data.data?._id);
       /**
        * @deprecated referes to teams store
        * setOpenedTeam(
@@ -278,16 +275,16 @@
     const response = await _viewModel.leaveTeam($openTeam?.teamId);
     if (response.isSuccessful) {
       setTimeout(async () => {
-        const activeTeam = await _viewModel.checkActiveTeam();
+        // const activeTeam = await _viewModel.checkActiveTeam();
         if (activeTeam) {
           const teamIdToActivate = await _viewModel.activateInitialWorkspace();
-          if (teamIdToActivate) {
-            await _viewModel.activateTeam(teamIdToActivate);
-          }
+          // if (teamIdToActivate) {
+          //   await _viewModel.activateTeam(teamIdToActivate);
+          // }
         }
         setTimeout(async () => {
           await _viewModel.refreshTeams(userId);
-          await _viewModelWorkspace.refreshWorkspaces(userId);
+          // await _viewModelWorkspace.refreshWorkspaces(userId);
           notifications.success("You left a team.");
           handleLeaveTeamModal();
           isShowMoreVisible = false;
@@ -375,7 +372,7 @@
 
   const handleLogoEdit = (e: any) => {
     const fileInput = document.getElementById("team-file-input");
-    fileInput.click();
+    // fileInput.click();
   };
 
   const handleOnShowMoreClick = () => {
@@ -416,7 +413,7 @@
     splitter = document.querySelector(
       ".splitter-sidebar .splitpanes__splitter",
     );
-    splitter.style.width = "1px";
+    // splitter.style.width = "1px";
   });
 
   onDestroy(() => {
@@ -447,7 +444,7 @@
     handleCreateTeamModal();
   }}
 >
-  <Input
+  <!-- <Input
     value={newTeam.name.value}
     inputId="team-name-input"
     labelText="Team or Organization name"
@@ -474,7 +471,7 @@
     type={"textarea"}
     inputClassProp={`py-2 px-3 border-0`}
     labelTextClassProp={`mt-3`}
-  />
+  /> -->
   <DragDrop
     value={newTeam.file.value}
     maxFileSize={100}
@@ -566,7 +563,7 @@
   }}
 >
   <Pane class="sidebar-left-panel" minSize={20} size={$workspaceLeftPanelWidth}>
-    <WorkspaceList
+    <!-- <WorkspaceList
       {userId}
       {handleCreateTeamModal}
       openTeam={$openTeam}
@@ -580,14 +577,14 @@
       {teamRepositoryMethods}
       {teamServiceMethods}
       {collectionsMethods}
-    />
+    /> -->
   </Pane>
   <Pane
     class="sidebar-right-panel"
     minSize={60}
     size={$workspaceRightPanelWidth}
   >
-    <WorkspaceContent
+    <!-- <WorkspaceContent
       {currentTeam}
       {userId}
       teams={allTeams}
@@ -605,7 +602,7 @@
       {teamServiceMethods}
       {teamRepositoryMethods}
       workspaces={$workspaces}
-    />
+    /> -->
   </Pane>
 </Splitpanes>
 
