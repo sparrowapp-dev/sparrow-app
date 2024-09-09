@@ -184,8 +184,8 @@ class DecodeRequest {
     const res = uniqueHeaders.filter((elem) => {
       if (
         elem.key === "" ||
-        elem.key.toLowerCase() === "content-length" ||
-        elem.key.toLowerCase() === "content-type"
+        elem.key.toLowerCase() === "content-length"
+        // || elem.key.toLowerCase() === "content-type" // if required or not (research in progress)
       )
         return false;
       return true;
