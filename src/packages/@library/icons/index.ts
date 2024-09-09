@@ -72,3 +72,4 @@ export { default as VerticalGridIcon } from "./VerticalGrid.svelte";
 export { default as HorizontalGridIcon } from "./HorizontalGrid.svelte";
 export { default as BlankIcon } from "./blank.svelte";
 export { default as CategoryIcon } from "./Category.svelte";
+export { default as PlayArrow } from "./PlayArrow.svelte";
