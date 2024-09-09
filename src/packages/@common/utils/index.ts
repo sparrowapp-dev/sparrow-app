@@ -6,3 +6,4 @@ export { Debounce } from "./debounce";
 export { CompareArray } from "./compare-array";
 export { InitWebSocketTab } from "./init-web-socket-tab";
 export { MarkdownFormatter } from "./parse-markdown-to-texteditor";
+export { SetDataStructure } from "./set-data-structure";
