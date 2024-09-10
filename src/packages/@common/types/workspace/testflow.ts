@@ -3,6 +3,10 @@ export interface NodesWrapper {
     id: string;
     type: string;
     data: object;
+    position: {
+      x: number;
+      y: number;
+    };
   }[];
 }
 export interface EdgesWrapper {
@@ -11,12 +15,6 @@ export interface EdgesWrapper {
     source: string;
     target: string;
   }[];
-}
-export interface PositionWrapper {
-  position: {
-    x: number;
-    y: number;
-  };
 }
 
 export interface Testflow extends NodesWrapper, EdgesWrapper {}
