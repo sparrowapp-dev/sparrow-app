@@ -5,6 +5,10 @@
   import { StartBlock, RequestBlock } from "../components";
 
   import "@xyflow/svelte/dist/style.css";
+  import { onMount } from "svelte";
+  export let tab;
+  export let onUpdateNodes;
+  export let onUpdateEdges;
 
   const checkIfEdgesExist = (_id: string) => {
     let edge = [];
@@ -47,7 +51,7 @@
           },
           position: {
             x: nodes[n - 1].position.x + 300,
-            y: nodes[0].position.y - 20,
+            y: nodes[n - 1].position.y - 0,
           },
         },
       ];
@@ -63,26 +67,47 @@
       ];
     });
   };
-
-  const nodes = writable([
-    {
-      id: "1",
-      type: "startBlock",
-      data: {
-        color: writable("#ff4000"),
-        onClick: function (_id: string) {
-          createNewNode(_id);
-        },
-        onCheckEdges: function (_id: string) {
-          return checkIfEdgesExist(_id);
-        },
-        label: "Start",
-      },
-      position: { x: 100, y: 350 },
-    },
-  ]);
-
+  const nodes = writable([]);
   const edges = writable([]);
+  onMount(() => {
+    nodes.update((_nodes) => {
+      const dbNodes = $tab?.property?.testflow?.nodes;
+      let res = [];
+      for (let i = 0; i < dbNodes.length; i++) {
+        res.push({
+          id: dbNodes[i].id,
+          type: dbNodes[i].type,
+          data: {
+            color: writable("#ff4000"),
+            onClick: function (_id: string) {
+              createNewNode(_id);
+            },
+            onCheckEdges: function (_id: string) {
+              return checkIfEdgesExist(_id);
+            },
+            label: "REST API Request",
+          },
+          position: {
+            x: dbNodes[i].position.x,
+            y: dbNodes[i].position.y,
+          },
+        });
+      }
+      return res;
+    });
+    edges.update((_edges) => {
+      const dbEdges = $tab?.property?.testflow?.edges;
+      let res = [];
+      for (let i = 0; i < dbEdges.length; i++) {
+        res.push({
+          id: dbEdges[i].id,
+          source: dbEdges[i].source,
+          target: dbEdges[i].target,
+        });
+      }
+      return res;
+    });
+  });
 
   const nodeTypes = {
     startBlock: StartBlock,
@@ -90,16 +115,21 @@
   };
 
   nodes.subscribe((val) => {
-    console.log("nodes", val);
+    if (val && val.length) onUpdateNodes(val);
   });
   edges.subscribe((val) => {
-    console.log("edges", val);
+    if (val) onUpdateEdges(val);
   });
 </script>
 
 <div class="h-100">
   <SvelteFlow {nodes} {edges} {nodeTypes}>
-    <Background bgColor={"var(--bg-secondary-850)"} />
+    <Background
+      bgColor={"var(--bg-secondary-850)"}
+      patternColor={"var(--bg-secondary-500)"}
+      size={4}
+      gap={20}
+    />
   </SvelteFlow>
 </div>
 

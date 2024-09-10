@@ -22,7 +22,6 @@
     isAddBlockVisible = !data?.onCheckEdges(id);
   }}
 >
-  <Handle type="target" position={Position.Left} />
   <span
     ><PlayArrow
       height={"14px"}
