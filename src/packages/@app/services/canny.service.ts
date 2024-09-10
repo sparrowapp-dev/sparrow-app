@@ -260,10 +260,30 @@ export class CannyIoService {
     });
   
     return response;
-    console.log("This is respones", response)
   };
 
 
+/**
+ * Lists the change log entries of a specified type by making a POST request.
+ *
+ * @param {string} type - The type of change log entries to fetch (e.g., "new", "fixed","improved").
+ * @returns {Promise<Object>} - A promise that resolves to the response object from the API call.
+ */
+
+  public listChangeLog = async (type:string) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/entries/list`, {
+      body: {
+        apiKey: this.apiKey,
+        type
+              
+      },
+      headers: {
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+      },
+    });
+  
+    return response;
+  };
   
 
 

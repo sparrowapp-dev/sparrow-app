@@ -3,7 +3,6 @@
     AddFeedback,
     DiscordCard,
     FeedbackSection,
-    ReleaseNotes,
     Community,
     MyActivity,
   } from "@support/features";
@@ -17,6 +16,7 @@
   import UpdateIcon from "@library/icons/UpdateIcon.svelte";
   import ActivityIcon from "@library/icons/ActivityIcon.svelte";
   import DocIcon from "@library/icons/DocIcon.svelte";
+    import { ReleaseNotes } from "@support/features/release-notes/layout";
 
   const _viewModel = new HelpPageViewModel();
 
@@ -155,6 +155,7 @@
               />
             {:else if activeTab === "updates"}
               <ReleaseNotes
+              listChangeLog={_viewModel.listChangeLog}
                 {releaseNotesData}
                 onLearnMore={_viewModel.learnMore}
               />

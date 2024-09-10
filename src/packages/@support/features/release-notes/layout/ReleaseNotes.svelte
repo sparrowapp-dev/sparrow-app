@@ -1,8 +1,15 @@
 <script>
   import { SearchIcon } from "$lib/assets/icons";
-  // import HelpCard from "@app/pages/Help/HelpCard.svelte";
   import { Select } from "@library/forms";
   import { ArrowUnfilledIcon, CrossIcon, StackIcon } from "@library/icons";
+  import { onMount } from "svelte";
+  export let listChangeLog;
+
+  onMount(async () => {
+    // here in thsi function we weill sent thetype based on the select compoent
+    let releaseNOTes = await listChangeLog();
+    console.log("This is realse notes", releaseNOTes);
+  });
   let events = [
     {
       date: "Jul 31, 2020",
