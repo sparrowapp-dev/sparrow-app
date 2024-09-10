@@ -20,12 +20,45 @@ export class CannyIoService {
     return response;
   };
 
+  public updatePost = async (postID: string, body: object) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/posts/update`, {
+      body: {
+        apiKey: this.apiKey,
+        id: postID,
+        ...body,
+      },
+      headers: {
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+      },
+    });
+    return response;
+  };
+
+  // returns the post data for a specific post
+  retrievePost = async (postID: string) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/posts/retrieve`,
+      {
+        body: {
+          apiKey: this.apiKey,
+          id: postID,
+        },
+        headers: {
+          "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+        },
+      },
+    );
+    return response;
+  };
+
   // returns the list of posts available
-  public listPosts = async (boardID: string) => {
+  public listPosts = async (boardID: string, sort: string) => {
     const response = await makeRequest("POST", `${this.apiUrl}/posts/list`, {
       body: {
         apiKey: this.apiKey,
         boardID,
+        sort,
       },
       headers: {
         "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
