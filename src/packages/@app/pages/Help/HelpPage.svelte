@@ -5,13 +5,13 @@
     FeedbackSection,
     FeedbackToast,
     ReleaseNotes,
+    Community
   } from "@support/features";
   import DiscordPost from "@support/features/discord-post/layout/DiscordPost.svelte";
   import HelpPageViewModel from "./HelpPage.ViewModel";
   import { onMount } from "svelte";
   import { Motion } from "svelte-motion";
   import { pagesMotion } from "@app/constants";
-  import { Community } from "@support/features/community";
 
   const _viewModel = new HelpPageViewModel();
 
