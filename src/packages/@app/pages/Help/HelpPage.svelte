@@ -15,6 +15,12 @@
 
   const _viewModel = new HelpPageViewModel();
 
+
+  let listVotes=[];
+
+
+
+
   document.addEventListener("contextmenu", (event) => event.preventDefault());
 
   let activeTab = "feedback";
@@ -31,6 +37,7 @@
 
   onMount(async () => {
     await _viewModel.fetchReleaseNotes();
+   
     releaseNotesData = await _viewModel.getAllReleaseNotes();
     let pathname = window.location.pathname;
     if (pathname.includes("app/help/updates")) {
@@ -87,6 +94,12 @@
                 onAddFeedback={_viewModel.addFeedback}
                 fetchPosts={_viewModel.getListOfPOsts}
                 onRetrievePost={_viewModel.retrievePostData}
+                onAddComment={_viewModel.addComment}
+                fetchComments={_viewModel.listComments}
+                currentUser={_viewModel.createUser}
+                createVote={_viewModel.CreateVote}
+                deleteVote={_viewModel.deleteVote}
+                listVote={_viewModel.listVote}
               />
             {:else if activeTab === "updates"}
               <ReleaseNotes

@@ -197,11 +197,10 @@ class HelpPageViewModel {
     return response;
   };
 
-  public getListOfPOsts = async (sort) => {
+  public getListOfPOsts = async (sort:string,search:string, status: string) => {
     const boards = await this.RetrieveBoards();
-
     const boardID = boards?.data?.boards[0]?.id;
-    const response = await this.cannyService.listPosts(boardID, sort);
+    const response = await this.cannyService.listPosts(boardID, sort, search,status );
     return response;
   };
 
@@ -263,6 +262,162 @@ class HelpPageViewModel {
     const response = await this.cannyService.updatePost(postID, {});
     return response;
   };
+
+
+
+   /**
+   * Adds a comment to a post. If the user does not exist, creates a new user and then adds the comment.
+   * @param postID - The ID of the post to comment on.
+   * @param value - The text of the comment.
+   * @returns {Promise<any>} The response from the Canny service.
+   */
+   public addComment = async (postID: string, value: string, parentID:string) => {
+    
+      let userInfo;
+      await user.subscribe((value) => {
+        userInfo = value;
+      });
+
+      // Try to retrieve the user first
+      let userResponse = await this.cannyService.retrieveUser(userInfo?.email);
+
+      // If user does not exist, create a new user
+      if (!userResponse?.data) {
+        userResponse = await this.cannyService.createUser({
+          name: userInfo?.name,
+          email: userInfo?.email,
+          userID: userInfo?._id,
+        });
+      }
+
+      const authorID = userResponse?.data?.id;  // Use the retrieved or newly created user's ID
+
+      // Call the create comment API
+      const response = await this.cannyService.createComment(authorID,postID, value, parentID);
+      if (response.isSuccessful) {
+        notifications.success("Comment added successfully");
+      } else {
+        notifications.error("Failed to add comment. Please try again.");
+      }
+      return response;
+    
+  };
+
+
+  /**
+ * Lists comments for a specific post. If the user exists, retrieves their comments for the post.
+ * @param postID - The ID of the post to fetch comments for.
+ * @param boardID - The ID of the board to which the post belongs.
+ * @returns {Promise<any>} The response from the Canny service.
+ */
+public listComments = async (postID: string) => {
+ 
+    let userInfo;
+    await user.subscribe((value) => {
+      userInfo = value;
+    });
+
+    const boards = await this.RetrieveBoards();
+    const boardID = boards?.data?.boards[0]?.id;
+
+    const response = await this.cannyService.listComments(postID, boardID);
+
+    if (response.isSuccessful) {
+      const comments = response.data.comments; 
+      return comments; 
+    } 
+    
+  };
+
+ // Handle unvote
+ public CreateVote= async (postID:string)=> {
+  let userInfo;
+  await user.subscribe((value) => {
+    userInfo = value;
+  });
+
+  // Try to retrieve the user first
+  let userResponse = await this.cannyService.retrieveUser( userInfo.email);
+
+  // If user does not exist, create a new user
+  if (!userResponse?.data) {
+    userResponse = await this.cannyService.createUser({
+      name: userInfo?.name,
+      email: userInfo?.email,
+      userID: userInfo?._id,
+    });
+  }
+  const UserId = userResponse?.data?.id;  // Use the retrieved or newly created user's ID
+  if (UserId) {
+    const result = await this.cannyService.createVote(postID,UserId);
+    return result;
+  }
+  
+}
+  // Handle unvote
+  public deleteVote= async (postID:string) =>{
+
+    let userInfo;
+    await user.subscribe((value) => {
+      userInfo = value;
+    });
+
+    // Try to retrieve the user first
+    let userResponse = await this.cannyService.retrieveUser(userInfo.email);
+
+    // If user does not exist, create a new user
+    if (!userResponse?.data) {
+      userResponse = await this.cannyService.createUser({
+        name: userInfo?.name,
+        email: userInfo?.email,
+        userID: userInfo?._id,
+      });
+    }
+
+    // console.log("This is user response", userResponse)
+
+    const UserId = userResponse?.data?.id;  // Use the retrieved or newly created user's ID
+
+
+    if (UserId) {
+      const result = await this.cannyService.deleteVote(postID,UserId);
+      return result;
+    }
+    
+  }
+
+
+  //list votes data based on post id
+  public listVote= async (postID:string) =>{
+
+    let userInfo;
+    await user.subscribe((value) => {
+      userInfo = value;
+    });
+
+    // Try to retrieve the user first
+    let userResponse = await this.cannyService.retrieveUser(userInfo.email);
+
+    // If user does not exist, create a new user
+    if (!userResponse?.data) {
+      userResponse = await this.cannyService.createUser({
+        name: userInfo?.name,
+        email: userInfo?.email,
+        userID: userInfo?._id,
+      });
+    }
+
+    const UserId = userResponse?.data?.id;  // Use the retrieved or newly created user's ID
+
+    if (UserId) {
+      const result = await this.cannyService.listVotes(postID);
+      return result;
+    }
+    
+  }
+
+
+
 }
 
 export default HelpPageViewModel;
