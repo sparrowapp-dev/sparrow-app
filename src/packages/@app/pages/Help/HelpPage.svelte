@@ -66,6 +66,7 @@
       >
         Community
       </div>
+
       </div>
       <!--
         -- Help Body 
@@ -94,6 +95,7 @@
               {:else if activeTab === "community"}
               <Community/>
               <DiscordPost />
+
             {/if}
           </div>
         </div>
