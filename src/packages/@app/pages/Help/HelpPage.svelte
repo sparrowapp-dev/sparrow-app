@@ -5,6 +5,7 @@
     FeedbackSection,
     FeedbackToast,
     ReleaseNotes,
+    Community
   } from "@support/features";
   import DiscordPost from "@support/features/discord-post/layout/DiscordPost.svelte";
   import HelpPageViewModel from "./HelpPage.ViewModel";
@@ -30,6 +31,7 @@
       activeTab = tab;
     }
   }
+  
 
   let releaseNotesData = [];
 
@@ -65,6 +67,13 @@
         >
           Updates
         </div>
+        <div
+        class="tab {activeTab === 'community' ? 'active' : ''}"
+        on:click={() => setActiveTab("community")}
+      >
+        Community
+      </div>
+
       </div>
       <!--
         -- Help Body 
@@ -77,10 +86,9 @@
           style="width: calc(100% - 274px );"
           class="ps-3 pe-2 pt-3 pb-2 h-100"
         >
-          <div class="h-100 pe-2" style="overflow:auto;">
+          <div class=" h-100 pe-2" style="margin-left:34px; overflow:auto;">
             {#if activeTab === "feedback"}
-              <!-- <FeedbackToast />
-              <DiscordPost /> -->
+             
               <FeedbackSection
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
@@ -98,6 +106,11 @@
                 {releaseNotesData}
                 onLearnMore={_viewModel.learnMore}
               />
+
+              {:else if activeTab === "community"}
+              <Community/>
+              <DiscordPost />
+
             {/if}
           </div>
         </div>
