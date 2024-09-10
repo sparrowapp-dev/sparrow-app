@@ -23,6 +23,28 @@
     });
     return response;
   };
+  /**
+   * finds the next node id
+   * @param list - list of existing nodes
+   */
+  const findNextNodeId = (list): string => {
+    const isNameAvailable: (proposedName: string) => boolean = (
+      proposedName,
+    ) => {
+      return list.some((element) => {
+        return element.id === proposedName;
+      });
+    };
+
+    for (let i = 1; i < list.length + 10; i++) {
+      const proposedName: string = `${i}`;
+      if (!isNameAvailable(proposedName)) {
+        return proposedName;
+      }
+    }
+
+    return "";
+  };
 
   const createNewNode = (_id: string) => {
     if (!_id) return;
@@ -30,17 +52,25 @@
       return;
     }
 
-    const targetNode = Number(_id) + 1 + "";
+    const targetNode = findNextNodeId($nodes);
 
     nodes.update((nodes) => {
-      const n = nodes.length;
+      let nextNodePosition;
+      // finds next node positions
+      for (let i = 0; i < nodes?.length; i++) {
+        if (nodes[i].id === _id) {
+          nextNodePosition = {
+            x: nodes[i].position.x + 300,
+            y: nodes[i].position.y,
+          };
+        }
+      }
       return [
         ...nodes,
         {
           id: targetNode,
           type: "requestBlock",
           data: {
-            color: writable("#ff4000"),
             onClick: function (_id: string) {
               createNewNode(_id);
             },
@@ -49,10 +79,8 @@
             },
             label: "REST API Request",
           },
-          position: {
-            x: nodes[n - 1].position.x + 300,
-            y: nodes[n - 1].position.y - 0,
-          },
+          position: nextNodePosition,
+          deletable: true,
         },
       ];
     });
@@ -78,7 +106,6 @@
           id: dbNodes[i].id,
           type: dbNodes[i].type,
           data: {
-            color: writable("#ff4000"),
             onClick: function (_id: string) {
               createNewNode(_id);
             },
@@ -91,6 +118,7 @@
             x: dbNodes[i].position.x,
             y: dbNodes[i].position.y,
           },
+          deletable: dbNodes[i].id === "1" ? false : true,
         });
       }
       return res;
