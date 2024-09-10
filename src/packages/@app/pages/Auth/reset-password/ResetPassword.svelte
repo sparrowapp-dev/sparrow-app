@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Header from "$lib/components/header/Header.svelte";
   import vector1 from "$lib/assets/Vector1.svg";
   import vector2 from "$lib/assets/Vector2.svg";
   // import sparrowicon from "$lib/assets/sparrowIcon.svg";
@@ -123,7 +122,7 @@
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
   style="height: 100vh;"
 >
-  <Header />
+  <!-- <Header /> -->
   <div
     class="d-flex mb-5 flex-column align-items-center justify-content-center"
   >

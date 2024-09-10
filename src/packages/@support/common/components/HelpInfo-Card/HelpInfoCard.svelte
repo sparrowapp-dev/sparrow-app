@@ -15,7 +15,7 @@
           <span class="category">{status?.category?.name}</span>
         </div>
 
-        <Upvote score={status.score} />
+        <Upvote upvote={status.score} />
       </div>
     </div>
   {/each}

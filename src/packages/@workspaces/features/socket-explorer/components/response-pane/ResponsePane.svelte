@@ -1,8 +1,5 @@
 <script lang="ts">
   // TODO: Change location for default page component
-  import DefaultPage from "$lib/components/collections/req-res-section/sub-components/response-body-section/DefaultPage.svelte";
-  import CodeMirrorResponse from "$lib/components/editor/CodeMirrorResponse.svelte";
-  import TabularInput from "$lib/components/inputs/TabularInput.svelte";
   import { RequestDataType, ResponseFormatter } from "$lib/utils/enums";
   import type { Response } from "$lib/utils/interfaces/request.interface";
 
@@ -21,7 +18,7 @@
 </script>
 
 {#if response == undefined}
-  <DefaultPage />
+  <!-- <DefaultPage /> -->
 {/if}
 
 {#if response != undefined}
@@ -44,15 +41,15 @@
   <!-- Routes according to tabs -->
   {#if activeTab === "Body"}
     <!-- Render Body content -->
-    <CodeMirrorResponse
+    <!-- <CodeMirrorResponse
       rawValue={response.body}
       rawTab={RequestDataType.JSON}
       formatter={ResponseFormatter.PRETTY}
       currentTabId=""
-    />
+    /> -->
   {:else if activeTab === "Headers"}
     <!-- Render Headers content -->
-    <TabularInput
+    <!-- <TabularInput
       rows={response.headers.map((header, index) => ({
         id: index.toString(),
         Key: header.key,
@@ -60,6 +57,6 @@
       }))}
       class="w-100"
       columns={["Key", "Value"]}
-    />
+    /> -->
   {/if}
 {/if}

@@ -19,7 +19,7 @@
   import { ResponseFormatterEnum } from "@common/types/workspace";
   import BeautifyIcon from "$lib/assets/beautify.svg";
   import js_beautify, { html_beautify } from "js-beautify";
-  import { WithSelect } from "@workspaces/common/hoc";
+  import { WithSelectV3 } from "@workspaces/common/hoc";
 
   export let response;
   export let apiState;
@@ -156,7 +156,7 @@
 
       {#if apiState.responseBodyFormatter === ResponseFormatter.PRETTY}
         <span class="">
-          <WithSelect
+          <WithSelectV3
             id={"hash565"}
             data={[
               {

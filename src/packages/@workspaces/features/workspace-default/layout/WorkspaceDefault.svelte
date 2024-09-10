@@ -26,10 +26,10 @@
 </script>
 
 <div
-  class="d-flex flex-column align-items-center h-100"
-  style="padding-top: 124px; padding-right:325px; padding-left:325px; padding-bottom: 24px;"
+  class="d-flex flex-column align-items-center h-100 justify-content-center"
+  style=""
 >
-  <div style="height: 176px; width: 175px; margin-bottom: 24px;">
+  <div style="height: 176px; width: 175px;" class="sparrow-logo">
     <SparrowLogo />
   </div>
   <div class="d-flex" style="gap: 19px;">
@@ -143,3 +143,9 @@
     </div>
   </div>
 </div>
+
+<style>
+  .sparrow-logo {
+    margin-bottom: 15vh;
+  }
+</style>

@@ -63,7 +63,7 @@ export class UrlInputTheme {
         borderRadius: "0",
       },
       "&.cm-editor.cm-focused": {
-        border: "1px solid var(--border-primary-200)",
+        border: "1px solid var(--border-primary-300)",
         borderRadius: "0",
       },
       ".cm-scroller::-webkit-scrollbar": {

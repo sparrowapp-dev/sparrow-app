@@ -165,14 +165,14 @@
             {status}
           </div>
           <div class="p-2">
-            {#if !(filteredProducts?.length == 0 && searchTerm.length > 0) && products.length === 0}
+            <!-- {#if !(filteredProducts?.length == 0 && searchTerm.length > 0) && products.length === 0}
               <p
                 class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
                 style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
               >
                 No Data is there.
               </p>
-            {/if}
+            {/if} -->
 
             {#if (filteredProducts?.length == 0 && searchTerm.length > 0) || filteredProducts?.length == 0}
               <p

@@ -119,6 +119,7 @@
           handleRedirect(true);
           openDefaultBrowser();
         }}
+        id="create_account_or_sign_in"
       >
         Create an Account or Sign In</button
       >
@@ -132,6 +133,7 @@
       </div>
       <div style="height:32px;">
         <Button
+          id="try_sparrow_edge"
           onClick={() => {
             skipLoginHandler();
           }}
@@ -189,7 +191,7 @@
         }}
       >
         <div
-          class="d-flex"
+          class="d-flex align-items-center"
           on:mouseenter={() => {
             isHover = true;
           }}
@@ -250,7 +252,7 @@
   }
   a:hover {
     text-decoration: underline;
-    color: var(--primary-btn-color);
+    color: var(--text-primary-300);
   }
   .cursor-pointer {
     cursor: pointer;
@@ -277,7 +279,7 @@
     color: transparent;
   }
   .star-text-hover {
-    color: var(--primary-btn-color);
+    color: var(--text-primary-300);
     text-decoration: underline;
   }
   .btn-guest {
