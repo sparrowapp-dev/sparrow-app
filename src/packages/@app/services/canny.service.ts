@@ -119,4 +119,115 @@ export class CannyIoService {
     );
     return response;
   };
+
+    /**
+   * Retrieves an existing user from Canny.
+   * @param userIdentifier - The unique identifier of the user in your application.
+   * @returns {Promise<any>} The response containing user details if found.
+   */
+    public retrieveUser = async (userIdentifier: string) => {
+      const response = await makeRequest("POST", `${this.apiUrl}/users/retrieve`, {
+        body: {
+          apiKey: this.apiKey,
+          email: userIdentifier,  // You can also use email or id from Canny if needed
+        },
+        headers: {
+          "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+        },
+      });
+      return response;
+    };
+
+
+  public createComment = async ( authorID: string, postID: string, value: string, parentID :string) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/comments/create`, {
+      body: {
+        apiKey: this.apiKey,
+        authorID,
+        postID,
+        value,
+        parentID
+      },
+      headers: {
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+      },
+    });
+    return response;
+  };
+
+
+  public listComments = async (postID: string, boardID: string, limit = 10, skip = 0) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/comments/list`, {
+      body: {
+        apiKey: this.apiKey,
+        postID,
+        boardID,
+        limit,
+        skip
+      },
+      headers: {
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+      },
+    });
+  
+    return response;
+  };
+
+
+  public createVote = async (postID: string, voterID: string) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/votes/create`, {
+      body: {
+        apiKey: this.apiKey,
+        postID,
+        voterID
+       
+      },
+      headers: {
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+      },
+    });
+  
+    return response;
+    console.log("return response of create vote ", response)
+  };
+
+  public deleteVote = async (postID: string, voterID: string) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/votes/delete`, {
+      body: {
+        apiKey: this.apiKey,
+        postID,
+        voterID
+       
+      },
+      headers: {
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+      },
+    });
+  
+    return response;
+  };
+
+
+
+  public listVotes = async (postID: string ) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/votes/list`, {
+      body: {
+        apiKey: this.apiKey,
+        postID,
+       
+      },
+      headers: {
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+      },
+    });
+  
+    return response;
+    console.log("This is respones", response)
+  };
+
+
 }
+  
+
+
+
