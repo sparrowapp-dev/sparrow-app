@@ -19,12 +19,18 @@
   export let onAddFeedback;
   export let fetchPosts;
   export let onRetrievePost;
+  export let onAddComment;
+  export let fetchComments;
+  export let createVote;
+  export let deleteVote;
+  export let listVote;
 
   let searchTerm = "";
 
   let currentSort = "trending";
   let posts = [];
   let userInfo: any = {};
+  let votelist = [];
   user.subscribe((value) => {
     userInfo = value;
   });
@@ -37,6 +43,8 @@
     currentSort = sortType;
     const listPosts = await fetchPosts(sortType, searchQuery, status);
     posts = listPosts?.data?.posts;
+    // votelist = await listVote(post.id);
+    // console.log("THis is votelist", votelist);
   };
 
   let status = "open,under review,planned,in progress,complete";
@@ -44,6 +52,11 @@
   onMount(async () => {
     getPosts(currentSort, searchTerm, status);
   });
+
+  const handleUpvote = (e) => {
+    getPosts(currentSort, searchTerm, status);
+  };
+
   let isPostopen = false;
 
   // Function to handle input change
@@ -79,129 +92,131 @@
 
 <div style="margin: 8px 46px 0 34px;">
   <FeedbackDefault {onAddFeedback} {userInfo} {onInputFeedback} />
-  <div class="d-flex" style=" margin-top:38px; justify-content: space-between;">
-    <div class="" style="">
-      <div class={`d-flex search-input-container rounded py-1 px-2 mb-2`}>
-        <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
-        <input
-          type="text"
-          id="search-input"
-          class={`bg-transparent w-100 border-0 my-auto`}
-          placeholder="Search updates"
-          on:input={(e) => {
-            handleInputChange(e.target.value);
-          }}
-        />
-      </div>
-    </div>
-    <div class="d-flex" style="gap:15px;">
-      <div>
-        <Select
-          iconRequired={true}
-          data={[
-            {
-              name: "Feature Request",
-              id: FeedbackType.FEATURE_REQUEST,
-            },
-            {
-              name: "UX Improvement",
-              id: FeedbackType.UI_IMPROVEMENT,
-            },
-            {
-              name: "Bugs",
-              id: FeedbackType.BUG,
-            },
-            {
-              name: "All Categories",
-              id: FeedbackType.ALL_CATEGORY,
-            },
-          ]}
-          icon={CategoryIcon}
-          onclick={(id = "") => {
-            type = id;
-            handleCategoryChange(id);
-          }}
-          titleId={type}
-          zIndex={499}
-          disabled={false}
-          borderType={"none"}
-          borderActiveType={"none"}
-          borderHighlight={"hover-active"}
-          headerHighlight={"hover-active"}
-          headerHeight={"26px"}
-          minBodyWidth={"150px"}
-          minHeaderWidth={"150px"}
-          maxHeaderWidth={"200px"}
-          borderRounded={"2px"}
-          headerTheme={"violet2"}
-          bodyTheme={"violet"}
-          placeholderText={"Categories"}
-          menuItem={"v2"}
-          headerFontSize={"10px"}
-          isDropIconFilled={true}
-          position={"absolute"}
-        />
-      </div>
-      <div>
-        <Select
-          data={[
-            {
-              name: "Open",
-              id: FeedbackStatusType.OPEN,
-            },
-            {
-              name: "Completed",
-              id: FeedbackStatusType.COMPLETED,
-            },
-            {
-              name: "In Progress",
-              id: FeedbackStatusType.IN_PROGRESS,
-            },
-            {
-              name: "Planned",
-              id: FeedbackStatusType.PLANNED,
-            },
-            {
-              name: "Under review",
-              id: FeedbackStatusType.UNDER_REVIEW,
-            },
-            {
-              name: "All Status",
-              id: FeedbackStatusType.ALL_STATUS,
-            },
-          ]}
-          onclick={(id = "") => {
-            type = id;
-            handleSelectChange(id);
-          }}
-          titleId={type}
-          placeholderText={"Status"}
-          id={"feeds"}
-          zIndex={499}
-          disabled={false}
-          iconRequired={true}
-          icon={StatusIcon}
-          borderType={"none"}
-          borderActiveType={"none"}
-          borderHighlight={"hover-active"}
-          headerHighlight={"hover-active"}
-          headerHeight={"26px"}
-          minBodyWidth={"150px"}
-          minHeaderWidth={"150px"}
-          maxHeaderWidth={"200px"}
-          borderRounded={"2px"}
-          headerTheme={"violet2"}
-          bodyTheme={"violet"}
-          menuItem={"v2"}
-          headerFontSize={"10px"}
-          isDropIconFilled={true}
-          position={"absolute"}
-        />
-      </div>
-    </div>
-  </div>
-
   {#if !isPostopen}
+    <div
+      class="d-flex"
+      style=" margin-top:38px; justify-content: space-between;"
+    >
+      <div class="" style="">
+        <div class={`d-flex search-input-container rounded py-1 px-2 mb-2`}>
+          <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
+          <input
+            type="text"
+            id="search-input"
+            class={`bg-transparent w-100 border-0 my-auto`}
+            placeholder="Search updates"
+            on:input={(e) => {
+              handleInputChange(e.target.value);
+            }}
+          />
+        </div>
+      </div>
+      <div class="d-flex" style="gap:15px;">
+        <div>
+          <Select
+            iconRequired={true}
+            data={[
+              {
+                name: "Feature Request",
+                id: FeedbackType.FEATURE_REQUEST,
+              },
+              {
+                name: "UX Improvement",
+                id: FeedbackType.UI_IMPROVEMENT,
+              },
+              {
+                name: "Bugs",
+                id: FeedbackType.BUG,
+              },
+              {
+                name: "All Categories",
+                id: FeedbackType.ALL_CATEGORY,
+              },
+            ]}
+            icon={CategoryIcon}
+            onclick={(id = "") => {
+              type = id;
+              handleCategoryChange(id);
+            }}
+            titleId={type}
+            zIndex={499}
+            disabled={false}
+            borderType={"none"}
+            borderActiveType={"none"}
+            borderHighlight={"hover-active"}
+            headerHighlight={"hover-active"}
+            headerHeight={"26px"}
+            minBodyWidth={"150px"}
+            minHeaderWidth={"150px"}
+            maxHeaderWidth={"200px"}
+            borderRounded={"2px"}
+            headerTheme={"violet2"}
+            bodyTheme={"violet"}
+            placeholderText={"Categories"}
+            menuItem={"v2"}
+            headerFontSize={"10px"}
+            isDropIconFilled={true}
+            position={"absolute"}
+          />
+        </div>
+        <div>
+          <Select
+            data={[
+              {
+                name: "Open",
+                id: FeedbackStatusType.OPEN,
+              },
+              {
+                name: "Completed",
+                id: FeedbackStatusType.COMPLETED,
+              },
+              {
+                name: "In Progress",
+                id: FeedbackStatusType.IN_PROGRESS,
+              },
+              {
+                name: "Planned",
+                id: FeedbackStatusType.PLANNED,
+              },
+              {
+                name: "Under review",
+                id: FeedbackStatusType.UNDER_REVIEW,
+              },
+              {
+                name: "All Status",
+                id: FeedbackStatusType.ALL_STATUS,
+              },
+            ]}
+            onclick={(id = "") => {
+              type = id;
+              handleSelectChange(id);
+            }}
+            titleId={type}
+            placeholderText={"Status"}
+            id={"feeds"}
+            zIndex={499}
+            disabled={false}
+            iconRequired={true}
+            icon={StatusIcon}
+            borderType={"none"}
+            borderActiveType={"none"}
+            borderHighlight={"hover-active"}
+            headerHighlight={"hover-active"}
+            headerHeight={"26px"}
+            minBodyWidth={"150px"}
+            minHeaderWidth={"150px"}
+            maxHeaderWidth={"200px"}
+            borderRounded={"2px"}
+            headerTheme={"violet2"}
+            bodyTheme={"violet"}
+            menuItem={"v2"}
+            headerFontSize={"10px"}
+            isDropIconFilled={true}
+            position={"absolute"}
+          />
+        </div>
+      </div>
+    </div>
     <div class="d-flex" style=" height:100%; margin-top:51px; ">
       <div style="width:187px; margin-right:28px; ">
         <div>
@@ -254,7 +269,7 @@
               <div style="flex: 1;">
                 <div
                   class="title"
-                  on:click={() => {
+                  on:click={async () => {
                     id = post?.id;
                     isPostopen = true;
                   }}
@@ -266,7 +281,14 @@
                 </div>
               </div>
 
-              <UpvoteIcon upvote={post?.score} />
+              <UpvoteIcon
+                {handleUpvote}
+                authordId={post.author.id}
+                postID={post.id}
+                likePost={createVote}
+                dislikePost={deleteVote}
+                upvote={post?.score}
+              />
             </div>
 
             <div style="margin-top: 10px; flex: 1;">
@@ -294,7 +316,14 @@
   {/if}
 
   {#if isPostopen}
-    <FeedbackPost bind:isPostopen {onRetrievePost} {userInfo} bind:id />
+    <FeedbackPost
+      bind:isPostopen
+      {onRetrievePost}
+      {userInfo}
+      {onAddComment}
+      {fetchComments}
+      bind:id
+    />
   {/if}
 </div>
 

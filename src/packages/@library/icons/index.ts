@@ -70,3 +70,5 @@ export { default as SortIcon } from "./Sort.svelte";
 export { default as TriangleIcon } from "./Triangle.svelte";
 export { default as CommentIcon } from "./Comment.svelte";
 export { default as StatusIcon } from "./Status.svelte";
+export { default as Thumb_upIcon } from "./Thumb_up.svelte";
+
