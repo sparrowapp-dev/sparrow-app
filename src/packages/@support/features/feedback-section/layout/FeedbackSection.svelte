@@ -13,7 +13,6 @@
     FeedbackType,
     FeedbackStatusType,
   } from "@support/common/types/feedback";
-  export let type = FeedbackType.ALL_CATEGORY;
   import { tickIcon } from "@library/forms/select/svgs";
   export let onInputFeedback;
   export let onAddFeedback;
@@ -24,6 +23,9 @@
   export let createVote;
   export let deleteVote;
   export let listVote;
+
+  let feedbackType = FeedbackType.ALL_CATEGORY;
+  let feedbackStatusType = FeedbackStatusType.ALL_STATUS;
 
   let searchTerm = "";
 
@@ -47,7 +49,9 @@
     // console.log("THis is votelist", votelist);
   };
 
-  let status = "open,under review,planned,in progress,complete";
+  const defaultStaus = "open,under review,planned,in progress,complete";
+
+  let status = defaultStaus;
 
   onMount(async () => {
     getPosts(currentSort, searchTerm, status);
@@ -65,9 +69,11 @@
     await getPosts(currentSort, searchQuery, status); // Fetch posts with search term
   };
 
-  const handleSelectChange = async (_status: string) => {
+  const handleStatusChange = async (_status: string) => {
+    feedbackStatusType = _status;
+
     if (_status == "all status") {
-      status = "open,under review,planned,in progress,complete";
+      status = defaultStaus;
     } else {
       status = _status;
     }
@@ -75,7 +81,7 @@
   };
 
   const handleCategoryChange = async (selectedCategory) => {
-    type = selectedCategory;
+    feedbackType = selectedCategory;
 
     if (selectedCategory === FeedbackType.ALL_CATEGORY) {
       // Show all posts if "All Categories" is selected
@@ -135,10 +141,10 @@
             ]}
             icon={CategoryIcon}
             onclick={(id = "") => {
-              type = id;
+              feedbackType = id;
               handleCategoryChange(id);
             }}
-            titleId={type}
+            titleId={feedbackType}
             zIndex={499}
             disabled={false}
             borderType={"none"}
@@ -188,10 +194,9 @@
               },
             ]}
             onclick={(id = "") => {
-              type = id;
-              handleSelectChange(id);
+              handleStatusChange(id);
             }}
-            titleId={type}
+            titleId={feedbackStatusType}
             placeholderText={"Status"}
             id={"feeds"}
             zIndex={499}
