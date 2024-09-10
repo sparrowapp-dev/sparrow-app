@@ -1,5 +1,5 @@
 <script>
-  import { AttachmentIcon, Thumb_upIcon } from "@library/icons";
+  import { AttachmentIcon } from "@library/icons";
   import { Button, IconFallback } from "@library/ui";
   import { CommentCard } from "@support/common/components";
 
@@ -113,7 +113,7 @@
 
     <!-- Check if the comment has replies and render them recursively -->
     {#if comment.replies && comment.replies.length > 0}
-      <div class="nested-comments">
+      <div >
         {#each comment.replies as reply}
           <CommentCard
             {onAddComment}
@@ -188,7 +188,6 @@
   }
 
   .search-input-container {
-    /* border: 1px solid var(--border-color); */
     background: var(--bg-tertiary-400);
     width: 100%;
     font-size: 12px;
@@ -196,16 +195,11 @@
     position: relative;
     border: 1px solid transparent;
   }
-  /* .search-input-container:hover {
-    border: 1px solid var(--border-primary-300);
-    caret-color: var(--border-primary-300);
-  } */
-
+ 
   .search-input-container:focus-within {
     border-color: #636566;
     caret-color: var(--border-primary-300);
   }
-
   #search-input:focus {
     outline: none;
     border: none;

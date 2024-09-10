@@ -48,6 +48,7 @@
   let isImageOpen = false;
 
   let comments = [];
+  let nestedComments = [];
 
   function nestComments(comments) {
     const commentMap = {};
@@ -65,9 +66,6 @@
     });
     return comments.filter((comment) => !comment.parentID);
   }
-
-  // Example usage
-  let nestedComments = [];
 
   const logMessage = async () => {
     comments = await fetchComments(id);
@@ -87,21 +85,6 @@
       nestedComments = nestComments(comments);
     }
   }
-
-  function addReply(commentId, reply) {
-    comments = comments.map((comment) => {
-      if (comment.id === commentId) {
-        return { ...comment, replies: [...comment.replies, reply] };
-      }
-      return comment;
-    });
-  }
-
-  const handleAddCommentInput = (e) => {
-   
-    commentValue = e.target.value;
-    
-  };
 </script>
 
 <div class="d-flex flex-row" style="margin-top: 51px; ">
@@ -203,7 +186,7 @@
           class={`bg-transparent w-100 border-0 my-auto`}
           placeholder="Leave a comment"
           on:input={(e) => {
-            handleAddCommentInput(e);
+            commentValue = e.target.value;
           }}
           bind:value={commentValue}
         />
