@@ -66,3 +66,4 @@ export { default as DownloadIcon } from "./Download.svelte";
 export { default as TickIcon } from "./Tick.svelte";
 export { default as Help } from "./Help.svelte";
 export { default as CategoryIcon } from "./Category.svelte";
+export { default as ExternalLinkIcon } from "./ExternalLink.svelte";

@@ -31,7 +31,7 @@
 </script>
 
 <div class="d-flex flex-column align-items-center">
-  <List  classProps={"pb-2 p-1"}>
+  <List classProps={"pb-2 p-1"}>
     <p class="text-fs-12 text-center" style="color: var(--text-secondary-50)">
       Add Collections to your Workspace to group your requests or send an API
       request directly
@@ -60,9 +60,8 @@
             width={"22px"}
             color={"var(--text-secondary-200)"}
           />
-          <span
-            style="color: var(--text-secondary-200)"
-            class="ps-2 fw-bold text-fs-12">Add Collection</span
+          <span style="color: var(--text-secondary-200)" class="ps-2 text-fs-12"
+            >Add Collection</span
           >
         </p>
       {/if}

@@ -10,20 +10,20 @@
 {#if isVisible}
   <div class="ticker-container">
     <div class="ticker-container-div">
-      <div style="margin-right: 10px;">
+      <div style="margin-right: 16px;">
         <RocketIcon />
       </div>
 
       <div>
-        <span class="txt-dark">Enjoying Sparrow?</span>
-        <span class="txt-light"
+        <span class="txt-dark text-fs-14">Enjoying Sparrow?</span>
+        <span class="txt-light text-fs-14"
           >Unlock the full power by creating an account or signing in.</span
         >
       </div>
 
       <div class="buttons">
         <button class="click-btn" on:click={onClick}>
-          Create an Account or Sign In
+          <span> Create an Account or Sign In</span>
         </button>
       </div>
     </div>
@@ -42,27 +42,27 @@
 <style>
   .ticker-container {
     width: 100%;
-    height: 46px;
+    height: 56px;
     background-color: var(--bg-primary-300);
+    box-shadow: 0px 16px 48px 0px rgba(0, 0, 0, 0.17);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
+    /* gap: 20px; */
   }
   .cross-btn-div {
-    margin-right: 50px;
+    margin-right: 25px;
   }
   .ticker-container-div {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 90vw;
+    width: 100vw;
   }
   .cross-btn {
     background: none;
     border: none;
     cursor: pointer;
-    /* margin-left: auto; */
   }
   .relase-btn {
     padding-top: 4px;
@@ -75,22 +75,52 @@
     background: transparent;
   }
   .click-btn {
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     padding-left: 12px;
     padding-right: 12px;
-    color: blue;
+    color: transparent;
     border: 2px solid white;
-    border-radius: 7px;
+    border-radius: 4px;
     font-weight: 500;
+    font-size: 14px;
     background: white;
+    background-clip: border-box;
+    position: relative;
+    z-index: 1;
+  }
+
+  .click-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
+    z-index: -1;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
+    clip-path: inset(0 0 0 0);
+  }
+
+  .click-btn span {
+    background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
+    position: relative;
+    z-index: 2;
   }
   .buttons {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 8px;
-    margin-left: 32px;
+    margin-left: 24px;
   }
   .txt-dark {
     font-weight: 500;
