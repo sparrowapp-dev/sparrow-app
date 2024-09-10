@@ -5,6 +5,7 @@
     FeedbackSection,
     FeedbackToast,
     ReleaseNotes,
+    Community
   } from "@support/features";
   import DiscordPost from "@support/features/discord-post/layout/DiscordPost.svelte";
   import HelpPageViewModel from "./HelpPage.ViewModel";
@@ -13,6 +14,12 @@
   import { pagesMotion } from "@app/constants";
 
   const _viewModel = new HelpPageViewModel();
+
+
+  let listVotes=[];
+
+
+
 
   document.addEventListener("contextmenu", (event) => event.preventDefault());
 
@@ -24,11 +31,13 @@
       activeTab = tab;
     }
   }
+  
 
   let releaseNotesData = [];
 
   onMount(async () => {
     await _viewModel.fetchReleaseNotes();
+   
     releaseNotesData = await _viewModel.getAllReleaseNotes();
     let pathname = window.location.pathname;
     if (pathname.includes("app/help/updates")) {
@@ -58,6 +67,13 @@
         >
           Updates
         </div>
+        <div
+        class="tab {activeTab === 'community' ? 'active' : ''}"
+        on:click={() => setActiveTab("community")}
+      >
+        Community
+      </div>
+
       </div>
       <!--
         -- Help Body 
@@ -70,19 +86,31 @@
           style="width: calc(100% - 274px );"
           class="ps-3 pe-2 pt-3 pb-2 h-100"
         >
-          <div class="h-100 pe-2" style="overflow:auto;">
+          <div class=" h-100 pe-2" style="margin-left:34px; overflow:auto;">
             {#if activeTab === "feedback"}
-              <!-- <FeedbackToast />
-              <DiscordPost /> -->
+             
               <FeedbackSection
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
+                fetchPosts={_viewModel.getListOfPOsts}
+                onRetrievePost={_viewModel.retrievePostData}
+                onAddComment={_viewModel.addComment}
+                fetchComments={_viewModel.listComments}
+                currentUser={_viewModel.createUser}
+                createVote={_viewModel.CreateVote}
+                deleteVote={_viewModel.deleteVote}
+                listVote={_viewModel.listVote}
               />
             {:else if activeTab === "updates"}
               <ReleaseNotes
                 {releaseNotesData}
                 onLearnMore={_viewModel.learnMore}
               />
+
+              {:else if activeTab === "community"}
+              <Community/>
+              <DiscordPost />
+
             {/if}
           </div>
         </div>

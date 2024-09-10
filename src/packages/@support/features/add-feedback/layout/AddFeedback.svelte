@@ -5,16 +5,10 @@
   import Drop from "../components/Drop/Drop.svelte";
   import { notifications } from "@library/ui/toast/Toast";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { FeedbackType } from "@support/common/types";
 
   export let onAddFeedback;
   export let onInputFeedback;
-  enum FeedbackType {
-    FEATURE_REQUEST = "Feature Request",
-    UI_IMPROVEMENT = "UI Improvement",
-    BUG = "Bug",
-    ALL_CATEGORY = "Uncategorized",
-    CATEGORY = "Category",
-  }
 
   let type: FeedbackType = FeedbackType.CATEGORY;
   let feedbackDescription = "";
