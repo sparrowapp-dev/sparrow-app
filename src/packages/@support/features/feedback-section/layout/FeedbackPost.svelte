@@ -37,11 +37,8 @@
   onMount(async () => {
     const res = await onRetrievePost(id);
     post = await res?.data;
-    console.log(post, "post");
-
     createdAt = timeAgo(post?.created);
     postImages = post?.imageURLs;
-    console.log(postImage, "iiiiiiiiiiiiiiiiiiiiiiiiiiiii");
   });
 </script>
 

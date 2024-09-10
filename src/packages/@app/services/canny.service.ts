@@ -53,12 +53,14 @@ export class CannyIoService {
   };
 
   // returns the list of posts available
-  public listPosts = async (boardID: string, sort: string) => {
+  public listPosts = async (boardID: string, sort: string, search:string,status: string) => {   
     const response = await makeRequest("POST", `${this.apiUrl}/posts/list`, {
       body: {
         apiKey: this.apiKey,
         boardID,
         sort,
+        search,
+        status
       },
       headers: {
         "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],

@@ -9,51 +9,76 @@
   import { SearchIcon } from "$lib/assets/app.asset";
   import { Select } from "@library/forms";
   import { CategoryIcon, StatusIcon } from "@library/icons";
-  import { FeedbackType } from "@support/common/types/feedback";
-  export let type = FeedbackType.ALL_CATEGORY;
+  import {
+    FeedbackType,
+    FeedbackStatusType,
+  } from "@support/common/types/feedback";
   import { tickIcon } from "@library/forms/select/svgs";
   export let onInputFeedback;
   export let onAddFeedback;
   export let fetchPosts;
   export let onRetrievePost;
-  let currentSort = "newest";
-  let posts = [];
-  let filteredPosts = [];
+
+  let feedbackType = FeedbackType.ALL_CATEGORY;
+  let feedbackStatusType = FeedbackStatusType.ALL_STATUS;
+
   let searchTerm = "";
+
+  let currentSort = "trending";
+  let posts = [];
   let userInfo: any = {};
   user.subscribe((value) => {
     userInfo = value;
   });
   let id = "";
-  const getPosts = async (sortType) => {
-    currentSort = sortType; // Added: Update the sorting type
-    const listPosts = await fetchPosts(sortType); // Modified: Pass sortType to fetchPosts
+  const getPosts = async (
+    sortType: string,
+    searchQuery: string = "",
+    status: string,
+  ) => {
+    currentSort = sortType;
+    const listPosts = await fetchPosts(sortType, searchQuery, status);
     posts = listPosts?.data?.posts;
   };
 
-  // const filterPosts = () => {
-  //   filteredPosts = posts.filter((post) =>
-  //     post.title.toLowerCase().includes(searchTerm.toLowerCase()),
-  //   );
-  // };
+  const defaultStaus = "open,under review,planned,in progress,complete";
 
-  // const handleSearch = (event) => {
-  //   searchTerm = event.target.value;
-  //   filterPosts();
-  // };
+  let status = defaultStaus;
 
   onMount(async () => {
-    getPosts(currentSort);
+    getPosts(currentSort, searchTerm, status);
   });
   let isPostopen = false;
 
-  const filterPosts = () => {
-    if (searchTerm) {
-      filteredPosts = posts.filter((post) =>
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()),
-      );
+  // Function to handle input change
+  const handleInputChange = async (searchQuery: string) => {
+    searchTerm = searchQuery;
+    await getPosts(currentSort, searchQuery, status); // Fetch posts with search term
+  };
+
+  const handleStatusChange = async (_status: string) => {
+    feedbackStatusType = _status;
+
+    if (_status == "all status") {
+      status = defaultStaus;
     } else {
-      filteredPosts = posts; // Show all posts if no search term
+      status = _status;
+    }
+    await getPosts(currentSort, searchTerm, status);
+  };
+
+  const handleCategoryChange = async (selectedCategory) => {
+    feedbackType = selectedCategory;
+
+    if (selectedCategory === FeedbackType.ALL_CATEGORY) {
+      // Show all posts if "All Categories" is selected
+      await getPosts(currentSort, searchTerm, status);
+    } else {
+      // Fetch and filter posts by the selected category
+      const listPosts = await fetchPosts(currentSort, searchTerm, status);
+      posts = listPosts?.data?.posts.filter(
+        (post) => post?.category?.name === selectedCategory,
+      );
     }
   };
 </script>
@@ -69,9 +94,9 @@
           id="search-input"
           class={`bg-transparent w-100 border-0 my-auto`}
           placeholder="Search updates"
-          on:input={() => {}}
-          on:input={filterPosts}
-          bind:value={searchTerm}
+          on:input={(e) => {
+            handleInputChange(e.target.value);
+          }}
         />
       </div>
     </div>
@@ -99,10 +124,10 @@
           ]}
           icon={CategoryIcon}
           onclick={(id = "") => {
-            type = id;
+            feedbackType = id;
+            handleCategoryChange(id);
           }}
-          titleId={type}
-          id={"feeds"}
+          titleId={feedbackType}
           zIndex={499}
           disabled={false}
           borderType={"none"}
@@ -127,26 +152,37 @@
         <Select
           data={[
             {
-              name: "Feature Request",
-              id: FeedbackType.FEATURE_REQUEST,
+              name: "Open",
+              id: FeedbackStatusType.OPEN,
             },
             {
-              name: "UX Improvement",
-              id: FeedbackType.UI_IMPROVEMENT,
+              name: "Completed",
+              id: FeedbackStatusType.COMPLETED,
             },
             {
-              name: "Bugs",
-              id: FeedbackType.BUG,
+              name: "In Progress",
+              id: FeedbackStatusType.IN_PROGRESS,
             },
             {
-              name: "All Categories",
-              id: FeedbackType.ALL_CATEGORY,
+              name: "Planned",
+              id: FeedbackStatusType.PLANNED,
+            },
+            {
+              name: "Under review",
+              id: FeedbackStatusType.UNDER_REVIEW,
+            },
+            {
+              name: "All Status",
+              id: FeedbackStatusType.ALL_STATUS,
             },
           ]}
+          onclick={(id = "") => {
+            handleStatusChange(id);
+          }}
+          titleId={feedbackStatusType}
           placeholderText={"Status"}
           id={"feeds"}
           zIndex={499}
-          onclick={() => {}}
           disabled={false}
           iconRequired={true}
           icon={StatusIcon}
@@ -184,21 +220,23 @@
           style="align-items: baseline; gap:10px; margin-top:13px; "
         >
           <button
-            on:click={() => getPosts("trending")}
-            class=" sort-buttons tick-icon d-flex justify-content-between w-100"
+            on:click={() => getPosts("trending", searchTerm, status)}
+            class=" sort-buttons d-flex justify-content-between w-100"
           >
             <span>Trending</span>
             <img src={tickIcon} alt="" class="pt-1 tick-icon" style="" />
           </button>
+
           <button
-            on:click={() => getPosts("newest")}
+            on:click={() => getPosts("newest", searchTerm, status)}
             class=" sort-buttons d-flex justify-content-between w-100"
           >
             <span>Now</span>
             <img src={tickIcon} alt="" class="pt-1 tick-icon" style="" />
           </button>
+
           <button
-            on:click={() => getPosts("score")}
+            on:click={() => getPosts("score", searchTerm, status)}
             class="sort-buttons d-flex justify-content-between w-100"
           >
             <span>Top</span>
@@ -297,11 +335,11 @@
     font-size: 18px;
     font-weight: 700;
     margin-bottom: 5px;
-    color: #3670f7;
   }
   .title:hover {
     text-decoration: underline;
     cursor: pointer;
+    color: #3670f7;
   }
 
   .category {
