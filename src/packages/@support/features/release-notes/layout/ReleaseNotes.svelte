@@ -1,66 +1,83 @@
 <script>
   import { SearchIcon } from "$lib/assets/icons";
   import { Select } from "@library/forms";
-  import { ArrowUnfilledIcon, CrossIcon, StackIcon } from "@library/icons";
+  import {
+    ArrowUnfilledIcon,
+    CrossIcon,
+    FilterIcon,
+    LinkedinIcon,
+    ThumbIcon,
+  } from "@library/icons";
   import { onMount } from "svelte";
   export let listChangeLog;
+  import { marked } from "marked";
+  import constants from "$lib/utils/constants";
+
+  const externalSparrowGithub = constants.SPARROW_GITHUB;
+  const externalSparrowLinkedin = constants.SPARROW_LINKEDIN;
+
+  let events = [];
+  let filteredEvents = events;
 
   onMount(async () => {
     // here in thsi function we weill sent thetype based on the select compoent
-    let releaseNOTes = await listChangeLog();
-    console.log("This is realse notes", releaseNOTes);
+    let releaseNotes = await listChangeLog();
+    console.log("This is realse notes", releaseNotes);
+    events = releaseNotes.data.entries;
+    console.log("This is filterreed events", events);
+    filteredEvents = events;
   });
-  let events = [
-    {
-      date: "Jul 31, 2020",
-      title: "v2.4.2 - Latest Version",
-      description:
-        "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process",
-      tags: ["New"], // Example with only one tag
-      link: "Github",
-      reactions: 41,
-    },
-    {
-      date: "Aug 05, 2024",
-      title: "v2.4.3 - Latest Version",
-      description:
-        "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process.",
-      tags: ["New", "Fixed", "Improved"], // Example tags
-      link: "Github",
-      reactions: 41,
-    },
-    {
-      date: "Jul 31, 2026",
-      title: "v2.4.4 - Latest Version",
-      description:
-        "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process",
-      tags: ["New"], // Example with only one tag
-      link: "Github",
-      reactions: 41,
-    },
-    {
-      date: "Aug 05, 2028",
-      title: "v2.4.5 - Latest Version",
-      description:
-        "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process.",
-      tags: ["New", "Fixed", "Improved"], // Example tags
-      link: "Github",
-      reactions: 41,
-    },
-    {
-      date: "Jul 31, 2029",
-      title: "v2.4.6 - Latest Version",
-      description:
-        "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process",
-      tags: ["New"],
-      link: "Github",
-      reactions: 41,
-    },
-  ];
+
+  //   {
+  //     date: "Jul 31, 2020",
+  //     title: "v2.4.2 - Latest Version",
+  //     description:
+  //       "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process",
+  //     tags: ["New"], // Example with only one tag
+  //     link: "Github",
+  //     reactions: 41,
+  //   },
+  //   {
+  //     date: "Aug 05, 2024",
+  //     title: "v2.4.3 - Latest Version",
+  //     description:
+  //       "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process.",
+  //     tags: ["New", "Fixed", "Improved"], // Example tags
+  //     link: "Github",
+  //     reactions: 41,
+  //   },
+  //   {
+  //     date: "Jul 31, 2026",
+  //     title: "v2.4.4 - Latest Version",
+  //     description:
+  //       "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process",
+  //     tags: ["New"], // Example with only one tag
+  //     link: "Github",
+  //     reactions: 41,
+  //   },
+  //   {
+  //     date: "Aug 05, 2028",
+  //     title: "v2.4.5 - Latest Version",
+  //     description:
+  //       "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process.",
+  //     tags: ["New", "Fixed", "Improved"], // Example tags
+  //     link: "Github",
+  //     reactions: 41,
+  //   },
+  //   {
+  //     date: "Jul 31, 2029",
+  //     title: "v2.4.6 - Latest Version",
+  //     description:
+  //       "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process",
+  //     tags: ["New"],
+  //     link: "Github",
+  //     reactions: 41,
+  //   },
+  // ];
+
   let searchQuery = "";
   let selectedEvent = [];
   let showTimeline = true;
-  let filteredEvents = events;
 
   const filterEvents = () => {
     filteredEvents = events.filter((event) =>
@@ -79,9 +96,9 @@
   };
 
   function getTagClass(tag) {
-    if (tag === "New") return "tag-new";
-    if (tag === "Fixed") return "tag-fixed";
-    if (tag === "Improved") return "tag-improved";
+    if (tag === "new") return "tag-new";
+    if (tag === "fixed") return "tag-fixed";
+    if (tag === "improved") return "tag-improved";
     return "";
   }
 
@@ -105,22 +122,24 @@
   };
   let subCategory;
 
-  let selectedTag = "All"; // Default to 'All'
+  let selectedTag = ""; // Default to 'All'
 
-  // Reactive statement to filter events based on selected tag
-  $: {
-    if (selectedTag === "All") {
-      filteredEvents = events;
-    } else {
-      filteredEvents = events.filter((event) =>
-        event.tags.includes(selectedTag),
-      );
-    }
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const options = { day: "2-digit", month: "short", year: "numeric" };
+    return date.toLocaleDateString("en-GB", options);
   }
 
   // Function to handle select changes
   function handleSelectChange(id) {
     selectedTag = id;
+    if (selectedTag === "all") {
+      filteredEvents = events;
+    } else {
+      filteredEvents = events.filter((event) =>
+        event.types.includes(selectedTag),
+      );
+    }
   }
 </script>
 
@@ -172,32 +191,34 @@
         <Select
           id={"feeds"}
           data={[
-            { name: "All", id: "All" },
-            { name: "New", id: "New" },
-            { name: "Fixed", id: "Fixed" },
-            { name: "Improved", id: "Improved" },
+            { name: "All", id: "all" },
+            { name: "New", id: "new" },
+            { name: "Fixed", id: "fixed" },
+            { name: "Improved", id: "improved" },
           ]}
           titleId={selectedTag}
           onclick={(id = "") => {
             type = id;
             handleSelectChange(id);
           }}
-          minHeaderWidth={"185px"}
-          iconRequired={true}
-          icon={StackIcon}
-          iconColor={"var(--icon-primary-300)"}
-          isDropIconFilled={true}
-          borderType={"none"}
-          borderActiveType={"none"}
-          headerHighlight={""}
-          headerTheme={"violet"}
-          menuItem={"v2"}
-          headerFontSize={"12px"}
-          maxHeaderWidth={"185px"}
-          zIndex={200}
-          bodyTheme={"violet"}
-          borderRounded={"2px"}
-          position={"absolute"}
+          placeholderText={"Filters"}
+          zIndex={499}
+            disabled={false}
+            borderType={"none"}
+            borderActiveType={"none"}
+            borderHighlight={"hover-active"}
+            headerHighlight={"hover-active"}
+            headerHeight={"26px"}
+            minBodyWidth={"150px"}
+            minHeaderWidth={"150px"}
+            maxHeaderWidth={"200px"}
+            borderRounded={"2px"}
+            headerTheme={"violet2"}
+            bodyTheme={"violet"}
+            menuItem={"v2"}
+            headerFontSize={"10px"}
+            isDropIconFilled={true}
+            position={"absolute"}
         />
       </div>
     </div>
@@ -206,25 +227,25 @@
         <div class="timeline">
           {#each filteredEvents as event}
             <div class="timeline-event">
-              <div class="timeline-date">{event.date}</div>
+              <div class="timeline-date">{formatDate(event.publishedAt)}</div>
               <div class="timeline-circle"></div>
               <div class="timeline-content">
                 <h3>{event.title}</h3>
                 <div class="tags">
-                  {#each event.tags as tag}
+                  {#each event.types as tag}
                     <span class="tag {getTagClass(tag)}">{tag}</span>
                   {/each}
                 </div>
-                {#if event.description.split(" ").length > 20}
+                {#if event.plaintextDetails.split(" ").length > 20}
                   <p
                     style="font-size: 14px; font-weight:400; line-height:24px; "
                     class=""
                   >
-                    {truncateDescription(event.description)}
+                    {truncateDescription(event.plaintextDetails)}
                     <span
-                      style="text-decoration: underline; color:#3670F7; border:none; background-color:transparent "
+                      style="text-decoration: underline; color:#3670F7; border:none; background-color:transparent; cursor:pointer "
                       class="ms-0"
-                      on:click={() => handleSeeMore(event)}>....see more</span
+                      on:click={() => handleSeeMore(event)}>see more</span
                     >
                   </p>
                 {:else}
@@ -236,14 +257,30 @@
                   </p>
                 {/if}
                 <div class="d-flex align-items-center justify-content-between">
-                  <a href="#">{event.link}</a>
-                  <div class="timeline-reactions">
-                    <span class="me-1 icon">👍</span>
-                    <span>{event.reactions}</span>
-                    <span
-                      style="border-left: 1px solid grey; padding-left:3px;"
-                      class="icon">👍</span
+                  <p
+                    style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
+                    class="mb-0"
+                    on:click={async () => {
+                      await open(externalSparrowGithub);
+                    }}
+                  >
+                    Github
+                  </p>
+
+                  <div class="d-flex align-items-center gap-2">
+                    <ThumbIcon height={"18px"} width={"18px"} />
+                    <div style="color: var(--white-color);">
+                      {event.reactions?.like || ""}
+                    </div>
+                    <div
+                      style="cursor:pointer; border-left:1px solid grey;"
+                      class="ps-2"
+                      on:click={async () => {
+                        await open(externalSparrowLinkedin);
+                      }}
                     >
+                      <LinkedinIcon height={"18px"} width={"18px"} />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -255,40 +292,59 @@
           class="no-results mt-5 d-flex justify-content-center align-items-center mx-1 text-fs-14 mb-0 text-center"
           style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
         >
-          <p>No results found for "{searchQuery}"</p>
+          <p>No results found </p>
         </div>
       {/if}
     {:else}
       <div class="d-flex selected-event-detail">
         <div style="width:23.5%; " class="d-flex mt-2">
-          <div style="cursor:pointer;" on:click={handleBack}>
-            <div style="transform: rotate(90deg);">
-              <ArrowUnfilledIcon height={"16px"} width={"16px"} />
+          <div>
+            <div
+              on:click={handleBack}
+              style="cursor:pointer; transform: rotate(90deg);"
+            >
+              <ArrowUnfilledIcon
+                height={"16px"}
+                width={"16px"}
+                color={"var(--white-color )"}
+              />
             </div>
           </div>
-          <span class="ms-2">{selectedEvent.date}</span>
+          <div
+            class="ms-2 text-fs-14"
+            style="margin-top:1.5px; color:var(--white-color); font-weight:700;"
+          >
+            {formatDate(selectedEvent.publishedAt)}
+          </div>
         </div>
 
         <div class="ms-2 timeline-content">
           <h3>{selectedEvent.title}</h3>
           <div class="tags">
-            {#each selectedEvent.tags as tag}
+            {#each selectedEvent.types as tag}
               <span class="tag {getTagClass(tag)}">{tag}</span>
             {/each}
           </div>
 
-          <p style="font-size: 14px; font-weight:400; " class="">
-            {selectedEvent.description}
+          <p style="font-size: 14px; font-weight:400; " class="mt-3">
+            {@html marked(selectedEvent.markdownDetails)}
           </p>
-          <div class="d-flex align-items-center justify-content-between">
-            <a href="#">{selectedEvent.link}</a>
-            <div class="timeline-reactions">
-              <span class="me-1 icon">👍</span>
-              <span>{selectedEvent.reactions}</span>
-              <span
-                style="border-left: 1px solid grey; padding-left:3px;"
-                class="icon">👍</span
-              >
+
+          <div class="d-flex align-items-center justify-content-between p-1">
+            <p
+              style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
+              class="mb-0"
+            >
+              Github
+            </p>
+            <div class="d-flex align-items-center gap-2">
+              <ThumbIcon height={"18px"} width={"18px"} />
+              <div style="color: var(--white-color);">
+                {selectedEvent.reactions?.like || ""}
+              </div>
+              <div style="border-left:1px solid grey;" class="ps-2">
+                <LinkedinIcon height={"18px"} width={"18px"} />
+              </div>
             </div>
           </div>
         </div>
@@ -298,6 +354,9 @@
 </div>
 
 <style>
+  :global(h1) {
+    font-size: 24px;
+  }
   .selected-event-detail {
     display: flex;
     justify-content: space-between;
@@ -305,7 +364,8 @@
   .search-input-container {
     border: 1px solid var(--border-color);
     background: var(--bg-tertiary-400);
-    width: 27vw;
+    height: 26px;;
+    width: 300px;
     font-size: 12px;
     position: relative;
     border: 1px solid transparent;
@@ -377,7 +437,7 @@
   .timeline-circle {
     width: 12px;
     height: 12px;
-    background-color: #3670f7;
+    background-color: var(--bg-primary-300);
     border-radius: 50%;
     position: absolute;
     left: 0px;
@@ -388,7 +448,7 @@
   .timeline-content {
     margin-left: 40px;
     padding: 10px 20px;
-    background-color: #151515;
+    background-color: var(--bg-secondary-800);
     border-radius: 2px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     width: 100%;
