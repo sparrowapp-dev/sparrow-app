@@ -10,7 +10,7 @@
       <div class=" d-flex justify-content-between align-items-center">
         <div class="test">
           <p class="card-title pb-0 mb-0 ellipsis" style="font-weight: 500; ">
-            {status.title}dfsgfsfsghdghdghdfdg dfsgfsfsghdghdghdfdg dfsgfsfsghdghdghdfdg
+            {status.title}
           </p>
           <span class="category">{status?.category?.name}</span>
         </div>
