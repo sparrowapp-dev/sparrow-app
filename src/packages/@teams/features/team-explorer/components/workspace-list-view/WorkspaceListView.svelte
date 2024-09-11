@@ -39,16 +39,6 @@
     "Last Updated",
     "",
   ];
-
-  $: filteredProductStatus = productStatus.map((status) => ({
-    ...status,
-    filteredProducts:
-      searchTerm.trim().length > 0
-        ? status.products.filter((product) =>
-            product.title.toLowerCase().includes(searchTerm.toLowerCase()),
-          )
-        : status.products,
-  }));
 </script>
 
 <div class=" h-100 d-flex flex-column pb-2">
