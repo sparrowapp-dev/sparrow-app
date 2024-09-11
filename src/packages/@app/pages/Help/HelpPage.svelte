@@ -17,11 +17,22 @@
   document.addEventListener("contextmenu", (event) => event.preventDefault());
 
   let activeTab = "feedback";
+  let isPostopenFromActivity = false;
+  let postIdFromActivity;
 
   function setActiveTab(tab) {
     if (tab !== "faq") {
       // Disable FAQ tab
       activeTab = tab;
+    }
+  }
+
+  function setActiveTabFromActivity(tab, postID) {
+    if (tab !== "faq") {
+      // Disable FAQ tab
+      isPostopenFromActivity = true;
+      activeTab = tab;
+      postIdFromActivity = postID;
     }
   }
 
@@ -79,11 +90,18 @@
                 onAddFeedback={_viewModel.addFeedback}
                 fetchPosts={_viewModel.getListOfPOsts}
                 onRetrievePost={_viewModel.retrievePostData}
+                {postIdFromActivity}
+                {isPostopenFromActivity}
               />
             {:else if activeTab === "updates"}
               <ReleaseNotes
-                {releaseNotesData}
-                onLearnMore={_viewModel.learnMore}
+                onInputFeedback={_viewModel.createPost}
+                onAddFeedback={_viewModel.addFeedback}
+                fetchPosts={_viewModel.getUserPosts}
+                onRetrievePost={_viewModel.retrievePostData}
+                fetchComments={_viewModel.retreiveComments}
+                fetchLikedPosts={_viewModel.retrieveUserVotes}
+                {setActiveTabFromActivity}
               />
             {/if}
           </div>

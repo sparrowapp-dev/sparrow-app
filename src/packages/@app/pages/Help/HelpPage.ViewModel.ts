@@ -197,11 +197,11 @@ class HelpPageViewModel {
     return response;
   };
 
-  public getListOfPOsts = async (sort) => {
+  public getListOfPOsts = async (sort, userID) => {
     const boards = await this.RetrieveBoards();
 
     const boardID = boards?.data?.boards[0]?.id;
-    const response = await this.cannyService.listPosts(boardID, sort);
+    const response = await this.cannyService.listPosts(boardID, sort, userID);
     return response;
   };
 
@@ -263,6 +263,21 @@ class HelpPageViewModel {
     const response = await this.cannyService.updatePost(postID, {});
     return response;
   };
+
+  public getUserPosts = async (sort: string, userId: string) => {
+    const response = await this.cannyService.listUsersPost(sort, userId)
+    return response
+  }
+
+  public retreiveComments = async (body: object, authorID: string) => {
+    const response = await this.cannyService.retreiveComments({}, authorID)
+    return response;
+  }
+
+  public retrieveUserVotes = async (userID: string) => {
+    const response = await this.cannyService.retrieveVotes({}, userID)
+    return response
+  }
 }
 
 export default HelpPageViewModel;

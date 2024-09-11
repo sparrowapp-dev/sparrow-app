@@ -13,6 +13,8 @@
   export let userInfo;
   export let id;
   export let onRetrievePost;
+  export let postIdFromActivity;
+
   let post = [];
   let currentImage = "";
   let createdAt = "";
@@ -35,10 +37,9 @@
   let isImageOpen = false;
 
   onMount(async () => {
-    const res = await onRetrievePost(id);
+    const res = await onRetrievePost(id || postIdFromActivity);
     post = await res?.data;
     console.log(post, "post");
-
     createdAt = timeAgo(post?.created);
     postImages = post?.imageURLs;
     console.log(postImage, "iiiiiiiiiiiiiiiiiiiiiiiiiiiii");

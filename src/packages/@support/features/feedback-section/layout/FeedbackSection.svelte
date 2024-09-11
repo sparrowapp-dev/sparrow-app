@@ -16,6 +16,8 @@
   export let onAddFeedback;
   export let fetchPosts;
   export let onRetrievePost;
+  export let postIdFromActivity: any;
+  export let isPostopenFromActivity;
   let currentSort = "newest";
   let posts = [];
   let filteredPosts = [];
@@ -24,6 +26,7 @@
   user.subscribe((value) => {
     userInfo = value;
   });
+
   let id = "";
   const getPosts = async (sortType) => {
     currentSort = sortType; // Added: Update the sorting type
@@ -45,7 +48,8 @@
   onMount(async () => {
     getPosts(currentSort);
   });
-  let isPostopen = false;
+
+  let isPostopen = isPostopenFromActivity || false;
 
   const filterPosts = () => {
     if (searchTerm) {
@@ -261,7 +265,13 @@
   {/if}
 
   {#if isPostopen}
-    <FeedbackPost bind:isPostopen {onRetrievePost} {userInfo} bind:id />
+    <FeedbackPost
+      bind:isPostopen
+      {onRetrievePost}
+      {userInfo}
+      bind:id
+      bind:postIdFromActivity
+    />
   {/if}
 </div>
 

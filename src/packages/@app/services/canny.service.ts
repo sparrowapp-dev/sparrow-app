@@ -53,12 +53,13 @@ export class CannyIoService {
   };
 
   // returns the list of posts available
-  public listPosts = async (boardID: string, sort: string) => {
+  public listPosts = async (boardID: string, sort: string, userID?: string) => {
     const response = await makeRequest("POST", `${this.apiUrl}/posts/list`, {
       body: {
         apiKey: this.apiKey,
         boardID,
         sort,
+        userID
       },
       headers: {
         "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
@@ -117,4 +118,61 @@ export class CannyIoService {
     );
     return response;
   };
+
+  public listUsersPost = async (sort: string, userId: string,) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/posts/list`, {
+      body: {
+        apiKey: this.apiKey,
+        // authorID: userId,
+        sort,
+      },
+      headers: {
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+      },
+    });
+    console.log(response)
+    return response
+  }
+
+  public retreiveComments = async (body?: object, authorID?: string) => {
+
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/comments/list`,
+      {
+        body: {
+          apiKey: this.apiKey,
+          // authorID,
+          ...body
+        },
+        headers: {
+          "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+        },
+      },
+    );
+    return response;
+  }
+
+  public retrieveVotes = async (body?: object, userID: string) => {
+    const response = await makeRequest(
+      "POST",
+      `https://canny.io/api/v1/votes/list`,
+      {
+        body: {
+          apiKey: this.apiKey,
+          userID, // just for now testing
+          ...body
+        },
+        headers: {
+          "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+        },
+      },
+    );
+
+    return response;
+  }
+
+  public updateComment = async (commentID: string) => {
+
+  }
 }
