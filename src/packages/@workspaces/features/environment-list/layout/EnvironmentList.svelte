@@ -236,7 +236,7 @@
         <div class={`pb-2 px-1`}>
           {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
             <p
-              class={`add-env-desc-text mb-3 text-fs-12 mb-0 fw-normal text-center`}
+              class={`add-env-desc-text mt-2 mb-3 text-fs-12 mb-0 fw-normal text-center`}
               style="color: var(--text-secondary-50)"
             >
               Add Environments in your Workspace for precise API testing with
