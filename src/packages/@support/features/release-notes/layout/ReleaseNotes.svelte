@@ -6,78 +6,32 @@
     CrossIcon,
     FilterIcon,
     LinkedinIcon,
+    LinkIcon,
     ThumbIcon,
   } from "@library/icons";
   import { onMount } from "svelte";
   export let listChangeLog;
   import { marked } from "marked";
   import constants from "$lib/utils/constants";
+  import { Tooltip } from "@library/ui";
+  import copyToClipBoard from "$lib/utils/copyToClipboard";
+  import { notifications } from "@library/ui/toast/Toast";
 
   const externalSparrowGithub = constants.SPARROW_GITHUB;
   const externalSparrowLinkedin = constants.SPARROW_LINKEDIN;
 
+  let type = "all";
   let events = [];
+  let searchQuery = "";
+  let showTimeline = true;
+  let selectedEvent = [];
   let filteredEvents = events;
 
   onMount(async () => {
-    // here in thsi function we weill sent thetype based on the select compoent
     let releaseNotes = await listChangeLog();
-    console.log("This is realse notes", releaseNotes);
     events = releaseNotes.data.entries;
-    console.log("This is filterreed events", events);
     filteredEvents = events;
   });
-
-  //   {
-  //     date: "Jul 31, 2020",
-  //     title: "v2.4.2 - Latest Version",
-  //     description:
-  //       "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process",
-  //     tags: ["New"], // Example with only one tag
-  //     link: "Github",
-  //     reactions: 41,
-  //   },
-  //   {
-  //     date: "Aug 05, 2024",
-  //     title: "v2.4.3 - Latest Version",
-  //     description:
-  //       "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process.",
-  //     tags: ["New", "Fixed", "Improved"], // Example tags
-  //     link: "Github",
-  //     reactions: 41,
-  //   },
-  //   {
-  //     date: "Jul 31, 2026",
-  //     title: "v2.4.4 - Latest Version",
-  //     description:
-  //       "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process",
-  //     tags: ["New"], // Example with only one tag
-  //     link: "Github",
-  //     reactions: 41,
-  //   },
-  //   {
-  //     date: "Aug 05, 2028",
-  //     title: "v2.4.5 - Latest Version",
-  //     description:
-  //       "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process.",
-  //     tags: ["New", "Fixed", "Improved"], // Example tags
-  //     link: "Github",
-  //     reactions: 41,
-  //   },
-  //   {
-  //     date: "Jul 31, 2029",
-  //     title: "v2.4.6 - Latest Version",
-  //     description:
-  //       "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process",
-  //     tags: ["New"],
-  //     link: "Github",
-  //     reactions: 41,
-  //   },
-  // ];
-
-  let searchQuery = "";
-  let selectedEvent = [];
-  let showTimeline = true;
 
   const filterEvents = () => {
     filteredEvents = events.filter((event) =>
@@ -111,8 +65,6 @@
     selectedEvent = null;
     showTimeline = true;
   };
-
-  let type = "all";
 
   const truncateDescription = (description) => {
     const words = description.split(" ");
@@ -233,10 +185,35 @@
               <div class="timeline-date">{formatDate(event.publishedAt)}</div>
               <div class="timeline-circle"></div>
               <div class="timeline-content">
-                <h3>{event.title}</h3>
+                <div class="d-flex gap-2">
+                  <h3 on:click={() => handleSeeMore(event)}>{event.title}</h3>
+                  <div
+                    style="height: 24px; width:24px; cursor:pointer"
+                    on:click={async () => {
+                      await copyToClipBoard(event.url);
+                      notifications.success("Link copied to clipboard!");
+                    }}
+                  >
+                    <Tooltip
+                      title={"Link"}
+                      placement={"right"}
+                      distance={13}
+                      show={true}
+                      zIndex={701}
+                    >
+                      <LinkIcon
+                        height={"18px"}
+                        width={"18px"}
+                        color={"var(--white-color)"}
+                      />
+                    </Tooltip>
+                  </div>
+                </div>
                 <div class="tags">
                   {#each event.types as tag}
-                    <span class="tag {getTagClass(tag)}">{tag}</span>
+                    <span class="tag {getTagClass(tag)}">
+                      {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
+                    >
                   {/each}
                 </div>
                 {#if event.plaintextDetails.split(" ").length > 20}
@@ -325,7 +302,9 @@
           <h3>{selectedEvent.title}</h3>
           <div class="tags">
             {#each selectedEvent.types as tag}
-              <span class="tag {getTagClass(tag)}">{tag}</span>
+              <span class="tag {getTagClass(tag)}">
+                {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
+              >
             {/each}
           </div>
 
