@@ -128,9 +128,6 @@
       >
         Version {version}
       </p>
-      <p class="cursor-pointer check-for-update text-center sparrow-fs-12 0">
-        Check for Update
-      </p>
     </div>
   </div>
 </div>

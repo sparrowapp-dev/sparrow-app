@@ -191,12 +191,29 @@ class HelpPageViewModel {
     )?.id;
     return categoryID;
   };
-  // write js docs
-  retrievePostData = async (postID: string) => {
+ 
+
+  /**
+ * Retrieves data for a specific post using the post ID.
+ * 
+ * @param   postID - The ID of the post to retrieve.
+ * @returns {Promise<Object>} The response from the server containing the post data.
+ */
+
+  public retrievePostData = async (postID: string) => {
     const response = await this.cannyService.retrievePost(postID);
     return response;
   };
 
+
+  /**
+ * Retrieves a list of posts based on sorting, search, and status filters.
+ * 
+ * @param   sort - The sorting criteria for the posts (e.g., by date, votes, etc.).
+ * @param   search - The search query to filter posts.
+ * @param   status - The status of the posts to filter (e.g., open, closed).
+ * @returns {Promise<Object>} The response from the server containing the list of posts.
+ */
   public getListOfPOsts = async (sort:string,search:string, status: string) => {
     const boards = await this.RetrieveBoards();
     const boardID = boards?.data?.boards[0]?.id;
@@ -258,11 +275,16 @@ class HelpPageViewModel {
     }
   };
 
+/**
+ * Updates a post with the given post ID.
+ * 
+ * @param  postID - The ID of the post to be updated.
+ * @returns {Promise<Object>} The response from the server after updating the post.
+ */
   public updatePost = async (postID) => {
     const response = await this.cannyService.updatePost(postID, {});
     return response;
   };
-
 
 
    /**
@@ -329,7 +351,12 @@ public listComments = async (postID: string) => {
     
   };
 
- // Handle unvote
+/**
+ * Creates a vote for a post. If the user doesn't exist, it creates a new user first.
+ * 
+ * @param   postID - The ID of the post to vote on.
+ * @returns {Promise<Object>} The response from the server after creating the vote.
+ */
  public CreateVote= async (postID:string)=> {
   let userInfo;
   await user.subscribe((value) => {
@@ -354,18 +381,22 @@ public listComments = async (postID: string) => {
   }
   
 }
-  // Handle unvote
-  public deleteVote= async (postID:string) =>{
+
+
+/**
+ * Deletes a vote for a post. If the user doesn't exist, it creates a new user first.
+ * 
+ * @param   postID - The ID of the post whose vote is to be deleted.
+ * @returns {Promise<Object>} The response from the server after deleting the vote.
+ */
+
+public deleteVote= async (postID:string) =>{
 
     let userInfo;
     await user.subscribe((value) => {
       userInfo = value;
     });
-
-    // Try to retrieve the user first
     let userResponse = await this.cannyService.retrieveUser(userInfo.email);
-
-    // If user does not exist, create a new user
     if (!userResponse?.data) {
       userResponse = await this.cannyService.createUser({
         name: userInfo?.name,
@@ -374,11 +405,7 @@ public listComments = async (postID: string) => {
       });
     }
 
-    // console.log("This is user response", userResponse)
-
-    const UserId = userResponse?.data?.id;  // Use the retrieved or newly created user's ID
-
-
+    const UserId = userResponse?.data?.id;  
     if (UserId) {
       const result = await this.cannyService.deleteVote(postID,UserId);
       return result;
@@ -387,7 +414,13 @@ public listComments = async (postID: string) => {
   }
 
 
-  //list votes data based on post id
+  /**
+ * Retrieves the list of votes for a post. If the user doesn't exist, it creates a new user first.
+ * 
+ * @param   postID - The ID of the post whose votes are being retrieved.
+ * @returns {Promise<Object>} The response from the server with the list of votes.
+ */
+
   public listVote= async (postID:string) =>{
 
     let userInfo;
@@ -395,7 +428,6 @@ public listComments = async (postID: string) => {
       userInfo = value;
     });
 
-    // Try to retrieve the user first
     let userResponse = await this.cannyService.retrieveUser(userInfo.email);
 
     // If user does not exist, create a new user
@@ -412,12 +444,47 @@ public listComments = async (postID: string) => {
     if (UserId) {
       const result = await this.cannyService.listVotes(postID);
       return result;
-    }
-    
+    } 
   }
 
 
 
-}
+  public listVote= async (postID:string) =>{
+
+    let userInfo;
+    await user.subscribe((value) => {
+      userInfo = value;
+    });
+
+    let userResponse = await this.cannyService.retrieveUser(userInfo.email);
+
+    // If user does not exist, create a new user
+    if (!userResponse?.data) {
+      userResponse = await this.cannyService.createUser({
+        name: userInfo?.name,
+        email: userInfo?.email,
+        userID: userInfo?._id,
+      });
+    }
+
+    const UserId = userResponse?.data?.id;  // Use the retrieved or newly created user's ID
+
+    if (UserId) {
+      const result = await this.cannyService.listVotes(postID);
+      return result;
+    } 
+  }
+
+
+
+  public listChangeLog= async (type:string) =>{
+      const result = await this.cannyService.listChangeLog(type);
+      return result;
+    } 
+  
+  
+  
+  }
+
 
 export default HelpPageViewModel;
