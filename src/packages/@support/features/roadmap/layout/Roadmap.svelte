@@ -9,6 +9,8 @@
 
   export let fetchPosts;
 
+  export let   setPostId
+
   let productStatus = [];
   let type = "allCategories";
   let searchTerm = "";
@@ -185,7 +187,7 @@
               >
                 No Result Found.
               </p>{:else}
-              <HelpInfoCard status={filteredProducts} />
+              <HelpInfoCard { setPostId} status={filteredProducts} />
             {/if}
           </div>
 

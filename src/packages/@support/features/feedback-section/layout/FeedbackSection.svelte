@@ -24,6 +24,9 @@
   export let deleteVote;
   export let listVote;
 
+  export let isPostopenFromActivity;
+  export let postId;
+
   let feedbackType = FeedbackType.ALL_CATEGORY;
   let feedbackStatusType = FeedbackStatusType.ALL_STATUS;
 
@@ -55,13 +58,14 @@
 
   onMount(async () => {
     getPosts(currentSort, searchTerm, status);
+    isPostopenFromActivity = false;
   });
 
   const handleUpvote = (e) => {
     getPosts(currentSort, searchTerm, status);
   };
 
-  let isPostopen = false;
+  let isPostopen = isPostopenFromActivity || false;
 
   // Function to handle input change
   const handleInputChange = async (searchQuery: string) => {
@@ -221,10 +225,7 @@
           />
         </div>
       </div>
-      
     </div>
-
-
 
     <div class="d-flex" style=" height:100%; margin-top:51px; ">
       <div style="width:187px; margin-right:28px; ">
@@ -279,7 +280,8 @@
                 <div
                   class="title"
                   on:click={async () => {
-                    id = post?.id;
+                    postId = post?.id;
+                    // id = post?.id;
                     isPostopen = true;
                   }}
                 >
@@ -293,7 +295,7 @@
               <UpvoteIcon
                 {handleUpvote}
                 authordId={post.author.id}
-                postID={post.id}
+                postId={post.id}
                 likePost={createVote}
                 dislikePost={deleteVote}
                 upvote={post?.score}
@@ -326,12 +328,12 @@
 
   {#if isPostopen}
     <FeedbackPost
+      bind:postId
       bind:isPostopen
       {onRetrievePost}
       {userInfo}
       {onAddComment}
       {fetchComments}
-      bind:id
     />
   {/if}
 </div>
