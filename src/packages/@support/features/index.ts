@@ -6,5 +6,4 @@ export * from "./feedback-toast";
 export * from "./release-notes";
 export * from "./feedback-section";
 export * from "./community"
-export * from "./my-activity"
 

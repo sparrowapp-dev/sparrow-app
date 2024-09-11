@@ -1,5 +1,7 @@
 <script>
   import { SearchIcon } from "$lib/assets/icons";
+
+  // import { SearchIcon } from "$lib/assets/icons";
   import { Select } from "@library/forms";
   import { CategoryIcon, CrossIcon, StackIcon } from "@library/icons";
   import HelpInfoCard from "@support/common/components/HelpInfo-Card/HelpInfoCard.svelte";
@@ -11,6 +13,12 @@
   let type = "allCategories";
   let searchTerm = "";
 
+  /**
+   * Returns a color code based on the provided status.
+   *
+   * @param status - The current status of the product (e.g., "Under Review", "In Progress", "Planned").
+   * @returns The corresponding color code.
+   */
   function getColor(status) {
     if (status === "Under Review") return "white";
     if (status === "In Progress") return "#DF77F9";
@@ -18,6 +26,11 @@
     return "white";
   }
 
+  /**
+   * Transforms an array of posts into a product status map.
+   *
+   * @param posts - An array of posts, each containing a status and other product details.
+   */
   function transformPostsToProductStatus(posts) {
     const statusMap = {
       "under review": { status: "Under Review", products: [] },
@@ -165,15 +178,6 @@
             {status}
           </div>
           <div class="p-2">
-            <!-- {#if !(filteredProducts?.length == 0 && searchTerm.length > 0) && products.length === 0}
-              <p
-                class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
-                style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
-              >
-                No Data is there.
-              </p>
-            {/if} -->
-
             {#if (filteredProducts?.length == 0 && searchTerm.length > 0) || filteredProducts?.length == 0}
               <p
                 class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"

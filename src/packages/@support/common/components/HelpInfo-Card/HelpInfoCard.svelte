@@ -8,9 +8,9 @@
   {#each status as status}
     <div class="p-2 review-card">
       <div class=" d-flex justify-content-between align-items-center">
-        <div>
-          <p class="card-title pb-0 mb-0" style="font-weight: 500; ">
-            {status.title}
+        <div class="test">
+          <p class="card-title pb-0 mb-0 ellipsis" style="font-weight: 500; ">
+            {status.title}dfsgfsfsghdghdghdfdg dfsgfsfsghdghdghdfdg dfsgfsfsghdghdghdfdg
           </p>
           <span class="category">{status?.category?.name}</span>
         </div>
@@ -47,6 +47,11 @@
     padding: 2px 5px 2px 5px;
     border-radius: 4px;
     font-size: 12px;
+  }
+
+
+  .test{
+    width: calc(100% - 40px);
   }
 
 </style>

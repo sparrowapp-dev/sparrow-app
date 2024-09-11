@@ -142,10 +142,10 @@ export class CannyIoService {
     /**
  * Creates a new comment on a post.
  * 
- * @param {string} authorID - The ID of the author making the comment.
- * @param {string} postID - The ID of the post on which the comment is made.
- * @param {string} value - The content of the comment.
- * @param {string} parentID - The ID of the parent comment (if this is a reply).
+ * @param    authorID - The ID of the author making the comment.
+ * @param    postID - The ID of the post on which the comment is made.
+ * @param    value - The content of the comment.
+ * @param    parentID - The ID of the parent comment (if this is a reply).
  * @returns {Promise<Object>} The response from the server after creating the comment.
  */
   public createComment = async ( authorID: string, postID: string, value: string, parentID :string) => {
@@ -167,10 +167,10 @@ export class CannyIoService {
 /**
  * Retrieves a list of comments for a specific post.
  * 
- * @param {string} postID - The ID of the post whose comments are being retrieved.
- * @param {string} boardID - The ID of the board the post belongs to.
- * @param {number} [limit=10] - The maximum number of comments to retrieve.
- * @param {number} [skip=0] - The number of comments to skip (used for pagination).
+ * @param  postID - The ID of the post whose comments are being retrieved.
+ * @param  boardID - The ID of the board the post belongs to.
+ * @param  [limit=10] - The maximum number of comments to retrieve.
+ * @param  [skip=0] - The number of comments to skip (used for pagination).
  * @returns {Promise<Object>} The response from the server with the list of comments.
  */
   public listComments = async (postID: string, boardID: string, limit = 10, skip = 0) => {
@@ -194,8 +194,8 @@ export class CannyIoService {
   /**
  * Creates a vote on a post.
  * 
- * @param {string} postID - The ID of the post to vote on.
- * @param {string} voterID - The ID of the user casting the vote.
+ * @param  postID - The ID of the post to vote on.
+ * @param  voterID - The ID of the user casting the vote.
  * @returns {Promise<Object>} The response from the server after creating the vote.
  */
 
@@ -220,8 +220,8 @@ export class CannyIoService {
   /**
  * Deletes a vote on a post.
  * 
- * @param {string} postID - The ID of the post whose vote is being deleted.
- * @param {string} voterID - The ID of the user removing their vote.
+ * @param  postID - The ID of the post whose vote is being deleted.
+ * @param  voterID - The ID of the user removing their vote.
  * @returns {Promise<Object>} The response from the server after deleting the vote.
  */
   public deleteVote = async (postID: string, voterID: string) => {
@@ -244,7 +244,7 @@ export class CannyIoService {
 /**
  * Retrieves a list of votes for a post.
  * 
- * @param {string} postID - The ID of the post whose votes are being retrieved.
+ * @param    postID - The ID of the post whose votes are being retrieved.
  * @returns {Promise<Object>} The response from the server with the list of votes.
  */
   public listVotes = async (postID: string ) => {
@@ -266,7 +266,7 @@ export class CannyIoService {
 /**
  * Lists the change log entries of a specified type by making a POST request.
  *
- * @param {string} type - The type of change log entries to fetch (e.g., "new", "fixed","improved").
+ * @param    type - The type of change log entries to fetch (e.g., "new", "fixed","improved").
  * @returns {Promise<Object>} - A promise that resolves to the response object from the API call.
  */
 

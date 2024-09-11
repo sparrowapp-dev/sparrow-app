@@ -196,7 +196,7 @@ class HelpPageViewModel {
   /**
  * Retrieves data for a specific post using the post ID.
  * 
- * @param {string} postID - The ID of the post to retrieve.
+ * @param   postID - The ID of the post to retrieve.
  * @returns {Promise<Object>} The response from the server containing the post data.
  */
 
@@ -209,9 +209,9 @@ class HelpPageViewModel {
   /**
  * Retrieves a list of posts based on sorting, search, and status filters.
  * 
- * @param {string} sort - The sorting criteria for the posts (e.g., by date, votes, etc.).
- * @param {string} search - The search query to filter posts.
- * @param {string} status - The status of the posts to filter (e.g., open, closed).
+ * @param   sort - The sorting criteria for the posts (e.g., by date, votes, etc.).
+ * @param   search - The search query to filter posts.
+ * @param   status - The status of the posts to filter (e.g., open, closed).
  * @returns {Promise<Object>} The response from the server containing the list of posts.
  */
   public getListOfPOsts = async (sort:string,search:string, status: string) => {
@@ -278,7 +278,7 @@ class HelpPageViewModel {
 /**
  * Updates a post with the given post ID.
  * 
- * @param {string} postID - The ID of the post to be updated.
+ * @param  postID - The ID of the post to be updated.
  * @returns {Promise<Object>} The response from the server after updating the post.
  */
   public updatePost = async (postID) => {
@@ -354,7 +354,7 @@ public listComments = async (postID: string) => {
 /**
  * Creates a vote for a post. If the user doesn't exist, it creates a new user first.
  * 
- * @param {string} postID - The ID of the post to vote on.
+ * @param   postID - The ID of the post to vote on.
  * @returns {Promise<Object>} The response from the server after creating the vote.
  */
  public CreateVote= async (postID:string)=> {
@@ -386,7 +386,7 @@ public listComments = async (postID: string) => {
 /**
  * Deletes a vote for a post. If the user doesn't exist, it creates a new user first.
  * 
- * @param {string} postID - The ID of the post whose vote is to be deleted.
+ * @param   postID - The ID of the post whose vote is to be deleted.
  * @returns {Promise<Object>} The response from the server after deleting the vote.
  */
 
@@ -417,7 +417,7 @@ public deleteVote= async (postID:string) =>{
   /**
  * Retrieves the list of votes for a post. If the user doesn't exist, it creates a new user first.
  * 
- * @param {string} postID - The ID of the post whose votes are being retrieved.
+ * @param   postID - The ID of the post whose votes are being retrieved.
  * @returns {Promise<Object>} The response from the server with the list of votes.
  */
 

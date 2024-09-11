@@ -4,7 +4,6 @@
     DiscordCard,
     FeedbackSection,
     Community,
-    MyActivity,
   } from "@support/features";
   import DiscordPost from "@support/features/discord-post/layout/DiscordPost.svelte";
   import HelpPageViewModel from "./HelpPage.ViewModel";
@@ -166,13 +165,6 @@
               <DiscordPost />
             {:else if activeTab === "myActivity"}
               My Activity
-              <!-- <MyActivity
-                onAddFeedback={_viewModel.addFeedback}
-                fetchPosts={_viewModel.getUserPosts}
-                onRetrievePost={_viewModel.retrievePostData}
-                fetchComments={_viewModel.retreiveUserComments}
-                fetchLikedPosts={_viewModel.retrieveUserVotes}
-              /> -->
             {/if}
           </div>
         </div>
