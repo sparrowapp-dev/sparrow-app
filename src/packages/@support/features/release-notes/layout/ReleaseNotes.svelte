@@ -13,7 +13,7 @@
   export let listChangeLog;
   import { marked } from "marked";
   import constants from "$lib/utils/constants";
-  import { Tooltip } from "@library/ui";
+  import { Loader, Tooltip } from "@library/ui";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
   import { notifications } from "@library/ui/toast/Toast";
 
@@ -26,12 +26,8 @@
   let showTimeline = true;
   let selectedEvent = [];
   let filteredEvents = events;
-
-  onMount(async () => {
-    let releaseNotes = await listChangeLog();
-    events = releaseNotes.data.entries;
-    filteredEvents = events;
-  });
+  let selectedTag = ""; // Default to 'All'
+  let isLoading = false;
 
   const filterEvents = () => {
     filteredEvents = events.filter((event) =>
@@ -69,12 +65,9 @@
   const truncateDescription = (description) => {
     const words = description.split(" ");
     return words.length > 30
-      ? words.slice(0, 30).join(" ") + "..."
+      ? words.slice(0, 40).join(" ") + "..."
       : description;
   };
-  let subCategory;
-
-  let selectedTag = ""; // Default to 'All'
 
   function formatDate(dateString) {
     const date = new Date(dateString);
@@ -93,6 +86,14 @@
       );
     }
   }
+
+  onMount(async () => {
+    isLoading = true;
+    let releaseNotes = await listChangeLog();
+    events = releaseNotes.data.entries;
+    filteredEvents = events;
+    isLoading = false;
+  });
 </script>
 
 <div style="height:100%; width:100%;">
@@ -177,165 +178,180 @@
         />
       </div>
     </div>
-    {#if showTimeline}
-      {#if filteredEvents.length > 0}
-        <div class="timeline">
-          {#each filteredEvents as event}
-            <div class="timeline-event">
-              <div class="timeline-date">{formatDate(event.publishedAt)}</div>
-              <div class="timeline-circle"></div>
-              <div class="timeline-content">
-                <div class="d-flex gap-2">
-                  <h3 on:click={() => handleSeeMore(event)}>{event.title}</h3>
-                  <div
-                    style="height: 24px; width:24px; cursor:pointer"
-                    on:click={async () => {
-                      await copyToClipBoard(event.url);
-                      notifications.success("Link copied to clipboard!");
-                    }}
-                  >
-                    <Tooltip
-                      title={"Link"}
-                      placement={"right"}
-                      distance={13}
-                      show={true}
-                      zIndex={701}
-                    >
-                      <LinkIcon
-                        height={"18px"}
-                        width={"18px"}
-                        color={"var(--white-color)"}
-                      />
-                    </Tooltip>
-                  </div>
-                </div>
-                <div class="tags">
-                  {#each event.types as tag}
-                    <span class="tag {getTagClass(tag)}">
-                      {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
-                    >
-                  {/each}
-                </div>
-                {#if event.plaintextDetails.split(" ").length > 20}
-                  <p
-                    style="font-size: 14px; font-weight:400; line-height:24px; "
-                    class=""
-                  >
-                    {truncateDescription(event.plaintextDetails)}
-                    <span
-                      style="text-decoration: underline; color:#3670F7; border:none; background-color:transparent; cursor:pointer "
-                      class="ms-0"
-                      on:click={() => handleSeeMore(event)}>see more</span
-                    >
-                  </p>
-                {:else}
-                  <p
-                    style="font-size: 14px; font-weight:400; line-height:24px; "
-                    class=""
-                  >
-                    {event.description}
-                  </p>
-                {/if}
-                <div class="d-flex align-items-center justify-content-between">
-                  <p
-                    style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
-                    class="mb-0"
-                    on:click={async () => {
-                      await open(externalSparrowGithub);
-                    }}
-                  >
-                    Github
-                  </p>
 
-                  <div class="d-flex align-items-center gap-2">
-                    <!-- <ThumbIcon height={"18px"} width={"18px"} />
+    {#if isLoading}
+      <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+    {:else}
+      <div>
+        {#if showTimeline}
+          {#if filteredEvents.length > 0}
+            <div class="timeline">
+              {#each filteredEvents as event}
+                <div class="timeline-event">
+                  <div class="timeline-date">
+                    {formatDate(event.publishedAt)}
+                  </div>
+                  <div class="timeline-circle"></div>
+                  <div class="timeline-content">
+                    <div class="d-flex gap-2">
+                      <h3 on:click={() => handleSeeMore(event)}>
+                        {event.title}
+                      </h3>
+                      <div
+                        style="height: 24px; width:24px; cursor:pointer"
+                        on:click={async () => {
+                          await copyToClipBoard(event.url);
+                          notifications.success("Link copied to clipboard!");
+                        }}
+                      >
+                        <Tooltip
+                          title={"Link"}
+                          placement={"right"}
+                          distance={13}
+                          show={true}
+                          zIndex={701}
+                        >
+                          <LinkIcon
+                            height={"18px"}
+                            width={"18px"}
+                            color={"var(--white-color)"}
+                          />
+                        </Tooltip>
+                      </div>
+                    </div>
+                    <div class="tags">
+                      {#each event.types as tag}
+                        <span class="tag {getTagClass(tag)}">
+                          {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
+                        >
+                      {/each}
+                    </div>
+                    {#if event.plaintextDetails.split(" ").length > 20}
+                      <p
+                        style="font-size: 14px; font-weight:400; line-height:24px; "
+                        class=""
+                      >
+                        {truncateDescription(event.plaintextDetails)}
+                        <span
+                          style="text-decoration: underline; color:#3670F7; border:none; background-color:transparent; cursor:pointer "
+                          class="ms-0"
+                          on:click={() => handleSeeMore(event)}>see more</span
+                        >
+                      </p>
+                    {:else}
+                      <p
+                        style="font-size: 14px; font-weight:400; line-height:24px; "
+                        class=""
+                      >
+                        {event.description}
+                      </p>
+                    {/if}
+                    <div
+                      class="d-flex align-items-center justify-content-between"
+                    >
+                      <p
+                        style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
+                        class="mb-0"
+                        on:click={async () => {
+                          await open(externalSparrowGithub);
+                        }}
+                      >
+                        Github
+                      </p>
+
+                      <div class="d-flex align-items-center gap-2">
+                        <!-- <ThumbIcon height={"18px"} width={"18px"} />
                     <div style="color: var(--white-color);">
                       {event.reactions?.like || ""}
                     </div> -->
-                    <div
-                      style="cursor:pointer; border-left:1px solid grey;"
-                      class="ps-2"
-                      on:click={async () => {
-                        await open(externalSparrowLinkedin);
-                      }}
-                    >
-                      <LinkedinIcon height={"18px"} width={"18px"} />
+                        <div
+                          style="cursor:pointer; border-left:1px solid grey;"
+                          class="ps-2"
+                          on:click={async () => {
+                            await open(externalSparrowLinkedin);
+                          }}
+                        >
+                          <LinkedinIcon height={"18px"} width={"18px"} />
+                        </div>
+                      </div>
                     </div>
+                  </div>
+                </div>
+              {/each}
+            </div>
+          {:else}
+            <div
+              class="no-results mt-5 d-flex justify-content-center align-items-center mx-1 text-fs-14 mb-0 text-center"
+              style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+            >
+              <p>No results found</p>
+            </div>
+          {/if}
+        {:else}
+          <div class="d-flex selected-event-detail">
+            <div style="width:23.5%; " class="d-flex mt-2">
+              <div>
+                <div
+                  on:click={handleBack}
+                  style="cursor:pointer; transform: rotate(90deg);"
+                >
+                  <ArrowUnfilledIcon
+                    height={"16px"}
+                    width={"16px"}
+                    color={"var(--white-color )"}
+                  />
+                </div>
+              </div>
+              <div
+                class="ms-2 text-fs-14"
+                style="margin-top:1.5px; color:var(--white-color); font-weight:700;"
+              >
+                {formatDate(selectedEvent.publishedAt)}
+              </div>
+            </div>
+
+            <div class="ms-2 timeline-content">
+              <h3>{selectedEvent.title}</h3>
+              <div class="tags">
+                {#each selectedEvent.types as tag}
+                  <span class="tag {getTagClass(tag)}">
+                    {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
+                  >
+                {/each}
+              </div>
+
+              <p style="font-size: 14px; font-weight:400; " class="mt-3">
+                {@html marked(selectedEvent.markdownDetails)}
+              </p>
+
+              <div
+                class="d-flex align-items-center justify-content-between p-1"
+              >
+                <p
+                  style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
+                  class="mb-0"
+                >
+                  Github
+                </p>
+                <div class="d-flex align-items-center gap-2">
+                  <!-- <ThumbIcon height={"18px"} width={"18px"} />
+              <div style="color: var(--white-color);">
+                {selectedEvent.reactions?.like || ""}
+              </div> -->
+                  <div
+                    style="border-left:1px solid grey;"
+                    class="ps-2"
+                    on:click={async () => {
+                      await open(externalSparrowLinkedin);
+                    }}
+                  >
+                    <LinkedinIcon height={"18px"} width={"18px"} />
                   </div>
                 </div>
               </div>
             </div>
-          {/each}
-        </div>
-      {:else}
-        <div
-          class="no-results mt-5 d-flex justify-content-center align-items-center mx-1 text-fs-14 mb-0 text-center"
-          style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
-        >
-          <p>No results found</p>
-        </div>
-      {/if}
-    {:else}
-      <div class="d-flex selected-event-detail">
-        <div style="width:23.5%; " class="d-flex mt-2">
-          <div>
-            <div
-              on:click={handleBack}
-              style="cursor:pointer; transform: rotate(90deg);"
-            >
-              <ArrowUnfilledIcon
-                height={"16px"}
-                width={"16px"}
-                color={"var(--white-color )"}
-              />
-            </div>
           </div>
-          <div
-            class="ms-2 text-fs-14"
-            style="margin-top:1.5px; color:var(--white-color); font-weight:700;"
-          >
-            {formatDate(selectedEvent.publishedAt)}
-          </div>
-        </div>
-
-        <div class="ms-2 timeline-content">
-          <h3>{selectedEvent.title}</h3>
-          <div class="tags">
-            {#each selectedEvent.types as tag}
-              <span class="tag {getTagClass(tag)}">
-                {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
-              >
-            {/each}
-          </div>
-
-          <p style="font-size: 14px; font-weight:400; " class="mt-3">
-            {@html marked(selectedEvent.markdownDetails)}
-          </p>
-
-          <div class="d-flex align-items-center justify-content-between p-1">
-            <p
-              style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
-              class="mb-0"
-            >
-              Github
-            </p>
-            <div class="d-flex align-items-center gap-2">
-              <!-- <ThumbIcon height={"18px"} width={"18px"} />
-              <div style="color: var(--white-color);">
-                {selectedEvent.reactions?.like || ""}
-              </div> -->
-              <div
-                style="border-left:1px solid grey;"
-                class="ps-2"
-                on:click={async () => {
-                  await open(externalSparrowLinkedin);
-                }}
-              >
-                <LinkedinIcon height={"18px"} width={"18px"} />
-              </div>
-            </div>
-          </div>
-        </div>
+        {/if}
       </div>
     {/if}
   </div>
@@ -389,13 +405,13 @@
     content: "";
     position: absolute;
     width: 1px;
-    background-color: #3670f7;
+    background-color: var(--bg-primary-300);
     top: 0;
     bottom: 0;
     left: 7px;
     margin-left: -1px;
     margin-top: 26px;
-    margin-bottom: 170px;
+    margin-bottom: 175px;
   }
 
   .timeline-event {
@@ -415,7 +431,7 @@
     left: -140px;
     top: 10px;
     font-weight: bold;
-    color: #ffffff;
+    color: var(--white-color);
     width: 120px;
     text-align: right;
     font-weight: 700;
@@ -446,15 +462,15 @@
     font-size: 18px;
     font-weight: 700;
     line-height: 27px;
-    color: #ffffff;
+    color: var(--white-color);
   }
 
   .timeline-content h3:hover {
-    color: #3670f7;
+    color: var(--text-primary-300);
   }
 
   .timeline-content a {
-    color: #3670f7;
+    color: var(--text-primary-300);
     text-decoration: underline;
     margin-right: 10px;
   }
