@@ -75,6 +75,8 @@ export { default as RoadmapIcon } from "./RoadmapIcon.svelte";
 export { default as GroupIcon } from "./GroupIcon.svelte";
 export { default as DocIcon } from "./DocIcon.svelte";
 export { default as ActivityIcon } from "./ActivityIcon.svelte";
+export { default as UpdateIcon } from "./UpdateIcon.svelte";
+
 
 
 

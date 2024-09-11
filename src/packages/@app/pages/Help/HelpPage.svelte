@@ -5,16 +5,13 @@
     FeedbackSection,
     Community,
   } from "@support/features";
+  import { ActivityIcon, DocIcon, GroupIcon, RoadmapIcon, UpdateIcon } from "@library/icons";
   import DiscordPost from "@support/features/discord-post/layout/DiscordPost.svelte";
   import HelpPageViewModel from "./HelpPage.ViewModel";
   import { onMount } from "svelte";
   import { Motion } from "svelte-motion";
   import { pagesMotion } from "@app/constants";
   import Roadmap from "@support/features/roadmap/layout/Roadmap.svelte";
-  import { GroupIcon, RoadmapIcon, StackIcon } from "@library/icons";
-  import UpdateIcon from "@library/icons/UpdateIcon.svelte";
-  import ActivityIcon from "@library/icons/ActivityIcon.svelte";
-  import DocIcon from "@library/icons/DocIcon.svelte";
   import { ReleaseNotes } from "@support/features/release-notes/layout";
 
   const _viewModel = new HelpPageViewModel();
