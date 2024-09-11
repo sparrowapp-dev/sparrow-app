@@ -321,7 +321,7 @@
     </div>
 
     <div
-      class="d-flex align-items-center justify-content-between px-2 pt-3 gap-1"
+      class="d-flex align-items-center justify-content-between ps-2 pt-3 pe-1 gap-1"
     >
       <Input
         id="collection-list-search"
@@ -342,7 +342,7 @@
         style="outline:none;"
         placeholder="Search"
       />
-      <div class="d-flex align-items-center justify-content-center">
+      <div class="d-flex align-items-center justify-content-center d-none">
         <button
           id="filter-btn"
           class="filter-btn btn bg-backgroundDark d-flex align-items-center justify-content-center p-2 d-none
