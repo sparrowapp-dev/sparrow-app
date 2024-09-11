@@ -203,22 +203,25 @@
           }}
           placeholderText={"Filters"}
           zIndex={499}
-            disabled={false}
-            borderType={"none"}
-            borderActiveType={"none"}
-            borderHighlight={"hover-active"}
-            headerHighlight={"hover-active"}
-            headerHeight={"26px"}
-            minBodyWidth={"150px"}
-            minHeaderWidth={"150px"}
-            maxHeaderWidth={"200px"}
-            borderRounded={"2px"}
-            headerTheme={"violet2"}
-            bodyTheme={"violet"}
-            menuItem={"v2"}
-            headerFontSize={"10px"}
-            isDropIconFilled={true}
-            position={"absolute"}
+          disabled={false}
+          iconRequired={true}
+          icon={FilterIcon}
+          iconColor={"var(--white-color)"}
+          borderType={"none"}
+          borderActiveType={"none"}
+          borderHighlight={"hover-active"}
+          headerHighlight={"hover-active"}
+          headerHeight={"26px"}
+          minBodyWidth={"150px"}
+          minHeaderWidth={"150px"}
+          maxHeaderWidth={"200px"}
+          borderRounded={"2px"}
+          headerTheme={"violet2"}
+          bodyTheme={"violet"}
+          menuItem={"v2"}
+          headerFontSize={"10px"}
+          isDropIconFilled={true}
+          position={"absolute"}
         />
       </div>
     </div>
@@ -268,10 +271,10 @@
                   </p>
 
                   <div class="d-flex align-items-center gap-2">
-                    <ThumbIcon height={"18px"} width={"18px"} />
+                    <!-- <ThumbIcon height={"18px"} width={"18px"} />
                     <div style="color: var(--white-color);">
                       {event.reactions?.like || ""}
-                    </div>
+                    </div> -->
                     <div
                       style="cursor:pointer; border-left:1px solid grey;"
                       class="ps-2"
@@ -292,7 +295,7 @@
           class="no-results mt-5 d-flex justify-content-center align-items-center mx-1 text-fs-14 mb-0 text-center"
           style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
         >
-          <p>No results found </p>
+          <p>No results found</p>
         </div>
       {/if}
     {:else}
@@ -338,11 +341,17 @@
               Github
             </p>
             <div class="d-flex align-items-center gap-2">
-              <ThumbIcon height={"18px"} width={"18px"} />
+              <!-- <ThumbIcon height={"18px"} width={"18px"} />
               <div style="color: var(--white-color);">
                 {selectedEvent.reactions?.like || ""}
-              </div>
-              <div style="border-left:1px solid grey;" class="ps-2">
+              </div> -->
+              <div
+                style="border-left:1px solid grey;"
+                class="ps-2"
+                on:click={async () => {
+                  await open(externalSparrowLinkedin);
+                }}
+              >
                 <LinkedinIcon height={"18px"} width={"18px"} />
               </div>
             </div>
@@ -364,7 +373,7 @@
   .search-input-container {
     border: 1px solid var(--border-color);
     background: var(--bg-tertiary-400);
-    height: 26px;;
+    height: 26px;
     width: 300px;
     font-size: 12px;
     position: relative;
