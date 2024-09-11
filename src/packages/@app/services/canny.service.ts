@@ -139,6 +139,15 @@ export class CannyIoService {
     };
 
 
+    /**
+ * Creates a new comment on a post.
+ * 
+ * @param    authorID - The ID of the author making the comment.
+ * @param    postID - The ID of the post on which the comment is made.
+ * @param    value - The content of the comment.
+ * @param    parentID - The ID of the parent comment (if this is a reply).
+ * @returns {Promise<Object>} The response from the server after creating the comment.
+ */
   public createComment = async ( authorID: string, postID: string, value: string, parentID :string) => {
     const response = await makeRequest("POST", `${this.apiUrl}/comments/create`, {
       body: {
@@ -155,7 +164,15 @@ export class CannyIoService {
     return response;
   };
 
-
+/**
+ * Retrieves a list of comments for a specific post.
+ * 
+ * @param  postID - The ID of the post whose comments are being retrieved.
+ * @param  boardID - The ID of the board the post belongs to.
+ * @param  [limit=10] - The maximum number of comments to retrieve.
+ * @param  [skip=0] - The number of comments to skip (used for pagination).
+ * @returns {Promise<Object>} The response from the server with the list of comments.
+ */
   public listComments = async (postID: string, boardID: string, limit = 10, skip = 0) => {
     const response = await makeRequest("POST", `${this.apiUrl}/comments/list`, {
       body: {
@@ -174,6 +191,14 @@ export class CannyIoService {
   };
 
 
+  /**
+ * Creates a vote on a post.
+ * 
+ * @param  postID - The ID of the post to vote on.
+ * @param  voterID - The ID of the user casting the vote.
+ * @returns {Promise<Object>} The response from the server after creating the vote.
+ */
+
   public createVote = async (postID: string, voterID: string) => {
     const response = await makeRequest("POST", `${this.apiUrl}/votes/create`, {
       body: {
@@ -191,6 +216,14 @@ export class CannyIoService {
     console.log("return response of create vote ", response)
   };
 
+
+  /**
+ * Deletes a vote on a post.
+ * 
+ * @param  postID - The ID of the post whose vote is being deleted.
+ * @param  voterID - The ID of the user removing their vote.
+ * @returns {Promise<Object>} The response from the server after deleting the vote.
+ */
   public deleteVote = async (postID: string, voterID: string) => {
     const response = await makeRequest("POST", `${this.apiUrl}/votes/delete`, {
       body: {
@@ -208,7 +241,12 @@ export class CannyIoService {
   };
 
 
-
+/**
+ * Retrieves a list of votes for a post.
+ * 
+ * @param    postID - The ID of the post whose votes are being retrieved.
+ * @returns {Promise<Object>} The response from the server with the list of votes.
+ */
   public listVotes = async (postID: string ) => {
     const response = await makeRequest("POST", `${this.apiUrl}/votes/list`, {
       body: {
@@ -222,8 +260,31 @@ export class CannyIoService {
     });
   
     return response;
-    console.log("This is respones", response)
   };
+
+
+/**
+ * Lists the change log entries of a specified type by making a POST request.
+ *
+ * @param    type - The type of change log entries to fetch (e.g., "new", "fixed","improved").
+ * @returns {Promise<Object>} - A promise that resolves to the response object from the API call.
+ */
+
+  public listChangeLog = async (type:string) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/entries/list`, {
+      body: {
+        apiKey: this.apiKey,
+        type
+              
+      },
+      headers: {
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+      },
+    });
+  
+    return response;
+  };
+  
 
 
 }

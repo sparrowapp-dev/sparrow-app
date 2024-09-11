@@ -48,7 +48,7 @@
     {/if}
     
   </div>
-  <span style="margin-top: 5px; font-size: 14px;">{upvote}</span>
+  <span style="margin-top: 1px; font-size: 14px;">{upvote}</span>
 </div>
 
 <style>
@@ -57,7 +57,7 @@
     flex-direction: column;
     align-items: center;
     border: 0.3px solid #8A9299;
-    padding: 5px;
+    padding: 1px;
     border-radius: 4px;
     cursor: pointer;
     margin-left: 10px;
