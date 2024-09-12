@@ -31,19 +31,22 @@
 </script>
 
 <div class="d-flex flex-column align-items-center">
-  <List classProps={"pb-2 p-1"}>
-    <p class="text-fs-12 text-center" style="color: var(--text-secondary-50)">
-      Add Collections to your Workspace to group your requests or send an API
-      request directly
-    </p>
-    <div class="w-100 mt-3">
+  <List classProps={"pb-2 p-1 w-100"}>
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+      <p
+        class="text-fs-12 text-center w-100"
+        style="color: var(--text-secondary-50)"
+      >
+        Add Collections to your Workspace to group your requests or send an API
+        request directly
+      </p>
+    {/if}
+    <div class="w-100 mt-0">
       {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-        <p
-          class="add-collection d-flex justify-content-center align-items-center border-radius-2 {isAddCollectionDisabled
-            ? 'disabled'
-            : ''}"
+        <button
+          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+          class="bg-transparent w-100 mb-2 add-collection d-flex justify-content-center align-items-center border-radius-2"
           style="color: var(--text-secondary-100);"
-          role="button"
           on:click={() => {
             if (isGuestUser === true) {
               onItemCreated("collection", {
@@ -63,11 +66,10 @@
           <span style="color: var(--text-secondary-200)" class="ps-2 text-fs-12"
             >Add Collection</span
           >
-        </p>
+        </button>
       {/if}
-
       <p
-        class="import-curl d-flex justify-content-center align-items-center border-radius-2"
+        class="import-curl w-100 d-flex justify-content-center align-items-center border-radius-2"
         style="color: var(--text-secondary-100);"
         role="button"
         on:click={() => {

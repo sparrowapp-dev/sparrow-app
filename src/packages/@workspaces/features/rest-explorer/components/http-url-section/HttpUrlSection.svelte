@@ -189,14 +189,15 @@
       disabled={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
         : false}
-      style="background-color: {isSave
+      style="background-color: {isSave ||
+      userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? 'var(--icon-secondary-550)'
         : 'var(--bg-secondary-400)'}; color: white;"
     >
       <DiskIcon
         height={22}
         width={22}
-        color={isSave
+        color={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
           ? "var(--icon-secondary-380)"
           : isHovered && !isSave && !isGuestUser
           ? "var(--icon-primary-200)"

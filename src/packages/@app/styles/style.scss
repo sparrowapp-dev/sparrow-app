@@ -106,7 +106,8 @@ $theme-grey-808080: #808080;
 $theme-grey-636566: #636566;
 $theme-grey-60616B: #60616b;
 $theme-grey-484848: #484848;
-$theme-grey-4D4D4D: #4d4d4d;
+$theme-grey-4D4D4D: #4D4D4D;
+$theme-grey-4e4e4e: #4e4e4e;
 $theme-grey-45494D: #45494d;
 $theme-grey-353646: #353646;
 $theme-grey-333333: #333333;
@@ -121,6 +122,8 @@ $theme-grey-151515: #151515;
 $theme-grey-000000: #000000;
 $theme-grey-191919: #191919;
 $theme-grey-121212: #121212;
+$theme-grey-1D1D20: #1D1D20;
+
 
 $theme-blue-F5F6F8: #f5f6f8;
 $theme-blue-B0B0B0: #b0b0b0;
@@ -476,60 +479,57 @@ $theme-green-8dc599: #8dc599;
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
 
-$theme-colors: map-merge(
-  $theme-colors,
-  (
-    "primaryColor": $sparrow-blue,
-    "recentApiText": $sparrow-recentApiText,
+$theme-colors: map-merge($theme-colors,
+    ("primaryColor": $sparrow-blue,
+      "recentApiText": $sparrow-recentApiText,
 
-    "secondaryColor": $sparrow-yellow,
-    "blackColor": $sparrow-black,
-    "successColor": $sparrow-success,
-    "borderColor": $sparrow-error,
-    "defaultColor": $sparrow-default,
-    "dangerColor": $sparrow-danger,
-    "whiteColor": $sparrow-white,
-    "lightGray": $sparrow-light-gray,
-    "backgroundColor": $sparrow-background,
-    "backgroundLight": $sparrow-background-light,
-    "backgroundDark": $sparrow-background-dark,
-    "backgroundDropdown": $sparrow-background-dropdown,
-    "plusButton": $sparrow-plusbutton,
-    "lightBackground": $sparrow-border-color,
-    "requestBodyColor": $sparrow-request-body,
-    "labelColor": $sparrow-send-button,
-    "buttonBackColor": $sparrow-button-background,
-    "buttonColor": $sparrow-button-color,
-    "redColor": $sparrow-gradient,
-    "getColor": $sparrow-get,
-    "putColor": $sparrow-put,
-    "postColor": $sparrow-post,
-    "deleteColor": $sparrow-delete,
-    "headColor": $sparrow-head,
-    "patchColor": $sparrow-patc,
-    "optionsColor": $sparrow-opt,
-    "textColor": $sparrow-text-color,
-    "keyValuePairColor": $sparrow-key-value-pair,
-    "dullBackground": $sparrow-dull-background,
-    "sparrowBottomBorder": $sparrow-bottom-border,
-    "emailInviteBackgroundColor": $sparrow-email-invite-bg-color,
-    "dropdownBorderColor": $sparrow-dropdown-border-color,
-    "activeSyncBtn": $sparrow-active-sync,
-    "dropdownButton": $sparrow-dropdown,
-    "dropdownHover": $sparrow-dropdown-hover,
-    "dropdownContainer": $sparrow-dropdown-container,
-    "dropdownOptionHover": $sparrow-dropdown-option-hover,
-    "dropdownOptionActive": $sparrow-dropdown-option-active,
-    "saveButtonLine": $sparrow-send-button-line,
+      "secondaryColor": $sparrow-yellow,
+      "blackColor": $sparrow-black,
+      "successColor": $sparrow-success,
+      "borderColor": $sparrow-error,
+      "defaultColor": $sparrow-default,
+      "dangerColor": $sparrow-danger,
+      "whiteColor": $sparrow-white,
+      "lightGray": $sparrow-light-gray,
+      "backgroundColor": $sparrow-background,
+      "backgroundLight": $sparrow-background-light,
+      "backgroundDark": $sparrow-background-dark,
+      "backgroundDropdown": $sparrow-background-dropdown,
+      "plusButton": $sparrow-plusbutton,
+      "lightBackground": $sparrow-border-color,
+      "requestBodyColor": $sparrow-request-body,
+      "labelColor": $sparrow-send-button,
+      "buttonBackColor": $sparrow-button-background,
+      "buttonColor": $sparrow-button-color,
+      "redColor": $sparrow-gradient,
+      "getColor": $sparrow-get,
+      "putColor": $sparrow-put,
+      "postColor": $sparrow-post,
+      "deleteColor": $sparrow-delete,
+      "headColor": $sparrow-head,
+      "patchColor": $sparrow-patc,
+      "optionsColor": $sparrow-opt,
+      "textColor": $sparrow-text-color,
+      "keyValuePairColor": $sparrow-key-value-pair,
+      "dullBackground": $sparrow-dull-background,
+      "sparrowBottomBorder": $sparrow-bottom-border,
+      "emailInviteBackgroundColor": $sparrow-email-invite-bg-color,
+      "dropdownBorderColor": $sparrow-dropdown-border-color,
+      "activeSyncBtn": $sparrow-active-sync,
+      "dropdownButton": $sparrow-dropdown,
+      "dropdownHover": $sparrow-dropdown-hover,
+      "dropdownContainer": $sparrow-dropdown-container,
+      "dropdownOptionHover": $sparrow-dropdown-option-hover,
+      "dropdownOptionActive": $sparrow-dropdown-option-active,
+      "saveButtonLine": $sparrow-send-button-line,
 
-    "sparrowBgContainer": $sparrow-bg-container,
-    "sparrowBgContainerBorder": $sparrow-bg-container-border,
-    "sparrowBgContainerOne": $sparrow-bg-container-one,
-    "sparrowBgContainerTwo": $sparrow-bg-container-two,
-    "sparrowBgContainerThree": $sparrow-bg-container-three,
-    "sparrowBgContainerFour": $sparrow-bg-container-four,
-  )
-);
+      "sparrowBgContainer": $sparrow-bg-container,
+      "sparrowBgContainerBorder": $sparrow-bg-container-border,
+      "sparrowBgContainerOne": $sparrow-bg-container-one,
+      "sparrowBgContainerTwo": $sparrow-bg-container-two,
+      "sparrowBgContainerThree": $sparrow-bg-container-three,
+      "sparrowBgContainerFour": $sparrow-bg-container-four,
+    ));
 
 // Define a map for font sizes in pixels
 $sparrow-font-sizes: (
@@ -890,3 +890,9 @@ span {
 textarea {
   resize: none;
 }
+
+button:disabled{
+  pointer-events: none !important;
+  opacity: 0.7;
+}
+

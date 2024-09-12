@@ -437,6 +437,7 @@
                           (isImportCollectionPopup = true)}
                         onItemCreated={_viewModel.handleCreateItem}
                         {isGuestUser}
+                        {userRole}
                       />
                     </div>
                   </Motion>
