@@ -5,3 +5,14 @@ export enum FeedbackType {
   ALL_CATEGORY = "Uncategorized",
   CATEGORY = "Category",
 }
+
+
+export enum FeedbackStatusType {
+  OPEN = "open",
+  COMPLETED = "complete",
+  IN_PROGRESS = "in progress",
+  PLANNED = "planned",
+  UNDER_REVIEW = "under review",
+  ALL_STATUS = "all status",
+}
+

@@ -3,26 +3,37 @@
     AddFeedback,
     DiscordCard,
     FeedbackSection,
-    FeedbackToast,
-    ReleaseNotes,
+    Community,
   } from "@support/features";
+  import {
+    ActivityIcon,
+    DocIcon,
+    GroupIcon,
+    RoadmapIcon,
+    UpdateIcon,
+  } from "@library/icons";
   import DiscordPost from "@support/features/discord-post/layout/DiscordPost.svelte";
   import HelpPageViewModel from "./HelpPage.ViewModel";
   import { onMount } from "svelte";
   import { Motion } from "svelte-motion";
   import { pagesMotion } from "@app/constants";
+  import Roadmap from "@support/features/roadmap/layout/Roadmap.svelte";
+  import { ReleaseNotes } from "@support/features/release-notes/layout";
+  import ActivitySection from "@support/features/activity-section/ActivitySection.svelte";
 
   const _viewModel = new HelpPageViewModel();
 
+  let listVotes = [];
+
   document.addEventListener("contextmenu", (event) => event.preventDefault());
 
-  let activeTab = "feedback";
+  let parentPostOpen = false;
   let isPostopenFromActivity = false;
   let postIdFromActivity;
+  let activeTab = "roadmap";
 
   function setActiveTab(tab) {
     if (tab !== "faq") {
-      // Disable FAQ tab
       activeTab = tab;
     }
   }
@@ -45,29 +56,95 @@
     if (pathname.includes("app/help/updates")) {
       activeTab = "updates";
     } else {
-      activeTab = "feedback";
+      activeTab = "roadmap";
     }
   });
+
+  $: {
+    parentPostOpen = true;
+  }
 </script>
 
 <Motion {...pagesMotion} let:motion>
   <div class="h-100" use:motion>
     <div class="h-100 d-flex flex-column">
-      <!--
-        --  Help Navigator
-      -->
+      <!----Help Navigator-->
       <div class="tabs px-3">
         <div
-          class="tab {activeTab === 'feedback' ? 'active' : ''}"
+          class="tab d-flex align-items-center gap-2 {activeTab === 'roadmap'
+            ? 'active'
+            : ''}"
+          on:click={() => setActiveTab("roadmap")}
+        >
+          <RoadmapIcon
+            height={"17px"}
+            width={"17px"}
+            color={activeTab === "roadmap"
+              ? "var(--text-primary-300)"
+              : "var( --white-color )"}
+          />
+          Roadmap
+        </div>
+        <div
+          class="tab align-items-center gap-2 {activeTab === 'feedback'
+            ? 'active'
+            : ''}"
           on:click={() => setActiveTab("feedback")}
         >
+          <DocIcon
+            height={"17px"}
+            width={"17px"}
+            color={activeTab === "feedback"
+              ? "var(--text-primary-300)"
+              : "var( --white-color )"}
+          />
           Feedback
         </div>
         <div
-          class="tab {activeTab === 'updates' ? 'active' : ''}"
+          class="tab align-items-center gap-2 {activeTab === 'updates'
+            ? 'active'
+            : ''}"
           on:click={() => setActiveTab("updates")}
         >
+          <UpdateIcon
+            height={"17px"}
+            width={"17px"}
+            color={activeTab === "updates"
+              ? "var(--text-primary-300)"
+              : "var( --white-color )"}
+          />
           Updates
+        </div>
+        <div
+          class="tab align-items-center gap-2 {activeTab === 'community'
+            ? 'active'
+            : ''}"
+          on:click={() => setActiveTab("community")}
+        >
+          <GroupIcon
+            height={"17px"}
+            width={"17px"}
+            color={activeTab === "community"
+              ? "var(--text-primary-300)"
+              : "var( --white-color )"}
+          />
+          Community
+        </div>
+
+        <div
+          class="tab align-items-center gap-2 {activeTab === 'myActivity'
+            ? 'active'
+            : ''}"
+          on:click={() => setActiveTab("myActivity")}
+        >
+          <ActivityIcon
+            height={"17px"}
+            width={"17px"}
+            color={activeTab === "myActivity"
+              ? "var(--text-primary-300)"
+              : "var( --white-color )"}
+          />
+          My Activity
         </div>
       </div>
       <!--
@@ -81,25 +158,41 @@
           style="width: calc(100% - 274px );"
           class="ps-3 pe-2 pt-3 pb-2 h-100"
         >
-          <div class="h-100 pe-2" style="overflow:auto;">
+          <div class=" h-100 pe-2" style="margin-left:34px; overflow:auto;">
             {#if activeTab === "feedback"}
-              <!-- <FeedbackToast />
-              <DiscordPost /> -->
               <FeedbackSection
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
                 fetchPosts={_viewModel.getListOfPOsts}
                 onRetrievePost={_viewModel.retrievePostData}
+                onAddComment={_viewModel.addComment}
+                fetchComments={_viewModel.listComments}
+                currentUser={_viewModel.createUser}
+                createVote={_viewModel.CreateVote}
+                deleteVote={_viewModel.deleteVote}
+                listVote={_viewModel.listVote}
                 {postIdFromActivity}
                 {isPostopenFromActivity}
+                {parentPostOpen}
               />
             {:else if activeTab === "updates"}
               <ReleaseNotes
+                listChangeLog={_viewModel.listChangeLog}
+                {releaseNotesData}
+                onLearnMore={_viewModel.learnMore}
+              />
+            {:else if activeTab === "roadmap"}
+              <Roadmap fetchPosts={_viewModel.getListOfPOsts} />
+            {:else if activeTab === "community"}
+              <Community />
+              <DiscordPost />
+            {:else if activeTab === "myActivity"}
+              <ActivitySection
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
                 fetchPosts={_viewModel.getUserPosts}
                 onRetrievePost={_viewModel.retrievePostData}
-                fetchComments={_viewModel.retreiveComments}
+                fetchComments={_viewModel.retrieveUserComments}
                 fetchLikedPosts={_viewModel.retrieveUserVotes}
                 {setActiveTabFromActivity}
               />
@@ -112,7 +205,6 @@
               <AddFeedback
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
-                onSendFeedback={_viewModel.sendFeedback}
               />
             </div>
             <div>

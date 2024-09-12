@@ -60,7 +60,7 @@
     color: var(--request-delete);
   }
   .green-api {
-    color: var(--request-get);
+    color: var(--icon-success-100);
   }
   .yellow-api {
     color: var(--request-post);

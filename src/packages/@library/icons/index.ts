@@ -63,9 +63,22 @@ export { default as DustbinIcon } from "./Dustbin.svelte";
 export { default as ArrowUpward } from "./ArrowUpward.svelte";
 export { default as ArrowDownward } from "./ArrowDownward.svelte";
 export { default as DownloadIcon } from "./Download.svelte";
+export { default as TickIcon } from "./Tick.svelte";
 export { default as Help } from "./Help.svelte";
 export { default as CategoryIcon } from "./Category.svelte";
+export { default as LogoSymbol } from "./LogoSymbol.svelte";
 export { default as SortIcon } from "./Sort.svelte";
 export { default as TriangleIcon } from "./Triangle.svelte";
 export { default as CommentIcon } from "./Comment.svelte";
 export { default as StatusIcon } from "./Status.svelte";
+export { default as RoadmapIcon } from "./RoadmapIcon.svelte";
+export { default as GroupIcon } from "./GroupIcon.svelte";
+export { default as DocIcon } from "./DocIcon.svelte";
+export { default as ActivityIcon } from "./ActivityIcon.svelte";
+export { default as UpdateIcon } from "./UpdateIcon.svelte";
+
+
+
+
+
+

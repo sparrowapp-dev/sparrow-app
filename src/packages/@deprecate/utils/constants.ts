@@ -20,6 +20,7 @@ const constants = {
   CANNY_URL: import.meta.env.VITE_CANNY_URL,
   AZURE_INSIGHTS_CONNECTION_STRING: import.meta.env
     .VITE_AZURE_INSIGHTS_CONNECTION_STRING,
+  BASE_URL: import.meta.env.VITE_BASE_URL,
 };
 
 export default constants;
