@@ -20,10 +20,10 @@
 
   export let isPostopen;
   export let userInfo;
-  export let id;
   export let onRetrievePost;
   export let onAddComment;
   export let fetchComments;
+  export let postId;
 
   let post = [];
   let currentImage = "";
@@ -68,19 +68,16 @@
   }
 
   const logMessage = async () => {
-    comments = await fetchComments(id);
+    comments = await fetchComments(postId);
     nestedComments = nestComments(comments);
   };
 
   onMount(async () => {
-    isLoading = true;
-    const res = await onRetrievePost(id);
+    const res = await onRetrievePost(postId);
     post = await res?.data;
     createdAt = timeAgo(post?.created);
     postImages = post?.imageURLs;
-    comments = await fetchComments(id);
-    isLoading = false;
-    console.log("This is post", post);
+    comments = await fetchComments(postId);
   });
 
   $: {
@@ -105,221 +102,218 @@
   };
 </script>
 
-{#if isLoading}
-  <div class="mt-5">
-    <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+<div class="d-flex flex-row" style="margin-top: 51px; ">
+  <!-- Back Button -->
+  <div
+    class="back-button"
+    on:click={() => {
+      isPostopen = false;
+    }}
+  >
+    <LeftIcon color={"#FFFFFF"} />
+    <span class="px-2" style="font-size: 14px;">back</span>
   </div>
-{:else}
-  <div class="d-flex flex-row" style="margin-top: 51px; ">
-    <!-- Back Button -->
-    <div
-      class="back-button"
-      on:click={() => {
-        isPostopen = false;
-      }}
-    >
-      <LeftIcon color={"#FFFFFF"} />
-      <span class="px-2" style="font-size: 14px;">back</span>
-    </div>
 
-    <!-- Post Card -->
+  <!-- Post Card -->
 
-    <div style="gap:26px; width:calc(100% - 187px ); ">
-      <div>
-        <div
-          class="flex-column"
-          style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
+  <div style="gap:26px; width:calc(100% - 187px ); ">
+    <div>
+      <div
+        class="flex-column"
+        style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
+      >
+        <span style="font-size: 18px; font-weight: 700;">{post?.title}</span>
+        <span
+          class="px-2"
+          style="border:0.2px solid #DF77F9 ; color:#DF77F9; padding-bottom: 14px; border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
         >
-          <span style="font-size: 18px; font-weight: 700;">{post?.title}</span>
-          <span
-            class="px-2"
-            style="border:0.2px solid #DF77F9 ; color:#DF77F9; padding-bottom: 14px; border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
-          >
-            {post?.status
-              ? post.status.charAt(0).toUpperCase() + post.status.slice(1)
-              : ""}</span
-          >
-        </div>
+          {post?.status
+            ? post.status.charAt(0).toUpperCase() + post.status.slice(1)
+            : ""}</span
+        >
+      </div>
 
-        <div class="d-flex flex-row">
-          <div
-            style="display: flex; flex-direction: column; gap: 1px; min-height:80px; width:calc(100% - 37px);"
-          >
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <IconFallback
-                character={post.author?.name?.charAt(0)}
-                width="34px"
-                height="32px"
-                backgroundColor="#1C1D2B"
-                borderColor="#45494D"
-              />
-              <div style="font-size: 14px; font-weight: 500;">
-                {post.author?.name}
-              </div>
+      <div class="d-flex flex-row">
+        <div
+          style="display: flex; flex-direction: column; gap: 1px; min-height:80px; width:calc(100% - 37px);"
+        >
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <IconFallback
+              character={post.author?.name?.charAt(0)}
+              width="34px"
+              height="32px"
+              backgroundColor="#1C1D2B"
+              borderColor="#45494D"
+            />
+            <div style="font-size: 14px; font-weight: 500;">
+              {post.author?.name}
             </div>
-            <div class="text-fs-12" style=" padding-left:45px; font-weight:400;">
-              {post?.details}
-            </div>
-            <div class="ms-4 ps-3">
-              <div>
-                {#each postImages as postImage}
+          </div>
+          <div class="text-fs-12" style=" padding-left:45px; font-weight:400;">
+            {post?.details}
+          </div>
+          <div class="ms-4 ps-3">
+            <div>
+              {#each postImages as postImage}
+                <img
+                  on:click={() => {
+                    isImageOpen = true;
+                    currentImage = postImage;
+                  }}
+                  src={postImage}
+                  alt="post image"
+                  style="display:inline; height: 100px; margin-top: 20px; border-radius: 2px; margin:10px;"
+                />
+                <ImageModal
+                  isOpen={isImageOpen}
+                  type={"dark"}
+                  width={"40%"}
+                  zIndex={10000}
+                  handleModalState={(flag = false) => {
+                    isImageOpen = flag;
+                  }}
+                >
                   <img
-                    on:click={() => {
-                      isImageOpen = true;
-                      currentImage = postImage;
-                    }}
-                    src={postImage}
+                    src={currentImage}
                     alt="post image"
-                    style="display:inline; height: 100px; margin-top: 20px; border-radius: 2px; margin:10px;"
+                    style="width:100%; height:100%;"
                   />
-                  <ImageModal
-                    isOpen={isImageOpen}
-                    type={"dark"}
-                    width={"40%"}
-                    zIndex={10000}
-                    handleModalState={(flag = false) => {
-                      isImageOpen = flag;
-                    }}
-                  >
-                    <img
-                      src={currentImage}
-                      alt="post image"
-                      style="width:100%; height:100%;"
-                    />
-                  </ImageModal>
-                {/each}
-              </div>
+                </ImageModal>
+              {/each}
+            </div>
 
-              <div
-                style="display: flex; align-items: center; font-size: 12px; margin-top:10px; color:#999999 !important;"
-              >
-                <span style="padding-left:4px;">{createdAt} </span>
-                <span class="px-2">|</span>
-                <!-- <span
+            <div
+              style="display: flex; align-items: center; font-size: 12px; margin-top:10px; color:#999999 !important;"
+            >
+              <span style="padding-left:4px;">{createdAt} </span>
+              <span class="px-2">|</span>
+              <!-- <span
                   class="px-2"
                   on:click={() => {
                     isExposeFeedbackForm = true;
                   }}>Edit post</span
                 > -->
-              </div>
             </div>
-          </div>
-
-          <div class="mt-1">
-            <UpvoteIcon upvote={post?.score} />
           </div>
         </div>
 
-        <!-- Add comment input -->
-        <div
-          class={`d-flex align-items-center search-input-container  mb-5 mt-3 px-2 mb-2`}
-        >
-          <input
-            type="text"
-            id="search-input"
-            class={`bg-transparent w-100 border-0 my-auto`}
-            placeholder="Leave a comment"
-            on:input={(e) => {
-              commentValue = e.target.value;
-            }}
-            bind:value={commentValue}
-          />
-
-          <div class="d-flex align-items-center gap-2">
-            <AttachmentIcon
-              height={"12px"}
-              width={"12px"}
-              color={"var(--text-secondary-200)"}
-            />
-
-            <Button
-              title={`Add`}
-              type={`primary`}
-              loaderSize={17}
-              textStyleProp={"font-size: var(--small-text)"}
-              buttonClassProp={`ps-2`}
-              buttonStyleProp={`height: 20px; width:35px; rounded;`}
-              onClick={async () => {
-                await onAddComment(id, commentValue, null);
-                comments = await fetchComments(id);
-                commentValue = "";
-              }}
-              disable={commentValue.length == 0}
-            />
-          </div>
+        <div class="mt-1">
+          <UpvoteIcon upvote={post?.score} />
         </div>
+      </div>
 
-        <!-- Commnet activity section -->
-        {#if nestedComments.length > 0}
-          <div>
-            <div class="d-flex align-items-center justify-content-between mb-3">
-              <h6>Activity Feed</h6>
+      <!-- <div>
+          <UpvoteIcon upvote={post?.score} />
+        </div> -->
+    </div>
 
-              <Select
-                data={[
-                  {
-                    name: "New First ",
-                    id: FeedbackStatusType.OPEN,
-                  },
-                  {
-                    name: "Old First",
-                    id: FeedbackStatusType.COMPLETED,
-                  },
-                ]}
-                onclick={(id = "") => {
-                  type = id;
-                  handleSortChange();
-                  console.log("Test");
-                }}
-                titleId={type}
-                placeholderText={"Sort By"}
-                zIndex={499}
-                disabled={false}
-                iconRequired={true}
-                icon={SortIcon}
-                borderType={"none"}
-                borderActiveType={"none"}
-                borderHighlight={"hover-active"}
-                headerHighlight={"hover-active"}
-                headerHeight={"26px"}
-                minBodyWidth={"150px"}
-                minHeaderWidth={"150px"}
-                maxHeaderWidth={"200px"}
-                borderRounded={"2px"}
-                headerTheme={"violet2"}
-                bodyTheme={"violet"}
-                menuItem={"v2"}
-                headerFontSize={"10px"}
-                isDropIconFilled={true}
-                position={"absolute"}
-              />
-            </div>
+    <!-- Add comment input -->
+    <div
+      class={`d-flex align-items-center search-input-container  mb-5 mt-3 px-2 mb-2`}
+    >
+      <input
+        type="text"
+        id="search-input"
+        class={`bg-transparent w-100 border-0 my-auto`}
+        placeholder="Leave a comment"
+        on:input={(e) => {
+          commentValue = e.target.value;
+        }}
+        bind:value={commentValue}
+      />
 
-            <!-- List of comments -->
-            <div>
-              {#each nestedComments as comment}
-                <CommentCard
-                  {onAddComment}
-                  {userInfo}
-                  {comment}
-                  {fetchComments}
-                  {logMessage}
-                />
-              {/each}
-            </div>
-          </div>
-        {:else}
-          <p
-            class="mx-1 text-fs-12 mb-0 text-center"
-            style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
-          >
-            No Comments Yet
-          </p>
-        {/if}
+      <div class="d-flex align-items-center gap-2">
+        <AttachmentIcon
+          height={"12px"}
+          width={"12px"}
+          color={"var(--text-secondary-200)"}
+        />
+
+        <Button
+          title={`Add`}
+          type={`primary`}
+          loaderSize={17}
+          textStyleProp={"font-size: var(--small-text)"}
+          buttonClassProp={`ps-2`}
+          buttonStyleProp={`height: 20px; width:35px; rounded;`}
+          onClick={async () => {
+            await onAddComment(postId, commentValue, null);
+            comments = await fetchComments(postId);
+            commentValue = "";
+          }}
+          disable={commentValue.length == 0}
+        />
       </div>
     </div>
+    {#if nestedComments.length > 0}
+      <div>
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h6>Activity Feed</h6>
+
+          <Select
+            data={[
+              {
+                name: "New First ",
+                id: FeedbackStatusType.OPEN,
+              },
+              {
+                name: "Old First",
+                id: FeedbackStatusType.COMPLETED,
+              },
+            ]}
+            onclick={(id = "") => {
+              type = id;
+              handleSortChange();
+              console.log("Test");
+            }}
+            titleId={type}
+            placeholderText={"Sort By"}
+            zIndex={499}
+            disabled={false}
+            iconRequired={true}
+            icon={SortIcon}
+            borderType={"none"}
+            borderActiveType={"none"}
+            borderHighlight={"hover-active"}
+            headerHighlight={"hover-active"}
+            headerHeight={"26px"}
+            minBodyWidth={"150px"}
+            minHeaderWidth={"150px"}
+            maxHeaderWidth={"200px"}
+            borderRounded={"2px"}
+            headerTheme={"violet2"}
+            bodyTheme={"violet"}
+            menuItem={"v2"}
+            headerFontSize={"10px"}
+            isDropIconFilled={true}
+            position={"absolute"}
+          />
+        </div>
+
+        <!-- List of comments -->
+        <div>
+          {#each nestedComments as comment}
+            <CommentCard
+              {postId}
+              {onAddComment}
+              {userInfo}
+              {comment}
+              {fetchComments}
+              {logMessage}
+            />
+          {/each}
+        </div>
+      </div>
+    {:else}
+      <p
+        class="mx-1 text-fs-12 mb-0 text-center"
+        style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+      >
+        No Comments Yet
+      </p>
+    {/if}
   </div>
-{/if}
+</div>
 
 <Modal
   title={"Edit Feedback"}
@@ -457,7 +451,7 @@
       </div>
     </div>
   </div>
-  <div class="d-flex align-items-center justify-content-between">
+  <!-- <div class="d-flex align-items-center justify-content-between">
     <div class="d-flex">
       <Button
         type={"violet"}
@@ -511,7 +505,7 @@
         }}
       />
     </div>
-  </div>
+  </div> -->
 </Modal>
 
 <style>

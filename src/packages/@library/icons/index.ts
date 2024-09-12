@@ -76,9 +76,7 @@ export { default as GroupIcon } from "./GroupIcon.svelte";
 export { default as DocIcon } from "./DocIcon.svelte";
 export { default as ActivityIcon } from "./ActivityIcon.svelte";
 export { default as UpdateIcon } from "./UpdateIcon.svelte";
-
-
-
-
-
-
+export { default as LinkedinIcon } from "./LinkedinIcon.svelte";
+export { default as ThumbIcon } from "./ThumbIcon.svelte";
+export { default as FilterIcon } from "./FilterIcon.svelte";
+export { default as LinkIcon } from "./LinkIcon.svelte";

@@ -8,6 +8,7 @@
   export let onAddComment;
   export let fetchComments;
   export let logMessage;
+  export let postId;
   const isAuthor = userInfo?.email === comment?.author?.email;
 
   let parentID = comment?.id;
@@ -15,7 +16,7 @@
   function timeAgo(createdTime) {
     const now = new Date();
     const commentTime = new Date(createdTime);
-    const difference = now - commentTime; // difference in milliseconds
+    const difference = now - commentTime;
     const hours = Math.floor(difference / (1000 * 60 * 60)); // convert to hours
 
     if (hours < 1) {
@@ -99,22 +100,22 @@
             buttonClassProp={`ps-2`}
             buttonStyleProp={`height: 20px; width:35px; rounded;`}
             onClick={async () => {
-              await onAddComment(comment.post.id, commentValue, comment?.id);
+              await onAddComment(postId, commentValue, comment?.id);
               logMessage();
               commentValue = "";
               setTimeout(() => {
                 isReplying = false;
               }, 3000);
             }}
-              disable={commentValue.length == 0}
-              />
+            disable={commentValue.length == 0}
+          />
         </div>
       </div>
     {/if}
 
     <!-- Check if the comment has replies and render them recursively -->
     {#if comment.replies && comment.replies.length > 0}
-      <div >
+      <div>
         {#each comment.replies as reply}
           <CommentCard
             {onAddComment}
@@ -196,7 +197,7 @@
     position: relative;
     border: 1px solid transparent;
   }
- 
+
   .search-input-container:focus-within {
     border-color: #636566;
     caret-color: var(--border-primary-300);
