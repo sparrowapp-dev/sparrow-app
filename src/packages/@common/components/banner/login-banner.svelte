@@ -48,7 +48,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* gap: 20px; */
   }
   .cross-btn-div {
     margin-right: 25px;
