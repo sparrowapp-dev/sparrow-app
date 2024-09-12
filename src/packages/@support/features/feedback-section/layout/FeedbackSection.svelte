@@ -271,7 +271,7 @@
         <div style="width: 77%;">
           <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
         </div>
-      {:else if posts.length > 0}
+      {:else if posts?.length > 0}
         <div
           class="posts d-flex flex-column"
           style="gap:26px; width:calc(100% - 187px );"

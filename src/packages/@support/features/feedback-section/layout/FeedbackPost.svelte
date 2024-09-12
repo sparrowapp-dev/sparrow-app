@@ -195,12 +195,12 @@
               >
                 <span style="padding-left:4px;">{createdAt} </span>
                 <span class="px-2">|</span>
-                <span
+                <!-- <span
                   class="px-2"
                   on:click={() => {
                     isExposeFeedbackForm = true;
                   }}>Edit post</span
-                >
+                > -->
               </div>
             </div>
           </div>
