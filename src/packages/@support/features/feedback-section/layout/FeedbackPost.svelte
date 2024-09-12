@@ -20,10 +20,10 @@
 
   export let isPostopen;
   export let userInfo;
-  export let id;
   export let onRetrievePost;
   export let onAddComment;
   export let fetchComments;
+  export let   postId;
 
   let post = [];
   let currentImage = "";
@@ -73,11 +73,11 @@
   };
 
   onMount(async () => {
-    const res = await onRetrievePost(id);
+    const res = await onRetrievePost(   postId);
     post = await res?.data;
     createdAt = timeAgo(post?.created);
     postImages = post?.imageURLs;
-    comments = await fetchComments(id);
+    comments = await fetchComments(  postId);
   });
 
   $: {
@@ -92,7 +92,7 @@
   <div
     class="back-button"
     on:click={() => {
-      isPostopen = false;
+      isPostopen = false;      
     }}
   >
     <LeftIcon color={"#FFFFFF"} />
@@ -206,8 +206,8 @@
             buttonClassProp={`ps-2`}
             buttonStyleProp={`height: 20px; width:35px; rounded;`}
             onClick={async () => {
-              await onAddComment(id, commentValue, null);
-              comments = await fetchComments(id);
+              await onAddComment(   postId, commentValue, null);
+              comments = await fetchComments(   postId);
               commentValue = "";
             }}
             disable={commentValue.length == 0}
@@ -261,6 +261,7 @@
           <div>
             {#each nestedComments as comment}
               <CommentCard
+              {  postId}
                 {onAddComment}
                 {userInfo}
                 {comment}

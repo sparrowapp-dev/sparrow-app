@@ -8,6 +8,7 @@
   import Paragraph from "@editorjs/paragraph";
   import edjsParser from "editorjs-parser";
   import { onMount } from "svelte";
+  import { MarkdownFormatter } from "@common/utils";
   /**
    * add commments like this
    */
@@ -39,10 +40,16 @@
   let editor: EditorJS;
 
   const parser = new edjsParser();
-  onMount(() => {
+  onMount(async () => {
     let parsedValue = [];
     if (value) {
-      parsedValue = JSON.parse(value);
+      try {
+        parsedValue = JSON.parse(value) || [];
+      } catch (e) {
+        const formatter = new MarkdownFormatter();
+        const editorData = await formatter.FormatData(value);
+        parsedValue = editorData?.blocks || [];
+      }
     }
     editor = new EditorJS({
       holder: id,
@@ -98,18 +105,29 @@
   };
 
   // Reactive statement to update the editor when certain conditions change - When doc is generating.
+  const docRerender = async () => {
+    if (editor) {
+      if (editor?.blocks) {
+        editor.blocks.clear();
+      }
+      if (editor?.render) {
+        let renderObject = [];
+        try {
+          renderObject = JSON?.parse(value) || [];
+        } catch (e) {
+          const formatter = new MarkdownFormatter();
+          const editorData = await formatter.FormatData(value);
+          renderObject = editorData?.blocks || [];
+        }
+        editor.render({
+          blocks: renderObject,
+        });
+      }
+    }
+  };
   $: {
     if (value && isReadOnly) {
-      if (editor) {
-        if (editor?.blocks) {
-          editor.blocks.clear();
-        }
-        if (editor?.render) {
-          editor.render({
-            blocks: JSON.parse(value),
-          });
-        }
-      }
+      docRerender();
     }
   }
 </script>
