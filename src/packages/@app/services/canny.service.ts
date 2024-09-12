@@ -247,11 +247,11 @@ export class CannyIoService {
  * @param    postID - The ID of the post whose votes are being retrieved.
  * @returns {Promise<Object>} The response from the server with the list of votes.
  */
-  public listVotes = async (postID: string ) => {
+  public listVotes = async (userID: string ) => {
     const response = await makeRequest("POST", `${this.apiUrl}/votes/list`, {
       body: {
         apiKey: this.apiKey,
-        postID,
+        userID,
        
       },
       headers: {

@@ -5,35 +5,34 @@
 
   export let upvote: number; // Current upvote count
   export let postID: string; // Post ID
-  export let hasUpvoted: boolean = false; // Track if the user has upvoted
   export let likePost: (postId: string) => void; // Function to call `Upvote`
   export let dislikePost: (postId: string) => void; // Function to call `UndoUpvote`
-  export let authordId: string;
   export let handleUpvote;
 
-  let upvoteValue = upvote;
+  export let isPostLiked;
+
 
   const handleClick = () => {
-    if (hasUpvoted) {
+    if (isPostLiked) {
       dislikePost(postID);
-      handleUpvote(); // Remove upvote
+      upvote--;
     } else {
-      likePost(postID); // Add upvote
-      handleUpvote();
+      likePost(postID);
+      upvote++; 
     }
-    hasUpvoted = !hasUpvoted; // Toggle the upvote state
+    isPostLiked = !isPostLiked; // Toggle the upvote state
   };
 </script>
 
 <div
-  class={hasUpvoted
+  class={isPostLiked
     ? "upvote-container upvoted"
     : "upvote-container not-upvoted"}
   style="background-color: {backgroundColor}"
   on:click={handleClick}
 >
   <div style="height: 22px; width: 24px; text-align: center;">
-    {#if hasUpvoted}
+    {#if isPostLiked}
       <TriangleIcon height={"10px"} width={"10px"} color={"blue"} />
     {:else}
       <TriangleIcon height={"10px"} width={"10px"} color={"white"} />

@@ -73,8 +73,8 @@
 
   onMount(async () => {
     const response = await fetchPosts();
-    if (response?.data?.posts) {
-      transformPostsToProductStatus(response.data.posts);
+    if (response) {
+      transformPostsToProductStatus(response);
     }
   });
 </script>

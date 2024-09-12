@@ -46,11 +46,8 @@
   ) => {
     currentSort = sortType;
     isLoading = true;
-    const listPosts = await fetchPosts(sortType, searchQuery, status);
-    posts = listPosts?.data?.posts;
+    posts = await fetchPosts(sortType, searchQuery, status);
     isLoading = false;
-    // votelist = await listVote(post.id);
-    // console.log("THis is votelist", votelist);
   };
 
   const defaultStaus = "open,under review,planned,in progress,complete";
@@ -105,7 +102,6 @@
 <div style="margin: 8px 46px 0 34px;">
   <FeedbackDefault {onAddFeedback} {userInfo} {onInputFeedback} />
   {#if !isPostopen}
-
     <div
       class="d-flex"
       style=" margin-top:38px; justify-content: space-between;"
@@ -272,10 +268,10 @@
       </div>
 
       {#if isLoading}
-         <div style="width: 77%;"> <Loader loaderSize={"20px"} loaderMessage="Please Wait..." /></div>
-      {:else}
-
-        {#if posts.length > 0}
+        <div style="width: 77%;">
+          <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+        </div>
+      {:else if posts.length > 0}
         <div
           class="posts d-flex flex-column"
           style="gap:26px; width:calc(100% - 187px );"
@@ -310,7 +306,8 @@
                 </div>
 
                 <UpvoteIcon
-                   backgroundColor={"transparent"}
+                  isPostLiked={post.isPostLiked}
+                  backgroundColor={"transparent"}
                   {handleUpvote}
                   authordId={post.author.id}
                   postID={post.id}
@@ -341,14 +338,13 @@
             </div>
           {/each}
         </div>
-        {:else}
+      {:else}
         <p
-        class=" text-fs-12 mb-0 text-center"
-        style=" margin-left:250px; margin-top:45px; font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
-      >
-        No Result Found
-      </p>
-        {/if}
+          class=" text-fs-12 mb-0 text-center"
+          style=" margin-left:250px; margin-top:45px; font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+        >
+          No Result Found
+        </p>
       {/if}
     </div>
   {/if}
