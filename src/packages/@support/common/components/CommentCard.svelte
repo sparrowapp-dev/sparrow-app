@@ -106,7 +106,8 @@
                 isReplying = false;
               }, 3000);
             }}
-          />
+              disable={commentValue.length == 0}
+              />
         </div>
       </div>
     {/if}

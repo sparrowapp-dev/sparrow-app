@@ -14,6 +14,7 @@
     FeedbackStatusType,
   } from "@support/common/types/feedback";
   import { tickIcon } from "@library/forms/select/svgs";
+  import { Loader } from "@library/ui";
   export let onInputFeedback;
   export let onAddFeedback;
   export let fetchPosts;
@@ -33,6 +34,7 @@
   let posts = [];
   let userInfo: any = {};
   let votelist = [];
+  let isLoading = false;
   user.subscribe((value) => {
     userInfo = value;
   });
@@ -43,8 +45,10 @@
     status: string,
   ) => {
     currentSort = sortType;
+    isLoading = true;
     const listPosts = await fetchPosts(sortType, searchQuery, status);
     posts = listPosts?.data?.posts;
+    isLoading = false;
     // votelist = await listVote(post.id);
     // console.log("THis is votelist", votelist);
   };
@@ -88,10 +92,12 @@
       await getPosts(currentSort, searchTerm, status);
     } else {
       // Fetch and filter posts by the selected category
+      isLoading = true;
       const listPosts = await fetchPosts(currentSort, searchTerm, status);
       posts = listPosts?.data?.posts.filter(
         (post) => post?.category?.name === selectedCategory,
       );
+      isLoading = false;
     }
   };
 </script>
@@ -99,6 +105,7 @@
 <div style="margin: 8px 46px 0 34px;">
   <FeedbackDefault {onAddFeedback} {userInfo} {onInputFeedback} />
   {#if !isPostopen}
+
     <div
       class="d-flex"
       style=" margin-top:38px; justify-content: space-between;"
@@ -221,10 +228,7 @@
           />
         </div>
       </div>
-      
     </div>
-
-
 
     <div class="d-flex" style=" height:100%; margin-top:51px; ">
       <div style="width:187px; margin-right:28px; ">
@@ -240,87 +244,112 @@
         >
           <button
             on:click={() => getPosts("trending", searchTerm, status)}
-            class=" sort-buttons d-flex justify-content-between w-100"
+            class="sort-buttons d-flex justify-content-between w-100"
+            class:active={currentSort === "trending"}
           >
             <span>Trending</span>
-            <img src={tickIcon} alt="" class="pt-1 tick-icon" style="" />
+            <img src={tickIcon} alt="" class="pt-1 tick-icon" />
           </button>
 
           <button
             on:click={() => getPosts("newest", searchTerm, status)}
-            class=" sort-buttons d-flex justify-content-between w-100"
+            class="sort-buttons d-flex justify-content-between w-100"
+            class:active={currentSort === "newest"}
           >
             <span>Now</span>
-            <img src={tickIcon} alt="" class="pt-1 tick-icon" style="" />
+            <img src={tickIcon} alt="" class="pt-1 tick-icon" />
           </button>
 
           <button
             on:click={() => getPosts("score", searchTerm, status)}
             class="sort-buttons d-flex justify-content-between w-100"
+            class:active={currentSort === "score"}
           >
             <span>Top</span>
-            <img src={tickIcon} alt="" class="pt-1 tick-icon" style="" />
+            <img src={tickIcon} alt="" class="pt-1 tick-icon" />
           </button>
         </div>
       </div>
 
-      <div
-        class="posts d-flex flex-column"
-        style="gap:26px; width:calc(100% - 187px );"
-      >
-        {#each posts as post}
-          <div
-            style="display: flex; flex-direction: column; background-color: #151515; padding: 10px; min-height: 195px; border-radius:2px;"
-          >
+      {#if isLoading}
+         <div style="width: 77%;"> <Loader loaderSize={"20px"} loaderMessage="Please Wait..." /></div>
+      {:else}
+
+        {#if posts.length > 0}
+        <div
+          class="posts d-flex flex-column"
+          style="gap:26px; width:calc(100% - 187px );"
+        >
+          {#each posts as post}
             <div
-              style="display: flex; justify-content: space-between; align-items: flex-start;"
+              style="display: flex; flex-direction: column; background-color: #151515; padding: 10px; min-height: 195px; border-radius:2px;"
             >
-              <div style="flex: 1;">
-                <div
-                  class="title"
-                  on:click={async () => {
-                    id = post?.id;
-                    isPostopen = true;
-                  }}
-                >
-                  {post?.title}
+              <div
+                style="display: flex; justify-content: space-between; align-items: flex-start;"
+              >
+                <div style="flex: 1;">
+                  <div
+                    class="title"
+                    on:click={async () => {
+                      id = post?.id;
+                      isPostopen = true;
+                    }}
+                  >
+                    {post?.title}
+                  </div>
+                  <div
+                    style="height: 16px; display: flex; align-items: center;"
+                  >
+                    <span class="category">
+                      {post?.status
+                        ? post.status.charAt(0).toUpperCase() +
+                          post.status.slice(1)
+                        : ""}
+                    </span>
+                  </div>
                 </div>
-                <div style="height: 16px; display: flex; align-items: center;">
-                  <span class="category">{post?.status} </span>
-                </div>
+
+                <UpvoteIcon
+                   backgroundColor={"transparent"}
+                  {handleUpvote}
+                  authordId={post.author.id}
+                  postID={post.id}
+                  likePost={createVote}
+                  dislikePost={deleteVote}
+                  upvote={post?.score}
+                />
               </div>
 
-              <UpvoteIcon
-                {handleUpvote}
-                authordId={post.author.id}
-                postID={post.id}
-                likePost={createVote}
-                dislikePost={deleteVote}
-                upvote={post?.score}
-              />
-            </div>
+              <div style="margin-top: 10px; flex: 1;">
+                <p style="color: #CCCCCC; margin: 0; padding-top:10px;">
+                  {post?.details}
+                </p>
+              </div>
 
-            <div style="margin-top: 10px; flex: 1;">
-              <p style="color: #CCCCCC; margin: 0; padding-top:10px;">
-                {post?.details}
-              </p>
+              <div
+                style="display: flex; align-items: center; margin-top: 10px; gap:5px;"
+              >
+                <span>
+                  <CommentIcon
+                    width={"15px"}
+                    height={"13.95px"}
+                    color={"#808080"}
+                  />
+                </span>
+                <span style=" font-size: 13px;">{post?.commentCount}</span>
+              </div>
             </div>
-
-            <div
-              style="display: flex; align-items: center; margin-top: 10px; gap:5px;"
-            >
-              <span>
-                <CommentIcon
-                  width={"15px"}
-                  height={"13.95px"}
-                  color={"#808080"}
-                />
-              </span>
-              <span style=" font-size: 13px;">{post?.commentCount}</span>
-            </div>
-          </div>
-        {/each}
-      </div>
+          {/each}
+        </div>
+        {:else}
+        <p
+        class=" text-fs-12 mb-0 text-center"
+        style=" margin-left:250px; margin-top:45px; font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+      >
+        No Result Found
+      </p>
+        {/if}
+      {/if}
     </div>
   {/if}
 
@@ -392,6 +421,7 @@
     border: none !important;
     font-weight: 500;
   }
+
   .sort-buttons:hover {
     color: #3670f7 !important;
   }
@@ -399,14 +429,20 @@
   .sort-buttons:focus-within {
     color: #3670f7 !important;
   }
+
   .tick-icon {
     display: none;
   }
 
+  /* When a button has the 'active' class */
+  .sort-buttons.active {
+    color: #3670f7 !important; /* Blue color for active sort */
+  }
+
+  .sort-buttons.active .tick-icon {
+    display: revert; /* Show tick icon for active sort */
+  }
   /* .sort-buttons:hover .tick-icon {
     display: revert;
   } */
-  .sort-buttons:focus-within .tick-icon {
-    display: revert;
-  }
 </style>
