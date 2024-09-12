@@ -297,8 +297,8 @@ class HelpPageViewModel {
     return response
   }
 
-  public retrieveUserVotes = async (userID: string, sort?: string, search?: string, status?: string) => {
-    const response = await this.cannyService.retrieveVotes(userID, sort, search, status)
+  public retrieveUserVotes = async (userID: string) => {
+    const response = await this.cannyService.retrieveVotes({}, userID)
     return response
   }
 

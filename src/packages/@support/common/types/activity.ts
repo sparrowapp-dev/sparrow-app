@@ -10,5 +10,6 @@ export enum ActivityStatusType {
     COMMENT = "comment",
     POST = "post",
     ALL_ACTIVITY = "all activity",
+    UPVOTED_POSTS = 'upvoted posts'
 }
 

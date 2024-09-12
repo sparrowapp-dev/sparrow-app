@@ -35,6 +35,7 @@
   let posts = [];
   let filteredPosts = [];
   let filteredComments = [];
+  let filteredLikedPosts = [];
   let searchTerm = "";
   let userInfo: any = {};
   let comments = [];
@@ -59,7 +60,7 @@
       const [postsData, commentsData, likedPostsData] = await Promise.all([
         fetchPosts(currentSort, userInfo._id),
         fetchComments(userInfo._id),
-        fetchLikedPosts(currentSort, userInfo._id),
+        fetchLikedPosts(userInfo._id),
       ]);
 
       if (!commentsData || !postsData || !likedPostsData) {
@@ -69,8 +70,11 @@
       comments = commentsData?.data?.comments || [];
       likedPosts = likedPostsData?.data?.votes || [];
 
+      console.log(likedPosts);
+
       filterPosts();
       filterComments();
+      filterLikedPosts();
       // sortComments(currentSort);
       loading = false;
     } catch (error) {
@@ -94,6 +98,12 @@
     );
   };
 
+  const filterLikedPosts = () => {
+    filteredLikedPosts = likedPosts.filter((vote) =>
+      vote.post.title.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  };
+
   const sortPosts = async (sort) => {
     const response = await fetchPosts(sort, userInfo._id);
     filteredPosts = response?.data?.posts;
@@ -111,6 +121,18 @@
     }
   };
 
+  const sortLikedPosts = (sortType) => {
+    if (sortType === "newest") {
+      filteredLikedPosts = likedPosts
+        .filter((vote) => vote.post.title)
+        .sort((a, b) => new Date(b.created) - new Date(a.created));
+    } else if (sortType === "oldest") {
+      filteredLikedPosts = likedPosts
+        .filter((vote) => vote.post.value)
+        .sort((a, b) => new Date(a.created) - new Date(b.created));
+    }
+  };
+
   const handleInputChange = (searchQuery) => {
     searchTerm = searchQuery;
     filterPosts();
@@ -118,17 +140,23 @@
 
   const handleSortChange = async (sortType) => {
     currentSort = sortType;
-    await sortComments(sortType);
+    sortComments(sortType);
     await sortPosts(sortType);
+    sortLikedPosts(sortPosts);
   };
 
   const handleCategoryChange = (selectedCategory) => {
     activityType = selectedCategory;
     if (selectedCategory === ActivityType.ALL_CATEGORIES) {
       filteredPosts = posts;
+      filteredLikedPosts = likedPosts;
     } else {
       filteredPosts = posts.filter(
         (post) => post?.category?.name === selectedCategory,
+      );
+
+      filteredLikedPosts = likedPosts.filter(
+        (vote) => vote.post.category?.name === selectedCategory,
       );
     }
   };
@@ -139,12 +167,19 @@
     if (selectedStatus === ActivityStatusType.POST) {
       filteredPosts = posts;
       filteredComments = [];
+      filteredLikedPosts = [];
     } else if (selectedStatus === ActivityStatusType.COMMENT) {
       filteredPosts = [];
+      filteredLikedPosts = [];
       filteredComments = comments;
+    } else if (selectedStatus === ActivityStatusType.UPVOTED_POSTS) {
+      filteredPosts = [];
+      filteredComments = [];
+      filteredLikedPosts = likedPosts;
     } else {
       filteredPosts = posts;
       filteredComments = comments;
+      filteredLikedPosts = likedPosts;
     }
   };
 
@@ -228,6 +263,7 @@
           data={[
             { name: "Comment", id: ActivityStatusType.COMMENT },
             { name: "Post", id: ActivityStatusType.POST },
+            { name: "Upvoted Posts", id: ActivityStatusType.UPVOTED_POSTS },
             { name: "All Activity", id: ActivityStatusType.ALL_ACTIVITY },
           ]}
           onclick={(id = "") => {
@@ -329,7 +365,7 @@
           {/if}
 
           <div class="comments">
-            {#if comments.length > 0}
+            {#if filteredComments.length > 0}
               <h2 class="comment-section-heading">Comments</h2>
               <ul class="comment-list">
                 {#each filteredComments as comment}
@@ -390,13 +426,54 @@
                   </li>
                 {/each}
               </ul>
-            {:else}
+              <!-- {:else}
               <p
                 class="mx-1 text-fs-12 mb-0 text-center"
                 style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
               >
                 No Result Found
-              </p>
+              </p> -->
+            {/if}
+          </div>
+
+          <div class="upvoted-posts">
+            {#if filteredLikedPosts.length > 0}
+              <h2 class="post-section-heading">Upvoted Posts</h2>
+              <ul>
+                {#each filteredLikedPosts as { post }}
+                  <li>
+                    <div class="post-card">
+                      <div class="post-header">
+                        <div
+                          class="post-title"
+                          on:click={() => (
+                            (id = post?.id), (isPostopen = true)
+                          )}
+                        >
+                          {post?.title}
+                        </div>
+                        <UpvoteIcon upvote={post?.score} />
+                      </div>
+                      <div class="secondary">
+                        <div class="badge {post?.status}">
+                          <span>{post?.status}</span>
+                        </div>
+                        <div class="post-body">
+                          <p>{post?.details}</p>
+                        </div>
+                        <div class="post-footer">
+                          <CommentIcon
+                            width="15px"
+                            height="13.95px"
+                            color="#808080"
+                          />
+                          <span>{post?.commentCount}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                {/each}
+              </ul>
             {/if}
           </div>
         </div>
