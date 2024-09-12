@@ -29,6 +29,8 @@
   export let deleteVote;
   export let listVote;
 
+  export let postId;
+
   let feedbackType = FeedbackType.ALL_CATEGORY;
   let feedbackStatusType = FeedbackStatusType.ALL_STATUS;
 
@@ -61,6 +63,7 @@
 
   onMount(async () => {
     getPosts(currentSort, searchTerm, status);
+    isPostopenFromActivity = false;
   });
 
   const handleUpvote = (e) => {
@@ -286,7 +289,8 @@
                 <div
                   class="title"
                   on:click={async () => {
-                    id = post?.id;
+                    postId = post?.id;
+                    // id = post?.id;
                     isPostopen = true;
                   }}
                 >
@@ -300,7 +304,7 @@
               <UpvoteIcon
                 {handleUpvote}
                 authordId={post.author.id}
-                postID={post.id}
+                postId={post.id}
                 likePost={createVote}
                 dislikePost={deleteVote}
                 upvote={post?.score}
@@ -333,6 +337,7 @@
 
   {#if isPostopen}
     <FeedbackPost
+      bind:postId
       bind:isPostopen
       {onRetrievePost}
       {userInfo}

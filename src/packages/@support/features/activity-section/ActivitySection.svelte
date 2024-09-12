@@ -20,6 +20,7 @@
     ActivityType,
   } from "@support/common/types/activity";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import Loader from "@library/ui/loader/Loader.svelte";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
@@ -286,7 +287,7 @@
         <div
           style="display: flex; justify-content: center; align-items: center; width: 100%; height: 50vh;"
         >
-          <Spinner classProp="small" />
+          <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
         </div>
       {:else}
         <div class="posts-comments">

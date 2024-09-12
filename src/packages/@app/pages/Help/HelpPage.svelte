@@ -60,8 +60,14 @@
     }
   });
 
-  $: {
-    parentPostOpen = true;
+  let postId = "";
+
+  function setPostId(tab, postID) {
+    if (tab !== "faq") {
+      isPostopenFromActivity = true;
+      activeTab = tab;
+      postId = postID;
+    }
   }
 </script>
 
@@ -74,7 +80,10 @@
           class="tab d-flex align-items-center gap-2 {activeTab === 'roadmap'
             ? 'active'
             : ''}"
-          on:click={() => setActiveTab("roadmap")}
+          on:click={() => {
+            setActiveTab("roadmap");
+            isPostopenFromActivity = false;
+          }}
         >
           <RoadmapIcon
             height={"17px"}
@@ -89,7 +98,10 @@
           class="tab align-items-center gap-2 {activeTab === 'feedback'
             ? 'active'
             : ''}"
-          on:click={() => setActiveTab("feedback")}
+          on:click={() => {
+            setActiveTab("feedback");
+            isPostopenFromActivity = false;
+          }}
         >
           <DocIcon
             height={"17px"}
@@ -104,7 +116,10 @@
           class="tab align-items-center gap-2 {activeTab === 'updates'
             ? 'active'
             : ''}"
-          on:click={() => setActiveTab("updates")}
+          on:click={() => {
+            setActiveTab("updates");
+            isPostopenFromActivity = false;
+          }}
         >
           <UpdateIcon
             height={"17px"}
@@ -119,7 +134,10 @@
           class="tab align-items-center gap-2 {activeTab === 'community'
             ? 'active'
             : ''}"
-          on:click={() => setActiveTab("community")}
+          on:click={() => {
+            setActiveTab("community");
+            isPostopenFromActivity = false;
+          }}
         >
           <GroupIcon
             height={"17px"}
@@ -135,7 +153,10 @@
           class="tab align-items-center gap-2 {activeTab === 'myActivity'
             ? 'active'
             : ''}"
-          on:click={() => setActiveTab("myActivity")}
+          on:click={() => {
+            setActiveTab("myActivity");
+            isPostPostOpen = false;
+          }}
         >
           <ActivityIcon
             height={"17px"}
@@ -167,22 +188,18 @@
                 onRetrievePost={_viewModel.retrievePostData}
                 onAddComment={_viewModel.addComment}
                 fetchComments={_viewModel.listComments}
-                currentUser={_viewModel.createUser}
                 createVote={_viewModel.CreateVote}
                 deleteVote={_viewModel.deleteVote}
                 listVote={_viewModel.listVote}
                 {postIdFromActivity}
-                {isPostopenFromActivity}
                 {parentPostOpen}
+                bind:postId
+                bind:isPostopenFromActivity
               />
             {:else if activeTab === "updates"}
-              <ReleaseNotes
-                listChangeLog={_viewModel.listChangeLog}
-                {releaseNotesData}
-                onLearnMore={_viewModel.learnMore}
-              />
+              <ReleaseNotes listChangeLog={_viewModel.listChangeLog} />
             {:else if activeTab === "roadmap"}
-              <Roadmap fetchPosts={_viewModel.getListOfPOsts} />
+              <Roadmap {setPostId} fetchPosts={_viewModel.getListOfPOsts} />
             {:else if activeTab === "community"}
               <Community />
               <DiscordPost />

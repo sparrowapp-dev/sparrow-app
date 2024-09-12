@@ -12,6 +12,7 @@
 
   import { Button, IconFallback, Modal } from "@library/ui";
   import ImageModal from "@library/ui/image-modal/ImageModal.svelte";
+  import Loader from "@library/ui/loader/Loader.svelte";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import { CommentCard, UpvoteIcon } from "@support/common/components";
   import { FeedbackType } from "@support/common/types";
@@ -88,6 +89,8 @@
       comments = await fetchComments(id);
     } catch (error) {
       loading = false;
+    } finally {
+      loading = false;
     }
   });
 
@@ -113,11 +116,11 @@
   <!-- Post Card -->
 
   <div style="gap:26px; width:calc(100% - 187px );">
-    {#if post.length === 0}
+    {#if loading}
       <div
         style="display: flex; justify-content: center; margin: 60px 0px 60px 0px;"
       >
-        <Spinner size={10} classProp="small" />
+        <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
       </div>
     {:else}
       <div>
