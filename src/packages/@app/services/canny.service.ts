@@ -345,7 +345,7 @@ export class CannyIoService {
     return response;
   }
 
-  public retrieveVotes = async (body?: object, userID: string) => {
+  public retrieveVotes = async (userID: string, sort: string, search: string, status: string) => {
     const response = await makeRequest(
       "POST",
       `https://canny.io/api/v1/votes/list`,
@@ -353,7 +353,7 @@ export class CannyIoService {
         body: {
           apiKey: this.apiKey,
           userID, // just for now testing
-          ...body
+          sort, search, status
         },
         headers: {
           "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],

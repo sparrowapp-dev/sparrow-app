@@ -12,6 +12,7 @@
 
   import { Button, IconFallback, Modal } from "@library/ui";
   import ImageModal from "@library/ui/image-modal/ImageModal.svelte";
+  import Spinner from "@library/ui/spinner/Spinner.svelte";
   import { CommentCard, UpvoteIcon } from "@support/common/components";
   import { FeedbackType } from "@support/common/types";
   import { FeedbackStatusType } from "@support/common/types/feedback";
@@ -36,6 +37,7 @@
   let isLoading = false;
   let postImages = [];
   let commentValue = "";
+  let loading = false;
 
   const timeAgo = (date) => {
     const diffInSeconds = (new Date() - new Date(date)) / 1000;
@@ -74,12 +76,19 @@
   };
 
   onMount(async () => {
-    const res = await onRetrievePost(id || postIdFromActivity);
-    post = await res?.data;
-    console.log(post, "post");
-    createdAt = timeAgo(post?.created);
-    postImages = post?.imageURLs;
-    comments = await fetchComments(id);
+    try {
+      loading = true;
+      console.log(post);
+      const res = await onRetrievePost(id || postIdFromActivity);
+      post = await res?.data;
+      console.log(post);
+      console.log(post, "post");
+      createdAt = timeAgo(post?.created);
+      postImages = post?.imageURLs;
+      comments = await fetchComments(id);
+    } catch (error) {
+      loading = false;
+    }
   });
 
   $: {
@@ -103,185 +112,193 @@
 
   <!-- Post Card -->
 
-  <div style="gap:26px; width:calc(100% - 187px ); ">
-    <div>
+  <div style="gap:26px; width:calc(100% - 187px );">
+    {#if post.length === 0}
       <div
-        class="flex-column"
-        style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
+        style="display: flex; justify-content: center; margin: 60px 0px 60px 0px;"
       >
-        <span style="font-size: 18px; font-weight: 700;">{post?.title}</span>
-        <span
-          class="px-2"
-          style="border:0.2px solid #DF77F9 ; color:#DF77F9; padding-bottom: 14px; border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
-          >{post?.status}</span
-        >
+        <Spinner size={10} classProp="small" />
       </div>
-
-      <div class="d-flex flex-row">
+    {:else}
+      <div>
         <div
-          style="display: flex; flex-direction: column; gap: 1px; min-height:80px; width:calc(100% - 37px);"
+          class="flex-column"
+          style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
         >
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <IconFallback character={post?.author?.name.charAt(0)} />
-            <div style="font-size: 14px; font-weight: 500;">
-              <!-- {userInfo?.name} -->
-              {post?.author?.name}
+          <span style="font-size: 18px; font-weight: 700;">{post?.title}</span>
+          <span
+            class="px-2"
+            style="border:0.2px solid #DF77F9 ; color:#DF77F9; padding-bottom: 14px; border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
+            >{post?.status}</span
+          >
+        </div>
+
+        <div class="d-flex flex-row">
+          <div
+            style="display: flex; flex-direction: column; gap: 1px; min-height:80px; width:calc(100% - 37px);"
+          >
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <IconFallback character={post?.author?.name.charAt(0)} />
+              <div style="font-size: 14px; font-weight: 500;">
+                <!-- {userInfo?.name} -->
+                {post?.author?.name}
+              </div>
+            </div>
+            <div style="font-size: 14px; padding-left:45px; font-weight:400;">
+              {post?.details}
+            </div>
+            <div>
+              {#each postImages as postImage}
+                <img
+                  on:click={() => {
+                    isImageOpen = true;
+                    currentImage = postImage;
+                  }}
+                  src={postImage}
+                  alt="post image"
+                  style="width:100px; display:inline; height: 100px; margin-top: 20px; border-radius: 2px; margin:10px;"
+                />
+                <ImageModal
+                  isOpen={isImageOpen}
+                  type={"dark"}
+                  width={"40%"}
+                  zIndex={10000}
+                  handleModalState={(flag = false) => {
+                    isImageOpen = flag;
+                  }}
+                >
+                  <img
+                    src={currentImage}
+                    alt="post image"
+                    style="width:100%; height:100%;"
+                  />
+                </ImageModal>
+              {/each}
+            </div>
+
+            <div
+              style="display: flex; align-items: center; font-size: 12px; margin-top:10px; color:#999999 !important;"
+            >
+              <span style="padding-left:10px;">{createdAt} </span>
+              <span class="px-2">|</span>
+              <span
+                class="px-2"
+                on:click={() => {
+                  isExposeFeedbackForm = true;
+                }}>Edit post</span
+              >
             </div>
           </div>
-          <div style="font-size: 14px; padding-left:45px; font-weight:400;">
-            {post?.details}
-          </div>
+
           <div>
-            {#each postImages as postImage}
-              <img
-                on:click={() => {
-                  isImageOpen = true;
-                  currentImage = postImage;
-                }}
-                src={postImage}
-                alt="post image"
-                style="width:100px; display:inline; height: 100px; margin-top: 20px; border-radius: 2px; margin:10px;"
-              />
-              <ImageModal
-                isOpen={isImageOpen}
-                type={"dark"}
-                width={"40%"}
-                zIndex={10000}
-                handleModalState={(flag = false) => {
-                  isImageOpen = flag;
-                }}
-              >
-                <img
-                  src={currentImage}
-                  alt="post image"
-                  style="width:100%; height:100%;"
-                />
-              </ImageModal>
-            {/each}
-          </div>
-
-          <div
-            style="display: flex; align-items: center; font-size: 12px; margin-top:10px; color:#999999 !important;"
-          >
-            <span style="padding-left:10px;">{createdAt} </span>
-            <span class="px-2">|</span>
-            <span
-              class="px-2"
-              on:click={() => {
-                isExposeFeedbackForm = true;
-              }}>Edit post</span
-            >
+            <UpvoteIcon upvote={post?.score} />
           </div>
         </div>
 
-        <div>
-          <UpvoteIcon upvote={post?.score} />
-        </div>
-      </div>
-
-      <!-- Add comment input -->
-      <div
-        class={`d-flex align-items-center search-input-container  mb-5 mt-3 px-2 mb-2`}
-      >
-        <input
-          type="text"
-          id="search-input"
-          class={`bg-transparent w-100 border-0 my-auto`}
-          placeholder="Leave a comment"
-          on:input={(e) => {
-            commentValue = e.target.value;
-          }}
-          bind:value={commentValue}
-        />
-
-        <div class="d-flex align-items-center gap-2">
-          <AttachmentIcon
-            height={"12px"}
-            width={"12px"}
-            color={"var(--text-secondary-200)"}
-          />
-
-          <Button
-            title={`Add`}
-            type={`primary`}
-            loaderSize={17}
-            textStyleProp={"font-size: var(--small-text)"}
-            buttonClassProp={`ps-2`}
-            buttonStyleProp={`height: 20px; width:35px; rounded;`}
-            onClick={async () => {
-              await onAddComment(id, commentValue, null);
-              comments = await fetchComments(id);
-              commentValue = "";
+        <!-- Add comment input -->
+        <div
+          class={`d-flex align-items-center search-input-container  mb-5 mt-3 px-2 mb-2`}
+        >
+          <input
+            type="text"
+            id="search-input"
+            class={`bg-transparent w-100 border-0 my-auto`}
+            placeholder="Leave a comment"
+            on:input={(e) => {
+              commentValue = e.target.value;
             }}
-            disable={commentValue.length == 0}
+            bind:value={commentValue}
           />
-        </div>
-      </div>
 
-      <!-- Commnet activity section -->
-      {#if nestedComments.length > 0}
-        <div>
-          <div class="d-flex align-items-center justify-content-between mb-3">
-            <h6>Activity Feed</h6>
+          <div class="d-flex align-items-center gap-2">
+            <AttachmentIcon
+              height={"12px"}
+              width={"12px"}
+              color={"var(--text-secondary-200)"}
+            />
 
-            <Select
-              data={[
-                {
-                  name: "Open",
-                  id: FeedbackStatusType.OPEN,
-                },
-                {
-                  name: "Completed",
-                  id: FeedbackStatusType.COMPLETED,
-                },
-              ]}
-              onclick={(id = "") => {}}
-              titleId={type}
-              placeholderText={"Sort By"}
-              zIndex={499}
-              disabled={false}
-              iconRequired={true}
-              icon={SortIcon}
-              borderType={"none"}
-              borderActiveType={"none"}
-              borderHighlight={"hover-active"}
-              headerHighlight={"hover-active"}
-              headerHeight={"26px"}
-              minBodyWidth={"150px"}
-              minHeaderWidth={"150px"}
-              maxHeaderWidth={"200px"}
-              borderRounded={"2px"}
-              headerTheme={"violet2"}
-              bodyTheme={"violet"}
-              menuItem={"v2"}
-              headerFontSize={"10px"}
-              isDropIconFilled={true}
-              position={"absolute"}
+            <Button
+              title={`Add`}
+              type={`primary`}
+              loaderSize={17}
+              textStyleProp={"font-size: var(--small-text)"}
+              buttonClassProp={`ps-2`}
+              buttonStyleProp={`height: 20px; width:35px; rounded;`}
+              onClick={async () => {
+                await onAddComment(id, commentValue, null);
+                comments = await fetchComments(id);
+                commentValue = "";
+              }}
+              disable={commentValue.length == 0}
             />
           </div>
-
-          <!-- List of comments -->
-          <div>
-            {#each nestedComments as comment}
-              <CommentCard
-                {onAddComment}
-                {userInfo}
-                {comment}
-                {fetchComments}
-                {logMessage}
-              />
-            {/each}
-          </div>
         </div>
-      {:else}
-        <p
-          class="mx-1 text-fs-12 mb-0 text-center"
-          style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
-        >
-          No Comments Yet
-        </p>
-      {/if}
-    </div>
+
+        <!-- Commnet activity section -->
+        {#if nestedComments.length > 0}
+          <div>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h6>Activity Feed</h6>
+
+              <Select
+                data={[
+                  {
+                    name: "Open",
+                    id: FeedbackStatusType.OPEN,
+                  },
+                  {
+                    name: "Completed",
+                    id: FeedbackStatusType.COMPLETED,
+                  },
+                ]}
+                onclick={(id = "") => {}}
+                titleId={type}
+                placeholderText={"Sort By"}
+                zIndex={499}
+                disabled={false}
+                iconRequired={true}
+                icon={SortIcon}
+                borderType={"none"}
+                borderActiveType={"none"}
+                borderHighlight={"hover-active"}
+                headerHighlight={"hover-active"}
+                headerHeight={"26px"}
+                minBodyWidth={"150px"}
+                minHeaderWidth={"150px"}
+                maxHeaderWidth={"200px"}
+                borderRounded={"2px"}
+                headerTheme={"violet2"}
+                bodyTheme={"violet"}
+                menuItem={"v2"}
+                headerFontSize={"10px"}
+                isDropIconFilled={true}
+                position={"absolute"}
+              />
+            </div>
+
+            <!-- List of comments -->
+            <div>
+              {#each nestedComments as comment}
+                <CommentCard
+                  {onAddComment}
+                  {userInfo}
+                  {comment}
+                  {fetchComments}
+                  {logMessage}
+                />
+              {/each}
+            </div>
+          </div>
+        {:else}
+          <p
+            class="mx-1 text-fs-12 mb-0 text-center"
+            style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+          >
+            No Comments Yet
+          </p>
+        {/if}
+      </div>
+    {/if}
   </div>
 </div>
 

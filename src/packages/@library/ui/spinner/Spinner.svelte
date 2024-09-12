@@ -28,4 +28,9 @@
       transform: rotate(360deg);
     }
   }
+
+  .small {
+    width: 50px;
+    height: 50px;
+  }
 </style>

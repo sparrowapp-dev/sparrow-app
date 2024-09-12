@@ -7,16 +7,21 @@
   import { SearchIcon } from "$lib/assets/app.asset";
   import { Select } from "@library/forms";
   import { CategoryIcon, StatusIcon } from "@library/icons";
+
   import {
     FeedbackStatusType,
     FeedbackType,
   } from "@support/common/types/feedback";
-
-  export let type = FeedbackType.ALL_CATEGORY;
   import { tickIcon } from "@library/forms/select/svgs";
   import { IconFallback } from "@library/ui";
   import { Like } from "@library/ui/like";
+  import {
+    ActivityStatusType,
+    ActivityType,
+  } from "@support/common/types/activity";
+  import Spinner from "@library/ui/spinner/Spinner.svelte";
 
+  export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
   export let onAddFeedback;
   export let fetchPosts;
@@ -24,87 +29,122 @@
   export let fetchComments;
   export let fetchLikedPosts;
   export let setActiveTabFromActivity;
-  // export let userInfo;
 
   let currentSort = "newest";
   let posts = [];
   let filteredPosts = [];
+  let filteredComments = [];
   let searchTerm = "";
   let userInfo: any = {};
   let comments = [];
-  let isHovering = null; // Keep track of which comment is being hovered
   let likedPosts = [];
-  // let comments = [];
+  let isHovering = null; // Keep track of which comment is being hovered
+  let isPostopen = false;
+  let activityType = ActivityType.ALL_CATEGORIES;
+  let activityStatusType: string = ActivityStatusType.ALL_ACTIVITY;
+  const defaultStaus = "all activity";
+  let status = defaultStaus;
+  let id = "";
+  let loading = false;
 
   user.subscribe((value) => {
     userInfo = value;
   });
 
-  let id = "";
-  const getPosts = async (
-    sortType: string,
-    searchTerm?: string,
-    status?: string,
-  ) => {
-    currentSort = sortType;
+  // Fetch all data once on mount
+  const getAllData = async () => {
+    try {
+      loading = true;
+      const [postsData, commentsData, likedPostsData] = await Promise.all([
+        fetchPosts(currentSort, userInfo._id),
+        fetchComments(userInfo._id),
+        fetchLikedPosts(currentSort, userInfo._id),
+      ]);
 
-    const listPosts = await fetchPosts(
-      currentSort,
-      userInfo._id,
-      searchTerm,
-      status,
-    );
-    console.log(listPosts);
-    posts = listPosts?.data?.posts;
-  };
+      if (!commentsData || !postsData || !likedPostsData) {
+        loading = false;
+      }
+      posts = postsData?.data?.posts || [];
+      comments = commentsData?.data?.comments || [];
+      likedPosts = likedPostsData?.data?.votes || [];
 
-  const getComments = async (sortBy?: string) => {
-    const listComments = await fetchComments(
-      userInfo._id,
-      currentSort,
-      userInfo._id,
-      searchTerm,
-      status,
-    );
-    console.log(listComments);
-
-    if (sortBy === "newest") {
-      comments = listComments.data.comments.filter((_) => _.value);
-      comments = comments.sort(
-        (a, b) => new Date(b.created) - new Date(a.created),
-      );
-    } else if (sortBy === "oldest") {
-      comments = listComments.data.comments.filter((_) => _.value);
-      comments = comments.sort(
-        (a, b) => new Date(a.created) - new Date(b.created),
-      );
-    } else {
-      comments = listComments.data.comments.filter((_) => _.value);
+      filterPosts();
+      filterComments();
+      // sortComments(currentSort);
+      loading = false;
+    } catch (error) {
+      loading = false;
     }
   };
 
-  const getLikedPosts = async () => {
-    const listsPosts = await fetchLikedPosts(userInfo._id);
-    likedPosts = listsPosts.data.votes;
-    console.log(listsPosts);
-  };
-
   onMount(async () => {
-    getPosts(currentSort);
-    getComments();
-    getLikedPosts();
+    await getAllData();
   });
 
-  let isPostopen = false;
+  const filterPosts = () => {
+    filteredPosts = posts.filter((post) =>
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  };
 
-  let activityType = FeedbackType.ALL_CATEGORY;
-  let activityStatusType: string = FeedbackStatusType.ALL_STATUS;
+  const filterComments = () => {
+    filteredComments = comments.filter((comment) =>
+      comment.value.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  };
 
-  const defaultStaus = "open,under review,planned,in progress,complete";
-  let status = defaultStaus;
+  const sortPosts = async (sort) => {
+    const response = await fetchPosts(sort, userInfo._id);
+    filteredPosts = response?.data?.posts;
+  };
 
-  const firstLetterCapital = (str: string) => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
+  const sortComments = (sortType) => {
+    if (sortType === "newest") {
+      filteredComments = comments
+        .filter((comment) => comment.value)
+        .sort((a, b) => new Date(b.created) - new Date(a.created));
+    } else if (sortType === "oldest") {
+      filteredComments = comments
+        .filter((comment) => comment.value)
+        .sort((a, b) => new Date(a.created) - new Date(b.created));
+    }
+  };
+
+  const handleInputChange = (searchQuery) => {
+    searchTerm = searchQuery;
+    filterPosts();
+  };
+
+  const handleSortChange = async (sortType) => {
+    currentSort = sortType;
+    await sortComments(sortType);
+    await sortPosts(sortType);
+  };
+
+  const handleCategoryChange = (selectedCategory) => {
+    activityType = selectedCategory;
+    if (selectedCategory === ActivityType.ALL_CATEGORIES) {
+      filteredPosts = posts;
+    } else {
+      filteredPosts = posts.filter(
+        (post) => post?.category?.name === selectedCategory,
+      );
+    }
+  };
+
+  const handleActivityChanges = (selectedStatus) => {
+    activityStatusType = selectedStatus;
+
+    if (selectedStatus === ActivityStatusType.POST) {
+      filteredPosts = posts;
+      filteredComments = [];
+    } else if (selectedStatus === ActivityStatusType.COMMENT) {
+      filteredPosts = [];
+      filteredComments = comments;
+    } else {
+      filteredPosts = posts;
+      filteredComments = comments;
+    }
   };
 
   function timeAgo(createdTime: string) {
@@ -114,59 +154,13 @@
     const hours = Math.floor(difference / (1000 * 60 * 60)); // convert to hours
 
     if (hours < 1) {
-      return firstLetterCapital("less than an hour ago");
+      return "less than an hour ago";
     } else if (hours === 1) {
       return "1 hour ago";
     } else {
       return `${hours} hours ago`;
     }
   }
-
-  const filterComments = () => {
-    if (searchTerm.trim() === "") {
-      getComments();
-    } else {
-      // Filter comments based on the search term
-      comments = comments.filter((comment) => {
-        const commentContent = comment.value.toLowerCase();
-        return commentContent.includes(searchTerm.toLowerCase());
-      });
-    }
-    console.log("Filtered Comments:", comments);
-  };
-
-  const handleInputChange = async (searchQuery: string) => {
-    searchTerm = searchQuery;
-    await getPosts(currentSort, searchTerm);
-    filterComments();
-  };
-
-  const handleStatusChange = async (_status: string) => {
-    console.log(_status);
-    activityStatusType = _status;
-
-    if (_status == "all status") {
-      status = defaultStaus;
-    } else {
-      status = _status;
-    }
-    await getPosts(currentSort, searchTerm, status);
-  };
-
-  const handleCategoryChange = async (selectedCategory) => {
-    activityStatusType = selectedCategory;
-
-    if (selectedCategory === FeedbackType.ALL_CATEGORY) {
-      // Show all posts if "All Categories" is selected
-      await getPosts(currentSort, searchTerm, status);
-    } else {
-      // Fetch and filter posts by the selected category
-      const listPosts = await fetchPosts(currentSort, searchTerm, status);
-      posts = listPosts?.data?.posts.filter(
-        (post) => post?.category?.name === selectedCategory,
-      );
-    }
-  };
 </script>
 
 <div class="container">
@@ -180,50 +174,34 @@
 
   <div
     class="d-flex align-items-center"
-    style=" margin-top:15px; justify-content: space-between;"
+    style="margin-top: 15px; justify-content: space-between;"
   >
     <div class="">
-      <div class={`d-flex search-input-container rounded px-2 mb-2`}>
-        <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
+      <div class="d-flex search-input-container rounded px-2 mb-2">
+        <SearchIcon width={14} height={14} classProp="my-auto me-3" />
         <input
           type="text"
           id="search-input"
-          class={`bg-transparent w-100 border-0 my-auto`}
+          class="bg-transparent w-100 border-0 my-auto"
           placeholder="Search updates"
-          on:input={(e) => {
-            handleInputChange(e.target.value);
-          }}
+          on:input={(e) => handleInputChange(e.target.value)}
         />
       </div>
     </div>
-    <div class="d-flex" style="gap:15px;">
+    <div class="d-flex" style="gap: 15px;">
       <div>
         <Select
           iconRequired={true}
           data={[
-            {
-              name: "Feature Request",
-              id: FeedbackType.FEATURE_REQUEST,
-            },
-            {
-              name: "UX Improvement",
-              id: FeedbackType.UI_IMPROVEMENT,
-            },
-            {
-              name: "Bugs",
-              id: FeedbackType.BUG,
-            },
-            {
-              name: "All Categories",
-              id: FeedbackType.ALL_CATEGORY,
-            },
+            { name: "Feature Request", id: ActivityType.FEATURE_REQUEST },
+            { name: "UX Improvement", id: ActivityType.UI_IMPROVEMENT },
+            { name: "Bugs", id: ActivityType.BUG },
+            { name: "All Categories", id: ActivityType.ALL_CATEGORIES },
           ]}
           icon={CategoryIcon}
-          onclick={(id = "") => {
-            activityType = id;
-            handleCategoryChange(id);
-          }}
+          onclick={(id = "") => handleCategoryChange(id)}
           titleId={activityType}
+          placeholderText="Categories"
           zIndex={499}
           disabled={false}
           borderType={"none"}
@@ -237,7 +215,6 @@
           borderRounded={"2px"}
           headerTheme={"violet2"}
           bodyTheme={"violet"}
-          placeholderText={"Categories"}
           menuItem={"v2"}
           headerFontSize={"10px"}
           isDropIconFilled={true}
@@ -246,43 +223,20 @@
       </div>
       <div>
         <Select
+          id="as"
           data={[
-            {
-              name: "Open",
-              id: FeedbackStatusType.OPEN,
-            },
-            {
-              name: "Completed",
-              id: FeedbackStatusType.COMPLETED,
-            },
-            {
-              name: "In Progress",
-              id: FeedbackStatusType.IN_PROGRESS,
-            },
-            {
-              name: "Planned",
-              id: FeedbackStatusType.PLANNED,
-            },
-            {
-              name: "Under review",
-              id: FeedbackStatusType.UNDER_REVIEW,
-            },
-            {
-              name: "All Status",
-              id: FeedbackStatusType.ALL_STATUS,
-            },
+            { name: "Comment", id: ActivityStatusType.COMMENT },
+            { name: "Post", id: ActivityStatusType.POST },
+            { name: "All Activity", id: ActivityStatusType.ALL_ACTIVITY },
           ]}
           onclick={(id = "") => {
-            console.log("second drop down" + id);
-            handleStatusChange(id);
+            handleActivityChanges(id);
           }}
           titleId={activityStatusType}
-          placeholderText={"Status"}
-          id={"feeds"}
+          placeholderText="Status"
           zIndex={499}
           disabled={false}
           iconRequired={true}
-          icon={StatusIcon}
           borderType={"none"}
           borderActiveType={"none"}
           borderHighlight={"hover-active"}
@@ -302,6 +256,7 @@
       </div>
     </div>
   </div>
+
   {#if !isPostopen}
     <div class="post-list" style="margin-top: 50px">
       <div class="sidebar">
@@ -311,20 +266,14 @@
         </div>
         <div class="sort-options">
           <button
-            on:click={() => {
-              getPosts("newest", searchTerm, status);
-              getComments("newest");
-            }}
+            on:click={() => handleSortChange("newest")}
             class="sort-button"
           >
             Newest
             <img src={tickIcon} alt="" class="tick-icon" />
           </button>
           <button
-            on:click={() => {
-              getPosts("oldest", searchTerm, status);
-              getComments("oldest");
-            }}
+            on:click={() => handleSortChange("oldest")}
             class="sort-button"
           >
             Oldest
@@ -332,137 +281,21 @@
           </button>
         </div>
       </div>
-      <div class="posts-comments">
-        <h2 class="post-section-heading text-fs-12 text-primary-300">Posts</h2>
 
-        {#if posts.length > 0}
-          <ul style="">
-            {#each posts as post}
-              <li>
-                <!-- Use <li> instead of <div> for valid HTML structure inside <ul> -->
-                <div class="post-card" style="">
-                  <div class="post-header">
-                    <div
-                      class="post-title"
-                      on:click={() => ((id = post?.id), (isPostopen = true))}
-                    >
-                      {post?.title}
-                    </div>
-                    <UpvoteIcon upvote={post?.score} />
-                  </div>
-                  <div class="secondary">
-                    <div class="badge {post?.status}">
-                      <span>{post?.status}</span>
-                    </div>
-                    <div class="post-body">
-                      <p>{post?.details}</p>
-                    </div>
-                    <div class="post-footer">
-                      <CommentIcon
-                        width="15px"
-                        height="13.95px"
-                        color="#808080"
-                      />
-                      <span>{post?.commentCount}</span>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            {/each}
-          </ul>
-        {:else}
-          <p
-            class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
-            style="color: var(--text-secondary-550);  font-weight:300; letter-spacing: 0.5px;"
-          >
-            No Result Found
-          </p>
-        {/if}
-
-        <hr />
-
-        <div class="comments">
-          <h2 class="comment-section-heading">Comments</h2>
-          {#if comments.length > 0}
-            <ul class="comment-list">
-              {#each comments as comment}
-                <li
-                  class="comment"
-                  style=""
-                  on:mouseenter={() => (isHovering = comment.id)}
-                  on:mouseleave={() => (isHovering = null)}
-                >
-                  <IconFallback
-                    character="M"
-                    width="34px"
-                    height="32px"
-                    backgroundColor="#1C1D2B"
-                    borderColor="#45494D"
-                  />
-                  <div class="comment-content">
-                    <div
-                      class=""
-                      style="display: flex; justify-content: space-between; align-items: start;"
-                    >
-                      <div class="">
-                        <div class="comment-author">{comment.author.name}</div>
-                        <div class="comment-text">{comment.value}</div>
-                      </div>
-
-                      {#if isHovering === comment.id}
-                        <span
-                          on:click={() => (
-                            ((id = comment?.post?.id), (isPostopen = true)),
-                            setActiveTabFromActivity(
-                              "feedback",
-                              comment.post?.id,
-                            )
-                          )}
-                          class="go-to-post"
-                          style="font-size: 12px; letter-spacing: 0.25px; font-weight: 400;"
-                          >Go to post &#8599;</span
-                        >
-                      {/if}
-                    </div>
-
-                    <div class="comment-meta">
-                      <div class="comment-moreinfo">
-                        <span class="comment-time">
-                          {timeAgo(comment.created)}
-                        </span>
-                        <a href="#" class="comment-reply">Reply</a>
-                      </div>
-                      <div class="comment-likes">
-                        <Like />
-                        <span class="like-count">{comment.likeCount}</span>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              {/each}
-            </ul>
-          {:else}
-            <p
-              class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
-              style="color: var(--text-secondary-550);  font-weight:300; letter-spacing: 0.5px;"
-            >
-              No Result Found
-            </p>
-          {/if}
+      {#if loading}
+        <div
+          style="display: flex; justify-content: center; align-items: center; width: 100%; height: 50vh;"
+        >
+          <Spinner classProp="small" />
         </div>
-
-        <hr />
-        <div class="">
-          <h2 class="post-section-heading" style="margin: 20px 0px 20px 0px;">
-            Posts you liked
-          </h2>
-
-          {#if posts.length > 0}
-            <ul style="">
-              {#each posts as post}
+      {:else}
+        <div class="posts-comments">
+          {#if filteredPosts.length > 0}
+            <h2 class="post-section-heading">Posts</h2>
+            <ul>
+              {#each filteredPosts as post}
                 <li>
-                  <!-- Use <li> instead of <div> for valid HTML structure inside <ul> -->
-                  <div class="post-card" style="">
+                  <div class="post-card">
                     <div class="post-header">
                       <div
                         class="post-title"
@@ -492,16 +325,81 @@
                 </li>
               {/each}
             </ul>
-          {:else}
-            <p
-              class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
-              style="color: var(--text-secondary-550);  font-weight:300; letter-spacing: 0.5px;"
-            >
-              No Result Found
-            </p>
           {/if}
+
+          <div class="comments">
+            {#if comments.length > 0}
+              <h2 class="comment-section-heading">Comments</h2>
+              <ul class="comment-list">
+                {#each filteredComments as comment}
+                  <li
+                    class="comment"
+                    style=""
+                    on:mouseenter={() => (isHovering = comment.id)}
+                    on:mouseleave={() => (isHovering = null)}
+                  >
+                    <IconFallback
+                      character="M"
+                      width="34px"
+                      height="32px"
+                      backgroundColor="#1C1D2B"
+                      borderColor="#45494D"
+                    />
+                    <div class="comment-content">
+                      <div
+                        class=""
+                        style="display: flex; justify-content: space-between; align-items: start;"
+                      >
+                        <div class="">
+                          <div class="comment-author">
+                            {comment.author.name}
+                          </div>
+                          <div class="comment-text">{comment.value}</div>
+                        </div>
+
+                        {#if isHovering === comment.id}
+                          <span
+                            on:click={() => (
+                              ((id = comment?.post?.id), (isPostopen = true)),
+                              setActiveTabFromActivity(
+                                "feedback",
+                                comment.post?.id,
+                              )
+                            )}
+                            class="go-to-post"
+                            style="font-size: 12px; letter-spacing: 0.25px; font-weight: 400;"
+                            >Go to post &#8599;</span
+                          >
+                        {/if}
+                      </div>
+
+                      <div class="comment-meta">
+                        <div class="comment-moreinfo">
+                          <span class="comment-time">
+                            {timeAgo(comment.created)}
+                          </span>
+                          <a href="#" class="comment-reply">Reply</a>
+                        </div>
+                        <div class="comment-likes">
+                          <Like />
+                          <span class="like-count">{comment.likeCount}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                {/each}
+              </ul>
+            {:else}
+              <p
+                class="mx-1 text-fs-12 mb-0 text-center"
+                style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+              >
+                No Result Found
+              </p>
+            {/if}
+          </div>
         </div>
-      </div>
+      {/if}
     </div>
   {/if}
 
