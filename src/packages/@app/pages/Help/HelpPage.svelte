@@ -187,8 +187,6 @@
             {:else if activeTab === "updates"}
               <ReleaseNotes
                 listChangeLog={_viewModel.listChangeLog}
-                {releaseNotesData}
-                onLearnMore={_viewModel.learnMore}
               />
             {:else if activeTab === "roadmap"}
               <Roadmap
