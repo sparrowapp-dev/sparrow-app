@@ -39,6 +39,8 @@
   }
 
   function setActiveTabFromActivity(tab, postID) {
+    console.log(tab, postID);
+
     if (tab !== "faq") {
       // Disable FAQ tab
       isPostopenFromActivity = true;

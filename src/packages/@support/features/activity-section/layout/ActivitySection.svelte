@@ -370,10 +370,11 @@
                         {#if isHovering === comment.id}
                           <span
                             on:click={() => (
-                              ((id = comment?.post?.id), (isPostopen = true)),
+                              ((postId = comment?.post?.id),
+                              (isPostopen = true)),
                               setActiveTabFromActivity(
                                 "feedback",
-                                comment.post?.id,
+                                comment?.post?.id,
                               )
                             )}
                             class="go-to-post"
