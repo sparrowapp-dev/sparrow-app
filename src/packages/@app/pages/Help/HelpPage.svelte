@@ -49,13 +49,13 @@
 
   let isPostopenFromActivity = false;
 
-  let   postId = "";
+  let postId = "";
 
-  function  setPostId(tab, postID) {
+  function setPostId(tab, postID) {
     if (tab !== "faq") {
       isPostopenFromActivity = true;
       activeTab = tab;
-        postId = postID;
+      postId = postID;
     }
   }
 </script>
@@ -185,14 +185,9 @@
                 bind:isPostopenFromActivity
               />
             {:else if activeTab === "updates"}
-              <ReleaseNotes
-                listChangeLog={_viewModel.listChangeLog}
-              />
+              <ReleaseNotes listChangeLog={_viewModel.listChangeLog} />
             {:else if activeTab === "roadmap"}
-              <Roadmap
-                { setPostId}
-                fetchPosts={_viewModel.getListOfPOsts}
-              />
+              <Roadmap {setPostId} fetchPosts={_viewModel.getListOfPOsts} />
             {:else if activeTab === "community"}
               <Community />
               <DiscordPost />
@@ -207,6 +202,7 @@
               <AddFeedback
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
+                selectId={"help"}
               />
             </div>
             <div>

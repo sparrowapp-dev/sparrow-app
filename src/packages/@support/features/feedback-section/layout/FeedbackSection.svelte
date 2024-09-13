@@ -86,6 +86,7 @@
   };
 
   const handleCategoryChange = async (selectedCategory) => {
+    // debugger;
     feedbackType = selectedCategory;
 
     if (selectedCategory === FeedbackType.ALL_CATEGORY) {
@@ -95,9 +96,14 @@
       // Fetch and filter posts by the selected category
       isLoading = true;
       const listPosts = await fetchPosts(currentSort, searchTerm, status);
-      posts = listPosts?.data?.posts.filter(
-        (post) => post?.category?.name === selectedCategory,
-      );
+      // debugger;
+      console.log("list----", listPosts, selectedCategory);
+      posts = listPosts?.filter((post) => {
+        // debugger;
+        console.log("post", post?.category?.name);
+        return post?.category?.name === selectedCategory;
+      });
+      console.log("postsss", posts);
       isLoading = false;
     }
   };
@@ -112,7 +118,7 @@
     if (status === "under review") return "white";
     if (status === "in progress") return "#DF77F9";
     if (status === "planned") return "#FFE47E";
-    if(status ==="open") return "#00a86b";
+    if (status === "open") return "#00a86b";
     return "white";
   }
 </script>
@@ -131,7 +137,7 @@
             type="text"
             id="search-input"
             class={`bg-transparent w-100 border-0 my-auto`}
-            placeholder="Search updates"
+            placeholder="Search Feedbacks"
             on:input={(e) => {
               handleInputChange(e.target.value);
             }}
