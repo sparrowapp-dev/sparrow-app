@@ -144,10 +144,10 @@
         <Select
           id={"feeds"}
           data={[
-            { name: "All", id: "all" },
             { name: "New", id: "new" },
             { name: "Fixed", id: "fixed" },
             { name: "Improved", id: "improved" },
+            { name: "All", id: "all" },
           ]}
           titleId={selectedTag}
           onclick={(id = "") => {
