@@ -9,7 +9,7 @@
     UpdateRequestUrlType,
   } from "@workspaces/common/type";
   import { notifications } from "@library/ui/toast/Toast";
-  import DropButton from "$lib/components/buttons/DropButton.svelte";
+  import { DropButton } from "@workspaces/common/components";
   import { CodeMirrorInput } from "../../../../common/components";
   import { UrlInputTheme } from "../../../../common/utils/";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
@@ -38,6 +38,7 @@
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
   };
+
   /**
    * @description - save request handler
    */
@@ -188,12 +189,15 @@
       disabled={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
         : false}
-         style="background-color: {isSave ? 'var(--icon-secondary-550)' : 'var(--bg-secondary-400)'}; color: white;"
+      style="background-color: {isSave ||
+      userRole === WorkspaceRole.WORKSPACE_VIEWER
+        ? 'var(--icon-secondary-550)'
+        : 'var(--bg-secondary-400)'}; color: white;"
     >
       <DiskIcon
         height={22}
         width={22}
-        color={isSave
+        color={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
           ? "var(--icon-secondary-380)"
           : isHovered && !isSave && !isGuestUser
           ? "var(--icon-primary-200)"
@@ -208,6 +212,10 @@
   .save-disk {
     padding: 7px;
     background-color: var(--bg-secondary-400);
+  }
+
+  .save-disk:disabled {
+    background-color: var(--bg-secondary-550);
   }
   :global(.url-red-border) {
     border: 1px solid var(--border-danger-200) !important;

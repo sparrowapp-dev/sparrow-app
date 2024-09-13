@@ -1,21 +1,14 @@
-<script lang="ts">
-  // import CollectionsList from "$lib/components/collections/collections-list/CollectionList.svelte";
-  import RequestResponse from "$lib/components/collections/req-res-section/RequestResponse.svelte";
-  import DefaultTabBar from "$lib/components/collections/req-res-section/sub-components/sub-components-header/DefaultTabBar.svelte";
-  import TabBar from "$lib/components/collections/req-res-section/sub-components/sub-components-header/TabBar.old.svelte";
+<!-- <script lang="ts">
   import { collapsibleState } from "$lib/store/request-response-section";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { CollectionsViewModel } from "./Collections.ViewModel.old";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
-  import MyWorkspace from "$lib/components/workspace/workspace-tab/myWorkspace.svelte";
-  import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
+
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import type { Writable } from "svelte/store";
-  import MyCollection from "$lib/components/collections/collection-tab/MyCollection.svelte";
-  import MyFolder from "$lib/components/collections/folder-tab/MyFolder.svelte";
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "$lib/utils/animations";
   import { onDestroy, onMount } from "svelte";
@@ -207,9 +200,9 @@
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
-</script>
+</script> -->
 
-<Splitpanes
+<!-- <Splitpanes
   class="splitter-sidebar"
   on:resize={(e) => {
     collectionLeftPanelWidth.set(e.detail[0].size);
@@ -220,8 +213,8 @@
     class="sidebar-left-panel"
     minSize={20}
     size={$collapsibleState ? 0 : $collectionLeftPanelWidth}
-  >
-    <!-- <CollectionsList
+  > -->
+<!-- <CollectionsList
       {runAnimation}
       {changeAnimation}
       activeTabId={$activeTab?.id}
@@ -230,7 +223,7 @@
       {collectionsMethods}
       {loggedUserRoleInWorkspace}
     /> -->
-  </Pane>
+<!-- </Pane>
   <Pane
     class="sidebar-right-panel"
     minSize={60}
@@ -245,8 +238,8 @@
           {loggedUserRoleInWorkspace}
           {refreshEnv}
         />
-      </div>
-      <!-- <div class="tab__content d-flex vh-100">
+      </div> -->
+<!-- <div class="tab__content d-flex vh-100">
         <div class="w-100">
           {#if $tabList && $tabList.length == 0}
             <DefaultTabBar {collectionsMethods} />
@@ -267,7 +260,7 @@
               {loggedUserRoleInWorkspace}
             />
           </div> -->
-      <div class="tab__content d-flex">
+<!-- <div class="tab__content d-flex">
         <div class="w-100">
           {#if $tabList && $tabList.length == 0}
             <DefaultTabBar {collectionsMethods} />
@@ -300,14 +293,14 @@
         </div>
       </div>
     </div>
-  </Pane>
-</Splitpanes>
+  </Pane> -->
+<!-- </Splitpanes> -->
 <!-- </div>
 </Motion> -->
-<svelte:window on:keydown={handleKeyPress} />
+<!-- <svelte:window on:keydown={handleKeyPress} />
 
 <style>
   :global(.splitter-sidebar.splitpanes) {
     width: calc(100vw - 72px) !important;
   }
-</style>
+</style> -->

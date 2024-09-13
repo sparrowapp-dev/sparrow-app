@@ -92,15 +92,15 @@
           </tr>
         </thead>
       </table>
-     <div>
-       <img
-        src={TeamSkeleton}
-        alt="Team-Skelton"
-        width="100%"
-        height="100%"
-        style=""
-      />
-     </div>
+      <div>
+        <img
+          src={TeamSkeleton}
+          alt="Team-Skelton"
+          width="100%"
+          height="100%"
+          style=""
+        />
+      </div>
     {/if}
 
     {#if !isGuestUser}

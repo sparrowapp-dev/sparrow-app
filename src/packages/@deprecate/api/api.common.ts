@@ -8,7 +8,7 @@ import { setAuthJwt } from "$lib/utils/jwt";
 import { isLoading } from "$lib/store/auth.store";
 import { ErrorMessages } from "$lib/utils/enums/enums";
 import { invoke } from "@tauri-apps/api/core";
-import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+import { DashboardViewModel } from "@app/pages/Dashboard/Dashboard.ViewModel";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
@@ -167,7 +167,7 @@ const makeRequest = async (
       e.response?.data?.statusCode === 401 &&
       e.response.data.message === ErrorMessages.Unauthorized
     ) {
-      const _viewModel = new HeaderDashboardViewModel();
+      const _viewModel = new DashboardViewModel();
       await _viewModel.clientLogout();
       return error("Unauthorized");
     }
