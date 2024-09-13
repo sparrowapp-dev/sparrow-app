@@ -115,7 +115,13 @@
   };
 
   $: {
-    if (currentWorkspaceId) {
+    if (
+      currentTeamName ||
+      currentTeamId ||
+      currentWorkspaceName ||
+      currentWorkspaceId ||
+      workspaceDocuments
+    ) {
       calculateLimitedWorkspace();
     }
   }

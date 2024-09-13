@@ -6,7 +6,7 @@
   import type { TabDocument, TeamDocument } from "@app/database/database";
   import RecentApi from "@teams/features/recent-apis/layout/RecentApi.svelte";
   import RecentWorkspace from "@teams/features/recent-workspace/layout/RecentWorkspace.svelte";
-
+  import { open } from "@tauri-apps/plugin-shell";
   import { base64ToURL } from "$lib/utils/helpers";
   import { List } from "@library/ui";
   import { PeopleIcon } from "$lib/assets/app.asset";
