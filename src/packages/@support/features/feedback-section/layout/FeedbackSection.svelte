@@ -62,7 +62,7 @@
     isPostopenFromActivity = false;
   });
 
-  const handleUpvote = (e) => {
+  const handleUpvote = () => {
     getPosts(currentSort, searchTerm, status);
   };
 
@@ -101,6 +101,20 @@
       isLoading = false;
     }
   };
+
+  /**
+   * Returns a color code based on the provided status.
+   *
+   * @param status - The current status of the product (e.g., "Under Review", "In Progress", "Planned").
+   * @returns The corresponding color code.
+   */
+  function getColor(status) {
+    if (status === "under review") return "white";
+    if (status === "in progress") return "#DF77F9";
+    if (status === "planned") return "#FFE47E";
+    if(status ==="open") return "#00a86b";
+    return "white";
+  }
 </script>
 
 <div style="margin: 8px 46px 0 34px;">
@@ -301,7 +315,17 @@
                   <div
                     style="height: 16px; display: flex; align-items: center;"
                   >
-                    <span class="category">{post?.status} </span>
+                    <span
+                      class="category"
+                      style="color:{getColor(
+                        post.status,
+                      )}; border:0.2px solid {getColor(status)};  "
+                    >
+                      {post?.status
+                        ? post.status.charAt(0).toUpperCase() +
+                          post.status.slice(1)
+                        : ""}
+                    </span>
                   </div>
                 </div>
                 <UpvoteIcon
@@ -356,6 +380,7 @@
       {userInfo}
       {onAddComment}
       {fetchComments}
+      {handleUpvote}
     />
   {/if}
 </div>
@@ -401,10 +426,7 @@
 
   .category {
     background-color: #171302;
-    color: #ffe47e;
-    opacity: 0.5;
     padding: 1px 4px;
-    border: 0.2px solid #ffe47e;
     border-radius: 4px;
     font-size: 12px;
     line-height: 16px;
