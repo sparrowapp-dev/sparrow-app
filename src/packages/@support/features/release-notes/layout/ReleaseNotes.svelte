@@ -16,6 +16,7 @@
   import { Loader, Tooltip } from "@library/ui";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
   import { notifications } from "@library/ui/toast/Toast";
+  import { open } from "@tauri-apps/plugin-shell";
 
   const externalSparrowGithub = constants.SPARROW_GITHUB;
   const externalSparrowLinkedin = constants.SPARROW_LINKEDIN;
