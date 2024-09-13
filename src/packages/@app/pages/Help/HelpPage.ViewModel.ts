@@ -214,7 +214,15 @@ class HelpPageViewModel {
     const boards = await this.RetrieveBoards();
     const boardID = boards?.data?.boards[0]?.id;
     const response = await this.cannyService.listPosts(boardID, sort, search, status, userId);
-    return response;
+    let voteList = await this.listVote();
+    let result = response.data.posts.map((post) => {
+
+      const isLiked = voteList.data.votes.some(
+        (vote) => vote.post.id === post.id,
+      );
+      return { ...post, isPostLiked: isLiked };
+    });
+    return result;
   };
 
   /**
@@ -296,6 +304,8 @@ class HelpPageViewModel {
     const response = await this.cannyService.retrieveUserComments(authorID, sort, search, status);
     return response
   }
+
+
 
   public retrieveUserVotes = async (userID: string) => {
     const response = await this.cannyService.retrieveVotes({}, userID)
@@ -453,23 +463,20 @@ class HelpPageViewModel {
         userID: userInfo?._id,
       });
     }
-
     const UserId = userResponse?.data?.id;  // Use the retrieved or newly created user's ID
 
     if (UserId) {
-      const result = await this.cannyService.listVotes(postID);
+      console.log("This is user ID", UserId)
+      const result = await this.cannyService.listVotes(UserId);
       return result;
     }
   }
-
 
 
   public listChangeLog = async (type: string) => {
     const result = await this.cannyService.listChangeLog(type);
     return result;
   }
-
-
 
 }
 

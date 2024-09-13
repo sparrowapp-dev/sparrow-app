@@ -4,15 +4,15 @@
   // import { SearchIcon } from "$lib/assets/icons";
   import { Select } from "@library/forms";
   import { CategoryIcon, CrossIcon, StackIcon } from "@library/icons";
-    import { Loader } from "@library/ui";
+  import { Loader } from "@library/ui";
   import HelpInfoCard from "@support/common/components/HelpInfo-Card/HelpInfoCard.svelte";
   import { onMount } from "svelte";
 
   export let fetchPosts;
 
-  export let   setPostId
+  export let setPostId;
 
-  let isLoading=false;
+  let isLoading = false;
 
   let productStatus = [];
   let type = "allCategories";
@@ -77,12 +77,12 @@
   }));
 
   onMount(async () => {
-    isLoading=true;
+    isLoading = true;
     const response = await fetchPosts();
-    if (response?.data?.posts) {
-      transformPostsToProductStatus(response.data.posts);
+    if (response) {
+      transformPostsToProductStatus(response);
     }
-    isLoading=false;
+    isLoading = false;
   });
 </script>
 
@@ -111,7 +111,7 @@
           type="text"
           id="search-input"
           class={`bg-transparent w-100 border-0 my-auto`}
-          placeholder="Search workspaces"
+          placeholder="Search Roadmap"
           on:input={(e) => {
             searchTerm = e.target.value;
           }}
@@ -169,52 +169,48 @@
     </div>
 
     {#if isLoading}
-    <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+      <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
     {:else}
-    <div
-    class="d-flex justify-content-between gap-2 update-state-section"
-    style="width:100%;"
-  >
-    {#each filteredProductStatus as { status, products, filteredProducts }}
       <div
-        class="rounded-2"
-        style="width:100%; background-color: var(--bg-secondary-800); overflow: hidden;"
+        class="d-flex justify-content-between gap-2 update-state-section"
+        style="width:100%;"
       >
-        <div
-          style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-secondary-870); height:32px;  color:{getColor(
-            status,
-          )}; border-bottom:1px solid {getColor(status)};"
-        >
-          {status}
-        </div>
-        <div class="p-2">
-          {#if (filteredProducts?.length == 0 && searchTerm.length > 0) || filteredProducts?.length == 0}
-            <p
-              class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
-              style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
-            >
-              No Result Found.
-            </p>{:else}
-            <HelpInfoCard { setPostId} status={filteredProducts} />
-          {/if}
-        </div>
-
-        {#if filteredProductStatus.length == 0 && searchTerm.length >= 0}
-          <p
-            class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
-            style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
+        {#each filteredProductStatus as { status, products, filteredProducts }}
+          <div
+            class="rounded-2"
+            style="width:100%; background-color: var(--bg-secondary-800); overflow: hidden;"
           >
-            No results found.
-          </p>
-        {/if}
+            <div
+              style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-secondary-870); height:32px;  color:{getColor(
+                status,
+              )}; border-bottom:1px solid {getColor(status)};"
+            >
+              {status}
+            </div>
+            <div class="p-2">
+              {#if (filteredProducts?.length == 0 && searchTerm.length > 0) || filteredProducts?.length == 0}
+                <p
+                  class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
+                  style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
+                >
+                  No Result Found.
+                </p>{:else}
+                <HelpInfoCard {setPostId} status={filteredProducts} />
+              {/if}
+            </div>
+
+            {#if filteredProductStatus.length == 0 && searchTerm.length >= 0}
+              <p
+                class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
+                style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
+              >
+                No results found.
+              </p>
+            {/if}
+          </div>
+        {/each}
       </div>
-    {/each}
-  </div>
     {/if}
-
-   
-
-
   </div>
 </div>
 

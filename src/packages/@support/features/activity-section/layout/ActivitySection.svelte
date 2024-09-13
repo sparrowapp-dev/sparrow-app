@@ -30,6 +30,7 @@
   export let fetchComments;
   export let fetchLikedPosts;
   export let setActiveTabFromActivity;
+  export let listPostsComments;
 
   let currentSort = "newest";
   let posts = [];
@@ -46,14 +47,13 @@
   let activityStatusType: string = ActivityStatusType.ALL_ACTIVITY;
   const defaultStaus = "all activity";
   let status = defaultStaus;
-  let id = "";
+  let postId = "";
   let loading = false;
 
   user.subscribe((value) => {
     userInfo = value;
   });
 
-  // Fetch all data once on mount
   const getAllData = async () => {
     try {
       loading = true;
@@ -70,12 +70,7 @@
       comments = commentsData?.data?.comments || [];
       likedPosts = likedPostsData?.data?.votes || [];
 
-      console.log(likedPosts);
-
-      filterPosts();
-      filterComments();
-      filterLikedPosts();
-      // sortComments(currentSort);
+      applyAllFilters();
       loading = false;
     } catch (error) {
       loading = false;
@@ -86,102 +81,78 @@
     await getAllData();
   });
 
-  const filterPosts = () => {
-    filteredPosts = posts.filter((post) =>
+  const applyAllFilters = () => {
+    let tempPosts = posts.filter((post) =>
       post.title.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-  };
-
-  const filterComments = () => {
-    filteredComments = comments.filter((comment) =>
+    let tempComments = comments.filter((comment) =>
       comment.value.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-  };
-
-  const filterLikedPosts = () => {
-    filteredLikedPosts = likedPosts.filter((vote) =>
+    let tempLikedPosts = likedPosts.filter((vote) =>
       vote.post.title.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-  };
 
-  const sortPosts = async (sort) => {
-    const response = await fetchPosts(sort, userInfo._id);
-    filteredPosts = response?.data?.posts;
-  };
-
-  const sortComments = (sortType) => {
-    if (sortType === "newest") {
-      filteredComments = comments
-        .filter((comment) => comment.value)
-        .sort((a, b) => new Date(b.created) - new Date(a.created));
-    } else if (sortType === "oldest") {
-      filteredComments = comments
-        .filter((comment) => comment.value)
-        .sort((a, b) => new Date(a.created) - new Date(b.created));
+    if (activityType !== ActivityType.ALL_CATEGORIES) {
+      tempPosts = tempPosts.filter(
+        (post) => post?.category?.name === activityType,
+      );
+      tempLikedPosts = tempLikedPosts.filter(
+        (vote) => vote.post.category?.name === activityType,
+      );
     }
-  };
 
-  const sortLikedPosts = (sortType) => {
-    if (sortType === "newest") {
-      filteredLikedPosts = likedPosts
-        .filter((vote) => vote.post.title)
-        .sort((a, b) => new Date(b.created) - new Date(a.created));
-    } else if (sortType === "oldest") {
-      filteredLikedPosts = likedPosts
-        .filter((vote) => vote.post.value)
-        .sort((a, b) => new Date(a.created) - new Date(b.created));
+    if (activityStatusType === ActivityStatusType.POST) {
+      tempComments = [];
+      tempLikedPosts = [];
+    } else if (activityStatusType === ActivityStatusType.COMMENT) {
+      tempPosts = [];
+      tempLikedPosts = [];
+    } else if (activityStatusType === ActivityStatusType.UPVOTED_POSTS) {
+      tempPosts = [];
+      tempComments = [];
     }
+
+    const sortFunction = (a, b) => {
+      if (currentSort === "newest") {
+        return new Date(b.created) - new Date(a.created);
+      } else if (currentSort === "oldest") {
+        return new Date(a.created) - new Date(b.created);
+      }
+      return 0;
+    };
+
+    filteredPosts = tempPosts.sort(sortFunction);
+    filteredComments = tempComments.sort(sortFunction);
+    filteredLikedPosts = tempLikedPosts.sort(sortFunction);
   };
 
   const handleInputChange = (searchQuery) => {
     searchTerm = searchQuery;
-    filterPosts();
+    applyAllFilters();
   };
 
   const handleSortChange = async (sortType) => {
     currentSort = sortType;
-    sortComments(sortType);
-    await sortPosts(sortType);
-    sortLikedPosts(sortPosts);
+    applyAllFilters();
   };
 
   const handleCategoryChange = (selectedCategory) => {
     activityType = selectedCategory;
-    if (selectedCategory === ActivityType.ALL_CATEGORIES) {
-      filteredPosts = posts;
-      filteredLikedPosts = likedPosts;
-    } else {
-      filteredPosts = posts.filter(
-        (post) => post?.category?.name === selectedCategory,
-      );
-
-      filteredLikedPosts = likedPosts.filter(
-        (vote) => vote.post.category?.name === selectedCategory,
-      );
-    }
+    applyAllFilters();
   };
 
   const handleActivityChanges = (selectedStatus) => {
     activityStatusType = selectedStatus;
-
-    if (selectedStatus === ActivityStatusType.POST) {
-      filteredPosts = posts;
-      filteredComments = [];
-      filteredLikedPosts = [];
-    } else if (selectedStatus === ActivityStatusType.COMMENT) {
-      filteredPosts = [];
-      filteredLikedPosts = [];
-      filteredComments = comments;
-    } else if (selectedStatus === ActivityStatusType.UPVOTED_POSTS) {
-      filteredPosts = [];
-      filteredComments = [];
-      filteredLikedPosts = likedPosts;
-    } else {
-      filteredPosts = posts;
-      filteredComments = comments;
-      filteredLikedPosts = likedPosts;
-    }
+    applyAllFilters();
   };
+
+  // You can remove these individual filter functions as they're now incorporated into applyAllFilters
+  // filterPosts();
+  // filterComments();
+  // filterLikedPosts();
+  // sortPosts();
+  // sortComments();
+  // sortLikedPosts();
 
   function timeAgo(createdTime: string) {
     const now = new Date();
@@ -304,14 +275,14 @@
         <div class="sort-options">
           <button
             on:click={() => handleSortChange("newest")}
-            class="sort-button"
+            class={`sort-button ${currentSort === "newest" && "selected-sort"}`}
           >
             Newest
             <img src={tickIcon} alt="" class="tick-icon" />
           </button>
           <button
             on:click={() => handleSortChange("oldest")}
-            class="sort-button"
+            class={`sort-button ${currentSort === "oldest" && "selected-sort"}`}
           >
             Oldest
             <img src={tickIcon} alt="" class="tick-icon" />
@@ -336,7 +307,9 @@
                     <div class="post-header">
                       <div
                         class="post-title"
-                        on:click={() => ((id = post?.id), (isPostopen = true))}
+                        on:click={() => (
+                          (postId = post?.id), (isPostopen = true)
+                        )}
                       >
                         {post?.title}
                       </div>
@@ -447,7 +420,7 @@
                         <div
                           class="post-title"
                           on:click={() => (
-                            (id = post?.id), (isPostopen = true)
+                            (postId = post?.id), (isPostopen = true)
                           )}
                         >
                           {post?.title}
@@ -482,7 +455,13 @@
   {/if}
 
   {#if isPostopen}
-    <FeedbackPost bind:isPostopen {onRetrievePost} {userInfo} bind:id />
+    <FeedbackPost
+      bind:isPostopen
+      {onRetrievePost}
+      {userInfo}
+      bind:postId
+      fetchComments={listPostsComments}
+    />
   {/if}
 </div>
 
@@ -776,12 +755,14 @@
     display: none;
   }
 
-  .sort-button:focus-within .tick-icon,
-  .sort-button:hover .tick-icon {
+  .sort-button:focus-within .tick-icon {
     display: block;
   }
 
   .sort-buttons:focus-within {
+    color: #3670f7 !important;
+  }
+  .selected-sort {
     color: #3670f7 !important;
   }
   .tick-icon {
@@ -818,6 +799,7 @@
     color: #df77f9;
     border: 1px solid #df77f9;
     background-color: #1c0837;
+    padding-bottom: 17px;
   }
 
   .review {

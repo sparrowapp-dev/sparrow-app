@@ -19,7 +19,7 @@
   import { pagesMotion } from "@app/constants";
   import Roadmap from "@support/features/roadmap/layout/Roadmap.svelte";
   import { ReleaseNotes } from "@support/features/release-notes/layout";
-  import ActivitySection from "@support/features/activity-section/ActivitySection.svelte";
+  import { ActivitySection } from "@support/features/activity-section";
 
   const _viewModel = new HelpPageViewModel();
 
@@ -211,6 +211,7 @@
                 onRetrievePost={_viewModel.retrievePostData}
                 fetchComments={_viewModel.retrieveUserComments}
                 fetchLikedPosts={_viewModel.retrieveUserVotes}
+                listPostsComments={_viewModel.listComments}
                 {setActiveTabFromActivity}
               />
             {/if}
