@@ -114,7 +114,7 @@
     if (status === "under review") return "white";
     if (status === "in progress") return "#DF77F9";
     if (status === "planned") return "#FFE47E";
-    if (status === "open") return "#00a86b";
+    if (status === "open") return "#1193F0";
     return "white";
   }
 </script>

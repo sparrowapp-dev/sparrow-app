@@ -250,11 +250,11 @@
         />
 
         <div class="d-flex align-items-center gap-2">
-          <AttachmentIcon
+          <!-- <AttachmentIcon
             height={"12px"}
             width={"12px"}
             color={"var(--text-secondary-200)"}
-          />
+          /> -->
 
           <Button
             title={`Add`}
