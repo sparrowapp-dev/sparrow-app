@@ -114,7 +114,7 @@
     if (status === "under review") return "white";
     if (status === "in progress") return "#DF77F9";
     if (status === "planned") return "#FFE47E";
-    if (status === "open") return "#00a86b";
+    if (status === "open") return "#1193F0";
     return "white";
   }
 </script>
@@ -321,7 +321,7 @@
                       class="category"
                       style="color:{getColor(
                         post.status,
-                      )}; border:0.2px solid {getColor(status)};  "
+                      )}; border:0.2px solid {getColor(post.status)};  "
                     >
                       {post?.status
                         ? post.status.charAt(0).toUpperCase() +
@@ -330,16 +330,18 @@
                     </span>
                   </div>
                 </div>
+              <div style="cursor:pointer">
                 <UpvoteIcon
-                  isPostLiked={post.isPostLiked}
-                  backgroundColor={"transparent"}
-                  {handleUpvote}
-                  authordId={post.author.id}
-                  postID={post.id}
-                  likePost={createVote}
-                  dislikePost={deleteVote}
-                  upvote={post?.score}
-                />
+                isPostLiked={post.isPostLiked}
+                backgroundColor={"transparent"}
+                {handleUpvote}
+                authordId={post.author.id}
+                postID={post.id}
+                likePost={createVote}
+                dislikePost={deleteVote}
+                upvote={post?.score}
+              />
+              </div>
               </div>
 
               <div style="margin-top: 10px; flex: 1;">

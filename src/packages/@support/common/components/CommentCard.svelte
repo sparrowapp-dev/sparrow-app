@@ -39,6 +39,8 @@
   const handleAddCommentInput = (e) => {
     commentValue = e.target.value;
   };
+
+  let isCommenting=false;
 </script>
 
 
@@ -105,14 +107,17 @@
             buttonClassProp={`ps-2`}
             buttonStyleProp={`height: 20px; width:35px; rounded;`}
             onClick={async () => {
+              isCommenting=true;
               await onAddComment(postId, commentValue, comment?.id);
+              isCommenting=false;
+
               logMessage();
               commentValue = "";
               setTimeout(() => {
                 isReplying = false;
               }, 3000);
             }}
-            disable={commentValue.length == 0}
+            disable={commentValue.length == 0 || isCommenting}
           />
         </div>
       </div>

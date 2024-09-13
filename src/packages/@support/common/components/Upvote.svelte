@@ -48,7 +48,7 @@
     align-items: center;
     padding: 1px 4px;
     border-radius: 4px;
-    cursor: pointer;
+    /* cursor: pointer; */
     margin-left: 10px;
   }
 
