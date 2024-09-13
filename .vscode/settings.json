@@ -1,11 +1,11 @@
 {
   "editor.minimap.enabled": false,
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
   },
   "svelte.enable-ts-plugin": true,
   "[typescript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
