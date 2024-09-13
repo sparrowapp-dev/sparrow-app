@@ -19,6 +19,7 @@
   import { pagesMotion } from "@app/constants";
   import Roadmap from "@support/features/roadmap/layout/Roadmap.svelte";
   import { ReleaseNotes } from "@support/features/release-notes/layout";
+  import { ActivitySection } from "@support/features/activity-section";
 
   const _viewModel = new HelpPageViewModel();
 
@@ -26,11 +27,25 @@
 
   document.addEventListener("contextmenu", (event) => event.preventDefault());
 
+  let parentPostOpen = false;
+  let isPostopenFromActivity = false;
+  let postIdFromActivity;
   let activeTab = "roadmap";
 
   function setActiveTab(tab) {
     if (tab !== "faq") {
       activeTab = tab;
+    }
+  }
+
+  function setActiveTabFromActivity(tab, postID) {
+    console.log(tab, postID);
+
+    if (tab !== "faq") {
+      // Disable FAQ tab
+      isPostopenFromActivity = true;
+      activeTab = tab;
+      postIdFromActivity = postID;
     }
   }
 
@@ -46,8 +61,6 @@
       activeTab = "roadmap";
     }
   });
-
-  let isPostopenFromActivity = false;
 
   let postId = "";
 
@@ -177,10 +190,11 @@
                 onRetrievePost={_viewModel.retrievePostData}
                 onAddComment={_viewModel.addComment}
                 fetchComments={_viewModel.listComments}
-                currentUser={_viewModel.createUser}
                 createVote={_viewModel.CreateVote}
                 deleteVote={_viewModel.deleteVote}
                 listVote={_viewModel.listVote}
+                {postIdFromActivity}
+                {parentPostOpen}
                 bind:postId
                 bind:isPostopenFromActivity
               />
@@ -192,7 +206,16 @@
               <Community />
               <DiscordPost />
             {:else if activeTab === "myActivity"}
-              My Activity
+              <ActivitySection
+                onInputFeedback={_viewModel.createPost}
+                onAddFeedback={_viewModel.addFeedback}
+                fetchPosts={_viewModel.getUserPosts}
+                onRetrievePost={_viewModel.retrievePostData}
+                fetchComments={_viewModel.retrieveUserComments}
+                fetchLikedPosts={_viewModel.retrieveUserVotes}
+                listPostsComments={_viewModel.listComments}
+                {setActiveTabFromActivity}
+              />
             {/if}
           </div>
         </div>
