@@ -96,14 +96,10 @@
       // Fetch and filter posts by the selected category
       isLoading = true;
       const listPosts = await fetchPosts(currentSort, searchTerm, status);
-      // debugger;
-      console.log("list----", listPosts, selectedCategory);
+
       posts = listPosts?.filter((post) => {
-        // debugger;
-        console.log("post", post?.category?.name);
         return post?.category?.name === selectedCategory;
       });
-      console.log("postsss", posts);
       isLoading = false;
     }
   };
