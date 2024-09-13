@@ -9,6 +9,7 @@
 
   export let onAddFeedback;
   export let onInputFeedback;
+  export let selectId = "";
 
   let type: FeedbackType = FeedbackType.CATEGORY;
   let feedbackDescription = "";
@@ -150,7 +151,7 @@
         iconRequired={true}
         icon={CategoryIcon}
         placeholderText={"Category"}
-        id={"feeds"}
+        id={`feeds-${selectId}`}
         zIndex={499}
         titleId={type}
         onclick={(id = "") => {

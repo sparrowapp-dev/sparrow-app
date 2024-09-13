@@ -27,6 +27,6 @@
     </div>
   </div>
   <div style="width:calc(100% - 72.5% );  ">
-    <AddFeedback {onInputFeedback} {onAddFeedback} />
+    <AddFeedback {onInputFeedback} {onAddFeedback} selectId={"gightPanel"} />
   </div>
 </div>
