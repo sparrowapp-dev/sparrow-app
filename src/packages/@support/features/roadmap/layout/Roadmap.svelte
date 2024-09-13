@@ -111,7 +111,7 @@
           type="text"
           id="search-input"
           class={`bg-transparent w-100 border-0 my-auto`}
-          placeholder="Search workspaces"
+          placeholder="Search Roadmap"
           on:input={(e) => {
             searchTerm = e.target.value;
           }}
@@ -181,9 +181,7 @@
         style="width:100%; background-color: var(--bg-secondary-800); overflow: hidden;"
       >
         <div
-          style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-secondary-870); height:32px;  color:{getColor(
-            status,
-          )}; border-bottom:1px solid {getColor(status)};"
+          style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-secondary-870); height:32px;  color:{getColor(status)}; border-bottom:1px solid {getColor(status)};"
         >
           {status}
         </div>
