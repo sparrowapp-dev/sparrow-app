@@ -86,6 +86,7 @@
   };
 
   const handleCategoryChange = async (selectedCategory) => {
+    // debugger;
     feedbackType = selectedCategory;
 
     if (selectedCategory === FeedbackType.ALL_CATEGORY) {
@@ -95,9 +96,10 @@
       // Fetch and filter posts by the selected category
       isLoading = true;
       const listPosts = await fetchPosts(currentSort, searchTerm, status);
-      posts = listPosts?.data?.posts.filter(
-        (post) => post?.category?.name === selectedCategory,
-      );
+
+      posts = listPosts?.filter((post) => {
+        return post?.category?.name === selectedCategory;
+      });
       isLoading = false;
     }
   };
@@ -131,7 +133,7 @@
             type="text"
             id="search-input"
             class={`bg-transparent w-100 border-0 my-auto`}
-            placeholder="Search updates"
+            placeholder="Search Feedbacks"
             on:input={(e) => {
               handleInputChange(e.target.value);
             }}

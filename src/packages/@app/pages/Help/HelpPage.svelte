@@ -223,6 +223,7 @@
               <AddFeedback
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
+                selectId={"help"}
               />
             </div>
             <div>

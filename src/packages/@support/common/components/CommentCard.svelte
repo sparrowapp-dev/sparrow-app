@@ -13,22 +13,26 @@
 
   let parentID = comment?.id;
 
-  function timeAgo(createdTime) {
-    const now = new Date();
-    const commentTime = new Date(createdTime);
-    const difference = now - commentTime;
-    const hours = Math.floor(difference / (1000 * 60 * 60)); // convert to hours
 
-    if (hours < 1) {
-      return "less than an hour ago";
-    } else if (hours === 1) {
-      return "1 hour ago";
-    } else {
-      return `${hours} hours ago`;
-    }
+
+  const timeAgo = (date) => {
+  const diffInSeconds = (new Date() - new Date(date)) / 1000;
+  const minutes = Math.floor(diffInSeconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (days >= 1) {
+    return `${days} day${days > 1 ? "s" : ""} ago`;
+  } else if (hours >= 1) {
+    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  } else if (minutes >= 1) {
+    return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+  } else {
+    const seconds = Math.floor(diffInSeconds);
+    return `${seconds} second${seconds > 1 ? "s" : ""} ago`;
   }
+};
 
-  const commentTime = timeAgo(comment.created); // Format the time in hours
 
   let isReplying = false;
   let commentValue = "";
@@ -36,6 +40,7 @@
     commentValue = e.target.value;
   };
 </script>
+
 
 <div class="comment">
   <IconFallback
@@ -53,7 +58,7 @@
     </div>
     <div class="comment-meta">
       <div class="comment-moreinfo">
-        <span class="comment-time">{commentTime}</span>
+        <span class="comment-time">{ timeAgo(comment.created)}</span>
         {#if !comment.parentID}
           <p
             on:click={() => (isReplying = !isReplying)}
@@ -65,7 +70,7 @@
           </p>
         {/if}
         {#if isAuthor}
-          <span class="edit-comment">Edit comment</span>
+          <!-- <span class="edit-comment">Edit comment</span> -->
         {/if}
       </div>
     </div>
