@@ -29,8 +29,8 @@
   export let onRetrievePost;
   export let fetchComments;
   export let fetchLikedPosts;
-  export let setActiveTabFromActivity;
   export let listPostsComments;
+  export let setPostId;
 
   let currentSort = "newest";
   let posts = [];
@@ -82,15 +82,34 @@
   });
 
   const applyAllFilters = () => {
-    let tempPosts = posts.filter((post) =>
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-    let tempComments = comments.filter((comment) =>
-      comment.value.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-    let tempLikedPosts = likedPosts.filter((vote) =>
-      vote.post.title.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
+    let tempPosts = posts
+      .filter((post) => {
+        if (post.author.email.toLowerCase() === userInfo.email.toLowerCase())
+          return true;
+        return false;
+      })
+      .filter((post) =>
+        post.title.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
+    let tempComments = comments
+      .filter((post) => {
+        if (post.author.email.toLowerCase() === userInfo.email.toLowerCase())
+          return true;
+        return false;
+      })
+      .filter((comment) =>
+        comment.value.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
+
+    let tempLikedPosts = likedPosts
+      .filter((post) => {
+        if (post.voter.email.toLowerCase() === userInfo.email.toLowerCase())
+          return true;
+        return false;
+      })
+      .filter((vote) =>
+        vote.post.title.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
 
     if (activityType !== ActivityType.ALL_CATEGORIES) {
       tempPosts = tempPosts.filter(
@@ -308,7 +327,9 @@
                       <div
                         class="post-title"
                         on:click={() => (
-                          (postId = post?.id), (isPostopen = true)
+                          (postId = post?.id),
+                          (isPostopen = true),
+                          setPostId("feedback", postId)
                         )}
                       >
                         {post?.title}
@@ -372,10 +393,7 @@
                             on:click={() => (
                               ((postId = comment?.post?.id),
                               (isPostopen = true)),
-                              setActiveTabFromActivity(
-                                "feedback",
-                                comment?.post?.id,
-                              )
+                              setPostId("feedback", comment?.post?.id)
                             )}
                             class="go-to-post"
                             style="font-size: 12px; letter-spacing: 0.25px; font-weight: 400;"
@@ -421,7 +439,9 @@
                         <div
                           class="post-title"
                           on:click={() => (
-                            (postId = post?.id), (isPostopen = true)
+                            (postId = post?.id),
+                            (isPostopen = true),
+                            setPostId("feedback", postId)
                           )}
                         >
                           {post?.title}

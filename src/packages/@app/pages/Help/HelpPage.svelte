@@ -23,29 +23,13 @@
 
   const _viewModel = new HelpPageViewModel();
 
-  let listVotes = [];
-
   document.addEventListener("contextmenu", (event) => event.preventDefault());
 
-  let parentPostOpen = false;
-  let isPostopenFromActivity = false;
-  let postIdFromActivity;
   let activeTab = "roadmap";
 
   function setActiveTab(tab) {
     if (tab !== "faq") {
       activeTab = tab;
-    }
-  }
-
-  function setActiveTabFromActivity(tab, postID) {
-    console.log(tab, postID);
-
-    if (tab !== "faq") {
-      // Disable FAQ tab
-      isPostopenFromActivity = true;
-      activeTab = tab;
-      postIdFromActivity = postID;
     }
   }
 
@@ -61,6 +45,8 @@
       activeTab = "roadmap";
     }
   });
+
+  let isPostopenFromActivity = false;
 
   let postId = "";
 
@@ -157,7 +143,7 @@
             : ''}"
           on:click={() => {
             setActiveTab("myActivity");
-            isPostPostOpen = false;
+            isPostopenFromActivity = false;
           }}
         >
           <ActivityIcon
@@ -190,11 +176,10 @@
                 onRetrievePost={_viewModel.retrievePostData}
                 onAddComment={_viewModel.addComment}
                 fetchComments={_viewModel.listComments}
+                currentUser={_viewModel.createUser}
                 createVote={_viewModel.CreateVote}
                 deleteVote={_viewModel.deleteVote}
                 listVote={_viewModel.listVote}
-                {postIdFromActivity}
-                {parentPostOpen}
                 bind:postId
                 bind:isPostopenFromActivity
               />
@@ -214,9 +199,8 @@
                 fetchComments={_viewModel.retrieveUserComments}
                 fetchLikedPosts={_viewModel.retrieveUserVotes}
                 listPostsComments={_viewModel.listComments}
-                {setActiveTabFromActivity}
-              />
-            {/if}
+                {setPostId}
+              />{/if}
           </div>
         </div>
         <div style="width: 274px;" class="ps-2 pe-3 pt-3 pb-2 h-100">
