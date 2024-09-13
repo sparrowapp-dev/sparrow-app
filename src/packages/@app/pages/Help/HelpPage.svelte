@@ -19,10 +19,9 @@
   import { pagesMotion } from "@app/constants";
   import Roadmap from "@support/features/roadmap/layout/Roadmap.svelte";
   import { ReleaseNotes } from "@support/features/release-notes/layout";
+  import { ActivitySection } from "@support/features/activity-section";
 
   const _viewModel = new HelpPageViewModel();
-
-  let listVotes = [];
 
   document.addEventListener("contextmenu", (event) => event.preventDefault());
 
@@ -144,7 +143,7 @@
             : ''}"
           on:click={() => {
             setActiveTab("myActivity");
-            isPostPostOpen = false;
+            isPostopenFromActivity = false;
           }}
         >
           <ActivityIcon
@@ -192,8 +191,16 @@
               <Community />
               <DiscordPost />
             {:else if activeTab === "myActivity"}
-              My Activity
-            {/if}
+              <ActivitySection
+                onInputFeedback={_viewModel.createPost}
+                onAddFeedback={_viewModel.addFeedback}
+                fetchPosts={_viewModel.getUserPosts}
+                onRetrievePost={_viewModel.retrievePostData}
+                fetchComments={_viewModel.retrieveUserComments}
+                fetchLikedPosts={_viewModel.retrieveUserVotes}
+                listPostsComments={_viewModel.listComments}
+                {setPostId}
+              />{/if}
           </div>
         </div>
         <div style="width: 274px;" class="ps-2 pe-3 pt-3 pb-2 h-100">

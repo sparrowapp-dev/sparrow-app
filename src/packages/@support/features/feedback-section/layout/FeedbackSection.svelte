@@ -15,6 +15,7 @@
   } from "@support/common/types/feedback";
   import { tickIcon } from "@library/forms/select/svgs";
   import { Loader } from "@library/ui";
+  import { Debounce } from "@common/utils";
   export let onInputFeedback;
   export let onAddFeedback;
   export let fetchPosts;
@@ -117,6 +118,10 @@
     if (status === "open") return "#1193F0";
     return "white";
   }
+  const handleInputChangeDebounced = new Debounce().debounce(
+    handleInputChange,
+    1000,
+  );
 </script>
 
 <div style="margin: 8px 46px 0 34px;">
@@ -135,7 +140,7 @@
             class={`bg-transparent w-100 border-0 my-auto`}
             placeholder="Search updates"
             on:input={(e) => {
-              handleInputChange(e.target.value);
+              handleInputChangeDebounced(e.target.value);
             }}
           />
         </div>
