@@ -490,7 +490,6 @@ class HelpPageViewModel {
     const UserId = userResponse?.data?.id; // Use the retrieved or newly created user's ID
 
     if (UserId) {
-      console.log("This is user ID", UserId);
       const result = await this.cannyService.listVotes(UserId);
       return result;
     }

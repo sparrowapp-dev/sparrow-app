@@ -145,7 +145,6 @@ export class CannyIoService {
         "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
       },
     });
-    console.log(response);
     return response;
   };
 
@@ -274,7 +273,6 @@ export class CannyIoService {
     });
 
     return response;
-    console.log("return response of create vote ", response);
   };
 
   /**
@@ -341,8 +339,6 @@ export class CannyIoService {
   };
 
   public retreiveComments = async (body?: object) => {
-    console.log(body);
-
     const response = await makeRequest("POST", `${this.apiUrl}/comments/list`, {
       body: {
         apiKey: this.apiKey,

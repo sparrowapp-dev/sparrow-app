@@ -291,7 +291,6 @@
               onclick={(id = "") => {
                 type = id;
                 handleSortChange(id);
-                console.log("Test");
               }}
               titleId={type}
               placeholderText={"Sort By"}
