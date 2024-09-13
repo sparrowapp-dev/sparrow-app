@@ -29,8 +29,8 @@
   export let isPostopenFromActivity;
   export let postId;
 
-  let feedbackType = FeedbackType.ALL_CATEGORY;
-  let feedbackStatusType = FeedbackStatusType.ALL_STATUS;
+  let feedbackType = ""
+  let feedbackStatusType = ""
 
   let searchTerm = "";
 
@@ -138,7 +138,7 @@
             type="text"
             id="search-input"
             class={`bg-transparent w-100 border-0 my-auto`}
-            placeholder="Search Feedbacks"
+            placeholder="Search updates"
             on:input={(e) => {
               handleInputChangeDebounced(e.target.value);
             }}
@@ -326,7 +326,7 @@
                       class="category"
                       style="color:{getColor(
                         post.status,
-                      )}; border:0.2px solid {getColor(status)};  "
+                      )}; border:0.2px solid {getColor(post.status)};  "
                     >
                       {post?.status
                         ? post.status.charAt(0).toUpperCase() +
@@ -335,16 +335,18 @@
                     </span>
                   </div>
                 </div>
+              <div style="cursor:pointer">
                 <UpvoteIcon
-                  isPostLiked={post.isPostLiked}
-                  backgroundColor={"transparent"}
-                  {handleUpvote}
-                  authordId={post.author.id}
-                  postID={post.id}
-                  likePost={createVote}
-                  dislikePost={deleteVote}
-                  upvote={post?.score}
-                />
+                isPostLiked={post.isPostLiked}
+                backgroundColor={"transparent"}
+                {handleUpvote}
+                authordId={post.author.id}
+                postID={post.id}
+                likePost={createVote}
+                dislikePost={deleteVote}
+                upvote={post?.score}
+              />
+              </div>
               </div>
 
               <div style="margin-top: 10px; flex: 1;">

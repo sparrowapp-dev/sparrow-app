@@ -25,7 +25,7 @@
    * @returns The corresponding color code.
    */
   function getColor(status) {
-    if (status === "Under Review") return "white";
+    if (status === "Under Review") return "#FBA574";
     if (status === "In Progress") return "#DF77F9";
     if (status === "Planned") return "#FFE47E";
     return "white";
@@ -111,7 +111,7 @@
           type="text"
           id="search-input"
           class={`bg-transparent w-100 border-0 my-auto`}
-          placeholder="Search Roadmap"
+          placeholder="Search updates"
           on:input={(e) => {
             searchTerm = e.target.value;
           }}

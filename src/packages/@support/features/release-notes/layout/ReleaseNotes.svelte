@@ -144,10 +144,10 @@
         <Select
           id={"feeds"}
           data={[
-            { name: "All", id: "all" },
             { name: "New", id: "new" },
             { name: "Fixed", id: "fixed" },
             { name: "Improved", id: "improved" },
+            { name: "All", id: "all" },
           ]}
           titleId={selectedTag}
           onclick={(id = "") => {
@@ -205,9 +205,9 @@
                         }}
                       >
                         <Tooltip
-                          title={"Link"}
+                          title={"Copy link"}
                           placement={"right"}
-                          distance={13}
+                          distance={4}
                           show={true}
                           zIndex={701}
                         >
@@ -311,7 +311,32 @@
             </div>
 
             <div class="ms-2 timeline-content">
-              <h3>{selectedEvent.title}</h3>
+              <div class="d-flex gap-2">
+                <h3>
+                  {selectedEvent.title}
+                </h3>
+                <div
+                  style="height: 24px; width:24px; cursor:pointer"
+                  on:click={async () => {
+                    await copyToClipBoard(selectedEvent.url);
+                    notifications.success("Link copied to clipboard!");
+                  }}
+                >
+                  <Tooltip
+                    title={"Link"}
+                    placement={"right"}
+                    distance={13}
+                    show={true}
+                    zIndex={701}
+                  >
+                    <LinkIcon
+                      height={"18px"}
+                      width={"18px"}
+                      color={"var(--white-color)"}
+                    />
+                  </Tooltip>
+                </div>
+              </div>
               <div class="tags">
                 {#each selectedEvent.types as tag}
                   <span class="tag {getTagClass(tag)}">
@@ -330,6 +355,9 @@
                 <p
                   style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
                   class="mb-0"
+                  on:click={async () => {
+                    await open(externalSparrowGithub);
+                  }}
                 >
                   Github
                 </p>

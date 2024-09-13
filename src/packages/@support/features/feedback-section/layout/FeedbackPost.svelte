@@ -122,6 +122,8 @@
       nestedComments = sortCommentsOldToNew(nestedComments);
     }
   };
+
+  let isCommenting = false;
 </script>
 
 <div class="d-flex flex-row" style="margin-top: 51px; ">
@@ -259,16 +261,18 @@
           <Button
             title={`Add`}
             type={`primary`}
-            loaderSize={17}
+            loaderSize={13}
             textStyleProp={"font-size: var(--small-text)"}
-            buttonClassProp={`ps-2`}
-            buttonStyleProp={`height: 20px; width:35px; rounded;`}
+            buttonStyleProp={`height: 20px;  rounded;`}
+            loader={isCommenting}
             onClick={async () => {
+              isCommenting = true;
               await onAddComment(postId, commentValue, null);
               comments = await fetchComments(postId);
               commentValue = "";
+              isCommenting = false;
             }}
-            disable={commentValue.length == 0}
+            disable={commentValue.length == 0 || isCommenting}
           />
         </div>
       </div>

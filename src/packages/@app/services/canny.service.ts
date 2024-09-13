@@ -59,6 +59,7 @@ export class CannyIoService {
     search: string,
     status: string,
     userId: string,
+    limit:number=40
   ) => {
     const response = await makeRequest("POST", `${this.apiUrl}/posts/list`, {
       body: {
@@ -68,6 +69,7 @@ export class CannyIoService {
         userID: userId,
         search,
         status,
+        limit
       },
       headers: {
         "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
