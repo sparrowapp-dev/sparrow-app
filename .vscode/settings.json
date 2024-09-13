@@ -1,7 +1,7 @@
 {
   "editor.minimap.enabled": false,
   "[javascript]": {
-    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "svelte.enable-ts-plugin": true,
   "[typescript]": {
