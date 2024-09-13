@@ -28,8 +28,8 @@
   export let isPostopenFromActivity;
   export let postId;
 
-  let feedbackType = FeedbackType.ALL_CATEGORY;
-  let feedbackStatusType = FeedbackStatusType.ALL_STATUS;
+  let feedbackType = ""
+  let feedbackStatusType = ""
 
   let searchTerm = "";
 
@@ -133,7 +133,7 @@
             type="text"
             id="search-input"
             class={`bg-transparent w-100 border-0 my-auto`}
-            placeholder="Search Feedbacks"
+            placeholder="Search updates"
             on:input={(e) => {
               handleInputChange(e.target.value);
             }}
