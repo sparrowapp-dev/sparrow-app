@@ -13,26 +13,23 @@
 
   let parentID = comment?.id;
 
-
-
   const timeAgo = (date) => {
-  const diffInSeconds = (new Date() - new Date(date)) / 1000;
-  const minutes = Math.floor(diffInSeconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
+    const diffInSeconds = (new Date() - new Date(date)) / 1000;
+    const minutes = Math.floor(diffInSeconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
 
-  if (days >= 1) {
-    return `${days} day${days > 1 ? "s" : ""} ago`;
-  } else if (hours >= 1) {
-    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-  } else if (minutes >= 1) {
-    return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-  } else {
-    const seconds = Math.floor(diffInSeconds);
-    return `${seconds} second${seconds > 1 ? "s" : ""} ago`;
-  }
-};
-
+    if (days >= 1) {
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    } else if (hours >= 1) {
+      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    } else if (minutes >= 1) {
+      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    } else {
+      const seconds = Math.floor(diffInSeconds);
+      return `${seconds} second${seconds > 1 ? "s" : ""} ago`;
+    }
+  };
 
   let isReplying = false;
   let commentValue = "";
@@ -40,9 +37,8 @@
     commentValue = e.target.value;
   };
 
-  let isCommenting=false;
+  let isCommenting = false;
 </script>
-
 
 <div class="comment">
   <IconFallback
@@ -60,7 +56,7 @@
     </div>
     <div class="comment-meta">
       <div class="comment-moreinfo">
-        <span class="comment-time">{ timeAgo(comment.created)}</span>
+        <span class="comment-time">{timeAgo(comment.created)}</span>
         {#if !comment.parentID}
           <p
             on:click={() => (isReplying = !isReplying)}
@@ -102,14 +98,14 @@
           <Button
             title={`Add`}
             type={`primary`}
-            loaderSize={17}
+            loaderSize={13}
+            loader={isCommenting}
             textStyleProp={"font-size: var(--small-text)"}
-            buttonClassProp={`ps-2`}
-            buttonStyleProp={`height: 20px; width:35px; rounded;`}
+            buttonStyleProp={`height: 20px;  rounded;`}
             onClick={async () => {
-              isCommenting=true;
+              isCommenting = true;
               await onAddComment(postId, commentValue, comment?.id);
-              isCommenting=false;
+              isCommenting = false;
 
               logMessage();
               commentValue = "";
