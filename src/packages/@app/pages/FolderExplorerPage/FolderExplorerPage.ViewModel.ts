@@ -14,17 +14,17 @@ import type {
 
 // Utils
 import { moveNavigation } from "$lib/utils/helpers";
-import {
-  Events,
-  ItemType,
-  // ResponseStatusCode,
-  UntrackedItems,
-} from "$lib/utils/enums";
+import { Events, ItemType } from "$lib/utils/enums";
 // import { invoke } from "@tauri-apps/api/core";
 import { v4 as uuidv4 } from "uuid";
 
 // Stores
-import type { CollectionItemsDto, Folder, Tab } from "@common/types/workspace";
+import type {
+  CollectionDto,
+  CollectionItemsDto,
+  Folder,
+  Tab,
+} from "@common/types/workspace";
 import type { CreateApiRequestPostBody } from "$lib/utils/dto";
 import { InitRequestTab } from "@common/utils";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
@@ -204,16 +204,12 @@ class FolderExplorerPage {
    * @returns
    */
   public handleCreateAPIRequest = async (
-    collection: CollectionDocument,
-    folder: Folder,
+    collection: CollectionDto,
+    folder: CollectionItemsDto,
   ) => {
-    // const sampleRequest = generateSampleRequest(
-    //   UntrackedItems.UNTRACKED + uuidv4(),
-    //   new Date().toString(),
-    // );
     const initRequestTab = new InitRequestTab(
-      UntrackedItems.UNTRACKED + uuidv4(),
-      collection.workspaceId,
+      uuidv4(),
+      collection?.workspaceId,
     );
 
     let userSource = {};
@@ -244,42 +240,28 @@ class FolderExplorerPage {
         },
       },
     };
-    await this.collectionRepository.addRequestInFolder(
-      requestObj.collectionId,
-      requestObj.folderId,
-      {
-        ...requestObj.items.items,
-        id: initRequestTab.getValue().id,
-      },
-    );
 
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
-    if (isGuestUser === true) {
-      const res = await this.collectionRepository.readRequestInFolder(
-        requestObj.collectionId,
-        requestObj.folderId,
-        initRequestTab?.getValue().id,
+    if (isGuestUser) {
+      // pushing http request to collection model
+      await this.collectionRepository.addRequestInFolder(
+        requestObj.collectionId as string,
+        requestObj.folderId as string,
+        {
+          ...requestObj?.items?.items,
+          id: initRequestTab.getValue().id,
+        },
       );
-
-      res.id = uuidv4();
-      await this.collectionRepository.updateRequestInFolder(
-        requestObj.collectionId,
-        requestObj.folderId,
-        initRequestTab.getValue().id,
-        res,
-      );
-
-      initRequestTab.updateId(res.id);
+      // pushing http request to tab model
       initRequestTab.updatePath({
         workspaceId: collection.workspaceId,
         collectionId: collection.id,
         folderId: folder.id,
       });
       initRequestTab.updateIsSave(true);
-      // this.handleOpenRequest(collection, folder, sampleRequest);
       await this.tabRepository.createTab(initRequestTab.getValue());
       moveNavigation("right");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
@@ -292,27 +274,15 @@ class FolderExplorerPage {
       await this.collectionService.addRequestInCollection(requestObj);
     if (response.isSuccessful && response.data.data) {
       const request = response.data.data;
-
-      this.collectionRepository.addRequestInFolder(
-        requestObj.collectionId,
-        requestObj.folderId,
-        request,
+      // pushing http request to collection model
+      await this.collectionRepository.addRequestInFolder(
+        requestObj?.collectionId as string,
+        requestObj?.folderId as string,
+        {
+          ...request,
+        },
       );
-      // this.collectionRepository.updateRequestInFolder(
-      //   requestObj.collectionId,
-      //   requestObj.folderId,
-      //   sampleRequest.id,
-      //   request,
-      // );
-
-      // sampleRequest.id = request.id;
-      // sampleRequest.path.workspaceId = collection.workspaceId;
-      // sampleRequest.path.collectionId = collection.id;
-      // sampleRequest.path.folderId = folder.id;
-      // sampleRequest.path.folderName = folder.name;
-      // sampleRequest.property.request.save.api = true;
-      // sampleRequest.property.request.save.description = true;
-
+      // pushing http request to tab model
       initRequestTab.updateId(request.id);
       initRequestTab.updatePath({
         workspaceId: collection.workspaceId,
@@ -320,7 +290,6 @@ class FolderExplorerPage {
         folderId: folder.id,
       });
       initRequestTab.updateIsSave(true);
-      // this.handleOpenRequest(collection, folder, sampleRequest);
       this.tabRepository.createTab(initRequestTab.getValue());
       moveNavigation("right");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, {

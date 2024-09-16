@@ -191,7 +191,7 @@
         }}
       >
         <div
-          class="d-flex"
+          class="d-flex align-items-center"
           on:mouseenter={() => {
             isHover = true;
           }}
@@ -252,7 +252,7 @@
   }
   a:hover {
     text-decoration: underline;
-    color: var(--primary-btn-color);
+    color: var(--text-primary-300);
   }
   .cursor-pointer {
     cursor: pointer;
@@ -279,7 +279,7 @@
     color: transparent;
   }
   .star-text-hover {
-    color: var(--primary-btn-color);
+    color: var(--text-primary-300);
     text-decoration: underline;
   }
   .btn-guest {

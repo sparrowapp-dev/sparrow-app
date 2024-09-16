@@ -6,10 +6,7 @@ import { checkValidation, loginSchema } from "$lib/utils/validation";
 import { navigate } from "svelte-navigator";
 import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
 import { isResponseError, setUser } from "$lib/store/auth.store";
-import {
-  resizeWindowOnLogOut,
-  resizeWindowOnLogin,
-} from "$lib/components/header/window-resize";
+import { resizeWindowOnLogOut, resizeWindowOnLogin } from "../../../utils";
 import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";

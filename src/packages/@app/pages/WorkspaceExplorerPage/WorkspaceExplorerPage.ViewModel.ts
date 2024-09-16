@@ -5,6 +5,8 @@ import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { throttle } from "$lib/utils/throttle";
 import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
 import type { UpdatesDocType } from "@app/models/updates.model";
+import { CollectionRepository } from "@app/repositories/collection.repository";
+import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { UpdatesRepository } from "@app/repositories/updates.repository";
@@ -22,6 +24,8 @@ export default class WorkspaceExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private teamRepository = new TeamRepository();
   private updatesRepository = new UpdatesRepository();
+  private collectionRepository = new CollectionRepository();
+  private environmentRepository = new EnvironmentRepository();
 
   // Private Services
   private collectionService = new CollectionService();
@@ -157,7 +161,8 @@ export default class WorkspaceExplorerViewModel {
           "path.workspaceId": workspace._id,
         },
       });
-      await this.tabRepository.activateInitialTab();
+      await this.collectionRepository.removeCollections(workspace._id);
+      await this.environmentRepository.removeEnvironments(workspace._id);
       notifications.success(
         `${workspace.name} is removed from ${workspace?.team?.teamName}.`,
       );

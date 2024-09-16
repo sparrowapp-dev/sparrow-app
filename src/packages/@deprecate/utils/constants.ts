@@ -11,6 +11,7 @@ const constants = {
   SPARROW_SUPPORT_EMAIL: import.meta.env.VITE_SPARROW_SUPPORT_EMAIL,
   SPARROW_AUTH_URL: import.meta.env.VITE_AUTH_URL,
   SPARROW_GITHUB: import.meta.env.VITE_SPARROW_GITHUB,
+  SPARROW_LINKEDIN: import.meta.env.VITE_SPARROW_LINKEDIN,
   SPARROW_DOWNLOAD_LINK: import.meta.env.VITE_SPARROW_DOWNLOAD_LINK,
   GITHUB_API: "https://api.github.com",
   RELEASE_NOTES_PAT_TOKEN: import.meta.env.VITE_RELEASE_NOTES_PAT_TOKEN,
@@ -20,6 +21,7 @@ const constants = {
   CANNY_URL: import.meta.env.VITE_CANNY_URL,
   AZURE_INSIGHTS_CONNECTION_STRING: import.meta.env
     .VITE_AZURE_INSIGHTS_CONNECTION_STRING,
+  BASE_URL: import.meta.env.VITE_BASE_URL,
 };
 
 export default constants;

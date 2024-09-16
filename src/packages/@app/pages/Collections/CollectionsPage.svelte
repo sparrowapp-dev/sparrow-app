@@ -28,7 +28,7 @@
     WorkspaceDefault,
     SaveAsCollectionItem,
   } from "@workspaces/features";
-  import CloseConfirmationPopup from "$lib/components/popup/CloseConfirmationPopup.svelte";
+  import {WithModal} from "@workspaces/common/hoc";
   import { notifications } from "@library/ui/toast/Toast";
 
   // ---- Interface, enum & constants
@@ -454,6 +454,7 @@
                           (isImportCollectionPopup = true)}
                         onItemCreated={_viewModel.handleCreateItem}
                         {isGuestUser}
+                        {userRole}
                       />
                     </div>
                   </Motion>
@@ -467,7 +468,7 @@
   </div>
 </Motion>
 
-<CloseConfirmationPopup
+<WithModal
   isOpen={isPopupClosed}
   onModalStateChanged={handleClosePopupBackdrop}
   onSave={handlePopupSave}
