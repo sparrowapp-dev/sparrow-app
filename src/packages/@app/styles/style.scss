@@ -135,6 +135,7 @@ $theme-blue-1193F0: #1193f0;
 $theme-blue-3670F7: #3670f7;
 $theme-blue-0B5ED7: #0b5ed7;
 $theme-blue-2B5ED4: #2b5ed4;
+$theme-blue-DF77F9: #df77f9;
 $theme-blue-303F4F: #303f4f;
 $theme-blue-1D3650: #1d3650;
 $theme-blue-74AEF6: #74aef6;
@@ -167,6 +168,8 @@ $theme-red-230408: #230408;
 $theme-red-2B1C1D: #2b1c1d;
 
 $theme-green-8dc599: #8dc599;
+$theme-green-00A86B: #00a86b;
+
 
 :root {
   --tab-bar-hover: #{$sparrow-email-invite-bg-color};
@@ -261,6 +264,7 @@ $theme-green-8dc599: #8dc599;
   --text-primary-300: #{$theme-blue-3670F7};
   --text-primary-350: #{$theme-blue-74AEF6};
   --text-primary-400: #{$theme-blue-0B5ED7};
+  --text-primary-440: #{$theme-blue-DF77F9};
   --text-primary-500: #{$theme-blue-87b9f7};
   --text-primary-600: #{$theme-blue-007bff};
 
@@ -408,6 +412,11 @@ $theme-green-8dc599: #8dc599;
   --border-tertiary-600: #{$theme-violet-2E2F3D};
   --border-tertiary-700: #{$theme-violet-1c1d27};
   --border-tertiary-750: #{$theme-violet-1C1D2B};
+
+
+  --text-success-200: #{$theme-green-00A86B};
+
+
 
   --border-danger-100: #{$theme-red-e5acb2};
   --border-danger-200: #{$theme-red-fe8c98};
@@ -891,8 +900,7 @@ textarea {
   resize: none;
 }
 
-button:disabled{
+button:disabled {
   pointer-events: none !important;
   opacity: 0.7;
 }
-
