@@ -21,20 +21,119 @@
   import { ReleaseNotes } from "@support/features/release-notes/layout";
   import { ActivitySection } from "@support/features/activity-section";
 
-  const _viewModel = new HelpPageViewModel();
-
+  /**
+   * @description - Prevents the default context menu from appearing on right-click.
+   * @param event - The event triggered by a right-click.
+   */
   document.addEventListener("contextmenu", (event) => event.preventDefault());
 
+  /**
+   * @description - Initializes the HelpPageViewModel instance.
+   */
+  const _viewModel = new HelpPageViewModel();
+
+  /**
+   * @description - Holds the currently active tab. Default is "roadmap".
+   */
   let activeTab = "roadmap";
 
-  function setActiveTab(tab) {
+  /**
+   * @description - Stores the release notes data as an array.
+   */
+  let releaseNotesData = [];
+
+  /**
+   * @description - Tracks if a post was opened from the activity tab.
+   */
+  let isPostopenFromActivity = false;
+
+  /**
+   * @description - Stores the ID of the currently selected post.
+   */
+  let postId = "";
+
+  /**
+   * @description - Sets the active tab, preventing "faq" from being selected.
+   * @param tab - The name of the tab to set as active.
+   */
+  const setActiveTab = (tab) => {
     if (tab !== "faq") {
       activeTab = tab;
     }
-  }
+  };
 
-  let releaseNotesData = [];
+  /**
+   * @description - Sets the post ID and marks the activity as opened from a post. Prevents "faq" from being selected.
+   * @param tab - The name of the tab to set as active.
+   * @param postID - The ID of the post to set.
+   */
+  const setPostId = (tab, postID) => {
+    if (tab !== "faq") {
+      isPostopenFromActivity = true;
+      activeTab = tab;
+      postId = postID;
+    }
+  };
 
+  /**
+   * Get the font and background color based on the status.
+   *
+   * @param {string} status - The status value to determine the colors for.
+   * @returns {{ fontColor: string, backgroundColor: string }} An object containing the font and background colors.
+   */
+  const getColor = (status) => {
+    if (status === "new" || status === "open") {
+      return { fontColor: "#1193F0", backgroundColor: "#050938" };
+    }
+    if (status === "fixed" || status === "in progress") {
+      return { fontColor: "#DF77F9", backgroundColor: "#DF77F9" };
+    }
+    if (status === "improved" || status === "complete") {
+      return { fontColor: "#69D696", backgroundColor: "#031B0D" };
+    }
+    if (status === "planned") {
+      return { fontColor: "#FFE47E", backgroundColor: "#171302" };
+    }
+    if (status === "under review") {
+      return { fontColor: "#FBA574", backgroundColor: "#1C1405" };
+    }
+    return { fontColor: "white", backgroundColor: "black" };
+  };
+
+  /**
+   * Formats a given date into a human-readable "time ago" string.
+   *
+   * @param {Date} date - The date to format, can be a date string or a Date object.
+   * @returns {string} A string representing how much time has passed since the given date (e.g., "2 hours ago", "5 days ago").
+   *
+   * @example
+   * // Returns "5 minutes ago"
+   * formatTimeAgo(new Date(Date.now() - 5 * 60 * 1000));
+   */
+
+  const formatTimeAgo = (date) => {
+    const diffInSeconds = (new Date() - new Date(date)) / 1000;
+    const minutes = Math.floor(diffInSeconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days >= 1) {
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    } else if (hours >= 1) {
+      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    } else if (minutes >= 1) {
+      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    } else {
+      const seconds = Math.floor(diffInSeconds);
+      return `${seconds} second${seconds > 1 ? "s" : ""} ago`;
+    }
+  };
+
+  /**
+   * @description - Fetches release notes when the component is mounted and sets the appropriate active tab based on the current URL path.
+   * - Fetches and sets `releaseNotesData`.
+   * - Checks the current URL path and sets `activeTab` to either "updates" or "roadmap".
+   */
   onMount(async () => {
     await _viewModel.fetchReleaseNotes();
     releaseNotesData = await _viewModel.getAllReleaseNotes();
@@ -45,18 +144,6 @@
       activeTab = "roadmap";
     }
   });
-
-  let isPostopenFromActivity = false;
-
-  let postId = "";
-
-  function setPostId(tab, postID) {
-    if (tab !== "faq") {
-      isPostopenFromActivity = true;
-      activeTab = tab;
-      postId = postID;
-    }
-  }
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -155,7 +242,10 @@
           />
           My Activity
         </div>
+
+        <div style="width: 400px;"></div>
       </div>
+
       <!--
         -- Help Body 
       -->
@@ -176,17 +266,22 @@
                 onRetrievePost={_viewModel.retrievePostData}
                 onAddComment={_viewModel.addComment}
                 fetchComments={_viewModel.listComments}
-                currentUser={_viewModel.createUser}
                 createVote={_viewModel.CreateVote}
                 deleteVote={_viewModel.deleteVote}
                 listVote={_viewModel.listVote}
+                {getColor}
+                {formatTimeAgo}
                 bind:postId
                 bind:isPostopenFromActivity
               />
             {:else if activeTab === "updates"}
               <ReleaseNotes listChangeLog={_viewModel.listChangeLog} />
             {:else if activeTab === "roadmap"}
-              <Roadmap {setPostId} fetchPosts={_viewModel.getListOfPOsts} />
+              <Roadmap
+                {setPostId}
+                fetchPosts={_viewModel.getListOfPOsts}
+                {getColor}
+              />
             {:else if activeTab === "community"}
               <Community />
               <DiscordPost />
@@ -200,6 +295,7 @@
                 fetchLikedPosts={_viewModel.retrieveUserVotes}
                 listPostsComments={_viewModel.listComments}
                 {setPostId}
+                {formatTimeAgo}
               />{/if}
           </div>
         </div>

@@ -7,7 +7,7 @@
   export let userInfo;
   export let onAddComment;
   export let fetchComments;
-  export let logMessage;
+  export let reloadComments;
   export let postId;
   const isAuthor = userInfo?.email === comment?.author?.email;
 
@@ -107,7 +107,7 @@
               await onAddComment(postId, commentValue, comment?.id);
               isCommenting = false;
 
-              logMessage();
+              reloadComments();
               commentValue = "";
               setTimeout(() => {
                 isReplying = false;

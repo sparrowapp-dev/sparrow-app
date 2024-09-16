@@ -3,13 +3,11 @@
 
   export let backgroundColor = "";
 
-  export let upvote: number; // Current upvote count
-  export let postID: string; // Post ID
-  export let likePost: (postId: string) => void; // Function to call `Upvote`
-  export let dislikePost: (postId: string) => void; // Function to call `UndoUpvote`
-  export let handleUpvote;
-
-  export let isPostLiked;
+  export let upvote: number; 
+  export let postID: string;
+  export let likePost: (postId: string) => void; 
+  export let dislikePost: (postId: string) => void; 
+  export let isPostLiked: boolean;
 
 
   const handleClick = () => {
@@ -48,16 +46,15 @@
     align-items: center;
     padding: 1px 4px;
     border-radius: 4px;
-    /* cursor: pointer; */
     margin-left: 10px;
   }
 
   .upvoted {
-    border: 0.3px solid blue;
-    color: blue;
+    border: 0.3px solid var(--text-primary-300);
+    color: var(--text-primary-300);
   }
 
   .not-upvoted {
-    border: 0.3px solid #8A9299;
+    border: 0.3px solid var(--bg-secondary-200);
   }
 </style>
