@@ -41,7 +41,6 @@
   let isExposeFeedbackForm = false;
   let type = FeedbackType.CATEGORY;
 
-
   function nestComments(comments) {
     const commentMap = {};
     comments.forEach((comment) => {
@@ -74,25 +73,24 @@
     isLoading = false;
   });
 
-  
   function sortCommentsOldToNew(comments) {
     if (!Array.isArray(comments)) {
       console.error("Invalid comments data: expected an array.");
       return [];
     }
     return comments
-    .slice()
-    .sort((a, b) => new Date(a.created) - new Date(b.created));
+      .slice()
+      .sort((a, b) => new Date(a.created) - new Date(b.created));
   }
-  
+
   function sortCommentsNewToOld(comments) {
     if (!Array.isArray(comments)) {
       console.error("Invalid comments data: expected an array.");
       return [];
     }
     return comments
-    .slice()
-    .sort((a, b) => new Date(b.created) - new Date(a.created)); // Reversed comparison
+      .slice()
+      .sort((a, b) => new Date(b.created) - new Date(a.created)); // Reversed comparison
   }
 
   const handleSortChange = (id) => {
@@ -102,7 +100,7 @@
       nestedComments = sortCommentsOldToNew(nestedComments);
     }
   };
-  
+
   $: {
     if (comments) {
       nestedComments = nestComments(comments);
@@ -137,14 +135,16 @@
           style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
         >
           <span style="font-size: 18px; font-weight: 700;">{post?.title}</span>
-           <span
+          <span
             class="px-2"
-            style="border:0.2px solid {getColor(post?.status).fontColor}; color: {getColor(post?.status).fontColor}; padding-bottom: 14px; border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
+            style="border:0.2px solid {getColor(post?.status)
+              .fontColor}; color: {getColor(post?.status)
+              .fontColor}; padding-bottom: 14px; border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
           >
             {post?.status
               ? post.status.charAt(0).toUpperCase() + post.status.slice(1)
               : ""}
-              </span > 
+          </span>
         </div>
 
         <div class="d-flex flex-row">
@@ -236,18 +236,19 @@
         />
 
         <div class="d-flex align-items-center gap-2">
-          <!-- <AttachmentIcon
+          <AttachmentIcon
             height={"12px"}
             width={"12px"}
             color={"var(--text-secondary-200)"}
-          /> -->
+          />
 
           <Button
             title={`Add`}
             type={`primary`}
             loaderSize={13}
             textStyleProp={"font-size: var(--small-text)"}
-            buttonStyleProp={`height: 20px;  rounded;`}
+            buttonClassProp={`ps-2`}
+            buttonStyleProp={`height: 20px; width:35px;`}
             loader={isCommenting}
             onClick={async () => {
               isCommenting = true;
@@ -540,7 +541,7 @@
   }
 
   .search-input-container {
-    background: var(--bg-tertiary-400);
+    background: var(--bg-secondary-800);
     width: 100%;
     font-size: 12px;
     height: 30px;

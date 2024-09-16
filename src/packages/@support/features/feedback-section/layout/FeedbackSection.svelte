@@ -407,7 +407,7 @@
                       class="category"
                       style="color:{getColor(
                         post.status
-                      ).fontColor}; border:0.2px solid {getColor(post.status).fontColor};  background-color: {getColor(post.status).backgroundColor}  "
+                      ).fontColor}; border:0.2px solid {getColor(post.status).fontColor}; "
                     >
                       {post?.status
                         ? post.status.charAt(0).toUpperCase() +

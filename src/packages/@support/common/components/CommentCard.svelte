@@ -3,16 +3,50 @@
   import { Button, IconFallback } from "@library/ui";
   import { CommentCard } from "@support/common/components";
 
+  /**
+   * @description - The current comment being added or modified by the user.
+   */
   export let comment;
+
+  /**
+   * @description - Information about the current user, including details like name, ID, etc.
+   */
   export let userInfo;
+
+  /**
+   * @description - Callback function triggered when a new comment is added.
+   */
   export let onAddComment;
+
+  /**
+   * @description - Function to fetch comments for a specific post from the server.
+   */
   export let fetchComments;
+
+  /**
+   * @description - Function to reload the list of comments, typically after a new comment is added or deleted.
+   */
   export let reloadComments;
+
+  /**
+   * @description - The ID of the post to which the comments belong.
+   */
   export let postId;
+
+
+  let isCommenting = false;
+
+  let isReplying = false;
+
+  let commentValue = "";
+
   const isAuthor = userInfo?.email === comment?.author?.email;
 
-  let parentID = comment?.id;
-
+  /**
+   * Formats a given date into a human-readable "time ago" string.
+   * @param  date - The date to format.
+   * @returns  Formatted time string (e.g., "2 hours ago").
+   */
   const timeAgo = (date) => {
     const diffInSeconds = (new Date() - new Date(date)) / 1000;
     const minutes = Math.floor(diffInSeconds / 60);
@@ -31,13 +65,14 @@
     }
   };
 
-  let isReplying = false;
-  let commentValue = "";
+  /**
+   * Updates the comment value with the input from the event.
+   * @param {Event} e - The input event.
+   */
   const handleAddCommentInput = (e) => {
     commentValue = e.target.value;
   };
-
-  let isCommenting = false;
+  
 </script>
 
 <div class="comment">
