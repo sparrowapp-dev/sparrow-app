@@ -22,7 +22,6 @@
   } from "@workspaces/features/rest-explorer/components";
   import Loader from "@library/ui/loader/Loader.svelte";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { notifications } from "@library/ui/toast/Toast";
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import Button from "@library/ui/button/Button.svelte";

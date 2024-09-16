@@ -5,7 +5,7 @@
   import workspaceAsset from "$lib/assets/workspace.svg";
   import folderAsset from "$lib/assets/folder.svg";
   import leftArrowAsset from "$lib/assets/angleLeft.svg";
-  import { searchTreeDocument } from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest";
+  import { searchTreeDocument } from "../utils";
   import { notifications } from "@library/ui/toast/Toast";
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
@@ -14,8 +14,7 @@
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import QuestionIcon from "$lib/assets/question.svelte";
   import Button from "@library/ui/button/Button.svelte";
-  import FileType from "$lib/components/file-types/FileType.svelte";
-  import ComboText from "$lib/components/text/ComboText.svelte";
+  import { FileType } from "../components";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import {
     bestPractice,

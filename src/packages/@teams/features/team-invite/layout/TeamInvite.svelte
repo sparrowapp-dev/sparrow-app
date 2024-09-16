@@ -60,7 +60,7 @@
    */
   const isEmailAlreadyExistInTeam = (email: string) => {
     for (let i = 0; i < users.length; i++) {
-      if (email === users[i].email) {
+      if (email.toLowerCase() === users[i].email.toLowerCase()) {
         return true;
       }
     }

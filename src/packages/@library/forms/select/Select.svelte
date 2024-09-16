@@ -33,7 +33,7 @@
     display?: string;
   }>;
 
-  export let iconColor="grey";
+  export let iconColor = "grey";
 
   /**
    * Callback to parent component.
@@ -85,7 +85,8 @@
     | "transparent"
     | "violet"
     | "violet2"
-    | "dark-violet" = "dark";
+    | "dark-violet"
+    | "dark-violet2" = "dark";
 
   /**
    * Determines the background state for the Select body.
@@ -214,6 +215,9 @@
     case "dark-violet":
       selectBackgroundClass = "select-background-dark-violet";
       break;
+    case "dark-violet2":
+      selectBackgroundClass = "select-background-dark-violet2";
+      break;
   }
 
   let selectBodyBackgroundClass = "";
@@ -296,6 +300,9 @@
         case "dark-violet":
           x = "dark-violet";
           break;
+        case "dark-violet2":
+          x = "dark-violet2";
+          break;
       }
       return `select-btn-state-clicked-${x}`;
     }
@@ -320,6 +327,10 @@
           break;
         case "dark-violet":
           x = "dark-violet";
+          break;
+        case "dark-violet2":
+          x = "dark-violet2";
+          break;
       }
       return `select-btn-state-active-${x}`;
     } else {
@@ -411,11 +422,7 @@
       >
         {#if iconRequired}
           <span class="me-2" style="margin-top: -2px;"
-            ><Icon
-              height={14}
-              width={14}
-              color={iconColor}
-            /></span
+            ><Icon height={14} width={14} color={iconColor} /></span
           >
         {/if}
 
@@ -603,6 +610,9 @@
   .select-background-dark-violet {
     background-color: var(--bg-secondary-600);
   }
+  .select-background-dark-violet2 {
+    background-color: var(--bg-tertiary-500);
+  }
 
   // hover or open-body states
   .select-btn-state-active-transparent {
@@ -620,6 +630,9 @@
   .select-btn-state-active-dark-violet {
     background-color: var(--bg-tertiary-600);
   }
+  .select-btn-state-active-dark-violet2 {
+    background-color: var(--bg-tertiary-600);
+  }
 
   // clicked states
   .select-btn-state-clicked-transparent {
@@ -635,6 +648,10 @@
     background-color: var(--bg-tertiary-700);
   }
   .select-btn-state-clicked-dark-violet {
+    background-color: var(--bg-tertiary-700);
+  }
+
+  .select-btn-state-clicked-dark-violet2 {
     background-color: var(--bg-tertiary-700);
   }
   //////////////////////////

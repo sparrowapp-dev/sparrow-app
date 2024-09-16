@@ -1,9 +1,5 @@
 <script lang="ts">
-  import RequestBody from "$lib/components/collections/req-res-section/sub-components/request-body-section/RequestBody.svelte";
-  import CodeMirror from "@library/forms/editor/Editor.svelte";
-  import TabularInput, {
-    type TableRow,
-  } from "$lib/components/inputs/TabularInput.svelte";
+  // import CodeMirror from "@library/forms/editor/Editor.svelte";
 
   class RequestParamTab {
     tabName: string = "";
@@ -19,17 +15,17 @@
   let activeTab = tabs[0].tabName; // Set the first tab as the active tab by default
 
   // Headers
-  let headers: TableRow[] = [
-    { id: "1", Key: "Accept", Value: "*/*" },
-    { id: "2", Key: "Connection", Value: "keep-alive" },
-    { id: "3", Key: "", Value: "" },
-  ];
+  // let headers: TableRow[] = [
+  //   { id: "1", Key: "Accept", Value: "*/*" },
+  //   { id: "2", Key: "Connection", Value: "keep-alive" },
+  //   { id: "3", Key: "", Value: "" },
+  // ];
 
-  // Parameters
-  let parameters: TableRow[] = [
-    { id: "1", Key: "name", Value: "John Doe" },
-    { id: "2", Key: "", Value: "" },
-  ];
+  // // Parameters
+  // let parameters: TableRow[] = [
+  //   { id: "1", Key: "name", Value: "John Doe" },
+  //   { id: "2", Key: "", Value: "" },
+  // ];
 </script>
 
 <div class="py-2 px-3">
@@ -52,18 +48,18 @@
   <!-- Routes according to tabs -->
   {#if activeTab === "Headers"}
     <!-- Render Headers content -->
-    <TabularInput
+    <!-- <TabularInput
       bind:rows={headers}
       class="w-100"
       columns={["Key", "Value"]}
-    />
+    /> -->
   {:else if activeTab === "Parameters"}
     <!-- Render Parameters content -->
-    <TabularInput
+    <!-- <TabularInput
       bind:rows={parameters}
       class="w-100"
       columns={["Key", "Value"]}
-    />
+    /> -->
   {:else if activeTab === "Body"}
     <!-- Render Body content -->
     <!-- TODO: add support for request body -->
