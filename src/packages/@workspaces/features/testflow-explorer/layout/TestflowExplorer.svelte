@@ -2,10 +2,13 @@
   import { writable } from "svelte/store";
   import { SvelteFlow, Background, Controls } from "@xyflow/svelte";
 
-  import { StartBlock, RequestBlock } from "../components";
+  import { StartBlock, RequestBlock, RunHistory } from "../components";
 
   import "@xyflow/svelte/dist/style.css";
   import { onMount } from "svelte";
+  import { Tooltip } from "@library/ui";
+  import { WithButtonV3, WithButtonV5 } from "@workspaces/common/hoc";
+  import { HistoryIcon } from "@library/icons";
   export let tab;
   export let onUpdateNodes;
   export let onUpdateEdges;
@@ -150,7 +153,29 @@
   });
 </script>
 
-<div class="h-100">
+<div class="h-100 position-relative">
+  <div
+    class="d-flex justify-content-between position-absolute p-3"
+    style="top:0;
+  left:0;
+  right:0;
+  z-index:100;"
+  >
+    <div>
+      <!-- PASTE NAME CODE HERE -->
+    </div>
+    <div class="d-flex">
+      <div>
+        <!--PASTE RUN CODE HERE-->
+      </div>
+      <div>
+        <!--PASTE SAVE CODE HERE -->
+      </div>
+      <div class="position-relative">
+        <RunHistory />
+      </div>
+    </div>
+  </div>
   <SvelteFlow {nodes} {edges} {nodeTypes}>
     <Background
       bgColor={"var(--bg-secondary-850)"}
