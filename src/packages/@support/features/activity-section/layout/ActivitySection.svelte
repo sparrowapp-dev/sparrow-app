@@ -21,6 +21,7 @@
   } from "@support/common/types/activity";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import Loader from "@library/ui/loader/Loader.svelte";
+  import formatTimeAgo from "$lib/utils/formatTimeAgo";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
@@ -31,7 +32,6 @@
   export let fetchLikedPosts;
   export let listPostsComments;
   export let setPostId;
-  export let formatTimeAgo
 
   let currentSort = "newest";
   let posts = [];

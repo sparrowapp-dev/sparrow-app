@@ -77,7 +77,6 @@
   export let getColor
 
 
-  export let formatTimeAgo;
 
 
 
@@ -473,7 +472,6 @@
       {fetchComments}
       {handleUpvote}
       {getColor}
-      {formatTimeAgo}
     />
   {/if}
 </div>

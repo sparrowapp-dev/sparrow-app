@@ -3,12 +3,11 @@
 
   export let backgroundColor = "";
 
-  export let upvote: number; 
+  export let upvote: number;
   export let postID: string;
-  export let likePost: (postId: string) => void; 
-  export let dislikePost: (postId: string) => void; 
+  export let likePost: (postId: string) => void;
+  export let dislikePost: (postId: string) => void;
   export let isPostLiked: boolean;
-
 
   const handleClick = () => {
     if (isPostLiked) {
@@ -16,7 +15,7 @@
       upvote--;
     } else {
       likePost(postID);
-      upvote++; 
+      upvote++;
     }
     isPostLiked = !isPostLiked; // Toggle the upvote state
   };
@@ -50,11 +49,11 @@
   }
 
   .upvoted {
-    border: 0.3px solid var(--text-primary-300);
+    border: 0.3px solid var(--border-primary-300);
     color: var(--text-primary-300);
   }
 
   .not-upvoted {
-    border: 0.3px solid var(--bg-secondary-200);
+    border: 0.3px solid var(--border-secondary-200);
   }
 </style>
