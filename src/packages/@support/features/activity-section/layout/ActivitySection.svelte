@@ -21,7 +21,7 @@
   } from "@support/common/types/activity";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import Loader from "@library/ui/loader/Loader.svelte";
-  import formatTimeAgo from "$lib/utils/formatTimeAgo";
+  import formatTimeAgo from "@support/common/utils/formatTimeAgo";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;

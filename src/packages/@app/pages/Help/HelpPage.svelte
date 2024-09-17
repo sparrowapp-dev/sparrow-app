@@ -20,7 +20,6 @@
   import Roadmap from "@support/features/roadmap/layout/Roadmap.svelte";
   import { ReleaseNotes } from "@support/features/release-notes/layout";
   import { ActivitySection } from "@support/features/activity-section";
-  import formatTimeAgo from "$lib/utils/formatTimeAgo";
 
   /**
    * @description - Prevents the default context menu from appearing on right-click.
