@@ -31,7 +31,6 @@
   import Button from "@library/ui/button/Button.svelte";
   import { WorkspaceRole } from "$lib/utils/enums";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-  import { CommonService } from "$lib/services-v2/common.service";
   import gitBranchIcon from "$lib/assets/git-branch.svg";
   import { ReloadCollectionIcon } from "$lib/assets/icons";
   import type { CollectionDocument, TabDocument } from "@app/database/database";
@@ -57,7 +56,6 @@
   let requestCount = 0;
   let folderCount = 0;
   let showFolderAPIButtons: boolean = true;
-  const commonService = new CommonService();
   let visibility = false;
   let isActiveSyncEnabled = true;
   let isBranchSynced: boolean = false;

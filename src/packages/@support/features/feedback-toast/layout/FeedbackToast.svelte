@@ -7,8 +7,15 @@
   let isReadMore = false;
 </script>
 
-<div class="container1" style="background-color: black;">
-  <div style="">
+<div class="p-3 mt-1" style="background-color: black;">
+  <div style="" class="">
+    <div>
+      <p style="font-size: 20px; font-weight:700;">Community</p>
+      <p style="color: #999999; font-size;14px;">
+        Stay updated with all feedback, from planning to progress, on a single
+        roadmap.
+      </p>
+    </div>
     <div class="feedback-section active">
       <h3
         class=""
@@ -47,47 +54,47 @@
         quick responses and can engage in real-time discussions.
       </p>
 
-      {#if isReadMore}
-        <div class="key-features">
-          <h3>Key Features</h3>
-          <p
-            class="d-flex gap-2 align-items-center"
-            style="margin: 0px; color:var(--text-secondary-50);"
+      <!-- {#if isReadMore} -->
+      <div class="key-features">
+        <h3>Key Features</h3>
+        <p
+          class="d-flex gap-2 align-items-center"
+          style="margin: 0px; color:var(--text-secondary-50);"
+        >
+          <span><Ellipse /> </span><span class="fw-bold"
+            >Switchable Channel:</span
+          ><span class="fw-light"
+            >Easily navigate between different feedback and support channels.</span
           >
-            <span><Ellipse /> </span><span class="fw-bold"
-              >Switchable Channel:</span
-            ><span class="fw-light"
-              >Easily navigate between different feedback and support channels.</span
-            >
-          </p>
-          <p
-            class="d-flex gap-2 align-items-center"
-            style="margin: 0px;  color:var(--text-secondary-50);"
+        </p>
+        <p
+          class="d-flex gap-2 align-items-center"
+          style="margin: 0px;  color:var(--text-secondary-50);"
+        >
+          <span><Ellipse /> </span><span class="fw-bold"
+            >Rich media sharing:</span
+          ><span class="fw-light">
+            Share screenshots , videos and other files to provide comprehensive
+            feedback.</span
           >
-            <span><Ellipse /> </span><span class="fw-bold"
-              >Rich media sharing:</span
-            ><span class="fw-light">
-              Share screenshots , videos and other files to provide
-              comprehensive feedback.</span
-            >
-          </p>
-          <p
-            class="d-flex gap-2 align-items-center"
-            style="margin: 0px;  color:var(--text-secondary-50);"
-          >
-            <span><Ellipse /> </span><span class="fw-bold">Tagging: </span><span
-              class="fw-light"
-              >Tag your feedback for easy categorization and searchability.</span
-            >
-          </p>
-          <p
+        </p>
+        <p
+          class="d-flex gap-2 align-items-center"
+          style="margin: 0px;  color:var(--text-secondary-50);"
+        >
+          <span><Ellipse /> </span><span class="fw-bold">Tagging: </span><span
             class="fw-light"
-            style="margin: 0px; padding-left:17px;  color:var(--text-secondary-50);"
+            >Tag your feedback for easy categorization and searchability.</span
           >
-            Join our community and start contributing to Sparrow.
-          </p>
-        </div>
-      {/if}
+        </p>
+        <p
+          class="fw-light"
+          style="margin: 0px; padding-left:17px;  color:var(--text-secondary-50);"
+        >
+          Join our community and start contributing to Sparrow.
+        </p>
+      </div>
+      <!-- {/if} -->
 
       <div class="d-flex justify-content-center">
         <p
@@ -97,7 +104,7 @@
             isReadMore = !isReadMore;
           }}
         >
-          <span class="me-2 text-primary-300 text-fs-14"
+          <!-- <span class="me-2 text-primary-300 text-fs-14"
             >{!isReadMore ? "More" : "Less"}</span
           >
           <span
@@ -109,7 +116,7 @@
               width={"14px"}
               color={"var(--text-primary-300)"}
             />
-          </span>
+          </span> -->
         </p>
       </div>
     </div>

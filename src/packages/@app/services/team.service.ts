@@ -49,9 +49,6 @@ export class TeamService {
         headers: getAuthHeaders(),
       },
     );
-    if (response.isSuccessful) {
-      await this.teamRepository.removeTeam(teamId);
-    }
     return response;
   };
 
@@ -100,7 +97,7 @@ export class TeamService {
         headers: getAuthHeaders(),
       },
     );
-       return response;
+    return response;
   };
 
   public promoteToOwnerAtTeam = async (teamId: string, userId: string) => {

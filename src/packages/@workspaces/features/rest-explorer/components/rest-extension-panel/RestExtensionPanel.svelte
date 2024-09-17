@@ -21,7 +21,6 @@
     hasWorkpaceLevelPermission,
   } from "$lib/utils/helpers";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import ComboText from "$lib/components/text/ComboText.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
@@ -146,12 +145,12 @@
     <div class="sidebar-content p-3 bg-backgroundLight">
       <div class="d-flex">
         <div>
-          <ComboText
+          <!-- <ComboText
             value={requestMethod}
             comboContainerClassProp={"d-flex flex-start pb-2"}
             singleTextClassProp={"rounded d-flex align-items-center justify-content-center"}
             valueClassProp={`text-${getMethodStyle(requestMethod)}`}
-          />
+          /> -->
         </div>
         <div style="width: calc(100% - 70px);">
           <p class="ellipsis mb-0" style="font-size:12px;">

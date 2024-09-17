@@ -180,7 +180,7 @@
 
 <div
   style="height:100%; overflow:hidden"
-  class={`sidebar d-flex flex-column bg-secondary-900 scroll `}
+  class={`sidebar d-flex flex-column bg-secondary-900 scroll px-1`}
 >
   <div
     class="d-flex justify-content-between align-items-center align-self-stretch px-0 pt-3 d-none"
@@ -206,7 +206,7 @@
     style="margin-top:5px; flex:1;"
   >
     <div
-      class="d-flex align-items-center p-2 rounded-1"
+      class="d-flex align-items-center pe-2 rounded-1"
       style="cursor:pointer; justify-content: space-between; height:32px;
       background-color: {isHovered
         ? 'var(--dropdown-option-hover)'
@@ -215,7 +215,10 @@
       on:mouseout={handleMouseOut}
       on:click={toggleExpandCollection}
     >
-      <div class="d-flex align-items-center ps-2">
+      <div
+        class="d-flex align-items-center ps-3 p-2"
+        style="width: calc(100% - 30px);"
+      >
         <img
           src={angleRight}
           class="me-3"
@@ -236,40 +239,42 @@
         </p>
       </div>
 
-      <Tooltip
-        title={"Add Collection"}
-        placement={"bottom"}
-        distance={13}
-        show={isHovered}
-        zIndex={701}
-      >
-        <button
-          style="height: 24px; width:24px;"
-          class="add-icon-container border-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
-            ? 'collections-active'
-            : 'collections-inactive'}"
-          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          on:click|stopPropagation={() => {
-            isExpandCollection = true;
-            isGuestUser
-              ? onItemCreated("collection", {
-                  workspaceId: currentWorkspaceId,
-                  collection: collectionList,
-                })
-              : showImportCollectionPopup();
-          }}
+      {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+        <Tooltip
+          title={"Add Collection"}
+          placement={"bottom"}
+          distance={13}
+          show={isHovered}
+          zIndex={701}
         >
-          <PlusIcon
-            height={"22px"}
-            width={"22px"}
-            color={"var(--white-color)"}
-          />
-        </button>
-      </Tooltip>
+          <button
+            style="height: 24px; width:24px;"
+            class="add-icon-container border-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
+              ? 'collections-active'
+              : 'collections-inactive'}"
+            disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+            on:click|stopPropagation={() => {
+              isExpandCollection = true;
+              isGuestUser
+                ? onItemCreated("collection", {
+                    workspaceId: currentWorkspaceId,
+                    collection: collectionList,
+                  })
+                : showImportCollectionPopup();
+            }}
+          >
+            <PlusIcon
+              height={"22px"}
+              width={"22px"}
+              color={"var(--white-color)"}
+            />
+          </button>
+        </Tooltip>
+      {/if}
     </div>
 
     {#if isExpandCollection}
-      <div class="overflow-auto d-flex flex-column ms-2 me-0 pt-2 mb-2">
+      <div class="overflow-auto d-flex flex-column ms-2 me-0 pt-1 mb-2">
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
             {#if collectionFilter.length > 0}
@@ -277,7 +282,7 @@
                 bind:scrollList
                 height={"auto"}
                 overflowY={"auto"}
-                classProps={"pe-1"}
+                classProps={"pe-0"}
               >
                 {#each collectionFilter as col}
                   <Collection
@@ -301,7 +306,7 @@
                 bind:scrollList
                 height={"auto"}
                 overflowY={"auto"}
-                classProps={"pe-1"}
+                classProps={"pe-0"}
               >
                 <p
                   class="mx-1 text-fs-12 mb-0 text-center"
@@ -316,7 +321,7 @@
               bind:scrollList
               height={"auto"}
               overflowY={"auto"}
-              classProps={"pe-1"}
+              classProps={"pe-0"}
             >
               {#each collectionListDocument as col}
                 <Collection

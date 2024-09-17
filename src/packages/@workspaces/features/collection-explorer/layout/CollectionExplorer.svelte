@@ -447,7 +447,9 @@
     border-radius: 0%;
   }
   textarea {
-    outline: none;
+    outline-color: var(--text-primary-600);
+    border: none;
+    border-radius: 8px !important;
   }
   textarea::placeholder {
     color: var(--text-color);
@@ -455,7 +457,7 @@
 
   .input-outline:focus,
   .input-outline:hover {
-    outline: 1px solid var(--sparrow-blue);
+    outline: 1px solid var(--text-primary-600);
   }
 
   .add-button {
@@ -471,5 +473,8 @@
 
   .highlighted-number {
     color: var(--text-primary-300);
+  }
+  .text-plusButton {
+    color: var(--text-primary-600) !important;
   }
 </style>

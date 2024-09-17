@@ -3,24 +3,32 @@
     AddFeedback,
     DiscordCard,
     FeedbackSection,
-    FeedbackToast,
-    ReleaseNotes,
+    Community,
   } from "@support/features";
+  import {
+    ActivityIcon,
+    DocIcon,
+    GroupIcon,
+    RoadmapIcon,
+    UpdateIcon,
+  } from "@library/icons";
   import DiscordPost from "@support/features/discord-post/layout/DiscordPost.svelte";
   import HelpPageViewModel from "./HelpPage.ViewModel";
   import { onMount } from "svelte";
   import { Motion } from "svelte-motion";
   import { pagesMotion } from "@app/constants";
+  import Roadmap from "@support/features/roadmap/layout/Roadmap.svelte";
+  import { ReleaseNotes } from "@support/features/release-notes/layout";
+  import { ActivitySection } from "@support/features/activity-section";
 
   const _viewModel = new HelpPageViewModel();
 
   document.addEventListener("contextmenu", (event) => event.preventDefault());
 
-  let activeTab = "feedback";
+  let activeTab = "roadmap";
 
   function setActiveTab(tab) {
     if (tab !== "faq") {
-      // Disable FAQ tab
       activeTab = tab;
     }
   }
@@ -34,29 +42,118 @@
     if (pathname.includes("app/help/updates")) {
       activeTab = "updates";
     } else {
-      activeTab = "feedback";
+      activeTab = "roadmap";
     }
   });
+
+  let isPostopenFromActivity = false;
+
+  let postId = "";
+
+  function setPostId(tab, postID) {
+    if (tab !== "faq") {
+      isPostopenFromActivity = true;
+      activeTab = tab;
+      postId = postID;
+    }
+  }
 </script>
 
 <Motion {...pagesMotion} let:motion>
   <div class="h-100" use:motion>
     <div class="h-100 d-flex flex-column">
-      <!--
-        --  Help Navigator
-      -->
+      <!----Help Navigator-->
       <div class="tabs px-3">
         <div
-          class="tab {activeTab === 'feedback' ? 'active' : ''}"
-          on:click={() => setActiveTab("feedback")}
+          class="tab d-flex align-items-center gap-2 {activeTab === 'roadmap'
+            ? 'active'
+            : ''}"
+          on:click={() => {
+            setActiveTab("roadmap");
+            isPostopenFromActivity = false;
+          }}
         >
+          <RoadmapIcon
+            height={"17px"}
+            width={"17px"}
+            color={activeTab === "roadmap"
+              ? "var(--text-primary-300)"
+              : "var( --white-color )"}
+          />
+          Roadmap
+        </div>
+        <div
+          class="tab align-items-center gap-2 {activeTab === 'feedback'
+            ? 'active'
+            : ''}"
+          on:click={() => {
+            setActiveTab("feedback");
+            isPostopenFromActivity = false;
+          }}
+        >
+          <DocIcon
+            height={"17px"}
+            width={"17px"}
+            color={activeTab === "feedback"
+              ? "var(--text-primary-300)"
+              : "var( --white-color )"}
+          />
           Feedback
         </div>
         <div
-          class="tab {activeTab === 'updates' ? 'active' : ''}"
-          on:click={() => setActiveTab("updates")}
+          class="tab align-items-center gap-2 {activeTab === 'updates'
+            ? 'active'
+            : ''}"
+          on:click={() => {
+            setActiveTab("updates");
+            isPostopenFromActivity = false;
+          }}
         >
+          <UpdateIcon
+            height={"17px"}
+            width={"17px"}
+            color={activeTab === "updates"
+              ? "var(--text-primary-300)"
+              : "var( --white-color )"}
+          />
           Updates
+        </div>
+        <div
+          class="tab align-items-center gap-2 {activeTab === 'community'
+            ? 'active'
+            : ''}"
+          on:click={() => {
+            setActiveTab("community");
+            isPostopenFromActivity = false;
+          }}
+        >
+          <GroupIcon
+            height={"17px"}
+            width={"17px"}
+            color={activeTab === "community"
+              ? "var(--text-primary-300)"
+              : "var( --white-color )"}
+          />
+          Community
+        </div>
+
+        <div
+          class="tab align-items-center gap-2 {activeTab === 'myActivity'
+            ? 'active'
+            : ''}"
+          on:click={() => {
+            setActiveTab("myActivity");
+            isPostopenFromActivity = false;
+          }}
+        >
+          <ActivityIcon
+            height={"17px"}
+            width={"17px"}
+            color={activeTab === "myActivity"
+              ? "var(--text-primary-300)"
+              : "var( --white-color )"}
+          />
+          My Activity
         </div>
       </div>
       <!--
@@ -70,20 +167,40 @@
           style="width: calc(100% - 274px );"
           class="ps-3 pe-2 pt-3 pb-2 h-100"
         >
-          <div class="h-100 pe-2" style="overflow:auto;">
+          <div class=" h-100 pe-2" style="margin-left:34px; overflow:auto;">
             {#if activeTab === "feedback"}
-              <!-- <FeedbackToast />
-              <DiscordPost /> -->
               <FeedbackSection
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
+                fetchPosts={_viewModel.getListOfPOsts}
+                onRetrievePost={_viewModel.retrievePostData}
+                onAddComment={_viewModel.addComment}
+                fetchComments={_viewModel.listComments}
+                currentUser={_viewModel.createUser}
+                createVote={_viewModel.CreateVote}
+                deleteVote={_viewModel.deleteVote}
+                listVote={_viewModel.listVote}
+                bind:postId
+                bind:isPostopenFromActivity
               />
             {:else if activeTab === "updates"}
-              <ReleaseNotes
-                {releaseNotesData}
-                onLearnMore={_viewModel.learnMore}
-              />
-            {/if}
+              <ReleaseNotes listChangeLog={_viewModel.listChangeLog} />
+            {:else if activeTab === "roadmap"}
+              <Roadmap {setPostId} fetchPosts={_viewModel.getListOfPOsts} />
+            {:else if activeTab === "community"}
+              <Community />
+              <DiscordPost />
+            {:else if activeTab === "myActivity"}
+              <ActivitySection
+                onInputFeedback={_viewModel.createPost}
+                onAddFeedback={_viewModel.addFeedback}
+                fetchPosts={_viewModel.getUserPosts}
+                onRetrievePost={_viewModel.retrievePostData}
+                fetchComments={_viewModel.retrieveUserComments}
+                fetchLikedPosts={_viewModel.retrieveUserVotes}
+                listPostsComments={_viewModel.listComments}
+                {setPostId}
+              />{/if}
           </div>
         </div>
         <div style="width: 274px;" class="ps-2 pe-3 pt-3 pb-2 h-100">
@@ -92,7 +209,7 @@
               <AddFeedback
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
-                onSendFeedback={_viewModel.sendFeedback}
+                selectId={"help"}
               />
             </div>
             <div>

@@ -1,7 +1,5 @@
 import { ItemType } from "../enums/item-type.enum";
 import { WorkspaceDefault } from "../enums/request.enum";
-import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-const _workspaceViewModel = new HeaderDashboardViewModel();
 
 const generateSampleWorkspace = (
   id: string,

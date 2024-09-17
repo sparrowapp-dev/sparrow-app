@@ -393,7 +393,7 @@
     background-color: var(--bg-tertiary-600);
   }
   .threedot-icon-container:hover {
-    background-color: var(--bg-tertiary-500);
+    background-color: var(--bg-tertiary-190);
   }
 
   .btn-primary {

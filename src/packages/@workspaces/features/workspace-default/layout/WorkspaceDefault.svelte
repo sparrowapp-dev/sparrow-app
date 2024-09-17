@@ -12,10 +12,11 @@
   import PlusIcon from "@library/icons/PlusIcon.svelte";
   import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
   import type { Observable } from "rxjs";
+  import { WorkspaceRole } from "$lib/utils/enums";
   export let showImportCollectionPopup;
   export let onItemCreated;
   export let isGuestUser = false;
-
+  export let userRole;
   export let currentWorkspace: Observable<WorkspaceDocument>;
   let currentWorkspaceId: string;
   currentWorkspace.subscribe((value) => {
@@ -34,37 +35,39 @@
     <SparrowLogo />
   </div>
   <div class="d-flex" style="gap: 19px;">
-    <div
-      class=" "
-      style="height: 120px; width:130px; border: 0.5px solid var(--text-tertiary-400 );  border-radius : 4px; "
-      role="button"
-      on:click={() => {
-        if (isGuestUser) {
-          onItemCreated("collection", {
-            workspaceId: currentWorkspaceId,
-          });
-        } else {
-          showImportCollectionPopup();
-        }
-      }}
-    >
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <div
-        class="d-flex justify-content-center align-items-center"
-        style="height: 79px"
+        class=" "
+        style="height: 120px; width:130px; border: 0.5px solid var(--text-tertiary-400 );  border-radius : 4px; "
+        role="button"
+        on:click={() => {
+          if (isGuestUser) {
+            onItemCreated("collection", {
+              workspaceId: currentWorkspaceId,
+            });
+          } else {
+            showImportCollectionPopup();
+          }
+        }}
       >
-        <CollectionIcon
-          width="18px"
-          height="18px"
-          color=" var( --text-primary-300)"
-        />
+        <div
+          class="d-flex justify-content-center align-items-center"
+          style="height: 79px"
+        >
+          <LibraryIcon
+            width="18px"
+            height="18px"
+            color=" var( --text-primary-300)"
+          />
+        </div>
+        <div
+          class="d-flex justify-content-center align-items-center"
+          style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px 20px 10px 10px; font-size:14px;  "
+        >
+          <span><PlusIcon color={"var(--white-color)"} /></span> Collection
+        </div>
       </div>
-      <div
-        class="d-flex justify-content-center align-items-center"
-        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px 20px 10px 10px; font-size:14px;  "
-      >
-        <span><PlusIcon color={"var(--white-color)"} /></span> Collection
-      </div>
-    </div>
+    {/if}
 
     <div
       class=" "
@@ -91,32 +94,31 @@
         <span><PlusIcon color={"var(--white-color)"} /></span> REST API
       </div>
     </div>
-
-    <div
-      class=" "
-      style="height: 120px; width:120px; border: 0.5px solid var(--text-tertiary-400 );  border-radius : 4px; "
-      role="button"
-      on:click={handleCreateEnvironment}
-    >
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <div
-        class="d-flex justify-content-center align-items-center"
-        style="height: 79px"
+        class=" "
+        style="height: 120px; width:120px; border: 0.5px solid var(--text-tertiary-400 );  border-radius : 4px; "
+        role="button"
+        on:click={handleCreateEnvironment}
       >
-        <StackIcon
-          width="22px"
-          height="22px"
-          color=" var( --text-primary-300)"
-        />
+        <div
+          class="d-flex justify-content-center align-items-center"
+          style="height: 79px"
+        >
+          <StackIcon
+            width="22px"
+            height="22px"
+            color=" var( --text-primary-300)"
+          />
+        </div>
+        <div
+          class="d-flex justify-content-center align-items-center"
+          style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px 14px 10px 6px; font-size:14px;  "
+        >
+          <span><PlusIcon color={"var(--white-color)"} /></span> Environment
+        </div>
       </div>
-      <div
-        class="d-flex justify-content-center align-items-center"
-        style="height: 41px; background-color:var(--text-tertiary-400 ); font-size:14px;  
-        padding: 10px 14px 10px 6px;
-        "
-      >
-        <span><PlusIcon color={"var(--white-color)"} /></span> Environment
-      </div>
-    </div>
+    {/if}
 
     <div
       class=" "
