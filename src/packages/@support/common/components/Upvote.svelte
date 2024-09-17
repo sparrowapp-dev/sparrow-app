@@ -1,7 +1,6 @@
 <script lang="ts">
   import { TriangleIcon } from "@library/icons";
 
-  export let backgroundColor = "";
 
   export let upvote: number; 
   export let postID: string;
@@ -18,7 +17,7 @@
       likePost(postID);
       upvote++; 
     }
-    isPostLiked = !isPostLiked; // Toggle the upvote state
+    isPostLiked = !isPostLiked; 
   };
 </script>
 
@@ -26,7 +25,6 @@
   class={isPostLiked
     ? "upvote-container upvoted"
     : "upvote-container not-upvoted"}
-  style="background-color: {backgroundColor}"
   on:click={handleClick}
 >
   <div style="height: 22px; width: 24px; text-align: center;">
@@ -52,6 +50,7 @@
   .upvoted {
     border: 0.3px solid var(--text-primary-300);
     color: var(--text-primary-300);
+    background-color: var(--bg-primary-650);
   }
 
   .not-upvoted {

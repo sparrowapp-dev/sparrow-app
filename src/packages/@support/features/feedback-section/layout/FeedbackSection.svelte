@@ -206,7 +206,7 @@
   });
 </script>
 
-<div style="margin: 8px 46px 0 34px;">
+<div style="padding:20px;">
   <FeedbackDefault {onAddFeedback} {userInfo} {onInputFeedback} />
   {#if !isPostopen}
     <div
@@ -385,7 +385,7 @@
         >
           {#each posts as post}
             <div
-              style="display: flex; flex-direction: column; background-color: #151515; padding: 10px; min-height: 195px; border-radius:2px;"
+              style="display: flex; flex-direction: column; background-color: #151515; padding: 15px; min-height: 195px; border-radius:2px;"
             >
               <div
                 style="display: flex; justify-content: space-between; align-items: flex-start;"
@@ -404,7 +404,7 @@
                     style="height: 16px; display: flex; align-items: center;"
                   >
                     <span
-                      class="category"
+                      class="category mt-2"
                       style="color:{getColor(
                         post.status
                       ).fontColor}; border:0.2px solid {getColor(post.status).fontColor}; "
@@ -419,7 +419,6 @@
                 <div style="cursor:pointer">
                   <UpvoteIcon
                     isPostLiked={post.isPostLiked}
-                    backgroundColor={"transparent"}
                     {handleUpvote}
                     postID={post.id}
                     likePost={createVote}
@@ -509,6 +508,7 @@
     font-size: 18px;
     font-weight: 700;
     margin-bottom: 5px;
+    color: var(--white-color);
   }
   .title:hover {
     text-decoration: underline;

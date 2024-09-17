@@ -4,7 +4,7 @@
   let isReadMore = false;
 </script>
 
-<div class="ps-2 pt-2" style=" background-color: black;">
+<div  style=" padding:20px; background-color: black;">
   <div style="" class="">
     <div>
       <p  class="text-fs-20"  style="font-weight:700;">Community</p>
