@@ -4,7 +4,7 @@
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/variables-dark";
 
-$sparrow-blue: #007bff;
+$sparrow-blue: #3670f7;
 $sparrow-yellow: #f9b001;
 $sparrow-black: #000000;
 $sparrow-success: #8dc599;
@@ -147,6 +147,7 @@ $theme-violet-2E2F3D: #2e2f3d;
 $theme-violet-323548: #323548;
 $theme-violet-1c1d27: #1c1d27;
 $theme-violet-1C1D2B: #1c1d2b;
+$theme-violet-363849: #363849;
 
 $theme-red-e5acb2: #e5acb2;
 $theme-red-fe8c98: #fe8c98;
@@ -351,6 +352,7 @@ $theme-red-2B1C1D: #2b1c1d;
   --bg-tertiary-650: #{$theme-violet-323548};
   --bg-tertiary-700: #{$theme-violet-1c1d27};
   --bg-tertiary-750: #{$theme-violet-1C1D2B};
+  --bg-tertiary-800: #{$theme-violet-363849};
 
   --bg-danger-100: #{$theme-red-e5acb2};
   --bg-danger-200: #{$theme-red-fe8c98};
@@ -473,9 +475,8 @@ $theme-red-2B1C1D: #2b1c1d;
 $theme-colors: map-merge(
   $theme-colors,
   (
-    "primaryColor": $sparrow-blue,
+    "primaryColor": $theme-blue-3670F7,
     "recentApiText": $sparrow-recentApiText,
-
     "secondaryColor": $sparrow-yellow,
     "blackColor": $sparrow-black,
     "successColor": $sparrow-success,
@@ -555,7 +556,7 @@ $sparrow-font-sizes: (
   // 20px in rem
   28: 1.75rem,
   // 28px in rem
-  36: 2.25rem // 36px in rem,
+  36: 2.25rem // 36px in rem
 );
 
 // Define a map for border radius in pixels

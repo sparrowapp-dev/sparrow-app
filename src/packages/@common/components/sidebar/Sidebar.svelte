@@ -77,7 +77,7 @@
 <div class={`sidebar ${componentClass}`}>
   <div class="primary-sidebar-items">
     {#each primarySidebarItems as item (item.route)}
-      <SidebarItem {item} {isGuestUser}/>
+      <SidebarItem {item} {isGuestUser} />
     {/each}
   </div>
   <div class="secondary-sidebar-items">
@@ -96,6 +96,10 @@
     justify-content: space-between;
     width: 54px;
     background-color: var(--bg-secondary-850);
-    padding: 5px 0px 10px 0px;
+    padding: 5px 0px 0px 0px;
+  }
+
+  .secondary-sidebar-items {
+    padding: 0px;
   }
 </style>

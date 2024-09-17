@@ -393,11 +393,11 @@
     >
       <div class="d-flex gap-4 mb-4 ps-2">
         <div class="d-flex align-items-center gap-2">
-          <span class="fs-4 text-plusButton">{totalRequests}</span>
+          <span class="fs-4 highlighted-number">{totalRequests}</span>
           <p style="font-size: 12px;" class="mb-0">API Requests</p>
         </div>
         <div class="d-flex align-items-center gap-2">
-          <span class="fs-4 text-plusButton">{totalFolders}</span>
+          <span class="fs-4 highlighted-number">{totalFolders}</span>
           <p style="font-size: 12px;" class="mb-0">Folder</p>
         </div>
       </div>
@@ -467,5 +467,9 @@
   }
   .collection-area {
     height: 300px;
+  }
+
+  .highlighted-number {
+    color: var(--text-primary-300);
   }
 </style>

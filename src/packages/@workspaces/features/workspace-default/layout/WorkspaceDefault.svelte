@@ -7,6 +7,7 @@
     LibraryIcon,
     SocketIcon,
     StackIcon,
+    CollectionIcon,
   } from "@library/icons";
   import PlusIcon from "@library/icons/PlusIcon.svelte";
   import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
@@ -51,15 +52,15 @@
         class="d-flex justify-content-center align-items-center"
         style="height: 79px"
       >
-        <LibraryIcon
-          width="24px"
-          height="24px"
+        <CollectionIcon
+          width="18px"
+          height="18px"
           color=" var( --text-primary-300)"
         />
       </div>
       <div
         class="d-flex justify-content-center align-items-center"
-        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px;  "
+        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px 20px 10px 10px; font-size:14px;  "
       >
         <span><PlusIcon color={"var(--white-color)"} /></span> Collection
       </div>
@@ -78,16 +79,16 @@
         style="height: 79px"
       >
         <VectorIcon
-          width="24px"
-          height="24px"
+          width="18px"
+          height="18px"
           color=" var( --text-primary-300)"
         />
       </div>
       <div
         class="d-flex justify-content-center align-items-center"
-        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px;  "
+        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px 20px 10px 10px; font-size:14px;  "
       >
-        <span><PlusIcon color={"var(--white-color)"} /></span> Request
+        <span><PlusIcon color={"var(--white-color)"} /></span> REST API
       </div>
     </div>
 
@@ -102,14 +103,16 @@
         style="height: 79px"
       >
         <StackIcon
-          width="24px"
-          height="24px"
+          width="22px"
+          height="22px"
           color=" var( --text-primary-300)"
         />
       </div>
       <div
         class="d-flex justify-content-center align-items-center"
-        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px;  "
+        style="height: 41px; background-color:var(--text-tertiary-400 ); font-size:14px;  
+        padding: 10px 14px 10px 6px;
+        "
       >
         <span><PlusIcon color={"var(--white-color)"} /></span> Environment
       </div>
@@ -136,7 +139,7 @@
       </div>
       <div
         class="d-flex justify-content-center align-items-center"
-        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px;  "
+        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px 20px 10px 10px; font-size:14px;  "
       >
         <span><PlusIcon color={"var(--white-color)"} /></span> WebSocket
       </div>

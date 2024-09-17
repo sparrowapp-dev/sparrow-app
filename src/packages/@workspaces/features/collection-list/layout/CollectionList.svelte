@@ -260,8 +260,8 @@
           }}
         >
           <PlusIcon
-            height={"18px"}
-            width={"18px"}
+            height={"22px"}
+            width={"22px"}
             color={"var(--white-color)"}
           />
         </button>
@@ -349,15 +349,14 @@
             {isGuestUser}
           />
 
-          
-    {#if  searchData.length !==0 }
-    <p
-    class="mx-1 text-fs-12 mb-0 text-center"
-    style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
-  >
-    No Result Found
-  </p>
-    {/if}
+          {#if searchData.length !== 0}
+            <p
+              class="mx-1 text-fs-12 mb-0 text-center"
+              style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+            >
+              No Result Found
+            </p>
+          {/if}
         {/if}
       </div>
     {/if}

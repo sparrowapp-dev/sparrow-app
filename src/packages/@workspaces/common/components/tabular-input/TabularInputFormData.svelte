@@ -13,6 +13,8 @@
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "..";
   import { onMount } from "svelte";
+  import { DustbinIcon } from "@library/icons";
+  import { Tooltip } from "@library/ui";
   type Mode = "READ" | "WRITE";
 
   export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
@@ -409,7 +411,8 @@
               {#if pairs.length - 1 != index}
                 <div class="h-75 pe-1">
                   <button
-                    class="bg-secondary-700 border-0 {mode !== 'READ' &&
+                    class="action-icon bg-secondary-700 border-0 {mode !==
+                      'READ' &&
                     element.type == 'text' &&
                     element.value == ''
                       ? 'opacity-1'
@@ -419,16 +422,28 @@
                       uploadFormFile(index);
                     }}
                   >
-                    <img src={attachFile} alt="" />
+                    <Tooltip
+                      title={"Attach File"}
+                      placement={"left"}
+                      distance={10}
+                    >
+                      <img src={attachFile} alt="" />
+                    </Tooltip>
                   </button>
                   <button
-                    class="bg-secondary-700 border-0"
+                    class="action-icon bg-secondary-700 border-0"
                     style="width:20px;"
                     on:click={() => {
                       deleteParam(index);
                     }}
                   >
-                    <img src={trashIcon} alt="" />
+                    <Tooltip title={"Delete"} placement={"left"} distance={10}>
+                      <DustbinIcon
+                        height={"12px"}
+                        width={"12px"}
+                        color={"var(--icon-secondary-200)"}
+                      />
+                    </Tooltip>
                   </button>
                 </div>
               {:else}
@@ -522,6 +537,16 @@
   }
 
   /* Style the checkmark/indicator */
+
+  .action-icon {
+    height: 24px;
+    width: 24px;
+    border-radius: 2px;
+  }
+
+  .action-icon:hover {
+    background-color: var(--bg-secondary-500);
+  }
   .container .checkmark:after {
     left: 5px;
     top: 2px;

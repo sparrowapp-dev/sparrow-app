@@ -178,7 +178,7 @@
       >
         <Tooltip title={"Star Us On GitHub"} placement={"top"}>
           <div
-            class="px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
+            class=" px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
               ? 'bg-secondary-600'
               : ''}"
             role="button"
@@ -290,5 +290,9 @@
   .not-found-text {
     color: var(--request-arc);
     font-size: 12px;
+  }
+
+  .github-icon {
+    padding-bottom: 50px !important;
   }
 </style>
