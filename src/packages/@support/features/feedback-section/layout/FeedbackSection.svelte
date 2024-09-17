@@ -506,7 +506,7 @@
     font-size: 18px;
     font-weight: 700;
     margin-bottom: 5px;
-    color: var(--white-color);
+    color: var(--text-secondary-100);
   }
   .title:hover {
     text-decoration: underline;
