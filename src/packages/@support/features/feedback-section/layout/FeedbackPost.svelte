@@ -247,8 +247,7 @@
             type={`primary`}
             loaderSize={13}
             textStyleProp={"font-size: var(--small-text)"}
-            buttonClassProp={`ps-2`}
-            buttonStyleProp={`height: 20px; width:35px;`}
+            buttonStyleProp={`height: 20px; rounded;`}
             loader={isCommenting}
             onClick={async () => {
               isCommenting = true;

@@ -231,7 +231,7 @@
   }
 
   .search-input-container {
-    background: var(--bg-tertiary-400);
+    background: var(--bg-secondary-800);
     width: 100%;
     font-size: 12px;
     height: 30px;
