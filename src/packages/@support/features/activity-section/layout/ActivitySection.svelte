@@ -349,7 +349,7 @@
                             </span>
                           </div>
                         </div>
-                        <div style="cursor:pointer">
+                        <div style="">
                           <UpvoteIcon upvote={post?.score} />
                         </div>
                       </div>
