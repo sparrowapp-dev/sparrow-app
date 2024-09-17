@@ -300,6 +300,10 @@ $theme-green-00A86B: #00a86b;
   --text-tertiary-600: #{$theme-violet-2E2F3D};
   --text-tertiary-700: #{$theme-violet-1c1d27};
   --text-tertiary-750: #{$theme-violet-1C1D2B};
+  
+  
+  --text-success-200: #{$theme-green-00A86B};
+
 
   --text-danger-100: #{$theme-red-e5acb2};
   --text-danger-200: #{$theme-red-fe8c98};
@@ -416,7 +420,7 @@ $theme-green-00A86B: #00a86b;
   --border-tertiary-750: #{$theme-violet-1C1D2B};
 
 
-  --text-success-200: #{$theme-green-00A86B};
+  --border-success-200: #{$theme-green-00A86B};
 
 
 
@@ -441,6 +445,7 @@ $theme-green-00A86B: #00a86b;
   --icon-primary-200: #{$theme-blue-1193F0};
   --icon-primary-300: #{$theme-blue-3670F7};
   --icon-primary-400: #{$theme-blue-0B5ED7};
+  --icon-primary-440: #{$theme-blue-DF77F9};
   --icon-primary-900: #{$theme-blue-303F4F};
 
   --icon-secondary-100: #{$theme-grey-ffffff};

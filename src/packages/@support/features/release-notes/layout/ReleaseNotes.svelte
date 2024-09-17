@@ -237,7 +237,7 @@
             disabled={false}
             iconRequired={true}
             icon={FilterIcon}
-            iconColor={"var(--white-color)"}
+            iconColor={"var(--text-secondary-100)"}
             borderType={"none"}
             borderActiveType={"none"}
             borderHighlight={"hover-active"}
@@ -295,7 +295,7 @@
                           <LinkIcon
                             height={"18px"}
                             width={"18px"}
-                            color={"var(--white-color)"}
+                            color={"var(--text-secondary-100)"}
                           />
                         </Tooltip>
                       </div>
@@ -342,7 +342,7 @@
 
                       <div class="d-flex align-items-center gap-2">
                         <!-- <ThumbIcon height={"18px"} width={"18px"} />
-                    <div style="color: var(--white-color);">
+                    <div style="color: var(--text-secondary-100);">
                       {event.reactions?.like || ""}
                     </div> -->
                         <div
@@ -379,13 +379,13 @@
                   <ArrowUnfilledIcon
                     height={"16px"}
                     width={"16px"}
-                    color={"var(--white-color )"}
+                    color={"var(--text-secondary-100)"}
                   />
                 </div>
               </div>
               <div
                 class="ms-2 text-fs-14"
-                style="margin-top:1.5px; color:var(--white-color); font-weight:700;"
+                style="margin-top:1.5px; color:var(--text-secondary-100); font-weight:700;"
               >
                 {formatDate(selectedEvent.publishedAt)}
               </div>
@@ -413,7 +413,7 @@
                     <LinkIcon
                       height={"18px"}
                       width={"18px"}
-                      color={"var(--white-color)"}
+                      color={"var(--text-secondary-100)"}
                     />
                   </Tooltip>
                 </div>
@@ -444,7 +444,7 @@
                 </p>
                 <div class="d-flex align-items-center gap-2">
                   <!-- <ThumbIcon height={"18px"} width={"18px"} />
-              <div style="color: var(--white-color);">
+              <div style="color: var(--text-secondary-100);">
                 {selectedEvent.reactions?.like || ""}
               </div> -->
                   <div
@@ -540,7 +540,7 @@
     left: -140px;
     top: 10px;
     font-weight: bold;
-    color: var(--white-color);
+    color: var(--text-secondary-100);
     width: 120px;
     text-align: right;
     font-weight: 700;
@@ -571,7 +571,7 @@
     font-size: 18px;
     font-weight: 700;
     line-height: 27px;
-    color: var(--white-color);
+    color: var(--text-secondary-100);
   }
 
   .timeline-content h3:hover {
@@ -611,16 +611,16 @@
 
   .tag-new {
     color: var(--primary-btn-color);
-    border-color: var(--primary-btn-color);
+    border-color: var(--border-primary-200);
   }
 
   .tag-fixed {
     color: var(--text-primary-440);
-    border-color: var(--text-primary-440);
+    border-color: var(--icon-primary-440);
   }
 
   .tag-improved {
     color: var(--text-success-200);
-    border-color: var(--text-success-200);
+    border-color: var(--border-success-200);
   }
 </style>

@@ -15,7 +15,7 @@
   import { FeedbackType } from "@support/common/types";
   import { Drop } from "@workspaces/features/import-collection/components";
   import { onMount } from "svelte";
-
+  import formatTimeAgo from "@support/common/utils/formatTimeAgo";
   export let isPostopen;
   export let userInfo;
   export let onRetrievePost;
@@ -24,7 +24,6 @@
   export let postId;
   export let handleUpvote;
   export let getColor;
-  export let formatTimeAgo;
 
   let post = [];
   let nestedComments = [];
@@ -117,7 +116,7 @@
       handleUpvote();
     }}
   >
-    <LeftIcon color={"var(--white-color)"} />
+    <LeftIcon color={"var(--text-secondary-100)"} />
     <span class="px-2" style="font-size: 14px;">back</span>
   </div>
 
@@ -157,7 +156,7 @@
                 width="34px"
                 height="32px"
                 backgroundColor="var(--bg-tertiary-750)"
-                borderColor="var(--bg-secondary-300)"
+                borderColor="var(--border-secondary-300)"
               />
               <div style="font-size: 14px; font-weight: 500;">
                 {post.author?.name}
@@ -236,11 +235,11 @@
         />
 
         <div class="d-flex align-items-center gap-2">
-          <AttachmentIcon
+          <!-- <AttachmentIcon
             height={"12px"}
             width={"12px"}
             color={"var(--text-secondary-200)"}
-          />
+          /> -->
 
           <Button
             title={`Add`}

@@ -101,35 +101,6 @@
   };
 
   /**
-   * Formats a given date into a human-readable "time ago" string.
-   *
-   * @param {Date} date - The date to format, can be a date string or a Date object.
-   * @returns {string} A string representing how much time has passed since the given date (e.g., "2 hours ago", "5 days ago").
-   *
-   * @example
-   * // Returns "5 minutes ago"
-   * formatTimeAgo(new Date(Date.now() - 5 * 60 * 1000));
-   */
-
-  const formatTimeAgo = (date) => {
-    const diffInSeconds = (new Date() - new Date(date)) / 1000;
-    const minutes = Math.floor(diffInSeconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    if (days >= 1) {
-      return `${days} day${days > 1 ? "s" : ""} ago`;
-    } else if (hours >= 1) {
-      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-    } else if (minutes >= 1) {
-      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-    } else {
-      const seconds = Math.floor(diffInSeconds);
-      return `${seconds} second${seconds > 1 ? "s" : ""} ago`;
-    }
-  };
-
-  /**
    * @description - Fetches release notes when the component is mounted and sets the appropriate active tab based on the current URL path.
    * - Fetches and sets `releaseNotesData`.
    * - Checks the current URL path and sets `activeTab` to either "updates" or "roadmap".
@@ -165,7 +136,7 @@
             width={"17px"}
             color={activeTab === "roadmap"
               ? "var(--text-primary-300)"
-              : "var( --white-color )"}
+              : "var(--text-secondary-100)"}
           />
           Roadmap
         </div>
@@ -183,7 +154,7 @@
             width={"17px"}
             color={activeTab === "feedback"
               ? "var(--text-primary-300)"
-              : "var( --white-color )"}
+              : "var(--text-secondary-100)"}
           />
           Feedback
         </div>
@@ -201,7 +172,7 @@
             width={"17px"}
             color={activeTab === "updates"
               ? "var(--text-primary-300)"
-              : "var( --white-color )"}
+              : "var(--text-secondary-100)"}
           />
           Updates
         </div>
@@ -219,7 +190,7 @@
             width={"17px"}
             color={activeTab === "community"
               ? "var(--text-primary-300)"
-              : "var( --white-color )"}
+              : "var(--text-secondary-100)"}
           />
           Community
         </div>
@@ -238,7 +209,7 @@
             width={"17px"}
             color={activeTab === "myActivity"
               ? "var(--text-primary-300)"
-              : "var( --white-color )"}
+              : "var(--text-secondary-100)"}
           />
           My Activity
         </div>
@@ -270,7 +241,6 @@
                 deleteVote={_viewModel.deleteVote}
                 listVote={_viewModel.listVote}
                 {getColor}
-                {formatTimeAgo}
                 bind:postId
                 bind:isPostopenFromActivity
               />
@@ -296,7 +266,6 @@
                 listPostsComments={_viewModel.listComments}
                 {getColor}
                 {setPostId}
-                {formatTimeAgo}
               />{/if}
           </div>
         </div>
@@ -323,7 +292,7 @@
   .tabs {
     display: flex;
     height: 37px;
-    border-bottom: 2px solid var(--text-secondary-900);
+    border-bottom: 2px solid var(--border-secondary-900);
     background-color: var(--bg-secondary-900);
   }
 
@@ -348,6 +317,6 @@
     bottom: -2px;
     width: 100%;
     height: 2px;
-    border-bottom: 4px solid var(--text-primary-300);
+    border-bottom: 4px solid var(--border-primary-300);
   }
 </style>
