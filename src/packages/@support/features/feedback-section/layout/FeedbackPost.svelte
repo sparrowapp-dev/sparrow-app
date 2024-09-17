@@ -8,16 +8,14 @@
     SortIcon,
     StatusIcon,
   } from "@library/icons";
-  import Comment from "@library/icons/Comment.svelte";
 
   import { Button, IconFallback, Loader, Modal } from "@library/ui";
   import ImageModal from "@library/ui/image-modal/ImageModal.svelte";
   import { CommentCard, UpvoteIcon } from "@support/common/components";
   import { FeedbackType } from "@support/common/types";
-  import { FeedbackStatusType } from "@support/common/types/feedback";
   import { Drop } from "@workspaces/features/import-collection/components";
   import { onMount } from "svelte";
-
+  import formatTimeAgo from "@support/common/utils/formatTimeAgo";
   export let isPostopen;
   export let userInfo;
   export let onRetrievePost;
@@ -25,37 +23,22 @@
   export let fetchComments;
   export let postId;
   export let handleUpvote;
+  export let getColor;
 
   let post = [];
-  let currentImage = "";
-  let createdAt = "";
-  let isExposeFeedbackForm = false;
-  let feedbackDescription = "";
-  let feedbackSubject = "";
-  let type = FeedbackType.CATEGORY;
-  let postImages = [];
-  let commentValue = "";
-  let isLoading = false;
-
-  const timeAgo = (date) => {
-    const diffInSeconds = (new Date() - new Date(date)) / 1000;
-    const minutes = Math.floor(diffInSeconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    if (days >= 1) {
-      return `${days} day${days > 1 ? "s" : ""} ago`;
-    } else if (hours >= 1) {
-      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-    } else {
-      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-    }
-  };
-
-  let isImageOpen = false;
-
-  let comments = [];
   let nestedComments = [];
+  let postImages = [];
+  let comments = [];
+  let createdAt = "";
+  let commentValue = "";
+  let currentImage = "";
+  let feedbackSubject = "";
+  let feedbackDescription = "";
+  let isLoading = false;
+  let isImageOpen = false;
+  let isCommenting = false;
+  let isExposeFeedbackForm = false;
+  let type = FeedbackType.CATEGORY;
 
   function nestComments(comments) {
     const commentMap = {};
@@ -74,7 +57,7 @@
     return comments.filter((comment) => !comment.parentID);
   }
 
-  const logMessage = async () => {
+  const reloadComments = async () => {
     comments = await fetchComments(postId);
     nestedComments = nestComments(comments);
   };
@@ -83,17 +66,11 @@
     isLoading = true;
     const res = await onRetrievePost(postId);
     post = await res?.data;
-    createdAt = timeAgo(post?.created);
+    createdAt = formatTimeAgo(post?.created);
     postImages = post?.imageURLs;
     comments = await fetchComments(postId);
     isLoading = false;
   });
-
-  $: {
-    if (comments) {
-      nestedComments = nestComments(comments);
-    }
-  }
 
   function sortCommentsOldToNew(comments) {
     if (!Array.isArray(comments)) {
@@ -123,7 +100,11 @@
     }
   };
 
-  let isCommenting = false;
+  $: {
+    if (comments) {
+      nestedComments = nestComments(comments);
+    }
+  }
 </script>
 
 <div class="d-flex flex-row" style="margin-top: 51px; ">
@@ -135,7 +116,7 @@
       handleUpvote();
     }}
   >
-    <LeftIcon color={"#FFFFFF"} />
+    <LeftIcon color={"var(--text-secondary-100)"} />
     <span class="px-2" style="font-size: 14px;">back</span>
   </div>
 
@@ -155,12 +136,14 @@
           <span style="font-size: 18px; font-weight: 700;">{post?.title}</span>
           <span
             class="px-2"
-            style="border:0.2px solid #DF77F9 ; color:#DF77F9; padding-bottom: 14px; border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
+            style="border:0.2px solid {getColor(post?.status)
+              .fontColor}; color: {getColor(post?.status)
+              .fontColor}; padding-bottom: 14px; border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
           >
             {post?.status
               ? post.status.charAt(0).toUpperCase() + post.status.slice(1)
-              : ""}</span
-          >
+              : ""}
+          </span>
         </div>
 
         <div class="d-flex flex-row">
@@ -172,8 +155,8 @@
                 character={post.author?.name?.charAt(0)}
                 width="34px"
                 height="32px"
-                backgroundColor="#1C1D2B"
-                borderColor="#45494D"
+                backgroundColor="var(--bg-tertiary-750)"
+                borderColor="var(--border-secondary-300)"
               />
               <div style="font-size: 14px; font-weight: 500;">
                 {post.author?.name}
@@ -216,16 +199,16 @@
               </div>
 
               <div
-                style="display: flex; align-items: center; font-size: 12px; margin-top:10px; color:#999999 !important;"
+                style="display: flex; align-items: center; font-size: 12px; margin-top:10px; color:var(--text-secondary-50) !important;"
               >
                 <span style="padding-left:4px;">{createdAt} </span>
                 <span class="px-2">|</span>
-                <!-- <span
+                <span
                   class="px-2"
                   on:click={() => {
                     isExposeFeedbackForm = true;
                   }}>Edit post</span
-                > -->
+                >
               </div>
             </div>
           </div>
@@ -263,7 +246,8 @@
             type={`primary`}
             loaderSize={13}
             textStyleProp={"font-size: var(--small-text)"}
-            buttonStyleProp={`height: 20px;  rounded;`}
+            buttonClassProp={`ps-2`}
+            buttonStyleProp={`height: 20px; width:35px;`}
             loader={isCommenting}
             onClick={async () => {
               isCommenting = true;
@@ -329,7 +313,7 @@
                 {userInfo}
                 {comment}
                 {fetchComments}
-                {logMessage}
+                {reloadComments}
               />
             {/each}
           </div>
@@ -416,7 +400,7 @@
     <div
       class="p-2 bg-tertiary-300
          mb-3"
-      style="height: 137px; border-radius: 4px; color:#676A80; "
+      style="height: 137px; border-radius: 4px; color:var(--text-tertiary-100); "
     >
       <Input
         on:input={() => {
@@ -556,21 +540,16 @@
   }
 
   .search-input-container {
-    /* border: 1px solid var(--border-color); */
-    background: var(--bg-tertiary-400);
+    background: var(--bg-secondary-800);
     width: 100%;
     font-size: 12px;
     height: 30px;
     position: relative;
     border: 1px solid transparent;
   }
-  /* .search-input-container:hover {
-    border: 1px solid var(--border-primary-300);
-    caret-color: var(--border-primary-300);
-  } */
 
   .search-input-container:focus-within {
-    border-color: #636566;
+    border-color: var(--text-secondary-350);
     caret-color: var(--border-primary-300);
   }
 
