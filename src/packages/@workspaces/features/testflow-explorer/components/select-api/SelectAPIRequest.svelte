@@ -3,6 +3,7 @@
   import type { CollectionDocument } from "@app/database/database";
   import { CollectionIcon, FolderIcon2 } from "@library/icons";
   import type { Observable } from "rxjs";
+  import { onDestroy, onMount } from "svelte";
   export let name;
   export let method;
   export let collections = [];
@@ -56,9 +57,24 @@
       arrayData = data.items;
     }
   };
+  let dropdownRef;
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (dropdownRef && !dropdownRef.contains(event.target as Node)) {
+      isOpen = false;
+    }
+  };
+
+  onMount(() => {
+    document.addEventListener("click", handleClickOutside);
+  });
+
+  onDestroy(() => {
+    document.removeEventListener("click", handleClickOutside);
+  });
 </script>
 
-<div class="dropdown">
+<div class="dropdown" bind:this={dropdownRef}>
   <!-- <p>Select API Request</p> -->
   <div on:click={() => (isOpen = !isOpen)} class="dropdown-header">
     {#if selectedRequest}
