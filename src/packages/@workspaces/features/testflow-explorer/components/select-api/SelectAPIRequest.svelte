@@ -3,6 +3,7 @@
   import type { CollectionDocument } from "@app/database/database";
   import { CollectionIcon, FolderIcon2 } from "@library/icons";
   import type { Observable } from "rxjs";
+  import { onDestroy, onMount } from "svelte";
   export let name;
   export let method;
   export let collections = [];
@@ -50,15 +51,32 @@
           data.request.method,
         );
       }
+      arrayData = collections;
     }
     if (data?.type !== "REQUEST") {
       previousItem = data;
       arrayData = data.items;
     }
   };
+  let dropdownRef;
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (dropdownRef && !dropdownRef.contains(event.target as Node)) {
+      isOpen = false;
+      arrayData = collections;
+    }
+  };
+
+  onMount(() => {
+    document.addEventListener("click", handleClickOutside);
+  });
+
+  onDestroy(() => {
+    document.removeEventListener("click", handleClickOutside);
+  });
 </script>
 
-<div class="dropdown">
+<div class="dropdown" bind:this={dropdownRef}>
   <!-- <p>Select API Request</p> -->
   <div on:click={() => (isOpen = !isOpen)} class="dropdown-header">
     {#if selectedRequest}
@@ -91,7 +109,7 @@
         </p>
       </div>
     {:else}
-      <p class="select-txt">Select API Request</p>
+      <p class="select-txt">Select an API Request</p>
     {/if}
   </div>
   <div
@@ -161,7 +179,7 @@
     margin-top: 5px;
     width: 170px;
     padding-top: 10px;
-    padding-bottom: 2px;
+    padding-bottom: 10px;
     cursor: pointer;
     /* justify-content: center;
     align-items: center; */
