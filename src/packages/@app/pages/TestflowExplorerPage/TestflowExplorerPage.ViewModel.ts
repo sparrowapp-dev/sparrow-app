@@ -114,7 +114,6 @@ export class TestflowExplorerPageViewModel {
         environmentDocuments = value;
       }
     });
-    console.log("envirornments", environmentDocuments);
     let environmentVariables;
 
     if (environmentDocuments && currentWorkspaceId) {
