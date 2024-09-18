@@ -658,7 +658,6 @@ class RestExplorerViewModel
    * @description send request
    */
   public sendRequest = async (environmentVariables = []) => {
-    console.log("envvvvvvvvvv", environmentVariables);
     this.updateRequestState({ isSendRequestInProgress: true });
     const start = Date.now();
 
