@@ -2,18 +2,24 @@
   import { writable } from "svelte/store";
   import { SvelteFlow, Background, Controls } from "@xyflow/svelte";
 
-  import { StartBlock, RequestBlock, RequestBodyTestFlow } from "../components";
+  import {
+    StartBlock,
+    RequestBlock,
+    RequestBodyTestFlow,
+    RunHistory,
+  } from "../components";
   import { RequestSectionEnum, type Tab } from "@common/types/workspace";
 
   import "@xyflow/svelte/dist/style.css";
   import { onMount } from "svelte";
+
+  import "@xyflow/svelte/dist/style.css";
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
   import { DropButton } from "@workspaces/common/components";
   import {
     ArrowOutwardIcon,
     ArrowSplit,
-    ArrowUpward,
     CrossIcon,
     VectorIcon,
   } from "@library/icons";
@@ -25,6 +31,9 @@
   export let onUpdateEdges;
   export let collectionList: Observable<CollectionDocument[]>;
   export let onClickRun;
+  export let testflowStore;
+  export let toggleHistoryDetails;
+  export let toggleHistoryContainer;
 
   const checkIfEdgesExist = (_id: string) => {
     let edge = [];
@@ -239,6 +248,7 @@
 
   nodes.subscribe((val) => {
     if (val && val.length) onUpdateNodes(val);
+    console.log(val, "va;");
   });
   edges.subscribe((val) => {
     if (val) onUpdateEdges(val);
@@ -247,15 +257,40 @@
   let selectedTab = "response";
 </script>
 
-<div class="parent-container">
-  <div class="run-btn">
-    <DropButton
-      title="Run"
-      type="default"
-      onClick={() => {
-        onClickRun();
-      }}
-    />
+<div class="h-100 position-relative">
+  <div
+    class="d-flex justify-content-between position-absolute p-3"
+    style="top:0;
+  left:0;
+  right:0;
+  z-index:100;"
+  >
+    <div>
+      <!-- PASTE NAME CODE HERE -->
+    </div>
+    <div class="d-flex">
+      <div>
+        <!--PASTE RUN CODE HERE-->
+        <DropButton
+          title="Run"
+          type="default"
+          onClick={() => {
+            onClickRun();
+          }}
+        />
+      </div>
+      <div>
+        <!-- PASTE SAVE CODE HERE -->
+      </div>
+      <div class="position-relative">
+        <RunHistory
+          {testflowStore}
+          testflowName={$tab?.name}
+          {toggleHistoryDetails}
+          {toggleHistoryContainer}
+        />
+      </div>
+    </div>
   </div>
   <SvelteFlow {nodes} {edges} {nodeTypes}>
     <Background
@@ -286,7 +321,7 @@
             REST API REQUEST
           </p>
         </div>
-        <div class="d-flex gap-2 align-items-center " style="cursor:pointer">
+        <div class="d-flex gap-2 align-items-center" style="cursor:pointer">
           <ArrowOutwardIcon width={"8px"} height={"8px"} color={"#8A9299"} />
           <CrossIcon width={"14px"} height={"14px"} color={"#8A9299"} />
         </div>

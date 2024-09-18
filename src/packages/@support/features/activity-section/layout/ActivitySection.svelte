@@ -21,6 +21,8 @@
   } from "@support/common/types/activity";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import Loader from "@library/ui/loader/Loader.svelte";
+  import { FormatTime } from "@common/utils/formatTime";
+  const formatTimeAgo = new FormatTime().formatTimeAgo;
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
@@ -172,27 +174,6 @@
   // sortPosts();
   // sortComments();
   // sortLikedPosts();
-
-
-  const timeAgo = (date) => {
-    const diffInSeconds = (new Date() - new Date(date)) / 1000;
-    const minutes = Math.floor(diffInSeconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    if (days >= 1) {
-      return `${days} day${days > 1 ? "s" : ""} ago`;
-    } else if (hours >= 1) {
-      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-    } else if (minutes >= 1) {
-      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-    } else {
-      const seconds = Math.floor(diffInSeconds);
-      return `${seconds} second${seconds > 1 ? "s" : ""} ago`;
-    }
-  };
-
-  
 </script>
 
 <div class="container">
@@ -411,7 +392,7 @@
                       <div class="comment-meta">
                         <div class="comment-moreinfo">
                           <span class="comment-time">
-                            {timeAgo(comment.created)}
+                            {formatTimeAgo(comment.created)}
                           </span>
                           <a href="#" class="comment-reply">Reply</a>
                         </div>
