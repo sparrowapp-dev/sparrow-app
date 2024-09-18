@@ -6,7 +6,6 @@ export enum FeedbackType {
   CATEGORY = "Category",
 }
 
-
 export enum FeedbackStatusType {
   OPEN = "open",
   COMPLETED = "complete",
@@ -16,3 +15,9 @@ export enum FeedbackStatusType {
   ALL_STATUS = "all status",
 }
 
+export enum UpdatesTagType {
+  NEW = "new",
+  FIXED = "fixed",
+  IMPROVED = "improved",
+  ALL = "all",
+}

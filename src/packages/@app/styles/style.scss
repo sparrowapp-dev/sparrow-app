@@ -118,6 +118,7 @@ $theme-grey-272727: #272727;
 $theme-grey-212222: #212222;
 $theme-grey-1A1A1A: #1a1a1a;
 $theme-grey-161617: #161617;
+$theme-grey-1E1E1E: #1E1E1E;
 $theme-grey-151515: #151515;
 $theme-grey-000000: #000000;
 $theme-grey-191919: #191919;
@@ -135,6 +136,7 @@ $theme-blue-1193F0: #1193f0;
 $theme-blue-3670F7: #3670f7;
 $theme-blue-0B5ED7: #0b5ed7;
 $theme-blue-2B5ED4: #2b5ed4;
+$theme-blue-DF77F9: #df77f9;
 $theme-blue-303F4F: #303f4f;
 $theme-blue-1D3650: #1d3650;
 $theme-blue-74AEF6: #74aef6;
@@ -149,8 +151,10 @@ $theme-violet-22232E: #22232e;
 $theme-violet-272831: #272831;
 $theme-violet-2E2F3D: #2e2f3d;
 $theme-violet-323548: #323548;
+$theme-violet-262834: #262834;
 $theme-violet-1c1d27: #1c1d27;
 $theme-violet-1C1D2B: #1c1d2b;
+
 
 $theme-red-e5acb2: #e5acb2;
 $theme-red-fe8c98: #fe8c98;
@@ -167,6 +171,8 @@ $theme-red-230408: #230408;
 $theme-red-2B1C1D: #2b1c1d;
 
 $theme-green-8dc599: #8dc599;
+$theme-green-00A86B: #00a86b;
+
 
 :root {
   --tab-bar-hover: #{$sparrow-email-invite-bg-color};
@@ -261,6 +267,7 @@ $theme-green-8dc599: #8dc599;
   --text-primary-300: #{$theme-blue-3670F7};
   --text-primary-350: #{$theme-blue-74AEF6};
   --text-primary-400: #{$theme-blue-0B5ED7};
+  --text-primary-440: #{$theme-blue-DF77F9};
   --text-primary-500: #{$theme-blue-87b9f7};
   --text-primary-600: #{$theme-blue-007bff};
 
@@ -295,6 +302,10 @@ $theme-green-8dc599: #8dc599;
   --text-tertiary-600: #{$theme-violet-2E2F3D};
   --text-tertiary-700: #{$theme-violet-1c1d27};
   --text-tertiary-750: #{$theme-violet-1C1D2B};
+  
+  
+  --text-success-200: #{$theme-green-00A86B};
+
 
   --text-danger-100: #{$theme-red-e5acb2};
   --text-danger-200: #{$theme-red-fe8c98};
@@ -346,6 +357,7 @@ $theme-green-8dc599: #8dc599;
   --bg-secondary-850: #{$theme-grey-121212};
   --bg-secondary-900: #{$theme-grey-000000};
   --bg-secondary-950: #{$theme-grey-808080};
+  --bg-secondary-970: #{$theme-grey-1E1E1E};
   --bg-secondary-1000: #{$theme-grey-CCCCCC};
   --bg-secondary-1100: #{$theme-grey-2B343D};
 
@@ -409,6 +421,11 @@ $theme-green-8dc599: #8dc599;
   --border-tertiary-700: #{$theme-violet-1c1d27};
   --border-tertiary-750: #{$theme-violet-1C1D2B};
 
+
+  --border-success-200: #{$theme-green-00A86B};
+
+
+
   --border-danger-100: #{$theme-red-e5acb2};
   --border-danger-200: #{$theme-red-fe8c98};
   --border-danger-300: #{$theme-red-ff7878};
@@ -430,6 +447,7 @@ $theme-green-8dc599: #8dc599;
   --icon-primary-200: #{$theme-blue-1193F0};
   --icon-primary-300: #{$theme-blue-3670F7};
   --icon-primary-400: #{$theme-blue-0B5ED7};
+  --icon-primary-440: #{$theme-blue-DF77F9};
   --icon-primary-900: #{$theme-blue-303F4F};
 
   --icon-secondary-100: #{$theme-grey-ffffff};
@@ -533,6 +551,8 @@ $theme-colors: map-merge($theme-colors,
 
 // Define a map for font sizes in pixels
 $sparrow-font-sizes: (
+  6: 0.4rem,
+  // 6px in rem
   8: 0.5rem,
   // 8px in rem
   9: 0.5625rem,
@@ -658,6 +678,7 @@ $sparrow-bg-colors: (
   tertiary-500: $theme-violet-272831,
   tertiary-600: $theme-violet-2E2F3D,
   tertiary-650: $theme-violet-323548,
+  tertiary-670: $theme-violet-262834,
   tertiary-700: $theme-violet-1c1d27,
   tertiary-750: $theme-violet-1C1D2B,
 
@@ -727,6 +748,9 @@ $sparrow-border-colors: (
 
   .text-fs-#{$size} {
     font-size: $value;
+  }
+  .text-fs-#{$size}-important {
+    font-size: $value !important;
   }
 }
 
@@ -891,8 +915,7 @@ textarea {
   resize: none;
 }
 
-button:disabled{
+button:disabled {
   pointer-events: none !important;
   opacity: 0.7;
 }
-

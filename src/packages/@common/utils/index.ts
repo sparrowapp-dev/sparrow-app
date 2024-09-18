@@ -8,3 +8,4 @@ export { InitWebSocketTab } from "./init-web-socket-tab";
 export { InitTestflowTab } from "./init-testflow-tab";
 export { MarkdownFormatter } from "./parse-markdown-to-texteditor";
 export { SetDataStructure } from "./set-data-structure";
+export { FormatTime } from "./formatTime";

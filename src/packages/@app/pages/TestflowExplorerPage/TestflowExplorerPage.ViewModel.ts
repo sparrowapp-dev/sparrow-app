@@ -1,4 +1,5 @@
 import { makeHttpRequestV2 } from "$lib/api/api.common";
+import { ResponseStatusCode } from "$lib/utils/enums";
 import { environmentType } from "$lib/utils/enums";
 import { createDeepCopy } from "$lib/utils/helpers";
 import { RequestTabAdapter } from "@app/adapter";
@@ -10,7 +11,10 @@ import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import type { Tab } from "@common/types/workspace";
 import { Debounce } from "@common/utils";
 import { DecodeRequest } from "@workspaces/features/rest-explorer/utils";
-import { testFlowDataStore } from "@workspaces/features/socket-explorer/store/testflow";
+import {
+  testFlowDataStore,
+  type TFHistoryType,
+} from "@workspaces/features/socket-explorer/store/testflow";
 import { BehaviorSubject, Observable } from "rxjs";
 
 export class TestflowExplorerPageViewModel {
@@ -159,19 +163,42 @@ export class TestflowExplorerPageViewModel {
   };
 
   public handleTestFlowRun = async () => {
-    // debugger;
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const environments = await this.refreshEnvironment(
       progressiveTab.path.workspaceId,
     );
     const nodes = progressiveTab?.property?.testflow?.nodes;
+
     testFlowDataStore.update((testFlowDataMap) => {
-      testFlowDataMap.set(progressiveTab.tabId, {
-        nodes: [],
-      });
+      let wsData = testFlowDataMap.get(progressiveTab.tabId);
+      if (wsData) {
+        wsData.nodes = [];
+      } else {
+        wsData = {
+          nodes: [],
+          history: [],
+          isRunHistoryEnable: false,
+        };
+      }
+      testFlowDataMap.set(progressiveTab.tabId, wsData);
       return testFlowDataMap;
     });
-    nodes.forEach(async (element) => {
+
+    let successRequests = 0;
+    let failedRequests = 0;
+    let totalTime = 0;
+    const history: TFHistoryType = {
+      status: "fail",
+      successRequests: "",
+      failedRequests: "",
+      totalTime: "",
+      timestamp: new Date().toISOString(),
+      requests: [],
+      expand: false,
+    };
+
+    // Sequential execution
+    for (const element of nodes) {
       if (
         element?.type === "requestBlock" &&
         element?.data?.collectionId?.length > 0
@@ -206,19 +233,19 @@ export class TestflowExplorerPageViewModel {
 
         try {
           const response = await makeHttpRequestV2(...decodeData);
+          const end = Date.now();
+          const duration = end - start;
+
           testFlowDataStore.update((testFlowDataMap) => {
             const existingTestFlowData = testFlowDataMap.get(
               progressiveTab.tabId,
             );
-
-            // Check if the node with the same id already exists
             if (existingTestFlowData) {
               const existingNodeIndex = existingTestFlowData.nodes.findIndex(
                 (n) => n.id === element.id,
               );
+
               let resData;
-              const end = Date.now();
-              const duration = end - start;
               if (response.isSuccessful) {
                 const byteLength = new TextEncoder().encode(
                   JSON.stringify(response),
@@ -228,23 +255,25 @@ export class TestflowExplorerPageViewModel {
                 const responseBody = response.data.body;
                 const formattedHeaders = Object.entries(
                   response?.data?.headers || {},
-                );
-                const responseHeaders = [];
-                formattedHeaders.forEach((elem) => {
-                  responseHeaders.push({
-                    key: elem[0],
-                    value: elem[1],
-                  });
-                });
+                ).map(([key, value]) => ({ key, value }));
                 const responseStatus = response?.data?.status;
 
                 resData = {
                   body: responseBody,
-                  headers: responseHeaders,
+                  headers: formattedHeaders,
                   status: responseStatus,
                   time: duration,
                   size: responseSizeKB,
                 };
+                successRequests++;
+                totalTime += duration;
+                const req = {
+                  method: request?.request?.method,
+                  name: request?.name,
+                  status: resData.status, // need to be updated
+                  time: duration.toString() + " ms",
+                };
+                history.requests.push(req);
               } else {
                 resData = {
                   body: "",
@@ -253,21 +282,25 @@ export class TestflowExplorerPageViewModel {
                   time: duration,
                   size: 0,
                 };
+                failedRequests++;
+                totalTime += duration;
+                const req = {
+                  method: request?.request?.method,
+                  name: request?.name,
+                  status: ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                  time: duration.toString() + " ms",
+                };
+                history.requests.push(req);
               }
-
               if (existingNodeIndex > -1) {
-                // Update the existing node's response
                 existingTestFlowData.nodes[existingNodeIndex].response =
                   resData;
               } else {
-                // Add a new node
                 existingTestFlowData.nodes.push({
                   id: element.id,
                   response: resData,
                 });
               }
-
-              // Set the updated data back into the map
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
             return testFlowDataMap;
@@ -277,8 +310,6 @@ export class TestflowExplorerPageViewModel {
             const existingTestFlowData = testFlowDataMap.get(
               progressiveTab.tabId,
             );
-
-            // Check if the node with the same id already exists
             if (existingTestFlowData) {
               const existingNodeIndex = existingTestFlowData.nodes.findIndex(
                 (n) => n.id === element.id,
@@ -293,23 +324,76 @@ export class TestflowExplorerPageViewModel {
               };
 
               if (existingNodeIndex > -1) {
-                // Update the existing node's response
                 existingTestFlowData.nodes[existingNodeIndex].response =
                   resData;
               } else {
-                // Add a new node
                 existingTestFlowData.nodes.push({
                   id: element.id,
                   response: resData,
                 });
               }
-              // Set the updated data back into the map
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
             return testFlowDataMap;
           });
+          failedRequests++;
+          totalTime += 0;
+          const req = {
+            method: request?.request?.method,
+            name: request?.name,
+            status: ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            time: 0 + " ms",
+          };
+          history.requests.push(req);
         }
       }
+    }
+
+    // Now update the history and log it after all requests are done
+    history.totalTime = totalTime.toString() + " ms";
+    history.successRequests = successRequests.toString();
+    history.failedRequests = failedRequests.toString();
+    if (failedRequests === 0) {
+      history.status = "pass";
+    }
+
+    testFlowDataStore.update((testFlowDataMap) => {
+      const wsData = testFlowDataMap.get(progressiveTab.tabId);
+      if (wsData) {
+        const hs = wsData.history;
+        hs.unshift(history);
+        wsData.history = hs;
+      }
+      testFlowDataMap.set(progressiveTab.tabId, wsData);
+      return testFlowDataMap;
+    });
+  };
+
+  public toggleHistoryContainer = (_toggleState: boolean) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    testFlowDataStore.update((testFlowDataMap) => {
+      let wsData = testFlowDataMap.get(progressiveTab.tabId);
+      if (wsData) {
+        wsData.isRunHistoryEnable = _toggleState;
+      } else {
+        wsData = {
+          isRunHistoryEnable: _toggleState,
+        };
+      }
+      testFlowDataMap.set(progressiveTab.tabId, wsData);
+      return testFlowDataMap;
+    });
+  };
+
+  public toggleHistoryDetails = (_toggleState: boolean, _index: number) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    testFlowDataStore.update((testFlowDataMap) => {
+      const wsData = testFlowDataMap.get(progressiveTab.tabId);
+      if (wsData) {
+        wsData.history[_index].expand = _toggleState;
+      }
+      testFlowDataMap.set(progressiveTab.tabId, wsData);
+      return testFlowDataMap;
     });
   };
 }
