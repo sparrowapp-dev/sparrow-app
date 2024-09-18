@@ -10,6 +10,11 @@
   export let onUpdateNodes;
   export let onUpdateEdges;
 
+  let folderId: string;
+  let workspaceId: string;
+  let collectionId: string;
+  let apiId: string;
+
   const checkIfEdgesExist = (_id: string) => {
     let edge = [];
     edges.subscribe((value) => {
@@ -148,9 +153,24 @@
   edges.subscribe((val) => {
     if (val) onUpdateEdges(val);
   });
+
+  function drop(event) {
+    event.preventDefault();
+    const data = JSON.parse(event.dataTransfer.getData("text/plain"));
+
+    console.log(data);
+    if (!data) return;
+
+    folderId = data.folderId;
+    workspaceId = data.workspaceId;
+    collectionId = data.collectionId;
+    apiId = data.apiId;
+
+    createNewNode($nodes.length.toString());
+  }
 </script>
 
-<div class="h-100">
+<div class="h-100" on:drop={(e) => drop(e)}>
   <SvelteFlow {nodes} {edges} {nodeTypes}>
     <Background
       bgColor={"var(--bg-secondary-850)"}
