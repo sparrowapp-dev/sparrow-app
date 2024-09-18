@@ -138,12 +138,12 @@
 </script>
 
 <div
-  class={`d-flex flex-column  h-100 env-sidebar mt-1 bg-secondary-900   pt-0 px-1`}
+  class={`d-flex flex-column  h-100 env-sidebar  bg-secondary-900   pt-0 px-1`}
   style="font-weight: 500;"
 >
   <div
     class="d-flex align-items-center rounded-1 me-0 mb-0 pe-2"
-    style="cursor:pointer; justify-content: space-between; height:32px;
+    style="cursor:pointer; justify-content: space-between; height:34px;
       background-color: {isHovered
       ? 'var(--dropdown-option-hover)'
       : 'transparent'}; "
