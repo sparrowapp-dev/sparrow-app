@@ -65,12 +65,7 @@
     right: 0px;
     transform: translateY(-50%) translateX(100%);
     align-items: center;
-    display: none;
-  }
-  .start-block:hover {
-    .add-block-btn {
-      display: flex;
-    }
+    display: flex;
   }
   .btnc {
     border: 1px dashed var(--border-primary-300);
