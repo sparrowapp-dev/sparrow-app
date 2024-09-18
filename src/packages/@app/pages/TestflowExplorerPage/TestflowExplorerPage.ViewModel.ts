@@ -1,10 +1,13 @@
 import { makeHttpRequestV2 } from "$lib/api/api.common";
 import { ResponseStatusCode } from "$lib/utils/enums";
+import { environmentType } from "$lib/utils/enums";
 import { createDeepCopy } from "$lib/utils/helpers";
 import { RequestTabAdapter } from "@app/adapter";
-import type { TabDocument } from "@app/database/database";
+import type { TabDocument, WorkspaceDocument } from "@app/database/database";
 import { CollectionRepository } from "@app/repositories/collection.repository";
+import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
+import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import type { Tab } from "@common/types/workspace";
 import { Debounce } from "@common/utils";
 import { DecodeRequest } from "@workspaces/features/rest-explorer/utils";
@@ -18,6 +21,8 @@ export class TestflowExplorerPageViewModel {
   private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
   private tabRepository = new TabRepository();
   private collectionRepository = new CollectionRepository();
+  private environmentRepository = new EnvironmentRepository();
+  private workspaceRepository = new WorkspaceRepository();
   /**
    * Utils
    */
@@ -94,8 +99,74 @@ export class TestflowExplorerPageViewModel {
     return this.collectionRepository.getCollection();
   };
 
+  private refreshEnvironment = async (currentWorkspaceId: string) => {
+    let environmentId: string;
+    const activeWorkspace = await this.workspaceRepository.getActiveWorkspace();
+    const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+      async (value: WorkspaceDocument) => {
+        const activeWorkspaceRxDoc = value;
+        if (activeWorkspaceRxDoc) {
+          currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
+          environmentId = activeWorkspaceRxDoc.get("environmentId");
+        }
+      },
+    );
+    const environments = await this.environmentRepository.getEnvironment();
+    let environmentDocuments;
+    environments.subscribe((value) => {
+      if (value) {
+        environmentDocuments = value;
+      }
+    });
+    let environmentVariables;
+
+    if (environmentDocuments && currentWorkspaceId) {
+      if (environmentDocuments?.length > 0) {
+        const filteredEnv = environmentDocuments
+          .filter((elem) => {
+            return elem.workspaceId === currentWorkspaceId;
+          })
+          .filter((elem) => {
+            if (
+              elem.type === environmentType.GLOBAL ||
+              elem.id === environmentId
+            ) {
+              return true;
+            }
+          });
+        if (filteredEnv?.length > 0) {
+          let envs = [];
+          filteredEnv.forEach((elem) => {
+            environmentVariables = {
+              local: filteredEnv[1],
+              global: filteredEnv[0],
+              filtered: [],
+            };
+
+            const temp = elem.toMutableJSON();
+            temp.variable.forEach((variable) => {
+              if (variable.key && variable.checked) {
+                envs.unshift({
+                  key: variable.key,
+                  value: variable.value,
+                  type: temp.type === environmentType.GLOBAL ? "G" : "E",
+                  environment: temp.name,
+                });
+              }
+            });
+            environmentVariables.filtered = envs;
+          });
+        }
+      }
+    }
+    return environmentVariables;
+  };
+
   public handleTestFlowRun = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
+    const environments = await this.refreshEnvironment(
+      progressiveTab.path.workspaceId,
+    );
     const nodes = progressiveTab?.property?.testflow?.nodes;
 
     testFlowDataStore.update((testFlowDataMap) => {
@@ -156,7 +227,7 @@ export class TestflowExplorerPageViewModel {
         );
         const decodeData = this._decodeRequest.init(
           adaptedRequest.property.request,
-          [],
+          environments?.filtered || [],
         );
         const start = Date.now();
 
