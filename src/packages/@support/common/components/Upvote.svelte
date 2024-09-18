@@ -46,6 +46,11 @@
     margin-left: 10px;
   }
 
+  .upvote-container:hover {
+    opacity: 70%;
+    background-color: #232F3D;
+  }
+
   .upvoted {
     border: 0.3px solid var(--border-primary-300);
     color: var(--text-primary-300);

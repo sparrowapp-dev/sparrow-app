@@ -1,6 +1,12 @@
 <script lang="ts">
   import { user } from "$lib/store";
-  import { CommentIcon, LikeIcon, SortIcon } from "@library/icons";
+  import {
+    ActivityIcon,
+    CommentIcon,
+    LikeIcon,
+    SortIcon,
+    TableChart,
+  } from "@library/icons";
   import { UpvoteIcon } from "@support/common/components";
   import FeedbackPost from "@support/features/feedback-section/layout/FeedbackPost.svelte";
   import { onMount } from "svelte";
@@ -22,6 +28,7 @@
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import Loader from "@library/ui/loader/Loader.svelte";
   import formatTimeAgo from "@support/common/utils/formatTimeAgo";
+  import ArrowOutward from "@library/icons/ArrowOutward.svelte";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
@@ -179,7 +186,7 @@
 <div class="container" style="padding: 20px;">
   <div class="mt-0">
     <p style="font-size: 20px; font-weight:700; ">My Activity</p>
-    <p style="color: var(--text-secondary-50); font-size;14px;">
+    <p class="text-fs-14" style="color: var(--text-secondary-50); ">
       Find all your posts, comments, and likes in one place and easily keep
       track of them.
     </p>
@@ -250,6 +257,7 @@
           placeholderText="Status"
           zIndex={499}
           disabled={false}
+          icon={TableChart}
           iconRequired={true}
           borderType={"none"}
           borderActiveType={"none"}
@@ -316,7 +324,7 @@
                 <ul>
                   {#each filteredPosts as post}
                     <div
-                      style="display: flex; flex-direction: column; background-color: #151515; padding: 15px; min-height: 195px; border-radius:2px;"
+                      style="display: flex; flex-direction: column; background-color: #151515; padding: 20px;  border-radius:2px;"
                     >
                       <div
                         style="display: flex; justify-content: space-between; align-items: flex-start;"
@@ -387,7 +395,7 @@
                   No Result Found
                 </p>
 
-                <hr class="mt-4" style="color: #45494D;" />
+                <hr class="mt-4" style="" />
               {/if}
             </div>
           {/if}
@@ -418,28 +426,42 @@
                       />
                       <div class="comment-content">
                         <div
-                          class=""
+                          class="mt-2"
                           style="display: flex; justify-content: space-between; align-items: start;"
                         >
-                          <div class="">
-                            <div class="comment-author">
-                              {comment.author.name}
-                            </div>
-                            <div class="comment-text">{comment.value}</div>
-                          </div>
-
-                          {#if isHovering === comment.id}
-                            <span
-                              on:click={() => (
-                                ((postId = comment?.post?.id),
-                                (isPostopen = true)),
-                                setPostId("feedback", comment?.post?.id)
-                              )}
-                              class="go-to-post"
-                              style="font-size: 12px; letter-spacing: 0.25px; font-weight: 400;"
-                              >Go to post &#8599;</span
+                          <div class="w-100">
+                            <div
+                              class="d-flex justify-content-between mb-2"
+                              style=" font-weight: 500; margin-bottom: 4px;"
                             >
-                          {/if}
+                              <p>{comment.author.name}</p>
+                              <div style="">
+                                {#if isHovering === comment.id}
+                                <span
+                                  on:click={() => (
+                                    ((postId = comment?.post?.id),
+                                    (isPostopen = true)),
+                                    setPostId("feedback", comment?.post?.id)
+                                  )}
+                                  class="go-to-post"
+                                  style="font-size: 12px; letter-spacing: 0.25px; font-weight: 400;"
+                                  >Go to post</span
+                                >
+                                <ArrowOutward
+                                  height={"10px"}
+                                  width={"10px"}
+                                  color={"white"}
+                                />
+                                {/if}
+                              </div>
+                            </div>
+
+                            <div class="comment-text">
+                              <p style="word-break: break-all;">
+                                {comment.value}
+                              </p>
+                            </div>
+                          </div>
                         </div>
 
                         <div class="comment-meta">
@@ -604,7 +626,7 @@
 
   .title {
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 500;
     margin-bottom: 5px;
     color: var(--white-color);
   }
@@ -672,15 +694,11 @@
   }
 
   .comment-content {
-    flex-grow: 1;
+    width: calc(100% - 5px);
+    /* width: 100%; */
     display: flex;
     flex-direction: column;
     gap: 5px;
-  }
-
-  .comment-author {
-    font-weight: 500;
-    margin-bottom: 4px;
   }
 
   .comment-text {

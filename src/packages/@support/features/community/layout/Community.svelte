@@ -8,7 +8,7 @@
   <div style="" class="">
     <div>
       <p  class="text-fs-20"  style="font-weight:700;">Community</p>
-      <p class="text-fs-14" style="color: #999999;">
+      <p class="text-fs-14" style="color: var(--text-secondary-50);">
         Stay updated with all feedback, from planning to progress, on a single
         roadmap.
       </p>

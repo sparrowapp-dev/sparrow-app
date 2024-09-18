@@ -71,14 +71,10 @@
    */
   export let postId: string;
 
-    /**
+  /**
    * @description - Function to get Color based on tag status or cateogry status.
    */
-  export let getColor
-
-
-
-
+  export let getColor;
 
   let feedbackType = "";
 
@@ -123,14 +119,12 @@
     isLoading = false;
   };
 
-
   /**
    * @description - Handles upvoting action by refreshing the posts with the current sorting, search term, and status.
    */
   const handleUpvote = () => {
     getPosts(currentSort, searchTerm, status);
   };
-
 
   /**
    * @description - Handles the change of input in the search bar and fetches posts that match the search query.
@@ -141,7 +135,6 @@
     searchTerm = searchQuery;
     await getPosts(currentSort, searchQuery, status); // Fetch posts with search term
   };
-
 
   /**
    * @description - Handles changes in the status filter and fetches posts that match the selected status.
@@ -158,7 +151,6 @@
     }
     await getPosts(currentSort, searchTerm, status);
   };
-
 
   /**
    * @description - Handles the change of category and fetches posts that match the selected category.
@@ -183,8 +175,6 @@
       isLoading = false;
     }
   };
-
-  
 
   /**
    * @description - Debounced function for handling input changes to avoid frequent API calls.
@@ -336,7 +326,7 @@
       <div style="width:187px; margin-right:28px; ">
         <div>
           <SortIcon width={"12px"} height={"8px"} />
-          <span style="padding-left: 8px; padding-top:4px ; font-size:500;">
+          <span class="text-fs-13" style="padding-left: 8px; padding-top:4px ; font-weight:500;">
             Sort By</span
           >
         </div>
@@ -349,7 +339,7 @@
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "trending"}
           >
-            <span>Trending</span>
+            <span class="text-fs-13">Trending</span>
             <img src={tickIcon} alt="" class="pt-1 tick-icon" />
           </button>
 
@@ -358,7 +348,7 @@
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "newest"}
           >
-            <span>Now</span>
+            <span class="text-fs-13">Now</span>
             <img src={tickIcon} alt="" class="pt-1 tick-icon" />
           </button>
 
@@ -367,7 +357,7 @@
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "score"}
           >
-            <span>Top</span>
+            <span class="text-fs-13">Top</span>
             <img src={tickIcon} alt="" class="pt-1 tick-icon" />
           </button>
         </div>
@@ -384,7 +374,7 @@
         >
           {#each posts as post}
             <div
-              style="display: flex; flex-direction: column; background-color: #151515; padding: 15px; min-height: 195px; border-radius:2px;"
+              style="display: flex; flex-direction: column; background-color: #151515; padding: 20px;border-radius:2px;"
             >
               <div
                 style="display: flex; justify-content: space-between; align-items: flex-start;"
@@ -403,10 +393,10 @@
                     style="height: 16px; display: flex; align-items: center;"
                   >
                     <span
-                      class="category mt-2"
-                      style="color:{getColor(
-                        post.status
-                      ).fontColor}; border:0.2px solid {getColor(post.status).fontColor}; "
+                      class="category mt-2 text-fs-10"
+                      style="color:{getColor(post.status)
+                        .fontColor}; border:0.2px solid {getColor(post.status)
+                        .fontColor}; "
                     >
                       {post?.status
                         ? post.status.charAt(0).toUpperCase() +
@@ -429,6 +419,7 @@
 
               <div style="margin-top: 10px; flex: 1;">
                 <p
+                class="text-fs-14"
                   style="color: var(--text-secondary-1000); margin: 0; padding-top:10px;"
                 >
                   {post?.details}
@@ -504,7 +495,7 @@
   }
   .title {
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 500;
     margin-bottom: 5px;
     color: var(--text-secondary-100);
   }

@@ -2,15 +2,12 @@
   import Upvote from "../Upvote.svelte";
 
   export let status;
-  export let   setPostId;
+  export let setPostId;
 </script>
 
 <div>
   {#each status as status}
-    <div
-      class="p-2 review-card"
-      on:click={setPostId("feedback", status.id)}
-    >
+    <div class="p-2 review-card" on:click={setPostId("feedback", status.id)}>
       <div class=" d-flex justify-content-between align-items-center">
         <div class="test">
           <p class="card-title pb-0 mb-0 ellipsis" style="font-weight: 500; ">
@@ -40,17 +37,20 @@
     color: #fff;
     margin: 10px 0;
     border-radius: 3px;
-    border: 0.5px solid var(--bg-secondary-315);
+    border: 1px solid var(--border-secondary-295);
     display: flex;
     flex-direction: column;
     justify-content: center;
+    margin-bottom: 22px;
   }
 
   .category {
     background-color: var(--bg-secondary-330);
     padding: 2px 5px 2px 5px;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 10px;
+    font-weight: 500;
+    color: #e0e0e0;
   }
 
   .test {

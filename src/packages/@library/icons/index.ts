@@ -80,3 +80,4 @@ export { default as LinkedinIcon } from "./LinkedinIcon.svelte";
 export { default as ThumbIcon } from "./ThumbIcon.svelte";
 export { default as FilterIcon } from "./FilterIcon.svelte";
 export { default as LinkIcon } from "./LinkIcon.svelte";
+export { default as TableChart } from "./TableChart.svelte";
