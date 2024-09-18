@@ -2,14 +2,24 @@
   import { writable } from "svelte/store";
   import { SvelteFlow, Background, Controls } from "@xyflow/svelte";
 
-  import { StartBlock, RequestBlock } from "../components";
-  import type { Tab } from "@common/types/workspace";
+  import { StartBlock, RequestBlock, RequestBodyTestFlow } from "../components";
+  import { RequestSectionEnum, type Tab } from "@common/types/workspace";
 
   import "@xyflow/svelte/dist/style.css";
   import { onMount } from "svelte";
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
   import { DropButton } from "@workspaces/common/components";
+  import {
+    ArrowOutwardIcon,
+    ArrowSplit,
+    ArrowUpward,
+    CrossIcon,
+    VectorIcon,
+  } from "@library/icons";
+  import RequestNavigatorTestFlow from "../components/request-navigator/RequestNavigatorTestFlow.svelte";
+  import RequestParameterTestFlow from "../components/request-parameter/RequestParameterTestFlow.svelte";
+  import RequestHeaderTestFlow from "../components/request-header/RequestHeaderTestFlow.svelte";
   export let tab: Observable<Tab>;
   export let onUpdateNodes;
   export let onUpdateEdges;
@@ -158,6 +168,9 @@
   const nodes = writable([]);
   const edges = writable([]);
   onMount(() => {
+    tab.subscribe((value) => {
+      console.log("THis is tab after subscribed", value);
+    });
     nodes.update((_nodes) => {
       const dbNodes = $tab?.property?.testflow?.nodes;
       let res = [];
@@ -230,6 +243,8 @@
   edges.subscribe((val) => {
     if (val) onUpdateEdges(val);
   });
+
+  let selectedTab = "response";
 </script>
 
 <div class="parent-container">
@@ -250,11 +265,145 @@
       gap={20}
     />
   </SvelteFlow>
+
+  <div class="request-container" style="">
+    <div class="m-2" style="background-color:#121212; border:1px solid #2A2C3C">
+      <!-- Requet Nav -->
+      <div
+        class="d-flex align-items-center justify-content-between p-1 ps-2 pe-2 rounded-1"
+        style="34px; background-color:#2A2C3C; border-bottom:1px solid #4B4F6B ; "
+      >
+        <div class="d-flex align-items-center gap-2">
+          <VectorIcon
+            height={"14"}
+            width={"14"}
+            color={"var(--icon-primary-300)"}
+          />
+          <p
+            class="mb-0 pb-0 text-fs-12"
+            style="font-weight: 500; color:#D7D7D7;"
+          >
+            REST API REQUEST
+          </p>
+        </div>
+        <div class="d-flex gap-2 align-items-center " style="cursor:pointer">
+          <ArrowOutwardIcon width={"8px"} height={"8px"} color={"#8A9299"} />
+          <CrossIcon width={"14px"} height={"14px"} color={"#8A9299"} />
+        </div>
+      </div>
+
+      <!-- Request Body -->
+      <div class="d-flex m-1">
+        <!-- Sidebar -->
+        <div
+          style="height: 224px; width:187px; background-color: #22232E;  border-radius:2px;"
+          class=""
+        >
+          <div>
+            <p class="text-fs-12 p-1 ms-1 mt-2" style="color:#D7D7D7">
+              Select an API request
+            </p>
+          </div>
+
+          <div style="cursor: pointer;">
+            <div
+              class="button-hover m-1 d-flex align-items-center justify-content-start gap-2 px-3 mb-2 {selectedTab ===
+              'response'
+                ? 'active'
+                : 'd'}"
+              style=" height:25px; border-radius:2px;"
+              on:click={() => {
+                selectedTab = "response";
+              }}
+            >
+              <ArrowSplit
+                height={"10"}
+                width={"10"}
+                color={"var(--icon-secondary-100)"}
+              />
+              <p class="mb-0 pb-0 text-fs-10">Response</p>
+            </div>
+            <div
+              class="button-hover m-1 d-flex align-items-center justify-content-start gap-2 px-3 mb-2 {selectedTab ===
+              'request'
+                ? 'active'
+                : 'd'} "
+              style=" height:25px; border-radius:2px;"
+              on:click={() => {
+                selectedTab = "request";
+              }}
+            >
+              <VectorIcon
+                height={"10"}
+                width={"10"}
+                color={"var(--icon-secondary-100)"}
+              />
+              <p class="mb-0 pb-0 text-fs-10">Request</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Request Data -->
+        <div>
+          {#if selectedTab === "response"}
+            <div>Response Body</div>
+          {:else}
+            <div class="p-2">
+              <RequestNavigatorTestFlow />
+
+              <div style="flex:1; overflow:auto;" class="p-0">
+                {#if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.REQUEST_BODY}
+                  <!-- <RequestBodyTestFlow
+                  body={$tab.property.request.body}
+                  method={$tab.property.request.method}
+                  requestState={$tab.property.request.state}
+                /> -->
+                  Body
+                {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}
+                  <!-- <RequestParameterTestFlow
+                    isBulkEditActive={$tab?.property?.request.state
+                      ?.isParameterBulkEditActive}
+                    params={$tab.property.request.queryParams}
+                    authParameter={$requestAuthParameter}
+                  /> -->
+                  Request parametes
+                {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.HEADERS}
+                  <!-- <RequestHeaderTestFlow
+                    isBulkEditActive={$tab?.property?.request.state
+                      ?.isHeaderBulkEditActive}
+                    headers={$tab.property.request.headers}
+                    autoGeneratedHeaders={$tab.property.request
+                      .autoGeneratedHeaders}
+                    authHeader={$requestAuthHeader}
+                  /> -->
+                  Request Headers
+                {/if}
+              </div>
+            </div>
+          {/if}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <style>
   :global(.svelte-flow__attribution) {
     display: none;
+  }
+  .button-hover:hover {
+    background-color: #3e3f51;
+  }
+
+  .button-hover.active {
+    background-color: #3e3f51;
+  }
+  .request-container {
+    position: absolute;
+    top: 280px;
+    background-color: #151515;
+    width: 100%;
+    height: 268px;
   }
   .run-btn {
     position: absolute;
