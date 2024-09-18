@@ -38,6 +38,21 @@ const TestflowSchemaLiteral = {
           },
           data: {
             type: "object",
+            name: {
+              type: "string",
+            },
+            collectionId: {
+              type: "string",
+            },
+            folderId: {
+              type: "string",
+            },
+            requestId: {
+              type: "string",
+            },
+            method: {
+              type: " string",
+            },
           },
           position: {
             type: "object",

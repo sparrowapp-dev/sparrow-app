@@ -75,7 +75,7 @@ export class TestflowViewModel {
           id: "1",
           type: "startBlock",
           data: {
-            label: "Start",
+            name: "Start",
           },
           position: { x: 100, y: 350 },
         },

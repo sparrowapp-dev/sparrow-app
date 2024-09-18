@@ -3,12 +3,18 @@
   import { SvelteFlow, Background, Controls } from "@xyflow/svelte";
 
   import { StartBlock, RequestBlock } from "../components";
+  import type { Tab } from "@common/types/workspace";
 
   import "@xyflow/svelte/dist/style.css";
   import { onMount } from "svelte";
-  export let tab;
+  import type { Observable } from "rxjs";
+  import type { CollectionDocument } from "@app/database/database";
+  import { DropButton } from "@workspaces/common/components";
+  export let tab: Observable<Tab>;
   export let onUpdateNodes;
   export let onUpdateEdges;
+  export let collectionList: Observable<CollectionDocument[]>;
+  export let onClickRun;
 
   const checkIfEdgesExist = (_id: string) => {
     let edge = [];
@@ -22,6 +28,28 @@
       }
     });
     return response;
+  };
+  const updateSelectedAPI = (
+    id: string,
+    name: string,
+    requestId: string,
+    collectionId: string,
+    method: string,
+    folderId?: string,
+  ) => {
+    nodes.update((_nodes) => {
+      const dbNodes = _nodes;
+      for (let index = 0; index < dbNodes.length; index++) {
+        if (dbNodes[index].id === id) {
+          dbNodes[index].data.requestId = requestId;
+          dbNodes[index].data.name = name;
+          dbNodes[index].data.collectionId = collectionId;
+          dbNodes[index].data.method = method;
+          dbNodes[index].data.folderId = folderId ?? "";
+        }
+      }
+      return dbNodes;
+    });
   };
   /**
    * finds the next node id
@@ -45,6 +73,20 @@
 
     return "";
   };
+  let collectionListDocument;
+  let filteredCollections = writable([]);
+
+  $: {
+    if (collectionList) {
+      collectionList.subscribe((value) => {
+        collectionListDocument = value;
+        collectionListDocument = collectionListDocument?.filter(
+          (value) => value.workspaceId === $tab?.path?.workspaceId,
+        );
+        filteredCollections.set(collectionListDocument);
+      });
+    }
+  }
 
   const createNewNode = (_id: string) => {
     if (!_id) return;
@@ -77,7 +119,25 @@
             onCheckEdges: function (_id: string) {
               return checkIfEdgesExist(_id);
             },
-            label: "REST API Request",
+            onUpdateSelectedAPI: function (
+              _id: string,
+              name: string,
+              requestId: string,
+              collectionId: string,
+              method: string,
+              folderId?: string,
+            ) {
+              updateSelectedAPI(
+                _id,
+                name,
+                requestId,
+                collectionId,
+                method,
+                folderId,
+              );
+            },
+            collections: filteredCollections,
+            tab: tab,
           },
           position: nextNodePosition,
           deletable: true,
@@ -112,7 +172,29 @@
             onCheckEdges: function (_id: string) {
               return checkIfEdgesExist(_id);
             },
-            label: "REST API Request",
+            onUpdateSelectedAPI: function (
+              _id: string,
+              name: string,
+              requestId: string,
+              collectionId: string,
+              method: string,
+              folderId?: string,
+            ) {
+              updateSelectedAPI(
+                _id,
+                name,
+                requestId,
+                collectionId,
+                method,
+                folderId,
+              );
+            },
+            name: dbNodes[i].data?.name,
+            method: dbNodes[i].data?.method,
+            collectionId: dbNodes[i].data?.collectionId,
+            requestId: dbNodes[i].data?.requestId,
+            folderId: dbNodes[i].data?.folderId,
+            collections: filteredCollections,
           },
           position: {
             x: dbNodes[i].position.x,
@@ -150,7 +232,16 @@
   });
 </script>
 
-<div class="h-100">
+<div class="parent-container">
+  <div class="run-btn">
+    <DropButton
+      title="Run"
+      type="default"
+      onClick={() => {
+        onClickRun();
+      }}
+    />
+  </div>
   <SvelteFlow {nodes} {edges} {nodeTypes}>
     <Background
       bgColor={"var(--bg-secondary-850)"}
@@ -164,5 +255,16 @@
 <style>
   :global(.svelte-flow__attribution) {
     display: none;
+  }
+  .run-btn {
+    position: absolute;
+    top: 10px; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
+    z-index: 10; /* Ensure it's higher than the SvelteFlow */
+    background-color: red;
+  }
+  .parent-container {
+    position: relative;
+    height: 100%;
   }
 </style>
