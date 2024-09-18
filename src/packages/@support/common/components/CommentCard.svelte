@@ -33,7 +33,6 @@
    */
   export let postId;
 
-
   let isCommenting = false;
 
   let isReplying = false;
@@ -72,7 +71,6 @@
   const handleAddCommentInput = (e) => {
     commentValue = e.target.value;
   };
-  
 </script>
 
 <div class="comment">

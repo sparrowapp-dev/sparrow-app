@@ -15,7 +15,8 @@
   import { FeedbackType } from "@support/common/types";
   import { Drop } from "@workspaces/features/import-collection/components";
   import { onMount } from "svelte";
-  import formatTimeAgo from "@support/common/utils/formatTimeAgo";
+  import { FormatTime } from "@common/utils/formatTime";
+  const formatTimeAgo = new FormatTime().formatTimeAgo;
   export let isPostopen;
   export let userInfo;
   export let onRetrievePost;

@@ -21,7 +21,8 @@
   } from "@support/common/types/activity";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import Loader from "@library/ui/loader/Loader.svelte";
-  import formatTimeAgo from "@support/common/utils/formatTimeAgo";
+  import { FormatTime } from "@common/utils/formatTime";
+  const formatTimeAgo = new FormatTime().formatTimeAgo;
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
@@ -173,9 +174,6 @@
   // sortPosts();
   // sortComments();
   // sortLikedPosts();
-
-
-  
 </script>
 
 <div class="container">

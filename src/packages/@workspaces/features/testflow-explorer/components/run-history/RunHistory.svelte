@@ -9,6 +9,8 @@
 
   import { Tooltip } from "@library/ui";
   import { WithButtonV5 } from "@workspaces/common/hoc";
+  import { FormatTime } from "@common/utils/formatTime";
+  const formatTimeAgo = new FormatTime().formatTimeAgo;
 
   const timelines = [
     {
@@ -16,7 +18,7 @@
       successRequests: "7",
       failedRequests: "2",
       totalTIme: "10sec",
-      timestamp: "",
+      timestamp: new Date().toISOString(),
       requests: [
         {
           method: "GET",
@@ -56,7 +58,7 @@
       successRequests: "7",
       failedRequests: "2",
       totalTIme: "10sec",
-      timestamp: "",
+      timestamp: new Date().toISOString(),
       requests: [
         {
           method: "GET",
@@ -90,7 +92,7 @@
       successRequests: "7",
       failedRequests: "2",
       totalTIme: "10sec",
-      timestamp: "",
+      timestamp: new Date().toISOString(),
       requests: [
         {
           method: "GET",
@@ -173,7 +175,7 @@
         <div class="time-line ms-3">
           {#each timelines as history}
             <div class="position-relative">
-              <div class="ms-3 mb-4 p-3 bg-tertiary-670">
+              <div class="ms-3 mb-1 p-3 bg-tertiary-670">
                 <div class="d-flex justify-content-between mb-3">
                   <span class="text-fs-8">
                     {history?.successRequests} Success | {history?.failedRequests}
@@ -183,7 +185,7 @@
                 </div>
                 {#each history?.requests as request, index}
                   {#if index <= 1 || (history.expand && index > 1)}
-                    <div class="d-flex mb-1 align-items-center">
+                    <div class="d-flex mb-2 align-items-center">
                       <span
                         style="padding: 0px 2px; width: 30px;"
                         class="bg-tertiary-190 text-center text-fs-6-important text-{getMethodStyle(
@@ -215,6 +217,14 @@
                 {:else if history.expand && history?.requests.length > 2}
                   <span class="text-fs-8">see Less</span>
                 {/if}
+              </div>
+              <div class="ms-3 mb-3">
+                <p
+                  class="text-fs-6 m-0 text-secondary-200"
+                  style="text-align: right;"
+                >
+                  {formatTimeAgo(history?.timestamp)}
+                </p>
               </div>
               <div
                 class="position-absolute bg-tertiary-750 d-flex align-items-center justify-content-center"
