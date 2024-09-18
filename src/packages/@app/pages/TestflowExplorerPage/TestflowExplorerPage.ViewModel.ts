@@ -1,13 +1,27 @@
+import { makeHttpRequestV2 } from "$lib/api/api.common";
+import { ResponseStatusCode } from "$lib/utils/enums";
 import { createDeepCopy } from "$lib/utils/helpers";
+import { RequestTabAdapter } from "@app/adapter";
 import type { TabDocument } from "@app/database/database";
+import { CollectionRepository } from "@app/repositories/collection.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
 import type { Tab } from "@common/types/workspace";
 import { Debounce } from "@common/utils";
+import { DecodeRequest } from "@workspaces/features/rest-explorer/utils";
+import {
+  testFlowDataStore,
+  type TFHistoryType,
+} from "@workspaces/features/socket-explorer/store/testflow";
 import { BehaviorSubject, Observable } from "rxjs";
 
 export class TestflowExplorerPageViewModel {
   private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
   private tabRepository = new TabRepository();
+  private collectionRepository = new CollectionRepository();
+  /**
+   * Utils
+   */
+  private _decodeRequest = new DecodeRequest();
 
   public constructor(doc: TabDocument) {
     if (doc?.isActive) {
@@ -38,7 +52,11 @@ export class TestflowExplorerPageViewModel {
         id: elem.id,
         type: elem.type,
         data: {
-          label: elem.data.label,
+          name: elem.data.name,
+          requestId: elem.data.requestId,
+          folderId: elem.data.folderId,
+          collectionId: elem.data.collectionId,
+          method: elem.data.method,
         },
         position: { x: elem.position.x, y: elem.position.y },
       };
@@ -63,4 +81,248 @@ export class TestflowExplorerPageViewModel {
   };
 
   public updateEdges = new Debounce().debounce(this.updateEdgesDebounce, 300);
+
+  public updateSelectedAPI = async (nodeId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+  };
+
+  /**
+   * Get list of collections from current active workspace
+   * @returns :Observable<CollectionDocument[]> - the list of collection from current active workspace
+   */
+  public getCollectionList = () => {
+    return this.collectionRepository.getCollection();
+  };
+
+  public handleTestFlowRun = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const nodes = progressiveTab?.property?.testflow?.nodes;
+
+    testFlowDataStore.update((testFlowDataMap) => {
+      let wsData = testFlowDataMap.get(progressiveTab.tabId);
+      if (wsData) {
+        wsData.nodes = [];
+      } else {
+        wsData = {
+          nodes: [],
+          history: [],
+          isRunHistoryEnable: false,
+        };
+      }
+      testFlowDataMap.set(progressiveTab.tabId, wsData);
+      return testFlowDataMap;
+    });
+
+    let successRequests = 0;
+    let failedRequests = 0;
+    let totalTime = 0;
+    const history: TFHistoryType = {
+      status: "fail",
+      successRequests: "",
+      failedRequests: "",
+      totalTime: "",
+      timestamp: new Date().toISOString(),
+      requests: [],
+      expand: false,
+    };
+
+    // Sequential execution
+    for (const element of nodes) {
+      if (
+        element?.type === "requestBlock" &&
+        element?.data?.collectionId?.length > 0
+      ) {
+        let request;
+        if (element?.data?.folderId?.length > 0) {
+          request = await this.collectionRepository.readRequestInFolder(
+            element.data.collectionId,
+            element.data.folderId,
+            element.data.requestId,
+          );
+        } else {
+          request =
+            await this.collectionRepository.readRequestOrFolderInCollection(
+              element.data.collectionId,
+              element.data.requestId,
+            );
+        }
+
+        const requestTabAdapter = new RequestTabAdapter();
+        const adaptedRequest = requestTabAdapter.adapt(
+          progressiveTab.path.workspaceId,
+          element.data.collectionId,
+          element.data.folderId,
+          request,
+        );
+        const decodeData = this._decodeRequest.init(
+          adaptedRequest.property.request,
+          [],
+        );
+        const start = Date.now();
+
+        try {
+          const response = await makeHttpRequestV2(...decodeData);
+          const end = Date.now();
+          const duration = end - start;
+
+          testFlowDataStore.update((testFlowDataMap) => {
+            const existingTestFlowData = testFlowDataMap.get(
+              progressiveTab.tabId,
+            );
+            if (existingTestFlowData) {
+              const existingNodeIndex = existingTestFlowData.nodes.findIndex(
+                (n) => n.id === element.id,
+              );
+
+              let resData;
+              if (response.isSuccessful) {
+                const byteLength = new TextEncoder().encode(
+                  JSON.stringify(response),
+                ).length;
+                const responseSizeKB = byteLength / 1024;
+
+                const responseBody = response.data.body;
+                const formattedHeaders = Object.entries(
+                  response?.data?.headers || {},
+                ).map(([key, value]) => ({ key, value }));
+                const responseStatus = response?.data?.status;
+
+                resData = {
+                  body: responseBody,
+                  headers: formattedHeaders,
+                  status: responseStatus,
+                  time: duration,
+                  size: responseSizeKB,
+                };
+                successRequests++;
+                totalTime += duration;
+                const req = {
+                  method: request?.request?.method,
+                  name: request?.name,
+                  status: resData.status, // need to be updated
+                  time: duration.toString() + " ms",
+                };
+                history.requests.push(req);
+              } else {
+                resData = {
+                  body: "",
+                  headers: [],
+                  status: "Not Found",
+                  time: duration,
+                  size: 0,
+                };
+                failedRequests++;
+                totalTime += duration;
+                const req = {
+                  method: request?.request?.method,
+                  name: request?.name,
+                  status: ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                  time: duration.toString() + " ms",
+                };
+                history.requests.push(req);
+              }
+              if (existingNodeIndex > -1) {
+                existingTestFlowData.nodes[existingNodeIndex].response =
+                  resData;
+              } else {
+                existingTestFlowData.nodes.push({
+                  id: element.id,
+                  response: resData,
+                });
+              }
+              testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
+            }
+            return testFlowDataMap;
+          });
+        } catch (error) {
+          testFlowDataStore.update((testFlowDataMap) => {
+            const existingTestFlowData = testFlowDataMap.get(
+              progressiveTab.tabId,
+            );
+            if (existingTestFlowData) {
+              const existingNodeIndex = existingTestFlowData.nodes.findIndex(
+                (n) => n.id === element.id,
+              );
+
+              const resData = {
+                body: "",
+                headers: [],
+                status: "Not Found",
+                time: 0,
+                size: 0,
+              };
+
+              if (existingNodeIndex > -1) {
+                existingTestFlowData.nodes[existingNodeIndex].response =
+                  resData;
+              } else {
+                existingTestFlowData.nodes.push({
+                  id: element.id,
+                  response: resData,
+                });
+              }
+              testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
+            }
+            return testFlowDataMap;
+          });
+          failedRequests++;
+          totalTime += 0;
+          const req = {
+            method: request?.request?.method,
+            name: request?.name,
+            status: ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            time: 0 + " ms",
+          };
+          history.requests.push(req);
+        }
+      }
+    }
+
+    // Now update the history and log it after all requests are done
+    history.totalTime = totalTime.toString() + " ms";
+    history.successRequests = successRequests.toString();
+    history.failedRequests = failedRequests.toString();
+    if (failedRequests === 0) {
+      history.status = "pass";
+    }
+
+    testFlowDataStore.update((testFlowDataMap) => {
+      const wsData = testFlowDataMap.get(progressiveTab.tabId);
+      if (wsData) {
+        const hs = wsData.history;
+        hs.unshift(history);
+        wsData.history = hs;
+      }
+      testFlowDataMap.set(progressiveTab.tabId, wsData);
+      return testFlowDataMap;
+    });
+  };
+
+  public toggleHistoryContainer = (_toggleState: boolean) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    testFlowDataStore.update((testFlowDataMap) => {
+      let wsData = testFlowDataMap.get(progressiveTab.tabId);
+      if (wsData) {
+        wsData.isRunHistoryEnable = _toggleState;
+      } else {
+        wsData = {
+          isRunHistoryEnable: _toggleState,
+        };
+      }
+      testFlowDataMap.set(progressiveTab.tabId, wsData);
+      return testFlowDataMap;
+    });
+  };
+
+  public toggleHistoryDetails = (_toggleState: boolean, _index: number) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    testFlowDataStore.update((testFlowDataMap) => {
+      const wsData = testFlowDataMap.get(progressiveTab.tabId);
+      if (wsData) {
+        wsData.history[_index].expand = _toggleState;
+      }
+      testFlowDataMap.set(progressiveTab.tabId, wsData);
+      return testFlowDataMap;
+    });
+  };
 }

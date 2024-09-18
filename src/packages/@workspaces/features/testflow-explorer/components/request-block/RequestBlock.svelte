@@ -3,15 +3,45 @@
   import { Handle, Position } from "@xyflow/svelte";
   import { ArrowIcon } from "../../icons";
   import { VectorIcon } from "@library/icons";
+  import { onMount } from "svelte";
+  import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
+  import type { CollectionDocument } from "@app/database/database";
+  import type { Observable } from "rxjs";
 
   export let data: {
     onCheckEdges: (id: string) => boolean;
-    label: string;
+    name?: string;
+    method?: string;
     onClick: (id: string) => void;
+    onUpdateSelectedAPI: (
+      id: string,
+      name: string,
+      requestId: string,
+      collectionId: string,
+      method: string,
+      folderId?: string,
+    ) => void;
+    collections: Observable<CollectionDocument[]>;
   };
   export let id;
 
   let isAddBlockVisible = false;
+  const updateNode = (
+    name: string,
+    requestId: string,
+    collectionId: string,
+    method: string,
+    folderId?: string,
+  ) => {
+    data.onUpdateSelectedAPI(
+      id,
+      name,
+      requestId,
+      collectionId,
+      method,
+      folderId ?? "",
+    );
+  };
 </script>
 
 <div
@@ -33,9 +63,15 @@
   </div>
   <hr class="my-0" />
   <div class="px-3 py-2">
-    <span class="text-fs-12 text-fs-10 text-secondary-200"
+    <!-- <span class="text-fs-12 text-fs-10 text-secondary-200"
       >Select an API request</span
-    >
+    > -->
+    <SelectApiRequest
+      {updateNode}
+      collectionData={data.collections}
+      name={data.name}
+      method={data.method}
+    />
   </div>
   <Handle type="source" position={Position.Right} />
   {#if isAddBlockVisible}
