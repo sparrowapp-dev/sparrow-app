@@ -51,6 +51,7 @@
           data.request.method,
         );
       }
+      arrayData = collections;
     }
     if (data?.type !== "REQUEST") {
       previousItem = data;
@@ -62,6 +63,7 @@
   const handleClickOutside = (event: MouseEvent) => {
     if (dropdownRef && !dropdownRef.contains(event.target as Node)) {
       isOpen = false;
+      arrayData = collections;
     }
   };
 
@@ -107,7 +109,7 @@
         </p>
       </div>
     {:else}
-      <p class="select-txt">Select API Request</p>
+      <p class="select-txt">Select an API Request</p>
     {/if}
   </div>
   <div
@@ -177,7 +179,7 @@
     margin-top: 5px;
     width: 170px;
     padding-top: 10px;
-    padding-bottom: 2px;
+    padding-bottom: 10px;
     cursor: pointer;
     /* justify-content: center;
     align-items: center; */
