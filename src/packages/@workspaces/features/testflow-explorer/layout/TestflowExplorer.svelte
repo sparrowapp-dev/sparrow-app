@@ -19,7 +19,13 @@
   let folderId: string;
   let workspaceId: string;
   let collectionId: string;
-  let apiId: string;
+  let id: string;
+  let method: string;
+  let name: string;
+  let collection;
+  let requestId: string;
+
+  let testFlowDrag: boolean = false;
 
   const checkIfEdgesExist = (_id: string) => {
     let edge = [];
@@ -118,6 +124,12 @@
           id: targetNode,
           type: "requestBlock",
           data: {
+            name,
+            collectionId,
+            method,
+            folderId: folderId ? folderId : "",
+            workspaceId,
+            collection: collection,
             onClick: function (_id: string) {
               createNewNode(_id);
             },
@@ -201,6 +213,14 @@
             folderId: dbNodes[i].data?.folderId,
             collections: filteredCollections,
           },
+
+          name: "",
+          method: "",
+          collectionId: "",
+          requestId: "",
+          folderId: "",
+          collections: "",
+
           position: {
             x: dbNodes[i].position.x,
             y: dbNodes[i].position.y,
@@ -240,13 +260,15 @@
     event.preventDefault();
     const data = JSON.parse(event.dataTransfer.getData("text/plain"));
 
-    console.log(data);
     if (!data) return;
 
+    id = data.apiId;
     folderId = data.folderId;
     workspaceId = data.workspaceId;
     collectionId = data.collectionId;
-    apiId = data.apiId;
+    name = data.name;
+    method = data.method;
+    collection = data.collection;
 
     createNewNode($nodes.length.toString());
   }

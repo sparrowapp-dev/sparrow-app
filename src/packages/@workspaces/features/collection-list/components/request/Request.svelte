@@ -123,15 +123,15 @@
   };
 
   function dragStart(event, collection) {
-    
     const data = {
       workspaceId: collection.workspaceId,
       collectionId: collection.id,
-      folderId: folder.id,
+      folderId: folder?.id ?? "",
       requestId: api.id,
+      name: api.name,
+      method: api.request.method,
+      collection: collection,
     };
-
-    console.log(data);
     event.dataTransfer.setData("text/plain", JSON.stringify(data));
   }
 </script>
