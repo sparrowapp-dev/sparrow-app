@@ -187,7 +187,7 @@
           }}
         >
           <div style="margin-left: 5px;">
-            {#if data.type === "REQUEST"}
+            {#if data?.type === "REQUEST"}
               <span class="text-{getMethodStyle(data?.request?.method)}">
                 <span
                   class={"request-icon"}
