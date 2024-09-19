@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { ArrowIcon } from "@library/icons";
-  import {Spinner} from "@library/ui";
+  import { ArrowIcon, RunIcon } from "@library/icons";
+  import { Spinner } from "@library/ui";
 
   export let title = "Submit";
   export let onClick: (e) => void;
@@ -10,6 +10,12 @@
   export let textClassProp = "";
   export let textStyleProp = "";
   export let type: "default" = "default";
+  export let iconRequired = false;
+  export let icon = RunIcon;
+  export let iconColor = "";
+  export let iconHeight = "14px";
+  export let iconWidth = "14px";
+
   enum BtnType {
     DEFAULT = "default",
   }
@@ -24,6 +30,7 @@
       btnClass = "";
       break;
   }
+  const Icon = icon;
 </script>
 
 <button
@@ -47,6 +54,15 @@
           <Spinner size={`${loaderSize}px`} />
         </span>
       {:else if !loader}
+        {#if iconRequired}
+          <span
+            ><Icon
+              height={iconHeight}
+              width={iconWidth}
+              color={iconColor}
+            /></span
+          >
+        {/if}
         <span class={textClassProp} style={textStyleProp}>
           {title}
         </span>

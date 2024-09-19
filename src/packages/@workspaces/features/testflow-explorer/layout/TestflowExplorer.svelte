@@ -12,6 +12,7 @@
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
   import { DropButton } from "@workspaces/common/components";
+  import { RunIcon } from "@library/icons";
   export let tab: Observable<Tab>;
   export let onUpdateNodes;
   export let onUpdateEdges;
@@ -81,6 +82,7 @@
   };
   let collectionListDocument;
   let filteredCollections = writable([]);
+  let isRunDisabled = false;
 
   $: {
     if (collectionList) {
@@ -236,9 +238,13 @@
     startBlock: StartBlock,
     requestBlock: RequestBlock,
   };
+  let nodesValue = 1;
 
   nodes.subscribe((val) => {
-    if (val && val.length) onUpdateNodes(val);
+    if (val && val.length) {
+      onUpdateNodes(val);
+      nodesValue = val.length;
+    }
   });
   edges.subscribe((val) => {
     if (val) onUpdateEdges(val);
@@ -257,15 +263,25 @@
       <!-- PASTE NAME CODE HERE -->
     </div>
     <div class="d-flex">
-      <div>
+      <div style="margin-right: 5px;">
         <!--PASTE RUN CODE HERE-->
-        <DropButton
-          title="Run"
-          type="default"
-          onClick={() => {
-            onClickRun();
-          }}
-        />
+        {#if nodesValue > 1}
+          <DropButton
+            title="Run"
+            type="default"
+            iconRequired={true}
+            icon={RunIcon}
+            iconHeight={"14px"}
+            iconWidth={"14px"}
+            disable={isRunDisabled}
+            iconColor={"var(--icon-secondary-100)"}
+            onClick={async () => {
+              isRunDisabled = true;
+              await onClickRun();
+              isRunDisabled = false;
+            }}
+          />
+        {/if}
       </div>
       <div>
         <!-- PASTE SAVE CODE HERE -->
