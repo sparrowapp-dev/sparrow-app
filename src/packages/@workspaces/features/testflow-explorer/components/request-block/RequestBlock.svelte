@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Writable } from "svelte/store";
   import { Handle, Position } from "@xyflow/svelte";
-  import { ArrowIcon } from "../../icons";
+  import { ArrowIcon, InfoIcon } from "../../icons";
   import { VectorIcon } from "@library/icons";
   import { onMount } from "svelte";
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
@@ -26,6 +26,7 @@
   export let id;
 
   let isAddBlockVisible = false;
+  let isRunTextVisible = false;
   const updateNode = (
     name: string,
     requestId: string,
@@ -33,6 +34,7 @@
     method: string,
     folderId?: string,
   ) => {
+    isRunTextVisible = true;
     data.onUpdateSelectedAPI(
       id,
       name,
@@ -63,15 +65,18 @@
   </div>
   <hr class="my-0" />
   <div class="px-3 py-2">
-    <!-- <span class="text-fs-12 text-fs-10 text-secondary-200"
-      >Select an API request</span
-    > -->
     <SelectApiRequest
       {updateNode}
       collectionData={data.collections}
       name={data.name}
       method={data.method}
     />
+    {#if data?.name?.length > 0 || isRunTextVisible}
+      <div class="d-flex run-txt-container">
+        <InfoIcon height="10px" width="10px" />
+        <p style="font-size: 10px;">Run the block to get response</p>
+      </div>
+    {/if}
   </div>
   <Handle type="source" position={Position.Right} />
   {#if isAddBlockVisible}
@@ -122,5 +127,14 @@
   .arrow {
     padding: 8px 4px;
     display: inline-block;
+  }
+  .run-txt-container {
+    align-items: center;
+    padding-top: 10px;
+  }
+  .run-txt-container p {
+    margin-bottom: 0px;
+    color: #808080;
+    margin-left: 4px;
   }
 </style>
