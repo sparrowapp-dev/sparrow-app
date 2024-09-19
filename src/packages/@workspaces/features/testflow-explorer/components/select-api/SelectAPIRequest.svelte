@@ -179,39 +179,41 @@
       </div>
     {/if}
     {#each arrayData as data}
-      <div
-        class="d-flex dropdown-single-option"
-        on:click={() => {
-          handleSelectApi(data);
-        }}
-      >
-        <div style="margin-left: 5px;">
-          {#if data.type === "REQUEST"}
-            <span class="text-{getMethodStyle(data?.request?.method)}">
-              <span
-                class={"request-icon"}
-                style="font-size: 10px; font-weight: 500;"
-                >{data?.request?.method || ""}</span
-              >
-            </span>
-          {:else if data?.type === "FOLDER"}
-            <FolderIcon2
-              height={"10px"}
-              width={"10px"}
-              color={"var(--icon-secondary-100)"}
-            />
-          {:else}
-            <CollectionIcon
-              height={"10px"}
-              width={"10px"}
-              color={"var(--icon-secondary-100)"}
-            />
-          {/if}
+      {#if data?.type !== "WEBSOCKET"}
+        <div
+          class="d-flex dropdown-single-option"
+          on:click={() => {
+            handleSelectApi(data);
+          }}
+        >
+          <div style="margin-left: 5px;">
+            {#if data.type === "REQUEST"}
+              <span class="text-{getMethodStyle(data?.request?.method)}">
+                <span
+                  class={"request-icon"}
+                  style="font-size: 10px; font-weight: 500;"
+                  >{data?.request?.method || ""}</span
+                >
+              </span>
+            {:else if data?.type === "FOLDER"}
+              <FolderIcon2
+                height={"10px"}
+                width={"10px"}
+                color={"var(--icon-secondary-100)"}
+              />
+            {:else}
+              <CollectionIcon
+                height={"10px"}
+                width={"10px"}
+                color={"var(--icon-secondary-100)"}
+              />
+            {/if}
+          </div>
+          <p class="options-txt ellipsis">
+            {data.name}
+          </p>
         </div>
-        <p class="options-txt ellipsis">
-          {data.name}
-        </p>
-      </div>
+      {/if}
     {/each}
   </div>
 </div>
