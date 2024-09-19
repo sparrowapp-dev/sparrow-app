@@ -145,7 +145,7 @@
               );
             },
             collections: filteredCollections,
-            tab: tab,
+            tabId: $tab.tabId,
           },
           position: nextNodePosition,
           deletable: true,
@@ -206,6 +206,7 @@
             requestId: dbNodes[i].data?.requestId,
             folderId: dbNodes[i].data?.folderId,
             collections: filteredCollections,
+            tabId: $tab.tabId,
           },
           position: {
             x: dbNodes[i].position.x,
