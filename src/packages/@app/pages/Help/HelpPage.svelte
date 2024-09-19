@@ -264,6 +264,7 @@
                 fetchComments={_viewModel.retrieveUserComments}
                 fetchLikedPosts={_viewModel.retrieveUserVotes}
                 listPostsComments={_viewModel.listComments}
+                {getColor}
                 {setPostId}
               />{/if}
           </div>

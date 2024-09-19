@@ -1,6 +1,12 @@
 <script lang="ts">
   import { user } from "$lib/store";
-  import { CommentIcon, LikeIcon, SortIcon } from "@library/icons";
+  import {
+    ActivityIcon,
+    CommentIcon,
+    LikeIcon,
+    SortIcon,
+    TableChart,
+  } from "@library/icons";
   import { UpvoteIcon } from "@support/common/components";
   import FeedbackPost from "@support/features/feedback-section/layout/FeedbackPost.svelte";
   import { onMount } from "svelte";
@@ -22,6 +28,7 @@
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import Loader from "@library/ui/loader/Loader.svelte";
   import formatTimeAgo from "@support/common/utils/formatTimeAgo";
+  import ArrowOutward from "@library/icons/ArrowOutward.svelte";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
@@ -32,6 +39,7 @@
   export let fetchLikedPosts;
   export let listPostsComments;
   export let setPostId;
+  export let getColor;
 
   let currentSort = "newest";
   let posts = [];
@@ -173,15 +181,12 @@
   // sortPosts();
   // sortComments();
   // sortLikedPosts();
-
-
-  
 </script>
 
-<div class="container">
-  <div class="my-activity">
-    <div class="title">My Activity</div>
-    <p class="description">
+<div class="container" style="padding: 20px;">
+  <div class="mt-0">
+    <p style="font-size: 20px; font-weight:700; ">My Activity</p>
+    <p class="text-fs-14" style="color: var(--text-secondary-50); ">
       Find all your posts, comments, and likes in one place and easily keep
       track of them.
     </p>
@@ -189,9 +194,9 @@
 
   <div
     class="d-flex align-items-center"
-    style="margin-top: 15px; justify-content: space-between;"
+    style="justify-content: space-between;"
   >
-    <div class="">
+    <div>
       <div class="d-flex search-input-container rounded px-2 mb-2">
         <SearchIcon width={14} height={14} classProp="my-auto me-3" />
         <input
@@ -252,6 +257,7 @@
           placeholderText="Status"
           zIndex={499}
           disabled={false}
+          icon={TableChart}
           iconRequired={true}
           borderType={"none"}
           borderActiveType={"none"}
@@ -306,159 +312,273 @@
         </div>
       {:else}
         <div class="posts-comments">
-          {#if filteredPosts.length > 0}
-            <h2 class="post-section-heading">Posts</h2>
-            <ul>
-              {#each filteredPosts as post}
-                <li>
-                  <div class="post-card">
-                    <div class="post-header">
+          <!-- Feedback Posts -->
+          {#if activityStatusType === ActivityStatusType.POST || activityStatusType === ActivityStatusType.ALL_ACTIVITY}
+            <div>
+              <h2
+                style=" font-size: 15px; color: #999999; margin-bottom: 12px;"
+              >
+                Feedbacks
+              </h2>
+              {#if filteredPosts.length > 0}
+                <ul>
+                  {#each filteredPosts as post}
+                    <div
+                      style="display: flex; flex-direction: column; background-color: #151515; padding: 20px;  border-radius:2px;"
+                    >
                       <div
-                        class="post-title"
-                        on:click={() => (
-                          (postId = post?.id),
-                          (isPostopen = true),
-                          setPostId("feedback", postId)
-                        )}
+                        style="display: flex; justify-content: space-between; align-items: flex-start;"
                       >
-                        {post?.title}
+                        <div style="flex: 1;">
+                          <div
+                            class="title"
+                            on:click={() => (
+                              (postId = post?.id),
+                              (isPostopen = true),
+                              setPostId("feedback", postId)
+                            )}
+                          >
+                            {post?.title}
+                          </div>
+                          <div
+                            style="height: 16px; display: flex; align-items: center;"
+                          >
+                            <span
+                              class="category mt-2"
+                              style="color:{getColor(post.status)
+                                .fontColor}; border:0.2px solid {getColor(
+                                post.status,
+                              ).fontColor}; "
+                            >
+                              {post?.status
+                                ? post.status.charAt(0).toUpperCase() +
+                                  post.status.slice(1)
+                                : ""}
+                            </span>
+                          </div>
+                        </div>
+                        <div style="">
+                          <UpvoteIcon upvote={post?.score} />
+                        </div>
                       </div>
-                      <UpvoteIcon upvote={post?.score} />
+
+                      <div style="margin-top: 10px; flex: 1;">
+                        <p
+                          style="color: var(--text-secondary-1000); margin: 0; padding-top:10px;"
+                        >
+                          {post?.details}
+                        </p>
+                      </div>
+
+                      <div
+                        style="display: flex; align-items: center; margin-top: 10px; gap:5px;"
+                      >
+                        <span>
+                          <CommentIcon
+                            width={"15px"}
+                            height={"13.95px"}
+                            color={"var(--icon-secondary-950)"}
+                          />
+                        </span>
+                        <span style=" font-size: 13px;"
+                          >{post?.commentCount}</span
+                        >
+                      </div>
                     </div>
-                    <div class="secondary">
-                      <div class="badge {post?.status}">
-                        <span>{post?.status}</span>
-                      </div>
-                      <div class="post-body">
-                        <p>{post?.details}</p>
-                      </div>
-                      <div class="post-footer">
-                        <CommentIcon
-                          width="15px"
-                          height="13.95px"
-                          color="#808080"
-                        />
-                        <span>{post?.commentCount}</span>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              {/each}
-            </ul>
+                  {/each}
+                </ul>
+              {:else}
+                <p
+                  class="mx-1 text-fs-12 mb-0 text-center"
+                  style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                >
+                  No Result Found
+                </p>
+
+                <hr class="mt-4" style="" />
+              {/if}
+            </div>
           {/if}
 
-          <div class="comments">
-            {#if filteredComments.length > 0}
-              <h2 class="comment-section-heading">Comments</h2>
-              <ul class="comment-list">
-                {#each filteredComments as comment}
-                  <li
-                    class="comment"
-                    style=""
-                    on:mouseenter={() => (isHovering = comment.id)}
-                    on:mouseleave={() => (isHovering = null)}
-                  >
-                    <IconFallback
-                      character="M"
-                      width="34px"
-                      height="32px"
-                      backgroundColor="#1C1D2B"
-                      borderColor="#45494D"
-                    />
-                    <div class="comment-content">
-                      <div
-                        class=""
-                        style="display: flex; justify-content: space-between; align-items: start;"
-                      >
-                        <div class="">
-                          <div class="comment-author">
-                            {comment.author.name}
+          <!-- Comments Section  -->
+          {#if activityStatusType === ActivityStatusType.COMMENT || activityStatusType === ActivityStatusType.ALL_ACTIVITY}
+            <div class="comments mb-2">
+              <h2
+                style=" font-size: 15px; color: #999999; margin-bottom: 12px;"
+              >
+                Comments
+              </h2>
+              {#if filteredComments.length > 0}
+                <ul>
+                  {#each filteredComments as comment}
+                    <li
+                      class="comment"
+                      style=""
+                      on:mouseenter={() => (isHovering = comment.id)}
+                      on:mouseleave={() => (isHovering = null)}
+                    >
+                      <IconFallback
+                        character="M"
+                        width="34px"
+                        height="32px"
+                        backgroundColor="#1C1D2B"
+                        borderColor="#45494D"
+                      />
+                      <div class="comment-content">
+                        <div
+                          class="mt-2"
+                          style="display: flex; justify-content: space-between; align-items: start;"
+                        >
+                          <div class="w-100">
+                            <div
+                              class="d-flex justify-content-between mb-2"
+                              style=" font-weight: 500; margin-bottom: 4px;"
+                            >
+                              <p>{comment.author.name}</p>
+                              <div style="">
+                                {#if isHovering === comment.id}
+                                <span
+                                  on:click={() => (
+                                    ((postId = comment?.post?.id),
+                                    (isPostopen = true)),
+                                    setPostId("feedback", comment?.post?.id)
+                                  )}
+                                  class="go-to-post"
+                                  style="font-size: 12px; letter-spacing: 0.25px; font-weight: 400;"
+                                  >Go to post</span
+                                >
+                                <ArrowOutward
+                                  height={"10px"}
+                                  width={"10px"}
+                                  color={"white"}
+                                />
+                                {/if}
+                              </div>
+                            </div>
+
+                            <div class="comment-text">
+                              <p style="word-break: break-all;">
+                                {comment.value}
+                              </p>
+                            </div>
                           </div>
-                          <div class="comment-text">{comment.value}</div>
                         </div>
 
-                        {#if isHovering === comment.id}
-                          <span
-                            on:click={() => (
-                              ((postId = comment?.post?.id),
-                              (isPostopen = true)),
-                              setPostId("feedback", comment?.post?.id)
-                            )}
-                            class="go-to-post"
-                            style="font-size: 12px; letter-spacing: 0.25px; font-weight: 400;"
-                            >Go to post &#8599;</span
-                          >
-                        {/if}
-                      </div>
-
-                      <div class="comment-meta">
-                        <div class="comment-moreinfo">
-                          <span class="comment-time">
-                            {formatTimeAgo(comment.created)}
-                          </span>
-                          <a href="#" class="comment-reply">Reply</a>
-                        </div>
-                        <!-- <div class="comment-likes">
+                        <div class="comment-meta">
+                          <div class="comment-moreinfo">
+                            <span class="comment-time">
+                              {formatTimeAgo(comment.created)}
+                            </span>
+                            <a href="#" class="comment-reply">Reply</a>
+                          </div>
+                          <!-- <div class="comment-likes">
                           <Like />
                           <span class="like-count">{comment.likeCount}</span>
                         </div> -->
+                        </div>
                       </div>
-                    </div>
-                  </li>
-                {/each}
-              </ul>
-              <!-- {:else}
-              <p
-                class="mx-1 text-fs-12 mb-0 text-center"
-                style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
-              >
-                No Result Found
-              </p> -->
-            {/if}
-          </div>
+                    </li>
+                  {/each}
+                </ul>
+              {:else}
+                <p
+                  class="mx-1 text-fs-12 mb-0 text-center"
+                  style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                >
+                  No Result Found
+                </p>
+              {/if}
 
-          <div class="upvoted-posts">
-            {#if filteredLikedPosts.length > 0}
-              <h2 class="post-section-heading">Upvoted Posts</h2>
-              <ul>
-                {#each filteredLikedPosts as { post }}
-                  <li>
-                    <div class="post-card">
-                      <div class="post-header">
-                        <div
-                          class="post-title"
-                          on:click={() => (
-                            (postId = post?.id),
-                            (isPostopen = true),
-                            setPostId("feedback", postId)
-                          )}
-                        >
-                          {post?.title}
+              <hr class=" mb-3" style="color: #45494D;" />
+            </div>
+          {/if}
+
+          <!-- Upvoted Section  -->
+          {#if activityStatusType === ActivityStatusType.UPVOTED_POSTS || activityStatusType === ActivityStatusType.ALL_ACTIVITY}
+            <div class="mt-3">
+              <h2
+                style=" font-size: 15px; color: #999999; margin-bottom: 12px;"
+              >
+                Upvoted Posts
+              </h2>
+              {#if filteredLikedPosts.length > 0}
+                <ul>
+                  {#each filteredLikedPosts as { post }}
+                    <div
+                      class="mb-4"
+                      style="display: flex; flex-direction: column; background-color: #151515; padding: 15px; min-height: 195px; border-radius:2px; "
+                    >
+                      <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start;"
+                      >
+                        <div style="flex: 1;">
+                          <div
+                            class="title"
+                            on:click={() => (
+                              (postId = post?.id),
+                              (isPostopen = true),
+                              setPostId("feedback", postId)
+                            )}
+                          >
+                            {post?.title}
+                          </div>
+                          <div
+                            style="height: 16px; display: flex; align-items: center;"
+                          >
+                            <span
+                              class="category mt-2"
+                              style="color:{getColor(post.status)
+                                .fontColor}; border:0.2px solid {getColor(
+                                post.status,
+                              ).fontColor}; "
+                            >
+                              {post?.status
+                                ? post.status.charAt(0).toUpperCase() +
+                                  post.status.slice(1)
+                                : ""}
+                            </span>
+                          </div>
                         </div>
-                        <UpvoteIcon upvote={post?.score} />
+                        <div>
+                          <UpvoteIcon isPostLiked={true} upvote={post?.score} />
+                        </div>
                       </div>
-                      <div class="secondary">
-                        <div class="badge {post?.status}">
-                          <span>{post?.status}</span>
-                        </div>
-                        <div class="post-body">
-                          <p>{post?.details}</p>
-                        </div>
-                        <div class="post-footer">
+
+                      <div style="margin-top: 10px; flex: 1;">
+                        <p
+                          style="color: var(--text-secondary-1000); margin: 0; padding-top:10px;"
+                        >
+                          {post?.details}
+                        </p>
+                      </div>
+
+                      <div
+                        style="display: flex; align-items: center; margin-top: 10px; gap:5px;"
+                      >
+                        <span>
                           <CommentIcon
-                            width="15px"
-                            height="13.95px"
-                            color="#808080"
+                            width={"15px"}
+                            height={"13.95px"}
+                            color={"var(--icon-secondary-950)"}
                           />
-                          <span>{post?.commentCount}</span>
-                        </div>
+                        </span>
+                        <span style=" font-size: 13px;"
+                          >{post?.commentCount}</span
+                        >
                       </div>
                     </div>
-                  </li>
-                {/each}
-              </ul>
-            {/if}
-          </div>
+                  {/each}
+                </ul>
+              {:else}
+                <p
+                  class="mx-1 text-fs-12 mb-0 text-center"
+                  style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                >
+                  No Result Found
+                </p>
+              {/if}
+            </div>
+          {/if}
         </div>
       {/if}
     </div>
@@ -471,6 +591,7 @@
       {userInfo}
       bind:postId
       fetchComments={listPostsComments}
+      {getColor}
     />
   {/if}
 </div>
@@ -495,6 +616,26 @@
     caret-color: var(--border-primary-300);
   }
 
+  .category {
+    background-color: #171302;
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: var(--white-color);
+  }
+  .title:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    color: var(--text-primary-300);
+  }
+
   #search-input {
     padding-bottom: 5px !important;
   }
@@ -502,10 +643,6 @@
     outline: none;
     border: none;
     box-shadow: none;
-  }
-
-  hr {
-    color: #cbcbcb;
   }
 
   div.my-activity {
@@ -540,9 +677,6 @@
     margin-bottom: 15px;
   }
 
-  .comment-list {
-  }
-
   .comment {
     display: flex;
     align-items: flex-start;
@@ -553,22 +687,18 @@
 
   .comment:hover {
     background-color: #1a1a1a;
-    border-radius: 5px;
+    border-radius: 2px;
     cursor: pointer;
     transition: all;
     animation-duration: 1s;
   }
 
   .comment-content {
-    flex-grow: 1;
+    width: calc(100% - 5px);
+    /* width: 100%; */
     display: flex;
     flex-direction: column;
     gap: 5px;
-  }
-
-  .comment-author {
-    font-weight: 500;
-    margin-bottom: 4px;
   }
 
   .comment-text {
@@ -600,7 +730,6 @@
     align-items: start;
     margin-left: auto;
     gap: 5px;
-    /* border: 2px solid red; */
   }
 
   .post-section-heading {
@@ -723,8 +852,6 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    /* gap: 30px; */
-    /* border: 2px solid blue; */
   }
 
   .post-card {
@@ -823,8 +950,6 @@
   }
 
   .secondary {
-    /* position: relative; */
-    /* top: -10%; */
     display: flex;
     flex-direction: column;
     gap: 5px;

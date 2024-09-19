@@ -22,7 +22,7 @@
     <div class="" style="">
       <IconFallback character={userInfo?.name?.charAt(0)} />
     </div>
-    <div style="font-weight: 500px; font-size:21px;">
+    <div style="font-weight: 500px; font-size:19px;">
       Hey {userInfo?.name}, share your feedback
     </div>
   </div>
