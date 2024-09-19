@@ -4,6 +4,7 @@
   import { CollectionIcon, FolderIcon2 } from "@library/icons";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
+  import DropdownArrow from "../../icons/DropdownArrow.svelte";
   export let name;
   export let method;
   export let collections = [];
@@ -109,7 +110,15 @@
         </p>
       </div>
     {:else}
-      <p class="select-txt">Select an API Request</p>
+      <div
+        class="d-flex"
+        style="justify-content: space-between; align-items:center"
+      >
+        <p class="select-txt">Select an API Request</p>
+        <div style="margin-right: 10px;">
+          <DropdownArrow height={"8px"} width={"8px"} />
+        </div>
+      </div>
     {/if}
   </div>
   <div
@@ -133,13 +142,13 @@
             <FolderIcon2
               height={"10px"}
               width={"10px"}
-              color={"var(--icon-secondary-130)"}
+              color={"var(--icon-secondary-100)"}
             />
           {:else}
             <CollectionIcon
               height={"10px"}
               width={"10px"}
-              color={"var(--icon-secondary-130)"}
+              color={"var(--icon-secondary-100)"}
             />
           {/if}
         </div>
@@ -161,12 +170,14 @@
   }
   .dropdown-header {
     background-color: #3c3f52;
-    /* color: white; */
-    padding-top: 12px;
-    padding-bottom: 2px;
-    border-radius: 2px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border-radius: 3px;
     width: 170px;
     cursor: pointer;
+  }
+  .dropdown-header p {
+    margin-bottom: 0;
   }
   .select-txt {
     font-size: 10px;
@@ -181,34 +192,25 @@
     padding-top: 10px;
     padding-bottom: 10px;
     cursor: pointer;
-    /* justify-content: center;
-    align-items: center; */
-    /* align-self: center; */
-    /* padding-left: 10px; */
+    border-radius: 3px;
   }
   .options-txt {
     font-size: 10px;
     margin-left: 6px;
-    margin-top: 15px;
-    /* align-self: center; */
   }
-  /* .dropdown-options:hover */
-  /* .options-txt:hover {
-  } */
   .dropdown-single-option {
-    /* align-self: center; */
-    /* padding-left: 2px; */
-    /* background-color: red; */
     width: 150px;
     align-items: center;
     margin-left: 10px;
-    /* width:; */
+    padding-top: 6px;
+    padding-bottom: 6px;
   }
   .dropdown-single-option:hover {
     background-color: #353646;
     border-radius: 2px;
-    /* margin-right: 10px; */
-    /* padding-left: 2px; */
+  }
+  .dropdown-single-option p {
+    margin-bottom: 0px;
   }
   .method-container {
     background-color: #22232e;
