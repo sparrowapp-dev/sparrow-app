@@ -35,6 +35,7 @@
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
 
+  let isNodesDraggable = false;
   const checkIfEdgesExist = (_id: string) => {
     let edge = [];
     edges.subscribe((value) => {
@@ -132,6 +133,8 @@
           id: targetNode,
           type: "requestBlock",
           data: {
+            blocks: nodes,
+            connector: edges,
             onClick: function (_id: string) {
               createNewNode(_id);
             },
@@ -160,6 +163,7 @@
           },
           position: nextNodePosition,
           deletable: true,
+          draggable: isNodesDraggable, // Disable dragging for this node
         },
       ];
     });
@@ -185,6 +189,8 @@
           id: dbNodes[i].id,
           type: dbNodes[i].type,
           data: {
+            blocks: nodes,
+            connector: edges,
             onClick: function (_id: string) {
               createNewNode(_id);
             },
@@ -220,6 +226,7 @@
             y: dbNodes[i].position.y,
           },
           deletable: dbNodes[i].id === "1" ? false : true,
+          draggable: isNodesDraggable, // Disable dragging for this node
         });
       }
       return res;

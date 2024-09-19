@@ -91,3 +91,4 @@ export { default as ArrowSplit } from "./ArrowSplit.svelte";
 export { default as HistoryIcon } from "./History.svelte";
 export { default as ExclamationIcon } from "./Exclamation.svelte";
 export { default as CheckIcon2 } from "./Check2.svelte";
+export { default as ArrowRightIcon } from "./ArrowRight.svelte";

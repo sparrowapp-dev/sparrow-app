@@ -4,6 +4,8 @@
   import { CollectionIcon, FolderIcon2 } from "@library/icons";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
+  import DropdownArrow from "../../icons/DropdownArrow.svelte";
+  import { BackArrowIcon } from "../../icons";
   export let name;
   export let method;
   export let collections = [];
@@ -21,6 +23,7 @@
   let selectedCollection;
   let selectedFolder;
   let selectedItem = "COLLECTION";
+  let ignoreClickOutside = false;
 
   const handleSelectApi = (data) => {
     if (data?.totalRequests !== undefined) {
@@ -52,6 +55,8 @@
         );
       }
       arrayData = collections;
+      selectedCollection = null;
+      selectedFolder = null;
     }
     if (data?.type !== "REQUEST") {
       previousItem = data;
@@ -61,10 +66,15 @@
   let dropdownRef;
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (dropdownRef && !dropdownRef.contains(event.target as Node)) {
+    if (
+      !ignoreClickOutside &&
+      dropdownRef &&
+      !dropdownRef.contains(event.target as Node)
+    ) {
       isOpen = false;
       arrayData = collections;
     }
+    ignoreClickOutside = false;
   };
 
   onMount(() => {
@@ -109,7 +119,15 @@
         </p>
       </div>
     {:else}
-      <p class="select-txt">Select an API Request</p>
+      <div
+        class="d-flex"
+        style="justify-content: space-between; align-items:center"
+      >
+        <p class="select-txt">Select an API Request</p>
+        <div style="margin-right: 10px;">
+          <DropdownArrow height={"8px"} width={"8px"} />
+        </div>
+      </div>
     {/if}
   </div>
   <div
@@ -118,8 +136,55 @@
       ? 'block'
       : 'none'}; position:absolute"
   >
+    {#if selectedCollection}
+      <div class="d-flex ellipsis back-header">
+        <div
+          style="margin-left: 4px;"
+          on:click={() => {
+            if (selectedFolder) {
+              arrayData = selectedCollection.items;
+              selectedFolder = null;
+            } else if (selectedCollection) {
+              arrayData = collections;
+              selectedCollection = null;
+              ignoreClickOutside = true;
+            }
+          }}
+        >
+          <BackArrowIcon width="8px" height="8px" />
+        </div>
+        <div class="d-flex" style="margin-left: 4px; align-items:center;">
+          <CollectionIcon
+            height={"10px"}
+            width={"10px"}
+            color={"var(--icon-secondary-100)"}
+          />
+          <p class="ellipsis" style="margin-left: 4px; margin-bottom:0px">
+            {selectedCollection.name}
+          </p>
+        </div>
+        {#if selectedFolder}
+          <p style="margin-bottom: 0px;">/</p>
+          <div class="d-flex" style="margin-left: 4px; align-items:center;">
+            <FolderIcon2
+              height={"10px"}
+              width={"10px"}
+              color={"var(--icon-secondary-100)"}
+            />
+            <p class="ellipsis" style="margin-left: 4px; margin-bottom:0px;">
+              {selectedFolder.name}
+            </p>
+          </div>
+        {/if}
+      </div>
+    {/if}
     {#each arrayData as data}
-      <div class="d-flex dropdown-single-option">
+      <div
+        class="d-flex dropdown-single-option"
+        on:click={() => {
+          handleSelectApi(data);
+        }}
+      >
         <div style="margin-left: 5px;">
           {#if data.type === "REQUEST"}
             <span class="text-{getMethodStyle(data?.request?.method)}">
@@ -133,22 +198,17 @@
             <FolderIcon2
               height={"10px"}
               width={"10px"}
-              color={"var(--icon-secondary-130)"}
+              color={"var(--icon-secondary-100)"}
             />
           {:else}
             <CollectionIcon
               height={"10px"}
               width={"10px"}
-              color={"var(--icon-secondary-130)"}
+              color={"var(--icon-secondary-100)"}
             />
           {/if}
         </div>
-        <p
-          class="options-txt ellipsis"
-          on:click={() => {
-            handleSelectApi(data);
-          }}
-        >
+        <p class="options-txt ellipsis">
           {data.name}
         </p>
       </div>
@@ -161,12 +221,14 @@
   }
   .dropdown-header {
     background-color: #3c3f52;
-    /* color: white; */
-    padding-top: 12px;
-    padding-bottom: 2px;
-    border-radius: 2px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border-radius: 3px;
     width: 170px;
     cursor: pointer;
+  }
+  .dropdown-header p {
+    margin-bottom: 0;
   }
   .select-txt {
     font-size: 10px;
@@ -181,34 +243,25 @@
     padding-top: 10px;
     padding-bottom: 10px;
     cursor: pointer;
-    /* justify-content: center;
-    align-items: center; */
-    /* align-self: center; */
-    /* padding-left: 10px; */
+    border-radius: 3px;
   }
   .options-txt {
     font-size: 10px;
     margin-left: 6px;
-    margin-top: 15px;
-    /* align-self: center; */
   }
-  /* .dropdown-options:hover */
-  /* .options-txt:hover {
-  } */
   .dropdown-single-option {
-    /* align-self: center; */
-    /* padding-left: 2px; */
-    /* background-color: red; */
     width: 150px;
     align-items: center;
     margin-left: 10px;
-    /* width:; */
+    padding-top: 6px;
+    padding-bottom: 6px;
   }
   .dropdown-single-option:hover {
     background-color: #353646;
     border-radius: 2px;
-    /* margin-right: 10px; */
-    /* padding-left: 2px; */
+  }
+  .dropdown-single-option p {
+    margin-bottom: 0px;
   }
   .method-container {
     background-color: #22232e;
@@ -218,6 +271,10 @@
     padding-bottom: 2px;
     margin-left: 5px;
     border-radius: 2px;
+  }
+  .back-header {
+    width: 100%;
+    padding-bottom: 10px;
   }
   .selected-container {
     align-items: center;
