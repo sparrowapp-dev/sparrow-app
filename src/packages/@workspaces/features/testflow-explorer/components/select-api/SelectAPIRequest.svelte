@@ -29,10 +29,14 @@
     if (data?.totalRequests !== undefined) {
       selectedCollection = data;
       selectedItem = "COLLECTION";
+      arrayData = data.items;
+      previousItem = data;
     }
     if (data?.type === "FOLDER") {
       selectedFolder = data;
       selectedItem = "FOLDER";
+      arrayData = data.items;
+      previousItem = data;
     }
     if (data?.type === "REQUEST") {
       selectedItem = "REQUEST";
@@ -58,10 +62,6 @@
       selectedCollection = null;
       selectedFolder = null;
     }
-    if (data?.type !== "REQUEST") {
-      previousItem = data;
-      arrayData = data.items;
-    }
   };
   let dropdownRef;
 
@@ -73,6 +73,8 @@
     ) {
       isOpen = false;
       arrayData = collections;
+      selectedCollection = null;
+      selectedFolder = null;
     }
     ignoreClickOutside = false;
   };
@@ -178,41 +180,56 @@
         {/if}
       </div>
     {/if}
-    {#each arrayData as data}
-      <div
-        class="d-flex dropdown-single-option"
-        on:click={() => {
-          handleSelectApi(data);
-        }}
-      >
-        <div style="margin-left: 5px;">
-          {#if data.type === "REQUEST"}
-            <span class="text-{getMethodStyle(data?.request?.method)}">
-              <span
-                class={"request-icon"}
-                style="font-size: 10px; font-weight: 500;"
-                >{data?.request?.method || ""}</span
-              >
-            </span>
-          {:else if data?.type === "FOLDER"}
-            <FolderIcon2
-              height={"10px"}
-              width={"10px"}
-              color={"var(--icon-secondary-100)"}
-            />
-          {:else}
-            <CollectionIcon
-              height={"10px"}
-              width={"10px"}
-              color={"var(--icon-secondary-100)"}
-            />
+    <div class="scrollable-list">
+      {#if arrayData?.length > 0}
+        {#each arrayData as data}
+          {#if data?.type !== "WEBSOCKET"}
+            <div
+              class="d-flex dropdown-single-option"
+              on:click|stopPropagation={() => {
+                handleSelectApi(data);
+              }}
+            >
+              <div style="margin-left: 5px;">
+                {#if data?.type === "REQUEST"}
+                  <span class="text-{getMethodStyle(data?.request?.method)}">
+                    <span
+                      class={"request-icon"}
+                      style="font-size: 10px; font-weight: 500;"
+                      >{data?.request?.method || ""}</span
+                    >
+                  </span>
+                {:else if data?.type === "FOLDER"}
+                  <FolderIcon2
+                    height={"10px"}
+                    width={"10px"}
+                    color={"var(--icon-secondary-100)"}
+                  />
+                {:else}
+                  <CollectionIcon
+                    height={"10px"}
+                    width={"10px"}
+                    color={"var(--icon-secondary-100)"}
+                  />
+                {/if}
+              </div>
+              <p class="options-txt ellipsis">
+                {data.name}
+              </p>
+            </div>
           {/if}
+        {/each}
+      {:else}
+        <div
+          style="width:170px; align-items:center; justify-content:center;"
+          class="d-flex"
+        >
+          <p style="color: #808080; font-size: 10px; margin-top: 10px; ">
+            No APIs Present.
+          </p>
         </div>
-        <p class="options-txt ellipsis">
-          {data.name}
-        </p>
-      </div>
-    {/each}
+      {/if}
+    </div>
   </div>
 </div>
 
@@ -243,7 +260,7 @@
     padding-top: 10px;
     padding-bottom: 10px;
     cursor: pointer;
-    border-radius: 3px;
+    border-radius: 4px;
   }
   .options-txt {
     font-size: 10px;
@@ -263,14 +280,19 @@
   .dropdown-single-option p {
     margin-bottom: 0px;
   }
+  .scrollable-list {
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
   .method-container {
     background-color: #22232e;
-    padding-left: 6px;
-    padding-right: 6px;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    margin-left: 5px;
-    border-radius: 2px;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-bottom: 3px;
+    margin-left: 8px;
+    border-radius: 3px;
+    margin-top: 0px;
   }
   .back-header {
     width: 100%;

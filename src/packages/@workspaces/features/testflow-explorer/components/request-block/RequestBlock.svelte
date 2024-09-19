@@ -75,8 +75,8 @@
     />
     {#if data?.name?.length > 0 || isRunTextVisible}
       <div class="d-flex run-txt-container">
-        <InfoIcon height="10px" width="10px" />
-        <p style="font-size: 10px;">Run the block to get response</p>
+        <InfoIcon height="8px" width="8px" />
+        <p style="font-size: 8px;">Run the block to get response</p>
       </div>
     {/if}
   </div>
