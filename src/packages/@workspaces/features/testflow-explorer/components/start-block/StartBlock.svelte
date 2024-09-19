@@ -3,6 +3,7 @@
   import { Handle, Position, type NodeProps } from "@xyflow/svelte";
   import { ArrowIcon } from "../../icons";
   import { PlayArrow } from "@library/icons";
+  import { onMount } from "svelte";
 
   // type $$Props = NodeProps;
 
@@ -10,18 +11,28 @@
     onCheckEdges: (id: string) => boolean;
     label: string;
     onClick: (id: string) => void;
+    blocks: any;
+    connector: any;
   };
   export let id;
 
   let isAddBlockVisible = false;
+
+  onMount(() => {
+    data.blocks.subscribe(() => {
+      setTimeout(() => {
+        isAddBlockVisible = !data?.onCheckEdges(id);
+      }, 10);
+    });
+    data.connector.subscribe(() => {
+      setTimeout(() => {
+        isAddBlockVisible = !data?.onCheckEdges(id);
+      }, 10);
+    });
+  });
 </script>
 
-<div
-  class="start-block position-relative"
-  on:mouseenter={() => {
-    isAddBlockVisible = !data?.onCheckEdges(id);
-  }}
->
+<div class="start-block position-relative">
   <span
     ><PlayArrow
       height={"14px"}
@@ -37,7 +48,6 @@
         <span
           on:click={() => {
             data.onClick(id);
-            isAddBlockVisible = false;
           }}
         >
           <span class="btnc py-1 px-3 d-flex align-items-center">
@@ -65,12 +75,7 @@
     right: 0px;
     transform: translateY(-50%) translateX(100%);
     align-items: center;
-    display: none;
-  }
-  .start-block:hover {
-    .add-block-btn {
-      display: flex;
-    }
+    display: flex;
   }
   .btnc {
     border: 1px dashed var(--border-primary-300);
