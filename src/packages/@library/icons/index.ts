@@ -90,3 +90,4 @@ export { default as LinkIcon } from "./LinkIcon.svelte";
 export { default as HistoryIcon } from "./History.svelte";
 export { default as ExclamationIcon } from "./Exclamation.svelte";
 export { default as CheckIcon2 } from "./Check2.svelte";
+export { default as RunIcon } from "./Run.svelte";

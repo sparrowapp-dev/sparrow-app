@@ -12,7 +12,7 @@
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
   import { DropButton } from "@workspaces/common/components";
-  import { RunIcon } from "../icons";
+  import { RunIcon } from "@library/icons";
   export let tab: Observable<Tab>;
   export let onUpdateNodes;
   export let onUpdateEdges;
@@ -81,6 +81,7 @@
   };
   let collectionListDocument;
   let filteredCollections = writable([]);
+  let isRunDisabled = false;
 
   $: {
     if (collectionList) {
@@ -266,11 +267,14 @@
             type="default"
             iconRequired={true}
             icon={RunIcon}
-            iconHeight={14}
-            iconWidth={12}
+            iconHeight={"14px"}
+            iconWidth={"14px"}
+            disable={isRunDisabled}
             iconColor={"var(--icon-secondary-100)"}
-            onClick={() => {
-              onClickRun();
+            onClick={async () => {
+              isRunDisabled = true;
+              await onClickRun();
+              isRunDisabled = false;
             }}
           />
         {/if}

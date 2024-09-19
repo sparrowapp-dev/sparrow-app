@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { GitBranchIcon } from "$lib/assets/icons";
-  import { ArrowIcon } from "@library/icons";
+  import { ArrowIcon, RunIcon } from "@library/icons";
   import { Spinner } from "@library/ui";
 
   export let title = "Submit";
@@ -12,10 +11,10 @@
   export let textStyleProp = "";
   export let type: "default" = "default";
   export let iconRequired = false;
-  export let icon = GitBranchIcon;
+  export let icon = RunIcon;
   export let iconColor = "";
-  export let iconHeight = 14;
-  export let iconWidth = 14;
+  export let iconHeight = "14px";
+  export let iconWidth = "14px";
 
   enum BtnType {
     DEFAULT = "default",
