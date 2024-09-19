@@ -103,7 +103,7 @@
       titleId={requestState.requestBodyNavigation}
       onclick={handleDropdown}
       zIndex={499}
-      disabled={false}
+      disabled={true}
     />
     <span class="pe-3" />
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
@@ -134,22 +134,8 @@
         titleId={requestState.requestBodyLanguage}
         onclick={handleRawDropDown}
         zIndex={499}
-        disabled={false}
+        disabled={true}
       />
-    {/if}
-  </div>
-  <div>
-    {#if requestState.requestBodyNavigation === RequestDataset.RAW}
-      <div
-        on:click={() => {
-          updateBeautifiedState(true);
-          notifications.success("Code formatted successfully!");
-        }}
-        role="button"
-        class="icon-container d-flex align-items-center justify-content-center border-radius-2"
-      >
-        <img src={BeautifyIcon} style="height:10px; width:10px;" />
-      </div>
     {/if}
   </div>
 </div>

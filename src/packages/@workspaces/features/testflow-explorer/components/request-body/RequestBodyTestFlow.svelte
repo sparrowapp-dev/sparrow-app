@@ -13,13 +13,12 @@
   export let body;
   export let requestState;
   export let method;
+
   let isBodyBeautified = false;
   const updateBeautifiedState = (value: boolean) => {
     isBodyBeautified = value;
   };
 </script>
-
-Request BOdy Component
 
 <div class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative">
   <RequestBodyNavigator {method} {requestState} {updateBeautifiedState} />

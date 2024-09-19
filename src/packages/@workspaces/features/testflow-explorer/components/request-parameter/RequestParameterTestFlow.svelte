@@ -5,12 +5,10 @@
     import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
     import { Events } from "$lib/utils/enums";
     export let params;
-    export let onUpdateRequestParams;
     export let environmentVariables = [];
     export let authParameter;
-    export let onUpdateEnvironment;
   
-    let isBulkEditRequired = true;
+    let isBulkEditRequired = false;
     export let onUpdateRequestState;
   
     export let isBulkEditActive;
@@ -23,7 +21,7 @@
       "Usage - Manage multiple parameters.  Format - Key: Value";
   
     const handleParamsChange = (pairs: KeyValuePair[]): void => {
-      onUpdateRequestParams(pairs);
+      // onUpdateRequestParams(pairs);
     };
   
     const toggleBulkEdit = (value) => {
@@ -34,6 +32,7 @@
   
   <section class="w-100" style="">
     <TabularInput
+       mode={"READ"}
       {isBulkEditRequired}
       bulkEditPlaceholder={bulkEditParamsPlaceholder}
       {isBulkEditActive}
@@ -42,7 +41,7 @@
       keyValue={createDeepCopy(params)}
       callback={handleParamsChange}
       {environmentVariables}
-      {onUpdateEnvironment}
+      
     />
   </section>
   

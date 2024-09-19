@@ -1,3 +1,4 @@
+import type { CollectionItemsDto } from "@common/types/workspace";
 import { writable } from "svelte/store";
 export type KeyValuePair = {
   key: string;
@@ -14,6 +15,7 @@ export type Response = {
 export type nodes = {
   id: string;
   response: Response;
+  request: CollectionItemsDto
 };
 
 type Request = {
