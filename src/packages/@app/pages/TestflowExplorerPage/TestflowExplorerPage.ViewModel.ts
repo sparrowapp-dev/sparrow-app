@@ -10,6 +10,7 @@ import { TabRepository } from "@app/repositories/tab.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import type { Tab } from "@common/types/workspace";
 import { Debounce, ParseTime } from "@common/utils";
+import { notifications } from "@library/ui/toast/Toast";
 import { DecodeRequest } from "@workspaces/features/rest-explorer/utils";
 import {
   testFlowDataStore,
@@ -375,6 +376,9 @@ export class TestflowExplorerPageViewModel {
       testFlowDataMap.set(progressiveTab.tabId, wsData);
       return testFlowDataMap;
     });
+    notifications.success(
+      `Test Completed: ${successRequests} Passed, ${failedRequests} Failed`,
+    );
   };
 
   public toggleHistoryContainer = (_toggleState: boolean) => {
