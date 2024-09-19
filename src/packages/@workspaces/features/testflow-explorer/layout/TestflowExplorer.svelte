@@ -118,6 +118,8 @@
           id: targetNode,
           type: "requestBlock",
           data: {
+            blocks: nodes,
+            connector: edges,
             onClick: function (_id: string) {
               createNewNode(_id);
             },
@@ -171,6 +173,8 @@
           id: dbNodes[i].id,
           type: dbNodes[i].type,
           data: {
+            blocks: nodes,
+            connector: edges,
             onClick: function (_id: string) {
               createNewNode(_id);
             },
