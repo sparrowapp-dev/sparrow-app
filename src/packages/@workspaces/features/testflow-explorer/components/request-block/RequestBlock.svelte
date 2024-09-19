@@ -1,7 +1,9 @@
 <script lang="ts">
   import { Handle, Position } from "@xyflow/svelte";
   import { ArrowSolid, DropdownArrow } from "../../icons";
-  import { ArrowRightIcon, DownArrowIcon, VectorIcon } from "@library/icons";
+  import { ArrowRightIcon } from "@library/icons";
+  import { InfoIcon } from "../../icons";
+  import { VectorIcon } from "@library/icons";
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
@@ -24,6 +26,7 @@
   export let id;
 
   let isAddBlockVisible = false;
+  let isRunTextVisible = false;
   const updateNode = (
     name: string,
     requestId: string,
@@ -31,6 +34,7 @@
     method: string,
     folderId?: string,
   ) => {
+    isRunTextVisible = true;
     data.onUpdateSelectedAPI(
       id,
       name,
@@ -69,6 +73,12 @@
       name={data.name}
       method={data.method}
     />
+    {#if data?.name?.length > 0 || isRunTextVisible}
+      <div class="d-flex run-txt-container">
+        <InfoIcon height="10px" width="10px" />
+        <p style="font-size: 10px;">Run the block to get response</p>
+      </div>
+    {/if}
   </div>
   <Handle type="source" position={Position.Right} />
   {#if isAddBlockVisible}
@@ -185,5 +195,14 @@
   .arrow {
     padding: 8px 4px;
     display: inline-block;
+  }
+  .run-txt-container {
+    align-items: center;
+    padding-top: 10px;
+  }
+  .run-txt-container p {
+    margin-bottom: 0px;
+    color: #808080;
+    margin-left: 4px;
   }
 </style>
