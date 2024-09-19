@@ -5,6 +5,7 @@
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
   import DropdownArrow from "../../icons/DropdownArrow.svelte";
+  import { BackArrowIcon } from "../../icons";
   export let name;
   export let method;
   export let collections = [];
@@ -22,6 +23,7 @@
   let selectedCollection;
   let selectedFolder;
   let selectedItem = "COLLECTION";
+  let ignoreClickOutside = false;
 
   const handleSelectApi = (data) => {
     if (data?.totalRequests !== undefined) {
@@ -53,6 +55,8 @@
         );
       }
       arrayData = collections;
+      selectedCollection = null;
+      selectedFolder = null;
     }
     if (data?.type !== "REQUEST") {
       previousItem = data;
@@ -62,10 +66,15 @@
   let dropdownRef;
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (dropdownRef && !dropdownRef.contains(event.target as Node)) {
+    if (
+      !ignoreClickOutside &&
+      dropdownRef &&
+      !dropdownRef.contains(event.target as Node)
+    ) {
       isOpen = false;
       arrayData = collections;
     }
+    ignoreClickOutside = false;
   };
 
   onMount(() => {
@@ -127,8 +136,55 @@
       ? 'block'
       : 'none'}; position:absolute"
   >
+    {#if selectedCollection}
+      <div class="d-flex ellipsis back-header">
+        <div
+          style="margin-left: 4px;"
+          on:click={() => {
+            if (selectedFolder) {
+              arrayData = selectedCollection.items;
+              selectedFolder = null;
+            } else if (selectedCollection) {
+              arrayData = collections;
+              selectedCollection = null;
+              ignoreClickOutside = true;
+            }
+          }}
+        >
+          <BackArrowIcon width="8px" height="8px" />
+        </div>
+        <div class="d-flex" style="margin-left: 4px; align-items:center;">
+          <CollectionIcon
+            height={"10px"}
+            width={"10px"}
+            color={"var(--icon-secondary-100)"}
+          />
+          <p class="ellipsis" style="margin-left: 4px; margin-bottom:0px">
+            {selectedCollection.name}
+          </p>
+        </div>
+        {#if selectedFolder}
+          <p style="margin-bottom: 0px;">/</p>
+          <div class="d-flex" style="margin-left: 4px; align-items:center;">
+            <FolderIcon2
+              height={"10px"}
+              width={"10px"}
+              color={"var(--icon-secondary-100)"}
+            />
+            <p class="ellipsis" style="margin-left: 4px; margin-bottom:0px;">
+              {selectedFolder.name}
+            </p>
+          </div>
+        {/if}
+      </div>
+    {/if}
     {#each arrayData as data}
-      <div class="d-flex dropdown-single-option">
+      <div
+        class="d-flex dropdown-single-option"
+        on:click={() => {
+          handleSelectApi(data);
+        }}
+      >
         <div style="margin-left: 5px;">
           {#if data.type === "REQUEST"}
             <span class="text-{getMethodStyle(data?.request?.method)}">
@@ -152,12 +208,7 @@
             />
           {/if}
         </div>
-        <p
-          class="options-txt ellipsis"
-          on:click={() => {
-            handleSelectApi(data);
-          }}
-        >
+        <p class="options-txt ellipsis">
           {data.name}
         </p>
       </div>
@@ -220,6 +271,10 @@
     padding-bottom: 2px;
     margin-left: 5px;
     border-radius: 2px;
+  }
+  .back-header {
+    width: 100%;
+    padding-bottom: 10px;
   }
   .selected-container {
     align-items: center;
