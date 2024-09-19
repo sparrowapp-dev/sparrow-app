@@ -22,6 +22,7 @@
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
 
+  let isNodesDraggable = false;
   const checkIfEdgesExist = (_id: string) => {
     let edge = [];
     edges.subscribe((value) => {
@@ -150,6 +151,7 @@
           },
           position: nextNodePosition,
           deletable: true,
+          draggable: isNodesDraggable, // Disable dragging for this node
         },
       ];
     });
@@ -212,6 +214,7 @@
             y: dbNodes[i].position.y,
           },
           deletable: dbNodes[i].id === "1" ? false : true,
+          draggable: isNodesDraggable, // Disable dragging for this node
         });
       }
       return res;

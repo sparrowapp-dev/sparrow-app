@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { Writable } from "svelte/store";
   import { Handle, Position } from "@xyflow/svelte";
-  import { ArrowIcon, InfoIcon } from "../../icons";
+  import { ArrowSolid, DropdownArrow } from "../../icons";
+  import { ArrowRightIcon } from "@library/icons";
+  import { InfoIcon } from "../../icons";
   import { VectorIcon } from "@library/icons";
-  import { onMount } from "svelte";
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
@@ -44,6 +44,8 @@
       folderId ?? "",
     );
   };
+
+  let isCreateBlockArrowHovered = false;
 </script>
 
 <div
@@ -80,22 +82,69 @@
   </div>
   <Handle type="source" position={Position.Right} />
   {#if isAddBlockVisible}
-    <div class="add-block-btn" style="position: absolute;   ">
-      <div class="arrow">
-        <ArrowIcon />
-      </div>
+    <div class="add-block-btn py-5 ps-2 pe-5" style="position: absolute;   ">
       <span
         on:click={() => {
           data.onClick(id);
           isAddBlockVisible = false;
+          isCreateBlockArrowHovered = false;
+        }}
+        on:mouseenter={() => {
+          isCreateBlockArrowHovered = true;
+        }}
+        on:mouseleave={() => {
+          isCreateBlockArrowHovered = false;
         }}
       >
-        <span class="btnc py-1 px-3 d-flex align-items-center">
-          <span class="text-fs-16 me-2">+</span> <span>Add Block</span>
+        <span class="d-flex align-items-center">
+          <span
+            class="btnc position p-1 d-flex align-items-center justify-content-center"
+          >
+            <ArrowRightIcon
+              height={"8px"}
+              width={"8px"}
+              color={isCreateBlockArrowHovered
+                ? "var(--icon-secondary-100)"
+                : "var(--icon-primary-300)"}
+            />
+          </span>
         </span>
       </span>
     </div>
   {/if}
+  <!-- Dummy Add block -->
+  {#if isCreateBlockArrowHovered && isAddBlockVisible}
+    <div
+      class="position-absolute d-flex align-items-center"
+      style="right:-25px; top:50%; transform : translateX(100%) translateY(-50%); opacity:0.6;"
+    >
+      <div>
+        <ArrowSolid />
+      </div>
+      <div class="request-block-dummy position-relative">
+        <div class="px-3 py-2">
+          <span class="text-fs-12 text-fs-10">
+            <VectorIcon
+              height={"12px"}
+              width={"12px"}
+              color={"var(--icon-primary-300)"}
+            />
+            <span class="ms-2">REST API Request</span>
+          </span>
+        </div>
+        <hr class="my-0" />
+        <div class="px-3 py-3">
+          <p
+            class="bg-tertiary-190 d-flex align-items-center justify-content-between py-2 px-2 border-radius-2 mb-0 text-fs-10 text-secondary-200"
+          >
+            <span> Select an API Request </span>
+            <span><DropdownArrow height={"8px"} width={"8px"} /></span>
+          </p>
+        </div>
+      </div>
+    </div>
+  {/if}
+  <!------------------->
 </div>
 
 <style lang="scss">
@@ -107,6 +156,15 @@
     font-size: 0.7rem;
     width: 200px;
   }
+  .request-block-dummy {
+    background: #eee;
+    background-color: var(--bg-tertiary-300);
+    height: auto;
+    border-radius: 0.125rem;
+    font-size: 0.7rem;
+    width: 200px;
+  }
+
   .add-block-btn {
     color: var(--text-primary-300);
     width: max-content;
@@ -122,7 +180,17 @@
     }
   }
   .btnc {
-    border: 1px dashed var(--border-primary-300);
+    height: 18px;
+    width: 18px;
+    border: 1px solid var(--border-primary-300);
+    border-radius: 50%;
+  }
+  .btnc:hover {
+    height: 18px;
+    width: 18px;
+    border: 1px solid var(--border-primary-300);
+    background-color: var(--bg-primary-300);
+    border-radius: 50%;
   }
   .arrow {
     padding: 8px 4px;
