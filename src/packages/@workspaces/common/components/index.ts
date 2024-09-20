@@ -7,3 +7,4 @@ export { default as ReviewEnvironment } from "./review-environment/ReviewEnviron
 export { default as TabularInputV2 } from "./tabular-input-v2/TabularInputV2.svelte";
 export { default as DropButton } from "./drop-button/DropButton.svelte";
 export { default as ComboText } from "./combo-text/ComboText.svelte";
+export { default as TableNavbar } from "./table-navbar/TableNavbar.svelte";
