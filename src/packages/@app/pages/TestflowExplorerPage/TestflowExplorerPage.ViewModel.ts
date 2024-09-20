@@ -308,6 +308,7 @@ export class TestflowExplorerPageViewModel {
                 existingTestFlowData.nodes.push({
                   id: element.id,
                   response: resData,
+                  request: adaptedRequest
                 });
               }
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);

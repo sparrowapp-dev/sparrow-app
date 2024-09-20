@@ -321,7 +321,7 @@
             Value
           </p>
 
-          {#if bulkEditPlaceholder}
+          {#if isBulkEditRequired}
             <div class="me-3">
               <button class="bg-transparent border-0 mt-1 d-flex" style="">
                 <p

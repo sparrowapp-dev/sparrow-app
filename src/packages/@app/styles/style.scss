@@ -94,6 +94,7 @@ $theme-grey-ffffff: #ffffff;
 $theme-grey-F5F5F5: #f5f5f5;
 $theme-grey-e5e5e5: #e5e5e5;
 $theme-grey-C4CBDA: #c4cbda;
+$theme-grey-d7d7d7: #d7d7d7;
 $theme-grey-A5B5CA: #a5b5ca;
 $theme-grey-B6B5B5: #b6b5b5;
 $theme-grey-8A9299: #8a9299;
@@ -150,10 +151,12 @@ $theme-violet-2A2C3C: #2a2c3c;
 $theme-violet-22232E: #22232e;
 $theme-violet-272831: #272831;
 $theme-violet-2E2F3D: #2e2f3d;
+$theme-violet-3e3f51: #3e3f51;
 $theme-violet-323548: #323548;
 $theme-violet-262834: #262834;
 $theme-violet-1c1d27: #1c1d27;
 $theme-violet-1C1D2B: #1c1d2b;
+
 
 
 $theme-red-e5acb2: #e5acb2;
@@ -277,6 +280,7 @@ $theme-green-00A86B: #00a86b;
   --text-secondary-150: #{$theme-grey-e5e5e5};
   --text-secondary-200: #{$theme-grey-8A9299};
   --text-secondary-250: #{$theme-grey-83899F};
+  --text-secondary-270: #{$theme-grey-d7d7d7};
   --text-secondary-290: #{$theme-grey-484848};
   --text-secondary-300: #{$theme-grey-45494D};
   --text-secondary-350: #{$theme-grey-636566};
@@ -302,8 +306,8 @@ $theme-green-00A86B: #00a86b;
   --text-tertiary-600: #{$theme-violet-2E2F3D};
   --text-tertiary-700: #{$theme-violet-1c1d27};
   --text-tertiary-750: #{$theme-violet-1C1D2B};
-  
-  
+
+
   --text-success-200: #{$theme-green-00A86B};
 
 
@@ -340,6 +344,7 @@ $theme-green-00A86B: #00a86b;
   --bg-secondary-110: #{$theme-grey-F5F5F5};
   --bg-secondary-150: #{$theme-grey-e5e5e5};
   --bg-secondary-200: #{$theme-grey-8A9299};
+  --bg-secondary-270: #{$theme-grey-d7d7d7};
   --bg-secondary-290: #{$theme-grey-484848};
   --bg-secondary-300: #{$theme-grey-45494D};
   --bg-secondary-320: #{$theme-grey-353646};
@@ -367,6 +372,7 @@ $theme-green-00A86B: #00a86b;
   --bg-tertiary-400: #{$theme-violet-22232E};
   --bg-tertiary-500: #{$theme-violet-272831};
   --bg-tertiary-600: #{$theme-violet-2E2F3D};
+  --bg-tertiary-630: #{$theme-violet-3e3f51};
   --bg-tertiary-650: #{$theme-violet-323548};
   --bg-tertiary-670: #{$theme-violet-262834};
   --bg-tertiary-700: #{$theme-violet-1c1d27};
@@ -751,6 +757,7 @@ $sparrow-border-colors: (
   .text-fs-#{$size} {
     font-size: $value;
   }
+
   .text-fs-#{$size}-important {
     font-size: $value !important;
   }
