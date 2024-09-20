@@ -54,7 +54,7 @@
                 width={"15px"}
                 color={"var(--icon-secondary-100)"}
               />
-              <span class="ms-2 text-fs-12"> Run History </span>
+              <span class="ms-2 text-fs-12 fw-bold"> Run History </span>
             </div>
             <div
               role="button"
@@ -65,28 +65,30 @@
               <CrossIcon
                 height={"15px"}
                 width={"15px"}
-                color={"var(--icon-secondary-170)"}
+                color={"var(--icon-secondary-200)"}
               />
             </div>
           </div>
-          <hr class="my-3" />
+          <hr class="my-3 text-tertiary-190" />
 
           <!-- TITLE -->
-          <p class="text-fs-10 ellipsis">{testflowName}</p>
+          <p class="text-fs-10 ellipsis fw-bold">{testflowName}</p>
         </div>
         <!-- BODY -->
         <div style="flex:1; overflow:auto;">
           <div class="time-line ms-3">
             {#if testflowStore?.history}
               {#each testflowStore?.history as history, ind}
-                <div class="position-relative">
-                  <div class="ms-3 mb-1 p-3 bg-tertiary-670">
+                <div class="position-relative history-selector">
+                  <div class="ms-3 mb-1 p-3 bg-tertiary-670 border-radius-2">
                     <div class="d-flex justify-content-between mb-3">
-                      <span class="text-fs-8">
+                      <span class="text-fs-8 fw-bold">
                         {history?.successRequests} Success | {history?.failedRequests}
                         fail
                       </span>
-                      <span class="text-fs-8">{history?.totalTime}</span>
+                      <span class="text-fs-8" style="padding-right:2px;"
+                        >{history?.totalTime}</span
+                      >
                     </div>
                     {#each history?.requests as request, index}
                       {#if index <= 1 || (history.expand && index > 1)}
@@ -103,18 +105,20 @@
                           >
                           <span
                             style="padding: 0px 2px; width: 20px;"
-                            class="text-fs-8 bg-tertiary-190 text-center text-{request.status ===
-                              ResponseStatusCode.OK ||
-                            request.status === ResponseStatusCode.CREATED
+                            class="text-fs-8 bg-tertiary-190 text-center text-{Number(
+                              request.status.split(' ')[0],
+                            ) >= 200 &&
+                            Number(request.status.split(' ')[0]) < 300
                               ? 'getColor'
                               : 'deleteColor'}"
                             >{request.status.split(" ")[0]}</span
                           >
                           <span
                             style="padding: 0px 2px; width: 40px; text-align: right;"
-                            class="text-fs-8 text-{request.status ===
-                              ResponseStatusCode.OK ||
-                            request.status === ResponseStatusCode.CREATED
+                            class="text-fs-8 text-{Number(
+                              request.status.split(' ')[0],
+                            ) >= 200 &&
+                            Number(request.status.split(' ')[0]) < 300
                               ? 'getColor'
                               : 'deleteColor'}">{request.time}</span
                           >
@@ -123,14 +127,18 @@
                     {/each}
                     {#if !history.expand && history?.requests.length > 2}
                       <span
-                        class="text-fs-8"
+                        role="button"
+                        class="text-fs-8 text-secondary-200"
+                        style="text-decoration: underline;"
                         on:click={() => {
                           toggleHistoryDetails(true, ind);
                         }}>see all {history?.requests?.length} requests</span
                       >
                     {:else if history.expand && history?.requests.length > 2}
                       <span
-                        class="text-fs-8"
+                        role="button"
+                        class="text-fs-8 text-secondary-200"
+                        style="text-decoration: underline;"
                         on:click={() => {
                           toggleHistoryDetails(false, ind);
                         }}>see Less</span
@@ -148,19 +156,19 @@
                   <div
                     class="position-absolute bg-tertiary-750 d-flex align-items-center justify-content-center"
                     style="height:14px; width:14px; top:0; left: -8px; border-radius:50%; overflow:hidden;
-                border: 1px solid grey;"
+                border: 1px solid var(--border-secondary-50);"
                   >
                     {#if history.status === "pass"}
                       <CheckIcon2
                         height={"8px"}
                         width={"8px"}
-                        color={"green"}
+                        color={"#69D696"}
                       />
                     {:else}
                       <ExclamationIcon
                         height={"8px"}
                         width={"8px"}
-                        color="red"
+                        color="#FF7878"
                       />
                     {/if}
                   </div>
@@ -176,6 +184,19 @@
 
 <style>
   .time-line {
-    border-left: 1px solid grey;
+    border-left: 1px solid var(--border-secondary-50);
+  }
+  .history-selector:last-child::before {
+    content: ""; /* Custom content for the pseudo-element */
+    color: var(--primary-color); /* Adjust color as per your design */
+    font-size: 12px; /* Adjust font size */
+    margin-right: 5px; /* Space between the bullet and content */
+    display: inline-block; /* Ensure it's inline with the content */
+    background-color: var(--bg-tertiary-750);
+    position: absolute;
+    bottom: 0;
+    left: -2px;
+    width: 4px;
+    top: 14px;
   }
 </style>

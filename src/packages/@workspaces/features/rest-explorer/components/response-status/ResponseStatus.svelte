@@ -52,16 +52,41 @@
           distance={20}
         >
           <span
-            class="d-flex align-items-center ps-1 pe-1 border-0 justify-content-center rounded text-backgroundColor gap-1 time-primary1"
-            style="font-size: 12px;"
+            class="text-fs-12 d-flex align-items-center ps-1 pe-1 border-0 justify-content-center rounded text-backgroundColor gap-1 time-primary1"
+            style=" color:{response.status === ResponseStatusCode.OK ||
+            response.status === ResponseStatusCode.CREATED
+              ? 'var(--icon-success-100)'
+              : 'var(--request-delete)'};"
           >
             <span class="me-1 d-flex">
-              <ClockIcon />
+              <ClockIcon
+                color={response.status === ResponseStatusCode.OK ||
+                response.status === ResponseStatusCode.CREATED
+                  ? "var(--icon-success-100)"
+                  : "var(--request-delete)"}
+                height={"8px"}
+                width={"8px"}
+              />
             </span>
-            <span>
+            <span
+              class="text-fs-12"
+              style=" color:{response.status === ResponseStatusCode.OK ||
+              response.status === ResponseStatusCode.CREATED
+                ? 'var(--icon-success-100)'
+                : 'var(--request-delete)'};"
+            >
               {response.time}
             </span>
-            <p class="mb-0" style="font-size: 12px;">ms</p>
+            <p
+              class="mb-0 text-fs-12"
+              style=" font-size: 12px; color:{response.status ===
+                ResponseStatusCode.OK ||
+              response.status === ResponseStatusCode.CREATED
+                ? 'var(--icon-success-100)'
+                : 'var(--request-delete)'};"
+            >
+              ms
+            </p>
           </span>
         </Tooltip>
         <Tooltip

@@ -9,7 +9,8 @@ import { EnvironmentRepository } from "@app/repositories/environment.repository"
 import { TabRepository } from "@app/repositories/tab.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import type { Tab } from "@common/types/workspace";
-import { Debounce } from "@common/utils";
+import { Debounce, ParseTime } from "@common/utils";
+import { notifications } from "@library/ui/toast/Toast";
 import { DecodeRequest } from "@workspaces/features/rest-explorer/utils";
 import {
   testFlowDataStore,
@@ -265,13 +266,21 @@ export class TestflowExplorerPageViewModel {
                   time: duration,
                   size: responseSizeKB,
                 };
-                successRequests++;
+
+                if (
+                  Number(resData.status.split(" ")[0]) >= 200 &&
+                  Number(resData.status.split(" ")[0]) < 300
+                ) {
+                  successRequests++;
+                } else {
+                  failedRequests++;
+                }
                 totalTime += duration;
                 const req = {
                   method: request?.request?.method,
                   name: request?.name,
                   status: resData.status, // need to be updated
-                  time: duration.toString() + " ms",
+                  time: new ParseTime().convertMilliseconds(duration),
                 };
                 history.requests.push(req);
               } else {
@@ -288,7 +297,7 @@ export class TestflowExplorerPageViewModel {
                   method: request?.request?.method,
                   name: request?.name,
                   status: ResponseStatusCode.INTERNAL_SERVER_ERROR,
-                  time: duration.toString() + " ms",
+                  time: new ParseTime().convertMilliseconds(duration),
                 };
                 history.requests.push(req);
               }
@@ -299,6 +308,7 @@ export class TestflowExplorerPageViewModel {
                 existingTestFlowData.nodes.push({
                   id: element.id,
                   response: resData,
+                  request: adaptedRequest
                 });
               }
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
@@ -350,7 +360,7 @@ export class TestflowExplorerPageViewModel {
     }
 
     // Now update the history and log it after all requests are done
-    history.totalTime = totalTime.toString() + " ms";
+    history.totalTime = new ParseTime().convertMilliseconds(totalTime);
     history.successRequests = successRequests.toString();
     history.failedRequests = failedRequests.toString();
     if (failedRequests === 0) {
@@ -367,6 +377,9 @@ export class TestflowExplorerPageViewModel {
       testFlowDataMap.set(progressiveTab.tabId, wsData);
       return testFlowDataMap;
     });
+    notifications.success(
+      `Test Completed: ${successRequests} Passed, ${failedRequests} Failed`,
+    );
   };
 
   public toggleHistoryContainer = (_toggleState: boolean) => {
@@ -378,6 +391,8 @@ export class TestflowExplorerPageViewModel {
       } else {
         wsData = {
           isRunHistoryEnable: _toggleState,
+          history: [],
+          nodes: [],
         };
       }
       testFlowDataMap.set(progressiveTab.tabId, wsData);
