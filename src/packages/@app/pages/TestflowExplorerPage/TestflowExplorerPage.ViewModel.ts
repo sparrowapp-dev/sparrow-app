@@ -3,7 +3,7 @@ import { ResponseStatusCode } from "$lib/utils/enums";
 import { environmentType } from "$lib/utils/enums";
 import { createDeepCopy } from "$lib/utils/helpers";
 import { RequestTabAdapter } from "@app/adapter";
-import type { TabDocument, WorkspaceDocument } from "@app/database/database";
+import type { TabDocument } from "@app/database/database";
 import { CollectionRepository } from "@app/repositories/collection.repository";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
@@ -88,9 +88,7 @@ export class TestflowExplorerPageViewModel {
 
   public updateEdges = new Debounce().debounce(this.updateEdgesDebounce, 300);
 
-  public updateSelectedAPI = async (nodeId: string) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-  };
+  public updateSelectedAPI = async () => {};
 
   /**
    * Get list of collections from current active workspace
@@ -100,18 +98,16 @@ export class TestflowExplorerPageViewModel {
     return this.collectionRepository.getCollection();
   };
 
-  private refreshEnvironment = async (currentWorkspaceId: string) => {
+  private getActiveEnvironments = async (currentWorkspaceId: string) => {
     let environmentId: string;
-    const activeWorkspace = await this.workspaceRepository.getActiveWorkspace();
-    const activeWorkspaceSubscribe = activeWorkspace.subscribe(
-      async (value: WorkspaceDocument) => {
-        const activeWorkspaceRxDoc = value;
-        if (activeWorkspaceRxDoc) {
-          currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
-          environmentId = activeWorkspaceRxDoc.get("environmentId");
-        }
-      },
-    );
+    const activeWorkspace =
+      await this.workspaceRepository.getActiveWorkspaceDoc();
+
+    if (activeWorkspace) {
+      currentWorkspaceId = activeWorkspace.get("_id");
+      environmentId = activeWorkspace.get("environmentId");
+    }
+
     const environments = await this.environmentRepository.getEnvironment();
     let environmentDocuments;
     environments.subscribe((value) => {
@@ -136,7 +132,7 @@ export class TestflowExplorerPageViewModel {
             }
           });
         if (filteredEnv?.length > 0) {
-          let envs = [];
+          const envs = [];
           filteredEnv.forEach((elem) => {
             environmentVariables = {
               local: filteredEnv[1],
@@ -165,7 +161,7 @@ export class TestflowExplorerPageViewModel {
 
   public handleTestFlowRun = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const environments = await this.refreshEnvironment(
+    const environments = await this.getActiveEnvironments(
       progressiveTab.path.workspaceId,
     );
     const nodes = progressiveTab?.property?.testflow?.nodes;
@@ -242,10 +238,6 @@ export class TestflowExplorerPageViewModel {
               progressiveTab.tabId,
             );
             if (existingTestFlowData) {
-              const existingNodeIndex = existingTestFlowData.nodes.findIndex(
-                (n) => n.id === element.id,
-              );
-
               let resData;
               if (response.isSuccessful) {
                 const byteLength = new TextEncoder().encode(
@@ -258,13 +250,16 @@ export class TestflowExplorerPageViewModel {
                   response?.data?.headers || {},
                 ).map(([key, value]) => ({ key, value }));
                 const responseStatus = response?.data?.status;
-
                 resData = {
                   body: responseBody,
                   headers: formattedHeaders,
                   status: responseStatus,
                   time: duration,
                   size: responseSizeKB,
+                  responseContentType:
+                    this._decodeRequest.setResponseContentType(
+                      formattedHeaders,
+                    ),
                 };
 
                 if (
@@ -287,7 +282,7 @@ export class TestflowExplorerPageViewModel {
                 resData = {
                   body: "",
                   headers: [],
-                  status: "Not Found",
+                  status: ResponseStatusCode.ERROR,
                   time: duration,
                   size: 0,
                 };
@@ -296,21 +291,17 @@ export class TestflowExplorerPageViewModel {
                 const req = {
                   method: request?.request?.method,
                   name: request?.name,
-                  status: ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                  status: ResponseStatusCode.ERROR,
                   time: new ParseTime().convertMilliseconds(duration),
                 };
                 history.requests.push(req);
               }
-              if (existingNodeIndex > -1) {
-                existingTestFlowData.nodes[existingNodeIndex].response =
-                  resData;
-              } else {
-                existingTestFlowData.nodes.push({
-                  id: element.id,
-                  response: resData,
-                  request: adaptedRequest
-                });
-              }
+              existingTestFlowData.nodes.push({
+                id: element.id,
+                response: resData,
+                request: adaptedRequest,
+              });
+
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
             return testFlowDataMap;
@@ -321,27 +312,20 @@ export class TestflowExplorerPageViewModel {
               progressiveTab.tabId,
             );
             if (existingTestFlowData) {
-              const existingNodeIndex = existingTestFlowData.nodes.findIndex(
-                (n) => n.id === element.id,
-              );
-
               const resData = {
                 body: "",
                 headers: [],
-                status: "Not Found",
+                status: ResponseStatusCode.ERROR,
                 time: 0,
                 size: 0,
               };
 
-              if (existingNodeIndex > -1) {
-                existingTestFlowData.nodes[existingNodeIndex].response =
-                  resData;
-              } else {
-                existingTestFlowData.nodes.push({
-                  id: element.id,
-                  response: resData,
-                });
-              }
+              existingTestFlowData.nodes.push({
+                id: element.id,
+                response: resData,
+                request: adaptedRequest,
+              });
+
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
             return testFlowDataMap;
@@ -351,7 +335,7 @@ export class TestflowExplorerPageViewModel {
           const req = {
             method: request?.request?.method,
             name: request?.name,
-            status: ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status: ResponseStatusCode.ERROR,
             time: 0 + " ms",
           };
           history.requests.push(req);

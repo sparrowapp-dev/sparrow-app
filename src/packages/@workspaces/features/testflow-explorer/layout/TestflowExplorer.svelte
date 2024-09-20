@@ -10,6 +10,13 @@
     RequestHeaderTestFlow,
     RequestParameterTestFlow,
     RequestNavigatorTestFlow,
+    ResponseDefaultScreen,
+    ResponseErrorScreen,
+    ResponseStatus,
+    ResponseNavigator,
+    ResponseBodyNavigator,
+    ResponseBody,
+    ResponseHeaders,
   } from "../components";
   import { RequestSectionEnum, type Tab } from "@common/types/workspace";
 
@@ -31,6 +38,7 @@
     VectorIcon,
   } from "@library/icons";
   import { RunIcon } from "@library/icons";
+  import { ResponseStatusCode } from "$lib/utils/enums";
   export let tab: Observable<Tab>;
   export let onUpdateNodes;
   export let onUpdateEdges;
@@ -255,12 +263,20 @@
   let selectedNode;
   $: {
     if (testflowStore || selectedNodeId) {
+      let isIdExist = false;
       testflowStore?.nodes?.forEach((element) => {
         if (element.id === selectedNodeId) {
           selectedNode = element;
+          responseState.responseBodyLanguage =
+            selectedNode.response.responseContentType;
+          responseState.responseBodyFormatter = "Pretty";
+          isIdExist = true;
           console.log("This is selcted node", selectedNode);
         }
       });
+      if (!isIdExist) {
+        selectedNode = undefined;
+      }
     }
   }
 
@@ -270,7 +286,7 @@
   };
   let nodesValue = 1;
 
-  let selectedNodeId = 0;
+  let selectedNodeId = "0";
   const checkIfResponseExist = (id) => {
     let result = false;
     testflowStore?.nodes?.forEach((element) => {
@@ -287,11 +303,12 @@
     let selectedNodeTrue = val.find((node) => node.selected === true);
 
     if (selectedNodeTrue) {
-      if (selectedNodeTrue.data.requestId) {
-        if (checkIfResponseExist(selectedNodeTrue.id)) {
-          selectedNodeId = selectedNodeTrue.id;
-        }
-      }
+      selectedNodeId = selectedNodeTrue.id;
+      // if (selectedNodeTrue.data.requestId) {
+      //   if (checkIfResponseExist(selectedNodeTrue.id)) {
+      //     selectedNodeId = selectedNodeTrue.id;
+      //   }
+      // }
     }
   });
   edges.subscribe((val) => {
@@ -301,6 +318,7 @@
   let selectedTab = "response";
 
   let requestNavigation = "Request Body";
+  let responseNavigation = "Response";
 
   function updateActiveTabInsideRequestBody(tab: string) {
     if (tab === "Body") {
@@ -313,6 +331,26 @@
 
     return requestNavigation;
   }
+
+  function updateResponseNavigation(tab: string) {
+    if (tab === "Response") {
+      responseNavigation = "Response";
+    } else if (tab === "Headers") {
+      responseNavigation = "Headers";
+    }
+    return responseNavigation;
+  }
+  const onUpdateRequestState = async (_state) => {
+    responseState = {
+      ...responseState,
+      ..._state,
+    };
+  };
+
+  let responseState = {
+    responseBodyLanguage: "",
+    responseBodyFormatter: "",
+  };
 </script>
 
 <div class="h-100 position-relative">
@@ -340,6 +378,7 @@
             disable={isRunDisabled}
             iconColor={"var(--icon-secondary-100)"}
             onClick={async () => {
+              selectedNodeId = "0";
               isRunDisabled = true;
               await onClickRun();
               isRunDisabled = false;
@@ -389,7 +428,52 @@
           <!-- Request Data -->
           <div class="request-rhs-container">
             {#if selectedTab === "response"}
-              <div>Response Body</div>
+              <div class="p-2" style="">
+                <div
+                  class="d-flex flex-column h-100 pt-1"
+                  style="overflow:auto;"
+                >
+                  <div class="h-100 d-flex flex-column">
+                    <div style="flex:1; overflow:auto;">
+                      {#if selectedNode?.response?.status === ResponseStatusCode.ERROR}
+                        <ResponseErrorScreen />
+                      {:else if selectedNode?.response?.status}
+                        <div class="h-100 d-flex flex-column">
+                          <ResponseStatus response={selectedNode?.response} />
+                          <ResponseNavigator
+                            requestStateSection={responseNavigation}
+                            {updateResponseNavigation}
+                            responseHeadersLength={selectedNode?.response
+                              ?.headers?.length || 0}
+                          />
+                          {#if responseNavigation === "Response"}
+                            {#if responseState?.responseBodyLanguage !== "Image"}
+                              <ResponseBodyNavigator
+                                response={selectedNode?.response}
+                                apiState={responseState}
+                                {onUpdateRequestState}
+                                onClearResponse={() => {}}
+                              />
+                            {/if}
+                            <div style="flex:1; overflow:auto;">
+                              <ResponseBody
+                                response={selectedNode?.response}
+                                apiState={responseState}
+                              />
+                            </div>
+                          {:else if responseNavigation === "Headers"}
+                            <div style="flex:1; overflow:auto;">
+                              <ResponseHeaders
+                                responseHeader={selectedNode?.response.headers}
+                              />
+                            </div>
+                          {/if}
+                        </div>
+                      {/if}
+                    </div>
+                  </div>
+                </div>
+              </div>
             {:else}
               <div class="p-2" style="">
                 <RequestNavigatorTestFlow

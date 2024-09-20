@@ -111,7 +111,9 @@
                             Number(request.status.split(' ')[0]) < 300
                               ? 'getColor'
                               : 'deleteColor'}"
-                            >{request.status.split(" ")[0]}</span
+                            >{request.status === ResponseStatusCode.ERROR
+                              ? "ERR"
+                              : request.status.split(" ")[0]}</span
                           >
                           <span
                             style="padding: 0px 2px; width: 40px; text-align: right;"

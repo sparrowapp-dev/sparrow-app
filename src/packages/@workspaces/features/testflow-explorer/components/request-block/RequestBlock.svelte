@@ -16,6 +16,7 @@
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { testFlowDataStore } from "@workspaces/features/socket-explorer/store/testflow";
+  import { createDeepCopy } from "$lib/utils/helpers";
 
   export let data: {
     onCheckEdges: (id: string) => boolean;
@@ -65,10 +66,9 @@
       if (testflowStore?.nodes?.length >= 1) {
         testflowStore?.nodes?.forEach((element) => {
           if (element.id === id) {
-            currentBlock = element;
-            if (currentBlock?.response?.status === "Not Found") {
-              currentBlock.response.status =
-                ResponseStatusCode.INTERNAL_SERVER_ERROR;
+            currentBlock = createDeepCopy(element);
+            if (currentBlock?.response?.status === ResponseStatusCode.ERROR) {
+              currentBlock.response.status = "ERR";
             }
           }
         });
