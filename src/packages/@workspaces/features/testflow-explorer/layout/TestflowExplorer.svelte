@@ -506,6 +506,7 @@
   }
 
   .request-rhs-container {
+    height: 224px;
     overflow: auto;
     width: calc(100% - 190px);
   }
