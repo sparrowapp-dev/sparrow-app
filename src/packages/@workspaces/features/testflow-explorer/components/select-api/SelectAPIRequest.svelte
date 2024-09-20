@@ -63,7 +63,7 @@
       selectedFolder = null;
     }
   };
-  let dropdownRef;
+  let dropdownRef: HTMLElement;
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
