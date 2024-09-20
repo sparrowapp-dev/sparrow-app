@@ -7,6 +7,9 @@
     RequestBlock,
     RequestBodyTestFlow,
     RunHistory,
+    RequestHeaderTestFlow,
+    RequestParameterTestFlow,
+    RequestNavigatorTestFlow,
   } from "../components";
   import { RequestSectionEnum, type Tab } from "@common/types/workspace";
 
@@ -23,9 +26,6 @@
     CrossIcon,
     VectorIcon,
   } from "@library/icons";
-  import RequestNavigatorTestFlow from "../components/request-navigator/RequestNavigatorTestFlow.svelte";
-  import RequestParameterTestFlow from "../components/request-parameter/RequestParameterTestFlow.svelte";
-  import RequestHeaderTestFlow from "../components/request-header/RequestHeaderTestFlow.svelte";
   import { RunIcon } from "@library/icons";
   export let tab: Observable<Tab>;
   export let onUpdateNodes;
@@ -254,6 +254,7 @@
       testflowStore?.nodes?.forEach((element) => {
         if (element.id === selectedNodeId) {
           selectedNode = element;
+          console.log("This is selcted node", selectedNode);
         }
       });
     }
@@ -303,7 +304,7 @@
     } else if (tab === "Headers") {
       requestNavigation = "Headers";
     } else {
-      requestNavigation = "Parameters"; // If the input is neither "body" nor "header"
+      requestNavigation = "Parameters";
     }
 
     return requestNavigation;
@@ -368,28 +369,37 @@
     <div class="request-container" style="">
       <div
         class="rounded-2"
-        style="background-color:#121212; border:1px solid #2A2C3C;  margin:10px; margin-top:15px; height:268px;"
+        style="background-color:var(--bg-secondary-850); border:1px solid var(--border-tertiary-300);  margin:10px; margin-top:15px; height:268px;"
       >
         <!-- Requet Nav -->
         <div
           class="d-flex align-items-center justify-content-between p-1 ps-2 pe-2"
-          style="34px; background-color:#2A2C3C; border-bottom:1px solid #4B4F6B ; "
+          style="height:34px; background-color:var(--bg-tertiary-300); border-bottom:1px solid #4B4F6B ; "
         >
-          <div class="d-flex align-items-center gap-2">
-            <VectorIcon
-              height={"14"}
-              width={"14"}
-              color={"var(--icon-primary-300)"}
-            />
-            <div class="d-flex gap-3">
-              {selectedNode?.request?.property?.request?.method}
-              {selectedNode?.request?.name}
-            </div>
+          <div
+            class="d-flex align-items-center justify-content-start gap-2"
+            style="width:calc(100% - 50px)"
+          >
             <p
-              class="mb-0 pb-0 text-fs-12"
-              style="font-weight: 500; color:#D7D7D7;"
+              class="text-fs-10 mb-0 pb-0"
+              style="color:var(--text-secondary-270); margin-bottom:0px; padding-bottom:0px;"
             >
-              <!-- REST API REQUEST -->
+              {selectedNode?.request?.property?.request?.method}
+            </p>
+            <p
+              class="text-fs-12 mb-0 pb-0 ellipsis"
+              style="color:var(--text-secondary-270); margin-bottom:0px; padding-bottom:0px;"
+            >
+              {selectedNode?.request?.name}
+            </p>
+            <div
+              style="height: 12px; width:1px; background-color:#D7D7D7; border:1px solid #D7D7D7 "
+            ></div>
+            <p
+              class="text-fs-12 mb-0 pb-0 ellipsis"
+              style="color:var(--text-secondary-270); font-weight:400;"
+            >
+              {selectedNode?.request?.property?.request?.url}
             </p>
           </div>
           <div class="d-flex gap-2 align-items-center" style="cursor:pointer">
@@ -405,12 +415,26 @@
         >
           <!-- Sidebar -->
           <div
-            style="max-height:224px; height:224px; min-width:187px; background-color: #22232E;  border-radius:2px; margin:4px;"
+            style="max-height:224px; height:224px; min-width:187px; width:187px; background-color: #22232E;  border-radius:2px; margin:1px;"
             class=""
           >
-            <div>
-              <p class="text-fs-12 p-1 ms-1 mt-2" style="color:#D7D7D7">
+            <div class="d-flex align-items-center gap-2 p-1 ms-1 mt-2">
+              <!-- <p class="text-fs-12 p-1 ms-1 mt-2" style="color:#D7D7D7">
                 Select an API request
+              </p> -->
+
+              <p
+                class="text-fs-10 mb-0 pb-0"
+                style="color:#D7D7D7; margin-bottom:0px; padding-bottom:0px;"
+              >
+                {selectedNode?.request?.property?.request?.method}
+              </p>
+
+              <p
+                class="text-fs-12 mb-0 pb-0 ellipsis pe-3"
+                style="color:#D7D7D7; margin-bottom:0px; padding-bottom:0px;"
+              >
+                {selectedNode?.request?.name}
               </p>
             </div>
 
@@ -509,6 +533,11 @@
   .button-hover:hover {
     background-color: #3e3f51;
   }
+  .request-url {
+    width: calc(100% - 200px);
+    word-break: keep-all;
+    margin-bottom: 0px;
+  }
 
   .request-rhs-container {
     overflow: auto;
@@ -521,7 +550,7 @@
   .request-container {
     position: absolute;
     bottom: 0px;
-    background-color: #151515;
+    background-color: var(--bg-secondary-800);
     width: 100%;
   }
   .run-btn {

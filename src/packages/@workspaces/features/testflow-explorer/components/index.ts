@@ -4,3 +4,4 @@ export { default as RequestBodyTestFlow } from "./request-body/RequestBodyTestFl
 export { default as RequestHeaderTestFlow } from "./request-header/RequestHeaderTestFlow.svelte";
 export { default as RequestParameterTestFlow } from "./request-parameter/RequestParameterTestFlow.svelte";
 export { default as RunHistory } from "./run-history/RunHistory.svelte";
+export { default as RequestNavigatorTestFlow } from "./request-navigator/RequestNavigatorTestFlow.svelte";
