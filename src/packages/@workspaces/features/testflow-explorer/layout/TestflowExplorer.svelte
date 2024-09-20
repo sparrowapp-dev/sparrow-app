@@ -255,7 +255,6 @@
   <div
     class="d-flex justify-content-between position-absolute p-3"
     style="top:0;
-  left:0;
   right:0;
   z-index:100;"
   >
@@ -273,6 +272,7 @@
             icon={RunIcon}
             iconHeight={"14px"}
             iconWidth={"14px"}
+            style="height: 36px;"
             disable={isRunDisabled}
             iconColor={"var(--icon-secondary-100)"}
             onClick={async () => {

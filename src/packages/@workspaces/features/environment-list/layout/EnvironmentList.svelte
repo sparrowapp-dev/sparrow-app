@@ -138,12 +138,12 @@
 </script>
 
 <div
-  class={`d-flex flex-column  h-100 env-sidebar  bg-secondary-900   pt-0 px-1`}
+  class={`d-flex flex-column  h-100 env-sidebar bg-secondary-900   pt-0 px-1`}
   style="font-weight: 500;"
 >
   <div
     class="d-flex align-items-center rounded-1 me-0 mb-0 pe-2"
-    style="cursor:pointer; justify-content: space-between; height:34px;
+    style="cursor:pointer; justify-content: space-between; height:32px;
       background-color: {isHovered
       ? 'var(--dropdown-option-hover)'
       : 'transparent'}; "
@@ -152,7 +152,7 @@
     on:click={toggleExpandEnvironment}
   >
     <div
-      class="d-flex align-items-center ps-3 p-2"
+      class="d-flex align-items-center ps-3 pe-1 py-1"
       style="width: calc(100% - 30px);"
     >
       <img
@@ -192,8 +192,8 @@
           on:click|stopPropagation={handleCreateEnvironment}
         >
           <PlusIcon
-            height={"18px"}
-            width={"18px"}
+            height={"22px"}
+            width={"22px"}
             color={"var( --white-color)"}
           />
         </button>
@@ -202,7 +202,7 @@
   </div>
 
   {#if isExpandEnvironment}
-    <div class="overflow-auto h-100 mb-2 ps-2" bind:this={scrollDiv}>
+    <div style="flex:1;" class="overflow-auto h-100 ps-2" bind:this={scrollDiv}>
       {#if filteredLocalEnvironment && localEnvironment.length === 0}
         {#if filteredGlobalEnvironment && filteredGlobalEnvironment.length > 0}
           <div class="mb-0">
