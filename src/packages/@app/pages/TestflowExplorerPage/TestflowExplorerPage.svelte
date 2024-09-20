@@ -19,7 +19,6 @@
   testFlowDataStore.subscribe((val) => {
     if (val) {
       testflowStore = val.get(tab?.tabId);
-      console.log(testflowStore);
     }
   });
 </script>

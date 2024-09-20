@@ -26,6 +26,7 @@
   import RequestNavigatorTestFlow from "../components/request-navigator/RequestNavigatorTestFlow.svelte";
   import RequestParameterTestFlow from "../components/request-parameter/RequestParameterTestFlow.svelte";
   import RequestHeaderTestFlow from "../components/request-header/RequestHeaderTestFlow.svelte";
+  import { RunIcon } from "@library/icons";
   export let tab: Observable<Tab>;
   export let onUpdateNodes;
   export let onUpdateEdges;
@@ -95,6 +96,7 @@
   };
   let collectionListDocument;
   let filteredCollections = writable([]);
+  let isRunDisabled = false;
 
   $: {
     if (collectionList) {
@@ -159,7 +161,7 @@
               );
             },
             collections: filteredCollections,
-            tab: tab,
+            tabId: $tab.tabId,
           },
           position: nextNodePosition,
           deletable: true,
@@ -220,6 +222,7 @@
             requestId: dbNodes[i].data?.requestId,
             folderId: dbNodes[i].data?.folderId,
             collections: filteredCollections,
+            tabId: $tab.tabId,
           },
           position: {
             x: dbNodes[i].position.x,
@@ -260,6 +263,7 @@
     startBlock: StartBlock,
     requestBlock: RequestBlock,
   };
+  let nodesValue = 1;
 
   let selectedNodeId = 0;
   const checkIfResponseExist = (id) => {
@@ -273,7 +277,7 @@
   };
   nodes.subscribe((val) => {
     if (val && val.length) onUpdateNodes(val);
-
+    nodesValue = val.length;
     // Find the node where selected is true
     let selectedNodeTrue = val.find((node) => node.selected === true);
 
@@ -318,15 +322,25 @@
       <!-- PASTE NAME CODE HERE -->
     </div>
     <div class="d-flex">
-      <div>
+      <div style="margin-right: 5px;">
         <!--PASTE RUN CODE HERE-->
-        <DropButton
-          title="Run"
-          type="default"
-          onClick={() => {
-            onClickRun();
-          }}
-        />
+        {#if nodesValue > 1}
+          <DropButton
+            title="Run"
+            type="default"
+            iconRequired={true}
+            icon={RunIcon}
+            iconHeight={"14px"}
+            iconWidth={"14px"}
+            disable={isRunDisabled}
+            iconColor={"var(--icon-secondary-100)"}
+            onClick={async () => {
+              isRunDisabled = true;
+              await onClickRun();
+              isRunDisabled = false;
+            }}
+          />
+        {/if}
       </div>
       <div>
         <!-- PASTE SAVE CODE HERE -->
