@@ -3,12 +3,10 @@
   import {
     RequestDataTypeEnum,
     ResponseFormatterEnum,
-    type Response,
-    type State,
   } from "@common/types/workspace";
   // import { SparrowLogo } from "../../assets/images";
-  export let response: Response;
-  export let apiState: State;
+  export let response;
+  export let apiState;
 
   let language = apiState.responseBodyLanguage;
   $: {

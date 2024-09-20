@@ -1,6 +1,11 @@
 <script lang="ts">
   import { writable } from "svelte/store";
-  import { SvelteFlow, Background, Controls } from "@xyflow/svelte";
+  import {
+    SvelteFlow,
+    Background,
+    type Node,
+    type NodeTypes,
+  } from "@xyflow/svelte";
 
   import {
     StartBlock,
@@ -10,7 +15,6 @@
     RequestHeaderTestFlow,
     RequestParameterTestFlow,
     RequestNavigatorTestFlow,
-    ResponseDefaultScreen,
     ResponseErrorScreen,
     ResponseStatus,
     ResponseNavigator,
@@ -18,7 +22,11 @@
     ResponseBody,
     ResponseHeaders,
   } from "../components";
-  import { RequestSectionEnum, type Tab } from "@common/types/workspace";
+  import {
+    RequestSectionEnum,
+    type CollectionDto,
+    type Tab,
+  } from "@common/types/workspace";
 
   import "@xyflow/svelte/dist/style.css";
   import { onMount } from "svelte";
@@ -31,19 +39,11 @@
     TableNavbar,
     TableSidebar,
   } from "@workspaces/common/components";
-  import {
-    ArrowOutwardIcon,
-    ArrowSplit,
-    CrossIcon,
-    VectorIcon,
-  } from "@library/icons";
   import { RunIcon } from "@library/icons";
   import { ResponseStatusCode } from "$lib/utils/enums";
-  import { bool } from "yup";
   import type {
     TFEdgeHandlerType,
     TFEdgeType,
-    TFNodeHandlerType,
     TFNodeType,
   } from "@common/types/workspace/testflow";
   import type { TFNodeStoreType } from "@workspaces/features/socket-explorer/store/testflow";
@@ -56,7 +56,7 @@
   export let testflowStore;
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
-  const nodes = writable<TFNodeHandlerType[]>([]);
+  const nodes = writable<Node[]>([]);
   const edges = writable<TFEdgeHandlerType[]>([]);
 
   let isNodesDraggable = false;
@@ -118,7 +118,7 @@
     return "";
   };
   let collectionListDocument;
-  let filteredCollections = writable([]);
+  let filteredCollections = writable<CollectionDto[]>([]);
   let isRunDisabled = false;
 
   $: {
@@ -128,7 +128,9 @@
         collectionListDocument = collectionListDocument?.filter(
           (value) => value.workspaceId === $tab?.path?.workspaceId,
         );
-        filteredCollections.set(collectionListDocument);
+        filteredCollections.set(
+          collectionListDocument as unknown as CollectionDto[],
+        );
       });
     }
   }
@@ -141,19 +143,19 @@
 
     const targetNode = findNextNodeId($nodes);
 
-    nodes.update((nodes: TFNodeHandlerType[]) => {
+    nodes.update((_nodes: Node[]) => {
       let nextNodePosition;
       // finds next node positions
-      for (let i = 0; i < nodes?.length; i++) {
-        if (nodes[i].id === _id) {
+      for (let i = 0; i < _nodes?.length; i++) {
+        if (_nodes[i].id === _id) {
           nextNodePosition = {
-            x: nodes[i].position.x + 300,
-            y: nodes[i].position.y,
+            x: _nodes[i].position.x + 300,
+            y: _nodes[i].position.y,
           };
         }
       }
       return [
-        ...nodes,
+        ...(_nodes || []),
         {
           id: targetNode,
           type: "requestBlock",
@@ -205,7 +207,7 @@
   };
 
   onMount(() => {
-    nodes.update((_nodes: TFNodeHandlerType[]) => {
+    nodes.update((_nodes: Node[]) => {
       const dbNodes = $tab?.property?.testflow?.nodes as TFNodeType[];
       let res = [];
       for (let i = 0; i < dbNodes.length; i++) {
@@ -277,8 +279,8 @@
       testflowStore?.nodes?.forEach((element: TFNodeStoreType) => {
         if (element.id === selectedNodeId) {
           selectedNode = element;
-          responseState.responseBodyLanguage =
-            selectedNode.response.responseContentType;
+          responseState.responseBodyLanguage = selectedNode.response
+            .responseContentType as string;
           responseState.responseBodyFormatter = "Pretty";
           isIdExist = true;
           console.log("This is selcted node", selectedNode);
@@ -306,13 +308,11 @@
     });
     return result;
   };
-  nodes.subscribe((val: TFNodeHandlerType[]) => {
+  nodes.subscribe((val: Node[]) => {
     if (val && val.length) onUpdateNodes(val);
     nodesValue = val.length;
     // Find the node where selected is true
-    let selectedNodeTrue = val.find(
-      (node: TFNodeHandlerType) => node.selected === true,
-    );
+    let selectedNodeTrue = val.find((node: Node) => node.selected === true);
 
     if (selectedNodeTrue) {
       selectedNodeId = selectedNodeTrue.id;
@@ -352,14 +352,18 @@
     }
     return responseNavigation;
   }
-  const onUpdateRequestState = async (_state) => {
+  const onUpdateRequestState = async (_state: Partial<TFResponseState>) => {
     responseState = {
       ...responseState,
       ..._state,
     };
   };
 
-  let responseState = {
+  interface TFResponseState {
+    responseBodyLanguage: string;
+    responseBodyFormatter: string;
+  }
+  let responseState: TFResponseState = {
     responseBodyLanguage: "",
     responseBodyFormatter: "",
   };
@@ -494,7 +498,7 @@
                   headersLength={selectedNode?.request?.property?.request
                     ?.headers?.length || 0}
                   autoGeneratedHeadersLength={selectedNode?.request?.property
-                    ?.request?.request?.autoGeneratedHeaders?.length || 0}
+                    ?.request?.autoGeneratedHeaders?.length || 0}
                   {updateActiveTabInsideRequestBody}
                   bind:requestNavigation
                 />
@@ -512,6 +516,9 @@
                       params={selectedNode?.request?.property?.request
                         ?.queryParams}
                       authParameter={{}}
+                      isBulkEditActive={false}
+                      onUpdateRequestState={() => {}}
+                      environmentVariables={[]}
                     />
                   {:else if requestNavigation === RequestSectionEnum.HEADERS}
                     <RequestHeaderTestFlow
@@ -520,6 +527,10 @@
                       autoGeneratedHeaders={selectedNode?.request?.property
                         ?.request?.autoGeneratedHeaders}
                       authHeader={{}}
+                      environmentVariables={[]}
+                      onHeadersChange={() => {}}
+                      isBulkEditActive={false}
+                      onUpdateRequestState={() => {}}
                     />
                   {/if}
                 </div>
