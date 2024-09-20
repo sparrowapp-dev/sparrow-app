@@ -39,6 +39,10 @@ export class TestflowExplorerPageViewModel {
    */
   private _decodeRequest = new DecodeRequest();
 
+  /**
+   * Constructor to initialize the TestflowExplorerPageViewModel class
+   * @param doc - TabDocument that contains information about the active tab
+   */
   public constructor(doc: TabDocument) {
     if (doc?.isActive) {
       setTimeout(() => {
@@ -49,18 +53,25 @@ export class TestflowExplorerPageViewModel {
     }
   }
 
+  /**
+   * Returns an observable that emits the current state of the tab
+   */
   public get tab(): Observable<Partial<Tab>> {
     return this._tab.asObservable();
   }
 
+  /**
+   * Sets the value of the tab and updates the observable
+   * @param value - the updated tab value
+   */
   private set tab(value: Tab) {
     this._tab.next(value);
   }
+
   /**
-   *
+   * Updates the nodes in the testflow with debounce to avoid frequent calls
    * @param _nodes - nodes of the testflow
    */
-
   private updateNodesDebounce = async (_nodes: TFNodeType[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const nodes = _nodes.map((elem) => {
@@ -83,12 +94,16 @@ export class TestflowExplorerPageViewModel {
     // this.compareRequestWithServer();
   };
 
+  /**
+   * Debounced method for updating testflow nodes
+   */
   public updateNodes = new Debounce().debounce(
     this.updateNodesDebounce as any,
     300,
   );
+
   /**
-   *
+   * Updates the edges in the testflow with debounce to avoid frequent calls
    * @param _edges - edges of the testflow
    */
   private updateEdgesDebounce = async (_edges: string) => {
@@ -99,21 +114,32 @@ export class TestflowExplorerPageViewModel {
     // this.compareRequestWithServer();
   };
 
+  /**
+   * Debounced method for updating testflow edges
+   */
   public updateEdges = new Debounce().debounce(
     this.updateEdgesDebounce as any,
     300,
   );
 
+  /**
+   * Placeholder for method to update selected API
+   */
   public updateSelectedAPI = async () => {};
 
   /**
-   * Get list of collections from current active workspace
-   * @returns - the list of collection from current active workspace
+   * Retrieves the list of collections from the current active workspace
+   * @returns - the list of collections
    */
   public getCollectionList = () => {
     return this.collectionRepository.getCollection();
   };
 
+  /**
+   * Fetches the active environments for the current workspace
+   * @param currentWorkspaceId - the current workspace ID
+   * @returns - environment variables filtered for the workspace
+   */
   private getActiveEnvironments = async (currentWorkspaceId: string) => {
     let environmentId: string;
     const activeWorkspace =
@@ -179,6 +205,9 @@ export class TestflowExplorerPageViewModel {
     return environmentVariables;
   };
 
+  /**
+   * Handles running the test flow by processing each node sequentially and recording the results
+   */
   public handleTestFlowRun = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const environments = await this.getActiveEnvironments(
@@ -395,10 +424,18 @@ export class TestflowExplorerPageViewModel {
     );
   };
 
+  /**
+   * Toggles the visibility of the history container for the test flow.
+   * If the tab data is already available, it updates the `isRunHistoryEnable` property.
+   * If the tab data is not found, it initializes it with the provided toggle state.
+   * @param _toggleState - boolean flag to enable or disable the history container.
+   */
   public toggleHistoryContainer = (_toggleState: boolean) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const progressiveTab = createDeepCopy(this._tab.getValue()); // Create a deep copy of the current tab
     testFlowDataStore.update((testFlowDataMap) => {
-      let wsData = testFlowDataMap.get(progressiveTab.tabId);
+      let wsData = testFlowDataMap.get(progressiveTab.tabId); // Retrieve data for the current tab
+
+      // Update existing data or initialize if not found
       if (wsData) {
         wsData.isRunHistoryEnable = _toggleState;
       } else {
@@ -408,18 +445,24 @@ export class TestflowExplorerPageViewModel {
           nodes: [],
         };
       }
-      testFlowDataMap.set(progressiveTab.tabId, wsData);
+      testFlowDataMap.set(progressiveTab.tabId, wsData); // Save the updated tab data
       return testFlowDataMap;
     });
   };
 
+  /**
+   * Toggles the expansion of a specific history entry in the test flow.
+   * @param _toggleState - boolean flag to expand or collapse the history details.
+   * @param _index - the index of the history entry to be toggled.
+   */
   public toggleHistoryDetails = (_toggleState: boolean, _index: number) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const progressiveTab = createDeepCopy(this._tab.getValue()); // Create a deep copy of the current tab
     testFlowDataStore.update((testFlowDataMap) => {
-      const wsData = testFlowDataMap.get(progressiveTab.tabId);
-      if (wsData) {
+      const wsData = testFlowDataMap.get(progressiveTab.tabId); // Retrieve data for the current tab
+      // If the history data exists, update the 'expand' state for the specific entry
+      if (wsData && wsData.history[_index]) {
         wsData.history[_index].expand = _toggleState;
-        testFlowDataMap.set(progressiveTab.tabId, wsData);
+        testFlowDataMap.set(progressiveTab.tabId, wsData); // Save the updated history data
       }
       return testFlowDataMap;
     });
