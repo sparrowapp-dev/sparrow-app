@@ -245,14 +245,45 @@
     });
   });
 
+  let selectedNode;
+  $: {
+    if (testflowStore || selectedNodeId) {
+      testflowStore?.nodes?.forEach((element) => {
+        if (element.id === selectedNodeId) {
+          selectedNode = element;
+        }
+      });
+    }
+  }
+
   const nodeTypes = {
     startBlock: StartBlock,
     requestBlock: RequestBlock,
   };
 
+  let selectedNodeId = 0;
+  const checkIfResponseExist = (id) => {
+    let result = false;
+    testflowStore?.nodes?.forEach((element) => {
+      if (element.id === id) {
+        result = true;
+      }
+    });
+    return result;
+  };
   nodes.subscribe((val) => {
     if (val && val.length) onUpdateNodes(val);
-    // console.log(val, "va;");
+
+    // Find the node where selected is true
+    let selectedNodeTrue = val.find((node) => node.selected === true);
+
+    if (selectedNodeTrue) {
+      if (selectedNodeTrue.data.requestId) {
+        if (checkIfResponseExist(selectedNodeTrue.id)) {
+          selectedNodeId = selectedNodeTrue.id;
+        }
+      }
+    }
   });
   edges.subscribe((val) => {
     if (val) onUpdateEdges(val);
@@ -319,139 +350,142 @@
     />
   </SvelteFlow>
 
-  <div class="request-container" style="">
-    <div
-      class="rounded-2"
-      style="background-color:#121212; border:1px solid #2A2C3C;  margin:10px; margin-top:15px;"
-    >
-      <!-- Requet Nav -->
+  {#if testflowStore?.nodes?.length >= 1 && selectedNode}
+    <div class="request-container" style="">
       <div
-        class="d-flex align-items-center justify-content-between p-1 ps-2 pe-2 "
-        style="34px; background-color:#2A2C3C; border-bottom:1px solid #4B4F6B ; "
+        class="rounded-2"
+        style="background-color:#121212; border:1px solid #2A2C3C;  margin:10px; margin-top:15px; height:268px;"
       >
-        <div class="d-flex align-items-center gap-2">
-          <VectorIcon
-            height={"14"}
-            width={"14"}
-            color={"var(--icon-primary-300)"}
-          />
-          <p
-            class="mb-0 pb-0 text-fs-12"
-            style="font-weight: 500; color:#D7D7D7;"
-          >
-            REST API REQUEST
-          </p>
-        </div>
-        <div class="d-flex gap-2 align-items-center" style="cursor:pointer">
-          <ArrowOutwardIcon width={"8px"} height={"8px"} color={"#8A9299"} />
-          <CrossIcon width={"14px"} height={"14px"} color={"#8A9299"} />
-        </div>
-      </div>
-
-      <!-- Request Body -->
-      <div
-        class="d-flex justify-content-between m-1"
-        style="max-height: 268px;"
-      >
-        <!-- Sidebar -->
+        <!-- Requet Nav -->
         <div
-          style="min-height:268px; min-width:187px; background-color: #22232E;  border-radius:2px;"
-          class=""
+          class="d-flex align-items-center justify-content-between p-1 ps-2 pe-2"
+          style="34px; background-color:#2A2C3C; border-bottom:1px solid #4B4F6B ; "
         >
-          <div>
-            <p class="text-fs-12 p-1 ms-1 mt-2" style="color:#D7D7D7">
-              Select an API request
+          <div class="d-flex align-items-center gap-2">
+            <VectorIcon
+              height={"14"}
+              width={"14"}
+              color={"var(--icon-primary-300)"}
+            />
+            <div class="d-flex gap-3">
+              {selectedNode?.request?.property?.request?.method}
+              {selectedNode?.request?.name}
+            </div>
+            <p
+              class="mb-0 pb-0 text-fs-12"
+              style="font-weight: 500; color:#D7D7D7;"
+            >
+              <!-- REST API REQUEST -->
             </p>
           </div>
-
-          <div style="cursor: pointer;">
-            <div
-              class="button-hover m-1 d-flex align-items-center justify-content-start gap-2 px-3 mb-2 {selectedTab ===
-              'response'
-                ? 'active'
-                : ''}"
-              style=" height:25px; border-radius:2px;"
-              on:click={() => {
-                selectedTab = "response";
-              }}
-            >
-              <ArrowSplit
-                height={"10"}
-                width={"10"}
-                color={"var(--icon-secondary-100)"}
-              />
-              <p class="mb-0 pb-0 text-fs-10">Response</p>
-            </div>
-            <div
-              class="button-hover m-1 d-flex align-items-center justify-content-start gap-2 px-3 mb-2 {selectedTab ===
-              'request'
-                ? 'active'
-                : ''} "
-              style=" height:25px; border-radius:2px;"
-              on:click={() => {
-                selectedTab = "request";
-              }}
-            >
-              <VectorIcon
-                height={"10"}
-                width={"10"}
-                color={"var(--icon-secondary-100)"}
-              />
-              <p class="mb-0 pb-0 text-fs-10">Request</p>
-            </div>
+          <div class="d-flex gap-2 align-items-center" style="cursor:pointer">
+            <ArrowOutwardIcon width={"8px"} height={"8px"} color={"#8A9299"} />
+            <CrossIcon width={"14px"} height={"14px"} color={"#8A9299"} />
           </div>
         </div>
 
-        <!-- Request Data -->
-        <div class="request-rhs-container">
-          {#if selectedTab === "response"}
-            <div>Response Body</div>
-          {:else}
-            <div class="p-2" style="">
-              <RequestNavigatorTestFlow
-                paramsLength={testflowStore?.nodes[0].request?.property?.request
-                  ?.queryParams?.length || 0}
-                headersLength={testflowStore?.nodes[0].request?.property
-                  ?.request?.headers?.length || 0}
-                autoGeneratedHeadersLength={testflowStore?.nodes[0].request
-                  ?.property?.request?.request?.autoGeneratedHeaders?.length ||
-                  0}
-                {updateActiveTabInsideRequestBody}
-                bind:requestNavigation
-              />
+        <!-- Request Body -->
+        <div
+          class="d-flex justify-content-between m-1"
+          style="max-height: 268px;"
+        >
+          <!-- Sidebar -->
+          <div
+            style="max-height:224px; height:224px; min-width:187px; background-color: #22232E;  border-radius:2px; margin:4px;"
+            class=""
+          >
+            <div>
+              <p class="text-fs-12 p-1 ms-1 mt-2" style="color:#D7D7D7">
+                Select an API request
+              </p>
+            </div>
 
-              <div style="flex:1; overflow:auto;" class="p-0 w-100">
-                {#if requestNavigation === RequestSectionEnum.REQUEST_BODY}
-                  <RequestBodyTestFlow
-                    body={testflowStore?.nodes[0].request?.property?.request
-                      ?.body}
-                    method={testflowStore?.nodes[0].request?.property?.request
-                      ?.method}
-                    requestState={testflowStore?.nodes[0].request?.property
-                      ?.request?.state}
-                  />
-                {:else if requestNavigation === RequestSectionEnum.PARAMETERS}
-                  <RequestParameterTestFlow
-                    params={testflowStore?.nodes[0].request?.property?.request
-                      ?.queryParams}
-                    authParameter={{}}
-                  />
-                {:else if requestNavigation === RequestSectionEnum.HEADERS}
-                  <RequestHeaderTestFlow
-                    headers={testflowStore.nodes[0].request?.property?.request
-                      ?.headers}
-                    autoGeneratedHeaders={testflowStore.nodes[0].request
-                      ?.property?.request?.autoGeneratedHeaders}
-                    authHeader={{}}
-                  />
-                {/if}
+            <div style="cursor: pointer;">
+              <div
+                class="button-hover m-1 d-flex align-items-center justify-content-start gap-2 px-3 mb-2 {selectedTab ===
+                'response'
+                  ? 'active'
+                  : ''}"
+                style=" height:25px; border-radius:2px;"
+                on:click={() => {
+                  selectedTab = "response";
+                }}
+              >
+                <ArrowSplit
+                  height={"10"}
+                  width={"10"}
+                  color={"var(--icon-secondary-100)"}
+                />
+                <p class="mb-0 pb-0 text-fs-10">Response</p>
+              </div>
+              <div
+                class="button-hover m-1 d-flex align-items-center justify-content-start gap-2 px-3 mb-2 {selectedTab ===
+                'request'
+                  ? 'active'
+                  : ''} "
+                style=" height:25px; border-radius:2px;"
+                on:click={() => {
+                  selectedTab = "request";
+                }}
+              >
+                <VectorIcon
+                  height={"10"}
+                  width={"10"}
+                  color={"var(--icon-secondary-100)"}
+                />
+                <p class="mb-0 pb-0 text-fs-10">Request</p>
               </div>
             </div>
-          {/if}
+          </div>
+
+          <!-- Request Data -->
+          <div class="request-rhs-container">
+            {#if selectedTab === "response"}
+              <div>Response Body</div>
+            {:else}
+              <div class="p-2" style="">
+                <RequestNavigatorTestFlow
+                  paramsLength={selectedNode?.request?.property?.request
+                    ?.queryParams?.length || 0}
+                  headersLength={selectedNode?.request?.property?.request
+                    ?.headers?.length || 0}
+                  autoGeneratedHeadersLength={selectedNode?.request?.property
+                    ?.request?.request?.autoGeneratedHeaders?.length || 0}
+                  {updateActiveTabInsideRequestBody}
+                  bind:requestNavigation
+                />
+
+                <div style="flex:1; overflow:auto;" class="p-0 w-100">
+                  {#if requestNavigation === RequestSectionEnum.REQUEST_BODY}
+                    <RequestBodyTestFlow
+                      body={selectedNode?.request?.property?.request?.body}
+                      method={selectedNode?.request?.property?.request?.method}
+                      requestState={selectedNode?.request?.property?.request
+                        ?.state}
+                    />
+                  {:else if requestNavigation === RequestSectionEnum.PARAMETERS}
+                    <RequestParameterTestFlow
+                      params={selectedNode?.request?.property?.request
+                        ?.queryParams}
+                      authParameter={{}}
+                    />
+                  {:else if requestNavigation === RequestSectionEnum.HEADERS}
+                    <RequestHeaderTestFlow
+                      headers={selectedNode?.request?.property?.request
+                        ?.headers}
+                      autoGeneratedHeaders={selectedNode?.request?.property
+                        ?.request?.autoGeneratedHeaders}
+                      authHeader={{}}
+                    />
+                  {/if}
+                </div>
+              </div>
+            {/if}
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  {/if}
 </div>
 
 <style>
