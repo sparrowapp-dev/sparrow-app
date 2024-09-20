@@ -3,12 +3,16 @@ import { ResponseStatusCode } from "$lib/utils/enums";
 import { environmentType } from "$lib/utils/enums";
 import { createDeepCopy } from "$lib/utils/helpers";
 import { RequestTabAdapter } from "@app/adapter";
-import type { TabDocument } from "@app/database/database";
+import type { EnvironmentDocument, TabDocument } from "@app/database/database";
 import { CollectionRepository } from "@app/repositories/collection.repository";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import type { Tab } from "@common/types/workspace";
+import type {
+  ENVDocumentType,
+  ENVExtractVariableType,
+} from "@common/types/workspace/environment";
 import type {
   TFAPIResponseType,
   TFNodeType,
@@ -19,6 +23,7 @@ import { DecodeRequest } from "@workspaces/features/rest-explorer/utils";
 import {
   testFlowDataStore,
   type TFHistoryAPIResponseStoreType,
+  type TFHistoryStoreType,
   type TFKeyValueStoreType,
 } from "@workspaces/features/socket-explorer/store/testflow";
 import { BehaviorSubject, Observable } from "rxjs";
@@ -120,13 +125,19 @@ export class TestflowExplorerPageViewModel {
     }
 
     const environments = await this.environmentRepository.getEnvironment();
-    let environmentDocuments;
+    let environmentDocuments: EnvironmentDocument[] = [];
+
     environments.subscribe((value) => {
       if (value) {
         environmentDocuments = value;
       }
     });
-    let environmentVariables;
+
+    let environmentVariables: {
+      filtered: ENVExtractVariableType[];
+    } = {
+      filtered: [],
+    };
 
     if (environmentDocuments && currentWorkspaceId) {
       if (environmentDocuments?.length > 0) {
@@ -143,15 +154,13 @@ export class TestflowExplorerPageViewModel {
             }
           });
         if (filteredEnv?.length > 0) {
-          const envs = [];
+          const envs: ENVExtractVariableType[] = [];
           filteredEnv.forEach((elem) => {
             environmentVariables = {
-              local: filteredEnv[1],
-              global: filteredEnv[0],
               filtered: [],
             };
 
-            const temp = elem.toMutableJSON();
+            const temp = elem.toMutableJSON() as ENVDocumentType;
             temp.variable.forEach((variable) => {
               if (variable.key && variable.checked) {
                 envs.unshift({
@@ -195,7 +204,7 @@ export class TestflowExplorerPageViewModel {
     let successRequests = 0;
     let failedRequests = 0;
     let totalTime = 0;
-    const history: TFHistoryType = {
+    const history: TFHistoryStoreType = {
       status: "fail",
       successRequests: "",
       failedRequests: "",
@@ -240,7 +249,13 @@ export class TestflowExplorerPageViewModel {
         const start = Date.now();
 
         try {
-          const response = await makeHttpRequestV2(...decodeData);
+          const response = await makeHttpRequestV2(
+            decodeData[0],
+            decodeData[1],
+            decodeData[2],
+            decodeData[3],
+            decodeData[4],
+          );
           const end = Date.now();
           const duration = end - start;
 
