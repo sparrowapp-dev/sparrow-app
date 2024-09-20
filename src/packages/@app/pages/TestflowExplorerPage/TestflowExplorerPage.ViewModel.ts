@@ -29,7 +29,7 @@ import {
 import { BehaviorSubject, Observable } from "rxjs";
 
 export class TestflowExplorerPageViewModel {
-  private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
+  private _tab = new BehaviorSubject<Partial<Tab>>({});
   private tabRepository = new TabRepository();
   private collectionRepository = new CollectionRepository();
   private environmentRepository = new EnvironmentRepository();
@@ -49,7 +49,7 @@ export class TestflowExplorerPageViewModel {
     }
   }
 
-  public get tab(): Observable<Tab> {
+  public get tab(): Observable<Partial<Tab>> {
     return this._tab.asObservable();
   }
 
@@ -108,7 +108,7 @@ export class TestflowExplorerPageViewModel {
 
   /**
    * Get list of collections from current active workspace
-   * @returns :Observable<CollectionDocument[]> - the list of collection from current active workspace
+   * @returns - the list of collection from current active workspace
    */
   public getCollectionList = () => {
     return this.collectionRepository.getCollection();
