@@ -19,7 +19,11 @@
   import "@xyflow/svelte/dist/style.css";
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
-  import { DropButton, TableNavbar } from "@workspaces/common/components";
+  import {
+    DropButton,
+    TableNavbar,
+    TableSidebar,
+  } from "@workspaces/common/components";
   import {
     ArrowOutwardIcon,
     ArrowSplit,
@@ -380,67 +384,7 @@
           style="max-height: 268px;"
         >
           <!-- Sidebar -->
-          <div
-            style="max-height:224px; height:224px; min-width:187px; width:187px; background-color: var(--bg-tertiary-400);  border-radius:2px; margin:1px;"
-            class=""
-          >
-            <div class="d-flex align-items-center gap-2 p-1 ms-1 mt-2">
-              <!-- <p class="text-fs-12 p-1 ms-1 mt-2" style="color:#D7D7D7">
-                Select an API request
-              </p> -->
-
-              <p
-                class="text-fs-10 mb-0 pb-0"
-                style="color:var(--text-secondary-270); margin-bottom:0px; padding-bottom:0px;"
-              >
-                {selectedNode?.request?.property?.request?.method}
-              </p>
-
-              <p
-                class="text-fs-12 mb-0 pb-0 ellipsis pe-3"
-                style="color:var(--text-secondary-270); margin-bottom:0px; padding-bottom:0px;"
-              >
-                {selectedNode?.request?.name}
-              </p>
-            </div>
-
-            <div style="cursor: pointer;">
-              <div
-                class="button-hover m-1 d-flex align-items-center justify-content-start gap-2 px-3 mb-2 {selectedTab ===
-                'response'
-                  ? 'active'
-                  : ''}"
-                style=" height:25px; border-radius:2px;"
-                on:click={() => {
-                  selectedTab = "response";
-                }}
-              >
-                <ArrowSplit
-                  height={"10"}
-                  width={"10"}
-                  color={"var(--icon-secondary-100)"}
-                />
-                <p class="mb-0 pb-0 text-fs-10">Response</p>
-              </div>
-              <div
-                class="button-hover m-1 d-flex align-items-center justify-content-start gap-2 px-3 mb-2 {selectedTab ===
-                'request'
-                  ? 'active'
-                  : ''} "
-                style=" height:25px; border-radius:2px;"
-                on:click={() => {
-                  selectedTab = "request";
-                }}
-              >
-                <VectorIcon
-                  height={"10"}
-                  width={"10"}
-                  color={"var(--icon-secondary-100)"}
-                />
-                <p class="mb-0 pb-0 text-fs-10">Request</p>
-              </div>
-            </div>
-          </div>
+          <TableSidebar {selectedNode} bind:selectedTab />
 
           <!-- Request Data -->
           <div class="request-rhs-container">

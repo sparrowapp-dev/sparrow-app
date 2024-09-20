@@ -8,3 +8,4 @@ export { default as TabularInputV2 } from "./tabular-input-v2/TabularInputV2.sve
 export { default as DropButton } from "./drop-button/DropButton.svelte";
 export { default as ComboText } from "./combo-text/ComboText.svelte";
 export { default as TableNavbar } from "./table-navbar/TableNavbar.svelte";
+export { default as TableSidebar } from "./table-sidebar/TableSidebar.svelte";
