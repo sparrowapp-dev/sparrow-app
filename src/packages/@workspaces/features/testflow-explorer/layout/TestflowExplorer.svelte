@@ -31,6 +31,8 @@
     VectorIcon,
   } from "@library/icons";
   import { RunIcon } from "@library/icons";
+  import { Modal } from "@library/ui";
+  import DeleteNode from "@workspaces/common/components/delete-node/DeleteNode.svelte";
   export let tab: Observable<Tab>;
   export let onUpdateNodes;
   export let onUpdateEdges;
@@ -114,6 +116,16 @@
     }
   }
 
+  let deletedNodeId: number;
+  let deleteNodeName: "";
+
+  const handleChange = (id, name) => {
+    isDeleteNodeModalOpen = true;
+    deletedNodeId = id;
+    deleteNodeName = name;
+    console.log("This is name of thenode that is to be delte ", deleteNodeName);
+  };
+
   const createNewNode = (_id: string) => {
     if (!_id) return;
     if (checkIfEdgesExist(_id)) {
@@ -164,11 +176,14 @@
                 folderId,
               );
             },
+            onOpenDeleteModal: function (id, name) {
+              handleChange(id, name);
+            },
             collections: filteredCollections,
             tabId: $tab.tabId,
           },
           position: nextNodePosition,
-          deletable: true,
+          deletable: false,
           draggable: isNodesDraggable, // Disable dragging for this node
         },
       ];
@@ -220,6 +235,9 @@
                 folderId,
               );
             },
+            onOpenDeleteModal: function (id: number, name: string) {
+              handleChange(id, name);
+            },
             name: dbNodes[i].data?.name,
             method: dbNodes[i].data?.method,
             collectionId: dbNodes[i].data?.collectionId,
@@ -232,7 +250,7 @@
             x: dbNodes[i].position.x,
             y: dbNodes[i].position.y,
           },
-          deletable: dbNodes[i].id === "1" ? false : true,
+          deletable: dbNodes[i].id === "1" ? false : false,
           draggable: isNodesDraggable, // Disable dragging for this node
         });
       }
@@ -254,6 +272,7 @@
 
   let selectedNode;
   $: {
+    console.log("this is sleecte nod id eout side the dollar", selectedNodeId);
     if (testflowStore || selectedNodeId) {
       testflowStore?.nodes?.forEach((element) => {
         if (element.id === selectedNodeId) {
@@ -271,6 +290,7 @@
   let nodesValue = 1;
 
   let selectedNodeId = 0;
+  let currentSelectedNode = 0;
   const checkIfResponseExist = (id) => {
     let result = false;
     testflowStore?.nodes?.forEach((element) => {
@@ -284,12 +304,14 @@
     if (val && val.length) onUpdateNodes(val);
     nodesValue = val.length;
     // Find the node where selected is true
-    let selectedNodeTrue = val.find((node) => node.selected === true);
+    currentSelectedNode = val.find((node) => node.selected === true);
 
-    if (selectedNodeTrue) {
-      if (selectedNodeTrue.data.requestId) {
-        if (checkIfResponseExist(selectedNodeTrue.id)) {
-          selectedNodeId = selectedNodeTrue.id;
+    console.log("This is current slecte node", currentSelectedNode);
+
+    if (currentSelectedNode) {
+      if (currentSelectedNode.data.requestId) {
+        if (checkIfResponseExist(currentSelectedNode.id)) {
+          selectedNodeId = currentSelectedNode.id;
         }
       }
     }
@@ -313,6 +335,34 @@
 
     return requestNavigation;
   }
+
+  let isDeleteNodeModalOpen = false;
+
+  const handleDeleteNode = (id) => {
+    console.log("Inside handle Delete Node, this is id ->", id);
+
+    // Step 1: Remove the node with the given ID from the nodes store
+    nodes.update((_nodes) => {
+      // Filter out the node with the matching id
+      return _nodes.filter((node) => node.id < id);
+    });
+
+    // Step 2: Remove any edges that are connected to the node
+    edges.update((_edges) => {
+      return _edges.filter((edge) => edge.source !== id && edge.target < id);
+    });
+
+    isDeleteNodeModalOpen = false;
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === "Backspace") {
+      event.preventDefault();
+    }
+    if (event.key === "Delete") {
+      handleChange(currentSelectedNode.id, currentSelectedNode.name);
+    }
+  };
 </script>
 
 <div class="h-100 position-relative">
@@ -435,6 +485,27 @@
     </div>
   {/if}
 </div>
+<svelte:window on:keydown={handleKeyPress} />
+
+<Modal
+  title={"Delete Node"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isDeleteNodeModalOpen}
+  handleModalState={(flag) => {
+    isDeleteNodeModalOpen = flag;
+  }}
+>
+  <DeleteNode
+    {deletedNodeId}
+    {deleteNodeName}
+    {handleDeleteNode}
+    handleModalState={(flag) => {
+      isDeleteNodeModalOpen = flag;
+    }}
+  />
+</Modal>
 
 <style>
   :global(.svelte-flow__attribution) {
