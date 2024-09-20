@@ -17,9 +17,11 @@
 
   import { ErrorInfoIcon, Information } from "@library/icons";
 
-  let enableKeyValueHighlighting = true;
   import { Editor } from "@library/forms";
-    import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
+  import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
+  import LazyElement from "./LazyElement.svelte";
+
+  let enableKeyValueHighlighting = true;
 
   type Mode = "READ" | "WRITE";
 
@@ -405,183 +407,21 @@
           </div>
         {/if}
         {#each pairs as element, index (index)}
-          <div
-            aria-label="Toggle Hover"
-            class="sortable > div pair-container"
-            style=" width:100%;"
-            data-list-key={JSON.stringify({
-              name: element.key,
-              description: element.value,
-              checked: element.checked,
-            })}
-          >
-            <div
-              style="padding-top: 1px;  display: flex;flex-direction: column;width:100%;"
-            >
-              <div
-                class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
-                style="padding-top:3px; padding-bottom:3px; height:24px; padding-bottom:3px;"
-              >
-                <img
-                  src={dragIcon}
-                  alt=""
-                  class="d-none"
-                  style="cursor:grabbing;"
-                />
-                <div style="width:30px;">
-                  {#if pairs.length - 1 != index || mode === "READ"}
-                    <label class="container">
-                      <input
-                        type="checkbox"
-                        bind:checked={element.checked}
-                        on:input={() => {
-                          updateCheck(index);
-                        }}
-                      />
-                      <span class="checkmark"></span>
-                    </label>
-                  {/if}
-                </div>
-
-                <div class=" d-flex gap-0" style="width:calc(100% - 120px);">
-                  <div class="w-50 position-relative">
-                    <CodeMirrorInput
-                      bind:value={element.key}
-                      onUpdateInput={() => {
-                        updateParam(index);
-                      }}
-                      disabled={mode == "READ" ? true : false}
-                      placeholder={"Add Key"}
-                      {theme}
-                      {environmentVariables}
-                      {onUpdateEnvironment}
-                    />
-                  </div>
-                  {#if type === "file"}
-                    <div class="w-50">
-                      <div
-                        class="position-relative rounded p-1 d-flex backgroundColor"
-                        style="height: 27px;"
-                      >
-                        {#if element.value === ""}
-                          <input
-                            type="text"
-                            class="form-control keyValuePair py-1"
-                            readonly
-                            style="z-index:4; font-size:13px;
-                  position: absolute;
-                    top:0;
-                    left:0;
-                    right:0;
-                    bottom:-1;"
-                            placeholder="Choose File"
-                          />
-                          <input
-                            class="form-input"
-                            type="text"
-                            id="formdata-file"
-                            on:click={() => {
-                              uploadFormFile(index);
-                            }}
-                            style="opacity: 0;
-                    position: absolute;
-                    top:0;
-                    left:0;
-                    right:0;
-                    bottom:0;
-                    z-index:10;
-                    "
-                          />
-                        {:else}
-                          <input
-                            type="text"
-                            class="keyValuePair py-1"
-                            readonly
-                            style="z-index:4; font-size:13px;
-                  position: absolute;
-                    top:0;
-                    left:0;
-                    right:0;
-                    bottom:-1;"
-                            placeholder=""
-                          />
-                          <div
-                            class="position-absolute"
-                            style="height:18px; z-index: 5;
-                   
-                    font-size:13px;
-                 
-                    top:0;
-                    left:0px;"
-                          >
-                            <span style="font-size:10px;" class="m-1"
-                              >{element.value}</span
-                            >
-                            <img
-                              src={close}
-                              alt=""
-                              style="cursor:pointer;"
-                              on:click={() => {
-                                removeFormFile(index);
-                              }}
-                            />
-                          </div>
-                        {/if}
-                      </div>
-                    </div>
-                  {:else}
-                    <div class="w-50 position-relative">
-                      <CodeMirrorInput
-                        bind:value={element.value}
-                        onUpdateInput={() => {
-                          updateParam(index);
-                        }}
-                        placeholder={"Add Value"}
-                        disabled={mode == "READ" ? true : false}
-                        {theme}
-                        {environmentVariables}
-                        {onUpdateEnvironment}
-                      />
-                    </div>
-                  {/if}
-                </div>
-                {#if pairs.length - 1 != index}
-                  <div
-                    class="h-70 pe-1 d-flex justify-content-center align-items-center"
-                  >
-                    <button
-                      class="bg-secondary-700 border-0"
-                      style="width:40px;"
-                    >
-                      {#if mode !== "READ"}
-                        <Tooltip
-                          title={"Delete"}
-                          placement={"left"}
-                          distance={10}
-                        >
-                          <img
-                            class="trash-icon"
-                            src={trashIcon}
-                            on:click={() => {
-                              deleteParam(index);
-                            }}
-                            alt=""
-                          />
-                        </Tooltip>
-                      {/if}
-                    </button>
-                  </div>
-                {:else}
-                  <div class="h-75 pe-1">
-                    <button
-                      class="bg-backgroundColor border-0"
-                      style="width:40px;"
-                    />
-                  </div>
-                {/if}
-              </div>
-            </div>
-          </div>
+          <LazyElement
+            {element}
+            {index}
+            {pairs}
+            {mode}
+            {type}
+            {theme}
+            {environmentVariables}
+            {onUpdateEnvironment}
+            {updateParam}
+            {updateCheck}
+            {uploadFormFile}
+            {removeFormFile}
+            {deleteParam}
+          />
         {/each}
       </div>
     </div>
@@ -726,13 +566,14 @@
 
         <!-- Bulk Edit TextArea starts -->
         <div style="height:100%">
-          {#if isBulkEditLoaded}           
+          {#if isBulkEditLoaded}
             <BulkEditEditor
-            bind:value={bulkText}
-            on:change={handleBulkTextarea}
-            {enableKeyValueHighlighting}
-            class={`px-2 sparrow-fs-18 outline-none`}
-            placeholder={bulkEditPlaceholder}/>
+              bind:value={bulkText}
+              on:change={handleBulkTextarea}
+              {enableKeyValueHighlighting}
+              class={`px-2 sparrow-fs-18 outline-none`}
+              placeholder={bulkEditPlaceholder}
+            />
           {/if}
         </div>
         <!-- Bulk Edit TextArea end -->
