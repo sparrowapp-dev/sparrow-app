@@ -276,10 +276,51 @@
     collection = data.collection;
 
     createNewNode($nodes.length.toString());
+    nodes.update((nodes) =>
+      nodes.map((node, index, array) => ({
+        ...node,
+        data: {
+          ...node.data,
+          parentDrag: false,
+          isLastNode: index === array.length - 1,
+        },
+      })),
+    );
   }
+
+  const handleDragEnter = () => {
+    nodes.update((nodes) => {
+      return nodes.map((node, index, array) => ({
+        ...node,
+        data: {
+          ...node.data,
+          isLastNode: index === array.length - 1,
+          parentDrag: index === array.length - 1,
+        },
+      }));
+    });
+  };
+
+  const handleDragEnd = () => {
+    nodes.update((nodes) =>
+      nodes.map((node, index, array) => ({
+        ...node,
+        data: {
+          ...node.data,
+          parentDrag: false,
+          isLastNode: index === array.length - 1,
+        },
+      })),
+    );
+  };
 </script>
 
-<div class="h-100 position-relative" on:drop={(e) => drop(e)}>
+<div
+  class="h-100 position-relative"
+  on:dragleave={handleDragEnd}
+  on:drop={(e) => drop(e)}
+  on:dragenter={handleDragEnter}
+>
   <div
     class="d-flex justify-content-between position-absolute p-3"
     style="top:0;
