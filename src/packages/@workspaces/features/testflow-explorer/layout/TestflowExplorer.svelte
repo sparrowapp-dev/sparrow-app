@@ -48,7 +48,6 @@
     TFResponseStateType,
   } from "@common/types/workspace/testflow";
   import type { TFNodeStoreType } from "@workspaces/features/socket-explorer/store/testflow";
-  import { collections } from "@common/components/sidebar/common";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;

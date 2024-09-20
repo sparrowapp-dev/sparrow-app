@@ -15,13 +15,20 @@
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import { testFlowDataStore } from "@workspaces/features/socket-explorer/store/testflow";
+  import {
+    testFlowDataStore,
+    type TFDataStoreType,
+    type TFNodeStoreType,
+  } from "@workspaces/features/socket-explorer/store/testflow";
   import { createDeepCopy } from "$lib/utils/helpers";
 
+  /**
+   * The data object containing various handlers and data stores.
+   */
   export let data: {
     onCheckEdges: (id: string) => boolean;
-    name?: string;
-    method?: string;
+    name: string;
+    method: string;
     onClick: (id: string) => void;
     onUpdateSelectedAPI: (
       id: string,
@@ -34,10 +41,23 @@
     tabId: string;
     collections: Observable<CollectionDocument[]>;
   };
+
+  /**
+   * The unique identifier for the current block.
+   */
   export let id;
 
-  let isAddBlockVisible = false;
-  let isRunTextVisible = false;
+  let isAddBlockVisible = false; // State to track visibility of add block button
+  let isRunTextVisible = false; // State to track visibility of run text
+
+  /**
+   * Updates the node when an API is selected.
+   * @param name - The name of the API.
+   * @param requestId - The request ID.
+   * @param collectionId - The collection ID.
+   * @param method - The HTTP method.
+   * @param [folderId] - Optional folder ID.
+   */
   const updateNode = (
     name: string,
     requestId: string,
@@ -58,11 +78,15 @@
 
   let isCreateBlockArrowHovered = false;
 
-  let testflowStore;
-  let currentBlock;
+  let testflowStore: TFDataStoreType;
+  let currentBlock: TFNodeStoreType | undefined;
+
+  /**
+   * Testflow store subscriber to get current node status
+   */
   const testFlowDataStoreSubscriber = testFlowDataStore.subscribe((val) => {
     if (val) {
-      testflowStore = val.get(data.tabId);
+      testflowStore = val.get(data.tabId) as TFDataStoreType;
       if (testflowStore?.nodes?.length >= 1) {
         testflowStore?.nodes?.forEach((element) => {
           if (element.id === id) {
@@ -80,9 +104,16 @@
     }
   });
   onDestroy(() => {
+    // Clean up the subscription on component destruction
     testFlowDataStoreSubscriber();
   });
-  const checkIfRequestSucceed = (currentBlock) => {
+
+  /**
+   * Checks if the current request was successful based on the response status.
+   * @param currentBlock - The current block of the test flow.
+   * @returns True if the request succeeded, false otherwise.
+   */
+  const checkIfRequestSucceed = (currentBlock: TFNodeStoreType) => {
     if (
       Number(currentBlock?.response?.status.split(" ")[0]) >= 200 &&
       Number(currentBlock?.response?.status.split(" ")[0]) < 300
@@ -104,6 +135,7 @@
   }}
 >
   <Handle type="target" position={Position.Left} />
+  <!-- Block Header -->
   <div class="px-3 py-2">
     <span class="text-fs-12 text-fs-10">
       {#if !currentBlock}
@@ -120,7 +152,9 @@
       <span class="ms-2">REST API Request</span>
     </span>
   </div>
+  <!-- ------------ -->
   <hr class="my-0" />
+  <!-- Select API option -->
   <div class="px-3 py-2">
     <SelectApiRequest
       {updateNode}
@@ -137,6 +171,8 @@
       {/if}
     {/if}
   </div>
+  <!-- ------------ -->
+  <!-- Block footer -->
   {#if currentBlock}
     <div class="px-3 pb-2 d-flex">
       <!-- Response status -->
@@ -175,7 +211,9 @@
       </span>
     </div>
   {/if}
+  <!-- ------------- -->
   <Handle type="source" position={Position.Right} />
+  <!-- Circular arrow button by clicking this a new block adds -->
   {#if isAddBlockVisible}
     <div class="add-block-btn py-5 ps-2 pe-5" style="position: absolute;   ">
       <span
@@ -207,7 +245,8 @@
       </span>
     </div>
   {/if}
-  <!-- Dummy Add block -->
+  <!-- ------------------- -->
+  <!-- Dummy Add API block -->
   {#if isCreateBlockArrowHovered && isAddBlockVisible}
     <div
       class="position-absolute d-flex align-items-center"
@@ -239,7 +278,7 @@
       </div>
     </div>
   {/if}
-  <!------------------->
+  <!-- ----------------- -->
 </div>
 
 <style lang="scss">
