@@ -24,7 +24,7 @@
   {onClick}
   {disable}
   {loader}
-  buttonSize={"37px"}
+  buttonSize={"36px"}
   iconSize={"20px"}
   borderRadius={"2px"}
   defaultBackgroundColor={"var(--bg-secondary-970)"}

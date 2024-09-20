@@ -16,6 +16,9 @@
   export let iconHeight = "14px";
   export let iconWidth = "14px";
 
+  let componentStyle = "";
+  export { componentStyle as style };
+
   enum BtnType {
     DEFAULT = "default",
   }
@@ -36,7 +39,7 @@
 <button
   disabled={disable}
   class={`border-0`}
-  style="background-color: transparent;"
+  style="background-color: transparent; {componentStyle}"
 >
   <div
     class="d-flex justify-content-center h-100 border-radius-2 overflow-hidden"
