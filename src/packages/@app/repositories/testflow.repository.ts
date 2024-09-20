@@ -1,5 +1,5 @@
 import { RxDB } from "@app/database/database";
-import type { TFJSONDocType, TFObsDocType } from "@common/models/testflow";
+import type { TFJSONDocType, TFObsDocType } from "@app/models/testflow.model";
 import type { Observable } from "rxjs";
 
 export class TestflowRepository {

@@ -55,7 +55,10 @@ import {
   type GuestUserDocType,
 } from "@app/models/guest-user.model";
 import { updatesSchema, type UpdatesDocType } from "@app/models/updates.model";
-import { TestflowSchema, type TFContainerType } from "@common/models/testflow";
+import {
+  TestflowSchema,
+  type TFContainerType,
+} from "@app/models/testflow.model";
 // import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 // addRxPlugin(RxDBDevModePlugin);
 

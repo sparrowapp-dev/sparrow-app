@@ -4,7 +4,7 @@ import { InitTab } from "@common/factory";
 import { v4 as uuidv4 } from "uuid";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TestflowRepository } from "@app/repositories/testflow.repository";
-import type { TFJSONDocType } from "@common/models/testflow";
+import type { TFJSONDocType } from "@app/models/testflow.model";
 import { TestflowDefault } from "@common/types/workspace/testflow";
 
 export class TestflowViewModel {
