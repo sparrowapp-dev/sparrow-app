@@ -241,7 +241,6 @@ export class TestflowExplorerPageViewModel {
 
         try {
           const response = await makeHttpRequestV2(...decodeData);
-          console.log("ggggggggggggg", response);
           const end = Date.now();
           const duration = end - start;
 
@@ -276,8 +275,6 @@ export class TestflowExplorerPageViewModel {
                       formattedHeaders,
                     ),
                 };
-                console.log(formattedHeaders, "formathead");
-                console.log(resData);
 
                 if (
                   Number(resData.status.split(" ")[0]) >= 200 &&
