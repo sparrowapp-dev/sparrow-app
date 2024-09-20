@@ -21,6 +21,7 @@
     type TFNodeStoreType,
   } from "@workspaces/features/socket-explorer/store/testflow";
   import { createDeepCopy } from "$lib/utils/helpers";
+  import { ParseTime } from "@common/utils";
 
   /**
    * The data object containing various handlers and data stores.
@@ -108,6 +109,8 @@
     testFlowDataStoreSubscriber();
   });
 
+  const parseTime = new ParseTime();
+
   /**
    * Checks if the current request was successful based on the response status.
    * @param currentBlock - The current block of the test flow.
@@ -177,9 +180,9 @@
     <div class="px-3 pb-2 d-flex">
       <!-- Response status -->
       <span
-        class="d-flex align-items-center me-2 text-fs-8 text-{Number(
-          currentBlock?.response?.status.split(' ')[0],
-        ) >= 200 && Number(currentBlock?.response?.status.split(' ')[0]) < 300
+        class="d-flex align-items-center me-2 text-fs-8 text-{checkIfRequestSucceed(
+          currentBlock,
+        )
           ? 'getColor'
           : 'deleteColor'}"
       >
@@ -206,7 +209,7 @@
           width={"7px"}
         />
         <span class="ms-1">
-          {currentBlock?.response?.time + " ms" || ""}
+          {parseTime.convertMilliseconds(currentBlock?.response?.time) || ""}
         </span>
       </span>
     </div>

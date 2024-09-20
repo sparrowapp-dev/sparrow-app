@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { getMethodStyle } from "$lib/utils/helpers";
   import {
     CheckIcon2,
@@ -16,6 +16,20 @@
   export let testflowName = "";
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
+
+  /**
+   * Checks if the current request was successful based on the response status.
+   * @param _status - The current status of the request.
+   * @returns True if the request succeeded, false otherwise.
+   */
+  const checkIfRequestSucceed = (_status: string) => {
+    if (
+      Number(_status.split(" ")[0]) >= 200 &&
+      Number(_status.split(" ")[0]) < 300
+    )
+      return true;
+    return false;
+  };
 </script>
 
 <div class="position-relative">
@@ -105,10 +119,9 @@
                           >
                           <span
                             style="padding: 0px 2px; width: 20px;"
-                            class="text-fs-8 bg-tertiary-190 text-center text-{Number(
-                              request.status.split(' ')[0],
-                            ) >= 200 &&
-                            Number(request.status.split(' ')[0]) < 300
+                            class="text-fs-8 bg-tertiary-190 text-center text-{checkIfRequestSucceed(
+                              request?.status,
+                            )
                               ? 'getColor'
                               : 'deleteColor'}"
                             >{request.status === ResponseStatusCode.ERROR
@@ -117,10 +130,9 @@
                           >
                           <span
                             style="padding: 0px 2px; width: 40px; text-align: right;"
-                            class="text-fs-8 text-{Number(
-                              request.status.split(' ')[0],
-                            ) >= 200 &&
-                            Number(request.status.split(' ')[0]) < 300
+                            class="text-fs-8 text-{checkIfRequestSucceed(
+                              request?.status,
+                            )
                               ? 'getColor'
                               : 'deleteColor'}">{request.time}</span
                           >
@@ -160,7 +172,7 @@
                     style="height:14px; width:14px; top:0; left: -8px; border-radius:50%; overflow:hidden;
                 border: 1px solid var(--border-secondary-50);"
                   >
-                    {#if history.status === "pass"}
+                    {#if history?.status === "pass"}
                       <CheckIcon2
                         height={"8px"}
                         width={"8px"}
