@@ -7,6 +7,8 @@ export interface TFNodeType {
     requestId: string;
     folderId: string;
     collectionId: string;
+    name: string;
+    method: string;
   };
   position: {
     x: number;
@@ -53,4 +55,42 @@ export interface TFAPIResponseType {
   body: string;
   headers: object;
   status: string;
+}
+
+export interface TFNodeHandlerType {
+  id: string;
+  type: string;
+  data: {
+    requestId: string;
+    folderId: string;
+    collectionId: string;
+    blocks: any;
+    connector: any;
+    onClick: any;
+    onCheckEdges: any;
+    onUpdateSelectedAPI: any;
+    name: string;
+    method: string;
+    collections: any;
+    tabId: string;
+  };
+  selected: boolean;
+  position: {
+    x: number;
+    y: number;
+  };
+  deletable: string;
+  draggable: string;
+}
+
+export interface TFEdgeHandlerType {
+  id: string;
+  source: string;
+  target: string;
+}
+
+export interface TFEdgeType {
+  id: string;
+  source: string;
+  target: string;
 }

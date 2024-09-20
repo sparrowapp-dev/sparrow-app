@@ -119,8 +119,6 @@ const schemaTyped = toTypedRxJsonSchema(TestflowSchemaLiteral);
 export type TFJSONDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
   typeof schemaTyped
 >;
-export type TFNodesType = TFJSONDocType["nodes"][number];
-export type TFEdgesType = TFJSONDocType["edges"][number];
 export type TFObsDocType = RxDocument<TFJSONDocType>;
 export type TFContainerType = RxCollection<TFJSONDocType>;
 

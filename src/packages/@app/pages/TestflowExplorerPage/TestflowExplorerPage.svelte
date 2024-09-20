@@ -3,7 +3,10 @@
   import { TestflowExplorerPageViewModel } from "./TestflowExplorerPage.ViewModel";
   import { TestflowExplorer } from "@workspaces/features/testflow-explorer";
   import type { CollectionDocument } from "@app/database/database";
-  import { testFlowDataStore } from "@workspaces/features/socket-explorer/store/testflow";
+  import {
+    testFlowDataStore,
+    type TFDataStoreType,
+  } from "@workspaces/features/socket-explorer/store/testflow";
   export let tab;
   const _viewModel = new TestflowExplorerPageViewModel(tab);
   let collectionList: Observable<CollectionDocument[]> =
@@ -15,10 +18,10 @@
       render = true;
     }
   });
-  let testflowStore;
+  let testflowStore: TFDataStoreType;
   testFlowDataStore.subscribe((val) => {
     if (val) {
-      testflowStore = val.get(tab?.tabId);
+      testflowStore = val.get(tab?.tabId) as TFDataStoreType;
       console.log(testflowStore, "TF");
     }
   });

@@ -39,7 +39,16 @@
   } from "@library/icons";
   import { RunIcon } from "@library/icons";
   import { ResponseStatusCode } from "$lib/utils/enums";
-  export let tab: Observable<Tab>;
+  import { bool } from "yup";
+  import type {
+    TFEdgeHandlerType,
+    TFEdgeType,
+    TFNodeHandlerType,
+    TFNodeType,
+  } from "@common/types/workspace/testflow";
+  import type { TFNodeStoreType } from "@workspaces/features/socket-explorer/store/testflow";
+
+  export let tab: Observable<Partial<Tab>>;
   export let onUpdateNodes;
   export let onUpdateEdges;
   export let collectionList: Observable<CollectionDocument[]>;
@@ -47,10 +56,12 @@
   export let testflowStore;
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
+  const nodes = writable<TFNodeHandlerType[]>([]);
+  const edges = writable<TFEdgeHandlerType[]>([]);
 
   let isNodesDraggable = false;
   const checkIfEdgesExist = (_id: string) => {
-    let edge = [];
+    let edge: TFEdgeHandlerType[] = [];
     edges.subscribe((value) => {
       edge = value;
     })();
@@ -88,7 +99,7 @@
    * finds the next node id
    * @param list - list of existing nodes
    */
-  const findNextNodeId = (list): string => {
+  const findNextNodeId = (list: { id: string }[]): string => {
     const isNameAvailable: (proposedName: string) => boolean = (
       proposedName,
     ) => {
@@ -130,7 +141,7 @@
 
     const targetNode = findNextNodeId($nodes);
 
-    nodes.update((nodes) => {
+    nodes.update((nodes: TFNodeHandlerType[]) => {
       let nextNodePosition;
       // finds next node positions
       for (let i = 0; i < nodes?.length; i++) {
@@ -192,11 +203,10 @@
       ];
     });
   };
-  const nodes = writable([]);
-  const edges = writable([]);
+
   onMount(() => {
-    nodes.update((_nodes) => {
-      const dbNodes = $tab?.property?.testflow?.nodes;
+    nodes.update((_nodes: TFNodeHandlerType[]) => {
+      const dbNodes = $tab?.property?.testflow?.nodes as TFNodeType[];
       let res = [];
       for (let i = 0; i < dbNodes.length; i++) {
         res.push({
@@ -246,8 +256,8 @@
       }
       return res;
     });
-    edges.update((_edges) => {
-      const dbEdges = $tab?.property?.testflow?.edges;
+    edges.update((_edges: TFEdgeHandlerType[]) => {
+      const dbEdges = $tab?.property?.testflow?.edges as TFEdgeType[];
       let res = [];
       for (let i = 0; i < dbEdges.length; i++) {
         res.push({
@@ -260,11 +270,11 @@
     });
   });
 
-  let selectedNode;
+  let selectedNode: TFNodeStoreType | undefined;
   $: {
     if (testflowStore || selectedNodeId) {
       let isIdExist = false;
-      testflowStore?.nodes?.forEach((element) => {
+      testflowStore?.nodes?.forEach((element: TFNodeStoreType) => {
         if (element.id === selectedNodeId) {
           selectedNode = element;
           responseState.responseBodyLanguage =
@@ -287,20 +297,22 @@
   let nodesValue = 1;
 
   let selectedNodeId = "0";
-  const checkIfResponseExist = (id) => {
+  const checkIfResponseExist = (id: string) => {
     let result = false;
-    testflowStore?.nodes?.forEach((element) => {
+    testflowStore?.nodes?.forEach((element: TFNodeStoreType) => {
       if (element.id === id) {
         result = true;
       }
     });
     return result;
   };
-  nodes.subscribe((val) => {
+  nodes.subscribe((val: TFNodeHandlerType[]) => {
     if (val && val.length) onUpdateNodes(val);
     nodesValue = val.length;
     // Find the node where selected is true
-    let selectedNodeTrue = val.find((node) => node.selected === true);
+    let selectedNodeTrue = val.find(
+      (node: TFNodeHandlerType) => node.selected === true,
+    );
 
     if (selectedNodeTrue) {
       selectedNodeId = selectedNodeTrue.id;
