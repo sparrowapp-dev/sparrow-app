@@ -7,6 +7,7 @@
     testFlowDataStore,
     type TFDataStoreType,
   } from "@workspaces/features/socket-explorer/store/testflow";
+  import { onDestroy } from "svelte";
   export let tab;
   const _viewModel = new TestflowExplorerPageViewModel(tab);
   let collectionList: Observable<CollectionDocument[]> =
@@ -22,8 +23,10 @@
   testFlowDataStore.subscribe((val) => {
     if (val) {
       testflowStore = val.get(tab?.tabId) as TFDataStoreType;
-      console.log(testflowStore, "TF");
     }
+  });
+  onDestroy(() => {
+    sub.unsubscribe();
   });
 </script>
 

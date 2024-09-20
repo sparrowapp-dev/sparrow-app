@@ -94,3 +94,8 @@ export interface TFEdgeType {
   source: string;
   target: string;
 }
+
+export interface TFResponseStateType {
+  responseBodyLanguage: string;
+  responseBodyFormatter: string;
+}
