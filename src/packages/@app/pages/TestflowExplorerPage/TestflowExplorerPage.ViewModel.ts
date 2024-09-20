@@ -9,12 +9,17 @@ import { EnvironmentRepository } from "@app/repositories/environment.repository"
 import { TabRepository } from "@app/repositories/tab.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import type { Tab } from "@common/types/workspace";
+import type {
+  TFAPIResponseType,
+  TFNodeType,
+} from "@common/types/workspace/testflow";
 import { Debounce, ParseTime } from "@common/utils";
 import { notifications } from "@library/ui/toast/Toast";
 import { DecodeRequest } from "@workspaces/features/rest-explorer/utils";
 import {
   testFlowDataStore,
-  type TFHistoryType,
+  type TFHistoryAPIResponseStoreType,
+  type TFKeyValueStoreType,
 } from "@workspaces/features/socket-explorer/store/testflow";
 import { BehaviorSubject, Observable } from "rxjs";
 
@@ -51,18 +56,18 @@ export class TestflowExplorerPageViewModel {
    * @param _nodes - nodes of the testflow
    */
 
-  private updateNodesDebounce = async (_nodes) => {
+  private updateNodesDebounce = async (_nodes: TFNodeType[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const nodes = _nodes.map((elem) => {
       return {
         id: elem.id,
         type: elem.type,
         data: {
-          name: elem.data.name,
+          name: elem.data.name, // not required to save in db
           requestId: elem.data.requestId,
           folderId: elem.data.folderId,
           collectionId: elem.data.collectionId,
-          method: elem.data.method,
+          method: elem.data.method, // not required to save in db
         },
         position: { x: elem.position.x, y: elem.position.y },
       };
@@ -73,7 +78,10 @@ export class TestflowExplorerPageViewModel {
     // this.compareRequestWithServer();
   };
 
-  public updateNodes = new Debounce().debounce(this.updateNodesDebounce, 300);
+  public updateNodes = new Debounce().debounce(
+    this.updateNodesDebounce as any,
+    300,
+  );
   /**
    *
    * @param _edges - edges of the testflow
@@ -86,7 +94,10 @@ export class TestflowExplorerPageViewModel {
     // this.compareRequestWithServer();
   };
 
-  public updateEdges = new Debounce().debounce(this.updateEdgesDebounce, 300);
+  public updateEdges = new Debounce().debounce(
+    this.updateEdgesDebounce as any,
+    300,
+  );
 
   public updateSelectedAPI = async () => {};
 
@@ -230,6 +241,7 @@ export class TestflowExplorerPageViewModel {
 
         try {
           const response = await makeHttpRequestV2(...decodeData);
+          console.log("ggggggggggggg", response);
           const end = Date.now();
           const duration = end - start;
 
@@ -238,17 +250,20 @@ export class TestflowExplorerPageViewModel {
               progressiveTab.tabId,
             );
             if (existingTestFlowData) {
-              let resData;
+              let resData: TFHistoryAPIResponseStoreType;
               if (response.isSuccessful) {
                 const byteLength = new TextEncoder().encode(
                   JSON.stringify(response),
                 ).length;
                 const responseSizeKB = byteLength / 1024;
-
-                const responseBody = response.data.body;
+                const responseData: TFAPIResponseType = response.data;
+                const responseBody = responseData.body;
                 const formattedHeaders = Object.entries(
                   response?.data?.headers || {},
-                ).map(([key, value]) => ({ key, value }));
+                ).map(([key, value]) => ({
+                  key,
+                  value,
+                })) as TFKeyValueStoreType[];
                 const responseStatus = response?.data?.status;
                 resData = {
                   body: responseBody,
@@ -261,6 +276,8 @@ export class TestflowExplorerPageViewModel {
                       formattedHeaders,
                     ),
                 };
+                console.log(formattedHeaders, "formathead");
+                console.log(resData);
 
                 if (
                   Number(resData.status.split(" ")[0]) >= 200 &&
@@ -272,8 +289,8 @@ export class TestflowExplorerPageViewModel {
                 }
                 totalTime += duration;
                 const req = {
-                  method: request?.request?.method,
-                  name: request?.name,
+                  method: request?.request?.method as string,
+                  name: request?.name as string,
                   status: resData.status, // need to be updated
                   time: new ParseTime().convertMilliseconds(duration),
                 };
@@ -289,8 +306,8 @@ export class TestflowExplorerPageViewModel {
                 failedRequests++;
                 totalTime += duration;
                 const req = {
-                  method: request?.request?.method,
-                  name: request?.name,
+                  method: request?.request?.method as string,
+                  name: request?.name as string,
                   status: ResponseStatusCode.ERROR,
                   time: new ParseTime().convertMilliseconds(duration),
                 };
@@ -333,8 +350,8 @@ export class TestflowExplorerPageViewModel {
           failedRequests++;
           totalTime += 0;
           const req = {
-            method: request?.request?.method,
-            name: request?.name,
+            method: request?.request?.method as string,
+            name: request?.name as string,
             status: ResponseStatusCode.ERROR,
             time: 0 + " ms",
           };
@@ -357,8 +374,8 @@ export class TestflowExplorerPageViewModel {
         const hs = wsData.history;
         hs.unshift(history);
         wsData.history = hs;
+        testFlowDataMap.set(progressiveTab.tabId, wsData);
       }
-      testFlowDataMap.set(progressiveTab.tabId, wsData);
       return testFlowDataMap;
     });
     notifications.success(
@@ -390,8 +407,8 @@ export class TestflowExplorerPageViewModel {
       const wsData = testFlowDataMap.get(progressiveTab.tabId);
       if (wsData) {
         wsData.history[_index].expand = _toggleState;
+        testFlowDataMap.set(progressiveTab.tabId, wsData);
       }
-      testFlowDataMap.set(progressiveTab.tabId, wsData);
       return testFlowDataMap;
     });
   };

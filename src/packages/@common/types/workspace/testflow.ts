@@ -1,14 +1,35 @@
+import type { HttpCResponseType } from "../http-client/client";
+
+export interface TFNodeType {
+  id: string;
+  type: string;
+  data: {
+    requestId: string;
+    folderId: string;
+    collectionId: string;
+  };
+  position: {
+    x: number;
+    y: number;
+  };
+}
+
 export interface NodesWrapper {
   nodes: {
     id: string;
     type: string;
-    data: object;
+    data: {
+      requestId: string;
+      folderId: string;
+      collectionId: string;
+    };
     position: {
       x: number;
       y: number;
     };
   }[];
 }
+
 export interface EdgesWrapper {
   edges: {
     id: string;
@@ -26,4 +47,10 @@ export enum TestflowDefault {
 
 export interface TestflowWrapper {
   testflow: Testflow;
+}
+
+export interface TFAPIResponseType {
+  body: string;
+  headers: object;
+  status: string;
 }

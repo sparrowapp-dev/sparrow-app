@@ -8,7 +8,7 @@
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { WorkspaceRole } from "$lib/utils/enums";
   import { TreeIcon } from "@library/icons";
-  import type { TFJSONDocType } from "@common/models/testflow";
+  import type { TFJSONDocType } from "@app/models/testflow.model";
   import { TestflowDefault } from "@common/types/workspace/testflow";
 
   /**

@@ -8,7 +8,7 @@
   import angleRight from "$lib/assets/angle-right-v2.svg";
   import { Tooltip } from "@library/ui";
   import { TestflowListItem } from "../components";
-  import type { TFJSONDocType } from "@common/models/testflow";
+  import type { TFJSONDocType } from "@app/models/testflow.model";
   import type { ScrollList } from "@library/ui/list/types";
   import { TestflowDefault } from "@common/types/workspace/testflow";
 

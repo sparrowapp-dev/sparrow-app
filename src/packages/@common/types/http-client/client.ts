@@ -1,4 +1,4 @@
-export interface MakeRequestResponse {
+export interface HttpCResponseType {
   status: "success" | "error";
   isSuccessful: boolean;
   message: string;
