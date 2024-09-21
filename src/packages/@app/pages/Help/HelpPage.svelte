@@ -168,6 +168,7 @@
           on:click={() => {
             setActiveTab("updates");
             isPostopenFromActivity = false;
+            MixpanelEvent(Events.Updates_Tab);
           }}
         >
           <UpdateIcon

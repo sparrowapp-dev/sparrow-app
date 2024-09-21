@@ -80,4 +80,12 @@ export enum Events {
   Activity_SortBy_Filter = "Activity_SortBy_Filter",
   Activity_Post = "Activity_Post",
   Activity_GoToPost = "Activity_GoToPost",
+  Updates_Tab = "Updates_Tab",
+  Version_Updates = "Version_Updates",
+  Copy_Link = "Copy_Link",
+  See_More_Updates = "See_More_Updates",
+  Like_Updates = "Like_Updates",
+  Updates_Filter = "Updates_Filter",
+  Github_Updates = "Github_Updates",
+  LinkedIn_Updates_Icon = "LinkedIn_Updates_Icon",
 }
