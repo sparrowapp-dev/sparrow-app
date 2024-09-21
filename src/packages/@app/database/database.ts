@@ -57,7 +57,7 @@ import {
 import { updatesSchema, type UpdatesDocType } from "@app/models/updates.model";
 import {
   TestflowSchema,
-  type TFContainerType,
+  type TFRxContainerType,
 } from "@app/models/testflow.model";
 // import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 // addRxPlugin(RxDBDevModePlugin);
@@ -98,7 +98,7 @@ export type DatabaseCollections = {
   activesidebartab: ActiveSideBarTabContainer;
   windowSettings: WindowSettingsContainer;
   team: TeamContainer;
-  testflow: TFContainerType;
+  testflow: TFRxContainerType;
 };
 
 // define the Rx database type

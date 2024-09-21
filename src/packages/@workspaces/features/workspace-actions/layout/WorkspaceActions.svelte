@@ -37,7 +37,7 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { CollectionList, EnvironmentList } from "@workspaces/features";
   import { TestflowList } from "@workspaces/features/testflow-list";
-  import { TestflowDefault } from "@common/types/workspace/testflow";
+  import { TFDefaultEnum } from "@common/types/workspace/testflow";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -250,7 +250,7 @@
           },
         },
         {
-          name: `Add ${TestflowDefault.FULL_NAME}`,
+          name: `Add ${TFDefaultEnum.FULL_NAME}`,
           icon: TreeIcon,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "15px",
@@ -297,7 +297,7 @@
           onclick: () => onItemCreated("web-socket", {}),
         },
         {
-          name: `Add ${TestflowDefault.FULL_NAME}`,
+          name: `Add ${TFDefaultEnum.FULL_NAME}`,
           icon: TreeIcon,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "15px",

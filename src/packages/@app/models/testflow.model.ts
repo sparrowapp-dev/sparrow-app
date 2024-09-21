@@ -116,11 +116,11 @@ const TestflowSchemaLiteral = {
 } as const;
 
 const schemaTyped = toTypedRxJsonSchema(TestflowSchemaLiteral);
-export type TFJSONDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
+export type TFRxDocumentType = ExtractDocumentTypeFromTypedRxJsonSchema<
   typeof schemaTyped
 >;
-export type TFObsDocType = RxDocument<TFJSONDocType>;
-export type TFContainerType = RxCollection<TFJSONDocType>;
+export type TFRxHandlerType = RxDocument<TFRxDocumentType>;
+export type TFRxContainerType = RxCollection<TFRxDocumentType>;
 
-export const TestflowSchema: RxJsonSchema<TFJSONDocType> =
+export const TestflowSchema: RxJsonSchema<TFRxDocumentType> =
   TestflowSchemaLiteral;

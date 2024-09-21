@@ -1,5 +1,8 @@
 import { RxDB } from "@app/database/database";
-import type { TFJSONDocType, TFObsDocType } from "@app/models/testflow.model";
+import type {
+  TFRxDocumentType,
+  TFRxHandlerType,
+} from "@app/models/testflow.model";
 import type { Observable } from "rxjs";
 
 export class TestflowRepository {
@@ -11,7 +14,7 @@ export class TestflowRepository {
    * @param _testflow - The test flow document to be inserted into the database.
    * @returns  A promise that resolves when the test flow has been added.
    */
-  public addTestflow = async (_testflow: TFJSONDocType): Promise<void> => {
+  public addTestflow = async (_testflow: TFRxDocumentType): Promise<void> => {
     await this.rxdb?.insert(_testflow);
   };
 
@@ -20,7 +23,9 @@ export class TestflowRepository {
    *
    * @returns An observable that emits an array of test flow documents, sorted by their creation date in ascending order.
    */
-  public getTestflowsObserver = (): Observable<TFObsDocType[]> | undefined => {
+  public getTestflowsObserver = ():
+    | Observable<TFRxHandlerType[]>
+    | undefined => {
     return this.rxdb?.find().sort({ createdAt: "asc" }).$;
   };
 
@@ -33,7 +38,7 @@ export class TestflowRepository {
    */
   public updateTestflow = async (
     uuid: string,
-    data: Partial<TFJSONDocType>,
+    data: Partial<TFRxDocumentType>,
   ): Promise<void> => {
     const testflow = await this.rxdb
       ?.findOne({
@@ -42,7 +47,7 @@ export class TestflowRepository {
         },
       })
       .exec();
-    testflow?.incrementalModify((value: TFJSONDocType) => {
+    testflow?.incrementalModify((value: TFRxDocumentType) => {
       if (data.name) value.name = data.name;
       if (data.workspaceId) value.workspaceId = data.workspaceId;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
@@ -78,7 +83,7 @@ export class TestflowRepository {
    */
   public getTestflowByWorkspaceId = async (
     _workspaceId: string,
-  ): Promise<TFJSONDocType[] | undefined> => {
+  ): Promise<TFRxDocumentType[] | undefined> => {
     return await this.rxdb
       ?.find({
         selector: {

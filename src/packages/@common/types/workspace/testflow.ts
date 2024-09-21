@@ -1,5 +1,3 @@
-import type { HttpCResponseType } from "../http-client/client";
-
 export interface TFNodeType {
   id: string;
   type: string;
@@ -16,7 +14,19 @@ export interface TFNodeType {
   };
 }
 
-export interface NodesWrapper {
+export interface TFDocumentType {
+  _id: string;
+  workspaceId: string;
+  name: string;
+  nodes: TFNodeType[];
+  edges: TFEdgeType[];
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  updatedBy: string;
+}
+
+export interface TFTabNodesWrapperType {
   nodes: {
     id: string;
     type: string;
@@ -24,6 +34,8 @@ export interface NodesWrapper {
       requestId: string;
       folderId: string;
       collectionId: string;
+      name: string;
+      method: string;
     };
     position: {
       x: number;
@@ -32,7 +44,7 @@ export interface NodesWrapper {
   }[];
 }
 
-export interface EdgesWrapper {
+export interface TFTabEdgesWrapperType {
   edges: {
     id: string;
     source: string;
@@ -40,15 +52,17 @@ export interface EdgesWrapper {
   }[];
 }
 
-export interface Testflow extends NodesWrapper, EdgesWrapper {}
+export interface TFTabItemType
+  extends TFTabNodesWrapperType,
+    TFTabEdgesWrapperType {}
 
-export enum TestflowDefault {
+export enum TFDefaultEnum {
   FULL_NAME = "Test Flow",
   NAME = "Flow",
 }
 
-export interface TestflowWrapper {
-  testflow: Testflow;
+export interface TFTabItemWrapperType {
+  testflow: TFTabItemType;
 }
 
 export interface TFAPIResponseType {
