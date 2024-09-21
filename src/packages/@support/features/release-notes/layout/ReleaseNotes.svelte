@@ -164,11 +164,20 @@
     }
   };
 
+  function extractReleaseDate(text) {
+    // Updated regex to handle various release date formats with optional extra spaces
+    const dateMatch = text.match(
+      /Release\s*Date\s*:\s*([A-Za-z]{3,}\s*\d{1,2},\s*\d{4})/,
+    );
+    return dateMatch ? dateMatch[1].trim() : "Unknown Release Date";
+  }
+
   onMount(async () => {
     isLoading = true;
     let releaseNotes = await listChangeLog();
     events = releaseNotes.data.entries;
     filteredEvents = events;
+    console.log("This is sevent", filteredEvents);
     isLoading = false;
   });
 </script>
@@ -267,7 +276,11 @@
               {#each filteredEvents as event}
                 <div class="timeline-event">
                   <div class="timeline-date">
-                    {formatDate(event.publishedAt)}
+                    {#if event.plaintextDetails}
+                      {extractReleaseDate(event.plaintextDetails)}
+                    {:else}
+                      {extractReleaseDate(event.markdownDetails)}
+                    {/if}
                   </div>
                   <div class="timeline-circle"></div>
                   <div class="timeline-content">
@@ -388,7 +401,11 @@
                 class="ms-2 text-fs-14"
                 style="margin-top:1.5px; color:var(--text-secondary-100); font-weight:500;"
               >
-                {formatDate(selectedEvent.publishedAt)}
+                {#if event.plaintextDetails}
+                  {extractReleaseDate(selectedEvent.plaintextDetails)}
+                {:else}
+                  {extractReleaseDate(selectedEvent.markdownDetails)}
+                {/if}
               </div>
             </div>
 
