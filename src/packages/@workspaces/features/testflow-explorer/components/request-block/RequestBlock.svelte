@@ -94,12 +94,12 @@
     return false;
   };
 
-  let leaveButtonMenu: boolean = false;
+  let moreOptionsMenu: boolean = false;
 
   export let isDeleteNodeModalOpen = false;
 
   const handleOpenModal = () => {
-    leaveButtonMenu = !leaveButtonMenu;
+    moreOptionsMenu = !moreOptionsMenu;
     data.onOpenDeleteModal(id, data.name);
   };
 </script>
@@ -135,17 +135,17 @@
     <div
       style="position: relative;"
       class="ms-2 d-flex justify-content-center align-items-center moreOption-icon rounded"
-      tabindex="0"  
+      tabindex="0"
       on:click={() => {
-        leaveButtonMenu = !leaveButtonMenu;
+        moreOptionsMenu = !moreOptionsMenu;
       }}
       on:blur={() => {
-        leaveButtonMenu = false; 
+        moreOptionsMenu = false;
       }}
     >
       <ThreeDotIcon />
 
-      {#if leaveButtonMenu}
+      {#if moreOptionsMenu}
         <div
           class="d-flex align-items-center justify-content-center"
           style="z-index:1000; border-radius:2px; height:29px; width:96px; background-color:#22232E; position:absolute; top:27px; right:-75px;"
@@ -289,19 +289,6 @@
   {/if}
   <!------------------->
 </div>
-
-<Modal
-  title={"Delete Node"}
-  type={"dark"}
-  width={"35%"}
-  zIndex={1000}
-  isOpen={isDeleteNodeModalOpen}
-  handleModalState={(flag) => {
-    isDeleteNodeModalOpen = flag;
-  }}
->
-  Hello
-</Modal>
 
 <style lang="scss">
   .request-block {

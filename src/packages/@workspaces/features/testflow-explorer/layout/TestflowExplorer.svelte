@@ -119,11 +119,10 @@
   let deletedNodeId: number;
   let deleteNodeName: "";
 
-  const handleChange = (id, name) => {
+  const handleDeleteModal = (id, name) => {
     isDeleteNodeModalOpen = true;
     deletedNodeId = id;
     deleteNodeName = name;
-    console.log("This is name of thenode that is to be delte ", deleteNodeName);
   };
 
   const createNewNode = (_id: string) => {
@@ -177,7 +176,7 @@
               );
             },
             onOpenDeleteModal: function (id, name) {
-              handleChange(id, name);
+              handleDeleteModal(id, name);
             },
             collections: filteredCollections,
             tabId: $tab.tabId,
@@ -236,7 +235,7 @@
               );
             },
             onOpenDeleteModal: function (id: number, name: string) {
-              handleChange(id, name);
+              handleDeleteModal(id, name);
             },
             name: dbNodes[i].data?.name,
             method: dbNodes[i].data?.method,
@@ -272,12 +271,10 @@
 
   let selectedNode;
   $: {
-    console.log("this is sleecte nod id eout side the dollar", selectedNodeId);
     if (testflowStore || selectedNodeId) {
       testflowStore?.nodes?.forEach((element) => {
         if (element.id === selectedNodeId) {
           selectedNode = element;
-          console.log("This is selcted node", selectedNode);
         }
       });
     }
@@ -305,8 +302,6 @@
     nodesValue = val.length;
     // Find the node where selected is true
     currentSelectedNode = val.find((node) => node.selected === true);
-
-    console.log("This is current slecte node", currentSelectedNode);
 
     if (currentSelectedNode) {
       if (currentSelectedNode.data.requestId) {
@@ -339,15 +334,11 @@
   let isDeleteNodeModalOpen = false;
 
   const handleDeleteNode = (id) => {
-    console.log("Inside handle Delete Node, this is id ->", id);
 
-    // Step 1: Remove the node with the given ID from the nodes store
     nodes.update((_nodes) => {
-      // Filter out the node with the matching id
       return _nodes.filter((node) => node.id < id);
     });
 
-    // Step 2: Remove any edges that are connected to the node
     edges.update((_edges) => {
       return _edges.filter((edge) => edge.source !== id && edge.target < id);
     });
@@ -360,7 +351,7 @@
       event.preventDefault();
     }
     if (event.key === "Delete") {
-      handleChange(currentSelectedNode.id, currentSelectedNode.name);
+      handleDeleteModal(currentSelectedNode.id, currentSelectedNode.name);
     }
   };
 </script>

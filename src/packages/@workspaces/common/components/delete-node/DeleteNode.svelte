@@ -1,15 +1,12 @@
 <script>
   import { Button } from "@library/ui";
-  import { notifications } from "@library/ui/toast/Toast";
-  import { onMount } from "svelte";
 
-  // Props passed to the component
-  export let handleModalState; // Function to handle the modal state
+  export let handleModalState;
   export let deletedNodeId;
   export let handleDeleteNode;
-export let deleteNodeName;
+  export let deleteNodeName;
+  
   let isDeletingNode = false;
-  let selectedNodeName = "";
 
   const handleDeletNode = () => {
     isDeletingNode = true;
@@ -44,14 +41,13 @@ export let deleteNodeName;
         }}
       />
     </span>
-    <!-- Leave button to confirm leaving the team -->
     <Button
       disable={false}
       title={"Delete"}
       textClassProp={"fs-6"}
       type={"danger"}
       onClick={() => {
-        handleDeletNode(); // Execute the leave team function
+        handleDeletNode();
       }}
       loader={isDeletingNode}
     />
