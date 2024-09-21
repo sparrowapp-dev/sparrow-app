@@ -42,15 +42,13 @@
   import { RunIcon } from "@library/icons";
   import { ResponseStatusCode } from "$lib/utils/enums";
   import type {
+    TFDataStoreType,
     TFEdgeHandlerType,
     TFEdgeType,
+    TFNodeStoreType,
     TFNodeType,
     TFResponseStateType,
   } from "@common/types/workspace/testflow";
-  import type {
-    TFDataStoreType,
-    TFNodeStoreType,
-  } from "@workspaces/features/socket-explorer/store/testflow";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;

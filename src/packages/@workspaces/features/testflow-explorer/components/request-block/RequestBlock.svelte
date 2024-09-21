@@ -15,13 +15,13 @@
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import {
-    testFlowDataStore,
-    type TFDataStoreType,
-    type TFNodeStoreType,
-  } from "@workspaces/features/socket-explorer/store/testflow";
+  import { testFlowDataStore } from "@workspaces/features/testflow-explorer/store";
   import { createDeepCopy } from "$lib/utils/helpers";
   import { ParseTime } from "@common/utils";
+  import type {
+    TFDataStoreType,
+    TFNodeStoreType,
+  } from "@common/types/workspace/testflow";
 
   /**
    * The data object containing various handlers and data stores.

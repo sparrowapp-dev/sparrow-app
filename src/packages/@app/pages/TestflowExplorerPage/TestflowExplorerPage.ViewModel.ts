@@ -15,17 +15,15 @@ import type {
 } from "@common/types/workspace/environment";
 import type {
   TFAPIResponseType,
+  TFHistoryAPIResponseStoreType,
+  TFHistoryStoreType,
+  TFKeyValueStoreType,
   TFNodeType,
 } from "@common/types/workspace/testflow";
 import { Debounce, ParseTime } from "@common/utils";
 import { notifications } from "@library/ui/toast/Toast";
 import { DecodeRequest } from "@workspaces/features/rest-explorer/utils";
-import {
-  testFlowDataStore,
-  type TFHistoryAPIResponseStoreType,
-  type TFHistoryStoreType,
-  type TFKeyValueStoreType,
-} from "@workspaces/features/socket-explorer/store/testflow";
+import { testFlowDataStore } from "@workspaces/features/testflow-explorer/store";
 import { BehaviorSubject, Observable } from "rxjs";
 
 export class TestflowExplorerPageViewModel {

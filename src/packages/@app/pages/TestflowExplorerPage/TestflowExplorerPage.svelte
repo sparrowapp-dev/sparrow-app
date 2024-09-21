@@ -3,11 +3,9 @@
   import { TestflowExplorerPageViewModel } from "./TestflowExplorerPage.ViewModel";
   import { TestflowExplorer } from "@workspaces/features/testflow-explorer";
   import type { CollectionDocument } from "@app/database/database";
-  import {
-    testFlowDataStore,
-    type TFDataStoreType,
-  } from "@workspaces/features/socket-explorer/store/testflow";
+  import { testFlowDataStore } from "@workspaces/features/testflow-explorer/store";
   import { onDestroy } from "svelte";
+  import type { TFDataStoreType } from "@common/types/workspace/testflow";
   export let tab;
   const _viewModel = new TestflowExplorerPageViewModel(tab);
   let collectionList: Observable<CollectionDocument[]> =
