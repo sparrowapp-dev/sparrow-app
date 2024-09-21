@@ -206,6 +206,7 @@
           on:click={() => {
             setActiveTab("myActivity");
             isPostopenFromActivity = false;
+            MixpanelEvent(Events.Activity_Tab);
           }}
         >
           <ActivityIcon

@@ -74,4 +74,10 @@ export enum Events {
   Roadmap_Search = "Roadmap_Search",
   Roadmap_Feedback_Link = "Roadmap_Feedback_Link",
   Community_Tab = "Community_Tab",
+  Activity_Tab = "Activity_Tab",
+  Activity_Categories_Filter = "Activity_Categories_Filter",
+  Activity_Filter = "Activity_Filter",
+  Activity_SortBy_Filter = "Activity_SortBy_Filter",
+  Activity_Post = "Activity_Post",
+  Activity_GoToPost = "Activity_GoToPost",
 }
