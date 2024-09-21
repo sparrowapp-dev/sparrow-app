@@ -16,6 +16,9 @@
   import { Drop } from "@workspaces/features/import-collection/components";
   import { onMount } from "svelte";
   import formatTimeAgo from "@support/common/utils/formatTimeAgo";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+
   export let isPostopen;
   export let userInfo;
   export let onRetrievePost;
@@ -254,6 +257,8 @@
               comments = await fetchComments(postId);
               commentValue = "";
               isCommenting = false;
+              MixpanelEvent(Events.Add_Comment);
+
             }}
             disable={commentValue.length == 0 || isCommenting}
           />

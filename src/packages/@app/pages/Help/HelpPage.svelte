@@ -150,6 +150,7 @@
           on:click={() => {
             setActiveTab("feedback");
             isPostopenFromActivity = false;
+            MixpanelEvent(Events.Feedback_Tab);
           }}
         >
           <DocIcon
