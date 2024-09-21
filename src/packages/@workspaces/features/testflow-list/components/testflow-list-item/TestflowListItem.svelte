@@ -1,15 +1,19 @@
 <script lang="ts">
   import threedotIcon from "$lib/assets/3dot.svg";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "@library/ui/button/Button.svelte";
-  import { Options } from "@library/ui";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import {
+    Button,
+    Tooltip,
+    Options,
+    Spinner,
+    Modal as ModalWrapperV1,
+  } from "@library/ui";
   import { WorkspaceRole } from "$lib/utils/enums";
   import { TreeIcon } from "@library/icons";
-  import type { TFJSONDocType } from "@common/models/testflow";
-  import { TestflowDefault } from "@common/types/workspace/testflow";
+  import {
+    TFDefaultEnum,
+    type TFDocumentType,
+  } from "@common/types/workspace/testflow";
 
   /**
    * current workspace to identify the selected testflow
@@ -19,7 +23,7 @@
   /**
    * individual testflow
    */
-  export let flow: TFJSONDocType;
+  export let flow: TFDocumentType;
 
   /**
    * deletes the testflow
@@ -120,7 +124,7 @@
       menuItems = [
         {
           onClick: openTestflow,
-          displayText: `Open ${TestflowDefault.NAME}`,
+          displayText: `Open ${TFDefaultEnum.NAME}`,
           disabled: false,
         },
         {
@@ -142,7 +146,7 @@
 </script>
 
 <ModalWrapperV1
-  title={`Delete ${TestflowDefault.NAME}?`}
+  title={`Delete ${TFDefaultEnum.NAME}?`}
   type={"danger"}
   width={"35%"}
   zIndex={1000}
@@ -151,7 +155,7 @@
 >
   <div class="text-lightGray mb-1 sparrow-fs-14">
     <p style="font-weight: 400;" class="text-fs-14">
-      Are you sure you want to delete this {TestflowDefault.FULL_NAME}?
+      Are you sure you want to delete this {TFDefaultEnum.FULL_NAME}?
       <span style="font-weight:700;" class="">"{flow.name}"</span>
       and all its variables will be removed and cannot be restored.
     </p>

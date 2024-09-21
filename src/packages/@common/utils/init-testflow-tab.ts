@@ -1,52 +1,55 @@
 import { v4 as uuidv4 } from "uuid";
 import { TabTypeEnum, type Path, type Tab } from "@common/types/workspace";
-import { TestflowDefault } from "@common/types/workspace/testflow";
+import { TFDefaultEnum } from "@common/types/workspace/testflow";
 
 class InitTestflowTab {
-  private _tab: Tab = {};
+  private _tab: Tab;
   /**
    *
    * @param _id - Test Flow mongo id
    * @param _workspaceId - Workspace Id to which Collection belongs to
    */
   constructor(_id: string, _workspaceId: string) {
+    this._tab = {
+      id: _id,
+      tabId: uuidv4(),
+      name: TFDefaultEnum.NAME,
+      type: TabTypeEnum.TESTFLOW,
+      description: "",
+      source: "USER",
+      activeSync: false,
+      property: {
+        testflow: {
+          nodes: [
+            {
+              id: "1",
+              type: "startBlock",
+              data: {
+                name: "Start",
+                collectionId: "",
+                folderId: "",
+                requestId: "",
+                method: "",
+              },
+              position: { x: 100, y: 350 },
+            },
+          ],
+          edges: [],
+        },
+      },
+      path: {
+        workspaceId: _workspaceId,
+        collectionId: "",
+        folderId: "",
+      },
+      isSaved: true,
+      index: 0,
+      isActive: true,
+      isDeleted: false,
+      timestamp: new Date().toString(),
+    };
     if (!_id || !_workspaceId) {
       console.error("invalid id or workspace id on create new tab test flow!");
-    } else {
-      this._tab = {
-        id: _id,
-        tabId: uuidv4(),
-        name: TestflowDefault.NAME,
-        type: TabTypeEnum.TESTFLOW,
-        description: "",
-        source: "USER",
-        activeSync: false,
-        property: {
-          testflow: {
-            nodes: [
-              {
-                id: "1",
-                type: "startBlock",
-                data: {
-                  name: "Start",
-                },
-                position: { x: 100, y: 350 },
-              },
-            ],
-            edges: [],
-          },
-        },
-        path: {
-          workspaceId: _workspaceId,
-          collectionId: "",
-          folderId: "",
-        },
-        isSaved: true,
-        index: 0,
-        isActive: true,
-        isDeleted: false,
-        timestamp: new Date().toString(),
-      };
     }
   }
   public getValue(): Tab {
