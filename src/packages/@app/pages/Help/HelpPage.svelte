@@ -20,6 +20,8 @@
   import Roadmap from "@support/features/roadmap/layout/Roadmap.svelte";
   import { ReleaseNotes } from "@support/features/release-notes/layout";
   import { ActivitySection } from "@support/features/activity-section";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
   /**
    * @description - Prevents the default context menu from appearing on right-click.
@@ -129,6 +131,7 @@
           on:click={() => {
             setActiveTab("roadmap");
             isPostopenFromActivity = false;
+            MixpanelEvent(Events.Roadmap_Tab);
           }}
         >
           <RoadmapIcon
