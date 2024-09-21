@@ -73,4 +73,5 @@ export enum Events {
   Roadmap_Categories_Filter = "Roadmap_Categories_Filter",
   Roadmap_Search = "Roadmap_Search",
   Roadmap_Feedback_Link = "Roadmap_Feedback_Link",
+  Community_Tab = "Community_Tab",
 }

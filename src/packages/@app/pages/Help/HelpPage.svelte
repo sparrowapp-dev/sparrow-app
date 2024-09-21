@@ -186,6 +186,7 @@
           on:click={() => {
             setActiveTab("community");
             isPostopenFromActivity = false;
+            MixpanelEvent(Events.Community_Tab);
           }}
         >
           <GroupIcon
