@@ -219,11 +219,13 @@ export class TestflowExplorerPageViewModel {
       let wsData = testFlowDataMap.get(progressiveTab.tabId);
       if (wsData) {
         wsData.nodes = [];
+        wsData.isTestFlowRunning = true;
       } else {
         wsData = {
           nodes: [],
           history: [],
           isRunHistoryEnable: false,
+          isTestFlowRunning: true,
         };
       }
       testFlowDataMap.set(progressiveTab.tabId, wsData);
@@ -418,6 +420,7 @@ export class TestflowExplorerPageViewModel {
           hs.unshift(history);
           wsData.history = hs;
         }
+        wsData.isTestFlowRunning = false;
         testFlowDataMap.set(progressiveTab.tabId, wsData);
       }
       return testFlowDataMap;
@@ -446,6 +449,7 @@ export class TestflowExplorerPageViewModel {
           isRunHistoryEnable: _toggleState,
           history: [],
           nodes: [],
+          isTestFlowRunning: false,
         };
       }
       testFlowDataMap.set(progressiveTab.tabId, wsData); // Save the updated tab data

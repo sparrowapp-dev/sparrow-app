@@ -46,6 +46,7 @@ export type TFDataStoreType = {
   nodes: TFNodeStoreType[];
   history: TFHistoryStoreType[];
   isRunHistoryEnable: boolean;
+  isTestFlowRunning: boolean;
 };
 
 export const testFlowDataStore = writable<Map<string, TFDataStoreType>>(

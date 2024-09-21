@@ -47,7 +47,10 @@
     TFNodeType,
     TFResponseStateType,
   } from "@common/types/workspace/testflow";
-  import type { TFNodeStoreType } from "@workspaces/features/socket-explorer/store/testflow";
+  import type {
+    TFDataStoreType,
+    TFNodeStoreType,
+  } from "@workspaces/features/socket-explorer/store/testflow";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -55,7 +58,7 @@
   export let onUpdateEdges;
   export let collectionList: Observable<CollectionDocument[]>;
   export let onClickRun;
-  export let testflowStore;
+  export let testflowStore: TFDataStoreType;
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
 
@@ -142,7 +145,6 @@
   // List to store collection documents and filtered collections
   let collectionListDocument;
   let filteredCollections = writable<CollectionDto[]>([]);
-  let isRunDisabled = false;
 
   // Filter collections based on the current tab's workspace ID
   const collectionsSubscriber = collectionList.subscribe((value) => {
@@ -452,13 +454,11 @@
             iconHeight={"14px"}
             iconWidth={"14px"}
             style="height: 36px;"
-            disable={isRunDisabled}
+            disable={testflowStore?.isTestFlowRunning}
             iconColor={"var(--icon-secondary-100)"}
             onClick={async () => {
               selectedNodeId = "0";
-              isRunDisabled = true;
               await onClickRun();
-              isRunDisabled = false;
             }}
           />
         {/if}
