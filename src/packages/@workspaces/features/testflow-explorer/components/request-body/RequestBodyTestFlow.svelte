@@ -9,7 +9,7 @@
     UrlEncoded,
   } from "./sub-body";
 
-  export let environmentVariables = [];
+  export let environmentVariables;
   export let body;
   export let requestState;
   export let method;
@@ -21,7 +21,12 @@
 </script>
 
 <div class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative">
-  <RequestBodyNavigator {method} {requestState} {updateBeautifiedState} />
+  <RequestBodyNavigator
+    {method}
+    {requestState}
+    {updateBeautifiedState}
+    onUpdateRequestState={() => {}}
+  />
   <div style="flex:1; overflow:auto;">
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
       <Raw
@@ -33,9 +38,19 @@
     {:else if requestState.requestBodyNavigation === RequestDataset.NONE}
       <None />
     {:else if requestState.requestBodyNavigation === RequestDataset.URLENCODED}
-      <UrlEncoded value={body.urlencoded} />
+      <UrlEncoded
+        value={body.urlencoded}
+        {environmentVariables}
+        onUpdateEnvironment={() => {}}
+        onUpdateRequestBody={() => {}}
+      />
     {:else if requestState.requestBodyNavigation === RequestDataset.FORMDATA}
-      <FormData keyValue={body.formdata} formData={body.formdata} />
+      <FormData
+        keyValue={body.formdata}
+        {environmentVariables}
+        onUpdateRequestBody={() => {}}
+        onUpdateEnvironment={() => {}}
+      />
     {:else if requestState.requestBodyNavigation === RequestDataset.BINARY}
       <Binary />
     {/if}

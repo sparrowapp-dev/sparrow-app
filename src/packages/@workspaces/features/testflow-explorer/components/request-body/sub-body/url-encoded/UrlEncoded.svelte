@@ -17,5 +17,8 @@
     callback={handleUrlEncodeChange}
     {environmentVariables}
     {onUpdateEnvironment}
+    isInputBoxEditable={false}
+    isCheckBoxEditable={false}
+    onToggleBulkEdit={() => {}}
   />
 </section>

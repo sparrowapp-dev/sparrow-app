@@ -31,7 +31,7 @@ class InitTestflowTab {
                 requestId: "",
                 method: "",
               },
-              position: { x: 100, y: 350 },
+              position: { x: 100, y: 200 },
             },
           ],
           edges: [],
