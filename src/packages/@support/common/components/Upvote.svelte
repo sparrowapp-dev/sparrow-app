@@ -1,54 +1,39 @@
 <script lang="ts">
   import { TriangleIcon } from "@library/icons";
 
-  export let upvote: number; // Current upvote count
-  export let postID: string; // Post ID
-  export let hasUpvoted: boolean = false; // Track if the user has upvoted
-  export let likePost: (postId: string) => void; // Function to call `Upvote`
-  export let dislikePost: (postId: string) => void; // Function to call `UndoUpvote`
-  export let authordId: string;
-  export let handleUpvote
 
-  let upvoteValue = upvote;
+  export let upvote: number;
+  export let postID: string;
+  export let likePost: (postId: string) => void;
+  export let dislikePost: (postId: string) => void;
+  export let isPostLiked: boolean;
 
   const handleClick = () => {
-    if (hasUpvoted) {
+    if (isPostLiked) {
       dislikePost(postID);
-      handleUpvote() // Remove upvote
-      upvoteValue--;
+      upvote--;
     } else {
-      likePost(postID); // Add upvote
-      handleUpvote()
-      upvoteValue++;
+      likePost(postID);
+      upvote++;
     }
-    hasUpvoted = !hasUpvoted; // Toggle the upvote state
+    isPostLiked = !isPostLiked; 
   };
-
-
 </script>
 
 <div
-  class={hasUpvoted ? 'upvote-container upvoted' : 'upvote-container not-upvoted'}
+  class={isPostLiked
+    ? "upvote-container upvoted"
+    : "upvote-container not-upvoted"}
   on:click={handleClick}
 >
-  <div style="height: 24px; width: 24px; text-align: center;">
-    {#if hasUpvoted}
-    <TriangleIcon
-      height={"15px"}
-      width={"10px"}
-      color={"blue"}
-    />
+  <div style="height: 22px; width: 24px; text-align: center;">
+    {#if isPostLiked}
+      <TriangleIcon height={"10px"} width={"10px"} color={"blue"} />
     {:else}
-
-    <TriangleIcon
-    height={"15px"}
-    width={"10px"}
-    color={"white"}
-  />
+      <TriangleIcon height={"10px"} width={"10px"} color={"white"} />
     {/if}
-    
   </div>
-  <span style="margin-top: 1px; font-size: 14px;">{upvote}</span>
+  <span style=" font-size: 14px;">{upvote}</span>
 </div>
 
 <style>
@@ -56,22 +41,23 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: 0.3px solid #8A9299;
-    padding: 1px;
+    padding: 1px 4px;
     border-radius: 4px;
-    cursor: pointer;
     margin-left: 10px;
-    background-color: #1e1e1e; /* Optional: Set a background color */
+  }
+
+  .upvote-container:hover {
+    opacity: 70%;
+    background-color: #232F3D;
   }
 
   .upvoted {
-    border: 0.3px solid blue;
-    color: blue;
-
+    border: 0.3px solid var(--border-primary-300);
+    color: var(--text-primary-300);
+    background-color: var(--bg-primary-650);
   }
 
   .not-upvoted {
-    border: 0.3px solid white;
-   
+    border: 0.3px solid var(--border-secondary-200);
   }
 </style>

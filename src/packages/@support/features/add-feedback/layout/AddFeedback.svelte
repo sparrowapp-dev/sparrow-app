@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Input, Select, Textarea } from "@library/forms";
-  import { AttachmentIcon, CategoryIcon, CrossIcon } from "@library/icons";
+  import { AttachmentIcon, CategoryIcon, CrossIcon, PlusIcon } from "@library/icons";
   import { Button, Modal } from "@library/ui";
   import Drop from "../components/Drop/Drop.svelte";
   import { notifications } from "@library/ui/toast/Toast";
@@ -9,6 +9,7 @@
 
   export let onAddFeedback;
   export let onInputFeedback;
+  export let selectId = "";
 
   let type: FeedbackType = FeedbackType.CATEGORY;
   let feedbackDescription = "";
@@ -103,7 +104,8 @@
       }}
       class="add-feedback w-100 outline-none border-0 border-radius-4 text-fs-14 fw-normal"
     >
-      + <span class="px-2"> Add Feedback</span>
+      <PlusIcon height={"20"} width={"20"}/>
+       <span class="px-2"> Add Feedback</span>
     </button>
   </Tooltip>
 </div>
@@ -150,7 +152,7 @@
         iconRequired={true}
         icon={CategoryIcon}
         placeholderText={"Category"}
-        id={"feeds"}
+        id={`feeds-${selectId}`}
         zIndex={499}
         titleId={type}
         onclick={(id = "") => {

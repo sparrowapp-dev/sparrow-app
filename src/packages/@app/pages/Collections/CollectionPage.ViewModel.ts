@@ -85,6 +85,7 @@ import { SocketTabAdapter } from "@app/adapter/socket-tab";
 import type { CollectionDocType } from "@app/models/collection.model";
 import type { GuideQuery } from "@app/types/user-guide";
 import type { FeatureQuery } from "@app/types/feature-switch";
+import { ReduceQueryParams } from "@workspaces/features/rest-explorer/utils";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -724,7 +725,14 @@ export default class CollectionsViewModel {
   ) => {
     const response =
       await this.collectionService.importCollectionFromCurl(importCurl);
+
     if (response.isSuccessful) {
+      const req = response.data.data.request;
+      const reducedQueryParams = new ReduceQueryParams(req.queryParams);
+      const paramString = reducedQueryParams.getValue();
+      if (paramString) {
+        response.data.data.request.url = req.url + "?" + paramString;
+      }
       const requestTabAdapter = new RequestTabAdapter();
       const tabId = UntrackedItems.UNTRACKED + uuidv4();
       const adaptedRequest = requestTabAdapter.adapt(
@@ -2250,14 +2258,14 @@ export default class CollectionsViewModel {
         );
       }
 
-      notifications.success(`"${websocket.name}" Web Socket deleted.`);
+      notifications.success(`"${websocket.name}" WebSocket deleted.`);
       this.removeMultipleTabs([websocket.id]);
       MixpanelEvent(Events.DELETE_REQUEST, {
         source: "Collection list",
       });
       return true;
     } else {
-      notifications.error("Failed to delete the Web Socket.");
+      notifications.error("Failed to delete the WebSocket.");
       return false;
     }
   };

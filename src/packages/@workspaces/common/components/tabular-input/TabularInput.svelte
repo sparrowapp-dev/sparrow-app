@@ -15,11 +15,11 @@
   import { Tooltip } from "@library/ui";
   import SliderSwitch from "@library/forms/SliderSwitch/SliderSwitch.svelte";
 
-  import { ErrorInfoIcon, Information } from "@library/icons";
+  import { DustbinIcon, ErrorInfoIcon, Information } from "@library/icons";
 
   let enableKeyValueHighlighting = true;
   import { Editor } from "@library/forms";
-    import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
+  import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
 
   type Mode = "READ" | "WRITE";
 
@@ -550,24 +550,29 @@
                     class="h-70 pe-1 d-flex justify-content-center align-items-center"
                   >
                     <button
-                      class="bg-secondary-700 border-0"
-                      style="width:40px;"
+                      class="bg-secondary-700 border-0 d-flex justify-content-end align-items-center"
+                      style="width:40px; padding-right: 5px;"
+                      on:click={() => {
+                        deleteParam(index);
+                      }}
                     >
                       {#if mode !== "READ"}
-                        <Tooltip
-                          title={"Delete"}
-                          placement={"left"}
-                          distance={10}
-                        >
-                          <img
-                            class="trash-icon"
-                            src={trashIcon}
-                            on:click={() => {
-                              deleteParam(index);
-                            }}
-                            alt=""
-                          />
-                        </Tooltip>
+                        <span class="trash-icon">
+                          <Tooltip
+                            title={"Delete"}
+                            placement={"left"}
+                            distance={10}
+                          >
+                            <DustbinIcon
+                              height={"12px"}
+                              width={"12px"}
+                              color={"--icon-secondary-200"}
+                              on:click={() => {
+                                deleteParam(index);
+                              }}
+                            />
+                          </Tooltip>
+                        </span>
                       {/if}
                     </button>
                   </div>
@@ -726,13 +731,14 @@
 
         <!-- Bulk Edit TextArea starts -->
         <div style="height:100%">
-          {#if isBulkEditLoaded}           
+          {#if isBulkEditLoaded}
             <BulkEditEditor
-            bind:value={bulkText}
-            on:change={handleBulkTextarea}
-            {enableKeyValueHighlighting}
-            class={`px-2 sparrow-fs-18 outline-none`}
-            placeholder={bulkEditPlaceholder}/>
+              bind:value={bulkText}
+              on:change={handleBulkTextarea}
+              {enableKeyValueHighlighting}
+              class={`px-2 sparrow-fs-18 outline-none`}
+              placeholder={bulkEditPlaceholder}
+            />
           {/if}
         </div>
         <!-- Bulk Edit TextArea end -->
@@ -830,6 +836,11 @@
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
+  }
+
+  .trash-icon {
+    height: 24px;
+    width: 24px;
   }
   .trash-icon:hover {
     background-color: var(--bg-secondary-500);

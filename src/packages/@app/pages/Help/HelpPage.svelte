@@ -5,7 +5,13 @@
     FeedbackSection,
     Community,
   } from "@support/features";
-  import { ActivityIcon, DocIcon, GroupIcon, RoadmapIcon, UpdateIcon } from "@library/icons";
+  import {
+    ActivityIcon,
+    DocIcon,
+    GroupIcon,
+    RoadmapIcon,
+    UpdateIcon,
+  } from "@library/icons";
   import DiscordPost from "@support/features/discord-post/layout/DiscordPost.svelte";
   import HelpPageViewModel from "./HelpPage.ViewModel";
   import { onMount } from "svelte";
@@ -13,23 +19,94 @@
   import { pagesMotion } from "@app/constants";
   import Roadmap from "@support/features/roadmap/layout/Roadmap.svelte";
   import { ReleaseNotes } from "@support/features/release-notes/layout";
+  import { ActivitySection } from "@support/features/activity-section";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
-  const _viewModel = new HelpPageViewModel();
-
-  let listVotes = [];
-
+  /**
+   * @description - Prevents the default context menu from appearing on right-click.
+   * @param event - The event triggered by a right-click.
+   */
   document.addEventListener("contextmenu", (event) => event.preventDefault());
 
+  /**
+   * @description - Initializes the HelpPageViewModel instance.
+   */
+  const _viewModel = new HelpPageViewModel();
+
+  /**
+   * @description - Holds the currently active tab. Default is "roadmap".
+   */
   let activeTab = "roadmap";
 
-  function setActiveTab(tab) {
+  /**
+   * @description - Stores the release notes data as an array.
+   */
+  let releaseNotesData = [];
+
+  /**
+   * @description - Tracks if a post was opened from the activity tab.
+   */
+  let isPostopenFromActivity = false;
+
+  /**
+   * @description - Stores the ID of the currently selected post.
+   */
+  let postId = "";
+
+  /**
+   * @description - Sets the active tab, preventing "faq" from being selected.
+   * @param tab - The name of the tab to set as active.
+   */
+  const setActiveTab = (tab) => {
     if (tab !== "faq") {
       activeTab = tab;
     }
-  }
+  };
 
-  let releaseNotesData = [];
+  /**
+   * @description - Sets the post ID and marks the activity as opened from a post. Prevents "faq" from being selected.
+   * @param tab - The name of the tab to set as active.
+   * @param postID - The ID of the post to set.
+   */
+  const setPostId = (tab, postID) => {
+    if (tab !== "faq") {
+      isPostopenFromActivity = true;
+      activeTab = tab;
+      postId = postID;
+    }
+  };
 
+  /**
+   * Get the font and background color based on the status.
+   *
+   * @param {string} status - The status value to determine the colors for.
+   * @returns {{ fontColor: string, backgroundColor: string }} An object containing the font and background colors.
+   */
+  const getColor = (status) => {
+    if (status === "new" || status === "open") {
+      return { fontColor: "#1193F0", backgroundColor: "#050938" };
+    }
+    if (status === "fixed" || status === "in progress") {
+      return { fontColor: "#DF77F9", backgroundColor: "#DF77F9" };
+    }
+    if (status === "improved" || status === "complete") {
+      return { fontColor: "#69D696", backgroundColor: "#031B0D" };
+    }
+    if (status === "planned") {
+      return { fontColor: "#FFE47E", backgroundColor: "#171302" };
+    }
+    if (status === "under review") {
+      return { fontColor: "#FBA574", backgroundColor: "#1C1405" };
+    }
+    return { fontColor: "white", backgroundColor: "black" };
+  };
+
+  /**
+   * @description - Fetches release notes when the component is mounted and sets the appropriate active tab based on the current URL path.
+   * - Fetches and sets `releaseNotesData`.
+   * - Checks the current URL path and sets `activeTab` to either "updates" or "roadmap".
+   */
   onMount(async () => {
     await _viewModel.fetchReleaseNotes();
     releaseNotesData = await _viewModel.getAllReleaseNotes();
@@ -51,14 +128,18 @@
           class="tab d-flex align-items-center gap-2 {activeTab === 'roadmap'
             ? 'active'
             : ''}"
-          on:click={() => setActiveTab("roadmap")}
+          on:click={() => {
+            setActiveTab("roadmap");
+            isPostopenFromActivity = false;
+            MixpanelEvent(Events.Roadmap_Tab);
+          }}
         >
           <RoadmapIcon
             height={"17px"}
             width={"17px"}
             color={activeTab === "roadmap"
               ? "var(--text-primary-300)"
-              : "var( --white-color )"}
+              : "var(--text-secondary-100)"}
           />
           Roadmap
         </div>
@@ -66,14 +147,18 @@
           class="tab align-items-center gap-2 {activeTab === 'feedback'
             ? 'active'
             : ''}"
-          on:click={() => setActiveTab("feedback")}
+          on:click={() => {
+            setActiveTab("feedback");
+            isPostopenFromActivity = false;
+            MixpanelEvent(Events.Feedback_Tab);
+          }}
         >
           <DocIcon
             height={"17px"}
             width={"17px"}
             color={activeTab === "feedback"
               ? "var(--text-primary-300)"
-              : "var( --white-color )"}
+              : "var(--text-secondary-100)"}
           />
           Feedback
         </div>
@@ -81,14 +166,18 @@
           class="tab align-items-center gap-2 {activeTab === 'updates'
             ? 'active'
             : ''}"
-          on:click={() => setActiveTab("updates")}
+          on:click={() => {
+            setActiveTab("updates");
+            isPostopenFromActivity = false;
+            MixpanelEvent(Events.Updates_Tab);
+          }}
         >
           <UpdateIcon
             height={"17px"}
             width={"17px"}
             color={activeTab === "updates"
               ? "var(--text-primary-300)"
-              : "var( --white-color )"}
+              : "var(--text-secondary-100)"}
           />
           Updates
         </div>
@@ -96,14 +185,18 @@
           class="tab align-items-center gap-2 {activeTab === 'community'
             ? 'active'
             : ''}"
-          on:click={() => setActiveTab("community")}
+          on:click={() => {
+            setActiveTab("community");
+            isPostopenFromActivity = false;
+            MixpanelEvent(Events.Community_Tab);
+          }}
         >
           <GroupIcon
             height={"17px"}
             width={"17px"}
             color={activeTab === "community"
               ? "var(--text-primary-300)"
-              : "var( --white-color )"}
+              : "var(--text-secondary-100)"}
           />
           Community
         </div>
@@ -112,18 +205,25 @@
           class="tab align-items-center gap-2 {activeTab === 'myActivity'
             ? 'active'
             : ''}"
-          on:click={() => setActiveTab("myActivity")}
+          on:click={() => {
+            setActiveTab("myActivity");
+            isPostopenFromActivity = false;
+            MixpanelEvent(Events.Activity_Tab);
+          }}
         >
           <ActivityIcon
             height={"17px"}
             width={"17px"}
             color={activeTab === "myActivity"
               ? "var(--text-primary-300)"
-              : "var( --white-color )"}
+              : "var(--text-secondary-100)"}
           />
           My Activity
         </div>
+
+        <div style="width: 400px;"></div>
       </div>
+
       <!--
         -- Help Body 
       -->
@@ -144,25 +244,36 @@
                 onRetrievePost={_viewModel.retrievePostData}
                 onAddComment={_viewModel.addComment}
                 fetchComments={_viewModel.listComments}
-                currentUser={_viewModel.createUser}
                 createVote={_viewModel.CreateVote}
                 deleteVote={_viewModel.deleteVote}
                 listVote={_viewModel.listVote}
+                {getColor}
+                bind:postId
+                bind:isPostopenFromActivity
               />
             {:else if activeTab === "updates"}
-              <ReleaseNotes
-                listChangeLog={_viewModel.listChangeLog}
-                {releaseNotesData}
-                onLearnMore={_viewModel.learnMore}
-              />
+              <ReleaseNotes listChangeLog={_viewModel.listChangeLog} />
             {:else if activeTab === "roadmap"}
-              <Roadmap fetchPosts={_viewModel.getListOfPOsts} />
+              <Roadmap
+                {setPostId}
+                fetchPosts={_viewModel.getListOfPOsts}
+                {getColor}
+              />
             {:else if activeTab === "community"}
               <Community />
               <DiscordPost />
             {:else if activeTab === "myActivity"}
-              My Activity
-            {/if}
+              <ActivitySection
+                onInputFeedback={_viewModel.createPost}
+                onAddFeedback={_viewModel.addFeedback}
+                fetchPosts={_viewModel.getUserPosts}
+                onRetrievePost={_viewModel.retrievePostData}
+                fetchComments={_viewModel.retrieveUserComments}
+                fetchLikedPosts={_viewModel.retrieveUserVotes}
+                listPostsComments={_viewModel.listComments}
+                {getColor}
+                {setPostId}
+              />{/if}
           </div>
         </div>
         <div style="width: 274px;" class="ps-2 pe-3 pt-3 pb-2 h-100">
@@ -171,6 +282,7 @@
               <AddFeedback
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
+                selectId={"help"}
               />
             </div>
             <div>
@@ -187,7 +299,7 @@
   .tabs {
     display: flex;
     height: 37px;
-    border-bottom: 2px solid var(--text-secondary-900);
+    border-bottom: 2px solid var(--border-secondary-900);
     background-color: var(--bg-secondary-900);
   }
 
@@ -212,6 +324,6 @@
     bottom: -2px;
     width: 100%;
     height: 2px;
-    border-bottom: 4px solid var(--text-primary-300);
+    border-bottom: 4px solid var(--border-primary-300);
   }
 </style>

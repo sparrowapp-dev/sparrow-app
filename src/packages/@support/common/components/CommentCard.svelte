@@ -2,35 +2,74 @@
   import { AttachmentIcon } from "@library/icons";
   import { Button, IconFallback } from "@library/ui";
   import { CommentCard } from "@support/common/components";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
+  /**
+   * @description - The current comment being added or modified by the user.
+   */
   export let comment;
+
+  /**
+   * @description - Information about the current user, including details like name, ID, etc.
+   */
   export let userInfo;
+
+  /**
+   * @description - Callback function triggered when a new comment is added.
+   */
   export let onAddComment;
+
+  /**
+   * @description - Function to fetch comments for a specific post from the server.
+   */
   export let fetchComments;
-  export let logMessage;
-  const isAuthor = userInfo?.email === comment?.author?.email;
 
-  let parentID = comment?.id;
+  /**
+   * @description - Function to reload the list of comments, typically after a new comment is added or deleted.
+   */
+  export let reloadComments;
 
-  function timeAgo(createdTime) {
-    const now = new Date();
-    const commentTime = new Date(createdTime);
-    const difference = now - commentTime; // difference in milliseconds
-    const hours = Math.floor(difference / (1000 * 60 * 60)); // convert to hours
+  /**
+   * @description - The ID of the post to which the comments belong.
+   */
+  export let postId;
 
-    if (hours < 1) {
-      return "less than an hour ago";
-    } else if (hours === 1) {
-      return "1 hour ago";
-    } else {
-      return `${hours} hours ago`;
-    }
-  }
-
-  const commentTime = timeAgo(comment.created); // Format the time in hours
+  let isCommenting = false;
 
   let isReplying = false;
+
   let commentValue = "";
+
+  const isAuthor = userInfo?.email === comment?.author?.email;
+
+  /**
+   * Formats a given date into a human-readable "time ago" string.
+   * @param  date - The date to format.
+   * @returns  Formatted time string (e.g., "2 hours ago").
+   */
+  const timeAgo = (date) => {
+    const diffInSeconds = (new Date() - new Date(date)) / 1000;
+    const minutes = Math.floor(diffInSeconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days >= 1) {
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    } else if (hours >= 1) {
+      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    } else if (minutes >= 1) {
+      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    } else {
+      const seconds = Math.floor(diffInSeconds);
+      return `${seconds} second${seconds > 1 ? "s" : ""} ago`;
+    }
+  };
+
+  /**
+   * Updates the comment value with the input from the event.
+   * @param {Event} e - The input event.
+   */
   const handleAddCommentInput = (e) => {
     commentValue = e.target.value;
   };
@@ -46,16 +85,27 @@
   />
 
   <div class="comment-content">
-    <div class="comment-author">{comment.author.name || ""}</div>
-    <div class="comment-text">
-      {comment.value}
+    <div class="comment-author text-fs-14 mt-1">
+      {comment.author.name || ""}
+    </div>
+    <div
+      class="text-fs-12"
+      style="font-weight: 400; color:var(--text-secondary-1000);  "
+    >
+      <p style="word-break: break-all;">
+        {comment.value}
+      </p>
     </div>
     <div class="comment-meta">
       <div class="comment-moreinfo">
-        <span class="comment-time">{commentTime}</span>
+        <span class="comment-time">{timeAgo(comment.created)}</span>
         {#if !comment.parentID}
           <p
-            on:click={() => (isReplying = !isReplying)}
+            on:click={() => {
+              isReplying = !isReplying;
+              MixpanelEvent(Events.Reply_Comment);
+
+            }}
             style="color: {isReplying
               ? 'white'
               : 'grey'}; text-decoration: {isReplying ? 'underline' : 'none'};"
@@ -64,7 +114,7 @@
           </p>
         {/if}
         {#if isAuthor}
-          <span class="edit-comment">Edit comment</span>
+          <!-- <span class="edit-comment">Edit comment</span> -->
         {/if}
       </div>
     </div>
@@ -84,28 +134,32 @@
           bind:value={commentValue}
         />
 
-        <div class="d-flex align-items-center gap-2">
-          <AttachmentIcon
+        <div class="d-flex align-items-center gap-2 ms-1">
+          <!-- <AttachmentIcon
             height={"12px"}
             width={"12px"}
             color={"var(--text-secondary-200)"}
-          />
+          /> -->
 
           <Button
             title={`Add`}
             type={`primary`}
-            loaderSize={17}
+            loaderSize={13}
+            loader={isCommenting}
             textStyleProp={"font-size: var(--small-text)"}
-            buttonClassProp={`ps-2`}
-            buttonStyleProp={`height: 20px; width:35px; rounded;`}
+            buttonStyleProp={`height: 20px;  rounded; margin-left:2px;`}
             onClick={async () => {
-              await onAddComment(comment.post.id, commentValue, comment?.id);
-              logMessage();
+              isCommenting = true;
+              await onAddComment(postId, commentValue, comment?.id);
+              isCommenting = false;
+
+              reloadComments();
               commentValue = "";
               setTimeout(() => {
                 isReplying = false;
               }, 3000);
             }}
+            disable={commentValue.length == 0 || isCommenting}
           />
         </div>
       </div>
@@ -113,7 +167,7 @@
 
     <!-- Check if the comment has replies and render them recursively -->
     {#if comment.replies && comment.replies.length > 0}
-      <div >
+      <div>
         {#each comment.replies as reply}
           <CommentCard
             {onAddComment}
@@ -142,7 +196,7 @@
   }
 
   .comment-content {
-    flex-grow: 1;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -188,16 +242,17 @@
   }
 
   .search-input-container {
-    background: var(--bg-tertiary-400);
+    background: var(--bg-secondary-800);
     width: 100%;
     font-size: 12px;
     height: 30px;
     position: relative;
-    border: 1px solid transparent;
+    border: 1px solid var(--border-secondary-310);
+    border-radius: 2px;
   }
- 
+
   .search-input-container:focus-within {
-    border-color: #636566;
+    border-color: var(--border-primary-300);
     caret-color: var(--border-primary-300);
   }
   #search-input:focus {

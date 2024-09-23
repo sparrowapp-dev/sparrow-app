@@ -1,303 +1,501 @@
 <script>
   import { SearchIcon } from "$lib/assets/icons";
   import { Select } from "@library/forms";
-  import { ArrowUnfilledIcon, CrossIcon, StackIcon } from "@library/icons";
+  import {
+    ArrowUnfilledIcon,
+    CrossIcon,
+    FilterIcon,
+    LinkedinIcon,
+    LinkIcon,
+    ThumbIcon,
+  } from "@library/icons";
   import { onMount } from "svelte";
+  import { marked } from "marked";
+  import constants from "$lib/utils/constants";
+  import { Loader, Tooltip } from "@library/ui";
+  import copyToClipBoard from "$lib/utils/copyToClipboard";
+  import { notifications } from "@library/ui/toast/Toast";
+  import { open } from "@tauri-apps/plugin-shell";
+  import { UpdatesTagType } from "@support/common/types/feedback";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   export let listChangeLog;
 
-  onMount(async () => {
-    // here in thsi function we weill sent thetype based on the select compoent
-    let releaseNOTes = await listChangeLog();
-    console.log("This is realse notes", releaseNOTes);
-  });
-  let events = [
-    {
-      date: "Jul 31, 2020",
-      title: "v2.4.2 - Latest Version",
-      description:
-        "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process",
-      tags: ["New"], // Example with only one tag
-      link: "Github",
-      reactions: 41,
-    },
-    {
-      date: "Aug 05, 2024",
-      title: "v2.4.3 - Latest Version",
-      description:
-        "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process.",
-      tags: ["New", "Fixed", "Improved"], // Example tags
-      link: "Github",
-      reactions: 41,
-    },
-    {
-      date: "Jul 31, 2026",
-      title: "v2.4.4 - Latest Version",
-      description:
-        "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process",
-      tags: ["New"], // Example with only one tag
-      link: "Github",
-      reactions: 41,
-    },
-    {
-      date: "Aug 05, 2028",
-      title: "v2.4.5 - Latest Version",
-      description:
-        "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process.",
-      tags: ["New", "Fixed", "Improved"], // Example tags
-      link: "Github",
-      reactions: 41,
-    },
-    {
-      date: "Jul 31, 2029",
-      title: "v2.4.6 - Latest Version",
-      description:
-        "The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process. The latest update includes improved JSON Schema Validation. This enhancement ensures more accurate validation of complex JSON structures, helping you catch errors early in the testing process",
-      tags: ["New"],
-      link: "Github",
-      reactions: 41,
-    },
-  ];
+  /**
+   * External URL for Sparrow's GitHub page.
+   */
+  const externalSparrowGithub = constants.SPARROW_GITHUB;
+
+  /**
+   * External URL for Sparrow's LinkedIn page.
+   */
+  const externalSparrowLinkedin = constants.SPARROW_LINKEDIN;
+
+  /**
+   * Type of events to filter.
+   */
+  let type = "all";
+
+  /**
+   * List of events.
+   */
+  let events = [];
+
+  /**
+   * Search query input by the user.
+   */
   let searchQuery = "";
-  let selectedEvent = [];
+
+  /**
+   * Boolean flag to determine whether to show the timeline.
+   */
   let showTimeline = true;
+
+  /**
+   * The currently selected event.
+   */
+  let selectedEvent = [];
+
+  /**
+   * List of events filtered by search query or selected tag.
+   */
   let filteredEvents = events;
 
+  /**
+   * The currently selected tag for filtering events.
+   * Defaults to an empty string, which corresponds to "All".
+   */
+  let selectedTag = "";
+
+  /**
+   * Boolean flag to indicate whether events are being loaded.
+   */
+  let isLoading = false;
+
+  /**
+   * Filters the list of events based on the search query.
+   */
   const filterEvents = () => {
     filteredEvents = events.filter((event) =>
       event.title.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   };
 
+  /**
+   * Handles input change for the search query.
+   * @param {Event} e - The input event triggered when typing in the search field.
+   */
   const handleInput = (e) => {
     searchQuery = e.target.value;
     filterEvents();
   };
 
+  /**
+   * Clears the search input and resets the filtered events to show all.
+   */
   const clearSearch = () => {
     searchQuery = "";
     filteredEvents = events;
   };
 
-  function getTagClass(tag) {
-    if (tag === "New") return "tag-new";
-    if (tag === "Fixed") return "tag-fixed";
-    if (tag === "Improved") return "tag-improved";
+  /**
+   * Gets the appropriate CSS class for a given tag.
+   * @param  tag - The tag associated with an event (e.g., "new", "fixed", "improved").
+   * @returns  - The CSS class corresponding to the tag.
+   */
+  const getTagClass = (tag) => {
+    if (tag === UpdatesTagType.NEW) return "tag-new";
+    if (tag === UpdatesTagType.FIXED) return "tag-fixed";
+    if (tag === UpdatesTagType.IMPROVED) return "tag-improved";
     return "";
-  }
+  };
 
+  /**
+   * Handles the action when the user clicks to see more details of an event.
+   * @param {Object} event - The event data to be displayed.
+   */
   const handleSeeMore = (event) => {
     selectedEvent = event;
     showTimeline = false;
   };
 
+  /**
+   * Handles the action when the user clicks to go back to the timeline view.
+   */
   const handleBack = () => {
     selectedEvent = null;
     showTimeline = true;
   };
 
-  let type = "all";
-
+  /**
+   * Truncates an event description if it exceeds a certain word count.
+   * @param {string} description - The event description to truncate.
+   * @returns {string} - The truncated description followed by ellipsis if it's too long.
+   */
   const truncateDescription = (description) => {
     const words = description.split(" ");
     return words.length > 30
-      ? words.slice(0, 30).join(" ") + "..."
+      ? words.slice(0, 40).join(" ") + "..."
       : description;
   };
-  let subCategory;
 
-  let selectedTag = "All"; // Default to 'All'
+  /**
+   * Formats a date string into a more readable format.
+   * @param {string} dateString - The raw date string to format.
+   * @returns {string} - The formatted date string (e.g., "31 Dec 2024").
+   */
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { day: "2-digit", month: "short", year: "numeric" };
+    return date.toLocaleDateString("en-GB", options);
+  };
 
-  // Reactive statement to filter events based on selected tag
-  $: {
-    if (selectedTag === "All") {
+  /**
+   * Handles the selection change for event tags.
+   * Filters events based on the selected tag.
+   * @param {string} id - The tag ID selected by the user (e.g., "new", "all").
+   */
+  const handleSelectChange = (id) => {
+    selectedTag = id;
+    if (selectedTag === "all") {
       filteredEvents = events;
     } else {
       filteredEvents = events.filter((event) =>
-        event.tags.includes(selectedTag),
+        event.types.includes(selectedTag),
       );
     }
-  }
+    MixpanelEvent(Events.Updates_Filter);
 
-  // Function to handle select changes
-  function handleSelectChange(id) {
-    selectedTag = id;
-  }
+  };
+
+  onMount(async () => {
+    isLoading = true;
+    let releaseNotes = await listChangeLog();
+    events = releaseNotes.data.entries;
+    filteredEvents = events;
+    isLoading = false;
+  });
 </script>
 
 <div style="height:100%; width:100%;">
   <div class="container-data" style="padding: 20px;">
     <div class="headerq">
       <p style="font-size: 20px; font-weight:700;">Updates</p>
-      <p style="color: #999999; font-size;14px;">
+      <p style="color: var(--text-secondary-50); font-size:14px;">
         Check out our latest releases designed to boost your productivity and
         efficiency.
       </p>
     </div>
 
-    <div class="d-flex justify-content-between page-funationality">
-      <div class="" style="">
-        <div class={`d-flex search-input-container rounded py-1 px-2 mb-4`}>
-          <SearchIcon
-            width={14}
-            height={14}
-            color={"grey"}
-            classProp={`my-auto me-3`}
-          />
-          <input
-            type="text"
-            id="search-input"
-            class={`bg-transparent w-100 border-0 my-auto`}
-            placeholder="Search updates"
-            on:input={handleInput}
-          />
+    {#if showTimeline}
+      <div class="d-flex justify-content-between page-funationality">
+        <div class="" style="">
+          <div class={`d-flex search-input-container rounded py-1 px-2 mb-4`}>
+            <SearchIcon
+              width={14}
+              height={14}
+              color={"grey"}
+              classProp={`my-auto me-3`}
+            />
+            <input
+              type="text"
+              id="search-input"
+              class={`bg-transparent w-100 border-0 my-auto`}
+              placeholder="Search updates"
+              on:input={handleInput}
+            />
 
-          {#if searchQuery.length != 0}
-            <div
-              class="clear-icon"
-              on:click={() => {
-                clearSearch();
-              }}
-            >
-              <CrossIcon
-                height="16px"
-                width="12px"
-                color="var(--icon-secondary-300)"
-              />
-            </div>
-          {/if}
+            {#if searchQuery.length != 0}
+              <div
+                class="clear-icon"
+                on:click={() => {
+                  clearSearch();
+                }}
+              >
+                <CrossIcon
+                  height="16px"
+                  width="12px"
+                  color="var(--icon-secondary-300)"
+                />
+              </div>
+            {/if}
+          </div>
+        </div>
+
+        <div class="filter">
+          <Select
+            id={"feeds"}
+            data={[
+              { name: "New", id: UpdatesTagType.NEW },
+              { name: "Fixed", id: UpdatesTagType.FIXED },
+              { name: "Improved", id: UpdatesTagType.IMPROVED },
+              { name: "All", id: UpdatesTagType.ALL },
+            ]}
+            titleId={selectedTag}
+            onclick={(id = "") => {
+              type = id;
+              handleSelectChange(id);
+            }}
+            placeholderText={"Filters"}
+            zIndex={499}
+            disabled={false}
+            iconRequired={true}
+            icon={FilterIcon}
+            iconColor={"var(--text-secondary-100)"}
+            borderType={"none"}
+            borderActiveType={"none"}
+            borderHighlight={"hover-active"}
+            headerHighlight={"hover-active"}
+            headerHeight={"26px"}
+            minBodyWidth={"150px"}
+            minHeaderWidth={"150px"}
+            maxHeaderWidth={"200px"}
+            borderRounded={"2px"}
+            headerTheme={"violet2"}
+            bodyTheme={"violet"}
+            menuItem={"v2"}
+            headerFontSize={"10px"}
+            isDropIconFilled={true}
+            position={"absolute"}
+          />
         </div>
       </div>
+    {/if}
+    {#if isLoading}
+      <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+    {:else}
+      <div>
+        {#if showTimeline}
+          {#if filteredEvents.length > 0}
+            <div class="timeline">
+              {#each filteredEvents as event}
+                <div class="timeline-event">
+                  <div class="timeline-date">
+                    {formatDate(event.publishedAt)}
+                  </div>
+                  <div class="timeline-circle"></div>
+                  <div class="timeline-content">
+                    <div class="d-flex gap-2">
+                      <h3
+                        class="text-fs-18"
+                        on:click={() => {
+                          handleSeeMore(event);
+                          MixpanelEvent(Events.Version_Updates);
+                        }}
+                      >
+                        {event.title}
+                      </h3>
+                      <div
+                        class="link-div"
+                        style="height: 24px; width:24px; cursor:pointer"
+                        on:click={async () => {
+                          await copyToClipBoard(event.url);
+                          notifications.success("Link copied to clipboard!");
+                          MixpanelEvent(Events.Copy_Link);
+                        }}
+                      >
+                        <Tooltip
+                          title={"Copy link"}
+                          placement={"right"}
+                          distance={4}
+                          show={true}
+                          zIndex={701}
+                        >
+                          <LinkIcon
+                            height={"18px"}
+                            width={"18px"}
+                            color={"var(--text-secondary-100)"}
+                          />
+                        </Tooltip>
+                      </div>
+                    </div>
+                    <div class="tags">
+                      {#each event.types as tag}
+                        <span class="tag {getTagClass(tag)}">
+                          {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
+                        >
+                      {/each}
+                    </div>
+                    {#if event.plaintextDetails.split(" ").length > 20}
+                      <p
+                        style="font-size: 14px; font-weight:400; line-height:24px; "
+                        class=""
+                      >
+                        {truncateDescription(event.plaintextDetails)}
+                        <span
+                          style="text-decoration: underline; color:#3670F7; border:none; background-color:transparent; cursor:pointer "
+                          class="ms-0"
+                          on:click={() => {
+                            handleSeeMore(event);
+                            MixpanelEvent(Events.See_More_Updates);
+                          }}>see more</span
+                        >
+                      </p>
+                    {:else}
+                      <p
+                        style="font-size: 14px; font-weight:400; line-height:24px; "
+                        class=""
+                      >
+                        {event.description}
+                      </p>
+                    {/if}
+                    <div
+                      class="d-flex align-items-center justify-content-between"
+                    >
+                      <p
+                        style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
+                        class="mb-0"
+                        on:click={async () => {
+                          await open(externalSparrowGithub);
+                          MixpanelEvent(Events.Github_Updates);
+                        }}
+                      >
+                        Github
+                      </p>
 
-      <div class="filter">
-        <Select
-          id={"feeds"}
-          data={[
-            { name: "All", id: "All" },
-            { name: "New", id: "New" },
-            { name: "Fixed", id: "Fixed" },
-            { name: "Improved", id: "Improved" },
-          ]}
-          titleId={selectedTag}
-          onclick={(id = "") => {
-            type = id;
-            handleSelectChange(id);
-          }}
-          minHeaderWidth={"185px"}
-          iconRequired={true}
-          icon={StackIcon}
-          iconColor={"var(--icon-primary-300)"}
-          isDropIconFilled={true}
-          borderType={"none"}
-          borderActiveType={"none"}
-          headerHighlight={""}
-          headerTheme={"violet"}
-          menuItem={"v2"}
-          headerFontSize={"12px"}
-          maxHeaderWidth={"185px"}
-          zIndex={200}
-          bodyTheme={"violet"}
-          borderRounded={"2px"}
-          position={"absolute"}
-        />
-      </div>
-    </div>
-    {#if showTimeline}
-      {#if filteredEvents.length > 0}
-        <div class="timeline">
-          {#each filteredEvents as event}
-            <div class="timeline-event">
-              <div class="timeline-date">{event.date}</div>
-              <div class="timeline-circle"></div>
-              <div class="timeline-content">
-                <h3>{event.title}</h3>
-                <div class="tags">
-                  {#each event.tags as tag}
-                    <span class="tag {getTagClass(tag)}">{tag}</span>
-                  {/each}
+                      <div class="d-flex align-items-center gap-2">
+                        <!-- <ThumbIcon height={"18px"} width={"18px"} />
+                    <div style="color: var(--text-secondary-100);">
+                      {event.reactions?.like || ""}
+                    </div> -->
+                        <div
+                          style="cursor:pointer; solid grey;"
+                          class="ps-2"
+                          on:click={async () => {
+                            await open(externalSparrowLinkedin);
+                            MixpanelEvent(Events.LinkedIn_Updates_Icon);
+                          }}
+                        >
+                          <LinkedinIcon height={"18px"} width={"18px"} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                {#if event.description.split(" ").length > 20}
-                  <p
-                    style="font-size: 14px; font-weight:400; line-height:24px; "
-                    class=""
+              {/each}
+            </div>
+          {:else}
+            <div
+              class="no-results mt-5 d-flex justify-content-center align-items-center mx-1 text-fs-14 mb-0 text-center"
+              style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+            >
+              <p>No results found</p>
+            </div>
+          {/if}
+        {:else}
+          <div class="d-flex selected-event-detail">
+            <div style="width:23.5%; " class="d-flex mt-2">
+              <div>
+                <div
+                  on:click={handleBack}
+                  style="cursor:pointer; transform: rotate(90deg);"
+                >
+                  <ArrowUnfilledIcon
+                    height={"16px"}
+                    width={"16px"}
+                    color={"var(--text-secondary-100)"}
+                  />
+                </div>
+              </div>
+              <div
+                class="ms-2 text-fs-14"
+                style="margin-top:1.5px; color:var(--text-secondary-100); font-weight:500;"
+              >
+                {formatDate(selectedEvent.publishedAt)}
+              </div>
+            </div>
+
+            <div class="ms-2 timeline-content">
+              <div class="d-flex gap-2">
+                <h3>
+                  {selectedEvent.title}
+                </h3>
+                <div
+                  style="height: 24px; width:24px; cursor:pointer"
+                  on:click={async () => {
+                    await copyToClipBoard(selectedEvent.url);
+                    notifications.success("Link copied to clipboard!");
+                    MixpanelEvent(Events.Copy_Link);
+                  }}
+                >
+                  <Tooltip
+                    title={"Link"}
+                    placement={"right"}
+                    distance={20}
+                    show={true}
+                    zIndex={701}
                   >
-                    {truncateDescription(event.description)}
-                    <span
-                      style="text-decoration: underline; color:#3670F7; border:none; background-color:transparent "
-                      class="ms-0"
-                      on:click={() => handleSeeMore(event)}>....see more</span
-                    >
-                  </p>
-                {:else}
-                  <p
-                    style="font-size: 14px; font-weight:400; line-height:24px; "
-                    class=""
+                    <LinkIcon
+                      height={"18px"}
+                      width={"18px"}
+                      color={"var(--text-secondary-100)"}
+                    />
+                  </Tooltip>
+                </div>
+              </div>
+              <div class="tags">
+                {#each selectedEvent.types as tag}
+                  <span class="tag {getTagClass(tag)}">
+                    {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
                   >
-                    {event.description}
-                  </p>
-                {/if}
-                <div class="d-flex align-items-center justify-content-between">
-                  <a href="#">{event.link}</a>
-                  <div class="timeline-reactions">
-                    <span class="me-1 icon">👍</span>
-                    <span>{event.reactions}</span>
-                    <span
-                      style="border-left: 1px solid grey; padding-left:3px;"
-                      class="icon">👍</span
-                    >
+                {/each}
+              </div>
+
+              <p style="font-size: 14px; font-weight:400; " class="mt-3">
+                {@html marked(selectedEvent.markdownDetails)}
+              </p>
+
+              <div
+                class="d-flex align-items-center justify-content-between p-1"
+              >
+                <p
+                  style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
+                  class="mb-0"
+                  on:click={async () => {
+                    await open(externalSparrowGithub);
+                    MixpanelEvent(Events.Github_Updates);
+                  }}
+                >
+                  Github
+                </p>
+                <div class="d-flex align-items-center gap-2">
+                  <!-- <ThumbIcon height={"18px"} width={"18px"} />
+              <div style="color: var(--text-secondary-100);">
+                {selectedEvent.reactions?.like || ""}
+              </div> -->
+                  <div
+                    style=" solid grey;"
+                    class="ps-2"
+                    on:click={async () => {
+                      await open(externalSparrowLinkedin);
+                      MixpanelEvent(Events.LinkedIn_Updates_Icon);
+                    }}
+                  >
+                    <LinkedinIcon height={"18px"} width={"18px"} />
                   </div>
                 </div>
               </div>
             </div>
-          {/each}
-        </div>
-      {:else}
-        <div
-          class="no-results mt-5 d-flex justify-content-center align-items-center mx-1 text-fs-14 mb-0 text-center"
-          style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
-        >
-          <p>No results found for "{searchQuery}"</p>
-        </div>
-      {/if}
-    {:else}
-      <div class="d-flex selected-event-detail">
-        <div style="width:23.5%; " class="d-flex mt-2">
-          <div style="cursor:pointer;" on:click={handleBack}>
-            <div style="transform: rotate(90deg);">
-              <ArrowUnfilledIcon height={"16px"} width={"16px"} />
-            </div>
           </div>
-          <span class="ms-2">{selectedEvent.date}</span>
-        </div>
-
-        <div class="ms-2 timeline-content">
-          <h3>{selectedEvent.title}</h3>
-          <div class="tags">
-            {#each selectedEvent.tags as tag}
-              <span class="tag {getTagClass(tag)}">{tag}</span>
-            {/each}
-          </div>
-
-          <p style="font-size: 14px; font-weight:400; " class="">
-            {selectedEvent.description}
-          </p>
-          <div class="d-flex align-items-center justify-content-between">
-            <a href="#">{selectedEvent.link}</a>
-            <div class="timeline-reactions">
-              <span class="me-1 icon">👍</span>
-              <span>{selectedEvent.reactions}</span>
-              <span
-                style="border-left: 1px solid grey; padding-left:3px;"
-                class="icon">👍</span
-              >
-            </div>
-          </div>
-        </div>
+        {/if}
       </div>
     {/if}
   </div>
 </div>
 
 <style>
+  :global(h1) {
+    font-size: 24px;
+  }
+  .link-div {
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    border-radius: 2px;
+  }
+  .link-div:hover {
+    background-color: var(--dull-background-color);
+  }
   .selected-event-detail {
     display: flex;
     justify-content: space-between;
@@ -305,7 +503,8 @@
   .search-input-container {
     border: 1px solid var(--border-color);
     background: var(--bg-tertiary-400);
-    width: 27vw;
+    height: 26px;
+    width: 300px;
     font-size: 12px;
     position: relative;
     border: 1px solid transparent;
@@ -340,14 +539,14 @@
   .timeline::before {
     content: "";
     position: absolute;
-    width: 1px;
-    background-color: #3670f7;
+    width: 0.6px;
+    background-color: var(--bg-primary-300);
     top: 0;
     bottom: 0;
     left: 7px;
     margin-left: -1px;
     margin-top: 26px;
-    margin-bottom: 170px;
+    margin-bottom: 175px;
   }
 
   .timeline-event {
@@ -367,17 +566,17 @@
     left: -140px;
     top: 10px;
     font-weight: bold;
-    color: #ffffff;
+    color: var(--text-secondary-100);
     width: 120px;
     text-align: right;
-    font-weight: 700;
+    font-weight: 500;
     font-size: 14px;
   }
 
   .timeline-circle {
     width: 12px;
     height: 12px;
-    background-color: #3670f7;
+    background-color: var(--bg-primary-300);
     border-radius: 50%;
     position: absolute;
     left: 0px;
@@ -388,7 +587,7 @@
   .timeline-content {
     margin-left: 40px;
     padding: 10px 20px;
-    background-color: #151515;
+    background-color: var(--bg-secondary-800);
     border-radius: 2px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     width: 100%;
@@ -398,15 +597,15 @@
     font-size: 18px;
     font-weight: 700;
     line-height: 27px;
-    color: #ffffff;
+    color: var(--text-secondary-100);
   }
 
   .timeline-content h3:hover {
-    color: #3670f7;
+    color: var(--text-primary-300);
   }
 
   .timeline-content a {
-    color: #3670f7;
+    color: var(--text-primary-300);
     text-decoration: underline;
     margin-right: 10px;
   }
@@ -437,17 +636,17 @@
   }
 
   .tag-new {
-    color: #1193f0;
-    border-color: #1193f0;
+    color: var(--primary-btn-color);
+    border-color: var(--border-primary-200);
   }
 
   .tag-fixed {
-    color: #df77f9;
-    border-color: #df77f9;
+    color: var(--text-primary-440);
+    border-color: var(--icon-primary-440);
   }
 
   .tag-improved {
-    color: #00a86b; /* I believe you meant this color for "Improved" */
-    border-color: #00a86b;
+    color: var(--text-success-200);
+    border-color: var(--border-success-200);
   }
 </style>
