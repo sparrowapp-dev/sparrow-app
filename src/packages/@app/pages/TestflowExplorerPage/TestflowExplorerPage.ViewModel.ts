@@ -68,6 +68,13 @@ export class TestflowExplorerPageViewModel {
   }
 
   /**
+   * Return active workspace of the user
+   */
+  public get activeWorkspace() {
+    return this.workspaceRepository.getActiveWorkspace();
+  }
+
+  /**
    * Updates the nodes in the testflow with debounce to avoid frequent calls
    * @param _nodes - nodes of the testflow
    */
