@@ -92,7 +92,7 @@
           <ExternalLinkIcon
             width="16px"
             height="16px"
-            color="var(--text-primary-300)"
+            color="var(--icon-primary-300)"
           />
         </span>
       </span>
@@ -109,7 +109,7 @@
           <CopyIcon
             width="18px"
             height="18px"
-            color="var(--text-primary-300)"
+            color="var(--icon-primary-300)"
           />
         </span>
         Copy</span
