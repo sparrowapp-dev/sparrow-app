@@ -122,7 +122,7 @@
     }
   };
 
-  function dragStart(event, collection) {
+  const dragStart = (event, collection) => {
     const data = {
       workspaceId: collection.workspaceId,
       collectionId: collection.id,
@@ -130,10 +130,9 @@
       requestId: api.id,
       name: api.name,
       method: api.request.method,
-      collection: collection,
     };
     event.dataTransfer.setData("text/plain", JSON.stringify(data));
-  }
+  };
 </script>
 
 <svelte:window

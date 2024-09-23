@@ -11,7 +11,11 @@
     RequestParameterTestFlow,
     RequestNavigatorTestFlow,
   } from "../components";
-  import { RequestSectionEnum, type Tab } from "@common/types/workspace";
+  import {
+    RequestSectionEnum,
+    type CollectionDto,
+    type Tab,
+  } from "@common/types/workspace";
 
   import "@xyflow/svelte/dist/style.css";
   import { onMount } from "svelte";
@@ -46,7 +50,7 @@
   let id: string;
   let method: string;
   let name: string;
-  let collection;
+  let collection: CollectionDto;
   let requestId: string;
 
   let testFlowDrag: boolean = false;
@@ -155,7 +159,6 @@
             method,
             folderId: folderId ? folderId : "",
             workspaceId,
-            collection: collection,
             blocks: nodes,
             connector: edges,
             onClick: function (_id: string) {
