@@ -28,7 +28,7 @@
     WorkspaceDefault,
     SaveAsCollectionItem,
   } from "@workspaces/features";
-  import {WithModal} from "@workspaces/common/hoc";
+  import { WithModal } from "@workspaces/common/hoc";
   import { notifications } from "@library/ui/toast/Toast";
 
   // ---- Interface, enum & constants
@@ -285,6 +285,8 @@
     if (value) {
       if (prevWorkspaceId !== value._id) {
         _viewModel.fetchCollections(value?._id);
+        _viewModel2.refreshEnvironment(value?._id);
+        _viewModel3.refreshTestflow(value?._id);
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
       }
