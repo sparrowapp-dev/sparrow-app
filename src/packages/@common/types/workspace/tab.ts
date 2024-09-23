@@ -3,7 +3,7 @@ import type { RequestWrapper } from "./request";
 import type { FolderWrapper } from "./folder";
 import type { WorkspaceWrapper } from "./workspace";
 import type { WebSocketWrapper } from "./web-socket";
-import type { TestflowWrapper } from "./testflow";
+import type { TFTabItemWrapperType } from "./testflow";
 
 import type {
   ActiveSyncWrapper,
@@ -27,7 +27,7 @@ export interface Property
     Partial<CollectionWrapper>,
     Partial<WorkspaceWrapper>,
     Partial<WebSocketWrapper>,
-    Partial<TestflowWrapper> {}
+    Partial<TFTabItemWrapperType> {}
 
 export interface PropertyWrapper {
   property: Property;

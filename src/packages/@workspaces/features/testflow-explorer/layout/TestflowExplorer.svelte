@@ -1,6 +1,11 @@
 <script lang="ts">
   import { writable } from "svelte/store";
-  import { SvelteFlow, Background, Controls } from "@xyflow/svelte";
+  import {
+    SvelteFlow,
+    Background,
+    type Node,
+    type NodeTypes,
+  } from "@xyflow/svelte";
 
   import {
     StartBlock,
@@ -10,11 +15,21 @@
     RequestHeaderTestFlow,
     RequestParameterTestFlow,
     RequestNavigatorTestFlow,
+    ResponseErrorScreen,
+    ResponseStatus,
+    ResponseNavigator,
+    ResponseBodyNavigator,
+    ResponseBody,
+    ResponseHeaders,
   } from "../components";
-  import { RequestSectionEnum, type Tab } from "@common/types/workspace";
+  import {
+    RequestSectionEnum,
+    type CollectionDto,
+    type Tab,
+  } from "@common/types/workspace";
 
   import "@xyflow/svelte/dist/style.css";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   import "@xyflow/svelte/dist/style.css";
   import type { Observable } from "rxjs";
@@ -24,27 +39,44 @@
     TableNavbar,
     TableSidebar,
   } from "@workspaces/common/components";
-  import {
-    ArrowOutwardIcon,
-    ArrowSplit,
-    CrossIcon,
-    VectorIcon,
-  } from "@library/icons";
   import { RunIcon } from "@library/icons";
   import { Modal } from "@library/ui";
   import DeleteNode from "@workspaces/common/components/delete-node/DeleteNode.svelte";
-  export let tab: Observable<Tab>;
+  import { ResponseStatusCode } from "$lib/utils/enums";
+  import type {
+    TFDataStoreType,
+    TFEdgeHandlerType,
+    TFEdgeType,
+    TFNodeStoreType,
+    TFNodeType,
+    TFResponseStateType,
+  } from "@common/types/workspace/testflow";
+  import { boolean } from "yup";
+
+  // Declaring props for the component
+  export let tab: Observable<Partial<Tab>>;
   export let onUpdateNodes;
   export let onUpdateEdges;
   export let collectionList: Observable<CollectionDocument[]>;
   export let onClickRun;
-  export let testflowStore;
+  export let testflowStore: TFDataStoreType;
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
 
+  // Writable stores for nodes and edges
+  const nodes = writable<Node[]>([]);
+  const edges = writable<TFEdgeHandlerType[]>([]);
+
+  // Flag to control whether nodes are draggable
   let isNodesDraggable = false;
+
+  /**
+   * Checks if edges exist for the given node ID.
+   * @param _id - Node ID to check for connected edges.
+   * @returns True if edges exist, otherwise false.
+   */
   const checkIfEdgesExist = (_id: string) => {
-    let edge = [];
+    let edge: TFEdgeHandlerType[] = [];
     edges.subscribe((value) => {
       edge = value;
     })();
@@ -56,6 +88,16 @@
     });
     return response;
   };
+
+  /**
+   * Updates the selected API in a specific node.
+   * @param id - Node ID.
+   * @param name - Name of the API.
+   * @param requestId - Request ID.
+   * @param collectionId - Collection ID.
+   * @param method - Request method (e.g., GET, POST).
+   * @param folderId - Folder ID (optional).
+   */
   const updateSelectedAPI = (
     id: string,
     name: string,
@@ -78,11 +120,13 @@
       return dbNodes;
     });
   };
+
   /**
-   * finds the next node id
-   * @param list - list of existing nodes
+   * Finds the next available node ID.
+   * @param list - List of existing nodes.
+   * @returns The next available node ID as a string.
    */
-  const findNextNodeId = (list): string => {
+  const findNextNodeId = (list: { id: string }[]): string => {
     const isNameAvailable: (proposedName: string) => boolean = (
       proposedName,
     ) => {
@@ -97,34 +141,37 @@
         return proposedName;
       }
     }
-
     return "";
   };
+  // List to store collection documents and filtered collections
   let collectionListDocument;
-  let filteredCollections = writable([]);
-  let isRunDisabled = false;
+  let filteredCollections = writable<CollectionDto[]>([]);
 
-  $: {
-    if (collectionList) {
-      collectionList.subscribe((value) => {
-        collectionListDocument = value;
-        collectionListDocument = collectionListDocument?.filter(
-          (value) => value.workspaceId === $tab?.path?.workspaceId,
-        );
-        filteredCollections.set(collectionListDocument);
-      });
+  // Filter collections based on the current tab's workspace ID
+  const collectionsSubscriber = collectionList.subscribe((value) => {
+    if (value) {
+      collectionListDocument = value;
+      collectionListDocument = collectionListDocument?.filter(
+        (value) => value.workspaceId === $tab?.path?.workspaceId,
+      );
+      filteredCollections.set(
+        collectionListDocument as unknown as CollectionDto[],
+      );
     }
-  }
+  });
 
-  let deletedNodeId: number;
-  let deleteNodeName: "";
+  let deletedNodeId: string;
 
-  const handleDeleteModal = (id, name) => {
+  const handleDeleteModal = (id: string) => {
     isDeleteNodeModalOpen = true;
     deletedNodeId = id;
-    deleteNodeName = name;
+    countNextDeletedNode(id);
   };
 
+  /**
+   * Creates a new node and connects it to the existing node.
+   * @param _id - The ID of the existing node.
+   */
   const createNewNode = (_id: string) => {
     if (!_id) return;
     if (checkIfEdgesExist(_id)) {
@@ -133,19 +180,19 @@
 
     const targetNode = findNextNodeId($nodes);
 
-    nodes.update((nodes) => {
+    nodes.update((_nodes: Node[] | any[]) => {
       let nextNodePosition;
-      // finds next node positions
-      for (let i = 0; i < nodes?.length; i++) {
-        if (nodes[i].id === _id) {
+      // Find the next node position based on the current node's position
+      for (let i = 0; i < _nodes?.length; i++) {
+        if (_nodes[i].id === _id) {
           nextNodePosition = {
-            x: nodes[i].position.x + 300,
-            y: nodes[i].position.y,
+            x: _nodes[i].position.x + 300,
+            y: _nodes[i].position.y,
           };
         }
       }
       return [
-        ...nodes,
+        ...(_nodes || []),
         {
           id: targetNode,
           type: "requestBlock",
@@ -175,8 +222,8 @@
                 folderId,
               );
             },
-            onOpenDeleteModal: function (id, name) {
-              handleDeleteModal(id, name);
+            onOpenDeleteModal: function (id: string) {
+              handleDeleteModal(id);
             },
             collections: filteredCollections,
             tabId: $tab.tabId,
@@ -198,11 +245,14 @@
       ];
     });
   };
-  const nodes = writable([]);
-  const edges = writable([]);
+
+  /**
+   * Initializes nodes and edges on component mount.
+   */
   onMount(() => {
-    nodes.update((_nodes) => {
-      const dbNodes = $tab?.property?.testflow?.nodes;
+    // Load initial nodes from the tab property
+    nodes.update((_nodes: Node[]) => {
+      const dbNodes = $tab?.property?.testflow?.nodes as TFNodeType[];
       let res = [];
       for (let i = 0; i < dbNodes.length; i++) {
         res.push({
@@ -234,8 +284,8 @@
                 folderId,
               );
             },
-            onOpenDeleteModal: function (id: number, name: string) {
-              handleDeleteModal(id, name);
+            onOpenDeleteModal: function (id: string) {
+              handleDeleteModal(id);
             },
             name: dbNodes[i].data?.name,
             method: dbNodes[i].data?.method,
@@ -255,8 +305,8 @@
       }
       return res;
     });
-    edges.update((_edges) => {
-      const dbEdges = $tab?.property?.testflow?.edges;
+    edges.update((_edges: TFEdgeHandlerType[]) => {
+      const dbEdges = $tab?.property?.testflow?.edges as TFEdgeType[];
       let res = [];
       for (let i = 0; i < dbEdges.length; i++) {
         res.push({
@@ -269,57 +319,83 @@
     });
   });
 
-  let selectedNode;
+  let selectedNode: TFNodeStoreType | undefined;
+
+  // Reactive statement to handle selected node updates
   $: {
     if (testflowStore || selectedNodeId) {
-      testflowStore?.nodes?.forEach((element) => {
+      let isIdExist = false;
+      testflowStore?.nodes?.forEach((element: TFNodeStoreType) => {
         if (element.id === selectedNodeId) {
           selectedNode = element;
+          responseState.responseBodyLanguage = selectedNode.response
+            .responseContentType as string;
+          responseState.responseBodyFormatter = "Pretty";
+          isIdExist = true;
         }
       });
+      if (!isIdExist) {
+        selectedNode = undefined;
+      }
     }
   }
 
+  /**
+   * The node types used in the SvelteFlow graph.
+   */
   const nodeTypes = {
     startBlock: StartBlock,
     requestBlock: RequestBlock,
-  };
+  } as unknown as NodeTypes;
   let nodesValue = 1;
 
-  let selectedNodeId = 0;
-  let currentSelectedNode = 0;
-  const checkIfResponseExist = (id) => {
+  let selectedNodeId = "0";
+  let selectedNodeName: string = "";
+
+  /**
+   * Checks if a response exists for a given node ID.
+   * @param id - The ID of the node to check.
+   * @returns - True if the response exists, false otherwise.
+   */
+  const checkIfResponseExist = (id: string) => {
     let result = false;
-    testflowStore?.nodes?.forEach((element) => {
+    testflowStore?.nodes?.forEach((element: TFNodeStoreType) => {
       if (element.id === id) {
         result = true;
       }
     });
     return result;
   };
-  nodes.subscribe((val) => {
+
+  // Subscribe to changes in the nodes
+  const nodesSubscriber = nodes.subscribe((val: Node[]) => {
     if (val && val.length) onUpdateNodes(val);
     nodesValue = val.length;
     // Find the node where selected is true
-    currentSelectedNode = val.find((node) => node.selected === true);
+    let node = val.find((node: Node) => node.selected === true);
 
-    if (currentSelectedNode) {
-      if (currentSelectedNode.data.requestId) {
-        if (checkIfResponseExist(currentSelectedNode.id)) {
-          selectedNodeId = currentSelectedNode.id;
-        }
-      }
+    if (node) {
+      selectedNodeName = node?.data?.name as string;
+      selectedNodeId = node.id;
     }
   });
-  edges.subscribe((val) => {
+
+  // Subscribe to changes in the edges
+  const edgesSubscriber = edges.subscribe((val) => {
     if (val) onUpdateEdges(val);
   });
 
   let selectedTab = "response";
 
   let requestNavigation = "Request Body";
+  let responseNavigation = "Response";
 
-  function updateActiveTabInsideRequestBody(tab: string) {
+  /**
+   * Updates the active tab inside the Request Body section.
+   * @param tab - The tab to update.
+   * @returns- The updated request navigation.
+   */
+  const updateActiveTabInsideRequestBody = (tab: string) => {
     if (tab === "Body") {
       requestNavigation = "Request Body";
     } else if (tab === "Headers") {
@@ -329,12 +405,25 @@
     }
 
     return requestNavigation;
+  };
+
+  /**
+   * Updates the navigation inside the Response section.
+   * @param tab - The tab to update.
+   * @returns - The updated response navigation.
+   */
+  function updateResponseNavigation(tab: string) {
+    if (tab === "Response") {
+      responseNavigation = "Response";
+    } else if (tab === "Headers") {
+      responseNavigation = "Headers";
+    }
+    return responseNavigation;
   }
 
   let isDeleteNodeModalOpen = false;
 
-  const handleDeleteNode = (id) => {
-
+  const handleDeleteNode = (id: string) => {
     nodes.update((_nodes) => {
       return _nodes.filter((node) => node.id < id);
     });
@@ -346,14 +435,45 @@
     isDeleteNodeModalOpen = false;
   };
 
-  const handleKeyPress = (event) => {
+  let deleteCount = 0; // Variable to store the count of nodes to be deleted
+
+  const countNextDeletedNode = (id: string) => {
+    // Count nodes with an id greater than the one being deleted
+    nodes.subscribe((_nodes) => {
+      deleteCount = _nodes.filter((node) => node.id > id).length;
+    });
+  };
+
+  const handleKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Backspace") {
       event.preventDefault();
     }
     if (event.key === "Delete") {
-      handleDeleteModal(currentSelectedNode.id, currentSelectedNode.name);
+      handleDeleteModal(selectedNodeId);
     }
   };
+  // API response UI states
+  let responseState: TFResponseStateType = {
+    responseBodyLanguage: "",
+    responseBodyFormatter: "",
+  };
+
+  /**
+   * Updates the response state with partial changes.
+   * @param _state - The partial state to update.
+   */
+  const onUpdateRequestState = async (_state: Partial<TFResponseStateType>) => {
+    responseState = {
+      ...responseState,
+      ..._state,
+    };
+  };
+
+  onDestroy(() => {
+    collectionsSubscriber.unsubscribe();
+    nodesSubscriber();
+    edgesSubscriber();
+  });
 </script>
 
 <div class="h-100 position-relative">
@@ -364,11 +484,10 @@
   z-index:100;"
   >
     <div>
-      <!-- PASTE NAME CODE HERE -->
+      <!-- INSERT NAME COMPONENT HERE -->
     </div>
     <div class="d-flex">
       <div style="margin-right: 5px;">
-        <!--PASTE RUN CODE HERE-->
         {#if nodesValue > 1}
           <DropButton
             title="Run"
@@ -378,18 +497,17 @@
             iconHeight={"14px"}
             iconWidth={"14px"}
             style="height: 36px;"
-            disable={isRunDisabled}
+            disable={testflowStore?.isTestFlowRunning}
             iconColor={"var(--icon-secondary-100)"}
             onClick={async () => {
-              isRunDisabled = true;
+              selectedNodeId = "0";
               await onClickRun();
-              isRunDisabled = false;
             }}
           />
         {/if}
       </div>
       <div>
-        <!-- PASTE SAVE CODE HERE -->
+        <!-- INSERT SAVE COMPONENT HERE -->
       </div>
       <div class="position-relative">
         <RunHistory
@@ -430,7 +548,52 @@
           <!-- Request Data -->
           <div class="request-rhs-container">
             {#if selectedTab === "response"}
-              <div>Response Body</div>
+              <div class="p-2" style="">
+                <div
+                  class="d-flex flex-column h-100 pt-1"
+                  style="overflow:auto;"
+                >
+                  <div class="h-100 d-flex flex-column">
+                    <div style="flex:1; overflow:auto;">
+                      {#if selectedNode?.response?.status === ResponseStatusCode.ERROR}
+                        <ResponseErrorScreen />
+                      {:else if selectedNode?.response?.status}
+                        <div class="h-100 d-flex flex-column">
+                          <ResponseStatus response={selectedNode?.response} />
+                          <ResponseNavigator
+                            requestStateSection={responseNavigation}
+                            {updateResponseNavigation}
+                            responseHeadersLength={selectedNode?.response
+                              ?.headers?.length || 0}
+                          />
+                          {#if responseNavigation === "Response"}
+                            {#if responseState?.responseBodyLanguage !== "Image"}
+                              <ResponseBodyNavigator
+                                response={selectedNode?.response}
+                                apiState={responseState}
+                                {onUpdateRequestState}
+                                onClearResponse={() => {}}
+                              />
+                            {/if}
+                            <div style="flex:1; overflow:auto;">
+                              <ResponseBody
+                                response={selectedNode?.response}
+                                apiState={responseState}
+                              />
+                            </div>
+                          {:else if responseNavigation === "Headers"}
+                            <div style="flex:1; overflow:auto;">
+                              <ResponseHeaders
+                                responseHeader={selectedNode?.response.headers}
+                              />
+                            </div>
+                          {/if}
+                        </div>
+                      {/if}
+                    </div>
+                  </div>
+                </div>
+              </div>
             {:else}
               <div class="p-2" style="">
                 <RequestNavigatorTestFlow
@@ -439,7 +602,7 @@
                   headersLength={selectedNode?.request?.property?.request
                     ?.headers?.length || 0}
                   autoGeneratedHeadersLength={selectedNode?.request?.property
-                    ?.request?.request?.autoGeneratedHeaders?.length || 0}
+                    ?.request?.autoGeneratedHeaders?.length || 0}
                   {updateActiveTabInsideRequestBody}
                   bind:requestNavigation
                 />
@@ -457,6 +620,9 @@
                       params={selectedNode?.request?.property?.request
                         ?.queryParams}
                       authParameter={{}}
+                      isBulkEditActive={false}
+                      onUpdateRequestState={() => {}}
+                      environmentVariables={[]}
                     />
                   {:else if requestNavigation === RequestSectionEnum.HEADERS}
                     <RequestHeaderTestFlow
@@ -465,6 +631,10 @@
                       autoGeneratedHeaders={selectedNode?.request?.property
                         ?.request?.autoGeneratedHeaders}
                       authHeader={{}}
+                      environmentVariables={[]}
+                      onHeadersChange={() => {}}
+                      isBulkEditActive={false}
+                      onUpdateRequestState={() => {}}
                     />
                   {/if}
                 </div>
@@ -479,9 +649,9 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <Modal
-  title={"Delete Node"}
+  title={""}
   type={"dark"}
-  width={"35%"}
+  width={"540px"}
   zIndex={1000}
   isOpen={isDeleteNodeModalOpen}
   handleModalState={(flag) => {
@@ -490,9 +660,10 @@
 >
   <DeleteNode
     {deletedNodeId}
-    {deleteNodeName}
+    {selectedNodeName}
     {handleDeleteNode}
-    handleModalState={(flag) => {
+    {deleteCount}
+    handleModalState={(flag = false) => {
       isDeleteNodeModalOpen = flag;
     }}
   />
@@ -502,14 +673,6 @@
   :global(.svelte-flow__attribution) {
     display: none;
   }
-  .button-hover:hover {
-    background-color: var(--bg-tertiary-630);
-  }
-  .request-url {
-    width: calc(100% - 200px);
-    word-break: keep-all;
-    margin-bottom: 0px;
-  }
 
   .request-rhs-container {
     height: 224px;
@@ -517,24 +680,10 @@
     width: calc(100% - 190px);
   }
 
-  .button-hover.active {
-    background-color: var(--bg-tertiary-630);
-  }
   .request-container {
     position: absolute;
     bottom: 0px;
     background-color: var(--bg-secondary-800);
     width: 100%;
-  }
-  .run-btn {
-    position: absolute;
-    top: 10px; /* Adjust as needed */
-    right: 10px; /* Adjust as needed */
-    z-index: 10; /* Ensure it's higher than the SvelteFlow */
-    background-color: red;
-  }
-  .parent-container {
-    position: relative;
-    height: 100%;
   }
 </style>

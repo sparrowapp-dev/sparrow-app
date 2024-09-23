@@ -4,8 +4,9 @@
   export let handleModalState;
   export let deletedNodeId;
   export let handleDeleteNode;
-  export let deleteNodeName;
-  
+  export let selectedNodeName;
+  export let deleteCount;
+
   let isDeletingNode = false;
 
   const handleDeletNode = () => {
@@ -18,12 +19,19 @@
 <!-- Section for the modal content -->
 <section>
   <div>
+    <div
+      class="mb-3"
+      style="font-weight: 500 ; color:var(--text-secondary-100);"
+    >
+      Delete <span>{selectedNodeName || ""}</span> block?
+    </div>
     <!-- Prompt message for the user to confirm leaving the team -->
-    <p class="lightGray" style="color: lightGray;">
+    <p class="text-fs-14" style="color: var(--text-secondary-1000);">
       Are you sure you want to delete this block? Deleting
       <span style="font-weight: 700;">
-        "{deleteNodeName || ""}"
-      </span>? will also remove its two connected blocks.
+        "{selectedNodeName || ""}"
+      </span>
+      will also remove its {deleteCount} connected blocks.
     </p>
   </div>
 

@@ -63,7 +63,7 @@
       selectedFolder = null;
     }
   };
-  let dropdownRef;
+  let dropdownRef: HTMLElement;
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -139,7 +139,7 @@
       : 'none'}; position:absolute"
   >
     {#if selectedCollection}
-      <div class="d-flex ellipsis back-header">
+      <div class="d-flex ellipsis back-header px-1">
         <div
           style="margin-left: 4px;"
           on:click={() => {
@@ -166,7 +166,7 @@
           </p>
         </div>
         {#if selectedFolder}
-          <p style="margin-bottom: 0px;">/</p>
+          <p style="margin-bottom: 0px;"><span class="ms-1"></span>/</p>
           <div class="d-flex" style="margin-left: 4px; align-items:center;">
             <FolderIcon2
               height={"10px"}
@@ -185,12 +185,15 @@
         {#each arrayData as data}
           {#if data?.type !== "WEBSOCKET"}
             <div
-              class="d-flex dropdown-single-option"
+              class="d-flex align-items-center dropdown-single-option"
               on:click|stopPropagation={() => {
                 handleSelectApi(data);
               }}
             >
-              <div style="margin-left: 5px;">
+              <div
+                style="margin-left: 5px;"
+                class="d-flex align-items-center justify-content-center"
+              >
                 {#if data?.type === "REQUEST"}
                   <span class="text-{getMethodStyle(data?.request?.method)}">
                     <span
@@ -234,8 +237,6 @@
 </div>
 
 <style>
-  .dropdown {
-  }
   .dropdown-header {
     background-color: #3c3f52;
     padding-top: 8px;
@@ -257,8 +258,8 @@
     background-color: #3c3f52;
     margin-top: 5px;
     width: 170px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 4px;
+    padding-bottom: 4px;
     cursor: pointer;
     border-radius: 4px;
   }
@@ -267,9 +268,9 @@
     margin-left: 6px;
   }
   .dropdown-single-option {
-    width: 150px;
     align-items: center;
-    margin-left: 10px;
+    margin-left: 4px;
+    margin-right: 4px;
     padding-top: 6px;
     padding-bottom: 6px;
   }
@@ -296,7 +297,7 @@
   }
   .back-header {
     width: 100%;
-    padding-bottom: 10px;
+    padding-bottom: 4px;
   }
   .selected-container {
     align-items: center;

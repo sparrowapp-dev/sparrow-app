@@ -3,7 +3,7 @@
   import { BoxIcon, ClockIcon, DotIcon } from "@library/icons";
   import type { Response } from "@common/types/workspace";
   import { Tooltip } from "@library/ui";
-  export let response: Response;
+  export let response;
 
   /**
    * Checks if the current request was successful based on the response status.
