@@ -433,6 +433,7 @@
     });
 
     isDeleteNodeModalOpen = false;
+    
   };
 
   let deleteCount = 0; // Variable to store the count of nodes to be deleted

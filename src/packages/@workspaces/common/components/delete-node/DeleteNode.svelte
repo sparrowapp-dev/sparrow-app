@@ -29,7 +29,7 @@
     <p class="text-fs-14" style="color: var(--text-secondary-1000);">
       Are you sure you want to delete this block? Deleting
       <span style="font-weight: 700;">
-        "{selectedNodeName || ""}"
+        {selectedNodeName ? `"${selectedNodeName}"` : "this"}
       </span>
       will also remove its {deleteCount} connected blocks.
     </p>
