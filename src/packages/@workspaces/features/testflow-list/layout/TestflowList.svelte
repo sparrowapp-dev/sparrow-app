@@ -1,16 +1,14 @@
 <script lang="ts">
-  import { PlusIcon, StackIcon, StackFilled, TreeIcon } from "@library/icons";
-  import List from "@library/ui/list/List.svelte";
+  import { PlusIcon, TreeIcon } from "@library/icons";
+  import { List, Tooltip } from "@library/ui";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  //   import { ListItem } from "../components";
   import angleRight from "$lib/assets/angle-right-v2.svg";
-  import { Tooltip } from "@library/ui";
   import { TestflowListItem } from "../components";
-  import type { TFJSONDocType } from "@common/models/testflow";
   import type { ScrollList } from "@library/ui/list/types";
-  import { TestflowDefault } from "@common/types/workspace/testflow";
+  import {
+    TFDefaultEnum,
+    type TFDocumentType,
+  } from "@common/types/workspace/testflow";
 
   /**
    * current workspace
@@ -19,7 +17,7 @@
   /**
    * testflow list
    */
-  export let testflows: TFJSONDocType[] = [];
+  export let testflows: TFDocumentType[] = [];
   /**
    * opened testflow
    */
@@ -67,11 +65,11 @@
 
   let flows = [];
   const filterTestflowToWorkspace = (
-    _testflows: TFJSONDocType[],
+    _testflows: TFDocumentType[],
     _workspaceId: string,
   ) => {
     if (_testflows && _workspaceId) {
-      flows = _testflows.filter((element: TFJSONDocType) => {
+      flows = _testflows.filter((element: TFDocumentType) => {
         return element.workspaceId === _workspaceId;
       });
     }
@@ -148,7 +146,7 @@
     </div>
 
     <Tooltip
-      title={`Add New ${TestflowDefault.NAME}`}
+      title={`Add New ${TFDefaultEnum.NAME}`}
       placement={"bottom"}
       distance={13}
       show={isHovered}
@@ -202,8 +200,7 @@
             />
             <span
               style="color: var(--text-secondary-200)"
-              class="ps-2 fw-bold text-fs-12"
-              >Add New {TestflowDefault.NAME}</span
+              class="ps-2 fw-bold text-fs-12">Add New {TFDefaultEnum.NAME}</span
             >
           </button>
         </div>

@@ -1,34 +1,55 @@
 <script lang="ts">
-  import type { Writable } from "svelte/store";
-  import { Handle, Position, type NodeProps } from "@xyflow/svelte";
+  import type { Unsubscriber } from "svelte/store";
+  import { Handle, Position } from "@xyflow/svelte";
   import { ArrowIcon } from "../../icons";
   import { PlayArrow } from "@library/icons";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
-  // type $$Props = NodeProps;
-
+  /**
+   * The data object containing various handlers and data stores.
+   */
   export let data: {
     onCheckEdges: (id: string) => boolean;
-    label: string;
     onClick: (id: string) => void;
     blocks: any;
     connector: any;
   };
-  export let id;
 
+  /**
+   * The unique identifier for the current block.
+   */
+  export let id: string;
+
+  // State to control the visibility of the "Add Block" button
   let isAddBlockVisible = false;
 
+  // Unsubscribers for the blocks and connector stores
+  let dataBlocksSubscriber: Unsubscriber;
+  let dataConnectorSubscriber: Unsubscriber;
+
+  // Lifecycle method - runs when the component is mounted
   onMount(() => {
-    data.blocks.subscribe(() => {
+    // Subscribe to changes in the blocks store
+    dataBlocksSubscriber = data.blocks.subscribe(() => {
+      // Update visibility of the "Add Block" button based on edge check
       setTimeout(() => {
         isAddBlockVisible = !data?.onCheckEdges(id);
       }, 10);
     });
-    data.connector.subscribe(() => {
+    // Subscribe to changes in the connector store
+    dataConnectorSubscriber = data.connector.subscribe(() => {
+      // Update visibility of the "Add Block" button based on edge check
       setTimeout(() => {
         isAddBlockVisible = !data?.onCheckEdges(id);
       }, 10);
     });
+  });
+
+  // Lifecycle method - runs when the component is destroyed
+  onDestroy(() => {
+    // Unsubscribe from the blocks and connector stores to avoid memory leaks
+    dataBlocksSubscriber();
+    dataConnectorSubscriber();
   });
 </script>
 

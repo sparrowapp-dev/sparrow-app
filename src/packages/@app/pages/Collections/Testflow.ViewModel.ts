@@ -4,8 +4,8 @@ import { InitTab } from "@common/factory";
 import { v4 as uuidv4 } from "uuid";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TestflowRepository } from "@app/repositories/testflow.repository";
-import type { TFJSONDocType } from "@common/models/testflow";
-import { TestflowDefault } from "@common/types/workspace/testflow";
+import type { TFRxDocumentType } from "@app/models/testflow.model";
+import { TFDefaultEnum } from "@common/types/workspace/testflow";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -32,26 +32,24 @@ export class TestflowViewModel {
    * @param name - The base name for the new Testflow.
    * @returns The next available name for the new Testflow.
    */
-  private getNextTestflow: (list: TFJSONDocType[], name: string) => string = (
-    list,
-    name,
-  ) => {
-    const isNameAvailable: (proposedName: string) => boolean = (
-      proposedName,
-    ) => {
-      return list.some((element) => {
-        return element.name === proposedName;
-      });
+  private getNextTestflow: (list: TFRxDocumentType[], name: string) => string =
+    (list, name) => {
+      const isNameAvailable: (proposedName: string) => boolean = (
+        proposedName,
+      ) => {
+        return list.some((element) => {
+          return element.name === proposedName;
+        });
+      };
+
+      if (!isNameAvailable(name)) return name;
+
+      for (let i = 2; i < list.length + 10; i++) {
+        const proposedName: string = `${name} ${i}`;
+        if (!isNameAvailable(proposedName)) return proposedName;
+      }
+      return "";
     };
-
-    if (!isNameAvailable(name)) return name;
-
-    for (let i = 2; i < list.length + 10; i++) {
-      const proposedName: string = `${name} ${i}`;
-      if (!isNameAvailable(proposedName)) return proposedName;
-    }
-    return "";
-  };
 
   /**
    * Creates a new Testflow in the active workspace, initializes a tab for the new Testflow,
@@ -65,11 +63,11 @@ export class TestflowViewModel {
       await this.workspaceRepository.getActiveWorkspaceDoc();
     const testflows = (await this.testflowRepository.getTestflowByWorkspaceId(
       currentWorkspace._id,
-    )) as TFJSONDocType[];
+    )) as TFRxDocumentType[];
     const testFLowId = uuidv4();
-    const newTestflow: TFJSONDocType = {
+    const newTestflow: TFRxDocumentType = {
       _id: testFLowId,
-      name: this.getNextTestflow(testflows, `New ${TestflowDefault.NAME}`),
+      name: this.getNextTestflow(testflows, `New ${TFDefaultEnum.NAME}`),
       nodes: [
         {
           id: "1",
@@ -95,7 +93,7 @@ export class TestflowViewModel {
     await this.testflowRepository.addTestflow(newTestflow);
     initTestflowTab.updateName(newTestflow.name);
     this.tabRepository.createTab(initTestflowTab.getValue());
-    notifications.success(`New ${TestflowDefault.NAME} Created!`);
+    notifications.success(`New ${TFDefaultEnum.NAME} Created!`);
   };
 
   /**
@@ -105,7 +103,7 @@ export class TestflowViewModel {
    * @param testflow - The Testflow document to be deleted.
    * @returns An object indicating whether the operation was successful.
    */
-  public handleDeleteTestflow = async (testflow: TFJSONDocType) => {
+  public handleDeleteTestflow = async (testflow: TFRxDocumentType) => {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       testflow.workspaceId as string,
     );
@@ -113,7 +111,7 @@ export class TestflowViewModel {
     this.testflowRepository.removeTestflow(testflow._id);
     await this.tabRepository.removeTab(testflow._id);
     notifications.success(
-      `${testflow.name} ${TestflowDefault.NAME} is removed from ${currentWorkspace.name}.`,
+      `${testflow.name} ${TFDefaultEnum.NAME} is removed from ${currentWorkspace.name}.`,
     );
     return {
       isSuccessful: true,
@@ -129,7 +127,7 @@ export class TestflowViewModel {
    * @returns A promise that resolves when the Testflow and tab (if present) have been updated.
    */
   public handleUpdateTestflow = async (
-    testflow: TFJSONDocType,
+    testflow: TFRxDocumentType,
     newTestflowName: string,
   ): Promise<void> => {
     this.testflowRepository.updateTestflow(testflow._id, {
@@ -151,7 +149,7 @@ export class TestflowViewModel {
    * @returns - A promise that resolves when the Testflow has been opened and the tab created.
    */
   public handleOpenTestflow = async (
-    _testflow: TFJSONDocType,
+    _testflow: TFRxDocumentType,
   ): Promise<void> => {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       _testflow.workspaceId,
