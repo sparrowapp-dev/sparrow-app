@@ -68,6 +68,13 @@ export class TestflowExplorerPageViewModel {
   }
 
   /**
+   * Return active workspace of the user
+   */
+  public get activeWorkspace() {
+    return this.workspaceRepository.getActiveWorkspace();
+  }
+
+  /**
    * Updates the nodes in the testflow with debounce to avoid frequent calls
    * @param _nodes - nodes of the testflow
    */
@@ -456,6 +463,38 @@ export class TestflowExplorerPageViewModel {
     });
   };
 
+
+  /**
+ * Removes nodes with an ID less than the specified ID and updates the testFlowDataStore.
+ * @param tabId - The ID of the tab to update.
+ * @param id - The ID threshold; nodes with an ID less than this will be removed.
+ */
+public deleteNodeResponse = (tabId: string, id: string) => {
+  console.log("Inside deleteNode Response function ")
+  console.log("This is tab Id ", tabId);
+  console.log("This is id", id)
+  // Create a deep copy of the current tab data
+  const progressiveTab = createDeepCopy(this._tab.getValue());
+
+  testFlowDataStore.update((testFlowDataMap) => {
+    // Retrieve the data for the specific tab using tabId
+    const wsData = testFlowDataMap.get(tabId); 
+    
+    // If there is data for this tab, proceed to update the nodes
+    if (wsData) {
+      // Filter out nodes with ID less than the specified ID
+      wsData.nodes = wsData.nodes.filter((node) => node.id < id);
+
+      // Update the testFlowDataStore with the modified data
+      testFlowDataMap.set(tabId, wsData);
+    }
+
+    return testFlowDataMap; // Return the updated data map
+  });
+};
+
+
+
   /**
    * Toggles the expansion of a specific history entry in the test flow.
    * @param _toggleState - boolean flag to expand or collapse the history details.
@@ -473,4 +512,5 @@ export class TestflowExplorerPageViewModel {
       return testFlowDataMap;
     });
   };
+
 }

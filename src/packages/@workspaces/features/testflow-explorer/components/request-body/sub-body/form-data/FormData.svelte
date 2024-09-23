@@ -19,5 +19,8 @@
     callback={handleFormDataChange}
     {environmentVariables}
     {onUpdateEnvironment}
+    isCheckBoxEditable={false}
+    isInputBoxEditable={false}
+    isTopHeaderRequired={true}
   />
 </section>

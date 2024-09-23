@@ -12,20 +12,18 @@
   import close from "$lib/assets/cross.svg";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "..";
-  import { onMount } from "svelte";
-  import { DustbinIcon } from "@library/icons";
   import { Tooltip } from "@library/ui";
-  type Mode = "READ" | "WRITE";
-
   export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
   export let callback: (pairs: KeyValuePair[]) => void;
-  export let mode: Mode = "WRITE";
   export let readable: { key: string; value: string } = {
     key: "",
     value: "",
   };
   export let environmentVariables;
   export let onUpdateEnvironment;
+  export let isCheckBoxEditable = true;
+  export let isTopHeaderRequired = true;
+  export let isInputBoxEditable = true;
   let pairs: KeyValuePair[] | KeyValuePairWithBase[] = keyValue;
   let controller: boolean = false;
 
@@ -64,7 +62,7 @@
     pairs = pairs;
     if (
       pairs.length - 1 === index &&
-      mode === "WRITE" &&
+      isInputBoxEditable &&
       (pairs[index].key !== "" || pairs[index].value !== "")
     ) {
       pairs[pairs.length - 1].checked = true;
@@ -155,7 +153,7 @@
     let filteredKeyValue = pairs.map((elem, i) => {
       if (i !== pairs.length - 1) {
         elem.checked = flag;
-      } else if (mode === "READ") {
+      } else if (!isInputBoxEditable) {
         elem.checked = flag;
       }
       return elem;
@@ -168,12 +166,16 @@
 <div
   class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
 >
-  <div class="d-flex gap-3 align-items-center w-100">
+  <div
+    class="d-flex gap-3 align-items-center w-100 {!isTopHeaderRequired
+      ? 'd-none'
+      : ''}"
+  >
     <div style="width:30px; margin-left: 5px;">
       <label class="container">
         <input
           type="checkbox"
-          disabled={pairs.length === 1}
+          disabled={pairs.length === 1 || !isCheckBoxEditable}
           bind:checked={controller}
           on:input={handleCheckAll}
         />
@@ -289,15 +291,10 @@
           >
             <div
               class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
+              style="padding-top:3px; padding-bottom:3px; height:24px; padding-bottom:3px;"
             >
-              <img
-                src={dragIcon}
-                alt=""
-                class="d-none"
-                style="cursor:grabbing;"
-              />
               <div style="width:30px; height: 14px;">
-                {#if pairs.length - 1 != index || mode === "READ"}
+                {#if pairs.length - 1 != index || !isInputBoxEditable}
                   <label class="container">
                     <input
                       type="checkbox"
@@ -305,6 +302,7 @@
                       on:input={() => {
                         updateCheck(index);
                       }}
+                      disabled={!isCheckBoxEditable}
                     />
                     <span class="checkmark"></span>
                   </label>
@@ -318,7 +316,7 @@
                     onUpdateInput={() => {
                       updateParam(index);
                     }}
-                    disabled={mode == "READ" ? true : false}
+                    disabled={!isInputBoxEditable ? true : false}
                     placeholder={"Add Key"}
                     {theme}
                     {environmentVariables}
@@ -330,66 +328,25 @@
                     <div
                       class="position-relative rounded p-1 d-flex backgroundColor"
                     >
-                      {#if element.value === ""}
-                        <input
-                          type="text"
-                          class="form-control keyValuePair py-1"
-                          readonly
-                          style="z-index:4; font-size:13px;
-                      position: absolute;
-                        top:0;
-                        left:0;
-                        right:0;
-                        bottom:-1;"
-                          placeholder="Choose File"
-                        />
-                        <input
-                          class="form-input"
-                          type="text"
-                          id="formdata-file"
+                      <div
+                        class="bg-keyValuePairColor d-flex h-fit rounded"
+                        style="padding: 1px 4px;"
+                      >
+                        <p style="font-size:10px;" class="mb-0 me-1">
+                          {element.value ? element.value : "corrupted-file"}
+                        </p>
+                        <img
+                          src={close}
+                          alt=""
+                          class="my-auto"
+                          style="cursor:pointer; height: 10px; width: 10px;"
                           on:click={() => {
-                            uploadFormFile(index);
-                          }}
-                          style="opacity: 0;
-                        position: absolute;
-                        top:0;
-                        left:0;
-                        right:0;
-                        bottom:0;
-                        z-index:10;
-                        "
-                        />
-                      {:else}
-                        <!-- <input
-                            type="text"
-                            class="keyValuePair py-1"
-                            readonly
-                            style="z-index:4; font-size:13px;
-                      position: absolute;
-                        top:0;
-                        left:0;
-                        right:0;
-                        bottom:-1;"
-                            placeholder=""
-                          /> -->
-                        <div
-                          class="bg-keyValuePairColor d-flex h-fit rounded"
-                          style="padding: 1px 4px;"
-                        >
-                          <p style="font-size:10px;" class="mb-0 me-1">
-                            {element.value}
-                          </p>
-                          <img
-                            src={close}
-                            alt=""
-                            class="my-auto"
-                            style="cursor:pointer; height: 10px; width: 10px;"
-                            on:click={() => {
+                            if (isInputBoxEditable) {
                               removeFormFile(index);
-                            }}
-                          />
-                        </div>
-                      {/if}
+                            }
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 {:else}
@@ -400,7 +357,7 @@
                         updateParam(index);
                       }}
                       placeholder={"Add Value"}
-                      disabled={mode == "READ" ? true : false}
+                      disabled={!isInputBoxEditable ? true : false}
                       {theme}
                       {environmentVariables}
                       {onUpdateEnvironment}
@@ -408,52 +365,46 @@
                   </div>
                 {/if}
               </div>
-              {#if pairs.length - 1 != index}
-                <div class="h-75 pe-1">
-                  <button
-                    class="action-icon bg-secondary-700 border-0 {mode !==
-                      'READ' &&
-                    element.type == 'text' &&
-                    element.value == ''
-                      ? 'opacity-1'
-                      : 'opacity-0 pe-none'}"
-                    style="width:20px;"
-                    on:click={() => {
-                      uploadFormFile(index);
-                    }}
-                  >
+              <div class="h-75 d-flex align-items-center" style="width:48px;">
+                {#if pairs.length - 1 != index}
+                  {#if isInputBoxEditable}
                     <Tooltip
-                      title={"Attach File"}
-                      placement={"left"}
-                      distance={10}
+                      title="Attach"
+                      show={isInputBoxEditable &&
+                        element.type == "text" &&
+                        element.value == ""}
+                      placement="bottom-left"
                     >
-                      <img src={attachFile} alt="" />
+                      <button
+                        class="me-1 d-flex align-items-center justify-content-center bg-secondary-700 border-0 {isInputBoxEditable &&
+                        element.type == 'text' &&
+                        element.value == ''
+                          ? 'opacity-1'
+                          : 'opacity-0 pe-none'}"
+                        style="width:20px; height:16px;"
+                        on:click={() => {
+                          uploadFormFile(index);
+                        }}
+                      >
+                        <img src={attachFile} alt="" />
+                      </button>
                     </Tooltip>
-                  </button>
-                  <button
-                    class="action-icon bg-secondary-700 border-0"
-                    style="width:20px;"
-                    on:click={() => {
-                      deleteParam(index);
-                    }}
-                  >
-                    <Tooltip title={"Delete"} placement={"left"} distance={10}>
-                      <DustbinIcon
-                        height={"12px"}
-                        width={"12px"}
-                        color={"var(--icon-secondary-200)"}
-                      />
+                    <Tooltip title="Delete" placement="bottom-left">
+                      <button
+                        class="me-1 d-flex align-items-center justify-content-center bg-secondary-700 border-0"
+                        style="width:20px; height:16px;"
+                        on:click={() => {
+                          deleteParam(index);
+                        }}
+                      >
+                        <img src={trashIcon} alt="" />
+                      </button>
                     </Tooltip>
-                  </button>
-                </div>
-              {:else}
-                <div class="h-75 pe-1">
-                  <button
-                    class="bg-backgroundColor border-0"
-                    style="width:40px;"
-                  />
-                </div>
-              {/if}
+                  {:else}
+                    <div style="width:45px;" class="opacity:0;"></div>
+                  {/if}
+                {/if}
+              </div>
             </div>
           </div>
         </div>
@@ -521,7 +472,7 @@
   /* When the checkbox is checked, add a blue background */
   .container input:checked ~ .checkmark {
     border: none;
-    background-color: var(--text-primary-200);
+    background-color: var(--text-primary-300);
   }
 
   /* Create the checkmark/indicator (hidden when not checked) */

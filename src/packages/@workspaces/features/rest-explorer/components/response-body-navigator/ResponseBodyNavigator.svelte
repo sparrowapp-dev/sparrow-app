@@ -212,7 +212,7 @@
           class="icon-container d-flex align-items-center justify-content-center border-radius-2"
           style="height: 32px; width: 32px;"
         >
-          <img src={downloadIcon} style="height:18px; width:18px;" />
+          <img src={downloadIcon} style="height:16px; width:16px;" />
         </div>
         <!-- Copy button -->
         <div
@@ -221,7 +221,7 @@
           class="icon-container d-flex align-items-center justify-content-center border-radius-2"
           style="height: 32px; width: 32px;"
         >
-          <img src={copyIcon} style="height:18px; width:18px;" />
+          <img src={copyIcon} style="height:16px; width:16px;" />
         </div>
         <!-- Prettier button -->
         <div
@@ -230,9 +230,9 @@
           }}
           role="button"
           class="icon-container d-flex align-items-center justify-content-center border-radius-2"
-          style="margin-right: 16px; height: 32px; width: 32px;"
+          style="height: 32px; width: 32px;"
         >
-          <img src={BeautifyIcon} style="height:16px; width:16px;" />
+          <img src={BeautifyIcon} style="height:12px; width:12px;" />
         </div>
       </div>
     {/if}
