@@ -1,9 +1,11 @@
 <script>
   import { ArrowOutwardIcon, CrossIcon } from "@library/icons";
+  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import { Tooltip } from "@library/ui";
 
   export let selectedNode;
   export let onClose;
+  export let onRedirect;
 </script>
 
 <div
@@ -14,12 +16,16 @@
     class="d-flex align-items-center justify-content-start gap-2"
     style="width:calc(100% - 50px)"
   >
-    <p
-      class="text-fs-10 mb-0 pb-0"
-      style="color:var(--text-secondary-270); margin-bottom:0px; padding-bottom:0px;"
+    <div
+      class="d-flex align-items-center border-radius-4 text-fs-10 mb-0 px-2 method-container text-{getMethodStyle(
+        selectedNode?.request?.property?.request?.method,
+      )}"
+      style="margin-bottom:0px; padding-top:2px; padding-bottom:2px;"
     >
-      {selectedNode?.request?.property?.request?.method}
-    </p>
+      <span>
+        {selectedNode?.request?.property?.request?.method}
+      </span>
+    </div>
     <p
       class="text-fs-12 mb-0 pb-0 ellipsis"
       style="color:var(--text-secondary-270); margin-bottom:0px; padding-bottom:0px;"
@@ -37,15 +43,15 @@
     </p>
   </div>
   <div class="d-flex gap-2 align-items-center" style="cursor:pointer">
-    <!-- <Tooltip title="Testing" placement={"bottom"} zIndex={100}>
-      <span on:click={() => {}} class="pe-2">
+    <Tooltip title="Testing" placement={"bottom"} zIndex={100}>
+      <span on:click={onRedirect} class="pe-2">
         <ArrowOutwardIcon
           width={"8px"}
           height={"8px"}
           color={"var(  --icon-secondary-200)"}
         />
       </span>
-    </Tooltip> -->
+    </Tooltip>
     <Tooltip title="Close" placement={"bottom-left"} zIndex={100}>
       <span on:click={onClose} class="pe-2">
         <CrossIcon
@@ -57,3 +63,10 @@
     </Tooltip>
   </div>
 </div>
+
+<style>
+  .method-container {
+    border: 1px solid var(--border-tertiary-400);
+    background-color: var(--bg-tertiary-400);
+  }
+</style>
