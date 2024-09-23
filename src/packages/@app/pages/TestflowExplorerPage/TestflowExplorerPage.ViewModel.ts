@@ -497,10 +497,22 @@ export class TestflowExplorerPageViewModel {
     _folderId: string,
     _requestId: string,
   ) => {
-    if (!_workspaceId) return;
-    if (!_collectionId) return;
-    if (!_requestId) return;
+    const errorMessage = "id can't be empty while redirecting request!";
+    // base conditions
+    if (!_workspaceId) {
+      console.error("Workspace " + errorMessage);
+      return;
+    }
+    if (!_collectionId) {
+      console.error("Collection " + errorMessage);
+      return;
+    }
+    if (!_requestId) {
+      console.error("Request " + errorMessage);
+      return;
+    }
 
+    // fetching request from the db
     let request;
     if (_folderId?.length > 0) {
       request = await this.collectionRepository.readRequestInFolder(
@@ -514,16 +526,20 @@ export class TestflowExplorerPageViewModel {
         _requestId,
       );
     }
-    if (request) {
-      const requestTabAdapter = new RequestTabAdapter();
-      const adaptedRequest = requestTabAdapter.adapt(
-        _workspaceId || "",
-        _collectionId || "",
-        _folderId || "",
-        request,
-      );
-      this.tabRepository.createTab(adaptedRequest);
-      moveNavigation("right");
+    if (!request) {
+      console.error("Request not found for redirecting!");
+      return;
     }
+
+    // creating a tab for the request
+    const requestTabAdapter = new RequestTabAdapter();
+    const adaptedRequest = requestTabAdapter.adapt(
+      _workspaceId || "",
+      _collectionId || "",
+      _folderId || "",
+      request,
+    );
+    this.tabRepository.createTab(adaptedRequest);
+    moveNavigation("right");
   };
 }
