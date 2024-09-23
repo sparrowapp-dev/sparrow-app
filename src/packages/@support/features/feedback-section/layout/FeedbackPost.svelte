@@ -134,7 +134,7 @@
           class="flex-column"
           style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
         >
-          <span style="font-size: 18px; font-weight: 700;">{post?.title}</span>
+          <span style="font-size: 18px; font-weight: 500;">{post?.title}</span>
           <span
             class="px-2"
             style="border:0.2px solid {getColor(post?.status)
@@ -204,12 +204,12 @@
               >
                 <span style="padding-left:4px;">{createdAt} </span>
                 <span class="px-2">|</span>
-                <span
+                <!-- <span
                   class="px-2"
                   on:click={() => {
                     isExposeFeedbackForm = true;
                   }}>Edit post</span
-                >
+                > -->
               </div>
             </div>
           </div>
@@ -235,7 +235,7 @@
           bind:value={commentValue}
         />
 
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 ms-1">
           <!-- <AttachmentIcon
             height={"12px"}
             width={"12px"}
@@ -247,8 +247,7 @@
             type={`primary`}
             loaderSize={13}
             textStyleProp={"font-size: var(--small-text)"}
-            buttonClassProp={`ps-2`}
-            buttonStyleProp={`height: 20px; width:35px;`}
+            buttonStyleProp={`height: 20px; rounded;`}
             loader={isCommenting}
             onClick={async () => {
               isCommenting = true;
@@ -264,7 +263,7 @@
       {#if nestedComments.length > 0}
         <div>
           <div class="d-flex align-items-center justify-content-between mb-3">
-            <h6>Activity Feed</h6>
+            <h6 class="text-fs-14 ">Activity Feed</h6>
 
             <Select
               data={[
@@ -546,11 +545,12 @@
     font-size: 12px;
     height: 30px;
     position: relative;
-    border: 1px solid transparent;
+    border: 1px solid var(--border-secondary-310);
+    border-radius: 2px;
   }
 
   .search-input-container:focus-within {
-    border-color: var(--text-secondary-350);
+    border-color: var(--border-primary-300);
     caret-color: var(--border-primary-300);
   }
 

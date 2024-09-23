@@ -177,7 +177,7 @@
   <div class="container-data" style="padding: 20px;">
     <div class="headerq">
       <p style="font-size: 20px; font-weight:700;">Updates</p>
-      <p style="color: var(--text-secondary-50); font-size;14px;">
+      <p style="color: var(--text-secondary-50); font-size:14px;">
         Check out our latest releases designed to boost your productivity and
         efficiency.
       </p>
@@ -279,6 +279,7 @@
                         {event.title}
                       </h3>
                       <div
+                        class="link-div"
                         style="height: 24px; width:24px; cursor:pointer"
                         on:click={async () => {
                           await copyToClipBoard(event.url);
@@ -346,7 +347,7 @@
                       {event.reactions?.like || ""}
                     </div> -->
                         <div
-                          style="cursor:pointer; border-left:1px solid grey;"
+                          style="cursor:pointer; solid grey;"
                           class="ps-2"
                           on:click={async () => {
                             await open(externalSparrowLinkedin);
@@ -385,7 +386,7 @@
               </div>
               <div
                 class="ms-2 text-fs-14"
-                style="margin-top:1.5px; color:var(--text-secondary-100); font-weight:700;"
+                style="margin-top:1.5px; color:var(--text-secondary-100); font-weight:500;"
               >
                 {formatDate(selectedEvent.publishedAt)}
               </div>
@@ -406,7 +407,7 @@
                   <Tooltip
                     title={"Link"}
                     placement={"right"}
-                    distance={13}
+                    distance={20}
                     show={true}
                     zIndex={701}
                   >
@@ -448,7 +449,7 @@
                 {selectedEvent.reactions?.like || ""}
               </div> -->
                   <div
-                    style="border-left:1px solid grey;"
+                    style=" solid grey;"
                     class="ps-2"
                     on:click={async () => {
                       await open(externalSparrowLinkedin);
@@ -469,6 +470,15 @@
 <style>
   :global(h1) {
     font-size: 24px;
+  }
+  .link-div {
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    border-radius: 2px;
+  }
+  .link-div:hover {
+    background-color: var(--dull-background-color);
   }
   .selected-event-detail {
     display: flex;
@@ -513,7 +523,7 @@
   .timeline::before {
     content: "";
     position: absolute;
-    width: 1px;
+    width: 0.6px;
     background-color: var(--bg-primary-300);
     top: 0;
     bottom: 0;
@@ -543,7 +553,7 @@
     color: var(--text-secondary-100);
     width: 120px;
     text-align: right;
-    font-weight: 700;
+    font-weight: 500;
     font-size: 14px;
   }
 

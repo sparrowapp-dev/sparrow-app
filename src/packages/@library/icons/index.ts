@@ -93,3 +93,4 @@ export { default as ExclamationIcon } from "./Exclamation.svelte";
 export { default as CheckIcon2 } from "./Check2.svelte";
 export { default as RunIcon } from "./Run.svelte";
 export { default as ArrowRightIcon } from "./ArrowRight.svelte";
+export { default as TableChart } from "./TableChart.svelte";

@@ -516,7 +516,7 @@
             rightClickContextMenu2(e);
           }}
         >
-          <img src={AddIcon} alt="AddIcon" />
+          <img height="12px" width="12px" src={AddIcon} alt="AddIcon" />
         </button>
       </Tooltip>
 
@@ -763,6 +763,9 @@
     visibility: hidden;
     background-color: transparent;
   }
+  .threedot-icon-container:active {
+    background-color: var(--bg-secondary-420) !important;
+  }
 
   .threedot-active {
     visibility: visible;
@@ -777,6 +780,10 @@
     background-color: var(--bg-tertiary-500) !important;
     border-radius: 4px;
     padding: 5px;
+  }
+
+  .add-icon-container:active {
+    background-color: var(--bg-secondary-420) !important;
   }
   .add-item-active {
     visibility: visible;

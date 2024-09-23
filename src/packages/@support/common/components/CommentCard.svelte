@@ -83,9 +83,16 @@
   />
 
   <div class="comment-content">
-    <div class="comment-author">{comment.author.name || ""}</div>
-    <div class="comment-text">
-      {comment.value}
+    <div class="comment-author text-fs-14 mt-1">
+      {comment.author.name || ""}
+    </div>
+    <div
+      class="text-fs-12"
+      style="font-weight: 400; color:var(--text-secondary-1000);  "
+    >
+      <p style="word-break: break-all;">
+        {comment.value}
+      </p>
     </div>
     <div class="comment-meta">
       <div class="comment-moreinfo">
@@ -121,7 +128,7 @@
           bind:value={commentValue}
         />
 
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 ms-1">
           <!-- <AttachmentIcon
             height={"12px"}
             width={"12px"}
@@ -134,7 +141,7 @@
             loaderSize={13}
             loader={isCommenting}
             textStyleProp={"font-size: var(--small-text)"}
-            buttonStyleProp={`height: 20px;  rounded;`}
+            buttonStyleProp={`height: 20px;  rounded; margin-left:2px;`}
             onClick={async () => {
               isCommenting = true;
               await onAddComment(postId, commentValue, comment?.id);
@@ -183,7 +190,7 @@
   }
 
   .comment-content {
-    flex-grow: 1;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -229,16 +236,17 @@
   }
 
   .search-input-container {
-    background: var(--bg-tertiary-400);
+    background: var(--bg-secondary-800);
     width: 100%;
     font-size: 12px;
     height: 30px;
     position: relative;
-    border: 1px solid transparent;
+    border: 1px solid var(--border-secondary-310);
+    border-radius: 2px;
   }
 
   .search-input-container:focus-within {
-    border-color: #636566;
+    border-color: var(--border-primary-300);
     caret-color: var(--border-primary-300);
   }
   #search-input:focus {
