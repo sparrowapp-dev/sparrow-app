@@ -17,6 +17,8 @@
   import { notifications } from "@library/ui/toast/Toast";
   import { open } from "@tauri-apps/plugin-shell";
   import { UpdatesTagType } from "@support/common/types/feedback";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   export let listChangeLog;
 
   /**
@@ -162,6 +164,7 @@
         event.types.includes(selectedTag),
       );
     }
+    MixpanelEvent(Events.Updates_Filter);
   };
 
   function extractReleaseDate(text) {
@@ -287,7 +290,10 @@
                     <div class="d-flex gap-2">
                       <h3
                         class="text-fs-18"
-                        on:click={() => handleSeeMore(event)}
+                        on:click={() => {
+                          handleSeeMore(event);
+                          MixpanelEvent(Events.Version_Updates);
+                        }}
                       >
                         {event.title}
                       </h3>
@@ -297,6 +303,7 @@
                         on:click={async () => {
                           await copyToClipBoard(event.url);
                           notifications.success("Link copied to clipboard!");
+                          MixpanelEvent(Events.Copy_Link);
                         }}
                       >
                         <Tooltip
@@ -330,7 +337,10 @@
                         <span
                           style="text-decoration: underline; color:#3670F7; border:none; background-color:transparent; cursor:pointer "
                           class="ms-0"
-                          on:click={() => handleSeeMore(event)}>see more</span
+                          on:click={() => {
+                            handleSeeMore(event);
+                            MixpanelEvent(Events.See_More_Updates);
+                          }}>see more</span
                         >
                       </p>
                     {:else}
@@ -352,6 +362,7 @@
                             event.title.match(/v\d+\.\d+\.\d+/)[0];
                           const releaseNoteUrl = `${externalSparrowRealseNote}${version}`;
                           await open(releaseNoteUrl);
+                          MixpanelEvent(Events.Github_Updates);
                         }}
                       >
                         Github
@@ -367,6 +378,7 @@
                           class="ps-2"
                           on:click={async () => {
                             await open(externalSparrowLinkedin);
+                            MixpanelEvent(Events.LinkedIn_Updates_Icon);
                           }}
                         >
                           <LinkedinIcon height={"18px"} width={"18px"} />
@@ -422,6 +434,7 @@
                   on:click={async () => {
                     await copyToClipBoard(selectedEvent.url);
                     notifications.success("Link copied to clipboard!");
+                    MixpanelEvent(Events.Copy_Link);
                   }}
                 >
                   <Tooltip
@@ -462,6 +475,7 @@
                       selectedEvent.title.match(/v\d+\.\d+\.\d+/)[0];
                     const releaseNoteUrl = `${externalSparrowRealseNote}${version}`;
                     await open(releaseNoteUrl);
+                    MixpanelEvent(Events.Github_Updates);
                   }}
                 >
                   Github
@@ -476,6 +490,7 @@
                     class="ps-2"
                     on:click={async () => {
                       await open(externalSparrowLinkedin);
+                      MixpanelEvent(Events.LinkedIn_Updates_Icon);
                     }}
                   >
                     <LinkedinIcon height={"18px"} width={"18px"} />

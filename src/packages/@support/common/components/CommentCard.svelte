@@ -2,6 +2,8 @@
   import { AttachmentIcon } from "@library/icons";
   import { Button, IconFallback } from "@library/ui";
   import { CommentCard } from "@support/common/components";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
   /**
    * @description - The current comment being added or modified by the user.
@@ -99,7 +101,11 @@
         <span class="comment-time">{timeAgo(comment.created)}</span>
         {#if !comment.parentID}
           <p
-            on:click={() => (isReplying = !isReplying)}
+            on:click={() => {
+              isReplying = !isReplying;
+              MixpanelEvent(Events.Reply_Comment);
+
+            }}
             style="color: {isReplying
               ? 'white'
               : 'grey'}; text-decoration: {isReplying ? 'underline' : 'none'};"

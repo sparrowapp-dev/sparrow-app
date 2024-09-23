@@ -15,6 +15,8 @@
   import { tickIcon } from "@library/forms/select/svgs";
   import { Loader } from "@library/ui";
   import { Debounce } from "@common/utils";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
   /**
    * @description - Callback for inputting feedback.
@@ -203,7 +205,12 @@
       style=" margin-top:38px; justify-content: space-between;"
     >
       <div>
-        <div class={`d-flex search-input-container rounded py-1 px-2 mb-2`}>
+        <div
+          class={`d-flex search-input-container rounded py-1 px-2 mb-2`}
+          on:click={() => {
+            MixpanelEvent(Events.Feedback_Search);
+          }}
+        >
           <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
           <input
             type="text"
@@ -242,6 +249,7 @@
             onclick={(id = "") => {
               feedbackType = id;
               handleCategoryChange(id);
+              MixpanelEvent(Events.Feedback_Categories_Filter);
             }}
             titleId={feedbackType}
             zIndex={499}
@@ -294,6 +302,7 @@
             ]}
             onclick={(id = "") => {
               handleStatusChange(id);
+              MixpanelEvent(Events.Feedback_Status_Filter);
             }}
             titleId={feedbackStatusType}
             placeholderText={"Status"}
@@ -327,7 +336,10 @@
       <div style="width:187px; margin-right:28px; ">
         <div>
           <SortIcon width={"12px"} height={"8px"} />
-          <span class="text-fs-13" style="padding-left: 8px; padding-top:4px ; font-weight:500;">
+          <span
+            class="text-fs-13"
+            style="padding-left: 8px; padding-top:4px ; font-weight:500;"
+          >
             Sort By</span
           >
         </div>
@@ -336,7 +348,10 @@
           style="align-items: baseline; gap:10px; margin-top:13px; "
         >
           <button
-            on:click={() => getPosts("trending", searchTerm, status)}
+            on:click={() => {
+              getPosts("trending", searchTerm, status);
+              MixpanelEvent(Events.Feedback_SortBy_Filter);
+            }}
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "trending"}
           >
@@ -345,7 +360,10 @@
           </button>
 
           <button
-            on:click={() => getPosts("newest", searchTerm, status)}
+            on:click={() => {
+              getPosts("newest", searchTerm, status);
+              MixpanelEvent(Events.Feedback_SortBy_Filter);
+            }}
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "newest"}
           >
@@ -354,7 +372,10 @@
           </button>
 
           <button
-            on:click={() => getPosts("score", searchTerm, status)}
+            on:click={() => {
+              getPosts("score", searchTerm, status);
+              MixpanelEvent(Events.Feedback_SortBy_Filter);
+            }}
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "score"}
           >
@@ -386,6 +407,7 @@
                     on:click={async () => {
                       postId = post?.id;
                       isPostopen = true;
+                      MixpanelEvent(Events.Feedback_Post);
                     }}
                   >
                     {post?.title}
@@ -406,7 +428,12 @@
                     </span>
                   </div>
                 </div>
-                <div style="cursor:pointer">
+                <div
+                  style="cursor:pointer"
+                  on:click={() => {
+                    MixpanelEvent(Events.Upvote_Post);
+                  }}
+                >
                   <UpvoteIcon
                     isPostLiked={post.isPostLiked}
                     {handleUpvote}
@@ -420,7 +447,7 @@
 
               <div style="margin-top: 10px; flex: 1;">
                 <p
-                class="text-fs-14"
+                  class="text-fs-14"
                   style="color: var(--text-secondary-1000); margin: 0; padding-top:10px;"
                 >
                   {post?.details}

@@ -4,6 +4,8 @@
   export let userInfo;
   export let onInputFeedback;
   export let onAddFeedback;
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 </script>
 
 <div style="height: 89px; !important; padding-bottom:21px;">
@@ -26,7 +28,12 @@
       Hey {userInfo?.name}, share your feedback
     </div>
   </div>
-  <div style="width:calc(100% - 72.5% );  ">
+  <div
+    style="width:calc(100% - 72.5% );  "
+    on:click={() => {
+      MixpanelEvent(Events.Add_Feedback);
+    }}
+  >
     <AddFeedback {onInputFeedback} {onAddFeedback} selectId={"gightPanel"} />
   </div>
 </div>

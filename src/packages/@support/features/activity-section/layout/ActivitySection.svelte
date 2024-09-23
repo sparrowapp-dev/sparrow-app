@@ -13,6 +13,8 @@
   import { SearchIcon } from "$lib/assets/app.asset";
   import { Select } from "@library/forms";
   import { CategoryIcon, StatusIcon } from "@library/icons";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
   import {
     FeedbackStatusType,
@@ -219,7 +221,10 @@
             { name: "All Categories", id: ActivityType.ALL_CATEGORIES },
           ]}
           icon={CategoryIcon}
-          onclick={(id = "") => handleCategoryChange(id)}
+          on:click={(id = "") => {
+            handleCategoryChange(id);
+            MixpanelEvent(Events.Activity_Categories_Filter);
+          }}
           titleId={activityType}
           placeholderText="Categories"
           zIndex={499}
@@ -252,6 +257,7 @@
           ]}
           onclick={(id = "") => {
             handleActivityChanges(id);
+            MixpanelEvent(Events.Activity_Filter);
           }}
           titleId={activityStatusType}
           placeholderText="Status"
@@ -288,14 +294,20 @@
         </div>
         <div class="sort-options">
           <button
-            on:click={() => handleSortChange("newest")}
+            on:click={() => {
+              handleSortChange("newest");
+              MixpanelEvent(Events.Activity_SortBy_Filter);
+            }}
             class={`sort-button ${currentSort === "newest" && "selected-sort"}`}
           >
             Newest
             <img src={tickIcon} alt="" class="tick-icon" />
           </button>
           <button
-            on:click={() => handleSortChange("oldest")}
+            on:click={() => {
+              handleSortChange("oldest");
+              MixpanelEvent(Events.Activity_SortBy_Filter);
+            }}
             class={`sort-button ${currentSort === "oldest" && "selected-sort"}`}
           >
             Oldest
@@ -436,21 +448,22 @@
                               <p>{comment.author.name}</p>
                               <div style="">
                                 {#if isHovering === comment.id}
-                                <span
-                                  on:click={() => (
-                                    ((postId = comment?.post?.id),
-                                    (isPostopen = true)),
-                                    setPostId("feedback", comment?.post?.id)
-                                  )}
-                                  class="go-to-post"
-                                  style="font-size: 12px; letter-spacing: 0.25px; font-weight: 400;"
-                                  >Go to post</span
-                                >
-                                <ArrowOutward
-                                  height={"10px"}
-                                  width={"10px"}
-                                  color={"white"}
-                                />
+                                  <span
+                                    on:click={() => {
+                                      postId = comment?.post?.id;
+                                      isPostopen = true;
+                                      setPostId("feedback", comment?.post?.id);
+                                      MixpanelEvent(Events.Activity_GoToPost);
+                                    }}
+                                    class="go-to-post"
+                                    style="font-size: 12px; letter-spacing: 0.25px; font-weight: 400;"
+                                    >Go to post</span
+                                  >
+                                  <ArrowOutward
+                                    height={"10px"}
+                                    width={"10px"}
+                                    color={"white"}
+                                  />
                                 {/if}
                               </div>
                             </div>
