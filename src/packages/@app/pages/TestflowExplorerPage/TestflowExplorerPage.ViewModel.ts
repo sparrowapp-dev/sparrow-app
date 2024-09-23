@@ -1,7 +1,7 @@
 import { makeHttpRequestV2 } from "$lib/api/api.common";
 import { ResponseStatusCode } from "$lib/utils/enums";
 import { environmentType } from "$lib/utils/enums";
-import { createDeepCopy } from "$lib/utils/helpers";
+import { createDeepCopy, moveNavigation } from "$lib/utils/helpers";
 import { RequestTabAdapter } from "@app/adapter";
 import type { EnvironmentDocument, TabDocument } from "@app/database/database";
 import { CollectionRepository } from "@app/repositories/collection.repository";
@@ -479,5 +479,67 @@ export class TestflowExplorerPageViewModel {
       }
       return testFlowDataMap;
     });
+  };
+
+  /**
+   * Redirects to a specific request based on the provided workspace, collection, folder, and request IDs.
+   *
+   * @param _workspaceId - The ID of the workspace where the request is located.
+   * @param _collectionId - The ID of the collection containing the request.
+   * @param _folderId - The ID of the folder containing the request (if applicable).
+   * @param _requestId - The ID of the request to be redirected to.
+   *
+   * @returns Resolves when the redirection process is completed.
+   */
+  public redirectRequest = async (
+    _workspaceId: string,
+    _collectionId: string,
+    _folderId: string,
+    _requestId: string,
+  ) => {
+    const errorMessage = "id can't be empty while redirecting request!";
+    // base conditions
+    if (!_workspaceId) {
+      console.error("Workspace " + errorMessage);
+      return;
+    }
+    if (!_collectionId) {
+      console.error("Collection " + errorMessage);
+      return;
+    }
+    if (!_requestId) {
+      console.error("Request " + errorMessage);
+      return;
+    }
+
+    // fetching request from the db
+    let request;
+    if (_folderId?.length > 0) {
+      request = await this.collectionRepository.readRequestInFolder(
+        _collectionId,
+        _folderId,
+        _requestId,
+      );
+    } else {
+      request = await this.collectionRepository.readRequestOrFolderInCollection(
+        _collectionId,
+        _requestId,
+      );
+    }
+    if (!request) {
+      console.error("Request not found for redirecting!");
+      return;
+    }
+
+    // creating a tab for the request
+    const requestTabAdapter = new RequestTabAdapter();
+    const adaptedRequest = requestTabAdapter.adapt(
+      _workspaceId || "",
+      _collectionId || "",
+      _folderId || "",
+      request,
+    );
+    this.tabRepository.createTab(adaptedRequest);
+    moveNavigation("right");
   };
 }

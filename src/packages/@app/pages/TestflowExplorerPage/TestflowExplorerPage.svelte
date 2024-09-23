@@ -72,5 +72,6 @@
     onClickRun={_viewModel.handleTestFlowRun}
     toggleHistoryDetails={_viewModel.toggleHistoryDetails}
     toggleHistoryContainer={_viewModel.toggleHistoryContainer}
+    onRedrectRequest={_viewModel.redirectRequest}
   />
 {/if}

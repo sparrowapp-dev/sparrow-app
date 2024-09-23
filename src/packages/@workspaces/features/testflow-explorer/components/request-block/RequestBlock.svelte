@@ -42,6 +42,7 @@
     tabId: string;
     collections: Observable<CollectionDocument[]>;
   };
+  export let selected;
 
   /**
    * The unique identifier for the current block.
@@ -128,7 +129,13 @@
 
 <div
   class="request-block position-relative border-radius-4"
-  style={!currentBlock
+  style={selected && !currentBlock
+    ? "border: 2px solid var(--border-primary-300);"
+    : selected && currentBlock && checkIfRequestSucceed(currentBlock)
+    ? "border: 2px solid #69D696;"
+    : selected && currentBlock && !checkIfRequestSucceed(currentBlock)
+    ? "border: 2px solid #FF7878;"
+    : !currentBlock
     ? ""
     : checkIfRequestSucceed(currentBlock)
     ? "border-left: 2px solid #69D696;"
@@ -292,6 +299,7 @@
     border-radius: 0.125rem;
     font-size: 0.7rem;
     width: 200px;
+    border: 2px solid transparent;
   }
   .request-block-dummy {
     background: #eee;
