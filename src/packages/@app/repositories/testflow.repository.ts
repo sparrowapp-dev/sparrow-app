@@ -104,4 +104,12 @@ export class TestflowRepository {
       .exec();
   };
 
+  public refreshTestflow = async (data, workspaceId): Promise<void> => {
+    const testflows = data.map((_testflow) => {
+      _testflow["workspaceId"] = workspaceId;
+      return _testflow;
+    });
+    await RxDB.getInstance().rxdb.testflow.bulkUpsert(testflows);
+    return;
+  };
 }
