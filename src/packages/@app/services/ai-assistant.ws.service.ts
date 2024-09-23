@@ -10,7 +10,7 @@ import { io } from "socket.io-client";
  */
 export class AiAssistantWebSocketService {
   constructor() {}
-  private apiUrl: string = constants.API_URL;
+  private baseUrl: string = constants.BASE_URL;
 
   /**
    * Connects to the AI Assistant WebSocket server.
@@ -18,7 +18,7 @@ export class AiAssistantWebSocketService {
    * and stores the socket instance in the `socketStore`.
    */
   public connectWebSocket = async () => {
-    const socket = io(`${this.apiUrl}/ai-assistant`, {
+    const socket = io(`${this.baseUrl}/ai-assistant`, {
       transports: ["websocket"], // Forces WebSocket transport
       auth: getAuthHeaders(),
     });

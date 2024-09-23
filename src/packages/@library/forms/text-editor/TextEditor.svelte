@@ -8,6 +8,7 @@
   import Paragraph from "@editorjs/paragraph";
   import edjsParser from "editorjs-parser";
   import { onMount } from "svelte";
+  import { MarkdownFormatter } from "@common/utils";
   /**
    * add commments like this
    */
@@ -39,13 +40,18 @@
   let editor: EditorJS;
 
   const parser = new edjsParser();
-  onMount(() => {
+  onMount(async () => {
     let parsedValue = [];
     if (value) {
-      parsedValue = JSON.parse(value);
+      try {
+        parsedValue = JSON.parse(value) || [];
+      } catch (e) {
+        const formatter = new MarkdownFormatter();
+        const editorData = await formatter.FormatData(value);
+        parsedValue = editorData?.blocks || [];
+      }
     }
     editor = new EditorJS({
-      inlineToolbar: ["bold", "italic", "underline"],
       holder: id,
       tools: {
         list: {
@@ -54,7 +60,8 @@
         },
         header: {
           class: Header,
-          inlineToolbar: ["bold", "italic", "underline", "inlineCode"],
+          inlineToolbar: ["bold", "italic", "underline", "inlineCode", "list"],
+          inlineToolbar: true,
 
           config: {
             levels: [2, 3, 4],
@@ -70,6 +77,7 @@
         paragraph: {
           class: Paragraph,
           inlineToolbar: ["bold", "italic", "underline", "inlineCode", "list"],
+          inlineToolbar: true,
         },
       },
       readOnly: isReadOnly,
@@ -97,27 +105,34 @@
   };
 
   // Reactive statement to update the editor when certain conditions change - When doc is generating.
-  $: {
-    if (value && isReadOnly) {
+  const docRerender = async () => {
+    if (editor) {
       if (editor?.blocks) {
         editor.blocks.clear();
+      }
+      if (editor?.render) {
+        let renderObject = [];
+        try {
+          renderObject = JSON?.parse(value) || [];
+        } catch (e) {
+          const formatter = new MarkdownFormatter();
+          const editorData = await formatter.FormatData(value);
+          renderObject = editorData?.blocks || [];
+        }
         editor.render({
-          blocks: JSON.parse(value),
+          blocks: renderObject,
         });
       }
     }
-    // Toggle the editor's read-only mode if the isReadOnly state changes
-    if (
-      editor?.readOnly &&
-      typeof isReadOnly === "boolean" &&
-      editor?.readOnly?.isEnabled !== isReadOnly
-    ) {
-      editor.readOnly.toggle(isReadOnly);
+  };
+  $: {
+    if (value && isReadOnly) {
+      docRerender();
     }
   }
 </script>
 
-<div style="margin-bottom:10px;" on:input={saveContent} id="editorjs"></div>
+<div on:input={saveContent} id="editorjs"></div>
 
 <style>
   :global(.ce-popover__container) {
@@ -125,13 +140,13 @@
     border: none !important;
     width: 70px !important;
     position: absolute;
-    left: 90px;
+    left: 90px !important;
     right: 90px;
   }
   :global(.ce-popover--nested) {
     position: absolute;
-    left: 90px;
-    right: 90px;
+    left: 0px !important;
+    right: 10px !important;
   }
   :global(.ce-toolbar__actions.ce-toolbar__actions--opened) {
     right: 116%;
@@ -243,7 +258,7 @@
   }
 
   :global(.ce-inline-tool--link) {
-    display: none;
+    display: none !important ;
   }
 
   :global(.ce-popover) {

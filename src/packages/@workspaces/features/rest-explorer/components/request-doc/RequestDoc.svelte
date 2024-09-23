@@ -25,7 +25,10 @@
   </div>
   <div style="height: 100%; min-height:160px; " class="area">
     <div on:keydown|stopPropagation on:keyup|stopPropagation>
-      <div id="editor2">
+      <div
+        id="editor2"
+        style={isDocGenerating ? "pointer-events: none !important; " : ""}
+      >
         <TextEditor
           placeholder={"Add documentation; insert / to see all the options."}
           id={"editor2"}

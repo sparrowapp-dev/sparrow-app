@@ -22,6 +22,7 @@
     | "teritiary"
     | "other"
     | "icon" = "other";
+  export let id = "";
   enum BtnType {
     PRIMARY = "primary",
     DARK = "dark",
@@ -64,6 +65,7 @@
 </script>
 
 <button
+  {id}
   disabled={disable}
   style={`${buttonStyleProp} ${
     type !== "other" && type !== "icon"
@@ -113,7 +115,7 @@
     color: var(--white-color);
   }
   .custom-btn-dark {
-    background-color: var(  --bg-tertiary-300 );
+    background-color: var(--bg-tertiary-300);
     color: var(--white-color);
   }
   .custom-btn-violet {
@@ -125,7 +127,7 @@
     color: var(--white-color);
   }
   .custom-btn-primary:active {
-    background-color: var(  --bg-primary-600);
+    background-color: var(--bg-primary-600);
     color: var(--white-color);
   }
   .custom-btn-dark:hover {
@@ -144,13 +146,13 @@
   }
   .custom-btn-transparent:hover {
   }
-  .custom-btn-teritiary{
-    color: var(--text-primary-300); 
+  .custom-btn-teritiary {
+    color: var(--text-primary-300);
     border: 1px solid var(--border-primary-200) !important;
   }
-  .custom-btn-teritiary:hover{
-    color: var(--white-color); 
-    background-color: var(--bg-primary-300 );
+  .custom-btn-teritiary:hover {
+    color: var(--white-color);
+    background-color: var(--bg-primary-300);
     border: 1px solid var(--border-primary-200) !important;
   }
 </style>

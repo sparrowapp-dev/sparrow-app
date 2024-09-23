@@ -5,7 +5,7 @@
   import workspaceAsset from "$lib/assets/workspace.svg";
   import folderAsset from "$lib/assets/folder.svg";
   import leftArrowAsset from "$lib/assets/angleLeft.svg";
-  import { searchTreeDocument } from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest";
+  import { searchTreeDocument } from "../utils";
   import { notifications } from "@library/ui/toast/Toast";
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
@@ -14,8 +14,7 @@
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import QuestionIcon from "$lib/assets/question.svelte";
   import Button from "@library/ui/button/Button.svelte";
-  import FileType from "$lib/components/file-types/FileType.svelte";
-  import ComboText from "$lib/components/text/ComboText.svelte";
+  import { FileType } from "../components";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import {
     bestPractice,
@@ -718,7 +717,10 @@
             <QuestionIcon color={"var(--sparrow-text-color)"} />
           </span>
           {#if instructionEnabled}
-            <div class="bg-tertiary-300 api-name-usage p-3">
+            <div
+              style="z-index: 10;"
+              class="bg-tertiary-300 api-name-usage p-3"
+            >
               <div class="d-flex justify-content-between">
                 <p class="text-whiteColor">Best Practices</p>
                 <img
@@ -787,17 +789,19 @@
       <p class="api-url">{componentData?.property.request.url}</p>
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>
-    <div
-      class="pb-1 bg-tertiary-300"
-      id="editor1"
-      style="width:100%; height:170px ; overflow-y:auto; margin:0px !important; "
-    >
-      <TextEditor
-        placeholder={"Add a description to help people know about this request."}
-        isReadOnly={true}
-        id={"editor1"}
-        value={requestDescription}
-      />
+    <div style="height:170px; overflow:auto !important;">
+      <div
+        class="pb-1 bg-tertiary-300"
+        id="editor1"
+        style="width:100%;  margin:0px !important; pointer-events: none !important;"
+      >
+        <TextEditor
+          placeholder={"Add a description to help people know about this request."}
+          isReadOnly={true}
+          id={"editor1"}
+          value={requestDescription}
+        />
+      </div>
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>
     {#if path.length === 0}

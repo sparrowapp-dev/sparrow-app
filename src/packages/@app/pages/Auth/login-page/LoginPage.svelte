@@ -2,7 +2,6 @@
   import { Link, navigate } from "svelte-navigator";
   import { isLoading, isResponseError, setUser } from "$lib/store/auth.store";
   import { jwtDecode } from "$lib/utils/jwt";
-  import Header from "$lib/components/header/Header.svelte";
   import googleLogo from "$lib/assets/googlelogo.svg";
   import eyeHide from "$lib/assets/eye-hide.svg";
   import eyeShow from "$lib/assets/eye-show.svg";
@@ -10,7 +9,6 @@
   import sparrowicon from "$lib/assets/sparrowIcon.svg";
   import { once } from "@tauri-apps/api/event";
   import { Window } from "@tauri-apps/api/window";
-  import LoginWaitingScreen from "$lib/components/Transition/LoginWaitingScreen.svelte";
 
   let isEmailTouched = false;
 
@@ -108,14 +106,14 @@
 </script>
 
 {#if isSignInPopup}
-  <LoginWaitingScreen onClick={handleSignInPopup} {isLoadingPage} />
+  <!-- <LoginWaitingScreen onClick={handleSignInPopup} {isLoadingPage} /> -->
 {/if}
 
 <div
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded"
   style="height:100vh;"
 >
-  <Header />
+  <!-- <Header /> -->
   <div
     class="container d-flex flex-column align-items-center justify-content-center"
   >

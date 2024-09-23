@@ -31,7 +31,6 @@
   import Button from "@library/ui/button/Button.svelte";
   import { WorkspaceRole } from "$lib/utils/enums";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-  import { CommonService } from "$lib/services-v2/common.service";
   import gitBranchIcon from "$lib/assets/git-branch.svg";
   import { ReloadCollectionIcon } from "$lib/assets/icons";
   import type { CollectionDocument, TabDocument } from "@app/database/database";
@@ -57,7 +56,6 @@
   let requestCount = 0;
   let folderCount = 0;
   let showFolderAPIButtons: boolean = true;
-  const commonService = new CommonService();
   let visibility = false;
   let isActiveSyncEnabled = true;
   let isBranchSynced: boolean = false;
@@ -339,7 +337,7 @@
             workspaceId: collection.workspaceId,
             collection,
           }),
-        displayText: "Add New Web Socket",
+        displayText: "Add New WebSocket",
         disabled: false,
         hidden: false,
       },
@@ -406,7 +404,7 @@
             collection,
           });
         },
-        displayText: "Add New Web Socket",
+        displayText: "Add New WebSocket",
         disabled: false,
         hidden: false,
         icon: SocketIcon,
@@ -518,7 +516,7 @@
             rightClickContextMenu2(e);
           }}
         >
-          <img src={AddIcon} alt="AddIcon" />
+          <img height="12px" width="12px" src={AddIcon} alt="AddIcon" />
         </button>
       </Tooltip>
 
@@ -647,7 +645,7 @@
             </Tooltip>
 
             <Tooltip
-              title={"Add Web Socket"}
+              title={"Add WebSocket"}
               placement={"bottom"}
               distance={12}
             >
@@ -765,6 +763,9 @@
     visibility: hidden;
     background-color: transparent;
   }
+  .threedot-icon-container:active {
+    background-color: var(--bg-secondary-420) !important;
+  }
 
   .threedot-active {
     visibility: visible;
@@ -779,6 +780,10 @@
     background-color: var(--bg-tertiary-500) !important;
     border-radius: 4px;
     padding: 5px;
+  }
+
+  .add-icon-container:active {
+    background-color: var(--bg-secondary-420) !important;
   }
   .add-item-active {
     visibility: visible;

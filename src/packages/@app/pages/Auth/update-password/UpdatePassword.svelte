@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Header from "$lib/components/header/Header.svelte";
   import angleLeft from "$lib/assets/angleLeft.svg";
   import lineIcon from "$lib/assets/line.svg";
   import starIcon from "$lib/assets/starIcon.svg";
@@ -87,7 +86,7 @@
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
   style="height: 100vh;"
 >
-  <Header />
+  <!-- <Header /> -->
   {#if isLoadingPage}
     <Loader loaderSize={"80px"} loaderMessage="Please Wait..." />
   {:else}

@@ -7,14 +7,16 @@
     LibraryIcon,
     SocketIcon,
     StackIcon,
+    CollectionIcon,
   } from "@library/icons";
   import PlusIcon from "@library/icons/PlusIcon.svelte";
   import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
   import type { Observable } from "rxjs";
+  import { WorkspaceRole } from "$lib/utils/enums";
   export let showImportCollectionPopup;
   export let onItemCreated;
   export let isGuestUser = false;
-
+  export let userRole;
   export let currentWorkspace: Observable<WorkspaceDocument>;
   let currentWorkspaceId: string;
   currentWorkspace.subscribe((value) => {
@@ -26,44 +28,46 @@
 </script>
 
 <div
-  class="d-flex flex-column align-items-center h-100"
-  style="padding-top: 124px; padding-right:325px; padding-left:325px; padding-bottom: 24px;"
+  class="d-flex flex-column align-items-center h-100 justify-content-center"
+  style=""
 >
-  <div style="height: 176px; width: 175px; margin-bottom: 24px;">
+  <div style="height: 176px; width: 175px;" class="sparrow-logo">
     <SparrowLogo />
   </div>
   <div class="d-flex" style="gap: 19px;">
-    <div
-      class=" "
-      style="height: 120px; width:130px; border: 0.5px solid var(--text-tertiary-400 );  border-radius : 4px; "
-      role="button"
-      on:click={() => {
-        if (isGuestUser) {
-          onItemCreated("collection", {
-            workspaceId: currentWorkspaceId,
-          });
-        } else {
-          showImportCollectionPopup();
-        }
-      }}
-    >
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <div
-        class="d-flex justify-content-center align-items-center"
-        style="height: 79px"
+        class=" "
+        style="height: 120px; width:130px; border: 0.5px solid var(--text-tertiary-400 );  border-radius : 4px; "
+        role="button"
+        on:click={() => {
+          if (isGuestUser) {
+            onItemCreated("collection", {
+              workspaceId: currentWorkspaceId,
+            });
+          } else {
+            showImportCollectionPopup();
+          }
+        }}
       >
-        <LibraryIcon
-          width="24px"
-          height="24px"
-          color=" var( --text-primary-300)"
-        />
+        <div
+          class="d-flex justify-content-center align-items-center"
+          style="height: 79px"
+        >
+          <LibraryIcon
+            width="18px"
+            height="18px"
+            color=" var( --text-primary-300)"
+          />
+        </div>
+        <div
+          class="d-flex justify-content-center align-items-center"
+          style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px 20px 10px 10px; font-size:14px;  "
+        >
+          <span><PlusIcon color={"var(--white-color)"} /></span> Collection
+        </div>
       </div>
-      <div
-        class="d-flex justify-content-center align-items-center"
-        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px;  "
-      >
-        <span><PlusIcon color={"var(--white-color)"} /></span> Collection
-      </div>
-    </div>
+    {/if}
 
     <div
       class=" "
@@ -78,42 +82,43 @@
         style="height: 79px"
       >
         <VectorIcon
-          width="24px"
-          height="24px"
+          width="18px"
+          height="18px"
           color=" var( --text-primary-300)"
         />
       </div>
       <div
         class="d-flex justify-content-center align-items-center"
-        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px;  "
+        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px 20px 10px 10px; font-size:14px;  "
       >
-        <span><PlusIcon color={"var(--white-color)"} /></span> Request
+        <span><PlusIcon color={"var(--white-color)"} /></span> REST API
       </div>
     </div>
-
-    <div
-      class=" "
-      style="height: 120px; width:120px; border: 0.5px solid var(--text-tertiary-400 );  border-radius : 4px; "
-      role="button"
-      on:click={handleCreateEnvironment}
-    >
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <div
-        class="d-flex justify-content-center align-items-center"
-        style="height: 79px"
+        class=" "
+        style="height: 120px; width:120px; border: 0.5px solid var(--text-tertiary-400 );  border-radius : 4px; "
+        role="button"
+        on:click={handleCreateEnvironment}
       >
-        <StackIcon
-          width="24px"
-          height="24px"
-          color=" var( --text-primary-300)"
-        />
+        <div
+          class="d-flex justify-content-center align-items-center"
+          style="height: 79px"
+        >
+          <StackIcon
+            width="22px"
+            height="22px"
+            color=" var( --text-primary-300)"
+          />
+        </div>
+        <div
+          class="d-flex justify-content-center align-items-center"
+          style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px 14px 10px 6px; font-size:14px;  "
+        >
+          <span><PlusIcon color={"var(--white-color)"} /></span> Environment
+        </div>
       </div>
-      <div
-        class="d-flex justify-content-center align-items-center"
-        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px;  "
-      >
-        <span><PlusIcon color={"var(--white-color)"} /></span> Environment
-      </div>
-    </div>
+    {/if}
 
     <div
       class=" "
@@ -136,10 +141,16 @@
       </div>
       <div
         class="d-flex justify-content-center align-items-center"
-        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px;  "
+        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px 20px 10px 10px; font-size:14px;  "
       >
         <span><PlusIcon color={"var(--white-color)"} /></span> WebSocket
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  .sparrow-logo {
+    margin-bottom: 15vh;
+  }
+</style>

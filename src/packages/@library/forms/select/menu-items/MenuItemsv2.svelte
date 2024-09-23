@@ -143,7 +143,7 @@
   }
 
   .select-ticked-highlight-text {
-    color: var(--text-primary-200) !important;
+    color: var(--text-primary-300) !important;
   }
 
   /* others */

@@ -15,7 +15,7 @@
   import { Tooltip } from "@library/ui";
   import SliderSwitch from "@library/forms/SliderSwitch/SliderSwitch.svelte";
 
-  import { ErrorInfoIcon, Information } from "@library/icons";
+  import { DustbinIcon, ErrorInfoIcon, Information } from "@library/icons";
 
   import { Editor } from "@library/forms";
   import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
@@ -567,7 +567,14 @@
         <!-- Bulk Edit TextArea starts -->
         <div style="height:100%">
           {#if isBulkEditLoaded}
+          {#if isBulkEditLoaded}
             <BulkEditEditor
+              bind:value={bulkText}
+              on:change={handleBulkTextarea}
+              {enableKeyValueHighlighting}
+              class={`px-2 sparrow-fs-18 outline-none`}
+              placeholder={bulkEditPlaceholder}
+            />
               bind:value={bulkText}
               on:change={handleBulkTextarea}
               {enableKeyValueHighlighting}
@@ -671,6 +678,11 @@
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
+  }
+
+  .trash-icon {
+    height: 24px;
+    width: 24px;
   }
   .trash-icon:hover {
     background-color: var(--bg-secondary-500);

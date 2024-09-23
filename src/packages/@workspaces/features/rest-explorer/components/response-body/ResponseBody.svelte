@@ -60,13 +60,21 @@
         on:change={() => {}}
         isEditable={false}
         isFormatted={true}
-      />
-    {/if}
+      />{/if}
   </div>
 </div>
 
 <style>
   iframe {
     pointer-events: none;
+  }
+
+  .response-body {
+    overflow-y: hidden;
+    transition: overflow 0.3s ease-in-out;
+  }
+
+  .response-body:hover {
+    overflow-y: auto;
   }
 </style>

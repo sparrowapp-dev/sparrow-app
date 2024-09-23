@@ -5,17 +5,13 @@
   import Authguard from "@app/routing/Authguard.svelte";
   import Navigate from "@app/routing/Navigate.svelte";
   import Dashboard from "@app/pages/Dashboard/Dashboard.svelte";
-  import { TabRepository } from "@app/repositories/tab.repository";
-  import { syncTabs } from "$lib/store/request-response-section";
   import EntryPoint from "@app/pages/Auth/entry-point/EntryPoint.svelte";
-  import { resizeWindowOnLogin } from "$lib/components/header/window-resize";
+  import { resizeWindowOnLogin } from "../utils";
   import { registerDeepLinkHandler } from "$lib/utils/deeplink/app.deeplink";
   import { onMount } from "svelte";
   import { user } from "$lib/store/auth.store";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import { handleShortcuts } from "$lib/utils/shortcuts";
-  import AutoUpdateDialog from "$lib/components/Modal/AutoUpdateDialog.svelte";
+  import { AppUpdater } from "@common/features";
   import { getCurrent } from "@tauri-apps/api/window";
   import { notifications } from "@library/ui/toast/Toast";
   import LoginPage from "@app/pages/Auth/login-page/LoginPage.svelte";
@@ -23,36 +19,7 @@
   import { singleInstanceHandler } from "$lib/utils/singleinstance/app.singleinstance";
 
   export let url = "/";
-  // const tabRepository = new TabRepository();
-  // let flag: boolean = true;
   let isActiveInternet: boolean = true;
-  // let tabList = tabRepository.getTabList();
-  // let sample = generateSampleRequest("id", new Date().toString());
-  // tabList.subscribe((val) => {
-  //   if (val.length > 0) {
-  //     if (flag) {
-  //       let progressiveTab;
-  //       const tabList = val.map((elem) => {
-  //         let temp = createDeepCopy(elem.toJSON());
-  //         if (temp?.property?.request) {
-  //           temp.property.request.state.responseSection =
-  //             sample.property.request.state.responseSection;
-  //           temp.property.request.state.responseRaw =
-  //             sample.property.request.state.responseRaw;
-  //           temp.property.request.state.responseFormatter =
-  //             sample.property.request.state.responseFormatter;
-  //           temp.property.request.response = sample.property.request.response;
-  //         }
-  //         if (elem.isActive) {
-  //           progressiveTab = temp;
-  //         }
-  //         return temp;
-  //       });
-  //       syncTabs(tabList, progressiveTab);
-  //       flag = false;
-  //     }
-  //   }
-  // });
 
   const doOnlineCheck = () => {
     if (!navigator.onLine && isActiveInternet) {
@@ -97,7 +64,7 @@
   });
 </script>
 
-<AutoUpdateDialog />
+<AppUpdater />
 <Router {url}>
   <Authguard>
     <section slot="loggedIn">
