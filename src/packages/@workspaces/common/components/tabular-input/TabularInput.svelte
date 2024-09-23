@@ -567,14 +567,7 @@
         <!-- Bulk Edit TextArea starts -->
         <div style="height:100%">
           {#if isBulkEditLoaded}
-          {#if isBulkEditLoaded}
             <BulkEditEditor
-              bind:value={bulkText}
-              on:change={handleBulkTextarea}
-              {enableKeyValueHighlighting}
-              class={`px-2 sparrow-fs-18 outline-none`}
-              placeholder={bulkEditPlaceholder}
-            />
               bind:value={bulkText}
               on:change={handleBulkTextarea}
               {enableKeyValueHighlighting}
