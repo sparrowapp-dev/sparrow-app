@@ -17,8 +17,8 @@
   };
 </script>
 
-<div style="max-height: 509px;">
-  <div class=" d-flex flex-column" style="gap:19.72px;">
+<div style="height: 509px;">
+  <div class=" d-flex flex-column" style="gap:19.72px; height:480px;">
     <div style="height: 276px; padding:auto; padding-top:0px;">
       {#if !navigator.onLine}
         <div class="fallback-message">
@@ -32,8 +32,8 @@
         />
       {/if}
     </div>
-    <div class="d-flex flex-column" style=" gap:19.72px;">
-      <div class="d-flex flex-row justify-content-center" style="gap:5.48px;">
+    <div class="d-flex flex-column" style=" gap:19.72px; ">
+      <div class=" d-flex flex-row justify-content-center" style=" gap:5.48px;">
         {#each data as element, index}
           <button
             class="border-0"
@@ -61,45 +61,45 @@
           {stepData?.subheading}
         </p>
       </div>
-      <header
-        class="d-flex"
-        style=" height:auto; 	justify-content: space-between;"
-      >
-        <div>
-          {#if currentStep > 0}
-            <button
-              class="btn border-0"
-              style=" background-color: var(--bg-primary-300) ; padding:3px 19px 3px 20px; border-radius:4.78px; outline:none; "
-              on:click={() => {
-                navigateStep("prev");
-              }}>Previous</button
-            >
-          {/if}
-        </div>
-        {#if currentStep === n - 1}
-          <button
-            class="btn border-0"
-            style="background-color: var(--bg-primary-300); padding:3px 19px 3px 20px; border-radius:4.78px; outline:none;"
-            on:click={() => {
-              handleClosePopup(false);
-            }}
-          >
-            Close
-          </button>
-        {:else}
-          <button
-            class=" btn border-0"
-            style="background-color: var(--bg-primary-300); padding:3px 19px 3px 20px; border-radius:4.78px; outline:none; "
-            on:click={() => {
-              navigateStep("next");
-            }}
-          >
-            Next
-          </button>
-        {/if}
-      </header>
     </div>
   </div>
+  <header
+    class="d-flex"
+    style=" height:auto; 	justify-content: space-between;"
+  >
+    <div>
+      {#if currentStep > 0}
+        <button
+          class="btn border-0"
+          style=" background-color: var(--bg-primary-300) ; padding:3px 19px 3px 20px; border-radius:4.78px; outline:none; "
+          on:click={() => {
+            navigateStep("prev");
+          }}>Previous</button
+        >
+      {/if}
+    </div>
+    {#if currentStep === n - 1}
+      <button
+        class="btn border-0"
+        style="background-color: var(--bg-primary-300); padding:3px 19px 3px 20px; border-radius:4.78px; outline:none;"
+        on:click={() => {
+          handleClosePopup(false);
+        }}
+      >
+        Close
+      </button>
+    {:else}
+      <button
+        class=" btn border-0"
+        style="background-color: var(--bg-primary-300); padding:3px 19px 3px 20px; border-radius:4.78px; outline:none; "
+        on:click={() => {
+          navigateStep("next");
+        }}
+      >
+        Next
+      </button>
+    {/if}
+  </header>
 </div>
 
 <style>
