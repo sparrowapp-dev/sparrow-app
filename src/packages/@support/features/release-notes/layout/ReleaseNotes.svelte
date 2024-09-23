@@ -22,7 +22,7 @@
   /**
    * External URL for Sparrow's GitHub page.
    */
-  const externalSparrowGithub = constants.SPARROW_GITHUB;
+  const externalSparrowRealseNote = constants.RELEASE_NOTE_DYNAMIC_API;
 
   /**
    * External URL for Sparrow's LinkedIn page.
@@ -348,7 +348,10 @@
                         style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
                         class="mb-0"
                         on:click={async () => {
-                          await open(externalSparrowGithub);
+                          const version =
+                            event.title.match(/v\d+\.\d+\.\d+/)[0];
+                          const releaseNoteUrl = `${externalSparrowRealseNote}${version}`;
+                          await open(releaseNoteUrl);
                         }}
                       >
                         Github
@@ -455,7 +458,10 @@
                   style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
                   class="mb-0"
                   on:click={async () => {
-                    await open(externalSparrowGithub);
+                    const version =
+                      selectedEvent.title.match(/v\d+\.\d+\.\d+/)[0];
+                    const releaseNoteUrl = `${externalSparrowRealseNote}${version}`;
+                    await open(releaseNoteUrl);
                   }}
                 >
                   Github

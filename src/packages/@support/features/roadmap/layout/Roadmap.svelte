@@ -68,7 +68,7 @@
           product?.category?.name === "Feature Request") ||
         (type === "UI Improvement" &&
           product?.category?.name === "UI Improvement") ||
-        (type === "bug" && product?.category?.name === "Bug");
+        (type === "Bug" && product?.category?.name === "Bug");
 
       return matchesSearchTerm && matchesCategory;
     }),

@@ -317,6 +317,7 @@
             headerFontSize={"10px"}
             isDropIconFilled={true}
             position={"absolute"}
+            maxBodyHeight={"205px"}
           />
         </div>
       </div>
@@ -394,8 +395,8 @@
                   >
                     <span
                       class="category mt-2 text-fs-10"
-                      style="color:{getColor(post.status)
-                        .fontColor}; border:0.2px solid {getColor(post.status)
+                      style="color:{getColor(post?.status)
+                        .fontColor}; border:0.2px solid {getColor(post?.status)
                         .fontColor}; "
                     >
                       {post?.status
