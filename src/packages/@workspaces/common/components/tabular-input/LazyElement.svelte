@@ -5,6 +5,12 @@
   import close from "$lib/assets/close-icon.svg";
   import { CodeMirrorInput } from "../";
   import { Tooltip } from "@library/ui";
+  import type {
+    ObserverEventDetails,
+    ScrollDirection,
+    Options,
+  } from "svelte-inview";
+  import { Skeleton } from "@library/ui/skeleton";
 
   export let element;
   export let index;
@@ -18,11 +24,7 @@
   export let updateCheck;
   export let removeFormFile;
   export let deleteParam;
-  import type {
-    ObserverEventDetails,
-    ScrollDirection,
-    Options,
-  } from "svelte-inview";
+  export let uploadFormFile;
 
   let isInView: boolean = false;
   let scrollDirection: ScrollDirection | any;
@@ -39,7 +41,6 @@
   };
 </script>
 
-<!-- Add the `use:inview` directive to track the visibility of the container -->
 <div
   use:inview={options}
   on:inview_change={handleChange}
@@ -171,6 +172,11 @@
       </div>
     </div>
   {/if}
+  {#if !isInView}
+    <div class="skelton-parent">
+      <Skeleton width="100%" height="18px" />
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -259,8 +265,11 @@
     background-color: var(--bg-secondary-500);
   }
 
-  .lazy-element {
-    width: 100%;
+  .skelton-parent {
+    display: flex;
     height: 24px;
+    padding: 2px 20px 2px 0px;
+    margin: 0px;
+    gap: 10%;
   }
 </style>

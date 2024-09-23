@@ -63,3 +63,7 @@ export { default as DustbinIcon } from "./Dustbin.svelte";
 export { default as ArrowUpward } from "./ArrowUpward.svelte";
 export { default as ArrowDownward } from "./ArrowDownward.svelte";
 export { default as DownloadIcon } from "./Download.svelte";
+export { default as HomeIcon } from "./Home.svelte";
+export { default as HelpIcon } from "./Help.svelte";
+export { default as CollectionsIcon } from "./Collections.svelte";
+export { default as Settings2Icon } from "./Settings2.svelte";

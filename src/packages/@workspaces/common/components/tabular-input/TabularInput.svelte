@@ -418,9 +418,9 @@
             {onUpdateEnvironment}
             {updateParam}
             {updateCheck}
-            {uploadFormFile}
             {removeFormFile}
             {deleteParam}
+            {uploadFormFile}
           />
         {/each}
       </div>
