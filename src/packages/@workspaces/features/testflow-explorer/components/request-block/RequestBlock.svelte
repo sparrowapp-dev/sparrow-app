@@ -260,7 +260,7 @@
   {#if isCreateBlockArrowHovered && isAddBlockVisible}
     <div
       class="position-absolute d-flex align-items-center"
-      style="right:-25px; top:50%; transform : translateX(100%) translateY(-50%); opacity:0.6;"
+      style="right:-28px; top:50%; transform : translateX(100%) translateY(-50%); opacity:0.6;"
     >
       <div>
         <ArrowSolid />
