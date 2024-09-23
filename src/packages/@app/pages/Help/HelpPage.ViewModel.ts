@@ -85,7 +85,7 @@ class HelpPageViewModel {
    * @returns void
    */
   public addFeedback = async () => {
-    MixpanelEvent(Events.ADD_FEEDBACK, {
+    MixpanelEvent(Events.Add_Feedback, {
       source: "Feedback",
     });
     return true;

@@ -6,6 +6,8 @@
   import HelpInfoCard from "@support/common/components/HelpInfo-Card/HelpInfoCard.svelte";
   import { FeedbackType } from "@support/common/types";
   import { onMount } from "svelte";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
   /** @type {Function} Function to fetch posts. */
   export let fetchPosts;
@@ -105,6 +107,9 @@
       <div
         style="margin-bottom: 37px;"
         class={`d-flex search-input-container rounded py-1 px-2 `}
+        on:click={()=>{
+           MixpanelEvent(Events.Roadmap_Search);
+        }}
       >
         <SearchIcon
           width={14}
@@ -149,6 +154,7 @@
           ]}
           onclick={(id = "") => {
             type = id;
+            MixpanelEvent(Events.Roadmap_Categories_Filter);
           }}
           titleId={type}
           minHeaderWidth={"185px"}

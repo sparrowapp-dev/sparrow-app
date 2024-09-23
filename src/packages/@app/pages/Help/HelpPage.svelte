@@ -20,6 +20,8 @@
   import Roadmap from "@support/features/roadmap/layout/Roadmap.svelte";
   import { ReleaseNotes } from "@support/features/release-notes/layout";
   import { ActivitySection } from "@support/features/activity-section";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
   /**
    * @description - Prevents the default context menu from appearing on right-click.
@@ -129,6 +131,7 @@
           on:click={() => {
             setActiveTab("roadmap");
             isPostopenFromActivity = false;
+            MixpanelEvent(Events.Roadmap_Tab);
           }}
         >
           <RoadmapIcon
@@ -147,6 +150,7 @@
           on:click={() => {
             setActiveTab("feedback");
             isPostopenFromActivity = false;
+            MixpanelEvent(Events.Feedback_Tab);
           }}
         >
           <DocIcon
@@ -165,6 +169,7 @@
           on:click={() => {
             setActiveTab("updates");
             isPostopenFromActivity = false;
+            MixpanelEvent(Events.Updates_Tab);
           }}
         >
           <UpdateIcon
@@ -183,6 +188,7 @@
           on:click={() => {
             setActiveTab("community");
             isPostopenFromActivity = false;
+            MixpanelEvent(Events.Community_Tab);
           }}
         >
           <GroupIcon
@@ -202,6 +208,7 @@
           on:click={() => {
             setActiveTab("myActivity");
             isPostopenFromActivity = false;
+            MixpanelEvent(Events.Activity_Tab);
           }}
         >
           <ActivityIcon
