@@ -1,7 +1,9 @@
 <script>
   import { ArrowOutwardIcon, CrossIcon } from "@library/icons";
+  import { Tooltip } from "@library/ui";
 
   export let selectedNode;
+  export let onClose;
 </script>
 
 <div
@@ -35,15 +37,23 @@
     </p>
   </div>
   <div class="d-flex gap-2 align-items-center" style="cursor:pointer">
-    <ArrowOutwardIcon
-      width={"8px"}
-      height={"8px"}
-      color={"var(  --icon-secondary-200)"}
-    />
-    <CrossIcon
-      width={"14px"}
-      height={"14px"}
-      color={"var(--icon-secondary-200)"}
-    />
+    <!-- <Tooltip title="Testing" placement={"bottom"} zIndex={100}>
+      <span on:click={() => {}} class="pe-2">
+        <ArrowOutwardIcon
+          width={"8px"}
+          height={"8px"}
+          color={"var(  --icon-secondary-200)"}
+        />
+      </span>
+    </Tooltip> -->
+    <Tooltip title="Close" placement={"bottom-left"} zIndex={100}>
+      <span on:click={onClose} class="pe-2">
+        <CrossIcon
+          width={"14px"}
+          height={"14px"}
+          color={"var(--icon-secondary-200)"}
+        />
+      </span>
+    </Tooltip>
   </div>
 </div>

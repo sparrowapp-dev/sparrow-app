@@ -334,7 +334,7 @@
   } as unknown as NodeTypes;
   let nodesValue = 1;
 
-  let selectedNodeId = "0";
+  let selectedNodeId = "1";
 
   // Subscribe to changes in the nodes
   const nodesSubscriber = nodes.subscribe((val: Node[]) => {
@@ -406,6 +406,20 @@
     };
   };
 
+  /**
+   * Unselect all the existing nodes
+   */
+  const unselectNodes = () => {
+    nodes.update((_nodes: Node[] | any[]) => {
+      _nodes.forEach((_nodeItem) => {
+        _nodeItem.selected = false;
+      });
+      return _nodes;
+    });
+    selectedNodeId = "1";
+    selectedNode = undefined;
+  };
+
   onDestroy(() => {
     collectionsSubscriber.unsubscribe();
     nodesSubscriber();
@@ -437,7 +451,6 @@
             disable={testflowStore?.isTestFlowRunning}
             iconColor={"var(--icon-secondary-100)"}
             onClick={async () => {
-              selectedNodeId = "0";
               await onClickRun();
             }}
           />
@@ -473,7 +486,12 @@
         style="background-color:var(--bg-secondary-850); border:1px solid var(--border-tertiary-300);  margin:10px; height:350px;"
       >
         <!-- Request Response Nav -->
-        <TableNavbar {selectedNode} />
+        <TableNavbar
+          bind:selectedNode
+          onClose={() => {
+            unselectNodes();
+          }}
+        />
 
         <!-- Request Respone Body -->
         <div
