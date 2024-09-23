@@ -35,6 +35,7 @@
     VectorIcon,
   } from "@library/icons";
   import { RunIcon } from "@library/icons";
+  import { string } from "yup";
   export let tab: Observable<Tab>;
   export let onUpdateNodes;
   export let onUpdateEdges;
@@ -44,16 +45,14 @@
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
 
-  let folderId: string;
-  let workspaceId: string;
-  let collectionId: string;
-  let id: string;
-  let method: string;
-  let name: string;
-  let collection: CollectionDto;
-  let requestId: string;
-
-  let testFlowDrag: boolean = false;
+  let collectionData = {
+    folderId: "",
+    workspaceId: "",
+    collectionId: "",
+    method: "",
+    id: "",
+    name: "",
+  };
 
   let isNodesDraggable = false;
   const checkIfEdgesExist = (_id: string) => {
@@ -155,10 +154,10 @@
           type: "requestBlock",
           data: {
             name,
-            collectionId,
-            method,
-            folderId: folderId ? folderId : "",
-            workspaceId,
+            collectionId: collectionData.collectionId,
+            method: collectionData.method,
+            folderId: collectionData.folderId ? collectionData.folderId : "",
+            workspaceId: collectionData.workspaceId,
             blocks: nodes,
             connector: edges,
             onClick: function (_id: string) {
@@ -332,13 +331,12 @@
 
     if (!data) return;
 
-    id = data.apiId;
-    folderId = data.folderId;
-    workspaceId = data.workspaceId;
-    collectionId = data.collectionId;
-    name = data.name;
-    method = data.method;
-    collection = data.collection;
+    collectionData.id = data.apiId;
+    collectionData.folderId = data.folderId;
+    collectionData.workspaceId = data.workspaceId;
+    collectionData.collectionId = data.collectionId;
+    collectionData.name = data.name;
+    collectionData.method = data.method;
 
     createNewNode($nodes.length.toString());
     nodes.update((nodes) =>
