@@ -92,4 +92,16 @@ export class TestflowRepository {
       })
       .exec();
   };
+
+
+  public readTestFlow = async (uuid: string): Promise<any> => {
+    return await RxDB.getInstance()
+      .rxdb.environment.findOne({
+        selector: {
+          id: uuid,
+        },
+      })
+      .exec();
+  };
+
 }

@@ -7,6 +7,7 @@ import type { EnvironmentDocument, TabDocument } from "@app/database/database";
 import { CollectionRepository } from "@app/repositories/collection.repository";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
+import { TestflowRepository } from "@app/repositories/testflow.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import type { Tab } from "@common/types/workspace";
 import type {
@@ -32,6 +33,8 @@ export class TestflowExplorerPageViewModel {
   private collectionRepository = new CollectionRepository();
   private environmentRepository = new EnvironmentRepository();
   private workspaceRepository = new WorkspaceRepository();
+  private testflowRepository = new TestflowRepository();
+
   /**
    * Utils
    */
@@ -542,4 +545,27 @@ export class TestflowExplorerPageViewModel {
     this.tabRepository.createTab(adaptedRequest);
     moveNavigation("right");
   };
+
+
+
+    /**
+   * @description - updates environment tab name
+   * @param _name - new environment name
+   */
+    public updateName = async (_name: any, event = "") => {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      if (event === "blur" && _name === "") {
+        const data = await this.testflowRepository.readTestFlow(
+          progressiveTab.id,
+        );
+        progressiveTab.name = data.name;
+      } else if (event === "") {
+        progressiveTab.name = _name;
+      }
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      // this.compareRequestWithServer();
+    };
+
+
 }

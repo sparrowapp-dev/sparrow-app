@@ -62,7 +62,7 @@
   export let environmentVariables;
   export let isTestflowEditable;
   export let onRedrectRequest;
-
+  export let onUpdateTestFlowName;
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
   const edges = writable<TFEdgeHandlerType[]>([]);
@@ -426,17 +426,38 @@
     nodesSubscriber();
     edgesSubscriber();
   });
+
+  let testFlowName = $tab?.name;
+  const handleTestFlowNameChange = (_name, event) => {
+    onUpdateTestFlowName(_name, event);
+  };
+
 </script>
 
 <div class="h-100 d-flex flex-column position-relative">
   <div
     class="d-flex justify-content-between position-absolute p-3"
-    style="top:0;
+    style="top:0; width: 100%;
   right:0;
   z-index:100;"
   >
     <div>
       <!-- INSERT NAME COMPONENT HERE -->
+      <div style="" class={`d-flex search-input-container  py-1 px-2 `}>
+        <input
+          type="text"
+          id="search-input"
+          class={`bg-transparent w-100 border-0 my-auto`}
+          on:input={(e) => {
+            testFlowName = e.target.value;
+            handleTestFlowNameChange(testFlowName, "");
+          }}
+          on:blur={(e) => {
+            handleTestFlowNameChange(testFlowName, "blur");
+          }}
+          value={testFlowName}
+        />
+      </div>
     </div>
     <div class="d-flex">
       <div style="margin-right: 5px;">
@@ -636,5 +657,36 @@
   .request-container {
     background-color: var(--bg-secondary-800);
     width: 100%;
+  }
+
+  .search-input-container {
+    border: 1px solid var(--border-color);
+    background: var(--bg-tertiary-400);
+    max-width: 20vw;
+    font-size: 12px;
+    position: relative;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    height: 36px;
+  }
+
+  .search-input-container > input:focus {
+    outline: none;
+    caret-color: var(--workspace-hover-color);
+  }
+  .search-input-container:focus-within {
+    border: 1px solid var(--workspace-hover-color);
+  }
+
+  .search-input-container:hover {
+    border: 1px solid var(--border-primary-300);
+    caret-color: var(--border-primary-300);
+  }
+  .search-input-container:focus-within {
+    border-color: var(--border-primary-300);
+    caret-color: var(--border-primary-300);
   }
 </style>
