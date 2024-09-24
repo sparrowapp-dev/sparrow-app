@@ -42,6 +42,8 @@
     TableSidebar,
   } from "@workspaces/common/components";
   import { RunIcon } from "@library/icons";
+  import { Modal } from "@library/ui";
+  import DeleteNode from "@workspaces/common/components/delete-node/DeleteNode.svelte";
   import { ResponseStatusCode } from "$lib/utils/enums";
   import type {
     TFDataStoreType,
@@ -68,6 +70,8 @@
   export let onRedrectRequest;
   export let onUpdateTestFlowName;
   export let onSaveTestflow;
+
+  export let deleteNodeResponse;
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -205,6 +209,14 @@
     }
   });
 
+  let deletedNodeId: string;
+
+  const handleDeleteModal = (id: string) => {
+    isDeleteNodeModalOpen = true;
+    deletedNodeId = id;
+    countNextDeletedNode(id);
+  };
+
   /**
    * Creates a new node and connects it to the existing node.
    * @param _id - The ID of the existing node.
@@ -259,12 +271,15 @@
                 folderId,
               );
             },
+            onOpenDeleteModal: function (id: string) {
+              handleDeleteModal(id);
+            },
             collections: filteredCollections,
             tabId: $tab.tabId,
           },
           position: nextNodePosition,
-          deletable: true,
-          draggable: isNodesDraggable,
+          deletable: false,
+          draggable: isNodesDraggable, // Disable dragging for this node
         },
       ];
     });
@@ -344,6 +359,9 @@
                 folderId,
               );
             },
+            onOpenDeleteModal: function (id: string) {
+              handleDeleteModal(id);
+            },
             name: request?.name ?? dbNodes[i].data?.name,
             method: request?.request?.method ?? dbNodes[i].data?.method,
             collectionId: dbNodes[i].data?.collectionId,
@@ -356,8 +374,8 @@
             x: dbNodes[i].position.x,
             y: dbNodes[i].position.y,
           },
-          deletable: dbNodes[i].id === "1" ? false : true,
-          draggable: isNodesDraggable,
+          deletable: dbNodes[i].id === "1" ? false : false,
+          draggable: isNodesDraggable, // Disable dragging for this node
         });
       }
       return res;
@@ -407,6 +425,7 @@
   } as unknown as NodeTypes;
   let nodesValue = 1;
 
+  let selectedNodeName: string = "";
   let selectedNodeId = "1";
 
   // Subscribe to changes in the nodes
@@ -414,10 +433,11 @@
     if (val && val.length) onUpdateNodes(val);
     nodesValue = val.length;
     // Find the node where selected is true
-    let selectedNodeTrue = val.find((node: Node) => node.selected === true);
+    let node = val.find((node: Node) => node.selected === true);
 
-    if (selectedNodeTrue) {
-      selectedNodeId = selectedNodeTrue.id;
+    if (node) {
+      selectedNodeName = node?.data?.name as string;
+      selectedNodeId = node.id;
     }
   });
 
@@ -462,6 +482,41 @@
     return responseNavigation;
   }
 
+  let isDeleteNodeModalOpen = false;
+
+  const handleDeleteNode = (id: string) => {
+    nodes.update((_nodes) => {
+      return _nodes.filter((node) => node.id < id);
+    });
+
+    edges.update((_edges) => {
+      return _edges.filter((edge) => edge.source !== id && edge.target < id);
+    });
+
+    deleteNodeResponse($tab.tabId, selectedNodeId);
+    unselectNodes();
+
+    isDeleteNodeModalOpen = false;
+  };
+
+  let deleteCount = 0; // Variable to store the count of nodes to be deleted
+
+  const countNextDeletedNode = (id: string) => {
+    // Count nodes with an id greater than the one being deleted
+    nodes.subscribe((_nodes) => {
+      deleteCount = _nodes.filter((node) => node.id > id).length;
+    });
+  };
+
+  const handleKeyPress = (event: KeyboardEvent) => {
+    if (event.key === "Backspace") {
+      event.preventDefault();
+    }
+    if (event.key === "Delete") {
+      event.preventDefault();
+      handleDeleteModal(selectedNodeId);
+    }
+  };
   // API response UI states
   let responseState: TFResponseStateType = {
     responseBodyLanguage: "",
@@ -498,6 +553,12 @@
     nodesSubscriber();
     edgesSubscriber();
   });
+
+  let divElement;
+
+  function focusDiv() {
+    divElement.focus();
+  }
 </script>
 
 <div class="h-100 d-flex flex-column position-relative">
@@ -548,7 +609,13 @@
       </div>
     </div>
   </div>
-  <div style="flex:1; overflow:auto;">
+  <div
+    bind:this={divElement}
+    tabindex="0"
+    on:keydown={handleKeyPress}
+    on:click={focusDiv}
+    style="flex:1; overflow:auto; outline: none;"
+  >
     <SvelteFlow {nodes} {edges} {nodeTypes}>
       <Background
         bgColor={"var(--bg-secondary-850)"}
@@ -699,6 +766,28 @@
     </div>
   {/if}
 </div>
+<!-- <svelte:window on:keydown={handleKeyPress} /> -->
+
+<Modal
+  title={""}
+  type={"dark"}
+  width={"540px"}
+  zIndex={1000}
+  isOpen={isDeleteNodeModalOpen}
+  handleModalState={(flag) => {
+    isDeleteNodeModalOpen = flag;
+  }}
+>
+  <DeleteNode
+    {deletedNodeId}
+    {selectedNodeName}
+    {handleDeleteNode}
+    {deleteCount}
+    handleModalState={(flag = false) => {
+      isDeleteNodeModalOpen = flag;
+    }}
+  />
+</Modal>
 
 <style>
   :global(.svelte-flow__attribution) {

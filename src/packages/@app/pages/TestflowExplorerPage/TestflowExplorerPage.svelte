@@ -14,6 +14,8 @@
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
 
+    let deleteNodeResponse = _viewModel.deleteNodesLessThanId;
+
   let render = false;
   const sub = _viewModel.tab.subscribe((val) => {
     if (val?.tabId) {
@@ -88,6 +90,7 @@
     onClickRun={_viewModel.handleTestFlowRun}
     toggleHistoryDetails={_viewModel.toggleHistoryDetails}
     toggleHistoryContainer={_viewModel.toggleHistoryContainer}
+    deleteNodeResponse={_viewModel.deleteNodeResponse}
     onRedrectRequest={_viewModel.redirectRequest}
     onUpdateTestFlowName={_viewModel.updateName}
     onSaveTestflow={_viewModel.saveTestflow}
