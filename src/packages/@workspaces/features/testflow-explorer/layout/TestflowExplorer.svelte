@@ -432,7 +432,12 @@
   });
 
   let testFlowName = $tab?.name;
- 
+
+  $: {
+    if (tab) {
+      testFlowName = $tab?.name;
+    }
+  }
 </script>
 
 <div class="h-100 d-flex flex-column position-relative">
@@ -444,7 +449,7 @@
   >
     <div>
       <!-- INSERT NAME COMPONENT HERE -->
-      <TestFlowName {onUpdateTestFlowName} bind:testFlowName />
+      <TestFlowName {onUpdateTestFlowName} {testFlowName} />
     </div>
     <div class="d-flex">
       <div style="margin-right: 5px;">
@@ -648,32 +653,5 @@
   .request-container {
     background-color: var(--bg-secondary-800);
     width: 100%;
-  }
-
-  .search-input-container {
-    border: 1px solid var(--border-color);
-    background: var(--bg-tertiary-400);
-    max-width: 20vw;
-    position: relative;
-    border: 1px solid transparent;
-    gap: 2px;
-    height: 36px;
-  }
-
-  .search-input-container > input:focus {
-    outline: none;
-    caret-color: var(--workspace-hover-color);
-  }
-  .search-input-container:focus-within {
-    border: 1px solid var(--workspace-hover-color);
-  }
-
-  .search-input-container:hover {
-    border: 1px solid var(--border-primary-300);
-    caret-color: var(--border-primary-300);
-  }
-  .search-input-container:focus-within {
-    border-color: var(--border-primary-300);
-    caret-color: var(--border-primary-300);
   }
 </style>

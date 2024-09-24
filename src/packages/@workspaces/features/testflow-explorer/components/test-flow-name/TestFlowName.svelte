@@ -10,15 +10,14 @@
   <input
     type="text"
     id="search-input"
+    bind:value={testFlowName}
     class={`bg-transparent w-100 border-0 my-auto`}
-    on:input={(e) => {
-      testFlowName = e.target.value;
-      onUpdateTestFlowName(testFlowName, "");
+    on:input={async (e) => {
+      await onUpdateTestFlowName(testFlowName, "");
     }}
-    on:blur={(e) => {
-      onUpdateTestFlowName(testFlowName, "blur");
+    on:blur={async (e) => {
+      await onUpdateTestFlowName(testFlowName, "blur");
     }}
-    value={testFlowName}
   />
 </div>
 
@@ -26,7 +25,7 @@
   .input-name-container {
     border: 1px solid var(--border-color);
     background: var(--bg-tertiary-400);
-    max-width: 20vw;
+   width: 81px;
     position: relative;
     border: 1px solid transparent;
     gap: 2px;

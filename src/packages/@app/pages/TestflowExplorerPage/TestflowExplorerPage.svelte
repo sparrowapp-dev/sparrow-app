@@ -8,7 +8,7 @@
   import type { TFDataStoreType } from "@common/types/workspace/testflow";
   import { user } from "$lib/store";
   import { WorkspaceRole } from "$lib/utils/enums";
-    import { Debounce } from "@common/utils";
+  import { Debounce } from "@common/utils";
   export let tab;
   const _viewModel = new TestflowExplorerPageViewModel(tab);
   let collectionList: Observable<CollectionDocument[]> =
@@ -65,12 +65,11 @@
     1000,
   );
 
-
   let prevTabName = "";
   $: {
     if (tab) {
-      if (tab?.name && prevTabName !== tab.name) {
-        // _viewModel.updateNameWithEnvironmentList(tab.name);
+      if (tab?.name && prevTabName !== tab?.name) {
+        // _viewModel.updateNameWithTestFlowList(tab.name);
         renameWithTestFlowList(tab.name);
       }
       prevTabName = tab.name;
