@@ -193,13 +193,14 @@
           };
         }
       }
+
       return [
         ...(_nodes || []),
         {
           id: targetNode,
           type: "requestBlock",
           data: {
-            name,
+            name: collectionData.name,
             collectionId: collectionData.collectionId,
             method: collectionData.method,
             folderId: collectionData.folderId ? collectionData.folderId : "",
@@ -208,6 +209,9 @@
             connector: edges,
             onClick: function (_id: string) {
               createNewNode(_id);
+            },
+            onDrop: function (event, id) {
+              return drop(event, id);
             },
             onCheckEdges: function (_id: string) {
               return checkIfEdgesExist(_id);
@@ -270,6 +274,9 @@
             },
             onCheckEdges: function (_id: string) {
               return checkIfEdgesExist(_id);
+            },
+            onDrop: function (event, _id) {
+              return drop(event, _id);
             },
             onUpdateSelectedAPI: function (
               _id: string,
@@ -377,9 +384,13 @@
     if (val) onUpdateEdges(val);
   });
 
-  function drop(event) {
+  function drop(event, _id: string) {
+    console.log("Hey ID", _id);
+    console.log(event);
     event.preventDefault();
     const data = JSON.parse(event.dataTransfer.getData("text/plain"));
+
+    console.log(data);
 
     if (!data) return;
 
@@ -390,17 +401,17 @@
     collectionData.name = data.name;
     collectionData.method = data.method;
 
-    createNewNode($nodes.length.toString());
-    nodes.update((nodes) =>
-      nodes.map((node, index, array) => ({
-        ...node,
-        data: {
-          ...node.data,
-          parentDrag: false,
-          isLastNode: index === array.length - 1,
-        },
-      })),
-    );
+    createNewNode(_id);
+    // nodes.update((nodes) =>
+    //   nodes.map((node, index, array) => ({
+    //     ...node,
+    //     data: {
+    //       ...node.data,
+    //       parentDrag: false,
+    //       isLastNode: index === array.length - 1,
+    //     },
+    //   })),
+    // );
   }
 
   const handleDragEnter = () => {
@@ -422,7 +433,7 @@
         ...node,
         data: {
           ...node.data,
-          parentDrag: false,
+          parentDrag: index === array.length - 1,
           isLastNode: index === array.length - 1,
         },
       })),
@@ -504,9 +515,8 @@
 
 <div
   class="h-100 d-flex flex-column position-relative"
-  on:dragleave={handleDragEnd}
-  on:drop={(e) => drop(e)}
   on:dragenter={handleDragEnter}
+  on:dragleave={handleDragEnd}
 >
   <div
     class="d-flex justify-content-between position-absolute p-3"

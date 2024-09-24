@@ -8,7 +8,7 @@
     ExclamationIcon,
     CheckIcon2,
   } from "@library/icons";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { ResponseStatusCode } from "$lib/utils/enums";
   import { InfoIcon } from "../../icons";
   import { VectorIcon } from "@library/icons";
@@ -34,6 +34,7 @@
     name: string;
     method: string;
     onClick: (id: string) => void;
+    onDrop: (event: any) => void;
     onUpdateSelectedAPI: (
       id: string,
       name: string,
@@ -82,12 +83,13 @@
   };
 
   $: {
-    isDropHereVisible = data.parentDrag && data.isLastNode;
+    isDropHereVisible = data.parentDrag;
   }
   let isCreateBlockArrowHovered = false;
 
   let testflowStore: TFDataStoreType;
   let currentBlock: TFNodeStoreType | undefined;
+  let dropHereDrag = false;
 
   /**
    * Testflow store subscriber to get current node status
@@ -111,6 +113,27 @@
       currentBlock = undefined;
     }
   });
+
+  let dataBlocksSubscriber;
+  let dataConnectorSubscriber;
+  // Lifecycle method - runs when the component is mounted
+  onMount(() => {
+    // Subscribe to changes in the blocks store
+    dataBlocksSubscriber = data.blocks.subscribe(() => {
+      // Update visibility of the "Add Block" button based on edge check
+      setTimeout(() => {
+        isAddBlockVisible = !data?.onCheckEdges(id);
+      }, 10);
+    });
+    // Subscribe to changes in the connector store
+    dataConnectorSubscriber = data.connector.subscribe(() => {
+      // Update visibility of the "Add Block" button based on edge check
+      setTimeout(() => {
+        isAddBlockVisible = !data?.onCheckEdges(id);
+      }, 10);
+    });
+  });
+
   onDestroy(() => {
     // Clean up the subscription on component destruction
     testFlowDataStoreSubscriber();
@@ -147,7 +170,7 @@
     ? "border-left: 2px solid #69D696;"
     : "border-left: 2px solid #FF7878;"}
   on:mouseenter={() => {
-    isAddBlockVisible = !data?.onCheckEdges(id);
+    // isAddBlockVisible = !data?.onCheckEdges(id);
   }}
 >
   <Handle type="target" position={Position.Left} />
@@ -228,20 +251,33 @@
     </div>
   {/if}
 
-  {#if isDropHereVisible}
-    <div class="position-absolute drop-btn">
-      <div class="d-flex align-items-center justify-content-center">
-        <div class="drop">
-          <ArrowIcon />
-        </div>
+  <div class="border border-danger">
+    {#if isDropHereVisible}
+      <div class="">
+        {#if isAddBlockVisible}
+          <div
+            class={`drop-btn z-3`}
+            on:drop={(e) => {
+              data.onDrop(e, id);
+            }}
+          >
+            <div class="d-flex align-items-center justify-content-center">
+              <div class="drop">
+                <ArrowIcon />
+              </div>
 
-        <span class="py-1 px-3 d-flex align-items-center gap-2 dashed-border">
-          <Drop />
-          <span class="py-1">Drop Here</span>
-        </span>
+              <span
+                class="py-1 px-3 d-flex align-items-center gap-2 dashed-border"
+              >
+                <Drop />
+                <span class="py-1">Drop Here</span>
+              </span>
+            </div>
+          </div>
+        {/if}
       </div>
-    </div>
-  {/if}
+    {/if}
+  </div>
   <Handle type="source" position={Position.Right} />
   <!-- Circular arrow button by clicking this a new block adds -->
   {#if isAddBlockVisible}
@@ -308,10 +344,18 @@
       </div>
     </div>
   {/if}
+
   <!-- ----------------- -->
 </div>
 
 <style lang="scss">
+  .drop-here-box {
+    position: absolute;
+    right: -300px;
+    top: 00%;
+    width: 200px;
+    height: 200px;
+  }
   .dashed-border {
     border: 1px dashed var(--border-primary-300);
   }
