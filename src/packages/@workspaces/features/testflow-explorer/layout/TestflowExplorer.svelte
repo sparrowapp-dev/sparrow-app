@@ -275,6 +275,7 @@
           id: "xy-edge__" + _id + "-" + targetNode,
           source: _id,
           target: targetNode,
+          deletable: false,
         },
       ];
     });
@@ -369,6 +370,7 @@
           id: dbEdges[i].id,
           source: dbEdges[i].source,
           target: dbEdges[i].target,
+          deletable: false,
         });
       }
       return res;
