@@ -171,4 +171,5 @@ export type TFDataStoreType = {
   history: TFHistoryStoreType[];
   isRunHistoryEnable: boolean;
   isTestFlowRunning: boolean;
+  isTestFlowSaveInProgress: boolean;
 };

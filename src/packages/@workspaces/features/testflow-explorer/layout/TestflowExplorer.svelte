@@ -459,7 +459,10 @@
         {/if}
       </div>
       <div>
+        <!-- INSERT SAVE COMPONENT HERE -->
         <button
+          disabled={testflowStore?.isTestFlowSaveInProgress ||
+            !isTestflowEditable}
           on:click={() => {
             onSaveTestflow();
           }}>SAVE</button
