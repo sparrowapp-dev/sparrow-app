@@ -15,6 +15,8 @@
   import { tickIcon } from "@library/forms/select/svgs";
   import { Loader } from "@library/ui";
   import { Debounce } from "@common/utils";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
   /**
    * @description - Callback for inputting feedback.
@@ -71,14 +73,10 @@
    */
   export let postId: string;
 
-    /**
+  /**
    * @description - Function to get Color based on tag status or cateogry status.
    */
-  export let getColor
-
-
-
-
+  export let getColor;
 
   let feedbackType = "";
 
@@ -123,14 +121,12 @@
     isLoading = false;
   };
 
-
   /**
    * @description - Handles upvoting action by refreshing the posts with the current sorting, search term, and status.
    */
   const handleUpvote = () => {
     getPosts(currentSort, searchTerm, status);
   };
-
 
   /**
    * @description - Handles the change of input in the search bar and fetches posts that match the search query.
@@ -141,7 +137,6 @@
     searchTerm = searchQuery;
     await getPosts(currentSort, searchQuery, status); // Fetch posts with search term
   };
-
 
   /**
    * @description - Handles changes in the status filter and fetches posts that match the selected status.
@@ -158,7 +153,6 @@
     }
     await getPosts(currentSort, searchTerm, status);
   };
-
 
   /**
    * @description - Handles the change of category and fetches posts that match the selected category.
@@ -184,8 +178,6 @@
     }
   };
 
-  
-
   /**
    * @description - Debounced function for handling input changes to avoid frequent API calls.
    * Calls `handleInputChange` with a delay of 1000ms.
@@ -205,7 +197,7 @@
   });
 </script>
 
-<div style="margin: 8px 46px 0 34px;">
+<div style="padding:20px;">
   <FeedbackDefault {onAddFeedback} {userInfo} {onInputFeedback} />
   {#if !isPostopen}
     <div
@@ -213,7 +205,12 @@
       style=" margin-top:38px; justify-content: space-between;"
     >
       <div>
-        <div class={`d-flex search-input-container rounded py-1 px-2 mb-2`}>
+        <div
+          class={`d-flex search-input-container rounded py-1 px-2 mb-2`}
+          on:click={() => {
+            MixpanelEvent(Events.Feedback_Search);
+          }}
+        >
           <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
           <input
             type="text"
@@ -252,6 +249,7 @@
             onclick={(id = "") => {
               feedbackType = id;
               handleCategoryChange(id);
+              MixpanelEvent(Events.Feedback_Categories_Filter);
             }}
             titleId={feedbackType}
             zIndex={499}
@@ -304,6 +302,7 @@
             ]}
             onclick={(id = "") => {
               handleStatusChange(id);
+              MixpanelEvent(Events.Feedback_Status_Filter);
             }}
             titleId={feedbackStatusType}
             placeholderText={"Status"}
@@ -336,7 +335,10 @@
       <div style="width:187px; margin-right:28px; ">
         <div>
           <SortIcon width={"12px"} height={"8px"} />
-          <span style="padding-left: 8px; padding-top:4px ; font-size:500;">
+          <span
+            class="text-fs-13"
+            style="padding-left: 8px; padding-top:4px ; font-weight:500;"
+          >
             Sort By</span
           >
         </div>
@@ -345,29 +347,38 @@
           style="align-items: baseline; gap:10px; margin-top:13px; "
         >
           <button
-            on:click={() => getPosts("trending", searchTerm, status)}
+            on:click={() => {
+              getPosts("trending", searchTerm, status);
+              MixpanelEvent(Events.Feedback_SortBy_Filter);
+            }}
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "trending"}
           >
-            <span>Trending</span>
+            <span class="text-fs-13">Trending</span>
             <img src={tickIcon} alt="" class="pt-1 tick-icon" />
           </button>
 
           <button
-            on:click={() => getPosts("newest", searchTerm, status)}
+            on:click={() => {
+              getPosts("newest", searchTerm, status);
+              MixpanelEvent(Events.Feedback_SortBy_Filter);
+            }}
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "newest"}
           >
-            <span>Now</span>
+            <span class="text-fs-13">Now</span>
             <img src={tickIcon} alt="" class="pt-1 tick-icon" />
           </button>
 
           <button
-            on:click={() => getPosts("score", searchTerm, status)}
+            on:click={() => {
+              getPosts("score", searchTerm, status);
+              MixpanelEvent(Events.Feedback_SortBy_Filter);
+            }}
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "score"}
           >
-            <span>Top</span>
+            <span class="text-fs-13">Top</span>
             <img src={tickIcon} alt="" class="pt-1 tick-icon" />
           </button>
         </div>
@@ -384,7 +395,7 @@
         >
           {#each posts as post}
             <div
-              style="display: flex; flex-direction: column; background-color: #151515; padding: 10px; min-height: 195px; border-radius:2px;"
+              style="display: flex; flex-direction: column; background-color: #151515; padding: 20px;border-radius:2px;"
             >
               <div
                 style="display: flex; justify-content: space-between; align-items: flex-start;"
@@ -395,6 +406,7 @@
                     on:click={async () => {
                       postId = post?.id;
                       isPostopen = true;
+                      MixpanelEvent(Events.Feedback_Post);
                     }}
                   >
                     {post?.title}
@@ -403,10 +415,10 @@
                     style="height: 16px; display: flex; align-items: center;"
                   >
                     <span
-                      class="category"
-                      style="color:{getColor(
-                        post.status
-                      ).fontColor}; border:0.2px solid {getColor(post.status).fontColor}; "
+                      class="category mt-2 text-fs-10"
+                      style="color:{getColor(post.status)
+                        .fontColor}; border:0.2px solid {getColor(post.status)
+                        .fontColor}; "
                     >
                       {post?.status
                         ? post.status.charAt(0).toUpperCase() +
@@ -415,10 +427,14 @@
                     </span>
                   </div>
                 </div>
-                <div style="cursor:pointer">
+                <div
+                  style="cursor:pointer"
+                  on:click={() => {
+                    MixpanelEvent(Events.Upvote_Post);
+                  }}
+                >
                   <UpvoteIcon
                     isPostLiked={post.isPostLiked}
-                    backgroundColor={"transparent"}
                     {handleUpvote}
                     postID={post.id}
                     likePost={createVote}
@@ -430,6 +446,7 @@
 
               <div style="margin-top: 10px; flex: 1;">
                 <p
+                  class="text-fs-14"
                   style="color: var(--text-secondary-1000); margin: 0; padding-top:10px;"
                 >
                   {post?.details}
@@ -505,8 +522,9 @@
   }
   .title {
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 500;
     margin-bottom: 5px;
+    color: var(--text-secondary-100);
   }
   .title:hover {
     text-decoration: underline;

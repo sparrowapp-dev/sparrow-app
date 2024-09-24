@@ -4,7 +4,7 @@
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/variables-dark";
 
-$sparrow-blue: #007bff;
+$sparrow-blue: #3670f7;
 $sparrow-yellow: #f9b001;
 $sparrow-black: #000000;
 $sparrow-success: #8dc599;
@@ -140,6 +140,7 @@ $theme-blue-2B5ED4: #2b5ed4;
 $theme-blue-DF77F9: #df77f9;
 $theme-blue-303F4F: #303f4f;
 $theme-blue-1D3650: #1d3650;
+$theme-blue-1E263B: #1e263b;
 $theme-blue-74AEF6: #74aef6;
 $theme-blue-11253a: #11253a;
 $theme-blue-1E2A47: #1e2a47;
@@ -156,6 +157,7 @@ $theme-violet-323548: #323548;
 $theme-violet-262834: #262834;
 $theme-violet-1c1d27: #1c1d27;
 $theme-violet-1C1D2B: #1c1d2b;
+$theme-violet-363849: #363849;
 
 
 
@@ -337,6 +339,7 @@ $theme-green-00A86B: #00a86b;
   --bg-primary-400: #{$theme-blue-0B5ED7};
   --bg-primary-500: #{$theme-blue-2B5ED4};
   --bg-primary-600: #{$theme-blue-1D3650};
+  --bg-primary-650: #{$theme-blue-1E263B};
   --bg-primary-700: #{$theme-blue-11253a};
   --bg-primary-800: #{$theme-blue-1E2A47};
 
@@ -360,6 +363,7 @@ $theme-green-00A86B: #00a86b;
   --bg-secondary-750: #{$theme-grey-4D4D4D};
   --bg-secondary-800: #{$theme-grey-151515};
   --bg-secondary-850: #{$theme-grey-121212};
+  --bg-secondary-870: #{$theme-grey-1D1D20};
   --bg-secondary-900: #{$theme-grey-000000};
   --bg-secondary-950: #{$theme-grey-808080};
   --bg-secondary-970: #{$theme-grey-1E1E1E};
@@ -377,6 +381,7 @@ $theme-green-00A86B: #00a86b;
   --bg-tertiary-670: #{$theme-violet-262834};
   --bg-tertiary-700: #{$theme-violet-1c1d27};
   --bg-tertiary-750: #{$theme-violet-1C1D2B};
+  --bg-tertiary-800: #{$theme-violet-363849};
 
   --bg-danger-100: #{$theme-red-e5acb2};
   --bg-danger-200: #{$theme-red-fe8c98};
@@ -408,7 +413,9 @@ $theme-green-00A86B: #00a86b;
   --border-secondary-150: #{$theme-grey-e5e5e5};
   --border-secondary-200: #{$theme-grey-8A9299};
   --border-secondary-290: #{$theme-grey-484848};
-  --border-secondary-300: #{$theme-grey-45494D};
+  --border-secondary-295: #{$theme-grey-4e4e4e};
+  --border-secondary-300: #{$theme-grey-636566};
+  --border-secondary-310: #{$theme-grey-636566};
   --border-secondary-320: #{$theme-grey-353646};
   --border-secondary-400: #{$theme-grey-313233};
   --border-secondary-450: #{$theme-grey-191919};
@@ -506,7 +513,7 @@ $theme-green-00A86B: #00a86b;
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
 
 $theme-colors: map-merge($theme-colors,
-    ("primaryColor": $sparrow-blue,
+    ("primaryColor": $theme-blue-3670F7,
       "recentApiText": $sparrow-recentApiText,
 
       "secondaryColor": $sparrow-yellow,

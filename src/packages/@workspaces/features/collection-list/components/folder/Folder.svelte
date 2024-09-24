@@ -307,7 +307,7 @@
               folder: explorer,
             });
           },
-          displayText: "Add New Web Socket",
+          displayText: "Add New WebSocket",
           disabled: false,
           hidden:
             !collection.activeSync ||

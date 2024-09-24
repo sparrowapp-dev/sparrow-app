@@ -6,8 +6,8 @@
   import HelpInfoCard from "@support/common/components/HelpInfo-Card/HelpInfoCard.svelte";
   import { FeedbackType } from "@support/common/types";
   import { onMount } from "svelte";
-
-  
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
   /** @type {Function} Function to fetch posts. */
   export let fetchPosts;
@@ -17,7 +17,6 @@
 
   /** @type {Function} Returns color based on status. @param {string} status - Status to determine color. @returns {{ fontColor: string, backgroundColor: string }} */
   export let getColor;
-
 
   let isLoading = false;
 
@@ -98,7 +97,7 @@
   <div class="container-data" style="padding: 20px;">
     <div class="headerq">
       <p style="font-size: 20px; font-weight:700;">Roadmap</p>
-      <p style="color: var(--text-secondary-50); font-size;14px;">
+      <p class="text-fs-14" style="color: var(--text-secondary-50);">
         Stay updated with all feedback, from planning to progress, on a single
         roadmap.
       </p>
@@ -108,6 +107,9 @@
       <div
         style="margin-bottom: 37px;"
         class={`d-flex search-input-container rounded py-1 px-2 `}
+        on:click={()=>{
+           MixpanelEvent(Events.Roadmap_Search);
+        }}
       >
         <SearchIcon
           width={14}
@@ -152,6 +154,7 @@
           ]}
           onclick={(id = "") => {
             type = id;
+            MixpanelEvent(Events.Roadmap_Categories_Filter);
           }}
           titleId={type}
           minHeaderWidth={"185px"}
@@ -186,17 +189,17 @@
         {#each filteredFeedbackStatus as { status, products, filteredFeedbacks }}
           <div
             class="rounded-2"
-            style="width:100%; background-color: var(--bg-secondary-800); overflow: hidden;"
+            style="width:100%; background-color: var(--bg-secondary-800); overflow: hidden; border:0.6px solid var(--border-secondary-300)"
           >
             <div
               style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-secondary-870); height:32px;  color:{getColor(
                 status,
-              ).fontColor}; border-bottom:1px solid {getColor(status)
+              ).fontColor}; border-bottom:0.5px solid {getColor(status)
                 .fontColor};"
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
             </div>
-            <div class="p-2">
+            <div class="" style="background-color: var(--bg-secondary-800); padding:12px;">
               {#if (filteredFeedbacks?.length == 0 && searchTerm.length > 0) || filteredFeedbacks?.length == 0}
                 <p
                   class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"

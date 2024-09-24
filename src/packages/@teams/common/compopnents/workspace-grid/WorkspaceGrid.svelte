@@ -22,9 +22,7 @@
    */
   export let onDeleteWorkspace;
 
-
   export let onAddMember;
-
 
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
@@ -195,9 +193,17 @@
     visibility: visible;
   }
 
+  .threedot-icon-container:hover {
+    background-color: var(--bg-tertiary-500) !important;
+  }
+
+  .threedot-icon-container:active {
+    background-color: var(--bg-tertiary-800) !important;
+  }
+
   .threedot-active {
     visibility: visible;
-    background-color: var(--workspace-hover-color);
+    background-color: var(--bg-tertiary-800) !important;
   }
   .workspace-delete-confirmation {
     .btn-close1 {

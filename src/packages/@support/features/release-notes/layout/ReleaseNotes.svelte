@@ -17,6 +17,8 @@
   import { notifications } from "@library/ui/toast/Toast";
   import { open } from "@tauri-apps/plugin-shell";
   import { UpdatesTagType } from "@support/common/types/feedback";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   export let listChangeLog;
 
   /**
@@ -162,6 +164,8 @@
         event.types.includes(selectedTag),
       );
     }
+    MixpanelEvent(Events.Updates_Filter);
+
   };
 
   onMount(async () => {
@@ -177,7 +181,7 @@
   <div class="container-data" style="padding: 20px;">
     <div class="headerq">
       <p style="font-size: 20px; font-weight:700;">Updates</p>
-      <p style="color: var(--text-secondary-50); font-size;14px;">
+      <p style="color: var(--text-secondary-50); font-size:14px;">
         Check out our latest releases designed to boost your productivity and
         efficiency.
       </p>
@@ -274,15 +278,20 @@
                     <div class="d-flex gap-2">
                       <h3
                         class="text-fs-18"
-                        on:click={() => handleSeeMore(event)}
+                        on:click={() => {
+                          handleSeeMore(event);
+                          MixpanelEvent(Events.Version_Updates);
+                        }}
                       >
                         {event.title}
                       </h3>
                       <div
+                        class="link-div"
                         style="height: 24px; width:24px; cursor:pointer"
                         on:click={async () => {
                           await copyToClipBoard(event.url);
                           notifications.success("Link copied to clipboard!");
+                          MixpanelEvent(Events.Copy_Link);
                         }}
                       >
                         <Tooltip
@@ -316,7 +325,10 @@
                         <span
                           style="text-decoration: underline; color:#3670F7; border:none; background-color:transparent; cursor:pointer "
                           class="ms-0"
-                          on:click={() => handleSeeMore(event)}>see more</span
+                          on:click={() => {
+                            handleSeeMore(event);
+                            MixpanelEvent(Events.See_More_Updates);
+                          }}>see more</span
                         >
                       </p>
                     {:else}
@@ -335,6 +347,7 @@
                         class="mb-0"
                         on:click={async () => {
                           await open(externalSparrowGithub);
+                          MixpanelEvent(Events.Github_Updates);
                         }}
                       >
                         Github
@@ -346,10 +359,11 @@
                       {event.reactions?.like || ""}
                     </div> -->
                         <div
-                          style="cursor:pointer; border-left:1px solid grey;"
+                          style="cursor:pointer; solid grey;"
                           class="ps-2"
                           on:click={async () => {
                             await open(externalSparrowLinkedin);
+                            MixpanelEvent(Events.LinkedIn_Updates_Icon);
                           }}
                         >
                           <LinkedinIcon height={"18px"} width={"18px"} />
@@ -385,7 +399,7 @@
               </div>
               <div
                 class="ms-2 text-fs-14"
-                style="margin-top:1.5px; color:var(--text-secondary-100); font-weight:700;"
+                style="margin-top:1.5px; color:var(--text-secondary-100); font-weight:500;"
               >
                 {formatDate(selectedEvent.publishedAt)}
               </div>
@@ -401,12 +415,13 @@
                   on:click={async () => {
                     await copyToClipBoard(selectedEvent.url);
                     notifications.success("Link copied to clipboard!");
+                    MixpanelEvent(Events.Copy_Link);
                   }}
                 >
                   <Tooltip
                     title={"Link"}
                     placement={"right"}
-                    distance={13}
+                    distance={20}
                     show={true}
                     zIndex={701}
                   >
@@ -438,6 +453,7 @@
                   class="mb-0"
                   on:click={async () => {
                     await open(externalSparrowGithub);
+                    MixpanelEvent(Events.Github_Updates);
                   }}
                 >
                   Github
@@ -448,10 +464,11 @@
                 {selectedEvent.reactions?.like || ""}
               </div> -->
                   <div
-                    style="border-left:1px solid grey;"
+                    style=" solid grey;"
                     class="ps-2"
                     on:click={async () => {
                       await open(externalSparrowLinkedin);
+                      MixpanelEvent(Events.LinkedIn_Updates_Icon);
                     }}
                   >
                     <LinkedinIcon height={"18px"} width={"18px"} />
@@ -469,6 +486,15 @@
 <style>
   :global(h1) {
     font-size: 24px;
+  }
+  .link-div {
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    border-radius: 2px;
+  }
+  .link-div:hover {
+    background-color: var(--dull-background-color);
   }
   .selected-event-detail {
     display: flex;
@@ -513,7 +539,7 @@
   .timeline::before {
     content: "";
     position: absolute;
-    width: 1px;
+    width: 0.6px;
     background-color: var(--bg-primary-300);
     top: 0;
     bottom: 0;
@@ -543,7 +569,7 @@
     color: var(--text-secondary-100);
     width: 120px;
     text-align: right;
-    font-weight: 700;
+    font-weight: 500;
     font-size: 14px;
   }
 

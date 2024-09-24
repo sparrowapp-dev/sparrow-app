@@ -292,7 +292,7 @@
           disabled={loggedUserRoleInWorkspace ===
             WorkspaceRole.WORKSPACE_VIEWER}
         >
-          <img src={threedotIcon} alt="threedotIcon" />
+          <img class="threedot-icon" src={threedotIcon} alt="threedotIcon" />
         </button>
       </Tooltip>
     {/if}
@@ -360,5 +360,9 @@
       width: calc(100% - 30px);
       text-align: left;
     }
+  }
+
+  .threedot-icon {
+    transform: rotate(90deg);
   }
 </style>
