@@ -8,6 +8,7 @@ import type { TFRxDocumentType } from "@app/models/testflow.model";
 import { TFDefaultEnum } from "@common/types/workspace/testflow";
 import { TestflowService } from "@app/services/testflow.service";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
+import type { Tab } from "@common/types/workspace";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -80,6 +81,8 @@ export class TestflowViewModel {
             collectionId: "",
             requestId: "",
             folderId: "",
+            method: "",
+            name: "",
           },
           position: { x: 100, y: 200 },
         },
@@ -207,14 +210,46 @@ export class TestflowViewModel {
     testflow: TFRxDocumentType,
     newTestflowName: string,
   ): Promise<void> => {
-    this.testflowRepository.updateTestflow(testflow._id, {
-      name: newTestflowName,
+    const currentWorkspace = await this.workspaceRepository.readWorkspace(
+      testflow.workspaceId,
+    );
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
     });
-    const currentTab = await this.tabRepository.getTabById(testflow._id);
-    if (currentTab) {
-      await this.tabRepository.updateTab(currentTab?.tabId as string, {
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      this.testflowRepository.updateTestflow(testflow._id, {
         name: newTestflowName,
       });
+      const currentTab = await this.tabRepository.getTabById(testflow._id);
+      if (currentTab) {
+        await this.tabRepository.updateTab(currentTab?.tabId as string, {
+          name: newTestflowName,
+        });
+      }
+      return;
+    }
+    const response = await this.testflowService.updateTestflow(
+      currentWorkspace._id,
+      testflow._id,
+      {
+        name: newTestflowName,
+      },
+    );
+    if (response.isSuccessful) {
+      this.testflowRepository.updateTestflow(testflow._id, {
+        name: newTestflowName,
+      });
+      const currentTab = await this.tabRepository.getTabById(testflow._id);
+      if (currentTab) {
+        await this.tabRepository.updateTab(currentTab.tabId as string, {
+          name: newTestflowName,
+        });
+      }
+    } else if (response.message === "Network Error") {
+      notifications.error(response.message);
+    } else {
+      notifications.error("Failed to rename testflow");
     }
   };
 
@@ -237,6 +272,8 @@ export class TestflowViewModel {
       currentWorkspace._id,
     );
     initTestflowTab.updateName(_testflow.name);
+    initTestflowTab.setNodes(_testflow.nodes);
+    initTestflowTab.setEdges(_testflow.edges);
     this.tabRepository.createTab(initTestflowTab.getValue());
   };
 
@@ -259,5 +296,64 @@ export class TestflowViewModel {
       this.testflowRepository.refreshTestflow(testflows, workspaceId);
     }
     return;
+  };
+
+  /**
+   * @description - saves testflow to the mongo server
+   */
+  public saveTestflow = async (_tab: Tab) => {
+    const currentTestflow = _tab;
+    const activeWorkspace = await this.workspaceRepository.readWorkspace(
+      currentTestflow?.path?.workspaceId as string,
+    );
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      await this.testflowRepository.updateTestflow(
+        currentTestflow?.id as string,
+        {
+          name: currentTestflow.name,
+          nodes: currentTestflow?.property?.testflow?.nodes,
+          edges: currentTestflow?.property?.testflow?.edges,
+        },
+      );
+      notifications.success(
+        `Changes saved for ${currentTestflow.name} testflow.`,
+      );
+
+      return true;
+    }
+
+    const response = await this.testflowService.updateTestflow(
+      activeWorkspace._id,
+      currentTestflow?.id as string,
+      {
+        name: currentTestflow.name,
+        nodes: currentTestflow?.property?.testflow?.nodes,
+        edges: currentTestflow?.property?.testflow?.edges,
+      },
+    );
+    if (response.isSuccessful) {
+      this.testflowRepository.updateTestflow(
+        response.data.data._id,
+        response.data.data,
+      );
+
+      notifications.success(
+        `Changes saved for ${currentTestflow.name} testflow.`,
+      );
+      return true;
+    } else {
+      if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error(
+          `Failed to save changes for ${currentTestflow.name} testflow.`,
+        );
+      }
+      return false;
+    }
   };
 }

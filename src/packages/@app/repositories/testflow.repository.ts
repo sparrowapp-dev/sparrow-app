@@ -49,6 +49,8 @@ export class TestflowRepository {
       .exec();
     testflow?.incrementalModify((value: TFRxDocumentType) => {
       if (data.name) value.name = data.name;
+      if (data?.nodes) value.nodes = data.nodes;
+      if (data?.edges) value.edges = data.edges;
       if (data.workspaceId) value.workspaceId = data.workspaceId;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;
@@ -93,12 +95,38 @@ export class TestflowRepository {
       .exec();
   };
 
-  public refreshTestflow = async (data, workspaceId): Promise<void> => {
+  /**
+   * Refreshes the testflows by adding the `workspaceId` to each testflow and bulk upserting them to the database.
+   *
+   * @param data - Array of testflow data.
+   * @param workspaceId - The ID of the workspace to be added to each testflow.
+   * @returns A promise that resolves once the testflows are upserted.
+   */
+  public refreshTestflow = async (
+    data: TFRxDocumentType[],
+    workspaceId: string,
+  ): Promise<void> => {
     const testflows = data.map((_testflow) => {
       _testflow["workspaceId"] = workspaceId;
       return _testflow;
     });
-    await RxDB.getInstance().rxdb.testflow.bulkUpsert(testflows);
+    await this.rxdb?.bulkUpsert(testflows);
     return;
+  };
+
+  /**
+   * Reads a testflow document by its UUID from the database.
+   *
+   * @param uuid - The unique ID of the testflow document.
+   * @returns A promise that resolves to the testflow document.
+   */
+  public readTestflow = async (uuid: string): Promise<any> => {
+    return await this.rxdb
+      ?.findOne({
+        selector: {
+          _id: uuid,
+        },
+      })
+      .exec();
   };
 }
