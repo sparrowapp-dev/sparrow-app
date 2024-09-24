@@ -585,6 +585,7 @@
             iconColor={"var(--icon-secondary-100)"}
             onClick={async () => {
               await onClickRun();
+              selectedNodeId = "2";
               MixpanelEvent(Events.Run_TestFlows);
             }}
           />
