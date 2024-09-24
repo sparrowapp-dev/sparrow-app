@@ -622,27 +622,24 @@ export class TestflowExplorerPageViewModel {
     moveNavigation("right");
   };
 
-
-
-    /**
+  /**
    * @description - updates testflow tab name
    * @param _name - new test flow name
    */
-    public updateName = async (_name: string, event = "") => {
-      const progressiveTab = createDeepCopy(this._tab.getValue());
-      if (event === "blur" && _name === "") {
-        const data = await this.testflowRepository.readTestflow(
-          progressiveTab.id,
-        );
-        progressiveTab.name = data.name;
-      } else if (event === "") {
-        progressiveTab.name = _name;
-      }
-      this.tab = progressiveTab;
-      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-      this.compareTestflowWithServer();
-    };
-
+  public updateName = async (_name: string, event = "") => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (event === "blur" && _name === "") {
+      const data = await this.testflowRepository.readTestflow(
+        progressiveTab.id,
+      );
+      progressiveTab.name = data.name;
+    } else if (event === "") {
+      progressiveTab.name = _name;
+    }
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareTestflowWithServer();
+  };
 
   /**
    * @description - saves testflow to the mongo server
@@ -767,19 +764,15 @@ export class TestflowExplorerPageViewModel {
     });
   };
 
-
-     /**
+  /**
    * @description - updates environment tab name
    * @param _name - new environment name
    */
-     public updateNameWithTestFlowList = async (_name: string) => {
-      const progressiveTab = createDeepCopy(this._tab.getValue());
-      if (progressiveTab?.name && _name !== progressiveTab.name) {
-        progressiveTab.name = _name;
-      }
-      this.tab = progressiveTab;
-    };
-
-  
-
+  public updateNameWithTestFlowList = async (_name: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (progressiveTab?.name && _name !== progressiveTab.name) {
+      progressiveTab.name = _name;
+    }
+    this.tab = progressiveTab;
+  };
 }
