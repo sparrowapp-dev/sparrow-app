@@ -21,6 +21,7 @@
     ResponseBodyNavigator,
     ResponseBody,
     ResponseHeaders,
+    TestFlowName,
   } from "../components";
   import {
     RequestSectionEnum,
@@ -431,7 +432,6 @@
   const handleTestFlowNameChange = (_name, event) => {
     onUpdateTestFlowName(_name, event);
   };
-
 </script>
 
 <div class="h-100 d-flex flex-column position-relative">
@@ -443,21 +443,7 @@
   >
     <div>
       <!-- INSERT NAME COMPONENT HERE -->
-      <div style="" class={`d-flex align-items-center justify-content-center text-fs-12 search-input-container  py-1 px-2 `}>
-        <input
-          type="text"
-          id="search-input"
-          class={`bg-transparent w-100 border-0 my-auto`}
-          on:input={(e) => {
-            testFlowName = e.target.value;
-            handleTestFlowNameChange(testFlowName, "");
-          }}
-          on:blur={(e) => {
-            handleTestFlowNameChange(testFlowName, "blur");
-          }}
-          value={testFlowName}
-        />
-      </div>
+      <TestFlowName {handleTestFlowNameChange} bind:testFlowName />
     </div>
     <div class="d-flex">
       <div style="margin-right: 5px;">
