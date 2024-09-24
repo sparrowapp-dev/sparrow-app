@@ -430,14 +430,6 @@
     nodesSubscriber();
     edgesSubscriber();
   });
-
-  let testFlowName = $tab?.name;
-
-  $: {
-    if (tab) {
-      testFlowName = $tab?.name;
-    }
-  }
 </script>
 
 <div class="h-100 d-flex flex-column position-relative">
@@ -449,7 +441,7 @@
   >
     <div>
       <!-- INSERT NAME COMPONENT HERE -->
-      <TestFlowName {onUpdateTestFlowName} {testFlowName} />
+      <TestFlowName {onUpdateTestFlowName} testFlowName={$tab?.name} />
     </div>
     <div class="d-flex">
       <div style="margin-right: 5px;">

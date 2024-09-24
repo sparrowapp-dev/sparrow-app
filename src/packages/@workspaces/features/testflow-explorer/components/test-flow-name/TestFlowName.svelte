@@ -9,7 +9,6 @@
 >
   <input
     type="text"
-    id="search-input"
     bind:value={testFlowName}
     class={`bg-transparent w-100 border-0 my-auto`}
     on:input={async (e) => {

@@ -69,7 +69,6 @@
   $: {
     if (tab) {
       if (tab?.name && prevTabName !== tab?.name) {
-        // _viewModel.updateNameWithTestFlowList(tab.name);
         renameWithTestFlowList(tab.name);
       }
       prevTabName = tab.name;
