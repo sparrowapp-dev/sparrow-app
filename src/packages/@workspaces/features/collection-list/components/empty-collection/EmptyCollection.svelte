@@ -63,9 +63,8 @@
             width={"22px"}
             color={"var(--text-secondary-200)"}
           />
-          <span
-            style="color: var(--text-secondary-200)"
-            class="ps-2 fw-bold text-fs-12">Add Collection</span
+          <span style="color: var(--text-secondary-200)" class="ps-2 text-fs-12"
+            >Add Collection</span
           >
         </button>
       {/if}

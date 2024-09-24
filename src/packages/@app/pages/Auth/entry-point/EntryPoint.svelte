@@ -5,6 +5,8 @@
   import constants from "$lib/utils/constants";
   import StarIcon from "../../../../@library/icons/Star.svelte";
   import StarFilled from "@library/icons/StarFilled.svelte";
+  import CopyIcon from "@library/icons/Copy.svelte";
+  import ExternalLinkIcon from "@library/icons/ExternalLink.svelte";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
   import { open } from "@tauri-apps/plugin-shell";
   import { version } from "../../../../../../src-tauri/tauri.conf.json";
@@ -84,17 +86,33 @@
       If your browser doesn’t open automatically, please visit
       <span
         on:click={openDefaultBrowser}
-        class="text-primary-150 cursor-pointer text-decoration-underline"
-        >Sparrow website <img class="mx-2" src={externalLink} alt="" /></span
-      >
+        class="text-primary-300 cursor-pointer text-decoration-underline"
+        >Sparrow website
+        <span class="mx-2">
+          <ExternalLinkIcon
+            width="16px"
+            height="16px"
+            color="var(--icon-primary-300)"
+          />
+        </span>
+      </span>
       to sign In or copy URL
       <span
-        class="text-labelColor cursor-pointer text-decoration-underline bg-secondary-550"
+        class="text-primary-300 cursor-pointer text-decoration-underline"
         style="border-radius: 2px;"
         on:click={async () => {
           await copyToClipBoard(externalSparrowLink);
           notifications.success("Link copied to clipboard!");
-        }}><img src={copyIcon} class="px-2" />Copy</span
+        }}
+      >
+        <span class="mx-2">
+          <CopyIcon
+            width="18px"
+            height="18px"
+            color="var(--icon-primary-300)"
+          />
+        </span>
+        Copy</span
       >
     </p></Redirect
   >

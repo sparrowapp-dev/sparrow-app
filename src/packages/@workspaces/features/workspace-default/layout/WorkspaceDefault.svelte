@@ -14,6 +14,7 @@
   import type { Observable } from "rxjs";
   import { Card } from "../components";
   import { TFDefaultEnum } from "@common/types/workspace/testflow";
+  import { WorkspaceRole } from "$lib/utils/enums";
 
   export let showImportCollectionPopup;
   export let onItemCreated;
@@ -21,6 +22,7 @@
   export let currentWorkspace: Observable<WorkspaceDocument>;
   export let handleCreateEnvironment;
   export let onCreateTestflow;
+  export let userRole;
 
   let currentWorkspaceId: string;
 
@@ -34,21 +36,23 @@
     <SparrowLogo />
   </div>
   <div class="cards">
-    <Card
-      icon={CollectionIcon}
-      label="Collection"
-      iconColor="var(--text-primary-300)"
-      iconSize={"18px"}
-      onClick={() => {
-        if (isGuestUser) {
-          onItemCreated("collection", {
-            workspaceId: currentWorkspaceId,
-          });
-        } else {
-          showImportCollectionPopup();
-        }
-      }}
-    />
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+      <Card
+        icon={CollectionIcon}
+        label="Collection"
+        iconColor="var(--text-primary-300)"
+        iconSize={"18px"}
+        onClick={() => {
+          if (isGuestUser) {
+            onItemCreated("collection", {
+              workspaceId: currentWorkspaceId,
+            });
+          } else {
+            showImportCollectionPopup();
+          }
+        }}
+      />
+    {/if}
     <Card
       icon={VectorIcon}
       label="Request"
@@ -68,23 +72,27 @@
         MixpanelEvent(Events.WebSocket_Button);
       }}
     />
-    <Card
-      icon={TreeIcon}
-      label={`${TFDefaultEnum.FULL_NAME}`}
-      iconColor="var(--text-primary-300)"
-      iconSize={"18px"}
-      onClick={() => {
-        onCreateTestflow();
-        MixpanelEvent(Events.Default_Screen_TestFlows);
-      }}
-    />
-    <Card
-      icon={StackIcon}
-      label="Environment"
-      iconColor="var(--text-primary-300)"
-      iconSize={"18px"}
-      onClick={handleCreateEnvironment}
-    />
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+      <Card
+        icon={TreeIcon}
+        label={`${TFDefaultEnum.FULL_NAME}`}
+        iconColor="var(--text-primary-300)"
+        iconSize={"18px"}
+        onClick={() => {
+          onCreateTestflow();
+          MixpanelEvent(Events.Default_Screen_TestFlows);
+        }}
+      />
+    {/if}
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+      <Card
+        icon={StackIcon}
+        label="Environment"
+        iconColor="var(--text-primary-300)"
+        iconSize={"18px"}
+        onClick={handleCreateEnvironment}
+      />
+    {/if}
   </div>
 </div>
 
