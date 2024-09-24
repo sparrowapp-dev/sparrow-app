@@ -4,6 +4,8 @@
   import { ArrowIcon } from "../../icons";
   import { PlayArrow } from "@library/icons";
   import { onDestroy, onMount } from "svelte";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
   /**
    * The data object containing various handlers and data stores.
@@ -53,7 +55,12 @@
   });
 </script>
 
-<div class="start-block position-relative">
+<div
+  class="start-block position-relative"
+  on:click={() => {
+    MixpanelEvent(Events.Start_TestFlows);
+  }}
+>
   <span
     ><PlayArrow
       height={"14px"}
