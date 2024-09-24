@@ -21,6 +21,7 @@
     ResponseBodyNavigator,
     ResponseBody,
     ResponseHeaders,
+    TestFlowName,
     SaveTestflow,
   } from "../components";
   import {
@@ -63,6 +64,7 @@
   export let environmentVariables;
   export let isTestflowEditable;
   export let onRedrectRequest;
+  export let onUpdateTestFlowName;
   export let onSaveTestflow;
 
   // Writable stores for nodes and edges
@@ -433,12 +435,13 @@
 <div class="h-100 d-flex flex-column position-relative">
   <div
     class="d-flex justify-content-between position-absolute p-3"
-    style="top:0;
+    style="top:0; width: 100%;
   right:0;
   z-index:100;"
   >
     <div>
       <!-- INSERT NAME COMPONENT HERE -->
+      <TestFlowName {onUpdateTestFlowName} testFlowName={$tab?.name} />
     </div>
     <div class="d-flex">
       <div style="margin-right: 5px;">

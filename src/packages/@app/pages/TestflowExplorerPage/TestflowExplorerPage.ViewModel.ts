@@ -36,8 +36,9 @@ export class TestflowExplorerPageViewModel {
   private collectionRepository = new CollectionRepository();
   private environmentRepository = new EnvironmentRepository();
   private workspaceRepository = new WorkspaceRepository();
-  private guestUserRepository = new GuestUserRepository();
   private testflowRepository = new TestflowRepository();
+
+  private guestUserRepository = new GuestUserRepository();
   private testflowService = new TestflowService();
   private compareArray = new CompareArray();
   /**
@@ -622,6 +623,25 @@ export class TestflowExplorerPageViewModel {
   };
 
   /**
+   * @description - updates testflow tab name
+   * @param _name - new test flow name
+   */
+  public updateName = async (_name: string, event = "") => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (event === "blur" && _name === "") {
+      const data = await this.testflowRepository.readTestflow(
+        progressiveTab.id,
+      );
+      progressiveTab.name = data.name;
+    } else if (event === "") {
+      progressiveTab.name = _name;
+    }
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareTestflowWithServer();
+  };
+
+  /**
    * @description - saves testflow to the mongo server
    */
   public saveTestflow = async () => {
@@ -742,5 +762,17 @@ export class TestflowExplorerPageViewModel {
       ); // Save the updated tab data
       return testFlowDataMap;
     });
+  };
+
+  /**
+   * @description - updates environment tab name
+   * @param _name - new environment name
+   */
+  public updateNameWithTestFlowList = async (_name: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (progressiveTab?.name && _name !== progressiveTab.name) {
+      progressiveTab.name = _name;
+    }
+    this.tab = progressiveTab;
   };
 }
