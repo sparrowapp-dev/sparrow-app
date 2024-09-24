@@ -73,6 +73,9 @@ class InitTestflowTab {
   public updateIsSave(_isSave: boolean) {
     this._tab.isSaved = _isSave;
   }
+  public setName(_name: string) {
+    this._tab.name = _name;
+  }
 }
 
 export { InitTestflowTab };

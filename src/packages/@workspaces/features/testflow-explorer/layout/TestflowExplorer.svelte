@@ -64,6 +64,7 @@
   export let toggleHistoryContainer;
   export let environmentVariables;
   export let isTestflowEditable;
+  export let onRedrectRequest;
 
   export let deleteNodeResponse;
 
@@ -545,6 +546,15 @@
           bind:selectedNode
           onClose={() => {
             unselectNodes();
+          }}
+          onRedirect={() => {
+            const path = selectedNode?.request?.path;
+            onRedrectRequest(
+              path?.workspaceId,
+              path?.collectionId,
+              path?.folderId,
+              selectedNode?.request?.id,
+            );
           }}
         />
 

@@ -75,5 +75,6 @@
     toggleHistoryDetails={_viewModel.toggleHistoryDetails}
     toggleHistoryContainer={_viewModel.toggleHistoryContainer}
     deleteNodeResponse={_viewModel.deleteNodeResponse}
+    onRedrectRequest={_viewModel.redirectRequest}
   />
 {/if}
