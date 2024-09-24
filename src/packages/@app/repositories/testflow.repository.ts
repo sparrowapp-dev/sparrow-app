@@ -96,7 +96,7 @@ export class TestflowRepository {
 
   public readTestFlow = async (uuid: string): Promise<any> => {
     return await RxDB.getInstance()
-      .rxdb.environment.findOne({
+      .rxdb?.testflow.findOne({
         selector: {
           id: uuid,
         },

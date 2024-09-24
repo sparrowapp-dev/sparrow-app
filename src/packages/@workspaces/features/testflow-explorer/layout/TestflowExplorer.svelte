@@ -443,7 +443,7 @@
   >
     <div>
       <!-- INSERT NAME COMPONENT HERE -->
-      <div style="" class={`d-flex search-input-container  py-1 px-2 `}>
+      <div style="" class={`d-flex align-items-center justify-content-center text-fs-12 search-input-container  py-1 px-2 `}>
         <input
           type="text"
           id="search-input"
@@ -663,12 +663,8 @@
     border: 1px solid var(--border-color);
     background: var(--bg-tertiary-400);
     max-width: 20vw;
-    font-size: 12px;
     position: relative;
     border: 1px solid transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     gap: 2px;
     height: 36px;
   }

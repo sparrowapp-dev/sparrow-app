@@ -549,8 +549,8 @@ export class TestflowExplorerPageViewModel {
 
 
     /**
-   * @description - updates environment tab name
-   * @param _name - new environment name
+   * @description - updates testflow tab name
+   * @param _name - new test flow name
    */
     public updateName = async (_name: any, event = "") => {
       const progressiveTab = createDeepCopy(this._tab.getValue());
