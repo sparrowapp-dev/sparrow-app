@@ -146,7 +146,7 @@
   };
 
   // List to store collection documents and filtered collections
-  let collectionListDocument;
+  let collectionListDocument: CollectionDocument[];
   let filteredCollections = writable<CollectionDto[]>([]);
 
   // Sync the nodes with collection data
@@ -178,6 +178,7 @@
               );
             }
             dbNodes[index].data.name = request?.name || "";
+            dbNodes[index].data.method = request?.request?.name || "";
           }
         }
       }
@@ -293,7 +294,7 @@
               dbNodes[i].data.folderId &&
               dbNodes[i].data.folderId?.length > 0
             ) {
-              const folder = collection.items.find(
+              const folder = collection?.items?.find(
                 (fol) => fol.id === dbNodes[i].data.folderId,
               );
               if (folder) {
@@ -302,7 +303,7 @@
                 );
               }
             } else {
-              request = collection.items.find(
+              request = collection?.items?.find(
                 (req) => req.id === dbNodes[i].data.requestId,
               );
             }
