@@ -640,7 +640,7 @@ export class TestflowExplorerPageViewModel {
       }
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-      this.compareRequestWithServer();
+      this.compareTestflowWithServer();
     };
 
 
@@ -766,54 +766,6 @@ export class TestflowExplorerPageViewModel {
       return testFlowDataMap;
     });
   };
-
-
- 
-    /**
-   * Compares the current environment tab with the server version and updates the saved status accordingly.
-   * This method is debounced to reduce the number of server requests.
-   * @return A promise that resolves when the comparison is complete.
-   */
-    private compareTestFlowWithServerDebounced = async () => {
-      let result = true;
-      const progressiveTab = createDeepCopy(this._tab.getValue());
-  
-      let testFlowServer = await this.testflowRepository.readTestflow(
-        progressiveTab.id,
-      );
-  
-      if (!testFlowServer) {
-        result = false;
-      }
-   
-      // name
-      else if (testFlowServer.name !== progressiveTab.name) {
-        result = false;
-      }
-
-      // result
-      if (result) {
-        this.tabRepository.updateTab(progressiveTab.tabId, {
-          isSaved: true,
-        });
-        progressiveTab.isSaved = true;
-        this.tab = progressiveTab;
-      } else {
-        this.tabRepository.updateTab(progressiveTab.tabId, {
-          isSaved: false,
-        });
-        progressiveTab.isSaved = false;
-        this.tab = progressiveTab;
-      }
-    };
-  
-    /**
-     * Debounced method to compare the current request tab with the server version.
-     */
-    private compareRequestWithServer = new Debounce().debounce(
-      this.compareTestFlowWithServerDebounced,
-      1000,
-    );
 
 
      /**
