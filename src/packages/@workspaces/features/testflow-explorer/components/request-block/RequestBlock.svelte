@@ -131,8 +131,6 @@
 
   let moreOptionsMenu: boolean = false;
 
-  export let isDeleteNodeModalOpen = false;
-
   const handleOpenModal = () => {
     moreOptionsMenu = !moreOptionsMenu;
     data.onOpenDeleteModal(id);
