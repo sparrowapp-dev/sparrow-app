@@ -144,9 +144,46 @@
     }
     return "";
   };
+
   // List to store collection documents and filtered collections
   let collectionListDocument;
   let filteredCollections = writable<CollectionDto[]>([]);
+
+  // Sync the nodes with collection data
+  const syncNodesWithCollectionList = () => {
+    nodes.update((_nodes) => {
+      const dbNodes = _nodes;
+      for (let index = 0; index < dbNodes.length; index++) {
+        if (collectionListDocument) {
+          const collection = collectionListDocument.find(
+            (col) => col.id === dbNodes[index].data.collectionId,
+          );
+          if (collection) {
+            let request;
+            if (
+              dbNodes[index].data.folderId &&
+              dbNodes[index].data.folderId?.length > 0
+            ) {
+              const folder = collection.items.find(
+                (fol) => fol.id === dbNodes[index].data.folderId,
+              );
+              if (folder) {
+                request = folder.items.find(
+                  (req) => req.id === dbNodes[index].data.requestId,
+                );
+              }
+            } else {
+              request = collection.items.find(
+                (req) => req.id === dbNodes[index].data.requestId,
+              );
+            }
+            dbNodes[index].data.name = request?.name || "";
+          }
+        }
+      }
+      return dbNodes;
+    });
+  };
 
   // Filter collections based on the current tab's workspace ID
   const collectionsSubscriber = collectionList.subscribe((value) => {
@@ -158,6 +195,7 @@
       filteredCollections.set(
         collectionListDocument as unknown as CollectionDto[],
       );
+      syncNodesWithCollectionList();
     }
   });
 
@@ -245,6 +283,31 @@
       const dbNodes = $tab?.property?.testflow?.nodes as TFNodeType[];
       let res = [];
       for (let i = 0; i < dbNodes.length; i++) {
+        let request;
+        if (collectionListDocument) {
+          const collection = collectionListDocument.find(
+            (col) => col.id === dbNodes[i].data.collectionId,
+          );
+          if (collection) {
+            if (
+              dbNodes[i].data.folderId &&
+              dbNodes[i].data.folderId?.length > 0
+            ) {
+              const folder = collection.items.find(
+                (fol) => fol.id === dbNodes[i].data.folderId,
+              );
+              if (folder) {
+                request = folder.items.find(
+                  (req) => req.id === dbNodes[i].data.requestId,
+                );
+              }
+            } else {
+              request = collection.items.find(
+                (req) => req.id === dbNodes[i].data.requestId,
+              );
+            }
+          }
+        }
         res.push({
           id: dbNodes[i].id,
           type: dbNodes[i].type,
@@ -274,8 +337,8 @@
                 folderId,
               );
             },
-            name: dbNodes[i].data?.name,
-            method: dbNodes[i].data?.method,
+            name: request?.name ?? dbNodes[i].data?.name,
+            method: request?.request?.method ?? dbNodes[i].data?.method,
             collectionId: dbNodes[i].data?.collectionId,
             requestId: dbNodes[i].data?.requestId,
             folderId: dbNodes[i].data?.folderId,

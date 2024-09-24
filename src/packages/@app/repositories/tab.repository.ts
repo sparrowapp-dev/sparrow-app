@@ -605,7 +605,7 @@ export class TabRepository {
         },
       })
       .exec();
-    await query.incrementalModify((value: Tab) => {
+    await query?.incrementalModify((value: Tab) => {
       return { ...value, ...tab };
     });
   };
@@ -621,7 +621,7 @@ export class TabRepository {
         },
       })
       .exec();
-    await query.incrementalModify((value: Tab) => {
+    await query?.incrementalModify((value: Tab) => {
       return { ...value, ...tab };
     });
   };
