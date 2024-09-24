@@ -470,9 +470,6 @@ export class TestflowExplorerPageViewModel {
  * @param id - The ID threshold; nodes with an ID less than this will be removed.
  */
 public deleteNodeResponse = (tabId: string, id: string) => {
-  console.log("Inside deleteNode Response function ")
-  console.log("This is tab Id ", tabId);
-  console.log("This is id", id)
   // Create a deep copy of the current tab data
   const progressiveTab = createDeepCopy(this._tab.getValue());
 

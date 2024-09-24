@@ -422,7 +422,7 @@
       return _edges.filter((edge) => edge.source !== id && edge.target < id);
     });
 
-    deleteNodeResponse(  $tab.tabId ,selectedNodeId);
+    deleteNodeResponse($tab.tabId, selectedNodeId);
     unselectNodes();
 
     isDeleteNodeModalOpen = false;
@@ -439,6 +439,7 @@
 
   const handleKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Backspace") {
+      console.log("Backspace is clicked");
       event.preventDefault();
     }
     if (event.key === "Delete") {
@@ -481,6 +482,12 @@
     nodesSubscriber();
     edgesSubscriber();
   });
+
+  let divElement;
+
+  function focusDiv() {
+    divElement.focus();
+  }
 </script>
 
 <div class="h-100 d-flex flex-column position-relative">
@@ -525,7 +532,13 @@
       </div>
     </div>
   </div>
-  <div style="flex:1; overflow:auto;">
+  <div
+    bind:this={divElement}
+    tabindex="0"
+    on:keydown={handleKeyPress}
+    on:click={focusDiv}
+    style="flex:1; overflow:auto; outline: none;"
+  >
     <SvelteFlow {nodes} {edges} {nodeTypes}>
       <Background
         bgColor={"var(--bg-secondary-850)"}
@@ -676,7 +689,7 @@
     </div>
   {/if}
 </div>
-<svelte:window on:keydown={handleKeyPress} />
+<!-- <svelte:window on:keydown={handleKeyPress} /> -->
 
 <Modal
   title={""}
