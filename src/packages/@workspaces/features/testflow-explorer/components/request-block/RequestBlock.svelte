@@ -179,6 +179,7 @@
       tabindex="0"
       on:click={() => {
         moreOptionsMenu = !moreOptionsMenu;
+        event.stopPropagation();
       }}
       on:blur={() => {
         moreOptionsMenu = false;

@@ -119,7 +119,7 @@
         width={22}
         color={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
           ? "var(--icon-secondary-380)"
-          : isHovered && !isSave && !isGuestUser
+          : isHovered
           ? "var(--icon-primary-200)"
           : "var(--icon-secondary-100)"}
       />

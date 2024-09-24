@@ -10,6 +10,9 @@
     type TFDocumentType,
   } from "@common/types/workspace/testflow";
 
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+
   /**
    * current workspace
    */
@@ -199,6 +202,8 @@
                 WorkspaceRole.WORKSPACE_VIEWER}
               on:click={async () => {
                 await onCreateTestflow();
+                MixpanelEvent(Events.Add_New_Flow);
+
               }}
             >
               <PlusIcon

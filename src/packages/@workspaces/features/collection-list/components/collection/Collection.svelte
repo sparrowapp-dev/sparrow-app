@@ -337,7 +337,7 @@
             workspaceId: collection.workspaceId,
             collection,
           }),
-        displayText: "Add New Web Socket",
+        displayText: "Add New WebSocket",
         disabled: false,
         hidden: false,
       },
@@ -404,7 +404,7 @@
             collection,
           });
         },
-        displayText: "Add New Web Socket",
+        displayText: "Add New WebSocket",
         disabled: false,
         hidden: false,
         icon: SocketIcon,
@@ -645,7 +645,7 @@
             </Tooltip>
 
             <Tooltip
-              title={"Add Web Socket"}
+              title={"Add WebSocket"}
               placement={"bottom"}
               distance={12}
             >

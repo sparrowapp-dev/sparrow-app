@@ -73,6 +73,7 @@ export { default as HorizontalGridIcon } from "./HorizontalGrid.svelte";
 export { default as BlankIcon } from "./blank.svelte";
 export { default as CategoryIcon } from "./Category.svelte";
 export { default as PlayArrow } from "./PlayArrow.svelte";
+export { default as ExternalLinkIcon } from "./ExternalLink.svelte";
 export { default as LogoSymbol } from "./LogoSymbol.svelte";
 export { default as SortIcon } from "./Sort.svelte";
 export { default as TriangleIcon } from "./Triangle.svelte";

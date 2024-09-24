@@ -17,6 +17,8 @@
   import { onMount } from "svelte";
   import { FormatTime } from "@common/utils/formatTime";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   export let isPostopen;
   export let userInfo;
   export let onRetrievePost;
@@ -255,6 +257,7 @@
               comments = await fetchComments(postId);
               commentValue = "";
               isCommenting = false;
+              MixpanelEvent(Events.Add_Comment);
             }}
             disable={commentValue.length == 0 || isCommenting}
           />
@@ -263,7 +266,7 @@
       {#if nestedComments.length > 0}
         <div>
           <div class="d-flex align-items-center justify-content-between mb-3">
-            <h6 class="text-fs-14 ">Activity Feed</h6>
+            <h6 class="text-fs-14">Activity Feed</h6>
 
             <Select
               data={[

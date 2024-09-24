@@ -1,5 +1,7 @@
 <script>
   import Upvote from "../Upvote.svelte";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
   export let status;
   export let setPostId;
@@ -7,7 +9,13 @@
 
 <div>
   {#each status as status}
-    <div class="p-2 review-card" on:click={setPostId("feedback", status.id)}>
+    <div
+      class="p-2 review-card"
+      on:click={() => {
+        setPostId("feedback", status.id);
+        MixpanelEvent(Events.Roadmap_Feedback_Link);
+      }}
+    >
       <div class=" d-flex justify-content-between align-items-center">
         <div class="test">
           <p class="card-title pb-0 mb-0 ellipsis" style="font-weight: 500; ">

@@ -28,7 +28,7 @@
                 style="width: 100%;"
               >
                 <p
-                  class="mb-0 ellipsis overflow-hidden ellipsis"
+                  class="list-name mb-0 ellipsis overflow-hidden ellipsis"
                   style="font-size: 12px; font-weight:700"
                 >
                   {list.name}
@@ -36,7 +36,7 @@
 
                 <p
                   class="team-name mb-0 title fw-bold ellipsis overflow-hidden"
-                  style="font-size: 10px; color:var( --sparrow-text-color)"
+                  style="font-size: 12px; color:var( --sparrow-text-color)"
                 >
                   {list?.team?.teamName}
                 </p>
@@ -64,13 +64,13 @@
   }
 
   .sidebar-workspace-list::-webkit-scrollbar-button {
-   color: var(--bg-secondary-330);
-  } 
-  
+    color: var(--bg-secondary-330);
+  }
+
   .workspace-heading {
     margin-left: 5px;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 21px;
   }
   .workspace-list-data:hover {
@@ -85,5 +85,10 @@
   .title {
     width: calc(100% - 40px);
     text-align: left;
+  }
+
+  .team-name {
+    align-self: stretch !important;
+    font-weight: 400 !important;
   }
 </style>

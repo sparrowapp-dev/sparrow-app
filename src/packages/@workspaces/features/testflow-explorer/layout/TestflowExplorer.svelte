@@ -21,6 +21,8 @@
     ResponseBodyNavigator,
     ResponseBody,
     ResponseHeaders,
+    TestFlowName,
+    SaveTestflow,
   } from "../components";
   import {
     RequestSectionEnum,
@@ -51,7 +53,8 @@
     TFNodeType,
     TFResponseStateType,
   } from "@common/types/workspace/testflow";
-  import { boolean } from "yup";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -65,6 +68,8 @@
   export let environmentVariables;
   export let isTestflowEditable;
   export let onRedrectRequest;
+  export let onUpdateTestFlowName;
+  export let onSaveTestflow;
 
   export let deleteNodeResponse;
 
@@ -148,9 +153,47 @@
     }
     return "";
   };
+
   // List to store collection documents and filtered collections
-  let collectionListDocument;
+  let collectionListDocument: CollectionDocument[];
   let filteredCollections = writable<CollectionDto[]>([]);
+
+  // Sync the nodes with collection data
+  const syncNodesWithCollectionList = () => {
+    nodes.update((_nodes) => {
+      const dbNodes = _nodes;
+      for (let index = 0; index < dbNodes.length; index++) {
+        if (collectionListDocument) {
+          const collection = collectionListDocument.find(
+            (col) => col.id === dbNodes[index].data.collectionId,
+          );
+          if (collection) {
+            let request;
+            if (
+              dbNodes[index].data.folderId &&
+              dbNodes[index].data.folderId?.length > 0
+            ) {
+              const folder = collection.items.find(
+                (fol) => fol.id === dbNodes[index].data.folderId,
+              );
+              if (folder) {
+                request = folder.items.find(
+                  (req) => req.id === dbNodes[index].data.requestId,
+                );
+              }
+            } else {
+              request = collection.items.find(
+                (req) => req.id === dbNodes[index].data.requestId,
+              );
+            }
+            dbNodes[index].data.name = request?.name || "";
+            dbNodes[index].data.method = request?.request?.name || "";
+          }
+        }
+      }
+      return dbNodes;
+    });
+  };
 
   // Filter collections based on the current tab's workspace ID
   const collectionsSubscriber = collectionList.subscribe((value) => {
@@ -162,6 +205,7 @@
       filteredCollections.set(
         collectionListDocument as unknown as CollectionDto[],
       );
+      syncNodesWithCollectionList();
     }
   });
 
@@ -260,6 +304,31 @@
       const dbNodes = $tab?.property?.testflow?.nodes as TFNodeType[];
       let res = [];
       for (let i = 0; i < dbNodes.length; i++) {
+        let request;
+        if (collectionListDocument) {
+          const collection = collectionListDocument.find(
+            (col) => col.id === dbNodes[i].data.collectionId,
+          );
+          if (collection) {
+            if (
+              dbNodes[i].data.folderId &&
+              dbNodes[i].data.folderId?.length > 0
+            ) {
+              const folder = collection?.items?.find(
+                (fol) => fol.id === dbNodes[i].data.folderId,
+              );
+              if (folder) {
+                request = folder.items.find(
+                  (req) => req.id === dbNodes[i].data.requestId,
+                );
+              }
+            } else {
+              request = collection?.items?.find(
+                (req) => req.id === dbNodes[i].data.requestId,
+              );
+            }
+          }
+        }
         res.push({
           id: dbNodes[i].id,
           type: dbNodes[i].type,
@@ -292,8 +361,8 @@
             onOpenDeleteModal: function (id: string) {
               handleDeleteModal(id);
             },
-            name: dbNodes[i].data?.name,
-            method: dbNodes[i].data?.method,
+            name: request?.name ?? dbNodes[i].data?.name,
+            method: request?.request?.method ?? dbNodes[i].data?.method,
             collectionId: dbNodes[i].data?.collectionId,
             requestId: dbNodes[i].data?.requestId,
             folderId: dbNodes[i].data?.folderId,
@@ -439,10 +508,10 @@
 
   const handleKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Backspace") {
-      console.log("Backspace is clicked");
       event.preventDefault();
     }
     if (event.key === "Delete") {
+      event.preventDefault();
       handleDeleteModal(selectedNodeId);
     }
   };
@@ -493,12 +562,13 @@
 <div class="h-100 d-flex flex-column position-relative">
   <div
     class="d-flex justify-content-between position-absolute p-3"
-    style="top:0;
+    style="top:0; width: 100%;
   right:0;
   z-index:100;"
   >
     <div>
       <!-- INSERT NAME COMPONENT HERE -->
+      <TestFlowName {onUpdateTestFlowName} testFlowName={$tab?.name} />
     </div>
     <div class="d-flex">
       <div style="margin-right: 5px;">
@@ -515,12 +585,17 @@
             iconColor={"var(--icon-secondary-100)"}
             onClick={async () => {
               await onClickRun();
+              MixpanelEvent(Events.Run_TestFlows);
             }}
           />
         {/if}
       </div>
       <div>
-        <!-- INSERT SAVE COMPONENT HERE -->
+        <SaveTestflow
+          isSave={$tab.isSaved}
+          {isTestflowEditable}
+          {onSaveTestflow}
+        />
       </div>
       <div class="position-relative">
         <RunHistory

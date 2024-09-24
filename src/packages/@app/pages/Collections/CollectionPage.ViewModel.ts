@@ -2258,14 +2258,14 @@ export default class CollectionsViewModel {
         );
       }
 
-      notifications.success(`"${websocket.name}" Web Socket deleted.`);
+      notifications.success(`"${websocket.name}" WebSocket deleted.`);
       this.removeMultipleTabs([websocket.id]);
       MixpanelEvent(Events.DELETE_REQUEST, {
         source: "Collection list",
       });
       return true;
     } else {
-      notifications.error("Failed to delete the Web Socket.");
+      notifications.error("Failed to delete the WebSocket.");
       return false;
     }
   };
