@@ -1,5 +1,5 @@
 <script>
-  export let handleTestFlowNameChange;
+  export let onUpdateTestFlowName;
   export let testFlowName;
 </script>
 
@@ -13,10 +13,10 @@
     class={`bg-transparent w-100 border-0 my-auto`}
     on:input={(e) => {
       testFlowName = e.target.value;
-      handleTestFlowNameChange(testFlowName, "");
+      onUpdateTestFlowName(testFlowName, "");
     }}
     on:blur={(e) => {
-      handleTestFlowNameChange(testFlowName, "blur");
+      onUpdateTestFlowName(testFlowName, "blur");
     }}
     value={testFlowName}
   />

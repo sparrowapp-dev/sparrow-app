@@ -74,5 +74,6 @@
     toggleHistoryContainer={_viewModel.toggleHistoryContainer}
     onRedrectRequest={_viewModel.redirectRequest}
     onUpdateTestFlowName={_viewModel.updateName}
+    onSaveTestflow={_viewModel.saveTestflow}
   />
 {/if}

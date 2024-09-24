@@ -6,9 +6,11 @@ import { RequestTabAdapter } from "@app/adapter";
 import type { EnvironmentDocument, TabDocument } from "@app/database/database";
 import { CollectionRepository } from "@app/repositories/collection.repository";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
+import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TestflowRepository } from "@app/repositories/testflow.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
+import { TestflowService } from "@app/services/testflow.service";
 import type { Tab } from "@common/types/workspace";
 import type {
   ENVDocumentType,
@@ -16,12 +18,13 @@ import type {
 } from "@common/types/workspace/environment";
 import type {
   TFAPIResponseType,
+  TFDataStoreType,
   TFHistoryAPIResponseStoreType,
   TFHistoryStoreType,
   TFKeyValueStoreType,
   TFNodeType,
 } from "@common/types/workspace/testflow";
-import { Debounce, ParseTime } from "@common/utils";
+import { CompareArray, Debounce, ParseTime } from "@common/utils";
 import { notifications } from "@library/ui/toast/Toast";
 import { DecodeRequest } from "@workspaces/features/rest-explorer/utils";
 import { testFlowDataStore } from "@workspaces/features/testflow-explorer/store";
@@ -35,6 +38,9 @@ export class TestflowExplorerPageViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private testflowRepository = new TestflowRepository();
 
+  private guestUserRepository = new GuestUserRepository();
+  private testflowService = new TestflowService();
+  private compareArray = new CompareArray();
   /**
    * Utils
    */
@@ -100,7 +106,7 @@ export class TestflowExplorerPageViewModel {
     progressiveTab.property.testflow.nodes = nodes;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    // this.compareRequestWithServer();
+    this.compareTestflowWithServer();
   };
 
   /**
@@ -120,7 +126,7 @@ export class TestflowExplorerPageViewModel {
     progressiveTab.property.testflow.edges = _edges;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    // this.compareRequestWithServer();
+    this.compareTestflowWithServer();
   };
 
   /**
@@ -143,6 +149,74 @@ export class TestflowExplorerPageViewModel {
   public getCollectionList = () => {
     return this.collectionRepository.getCollection();
   };
+
+  /**
+   * Compares the current testflow tab with the server version and updates the saved status accordingly.
+   * This method is debounced to reduce the number of server requests.
+   * @return A promise that resolves when the comparison is complete.
+   */
+  private compareTestflowWithServerDebounced = async () => {
+    let result = true;
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+
+    let testflowServer = await this.testflowRepository.readTestflow(
+      progressiveTab.id,
+    );
+    testflowServer = testflowServer.toMutableJSON();
+    // console.log(progressiveTab, testflowServer); will be used for debugging in some time
+
+    if (!testflowServer) {
+      result = false;
+    }
+
+    // name
+    else if (testflowServer.name !== progressiveTab.name) {
+      result = false;
+    }
+
+    // nodes
+    else if (
+      !this.compareArray.init(
+        testflowServer.nodes,
+        progressiveTab.property.testflow.nodes,
+      )
+    ) {
+      result = false;
+    }
+
+    // nodes
+    else if (
+      !this.compareArray.init(
+        testflowServer.edges,
+        progressiveTab.property.testflow.edges,
+      )
+    ) {
+      result = false;
+    }
+
+    // result
+    if (result) {
+      this.tabRepository.updateTab(progressiveTab.tabId, {
+        isSaved: true,
+      });
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+    } else {
+      this.tabRepository.updateTab(progressiveTab.tabId, {
+        isSaved: false,
+      });
+      progressiveTab.isSaved = false;
+      this.tab = progressiveTab;
+    }
+  };
+
+  /**
+   * Debounced method to compare the current request tab with the server version.
+   */
+  private compareTestflowWithServer = new Debounce().debounce(
+    this.compareTestflowWithServerDebounced,
+    1000,
+  );
 
   /**
    * Fetches the active environments for the current workspace
@@ -235,6 +309,7 @@ export class TestflowExplorerPageViewModel {
           history: [],
           isRunHistoryEnable: false,
           isTestFlowRunning: true,
+          isTestFlowSaveInProgress: false,
         };
       }
       testFlowDataMap.set(progressiveTab.tabId, wsData);
@@ -459,6 +534,7 @@ export class TestflowExplorerPageViewModel {
           history: [],
           nodes: [],
           isTestFlowRunning: false,
+          isTestFlowSaveInProgress: false,
         };
       }
       testFlowDataMap.set(progressiveTab.tabId, wsData); // Save the updated tab data
@@ -568,4 +644,126 @@ export class TestflowExplorerPageViewModel {
     };
 
 
+  /**
+   * @description - saves testflow to the mongo server
+   */
+  public saveTestflow = async () => {
+    const progressiveTab = this._tab.getValue() as Tab;
+    testFlowDataStore.update((testFlowDataMap) => {
+      let wsData = testFlowDataMap.get(progressiveTab.tabId); // Retrieve data for the current tab
+
+      // Update existing data or initialize if not found
+      if (wsData) {
+        wsData.isTestFlowSaveInProgress = true;
+      } else {
+        wsData = {
+          isRunHistoryEnable: false,
+          history: [],
+          nodes: [],
+          isTestFlowRunning: false,
+          isTestFlowSaveInProgress: true,
+        };
+      }
+      testFlowDataMap.set(progressiveTab.tabId, wsData); // Save the updated tab data
+      return testFlowDataMap;
+    });
+    const currentTestflow = this._tab.getValue();
+    const activeWorkspace = await this.workspaceRepository.readWorkspace(
+      currentTestflow?.path?.workspaceId as string,
+    );
+    // await this.updateEnvironmentState({ isSaveInProgress: true });
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      await this.testflowRepository.updateTestflow(
+        currentTestflow?.id as string,
+        {
+          name: currentTestflow.name,
+          nodes: currentTestflow?.property?.testflow?.nodes,
+          edges: currentTestflow?.property?.testflow?.edges,
+        },
+      );
+      const progressiveTab = this._tab.getValue();
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab as Tab;
+      await this.tabRepository.updateTab(
+        progressiveTab?.tabId as string,
+        progressiveTab,
+      );
+      // await this.updateEnvironmentState({
+      //   isSaveInProgress: false,
+      // });
+      notifications.success(
+        `Changes saved for ${currentTestflow.name} testflow.`,
+      );
+
+      testFlowDataStore.update((testFlowDataMap) => {
+        let wsData = testFlowDataMap.get(progressiveTab?.tabId as string); // Retrieve data for the current tab
+
+        // Update existing data or initialize if not found
+        if (wsData) {
+          wsData.isTestFlowSaveInProgress = false;
+        }
+        testFlowDataMap.set(
+          progressiveTab.tabId as string,
+          wsData as TFDataStoreType,
+        ); // Save the updated tab data
+        return testFlowDataMap;
+      });
+      return;
+    }
+
+    const response = await this.testflowService.updateTestflow(
+      activeWorkspace._id,
+      currentTestflow?.id as string,
+      {
+        name: currentTestflow.name,
+        nodes: currentTestflow?.property?.testflow?.nodes,
+        edges: currentTestflow?.property?.testflow?.edges,
+      },
+    );
+    if (response.isSuccessful) {
+      this.testflowRepository.updateTestflow(
+        response.data.data._id,
+        response.data.data,
+      );
+      const progressiveTab = this._tab.getValue();
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab as Tab;
+      await this.tabRepository.updateTab(
+        progressiveTab?.tabId as string,
+        progressiveTab,
+      );
+      // await this.updateEnvironmentState({
+      //   isSaveInProgress: false,
+      // });
+      notifications.success(
+        `Changes saved for ${currentTestflow.name} testflow.`,
+      );
+    } else {
+      // await this.updateEnvironmentState({ isSaveInProgress: false });
+      if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error(
+          `Failed to save changes for ${currentTestflow.name} testflow.`,
+        );
+      }
+    }
+    testFlowDataStore.update((testFlowDataMap) => {
+      let wsData = testFlowDataMap.get(progressiveTab?.tabId as string); // Retrieve data for the current tab
+
+      // Update existing data or initialize if not found
+      if (wsData) {
+        wsData.isTestFlowSaveInProgress = false;
+      }
+      testFlowDataMap.set(
+        progressiveTab.tabId as string,
+        wsData as TFDataStoreType,
+      ); // Save the updated tab data
+      return testFlowDataMap;
+    });
+  };
 }

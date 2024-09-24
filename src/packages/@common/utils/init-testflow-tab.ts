@@ -1,6 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
 import { TabTypeEnum, type Path, type Tab } from "@common/types/workspace";
-import { TFDefaultEnum } from "@common/types/workspace/testflow";
+import {
+  TFDefaultEnum,
+  type TFTabEdgeType,
+  type TFTabNodeType,
+} from "@common/types/workspace/testflow";
 
 class InitTestflowTab {
   private _tab: Tab;
@@ -75,6 +79,17 @@ class InitTestflowTab {
   }
   public setName(_name: string) {
     this._tab.name = _name;
+  }
+
+  public setNodes(_nodes: TFTabNodeType[]) {
+    if (this._tab?.property?.testflow?.nodes) {
+      this._tab.property.testflow.nodes = _nodes;
+    }
+  }
+  public setEdges(_edges: TFTabEdgeType[]) {
+    if (this._tab?.property?.testflow?.edges) {
+      this._tab.property.testflow.edges = _edges;
+    }
   }
 }
 

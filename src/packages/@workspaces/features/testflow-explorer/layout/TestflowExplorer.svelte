@@ -64,6 +64,8 @@
   export let isTestflowEditable;
   export let onRedrectRequest;
   export let onUpdateTestFlowName;
+  export let onSaveTestflow;
+
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
   const edges = writable<TFEdgeHandlerType[]>([]);
@@ -429,9 +431,7 @@
   });
 
   let testFlowName = $tab?.name;
-  const handleTestFlowNameChange = (_name, event) => {
-    onUpdateTestFlowName(_name, event);
-  };
+ 
 </script>
 
 <div class="h-100 d-flex flex-column position-relative">
@@ -443,7 +443,7 @@
   >
     <div>
       <!-- INSERT NAME COMPONENT HERE -->
-      <TestFlowName {handleTestFlowNameChange} bind:testFlowName />
+      <TestFlowName {onUpdateTestFlowName} bind:testFlowName />
     </div>
     <div class="d-flex">
       <div style="margin-right: 5px;">
@@ -466,6 +466,13 @@
       </div>
       <div>
         <!-- INSERT SAVE COMPONENT HERE -->
+        <button
+          disabled={testflowStore?.isTestFlowSaveInProgress ||
+            !isTestflowEditable}
+          on:click={() => {
+            onSaveTestflow();
+          }}>SAVE</button
+        >
       </div>
       <div class="position-relative">
         <RunHistory
