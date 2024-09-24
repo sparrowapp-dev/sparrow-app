@@ -6,8 +6,11 @@ import { RequestTabAdapter } from "@app/adapter";
 import type { EnvironmentDocument, TabDocument } from "@app/database/database";
 import { CollectionRepository } from "@app/repositories/collection.repository";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
+import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
+import { TestflowRepository } from "@app/repositories/testflow.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
+import { TestflowService } from "@app/services/testflow.service";
 import type { Tab } from "@common/types/workspace";
 import type {
   ENVDocumentType,
@@ -32,6 +35,9 @@ export class TestflowExplorerPageViewModel {
   private collectionRepository = new CollectionRepository();
   private environmentRepository = new EnvironmentRepository();
   private workspaceRepository = new WorkspaceRepository();
+  private guestUserRepository = new GuestUserRepository();
+  private testflowRepository = new TestflowRepository();
+  private testflowService = new TestflowService();
   /**
    * Utils
    */
@@ -541,5 +547,88 @@ export class TestflowExplorerPageViewModel {
     );
     this.tabRepository.createTab(adaptedRequest);
     moveNavigation("right");
+  };
+
+  /**
+   * @description - saves testflow to the mongo server
+   */
+  public saveTestflow = async () => {
+    const currentTestflow = this._tab.getValue();
+    const activeWorkspace = await this.workspaceRepository.readWorkspace(
+      currentTestflow?.path?.workspaceId as string,
+    );
+    // await this.updateEnvironmentState({ isSaveInProgress: true });
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      await this.testflowRepository.updateTestflow(
+        currentTestflow?.id as string,
+        {
+          name: currentTestflow.name,
+          nodes: currentTestflow?.property?.testflow?.nodes,
+          edges: currentTestflow?.property?.testflow?.edges,
+        },
+      );
+      const progressiveTab = this._tab.getValue();
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab as Tab;
+      await this.tabRepository.updateTab(
+        progressiveTab?.tabId as string,
+        progressiveTab,
+      );
+      // await this.updateEnvironmentState({
+      //   isSaveInProgress: false,
+      // });
+      notifications.success(
+        `Changes saved for ${currentTestflow.name} testflow.`,
+      );
+
+      return;
+    }
+
+    const response = await this.testflowService.updateTestflow(
+      activeWorkspace._id,
+      currentTestflow?.id as string,
+      {
+        name: currentTestflow.name,
+        nodes: currentTestflow?.property?.testflow?.nodes,
+        edges: currentTestflow?.property?.testflow?.edges,
+      },
+    );
+    if (response.isSuccessful) {
+      this.testflowRepository.updateTestflow(
+        response.data.data._id,
+        response.data.data,
+      );
+      const progressiveTab = this._tab.getValue();
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab as Tab;
+      await this.tabRepository.updateTab(
+        progressiveTab?.tabId as string,
+        progressiveTab,
+      );
+      // await this.updateEnvironmentState({
+      //   isSaveInProgress: false,
+      // });
+      notifications.success(
+        `Changes saved for ${currentTestflow.name} testflow.`,
+      );
+    } else {
+      // await this.updateEnvironmentState({ isSaveInProgress: false });
+      if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error(
+          `Failed to save changes for ${currentTestflow.name} testflow.`,
+        );
+      }
+    }
+
+    // MixpanelEvent(Events.SAVE_LOCAL_ENVIRONMENT_VARIABLES, {
+    //   environmentName: currentEnvironment.name,
+    //   environmanetId: currentEnvironment.id,
+    // });
   };
 }

@@ -62,6 +62,7 @@
   export let environmentVariables;
   export let isTestflowEditable;
   export let onRedrectRequest;
+  export let onSaveTestflow;
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -458,7 +459,11 @@
         {/if}
       </div>
       <div>
-        <!-- INSERT SAVE COMPONENT HERE -->
+        <button
+          on:click={() => {
+            onSaveTestflow();
+          }}>SAVE</button
+        >
       </div>
       <div class="position-relative">
         <RunHistory

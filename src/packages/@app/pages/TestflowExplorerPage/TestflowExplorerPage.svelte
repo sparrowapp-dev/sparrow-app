@@ -73,5 +73,6 @@
     toggleHistoryDetails={_viewModel.toggleHistoryDetails}
     toggleHistoryContainer={_viewModel.toggleHistoryContainer}
     onRedrectRequest={_viewModel.redirectRequest}
+    onSaveTestflow={_viewModel.saveTestflow}
   />
 {/if}

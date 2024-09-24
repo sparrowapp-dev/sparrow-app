@@ -49,6 +49,8 @@ export class TestflowRepository {
       .exec();
     testflow?.incrementalModify((value: TFRxDocumentType) => {
       if (data.name) value.name = data.name;
+      if (data?.nodes) value.nodes = data.nodes;
+      if (data?.edges) value.edges = data.edges;
       if (data.workspaceId) value.workspaceId = data.workspaceId;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;

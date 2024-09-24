@@ -89,30 +89,34 @@ export interface TFResponseStateType {
 /**
  * TF (Test FLow) Tab TYPE
  */
-export interface TFTabNodesWrapperType {
-  nodes: {
-    id: string;
-    type: string;
-    data: {
-      requestId: string;
-      folderId: string;
-      collectionId: string;
-      name: string;
-      method: string;
-    };
-    position: {
-      x: number;
-      y: number;
-    };
-  }[];
+
+export interface TFTabNodeType {
+  id: string;
+  type: string;
+  data: {
+    requestId: string;
+    folderId: string;
+    collectionId: string;
+    name: string;
+    method: string;
+  };
+  position: {
+    x: number;
+    y: number;
+  };
 }
 
+export interface TFTabNodesWrapperType {
+  nodes: TFTabNodeType[];
+}
+
+export interface TFTabEdgeType {
+  id: string;
+  source: string;
+  target: string;
+}
 export interface TFTabEdgesWrapperType {
-  edges: {
-    id: string;
-    source: string;
-    target: string;
-  }[];
+  edges: TFTabEdgeType[];
 }
 
 export interface TFTabItemType
