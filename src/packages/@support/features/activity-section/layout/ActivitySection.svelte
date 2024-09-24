@@ -501,7 +501,7 @@
                 </p>
               {/if}
 
-              <hr class=" mb-3" style="color: #45494D;" />
+              <hr class="mt-4" style="" />
             </div>
           {/if}
 
@@ -583,12 +583,13 @@
                 </ul>
               {:else}
                 <p
-                  class="mx-1 text-fs-12 mb-0 text-center"
+                  class="mx-1 text-fs-12 mb-0 text-center mt-4 mb-4"
                   style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
                 >
                   No Result Found
                 </p>
               {/if}
+
             </div>
           {/if}
         </div>
