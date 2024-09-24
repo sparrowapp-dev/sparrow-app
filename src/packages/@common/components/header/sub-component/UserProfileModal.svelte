@@ -73,7 +73,7 @@
 
 {#if !isGuestUser}
   <Tooltip
-    title="User Profile"
+    title="Profile"
     placement="bottom"
     distance={20}
     zIndex={5}

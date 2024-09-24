@@ -766,4 +766,18 @@ export class TestflowExplorerPageViewModel {
       return testFlowDataMap;
     });
   };
+
+
+    /**
+   * @description - updates environment tab name
+   * @param _name - new environment name
+   */
+    public updateNameWithTestFlowList = async (_name: string) => {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      if (progressiveTab?.name && _name !== progressiveTab.name) {
+        progressiveTab.name = _name;
+      }
+      this.tab = progressiveTab;
+    };
+
 }
