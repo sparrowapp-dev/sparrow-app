@@ -21,6 +21,7 @@
     ResponseBodyNavigator,
     ResponseBody,
     ResponseHeaders,
+    SaveTestflow,
   } from "../components";
   import {
     RequestSectionEnum,
@@ -459,14 +460,11 @@
         {/if}
       </div>
       <div>
-        <!-- INSERT SAVE COMPONENT HERE -->
-        <button
-          disabled={testflowStore?.isTestFlowSaveInProgress ||
-            !isTestflowEditable}
-          on:click={() => {
-            onSaveTestflow();
-          }}>SAVE</button
-        >
+        <SaveTestflow
+          isSave={$tab.isSaved}
+          {isTestflowEditable}
+          {onSaveTestflow}
+        />
       </div>
       <div class="position-relative">
         <RunHistory

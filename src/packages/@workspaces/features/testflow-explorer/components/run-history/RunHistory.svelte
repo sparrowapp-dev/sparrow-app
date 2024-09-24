@@ -51,7 +51,7 @@
     </Tooltip>
     {#if testflowStore?.isRunHistoryEnable}
       <div
-        class="position-absolute d-flex flex-column bg-tertiary-750 border-radius-2 p-3"
+        class="run-history-container position-absolute d-flex flex-column bg-tertiary-750 border-radius-2 p-3"
         style="bottom:-10px;
               right:0;
               z-index:100;
@@ -212,5 +212,10 @@
     left: -2px;
     width: 4px;
     top: 14px;
+  }
+  .run-history-container {
+    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
   }
 </style>
