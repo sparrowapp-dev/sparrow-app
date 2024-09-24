@@ -180,7 +180,6 @@
     let releaseNotes = await listChangeLog();
     events = releaseNotes.data.entries;
     filteredEvents = events;
-    console.log("This is sevent", filteredEvents);
     isLoading = false;
   });
 </script>
