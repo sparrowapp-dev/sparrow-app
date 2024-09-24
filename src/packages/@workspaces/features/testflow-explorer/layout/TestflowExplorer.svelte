@@ -51,6 +51,8 @@
     TFNodeType,
     TFResponseStateType,
   } from "@common/types/workspace/testflow";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -522,6 +524,7 @@
             iconColor={"var(--icon-secondary-100)"}
             onClick={async () => {
               await onClickRun();
+              MixpanelEvent(Events.Run_TestFlows);
             }}
           />
         {/if}

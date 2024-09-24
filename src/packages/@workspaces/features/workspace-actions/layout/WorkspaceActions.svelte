@@ -256,6 +256,7 @@
           iconSize: "15px",
           onclick: () => {
             onCreateTestflow();
+            MixpanelEvent(Events.LeftPanel_Plus_Icon);
           },
         },
       ]
@@ -303,6 +304,7 @@
           iconSize: "15px",
           onclick: () => {
             onCreateTestflow();
+            MixpanelEvent(Events.LeftPanel_Plus_Icon);
           },
         },
       ];

@@ -6,6 +6,8 @@
     ExclamationIcon,
     HistoryIcon,
   } from "@library/icons";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
   import { Tooltip } from "@library/ui";
   import { WithButtonV5 } from "@workspaces/common/hoc";
@@ -44,6 +46,7 @@
         icon={HistoryIcon}
         onClick={() => {
           toggleHistoryContainer(!testflowStore?.isRunHistoryEnable);
+          MixpanelEvent(Events.Run_History);
         }}
         disable={false}
         loader={false}

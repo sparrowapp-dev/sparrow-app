@@ -75,6 +75,7 @@
       iconSize={"18px"}
       onClick={() => {
         onCreateTestflow();
+        MixpanelEvent(Events.Default_Screen_TestFlows);
       }}
     />
     <Card
