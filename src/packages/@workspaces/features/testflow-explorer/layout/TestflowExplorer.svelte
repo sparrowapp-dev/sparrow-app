@@ -458,7 +458,6 @@
             onClick={async () => {
               await onClickRun();
               MixpanelEvent(Events.Run_TestFlows);
-
             }}
           />
         {/if}
