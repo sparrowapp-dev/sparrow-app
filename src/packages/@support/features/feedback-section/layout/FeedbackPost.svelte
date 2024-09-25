@@ -11,13 +11,13 @@
 
   import { Button, IconFallback, Loader, Modal } from "@library/ui";
   import ImageModal from "@library/ui/image-modal/ImageModal.svelte";
-  import { CommentCard, UpvoteIcon } from "@support/common/components";
+  import { CommentCard, Drop, UpvoteIcon } from "@support/common/components";
   import { FeedbackType } from "@support/common/types";
-  import { Drop } from "@workspaces/features/import-collection/components";
   import { onMount } from "svelte";
   import formatTimeAgo from "@support/common/utils/formatTimeAgo";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { notifications } from "@library/ui/toast/Toast";
 
   export let isPostopen;
   export let userInfo;
@@ -27,6 +27,7 @@
   export let postId;
   export let handleUpvote;
   export let getColor;
+  export let onUpdateFeedback;
 
   let post = [];
   let nestedComments = [];
@@ -37,11 +38,20 @@
   let currentImage = "";
   let feedbackSubject = "";
   let feedbackDescription = "";
+  let uploadFeedback = {
+    file: {
+      value: [],
+    },
+  };
   let isLoading = false;
   let isImageOpen = false;
   let isCommenting = false;
   let isExposeFeedbackForm = false;
   let type = FeedbackType.CATEGORY;
+  let isAuthor = false;
+  let isEditingPost = false;
+  let imageURLsArray = [];
+  let tempImageURLsArray = [];
 
   function nestComments(comments) {
     const commentMap = {};
@@ -65,13 +75,23 @@
     nestedComments = nestComments(comments);
   };
 
-  onMount(async () => {
-    isLoading = true;
+  const reloadPost = async () => {
     const res = await onRetrievePost(postId);
     post = await res?.data;
     createdAt = formatTimeAgo(post?.created);
     postImages = post?.imageURLs;
     comments = await fetchComments(postId);
+    isAuthor = userInfo?.email === post?.author?.email;
+    feedbackDescription = post?.details;
+    feedbackSubject = post?.title;
+    type = post.category.name;
+    imageURLsArray = post.imageURLs.map((url) => url);
+    tempImageURLsArray = [...imageURLsArray];
+  };
+
+  onMount(async () => {
+    isLoading = true;
+    await reloadPost();
     isLoading = false;
   });
 
@@ -108,6 +128,69 @@
       nestedComments = nestComments(comments);
     }
   }
+
+  let isDescriptionEmpty = false;
+  let isSubjectEmpty = false;
+  let isTextArea = false;
+
+  const handleLogoInputChange = (e) => {
+    const errorMessage =
+      "Failed to upload the file. Please check the file size or the format";
+
+    let targetFile = [
+      ...uploadFeedback.file.value,
+      ...(e?.target?.files || e?.dataTransfer?.files),
+    ];
+    const maxImageSize = 2097152; // 2 MB
+    if (targetFile?.length === 0) {
+      return;
+    }
+    let isErrorThrown = false;
+    const selectedFiles = targetFile.filter((file) => {
+      let fileType = "mp4";
+      if (file.name) {
+        fileType = `.${(file?.name).split(".").pop().toLowerCase()}`;
+      }
+
+      if (
+        fileType === ".jpg" ||
+        fileType === ".jpeg" ||
+        fileType === ".png" ||
+        fileType === ".svg"
+      ) {
+        if (file.size > maxImageSize) {
+          // image size exceeded
+          isErrorThrown = true;
+          return false;
+        }
+        return true;
+      } else {
+        isErrorThrown = true;
+        return false;
+      }
+    });
+    if (selectedFiles.length > 5) {
+      selectedFiles.length = 5;
+      isErrorThrown = true;
+    }
+    if (isErrorThrown) {
+      notifications.error(errorMessage);
+    }
+    uploadFeedback.file.value = selectedFiles;
+  };
+
+  const removeFile = (index, isImageUrl = false) => {
+    if (isImageUrl) {
+      // Remove from imageURLsArray
+      tempImageURLsArray = tempImageURLsArray.filter((_, i) => i !== index);
+    } else {
+      // Remove from uploadFeedback.file.value
+      const files = Array.from(uploadFeedback.file.value).filter(
+        (_, i) => i !== index,
+      );
+      uploadFeedback.file.value = files;
+    }
+  };
 </script>
 
 <div class="d-flex flex-row" style="margin-top: 51px; ">
@@ -205,13 +288,25 @@
                 style="display: flex; align-items: center; font-size: 12px; margin-top:10px; color:var(--text-secondary-50) !important;"
               >
                 <span style="padding-left:4px;">{createdAt} </span>
-                <span class="px-2">|</span>
-                <!-- <span
-                  class="px-2"
-                  on:click={() => {
-                    isExposeFeedbackForm = true;
-                  }}>Edit post</span
-                > -->
+
+                {#if isAuthor}
+                  <span class="px-2">|</span>
+                  <span
+                    on:click={() => {
+                      isEditingPost = !isEditingPost;
+                    }}
+                    style="color: {isEditingPost
+                      ? 'white'
+                      : 'grey'}; text-decoration: {isEditingPost
+                      ? 'underline'
+                      : 'none'};"
+                    class="px-2"
+                    on:click={() => {
+                      console.log("This is post befor eon clk", post);
+                      isExposeFeedbackForm = true;
+                    }}>Edit post</span
+                  >
+                {/if}
               </div>
             </div>
           </div>
@@ -258,7 +353,6 @@
               commentValue = "";
               isCommenting = false;
               MixpanelEvent(Events.Add_Comment);
-
             }}
             disable={commentValue.length == 0 || isCommenting}
           />
@@ -267,7 +361,7 @@
       {#if nestedComments.length > 0}
         <div>
           <div class="d-flex align-items-center justify-content-between mb-3">
-            <h6 class="text-fs-14 ">Activity Feed</h6>
+            <h6 class="text-fs-14">Activity Feed</h6>
 
             <Select
               data={[
@@ -342,59 +436,10 @@
   isOpen={isExposeFeedbackForm}
   handleModalState={(flag = false) => {
     isExposeFeedbackForm = flag;
-    feedbackDescription = post?.details;
-    feedbackSubject = post?.title;
-    type = FeedbackType.CATEGORY;
   }}
 >
   <div class="pt-2"></div>
-  <div class="d-flex pb-2">
-    <Select
-      data={[
-        {
-          name: "Feature Request",
-          id: FeedbackType.FEATURE_REQUEST,
-        },
-        {
-          name: "UX Improvement",
-          id: FeedbackType.UI_IMPROVEMENT,
-        },
-        {
-          name: "Bugs",
-          id: FeedbackType.BUG,
-        },
-        {
-          name: "All Categories",
-          id: FeedbackType.ALL_CATEGORY,
-        },
-      ]}
-      iconRequired={true}
-      icon={CategoryIcon}
-      placeholderText={"Category"}
-      id={"feeds"}
-      zIndex={499}
-      titleId={type}
-      onclick={(id = "") => {
-        type = id;
-      }}
-      disabled={false}
-      borderType={"none"}
-      borderActiveType={"none"}
-      borderHighlight={"hover-active"}
-      headerHighlight={"hover-active"}
-      headerHeight={"36px"}
-      minBodyWidth={"150px"}
-      minHeaderWidth={"128px"}
-      maxHeaderWidth={"200px"}
-      borderRounded={"4px"}
-      headerTheme={"violet2"}
-      bodyTheme={"violet"}
-      menuItem={"v2"}
-      headerFontSize={"10px"}
-      isDropIconFilled={true}
-      position={"absolute"}
-    />
-  </div>
+
   <div style="">
     <p class="text-fs-14 mb-0 text-secondary-150">Description</p>
     <p class="text-fs-12 text-secondary-200 mb-0">
@@ -455,6 +500,7 @@
       <Drop
         styleProp={""}
         maxFileSize={2048}
+        onChange={handleLogoInputChange}
         labelDescription="Choose an image or drag and drop it here."
         inputId="upload--feedback-file-input"
         inputPlaceholder="Drag and Drop or"
@@ -465,12 +511,75 @@
       <div class="d-flex justify-content-between">
         <div></div>
         <div>
-          <span class="text-fs-12 text-tertiary-100">/5</span>
+          <span class="text-fs-12 text-tertiary-100">
+            {(uploadFeedback.file.value.length || 0) +
+              (imageURLsArray.length || 0)}/5
+          </span>
         </div>
       </div>
     </div>
   </div>
-  <!-- <div class="d-flex align-items-center justify-content-between">
+  {#if tempImageURLsArray.length > 0}
+    <div class="file-scroller mb-2 d-flex gap-1 overflow-auto">
+      {#each tempImageURLsArray as file, index}
+        <div
+          class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
+        >
+          <span>
+            <AttachmentIcon
+              height={"12px"}
+              width={"12px"}
+              color={"var(--text-secondary-200)"}
+            />
+          </span>
+          <span class="mb-0 text-fs-12 px-2 ellipsis"
+            >{file?.name || file.slice(-10)}</span
+          >
+          <span
+            on:click={() => {
+              removeFile(index, true);
+            }}
+            ><CrossIcon
+              height={"12px"}
+              width={"9px"}
+              color={"var(--text-secondary-200)"}
+            /></span
+          >
+        </div>
+      {/each}
+    </div>
+  {/if}
+  {#if uploadFeedback?.file?.value?.length > 0}
+    <div class="file-scroller mb-2 d-flex gap-1 overflow-auto">
+      {#each uploadFeedback.file.value as file, index}
+        <div
+          class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
+        >
+          <span>
+            <AttachmentIcon
+              height={"12px"}
+              width={"12px"}
+              color={"var(--text-secondary-200)"}
+            />
+          </span>
+          <span class="mb-0 text-fs-12 px-2 ellipsis"
+            >{file?.name || file.slice(-10)}</span
+          >
+          <span
+            on:click={() => {
+              removeFile(index);
+            }}
+            ><CrossIcon
+              height={"12px"}
+              width={"9px"}
+              color={"var(--text-secondary-200)"}
+            /></span
+          >
+        </div>
+      {/each}
+    </div>
+  {/if}
+  <div class="d-flex align-items-center justify-content-end">
     <div class="d-flex">
       <Button
         type={"violet"}
@@ -478,19 +587,13 @@
         buttonClassProp={"me-2"}
         onClick={async () => {
           isExposeFeedbackForm = false;
-          feedbackDescription = "";
-          feedbackSubject = "";
-          type = FeedbackType.CATEGORY;
-          uploadFeedback = {
-            file: {
-              value: [],
-            },
-          };
+          isEditingPost = false;
+          tempImageURLsArray = [...imageURLsArray]; // Restore original values
         }}
       />
       <Button
         type={"primary"}
-        title={"Add"}
+        title={"Save"}
         loader={isLoading}
         onClick={async () => {
           isLoading = true;
@@ -507,24 +610,29 @@
             isLoading = false;
           } else {
             isSubjectEmpty = isDescriptionEmpty = isTextArea = false;
-            const res = await onInputFeedback(
+            const res = await onUpdateFeedback(
+              post?.id,
               feedbackSubject,
               feedbackDescription,
-              type === FeedbackType.CATEGORY ? FeedbackType.ALL_CATEGORY : type,
               uploadFeedback,
+              tempImageURLsArray,
             );
             if (res?.isSuccessful) {
               isExposeFeedbackForm = false;
-              type = FeedbackType.CATEGORY;
-              feedbackDescription = "";
-              feedbackSubject = "";
+              await reloadPost();
+              isEditingPost = false;
+              uploadFeedback = {
+                file: {
+                  value: [],
+                },
+              };
             }
           }
           isLoading = false;
         }}
       />
     </div>
-  </div> -->
+  </div>
 </Modal>
 
 <style>

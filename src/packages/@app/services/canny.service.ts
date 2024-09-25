@@ -20,20 +20,6 @@ export class CannyIoService {
     return response;
   };
 
-  public updatePost = async (postID: string, body: object) => {
-    const response = await makeRequest("POST", `${this.apiUrl}/posts/update`, {
-      body: {
-        apiKey: this.apiKey,
-        id: postID,
-        ...body,
-      },
-      headers: {
-        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
-      },
-    });
-    return response;
-  };
-
   // returns the post data for a specific post
   retrievePost = async (postID: string) => {
     const response = await makeRequest(
@@ -59,7 +45,7 @@ export class CannyIoService {
     search: string,
     status: string,
     userId: string,
-    limit:number=40
+    limit: number = 40,
   ) => {
     const response = await makeRequest("POST", `${this.apiUrl}/posts/list`, {
       body: {
@@ -69,7 +55,7 @@ export class CannyIoService {
         userID: userId,
         search,
         status,
-        limit
+        limit,
       },
       headers: {
         "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
@@ -118,6 +104,22 @@ export class CannyIoService {
   public createPost = async (body: object) => {
     const response = await makeHttpRequestV2(
       `${this.apiUrl}/posts/create`,
+      "POST",
+      JSON.stringify([]),
+      JSON.stringify({
+        apiKey: this.apiKey,
+        ...body,
+      }),
+      ContentTypeEnum["application/json"],
+    );
+    return response;
+  };
+
+  // creates a new post in the board
+  public updatePost = async (body: object) => {
+    debugger;
+    const response = await makeHttpRequestV2(
+      `${this.apiUrl}/posts/update`,
       "POST",
       JSON.stringify([]),
       JSON.stringify({
