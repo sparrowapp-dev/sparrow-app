@@ -17,7 +17,9 @@
   export let options: {
     name: String;
     icon: any;
-    color:String
+    color: String;
+    iconColor: string;
+    iconSize: string;
     onclick: () => void;
   }[];
 
@@ -96,16 +98,23 @@
       {#each options as item}
         <button
           class="border-0 d-flex p-2 rounded-1 w-100 option-button"
-   style="color: {item.color};"
- 
+          style="color: {item.color};"
           on:click={() => item.onclick()}
         >
           {#if item.icon}
-            <img
+            <!-- <img
               src={item.icon}
               alt=""
               style="width: 15px; height: 15px; margin: auto 10px auto 5px;"
-            />
+            /> -->
+            <span class="me-2">
+              <svelte:component
+                this={item.icon}
+                height={item.iconSize}
+                width={item.iconSize}
+                color={item.iconColor}
+              />
+            </span>
           {/if}
           <p style="margin-bottom: 0;">{item.name}</p>
         </button>

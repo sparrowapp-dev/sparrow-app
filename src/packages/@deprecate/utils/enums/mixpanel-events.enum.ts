@@ -68,6 +68,12 @@ export enum Events {
   WebSocket_Connected = "WebSocket_Connected",
   WebSocket_Disconnected = "WebSocket_Disconnected",
   Send_WebSocket_Request = "Send_WebSocket_Request",
+  Default_Screen_TestFlows = "Default_Screen_TestFlows",
+  LeftPanel_Plus_Icon = "LeftPanel_Plus_Icon",
+  Add_New_Flow = "Add_New_Flow",
+  Start_TestFlows = "Start_TestFlows",
+  Run_TestFlows = "Run_TestFlows",
+  Run_History = "Run_History",
   Roadmap_Tab = "Roadmap_Tab",
   Roadmap_Categories_Filter = "Roadmap_Categories_Filter",
   Roadmap_Search = "Roadmap_Search",
@@ -99,5 +105,5 @@ export enum Events {
   Reply_Comment = "Reply_Comment",
   Edit_Post = "Edit_Post",
   Like_Comment = "Like_Comment",
-  Upvote_Post = "Upvote_Post"
+  Upvote_Post = "Upvote_Post",
 }

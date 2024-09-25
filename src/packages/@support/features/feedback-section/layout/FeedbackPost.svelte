@@ -14,7 +14,8 @@
   import { CommentCard, Drop, UpvoteIcon } from "@support/common/components";
   import { FeedbackType } from "@support/common/types";
   import { onMount } from "svelte";
-  import formatTimeAgo from "@support/common/utils/formatTimeAgo";
+  import { FormatTime } from "@common/utils/formatTime";
+  const formatTimeAgo = new FormatTime().formatTimeAgo;
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { notifications } from "@library/ui/toast/Toast";

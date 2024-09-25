@@ -70,7 +70,7 @@
           product?.category?.name === "Feature Request") ||
         (type === "UI Improvement" &&
           product?.category?.name === "UI Improvement") ||
-        (type === "bug" && product?.category?.name === "Bug");
+        (type === "Bug" && product?.category?.name === "Bug");
 
       return matchesSearchTerm && matchesCategory;
     }),
@@ -183,7 +183,7 @@
       <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
     {:else}
       <div
-        class="d-flex justify-content-between gap-2 update-state-section"
+        class="d-flex justify-content-between gap-3 update-state-section"
         style="width:100%;"
       >
         {#each filteredFeedbackStatus as { status, products, filteredFeedbacks }}

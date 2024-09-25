@@ -80,6 +80,7 @@ class RestExplorerViewModel {
       setTimeout(() => {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
+        delete t.index;
         this.tab = t;
       }, 0);
     }

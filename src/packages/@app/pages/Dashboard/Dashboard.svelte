@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { Sidebar, LoginBanner, LoginSignupConfirmation } from "@common/components";
+  import {
+    Sidebar,
+    LoginBanner,
+    LoginSignupConfirmation,
+  } from "@common/components";
   import { Route, navigate } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
@@ -116,7 +120,8 @@
     }
     workspaceDocuments = await _viewModel.workspaces();
     teamDocuments = await _viewModel.getTeams();
-    await _viewModel.connectWebSocket();
+    // Disabling web socket for now due to issues in release_v1 deployment, can be enabled in future if required.
+    // await _viewModel.connectWebSocket();
   });
 
   onDestroy(() => {
@@ -260,7 +265,6 @@
   </div>
 </div>
 
-
 <Modal
   title={"Confirm SignUp / Login?"}
   type={"dark"}
@@ -272,7 +276,6 @@
   }}
 >
   <LoginSignupConfirmation {handleLogin} bind:isPopupOpen />
-
 </Modal>
 
 <ModalWrapperV1

@@ -19,7 +19,10 @@
 
   import { onDestroy, onMount } from "svelte";
   import ResponseError from "../response-error/ResponseError.svelte";
-  import { RequestSection } from "$lib/utils/enums/request.enum";
+  import {
+    RequestSection,
+    ResponseStatusCode,
+  } from "$lib/utils/enums/request.enum";
   import {
     findAuthHeader,
     findAuthParameter,
@@ -354,7 +357,7 @@
         </div>
       {:else if !response?.status}
         <DefaultPage />
-      {:else if response?.status === "Not Found"}
+      {:else if response?.status === ResponseStatusCode.ERROR}
         <ResponseError />
       {:else if response?.status}
         <ResponseParams
