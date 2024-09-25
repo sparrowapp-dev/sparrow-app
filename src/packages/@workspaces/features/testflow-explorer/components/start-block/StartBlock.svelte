@@ -112,4 +112,7 @@
     padding: 8px 4px;
     display: inline-block;
   }
+  :global(.svelte-flow__handle) {
+    pointer-events: none !important;
+  }
 </style>
