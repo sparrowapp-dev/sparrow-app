@@ -126,7 +126,6 @@
           setTimeout(() => {
             req.name = _node?.data?.name;
             req.method = _node?.data?.method;
-            console.log(req, id);
           }, 10);
         }
       });
@@ -240,7 +239,7 @@
       method={req.method}
     />
     {#if !currentBlock}
-      {#if data?.name?.length > 0 || isRunTextVisible}
+      {#if req.name?.length > 0}
         <div class="d-flex run-txt-container">
           <InfoIcon height="8px" width="8px" />
           <p style="font-size: 8px;">Run the block to get response</p>
