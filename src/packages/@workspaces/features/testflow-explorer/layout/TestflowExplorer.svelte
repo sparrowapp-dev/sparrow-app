@@ -573,6 +573,12 @@
       <TestFlowName {onUpdateTestFlowName} testFlowName={$tab?.name} />
     </div>
     <div class="d-flex">
+      {#if testflowStore?.isTestFlowRunning}
+        <div class="d-flex testing-text-container">
+          <div class="loader"></div>
+          <p class="testing-txt">Testing</p>
+        </div>
+      {/if}
       <div style="margin-right: 5px;">
         {#if nodesValue > 1}
           <DropButton
@@ -794,6 +800,33 @@
   :global(.svelte-flow__attribution) {
     display: none;
   }
+  .loader {
+    color: var(--bg-primary-300);
+    width: 2px;
+    aspect-ratio: 1;
+    border-radius: 100%;
+    box-shadow:
+      9px 0 0 4px,
+      18px 0 0 2px,
+      27px 0 0 0;
+    transform: translateX(-40px);
+    animation: l21 0.5s infinite alternate linear;
+  }
+
+  @keyframes l21 {
+    50% {
+      box-shadow:
+        9px 0 0 2px,
+        18px 0 0 4px,
+        27px 0 0 2px;
+    }
+    100% {
+      box-shadow:
+        9px 0 0 0,
+        18px 0 0 2px,
+        27px 0 0 4px;
+    }
+  }
 
   .request-rhs-container {
     height: 100%;
@@ -804,5 +837,23 @@
   .request-container {
     background-color: var(--bg-secondary-800);
     width: 100%;
+  }
+  .testing-txt {
+    color: var(--text-primary-300);
+    font-size: 14;
+    font-weight: 400;
+    align-self: center;
+    align-content: center;
+    margin-top: 15%;
+    margin-right: 10px;
+  }
+  .testing-text-container {
+    align-items: center;
+    justify-content: flex-end;
+    height: 36px;
+    background-color: var(--bg-tertiary-750);
+    width: 110px;
+    margin-right: 10px;
+    border-radius: 4px;
   }
 </style>
