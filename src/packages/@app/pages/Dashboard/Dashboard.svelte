@@ -120,6 +120,7 @@
     }
     workspaceDocuments = await _viewModel.workspaces();
     teamDocuments = await _viewModel.getTeams();
+    // Disabling web socket for now due to issues in release_v1 deployment, can be enabled in future if required.
     // await _viewModel.connectWebSocket();
   });
 
