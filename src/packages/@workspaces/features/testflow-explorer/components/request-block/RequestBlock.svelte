@@ -15,8 +15,10 @@
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
+  import { testFlowDataStore } from "@workspaces/features/testflow-explorer/store/testflow";
   import Drop from "../../icons/Drop.svelte";
-  import { testFlowDataStore } from "@workspaces/features/testflow-explorer/store";
+  import { ThreeDotIcon } from "$lib/assets/app.asset";
+  import { Dropdown, Modal, Tooltip } from "@library/ui";
   import { createDeepCopy } from "$lib/utils/helpers";
   import { ParseTime } from "@common/utils";
   import type {
@@ -43,6 +45,7 @@
       method: string,
       folderId?: string,
     ) => void;
+    onOpenDeleteModal: () => void;
     tabId: string;
     collections: Observable<CollectionDocument[]>;
   };
@@ -82,9 +85,9 @@
     );
   };
 
-  $: {
-    isDropHereVisible = data.parentDrag;
-  }
+  // $: {
+  //   isDropHereVisible = data.parentDrag;
+  // }
   let isCreateBlockArrowHovered = false;
 
   let testflowStore: TFDataStoreType;
@@ -119,11 +122,12 @@
   // Lifecycle method - runs when the component is mounted
   onMount(() => {
     // Subscribe to changes in the blocks store
-    dataBlocksSubscriber = data.blocks.subscribe(() => {
+    dataBlocksSubscriber = data.blocks.subscribe((_nodes) => {
       // Update visibility of the "Add Block" button based on edge check
       setTimeout(() => {
         isAddBlockVisible = !data?.onCheckEdges(id);
       }, 10);
+      isDropHereVisible = _nodes[0].data.parentDrag;
     });
     // Subscribe to changes in the connector store
     dataConnectorSubscriber = data.connector.subscribe(() => {
@@ -154,9 +158,20 @@
       return true;
     return false;
   };
+
+  let moreOptionsMenu: boolean = false;
+
+  const handleOpenModal = () => {
+    moreOptionsMenu = !moreOptionsMenu;
+    data.onOpenDeleteModal(id);
+  };
 </script>
 
 <div
+  on:dragenter={() => {
+    // debugger;
+    isDropHereVisible = true;
+  }}
   class="request-block position-relative border-radius-4"
   style={selected && !currentBlock
     ? "border: 2px solid var(--border-primary-300);"
@@ -174,8 +189,7 @@
   }}
 >
   <Handle type="target" position={Position.Left} />
-  <!-- Block Header -->
-  <div class="px-3 py-2">
+  <div class=" d-flex justify-content-between align-items-center px-3 py-2">
     <span class="text-fs-12 text-fs-10">
       {#if !currentBlock}
         <VectorIcon
@@ -190,6 +204,38 @@
       {/if}
       <span class="ms-2">REST API Request</span>
     </span>
+
+    <div
+      style="position: relative;"
+      class="ms-2 d-flex justify-content-center align-items-center moreOption-icon rounded"
+      tabindex="0"
+      on:click={() => {
+        moreOptionsMenu = !moreOptionsMenu;
+        event.stopPropagation();
+      }}
+      on:blur={() => {
+        moreOptionsMenu = false;
+      }}
+    >
+      <ThreeDotIcon />
+
+      {#if moreOptionsMenu}
+        <div
+          class="d-flex align-items-center justify-content-center"
+          style="z-index:1000; border-radius:2px; height:29px; width:96px; background-color:#22232E; position:absolute; top:27px; right:-75px;"
+        >
+          <div
+            class="d-flex align-items-center justify-content-start"
+            style="color:#FF4646; background-color: #2E2F3D; height:23px; width:90px; border-radius:2px;"
+            on:click={() => {
+              handleOpenModal();
+            }}
+          >
+            <p class="pb-0 mb-0 ps-1">Delete</p>
+          </div>
+        </div>
+      {/if}
+    </div>
   </div>
   <!-- ------------ -->
   <hr class="my-0" />
@@ -251,8 +297,8 @@
     </div>
   {/if}
 
-  <div class="border border-danger">
-    {#if isDropHereVisible}
+  <div class="">
+    {#if isDropHereVisible && isAddBlockVisible}
       <div class="">
         {#if isAddBlockVisible}
           <div
@@ -316,13 +362,15 @@
   {#if isCreateBlockArrowHovered && isAddBlockVisible}
     <div
       class="position-absolute d-flex align-items-center"
-      style="right:-25px; top:50%; transform : translateX(100%) translateY(-50%); opacity:0.6;"
+      style="right:-28px; top:50%; transform : translateX(100%) translateY(-50%); opacity:0.6;"
     >
       <div>
         <ArrowSolid />
       </div>
       <div class="request-block-dummy position-relative">
-        <div class="px-3 py-2">
+        <div
+          class="d-flex justify-content-between align-items-center px-3 py-2"
+        >
           <span class="text-fs-12 text-fs-10">
             <VectorIcon
               height={"12px"}
@@ -331,6 +379,9 @@
             />
             <span class="ms-2">REST API Request</span>
           </span>
+          <div>
+            <ThreeDotIcon />
+          </div>
         </div>
         <hr class="my-0" />
         <div class="px-3 py-3">
@@ -425,5 +476,13 @@
     margin-bottom: 0px;
     color: #808080;
     margin-left: 4px;
+  }
+
+  .moreOption-icon {
+    height: 24px;
+    width: 24px;
+  }
+  .moreOption-icon:hover {
+    background-color: var(--bg-tertiary-190);
   }
 </style>

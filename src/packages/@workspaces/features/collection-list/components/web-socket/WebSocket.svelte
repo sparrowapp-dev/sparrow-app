@@ -132,7 +132,7 @@
 />
 
 <ModalWrapperV1
-  title={"Delete Web Socket?"}
+  title={"Delete WebSocket?"}
   type={"danger"}
   width={"35%"}
   zIndex={1000}
@@ -141,7 +141,7 @@
 >
   <div class="text-lightGray mb-1 sparrow-fs-12">
     <p>
-      Are you sure you want to delete this Web Socket? <span
+      Are you sure you want to delete this WebSocket? <span
         class="text-whiteColor fw-bold">"{api.name}"</span
       >
       will be removed and cannot be restored.
@@ -203,7 +203,7 @@
             websocket: api,
           });
         },
-        displayText: "Open Web Socket",
+        displayText: "Open WebSocket",
         disabled: false,
         hidden: false,
       },
@@ -212,7 +212,7 @@
           isRenaming = true;
           setTimeout(() => inputField.focus(), 100);
         },
-        displayText: "Rename Web Socket",
+        displayText: "Rename WebSocket",
         disabled: false,
         hidden:
           !collection.activeSync ||

@@ -6,6 +6,8 @@
     ExclamationIcon,
     HistoryIcon,
   } from "@library/icons";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
   import { Tooltip } from "@library/ui";
   import { WithButtonV5 } from "@workspaces/common/hoc";
@@ -44,6 +46,7 @@
         icon={HistoryIcon}
         onClick={() => {
           toggleHistoryContainer(!testflowStore?.isRunHistoryEnable);
+          MixpanelEvent(Events.Run_History);
         }}
         disable={false}
         loader={false}
@@ -51,7 +54,7 @@
     </Tooltip>
     {#if testflowStore?.isRunHistoryEnable}
       <div
-        class="position-absolute d-flex flex-column bg-tertiary-750 border-radius-2 p-3"
+        class="run-history-container position-absolute d-flex flex-column bg-tertiary-750 border-radius-2 p-3"
         style="bottom:-10px;
               right:0;
               z-index:100;
@@ -212,5 +215,10 @@
     left: -2px;
     width: 4px;
     top: 14px;
+  }
+  .run-history-container {
+    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
   }
 </style>

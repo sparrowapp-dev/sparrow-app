@@ -488,6 +488,16 @@
   }
 
   /* Style the checkmark/indicator */
+
+  .action-icon {
+    height: 24px;
+    width: 24px;
+    border-radius: 2px;
+  }
+
+  .action-icon:hover {
+    background-color: var(--bg-secondary-500);
+  }
   .container .checkmark:after {
     left: 5px;
     top: 2px;

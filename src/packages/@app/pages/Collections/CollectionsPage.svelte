@@ -28,7 +28,7 @@
     WorkspaceDefault,
     SaveAsCollectionItem,
   } from "@workspaces/features";
-  import {WithModal} from "@workspaces/common/hoc";
+  import { WithModal } from "@workspaces/common/hoc";
   import { notifications } from "@library/ui/toast/Toast";
 
   // ---- Interface, enum & constants
@@ -177,7 +177,8 @@
     if (
       (tab?.type === TabTypeEnum.REQUEST ||
         tab?.type === TabTypeEnum.WEB_SOCKET ||
-        tab?.type === TabTypeEnum.ENVIRONMENT) &&
+        tab?.type === TabTypeEnum.ENVIRONMENT ||
+        tab?.type === TabTypeEnum.TESTFLOW) &&
       !tab?.isSaved
     ) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
@@ -204,16 +205,27 @@
    * Handle save functionality on close confirmation popup
    */
   const handlePopupSave = async () => {
-    if (removeTab.type === TabTypeEnum.ENVIRONMENT) {
+    if (
+      removeTab.type === TabTypeEnum.ENVIRONMENT ||
+      removeTab.type === TabTypeEnum.TESTFLOW
+    ) {
       if (removeTab?.path.workspaceId) {
         const id = removeTab?.id;
         loader = true;
-
-        const res = await _viewModel2.saveEnvironment(removeTab);
-        if (res) {
-          loader = false;
-          _viewModel.handleRemoveTab(id);
-          isPopupClosed = false;
+        if (removeTab.type === TabTypeEnum.ENVIRONMENT) {
+          const res = await _viewModel2.saveEnvironment(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
+        } else if (removeTab.type === TabTypeEnum.TESTFLOW) {
+          const res = await _viewModel3.saveTestflow(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
         }
         loader = false;
       }
@@ -285,6 +297,8 @@
     if (value) {
       if (prevWorkspaceId !== value._id) {
         _viewModel.fetchCollections(value?._id);
+        _viewModel2.refreshEnvironment(value?._id);
+        _viewModel3.refreshTestflow(value?._id);
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
       }

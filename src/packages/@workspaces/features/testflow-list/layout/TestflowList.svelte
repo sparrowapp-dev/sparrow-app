@@ -10,6 +10,9 @@
     type TFDocumentType,
   } from "@common/types/workspace/testflow";
 
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+
   /**
    * current workspace
    */
@@ -91,10 +94,10 @@
   }
 
   $: filteredflows = searchData
-    ? testflows.filter((flow) =>
+    ? flows.filter((flow) =>
         flow.name.toLowerCase().includes(searchData.toLowerCase()),
       )
-    : testflows;
+    : flows;
 
   let scrollDiv: HTMLElement;
 
@@ -109,14 +112,14 @@
 </script>
 
 <div
-  class={`d-flex flex-column  h-100 env-sidebar bg-secondary-900   pt-0`}
+  class={`d-flex flex-column  h-100 env-sidebar bg-secondary-900 pt-0 px-1`}
   style="font-weight: 500;"
 >
   <!-- 
   --  Testflow Header 
   -->
   <div
-    class="d-flex align-items-center p-2 rounded-1 me-0 mb-0"
+    class="d-flex align-items-center rounded-1 me-0 mb-0 pe-2"
     style="cursor:pointer; justify-content: space-between; height:32px;
         background-color: {isHovered
       ? 'var(--dropdown-option-hover)'
@@ -125,7 +128,10 @@
     on:mouseout={handleMouseOut}
     on:click={toggleExpandTestflow}
   >
-    <div class="d-flex align-items-center ps-2">
+    <div
+      class="d-flex align-items-center ps-3 pe-1 py-1"
+      style="width: calc(100% - 30px);"
+    >
       <img
         src={angleRight}
         class="me-3"
@@ -171,39 +177,48 @@
   </div>
 
   {#if isExpandTestflow}
-    <div class="overflow-auto h-100 mt-1" bind:this={scrollDiv}>
+    <div
+      style="flex:1;"
+      class="overflow-auto h-100 mt-1 ps-2"
+      bind:this={scrollDiv}
+    >
       <!-- 
   --  Testflow Empty screen 
   -->
       {#if filteredflows && flows.length === 0}
-        <div class={`pb-2 px-2`}>
-          <p
-            class={`add-env-desc-text mb-3 text-fs-12 mb-0 fw-normal text-center`}
-            style="color: var(--text-secondary-50)"
-          >
-            Start with basic test cases to check core functions and build a
-            strong testing foundation.
-          </p>
-          <button
-            class=" w-100 add-testflow bg-transparent d-flex justify-content-center align-items-center border-radius-2"
-            style="color: var(--text-secondary-100);"
-            disabled={loggedUserRoleInWorkspace ===
-              WorkspaceRole.WORKSPACE_VIEWER}
-            on:click={async () => {
-              await onCreateTestflow();
-            }}
-          >
-            <PlusIcon
-              height={"22px"}
-              width={"22px"}
-              color={"var(--text-secondary-200)"}
-            />
-            <span
-              style="color: var(--text-secondary-200)"
-              class="ps-2 fw-bold text-fs-12">Add New {TFDefaultEnum.NAME}</span
+        {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
+          <div class={`pb-2 px-2`}>
+            <p
+              class={`add-env-desc-text mb-3 text-fs-12 mb-0 fw-normal text-center`}
+              style="color: var(--text-secondary-50)"
             >
-          </button>
-        </div>
+              Start with basic test cases to check core functions and build a
+              strong testing foundation.
+            </p>
+            <button
+              class=" w-100 add-testflow bg-transparent d-flex justify-content-center align-items-center border-radius-2"
+              style="color: var(--text-secondary-100);"
+              disabled={loggedUserRoleInWorkspace ===
+                WorkspaceRole.WORKSPACE_VIEWER}
+              on:click={async () => {
+                await onCreateTestflow();
+                MixpanelEvent(Events.Add_New_Flow);
+
+              }}
+            >
+              <PlusIcon
+                height={"22px"}
+                width={"22px"}
+                color={"var(--text-secondary-200)"}
+              />
+              <span
+                style="color: var(--text-secondary-200)"
+                class="ps-2 fw-bold text-fs-12"
+                >Add New {TFDefaultEnum.NAME}</span
+              >
+            </button>
+          </div>
+        {/if}
       {/if}
 
       <!-- 
@@ -214,7 +229,7 @@
           bind:scrollList
           height={"auto"}
           overflowY={"auto"}
-          classProps={"pe-1"}
+          classProps={"pe-0"}
           style={"flex:1;"}
         >
           {#each filteredflows as flow}

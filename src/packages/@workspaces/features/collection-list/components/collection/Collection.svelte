@@ -337,7 +337,7 @@
             workspaceId: collection.workspaceId,
             collection,
           }),
-        displayText: "Add New Web Socket",
+        displayText: "Add New WebSocket",
         disabled: false,
         hidden: false,
       },
@@ -404,7 +404,7 @@
             collection,
           });
         },
-        displayText: "Add New Web Socket",
+        displayText: "Add New WebSocket",
         disabled: false,
         hidden: false,
         icon: SocketIcon,
@@ -516,7 +516,7 @@
             rightClickContextMenu2(e);
           }}
         >
-          <img src={AddIcon} alt="AddIcon" />
+          <img height="12px" width="12px" src={AddIcon} alt="AddIcon" />
         </button>
       </Tooltip>
 
@@ -645,7 +645,7 @@
             </Tooltip>
 
             <Tooltip
-              title={"Add Web Socket"}
+              title={"Add WebSocket"}
               placement={"bottom"}
               distance={12}
             >
@@ -763,6 +763,9 @@
     visibility: hidden;
     background-color: transparent;
   }
+  .threedot-icon-container:active {
+    background-color: var(--bg-secondary-420) !important;
+  }
 
   .threedot-active {
     visibility: visible;
@@ -777,6 +780,10 @@
     background-color: var(--bg-tertiary-500) !important;
     border-radius: 4px;
     padding: 5px;
+  }
+
+  .add-icon-container:active {
+    background-color: var(--bg-secondary-420) !important;
   }
   .add-item-active {
     visibility: visible;

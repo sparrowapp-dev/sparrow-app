@@ -396,6 +396,10 @@
     background-color: transparent;
   }
 
+  .threedot-icon-container:active {
+    background-color: var(--bg-secondary-420) !important;
+  }
+
   .threedot-active {
     visibility: visible;
     background-color: var(--bg-tertiary-600);

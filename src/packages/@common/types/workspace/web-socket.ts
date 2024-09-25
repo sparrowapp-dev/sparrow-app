@@ -168,7 +168,7 @@ export interface WebSocket
     MessageWrapper {}
 
 export enum WebSocketDefault {
-  NAME = "New Web Socket",
+  NAME = "New WebSocket",
 }
 
 export interface WebSocketWrapper {

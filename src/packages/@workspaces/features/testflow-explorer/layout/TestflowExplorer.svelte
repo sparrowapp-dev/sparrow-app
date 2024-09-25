@@ -41,6 +41,8 @@
   } from "@workspaces/common/components";
   import { RunIcon } from "@library/icons";
   import { string } from "yup";
+  import { Modal } from "@library/ui";
+  import DeleteNode from "@workspaces/common/components/delete-node/DeleteNode.svelte";
   import { ResponseStatusCode } from "$lib/utils/enums";
   import type {
     TFDataStoreType,
@@ -50,6 +52,7 @@
     TFNodeType,
     TFResponseStateType,
   } from "@common/types/workspace/testflow";
+  import { Debounce } from "@common/utils";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -63,6 +66,10 @@
   export let environmentVariables;
   export let isTestflowEditable;
   export let onRedrectRequest;
+  export let onUpdateTestFlowName;
+  export let onSaveTestflow;
+
+  export let deleteNodeResponse;
 
   let collectionData = {
     folderId: "",
@@ -76,6 +83,8 @@
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
   const edges = writable<TFEdgeHandlerType[]>([]);
+
+  // const debounce = new Debounce();
 
   // Flag to control whether nodes are draggable
   let isNodesDraggable = false;
@@ -420,25 +429,27 @@
         ...node,
         data: {
           ...node.data,
-          isLastNode: index === array.length - 1,
-          parentDrag: index === array.length - 1,
+          // isLastNode: index === array.length - 1,
+          // parentDrag: index === array.length - 1,
+          parentDrag: true,
         },
+        // node.data.parentDrag = true;
       }));
     });
   };
 
-  const handleDragEnd = () => {
+  const handleDragEnd = new Debounce().debounce(() => {
     nodes.update((nodes) =>
       nodes.map((node, index, array) => ({
         ...node,
         data: {
           ...node.data,
-          parentDrag: index === array.length - 1,
-          isLastNode: index === array.length - 1,
+          parentDrag: false,
+          // isLastNode: index === array.length - 1,
         },
       })),
     );
-  };
+  }, 1000);
   let selectedTab = "response";
 
   let requestNavigation = "Request Body";
@@ -517,6 +528,7 @@
   class="h-100 d-flex flex-column position-relative"
   on:dragenter={handleDragEnter}
   on:dragleave={handleDragEnd}
+  on:drop={handleDragEnd}
 >
   <div
     class="d-flex justify-content-between position-absolute p-3"

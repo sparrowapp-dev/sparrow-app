@@ -6,12 +6,17 @@ import { TabRepository } from "@app/repositories/tab.repository";
 import { TestflowRepository } from "@app/repositories/testflow.repository";
 import type { TFRxDocumentType } from "@app/models/testflow.model";
 import { TFDefaultEnum } from "@common/types/workspace/testflow";
+import { TestflowService } from "@app/services/testflow.service";
+import { GuestUserRepository } from "@app/repositories/guest-user.repository";
+import type { Tab } from "@common/types/workspace";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private testflowRepository = new TestflowRepository();
   private tabRepository = new TabRepository();
   private initTab = new InitTab();
+  private guestUserRepository = new GuestUserRepository();
+  private testflowService = new TestflowService();
 
   constructor() {}
 
@@ -73,9 +78,13 @@ export class TestflowViewModel {
           id: "1",
           type: "startBlock",
           data: {
-            name: "Start",
+            collectionId: "",
+            requestId: "",
+            folderId: "",
+            method: "",
+            name: "",
           },
-          position: { x: 100, y: 350 },
+          position: { x: 100, y: 200 },
         },
       ],
       edges: [],
@@ -86,14 +95,61 @@ export class TestflowViewModel {
       updatedAt: "",
       updatedBy: "",
     };
-    const initTestflowTab = this.initTab.testflow(
-      testFLowId,
-      currentWorkspace._id,
-    );
-    await this.testflowRepository.addTestflow(newTestflow);
-    initTestflowTab.updateName(newTestflow.name);
-    this.tabRepository.createTab(initTestflowTab.getValue());
-    notifications.success(`New ${TFDefaultEnum.NAME} Created!`);
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      await this.testflowRepository.addTestflow(newTestflow);
+      const initTestflowTab = this.initTab.testflow(
+        testFLowId,
+        currentWorkspace._id,
+      );
+      initTestflowTab.updateName(newTestflow.name);
+      this.tabRepository.createTab(initTestflowTab.getValue());
+      notifications.success(`New ${TFDefaultEnum.NAME} Created!`);
+      return;
+    }
+    const response = await this.testflowService.addTestflow({
+      name: newTestflow.name,
+      workspaceId: newTestflow.workspaceId,
+      edges: [],
+      nodes: [
+        {
+          id: "1",
+          type: "startBlock",
+          position: {
+            x: 100,
+            y: 200,
+          },
+          data: {
+            requestId: "",
+            collectionId: "",
+            folderId: "",
+          },
+        },
+      ],
+    });
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+
+      const initTestflowTab = this.initTab.testflow(
+        res._id,
+        currentWorkspace._id,
+      );
+      initTestflowTab.setName(res.name);
+      this.tabRepository.createTab(initTestflowTab.getValue());
+
+      this.testflowRepository.addTestflow({
+        ...res,
+        workspaceId: currentWorkspace._id,
+      });
+      notifications.success("New Testflow Created!");
+      // MixpanelEvent(Events.CREATE_TESTFLOW);
+      return;
+    } else {
+      notifications.error("Failed to create Testflow. Please try again.");
+    }
   };
 
   /**
@@ -107,15 +163,39 @@ export class TestflowViewModel {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       testflow.workspaceId as string,
     );
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      this.testflowRepository.removeTestflow(testflow._id);
+      await this.tabRepository.removeTab(testflow._id);
+      notifications.success(
+        `${testflow.name} ${TFDefaultEnum.NAME} is removed from ${currentWorkspace.name}.`,
+      );
+      return {
+        isSuccessful: true,
+      };
+    }
 
-    this.testflowRepository.removeTestflow(testflow._id);
-    await this.tabRepository.removeTab(testflow._id);
-    notifications.success(
-      `${testflow.name} ${TFDefaultEnum.NAME} is removed from ${currentWorkspace.name}.`,
+    const response = await this.testflowService.deleteTestflow(
+      currentWorkspace._id,
+      testflow._id,
     );
-    return {
-      isSuccessful: true,
-    };
+    if (response.isSuccessful) {
+      this.testflowRepository.removeTestflow(testflow._id);
+      this.tabRepository.removeTab(testflow._id);
+      notifications.success(
+        `${testflow.name} testflow is removed from ${currentWorkspace.name}.`,
+      );
+    } else if (response.message === "Network Error") {
+      notifications.error(response.message);
+    } else {
+      notifications.error(
+        `Failed to remove ${testflow.name} testflow from ${currentWorkspace.name}.`,
+      );
+    }
+    return response;
   };
 
   /**
@@ -130,14 +210,46 @@ export class TestflowViewModel {
     testflow: TFRxDocumentType,
     newTestflowName: string,
   ): Promise<void> => {
-    this.testflowRepository.updateTestflow(testflow._id, {
-      name: newTestflowName,
+    const currentWorkspace = await this.workspaceRepository.readWorkspace(
+      testflow.workspaceId,
+    );
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
     });
-    const currentTab = await this.tabRepository.getTabById(testflow._id);
-    if (currentTab) {
-      await this.tabRepository.updateTab(currentTab?.tabId as string, {
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      this.testflowRepository.updateTestflow(testflow._id, {
         name: newTestflowName,
       });
+      const currentTab = await this.tabRepository.getTabById(testflow._id);
+      if (currentTab) {
+        await this.tabRepository.updateTab(currentTab?.tabId as string, {
+          name: newTestflowName,
+        });
+      }
+      return;
+    }
+    const response = await this.testflowService.updateTestflow(
+      currentWorkspace._id,
+      testflow._id,
+      {
+        name: newTestflowName,
+      },
+    );
+    if (response.isSuccessful) {
+      this.testflowRepository.updateTestflow(testflow._id, {
+        name: newTestflowName,
+      });
+      const currentTab = await this.tabRepository.getTabById(testflow._id);
+      if (currentTab) {
+        await this.tabRepository.updateTab(currentTab.tabId as string, {
+          name: newTestflowName,
+        });
+      }
+    } else if (response.message === "Network Error") {
+      notifications.error(response.message);
+    } else {
+      notifications.error("Failed to rename testflow");
     }
   };
 
@@ -160,6 +272,88 @@ export class TestflowViewModel {
       currentWorkspace._id,
     );
     initTestflowTab.updateName(_testflow.name);
+    initTestflowTab.setNodes(_testflow.nodes);
+    initTestflowTab.setEdges(_testflow.edges);
     this.tabRepository.createTab(initTestflowTab.getValue());
+  };
+
+  /**
+   * @description - refreshes testflow data with sync to mongo server
+   * @param workspaceId - workspace Id to which testflow belongs
+   * @returns
+   */
+  public refreshTestflow = async (workspaceId: string) => {
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      return;
+    }
+    const response = await this.testflowService.fetchAllTestflow(workspaceId);
+    if (response.isSuccessful && response.data.data) {
+      const testflows = response.data.data;
+      this.testflowRepository.refreshTestflow(testflows, workspaceId);
+    }
+    return;
+  };
+
+  /**
+   * @description - saves testflow to the mongo server
+   */
+  public saveTestflow = async (_tab: Tab) => {
+    const currentTestflow = _tab;
+    const activeWorkspace = await this.workspaceRepository.readWorkspace(
+      currentTestflow?.path?.workspaceId as string,
+    );
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      await this.testflowRepository.updateTestflow(
+        currentTestflow?.id as string,
+        {
+          name: currentTestflow.name,
+          nodes: currentTestflow?.property?.testflow?.nodes,
+          edges: currentTestflow?.property?.testflow?.edges,
+        },
+      );
+      notifications.success(
+        `Changes saved for ${currentTestflow.name} testflow.`,
+      );
+
+      return true;
+    }
+
+    const response = await this.testflowService.updateTestflow(
+      activeWorkspace._id,
+      currentTestflow?.id as string,
+      {
+        name: currentTestflow.name,
+        nodes: currentTestflow?.property?.testflow?.nodes,
+        edges: currentTestflow?.property?.testflow?.edges,
+      },
+    );
+    if (response.isSuccessful) {
+      this.testflowRepository.updateTestflow(
+        response.data.data._id,
+        response.data.data,
+      );
+
+      notifications.success(
+        `Changes saved for ${currentTestflow.name} testflow.`,
+      );
+      return true;
+    } else {
+      if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error(
+          `Failed to save changes for ${currentTestflow.name} testflow.`,
+        );
+      }
+      return false;
+    }
   };
 }
