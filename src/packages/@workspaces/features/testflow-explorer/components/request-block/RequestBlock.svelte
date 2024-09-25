@@ -118,9 +118,8 @@
   };
 
   onMount(() => {
-    // Subscribe to changes in the blocks store
+    // Subscribe to changes in the blocks
     dataBlocksSubscriber = data.blocks.subscribe((_nodes: Node) => {
-      // Update visibility of the "Add Block" button based on edge check
       _nodes.forEach((_node) => {
         if (_node.id === id) {
           setTimeout(() => {
@@ -129,7 +128,6 @@
           }, 10);
         }
       });
-      // });
     });
   });
   onDestroy(() => {
