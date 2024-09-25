@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Handle, Position } from "@xyflow/svelte";
+  import { Handle, Position, type Node } from "@xyflow/svelte";
   import { ArrowSolid, DropdownArrow } from "../../icons";
   import {
     ArrowRightIcon,
@@ -8,7 +8,7 @@
     ExclamationIcon,
     CheckIcon2,
   } from "@library/icons";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { ResponseStatusCode } from "$lib/utils/enums";
   import { InfoIcon } from "../../icons";
   import { VectorIcon } from "@library/icons";
@@ -17,18 +17,20 @@
   import type { Observable } from "rxjs";
   import { testFlowDataStore } from "@workspaces/features/testflow-explorer/store/testflow";
   import { ThreeDotIcon } from "$lib/assets/app.asset";
-  import { Dropdown, Modal, Tooltip } from "@library/ui";
   import { createDeepCopy } from "$lib/utils/helpers";
   import { ParseTime } from "@common/utils";
   import type {
     TFDataStoreType,
     TFNodeStoreType,
   } from "@common/types/workspace/testflow";
+  import type { Unsubscriber } from "svelte/store";
 
   /**
    * The data object containing various handlers and data stores.
    */
   export let data: {
+    blocks: any;
+    connector: any;
     onCheckEdges: (id: string) => boolean;
     name: string;
     method: string;
@@ -41,7 +43,7 @@
       method: string,
       folderId?: string,
     ) => void;
-    onOpenDeleteModal: () => void;
+    onOpenDeleteModal: (id: string) => void;
     tabId: string;
     collections: Observable<CollectionDocument[]>;
   };
@@ -108,9 +110,30 @@
       currentBlock = undefined;
     }
   });
+
+  let dataBlocksSubscriber: Unsubscriber;
+  let req = {
+    name: "",
+    method: "",
+  };
+
+  onMount(() => {
+    // Subscribe to changes in the blocks
+    dataBlocksSubscriber = data.blocks.subscribe((_nodes: Node) => {
+      _nodes.forEach((_node) => {
+        if (_node.id === id) {
+          setTimeout(() => {
+            req.name = _node?.data?.name;
+            req.method = _node?.data?.method;
+          }, 10);
+        }
+      });
+    });
+  });
   onDestroy(() => {
     // Clean up the subscription on component destruction
     testFlowDataStoreSubscriber();
+    dataBlocksSubscriber();
   });
 
   const parseTime = new ParseTime();
@@ -210,11 +233,11 @@
     <SelectApiRequest
       {updateNode}
       collectionData={data.collections}
-      name={data.name}
-      method={data.method}
+      name={req.name}
+      method={req.method}
     />
     {#if !currentBlock}
-      {#if data?.name?.length > 0 || isRunTextVisible}
+      {#if req.name?.length > 0}
         <div class="d-flex run-txt-container">
           <InfoIcon height="8px" width="8px" />
           <p style="font-size: 8px;">Run the block to get response</p>

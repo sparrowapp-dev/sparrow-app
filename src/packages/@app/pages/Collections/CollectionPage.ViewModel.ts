@@ -2136,11 +2136,13 @@ export default class CollectionsViewModel {
           folder.id,
           request.id,
         );
+        this.tabRepository.removeTab(request.id);
       } else {
         await this.collectionRepository.deleteRequestOrFolderInCollection(
           collection.id,
           request.id,
         );
+        this.tabRepository.removeTab(request.id);
       }
 
       return true;

@@ -187,7 +187,7 @@
               );
             }
             dbNodes[index].data.name = request?.name || "";
-            dbNodes[index].data.method = request?.request?.name || "";
+            dbNodes[index].data.method = request?.request?.method || "";
           }
         }
       }

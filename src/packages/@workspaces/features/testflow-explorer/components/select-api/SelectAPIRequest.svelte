@@ -91,22 +91,7 @@
 <div class="dropdown" bind:this={dropdownRef}>
   <!-- <p>Select API Request</p> -->
   <div on:click={() => (isOpen = !isOpen)} class="dropdown-header">
-    {#if selectedRequest}
-      <div class="d-flex selected-container">
-        <p class="method-container">
-          <span class="text-{getMethodStyle(selectedRequest?.request?.method)}">
-            <span
-              class={"request-icon"}
-              style="font-size: 10px; font-weight: 500;"
-              >{selectedRequest?.request?.method || ""}</span
-            >
-          </span>
-        </p>
-        <p style="font-size: 10px; margin-left: 10px;" class="ellipsis">
-          {selectedRequest?.name}
-        </p>
-      </div>
-    {:else if name || method}
+    {#if name || method}
       <div class="d-flex selected-container">
         <p class="method-container">
           <span class="text-{getMethodStyle(method)}">
