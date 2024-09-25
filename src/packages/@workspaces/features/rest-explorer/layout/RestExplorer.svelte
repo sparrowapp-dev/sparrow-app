@@ -66,6 +66,7 @@
     CreateCollection,
     SendingApiRequest,
   } from "@workspaces/common/constants";
+  import { ResponseStatusCode } from "$lib/utils/enums";
 
   export let tab: Observable<RequestTab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -354,7 +355,7 @@
                       </div>
                     {:else if !$tab.property.request?.response?.status}
                       <ResponseDefaultScreen />
-                    {:else if $tab.property.request?.response?.status === "Not Found"}
+                    {:else if $tab.property.request?.response?.status === ResponseStatusCode.ERROR}
                       <ResponseErrorScreen />
                     {:else if $tab.property.request?.response?.status}
                       <div class="h-100 d-flex flex-column">

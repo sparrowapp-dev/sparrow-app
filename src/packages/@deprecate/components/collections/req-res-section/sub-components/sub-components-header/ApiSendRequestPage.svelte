@@ -15,6 +15,7 @@
   import {
     RequestMethod,
     RequestProperty,
+    ResponseStatusCode,
   } from "$lib/utils/enums/request.enum";
   import type { RequestMethodType } from "$lib/utils/types/request.type";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
@@ -138,7 +139,7 @@
                 {
                   body: "",
                   headers: "",
-                  status: "Not Found",
+                  status: ResponseStatusCode.ERROR,
                   time: 0,
                   size: 0,
                 },
@@ -190,7 +191,7 @@
               {
                 body: "",
                 headers: "",
-                status: "Not Found",
+                status: ResponseStatusCode.ERROR,
                 time: 0,
                 size: 0,
               },

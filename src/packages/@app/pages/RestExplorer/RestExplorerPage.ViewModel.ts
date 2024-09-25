@@ -27,7 +27,12 @@ import { CollectionRepository } from "@app/repositories/collection.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { BehaviorSubject, Observable } from "rxjs";
-import { Events, ItemType, UntrackedItems } from "$lib/utils/enums";
+import {
+  Events,
+  ItemType,
+  ResponseStatusCode,
+  UntrackedItems,
+} from "$lib/utils/enums";
 import type { CreateDirectoryPostBody } from "$lib/utils/dto";
 
 // ---- Service
@@ -159,6 +164,7 @@ class RestExplorerViewModel
       setTimeout(() => {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
+        delete t.index;
         this.tab = t;
         this.authHeader = new ReduceAuthHeader(
           this._tab.getValue().property.request?.state,
@@ -671,7 +677,7 @@ class RestExplorerViewModel
           this.updateResponse({
             body: "",
             headers: [],
-            status: "Not Found",
+            status: ResponseStatusCode.ERROR,
             time: 0,
             size: 0,
           });
@@ -719,7 +725,7 @@ class RestExplorerViewModel
         this.updateResponse({
           body: "",
           headers: [],
-          status: "Not Found",
+          status: ResponseStatusCode.ERROR,
           time: 0,
           size: 0,
         });
@@ -1627,7 +1633,7 @@ class RestExplorerViewModel
           response.data.data._id,
         );
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = response.data.data.variable;
           envTab.isSaved = true;
@@ -1869,7 +1875,7 @@ class RestExplorerViewModel
       // Update the AI thread ID and conversation with the new data
       await this.updateRequestAIThread(data.threadId);
       await this.updateRequestAIConversation([
-        ...componentData?.property?.request?.ai?.conversations,
+        ...(componentData?.property?.request?.ai?.conversations || []),
         {
           message: "",
           messageId: data.messageId,
@@ -1883,7 +1889,7 @@ class RestExplorerViewModel
     } else {
       // Update the conversation with an error message
       this.updateRequestAIConversation([
-        ...componentData?.property?.request?.ai?.conversations,
+        ...(componentData?.property?.request?.ai?.conversations || []),
         {
           message: "Something went wrong! Please try again.",
           messageId: uuidv4(),
@@ -1973,7 +1979,7 @@ class RestExplorerViewModel
           });
           // Update the conversation with an error message
           this.updateRequestAIConversation([
-            ...componentData?.property?.request?.ai?.conversations,
+            ...(componentData?.property?.request?.ai?.conversations || []),
             {
               message: "Something went wrong! Please try again.",
               messageId: uuidv4(),

@@ -5,7 +5,8 @@ export enum TabTypeEnum {
   WORKSPACE = "WORKSPACE",
   WEB_SOCKET = "WEBSOCKET",
   PERSONAL = "PERSONAL",
-  ENVIRONMENT="ENVIRONMENT"
+  ENVIRONMENT = "ENVIRONMENT",
+  TESTFLOW = "TESTFLOW",
 }
 export interface WorkspaceIdWrapper {
   workspaceId: string;

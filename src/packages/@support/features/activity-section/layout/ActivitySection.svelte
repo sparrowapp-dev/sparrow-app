@@ -29,7 +29,8 @@
   } from "@support/common/types/activity";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import Loader from "@library/ui/loader/Loader.svelte";
-  import formatTimeAgo from "@support/common/utils/formatTimeAgo";
+  import { FormatTime } from "@common/utils/formatTime";
+  const formatTimeAgo = new FormatTime().formatTimeAgo;
   import ArrowOutward from "@library/icons/ArrowOutward.svelte";
 
   export let type = FeedbackType.ALL_CATEGORY;

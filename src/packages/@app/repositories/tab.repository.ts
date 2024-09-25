@@ -221,7 +221,7 @@ export class TabRepository {
 
   public getTabWithWorkspaceId = (
     workspaceId: string,
-  ): Observable<TabDocument> => {
+  ): Observable<TabDocument> | undefined => {
     return this.rxdb?.findOne({
       selector: {
         "path.workspaceId": workspaceId,
@@ -605,7 +605,7 @@ export class TabRepository {
         },
       })
       .exec();
-    await query.incrementalModify((value: Tab) => {
+    await query?.incrementalModify((value: Tab) => {
       return { ...value, ...tab };
     });
   };
@@ -621,7 +621,7 @@ export class TabRepository {
         },
       })
       .exec();
-    await query.incrementalModify((value: Tab) => {
+    await query?.incrementalModify((value: Tab) => {
       return { ...value, ...tab };
     });
   };

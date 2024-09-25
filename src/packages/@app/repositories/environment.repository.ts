@@ -47,20 +47,6 @@ export class EnvironmentRepository {
         },
       })
       .exec();
-    if (environment.isActive) {
-      const globalEnvironment = await RxDB.getInstance()
-        .rxdb.environment.findOne({
-          selector: {
-            type: "GLOBAL",
-          },
-        })
-        .exec();
-
-      globalEnvironment.incrementalModify((value) => {
-        value.isActive = true;
-        return value;
-      });
-    }
     environment.remove();
   };
 
