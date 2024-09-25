@@ -177,7 +177,7 @@
     onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
     onUpdateAiConversation={_viewModel.updateRequestAIConversation}
     onUpdateRequestState={_viewModel.updateRequestState}
-    onGenerateAiResponse={_viewModel.generateStreamAiResponse}
+    onGenerateAiResponse={_viewModel.generateAiResponse}
     onToggleLike={_viewModel.toggleChatMessageLike}
   />
 {/if}
