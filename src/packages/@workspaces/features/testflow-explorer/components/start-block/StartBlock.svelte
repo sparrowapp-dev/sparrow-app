@@ -6,6 +6,8 @@
   import { onDestroy, onMount } from "svelte";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { testFlowDataStore } from "../../store";
+  import type { TFDataStoreType } from "@common/types/workspace/testflow";
 
   /**
    * The data object containing various handlers and data stores.
@@ -15,6 +17,7 @@
     onClick: (id: string) => void;
     blocks: any;
     connector: any;
+    tabId: string;
   };
 
   /**
@@ -47,18 +50,33 @@
     });
   });
 
+  /**
+   * Testflow store subscriber to get current node status
+   */
+  let testflowStore: TFDataStoreType;
+  const testFlowDataStoreSubscriber = testFlowDataStore.subscribe((val) => {
+    if (val) {
+      testflowStore = val.get(data.tabId) as TFDataStoreType;
+    }
+  });
+
   // Lifecycle method - runs when the component is destroyed
   onDestroy(() => {
     // Unsubscribe from the blocks and connector stores to avoid memory leaks
     dataBlocksSubscriber();
     dataConnectorSubscriber();
+    testFlowDataStoreSubscriber();
   });
 </script>
 
 <div
+  style={testflowStore?.isTestFlowRunning
+    ? "pointer-events: none; opacity: 0.7;"
+    : ""}
   class="start-block position-relative"
   on:click={() => {
     MixpanelEvent(Events.Start_TestFlows);
+    data.onClick("0");
   }}
 >
   <span
@@ -74,7 +92,9 @@
           <ArrowIcon />
         </div>
         <span
-          on:click={() => {
+          on:click={(event) => {
+            event?.preventDefault();
+            event.stopPropagation();
             data.onClick(id);
           }}
         >
