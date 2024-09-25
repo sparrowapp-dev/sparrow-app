@@ -219,6 +219,8 @@
    * @param id - The ID of the node to be deleted.
    */
   const handleDeleteModal = (id: string) => {
+    if (!id) return;
+    if (id === "1") return;
     isDeleteNodeModalOpen = true;
     deletedNodeId = id;
     countNextDeletedNode(id);
@@ -228,8 +230,17 @@
    * Creates a new node and connects it to the existing node.
    * @param _id - The ID of the existing node.
    */
-  const createNewNode = (_id: string, _requestData = undefined) => {
+  const createNewNode = async (_id: string, _requestData = undefined) => {
     if (!_id) return;
+
+    // handles run from from start button click
+    if (_id === "0") {
+      await onClickRun();
+      selectedNodeId = "2";
+      MixpanelEvent(Events.Run_TestFlows);
+      return;
+    }
+
     if (checkIfEdgesExist(_id)) {
       return;
     }
