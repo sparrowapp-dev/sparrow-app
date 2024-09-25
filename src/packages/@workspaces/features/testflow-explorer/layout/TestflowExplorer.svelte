@@ -55,6 +55,7 @@
   } from "@common/types/workspace/testflow";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Debounce } from "@common/utils";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -211,6 +212,12 @@
 
   let deletedNodeId: string;
 
+  /**
+   * Opens the delete confirmation modal and sets the ID of the node to be deleted.
+   * Also triggers the count of the next node to be deleted.
+   *
+   * @param id - The ID of the node to be deleted.
+   */
   const handleDeleteModal = (id: string) => {
     isDeleteNodeModalOpen = true;
     deletedNodeId = id;
@@ -221,7 +228,7 @@
    * Creates a new node and connects it to the existing node.
    * @param _id - The ID of the existing node.
    */
-  const createNewNode = (_id: string) => {
+  const createNewNode = (_id: string, _requestData = undefined) => {
     if (!_id) return;
     if (checkIfEdgesExist(_id)) {
       return;
@@ -248,8 +255,8 @@
           data: {
             blocks: nodes,
             connector: edges,
-            onClick: function (_id: string) {
-              createNewNode(_id);
+            onClick: function (_id: string, _options = undefined) {
+              createNewNode(_id, _options);
             },
             onCheckEdges: function (_id: string) {
               return checkIfEdgesExist(_id);
@@ -274,6 +281,11 @@
             onOpenDeleteModal: function (id: string) {
               handleDeleteModal(id);
             },
+            name: _requestData ? _requestData?.name : "",
+            method: _requestData ? _requestData?.method : "",
+            collectionId: _requestData ? _requestData?.collectionId : "",
+            folderId: _requestData?.folderId ? _requestData?.folderId : "",
+            requestId: _requestData ? _requestData?.requestId : "",
             collections: filteredCollections,
             tabId: $tab.tabId,
           },
@@ -336,8 +348,8 @@
           data: {
             blocks: nodes,
             connector: edges,
-            onClick: function (_id: string) {
-              createNewNode(_id);
+            onClick: function (_id: string, _options = undefined) {
+              createNewNode(_id, _options);
             },
             onCheckEdges: function (_id: string) {
               return checkIfEdgesExist(_id);
@@ -484,6 +496,11 @@
 
   let isDeleteNodeModalOpen = false;
 
+  /**
+   * Handles the deletion of a node and its related edges by filtering
+   * the `nodes` and `edges` stores, and performs necessary cleanup actions.
+   * @param id - The ID of the node to delete.
+   */
   const handleDeleteNode = (id: string) => {
     nodes.update((_nodes) => {
       return _nodes.filter((node) => node.id < id);
@@ -501,13 +518,22 @@
 
   let deleteCount = 0; // Variable to store the count of nodes to be deleted
 
+  /**
+   *  Count nodes with an id greater than the one being deleted
+   * @param id - node id from which count starts
+   */
   const countNextDeletedNode = (id: string) => {
-    // Count nodes with an id greater than the one being deleted
     nodes.subscribe((_nodes) => {
       deleteCount = _nodes.filter((node) => node.id > id).length;
     });
   };
 
+  /**
+   * Handles key press events, preventing default behavior for "Backspace" and "Delete" keys.
+   * If "Delete" is pressed, it triggers the deletion modal for the selected node.
+   *
+   * @param event - The key press event object.
+   */
   const handleKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Backspace") {
       event.preventDefault();
@@ -517,6 +543,7 @@
       handleDeleteModal(selectedNodeId);
     }
   };
+
   // API response UI states
   let responseState: TFResponseStateType = {
     responseBodyLanguage: "",
@@ -548,20 +575,63 @@
     selectedNode = undefined;
   };
 
+  let divElement: HTMLElement;
+  /**
+   * Focuses the div element by calling its focus method.
+   */
+  const focusDiv = () => {
+    divElement.focus();
+  };
+
+  /**
+   * Handles the drag enter event and updates all nodes to set `parentDrag` to true.
+   */
+  const handleDragEnter = () => {
+    nodes.update((nodes) => {
+      return nodes.map((node, index, array) => ({
+        ...node,
+        data: {
+          ...node.data,
+          parentDrag: true,
+        },
+      }));
+    });
+  };
+
+  /**
+   * Handles the drag end event with a debounce of 1000 milliseconds
+   * and updates all nodes to set `parentDrag` to false.
+   */
+  const handleDragEnd = new Debounce().debounce(() => {
+    nodes.update((nodes) =>
+      nodes.map((node, index, array) => ({
+        ...node,
+        data: {
+          ...node.data,
+          parentDrag: false,
+        },
+      })),
+    );
+  }, 1000);
+
+  /**
+   * Cleanup function to be called when the component is destroyed.
+   * Unsubscribes from `collectionsSubscriber` and invokes the cleanup
+   * functions for `nodesSubscriber` and `edgesSubscriber`.
+   */
   onDestroy(() => {
     collectionsSubscriber.unsubscribe();
     nodesSubscriber();
     edgesSubscriber();
   });
-
-  let divElement;
-
-  function focusDiv() {
-    divElement.focus();
-  }
 </script>
 
-<div class="h-100 d-flex flex-column position-relative">
+<div
+  class="h-100 d-flex flex-column position-relative"
+  on:dragenter={handleDragEnter}
+  on:dragleave={handleDragEnd}
+  on:drop={handleDragEnd}
+>
   <div
     class="d-flex justify-content-between position-absolute p-3"
     style="top:0; width: 100%;
