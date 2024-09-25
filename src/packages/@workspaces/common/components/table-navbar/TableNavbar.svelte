@@ -32,9 +32,11 @@
     >
       {selectedNode?.request?.name}
     </p>
-    <div
-      style="height: 12px; width:1px; background-color:var(--bg-secondary-270); border:1px solid #D7D7D7 "
-    ></div>
+    {#if selectedNode?.request?.property?.request?.url}
+      <div
+        style="height: 12px; width:1px; background-color:var(--bg-secondary-270); border:1px solid #D7D7D7 "
+      ></div>
+    {/if}
     <p
       class="text-fs-12 mb-0 pb-0 ellipsis"
       style="color:var(--text-secondary-270); font-weight:400;"
