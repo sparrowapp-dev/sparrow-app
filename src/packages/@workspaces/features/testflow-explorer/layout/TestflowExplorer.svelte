@@ -211,6 +211,7 @@
   });
 
   let deletedNodeId: string;
+  let deleteNodeName: string = "";
 
   /**
    * Opens the delete confirmation modal and sets the ID of the node to be deleted.
@@ -223,6 +224,8 @@
     if (id === "1") return;
     isDeleteNodeModalOpen = true;
     deletedNodeId = id;
+    let filteredNodes = $nodes.filter((node) => node.id === id);
+    deleteNodeName = filteredNodes[0]?.data?.name;
     countNextDeletedNode(id);
   };
 
@@ -235,6 +238,7 @@
 
     // handles run from from start button click
     if (_id === "0") {
+      unselectNodes();
       await onClickRun();
       selectedNodeId = "2";
       MixpanelEvent(Events.Run_TestFlows);
@@ -643,16 +647,16 @@
   on:dragleave={handleDragEnd}
   on:drop={handleDragEnd}
 >
+  <div class="p-3" style="position:absolute; z-index:100; top:0;">
+    <!-- INSERT NAME COMPONENT HERE -->
+    <TestFlowName {onUpdateTestFlowName} testFlowName={$tab?.name} />
+  </div>
   <div
     class="d-flex justify-content-between position-absolute p-3"
-    style="top:0; width: 100%;
+    style="top:0; ;
   right:0;
   z-index:100;"
   >
-    <div>
-      <!-- INSERT NAME COMPONENT HERE -->
-      <TestFlowName {onUpdateTestFlowName} testFlowName={$tab?.name} />
-    </div>
     <div class="d-flex">
       {#if testflowStore?.isTestFlowRunning}
         <div class="d-flex testing-text-container">
@@ -673,6 +677,7 @@
             disable={testflowStore?.isTestFlowRunning}
             iconColor={"var(--icon-secondary-100)"}
             onClick={async () => {
+              unselectNodes();
               await onClickRun();
               selectedNodeId = "2";
               MixpanelEvent(Events.Run_TestFlows);
@@ -868,7 +873,7 @@
 >
   <DeleteNode
     {deletedNodeId}
-    {selectedNodeName}
+    {deleteNodeName}
     {handleDeleteNode}
     {deleteCount}
     handleModalState={(flag = false) => {

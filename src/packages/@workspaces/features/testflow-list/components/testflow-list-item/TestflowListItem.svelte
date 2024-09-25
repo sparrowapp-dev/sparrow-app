@@ -146,7 +146,7 @@
 </script>
 
 <ModalWrapperV1
-  title={`Delete ${TFDefaultEnum.NAME}?`}
+  title={`Delete Flow?`}
   type={"danger"}
   width={"35%"}
   zIndex={1000}
@@ -155,9 +155,9 @@
 >
   <div class="text-lightGray mb-1 sparrow-fs-14">
     <p style="font-weight: 400;" class="text-fs-14">
-      Are you sure you want to delete this {TFDefaultEnum.FULL_NAME}?
+      Are you sure you want to delete this Flow?
       <span style="font-weight:700;" class="">"{flow.name}"</span>
-      and all its variables will be removed and cannot be restored.
+      and all its blocks will be removed and cannot be restored.
     </p>
   </div>
 
