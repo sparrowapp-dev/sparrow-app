@@ -14,7 +14,7 @@
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
 
-    let deleteNodeResponse = _viewModel.deleteNodesLessThanId;
+  let deleteNodeResponse = _viewModel.deleteNodesLessThanId;
 
   let render = false;
   const sub = _viewModel.tab.subscribe((val) => {
@@ -36,17 +36,14 @@
     }
   });
 
-  let isTestflowEditable = false;
+  let isTestflowEditable = true;
   const activeWorkspaceSubscriber = _viewModel.activeWorkspace.subscribe(
     (_workspace) => {
       const workspaceDoc = _workspace?.toMutableJSON();
       if (workspaceDoc) {
         workspaceDoc.users?.forEach((_user) => {
           if (_user.id === userId) {
-            if (
-              _user.role === WorkspaceRole.WORKSPACE_ADMIN ||
-              _user.role === WorkspaceRole.WORKSPACE_EDITOR
-            ) {
+            if (_user.role !== WorkspaceRole.WORKSPACE_VIEWER) {
               isTestflowEditable = true;
             } else {
               isTestflowEditable = false;
@@ -63,7 +60,7 @@
   });
 
   const renameWithTestFlowList = new Debounce().debounce(
-    _viewModel.updateNameWithTestFlowList,
+    _viewModel.updateNameWithTestFlowList as any,
     1000,
   );
 

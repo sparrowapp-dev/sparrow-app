@@ -187,7 +187,7 @@
               );
             }
             dbNodes[index].data.name = request?.name || "";
-            dbNodes[index].data.method = request?.request?.name || "";
+            dbNodes[index].data.method = request?.request?.method || "";
           }
         }
       }
@@ -587,6 +587,7 @@
             iconColor={"var(--icon-secondary-100)"}
             onClick={async () => {
               await onClickRun();
+              selectedNodeId = "2";
               MixpanelEvent(Events.Run_TestFlows);
             }}
           />
