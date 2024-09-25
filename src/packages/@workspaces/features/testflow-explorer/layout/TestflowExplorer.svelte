@@ -647,7 +647,7 @@
   on:dragleave={handleDragEnd}
   on:drop={handleDragEnd}
 >
-  <div class="p-3" style="position:absolute; z-index:100; top:0;">
+  <div class="p-3" style="position:absolute; z-index:3; top:0;">
     <!-- INSERT NAME COMPONENT HERE -->
     <TestFlowName {onUpdateTestFlowName} testFlowName={$tab?.name} />
   </div>
@@ -655,7 +655,7 @@
     class="d-flex justify-content-between position-absolute p-3"
     style="top:0; ;
   right:0;
-  z-index:100;"
+  z-index:3;"
   >
     <div class="d-flex">
       {#if testflowStore?.isTestFlowRunning}
