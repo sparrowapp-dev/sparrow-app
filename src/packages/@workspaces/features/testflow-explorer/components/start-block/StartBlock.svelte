@@ -70,7 +70,7 @@
 </script>
 
 <div
-  style={testflowStore.isTestFlowRunning
+  style={testflowStore?.isTestFlowRunning
     ? "pointer-events: none; opacity: 0.7;"
     : ""}
   class="start-block position-relative"
