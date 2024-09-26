@@ -624,6 +624,11 @@
             isTextArea = false;
             isDescriptionEmpty = false;
             isSubjectEmpty = false;
+            uploadFeedback = {
+              file: {
+                value: [],
+              },
+            };
           }}
         />
         <Button
