@@ -4,7 +4,7 @@
   export let handleModalState;
   export let deletedNodeId;
   export let handleDeleteNode;
-  export let selectedNodeName;
+  export let deleteNodeName;
   export let deleteCount;
 
   let isDeletingNode = false;
@@ -23,15 +23,19 @@
       class="mb-3"
       style="font-weight: 500 ; color:var(--text-secondary-100);"
     >
-      Delete <span>{selectedNodeName || ""}</span> block?
+      Delete block?
     </div>
     <!-- Prompt message for the user to confirm leaving the team -->
     <p class="text-fs-14" style="color: var(--text-secondary-1000);">
-      Are you sure you want to delete this block? Deleting
-      <span style="font-weight: 700;">
-        {selectedNodeName ? `"${selectedNodeName}"` : "this"}
-      </span>
-      will also remove its {deleteCount} connected blocks.
+      Are you sure you want to delete this block?
+
+      {#if deleteCount > 0}
+        Deleting
+        <span style="font-weight: 700;">
+          {deleteNodeName ? `"${deleteNodeName}"` : "this"}
+        </span>
+        will also remove its {deleteCount} connected blocks.
+      {/if}
     </p>
   </div>
 
