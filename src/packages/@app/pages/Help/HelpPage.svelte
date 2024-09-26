@@ -240,6 +240,7 @@
               <FeedbackSection
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
+                onUpdateFeedback={_viewModel.updatePost}
                 fetchPosts={_viewModel.getListOfPOsts}
                 onRetrievePost={_viewModel.retrievePostData}
                 onAddComment={_viewModel.addComment}

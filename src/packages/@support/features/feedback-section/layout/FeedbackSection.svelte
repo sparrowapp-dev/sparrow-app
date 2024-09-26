@@ -78,6 +78,8 @@
    */
   export let getColor;
 
+  export let onUpdateFeedback;
+
   let feedbackType = "";
 
   let feedbackStatusType = "";
@@ -489,6 +491,7 @@
       {onAddComment}
       {fetchComments}
       {handleUpvote}
+      {onUpdateFeedback}
       {getColor}
     />
   {/if}
