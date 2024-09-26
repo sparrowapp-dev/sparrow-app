@@ -119,7 +119,6 @@
     currentSort = sortType;
     isLoading = true;
     posts = await fetchPosts(sortType, searchQuery, status);
-    console.log("This is posts", posts);
     isLoading = false;
   };
 

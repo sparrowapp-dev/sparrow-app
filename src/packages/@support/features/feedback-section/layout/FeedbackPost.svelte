@@ -60,11 +60,11 @@
 
   function nestComments(comments) {
     const commentMap = {};
-    comments.forEach((comment) => {
+    comments?.forEach((comment) => {
       comment.replies = [];
       commentMap[comment.id] = comment;
     });
-    comments.forEach((comment) => {
+    comments?.forEach((comment) => {
       if (comment.parentID) {
         const parentComment = commentMap[comment.parentID];
         if (parentComment) {
@@ -89,8 +89,8 @@
     isAuthor = userInfo?.email === post?.author?.email;
     feedbackDescription = post?.details;
     feedbackSubject = post?.title;
-    type = post.category.name;
-    imageURLsArray = post.imageURLs.map((url) => url);
+    type = post?.category?.name;
+    imageURLsArray = post?.imageURLs?.map((url) => url);
     tempImageURLsArray = [...imageURLsArray];
     originalFeedbackDescription = feedbackDescription;
     originalFeedbackSubject = feedbackSubject;
@@ -199,7 +199,9 @@
       const files = Array.from(uploadFeedback.file.value).filter(
         (_, i) => i !== index,
       );
-      uploadFeedback.file.value = files;
+      if (uploadFeedback?.file) {
+        uploadFeedback.file.value = files;
+      }
     }
   };
 </script>
@@ -238,7 +240,7 @@
               .fontColor}; padding-bottom: 14px; border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
           >
             {post?.status
-              ? post.status.charAt(0).toUpperCase() + post.status.slice(1)
+              ? post?.status.charAt(0).toUpperCase() + post?.status.slice(1)
               : ""}
           </span>
         </div>
@@ -249,14 +251,14 @@
           >
             <div style="display: flex; align-items: center; gap: 12px;">
               <IconFallback
-                character={post.author?.name?.charAt(0)}
+                character={post?.author?.name?.charAt(0)}
                 width="34px"
                 height="32px"
                 backgroundColor="var(--bg-tertiary-750)"
                 borderColor="var(--border-secondary-300)"
               />
               <div style="font-size: 14px; font-weight: 500;">
-                {post.author?.name}
+                {post?.author?.name}
               </div>
             </div>
             <div
@@ -547,9 +549,9 @@
         </div>
       </div>
     </div>
-    <div class="d-flex gap-1  overflow-scroll file-scroller">
+    <div class="d-flex gap-1 overflow-scroll file-scroller">
       {#if tempImageURLsArray.length > 0}
-        <div class="file-scroller mb-2 d-flex gap-1 ">
+        <div class="file-scroller mb-2 d-flex gap-1">
           {#each tempImageURLsArray as file, index}
             <div
               class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
@@ -562,7 +564,7 @@
                 />
               </span>
               <span class="mb-0 text-fs-12 px-2 ellipsis"
-                >{file?.name || file.slice(-10)}</span
+                >{file?.name || file?.slice(-10)}</span
               >
               <span
                 on:click={() => {
@@ -580,7 +582,7 @@
       {/if}
       {#if uploadFeedback?.file?.value?.length > 0}
         <div class="file-scroller mb-2 d-flex gap-1">
-          {#each uploadFeedback.file.value as file, index}
+          {#each uploadFeedback?.file?.value as file, index}
             <div
               class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
             >
@@ -592,7 +594,7 @@
                 />
               </span>
               <span class="mb-0 text-fs-12 px-2 ellipsis"
-                >{file?.name || file.slice(-10)}</span
+                >{file?.name || file?.slice(-10)}</span
               >
               <span
                 on:click={() => {
