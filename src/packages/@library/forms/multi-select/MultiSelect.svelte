@@ -140,7 +140,7 @@
         {#if !countCheckedList(list)}
           <span class="text-fs-12 text-secondary-200"> Select</span>
         {:else}
-          <div class="me-4 navigator">
+          <div class="me-4 navigator ">
             {#each list as element}
               {#if element.checked}
                 <span class="header-item text-fs-12 py-2 ps-2 pe-0 rounded me-2"
@@ -176,7 +176,7 @@
 
     {#if isOpen}
       <div
-        class="d-none dropdown-data p-1 rounded"
+        class="d-none dropdown-data p-1 rounded select-data"
         class:dropdown-active={isOpen}
         transition:slide={{ duration: 100 }}
       >
@@ -360,5 +360,14 @@
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
+  }
+
+  .select-data {
+    color: white;
+    border: 1px solid rgb(44, 44, 44);
+    transition: 0.3s ease;
+    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
   }
 </style>
