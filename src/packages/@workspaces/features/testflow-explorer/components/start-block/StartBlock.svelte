@@ -93,7 +93,7 @@
         on:drop={(e) => {
           e.preventDefault();
           const requestEvent = JSON.parse(e.dataTransfer.getData("text/plain"));
-          if (!data) return;
+          if (!requestEvent) return;
           const requestData = {
             requestId: requestEvent.requestId,
             folderId: requestEvent.folderId,
