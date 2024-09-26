@@ -337,7 +337,8 @@
                 <ul>
                   {#each filteredPosts as post}
                     <div
-                      style="display: flex; flex-direction: column; background-color: #151515; padding: 20px;  border-radius:2px;"
+                    class="mb-4"
+                      style=" display: flex; flex-direction: column; background-color: #151515; padding: 20px;  border-radius:2px;"
                     >
                       <div
                         style="display: flex; justify-content: space-between; align-items: flex-start;"
@@ -438,13 +439,13 @@
                       />
                       <div class="comment-content">
                         <div
-                          class="mt-2"
+                          class="mt-1"
                           style="display: flex; justify-content: space-between; align-items: start;"
                         >
                           <div class="w-100">
                             <div
-                              class="d-flex justify-content-between mb-2"
-                              style=" font-weight: 500; margin-bottom: 4px;"
+                              class="d-flex justify-content-between"
+                              style=" font-weight: 500; "
                             >
                               <p>{comment.author.name}</p>
                               <div style="">

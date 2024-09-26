@@ -117,7 +117,6 @@ export class CannyIoService {
 
   // creates a new post in the board
   public updatePost = async (body: object) => {
-    debugger;
     const response = await makeHttpRequestV2(
       `${this.apiUrl}/posts/update`,
       "POST",

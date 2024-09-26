@@ -1,7 +1,6 @@
 <script lang="ts">
   import { TriangleIcon } from "@library/icons";
 
-
   export let upvote: number;
   export let postID: string;
   export let likePost: (postId: string) => void;
@@ -16,7 +15,7 @@
       likePost(postID);
       upvote++;
     }
-    isPostLiked = !isPostLiked; 
+    isPostLiked = !isPostLiked;
   };
 </script>
 
@@ -46,10 +45,10 @@
     margin-left: 10px;
   }
 
-  .upvote-container:hover {
+  /* .upvote-container:hover {
     opacity: 70%;
     background-color: #232F3D;
-  }
+  } */
 
   .upvoted {
     border: 0.3px solid var(--border-primary-300);
