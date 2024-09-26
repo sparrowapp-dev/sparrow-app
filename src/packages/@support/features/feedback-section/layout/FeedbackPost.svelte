@@ -55,7 +55,7 @@
   let imageURLsArray = [];
   let tempImageURLsArray = [];
 
-  let originalFeedbackDescription = ""; 
+  let originalFeedbackDescription = "";
   let originalFeedbackSubject = "";
 
   function nestComments(comments) {
@@ -153,6 +153,7 @@
       return;
     }
     let isErrorThrown = false;
+
     const selectedFiles = targetFile.filter((file) => {
       let fileType = "mp4";
       if (file.name) {
@@ -176,10 +177,13 @@
         return false;
       }
     });
-    if (selectedFiles.length > 5) {
-      selectedFiles.length = 5;
+
+    let totalImagesCount = selectedFiles.length + tempImageURLsArray.length;
+    if (totalImagesCount > 5) {
+      selectedFiles.length = 5 - tempImageURLsArray.length;
       isErrorThrown = true;
     }
+
     if (isErrorThrown) {
       notifications.error(errorMessage);
     }
@@ -299,6 +303,7 @@
                 {#if isAuthor}
                   <span class="px-2">|</span>
                   <span
+                    role="button"
                     on:click={() => {
                       isEditingPost = !isEditingPost;
                     }}
@@ -542,66 +547,68 @@
         </div>
       </div>
     </div>
-    {#if tempImageURLsArray.length > 0}
-      <div class="file-scroller mb-2 d-flex gap-1 overflow-auto">
-        {#each tempImageURLsArray as file, index}
-          <div
-            class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
-          >
-            <span>
-              <AttachmentIcon
-                height={"12px"}
-                width={"12px"}
-                color={"var(--text-secondary-200)"}
-              />
-            </span>
-            <span class="mb-0 text-fs-12 px-2 ellipsis"
-              >{file?.name || file.slice(-10)}</span
+    <div>
+      {#if tempImageURLsArray.length > 0}
+        <div class="file-scroller mb-2 d-flex gap-1 overflow-auto">
+          {#each tempImageURLsArray as file, index}
+            <div
+              class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
             >
-            <span
-              on:click={() => {
-                removeFile(index, true);
-              }}
-              ><CrossIcon
-                height={"12px"}
-                width={"9px"}
-                color={"var(--text-secondary-200)"}
-              /></span
+              <span>
+                <AttachmentIcon
+                  height={"12px"}
+                  width={"12px"}
+                  color={"var(--text-secondary-200)"}
+                />
+              </span>
+              <span class="mb-0 text-fs-12 px-2 ellipsis"
+                >{file?.name || file.slice(-10)}</span
+              >
+              <span
+                on:click={() => {
+                  removeFile(index, true);
+                }}
+                ><CrossIcon
+                  height={"12px"}
+                  width={"9px"}
+                  color={"var(--text-secondary-200)"}
+                /></span
+              >
+            </div>
+          {/each}
+        </div>
+      {/if}
+      {#if uploadFeedback?.file?.value?.length > 0}
+        <div class="file-scroller mb-2 d-flex gap-1 overflow-auto">
+          {#each uploadFeedback.file.value as file, index}
+            <div
+              class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
             >
-          </div>
-        {/each}
-      </div>
-    {/if}
-    {#if uploadFeedback?.file?.value?.length > 0}
-      <div class="file-scroller mb-2 d-flex gap-1 overflow-auto">
-        {#each uploadFeedback.file.value as file, index}
-          <div
-            class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
-          >
-            <span>
-              <AttachmentIcon
-                height={"12px"}
-                width={"12px"}
-                color={"var(--text-secondary-200)"}
-              />
-            </span>
-            <span class="mb-0 text-fs-12 px-2 ellipsis"
-              >{file?.name || file.slice(-10)}</span
-            >
-            <span
-              on:click={() => {
-                removeFile(index);
-              }}
-              ><CrossIcon
-                height={"12px"}
-                width={"9px"}
-                color={"var(--text-secondary-200)"}
-              /></span
-            >
-          </div>
-        {/each}
-      </div>
-    {/if}
+              <span>
+                <AttachmentIcon
+                  height={"12px"}
+                  width={"12px"}
+                  color={"var(--text-secondary-200)"}
+                />
+              </span>
+              <span class="mb-0 text-fs-12 px-2 ellipsis"
+                >{file?.name || file.slice(-10)}</span
+              >
+              <span
+                on:click={() => {
+                  removeFile(index);
+                }}
+                ><CrossIcon
+                  height={"12px"}
+                  width={"9px"}
+                  color={"var(--text-secondary-200)"}
+                /></span
+              >
+            </div>
+          {/each}
+        </div>
+      {/if}
+    </div>
     <div class="d-flex align-items-center justify-content-end">
       <div class="d-flex">
         <Button
@@ -614,9 +621,9 @@
             tempImageURLsArray = [...imageURLsArray];
             feedbackDescription = originalFeedbackDescription;
             feedbackSubject = originalFeedbackSubject; // Restore original values
-            isTextArea=false;
-            isDescriptionEmpty=false
-            isSubjectEmpty =false;
+            isTextArea = false;
+            isDescriptionEmpty = false;
+            isSubjectEmpty = false;
           }}
         />
         <Button
@@ -709,5 +716,9 @@
     color: var(--error--color);
     font-size: 12px;
     margin-bottom: 20px;
+  }
+
+  .file-scroller::-webkit-scrollbar {
+    display: none;
   }
 </style>
