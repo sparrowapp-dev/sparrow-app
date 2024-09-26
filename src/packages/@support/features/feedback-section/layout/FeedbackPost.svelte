@@ -60,11 +60,11 @@
 
   function nestComments(comments) {
     const commentMap = {};
-    comments.forEach((comment) => {
+    comments?.forEach((comment) => {
       comment.replies = [];
-      commentMap[comment?.id] = comment;
+      commentMap[comment.id] = comment;
     });
-    comments.forEach((comment) => {
+    comments?.forEach((comment) => {
       if (comment.parentID) {
         const parentComment = commentMap[comment.parentID];
         if (parentComment) {
@@ -90,7 +90,7 @@
     feedbackDescription = post?.details;
     feedbackSubject = post?.title;
     type = post?.category?.name;
-    imageURLsArray = post?.imageURLs.map((url) => url);
+    imageURLsArray = post?.imageURLs?.map((url) => url);
     tempImageURLsArray = [...imageURLsArray];
     originalFeedbackDescription = feedbackDescription;
     originalFeedbackSubject = feedbackSubject;
@@ -199,7 +199,7 @@
       const files = Array.from(uploadFeedback.file.value).filter(
         (_, i) => i !== index,
       );
-      if (uploadFeedback?.file?.value) {
+      if (uploadFeedback?.file) {
         uploadFeedback.file.value = files;
       }
     }
