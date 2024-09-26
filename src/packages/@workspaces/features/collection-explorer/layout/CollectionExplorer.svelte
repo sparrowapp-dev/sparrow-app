@@ -189,9 +189,9 @@
             disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
               tab?.activeSync}
             on:blur={(event) => {
-              const newValue = event?.target?.value;
+              const newValue = event?.target?.value?.trim();
               const previousValue = tab.name;
-              if (event.target.value === "") {
+              if (newValue === "") {
                 resetInputField();
               } else if (newValue !== previousValue) {
                 onRename(collection, newValue);
