@@ -288,7 +288,7 @@ class HelpPageViewModel {
   };
 
   
-  public updatePostFinal = async (
+  public updatePost = async (
     postID: string,
     title: string,
     description: string,

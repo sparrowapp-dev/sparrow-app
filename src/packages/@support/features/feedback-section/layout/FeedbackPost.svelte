@@ -45,6 +45,7 @@
     },
   };
   let isLoading = false;
+  let isSaving = false;
   let isImageOpen = false;
   let isCommenting = false;
   let isExposeFeedbackForm = false;
@@ -53,6 +54,9 @@
   let isEditingPost = false;
   let imageURLsArray = [];
   let tempImageURLsArray = [];
+
+  let originalFeedbackDescription = ""; 
+  let originalFeedbackSubject = "";
 
   function nestComments(comments) {
     const commentMap = {};
@@ -88,6 +92,8 @@
     type = post.category.name;
     imageURLsArray = post.imageURLs.map((url) => url);
     tempImageURLsArray = [...imageURLsArray];
+    originalFeedbackDescription = feedbackDescription;
+    originalFeedbackSubject = feedbackSubject;
   };
 
   onMount(async () => {
@@ -303,7 +309,6 @@
                       : 'none'};"
                     class="px-2"
                     on:click={() => {
-                      console.log("This is post befor eon clk", post);
                       isExposeFeedbackForm = true;
                     }}>Edit post</span
                   >
@@ -437,201 +442,224 @@
   isOpen={isExposeFeedbackForm}
   handleModalState={(flag = false) => {
     isExposeFeedbackForm = flag;
+    isEditingPost = false;
   }}
 >
-  <div class="pt-2"></div>
+  <div>
+    <div class="pt-2"></div>
 
-  <div style="">
-    <p class="text-fs-14 mb-0 text-secondary-150">Description</p>
-    <p class="text-fs-12 text-secondary-200 mb-0">
-      {feedbackDescription.length} / 200
-    </p>
+    <div style="">
+      <p class="text-fs-14 mb-0 text-secondary-150">Description</p>
+      <p class="text-fs-12 text-secondary-200 mb-0">
+        {feedbackDescription.length} / 200
+      </p>
 
-    <div
-      class="p-2 bg-tertiary-300
-         mb-3"
-      style="height: 137px; border-radius: 4px; color:var(--text-tertiary-100); "
-    >
-      <Input
-        on:input={() => {
-          // if (feedbackSubject.length > 0) {
-          //   isSubjectEmpty = false;
-          //   isTextArea = false;
-          // }
-        }}
-        id="feedback-subject"
-        width={"100%"}
-        type="text"
-        isEditIconRequired={false}
-        bind:value={feedbackSubject}
-        defaultBorderColor="transparent"
-        hoveredBorderColor="transparent"
-        focusedBorderColor={"transparent"}
-        class="text-fs-20 bg-transparent ellipsis fw-normal px-2"
-        style="outline:none;"
-        disabled={false}
-        placeholder="Subject"
-        maxlength={200}
-      />
-      <hr style="margin:0px; padding-bottom:8px;" />
-      <Textarea
-        width={"100%"}
-        on:input={() => {
-          // if (feedbackDescription.length > 0) {
-          //   isDescriptionEmpty = false;
-          //   isTextArea = false;
-          // }
-        }}
-        id="feedback-description"
-        height={"90px"}
-        bind:value={feedbackDescription}
-        defaultBorderColor="transparent"
-        hoveredBorderColor="transparent"
-        focusedBorderColor={"transparent"}
-        class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
-        style="outline:none;
+      <div
+        class="p-2 bg-tertiary-300 {isDescriptionEmpty ||
+        isSubjectEmpty ||
+        isTextArea
+          ? 'empty-data-error mb-0'
+          : 'mb-3'}"
+        style="height: 137px; border-radius: 4px; color:#676A80; "
+      >
+        <Input
+          on:input={() => {
+            if (feedbackSubject.length > 0) {
+              isSubjectEmpty = false;
+              isTextArea = false;
+            }
+          }}
+          id="feedback-subject"
+          width={"100%"}
+          type="text"
+          isEditIconRequired={false}
+          bind:value={feedbackSubject}
+          defaultBorderColor="transparent"
+          hoveredBorderColor="transparent"
+          focusedBorderColor={"transparent"}
+          class="text-fs-20 bg-transparent ellipsis fw-normal px-2"
+          style="outline:none;"
+          disabled={false}
+          placeholder="Subject"
+          maxlength={200}
+        />
+        <hr style="margin:0px; padding-bottom:8px;" />
+        <Textarea
+          width={"100%"}
+          on:input={() => {
+            if (feedbackDescription.length > 0) {
+              isDescriptionEmpty = false;
+              isTextArea = false;
+            }
+          }}
+          id="feedback-description"
+          height={"90px"}
+          bind:value={feedbackDescription}
+          defaultBorderColor="transparent"
+          hoveredBorderColor="transparent"
+          focusedBorderColor={"transparent"}
+          class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
+          style="outline:none;
        "
-        disabled={false}
-        placeholder="Add short description"
-        maxlength={200}
-      />
-    </div>
+          disabled={false}
+          placeholder="Add short description"
+          maxlength={200}
+        />
+      </div>
 
-    <div class="drop-box mb-2" style="">
-      <Drop
-        styleProp={""}
-        maxFileSize={2048}
-        onChange={handleLogoInputChange}
-        labelDescription="Choose an image or drag and drop it here."
-        inputId="upload--feedback-file-input"
-        inputPlaceholder="Drag and Drop or"
-        supportedFileTypes={[".png", ".jpg", ".jpeg", ".svg"]}
-        height={"80px"}
-        infoMessage={"Images: SVG, PNG, JPG, JPEG <br/> (limit 2MB each)<br/> No video files, only images <br/> are accepted"}
-      />
-      <div class="d-flex justify-content-between">
-        <div></div>
-        <div>
-          <span class="text-fs-12 text-tertiary-100">
-            {(uploadFeedback.file.value.length || 0) +
-              (imageURLsArray.length || 0)}/5
-          </span>
+      {#if isSubjectEmpty}
+        <p class="error-message">Enter a relevant subject for feedback.</p>
+      {/if}
+      {#if isDescriptionEmpty}
+        <p class="error-message">Enter a relevant description for feedback.</p>
+      {/if}
+      {#if isTextArea}
+        <p class="error-message">
+          Please enter subject and description for adding a feedback.
+        </p>
+      {/if}
+
+      <div class="drop-box mb-2" style="">
+        <Drop
+          styleProp={""}
+          maxFileSize={2048}
+          onChange={handleLogoInputChange}
+          labelDescription="Choose an image or drag and drop it here."
+          inputId="upload--feedback-file-input"
+          inputPlaceholder="Drag and Drop or"
+          supportedFileTypes={[".png", ".jpg", ".jpeg", ".svg"]}
+          height={"80px"}
+          infoMessage={"Images: SVG, PNG, JPG, JPEG <br/> (limit 2MB each)<br/> No video files, only images <br/> are accepted"}
+        />
+        <div class="d-flex justify-content-between">
+          <div></div>
+          <div>
+            <span class="text-fs-12 text-tertiary-100">
+              {(uploadFeedback.file.value.length || 0) +
+                (tempImageURLsArray.length || 0)}/5
+            </span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  {#if tempImageURLsArray.length > 0}
-    <div class="file-scroller mb-2 d-flex gap-1 overflow-auto">
-      {#each tempImageURLsArray as file, index}
-        <div
-          class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
-        >
-          <span>
-            <AttachmentIcon
-              height={"12px"}
-              width={"12px"}
-              color={"var(--text-secondary-200)"}
-            />
-          </span>
-          <span class="mb-0 text-fs-12 px-2 ellipsis"
-            >{file?.name || file.slice(-10)}</span
+    {#if tempImageURLsArray.length > 0}
+      <div class="file-scroller mb-2 d-flex gap-1 overflow-auto">
+        {#each tempImageURLsArray as file, index}
+          <div
+            class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
           >
-          <span
-            on:click={() => {
-              removeFile(index, true);
-            }}
-            ><CrossIcon
-              height={"12px"}
-              width={"9px"}
-              color={"var(--text-secondary-200)"}
-            /></span
+            <span>
+              <AttachmentIcon
+                height={"12px"}
+                width={"12px"}
+                color={"var(--text-secondary-200)"}
+              />
+            </span>
+            <span class="mb-0 text-fs-12 px-2 ellipsis"
+              >{file?.name || file.slice(-10)}</span
+            >
+            <span
+              on:click={() => {
+                removeFile(index, true);
+              }}
+              ><CrossIcon
+                height={"12px"}
+                width={"9px"}
+                color={"var(--text-secondary-200)"}
+              /></span
+            >
+          </div>
+        {/each}
+      </div>
+    {/if}
+    {#if uploadFeedback?.file?.value?.length > 0}
+      <div class="file-scroller mb-2 d-flex gap-1 overflow-auto">
+        {#each uploadFeedback.file.value as file, index}
+          <div
+            class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
           >
-        </div>
-      {/each}
-    </div>
-  {/if}
-  {#if uploadFeedback?.file?.value?.length > 0}
-    <div class="file-scroller mb-2 d-flex gap-1 overflow-auto">
-      {#each uploadFeedback.file.value as file, index}
-        <div
-          class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
-        >
-          <span>
-            <AttachmentIcon
-              height={"12px"}
-              width={"12px"}
-              color={"var(--text-secondary-200)"}
-            />
-          </span>
-          <span class="mb-0 text-fs-12 px-2 ellipsis"
-            >{file?.name || file.slice(-10)}</span
-          >
-          <span
-            on:click={() => {
-              removeFile(index);
-            }}
-            ><CrossIcon
-              height={"12px"}
-              width={"9px"}
-              color={"var(--text-secondary-200)"}
-            /></span
-          >
-        </div>
-      {/each}
-    </div>
-  {/if}
-  <div class="d-flex align-items-center justify-content-end">
-    <div class="d-flex">
-      <Button
-        type={"violet"}
-        title={"Cancel"}
-        buttonClassProp={"me-2"}
-        onClick={async () => {
-          isExposeFeedbackForm = false;
-          isEditingPost = false;
-          tempImageURLsArray = [...imageURLsArray]; // Restore original values
-        }}
-      />
-      <Button
-        type={"primary"}
-        title={"Save"}
-        loader={isLoading}
-        onClick={async () => {
-          isLoading = true;
+            <span>
+              <AttachmentIcon
+                height={"12px"}
+                width={"12px"}
+                color={"var(--text-secondary-200)"}
+              />
+            </span>
+            <span class="mb-0 text-fs-12 px-2 ellipsis"
+              >{file?.name || file.slice(-10)}</span
+            >
+            <span
+              on:click={() => {
+                removeFile(index);
+              }}
+              ><CrossIcon
+                height={"12px"}
+                width={"9px"}
+                color={"var(--text-secondary-200)"}
+              /></span
+            >
+          </div>
+        {/each}
+      </div>
+    {/if}
+    <div class="d-flex align-items-center justify-content-end">
+      <div class="d-flex">
+        <Button
+          type={"violet"}
+          title={"Cancel"}
+          buttonClassProp={"me-2"}
+          onClick={async () => {
+            isExposeFeedbackForm = false;
+            isEditingPost = false;
+            tempImageURLsArray = [...imageURLsArray];
+            feedbackDescription = originalFeedbackDescription;
+            feedbackSubject = originalFeedbackSubject; // Restore original values
+            isTextArea=false;
+            isDescriptionEmpty=false
+            isSubjectEmpty =false;
+          }}
+        />
+        <Button
+          type={"primary"}
+          title={"Save"}
+          loader={isSaving}
+          onClick={async () => {
+            isSaving = true;
 
-          if (!feedbackDescription || !feedbackSubject) {
-            if (!feedbackDescription && !feedbackSubject) {
-              isTextArea = true;
-              isSubjectEmpty = isDescriptionEmpty = false;
+            if (!feedbackDescription || !feedbackSubject) {
+              if (!feedbackDescription && !feedbackSubject) {
+                isTextArea = true;
+                isSubjectEmpty = isDescriptionEmpty = false;
+              } else {
+                isTextArea = false;
+                isSubjectEmpty = !feedbackSubject;
+                isDescriptionEmpty = !feedbackDescription;
+              }
+              isSaving = false;
             } else {
-              isTextArea = false;
-              isSubjectEmpty = !feedbackSubject;
-              isDescriptionEmpty = !feedbackDescription;
+              isSubjectEmpty = isDescriptionEmpty = isTextArea = false;
+              const res = await onUpdateFeedback(
+                post?.id,
+                feedbackSubject,
+                feedbackDescription,
+                uploadFeedback,
+                tempImageURLsArray,
+              );
+              if (res?.isSuccessful) {
+                isExposeFeedbackForm = false;
+                isEditingPost = false;
+                await reloadPost();
+                uploadFeedback = {
+                  file: {
+                    value: [],
+                  },
+                };
+              }
             }
-            isLoading = false;
-          } else {
-            isSubjectEmpty = isDescriptionEmpty = isTextArea = false;
-            const res = await onUpdateFeedback(
-              post?.id,
-              feedbackSubject,
-              feedbackDescription,
-              uploadFeedback,
-              tempImageURLsArray,
-            );
-            if (res?.isSuccessful) {
-              isExposeFeedbackForm = false;
-              await reloadPost();
-              isEditingPost = false;
-              uploadFeedback = {
-                file: {
-                  value: [],
-                },
-              };
-            }
-          }
-          isLoading = false;
-        }}
-      />
+            isSaving = false;
+          }}
+        />
+      </div>
     </div>
   </div>
 </Modal>
@@ -671,5 +699,15 @@
     outline: none;
     border: none;
     box-shadow: none;
+  }
+
+  .empty-data-error {
+    border: 1px solid var(--error--color);
+  }
+
+  .error-message {
+    color: var(--error--color);
+    font-size: 12px;
+    margin-bottom: 20px;
   }
 </style>

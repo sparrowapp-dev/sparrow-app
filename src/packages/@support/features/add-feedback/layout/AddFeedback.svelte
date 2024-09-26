@@ -7,9 +7,9 @@
     PlusIcon,
   } from "@library/icons";
   import { Button, Modal } from "@library/ui";
-  import Drop from "../components/Drop/Drop.svelte";
   import { notifications } from "@library/ui/toast/Toast";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+    import { Drop } from "@support/common/components";
   import { FeedbackType } from "@support/common/types";
 
   export let onAddFeedback;
