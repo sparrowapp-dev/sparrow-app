@@ -87,7 +87,24 @@
     /><span class="ms-3 text-fs-12">Start</span>
     <Handle type="source" position={Position.Right} />
     {#if isAddBlockVisible}
-      <div class="add-block-btn" style="position: absolute;   ">
+      <div
+        class="add-block-btn"
+        style="position: absolute;"
+        on:drop={(e) => {
+          e.preventDefault();
+          const requestEvent = JSON.parse(e.dataTransfer.getData("text/plain"));
+          if (!data) return;
+          const requestData = {
+            requestId: requestEvent.requestId,
+            folderId: requestEvent.folderId,
+            workspaceId: requestEvent.workspaceId,
+            collectionId: requestEvent.collectionId,
+            name: requestEvent.name,
+            method: requestEvent.method,
+          };
+          data.onClick(id, requestData);
+        }}
+      >
         <div class="arrow">
           <ArrowIcon />
         </div>
