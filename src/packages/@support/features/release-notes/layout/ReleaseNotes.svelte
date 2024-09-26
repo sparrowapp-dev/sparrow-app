@@ -24,7 +24,7 @@
   /**
    * External URL for Sparrow's GitHub page.
    */
-  const externalSparrowRealseNote = constants.SPARROW_DOWNLOAD_LINK;
+  const externalSparrowRealseNote = constants.VITE_SPARROW_GITHUB;
 
   /**
    * External URL for Sparrow's LinkedIn page.
@@ -359,7 +359,7 @@
                         on:click={async () => {
                           const version =
                             event.title.match(/v\d+\.\d+\.\d+/)[0];
-                          const releaseNoteUrl = `${externalSparrowRealseNote}/tag/${version}`;
+                          const releaseNoteUrl = `${externalSparrowRealseNote}/sparrow-app/releases/tag/${version}`;
                           await open(releaseNoteUrl);
                           MixpanelEvent(Events.Github_Updates);
                         }}
