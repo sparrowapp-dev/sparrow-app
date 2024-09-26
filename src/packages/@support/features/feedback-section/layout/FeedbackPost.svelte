@@ -547,9 +547,9 @@
         </div>
       </div>
     </div>
-    <div>
+    <div class="d-flex gap-1  overflow-scroll file-scroller">
       {#if tempImageURLsArray.length > 0}
-        <div class="file-scroller mb-2 d-flex gap-1 overflow-auto">
+        <div class="file-scroller mb-2 d-flex gap-1 ">
           {#each tempImageURLsArray as file, index}
             <div
               class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
@@ -579,7 +579,7 @@
         </div>
       {/if}
       {#if uploadFeedback?.file?.value?.length > 0}
-        <div class="file-scroller mb-2 d-flex gap-1 overflow-auto">
+        <div class="file-scroller mb-2 d-flex gap-1">
           {#each uploadFeedback.file.value as file, index}
             <div
               class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
