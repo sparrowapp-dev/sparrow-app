@@ -158,7 +158,7 @@
                         style="text-decoration: underline;"
                         on:click={() => {
                           toggleHistoryDetails(false, ind);
-                        }}>see less</span
+                        }}>see Less</span
                       >
                     {/if}
                   </div>

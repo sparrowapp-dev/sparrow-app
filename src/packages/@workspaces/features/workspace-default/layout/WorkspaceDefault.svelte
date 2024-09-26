@@ -55,7 +55,7 @@
     {/if}
     <Card
       icon={VectorIcon}
-      label="REST API"
+      label="Request"
       iconColor="var(--text-primary-300)"
       iconSize={"18px"}
       onClick={() => {
