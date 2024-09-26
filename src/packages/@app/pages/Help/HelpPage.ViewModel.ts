@@ -287,7 +287,18 @@ class HelpPageViewModel {
     }
   };
 
-  
+  /**
+   * Updates a post with the provided title, description, uploaded files, and image URLs.
+   *
+   * @param {string} postID - The ID of the post to update.
+   * @param {string} title - The updated title of the post.
+   * @param {string} description - The updated description of the post.
+   * @param {{ file: { value: File[] } }} uploadFeedback - An object containing the uploaded files for feedback.
+   * @param {string[]} imageURLsArray - An array of existing image URLs to be combined with new uploads.
+   *
+   * @returns {Promise<Object>} The response from the Canny service after attempting to update the post.
+   */
+
   public updatePost = async (
     postID: string,
     title: string,

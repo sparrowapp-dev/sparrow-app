@@ -24,7 +24,7 @@
   /**
    * External URL for Sparrow's GitHub page.
    */
-  const externalSparrowRealseNote = constants.VITE_SPARROW_GITHUB;
+  const externalSparrowRealseNote = constants.SPARROW_GITHUB;
 
   /**
    * External URL for Sparrow's LinkedIn page.
