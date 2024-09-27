@@ -1,0 +1,305 @@
+// @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100&display=swap");
+// @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+
+$sparrow-blue: #007bff;
+$sparrow-yellow: #f9b001;
+$sparrow-black: #000000;
+$sparrow-success: #8dc599;
+$sparrow-error: #e5acb2;
+$sparrow-default: #45494d;
+$sparrow-danger: #fe8c98;
+$sparrow-white: #ffffff;
+$sparrow-light-gray: #cccccc;
+$sparrow-gradient: red;
+$sparrow-background: #19191a;
+$sparrow-primary-btn: #1193f0;
+$sparrow-primary-btn-hover: #0B5ED7;
+$sparrow-background-light: #1e1e1e;
+$sparrow-background-dark: #1e1e1e;
+$sparrow-background-dropdown: #141414;
+$sparrow-plusbutton: #85c2ff;
+$sparrow-border-color: #313233;
+$sparrow-get: #69d696;
+$sparrow-put: #9685ff;
+$sparrow-post: #ffe47e;
+$sparrow-delete: #ff7878;
+$sparrow-trac: #fba574;
+$sparrow-head: #69d696;
+$sparrow-con: #58c6b9;
+$sparrow-patc: #df77f9;
+$sparrow-opt: #f15ea5;
+$sparrow-arc: #8a9299;
+$sparrow-request-body: #8a9299;
+$sparrow-send-button: #85c2ff;
+$sparrow-send-hoverbutton: #04416d;
+$sparrow-button-background: #2d2c2c;
+$sparrow-button-color: #e5e5e5;
+$sparrow-input-slider-button: #1d3650;
+$sparrow-dull-background: #232424;
+$sparrow-bottom-border: #85c2ff;
+$sparrow-cancel-hover: #31323360;
+$sparrow-delete-hover: #f16674;
+$sparrow-background-hover: rgba(0, 0, 0, 0.706);
+$sparrow-button-pressed: #1d3650;
+$sparrow-text-color: #8a9299;
+$sparrow-key-value-pair: #262626;
+$sparrow-selectedSideBarTab: #11253a;
+$sparrow-selectedSideBarTab: #11253a;
+$sparrow-recentApiText: #f3e4e4d7;
+$sparrow-errorTextColor:#fe8c98;
+$sparrow-editor-operator-color: #FE2E2E;
+$sparrow-editor-bool-color: #82DB42;
+$sparrow-editor-name-color: #9CDCFE;
+$sparrow-editor-varible-color: #ECCD43;
+$sparrow-editor-bracket-color: #9217F6;
+$sparrow-editor-square-bracket-color: #FF8000;
+$sparrow-editor-number-color: #8DC599;
+$sparrow-editor-angle-bracket-color: #636566;
+$sparrow-editor-tag-color: #246BB8;
+$sparrow-editor-string-color: #CE9178;
+$sparrow-email-invite-bg-color:#1E1E1E;
+$sparrow-container-border: #FFFFFF17;
+$sparrow-small-text-size: 0.75rem;
+$sparrow-base-text-size: 0.875rem;
+$sparrow-bg-container: #8989890D;
+$sparrow-bg-container-border: #313233;
+$sparrow-bg-container-one: #1392F0;
+$sparrow-bg-container-two: #4165F9;
+$sparrow-bg-container-three: #5652FD;
+$sparrow-bg-container-four: #376FF7;
+$sparrow-primary-color: #3670F7;
+
+:root {
+  --blackColor: #{$sparrow-black};
+  --defaultcolor: #{$sparrow-default};
+  --recentApiText: #{$sparrow-recentApiText};
+  --primary-btn-color: #{$sparrow-primary-btn};
+  --primary-btn-color-hover:#{$sparrow-primary-btn-hover};
+  --success-color: #{$sparrow-success};
+  --button-color: #{$sparrow-request-body};
+  --send-button: #{$sparrow-send-button};
+  --send1-hoverbutton: #{$sparrow-send-hoverbutton};
+  --white-color: #{$sparrow-white};
+  --background-color: #{$sparrow-background};
+  --dull-background-color: #{$sparrow-dull-background};
+  --background-light: #{$sparrow-background-light};
+  --background-dark: #{$sparrow-background-dark};
+  --background-dropdown: #{$sparrow-background-dropdown};
+  --border-color: #{$sparrow-border-color};
+  --request-get: #{$sparrow-get};
+  --request-put: #{$sparrow-put};
+  --request-post: #{$sparrow-post};
+  --request-delete: #{$sparrow-delete};
+  --request-arc: #{$sparrow-arc};
+  --request-trac: #{$sparrow-trac};
+  --request-head: #{$sparrow-head};
+  --request-con: #{$sparrow-con};
+  --request-patc: #{$sparrow-patc};
+  --request-opt: #{$sparrow-opt};
+  --workspace-hover-color: #{$sparrow-plusbutton};
+  --sparrow-bottom-border: #{$sparrow-bottom-border};
+  --sparrow-input-slider-button: #{$sparrow-input-slider-button};
+  --dangerColor: #{$sparrow-danger};
+  --cancel-hover: #{$sparrow-cancel-hover};
+  --delete-hover: #{$sparrow-delete-hover};
+  --background-hover: #{$sparrow-background-hover};
+  --button-pressed: #{$sparrow-button-pressed};
+  --keyvalue-pair: #{$sparrow-key-value-pair};
+  --selected-active-sidebar: #{$sparrow-selectedSideBarTab};
+  --sparrow-blue: #{$sparrow-blue};
+  --sparrow-button-background: #{$sparrow-button-background};
+  --editor-operator:#{$sparrow-editor-operator-color};
+  --editor-bool:#{$sparrow-editor-bool-color};
+  --editor-name:#{$sparrow-editor-name-color};
+  --editor-variable:#{$sparrow-editor-varible-color};
+  --editor-bracket:#{$sparrow-editor-bracket-color};
+  --editor-square-bracket:#{$sparrow-editor-square-bracket-color};
+  --error--color: #{$sparrow-errorTextColor};
+  --sparrow-text-color:#{$sparrow-text-color};
+  --editor-number:#{$sparrow-editor-number-color};
+  --editor-angle-bracket:#{$sparrow-editor-angle-bracket-color};
+  --editor-tag-color: #{$sparrow-editor-tag-color};
+  --editor-string-color: #{$sparrow-editor-string-color};
+  --sparrow-container-border: #{$sparrow-container-border};
+  --base-text: #{$sparrow-base-text-size};
+  --small-text: #{$sparrow-small-text-size};
+  --primary-color: #{$sparrow-primary-color};
+  --bg-conatiner: #{$sparrow-bg-container};
+  --bg-container-border: #{$sparrow-bg-container-border};
+  --bg-container-one: #{$sparrow-bg-container-one};
+  --bg-container-two: #{$sparrow-bg-container-two};
+  --bg-container-three: #{$sparrow-bg-container-three};
+  --bg-container-four: #{$sparrow-bg-container-four};
+}
+
+// $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
+
+$theme-colors: map-merge(
+  $theme-colors,
+  (
+    "primaryColor": $sparrow-blue,
+    "recentApiText": $sparrow-recentApiText,
+
+    "secondaryColor": $sparrow-yellow,
+    "blackColor": $sparrow-black,
+    "successColor": $sparrow-success,
+    "borderColor": $sparrow-error,
+    "defaultColor": $sparrow-default,
+    "dangerColor": $sparrow-danger,
+    "whiteColor": $sparrow-white,
+    "lightGray": $sparrow-light-gray,
+    "backgroundColor": $sparrow-background,
+    "backgroundLight": $sparrow-background-light,
+    "backgroundDark": $sparrow-background-dark,
+    "backgroundDropdown": $sparrow-background-dropdown,
+    "plusButton": $sparrow-plusbutton,
+    "lightBackground": $sparrow-border-color,
+    "requestBodyColor": $sparrow-request-body,
+    "labelColor": $sparrow-send-button,
+    "buttonBackColor": $sparrow-button-background,
+    "buttonColor": $sparrow-button-color,
+    "redColor": $sparrow-gradient,
+    "getColor": $sparrow-get,
+    "putColor": $sparrow-put,
+    "postColor": $sparrow-post,
+    "deleteColor": $sparrow-delete,
+    "headColor": $sparrow-head,
+    "patchColor": $sparrow-patc,
+    "optionsColor": $sparrow-opt,
+    "textColor": $sparrow-text-color,
+    "keyValuePairColor": $sparrow-key-value-pair,
+    "dullBackground": $sparrow-dull-background,
+    "sparrowBottomBorder": $sparrow-bottom-border,
+    "emailInviteBackgroundColor": $sparrow-email-invite-bg-color,
+    "containerBorder": $sparrow-container-border,
+    "editorAngleBracket": $sparrow-editor-bracket-color,
+    "sparrowPrimaryColor": $sparrow-primary-color,
+    "sparrowBgContainer": $sparrow-bg-container,
+    "sparrowBgContainerBorder": $sparrow-bg-container-border,
+    "sparrowBgContainerOne": $sparrow-bg-container-one,
+    "sparrowBgContainerTwo": $sparrow-bg-container-two,
+    "sparrowBgContainerThree": $sparrow-bg-container-three,
+    "sparrowBgContainerFour": $sparrow-bg-container-four
+  )
+);
+
+// Define a map for font sizes in pixels
+$sparrow-font-sizes: (
+  8: 0.5rem, // 8px in rem
+  9: 0.5625rem, // 9px in rem
+  10: 0.625rem, // 10px in rem
+  11: 0.6875rem, // 11px in rem
+  12: 0.75rem, // 12px in rem
+  13: 0.8125rem, // 13px in rem
+  14: 0.875rem, // 14px in rem
+  15: 0.9375rem, // 15px in rem
+  16: 1rem, // 16px in rem
+  17: 1.0625rem, // 17px in rem
+  18: 1.125rem, // 18px in rem
+  19: 1.1875rem, // 19px in rem
+  20: 1.25rem, // 20px in rem
+  28: 1.75rem,
+  32: 2rem, // 32rem
+  36: 2.25rem // 36px in rem
+);
+
+// Generate utility classes for font sizes
+  @each $size, $value in $sparrow-font-sizes {
+    .sparrow-fs-#{$size} {
+      font-size: $value;
+    }
+  }
+
+// Define a map for font weights in pixels
+$sparrow-font-weights: (
+  300: 300,
+  400: 400,
+  500: 600,
+  600: 600,
+  700: 700,
+  900: 900
+);
+  
+// Generate utility classes for font sizes
+  @each $size, $value in $sparrow-font-weights {
+    .sparrow-fw-#{$size} {
+      font-weight: $value;
+    }
+  }
+
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/root";
+@import "bootstrap";
+
+body {
+  background-color: var(--blackColor);
+}
+
+.border-error {
+  border-color: $sparrow-error;
+  border-width: 3px;
+}
+
+.border-success {
+  border-color: $sparrow-success;
+  border-width: 1px;
+}
+
+.border-default {
+  border-color: $sparrow-default;
+  border-width: 1px;
+}
+
+.border-color {
+  border-color: #313233;
+  width: 1px;
+}
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sparrow-thin-scrollbar::-webkit-scrollbar {
+  width: 2px;
+}
+.sparrow-thin-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+}
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.env-highlight {
+  &.env-found {
+    color: #9CDCFE;
+  }
+
+  &.env-not-found {
+    color: #FE8C98;
+    cursor: pointer;
+  }
+
+  &.hover-found {
+    color: #9CDCFE;
+  }
+
+  &.hover-not-found {
+    color: #FE8C98;
+    background-color: #230408;
+  }
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 0 transparent inset !important;
+}
