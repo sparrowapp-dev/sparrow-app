@@ -288,14 +288,66 @@ class HelpPageViewModel {
   };
 
   /**
-   * Updates a post with the given post ID.
+   * Updates a post with the provided title, description, uploaded files, and image URLs.
    *
-   * @param  postID - The ID of the post to be updated.
-   * @returns {Promise<Object>} The response from the server after updating the post.
+   * @param {string} postID - The ID of the post to update.
+   * @param {string} title - The updated title of the post.
+   * @param {string} description - The updated description of the post.
+   * @param {{ file: { value: File[] } }} uploadFeedback - An object containing the uploaded files for feedback.
+   * @param {string[]} imageURLsArray - An array of existing image URLs to be combined with new uploads.
+   *
+   * @returns {Promise<Object>} The response from the Canny service after attempting to update the post.
    */
-  public updatePost = async (postID) => {
-    const response = await this.cannyService.updatePost(postID, {});
-    return response;
+
+  public updatePost = async (
+    postID: string,
+    title: string,
+    description: string,
+    uploadFeedback: {
+      file: {
+        value: File[];
+      };
+    },
+    imageURLsArray: string[], // Add this parameter to receive the image URLs
+  ) => {
+    const errorMessage = "Feedback submission failed. Please try again.";
+    const files = Array.from(uploadFeedback?.file?.value);
+    const formData = new FormData();
+    files.forEach((file) => formData.append("files", file));
+
+    let combinedImages: string[] = [...imageURLsArray]; // Start with existing image URLs
+
+    const imageResponse = await this.feedbackService.fetchuploads(formData);
+    if (imageResponse?.isSuccessful) {
+      const uploadedImages = imageResponse?.data?.data?.map(
+        (file: { fileUrl: string }) => file?.fileUrl,
+      );
+
+      // Append uploaded image URLs to the combinedImages array
+      if (uploadedImages) {
+        combinedImages = [...combinedImages, ...uploadedImages];
+      }
+
+      try {
+        const response = await this.cannyService.updatePost({
+          postID: postID,
+          title: title,
+          details: description,
+          imageURLs: combinedImages, // Use the combined image URLs
+        });
+
+        if (response.isSuccessful) {
+          notifications.success("Feedback Updated successfully");
+        } else {
+          notifications.error(errorMessage);
+        }
+        return response;
+      } catch (e) {
+        notifications.error(errorMessage);
+      }
+    } else {
+      notifications.error(errorMessage);
+    }
   };
 
   public getUserPosts = async (
