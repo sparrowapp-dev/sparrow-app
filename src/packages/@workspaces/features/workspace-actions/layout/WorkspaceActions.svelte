@@ -26,6 +26,7 @@
     TreeIcon,
     VectorIcon,
     BubbleIcon,
+    StackIcon,
   } from "@library/icons";
   import { WithButton } from "@workspaces/common/hoc";
   import { version } from "../../../../../../src-tauri/tauri.conf.json";
@@ -262,13 +263,6 @@
       ]
     : [
         {
-          name: "Add New API",
-          icon: VectorIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "12px",
-          onclick: () => onItemCreated("request", {}),
-        },
-        {
           name: "Add Collection",
           icon: CollectionIcon,
           iconColor: "var(--icon-secondary-130)",
@@ -277,6 +271,13 @@
             showImportCollectionPopup();
             isExpandCollection = true;
           },
+        },
+        {
+          name: "Add REST API",
+          icon: VectorIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "12px",
+          onclick: () => onItemCreated("request", {}),
         },
         {
           name: "Import cURL",
@@ -298,6 +299,16 @@
           onclick: () => onItemCreated("web-socket", {}),
         },
         {
+          name: "Add Environment",
+          icon: StackIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            isExpandEnvironment = true;
+            onCreateEnvironment();
+          },
+        },
+        {
           name: `Add ${TFDefaultEnum.FULL_NAME}`,
           icon: TreeIcon,
           iconColor: "var(--icon-secondary-130)",
@@ -305,6 +316,7 @@
           onclick: () => {
             onCreateTestflow();
             MixpanelEvent(Events.LeftPanel_Plus_Icon);
+            isExpandTestflow = true;
           },
         },
       ];

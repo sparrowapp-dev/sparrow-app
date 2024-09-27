@@ -98,9 +98,13 @@ export class EnvironmentViewModel {
    * @param localEnvironment - new environment data
    * @returns
    */
-  public onCreateEnvironment = async (localEnvironment) => {
+  public onCreateEnvironment = async () => {
     const currentWorkspace =
       await this.workspaceRepository.getActiveWorkspaceDoc();
+    const localEnvironment =
+      await this.environmentRepository.getEnvironmentByWorkspaceId(
+        currentWorkspace._id,
+      );
     const newEnvironment = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
       name: this.getNextEnvironment(localEnvironment, "New Environment"),
