@@ -317,6 +317,7 @@
                     class="px-2"
                     on:click={() => {
                       isExposeFeedbackForm = true;
+                      MixpanelEvent(Events.Edit_Post);
                     }}>Edit post</span
                   >
                 {/if}
