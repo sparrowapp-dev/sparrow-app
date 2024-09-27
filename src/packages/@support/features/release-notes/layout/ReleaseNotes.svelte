@@ -10,59 +10,128 @@
     ThumbIcon,
   } from "@library/icons";
   import { onMount } from "svelte";
-  export let listChangeLog;
   import { marked } from "marked";
   import constants from "$lib/utils/constants";
   import { Loader, Tooltip } from "@library/ui";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
   import { notifications } from "@library/ui/toast/Toast";
   import { open } from "@tauri-apps/plugin-shell";
+  import { UpdatesTagType } from "@support/common/types/feedback";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  export let listChangeLog;
 
-  const externalSparrowGithub = constants.SPARROW_GITHUB;
+  /**
+   * External URL for Sparrow's GitHub page.
+   */
+  const externalSparrowRealseNote = constants.SPARROW_GITHUB;
+
+  /**
+   * External URL for Sparrow's LinkedIn page.
+   */
   const externalSparrowLinkedin = constants.SPARROW_LINKEDIN;
 
+  /**
+   * Type of events to filter.
+   */
   let type = "all";
+
+  /**
+   * List of events.
+   */
   let events = [];
+
+  /**
+   * Search query input by the user.
+   */
   let searchQuery = "";
+
+  /**
+   * Boolean flag to determine whether to show the timeline.
+   */
   let showTimeline = true;
+
+  /**
+   * The currently selected event.
+   */
   let selectedEvent = [];
+
+  /**
+   * List of events filtered by search query or selected tag.
+   */
   let filteredEvents = events;
-  let selectedTag = ""; // Default to 'All'
+
+  /**
+   * The currently selected tag for filtering events.
+   * Defaults to an empty string, which corresponds to "All".
+   */
+  let selectedTag = "";
+
+  /**
+   * Boolean flag to indicate whether events are being loaded.
+   */
   let isLoading = false;
 
+  /**
+   * Filters the list of events based on the search query.
+   */
   const filterEvents = () => {
     filteredEvents = events.filter((event) =>
       event.title.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   };
 
+  /**
+   * Handles input change for the search query.
+   * @param {Event} e - The input event triggered when typing in the search field.
+   */
   const handleInput = (e) => {
     searchQuery = e.target.value;
     filterEvents();
   };
 
+  /**
+   * Clears the search input and resets the filtered events to show all.
+   */
   const clearSearch = () => {
     searchQuery = "";
     filteredEvents = events;
   };
 
-  function getTagClass(tag) {
-    if (tag === "new") return "tag-new";
-    if (tag === "fixed") return "tag-fixed";
-    if (tag === "improved") return "tag-improved";
+  /**
+   * Gets the appropriate CSS class for a given tag.
+   * @param  tag - The tag associated with an event (e.g., "new", "fixed", "improved").
+   * @returns  - The CSS class corresponding to the tag.
+   */
+  const getTagClass = (tag) => {
+    if (tag === UpdatesTagType.NEW) return "tag-new";
+    if (tag === UpdatesTagType.FIXED) return "tag-fixed";
+    if (tag === UpdatesTagType.IMPROVED) return "tag-improved";
     return "";
-  }
+  };
 
+  /**
+   * Handles the action when the user clicks to see more details of an event.
+   * @param {Object} event - The event data to be displayed.
+   */
   const handleSeeMore = (event) => {
     selectedEvent = event;
     showTimeline = false;
   };
 
+  /**
+   * Handles the action when the user clicks to go back to the timeline view.
+   */
   const handleBack = () => {
     selectedEvent = null;
     showTimeline = true;
   };
 
+  /**
+   * Truncates an event description if it exceeds a certain word count.
+   * @param {string} description - The event description to truncate.
+   * @returns {string} - The truncated description followed by ellipsis if it's too long.
+   */
   const truncateDescription = (description) => {
     const words = description.split(" ");
     return words.length > 30
@@ -70,14 +139,23 @@
       : description;
   };
 
-  function formatDate(dateString) {
+  /**
+   * Formats a date string into a more readable format.
+   * @param {string} dateString - The raw date string to format.
+   * @returns {string} - The formatted date string (e.g., "31 Dec 2024").
+   */
+  const formatDate = (dateString) => {
     const date = new Date(dateString);
     const options = { day: "2-digit", month: "short", year: "numeric" };
     return date.toLocaleDateString("en-GB", options);
-  }
+  };
 
-  // Function to handle select changes
-  function handleSelectChange(id) {
+  /**
+   * Handles the selection change for event tags.
+   * Filters events based on the selected tag.
+   * @param {string} id - The tag ID selected by the user (e.g., "new", "all").
+   */
+  const handleSelectChange = (id) => {
     selectedTag = id;
     if (selectedTag === "all") {
       filteredEvents = events;
@@ -86,6 +164,15 @@
         event.types.includes(selectedTag),
       );
     }
+    MixpanelEvent(Events.Updates_Filter);
+  };
+
+  function extractReleaseDate(text) {
+    // Updated regex to handle various release date formats with optional extra spaces
+    const dateMatch = text.match(
+      /Release\s*Date\s*:\s*([A-Za-z]{3,}\s*\d{1,2},\s*\d{4})/,
+    );
+    return dateMatch ? dateMatch[1].trim() : "Unknown Release Date";
   }
 
   onMount(async () => {
@@ -101,85 +188,86 @@
   <div class="container-data" style="padding: 20px;">
     <div class="headerq">
       <p style="font-size: 20px; font-weight:700;">Updates</p>
-      <p style="color: #999999; font-size;14px;">
+      <p style="color: var(--text-secondary-50); font-size:14px;">
         Check out our latest releases designed to boost your productivity and
         efficiency.
       </p>
     </div>
 
-    <div class="d-flex justify-content-between page-funationality">
-      <div class="" style="">
-        <div class={`d-flex search-input-container rounded py-1 px-2 mb-4`}>
-          <SearchIcon
-            width={14}
-            height={14}
-            color={"grey"}
-            classProp={`my-auto me-3`}
-          />
-          <input
-            type="text"
-            id="search-input"
-            class={`bg-transparent w-100 border-0 my-auto`}
-            placeholder="Search updates"
-            on:input={handleInput}
-          />
+    {#if showTimeline}
+      <div class="d-flex justify-content-between page-funationality">
+        <div class="" style="">
+          <div class={`d-flex search-input-container rounded py-1 px-2 mb-4`}>
+            <SearchIcon
+              width={14}
+              height={14}
+              color={"grey"}
+              classProp={`my-auto me-3`}
+            />
+            <input
+              type="text"
+              id="search-input"
+              class={`bg-transparent w-100 border-0 my-auto`}
+              placeholder="Search updates"
+              on:input={handleInput}
+            />
 
-          {#if searchQuery.length != 0}
-            <div
-              class="clear-icon"
-              on:click={() => {
-                clearSearch();
-              }}
-            >
-              <CrossIcon
-                height="16px"
-                width="12px"
-                color="var(--icon-secondary-300)"
-              />
-            </div>
-          {/if}
+            {#if searchQuery.length != 0}
+              <div
+                class="clear-icon"
+                on:click={() => {
+                  clearSearch();
+                }}
+              >
+                <CrossIcon
+                  height="16px"
+                  width="12px"
+                  color="var(--icon-secondary-300)"
+                />
+              </div>
+            {/if}
+          </div>
+        </div>
+
+        <div class="filter">
+          <Select
+            id={"feeds"}
+            data={[
+              { name: "New", id: UpdatesTagType.NEW },
+              { name: "Fixed", id: UpdatesTagType.FIXED },
+              { name: "Improved", id: UpdatesTagType.IMPROVED },
+              { name: "All", id: UpdatesTagType.ALL },
+            ]}
+            titleId={selectedTag}
+            onclick={(id = "") => {
+              type = id;
+              handleSelectChange(id);
+            }}
+            placeholderText={"Filters"}
+            zIndex={499}
+            disabled={false}
+            iconRequired={true}
+            icon={FilterIcon}
+            iconColor={"var(--text-secondary-100)"}
+            borderType={"none"}
+            borderActiveType={"none"}
+            borderHighlight={"hover-active"}
+            headerHighlight={"hover-active"}
+            headerHeight={"26px"}
+            minBodyWidth={"150px"}
+            minHeaderWidth={"150px"}
+            maxHeaderWidth={"200px"}
+            borderRounded={"2px"}
+            headerTheme={"violet2"}
+            bodyTheme={"violet"}
+            menuItem={"v2"}
+            headerFontSize={"10px"}
+            isDropIconFilled={true}
+            position={"absolute"}
+          />
         </div>
       </div>
-
-      <div class="filter">
-        <Select
-          id={"feeds"}
-          data={[
-            { name: "New", id: "new" },
-            { name: "Fixed", id: "fixed" },
-            { name: "Improved", id: "improved" },
-            { name: "All", id: "all" },
-          ]}
-          titleId={selectedTag}
-          onclick={(id = "") => {
-            type = id;
-            handleSelectChange(id);
-          }}
-          placeholderText={"Filters"}
-          zIndex={499}
-          disabled={false}
-          iconRequired={true}
-          icon={FilterIcon}
-          iconColor={"var(--white-color)"}
-          borderType={"none"}
-          borderActiveType={"none"}
-          borderHighlight={"hover-active"}
-          headerHighlight={"hover-active"}
-          headerHeight={"26px"}
-          minBodyWidth={"150px"}
-          minHeaderWidth={"150px"}
-          maxHeaderWidth={"200px"}
-          borderRounded={"2px"}
-          headerTheme={"violet2"}
-          bodyTheme={"violet"}
-          menuItem={"v2"}
-          headerFontSize={"10px"}
-          isDropIconFilled={true}
-          position={"absolute"}
-        />
-      </div>
-    </div>
-
+    {/if}
     {#if isLoading}
       <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
     {:else}
@@ -190,19 +278,31 @@
               {#each filteredEvents as event}
                 <div class="timeline-event">
                   <div class="timeline-date">
-                    {formatDate(event.publishedAt)}
+                    {#if event.plaintextDetails}
+                      {extractReleaseDate(event.plaintextDetails)}
+                    {:else}
+                      {extractReleaseDate(event.markdownDetails)}
+                    {/if}
                   </div>
                   <div class="timeline-circle"></div>
                   <div class="timeline-content">
                     <div class="d-flex gap-2">
-                      <h3 on:click={() => handleSeeMore(event)}>
+                      <h3
+                        class="text-fs-18"
+                        on:click={() => {
+                          handleSeeMore(event);
+                          MixpanelEvent(Events.Version_Updates);
+                        }}
+                      >
                         {event.title}
                       </h3>
                       <div
+                        class="link-div"
                         style="height: 24px; width:24px; cursor:pointer"
                         on:click={async () => {
                           await copyToClipBoard(event.url);
                           notifications.success("Link copied to clipboard!");
+                          MixpanelEvent(Events.Copy_Link);
                         }}
                       >
                         <Tooltip
@@ -215,7 +315,7 @@
                           <LinkIcon
                             height={"18px"}
                             width={"18px"}
-                            color={"var(--white-color)"}
+                            color={"var(--text-secondary-100)"}
                           />
                         </Tooltip>
                       </div>
@@ -236,7 +336,10 @@
                         <span
                           style="text-decoration: underline; color:#3670F7; border:none; background-color:transparent; cursor:pointer "
                           class="ms-0"
-                          on:click={() => handleSeeMore(event)}>see more</span
+                          on:click={() => {
+                            handleSeeMore(event);
+                            MixpanelEvent(Events.See_More_Updates);
+                          }}>see more</span
                         >
                       </p>
                     {:else}
@@ -254,7 +357,11 @@
                         style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
                         class="mb-0"
                         on:click={async () => {
-                          await open(externalSparrowGithub);
+                          const version =
+                            event.title.match(/v\d+\.\d+\.\d+/)[0];
+                          const releaseNoteUrl = `${externalSparrowRealseNote}/sparrow-app/releases/tag/${version}`;
+                          await open(releaseNoteUrl);
+                          MixpanelEvent(Events.Github_Updates);
                         }}
                       >
                         Github
@@ -262,14 +369,15 @@
 
                       <div class="d-flex align-items-center gap-2">
                         <!-- <ThumbIcon height={"18px"} width={"18px"} />
-                    <div style="color: var(--white-color);">
+                    <div style="color: var(--text-secondary-100);">
                       {event.reactions?.like || ""}
                     </div> -->
                         <div
-                          style="cursor:pointer; border-left:1px solid grey;"
+                          style="cursor:pointer; solid grey;"
                           class="ps-2"
                           on:click={async () => {
                             await open(externalSparrowLinkedin);
+                            MixpanelEvent(Events.LinkedIn_Updates_Icon);
                           }}
                         >
                           <LinkedinIcon height={"18px"} width={"18px"} />
@@ -299,15 +407,19 @@
                   <ArrowUnfilledIcon
                     height={"16px"}
                     width={"16px"}
-                    color={"var(--white-color )"}
+                    color={"var(--text-secondary-100)"}
                   />
                 </div>
               </div>
               <div
                 class="ms-2 text-fs-14"
-                style="margin-top:1.5px; color:var(--white-color); font-weight:700;"
+                style="margin-top:1.5px; color:var(--text-secondary-100); font-weight:500;"
               >
-                {formatDate(selectedEvent.publishedAt)}
+                {#if event.plaintextDetails}
+                  {extractReleaseDate(selectedEvent.plaintextDetails)}
+                {:else}
+                  {extractReleaseDate(selectedEvent.markdownDetails)}
+                {/if}
               </div>
             </div>
 
@@ -321,19 +433,20 @@
                   on:click={async () => {
                     await copyToClipBoard(selectedEvent.url);
                     notifications.success("Link copied to clipboard!");
+                    MixpanelEvent(Events.Copy_Link);
                   }}
                 >
                   <Tooltip
                     title={"Link"}
                     placement={"right"}
-                    distance={13}
+                    distance={20}
                     show={true}
                     zIndex={701}
                   >
                     <LinkIcon
                       height={"18px"}
                       width={"18px"}
-                      color={"var(--white-color)"}
+                      color={"var(--text-secondary-100)"}
                     />
                   </Tooltip>
                 </div>
@@ -357,21 +470,26 @@
                   style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
                   class="mb-0"
                   on:click={async () => {
-                    await open(externalSparrowGithub);
+                    const version =
+                      selectedEvent.title.match(/v\d+\.\d+\.\d+/)[0];
+                    const releaseNoteUrl = `${externalSparrowRealseNote}/sparrow-app/releases/tag/${version}`;
+                    await open(releaseNoteUrl);
+                    MixpanelEvent(Events.Github_Updates);
                   }}
                 >
                   Github
                 </p>
                 <div class="d-flex align-items-center gap-2">
                   <!-- <ThumbIcon height={"18px"} width={"18px"} />
-              <div style="color: var(--white-color);">
+              <div style="color: var(--text-secondary-100);">
                 {selectedEvent.reactions?.like || ""}
               </div> -->
                   <div
-                    style="border-left:1px solid grey;"
+                    style=" solid grey;"
                     class="ps-2"
                     on:click={async () => {
                       await open(externalSparrowLinkedin);
+                      MixpanelEvent(Events.LinkedIn_Updates_Icon);
                     }}
                   >
                     <LinkedinIcon height={"18px"} width={"18px"} />
@@ -389,6 +507,15 @@
 <style>
   :global(h1) {
     font-size: 24px;
+  }
+  .link-div {
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    border-radius: 2px;
+  }
+  .link-div:hover {
+    background-color: var(--dull-background-color);
   }
   .selected-event-detail {
     display: flex;
@@ -433,7 +560,7 @@
   .timeline::before {
     content: "";
     position: absolute;
-    width: 1px;
+    width: 0.6px;
     background-color: var(--bg-primary-300);
     top: 0;
     bottom: 0;
@@ -460,10 +587,10 @@
     left: -140px;
     top: 10px;
     font-weight: bold;
-    color: var(--white-color);
+    color: var(--text-secondary-100);
     width: 120px;
     text-align: right;
-    font-weight: 700;
+    font-weight: 500;
     font-size: 14px;
   }
 
@@ -491,7 +618,7 @@
     font-size: 18px;
     font-weight: 700;
     line-height: 27px;
-    color: var(--white-color);
+    color: var(--text-secondary-100);
   }
 
   .timeline-content h3:hover {
@@ -530,17 +657,17 @@
   }
 
   .tag-new {
-    color: #1193f0;
-    border-color: #1193f0;
+    color: var(--primary-btn-color);
+    border-color: var(--border-primary-200);
   }
 
   .tag-fixed {
-    color: #df77f9;
-    border-color: #df77f9;
+    color: var(--text-primary-440);
+    border-color: var(--icon-primary-440);
   }
 
   .tag-improved {
-    color: #00a86b; /* I believe you meant this color for "Improved" */
-    border-color: #00a86b;
+    color: var(--text-success-200);
+    border-color: var(--border-success-200);
   }
 </style>

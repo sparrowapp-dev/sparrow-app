@@ -4,7 +4,6 @@
   import { UpvoteIcon } from "@support/common/components";
   import FeedbackPost from "./FeedbackPost.svelte";
   import FeedbackDefault from "./FeedbackDefault.svelte";
-  import FeedbackFilters from "./FeedbackFilters.svelte";
   import { onMount } from "svelte";
   import { SearchIcon } from "$lib/assets/app.asset";
   import { Select } from "@library/forms";
@@ -16,33 +15,102 @@
   import { tickIcon } from "@library/forms/select/svgs";
   import { Loader } from "@library/ui";
   import { Debounce } from "@common/utils";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+
+  /**
+   * @description - Callback for inputting feedback.
+   */
   export let onInputFeedback;
+
+  /**
+   * @description - Callback for adding feedback.
+   */
   export let onAddFeedback;
+
+  /**
+   * @description - Function to fetch posts from the server.
+   */
   export let fetchPosts;
+
+  /**
+   * @description - Callback to retrieve a specific post.
+   */
   export let onRetrievePost;
+
+  /**
+   * @description - Callback for adding a comment.
+   */
   export let onAddComment;
+
+  /**
+   * @description - Function to fetch comments for a post.
+   */
   export let fetchComments;
+
+  /**
+   * @description - Function to create a vote.
+   */
   export let createVote;
+
+  /**
+   * @description - Function to delete a vote.
+   */
   export let deleteVote;
+
+  /**
+   * @description - Function to list votes.
+   */
   export let listVote;
 
+  /**
+   * @description - Tracks if the post is opened from an activity.
+   */
   export let isPostopenFromActivity;
-  export let postId;
 
-  let feedbackType = ""
-  let feedbackStatusType = ""
+  /**
+   * @description - Stores the ID of the post.
+   */
+  export let postId: string;
+
+  /**
+   * @description - Function to get Color based on tag status or cateogry status.
+   */
+  export let getColor;
+
+  export let onUpdateFeedback;
+
+  let feedbackType = "";
+
+  let feedbackStatusType = "";
 
   let searchTerm = "";
 
   let currentSort = "trending";
+
   let posts = [];
+
   let userInfo: any = {};
-  let votelist = [];
+
   let isLoading = false;
+
+  let status = defaultStaus;
+
+  let isPostopen = isPostopenFromActivity || false;
+
+  const defaultStaus = "open,under review,planned,in progress,complete";
+
   user.subscribe((value) => {
     userInfo = value;
   });
-  let id = "";
+
+  /**
+   * @description - Fetches posts based on sorting type, search query, and status, then updates the `posts` array.
+   *
+   * @param {string} sortType - The type of sorting to apply (e.g., "trending", "latest").
+   * @param {string} [searchQuery=""] - The search term to filter posts (optional).
+   * @param {string} status - The status of the posts to filter (e.g., "open", "in progress").
+   */
   const getPosts = async (
     sortType: string,
     searchQuery: string = "",
@@ -54,27 +122,28 @@
     isLoading = false;
   };
 
-  const defaultStaus = "open,under review,planned,in progress,complete";
-
-  let status = defaultStaus;
-
-  onMount(async () => {
-    getPosts(currentSort, searchTerm, status);
-    isPostopenFromActivity = false;
-  });
-
+  /**
+   * @description - Handles upvoting action by refreshing the posts with the current sorting, search term, and status.
+   */
   const handleUpvote = () => {
     getPosts(currentSort, searchTerm, status);
   };
 
-  let isPostopen = isPostopenFromActivity || false;
-
-  // Function to handle input change
+  /**
+   * @description - Handles the change of input in the search bar and fetches posts that match the search query.
+   *
+   * @param {string} searchQuery - The search term entered by the user.
+   */
   const handleInputChange = async (searchQuery: string) => {
     searchTerm = searchQuery;
     await getPosts(currentSort, searchQuery, status); // Fetch posts with search term
   };
 
+  /**
+   * @description - Handles changes in the status filter and fetches posts that match the selected status.
+   *
+   * @param {string} _status - The new status to filter posts by (e.g., "open", "planned").
+   */
   const handleStatusChange = async (_status: string) => {
     feedbackStatusType = _status;
 
@@ -86,6 +155,11 @@
     await getPosts(currentSort, searchTerm, status);
   };
 
+  /**
+   * @description - Handles the change of category and fetches posts that match the selected category.
+   *
+   * @param {string} selectedCategory - The selected category for filtering posts (e.g., "Feature Request", "Bug").
+   */
   const handleCategoryChange = async (selectedCategory) => {
     // debugger;
     feedbackType = selectedCategory;
@@ -96,7 +170,7 @@
     } else {
       // Fetch and filter posts by the selected category
       isLoading = true;
-      const listPosts = await fetchPosts(currentSort, searchTerm, status);
+      const listPosts = await getPosts(currentSort, searchTerm, status);
 
       posts = listPosts?.filter((post) => {
         return post?.category?.name === selectedCategory;
@@ -106,33 +180,38 @@
   };
 
   /**
-   * Returns a color code based on the provided status.
-   *
-   * @param status - The current status of the product (e.g., "Under Review", "In Progress", "Planned").
-   * @returns The corresponding color code.
+   * @description - Debounced function for handling input changes to avoid frequent API calls.
+   * Calls `handleInputChange` with a delay of 1000ms.
    */
-  function getColor(status) {
-    if (status === "under review") return "white";
-    if (status === "in progress") return "#DF77F9";
-    if (status === "planned") return "#FFE47E";
-    if (status === "open") return "#1193F0";
-    return "white";
-  }
   const handleInputChangeDebounced = new Debounce().debounce(
     handleInputChange,
     1000,
   );
+
+  /**
+   * @description - Executes when the component is mounted. Fetches the initial set of posts and resets the `isPostopenFromActivity` flag.
+   */
+
+  onMount(async () => {
+    getPosts(currentSort, searchTerm, status);
+    isPostopenFromActivity = false;
+  });
 </script>
 
-<div style="margin: 8px 46px 0 34px;">
+<div style="padding:20px;">
   <FeedbackDefault {onAddFeedback} {userInfo} {onInputFeedback} />
   {#if !isPostopen}
     <div
       class="d-flex"
       style=" margin-top:38px; justify-content: space-between;"
     >
-      <div class="" style="">
-        <div class={`d-flex search-input-container rounded py-1 px-2 mb-2`}>
+      <div>
+        <div
+          class={`d-flex search-input-container rounded py-1 px-2 mb-2`}
+          on:click={() => {
+            MixpanelEvent(Events.Feedback_Search);
+          }}
+        >
           <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
           <input
             type="text"
@@ -171,6 +250,7 @@
             onclick={(id = "") => {
               feedbackType = id;
               handleCategoryChange(id);
+              MixpanelEvent(Events.Feedback_Categories_Filter);
             }}
             titleId={feedbackType}
             zIndex={499}
@@ -223,6 +303,7 @@
             ]}
             onclick={(id = "") => {
               handleStatusChange(id);
+              MixpanelEvent(Events.Feedback_Status_Filter);
             }}
             titleId={feedbackStatusType}
             placeholderText={"Status"}
@@ -246,6 +327,7 @@
             headerFontSize={"10px"}
             isDropIconFilled={true}
             position={"absolute"}
+            maxBodyHeight={"205px"}
           />
         </div>
       </div>
@@ -255,7 +337,10 @@
       <div style="width:187px; margin-right:28px; ">
         <div>
           <SortIcon width={"12px"} height={"8px"} />
-          <span style="padding-left: 8px; padding-top:4px ; font-size:500;">
+          <span
+            class="text-fs-13"
+            style="padding-left: 8px; padding-top:4px ; font-weight:500;"
+          >
             Sort By</span
           >
         </div>
@@ -264,29 +349,38 @@
           style="align-items: baseline; gap:10px; margin-top:13px; "
         >
           <button
-            on:click={() => getPosts("trending", searchTerm, status)}
+            on:click={() => {
+              getPosts("trending", searchTerm, status);
+              MixpanelEvent(Events.Feedback_SortBy_Filter);
+            }}
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "trending"}
           >
-            <span>Trending</span>
+            <span class="text-fs-13">Trending</span>
             <img src={tickIcon} alt="" class="pt-1 tick-icon" />
           </button>
 
           <button
-            on:click={() => getPosts("newest", searchTerm, status)}
+            on:click={() => {
+              getPosts("newest", searchTerm, status);
+              MixpanelEvent(Events.Feedback_SortBy_Filter);
+            }}
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "newest"}
           >
-            <span>Now</span>
+            <span class="text-fs-13">Now</span>
             <img src={tickIcon} alt="" class="pt-1 tick-icon" />
           </button>
 
           <button
-            on:click={() => getPosts("score", searchTerm, status)}
+            on:click={() => {
+              getPosts("score", searchTerm, status);
+              MixpanelEvent(Events.Feedback_SortBy_Filter);
+            }}
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "score"}
           >
-            <span>Top</span>
+            <span class="text-fs-13">Top</span>
             <img src={tickIcon} alt="" class="pt-1 tick-icon" />
           </button>
         </div>
@@ -303,7 +397,7 @@
         >
           {#each posts as post}
             <div
-              style="display: flex; flex-direction: column; background-color: #151515; padding: 10px; min-height: 195px; border-radius:2px;"
+              style="display: flex; flex-direction: column; background-color: #151515; padding: 20px;border-radius:2px;"
             >
               <div
                 style="display: flex; justify-content: space-between; align-items: flex-start;"
@@ -313,8 +407,8 @@
                     class="title"
                     on:click={async () => {
                       postId = post?.id;
-                      // id = post?.id;
                       isPostopen = true;
+                      MixpanelEvent(Events.Feedback_Post);
                     }}
                   >
                     {post?.title}
@@ -323,10 +417,10 @@
                     style="height: 16px; display: flex; align-items: center;"
                   >
                     <span
-                      class="category"
-                      style="color:{getColor(
-                        post.status,
-                      )}; border:0.2px solid {getColor(post.status)};  "
+                      class="category mt-2 text-fs-10"
+                      style="color:{getColor(post?.status)
+                        .fontColor}; border:0.2px solid {getColor(post?.status)
+                        .fontColor}; "
                     >
                       {post?.status
                         ? post.status.charAt(0).toUpperCase() +
@@ -335,22 +429,28 @@
                     </span>
                   </div>
                 </div>
-              <div style="cursor:pointer">
-                <UpvoteIcon
-                isPostLiked={post.isPostLiked}
-                backgroundColor={"transparent"}
-                {handleUpvote}
-                authordId={post.author.id}
-                postID={post.id}
-                likePost={createVote}
-                dislikePost={deleteVote}
-                upvote={post?.score}
-              />
-              </div>
+                <div
+                  style="cursor:pointer"
+                  on:click={() => {
+                    MixpanelEvent(Events.Upvote_Post);
+                  }}
+                >
+                  <UpvoteIcon
+                    isPostLiked={post.isPostLiked}
+                    {handleUpvote}
+                    postID={post.id}
+                    likePost={createVote}
+                    dislikePost={deleteVote}
+                    upvote={post?.score}
+                  />
+                </div>
               </div>
 
               <div style="margin-top: 10px; flex: 1;">
-                <p style="color: #CCCCCC; margin: 0; padding-top:10px;">
+                <p
+                  class="text-fs-14"
+                  style="color: var(--text-secondary-1000); margin: 0; padding-top:10px;"
+                >
                   {post?.details}
                 </p>
               </div>
@@ -362,7 +462,7 @@
                   <CommentIcon
                     width={"15px"}
                     height={"13.95px"}
-                    color={"#808080"}
+                    color={"var(--icon-secondary-950)"}
                   />
                 </span>
                 <span style=" font-size: 13px;">{post?.commentCount}</span>
@@ -390,13 +490,14 @@
       {onAddComment}
       {fetchComments}
       {handleUpvote}
+      {onUpdateFeedback}
+      {getColor}
     />
   {/if}
 </div>
 
 <style>
   .search-input-container {
-    /* border: 1px solid var(--border-color); */
     background: var(--bg-tertiary-400);
     width: 20vw;
     font-size: 12px;
@@ -424,13 +525,14 @@
   }
   .title {
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 500;
     margin-bottom: 5px;
+    color: var(--text-secondary-100);
   }
   .title:hover {
     text-decoration: underline;
     cursor: pointer;
-    color: #3670f7;
+    color: var(--text-primary-300);
   }
 
   .category {
@@ -441,7 +543,7 @@
     line-height: 16px;
   }
   .sort-buttons {
-    color: #808080 !important;
+    color: var(--text-secondary-550) !important;
     background: none !important;
     outline: none !important;
     border: none !important;
@@ -449,11 +551,11 @@
   }
 
   .sort-buttons:hover {
-    color: #3670f7 !important;
+    color: var(--text-primary-300) !important;
   }
 
   .sort-buttons:focus-within {
-    color: #3670f7 !important;
+    color: var(--text-primary-300) !important;
   }
 
   .tick-icon {
@@ -462,13 +564,10 @@
 
   /* When a button has the 'active' class */
   .sort-buttons.active {
-    color: #3670f7 !important; /* Blue color for active sort */
+    color: var(--text-primary-300) !important;
   }
 
   .sort-buttons.active .tick-icon {
-    display: revert; /* Show tick icon for active sort */
-  }
-  /* .sort-buttons:hover .tick-icon {
     display: revert;
-  } */
+  }
 </style>

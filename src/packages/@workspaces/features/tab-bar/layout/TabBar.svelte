@@ -1,34 +1,27 @@
 <script lang="ts">
   // ---- SVG
-
-  import ViewGrid from "@workspaces/features/tab-bar/assets/ViewGrid.svelte";
-  import VerticalGrid from "@library/icons/VerticalGrid.svelte";
-  import SplitVerital from "@workspaces/features/tab-bar/assets/SplitVertical.svg";
-  import SplitHorizontal from "@workspaces/features/tab-bar/assets/SplitHorizontal.svg";
   import AngleRight from "@library/icons/AngleRight.svelte";
   import AngleLeft from "@library/icons/AngleLeft.svelte";
   import PlusIcon from "@library/icons/PlusIcon.svelte";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-  // ---- Store
-  import { collapsibleState } from "$lib/store/request-response-section";
 
   // ---- Interface
   import type { TabDocument } from "@app/database/database";
 
   // ---- Component
-  import Tab from "@workspaces/features/tab-bar/components/tab/Tab.svelte";
+  import Tab from "../components/tab/Tab.svelte";
   import { Dropdown } from "@library/ui";
 
   // ---- Helper
-  import {
-    moveNavigation,
-    tabBarScroller,
-  } from "$lib/utils/helpers/navigation";
-  import Button from "@library/ui/button/Button.svelte";
+  import { tabBarScroller } from "$lib/utils/helpers/navigation";
   import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
   import { HelpIcon } from "$lib/assets/app.asset";
-  import { MoreOptions } from "@library/icons";
-    import { TabTypeEnum } from "@common/types/workspace";
+  import {
+    HorizontalGridIcon,
+    MoreOptions,
+    VerticalGridIcon,
+  } from "@library/icons";
+  import { TabTypeEnum } from "@common/types/workspace";
 
   // ------ Props ------
   /**
@@ -68,11 +61,11 @@
 
   export let onChangeViewInRequest: (view: string) => void;
 
-  let isTabSaved:boolean;
+  let isTabSaved: boolean;
 
   export let isGuestUser = false;
 
-  let activeTabType:string;
+  let activeTabType: string;
 
   const getActiveTabType = (tabList) => {
     for (const tab of tabList) {
@@ -84,7 +77,6 @@
     }
     return activeTabType;
   };
-
 
   $: {
     if (tabList) {
@@ -232,56 +224,55 @@
       </Tooltip>
     </div>
     <div class=" d-flex ms-auto my-auto me-2 {!tabList.length ? 'd-none' : ''}">
-    
-     {#if activeTabType === TabTypeEnum.REQUEST }
-      <!-- QuickHelp Button -->
-      <div>
-        <button
-          role="button"
-          class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
-          on:click={async () => {
-            const event = await onFetchCollectionGuide({
-              id: "collection-guide",
-            });
-            const guideData = event?.getLatest().toMutableJSON();
-            if (guideData?.isActive === false) {
-              onUpdateCollectionGuide(
-                {
-                  id: "collection-guide",
-                },
-                true,
-              );
-            } else {
-              onUpdateCollectionGuide(
-                {
-                  id: "collection-guide",
-                },
-                false,
-              );
-            }
-          }}
-        >
-          <Tooltip
-            title={"Quick Help"}
-            distance={10}
-            placement={"bottom"}
-            zIndex={10}
+      {#if activeTabType === TabTypeEnum.REQUEST}
+        <!-- QuickHelp Button -->
+        <div>
+          <button
+            role="button"
+            class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
+            on:click={async () => {
+              const event = await onFetchCollectionGuide({
+                id: "collection-guide",
+              });
+              const guideData = event?.getLatest().toMutableJSON();
+              if (guideData?.isActive === false) {
+                onUpdateCollectionGuide(
+                  {
+                    id: "collection-guide",
+                  },
+                  true,
+                );
+              } else {
+                onUpdateCollectionGuide(
+                  {
+                    id: "collection-guide",
+                  },
+                  false,
+                );
+              }
+            }}
           >
-            <div
-              class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
-              style="height: 24px; width:24px;"
+            <Tooltip
+              title={"Quick Help"}
+              distance={10}
+              placement={"bottom"}
+              zIndex={10}
             >
-              <HelpIcon
-                height={"16px"}
-                width={"16px"}
-                color={"var(--text-secondary-200)"}
-              />
-            </div>
-          </Tooltip>
-        </button>
-      </div>
+              <div
+                class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
+                style="height: 24px; width:24px;"
+              >
+                <HelpIcon
+                  height={"16px"}
+                  width={"16px"}
+                  color={"var(--text-secondary-200)"}
+                />
+              </div>
+            </Tooltip>
+          </button>
+        </div>
 
-      <!-- Split button -->
+        <!-- Split button -->
         <div
           class="layout d-flex align-items-center ms-auto mt-1"
           style="height: 24px; "
@@ -294,12 +285,18 @@
             options={[
               {
                 name: "Split Vertically",
-                icon: SplitVerital,
+                icon: VerticalGridIcon,
+                iconColor: "var(--icon-primary-300)",
+                color: "var(--text-secondary-100)",
+                iconSize: "13px",
                 onclick: () => onChangeViewInRequest("vertical"),
               },
               {
                 name: "Split Horizontally",
-                icon: SplitHorizontal,
+                icon: HorizontalGridIcon,
+                iconColor: "var(--icon-primary-300)",
+                color: "var(--text-secondary-100)",
+                iconSize: "12px",
                 onclick: () => onChangeViewInRequest("horizontal"),
               },
             ]}
@@ -319,9 +316,15 @@
                 }}
               >
                 {#if $requestSplitterDirection === "horizontal"}
-                  <ViewGrid color={"var(--icon-secondary-200)"} height={13} />
+                  <HorizontalGridIcon
+                    color={"var(--icon-secondary-200)"}
+                    height={13}
+                  />
                 {:else}
-                  <VerticalGrid height={13} color="var(--icon-secondary-200)" />
+                  <VerticalGridIcon
+                    height={13}
+                    color="var(--icon-secondary-200)"
+                  />
                 {/if}
               </button>
             </Tooltip>
@@ -332,26 +335,7 @@
             bind:isMenuOpen={moreOption}
             horizontalPosition="left"
             minWidth={150}
-            options={[
-              {
-                name: "Close all Tabs",
-                icon: "",
-                onclick: () => {
-                  tabList.map((tab) => {
-                    onTabClosed(tab.id, tab);
-                  });
-                },
-              },
-
-              {
-                name: "Close Selected Tab",
-                icon: "",
-                onclick: () => {
-                  let activeTab = tabList.filter((tab) => tab.isActive)[0];
-                  onTabClosed(activeTab.id, activeTab);
-                },
-              },
-            ]}
+            options={[]}
           >
             <button
               id="moreOptions"

@@ -105,7 +105,7 @@ export class SocketTabAdapter {
    * @param _tab - request backend data
    * @returns
    */
-  public unadapt(_tab: Tab) {
+  public unadapt(_tab: Partial<Tab>) {
     const socketTab = createDeepCopy(_tab);
     const messageType =
       socketTab.property.websocket.state.socketMessageLanguage;

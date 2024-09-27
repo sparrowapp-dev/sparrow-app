@@ -3,6 +3,7 @@ import {
   InitEnvironmentTab,
   InitFolderTab,
   InitRequestTab,
+  InitTestflowTab,
   InitWebSocketTab,
 } from "@common/utils";
 // import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
@@ -22,6 +23,14 @@ class InitTab {
    */
   public webSocket = (_id: string, _workspaceId: string) => {
     return new InitWebSocketTab(_id, _workspaceId);
+  };
+
+  /**
+   * @param _id - testflow mongo document id
+   * @param _workspaceId - Workspace mongo id to which testflow belongs to
+   */
+  public testflow = (_id: string, _workspaceId: string) => {
+    return new InitTestflowTab(_id, _workspaceId);
   };
   /**
    * @param _id - request mongo document id

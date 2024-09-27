@@ -1,10 +1,15 @@
 <script lang="ts">
   import { Input, Select, Textarea } from "@library/forms";
-  import { AttachmentIcon, CategoryIcon, CrossIcon } from "@library/icons";
+  import {
+    AttachmentIcon,
+    CategoryIcon,
+    CrossIcon,
+    PlusIcon,
+  } from "@library/icons";
   import { Button, Modal } from "@library/ui";
-  import Drop from "../components/Drop/Drop.svelte";
   import { notifications } from "@library/ui/toast/Toast";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+    import { Drop } from "@support/common/components";
   import { FeedbackType } from "@support/common/types";
 
   export let onAddFeedback;
@@ -19,7 +24,7 @@
       value: [],
     },
   };
-  let isExposeFeedbackForm = false;
+  export let isExposeFeedbackForm = false;
   let isLoading = false;
   let isDescriptionEmpty = false;
   let isSubjectEmpty = false;
@@ -104,7 +109,8 @@
       }}
       class="add-feedback w-100 outline-none border-0 border-radius-4 text-fs-14 fw-normal"
     >
-      + <span class="px-2"> Add Feedback</span>
+      <PlusIcon height={"20"} width={"20"} />
+      <span class="px-2"> Add Feedback</span>
     </button>
   </Tooltip>
 </div>

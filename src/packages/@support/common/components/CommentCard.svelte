@@ -2,17 +2,52 @@
   import { AttachmentIcon } from "@library/icons";
   import { Button, IconFallback } from "@library/ui";
   import { CommentCard } from "@support/common/components";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
+  /**
+   * @description - The current comment being added or modified by the user.
+   */
   export let comment;
+
+  /**
+   * @description - Information about the current user, including details like name, ID, etc.
+   */
   export let userInfo;
+
+  /**
+   * @description - Callback function triggered when a new comment is added.
+   */
   export let onAddComment;
+
+  /**
+   * @description - Function to fetch comments for a specific post from the server.
+   */
   export let fetchComments;
-  export let logMessage;
+
+  /**
+   * @description - Function to reload the list of comments, typically after a new comment is added or deleted.
+   */
+  export let reloadComments;
+
+  /**
+   * @description - The ID of the post to which the comments belong.
+   */
   export let postId;
+
+  let isCommenting = false;
+
+  let isReplying = false;
+
+  let commentValue = "";
+
   const isAuthor = userInfo?.email === comment?.author?.email;
 
-  let parentID = comment?.id;
-
+  /**
+   * Formats a given date into a human-readable "time ago" string.
+   * @param  date - The date to format.
+   * @returns  Formatted time string (e.g., "2 hours ago").
+   */
   const timeAgo = (date) => {
     const diffInSeconds = (new Date() - new Date(date)) / 1000;
     const minutes = Math.floor(diffInSeconds / 60);
@@ -31,13 +66,13 @@
     }
   };
 
-  let isReplying = false;
-  let commentValue = "";
+  /**
+   * Updates the comment value with the input from the event.
+   * @param {Event} e - The input event.
+   */
   const handleAddCommentInput = (e) => {
     commentValue = e.target.value;
   };
-
-  let isCommenting = false;
 </script>
 
 <div class="comment">
@@ -50,16 +85,27 @@
   />
 
   <div class="comment-content">
-    <div class="comment-author">{comment.author.name || ""}</div>
-    <div class="comment-text">
-      {comment.value}
+    <div class="comment-author text-fs-14 mt-1">
+      {comment.author.name || ""}
+    </div>
+    <div
+      class="text-fs-12"
+      style="font-weight: 400; color:var(--text-secondary-1000);  "
+    >
+      <p style="word-break: break-all;">
+        {comment.value}
+      </p>
     </div>
     <div class="comment-meta">
       <div class="comment-moreinfo">
         <span class="comment-time">{timeAgo(comment.created)}</span>
         {#if !comment.parentID}
           <p
-            on:click={() => (isReplying = !isReplying)}
+            on:click={() => {
+              isReplying = !isReplying;
+              MixpanelEvent(Events.Reply_Comment);
+
+            }}
             style="color: {isReplying
               ? 'white'
               : 'grey'}; text-decoration: {isReplying ? 'underline' : 'none'};"
@@ -88,7 +134,7 @@
           bind:value={commentValue}
         />
 
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 ms-1">
           <!-- <AttachmentIcon
             height={"12px"}
             width={"12px"}
@@ -101,13 +147,13 @@
             loaderSize={13}
             loader={isCommenting}
             textStyleProp={"font-size: var(--small-text)"}
-            buttonStyleProp={`height: 20px;  rounded;`}
+            buttonStyleProp={`height: 20px;  rounded; margin-left:2px;`}
             onClick={async () => {
               isCommenting = true;
               await onAddComment(postId, commentValue, comment?.id);
               isCommenting = false;
 
-              logMessage();
+              reloadComments();
               commentValue = "";
               setTimeout(() => {
                 isReplying = false;
@@ -150,7 +196,7 @@
   }
 
   .comment-content {
-    flex-grow: 1;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -196,16 +242,17 @@
   }
 
   .search-input-container {
-    background: var(--bg-tertiary-400);
+    background: var(--bg-secondary-800);
     width: 100%;
     font-size: 12px;
     height: 30px;
     position: relative;
-    border: 1px solid transparent;
+    border: 1px solid var(--border-secondary-310);
+    border-radius: 2px;
   }
 
   .search-input-container:focus-within {
-    border-color: #636566;
+    border-color: var(--border-primary-300);
     caret-color: var(--border-primary-300);
   }
   #search-input:focus {

@@ -8,15 +8,17 @@
     SortIcon,
     StatusIcon,
   } from "@library/icons";
-  import Comment from "@library/icons/Comment.svelte";
 
   import { Button, IconFallback, Loader, Modal } from "@library/ui";
   import ImageModal from "@library/ui/image-modal/ImageModal.svelte";
-  import { CommentCard, UpvoteIcon } from "@support/common/components";
+  import { CommentCard, Drop, UpvoteIcon } from "@support/common/components";
   import { FeedbackType } from "@support/common/types";
-  import { FeedbackStatusType } from "@support/common/types/feedback";
-  import { Drop } from "@workspaces/features/import-collection/components";
   import { onMount } from "svelte";
+  import { FormatTime } from "@common/utils/formatTime";
+  const formatTimeAgo = new FormatTime().formatTimeAgo;
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { notifications } from "@library/ui/toast/Toast";
 
   export let isPostopen;
   export let userInfo;
@@ -25,45 +27,44 @@
   export let fetchComments;
   export let postId;
   export let handleUpvote;
+  export let getColor;
+  export let onUpdateFeedback;
 
   let post = [];
-  let currentImage = "";
-  let createdAt = "";
-  let isExposeFeedbackForm = false;
-  let feedbackDescription = "";
-  let feedbackSubject = "";
-  let type = FeedbackType.CATEGORY;
-  let postImages = [];
-  let commentValue = "";
-  let isLoading = false;
-
-  const timeAgo = (date) => {
-    const diffInSeconds = (new Date() - new Date(date)) / 1000;
-    const minutes = Math.floor(diffInSeconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    if (days >= 1) {
-      return `${days} day${days > 1 ? "s" : ""} ago`;
-    } else if (hours >= 1) {
-      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-    } else {
-      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-    }
-  };
-
-  let isImageOpen = false;
-
-  let comments = [];
   let nestedComments = [];
+  let postImages = [];
+  let comments = [];
+  let createdAt = "";
+  let commentValue = "";
+  let currentImage = "";
+  let feedbackSubject = "";
+  let feedbackDescription = "";
+  let uploadFeedback = {
+    file: {
+      value: [],
+    },
+  };
+  let isLoading = false;
+  let isSaving = false;
+  let isImageOpen = false;
+  let isCommenting = false;
+  let isExposeFeedbackForm = false;
+  let type = FeedbackType.CATEGORY;
+  let isAuthor = false;
+  let isEditingPost = false;
+  let imageURLsArray = [];
+  let tempImageURLsArray = [];
+
+  let originalFeedbackDescription = "";
+  let originalFeedbackSubject = "";
 
   function nestComments(comments) {
     const commentMap = {};
-    comments.forEach((comment) => {
+    comments?.forEach((comment) => {
       comment.replies = [];
       commentMap[comment.id] = comment;
     });
-    comments.forEach((comment) => {
+    comments?.forEach((comment) => {
       if (comment.parentID) {
         const parentComment = commentMap[comment.parentID];
         if (parentComment) {
@@ -74,26 +75,32 @@
     return comments.filter((comment) => !comment.parentID);
   }
 
-  const logMessage = async () => {
+  const reloadComments = async () => {
     comments = await fetchComments(postId);
     nestedComments = nestComments(comments);
   };
 
-  onMount(async () => {
-    isLoading = true;
+  const reloadPost = async () => {
     const res = await onRetrievePost(postId);
     post = await res?.data;
-    createdAt = timeAgo(post?.created);
+    createdAt = formatTimeAgo(post?.created);
     postImages = post?.imageURLs;
     comments = await fetchComments(postId);
+    isAuthor = userInfo?.email === post?.author?.email;
+    feedbackDescription = post?.details;
+    feedbackSubject = post?.title;
+    type = post?.category?.name;
+    imageURLsArray = post?.imageURLs?.map((url) => url);
+    tempImageURLsArray = [...imageURLsArray];
+    originalFeedbackDescription = feedbackDescription;
+    originalFeedbackSubject = feedbackSubject;
+  };
+
+  onMount(async () => {
+    isLoading = true;
+    await reloadPost();
     isLoading = false;
   });
-
-  $: {
-    if (comments) {
-      nestedComments = nestComments(comments);
-    }
-  }
 
   function sortCommentsOldToNew(comments) {
     if (!Array.isArray(comments)) {
@@ -123,7 +130,80 @@
     }
   };
 
-  let isCommenting = false;
+  $: {
+    if (comments) {
+      nestedComments = nestComments(comments);
+    }
+  }
+
+  let isDescriptionEmpty = false;
+  let isSubjectEmpty = false;
+  let isTextArea = false;
+
+  const handleLogoInputChange = (e) => {
+    const errorMessage =
+      "Failed to upload the file. Please check the file size or the format";
+
+    let targetFile = [
+      ...uploadFeedback.file.value,
+      ...(e?.target?.files || e?.dataTransfer?.files),
+    ];
+    const maxImageSize = 2097152; // 2 MB
+    if (targetFile?.length === 0) {
+      return;
+    }
+    let isErrorThrown = false;
+
+    const selectedFiles = targetFile.filter((file) => {
+      let fileType = "mp4";
+      if (file.name) {
+        fileType = `.${(file?.name).split(".").pop().toLowerCase()}`;
+      }
+
+      if (
+        fileType === ".jpg" ||
+        fileType === ".jpeg" ||
+        fileType === ".png" ||
+        fileType === ".svg"
+      ) {
+        if (file.size > maxImageSize) {
+          // image size exceeded
+          isErrorThrown = true;
+          return false;
+        }
+        return true;
+      } else {
+        isErrorThrown = true;
+        return false;
+      }
+    });
+
+    let totalImagesCount = selectedFiles.length + tempImageURLsArray.length;
+    if (totalImagesCount > 5) {
+      selectedFiles.length = 5 - tempImageURLsArray.length;
+      isErrorThrown = true;
+    }
+
+    if (isErrorThrown) {
+      notifications.error(errorMessage);
+    }
+    uploadFeedback.file.value = selectedFiles;
+  };
+
+  const removeFile = (index, isImageUrl = false) => {
+    if (isImageUrl) {
+      // Remove from imageURLsArray
+      tempImageURLsArray = tempImageURLsArray.filter((_, i) => i !== index);
+    } else {
+      // Remove from uploadFeedback.file.value
+      const files = Array.from(uploadFeedback.file.value).filter(
+        (_, i) => i !== index,
+      );
+      if (uploadFeedback?.file) {
+        uploadFeedback.file.value = files;
+      }
+    }
+  };
 </script>
 
 <div class="d-flex flex-row" style="margin-top: 51px; ">
@@ -135,7 +215,7 @@
       handleUpvote();
     }}
   >
-    <LeftIcon color={"#FFFFFF"} />
+    <LeftIcon color={"var(--text-secondary-100)"} />
     <span class="px-2" style="font-size: 14px;">back</span>
   </div>
 
@@ -152,15 +232,17 @@
           class="flex-column"
           style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
         >
-          <span style="font-size: 18px; font-weight: 700;">{post?.title}</span>
+          <span style="font-size: 18px; font-weight: 500;">{post?.title}</span>
           <span
             class="px-2"
-            style="border:0.2px solid #DF77F9 ; color:#DF77F9; padding-bottom: 14px; border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
+            style="border:0.2px solid {getColor(post?.status)
+              .fontColor}; color: {getColor(post?.status)
+              .fontColor}; padding-bottom: 14px; border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
           >
             {post?.status
-              ? post.status.charAt(0).toUpperCase() + post.status.slice(1)
-              : ""}</span
-          >
+              ? post?.status.charAt(0).toUpperCase() + post?.status.slice(1)
+              : ""}
+          </span>
         </div>
 
         <div class="d-flex flex-row">
@@ -169,14 +251,14 @@
           >
             <div style="display: flex; align-items: center; gap: 12px;">
               <IconFallback
-                character={post.author?.name?.charAt(0)}
+                character={post?.author?.name?.charAt(0)}
                 width="34px"
                 height="32px"
-                backgroundColor="#1C1D2B"
-                borderColor="#45494D"
+                backgroundColor="var(--bg-tertiary-750)"
+                borderColor="var(--border-secondary-300)"
               />
               <div style="font-size: 14px; font-weight: 500;">
-                {post.author?.name}
+                {post?.author?.name}
               </div>
             </div>
             <div
@@ -216,16 +298,28 @@
               </div>
 
               <div
-                style="display: flex; align-items: center; font-size: 12px; margin-top:10px; color:#999999 !important;"
+                style="display: flex; align-items: center; font-size: 12px; margin-top:10px; color:var(--text-secondary-50) !important;"
               >
                 <span style="padding-left:4px;">{createdAt} </span>
-                <span class="px-2">|</span>
-                <!-- <span
-                  class="px-2"
-                  on:click={() => {
-                    isExposeFeedbackForm = true;
-                  }}>Edit post</span
-                > -->
+
+                {#if isAuthor}
+                  <span class="px-2">|</span>
+                  <span
+                    role="button"
+                    on:click={() => {
+                      isEditingPost = !isEditingPost;
+                    }}
+                    style="color: {isEditingPost
+                      ? 'white'
+                      : 'grey'}; text-decoration: {isEditingPost
+                      ? 'underline'
+                      : 'none'};"
+                    class="px-2"
+                    on:click={() => {
+                      isExposeFeedbackForm = true;
+                    }}>Edit post</span
+                  >
+                {/if}
               </div>
             </div>
           </div>
@@ -251,7 +345,7 @@
           bind:value={commentValue}
         />
 
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 ms-1">
           <!-- <AttachmentIcon
             height={"12px"}
             width={"12px"}
@@ -263,7 +357,7 @@
             type={`primary`}
             loaderSize={13}
             textStyleProp={"font-size: var(--small-text)"}
-            buttonStyleProp={`height: 20px;  rounded;`}
+            buttonStyleProp={`height: 20px; rounded;`}
             loader={isCommenting}
             onClick={async () => {
               isCommenting = true;
@@ -271,6 +365,7 @@
               comments = await fetchComments(postId);
               commentValue = "";
               isCommenting = false;
+              MixpanelEvent(Events.Add_Comment);
             }}
             disable={commentValue.length == 0 || isCommenting}
           />
@@ -279,7 +374,7 @@
       {#if nestedComments.length > 0}
         <div>
           <div class="d-flex align-items-center justify-content-between mb-3">
-            <h6>Activity Feed</h6>
+            <h6 class="text-fs-14">Activity Feed</h6>
 
             <Select
               data={[
@@ -329,7 +424,7 @@
                 {userInfo}
                 {comment}
                 {fetchComments}
-                {logMessage}
+                {reloadComments}
               />
             {/each}
           </div>
@@ -354,189 +449,233 @@
   isOpen={isExposeFeedbackForm}
   handleModalState={(flag = false) => {
     isExposeFeedbackForm = flag;
-    feedbackDescription = post?.details;
-    feedbackSubject = post?.title;
-    type = FeedbackType.CATEGORY;
+    isEditingPost = false;
   }}
 >
-  <div class="pt-2"></div>
-  <div class="d-flex pb-2">
-    <Select
-      data={[
-        {
-          name: "Feature Request",
-          id: FeedbackType.FEATURE_REQUEST,
-        },
-        {
-          name: "UX Improvement",
-          id: FeedbackType.UI_IMPROVEMENT,
-        },
-        {
-          name: "Bugs",
-          id: FeedbackType.BUG,
-        },
-        {
-          name: "All Categories",
-          id: FeedbackType.ALL_CATEGORY,
-        },
-      ]}
-      iconRequired={true}
-      icon={CategoryIcon}
-      placeholderText={"Category"}
-      id={"feeds"}
-      zIndex={499}
-      titleId={type}
-      onclick={(id = "") => {
-        type = id;
-      }}
-      disabled={false}
-      borderType={"none"}
-      borderActiveType={"none"}
-      borderHighlight={"hover-active"}
-      headerHighlight={"hover-active"}
-      headerHeight={"36px"}
-      minBodyWidth={"150px"}
-      minHeaderWidth={"128px"}
-      maxHeaderWidth={"200px"}
-      borderRounded={"4px"}
-      headerTheme={"violet2"}
-      bodyTheme={"violet"}
-      menuItem={"v2"}
-      headerFontSize={"10px"}
-      isDropIconFilled={true}
-      position={"absolute"}
-    />
-  </div>
-  <div style="">
-    <p class="text-fs-14 mb-0 text-secondary-150">Description</p>
-    <p class="text-fs-12 text-secondary-200 mb-0">
-      {feedbackDescription.length} / 200
-    </p>
+  <div>
+    <div class="pt-2"></div>
 
-    <div
-      class="p-2 bg-tertiary-300
-         mb-3"
-      style="height: 137px; border-radius: 4px; color:#676A80; "
-    >
-      <Input
-        on:input={() => {
-          // if (feedbackSubject.length > 0) {
-          //   isSubjectEmpty = false;
-          //   isTextArea = false;
-          // }
-        }}
-        id="feedback-subject"
-        width={"100%"}
-        type="text"
-        isEditIconRequired={false}
-        bind:value={feedbackSubject}
-        defaultBorderColor="transparent"
-        hoveredBorderColor="transparent"
-        focusedBorderColor={"transparent"}
-        class="text-fs-20 bg-transparent ellipsis fw-normal px-2"
-        style="outline:none;"
-        disabled={false}
-        placeholder="Subject"
-        maxlength={200}
-      />
-      <hr style="margin:0px; padding-bottom:8px;" />
-      <Textarea
-        width={"100%"}
-        on:input={() => {
-          // if (feedbackDescription.length > 0) {
-          //   isDescriptionEmpty = false;
-          //   isTextArea = false;
-          // }
-        }}
-        id="feedback-description"
-        height={"90px"}
-        bind:value={feedbackDescription}
-        defaultBorderColor="transparent"
-        hoveredBorderColor="transparent"
-        focusedBorderColor={"transparent"}
-        class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
-        style="outline:none;
+    <div style="">
+      <p class="text-fs-14 mb-0 text-secondary-150">Description</p>
+      <p class="text-fs-12 text-secondary-200 mb-0">
+        {feedbackDescription.length} / 200
+      </p>
+
+      <div
+        class="p-2 bg-tertiary-300 {isDescriptionEmpty ||
+        isSubjectEmpty ||
+        isTextArea
+          ? 'empty-data-error mb-0'
+          : 'mb-3'}"
+        style="height: 137px; border-radius: 4px; color:#676A80; "
+      >
+        <Input
+          on:input={() => {
+            if (feedbackSubject.length > 0) {
+              isSubjectEmpty = false;
+              isTextArea = false;
+            }
+          }}
+          id="feedback-subject"
+          width={"100%"}
+          type="text"
+          isEditIconRequired={false}
+          bind:value={feedbackSubject}
+          defaultBorderColor="transparent"
+          hoveredBorderColor="transparent"
+          focusedBorderColor={"transparent"}
+          class="text-fs-20 bg-transparent ellipsis fw-normal px-2"
+          style="outline:none;"
+          disabled={false}
+          placeholder="Subject"
+          maxlength={200}
+        />
+        <hr style="margin:0px; padding-bottom:8px;" />
+        <Textarea
+          width={"100%"}
+          on:input={() => {
+            if (feedbackDescription.length > 0) {
+              isDescriptionEmpty = false;
+              isTextArea = false;
+            }
+          }}
+          id="feedback-description"
+          height={"90px"}
+          bind:value={feedbackDescription}
+          defaultBorderColor="transparent"
+          hoveredBorderColor="transparent"
+          focusedBorderColor={"transparent"}
+          class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
+          style="outline:none;
        "
-        disabled={false}
-        placeholder="Add short description"
-        maxlength={200}
-      />
-    </div>
+          disabled={false}
+          placeholder="Add short description"
+          maxlength={200}
+        />
+      </div>
 
-    <div class="drop-box mb-2" style="">
-      <Drop
-        styleProp={""}
-        maxFileSize={2048}
-        labelDescription="Choose an image or drag and drop it here."
-        inputId="upload--feedback-file-input"
-        inputPlaceholder="Drag and Drop or"
-        supportedFileTypes={[".png", ".jpg", ".jpeg", ".svg"]}
-        height={"80px"}
-        infoMessage={"Images: SVG, PNG, JPG, JPEG <br/> (limit 2MB each)<br/> No video files, only images <br/> are accepted"}
-      />
-      <div class="d-flex justify-content-between">
-        <div></div>
-        <div>
-          <span class="text-fs-12 text-tertiary-100">/5</span>
+      {#if isSubjectEmpty}
+        <p class="error-message">Enter a relevant subject for feedback.</p>
+      {/if}
+      {#if isDescriptionEmpty}
+        <p class="error-message">Enter a relevant description for feedback.</p>
+      {/if}
+      {#if isTextArea}
+        <p class="error-message">
+          Please enter subject and description for adding a feedback.
+        </p>
+      {/if}
+
+      <div class="drop-box mb-2" style="">
+        <Drop
+          styleProp={""}
+          maxFileSize={2048}
+          onChange={handleLogoInputChange}
+          labelDescription="Choose an image or drag and drop it here."
+          inputId="upload--feedback-file-input"
+          inputPlaceholder="Drag and Drop or"
+          supportedFileTypes={[".png", ".jpg", ".jpeg", ".svg"]}
+          height={"80px"}
+          infoMessage={"Images: SVG, PNG, JPG, JPEG <br/> (limit 2MB each)<br/> No video files, only images <br/> are accepted"}
+        />
+        <div class="d-flex justify-content-between">
+          <div></div>
+          <div>
+            <span class="text-fs-12 text-tertiary-100">
+              {(uploadFeedback.file.value.length || 0) +
+                (tempImageURLsArray.length || 0)}/5
+            </span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <!-- <div class="d-flex align-items-center justify-content-between">
-    <div class="d-flex">
-      <Button
-        type={"violet"}
-        title={"Cancel"}
-        buttonClassProp={"me-2"}
-        onClick={async () => {
-          isExposeFeedbackForm = false;
-          feedbackDescription = "";
-          feedbackSubject = "";
-          type = FeedbackType.CATEGORY;
-          uploadFeedback = {
-            file: {
-              value: [],
-            },
-          };
-        }}
-      />
-      <Button
-        type={"primary"}
-        title={"Add"}
-        loader={isLoading}
-        onClick={async () => {
-          isLoading = true;
-
-          if (!feedbackDescription || !feedbackSubject) {
-            if (!feedbackDescription && !feedbackSubject) {
-              isTextArea = true;
-              isSubjectEmpty = isDescriptionEmpty = false;
-            } else {
-              isTextArea = false;
-              isSubjectEmpty = !feedbackSubject;
-              isDescriptionEmpty = !feedbackDescription;
-            }
-            isLoading = false;
-          } else {
-            isSubjectEmpty = isDescriptionEmpty = isTextArea = false;
-            const res = await onInputFeedback(
-              feedbackSubject,
-              feedbackDescription,
-              type === FeedbackType.CATEGORY ? FeedbackType.ALL_CATEGORY : type,
-              uploadFeedback,
-            );
-            if (res?.isSuccessful) {
-              isExposeFeedbackForm = false;
-              type = FeedbackType.CATEGORY;
-              feedbackDescription = "";
-              feedbackSubject = "";
-            }
-          }
-          isLoading = false;
-        }}
-      />
+    <div class="d-flex gap-1 overflow-scroll file-scroller">
+      {#if tempImageURLsArray.length > 0}
+        <div class="file-scroller mb-2 d-flex gap-1">
+          {#each tempImageURLsArray as file, index}
+            <div
+              class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
+            >
+              <span>
+                <AttachmentIcon
+                  height={"12px"}
+                  width={"12px"}
+                  color={"var(--text-secondary-200)"}
+                />
+              </span>
+              <span class="mb-0 text-fs-12 px-2 ellipsis"
+                >{file?.name || file?.slice(-10)}</span
+              >
+              <span
+                on:click={() => {
+                  removeFile(index, true);
+                }}
+                ><CrossIcon
+                  height={"12px"}
+                  width={"9px"}
+                  color={"var(--text-secondary-200)"}
+                /></span
+              >
+            </div>
+          {/each}
+        </div>
+      {/if}
+      {#if uploadFeedback?.file?.value?.length > 0}
+        <div class="file-scroller mb-2 d-flex gap-1">
+          {#each uploadFeedback?.file?.value as file, index}
+            <div
+              class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
+            >
+              <span>
+                <AttachmentIcon
+                  height={"12px"}
+                  width={"12px"}
+                  color={"var(--text-secondary-200)"}
+                />
+              </span>
+              <span class="mb-0 text-fs-12 px-2 ellipsis"
+                >{file?.name || file?.slice(-10)}</span
+              >
+              <span
+                on:click={() => {
+                  removeFile(index);
+                }}
+                ><CrossIcon
+                  height={"12px"}
+                  width={"9px"}
+                  color={"var(--text-secondary-200)"}
+                /></span
+              >
+            </div>
+          {/each}
+        </div>
+      {/if}
     </div>
-  </div> -->
+    <div class="d-flex align-items-center justify-content-end">
+      <div class="d-flex">
+        <Button
+          type={"violet"}
+          title={"Cancel"}
+          buttonClassProp={"me-2"}
+          onClick={async () => {
+            isExposeFeedbackForm = false;
+            isEditingPost = false;
+            tempImageURLsArray = [...imageURLsArray];
+            feedbackDescription = originalFeedbackDescription;
+            feedbackSubject = originalFeedbackSubject; // Restore original values
+            isTextArea = false;
+            isDescriptionEmpty = false;
+            isSubjectEmpty = false;
+            uploadFeedback = {
+              file: {
+                value: [],
+              },
+            };
+          }}
+        />
+        <Button
+          type={"primary"}
+          title={"Save"}
+          loader={isSaving}
+          onClick={async () => {
+            isSaving = true;
+
+            if (!feedbackDescription || !feedbackSubject) {
+              if (!feedbackDescription && !feedbackSubject) {
+                isTextArea = true;
+                isSubjectEmpty = isDescriptionEmpty = false;
+              } else {
+                isTextArea = false;
+                isSubjectEmpty = !feedbackSubject;
+                isDescriptionEmpty = !feedbackDescription;
+              }
+              isSaving = false;
+            } else {
+              isSubjectEmpty = isDescriptionEmpty = isTextArea = false;
+              const res = await onUpdateFeedback(
+                post?.id,
+                feedbackSubject,
+                feedbackDescription,
+                uploadFeedback,
+                tempImageURLsArray,
+              );
+              if (res?.isSuccessful) {
+                isExposeFeedbackForm = false;
+                isEditingPost = false;
+                await reloadPost();
+                uploadFeedback = {
+                  file: {
+                    value: [],
+                  },
+                };
+              }
+            }
+            isSaving = false;
+          }}
+        />
+      </div>
+    </div>
+  </div>
 </Modal>
 
 <style>
@@ -556,21 +695,17 @@
   }
 
   .search-input-container {
-    /* border: 1px solid var(--border-color); */
-    background: var(--bg-tertiary-400);
+    background: var(--bg-secondary-800);
     width: 100%;
     font-size: 12px;
     height: 30px;
     position: relative;
-    border: 1px solid transparent;
+    border: 1px solid var(--border-secondary-310);
+    border-radius: 2px;
   }
-  /* .search-input-container:hover {
-    border: 1px solid var(--border-primary-300);
-    caret-color: var(--border-primary-300);
-  } */
 
   .search-input-container:focus-within {
-    border-color: #636566;
+    border-color: var(--border-primary-300);
     caret-color: var(--border-primary-300);
   }
 
@@ -578,5 +713,19 @@
     outline: none;
     border: none;
     box-shadow: none;
+  }
+
+  .empty-data-error {
+    border: 1px solid var(--error--color);
+  }
+
+  .error-message {
+    color: var(--error--color);
+    font-size: 12px;
+    margin-bottom: 20px;
+  }
+
+  .file-scroller::-webkit-scrollbar {
+    display: none;
   }
 </style>

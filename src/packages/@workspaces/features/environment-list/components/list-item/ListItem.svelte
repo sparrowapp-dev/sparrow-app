@@ -278,7 +278,7 @@
     </div>
     {#if env.id.includes(UntrackedItems.UNTRACKED)}
       <Spinner size={"15px"} />
-    {:else}
+    {:else if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
       <Tooltip placement="bottom" title="More" distance={17} show={!showMenu}>
         <button
           id={`show-more-environment-${env?.id}`}
@@ -292,7 +292,7 @@
           disabled={loggedUserRoleInWorkspace ===
             WorkspaceRole.WORKSPACE_VIEWER}
         >
-          <img src={threedotIcon} alt="threedotIcon" />
+          <img class="threedot-icon" src={threedotIcon} alt="threedotIcon" />
         </button>
       </Tooltip>
     {/if}
@@ -333,7 +333,7 @@
     }
 
     .btn-primary:hover {
-      background-color: var(--bg-secondary-850);
+      background-color: var(--bg-tertiary-300);
     }
 
     .renameInputFieldCollection {
@@ -360,5 +360,9 @@
       width: calc(100% - 30px);
       text-align: left;
     }
+  }
+
+  .threedot-icon {
+    transform: rotate(90deg);
   }
 </style>

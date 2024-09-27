@@ -1,16 +1,11 @@
 <script lang="ts">
   import { TriangleIcon } from "@library/icons";
 
-  export let backgroundColor = "";
-
-  export let upvote: number; // Current upvote count
-  export let postID: string; // Post ID
-  export let likePost: (postId: string) => void; // Function to call `Upvote`
-  export let dislikePost: (postId: string) => void; // Function to call `UndoUpvote`
-  export let handleUpvote;
-
-  export let isPostLiked;
-
+  export let upvote: number;
+  export let postID: string;
+  export let likePost: (postId: string) => void;
+  export let dislikePost: (postId: string) => void;
+  export let isPostLiked: boolean;
 
   const handleClick = () => {
     if (isPostLiked) {
@@ -18,9 +13,9 @@
       upvote--;
     } else {
       likePost(postID);
-      upvote++; 
+      upvote++;
     }
-    isPostLiked = !isPostLiked; // Toggle the upvote state
+    isPostLiked = !isPostLiked;
   };
 </script>
 
@@ -28,7 +23,6 @@
   class={isPostLiked
     ? "upvote-container upvoted"
     : "upvote-container not-upvoted"}
-  style="background-color: {backgroundColor}"
   on:click={handleClick}
 >
   <div style="height: 22px; width: 24px; text-align: center;">
@@ -48,16 +42,21 @@
     align-items: center;
     padding: 1px 4px;
     border-radius: 4px;
-    /* cursor: pointer; */
     margin-left: 10px;
   }
 
+  /* .upvote-container:hover {
+    opacity: 70%;
+    background-color: #232F3D;
+  } */
+
   .upvoted {
-    border: 0.3px solid blue;
-    color: blue;
+    border: 0.3px solid var(--border-primary-300);
+    color: var(--text-primary-300);
+    background-color: var(--bg-primary-650);
   }
 
   .not-upvoted {
-    border: 0.3px solid #8A9299;
+    border: 0.3px solid var(--border-secondary-200);
   }
 </style>

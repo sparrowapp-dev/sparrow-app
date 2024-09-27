@@ -11,10 +11,10 @@
     ArrowUpward,
     ArrowDownward,
     DownArrowIcon,
+    BlankIcon,
   } from "@library/icons";
   import { Dropdown, Tooltip } from "@library/ui";
   import { WithButtonV4 } from "@workspaces/common/hoc";
-  import { arrowInsert, arrowOutward, blank } from "../../icons";
 
   export let webSocket;
   export let onSearchMessage;
@@ -184,21 +184,30 @@
           options={[
             {
               name: "All messages",
-              icon: blank,
+              icon: BlankIcon,
+              iconColor: "",
+              iconSize: "13px",
+              color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("All messages");
               },
             },
             {
               name: "Sent",
-              icon: arrowOutward,
+              icon: ArrowOutwardIcon,
+              iconColor: "#69D696",
+              iconSize: "13px",
+              color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("Sent");
               },
             },
             {
               name: "Received",
-              icon: arrowInsert,
+              icon: ArrowInsertIcon,
+              iconColor: "#0B5ED7",
+              iconSize: "13px",
+              color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("Received");
               },

@@ -121,6 +121,18 @@
       inputField.blur();
     }
   };
+
+  const dragStart = (event, collection) => {
+    const data = {
+      workspaceId: collection.workspaceId,
+      collectionId: collection.id,
+      folderId: folder?.id ?? "",
+      requestId: api.id,
+      name: api.name,
+      method: api.request.method,
+    };
+    event.dataTransfer.setData("text/plain", JSON.stringify(data));
+  };
 </script>
 
 <svelte:window
@@ -236,6 +248,8 @@
 {/if}
 
 <div
+  draggable={true}
+  on:dragstart={(event) => dragStart(event, collection)}
   bind:this={requestTabWrapper}
   class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {api.id ===
   activeTabId
@@ -382,6 +396,10 @@
   .threedot-icon-container {
     visibility: hidden;
     background-color: transparent;
+  }
+
+  .threedot-icon-container:active {
+    background-color: var(--bg-secondary-420) !important;
   }
 
   .threedot-active {
