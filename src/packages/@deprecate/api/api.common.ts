@@ -14,7 +14,10 @@ import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 import type { Response } from "$lib/utils/interfaces/request.interface";
 import { listen } from "@tauri-apps/api/event";
-import { webSocketDataStore } from "@workspaces/features/socket-explorer/store";
+import {
+  webSocketDataStore,
+  webSocketListener,
+} from "@workspaces/features/socket-explorer/store";
 import { v4 as uuidv4 } from "uuid";
 import { RequestDataTypeEnum } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
@@ -315,6 +318,15 @@ const disconnectWebSocket = async (tab_id: string) => {
           }
           return webSocketDataMap;
         });
+        let listener;
+        webSocketListener.update((webSocketListenerMap) => {
+          listener = webSocketListenerMap.get(tab_id);
+          if (listener) {
+            console.log("listener in disconnect", listener);
+            listener();
+          }
+          return webSocketListenerMap;
+        });
         notifications.success("WebSocket disconnected successfully.");
       } catch (e) {
         console.error(e);
@@ -408,7 +420,7 @@ const connectWebSocket = async (
         notifications.success("WebSocket connected successfully");
 
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
-        listen(`ws_message_${tabId}`, (event) => {
+        const listener = await listen(`ws_message_${tabId}`, (event) => {
           console.log("event---->", event);
 
           webSocketDataStore.update((webSocketDataMap) => {
@@ -424,6 +436,10 @@ const connectWebSocket = async (
             }
             return webSocketDataMap;
           });
+        });
+        webSocketListener.update((webSocketListenerMap) => {
+          webSocketListenerMap.set(tabId, listener);
+          return webSocketListenerMap;
         });
       } catch (e) {
         console.error(e);

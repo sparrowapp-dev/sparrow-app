@@ -1,1 +1,1 @@
-export { webSocketDataStore } from "./websocket";
+export { webSocketDataStore, webSocketListener } from "./websocket";
