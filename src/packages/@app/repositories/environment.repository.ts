@@ -104,13 +104,13 @@ export class EnvironmentRepository {
    * Retrieves an array of test flow documents by their workspace ID.
    *
    * @param  _workspaceId - The unique identifier of the workspace to filter the test flows.
-   * @returns A promise that resolves to an array of test flow documents associated with the given workspace ID.
+   * @returns A promise that resolves to an array of environment documents associated with the given workspace ID.
    */
   public getEnvironmentByWorkspaceId = async (
     _workspaceId: string,
   ): Promise<any | undefined> => {
     console.log("CALLED");
-    return await RxDB.getInstance()
+    return await RxDB.get Instance()
       .rxdb.environment?.find({
         selector: {
           workspaceId: _workspaceId,
