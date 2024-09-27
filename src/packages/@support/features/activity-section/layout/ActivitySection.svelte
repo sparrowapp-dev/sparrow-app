@@ -345,11 +345,13 @@
                         <div style="flex: 1;">
                           <div
                             class="title"
-                            on:click={() => (
+                            on:click={() => {
                               (postId = post?.id),
                               (isPostopen = true),
                               setPostId("feedback", postId)
-                            )}
+                              MixpanelEvent(Events.Activity_Post);
+
+                            }}
                           >
                             {post?.title}
                           </div>
