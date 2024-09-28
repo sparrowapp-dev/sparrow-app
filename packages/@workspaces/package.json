@@ -12,6 +12,9 @@
   },
   "private": true,
   "main": "src/main.ts",
+  "exports": {
+    "./features": "./src/features/index.ts"
+  },
   "devDependencies": {
     "@fontsource/fira-mono": "^4.5.10",
     "@neoconfetti/svelte": "^1.0.0",
