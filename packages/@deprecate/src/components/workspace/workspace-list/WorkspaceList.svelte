@@ -1,11 +1,11 @@
 <script lang="ts">
-  import RecentApi from "$lib/components/dashboard/recent-apis/RecentAPI.svelte";
-  import RecentWorkspace from "$lib/components/dashboard/recent-workspace/RecentWorkspace.svelte";
-  import TeamsList from "$lib/components/dashboard/teams/TeamsList.svelte";
+  import RecentApi from "@deprecate/components/dashboard/recent-apis/RecentAPI.svelte";
+  import RecentWorkspace from "@deprecate/components/dashboard/recent-workspace/RecentWorkspace.svelte";
+  import TeamsList from "@deprecate/components/dashboard/teams/TeamsList.svelte";
   import type {
     TeamRepositoryMethods,
     TeamServiceMethods,
-  } from "$lib/utils/interfaces";
+  } from "@deprecate/utils/interfaces";
   export let data: any;
   export let tabList: any;
   export let collectionList: any;

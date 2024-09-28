@@ -1,11 +1,11 @@
 <script lang="ts">
-  import Warning from "$lib/assets/warning.svg";
-  import Cross from "$lib/assets/cross.svg";
+  import Warning from "@deprecate/assets/warning.svg";
+  import Cross from "@deprecate/assets/cross.svg";
   import { slide } from "svelte/transition";
   import type {
     EnvironmentResponseDto,
     UpdateEnvironmentPostBody,
-  } from "$lib/utils/dto";
+  } from "@deprecate/utils/dto";
   import { notifications } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
   export let environmentAxisX;

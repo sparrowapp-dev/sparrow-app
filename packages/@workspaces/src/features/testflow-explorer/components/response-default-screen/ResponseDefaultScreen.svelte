@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ComboText } from "@sparrow/workspaces/common/components";
-  import { isHorizontal } from "$lib/store/request-response-section";
+  import { isHorizontal } from "@deprecate/store/request-response-section";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
   import { SparrowLogo } from "@common/images";

@@ -1,9 +1,9 @@
 /**
  * @deprecated - please use enbironment service v1
  */
-import { getAuthHeaders, makeRequest } from "$lib/api/api.common";
-import constants from "$lib/utils/constants";
-import type { UpdateEnvironmentPostBody } from "$lib/utils/dto";
+import { getAuthHeaders, makeRequest } from "@deprecate/api/api.common";
+import constants from "@deprecate/utils/constants";
+import type { UpdateEnvironmentPostBody } from "@deprecate/utils/dto";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 
 export class EnvironmentService {

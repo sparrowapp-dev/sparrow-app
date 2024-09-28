@@ -1,9 +1,9 @@
 <script lang="ts">
-  import angleDown from "$lib/assets/dropdown.svg";
-  import angleUp from "$lib/assets/angle-up-2.svg";
-  import plus from "$lib/assets/white-plus.svg";
-  import close from "$lib/assets/close.svg";
-  import { selectMethodsStore, showPathStore } from "$lib/store/methods";
+  import angleDown from "@deprecate/assets/dropdown.svg";
+  import angleUp from "@deprecate/assets/angle-up-2.svg";
+  import plus from "@deprecate/assets/white-plus.svg";
+  import close from "@deprecate/assets/close.svg";
+  import { selectMethodsStore, showPathStore } from "@deprecate/store/methods";
   import { onDestroy } from "svelte";
   import { slide } from "svelte/transition";
   export let handleSearch: () => void;

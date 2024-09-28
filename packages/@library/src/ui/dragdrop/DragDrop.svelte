@@ -1,7 +1,11 @@
 <script lang="ts">
-  import { DeleteIcon, EditIcon, UploadIcon } from "$lib/assets/app.asset";
-  import { base64ToURL, imageDataToURL } from "$lib/utils/helpers";
-  import { CrossIcon } from "$lib/assets/app.asset";
+  import {
+    DeleteIcon,
+    EditIcon,
+    UploadIcon,
+  } from "@deprecate/assets/app.asset";
+  import { base64ToURL, imageDataToURL } from "@deprecate/utils/helpers";
+  import { CrossIcon } from "@deprecate/assets/app.asset";
 
   export let value: any = [];
   export let labelText: string;

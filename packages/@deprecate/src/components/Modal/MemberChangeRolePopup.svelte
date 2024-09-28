@@ -3,8 +3,8 @@
    * @deprecated please do not use this file
    * Instead of this we can use src\lib\components\Modal\Modal.svelte
    * **/
-  import closeIcon from "$lib/assets/close.svg";
-  import { base64ToURL } from "$lib/utils/helpers";
+  import closeIcon from "@deprecate/assets/close.svg";
+  import { base64ToURL } from "@deprecate/utils/helpers";
   import { fly, fade } from "svelte/transition";
   import Button from "../buttons/Button.svelte";
 

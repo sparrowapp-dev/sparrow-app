@@ -3,7 +3,7 @@
    * @deprecated This component is deprecated and will be removed in future releases.
    * Please use Table Component instead.
    */
-  import { calculateTimeDifferenceInDays } from "$lib/utils/workspacetimeUtils";
+  import { calculateTimeDifferenceInDays } from "@deprecate/utils/workspacetimeUtils";
   export let data: any;
   export let selectedTab: string;
 </script>

@@ -1,17 +1,17 @@
 <script lang="ts">
-  import threedotIcon from "$lib/assets/3dot.svg";
-  import { SelectIcon } from "$lib/assets/app.asset";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import threedotIcon from "@deprecate/assets/3dot.svg";
+  import { SelectIcon } from "@deprecate/assets/app.asset";
+  import { UntrackedItems } from "@deprecate/utils/enums/item-type.enum";
   import { Spinner } from "@sparrow/library/ui";
   import type {
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
-  } from "$lib/utils/interfaces/environment.interface";
-  import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
+  } from "@deprecate/utils/interfaces/environment.interface";
+  import { generateSampleEnvironment } from "@deprecate/utils/sample/environment.sample";
   import { notifications } from "@sparrow/library/ui";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
-  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
+  import RightOption from "@deprecate/components/right-click-menu/RightClickMenuView.svelte";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;

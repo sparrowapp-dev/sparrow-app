@@ -3,8 +3,8 @@
    * @deprecated please do not use this file
    * Instead of this we can use src\lib\components\dropdown\Dropdown
    * **/
-  import dropdown from "$lib/assets/dropdown.svg";
-  import checkIcon from "$lib/assets/check.svg";
+  import dropdown from "@deprecate/assets/dropdown.svg";
+  import checkIcon from "@deprecate/assets/check.svg";
   import { onDestroy, onMount } from "svelte";
   import { slide } from "svelte/transition";
 

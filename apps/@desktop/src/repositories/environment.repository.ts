@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type EnvironmentDocument } from "../database/database";
-import { environmentType } from "$lib/utils/enums/environment.enum";
+import { environmentType } from "@deprecate/utils/enums/environment.enum";
 import type { Observable } from "rxjs";
 
 export class EnvironmentRepository {

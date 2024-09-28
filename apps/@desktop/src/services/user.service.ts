@@ -1,6 +1,6 @@
-import { getAuthHeaders, makeRequest } from "$lib/api/api.common";
-import constants from "$lib/utils/constants";
-import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
+import { getAuthHeaders, makeRequest } from "@deprecate/api/api.common";
+import constants from "@deprecate/utils/constants";
+import type { MakeRequestResponse } from "@deprecate/utils/interfaces/common.interface";
 
 const apiUrl: string = constants.API_URL;
 export class UserService {

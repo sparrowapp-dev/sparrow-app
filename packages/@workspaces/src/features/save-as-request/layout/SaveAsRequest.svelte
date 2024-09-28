@@ -1,26 +1,26 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
-  import collectionAsset from "$lib/assets/collection.svg";
-  import workspaceAsset from "$lib/assets/workspace.svg";
-  import folderAsset from "$lib/assets/folder.svg";
-  import leftArrowAsset from "$lib/assets/angleLeft.svg";
+  import { ItemType } from "@deprecate/utils/enums/item-type.enum";
+  import collectionAsset from "@deprecate/assets/collection.svg";
+  import workspaceAsset from "@deprecate/assets/workspace.svg";
+  import folderAsset from "@deprecate/assets/folder.svg";
+  import leftArrowAsset from "@deprecate/assets/angleLeft.svg";
   import { searchTreeDocument } from "../utils";
   import { notifications } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
-  import tickIcon from "$lib/assets/tick-grey.svg";
-  import crossIcon from "$lib/assets/cross-grey.svg";
+  import tickIcon from "@deprecate/assets/tick-grey.svg";
+  import crossIcon from "@deprecate/assets/cross-grey.svg";
   import { Spinner } from "@sparrow/library/ui";
-  import QuestionIcon from "$lib/assets/question.svelte";
+  import QuestionIcon from "@deprecate/assets/question.svelte";
   import { Button } from "@sparrow/library/ui";
   import { FileType } from "../components";
-  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+  import { getMethodStyle } from "@deprecate/utils/helpers/conversion.helper";
   import {
     bestPractice,
     dos,
     donts,
-  } from "$lib/utils/constants/request.constant";
+  } from "@deprecate/utils/constants/request.constant";
   import {
     CollectionIcon,
     FolderIcon2,

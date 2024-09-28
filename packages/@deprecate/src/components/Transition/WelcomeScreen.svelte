@@ -1,9 +1,9 @@
 <script lang="ts">
-  import icons from "$lib/assets/app.asset";
+  import icons from "@deprecate/assets/app.asset";
   import { Spinner } from "@sparrow/library/ui";
-  import { register_user, setUser } from "$lib/store/auth.store";
-  import constants from "$lib/utils/constants";
-  import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
+  import { register_user, setUser } from "@deprecate/store/auth.store";
+  import constants from "@deprecate/utils/constants";
+  import { jwtDecode, setAuthJwt } from "@deprecate/utils/jwt";
   import { onDestroy, onMount } from "svelte";
 
   import { fly, fade } from "svelte/transition";

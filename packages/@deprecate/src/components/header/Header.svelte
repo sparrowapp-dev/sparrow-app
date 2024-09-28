@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getCurrent } from "@tauri-apps/api/window";
-  import sparrowicon from "$lib/assets/sparrowIcon.svg";
-  import icons from "$lib/assets/app.asset";
+  import sparrowicon from "@deprecate/assets/sparrowIcon.svg";
+  import icons from "@deprecate/assets/app.asset";
 
   let isMaximizeWindow: boolean = false;
 

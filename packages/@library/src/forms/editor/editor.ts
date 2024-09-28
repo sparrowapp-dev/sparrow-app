@@ -1,7 +1,7 @@
 import type { Compartment } from "@codemirror/state";
 import type { EditorView } from "codemirror";
 import { javascript } from "@codemirror/lang-javascript";
-import { RequestDataType } from "$lib/utils/enums";
+import { RequestDataType } from "@deprecate/utils/enums";
 import { html } from "@codemirror/lang-html";
 import { jsonSetup } from "./theme";
 import { xml } from "@codemirror/lang-xml";

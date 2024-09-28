@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { WorkspaceDocument } from "@app/database/database";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
   import {
     VectorIcon,
     SocketIcon,
@@ -14,7 +14,7 @@
   import type { Observable } from "rxjs";
   import { Card } from "../components";
   import { TFDefaultEnum } from "@common/types/workspace/testflow";
-  import { WorkspaceRole } from "$lib/utils/enums";
+  import { WorkspaceRole } from "@deprecate/utils/enums";
 
   export let showImportCollectionPopup;
   export let onItemCreated;

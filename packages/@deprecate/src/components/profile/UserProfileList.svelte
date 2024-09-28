@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { UserProfileSM } from "$lib/components";
+  import { UserProfileSM } from "@deprecate/components";
   import { onMount } from "svelte";
 
   export let users: any[];

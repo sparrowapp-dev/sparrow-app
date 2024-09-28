@@ -1,24 +1,24 @@
 <script lang="ts">
-  import downloadIcon from "$lib/assets/download.svg";
-  import copyIcon from "$lib/assets/copy.svg";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import copyToClipBoard from "$lib/utils/copyToClipboard";
+  import downloadIcon from "@deprecate/assets/download.svg";
+  import copyIcon from "@deprecate/assets/copy.svg";
+  import Dropdown from "@deprecate/components/dropdown/Dropdown.svelte";
+  import copyToClipBoard from "@deprecate/utils/copyToClipboard";
   import { notifications } from "@sparrow/library/ui";
   import {
     RequestDataType,
     ResponseFormatter,
     ResponseStatusCode,
-  } from "$lib/utils/enums/request.enum";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  } from "@deprecate/utils/enums/request.enum";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { UntrackedItems } from "@deprecate/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { RequestProperty } from "$lib/utils/enums/request.enum";
-  import StatusSuccess from "$lib/assets/status-success.svelte";
-  import StatusError from "$lib/assets/status-error.svelte";
-  import CodeMirrorResponse from "$lib/components/editor/CodeMirrorResponse.svelte";
+  import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
+  import { RequestProperty } from "@deprecate/utils/enums/request.enum";
+  import StatusSuccess from "@deprecate/assets/status-success.svelte";
+  import StatusError from "@deprecate/assets/status-error.svelte";
+  import CodeMirrorResponse from "@deprecate/components/editor/CodeMirrorResponse.svelte";
   import { Select } from "@sparrow/library/forms";
 
   export let response;

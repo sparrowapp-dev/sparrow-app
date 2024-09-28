@@ -1,29 +1,29 @@
 <script lang="ts">
-  import tableColumnIcon from "$lib/assets/tableColumn.svg";
-  import barIcon from "$lib/assets/barIcon.svg";
-  import lineIcon from "$lib/assets/line.svg";
+  import tableColumnIcon from "@deprecate/assets/tableColumn.svg";
+  import barIcon from "@deprecate/assets/barIcon.svg";
+  import lineIcon from "@deprecate/assets/line.svg";
   import {
     collapsibleState,
     isHorizontal,
     leftPanelWidth,
     rightPanelWidth,
-  } from "$lib/store/request-response-section";
+  } from "@deprecate/store/request-response-section";
   import { onDestroy } from "svelte";
   import { ApiSendRequestViewModel } from "./ApiSendRequestPage.ViewModel";
   import { createApiRequest } from "@app/services/rest-api.service";
-  import ColorDropdown from "$lib/components/dropdown/ColourDropdown.svelte";
+  import ColorDropdown from "@deprecate/components/dropdown/ColourDropdown.svelte";
   import {
     RequestMethod,
     RequestProperty,
     ResponseStatusCode,
-  } from "$lib/utils/enums/request.enum";
-  import type { RequestMethodType } from "$lib/utils/types/request.type";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  } from "@deprecate/utils/enums/request.enum";
+  import type { RequestMethodType } from "@deprecate/utils/types/request.type";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
+  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
   import EnvironmentPicker from "../environment-picker/EnvironmentPicker.svelte";
-  import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import { EnvironmentHeper } from "@deprecate/utils/helpers/environment.helper";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import CodeMirrorInput from "./CodeMirrorInput.svelte";
   import type { EditorSelection } from "@codemirror/state";
   import AddEnvironment from "../add-environment-popup/AddEnvironment.svelte";
@@ -32,8 +32,8 @@
     WorkspaceDocument,
   } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import { editLink } from "$lib/store/api-request";
+  import Dropdown from "@deprecate/components/dropdown/Dropdown.svelte";
+  import { editLink } from "@deprecate/store/api-request";
   import { v4 as uuidv4 } from "uuid";
   import { Select } from "@sparrow/library/forms";
 

@@ -1,39 +1,42 @@
 <script lang="ts">
-  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
-  import folder from "$lib/assets/folder.svg";
-  import folderOpenIcon from "$lib/assets/open-folder.svg";
+  import RightOption from "@deprecate/components/right-click-menu/RightClickMenuView.svelte";
+  import folder from "@deprecate/assets/folder.svg";
+  import folderOpenIcon from "@deprecate/assets/open-folder.svg";
 
-  import { isFolderCreatedFirstTime } from "$lib/store/collection";
+  import { isFolderCreatedFirstTime } from "@deprecate/store/collection";
 
   import Request from "../request/Request.svelte";
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import {
+    ItemType,
+    UntrackedItems,
+  } from "@deprecate/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
+  import { moveNavigation } from "@deprecate/utils/helpers/navigation";
   import { CollectionListViewModel } from "../CollectionList.ViewModel";
-  import { type CreateApiRequestPostBody } from "$lib/utils/dto";
-  import { type CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { type CreateApiRequestPostBody } from "@deprecate/utils/dto";
+  import { type CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import { Spinner } from "@sparrow/library/ui";
-  import threedotIcon from "$lib/assets/3dot.svg";
+  import threedotIcon from "@deprecate/assets/3dot.svg";
   import { CollectionService } from "@app/services/collection.service";
-  import { selectMethodsStore } from "$lib/store/methods";
+  import { selectMethodsStore } from "@deprecate/store/methods";
   import { onDestroy } from "svelte";
-  import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
-  import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
-  import { handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
-  import requestIcon from "$lib/assets/create_request.svg";
-  import angleRight from "$lib/assets/angleRight.svg";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import { generateSampleFolder } from "@deprecate/utils/sample/folder.sample";
+  import { isApiCreatedFirstTime } from "@deprecate/store/request-response-section";
+  import { handleFolderClick } from "@deprecate/utils/helpers/handle-clicks.helper";
+  import requestIcon from "@deprecate/assets/create_request.svg";
+  import angleRight from "@deprecate/assets/angleRight.svg";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import { Modal } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
   import {
     workspaceLevelPermissions,
     PERMISSION_NOT_FOUND_TEXT,
-  } from "$lib/utils/constants/permissions.constant";
-  import { WorkspaceRole } from "$lib/utils/enums";
+  } from "@deprecate/utils/constants/permissions.constant";
+  import { WorkspaceRole } from "@deprecate/utils/enums";
   import { Tooltip } from "@sparrow/library/ui";
 
   let expand: boolean = false;

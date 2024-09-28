@@ -10,12 +10,12 @@
     validateClientURL,
     validateClientXML,
     validateImportBody,
-  } from "$lib/utils/collections/utils.old";
-  import linkIcon from "$lib/assets/linkIcon.svg";
+  } from "@deprecate/utils/collections/utils.old";
+  import linkIcon from "@deprecate/assets/linkIcon.svg";
   import { invoke } from "@tauri-apps/api/core";
   import { Button } from "@sparrow/library/ui";
-  import { ContentTypeEnum, ResponseStatusCode } from "$lib/utils/enums";
-  import TickMark from "$lib/assets/tick-mark-rounded.svelte";
+  import { ContentTypeEnum, ResponseStatusCode } from "@deprecate/utils/enums";
+  import TickMark from "@deprecate/assets/tick-mark-rounded.svelte";
   import { Drop } from "../components";
 
   export let currentWorkspaceId;

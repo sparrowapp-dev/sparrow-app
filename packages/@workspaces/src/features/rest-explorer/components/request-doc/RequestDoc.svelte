@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Events } from "$lib/utils/enums";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
   import { generatingImage } from "@common/images";
   import { TextEditor } from "@sparrow/library/forms";
   import { AISuggestionBox } from "../../../../features/chat-bot/components";

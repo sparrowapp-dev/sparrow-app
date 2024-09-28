@@ -1,13 +1,13 @@
 <script lang="ts">
-  import dragIcon from "$lib/assets/drag.svg";
-  import trashIcon from "$lib/assets/trash-icon.svg";
-  import { findAuthParameter } from "$lib/utils/helpers/auth.helper";
-  import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
+  import dragIcon from "@deprecate/assets/drag.svg";
+  import trashIcon from "@deprecate/assets/trash-icon.svg";
+  import { findAuthParameter } from "@deprecate/utils/helpers/auth.helper";
+  import type { KeyValuePair } from "@deprecate/utils/interfaces/request.interface";
   import { onMount } from "svelte";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { RequestProperty } from "$lib/utils/enums/request.enum";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
+  import { RequestProperty } from "@deprecate/utils/enums/request.enum";
   import EnvironmentPicker from "../environment-picker/EnvironmentPicker.svelte";
-  import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
+  import { EnvironmentHeper } from "@deprecate/utils/helpers/environment.helper";
 
   export let request;
   export let params: KeyValuePair[] = [];

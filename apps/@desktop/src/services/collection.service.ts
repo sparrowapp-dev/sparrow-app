@@ -1,6 +1,6 @@
-import { getAuthHeaders, makeRequest } from "$lib/api/api.common";
+import { getAuthHeaders, makeRequest } from "@deprecate/api/api.common";
 import { CollectionRepository } from "../repositories/collection.repository";
-import constants from "$lib/utils/constants";
+import constants from "@deprecate/utils/constants";
 import type {
   CreateApiRequestPostBody,
   CreateCollectionPostBody,
@@ -8,8 +8,8 @@ import type {
   DeleteRequestName,
   ImportBodyUrl,
   UpdateCollectionName,
-} from "$lib/utils/dto";
-import { ContentTypeEnum } from "$lib/utils/enums/request.enum";
+} from "@deprecate/utils/dto";
+import { ContentTypeEnum } from "@deprecate/utils/enums/request.enum";
 import { createApiRequest } from "./rest-api.service";
 
 export class CollectionService {

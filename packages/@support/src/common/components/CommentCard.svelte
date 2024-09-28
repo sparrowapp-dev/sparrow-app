@@ -2,8 +2,8 @@
   import { AttachmentIcon } from "@sparrow/library/icons";
   import { Button, IconFallback } from "@sparrow/library/ui";
   import { CommentCard } from "@sparrow/support/common/components";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 
   /**
    * @description - The current comment being added or modified by the user.

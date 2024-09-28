@@ -7,12 +7,15 @@
     RightIcon,
     DoubleRightIcon,
     ShowMoreIcon,
-  } from "$lib/assets/app.asset";
-  import { ShowMoreOptions, UserProfileList } from "$lib/components";
+  } from "@deprecate/assets/app.asset";
+  import { ShowMoreOptions, UserProfileList } from "@deprecate/components";
   import type { TeamDocument } from "@app/database/database";
-  import { WorkspaceMemberRole } from "$lib/utils/enums";
-  import type { CurrentTeam, Team } from "$lib/utils/interfaces/team.interface";
-  import { calculateTimeDifferenceInDays } from "$lib/utils/workspacetimeUtils";
+  import { WorkspaceMemberRole } from "@deprecate/utils/enums";
+  import type {
+    CurrentTeam,
+    Team,
+  } from "@deprecate/utils/interfaces/team.interface";
+  import { calculateTimeDifferenceInDays } from "@deprecate/utils/workspacetimeUtils";
   import type { Observable } from "rxjs";
   import { navigate } from "svelte-navigator";
   import Table from "../../table/Table.svelte";

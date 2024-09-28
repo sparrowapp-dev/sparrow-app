@@ -1,11 +1,11 @@
 <script lang="ts" module="es6">
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
-  import { TeamRole, WorkspaceRole } from "$lib/utils/enums";
+  import { TeamRole, WorkspaceRole } from "@deprecate/utils/enums";
   import type {
     TeamRepositoryMethods,
     TeamServiceMethods,
     workspaceInviteMethods,
-  } from "$lib/utils/interfaces";
+  } from "@deprecate/utils/interfaces";
   import { notifications } from "@sparrow/library/ui";
   import Dropdown from "../dropdown/Dropdown.svelte";
   import MemberInfoPopup from "../workspace/member-info/MemberInfo.svelte";

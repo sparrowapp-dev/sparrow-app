@@ -1,6 +1,6 @@
 import { CollectionService } from "@app/services/collection.service";
-import type { ImportBodyUrl } from "$lib/utils/dto";
-import { ContentTypeEnum } from "$lib/utils/enums/request.enum";
+import type { ImportBodyUrl } from "@deprecate/utils/dto";
+import { ContentTypeEnum } from "@deprecate/utils/enums/request.enum";
 import yaml from "js-yaml";
 
 export class ImportCollectionViewModel {

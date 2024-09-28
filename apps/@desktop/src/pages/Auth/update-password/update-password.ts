@@ -1,6 +1,6 @@
 import { verifyEmail } from "../../../services/auth.service";
-import { errorMessageText } from "$lib/store/auth.store";
-import type { verifyPostbody } from "$lib/utils/dto";
+import { errorMessageText } from "@deprecate/store/auth.store";
+import type { verifyPostbody } from "@deprecate/utils/dto";
 import { notifications } from "@sparrow/library/ui";
 export const isSuccessfulResponse = writable(false);
 

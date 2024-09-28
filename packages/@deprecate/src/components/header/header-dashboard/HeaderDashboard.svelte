@@ -6,12 +6,12 @@
     NotifyIcon,
     SearchIcon,
     SettingIcon,
-  } from "$lib/assets/app.asset";
+  } from "@deprecate/assets/app.asset";
   import {
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
     user,
-  } from "$lib/store";
+  } from "@deprecate/store";
   import { onDestroy, onMount } from "svelte";
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
   import {
@@ -20,22 +20,22 @@
     type WorkspaceDocument,
   } from "@app/database/database";
   import { useNavigate } from "svelte-navigator";
-  import GlobalSearchBarPopup from "$lib/components/header/global-search-bar/GlobalSearchBar.svelte";
-  import { useTree } from "$lib/components/collections/collections-list/collectionList";
-  import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
+  import GlobalSearchBarPopup from "@deprecate/components/header/global-search-bar/GlobalSearchBar.svelte";
+  import { useTree } from "@deprecate/components/collections/collections-list/collectionList";
+  import { CollectionListViewModel } from "@deprecate/components/collections/collections-list/CollectionList.ViewModel";
   import { CollectionsViewModel } from "../../../../pages/Collections/Collections.ViewModel.old";
   const [, , searchNode] = useTree();
   import type {
     CollectionsMethods,
     CurrentTeam,
     CurrentWorkspace,
-  } from "$lib/utils/interfaces";
+  } from "@deprecate/utils/interfaces";
   export let collectionsMethods: CollectionsMethods;
   import { Tooltip } from "@sparrow/library/ui";
   import { fade, slide } from "svelte/transition";
   import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
 
   export let handleWorkspaceSwitch;
 

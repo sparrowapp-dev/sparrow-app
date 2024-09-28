@@ -1,5 +1,5 @@
 <script>
-  import spin from "$lib/assets/spin.svg";
+  import spin from "@deprecate/assets/spin.svg";
   /**
    * @deprecated This component is deprecated and will be removed in future releases.
    * Please use Loader Component instead.

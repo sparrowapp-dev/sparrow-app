@@ -1,6 +1,6 @@
 <script lang="ts">
-  import threedotIcon from "$lib/assets/3dot.svg";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import threedotIcon from "@deprecate/assets/3dot.svg";
+  import { UntrackedItems } from "@deprecate/utils/enums/item-type.enum";
   import {
     Button,
     Tooltip,
@@ -8,7 +8,7 @@
     Spinner,
     Modal as Modal,
   } from "@sparrow/library/ui";
-  import { WorkspaceRole } from "$lib/utils/enums";
+  import { WorkspaceRole } from "@deprecate/utils/enums";
   import { TreeIcon } from "@sparrow/library/icons";
   import {
     TFDefaultEnum,

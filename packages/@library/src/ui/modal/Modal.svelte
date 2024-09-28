@@ -2,7 +2,7 @@
   import { CrossIcon } from "@sparrow/library/icons";
 
   import { scale, fade } from "svelte/transition";
-  import warningIcon from "$lib/assets/download-warning.svg";
+  import warningIcon from "@deprecate/assets/download-warning.svg";
 
   export let isOpen = false;
   export let title: string;

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { replaceSlashWithGreaterThanSymbol } from "$lib/utils/helpers/common.helper";
-  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
-  import { handleRequestClick } from "$lib/utils/helpers/handle-clicks.helper";
+  import { replaceSlashWithGreaterThanSymbol } from "@deprecate/utils/helpers/common.helper";
+  import { getMethodStyle } from "@deprecate/utils/helpers/conversion.helper";
+  import { handleRequestClick } from "@deprecate/utils/helpers/handle-clicks.helper";
   export let path: string = "";
   export let searchData: string = "";
   export let getIndex;

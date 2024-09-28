@@ -1,4 +1,4 @@
-import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
+import type { KeyValuePair } from "@deprecate/utils/interfaces/request.interface";
 
 class ReduceQueryParams {
   private queryParam = "";

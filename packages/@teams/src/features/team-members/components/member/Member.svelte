@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { base64ToURL } from "$lib/utils/helpers";
+  import { base64ToURL } from "@deprecate/utils/helpers";
   import type {
     userDetails,
     workspaceDocumentWithPosition,
-  } from "$lib/utils/interfaces";
-  import { TeamRole } from "$lib/utils/enums/team.enum";
-  import { AdminLevelPermission } from "$lib/utils/constants/permissions.constant";
-  import type { MemberPopType } from "$lib/utils/types/common.type";
+  } from "@deprecate/utils/interfaces";
+  import { TeamRole } from "@deprecate/utils/enums/team.enum";
+  import { AdminLevelPermission } from "@deprecate/utils/constants/permissions.constant";
+  import type { MemberPopType } from "@deprecate/utils/types/common.type";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
   import { Profile } from "..";

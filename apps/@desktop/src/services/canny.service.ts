@@ -1,6 +1,6 @@
-import { makeHttpRequestV2, makeRequest } from "$lib/api/api.common";
-import { ContentTypeEnum } from "$lib/utils/enums";
-import constants from "$lib/utils/constants";
+import { makeHttpRequestV2, makeRequest } from "@deprecate/api/api.common";
+import { ContentTypeEnum } from "@deprecate/utils/enums";
+import constants from "@deprecate/utils/constants";
 
 export class CannyIoService {
   constructor() {}

@@ -1,7 +1,7 @@
 <!-- btoa stands for "binary to ASCII," and it's a JavaScript function for converting binary data into a base64-encoded ASCII string. The btoa function is commonly used to encode binary data, such as images or other file formats, into a format that can be safely included in text-based data formats like JSON or HTML. -->
 <script lang="ts">
-  import dragIcon from "$lib/assets/drag.svg";
-  import trashIcon from "$lib/assets/trash-icon.svg";
+  import dragIcon from "@deprecate/assets/drag.svg";
+  import trashIcon from "@deprecate/assets/trash-icon.svg";
   import {
     BearerToken,
     apiKey,
@@ -9,7 +9,7 @@
     basicAuthHeader,
     basicAuth_password,
     basicAuth_username,
-  } from "$lib/store/authorization";
+  } from "@deprecate/store/authorization";
 
   let username: string;
   let password: string;
@@ -53,8 +53,8 @@
   let apiKeyText: string;
   let apiValueText: string;
   const unsubscribeApiKey = apiKey.subscribe((value) => {
-    if(value){
-      apiKeyText=value
+    if (value) {
+      apiKeyText = value;
     }
   });
   const unsubscribeApiValue = apiValue.subscribe((value) => {

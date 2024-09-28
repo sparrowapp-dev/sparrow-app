@@ -1,7 +1,7 @@
-import { makeHttpRequestV2 } from "$lib/api/api.common";
-import { ResponseStatusCode } from "$lib/utils/enums";
-import { environmentType } from "$lib/utils/enums";
-import { createDeepCopy, moveNavigation } from "$lib/utils/helpers";
+import { makeHttpRequestV2 } from "@deprecate/api/api.common";
+import { ResponseStatusCode } from "@deprecate/utils/enums";
+import { environmentType } from "@deprecate/utils/enums";
+import { createDeepCopy, moveNavigation } from "@deprecate/utils/helpers";
 import { RequestTabAdapter } from "../../adapter";
 import type { EnvironmentDocument, TabDocument } from "../../database/database";
 import { CollectionRepository } from "../../repositories/collection.repository";

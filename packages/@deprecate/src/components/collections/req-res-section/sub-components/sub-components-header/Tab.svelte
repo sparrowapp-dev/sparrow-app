@@ -1,24 +1,24 @@
 <script lang="ts">
   // ---- Icon
-  import Crossicon from "$lib/assets/crossicon.svelte";
-  import BookIcon from "$lib/assets/book.svelte";
+  import Crossicon from "@deprecate/assets/crossicon.svelte";
+  import BookIcon from "@deprecate/assets/book.svelte";
   // ----
 
   // ---- SVG
-  import collectionAsset from "$lib/assets/collection-nodes.svg";
-  import folderTab from "$lib/assets/folder-tab.svg";
+  import collectionAsset from "@deprecate/assets/collection-nodes.svg";
+  import folderTab from "@deprecate/assets/folder-tab.svg";
   // ----
 
   // ---- Enum
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
+  import { ItemType } from "@deprecate/utils/enums/item-type.enum";
   // ----
 
   // ---- helper functions
-  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+  import { getMethodStyle } from "@deprecate/utils/helpers/conversion.helper";
   // ----
 
   // ---- Interface
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
   // ----
 
   // ------ Props ------

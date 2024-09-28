@@ -1,16 +1,16 @@
 <script lang="ts">
-  import vector1 from "$lib/assets/Vector1.svg";
-  import vector2 from "$lib/assets/Vector2.svg";
-  // import sparrowicon from "$lib/assets/sparrowIcon.svg";
-  import vector3 from "$lib/assets/Vector3.svg";
-  import starIcon from "$lib/assets/starIcon.svg";
+  import vector1 from "@deprecate/assets/Vector1.svg";
+  import vector2 from "@deprecate/assets/Vector2.svg";
+  // import sparrowicon from "@deprecate/assets/sparrowIcon.svg";
+  import vector3 from "@deprecate/assets/Vector3.svg";
+  import starIcon from "@deprecate/assets/starIcon.svg";
   import { handleResetPasswordValidation } from "./reset-password";
-  import { username } from "$lib/store/auth.store";
+  import { username } from "@deprecate/store/auth.store";
 
-  import angleLeft from "$lib/assets/angleLeft.svg";
-  import eyeHide from "$lib/assets/eye-hide.svg";
-  import eyeShow from "$lib/assets/eye-show.svg";
-  import {Loader} from "@sparrow/library/ui";
+  import angleLeft from "@deprecate/assets/angleLeft.svg";
+  import eyeHide from "@deprecate/assets/eye-hide.svg";
+  import eyeShow from "@deprecate/assets/eye-show.svg";
+  import { Loader } from "@sparrow/library/ui";
 
   let passwordText: string = "";
 

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { ResponseSection } from "$lib/utils/enums/request.enum";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { ResponseSection } from "@deprecate/utils/enums/request.enum";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import ResponseBody from "./ResponseBody.svelte";
 
   import ResponseHeader from "./ResponseHeader.svelte";

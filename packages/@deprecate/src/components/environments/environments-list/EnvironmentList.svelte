@@ -1,29 +1,29 @@
 <script lang="ts">
-  import { PlusIcon } from "$lib/assets/app.asset";
+  import { PlusIcon } from "@deprecate/assets/app.asset";
   import { Tooltip } from "@sparrow/library/ui";
   import { v4 as uuidv4 } from "uuid";
   import type {
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
-  } from "$lib/utils/interfaces/environment.interface";
+  } from "@deprecate/utils/interfaces/environment.interface";
   import { onDestroy } from "svelte";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { UntrackedItems } from "@deprecate/utils/enums/item-type.enum";
   import { notifications } from "@sparrow/library/ui";
-  import { isEnvironmentCreatedFirstTime } from "$lib/store/environment";
+  import { isEnvironmentCreatedFirstTime } from "@deprecate/store/environment";
   import { Spinner } from "@sparrow/library/ui";
-  import { isWorkspaceLoaded } from "$lib/store/workspace.store";
+  import { isWorkspaceLoaded } from "@deprecate/store/workspace.store";
   import EnvironmentTab from "./sub-components/environment-tab/EnvironmentTab.svelte";
-  import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
-  import { environmentType } from "$lib/utils/enums/environment.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import { generateSampleEnvironment } from "@deprecate/utils/sample/environment.sample";
+  import { environmentType } from "@deprecate/utils/enums/environment.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import { List } from "@sparrow/library/ui";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import type { WorkspaceRole } from "@deprecate/utils/enums";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
-  } from "$lib/utils/constants/permissions.constant";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  } from "@deprecate/utils/constants/permissions.constant";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;

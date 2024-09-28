@@ -1,13 +1,13 @@
 <script lang="ts">
-  import table from "$lib/assets/table.svg";
-  import hamburger from "$lib/assets/hamburger.svg";
-  import { workspaceView } from "$lib/store";
+  import table from "@deprecate/assets/table.svg";
+  import hamburger from "@deprecate/assets/hamburger.svg";
+  import { workspaceView } from "@deprecate/store";
   import { onDestroy } from "svelte";
-  import { SearchIcon } from "$lib/assets/app.asset";
-  import { base64ToURL } from "$lib/utils/helpers";
-  import { PeopleIcon } from "$lib/assets/app.asset";
+  import { SearchIcon } from "@deprecate/assets/app.asset";
+  import { base64ToURL } from "@deprecate/utils/helpers";
+  import { PeopleIcon } from "@deprecate/assets/app.asset";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
-  import { TeamRole } from "$lib/utils/enums";
+  import { TeamRole } from "@deprecate/utils/enums";
   import { Button } from "@sparrow/library/ui";
   import TeamNavigator from "../components/team-navigator/TeamNavigator.svelte";
   import {

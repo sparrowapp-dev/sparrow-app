@@ -1,18 +1,18 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
   import { HeaderDashboardViewModel } from "../../header/header-dashboard/HeaderDashboard.ViewModel";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { user, userWorkspaceLevelRole } from "$lib/store/auth.store";
-  import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
+  import { user, userWorkspaceLevelRole } from "@deprecate/store/auth.store";
+  import { isWorkspaceCreatedFirstTime } from "@deprecate/store/workspace.store";
   import type { Observable } from "rxjs";
-  import InviteToWorkspace from "$lib/components/workspace/invite-to-workspace/InviteToWorkspace.svelte";
+  import InviteToWorkspace from "@deprecate/components/workspace/invite-to-workspace/InviteToWorkspace.svelte";
   import type {
     CollectionDocument,
     TeamDocument,
     WorkspaceDocument,
   } from "@app/database/database";
-  import type { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
+  import type { CollectionListViewModel } from "@deprecate/components/collections/collections-list/CollectionList.ViewModel";
   import WorkspaceSetting from "../workspaceSetting.svelte";
   import WorkspaceSidebar from "../workspaceSidebar.svelte";
   import type {
@@ -20,11 +20,11 @@
     TeamServiceMethods,
     userDetails,
     workspaceInviteMethods,
-  } from "$lib/utils/interfaces";
-  import { TeamRole, WorkspaceRole } from "$lib/utils/enums";
+  } from "@deprecate/utils/interfaces";
+  import { TeamRole, WorkspaceRole } from "@deprecate/utils/enums";
   import { TeamViewModel } from "@app/pages/Teams/team.viewModel";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
+  import { workspaceLevelPermissions } from "@deprecate/utils/constants/permissions.constant";
   import { Modal } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
 

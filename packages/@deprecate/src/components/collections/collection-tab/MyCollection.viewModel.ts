@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { CollectionService } from "@app/services/collection.service";
-import type { CreateApiRequestPostBody } from "$lib/utils/dto";
-import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-import { moveNavigation } from "$lib/utils/helpers/navigation";
-import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+import type { CreateApiRequestPostBody } from "@deprecate/utils/dto";
+import { UntrackedItems } from "@deprecate/utils/enums/item-type.enum";
+import { moveNavigation } from "@deprecate/utils/helpers/navigation";
+import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
 
-import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
 import { v4 as uuidv4 } from "uuid";
 
 export class MyCollectionViewModel {

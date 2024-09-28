@@ -1,7 +1,10 @@
 <script lang="ts">
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { setAuthType, setBodyType } from "$lib/utils/helpers/auth.helper";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
+  import {
+    setAuthType,
+    setBodyType,
+  } from "@deprecate/utils/helpers/auth.helper";
+  import { moveNavigation } from "@deprecate/utils/helpers/navigation";
   import { navigate } from "svelte-navigator";
   export let api: any;
   export let data: any;

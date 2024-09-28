@@ -4,8 +4,8 @@
   export let userInfo;
   export let onInputFeedback;
   export let onAddFeedback;
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
 </script>
 
 <div style="height: 89px; !important; padding-bottom:21px;">

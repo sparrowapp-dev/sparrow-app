@@ -1,8 +1,8 @@
 <script lang="ts">
   import { Collection, EmptyCollection, SearchTree } from "../components";
-  import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
-  import angleRight from "$lib/assets/angle-right-v2.svg";
-  import { WorkspaceRole } from "$lib/utils/enums";
+  import doubleangleLeft from "@deprecate/assets/doubleangleLeft.svg";
+  import angleRight from "@deprecate/assets/angle-right-v2.svg";
+  import { WorkspaceRole } from "@deprecate/utils/enums";
   import { List } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type {
@@ -15,11 +15,11 @@
     Folder,
     Path,
     Request as RequestType,
-  } from "$lib/utils/interfaces/request.interface";
+  } from "@deprecate/utils/interfaces/request.interface";
   import { onDestroy } from "svelte";
   import { CollectionIcon } from "@sparrow/library/icons";
-  import { createDeepCopy } from "$lib/utils/helpers";
-  import constants from "$lib/utils/constants";
+  import { createDeepCopy } from "@deprecate/utils/helpers";
+  import constants from "@deprecate/utils/constants";
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
 

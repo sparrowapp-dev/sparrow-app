@@ -4,9 +4,9 @@ import type {
   EmailPostBody,
   verifyPostbody,
   resetPasswordPostBody,
-} from "$lib/utils/dto";
-import { makeRequest, getRefHeaders } from "$lib/api/api.common";
-import constants from "$lib/utils/constants";
+} from "@deprecate/utils/dto";
+import { makeRequest, getRefHeaders } from "@deprecate/api/api.common";
+import constants from "@deprecate/utils/constants";
 const apiUrl: string = constants.API_URL;
 
 const registerUser = async (userInfo: registerUserPostBody) => {

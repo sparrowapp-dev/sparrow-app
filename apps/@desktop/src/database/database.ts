@@ -23,7 +23,7 @@ import { addRxPlugin } from "rxdb";
 import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
 import { RxDBUpdatePlugin } from "rxdb/plugins/update";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
-import constants from "$lib/utils/constants";
+import constants from "@deprecate/utils/constants";
 import { teamSchema, type TeamDocType } from "../models/team.model";
 import {
   githubRepoSchema,

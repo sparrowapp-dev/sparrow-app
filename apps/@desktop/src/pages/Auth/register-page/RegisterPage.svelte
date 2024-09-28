@@ -1,14 +1,14 @@
 <script lang="ts">
-  import vector1 from "$lib/assets/Vector1.svg";
-  import vector2 from "$lib/assets/Vector2.svg";
-  import vector3 from "$lib/assets/Vector3.svg";
+  import vector1 from "@deprecate/assets/Vector1.svg";
+  import vector2 from "@deprecate/assets/Vector2.svg";
+  import vector3 from "@deprecate/assets/Vector3.svg";
   import { handleRegisterValidation } from "./register-page";
-  import { isLoading } from "$lib/store/auth.store";
-  import starIcon from "$lib/assets/starIcon.svg";
-  import eyeHide from "$lib/assets/eye-hide.svg";
-  import eyeShow from "$lib/assets/eye-show.svg";
+  import { isLoading } from "@deprecate/store/auth.store";
+  import starIcon from "@deprecate/assets/starIcon.svg";
+  import eyeHide from "@deprecate/assets/eye-hide.svg";
+  import eyeShow from "@deprecate/assets/eye-show.svg";
   import { Link } from "svelte-navigator";
-  import {Loader} from "@sparrow/library/ui";
+  import { Loader } from "@sparrow/library/ui";
 
   let userData = {
     email: "",

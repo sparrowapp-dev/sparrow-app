@@ -3,10 +3,10 @@
    * @deprecated please do not use this file
    * Instead of this we can use src\lib\components\Modal\Modal.svelte
    * **/
-  import closeIcon from "$lib/assets/close.svg";
+  import closeIcon from "@deprecate/assets/close.svg";
   import { CollectionService } from "@app/services/collection.service";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { ItemType } from "@deprecate/utils/enums/item-type.enum";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import { notifications } from "@sparrow/library/ui";
   import Button from "../buttons/Button.svelte";
   import { fly, fade } from "svelte/transition";

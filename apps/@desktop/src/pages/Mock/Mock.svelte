@@ -1,7 +1,7 @@
 <script lang="ts">
   import UnderDevelopment from "../UnderDevelopment/UnderDevelopment.svelte";
   import { Motion } from "svelte-motion";
-  import { scaleMotionProps } from "$lib/utils/animations";
+  import { scaleMotionProps } from "@deprecate/utils/animations";
 </script>
 
 <Motion {...scaleMotionProps} let:motion>

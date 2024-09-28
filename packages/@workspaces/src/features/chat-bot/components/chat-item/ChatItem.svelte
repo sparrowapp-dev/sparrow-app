@@ -16,8 +16,8 @@
   } from "@sparrow/library/icons";
   import { SparrowAIIcon } from "@common/icons";
   import { Tooltip } from "@sparrow/library/ui";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums";
   import { MessageTypeEnum } from "@common/types/workspace";
 
   export let message: string;

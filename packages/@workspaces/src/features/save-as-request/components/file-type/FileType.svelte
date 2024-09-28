@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
-  import folder from "$lib/assets/folder.svg";
-  import collection from "$lib/assets/collection.svg";
-  import { ItemType, RequestMethod } from "$lib/utils/enums";
+  import { getMethodStyle } from "@deprecate/utils/helpers/conversion.helper";
+  import folder from "@deprecate/assets/folder.svg";
+  import collection from "@deprecate/assets/collection.svg";
+  import { ItemType, RequestMethod } from "@deprecate/utils/enums";
   import { CollectionIcon, SocketIcon } from "@sparrow/library/icons";
   export let type: ItemType = ItemType.REQUEST;
   export let name = "";

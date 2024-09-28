@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { RequestAuthProperty } from "$lib/utils/enums/request.enum";
-  import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
+  import { RequestAuthProperty } from "@deprecate/utils/enums/request.enum";
+  import { EnvironmentHeper } from "@deprecate/utils/helpers/environment.helper";
   import EnvironmentPicker from "../environment-picker/EnvironmentPicker.svelte";
 
   export let bearerToken: string;

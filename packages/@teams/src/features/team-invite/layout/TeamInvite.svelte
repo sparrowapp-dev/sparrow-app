@@ -6,9 +6,9 @@
     base64ToURL,
     createDynamicComponents,
     validateEmail,
-  } from "$lib/utils/helpers";
+  } from "@deprecate/utils/helpers";
 
-  import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
+  import { TeamRole, WorkspaceRole } from "@deprecate/utils/enums/team.enum";
   import { Button, IconFallback } from "@sparrow/library/ui";
 
   export let onInviteClick;
@@ -21,7 +21,7 @@
    */
   export let onValidateEmail;
 
-  import closeIconWhite from "$lib/assets/close-icon-white.svg";
+  import closeIconWhite from "@deprecate/assets/close-icon-white.svg";
   import { MultiSelect, Select } from "@sparrow/library/forms";
   import { notifications } from "@sparrow/library/ui";
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Debounce } from "@common/utils";
   import { Modal } from "@sparrow/library/ui";
-  import TickMark from "$lib/assets/tick-mark-rounded.svelte";
+  import TickMark from "@deprecate/assets/tick-mark-rounded.svelte";
   import { Spinner } from "@sparrow/library/ui";
   let importCurl = "";
 

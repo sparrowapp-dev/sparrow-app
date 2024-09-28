@@ -1,4 +1,4 @@
-import { RequestDefault } from "$lib/utils/enums";
+import { RequestDefault } from "@deprecate/utils/enums";
 import {
   AuthSectionEnum,
   AuthTypeEnum,

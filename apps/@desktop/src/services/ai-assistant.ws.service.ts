@@ -1,6 +1,6 @@
-import { getAuthHeaders } from "$lib/api/api.common";
-import constants from "$lib/utils/constants";
-import type { StreamPromptDto } from "$lib/utils/dto/ai-assistant";
+import { getAuthHeaders } from "@deprecate/api/api.common";
+import constants from "@deprecate/utils/constants";
+import type { StreamPromptDto } from "@deprecate/utils/dto/ai-assistant";
 import { socketStore } from "../store/ws.store";
 import { io } from "socket.io-client";
 

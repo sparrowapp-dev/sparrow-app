@@ -2,7 +2,7 @@
   import { Route, navigate } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsHome from "../Collections/Collections.old.svelte";
-  import { collapsibleState } from "$lib/store/request-response-section";
+  import { collapsibleState } from "@deprecate/store/request-response-section";
   import { onDestroy, onMount } from "svelte";
   import ActiveSideBarTabViewModel from "./ActiveSideBarTab.ViewModel";
   import Mock from "../Mock/Mock.svelte";
@@ -13,19 +13,19 @@
     type WorkspaceDocument,
   } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import { generateSampleWorkspace } from "@deprecate/utils/sample/workspace.sample";
+  import { moveNavigation } from "@deprecate/utils/helpers/navigation";
   import {
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
-  } from "$lib/store/workspace.store";
+  } from "@deprecate/store/workspace.store";
   
-  import type { Path } from "$lib/utils/interfaces/request.interface";
-  import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
-  import { user, userWorkspaceLevelRole } from "$lib/store";
+  import type { Path } from "@deprecate/utils/interfaces/request.interface";
+  import type { CurrentTeam, CurrentWorkspace } from "@deprecate/utils/interfaces";
+  import { user, userWorkspaceLevelRole } from "@deprecate/store";
   import { TeamRepository } from "@app/repositories/team.repository";
   import { DashboardViewModel } from "./Dashboard.ViewModel.old";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import type { WorkspaceRole } from "@deprecate/utils/enums";
 
   const _dashboardViewModel = new DashboardViewModel();
   // const _viewModelWorkspace = new HeaderDashboardViewModel();

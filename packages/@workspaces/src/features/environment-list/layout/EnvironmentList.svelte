@@ -1,14 +1,14 @@
 <script lang="ts">
   import { PlusIcon, StackIcon, StackFilled } from "@sparrow/library/icons";
   import { List } from "@sparrow/library/ui";
-  import { WorkspaceRole } from "$lib/utils/enums";
+  import { WorkspaceRole } from "@deprecate/utils/enums";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
-  } from "$lib/utils/constants/permissions.constant";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  } from "@deprecate/utils/constants/permissions.constant";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
   import { ListItem } from "../components";
-  import angleRight from "$lib/assets/angle-right-v2.svg";
+  import angleRight from "@deprecate/assets/angle-right-v2.svg";
   import { Tooltip } from "@sparrow/library/ui";
 
   /**

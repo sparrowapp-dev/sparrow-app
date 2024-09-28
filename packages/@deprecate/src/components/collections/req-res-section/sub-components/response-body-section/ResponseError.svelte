@@ -1,8 +1,8 @@
 <script lang="ts">
-  import logoType from "$lib/assets/logotype.svg";
-  import logoSymbol from "$lib/assets/logoSymbol.svg";
+  import logoType from "@deprecate/assets/logotype.svg";
+  import logoSymbol from "@deprecate/assets/logoSymbol.svg";
   import { onDestroy } from "svelte";
-  import { currentTab, tabs } from "$lib/store/request-response-section";
+  import { currentTab, tabs } from "@deprecate/store/request-response-section";
 
   let currentTabId = null;
   let tabList = [];

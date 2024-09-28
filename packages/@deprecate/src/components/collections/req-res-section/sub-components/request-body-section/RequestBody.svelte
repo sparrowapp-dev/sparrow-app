@@ -1,21 +1,21 @@
 <script lang="ts">
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import { isHorizontal } from "$lib/store/request-response-section";
+  import Dropdown from "@deprecate/components/dropdown/Dropdown.svelte";
+  import { isHorizontal } from "@deprecate/store/request-response-section";
   import { onDestroy } from "svelte";
   import {
     RequestDataset,
     RequestDataType,
-  } from "$lib/utils/enums/request.enum";
+  } from "@deprecate/utils/enums/request.enum";
   import type {
     KeyValuePair,
     KeyValuePairWithBase,
     NewTab,
-  } from "$lib/utils/interfaces/request.interface";
+  } from "@deprecate/utils/interfaces/request.interface";
   import type { TabDocument } from "@app/database/database";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import type { Observable } from "rxjs";
-  import infoIcon from "$lib/assets/info-color-blue.svg";
-  import crossIcon from "$lib/assets/cross.svg";
+  import infoIcon from "@deprecate/assets/info-color-blue.svg";
+  import crossIcon from "@deprecate/assets/cross.svg";
   export let collectionsMethods: CollectionsMethods;
   export let activeTab;
   export let environmentVariables;

@@ -1,1 +1,1 @@
-export { default as ShowMoreOptions } from "$lib/components/dropdown/ShowMore.svelte";
+export { default as ShowMoreOptions } from "@deprecate/components/dropdown/ShowMore.svelte";

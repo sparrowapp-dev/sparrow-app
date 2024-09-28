@@ -44,7 +44,7 @@
   import { RunIcon } from "@sparrow/library/icons";
   import { Modal } from "@sparrow/library/ui";
   import DeleteNode from "../../../common/components/delete-node/DeleteNode.svelte";
-  import { ResponseStatusCode } from "$lib/utils/enums";
+  import { ResponseStatusCode } from "@deprecate/utils/enums";
   import type {
     TFDataStoreType,
     TFEdgeHandlerType,
@@ -53,8 +53,8 @@
     TFNodeType,
     TFResponseStateType,
   } from "@common/types/workspace/testflow";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
   import { Debounce } from "@common/utils";
 
   // Declaring props for the component

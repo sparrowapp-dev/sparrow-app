@@ -1,8 +1,8 @@
-import { user } from "$lib/store";
-import type { addUsersInWorkspacePayload } from "$lib/utils/dto";
-import { Events, WorkspaceRole } from "$lib/utils/enums";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { throttle } from "$lib/utils/throttle";
+import { user } from "@deprecate/store";
+import type { addUsersInWorkspacePayload } from "@deprecate/utils/dto";
+import { Events, WorkspaceRole } from "@deprecate/utils/enums";
+import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+import { throttle } from "@deprecate/utils/throttle";
 import type { TeamDocument, WorkspaceDocument } from "../../database/database";
 import type { UpdatesDocType } from "../../models/updates.model";
 import { CollectionRepository } from "../../repositories/collection.repository";

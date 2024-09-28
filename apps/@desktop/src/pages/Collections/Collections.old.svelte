@@ -1,28 +1,28 @@
 <!-- <script lang="ts">
-  import { collapsibleState } from "$lib/store/request-response-section";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { collapsibleState } from "@deprecate/store/request-response-section";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import { CollectionsViewModel } from "./Collections.ViewModel.old";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
+  import { ItemType } from "@deprecate/utils/enums/item-type.enum";
 
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import { moveNavigation } from "@deprecate/utils/helpers/navigation";
+  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
   import type { Writable } from "svelte/store";
   import { Motion } from "svelte-motion";
-  import { scaleMotionProps } from "$lib/utils/animations";
+  import { scaleMotionProps } from "@deprecate/utils/animations";
   import { onDestroy, onMount } from "svelte";
   import type {
     EnvironmentDocument,
     WorkspaceDocument,
   } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import { environmentType } from "$lib/utils/enums/environment.enum";
+  import { environmentType } from "@deprecate/utils/enums/environment.enum";
   import { ActiveSideBarTabReposistory } from "@app/repositories/active-sidebar-tab.repository";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import type { WorkspaceRole } from "@deprecate/utils/enums";
   import { Pane, Splitpanes } from "svelte-splitpanes";
-  import { collectionLeftPanelWidth } from "$lib/store";
-  import { collectionRightPanelWidth } from "$lib/store";
+  import { collectionLeftPanelWidth } from "@deprecate/store";
+  import { collectionRightPanelWidth } from "@deprecate/store";
 
   import RestExplorer from "../RestExplorer/RestExplorerPage.svelte";
   import { Route, navigate } from "svelte-navigator";

@@ -3,9 +3,9 @@
    * @deprecated please do not use this file
    * Instead of this we can use src\lib\components\Modal\Modal.svelte
    * **/
-  import closeIcon from "$lib/assets/close.svg";
+  import closeIcon from "@deprecate/assets/close.svg";
   import { CollectionService } from "@app/services/collection.service";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import { notifications } from "@sparrow/library/ui";
   import { fade, fly } from "svelte/transition";
   import Button from "../buttons/Button.svelte";

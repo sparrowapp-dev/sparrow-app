@@ -13,8 +13,8 @@ import type {
 } from "../../database/database";
 
 // Utils
-import { moveNavigation } from "$lib/utils/helpers";
-import { Events, ItemType } from "$lib/utils/enums";
+import { moveNavigation } from "@deprecate/utils/helpers";
+import { Events, ItemType } from "@deprecate/utils/enums";
 // import { invoke } from "@tauri-apps/api/core";
 import { v4 as uuidv4 } from "uuid";
 
@@ -25,14 +25,14 @@ import type {
   Folder,
   Tab,
 } from "@common/types/workspace";
-import type { CreateApiRequestPostBody } from "$lib/utils/dto";
+import type { CreateApiRequestPostBody } from "@deprecate/utils/dto";
 import { InitRequestTab } from "@common/utils";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 import { notifications } from "@sparrow/library/ui";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
-import { isGuestUserActive } from "$lib/store/auth.store";
-// import { generateSampleRequest } from "$lib/utils/sample";
-// import type { Folder, Path } from "$lib/utils/interfaces/request.interface";
+import { isGuestUserActive } from "@deprecate/store/auth.store";
+// import { generateSampleRequest } from "@deprecate/utils/sample";
+// import type { Folder, Path } from "@deprecate/utils/interfaces/request.interface";
 // import { InitRequestTab } from "@common/utils";
 
 class FolderExplorerPage {

@@ -1,19 +1,19 @@
 <script lang="ts">
-  import plus from "$lib/assets/plus.svg";
+  import plus from "@deprecate/assets/plus.svg";
   import { Tooltip } from "@sparrow/library/ui";
   /**
    * @deprecated referes to teams store
-   * import { openedTeam } from "$lib/store/team.store";
+   * import { openedTeam } from "@deprecate/store/team.store";
    **/
   import type {
     CurrentTeam,
     Team,
     TeamRepositoryMethods,
     TeamServiceMethods,
-  } from "$lib/utils/interfaces/team.interface";
+  } from "@deprecate/utils/interfaces/team.interface";
   import { onDestroy } from "svelte";
-  import { PeopleIcon } from "$lib/assets/app.asset";
-  import { base64ToURL } from "$lib/utils/helpers";
+  import { PeopleIcon } from "@deprecate/assets/app.asset";
+  import { base64ToURL } from "@deprecate/utils/helpers";
   import { TeamRepository } from "@app/repositories/team.repository";
   import { List } from "@sparrow/library/ui";
   export let handleCreateTeamModal: any;

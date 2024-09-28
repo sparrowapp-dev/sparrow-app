@@ -5,18 +5,18 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import {
   requestResponseStore,
   tabs,
-} from "$lib/store/request-response-section";
+} from "@deprecate/store/request-response-section";
 import { TabRepository } from "../../repositories/tab.repository";
 import { CollectionRepository } from "../../repositories/collection.repository";
 import { TeamService } from "../../services/team.service";
 import { TeamRepository } from "../../repositories/team.repository";
 import type { TeamDocument } from "../../database/database";
 import type { Observable } from "rxjs";
-import type { InviteBody } from "$lib/utils/dto/team-dto";
-import type { TeamRole, WorkspaceRole } from "$lib/utils/enums";
+import type { InviteBody } from "@deprecate/utils/dto/team-dto";
+import type { TeamRole, WorkspaceRole } from "@deprecate/utils/enums";
 import { UserService } from "../../services/user.service";
-import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
-import type { Team } from "$lib/utils/interfaces";
+import type { MakeRequestResponse } from "@deprecate/utils/interfaces/common.interface";
+import type { Team } from "@deprecate/utils/interfaces";
 
 export class TeamViewModel {
   constructor() {}

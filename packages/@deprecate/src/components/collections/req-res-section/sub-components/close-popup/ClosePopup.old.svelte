@@ -1,25 +1,25 @@
 <script lang="ts">
-  import crossAsset from "$lib/assets/close.svg";
+  import crossAsset from "@deprecate/assets/close.svg";
   import { updateCollectionRequest } from "@app/services/collection";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
+  import { ItemType } from "@deprecate/utils/enums/item-type.enum";
   import { fade, fly } from "svelte/transition";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import type {
     NewTab,
     RequestBody,
-  } from "$lib/utils/interfaces/request.interface";
-  import { RequestDataset } from "$lib/utils/enums/request.enum";
+  } from "@deprecate/utils/interfaces/request.interface";
+  import { RequestDataset } from "@deprecate/utils/enums/request.enum";
   import {
     setAuthType,
     setContentTypeHeader,
-  } from "$lib/utils/helpers/auth.helper";
+  } from "@deprecate/utils/helpers/auth.helper";
   import { Button } from "@sparrow/library/ui";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
-  } from "$lib/utils/constants/permissions.constant";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  } from "@deprecate/utils/constants/permissions.constant";
+  import type { WorkspaceRole } from "@deprecate/utils/enums";
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
   import { onDestroy } from "svelte";

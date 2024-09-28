@@ -1,10 +1,10 @@
-import { setCollectionList } from "$lib/store/collection";
-import { ItemType } from "$lib/utils/enums/item-type.enum";
-import type { Collection } from "$lib/utils/interfaces/collection.interface";
+import { setCollectionList } from "@deprecate/store/collection";
+import { ItemType } from "@deprecate/utils/enums/item-type.enum";
+import type { Collection } from "@deprecate/utils/interfaces/collection.interface";
 import {
   selectMethodsStore,
   selectedMethodsCollectionStore,
-} from "$lib/store/methods";
+} from "@deprecate/store/methods";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 let tree: any[];
 const filterTree: Collection[] = [];

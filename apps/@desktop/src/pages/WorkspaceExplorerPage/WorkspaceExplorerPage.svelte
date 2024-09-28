@@ -10,7 +10,7 @@
   import { DeleteWorkspace } from "@common/features";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import type { UpdatesDocType } from "../../../../models/updates.model";
-  import { user } from "$lib/store";
+  import { user } from "@deprecate/store";
 
   export let collectionList;
   export let tab;

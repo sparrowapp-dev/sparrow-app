@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { TeamRole } from "$lib/utils/enums/team.enum";
+  import { TeamRole } from "@deprecate/utils/enums/team.enum";
   import type {
     userDetails,
     workspaceDocumentWithPosition,
-  } from "$lib/utils/interfaces";
-  import type { MemberPopType } from "$lib/utils/types/common.type";
+  } from "@deprecate/utils/interfaces";
+  import type { MemberPopType } from "@deprecate/utils/types/common.type";
 
   import { ProfileWorkspace } from "./sub-profile";
   import { Select } from "@sparrow/library/forms";

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import table from "$lib/assets/table.svg";
-  import hamburger from "$lib/assets/hamburger.svg";
-  import AllWorkspace from "$lib/components/dashboard/workspaces/AllWorkspace.svelte";
-  import { workspaceView } from "$lib/store";
+  import table from "@deprecate/assets/table.svg";
+  import hamburger from "@deprecate/assets/hamburger.svg";
+  import AllWorkspace from "@deprecate/components/dashboard/workspaces/AllWorkspace.svelte";
+  import { workspaceView } from "@deprecate/store";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
-  import Members from "$lib/components/workspace/members/Members.svelte";
+  import Members from "@deprecate/components/workspace/members/Members.svelte";
   import { notifications } from "@sparrow/library/ui";
   import { onDestroy } from "svelte";
   import type {
@@ -12,10 +12,10 @@
     Team,
     TeamRepositoryMethods,
     TeamServiceMethods,
-  } from "$lib/utils/interfaces";
+  } from "@deprecate/utils/interfaces";
   import TeamInvite from "./team-invite/TeamInvite.svelte";
-  import { base64ToURL } from "$lib/utils/helpers";
-  import { PeopleIcon, ShowMoreIcon } from "$lib/assets/app.asset";
+  import { base64ToURL } from "@deprecate/utils/helpers";
+  import { PeopleIcon, ShowMoreIcon } from "@deprecate/assets/app.asset";
   import Settings from "./settings/Settings.svelte";
   import { Button } from "@sparrow/library/ui";
   import { Modal } from "@sparrow/library/ui";

@@ -1,5 +1,5 @@
-import { getAuthHeaders, makeRequest } from "$lib/api/api.common";
-import constants from "$lib/utils/constants";
+import { getAuthHeaders, makeRequest } from "@deprecate/api/api.common";
+import constants from "@deprecate/utils/constants";
 
 export class ReleaseService {
   private apiUrl: string;

@@ -1,5 +1,5 @@
-import { ContentTypeEnum } from "$lib/utils/enums";
-import { createDeepCopy } from "$lib/utils/helpers";
+import { ContentTypeEnum } from "@deprecate/utils/enums";
+import { createDeepCopy } from "@deprecate/utils/helpers";
 import {
   RequestDataTypeEnum,
   type CollectionItemsDto,

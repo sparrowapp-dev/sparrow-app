@@ -1,19 +1,19 @@
 <script lang="ts">
-  import { base64ToURL } from "$lib/utils/helpers";
+  import { base64ToURL } from "@deprecate/utils/helpers";
   import type {
     TeamRepositoryMethods,
     TeamServiceMethods,
     userDetails,
     workspaceDocumentWithPosition,
-  } from "$lib/utils/interfaces";
+  } from "@deprecate/utils/interfaces";
   import MemberInfoPopup from "../member-info/MemberInfo.svelte";
   import { notifications } from "@sparrow/library/ui";
-  import { TeamRole } from "$lib/utils/enums/team.enum";
+  import { TeamRole } from "@deprecate/utils/enums/team.enum";
   import { v4 as uuidv4 } from "uuid";
-  import { AdminLevelPermission } from "$lib/utils/constants/permissions.constant";
-  import type { MemberPopType } from "$lib/utils/types/common.type";
+  import { AdminLevelPermission } from "@deprecate/utils/constants/permissions.constant";
+  import type { MemberPopType } from "@deprecate/utils/types/common.type";
   import { Modal } from "@sparrow/library/ui";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import Dropdown from "@deprecate/components/dropdown/Dropdown.svelte";
   import { Button } from "@sparrow/library/ui";
   import { Spinner } from "@sparrow/library/ui";
   export let user: userDetails;

@@ -1,5 +1,8 @@
-import { getMultipartAuthHeaders, makeRequest } from "$lib/api/api.common";
-import constants from "$lib/utils/constants";
+import {
+  getMultipartAuthHeaders,
+  makeRequest,
+} from "@deprecate/api/api.common";
+import constants from "@deprecate/utils/constants";
 const apiUrl: string = constants.API_URL;
 export class FeedbackService {
   constructor() {}

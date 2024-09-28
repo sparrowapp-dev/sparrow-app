@@ -1,4 +1,4 @@
-import constants from "$lib/utils/constants";
+import constants from "@deprecate/utils/constants";
 
 const jwtDecode = (jwt: string) => {
   return JSON.parse(window.atob(jwt.split(".")[1]));

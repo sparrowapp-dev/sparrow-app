@@ -1,9 +1,9 @@
-import { getAuthHeaders, makeRequest } from "$lib/api/api.common";
-import constants from "$lib/utils/constants";
+import { getAuthHeaders, makeRequest } from "@deprecate/api/api.common";
+import constants from "@deprecate/utils/constants";
 import type {
   CreateEnvironmentPostBody,
   UpdateEnvironmentPostBody,
-} from "$lib/utils/dto";
+} from "@deprecate/utils/dto";
 
 export class EnvironmentService {
   constructor() {}

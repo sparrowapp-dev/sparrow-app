@@ -4,7 +4,7 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { EnvironmentService } from "../../services/environment.service";
 import { TeamService } from "../../services/team.service";
 import { WorkspaceService } from "../../services/workspace.service";
-import { throttle } from "$lib/utils/throttle";
+import { throttle } from "@deprecate/utils/throttle";
 import { notifications } from "@sparrow/library/ui";
 import {
   isGuestUserActive,
@@ -12,14 +12,14 @@ import {
   isResponseError,
   setUser,
   user,
-} from "$lib/store/auth.store";
+} from "@deprecate/store/auth.store";
 import { TabRepository } from "../../repositories/tab.repository";
 import {
   RxDB,
   type TeamDocument,
   type WorkspaceDocument,
 } from "../../database/database";
-import { clearAuthJwt } from "$lib/utils/jwt";
+import { clearAuthJwt } from "@deprecate/utils/jwt";
 import { userLogout } from "../../services/auth.service";
 import { FeatureSwitchService } from "../../services/feature-switch.service";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
@@ -28,8 +28,8 @@ import { v4 as uuidv4 } from "uuid";
 import { TeamAdapter } from "../../adapter";
 import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { Events } from "$lib/utils/enums";
+import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+import { Events } from "@deprecate/utils/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
 

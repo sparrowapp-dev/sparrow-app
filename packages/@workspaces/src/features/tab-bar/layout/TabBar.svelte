@@ -13,9 +13,9 @@
   import { Dropdown } from "@sparrow/library/ui";
 
   // ---- Helper
-  import { tabBarScroller } from "$lib/utils/helpers/navigation";
+  import { tabBarScroller } from "@deprecate/utils/helpers/navigation";
   import { requestSplitterDirection } from "@sparrow/workspaces/features/rest-explorer/store";
-  import { HelpIcon } from "$lib/assets/app.asset";
+  import { HelpIcon } from "@deprecate/assets/app.asset";
   import {
     HorizontalGridIcon,
     MoreOptions,

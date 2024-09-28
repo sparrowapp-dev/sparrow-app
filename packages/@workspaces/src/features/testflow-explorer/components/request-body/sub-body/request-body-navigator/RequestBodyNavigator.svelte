@@ -1,9 +1,9 @@
 <script lang="ts">
-  import infoIcon from "$lib/assets/info-color-blue.svg";
-  import BeautifyIcon from "$lib/assets/beautify.svg";
-  import crossIcon from "$lib/assets/cross.svg";
+  import infoIcon from "@deprecate/assets/info-color-blue.svg";
+  import BeautifyIcon from "@deprecate/assets/beautify.svg";
+  import crossIcon from "@deprecate/assets/cross.svg";
   import { Select } from "@sparrow/library/forms";
-  import { RequestDataType, RequestDataset } from "$lib/utils/enums";
+  import { RequestDataType, RequestDataset } from "@deprecate/utils/enums";
   import { notifications } from "@sparrow/library/ui";
   import { WithSelect } from "@sparrow/workspaces/common/hoc";
   export let method = "";

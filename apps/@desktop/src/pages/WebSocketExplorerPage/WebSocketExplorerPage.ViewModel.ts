@@ -4,7 +4,7 @@ import {
   ReduceQueryParams,
   DecodeWebsocket,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
-import { createDeepCopy, moveNavigation } from "$lib/utils/helpers";
+import { createDeepCopy, moveNavigation } from "@deprecate/utils/helpers";
 import { CompareArray, Debounce, InitWebSocketTab } from "@common/utils";
 
 // ---- DB
@@ -21,8 +21,8 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { EnvironmentRepository } from "../../repositories/environment.repository";
 
 import { BehaviorSubject, Observable } from "rxjs";
-import { Events, ItemType } from "$lib/utils/enums";
-import type { CreateDirectoryPostBody } from "$lib/utils/dto";
+import { Events, ItemType } from "@deprecate/utils/enums";
+import type { CreateDirectoryPostBody } from "@deprecate/utils/dto";
 
 import {
   insertCollection,
@@ -31,7 +31,7 @@ import {
 import { EnvironmentService } from "../../services/environment.service";
 
 // ---- Events
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 import {
   type KeyValueChecked,
   type Path,
@@ -43,7 +43,7 @@ import {
 import { notifications } from "@sparrow/library/ui";
 import { CollectionService } from "../../services/collection.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import { isGuestUserActive } from "$lib/store/auth.store";
+import { isGuestUserActive } from "@deprecate/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
 import { SocketTabAdapter } from "../../adapter/socket-tab";
 import type { CollectionDocType } from "../../models/collection.model";

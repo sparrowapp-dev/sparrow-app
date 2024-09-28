@@ -1,5 +1,5 @@
 <script>
-  import infoIcon from "$lib/assets/infoIcon.svg";
+  import infoIcon from "@deprecate/assets/infoIcon.svg";
 </script>
 
 <div

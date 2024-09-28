@@ -2,7 +2,7 @@
   import { EnvironmentExplorer } from "@sparrow/workspaces/features";
   import { EnvironmentExplorerViewModel } from "./EnvironmentExplorerPage.ViewModel";
   import { Debounce } from "@common/utils";
-  import { user } from "$lib/store";
+  import { user } from "@deprecate/store";
   import type { WorkspaceDocument } from "@app/database/database";
   /**
    * environment opened tab object

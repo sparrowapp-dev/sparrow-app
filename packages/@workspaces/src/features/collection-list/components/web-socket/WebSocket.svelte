@@ -7,24 +7,24 @@
   import { Options } from "@sparrow/library/ui";
 
   // ---- Helper functions
-  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
-  import { getPathFromUrl } from "$lib/utils/helpers/common.helper";
+  import { getMethodStyle } from "@deprecate/utils/helpers/conversion.helper";
+  import { getPathFromUrl } from "@deprecate/utils/helpers/common.helper";
 
   // ---- Enum and Interfaces
   import type {
     Request,
     Folder,
     Path,
-  } from "$lib/utils/interfaces/request.interface";
-  import { UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
+  } from "@deprecate/utils/interfaces/request.interface";
+  import { UntrackedItems, WorkspaceRole } from "@deprecate/utils/enums";
 
   // --- SVG
-  import threedotIcon from "$lib/assets/3dot.svg";
-  import reloadSyncIcon from "$lib/assets/reload-sync.svg";
+  import threedotIcon from "@deprecate/assets/3dot.svg";
+  import reloadSyncIcon from "@deprecate/assets/reload-sync.svg";
 
   // ---- DB
   import type { CollectionDocument } from "@app/database/database";
-  import { isGuestUserActive } from "$lib/store";
+  import { isGuestUserActive } from "@deprecate/store";
   import { SocketIcon } from "@sparrow/library/icons";
 
   /**

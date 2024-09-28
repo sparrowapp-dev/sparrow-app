@@ -2,16 +2,16 @@
   export let handleInvitePopup: (flag: boolean) => void;
   export let teamName: string = "";
   export let teamId: string = "";
-  import closeIcon from "$lib/assets/close.svg";
+  import closeIcon from "@deprecate/assets/close.svg";
   import {
     base64ToURL,
     createDynamicComponents,
     validateEmail,
-  } from "$lib/utils/helpers";
+  } from "@deprecate/utils/helpers";
   import { notifications } from "@sparrow/library/ui";
 
-  import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import { TeamRole, WorkspaceRole } from "@deprecate/utils/enums/team.enum";
+  import Dropdown from "@deprecate/components/dropdown/Dropdown.svelte";
   import { Button } from "@sparrow/library/ui";
 
   export let onSubmit;
@@ -21,7 +21,7 @@
   export let teamLogo;
   export let userId;
 
-  import closeIconWhite from "$lib/assets/close-icon-white.svg";
+  import closeIconWhite from "@deprecate/assets/close-icon-white.svg";
   let emailstoBeSentArr: string[] = [];
   let isAllSelectedCheck = false;
   let teamSpecificWorkspace = workspaces.map((elem) => {

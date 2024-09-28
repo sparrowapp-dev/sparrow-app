@@ -1,11 +1,11 @@
 <script lang="ts">
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import Dropdown from "@deprecate/components/dropdown/Dropdown.svelte";
   import type { WorkspaceDocument } from "@app/database/database";
-  import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
+  import { TeamRole, WorkspaceRole } from "@deprecate/utils/enums/team.enum";
   import type {
     TeamServiceMethods,
     workspaceDocumentWithPosition,
-  } from "$lib/utils/interfaces";
+  } from "@deprecate/utils/interfaces";
   import { notifications } from "@sparrow/library/ui";
   export let workspace: workspaceDocumentWithPosition;
   export let user;

@@ -56,8 +56,8 @@
   /**
    * Icons and images
    */
-  import { GitBranchIcon } from "$lib/assets/icons";
-  import refreshIcon from "$lib/assets/refresh.svg";
+  import { GitBranchIcon } from "@deprecate/assets/icons";
+  import refreshIcon from "@deprecate/assets/refresh.svg";
 
   /**
    * Components
@@ -70,9 +70,9 @@
   /**
    * Enums
    */
-  import { PERMISSION_NOT_FOUND_TEXT } from "$lib/utils/constants/permissions.constant";
+  import { PERMISSION_NOT_FOUND_TEXT } from "@deprecate/utils/constants/permissions.constant";
   import type { CollectionDocument, TabDocument } from "@app/database/database";
-  import { WorkspaceRole } from "$lib/utils/enums";
+  import { WorkspaceRole } from "@deprecate/utils/enums";
   import type { CollectionDto } from "@common/types/workspace";
 
   /**

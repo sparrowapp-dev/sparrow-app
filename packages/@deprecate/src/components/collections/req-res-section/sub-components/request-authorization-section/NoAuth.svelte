@@ -1,5 +1,5 @@
 <script lang="ts">
-  import linkIcon from "$lib/assets/linkIcon.svg";
+  import linkIcon from "@deprecate/assets/linkIcon.svg";
 
   function handleLinkClick(event) {
     event.preventDefault();

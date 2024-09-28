@@ -1,12 +1,12 @@
 <script lang="ts">
   import { SocketExplorer } from "@sparrow/workspaces/features";
-  import { environmentType } from "$lib/utils/enums";
+  import { environmentType } from "@deprecate/utils/enums";
 
   // ---- View Model
   import WebSocketViewModel from "./WebSocketExplorerPage.ViewModel";
   import { RestExplorer, ChatBot } from "@sparrow/workspaces/features";
   import { Debounce } from "@common/utils";
-  import { isGuestUserActive, user } from "$lib/store";
+  import { isGuestUserActive, user } from "@deprecate/store";
   import { onMount } from "svelte";
   import type { Tab } from "@common/types/workspace";
   import type { TabDocument, WorkspaceDocument } from "@app/database/database";

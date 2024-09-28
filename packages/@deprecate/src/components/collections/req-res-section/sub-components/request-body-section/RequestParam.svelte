@@ -1,5 +1,5 @@
 <script lang="ts">
-  import penIcon from "$lib/assets/pen.svg";
+  import penIcon from "@deprecate/assets/pen.svg";
   import Headers from "../request-header-section/Headers.svelte";
   import RequestBody from "../request-body-section/RequestBody.svelte";
   import Authorization from "../request-authorization-section/Authorization.svelte";
@@ -13,7 +13,7 @@
     leftPanelWidth,
     rightPanelWidth,
     topPanelHeight,
-  } from "$lib/store/request-response-section";
+  } from "@deprecate/store/request-response-section";
   import ResponseParams from "../response-body-section/ResponseParams.svelte";
   import DefaultPage from "../response-body-section/DefaultPage.svelte";
 
@@ -22,14 +22,14 @@
   import {
     RequestSection,
     ResponseStatusCode,
-  } from "$lib/utils/enums/request.enum";
+  } from "@deprecate/utils/enums/request.enum";
   import {
     findAuthHeader,
     findAuthParameter,
-  } from "$lib/utils/helpers/auth.helper";
-  import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  } from "@deprecate/utils/helpers/auth.helper";
+  import { createDeepCopy } from "@deprecate/utils/helpers/conversion.helper";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
+  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import { Loader } from "@sparrow/library/ui";
 

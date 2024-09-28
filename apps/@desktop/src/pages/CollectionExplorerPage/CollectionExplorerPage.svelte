@@ -13,7 +13,7 @@
   // Component
   import { CollectionExplorer } from "@sparrow/workspaces/features";
   import type { Observable } from "rxjs";
-  import { user } from "$lib/store";
+  import { user } from "@deprecate/store";
 
   // Exports
   export let tab: TabDocument;

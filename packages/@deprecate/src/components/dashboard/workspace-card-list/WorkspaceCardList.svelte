@@ -7,17 +7,17 @@
     LeftIcon,
     RightIcon,
     SearchIcon,
-  } from "$lib/assets/app.asset";
+  } from "@deprecate/assets/app.asset";
   import type {
     CurrentTeam,
     Team,
     workspaceInviteMethods,
-  } from "$lib/utils/interfaces";
+  } from "@deprecate/utils/interfaces";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { Button } from "@sparrow/library/ui";
   import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
   import type { Observable } from "rxjs";
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import { HeaderDashboardViewModel } from "@deprecate/components/header/header-dashboard/HeaderDashboard.ViewModel";
 
   export let userId: string;
   export let currActiveTeam: CurrentTeam;

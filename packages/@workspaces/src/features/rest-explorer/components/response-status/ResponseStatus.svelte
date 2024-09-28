@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ResponseStatusCode } from "$lib/utils/enums/request.enum";
+  import { ResponseStatusCode } from "@deprecate/utils/enums/request.enum";
   import { BoxIcon, ClockIcon, DotIcon } from "@sparrow/library/icons";
   import type { Response } from "@common/types/workspace";
   import { Tooltip } from "@sparrow/library/ui";

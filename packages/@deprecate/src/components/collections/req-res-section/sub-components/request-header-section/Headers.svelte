@@ -2,21 +2,21 @@
   import type {
     KeyValuePair,
     NewTab,
-  } from "$lib/utils/interfaces/request.interface";
+  } from "@deprecate/utils/interfaces/request.interface";
   import { TabularInput } from "@sparrow/library/forms";
-  import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
-  import AngleUp from "$lib/assets/angle-up.svelte";
-  import AngleDown from "$lib/assets/angle-down2.svelte";
+  import { createDeepCopy } from "@deprecate/utils/helpers/conversion.helper";
+  import AngleUp from "@deprecate/assets/angle-up.svelte";
+  import AngleDown from "@deprecate/assets/angle-down2.svelte";
   import { onMount } from "svelte";
   import {
     findAuthHeader,
     setContentTypeHeader,
-  } from "$lib/utils/helpers/auth.helper";
+  } from "@deprecate/utils/helpers/auth.helper";
   import {
     RequestDataset,
     RequestProperty,
-  } from "$lib/utils/enums/request.enum";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  } from "@deprecate/utils/enums/request.enum";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   export let request;
   export let collectionsMethods: CollectionsMethods;
   export let currentTabId;

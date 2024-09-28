@@ -3,21 +3,21 @@ import { TabRepository } from "../../repositories/tab.repository";
 import { TeamRepository } from "../../repositories/team.repository";
 import { TeamService } from "../../services/team.service";
 import { notifications } from "@sparrow/library/ui";
-import { user } from "$lib/store";
+import { user } from "@deprecate/store";
 
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { CollectionRepository } from "../../repositories/collection.repository";
 import { GithubRepoReposistory } from "../../repositories/github-repo.repository";
 import { GithubService } from "../../services/github.service";
-import { moveNavigation } from "$lib/utils/helpers";
+import { moveNavigation } from "@deprecate/utils/helpers";
 import { navigate } from "svelte-navigator";
 import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
-import type { Team } from "$lib/utils/interfaces";
+import type { MakeRequestResponse } from "@deprecate/utils/interfaces/common.interface";
+import type { Team } from "@deprecate/utils/interfaces";
 import { UserService } from "../../services/user.service";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { Events } from "$lib/utils/enums";
+import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+import { Events } from "@deprecate/utils/enums";
 
 export class TeamsViewModel {
   constructor() {}

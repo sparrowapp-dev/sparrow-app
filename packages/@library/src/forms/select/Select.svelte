@@ -1,9 +1,9 @@
 <script lang="ts">
   import { tickIcon } from "./svgs";
   import { onDestroy, onMount } from "svelte";
-  import { SearchIcon } from "$lib/assets/icons";
+  import { SearchIcon } from "@deprecate/assets/icons";
   import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
-  import { GitBranchIcon, DownArrowIcon } from "$lib/assets/icons";
+  import { GitBranchIcon, DownArrowIcon } from "@deprecate/assets/icons";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
   import { ArrowIcon } from "@sparrow/library/icons";
   import MenuItemsV3 from "./menu-items/MenuItemsV3.svelte";

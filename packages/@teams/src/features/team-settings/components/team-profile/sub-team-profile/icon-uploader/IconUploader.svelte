@@ -1,6 +1,10 @@
 <script lang="ts">
-  import { DeleteIcon, EditIcon, UploadIcon } from "$lib/assets/app.asset";
-  import { base64ToURL, imageDataToURL } from "$lib/utils/helpers";
+  import {
+    DeleteIcon,
+    EditIcon,
+    UploadIcon,
+  } from "@deprecate/assets/app.asset";
+  import { base64ToURL, imageDataToURL } from "@deprecate/utils/helpers";
 
   /**
    * The current value of the file input.

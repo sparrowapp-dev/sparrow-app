@@ -1,7 +1,7 @@
 <script lang="ts">
   // ---- Assets
-  import floppyDisk from "$lib/assets/floppy-disk.svg";
-  import angleDown from "$lib/assets/angle-down.svg";
+  import floppyDisk from "@deprecate/assets/floppy-disk.svg";
+  import angleDown from "@deprecate/assets/angle-down.svg";
   // ---- Components
   import {
     HttpUrlSection,
@@ -65,7 +65,7 @@
     CreateCollection,
     SendingApiRequest,
   } from "@sparrow/workspaces/common/constants";
-  import { ResponseStatusCode } from "$lib/utils/enums";
+  import { ResponseStatusCode } from "@deprecate/utils/enums";
 
   export let tab: Observable<RequestTab>;
   export let collections: Observable<CollectionDocument[]>;

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import trashIcon from "$lib/assets/trash-icon.svg";
+  import trashIcon from "@deprecate/assets/trash-icon.svg";
   import editIcon from "../../../features/rest-explorer/assets/icons/edit.svg";
   import moreOptions from "../../../features/rest-explorer/assets/icons/moreOptions.svg";
   import type {
     KeyValuePair,
     KeyValuePairWithBase,
-  } from "$lib/utils/interfaces/request.interface";
+  } from "@deprecate/utils/interfaces/request.interface";
   import type { KeyValueChecked } from "@common/types/workspace";
   import { partition } from "rxjs";
 

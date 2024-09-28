@@ -2,7 +2,7 @@ import {
   connectWebSocket,
   disconnectWebSocket,
   sendMessage,
-} from "$lib/api/api.common";
+} from "@deprecate/api/api.common";
 
 export class WebSocketService {
   public connectWebsocket = async (

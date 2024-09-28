@@ -1,29 +1,29 @@
 <script lang="ts">
-  import commetIcon from "$lib/assets/comment-fill.svg";
-  import codeIcon from "$lib/assets/code.svg";
-  import BookIcon from "$lib/assets/book.svelte";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import commetIcon from "@deprecate/assets/comment-fill.svg";
+  import codeIcon from "@deprecate/assets/code.svg";
+  import BookIcon from "@deprecate/assets/book.svelte";
+  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
   import { Tooltip } from "@sparrow/library/ui";
   import { onDestroy } from "svelte";
   import SaveRequest from "./sub-components/save-request/SaveRequest.svelte";
-  import type { RequestBody } from "$lib/utils/interfaces/request.interface";
+  import type { RequestBody } from "@deprecate/utils/interfaces/request.interface";
   import { updateCollectionRequest } from "@app/services/collection";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import SaveIcon from "$lib/assets/save-desc.svg";
-  import EditIcon from "$lib/assets/edit-desc.svg";
+  import { ItemType } from "@deprecate/utils/enums/item-type.enum";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
+  import SaveIcon from "@deprecate/assets/save-desc.svg";
+  import EditIcon from "@deprecate/assets/edit-desc.svg";
 
-  import { Events, type WorkspaceRole } from "$lib/utils/enums";
+  import { Events, type WorkspaceRole } from "@deprecate/utils/enums";
   import { notifications } from "@sparrow/library/ui";
 
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import { workspaceLevelPermissions } from "@deprecate/utils/constants/permissions.constant";
   import {
     getMethodStyle,
     hasWorkpaceLevelPermission,
-  } from "$lib/utils/helpers";
+  } from "@deprecate/utils/helpers";
   import { Modal } from "@sparrow/library/ui";
-  import ComboText from "$lib/components/text/ComboText.svelte";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import ComboText from "@deprecate/components/text/ComboText.svelte";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   export let activeTab;

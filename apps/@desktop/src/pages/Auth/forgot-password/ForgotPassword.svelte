@@ -1,9 +1,9 @@
 <script lang="ts">
-  import angleLeft from "$lib/assets/angleLeft.svg";
-  import starIcon from "$lib/assets/starIcon.svg";
+  import angleLeft from "@deprecate/assets/angleLeft.svg";
+  import starIcon from "@deprecate/assets/starIcon.svg";
 
   import { handleForgotPasswordValidation } from "./forgot-password";
-  import { isLoading, username } from "$lib/store/auth.store";
+  import { isLoading, username } from "@deprecate/store/auth.store";
   import { Link } from "svelte-navigator";
   import { Loader } from "@sparrow/library/ui";
 

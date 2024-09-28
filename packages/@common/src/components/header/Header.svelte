@@ -5,9 +5,9 @@
     SparrowEdgeIcon,
     StackIcon,
   } from "@sparrow/library/icons";
-  import { environmentType } from "$lib/utils/enums";
+  import { environmentType } from "@deprecate/utils/enums";
   import { SparrowIcon } from "@sparrow/library/icons";
-  import constants from "$lib/utils/constants";
+  import constants from "@deprecate/utils/constants";
   import type { WorkspaceDocument } from "@app/database/database";
   import { PlusIcon } from "@sparrow/library/icons";
   import { navigate } from "svelte-navigator";
@@ -131,9 +131,9 @@
   export let user;
   export let onLogout;
 
-  import profile from "$lib/assets/profileTab.svg";
-  import hoveredProfile from "$lib/assets/profile-hovered.svg";
-  import selectedProfile from "$lib/assets/profile-selected.svg";
+  import profile from "@deprecate/assets/profileTab.svg";
+  import hoveredProfile from "@deprecate/assets/profile-hovered.svg";
+  import selectedProfile from "@deprecate/assets/profile-selected.svg";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",

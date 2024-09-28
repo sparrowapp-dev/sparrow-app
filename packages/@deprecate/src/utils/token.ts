@@ -1,4 +1,4 @@
-import constants from "$lib/utils/constants";
+import constants from "@deprecate/utils/constants";
 
 const getUserToken = () => {
   let token = null;

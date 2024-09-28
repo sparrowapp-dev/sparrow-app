@@ -1,5 +1,5 @@
 <script>
-  import { SearchIcon } from "$lib/assets/icons";
+  import { SearchIcon } from "@deprecate/assets/icons";
   import { Select } from "@sparrow/library/forms";
   import {
     ArrowUnfilledIcon,
@@ -11,14 +11,14 @@
   } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   import { marked } from "marked";
-  import constants from "$lib/utils/constants";
+  import constants from "@deprecate/utils/constants";
   import { Loader, Tooltip } from "@sparrow/library/ui";
-  import copyToClipBoard from "$lib/utils/copyToClipboard";
+  import copyToClipBoard from "@deprecate/utils/copyToClipboard";
   import { notifications } from "@sparrow/library/ui";
   import { open } from "@tauri-apps/plugin-shell";
   import { UpdatesTagType } from "../../../common/types/feedback";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   export let listChangeLog;
 
   /**

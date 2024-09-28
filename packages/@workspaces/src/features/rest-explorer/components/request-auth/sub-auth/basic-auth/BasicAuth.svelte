@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { BasicAuth } from "$lib/utils/interfaces/request.interface";
+  import type { BasicAuth } from "@deprecate/utils/interfaces/request.interface";
   import { CodeMirrorInput } from "@sparrow/workspaces/common/components";
   import { AuthInputTheme } from "@sparrow/workspaces/common/utils";
 

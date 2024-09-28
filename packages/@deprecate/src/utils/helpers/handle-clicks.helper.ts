@@ -1,5 +1,5 @@
 // /* eslint-disable @typescript-eslint/no-explicit-any */
-// import { isFolderCreatedFirstTime } from "$lib/store/collection";
+// import { isFolderCreatedFirstTime } from "@deprecate/store/collection";
 // import { CollectionsViewModel } from "../../../pages/Collections/Collections.ViewModel.old";
 // import { ItemType } from "../enums/item-type.enum";
 // import type { Path } from "../interfaces/request.interface";

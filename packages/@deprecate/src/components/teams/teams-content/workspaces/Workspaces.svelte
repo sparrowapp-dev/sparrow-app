@@ -1,5 +1,5 @@
 <script lang="ts">
-  import RecentWorkspace from "$lib/components/table/recent-workspae/RecentWorkspace.svelte";
+  import RecentWorkspace from "@deprecate/components/table/recent-workspae/RecentWorkspace.svelte";
 
   export let data: any;
   export let selectedView: string;

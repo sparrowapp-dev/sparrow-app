@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { ThreeDotIcon } from "$lib/assets/app.asset";
+  import { ThreeDotIcon } from "@deprecate/assets/app.asset";
   import { UserProfileList } from "@sparrow/teams/common/compopnents";
   import { MenuView } from "@sparrow/teams/common/compopnents";
-  import { TeamRole, WorkspaceMemberRole } from "$lib/utils/enums";
+  import { TeamRole, WorkspaceMemberRole } from "@deprecate/utils/enums";
 
   export let list;
   export let activeTeam;

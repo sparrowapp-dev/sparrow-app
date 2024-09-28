@@ -13,7 +13,7 @@
   // Component
   import { FolderExplorer } from "@sparrow/workspaces/features";
   import type { Folder } from "@common/types/workspace";
-  import { user } from "$lib/store";
+  import { user } from "@deprecate/store";
 
   /**
    * folder tab document

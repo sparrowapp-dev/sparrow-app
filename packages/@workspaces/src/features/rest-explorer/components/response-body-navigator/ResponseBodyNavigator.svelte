@@ -1,23 +1,23 @@
 <script lang="ts">
-  import downloadIcon from "$lib/assets/download.svg";
-  import copyIcon from "$lib/assets/copy.svg";
-  import copyToClipBoard from "$lib/utils/copyToClipboard";
+  import downloadIcon from "@deprecate/assets/download.svg";
+  import copyIcon from "@deprecate/assets/copy.svg";
+  import copyToClipBoard from "@deprecate/utils/copyToClipboard";
   import { notifications } from "@sparrow/library/ui";
   import {
     RequestDataType,
     ResponseFormatter,
     ResponseStatusCode,
-  } from "$lib/utils/enums/request.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  } from "@deprecate/utils/enums/request.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { UntrackedItems } from "@deprecate/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import StatusSuccess from "$lib/assets/status-success.svelte";
-  import StatusError from "$lib/assets/status-error.svelte";
+  import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
+  import StatusSuccess from "@deprecate/assets/status-success.svelte";
+  import StatusError from "@deprecate/assets/status-error.svelte";
   import { Select } from "@sparrow/library/forms";
   import { ResponseFormatterEnum } from "@common/types/workspace";
-  import BeautifyIcon from "$lib/assets/beautify.svg";
+  import BeautifyIcon from "@deprecate/assets/beautify.svg";
   import js_beautify, { html_beautify } from "js-beautify";
   import { WithSelectV3 } from "@sparrow/workspaces/common/hoc";
 

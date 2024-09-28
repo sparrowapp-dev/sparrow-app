@@ -10,7 +10,7 @@
 
   // ---- Animation
   import { Motion } from "svelte-motion";
-  import { scaleMotionProps } from "$lib/utils/animations";
+  import { scaleMotionProps } from "@deprecate/utils/animations";
 
   import { onDestroy } from "svelte";
   // ---- Components
@@ -32,20 +32,20 @@
   import { notifications } from "@sparrow/library/ui";
 
   // ---- Interface, enum & constants
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { WorkspaceRole } from "$lib/utils/enums/team.enum";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
+  import { WorkspaceRole } from "@deprecate/utils/enums/team.enum";
+  import { workspaceLevelPermissions } from "@deprecate/utils/constants/permissions.constant";
 
   // ---- View Model
   import CollectionsViewModel from "./CollectionPage.ViewModel";
   import { EnvironmentViewModel } from "@app/pages/EnvironmentPage/EnvironmentPage.ViewModel";
 
   // ---- helpers
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
   import type { TabDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { onMount } from "svelte";
-  import { ItemType } from "$lib/utils/enums";
+  import { ItemType } from "@deprecate/utils/enums";
 
   import type {
     CollectionDocument,
@@ -54,9 +54,9 @@
   } from "@app/database/database";
   import type { GithubRepoDocType } from "../../models/github-repo.model";
   import { Modal } from "@sparrow/library/ui";
-  import { isGuestUserActive } from "$lib/store";
+  import { isGuestUserActive } from "@deprecate/store";
   import { pagesMotion } from "../../constants";
-  import { user } from "$lib/store";
+  import { user } from "@deprecate/store";
   import WebSocketExplorerPage from "../WebSocketExplorerPage/WebSocketExplorerPage.svelte";
   import {
     TabTypeEnum,

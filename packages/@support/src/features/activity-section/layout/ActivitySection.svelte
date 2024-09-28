@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { user } from "$lib/store";
+  import { user } from "@deprecate/store";
   import {
     ActivityIcon,
     CommentIcon,
@@ -10,11 +10,11 @@
   import { UpvoteIcon } from "@sparrow/support/common/components";
   import FeedbackPost from "../../../features/feedback-section/layout/FeedbackPost.svelte";
   import { onMount } from "svelte";
-  import { SearchIcon } from "$lib/assets/app.asset";
+  import { SearchIcon } from "@deprecate/assets/app.asset";
   import { Select } from "@sparrow/library/forms";
   import { CategoryIcon, StatusIcon } from "@sparrow/library/icons";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 
   import {
     FeedbackStatusType,

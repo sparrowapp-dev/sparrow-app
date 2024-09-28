@@ -1,5 +1,5 @@
 <script>
-  import { LeftIcon, SearchIcon } from "$lib/assets/app.asset";
+  import { LeftIcon, SearchIcon } from "@deprecate/assets/app.asset";
   import { Input, Select, Textarea } from "@sparrow/library/forms";
   import {
     AttachmentIcon,
@@ -10,7 +10,7 @@
   } from "@sparrow/library/icons";
 
   import { Button, IconFallback, Loader, Modal } from "@sparrow/library/ui";
-  import {ImageModal} from "@sparrow/library/ui";
+  import { ImageModal } from "@sparrow/library/ui";
   import {
     CommentCard,
     Drop,
@@ -20,8 +20,8 @@
   import { onMount } from "svelte";
   import { FormatTime } from "@common/utils/formatTime";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
   import { notifications } from "@sparrow/library/ui";
 
   export let isPostopen;

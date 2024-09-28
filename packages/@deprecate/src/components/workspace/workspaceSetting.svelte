@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { SearchIcon } from "$lib/assets/app.asset";
+  import { SearchIcon } from "@deprecate/assets/app.asset";
   import WorkspaceUserInfo from "./workspaceUserInfo.svelte";
-  import { Events, TeamRole } from "$lib/utils/enums";
+  import { Events, TeamRole } from "@deprecate/utils/enums";
   import type {
     CollectionsMethods,
     TeamRepositoryMethods,
     TeamServiceMethods,
     userDetails,
     workspaceInviteMethods,
-  } from "$lib/utils/interfaces";
+  } from "@deprecate/utils/interfaces";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   export let collectionsMethods: CollectionsMethods;
   import { notifications } from "@sparrow/library/ui";
@@ -16,8 +16,8 @@
   import { Button } from "@sparrow/library/ui";
   import { HeaderDashboardViewModel } from "../header/header-dashboard/HeaderDashboard.ViewModel";
   import Dropdown from "../dropdown/Dropdown.svelte";
-  import { requestResponseStore } from "$lib/store";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { requestResponseStore } from "@deprecate/store";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
   export let currentTeamworkspaces: WorkspaceDocument[];
   export let currentWorkspaceDetails: { id: string; name: string };
   export let currentTeamDetails: { id: string; name: string };

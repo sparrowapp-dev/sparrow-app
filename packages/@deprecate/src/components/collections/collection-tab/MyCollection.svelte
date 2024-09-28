@@ -1,23 +1,23 @@
 <script lang="ts">
-  import refreshIcon from "$lib/assets/refresh.svg";
+  import refreshIcon from "@deprecate/assets/refresh.svg";
   import { onDestroy, onMount } from "svelte";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import { MyCollectionViewModel } from "./MyCollection.viewModel";
   import {
     collapsibleState,
     isApiCreatedFirstTime,
-  } from "$lib/store/request-response-section";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { isCollectionCreatedFirstTime } from "$lib/store/collection";
+  } from "@deprecate/store/request-response-section";
+  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
+  import { isCollectionCreatedFirstTime } from "@deprecate/store/collection";
   import type { CollectionListViewModel } from "../collections-list/CollectionList.ViewModel";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import { ResponseStatusCode, WorkspaceRole } from "$lib/utils/enums";
+  import { ResponseStatusCode, WorkspaceRole } from "@deprecate/utils/enums";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
-  } from "$lib/utils/constants/permissions.constant";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  } from "@deprecate/utils/constants/permissions.constant";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
   import { Tooltip } from "@sparrow/library/ui";
   import { CollectionService } from "@app/services/collection.service";
   import { ImportCollectionViewModel } from "../collections-list/import-collection/ImportCollection.viewModel";
@@ -26,8 +26,8 @@
   import { invoke } from "@tauri-apps/api/core";
   import { Modal } from "@sparrow/library/ui";
   import { Select } from "@sparrow/library/forms";
-  import { GitBranchIcon } from "$lib/assets/icons";
-  import UserProfileList from "$lib/components/profile/UserProfileList.svelte";
+  import { GitBranchIcon } from "@deprecate/assets/icons";
+  import UserProfileList from "@deprecate/components/profile/UserProfileList.svelte";
 
   export let loaderColor = "default";
   export let activeTab;

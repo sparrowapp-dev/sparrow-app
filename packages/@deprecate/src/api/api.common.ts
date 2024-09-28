@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { type Method } from "axios";
 import type { RequestData } from "../utils/dto/requestdata";
-import { getUserToken, getRefToken } from "$lib/utils/token";
+import { getUserToken, getRefToken } from "@deprecate/utils/token";
 import { refreshToken } from "@app/services/auth.service";
-import constants from "$lib/utils/constants";
-import { setAuthJwt } from "$lib/utils/jwt";
-import { isLoading } from "$lib/store/auth.store";
-import { ErrorMessages } from "$lib/utils/enums/enums";
+import constants from "@deprecate/utils/constants";
+import { setAuthJwt } from "@deprecate/utils/jwt";
+import { isLoading } from "@deprecate/store/auth.store";
+import { ErrorMessages } from "@deprecate/utils/enums/enums";
 import { invoke } from "@tauri-apps/api/core";
 import { DashboardViewModel } from "@app/pages/Dashboard/Dashboard.ViewModel";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
-import type { Response } from "$lib/utils/interfaces/request.interface";
+import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+import type { MakeRequestResponse } from "@deprecate/utils/interfaces/common.interface";
+import type { Response } from "@deprecate/utils/interfaces/request.interface";
 import { listen } from "@tauri-apps/api/event";
 import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
 import { v4 as uuidv4 } from "uuid";

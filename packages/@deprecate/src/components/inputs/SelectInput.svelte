@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { DownArrow } from "$lib/assets";
-  import { PeopleIcon } from "$lib/assets/app.asset";
+  import { DownArrow } from "@deprecate/assets";
+  import { PeopleIcon } from "@deprecate/assets/app.asset";
   import { fly } from "svelte/transition";
 
   export let labelText = "Select";

@@ -6,17 +6,17 @@
   export let handleInvitePopup: (flag: boolean) => void;
   export let teamName: string;
   import { fade } from "svelte/transition";
-  import closeIcon from "$lib/assets/close-icon-normal.svg";
+  import closeIcon from "@deprecate/assets/close-icon-normal.svg";
   import SelectRoleDropdown from "../dropdown/SelectRoleDropdown.svelte";
-  import closeIconWhite from "$lib/assets/close-icon-white.svg";
+  import closeIconWhite from "@deprecate/assets/close-icon-white.svg";
   import type {
     addUsersInWorkspace,
     addUsersInWorkspacePayload,
-  } from "$lib/utils/dto";
+  } from "@deprecate/utils/dto";
   import { notifications } from "@sparrow/library/ui";
-  import { WorkspaceRole } from "$lib/utils/enums";
-  import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
-  import { validateEmail } from "$lib/utils/helpers";
+  import { WorkspaceRole } from "@deprecate/utils/enums";
+  import { createDynamicComponents } from "@deprecate/utils/helpers/common.helper";
+  import { validateEmail } from "@deprecate/utils/helpers";
   let emailstoBeSentArr: string[] = [];
   export let addUsersInWorkspace: (
     id: string,

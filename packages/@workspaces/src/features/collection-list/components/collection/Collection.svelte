@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 
   export let onItemCreated: (entityType: string, args: any) => void;
   export let onItemDeleted: (entityType: string, args: any) => void;
@@ -20,28 +20,31 @@
    * Role of user in active workspace
    */
   export let userRole;
-  import angleRight from "$lib/assets/angle-right-v2.svg";
-  import threedotIcon from "$lib/assets/3dot.svg";
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import angleRight from "@deprecate/assets/angle-right-v2.svg";
+  import threedotIcon from "@deprecate/assets/3dot.svg";
+  import {
+    ItemType,
+    UntrackedItems,
+  } from "@deprecate/utils/enums/item-type.enum";
   import { Spinner } from "@sparrow/library/ui";
-  import { selectMethodsStore } from "$lib/store/methods";
+  import { selectMethodsStore } from "@deprecate/store/methods";
   import { onDestroy, onMount } from "svelte";
-  import { isCollectionCreatedFirstTime } from "$lib/store/collection";
+  import { isCollectionCreatedFirstTime } from "@deprecate/store/collection";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
-  import { WorkspaceRole } from "$lib/utils/enums";
+  import { WorkspaceRole } from "@deprecate/utils/enums";
   import { Tooltip } from "@sparrow/library/ui";
-  import gitBranchIcon from "$lib/assets/git-branch.svg";
-  import { ReloadCollectionIcon } from "$lib/assets/icons";
+  import gitBranchIcon from "@deprecate/assets/git-branch.svg";
+  import { ReloadCollectionIcon } from "@deprecate/assets/icons";
   import type { CollectionDocument, TabDocument } from "@app/database/database";
   import Folder from "../folder/Folder.svelte";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
-  import { PERMISSION_NOT_FOUND_TEXT } from "$lib/utils/constants/permissions.constant";
-  import { CollectionMessage } from "$lib/utils/constants/request.constant";
-  import requestIcon from "$lib/assets/create_request.svg";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
-  import AddIcon from "$lib/assets/add.svg";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
+  import { workspaceLevelPermissions } from "@deprecate/utils/constants/permissions.constant";
+  import { PERMISSION_NOT_FOUND_TEXT } from "@deprecate/utils/constants/permissions.constant";
+  import { CollectionMessage } from "@deprecate/utils/constants/request.constant";
+  import requestIcon from "@deprecate/assets/create_request.svg";
+  import type { Path } from "@deprecate/utils/interfaces/request.interface";
+  import AddIcon from "@deprecate/assets/add.svg";
   import {
     FolderIcon,
     SyncIcon,
@@ -50,7 +53,7 @@
     SocketIcon,
   } from "@sparrow/library/icons";
   import { Options } from "@sparrow/library/ui";
-  import { isGuestUserActive } from "$lib/store";
+  import { isGuestUserActive } from "@deprecate/store";
 
   let deletedIds: [string] | [] = [];
   let requestCount = 0;

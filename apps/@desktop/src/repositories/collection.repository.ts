@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type CollectionDocument } from "../database/database";
-import { ItemType } from "$lib/utils/enums/item-type.enum";
-import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
-import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
+import { ItemType } from "@deprecate/utils/enums/item-type.enum";
+import { createDeepCopy } from "@deprecate/utils/helpers/conversion.helper";
+import type { CollectionItem } from "@deprecate/utils/interfaces/collection.interface";
 import type { Observable } from "rxjs";
 import type { CollectionItemsDto } from "@common/types/workspace";
 export class CollectionRepository {

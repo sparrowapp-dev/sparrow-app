@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ComboText from "$lib/components/text/ComboText.svelte";
-  import { isHorizontal } from "$lib/store/request-response-section";
+  import ComboText from "@deprecate/components/text/ComboText.svelte";
+  import { isHorizontal } from "@deprecate/store/request-response-section";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
   let isHorizontalMode: boolean;

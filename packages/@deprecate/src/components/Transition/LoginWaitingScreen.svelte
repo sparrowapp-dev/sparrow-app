@@ -1,5 +1,5 @@
 <script lang="ts">
-  import icons from "$lib/assets/app.asset";
+  import icons from "@deprecate/assets/app.asset";
 
   import { fly, fade } from "svelte/transition";
   import { Loader } from "@sparrow/library/ui";

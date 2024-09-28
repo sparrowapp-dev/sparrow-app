@@ -1,8 +1,8 @@
 <script lang="ts">
   import { logoSparrowSquare } from "@common/images";
   import { Spinner } from "@sparrow/library/ui";
-  import leftIcon from "$lib/assets/left.svg";
-  import constants from "$lib/utils/constants";
+  import leftIcon from "@deprecate/assets/left.svg";
+  import constants from "@deprecate/utils/constants";
   import { fly, fade } from "svelte/transition";
   import { version } from "../../../../src-tauri/tauri.conf.json";
   import { onMount } from "svelte";

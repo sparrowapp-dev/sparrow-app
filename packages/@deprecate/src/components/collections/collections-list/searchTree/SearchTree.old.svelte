@@ -1,11 +1,11 @@
 <script lang="ts">
-  import folder from "$lib/assets/folder.svg";
-  import Request from "$lib/components/collections/collections-list/searchTree/Request.svelte";
-  import collectionIcon from "$lib/assets/collection-icon.svg";
+  import folder from "@deprecate/assets/folder.svg";
+  import Request from "@deprecate/components/collections/collections-list/searchTree/Request.svelte";
+  import collectionIcon from "@deprecate/assets/collection-icon.svg";
   import {
     handleCollectionClick,
     handleFolderClick,
-  } from "$lib/utils/helpers/handle-clicks.helper";
+  } from "@deprecate/utils/helpers/handle-clicks.helper";
   let folderExpand: boolean = false;
   let collectionExpand: boolean = false;
   export let explorer: any;

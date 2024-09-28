@@ -1,10 +1,10 @@
 <script lang="ts">
-  import dragIcon from "$lib/assets/drag.svg";
-  import trashIcon from "$lib/assets/trash-icon.svg";
+  import dragIcon from "@deprecate/assets/drag.svg";
+  import trashIcon from "@deprecate/assets/trash-icon.svg";
   import type {
     KeyValuePair,
     KeyValuePairWithBase,
-  } from "$lib/utils/interfaces/request.interface";
+  } from "@deprecate/utils/interfaces/request.interface";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "../";
   import { onMount } from "svelte";

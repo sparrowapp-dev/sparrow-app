@@ -1,10 +1,10 @@
 <script lang="ts">
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import Dropdown from "@deprecate/components/dropdown/Dropdown.svelte";
   import { Select } from "@sparrow/library/forms";
-  import { AuthSection } from "$lib/utils/enums/authorization.enum";
-  import { RequestAuthProperty } from "$lib/utils/enums/request.enum";
-  import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
-  import type { ApiKey } from "$lib/utils/interfaces/request.interface";
+  import { AuthSection } from "@deprecate/utils/enums/authorization.enum";
+  import { RequestAuthProperty } from "@deprecate/utils/enums/request.enum";
+  import { EnvironmentHeper } from "@deprecate/utils/helpers/environment.helper";
+  import type { ApiKey } from "@deprecate/utils/interfaces/request.interface";
   import EnvironmentPicker from "../environment-picker/EnvironmentPicker.svelte";
   export let apiData: ApiKey;
   export let callback;

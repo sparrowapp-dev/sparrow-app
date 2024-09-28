@@ -1,31 +1,34 @@
 <script lang="ts">
-  import about from "$lib/assets/about.svg";
-  import collectionss from "$lib/assets/collections-old.svg";
-  import apiRequest from "$lib/assets/apiRequest.svg";
+  import about from "@deprecate/assets/about.svg";
+  import collectionss from "@deprecate/assets/collections-old.svg";
+  import apiRequest from "@deprecate/assets/apiRequest.svg";
   import { v4 as uuidv4 } from "uuid";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
-  import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
+  import { moveNavigation } from "@deprecate/utils/helpers/navigation";
+  import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
+  import { generateSampleWorkspace } from "@deprecate/utils/sample/workspace.sample";
+  import { CollectionListViewModel } from "@deprecate/components/collections/collections-list/CollectionList.ViewModel";
   const _colllectionListViewModel = new CollectionListViewModel();
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
-  import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
+  import {
+    ItemType,
+    UntrackedItems,
+  } from "@deprecate/utils/enums/item-type.enum";
+  import type { Path } from "@deprecate/utils/interfaces/request.interface";
+  import { generateSampleCollection } from "@deprecate/utils/sample/collection.sample";
   import type {
     CollectionDocument,
     WorkspaceDocument,
   } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { onDestroy } from "svelte";
-  import { isCollectionCreatedFirstTime } from "$lib/store/collection";
-  import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import { isCollectionCreatedFirstTime } from "@deprecate/store/collection";
+  import { isApiCreatedFirstTime } from "@deprecate/store/request-response-section";
+  import { HeaderDashboardViewModel } from "@deprecate/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { notifications } from "@sparrow/library/ui";
-  import ImportCollection from "$lib/components/collections/collections-list/import-collection/ImportCollection.svelte";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { createCollectionSource } from "$lib/store/event-source.store";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import ImportCollection from "@deprecate/components/collections/collections-list/import-collection/ImportCollection.svelte";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { createCollectionSource } from "@deprecate/store/event-source.store";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   export let collectionsMethods: CollectionsMethods;
 
   const collections: Observable<CollectionDocument[]> =

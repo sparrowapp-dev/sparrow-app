@@ -5,7 +5,7 @@
   import {
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
-  } from "$lib/store/workspace.store";
+  } from "@deprecate/store/workspace.store";
 
   import {
     leftPanelWidth,

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { WorkspaceMethods } from "$lib/utils/interfaces/workspace.interface";
+  import type { WorkspaceMethods } from "@deprecate/utils/interfaces/workspace.interface";
 
   import type { Observable } from "rxjs";
   import type { TeamDocument } from "@app/database/database";
@@ -8,18 +8,18 @@
     CurrentTeam,
     TeamRepositoryMethods,
     TeamServiceMethods,
-  } from "$lib/utils/interfaces";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
+  } from "@deprecate/utils/interfaces";
+  import type { Path } from "@deprecate/utils/interfaces/request.interface";
   import { TeamViewModel } from "./Teams.ViewModel.old";
-  import { scaleMotionProps } from "$lib/utils/animations";
+  import { scaleMotionProps } from "@deprecate/utils/animations";
   import { Motion } from "svelte-motion";
-  import { user } from "$lib/store/auth.store";
+  import { user } from "@deprecate/store/auth.store";
 
   import type { WorkspaceDocument } from "@app/database/database";
   /**
    * @deprecated referes to teams store
-   * import { openedTeam, setOpenedTeam } from "$lib/store/team.store";
-   * import { isTeamCreatedFirstTime } from "$lib/store/team.store";
+   * import { openedTeam, setOpenedTeam } from "@deprecate/store/team.store";
+   * import { isTeamCreatedFirstTime } from "@deprecate/store/team.store";
    **/
 
   import {
@@ -27,13 +27,13 @@
     isWorkspaceLoaded,
     workspaceLeftPanelWidth,
     workspaceRightPanelWidth,
-  } from "$lib/store";
-  import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  } from "@deprecate/store";
+  import { generateSampleWorkspace } from "@deprecate/utils/sample/workspace.sample";
+  import { UntrackedItems } from "@deprecate/utils/enums/item-type.enum";
   import { onDestroy, onMount } from "svelte";
-  import {} from "$lib/store";
-  import { generateSamepleTeam } from "$lib/utils/sample";
-  import { moveNavigation } from "$lib/utils/helpers";
+  import {} from "@deprecate/store";
+  import { generateSamepleTeam } from "@deprecate/utils/sample";
+  import { moveNavigation } from "@deprecate/utils/helpers";
   import { navigate } from "svelte-navigator";
   import { notifications } from "@sparrow/library/ui";
 

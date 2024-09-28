@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { replaceSlashWithGreaterThanSymbol } from "$lib/utils/helpers/common.helper";
-  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+  import { replaceSlashWithGreaterThanSymbol } from "@deprecate/utils/helpers/common.helper";
+  import { getMethodStyle } from "@deprecate/utils/helpers/conversion.helper";
   export let explorer: any;
   export let workspaceId: string;
   export let onItemOpened: (entityType: string, args: any) => void;

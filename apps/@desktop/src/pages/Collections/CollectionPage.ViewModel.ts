@@ -6,7 +6,7 @@ import type {
 
 //-----
 // Stores
-import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
+import { isApiCreatedFirstTime } from "@deprecate/store/request-response-section";
 //-----
 
 //-----
@@ -26,7 +26,7 @@ import {
 } from "../../services/collection";
 import { CollectionService } from "../../services/collection.service";
 import { notifications } from "@sparrow/library/ui";
-// import { setContentTypeHeader } from "$lib/utils/helpers";
+// import { setContentTypeHeader } from "@deprecate/utils/helpers";
 
 //-----
 //External Imports
@@ -39,25 +39,28 @@ import type {
   CreateApiRequestPostBody,
   CreateDirectoryPostBody,
   ImportBodyUrl,
-} from "$lib/utils/dto";
+} from "@deprecate/utils/dto";
 //-----
 
 //-----
 //Interfaces
-import type { Folder } from "$lib/utils/interfaces/request.interface";
+import type { Folder } from "@deprecate/utils/interfaces/request.interface";
 //-----
 
 //-----
 //Emuns
 
-import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-import { ContentTypeEnum, ResponseStatusCode } from "$lib/utils/enums";
+import {
+  ItemType,
+  UntrackedItems,
+} from "@deprecate/utils/enums/item-type.enum";
+import { ContentTypeEnum, ResponseStatusCode } from "@deprecate/utils/enums";
 //-----
 
-import { moveNavigation } from "$lib/utils/helpers/navigation";
+import { moveNavigation } from "@deprecate/utils/helpers/navigation";
 import { GuideRepository } from "../../repositories/guide.repository";
-import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 import { type Observable } from "rxjs";
 import { InitRequestTab, InitWebSocketTab } from "@common/utils";
 import { InitCollectionTab } from "@common/utils";
@@ -72,7 +75,7 @@ import { GithubRepoReposistory } from "../../repositories/github-repo.repository
 import { RequestTabAdapter } from "../../adapter/request-tab";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import { isGuestUserActive } from "$lib/store/auth.store";
+import { isGuestUserActive } from "@deprecate/store/auth.store";
 import { InitTab } from "@common/factory";
 import type {
   CollectionArgsDto,

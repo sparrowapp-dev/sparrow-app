@@ -1,9 +1,9 @@
 <script>
-  import cross from "$lib/assets/close.svg";
-  import environment from "$lib/assets/environment.png";
-  import dropdown from "$lib/assets/environment-dropdown.png";
-  import variables from "$lib/assets/variables.png";
-  import { QuickHelp } from "$lib/utils/constants/environment.constant";
+  import cross from "@deprecate/assets/close.svg";
+  import environment from "@deprecate/assets/environment.png";
+  import dropdown from "@deprecate/assets/environment-dropdown.png";
+  import variables from "@deprecate/assets/variables.png";
+  import { QuickHelp } from "@deprecate/utils/constants/environment.constant";
   export let closeQuickHelp;
 </script>
 

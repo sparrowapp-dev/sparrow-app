@@ -1,6 +1,6 @@
-import { getAuthHeaders, makeRequest } from "$lib/api/api.common";
-import constants from "$lib/utils/constants";
-import type { PromptDto } from "$lib/utils/dto/ai-assistant";
+import { getAuthHeaders, makeRequest } from "@deprecate/api/api.common";
+import constants from "@deprecate/utils/constants";
+import type { PromptDto } from "@deprecate/utils/dto/ai-assistant";
 
 export class AiAssistantService {
   constructor() {}

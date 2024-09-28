@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { WorkspaceRole } from "$lib/utils/enums";
+  import { WorkspaceRole } from "@deprecate/utils/enums";
 
   import type {
     SaveRequestType,
@@ -11,8 +11,8 @@
   import { UrlInputTheme } from "../../../../common/utils/";
   import { Tooltip } from "@sparrow/library/ui";
   import { DiskIcon } from "@sparrow/library/icons";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   let componentClass = "";
   export { componentClass as class };
 

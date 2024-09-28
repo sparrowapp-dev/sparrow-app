@@ -1,9 +1,9 @@
 <script lang="ts">
   import { Select } from "@sparrow/library/forms";
-  import { WorkspaceRole } from "$lib/utils/enums/team.enum";
+  import { WorkspaceRole } from "@deprecate/utils/enums/team.enum";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
-  import type { MemberPopType } from "$lib/utils/types/common.type";
+  import type { MemberPopType } from "@deprecate/utils/types/common.type";
 
   export let onRemoveUserFromWorkspace;
 

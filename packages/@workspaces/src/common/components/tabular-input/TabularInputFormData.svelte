@@ -1,15 +1,15 @@
 <script lang="ts">
-  import dragIcon from "$lib/assets/drag.svg";
-  import trashIcon from "$lib/assets/trash-icon.svg";
+  import dragIcon from "@deprecate/assets/drag.svg";
+  import trashIcon from "@deprecate/assets/trash-icon.svg";
   import editIcon from "../../../features/rest-explorer/assets/icons/edit.svg";
   import moreOptions from "../../../features/rest-explorer/assets/icons/moreOptions.svg";
   import attachFile from "../../../features/rest-explorer/assets/icons/attachFile.svg";
   import type {
     KeyValuePair,
     KeyValuePairWithBase,
-  } from "$lib/utils/interfaces/request.interface";
+  } from "@deprecate/utils/interfaces/request.interface";
   import { invoke } from "@tauri-apps/api/core";
-  import close from "$lib/assets/cross.svg";
+  import close from "@deprecate/assets/cross.svg";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "..";
   import { Tooltip } from "@sparrow/library/ui";

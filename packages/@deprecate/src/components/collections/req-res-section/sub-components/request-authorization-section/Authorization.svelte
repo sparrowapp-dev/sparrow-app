@@ -1,8 +1,8 @@
 <script lang="ts">
   import { Select } from "@sparrow/library/forms";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import { AuthType } from "$lib/utils/enums/authorization.enum";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import Dropdown from "@deprecate/components/dropdown/Dropdown.svelte";
+  import { AuthType } from "@deprecate/utils/enums/authorization.enum";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import ApiKey from "./ApiKey.svelte";
   import BasicAuth from "./BasicAuth.svelte";
   import BearerToken from "./BearerToken.svelte";

@@ -8,14 +8,14 @@
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
   import { DashboardViewModel } from "./Dashboard.ViewModel";
-  import { navigationState, user } from "$lib/store";
+  import { navigationState, user } from "@deprecate/store";
   import Mock from "../Mock/Mock.svelte";
   import Header from "@common/components/header/Header.svelte";
   import { onDestroy, onMount } from "svelte";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import HelpPage from "../Help/HelpPage.svelte";
-  import constants from "$lib/utils/constants";
+  import constants from "@deprecate/utils/constants";
   import { open } from "@tauri-apps/plugin-shell";
   import LoginPopup from "@common/components/popup/login-popup.svelte";
   import { Update, check } from "@tauri-apps/plugin-updater";
@@ -24,8 +24,8 @@
   import { Progress } from "@sparrow/library/ui";
   import { List } from "@sparrow/library/ui";
   import Updater from "@common/components/updater/Updater.svelte";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import Teams from "../Teams/Teams.svelte";
   import { Modal } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";

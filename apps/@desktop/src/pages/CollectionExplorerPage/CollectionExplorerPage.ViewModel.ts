@@ -12,15 +12,19 @@ import type { CollectionDocument, TabDocument } from "../../database/database";
 import { notifications } from "@sparrow/library/ui";
 
 // Utils
-import { moveNavigation } from "$lib/utils/helpers";
-import { ItemType, ResponseStatusCode, UntrackedItems } from "$lib/utils/enums";
+import { moveNavigation } from "@deprecate/utils/helpers";
+import {
+  ItemType,
+  ResponseStatusCode,
+  UntrackedItems,
+} from "@deprecate/utils/enums";
 import { invoke } from "@tauri-apps/api/core";
 import { v4 as uuidv4 } from "uuid";
 
 // Stores
 import { InitRequestTab } from "@common/utils";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
-import { isGuestUserActive } from "$lib/store/auth.store";
+import { isGuestUserActive } from "@deprecate/store/auth.store";
 import type {
   CollectionDto,
   CollectionItemsDto,

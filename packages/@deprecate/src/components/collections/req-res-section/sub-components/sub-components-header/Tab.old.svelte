@@ -1,11 +1,11 @@
 <script lang="ts">
-  import Crossicon from "$lib/assets/crossicon.svelte";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
-  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import collectionAsset from "$lib/assets/collection-nodes.svg";
-  import folderTab from "$lib/assets/folder-tab.svg";
-  import BookIcon from "$lib/assets/book.svelte";
+  import Crossicon from "@deprecate/assets/crossicon.svelte";
+  import { ItemType } from "@deprecate/utils/enums/item-type.enum";
+  import { getMethodStyle } from "@deprecate/utils/helpers/conversion.helper";
+  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
+  import collectionAsset from "@deprecate/assets/collection-nodes.svg";
+  import folderTab from "@deprecate/assets/folder-tab.svg";
+  import BookIcon from "@deprecate/assets/book.svelte";
   export let tab: NewTab;
   export let updateCurrentTab: (id: string) => void;
   export let tabWidth: number;

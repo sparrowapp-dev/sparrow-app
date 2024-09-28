@@ -16,7 +16,7 @@
   } from "./common";
 
   import SidebarItem, { type SidebarItemObj } from "./SidebarItem.svelte";
-  import { isGuestUserActive } from "$lib/store";
+  import { isGuestUserActive } from "@deprecate/store";
 
   let componentClass = "";
   export { componentClass as class };

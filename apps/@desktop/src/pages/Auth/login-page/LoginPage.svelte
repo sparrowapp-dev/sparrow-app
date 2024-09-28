@@ -1,12 +1,16 @@
 <script lang="ts">
   import { Link, navigate } from "svelte-navigator";
-  import { isLoading, isResponseError, setUser } from "$lib/store/auth.store";
-  import { jwtDecode } from "$lib/utils/jwt";
-  import googleLogo from "$lib/assets/googlelogo.svg";
-  import eyeHide from "$lib/assets/eye-hide.svg";
-  import eyeShow from "$lib/assets/eye-show.svg";
+  import {
+    isLoading,
+    isResponseError,
+    setUser,
+  } from "@deprecate/store/auth.store";
+  import { jwtDecode } from "@deprecate/utils/jwt";
+  import googleLogo from "@deprecate/assets/googlelogo.svg";
+  import eyeHide from "@deprecate/assets/eye-hide.svg";
+  import eyeShow from "@deprecate/assets/eye-show.svg";
   import { authNavigate, handleLoginValidation } from "./login-page";
-  import sparrowicon from "$lib/assets/sparrowIcon.svg";
+  import sparrowicon from "@deprecate/assets/sparrowIcon.svg";
   import { once } from "@tauri-apps/api/event";
   import { Window } from "@tauri-apps/api/window";
 

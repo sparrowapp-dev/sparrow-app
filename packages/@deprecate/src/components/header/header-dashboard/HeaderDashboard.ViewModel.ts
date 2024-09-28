@@ -2,9 +2,13 @@
 
 import { userLogout } from "@app/services/auth.service";
 import { WorkspaceService } from "@app/services/workspace.service";
-import { isLoggout, isResponseError, setUser } from "$lib/store/auth.store";
+import {
+  isLoggout,
+  isResponseError,
+  setUser,
+} from "@deprecate/store/auth.store";
 
-import { clearAuthJwt } from "$lib/utils/jwt";
+import { clearAuthJwt } from "@deprecate/utils/jwt";
 import { notifications } from "@sparrow/library/ui";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { resizeWindowOnLogOut } from "../window-resize";
@@ -13,8 +17,8 @@ import {
   type TeamDocument,
   type WorkspaceDocument,
 } from "@app/database/database";
-import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-import { requestResponseStore } from "$lib/store/request-response-section";
+import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
+import { requestResponseStore } from "@deprecate/store/request-response-section";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { EnvironmentService } from "@app/services/environment.service";
 import type { Observable } from "rxjs";
@@ -22,10 +26,10 @@ import { TeamRepository } from "@app/repositories/team.repository";
 import type {
   addUsersInWorkspace,
   addUsersInWorkspacePayload,
-} from "$lib/utils/dto/workspace-dto";
-import { Events, type WorkspaceRole } from "$lib/utils/enums";
-import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+} from "@deprecate/utils/dto/workspace-dto";
+import { Events, type WorkspaceRole } from "@deprecate/utils/enums";
+import type { MakeRequestResponse } from "@deprecate/utils/interfaces/common.interface";
+import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 
 export class HeaderDashboardViewModel {
   constructor() {}

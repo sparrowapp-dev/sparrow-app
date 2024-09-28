@@ -2,11 +2,11 @@ import {
   getAuthHeaders,
   getMultipartAuthHeaders,
   makeRequest,
-} from "$lib/api/api.common";
+} from "@deprecate/api/api.common";
 import { TeamRepository } from "../repositories/team.repository";
 import { WorkspaceRepository } from "../repositories/workspace.repository";
-import constants from "$lib/utils/constants";
-import type { InviteBody, TeamPostBody } from "$lib/utils/dto/team-dto";
+import constants from "@deprecate/utils/constants";
+import type { InviteBody, TeamPostBody } from "@deprecate/utils/dto/team-dto";
 const apiUrl: string = constants.API_URL;
 export class TeamService {
   constructor() {}

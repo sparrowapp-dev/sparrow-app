@@ -1,7 +1,7 @@
 <script lang="ts">
   // TODO: Change location for default page component
-  import { RequestDataType, ResponseFormatter } from "$lib/utils/enums";
-  import type { Response } from "$lib/utils/interfaces/request.interface";
+  import { RequestDataType, ResponseFormatter } from "@deprecate/utils/enums";
+  import type { Response } from "@deprecate/utils/interfaces/request.interface";
 
   export let response: Response | undefined = undefined;
   class ResponseParamTab {

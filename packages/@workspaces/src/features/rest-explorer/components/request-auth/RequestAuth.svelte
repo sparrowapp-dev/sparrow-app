@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AuthType } from "$lib/utils/enums/authorization.enum";
+  import { AuthType } from "@deprecate/utils/enums/authorization.enum";
   import { ApiKey, BasicAuth, BearerToken, NoAuth } from "./sub-auth";
   import { WithSelect } from "@sparrow/workspaces/common/hoc";
 

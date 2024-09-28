@@ -8,7 +8,7 @@ export default defineConfig(async () => ({
   resolve: {
     alias: {
       "@common": path.resolve("../../packages/@common/src/"),
-      $lib: path.resolve("../../packages/@deprecate/src/"),
+      "@deprecate": path.resolve("../../packages/@deprecate/src/"),
       "@app": path.resolve("./src/"),
     },
   },

@@ -1,15 +1,15 @@
 <script lang="ts">
   import { Tooltip } from "@sparrow/library/ui";
-  import plus from "$lib/assets/plus.svg";
+  import plus from "@deprecate/assets/plus.svg";
   import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/common/hoc";
   import type { TabDocument, TeamDocument } from "@app/database/database";
   import { RecentWorkspace, RecentApis } from "../../../features";
   import { open } from "@tauri-apps/plugin-shell";
-  import { base64ToURL } from "$lib/utils/helpers";
+  import { base64ToURL } from "@deprecate/utils/helpers";
   import { List } from "@sparrow/library/ui";
-  import { PeopleIcon } from "$lib/assets/app.asset";
-  import constants from "$lib/utils/constants";
+  import { PeopleIcon } from "@deprecate/assets/app.asset";
+  import constants from "@deprecate/utils/constants";
   export let teamList: TeamDocument[] = [];
   export let tabList: TabDocument[] = [];
   export let isCreateTeamModalOpen;

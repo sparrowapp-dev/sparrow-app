@@ -4,7 +4,7 @@
     DoubleRightIcon,
     LeftIcon,
     RightIcon,
-  } from "$lib/assets/app.asset";
+  } from "@deprecate/assets/app.asset";
   import type { WorkspaceDocument } from "@app/database/database";
   import { Button } from "@sparrow/library/ui";
   import { WorkspaceGrid } from "@sparrow/teams/common/compopnents";

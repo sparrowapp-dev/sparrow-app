@@ -1,19 +1,19 @@
 <script lang="ts">
-  import whitePlus from "$lib/assets/plus-white.svg";
-  import Plus from "$lib/assets/plus.svelte";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import whitePlus from "@deprecate/assets/plus-white.svg";
+  import Plus from "@deprecate/assets/plus.svelte";
+  import { UntrackedItems } from "@deprecate/utils/enums/item-type.enum";
+  import { moveNavigation } from "@deprecate/utils/helpers/navigation";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
+  import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
   import ImportCollection from "../import-collection/ImportCollection.svelte";
-  import { createCollectionSource } from "$lib/store/event-source.store";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import { createCollectionSource } from "@deprecate/store/event-source.store";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
-  } from "$lib/utils/constants/permissions.constant";
-  import { WorkspaceRole } from "$lib/utils/enums";
+  } from "@deprecate/utils/constants/permissions.constant";
+  import { WorkspaceRole } from "@deprecate/utils/enums";
   import { Tooltip } from "@sparrow/library/ui";
   export let handleCreateCollection: any;
   export let collectionsMethods: CollectionsMethods;

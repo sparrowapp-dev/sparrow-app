@@ -1,22 +1,22 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
 
   import {
     collapsibleState,
     isApiCreatedFirstTime,
-  } from "$lib/store/request-response-section";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  } from "@deprecate/store/request-response-section";
+  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
   import { MyFolderViewModel } from "./MyFolder.viewModel";
-  import { isFolderCreatedFirstTime } from "$lib/store/collection";
+  import { isFolderCreatedFirstTime } from "@deprecate/store/collection";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import type { WorkspaceRole } from "@deprecate/utils/enums";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
-  } from "$lib/utils/constants/permissions.constant";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
+  } from "@deprecate/utils/constants/permissions.constant";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers/common.helper";
   import { Tooltip } from "@sparrow/library/ui";
   export let loaderColor = "default";
   export let activeTab;

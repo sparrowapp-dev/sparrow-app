@@ -2,13 +2,13 @@
   import { onDestroy } from "svelte";
 
   // ---- SVG
-  import folderCloseIcon from "$lib/assets/folder.svg";
-  import folderOpenIcon from "$lib/assets/open-folder.svg";
-  import threedotIcon from "$lib/assets/3dot.svg";
-  import AddIcon from "$lib/assets/add.svg";
-  import requestIcon from "$lib/assets/create_request.svg";
+  import folderCloseIcon from "@deprecate/assets/folder.svg";
+  import folderOpenIcon from "@deprecate/assets/open-folder.svg";
+  import threedotIcon from "@deprecate/assets/3dot.svg";
+  import AddIcon from "@deprecate/assets/add.svg";
+  import requestIcon from "@deprecate/assets/create_request.svg";
   import { RequestIcon } from "@sparrow/library/icons";
-  import angleRight from "$lib/assets/angle-right-v2.svg";
+  import angleRight from "@deprecate/assets/angle-right-v2.svg";
 
   // ---- Components
   import Request from "../request/Request.svelte";
@@ -19,26 +19,32 @@
   import { Tooltip } from "@sparrow/library/ui";
 
   // ---- Enum, Constants and Interface
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import {
+    ItemType,
+    UntrackedItems,
+  } from "@deprecate/utils/enums/item-type.enum";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import {
     workspaceLevelPermissions,
     PERMISSION_NOT_FOUND_TEXT,
-  } from "$lib/utils/constants/permissions.constant";
-  import { WorkspaceRole } from "$lib/utils/enums";
-  import type { Folder, Path } from "$lib/utils/interfaces/request.interface";
+  } from "@deprecate/utils/constants/permissions.constant";
+  import { WorkspaceRole } from "@deprecate/utils/enums";
+  import type {
+    Folder,
+    Path,
+  } from "@deprecate/utils/interfaces/request.interface";
 
   // ---- Store
-  import { selectMethodsStore } from "$lib/store/methods";
+  import { selectMethodsStore } from "@deprecate/store/methods";
 
   // ---- Helper Functions
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 
   // ---- DB
   import type { CollectionDocument } from "@app/database/database";
   import { of } from "rxjs";
-  import { isGuestUserActive } from "$lib/store";
+  import { isGuestUserActive } from "@deprecate/store";
   import { WebSocket } from "..";
 
   /**

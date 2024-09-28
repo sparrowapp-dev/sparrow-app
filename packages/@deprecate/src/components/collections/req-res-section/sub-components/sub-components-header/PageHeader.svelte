@@ -1,39 +1,39 @@
 <script lang="ts">
-  import angleDown from "$lib/assets/angle-down.svg";
+  import angleDown from "@deprecate/assets/angle-down.svg";
   import {
     collapsibleState,
     isApiCreatedFirstTime,
-  } from "$lib/store/request-response-section";
-  import floppyDisk from "$lib/assets/floppy-disk.svelte";
-  import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
+  } from "@deprecate/store/request-response-section";
+  import floppyDisk from "@deprecate/assets/floppy-disk.svelte";
+  import SaveRequest from "@deprecate/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
   import { onDestroy, onMount } from "svelte";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
   import { updateCollectionRequest } from "@app/services/collection";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
-  import type { RequestBody } from "$lib/utils/interfaces/request.interface";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { ItemType } from "@deprecate/utils/enums/item-type.enum";
+  import type { RequestBody } from "@deprecate/utils/interfaces/request.interface";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import { Spinner } from "@sparrow/library/ui";
-  import lockicon from "$lib/assets/lock-icon.svg";
+  import lockicon from "@deprecate/assets/lock-icon.svg";
   import { Tooltip } from "@sparrow/library/ui";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { setContentTypeHeader } from "$lib/utils/helpers/auth.helper";
-  import { RequestDataset } from "$lib/utils/enums/request.enum";
-  import type { WorkspaceRole } from "$lib/utils/enums";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
+  import { setContentTypeHeader } from "@deprecate/utils/helpers/auth.helper";
+  import { RequestDataset } from "@deprecate/utils/enums/request.enum";
+  import type { WorkspaceRole } from "@deprecate/utils/enums";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
-  } from "$lib/utils/constants/permissions.constant";
+  } from "@deprecate/utils/constants/permissions.constant";
   import { Modal } from "@sparrow/library/ui";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import Dropdown from "@deprecate/components/dropdown/Dropdown.svelte";
   import { notifications } from "@sparrow/library/ui";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { Button } from "@sparrow/library/ui";
-  import UserProfileList from "$lib/components/profile/UserProfileList.svelte";
-  import FloppyDisk from "$lib/assets/floppy-disk.svelte";
-  import { PenIcon } from "$lib/assets/icons";
-  import Pen from "$lib/assets/icons/pen.svelte";
+  import UserProfileList from "@deprecate/components/profile/UserProfileList.svelte";
+  import FloppyDisk from "@deprecate/assets/floppy-disk.svelte";
+  import { PenIcon } from "@deprecate/assets/icons";
+  import Pen from "@deprecate/assets/icons/pen.svelte";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;

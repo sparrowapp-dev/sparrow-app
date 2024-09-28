@@ -1,11 +1,11 @@
 <script lang="ts">
-  import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
-  import FilterIcon from "$lib/assets/filter.svelte";
-  import plusIcon from "$lib/assets/plus-white.svg";
-  import CreateRequest from "$lib/assets/create_request.svg";
-  import CreateCollection from "$lib/assets/collections-faded.svg";
+  import doubleangleLeft from "@deprecate/assets/doubleangleLeft.svg";
+  import FilterIcon from "@deprecate/assets/filter.svelte";
+  import plusIcon from "@deprecate/assets/plus-white.svg";
+  import CreateRequest from "@deprecate/assets/create_request.svg";
+  import CreateCollection from "@deprecate/assets/collections-faded.svg";
 
-  import { Events, WorkspaceRole } from "$lib/utils/enums";
+  import { Events, WorkspaceRole } from "@deprecate/utils/enums";
   import { Dropdown } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type {
@@ -15,7 +15,7 @@
   import type {
     Folder,
     Request as RequestType,
-  } from "$lib/utils/interfaces/request.interface";
+  } from "@deprecate/utils/interfaces/request.interface";
 
   import { onDestroy } from "svelte";
   import {
@@ -28,12 +28,12 @@
     BubbleIcon,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/common/hoc";
-  import { createDeepCopy } from "$lib/utils/helpers";
+  import { createDeepCopy } from "@deprecate/utils/helpers";
   import { Input } from "@sparrow/library/forms";
   import { open } from "@tauri-apps/plugin-shell";
-  import constants from "$lib/utils/constants";
+  import constants from "@deprecate/utils/constants";
   import { Tooltip } from "@sparrow/library/ui";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
   import {
     CollectionList,
     EnvironmentList,

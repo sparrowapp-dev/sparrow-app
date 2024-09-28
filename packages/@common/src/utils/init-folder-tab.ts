@@ -1,4 +1,4 @@
-import { FolderDefault } from "$lib/utils/enums";
+import { FolderDefault } from "@deprecate/utils/enums";
 import {
   type Path,
   TabTypeEnum,

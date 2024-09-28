@@ -1,8 +1,12 @@
 <script lang="ts">
-  import angleLeft from "$lib/assets/angleLeft.svg";
-  import lineIcon from "$lib/assets/line.svg";
-  import starIcon from "$lib/assets/starIcon.svg";
-  import { errorMessageText, isLoading, username } from "$lib/store/auth.store";
+  import angleLeft from "@deprecate/assets/angleLeft.svg";
+  import lineIcon from "@deprecate/assets/line.svg";
+  import starIcon from "@deprecate/assets/starIcon.svg";
+  import {
+    errorMessageText,
+    isLoading,
+    username,
+  } from "@deprecate/store/auth.store";
   import { handleVerifyEmail, isSuccessfulResponse } from "./update-password";
 
   import { writable } from "svelte/store";

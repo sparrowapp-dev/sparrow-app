@@ -1,5 +1,5 @@
 <script>
-  import spin from "$lib/assets/spin.svg";
+  import spin from "@deprecate/assets/spin.svg";
 </script>
 
 <div

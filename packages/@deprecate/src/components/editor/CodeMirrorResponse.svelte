@@ -3,8 +3,8 @@
   import {
     RequestDataType,
     ResponseFormatter,
-  } from "$lib/utils/enums/request.enum";
-  import { isHorizontal } from "$lib/store/request-response-section";
+  } from "@deprecate/utils/enums/request.enum";
+  import { isHorizontal } from "@deprecate/store/request-response-section";
   import { EditorView } from "codemirror";
   import { basicSetup, basicTheme } from "@sparrow/library/forms/editor/theme";
   import { EditorState, Compartment } from "@codemirror/state";

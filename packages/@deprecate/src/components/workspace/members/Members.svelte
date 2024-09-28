@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { SearchIcon, CrossIcon } from "$lib/assets/app.asset";
-  import Tile from "$lib/components/workspace/members/Tile.svelte";
+  import { SearchIcon, CrossIcon } from "@deprecate/assets/app.asset";
+  import Tile from "@deprecate/components/workspace/members/Tile.svelte";
   import type {
     TeamRepositoryMethods,
     TeamServiceMethods,
-  } from "$lib/utils/interfaces";
+  } from "@deprecate/utils/interfaces";
   export let openTeam;
   export let teamServiceMethods: TeamServiceMethods;
   export let teamRepositoryMethods: TeamRepositoryMethods;

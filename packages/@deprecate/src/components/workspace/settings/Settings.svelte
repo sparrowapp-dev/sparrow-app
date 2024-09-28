@@ -4,7 +4,7 @@
     Team,
     TeamRepositoryMethods,
     TeamServiceMethods,
-  } from "$lib/utils/interfaces";
+  } from "@deprecate/utils/interfaces";
 
   export let openTeam: Team;
   export let teamServiceMethods: TeamServiceMethods;

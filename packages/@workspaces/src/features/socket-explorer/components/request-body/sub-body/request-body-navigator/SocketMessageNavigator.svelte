@@ -1,11 +1,11 @@
 <script lang="ts">
-  import BeautifyIcon from "$lib/assets/beautify.svg";
-  import { RequestDataType, RequestDataset } from "$lib/utils/enums";
+  import BeautifyIcon from "@deprecate/assets/beautify.svg";
+  import { RequestDataType, RequestDataset } from "@deprecate/utils/enums";
   import { Button } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
   import { WithSelect } from "@sparrow/workspaces/common/hoc";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   export let onUpdateRequestState;
   export let requestState;
   export let onSendMessage;

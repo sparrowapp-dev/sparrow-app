@@ -4,9 +4,9 @@
     LeftIcon,
     RightIcon,
     DoubleRightIcon,
-  } from "$lib/assets/app.asset";
+  } from "@deprecate/assets/app.asset";
   import type { TeamDocument } from "@app/database/database";
-  import { calculateTimeDifferenceInDays } from "$lib/utils/workspacetimeUtils";
+  import { calculateTimeDifferenceInDays } from "@deprecate/utils/workspacetimeUtils";
   import { Table } from "@sparrow/library/ui";
   import { Rows } from "@sparrow/teams/common/compopnents";
   import { TeamSkeleton } from "../../images";

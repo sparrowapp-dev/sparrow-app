@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { RequestAuthProperty } from "$lib/utils/enums/request.enum";
-  import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
-  import type { BasicAuth } from "$lib/utils/interfaces/request.interface";
+  import { RequestAuthProperty } from "@deprecate/utils/enums/request.enum";
+  import { EnvironmentHeper } from "@deprecate/utils/helpers/environment.helper";
+  import type { BasicAuth } from "@deprecate/utils/interfaces/request.interface";
   import EnvironmentPicker from "../environment-picker/EnvironmentPicker.svelte";
 
   export let callback;

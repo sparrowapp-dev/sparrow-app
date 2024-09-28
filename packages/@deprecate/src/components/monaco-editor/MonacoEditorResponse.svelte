@@ -9,8 +9,8 @@
     RequestDataType,
     RequestProperty,
     ResponseFormatter,
-  } from "$lib/utils/enums/request.enum";
-  import { requestResponseStore } from "$lib/store/request-response-section";
+  } from "@deprecate/utils/enums/request.enum";
+  import { requestResponseStore } from "@deprecate/store/request-response-section";
 
   export let rawTab: RequestDataType;
   export let rawValue;

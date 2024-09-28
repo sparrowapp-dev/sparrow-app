@@ -1,11 +1,14 @@
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 import { registerUser } from "../../../services/auth.service";
-import { register_user } from "$lib/store/auth.store";
-import { jwtDecode } from "$lib/utils/jwt";
+import { register_user } from "@deprecate/store/auth.store";
+import { jwtDecode } from "@deprecate/utils/jwt";
 import { notifications } from "@sparrow/library/ui";
-import { checkValidation, registrationSchema } from "$lib/utils/validation";
+import {
+  checkValidation,
+  registrationSchema,
+} from "@deprecate/utils/validation";
 import { navigate } from "svelte-navigator";
-import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
 import { sendUserDataToMixpanel } from "../login-page/login-page";
 
 const handleRegister = async (userData) => {

@@ -3,21 +3,21 @@ import {
   RequestDataset,
   RequestMethod,
   RequestDataType,
-} from "$lib/utils/enums/request.enum";
+} from "@deprecate/utils/enums/request.enum";
 import {
   findAuthHeader,
   findAuthParameter,
-} from "$lib/utils/helpers/auth.helper";
-import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+} from "@deprecate/utils/helpers/auth.helper";
+import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
 import type {
   Body,
   KeyValuePair,
   NewTab,
-} from "$lib/utils/interfaces/request.interface";
+} from "@deprecate/utils/interfaces/request.interface";
 import type {
   RequestDatasetType,
   RequestRawType,
-} from "$lib/utils/types/request.type";
+} from "@deprecate/utils/types/request.type";
 
 enum fileType {
   FILE = "File",

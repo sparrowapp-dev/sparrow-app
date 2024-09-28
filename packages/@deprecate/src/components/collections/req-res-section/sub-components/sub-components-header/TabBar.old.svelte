@@ -1,26 +1,26 @@
 <script lang="ts">
-  import plusIcon from "$lib/assets/actionicon-normal.svg";
-  import angleLeft from "$lib/assets/angleLeft.svg";
-  import angleRight from "$lib/assets/angle-right.svg";
+  import plusIcon from "@deprecate/assets/actionicon-normal.svg";
+  import angleLeft from "@deprecate/assets/angleLeft.svg";
+  import angleRight from "@deprecate/assets/angle-right.svg";
   import {
     collapsibleState,
     isApiCreatedFirstTime,
     tabs,
-  } from "$lib/store/request-response-section";
+  } from "@deprecate/store/request-response-section";
   import Tab from "./Tab.old.svelte";
   import { v4 as uuidv4 } from "uuid";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import { moveNavigation } from "@deprecate/utils/helpers/navigation";
+  import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
   import type { TabDocument, WorkspaceDocument } from "@app/database/database";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import { onDestroy } from "svelte";
   import SaveRequest from "../save-request/SaveRequest.svelte";
   import ClosePopup from "../close-popup/ClosePopup.old.svelte";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import { Modal } from "@sparrow/library/ui";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import type { WorkspaceRole } from "@deprecate/utils/enums";
   import type { Observable } from "rxjs";
   export let collectionsMethods: CollectionsMethods;
   export let onTabsSwitched: () => void;

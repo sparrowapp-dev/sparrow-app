@@ -3,7 +3,7 @@
    * @deprecated This component is deprecated and will be removed in future releases.
    * Please use ComboText Component instead.
    */
-  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+  import { getMethodStyle } from "@deprecate/utils/helpers/conversion.helper";
 
   export let method: string;
 </script>

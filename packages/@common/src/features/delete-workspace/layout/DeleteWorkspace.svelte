@@ -1,6 +1,6 @@
 <script lang="ts">
   // ---- helper functions
-  import { base64ToURL } from "$lib/utils/helpers";
+  import { base64ToURL } from "@deprecate/utils/helpers";
   // ---- document models
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   // ---- library

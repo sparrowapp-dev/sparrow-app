@@ -2,27 +2,27 @@
 // import type {
 //   CollectionDocument,
 //   WorkspaceDocument,
-// } from "$lib/database/app.database";
-// import { CollectionRepository } from "$lib/repositories/collection.repository";
-// import { EnvironmentRepository } from "$lib/repositories/environment.repository";
-// import { TabRepository } from "$lib/repositories/tab.repository";
-// import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
+// } from "@deprecate/database/app.database";
+// import { CollectionRepository } from "@deprecate/repositories/collection.repository";
+// import { EnvironmentRepository } from "@deprecate/repositories/environment.repository";
+// import { TabRepository } from "@deprecate/repositories/tab.repository";
+// import { WorkspaceRepository } from "@deprecate/repositories/workspace.repository";
 // import {
 //   progressiveTab,
 //   requestResponseStore,
 //   tabs,
-// } from "$lib/store/request-response-section";
-// import { ItemType } from "$lib/utils/enums/item-type.enum";
-// import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
+// } from "@deprecate/store/request-response-section";
+// import { ItemType } from "@deprecate/utils/enums/item-type.enum";
+// import type { CollectionItem } from "@deprecate/utils/interfaces/collection.interface";
 // import type {
 //   Collection,
 //   RequestBody,
-// } from "$lib/utils/interfaces/request.interface";
-// import type { UpdateEnvironmentPostBody } from "$lib/utils/dto";
-// import { CollectionService } from "$lib/services/collection.service";
-// import { setContentTypeHeader } from "$lib/utils/helpers";
-// import { RequestDataset } from "$lib/utils/enums";
-// import { updateCollectionRequest } from "$lib/services/collection";
+// } from "@deprecate/utils/interfaces/request.interface";
+// import type { UpdateEnvironmentPostBody } from "@deprecate/utils/dto";
+// import { CollectionService } from "@deprecate/services/collection.service";
+// import { setContentTypeHeader } from "@deprecate/utils/helpers";
+// import { RequestDataset } from "@deprecate/utils/enums";
+// import { updateCollectionRequest } from "@deprecate/services/collection";
 // export class CollectionsViewModel {
 //   private tabRepository = new TabRepository();
 //   private collectionRepository = new CollectionRepository();

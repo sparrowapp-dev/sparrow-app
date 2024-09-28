@@ -1,82 +1,83 @@
 <script lang="ts">
-   /**
+  /**
    * @deprecated please do not use this file
    * Instead of this we can use src\lib\components\dropdown\Dropdown
    * **/
-    import Dropdown from "$lib/assets/dropdown.svelte";
-    import checkIcon from "$lib/assets/check.svg";
-    import { onDestroy, onMount } from "svelte";
-    import { slide } from "svelte/transition";
-    let isOpen: boolean = false;
-    
-    export let data: Array<{
-        name: string;
-        id: string;
-        color: string;
-    }>;
-    export let onclick: (tab: string) => void;
-    export let method: string;
-    export let id:string;
-    export let disabled: boolean = false;
-    export let isWorkspaceMemberDropDown:boolean=false
-    let isHover: boolean = false;
-    let selectedRequest: {
-      name: string;
-      id: string;
-      color: string;
-    };
-  
-    const toggleDropdown = () => {
-      isOpen = !isOpen;
-    };
-  
-    $: {
-      if (method) {
-        data.forEach((element) => {
-          if (element.id === method) {
-            selectedRequest = element;
-          }
-        });
-      }
+  import Dropdown from "@deprecate/assets/dropdown.svelte";
+  import checkIcon from "@deprecate/assets/check.svg";
+  import { onDestroy, onMount } from "svelte";
+  import { slide } from "svelte/transition";
+  let isOpen: boolean = false;
+
+  export let data: Array<{
+    name: string;
+    id: string;
+    color: string;
+  }>;
+  export let onclick: (tab: string) => void;
+  export let method: string;
+  export let id: string;
+  export let disabled: boolean = false;
+  export let isWorkspaceMemberDropDown: boolean = false;
+  let isHover: boolean = false;
+  let selectedRequest: {
+    name: string;
+    id: string;
+    color: string;
+  };
+
+  const toggleDropdown = () => {
+    isOpen = !isOpen;
+  };
+
+  $: {
+    if (method) {
+      data.forEach((element) => {
+        if (element.id === method) {
+          selectedRequest = element;
+        }
+      });
     }
-  
-    function handleDropdownClick(event: MouseEvent) {
-      const dropdownElement = document.getElementById(`dropdown-member-${id}`);
-      if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
-        isOpen = false;
-      }
+  }
+
+  function handleDropdownClick(event: MouseEvent) {
+    const dropdownElement = document.getElementById(`dropdown-member-${id}`);
+    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+      isOpen = false;
     }
-  
-    onDestroy(() => {
-      window.removeEventListener("click", handleDropdownClick);
-    });
-  
-    onMount(() => {
-      window.addEventListener("click", handleDropdownClick);
-    });
-  </script>
-  
-  <div
-    class="parent-dropdown display-inline-block"
-    style=" position: relative;"
-    on:mouseover={() => {
-      isHover = true;
-    }}
-    on:mouseout={() => {
-      isHover = false;
-    }}
-    on:click={(event) => {
-      if (!disabled) {
-        handleDropdownClick(event);
-      }
-      event.stopPropagation();
-    }}
-  >
-  {#if  method==="admin" && isWorkspaceMemberDropDown}
-  <div class="default-admin-container p-2 rounded z-2">
-    <p  class="m-0 p-0 text-white text-capitalize"
-    style="font-size: 12px;">Admin</p>
-  </div>
+  }
+
+  onDestroy(() => {
+    window.removeEventListener("click", handleDropdownClick);
+  });
+
+  onMount(() => {
+    window.addEventListener("click", handleDropdownClick);
+  });
+</script>
+
+<div
+  class="parent-dropdown display-inline-block"
+  style=" position: relative;"
+  on:mouseover={() => {
+    isHover = true;
+  }}
+  on:mouseout={() => {
+    isHover = false;
+  }}
+  on:click={(event) => {
+    if (!disabled) {
+      handleDropdownClick(event);
+    }
+    event.stopPropagation();
+  }}
+>
+  {#if method === "admin" && isWorkspaceMemberDropDown}
+    <div class="default-admin-container p-2 rounded z-2">
+      <p class="m-0 p-0 text-white text-capitalize" style="font-size: 12px;">
+        Admin
+      </p>
+    </div>
   {:else}
     <div
       on:click={() => {
@@ -109,7 +110,7 @@
         >
       </div>
     </div>
-  
+
     {#if isOpen && !disabled}
       <div
         class="d-none dropdown-data p-1 rounded z-2"
@@ -138,54 +139,54 @@
         {/each}
       </div>
     {/if}
-    {/if}
-  </div>
-  
-  <style>
-    .dropdown-btn {
-      background: none;
-      outline: none;
-      border: none;
-      height: 34px;
-      width: auto;
-      padding: 0 10px;
-      border: 1px solid transparent;
-      cursor: pointer;
-    }
-    .dropdown-btn-hover {
-      background-color: var(--border-color);
-    }
-    .dropdown-data {
-      background-color: var(--background-dropdown);
-      color: white;
-      position: absolute;
-      top: 40px;
-      left: 0;
-      right: 0;
-      border: 1px solid rgb(44, 44, 44);
-    }
-    .dropdown-btn p,
-    .dropdown-data p {
-      font-size: 12px;
-      font-weight: 400;
-    }
-    .dropdown-active {
-      display: block !important;
-    }
-    .dropdown-logo-active {
-      transform: rotateX(180deg) !important;
-    }
-    .highlight {
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .highlight:hover {
-      background-color: #232424;
-    }
-    .dropdown-btn-active {
-      border: 1px solid var(--send-button) !important;
-    }
-    .disabled-text {
-      color: var(--sparrow-text-color) !important;
-    }
-  </style>
+  {/if}
+</div>
+
+<style>
+  .dropdown-btn {
+    background: none;
+    outline: none;
+    border: none;
+    height: 34px;
+    width: auto;
+    padding: 0 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  .dropdown-btn-hover {
+    background-color: var(--border-color);
+  }
+  .dropdown-data {
+    background-color: var(--background-dropdown);
+    color: white;
+    position: absolute;
+    top: 40px;
+    left: 0;
+    right: 0;
+    border: 1px solid rgb(44, 44, 44);
+  }
+  .dropdown-btn p,
+  .dropdown-data p {
+    font-size: 12px;
+    font-weight: 400;
+  }
+  .dropdown-active {
+    display: block !important;
+  }
+  .dropdown-logo-active {
+    transform: rotateX(180deg) !important;
+  }
+  .highlight {
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .highlight:hover {
+    background-color: #232424;
+  }
+  .dropdown-btn-active {
+    border: 1px solid var(--send-button) !important;
+  }
+  .disabled-text {
+    color: var(--sparrow-text-color) !important;
+  }
+</style>

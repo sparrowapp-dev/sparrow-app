@@ -1,4 +1,4 @@
-import { throttle } from "$lib/utils/throttle";
+import { throttle } from "@deprecate/utils/throttle";
 import { platform } from "@tauri-apps/plugin-os";
 import { handleLoginV2 } from "@app/pages/Auth/login-page/login-page";
 import { listen } from "@tauri-apps/api/event";

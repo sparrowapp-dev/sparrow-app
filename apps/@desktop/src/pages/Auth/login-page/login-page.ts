@@ -1,15 +1,15 @@
 import { loginUser } from "../../../services/auth.service";
-import constants from "$lib/utils/constants";
-import type { loginUserPostBody } from "$lib/utils/dto";
+import constants from "@deprecate/utils/constants";
+import type { loginUserPostBody } from "@deprecate/utils/dto";
 import { notifications } from "@sparrow/library/ui";
-import { checkValidation, loginSchema } from "$lib/utils/validation";
+import { checkValidation, loginSchema } from "@deprecate/utils/validation";
 import { navigate } from "svelte-navigator";
-import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
-import { isResponseError, setUser } from "$lib/store/auth.store";
+import { jwtDecode, setAuthJwt } from "@deprecate/utils/jwt";
+import { isResponseError, setUser } from "@deprecate/store/auth.store";
 import { resizeWindowOnLogOut, resizeWindowOnLogin } from "../../../utils";
 import mixpanel from "mixpanel-browser";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
 import ActiveSideBarTabViewModel from "../../Dashboard/ActiveSideBarTab.ViewModel";
 import { GuideRepository } from "../../../repositories/guide.repository";
 

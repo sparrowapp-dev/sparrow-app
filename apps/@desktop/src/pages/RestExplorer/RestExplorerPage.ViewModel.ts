@@ -6,7 +6,7 @@ import {
   ReduceAuthHeader,
   ReduceAuthParameter,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
-import { createDeepCopy, moveNavigation } from "$lib/utils/helpers";
+import { createDeepCopy, moveNavigation } from "@deprecate/utils/helpers";
 import {
   CompareArray,
   Debounce,
@@ -32,11 +32,11 @@ import {
   ItemType,
   ResponseStatusCode,
   UntrackedItems,
-} from "$lib/utils/enums";
-import type { CreateDirectoryPostBody } from "$lib/utils/dto";
+} from "@deprecate/utils/enums";
+import type { CreateDirectoryPostBody } from "@deprecate/utils/dto";
 
 // ---- Service
-import { makeHttpRequestV2 } from "$lib/api/api.common";
+import { makeHttpRequestV2 } from "@deprecate/api/api.common";
 import {
   insertCollection,
   insertCollectionDirectory,
@@ -46,7 +46,7 @@ import {
 import { EnvironmentService } from "../../services/environment.service";
 
 // ---- Events
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 import {
   type UpdateRequestUrl,
   type UpdateRequestName,
@@ -90,7 +90,7 @@ import { RequestTabAdapter } from "../../adapter/request-tab";
 import { GuideRepository } from "../../repositories/guide.repository";
 import { CollectionService } from "../../services/collection.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import { isGuestUserActive } from "$lib/store/auth.store";
+import { isGuestUserActive } from "@deprecate/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
 import { AiAssistantService } from "../../services/ai-assistant.service";
 import type { GuideQuery } from "../../types/user-guide";

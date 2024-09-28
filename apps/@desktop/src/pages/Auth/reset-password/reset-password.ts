@@ -1,8 +1,11 @@
 import { resetPassword } from "../../../services/auth.service";
-import type { resetPasswordPostBody } from "$lib/utils/dto";
+import type { resetPasswordPostBody } from "@deprecate/utils/dto";
 
 import { notifications } from "@sparrow/library/ui";
-import { checkValidation, resetPasswordSchema } from "$lib/utils/validation";
+import {
+  checkValidation,
+  resetPasswordSchema,
+} from "@deprecate/utils/validation";
 import { navigate } from "svelte-navigator";
 
 export const handleResetPassword = async (

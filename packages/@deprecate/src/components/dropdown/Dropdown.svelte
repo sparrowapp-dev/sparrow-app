@@ -1,11 +1,11 @@
 <script lang="ts">
-  import dropdown from "$lib/assets/dropdown.svg";
-  import Dropdown from "$lib/assets/dropdown.svelte";
-  import checkIcon from "$lib/assets/check.svg";
+  import dropdown from "@deprecate/assets/dropdown.svg";
+  import Dropdown from "@deprecate/assets/dropdown.svelte";
+  import checkIcon from "@deprecate/assets/check.svg";
   import { afterUpdate, onDestroy, onMount } from "svelte";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import closeIcon from "$lib/assets/close.svg";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import closeIcon from "@deprecate/assets/close.svg";
   type dropdownType = "text" | "img" | "checkbox";
   type dropdownHoverType = "add" | "remove";
   export let data: Array<{

@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { SearchIcon, EditIcon } from "$lib/assets/app.asset";
-  import Crossicon from "$lib/assets/crossicon.svelte";
-  import trashIcon from "$lib/assets/trash-icon.svg";
+  import { SearchIcon, EditIcon } from "@deprecate/assets/app.asset";
+  import Crossicon from "@deprecate/assets/crossicon.svelte";
+  import trashIcon from "@deprecate/assets/trash-icon.svg";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
-  } from "$lib/utils/constants/permissions.constant";
-  import type { WorkspaceRole } from "$lib/utils/enums";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  } from "@deprecate/utils/constants/permissions.constant";
+  import type { WorkspaceRole } from "@deprecate/utils/enums";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
+  import type { EnvValuePair } from "@deprecate/utils/interfaces/request.interface";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
   import { Tooltip } from "@sparrow/library/ui";
   type Mode = "READ" | "WRITE";
   export let loggedUserRoleInWorkspace: WorkspaceRole;

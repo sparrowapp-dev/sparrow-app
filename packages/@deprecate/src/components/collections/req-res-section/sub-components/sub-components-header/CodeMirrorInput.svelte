@@ -14,7 +14,7 @@
     type Tooltip,
   } from "@codemirror/view";
   import { environmentHoverHighlightStyle } from "./EnvironmentHighlight";
-  import { editLink } from "$lib/store/api-request";
+  import { editLink } from "@deprecate/store/api-request";
   // export let currentTabId: string;
   export let rawValue: string;
   export let handleRawChange: () => void;

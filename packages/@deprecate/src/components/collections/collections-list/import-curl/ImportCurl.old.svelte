@@ -2,11 +2,14 @@
   import { Modal } from "@sparrow/library/ui";
   import { Spinner } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
-  import { RequestDataType, RequestDataset } from "$lib/utils/enums";
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import { RequestDataType, RequestDataset } from "@deprecate/utils/enums";
+  import {
+    ItemType,
+    UntrackedItems,
+  } from "@deprecate/utils/enums/item-type.enum";
+  import { moveNavigation } from "@deprecate/utils/helpers/navigation";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
+  import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
   import { ImportCurlViewModel } from "./ImportCurl.viewModel.old";
   import { v4 as uuidv4 } from "uuid";
   export let onClick: (flag: boolean) => void;

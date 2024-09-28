@@ -1,2 +1,2 @@
-export { default as UserProfileSM } from "$lib/components/profile/UserProfileSM.svelte";
-export { default as UserProfileList } from "$lib/components/profile/UserProfileList.svelte";
+export { default as UserProfileSM } from "@deprecate/components/profile/UserProfileSM.svelte";
+export { default as UserProfileList } from "@deprecate/components/profile/UserProfileList.svelte";

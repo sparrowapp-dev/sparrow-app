@@ -1,10 +1,10 @@
 <script lang="ts">
-  import dropdown from "$lib/assets/dropdown.svg";
-  import checkIcon from "$lib/assets/check.svg";
-  import closeIcon from "$lib/assets/close-icon-normal.svg";
-  import closeIconWhite from "$lib/assets/close-icon-white.svg";
-  import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
-  import { validateEmail } from "$lib/utils/helpers";
+  import dropdown from "@deprecate/assets/dropdown.svg";
+  import checkIcon from "@deprecate/assets/check.svg";
+  import closeIcon from "@deprecate/assets/close-icon-normal.svg";
+  import closeIconWhite from "@deprecate/assets/close-icon-white.svg";
+  import { createDynamicComponents } from "@deprecate/utils/helpers/common.helper";
+  import { validateEmail } from "@deprecate/utils/helpers";
   import { onDestroy, onMount } from "svelte";
   import { fade, fly, slide } from "svelte/transition";
   let isOpen = false;

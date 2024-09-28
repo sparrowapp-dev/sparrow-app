@@ -3,13 +3,13 @@
     EnvironmentDocument,
     TabDocument,
   } from "@app/database/database";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import type { Observable } from "rxjs";
   import RequestParam from "./sub-components/request-body-section/RequestParam.svelte";
   import ApiSendRequestPage from "./sub-components/sub-components-header/ApiSendRequestPage.svelte";
   import PageHeader from "./sub-components/sub-components-header/PageHeader.svelte";
   import SidebarRight from "./SidebarRight.svelte";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import type { WorkspaceRole } from "@deprecate/utils/enums";
   export let activeTab: Observable<TabDocument>;
   export let collectionsMethods: CollectionsMethods;
   export let environmentVariables;

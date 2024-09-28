@@ -1,44 +1,44 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
-  import collectionAsset from "$lib/assets/collection.svg";
-  import workspaceAsset from "$lib/assets/workspace.svg";
-  import folderAsset from "$lib/assets/folder.svg";
-  import leftArrowAsset from "$lib/assets/angleLeft.svg";
+  import { ItemType } from "@deprecate/utils/enums/item-type.enum";
+  import collectionAsset from "@deprecate/assets/collection.svg";
+  import workspaceAsset from "@deprecate/assets/workspace.svg";
+  import folderAsset from "@deprecate/assets/folder.svg";
+  import leftArrowAsset from "@deprecate/assets/angleLeft.svg";
   import {
     insertCollection,
     insertCollectionDirectory,
     insertCollectionRequest,
   } from "@app/services/collection";
-  import { searchTreeDocument } from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest";
+  import { searchTreeDocument } from "@deprecate/components/collections/req-res-section/sub-components/save-request/SaveRequest";
   import type {
     CreateCollectionPostBody,
     CreateDirectoryPostBody,
-  } from "$lib/utils/dto";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  } from "@deprecate/utils/dto";
+  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
   import { notifications } from "@sparrow/library/ui";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
     WorkspaceDocument,
   } from "@app/database/database";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import tickIcon from "$lib/assets/tick-grey.svg";
-  import crossIcon from "$lib/assets/cross-grey.svg";
+  import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
+  import tickIcon from "@deprecate/assets/tick-grey.svg";
+  import crossIcon from "@deprecate/assets/cross-grey.svg";
   import { Spinner } from "@sparrow/library/ui";
-  import QuestionIcon from "$lib/assets/question.svelte";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import QuestionIcon from "@deprecate/assets/question.svelte";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import { Button } from "@sparrow/library/ui";
-  import FileType from "$lib/components/file-types/FileType.svelte";
-  import ComboText from "$lib/components/text/ComboText.svelte";
-  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+  import FileType from "@deprecate/components/file-types/FileType.svelte";
+  import ComboText from "@deprecate/components/text/ComboText.svelte";
+  import { getMethodStyle } from "@deprecate/utils/helpers/conversion.helper";
   import {
     bestPractice,
     dos,
     donts,
-  } from "$lib/utils/constants/request.constant";
+  } from "@deprecate/utils/constants/request.constant";
 
   export let collectionsMethods: CollectionsMethods;
   export let onClick;

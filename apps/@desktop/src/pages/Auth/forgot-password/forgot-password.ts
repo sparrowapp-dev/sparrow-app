@@ -1,7 +1,10 @@
 import { forgotPassword } from "../../../services/auth.service";
-import type { EmailPostBody } from "$lib/utils/dto";
+import type { EmailPostBody } from "@deprecate/utils/dto";
 import { notifications } from "@sparrow/library/ui";
-import { checkValidation, forgotPasswordSchema } from "$lib/utils/validation";
+import {
+  checkValidation,
+  forgotPasswordSchema,
+} from "@deprecate/utils/validation";
 import { navigate } from "svelte-navigator";
 
 export const handleForgotPassword = async (

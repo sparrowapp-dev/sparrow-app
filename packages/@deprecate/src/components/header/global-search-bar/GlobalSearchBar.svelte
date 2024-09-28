@@ -1,17 +1,17 @@
 <script lang="ts">
-  import tickMark from "$lib/assets/tickMark.svg";
-  import collectionsIcon from "$lib/assets/collections-old.svg";
-  import workspacesIcon from "$lib/assets/workspaces.svg";
-  import FolderIcon from "$lib/assets/folder.svg";
-  import RequestIcon from "$lib/assets/apiRequest.svg";
-  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+  import tickMark from "@deprecate/assets/tickMark.svg";
+  import collectionsIcon from "@deprecate/assets/collections-old.svg";
+  import workspacesIcon from "@deprecate/assets/workspaces.svg";
+  import FolderIcon from "@deprecate/assets/folder.svg";
+  import RequestIcon from "@deprecate/assets/apiRequest.svg";
+  import { getMethodStyle } from "@deprecate/utils/helpers/conversion.helper";
   import { onMount } from "svelte";
-  import { replaceSlashWithGreaterThanSymbol } from "$lib/utils/helpers/common.helper";
+  import { replaceSlashWithGreaterThanSymbol } from "@deprecate/utils/helpers/common.helper";
   import {
     handleCollectionClick,
     handleRequestClick,
     handleFolderClick,
-  } from "$lib/utils/helpers/handle-clicks.helper";
+  } from "@deprecate/utils/helpers/handle-clicks.helper";
   export let handleGlobalSearchPopup: (show: boolean) => void;
   export let searchData: string;
   export let filteredRequest: any[];

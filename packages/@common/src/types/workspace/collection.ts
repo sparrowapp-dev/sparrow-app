@@ -1,4 +1,4 @@
-import type { KeyValuePairWithBase } from "$lib/utils/interfaces/request.interface";
+import type { KeyValuePairWithBase } from "@deprecate/utils/interfaces/request.interface";
 import type {
   ActiveSyncWrapper,
   DescriptionWrapper,

@@ -1,6 +1,6 @@
-import { user } from "$lib/store";
-import { Events } from "$lib/utils/enums";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { user } from "@deprecate/store";
+import { Events } from "@deprecate/utils/enums";
+import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 import { ReleaseRepository } from "../../repositories/release.repository";
 import { CannyIoService } from "../../services/canny.service";
 import { FeedbackService } from "../../services/feedback.service";

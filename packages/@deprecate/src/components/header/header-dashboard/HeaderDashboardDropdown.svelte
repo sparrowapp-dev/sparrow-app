@@ -1,34 +1,34 @@
 <script lang="ts">
-  import constants from "$lib/utils/constants";
+  import constants from "@deprecate/utils/constants";
   import { onDestroy, onMount } from "svelte";
-  import plusIcon from "$lib/assets/plus.svg";
+  import plusIcon from "@deprecate/assets/plus.svg";
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
-  import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
-  import { moveNavigation, base64ToURL } from "$lib/utils/helpers";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
+  import { generateSampleWorkspace } from "@deprecate/utils/sample/workspace.sample";
+  import { moveNavigation, base64ToURL } from "@deprecate/utils/helpers";
+  import type { Path } from "@deprecate/utils/interfaces/request.interface";
   import { navigate } from "svelte-navigator";
   import {
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
-  } from "$lib/store/workspace.store";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  } from "@deprecate/store/workspace.store";
+  import { UntrackedItems } from "@deprecate/utils/enums/item-type.enum";
   import { notifications } from "@sparrow/library/ui";
 
   import type {
     CurrentTeam,
     CurrentWorkspace,
     CollectionsMethods,
-  } from "$lib/utils/interfaces";
-  import { Button, Input, Modal, SelectInput } from "$lib/components";
+  } from "@deprecate/utils/interfaces";
+  import { Button, Input, Modal, SelectInput } from "@deprecate/components";
   import type {
     InvalidWorkspacePostBody,
     WorkspacePostBody,
-  } from "$lib/utils/dto";
+  } from "@deprecate/utils/dto";
   import type { Observable } from "rxjs";
   import type { TeamDocument } from "@app/database/database";
   /**
    * @deprecated referes to teams store
-   * import { setOpenedTeam } from "$lib/store";
+   * import { setOpenedTeam } from "@deprecate/store";
    **/
 
   import { v4 as uuidv4 } from "uuid";

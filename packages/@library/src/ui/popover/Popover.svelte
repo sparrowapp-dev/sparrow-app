@@ -1,10 +1,9 @@
 <script lang="ts">
-  import Crossicon from "$lib/assets/crossicon.svelte";
-  export let onClose ;
+  import Crossicon from "@deprecate/assets/crossicon.svelte";
+  export let onClose;
   export let text = " ";
   export let heading = " ";
   let isGuidePopup = false;
-
 </script>
 
 <div
@@ -40,5 +39,4 @@
     font-size: 12px;
     line-height: 18px;
   }
-
 </style>

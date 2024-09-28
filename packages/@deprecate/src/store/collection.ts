@@ -1,5 +1,5 @@
-import { ItemType } from "$lib/utils/enums/item-type.enum";
-import type { RequestBody } from "$lib/utils/interfaces/request.interface";
+import { ItemType } from "@deprecate/utils/enums/item-type.enum";
+import type { RequestBody } from "@deprecate/utils/interfaces/request.interface";
 import { writable } from "svelte/store";
 
 export const collectionLeftPanelWidth = writable(20);

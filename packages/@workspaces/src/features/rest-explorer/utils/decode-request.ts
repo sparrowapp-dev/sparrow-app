@@ -9,7 +9,7 @@ import {
   RequestMethodEnum,
 } from "@common/types/workspace";
 import { ReduceAuthHeader, ReduceAuthParameter } from ".";
-import { createDeepCopy } from "$lib/utils/helpers";
+import { createDeepCopy } from "@deprecate/utils/helpers";
 import { SetDataStructure } from "@common/utils";
 
 class DecodeRequest {

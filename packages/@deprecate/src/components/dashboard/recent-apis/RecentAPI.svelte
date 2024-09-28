@@ -1,7 +1,7 @@
 <script lang="ts">
   import { List } from "@sparrow/library/ui";
-  import constants from "$lib/utils/constants";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
+  import constants from "@deprecate/utils/constants";
+  import { ItemType } from "@deprecate/utils/enums/item-type.enum";
   import Helper from "./Helper.svelte";
   export let tabList;
   export let data: any;

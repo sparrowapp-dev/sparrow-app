@@ -6,9 +6,7 @@ import path from "path";
 export default defineConfig(async () => ({
   plugins: [svelte()],
   resolve: {
-    alias: {
-      "@sparrow/library": path.resolve("../@sparrow/library/src/"),
-    },
+    alias: {},
   },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`

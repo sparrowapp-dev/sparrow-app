@@ -1,47 +1,50 @@
 <script lang="ts">
-  import angleRight from "$lib/assets/angleRight.svg";
-  import threedotIcon from "$lib/assets/3dot.svg";
-  import refreshIcon from "$lib/assets/refresh.svg";
+  import angleRight from "@deprecate/assets/angleRight.svg";
+  import threedotIcon from "@deprecate/assets/3dot.svg";
+  import refreshIcon from "@deprecate/assets/refresh.svg";
   import Folder from "../folder/Folder.svelte";
   import { getNextName } from "../collectionList";
   import { CollectionListViewModel } from "../CollectionList.ViewModel";
 
   import { CollectionService } from "@app/services/collection.service";
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import {
+    ItemType,
+    UntrackedItems,
+  } from "@deprecate/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
+  import { moveNavigation } from "@deprecate/utils/helpers/navigation";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import { Spinner } from "@sparrow/library/ui";
-  import { selectMethodsStore } from "$lib/store/methods";
+  import { selectMethodsStore } from "@deprecate/store/methods";
   import { onDestroy, onMount } from "svelte";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
-  import { handleCollectionClick } from "$lib/utils/helpers/handle-clicks.helper";
-  import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
+  import type { Path } from "@deprecate/utils/interfaces/request.interface";
+  import { handleCollectionClick } from "@deprecate/utils/helpers/handle-clicks.helper";
+  import { generateSampleFolder } from "@deprecate/utils/sample/folder.sample";
   import {
     isCollectionCreatedFirstTime,
     isFolderCreatedFirstTime,
-  } from "$lib/store/collection";
-  import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
-  import folderIcon from "$lib/assets/create_folder.svg";
-  import requestIcon from "$lib/assets/create_request.svg";
+  } from "@deprecate/store/collection";
+  import { isApiCreatedFirstTime } from "@deprecate/store/request-response-section";
+  import folderIcon from "@deprecate/assets/create_folder.svg";
+  import requestIcon from "@deprecate/assets/create_request.svg";
   import { Modal } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
-  } from "$lib/utils/constants/permissions.constant";
-  import { ResponseStatusCode, WorkspaceRole } from "$lib/utils/enums";
-  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
+  } from "@deprecate/utils/constants/permissions.constant";
+  import { ResponseStatusCode, WorkspaceRole } from "@deprecate/utils/enums";
+  import RightOption from "@deprecate/components/right-click-menu/RightClickMenuView.svelte";
   import { Tooltip } from "@sparrow/library/ui";
-  import { CommonService } from "$lib/services-v2/common.service";
+  import { CommonService } from "@deprecate/services-v2/common.service";
   import { ImportCollectionViewModel } from "../import-collection/ImportCollection.viewModel";
   import { invoke } from "@tauri-apps/api/core";
-  import gitBranchIcon from "$lib/assets/git-branch.svg";
-  import { CollectionMessage } from "$lib/utils/constants/request.constant";
-  import { ReloadCollectionIcon } from "$lib/assets/icons";
+  import gitBranchIcon from "@deprecate/assets/git-branch.svg";
+  import { CollectionMessage } from "@deprecate/utils/constants/request.constant";
+  import { ReloadCollectionIcon } from "@deprecate/assets/icons";
 
   export let title: string;
   export let collection: any;

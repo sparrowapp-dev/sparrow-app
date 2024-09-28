@@ -8,7 +8,7 @@
 <script lang="ts">
   import { v4 as uuidv4 } from "uuid";
   import { Button } from "@sparrow/library/ui";
-  import trashIcon from "$lib/assets/trash-icon.svg";
+  import trashIcon from "@deprecate/assets/trash-icon.svg";
 
   let componentClasses: string = "";
   export { componentClasses as class };

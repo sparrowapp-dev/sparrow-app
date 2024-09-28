@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { ThreeDotIcon } from "$lib/assets/app.asset";
-  import { formatDateInString } from "$lib/utils/workspacetimeUtils";
+  import { ThreeDotIcon } from "@deprecate/assets/app.asset";
+  import { formatDateInString } from "@deprecate/utils/workspacetimeUtils";
   import { onDestroy } from "svelte";
   import Card from "../card/Card.svelte";
-  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
+  import RightOption from "@deprecate/components/right-click-menu/RightClickMenuView.svelte";
 
   /**
    * Data of single workspace

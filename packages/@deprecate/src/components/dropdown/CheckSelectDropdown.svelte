@@ -1,13 +1,13 @@
 <script lang="ts">
-   /**
+  /**
    * @deprecated please do not use this file
    * Instead of this we can use src\lib\components\dropdown\Dropdown
    * **/
-  import dropdown from "$lib/assets/dropdown.svg";
-  import checkIcon from "$lib/assets/check.svg";
+  import dropdown from "@deprecate/assets/dropdown.svg";
+  import checkIcon from "@deprecate/assets/check.svg";
   import { onDestroy, onMount } from "svelte";
   import { fade, fly, slide } from "svelte/transition";
-  import closeIcon from "$lib/assets/close.svg";
+  import closeIcon from "@deprecate/assets/close.svg";
   let isOpen: boolean = false;
   export let isError: boolean = false;
   export let list: Array<{

@@ -4,15 +4,15 @@
     TeamAccess,
     TeamRole,
     WorkspaceRole,
-  } from "$lib/utils/enums/team.enum";
+  } from "@deprecate/utils/enums/team.enum";
   import type {
     TeamServiceMethods,
     userDetails,
     workspaceDocumentWithPosition,
-  } from "$lib/utils/interfaces";
-  import type { MemberPopType } from "$lib/utils/types/common.type";
+  } from "@deprecate/utils/interfaces";
+  import type { MemberPopType } from "@deprecate/utils/types/common.type";
 
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import Dropdown from "@deprecate/components/dropdown/Dropdown.svelte";
 
   export let user: userDetails;
   export let teamRole: TeamRole;

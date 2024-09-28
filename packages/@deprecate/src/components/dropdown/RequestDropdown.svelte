@@ -4,25 +4,25 @@
    * Instead of this we can use src\lib\components\dropdown\Dropdown
    * **/
   let visibilty = false;
-  import plusIcon from "$lib/assets/plus.svg";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import plusIcon from "@deprecate/assets/plus.svg";
+  import { moveNavigation } from "@deprecate/utils/helpers/navigation";
+  import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
   let container;
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
+  import { isApiCreatedFirstTime } from "@deprecate/store/request-response-section";
   import { slide } from "svelte/transition";
   import Spinner from "../Transition/Spinner.svelte";
   import ImportCollection from "../collections/collections-list/import-collection/ImportCollection.svelte";
-  import { createCollectionSource } from "$lib/store/event-source.store";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import { createCollectionSource } from "@deprecate/store/event-source.store";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import type { WorkspaceRole } from "@deprecate/utils/enums";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
-  } from "$lib/utils/constants/permissions.constant";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
+  } from "@deprecate/utils/constants/permissions.constant";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers/common.helper";
   import Tooltip from "../tooltip/Tooltip.svelte";
 
   export let handleCreateCollection;

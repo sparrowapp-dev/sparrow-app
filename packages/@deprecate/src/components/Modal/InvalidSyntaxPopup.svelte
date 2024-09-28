@@ -3,7 +3,7 @@
    * @deprecated please do not use this file
    * Instead of this we can use src\lib\components\Modal\Modal.svelte
    * **/
-  import closeIcon from "$lib/assets/close.svg";
+  import closeIcon from "@deprecate/assets/close.svg";
   import { fade, fly } from "svelte/transition";
   export let onClick: (flag: boolean) => void;
   export let handleError: () => void;

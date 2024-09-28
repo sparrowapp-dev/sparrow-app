@@ -48,7 +48,7 @@ import {
   handleRefresh,
 } from "codemirror-json-schema";
 import { hoverTooltip } from "@codemirror/view";
-import { EditorFont } from "$lib/utils/constants/fonts.constant";
+import { EditorFont } from "@deprecate/utils/constants/fonts.constant";
 
 export const basicTheme = EditorView.theme({
   "&": {

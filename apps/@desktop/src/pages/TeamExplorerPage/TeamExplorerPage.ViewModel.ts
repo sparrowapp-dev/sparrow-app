@@ -1,9 +1,9 @@
-import { user } from "$lib/store";
-import type { addUsersInWorkspacePayload } from "$lib/utils/dto";
-import type { InviteBody } from "$lib/utils/dto/team-dto";
-import { Events, UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
-import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { user } from "@deprecate/store";
+import type { addUsersInWorkspacePayload } from "@deprecate/utils/dto";
+import type { InviteBody } from "@deprecate/utils/dto/team-dto";
+import { Events, UntrackedItems, WorkspaceRole } from "@deprecate/utils/enums";
+import type { MakeRequestResponse } from "@deprecate/utils/interfaces/common.interface";
+import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 import type { WorkspaceDocument } from "../../database/database";
 import { CollectionRepository } from "../../repositories/collection.repository";
 import { EnvironmentRepository } from "../../repositories/environment.repository";

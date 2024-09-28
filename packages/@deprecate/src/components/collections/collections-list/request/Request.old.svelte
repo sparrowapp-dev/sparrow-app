@@ -1,24 +1,33 @@
 <script lang="ts">
   import { Spinner } from "@sparrow/library/ui";
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
-  import { getPathFromUrl } from "$lib/utils/helpers/common.helper";
-  import { showPathStore } from "$lib/store/methods";
+  import {
+    ItemType,
+    UntrackedItems,
+  } from "@deprecate/utils/enums/item-type.enum";
+  import { moveNavigation } from "@deprecate/utils/helpers/navigation";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
+  import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
+  import { getMethodStyle } from "@deprecate/utils/helpers/conversion.helper";
+  import type { Path } from "@deprecate/utils/interfaces/request.interface";
+  import { getPathFromUrl } from "@deprecate/utils/helpers/common.helper";
+  import { showPathStore } from "@deprecate/store/methods";
   import { onDestroy } from "svelte";
-  import threedotIcon from "$lib/assets/3dot.svg";
+  import threedotIcon from "@deprecate/assets/3dot.svg";
   import { CollectionService } from "@app/services/collection.service";
-  import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
-  import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
-  import { setAuthType, setBodyType } from "$lib/utils/helpers/auth.helper";
+  import {
+    currentFolderIdName,
+    isShowFilePopup,
+  } from "@deprecate/store/collection";
+  import { isApiCreatedFirstTime } from "@deprecate/store/request-response-section";
+  import {
+    setAuthType,
+    setBodyType,
+  } from "@deprecate/utils/helpers/auth.helper";
   import { Modal } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
-  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
-  import reloadSyncIcon from "$lib/assets/reload-sync.svg";
+  import RightOption from "@deprecate/components/right-click-menu/RightClickMenuView.svelte";
+  import reloadSyncIcon from "@deprecate/assets/reload-sync.svg";
   import { Tooltip } from "@sparrow/library/ui";
 
   export let name: string;

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import closeIcon from "$lib/assets/close-icon-normal.svg";
-  import closeIconWhite from "$lib/assets/close-icon-white.svg";
-  import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
+  import closeIcon from "@deprecate/assets/close-icon-normal.svg";
+  import closeIconWhite from "@deprecate/assets/close-icon-white.svg";
+  import { createDynamicComponents } from "@deprecate/utils/helpers/common.helper";
   import { onDestroy, onMount } from "svelte";
   import { slide } from "svelte/transition";
   import type { List } from "../../types";

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { getMethodStyle } from "$lib/utils/helpers";
-    import { onMount } from "svelte";
+  import { getMethodStyle } from "@deprecate/utils/helpers";
+  import { onMount } from "svelte";
   export let api: any;
   export let data: any;
   export let collectionList;
@@ -34,7 +34,7 @@
                 class="mb-0 api-type__endpoint fw-bold"
                 style="color:var(--text-secondary-550);"
               >
-              {list.team.teamName}/{list.name}
+                {list.team.teamName}/{list.name}
               </p>
             {/if}
           {/if}
@@ -50,8 +50,12 @@
         {#each collectionList.slice().reverse() as list}
           {#if list}
             {#if list?.id === api?.path?.collectionId}
-              <p   class="mb-0 api-type__endpoint fw-bold"
-              style="color:var(--text-secondary-550);">{list.name}</p>
+              <p
+                class="mb-0 api-type__endpoint fw-bold"
+                style="color:var(--text-secondary-550);"
+              >
+                {list.name}
+              </p>
               {#if api.path.folderId}
                 <p class="mb-0 api-type__endpoint"></p>
               {/if}
@@ -59,8 +63,12 @@
               {#each list.items as item}
                 {#if list.items && item}
                   {#if item.id === api.path.folderId}
-                    <p   class="mb-0 api-type__endpoint fw-bold"
-                    style="color:var(--text-secondary-550);">{item.name}</p>
+                    <p
+                      class="mb-0 api-type__endpoint fw-bold"
+                      style="color:var(--text-secondary-550);"
+                    >
+                      {item.name}
+                    </p>
                   {/if}
                 {/if}
               {/each}
@@ -81,10 +89,9 @@
 
   .helper-container:active,
   .helper-container:active .api-type {
-    background-color:var( --bg-secondary-320) ;
+    background-color: var(--bg-secondary-320);
     cursor: pointer;
   }
-
 
   .api-type {
     display: flex;

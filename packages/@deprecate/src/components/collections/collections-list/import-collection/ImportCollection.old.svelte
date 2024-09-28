@@ -3,14 +3,14 @@
   import { notifications } from "@sparrow/library/ui";
   import { Spinner } from "@sparrow/library/ui";
   import ProgressBar from "import { List } from "@sparrow/library/ui";progress/Progress.svelte";
-  import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import { generateSampleCollection } from "@deprecate/utils/sample/collection.sample";
+  import { moveNavigation } from "@deprecate/utils/helpers/navigation";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
+  import type { Path } from "@deprecate/utils/interfaces/request.interface";
+  import { HeaderDashboardViewModel } from "@deprecate/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import Request from "../request/Request.svelte";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import DragDrop from "import { List } from "@sparrow/library/ui";dragdrop/DragDrop.svelte";
   import { Modal } from "@sparrow/library/ui";
   import { CollectionService } from "@app/services/collection.service";
@@ -22,11 +22,11 @@
     validateClientURL,
     validateClientXML,
   } from "../collection/collection-utils/utils";
-  import linkIcon from "$lib/assets/linkIcon.svg";
+  import linkIcon from "@deprecate/assets/linkIcon.svg";
   import { invoke } from "@tauri-apps/api/core";
   import { Button } from "@sparrow/library/ui";
-  import { ContentTypeEnum, ResponseStatusCode } from "$lib/utils/enums";
-  import TickMark from "$lib/assets/tick-mark-rounded.svelte";
+  import { ContentTypeEnum, ResponseStatusCode } from "@deprecate/utils/enums";
+  import TickMark from "@deprecate/assets/tick-mark-rounded.svelte";
 
   export let handleCreateCollection;
   export let currentWorkspaceId;

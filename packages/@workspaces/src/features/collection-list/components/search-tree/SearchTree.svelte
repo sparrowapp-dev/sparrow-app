@@ -1,7 +1,7 @@
 <script lang="ts">
-  import folder from "$lib/assets/folder.svg";
+  import folder from "@deprecate/assets/folder.svg";
   import Request from "./Request.svelte";
-  import collectionIcon from "$lib/assets/collection-icon.svg";
+  import collectionIcon from "@deprecate/assets/collection-icon.svg";
   let folderExpand: boolean = false;
   let collectionExpand: boolean = false;
 

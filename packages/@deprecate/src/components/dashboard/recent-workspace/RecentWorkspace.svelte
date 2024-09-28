@@ -1,13 +1,13 @@
 <script lang="ts">
   /**
    * @deprecated referes to teams store
-   * import { openedTeam } from "$lib/store";
+   * import { openedTeam } from "@deprecate/store";
    **/
   import { navigate } from "svelte-navigator";
-  import { PeopleIcon } from "$lib/assets/app.asset";
-  import constants from "$lib/utils/constants";
+  import { PeopleIcon } from "@deprecate/assets/app.asset";
+  import constants from "@deprecate/utils/constants";
   import { List } from "@sparrow/library/ui";
-  import type { Team } from "$lib/utils/interfaces";
+  import type { Team } from "@deprecate/utils/interfaces";
   export let openTeam: Team;
   export let data: any;
   export let handleWorkspaceSwitch: any,

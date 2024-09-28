@@ -1,26 +1,26 @@
 <script lang="ts">
-  import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
-  import doubleangleRight from "$lib/assets/doubleangleRight.svg";
-  import SearchIcon from "$lib/assets/search.svelte";
-  import filterIcon from "$lib/assets/filter.svg";
-  import FilterIcon from "$lib/assets/filter.svelte";
-  import plusIcon from "$lib/assets/plus.svg";
+  import doubleangleLeft from "@deprecate/assets/doubleangleLeft.svg";
+  import doubleangleRight from "@deprecate/assets/doubleangleRight.svg";
+  import SearchIcon from "@deprecate/assets/search.svelte";
+  import filterIcon from "@deprecate/assets/filter.svg";
+  import FilterIcon from "@deprecate/assets/filter.svelte";
+  import plusIcon from "@deprecate/assets/plus.svg";
   import Collection from "./collection/Collection.old.svelte";
-  import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
-  import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
+  import FilterDropDown from "@deprecate/components/dropdown/FilterDropDown.svelte";
+  import RequestDropdown from "@deprecate/components/dropdown/RequestDropdown.svelte";
   import {
     collapseAnimationAppliedStore,
     collapsibleState,
     isApiCreatedFirstTime,
-  } from "$lib/store/request-response-section";
-  import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
+  } from "@deprecate/store/request-response-section";
+  import SearchTree from "@deprecate/components/collections/collections-list/searchTree/SearchTree.svelte";
   import { useTree } from "./collectionList";
   import { v4 as uuidv4 } from "uuid";
   import { onDestroy } from "svelte";
   import {
     selectMethodsStore,
     selectedMethodsCollectionStore,
-  } from "$lib/store/methods";
+  } from "@deprecate/store/methods";
 
   import EmptyCollection from "./empty-collection/EmptyCollection.old.svelte";
   import {
@@ -31,12 +31,15 @@
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import type { Observable } from "rxjs";
 
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
-  import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import { isCollectionCreatedFirstTime } from "$lib/store/collection";
+  import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
+  import {
+    ItemType,
+    UntrackedItems,
+  } from "@deprecate/utils/enums/item-type.enum";
+  import type { Path } from "@deprecate/utils/interfaces/request.interface";
+  import { generateSampleCollection } from "@deprecate/utils/sample/collection.sample";
+  import { moveNavigation } from "@deprecate/utils/helpers/navigation";
+  import { isCollectionCreatedFirstTime } from "@deprecate/store/collection";
 
   export let collectionsMethods: CollectionsMethods;
   export let activeTabId: string;
@@ -50,21 +53,21 @@
   const _colllectionListViewModel = new CollectionListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
 
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-  import { username } from "$lib/store/auth.store";
+  import { HeaderDashboardViewModel } from "@deprecate/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import { username } from "@deprecate/store/auth.store";
   import { notifications } from "@sparrow/library/ui";
   import { Spinner } from "@sparrow/library/ui";
-  import EnvironmentDropdown from "$lib/components/dropdown/EnvironmentDropdown.svelte";
-  import { environmentType } from "$lib/utils/enums/environment.enum";
-  import { createCollectionSource } from "$lib/store/event-source.store";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import { FolderDefault, type WorkspaceRole } from "$lib/utils/enums";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import { generateSampleRequest } from "$lib/utils/sample";
+  import EnvironmentDropdown from "@deprecate/components/dropdown/EnvironmentDropdown.svelte";
+  import { environmentType } from "@deprecate/utils/enums/environment.enum";
+  import { createCollectionSource } from "@deprecate/store/event-source.store";
+  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { FolderDefault, type WorkspaceRole } from "@deprecate/utils/enums";
+  import Dropdown from "@deprecate/components/dropdown/Dropdown.svelte";
+  import { generateSampleRequest } from "@deprecate/utils/sample";
   import ImportCollection from "./import-collection/ImportCollection.svelte";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
+  import { workspaceLevelPermissions } from "@deprecate/utils/constants/permissions.constant";
+  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers/common.helper";
   import { List } from "@sparrow/library/ui";
   import ImportCurl from "./import-curl/ImportCurl.svelte";
 

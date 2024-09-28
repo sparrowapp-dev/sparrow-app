@@ -1,14 +1,14 @@
 <script lang="ts">
-  import collections from "$lib/assets/collections-old.svg";
-  import collectionsFaded from "$lib/assets/collections-faded.svg";
-  import mock from "$lib/assets/mock.svg";
-  import environment from "$lib/assets/environment-old.svg";
-  import environmentFaded from "$lib/assets/environment-faded.svg";
-  import home from "$lib/assets/home.svg";
+  import collections from "@deprecate/assets/collections-old.svg";
+  import collectionsFaded from "@deprecate/assets/collections-faded.svg";
+  import mock from "@deprecate/assets/mock.svg";
+  import environment from "@deprecate/assets/environment-old.svg";
+  import environmentFaded from "@deprecate/assets/environment-faded.svg";
+  import home from "@deprecate/assets/home.svg";
   import Helper from "./Helper.svelte";
   import { Tooltip } from "@sparrow/library/ui";
-  import { HelpIcon } from "$lib/assets/app.asset";
-  import SettingsIcon from "$lib/assets/setting.svelte";
+  import { HelpIcon } from "@deprecate/assets/app.asset";
+  import SettingsIcon from "@deprecate/assets/setting.svelte";
   import type { WorkspaceDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   export let workspaces: Observable<WorkspaceDocument[]>;

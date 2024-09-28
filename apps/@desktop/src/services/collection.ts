@@ -1,15 +1,15 @@
-import constants from "$lib/utils/constants";
+import constants from "@deprecate/utils/constants";
 import {
   makeRequest,
   getAuthHeaders,
   makeHttpRequest,
-} from "$lib/api/api.common";
+} from "@deprecate/api/api.common";
 
 import type {
   CreateApiRequestPostBody,
   CreateCollectionPostBody,
   CreateDirectoryPostBody,
-} from "$lib/utils/dto";
+} from "@deprecate/utils/dto";
 
 import {
   apiEndPoint,
@@ -17,8 +17,8 @@ import {
   methodText,
   requestType,
   responseText,
-} from "$lib/store/api-request";
-import { keyStore, valueStore } from "$lib/store/parameter";
+} from "@deprecate/store/api-request";
+import { keyStore, valueStore } from "@deprecate/store/parameter";
 
 const apiUrl: string = constants.API_URL;
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { collapsibleState } from "$lib/store/request-response-section";
+  import { collapsibleState } from "@deprecate/store/request-response-section";
   import { Link } from "svelte-navigator";
   export let route: string;
   export let heading: string;
