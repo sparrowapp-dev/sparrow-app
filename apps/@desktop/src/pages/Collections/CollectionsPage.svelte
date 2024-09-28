@@ -62,8 +62,8 @@
     TabTypeEnum,
     type RequestTab,
     type Tab,
-  } from "@common/types/workspace";
-  import type { WebSocketTab } from "@common/types/workspace/web-socket";
+  } from "@sparrow/common/types/workspace";
+  import type { WebSocketTab } from "@sparrow/common/types/workspace/web-socket";
   import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
   import TestFlowExplorerPage from "../TestflowExplorerPage/TestflowExplorerPage.svelte";
   import { TestflowViewModel } from "./Testflow.ViewModel";

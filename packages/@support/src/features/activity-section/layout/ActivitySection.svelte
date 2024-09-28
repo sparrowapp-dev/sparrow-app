@@ -29,7 +29,7 @@
   } from "../../../common/types/activity";
   import { Spinner } from "@sparrow/library/ui";
   import { Loader } from "@sparrow/library/ui";
-  import { FormatTime } from "@common/utils/formatTime";
+  import { FormatTime } from "@sparrow/common/utils";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   import { ArrowOutwardIcon } from "@sparrow/library/icons";
 

@@ -31,7 +31,7 @@ import type { Observable } from "rxjs";
 import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 import { Events } from "@deprecate/utils/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
-import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
+import { InitWorkspaceTab } from "@sparrow/common/utils";
 
 export class DashboardViewModel {
   constructor() {}

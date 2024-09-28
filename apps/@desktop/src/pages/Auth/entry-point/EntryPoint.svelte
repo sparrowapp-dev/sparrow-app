@@ -1,6 +1,9 @@
 <script lang="ts">
   import { notifications } from "@sparrow/library/ui";
-  import { logoSparrowSquare, sparrowLogoBackground } from "@common/images";
+  import {
+    logoSparrowSquare,
+    sparrowLogoBackground,
+  } from "@sparrow/common/images";
   import Redirect from "../redirect/Redirect.svelte";
   import constants from "@deprecate/utils/constants";
   import { StarIcon } from "@sparrow/library/icons";

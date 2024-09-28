@@ -1,4 +1,4 @@
-import { AuthTypeEnum } from "@common/types/workspace";
+import { AuthTypeEnum } from "@sparrow/common/types/workspace";
 import { AuthSection, AuthType } from "../enums/authorization.enum";
 import {
   ContentTypeEnum,

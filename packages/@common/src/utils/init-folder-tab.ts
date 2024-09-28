@@ -3,7 +3,7 @@ import {
   type Path,
   TabTypeEnum,
   type FolderTab,
-} from "@common/types/workspace";
+} from "@sparrow/common/types/workspace";
 import { v4 as uuidv4 } from "uuid";
 
 class InitFolderTab {

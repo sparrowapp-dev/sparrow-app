@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Label } from "@sparrow/library/ui";
   import { type UpdateRequestStateType } from "@sparrow/workspaces/common/type";
-  import { ResponseSectionEnum } from "@common/types/workspace";
+  import { ResponseSectionEnum } from "@sparrow/common/types/workspace";
   export let requestStateSection: string;
   export let onUpdateRequestState: UpdateRequestStateType;
   export let responseHeadersLength = 0;

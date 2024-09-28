@@ -5,7 +5,7 @@
   // ---- View Model
   import RestExplorerViewModel from "./RestExplorerPage.ViewModel";
   import { RestExplorer, ChatBot } from "@sparrow/workspaces/features";
-  import { Debounce } from "@common/utils";
+  import { Debounce } from "@sparrow/common/utils";
   import { isGuestUserActive, user } from "@deprecate/store";
   import { onMount } from "svelte";
   export let tab;

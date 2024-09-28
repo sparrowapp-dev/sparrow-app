@@ -10,7 +10,7 @@ import { BehaviorSubject, type Observable } from "rxjs";
 import { GuideRepository } from "../../repositories/guide.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { TabRepository } from "../../repositories/tab.repository";
-import { Debounce, CompareArray } from "@common/utils";
+import { Debounce, CompareArray } from "@sparrow/common/utils";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();

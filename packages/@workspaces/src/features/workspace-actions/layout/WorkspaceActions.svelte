@@ -39,7 +39,7 @@
     EnvironmentList,
   } from "@sparrow/workspaces/features";
   import { TestflowList } from "../../testflow-list";
-  import { TFDefaultEnum } from "@common/types/workspace/testflow";
+  import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;

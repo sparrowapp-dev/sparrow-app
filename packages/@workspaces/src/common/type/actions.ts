@@ -8,7 +8,7 @@ import type {
   KeyValueChecked,
   Response,
   StatePartial,
-} from "@common/types/workspace";
+} from "@sparrow/common/types/workspace";
 
 export type UpdateRequestUrlType = (
   url: string,

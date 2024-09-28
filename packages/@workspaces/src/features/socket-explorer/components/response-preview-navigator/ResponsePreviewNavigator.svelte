@@ -9,7 +9,7 @@
   } from "@deprecate/utils/enums/request.enum";
   import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
-  import { ResponseFormatterEnum } from "@common/types/workspace";
+  import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
   import BeautifyIcon from "@deprecate/assets/beautify.svg";
   import js_beautify, { html_beautify } from "js-beautify";
   import {

@@ -1,4 +1,7 @@
-import type { CollectionItemsDto, RequestDto } from "@common/types/workspace";
+import type {
+  CollectionItemsDto,
+  RequestDto,
+} from "@sparrow/common/types/workspace";
 import type { ContentTypeEnum } from "../enums/request.enum";
 import type { Auth, KeyValuePair } from "../interfaces/request.interface";
 

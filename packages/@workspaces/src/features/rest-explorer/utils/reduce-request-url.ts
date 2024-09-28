@@ -1,4 +1,4 @@
-import type { KeyValueChecked } from "@common/types/workspace";
+import type { KeyValueChecked } from "@sparrow/common/types/workspace";
 
 class ReduceRequestURL {
   private queryParams: KeyValueChecked[];

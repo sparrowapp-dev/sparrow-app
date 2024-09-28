@@ -1,6 +1,6 @@
 <script>
   import { DangerIcon } from "@sparrow/library/icons";
-  import { SparrowLogo } from "@common/images";
+  import { SparrowLogo } from "@sparrow/common/images";
 </script>
 
 <div class="response-default">

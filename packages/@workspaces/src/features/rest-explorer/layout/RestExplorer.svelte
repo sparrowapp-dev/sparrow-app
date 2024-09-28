@@ -54,7 +54,7 @@
     ResponseSectionEnum,
     type KeyValue,
     type RequestTab,
-  } from "@common/types/workspace";
+  } from "@sparrow/common/types/workspace";
   import { requestSplitterDirection } from "../store";
   import { Popover } from "@sparrow/library/ui";
   import { onMount } from "svelte";

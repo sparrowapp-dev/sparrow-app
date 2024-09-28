@@ -12,7 +12,7 @@
 
   // Component
   import { FolderExplorer } from "@sparrow/workspaces/features";
-  import type { Folder } from "@common/types/workspace";
+  import type { Folder } from "@sparrow/common/types/workspace";
   import { user } from "@deprecate/store";
 
   /**

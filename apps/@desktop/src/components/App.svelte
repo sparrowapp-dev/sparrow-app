@@ -11,7 +11,7 @@
   import { onMount } from "svelte";
   import { user } from "@deprecate/store/auth.store";
   import { handleShortcuts } from "@deprecate/utils/shortcuts";
-  import { AppUpdater } from "@common/features";
+  import { AppUpdater } from "@sparrow/common/features";
   import { getCurrent } from "@tauri-apps/api/window";
   import LoginPage from "@app/pages/Auth/login-page/LoginPage.svelte";
   import RegisterPage from "@app/pages/Auth/register-page/RegisterPage.svelte";

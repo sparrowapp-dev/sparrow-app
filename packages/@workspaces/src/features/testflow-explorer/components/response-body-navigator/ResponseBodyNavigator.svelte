@@ -16,7 +16,7 @@
   import StatusSuccess from "@deprecate/assets/status-success.svelte";
   import StatusError from "@deprecate/assets/status-error.svelte";
   import { Select } from "@sparrow/library/forms";
-  import { ResponseFormatterEnum } from "@common/types/workspace";
+  import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
   import BeautifyIcon from "@deprecate/assets/beautify.svg";
   import js_beautify, { html_beautify } from "js-beautify";
   import { WithSelectV3 } from "@sparrow/workspaces/common/hoc";

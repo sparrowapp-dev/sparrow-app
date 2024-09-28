@@ -12,7 +12,7 @@ import {
   Debounce,
   InitRequestTab,
   MarkdownFormatter,
-} from "@common/utils";
+} from "@sparrow/common/utils";
 
 // ---- DB
 import type {
@@ -84,7 +84,7 @@ import {
   type StatePartial,
   type Conversation,
   MessageTypeEnum,
-} from "@common/types/workspace";
+} from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { RequestTabAdapter } from "../../adapter/request-tab";
 import { GuideRepository } from "../../repositories/guide.repository";

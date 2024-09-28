@@ -3,7 +3,7 @@
   import {
     RequestDataTypeEnum,
     ResponseFormatterEnum,
-  } from "@common/types/workspace";
+  } from "@sparrow/common/types/workspace";
   // import { SparrowLogo } from "../../assets/images";
   export let response;
   export let apiState;

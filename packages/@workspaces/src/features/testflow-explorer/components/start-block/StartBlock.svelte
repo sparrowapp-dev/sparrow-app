@@ -7,7 +7,7 @@
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
   import { testFlowDataStore } from "../../store";
-  import type { TFDataStoreType } from "@common/types/workspace/testflow";
+  import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";
 
   /**
    * The data object containing various handlers and data stores.

@@ -15,7 +15,6 @@
     "checkJs": true,
     "isolatedModules": true,
     "paths": {
-      "@common/*": ["../../packages/@common/src/*"],
       "@deprecate/*": ["../../packages/@deprecate/src/*"],
       "@app/*": ["./src/*"]
     }

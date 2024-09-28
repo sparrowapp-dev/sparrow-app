@@ -1,14 +1,14 @@
 import { notifications } from "@sparrow/library/ui";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
-import { InitTab } from "@common/factory";
+import { InitTab } from "@sparrow/common/factory";
 import { v4 as uuidv4 } from "uuid";
 import { TabRepository } from "../../repositories/tab.repository";
 import { TestflowRepository } from "../../repositories/testflow.repository";
 import type { TFRxDocumentType } from "../../models/testflow.model";
-import { TFDefaultEnum } from "@common/types/workspace/testflow";
+import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
 import { TestflowService } from "../../services/testflow.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import type { Tab } from "@common/types/workspace";
+import type { Tab } from "@sparrow/common/types/workspace";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();

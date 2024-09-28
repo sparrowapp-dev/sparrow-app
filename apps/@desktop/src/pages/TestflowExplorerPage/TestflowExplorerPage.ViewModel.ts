@@ -11,11 +11,11 @@ import { TabRepository } from "../../repositories/tab.repository";
 import { TestflowRepository } from "../../repositories/testflow.repository";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { TestflowService } from "../../services/testflow.service";
-import type { Tab } from "@common/types/workspace";
+import type { Tab } from "@sparrow/common/types/workspace";
 import type {
   ENVDocumentType,
   ENVExtractVariableType,
-} from "@common/types/workspace/environment";
+} from "@sparrow/common/types/workspace/environment";
 import type {
   TFAPIResponseType,
   TFDataStoreType,
@@ -23,8 +23,8 @@ import type {
   TFHistoryStoreType,
   TFKeyValueStoreType,
   TFNodeType,
-} from "@common/types/workspace/testflow";
-import { CompareArray, Debounce, ParseTime } from "@common/utils";
+} from "@sparrow/common/types/workspace/testflow";
+import { CompareArray, Debounce, ParseTime } from "@sparrow/common/utils";
 import { notifications } from "@sparrow/library/ui";
 import { DecodeRequest } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";

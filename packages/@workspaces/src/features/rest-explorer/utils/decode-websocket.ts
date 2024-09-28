@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { type KeyValue, type KeyValueChecked } from "@common/types/workspace";
+import {
+  type KeyValue,
+  type KeyValueChecked,
+} from "@sparrow/common/types/workspace";
 
 class DecodeWebsocket {
   constructor() {}

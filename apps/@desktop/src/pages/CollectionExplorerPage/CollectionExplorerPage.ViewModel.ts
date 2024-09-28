@@ -22,13 +22,13 @@ import { invoke } from "@tauri-apps/api/core";
 import { v4 as uuidv4 } from "uuid";
 
 // Stores
-import { InitRequestTab } from "@common/utils";
+import { InitRequestTab } from "@sparrow/common/utils";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { isGuestUserActive } from "@deprecate/store/auth.store";
 import type {
   CollectionDto,
   CollectionItemsDto,
-} from "@common/types/workspace";
+} from "@sparrow/common/types/workspace";
 
 class CollectionExplorerPage {
   // Private Repositories

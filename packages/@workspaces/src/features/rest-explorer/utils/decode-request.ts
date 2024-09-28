@@ -7,10 +7,10 @@ import {
   type Request,
   RequestDataTypeEnum,
   RequestMethodEnum,
-} from "@common/types/workspace";
+} from "@sparrow/common/types/workspace";
 import { ReduceAuthHeader, ReduceAuthParameter } from ".";
 import { createDeepCopy } from "@deprecate/utils/helpers";
-import { SetDataStructure } from "@common/utils";
+import { SetDataStructure } from "@sparrow/common/utils";
 
 class DecodeRequest {
   constructor() {}

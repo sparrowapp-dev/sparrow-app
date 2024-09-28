@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Debounce } from "@common/utils";
+  import { Debounce } from "@sparrow/common/utils";
   import { Modal } from "@sparrow/library/ui";
   import TickMark from "@deprecate/assets/tick-mark-rounded.svelte";
   import { Spinner } from "@sparrow/library/ui";

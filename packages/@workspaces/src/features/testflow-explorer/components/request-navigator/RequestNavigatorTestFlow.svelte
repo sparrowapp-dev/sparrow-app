@@ -1,6 +1,6 @@
 <script lang="ts">
   import { type UpdateRequestStateType } from "@sparrow/workspaces/common/type";
-  import { RequestSectionEnum } from "@common/types/workspace";
+  import { RequestSectionEnum } from "@sparrow/common/types/workspace";
   import { Label } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   export let requestStateSection = RequestSectionEnum.REQUEST_BODY;

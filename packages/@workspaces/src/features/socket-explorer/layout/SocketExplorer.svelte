@@ -19,7 +19,7 @@
     UpdateParamsType,
     UpdateRequestUrlType,
   } from "@sparrow/workspaces/common/type";
-  import { TabTypeEnum, type Tab } from "@common/types/workspace";
+  import { TabTypeEnum, type Tab } from "@sparrow/common/types/workspace";
 
   import {
     HttpUrlSection,
@@ -31,7 +31,7 @@
     SocketNavigator,
     SocketParameters,
   } from "../components";
-  import { SocketSectionEnum } from "@common/types/workspace/web-socket";
+  import { SocketSectionEnum } from "@sparrow/common/types/workspace/web-socket";
   import ResponseData from "../components/response-data/ResponseData.svelte";
 
   export let tab: Observable<Tab>;

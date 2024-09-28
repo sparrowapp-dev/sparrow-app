@@ -14,7 +14,7 @@
   } from "../../../common/types/feedback";
   import { TickIcon } from "@sparrow/library/icons";
   import { Loader } from "@sparrow/library/ui";
-  import { Debounce } from "@common/utils";
+  import { Debounce } from "@sparrow/common/utils";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 

@@ -8,7 +8,7 @@
   import {
     TFDefaultEnum,
     type TFDocumentType,
-  } from "@common/types/workspace/testflow";
+  } from "@sparrow/common/types/workspace/testflow";
 
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";

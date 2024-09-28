@@ -9,7 +9,6 @@ export default defineConfig(async () => ({
     alias: {
       src: path.resolve("./src/"),
       "@deprecate": path.resolve("../../packages/@deprecate/src/"),
-      "@common": path.resolve("../../packages/@common/src/"),
     },
   },
 

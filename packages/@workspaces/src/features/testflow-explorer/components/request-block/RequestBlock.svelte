@@ -19,11 +19,11 @@
   import { testFlowDataStore } from "../../../../features/testflow-explorer/store/testflow";
   import { ThreeDotIcon } from "@deprecate/assets/app.asset";
   import { createDeepCopy } from "@deprecate/utils/helpers";
-  import { ParseTime } from "@common/utils";
+  import { ParseTime } from "@sparrow/common/utils";
   import type {
     TFDataStoreType,
     TFNodeStoreType,
-  } from "@common/types/workspace/testflow";
+  } from "@sparrow/common/types/workspace/testflow";
   import type { Unsubscriber } from "svelte/store";
 
   /**

@@ -11,7 +11,7 @@
 
   import { Tooltip } from "@sparrow/library/ui";
   import { WithButtonV5 } from "@sparrow/workspaces/common/hoc";
-  import { FormatTime } from "@common/utils/formatTime";
+  import { FormatTime } from "@sparrow/common/utils";
   import { ResponseStatusCode } from "@deprecate/utils/enums";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   export let testflowStore;

@@ -24,16 +24,16 @@ import type {
   CollectionItemsDto,
   Folder,
   Tab,
-} from "@common/types/workspace";
+} from "@sparrow/common/types/workspace";
 import type { CreateApiRequestPostBody } from "@deprecate/utils/dto";
-import { InitRequestTab } from "@common/utils";
+import { InitRequestTab } from "@sparrow/common/utils";
 import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 import { notifications } from "@sparrow/library/ui";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { isGuestUserActive } from "@deprecate/store/auth.store";
 // import { generateSampleRequest } from "@deprecate/utils/sample";
 // import type { Folder, Path } from "@deprecate/utils/interfaces/request.interface";
-// import { InitRequestTab } from "@common/utils";
+// import { InitRequestTab } from "@sparrow/common/utils";
 
 class FolderExplorerPage {
   // Private Repositories

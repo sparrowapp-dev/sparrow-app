@@ -56,7 +56,7 @@
    * Types
    */
   import type { CollectionDocument, TabDocument } from "@app/database/database";
-  import type { Folder } from "@common/types/workspace";
+  import type { Folder } from "@sparrow/common/types/workspace";
 
   /**
    * Constants

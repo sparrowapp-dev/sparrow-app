@@ -1,4 +1,4 @@
-import type { Block } from "@common/types/editorjs";
+import type { Block } from "@sparrow/common/types/editorjs";
 
 class MarkdownFormatter {
   /**

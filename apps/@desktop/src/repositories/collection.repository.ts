@@ -4,7 +4,7 @@ import { ItemType } from "@deprecate/utils/enums/item-type.enum";
 import { createDeepCopy } from "@deprecate/utils/helpers/conversion.helper";
 import type { CollectionItem } from "@deprecate/utils/interfaces/collection.interface";
 import type { Observable } from "rxjs";
-import type { CollectionItemsDto } from "@common/types/workspace";
+import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
 export class CollectionRepository {
   constructor() {}
 

@@ -13,7 +13,7 @@
   import {
     TFDefaultEnum,
     type TFDocumentType,
-  } from "@common/types/workspace/testflow";
+  } from "@sparrow/common/types/workspace/testflow";
 
   /**
    * current workspace to identify the selected testflow

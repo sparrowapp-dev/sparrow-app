@@ -14,7 +14,7 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { TeamService } from "../../services/team.service";
 import { UserService } from "../../services/user.service";
 import { WorkspaceService } from "../../services/workspace.service";
-import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
+import { InitWorkspaceTab } from "@sparrow/common/utils";
 import { notifications } from "@sparrow/library/ui";
 import { BehaviorSubject, Observable } from "rxjs";
 import { navigate } from "svelte-navigator";

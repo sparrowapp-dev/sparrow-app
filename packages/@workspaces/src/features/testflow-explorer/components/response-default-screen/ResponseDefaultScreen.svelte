@@ -3,7 +3,7 @@
   import { isHorizontal } from "@deprecate/store/request-response-section";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
-  import { SparrowLogo } from "@common/images";
+  import { SparrowLogo } from "@sparrow/common/images";
   export let isMainScreen = false;
   let isHorizontalMode: boolean;
   isHorizontal.subscribe((value) => (isHorizontalMode = value));

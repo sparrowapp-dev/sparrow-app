@@ -16,7 +16,7 @@ import type { Response } from "@deprecate/utils/interfaces/request.interface";
 import { listen } from "@tauri-apps/api/event";
 import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
 import { v4 as uuidv4 } from "uuid";
-import { RequestDataTypeEnum } from "@common/types/workspace";
+import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { appInsights } from "@app/logger";
 

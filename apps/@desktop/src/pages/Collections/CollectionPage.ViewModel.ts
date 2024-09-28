@@ -62,9 +62,9 @@ import { GuideRepository } from "../../repositories/guide.repository";
 import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
 import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 import { type Observable } from "rxjs";
-import { InitRequestTab, InitWebSocketTab } from "@common/utils";
-import { InitCollectionTab } from "@common/utils";
-import { InitFolderTab } from "@common/utils/init-folder-tab";
+import { InitRequestTab, InitWebSocketTab } from "@sparrow/common/utils";
+import { InitCollectionTab } from "@sparrow/common/utils";
+import { InitFolderTab } from "@sparrow/common/utils";
 import { requestSplitterDirection } from "@sparrow/workspaces/features/rest-explorer/store";
 import {
   insertCollectionRequest,
@@ -76,14 +76,14 @@ import { RequestTabAdapter } from "../../adapter/request-tab";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { isGuestUserActive } from "@deprecate/store/auth.store";
-import { InitTab } from "@common/factory";
+import { InitTab } from "@sparrow/common/factory";
 import type {
   CollectionArgsDto,
   CollectionDto,
   CollectionItemsDto,
   RequestDto,
   Tab,
-} from "@common/types/workspace";
+} from "@sparrow/common/types/workspace";
 import { SocketTabAdapter } from "../../adapter/socket-tab";
 import type { CollectionDocType } from "../../models/collection.model";
 import type { GuideQuery } from "../../types/user-guide";

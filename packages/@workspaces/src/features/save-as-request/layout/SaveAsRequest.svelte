@@ -28,7 +28,7 @@
     SocketIcon,
     WorkspaceIcon,
   } from "@sparrow/library/icons";
-  import { TabTypeEnum } from "@common/types/workspace";
+  import { TabTypeEnum } from "@sparrow/common/types/workspace";
   import { TextEditor } from "@sparrow/library/forms";
 
   export let onClick;

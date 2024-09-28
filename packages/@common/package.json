@@ -1,5 +1,5 @@
 {
-  "name": "common",
+  "name": "@sparrow/common",
   "version": "0.0.1",
   "scripts": {
     "dev": "vite dev",
@@ -12,6 +12,26 @@
   },
   "private": true,
   "main": "src/main.ts",
+  "exports": {
+    "./components": "./src/components/index.ts",
+    "./factory": "./src/factory/index.ts",
+    "./features": "./src/features/index.ts",
+    "./icons": "./src/icons/index.ts",
+    "./images": "./src/images/index.ts",
+    "./utils": "./src/utils/index.ts",
+    "./types": "./src/types/index.ts",
+    "./types/workspace": "./src/types/workspace/index.ts",
+    "./types/workspace/collection": "./src/types/workspace/collection.ts",
+    "./types/workspace/common": "./src/types/workspace/common.ts",
+    "./types/workspace/environment": "./src/types/workspace/environment.ts",
+    "./types/workspace/folder": "./src/types/workspace/folder.ts",
+    "./types/workspace/request": "./src/types/workspace/request.ts",
+    "./types/workspace/tab": "./src/types/workspace/tab.ts",
+    "./types/workspace/testflow": "./src/types/workspace/testflow.ts",
+    "./types/workspace/web-socket": "./src/types/workspace/web-socket.ts",
+    "./types/workspace/workspace": "./src/types/workspace/workspace.ts",
+    "./types/editorjs": "./src/types/editorjs/index.ts"
+  },
   "devDependencies": {
     "@fontsource/fira-mono": "^4.5.10",
     "@neoconfetti/svelte": "^1.0.0",

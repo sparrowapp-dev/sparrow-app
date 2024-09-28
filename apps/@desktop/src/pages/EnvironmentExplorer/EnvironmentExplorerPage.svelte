@@ -1,7 +1,7 @@
 <script lang="ts">
   import { EnvironmentExplorer } from "@sparrow/workspaces/features";
   import { EnvironmentExplorerViewModel } from "./EnvironmentExplorerPage.ViewModel";
-  import { Debounce } from "@common/utils";
+  import { Debounce } from "@sparrow/common/utils";
   import { user } from "@deprecate/store";
   import type { WorkspaceDocument } from "@app/database/database";
   /**

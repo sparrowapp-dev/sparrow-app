@@ -1,4 +1,4 @@
-import { RequestMethodEnum } from "@common/types/workspace";
+import { RequestMethodEnum } from "@sparrow/common/types/workspace";
 
 const createDeepCopy = (data) => {
   return JSON.parse(JSON.stringify(data));

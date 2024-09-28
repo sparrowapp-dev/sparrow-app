@@ -15,7 +15,6 @@
     "isolatedModules": true,
     "paths": {
       "@deprecate/*": ["../../packages/@deprecate/src/*"],
-      "@common/*": ["../../packages/@common/src/*"],
       "src/*": ["./src/*"]
     }
   },

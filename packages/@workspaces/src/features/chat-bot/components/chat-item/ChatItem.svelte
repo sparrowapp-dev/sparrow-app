@@ -14,11 +14,11 @@
     RefreshIcon,
     TickIcon,
   } from "@sparrow/library/icons";
-  import { SparrowAIIcon } from "@common/icons";
+  import { SparrowAIIcon } from "@sparrow/common/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
   import { Events } from "@deprecate/utils/enums";
-  import { MessageTypeEnum } from "@common/types/workspace";
+  import { MessageTypeEnum } from "@sparrow/common/types/workspace";
 
   export let message: string;
   export let messageId: string;

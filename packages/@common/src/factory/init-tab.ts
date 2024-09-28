@@ -5,8 +5,8 @@ import {
   InitRequestTab,
   InitTestflowTab,
   InitWebSocketTab,
-} from "@common/utils";
-// import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
+} from "@sparrow/common/utils";
+// import { InitWorkspaceTab } from "@sparrow/common/utils/init-workspace-tab";
 
 class InitTab {
   constructor() {}

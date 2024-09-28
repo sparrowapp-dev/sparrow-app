@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { RequestDataTypeEnum } from "@common/types/workspace";
+  import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
   import { Input } from "@sparrow/library/forms";
   import {
     ArrowInsertIcon,

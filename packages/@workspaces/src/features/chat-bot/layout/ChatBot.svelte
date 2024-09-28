@@ -6,7 +6,10 @@
     AiChatToggler,
     AISuggestionBox,
   } from "../components";
-  import { MessageTypeEnum, type RequestTab } from "@common/types/workspace";
+  import {
+    MessageTypeEnum,
+    type RequestTab,
+  } from "@sparrow/common/types/workspace";
   import { CrossIcon } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";

@@ -5,7 +5,11 @@ import {
   DecodeWebsocket,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { createDeepCopy, moveNavigation } from "@deprecate/utils/helpers";
-import { CompareArray, Debounce, InitWebSocketTab } from "@common/utils";
+import {
+  CompareArray,
+  Debounce,
+  InitWebSocketTab,
+} from "@sparrow/common/utils";
 
 // ---- DB
 import type {
@@ -39,7 +43,7 @@ import {
   type StatePartial,
   type Tab,
   type CollectionItemsDto,
-} from "@common/types/workspace";
+} from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { CollectionService } from "../../services/collection.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
@@ -49,7 +53,7 @@ import { SocketTabAdapter } from "../../adapter/socket-tab";
 import type { CollectionDocType } from "../../models/collection.model";
 import { WebSocketService } from "../../services/web-socket.service";
 import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
-import { InitTab } from "@common/factory";
+import { InitTab } from "@sparrow/common/factory";
 
 class RestExplorerViewModel {
   /**

@@ -18,7 +18,7 @@
   } from "@sparrow/support/common/components";
   import { FeedbackType } from "@sparrow/support/common/types";
   import { onMount } from "svelte";
-  import { FormatTime } from "@common/utils/formatTime";
+  import { FormatTime } from "@sparrow/common/utils";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";

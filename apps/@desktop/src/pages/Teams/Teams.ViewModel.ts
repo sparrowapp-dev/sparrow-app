@@ -11,7 +11,7 @@ import { GithubRepoReposistory } from "../../repositories/github-repo.repository
 import { GithubService } from "../../services/github.service";
 import { moveNavigation } from "@deprecate/utils/helpers";
 import { navigate } from "svelte-navigator";
-import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
+import { InitWorkspaceTab } from "@sparrow/common/utils";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import type { MakeRequestResponse } from "@deprecate/utils/interfaces/common.interface";
 import type { Team } from "@deprecate/utils/interfaces";

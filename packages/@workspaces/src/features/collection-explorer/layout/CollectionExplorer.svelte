@@ -73,7 +73,7 @@
   import { PERMISSION_NOT_FOUND_TEXT } from "@deprecate/utils/constants/permissions.constant";
   import type { CollectionDocument, TabDocument } from "@app/database/database";
   import { WorkspaceRole } from "@deprecate/utils/enums";
-  import type { CollectionDto } from "@common/types/workspace";
+  import type { CollectionDto } from "@sparrow/common/types/workspace";
 
   /**
    * Role of user in active workspace
