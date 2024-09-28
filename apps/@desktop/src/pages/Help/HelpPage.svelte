@@ -4,7 +4,7 @@
     DiscordCard,
     FeedbackSection,
     Community,
-  } from "@support/features";
+  } from "@sparrow/support/features";
   import {
     ActivityIcon,
     DocIcon,
@@ -12,14 +12,14 @@
     RoadmapIcon,
     UpdateIcon,
   } from "@library/icons";
-  import DiscordPost from "@support/features/discord-post/layout/DiscordPost.svelte";
+  import { DiscordPost } from "@sparrow/support/features";
   import HelpPageViewModel from "./HelpPage.ViewModel";
   import { onMount } from "svelte";
   import { Motion } from "svelte-motion";
   import { pagesMotion } from "@app/constants";
-  import Roadmap from "@support/features/roadmap/layout/Roadmap.svelte";
-  import { ReleaseNotes } from "@support/features/release-notes/layout";
-  import { ActivitySection } from "@support/features/activity-section";
+  import { Roadmap } from "@sparrow/support/features";
+  import { ReleaseNotes } from "@sparrow/support/features";
+  import { ActivitySection } from "@sparrow/support/features";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 

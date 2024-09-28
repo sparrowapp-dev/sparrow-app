@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { DiscordIcon , HelpCenterIcon , SettingIcon} from "@library/icons";
+  import { DiscordIcon, HelpCenterIcon, SettingIcon } from "@library/icons";
   import { Tooltip } from "@library/ui";
-  import { DiscordIDs } from "@support/common/constants/discord.constants";
+  import { DiscordIDs } from "@sparrow/support/common/constants/discord.constants";
   import { open } from "@tauri-apps/plugin-shell";
 
   export let onJoin;
@@ -33,18 +33,23 @@
     class="w-100"
     style="padding-top:10px; padding-left:19px; padding-right:19px;"
   >
-  <Tooltip title="Join Community" placement="bottom" distance={15} >
-    <div
-      class="w-100 join-button d-flex justify-content-center align-items-center gap-8 align-self-center"
-      role="button"
-      style=" height:40px; background-color: var(--dropdown-button); border-radius:4px;"
-      on:click={async () => {
-        onJoin();
-      }}
-    >
-      <div class="fw-normal" style="font-size: 14px; color:var(--white-color);">Join</div>
-    </div>
-  </Tooltip>
+    <Tooltip title="Join Community" placement="bottom" distance={15}>
+      <div
+        class="w-100 join-button d-flex justify-content-center align-items-center gap-8 align-self-center"
+        role="button"
+        style=" height:40px; background-color: var(--dropdown-button); border-radius:4px;"
+        on:click={async () => {
+          onJoin();
+        }}
+      >
+        <div
+          class="fw-normal"
+          style="font-size: 14px; color:var(--white-color);"
+        >
+          Join
+        </div>
+      </div>
+    </Tooltip>
   </div>
 </div>
 <div class="d-flex flex-column" style="padding-top:17px; padding-left:10px;">

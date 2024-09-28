@@ -3,8 +3,8 @@
   import { Select } from "@library/forms";
   import { CategoryIcon, CrossIcon, StackIcon } from "@library/icons";
   import { Loader } from "@library/ui";
-  import HelpInfoCard from "@support/common/components/HelpInfo-Card/HelpInfoCard.svelte";
-  import { FeedbackType } from "@support/common/types";
+  import HelpInfoCard from "../../../common/components/HelpInfo-Card/HelpInfoCard.svelte";
+  import { FeedbackType } from "@sparrow/support/common/types";
   import { onMount } from "svelte";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";

@@ -16,7 +16,7 @@
   import copyToClipBoard from "$lib/utils/copyToClipboard";
   import { notifications } from "@library/ui/toast/Toast";
   import { open } from "@tauri-apps/plugin-shell";
-  import { UpdatesTagType } from "@support/common/types/feedback";
+  import { UpdatesTagType } from "../../../common/types/feedback";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   export let listChangeLog;

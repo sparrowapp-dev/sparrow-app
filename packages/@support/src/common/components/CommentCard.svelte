@@ -1,7 +1,7 @@
 <script>
   import { AttachmentIcon } from "@library/icons";
   import { Button, IconFallback } from "@library/ui";
-  import { CommentCard } from "@support/common/components";
+  import { CommentCard } from "@sparrow/support/common/components";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
@@ -104,7 +104,6 @@
             on:click={() => {
               isReplying = !isReplying;
               MixpanelEvent(Events.Reply_Comment);
-
             }}
             style="color: {isReplying
               ? 'white'

@@ -18,9 +18,7 @@
       "$lib/*": ["./src/packages/@deprecate/*"],
       "@library/*": ["./src/packages/@library/*"],
       "@app/*": ["./src/packages/@app/*"],
-      "@common/*": ["./src/packages/@common/*"],
-      "@support/*": ["./src/packages/@support/*"],
-      "@web/*": ["../@web/src/*"]
+      "@common/*": ["./src/packages/@common/*"]
     }
   },
   "include": [

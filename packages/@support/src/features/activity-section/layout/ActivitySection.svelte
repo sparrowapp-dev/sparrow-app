@@ -7,8 +7,8 @@
     SortIcon,
     TableChart,
   } from "@library/icons";
-  import { UpvoteIcon } from "@support/common/components";
-  import FeedbackPost from "@support/features/feedback-section/layout/FeedbackPost.svelte";
+  import { UpvoteIcon } from "@sparrow/support/common/components";
+  import FeedbackPost from "../../../features/feedback-section/layout/FeedbackPost.svelte";
   import { onMount } from "svelte";
   import { SearchIcon } from "$lib/assets/app.asset";
   import { Select } from "@library/forms";
@@ -19,14 +19,14 @@
   import {
     FeedbackStatusType,
     FeedbackType,
-  } from "@support/common/types/feedback";
+  } from "../../../common/types/feedback";
   import { tickIcon } from "@library/forms/select/svgs";
   import { IconFallback } from "@library/ui";
   import { Like } from "@library/ui/like";
   import {
     ActivityStatusType,
     ActivityType,
-  } from "@support/common/types/activity";
+  } from "../../../common/types/activity";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import Loader from "@library/ui/loader/Loader.svelte";
   import { FormatTime } from "@common/utils/formatTime";
@@ -337,7 +337,7 @@
                 <ul>
                   {#each filteredPosts as post}
                     <div
-                    class="mb-4"
+                      class="mb-4"
                       style=" display: flex; flex-direction: column; background-color: #151515; padding: 20px;  border-radius:2px;"
                     >
                       <div
@@ -359,7 +359,8 @@
                           >
                             <span
                               class="category mt-2"
-                              style="color:{getColor(post?.status)?.fontColor}; border:0.2px solid {getColor(
+                              style="color:{getColor(post?.status)
+                                ?.fontColor}; border:0.2px solid {getColor(
                                 post?.status,
                               )?.fontColor}; "
                             >
@@ -591,7 +592,6 @@
                   No Result Found
                 </p>
               {/if}
-
             </div>
           {/if}
         </div>

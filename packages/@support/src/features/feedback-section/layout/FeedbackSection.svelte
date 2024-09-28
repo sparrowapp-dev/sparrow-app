@@ -1,7 +1,7 @@
 <script lang="ts">
   import { user } from "$lib/store";
   import { CommentIcon, SortIcon } from "@library/icons";
-  import { UpvoteIcon } from "@support/common/components";
+  import { UpvoteIcon } from "../../../common/components";
   import FeedbackPost from "./FeedbackPost.svelte";
   import FeedbackDefault from "./FeedbackDefault.svelte";
   import { onMount } from "svelte";
@@ -11,7 +11,7 @@
   import {
     FeedbackType,
     FeedbackStatusType,
-  } from "@support/common/types/feedback";
+  } from "../../../common/types/feedback";
   import { tickIcon } from "@library/forms/select/svgs";
   import { Loader } from "@library/ui";
   import { Debounce } from "@common/utils";

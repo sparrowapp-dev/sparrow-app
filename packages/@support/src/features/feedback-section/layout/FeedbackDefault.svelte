@@ -1,6 +1,6 @@
 <script>
   import { IconFallback } from "@library/ui";
-  import { AddFeedback } from "@support/features/add-feedback";
+  import { AddFeedback } from "../../../features/add-feedback";
   export let userInfo;
   export let onInputFeedback;
   export let onAddFeedback;

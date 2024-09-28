@@ -11,8 +11,12 @@
 
   import { Button, IconFallback, Loader, Modal } from "@library/ui";
   import ImageModal from "@library/ui/image-modal/ImageModal.svelte";
-  import { CommentCard, Drop, UpvoteIcon } from "@support/common/components";
-  import { FeedbackType } from "@support/common/types";
+  import {
+    CommentCard,
+    Drop,
+    UpvoteIcon,
+  } from "@sparrow/support/common/components";
+  import { FeedbackType } from "@sparrow/support/common/types";
   import { onMount } from "svelte";
   import { FormatTime } from "@common/utils/formatTime";
   const formatTimeAgo = new FormatTime().formatTimeAgo;

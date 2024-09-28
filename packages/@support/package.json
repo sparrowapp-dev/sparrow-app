@@ -1,5 +1,5 @@
 {
-  "name": "support",
+  "name": "@sparrow/support",
   "version": "0.0.1",
   "scripts": {
     "dev": "vite dev",
@@ -12,6 +12,16 @@
   },
   "private": true,
   "main": "src/main.ts",
+  "exports": {
+    "./features": "./src/features/index.ts",
+    "./common/components": "./src/common/components/index.ts",
+    "./common/constants": "./src/common/constants/index.ts",
+    "./common/types": "./src/common/types/index.ts",
+    "./common/hoc": "./src/common/hoc/index.ts",
+    "./common/utils": "./src/common/utils/index.ts",
+    "./common/constants/discord.constants": "./src/common/constants/discord.constants.ts",
+    "./common/constants/learnMore.constant": "./src/common/constants/learnMore.constant.ts"
+  },
   "devDependencies": {
     "@fontsource/fira-mono": "^4.5.10",
     "@neoconfetti/svelte": "^1.0.0",

@@ -9,8 +9,8 @@
   import { Button, Modal } from "@library/ui";
   import { notifications } from "@library/ui/toast/Toast";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-    import { Drop } from "@support/common/components";
-  import { FeedbackType } from "@support/common/types";
+  import { Drop } from "@sparrow/support/common/components";
+  import { FeedbackType } from "@sparrow/support/common/types";
 
   export let onAddFeedback;
   export let onInputFeedback;
