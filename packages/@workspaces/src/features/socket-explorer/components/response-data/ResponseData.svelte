@@ -1,6 +1,6 @@
 <script lang="ts">
   import { RequestDataTypeEnum } from "@common/types/workspace";
-  import { Input } from "@library/forms";
+  import { Input } from "@sparrow/library/forms";
   import {
     ArrowInsertIcon,
     ArrowOutwardIcon,
@@ -12,8 +12,8 @@
     ArrowDownward,
     DownArrowIcon,
     BlankIcon,
-  } from "@library/icons";
-  import { Dropdown, Tooltip } from "@library/ui";
+  } from "@sparrow/library/icons";
+  import { Dropdown, Tooltip } from "@sparrow/library/ui";
   import { WithButtonV4 } from "@sparrow/workspaces/common/hoc";
 
   export let webSocket;

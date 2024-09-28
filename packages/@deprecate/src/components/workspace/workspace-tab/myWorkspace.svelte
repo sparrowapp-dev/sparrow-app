@@ -25,8 +25,8 @@
   import { TeamViewModel } from "@app/pages/Teams/team.viewModel";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { Modal } from "@sparrow/library/ui";
+  import { notifications } from "@sparrow/library/ui";
 
   export let collectionsMethods: CollectionsMethods;
   export let activeTab;
@@ -354,7 +354,7 @@
   <WorkspaceSidebar {handleWorkspaceTab} {noOfCollections} {email}
   ></WorkspaceSidebar>
 
-  <ModalWrapperV1
+  <Modal
     title={"Invite Team Members"}
     type={"dark"}
     width={"35%"}
@@ -370,7 +370,7 @@
       addUsersInWorkspace={_viewModel.addUsersInWorkspace}
       addUsersInWorkspaceInRxDB={_viewModel.addUsersInWorkspaceInRxDB}
     />
-  </ModalWrapperV1>
+  </Modal>
 </div>
 
 <style>

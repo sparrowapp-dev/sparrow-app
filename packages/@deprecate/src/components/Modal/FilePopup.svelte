@@ -6,7 +6,7 @@
   import closeIcon from "$lib/assets/close.svg";
   import { CollectionService } from "@app/services/collection.service";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import { fade, fly } from "svelte/transition";
   import Button from "../buttons/Button.svelte";
   export let folderId: string;

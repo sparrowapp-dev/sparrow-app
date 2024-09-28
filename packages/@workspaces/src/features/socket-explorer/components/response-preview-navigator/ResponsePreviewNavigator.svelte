@@ -2,7 +2,7 @@
   import downloadIcon from "$lib/assets/download.svg";
   import copyIcon from "$lib/assets/copy.svg";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import {
     RequestDataType,
     ResponseFormatter,
@@ -17,8 +17,8 @@
     WithSelect,
     WithSelectV2,
   } from "@sparrow/workspaces/common/hoc";
-  import { Tooltip } from "@library/ui";
-  import { CopyIcon, DownloadIcon } from "@library/icons";
+  import { Tooltip } from "@sparrow/library/ui";
+  import { CopyIcon, DownloadIcon } from "@sparrow/library/icons";
   import type { WebSocketMessage } from "../../store/websocket";
 
   export let webSocket;

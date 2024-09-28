@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AISparkle } from "@library/icons";
+  import { AISparkle } from "@sparrow/library/icons";
 
   export let title = "";
   export let onClick: (text: string) => void = () => {};

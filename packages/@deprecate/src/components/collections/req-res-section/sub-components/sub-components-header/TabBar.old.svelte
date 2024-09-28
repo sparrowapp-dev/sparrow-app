@@ -19,7 +19,7 @@
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import { Modal } from "@sparrow/library/ui";
   import type { WorkspaceRole } from "$lib/utils/enums";
   import type { Observable } from "rxjs";
   export let collectionsMethods: CollectionsMethods;
@@ -186,7 +186,7 @@
   </div>
 </div>
 
-<ModalWrapperV1
+<Modal
   title={"Save Request"}
   type={"dark"}
   width={"55%"}
@@ -203,9 +203,9 @@
     }}
     onClick={handleSaveAsBackdrop}
   />
-</ModalWrapperV1>
+</Modal>
 
-<ModalWrapperV1
+<Modal
   title={"Save Changes"}
   type={"dark"}
   width={"35%"}
@@ -223,7 +223,7 @@
     closeCallback={handleClosePopupBackdrop}
     {loggedUserRoleInWorkspace}
   />
-</ModalWrapperV1>
+</Modal>
 
 <style>
   .tabbar {

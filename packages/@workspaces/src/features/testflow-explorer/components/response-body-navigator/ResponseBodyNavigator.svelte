@@ -2,7 +2,7 @@
   import downloadIcon from "$lib/assets/download.svg";
   import copyIcon from "$lib/assets/copy.svg";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import {
     RequestDataType,
     ResponseFormatter,
@@ -15,7 +15,7 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import StatusSuccess from "$lib/assets/status-success.svelte";
   import StatusError from "$lib/assets/status-error.svelte";
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
   import { ResponseFormatterEnum } from "@common/types/workspace";
   import BeautifyIcon from "$lib/assets/beautify.svg";
   import js_beautify, { html_beautify } from "js-beautify";

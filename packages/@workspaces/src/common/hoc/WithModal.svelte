@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
 
   export let isOpen = false;
   export let isSaveDisabled = false;
@@ -12,7 +12,7 @@
   export let isGuestUser = false;
 </script>
 
-<ModalWrapperV1
+<Modal
   title={"Save Changes?"}
   type={"dark"}
   width={"35%"}
@@ -61,4 +61,4 @@
       />
     </div>
   </div>
-</ModalWrapperV1>
+</Modal>

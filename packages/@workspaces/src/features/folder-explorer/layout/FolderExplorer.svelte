@@ -50,7 +50,7 @@
   /**
    * Components
    */
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
 
   /**
    * Types

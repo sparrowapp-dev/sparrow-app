@@ -5,7 +5,7 @@
   import { workspaceView } from "$lib/store";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
   import Members from "$lib/components/workspace/members/Members.svelte";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import { onDestroy } from "svelte";
   import type {
     CurrentTeam,
@@ -17,8 +17,8 @@
   import { base64ToURL } from "$lib/utils/helpers";
   import { PeopleIcon, ShowMoreIcon } from "$lib/assets/app.asset";
   import Settings from "./settings/Settings.svelte";
-  import Button from "@library/ui/button/Button.svelte";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import { Button } from "@sparrow/library/ui";
+  import { Modal } from "@sparrow/library/ui";
   export let userId: string;
   export let data: any;
   export let loaderColor = "default";
@@ -76,7 +76,7 @@
   let teamInvitePopup = false;
 </script>
 
-<ModalWrapperV1
+<Modal
   title={"Invite Team Members"}
   type={"dark"}
   width={"35%"}
@@ -100,7 +100,7 @@
     handleInvitePopup={(flag) => {
       teamInvitePopup = flag;
     }}
-  /></ModalWrapperV1
+  /></Modal
 >
 <svelte:window on:click={handleCloseShowMoreClick()} />
 {#if openTeam}

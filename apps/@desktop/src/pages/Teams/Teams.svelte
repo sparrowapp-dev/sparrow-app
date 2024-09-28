@@ -17,7 +17,7 @@
   import TeamExplorerPage from "../TeamExplorerPage/TeamExplorerPage.svelte";
   import { TeamSidePanel } from "@sparrow/teams/features";
   import { TeamsViewModel } from "./Teams.ViewModel";
-  import { Modal } from "@library/ui/modal";
+  import { Modal } from "@sparrow/library/ui";
   import { CreateTeam } from "@sparrow/teams/features";
   import { pagesMotion } from "../../constants";
   import { version } from "../../../src-tauri/tauri.conf.json";

@@ -1,6 +1,10 @@
 <script lang="ts">
-  import { DiscordIcon, HelpCenterIcon, SettingIcon } from "@library/icons";
-  import { Tooltip } from "@library/ui";
+  import {
+    DiscordIcon,
+    HelpCenterIcon,
+    SettingIcon,
+  } from "@sparrow/library/icons";
+  import { Tooltip } from "@sparrow/library/ui";
   import { DiscordIDs } from "@sparrow/support/common/constants/discord.constants";
   import { open } from "@tauri-apps/plugin-shell";
 

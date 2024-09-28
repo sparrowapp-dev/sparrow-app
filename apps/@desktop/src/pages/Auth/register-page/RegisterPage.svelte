@@ -8,7 +8,7 @@
   import eyeHide from "$lib/assets/eye-hide.svg";
   import eyeShow from "$lib/assets/eye-show.svg";
   import { Link } from "svelte-navigator";
-  import Loader from "@library/ui/loader/Loader.svelte";
+  import {Loader} from "@sparrow/library/ui";
 
   let userData = {
     email: "",

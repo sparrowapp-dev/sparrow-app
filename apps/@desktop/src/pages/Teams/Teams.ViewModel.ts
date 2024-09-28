@@ -2,7 +2,7 @@ import { TeamAdapter } from "../../adapter";
 import { TabRepository } from "../../repositories/tab.repository";
 import { TeamRepository } from "../../repositories/team.repository";
 import { TeamService } from "../../services/team.service";
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 import { user } from "$lib/store";
 
 import { WorkspaceRepository } from "../../repositories/workspace.repository";

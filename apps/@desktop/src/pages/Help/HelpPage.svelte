@@ -11,7 +11,7 @@
     GroupIcon,
     RoadmapIcon,
     UpdateIcon,
-  } from "@library/icons";
+  } from "@sparrow/library/icons";
   import { DiscordPost } from "@sparrow/support/features";
   import HelpPageViewModel from "./HelpPage.ViewModel";
   import { onMount } from "svelte";

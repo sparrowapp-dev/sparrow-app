@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Editor } from "@library/forms";
+  import { Editor } from "@sparrow/library/forms";
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" = "Text";
   export let value = "";
   export let isBodyBeautified = false;

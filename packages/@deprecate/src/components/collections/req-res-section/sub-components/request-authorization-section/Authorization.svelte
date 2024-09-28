@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { AuthType } from "$lib/utils/enums/authorization.enum";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";

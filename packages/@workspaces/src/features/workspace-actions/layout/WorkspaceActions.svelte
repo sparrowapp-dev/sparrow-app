@@ -6,7 +6,7 @@
   import CreateCollection from "$lib/assets/collections-faded.svg";
 
   import { Events, WorkspaceRole } from "$lib/utils/enums";
-  import { Dropdown } from "@library/ui";
+  import { Dropdown } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
@@ -26,13 +26,13 @@
     TreeIcon,
     VectorIcon,
     BubbleIcon,
-  } from "@library/icons";
+  } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/common/hoc";
   import { createDeepCopy } from "$lib/utils/helpers";
-  import { Input } from "@library/forms";
+  import { Input } from "@sparrow/library/forms";
   import { open } from "@tauri-apps/plugin-shell";
   import constants from "$lib/utils/constants";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import {
     CollectionList,

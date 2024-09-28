@@ -13,7 +13,7 @@
   // ----
 
   // ---- Interface
-  import { SocketIcon, StackIcon, TreeIcon } from "@library/icons";
+  import { SocketIcon, StackIcon, TreeIcon } from "@sparrow/library/icons";
   import { TabTypeEnum, type Tab } from "@common/types/workspace";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   // ----

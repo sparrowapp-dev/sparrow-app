@@ -11,9 +11,9 @@
   } from "$lib/utils/interfaces";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   export let collectionsMethods: CollectionsMethods;
-  import { notifications } from "@library/ui/toast/Toast";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "@library/ui/button/Button.svelte";
+  import { notifications } from "@sparrow/library/ui";
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
   import { HeaderDashboardViewModel } from "../header/header-dashboard/HeaderDashboard.ViewModel";
   import Dropdown from "../dropdown/Dropdown.svelte";
   import { requestResponseStore } from "$lib/store";
@@ -236,7 +236,7 @@
       <span class="not-found-text mx-auto ellipsis">No results found.</span>
     {/if}
   </div>
-  <ModalWrapperV1
+  <Modal
     title={"Delete Workspace?"}
     type={"danger"}
     width={"35%"}
@@ -325,9 +325,9 @@
         </div>
       </div>
     </div>
-  </ModalWrapperV1>
+  </Modal>
 
-  <ModalWrapperV1
+  <Modal
     title={"Activate Workspace"}
     type={"primary"}
     width={"35%"}
@@ -382,7 +382,7 @@
         ]}
       ></Dropdown>
     </div>
-  </ModalWrapperV1>
+  </Modal>
 </div>
 
 <style lang="scss">

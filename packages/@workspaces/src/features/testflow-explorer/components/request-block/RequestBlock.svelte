@@ -8,11 +8,11 @@
     ExclamationIcon,
     CheckIcon2,
     DropIcon,
-  } from "@library/icons";
+  } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
   import { ResponseStatusCode } from "$lib/utils/enums";
   import { InfoIcon, ArrowIcon } from "../../icons";
-  import { VectorIcon } from "@library/icons";
+  import { VectorIcon } from "@sparrow/library/icons";
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";

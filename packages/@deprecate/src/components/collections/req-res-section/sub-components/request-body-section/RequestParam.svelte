@@ -31,7 +31,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { Pane, Splitpanes } from "svelte-splitpanes";
-  import Loader from "@library/ui/loader/Loader.svelte";
+  import { Loader } from "@sparrow/library/ui";
 
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;

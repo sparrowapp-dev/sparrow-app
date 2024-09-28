@@ -6,7 +6,7 @@
     TeamServiceMethods,
     workspaceDocumentWithPosition,
   } from "$lib/utils/interfaces";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   export let workspace: workspaceDocumentWithPosition;
   export let user;
   export let isWorkspaceMemberInfo = false;

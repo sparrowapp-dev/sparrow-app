@@ -3,7 +3,7 @@
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
   import angleRight from "$lib/assets/angle-right-v2.svg";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import List from "@library/ui/list/List.svelte";
+  import { List } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
@@ -17,11 +17,11 @@
     Request as RequestType,
   } from "$lib/utils/interfaces/request.interface";
   import { onDestroy } from "svelte";
-  import { CollectionIcon } from "@library/icons";
+  import { CollectionIcon } from "@sparrow/library/icons";
   import { createDeepCopy } from "$lib/utils/helpers";
   import constants from "$lib/utils/constants";
-  import { PlusIcon } from "@library/icons";
-  import { Tooltip } from "@library/ui";
+  import { PlusIcon } from "@sparrow/library/icons";
+  import { Tooltip } from "@sparrow/library/ui";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;

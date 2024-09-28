@@ -1,5 +1,5 @@
 <script lang="ts">
-  // import { ButtonV2 } from "@library/ui";
+  // import { ButtonV2 } from "@sparrow/library/ui";
   /**
    * icon to be embedded in button
    */

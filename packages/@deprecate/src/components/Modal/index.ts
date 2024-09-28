@@ -1,1 +1,1 @@
-export { default as ModalWrapperV1 } from "./Modal.svelte";
+export { default as Modal } from "./Modal.svelte";

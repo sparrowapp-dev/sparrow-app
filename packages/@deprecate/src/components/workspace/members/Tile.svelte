@@ -7,15 +7,15 @@
     workspaceDocumentWithPosition,
   } from "$lib/utils/interfaces";
   import MemberInfoPopup from "../member-info/MemberInfo.svelte";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import { TeamRole } from "$lib/utils/enums/team.enum";
   import { v4 as uuidv4 } from "uuid";
   import { AdminLevelPermission } from "$lib/utils/constants/permissions.constant";
   import type { MemberPopType } from "$lib/utils/types/common.type";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import { Modal } from "@sparrow/library/ui";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import Button from "@library/ui/button/Button.svelte";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { Button } from "@sparrow/library/ui";
+  import { Spinner } from "@sparrow/library/ui";
   export let user: userDetails;
   export let userType: TeamRole;
   export let openTeam;
@@ -223,7 +223,7 @@
   let confirmationError: string = "";
 </script>
 
-<ModalWrapperV1
+<Modal
   title={"Remove user?"}
   type={"danger"}
   width={"35%"}
@@ -267,9 +267,9 @@
       onClick={handleMemberPopUpSuccess}
     />
   </div>
-</ModalWrapperV1>
+</Modal>
 
-<ModalWrapperV1
+<Modal
   title={"Changing Role?"}
   type={"dark"}
   width={"35%"}
@@ -335,10 +335,10 @@
         handleMemberPromotePopUpSuccess();
       }}
     />
-  </div></ModalWrapperV1
+  </div></Modal
 >
 
-<ModalWrapperV1
+<Modal
   title={"Changing Role?"}
   type={"dark"}
   width={"35%"}
@@ -398,10 +398,10 @@
         handleMemberDemotePopUpSuccess();
       }}
     />
-  </div></ModalWrapperV1
+  </div></Modal
 >
 
-<ModalWrapperV1
+<Modal
   title={"Changing Role?"}
   type={"dark"}
   width={"35%"}
@@ -494,9 +494,9 @@
       }}
     />
   </div>
-</ModalWrapperV1>
+</Modal>
 
-<ModalWrapperV1
+<Modal
   title={`Access to ${openTeam?.name}`}
   type={"dark"}
   width={"35%"}
@@ -526,7 +526,7 @@
     {handleMemberPopUpSuccess}
     {getPermissionsData}
   />
-</ModalWrapperV1>
+</Modal>
 
 <div class="d-flex tile rounded align-items-center">
   <div

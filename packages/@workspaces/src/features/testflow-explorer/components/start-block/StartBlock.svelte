@@ -2,7 +2,7 @@
   import type { Unsubscriber } from "svelte/store";
   import { Handle, Position } from "@xyflow/svelte";
   import { ArrowIcon } from "../../icons";
-  import { PlayArrow } from "@library/icons";
+  import { PlayArrow } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";

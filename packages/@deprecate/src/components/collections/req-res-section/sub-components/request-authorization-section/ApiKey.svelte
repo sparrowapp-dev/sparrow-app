@@ -1,6 +1,6 @@
 <script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
   import { AuthSection } from "$lib/utils/enums/authorization.enum";
   import { RequestAuthProperty } from "$lib/utils/enums/request.enum";
   import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";

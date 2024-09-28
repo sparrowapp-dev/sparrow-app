@@ -8,9 +8,9 @@
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "../";
   import { onMount } from "svelte";
-  import { Tooltip } from "@library/ui";
-  import SliderSwitch from "@library/forms/SliderSwitch/SliderSwitch.svelte";
-  import { ErrorInfoIcon, Information } from "@library/icons";
+  import { Tooltip } from "@sparrow/library/ui";
+  import { Switch } from "@sparrow/library/forms";
+  import { ErrorInfoIcon, Information } from "@sparrow/library/icons";
   import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
 
   // exports
@@ -326,7 +326,7 @@
                   Bulk Edit
                 </p>
 
-                <SliderSwitch
+                <Switch
                   bind:checked={bulkToggle}
                   onClick={handleBulkTextUpdate}
                   onChange={toggleBulkEdit}
@@ -699,7 +699,7 @@
                   Bulk Edit
                 </p>
 
-                <SliderSwitch
+                <Switch
                   bind:checked={bulkToggle}
                   onChange={toggleBulkEdit}
                   onClick={handleBulkTextUpdate}

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
   import { WorkspaceRole } from "$lib/utils/enums/team.enum";
-  import { Modal } from "@library/ui";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
   import type { MemberPopType } from "$lib/utils/types/common.type";
 
   export let onRemoveUserFromWorkspace;
@@ -235,8 +235,6 @@
     />
   </div>
 </div>
-
-
 
 <style>
   .member-data-container:hover {

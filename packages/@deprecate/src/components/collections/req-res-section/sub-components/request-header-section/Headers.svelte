@@ -3,7 +3,7 @@
     KeyValuePair,
     NewTab,
   } from "$lib/utils/interfaces/request.interface";
-  import { TabularInput } from "@library/forms";
+  import { TabularInput } from "@sparrow/library/forms";
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import AngleUp from "$lib/assets/angle-up.svelte";
   import AngleDown from "$lib/assets/angle-down2.svelte";

@@ -3,7 +3,7 @@
   import folder from "$lib/assets/folder.svg";
   import collection from "$lib/assets/collection.svg";
   import { ItemType, RequestMethod } from "$lib/utils/enums";
-  import { CollectionIcon, SocketIcon } from "@library/icons";
+  import { CollectionIcon, SocketIcon } from "@sparrow/library/icons";
   export let type: ItemType = ItemType.REQUEST;
   export let name = "";
   export let method = RequestMethod.GET;

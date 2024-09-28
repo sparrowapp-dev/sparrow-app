@@ -13,7 +13,7 @@
     addUsersInWorkspace,
     addUsersInWorkspacePayload,
   } from "$lib/utils/dto";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import { WorkspaceRole } from "$lib/utils/enums";
   import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
   import { validateEmail } from "$lib/utils/helpers";

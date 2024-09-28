@@ -1,7 +1,7 @@
 <script>
-  import { ArrowOutwardIcon, CrossIcon } from "@library/icons";
+  import { ArrowOutwardIcon, CrossIcon } from "@sparrow/library/icons";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
-  import { Tooltip } from "@library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
 
   export let selectedNode;
   export let onClose;

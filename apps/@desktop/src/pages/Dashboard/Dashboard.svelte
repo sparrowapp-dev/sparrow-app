@@ -19,16 +19,16 @@
   import { open } from "@tauri-apps/plugin-shell";
   import LoginPopup from "@common/components/popup/login-popup.svelte";
   import { Update, check } from "@tauri-apps/plugin-updater";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import { relaunch } from "@tauri-apps/plugin-process";
-  import ProgressBar from "@library/ui/progress/Progress.svelte";
+  import { Progress } from "@sparrow/library/ui";
+  import { List } from "@sparrow/library/ui";
   import Updater from "@common/components/updater/Updater.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import Teams from "../Teams/Teams.svelte";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import { Modal } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";
-  import { Modal } from "@library/ui";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -221,7 +221,7 @@
     onClose={handleBannerClose}
   />
   {#if showProgressBar === true}
-    <ProgressBar onClick={() => {}} title="Update in progress" />
+    <Progress onClick={() => {}} title="Update in progress" />
   {/if}
 
   <!-- 
@@ -278,7 +278,7 @@
   <LoginSignupConfirmation {handleLogin} bind:isPopupOpen />
 </Modal>
 
-<ModalWrapperV1
+<Modal
   title={"New Workspace"}
   type={"primary"}
   width={"35%"}
@@ -296,4 +296,4 @@
     }}
     onCreateWorkspace={_viewModel.handleCreateWorkspace}
   />
-</ModalWrapperV1>
+</Modal>

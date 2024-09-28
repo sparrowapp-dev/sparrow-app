@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import { SearchIcon } from "$lib/assets/icons";
-  import { Select } from "@library/forms";
-  import { CategoryIcon, CrossIcon, StackIcon } from "@library/icons";
-  import { Loader } from "@library/ui";
+  import { Select } from "@sparrow/library/forms";
+  import { CategoryIcon, CrossIcon, StackIcon } from "@sparrow/library/icons";
+  import { Loader } from "@sparrow/library/ui";
   import HelpInfoCard from "../../../common/components/HelpInfo-Card/HelpInfoCard.svelte";
   import { FeedbackType } from "@sparrow/support/common/types";
   import { onMount } from "svelte";

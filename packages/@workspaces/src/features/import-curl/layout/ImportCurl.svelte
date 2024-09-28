@@ -1,8 +1,8 @@
 <script lang="ts">
   import { Debounce } from "@common/utils";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import { Modal } from "@sparrow/library/ui";
   import TickMark from "$lib/assets/tick-mark-rounded.svelte";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { Spinner } from "@sparrow/library/ui";
   let importCurl = "";
 
   export let workspaceId: string;

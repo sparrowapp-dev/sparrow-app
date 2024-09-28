@@ -5,7 +5,7 @@ import { EnvironmentService } from "../../services/environment.service";
 import { TeamService } from "../../services/team.service";
 import { WorkspaceService } from "../../services/workspace.service";
 import { throttle } from "$lib/utils/throttle";
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 import {
   isGuestUserActive,
   isLoggout,

@@ -5,7 +5,7 @@ import { ReleaseRepository } from "../../repositories/release.repository";
 import { CannyIoService } from "../../services/canny.service";
 import { FeedbackService } from "../../services/feedback.service";
 import { ReleaseService } from "../../services/release.service";
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 import { DiscordIDs } from "@sparrow/support/common/constants/discord.constants";
 import { LearnMoreURL } from "@sparrow/support/common/constants/learnMore.constant";
 import { open } from "@tauri-apps/plugin-shell";

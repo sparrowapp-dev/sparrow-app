@@ -13,7 +13,7 @@
   import { CollectionListViewModel } from "../CollectionList.ViewModel";
   import { type CreateApiRequestPostBody } from "$lib/utils/dto";
   import { type CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { Spinner } from "@sparrow/library/ui";
   import threedotIcon from "$lib/assets/3dot.svg";
   import { CollectionService } from "@app/services/collection.service";
   import { selectMethodsStore } from "$lib/store/methods";
@@ -25,16 +25,16 @@
   import angleRight from "$lib/assets/angleRight.svg";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import { notifications } from "@library/ui/toast/Toast";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Modal } from "@sparrow/library/ui";
+  import { notifications } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import {
     workspaceLevelPermissions,
     PERMISSION_NOT_FOUND_TEXT,
   } from "$lib/utils/constants/permissions.constant";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
 
   let expand: boolean = false;
   export let explorer;
@@ -343,7 +343,7 @@
 />
 
 <div>
-  <ModalWrapperV1
+  <Modal
     title={"Delete Folder?"}
     type={"danger"}
     width={"35%"}
@@ -390,7 +390,7 @@
           handleDelete();
         }}
       />
-    </div></ModalWrapperV1
+    </div></Modal
   >
 
   {#if showMenu}

@@ -1,13 +1,13 @@
 <script>
-  import { Ellipse, LogoSymbol } from "@library/icons";
+  import { Ellipse, LogoSymbol } from "@sparrow/library/icons";
 
   let isReadMore = false;
 </script>
 
-<div  style=" padding:20px; background-color: black;">
+<div style=" padding:20px; background-color: black;">
   <div style="" class="">
     <div>
-      <p  class="text-fs-20"  style="font-weight:700;">Community</p>
+      <p class="text-fs-20" style="font-weight:700;">Community</p>
       <p class="text-fs-14" style="color: var(--text-secondary-50);">
         Stay updated with all feedback, from planning to progress, on a single
         roadmap.
@@ -25,8 +25,8 @@
     <div class="content-section px-2">
       <h2 class="text-fs-12" style="padding: 16px, 10px, 10px, 10px;">
         <LogoSymbol height="25px" width="25px" />
-        <div 
-        class="text-fs-16"
+        <div
+          class="text-fs-16"
           style="font-weight:700; padding: 3px; padding-top:9px; padding-left:5px; display:inline;"
         >
           Welcome to Sparrow’s Community Hub!
@@ -44,7 +44,10 @@
     </div>
 
     <div class="discord-section px-2">
-      <h3 class="text-fs-16" style="color: var(--text-secondary-100); font-weight:700;">
+      <h3
+        class="text-fs-16"
+        style="color: var(--text-secondary-100); font-weight:700;"
+      >
         Connect with Us
       </h3>
       <p
@@ -102,7 +105,7 @@
           >
         </p>
         <p
-        class="text-fs-14"
+          class="text-fs-14"
           style="font-weight:400;margin: 0px; padding-left:17px;  color:var(--text-secondary-50);"
         >
           Join our community and start contributing to Sparrow.
@@ -132,7 +135,7 @@
     display: none;
   }
 
-  .feedback-section.active{
+  .feedback-section.active {
     display: block;
   }
 
@@ -149,8 +152,6 @@
   .content-section {
     margin-top: 20px;
   }
-
- 
 
   .content-section p {
     margin: 10px 0;

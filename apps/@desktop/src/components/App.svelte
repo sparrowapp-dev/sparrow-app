@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Router, Route } from "svelte-navigator";
   import "font-awesome/css/font-awesome.css";
-  import Toast from "@library/ui/toast/Toast.svelte";
+  import { Toast } from "@sparrow/library/ui";
   import Authguard from "../routing/Authguard.svelte";
   import Navigate from "../routing/Navigate.svelte";
   import Dashboard from "@app/pages/Dashboard/Dashboard.svelte";

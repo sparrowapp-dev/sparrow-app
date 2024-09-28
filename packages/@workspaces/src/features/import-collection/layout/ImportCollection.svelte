@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { notifications } from "@library/ui/toast/Toast";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { notifications } from "@sparrow/library/ui";
+  import { Spinner } from "@sparrow/library/ui";
   import { CollectionService } from "@app/services/collection.service";
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
   import {
     debounce,
     isUrlValid,
@@ -13,7 +13,7 @@
   } from "$lib/utils/collections/utils.old";
   import linkIcon from "$lib/assets/linkIcon.svg";
   import { invoke } from "@tauri-apps/api/core";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@sparrow/library/ui";
   import { ContentTypeEnum, ResponseStatusCode } from "$lib/utils/enums";
   import TickMark from "$lib/assets/tick-mark-rounded.svelte";
   import { Drop } from "../components";

@@ -1,9 +1,9 @@
 <script>
-  import Loader from "@library/ui/loader/Loader.svelte";
+  import { Loader } from "@sparrow/library/ui";
   import { setUser } from "$lib/store/auth.store";
   import constants from "$lib/utils/constants";
   import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   import { navigate } from "svelte-navigator";
 

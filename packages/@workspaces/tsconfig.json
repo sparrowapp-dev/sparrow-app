@@ -14,7 +14,7 @@
     "checkJs": true,
     "isolatedModules": true,
     "paths": {
-      "@library/*": ["../packages/@library/src/*"],
+      "@sparrow/library/*": ["../packages/@sparrow/library/src/*"],
       "@common/*": ["../packages/@common/src/*"],
       "$lib/*": ["../packages/@deprecate/src/*"]
     }

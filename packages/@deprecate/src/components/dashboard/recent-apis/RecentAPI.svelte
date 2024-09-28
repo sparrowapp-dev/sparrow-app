@@ -1,5 +1,5 @@
 <script lang="ts">
-  import List from "@library/ui/list/List.svelte";
+  import { List } from "@sparrow/library/ui";
   import constants from "$lib/utils/constants";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import Helper from "./Helper.svelte";

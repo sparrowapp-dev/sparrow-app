@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { Spinner } from "@sparrow/library/ui";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
@@ -14,12 +14,12 @@
   import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import { setAuthType, setBodyType } from "$lib/utils/helpers/auth.helper";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import { notifications } from "@library/ui/toast/Toast";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Modal } from "@sparrow/library/ui";
+  import { notifications } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import reloadSyncIcon from "$lib/assets/reload-sync.svg";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
 
   export let name: string;
   export let id: string;
@@ -302,7 +302,7 @@
   };
 </script>
 
-<ModalWrapperV1
+<Modal
   title={"Delete Request?"}
   type={"danger"}
   width={"35%"}
@@ -345,7 +345,7 @@
         handleDelete();
       }}
     />
-  </div></ModalWrapperV1
+  </div></Modal
 >
 
 {#if showMenu}

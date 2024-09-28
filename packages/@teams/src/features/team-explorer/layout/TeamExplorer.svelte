@@ -8,7 +8,7 @@
   import { PeopleIcon } from "$lib/assets/app.asset";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { TeamRole } from "$lib/utils/enums";
-  import { Button } from "@library/ui";
+  import { Button } from "@sparrow/library/ui";
   import TeamNavigator from "../components/team-navigator/TeamNavigator.svelte";
   import {
     TeamTabsEnum,
@@ -17,8 +17,8 @@
   import { WorkspaceListView } from "../components";
   import WorkspaceGridView from "../components/workspace-grid-view/WorkspaceGridView.svelte";
   import { TeamMembers, TeamSettings } from "@sparrow/teams/features";
-  import { CrossIcon, MoreOptions } from "@library/icons";
-  import { Tooltip, Dropdown } from "@library/ui";
+  import { CrossIcon, MoreOptions } from "@sparrow/library/icons";
+  import { Tooltip, Dropdown } from "@sparrow/library/ui";
 
   /**
    * user ID

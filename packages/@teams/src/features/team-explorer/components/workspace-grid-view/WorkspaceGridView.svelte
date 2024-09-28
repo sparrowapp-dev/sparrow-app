@@ -6,7 +6,7 @@
     RightIcon,
   } from "$lib/assets/app.asset";
   import type { WorkspaceDocument } from "@app/database/database";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@sparrow/library/ui";
   import { WorkspaceGrid } from "@sparrow/teams/common/compopnents";
   import { TeamSkeleton } from "../../images";
 

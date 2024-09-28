@@ -3,7 +3,7 @@
   import copyIcon from "$lib/assets/copy.svg";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import {
     RequestDataType,
     ResponseFormatter,
@@ -19,7 +19,7 @@
   import StatusSuccess from "$lib/assets/status-success.svelte";
   import StatusError from "$lib/assets/status-error.svelte";
   import CodeMirrorResponse from "$lib/components/editor/CodeMirrorResponse.svelte";
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
 
   export let response;
   export let apiState;

@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { Select } from "@library/forms";
-  import { CloudOffIcon, SparrowEdgeIcon, StackIcon } from "@library/icons";
+  import { Select } from "@sparrow/library/forms";
+  import {
+    CloudOffIcon,
+    SparrowEdgeIcon,
+    StackIcon,
+  } from "@sparrow/library/icons";
   import { environmentType } from "$lib/utils/enums";
-  import { ArrowIcon } from "@library/icons";
-  import { DownArrowIcon } from "$lib/assets/icons";
-  import ArrowUnfilled from "@library/icons/ArrowUnfilled.svelte";
-  import { Tooltip } from "@library/ui";
-  import { SparrowIcon } from "@library/icons";
+  import { SparrowIcon } from "@sparrow/library/icons";
   import constants from "$lib/utils/constants";
   import type { WorkspaceDocument } from "@app/database/database";
-  import { PlusIcon } from "@library/icons";
+  import { PlusIcon } from "@sparrow/library/icons";
   import { navigate } from "svelte-navigator";
   import PopupHint from "./sub-component/PopupHint.svelte";
   import UserProfileModal, {

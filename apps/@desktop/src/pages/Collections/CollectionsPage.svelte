@@ -29,7 +29,7 @@
     SaveAsCollectionItem,
   } from "@sparrow/workspaces/features";
   import { WithModal } from "@sparrow/workspaces/common/hoc";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
 
   // ---- Interface, enum & constants
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
@@ -53,7 +53,7 @@
     WorkspaceDocument,
   } from "@app/database/database";
   import type { GithubRepoDocType } from "../../models/github-repo.model";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import { Modal } from "@sparrow/library/ui";
   import { isGuestUserActive } from "$lib/store";
   import { pagesMotion } from "../../constants";
   import { user } from "$lib/store";
@@ -514,7 +514,7 @@
     onUploadFile={_viewModel.uploadFormFile}
     onExtractGitBranch={_viewModel.extractGitBranch}
   /> -->
-<ModalWrapperV1
+<Modal
   title={"New Collection"}
   type={"dark"}
   width={"35%"}
@@ -582,10 +582,10 @@
       return response;
     }}
   />
-</ModalWrapperV1>
+</Modal>
 
 <!-- {#if isImportCurlPopup} -->
-<ModalWrapperV1
+<Modal
   title={"Import cURL"}
   type={"dark"}
   width={"35%"}
@@ -601,10 +601,10 @@
     onItemImported={_viewModel.handleImportItem}
     onValidateCurl={_viewModel.handleValidateCurl}
   />
-</ModalWrapperV1>
+</Modal>
 <!-- {/if} -->
 
-<ModalWrapperV1
+<Modal
   title={"Save Request"}
   type={"dark"}
   width={"55%"}
@@ -665,7 +665,7 @@
     onRenameCollection={_viewModel.handleSaveAsRenameCollection}
     onRenameFolder={_viewModel.handleSaveAsRenameFolder}
   />
-</ModalWrapperV1>
+</Modal>
 
 <style>
   :global(.collection-splitter .splitpanes__splitter) {

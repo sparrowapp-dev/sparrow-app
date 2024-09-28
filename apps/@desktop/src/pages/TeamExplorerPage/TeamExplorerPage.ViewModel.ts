@@ -15,7 +15,7 @@ import { TeamService } from "../../services/team.service";
 import { UserService } from "../../services/user.service";
 import { WorkspaceService } from "../../services/workspace.service";
 import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 import { BehaviorSubject, Observable } from "rxjs";
 import { navigate } from "svelte-navigator";
 import { v4 as uuidv4 } from "uuid";

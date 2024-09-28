@@ -1,8 +1,8 @@
 <script lang="ts">
   import BeautifyIcon from "$lib/assets/beautify.svg";
   import { RequestDataType, RequestDataset } from "$lib/utils/enums";
-  import { Button } from "@library/ui";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { Button } from "@sparrow/library/ui";
+  import { notifications } from "@sparrow/library/ui";
   import { WithSelect } from "@sparrow/workspaces/common/hoc";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";

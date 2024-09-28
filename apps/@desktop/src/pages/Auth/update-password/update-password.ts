@@ -1,7 +1,7 @@
 import { verifyEmail } from "../../../services/auth.service";
 import { errorMessageText } from "$lib/store/auth.store";
 import type { verifyPostbody } from "$lib/utils/dto";
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 export const isSuccessfulResponse = writable(false);
 
 import { navigate } from "svelte-navigator";

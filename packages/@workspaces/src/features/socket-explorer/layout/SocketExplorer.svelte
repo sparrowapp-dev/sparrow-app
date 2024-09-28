@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Loader from "@library/ui/loader/Loader.svelte";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import { Loader } from "@sparrow/library/ui";
+  import { Modal } from "@sparrow/library/ui";
   import { Splitpanes, Pane } from "svelte-splitpanes";
 
   import type { CollectionDocument } from "@app/database/database";
@@ -215,7 +215,7 @@
       </div>
     </div>
   </div>
-  <ModalWrapperV1
+  <Modal
     title={"Save Request"}
     type={"dark"}
     width={"55%"}
@@ -242,7 +242,7 @@
       {onRenameCollection}
       {onRenameFolder}
     />
-  </ModalWrapperV1>
+  </Modal>
 {/if}
 
 <style>

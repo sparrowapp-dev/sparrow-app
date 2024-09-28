@@ -4,7 +4,7 @@
   import { TeamExplorerPageViewModel } from "./TeamExplorerPage.ViewModel";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { user } from "$lib/store";
-  import { Modal } from "@library/ui";
+  import { Modal } from "@sparrow/library/ui";
   import { LeaveTeam } from "@sparrow/teams/features";
 
   import { DeleteWorkspace } from "@common/features";

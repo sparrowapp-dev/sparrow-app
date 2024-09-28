@@ -1,7 +1,7 @@
 <script lang="ts">
   import { type UpdateRequestStateType } from "@sparrow/workspaces/common/type";
   import { RequestSectionEnum } from "@common/types/workspace";
-  import { Label } from "@library/ui";
+  import { Label } from "@sparrow/library/ui";
   import { SocketSectionEnum } from "@common/types/workspace/web-socket";
   export let requestStateSection: string | undefined;
   export let paramsLength = 0;

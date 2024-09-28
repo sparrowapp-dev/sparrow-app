@@ -35,7 +35,7 @@
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { editLink } from "$lib/store/api-request";
   import { v4 as uuidv4 } from "uuid";
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
 
   export const loaderColor = "default";
   export let activeTab;

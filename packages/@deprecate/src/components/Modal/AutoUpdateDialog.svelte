@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { notifications } from "@library/ui/toast/Toast";
-  import ProgressBar from "@library/ui/progress/Progress.svelte";
+  import { notifications } from "@sparrow/library/ui";
+  import ProgressBar from "import { List } from "@sparrow/library/ui";progress/Progress.svelte";
   import { Update, check } from "@tauri-apps/plugin-updater";
   import { relaunch } from "@tauri-apps/plugin-process";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "@library/ui/button/Button.svelte";
-  
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
+
   let showProgressBar = false;
   let updateAvailable = false;
   let newAppVersion: string | undefined = "";
@@ -56,7 +56,7 @@
   <ProgressBar onClick={handleUpdatePopUp} title="Update in progress" />{/if}
 
 {#if updateAvailable === true}
-  <ModalWrapperV1
+  <Modal
     title={`New Update Available - v${newAppVersion}`}
     type={"primary"}
     width={"50%"}
@@ -89,7 +89,7 @@
         loader={false}
         onClick={initiateUpdate}
       />
-    </div></ModalWrapperV1
+    </div></Modal
   >{/if}
 
 <style>

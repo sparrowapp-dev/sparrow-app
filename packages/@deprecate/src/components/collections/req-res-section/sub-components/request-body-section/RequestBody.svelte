@@ -20,8 +20,8 @@
   export let activeTab;
   export let environmentVariables;
 
-  import CodeMirror from "@library/forms/editor/Editor.svelte";
-  import { Select } from "@library/forms";
+  import CodeMirror from "@sparrow/library/forms/editor/Editor.svelte";
+  import { Select } from "@sparrow/library/forms";
 
   let currentTabId: string = "";
   let mainTab: string;

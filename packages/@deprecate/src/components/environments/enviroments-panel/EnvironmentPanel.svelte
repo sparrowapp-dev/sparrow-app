@@ -7,9 +7,9 @@
   } from "$lib/utils/interfaces/environment.interface";
   import { EnvironmentPanelViewModel } from "./EnvironmentPanel.ViewModel";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import QuickHelp from "./sub-components/quick-help/QuickHelp.svelte";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { Spinner } from "@sparrow/library/ui";
   import { environmentType } from "$lib/utils/enums/environment.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
@@ -19,7 +19,7 @@
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;

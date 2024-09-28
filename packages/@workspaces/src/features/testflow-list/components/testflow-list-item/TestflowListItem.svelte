@@ -6,10 +6,10 @@
     Tooltip,
     Options,
     Spinner,
-    Modal as ModalWrapperV1,
-  } from "@library/ui";
+    Modal as Modal,
+  } from "@sparrow/library/ui";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import { TreeIcon } from "@library/icons";
+  import { TreeIcon } from "@sparrow/library/icons";
   import {
     TFDefaultEnum,
     type TFDocumentType,
@@ -145,7 +145,7 @@
   let deleteTestflowLoader: boolean = false;
 </script>
 
-<ModalWrapperV1
+<Modal
   title={`Delete Flow?`}
   type={"danger"}
   width={"35%"}
@@ -189,7 +189,7 @@
         deleteTestflowLoader = false;
       }}
     />
-  </div></ModalWrapperV1
+  </div></Modal
 >
 
 {#if showMenu}

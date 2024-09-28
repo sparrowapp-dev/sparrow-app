@@ -41,8 +41,8 @@
     TableNavbar,
     TableSidebar,
   } from "@sparrow/workspaces/common/components";
-  import { RunIcon } from "@library/icons";
-  import { Modal } from "@library/ui";
+  import { RunIcon } from "@sparrow/library/icons";
+  import { Modal } from "@sparrow/library/ui";
   import DeleteNode from "../../../common/components/delete-node/DeleteNode.svelte";
   import { ResponseStatusCode } from "$lib/utils/enums";
   import type {

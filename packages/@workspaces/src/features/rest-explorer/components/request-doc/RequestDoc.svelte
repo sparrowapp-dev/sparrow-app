@@ -2,7 +2,7 @@
   import { Events } from "$lib/utils/enums";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { generatingImage } from "@common/images";
-  import { TextEditor } from "@library/forms";
+  import { TextEditor } from "@sparrow/library/forms";
   import { AISuggestionBox } from "../../../../features/chat-bot/components";
 
   export let onUpdateRequestDescription;

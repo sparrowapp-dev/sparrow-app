@@ -1,6 +1,6 @@
 <script lang="ts">
   import { SearchIcon } from "$lib/assets/icons";
-  import { PencilIcon } from "@library/icons";
+  import { PencilIcon } from "@sparrow/library/icons";
   import { createEventDispatcher } from "svelte";
 
   /**

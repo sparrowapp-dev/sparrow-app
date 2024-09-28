@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CrossIcon } from "@library/icons";
+  import { CrossIcon } from "@sparrow/library/icons";
 
   import { scale, fade } from "svelte/transition";
   import warningIcon from "$lib/assets/download-warning.svg";

@@ -1,6 +1,6 @@
 <script>
   import { SearchIcon } from "$lib/assets/icons";
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
   import {
     ArrowUnfilledIcon,
     CrossIcon,
@@ -8,13 +8,13 @@
     LinkedinIcon,
     LinkIcon,
     ThumbIcon,
-  } from "@library/icons";
+  } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   import { marked } from "marked";
   import constants from "$lib/utils/constants";
-  import { Loader, Tooltip } from "@library/ui";
+  import { Loader, Tooltip } from "@sparrow/library/ui";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import { open } from "@tauri-apps/plugin-shell";
   import { UpdatesTagType } from "../../../common/types/feedback";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";

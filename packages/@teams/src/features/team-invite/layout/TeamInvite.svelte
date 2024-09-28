@@ -9,7 +9,7 @@
   } from "$lib/utils/helpers";
 
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
-  import { Button, IconFallback } from "@library/ui";
+  import { Button, IconFallback } from "@sparrow/library/ui";
 
   export let onInviteClick;
   export let workspaces;
@@ -22,8 +22,8 @@
   export let onValidateEmail;
 
   import closeIconWhite from "$lib/assets/close-icon-white.svg";
-  import { MultiSelect, Select } from "@library/forms";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { MultiSelect, Select } from "@sparrow/library/forms";
+  import { notifications } from "@sparrow/library/ui";
 
   let emailstoBeSentArr: string[] = [];
   let teamSpecificWorkspace = workspaces.map((elem) => {

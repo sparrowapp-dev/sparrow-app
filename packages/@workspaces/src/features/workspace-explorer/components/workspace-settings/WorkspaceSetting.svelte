@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Input } from "@library/forms";
+  import { Input } from "@sparrow/library/forms";
   import { Shimmer } from "../../images";
   import { user } from "$lib/store";
   import { Member } from "./sub-workspace-settings";

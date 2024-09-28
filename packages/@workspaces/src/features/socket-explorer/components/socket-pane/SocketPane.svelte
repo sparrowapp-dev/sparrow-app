@@ -1,5 +1,5 @@
 <script lang="ts">
-  // import CodeMirror from "@library/forms/editor/Editor.svelte";
+  // import CodeMirror from "@sparrow/library/forms/editor/Editor.svelte";
 
   class RequestParamTab {
     tabName: string = "";

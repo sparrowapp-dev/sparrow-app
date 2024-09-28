@@ -4,8 +4,8 @@
   // ---- document models
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   // ---- library
-  import { Input } from "@library/forms";
-  import { Button, IconFallback } from "@library/ui";
+  import { Input } from "@sparrow/library/forms";
+  import { Button, IconFallback } from "@sparrow/library/ui";
   export let isDeleteWorkspaceModalOpen = false;
   export let workspace: WorkspaceDocument;
   export let openTeam: TeamDocument;

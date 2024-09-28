@@ -8,11 +8,11 @@
     createDynamicComponents,
     validateEmail,
   } from "$lib/utils/helpers";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
 
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@sparrow/library/ui";
 
   export let onSubmit;
   export let updateRepo;

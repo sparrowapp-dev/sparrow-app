@@ -5,12 +5,12 @@
     SaveRequestType,
     UpdateRequestUrlType,
   } from "@sparrow/workspaces/common/type";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import { DropButton } from "@sparrow/workspaces/common/components";
   import { CodeMirrorInput } from "../../../../common/components";
   import { UrlInputTheme } from "../../../../common/utils/";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-  import { DiskIcon } from "@library/icons";
+  import { Tooltip } from "@sparrow/library/ui";
+  import { DiskIcon } from "@sparrow/library/icons";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   let componentClass = "";

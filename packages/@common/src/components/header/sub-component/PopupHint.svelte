@@ -1,8 +1,8 @@
 <script>
-  import { CloudOffIcon } from "@library/icons";
-  import CrossIconRounded from "@library/icons/CrossIconRounded.svelte";
+  import { CloudOffIcon } from "@sparrow/library/icons";
+  import { CrossIconRounded } from "@sparrow/library/icons";
 
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
   import { onMount } from "svelte";
 
   let showMessage = true;

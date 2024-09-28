@@ -7,7 +7,7 @@ export default defineConfig(async () => ({
   plugins: [svelte()],
   resolve: {
     alias: {
-      "@library": path.resolve("../@library/src/"),
+      "@sparrow/library": path.resolve("../@sparrow/library/src/"),
     },
   },
 

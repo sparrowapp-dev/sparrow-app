@@ -15,7 +15,7 @@ import { CollectionService } from "../../services/collection.service";
 import { UpdatesService } from "../../services/updates.service";
 import { WorkspaceService } from "../../services/workspace.service";
 import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 import type { Observable } from "rxjs";
 
 export default class WorkspaceExplorerViewModel {

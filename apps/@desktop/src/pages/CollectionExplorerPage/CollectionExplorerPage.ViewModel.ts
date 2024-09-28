@@ -9,7 +9,7 @@ import { CollectionService } from "../../services/collection.service";
 import type { CollectionDocument, TabDocument } from "../../database/database";
 
 // Notification
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 
 // Utils
 import { moveNavigation } from "$lib/utils/helpers";

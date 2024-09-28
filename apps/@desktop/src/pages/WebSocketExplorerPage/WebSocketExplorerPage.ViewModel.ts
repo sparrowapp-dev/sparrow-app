@@ -40,7 +40,7 @@ import {
   type Tab,
   type CollectionItemsDto,
 } from "@common/types/workspace";
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 import { CollectionService } from "../../services/collection.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";

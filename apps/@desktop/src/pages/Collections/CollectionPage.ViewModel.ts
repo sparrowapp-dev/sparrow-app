@@ -25,7 +25,7 @@ import {
   insertCollectionDirectory,
 } from "../../services/collection";
 import { CollectionService } from "../../services/collection.service";
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 // import { setContentTypeHeader } from "$lib/utils/helpers";
 
 //-----

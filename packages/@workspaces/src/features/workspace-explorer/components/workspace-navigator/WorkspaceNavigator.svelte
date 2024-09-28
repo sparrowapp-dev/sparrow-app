@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { InformationIcon, SettingIcon } from "@library/icons";
+  import { InformationIcon, SettingIcon } from "@sparrow/library/icons";
   import { WorkspaceRole } from "$lib/utils/enums";
 
   /**

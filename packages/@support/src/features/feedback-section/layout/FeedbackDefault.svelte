@@ -1,5 +1,5 @@
 <script>
-  import { IconFallback } from "@library/ui";
+  import { IconFallback } from "@sparrow/library/ui";
   import { AddFeedback } from "../../../features/add-feedback";
   export let userInfo;
   export let onInputFeedback;

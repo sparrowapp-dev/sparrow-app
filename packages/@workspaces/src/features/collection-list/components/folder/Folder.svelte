@@ -7,16 +7,16 @@
   import threedotIcon from "$lib/assets/3dot.svg";
   import AddIcon from "$lib/assets/add.svg";
   import requestIcon from "$lib/assets/create_request.svg";
-  import { RequestIcon } from "@library/icons";
+  import { RequestIcon } from "@sparrow/library/icons";
   import angleRight from "$lib/assets/angle-right-v2.svg";
 
   // ---- Components
   import Request from "../request/Request.svelte";
-  import { Spinner } from "@library/ui";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "@library/ui/button/Button.svelte";
-  import { Options } from "@library/ui";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Spinner } from "@sparrow/library/ui";
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
+  import { Options } from "@sparrow/library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
 
   // ---- Enum, Constants and Interface
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
@@ -188,7 +188,7 @@
   on:contextmenu|preventDefault={handleSelectClick}
 />
 <div>
-  <ModalWrapperV1
+  <Modal
     title={"Delete Folder?"}
     type={"danger"}
     width={"35%"}
@@ -243,7 +243,7 @@
           isFolderPopup = false;
         }}
       />
-    </div></ModalWrapperV1
+    </div></Modal
   >
 
   {#if showMenu}

@@ -1,7 +1,7 @@
 <script>
-  import { DiskIcon } from "@library/icons";
+  import { DiskIcon } from "@sparrow/library/icons";
 
-  import { Tooltip } from "@library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
   export let isSave;
   export let isTestflowEditable;
   export let onSaveTestflow;
@@ -30,8 +30,8 @@
         color={isSave || !isTestflowEditable
           ? "var(--icon-secondary-380)"
           : isHovered
-          ? "var(--icon-primary-200)"
-          : "var(--icon-secondary-100)"}
+            ? "var(--icon-primary-200)"
+            : "var(--icon-secondary-100)"}
       />
     </button>
   </Tooltip>

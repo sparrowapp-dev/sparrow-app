@@ -12,7 +12,7 @@
   import close from "$lib/assets/cross.svg";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "..";
-  import { Tooltip } from "@library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
   export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
   export let callback: (pairs: KeyValuePair[]) => void;
   export let readable: { key: string; value: string } = {

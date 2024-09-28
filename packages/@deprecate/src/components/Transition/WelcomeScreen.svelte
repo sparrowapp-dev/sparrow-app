@@ -1,6 +1,6 @@
 <script lang="ts">
   import icons from "$lib/assets/app.asset";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { Spinner } from "@sparrow/library/ui";
   import { register_user, setUser } from "$lib/store/auth.store";
   import constants from "$lib/utils/constants";
   import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";

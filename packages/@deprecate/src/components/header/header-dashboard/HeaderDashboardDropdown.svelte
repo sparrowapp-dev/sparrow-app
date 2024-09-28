@@ -12,14 +12,14 @@
     isWorkspaceLoaded,
   } from "$lib/store/workspace.store";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
 
   import type {
     CurrentTeam,
     CurrentWorkspace,
     CollectionsMethods,
   } from "$lib/utils/interfaces";
-  import { Button, Input, ModalWrapperV1, SelectInput } from "$lib/components";
+  import { Button, Input, Modal, SelectInput } from "$lib/components";
   import type {
     InvalidWorkspacePostBody,
     WorkspacePostBody,
@@ -294,7 +294,7 @@
 </script>
 
 <!-- Create New Workspace POP UP -->
-<ModalWrapperV1
+<Modal
   title={"New Workspace"}
   type={"dark"}
   width={"35%"}
@@ -359,7 +359,7 @@
       }}
     />
   </div>
-</ModalWrapperV1>
+</Modal>
 {#if currentWorkspace?.name && currentWorkspace?.id && currentTeam?.name}
   <Dropdown
     dropdownId="header-dropdown"

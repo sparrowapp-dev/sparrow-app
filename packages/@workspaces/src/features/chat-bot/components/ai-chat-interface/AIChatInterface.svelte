@@ -1,7 +1,7 @@
 <script lang="ts">
   import { SparrowAIIcon } from "@common/icons";
   import { AISuggestionBox, PromptInput, ChatItem } from "../";
-  import { AISparkle, CrossIcon } from "@library/icons";
+  import { AISparkle, CrossIcon } from "@sparrow/library/icons";
   import { cubicOut } from "svelte/easing";
   import { generatingImage } from "@common/images";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";

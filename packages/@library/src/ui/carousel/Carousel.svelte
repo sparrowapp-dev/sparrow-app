@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { CarouselDataType } from "./types/carousel-data.type";
-  import { Ellipse } from "@library/icons";
+  import { Ellipse } from "@sparrow/library/icons";
   export let data: CarouselDataType[] = [];
   let stepData = data[0];
   let currentStep = 0;
@@ -63,10 +63,7 @@
       </div>
     </div>
   </div>
-  <header
-    class="d-flex"
-    style=" height:auto; 	justify-content: space-between;"
-  >
+  <header class="d-flex" style=" height:auto; 	justify-content: space-between;">
     <div>
       {#if currentStep > 0}
         <button

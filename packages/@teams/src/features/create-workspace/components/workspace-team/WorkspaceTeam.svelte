@@ -2,7 +2,7 @@
   /**
    * Components
    */
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
 
   /**
    * Constants

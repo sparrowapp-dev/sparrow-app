@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getMethodStyle } from "$lib/utils/helpers";
   import type { CollectionDocument } from "@app/database/database";
-  import { CollectionIcon, FolderIcon2 } from "@library/icons";
+  import { CollectionIcon, FolderIcon2 } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
   import DropdownArrow from "../../icons/DropdownArrow.svelte";

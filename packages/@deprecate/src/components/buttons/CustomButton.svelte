@@ -3,7 +3,7 @@
    * @deprecated This component is deprecated and will be removed in future releases.
    * Please use Button Component instead.
    */
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { Spinner } from "@sparrow/library/ui";
 
   enum BtnType {
     PRIMARY = "primary",

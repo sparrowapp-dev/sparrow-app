@@ -12,9 +12,9 @@
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import type { RequestBody } from "$lib/utils/interfaces/request.interface";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { Spinner } from "@sparrow/library/ui";
   import lockicon from "$lib/assets/lock-icon.svg";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { setContentTypeHeader } from "$lib/utils/helpers/auth.helper";
   import { RequestDataset } from "$lib/utils/enums/request.enum";
@@ -24,12 +24,12 @@
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import { Modal } from "@sparrow/library/ui";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@sparrow/library/ui";
   import UserProfileList from "$lib/components/profile/UserProfileList.svelte";
   import FloppyDisk from "$lib/assets/floppy-disk.svelte";
   import { PenIcon } from "$lib/assets/icons";
@@ -255,7 +255,7 @@
   };
 </script>
 
-<ModalWrapperV1
+<Modal
   title={"Delete Request?"}
   type={"danger"}
   width={"35%"}
@@ -298,7 +298,7 @@
         handleDelete();
       }}
     />
-  </div></ModalWrapperV1
+  </div></Modal
 >
 
 <div class="d-flex flex-column" data-tauri-drag-region>
@@ -433,7 +433,7 @@
                   },
                 ]}
               ></Dropdown>
-              <ModalWrapperV1
+              <Modal
                 title={"Save Request"}
                 type={"dark"}
                 width={"55%"}
@@ -447,7 +447,7 @@
                   {currentCollection}
                   onClick={handleBackdrop}
                 />
-              </ModalWrapperV1>
+              </Modal>
             </span>
           </div>
           <div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Editor } from "@library/forms";
+  import { Editor } from "@sparrow/library/forms";
   import {
     RequestDataTypeEnum,
     ResponseFormatterEnum,

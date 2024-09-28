@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@sparrow/library/ui";
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
   let componentClass = "";

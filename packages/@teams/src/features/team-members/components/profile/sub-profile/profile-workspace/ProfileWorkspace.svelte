@@ -1,7 +1,7 @@
 <script lang="ts">
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
   import type { workspaceDocumentWithPosition } from "$lib/utils/interfaces";
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
   export let workspace: workspaceDocumentWithPosition;
   export let user;
   export let userType;
@@ -59,9 +59,12 @@
 </script>
 
 <section>
-  <div class="d-flex justify-content-between align-items-center mb-1"
-  style="height: 34px; ">
-    <span style="font-size:12px; font-weight:400; " class="text-whiteColor">{workspace.name}</span
+  <div
+    class="d-flex justify-content-between align-items-center mb-1"
+    style="height: 34px; "
+  >
+    <span style="font-size:12px; font-weight:400; " class="text-whiteColor"
+      >{workspace.name}</span
     >
     <div class="dropdown-workspace-access">
       {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}
@@ -80,7 +83,7 @@
             {
               name: "Remove",
               id: "remove",
-              color:"danger",
+              color: "danger",
             },
           ]}
           onclick={handleDropdown}
@@ -115,7 +118,7 @@
             {
               name: "Remove",
               id: "remove",
-              color:"danger",
+              color: "danger",
             },
           ]}
           titleId={workspace.position ? workspace.position : ""}

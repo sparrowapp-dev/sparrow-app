@@ -6,13 +6,13 @@
     LikeIcon,
     SortIcon,
     TableChart,
-  } from "@library/icons";
+  } from "@sparrow/library/icons";
   import { UpvoteIcon } from "@sparrow/support/common/components";
   import FeedbackPost from "../../../features/feedback-section/layout/FeedbackPost.svelte";
   import { onMount } from "svelte";
   import { SearchIcon } from "$lib/assets/app.asset";
-  import { Select } from "@library/forms";
-  import { CategoryIcon, StatusIcon } from "@library/icons";
+  import { Select } from "@sparrow/library/forms";
+  import { CategoryIcon, StatusIcon } from "@sparrow/library/icons";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
@@ -20,18 +20,18 @@
     FeedbackStatusType,
     FeedbackType,
   } from "../../../common/types/feedback";
-  import { tickIcon } from "@library/forms/select/svgs";
-  import { IconFallback } from "@library/ui";
-  import { Like } from "@library/ui/like";
+  import { TickIcon } from "@sparrow/library/icons";
+  import { IconFallback } from "@sparrow/library/ui";
+
   import {
     ActivityStatusType,
     ActivityType,
   } from "../../../common/types/activity";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
-  import Loader from "@library/ui/loader/Loader.svelte";
+  import { Spinner } from "@sparrow/library/ui";
+  import { Loader } from "@sparrow/library/ui";
   import { FormatTime } from "@common/utils/formatTime";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
-  import ArrowOutward from "@library/icons/ArrowOutward.svelte";
+  import { ArrowOutwardIcon } from "@sparrow/library/icons";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
@@ -299,20 +299,32 @@
               handleSortChange("newest");
               MixpanelEvent(Events.Activity_SortBy_Filter);
             }}
-            class={`sort-button ${currentSort === "newest" && "selected-sort"}`}
+            class={`d-flex align-items-center sort-button ${currentSort === "newest" && "selected-sort"}`}
           >
-            Newest
-            <img src={tickIcon} alt="" class="tick-icon" />
+            <span> Newest </span>
+            {#if currentSort === "newest" && "selected-sort"}
+              <TickIcon
+                height={"14px"}
+                width={"14px"}
+                color={"var(--icon-primary-300)"}
+              />
+            {/if}
           </button>
           <button
             on:click={() => {
               handleSortChange("oldest");
               MixpanelEvent(Events.Activity_SortBy_Filter);
             }}
-            class={`sort-button ${currentSort === "oldest" && "selected-sort"}`}
+            class={`d-flex align-items-center sort-button ${currentSort === "oldest" && "selected-sort"}`}
           >
-            Oldest
-            <img src={tickIcon} alt="" class="tick-icon" />
+            <span> Oldest </span>
+            {#if currentSort === "oldest" && "selected-sort"}
+              <TickIcon
+                height={"14px"}
+                width={"14px"}
+                color={"var(--icon-primary-300)"}
+              />
+            {/if}
           </button>
         </div>
       </div>
@@ -462,7 +474,7 @@
                                     style="font-size: 12px; letter-spacing: 0.25px; font-weight: 400;"
                                     >Go to post</span
                                   >
-                                  <ArrowOutward
+                                  <ArrowOutwardIcon
                                     height={"10px"}
                                     width={"10px"}
                                     color={"white"}
@@ -486,10 +498,10 @@
                             </span>
                             <a href="#" class="comment-reply">Reply</a>
                           </div>
-                          <!-- <div class="comment-likes">
-                          <Like />
-                          <span class="like-count">{comment.likeCount}</span>
-                        </div> -->
+                          <div class="comment-likes">
+                            <LikeIcon />
+                            <span class="like-count">{comment.likeCount}</span>
+                          </div>
                         </div>
                       </div>
                     </li>

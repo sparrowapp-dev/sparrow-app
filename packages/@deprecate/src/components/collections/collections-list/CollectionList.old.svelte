@@ -52,8 +52,8 @@
 
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { username } from "$lib/store/auth.store";
-  import { notifications } from "@library/ui/toast/Toast";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { notifications } from "@sparrow/library/ui";
+  import { Spinner } from "@sparrow/library/ui";
   import EnvironmentDropdown from "$lib/components/dropdown/EnvironmentDropdown.svelte";
   import { environmentType } from "$lib/utils/enums/environment.enum";
   import { createCollectionSource } from "$lib/store/event-source.store";
@@ -65,7 +65,7 @@
   import ImportCollection from "./import-collection/ImportCollection.svelte";
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
-  import List from "@library/ui/list/List.svelte";
+  import { List } from "@sparrow/library/ui";
   import ImportCurl from "./import-curl/ImportCurl.svelte";
 
   const [, , searchNode] = useTree();

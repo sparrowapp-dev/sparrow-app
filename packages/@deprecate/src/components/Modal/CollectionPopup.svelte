@@ -7,7 +7,7 @@
   import { CollectionService } from "@app/services/collection.service";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import Button from "../buttons/Button.svelte";
   import { fly, fade } from "svelte/transition";
   export let collectionId: string;

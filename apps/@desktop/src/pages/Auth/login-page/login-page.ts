@@ -1,7 +1,7 @@
 import { loginUser } from "../../../services/auth.service";
 import constants from "$lib/utils/constants";
 import type { loginUserPostBody } from "$lib/utils/dto";
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 import { checkValidation, loginSchema } from "$lib/utils/validation";
 import { navigate } from "svelte-navigator";
 import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";

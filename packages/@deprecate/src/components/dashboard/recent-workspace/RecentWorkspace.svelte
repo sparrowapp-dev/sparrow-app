@@ -6,7 +6,7 @@
   import { navigate } from "svelte-navigator";
   import { PeopleIcon } from "$lib/assets/app.asset";
   import constants from "$lib/utils/constants";
-  import List from "@library/ui/list/List.svelte";
+  import { List } from "@sparrow/library/ui";
   import type { Team } from "$lib/utils/interfaces";
   export let openTeam: Team;
   export let data: any;

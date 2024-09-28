@@ -1,16 +1,16 @@
 <script lang="ts">
   // ---- SVG
-  import AngleRight from "@library/icons/AngleRight.svelte";
-  import AngleLeft from "@library/icons/AngleLeft.svelte";
-  import PlusIcon from "@library/icons/PlusIcon.svelte";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { AngleRightIcon } from "@sparrow/library/icons";
+  import { AngleLeftIcon } from "@sparrow/library/icons";
+  import { PlusIcon } from "@sparrow/library/icons";
+  import { Tooltip } from "@sparrow/library/ui";
 
   // ---- Interface
   import type { TabDocument } from "@app/database/database";
 
   // ---- Component
   import Tab from "../components/tab/Tab.svelte";
-  import { Dropdown } from "@library/ui";
+  import { Dropdown } from "@sparrow/library/ui";
 
   // ---- Helper
   import { tabBarScroller } from "$lib/utils/helpers/navigation";
@@ -20,7 +20,7 @@
     HorizontalGridIcon,
     MoreOptions,
     VerticalGridIcon,
-  } from "@library/icons";
+  } from "@sparrow/library/icons";
   import { TabTypeEnum } from "@common/types/workspace";
 
   // ------ Props ------
@@ -123,7 +123,7 @@
             class="left-btn d-flex justify-content-center align-items-center"
             style="height: 22px; width:22px;"
           >
-            <AngleLeft
+            <AngleLeftIcon
               height={"12px"}
               width={"24px"}
               color="var(--text-secondary-200)"
@@ -174,7 +174,7 @@
             class="right-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
             style="height: 22px; width:22px;"
           >
-            <AngleRight
+            <AngleRightIcon
               height={"12px"}
               width={"24px"}
               color="var(--text-secondary-200)"

@@ -11,7 +11,7 @@
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
   type Mode = "READ" | "WRITE";
   export let loggedUserRoleInWorkspace: WorkspaceRole;
   export let keyValue: EnvValuePair[];

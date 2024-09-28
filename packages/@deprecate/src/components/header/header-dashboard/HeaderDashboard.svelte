@@ -31,7 +31,7 @@
     CurrentWorkspace,
   } from "$lib/utils/interfaces";
   export let collectionsMethods: CollectionsMethods;
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
   import { fade, slide } from "svelte/transition";
   import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";

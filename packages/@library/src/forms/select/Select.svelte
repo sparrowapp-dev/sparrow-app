@@ -5,7 +5,7 @@
   import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
   import { GitBranchIcon, DownArrowIcon } from "$lib/assets/icons";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
-  import { ArrowIcon } from "@library/icons";
+  import { ArrowIcon } from "@sparrow/library/icons";
   import MenuItemsV3 from "./menu-items/MenuItemsV3.svelte";
   /**
    * Determines id of the menu item.

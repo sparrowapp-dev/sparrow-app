@@ -16,7 +16,7 @@
     CreateDirectoryPostBody,
   } from "$lib/utils/dto";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Observable } from "rxjs";
   import type {
@@ -26,11 +26,11 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import tickIcon from "$lib/assets/tick-grey.svg";
   import crossIcon from "$lib/assets/cross-grey.svg";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { Spinner } from "@sparrow/library/ui";
   import QuestionIcon from "$lib/assets/question.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@sparrow/library/ui";
   import FileType from "$lib/components/file-types/FileType.svelte";
   import ComboText from "$lib/components/text/ComboText.svelte";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";

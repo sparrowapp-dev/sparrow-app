@@ -1,7 +1,7 @@
 <script lang="ts">
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { Modal } from "@sparrow/library/ui";
+  import { Spinner } from "@sparrow/library/ui";
+  import { notifications } from "@sparrow/library/ui";
   import { RequestDataType, RequestDataset } from "$lib/utils/enums";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
@@ -86,7 +86,7 @@
   };
 </script>
 
-<ModalWrapperV1
+<Modal
   title={"Import via cURL"}
   type={"dark"}
   width={"35%"}
@@ -117,7 +117,7 @@
     >
     Import API Request</button
   >
-</ModalWrapperV1>
+</Modal>
 
 <style lang="scss">
   .textarea-div {

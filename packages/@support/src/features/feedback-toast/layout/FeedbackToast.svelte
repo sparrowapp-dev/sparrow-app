@@ -1,8 +1,7 @@
 <script>
-  import Ellipse from "@library/icons/Ellipse.svelte";
-  import LogoSymbol from "@library/icons/LogoSymbol.svelte";
-  import { Tooltip } from "@library/ui/tooltip";
-  import { ArrowUnfilledIcon } from "@library/icons";
+  import { Ellipse } from "@sparrow/library/icons";
+  import { LogoSymbol } from "@sparrow/library/icons";
+  import { ArrowUnfilledIcon } from "@sparrow/library/icons";
 
   let isReadMore = false;
 </script>

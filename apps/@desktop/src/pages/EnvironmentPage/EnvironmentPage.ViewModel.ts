@@ -1,4 +1,4 @@
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 import { EnvironmentRepository } from "../../repositories/environment.repository";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { EnvironmentService } from "../../services/environment.service";

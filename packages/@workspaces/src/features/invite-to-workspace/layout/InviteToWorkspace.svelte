@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { addUsersInWorkspacePayload } from "$lib/utils/dto";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import { Button } from "@library/ui";
+  import { Button } from "@sparrow/library/ui";
   import { InviteUserPicker } from "../components";
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
 
   /**
    * Controls the visibility of the invite popup.

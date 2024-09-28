@@ -1,4 +1,4 @@
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { InitTab } from "@common/factory";
 import { v4 as uuidv4 } from "uuid";

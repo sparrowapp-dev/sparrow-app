@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { ArrowIcon, RunIcon } from "@library/icons";
-  import { Spinner } from "@library/ui";
+  import { ArrowIcon, RunIcon } from "@sparrow/library/icons";
+  import { Spinner } from "@sparrow/library/ui";
 
   export let title = "Submit";
   export let onClick: (e) => void;

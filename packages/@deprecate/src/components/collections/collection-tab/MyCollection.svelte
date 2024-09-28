@@ -18,14 +18,14 @@
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
   import { CollectionService } from "@app/services/collection.service";
   import { ImportCollectionViewModel } from "../collections-list/import-collection/ImportCollection.viewModel";
-  import { notifications } from "@library/ui/toast/Toast";
-  import Button from "@library/ui/button/Button.svelte";
+  import { notifications } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
   import { invoke } from "@tauri-apps/api/core";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import { Select } from "@library/forms";
+  import { Modal } from "@sparrow/library/ui";
+  import { Select } from "@sparrow/library/forms";
   import { GitBranchIcon } from "$lib/assets/icons";
   import UserProfileList from "$lib/components/profile/UserProfileList.svelte";
 
@@ -323,7 +323,7 @@
 </script>
 
 <div class="main-container d-flex">
-  <ModalWrapperV1
+  <Modal
     title={"Switch Branch?"}
     type={"danger"}
     width={"35%"}
@@ -363,7 +363,7 @@
         }}
       />
     </div>
-  </ModalWrapperV1>
+  </Modal>
   <div
     class="my-collection d-flex flex-column"
     style="width:calc(100% - 280px); margin-top: 15px; min-width: 450px"

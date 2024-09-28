@@ -28,7 +28,7 @@ import type {
 import type { CreateApiRequestPostBody } from "$lib/utils/dto";
 import { InitRequestTab } from "@common/utils";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { isGuestUserActive } from "$lib/store/auth.store";
 // import { generateSampleRequest } from "$lib/utils/sample";

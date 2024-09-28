@@ -2,7 +2,7 @@ import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { registerUser } from "../../../services/auth.service";
 import { register_user } from "$lib/store/auth.store";
 import { jwtDecode } from "$lib/utils/jwt";
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 import { checkValidation, registrationSchema } from "$lib/utils/validation";
 import { navigate } from "svelte-navigator";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";

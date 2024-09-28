@@ -14,7 +14,7 @@
     workspaceInviteMethods,
   } from "$lib/utils/interfaces";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@sparrow/library/ui";
   import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
   import type { Observable } from "rxjs";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";

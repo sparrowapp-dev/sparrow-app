@@ -1,19 +1,19 @@
 <script lang="ts">
   import { user } from "$lib/store";
-  import { CommentIcon, SortIcon } from "@library/icons";
+  import { CommentIcon, SortIcon } from "@sparrow/library/icons";
   import { UpvoteIcon } from "../../../common/components";
   import FeedbackPost from "./FeedbackPost.svelte";
   import FeedbackDefault from "./FeedbackDefault.svelte";
   import { onMount } from "svelte";
   import { SearchIcon } from "$lib/assets/app.asset";
-  import { Select } from "@library/forms";
-  import { CategoryIcon, StatusIcon } from "@library/icons";
+  import { Select } from "@sparrow/library/forms";
+  import { CategoryIcon, StatusIcon } from "@sparrow/library/icons";
   import {
     FeedbackType,
     FeedbackStatusType,
   } from "../../../common/types/feedback";
-  import { tickIcon } from "@library/forms/select/svgs";
-  import { Loader } from "@library/ui";
+  import { TickIcon } from "@sparrow/library/icons";
+  import { Loader } from "@sparrow/library/ui";
   import { Debounce } from "@common/utils";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
@@ -353,11 +353,17 @@
               getPosts("trending", searchTerm, status);
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
-            class="sort-buttons d-flex justify-content-between w-100"
+            class="sort-buttons d-flex align-items-center justify-content-between w-100"
             class:active={currentSort === "trending"}
           >
             <span class="text-fs-13">Trending</span>
-            <img src={tickIcon} alt="" class="pt-1 tick-icon" />
+            {#if currentSort === "trending"}
+              <TickIcon
+                height={"14px"}
+                width={"14px"}
+                color={"var(--icon-primary-300)"}
+              />
+            {/if}
           </button>
 
           <button
@@ -365,11 +371,17 @@
               getPosts("newest", searchTerm, status);
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
-            class="sort-buttons d-flex justify-content-between w-100"
+            class="sort-buttons d-flex align-items-center justify-content-between w-100"
             class:active={currentSort === "newest"}
           >
             <span class="text-fs-13">Now</span>
-            <img src={tickIcon} alt="" class="pt-1 tick-icon" />
+            {#if currentSort === "newest"}
+              <TickIcon
+                height={"14px"}
+                width={"14px"}
+                color={"var(--icon-primary-300)"}
+              />
+            {/if}
           </button>
 
           <button
@@ -377,11 +389,17 @@
               getPosts("score", searchTerm, status);
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
-            class="sort-buttons d-flex justify-content-between w-100"
+            class="sort-buttons d-flex align-items-center justify-content-between w-100"
             class:active={currentSort === "score"}
           >
             <span class="text-fs-13">Top</span>
-            <img src={tickIcon} alt="" class="pt-1 tick-icon" />
+            {#if currentSort === "score"}
+              <TickIcon
+                height={"14px"}
+                width={"14px"}
+                color={"var(--icon-primary-300)"}
+              />
+            {/if}
           </button>
         </div>
       </div>

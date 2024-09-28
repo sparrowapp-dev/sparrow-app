@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { PlusIcon, TreeIcon } from "@library/icons";
-  import { List, Tooltip } from "@library/ui";
+  import { PlusIcon, TreeIcon } from "@sparrow/library/icons";
+  import { List, Tooltip } from "@sparrow/library/ui";
   import { WorkspaceRole } from "$lib/utils/enums";
   import angleRight from "$lib/assets/angle-right-v2.svg";
   import { TestflowListItem } from "../components";
-  import type { ScrollList } from "@library/ui/list/types";
+  import type { ScrollList } from "@sparrow/library/ui/list/types";
   import {
     TFDefaultEnum,
     type TFDocumentType,
@@ -203,7 +203,6 @@
               on:click={async () => {
                 await onCreateTestflow();
                 MixpanelEvent(Events.Add_New_Flow);
-
               }}
             >
               <PlusIcon

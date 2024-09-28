@@ -8,7 +8,7 @@
     StackIcon,
     TreeIcon,
     CollectionIcon,
-  } from "@library/icons";
+  } from "@sparrow/library/icons";
 
   import SparrowLogo from "../../rest-explorer/assets/images/sparrow-logo.svelte";
   import type { Observable } from "rxjs";

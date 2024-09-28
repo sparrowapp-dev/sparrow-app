@@ -13,7 +13,7 @@
     setAuthType,
     setContentTypeHeader,
   } from "$lib/utils/helpers/auth.helper";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@sparrow/library/ui";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import {
     PERMISSION_NOT_FOUND_TEXT,
@@ -23,7 +23,7 @@
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
   import { onDestroy } from "svelte";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   export let collectionsMethods: CollectionsMethods;
   export let closeCallback;
   export let componentData: NewTab;

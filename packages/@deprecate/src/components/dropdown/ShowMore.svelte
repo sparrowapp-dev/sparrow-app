@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@sparrow/library/ui";
 
   export let showMenu: boolean = false;
   export let menuItems = [];

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { ResponseStatusCode } from "$lib/utils/enums/request.enum";
-  import { BoxIcon, ClockIcon, DotIcon } from "@library/icons";
+  import { BoxIcon, ClockIcon, DotIcon } from "@sparrow/library/icons";
   import type { Response } from "@common/types/workspace";
-  import { Tooltip } from "@library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
   export let response;
 
   /**

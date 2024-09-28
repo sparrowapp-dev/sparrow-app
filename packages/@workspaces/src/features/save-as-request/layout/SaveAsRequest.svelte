@@ -6,14 +6,14 @@
   import folderAsset from "$lib/assets/folder.svg";
   import leftArrowAsset from "$lib/assets/angleLeft.svg";
   import { searchTreeDocument } from "../utils";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
   import tickIcon from "$lib/assets/tick-grey.svg";
   import crossIcon from "$lib/assets/cross-grey.svg";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { Spinner } from "@sparrow/library/ui";
   import QuestionIcon from "$lib/assets/question.svelte";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@sparrow/library/ui";
   import { FileType } from "../components";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import {
@@ -27,9 +27,9 @@
     PencilIcon2,
     SocketIcon,
     WorkspaceIcon,
-  } from "@library/icons";
+  } from "@sparrow/library/icons";
   import { TabTypeEnum } from "@common/types/workspace";
-  import { TextEditor } from "@library/forms";
+  import { TextEditor } from "@sparrow/library/forms";
 
   export let onClick;
   export let onFinish = (id: string) => {};

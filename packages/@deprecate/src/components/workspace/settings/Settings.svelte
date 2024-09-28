@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DragDrop from "@library/ui/dragdrop/DragDrop.svelte";
+  import DragDrop from "import { List } from "@sparrow/library/ui";dragdrop/DragDrop.svelte";
   import type {
     Team,
     TeamRepositoryMethods,

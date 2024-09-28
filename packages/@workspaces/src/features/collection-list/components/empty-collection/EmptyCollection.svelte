@@ -6,9 +6,9 @@
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-  import List from "@library/ui/list/List.svelte";
-  import { PlusIcon } from "@library/icons";
+  import { Tooltip } from "@sparrow/library/ui";
+  import { List } from "@sparrow/library/ui";
+  import { PlusIcon } from "@sparrow/library/icons";
 
   export let userRoleInWorkspace: WorkspaceRole;
   export let onImportCollectionPopup: () => void;

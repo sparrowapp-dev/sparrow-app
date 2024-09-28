@@ -1,7 +1,7 @@
 <script>
   import ApiListItem from "../../../common/components/api-list-items/ApiListItem.svelte";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
-  import List from "@library/ui/list/List.svelte";
+  import { List } from "@sparrow/library/ui";
   import constants from "$lib/utils/constants";
   export let tabList = [];
   export let collectionList;

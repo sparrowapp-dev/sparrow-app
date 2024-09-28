@@ -2,7 +2,7 @@
   import icons from "$lib/assets/app.asset";
 
   import { fly, fade } from "svelte/transition";
-  import Loader from "@library/ui/loader/Loader.svelte";
+  import { Loader } from "@sparrow/library/ui";
   export let onClick: (flag: boolean) => void;
   export let isLoadingPage;
 </script>

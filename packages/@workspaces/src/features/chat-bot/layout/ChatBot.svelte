@@ -7,7 +7,7 @@
     AISuggestionBox,
   } from "../components";
   import { MessageTypeEnum, type RequestTab } from "@common/types/workspace";
-  import { CrossIcon } from "@library/icons";
+  import { CrossIcon } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums";

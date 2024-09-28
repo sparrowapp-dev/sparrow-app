@@ -1,16 +1,16 @@
 <script>
   import { LeftIcon, SearchIcon } from "$lib/assets/app.asset";
-  import { Input, Select, Textarea } from "@library/forms";
+  import { Input, Select, Textarea } from "@sparrow/library/forms";
   import {
     AttachmentIcon,
     CategoryIcon,
     CrossIcon,
     SortIcon,
     StatusIcon,
-  } from "@library/icons";
+  } from "@sparrow/library/icons";
 
-  import { Button, IconFallback, Loader, Modal } from "@library/ui";
-  import ImageModal from "@library/ui/image-modal/ImageModal.svelte";
+  import { Button, IconFallback, Loader, Modal } from "@sparrow/library/ui";
+  import {ImageModal} from "@sparrow/library/ui";
   import {
     CommentCard,
     Drop,
@@ -22,7 +22,7 @@
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
 
   export let isPostopen;
   export let userInfo;

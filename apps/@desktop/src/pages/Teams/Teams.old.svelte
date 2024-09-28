@@ -35,12 +35,12 @@
   import { generateSamepleTeam } from "$lib/utils/sample";
   import { moveNavigation } from "$lib/utils/helpers";
   import { navigate } from "svelte-navigator";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
 
   import { v4 as uuidv4 } from "uuid";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "@library/ui/button/Button.svelte";
-  import DragDrop from "@library/ui/dragdrop/DragDrop.svelte";
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
+  import DragDrop from "import { List } from "@sparrow/library/ui";dragdrop/DragDrop.svelte";
   import { Pane, Splitpanes } from "svelte-splitpanes";
 
   export let data: any;
@@ -434,7 +434,7 @@
 />
 <!-- Create New Team POP UP -->
 
-<ModalWrapperV1
+<Modal
   title={"New Team"}
   type={"dark"}
   width={"35%"}
@@ -515,11 +515,11 @@
       }}
     />
   </div>
-</ModalWrapperV1>
+</Modal>
 
 <!-- Leave Team POP UP -->
 
-<ModalWrapperV1
+<Modal
   title={"Leave Team?"}
   type={"danger"}
   width={"35%"}
@@ -553,7 +553,7 @@
       }}
     />
   </div>
-</ModalWrapperV1>
+</Modal>
 
 <Splitpanes
   class="splitter-sidebar"

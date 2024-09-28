@@ -2,15 +2,15 @@
   import threedotIcon from "$lib/assets/3dot.svg";
   import { SelectIcon } from "$lib/assets/app.asset";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { Spinner } from "@sparrow/library/ui";
   import type {
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
   } from "$lib/utils/interfaces/environment.interface";
   import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
-  import { notifications } from "@library/ui/toast/Toast";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "@library/ui/button/Button.svelte";
+  import { notifications } from "@sparrow/library/ui";
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
@@ -182,7 +182,7 @@
   let deleteEnvironmentLoader: boolean = false;
 </script>
 
-<ModalWrapperV1
+<Modal
   title={"Delete Environment?"}
   type={"danger"}
   width={"35%"}
@@ -228,7 +228,7 @@
         deleteEnvironmentLoader = false;
       }}
     />
-  </div></ModalWrapperV1
+  </div></Modal
 >
 
 {#if showMenu}

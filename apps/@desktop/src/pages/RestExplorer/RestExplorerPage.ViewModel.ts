@@ -85,7 +85,7 @@ import {
   type Conversation,
   MessageTypeEnum,
 } from "@common/types/workspace";
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 import { RequestTabAdapter } from "../../adapter/request-tab";
 import { GuideRepository } from "../../repositories/guide.repository";
 import { CollectionService } from "../../services/collection.service";

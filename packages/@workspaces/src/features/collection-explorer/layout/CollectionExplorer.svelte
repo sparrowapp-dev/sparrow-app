@@ -62,10 +62,10 @@
   /**
    * Components
    */
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "@library/ui/button/Button.svelte";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-  import { Select } from "@library/forms";
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
+  import { Select } from "@sparrow/library/forms";
 
   /**
    * Enums
@@ -130,7 +130,7 @@
 </script>
 
 <div class="main-container d-flex h-100" style="overflow:auto;">
-  <ModalWrapperV1
+  <Modal
     title={"Switch Branch?"}
     type={"danger"}
     width={"35%"}
@@ -168,7 +168,7 @@
         }}
       />
     </div>
-  </ModalWrapperV1>
+  </Modal>
   <div
     class="my-collection d-flex flex-column w-100 z-3"
     style=" min-width: 450px"

@@ -1,6 +1,6 @@
 <script lang="ts">
   import plus from "$lib/assets/plus.svg";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
   /**
    * @deprecated referes to teams store
    * import { openedTeam } from "$lib/store/team.store";
@@ -15,7 +15,7 @@
   import { PeopleIcon } from "$lib/assets/app.asset";
   import { base64ToURL } from "$lib/utils/helpers";
   import { TeamRepository } from "@app/repositories/team.repository";
-  import List from "@library/ui/list/List.svelte";
+  import { List } from "@sparrow/library/ui";
   export let handleCreateTeamModal: any;
   export let teams: any;
   export let teamRepositoryMethods: TeamRepositoryMethods;

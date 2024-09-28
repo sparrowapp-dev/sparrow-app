@@ -1,6 +1,6 @@
-<script>
+<script lang="ts">
   import { PeopleIcon } from "$lib/assets/app.asset";
-  import List from "@library/ui/list/List.svelte";
+  import { List } from "@sparrow/library/ui";
   import constants from "$lib/utils/constants";
   export let data;
   export let openTeam;

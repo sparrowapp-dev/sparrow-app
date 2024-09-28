@@ -3,7 +3,7 @@
   import codeIcon from "$lib/assets/code.svg";
   import BookIcon from "$lib/assets/book.svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { Tooltip } from "@library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
   import { onDestroy, onMount } from "svelte";
   import type { RequestBody } from "$lib/utils/interfaces/request.interface";
   import { updateCollectionRequest } from "@app/services/collection";
@@ -13,14 +13,14 @@
   import EditIcon from "$lib/assets/edit-desc.svg";
 
   import { Events, type WorkspaceRole } from "$lib/utils/enums";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
 
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import {
     getMethodStyle,
     hasWorkpaceLevelPermission,
   } from "$lib/utils/helpers";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import { Modal } from "@sparrow/library/ui";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
@@ -264,7 +264,7 @@
   </div>
 </div>
 
-<!-- <ModalWrapperV1
+<!-- <Modal
   title={"Save Request"}
   type={"dark"}
   width={"55%"}
@@ -292,7 +292,7 @@
     {onCreateCollection}
     type="SAVE_DESCRIPTION"
   />
-</ModalWrapperV1> -->
+</Modal> -->
 
 <style>
   .sidebar-right {

@@ -12,7 +12,7 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { Spinner } from "@sparrow/library/ui";
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy, onMount } from "svelte";
   import type { Path } from "$lib/utils/interfaces/request.interface";
@@ -25,9 +25,9 @@
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import folderIcon from "$lib/assets/create_folder.svg";
   import requestIcon from "$lib/assets/create_request.svg";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import { notifications } from "@library/ui/toast/Toast";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Modal } from "@sparrow/library/ui";
+  import { notifications } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import {
     PERMISSION_NOT_FOUND_TEXT,
@@ -35,7 +35,7 @@
   } from "$lib/utils/constants/permissions.constant";
   import { ResponseStatusCode, WorkspaceRole } from "$lib/utils/enums";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
   import { CommonService } from "$lib/services-v2/common.service";
   import { ImportCollectionViewModel } from "../import-collection/ImportCollection.viewModel";
   import { invoke } from "@tauri-apps/api/core";
@@ -582,7 +582,7 @@
   let isCollectionHover = false;
 </script>
 
-<ModalWrapperV1
+<Modal
   title={"Delete Collection?"}
   type={"danger"}
   width={"35%"}
@@ -633,7 +633,7 @@
         handleDelete();
       }}
     />
-  </div></ModalWrapperV1
+  </div></Modal
 >
 
 {#if showMenu}

@@ -6,11 +6,11 @@
     TeamServiceMethods,
     workspaceInviteMethods,
   } from "$lib/utils/interfaces";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import Dropdown from "../dropdown/Dropdown.svelte";
   import MemberInfoPopup from "../workspace/member-info/MemberInfo.svelte";
-  import Button from "@library/ui/button/Button.svelte";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import { Button } from "@sparrow/library/ui";
+  import { Modal } from "@sparrow/library/ui";
   export let id: string;
   export let name: string;
   export let email: string;
@@ -323,7 +323,7 @@
         </p>
       </div>
     {/if}
-    <ModalWrapperV1
+    <Modal
       title={"Remove user?"}
       type={"danger"}
       width={"35%"}
@@ -379,9 +379,9 @@
           }}
         />
       </div>
-    </ModalWrapperV1>
+    </Modal>
 
-    <ModalWrapperV1
+    <Modal
       title={"Remove user?"}
       type={"danger"}
       width={"35%"}
@@ -427,11 +427,11 @@
           }}
         />
       </div>
-    </ModalWrapperV1>
+    </Modal>
   </div>
 </div>
 
-<ModalWrapperV1
+<Modal
   title={`Access to ${currentTeamDetails.name}`}
   type={"dark"}
   width={"35%"}
@@ -467,7 +467,7 @@
     handleDropDownWorkspaceLevel={handleDropdown}
     isWorkspaceMemberInfo={true}
   />
-</ModalWrapperV1>
+</Modal>
 
 <style>
   .user:hover {

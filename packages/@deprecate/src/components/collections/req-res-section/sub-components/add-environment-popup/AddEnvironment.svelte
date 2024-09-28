@@ -6,8 +6,8 @@
     EnvironmentResponseDto,
     UpdateEnvironmentPostBody,
   } from "$lib/utils/dto";
-  import { notifications } from "@library/ui/toast/Toast";
-  import Button from "@library/ui/button/Button.svelte";
+  import { notifications } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
   export let environmentAxisX;
   export let environmentAxisY;
   export let updateEnvironment: (

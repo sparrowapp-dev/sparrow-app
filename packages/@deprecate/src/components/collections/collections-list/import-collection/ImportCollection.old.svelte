@@ -1,8 +1,8 @@
 <script lang="ts">
   import { ImportCollectionViewModel } from "./ImportCollection.viewModel";
-  import { notifications } from "@library/ui/toast/Toast";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
-  import ProgressBar from "@library/ui/progress/Progress.svelte";
+  import { notifications } from "@sparrow/library/ui";
+  import { Spinner } from "@sparrow/library/ui";
+  import ProgressBar from "import { List } from "@sparrow/library/ui";progress/Progress.svelte";
   import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
@@ -11,10 +11,10 @@
   import Request from "../request/Request.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import DragDrop from "@library/ui/dragdrop/DragDrop.svelte";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import DragDrop from "import { List } from "@sparrow/library/ui";dragdrop/DragDrop.svelte";
+  import { Modal } from "@sparrow/library/ui";
   import { CollectionService } from "@app/services/collection.service";
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
   import {
     debounce,
     isUrlValid,
@@ -24,7 +24,7 @@
   } from "../collection/collection-utils/utils";
   import linkIcon from "$lib/assets/linkIcon.svg";
   import { invoke } from "@tauri-apps/api/core";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@sparrow/library/ui";
   import { ContentTypeEnum, ResponseStatusCode } from "$lib/utils/enums";
   import TickMark from "$lib/assets/tick-mark-rounded.svelte";
 
@@ -563,7 +563,7 @@
   />
 {/if}
 
-<ModalWrapperV1
+<Modal
   title={"Incorrect File format"}
   type={"dark"}
   width={"35%"}
@@ -597,9 +597,9 @@
       >
     </div>
   </div>
-</ModalWrapperV1>
+</Modal>
 
-<ModalWrapperV1
+<Modal
   title={"New Collection"}
   type={"dark"}
   width={"35%"}
@@ -931,7 +931,7 @@
       }}>Create Empty Collection</button
     >
   </div>
-</ModalWrapperV1>
+</Modal>
 
 <style lang="scss">
   #file-input {

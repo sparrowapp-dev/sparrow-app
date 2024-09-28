@@ -1,19 +1,19 @@
 <script lang="ts">
   import { RequestMethod, WorkspaceRole } from "$lib/utils/enums";
 
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
   import type {
     SaveRequestType,
     SendRequestType,
     UpdateRequestMethodType,
     UpdateRequestUrlType,
   } from "@sparrow/workspaces/common/type";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import { DropButton } from "@sparrow/workspaces/common/components";
   import { CodeMirrorInput } from "../../../../common/components";
   import { UrlInputTheme } from "../../../../common/utils/";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-  import { DiskIcon } from "@library/icons";
+  import { Tooltip } from "@sparrow/library/ui";
+  import { DiskIcon } from "@sparrow/library/icons";
   let componentClass = "";
   export { componentClass as class };
 

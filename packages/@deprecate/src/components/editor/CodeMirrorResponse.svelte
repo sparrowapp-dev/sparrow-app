@@ -6,9 +6,9 @@
   } from "$lib/utils/enums/request.enum";
   import { isHorizontal } from "$lib/store/request-response-section";
   import { EditorView } from "codemirror";
-  import { basicSetup, basicTheme } from "@library/forms/editor/theme";
+  import { basicSetup, basicTheme } from "@sparrow/library/forms/editor/theme";
   import { EditorState, Compartment } from "@codemirror/state";
-  import CodeMirrorViewHandler from "@library/forms/editor/editor";
+  import CodeMirrorViewHandler from "@sparrow/library/forms/editor/editor";
   import { html_beautify, js_beautify } from "js-beautify";
 
   export let currentTabId: string;

@@ -20,11 +20,10 @@
     RequestParameters,
     ResponseStatus,
   } from "../components";
-  import Loader from "@library/ui/loader/Loader.svelte";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { Loader } from "@sparrow/library/ui";
+  import { notifications } from "@sparrow/library/ui";
   import { Splitpanes, Pane } from "svelte-splitpanes";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@sparrow/library/ui";
 
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
@@ -57,9 +56,9 @@
     type RequestTab,
   } from "@common/types/workspace";
   import { requestSplitterDirection } from "../store";
-  import Popover from "@library/ui/popover/Popover.svelte";
+  import { Popover } from "@sparrow/library/ui";
   import { onMount } from "svelte";
-  import { Carousel, Modal } from "@library/ui";
+  import { Carousel, Modal } from "@sparrow/library/ui";
   import RequestDoc from "../components/request-doc/RequestDoc.svelte";
   import {
     AdvanceAPI,
@@ -431,7 +430,7 @@
       />
     </div>
   </div>
-  <ModalWrapperV1
+  <Modal
     title={"Save Request"}
     type={"dark"}
     width={"55%"}
@@ -458,7 +457,7 @@
       {onRenameCollection}
       {onRenameFolder}
     />
-  </ModalWrapperV1>
+  </Modal>
 {/if}
 
 <Modal

@@ -4,7 +4,7 @@
     WorkspaceExplorer,
   } from "@sparrow/workspaces/features";
   import WorkspaceExplorerViewModel from "./WorkspaceExplorerPage.ViewModel";
-  import { Modal } from "@library/ui";
+  import { Modal } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
   import { DeleteWorkspace } from "@common/features";

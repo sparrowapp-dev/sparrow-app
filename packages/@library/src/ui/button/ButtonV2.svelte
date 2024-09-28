@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { Spinner } from "@sparrow/library/ui";
 
   /**
    * performs operation on button click

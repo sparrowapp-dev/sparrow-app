@@ -7,7 +7,7 @@
   import type { MemberPopType } from "$lib/utils/types/common.type";
 
   import { ProfileWorkspace } from "./sub-profile";
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
 
   export let user: userDetails;
   export let teamRole: TeamRole;

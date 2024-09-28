@@ -14,7 +14,7 @@
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
   export let handleCreateCollection: any;
   export let collectionsMethods: CollectionsMethods;
   export let currentWorkspaceId: string;

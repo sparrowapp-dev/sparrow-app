@@ -8,13 +8,13 @@
     addUsersInWorkspace,
     addUsersInWorkspacePayload,
   } from "$lib/utils/dto";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import { WorkspaceRole } from "$lib/utils/enums";
   import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
   import { validateEmail } from "$lib/utils/helpers";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import InputSelect from "$lib/components/inputs/InputSelect.svelte";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@sparrow/library/ui";
   let loader = false;
   let emailstoBeSentArr: string[] = [];
   export let users;

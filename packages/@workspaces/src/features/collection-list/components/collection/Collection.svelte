@@ -23,14 +23,14 @@
   import angleRight from "$lib/assets/angle-right-v2.svg";
   import threedotIcon from "$lib/assets/3dot.svg";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import { Spinner } from "@sparrow/library/ui";
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy, onMount } from "svelte";
   import { isCollectionCreatedFirstTime } from "$lib/store/collection";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
   import gitBranchIcon from "$lib/assets/git-branch.svg";
   import { ReloadCollectionIcon } from "$lib/assets/icons";
   import type { CollectionDocument, TabDocument } from "@app/database/database";
@@ -48,8 +48,8 @@
     FolderPlusIcon,
     RequestIcon,
     SocketIcon,
-  } from "@library/icons";
-  import { Options } from "@library/ui";
+  } from "@sparrow/library/icons";
+  import { Options } from "@sparrow/library/ui";
   import { isGuestUserActive } from "$lib/store";
 
   let deletedIds: [string] | [] = [];
@@ -231,7 +231,7 @@
   }}
 />
 
-<ModalWrapperV1
+<Modal
   title={"Delete Collection?"}
   type={"danger"}
   width={"35%"}
@@ -287,7 +287,7 @@
         isCollectionPopup = false;
       }}
     />
-  </div></ModalWrapperV1
+  </div></Modal
 >
 
 {#if showMenu}
@@ -644,11 +644,7 @@
               </div>
             </Tooltip>
 
-            <Tooltip
-              title={"Add WebSocket"}
-              placement={"bottom"}
-              distance={12}
-            >
+            <Tooltip title={"Add WebSocket"} placement={"bottom"} distance={12}>
               <div
                 class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
                 style="height: 24px; width: 24px;"

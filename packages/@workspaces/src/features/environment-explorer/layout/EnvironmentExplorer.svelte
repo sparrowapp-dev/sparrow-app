@@ -8,11 +8,11 @@
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
   import { userWorkspaceLevelRole } from "$lib/store";
   import { TabularInputV2 } from "@sparrow/workspaces/common/components";
-  import { Input } from "@library/forms";
-  import { Carousel, Modal, Popover } from "@library/ui";
+  import { Input } from "@sparrow/library/forms";
+  import { Carousel, Modal, Popover } from "@sparrow/library/ui";
   import { environmentType, WorkspaceRole } from "$lib/utils/enums";
   import {
     CreateENV,

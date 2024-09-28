@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { PlusIcon, StackIcon, StackFilled } from "@library/icons";
-  import List from "@library/ui/list/List.svelte";
+  import { PlusIcon, StackIcon, StackFilled } from "@sparrow/library/icons";
+  import { List } from "@sparrow/library/ui";
   import { WorkspaceRole } from "$lib/utils/enums";
   import {
     PERMISSION_NOT_FOUND_TEXT,
@@ -9,7 +9,7 @@
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import { ListItem } from "../components";
   import angleRight from "$lib/assets/angle-right-v2.svg";
-  import { Tooltip } from "@library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
 
   /**
    * current workspace
