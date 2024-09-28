@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import angleLeft from "@deprecate/assets/angleLeft.svg";
   import lineIcon from "@deprecate/assets/line.svg";
   import starIcon from "@deprecate/assets/starIcon.svg";
@@ -6,7 +6,7 @@
     errorMessageText,
     isLoading,
     username,
-  } from "@deprecate/store/auth.store";
+  } from "@app/store/auth.store/auth.store";
   import { handleVerifyEmail, isSuccessfulResponse } from "./update-password";
 
   import { writable } from "svelte/store";
@@ -84,13 +84,12 @@
       errorMessage = value;
     }
   });
-</script>
+</script> -->
 
-<div
+<!-- <div
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
   style="height: 100vh;"
 >
-  <!-- <Header /> -->
   {#if isLoadingPage}
     <Loader loaderSize={"80px"} loaderMessage="Please Wait..." />
   {:else}
@@ -321,4 +320,4 @@
       </div>
     </div>
   {/if}
-</div>
+</div> -->

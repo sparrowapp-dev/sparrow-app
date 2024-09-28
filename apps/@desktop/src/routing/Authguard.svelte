@@ -1,9 +1,5 @@
 <script>
-  import {
-    isGuestUserActive,
-    setUser,
-    user,
-  } from "@deprecate/store/auth.store";
+  import { isGuestUserActive, setUser, user } from "@app/store/auth.store";
   import { getUserToken } from "@deprecate/utils/token";
   import { jwtDecode } from "@deprecate/utils/jwt";
   import { onMount } from "svelte";

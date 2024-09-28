@@ -3,11 +3,6 @@
   import type { TabDocument, TeamDocument } from "@app/database/database";
 
   import {
-    isWorkspaceCreatedFirstTime,
-    isWorkspaceLoaded,
-  } from "@deprecate/store/workspace.store";
-
-  import {
     leftPanelWidth,
     rightPanelWidth,
     leftPanelCollapse,

@@ -12,23 +12,22 @@ export function isUrlValid(str: string) {
   return pattern.test(str);
 }
 
-import { setCollectionList } from "@deprecate/store/collection";
 import { ItemType } from "@deprecate/utils/enums/item-type.enum";
 import type { Collection } from "@deprecate/utils/interfaces/collection.interface";
-import {
-  selectMethodsStore,
-  selectedMethodsCollectionStore,
-} from "@deprecate/store/methods";
+// import {
+//   selectMethodsStore,
+//   selectedMethodsCollectionStore,
+// } from "@app/store/auth.store/methods";
 import { ContentTypeEnum } from "../enums";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 let tree: any[];
 const filterTree: Collection[] = [];
 let selectedAPIMethods: string[] = [];
-selectMethodsStore.subscribe((value) => {
-  if (value) {
-    selectedAPIMethods = value;
-  }
-});
+// selectMethodsStore.subscribe((value) => {
+//   if (value) {
+//     selectedAPIMethods = value;
+//   }
+// });
 
 export const debounce = (func, delay = 1000) => {
   let timerId: any;
@@ -269,7 +268,7 @@ const useTree = (): any[] => {
     // Iterate through the tree to find the target folder and add the item
     for (let i = 0; i < tree.length; i++) {
       if (!helper(tree[i], folderId, type, name, id, method)) {
-        setCollectionList(tree);
+        // setCollectionList(tree);
         return;
       }
     }
@@ -278,7 +277,7 @@ const useTree = (): any[] => {
   const insertHead: (name: string, _id: string) => void = (name, _id) => {
     // Iterate through the tree to find the target folder and add the item
     tree.push({ name, _id, items: [] });
-    setCollectionList(tree);
+    // setCollectionList(tree);
     return;
   };
   const searchNode: (

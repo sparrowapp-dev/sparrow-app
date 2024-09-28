@@ -2,7 +2,7 @@
   import { Route, navigate } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsHome from "../Collections/Collections.old.svelte";
-  import { collapsibleState } from "@deprecate/store/request-response-section";
+  import { collapsibleState } from "@app/store/auth.store/request-response-section";
   import { onDestroy, onMount } from "svelte";
   import ActiveSideBarTabViewModel from "./ActiveSideBarTab.ViewModel";
   import Mock from "../Mock/Mock.svelte";
@@ -18,11 +18,11 @@
   import {
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
-  } from "@deprecate/store/workspace.store";
+  } from "@app/store/auth.store/workspace.store";
   
   import type { Path } from "@deprecate/utils/interfaces/request.interface";
   import type { CurrentTeam, CurrentWorkspace } from "@deprecate/utils/interfaces";
-  import { user, userWorkspaceLevelRole } from "@deprecate/store";
+  import { user, userWorkspaceLevelRole } from "@app/store/auth.store";
   import { TeamRepository } from "@app/repositories/team.repository";
   import { DashboardViewModel } from "./Dashboard.ViewModel.old";
   import type { WorkspaceRole } from "@deprecate/utils/enums";

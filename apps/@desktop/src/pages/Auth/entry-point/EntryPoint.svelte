@@ -20,7 +20,7 @@
   import { onMount } from "svelte";
   import { navigate } from "svelte-navigator";
   import { AuthViewModel } from "../Auth.ViewModel";
-  import { isGuestUserActive, navigationState } from "@deprecate/store";
+  import { isGuestUserActive, navigationState } from "@app/store/auth.store";
   import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import { Button } from "@sparrow/library/ui";

@@ -3,7 +3,7 @@ import { TabRepository } from "../../repositories/tab.repository";
 import { TeamRepository } from "../../repositories/team.repository";
 import { TeamService } from "../../services/team.service";
 import { notifications } from "@sparrow/library/ui";
-import { user } from "@deprecate/store";
+import { user } from "@app/store/auth.store";
 
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { CollectionRepository } from "../../repositories/collection.repository";

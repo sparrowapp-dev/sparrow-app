@@ -5,7 +5,6 @@ import { getUserToken, getRefToken } from "@deprecate/utils/token";
 import { refreshToken } from "@app/services/auth.service";
 import constants from "@deprecate/utils/constants";
 import { setAuthJwt } from "@deprecate/utils/jwt";
-import { isLoading } from "@deprecate/store/auth.store";
 import { ErrorMessages } from "@deprecate/utils/enums/enums";
 import { invoke } from "@tauri-apps/api/core";
 import { DashboardViewModel } from "@app/pages/Dashboard/Dashboard.ViewModel";
@@ -95,7 +94,6 @@ const makeRequest = async (
   requestData?: RequestData,
   includeAxiosData?: boolean,
 ) => {
-  isLoading.set(true);
   const startTime = performance.now();
   try {
     const response = await axios({
@@ -178,7 +176,6 @@ const makeRequest = async (
     }
     return error(e);
   } finally {
-    isLoading.set(false);
   }
 };
 

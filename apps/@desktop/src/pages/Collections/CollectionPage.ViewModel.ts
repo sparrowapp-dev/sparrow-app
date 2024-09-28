@@ -4,12 +4,6 @@ import type {
   WorkspaceDocument,
 } from "../../database/database";
 
-//-----
-// Stores
-import { isApiCreatedFirstTime } from "@deprecate/store/request-response-section";
-//-----
-
-//-----
 // Repositories
 import { CollectionRepository } from "../../repositories/collection.repository";
 import { EnvironmentRepository } from "../../repositories/environment.repository";
@@ -75,7 +69,7 @@ import { GithubRepoReposistory } from "../../repositories/github-repo.repository
 import { RequestTabAdapter } from "../../adapter/request-tab";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import { isGuestUserActive } from "@deprecate/store/auth.store";
+import { isGuestUserActive } from "@app/store/auth.store";
 import { InitTab } from "@sparrow/common/factory";
 import type {
   CollectionArgsDto,
@@ -211,7 +205,6 @@ export default class CollectionsViewModel {
   public createNewTab = async (_limit = 5) => {
     if (_limit === 0) return;
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
-    isApiCreatedFirstTime.set(true);
     if (ws) {
       this.tabRepository.createTab(
         new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
@@ -230,7 +223,6 @@ export default class CollectionsViewModel {
    */
   private createWebSocketNewTab = async () => {
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
-    isApiCreatedFirstTime.set(true);
     if (ws) {
       this.tabRepository.createTab(
         this.initTab.webSocket("UNTRACKED-" + uuidv4(), ws._id).getValue(),

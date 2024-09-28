@@ -1,4 +1,4 @@
-import { user } from "@deprecate/store";
+import { user } from "@app/store/auth.store";
 import type { addUsersInWorkspacePayload } from "@deprecate/utils/dto";
 import type { InviteBody } from "@deprecate/utils/dto/team-dto";
 import { Events, UntrackedItems, WorkspaceRole } from "@deprecate/utils/enums";

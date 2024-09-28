@@ -30,7 +30,7 @@ import { InitRequestTab } from "@sparrow/common/utils";
 import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 import { notifications } from "@sparrow/library/ui";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
-import { isGuestUserActive } from "@deprecate/store/auth.store";
+import { isGuestUserActive } from "@app/store/auth.store";
 // import { generateSampleRequest } from "@deprecate/utils/sample";
 // import type { Folder, Path } from "@deprecate/utils/interfaces/request.interface";
 // import { InitRequestTab } from "@sparrow/common/utils";

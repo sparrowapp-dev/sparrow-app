@@ -24,7 +24,7 @@
 
   // ---- DB
   import type { CollectionDocument } from "@app/database/database";
-  import { isGuestUserActive } from "@deprecate/store";
+  import { isGuestUserActive } from "@app/store/auth.store";
 
   /**
    * Callback for Item Deleted

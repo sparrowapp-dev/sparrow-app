@@ -3,7 +3,7 @@
   import { TeamExplorer, TeamInvite } from "@sparrow/teams/features";
   import { TeamExplorerPageViewModel } from "./TeamExplorerPage.ViewModel";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
-  import { user } from "@deprecate/store";
+  import { user } from "@app/store/auth.store";
   import { Modal } from "@sparrow/library/ui";
   import { LeaveTeam } from "@sparrow/teams/features";
 

@@ -13,25 +13,25 @@
   import { TeamViewModel } from "./Teams.ViewModel.old";
   import { scaleMotionProps } from "@deprecate/utils/animations";
   import { Motion } from "svelte-motion";
-  import { user } from "@deprecate/store/auth.store";
+  import { user } from "@app/store/auth.store";
 
   import type { WorkspaceDocument } from "@app/database/database";
   /**
    * @deprecated referes to teams store
-   * import { openedTeam, setOpenedTeam } from "@deprecate/store/team.store";
-   * import { isTeamCreatedFirstTime } from "@deprecate/store/team.store";
+   * import { openedTeam, setOpenedTeam } from "@app/store/auth.store/team.store";
+   * import { isTeamCreatedFirstTime } from "@app/store/auth.store/team.store";
    **/
 
   import {
-    isWorkspaceCreatedFirstTime,
-    isWorkspaceLoaded,
-    workspaceLeftPanelWidth,
-    workspaceRightPanelWidth,
-  } from "@deprecate/store";
+    // isWorkspaceCreatedFirstTime,
+    // isWorkspaceLoaded,
+    // workspaceLeftPanelWidth,
+    // workspaceRightPanelWidth,
+  } from "@app/store/auth.store";
   import { generateSampleWorkspace } from "@deprecate/utils/sample/workspace.sample";
   import { UntrackedItems } from "@deprecate/utils/enums/item-type.enum";
   import { onDestroy, onMount } from "svelte";
-  import {} from "@deprecate/store";
+  import {} from "@app/store/auth.store";
   import { generateSamepleTeam } from "@deprecate/utils/sample";
   import { moveNavigation } from "@deprecate/utils/helpers";
   import { navigate } from "svelte-navigator";
@@ -152,7 +152,7 @@
 
   const handleCreateWorkspace = async () => {
     workspaceUnderCreation = true;
-    isWorkspaceCreatedFirstTime.set(true);
+    // isWorkspaceCreatedFirstTime.set(true);
     isWorkspaceLoaded.set(false);
     const workspaceObj = generateSampleWorkspace(
       UntrackedItems.UNTRACKED + uuidv4(),
@@ -206,7 +206,7 @@
       collectionsMethods.handleCreateTab(workspaceObj);
       collectionsMethods.handleActiveTab(workspaceObj._id);
       moveNavigation("right");
-      isWorkspaceCreatedFirstTime.set(true);
+      // isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");
       isWorkspaceLoaded.set(true);
       let newWorkspace = response.data.data;
@@ -222,7 +222,7 @@
       navigate("/dashboard/collections");
     } else {
       workspaceUnderCreation = false;
-      isWorkspaceCreatedFirstTime.set(false);
+      // isWorkspaceCreatedFirstTime.set(false);
       isWorkspaceLoaded.set(true);
       notifications.error(response.message);
     }
@@ -558,12 +558,12 @@
 <Splitpanes
   class="splitter-sidebar"
   on:resize={(e) => {
-    workspaceLeftPanelWidth.set(e.detail[0].size);
-    workspaceRightPanelWidth.set(e.detail[1].size);
+    // workspaceLeftPanelWidth.set(e.detail[0].size);
+    // workspaceRightPanelWidth.set(e.detail[1].size);
   }}
 >
-  <Pane class="sidebar-left-panel" minSize={20} size={$workspaceLeftPanelWidth}>
-    <!-- <WorkspaceList
+  <!-- <Pane class="sidebar-left-panel" minSize={20} size={$workspaceLeftPanelWidth}> -->
+  <!-- <WorkspaceList
       {userId}
       {handleCreateTeamModal}
       openTeam={$openTeam}
@@ -578,13 +578,13 @@
       {teamServiceMethods}
       {collectionsMethods}
     /> -->
-  </Pane>
-  <Pane
+  <!-- </Pane> -->
+  <!-- <Pane
     class="sidebar-right-panel"
     minSize={60}
     size={$workspaceRightPanelWidth}
-  >
-    <!-- <WorkspaceContent
+  > -->
+  <!-- <WorkspaceContent
       {currentTeam}
       {userId}
       teams={allTeams}
@@ -603,7 +603,7 @@
       {teamRepositoryMethods}
       workspaces={$workspaces}
     /> -->
-  </Pane>
+  <!-- </Pane> -->
 </Splitpanes>
 
 <style>

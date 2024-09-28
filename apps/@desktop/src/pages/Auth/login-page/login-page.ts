@@ -5,7 +5,7 @@ import { notifications } from "@sparrow/library/ui";
 import { checkValidation, loginSchema } from "@deprecate/utils/validation";
 import { navigate } from "svelte-navigator";
 import { jwtDecode, setAuthJwt } from "@deprecate/utils/jwt";
-import { isResponseError, setUser } from "@deprecate/store/auth.store";
+import { setUser } from "@app/store/auth.store";
 import { resizeWindowOnLogOut, resizeWindowOnLogin } from "../../../utils";
 import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
@@ -53,7 +53,7 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
   } else {
     navigate("/");
     resizeWindowOnLogOut();
-    isResponseError.set(true);
+    // isResponseError.set(true);
     notifications.error(response.message);
     throw "error login user: " + response.message;
   }

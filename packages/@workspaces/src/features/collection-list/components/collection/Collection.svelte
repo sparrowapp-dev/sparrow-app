@@ -27,9 +27,7 @@
     UntrackedItems,
   } from "@deprecate/utils/enums/item-type.enum";
   import { Spinner } from "@sparrow/library/ui";
-  import { selectMethodsStore } from "@deprecate/store/methods";
   import { onDestroy, onMount } from "svelte";
-  import { isCollectionCreatedFirstTime } from "@deprecate/store/collection";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@deprecate/utils/enums";
@@ -38,11 +36,6 @@
   import { ReloadCollectionIcon } from "@deprecate/assets/icons";
   import type { CollectionDocument, TabDocument } from "@app/database/database";
   import Folder from "../folder/Folder.svelte";
-  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
-  import { workspaceLevelPermissions } from "@deprecate/utils/constants/permissions.constant";
-  import { PERMISSION_NOT_FOUND_TEXT } from "@deprecate/utils/constants/permissions.constant";
-  import { CollectionMessage } from "@deprecate/utils/constants/request.constant";
-  import requestIcon from "@deprecate/assets/create_request.svg";
   import type { Path } from "@deprecate/utils/interfaces/request.interface";
   import AddIcon from "@deprecate/assets/add.svg";
   import {
@@ -53,12 +46,11 @@
     SocketIcon,
   } from "@sparrow/library/icons";
   import { Options } from "@sparrow/library/ui";
-  import { isGuestUserActive } from "@deprecate/store";
+  import { isGuestUserActive } from "@app/store/auth.store";
 
   let deletedIds: [string] | [] = [];
   let requestCount = 0;
   let folderCount = 0;
-  let showFolderAPIButtons: boolean = true;
   let visibility = false;
   let isActiveSyncEnabled = true;
   let isBranchSynced: boolean = false;
@@ -115,18 +107,18 @@
   /**
    * Handle selected methods from filter
    */
-  const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
-    if (value && value.length > 0) {
-      showFolderAPIButtons = false;
-      visibility = true;
-    } else if (value && value.length === 0) {
-      visibility = false;
-    } else {
-      showFolderAPIButtons = true;
-    }
-  });
+  // const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
+  //   if (value && value.length > 0) {
+  //     showFolderAPIButtons = false;
+  //     visibility = true;
+  //   } else if (value && value.length === 0) {
+  //     visibility = false;
+  //   } else {
+  //     showFolderAPIButtons = true;
+  //   }
+  // });
   onDestroy(() => {
-    selectedMethodUnsubscibe();
+    // selectedMethodUnsubscibe();
   });
 
   $: {
@@ -430,7 +422,6 @@
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
       if (!isRenaming) {
-        isCollectionCreatedFirstTime.set(false);
         visibility = !visibility;
         if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
           if (visibility) {

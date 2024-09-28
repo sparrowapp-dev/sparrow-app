@@ -9,7 +9,7 @@
   import { resizeWindowOnLogin } from "../utils";
   import { registerDeepLinkHandler } from "@deprecate/utils/deeplink/app.deeplink";
   import { onMount } from "svelte";
-  import { user } from "@deprecate/store/auth.store";
+  import { user } from "@app/store/auth.store";
   import { handleShortcuts } from "@deprecate/utils/shortcuts";
   import { AppUpdater } from "@sparrow/common/features";
   import { getCurrent } from "@tauri-apps/api/window";

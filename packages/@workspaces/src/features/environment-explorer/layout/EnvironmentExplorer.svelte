@@ -9,7 +9,7 @@
     workspaceLevelPermissions,
   } from "@deprecate/utils/constants/permissions.constant";
   import { Tooltip } from "@sparrow/library/ui";
-  import { userWorkspaceLevelRole } from "@deprecate/store";
+
   import { TabularInputV2 } from "@sparrow/workspaces/common/components";
   import { Input } from "@sparrow/library/forms";
   import { Carousel, Modal, Popover } from "@sparrow/library/ui";

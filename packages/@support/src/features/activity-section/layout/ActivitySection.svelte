@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { user } from "@deprecate/store";
+  import { user } from "@app/store/auth.store";
   import {
     ActivityIcon,
     CommentIcon,

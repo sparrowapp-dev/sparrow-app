@@ -40,13 +40,13 @@ export const validateClientXML = (yamlString = "") => {
   }
 };
 
-import { setCollectionList } from "@deprecate/store/collection";
+import { setCollectionList } from "@app/store/auth.store/collection";
 import { ItemType } from "@deprecate/utils/enums/item-type.enum";
 import type { Collection } from "@deprecate/utils/interfaces/collection.interface";
 import {
   selectMethodsStore,
   selectedMethodsCollectionStore,
-} from "@deprecate/store/methods";
+} from "@app/store/auth.store/methods";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 let tree: any[];
 const filterTree: Collection[] = [];

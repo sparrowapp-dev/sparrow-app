@@ -1,7 +1,6 @@
 <script lang="ts">
   import { EnvironmentHeper } from "@deprecate/utils/helpers/environment.helper";
   import type { EditorSelection } from "@codemirror/state";
-  import { editLink } from "@deprecate/store/api-request";
   import { v4 as uuidv4 } from "uuid";
   import { CodeMirrorHandler } from "./sub-input";
   import { EnvironmentPicker, MissedEnvironment, ReviewEnvironment } from "../";

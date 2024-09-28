@@ -90,7 +90,7 @@ import { RequestTabAdapter } from "../../adapter/request-tab";
 import { GuideRepository } from "../../repositories/guide.repository";
 import { CollectionService } from "../../services/collection.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import { isGuestUserActive } from "@deprecate/store/auth.store";
+import { isGuestUserActive } from "@app/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
 import { AiAssistantService } from "../../services/ai-assistant.service";
 import type { GuideQuery } from "../../types/user-guide";

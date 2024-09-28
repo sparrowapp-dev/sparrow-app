@@ -24,7 +24,7 @@ import { v4 as uuidv4 } from "uuid";
 // Stores
 import { InitRequestTab } from "@sparrow/common/utils";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
-import { isGuestUserActive } from "@deprecate/store/auth.store";
+import { isGuestUserActive } from "@app/store/auth.store";
 import type {
   CollectionDto,
   CollectionItemsDto,

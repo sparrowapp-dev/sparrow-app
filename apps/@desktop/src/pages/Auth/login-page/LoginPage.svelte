@@ -1,10 +1,6 @@
 <script lang="ts">
   import { Link, navigate } from "svelte-navigator";
-  import {
-    isLoading,
-    isResponseError,
-    setUser,
-  } from "@deprecate/store/auth.store";
+  import { setUser } from "@app/store/auth.store";
   import { jwtDecode } from "@deprecate/utils/jwt";
   import googleLogo from "@deprecate/assets/googlelogo.svg";
   import eyeHide from "@deprecate/assets/eye-hide.svg";
@@ -72,15 +68,15 @@
 
   let isPasswordtouched: boolean = false;
 
-  isLoading.subscribe((value) => {
-    isLoadingPage = value;
-  });
+  // isLoading.subscribe((value) => {
+  //   isLoadingPage = value;
+  // });
 
   let isPasswordError: boolean;
 
-  isResponseError.subscribe((value) => {
-    isPasswordError = value;
-  });
+  // isResponseError.subscribe((value) => {
+  //   isPasswordError = value;
+  // });
 
   let errorMessage: string = "";
 

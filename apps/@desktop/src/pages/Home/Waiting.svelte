@@ -1,6 +1,6 @@
 <script>
   import { Loader } from "@sparrow/library/ui";
-  import { setUser } from "@deprecate/store/auth.store";
+  import { setUser } from "@app/store/auth.store";
   import constants from "@deprecate/utils/constants";
   import { jwtDecode, setAuthJwt } from "@deprecate/utils/jwt";
   import { notifications } from "@sparrow/library/ui";

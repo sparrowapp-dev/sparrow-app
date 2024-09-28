@@ -54,9 +54,9 @@
   } from "@app/database/database";
   import type { GithubRepoDocType } from "../../models/github-repo.model";
   import { Modal } from "@sparrow/library/ui";
-  import { isGuestUserActive } from "@deprecate/store";
+  import { isGuestUserActive } from "@app/store/auth.store";
   import { pagesMotion } from "../../constants";
-  import { user } from "@deprecate/store";
+  import { user } from "@app/store/auth.store";
   import WebSocketExplorerPage from "../WebSocketExplorerPage/WebSocketExplorerPage.svelte";
   import {
     TabTypeEnum,

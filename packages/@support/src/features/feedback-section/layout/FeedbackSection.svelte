@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { user } from "@deprecate/store";
+  import { user } from "@app/store/auth.store";
   import { CommentIcon, SortIcon } from "@sparrow/library/icons";
   import { UpvoteIcon } from "../../../common/components";
   import FeedbackPost from "./FeedbackPost.svelte";

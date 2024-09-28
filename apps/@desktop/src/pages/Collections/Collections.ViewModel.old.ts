@@ -11,7 +11,7 @@
 //   progressiveTab,
 //   requestResponseStore,
 //   tabs,
-// } from "@deprecate/store/request-response-section";
+// } from "@app/store/auth.store/request-response-section";
 // import { ItemType } from "@deprecate/utils/enums/item-type.enum";
 // import type { CollectionItem } from "@deprecate/utils/interfaces/collection.interface";
 // import type {

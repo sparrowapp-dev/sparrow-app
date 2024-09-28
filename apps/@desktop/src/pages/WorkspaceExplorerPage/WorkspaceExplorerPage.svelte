@@ -10,7 +10,7 @@
   import { DeleteWorkspace } from "@sparrow/common/features";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import type { UpdatesDocType } from "../../../../models/updates.model";
-  import { user } from "@deprecate/store";
+  import { user } from "@app/store/auth.store";
 
   export let collectionList;
   export let tab;

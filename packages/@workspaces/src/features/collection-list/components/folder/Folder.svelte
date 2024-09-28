@@ -5,8 +5,8 @@
   import folderCloseIcon from "@deprecate/assets/folder.svg";
   import folderOpenIcon from "@deprecate/assets/open-folder.svg";
   import threedotIcon from "@deprecate/assets/3dot.svg";
-  import AddIcon from "@deprecate/assets/add.svg";
-  import requestIcon from "@deprecate/assets/create_request.svg";
+  // import AddIcon from "@deprecate/assets/add.svg";
+  // import requestIcon from "@deprecate/assets/create_request.svg";
   import { RequestIcon } from "@sparrow/library/icons";
   import angleRight from "@deprecate/assets/angle-right-v2.svg";
 
@@ -35,16 +35,16 @@
   } from "@deprecate/utils/interfaces/request.interface";
 
   // ---- Store
-  import { selectMethodsStore } from "@deprecate/store/methods";
+  // import { selectMethodsStore } from "@app/store/auth.store/methods";
 
   // ---- Helper Functions
-  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  // import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
+  // import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 
   // ---- DB
   import type { CollectionDocument } from "@app/database/database";
-  import { of } from "rxjs";
-  import { isGuestUserActive } from "@deprecate/store";
+  // import { of } from "rxjs";
+  import { isGuestUserActive } from "@app/store/auth.store";
   import { WebSocket } from "..";
 
   /**
@@ -132,15 +132,15 @@
     }
   }
 
-  const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
-    if (value && value.length > 0) {
-      expand = true;
-      showFolderAPIButtons = false;
-    } else {
-      showFolderAPIButtons = true;
-      expand = false;
-    }
-  });
+  // const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
+  //   if (value && value.length > 0) {
+  //     expand = true;
+  //     showFolderAPIButtons = false;
+  //   } else {
+  //     showFolderAPIButtons = true;
+  //     expand = false;
+  //   }
+  // });
 
   function rightClickContextMenu(e: Event) {
     setTimeout(() => {
@@ -185,7 +185,7 @@
   };
 
   onDestroy(() => {
-    selectedMethodUnsubscibe();
+    // selectedMethodUnsubscibe();
   });
 </script>
 

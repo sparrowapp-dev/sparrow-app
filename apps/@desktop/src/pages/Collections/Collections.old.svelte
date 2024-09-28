@@ -1,5 +1,5 @@
 <!-- <script lang="ts">
-  import { collapsibleState } from "@deprecate/store/request-response-section";
+  import { collapsibleState } from "@app/store/auth.store/request-response-section";
   import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import { CollectionsViewModel } from "./Collections.ViewModel.old";
   import { ItemType } from "@deprecate/utils/enums/item-type.enum";
@@ -21,8 +21,8 @@
   import { ActiveSideBarTabReposistory } from "@app/repositories/active-sidebar-tab.repository";
   import type { WorkspaceRole } from "@deprecate/utils/enums";
   import { Pane, Splitpanes } from "svelte-splitpanes";
-  import { collectionLeftPanelWidth } from "@deprecate/store";
-  import { collectionRightPanelWidth } from "@deprecate/store";
+  import { collectionLeftPanelWidth } from "@app/store/auth.store";
+  import { collectionRightPanelWidth } from "@app/store/auth.store";
 
   import RestExplorer from "../RestExplorer/RestExplorerPage.svelte";
   import { Route, navigate } from "svelte-navigator";

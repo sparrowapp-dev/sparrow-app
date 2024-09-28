@@ -8,7 +8,7 @@
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
   import { DashboardViewModel } from "./Dashboard.ViewModel";
-  import { navigationState, user } from "@deprecate/store";
+  import { navigationState, user } from "@app/store/auth.store";
   import Mock from "../Mock/Mock.svelte";
   import { Header } from "@sparrow/common/components";
   import { onDestroy, onMount } from "svelte";
@@ -22,7 +22,7 @@
   import { relaunch } from "@tauri-apps/plugin-process";
   import { Progress } from "@sparrow/library/ui";
   import { List } from "@sparrow/library/ui";
-  import {Updater} from "@sparrow/common/components";
+  import { Updater } from "@sparrow/common/components";
   import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import Teams from "../Teams/Teams.svelte";
@@ -35,7 +35,7 @@
     if (value) {
       // await _viewModel.refreshTeams(value._id);
       // await _viewModel.refreshWorkspaces(value._id);
-      userId - value?._id;
+      userId = value?._id;
       await _viewModel.refreshTeamsWorkspaces(value._id);
     }
   });

@@ -1,7 +1,7 @@
 <script lang="ts">
   import table from "@deprecate/assets/table.svg";
   import hamburger from "@deprecate/assets/hamburger.svg";
-  import { workspaceView } from "@deprecate/store";
+  import { workspaceView } from "../store/workspace-view";
   import { onDestroy } from "svelte";
   import { SearchIcon } from "@deprecate/assets/app.asset";
   import { base64ToURL } from "@deprecate/utils/helpers";

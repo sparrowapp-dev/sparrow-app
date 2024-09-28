@@ -1,6 +1,5 @@
 import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
 import { registerUser } from "../../../services/auth.service";
-import { register_user } from "@deprecate/store/auth.store";
 import { jwtDecode } from "@deprecate/utils/jwt";
 import { notifications } from "@sparrow/library/ui";
 import {
@@ -13,7 +12,6 @@ import { sendUserDataToMixpanel } from "../login-page/login-page";
 
 const handleRegister = async (userData) => {
   const response = await registerUser(userData);
-  register_user.set(response);
   if (response.isSuccessful) {
     const userDetails = jwtDecode(response.data?.data?.accessToken?.token);
     sendUserDataToMixpanel(userDetails);

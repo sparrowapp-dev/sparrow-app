@@ -1,11 +1,11 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import vector1 from "@deprecate/assets/Vector1.svg";
   import vector2 from "@deprecate/assets/Vector2.svg";
   // import sparrowicon from "@deprecate/assets/sparrowIcon.svg";
   import vector3 from "@deprecate/assets/Vector3.svg";
   import starIcon from "@deprecate/assets/starIcon.svg";
   import { handleResetPasswordValidation } from "./reset-password";
-  import { username } from "@deprecate/store/auth.store";
+  import { username } from "@app/store/auth.store/auth.store";
 
   import angleLeft from "@deprecate/assets/angleLeft.svg";
   import eyeHide from "@deprecate/assets/eye-hide.svg";
@@ -116,14 +116,14 @@
       passwordInput.type = isPasswordVisible ? "text" : "password";
     }
   };
-</script>
+</script> -->
 
-<div
+<!-- <div
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
   style="height: 100vh;"
->
-  <!-- <Header /> -->
-  <div
+> -->
+<!-- <Header /> -->
+<!-- <div
     class="d-flex mb-5 flex-column align-items-center justify-content-center"
   >
     <p
@@ -274,8 +274,8 @@
           >
         </div>
       </form>
-    {/if}
-    <!-- {#if showModal}
+    {/if} -->
+<!-- {#if showModal}
       <div
         class="modal fade show d-flex align-items-center"
         tabindex="-1"
@@ -319,9 +319,9 @@
       </div>
       <div class="modal-backdrop fade show" />
     {/if} -->
-  </div>
-</div>
-
+<!-- </div>
+</div> -->
+<!-- 
 <style>
   input::-ms-reveal,
   input::-ms-clear {
@@ -352,4 +352,4 @@
       height: auto;
     }
   }
-</style>
+</style> -->

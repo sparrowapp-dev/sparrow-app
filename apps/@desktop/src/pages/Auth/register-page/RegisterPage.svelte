@@ -1,9 +1,9 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import vector1 from "@deprecate/assets/Vector1.svg";
   import vector2 from "@deprecate/assets/Vector2.svg";
   import vector3 from "@deprecate/assets/Vector3.svg";
   import { handleRegisterValidation } from "./register-page";
-  import { isLoading } from "@deprecate/store/auth.store";
+  import { isLoading } from "@app/store/auth.store/auth.store";
   import starIcon from "@deprecate/assets/starIcon.svg";
   import eyeHide from "@deprecate/assets/eye-hide.svg";
   import eyeShow from "@deprecate/assets/eye-show.svg";
@@ -137,14 +137,14 @@
       passwordInput.type = isPasswordVisible ? "text" : "password";
     }
   };
-</script>
+</script> -->
 
-<div
+<!-- <div
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
   style="height: 100vh;"
->
-  <!-- <Header /> -->
-  {#if isLoadingPage}
+> -->
+<!-- <Header /> -->
+<!-- {#if isLoadingPage}
     <Loader loaderSize={"80px"} loaderMessage="Please Wait..." />
   {:else}
     <div
@@ -382,9 +382,9 @@
       </form>
     </div>
   {/if}
-</div>
+</div> -->
 
-<style>
+<!-- <style>
   input::-ms-reveal,
   input::-ms-clear {
     display: none;
@@ -413,4 +413,4 @@
       height: auto; /* Remove fixed height for larger screens */
     }
   }
-</style>
+</style> -->

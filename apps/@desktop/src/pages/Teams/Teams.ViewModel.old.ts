@@ -5,7 +5,7 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import {
   requestResponseStore,
   tabs,
-} from "@deprecate/store/request-response-section";
+} from "@app/store/auth.store/request-response-section";
 import { TabRepository } from "../../repositories/tab.repository";
 import { CollectionRepository } from "../../repositories/collection.repository";
 import { TeamService } from "../../services/team.service";

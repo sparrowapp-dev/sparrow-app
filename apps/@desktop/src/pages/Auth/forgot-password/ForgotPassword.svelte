@@ -1,9 +1,9 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import angleLeft from "@deprecate/assets/angleLeft.svg";
   import starIcon from "@deprecate/assets/starIcon.svg";
 
   import { handleForgotPasswordValidation } from "./forgot-password";
-  import { isLoading, username } from "@deprecate/store/auth.store";
+  import { isLoading, username } from "@app/store/auth.store/auth.store";
   import { Link } from "svelte-navigator";
   import { Loader } from "@sparrow/library/ui";
 
@@ -39,14 +39,14 @@
   isLoading.subscribe((value) => {
     isLoadingPage = value;
   });
-</script>
+</script> -->
 
-<div
+<!-- <div
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
   style="height: 100vh;"
->
-  <!-- <Header /> -->
-  {#if isLoadingPage}
+> -->
+<!-- <Header /> -->
+<!-- {#if isLoadingPage}
     <Loader loaderSize={"80px"} loaderMessage="Please Wait..." />
   {:else}
     <div
@@ -117,4 +117,4 @@
       </form>
     </div>
   {/if}
-</div>
+</div> -->
