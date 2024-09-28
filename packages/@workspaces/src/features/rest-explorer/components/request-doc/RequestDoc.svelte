@@ -3,7 +3,7 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { generatingImage } from "@common/images";
   import { TextEditor } from "@library/forms";
-  import { AISuggestionBox } from "@workspaces/features/chat-bot/components";
+  import { AISuggestionBox } from "../../../../features/chat-bot/components";
 
   export let onUpdateRequestDescription;
   export let isDocGenerating = false;

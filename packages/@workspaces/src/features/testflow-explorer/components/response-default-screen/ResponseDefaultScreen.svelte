@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ComboText } from "@workspaces/common/components";
+  import { ComboText } from "@sparrow/workspaces/common/components";
   import { isHorizontal } from "$lib/store/request-response-section";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";

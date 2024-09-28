@@ -1,5 +1,5 @@
 {
-  "name": "workspaces",
+  "name": "@sparrow/workspaces",
   "version": "0.0.1",
   "scripts": {
     "dev": "vite dev",
@@ -13,7 +13,18 @@
   "private": true,
   "main": "src/main.ts",
   "exports": {
-    "./features": "./src/features/index.ts"
+    "./features": "./src/features/index.ts",
+    "./common/components": "./src/common/components/index.ts",
+    "./common/constants": "./src/common/constants/index.ts",
+    "./common/hoc": "./src/common/hoc/index.ts",
+    "./common/images": "./src/common/images/index.ts",
+    "./common/stores": "./src/common/stores/index.ts",
+    "./common/type": "./src/common/type/index.ts",
+    "./common/utils": "./src/common/utils/index.ts",
+    "./features/testflow-explorer/store": "./src/features/testflow-explorer/store/index.ts",
+    "./features/rest-explorer/utils": "./src/features/rest-explorer/utils/index.ts",
+    "./features/rest-explorer/store": "./src/features/rest-explorer/store/index.ts",
+    "./features/socket-explorer/store": "./src/features/socket-explorer/store/index.ts"
   },
   "devDependencies": {
     "@fontsource/fira-mono": "^4.5.10",

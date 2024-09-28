@@ -27,15 +27,18 @@
     VectorIcon,
     BubbleIcon,
   } from "@library/icons";
-  import { WithButton } from "@workspaces/common/hoc";
+  import { WithButton } from "@sparrow/workspaces/common/hoc";
   import { createDeepCopy } from "$lib/utils/helpers";
   import { Input } from "@library/forms";
   import { open } from "@tauri-apps/plugin-shell";
   import constants from "$lib/utils/constants";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { CollectionList, EnvironmentList } from "@workspaces/features";
-  import { TestflowList } from "@workspaces/features/testflow-list";
+  import {
+    CollectionList,
+    EnvironmentList,
+  } from "@sparrow/workspaces/features";
+  import { TestflowList } from "../../testflow-list";
   import { TFDefaultEnum } from "@common/types/workspace/testflow";
   export let appVersion;
 

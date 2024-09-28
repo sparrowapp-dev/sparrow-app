@@ -14,7 +14,7 @@
 
   // ---- Helper
   import { tabBarScroller } from "$lib/utils/helpers/navigation";
-  import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
+  import { requestSplitterDirection } from "@sparrow/workspaces/features/rest-explorer/store";
   import { HelpIcon } from "$lib/assets/app.asset";
   import {
     HorizontalGridIcon,

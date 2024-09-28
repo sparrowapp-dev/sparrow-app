@@ -10,7 +10,7 @@
     CollectionIcon,
   } from "@library/icons";
 
-  import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
+  import SparrowLogo from "../../rest-explorer/assets/images/sparrow-logo.svelte";
   import type { Observable } from "rxjs";
   import { Card } from "../components";
   import { TFDefaultEnum } from "@common/types/workspace/testflow";

@@ -4,7 +4,7 @@
   import {
     environmentDropdown,
     environmentPicker,
-  } from "@workspaces/common/images";
+  } from "@sparrow/workspaces/common/images";
   /**
    * callback which closes the quick help dialog
    */

@@ -19,7 +19,7 @@
     RestExtensionPanel,
     RequestParameters,
     ResponseStatus,
-  } from "@workspaces/features/rest-explorer/components";
+  } from "../components";
   import Loader from "@library/ui/loader/Loader.svelte";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import { notifications } from "@library/ui/toast/Toast";
@@ -28,7 +28,7 @@
 
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import { SaveAsCollectionItem } from "@workspaces/features";
+  import { SaveAsCollectionItem } from "@sparrow/workspaces/features";
   import type {
     ClearResponseType,
     CreateCollectionType,
@@ -49,7 +49,7 @@
     UpdateRequestNameType,
     UpdateRequestStateType,
     UpdateRequestUrlType,
-  } from "@workspaces/common/type";
+  } from "@sparrow/workspaces/common/type";
   import {
     RequestSectionEnum,
     ResponseSectionEnum,
@@ -65,7 +65,7 @@
     AdvanceAPI,
     CreateCollection,
     SendingApiRequest,
-  } from "@workspaces/common/constants";
+  } from "@sparrow/workspaces/common/constants";
   import { ResponseStatusCode } from "$lib/utils/enums";
 
   export let tab: Observable<RequestTab>;

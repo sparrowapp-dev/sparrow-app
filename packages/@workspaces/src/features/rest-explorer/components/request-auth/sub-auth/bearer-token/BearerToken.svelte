@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { AuthInputTheme } from "@workspaces/common/utils";
-  import { CodeMirrorInput } from "@workspaces/common/components";
+  import { AuthInputTheme } from "@sparrow/workspaces/common/utils";
+  import { CodeMirrorInput } from "@sparrow/workspaces/common/components";
 
   export let bearerToken: string;
   export let callback;

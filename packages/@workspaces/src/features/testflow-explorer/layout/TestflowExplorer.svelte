@@ -40,10 +40,10 @@
     DropButton,
     TableNavbar,
     TableSidebar,
-  } from "@workspaces/common/components";
+  } from "@sparrow/workspaces/common/components";
   import { RunIcon } from "@library/icons";
   import { Modal } from "@library/ui";
-  import DeleteNode from "@workspaces/common/components/delete-node/DeleteNode.svelte";
+  import DeleteNode from "../../../common/components/delete-node/DeleteNode.svelte";
   import { ResponseStatusCode } from "$lib/utils/enums";
   import type {
     TFDataStoreType,

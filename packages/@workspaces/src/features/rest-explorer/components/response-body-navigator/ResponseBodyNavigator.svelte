@@ -19,7 +19,7 @@
   import { ResponseFormatterEnum } from "@common/types/workspace";
   import BeautifyIcon from "$lib/assets/beautify.svg";
   import js_beautify, { html_beautify } from "js-beautify";
-  import { WithSelectV3 } from "@workspaces/common/hoc";
+  import { WithSelectV3 } from "@sparrow/workspaces/common/hoc";
 
   export let response;
   export let apiState;
@@ -36,8 +36,8 @@
     return fileExtension === "json" || fileExtension === "js"
       ? js_beautify(_data)
       : fileExtension === "xml" || fileExtension === "html"
-      ? html_beautify(_data)
-      : removeIndentation(_data);
+        ? html_beautify(_data)
+        : removeIndentation(_data);
   };
   /**
    * @description Copy API response to users clipboard.

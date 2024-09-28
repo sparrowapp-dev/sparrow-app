@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
-  import { TabularInput } from "@workspaces/common/components";
+  import { TabularInput } from "@sparrow/workspaces/common/components";
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import AngleUp from "$lib/assets/angle-up.svelte";
   import AngleDown from "$lib/assets/angle-down2.svelte";

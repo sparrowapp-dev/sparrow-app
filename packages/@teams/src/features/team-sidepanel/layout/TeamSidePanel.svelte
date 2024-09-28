@@ -2,7 +2,7 @@
   import { Tooltip } from "@library/ui/tooltip";
   import plus from "$lib/assets/plus.svg";
   import { DoubleArrowIcon, GithubIcon } from "@library/icons";
-  import WithButton from "@workspaces/common/hoc/WithButton.svelte";
+  import { WithButton } from "@sparrow/workspaces/common/hoc";
   import type { TabDocument, TeamDocument } from "@app/database/database";
   import RecentApi from "@teams/features/recent-apis/layout/RecentApi.svelte";
   import RecentWorkspace from "@teams/features/recent-workspace/layout/RecentWorkspace.svelte";

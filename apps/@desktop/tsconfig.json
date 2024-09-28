@@ -19,7 +19,6 @@
       "@library/*": ["./src/packages/@library/*"],
       "@app/*": ["./src/packages/@app/*"],
       "@common/*": ["./src/packages/@common/*"],
-      "@teams/*": ["./src/packages/@teams/*"],
       "@support/*": ["./src/packages/@support/*"],
       "@web/*": ["../@web/src/*"]
     }

@@ -27,7 +27,7 @@
     ImportCurl,
     WorkspaceDefault,
     SaveAsCollectionItem,
-  } from "@sparrow/workspaces/features"; 
+  } from "@sparrow/workspaces/features";
   import { WithModal } from "@sparrow/workspaces/common/hoc";
   import { notifications } from "@library/ui/toast/Toast";
 

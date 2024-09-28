@@ -42,13 +42,12 @@
 <!-- </section> -->
 
 <style>
-
-.sidebar-recentapi-list::-webkit-scrollbar-thumb {
+  .sidebar-recentapi-list::-webkit-scrollbar-thumb {
     background-color: var(--bg-secondary-330);
   }
 
   .sidebar-recentapi-list::-webkit-scrollbar-button {
-   color: var(--bg-secondary-330);
+    color: var(--bg-secondary-330);
   }
   .teams-heading {
     margin-left: 5px;

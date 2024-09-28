@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TabularInput } from "@workspaces/common/components";
+  import { TabularInput } from "@sparrow/workspaces/common/components";
 
   export let value;
   export let environmentVariables;

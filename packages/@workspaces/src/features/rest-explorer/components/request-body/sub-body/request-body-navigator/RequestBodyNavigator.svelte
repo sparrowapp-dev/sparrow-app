@@ -5,7 +5,7 @@
   import { Select } from "@library/forms";
   import { RequestDataType, RequestDataset } from "$lib/utils/enums";
   import { notifications } from "@library/ui/toast/Toast";
-  import { WithSelect } from "@workspaces/common/hoc";
+  import { WithSelect } from "@sparrow/workspaces/common/hoc";
   export let method = "";
   export let onUpdateRequestState;
   export let updateBeautifiedState: (value: boolean) => void;

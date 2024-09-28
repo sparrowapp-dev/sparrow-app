@@ -16,7 +16,7 @@
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import { testFlowDataStore } from "@workspaces/features/testflow-explorer/store/testflow";
+  import { testFlowDataStore } from "../../../../features/testflow-explorer/store/testflow";
   import { ThreeDotIcon } from "$lib/assets/app.asset";
   import { createDeepCopy } from "$lib/utils/helpers";
   import { ParseTime } from "@common/utils";
@@ -180,14 +180,14 @@
   style={selected && !currentBlock
     ? "border: 2px solid var(--border-primary-300);"
     : selected && currentBlock && checkIfRequestSucceed(currentBlock)
-    ? "border: 2px solid #69D696;"
-    : selected && currentBlock && !checkIfRequestSucceed(currentBlock)
-    ? "border: 2px solid #FF7878;"
-    : !currentBlock
-    ? ""
-    : checkIfRequestSucceed(currentBlock)
-    ? "border-left: 2px solid #69D696;"
-    : "border-left: 2px solid #FF7878;"}
+      ? "border: 2px solid #69D696;"
+      : selected && currentBlock && !checkIfRequestSucceed(currentBlock)
+        ? "border: 2px solid #FF7878;"
+        : !currentBlock
+          ? ""
+          : checkIfRequestSucceed(currentBlock)
+            ? "border-left: 2px solid #69D696;"
+            : "border-left: 2px solid #FF7878;"}
 >
   <Handle type="target" position={Position.Left} />
   <div class=" d-flex justify-content-between align-items-center px-3 py-2">

@@ -1,9 +1,5 @@
 <script lang="ts">
-  import {
-    Collection,
-    EmptyCollection,
-    SearchTree,
-  } from "@workspaces/features/collection-list/components";
+  import { Collection, EmptyCollection, SearchTree } from "../components";
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
   import angleRight from "$lib/assets/angle-right-v2.svg";
   import { WorkspaceRole } from "$lib/utils/enums";

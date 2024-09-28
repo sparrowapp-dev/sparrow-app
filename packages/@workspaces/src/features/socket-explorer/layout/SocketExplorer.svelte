@@ -5,7 +5,7 @@
 
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import { SaveAsCollectionItem } from "@workspaces/features";
+  import { SaveAsCollectionItem } from "@sparrow/workspaces/features";
 
   import type {
     CreateCollectionType,
@@ -18,7 +18,7 @@
     UpdateHeadersType,
     UpdateParamsType,
     UpdateRequestUrlType,
-  } from "@workspaces/common/type";
+  } from "@sparrow/workspaces/common/type";
   import { TabTypeEnum, type Tab } from "@common/types/workspace";
 
   import {

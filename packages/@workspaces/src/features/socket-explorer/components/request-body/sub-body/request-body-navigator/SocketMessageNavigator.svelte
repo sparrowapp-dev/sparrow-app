@@ -3,7 +3,7 @@
   import { RequestDataType, RequestDataset } from "$lib/utils/enums";
   import { Button } from "@library/ui";
   import { notifications } from "@library/ui/toast/Toast";
-  import { WithSelect } from "@workspaces/common/hoc";
+  import { WithSelect } from "@sparrow/workspaces/common/hoc";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   export let onUpdateRequestState;
@@ -51,7 +51,6 @@
     onClick={() => {
       onSendMessage();
       MixpanelEvent(Events.Send_WebSocket_Request);
-
     }}
     type={"primary"}
   />

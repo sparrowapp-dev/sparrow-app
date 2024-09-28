@@ -2,8 +2,8 @@
   import { Select } from "@library/forms";
   import { AuthSection } from "$lib/utils/enums/authorization.enum";
   import type { ApiKey } from "$lib/utils/interfaces/request.interface";
-  import { CodeMirrorInput } from "@workspaces/common/components";
-  import { AuthInputTheme } from "@workspaces/common/utils";
+  import { CodeMirrorInput } from "@sparrow/workspaces/common/components";
+  import { AuthInputTheme } from "@sparrow/workspaces/common/utils";
   export let apiData: ApiKey;
   export let callback;
   export let environmentVariables;

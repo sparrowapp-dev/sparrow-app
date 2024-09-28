@@ -12,6 +12,13 @@
   },
   "private": true,
   "main": "src/main.ts",
+  "exports": {
+    "./features": "./src/features/index.ts",
+    "./common/components": "./src/common/components/index.ts",
+    "./common/compopnents": "./src/common/compopnents/index.ts",
+    "./common/constants": "./src/common/constants/index.ts",
+    "./common/stores": "./src/common/stores/index.ts"
+  },
   "devDependencies": {
     "@fontsource/fira-mono": "^4.5.10",
     "@neoconfetti/svelte": "^1.0.0",

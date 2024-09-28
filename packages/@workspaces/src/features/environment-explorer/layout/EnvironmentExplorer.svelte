@@ -10,7 +10,7 @@
   } from "$lib/utils/constants/permissions.constant";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { userWorkspaceLevelRole } from "$lib/store";
-  import { TabularInputV2 } from "@workspaces/common/components";
+  import { TabularInputV2 } from "@sparrow/workspaces/common/components";
   import { Input } from "@library/forms";
   import { Carousel, Modal, Popover } from "@library/ui";
   import { environmentType, WorkspaceRole } from "$lib/utils/enums";
@@ -18,8 +18,8 @@
     CreateENV,
     IntroToEnvironment,
     SearchVariable,
-  } from "@workspaces/common/constants";
-  import { WithButtonV3 } from "@workspaces/common/hoc";
+  } from "@sparrow/workspaces/common/constants";
+  import { WithButtonV3 } from "@sparrow/workspaces/common/hoc";
 
   /**
    * selected environmet to be shown on API

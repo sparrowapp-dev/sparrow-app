@@ -16,7 +16,7 @@
     WithButtonV4,
     WithSelect,
     WithSelectV2,
-  } from "@workspaces/common/hoc";
+  } from "@sparrow/workspaces/common/hoc";
   import { Tooltip } from "@library/ui";
   import { CopyIcon, DownloadIcon } from "@library/icons";
   import type { WebSocketMessage } from "../../store/websocket";
@@ -35,8 +35,8 @@
     return fileExtension === "json" || fileExtension === "js"
       ? js_beautify(_data)
       : fileExtension === "xml" || fileExtension === "html"
-      ? html_beautify(_data)
-      : removeIndentation(_data);
+        ? html_beautify(_data)
+        : removeIndentation(_data);
   };
   /**
    * @description Copy API response to users clipboard.

@@ -14,7 +14,7 @@
     BlankIcon,
   } from "@library/icons";
   import { Dropdown, Tooltip } from "@library/ui";
-  import { WithButtonV4 } from "@workspaces/common/hoc";
+  import { WithButtonV4 } from "@sparrow/workspaces/common/hoc";
 
   export let webSocket;
   export let onSearchMessage;
@@ -102,11 +102,11 @@
             color={webSocket.status === "connected"
               ? "#69D696"
               : webSocket.status === "disconnected"
-              ? "#CB4A4A"
-              : webSocket.status === "connecting" ||
-                webSocket.status === "disconnecting"
-              ? "#FBA574"
-              : "#FBA574"}
+                ? "#CB4A4A"
+                : webSocket.status === "connecting" ||
+                    webSocket.status === "disconnecting"
+                  ? "#FBA574"
+                  : "#FBA574"}
             height={"8px"}
             width={"8px"}
           />
@@ -114,12 +114,12 @@
             {webSocket.status === "connected"
               ? "Connected"
               : webSocket.status === "disconnected"
-              ? "Disconnected"
-              : webSocket.status === "connecting"
-              ? "Connecting"
-              : webSocket.status === "disconnecting"
-              ? "Disconnecting"
-              : ""}
+                ? "Disconnected"
+                : webSocket.status === "connecting"
+                  ? "Connecting"
+                  : webSocket.status === "disconnecting"
+                    ? "Disconnecting"
+                    : ""}
           </span>
         </span>
         <span class="d-flex">

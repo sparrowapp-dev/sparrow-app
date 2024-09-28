@@ -7,9 +7,9 @@
     SendRequestType,
     UpdateRequestMethodType,
     UpdateRequestUrlType,
-  } from "@workspaces/common/type";
+  } from "@sparrow/workspaces/common/type";
   import { notifications } from "@library/ui/toast/Toast";
-  import { DropButton } from "@workspaces/common/components";
+  import { DropButton } from "@sparrow/workspaces/common/components";
   import { CodeMirrorInput } from "../../../../common/components";
   import { UrlInputTheme } from "../../../../common/utils/";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
@@ -200,8 +200,8 @@
         color={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
           ? "var(--icon-secondary-380)"
           : isHovered
-          ? "var(--icon-primary-200)"
-          : "var(--icon-secondary-100)"}
+            ? "var(--icon-primary-200)"
+            : "var(--icon-secondary-100)"}
       />
     </button>
   </Tooltip>
