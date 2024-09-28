@@ -62,7 +62,7 @@ import { type Observable } from "rxjs";
 import { InitRequestTab, InitWebSocketTab } from "@common/utils";
 import { InitCollectionTab } from "@common/utils";
 import { InitFolderTab } from "@common/utils/init-folder-tab";
-import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
+import { requestSplitterDirection } from "@sparrow/workspaces/features/rest-explorer/store";
 import {
   insertCollectionRequest,
   updateCollectionRequest,
@@ -85,7 +85,7 @@ import { SocketTabAdapter } from "../../adapter/socket-tab";
 import type { CollectionDocType } from "../../models/collection.model";
 import type { GuideQuery } from "../../types/user-guide";
 import type { FeatureQuery } from "../../types/feature-switch";
-import { ReduceQueryParams } from "@workspaces/features/rest-explorer/utils";
+import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/utils";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();

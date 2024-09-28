@@ -20,7 +20,6 @@
       "@app/*": ["./src/packages/@app/*"],
       "@common/*": ["./src/packages/@common/*"],
       "@teams/*": ["./src/packages/@teams/*"],
-      "@workspaces/*": ["./src/packages/@workspaces/*"],
       "@support/*": ["./src/packages/@support/*"],
       "@web/*": ["../@web/src/*"]
     }

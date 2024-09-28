@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { InviteToWorkspace, WorkspaceExplorer } from "@workspaces/features";
+  import {
+    InviteToWorkspace,
+    WorkspaceExplorer,
+  } from "@sparrow/workspaces/features";
   import WorkspaceExplorerViewModel from "./WorkspaceExplorerPage.ViewModel";
   import { Modal } from "@library/ui";
   import type { Observable } from "rxjs";

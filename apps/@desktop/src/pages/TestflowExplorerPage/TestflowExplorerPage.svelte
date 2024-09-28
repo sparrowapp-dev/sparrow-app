@@ -1,9 +1,9 @@
 <script lang="ts">
   import { of, type Observable } from "rxjs";
   import { TestflowExplorerPageViewModel } from "./TestflowExplorerPage.ViewModel";
-  import { TestflowExplorer } from "@workspaces/features/testflow-explorer";
+  import { TestflowExplorer } from "@sparrow/workspaces/features";
   import type { CollectionDocument } from "@app/database/database";
-  import { testFlowDataStore } from "@workspaces/features/testflow-explorer/store";
+  import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
   import { onDestroy } from "svelte";
   import type { TFDataStoreType } from "@common/types/workspace/testflow";
   import { user } from "$lib/store";

@@ -26,8 +26,8 @@ import type {
 } from "@common/types/workspace/testflow";
 import { CompareArray, Debounce, ParseTime } from "@common/utils";
 import { notifications } from "@library/ui/toast/Toast";
-import { DecodeRequest } from "@workspaces/features/rest-explorer/utils";
-import { testFlowDataStore } from "@workspaces/features/testflow-explorer/store";
+import { DecodeRequest } from "@sparrow/workspaces/features/rest-explorer/utils";
+import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
 import { BehaviorSubject, Observable } from "rxjs";
 
 export class TestflowExplorerPageViewModel {

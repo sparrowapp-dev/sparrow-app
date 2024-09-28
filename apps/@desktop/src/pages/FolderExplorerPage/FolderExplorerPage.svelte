@@ -11,7 +11,7 @@
   import FolderExplorerPage from "./FolderExplorerPage.ViewModel";
 
   // Component
-  import { FolderExplorer } from "@workspaces/features";
+  import { FolderExplorer } from "@sparrow/workspaces/features";
   import type { Folder } from "@common/types/workspace";
   import { user } from "$lib/store";
 

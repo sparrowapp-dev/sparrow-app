@@ -6,7 +6,7 @@
     leftPanelWidth,
     rightPanelWidth,
     leftPanelCollapse,
-  } from "@workspaces/common/stores";
+  } from "@sparrow/workspaces/common/stores";
 
   // ---- Animation
   import { Motion } from "svelte-motion";
@@ -27,8 +27,8 @@
     ImportCurl,
     WorkspaceDefault,
     SaveAsCollectionItem,
-  } from "@workspaces/features";
-  import { WithModal } from "@workspaces/common/hoc";
+  } from "@sparrow/workspaces/features"; 
+  import { WithModal } from "@sparrow/workspaces/common/hoc";
   import { notifications } from "@library/ui/toast/Toast";
 
   // ---- Interface, enum & constants
@@ -54,7 +54,6 @@
   } from "@app/database/database";
   import type { GithubRepoDocType } from "../../models/github-repo.model";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
   import { isGuestUserActive } from "$lib/store";
   import { pagesMotion } from "../../constants";
   import { user } from "$lib/store";

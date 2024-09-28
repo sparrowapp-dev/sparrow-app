@@ -5,7 +5,7 @@ import {
   ReduceQueryParams,
   ReduceAuthHeader,
   ReduceAuthParameter,
-} from "@workspaces/features/rest-explorer/utils";
+} from "@sparrow/workspaces/features/rest-explorer/utils";
 import { createDeepCopy, moveNavigation } from "$lib/utils/helpers";
 import {
   CompareArray,
@@ -72,7 +72,7 @@ import {
   type AddRequestInFolder,
   type SaveRequest,
   type SaveAsRequest,
-} from "@workspaces/common/type";
+} from "@sparrow/workspaces/common/type";
 import {
   type Auth,
   type Body,

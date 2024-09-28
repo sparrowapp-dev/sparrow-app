@@ -3,7 +3,7 @@ import {
   ReduceRequestURL,
   ReduceQueryParams,
   DecodeWebsocket,
-} from "@workspaces/features/rest-explorer/utils";
+} from "@sparrow/workspaces/features/rest-explorer/utils";
 import { createDeepCopy, moveNavigation } from "$lib/utils/helpers";
 import { CompareArray, Debounce, InitWebSocketTab } from "@common/utils";
 
@@ -48,7 +48,7 @@ import { v4 as uuidv4 } from "uuid";
 import { SocketTabAdapter } from "../../adapter/socket-tab";
 import type { CollectionDocType } from "../../models/collection.model";
 import { WebSocketService } from "../../services/web-socket.service";
-import { webSocketDataStore } from "@workspaces/features/socket-explorer/store";
+import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
 import { InitTab } from "@common/factory";
 
 class RestExplorerViewModel {

@@ -4,7 +4,7 @@
 
   // ---- View Model
   import RestExplorerViewModel from "./RestExplorerPage.ViewModel";
-  import { RestExplorer, ChatBot } from "@workspaces/features";
+  import { RestExplorer, ChatBot } from "@sparrow/workspaces/features";
   import { Debounce } from "@common/utils";
   import { isGuestUserActive, user } from "$lib/store";
   import { onMount } from "svelte";

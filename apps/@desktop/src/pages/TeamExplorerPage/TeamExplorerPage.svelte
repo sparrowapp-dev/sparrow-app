@@ -9,7 +9,7 @@
 
   import { DeleteWorkspace } from "@common/features";
   import { onMount } from "svelte";
-  import { InviteToWorkspace } from "@workspaces/features";
+  import { InviteToWorkspace } from "@sparrow/workspaces/features";
 
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
