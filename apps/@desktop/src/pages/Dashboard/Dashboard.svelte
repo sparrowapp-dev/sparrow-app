@@ -27,7 +27,7 @@
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import Teams from "../Teams/Teams.svelte";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import CreateWorkspace from "@teams/features/create-workspace/layout/CreateWorkspace.svelte";
+  import { CreateWorkspace } from "@sparrow/teams/features";
   import { Modal } from "@library/ui";
 
   const _viewModel = new DashboardViewModel();

@@ -64,7 +64,6 @@
     type Tab,
   } from "@common/types/workspace";
   import type { WebSocketTab } from "@common/types/workspace/web-socket";
-  import { TeamProfile } from "@teams/features/team-settings/components";
   import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
   import TestFlowExplorerPage from "../TestflowExplorerPage/TestflowExplorerPage.svelte";
   import { TestflowViewModel } from "./Testflow.ViewModel";

@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { Observable } from "rxjs";
-  import { TeamExplorer, TeamInvite } from "@teams/features";
+  import { TeamExplorer, TeamInvite } from "@sparrow/teams/features";
   import { TeamExplorerPageViewModel } from "./TeamExplorerPage.ViewModel";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { user } from "$lib/store";
   import { Modal } from "@library/ui";
-  import { LeaveTeam } from "@teams/features";
+  import { LeaveTeam } from "@sparrow/teams/features";
 
   import { DeleteWorkspace } from "@common/features";
   import { onMount } from "svelte";

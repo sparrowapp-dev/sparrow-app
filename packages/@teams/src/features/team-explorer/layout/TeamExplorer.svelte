@@ -13,10 +13,10 @@
   import {
     TeamTabsEnum,
     TeamViewEnum,
-  } from "@teams/common/constants/TeamTabs.constants";
+  } from "../../../common/constants/TeamTabs.constants";
   import { WorkspaceListView } from "../components";
   import WorkspaceGridView from "../components/workspace-grid-view/WorkspaceGridView.svelte";
-  import { TeamMembers, TeamSettings } from "@teams/features";
+  import { TeamMembers, TeamSettings } from "@sparrow/teams/features";
   import { CrossIcon, MoreOptions } from "@library/icons";
   import { Tooltip, Dropdown } from "@library/ui";
 

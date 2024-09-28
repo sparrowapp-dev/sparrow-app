@@ -7,7 +7,7 @@
   } from "$lib/assets/app.asset";
   import type { WorkspaceDocument } from "@app/database/database";
   import Button from "@library/ui/button/Button.svelte";
-  import { WorkspaceGrid } from "@teams/common/compopnents";
+  import { WorkspaceGrid } from "@sparrow/teams/common/compopnents";
   import { TeamSkeleton } from "../../images";
 
   export let searchQuery = "";

@@ -1,5 +1,5 @@
 <script>
-  import ApiListItem from "@teams/common/components/api-list-items/ApiListItem.svelte";
+  import ApiListItem from "../../../common/components/api-list-items/ApiListItem.svelte";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import List from "@library/ui/list/List.svelte";
   import constants from "$lib/utils/constants";
