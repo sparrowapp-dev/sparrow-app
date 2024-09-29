@@ -4,7 +4,6 @@
     userDetails,
     workspaceDocumentWithPosition,
   } from "@deprecate/utils/interfaces";
-  import type { MemberPopType } from "@deprecate/utils/types/common.type";
 
   import { ProfileWorkspace } from "./sub-profile";
   import { Select } from "@sparrow/library/forms";
@@ -13,7 +12,7 @@
   export let teamRole: TeamRole;
   export let workspaces: workspaceDocumentWithPosition[];
   export let userType: TeamRole;
-  export let handlePopup: (flag, popType: MemberPopType) => void;
+  export let handlePopup: (flag: boolean, popType: string) => void;
   export let owner = false;
   export let userId: string;
   export let handleMemberPopUpSuccess = (flag: boolean) => {};

@@ -6,7 +6,6 @@
   } from "@deprecate/utils/interfaces";
   import { TeamRole } from "@deprecate/utils/enums/team.enum";
   import { AdminLevelPermission } from "@deprecate/utils/constants/permissions.constant";
-  import type { MemberPopType } from "@deprecate/utils/types/common.type";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
   import { Profile } from "..";
@@ -72,7 +71,7 @@
     isMemberOwnershipPopup: false,
   };
 
-  const handlePopup = (flag: boolean, popType: MemberPopType): void => {
+  const handlePopup = (flag: boolean, popType: string): void => {
     switch (popType) {
       case "isMemberRemovePopup":
         memberPopObj.isMemberRemovePopup = flag;

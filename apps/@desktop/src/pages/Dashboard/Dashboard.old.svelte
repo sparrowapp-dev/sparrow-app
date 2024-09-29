@@ -20,7 +20,6 @@
     isWorkspaceLoaded,
   } from "@app/store/auth.store/workspace.store";
   
-  import type { Path } from "@deprecate/utils/interfaces/request.interface";
   import type { CurrentTeam, CurrentWorkspace } from "@deprecate/utils/interfaces";
   import { user, userWorkspaceLevelRole } from "@app/store/auth.store";
   import { TeamRepository } from "@app/repositories/team.repository";

@@ -11,7 +11,6 @@ import { DashboardViewModel } from "@app/pages/Dashboard/Dashboard.ViewModel";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
 import type { MakeRequestResponse } from "@deprecate/utils/interfaces/common.interface";
-import type { Response } from "@deprecate/utils/interfaces/request.interface";
 import { listen } from "@tauri-apps/api/event";
 import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
 import { v4 as uuidv4 } from "uuid";
@@ -477,7 +476,7 @@ const makeHttpRequestV2 = async (
       const duration = endTime - startTime;
       try {
         const responseBody = JSON.parse(data);
-        const apiResponse: Response = JSON.parse(responseBody.body) as Response;
+        const apiResponse = JSON.parse(responseBody.body);
         console.table(apiResponse);
         appInsights.trackDependencyData({
           id: uuidv4(),

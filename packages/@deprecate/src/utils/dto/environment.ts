@@ -1,5 +1,8 @@
-import type { EnvValuePair } from "../interfaces/request.interface";
-
+interface EnvValuePair {
+  key: string;
+  value: string;
+  chcecked: boolean;
+}
 export interface CreateEnvironmentPostBody {
   name: string;
   workspaceId: string;

@@ -1,4 +1,3 @@
-import type { KeyValuePairWithBase } from "@deprecate/utils/interfaces/request.interface";
 import type {
   ActiveSyncWrapper,
   DescriptionWrapper,
@@ -14,7 +13,7 @@ import type {
   TimestampWrapper,
   TypeWrapper,
 } from "./common";
-import type { KeyValueChecked } from "./request";
+import type { KeyValueChecked, KeyValueCheckedWithBase } from "./request";
 
 export interface IdWrapper2 {
   id: string;
@@ -51,7 +50,7 @@ interface RequestBodyDto {
   urlencoded?: KeyValueChecked[];
   formdata?: {
     text: KeyValueChecked[];
-    file: KeyValuePairWithBase[];
+    file: KeyValueCheckedWithBase[];
   };
 }
 

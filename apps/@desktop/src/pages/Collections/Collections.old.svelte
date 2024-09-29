@@ -7,7 +7,6 @@
   import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "@deprecate/utils/helpers/navigation";
-  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
   import type { Writable } from "svelte/store";
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "@deprecate/utils/animations";

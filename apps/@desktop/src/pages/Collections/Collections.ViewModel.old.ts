@@ -14,10 +14,6 @@
 // } from "@app/store/auth.store/request-response-section";
 // import { ItemType } from "@deprecate/utils/enums/item-type.enum";
 // import type { CollectionItem } from "@deprecate/utils/interfaces/collection.interface";
-// import type {
-//   Collection,
-//   RequestBody,
-// } from "@deprecate/utils/interfaces/request.interface";
 // import type { UpdateEnvironmentPostBody } from "@deprecate/utils/dto";
 // import { CollectionService } from "@deprecate/services/collection.service";
 // import { setContentTypeHeader } from "@deprecate/utils/helpers";

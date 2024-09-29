@@ -34,14 +34,7 @@ import type {
   CreateDirectoryPostBody,
   ImportBodyUrl,
 } from "@deprecate/utils/dto";
-//-----
 
-//-----
-//Interfaces
-import type { Folder } from "@deprecate/utils/interfaces/request.interface";
-//-----
-
-//-----
 //Emuns
 
 import {
@@ -1176,7 +1169,7 @@ export default class CollectionsViewModel {
   private handleCreateWebSocketInFolder = async (
     workspaceId: string,
     collection: CollectionDto,
-    explorer: Folder,
+    explorer: CollectionItemsDto,
   ) => {
     const websocket = new InitWebSocketTab(
       UntrackedItems.UNTRACKED + uuidv4(),
@@ -2031,7 +2024,7 @@ export default class CollectionsViewModel {
   private handleDeleteFolder = async (
     workspaceId: string,
     collection: CollectionDto,
-    explorer: Folder,
+    explorer: CollectionItemsDto,
     requestIds: string[],
   ) => {
     let userSource = {};
@@ -2189,7 +2182,7 @@ export default class CollectionsViewModel {
     workspaceId: string,
     collection: CollectionDto,
     websocket: CollectionItemsDto,
-    folder: Folder,
+    folder: CollectionItemsDto,
   ): Promise<boolean> => {
     let userSource = {};
     if (collection.activeSync) {

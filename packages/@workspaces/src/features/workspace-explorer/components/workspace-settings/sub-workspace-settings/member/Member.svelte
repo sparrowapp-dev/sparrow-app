@@ -3,7 +3,6 @@
   import { WorkspaceRole } from "@deprecate/utils/enums/team.enum";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
-  import type { MemberPopType } from "@deprecate/utils/types/common.type";
 
   export let onRemoveUserFromWorkspace;
 
@@ -81,7 +80,7 @@
     isMemberRemovePopup: false,
   };
 
-  const handlePopup = (flag: boolean, popType: MemberPopType): void => {
+  const handlePopup = (flag: boolean, popType: string): void => {
     switch (popType) {
       case "isMemberRemovePopup":
         memberPopObj.isMemberRemovePopup = flag;

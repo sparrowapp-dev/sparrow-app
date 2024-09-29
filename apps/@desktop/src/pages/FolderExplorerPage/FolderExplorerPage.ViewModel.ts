@@ -32,7 +32,6 @@ import { notifications } from "@sparrow/library/ui";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { isGuestUserActive } from "@app/store/auth.store";
 // import { generateSampleRequest } from "@deprecate/utils/sample";
-// import type { Folder, Path } from "@deprecate/utils/interfaces/request.interface";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class FolderExplorerPage {

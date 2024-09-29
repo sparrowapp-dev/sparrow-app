@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import type { WorkspaceMethods } from "@deprecate/utils/interfaces/workspace.interface";
 
   import type { Observable } from "rxjs";
@@ -9,7 +9,6 @@
     TeamRepositoryMethods,
     TeamServiceMethods,
   } from "@deprecate/utils/interfaces";
-  import type { Path } from "@deprecate/utils/interfaces/request.interface";
   import { TeamViewModel } from "./Teams.ViewModel.old";
   import { Motion } from "svelte-motion";
   import { user } from "@app/store/auth.store";
@@ -46,7 +45,7 @@
   export let handleWorkspaceSwitch: any;
   export let handleWorkspaceTab: any;
   export let activeSideBarTabMethods: any;
-  export let collectionsMethods: CollectionsMethods;
+  export let collectionsMethods;
   export let currentTeam: CurrentTeam;
   export let refreshTeamsWorkspaces: (userId: string) => void;
 
@@ -179,7 +178,7 @@
       //   }
       // });
 
-      let path: Path = {
+      let path = {
         workspaceId: responseData._id,
         collectionId: "",
       };
@@ -421,18 +420,18 @@
     activeTeamSubscribe.unsubscribe();
   });
   let teamUnderSubmission: boolean = false;
-</script>
+</script> -->
 
-<svelte:window
+<!-- <svelte:window
   on:click={(e) => {
     handleCloseShowMoreClick();
   }}
   on:contextmenu|preventDefault={() => {
     handleCloseShowMoreClick();
   }}
-/>
+/> -->
 <!-- Create New Team POP UP -->
-
+<!-- 
 <Modal
   title={"New Team"}
   type={"dark"}
@@ -442,8 +441,8 @@
   handleModalState={(flag) => {
     handleCreateTeamModal();
   }}
->
-  <!-- <Input
+> -->
+<!-- <Input
     value={newTeam.name.value}
     inputId="team-name-input"
     labelText="Team or Organization name"
@@ -471,7 +470,7 @@
     inputClassProp={`py-2 px-3 border-0`}
     labelTextClassProp={`mt-3`}
   /> -->
-  <DragDrop
+<!-- <DragDrop
     value={newTeam.file.value}
     maxFileSize={100}
     onChange={handleLogoInputChange}
@@ -514,10 +513,10 @@
       }}
     />
   </div>
-</Modal>
+</Modal> -->
 
 <!-- Leave Team POP UP -->
-
+<!-- 
 <Modal
   title={"Leave Team?"}
   type={"danger"}
@@ -552,17 +551,16 @@
       }}
     />
   </div>
-</Modal>
+</Modal> -->
 
-<Splitpanes
+<!-- <Splitpanes
   class="splitter-sidebar"
-  on:resize={(e) => {
-    // workspaceLeftPanelWidth.set(e.detail[0].size);
-    // workspaceRightPanelWidth.set(e.detail[1].size);
-  }}
->
-  <!-- <Pane class="sidebar-left-panel" minSize={20} size={$workspaceLeftPanelWidth}> -->
-  <!-- <WorkspaceList
+  on:resize={(e) => { -->
+// workspaceLeftPanelWidth.set(e.detail[0].size); // workspaceRightPanelWidth.set(e.detail[1].size);
+<!-- }}
+> -->
+<!-- <Pane class="sidebar-left-panel" minSize={20} size={$workspaceLeftPanelWidth}> -->
+<!-- <WorkspaceList
       {userId}
       {handleCreateTeamModal}
       openTeam={$openTeam}
@@ -577,13 +575,13 @@
       {teamServiceMethods}
       {collectionsMethods}
     /> -->
-  <!-- </Pane> -->
-  <!-- <Pane
+<!-- </Pane> -->
+<!-- <Pane
     class="sidebar-right-panel"
     minSize={60}
     size={$workspaceRightPanelWidth}
   > -->
-  <!-- <WorkspaceContent
+<!-- <WorkspaceContent
       {currentTeam}
       {userId}
       teams={allTeams}
@@ -602,10 +600,10 @@
       {teamRepositoryMethods}
       workspaces={$workspaces}
     /> -->
-  <!-- </Pane> -->
-</Splitpanes>
+<!-- </Pane> -->
+<!-- </Splitpanes> -->
 
-<style>
+<!-- <style>
   .warning-text {
     color: var(--colors-neutral-text-3, #ccc);
     font-size: 14px;
@@ -615,4 +613,4 @@
   :global(.splitter-sidebar.splitpanes) {
     width: calc(100vw - 72px);
   }
-</style>
+</style> -->

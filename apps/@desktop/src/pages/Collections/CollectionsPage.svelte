@@ -32,7 +32,6 @@
   import { notifications } from "@sparrow/library/ui";
 
   // ---- Interface, enum & constants
-  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
   import { WorkspaceRole } from "@deprecate/utils/enums/team.enum";
 
   // ---- View Model
