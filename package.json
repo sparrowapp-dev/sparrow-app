@@ -6,8 +6,6 @@
   "version": "0.0.1",
   "type": "module",
   "workspaces": [
-    "./packages/@sparrow-desktop",
-    "./packages/@sparrow-web",
     "./packages/@sparrow-library",
     "./packages/@sparrow-common",
     "./packages/@sparrow-teams",
