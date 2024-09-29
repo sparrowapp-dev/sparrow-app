@@ -2,7 +2,7 @@
   /**
    * Components
    */
-  import { Input } from "@library/forms";
+  import { Input } from "@sparrow/library/forms";
 
   /**
    * Types

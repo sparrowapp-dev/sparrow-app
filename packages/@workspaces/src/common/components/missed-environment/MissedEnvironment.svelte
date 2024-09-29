@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { DangerIcon } from "@library/icons";
+  import { DangerIcon } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
 
   /**

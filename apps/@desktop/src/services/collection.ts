@@ -1,24 +1,24 @@
-import constants from "$lib/utils/constants";
+import constants from "@app/constants/constants";
 import {
   makeRequest,
   getAuthHeaders,
   makeHttpRequest,
-} from "$lib/api/api.common";
+} from "@app/containers/api/api.common";
 
 import type {
   CreateApiRequestPostBody,
   CreateCollectionPostBody,
   CreateDirectoryPostBody,
-} from "$lib/utils/dto";
+} from "@sparrow/common/dto";
 
-import {
-  apiEndPoint,
-  bodyText,
-  methodText,
-  requestType,
-  responseText,
-} from "$lib/store/api-request";
-import { keyStore, valueStore } from "$lib/store/parameter";
+// import {
+//   apiEndPoint,
+//   bodyText,
+//   methodText,
+//   requestType,
+//   responseText,
+// } from "@app/store/auth.store/api-request";
+// import { keyStore, valueStore } from "@app/store/auth.store/parameter";
 
 const apiUrl: string = constants.API_URL;
 
@@ -128,93 +128,93 @@ const insertCollection: (
 //   return response;
 // };
 
-export const crudMethod = async () => {
-  try {
-    let keyText: string;
-    let valueText: string;
+// export const crudMethod = async () => {
+//   try {
+//     let keyText: string;
+//     let valueText: string;
 
-    keyStore.subscribe((value) => {
-      if (value) {
-        keyText = value;
-      }
-    });
+//     keyStore.subscribe((value) => {
+//       if (value) {
+//         keyText = value;
+//       }
+//     });
 
-    valueStore.subscribe((value) => {
-      if (value) {
-        valueText = value;
-      }
-    });
+//     valueStore.subscribe((value) => {
+//       if (value) {
+//         valueText = value;
+//       }
+//     });
 
-    let url: string = "";
-    const unsubscribeUrl = apiEndPoint.subscribe((value) => {
-      if (value) {
-        url = value;
-      }
-    });
+//     let url: string = "";
+//     const unsubscribeUrl = apiEndPoint.subscribe((value) => {
+//       if (value) {
+//         url = value;
+//       }
+//     });
 
-    if (url.length === 0) {
-      url = keyText + valueText;
-    }
+//     if (url.length === 0) {
+//       url = keyText + valueText;
+//     }
 
-    let method: string = "";
-    const unsubscribeMethod = methodText.subscribe((value) => {
-      if (value) {
-        method = value;
-      }
-    });
+//     let method: string = "";
+//     const unsubscribeMethod = methodText.subscribe((value) => {
+//       if (value) {
+//         method = value;
+//       }
+//     });
 
-    let bodyTextValue: string;
-    const unsubscribeBody = bodyText.subscribe((value) => {
-      if (value) {
-        bodyTextValue = value;
-      }
-    });
+//     let bodyTextValue: string;
+//     const unsubscribeBody = bodyText.subscribe((value) => {
+//       if (value) {
+//         bodyTextValue = value;
+//       }
+//     });
 
-    if (bodyTextValue === "") {
-      bodyTextValue = "{}";
-    }
+//     if (bodyTextValue === "") {
+//       bodyTextValue = "{}";
+//     }
 
-    let request: string = "";
-    const unsubscribeRequest = requestType.subscribe((value) => {
-      if (value) {
-        request = value;
-      }
-    });
+//     let request: string = "";
+//     const unsubscribeRequest = requestType.subscribe((value) => {
+//       if (value) {
+//         request = value;
+//       }
+//     });
 
-    // Unsubscribe from the stores after we're done
-    unsubscribeUrl();
-    unsubscribeMethod();
-    unsubscribeBody();
-    unsubscribeRequest();
+//     // Unsubscribe from the stores after we're done
+//     unsubscribeUrl();
+//     unsubscribeMethod();
+//     unsubscribeBody();
+//     unsubscribeRequest();
 
-    const headers =
-      "Content-Type=application/json&User-Agent=PostmanRuntime/7.33.0&Accept=*/*&Connection=keep-alive"; // Add your headers if needed
+//     const headers =
+//       "Content-Type=application/json&User-Agent=PostmanRuntime/7.33.0&Accept=*/*&Connection=keep-alive"; // Add your headers if needed
 
-    const response = await makeHttpRequest(
-      url,
-      method,
-      headers,
-      bodyTextValue,
-      request,
-    );
-    let responseData: any;
+//     const response = await makeHttpRequest(
+//       url,
+//       method,
+//       headers,
+//       bodyTextValue,
+//       request,
+//     );
+//     let responseData: any;
 
-    if (response?.data) {
-      try {
-        responseData = response?.data;
-      } catch (error) {
-        console.error("Error parsing JSON:", error);
-        responseData = null;
-      }
-    }
+//     if (response?.data) {
+//       try {
+//         responseData = response?.data;
+//       } catch (error) {
+//         console.error("Error parsing JSON:", error);
+//         responseData = null;
+//       }
+//     }
 
-    responseText.set(responseData);
-  } catch (error) {
-    console.error("Error:", error);
-    // return error.message;
-    // Handle the error gracefully, you can show an error message to the user or take other appropriate actions.
-  }
-};
+//     responseText.set(responseData);
+//   } catch (error) {
+//     console.error("Error:", error);
+//     // return error.message;
+//     // Handle the error gracefully, you can show an error message to the user or take other appropriate actions.
+//   }
+// };
 
 // const newRequest = {
 //   url: "https://example.com/api/resource",

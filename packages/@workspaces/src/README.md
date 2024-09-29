@@ -1,1 +1,1 @@
-This module has only access to @library and @common module
+This module has only access to @sparrow/library and @sparrow/common module

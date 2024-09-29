@@ -50,19 +50,19 @@
   /**
    * Components
    */
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
 
   /**
    * Types
    */
   import type { CollectionDocument, TabDocument } from "@app/database/database";
-  import type { Folder } from "@common/types/workspace";
+  import type { Folder } from "@sparrow/common/types/workspace";
 
   /**
    * Constants
    */
-  import { PERMISSION_NOT_FOUND_TEXT } from "$lib/utils/constants/permissions.constant";
-  import { WorkspaceRole } from "$lib/utils/enums";
+  import { PERMISSION_NOT_FOUND_TEXT } from "@sparrow/common/constants/permissions.constant";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   /**
    * Local variables

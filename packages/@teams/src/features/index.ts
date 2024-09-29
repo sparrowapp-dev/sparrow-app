@@ -5,3 +5,7 @@ export * from "./team-invite";
 export * from "./team-members";
 export * from "./team-settings";
 export * from "./leave-team";
+export * from "./create-workspace";
+export * from "./team-sidepanel";
+export * from "./recent-apis";
+export * from "./recent-workspace";

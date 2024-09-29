@@ -3,7 +3,7 @@ import {
   AuthTypeEnum,
   type Auth,
   type State,
-} from "@common/types/workspace";
+} from "@sparrow/common/types/workspace";
 
 class ReduceAuthParameter {
   private authParameter;

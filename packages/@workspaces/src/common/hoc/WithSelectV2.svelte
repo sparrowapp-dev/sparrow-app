@@ -1,5 +1,5 @@
 <script>
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
   /**
    * unique Select component id
    */

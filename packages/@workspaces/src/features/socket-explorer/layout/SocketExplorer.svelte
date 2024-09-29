@@ -1,11 +1,11 @@
 <script lang="ts">
-  import Loader from "@library/ui/loader/Loader.svelte";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import { Loader } from "@sparrow/library/ui";
+  import { Modal } from "@sparrow/library/ui";
   import { Splitpanes, Pane } from "svelte-splitpanes";
 
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import { SaveAsCollectionItem } from "@workspaces/features";
+  import { SaveAsCollectionItem } from "@sparrow/workspaces/features";
 
   import type {
     CreateCollectionType,
@@ -18,8 +18,8 @@
     UpdateHeadersType,
     UpdateParamsType,
     UpdateRequestUrlType,
-  } from "@workspaces/common/type";
-  import { TabTypeEnum, type Tab } from "@common/types/workspace";
+  } from "@sparrow/workspaces/common/type";
+  import { TabTypeEnum, type Tab } from "@sparrow/common/types/workspace";
 
   import {
     HttpUrlSection,
@@ -31,7 +31,7 @@
     SocketNavigator,
     SocketParameters,
   } from "../components";
-  import { SocketSectionEnum } from "@common/types/workspace/web-socket";
+  import { SocketSectionEnum } from "@sparrow/common/types/workspace/web-socket";
   import ResponseData from "../components/response-data/ResponseData.svelte";
 
   export let tab: Observable<Tab>;
@@ -215,7 +215,7 @@
       </div>
     </div>
   </div>
-  <ModalWrapperV1
+  <Modal
     title={"Save Request"}
     type={"dark"}
     width={"55%"}
@@ -242,7 +242,7 @@
       {onRenameCollection}
       {onRenameFolder}
     />
-  </ModalWrapperV1>
+  </Modal>
 {/if}
 
 <style>

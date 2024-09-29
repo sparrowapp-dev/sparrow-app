@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Label, Tooltip } from "@library/ui";
+  import { Label, Tooltip } from "@sparrow/library/ui";
   export let tabs = [];
   export let activeTeamTab: string;
   export let onUpdateActiveTab: (data: string) => void;
@@ -10,33 +10,31 @@
   <div class="d-flex mb-2">
     {#each tabs as tab}
       {#if tab?.visible}
-       
-          <button
-            class="navigation__link border-0 sparrow-fs-12 request-tab me-3 {tab.id ===
-            activeTeamTab
-              ? 'tab-active'
-              : ''} {tab.disabled ? 'tab-disabled' : ''}"
-            role="tab"
-            on:click={() => {
-              if (!tab.disabled) {
-                onUpdateActiveTab(tab.id);
-              }
-            }}
-            disabled={tab.disabled}
-          >
-            <span
-              class="d-flex align-items-center ps-1 pe-1 {tab.id !==
-              activeTeamTab
-                ? 'tab-active-text'
-                : ''}"
-              style="font-size: 12px; font-weight:700"
-              ><span>{tab.name}</span>
-              {#if tab.count}
-                <span class="ms-1"></span>
-                <Label number={tab.count} />
-              {/if}
-            </span>
-          </button>
+        <button
+          class="navigation__link border-0 sparrow-fs-12 request-tab me-3 {tab.id ===
+          activeTeamTab
+            ? 'tab-active'
+            : ''} {tab.disabled ? 'tab-disabled' : ''}"
+          role="tab"
+          on:click={() => {
+            if (!tab.disabled) {
+              onUpdateActiveTab(tab.id);
+            }
+          }}
+          disabled={tab.disabled}
+        >
+          <span
+            class="d-flex align-items-center ps-1 pe-1 {tab.id !== activeTeamTab
+              ? 'tab-active-text'
+              : ''}"
+            style="font-size: 12px; font-weight:700"
+            ><span>{tab.name}</span>
+            {#if tab.count}
+              <span class="ms-1"></span>
+              <Label number={tab.count} />
+            {/if}
+          </span>
+        </button>
       {/if}
     {/each}
   </div>

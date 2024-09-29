@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SparrowLogo } from "@common/images";
+  import { SparrowLogo } from "@sparrow/common/images";
   export let isMainScreen = false;
 </script>
 

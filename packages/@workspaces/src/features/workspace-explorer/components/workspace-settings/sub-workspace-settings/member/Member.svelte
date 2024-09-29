@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { Select } from "@library/forms";
-  import { WorkspaceRole } from "$lib/utils/enums/team.enum";
-  import { Modal } from "@library/ui";
-  import Button from "@library/ui/button/Button.svelte";
-  import type { MemberPopType } from "$lib/utils/types/common.type";
+  import { Select } from "@sparrow/library/forms";
+  import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
 
   export let onRemoveUserFromWorkspace;
 
@@ -81,7 +80,7 @@
     isMemberRemovePopup: false,
   };
 
-  const handlePopup = (flag: boolean, popType: MemberPopType): void => {
+  const handlePopup = (flag: boolean, popType: string): void => {
     switch (popType) {
       case "isMemberRemovePopup":
         memberPopObj.isMemberRemovePopup = flag;
@@ -235,8 +234,6 @@
     />
   </div>
 </div>
-
-
 
 <style>
   .member-data-container:hover {

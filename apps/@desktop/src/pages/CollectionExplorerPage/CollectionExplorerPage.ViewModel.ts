@@ -9,22 +9,26 @@ import { CollectionService } from "../../services/collection.service";
 import type { CollectionDocument, TabDocument } from "../../database/database";
 
 // Notification
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 
 // Utils
-import { moveNavigation } from "$lib/utils/helpers";
-import { ItemType, ResponseStatusCode, UntrackedItems } from "$lib/utils/enums";
+import { moveNavigation } from "@sparrow/common/utils";
+import {
+  ItemType,
+  ResponseStatusCode,
+  UntrackedItems,
+} from "@sparrow/common/enums";
 import { invoke } from "@tauri-apps/api/core";
 import { v4 as uuidv4 } from "uuid";
 
 // Stores
-import { InitRequestTab } from "@common/utils";
+import { InitRequestTab } from "@sparrow/common/utils";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
-import { isGuestUserActive } from "$lib/store/auth.store";
+import { isGuestUserActive } from "@app/store/auth.store";
 import type {
   CollectionDto,
   CollectionItemsDto,
-} from "@common/types/workspace";
+} from "@sparrow/common/types/workspace";
 
 class CollectionExplorerPage {
   // Private Repositories

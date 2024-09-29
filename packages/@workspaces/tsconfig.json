@@ -13,18 +13,8 @@
     "allowJs": true,
     "checkJs": true,
     "isolatedModules": true,
-    "paths": {
-      "@library/*": ["../packages/@library/src/*"],
-      "@common/*": ["../packages/@common/src/*"],
-      "$lib/*": ["../packages/@deprecate/src/*"]
-    }
+    "paths": {}
   },
-  "include": [
-    "src/**/*.d.ts",
-    "src/**/*.ts",
-    "src/**/*.js",
-    "src/**/*.svelte",
-    "../packages/@library/src/**/*.ts"
-  ],
+  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

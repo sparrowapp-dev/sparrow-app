@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { Editor } from "@library/forms";
+  import { Editor } from "@sparrow/library/forms";
   import {
     RequestDataTypeEnum,
     ResponseFormatterEnum,
     type Response,
     type State,
-  } from "@common/types/workspace";
+  } from "@sparrow/common/types/workspace";
   import { SparrowLogo } from "../../assets/images";
   export let response: Response;
   export let apiState: State;

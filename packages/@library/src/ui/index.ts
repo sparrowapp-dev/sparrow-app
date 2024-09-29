@@ -14,3 +14,4 @@ export * from "./carousel";
 export * from "./table";
 export * from "./icon-fallback";
 export * from "./toast";
+export * from "./image-modal";

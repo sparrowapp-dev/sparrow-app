@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { Editor } from "@library/forms";
+  import { Editor } from "@sparrow/library/forms";
   import {
     RequestDataTypeEnum,
     ResponseFormatterEnum,
-  } from "@common/types/workspace";
+  } from "@sparrow/common/types/workspace";
   // import { SparrowLogo } from "../../assets/images";
   export let response;
   export let apiState;

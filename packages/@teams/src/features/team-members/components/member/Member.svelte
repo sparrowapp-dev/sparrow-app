@@ -1,17 +1,16 @@
 <script lang="ts">
-  import { base64ToURL } from "$lib/utils/helpers";
+  import { base64ToURL } from "@sparrow/common/utils";
   import type {
     userDetails,
     workspaceDocumentWithPosition,
-  } from "$lib/utils/interfaces";
-  import { TeamRole } from "$lib/utils/enums/team.enum";
-  import { AdminLevelPermission } from "$lib/utils/constants/permissions.constant";
-  import type { MemberPopType } from "$lib/utils/types/common.type";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "@library/ui/button/Button.svelte";
+  } from "@sparrow/common/interfaces";
+  import { TeamRole } from "@sparrow/common/enums/team.enum";
+  import { AdminLevelPermission } from "@sparrow/common/constants/permissions.constant";
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
   import { Profile } from "..";
-  import { Select } from "@library/forms";
-  import { IconFallback } from "@library/ui";
+  import { Select } from "@sparrow/library/forms";
+  import { IconFallback } from "@sparrow/library/ui";
   export let user: userDetails;
   export let userType: TeamRole;
   export let openTeam;
@@ -72,7 +71,7 @@
     isMemberOwnershipPopup: false,
   };
 
-  const handlePopup = (flag: boolean, popType: MemberPopType): void => {
+  const handlePopup = (flag: boolean, popType: string): void => {
     switch (popType) {
       case "isMemberRemovePopup":
         memberPopObj.isMemberRemovePopup = flag;
@@ -222,7 +221,7 @@
   let confirmationError: string = "";
 </script>
 
-<ModalWrapperV1
+<Modal
   title={"Remove user?"}
   type={"danger"}
   width={"35%"}
@@ -266,9 +265,9 @@
       onClick={handleMemberPopUpSuccess}
     />
   </div>
-</ModalWrapperV1>
+</Modal>
 
-<ModalWrapperV1
+<Modal
   title={"Changing Role?"}
   type={"dark"}
   width={"35%"}
@@ -342,10 +341,10 @@
         handleMemberPromotePopUpSuccess();
       }}
     />
-  </div></ModalWrapperV1
+  </div></Modal
 >
 
-<ModalWrapperV1
+<Modal
   title={"Changing Role?"}
   type={"dark"}
   width={"35%"}
@@ -413,10 +412,10 @@
         }}
       />
     </div>
-  </div></ModalWrapperV1
+  </div></Modal
 >
 
-<ModalWrapperV1
+<Modal
   title={"Changing Role?"}
   type={"dark"}
   width={"35%"}
@@ -521,9 +520,9 @@
       }}
     />
   </div>
-</ModalWrapperV1>
+</Modal>
 
-<ModalWrapperV1
+<Modal
   title={`Access to ${openTeam?.name}`}
   type={"dark"}
   width={"35%"}
@@ -554,7 +553,7 @@
     {onRemoveUserFromWorkspace}
     {onChangeUserRoleAtWorkspace}
   />
-</ModalWrapperV1>
+</Modal>
 
 <div class="d-flex tile rounded align-items-center">
   <div

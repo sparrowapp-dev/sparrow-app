@@ -1,24 +1,28 @@
 <script>
-  import { LeftIcon, SearchIcon } from "$lib/assets/app.asset";
-  import { Input, Select, Textarea } from "@library/forms";
+  import { LeftIcon, SearchIcon } from "@deprecate/assets/app.asset";
+  import { Input, Select, Textarea } from "@sparrow/library/forms";
   import {
     AttachmentIcon,
     CategoryIcon,
     CrossIcon,
     SortIcon,
     StatusIcon,
-  } from "@library/icons";
+  } from "@sparrow/library/icons";
 
-  import { Button, IconFallback, Loader, Modal } from "@library/ui";
-  import ImageModal from "@library/ui/image-modal/ImageModal.svelte";
-  import { CommentCard, Drop, UpvoteIcon } from "@support/common/components";
-  import { FeedbackType } from "@support/common/types";
+  import { Button, IconFallback, Loader, Modal } from "@sparrow/library/ui";
+  import { ImageModal } from "@sparrow/library/ui";
+  import {
+    CommentCard,
+    Drop,
+    UpvoteIcon,
+  } from "@sparrow/support/common/components";
+  import { FeedbackType } from "@sparrow/support/common/types";
   import { onMount } from "svelte";
-  import { FormatTime } from "@common/utils/formatTime";
+  import { FormatTime } from "@sparrow/common/utils";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { notifications } from "@sparrow/library/ui";
 
   export let isPostopen;
   export let userInfo;

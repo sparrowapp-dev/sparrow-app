@@ -1,12 +1,12 @@
 <script lang="ts">
   import { Link, navigate } from "svelte-navigator";
-  import { isLoading, isResponseError, setUser } from "$lib/store/auth.store";
-  import { jwtDecode } from "$lib/utils/jwt";
-  import googleLogo from "$lib/assets/googlelogo.svg";
-  import eyeHide from "$lib/assets/eye-hide.svg";
-  import eyeShow from "$lib/assets/eye-show.svg";
+  import { setUser } from "@app/store/auth.store";
+  import { jwtDecode } from "@app/utils/jwt";
+  import googleLogo from "@deprecate/assets/googlelogo.svg";
+  import eyeHide from "@deprecate/assets/eye-hide.svg";
+  import eyeShow from "@deprecate/assets/eye-show.svg";
   import { authNavigate, handleLoginValidation } from "./login-page";
-  import sparrowicon from "$lib/assets/sparrowIcon.svg";
+  import sparrowicon from "@deprecate/assets/sparrowIcon.svg";
   import { once } from "@tauri-apps/api/event";
   import { Window } from "@tauri-apps/api/window";
 
@@ -68,15 +68,15 @@
 
   let isPasswordtouched: boolean = false;
 
-  isLoading.subscribe((value) => {
-    isLoadingPage = value;
-  });
+  // isLoading.subscribe((value) => {
+  //   isLoadingPage = value;
+  // });
 
   let isPasswordError: boolean;
 
-  isResponseError.subscribe((value) => {
-    isPasswordError = value;
-  });
+  // isResponseError.subscribe((value) => {
+  //   isPasswordError = value;
+  // });
 
   let errorMessage: string = "";
 

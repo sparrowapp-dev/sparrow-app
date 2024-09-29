@@ -1,19 +1,19 @@
 <script lang="ts">
-  import { RequestMethod, WorkspaceRole } from "$lib/utils/enums";
+  import { RequestMethod, WorkspaceRole } from "@sparrow/common/enums";
 
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
   import type {
     SaveRequestType,
     SendRequestType,
     UpdateRequestMethodType,
     UpdateRequestUrlType,
-  } from "@workspaces/common/type";
-  import { notifications } from "@library/ui/toast/Toast";
-  import { DropButton } from "@workspaces/common/components";
+  } from "@sparrow/workspaces/common/type";
+  import { notifications } from "@sparrow/library/ui";
+  import { DropButton } from "@sparrow/workspaces/common/components";
   import { CodeMirrorInput } from "../../../../common/components";
   import { UrlInputTheme } from "../../../../common/utils/";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-  import { DiskIcon } from "@library/icons";
+  import { Tooltip } from "@sparrow/library/ui";
+  import { DiskIcon } from "@sparrow/library/icons";
   let componentClass = "";
   export { componentClass as class };
 
@@ -200,8 +200,8 @@
         color={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
           ? "var(--icon-secondary-380)"
           : isHovered
-          ? "var(--icon-primary-200)"
-          : "var(--icon-secondary-100)"}
+            ? "var(--icon-primary-200)"
+            : "var(--icon-secondary-100)"}
       />
     </button>
   </Tooltip>

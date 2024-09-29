@@ -1,21 +1,20 @@
 <script lang="ts">
   import { Router, Route } from "svelte-navigator";
   import "font-awesome/css/font-awesome.css";
-  import Toast from "@library/ui/toast/Toast.svelte";
+  import { Toast } from "@sparrow/library/ui";
   import Authguard from "../routing/Authguard.svelte";
   import Navigate from "../routing/Navigate.svelte";
   import Dashboard from "@app/pages/Dashboard/Dashboard.svelte";
   import EntryPoint from "@app/pages/Auth/entry-point/EntryPoint.svelte";
   import { resizeWindowOnLogin } from "../utils";
-  import { registerDeepLinkHandler } from "$lib/utils/deeplink/app.deeplink";
+  import { registerDeepLinkHandler } from "@app/utils/deeplink/app.deeplink";
   import { onMount } from "svelte";
-  import { user } from "$lib/store/auth.store";
-  import { handleShortcuts } from "$lib/utils/shortcuts";
-  import { AppUpdater } from "@common/features";
+  import { user } from "@app/store/auth.store";
+  import { handleShortcuts } from "@app/utils/shortcuts";
+  import { AppUpdater } from "@sparrow/common/features";
   import { getCurrent } from "@tauri-apps/api/window";
   import LoginPage from "@app/pages/Auth/login-page/LoginPage.svelte";
-  import RegisterPage from "@app/pages/Auth/register-page/RegisterPage.svelte";
-  import { singleInstanceHandler } from "$lib/utils/singleinstance/app.singleinstance";
+  import { singleInstanceHandler } from "@app/utils/singleinstance/app.singleinstance";
 
   export let url = "/";
   let isActiveInternet: boolean = true;
@@ -81,7 +80,6 @@
         <Route path="/*"><Navigate to="/init" /></Route>
       {:else}
         <Route path="/login" component={LoginPage} />
-        <Route path="/register" component={RegisterPage} />
         <Route path="/*"><Navigate to="/login" /></Route>
       {/if}
     </section>

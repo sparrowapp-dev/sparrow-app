@@ -8,22 +8,22 @@
     ExclamationIcon,
     CheckIcon2,
     DropIcon,
-  } from "@library/icons";
+  } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
-  import { ResponseStatusCode } from "$lib/utils/enums";
+  import { ResponseStatusCode } from "@sparrow/common/enums";
   import { InfoIcon, ArrowIcon } from "../../icons";
-  import { VectorIcon } from "@library/icons";
+  import { VectorIcon } from "@sparrow/library/icons";
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import { testFlowDataStore } from "@workspaces/features/testflow-explorer/store/testflow";
-  import { ThreeDotIcon } from "$lib/assets/app.asset";
-  import { createDeepCopy } from "$lib/utils/helpers";
-  import { ParseTime } from "@common/utils";
+  import { testFlowDataStore } from "../../../../features/testflow-explorer/store/testflow";
+  import { ThreeDotIcon } from "@deprecate/assets/app.asset";
+  import { createDeepCopy } from "@sparrow/common/utils";
+  import { ParseTime } from "@sparrow/common/utils";
   import type {
     TFDataStoreType,
     TFNodeStoreType,
-  } from "@common/types/workspace/testflow";
+  } from "@sparrow/common/types/workspace/testflow";
   import type { Unsubscriber } from "svelte/store";
 
   /**
@@ -180,14 +180,14 @@
   style={selected && !currentBlock
     ? "border: 2px solid var(--border-primary-300);"
     : selected && currentBlock && checkIfRequestSucceed(currentBlock)
-    ? "border: 2px solid #69D696;"
-    : selected && currentBlock && !checkIfRequestSucceed(currentBlock)
-    ? "border: 2px solid #FF7878;"
-    : !currentBlock
-    ? ""
-    : checkIfRequestSucceed(currentBlock)
-    ? "border-left: 2px solid #69D696;"
-    : "border-left: 2px solid #FF7878;"}
+      ? "border: 2px solid #69D696;"
+      : selected && currentBlock && !checkIfRequestSucceed(currentBlock)
+        ? "border: 2px solid #FF7878;"
+        : !currentBlock
+          ? ""
+          : checkIfRequestSucceed(currentBlock)
+            ? "border-left: 2px solid #69D696;"
+            : "border-left: 2px solid #FF7878;"}
 >
   <Handle type="target" position={Position.Left} />
   <div class=" d-flex justify-content-between align-items-center px-3 py-2">

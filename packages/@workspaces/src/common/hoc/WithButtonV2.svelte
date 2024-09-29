@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ButtonV2 } from "@library/ui";
+  // import { ButtonV2 } from "@sparrow/library/ui";
   /**
    * icon to be embedded in button
    */
@@ -19,7 +19,7 @@
   $: ({ onClick, icon, disable, loader } = $$props);
 </script>
 
-<ButtonV2
+<!-- <ButtonV2
   {icon}
   {onClick}
   {disable}
@@ -33,4 +33,4 @@
   hoveredIconColor={"var(--bg-secondary-100 )"}
   clickedIconColor={"var(--bg-secondary-100 )"}
   borderRadius={"2px"}
-/>
+/> -->

@@ -2,7 +2,7 @@
   /**
    * Components
    */
-  import { Textarea } from "@library/forms";
+  import { Textarea } from "@sparrow/library/forms";
 
   /**
    * Types

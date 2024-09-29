@@ -1,30 +1,30 @@
 <script lang="ts">
   // ---- Components
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "@library/ui/button/Button.svelte";
-  import { Tooltip } from "@library/ui";
-  import { Options } from "@library/ui";
+  import { Spinner } from "@sparrow/library/ui";
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
+  import { Options } from "@sparrow/library/ui";
 
   // ---- Helper functions
-  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
-  import { getPathFromUrl } from "$lib/utils/helpers/common.helper";
+  import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
+  import { getPathFromUrl } from "@sparrow/common/utils/common.helper";
 
   // ---- Enum and Interfaces
   import type {
     Request,
     Folder,
     Path,
-  } from "$lib/utils/interfaces/request.interface";
-  import { UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
+  } from "@sparrow/common/interfaces/request.interface";
+  import { UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
 
   // --- SVG
-  import threedotIcon from "$lib/assets/3dot.svg";
-  import reloadSyncIcon from "$lib/assets/reload-sync.svg";
+  import threedotIcon from "@deprecate/assets/3dot.svg";
+  import reloadSyncIcon from "@deprecate/assets/reload-sync.svg";
 
   // ---- DB
   import type { CollectionDocument } from "@app/database/database";
-  import { isGuestUserActive } from "$lib/store";
+  import { isGuestUserActive } from "@app/store/auth.store";
 
   /**
    * Callback for Item Deleted
@@ -140,7 +140,7 @@
   on:contextmenu|preventDefault={handleSelectClick}
 />
 
-<ModalWrapperV1
+<Modal
   title={"Delete Request?"}
   type={"danger"}
   width={"35%"}
@@ -191,7 +191,7 @@
         isDeletePopup = false;
       }}
     />
-  </div></ModalWrapperV1
+  </div></Modal
 >
 
 {#if showMenu}

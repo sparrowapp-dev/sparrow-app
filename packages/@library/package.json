@@ -1,5 +1,5 @@
 {
-  "name": "library",
+  "name": "@sparrow/library",
   "version": "0.0.1",
   "scripts": {
     "dev": "vite dev",
@@ -12,6 +12,15 @@
   },
   "private": true,
   "main": "src/main.ts",
+  "exports": {
+    "./containers": "./src/containers/index.ts",
+    "./forms": "./src/forms/index.ts",
+    "./icons": "./src/icons/index.ts",
+    "./typography": "./src/typography/index.ts",
+    "./ui": "./src/ui/index.ts",
+    "./utils": "./src/utils/index.ts",
+    "./ui/list/types": "./src/ui/list/types.ts"
+  },
   "devDependencies": {
     "@fontsource/fira-mono": "^4.5.10",
     "@neoconfetti/svelte": "^1.0.0",

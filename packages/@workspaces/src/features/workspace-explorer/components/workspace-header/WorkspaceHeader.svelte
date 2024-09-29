@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { WorkspaceRole } from "$lib/utils/enums";
-  import { Input } from "@library/forms";
-  import { Button } from "@library/ui";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { WorkspaceRole } from "@sparrow/common/enums";
+  import { Input } from "@sparrow/library/forms";
+  import { Button } from "@sparrow/library/ui";
 
   /**
    * The name of the workspace.

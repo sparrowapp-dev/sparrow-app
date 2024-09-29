@@ -13,8 +13,8 @@ import type {
 } from "../../database/database";
 
 // Utils
-import { moveNavigation } from "$lib/utils/helpers";
-import { Events, ItemType } from "$lib/utils/enums";
+import { moveNavigation } from "@sparrow/common/utils";
+import { Events, ItemType } from "@sparrow/common/enums";
 // import { invoke } from "@tauri-apps/api/core";
 import { v4 as uuidv4 } from "uuid";
 
@@ -24,16 +24,15 @@ import type {
   CollectionItemsDto,
   Folder,
   Tab,
-} from "@common/types/workspace";
-import type { CreateApiRequestPostBody } from "$lib/utils/dto";
-import { InitRequestTab } from "@common/utils";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { notifications } from "@library/ui/toast/Toast";
+} from "@sparrow/common/types/workspace";
+import type { CreateApiRequestPostBody } from "@sparrow/common/dto";
+import { InitRequestTab } from "@sparrow/common/utils";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+import { notifications } from "@sparrow/library/ui";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
-import { isGuestUserActive } from "$lib/store/auth.store";
-// import { generateSampleRequest } from "$lib/utils/sample";
-// import type { Folder, Path } from "$lib/utils/interfaces/request.interface";
-// import { InitRequestTab } from "@common/utils";
+import { isGuestUserActive } from "@app/store/auth.store";
+// import { generateSampleRequest } from "@deprecate/utils/sample";
+// import { InitRequestTab } from "@sparrow/common/utils";
 
 class FolderExplorerPage {
   // Private Repositories

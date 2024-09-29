@@ -1,25 +1,25 @@
 <script lang="ts">
-  import { HelpIcon, SaveIcon } from "$lib/assets/app.asset";
+  import { HelpIcon, SaveIcon } from "@deprecate/assets/app.asset";
   import { onMount } from "svelte";
-  import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
+  import type { EnvValuePair } from "@sparrow/common/interfaces/request.interface";
   import { QuickHelp } from "../components";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
-  } from "$lib/utils/constants/permissions.constant";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-  import { userWorkspaceLevelRole } from "$lib/store";
-  import { TabularInputV2 } from "@workspaces/common/components";
-  import { Input } from "@library/forms";
-  import { Carousel, Modal, Popover } from "@library/ui";
-  import { environmentType, WorkspaceRole } from "$lib/utils/enums";
+  } from "@sparrow/common/constants/permissions.constant";
+  import { Tooltip } from "@sparrow/library/ui";
+
+  import { TabularInputV2 } from "@sparrow/workspaces/common/components";
+  import { Input } from "@sparrow/library/forms";
+  import { Carousel, Modal, Popover } from "@sparrow/library/ui";
+  import { environmentType, WorkspaceRole } from "@sparrow/common/enums";
   import {
     CreateENV,
     IntroToEnvironment,
     SearchVariable,
-  } from "@workspaces/common/constants";
-  import { WithButtonV3 } from "@workspaces/common/hoc";
+  } from "@sparrow/workspaces/common/constants";
+  import { WithButtonV3 } from "@sparrow/workspaces/common/hoc";
 
   /**
    * selected environmet to be shown on API

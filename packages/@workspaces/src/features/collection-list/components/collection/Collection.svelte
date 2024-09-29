@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   export let onItemCreated: (entityType: string, args: any) => void;
   export let onItemDeleted: (entityType: string, args: any) => void;
@@ -20,42 +20,37 @@
    * Role of user in active workspace
    */
   export let userRole;
-  import angleRight from "$lib/assets/angle-right-v2.svg";
-  import threedotIcon from "$lib/assets/3dot.svg";
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
-  import { selectMethodsStore } from "$lib/store/methods";
+  import angleRight from "@deprecate/assets/angle-right-v2.svg";
+  import threedotIcon from "@deprecate/assets/3dot.svg";
+  import {
+    ItemType,
+    UntrackedItems,
+  } from "@sparrow/common/enums/item-type.enum";
+  import { Spinner } from "@sparrow/library/ui";
   import { onDestroy, onMount } from "svelte";
-  import { isCollectionCreatedFirstTime } from "$lib/store/collection";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "@library/ui/button/Button.svelte";
-  import { WorkspaceRole } from "$lib/utils/enums";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-  import gitBranchIcon from "$lib/assets/git-branch.svg";
-  import { ReloadCollectionIcon } from "$lib/assets/icons";
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
+  import { WorkspaceRole } from "@sparrow/common/enums";
+  import { Tooltip } from "@sparrow/library/ui";
+  import gitBranchIcon from "@deprecate/assets/git-branch.svg";
+  import { ReloadCollectionIcon } from "@deprecate/assets/icons";
   import type { CollectionDocument, TabDocument } from "@app/database/database";
   import Folder from "../folder/Folder.svelte";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
-  import { PERMISSION_NOT_FOUND_TEXT } from "$lib/utils/constants/permissions.constant";
-  import { CollectionMessage } from "$lib/utils/constants/request.constant";
-  import requestIcon from "$lib/assets/create_request.svg";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
-  import AddIcon from "$lib/assets/add.svg";
+  import type { Path } from "@sparrow/common/interfaces/request.interface";
+  import AddIcon from "@deprecate/assets/add.svg";
   import {
     FolderIcon,
     SyncIcon,
     FolderPlusIcon,
     RequestIcon,
     SocketIcon,
-  } from "@library/icons";
-  import { Options } from "@library/ui";
-  import { isGuestUserActive } from "$lib/store";
+  } from "@sparrow/library/icons";
+  import { Options } from "@sparrow/library/ui";
+  import { isGuestUserActive } from "@app/store/auth.store";
 
   let deletedIds: [string] | [] = [];
   let requestCount = 0;
   let folderCount = 0;
-  let showFolderAPIButtons: boolean = true;
   let visibility = false;
   let isActiveSyncEnabled = true;
   let isBranchSynced: boolean = false;
@@ -112,18 +107,18 @@
   /**
    * Handle selected methods from filter
    */
-  const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
-    if (value && value.length > 0) {
-      showFolderAPIButtons = false;
-      visibility = true;
-    } else if (value && value.length === 0) {
-      visibility = false;
-    } else {
-      showFolderAPIButtons = true;
-    }
-  });
+  // const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
+  //   if (value && value.length > 0) {
+  //     showFolderAPIButtons = false;
+  //     visibility = true;
+  //   } else if (value && value.length === 0) {
+  //     visibility = false;
+  //   } else {
+  //     showFolderAPIButtons = true;
+  //   }
+  // });
   onDestroy(() => {
-    selectedMethodUnsubscibe();
+    // selectedMethodUnsubscibe();
   });
 
   $: {
@@ -231,7 +226,7 @@
   }}
 />
 
-<ModalWrapperV1
+<Modal
   title={"Delete Collection?"}
   type={"danger"}
   width={"35%"}
@@ -287,7 +282,7 @@
         isCollectionPopup = false;
       }}
     />
-  </div></ModalWrapperV1
+  </div></Modal
 >
 
 {#if showMenu}
@@ -427,7 +422,6 @@
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
       if (!isRenaming) {
-        isCollectionCreatedFirstTime.set(false);
         visibility = !visibility;
         if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
           if (visibility) {
@@ -644,11 +638,7 @@
               </div>
             </Tooltip>
 
-            <Tooltip
-              title={"Add WebSocket"}
-              placement={"bottom"}
-              distance={12}
-            >
+            <Tooltip title={"Add WebSocket"} placement={"bottom"} distance={12}>
               <div
                 class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
                 style="height: 24px; width: 24px;"

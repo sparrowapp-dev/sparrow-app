@@ -1,11 +1,11 @@
 <script lang="ts">
-  import infoIcon from "$lib/assets/info-color-blue.svg";
-  import BeautifyIcon from "$lib/assets/beautify.svg";
-  import crossIcon from "$lib/assets/cross.svg";
-  import { Select } from "@library/forms";
-  import { RequestDataType, RequestDataset } from "$lib/utils/enums";
-  import { notifications } from "@library/ui/toast/Toast";
-  import { WithSelect } from "@workspaces/common/hoc";
+  import infoIcon from "@deprecate/assets/info-color-blue.svg";
+  import BeautifyIcon from "@deprecate/assets/beautify.svg";
+  import crossIcon from "@deprecate/assets/cross.svg";
+  import { Select } from "@sparrow/library/forms";
+  import { RequestDataType, RequestDataset } from "@sparrow/common/enums";
+  import { notifications } from "@sparrow/library/ui";
+  import { WithSelect } from "@sparrow/workspaces/common/hoc";
   export let method = "";
   export let onUpdateRequestState;
   export let updateBeautifiedState: (value: boolean) => void;

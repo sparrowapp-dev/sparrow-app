@@ -1,16 +1,15 @@
 import { loginUser } from "../../../services/auth.service";
-import constants from "$lib/utils/constants";
-import type { loginUserPostBody } from "$lib/utils/dto";
-import { notifications } from "@library/ui/toast/Toast";
-import { checkValidation, loginSchema } from "$lib/utils/validation";
+import constants from "@app/constants/constants";
+import type { loginUserPostBody } from "@sparrow/common/dto";
+import { notifications } from "@sparrow/library/ui";
 import { navigate } from "svelte-navigator";
-import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
-import { isResponseError, setUser } from "$lib/store/auth.store";
+import { jwtDecode, setAuthJwt } from "@app/utils/jwt";
+import { setUser } from "@app/store/auth.store";
 import { resizeWindowOnLogOut, resizeWindowOnLogin } from "../../../utils";
 import mixpanel from "mixpanel-browser";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-import ActiveSideBarTabViewModel from "../../Dashboard/ActiveSideBarTab.ViewModel";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+// import ActiveSideBarTabViewModel from "../../Dashboard/ActiveSideBarTab.ViewModel";
 import { GuideRepository } from "../../../repositories/guide.repository";
 
 //------------------------------MixPanel-------------------------------//
@@ -28,7 +27,7 @@ export const navigateToRegister = () => {
 };
 
 export const authNavigate = async () => {};
-const _activeSidebarTabViewModel = new ActiveSideBarTabViewModel();
+// const _activeSidebarTabViewModel = new ActiveSideBarTabViewModel();
 const _guideRepository = new GuideRepository();
 
 //---------------- Handle Login ------------------//
@@ -48,12 +47,12 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
     });
     notifications.success("Login successful!");
     navigate("/dashboard/workspaces");
-    _activeSidebarTabViewModel.addActiveTab("workspaces");
+    // _activeSidebarTabViewModel.addActiveTab("workspaces");
     return response;
   } else {
     navigate("/");
     resizeWindowOnLogOut();
-    isResponseError.set(true);
+    // isResponseError.set(true);
     notifications.error(response.message);
     throw "error login user: " + response.message;
   }
@@ -85,7 +84,7 @@ export async function handleLoginV2(url: string) {
       _guideRepository.insert({ isActive: false, id: "environment-guide" });
       _guideRepository.insert({ isActive: false, id: "collection-guide" });
     }
-    _activeSidebarTabViewModel.addActiveTab("collections");
+    // _activeSidebarTabViewModel.addActiveTab("collections");
     await resizeWindowOnLogin();
   } else {
     notifications.error("Invalid token!");
@@ -96,13 +95,13 @@ export async function handleLoginV2(url: string) {
 export const handleLoginValidation = async (
   loginCredentials: loginUserPostBody,
 ) => {
-  const { isError, errorObject } = await checkValidation(
-    loginSchema,
-    loginCredentials,
-  );
-  if (isError) {
-    return errorObject;
-  }
+  // const { isError, errorObject } = await checkValidation(
+  //   loginSchema,
+  //   loginCredentials,
+  // );
+  // if (isError) {
+  //   return errorObject;
+  // }
 
   return handleLogin(loginCredentials);
 };

@@ -5,14 +5,14 @@ import {
   ReduceQueryParams,
   ReduceAuthHeader,
   ReduceAuthParameter,
-} from "@workspaces/features/rest-explorer/utils";
-import { createDeepCopy, moveNavigation } from "$lib/utils/helpers";
+} from "@sparrow/workspaces/features/rest-explorer/utils";
+import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import {
   CompareArray,
   Debounce,
   InitRequestTab,
   MarkdownFormatter,
-} from "@common/utils";
+} from "@sparrow/common/utils";
 
 // ---- DB
 import type {
@@ -32,11 +32,11 @@ import {
   ItemType,
   ResponseStatusCode,
   UntrackedItems,
-} from "$lib/utils/enums";
-import type { CreateDirectoryPostBody } from "$lib/utils/dto";
+} from "@sparrow/common/enums";
+import type { CreateDirectoryPostBody } from "@sparrow/common/dto";
 
 // ---- Service
-import { makeHttpRequestV2 } from "$lib/api/api.common";
+import { makeHttpRequestV2 } from "@app/containers/api/api.common";
 import {
   insertCollection,
   insertCollectionDirectory,
@@ -46,7 +46,7 @@ import {
 import { EnvironmentService } from "../../services/environment.service";
 
 // ---- Events
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import {
   type UpdateRequestUrl,
   type UpdateRequestName,
@@ -72,7 +72,7 @@ import {
   type AddRequestInFolder,
   type SaveRequest,
   type SaveAsRequest,
-} from "@workspaces/common/type";
+} from "@sparrow/workspaces/common/type";
 import {
   type Auth,
   type Body,
@@ -84,13 +84,13 @@ import {
   type StatePartial,
   type Conversation,
   MessageTypeEnum,
-} from "@common/types/workspace";
-import { notifications } from "@library/ui/toast/Toast";
+} from "@sparrow/common/types/workspace";
+import { notifications } from "@sparrow/library/ui";
 import { RequestTabAdapter } from "../../adapter/request-tab";
 import { GuideRepository } from "../../repositories/guide.repository";
 import { CollectionService } from "../../services/collection.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import { isGuestUserActive } from "$lib/store/auth.store";
+import { isGuestUserActive } from "@app/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
 import { AiAssistantService } from "../../services/ai-assistant.service";
 import type { GuideQuery } from "../../types/user-guide";

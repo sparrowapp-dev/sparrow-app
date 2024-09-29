@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CleanerIcon } from "@library/icons";
+  import { CleanerIcon } from "@sparrow/library/icons";
   import { Raw, SocketMessageNavigator } from "./sub-body";
 
   export let body;

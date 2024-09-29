@@ -1,16 +1,15 @@
 <script lang="ts">
-  import { Tooltip } from "@library/ui/tooltip";
-  import plus from "$lib/assets/plus.svg";
-  import { DoubleArrowIcon, GithubIcon } from "@library/icons";
-  import WithButton from "@workspaces/common/hoc/WithButton.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
+  import plus from "@deprecate/assets/plus.svg";
+  import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
+  import { WithButton } from "@sparrow/workspaces/common/hoc";
   import type { TabDocument, TeamDocument } from "@app/database/database";
-  import RecentApi from "@teams/features/recent-apis/layout/RecentApi.svelte";
-  import RecentWorkspace from "@teams/features/recent-workspace/layout/RecentWorkspace.svelte";
+  import { RecentWorkspace, RecentApis } from "../../../features";
   import { open } from "@tauri-apps/plugin-shell";
-  import { base64ToURL } from "$lib/utils/helpers";
-  import { List } from "@library/ui";
-  import { PeopleIcon } from "$lib/assets/app.asset";
-  import constants from "$lib/utils/constants";
+  import { base64ToURL } from "@sparrow/common/utils";
+  import { List } from "@sparrow/library/ui";
+  import { PeopleIcon } from "@deprecate/assets/app.asset";
+  import constants from "@app/constants/constants";
   export let teamList: TeamDocument[] = [];
   export let tabList: TabDocument[] = [];
   export let isCreateTeamModalOpen;
@@ -161,7 +160,7 @@
       <!-- Recent APIs-->
       {#if !isGuestUser}
         <section class="d-flex flex-column" style="max-height:33%;">
-          <RecentApi {tabList} {data} {collectionList} {onApiClick} />
+          <RecentApis {tabList} {data} {collectionList} {onApiClick} />
         </section>
 
         <!-- Recent Workspace Section -->

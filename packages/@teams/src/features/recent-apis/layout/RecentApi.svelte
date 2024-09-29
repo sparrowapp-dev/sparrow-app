@@ -1,8 +1,8 @@
 <script>
-  import ApiListItem from "@teams/common/components/api-list-items/ApiListItem.svelte";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
-  import List from "@library/ui/list/List.svelte";
-  import constants from "$lib/utils/constants";
+  import ApiListItem from "../../../common/components/api-list-items/ApiListItem.svelte";
+  import { ItemType } from "@sparrow/common/enums/item-type.enum";
+  import { List } from "@sparrow/library/ui";
+  import constants from "@app/constants/constants";
   export let tabList = [];
   export let collectionList;
   export let data;
@@ -42,13 +42,12 @@
 <!-- </section> -->
 
 <style>
-
-.sidebar-recentapi-list::-webkit-scrollbar-thumb {
+  .sidebar-recentapi-list::-webkit-scrollbar-thumb {
     background-color: var(--bg-secondary-330);
   }
 
   .sidebar-recentapi-list::-webkit-scrollbar-button {
-   color: var(--bg-secondary-330);
+    color: var(--bg-secondary-330);
   }
   .teams-heading {
     margin-left: 5px;

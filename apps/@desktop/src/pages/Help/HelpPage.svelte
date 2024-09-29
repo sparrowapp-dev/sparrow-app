@@ -4,24 +4,24 @@
     DiscordCard,
     FeedbackSection,
     Community,
-  } from "@support/features";
+  } from "@sparrow/support/features";
   import {
     ActivityIcon,
     DocIcon,
     GroupIcon,
     RoadmapIcon,
     UpdateIcon,
-  } from "@library/icons";
-  import DiscordPost from "@support/features/discord-post/layout/DiscordPost.svelte";
+  } from "@sparrow/library/icons";
+  import { DiscordPost } from "@sparrow/support/features";
   import HelpPageViewModel from "./HelpPage.ViewModel";
   import { onMount } from "svelte";
   import { Motion } from "svelte-motion";
   import { pagesMotion } from "@app/constants";
-  import Roadmap from "@support/features/roadmap/layout/Roadmap.svelte";
-  import { ReleaseNotes } from "@support/features/release-notes/layout";
-  import { ActivitySection } from "@support/features/activity-section";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Roadmap } from "@sparrow/support/features";
+  import { ReleaseNotes } from "@sparrow/support/features";
+  import { ActivitySection } from "@sparrow/support/features";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   /**
    * @description - Prevents the default context menu from appearing on right-click.

@@ -3,7 +3,7 @@ import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { GuideRepository } from "../../repositories/guide.repository";
 import { TeamRepository } from "../../repositories/team.repository";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
-import { InitTab } from "@common/factory";
+import { InitTab } from "@sparrow/common/factory";
 import { v4 as uuidv4 } from "uuid";
 
 export class AuthViewModel {

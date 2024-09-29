@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { WorkspaceRole } from "$lib/utils/enums";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   import type {
     SaveRequestType,
     UpdateRequestUrlType,
-  } from "@workspaces/common/type";
-  import { notifications } from "@library/ui/toast/Toast";
-  import { DropButton } from "@workspaces/common/components";
+  } from "@sparrow/workspaces/common/type";
+  import { notifications } from "@sparrow/library/ui";
+  import { DropButton } from "@sparrow/workspaces/common/components";
   import { CodeMirrorInput } from "../../../../common/components";
   import { UrlInputTheme } from "../../../../common/utils/";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-  import { DiskIcon } from "@library/icons";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import { Tooltip } from "@sparrow/library/ui";
+  import { DiskIcon } from "@sparrow/library/icons";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   let componentClass = "";
   export { componentClass as class };
 
@@ -120,8 +120,8 @@
         color={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
           ? "var(--icon-secondary-380)"
           : isHovered
-          ? "var(--icon-primary-200)"
-          : "var(--icon-secondary-100)"}
+            ? "var(--icon-primary-200)"
+            : "var(--icon-secondary-100)"}
       />
     </button>
   </Tooltip>

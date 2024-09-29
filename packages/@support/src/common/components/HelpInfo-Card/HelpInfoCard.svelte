@@ -1,7 +1,7 @@
 <script>
   import Upvote from "../Upvote.svelte";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   export let status;
   export let setPostId;

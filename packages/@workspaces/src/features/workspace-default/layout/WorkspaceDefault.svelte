@@ -1,20 +1,20 @@
 <script lang="ts">
   import type { WorkspaceDocument } from "@app/database/database";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import {
     VectorIcon,
     SocketIcon,
     StackIcon,
     TreeIcon,
     CollectionIcon,
-  } from "@library/icons";
+  } from "@sparrow/library/icons";
 
-  import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
+  import SparrowLogo from "../../rest-explorer/assets/images/sparrow-logo.svelte";
   import type { Observable } from "rxjs";
   import { Card } from "../components";
-  import { TFDefaultEnum } from "@common/types/workspace/testflow";
-  import { WorkspaceRole } from "$lib/utils/enums";
+  import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   export let showImportCollectionPopup;
   export let onItemCreated;

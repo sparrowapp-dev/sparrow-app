@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { UpdateRequestNameType } from "@workspaces/common/type";
+  import type { UpdateRequestNameType } from "@sparrow/workspaces/common/type";
 
   export let name: string;
   export let onUpdateRequestName: UpdateRequestNameType;

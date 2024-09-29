@@ -1,8 +1,8 @@
 <script lang="ts">
-  import sparrowicon from "@library/icons/logoSparrowSquare.svg";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
-  import leftIcon from "$lib/assets/left.svg";
-  import constants from "$lib/utils/constants";
+  import { logoSparrowSquare } from "@sparrow/common/images";
+  import { Spinner } from "@sparrow/library/ui";
+  import leftIcon from "@deprecate/assets/left.svg";
+  import constants from "@app/constants/constants";
   import { fly, fade } from "svelte/transition";
   import { version } from "../../../../src-tauri/tauri.conf.json";
   import { onMount } from "svelte";
@@ -48,7 +48,7 @@
       class="text-white d-flex justify-content-center align-items-center bg-primary-300"
       style="height: 60px; width: 60px; border-radius: 6px;"
     >
-      <img src={sparrowicon} alt="" class="" />
+      <img src={logoSparrowSquare} alt="" class="" />
     </div>
     <p
       class="container-header pt-4 pb-0 sparrow-fs-28 text-whiteColor text-center ms-2 me-2 fw-bold"

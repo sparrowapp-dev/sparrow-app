@@ -2,14 +2,14 @@ import {
   type Path,
   type KeyValueChecked,
   TabTypeEnum,
-} from "@common/types/workspace";
+} from "@sparrow/common/types/workspace";
 import {
   SocketDataTypeEnum,
   SocketSectionEnum,
   WebSocketDefault,
   type State,
   type WebSocketTab,
-} from "@common/types/workspace/web-socket";
+} from "@sparrow/common/types/workspace/web-socket";
 import { v4 as uuidv4 } from "uuid";
 
 class InitWebSocketTab {

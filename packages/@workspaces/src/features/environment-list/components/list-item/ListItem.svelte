@@ -1,13 +1,13 @@
 <script lang="ts">
-  import threedotIcon from "$lib/assets/3dot.svg";
-  import { SelectIcon } from "$lib/assets/app.asset";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import Spinner from "@library/ui/spinner/Spinner.svelte";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "@library/ui/button/Button.svelte";
-  import { Options } from "@library/ui";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-  import { WorkspaceRole } from "$lib/utils/enums";
+  import threedotIcon from "@deprecate/assets/3dot.svg";
+  import { SelectIcon } from "@deprecate/assets/app.asset";
+  import { UntrackedItems } from "@sparrow/common/enums/item-type.enum";
+  import { Spinner } from "@sparrow/library/ui";
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
+  import { Options } from "@sparrow/library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   /**
    * current workspace to identify the selected environment
@@ -150,7 +150,7 @@
   let deleteEnvironmentLoader: boolean = false;
 </script>
 
-<ModalWrapperV1
+<Modal
   title={"Delete Environment?"}
   type={"danger"}
   width={"35%"}
@@ -197,7 +197,7 @@
         deleteEnvironmentLoader = false;
       }}
     />
-  </div></ModalWrapperV1
+  </div></Modal
 >
 
 {#if showMenu}

@@ -1,9 +1,9 @@
-import { getAuthHeaders, makeRequest } from "$lib/api/api.common";
-import constants from "$lib/utils/constants";
+import { getAuthHeaders, makeRequest } from "@app/containers/api/api.common";
+import constants from "@app/constants/constants";
 import type {
   CreateEnvironmentPostBody,
   UpdateEnvironmentPostBody,
-} from "$lib/utils/dto";
+} from "@sparrow/common/dto";
 
 export class EnvironmentService {
   constructor() {}

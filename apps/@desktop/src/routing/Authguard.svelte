@@ -1,7 +1,7 @@
 <script>
-  import { isGuestUserActive, setUser, user } from "$lib/store/auth.store";
-  import { getUserToken } from "$lib/utils/token";
-  import { jwtDecode } from "$lib/utils/jwt";
+  import { isGuestUserActive, setUser, user } from "@app/store/auth.store";
+  import { getUserToken } from "@app/utils/token";
+  import { jwtDecode } from "@app/utils/jwt";
   import { onMount } from "svelte";
   import { GuestUserRepository } from "@app/repositories/guest-user.repository";
   const guestUserRepository = new GuestUserRepository();

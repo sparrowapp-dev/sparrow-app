@@ -2,43 +2,49 @@
   import { onDestroy } from "svelte";
 
   // ---- SVG
-  import folderCloseIcon from "$lib/assets/folder.svg";
-  import folderOpenIcon from "$lib/assets/open-folder.svg";
-  import threedotIcon from "$lib/assets/3dot.svg";
-  import AddIcon from "$lib/assets/add.svg";
-  import requestIcon from "$lib/assets/create_request.svg";
-  import { RequestIcon } from "@library/icons";
-  import angleRight from "$lib/assets/angle-right-v2.svg";
+  import folderCloseIcon from "@deprecate/assets/folder.svg";
+  import folderOpenIcon from "@deprecate/assets/open-folder.svg";
+  import threedotIcon from "@deprecate/assets/3dot.svg";
+  // import AddIcon from "@deprecate/assets/add.svg";
+  // import requestIcon from "@deprecate/assets/create_request.svg";
+  import { RequestIcon } from "@sparrow/library/icons";
+  import angleRight from "@deprecate/assets/angle-right-v2.svg";
 
   // ---- Components
   import Request from "../request/Request.svelte";
-  import { Spinner } from "@library/ui";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "@library/ui/button/Button.svelte";
-  import { Options } from "@library/ui";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Spinner } from "@sparrow/library/ui";
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
+  import { Options } from "@sparrow/library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
 
   // ---- Enum, Constants and Interface
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import {
+    ItemType,
+    UntrackedItems,
+  } from "@sparrow/common/enums/item-type.enum";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import {
     workspaceLevelPermissions,
     PERMISSION_NOT_FOUND_TEXT,
-  } from "$lib/utils/constants/permissions.constant";
-  import { WorkspaceRole } from "$lib/utils/enums";
-  import type { Folder, Path } from "$lib/utils/interfaces/request.interface";
+  } from "@sparrow/common/constants/permissions.constant";
+  import { WorkspaceRole } from "@sparrow/common/enums";
+  import type {
+    Folder,
+    Path,
+  } from "@sparrow/common/interfaces/request.interface";
 
   // ---- Store
-  import { selectMethodsStore } from "$lib/store/methods";
+  // import { selectMethodsStore } from "@app/store/auth.store/methods";
 
   // ---- Helper Functions
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  // import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
+  // import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   // ---- DB
   import type { CollectionDocument } from "@app/database/database";
-  import { of } from "rxjs";
-  import { isGuestUserActive } from "$lib/store";
+  // import { of } from "rxjs";
+  import { isGuestUserActive } from "@app/store/auth.store";
   import { WebSocket } from "..";
 
   /**
@@ -126,15 +132,15 @@
     }
   }
 
-  const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
-    if (value && value.length > 0) {
-      expand = true;
-      showFolderAPIButtons = false;
-    } else {
-      showFolderAPIButtons = true;
-      expand = false;
-    }
-  });
+  // const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
+  //   if (value && value.length > 0) {
+  //     expand = true;
+  //     showFolderAPIButtons = false;
+  //   } else {
+  //     showFolderAPIButtons = true;
+  //     expand = false;
+  //   }
+  // });
 
   function rightClickContextMenu(e: Event) {
     setTimeout(() => {
@@ -179,7 +185,7 @@
   };
 
   onDestroy(() => {
-    selectedMethodUnsubscibe();
+    // selectedMethodUnsubscibe();
   });
 </script>
 
@@ -188,7 +194,7 @@
   on:contextmenu|preventDefault={handleSelectClick}
 />
 <div>
-  <ModalWrapperV1
+  <Modal
     title={"Delete Folder?"}
     type={"danger"}
     width={"35%"}
@@ -243,7 +249,7 @@
           isFolderPopup = false;
         }}
       />
-    </div></ModalWrapperV1
+    </div></Modal
   >
 
   {#if showMenu}

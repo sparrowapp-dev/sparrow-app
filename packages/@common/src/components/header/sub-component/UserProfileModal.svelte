@@ -13,9 +13,9 @@
 </script>
 
 <script lang="ts">
-  import { SignOutIcon } from "@library/icons";
+  import { SignOutIcon } from "@sparrow/library/icons";
   import { afterUpdate, onMount } from "svelte";
-  import { Tooltip } from "@library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
   /**
    * List of side bar Items
    */

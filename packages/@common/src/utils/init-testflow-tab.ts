@@ -1,10 +1,14 @@
 import { v4 as uuidv4 } from "uuid";
-import { TabTypeEnum, type Path, type Tab } from "@common/types/workspace";
+import {
+  TabTypeEnum,
+  type Path,
+  type Tab,
+} from "@sparrow/common/types/workspace";
 import {
   TFDefaultEnum,
   type TFTabEdgeType,
   type TFTabNodeType,
-} from "@common/types/workspace/testflow";
+} from "@sparrow/common/types/workspace/testflow";
 
 class InitTestflowTab {
   private _tab: Tab;

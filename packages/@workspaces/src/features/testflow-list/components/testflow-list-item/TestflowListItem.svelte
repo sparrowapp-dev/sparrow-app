@@ -1,19 +1,19 @@
 <script lang="ts">
-  import threedotIcon from "$lib/assets/3dot.svg";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import threedotIcon from "@deprecate/assets/3dot.svg";
+  import { UntrackedItems } from "@sparrow/common/enums/item-type.enum";
   import {
     Button,
     Tooltip,
     Options,
     Spinner,
-    Modal as ModalWrapperV1,
-  } from "@library/ui";
-  import { WorkspaceRole } from "$lib/utils/enums";
-  import { TreeIcon } from "@library/icons";
+    Modal as Modal,
+  } from "@sparrow/library/ui";
+  import { WorkspaceRole } from "@sparrow/common/enums";
+  import { TreeIcon } from "@sparrow/library/icons";
   import {
     TFDefaultEnum,
     type TFDocumentType,
-  } from "@common/types/workspace/testflow";
+  } from "@sparrow/common/types/workspace/testflow";
 
   /**
    * current workspace to identify the selected testflow
@@ -145,7 +145,7 @@
   let deleteTestflowLoader: boolean = false;
 </script>
 
-<ModalWrapperV1
+<Modal
   title={`Delete Flow?`}
   type={"danger"}
   width={"35%"}
@@ -189,7 +189,7 @@
         deleteTestflowLoader = false;
       }}
     />
-  </div></ModalWrapperV1
+  </div></Modal
 >
 
 {#if showMenu}

@@ -2,12 +2,12 @@
   import type { Unsubscriber } from "svelte/store";
   import { Handle, Position } from "@xyflow/svelte";
   import { ArrowIcon } from "../../icons";
-  import { PlayArrow } from "@library/icons";
+  import { PlayArrow } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { testFlowDataStore } from "../../store";
-  import type { TFDataStoreType } from "@common/types/workspace/testflow";
+  import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";
 
   /**
    * The data object containing various handlers and data stores.

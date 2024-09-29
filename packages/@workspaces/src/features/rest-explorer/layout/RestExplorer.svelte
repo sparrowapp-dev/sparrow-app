@@ -1,7 +1,7 @@
 <script lang="ts">
   // ---- Assets
-  import floppyDisk from "$lib/assets/floppy-disk.svg";
-  import angleDown from "$lib/assets/angle-down.svg";
+  import floppyDisk from "@deprecate/assets/floppy-disk.svg";
+  import angleDown from "@deprecate/assets/angle-down.svg";
   // ---- Components
   import {
     HttpUrlSection,
@@ -19,16 +19,15 @@
     RestExtensionPanel,
     RequestParameters,
     ResponseStatus,
-  } from "@workspaces/features/rest-explorer/components";
-  import Loader from "@library/ui/loader/Loader.svelte";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import { notifications } from "@library/ui/toast/Toast";
+  } from "../components";
+  import { Loader } from "@sparrow/library/ui";
+  import { notifications } from "@sparrow/library/ui";
   import { Splitpanes, Pane } from "svelte-splitpanes";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Button } from "@sparrow/library/ui";
 
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import { SaveAsCollectionItem } from "@workspaces/features";
+  import { SaveAsCollectionItem } from "@sparrow/workspaces/features";
   import type {
     ClearResponseType,
     CreateCollectionType,
@@ -49,24 +48,24 @@
     UpdateRequestNameType,
     UpdateRequestStateType,
     UpdateRequestUrlType,
-  } from "@workspaces/common/type";
+  } from "@sparrow/workspaces/common/type";
   import {
     RequestSectionEnum,
     ResponseSectionEnum,
     type KeyValue,
     type RequestTab,
-  } from "@common/types/workspace";
+  } from "@sparrow/common/types/workspace";
   import { requestSplitterDirection } from "../store";
-  import Popover from "@library/ui/popover/Popover.svelte";
+  import { Popover } from "@sparrow/library/ui";
   import { onMount } from "svelte";
-  import { Carousel, Modal } from "@library/ui";
+  import { Carousel, Modal } from "@sparrow/library/ui";
   import RequestDoc from "../components/request-doc/RequestDoc.svelte";
   import {
     AdvanceAPI,
     CreateCollection,
     SendingApiRequest,
-  } from "@workspaces/common/constants";
-  import { ResponseStatusCode } from "$lib/utils/enums";
+  } from "@sparrow/workspaces/common/constants";
+  import { ResponseStatusCode } from "@sparrow/common/enums";
 
   export let tab: Observable<RequestTab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -431,7 +430,7 @@
       />
     </div>
   </div>
-  <ModalWrapperV1
+  <Modal
     title={"Save Request"}
     type={"dark"}
     width={"55%"}
@@ -458,7 +457,7 @@
       {onRenameCollection}
       {onRenameFolder}
     />
-  </ModalWrapperV1>
+  </Modal>
 {/if}
 
 <Modal

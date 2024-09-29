@@ -15,23 +15,10 @@
     "checkJs": true,
     "isolatedModules": true,
     "paths": {
-      "$lib/*": ["./src/packages/@deprecate/*"],
-      "@library/*": ["./src/packages/@library/*"],
-      "@app/*": ["./src/packages/@app/*"],
-      "@common/*": ["./src/packages/@common/*"],
-      "@teams/*": ["./src/packages/@teams/*"],
-      "@workspaces/*": ["./src/packages/@workspaces/*"],
-      "@support/*": ["./src/packages/@support/*"],
-      "@web/*": ["../@web/src/*"]
+      "@deprecate/*": ["../../packages/@deprecate/src/*"],
+      "@app/*": ["./src/*"]
     }
   },
-  "include": [
-    "src/**/*.d.ts",
-    "src/**/*.ts",
-    "src/**/*.js",
-    "src/**/*.svelte",
-    "packages/*/src/**/*.ts",
-    "packages/*/src/**/*.svelte"
-  ],
+  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

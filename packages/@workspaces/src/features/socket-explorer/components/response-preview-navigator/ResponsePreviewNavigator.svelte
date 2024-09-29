@@ -1,24 +1,24 @@
 <script lang="ts">
-  import downloadIcon from "$lib/assets/download.svg";
-  import copyIcon from "$lib/assets/copy.svg";
-  import copyToClipBoard from "$lib/utils/copyToClipboard";
-  import { notifications } from "@library/ui/toast/Toast";
+  import downloadIcon from "@deprecate/assets/download.svg";
+  import copyIcon from "@deprecate/assets/copy.svg";
+  import { copyToClipBoard } from "@sparrow/common/utils";
+  import { notifications } from "@sparrow/library/ui";
   import {
     RequestDataType,
     ResponseFormatter,
-  } from "$lib/utils/enums/request.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import { ResponseFormatterEnum } from "@common/types/workspace";
-  import BeautifyIcon from "$lib/assets/beautify.svg";
+  } from "@sparrow/common/enums/request.enum";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
+  import BeautifyIcon from "@deprecate/assets/beautify.svg";
   import js_beautify, { html_beautify } from "js-beautify";
   import {
     WithButtonV4,
     WithSelect,
     WithSelectV2,
-  } from "@workspaces/common/hoc";
-  import { Tooltip } from "@library/ui";
-  import { CopyIcon, DownloadIcon } from "@library/icons";
+  } from "@sparrow/workspaces/common/hoc";
+  import { Tooltip } from "@sparrow/library/ui";
+  import { CopyIcon, DownloadIcon } from "@sparrow/library/icons";
   import type { WebSocketMessage } from "../../store/websocket";
 
   export let webSocket;
@@ -35,8 +35,8 @@
     return fileExtension === "json" || fileExtension === "js"
       ? js_beautify(_data)
       : fileExtension === "xml" || fileExtension === "html"
-      ? html_beautify(_data)
-      : removeIndentation(_data);
+        ? html_beautify(_data)
+        : removeIndentation(_data);
   };
   /**
    * @description Copy API response to users clipboard.

@@ -11,7 +11,7 @@
     "./packages/@library",
     "./packages/@common",
     "./packages/@teams",
-    "./packages/@workspace",
+    "./packages/@workspaces",
     "./packages/@support",
     "./packages/@deprecate"
   ],

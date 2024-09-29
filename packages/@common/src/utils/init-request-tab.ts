@@ -1,4 +1,4 @@
-import { RequestDefault } from "$lib/utils/enums";
+import { RequestDefault } from "@sparrow/common/enums";
 import {
   AuthSectionEnum,
   AuthTypeEnum,
@@ -16,7 +16,7 @@ import {
   TabTypeEnum,
   FormDataTypeEnum,
   type StatePartial,
-} from "@common/types/workspace";
+} from "@sparrow/common/types/workspace";
 import { v4 as uuidv4 } from "uuid";
 
 class InitRequestTab {

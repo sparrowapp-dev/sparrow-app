@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type TabDocument } from "../database/database";
-import type { Tab } from "@common/types/workspace";
+import type { Tab } from "@sparrow/common/types/workspace";
 import type { Observable } from "rxjs";
 
 export class TabRepository {

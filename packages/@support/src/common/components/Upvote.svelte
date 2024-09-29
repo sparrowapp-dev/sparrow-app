@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TriangleIcon } from "@library/icons";
+  import { TriangleIcon } from "@sparrow/library/icons";
 
   export let upvote: number;
   export let postID: string;

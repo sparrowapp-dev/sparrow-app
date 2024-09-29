@@ -6,11 +6,11 @@
     leftPanelWidth,
     rightPanelWidth,
     leftPanelCollapse,
-  } from "@workspaces/common/stores";
+  } from "@sparrow/workspaces/common/stores";
 
   // ---- Animation
   import { Motion } from "svelte-motion";
-  import { scaleMotionProps } from "$lib/utils/animations";
+  import { scaleMotionProps } from "@app/constants";
 
   import { onDestroy } from "svelte";
   // ---- Components
@@ -27,25 +27,23 @@
     ImportCurl,
     WorkspaceDefault,
     SaveAsCollectionItem,
-  } from "@workspaces/features";
-  import { WithModal } from "@workspaces/common/hoc";
-  import { notifications } from "@library/ui/toast/Toast";
+  } from "@sparrow/workspaces/features";
+  import { WithModal } from "@sparrow/workspaces/common/hoc";
+  import { notifications } from "@sparrow/library/ui";
 
   // ---- Interface, enum & constants
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { WorkspaceRole } from "$lib/utils/enums/team.enum";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
 
   // ---- View Model
   import CollectionsViewModel from "./CollectionPage.ViewModel";
   import { EnvironmentViewModel } from "@app/pages/EnvironmentPage/EnvironmentPage.ViewModel";
 
   // ---- helpers
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   import type { TabDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { onMount } from "svelte";
-  import { ItemType } from "$lib/utils/enums";
+  import { ItemType } from "@sparrow/common/enums";
 
   import type {
     CollectionDocument,
@@ -53,19 +51,17 @@
     WorkspaceDocument,
   } from "@app/database/database";
   import type { GithubRepoDocType } from "../../models/github-repo.model";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
-  import { isGuestUserActive } from "$lib/store";
+  import { Modal } from "@sparrow/library/ui";
+  import { isGuestUserActive } from "@app/store/auth.store";
   import { pagesMotion } from "../../constants";
-  import { user } from "$lib/store";
+  import { user } from "@app/store/auth.store";
   import WebSocketExplorerPage from "../WebSocketExplorerPage/WebSocketExplorerPage.svelte";
   import {
     TabTypeEnum,
     type RequestTab,
     type Tab,
-  } from "@common/types/workspace";
-  import type { WebSocketTab } from "@common/types/workspace/web-socket";
-  import { TeamProfile } from "@teams/features/team-settings/components";
+  } from "@sparrow/common/types/workspace";
+  import type { WebSocketTab } from "@sparrow/common/types/workspace/web-socket";
   import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
   import TestFlowExplorerPage from "../TestflowExplorerPage/TestflowExplorerPage.svelte";
   import { TestflowViewModel } from "./Testflow.ViewModel";
@@ -516,7 +512,7 @@
     onUploadFile={_viewModel.uploadFormFile}
     onExtractGitBranch={_viewModel.extractGitBranch}
   /> -->
-<ModalWrapperV1
+<Modal
   title={"New Collection"}
   type={"dark"}
   width={"35%"}
@@ -584,10 +580,10 @@
       return response;
     }}
   />
-</ModalWrapperV1>
+</Modal>
 
 <!-- {#if isImportCurlPopup} -->
-<ModalWrapperV1
+<Modal
   title={"Import cURL"}
   type={"dark"}
   width={"35%"}
@@ -603,10 +599,10 @@
     onItemImported={_viewModel.handleImportItem}
     onValidateCurl={_viewModel.handleValidateCurl}
   />
-</ModalWrapperV1>
+</Modal>
 <!-- {/if} -->
 
-<ModalWrapperV1
+<Modal
   title={"Save Request"}
   type={"dark"}
   width={"55%"}
@@ -667,7 +663,7 @@
     onRenameCollection={_viewModel.handleSaveAsRenameCollection}
     onRenameFolder={_viewModel.handleSaveAsRenameFolder}
   />
-</ModalWrapperV1>
+</Modal>
 
 <style>
   :global(.collection-splitter .splitpanes__splitter) {

@@ -1,6 +1,6 @@
 <script>
-  import Cross from "@library/icons/Cross.svelte";
-  import RocketIcon from "@library/icons/RocketIcon.svelte";
+  import { CrossIcon } from "@sparrow/library/icons";
+  import { RocketIcon } from "@sparrow/library/icons";
   import { Link } from "svelte-navigator";
   export let isVisible = true;
   export let onClose;
@@ -29,7 +29,7 @@
     </div>
     <div class="cross-btn-div">
       <button class="cross-btn" on:click={onClose}>
-        <Cross
+        <CrossIcon
           height={"16px"}
           width={"12px"}
           color={"var(--icon-secondary-100)"}

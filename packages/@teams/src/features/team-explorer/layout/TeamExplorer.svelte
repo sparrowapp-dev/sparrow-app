@@ -1,24 +1,24 @@
 <script lang="ts">
-  import table from "$lib/assets/table.svg";
-  import hamburger from "$lib/assets/hamburger.svg";
-  import { workspaceView } from "$lib/store";
+  import table from "@deprecate/assets/table.svg";
+  import hamburger from "@deprecate/assets/hamburger.svg";
+  import { workspaceView } from "../store/workspace-view";
   import { onDestroy } from "svelte";
-  import { SearchIcon } from "$lib/assets/app.asset";
-  import { base64ToURL } from "$lib/utils/helpers";
-  import { PeopleIcon } from "$lib/assets/app.asset";
+  import { SearchIcon } from "@deprecate/assets/app.asset";
+  import { base64ToURL } from "@sparrow/common/utils";
+  import { PeopleIcon } from "@deprecate/assets/app.asset";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
-  import { TeamRole } from "$lib/utils/enums";
-  import { Button } from "@library/ui";
+  import { TeamRole } from "@sparrow/common/enums";
+  import { Button } from "@sparrow/library/ui";
   import TeamNavigator from "../components/team-navigator/TeamNavigator.svelte";
   import {
     TeamTabsEnum,
     TeamViewEnum,
-  } from "@teams/common/constants/TeamTabs.constants";
+  } from "../../../common/constants/TeamTabs.constants";
   import { WorkspaceListView } from "../components";
   import WorkspaceGridView from "../components/workspace-grid-view/WorkspaceGridView.svelte";
-  import { TeamMembers, TeamSettings } from "@teams/features";
-  import { CrossIcon, MoreOptions } from "@library/icons";
-  import { Tooltip, Dropdown } from "@library/ui";
+  import { TeamMembers, TeamSettings } from "@sparrow/teams/features";
+  import { CrossIcon, MoreOptions } from "@sparrow/library/icons";
+  import { Tooltip, Dropdown } from "@sparrow/library/ui";
 
   /**
    * user ID

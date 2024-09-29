@@ -3,7 +3,7 @@ import {
   TabTypeEnum,
   type WorkspaceTab,
   type Path,
-} from "@common/types/workspace";
+} from "@sparrow/common/types/workspace";
 
 class InitWorkspaceTab {
   private _tab: WorkspaceTab;
@@ -13,30 +13,30 @@ class InitWorkspaceTab {
    * @param _workspaceId - Workspace Id to which Collection belongs to
    */
   constructor(_id: string, _workspaceId: string) {
-      this._tab = {
-        id: _id,
-        tabId: uuidv4(),
-        name: "My Workspace" ,
-        type: TabTypeEnum.WORKSPACE,
-        description: "",
-        source: "USER",
-        activeSync: false,
-        property: {
-          collection: {
-            id: "",
-          },
+    this._tab = {
+      id: _id,
+      tabId: uuidv4(),
+      name: "My Workspace",
+      type: TabTypeEnum.WORKSPACE,
+      description: "",
+      source: "USER",
+      activeSync: false,
+      property: {
+        collection: {
+          id: "",
         },
-        path: {
-          workspaceId: _workspaceId,
-          collectionId: "",
-          folderId: "",
-        },
-        isSaved: true,
-        index: 0,
-        isActive: true,
-        isDeleted: false,
-        timestamp: new Date().toString(),
-      };
+      },
+      path: {
+        workspaceId: _workspaceId,
+        collectionId: "",
+        folderId: "",
+      },
+      isSaved: true,
+      index: 0,
+      isActive: true,
+      isDeleted: false,
+      timestamp: new Date().toString(),
+    };
   }
   public getValue(): WorkspaceTab {
     return this._tab;

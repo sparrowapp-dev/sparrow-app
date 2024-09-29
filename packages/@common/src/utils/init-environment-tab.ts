@@ -1,4 +1,4 @@
-import { TabTypeEnum } from "@common/types/workspace";
+import { TabTypeEnum } from "@sparrow/common/types/workspace";
 import { v4 as uuidv4 } from "uuid";
 
 class InitEnvironmentTab {
@@ -19,19 +19,19 @@ class InitEnvironmentTab {
       isDeleted: false,
       activeSync: false,
       property: {
-        environment:{
+        environment: {
           variable: [
-                {
-                  key: "",
-                  value: "",
-                  checked: true,
-                },
-              ],
-                 type: "LOCAL",
-                 state: {
-                  isSaveInProgress: false,
-                 }
-        }
+            {
+              key: "",
+              value: "",
+              checked: true,
+            },
+          ],
+          type: "LOCAL",
+          state: {
+            isSaveInProgress: false,
+          },
+        },
       },
       path: {
         workspaceId: _workspaceId,
@@ -73,7 +73,6 @@ class InitEnvironmentTab {
     return this;
   }
 
-  
   public setType(_type: string) {
     this._tab.property.environment.type = _type;
     return this;

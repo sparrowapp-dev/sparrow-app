@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { Input, Select, Textarea } from "@library/forms";
+  import { Input, Select, Textarea } from "@sparrow/library/forms";
   import {
     AttachmentIcon,
     CategoryIcon,
     CrossIcon,
     PlusIcon,
-  } from "@library/icons";
-  import { Button, Modal } from "@library/ui";
-  import { notifications } from "@library/ui/toast/Toast";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-    import { Drop } from "@support/common/components";
-  import { FeedbackType } from "@support/common/types";
+  } from "@sparrow/library/icons";
+  import { Button, Modal } from "@sparrow/library/ui";
+  import { notifications } from "@sparrow/library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
+  import { Drop } from "@sparrow/support/common/components";
+  import { FeedbackType } from "@sparrow/support/common/types";
 
   export let onAddFeedback;
   export let onInputFeedback;

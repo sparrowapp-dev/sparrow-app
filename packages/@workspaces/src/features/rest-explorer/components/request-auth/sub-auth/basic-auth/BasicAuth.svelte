@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { BasicAuth } from "$lib/utils/interfaces/request.interface";
-  import { CodeMirrorInput } from "@workspaces/common/components";
-  import { AuthInputTheme } from "@workspaces/common/utils";
+  import type { BasicAuth } from "@sparrow/common/interfaces/request.interface";
+  import { CodeMirrorInput } from "@sparrow/workspaces/common/components";
+  import { AuthInputTheme } from "@sparrow/workspaces/common/utils";
 
   export let callback;
   export let basicAuth: BasicAuth;

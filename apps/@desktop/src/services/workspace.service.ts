@@ -1,12 +1,12 @@
-import constants from "$lib/utils/constants";
-import { makeRequest, getAuthHeaders } from "$lib/api/api.common";
+import constants from "@app/constants/constants";
+import { makeRequest, getAuthHeaders } from "@app/containers/api/api.common";
 import type {
   WorkspacePostBody,
   WorkspacePutBody,
   addUsersInWorkspacePayload,
-} from "$lib/utils/dto";
-import type { WorkspaceRole } from "$lib/utils/enums";
-import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
+} from "@sparrow/common/dto";
+import type { WorkspaceRole } from "@sparrow/common/enums";
+import type { MakeRequestResponse } from "@app/types/http-client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const apiUrl: string = constants.API_URL;
 

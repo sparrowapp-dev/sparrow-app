@@ -4,12 +4,6 @@ import type {
   WorkspaceDocument,
 } from "../../database/database";
 
-//-----
-// Stores
-import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
-//-----
-
-//-----
 // Repositories
 import { CollectionRepository } from "../../repositories/collection.repository";
 import { EnvironmentRepository } from "../../repositories/environment.repository";
@@ -25,8 +19,8 @@ import {
   insertCollectionDirectory,
 } from "../../services/collection";
 import { CollectionService } from "../../services/collection.service";
-import { notifications } from "@library/ui/toast/Toast";
-// import { setContentTypeHeader } from "$lib/utils/helpers";
+import { notifications } from "@sparrow/library/ui";
+// import { setContentTypeHeader } from "@sparrow/common/utils";
 
 //-----
 //External Imports
@@ -39,30 +33,23 @@ import type {
   CreateApiRequestPostBody,
   CreateDirectoryPostBody,
   ImportBodyUrl,
-} from "$lib/utils/dto";
-//-----
+} from "@sparrow/common/dto";
 
-//-----
-//Interfaces
-import type { Folder } from "$lib/utils/interfaces/request.interface";
-//-----
-
-//-----
 //Emuns
 
-import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-import { ContentTypeEnum, ResponseStatusCode } from "$lib/utils/enums";
+import { ItemType, UntrackedItems } from "@sparrow/common/enums/item-type.enum";
+import { ContentTypeEnum, ResponseStatusCode } from "@sparrow/common/enums";
 //-----
 
-import { moveNavigation } from "$lib/utils/helpers/navigation";
+import { moveNavigation } from "@sparrow/common/utils/navigation";
 import { GuideRepository } from "../../repositories/guide.repository";
-import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { type Observable } from "rxjs";
-import { InitRequestTab, InitWebSocketTab } from "@common/utils";
-import { InitCollectionTab } from "@common/utils";
-import { InitFolderTab } from "@common/utils/init-folder-tab";
-import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
+import { InitRequestTab, InitWebSocketTab } from "@sparrow/common/utils";
+import { InitCollectionTab } from "@sparrow/common/utils";
+import { InitFolderTab } from "@sparrow/common/utils";
+import { requestSplitterDirection } from "@sparrow/workspaces/features/rest-explorer/store";
 import {
   insertCollectionRequest,
   updateCollectionRequest,
@@ -72,20 +59,20 @@ import { GithubRepoReposistory } from "../../repositories/github-repo.repository
 import { RequestTabAdapter } from "../../adapter/request-tab";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import { isGuestUserActive } from "$lib/store/auth.store";
-import { InitTab } from "@common/factory";
+import { isGuestUserActive } from "@app/store/auth.store";
+import { InitTab } from "@sparrow/common/factory";
 import type {
   CollectionArgsDto,
   CollectionDto,
   CollectionItemsDto,
   RequestDto,
   Tab,
-} from "@common/types/workspace";
+} from "@sparrow/common/types/workspace";
 import { SocketTabAdapter } from "../../adapter/socket-tab";
 import type { CollectionDocType } from "../../models/collection.model";
 import type { GuideQuery } from "../../types/user-guide";
 import type { FeatureQuery } from "../../types/feature-switch";
-import { ReduceQueryParams } from "@workspaces/features/rest-explorer/utils";
+import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/utils";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -208,7 +195,6 @@ export default class CollectionsViewModel {
   public createNewTab = async (_limit = 5) => {
     if (_limit === 0) return;
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
-    isApiCreatedFirstTime.set(true);
     if (ws) {
       this.tabRepository.createTab(
         new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
@@ -227,7 +213,6 @@ export default class CollectionsViewModel {
    */
   private createWebSocketNewTab = async () => {
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
-    isApiCreatedFirstTime.set(true);
     if (ws) {
       this.tabRepository.createTab(
         this.initTab.webSocket("UNTRACKED-" + uuidv4(), ws._id).getValue(),
@@ -1181,7 +1166,7 @@ export default class CollectionsViewModel {
   private handleCreateWebSocketInFolder = async (
     workspaceId: string,
     collection: CollectionDto,
-    explorer: Folder,
+    explorer: CollectionItemsDto,
   ) => {
     const websocket = new InitWebSocketTab(
       UntrackedItems.UNTRACKED + uuidv4(),
@@ -2036,7 +2021,7 @@ export default class CollectionsViewModel {
   private handleDeleteFolder = async (
     workspaceId: string,
     collection: CollectionDto,
-    explorer: Folder,
+    explorer: CollectionItemsDto,
     requestIds: string[],
   ) => {
     let userSource = {};
@@ -2194,7 +2179,7 @@ export default class CollectionsViewModel {
     workspaceId: string,
     collection: CollectionDto,
     websocket: CollectionItemsDto,
-    folder: Folder,
+    folder: CollectionItemsDto,
   ): Promise<boolean> => {
     let userSource = {};
     if (collection.activeSync) {

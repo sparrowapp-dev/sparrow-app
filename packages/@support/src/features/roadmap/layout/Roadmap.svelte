@@ -1,13 +1,13 @@
-<script>
-  import { SearchIcon } from "$lib/assets/icons";
-  import { Select } from "@library/forms";
-  import { CategoryIcon, CrossIcon, StackIcon } from "@library/icons";
-  import { Loader } from "@library/ui";
-  import HelpInfoCard from "@support/common/components/HelpInfo-Card/HelpInfoCard.svelte";
-  import { FeedbackType } from "@support/common/types";
+<script lang="ts">
+  import { SearchIcon } from "@deprecate/assets/icons";
+  import { Select } from "@sparrow/library/forms";
+  import { CategoryIcon, CrossIcon, StackIcon } from "@sparrow/library/icons";
+  import { Loader } from "@sparrow/library/ui";
+  import HelpInfoCard from "../../../common/components/HelpInfo-Card/HelpInfoCard.svelte";
+  import { FeedbackType } from "@sparrow/support/common/types";
   import { onMount } from "svelte";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   /** @type {Function} Function to fetch posts. */
   export let fetchPosts;

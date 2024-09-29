@@ -1,10 +1,10 @@
 <script>
-  import cross from "$lib/assets/close.svg";
-  import { QuickHelp } from "$lib/utils/constants/environment.constant";
+  import cross from "@deprecate/assets/close.svg";
+  import { QuickHelp } from "@sparrow/common/constants/environment.constant";
   import {
     environmentDropdown,
     environmentPicker,
-  } from "@workspaces/common/images";
+  } from "@sparrow/workspaces/common/images";
   /**
    * callback which closes the quick help dialog
    */

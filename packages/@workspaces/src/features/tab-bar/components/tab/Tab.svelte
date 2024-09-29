@@ -1,21 +1,20 @@
 <script lang="ts">
   // ---- Icon
-  import Crossicon from "$lib/assets/crossicon.svelte";
-  import BookIcon from "$lib/assets/book.svelte";
+  import Crossicon from "@deprecate/assets/crossicon.svelte";
+  import BookIcon from "@deprecate/assets/book.svelte";
   // ----
 
   // ---- SVG
-  import collectionAsset from "$lib/assets/collection-nodes.svg";
-  import folderTab from "$lib/assets/folder-tab.svg";
+  import collectionAsset from "@deprecate/assets/collection-nodes.svg";
+  import folderTab from "@deprecate/assets/folder-tab.svg";
 
   // ---- helper functions
-  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+  import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
   // ----
 
   // ---- Interface
-  import { SocketIcon, StackIcon, TreeIcon } from "@library/icons";
-  import { TabTypeEnum, type Tab } from "@common/types/workspace";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import { SocketIcon, StackIcon, TreeIcon } from "@sparrow/library/icons";
+  import { TabTypeEnum, type Tab } from "@sparrow/common/types/workspace";
   // ----
 
   // ------ Props ------

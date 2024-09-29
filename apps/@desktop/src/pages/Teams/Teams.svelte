@@ -3,22 +3,17 @@
   import type { TabDocument, TeamDocument } from "@app/database/database";
 
   import {
-    isWorkspaceCreatedFirstTime,
-    isWorkspaceLoaded,
-  } from "$lib/store/workspace.store";
-
-  import {
     leftPanelWidth,
     rightPanelWidth,
     leftPanelCollapse,
-  } from "@teams/common/stores";
+  } from "@sparrow/teams/common/stores";
 
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import TeamExplorerPage from "../TeamExplorerPage/TeamExplorerPage.svelte";
-  import TeamSidePanel from "@teams/features/team-sidepanel/layout/TeamSidePanel.svelte";
+  import { TeamSidePanel } from "@sparrow/teams/features";
   import { TeamsViewModel } from "./Teams.ViewModel";
-  import { Modal } from "@library/ui/modal";
-  import { CreateTeam } from "@teams/features";
+  import { Modal } from "@sparrow/library/ui";
+  import { CreateTeam } from "@sparrow/teams/features";
   import { pagesMotion } from "../../constants";
   import { version } from "../../../src-tauri/tauri.conf.json";
 

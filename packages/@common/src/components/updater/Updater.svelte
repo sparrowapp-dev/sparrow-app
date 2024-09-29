@@ -1,6 +1,6 @@
 <script>
-  import Cross from "@library/icons/Cross.svelte";
-  import RocketIcon from "@library/icons/RocketIcon.svelte";
+  import { CrossIcon } from "@sparrow/library/icons";
+  import { RocketIcon } from "@sparrow/library/icons";
   import { Link } from "svelte-navigator";
 
   export let show = true;
@@ -35,7 +35,7 @@
       <button class="update-btn" on:click={onUpdate}> Update </button>
 
       <button class="cross-btn" on:click={hideUpdater}>
-        <Cross height={"16px"} width={"12px"} color={"var(--cross-icon)"} />
+        <CrossIcon height={"16px"} width={"12px"} color={"var(--cross-icon)"} />
       </button>
     </div>
   </div>

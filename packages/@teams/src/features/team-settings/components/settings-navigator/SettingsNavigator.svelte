@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LockIcon } from "@library/icons";
+  import { LockIcon } from "@sparrow/library/icons";
   import { TeamSettingsTabsEnum } from "../../types";
 
   export let activeTeamSettingsTabId: string = "";

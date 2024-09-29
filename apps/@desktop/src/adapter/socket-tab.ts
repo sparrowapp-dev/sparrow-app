@@ -1,13 +1,13 @@
-import { ContentTypeEnum } from "$lib/utils/enums";
-import { createDeepCopy } from "$lib/utils/helpers";
+import { ContentTypeEnum } from "@sparrow/common/enums";
+import { createDeepCopy } from "@sparrow/common/utils";
 import {
   RequestDataTypeEnum,
   type CollectionItemsDto,
   type Path,
   type Tab,
-} from "@common/types/workspace";
-import { SocketDataTypeEnum } from "@common/types/workspace/web-socket";
-import { InitWebSocketTab } from "@common/utils";
+} from "@sparrow/common/types/workspace";
+import { SocketDataTypeEnum } from "@sparrow/common/types/workspace/web-socket";
+import { InitWebSocketTab } from "@sparrow/common/utils";
 
 /**
  * @class - this class makes request tab compatible with backend server

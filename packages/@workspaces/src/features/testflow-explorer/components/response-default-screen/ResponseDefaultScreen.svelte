@@ -1,12 +1,9 @@
 <script lang="ts">
-  import { ComboText } from "@workspaces/common/components";
-  import { isHorizontal } from "$lib/store/request-response-section";
+  import { ComboText } from "@sparrow/workspaces/common/components";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
-  import { SparrowLogo } from "@common/images";
+  import { SparrowLogo } from "@sparrow/common/images";
   export let isMainScreen = false;
-  let isHorizontalMode: boolean;
-  isHorizontal.subscribe((value) => (isHorizontalMode = value));
   let ctrlCommands: { [key: string]: string } = {};
   let altCommands: { [key: string]: string } = {};
   onMount(async () => {

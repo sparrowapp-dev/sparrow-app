@@ -1,8 +1,8 @@
 <script>
-  import { SearchIcon } from "$lib/assets/app.asset";
-  import { Select } from "@library/forms";
-  import { CategoryIcon, StatusIcon } from "@library/icons";
-  import { FeedbackType } from "@support/common/types/feedback";
+  import { SearchIcon } from "@deprecate/assets/app.asset";
+  import { Select } from "@sparrow/library/forms";
+  import { CategoryIcon, StatusIcon } from "@sparrow/library/icons";
+  import { FeedbackType } from "@sparrow/support/common/types/feedback";
   export let type = FeedbackType.ALL_CATEGORY;
   export let posts = [];
 </script>

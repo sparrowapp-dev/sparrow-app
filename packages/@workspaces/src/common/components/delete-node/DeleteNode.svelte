@@ -1,5 +1,5 @@
 <script>
-  import { Button } from "@library/ui";
+  import { Button } from "@sparrow/library/ui";
 
   export let handleModalState;
   export let deletedNodeId;

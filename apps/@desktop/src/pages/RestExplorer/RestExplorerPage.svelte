@@ -1,12 +1,12 @@
 <script lang="ts">
   import type { WorkspaceDocument } from "@app/database/database";
-  import { environmentType } from "$lib/utils/enums";
+  import { environmentType } from "@sparrow/common/enums";
 
   // ---- View Model
   import RestExplorerViewModel from "./RestExplorerPage.ViewModel";
-  import { RestExplorer, ChatBot } from "@workspaces/features";
-  import { Debounce } from "@common/utils";
-  import { isGuestUserActive, user } from "$lib/store";
+  import { RestExplorer, ChatBot } from "@sparrow/workspaces/features";
+  import { Debounce } from "@sparrow/common/utils";
+  import { isGuestUserActive, user } from "@app/store/auth.store";
   import { onMount } from "svelte";
   export let tab;
   let isLoginBannerActive = false;

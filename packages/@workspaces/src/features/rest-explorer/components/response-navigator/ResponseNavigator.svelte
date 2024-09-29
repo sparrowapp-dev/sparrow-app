@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { Label } from "@library/ui";
-  import { type UpdateRequestStateType } from "@workspaces/common/type";
-  import { ResponseSectionEnum } from "@common/types/workspace";
+  import { Label } from "@sparrow/library/ui";
+  import { type UpdateRequestStateType } from "@sparrow/workspaces/common/type";
+  import { ResponseSectionEnum } from "@sparrow/common/types/workspace";
   export let requestStateSection: string;
   export let onUpdateRequestState: UpdateRequestStateType;
   export let responseHeadersLength = 0;
@@ -71,11 +71,11 @@
     padding: 2px;
   }
   .navigation__link:hover {
-  background-color: var(--text-secondary-500);
-  border-radius: 2px;
+    background-color: var(--text-secondary-500);
+    border-radius: 2px;
   }
   .tab-active {
     color: var(--text-secondary-100);
-    border-bottom: 2px solid var(--border-primary-300 ) !important;
+    border-bottom: 2px solid var(--border-primary-300) !important;
   }
 </style>

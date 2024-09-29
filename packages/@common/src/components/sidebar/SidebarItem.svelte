@@ -12,7 +12,7 @@
 
 <script lang="ts">
   import { Link } from "svelte-navigator";
-  import { Tooltip } from "@library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
 
   /**
    * List of side bar Items

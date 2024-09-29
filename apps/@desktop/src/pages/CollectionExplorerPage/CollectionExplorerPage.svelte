@@ -11,9 +11,9 @@
   import CollectionExplorerPage from "./CollectionExplorerPage.ViewModel";
 
   // Component
-  import { CollectionExplorer } from "@workspaces/features";
+  import { CollectionExplorer } from "@sparrow/workspaces/features";
   import type { Observable } from "rxjs";
-  import { user } from "$lib/store";
+  import { user } from "@app/store/auth.store";
 
   // Exports
   export let tab: TabDocument;

@@ -1,21 +1,17 @@
 <script lang="ts">
-  import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
-  import FilterIcon from "$lib/assets/filter.svelte";
-  import plusIcon from "$lib/assets/plus-white.svg";
-  import CreateRequest from "$lib/assets/create_request.svg";
-  import CreateCollection from "$lib/assets/collections-faded.svg";
+  import doubleangleLeft from "@deprecate/assets/doubleangleLeft.svg";
+  import FilterIcon from "@deprecate/assets/filter.svelte";
+  import plusIcon from "@deprecate/assets/plus-white.svg";
+  import CreateRequest from "@deprecate/assets/create_request.svg";
+  import CreateCollection from "@deprecate/assets/collections-faded.svg";
 
-  import { Events, WorkspaceRole } from "$lib/utils/enums";
-  import { Dropdown } from "@library/ui";
+  import { Events, WorkspaceRole } from "@sparrow/common/enums";
+  import { Dropdown } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
     WorkspaceDocument,
   } from "@app/database/database";
-  import type {
-    Folder,
-    Request as RequestType,
-  } from "$lib/utils/interfaces/request.interface";
 
   import { onDestroy } from "svelte";
   import {
@@ -26,17 +22,20 @@
     TreeIcon,
     VectorIcon,
     BubbleIcon,
-  } from "@library/icons";
-  import { WithButton } from "@workspaces/common/hoc";
-  import { createDeepCopy } from "$lib/utils/helpers";
-  import { Input } from "@library/forms";
+  } from "@sparrow/library/icons";
+  import { WithButton } from "@sparrow/workspaces/common/hoc";
+  import { createDeepCopy } from "@sparrow/common/utils";
+  import { Input } from "@sparrow/library/forms";
   import { open } from "@tauri-apps/plugin-shell";
-  import constants from "$lib/utils/constants";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { CollectionList, EnvironmentList } from "@workspaces/features";
-  import { TestflowList } from "@workspaces/features/testflow-list";
-  import { TFDefaultEnum } from "@common/types/workspace/testflow";
+  import constants from "@app/constants/constants";
+  import { Tooltip } from "@sparrow/library/ui";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import {
+    CollectionList,
+    EnvironmentList,
+  } from "@sparrow/workspaces/features";
+  import { TestflowList } from "../../testflow-list";
+  import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;

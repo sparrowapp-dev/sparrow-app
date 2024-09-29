@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type WorkspaceDocument } from "../database/database";
-import type { addUsersInWorkspace } from "$lib/utils/dto/workspace-dto";
-import type { WorkspaceRole } from "$lib/utils/enums";
-import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
+import type { addUsersInWorkspace } from "@sparrow/common/dto/workspace-dto";
+import type { WorkspaceRole } from "@sparrow/common/enums";
+import type { CollectionItem } from "@sparrow/common/interfaces/collection.interface";
 import type { Observable } from "rxjs";
 import { CollectionRepository } from "./collection.repository";
 import { EnvironmentRepository } from "./environment.repository";

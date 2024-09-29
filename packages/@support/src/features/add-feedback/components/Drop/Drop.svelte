@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { InfoIcon, UploadIcon } from "@library/icons";
+  import { InfoIcon, UploadIcon } from "@sparrow/library/icons";
 
   export let labelDescription = "";
   export let inputId: string;

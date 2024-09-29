@@ -1,13 +1,16 @@
 <script lang="ts">
-  import { InviteToWorkspace, WorkspaceExplorer } from "@workspaces/features";
+  import {
+    InviteToWorkspace,
+    WorkspaceExplorer,
+  } from "@sparrow/workspaces/features";
   import WorkspaceExplorerViewModel from "./WorkspaceExplorerPage.ViewModel";
-  import { Modal } from "@library/ui";
+  import { Modal } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
-  import { DeleteWorkspace } from "@common/features";
+  import { DeleteWorkspace } from "@sparrow/common/features";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import type { UpdatesDocType } from "../../../../models/updates.model";
-  import { user } from "$lib/store";
+  import { user } from "@app/store/auth.store";
 
   export let collectionList;
   export let tab;

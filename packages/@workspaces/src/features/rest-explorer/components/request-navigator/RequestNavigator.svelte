@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { type UpdateRequestStateType } from "@workspaces/common/type";
-  import { RequestSectionEnum } from "@common/types/workspace";
-  import { Label } from "@library/ui";
+  import { type UpdateRequestStateType } from "@sparrow/workspaces/common/type";
+  import { RequestSectionEnum } from "@sparrow/common/types/workspace";
+  import { Label } from "@sparrow/library/ui";
   export let requestStateSection: string;
   export let authParameterLength = 0;
   export let authHeaderLength = 0;
@@ -95,10 +95,10 @@
 
 <div class="pb-2">
   <!-- Tabs -->
-  <div class="d-flex mb-2 ">
+  <div class="d-flex mb-2">
     {#each tabs as tab}
       <button
-        class="navigation__link  border-0 sparrow-fs-12 request-tab me-3 {tab.id ===
+        class="navigation__link border-0 sparrow-fs-12 request-tab me-3 {tab.id ===
         requestStateSection
           ? 'tab-active'
           : ''}"
@@ -120,8 +120,6 @@
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 
-
-
 <style>
   .navigation__link {
     color: var(--text-secondary-100);
@@ -130,8 +128,8 @@
   }
 
   .navigation__link:hover {
-  background-color: var(--text-secondary-500);
-  border-radius: 2px;
+    background-color: var(--text-secondary-500);
+    border-radius: 2px;
   }
   .tab-active {
     color: var(--text-secondary-100);

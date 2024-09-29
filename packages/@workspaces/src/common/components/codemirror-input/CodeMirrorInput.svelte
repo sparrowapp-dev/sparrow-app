@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
+  import { EnvironmentHeper } from "@sparrow/common/utils/environment.helper";
   import type { EditorSelection } from "@codemirror/state";
-  import { editLink } from "$lib/store/api-request";
   import { v4 as uuidv4 } from "uuid";
   import { CodeMirrorHandler } from "./sub-input";
   import { EnvironmentPicker, MissedEnvironment, ReviewEnvironment } from "../";
-  import { WorkspaceRole } from "$lib/utils/enums";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   /**
    * environment events

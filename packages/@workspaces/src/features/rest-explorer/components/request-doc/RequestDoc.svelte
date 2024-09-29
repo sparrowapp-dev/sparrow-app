@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { Events } from "$lib/utils/enums";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { generatingImage } from "@common/images";
-  import { TextEditor } from "@library/forms";
-  import { AISuggestionBox } from "@workspaces/features/chat-bot/components";
+  import { Events } from "@sparrow/common/enums";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { generatingImage } from "@sparrow/common/images";
+  import { TextEditor } from "@sparrow/library/forms";
+  import { AISuggestionBox } from "../../../../features/chat-bot/components";
 
   export let onUpdateRequestDescription;
   export let isDocGenerating = false;

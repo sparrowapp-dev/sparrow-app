@@ -6,9 +6,7 @@ import path from "path";
 export default defineConfig(async () => ({
   plugins: [svelte()],
   resolve: {
-    alias: {
-      $lib: path.resolve("./src/lib"),
-    },
+    alias: {},
   },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`

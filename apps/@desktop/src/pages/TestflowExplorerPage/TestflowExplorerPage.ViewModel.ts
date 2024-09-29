@@ -1,7 +1,7 @@
-import { makeHttpRequestV2 } from "$lib/api/api.common";
-import { ResponseStatusCode } from "$lib/utils/enums";
-import { environmentType } from "$lib/utils/enums";
-import { createDeepCopy, moveNavigation } from "$lib/utils/helpers";
+import { makeHttpRequestV2 } from "@app/containers/api/api.common";
+import { ResponseStatusCode } from "@sparrow/common/enums";
+import { environmentType } from "@sparrow/common/enums";
+import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import { RequestTabAdapter } from "../../adapter";
 import type { EnvironmentDocument, TabDocument } from "../../database/database";
 import { CollectionRepository } from "../../repositories/collection.repository";
@@ -11,11 +11,11 @@ import { TabRepository } from "../../repositories/tab.repository";
 import { TestflowRepository } from "../../repositories/testflow.repository";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { TestflowService } from "../../services/testflow.service";
-import type { Tab } from "@common/types/workspace";
+import type { Tab } from "@sparrow/common/types/workspace";
 import type {
   ENVDocumentType,
   ENVExtractVariableType,
-} from "@common/types/workspace/environment";
+} from "@sparrow/common/types/workspace/environment";
 import type {
   TFAPIResponseType,
   TFDataStoreType,
@@ -23,11 +23,11 @@ import type {
   TFHistoryStoreType,
   TFKeyValueStoreType,
   TFNodeType,
-} from "@common/types/workspace/testflow";
-import { CompareArray, Debounce, ParseTime } from "@common/utils";
-import { notifications } from "@library/ui/toast/Toast";
-import { DecodeRequest } from "@workspaces/features/rest-explorer/utils";
-import { testFlowDataStore } from "@workspaces/features/testflow-explorer/store";
+} from "@sparrow/common/types/workspace/testflow";
+import { CompareArray, Debounce, ParseTime } from "@sparrow/common/utils";
+import { notifications } from "@sparrow/library/ui";
+import { DecodeRequest } from "@sparrow/workspaces/features/rest-explorer/utils";
+import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
 import { BehaviorSubject, Observable } from "rxjs";
 
 export class TestflowExplorerPageViewModel {

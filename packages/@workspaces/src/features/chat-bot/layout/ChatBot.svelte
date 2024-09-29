@@ -6,11 +6,14 @@
     AiChatToggler,
     AISuggestionBox,
   } from "../components";
-  import { MessageTypeEnum, type RequestTab } from "@common/types/workspace";
-  import { CrossIcon } from "@library/icons";
+  import {
+    MessageTypeEnum,
+    type RequestTab,
+  } from "@sparrow/common/types/workspace";
+  import { CrossIcon } from "@sparrow/library/icons";
   import { onMount } from "svelte";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@sparrow/common/enums";
   import type { ScrollList } from "../types";
 
   export let tab: Observable<RequestTab>;

@@ -1,6 +1,6 @@
-import { getAuthHeaders, makeRequest } from "$lib/api/api.common";
+import { getAuthHeaders, makeRequest } from "@app/containers/api/api.common";
 import { CollectionRepository } from "../repositories/collection.repository";
-import constants from "$lib/utils/constants";
+import constants from "@app/constants/constants";
 import type {
   CreateApiRequestPostBody,
   CreateCollectionPostBody,
@@ -8,8 +8,8 @@ import type {
   DeleteRequestName,
   ImportBodyUrl,
   UpdateCollectionName,
-} from "$lib/utils/dto";
-import { ContentTypeEnum } from "$lib/utils/enums/request.enum";
+} from "@sparrow/common/dto";
+import { ContentTypeEnum } from "@sparrow/common/enums/request.enum";
 import { createApiRequest } from "./rest-api.service";
 
 export class CollectionService {

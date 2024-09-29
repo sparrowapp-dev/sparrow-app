@@ -3,9 +3,13 @@ import {
   ReduceRequestURL,
   ReduceQueryParams,
   DecodeWebsocket,
-} from "@workspaces/features/rest-explorer/utils";
-import { createDeepCopy, moveNavigation } from "$lib/utils/helpers";
-import { CompareArray, Debounce, InitWebSocketTab } from "@common/utils";
+} from "@sparrow/workspaces/features/rest-explorer/utils";
+import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import {
+  CompareArray,
+  Debounce,
+  InitWebSocketTab,
+} from "@sparrow/common/utils";
 
 // ---- DB
 import type {
@@ -21,8 +25,8 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { EnvironmentRepository } from "../../repositories/environment.repository";
 
 import { BehaviorSubject, Observable } from "rxjs";
-import { Events, ItemType } from "$lib/utils/enums";
-import type { CreateDirectoryPostBody } from "$lib/utils/dto";
+import { Events, ItemType } from "@sparrow/common/enums";
+import type { CreateDirectoryPostBody } from "@sparrow/common/dto";
 
 import {
   insertCollection,
@@ -31,7 +35,7 @@ import {
 import { EnvironmentService } from "../../services/environment.service";
 
 // ---- Events
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import {
   type KeyValueChecked,
   type Path,
@@ -39,17 +43,17 @@ import {
   type StatePartial,
   type Tab,
   type CollectionItemsDto,
-} from "@common/types/workspace";
-import { notifications } from "@library/ui/toast/Toast";
+} from "@sparrow/common/types/workspace";
+import { notifications } from "@sparrow/library/ui";
 import { CollectionService } from "../../services/collection.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import { isGuestUserActive } from "$lib/store/auth.store";
+import { isGuestUserActive } from "@app/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
 import { SocketTabAdapter } from "../../adapter/socket-tab";
 import type { CollectionDocType } from "../../models/collection.model";
 import { WebSocketService } from "../../services/web-socket.service";
-import { webSocketDataStore } from "@workspaces/features/socket-explorer/store";
-import { InitTab } from "@common/factory";
+import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
+import { InitTab } from "@sparrow/common/factory";
 
 class RestExplorerViewModel {
   /**

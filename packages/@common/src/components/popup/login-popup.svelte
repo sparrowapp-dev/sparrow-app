@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "@library/ui/button/Button.svelte";
+  import { Modal } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
 
   export let isOpen = false;
   export let onModalStateChanged: (flag: boolean) => void;
@@ -10,7 +10,7 @@
   export let description = "";
 </script>
 
-<ModalWrapperV1
+<Modal
   {title}
   type={"dark"}
   width={"35%"}
@@ -47,4 +47,4 @@
       </span>
     </div>
   </div>
-</ModalWrapperV1>
+</Modal>

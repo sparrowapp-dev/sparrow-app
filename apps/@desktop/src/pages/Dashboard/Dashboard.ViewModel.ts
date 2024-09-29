@@ -4,22 +4,16 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { EnvironmentService } from "../../services/environment.service";
 import { TeamService } from "../../services/team.service";
 import { WorkspaceService } from "../../services/workspace.service";
-import { throttle } from "$lib/utils/throttle";
-import { notifications } from "@library/ui/toast/Toast";
-import {
-  isGuestUserActive,
-  isLoggout,
-  isResponseError,
-  setUser,
-  user,
-} from "$lib/store/auth.store";
+import { throttle } from "@sparrow/common/utils";
+import { notifications } from "@sparrow/library/ui";
+import { isGuestUserActive, setUser, user } from "@app/store/auth.store";
 import { TabRepository } from "../../repositories/tab.repository";
 import {
   RxDB,
   type TeamDocument,
   type WorkspaceDocument,
 } from "../../database/database";
-import { clearAuthJwt } from "$lib/utils/jwt";
+import { clearAuthJwt } from "@app/utils/jwt";
 import { userLogout } from "../../services/auth.service";
 import { FeatureSwitchService } from "../../services/feature-switch.service";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
@@ -28,10 +22,10 @@ import { v4 as uuidv4 } from "uuid";
 import { TeamAdapter } from "../../adapter";
 import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { Events } from "$lib/utils/enums";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+import { Events } from "@sparrow/common/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
-import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
+import { InitWorkspaceTab } from "@sparrow/common/utils";
 
 export class DashboardViewModel {
   constructor() {}
@@ -271,8 +265,6 @@ export class DashboardViewModel {
     await this.guestUserRepository.clearTabs();
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();
-    isLoggout.set(true);
-    isResponseError.set(false);
     clearAuthJwt();
   };
 
@@ -292,8 +284,6 @@ export class DashboardViewModel {
     await this.tabRepository.clearTabs();
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();
-    isLoggout.set(true);
-    isResponseError.set(false);
     clearAuthJwt();
   };
 

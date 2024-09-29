@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { type UpdateRequestStateType } from "@workspaces/common/type";
-  import { RequestSectionEnum } from "@common/types/workspace";
-  import { Label } from "@library/ui";
-  import { SocketSectionEnum } from "@common/types/workspace/web-socket";
+  import { type UpdateRequestStateType } from "@sparrow/workspaces/common/type";
+  import { RequestSectionEnum } from "@sparrow/common/types/workspace";
+  import { Label } from "@sparrow/library/ui";
+  import { SocketSectionEnum } from "@sparrow/common/types/workspace/web-socket";
   export let requestStateSection: string | undefined;
   export let paramsLength = 0;
   export let headersLength = 0;

@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { SocketExplorer } from "@workspaces/features";
-  import { environmentType } from "$lib/utils/enums";
+  import { SocketExplorer } from "@sparrow/workspaces/features";
+  import { environmentType } from "@sparrow/common/enums";
 
   // ---- View Model
   import WebSocketViewModel from "./WebSocketExplorerPage.ViewModel";
-  import { RestExplorer, ChatBot } from "@workspaces/features";
-  import { Debounce } from "@common/utils";
-  import { isGuestUserActive, user } from "$lib/store";
+  import { RestExplorer, ChatBot } from "@sparrow/workspaces/features";
+  import { Debounce } from "@sparrow/common/utils";
+  import { isGuestUserActive, user } from "@app/store/auth.store";
   import { onMount } from "svelte";
-  import type { Tab } from "@common/types/workspace";
+  import type { Tab } from "@sparrow/common/types/workspace";
   import type { TabDocument, WorkspaceDocument } from "@app/database/database";
-  import { webSocketDataStore } from "@workspaces/features/socket-explorer/store";
+  import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
   export let tab: TabDocument;
   let isLoginBannerActive = false;
   const _viewModel = new WebSocketViewModel(tab);

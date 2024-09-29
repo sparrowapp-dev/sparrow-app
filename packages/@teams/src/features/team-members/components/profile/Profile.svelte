@@ -1,19 +1,18 @@
 <script lang="ts">
-  import { TeamRole } from "$lib/utils/enums/team.enum";
+  import { TeamRole } from "@sparrow/common/enums/team.enum";
   import type {
     userDetails,
     workspaceDocumentWithPosition,
-  } from "$lib/utils/interfaces";
-  import type { MemberPopType } from "$lib/utils/types/common.type";
+  } from "@sparrow/common/interfaces";
 
   import { ProfileWorkspace } from "./sub-profile";
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
 
   export let user: userDetails;
   export let teamRole: TeamRole;
   export let workspaces: workspaceDocumentWithPosition[];
   export let userType: TeamRole;
-  export let handlePopup: (flag, popType: MemberPopType) => void;
+  export let handlePopup: (flag: boolean, popType: string) => void;
   export let owner = false;
   export let userId: string;
   export let handleMemberPopUpSuccess = (flag: boolean) => {};

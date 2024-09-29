@@ -1,16 +1,16 @@
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 import { EnvironmentRepository } from "../../repositories/environment.repository";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { EnvironmentService } from "../../services/environment.service";
-import { Events } from "$lib/utils/enums";
-import { environmentType } from "$lib/utils/enums/environment.enum";
-import { createDeepCopy } from "$lib/utils/helpers";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { Events } from "@sparrow/common/enums";
+import { environmentType } from "@sparrow/common/enums/environment.enum";
+import { createDeepCopy } from "@sparrow/common/utils";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { BehaviorSubject, type Observable } from "rxjs";
 import { GuideRepository } from "../../repositories/guide.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { TabRepository } from "../../repositories/tab.repository";
-import { Debounce, CompareArray } from "@common/utils";
+import { Debounce, CompareArray } from "@sparrow/common/utils";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();

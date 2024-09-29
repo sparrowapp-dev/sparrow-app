@@ -1,27 +1,23 @@
 <script lang="ts">
-  import commetIcon from "$lib/assets/comment-fill.svg";
-  import codeIcon from "$lib/assets/code.svg";
-  import BookIcon from "$lib/assets/book.svelte";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { Tooltip } from "@library/ui";
+  import commetIcon from "@deprecate/assets/comment-fill.svg";
+  import codeIcon from "@deprecate/assets/code.svg";
+  import BookIcon from "@deprecate/assets/book.svelte";
+
+  import { Tooltip } from "@sparrow/library/ui";
   import { onDestroy, onMount } from "svelte";
-  import type { RequestBody } from "$lib/utils/interfaces/request.interface";
-  import { updateCollectionRequest } from "@app/services/collection";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
-  //   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import SaveIcon from "$lib/assets/save-desc.svg";
-  import EditIcon from "$lib/assets/edit-desc.svg";
+  import SaveIcon from "@deprecate/assets/save-desc.svg";
+  import EditIcon from "@deprecate/assets/edit-desc.svg";
 
-  import { Events, type WorkspaceRole } from "$lib/utils/enums";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { Events, type WorkspaceRole } from "@sparrow/common/enums";
+  import { notifications } from "@sparrow/library/ui";
 
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import { workspaceLevelPermissions } from "@sparrow/common/constants/permissions.constant";
   import {
     getMethodStyle,
     hasWorkpaceLevelPermission,
-  } from "$lib/utils/helpers";
-  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  } from "@sparrow/common/utils";
+  import { Modal } from "@sparrow/library/ui";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   // import { SaveAsRequest } from "../../../../features";
@@ -264,7 +260,7 @@
   </div>
 </div>
 
-<!-- <ModalWrapperV1
+<!-- <Modal
   title={"Save Request"}
   type={"dark"}
   width={"55%"}
@@ -292,7 +288,7 @@
     {onCreateCollection}
     type="SAVE_DESCRIPTION"
   />
-</ModalWrapperV1> -->
+</Modal> -->
 
 <style>
   .sidebar-right {

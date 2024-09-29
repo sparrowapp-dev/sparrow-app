@@ -1,27 +1,29 @@
 <script lang="ts">
-  import { notifications } from "@library/ui/toast/Toast";
-  import sparrowicon from "@library/icons/logoSparrowSquare.svg";
+  import { notifications } from "@sparrow/library/ui";
+  import {
+    logoSparrowSquare,
+    sparrowLogoBackground,
+  } from "@sparrow/common/images";
   import Redirect from "../redirect/Redirect.svelte";
-  import constants from "$lib/utils/constants";
-  import StarIcon from "@library/icons/Star.svelte";
-  import StarFilled from "@library/icons/StarFilled.svelte";
-  import CopyIcon from "@library/icons/Copy.svelte";
-  import ExternalLinkIcon from "@library/icons/ExternalLink.svelte";
-  import copyToClipBoard from "$lib/utils/copyToClipboard";
+  import constants from "@app/constants/constants";
+  import { StarIcon } from "@sparrow/library/icons";
+  import { StarFilledIcon } from "@sparrow/library/icons";
+  import { CopyIcon } from "@sparrow/library/icons";
+  import { ExternalLinkIcon } from "@sparrow/library/icons";
+  import { copyToClipBoard } from "@sparrow/common/utils";
   import { open } from "@tauri-apps/plugin-shell";
   import { version } from "../../../../src-tauri/tauri.conf.json";
-  import externalLink from "$lib/assets/external_link.svg";
-  import copyIcon from "$lib/assets/copy_icon.svg";
-  import bg from "@library/icons/sparrowLogoBackground.svg";
+  import externalLink from "@deprecate/assets/external_link.svg";
+  import copyIcon from "@deprecate/assets/copy_icon.svg";
   import BgContainer from "./BgContainer.svelte";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
   import { navigate } from "svelte-navigator";
   import { AuthViewModel } from "../Auth.ViewModel";
-  import { isGuestUserActive, navigationState } from "$lib/store";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import Button from "@library/ui/button/Button.svelte";
+  import { isGuestUserActive, navigationState } from "@app/store/auth.store";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import { Button } from "@sparrow/library/ui";
   let isEntry = false;
 
   let isHover = false;
@@ -122,7 +124,7 @@
       class="text-white d-flex justify-content-center align-items-center bg-primary-300"
       style="height: 60px; width: 60px; border-radius: 6px;"
     >
-      <img src={sparrowicon} alt="" class="" />
+      <img src={logoSparrowSquare} alt="" class="" />
     </div>
     <p
       class="container-header pt-4 pb-4 sparrow-fs-28 sparrow-fw-600 text-whiteColor text-center ms-2 me-2"
@@ -219,7 +221,7 @@
         >
           <div class="me-1">
             {#if isHover}
-              <StarFilled />
+              <StarFilledIcon />
             {:else}
               <StarIcon />
             {/if}
@@ -251,7 +253,7 @@
         right:0; z-index:-100 !important"
   class="w-100 position-fixed bg-blackColor"
 >
-  <img src={bg} alt="" style="height:100%; width:100%;" />
+  <img src={sparrowLogoBackground} alt="" style="height:100%; width:100%;" />
 </div>
 
 <style>

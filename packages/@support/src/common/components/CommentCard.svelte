@@ -1,9 +1,9 @@
 <script>
-  import { AttachmentIcon } from "@library/icons";
-  import { Button, IconFallback } from "@library/ui";
-  import { CommentCard } from "@support/common/components";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { AttachmentIcon } from "@sparrow/library/icons";
+  import { Button, IconFallback } from "@sparrow/library/ui";
+  import { CommentCard } from "@sparrow/support/common/components";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   /**
    * @description - The current comment being added or modified by the user.
@@ -104,7 +104,6 @@
             on:click={() => {
               isReplying = !isReplying;
               MixpanelEvent(Events.Reply_Comment);
-
             }}
             style="color: {isReplying
               ? 'white'

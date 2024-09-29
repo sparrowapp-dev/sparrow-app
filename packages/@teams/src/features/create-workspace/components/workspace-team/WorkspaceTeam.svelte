@@ -2,14 +2,14 @@
   /**
    * Components
    */
-  import { Select } from "@library/forms";
+  import { Select } from "@sparrow/library/forms";
 
   /**
    * Constants
    */
   import { TEAM_CONFIG } from "../../constants";
   import type { TeamDocument } from "@app/database/database";
-  import { base64ToURL } from "$lib/utils/helpers";
+  import { base64ToURL } from "@sparrow/common/utils";
 
   /**
    * Exports

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import spin from "$lib/assets/spin.svg";
+  import spin from "@deprecate/assets/spin.svg";
   export let size: string;
   export let classProp: string = "";
 </script>

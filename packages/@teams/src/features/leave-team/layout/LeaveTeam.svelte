@@ -1,6 +1,6 @@
 <script>
-  import { Button } from "@library/ui";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { Button } from "@sparrow/library/ui";
+  import { notifications } from "@sparrow/library/ui";
   import { onMount } from "svelte";
 
   // Props passed to the component

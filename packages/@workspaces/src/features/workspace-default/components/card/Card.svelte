@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PlusIcon } from "@library/icons";
+  import { PlusIcon } from "@sparrow/library/icons";
 
   export let icon;
   export let label: string;

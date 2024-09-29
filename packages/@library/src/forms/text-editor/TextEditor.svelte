@@ -8,7 +8,7 @@
   import Paragraph from "@editorjs/paragraph";
   import edjsParser from "editorjs-parser";
   import { onMount } from "svelte";
-  import { MarkdownFormatter } from "@common/utils";
+  import { MarkdownFormatter } from "@sparrow/common/utils";
   /**
    * add commments like this
    */

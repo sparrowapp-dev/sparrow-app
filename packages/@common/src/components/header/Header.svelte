@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { Select } from "@library/forms";
-  import { CloudOffIcon, SparrowEdgeIcon, StackIcon } from "@library/icons";
-  import { environmentType } from "$lib/utils/enums";
-  import { ArrowIcon } from "@library/icons";
-  import { DownArrowIcon } from "$lib/assets/icons";
-  import ArrowUnfilled from "@library/icons/ArrowUnfilled.svelte";
-  import { Tooltip } from "@library/ui";
-  import { SparrowIcon } from "@library/icons";
-  import constants from "$lib/utils/constants";
+  import { Select } from "@sparrow/library/forms";
+  import {
+    CloudOffIcon,
+    SparrowEdgeIcon,
+    StackIcon,
+  } from "@sparrow/library/icons";
+  import { environmentType } from "@sparrow/common/enums";
+  import { SparrowIcon } from "@sparrow/library/icons";
+  import constants from "@app/constants/constants";
   import type { WorkspaceDocument } from "@app/database/database";
-  import { PlusIcon } from "@library/icons";
+  import { PlusIcon } from "@sparrow/library/icons";
   import { navigate } from "svelte-navigator";
   import PopupHint from "./sub-component/PopupHint.svelte";
   import UserProfileModal, {
@@ -131,9 +131,9 @@
   export let user;
   export let onLogout;
 
-  import profile from "$lib/assets/profileTab.svg";
-  import hoveredProfile from "$lib/assets/profile-hovered.svg";
-  import selectedProfile from "$lib/assets/profile-selected.svg";
+  import profile from "@deprecate/assets/profileTab.svg";
+  import hoveredProfile from "@deprecate/assets/profile-hovered.svg";
+  import selectedProfile from "@deprecate/assets/profile-selected.svg";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",

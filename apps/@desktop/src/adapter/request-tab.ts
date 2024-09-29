@@ -4,15 +4,15 @@ import {
   setBodyType,
   unsetAuthType,
   unsetBodyType,
-} from "$lib/utils/helpers";
+} from "@sparrow/common/utils";
 import {
   RequestDatasetEnum,
   type FormData,
   type Path,
   type RequestTab,
   type Tab,
-} from "@common/types/workspace";
-import { InitRequestTab } from "@common/utils";
+} from "@sparrow/common/types/workspace";
+import { InitRequestTab } from "@sparrow/common/utils";
 
 /**
  * @class - this class makes request tab compatible with backend server

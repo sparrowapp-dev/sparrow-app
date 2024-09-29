@@ -4,7 +4,7 @@ import {
   type Auth,
   type KeyValue,
   type State,
-} from "@common/types/workspace";
+} from "@sparrow/common/types/workspace";
 
 class ReduceAuthHeader {
   private authHeader: KeyValue;

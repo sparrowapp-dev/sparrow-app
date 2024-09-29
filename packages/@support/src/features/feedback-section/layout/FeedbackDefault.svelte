@@ -1,11 +1,11 @@
 <script>
-  import { IconFallback } from "@library/ui";
-  import { AddFeedback } from "@support/features/add-feedback";
+  import { IconFallback } from "@sparrow/library/ui";
+  import { AddFeedback } from "../../../features/add-feedback";
   export let userInfo;
   export let onInputFeedback;
   export let onAddFeedback;
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 </script>
 
 <div style="height: 89px; !important; padding-bottom:21px;">

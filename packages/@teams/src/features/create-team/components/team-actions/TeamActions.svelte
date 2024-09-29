@@ -2,7 +2,7 @@
   /**
    * Components
    */
-  import { Button } from "@library/ui";
+  import { Button } from "@sparrow/library/ui";
 
   /**
    * Types

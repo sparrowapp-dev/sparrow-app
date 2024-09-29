@@ -28,7 +28,7 @@
     RequestSectionEnum,
     type CollectionDto,
     type Tab,
-  } from "@common/types/workspace";
+  } from "@sparrow/common/types/workspace";
 
   import "@xyflow/svelte/dist/style.css";
   import { onDestroy, onMount } from "svelte";
@@ -40,11 +40,11 @@
     DropButton,
     TableNavbar,
     TableSidebar,
-  } from "@workspaces/common/components";
-  import { RunIcon } from "@library/icons";
-  import { Modal } from "@library/ui";
-  import DeleteNode from "@workspaces/common/components/delete-node/DeleteNode.svelte";
-  import { ResponseStatusCode } from "$lib/utils/enums";
+  } from "@sparrow/workspaces/common/components";
+  import { RunIcon } from "@sparrow/library/icons";
+  import { Modal } from "@sparrow/library/ui";
+  import DeleteNode from "../../../common/components/delete-node/DeleteNode.svelte";
+  import { ResponseStatusCode } from "@sparrow/common/enums";
   import type {
     TFDataStoreType,
     TFEdgeHandlerType,
@@ -52,10 +52,10 @@
     TFNodeStoreType,
     TFNodeType,
     TFResponseStateType,
-  } from "@common/types/workspace/testflow";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Debounce } from "@common/utils";
+  } from "@sparrow/common/types/workspace/testflow";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { Debounce } from "@sparrow/common/utils";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;

@@ -1,8 +1,8 @@
-import { user } from "$lib/store";
-import type { addUsersInWorkspacePayload } from "$lib/utils/dto";
-import { Events, WorkspaceRole } from "$lib/utils/enums";
-import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { throttle } from "$lib/utils/throttle";
+import { user } from "@app/store/auth.store";
+import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
+import { Events, WorkspaceRole } from "@sparrow/common/enums";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+import { throttle } from "@sparrow/common/utils";
 import type { TeamDocument, WorkspaceDocument } from "../../database/database";
 import type { UpdatesDocType } from "../../models/updates.model";
 import { CollectionRepository } from "../../repositories/collection.repository";
@@ -14,8 +14,7 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { CollectionService } from "../../services/collection.service";
 import { UpdatesService } from "../../services/updates.service";
 import { WorkspaceService } from "../../services/workspace.service";
-import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
-import { notifications } from "@library/ui/toast/Toast";
+import { notifications } from "@sparrow/library/ui";
 import type { Observable } from "rxjs";
 
 export default class WorkspaceExplorerViewModel {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import { marked } from "marked";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@sparrow/library/ui";
   import { copyIcon, tickIcon } from "../../assests";
   import { tick } from "svelte";
 
@@ -13,12 +13,12 @@
     LikeIcon,
     RefreshIcon,
     TickIcon,
-  } from "@library/icons";
-  import { SparrowAIIcon } from "@common/icons";
-  import { Tooltip } from "@library/ui";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums";
-  import { MessageTypeEnum } from "@common/types/workspace";
+  } from "@sparrow/library/icons";
+  import { SparrowAIIcon } from "@sparrow/common/icons";
+  import { Tooltip } from "@sparrow/library/ui";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@sparrow/common/enums";
+  import { MessageTypeEnum } from "@sparrow/common/types/workspace";
 
   export let message: string;
   export let messageId: string;
