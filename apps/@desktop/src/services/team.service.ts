@@ -6,7 +6,7 @@ import {
 import { TeamRepository } from "../repositories/team.repository";
 import { WorkspaceRepository } from "../repositories/workspace.repository";
 import constants from "@app/constants/constants";
-import type { InviteBody, TeamPostBody } from "@deprecate/utils/dto/team-dto";
+import type { InviteBody, TeamPostBody } from "@sparrow/common/dto/team-dto";
 const apiUrl: string = constants.API_URL;
 export class TeamService {
   constructor() {}

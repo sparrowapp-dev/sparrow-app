@@ -5,7 +5,7 @@
   import type {
     KeyValuePair,
     KeyValuePairWithBase,
-  } from "@deprecate/utils/interfaces/request.interface";
+  } from "@sparrow/common/interfaces/request.interface";
   import type { KeyValueChecked } from "@sparrow/common/types/workspace";
   import { partition } from "rxjs";
 

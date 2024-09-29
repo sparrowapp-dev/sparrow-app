@@ -3,7 +3,7 @@
   import BeautifyIcon from "@deprecate/assets/beautify.svg";
   import crossIcon from "@deprecate/assets/cross.svg";
   import { Select } from "@sparrow/library/forms";
-  import { RequestDataType, RequestDataset } from "@deprecate/utils/enums";
+  import { RequestDataType, RequestDataset } from "@sparrow/common/enums";
   import { notifications } from "@sparrow/library/ui";
   import { WithSelect } from "@sparrow/workspaces/common/hoc";
   export let method = "";

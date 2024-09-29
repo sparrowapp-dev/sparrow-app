@@ -1,4 +1,4 @@
-import { ItemType } from "@deprecate/utils/enums/item-type.enum";
+import { ItemType } from "@sparrow/common/enums/item-type.enum";
 
 const helper = (tree, id, path) => {
   if (tree._id === id || tree.id === id) {

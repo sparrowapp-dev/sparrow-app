@@ -13,7 +13,7 @@
   import { CrossIcon } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import { Events } from "@deprecate/utils/enums";
+  import { Events } from "@sparrow/common/enums";
   import type { ScrollList } from "../types";
 
   export let tab: Observable<RequestTab>;

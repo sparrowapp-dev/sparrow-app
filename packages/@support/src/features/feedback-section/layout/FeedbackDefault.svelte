@@ -5,7 +5,7 @@
   export let onInputFeedback;
   export let onAddFeedback;
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 </script>
 
 <div style="height: 89px; !important; padding-bottom:21px;">

@@ -2,24 +2,20 @@
   import commetIcon from "@deprecate/assets/comment-fill.svg";
   import codeIcon from "@deprecate/assets/code.svg";
   import BookIcon from "@deprecate/assets/book.svelte";
-  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
+
   import { Tooltip } from "@sparrow/library/ui";
   import { onDestroy, onMount } from "svelte";
-  import type { RequestBody } from "@deprecate/utils/interfaces/request.interface";
-  import { updateCollectionRequest } from "@app/services/collection";
-  import { ItemType } from "@deprecate/utils/enums/item-type.enum";
-  //   import type { CollectionsMethods } from "@deprecate/utils/interfaces/collections.interface";
   import SaveIcon from "@deprecate/assets/save-desc.svg";
   import EditIcon from "@deprecate/assets/edit-desc.svg";
 
-  import { Events, type WorkspaceRole } from "@deprecate/utils/enums";
+  import { Events, type WorkspaceRole } from "@sparrow/common/enums";
   import { notifications } from "@sparrow/library/ui";
 
-  import { workspaceLevelPermissions } from "@deprecate/utils/constants/permissions.constant";
+  import { workspaceLevelPermissions } from "@sparrow/common/constants/permissions.constant";
   import {
     getMethodStyle,
     hasWorkpaceLevelPermission,
-  } from "@deprecate/utils/helpers";
+  } from "@sparrow/common/utils";
   import { Modal } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "@app/database/database";

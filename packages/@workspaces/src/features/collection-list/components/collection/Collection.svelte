@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   export let onItemCreated: (entityType: string, args: any) => void;
@@ -25,18 +25,18 @@
   import {
     ItemType,
     UntrackedItems,
-  } from "@deprecate/utils/enums/item-type.enum";
+  } from "@sparrow/common/enums/item-type.enum";
   import { Spinner } from "@sparrow/library/ui";
   import { onDestroy, onMount } from "svelte";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
-  import { WorkspaceRole } from "@deprecate/utils/enums";
+  import { WorkspaceRole } from "@sparrow/common/enums";
   import { Tooltip } from "@sparrow/library/ui";
   import gitBranchIcon from "@deprecate/assets/git-branch.svg";
   import { ReloadCollectionIcon } from "@deprecate/assets/icons";
   import type { CollectionDocument, TabDocument } from "@app/database/database";
   import Folder from "../folder/Folder.svelte";
-  import type { Path } from "@deprecate/utils/interfaces/request.interface";
+  import type { Path } from "@sparrow/common/interfaces/request.interface";
   import AddIcon from "@deprecate/assets/add.svg";
   import {
     FolderIcon,

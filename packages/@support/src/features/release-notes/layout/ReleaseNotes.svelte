@@ -18,7 +18,7 @@
   import { open } from "@tauri-apps/plugin-shell";
   import { UpdatesTagType } from "../../../common/types/feedback";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   export let listChangeLog;
 
   /**

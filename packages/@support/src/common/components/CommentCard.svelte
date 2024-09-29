@@ -2,7 +2,7 @@
   import { AttachmentIcon } from "@sparrow/library/icons";
   import { Button, IconFallback } from "@sparrow/library/ui";
   import { CommentCard } from "@sparrow/support/common/components";
-  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   /**

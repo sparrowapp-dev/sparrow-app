@@ -1,5 +1,5 @@
-import { ContentTypeEnum } from "@deprecate/utils/enums";
-import { createDeepCopy } from "@deprecate/utils/helpers";
+import { ContentTypeEnum } from "@sparrow/common/enums";
+import { createDeepCopy } from "@sparrow/common/utils";
 import {
   RequestDataTypeEnum,
   type CollectionItemsDto,

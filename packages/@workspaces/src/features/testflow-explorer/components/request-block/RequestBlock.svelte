@@ -10,7 +10,7 @@
     DropIcon,
   } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
-  import { ResponseStatusCode } from "@deprecate/utils/enums";
+  import { ResponseStatusCode } from "@sparrow/common/enums";
   import { InfoIcon, ArrowIcon } from "../../icons";
   import { VectorIcon } from "@sparrow/library/icons";
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
@@ -18,7 +18,7 @@
   import type { Observable } from "rxjs";
   import { testFlowDataStore } from "../../../../features/testflow-explorer/store/testflow";
   import { ThreeDotIcon } from "@deprecate/assets/app.asset";
-  import { createDeepCopy } from "@deprecate/utils/helpers";
+  import { createDeepCopy } from "@sparrow/common/utils";
   import { ParseTime } from "@sparrow/common/utils";
   import type {
     TFDataStoreType,

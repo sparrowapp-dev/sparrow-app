@@ -9,13 +9,12 @@
   import folderTab from "@deprecate/assets/folder-tab.svg";
 
   // ---- helper functions
-  import { getMethodStyle } from "@deprecate/utils/helpers/conversion.helper";
+  import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
   // ----
 
   // ---- Interface
   import { SocketIcon, StackIcon, TreeIcon } from "@sparrow/library/icons";
   import { TabTypeEnum, type Tab } from "@sparrow/common/types/workspace";
-  import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
   // ----
 
   // ------ Props ------

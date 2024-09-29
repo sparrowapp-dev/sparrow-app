@@ -4,7 +4,7 @@
     EditIcon,
     UploadIcon,
   } from "@deprecate/assets/app.asset";
-  import { base64ToURL, imageDataToURL } from "@deprecate/utils/helpers";
+  import { base64ToURL, imageDataToURL } from "@sparrow/common/utils";
   import { CrossIcon } from "@deprecate/assets/app.asset";
 
   export let value: any = [];

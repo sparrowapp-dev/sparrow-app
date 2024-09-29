@@ -1,6 +1,6 @@
 <script>
   import { ArrowSplit, VectorIcon } from "@sparrow/library/icons";
-  import { getMethodStyle } from "@deprecate/utils/helpers/conversion.helper";
+  import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
 
   export let selectedNode;
 

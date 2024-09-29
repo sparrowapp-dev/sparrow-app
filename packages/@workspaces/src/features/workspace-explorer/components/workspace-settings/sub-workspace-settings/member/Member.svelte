@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Select } from "@sparrow/library/forms";
-  import { WorkspaceRole } from "@deprecate/utils/enums/team.enum";
+  import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
 

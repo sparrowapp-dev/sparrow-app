@@ -4,7 +4,7 @@
   import { ArrowIcon } from "../../icons";
   import { PlayArrow } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
-  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { testFlowDataStore } from "../../store";
   import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";

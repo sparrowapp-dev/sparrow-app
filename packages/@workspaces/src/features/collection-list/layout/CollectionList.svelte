@@ -2,7 +2,7 @@
   import { Collection, EmptyCollection, SearchTree } from "../components";
   import doubleangleLeft from "@deprecate/assets/doubleangleLeft.svg";
   import angleRight from "@deprecate/assets/angle-right-v2.svg";
-  import { WorkspaceRole } from "@deprecate/utils/enums";
+  import { WorkspaceRole } from "@sparrow/common/enums";
   import { List } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type {
@@ -15,11 +15,11 @@
     Folder,
     Path,
     Request as RequestType,
-  } from "@deprecate/utils/interfaces/request.interface";
+  } from "@sparrow/common/interfaces/request.interface";
   import { onDestroy } from "svelte";
   import { CollectionIcon } from "@sparrow/library/icons";
-  import { createDeepCopy } from "@deprecate/utils/helpers";
-  import constants from "@app/constants/constants";
+  import { createDeepCopy } from "@sparrow/common/utils";
+
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
 

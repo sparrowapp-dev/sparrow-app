@@ -20,7 +20,7 @@
   import { Roadmap } from "@sparrow/support/features";
   import { ReleaseNotes } from "@sparrow/support/features";
   import { ActivitySection } from "@sparrow/support/features";
-  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   /**

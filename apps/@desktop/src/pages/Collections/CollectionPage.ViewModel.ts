@@ -20,7 +20,7 @@ import {
 } from "../../services/collection";
 import { CollectionService } from "../../services/collection.service";
 import { notifications } from "@sparrow/library/ui";
-// import { setContentTypeHeader } from "@deprecate/utils/helpers";
+// import { setContentTypeHeader } from "@sparrow/common/utils";
 
 //-----
 //External Imports
@@ -33,20 +33,17 @@ import type {
   CreateApiRequestPostBody,
   CreateDirectoryPostBody,
   ImportBodyUrl,
-} from "@deprecate/utils/dto";
+} from "@sparrow/common/dto";
 
 //Emuns
 
-import {
-  ItemType,
-  UntrackedItems,
-} from "@deprecate/utils/enums/item-type.enum";
-import { ContentTypeEnum, ResponseStatusCode } from "@deprecate/utils/enums";
+import { ItemType, UntrackedItems } from "@sparrow/common/enums/item-type.enum";
+import { ContentTypeEnum, ResponseStatusCode } from "@sparrow/common/enums";
 //-----
 
-import { moveNavigation } from "@deprecate/utils/helpers/navigation";
+import { moveNavigation } from "@sparrow/common/utils/navigation";
 import { GuideRepository } from "../../repositories/guide.repository";
-import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { type Observable } from "rxjs";
 import { InitRequestTab, InitWebSocketTab } from "@sparrow/common/utils";

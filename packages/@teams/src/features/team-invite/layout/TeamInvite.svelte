@@ -6,9 +6,9 @@
     base64ToURL,
     createDynamicComponents,
     validateEmail,
-  } from "@deprecate/utils/helpers";
+  } from "@sparrow/common/utils";
 
-  import { TeamRole, WorkspaceRole } from "@deprecate/utils/enums/team.enum";
+  import { TeamRole, WorkspaceRole } from "@sparrow/common/enums/team.enum";
   import { Button, IconFallback } from "@sparrow/library/ui";
 
   export let onInviteClick;

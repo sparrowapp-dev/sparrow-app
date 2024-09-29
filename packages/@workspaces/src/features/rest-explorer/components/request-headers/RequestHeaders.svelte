@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { KeyValuePair } from "@deprecate/utils/interfaces/request.interface";
+  import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { TabularInput } from "@sparrow/workspaces/common/components";
-  import { createDeepCopy } from "@deprecate/utils/helpers/conversion.helper";
+  import { createDeepCopy } from "@sparrow/common/utils/conversion.helper";
   import AngleUp from "@deprecate/assets/angle-up.svelte";
   import AngleDown from "@deprecate/assets/angle-down2.svelte";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import { Events } from "@deprecate/utils/enums";
+  import { Events } from "@sparrow/common/enums";
 
   export let environmentVariables = [];
   export let onHeadersChange;

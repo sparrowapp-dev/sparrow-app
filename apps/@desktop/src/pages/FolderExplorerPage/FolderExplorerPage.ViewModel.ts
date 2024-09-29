@@ -13,8 +13,8 @@ import type {
 } from "../../database/database";
 
 // Utils
-import { moveNavigation } from "@deprecate/utils/helpers";
-import { Events, ItemType } from "@deprecate/utils/enums";
+import { moveNavigation } from "@sparrow/common/utils";
+import { Events, ItemType } from "@sparrow/common/enums";
 // import { invoke } from "@tauri-apps/api/core";
 import { v4 as uuidv4 } from "uuid";
 
@@ -25,7 +25,7 @@ import type {
   Folder,
   Tab,
 } from "@sparrow/common/types/workspace";
-import type { CreateApiRequestPostBody } from "@deprecate/utils/dto";
+import type { CreateApiRequestPostBody } from "@sparrow/common/dto";
 import { InitRequestTab } from "@sparrow/common/utils";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { notifications } from "@sparrow/library/ui";

@@ -6,7 +6,7 @@ import {
   ReduceAuthHeader,
   ReduceAuthParameter,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@deprecate/utils/helpers";
+import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import {
   CompareArray,
   Debounce,
@@ -32,8 +32,8 @@ import {
   ItemType,
   ResponseStatusCode,
   UntrackedItems,
-} from "@deprecate/utils/enums";
-import type { CreateDirectoryPostBody } from "@deprecate/utils/dto";
+} from "@sparrow/common/enums";
+import type { CreateDirectoryPostBody } from "@sparrow/common/dto";
 
 // ---- Service
 import { makeHttpRequestV2 } from "@app/containers/api/api.common";

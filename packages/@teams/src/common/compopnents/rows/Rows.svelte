@@ -2,7 +2,7 @@
   import { ThreeDotIcon } from "@deprecate/assets/app.asset";
   import { UserProfileList } from "@sparrow/teams/common/compopnents";
   import { MenuView } from "@sparrow/teams/common/compopnents";
-  import { TeamRole, WorkspaceMemberRole } from "@deprecate/utils/enums";
+  import { TeamRole, WorkspaceMemberRole } from "@sparrow/common/enums";
 
   export let list;
   export let activeTeam;

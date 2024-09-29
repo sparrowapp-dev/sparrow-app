@@ -4,7 +4,7 @@
   import type {
     KeyValuePair,
     KeyValuePairWithBase,
-  } from "@deprecate/utils/interfaces/request.interface";
+  } from "@sparrow/common/interfaces/request.interface";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "../";
   import { onMount } from "svelte";

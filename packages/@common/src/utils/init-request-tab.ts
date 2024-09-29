@@ -1,4 +1,4 @@
-import { RequestDefault } from "@deprecate/utils/enums";
+import { RequestDefault } from "@sparrow/common/enums";
 import {
   AuthSectionEnum,
   AuthTypeEnum,

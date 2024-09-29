@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { WorkspaceRole } from "@deprecate/utils/enums";
+  import { WorkspaceRole } from "@sparrow/common/enums";
   import { Input } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
 

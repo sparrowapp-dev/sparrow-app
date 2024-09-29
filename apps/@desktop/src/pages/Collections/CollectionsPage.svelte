@@ -32,18 +32,18 @@
   import { notifications } from "@sparrow/library/ui";
 
   // ---- Interface, enum & constants
-  import { WorkspaceRole } from "@deprecate/utils/enums/team.enum";
+  import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
 
   // ---- View Model
   import CollectionsViewModel from "./CollectionPage.ViewModel";
   import { EnvironmentViewModel } from "@app/pages/EnvironmentPage/EnvironmentPage.ViewModel";
 
   // ---- helpers
-  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
+  import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   import type { TabDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { onMount } from "svelte";
-  import { ItemType } from "@deprecate/utils/enums";
+  import { ItemType } from "@sparrow/common/enums";
 
   import type {
     CollectionDocument,

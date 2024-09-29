@@ -1,9 +1,9 @@
 <script lang="ts">
   import { TabularInput } from "@sparrow/workspaces/common/components";
-  import { createDeepCopy } from "@deprecate/utils/helpers";
-  import type { KeyValuePair } from "@deprecate/utils/interfaces/request.interface";
+  import { createDeepCopy } from "@sparrow/common/utils";
+  import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import { Events } from "@deprecate/utils/enums";
+  import { Events } from "@sparrow/common/enums";
   export let params;
   export let environmentVariables;
   export let authParameter;

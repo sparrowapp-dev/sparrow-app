@@ -6,7 +6,7 @@
   import HelpInfoCard from "../../../common/components/HelpInfo-Card/HelpInfoCard.svelte";
   import { FeedbackType } from "@sparrow/support/common/types";
   import { onMount } from "svelte";
-  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   /** @type {Function} Function to fetch posts. */

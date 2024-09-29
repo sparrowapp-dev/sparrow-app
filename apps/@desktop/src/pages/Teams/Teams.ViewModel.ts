@@ -9,15 +9,15 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { CollectionRepository } from "../../repositories/collection.repository";
 import { GithubRepoReposistory } from "../../repositories/github-repo.repository";
 import { GithubService } from "../../services/github.service";
-import { moveNavigation } from "@deprecate/utils/helpers";
+import { moveNavigation } from "@sparrow/common/utils";
 import { navigate } from "svelte-navigator";
 import { InitWorkspaceTab } from "@sparrow/common/utils";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import type { MakeRequestResponse } from "@deprecate/utils/interfaces/common.interface";
-import type { Team } from "@deprecate/utils/interfaces";
+import type { MakeRequestResponse } from "@app/types/http-client";
+import type { Team } from "@sparrow/common/interfaces";
 import { UserService } from "../../services/user.service";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-import { Events } from "@deprecate/utils/enums";
+import { Events } from "@sparrow/common/enums";
 
 export class TeamsViewModel {
   constructor() {}

@@ -1,5 +1,5 @@
 import { makeHttpRequestV2, makeRequest } from "@app/containers/api/api.common";
-import { ContentTypeEnum } from "@deprecate/utils/enums";
+import { ContentTypeEnum } from "@sparrow/common/enums";
 import constants from "@app/constants/constants";
 
 export class CannyIoService {

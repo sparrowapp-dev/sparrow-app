@@ -1,6 +1,6 @@
 import { RxDB, type TeamDocument } from "../database/database";
-import { TeamRole } from "@deprecate/utils/enums";
-import type { userDetails } from "@deprecate/utils/interfaces";
+import { TeamRole } from "@sparrow/common/enums";
+import type { userDetails } from "@sparrow/common/interfaces";
 import type { Observable } from "rxjs";
 import { WorkspaceRepository } from "./workspace.repository";
 

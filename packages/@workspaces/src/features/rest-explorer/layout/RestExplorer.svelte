@@ -65,7 +65,7 @@
     CreateCollection,
     SendingApiRequest,
   } from "@sparrow/workspaces/common/constants";
-  import { ResponseStatusCode } from "@deprecate/utils/enums";
+  import { ResponseStatusCode } from "@sparrow/common/enums";
 
   export let tab: Observable<RequestTab>;
   export let collections: Observable<CollectionDocument[]>;

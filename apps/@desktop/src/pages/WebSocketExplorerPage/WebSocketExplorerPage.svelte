@@ -1,6 +1,6 @@
 <script lang="ts">
   import { SocketExplorer } from "@sparrow/workspaces/features";
-  import { environmentType } from "@deprecate/utils/enums";
+  import { environmentType } from "@sparrow/common/enums";
 
   // ---- View Model
   import WebSocketViewModel from "./WebSocketExplorerPage.ViewModel";

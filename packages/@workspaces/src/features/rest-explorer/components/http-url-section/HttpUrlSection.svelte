@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { RequestMethod, WorkspaceRole } from "@deprecate/utils/enums";
+  import { RequestMethod, WorkspaceRole } from "@sparrow/common/enums";
 
   import { Select } from "@sparrow/library/forms";
   import type {

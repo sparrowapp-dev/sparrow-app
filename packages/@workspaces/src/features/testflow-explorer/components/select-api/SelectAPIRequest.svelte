@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getMethodStyle } from "@deprecate/utils/helpers";
+  import { getMethodStyle } from "@sparrow/common/utils";
   import type { CollectionDocument } from "@app/database/database";
   import { CollectionIcon, FolderIcon2 } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";

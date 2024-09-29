@@ -23,7 +23,7 @@ import { TeamAdapter } from "../../adapter";
 import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-import { Events } from "@deprecate/utils/enums";
+import { Events } from "@sparrow/common/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import { InitWorkspaceTab } from "@sparrow/common/utils";
 

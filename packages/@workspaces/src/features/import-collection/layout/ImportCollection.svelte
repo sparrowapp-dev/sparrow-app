@@ -10,11 +10,11 @@
     validateClientURL,
     validateClientXML,
     validateImportBody,
-  } from "@deprecate/utils/collections/utils.old";
+  } from "@sparrow/common/utils/importCollectionValidations";
   import linkIcon from "@deprecate/assets/linkIcon.svg";
   import { invoke } from "@tauri-apps/api/core";
   import { Button } from "@sparrow/library/ui";
-  import { ContentTypeEnum, ResponseStatusCode } from "@deprecate/utils/enums";
+  import { ContentTypeEnum, ResponseStatusCode } from "@sparrow/common/enums";
   import TickMark from "@deprecate/assets/tick-mark-rounded.svelte";
   import { Drop } from "../components";
 

@@ -7,7 +7,7 @@
   import { onDestroy } from "svelte";
   import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";
   import { user } from "@app/store/auth.store";
-  import { WorkspaceRole } from "@deprecate/utils/enums";
+  import { WorkspaceRole } from "@sparrow/common/enums";
   import { Debounce } from "@sparrow/common/utils";
   export let tab;
   const _viewModel = new TestflowExplorerPageViewModel(tab);

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getMethodStyle } from "@deprecate/utils/helpers";
+  import { getMethodStyle } from "@sparrow/common/utils";
   import { onMount } from "svelte";
   export let api: any;
   export let data: any;

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { RequestDataset } from "@deprecate/utils/enums/request.enum";
+  import { RequestDataset } from "@sparrow/common/enums/request.enum";
   import {
     Binary,
     FormData,

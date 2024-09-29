@@ -1,6 +1,6 @@
 <script lang="ts">
   // ---- helper functions
-  import { base64ToURL } from "@deprecate/utils/helpers";
+  import { base64ToURL } from "@sparrow/common/utils";
   // ---- document models
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   // ---- library

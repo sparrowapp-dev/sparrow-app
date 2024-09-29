@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { addUsersInWorkspacePayload } from "@deprecate/utils/dto";
-  import { WorkspaceRole } from "@deprecate/utils/enums";
+  import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
+  import { WorkspaceRole } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
   import { InviteUserPicker } from "../components";
   import { Select } from "@sparrow/library/forms";

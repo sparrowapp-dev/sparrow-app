@@ -1,5 +1,5 @@
 import { resetPassword } from "../../../services/auth.service";
-import type { resetPasswordPostBody } from "@deprecate/utils/dto";
+import type { resetPasswordPostBody } from "@sparrow/common/dto";
 
 import { notifications } from "@sparrow/library/ui";
 import { navigate } from "svelte-navigator";

@@ -4,7 +4,7 @@ import {
   ReduceQueryParams,
   DecodeWebsocket,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@deprecate/utils/helpers";
+import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import {
   CompareArray,
   Debounce,
@@ -25,8 +25,8 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { EnvironmentRepository } from "../../repositories/environment.repository";
 
 import { BehaviorSubject, Observable } from "rxjs";
-import { Events, ItemType } from "@deprecate/utils/enums";
-import type { CreateDirectoryPostBody } from "@deprecate/utils/dto";
+import { Events, ItemType } from "@sparrow/common/enums";
+import type { CreateDirectoryPostBody } from "@sparrow/common/dto";
 
 import {
   insertCollection,

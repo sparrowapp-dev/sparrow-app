@@ -8,8 +8,8 @@ import type {
   DeleteRequestName,
   ImportBodyUrl,
   UpdateCollectionName,
-} from "@deprecate/utils/dto";
-import { ContentTypeEnum } from "@deprecate/utils/enums/request.enum";
+} from "@sparrow/common/dto";
+import { ContentTypeEnum } from "@sparrow/common/enums/request.enum";
 import { createApiRequest } from "./rest-api.service";
 
 export class CollectionService {

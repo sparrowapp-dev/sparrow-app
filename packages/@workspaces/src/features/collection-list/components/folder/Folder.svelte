@@ -22,23 +22,23 @@
   import {
     ItemType,
     UntrackedItems,
-  } from "@deprecate/utils/enums/item-type.enum";
-  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  } from "@sparrow/common/enums/item-type.enum";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import {
     workspaceLevelPermissions,
     PERMISSION_NOT_FOUND_TEXT,
-  } from "@deprecate/utils/constants/permissions.constant";
-  import { WorkspaceRole } from "@deprecate/utils/enums";
+  } from "@sparrow/common/constants/permissions.constant";
+  import { WorkspaceRole } from "@sparrow/common/enums";
   import type {
     Folder,
     Path,
-  } from "@deprecate/utils/interfaces/request.interface";
+  } from "@sparrow/common/interfaces/request.interface";
 
   // ---- Store
   // import { selectMethodsStore } from "@app/store/auth.store/methods";
 
   // ---- Helper Functions
-  // import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
+  // import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   // import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   // ---- DB

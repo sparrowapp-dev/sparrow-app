@@ -11,6 +11,38 @@ export function isUrlValid(str: string) {
   );
   return pattern.test(str);
 }
+
+import { ItemType } from "@sparrow/common/enums/item-type.enum";
+import type { Collection } from "@sparrow/common/interfaces/collection.interface";
+// import {
+//   selectMethodsStore,
+//   selectedMethodsCollectionStore,
+// } from "@app/store/auth.store/methods";
+import { ContentTypeEnum } from "../enums";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+let tree: any[];
+const filterTree: Collection[] = [];
+let selectedAPIMethods: string[] = [];
+// selectMethodsStore.subscribe((value) => {
+//   if (value) {
+//     selectedAPIMethods = value;
+//   }
+// });
+
+export const debounce = (func, delay = 1000) => {
+  let timerId: any;
+
+  return function (...args) {
+    /* eslint-disable @typescript-eslint/no-this-alias */
+    const context = this;
+
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      func.apply(context, args);
+    }, delay);
+  };
+};
+
 export const validateClientURL = (url = "") => {
   const urlPattern = /^(ftp|http|https):\/\/[^ "]+$/;
   return urlPattern.test(url);
@@ -40,23 +72,24 @@ export const validateClientXML = (yamlString = "") => {
   }
 };
 
-import { setCollectionList } from "@app/store/auth.store/collection";
-import { ItemType } from "@deprecate/utils/enums/item-type.enum";
-import type { Collection } from "@deprecate/utils/interfaces/collection.interface";
-import {
-  selectMethodsStore,
-  selectedMethodsCollectionStore,
-} from "@app/store/auth.store/methods";
-/* eslint-disable @typescript-eslint/no-explicit-any */
-let tree: any[];
-const filterTree: Collection[] = [];
-let selectedAPIMethods: string[] = [];
-selectMethodsStore.subscribe((value) => {
-  if (value) {
-    selectedAPIMethods = value;
+export const validateImportBody = (data: string) => {
+  let contentType;
+  try {
+    JSON.parse(data);
+    return (contentType = ContentTypeEnum["application/json"]);
+  } catch (jsonError) {
+    if (jsonError instanceof SyntaxError) {
+      try {
+        yaml.load(data);
+        return (contentType = ContentTypeEnum["text/plain"]);
+      } catch (yamlError) {
+        return contentType;
+      }
+    } else {
+      return contentType;
+    }
   }
-});
-
+};
 /**
  * Recursive helper function to modify the tree data structure by adding files or folders.
  */
@@ -132,6 +165,10 @@ const searchHelper: (
   folderDetails,
   activeSync,
 ) => {
+  const treeDoc = tree;
+  if (!tree.name) {
+    tree = tree._data;
+  }
   if (tree.name.toLowerCase().includes(searchText.toLowerCase())) {
     if (tree.type === "REQUEST") {
       file.push({
@@ -152,7 +189,7 @@ const searchHelper: (
       });
     } else {
       collection.push({
-        tree: JSON.parse(JSON.stringify(tree)),
+        tree: treeDoc,
         collectionId,
         workspaceId,
         path: createPath(path),
@@ -231,7 +268,7 @@ const useTree = (): any[] => {
     // Iterate through the tree to find the target folder and add the item
     for (let i = 0; i < tree.length; i++) {
       if (!helper(tree[i], folderId, type, name, id, method)) {
-        setCollectionList(tree);
+        // setCollectionList(tree);
         return;
       }
     }
@@ -240,7 +277,7 @@ const useTree = (): any[] => {
   const insertHead: (name: string, _id: string) => void = (name, _id) => {
     // Iterate through the tree to find the target folder and add the item
     tree.push({ name, _id, items: [] });
-    setCollectionList(tree);
+    // setCollectionList(tree);
     return;
   };
   const searchNode: (

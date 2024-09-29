@@ -13,7 +13,7 @@
   import { Dropdown } from "@sparrow/library/ui";
 
   // ---- Helper
-  import { tabBarScroller } from "@deprecate/utils/helpers/navigation";
+  import { tabBarScroller } from "@sparrow/common/utils/navigation";
   import { requestSplitterDirection } from "@sparrow/workspaces/features/rest-explorer/store";
   import { HelpIcon } from "@deprecate/assets/app.asset";
   import {

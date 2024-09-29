@@ -4,9 +4,9 @@ import type {
   WorkspacePostBody,
   WorkspacePutBody,
   addUsersInWorkspacePayload,
-} from "@deprecate/utils/dto";
-import type { WorkspaceRole } from "@deprecate/utils/enums";
-import type { MakeRequestResponse } from "@deprecate/utils/interfaces/common.interface";
+} from "@sparrow/common/dto";
+import type { WorkspaceRole } from "@sparrow/common/enums";
+import type { MakeRequestResponse } from "@app/types/http-client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const apiUrl: string = constants.API_URL;
 

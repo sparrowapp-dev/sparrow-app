@@ -12,12 +12,12 @@ import type { CollectionDocument, TabDocument } from "../../database/database";
 import { notifications } from "@sparrow/library/ui";
 
 // Utils
-import { moveNavigation } from "@deprecate/utils/helpers";
+import { moveNavigation } from "@sparrow/common/utils";
 import {
   ItemType,
   ResponseStatusCode,
   UntrackedItems,
-} from "@deprecate/utils/enums";
+} from "@sparrow/common/enums";
 import { invoke } from "@tauri-apps/api/core";
 import { v4 as uuidv4 } from "uuid";
 

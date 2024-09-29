@@ -1,6 +1,6 @@
 import { getAuthHeaders } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
-import type { StreamPromptDto } from "@deprecate/utils/dto/ai-assistant";
+import type { StreamPromptDto } from "@sparrow/common/dto/ai-assistant";
 import { socketStore } from "../store/ws.store";
 import { io } from "socket.io-client";
 

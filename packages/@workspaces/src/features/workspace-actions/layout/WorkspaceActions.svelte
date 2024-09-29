@@ -5,17 +5,13 @@
   import CreateRequest from "@deprecate/assets/create_request.svg";
   import CreateCollection from "@deprecate/assets/collections-faded.svg";
 
-  import { Events, WorkspaceRole } from "@deprecate/utils/enums";
+  import { Events, WorkspaceRole } from "@sparrow/common/enums";
   import { Dropdown } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
     WorkspaceDocument,
   } from "@app/database/database";
-  import type {
-    Folder,
-    Request as RequestType,
-  } from "@deprecate/utils/interfaces/request.interface";
 
   import { onDestroy } from "svelte";
   import {
@@ -28,7 +24,7 @@
     BubbleIcon,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/common/hoc";
-  import { createDeepCopy } from "@deprecate/utils/helpers";
+  import { createDeepCopy } from "@sparrow/common/utils";
   import { Input } from "@sparrow/library/forms";
   import { open } from "@tauri-apps/plugin-shell";
   import constants from "@app/constants/constants";

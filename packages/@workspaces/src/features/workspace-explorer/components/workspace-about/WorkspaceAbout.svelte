@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { WorkspaceRole } from "@deprecate/utils/enums";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   /**
    * The description of the workspace.

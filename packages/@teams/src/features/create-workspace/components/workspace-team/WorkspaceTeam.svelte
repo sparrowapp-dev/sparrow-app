@@ -9,7 +9,7 @@
    */
   import { TEAM_CONFIG } from "../../constants";
   import type { TeamDocument } from "@app/database/database";
-  import { base64ToURL } from "@deprecate/utils/helpers";
+  import { base64ToURL } from "@sparrow/common/utils";
 
   /**
    * Exports

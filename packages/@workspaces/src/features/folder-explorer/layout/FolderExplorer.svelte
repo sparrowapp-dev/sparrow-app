@@ -61,8 +61,8 @@
   /**
    * Constants
    */
-  import { PERMISSION_NOT_FOUND_TEXT } from "@deprecate/utils/constants/permissions.constant";
-  import { WorkspaceRole } from "@deprecate/utils/enums";
+  import { PERMISSION_NOT_FOUND_TEXT } from "@sparrow/common/constants/permissions.constant";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   /**
    * Local variables

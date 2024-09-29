@@ -1,11 +1,11 @@
 <script lang="ts">
   import Plus from "@deprecate/assets/plus.svelte";
-  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
+  import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
-  } from "@deprecate/utils/constants/permissions.constant";
-  import { WorkspaceRole } from "@deprecate/utils/enums";
+  } from "@sparrow/common/constants/permissions.constant";
+  import { WorkspaceRole } from "@sparrow/common/enums";
   import { Tooltip } from "@sparrow/library/ui";
   import { List } from "@sparrow/library/ui";
   import { PlusIcon } from "@sparrow/library/icons";

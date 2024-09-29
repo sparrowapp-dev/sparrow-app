@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { ItemType } from "@deprecate/utils/enums/item-type.enum";
+  import { ItemType } from "@sparrow/common/enums/item-type.enum";
   import collectionAsset from "@deprecate/assets/collection.svg";
   import workspaceAsset from "@deprecate/assets/workspace.svg";
   import folderAsset from "@deprecate/assets/folder.svg";
@@ -15,12 +15,12 @@
   import QuestionIcon from "@deprecate/assets/question.svelte";
   import { Button } from "@sparrow/library/ui";
   import { FileType } from "../components";
-  import { getMethodStyle } from "@deprecate/utils/helpers/conversion.helper";
+  import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
   import {
     bestPractice,
     dos,
     donts,
-  } from "@deprecate/utils/constants/request.constant";
+  } from "@sparrow/common/constants/request.constant";
   import {
     CollectionIcon,
     FolderIcon2,

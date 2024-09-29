@@ -7,7 +7,7 @@
   import type {
     KeyValuePair,
     KeyValuePairWithBase,
-  } from "@deprecate/utils/interfaces/request.interface";
+  } from "@sparrow/common/interfaces/request.interface";
   import { invoke } from "@tauri-apps/api/core";
   import close from "@deprecate/assets/cross.svg";
   import { TabularInputTheme } from "../../utils";

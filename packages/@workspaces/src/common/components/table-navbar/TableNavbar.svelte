@@ -1,6 +1,6 @@
 <script>
   import { ArrowOutwardIcon, CrossIcon } from "@sparrow/library/icons";
-  import { getMethodStyle } from "@deprecate/utils/helpers/conversion.helper";
+  import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
   import { Tooltip } from "@sparrow/library/ui";
 
   export let selectedNode;

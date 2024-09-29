@@ -1,19 +1,19 @@
 <script lang="ts">
   import { HelpIcon, SaveIcon } from "@deprecate/assets/app.asset";
   import { onMount } from "svelte";
-  import type { EnvValuePair } from "@deprecate/utils/interfaces/request.interface";
+  import type { EnvValuePair } from "@sparrow/common/interfaces/request.interface";
   import { QuickHelp } from "../components";
-  import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
+  import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
-  } from "@deprecate/utils/constants/permissions.constant";
+  } from "@sparrow/common/constants/permissions.constant";
   import { Tooltip } from "@sparrow/library/ui";
 
   import { TabularInputV2 } from "@sparrow/workspaces/common/components";
   import { Input } from "@sparrow/library/forms";
   import { Carousel, Modal, Popover } from "@sparrow/library/ui";
-  import { environmentType, WorkspaceRole } from "@deprecate/utils/enums";
+  import { environmentType, WorkspaceRole } from "@sparrow/common/enums";
   import {
     CreateENV,
     IntroToEnvironment,

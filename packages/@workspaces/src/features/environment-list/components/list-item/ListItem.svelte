@@ -1,13 +1,13 @@
 <script lang="ts">
   import threedotIcon from "@deprecate/assets/3dot.svg";
   import { SelectIcon } from "@deprecate/assets/app.asset";
-  import { UntrackedItems } from "@deprecate/utils/enums/item-type.enum";
+  import { UntrackedItems } from "@sparrow/common/enums/item-type.enum";
   import { Spinner } from "@sparrow/library/ui";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
   import { Options } from "@sparrow/library/ui";
   import { Tooltip } from "@sparrow/library/ui";
-  import { WorkspaceRole } from "@deprecate/utils/enums";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   /**
    * current workspace to identify the selected environment

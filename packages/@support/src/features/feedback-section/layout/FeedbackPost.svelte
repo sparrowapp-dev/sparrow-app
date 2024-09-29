@@ -20,7 +20,7 @@
   import { onMount } from "svelte";
   import { FormatTime } from "@sparrow/common/utils";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
-  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { notifications } from "@sparrow/library/ui";
 

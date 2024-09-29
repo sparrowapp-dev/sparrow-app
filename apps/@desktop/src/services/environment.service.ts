@@ -3,7 +3,7 @@ import constants from "@app/constants/constants";
 import type {
   CreateEnvironmentPostBody,
   UpdateEnvironmentPostBody,
-} from "@deprecate/utils/dto";
+} from "@sparrow/common/dto";
 
 export class EnvironmentService {
   constructor() {}

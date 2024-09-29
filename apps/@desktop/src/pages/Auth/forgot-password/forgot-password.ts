@@ -1,5 +1,5 @@
 import { forgotPassword } from "../../../services/auth.service";
-import type { EmailPostBody } from "@deprecate/utils/dto";
+import type { EmailPostBody } from "@sparrow/common/dto";
 import { notifications } from "@sparrow/library/ui";
 import { navigate } from "svelte-navigator";
 

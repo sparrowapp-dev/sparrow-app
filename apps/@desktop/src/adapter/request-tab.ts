@@ -4,7 +4,7 @@ import {
   setBodyType,
   unsetAuthType,
   unsetBodyType,
-} from "@deprecate/utils/helpers";
+} from "@sparrow/common/utils";
 import {
   RequestDatasetEnum,
   type FormData,

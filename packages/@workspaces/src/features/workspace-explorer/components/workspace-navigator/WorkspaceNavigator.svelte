@@ -1,6 +1,6 @@
 <script lang="ts">
   import { InformationIcon, SettingIcon } from "@sparrow/library/icons";
-  import { WorkspaceRole } from "@deprecate/utils/enums";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   /**
    * The ID of the currently selected workspace navigator item.

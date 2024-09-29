@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { TeamRole } from "@deprecate/utils/enums/team.enum";
+  import { TeamRole } from "@sparrow/common/enums/team.enum";
   import type {
     userDetails,
     workspaceDocumentWithPosition,
-  } from "@deprecate/utils/interfaces";
+  } from "@sparrow/common/interfaces";
 
   import { ProfileWorkspace } from "./sub-profile";
   import { Select } from "@sparrow/library/forms";

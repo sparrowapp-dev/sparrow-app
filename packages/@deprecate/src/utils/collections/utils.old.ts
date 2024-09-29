@@ -12,8 +12,8 @@ export function isUrlValid(str: string) {
   return pattern.test(str);
 }
 
-import { ItemType } from "@deprecate/utils/enums/item-type.enum";
-import type { Collection } from "@deprecate/utils/interfaces/collection.interface";
+import { ItemType } from "@sparrow/common/enums/item-type.enum";
+import type { Collection } from "@sparrow/common/interfaces/collection.interface";
 // import {
 //   selectMethodsStore,
 //   selectedMethodsCollectionStore,

@@ -22,7 +22,7 @@
   import { AuthViewModel } from "../Auth.ViewModel";
   import { isGuestUserActive, navigationState } from "@app/store/auth.store";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import { Button } from "@sparrow/library/ui";
   let isEntry = false;
 

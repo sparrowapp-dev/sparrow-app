@@ -4,10 +4,10 @@
   import { workspaceView } from "../store/workspace-view";
   import { onDestroy } from "svelte";
   import { SearchIcon } from "@deprecate/assets/app.asset";
-  import { base64ToURL } from "@deprecate/utils/helpers";
+  import { base64ToURL } from "@sparrow/common/utils";
   import { PeopleIcon } from "@deprecate/assets/app.asset";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
-  import { TeamRole } from "@deprecate/utils/enums";
+  import { TeamRole } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
   import TeamNavigator from "../components/team-navigator/TeamNavigator.svelte";
   import {

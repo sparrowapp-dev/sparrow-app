@@ -9,7 +9,7 @@ import type {
   CreateApiRequestPostBody,
   CreateCollectionPostBody,
   CreateDirectoryPostBody,
-} from "@deprecate/utils/dto";
+} from "@sparrow/common/dto";
 
 // import {
 //   apiEndPoint,

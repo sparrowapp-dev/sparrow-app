@@ -1,8 +1,8 @@
 import { user } from "@app/store/auth.store";
-import type { addUsersInWorkspacePayload } from "@deprecate/utils/dto";
-import type { InviteBody } from "@deprecate/utils/dto/team-dto";
-import { Events, UntrackedItems, WorkspaceRole } from "@deprecate/utils/enums";
-import type { MakeRequestResponse } from "@deprecate/utils/interfaces/common.interface";
+import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
+import type { InviteBody } from "@sparrow/common/dto/team-dto";
+import { Events, UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
+import type { MakeRequestResponse } from "@app/types/http-client";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import type { WorkspaceDocument } from "../../database/database";
 import { CollectionRepository } from "../../repositories/collection.repository";

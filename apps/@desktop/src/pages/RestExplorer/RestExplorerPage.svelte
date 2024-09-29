@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { WorkspaceDocument } from "@app/database/database";
-  import { environmentType } from "@deprecate/utils/enums";
+  import { environmentType } from "@sparrow/common/enums";
 
   // ---- View Model
   import RestExplorerViewModel from "./RestExplorerPage.ViewModel";

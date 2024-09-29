@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Events } from "@deprecate/utils/enums";
+  import { Events } from "@sparrow/common/enums";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { generatingImage } from "@sparrow/common/images";
   import { TextEditor } from "@sparrow/library/forms";

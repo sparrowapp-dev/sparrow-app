@@ -3,7 +3,7 @@ import { registerUser } from "../../../services/auth.service";
 import { jwtDecode } from "@app/utils/jwt";
 import { notifications } from "@sparrow/library/ui";
 import { navigate } from "svelte-navigator";
-import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 import { sendUserDataToMixpanel } from "../login-page/login-page";
 
 const handleRegister = async (userData) => {

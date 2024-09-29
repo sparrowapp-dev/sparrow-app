@@ -1,6 +1,6 @@
 <script>
   import cross from "@deprecate/assets/close.svg";
-  import { QuickHelp } from "@deprecate/utils/constants/environment.constant";
+  import { QuickHelp } from "@sparrow/common/constants/environment.constant";
   import {
     environmentDropdown,
     environmentPicker,

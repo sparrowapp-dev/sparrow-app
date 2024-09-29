@@ -4,7 +4,7 @@ import type {
   EmailPostBody,
   verifyPostbody,
   resetPasswordPostBody,
-} from "@deprecate/utils/dto";
+} from "@sparrow/common/dto";
 import { makeRequest, getRefHeaders } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
 const apiUrl: string = constants.API_URL;

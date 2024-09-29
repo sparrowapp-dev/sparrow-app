@@ -1,4 +1,4 @@
-import { FolderDefault } from "@deprecate/utils/enums";
+import { FolderDefault } from "@sparrow/common/enums";
 import {
   type Path,
   TabTypeEnum,

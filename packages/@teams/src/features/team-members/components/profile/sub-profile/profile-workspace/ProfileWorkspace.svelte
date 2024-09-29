@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { TeamRole, WorkspaceRole } from "@deprecate/utils/enums/team.enum";
-  import type { workspaceDocumentWithPosition } from "@deprecate/utils/interfaces";
+  import { TeamRole, WorkspaceRole } from "@sparrow/common/enums/team.enum";
+  import type { workspaceDocumentWithPosition } from "@sparrow/common/interfaces";
   import { Select } from "@sparrow/library/forms";
   export let workspace: workspaceDocumentWithPosition;
   export let user;

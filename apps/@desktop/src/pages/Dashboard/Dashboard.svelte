@@ -24,7 +24,7 @@
   import { List } from "@sparrow/library/ui";
   import { Updater } from "@sparrow/common/components";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import Teams from "../Teams/Teams.svelte";
   import { Modal } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";

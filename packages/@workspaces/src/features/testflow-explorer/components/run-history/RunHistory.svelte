@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { getMethodStyle } from "@deprecate/utils/helpers";
+  import { getMethodStyle } from "@sparrow/common/utils";
   import {
     CheckIcon2,
     CrossIcon,
     ExclamationIcon,
     HistoryIcon,
   } from "@sparrow/library/icons";
-  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   import { Tooltip } from "@sparrow/library/ui";
   import { WithButtonV5 } from "@sparrow/workspaces/common/hoc";
   import { FormatTime } from "@sparrow/common/utils";
-  import { ResponseStatusCode } from "@deprecate/utils/enums";
+  import { ResponseStatusCode } from "@sparrow/common/enums";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   export let testflowStore;
   export let testflowName = "";

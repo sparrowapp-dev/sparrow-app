@@ -13,7 +13,7 @@
   import { SearchIcon } from "@deprecate/assets/app.asset";
   import { Select } from "@sparrow/library/forms";
   import { CategoryIcon, StatusIcon } from "@sparrow/library/icons";
-  import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
+  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   import {

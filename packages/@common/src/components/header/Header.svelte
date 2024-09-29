@@ -5,7 +5,7 @@
     SparrowEdgeIcon,
     StackIcon,
   } from "@sparrow/library/icons";
-  import { environmentType } from "@deprecate/utils/enums";
+  import { environmentType } from "@sparrow/common/enums";
   import { SparrowIcon } from "@sparrow/library/icons";
   import constants from "@app/constants/constants";
   import type { WorkspaceDocument } from "@app/database/database";
