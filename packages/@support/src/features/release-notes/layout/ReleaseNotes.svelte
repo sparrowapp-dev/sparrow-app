@@ -16,7 +16,7 @@
   import { copyToClipBoard } from "@sparrow/common/utils";
   import { notifications } from "@sparrow/library/ui";
   import { open } from "@tauri-apps/plugin-shell";
-  import { UpdatesTagType } from "../../../common/types/feedback";
+  import { UpdatesTagType } from "../../../types/feedback";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   export let listChangeLog;

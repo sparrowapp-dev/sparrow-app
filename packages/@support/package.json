@@ -14,13 +14,13 @@
   "main": "src/main.ts",
   "exports": {
     "./features": "./src/features/index.ts",
-    "./components": "./src/common/components/index.ts",
-    "./constants": "./src/common/constants/index.ts",
-    "./types": "./src/common/types/index.ts",
-    "./hoc": "./src/common/hoc/index.ts",
-    "./utils": "./src/common/utils/index.ts",
-    "./constants/discord.constants": "./src/common/constants/discord.constants.ts",
-    "./constants/learnMore.constant": "./src/common/constants/learnMore.constant.ts"
+    "./components": "./src/components/index.ts",
+    "./constants": "./src/constants/index.ts",
+    "./types": "./src/types/index.ts",
+    "./hoc": "./src/hoc/index.ts",
+    "./utils": "./src/utils/index.ts",
+    "./constants/discord.constants": "./src/constants/discord.constants.ts",
+    "./constants/learnMore.constant": "./src/constants/learnMore.constant.ts"
   },
   "devDependencies": {
     "@fontsource/fira-mono": "^4.5.10",

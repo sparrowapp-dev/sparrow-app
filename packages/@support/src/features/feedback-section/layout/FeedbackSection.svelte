@@ -1,17 +1,14 @@
 <script lang="ts">
   import { user } from "@app/store/auth.store";
   import { CommentIcon, SortIcon } from "@sparrow/library/icons";
-  import { UpvoteIcon } from "../../../common/components";
+  import { UpvoteIcon } from "../../../components";
   import FeedbackPost from "./FeedbackPost.svelte";
   import FeedbackDefault from "./FeedbackDefault.svelte";
   import { onMount } from "svelte";
   import { SearchIcon } from "@deprecate/assets/app.asset";
   import { Select } from "@sparrow/library/forms";
   import { CategoryIcon, StatusIcon } from "@sparrow/library/icons";
-  import {
-    FeedbackType,
-    FeedbackStatusType,
-  } from "../../../common/types/feedback";
+  import { FeedbackType, FeedbackStatusType } from "../../../types/feedback";
   import { TickIcon } from "@sparrow/library/icons";
   import { Loader } from "@sparrow/library/ui";
   import { Debounce } from "@sparrow/common/utils";

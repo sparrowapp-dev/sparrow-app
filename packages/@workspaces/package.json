@@ -18,13 +18,13 @@
     "./features/rest-explorer/utils": "./src/features/rest-explorer/utils/index.ts",
     "./features/rest-explorer/store": "./src/features/rest-explorer/store/index.ts",
     "./features/socket-explorer/store": "./src/features/socket-explorer/store/index.ts",
-    "./components": "./src/common/components/index.ts",
-    "./constants": "./src/common/constants/index.ts",
-    "./hoc": "./src/common/hoc/index.ts",
-    "./images": "./src/common/images/index.ts",
-    "./stores": "./src/common/stores/index.ts",
-    "./type": "./src/common/type/index.ts",
-    "./utils": "./src/common/utils/index.ts"
+    "./components": "./src/components/index.ts",
+    "./constants": "./src/constants/index.ts",
+    "./hoc": "./src/hoc/index.ts",
+    "./images": "./src/images/index.ts",
+    "./stores": "./src/stores/index.ts",
+    "./type": "./src/type/index.ts",
+    "./utils": "./src/utils/index.ts"
   },
   "devDependencies": {
     "@fontsource/fira-mono": "^4.5.10",
