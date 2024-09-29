@@ -15,7 +15,7 @@
     "checkJs": true,
     "isolatedModules": true,
     "paths": {
-      "@deprecate/*": ["../../packages/@deprecate/src/*"],
+      "@deprecate/*": ["../../packages/@sparrow-deprecate/src/*"],
       "@app/*": ["./src/*"]
     }
   },
