@@ -9,7 +9,7 @@ import { resizeWindowOnLogOut, resizeWindowOnLogin } from "../../../utils";
 import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
-import ActiveSideBarTabViewModel from "../../Dashboard/ActiveSideBarTab.ViewModel";
+// import ActiveSideBarTabViewModel from "../../Dashboard/ActiveSideBarTab.ViewModel";
 import { GuideRepository } from "../../../repositories/guide.repository";
 
 //------------------------------MixPanel-------------------------------//
@@ -27,7 +27,7 @@ export const navigateToRegister = () => {
 };
 
 export const authNavigate = async () => {};
-const _activeSidebarTabViewModel = new ActiveSideBarTabViewModel();
+// const _activeSidebarTabViewModel = new ActiveSideBarTabViewModel();
 const _guideRepository = new GuideRepository();
 
 //---------------- Handle Login ------------------//
@@ -47,7 +47,7 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
     });
     notifications.success("Login successful!");
     navigate("/dashboard/workspaces");
-    _activeSidebarTabViewModel.addActiveTab("workspaces");
+    // _activeSidebarTabViewModel.addActiveTab("workspaces");
     return response;
   } else {
     navigate("/");
@@ -84,7 +84,7 @@ export async function handleLoginV2(url: string) {
       _guideRepository.insert({ isActive: false, id: "environment-guide" });
       _guideRepository.insert({ isActive: false, id: "collection-guide" });
     }
-    _activeSidebarTabViewModel.addActiveTab("collections");
+    // _activeSidebarTabViewModel.addActiveTab("collections");
     await resizeWindowOnLogin();
   } else {
     notifications.error("Invalid token!");

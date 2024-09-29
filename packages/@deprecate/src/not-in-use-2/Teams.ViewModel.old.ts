@@ -1,20 +1,20 @@
-// import { WorkspaceService } from "../../../../apps/@desktop/src/services/workspace.service";
+// import { WorkspaceService } from "../../services/workspace.service";
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// import { WorkspaceRepository } from "../../../../apps/@desktop/src/repositories/workspace.repository";
+// import { WorkspaceRepository } from "../../repositories/workspace.repository";
 // import {
 //   requestResponseStore,
 //   tabs,
 // } from "@app/store/auth.store/request-response-section";
-// import { TabRepository } from "../../../../apps/@desktop/src/repositories/tab.repository";
-// import { CollectionRepository } from "../../../../apps/@desktop/src/repositories/collection.repository";
-// import { TeamService } from "../../../../apps/@desktop/src/services/team.service";
-// import { TeamRepository } from "../../../../apps/@desktop/src/repositories/team.repository";
-// import type { TeamDocument } from "../../../../apps/@desktop/src/database/database";
+// import { TabRepository } from "../../repositories/tab.repository";
+// import { CollectionRepository } from "../../repositories/collection.repository";
+// import { TeamService } from "../../services/team.service";
+// import { TeamRepository } from "../../repositories/team.repository";
+// import type { TeamDocument } from "../../database/database";
 // import type { Observable } from "rxjs";
 // import type { InviteBody } from "@deprecate/utils/dto/team-dto";
 // import type { TeamRole, WorkspaceRole } from "@deprecate/utils/enums";
-// import { UserService } from "../../../../apps/@desktop/src/services/user.service";
+// import { UserService } from "../../services/user.service";
 // import type { MakeRequestResponse } from "@deprecate/utils/interfaces/common.interface";
 // import type { Team } from "@deprecate/utils/interfaces";
 
