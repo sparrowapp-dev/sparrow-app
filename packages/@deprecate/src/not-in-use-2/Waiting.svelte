@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
   import { Loader } from "@sparrow/library/ui";
   import { setUser } from "@app/store/auth.store";
   import constants from "@app/constants/constants";
@@ -24,10 +24,10 @@
     notifications.success("Login successful!");
     navigate("/dashboard");
   });
-</script>
+</script> -->
 
-<div class="d-flex align-items-center justify-content-center m-auto pt-5">
+<!-- <div class="d-flex align-items-center justify-content-center m-auto pt-5">
   <div>
     <Loader loaderSize={"80px"} loaderMessage="Please Wait..." />
   </div>
-</div>
+</div> -->

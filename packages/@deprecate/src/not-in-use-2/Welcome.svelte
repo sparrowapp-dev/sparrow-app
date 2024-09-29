@@ -1,8 +1,8 @@
-<script>
+<!-- <script>
   import spin from "@deprecate/assets/spin.svg";
-</script>
+</script> -->
 
-<div
+<!-- <div
   class="d-flex flex-column align-items-center justify-content-center loading-spinner spinner-item"
 >
   <img class="load-spin" src={spin} style="width: 80px; height:80px;" alt="" />
@@ -28,4 +28,4 @@
       transform: rotate(360deg);
     }
   }
-</style>
+</style> -->

@@ -1,5 +1,5 @@
 <script>
-  import { Link, navigate } from "svelte-navigator";
+  // import { Link, navigate } from "svelte-navigator";
 
   // Function to maximize the page
   // const maximizePage = () => {
@@ -8,17 +8,17 @@
   // };
 </script>
 
-<div class="homePage">
-  <div class="header">
-    <!-- <Header /> -->
-  </div>
+<!-- <div class="homePage">
+  <div class="header"> -->
+<!-- <Header /> -->
+<!-- </div>
   <h1>Welcome to Sparrow App</h1>
   <Link to="/dashboard/collections" class="btn btn-link mt-4 w-100"
     >Continue</Link
-  >
-  <!-- <a href="/" class="btn btn-link mt-4 w-100">Go Back</a> -->
-</div>
-
+  > -->
+<!-- <a href="/" class="btn btn-link mt-4 w-100">Go Back</a> -->
+<!-- </div> -->
+<!-- 
 <style>
   .homePage {
     height: 100vh;
@@ -50,4 +50,4 @@
       margin-top: 300px;
     }
   }
-</style>
+</style> -->
