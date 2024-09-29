@@ -7,7 +7,7 @@ export default defineConfig(async () => ({
   plugins: [svelte()],
   resolve: {
     alias: {
-      "@deprecate": path.resolve("../../packages/@deprecate/src/"),
+      "@deprecate": path.resolve("../../packages/@sparrow-deprecate/src/"),
       "@app": path.resolve("./src/"),
     },
   },

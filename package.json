@@ -3,17 +3,15 @@
   "private": true,
   "author": "Sparrow",
   "description": "The Sparrow App is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and making you a better programmer.",
-  "version": "2.8.0",
+  "version": "0.0.1",
   "type": "module",
   "workspaces": [
-    "./apps/@desktop",
-    "./apps/@web",
-    "./packages/@library",
-    "./packages/@common",
-    "./packages/@teams",
-    "./packages/@workspaces",
-    "./packages/@support",
-    "./packages/@deprecate"
+    "./packages/@sparrow-library",
+    "./packages/@sparrow-common",
+    "./packages/@sparrow-teams",
+    "./packages/@sparrow-workspaces",
+    "./packages/@sparrow-support",
+    "./packages/@sparrow-deprecate"
   ],
   "scripts": {
     "dev": "vite",
