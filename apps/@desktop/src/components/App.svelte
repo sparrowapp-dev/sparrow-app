@@ -14,7 +14,6 @@
   import { AppUpdater } from "@sparrow/common/features";
   import { getCurrent } from "@tauri-apps/api/window";
   import LoginPage from "@app/pages/Auth/login-page/LoginPage.svelte";
-  import RegisterPage from "@app/pages/Auth/register-page/RegisterPage.svelte";
   import { singleInstanceHandler } from "@app/utils/singleinstance/app.singleinstance";
 
   export let url = "/";
@@ -81,7 +80,6 @@
         <Route path="/*"><Navigate to="/init" /></Route>
       {:else}
         <Route path="/login" component={LoginPage} />
-        <Route path="/register" component={RegisterPage} />
         <Route path="/*"><Navigate to="/login" /></Route>
       {/if}
     </section>

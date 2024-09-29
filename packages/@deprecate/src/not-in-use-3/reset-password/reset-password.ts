@@ -1,4 +1,4 @@
-import { resetPassword } from "../../../services/auth.service";
+import { resetPassword } from "../../../../../apps/@desktop/src/services/auth.service";
 import type { resetPasswordPostBody } from "@sparrow/common/dto";
 
 import { notifications } from "@sparrow/library/ui";
