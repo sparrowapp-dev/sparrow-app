@@ -10,7 +10,7 @@
 
   // ---- Animation
   import { Motion } from "svelte-motion";
-  import { scaleMotionProps } from "@deprecate/utils/animations";
+  import { scaleMotionProps } from "@app/constants";
 
   import { onDestroy } from "svelte";
   // ---- Components
@@ -34,7 +34,6 @@
   // ---- Interface, enum & constants
   import type { NewTab } from "@deprecate/utils/interfaces/request.interface";
   import { WorkspaceRole } from "@deprecate/utils/enums/team.enum";
-  import { workspaceLevelPermissions } from "@deprecate/utils/constants/permissions.constant";
 
   // ---- View Model
   import CollectionsViewModel from "./CollectionPage.ViewModel";

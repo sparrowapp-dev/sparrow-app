@@ -1,5 +1,5 @@
-import { getAuthHeaders } from "@deprecate/api/api.common";
-import constants from "@deprecate/utils/constants";
+import { getAuthHeaders } from "@app/containers/api/api.common";
+import constants from "@app/constants/constants";
 import type { StreamPromptDto } from "@deprecate/utils/dto/ai-assistant";
 import { socketStore } from "../store/ws.store";
 import { io } from "socket.io-client";

@@ -1,8 +1,8 @@
 <script>
   import { Loader } from "@sparrow/library/ui";
   import { setUser } from "@app/store/auth.store";
-  import constants from "@deprecate/utils/constants";
-  import { jwtDecode, setAuthJwt } from "@deprecate/utils/jwt";
+  import constants from "@app/constants/constants";
+  import { jwtDecode, setAuthJwt } from "@app/utils/jwt";
   import { notifications } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   import { navigate } from "svelte-navigator";

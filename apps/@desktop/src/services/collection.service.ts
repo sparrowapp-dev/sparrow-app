@@ -1,6 +1,6 @@
-import { getAuthHeaders, makeRequest } from "@deprecate/api/api.common";
+import { getAuthHeaders, makeRequest } from "@app/containers/api/api.common";
 import { CollectionRepository } from "../repositories/collection.repository";
-import constants from "@deprecate/utils/constants";
+import constants from "@app/constants/constants";
 import type {
   CreateApiRequestPostBody,
   CreateCollectionPostBody,

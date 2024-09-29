@@ -1,1 +1,1 @@
-export { pagesMotion } from "./animation";
+export { pagesMotion, scaleMotionProps } from "./animation";

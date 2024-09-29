@@ -1,13 +1,13 @@
 <script lang="ts">
   import downloadIcon from "@deprecate/assets/download.svg";
   import copyIcon from "@deprecate/assets/copy.svg";
-  import copyToClipBoard from "@deprecate/utils/copyToClipboard";
+  import { copyToClipBoard } from "@sparrow/common/utils";
   import { notifications } from "@sparrow/library/ui";
   import {
     RequestDataType,
     ResponseFormatter,
   } from "@deprecate/utils/enums/request.enum";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
   import BeautifyIcon from "@deprecate/assets/beautify.svg";

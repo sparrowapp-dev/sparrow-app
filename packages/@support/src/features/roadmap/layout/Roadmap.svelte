@@ -7,7 +7,7 @@
   import { FeedbackType } from "@sparrow/support/common/types";
   import { onMount } from "svelte";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   /** @type {Function} Function to fetch posts. */
   export let fetchPosts;

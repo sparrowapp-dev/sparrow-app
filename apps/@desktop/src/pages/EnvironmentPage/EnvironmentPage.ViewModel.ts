@@ -4,7 +4,7 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { EnvironmentService } from "../../services/environment.service";
 import { Events, UntrackedItems } from "@deprecate/utils/enums";
 import { environmentType } from "@deprecate/utils/enums/environment.enum";
-import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { InitTab } from "@sparrow/common/factory";
 import { v4 as uuidv4 } from "uuid";
 import { GuideRepository } from "../../repositories/guide.repository";

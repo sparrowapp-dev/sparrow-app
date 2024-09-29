@@ -16,7 +16,7 @@ import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import type { MakeRequestResponse } from "@deprecate/utils/interfaces/common.interface";
 import type { Team } from "@deprecate/utils/interfaces";
 import { UserService } from "../../services/user.service";
-import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@deprecate/utils/enums";
 
 export class TeamsViewModel {

@@ -39,7 +39,7 @@
 
   // ---- Helper Functions
   // import { hasWorkpaceLevelPermission } from "@deprecate/utils/helpers";
-  // import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  // import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   // ---- DB
   import type { CollectionDocument } from "@app/database/database";

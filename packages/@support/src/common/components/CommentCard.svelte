@@ -3,7 +3,7 @@
   import { Button, IconFallback } from "@sparrow/library/ui";
   import { CommentCard } from "@sparrow/support/common/components";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   /**
    * @description - The current comment being added or modified by the user.

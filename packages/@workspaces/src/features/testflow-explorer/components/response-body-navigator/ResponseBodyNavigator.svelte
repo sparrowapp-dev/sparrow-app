@@ -1,21 +1,14 @@
 <script lang="ts">
   import downloadIcon from "@deprecate/assets/download.svg";
   import copyIcon from "@deprecate/assets/copy.svg";
-  import copyToClipBoard from "@deprecate/utils/copyToClipboard";
+  import { copyToClipBoard } from "@sparrow/common/utils";
   import { notifications } from "@sparrow/library/ui";
   import {
     RequestDataType,
     ResponseFormatter,
-    ResponseStatusCode,
   } from "@deprecate/utils/enums/request.enum";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
-  import { UntrackedItems } from "@deprecate/utils/enums/item-type.enum";
-  import { v4 as uuidv4 } from "uuid";
-  import { generateSampleRequest } from "@deprecate/utils/sample/request.sample";
-  import StatusSuccess from "@deprecate/assets/status-success.svelte";
-  import StatusError from "@deprecate/assets/status-error.svelte";
-  import { Select } from "@sparrow/library/forms";
   import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
   import BeautifyIcon from "@deprecate/assets/beautify.svg";
   import js_beautify, { html_beautify } from "js-beautify";

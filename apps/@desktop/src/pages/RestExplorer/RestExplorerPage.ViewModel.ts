@@ -36,7 +36,7 @@ import {
 import type { CreateDirectoryPostBody } from "@deprecate/utils/dto";
 
 // ---- Service
-import { makeHttpRequestV2 } from "@deprecate/api/api.common";
+import { makeHttpRequestV2 } from "@app/containers/api/api.common";
 import {
   insertCollection,
   insertCollectionDirectory,
@@ -46,7 +46,7 @@ import {
 import { EnvironmentService } from "../../services/environment.service";
 
 // ---- Events
-import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import {
   type UpdateRequestUrl,
   type UpdateRequestName,

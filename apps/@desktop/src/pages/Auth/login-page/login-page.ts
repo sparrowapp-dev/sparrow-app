@@ -1,14 +1,13 @@
 import { loginUser } from "../../../services/auth.service";
-import constants from "@deprecate/utils/constants";
+import constants from "@app/constants/constants";
 import type { loginUserPostBody } from "@deprecate/utils/dto";
 import { notifications } from "@sparrow/library/ui";
-import { checkValidation, loginSchema } from "@deprecate/utils/validation";
 import { navigate } from "svelte-navigator";
-import { jwtDecode, setAuthJwt } from "@deprecate/utils/jwt";
+import { jwtDecode, setAuthJwt } from "@app/utils/jwt";
 import { setUser } from "@app/store/auth.store";
 import { resizeWindowOnLogOut, resizeWindowOnLogin } from "../../../utils";
 import mixpanel from "mixpanel-browser";
-import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
 import ActiveSideBarTabViewModel from "../../Dashboard/ActiveSideBarTab.ViewModel";
 import { GuideRepository } from "../../../repositories/guide.repository";
@@ -96,13 +95,13 @@ export async function handleLoginV2(url: string) {
 export const handleLoginValidation = async (
   loginCredentials: loginUserPostBody,
 ) => {
-  const { isError, errorObject } = await checkValidation(
-    loginSchema,
-    loginCredentials,
-  );
-  if (isError) {
-    return errorObject;
-  }
+  // const { isError, errorObject } = await checkValidation(
+  //   loginSchema,
+  //   loginCredentials,
+  // );
+  // if (isError) {
+  //   return errorObject;
+  // }
 
   return handleLogin(loginCredentials);
 };

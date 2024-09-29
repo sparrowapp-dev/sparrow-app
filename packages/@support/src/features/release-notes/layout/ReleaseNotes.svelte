@@ -11,13 +11,13 @@
   } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   import { marked } from "marked";
-  import constants from "@deprecate/utils/constants";
+  import constants from "@app/constants/constants";
   import { Loader, Tooltip } from "@sparrow/library/ui";
-  import copyToClipBoard from "@deprecate/utils/copyToClipboard";
+  import { copyToClipBoard } from "@sparrow/common/utils";
   import { notifications } from "@sparrow/library/ui";
   import { open } from "@tauri-apps/plugin-shell";
   import { UpdatesTagType } from "../../../common/types/feedback";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   export let listChangeLog;
 

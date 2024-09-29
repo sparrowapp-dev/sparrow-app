@@ -27,7 +27,7 @@ import type {
 } from "@sparrow/common/types/workspace";
 import type { CreateApiRequestPostBody } from "@deprecate/utils/dto";
 import { InitRequestTab } from "@sparrow/common/utils";
-import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { notifications } from "@sparrow/library/ui";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { isGuestUserActive } from "@app/store/auth.store";

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Events } from "@deprecate/utils/enums";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { GenerateIcon, SendIcon } from "@sparrow/library/icons";
 
   export let placeholder = "";

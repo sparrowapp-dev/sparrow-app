@@ -2,7 +2,7 @@ import {
   connectWebSocket,
   disconnectWebSocket,
   sendMessage,
-} from "@deprecate/api/api.common";
+} from "@app/containers/api/api.common";
 
 export class WebSocketService {
   public connectWebsocket = async (

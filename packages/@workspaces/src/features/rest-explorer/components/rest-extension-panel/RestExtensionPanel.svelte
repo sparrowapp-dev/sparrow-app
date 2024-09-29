@@ -21,7 +21,7 @@
     hasWorkpaceLevelPermission,
   } from "@deprecate/utils/helpers";
   import { Modal } from "@sparrow/library/ui";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   // import { SaveAsRequest } from "../../../../features";

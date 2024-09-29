@@ -4,7 +4,7 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { EnvironmentService } from "../../services/environment.service";
 import { TeamService } from "../../services/team.service";
 import { WorkspaceService } from "../../services/workspace.service";
-import { throttle } from "@deprecate/utils/throttle";
+import { throttle } from "@sparrow/common/utils";
 import { notifications } from "@sparrow/library/ui";
 import { isGuestUserActive, setUser, user } from "@app/store/auth.store";
 import { TabRepository } from "../../repositories/tab.repository";
@@ -13,7 +13,7 @@ import {
   type TeamDocument,
   type WorkspaceDocument,
 } from "../../database/database";
-import { clearAuthJwt } from "@deprecate/utils/jwt";
+import { clearAuthJwt } from "@app/utils/jwt";
 import { userLogout } from "../../services/auth.service";
 import { FeatureSwitchService } from "../../services/feature-switch.service";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
@@ -22,7 +22,7 @@ import { v4 as uuidv4 } from "uuid";
 import { TeamAdapter } from "../../adapter";
 import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
-import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@deprecate/utils/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import { InitWorkspaceTab } from "@sparrow/common/utils";

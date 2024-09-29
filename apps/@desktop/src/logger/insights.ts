@@ -1,4 +1,4 @@
-import constants from "@deprecate/utils/constants";
+import constants from "@app/constants/constants";
 import { ApplicationInsights } from "@microsoft/applicationinsights-web";
 
 export const appInsights = new ApplicationInsights({

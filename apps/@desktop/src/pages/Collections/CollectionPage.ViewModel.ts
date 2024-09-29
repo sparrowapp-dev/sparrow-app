@@ -54,7 +54,7 @@ import { ContentTypeEnum, ResponseStatusCode } from "@deprecate/utils/enums";
 import { moveNavigation } from "@deprecate/utils/helpers/navigation";
 import { GuideRepository } from "../../repositories/guide.repository";
 import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
-import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { type Observable } from "rxjs";
 import { InitRequestTab, InitWebSocketTab } from "@sparrow/common/utils";
 import { InitCollectionTab } from "@sparrow/common/utils";

@@ -2,10 +2,6 @@ import { resetPassword } from "../../../services/auth.service";
 import type { resetPasswordPostBody } from "@deprecate/utils/dto";
 
 import { notifications } from "@sparrow/library/ui";
-import {
-  checkValidation,
-  resetPasswordSchema,
-} from "@deprecate/utils/validation";
 import { navigate } from "svelte-navigator";
 
 export const handleResetPassword = async (
@@ -27,13 +23,13 @@ export const handleResetPassword = async (
 export const handleResetPasswordValidation = async (
   resetPasswordCredential: resetPasswordPostBody,
 ) => {
-  const { isError, errorObject } = await checkValidation(
-    resetPasswordSchema,
-    resetPasswordCredential,
-  );
-  if (isError) {
-    return errorObject;
-  }
+  // const { isError, errorObject } = await checkValidation(
+  //   resetPasswordSchema,
+  //   resetPasswordCredential,
+  // );
+  // if (isError) {
+  //   return errorObject;
+  // }
   handleResetPassword(resetPasswordCredential);
   return {};
 };

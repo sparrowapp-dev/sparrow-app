@@ -21,7 +21,7 @@
   import { ReleaseNotes } from "@sparrow/support/features";
   import { ActivitySection } from "@sparrow/support/features";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   /**
    * @description - Prevents the default context menu from appearing on right-click.

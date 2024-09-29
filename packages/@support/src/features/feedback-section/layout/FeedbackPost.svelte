@@ -21,7 +21,7 @@
   import { FormatTime } from "@sparrow/common/utils";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { notifications } from "@sparrow/library/ui";
 
   export let isPostopen;

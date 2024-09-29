@@ -15,7 +15,7 @@
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import HelpPage from "../Help/HelpPage.svelte";
-  import constants from "@deprecate/utils/constants";
+  import constants from "@app/constants/constants";
   import { open } from "@tauri-apps/plugin-shell";
   import { Update, check } from "@tauri-apps/plugin-updater";
   import { notifications } from "@sparrow/library/ui";
@@ -23,7 +23,7 @@
   import { Progress } from "@sparrow/library/ui";
   import { List } from "@sparrow/library/ui";
   import { Updater } from "@sparrow/common/components";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import Teams from "../Teams/Teams.svelte";
   import { Modal } from "@sparrow/library/ui";

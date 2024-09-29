@@ -1,5 +1,5 @@
-import constants from "@deprecate/utils/constants";
-import { makeRequest, getAuthHeaders } from "@deprecate/api/api.common";
+import constants from "@app/constants/constants";
+import { makeRequest, getAuthHeaders } from "@app/containers/api/api.common";
 import type {
   WorkspacePostBody,
   WorkspacePutBody,

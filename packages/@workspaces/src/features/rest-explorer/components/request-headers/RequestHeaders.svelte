@@ -4,7 +4,7 @@
   import { createDeepCopy } from "@deprecate/utils/helpers/conversion.helper";
   import AngleUp from "@deprecate/assets/angle-up.svelte";
   import AngleDown from "@deprecate/assets/angle-down2.svelte";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@deprecate/utils/enums";
 
   export let environmentVariables = [];

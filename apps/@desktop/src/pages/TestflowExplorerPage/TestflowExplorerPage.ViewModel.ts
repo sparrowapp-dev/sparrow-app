@@ -1,4 +1,4 @@
-import { makeHttpRequestV2 } from "@deprecate/api/api.common";
+import { makeHttpRequestV2 } from "@app/containers/api/api.common";
 import { ResponseStatusCode } from "@deprecate/utils/enums";
 import { environmentType } from "@deprecate/utils/enums";
 import { createDeepCopy, moveNavigation } from "@deprecate/utils/helpers";

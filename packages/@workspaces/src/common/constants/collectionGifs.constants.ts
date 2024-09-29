@@ -1,4 +1,4 @@
-import constants from "@deprecate/utils/constants";
+import constants from "@app/constants/constants";
 
 export const CreateCollection = `${constants.AZURE_CDN_URL}/sparrow-gifs/CreateCollection_V2.0.2.gif`;
 export const AdvanceAPI = `${constants.AZURE_CDN_URL}/sparrow-gifs/AdvanceAPI_V2.0.2.gif`;

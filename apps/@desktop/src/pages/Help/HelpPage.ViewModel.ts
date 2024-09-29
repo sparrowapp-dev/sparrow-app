@@ -1,6 +1,6 @@
 import { user } from "@app/store/auth.store";
 import { Events } from "@deprecate/utils/enums";
-import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { ReleaseRepository } from "../../repositories/release.repository";
 import { CannyIoService } from "../../services/canny.service";
 import { FeedbackService } from "../../services/feedback.service";

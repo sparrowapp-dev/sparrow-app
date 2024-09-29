@@ -11,7 +11,6 @@
   } from "@deprecate/utils/interfaces";
   import type { Path } from "@deprecate/utils/interfaces/request.interface";
   import { TeamViewModel } from "./Teams.ViewModel.old";
-  import { scaleMotionProps } from "@deprecate/utils/animations";
   import { Motion } from "svelte-motion";
   import { user } from "@app/store/auth.store";
 

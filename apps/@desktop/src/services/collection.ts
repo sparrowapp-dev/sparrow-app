@@ -1,9 +1,9 @@
-import constants from "@deprecate/utils/constants";
+import constants from "@app/constants/constants";
 import {
   makeRequest,
   getAuthHeaders,
   makeHttpRequest,
-} from "@deprecate/api/api.common";
+} from "@app/containers/api/api.common";
 
 import type {
   CreateApiRequestPostBody,

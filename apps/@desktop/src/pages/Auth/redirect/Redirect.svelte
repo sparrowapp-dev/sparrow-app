@@ -2,7 +2,7 @@
   import { logoSparrowSquare } from "@sparrow/common/images";
   import { Spinner } from "@sparrow/library/ui";
   import leftIcon from "@deprecate/assets/left.svg";
-  import constants from "@deprecate/utils/constants";
+  import constants from "@app/constants/constants";
   import { fly, fade } from "svelte/transition";
   import { version } from "../../../../src-tauri/tauri.conf.json";
   import { onMount } from "svelte";

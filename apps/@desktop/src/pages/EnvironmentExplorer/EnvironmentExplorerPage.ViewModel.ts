@@ -5,7 +5,7 @@ import { EnvironmentService } from "../../services/environment.service";
 import { Events } from "@deprecate/utils/enums";
 import { environmentType } from "@deprecate/utils/enums/environment.enum";
 import { createDeepCopy } from "@deprecate/utils/helpers";
-import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { BehaviorSubject, type Observable } from "rxjs";
 import { GuideRepository } from "../../repositories/guide.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";

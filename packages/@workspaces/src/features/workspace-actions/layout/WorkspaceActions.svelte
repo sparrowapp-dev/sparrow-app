@@ -31,9 +31,9 @@
   import { createDeepCopy } from "@deprecate/utils/helpers";
   import { Input } from "@sparrow/library/forms";
   import { open } from "@tauri-apps/plugin-shell";
-  import constants from "@deprecate/utils/constants";
+  import constants from "@app/constants/constants";
   import { Tooltip } from "@sparrow/library/ui";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import {
     CollectionList,
     EnvironmentList,

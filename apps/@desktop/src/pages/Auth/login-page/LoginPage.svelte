@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Link, navigate } from "svelte-navigator";
   import { setUser } from "@app/store/auth.store";
-  import { jwtDecode } from "@deprecate/utils/jwt";
+  import { jwtDecode } from "@app/utils/jwt";
   import googleLogo from "@deprecate/assets/googlelogo.svg";
   import eyeHide from "@deprecate/assets/eye-hide.svg";
   import eyeShow from "@deprecate/assets/eye-show.svg";

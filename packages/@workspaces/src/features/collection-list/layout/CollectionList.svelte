@@ -19,7 +19,7 @@
   import { onDestroy } from "svelte";
   import { CollectionIcon } from "@sparrow/library/icons";
   import { createDeepCopy } from "@deprecate/utils/helpers";
-  import constants from "@deprecate/utils/constants";
+  import constants from "@app/constants/constants";
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
 

@@ -7,7 +7,7 @@
   } from "@sparrow/library/icons";
   import { environmentType } from "@deprecate/utils/enums";
   import { SparrowIcon } from "@sparrow/library/icons";
-  import constants from "@deprecate/utils/constants";
+  import constants from "@app/constants/constants";
   import type { WorkspaceDocument } from "@app/database/database";
   import { PlusIcon } from "@sparrow/library/icons";
   import { navigate } from "svelte-navigator";

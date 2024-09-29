@@ -4,7 +4,7 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { EnvironmentService } from "../../services/environment.service";
 import { TeamService } from "../../services/team.service";
 import { WorkspaceService } from "../../services/workspace.service";
-import { throttle } from "@deprecate/utils/throttle";
+import { throttle } from "@sparrow/common/utils";
 
 export class DashboardViewModel {
   constructor() {}

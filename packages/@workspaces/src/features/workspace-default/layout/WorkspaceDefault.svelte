@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { WorkspaceDocument } from "@app/database/database";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import {
     VectorIcon,
     SocketIcon,

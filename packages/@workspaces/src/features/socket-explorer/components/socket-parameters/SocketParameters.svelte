@@ -2,7 +2,7 @@
   import { TabularInput } from "@sparrow/workspaces/common/components";
   import { createDeepCopy } from "@deprecate/utils/helpers";
   import type { KeyValuePair } from "@deprecate/utils/interfaces/request.interface";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@deprecate/utils/enums";
   export let params;
   export let onUpdateRequestParams;

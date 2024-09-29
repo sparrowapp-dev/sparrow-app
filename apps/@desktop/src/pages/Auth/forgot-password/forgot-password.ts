@@ -1,10 +1,6 @@
 import { forgotPassword } from "../../../services/auth.service";
 import type { EmailPostBody } from "@deprecate/utils/dto";
 import { notifications } from "@sparrow/library/ui";
-import {
-  checkValidation,
-  forgotPasswordSchema,
-} from "@deprecate/utils/validation";
 import { navigate } from "svelte-navigator";
 
 export const handleForgotPassword = async (
@@ -19,13 +15,13 @@ export const handleForgotPassword = async (
 export const handleForgotPasswordValidation = async (
   forgotPasswordCredential: EmailPostBody,
 ) => {
-  const { isError, errorObject } = await checkValidation(
-    forgotPasswordSchema,
-    forgotPasswordCredential,
-  );
-  if (isError) {
-    return errorObject;
-  }
+  // const { isError, errorObject } = await checkValidation(
+  //   forgotPasswordSchema,
+  //   forgotPasswordCredential,
+  // );
+  // if (isError) {
+  //   return errorObject;
+  // }
   handleForgotPassword(forgotPasswordCredential);
   return {};
 };

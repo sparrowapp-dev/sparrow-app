@@ -6,7 +6,7 @@
     DoubleRightIcon,
   } from "@deprecate/assets/app.asset";
   import type { TeamDocument } from "@app/database/database";
-  import { calculateTimeDifferenceInDays } from "@deprecate/utils/workspacetimeUtils";
+  import { calculateTimeDifferenceInDays } from "../../../../common/utils/workspacetimeUtils";
   import { Table } from "@sparrow/library/ui";
   import { Rows } from "@sparrow/teams/common/compopnents";
   import { TeamSkeleton } from "../../images";

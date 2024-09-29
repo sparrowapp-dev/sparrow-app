@@ -54,7 +54,7 @@
     TFResponseStateType,
   } from "@sparrow/common/types/workspace/testflow";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Debounce } from "@sparrow/common/utils";
 
   // Declaring props for the component

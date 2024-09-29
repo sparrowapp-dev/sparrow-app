@@ -7,7 +7,7 @@
     HistoryIcon,
   } from "@sparrow/library/icons";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   import { Tooltip } from "@sparrow/library/ui";
   import { WithButtonV5 } from "@sparrow/workspaces/common/hoc";

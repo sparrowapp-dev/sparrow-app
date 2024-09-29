@@ -1,6 +1,6 @@
 <script lang="ts">
   import { notifications } from "@sparrow/library/ui";
-  import copyToClipBoard from "@deprecate/utils/copyToClipboard";
+  import { copyToClipBoard } from "@sparrow/common/utils";
   import { CopyIcon, DotIcon } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
 

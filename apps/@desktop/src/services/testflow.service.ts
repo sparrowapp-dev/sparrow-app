@@ -1,5 +1,5 @@
-import { getAuthHeaders, makeRequest } from "@deprecate/api/api.common";
-import constants from "@deprecate/utils/constants";
+import { getAuthHeaders, makeRequest } from "@app/containers/api/api.common";
+import constants from "@app/constants/constants";
 
 export class TestflowService {
   constructor() {}

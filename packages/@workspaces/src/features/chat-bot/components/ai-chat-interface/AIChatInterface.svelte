@@ -4,7 +4,7 @@
   import { AISparkle, CrossIcon } from "@sparrow/library/icons";
   import { cubicOut } from "svelte/easing";
   import { generatingImage } from "@sparrow/common/images";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@deprecate/utils/enums";
   import type { Conversation } from "@sparrow/common/types/workspace";
   import { fade, fly } from "svelte/transition";

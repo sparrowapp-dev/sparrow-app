@@ -9,7 +9,7 @@
   import { base64ToURL } from "@deprecate/utils/helpers";
   import { List } from "@sparrow/library/ui";
   import { PeopleIcon } from "@deprecate/assets/app.asset";
-  import constants from "@deprecate/utils/constants";
+  import constants from "@app/constants/constants";
   export let teamList: TeamDocument[] = [];
   export let tabList: TabDocument[] = [];
   export let isCreateTeamModalOpen;

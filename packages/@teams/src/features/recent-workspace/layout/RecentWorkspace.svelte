@@ -1,7 +1,7 @@
 <script lang="ts">
   import { PeopleIcon } from "@deprecate/assets/app.asset";
   import { List } from "@sparrow/library/ui";
-  import constants from "@deprecate/utils/constants";
+  import constants from "@app/constants/constants";
   export let data;
   export let openTeam;
   export let OnWorkspaceSwitch;

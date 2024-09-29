@@ -5,12 +5,12 @@
     sparrowLogoBackground,
   } from "@sparrow/common/images";
   import Redirect from "../redirect/Redirect.svelte";
-  import constants from "@deprecate/utils/constants";
+  import constants from "@app/constants/constants";
   import { StarIcon } from "@sparrow/library/icons";
   import { StarFilledIcon } from "@sparrow/library/icons";
   import { CopyIcon } from "@sparrow/library/icons";
   import { ExternalLinkIcon } from "@sparrow/library/icons";
-  import copyToClipBoard from "@deprecate/utils/copyToClipboard";
+  import { copyToClipBoard } from "@sparrow/common/utils";
   import { open } from "@tauri-apps/plugin-shell";
   import { version } from "../../../../src-tauri/tauri.conf.json";
   import externalLink from "@deprecate/assets/external_link.svg";
@@ -21,7 +21,7 @@
   import { navigate } from "svelte-navigator";
   import { AuthViewModel } from "../Auth.ViewModel";
   import { isGuestUserActive, navigationState } from "@app/store/auth.store";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
   import { Button } from "@sparrow/library/ui";
   let isEntry = false;

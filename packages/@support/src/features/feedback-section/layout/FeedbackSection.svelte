@@ -16,7 +16,7 @@
   import { Loader } from "@sparrow/library/ui";
   import { Debounce } from "@sparrow/common/utils";
   import { Events } from "@deprecate/utils/enums/mixpanel-events.enum";
-  import MixpanelEvent from "@deprecate/utils/mixpanel/MixpanelEvent";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   /**
    * @description - Callback for inputting feedback.
