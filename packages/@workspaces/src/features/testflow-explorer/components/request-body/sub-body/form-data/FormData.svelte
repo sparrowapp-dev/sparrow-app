@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TabularInputFormData } from "@sparrow/workspaces/common/components";
+  import { TabularInputFormData } from "@sparrow/workspaces/components";
 
   export let keyValue;
   export let onUpdateRequestBody;

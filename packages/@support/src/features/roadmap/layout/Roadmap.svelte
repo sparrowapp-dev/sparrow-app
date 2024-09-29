@@ -4,7 +4,7 @@
   import { CategoryIcon, CrossIcon, StackIcon } from "@sparrow/library/icons";
   import { Loader } from "@sparrow/library/ui";
   import HelpInfoCard from "../../../common/components/HelpInfo-Card/HelpInfoCard.svelte";
-  import { FeedbackType } from "@sparrow/support/common/types";
+  import { FeedbackType } from "@sparrow/support/types";
   import { onMount } from "svelte";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";

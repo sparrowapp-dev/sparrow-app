@@ -6,7 +6,7 @@
     leftPanelWidth,
     rightPanelWidth,
     leftPanelCollapse,
-  } from "@sparrow/teams/common/stores";
+  } from "@sparrow/teams/stores";
 
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import TeamExplorerPage from "../TeamExplorerPage/TeamExplorerPage.svelte";

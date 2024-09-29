@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type UpdateRequestStateType } from "@sparrow/workspaces/common/type";
+  import { type UpdateRequestStateType } from "@sparrow/workspaces/type";
   import { RequestSectionEnum } from "@sparrow/common/types/workspace";
   import { Label } from "@sparrow/library/ui";
   import { SocketSectionEnum } from "@sparrow/common/types/workspace/web-socket";

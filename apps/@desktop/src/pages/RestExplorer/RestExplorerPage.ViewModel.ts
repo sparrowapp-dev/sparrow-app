@@ -72,7 +72,7 @@ import {
   type AddRequestInFolder,
   type SaveRequest,
   type SaveAsRequest,
-} from "@sparrow/workspaces/common/type";
+} from "@sparrow/workspaces/type";
 import {
   type Auth,
   type Body,

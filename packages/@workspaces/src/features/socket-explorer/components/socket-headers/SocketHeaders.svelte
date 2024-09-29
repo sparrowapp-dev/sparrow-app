@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TabularInput } from "@sparrow/workspaces/common/components";
+  import { TabularInput } from "@sparrow/workspaces/components";
   import { createDeepCopy } from "@sparrow/common/utils/conversion.helper";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";

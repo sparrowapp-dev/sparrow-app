@@ -5,7 +5,7 @@
     SettingIcon,
   } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
-  import { DiscordIDs } from "@sparrow/support/common/constants/discord.constants";
+  import { DiscordIDs } from "@sparrow/support/constants/discord.constants";
   import { open } from "@tauri-apps/plugin-shell";
 
   export let onJoin;

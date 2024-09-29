@@ -23,7 +23,7 @@
     VectorIcon,
     BubbleIcon,
   } from "@sparrow/library/icons";
-  import { WithButton } from "@sparrow/workspaces/common/hoc";
+  import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
   import { Input } from "@sparrow/library/forms";
   import { open } from "@tauri-apps/plugin-shell";

@@ -6,7 +6,7 @@
     leftPanelWidth,
     rightPanelWidth,
     leftPanelCollapse,
-  } from "@sparrow/workspaces/common/stores";
+  } from "@sparrow/workspaces/stores";
 
   // ---- Animation
   import { Motion } from "svelte-motion";
@@ -28,7 +28,7 @@
     WorkspaceDefault,
     SaveAsCollectionItem,
   } from "@sparrow/workspaces/features";
-  import { WithModal } from "@sparrow/workspaces/common/hoc";
+  import { WithModal } from "@sparrow/workspaces/hoc";
   import { notifications } from "@sparrow/library/ui";
 
   // ---- Interface, enum & constants

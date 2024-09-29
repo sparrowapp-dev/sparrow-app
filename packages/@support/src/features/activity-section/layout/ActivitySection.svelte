@@ -7,7 +7,7 @@
     SortIcon,
     TableChart,
   } from "@sparrow/library/icons";
-  import { UpvoteIcon } from "@sparrow/support/common/components";
+  import { UpvoteIcon } from "@sparrow/support/components";
   import FeedbackPost from "../../../features/feedback-section/layout/FeedbackPost.svelte";
   import { onMount } from "svelte";
   import { SearchIcon } from "@deprecate/assets/app.asset";

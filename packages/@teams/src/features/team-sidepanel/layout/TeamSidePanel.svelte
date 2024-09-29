@@ -2,7 +2,7 @@
   import { Tooltip } from "@sparrow/library/ui";
   import plus from "@deprecate/assets/plus.svg";
   import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
-  import { WithButton } from "@sparrow/workspaces/common/hoc";
+  import { WithButton } from "@sparrow/workspaces/hoc";
   import type { TabDocument, TeamDocument } from "@app/database/database";
   import { RecentWorkspace, RecentApis } from "../../../features";
   import { open } from "@tauri-apps/plugin-shell";

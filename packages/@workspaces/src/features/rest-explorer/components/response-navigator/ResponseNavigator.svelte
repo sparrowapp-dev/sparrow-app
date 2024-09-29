@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Label } from "@sparrow/library/ui";
-  import { type UpdateRequestStateType } from "@sparrow/workspaces/common/type";
+  import { type UpdateRequestStateType } from "@sparrow/workspaces/type";
   import { ResponseSectionEnum } from "@sparrow/common/types/workspace";
   export let requestStateSection: string;
   export let onUpdateRequestState: UpdateRequestStateType;

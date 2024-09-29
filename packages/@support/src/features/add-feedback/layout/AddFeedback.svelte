@@ -9,8 +9,8 @@
   import { Button, Modal } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
   import { Tooltip } from "@sparrow/library/ui";
-  import { Drop } from "@sparrow/support/common/components";
-  import { FeedbackType } from "@sparrow/support/common/types";
+  import { Drop } from "@sparrow/support/components";
+  import { FeedbackType } from "@sparrow/support/types";
 
   export let onAddFeedback;
   export let onInputFeedback;

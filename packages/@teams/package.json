@@ -14,10 +14,10 @@
   "main": "src/main.ts",
   "exports": {
     "./features": "./src/features/index.ts",
-    "./common/components": "./src/common/components/index.ts",
-    "./common/compopnents": "./src/common/compopnents/index.ts",
-    "./common/constants": "./src/common/constants/index.ts",
-    "./common/stores": "./src/common/stores/index.ts"
+    "./components": "./src/common/components/index.ts",
+    "./compopnents": "./src/common/compopnents/index.ts",
+    "./constants": "./src/common/constants/index.ts",
+    "./stores": "./src/common/stores/index.ts"
   },
   "devDependencies": {
     "@fontsource/fira-mono": "^4.5.10",

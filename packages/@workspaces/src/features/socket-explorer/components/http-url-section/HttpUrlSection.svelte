@@ -4,9 +4,9 @@
   import type {
     SaveRequestType,
     UpdateRequestUrlType,
-  } from "@sparrow/workspaces/common/type";
+  } from "@sparrow/workspaces/type";
   import { notifications } from "@sparrow/library/ui";
-  import { DropButton } from "@sparrow/workspaces/common/components";
+  import { DropButton } from "@sparrow/workspaces/components";
   import { CodeMirrorInput } from "../../../../common/components";
   import { UrlInputTheme } from "../../../../common/utils/";
   import { Tooltip } from "@sparrow/library/ui";

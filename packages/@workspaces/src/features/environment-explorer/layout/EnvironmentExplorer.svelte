@@ -10,7 +10,7 @@
   } from "@sparrow/common/constants/permissions.constant";
   import { Tooltip } from "@sparrow/library/ui";
 
-  import { TabularInputV2 } from "@sparrow/workspaces/common/components";
+  import { TabularInputV2 } from "@sparrow/workspaces/components";
   import { Input } from "@sparrow/library/forms";
   import { Carousel, Modal, Popover } from "@sparrow/library/ui";
   import { environmentType, WorkspaceRole } from "@sparrow/common/enums";
@@ -18,8 +18,8 @@
     CreateENV,
     IntroToEnvironment,
     SearchVariable,
-  } from "@sparrow/workspaces/common/constants";
-  import { WithButtonV3 } from "@sparrow/workspaces/common/hoc";
+  } from "@sparrow/workspaces/constants";
+  import { WithButtonV3 } from "@sparrow/workspaces/hoc";
 
   /**
    * selected environmet to be shown on API

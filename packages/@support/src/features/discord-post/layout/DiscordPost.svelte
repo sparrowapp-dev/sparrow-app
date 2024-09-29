@@ -1,5 +1,5 @@
 <script>
-  import { DiscordIDs } from "@sparrow/support/common/constants/discord.constants";
+  import { DiscordIDs } from "@sparrow/support/constants/discord.constants";
   import { onMount } from "svelte";
 
   onMount(() => {
