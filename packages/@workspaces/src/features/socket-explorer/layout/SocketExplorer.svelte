@@ -18,7 +18,7 @@
     UpdateHeadersType,
     UpdateParamsType,
     UpdateRequestUrlType,
-  } from "@sparrow/workspaces/common/type";
+  } from "@sparrow/workspaces/type";
   import { TabTypeEnum, type Tab } from "@sparrow/common/types/workspace";
 
   import {

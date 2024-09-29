@@ -2,7 +2,7 @@
   import { SearchIcon } from "@deprecate/assets/app.asset";
   import { Select } from "@sparrow/library/forms";
   import { CategoryIcon, StatusIcon } from "@sparrow/library/icons";
-  import { FeedbackType } from "@sparrow/support/common/types/feedback";
+  import { FeedbackType } from "@sparrow/support/types/feedback";
   export let type = FeedbackType.ALL_CATEGORY;
   export let posts = [];
 </script>

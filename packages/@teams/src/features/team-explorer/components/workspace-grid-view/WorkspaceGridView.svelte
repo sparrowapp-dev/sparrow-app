@@ -7,7 +7,7 @@
   } from "@deprecate/assets/app.asset";
   import type { WorkspaceDocument } from "@app/database/database";
   import { Button } from "@sparrow/library/ui";
-  import { WorkspaceGrid } from "@sparrow/teams/common/compopnents";
+  import { WorkspaceGrid } from "@sparrow/teams/compopnents";
   import { TeamSkeleton } from "../../images";
 
   export let searchQuery = "";

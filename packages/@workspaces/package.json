@@ -14,17 +14,17 @@
   "main": "src/main.ts",
   "exports": {
     "./features": "./src/features/index.ts",
-    "./common/components": "./src/common/components/index.ts",
-    "./common/constants": "./src/common/constants/index.ts",
-    "./common/hoc": "./src/common/hoc/index.ts",
-    "./common/images": "./src/common/images/index.ts",
-    "./common/stores": "./src/common/stores/index.ts",
-    "./common/type": "./src/common/type/index.ts",
-    "./common/utils": "./src/common/utils/index.ts",
     "./features/testflow-explorer/store": "./src/features/testflow-explorer/store/index.ts",
     "./features/rest-explorer/utils": "./src/features/rest-explorer/utils/index.ts",
     "./features/rest-explorer/store": "./src/features/rest-explorer/store/index.ts",
-    "./features/socket-explorer/store": "./src/features/socket-explorer/store/index.ts"
+    "./features/socket-explorer/store": "./src/features/socket-explorer/store/index.ts",
+    "./components": "./src/components/index.ts",
+    "./constants": "./src/constants/index.ts",
+    "./hoc": "./src/hoc/index.ts",
+    "./images": "./src/images/index.ts",
+    "./stores": "./src/stores/index.ts",
+    "./type": "./src/type/index.ts",
+    "./utils": "./src/utils/index.ts"
   },
   "devDependencies": {
     "@fontsource/fira-mono": "^4.5.10",

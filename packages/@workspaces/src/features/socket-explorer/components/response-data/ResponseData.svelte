@@ -14,7 +14,7 @@
     BlankIcon,
   } from "@sparrow/library/icons";
   import { Dropdown, Tooltip } from "@sparrow/library/ui";
-  import { WithButtonV4 } from "@sparrow/workspaces/common/hoc";
+  import { WithButtonV4 } from "@sparrow/workspaces/hoc";
 
   export let webSocket;
   export let onSearchMessage;

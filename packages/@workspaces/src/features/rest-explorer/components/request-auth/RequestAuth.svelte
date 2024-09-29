@@ -1,7 +1,7 @@
 <script lang="ts">
   import { AuthType } from "@sparrow/common/enums/authorization.enum";
   import { ApiKey, BasicAuth, BearerToken, NoAuth } from "./sub-auth";
-  import { WithSelect } from "@sparrow/workspaces/common/hoc";
+  import { WithSelect } from "@sparrow/workspaces/hoc";
 
   export let auth;
   export let environmentVariables = [];

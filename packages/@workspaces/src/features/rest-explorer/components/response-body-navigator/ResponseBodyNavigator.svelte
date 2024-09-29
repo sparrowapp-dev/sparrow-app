@@ -12,7 +12,7 @@
   import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
   import BeautifyIcon from "@deprecate/assets/beautify.svg";
   import js_beautify, { html_beautify } from "js-beautify";
-  import { WithSelectV3 } from "@sparrow/workspaces/common/hoc";
+  import { WithSelectV3 } from "@sparrow/workspaces/hoc";
 
   export let response;
   export let apiState;

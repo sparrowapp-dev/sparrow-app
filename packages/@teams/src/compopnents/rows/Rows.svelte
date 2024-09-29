@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ThreeDotIcon } from "@deprecate/assets/app.asset";
-  import { UserProfileList } from "@sparrow/teams/common/compopnents";
-  import { MenuView } from "@sparrow/teams/common/compopnents";
+  import { UserProfileList } from "@sparrow/teams/compopnents";
+  import { MenuView } from "@sparrow/teams/compopnents";
   import { TeamRole, WorkspaceMemberRole } from "@sparrow/common/enums";
 
   export let list;

@@ -4,11 +4,11 @@
   import type {
     SaveRequestType,
     UpdateRequestUrlType,
-  } from "@sparrow/workspaces/common/type";
+  } from "@sparrow/workspaces/type";
   import { notifications } from "@sparrow/library/ui";
-  import { DropButton } from "@sparrow/workspaces/common/components";
-  import { CodeMirrorInput } from "../../../../common/components";
-  import { UrlInputTheme } from "../../../../common/utils/";
+  import { DropButton } from "@sparrow/workspaces/components";
+  import { CodeMirrorInput } from "../../../../components";
+  import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
   import { DiskIcon } from "@sparrow/library/icons";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";

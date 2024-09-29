@@ -13,7 +13,7 @@
   import {
     TeamTabsEnum,
     TeamViewEnum,
-  } from "../../../common/constants/TeamTabs.constants";
+  } from "../../../constants/TeamTabs.constants";
   import { WorkspaceListView } from "../components";
   import WorkspaceGridView from "../components/workspace-grid-view/WorkspaceGridView.svelte";
   import { TeamMembers, TeamSettings } from "@sparrow/teams/features";

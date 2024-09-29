@@ -1,5 +1,5 @@
 <script>
-  import ApiListItem from "../../../common/components/api-list-items/ApiListItem.svelte";
+  import ApiListItem from "../../../components/api-list-items/ApiListItem.svelte";
   import { ItemType } from "@sparrow/common/enums/item-type.enum";
   import { List } from "@sparrow/library/ui";
   import constants from "@app/constants/constants";

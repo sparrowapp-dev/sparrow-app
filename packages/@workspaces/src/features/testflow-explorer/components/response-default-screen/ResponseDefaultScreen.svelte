@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ComboText } from "@sparrow/workspaces/common/components";
+  import { ComboText } from "@sparrow/workspaces/components";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
   import { SparrowLogo } from "@sparrow/common/images";

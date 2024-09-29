@@ -16,7 +16,7 @@
     WithButtonV4,
     WithSelect,
     WithSelectV2,
-  } from "@sparrow/workspaces/common/hoc";
+  } from "@sparrow/workspaces/hoc";
   import { Tooltip } from "@sparrow/library/ui";
   import { CopyIcon, DownloadIcon } from "@sparrow/library/icons";
   import type { WebSocketMessage } from "../../store/websocket";

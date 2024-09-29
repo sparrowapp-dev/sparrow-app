@@ -10,7 +10,7 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   import { Tooltip } from "@sparrow/library/ui";
-  import { WithButtonV5 } from "@sparrow/workspaces/common/hoc";
+  import { WithButtonV5 } from "@sparrow/workspaces/hoc";
   import { FormatTime } from "@sparrow/common/utils";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   const formatTimeAgo = new FormatTime().formatTimeAgo;

@@ -1,9 +1,9 @@
 <script lang="ts">
   import dragIcon from "@deprecate/assets/drag.svg";
   import trashIcon from "@deprecate/assets/trash-icon.svg";
-  import editIcon from "../../../features/rest-explorer/assets/icons/edit.svg";
-  import moreOptions from "../../../features/rest-explorer/assets/icons/moreOptions.svg";
-  import attachFile from "../../../features/rest-explorer/assets/icons/attachFile.svg";
+  import editIcon from "../../features/rest-explorer/assets/icons/edit.svg";
+  import moreOptions from "../../features/rest-explorer/assets/icons/moreOptions.svg";
+  import attachFile from "../../features/rest-explorer/assets/icons/attachFile.svg";
   import type {
     KeyValuePair,
     KeyValuePairWithBase,

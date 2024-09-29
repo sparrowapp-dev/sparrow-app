@@ -7,7 +7,7 @@
     SortIcon,
     TableChart,
   } from "@sparrow/library/icons";
-  import { UpvoteIcon } from "@sparrow/support/common/components";
+  import { UpvoteIcon } from "@sparrow/support/components";
   import FeedbackPost from "../../../features/feedback-section/layout/FeedbackPost.svelte";
   import { onMount } from "svelte";
   import { SearchIcon } from "@deprecate/assets/app.asset";
@@ -16,17 +16,11 @@
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
-  import {
-    FeedbackStatusType,
-    FeedbackType,
-  } from "../../../common/types/feedback";
+  import { FeedbackStatusType, FeedbackType } from "../../../types/feedback";
   import { TickIcon } from "@sparrow/library/icons";
   import { IconFallback } from "@sparrow/library/ui";
 
-  import {
-    ActivityStatusType,
-    ActivityType,
-  } from "../../../common/types/activity";
+  import { ActivityStatusType, ActivityType } from "../../../types/activity";
   import { Spinner } from "@sparrow/library/ui";
   import { Loader } from "@sparrow/library/ui";
   import { FormatTime } from "@sparrow/common/utils";

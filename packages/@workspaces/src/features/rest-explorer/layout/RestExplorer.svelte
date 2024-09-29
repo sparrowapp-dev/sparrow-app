@@ -48,7 +48,7 @@
     UpdateRequestNameType,
     UpdateRequestStateType,
     UpdateRequestUrlType,
-  } from "@sparrow/workspaces/common/type";
+  } from "@sparrow/workspaces/type";
   import {
     RequestSectionEnum,
     ResponseSectionEnum,
@@ -64,7 +64,7 @@
     AdvanceAPI,
     CreateCollection,
     SendingApiRequest,
-  } from "@sparrow/workspaces/common/constants";
+  } from "@sparrow/workspaces/constants";
   import { ResponseStatusCode } from "@sparrow/common/enums";
 
   export let tab: Observable<RequestTab>;

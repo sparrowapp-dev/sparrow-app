@@ -5,7 +5,7 @@
   import { Select } from "@sparrow/library/forms";
   import { RequestDataType, RequestDataset } from "@sparrow/common/enums";
   import { notifications } from "@sparrow/library/ui";
-  import { WithSelect } from "@sparrow/workspaces/common/hoc";
+  import { WithSelect } from "@sparrow/workspaces/hoc";
   export let method = "";
   export let onUpdateRequestState;
   export let updateBeautifiedState: (value: boolean) => void;

@@ -3,7 +3,7 @@
   import { RequestDataType, RequestDataset } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
-  import { WithSelect } from "@sparrow/workspaces/common/hoc";
+  import { WithSelect } from "@sparrow/workspaces/hoc";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   export let onUpdateRequestState;
