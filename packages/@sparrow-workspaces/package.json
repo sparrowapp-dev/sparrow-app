@@ -58,6 +58,8 @@
     "svelte-navigator": "^3.2.2",
     "svelte-toasts": "^1.1.2",
     "uuid": "^9.0.1",
-    "yup": "^1.2.0"
+    "yup": "^1.2.0",
+    "@sparrow/library": "*",
+    "@sparrow/common": "*"
   }
 }

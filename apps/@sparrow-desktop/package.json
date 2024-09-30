@@ -67,7 +67,12 @@
     "svelte-splitpanes": "^0.8.0",
     "svelte-toasts": "^1.1.2",
     "uuid": "^9.0.1",
-    "yup": "^1.2.0"
+    "yup": "^1.2.0",
+    "@sparrow/library": "*",
+    "@sparrow/common": "*",
+    "@sparrow/support": "*",
+    "@sparrow/teams": "*",
+    "@sparrow/workspaces": "*"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
