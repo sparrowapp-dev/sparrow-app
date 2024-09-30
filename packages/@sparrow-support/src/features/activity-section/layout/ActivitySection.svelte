@@ -10,7 +10,7 @@
   import { UpvoteIcon } from "@sparrow/support/components";
   import FeedbackPost from "../../../features/feedback-section/layout/FeedbackPost.svelte";
   import { onMount } from "svelte";
-  import { SearchIcon } from "@deprecate/assets/app.asset";
+  import { SearchIcon } from "@deprecate/assets";
   import { Select } from "@sparrow/library/forms";
   import { CategoryIcon, StatusIcon } from "@sparrow/library/icons";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";

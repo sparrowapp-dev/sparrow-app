@@ -1,5 +1,5 @@
 <script>
-  import { LeftIcon, SearchIcon } from "@deprecate/assets/app.asset";
+  import { LeftIcon, SearchIcon } from "@deprecate/assets";
   import { Input, Select, Textarea } from "@sparrow/library/forms";
   import {
     AttachmentIcon,

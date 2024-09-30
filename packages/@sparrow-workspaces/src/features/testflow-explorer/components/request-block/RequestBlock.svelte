@@ -17,7 +17,7 @@
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { testFlowDataStore } from "../../../../features/testflow-explorer/store/testflow";
-  import { ThreeDotIcon } from "@deprecate/assets/app.asset";
+  import { ThreeDotIcon } from "@deprecate/assets";
   import { createDeepCopy } from "@sparrow/common/utils";
   import { ParseTime } from "@sparrow/common/utils";
   import type {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SearchIcon } from "@deprecate/assets/icons";
+  import { SearchIcon } from "@deprecate/assets";
   import { Select } from "@sparrow/library/forms";
   import { CategoryIcon, CrossIcon, StackIcon } from "@sparrow/library/icons";
   import { Loader } from "@sparrow/library/ui";

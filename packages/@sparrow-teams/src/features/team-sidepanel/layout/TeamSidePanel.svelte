@@ -8,7 +8,7 @@
   import { open } from "@tauri-apps/plugin-shell";
   import { base64ToURL } from "@sparrow/common/utils";
   import { List } from "@sparrow/library/ui";
-  import { PeopleIcon } from "@deprecate/assets/app.asset";
+  import { PeopleIcon } from "@deprecate/assets";
   import constants from "@app/constants/constants";
   export let teamList: TeamDocument[] = [];
   export let tabList: TabDocument[] = [];

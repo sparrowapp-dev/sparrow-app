@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PeopleIcon } from "@deprecate/assets/app.asset";
+  import { PeopleIcon } from "@deprecate/assets";
   import { List } from "@sparrow/library/ui";
   import constants from "@app/constants/constants";
   export let data;

@@ -1,11 +1,7 @@
 <script lang="ts">
-  import {
-    DeleteIcon,
-    EditIcon,
-    UploadIcon,
-  } from "@deprecate/assets/app.asset";
+  import { DeleteIcon, EditIcon, UploadIcon } from "@deprecate/assets";
   import { base64ToURL, imageDataToURL } from "@sparrow/common/utils";
-  import { CrossIcon } from "@deprecate/assets/app.asset";
+  import { CrossIcon } from "@deprecate/assets";
 
   export let value: any = [];
   export let inputId: string;

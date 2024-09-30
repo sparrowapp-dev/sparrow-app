@@ -1,8 +1,7 @@
 <script lang="ts">
-  export let width: number = 16,
-    height: number = 16,
-    color: string = "#45494D",
-    classProp: string = "";
+  export let width: number = 16;
+  export let height: number = 16;
+  export let color: string = "white";
 </script>
 
 <svg
@@ -11,7 +10,6 @@
   viewBox="0 0 16 16"
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
-  class={classProp}
 >
   <g clip-path="url(#clip0_1982_23222)">
     <path
@@ -21,7 +19,7 @@
   </g>
   <defs>
     <clipPath id="clip0_1982_23222">
-      <rect width="16" height="16" fill="white" />
+      <rect {width} {height} fill="white" />
     </clipPath>
   </defs>
 </svg>

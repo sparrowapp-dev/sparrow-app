@@ -3,9 +3,9 @@
     DeleteIcon,
     EditIcon,
     UploadIcon,
-  } from "@deprecate/assets/app.asset";
+  } from "@deprecate/assets";
   import { base64ToURL, imageDataToURL } from "@sparrow/common/utils";
-  import { CrossIcon } from "@deprecate/assets/app.asset";
+  import { CrossIcon } from "@deprecate/assets";
 
   export let value: any = [];
   export let labelText: string;

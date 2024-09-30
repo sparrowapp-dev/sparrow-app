@@ -3,9 +3,9 @@
   import hamburger from "@deprecate/assets/hamburger.svg";
   import { workspaceView } from "../store/workspace-view";
   import { onDestroy } from "svelte";
-  import { SearchIcon } from "@deprecate/assets/app.asset";
+  import { SearchIcon } from "@deprecate/assets";
   import { base64ToURL } from "@sparrow/common/utils";
-  import { PeopleIcon } from "@deprecate/assets/app.asset";
+  import { PeopleIcon } from "@deprecate/assets";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { TeamRole } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
