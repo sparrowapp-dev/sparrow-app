@@ -15,6 +15,14 @@ env:
     VITE_AUTH_URL: ${{ secrets.VITE_AUTH_URL_DEV }}
     VITE_SPARROW_GITHUB: ${{ secrets.VITE_SPARROW_GITHUB }}
     VITE_SPARROW_DOWNLOAD_LINK: ${{ secrets.VITE_SPARROW_DOWNLOAD_LINK }}
+    VITE_RELEASE_NOTES_PAT_TOKEN: ${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}
+    VITE_RELEASE_NOTES_API: ${{ vars.VITE_RELEASE_NOTES_API }}
+    VITE_AZURE_CDN_URL: ${{ vars.VITE_AZURE_CDN_URL }}
+    VITE_AZURE_INSIGHTS_CONNECTION_STRING: ${{ vars.VITE_AZURE_INSIGHTS_CONNECTION_STRING }}
+    VITE_CANNY_API: ${{ vars.VITE_CANNY_API }}
+    VITE_CANNY_URL: ${{ vars.VITE_CANNY_URL }}
+    VITE_BASE_URL: ${{ vars.VITE_BASE_URL }}
+    VITE_SPARROW_LINKEDIN: ${{ vars.VITE_SPARROW_LINKEDIN }}
     ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
@@ -39,6 +47,13 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1
+
+      - name: Install Rust 1.76.0
+        run: |
+          Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
+          .\rustup-init.exe -y
+          rustup install 1.76.0
+          rustup default 1.76.0
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
@@ -99,8 +114,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Rust setup
-        uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust 1.76.0
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          rustup install 1.76.0
+          rustup default 1.76.0
 
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
