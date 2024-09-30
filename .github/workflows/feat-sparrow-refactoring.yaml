@@ -1,4 +1,4 @@
-name: feat/sparrow-refactoring
+name: feat/web-app-testing
 
 on:
   push:
@@ -42,17 +42,19 @@ jobs:
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
-          $content = Get-Content src-tauri/tauri.conf.json -Raw
+          $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
           $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"'
-          Set-Content -Path src-tauri/tauri.conf.json -Value $newContent
+          Set-Content -Path apps/@sparrow-desktop/src-tauri/tauri.conf.json -Value $newContent
         shell: pwsh
+
 
       - name: Build Tauri App
         run: |
           yarn cache clean
           npm install -g pnpm
           yarn install
-          yarn tauri build --debug
+          yarn desktop-build
+          # yarn tauri build --debug
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
