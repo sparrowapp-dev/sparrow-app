@@ -1,6 +1,5 @@
 <script>
-  import { Button } from "@sparrow/library/ui";
+  import { Progress } from "@sparrow/library/ui";
 </script>
 
-SPARROW WEB
-<Button title={"CLICK TO LOGIN"} type={"primary"} onClick={() => {}} />
+<Progress title={"sparrow web coming soon..."} onClick={() => {}} />
