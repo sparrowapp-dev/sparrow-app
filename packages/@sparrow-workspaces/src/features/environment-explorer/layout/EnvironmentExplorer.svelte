@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { HelpIcon, SaveIcon } from "@deprecate/assets/app.asset";
+  import { HelpIcon, SaveIcon } from "@deprecate/assets";
   import { onMount } from "svelte";
   import type { EnvValuePair } from "@sparrow/common/interfaces/request.interface";
   import { QuickHelp } from "../components";

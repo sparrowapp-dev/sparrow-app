@@ -1,9 +1,5 @@
 <script lang="ts">
-  import {
-    DeleteIcon,
-    EditIcon,
-    UploadIcon,
-  } from "@deprecate/assets/app.asset";
+  import { DeleteIcon, EditIcon, UploadIcon } from "@deprecate/assets";
   import { base64ToURL, imageDataToURL } from "@sparrow/common/utils";
 
   export let value: any = [];

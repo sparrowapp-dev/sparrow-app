@@ -15,7 +15,7 @@
   // ---- Helper
   import { tabBarScroller } from "@sparrow/common/utils/navigation";
   import { requestSplitterDirection } from "@sparrow/workspaces/features/rest-explorer/store";
-  import { HelpIcon } from "@deprecate/assets/app.asset";
+  import { HelpIcon } from "@deprecate/assets";
   import {
     HorizontalGridIcon,
     MoreOptions,

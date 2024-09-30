@@ -4,7 +4,7 @@
     LeftIcon,
     RightIcon,
     DoubleRightIcon,
-  } from "@deprecate/assets/app.asset";
+  } from "@deprecate/assets";
   import type { TeamDocument } from "@app/database/database";
   import { calculateTimeDifferenceInDays } from "../../../../utils/workspacetimeUtils";
   import { Table } from "@sparrow/library/ui";

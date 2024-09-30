@@ -33,7 +33,7 @@
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { Tooltip } from "@sparrow/library/ui";
   import gitBranchIcon from "@deprecate/assets/git-branch.svg";
-  import { ReloadCollectionIcon } from "@deprecate/assets/icons";
+  import { ReloadCollectionIcon } from "@deprecate/assets";
   import type { CollectionDocument, TabDocument } from "@app/database/database";
   import Folder from "../folder/Folder.svelte";
   import type { Path } from "@sparrow/common/interfaces/request.interface";

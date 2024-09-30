@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ThreeDotIcon } from "@deprecate/assets/app.asset";
+  import { ThreeDotIcon } from "@deprecate/assets";
   import { formatDateInString } from "../../utils/workspacetimeUtils";
   import { onDestroy } from "svelte";
   // import Card from "../card/Card.svelte";

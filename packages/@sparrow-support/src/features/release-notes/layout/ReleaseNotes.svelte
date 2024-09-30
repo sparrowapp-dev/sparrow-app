@@ -1,5 +1,5 @@
 <script>
-  import { SearchIcon } from "@deprecate/assets/icons";
+  import { SearchIcon } from "@deprecate/assets";
   import { Select } from "@sparrow/library/forms";
   import {
     ArrowUnfilledIcon,
