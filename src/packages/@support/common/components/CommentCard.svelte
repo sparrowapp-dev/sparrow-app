@@ -35,6 +35,8 @@
    */
   export let postId;
 
+  export let getColor;
+
   let isCommenting = false;
 
   let isReplying = false;
@@ -87,14 +89,35 @@
   <div class="comment-content">
     <div class="comment-author text-fs-14 mt-1">
       {comment.author.name || ""}
+      {#if comment.value === "" || comment.author?.isAdmin === true}
+        <span
+          class="text-fs-14"
+          style="marign-start: 4px; color: var(--text-secondary-150); font-weight: 400;"
+        >
+          has marked this post as
+          <span
+            class="mb-0 ms-2 px-2"
+            style="border:0.2px solid {getColor(comment?.status)
+              .fontColor}; color: {getColor(comment?.status)
+              .fontColor};   border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
+          >
+            {comment?.status
+              ? comment?.status.charAt(0).toUpperCase() +
+                comment?.status.slice(1)
+              : ""}
+          </span>
+        </span>
+      {/if}
     </div>
     <div
       class="text-fs-12"
       style="font-weight: 400; color:var(--text-secondary-1000);  "
     >
-      <p style="word-break: break-all;">
-        {comment.value}
-      </p>
+      {#if comment.value !== ""}
+        <p class="mb-1 pb-0" style="word-break: break-all;">
+          {comment.value}
+        </p>
+      {/if}
     </div>
     <div class="comment-meta">
       <div class="comment-moreinfo">
@@ -104,7 +127,6 @@
             on:click={() => {
               isReplying = !isReplying;
               MixpanelEvent(Events.Reply_Comment);
-
             }}
             style="color: {isReplying
               ? 'white'
@@ -141,13 +163,14 @@
             color={"var(--text-secondary-200)"}
           /> -->
 
+
           <Button
             title={`Add`}
             type={`primary`}
             loaderSize={13}
             loader={isCommenting}
-            textStyleProp={"font-size: var(--small-text)"}
-            buttonStyleProp={`height: 20px;  rounded; margin-left:2px;`}
+            textStyleProp={"font-size:11px;"}
+            buttonStyleProp={`height: 20px; width:35px;`}
             onClick={async () => {
               isCommenting = true;
               await onAddComment(postId, commentValue, comment?.id);
@@ -159,8 +182,8 @@
                 isReplying = false;
               }, 3000);
             }}
-            disable={commentValue.length == 0 || isCommenting}
-          />
+            disable={commentValue.trim() === "" || isCommenting}
+            />
         </div>
       </div>
     {/if}

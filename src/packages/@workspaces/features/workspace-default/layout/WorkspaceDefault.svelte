@@ -66,7 +66,7 @@
       icon={SocketIcon}
       label="WebSocket"
       iconColor="var(--text-primary-300)"
-      iconSize={"18px"}
+      iconSize={"20px"}
       onClick={() => {
         onItemCreated("web-socket", {});
         MixpanelEvent(Events.WebSocket_Button);
@@ -75,7 +75,7 @@
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <Card
         icon={TreeIcon}
-        label={`${TFDefaultEnum.FULL_NAME}`}
+        label={"Test Flows"}
         iconColor="var(--text-primary-300)"
         iconSize={"18px"}
         onClick={() => {

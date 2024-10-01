@@ -168,6 +168,7 @@
   };
 
   const handleCategoryChange = (selectedCategory) => {
+    console.log("This is selectd Category", selectedCategory);
     activityType = selectedCategory;
     applyAllFilters();
   };
@@ -200,12 +201,17 @@
     style="justify-content: space-between;"
   >
     <div>
-      <div class="d-flex search-input-container rounded px-2 mb-2">
-        <SearchIcon width={14} height={14} classProp="my-auto me-3" />
+      <div class={`d-flex search-input-container rounded py-1 px-2 mb-2`}>
+        <SearchIcon
+          width={14}
+          height={14}
+          color={"var(--icon-secondary-200)"}
+          classProp={`my-auto me-1`}
+        />
         <input
           type="text"
           id="search-input"
-          class="bg-transparent w-100 border-0 my-auto"
+          class={`bg-transparent w-100 ms-1 border-0 my-auto`}
           placeholder="Search updates"
           on:input={(e) => handleInputChange(e.target.value)}
         />
@@ -217,12 +223,13 @@
           iconRequired={true}
           data={[
             { name: "Feature Request", id: ActivityType.FEATURE_REQUEST },
-            { name: "UX Improvement", id: ActivityType.UI_IMPROVEMENT },
+            { name: "UI Improvement", id: ActivityType.UI_IMPROVEMENT },
             { name: "Bugs", id: ActivityType.BUG },
             { name: "All Categories", id: ActivityType.ALL_CATEGORIES },
           ]}
           icon={CategoryIcon}
-          on:click={(id = "") => {
+          onclick={(id = "") => {
+            console.log("Inside handle selct click")
             handleCategoryChange(id);
             MixpanelEvent(Events.Activity_Categories_Filter);
           }}
@@ -287,32 +294,53 @@
   </div>
 
   {#if !isPostopen}
-    <div class="post-list" style="margin-top: 50px">
-      <div class="sidebar">
-        <div class="sort">
-          <SortIcon width="12px" height="8px" />
-          <span>Sort By</span>
+    <div class="post-list d-flex gap-4" style="margin-top: 50px">
+      <div style="width:129px;  ">
+        <div>
+          <SortIcon width={"12px"} height={"8px"} />
+          <span
+            class="text-fs-13"
+            style="padding-left: 8px; padding-top:4px ; font-weight:500;"
+          >
+            Sort By</span
+          >
         </div>
-        <div class="sort-options">
+        <div
+          class="d-flex flex-column"
+          style="align-items: baseline; gap:10px; margin-top:13px; "
+        >
           <button
             on:click={() => {
               handleSortChange("newest");
               MixpanelEvent(Events.Activity_SortBy_Filter);
             }}
-            class={`sort-button ${currentSort === "newest" && "selected-sort"}`}
+            class="sort-buttons d-flex justify-content-between w-100"
+            class:active={currentSort === "newest"}
           >
-            Newest
-            <img src={tickIcon} alt="" class="tick-icon" />
+            <span class="text-fs-13">Newest</span>
+            <img
+              src={tickIcon}
+              alt=""
+              class="pt-1 tick-icon"
+              style="width: 16px; height: 16px;"
+            />
           </button>
+
           <button
             on:click={() => {
               handleSortChange("oldest");
               MixpanelEvent(Events.Activity_SortBy_Filter);
             }}
-            class={`sort-button ${currentSort === "oldest" && "selected-sort"}`}
+            class="sort-buttons d-flex justify-content-between w-100"
+            class:active={currentSort === "oldest"}
           >
-            Oldest
-            <img src={tickIcon} alt="" class="tick-icon" />
+            <span class="text-fs-13">Oldest</span>
+            <img
+              src={tickIcon}
+              alt=""
+              class="pt-1 tick-icon"
+              style="width: 16px; height: 16px"
+            />
           </button>
         </div>
       </div>
@@ -337,7 +365,7 @@
                 <ul>
                   {#each filteredPosts as post}
                     <div
-                    class="mb-4"
+                      class="mb-4"
                       style=" display: flex; flex-direction: column; background-color: #151515; padding: 20px;  border-radius:2px;"
                     >
                       <div
@@ -359,7 +387,8 @@
                           >
                             <span
                               class="category mt-2"
-                              style="color:{getColor(post?.status)?.fontColor}; border:0.2px solid {getColor(
+                              style="color:{getColor(post?.status)
+                                ?.fontColor}; border:0.2px solid {getColor(
                                 post?.status,
                               )?.fontColor}; "
                             >
@@ -377,6 +406,7 @@
 
                       <div style="margin-top: 10px; flex: 1;">
                         <p
+                          class="text-fs-14"
                           style="color: var(--text-secondary-1000); margin: 0; padding-top:10px;"
                         >
                           {post?.details}
@@ -405,7 +435,7 @@
                   class="mx-1 text-fs-12 mb-0 text-center"
                   style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
                 >
-                  No Result Found
+                  No Feedback yet.
                 </p>
 
                 <hr class="mt-4" style="" />
@@ -431,7 +461,7 @@
                       on:mouseleave={() => (isHovering = null)}
                     >
                       <IconFallback
-                        character="M"
+                        character={comment.author.name.charAt(0)}
                         width="34px"
                         height="32px"
                         backgroundColor="#1C1D2B"
@@ -447,7 +477,7 @@
                               class="d-flex justify-content-between"
                               style=" font-weight: 500; "
                             >
-                              <p>{comment.author.name}</p>
+                              <p class="mb-1 pb-0">{comment.author.name}</p>
                               <div style="">
                                 {#if isHovering === comment.id}
                                   <span
@@ -471,7 +501,7 @@
                             </div>
 
                             <div class="comment-text">
-                              <p style="word-break: break-all;">
+                              <p class="mb-1" style="word-break: break-all; ">
                                 {comment.value}
                               </p>
                             </div>
@@ -483,12 +513,7 @@
                             <span class="comment-time">
                               {formatTimeAgo(comment.created)}
                             </span>
-                            <a href="#" class="comment-reply">Reply</a>
                           </div>
-                          <!-- <div class="comment-likes">
-                          <Like />
-                          <span class="like-count">{comment.likeCount}</span>
-                        </div> -->
                         </div>
                       </div>
                     </li>
@@ -499,7 +524,7 @@
                   class="mx-1 text-fs-12 mb-0 text-center"
                   style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
                 >
-                  No Result Found
+                  No Comment Yet.
                 </p>
               {/if}
 
@@ -509,7 +534,7 @@
 
           <!-- Upvoted Section  -->
           {#if activityStatusType === ActivityStatusType.UPVOTED_POSTS || activityStatusType === ActivityStatusType.ALL_ACTIVITY}
-            <div class="mt-3">
+            <div class="">
               <h2
                 style=" font-size: 15px; color: #999999; margin-bottom: 12px;"
               >
@@ -520,7 +545,7 @@
                   {#each filteredLikedPosts as { post }}
                     <div
                       class="mb-4"
-                      style="display: flex; flex-direction: column; background-color: #151515; padding: 15px; min-height: 195px; border-radius:2px; "
+                      style="display: flex; flex-direction: column; background-color: #151515; padding: 15px; border-radius:2px; "
                     >
                       <div
                         style="display: flex; justify-content: space-between; align-items: flex-start;"
@@ -560,6 +585,7 @@
 
                       <div style="margin-top: 10px; flex: 1;">
                         <p
+                          class="text-fs-14"
                           style="color: var(--text-secondary-1000); margin: 0; padding-top:10px;"
                         >
                           {post?.details}
@@ -588,10 +614,9 @@
                   class="mx-1 text-fs-12 mb-0 text-center mt-4 mb-4"
                   style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
                 >
-                  No Result Found
+                  No Upvoted Post yet.
                 </p>
               {/if}
-
             </div>
           {/if}
         </div>
@@ -613,13 +638,15 @@
 
 <style>
   .search-input-container {
-    /* border: 1px solid var(--border-color); */
     background: var(--bg-tertiary-400);
     width: 20vw;
     font-size: 12px;
     height: 26px;
     position: relative;
     border: 1px solid transparent;
+    align-items: center;
+    display: flex;
+    justify-content: center;
   }
   .search-input-container:hover {
     border: 1px solid var(--border-primary-300);
@@ -643,7 +670,7 @@
     font-size: 18px;
     font-weight: 500;
     margin-bottom: 5px;
-    color: var(--white-color);
+    color: var(--text-secondary-100);
   }
   .title:hover {
     text-decoration: underline;
@@ -658,25 +685,6 @@
     outline: none;
     border: none;
     box-shadow: none;
-  }
-
-  div.my-activity {
-    height: 89px !important;
-    padding-bottom: 21px;
-    display: flex;
-    flex-direction: column;
-    margin-top: 32px;
-  }
-
-  div.my-activity > div.title {
-    font-weight: 700;
-    font-size: 20px;
-    margin-bottom: 12px;
-  }
-
-  div.my-activity > p.description {
-    font-size: 14px;
-    color: #999999;
   }
 
   .posts-comments ul {
@@ -696,7 +704,7 @@
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    padding: 20px;
+    padding: 15px;
     width: 100%;
   }
 
@@ -761,7 +769,6 @@
   .comments h2 {
     font-size: 15px;
     color: #999999;
-    margin: 20px 0px 10px 0px;
     font-weight: 500;
   }
 
@@ -806,7 +813,6 @@
   }
 
   .search-input::placeholder {
-    /* ; */
     position: absolute;
     top: 50%;
     left: 20%;
@@ -824,149 +830,32 @@
     justify-content: space-between;
   }
 
-  .sidebar {
-    width: 187px;
-    margin-right: 28px;
+  .sort-buttons {
+    color: var(--text-secondary-550) !important;
+    background: none !important;
+    outline: none !important;
+    border: none !important;
+    font-weight: 500;
   }
 
-  .sort {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-  }
-
-  .sort-options {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 13px;
-    /* ; */
-  }
-
-  .sort-button {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    background: none;
-    border: none;
-    font-size: 14px;
-    color: #808080;
-    cursor: pointer;
-  }
-
-  .sort-button:hover {
-    color: #3670f7;
-  }
-
-  .sort-button:focus-within {
-    color: #3670f7;
-  }
-
-  .posts-lists {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .post-card {
-    background-color: #151515;
-    padding: 20px;
-    border-radius: 2px;
-    margin-bottom: 20px;
-  }
-
-  .post-header {
-    display: flex;
-    justify-content: space-between;
-    /* ; */
-  }
-
-  .post-title {
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  .post-title:hover {
-    text-decoration: underline;
-  }
-
-  .post-body {
-    margin-top: 10px;
-  }
-
-  .post-footer {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-top: 10px;
-  }
-
-  .tick-icon {
-    display: none;
-  }
-
-  .sort-button:focus-within .tick-icon {
-    display: block;
+  .sort-buttons:hover {
+    color: var(--text-primary-300) !important;
   }
 
   .sort-buttons:focus-within {
-    color: #3670f7 !important;
+    color: var(--text-primary-300) !important;
   }
-  .selected-sort {
-    color: #3670f7 !important;
-  }
+
   .tick-icon {
     display: none;
   }
 
-  .badge {
-    padding: 0.3rem 0.5rem;
-    border-radius: 5px;
-    display: inline-block;
-    width: fit-content;
+  /* When a button has the 'active' class */
+  .sort-buttons.active {
+    color: var(--text-primary-300) !important;
   }
 
-  /* Status Colors */
-  .complete {
-    color: #69d696;
-    border: 1px solid #69d696;
-    background-color: #031b0d;
-  }
-
-  .open {
-    color: #1193f0;
-    border: 1px solid #1193f0;
-    background-color: #050938;
-  }
-
-  .planned {
-    color: #ffe47e;
-    border: 1px solid #ffe47e;
-    background-color: #171302;
-  }
-
-  .progress {
-    color: #df77f9;
-    border: 1px solid #df77f9;
-    background-color: #1c0837;
-    padding-bottom: 17px;
-  }
-
-  .review {
-    color: #fba574;
-    border: 1px solid #fba574;
-    background-color: #1c1405;
-  }
-
-  .error {
-    color: #991b1b;
-  }
-
-  .secondary {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  .sort-buttons.active .tick-icon {
+    display: revert;
   }
 </style>

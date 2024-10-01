@@ -76,8 +76,8 @@
       {/if}
       <div class="d-flex align-items-center ellipsis">
         <p
-          style="font-size:16px; color: var(--text-secondary-100)"
-          class="mb-0 ellipsis"
+          style="font-size:16px; color: var(--text-secondary-100); width:80px;"
+          class="mb-0 ellipsis "
         >
           {workspace.team?.teamName}
         </p>
