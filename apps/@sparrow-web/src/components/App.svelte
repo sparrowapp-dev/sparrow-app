@@ -4,48 +4,14 @@
   import { Toast } from "@sparrow/library/ui";
   import Authguard from "../routing/Authguard.svelte";
   import Navigate from "../routing/Navigate.svelte";
-  import Dashboard from "@app/pages/Dashboard/Dashboard.svelte";
+  import Dashboard from "../pages/Dashboard/Dashboard.svelte";
   import { onMount } from "svelte";
-  import { user } from "@app/store/auth.store";
-  import { handleShortcuts } from "@app/utils/shortcuts";
+  import { handleLogin } from "./App";
 
   export let url = "/";
-  let isActiveInternet: boolean = true;
-
-  const doOnlineCheck = () => {
-    if (!navigator.onLine && isActiveInternet) {
-      isActiveInternet = false;
-    } else isActiveInternet = true;
-  };
 
   onMount(async () => {
-    let isloggedIn;
-    user.subscribe((value) => {
-      isloggedIn = value;
-    });
-
-    window.addEventListener(
-      "dragover",
-      function (e) {
-        e = e || event;
-        e.preventDefault();
-      },
-      false,
-    );
-    window.addEventListener(
-      "drop",
-      function (e) {
-        e = e || event;
-        e.preventDefault();
-      },
-      false,
-    );
-    setInterval(() => {
-      doOnlineCheck();
-    }, 5000);
-  });
-  window.addEventListener("contextmenu", (e) => {
-    e.preventDefault();
+    handleLogin(window.location.search);
   });
 </script>
 
@@ -64,7 +30,3 @@
 </Router>
 
 <Toast />
-<svelte:window on:keydown={handleShortcuts} on:keyup={handleShortcuts} />
-
-<style>
-</style>
