@@ -13,8 +13,6 @@
   import { copyToClipBoard } from "@sparrow/common/utils";
   import { open } from "@tauri-apps/plugin-shell";
   import { version } from "../../../../src-tauri/tauri.conf.json";
-  import externalLink from "@deprecate/assets/external_link.svg";
-  import copyIcon from "@deprecate/assets/copy_icon.svg";
   import BgContainer from "./BgContainer.svelte";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
