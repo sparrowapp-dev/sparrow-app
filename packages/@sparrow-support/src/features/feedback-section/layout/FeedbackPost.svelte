@@ -243,7 +243,10 @@
               .fontColor}; padding-bottom: 14px; border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
           >
             {post?.status
-              ? post?.status.charAt(0).toUpperCase() + post?.status.slice(1)
+              ? post.status
+                  .split(" ")
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(" ")
               : ""}
           </span>
         </div>
@@ -360,7 +363,7 @@
             type={`primary`}
             loaderSize={13}
             textStyleProp={"font-size:11px;"}
-            buttonStyleProp={`height: 20px; width:35px;`}
+            buttonStyleProp={`height: 20px; width:35px; justify-content:center;`}
             loader={isCommenting}
             onClick={async () => {
               isCommenting = true;

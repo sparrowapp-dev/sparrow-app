@@ -101,10 +101,12 @@
               .fontColor}; color: {getColor(comment?.status)
               .fontColor};   border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
           >
-            {comment?.status
-              ? comment?.status.charAt(0).toUpperCase() +
-                comment?.status.slice(1)
-              : ""}
+          {comment?.status
+            ? comment.status
+                .split(" ")
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+                .join(" ") 
+            : ""}
           </span>
         </span>
       {/if}

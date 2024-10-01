@@ -333,7 +333,10 @@
       </div>
     </div>
 
-    <div class="d-flex gap-4 justify-content-between" style=" height:100%; margin-top:51px; ">
+    <div
+      class="d-flex gap-4 justify-content-between"
+      style=" height:100%; margin-top:51px; "
+    >
       <div style="width:129px;  ">
         <div>
           <SortIcon width={"12px"} height={"8px"} />
@@ -359,8 +362,8 @@
             <span class="text-fs-13">Trending</span>
             {#if currentSort === "trending"}
               <TickIcon
-                height={"14px"}
-                width={"14px"}
+                height={"12px"}
+                width={"12px"}
                 color={"var(--icon-primary-300)"}
               />
             {/if}
@@ -377,8 +380,8 @@
             <span class="text-fs-13">Now</span>
             {#if currentSort === "newest"}
               <TickIcon
-                height={"14px"}
-                width={"14px"}
+                height={"12px"}
+                width={"12px"}
                 color={"var(--icon-primary-300)"}
               />
             {/if}
@@ -395,8 +398,8 @@
             <span class="text-fs-13">Top</span>
             {#if currentSort === "score"}
               <TickIcon
-                height={"14px"}
-                width={"14px"}
+                height={"12px"}
+                width={"12px"}
                 color={"var(--icon-primary-300)"}
               />
             {/if}
@@ -445,7 +448,7 @@
                         .map(
                           (word) =>
                             word.charAt(0).toUpperCase() + word.slice(1),
-                        ) // Capitalize the first letter of each word
+                        )
                         .join(" ")}
                     </span>
                   </div>

@@ -311,11 +311,11 @@
             class="sort-buttons align-items-center d-flex justify-content-between w-100"
             class:active={currentSort === "newest"}
           >
-            <span> Newest </span>
+            <span class="text-fs-13"> Newest </span>
             {#if currentSort === "newest"}
               <TickIcon
-                height={"14px"}
-                width={"14px"}
+                height={"12px"}
+                width={"12px"}
                 color={"var(--icon-primary-300)"}
               />
             {/if}
@@ -329,11 +329,11 @@
             class="sort-buttons align-items-center d-flex justify-content-between w-100"
             class:active={currentSort === "oldest"}
           >
-            <span> Oldest </span>
+            <span class="text-fs-13"> Oldest </span>
             {#if currentSort === "oldest"}
               <TickIcon
-                height={"14px"}
-                width={"14px"}
+                height={"12px"}
+                width={"12px"}
                 color={"var(--icon-primary-300)"}
               />
             {/if}

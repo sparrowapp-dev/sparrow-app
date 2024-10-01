@@ -6,8 +6,7 @@
   export let likePost: (postId: string) => void;
   export let dislikePost: (postId: string) => void;
   export let isPostLiked: boolean;
-
- 
+  export let isHoverRequired: boolean = true; // Default value is true
 
   const handleClick = () => {
     if (isPostLiked) {
@@ -22,9 +21,11 @@
 </script>
 
 <div
-  class={isPostLiked
-    ? "upvote-container upvoted"
-    : "upvote-container not-upvoted hover-effect"}
+  class={`
+    upvote-container 
+    ${isPostLiked ? "upvoted" : "not-upvoted"} 
+    ${!isPostLiked && isHoverRequired ? "hover-effect" : ""}
+  `}
   on:click={handleClick}
 >
   <div style="height: 22px; width: 24px; text-align: center;">
@@ -32,17 +33,17 @@
       <TriangleIcon
         height={"10px"}
         width={"10px"}
-        color={"var(  --icon-primary-300)"}
+        color={"var(--icon-primary-300)"}
       />
     {:else}
       <TriangleIcon
         height={"10px"}
         width={"10px"}
-        color={"var( --icon-secondary-100)"}
+        color={"var(--icon-secondary-100)"}
       />
     {/if}
   </div>
-  <span style=" font-size: 14px;">{upvote}</span>
+  <span style="font-size: 14px;">{upvote}</span>
 </div>
 
 <style>
