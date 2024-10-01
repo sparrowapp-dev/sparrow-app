@@ -21,7 +21,9 @@
   </div>
   <div class="card-footer">
     <span><PlusIcon color="var(--white-color)" /></span>
+   <span class="text-fs-14"  style="font-weight: 400;">
     {label}
+   </span>
   </div>
 </div>
 

@@ -63,6 +63,8 @@
         searchTerm.trim().length === 0 ||
         product.title.toLowerCase().includes(searchTerm.toLowerCase());
 
+      const productCategory = product?.category?.name || "Uncategorized";
+
       // Filter by category
       const matchesCategory =
         type === "allCategories" ||
@@ -70,7 +72,8 @@
           product?.category?.name === "Feature Request") ||
         (type === "UI Improvement" &&
           product?.category?.name === "UI Improvement") ||
-        (type === "Bug" && product?.category?.name === "Bug");
+        (type === "Bug" && product?.category?.name === "Bug") ||
+        (type === "Uncategorized" && productCategory === "Uncategorized");
 
       return matchesSearchTerm && matchesCategory;
     }),
@@ -89,6 +92,7 @@
     if (response) {
       transformPostsToFeedbackStatus(response);
     }
+
     isLoading = false;
   });
 </script>
@@ -115,12 +119,12 @@
           width={14}
           height={14}
           color={"var(--icon-secondary-200)"}
-          classProp={`my-auto me-3`}
+          classProp={`my-auto ms-2`}
         />
         <input
           type="text"
           id="search-input"
-          class={`bg-transparent w-100 border-0 my-auto`}
+          class={`bg-transparent w-100 border-0 ms-1 my-auto`}
           placeholder="Search updates"
           on:input={(e) => {
             searchTerm = e.target.value;
@@ -147,10 +151,10 @@
       <div class="filter">
         <Select
           data={[
-            { name: "All Categories", id: "allCategories" },
             { name: "Feature Request", id: FeedbackType.FEATURE_REQUEST },
             { name: "UI Improvement", id: FeedbackType.UI_IMPROVEMENT },
-            { name: "Bug", id: FeedbackType.BUG },
+            { name: "Bugs", id: FeedbackType.BUG },
+            { name: "All Categories", id: "allCategories" },
           ]}
           onclick={(id = "") => {
             type = id;
@@ -180,7 +184,9 @@
     </div>
 
     {#if isLoading}
-      <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+      <div class="mt-5">
+        <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+      </div>
     {:else}
       <div
         class="d-flex justify-content-between gap-3 update-state-section"
@@ -197,7 +203,10 @@
               ).fontColor}; border-bottom:0.5px solid {getColor(status)
                 .fontColor};"
             >
-              {status.charAt(0).toUpperCase() + status.slice(1)}
+              {status
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+                .join(" ")}
             </div>
             <div
               class=""

@@ -65,7 +65,7 @@
    * The currently selected tag for filtering events.
    * Defaults to an empty string, which corresponds to "All".
    */
-  let selectedTag = "";
+  let selectedTag = UpdatesTagType.ALL;
 
   /**
    * Boolean flag to indicate whether events are being loaded.
@@ -201,13 +201,13 @@
             <SearchIcon
               width={14}
               height={14}
-              color={"grey"}
+              color={"var(--icon-secondary-200)"}
               classProp={`my-auto me-3`}
             />
             <input
               type="text"
               id="search-input"
-              class={`bg-transparent w-100 border-0 my-auto`}
+              class={`bg-transparent w-100 border-0 ms-1 my-auto`}
               placeholder="Search updates"
               on:input={handleInput}
             />
@@ -286,9 +286,9 @@
                   </div>
                   <div class="timeline-circle"></div>
                   <div class="timeline-content">
-                    <div class="d-flex gap-2">
+                    <div class=" d-flex gap-2">
                       <h3
-                        class="text-fs-18"
+                        class="text-fs-18 mb-0"
                         on:click={() => {
                           handleSeeMore(event);
                           MixpanelEvent(Events.Version_Updates);
@@ -296,31 +296,31 @@
                       >
                         {event.title}
                       </h3>
-                      <div
-                        class="link-div"
-                        style="height: 24px; width:24px; cursor:pointer"
-                        on:click={async () => {
-                          await copyToClipBoard(event.url);
-                          notifications.success("Link copied to clipboard!");
-                          MixpanelEvent(Events.Copy_Link);
-                        }}
+                      <Tooltip
+                        title={"Copy link"}
+                        placement={"right"}
+                        distance={10}
+                        show={true}
+                        zIndex={701}
                       >
-                        <Tooltip
-                          title={"Copy link"}
-                          placement={"right"}
-                          distance={4}
-                          show={true}
-                          zIndex={701}
+                        <div
+                          class="link-div d-flex align-items-center justify-content-cetner"
+                          style="height:24px; width:24px; cursor:pointer"
+                          on:click={async () => {
+                            await copyToClipBoard(event.url);
+                            notifications.success("Link copied to clipboard!");
+                            MixpanelEvent(Events.Copy_Link);
+                          }}
                         >
                           <LinkIcon
                             height={"18px"}
                             width={"18px"}
                             color={"var(--text-secondary-100)"}
                           />
-                        </Tooltip>
-                      </div>
+                        </div>
+                      </Tooltip>
                     </div>
-                    <div class="tags">
+                    <div class="tags" style="margin-top: 5px;">
                       {#each event.types as tag}
                         <span class="tag {getTagClass(tag)}">
                           {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
@@ -393,7 +393,7 @@
               class="no-results mt-5 d-flex justify-content-center align-items-center mx-1 text-fs-14 mb-0 text-center"
               style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
             >
-              <p>No results found</p>
+              <p>No results found.</p>
             </div>
           {/if}
         {:else}
@@ -425,31 +425,35 @@
 
             <div class="ms-2 timeline-content">
               <div class="d-flex gap-2">
-                <h3>
-                  {selectedEvent.title}
-                </h3>
-                <div
-                  style="height: 24px; width:24px; cursor:pointer"
-                  on:click={async () => {
-                    await copyToClipBoard(selectedEvent.url);
-                    notifications.success("Link copied to clipboard!");
-                    MixpanelEvent(Events.Copy_Link);
-                  }}
+                <p
+                  class="pb-0 mb-1 text-fs-18"
+                  style="font-weight: 700; line-height: 27px;"
                 >
-                  <Tooltip
-                    title={"Link"}
-                    placement={"right"}
-                    distance={20}
-                    show={true}
-                    zIndex={701}
+                  {selectedEvent.title}
+                </p>
+                <Tooltip
+                  title={"Copy link"}
+                  placement={"right"}
+                  distance={10}
+                  show={true}
+                  zIndex={701}
+                >
+                  <div
+                    class="link-div"
+                    style="  height: 24px; width:24px; cursor:pointer"
+                    on:click={async () => {
+                      await copyToClipBoard(selectedEvent.url);
+                      notifications.success("Link copied to clipboard!");
+                      MixpanelEvent(Events.Copy_Link);
+                    }}
                   >
                     <LinkIcon
                       height={"18px"}
                       width={"18px"}
                       color={"var(--text-secondary-100)"}
                     />
-                  </Tooltip>
-                </div>
+                  </div>
+                </Tooltip>
               </div>
               <div class="tags">
                 {#each selectedEvent.types as tag}
@@ -485,7 +489,7 @@
                 {selectedEvent.reactions?.like || ""}
               </div> -->
                   <div
-                    style=" solid grey;"
+                    style="cursor:pointer; solid grey;"
                     class="ps-2"
                     on:click={async () => {
                       await open(externalSparrowLinkedin);
@@ -509,9 +513,10 @@
     font-size: 24px;
   }
   .link-div {
+    height: 24px;
     display: flex;
-    align-items: start;
     justify-content: center;
+    align-items: center;
     border-radius: 2px;
   }
   .link-div:hover {
@@ -625,12 +630,6 @@
     color: var(--text-primary-300);
   }
 
-  .timeline-content a {
-    color: var(--text-primary-300);
-    text-decoration: underline;
-    margin-right: 10px;
-  }
-
   .timeline-reactions {
     display: flex;
     align-items: center;
@@ -650,9 +649,9 @@
     display: inline-block;
     padding: 1.24px 5px;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 500;
-    margin-right: 8px;
+    margin-right: 6px;
     border: 1px solid;
   }
 

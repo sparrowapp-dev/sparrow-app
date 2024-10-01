@@ -199,7 +199,27 @@ class HelpPageViewModel {
    */
 
   public retrievePostData = async (postID: string) => {
+    let userInfo;
+
+    // Subscribe to the user store (assuming it's a Svelte store or similar)
+    user.subscribe((value) => {
+      userInfo = value;
+    });
+
+    // Retrieve the post data (keeping the full response intact)
     const response = await this.cannyService.retrievePost(postID);
+
+    // Retrieve the votes for the post
+    const voteList = await this.listVoteUsingPostId(postID);
+    const votes = voteList?.data?.votes || [];
+
+    // Check if the logged-in user has voted (liked) the post
+    const isLiked = votes.some((vote) => vote.voter?.email === userInfo.email);
+
+    // Append 'isPostLiked' to the 'data' field in the response object
+    response.data.isPostLiked = isLiked;
+
+    // Return the entire response object with the updated 'data' field
     return response;
   };
   /**
@@ -486,6 +506,8 @@ class HelpPageViewModel {
       const result = await this.cannyService.createVote(postID, UserId);
       return result;
     }
+
+    let result = this.listVoteUsingPostId(postID);
   };
 
   /**
@@ -543,6 +565,13 @@ class HelpPageViewModel {
 
     if (UserId) {
       const result = await this.cannyService.listVotes(UserId);
+      return result;
+    }
+  };
+
+  public listVoteUsingPostId = async (postID: string) => {
+    if (postID) {
+      const result = await this.cannyService.listVotesPostId(postID);
       return result;
     }
   };

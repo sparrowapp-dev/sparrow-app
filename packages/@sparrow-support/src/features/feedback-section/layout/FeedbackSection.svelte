@@ -158,9 +158,7 @@
    * @param {string} selectedCategory - The selected category for filtering posts (e.g., "Feature Request", "Bug").
    */
   const handleCategoryChange = async (selectedCategory) => {
-    // debugger;
     feedbackType = selectedCategory;
-
     if (selectedCategory === FeedbackType.ALL_CATEGORY) {
       // Show all posts if "All Categories" is selected
       await getPosts(currentSort, searchTerm, status);
@@ -209,11 +207,16 @@
             MixpanelEvent(Events.Feedback_Search);
           }}
         >
-          <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
+          <SearchIcon
+            width={14}
+            height={14}
+            color={"var(--icon-secondary-200)"}
+            classProp={`my-auto me-1`}
+          />
           <input
             type="text"
             id="search-input"
-            class={`bg-transparent w-100 border-0 my-auto`}
+            class={`bg-transparent w-100 ms-1 border-0 my-auto`}
             placeholder="Search updates"
             on:input={(e) => {
               handleInputChangeDebounced(e.target.value);
@@ -231,7 +234,7 @@
                 id: FeedbackType.FEATURE_REQUEST,
               },
               {
-                name: "UX Improvement",
+                name: "UI Improvement",
                 id: FeedbackType.UI_IMPROVEMENT,
               },
               {
@@ -278,20 +281,20 @@
                 id: FeedbackStatusType.OPEN,
               },
               {
-                name: "Completed",
-                id: FeedbackStatusType.COMPLETED,
-              },
-              {
-                name: "In Progress",
-                id: FeedbackStatusType.IN_PROGRESS,
+                name: "Under Review",
+                id: FeedbackStatusType.UNDER_REVIEW,
               },
               {
                 name: "Planned",
                 id: FeedbackStatusType.PLANNED,
               },
               {
-                name: "Under review",
-                id: FeedbackStatusType.UNDER_REVIEW,
+                name: "In Progress",
+                id: FeedbackStatusType.IN_PROGRESS,
+              },
+              {
+                name: "Complete",
+                id: FeedbackStatusType.COMPLETED,
               },
               {
                 name: "All Status",
@@ -330,8 +333,8 @@
       </div>
     </div>
 
-    <div class="d-flex" style=" height:100%; margin-top:51px; ">
-      <div style="width:187px; margin-right:28px; ">
+    <div class="d-flex gap-4 justify-content-between" style=" height:100%; margin-top:51px; ">
+      <div style="width:129px;  ">
         <div>
           <SortIcon width={"12px"} height={"8px"} />
           <span
@@ -437,10 +440,13 @@
                         .fontColor}; border:0.2px solid {getColor(post?.status)
                         .fontColor}; "
                     >
-                      {post?.status
-                        ? post.status.charAt(0).toUpperCase() +
-                          post.status.slice(1)
-                        : ""}
+                      {post.status
+                        .split(" ")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() + word.slice(1),
+                        ) // Capitalize the first letter of each word
+                        .join(" ")}
                     </span>
                   </div>
                 </div>
@@ -488,7 +494,7 @@
       {:else}
         <p
           class=" text-fs-12 mb-0 text-center"
-          style=" margin-left:250px; margin-top:45px; font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+          style=" margin-right:290px; margin-top:45px; font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
         >
           No Result Found
         </p>
@@ -507,6 +513,8 @@
       {handleUpvote}
       {onUpdateFeedback}
       {getColor}
+      likePost={createVote}
+      dislikePost={deleteVote}
     />
   {/if}
 </div>

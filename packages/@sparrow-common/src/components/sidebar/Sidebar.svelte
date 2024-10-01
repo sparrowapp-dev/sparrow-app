@@ -39,7 +39,7 @@
     },
     {
       route: !isGuestUser ? "/app/collections" : "/guest/collections",
-      heading: "Collections",
+      heading: "Workspace",
       defaultLogo: collections,
       hoveredLogo: hoveredCollections,
       selectedLogo: selectedCollections,

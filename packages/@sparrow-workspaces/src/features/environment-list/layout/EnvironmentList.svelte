@@ -171,7 +171,7 @@
       />
 
       <p class="ms-2 mb-0 sparrow-fs-13" style="font-weight: 500;">
-        Environment
+        Environments
       </p>
     </div>
     {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}

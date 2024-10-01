@@ -321,6 +321,26 @@ export class CannyIoService {
   };
 
   /**
+   * Retrieves a list of votes for a post.
+   *
+   * @param    postID - The ID of the post whose votes are being retrieved.
+   * @returns {Promise<Object>} The response from the server with the list of votes.
+   */
+  public listVotesPostId = async (postID: string) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/votes/list`, {
+      body: {
+        apiKey: this.apiKey,
+        postID,
+      },
+      headers: {
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+      },
+    });
+
+    return response;
+  };
+
+  /**
    * Lists the change log entries of a specified type by making a POST request.
    *
    * @param    type - The type of change log entries to fetch (e.g., "new", "fixed","improved").

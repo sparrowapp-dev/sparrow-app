@@ -30,6 +30,9 @@
   export let getColor;
   export let onUpdateFeedback;
 
+  export let likePost;
+  export let dislikePost;
+
   let post = [];
   let nestedComments = [];
   let postImages = [];
@@ -142,7 +145,7 @@
 
   const handleLogoInputChange = (e) => {
     const errorMessage =
-      "Failed to upload the file. Please check the file size or the format";
+      "Failed to upload the file. You are allowed to upload only 5 files per feedback.";
 
     let targetFile = [
       ...uploadFeedback.file.value,
@@ -277,7 +280,7 @@
                     }}
                     src={postImage}
                     alt="post image"
-                    style="display:inline; height: 100px; margin-top: 20px; border-radius: 2px; margin:10px;"
+                    style="display:inline; height: 100px; margin-top: 20px; border-radius: 2px; margin:10px;   object-fit: contain;   max-width: 100%; "
                   />
                   <ImageModal
                     isOpen={isImageOpen}
@@ -324,8 +327,14 @@
             </div>
           </div>
 
-          <div class="mt-1">
-            <UpvoteIcon upvote={post?.score} />
+          <div class="mt-1" style="cursor: pointer;">
+            <UpvoteIcon
+              isPostLiked={post?.isPostLiked}
+              upvote={post?.score}
+              {likePost}
+              {dislikePost}
+              postID={post.id}
+            />
           </div>
         </div>
       </div>
@@ -346,28 +355,25 @@
         />
 
         <div class="d-flex align-items-center gap-2 ms-1">
-          <!-- <AttachmentIcon
-            height={"12px"}
-            width={"12px"}
-            color={"var(--text-secondary-200)"}
-          /> -->
-
           <Button
             title={`Add`}
             type={`primary`}
             loaderSize={13}
-            textStyleProp={"font-size: var(--small-text)"}
-            buttonStyleProp={`height: 20px; rounded;`}
+            textStyleProp={"font-size:11px;"}
+            buttonStyleProp={`height: 20px; width:35px;`}
             loader={isCommenting}
             onClick={async () => {
               isCommenting = true;
-              await onAddComment(postId, commentValue, null);
-              comments = await fetchComments(postId);
+              commentValue.trim();
+              if (commentValue !== "") {
+                await onAddComment(postId, commentValue, null);
+              }
               commentValue = "";
+              comments = await fetchComments(postId);
               isCommenting = false;
               MixpanelEvent(Events.Add_Comment);
             }}
-            disable={commentValue.length == 0 || isCommenting}
+            disable={commentValue.trim() === "" || isCommenting}
           />
         </div>
       </div>
@@ -425,6 +431,7 @@
                 {comment}
                 {fetchComments}
                 {reloadComments}
+                {getColor}
               />
             {/each}
           </div>
@@ -549,9 +556,9 @@
         </div>
       </div>
     </div>
-    <div class="d-flex gap-1 overflow-scroll file-scroller">
+    <div class="d-flex gap-1 file-scroller flex-wrap">
       {#if tempImageURLsArray.length > 0}
-        <div class="file-scroller mb-2 d-flex gap-1">
+        <div class="file-scroller mb-2 d-flex gap-1 flex-wrap">
           {#each tempImageURLsArray as file, index}
             <div
               class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
@@ -580,8 +587,9 @@
           {/each}
         </div>
       {/if}
+
       {#if uploadFeedback?.file?.value?.length > 0}
-        <div class="file-scroller mb-2 d-flex gap-1">
+        <div class="file-scroller mb-2 d-flex gap-1 flex-wrap">
           {#each uploadFeedback?.file?.value as file, index}
             <div
               class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"

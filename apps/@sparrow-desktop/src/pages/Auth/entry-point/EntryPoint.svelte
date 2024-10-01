@@ -238,9 +238,7 @@
       <div class="divider-line my-4" />
 
       <div>
-        <p
-          class=" cursor-pointer text-center text-secondary-250 sparrow-fs-14 m-1"
-        >
+        <p class=" text-center text-secondary-250 sparrow-fs-14 m-1">
           Version {version}
         </p>
       </div>
