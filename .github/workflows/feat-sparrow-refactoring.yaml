@@ -127,7 +127,7 @@ jobs:
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
-          content=$(<src-tauri/tauri.conf.json)
+          content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
           newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
           echo "$newContent" > src-tauri/tauri.conf.json
         shell: bash
