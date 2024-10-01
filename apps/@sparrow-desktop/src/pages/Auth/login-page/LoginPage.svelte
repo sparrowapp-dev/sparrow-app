@@ -2,9 +2,9 @@
   import { Link, navigate } from "svelte-navigator";
   import { setUser } from "@app/store/auth.store";
   import { jwtDecode } from "@app/utils/jwt";
-  import googleLogo from "@deprecate/assets/googlelogo.svg";
-  import eyeHide from "@deprecate/assets/eye-hide.svg";
-  import eyeShow from "@deprecate/assets/eye-show.svg";
+  import { googleLogoIcon } from "@deprecate/assets";
+  import { eyeHideIcon } from "@deprecate/assets";
+  import { eyeShowIcon } from "@deprecate/assets";
   import { authNavigate, handleLoginValidation } from "./login-page";
   import sparrowicon from "@deprecate/assets/sparrowIcon.svg";
   import { once } from "@tauri-apps/api/event";
@@ -191,9 +191,9 @@
             class="bg-blackColor border-0 eye-icon d-flex align-items-center"
           >
             {#if isPasswordVisible}
-              <img src={eyeShow} alt="eye-show" />
+              <img src={eyeShowIcon} alt="eye-show" />
             {:else}
-              <img src={eyeHide} alt="eye-hie" />
+              <img src={eyeHideIcon} alt="eye-hie" />
             {/if}
           </button>
         </div>
@@ -240,7 +240,7 @@
           style="width: 32px; height:32px"
           class="bg-dark border-0 rounded"
         >
-          <img src={googleLogo} alt="Google Logo" class="w-100 h-100 p-1" />
+          <img src={googleLogoIcon} alt="Google Logo" class="w-100 h-100 p-1" />
         </button>
         <!-- <button
             on:click={() => handleSignInWithProvider("Microsoft")}
