@@ -15,9 +15,9 @@
     "./packages/@sparrow-support"
   ],
   "scripts": {
-    "desktop-dev": "yarn workspace @sparrow/desktop tauri dev",
+    "desktop-start": "yarn workspace @sparrow/desktop tauri dev",
     "desktop-build": "yarn workspace @sparrow/desktop tauri build",
-    "web-dev": "yarn workspace @sparrow/web dev",
+    "web-start": "yarn workspace @sparrow/web dev",
     "web-build": "yarn workspace @sparrow/web build"
   },
   "dependencies": {
