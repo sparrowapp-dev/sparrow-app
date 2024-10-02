@@ -359,7 +359,7 @@
                     {:else if !$tab.property.request?.response?.status}
                       <ResponseDefaultScreen />
                     {:else if $tab.property.request?.response?.status === ResponseStatusCode.ERROR}
-                      <ResponseErrorScreen />
+                      <!-- <ResponseErrorScreen /> -->
                     {:else if $tab.property.request?.response?.status}
                       <div class="h-100 d-flex flex-column">
                         <ResponseStatus
