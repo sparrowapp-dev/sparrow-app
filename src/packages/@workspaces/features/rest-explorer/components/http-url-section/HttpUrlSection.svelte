@@ -14,6 +14,7 @@
   import { UrlInputTheme } from "../../../../common/utils/";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { DiskIcon } from "@library/icons";
+  import type { CancelRequestType } from "@workspaces/common/type/actions";
   let componentClass = "";
   export { componentClass as class };
 
@@ -21,6 +22,7 @@
   export let httpMethod: string;
   export let isSendRequestInProgress: boolean;
   export let onSendButtonClicked: SendRequestType;
+  export let onCancelButtonClicked: CancelRequestType;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
   export let onUpdateRequestMethod: UpdateRequestMethodType;
   export let toggleSaveRequest: (flag: boolean) => void;
@@ -143,6 +145,7 @@
 
   <!-- Send button -->
   <span class="ps-2"></span>
+  {#if !isSendRequestInProgress}
   <DropButton
     title="Send"
     type="default"
@@ -160,6 +163,16 @@
       }
     }}
   />
+  {:else}
+  <DropButton
+  title="Cancel"
+  type="default"
+  disable={!isSendRequestInProgress ? true : false}
+  onClick={() => {
+      onCancelButtonClicked();
+  }}
+/>
+  {/if}
 
   <!-- Switch pane layout button -->
   <!-- <ToggleButton
