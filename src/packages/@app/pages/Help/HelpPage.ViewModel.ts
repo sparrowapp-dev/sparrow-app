@@ -211,15 +211,14 @@ class HelpPageViewModel {
 
     // Retrieve the votes for the post
     const voteList = await this.listVoteUsingPostId(postID);
+
     const votes = voteList?.data?.votes || [];
 
     // Check if the logged-in user has voted (liked) the post
     const isLiked = votes.some((vote) => vote.voter?.email === userInfo.email);
 
-    // Append 'isPostLiked' to the 'data' field in the response object
     response.data.isPostLiked = isLiked;
 
-    // Return the entire response object with the updated 'data' field
     return response;
   };
   /**
@@ -571,7 +570,7 @@ class HelpPageViewModel {
 
   public listVoteUsingPostId = async (postID: string) => {
     if (postID) {
-      const result = await this.cannyService.listVotesPostId(postID);
+      const result = await this.cannyService.listVotesUsingPostId(postID);
       return result;
     }
   };

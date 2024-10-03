@@ -336,7 +336,10 @@
       </div>
     </div>
 
-    <div class="d-flex gap-4 justify-content-between" style=" height:100%; margin-top:51px; ">
+    <div
+      class="d-flex gap-4 justify-content-between"
+      style=" height:100%; margin-top:51px; "
+    >
       <div style="width:129px;  ">
         <div>
           <SortIcon width={"12px"} height={"8px"} />
@@ -445,7 +448,7 @@
                         .map(
                           (word) =>
                             word.charAt(0).toUpperCase() + word.slice(1),
-                        ) // Capitalize the first letter of each word
+                        )
                         .join(" ")}
                     </span>
                   </div>

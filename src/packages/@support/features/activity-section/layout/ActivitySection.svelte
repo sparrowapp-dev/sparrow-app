@@ -168,7 +168,6 @@
   };
 
   const handleCategoryChange = (selectedCategory) => {
-    console.log("This is selectd Category", selectedCategory);
     activityType = selectedCategory;
     applyAllFilters();
   };
@@ -229,7 +228,6 @@
           ]}
           icon={CategoryIcon}
           onclick={(id = "") => {
-            console.log("Inside handle selct click")
             handleCategoryChange(id);
             MixpanelEvent(Events.Activity_Categories_Filter);
           }}

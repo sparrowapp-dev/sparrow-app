@@ -102,7 +102,7 @@
   <Modal
     title={"Add Feedback"}
     type={"dark"}
-    width={"633px"}
+    width={"50%"}
     zIndex={10000}
     isOpen={isExposeFeedbackForm}
     handleModalState={(flag = false) => {
