@@ -9,6 +9,7 @@ export default defineConfig(async () => ({
     alias: {
       src: path.resolve("./src/"),
       "@deprecate": path.resolve("../../packages/@sparrow-deprecate/src/"),
+      "@app": path.resolve("./src/"),
     },
   },
 
