@@ -360,7 +360,7 @@
             type={`primary`}
             loaderSize={13}
             textStyleProp={"font-size:11px;"}
-            buttonStyleProp={`height: 20px; width:35px;`}
+            buttonStyleProp={`height: 20px; width:35px; justify-content:center;`}
             loader={isCommenting}
             onClick={async () => {
               isCommenting = true;

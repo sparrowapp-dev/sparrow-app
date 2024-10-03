@@ -26,7 +26,7 @@
           >
         </div>
 
-        <Upvote upvote={status.score} />
+        <Upvote isHoverRequired={false} upvote={status.score} />
       </div>
     </div>
   {/each}

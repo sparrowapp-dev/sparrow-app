@@ -170,7 +170,7 @@
             loaderSize={13}
             loader={isCommenting}
             textStyleProp={"font-size:11px;"}
-            buttonStyleProp={`height: 20px; width:35px;`}
+            buttonStyleProp={`height: 20px; width:35px; justify-content:center;`}
             onClick={async () => {
               isCommenting = true;
               await onAddComment(postId, commentValue, comment?.id);
