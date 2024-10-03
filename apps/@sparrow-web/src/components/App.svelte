@@ -7,7 +7,6 @@
   import Dashboard from "@app/pages/Dashboard/Dashboard.svelte";
   import { onMount } from "svelte";
   import { user } from "@app/store/auth.store";
-  import { handleShortcuts } from "@app/utils/shortcuts";
 
   export let url = "/";
   let isActiveInternet: boolean = true;
@@ -64,7 +63,6 @@
 </Router>
 
 <Toast />
-<svelte:window on:keydown={handleShortcuts} on:keyup={handleShortcuts} />
 
 <style>
 </style>
