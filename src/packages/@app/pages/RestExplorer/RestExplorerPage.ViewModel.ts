@@ -159,6 +159,8 @@ class RestExplorerViewModel
   });
   private _tab: BehaviorSubject<RequestTab> = new BehaviorSubject({});
 
+  private controller: AbortController | null = null; // Store the AbortController here
+
   public constructor(doc: TabDocument) {
     if (doc?.isActive) {
       setTimeout(() => {
@@ -664,6 +666,10 @@ class RestExplorerViewModel
    * @description send request
    */
   public sendRequest = async (environmentVariables = []) => {
+    // Create an AbortController for the request
+    this.controller = new AbortController();
+    const { signal } = this.controller; // Extract the signal for the request
+
     this.updateRequestState({ isSendRequestInProgress: true });
     const start = Date.now();
 
@@ -671,7 +677,7 @@ class RestExplorerViewModel
       this._tab.getValue().property.request,
       environmentVariables.filtered || [],
     );
-    makeHttpRequestV2(...decodeData)
+    makeHttpRequestV2(...decodeData, signal)
       .then((response) => {
         if (response.isSuccessful === false) {
           this.updateResponse({
@@ -720,8 +726,15 @@ class RestExplorerViewModel
         }
       })
       .catch((error) => {
-        this.updateRequestState({ isSendRequestInProgress: false });
+        // Handle cancellation or other errors
+        if (error.name === "AbortError") {
+          this.updateRequestState({ isSendRequestInProgress: false });
+          return;
+        } else {
+          console.error(error);
+        }
 
+        this.updateRequestState({ isSendRequestInProgress: false });
         this.updateResponse({
           body: "",
           headers: [],
@@ -730,6 +743,15 @@ class RestExplorerViewModel
           size: 0,
         });
       });
+  };
+
+  public cancelRequest = (): void => {
+    if (this.controller) {
+      this.controller.abort(); // Abort the request using the stored controller
+      this.updateRequestState({ isSendRequestInProgress: false }); // Update the state when canceling
+      console.log("Request cancelled");
+    }
+    return;
   };
 
   /**
