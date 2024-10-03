@@ -7,13 +7,8 @@ import {
 export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
-  // {
-  // key: "tabId",
-  // fields: ["timestamp"],
-  // separator: "|",
-  // },
   type: "object",
-  version: 13,
+  version: 0,
   properties: {
     tabId: {
       // ---- RxDocumentId

@@ -34,10 +34,6 @@ import {
   type EnvironmentDocType,
 } from "../models/environment.model";
 import {
-  environmentTabSchema,
-  type EnvironmentTabDocType,
-} from "../models/environment-tab.model";
-import {
   windowSettingsSchema,
   type WindowSettingsDocType,
 } from "../models/window-settings-model";
@@ -73,8 +69,6 @@ export type TeamDocument = RxDocument<TeamDocType>;
 export type TeamContainer = RxCollection<TeamDocType>;
 export type EnvironmentContainer = RxCollection<EnvironmentDocType>;
 export type EnvironmentDocument = RxDocument<EnvironmentDocType>;
-export type EnvironmentTabContainer = RxCollection<EnvironmentTabDocType>;
-export type EnvironmentTabDocument = RxDocument<EnvironmentTabDocType>;
 export type GithubDocument = RxDocument<GithubRepoDocType>;
 export type ReleaseDocument = RxDocument<ReleaseDocType>;
 export type GuideDocumnet = RxDocument<GuideDocType>;
@@ -130,127 +124,12 @@ export class RxDB {
     await this.rxdb.addCollections({
       workspace: {
         schema: workspaceSchema,
-        migrationStrategies: {
-          // database  migration functions
-          1: function (oldDoc: WorkspaceDocument) {
-            return oldDoc;
-          },
-          2: function (oldDoc: WorkspaceDocument) {
-            return oldDoc;
-          },
-          3: function (oldDoc: WorkspaceDocument) {
-            return oldDoc;
-          },
-          4: function (oldDoc: WorkspaceDocument) {
-            return oldDoc;
-          },
-          5: function (oldDoc: WorkspaceDocument) {
-            return oldDoc;
-          },
-          6: function (oldDoc: WorkspaceDocument) {
-            return oldDoc;
-          },
-          7: function (oldDoc: WorkspaceDocument) {
-            return oldDoc;
-          },
-          8: function (oldDoc: WorkspaceDocument) {
-            return oldDoc;
-          },
-          9: function (oldDoc: WorkspaceDocument) {
-            return oldDoc;
-          },
-        },
       },
       tab: {
         schema: tabSchema,
-        migrationStrategies: {
-          // database  migration functions
-          1: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          2: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          3: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          4: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          5: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          6: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          7: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          8: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          9: function (oldDoc: TabDocument) {
-            if (oldDoc?.property?.request?.state) {
-              oldDoc.property.request.state.isHeaderBulkEditActive = false;
-              oldDoc.property.request.state.isParameterBulkEditActive = false;
-            }
-            return oldDoc;
-          },
-          10: function (oldDoc: TabDocument) {
-            const ai = {
-              conversations: [],
-              prompt: "",
-              threadId: "",
-            };
-            if (oldDoc?.property?.request) {
-              oldDoc.property.request.ai = ai;
-            }
-            if (oldDoc?.property?.request?.state) {
-              oldDoc.property.request.state.isChatbotActive = false;
-              oldDoc.property.request.state.isChatbotSuggestionsActive = true;
-              oldDoc.property.request.state.isChatbotGeneratingResponse = false;
-              oldDoc.property.request.state.isDocGenerating = false;
-              oldDoc.property.request.state.isDocAlreadyGenerated = false;
-            }
-            return oldDoc;
-          },
-          11: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          12: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          13: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-        },
       },
       collection: {
         schema: collectionSchema,
-        migrationStrategies: {
-          // database  migration functions
-          1: function (oldDoc: CollectionDocument) {
-            return oldDoc;
-          },
-          2: function (oldDoc: CollectionDocument) {
-            return oldDoc;
-          },
-          3: function (oldDoc: CollectionDocument) {
-            return oldDoc;
-          },
-          4: function (oldDoc: CollectionDocument) {
-            return oldDoc;
-          },
-          5: function (oldDoc: CollectionDocument) {
-            return oldDoc;
-          },
-          6: function (oldDoc: CollectionDocument) {
-            return oldDoc;
-          },
-          7: function (oldDoc: CollectionDocument) {
-            return oldDoc;
-          },
-        },
       },
       activesidebartab: {
         schema: activeSideBarTabSchema,
@@ -260,51 +139,12 @@ export class RxDB {
       },
       team: {
         schema: teamSchema,
-        migrationStrategies: {
-          //   // database  migration functions
-          1: function (oldDoc: TeamDocument) {
-            return oldDoc;
-          },
-          2: function (oldDoc: TeamDocument) {
-            return oldDoc;
-          },
-          3: function (oldDoc: TeamDocument) {
-            return oldDoc;
-          },
-        },
       },
       environment: {
         schema: environmentSchema,
-        migrationStrategies: {
-          //   // database  migration functions
-          1: function (oldDoc: EnvironmentDocument) {
-            return oldDoc;
-          },
-          2: function (oldDoc: EnvironmentDocument) {
-            return oldDoc;
-          },
-          3: function (oldDoc: EnvironmentDocument) {
-            return oldDoc;
-          },
-        },
       },
       testflow: {
         schema: TestflowSchema,
-      },
-      environmenttab: {
-        schema: environmentTabSchema,
-        migrationStrategies: {
-          //   // database  migration functions
-          1: function (oldDoc: EnvironmentTabDocument) {
-            return oldDoc;
-          },
-          2: function (oldDoc: EnvironmentTabDocument) {
-            return oldDoc;
-          },
-          3: function (oldDoc: EnvironmentTabDocument) {
-            return oldDoc;
-          },
-        },
       },
       githubrepo: {
         schema: githubRepoSchema,

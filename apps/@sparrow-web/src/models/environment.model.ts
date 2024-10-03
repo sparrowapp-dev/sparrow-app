@@ -8,7 +8,7 @@ export const environmentSchemaLiteral = {
   title: "environment",
   primaryKey: "id",
   type: "object",
-  version: 3,
+  version: 0,
   properties: {
     id: {
       type: "string",
