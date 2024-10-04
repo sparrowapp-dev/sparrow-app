@@ -765,6 +765,9 @@ class RestExplorerViewModel
       if (data) {
         abortController = data.abortController;
       }
+      // Delete the tabId from the map
+      restApiDataMap.delete(progressiveTab.tabId);
+
       return restApiDataMap;
     });
     if (abortController) {

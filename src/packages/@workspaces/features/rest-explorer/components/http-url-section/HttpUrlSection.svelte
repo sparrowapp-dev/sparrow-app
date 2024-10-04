@@ -15,6 +15,7 @@
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { DiskIcon } from "@library/icons";
   import type { CancelRequestType } from "@workspaces/common/type/actions";
+  import { Button } from "@library/ui";
   let componentClass = "";
   export { componentClass as class };
 
@@ -149,7 +150,6 @@
     <DropButton
       title="Send"
       type="default"
-      disable={isSendRequestInProgress ? true : false}
       onClick={() => {
         if (requestUrl === "") {
           const codeMirrorElement = document.querySelector(
@@ -166,8 +166,7 @@
   {:else}
     <DropButton
       title="Cancel"
-      type=""
-      disable={!isSendRequestInProgress ? true : false}
+      type="dark"
       onClick={() => {
         onCancelButtonClicked();
       }}
