@@ -770,7 +770,6 @@ class RestExplorerViewModel
     if (abortController) {
       abortController.abort(); // Abort the request using the stored controller
       this.updateRequestState({ isSendRequestInProgress: false }); // Update the state when canceling
-      console.log("Request cancelled");
     }
     return;
   };

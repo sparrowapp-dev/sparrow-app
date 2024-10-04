@@ -486,22 +486,13 @@ const makeHttpRequestV2 = async (
       const responseBody = JSON.parse(data);
       const apiResponse: Response = JSON.parse(responseBody.body) as Response;
       console.table(apiResponse);
-      let apiStatus = "400";
-      if (
-        typeof apiResponse.status === "string" &&
-        apiResponse.status.length > 0
-      ) {
-        apiStatus = apiResponse.status.split(" ")[0];
-      } else {
-        console.error("Invalid or missing status");
-      }
 
       const appInsightData = {
         id: uuidv4(),
         name: "RPC Duration Metric",
         duration,
-        success: parseInt(apiStatus) === 200 ? true : false,
-        responseCode: parseInt(apiStatus),
+        success: true,
+        responseCode: parseInt(apiResponse.status),
         properties: {
           source: "frontend",
           type: "RPC_HTTP",
@@ -510,7 +501,6 @@ const makeHttpRequestV2 = async (
       appInsights.trackDependencyData(appInsightData);
       return success(apiResponse);
     } catch (e) {
-      console.error(e);
       throw new Error("Error parsing response");
     }
   } catch (e) {
@@ -518,6 +508,17 @@ const makeHttpRequestV2 = async (
       throw new DOMException("Request was aborted", "AbortError");
     }
     console.error(e);
+    appInsights.trackDependencyData({
+      id: uuidv4(),
+      name: "RPC Duration Metric",
+      duration: performance.now() - startTime,
+      success: false,
+      responseCode: 400,
+      properties: {
+        source: "frontend",
+        type: "RPC_HTTP",
+      },
+    });
     throw new Error("Error with the request");
   }
 };
