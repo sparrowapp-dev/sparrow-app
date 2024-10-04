@@ -14,6 +14,8 @@
   import { UrlInputTheme } from "../../../../common/utils/";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { DiskIcon } from "@library/icons";
+  import type { CancelRequestType } from "@workspaces/common/type/actions";
+  import { Button } from "@library/ui";
   let componentClass = "";
   export { componentClass as class };
 
@@ -21,6 +23,7 @@
   export let httpMethod: string;
   export let isSendRequestInProgress: boolean;
   export let onSendButtonClicked: SendRequestType;
+  export let onCancelButtonClicked: CancelRequestType;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
   export let onUpdateRequestMethod: UpdateRequestMethodType;
   export let toggleSaveRequest: (flag: boolean) => void;
@@ -143,23 +146,32 @@
 
   <!-- Send button -->
   <span class="ps-2"></span>
-  <DropButton
-    title="Send"
-    type="default"
-    disable={isSendRequestInProgress ? true : false}
-    onClick={() => {
-      if (requestUrl === "") {
-        const codeMirrorElement = document.querySelector(
-          ".input-url .cm-editor",
-        );
-        if (codeMirrorElement) {
-          codeMirrorElement.classList.add("url-red-border");
+  {#if !isSendRequestInProgress}
+    <DropButton
+      title="Send"
+      type="default"
+      onClick={() => {
+        if (requestUrl === "") {
+          const codeMirrorElement = document.querySelector(
+            ".input-url .cm-editor",
+          );
+          if (codeMirrorElement) {
+            codeMirrorElement.classList.add("url-red-border");
+          }
+        } else {
+          onSendButtonClicked(environmentVariables);
         }
-      } else {
-        onSendButtonClicked(environmentVariables);
-      }
-    }}
-  />
+      }}
+    />
+  {:else}
+    <DropButton
+      title="Cancel"
+      type="dark"
+      onClick={() => {
+        onCancelButtonClicked();
+      }}
+    />
+  {/if}
 
   <!-- Switch pane layout button -->
   <!-- <ToggleButton

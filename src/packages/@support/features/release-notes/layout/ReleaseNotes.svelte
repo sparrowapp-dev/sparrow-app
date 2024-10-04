@@ -472,7 +472,7 @@
                   on:click={async () => {
                     const version =
                       selectedEvent.title.match(/v\d+\.\d+\.\d+/)[0];
-                    const releaseNoteUrl = `${externalSparrowRealseNote}${version}`;
+                    const releaseNoteUrl = `${externalSparrowRealseNote}/sparrow-app/releases/tag/${version}`;
                     await open(releaseNoteUrl);
                     MixpanelEvent(Events.Github_Updates);
                   }}

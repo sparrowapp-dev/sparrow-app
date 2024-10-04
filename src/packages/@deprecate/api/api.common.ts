@@ -473,73 +473,67 @@ const makeHttpRequestV2 = async (
   headers: string,
   body: string,
   request: string,
+  signal: AbortSignal,
 ) => {
-  // create a race condition between the timeout and the api call
   console.table({ url, method, headers, body, request });
   const startTime = performance.now();
-  return Promise.race([
-    timeout(apiTimeOut),
-    // Invoke communication
-    invoke("make_http_request_v2", {
+
+  try {
+    const data = await invoke("make_http_request_v2", {
       url,
       method,
       headers,
       body,
       request,
-    }),
-  ])
-    .then(async (data: string) => {
-      const endTime = performance.now();
-      const duration = endTime - startTime;
-      try {
-        const responseBody = JSON.parse(data);
-        const apiResponse: Response = JSON.parse(responseBody.body) as Response;
-        console.table(apiResponse);
-        appInsights.trackDependencyData({
-          id: uuidv4(),
-          name: "RPC Duration Metric",
-          duration,
-          success: true,
-          responseCode: parseInt(apiResponse.status),
-          properties: {
-            source: "frontend",
-            type: "RPC_HTTP",
-          },
-        });
-        return success(apiResponse);
-      } catch (e) {
-        console.error(e);
-        appInsights.trackDependencyData({
-          id: uuidv4(),
-          name: "RPC Duration Metric",
-          duration,
-          success: false,
-          responseCode: 400,
-          properties: {
-            source: "frontend",
-            type: "RPC_HTTP",
-          },
-        });
-        return error("error");
-      }
-    })
-    .catch((e) => {
-      const endTime = performance.now();
-      const duration = endTime - startTime;
-      appInsights.trackDependencyData({
+    });
+
+    // Handle the response and update UI accordingly
+    if (signal.aborted) {
+      throw new Error(); // Ignore response if request was cancelled
+    }
+
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+
+    try {
+      const responseBody = JSON.parse(data);
+      const apiResponse: Response = JSON.parse(responseBody.body) as Response;
+      console.table(apiResponse);
+
+      const appInsightData = {
         id: uuidv4(),
         name: "RPC Duration Metric",
         duration,
-        success: false,
-        responseCode: 400,
+        success: true,
+        responseCode: parseInt(apiResponse.status),
         properties: {
           source: "frontend",
           type: "RPC_HTTP",
         },
-      });
-      console.error(e);
-      return error("error");
+      };
+      appInsights.trackDependencyData(appInsightData);
+      return success(apiResponse);
+    } catch (e) {
+      throw new Error("Error parsing response");
+    }
+  } catch (e) {
+    if (signal.aborted) {
+      throw new DOMException("Request was aborted", "AbortError");
+    }
+    console.error(e);
+    appInsights.trackDependencyData({
+      id: uuidv4(),
+      name: "RPC Duration Metric",
+      duration: performance.now() - startTime,
+      success: false,
+      responseCode: 400,
+      properties: {
+        source: "frontend",
+        type: "RPC_HTTP",
+      },
     });
+    throw new Error("Error with the request");
+  }
 };
 
 export {
