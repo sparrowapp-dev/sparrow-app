@@ -146,32 +146,32 @@
   <!-- Send button -->
   <span class="ps-2"></span>
   {#if !isSendRequestInProgress}
-  <DropButton
-    title="Send"
-    type="default"
-    disable={isSendRequestInProgress ? true : false}
-    onClick={() => {
-      if (requestUrl === "") {
-        const codeMirrorElement = document.querySelector(
-          ".input-url .cm-editor",
-        );
-        if (codeMirrorElement) {
-          codeMirrorElement.classList.add("url-red-border");
+    <DropButton
+      title="Send"
+      type="default"
+      disable={isSendRequestInProgress ? true : false}
+      onClick={() => {
+        if (requestUrl === "") {
+          const codeMirrorElement = document.querySelector(
+            ".input-url .cm-editor",
+          );
+          if (codeMirrorElement) {
+            codeMirrorElement.classList.add("url-red-border");
+          }
+        } else {
+          onSendButtonClicked(environmentVariables);
         }
-      } else {
-        onSendButtonClicked(environmentVariables);
-      }
-    }}
-  />
+      }}
+    />
   {:else}
-  <DropButton
-  title="Cancel"
-  type="default"
-  disable={!isSendRequestInProgress ? true : false}
-  onClick={() => {
-      onCancelButtonClicked();
-  }}
-/>
+    <DropButton
+      title="Cancel"
+      type=""
+      disable={!isSendRequestInProgress ? true : false}
+      onClick={() => {
+        onCancelButtonClicked();
+      }}
+    />
   {/if}
 
   <!-- Switch pane layout button -->
