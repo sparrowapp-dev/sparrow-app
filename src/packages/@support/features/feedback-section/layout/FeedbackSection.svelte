@@ -80,9 +80,9 @@
 
   export let onUpdateFeedback;
 
-  let feedbackType = "";
+  let feedbackType = FeedbackType.ALL_CATEGORY;
 
-  let feedbackStatusType = "";
+  let feedbackStatusType = FeedbackStatusType.ALL_STATUS;
 
   let searchTerm = "";
 
@@ -271,7 +271,7 @@
             bodyTheme={"violet"}
             placeholderText={"Categories"}
             menuItem={"v2"}
-            headerFontSize={"10px"}
+            headerFontSize={"12px"}
             isDropIconFilled={true}
             position={"absolute"}
           />
@@ -327,7 +327,7 @@
             headerTheme={"violet2"}
             bodyTheme={"violet"}
             menuItem={"v2"}
-            headerFontSize={"10px"}
+            headerFontSize={"12px"}
             isDropIconFilled={true}
             position={"absolute"}
             maxBodyHeight={"205px"}

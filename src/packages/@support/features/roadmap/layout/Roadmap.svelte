@@ -1,7 +1,13 @@
 <script>
   import { SearchIcon } from "$lib/assets/icons";
   import { Select } from "@library/forms";
-  import { CategoryIcon, CrossIcon, StackIcon } from "@library/icons";
+  import {
+    CategoryIcon,
+    CrossIcon,
+    MessageDisabledIcon,
+    MessageIcon,
+    StackIcon,
+  } from "@library/icons";
   import { Loader } from "@library/ui";
   import HelpInfoCard from "@support/common/components/HelpInfo-Card/HelpInfoCard.svelte";
   import { FeedbackType } from "@support/common/types";
@@ -209,28 +215,37 @@
                 .join(" ")}
             </div>
             <div
-              class=""
               style="background-color: var(--bg-secondary-800); padding:12px;"
             >
-              {#if (filteredFeedbacks?.length == 0 && searchTerm.length > 0) || filteredFeedbacks?.length == 0}
+              {#if filteredFeedbacks?.length == 0 && searchTerm === ""}
+                <div
+                  class=""
+                  style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
+                >
+                  <MessageDisabledIcon
+                    height={"30px"}
+                    width={"30px"}
+                    color={"var(--icon-primary-300)"}
+                  />
+
+                  <p
+                    class="mx-1 text-fs-14 mb-0 text-center"
+                    style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                  >
+                    Share your feedback and check back here for updates.
+                  </p>
+                </div>
+              {:else if filteredFeedbacks.length == 0 && searchTerm.length > 0 }
                 <p
                   class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
                   style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
                 >
-                  No Result Found.
-                </p>{:else}
+                  No results found.
+                </p>
+              {:else}
                 <HelpInfoCard {setPostId} status={filteredFeedbacks} />
               {/if}
             </div>
-
-            {#if filteredFeedbackStatus.length == 0 && searchTerm.length >= 0}
-              <p
-                class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
-                style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
-              >
-                No results found.
-              </p>
-            {/if}
           </div>
         {/each}
       </div>

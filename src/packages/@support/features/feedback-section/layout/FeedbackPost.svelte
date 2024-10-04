@@ -5,6 +5,7 @@
     AttachmentIcon,
     CategoryIcon,
     CrossIcon,
+    MessageIcon,
     SortIcon,
     StatusIcon,
   } from "@library/icons";
@@ -437,12 +438,23 @@
           </div>
         </div>
       {:else}
-        <p
-          class="mx-1 text-fs-12 mb-0 text-center"
-          style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+        <div
+          class="d-flex"
+          style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
         >
-          No Comments Yet
-        </p>
+          <MessageIcon
+            height={"30px"}
+            width={"30px"}
+            color={"var(--icon-primary-300)"}
+          />
+
+          <p
+            class="mx-1 text-fs-14 mb-0 text-center"
+            style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+          >
+            No comments yet
+          </p>
+        </div>
       {/if}
     </div>
   {/if}

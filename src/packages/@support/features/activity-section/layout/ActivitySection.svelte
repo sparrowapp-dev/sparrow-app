@@ -176,14 +176,6 @@
     activityStatusType = selectedStatus;
     applyAllFilters();
   };
-
-  // You can remove these individual filter functions as they're now incorporated into applyAllFilters
-  // filterPosts();
-  // filterComments();
-  // filterLikedPosts();
-  // sortPosts();
-  // sortComments();
-  // sortLikedPosts();
 </script>
 
 <div class="container" style="padding: 20px;">
@@ -247,7 +239,7 @@
           headerTheme={"violet2"}
           bodyTheme={"violet"}
           menuItem={"v2"}
-          headerFontSize={"10px"}
+          headerFontSize={"12px"}
           isDropIconFilled={true}
           position={"absolute"}
         />
@@ -283,7 +275,7 @@
           headerTheme={"violet2"}
           bodyTheme={"violet"}
           menuItem={"v2"}
-          headerFontSize={"10px"}
+          headerFontSize={"12px"}
           isDropIconFilled={true}
           position={"absolute"}
         />
@@ -398,7 +390,10 @@
                           </div>
                         </div>
                         <div style="">
-                          <UpvoteIcon upvote={post?.score} />
+                          <UpvoteIcon
+                            isHoverRequired={false}
+                            upvote={post?.score}
+                          />
                         </div>
                       </div>
 
@@ -577,7 +572,11 @@
                           </div>
                         </div>
                         <div>
-                          <UpvoteIcon isPostLiked={true} upvote={post?.score} />
+                          <UpvoteIcon
+                            isHoverRequired={false}
+                            isPostLiked={true}
+                            upvote={post?.score}
+                          />
                         </div>
                       </div>
 
