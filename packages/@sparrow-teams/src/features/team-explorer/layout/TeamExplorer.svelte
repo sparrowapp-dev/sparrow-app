@@ -350,7 +350,7 @@
             {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
               <div class="pt-2">
                 <div
-                  class={`d-flex search-input-container rounded py-2 px-2 mb-4`}
+                  class={`d-flex search-input-container rounded py-2 px-2 align-items-center mb-4`}
                 >
                   <SearchIcon
                     width={14}
