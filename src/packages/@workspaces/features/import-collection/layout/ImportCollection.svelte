@@ -85,7 +85,7 @@
       ) {
         isValidClientURL = true;
         const response = await _collectionService.validateImportCollectionURL(
-          importData.replace("localhost", "127.0.0.1") + "-json",
+          importData.replace("localhost", "127.0.0.1"),
         );
         if (response?.data?.status === ResponseStatusCode.OK) {
           try {
@@ -280,7 +280,7 @@
       isValidClientURL &&
       isValidServerURL
     ) {
-      const importUrl = importData.replace("localhost", "127.0.0.1") + "-json";
+      const importUrl = importData.replace("localhost", "127.0.0.1");
 
       const response =
         await _collectionService.validateImportCollectionURL(importUrl);
