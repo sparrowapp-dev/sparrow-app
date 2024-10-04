@@ -322,7 +322,6 @@ const disconnectWebSocket = async (tab_id: string) => {
         webSocketListener.update((webSocketListenerMap) => {
           listener = webSocketListenerMap.get(tab_id);
           if (listener) {
-            console.log("listener in disconnect", listener);
             listener();
           }
           return webSocketListenerMap;
