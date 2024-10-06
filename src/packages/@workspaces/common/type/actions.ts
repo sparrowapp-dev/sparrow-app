@@ -69,6 +69,8 @@ export interface ClearResponse {
   clearResponse: ClearResponseType;
 }
 export type SendRequestType = () => Promise<void>;
+
+export type CancelRequestType = () => Promise<void>;
 export interface SendRequest {
   sendRequest: SendRequestType;
 }

@@ -67,6 +67,7 @@
     SendingApiRequest,
   } from "@workspaces/common/constants";
   import { ResponseStatusCode } from "$lib/utils/enums";
+  import type { CancelRequestType } from "@workspaces/common/type/actions";
 
   export let tab: Observable<RequestTab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -74,6 +75,7 @@
   export let requestAuthParameter: Observable<KeyValue>;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
   export let onSendRequest: SendRequestType;
+  export let onCancelRequest: CancelRequestType;
   export let onUpdateRequestMethod: UpdateRequestMethodType;
   export let onUpdateRequestParams: UpdateParamsType;
   export let onUpdateRequestName: UpdateRequestNameType;
@@ -192,6 +194,7 @@
         isSendRequestInProgress={$tab.property.request?.state
           ?.isSendRequestInProgress}
         onSendButtonClicked={onSendRequest}
+        onCancelButtonClicked={onCancelRequest}
         {onUpdateEnvironment}
         {environmentVariables}
         {onUpdateRequestUrl}
