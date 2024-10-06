@@ -4,6 +4,7 @@
     ActivityIcon,
     CommentIcon,
     LikeIcon,
+    MessageIcon,
     SortIcon,
     TableChart,
   } from "@library/icons";
@@ -32,6 +33,7 @@
   import { FormatTime } from "@common/utils/formatTime";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   import ArrowOutward from "@library/icons/ArrowOutward.svelte";
+  import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
@@ -66,6 +68,10 @@
     userInfo = value;
   });
 
+  let userPosts;
+  let userComments;
+  let userLikedPosts;
+
   const getAllData = async () => {
     try {
       loading = true;
@@ -82,6 +88,29 @@
       comments = commentsData?.data?.comments || [];
       likedPosts = likedPostsData?.data?.votes || [];
 
+      userPosts = posts.filter((post) => {
+        if (post.author.email.toLowerCase() === userInfo.email.toLowerCase())
+          return true;
+        return false;
+      });
+
+      userComments = comments.filter((post) => {
+        if (post.author.email.toLowerCase() === userInfo.email.toLowerCase())
+          return true;
+        return false;
+      });
+
+      userLikedPosts = likedPosts.filter((post) => {
+        if (post.voter.email.toLowerCase() === userInfo.email.toLowerCase())
+          return true;
+        return false;
+      });
+
+      hasActivity =
+        userPosts.length == 0 &&
+        userLikedPosts.length == 0 &&
+        userComments.length == 0;
+
       applyAllFilters();
       loading = false;
     } catch (error) {
@@ -93,35 +122,19 @@
     await getAllData();
   });
 
-  const applyAllFilters = () => {
-    let tempPosts = posts
-      .filter((post) => {
-        if (post.author.email.toLowerCase() === userInfo.email.toLowerCase())
-          return true;
-        return false;
-      })
-      .filter((post) =>
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()),
-      );
-    let tempComments = comments
-      .filter((post) => {
-        if (post.author.email.toLowerCase() === userInfo.email.toLowerCase())
-          return true;
-        return false;
-      })
-      .filter((comment) =>
-        comment.value.toLowerCase().includes(searchTerm.toLowerCase()),
-      );
+  let hasActivity = false;
 
-    let tempLikedPosts = likedPosts
-      .filter((post) => {
-        if (post.voter.email.toLowerCase() === userInfo.email.toLowerCase())
-          return true;
-        return false;
-      })
-      .filter((vote) =>
-        vote.post.title.toLowerCase().includes(searchTerm.toLowerCase()),
-      );
+  const applyAllFilters = () => {
+    let tempPosts = userPosts.filter((post) =>
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+    let tempComments = userComments.filter((comment) =>
+      comment.value.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+
+    let tempLikedPosts = userLikedPosts.filter((vote) =>
+      vote.post.title.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
 
     if (activityType !== ActivityType.ALL_CATEGORIES) {
       tempPosts = tempPosts.filter(
@@ -335,7 +348,25 @@
         </div>
       </div>
 
-      {#if loading}
+      {#if hasActivity}
+        <div
+          class="h-100 w-100 d-flex justify-content-center align-items-center"
+          style=";"
+        >
+          <div
+            class="d-flex"
+            style="flex-direction:column; align-items: center;"
+          >
+            <SparrowLogo />
+            <p
+              class="mx-1 text-fs-14 mb-0 text-center mt-5"
+              style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+            >
+              No activity yet. Start engaging to see it here
+            </p>
+          </div>
+        </div>
+      {:else if loading}
         <div
           style="display: flex; justify-content: center; align-items: center; width: 100%; height: 50vh;"
         >
@@ -424,12 +455,23 @@
                   {/each}
                 </ul>
               {:else}
-                <p
-                  class="mx-1 text-fs-12 mb-0 text-center"
-                  style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                <div
+                  class=""
+                  style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
                 >
-                  No Feedback yet.
-                </p>
+                  <MessageIcon
+                    height={"30px"}
+                    width={"30px"}
+                    color={"var(--icon-primary-300)"}
+                  />
+
+                  <p
+                    class="mx-1 text-fs-14 mb-0 text-center mt-3"
+                    style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                  >
+                    No upvoted posts yet
+                  </p>
+                </div>
 
                 <hr class="mt-4" style="" />
               {/if}
@@ -513,12 +555,23 @@
                   {/each}
                 </ul>
               {:else}
-                <p
-                  class="mx-1 text-fs-12 mb-0 text-center"
-                  style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                <div
+                  class=""
+                  style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
                 >
-                  No Comment Yet.
-                </p>
+                  <MessageIcon
+                    height={"30px"}
+                    width={"30px"}
+                    color={"var(--icon-primary-300)"}
+                  />
+
+                  <p
+                    class="mx-1 text-fs-14 mb-0 text-center mt-3"
+                    style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                  >
+                    No comments yet
+                  </p>
+                </div>
               {/if}
 
               <hr class="mt-4" style="" />
@@ -607,12 +660,23 @@
                   {/each}
                 </ul>
               {:else}
-                <p
-                  class="mx-1 text-fs-12 mb-0 text-center mt-4 mb-4"
-                  style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                <div
+                  class=""
+                  style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
                 >
-                  No Upvoted Post yet.
-                </p>
+                  <MessageIcon
+                    height={"30px"}
+                    width={"30px"}
+                    color={"var(--icon-primary-300)"}
+                  />
+
+                  <p
+                    class="mx-1 text-fs-14 mb-0 text-center mt-3"
+                    style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                  >
+                    No upvoted posts yet
+                  </p>
+                </div>
               {/if}
             </div>
           {/if}

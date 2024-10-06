@@ -1,9 +1,11 @@
 <script>
-  import { AttachmentIcon } from "@library/icons";
+  import { AttachmentIcon, CrossIcon } from "@library/icons";
   import { Button, IconFallback } from "@library/ui";
-  import { CommentCard } from "@support/common/components";
+  import { Attachment, CommentCard } from "@support/common/components";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { ImageModal } from "@library/ui/image-modal";
+    import { notifications } from "@library/ui/toast/Toast";
 
   /**
    * @description - The current comment being added or modified by the user.
@@ -45,6 +47,14 @@
 
   const isAuthor = userInfo?.email === comment?.author?.email;
 
+  let currentImage = "";
+
+  let isImageOpen = false;
+
+  let inputId = "reply-input2";
+
+
+
   /**
    * Formats a given date into a human-readable "time ago" string.
    * @param  date - The date to format.
@@ -68,12 +78,96 @@
     }
   };
 
+
+  let uploadReplyAttachment = {
+    file: {
+      value: [],
+    },
+  };
+
   /**
    * Updates the comment value with the input from the event.
    * @param {Event} e - The input event.
    */
   const handleAddCommentInput = (e) => {
     commentValue = e.target.value;
+  };
+
+  const handleInputAttachment = (e) => {
+    const errorMessage =
+      "Failed to upload the file. You are allowed to upload only 5 files per feedback.";
+    const sizeExceededMessage =
+      "One or more files exceed the size limit of 2MB.";
+    const typeErrorMessage =
+      "Only image files (jpg, jpeg, png, svg) are allowed.";
+    const maxFilesExceededMessage = "You can upload up to 5 files only.";
+
+    // Safely gather selected files
+    let newFiles = [
+      ...(uploadReplyAttachment.file?.value || []),
+      ...(e?.target?.files || e?.dataTransfer?.files || []),
+    ];
+
+    const maxImageSize = 2097152; // 2MB
+    let isSizeExceeded = false;
+    let isInvalidType = false;
+
+    // Filter valid image files
+    const validFiles = newFiles.filter((file) => {
+      const fileExtension = file.name?.split(".").pop().toLowerCase();
+      if (!fileExtension) return false; // Ignore files without extension
+
+      // Check file type
+      if (["jpg", "jpeg", "png", "svg"].includes(fileExtension)) {
+        // Check file size
+        if (file.size > maxImageSize) {
+          isSizeExceeded = true;
+          return false;
+        }
+        return true;
+      } else {
+        isInvalidType = true;
+        return false;
+      }
+    });
+
+    // Total number of valid files already uploaded
+    let currentFileCount = uploadReplyAttachment.file?.value?.length || 0;
+    let newFileCount = validFiles.length;
+
+    // Prevent adding more than 5 files in total
+    if (currentFileCount + newFileCount > 5) {
+      validFiles.length = 5 - currentFileCount; // Adjust the number of files to keep the total <= 5
+      notifications.error(maxFilesExceededMessage);
+    }
+
+    // Error notifications
+    if (isSizeExceeded) {
+      notifications.error(sizeExceededMessage);
+    }
+    if (isInvalidType) {
+      notifications.error(typeErrorMessage);
+    }
+
+    // Update the feedback files if no critical errors
+    if (!isSizeExceeded && !isInvalidType) {
+      uploadReplyAttachment.file.value = [
+        ...(uploadReplyAttachment.file?.value || []),
+        ...validFiles,
+      ];
+    }
+
+    console.log(
+      "This is image upload attachment array",
+      uploadReplyAttachment.file.value,
+    );
+  };
+
+  const removeCommentAttachment = (index) => {
+    uploadReplyAttachment.file.value =
+      uploadReplyAttachment.file.value.filter(
+        (_i, idx) => idx !== index, // Corrected: Use 'idx' to check against the index
+      );
   };
 </script>
 
@@ -89,7 +183,7 @@
   <div class="comment-content">
     <div class="comment-author text-fs-14 mt-1">
       {comment.author.name || ""}
-      {#if comment.value === "" || comment.author?.isAdmin === true}
+      {#if comment.value === "" && comment.author?.isAdmin === true}
         <span
           class="text-fs-14"
           style="marign-start: 4px; color: var(--text-secondary-150); font-weight: 400;"
@@ -119,6 +213,38 @@
         </p>
       {/if}
     </div>
+
+    <div>
+      <div>
+        {#each comment?.imageURLs as commentImage}
+          <img
+            on:click={() => {
+              isImageOpen = true;
+              currentImage = commentImage;
+            }}
+            src={commentImage}
+            alt="post image"
+            style="display:inline; height: 100px; margin-top: 20px; border-radius: 2px; margin:10px;   object-fit: contain;   max-width: 100%; "
+          />
+          <ImageModal
+            isOpen={isImageOpen}
+            type={"dark"}
+            width={"40%"}
+            zIndex={10000}
+            handleModalState={(flag = false) => {
+              isImageOpen = flag;
+            }}
+          >
+            <img
+              src={currentImage}
+              alt="post image"
+              style="width:100%; height:100%;"
+            />
+          </ImageModal>
+        {/each}
+      </div>
+    </div>
+
     <div class="comment-meta">
       <div class="comment-moreinfo">
         <span class="comment-time">{timeAgo(comment.created)}</span>
@@ -143,47 +269,90 @@
 
     {#if isReplying}
       <div
-        class={`d-flex align-items-center search-input-container  px-2 mb-2`}
+        class={`d-flex align-items-start search-input-container  mb-5 mt-3 p-1 px-2`}
+        style=" display:felx; flex-direction:column;"
       >
-        <input
-          type="text"
-          id="search-input"
-          class={`bg-transparent w-100 border-0 my-auto`}
-          placeholder="Leave a comment"
-          on:input={(e) => {
-            handleAddCommentInput(e);
-          }}
-          bind:value={commentValue}
-        />
-
-        <div class="d-flex align-items-center gap-2 ms-1">
-          <!-- <AttachmentIcon
-            height={"12px"}
-            width={"12px"}
-            color={"var(--text-secondary-200)"}
-          /> -->
-
-
-          <Button
-            title={`Add`}
-            type={`primary`}
-            loaderSize={13}
-            loader={isCommenting}
-            textStyleProp={"font-size:11px;"}
-            buttonStyleProp={`height: 20px; width:35px; justify-content:center;`}
-            onClick={async () => {
-              isCommenting = true;
-              await onAddComment(postId, commentValue, comment?.id);
-              isCommenting = false;
-
-              reloadComments();
-              commentValue = "";
-              setTimeout(() => {
-                isReplying = false;
-              }, 3000);
+        <div class="d-flex justify-content-end" style="width: 100%;">
+          <input
+            type="text"
+            id="reply-input"
+            class={`bg-transparent w-100 border-0 my-auto`}
+            placeholder="Leave a comment"
+            on:input={(e) => {
+              handleAddCommentInput(e);
             }}
-            disable={commentValue.trim() === "" || isCommenting}
+            bind:value={commentValue}
+          />
+
+          <div class="d-flex align-items-center gap-2 ms-1">
+            <Attachment onFileSelect={handleInputAttachment} {inputId} />
+
+            <Button
+              title={`Add`}
+              type={`primary`}
+              loaderSize={13}
+              textStyleProp={"font-size:11px;"}
+              buttonStyleProp={`height: 20px; width:35px; justify-content:center;`}
+              loader={isCommenting}
+              onClick={async () => {
+                isCommenting = true;
+                commentValue.trim();
+                if (commentValue !== "") {
+                  await onAddComment(
+                    postId,
+                    commentValue,
+                    comment?.id,
+                    uploadReplyAttachment,
+                  );
+                }
+                commentValue = "";
+                uploadReplyAttachment = {
+                  file: {
+                    value: [],
+                  },
+                };
+                setTimeout(() => {
+                  isReplying = false;
+                }, 3000);
+                reloadComments();
+                // comments = await fetchComments(postId);
+                isCommenting = false;
+              }}
+              disable={commentValue.trim() === "" || isCommenting}
             />
+          </div>
+        </div>
+
+        <div class="">
+          {#if uploadReplyAttachment?.file?.value?.length > 0}
+            <div class="mt-2 file-scroller mb-1 d-flex gap-1 flex-wrap">
+              {#each uploadReplyAttachment.file.value as file, index}
+                <div
+                  class="files d-flex align-items-center bg-tertiary-300 mb-1 px-3 py-1 border-radius-4"
+                >
+                  <span>
+                    <AttachmentIcon
+                      height={"12px"}
+                      width={"12px"}
+                      color={"var(--text-secondary-200)"}
+                    />
+                  </span>
+                  <span class="mb-0 text-fs-12 px-2 ellipsis">{file?.name}</span
+                  >
+                  <span
+                    on:click={() => {
+                      removeCommentAttachment(index);
+                    }}
+                    ><CrossIcon
+                      height={"12px"}
+                      width={"9px"}
+                      color={"var(--text-secondary-200)"}
+                    /></span
+                  >
+                </div>
+              {/each}
+            </div>
+          {/if}
         </div>
       </div>
     {/if}
@@ -222,7 +391,6 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 5px;
   }
 
   .comment-author {
@@ -268,7 +436,6 @@
     background: var(--bg-secondary-800);
     width: 100%;
     font-size: 12px;
-    height: 30px;
     position: relative;
     border: 1px solid var(--border-secondary-310);
     border-radius: 2px;
@@ -278,7 +445,7 @@
     border-color: var(--border-primary-300);
     caret-color: var(--border-primary-300);
   }
-  #search-input:focus {
+  #reply-input:focus {
     outline: none;
     border: none;
     box-shadow: none;

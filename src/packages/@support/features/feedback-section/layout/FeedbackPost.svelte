@@ -12,7 +12,12 @@
 
   import { Button, IconFallback, Loader, Modal } from "@library/ui";
   import ImageModal from "@library/ui/image-modal/ImageModal.svelte";
-  import { CommentCard, Drop, UpvoteIcon } from "@support/common/components";
+  import {
+    Attachment,
+    CommentCard,
+    Drop,
+    UpvoteIcon,
+  } from "@support/common/components";
   import { FeedbackType } from "@support/common/types";
   import { onMount } from "svelte";
   import { FormatTime } from "@common/utils/formatTime";
@@ -37,6 +42,7 @@
   let post = [];
   let nestedComments = [];
   let postImages = [];
+  let commentImages = [];
   let comments = [];
   let createdAt = "";
   let commentValue = "";
@@ -44,6 +50,11 @@
   let feedbackSubject = "";
   let feedbackDescription = "";
   let uploadFeedback = {
+    file: {
+      value: [],
+    },
+  };
+  let uploadedImageAttachment = {
     file: {
       value: [],
     },
@@ -90,6 +101,7 @@
     createdAt = formatTimeAgo(post?.created);
     postImages = post?.imageURLs;
     comments = await fetchComments(postId);
+    commentImages = comments?.imageURLs;
     isAuthor = userInfo?.email === post?.author?.email;
     feedbackDescription = post?.details;
     feedbackSubject = post?.title;
@@ -207,6 +219,84 @@
         uploadFeedback.file.value = files;
       }
     }
+  };
+
+  let inputId = "attachment-icon-container1";
+
+  const handleInputAttachment = (e) => {
+    const errorMessage =
+      "Failed to upload the file. You are allowed to upload only 5 files per feedback.";
+    const sizeExceededMessage =
+      "One or more files exceed the size limit of 2MB.";
+    const typeErrorMessage =
+      "Only image files (jpg, jpeg, png, svg) are allowed.";
+    const maxFilesExceededMessage = "You can upload up to 5 files only.";
+
+    // Safely gather selected files
+    let newFiles = [
+      ...(uploadedImageAttachment.file?.value || []),
+      ...(e?.target?.files || e?.dataTransfer?.files || []),
+    ];
+
+    const maxImageSize = 2097152; // 2MB
+    let isSizeExceeded = false;
+    let isInvalidType = false;
+
+    // Filter valid image files
+    const validFiles = newFiles.filter((file) => {
+      const fileExtension = file.name?.split(".").pop().toLowerCase();
+      if (!fileExtension) return false; // Ignore files without extension
+
+      // Check file type
+      if (["jpg", "jpeg", "png", "svg"].includes(fileExtension)) {
+        // Check file size
+        if (file.size > maxImageSize) {
+          isSizeExceeded = true;
+          return false;
+        }
+        return true;
+      } else {
+        isInvalidType = true;
+        return false;
+      }
+    });
+
+    // Total number of valid files already uploaded
+    let currentFileCount = uploadedImageAttachment.file?.value?.length || 0;
+    let newFileCount = validFiles.length;
+
+    // Prevent adding more than 5 files in total
+    if (currentFileCount + newFileCount > 5) {
+      validFiles.length = 5 - currentFileCount; // Adjust the number of files to keep the total <= 5
+      notifications.error(maxFilesExceededMessage);
+    }
+
+    // Error notifications
+    if (isSizeExceeded) {
+      notifications.error(sizeExceededMessage);
+    }
+    if (isInvalidType) {
+      notifications.error(typeErrorMessage);
+    }
+
+    // Update the feedback files if no critical errors
+    if (!isSizeExceeded && !isInvalidType) {
+      uploadedImageAttachment.file.value = [
+        ...(uploadedImageAttachment.file?.value || []),
+        ...validFiles,
+      ];
+    }
+
+    console.log(
+      "This is image upload attachment array",
+      uploadedImageAttachment.file.value,
+    );
+  };
+  const removeCommentAttachment = (index) => {
+    uploadedImageAttachment.file.value =
+      uploadedImageAttachment.file.value.filter(
+        (_i, idx) => idx !== index, // Corrected: Use 'idx' to check against the index
+      );
   };
 </script>
 
@@ -342,40 +432,88 @@
 
       <!-- Add comment input -->
       <div
-        class={`d-flex align-items-center search-input-container  mb-5 mt-3 px-2 mb-2`}
+        class={`d-flex align-items-start search-input-container  mb-5 mt-3 p-1 px-2`}
+        style=" display:felx; flex-direction:column;"
       >
-        <input
-          type="text"
-          id="search-input"
-          class={`bg-transparent w-100 border-0 my-auto`}
-          placeholder="Leave a comment"
-          on:input={(e) => {
-            commentValue = e.target.value;
-          }}
-          bind:value={commentValue}
-        />
-
-        <div class="d-flex align-items-center gap-2 ms-1">
-          <Button
-            title={`Add`}
-            type={`primary`}
-            loaderSize={13}
-            textStyleProp={"font-size:11px;"}
-            buttonStyleProp={`height: 20px; width:35px; justify-content:center;`}
-            loader={isCommenting}
-            onClick={async () => {
-              isCommenting = true;
-              commentValue.trim();
-              if (commentValue !== "") {
-                await onAddComment(postId, commentValue, null);
-              }
-              commentValue = "";
-              comments = await fetchComments(postId);
-              isCommenting = false;
-              MixpanelEvent(Events.Add_Comment);
+        <div class="d-flex justify-content-end" style="width: 100%;">
+          <input
+            type="text"
+            id="search-input"
+            class={`bg-transparent w-100 border-0 my-auto`}
+            placeholder="Leave a comment"
+            on:input={(e) => {
+              commentValue = e.target.value;
             }}
-            disable={commentValue.trim() === "" || isCommenting}
+            bind:value={commentValue}
           />
+
+          <div class="d-flex align-items-center gap-2 ms-1">
+            <Attachment onFileSelect={handleInputAttachment} {inputId} />
+
+            <Button
+              title={`Add`}
+              type={`primary`}
+              loaderSize={13}
+              textStyleProp={"font-size:11px;"}
+              buttonStyleProp={`height: 20px; width:35px; justify-content:center;`}
+              loader={isCommenting}
+              onClick={async () => {
+                isCommenting = true;
+                commentValue.trim();
+                if (commentValue !== "") {
+                  await onAddComment(
+                    postId,
+                    commentValue,
+                    null,
+                    uploadedImageAttachment,
+                  );
+                }
+                commentValue = "";
+                uploadedImageAttachment = {
+                  file: {
+                    value: [],
+                  },
+                };
+                comments = await fetchComments(postId);
+                isCommenting = false;
+
+                MixpanelEvent(Events.Add_Comment);
+              }}
+              disable={commentValue.trim() === "" || isCommenting}
+            />
+          </div>
+        </div>
+
+        <div class="">
+          {#if uploadedImageAttachment?.file?.value?.length > 0}
+            <div class="mt-2 file-scroller mb-1 d-flex gap-1 flex-wrap">
+              {#each uploadedImageAttachment.file.value as file, index}
+                <div
+                  class="files d-flex align-items-center bg-tertiary-300 mb-1 px-3 py-1 border-radius-4"
+                >
+                  <span>
+                    <AttachmentIcon
+                      height={"12px"}
+                      width={"12px"}
+                      color={"var(--text-secondary-200)"}
+                    />
+                  </span>
+                  <span class="mb-0 text-fs-12 px-2 ellipsis">{file?.name}</span
+                  >
+                  <span
+                    on:click={() => {
+                      removeCommentAttachment(index);
+                    }}
+                    ><CrossIcon
+                      height={"12px"}
+                      width={"9px"}
+                      color={"var(--text-secondary-200)"}
+                    /></span
+                  >
+                </div>
+              {/each}
+            </div>
+          {/if}
         </div>
       </div>
       {#if nestedComments.length > 0}
@@ -699,6 +837,9 @@
 </Modal>
 
 <style>
+  .visually-hidden {
+    display: none;
+  }
   .back-button {
     width: 187px;
     margin-right: 28px;
@@ -718,7 +859,7 @@
     background: var(--bg-secondary-800);
     width: 100%;
     font-size: 12px;
-    height: 30px;
+
     position: relative;
     border: 1px solid var(--border-secondary-310);
     border-radius: 2px;

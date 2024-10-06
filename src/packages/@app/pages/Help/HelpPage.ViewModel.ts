@@ -419,6 +419,11 @@ class HelpPageViewModel {
     postID: string,
     value: string,
     parentID: string,
+    uploadedImageAttachment: {
+      file: {
+        value: File[];
+      };
+    },
   ) => {
     let userInfo;
     await user.subscribe((value) => {
@@ -439,13 +444,32 @@ class HelpPageViewModel {
 
     const authorID = userResponse?.data?.id; // Use the retrieved or newly created user's ID
 
+    // Handle file upload (similar to createPost)
+    const errorMessage = "Failed to upload files. Please try again.";
+    const files = Array.from(uploadedImageAttachment?.file?.value);
+    const formData = new FormData();
+    files.forEach((file) => formData.append("files", file));
+    const imageResponse = await this.feedbackService.fetchuploads(formData);
+
+    let images = [];
+    if (imageResponse?.isSuccessful) {
+       images = imageResponse?.data?.data?.map(
+        (file: { fileUrl: string }) => file?.fileUrl,
+      );
+    } else {
+      notifications.error(errorMessage);
+      return;
+    }
+
     // Call the create comment API
-    const response = await this.cannyService.createComment(
+    const response = await this.cannyService.createComment({
       authorID,
       postID,
       value,
       parentID,
-    );
+      imageURLs: images,
+    });
+
     if (response.isSuccessful) {
       notifications.success("Comment added successfully");
     } else {
