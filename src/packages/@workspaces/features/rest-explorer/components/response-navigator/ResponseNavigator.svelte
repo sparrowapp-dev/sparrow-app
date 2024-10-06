@@ -3,7 +3,7 @@
   import { type UpdateRequestStateType } from "@workspaces/common/type";
   import { ResponseSectionEnum } from "@common/types/workspace";
   export let requestStateSection: string;
-  export let onUpdateRequestState: UpdateRequestStateType;
+  export let onUpdateResponseState;
   export let responseHeadersLength = 0;
 
   let tabs: {
@@ -48,7 +48,7 @@
           : ''}"
         role="tab"
         on:click={() => {
-          onUpdateRequestState({ responseNavigation: tab.id });
+          onUpdateResponseState("responseNavigation", tab.id);
         }}
       >
         <span class="d-flex align-items-center"
@@ -71,11 +71,11 @@
     padding: 2px;
   }
   .navigation__link:hover {
-  background-color: var(--text-secondary-500);
-  border-radius: 2px;
+    background-color: var(--text-secondary-500);
+    border-radius: 2px;
   }
   .tab-active {
     color: var(--text-secondary-100);
-    border-bottom: 2px solid var(--border-primary-300 ) !important;
+    border-bottom: 2px solid var(--border-primary-300) !important;
   }
 </style>
