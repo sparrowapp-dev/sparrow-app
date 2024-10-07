@@ -301,9 +301,11 @@ const disconnectWebSocket = async (tab_id: string) => {
       try {
         // Logic to handle response
         console.log("disconnected", data);
+        let listener;
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
+            listener = wsData.listener;
             wsData.messages.unshift({
               data: `Disconnected from ${url}`,
               transmitter: "disconnector",
@@ -312,9 +314,13 @@ const disconnectWebSocket = async (tab_id: string) => {
             });
             wsData.status = "disconnected";
             webSocketDataMap.set(tab_id, wsData);
+            if (listener) {
+              listener();
+            }
           }
           return webSocketDataMap;
         });
+
         notifications.success("WebSocket disconnected successfully.");
       } catch (e) {
         console.error(e);
@@ -373,6 +379,7 @@ const connectWebSocket = async (
       body: "",
       filter: "All messages",
       url: url,
+      listener: null,
     });
 
     return webSocketDataMap;
@@ -408,9 +415,7 @@ const connectWebSocket = async (
         notifications.success("WebSocket connected successfully");
 
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
-        listen(`ws_message_${tabId}`, (event) => {
-          console.log("event---->", event);
-
+        const listener = await listen(`ws_message_${tabId}`, (event) => {
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
@@ -424,6 +429,14 @@ const connectWebSocket = async (
             }
             return webSocketDataMap;
           });
+        });
+        webSocketDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tabId);
+          if (wsData) {
+            wsData.listener = listener;
+            webSocketDataMap.set(tabId, wsData);
+          }
+          return webSocketDataMap;
         });
       } catch (e) {
         console.error(e);
