@@ -209,13 +209,6 @@
   const addButtonData = isGuestUser
     ? [
         {
-          name: "Add New API",
-          icon: VectorIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "12px",
-          onclick: () => onItemCreated("request", {}),
-        },
-        {
           name: "Add Collection",
           icon: CollectionIcon,
           iconColor: "var(--icon-secondary-130)",
@@ -227,6 +220,13 @@
             });
             isExpandCollection = true;
           },
+        },
+        {
+          name: "Add REST API",
+          icon: VectorIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "12px",
+          onclick: () => onItemCreated("request", {}),
         },
         {
           name: "Import cURL",
@@ -248,6 +248,16 @@
           onclick: () => {
             onItemCreated("web-socket", {});
             MixpanelEvent(Events.Add_WebSocket);
+          },
+        },
+        {
+          name: "Add Environment",
+          icon: StackIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            isExpandEnvironment = true;
+            onCreateEnvironment();
           },
         },
         {
