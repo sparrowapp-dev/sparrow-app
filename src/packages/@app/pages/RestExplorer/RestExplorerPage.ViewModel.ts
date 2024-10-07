@@ -84,6 +84,9 @@ import {
   type StatePartial,
   type Conversation,
   MessageTypeEnum,
+  ResponseSectionEnum,
+  RequestDataTypeEnum,
+  ResponseFormatterEnum,
 } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
 import { RequestTabAdapter } from "@app/adapter/request-tab";
@@ -603,6 +606,42 @@ class RestExplorerViewModel
 
   /**
    *
+   * @param  - response state
+   */
+  public updateResponseState = async (key, val) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (key === "responseNavigation") {
+      restExplorerDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.response.navigation = val;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    } else if (key === "responseBodyLanguage") {
+      restExplorerDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.response.bodyLanguage = val;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    } else if (key === "responseBodyFormatter") {
+      restExplorerDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.response.bodyFormatter = val;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    }
+  };
+
+  /**
+   *
    * @param _auth - request auth
    */
   public updateRequestAuth = async (_auth: Auth) => {
@@ -674,6 +713,17 @@ class RestExplorerViewModel
       } else {
         data = {
           abortController: abortController,
+          response: {
+            body: "",
+            headers: [],
+            status: ResponseStatusCode.ERROR,
+            time: 0,
+            size: 0,
+            navigation: ResponseSectionEnum.RESPONSE,
+            bodyLanguage: RequestDataTypeEnum.TEXT,
+            bodyFormatter: ResponseFormatterEnum.PRETTY,
+          },
+          isSendRequestInProgress: false,
         };
       }
       restApiDataMap.set(progressiveTab.tabId, data);
@@ -682,7 +732,14 @@ class RestExplorerViewModel
     // Create an AbortController for the request
     const { signal } = abortController; // Extract the signal for the request
 
-    this.updateRequestState({ isSendRequestInProgress: true });
+    restExplorerDataStore.update((restApiDataMap) => {
+      let data = restApiDataMap.get(progressiveTab?.tabId);
+      if (data) {
+        data.isSendRequestInProgress = true;
+      }
+      restApiDataMap.set(progressiveTab.tabId, data);
+      return restApiDataMap;
+    });
     const start = Date.now();
 
     const decodeData = this._decodeRequest.init(
@@ -692,14 +749,19 @@ class RestExplorerViewModel
     makeHttpRequestV2(...decodeData, signal)
       .then((response) => {
         if (response.isSuccessful === false) {
-          this.updateResponse({
-            body: "",
-            headers: [],
-            status: ResponseStatusCode.ERROR,
-            time: 0,
-            size: 0,
+          restExplorerDataStore.update((restApiDataMap) => {
+            const data = restApiDataMap.get(progressiveTab?.tabId);
+            if (data) {
+              data.response.body = "";
+              data.response.headers = [];
+              data.response.status = ResponseStatusCode.ERROR;
+              data.response.time = 0;
+              data.response.size = 0;
+              data.isSendRequestInProgress = false;
+            }
+            restApiDataMap.set(progressiveTab.tabId, data);
+            return restApiDataMap;
           });
-          this.updateRequestState({ isSendRequestInProgress: false });
         } else {
           const end = Date.now();
           const byteLength = new TextEncoder().encode(
@@ -721,20 +783,21 @@ class RestExplorerViewModel
           let responseStatus = response.data.status;
           const bodyLanguage =
             this._decodeRequest.setResponseContentType(responseHeaders);
-          this.updateRequestState({
-            responseBodyLanguage: bodyLanguage,
-            isSendRequestInProgress: false,
+
+          restExplorerDataStore.update((restApiDataMap) => {
+            let data = restApiDataMap.get(progressiveTab?.tabId);
+            if (data) {
+              data.response.body = responseBody;
+              data.response.headers = responseHeaders;
+              data.response.status = responseStatus;
+              data.response.time = duration;
+              data.response.size = responseSizeKB;
+              data.response.bodyLanguage = bodyLanguage;
+              data.isSendRequestInProgress = false;
+            }
+            restApiDataMap.set(progressiveTab.tabId, data);
+            return restApiDataMap;
           });
-
-          const resData = {
-            body: responseBody,
-            headers: responseHeaders,
-            status: responseStatus,
-            time: duration,
-            size: responseSizeKB,
-          };
-
-          this.updateResponse(resData);
         }
       })
       .catch((error) => {
@@ -743,13 +806,18 @@ class RestExplorerViewModel
           return;
         }
 
-        this.updateRequestState({ isSendRequestInProgress: false });
-        this.updateResponse({
-          body: "",
-          headers: [],
-          status: ResponseStatusCode.ERROR,
-          time: 0,
-          size: 0,
+        restExplorerDataStore.update((restApiDataMap) => {
+          const data = restApiDataMap.get(progressiveTab?.tabId);
+          if (data) {
+            data.response.body = "";
+            data.response.headers = [];
+            data.response.status = ResponseStatusCode.ERROR;
+            data.response.time = 0;
+            data.response.size = 0;
+            data.isSendRequestInProgress = false;
+          }
+          restApiDataMap.set(progressiveTab.tabId, data);
+          return restApiDataMap;
         });
       });
   };
@@ -757,24 +825,27 @@ class RestExplorerViewModel
   /**
    * aborts the ongoing api request
    */
-  public cancelRequest = (): void => {
+  public cancelRequest = (): Promise<void> => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     let abortController;
     restExplorerDataStore.update((restApiDataMap) => {
-      let data = restApiDataMap.get(progressiveTab.tabId);
+      const data = restApiDataMap.get(progressiveTab.tabId);
       if (data) {
         abortController = data.abortController;
       }
-      // Delete the tabId from the map
-      restApiDataMap.delete(progressiveTab.tabId);
-
       return restApiDataMap;
     });
     if (abortController) {
       abortController.abort(); // Abort the request using the stored controller
-      this.updateRequestState({ isSendRequestInProgress: false }); // Update the state when canceling
+      restExplorerDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.isSendRequestInProgress = false;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
     }
-    return;
   };
 
   /**
