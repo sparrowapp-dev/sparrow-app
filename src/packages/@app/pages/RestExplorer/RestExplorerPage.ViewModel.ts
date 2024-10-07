@@ -96,6 +96,7 @@ import { AiAssistantService } from "@app/services/ai-assistant.service";
 import type { GuideQuery } from "@app/types/user-guide";
 import { AiAssistantWebSocketService } from "@app/services/ai-assistant.ws.service";
 import type { Socket } from "socket.io-client";
+import { restExplorerDataStore } from "@workspaces/features/rest-explorer/store";
 
 class RestExplorerViewModel
   implements
@@ -664,6 +665,23 @@ class RestExplorerViewModel
    * @description send request
    */
   public sendRequest = async (environmentVariables = []) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const abortController = new AbortController();
+    restExplorerDataStore.update((restApiDataMap) => {
+      let data = restApiDataMap.get(progressiveTab.tabId);
+      if (data) {
+        data.abortController = abortController;
+      } else {
+        data = {
+          abortController: abortController,
+        };
+      }
+      restApiDataMap.set(progressiveTab.tabId, data);
+      return restApiDataMap;
+    });
+    // Create an AbortController for the request
+    const { signal } = abortController; // Extract the signal for the request
+
     this.updateRequestState({ isSendRequestInProgress: true });
     const start = Date.now();
 
@@ -671,7 +689,7 @@ class RestExplorerViewModel
       this._tab.getValue().property.request,
       environmentVariables.filtered || [],
     );
-    makeHttpRequestV2(...decodeData)
+    makeHttpRequestV2(...decodeData, signal)
       .then((response) => {
         if (response.isSuccessful === false) {
           this.updateResponse({
@@ -720,8 +738,12 @@ class RestExplorerViewModel
         }
       })
       .catch((error) => {
-        this.updateRequestState({ isSendRequestInProgress: false });
+        // Handle cancellation or other errors
+        if (error.name === "AbortError") {
+          return;
+        }
 
+        this.updateRequestState({ isSendRequestInProgress: false });
         this.updateResponse({
           body: "",
           headers: [],
@@ -730,6 +752,29 @@ class RestExplorerViewModel
           size: 0,
         });
       });
+  };
+
+  /**
+   * aborts the ongoing api request
+   */
+  public cancelRequest = (): void => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    let abortController;
+    restExplorerDataStore.update((restApiDataMap) => {
+      let data = restApiDataMap.get(progressiveTab.tabId);
+      if (data) {
+        abortController = data.abortController;
+      }
+      // Delete the tabId from the map
+      restApiDataMap.delete(progressiveTab.tabId);
+
+      return restApiDataMap;
+    });
+    if (abortController) {
+      abortController.abort(); // Abort the request using the stored controller
+      this.updateRequestState({ isSendRequestInProgress: false }); // Update the state when canceling
+    }
+    return;
   };
 
   /**

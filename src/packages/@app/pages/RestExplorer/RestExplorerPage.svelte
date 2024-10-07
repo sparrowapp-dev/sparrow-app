@@ -144,6 +144,7 @@
   {isGuestUser}
   {isLoginBannerActive}
   onSendRequest={_viewModel.sendRequest}
+  onCancelRequest={_viewModel.cancelRequest}
   onUpdateRequestUrl={_viewModel.updateRequestUrl}
   onUpdateRequestMethod={_viewModel.updateRequestMethod}
   onUpdateRequestParams={_viewModel.updateParams}
