@@ -99,4 +99,22 @@ export class EnvironmentRepository {
       })
       .remove();
   };
+
+  /**
+   * Retrieves an environment by their workspace ID.
+   *
+   * @param  _workspaceId - The unique identifier of the workspace to filter the test flows.
+   * @returns A promise that resolves to an array of environment documents associated with the given workspace ID.
+   */
+  public getEnvironmentByWorkspaceId = async (
+    _workspaceId: string,
+  ): Promise<any | undefined> => {
+    return await RxDB.getInstance()
+      .rxdb.environment?.find({
+        selector: {
+          workspaceId: _workspaceId,
+        },
+      })
+      .exec();
+  };
 }
