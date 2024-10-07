@@ -98,3 +98,5 @@ export { default as TableChart } from "./TableChart.svelte";
 export { default as DropIcon } from "./Drop.svelte";
 export { default as MessageIcon } from "./MessageIcon.svelte";
 export { default as MessageDisabledIcon } from "./MessageDisabledIcon.svelte";
+export { default as CommentGridIcon } from "./CommentGridIcon.svelte";
+export { default as PostIcon } from "./PostIcon.svelte";

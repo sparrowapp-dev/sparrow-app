@@ -2,9 +2,11 @@
   import { user } from "$lib/store";
   import {
     ActivityIcon,
+    CommentGridIcon,
     CommentIcon,
     LikeIcon,
     MessageIcon,
+    PostIcon,
     SortIcon,
     TableChart,
   } from "@library/icons";
@@ -34,6 +36,7 @@
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   import ArrowOutward from "@library/icons/ArrowOutward.svelte";
   import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
+  import { ImageModal } from "@library/ui/image-modal";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
@@ -123,6 +126,8 @@
   });
 
   let hasActivity = false;
+  let currentImage = "";
+  let isImageOpen = false;
 
   const applyAllFilters = () => {
     let tempPosts = userPosts.filter((post) =>
@@ -459,7 +464,7 @@
                   class=""
                   style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
                 >
-                  <MessageIcon
+                  <CommentGridIcon
                     height={"30px"}
                     width={"30px"}
                     color={"var(--icon-primary-300)"}
@@ -469,7 +474,7 @@
                     class="mx-1 text-fs-14 mb-0 text-center mt-3"
                     style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
                   >
-                    No upvoted posts yet
+                    No Feedback yet
                   </p>
                 </div>
 
@@ -539,6 +544,37 @@
                               <p class="mb-1" style="word-break: break-all; ">
                                 {comment.value}
                               </p>
+                            </div>
+
+                            <div>
+                              <div>
+                                {#each comment?.imageURLs as commentImage}
+                                  <img
+                                    on:click={() => {
+                                      isImageOpen = true;
+                                      currentImage = commentImage;
+                                    }}
+                                    src={commentImage}
+                                    alt="post image"
+                                    style="display:inline; height: 100px; margin-top: 20px; border-radius: 2px; margin:10px;   object-fit: contain;   max-width: 100%; "
+                                  />
+                                  <ImageModal
+                                    isOpen={isImageOpen}
+                                    type={"dark"}
+                                    width={"40%"}
+                                    zIndex={10000}
+                                    handleModalState={(flag = false) => {
+                                      isImageOpen = flag;
+                                    }}
+                                  >
+                                    <img
+                                      src={currentImage}
+                                      alt="post image"
+                                      style="width:100%; height:100%;"
+                                    />
+                                  </ImageModal>
+                                {/each}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -664,7 +700,7 @@
                   class=""
                   style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
                 >
-                  <MessageIcon
+                  <PostIcon
                     height={"30px"}
                     width={"30px"}
                     color={"var(--icon-primary-300)"}
