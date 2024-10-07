@@ -3002,16 +3002,25 @@ export default class CollectionsViewModel {
   public collectionFileUpload = async (
     currentWorkspaceId: string,
     file: File,
+    type: string,
   ) => {
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
     if (isGuestUser !== true) {
-      const response = await this.collectionService.importCollectionFromFile(
-        currentWorkspaceId,
-        file,
-      );
+      let response;
+      if (type === "POSTMAN") {
+        response = await this.collectionService.importCollectionFromPostmanFile(
+          currentWorkspaceId,
+          file,
+        );
+      } else {
+        response = await this.collectionService.importCollectionFromFile(
+          currentWorkspaceId,
+          file,
+        );
+      }
       if (response.isSuccessful) {
         const path = {
           workspaceId: currentWorkspaceId,

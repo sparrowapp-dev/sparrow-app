@@ -221,6 +221,21 @@ export class CollectionService {
     return response;
   };
 
+  public validateImportCollectionFileUpload = async (
+    data: string = "",
+    jsonXml = "",
+  ) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/validate/file`, {
+      body: jsonXml,
+      headers: {
+        ...getAuthHeaders(),
+        "x-oapi-url": data,
+        "Content-type": ContentTypeEnum["application/json"],
+      },
+    });
+    return response;
+  };
+
   public validateImportCollectionURL = async (url = "") => {
     return createApiRequest(
       [
@@ -302,6 +317,24 @@ export class CollectionService {
     const response = await makeRequest(
       "POST",
       `${this.apiUrl}/api/workspace/${workspaceId}/importFile/collection`,
+      {
+        body: formData,
+        headers: { ...getAuthHeaders(), "Content-type": contentType },
+      },
+    );
+    return response;
+  };
+
+  public importCollectionFromPostmanFile = async (
+    workspaceId: string,
+    file: File,
+  ) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const contentType: ContentTypeEnum = ContentTypeEnum["multipart/form-data"];
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/collection/${workspaceId}/importPostmanCollection`,
       {
         body: formData,
         headers: { ...getAuthHeaders(), "Content-type": contentType },

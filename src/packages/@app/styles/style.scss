@@ -117,6 +117,7 @@ $theme-grey-313233: #313233;
 $theme-grey-2B343D: #2b343d;
 $theme-grey-272727: #272727;
 $theme-grey-212222: #212222;
+$theme-grey-19191A: #19191A;
 $theme-grey-1A1A1A: #1a1a1a;
 $theme-grey-161617: #161617;
 $theme-grey-1E1E1E: #1E1E1E;
@@ -290,6 +291,7 @@ $theme-green-00A86B: #00a86b;
   --text-secondary-400: #{$theme-grey-313233};
   --text-secondary-450: #{$theme-grey-191919};
   --text-secondary-500: #{$theme-grey-272727};
+  --text-secondary-530: #{$theme-grey-19191A};
   --text-secondary-550: #{$theme-grey-808080};
   --text-secondary-600: #{$theme-grey-212222};
   --text-secondary-700: #{$theme-grey-161617};
@@ -357,6 +359,7 @@ $theme-green-00A86B: #00a86b;
   --bg-secondary-420: #{$theme-grey-3E415A};
   --bg-secondary-450: #{$theme-grey-191919};
   --bg-secondary-500: #{$theme-grey-272727};
+  --bg-secondary-530: #{$theme-grey-19191A};
   --bg-secondary-550: #{$theme-grey-1A1A1A};
   --bg-secondary-600: #{$theme-grey-212222};
   --bg-secondary-700: #{$theme-grey-161617};
@@ -420,6 +423,7 @@ $theme-green-00A86B: #00a86b;
   --border-secondary-400: #{$theme-grey-313233};
   --border-secondary-450: #{$theme-grey-191919};
   --border-secondary-500: #{$theme-grey-272727};
+  --border-secondary-530: #{$theme-grey-19191A};
   --border-secondary-600: #{$theme-grey-212222};
   --border-secondary-700: #{$theme-grey-161617};
   --border-secondary-800: #{$theme-grey-151515};
@@ -478,6 +482,7 @@ $theme-green-00A86B: #00a86b;
   --icon-secondary-400: #{$theme-grey-313233};
   --icon-secondary-450: #{$theme-grey-191919};
   --icon-secondary-500: #{$theme-grey-272727};
+  --icon-secondary-530: #{$theme-grey-19191A};
   --icon-secondary-550: #{$theme-grey-1A1A1A};
   --icon-secondary-600: #{$theme-grey-212222};
   --icon-secondary-700: #{$theme-grey-161617};
@@ -630,6 +635,7 @@ $sparrow-text-colors: (
   secondary-300: $theme-grey-45494D,
   secondary-400: $theme-grey-313233,
   secondary-500: $theme-grey-272727,
+  secondary-530: $theme-grey-19191A,
   secondary-550: $theme-grey-1A1A1A,
   secondary-600: $theme-grey-212222,
   secondary-700: $theme-grey-161617,
@@ -677,6 +683,7 @@ $sparrow-bg-colors: (
   secondary-300: $theme-grey-45494D,
   secondary-400: $theme-grey-313233,
   secondary-500: $theme-grey-272727,
+  secondary-530: $theme-grey-19191A,
   secondary-550: $theme-grey-1A1A1A,
   secondary-600: $theme-grey-212222,
   secondary-700: $theme-grey-161617,
@@ -726,6 +733,7 @@ $sparrow-border-colors: (
   secondary-300: $theme-grey-45494D,
   secondary-400: $theme-grey-313233,
   secondary-500: $theme-grey-272727,
+  secondary-530: $theme-grey-19191A,
   secondary-550: $theme-grey-1A1A1A,
   secondary-600: $theme-grey-212222,
   secondary-700: $theme-grey-161617,
