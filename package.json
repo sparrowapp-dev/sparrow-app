@@ -60,6 +60,7 @@
     "socket.io-client": "^4.7.5",
     "svelte-agnostic-draggable": "^0.2.0",
     "svelte-file-dropzone": "^2.0.2",
+    "svelte-inview": "^4.0.2",
     "svelte-jsoneditor": "^0.18.9",
     "svelte-motion": "^0.11.5",
     "svelte-navigator": "^3.2.2",
