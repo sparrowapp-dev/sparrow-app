@@ -24,7 +24,7 @@
   const doOnlineCheck = () => {
     if (!navigator.onLine && isActiveInternet) {
       isActiveInternet = false;
-      notifications.error("The network connection has been lost.");
+      // notifications.error("The network connection has been lost.");
     } else isActiveInternet = true;
   };
 

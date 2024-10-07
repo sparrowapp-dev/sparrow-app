@@ -278,7 +278,7 @@
     </div>
     {#if env.id.includes(UntrackedItems.UNTRACKED)}
       <Spinner size={"15px"} />
-    {:else}
+    {:else if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
       <Tooltip placement="bottom" title="More" distance={17} show={!showMenu}>
         <button
           id={`show-more-environment-${env?.id}`}
@@ -333,7 +333,7 @@
     }
 
     .btn-primary:hover {
-      background-color: var(--bg-secondary-850);
+      background-color: var(--bg-tertiary-300);
     }
 
     .renameInputFieldCollection {

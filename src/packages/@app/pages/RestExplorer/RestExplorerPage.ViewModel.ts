@@ -27,7 +27,12 @@ import { CollectionRepository } from "@app/repositories/collection.repository";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { BehaviorSubject, Observable } from "rxjs";
-import { Events, ItemType, UntrackedItems } from "$lib/utils/enums";
+import {
+  Events,
+  ItemType,
+  ResponseStatusCode,
+  UntrackedItems,
+} from "$lib/utils/enums";
 import type { CreateDirectoryPostBody } from "$lib/utils/dto";
 
 // ---- Service
@@ -91,6 +96,7 @@ import { AiAssistantService } from "@app/services/ai-assistant.service";
 import type { GuideQuery } from "@app/types/user-guide";
 import { AiAssistantWebSocketService } from "@app/services/ai-assistant.ws.service";
 import type { Socket } from "socket.io-client";
+import { restExplorerDataStore } from "@workspaces/features/rest-explorer/store";
 
 class RestExplorerViewModel
   implements
@@ -159,6 +165,7 @@ class RestExplorerViewModel
       setTimeout(() => {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
+        delete t.index;
         this.tab = t;
         this.authHeader = new ReduceAuthHeader(
           this._tab.getValue().property.request?.state,
@@ -658,6 +665,23 @@ class RestExplorerViewModel
    * @description send request
    */
   public sendRequest = async (environmentVariables = []) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const abortController = new AbortController();
+    restExplorerDataStore.update((restApiDataMap) => {
+      let data = restApiDataMap.get(progressiveTab.tabId);
+      if (data) {
+        data.abortController = abortController;
+      } else {
+        data = {
+          abortController: abortController,
+        };
+      }
+      restApiDataMap.set(progressiveTab.tabId, data);
+      return restApiDataMap;
+    });
+    // Create an AbortController for the request
+    const { signal } = abortController; // Extract the signal for the request
+
     this.updateRequestState({ isSendRequestInProgress: true });
     const start = Date.now();
 
@@ -665,13 +689,13 @@ class RestExplorerViewModel
       this._tab.getValue().property.request,
       environmentVariables.filtered || [],
     );
-    makeHttpRequestV2(...decodeData)
+    makeHttpRequestV2(...decodeData, signal)
       .then((response) => {
         if (response.isSuccessful === false) {
           this.updateResponse({
             body: "",
             headers: [],
-            status: "Not Found",
+            status: ResponseStatusCode.ERROR,
             time: 0,
             size: 0,
           });
@@ -714,16 +738,43 @@ class RestExplorerViewModel
         }
       })
       .catch((error) => {
-        this.updateRequestState({ isSendRequestInProgress: false });
+        // Handle cancellation or other errors
+        if (error.name === "AbortError") {
+          return;
+        }
 
+        this.updateRequestState({ isSendRequestInProgress: false });
         this.updateResponse({
           body: "",
           headers: [],
-          status: "Not Found",
+          status: ResponseStatusCode.ERROR,
           time: 0,
           size: 0,
         });
       });
+  };
+
+  /**
+   * aborts the ongoing api request
+   */
+  public cancelRequest = (): void => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    let abortController;
+    restExplorerDataStore.update((restApiDataMap) => {
+      let data = restApiDataMap.get(progressiveTab.tabId);
+      if (data) {
+        abortController = data.abortController;
+      }
+      // Delete the tabId from the map
+      restApiDataMap.delete(progressiveTab.tabId);
+
+      return restApiDataMap;
+    });
+    if (abortController) {
+      abortController.abort(); // Abort the request using the stored controller
+      this.updateRequestState({ isSendRequestInProgress: false }); // Update the state when canceling
+    }
+    return;
   };
 
   /**
@@ -1627,7 +1678,7 @@ class RestExplorerViewModel
           response.data.data._id,
         );
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = response.data.data.variable;
           envTab.isSaved = true;
@@ -1869,7 +1920,7 @@ class RestExplorerViewModel
       // Update the AI thread ID and conversation with the new data
       await this.updateRequestAIThread(data.threadId);
       await this.updateRequestAIConversation([
-        ...componentData?.property?.request?.ai?.conversations,
+        ...(componentData?.property?.request?.ai?.conversations || []),
         {
           message: "",
           messageId: data.messageId,
@@ -1883,7 +1934,7 @@ class RestExplorerViewModel
     } else {
       // Update the conversation with an error message
       this.updateRequestAIConversation([
-        ...componentData?.property?.request?.ai?.conversations,
+        ...(componentData?.property?.request?.ai?.conversations || []),
         {
           message: "Something went wrong! Please try again.",
           messageId: uuidv4(),
@@ -1973,7 +2024,7 @@ class RestExplorerViewModel
           });
           // Update the conversation with an error message
           this.updateRequestAIConversation([
-            ...componentData?.property?.request?.ai?.conversations,
+            ...(componentData?.property?.request?.ai?.conversations || []),
             {
               message: "Something went wrong! Please try again.",
               messageId: uuidv4(),

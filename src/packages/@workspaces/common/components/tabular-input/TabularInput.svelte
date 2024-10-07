@@ -5,45 +5,37 @@
     KeyValuePair,
     KeyValuePairWithBase,
   } from "$lib/utils/interfaces/request.interface";
-  import { invoke } from "@tauri-apps/api/core";
-  import close from "$lib/assets/close.svg";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "../";
   import { onMount } from "svelte";
-  import Textarea from "@library/forms/textarea/Textarea.svelte";
-
   import { Tooltip } from "@library/ui";
   import SliderSwitch from "@library/forms/SliderSwitch/SliderSwitch.svelte";
-
-  import { DustbinIcon, ErrorInfoIcon, Information } from "@library/icons";
-
-  import { Editor } from "@library/forms";
+  import { ErrorInfoIcon, Information } from "@library/icons";
   import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
   import LazyElement from "./LazyElement.svelte";
 
-  let enableKeyValueHighlighting = true;
-
-  type Mode = "READ" | "WRITE";
-
+  // exports
   export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
   export let callback: (pairs: KeyValuePair[]) => void;
-  export let mode: Mode = "WRITE";
   export let readable: { key: string; value: string } = {
     key: "",
     value: "",
   };
   export let environmentVariables;
-  export let type: "file" | "text" = "text";
   export let onUpdateEnvironment;
-  let pairs: KeyValuePair[] | KeyValuePairWithBase[] = keyValue;
-  let controller: boolean = false;
-
-  export let isBulkEditActive;
   export let onToggleBulkEdit;
+  export let isBulkEditActive = false;
   export let isBulkEditRequired = false;
   export let isBulkEditHeaderInfoRequired = false;
-
+  export let isCheckBoxEditable = true;
+  export let isTopHeaderRequired = true;
+  export let isInputBoxEditable = true;
   export let bulkEditPlaceholder = "";
+  // export let type: "file" | "text" = "text";
+
+  let enableKeyValueHighlighting = true;
+  let pairs: KeyValuePair[] = keyValue;
+  let controller: boolean = false;
 
   let bulkText = "";
   let bulkToggle = isBulkEditActive;
@@ -88,7 +80,10 @@
     pairs = pairs;
     if (
       pairs.length - 1 === index &&
-      mode === "WRITE" &&
+      // although in readonly mode input is disabled
+      // but codemirror internally invokes this function and updates key value
+      // so one more extra check here for read only mode
+      isInputBoxEditable &&
       (pairs[index].key !== "" || pairs[index].value !== "")
     ) {
       pairs[pairs.length - 1].checked = true;
@@ -126,41 +121,41 @@
     callback(pairs);
   };
 
-  const extractFileName = (url) => {
-    const parts = url.split("\\");
-    const fileName = parts[parts.length - 1];
-    return fileName;
-  };
+  // const extractFileName = (url) => {
+  //   const parts = url.split("\\");
+  //   const fileName = parts[parts.length - 1];
+  //   return fileName;
+  // };
 
-  const uploadFormFile = async (index) => {
-    const filePathResponse = await invoke("fetch_file_command");
-    if (filePathResponse !== "Canceled") {
-      const filename = extractFileName(filePathResponse);
-      const updatedFilePath = filePathResponse;
-      let filteredPair = pairs.map((elem, i) => {
-        if (i == index) {
-          elem.value = filename;
-          elem.base = updatedFilePath;
-        }
-        return elem;
-      });
-      pairs = filteredPair;
-      callback(pairs);
-      updateParam(index);
-    }
-  };
+  // const uploadFormFile = async (index) => {
+  //   const filePathResponse = await invoke("fetch_file_command");
+  //   if (filePathResponse !== "Canceled") {
+  //     const filename = extractFileName(filePathResponse);
+  //     const updatedFilePath = filePathResponse;
+  //     let filteredPair = pairs.map((elem, i) => {
+  //       if (i == index) {
+  //         elem.value = filename;
+  //         elem.base = updatedFilePath;
+  //       }
+  //       return elem;
+  //     });
+  //     pairs = filteredPair;
+  //     callback(pairs);
+  //     updateParam(index);
+  //   }
+  // };
 
-  const removeFormFile = (index) => {
-    let filteredPair = pairs.map((elem, i) => {
-      if (i == index) {
-        elem.value = "";
-        elem.base = "";
-      }
-      return elem;
-    });
-    pairs = filteredPair;
-    callback(pairs);
-  };
+  // const removeFormFile = (index) => {
+  //   let filteredPair = pairs.map((elem, i) => {
+  //     if (i == index) {
+  //       elem.value = "";
+  //       elem.base = "";
+  //     }
+  //     return elem;
+  //   });
+  //   pairs = filteredPair;
+  //   callback(pairs);
+  // };
 
   const handleCheckAll = (): void => {
     let flag: boolean;
@@ -172,7 +167,7 @@
     let filteredKeyValue = pairs.map((elem, i) => {
       if (i !== pairs.length - 1) {
         elem.checked = flag;
-      } else if (mode === "READ") {
+      } else if (!isInputBoxEditable) {
         elem.checked = flag;
       }
       return elem;
@@ -283,8 +278,7 @@
       class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
     >
       <div
-        class="d-flex gap-3 py-1 mb-1 align-items-center w-100 ps-2 {mode ===
-        'READ'
+        class="d-flex gap-3 py-1 mb-1 align-items-center w-100 ps-2 {!isTopHeaderRequired
           ? 'd-none'
           : ''}"
         style="height:26px;"
@@ -299,7 +293,7 @@
           <label class="container">
             <input
               type="checkbox"
-              disabled={pairs.length === 1}
+              disabled={pairs.length === 1 || !isCheckBoxEditable}
               bind:checked={controller}
               on:input={handleCheckAll}
             />
@@ -323,7 +317,7 @@
             Value
           </p>
 
-          {#if bulkEditPlaceholder}
+          {#if isBulkEditRequired}
             <div class="me-3">
               <button class="bg-transparent border-0 mt-1 d-flex" style="">
                 <p
@@ -411,16 +405,14 @@
             {element}
             {index}
             {pairs}
-            {mode}
-            {type}
             {theme}
             {environmentVariables}
             {onUpdateEnvironment}
             {updateParam}
             {updateCheck}
-            {removeFormFile}
             {deleteParam}
-            {uploadFormFile}
+            {isInputBoxEditable}
+            {isCheckBoxEditable}
           />
         {/each}
       </div>
@@ -671,13 +663,5 @@
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
-  }
-
-  .trash-icon {
-    height: 24px;
-    width: 24px;
-  }
-  .trash-icon:hover {
-    background-color: var(--bg-secondary-500);
   }
 </style>

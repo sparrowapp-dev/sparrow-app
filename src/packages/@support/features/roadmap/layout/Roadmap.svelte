@@ -66,11 +66,11 @@
       // Filter by category
       const matchesCategory =
         type === "allCategories" ||
-        (type === "featureRequest" &&
+        (type === "Feature Request" &&
           product?.category?.name === "Feature Request") ||
         (type === "UI Improvement" &&
           product?.category?.name === "UI Improvement") ||
-        (type === "bug" && product?.category?.name === "Bug");
+        (type === "Bug" && product?.category?.name === "Bug");
 
       return matchesSearchTerm && matchesCategory;
     }),
@@ -107,8 +107,8 @@
       <div
         style="margin-bottom: 37px;"
         class={`d-flex search-input-container rounded py-1 px-2 `}
-        on:click={()=>{
-           MixpanelEvent(Events.Roadmap_Search);
+        on:click={() => {
+          MixpanelEvent(Events.Roadmap_Search);
         }}
       >
         <SearchIcon
@@ -183,7 +183,7 @@
       <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
     {:else}
       <div
-        class="d-flex justify-content-between gap-2 update-state-section"
+        class="d-flex justify-content-between gap-3 update-state-section"
         style="width:100%;"
       >
         {#each filteredFeedbackStatus as { status, products, filteredFeedbacks }}
@@ -199,7 +199,10 @@
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
             </div>
-            <div class="" style="background-color: var(--bg-secondary-800); padding:12px;">
+            <div
+              class=""
+              style="background-color: var(--bg-secondary-800); padding:12px;"
+            >
               {#if (filteredFeedbacks?.length == 0 && searchTerm.length > 0) || filteredFeedbacks?.length == 0}
                 <p
                   class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"

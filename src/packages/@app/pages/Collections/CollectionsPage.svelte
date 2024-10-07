@@ -28,7 +28,7 @@
     WorkspaceDefault,
     SaveAsCollectionItem,
   } from "@workspaces/features";
-  import {WithModal} from "@workspaces/common/hoc";
+  import { WithModal } from "@workspaces/common/hoc";
   import { notifications } from "@library/ui/toast/Toast";
 
   // ---- Interface, enum & constants
@@ -67,10 +67,13 @@
   import type { WebSocketTab } from "@common/types/workspace/web-socket";
   import { TeamProfile } from "@teams/features/team-settings/components";
   import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
+  import TestFlowExplorerPage from "../TestflowExplorerPage/TestflowExplorerPage.svelte";
+  import { TestflowViewModel } from "./Testflow.ViewModel";
 
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
+  const _viewModel3 = new TestflowViewModel();
 
   let currentWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
@@ -91,6 +94,7 @@
 
   let isExpandCollection = false;
   let isExpandEnvironment = false;
+  let isExpandTestflow = false;
 
   let localEnvironment;
   let globalEnvironment;
@@ -173,7 +177,8 @@
     if (
       (tab?.type === TabTypeEnum.REQUEST ||
         tab?.type === TabTypeEnum.WEB_SOCKET ||
-        tab?.type === TabTypeEnum.ENVIRONMENT) &&
+        tab?.type === TabTypeEnum.ENVIRONMENT ||
+        tab?.type === TabTypeEnum.TESTFLOW) &&
       !tab?.isSaved
     ) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
@@ -200,16 +205,27 @@
    * Handle save functionality on close confirmation popup
    */
   const handlePopupSave = async () => {
-    if (removeTab.type === TabTypeEnum.ENVIRONMENT) {
+    if (
+      removeTab.type === TabTypeEnum.ENVIRONMENT ||
+      removeTab.type === TabTypeEnum.TESTFLOW
+    ) {
       if (removeTab?.path.workspaceId) {
         const id = removeTab?.id;
         loader = true;
-
-        const res = await _viewModel2.saveEnvironment(removeTab);
-        if (res) {
-          loader = false;
-          _viewModel.handleRemoveTab(id);
-          isPopupClosed = false;
+        if (removeTab.type === TabTypeEnum.ENVIRONMENT) {
+          const res = await _viewModel2.saveEnvironment(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
+        } else if (removeTab.type === TabTypeEnum.TESTFLOW) {
+          const res = await _viewModel3.saveTestflow(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
         }
         loader = false;
       }
@@ -281,6 +297,8 @@
     if (value) {
       if (prevWorkspaceId !== value._id) {
         _viewModel.fetchCollections(value?._id);
+        _viewModel2.refreshEnvironment(value?._id);
+        _viewModel3.refreshTestflow(value?._id);
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
       }
@@ -362,8 +380,14 @@
           onUpdateEnvironment={_viewModel2.onUpdateEnvironment}
           onOpenEnvironment={_viewModel2.onOpenEnvironment}
           onSelectEnvironment={_viewModel2.onSelectEnvironment}
+          onCreateTestflow={_viewModel3.handleCreateTestflow}
+          testflows={_viewModel3.testflows}
+          onDeleteTestflow={_viewModel3.handleDeleteTestflow}
+          onUpdateTestflow={_viewModel3.handleUpdateTestflow}
+          onOpenTestflow={_viewModel3.handleOpenTestflow}
           bind:isExpandCollection
           bind:isExpandEnvironment
+          bind:isExpandTestflow
         />
       </Pane>
       <Pane
@@ -427,12 +451,19 @@
                       <WebSocketExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
+                {:else if $activeTab?.type === ItemType.TESTFLOW}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <TestFlowExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
                 {:else if !$tabList?.length}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WorkspaceDefault
                         {currentWorkspace}
                         {handleCreateEnvironment}
+                        onCreateTestflow={_viewModel3.handleCreateTestflow}
                         showImportCollectionPopup={() =>
                           (isImportCollectionPopup = true)}
                         onItemCreated={_viewModel.handleCreateItem}

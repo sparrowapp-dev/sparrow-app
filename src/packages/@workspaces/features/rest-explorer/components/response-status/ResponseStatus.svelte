@@ -4,6 +4,20 @@
   import type { Response } from "@common/types/workspace";
   import { Tooltip } from "@library/ui";
   export let response: Response;
+
+  /**
+   * Checks if the current request was successful based on the response status.
+   * @param _status - The current status of the request.
+   * @returns True if the request succeeded, false otherwise.
+   */
+  const checkIfRequestSucceed = (_status: string) => {
+    if (
+      Number(_status.split(" ")[0]) >= 200 &&
+      Number(_status.split(" ")[0]) < 300
+    )
+      return true;
+    return false;
+  };
 </script>
 
 <div class="d-flex flex-column align-items-start justify-content-between w-100">
@@ -26,15 +40,13 @@
           >
             <span
               class="ellipsis d-flex align-items-center"
-              style="color:{response.status === ResponseStatusCode.OK ||
-              response.status === ResponseStatusCode.CREATED
+              style="color:{checkIfRequestSucceed(response?.status)
                 ? 'var(--icon-success-100)'
                 : 'var(--request-delete)'};"
             >
               <span class="me-2 d-flex">
                 <DotIcon
-                  color={response.status === ResponseStatusCode.OK ||
-                  response.status === ResponseStatusCode.CREATED
+                  color={checkIfRequestSucceed(response?.status)
                     ? "var(--icon-success-100)"
                     : "var(--request-delete)"}
                   height={"6px"}
@@ -52,16 +64,38 @@
           distance={20}
         >
           <span
-            class="d-flex align-items-center ps-1 pe-1 border-0 justify-content-center rounded text-backgroundColor gap-1 time-primary1"
-            style="font-size: 12px;"
+            class="text-fs-12 d-flex align-items-center ps-1 pe-1 border-0 justify-content-center rounded text-backgroundColor gap-1 time-primary1"
+            style=" color:{checkIfRequestSucceed(response?.status)
+              ? 'var(--icon-success-100)'
+              : 'var(--request-delete)'};"
           >
             <span class="me-1 d-flex">
-              <ClockIcon />
+              <ClockIcon
+                color={checkIfRequestSucceed(response?.status)
+                  ? "var(--icon-success-100)"
+                  : "var(--request-delete)"}
+                height={"8px"}
+                width={"8px"}
+              />
             </span>
-            <span>
+            <span
+              class="text-fs-12"
+              style=" color:{checkIfRequestSucceed(response?.status)
+                ? 'var(--icon-success-100)'
+                : 'var(--request-delete)'};"
+            >
               {response.time}
             </span>
-            <p class="mb-0" style="font-size: 12px;">ms</p>
+            <p
+              class="mb-0 text-fs-12"
+              style=" font-size: 12px; color:{checkIfRequestSucceed(
+                response?.status,
+              )
+                ? 'var(--icon-success-100)'
+                : 'var(--request-delete)'};"
+            >
+              ms
+            </p>
           </span>
         </Tooltip>
         <Tooltip

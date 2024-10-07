@@ -24,7 +24,7 @@
   /**
    * External URL for Sparrow's GitHub page.
    */
-  const externalSparrowGithub = constants.SPARROW_GITHUB;
+  const externalSparrowRealseNote = constants.SPARROW_GITHUB;
 
   /**
    * External URL for Sparrow's LinkedIn page.
@@ -165,8 +165,15 @@
       );
     }
     MixpanelEvent(Events.Updates_Filter);
-
   };
+
+  function extractReleaseDate(text) {
+    // Updated regex to handle various release date formats with optional extra spaces
+    const dateMatch = text.match(
+      /Release\s*Date\s*:\s*([A-Za-z]{3,}\s*\d{1,2},\s*\d{4})/,
+    );
+    return dateMatch ? dateMatch[1].trim() : "Unknown Release Date";
+  }
 
   onMount(async () => {
     isLoading = true;
@@ -271,7 +278,11 @@
               {#each filteredEvents as event}
                 <div class="timeline-event">
                   <div class="timeline-date">
-                    {formatDate(event.publishedAt)}
+                    {#if event.plaintextDetails}
+                      {extractReleaseDate(event.plaintextDetails)}
+                    {:else}
+                      {extractReleaseDate(event.markdownDetails)}
+                    {/if}
                   </div>
                   <div class="timeline-circle"></div>
                   <div class="timeline-content">
@@ -346,7 +357,10 @@
                         style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
                         class="mb-0"
                         on:click={async () => {
-                          await open(externalSparrowGithub);
+                          const version =
+                            event.title.match(/v\d+\.\d+\.\d+/)[0];
+                          const releaseNoteUrl = `${externalSparrowRealseNote}/sparrow-app/releases/tag/${version}`;
+                          await open(releaseNoteUrl);
                           MixpanelEvent(Events.Github_Updates);
                         }}
                       >
@@ -401,7 +415,11 @@
                 class="ms-2 text-fs-14"
                 style="margin-top:1.5px; color:var(--text-secondary-100); font-weight:500;"
               >
-                {formatDate(selectedEvent.publishedAt)}
+                {#if event.plaintextDetails}
+                  {extractReleaseDate(selectedEvent.plaintextDetails)}
+                {:else}
+                  {extractReleaseDate(selectedEvent.markdownDetails)}
+                {/if}
               </div>
             </div>
 
@@ -452,7 +470,10 @@
                   style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
                   class="mb-0"
                   on:click={async () => {
-                    await open(externalSparrowGithub);
+                    const version =
+                      selectedEvent.title.match(/v\d+\.\d+\.\d+/)[0];
+                    const releaseNoteUrl = `${externalSparrowRealseNote}/sparrow-app/releases/tag/${version}`;
+                    await open(releaseNoteUrl);
                     MixpanelEvent(Events.Github_Updates);
                   }}
                 >

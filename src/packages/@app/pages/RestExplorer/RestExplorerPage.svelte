@@ -144,6 +144,7 @@
   {isGuestUser}
   {isLoginBannerActive}
   onSendRequest={_viewModel.sendRequest}
+  onCancelRequest={_viewModel.cancelRequest}
   onUpdateRequestUrl={_viewModel.updateRequestUrl}
   onUpdateRequestMethod={_viewModel.updateRequestMethod}
   onUpdateRequestParams={_viewModel.updateParams}
@@ -177,7 +178,7 @@
     onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
     onUpdateAiConversation={_viewModel.updateRequestAIConversation}
     onUpdateRequestState={_viewModel.updateRequestState}
-    onGenerateAiResponse={_viewModel.generateStreamAiResponse}
+    onGenerateAiResponse={_viewModel.generateAiResponse}
     onToggleLike={_viewModel.toggleChatMessageLike}
   />
 {/if}

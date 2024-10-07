@@ -29,7 +29,8 @@
   } from "@support/common/types/activity";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import Loader from "@library/ui/loader/Loader.svelte";
-  import formatTimeAgo from "@support/common/utils/formatTimeAgo";
+  import { FormatTime } from "@common/utils/formatTime";
+  const formatTimeAgo = new FormatTime().formatTimeAgo;
   import ArrowOutward from "@library/icons/ArrowOutward.svelte";
 
   export let type = FeedbackType.ALL_CATEGORY;
@@ -336,7 +337,8 @@
                 <ul>
                   {#each filteredPosts as post}
                     <div
-                      style="display: flex; flex-direction: column; background-color: #151515; padding: 20px;  border-radius:2px;"
+                    class="mb-4"
+                      style=" display: flex; flex-direction: column; background-color: #151515; padding: 20px;  border-radius:2px;"
                     >
                       <div
                         style="display: flex; justify-content: space-between; align-items: flex-start;"
@@ -357,10 +359,9 @@
                           >
                             <span
                               class="category mt-2"
-                              style="color:{getColor(post.status)
-                                .fontColor}; border:0.2px solid {getColor(
-                                post.status,
-                              ).fontColor}; "
+                              style="color:{getColor(post?.status)?.fontColor}; border:0.2px solid {getColor(
+                                post?.status,
+                              )?.fontColor}; "
                             >
                               {post?.status
                                 ? post.status.charAt(0).toUpperCase() +
@@ -438,13 +439,13 @@
                       />
                       <div class="comment-content">
                         <div
-                          class="mt-2"
+                          class="mt-1"
                           style="display: flex; justify-content: space-between; align-items: start;"
                         >
                           <div class="w-100">
                             <div
-                              class="d-flex justify-content-between mb-2"
-                              style=" font-weight: 500; margin-bottom: 4px;"
+                              class="d-flex justify-content-between"
+                              style=" font-weight: 500; "
                             >
                               <p>{comment.author.name}</p>
                               <div style="">
@@ -502,7 +503,7 @@
                 </p>
               {/if}
 
-              <hr class=" mb-3" style="color: #45494D;" />
+              <hr class="mt-4" style="" />
             </div>
           {/if}
 
@@ -540,9 +541,9 @@
                           >
                             <span
                               class="category mt-2"
-                              style="color:{getColor(post.status)
+                              style="color:{getColor(post?.status)
                                 .fontColor}; border:0.2px solid {getColor(
-                                post.status,
+                                post?.status,
                               ).fontColor}; "
                             >
                               {post?.status
@@ -584,12 +585,13 @@
                 </ul>
               {:else}
                 <p
-                  class="mx-1 text-fs-12 mb-0 text-center"
+                  class="mx-1 text-fs-12 mb-0 text-center mt-4 mb-4"
                   style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
                 >
                   No Result Found
                 </p>
               {/if}
+
             </div>
           {/if}
         </div>

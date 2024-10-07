@@ -78,6 +78,8 @@
    */
   export let getColor;
 
+  export let onUpdateFeedback;
+
   let feedbackType = "";
 
   let feedbackStatusType = "";
@@ -117,7 +119,6 @@
     currentSort = sortType;
     isLoading = true;
     posts = await fetchPosts(sortType, searchQuery, status);
-    console.log("This is posts", posts);
     isLoading = false;
   };
 
@@ -326,6 +327,7 @@
             headerFontSize={"10px"}
             isDropIconFilled={true}
             position={"absolute"}
+            maxBodyHeight={"205px"}
           />
         </div>
       </div>
@@ -416,8 +418,8 @@
                   >
                     <span
                       class="category mt-2 text-fs-10"
-                      style="color:{getColor(post.status)
-                        .fontColor}; border:0.2px solid {getColor(post.status)
+                      style="color:{getColor(post?.status)
+                        .fontColor}; border:0.2px solid {getColor(post?.status)
                         .fontColor}; "
                     >
                       {post?.status
@@ -488,6 +490,7 @@
       {onAddComment}
       {fetchComments}
       {handleUpvote}
+      {onUpdateFeedback}
       {getColor}
     />
   {/if}
