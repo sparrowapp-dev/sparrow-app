@@ -153,7 +153,7 @@
 
   let newFolderName: string = "";
   const handleRenameInput = (event: { target: { value: string } }) => {
-    newFolderName = event.target.value;
+    newFolderName = event.target.value.trim();;
   };
 
   const onRenameBlur = async () => {

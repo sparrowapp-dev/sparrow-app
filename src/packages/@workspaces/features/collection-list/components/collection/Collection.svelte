@@ -196,7 +196,7 @@
   let newCollectionName: string = "";
 
   const handleRenameInput = (event: { target: { value: string } }) => {
-    newCollectionName = event.target.value;
+    newCollectionName = event.target.value.trim();
   };
 
   const onRenameBlur = async () => {
@@ -644,11 +644,7 @@
               </div>
             </Tooltip>
 
-            <Tooltip
-              title={"Add WebSocket"}
-              placement={"bottom"}
-              distance={12}
-            >
+            <Tooltip title={"Add WebSocket"} placement={"bottom"} distance={12}>
               <div
                 class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
                 style="height: 24px; width: 24px;"

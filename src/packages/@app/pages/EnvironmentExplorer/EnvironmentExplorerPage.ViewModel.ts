@@ -58,7 +58,11 @@ export class EnvironmentExplorerViewModel {
    */
   public updateName = async (_name: any, event = "") => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    if (event === "blur" && _name === "") {
+
+    // Trim the name to handle cases with only spaces
+    const trimmedName = _name.trim();
+
+    if (event === "blur" && trimmedName === "") {
       const data = await this.environmentRepository.readEnvironment(
         progressiveTab.id,
       );

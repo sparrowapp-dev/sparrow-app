@@ -488,7 +488,7 @@ const makeHttpRequestV2 = async (
     });
 
     // Handle the response and update UI accordingly
-    if (signal.aborted) {
+    if (signal?.aborted) {
       throw new Error(); // Ignore response if request was cancelled
     }
 
@@ -517,7 +517,7 @@ const makeHttpRequestV2 = async (
       throw new Error("Error parsing response");
     }
   } catch (e) {
-    if (signal.aborted) {
+    if (signal?.aborted) {
       throw new DOMException("Request was aborted", "AbortError");
     }
     console.error(e);

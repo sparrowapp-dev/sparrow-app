@@ -38,7 +38,7 @@
         style="color: var(--text-secondary-50)"
       >
         Add Collections to your Workspace to group your requests or send an API
-        request directly
+        request directly.
       </p>
     {/if}
     <div class="w-100 mt-0">
@@ -63,7 +63,7 @@
             width={"22px"}
             color={"var(--text-secondary-200)"}
           />
-          <span style="color: var(--text-secondary-200)" class="ps-2 text-fs-12"
+          <span style="color: var(--text-secondary-200)" class="ps-2 text-fs-12 fw-bold"
             >Add Collection</span
           >
         </button>
