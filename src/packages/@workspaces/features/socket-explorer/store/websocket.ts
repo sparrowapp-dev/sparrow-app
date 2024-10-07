@@ -1,3 +1,4 @@
+import type { UnlistenFn } from "@tauri-apps/api/event";
 import { writable } from "svelte/store";
 
 export type WebSocketMessage = {
@@ -14,6 +15,7 @@ export type WebSocketData = {
   contentType: string;
   url: string;
   filter: "All messages" | "Sent" | "Received";
+  listener: UnlistenFn | null;
 };
 
 export const webSocketDataStore = writable<Map<string, WebSocketData>>(

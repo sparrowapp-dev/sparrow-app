@@ -1933,10 +1933,15 @@ class RestExplorerViewModel
       await this.displayDataInChunks(data.result, 100, 300);
     } else {
       // Update the conversation with an error message
+      let errorMessage = "Something went wrong! Please try again.";
+      if (response.message === "Limit reached") {
+        errorMessage =
+          "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
+      }
       this.updateRequestAIConversation([
         ...(componentData?.property?.request?.ai?.conversations || []),
         {
-          message: "Something went wrong! Please try again.",
+          message: errorMessage,
           messageId: uuidv4(),
           type: MessageTypeEnum.RECEIVER,
           isLiked: false,

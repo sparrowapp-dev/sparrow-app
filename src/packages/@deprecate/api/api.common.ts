@@ -14,10 +14,7 @@ import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 import type { Response } from "$lib/utils/interfaces/request.interface";
 import { listen } from "@tauri-apps/api/event";
-import {
-  webSocketDataStore,
-  webSocketListener,
-} from "@workspaces/features/socket-explorer/store";
+import { webSocketDataStore } from "@workspaces/features/socket-explorer/store";
 import { v4 as uuidv4 } from "uuid";
 import { RequestDataTypeEnum } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
@@ -304,9 +301,11 @@ const disconnectWebSocket = async (tab_id: string) => {
       try {
         // Logic to handle response
         console.log("disconnected", data);
+        let listener;
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
+            listener = wsData.listener;
             wsData.messages.unshift({
               data: `Disconnected from ${url}`,
               transmitter: "disconnector",
@@ -315,17 +314,13 @@ const disconnectWebSocket = async (tab_id: string) => {
             });
             wsData.status = "disconnected";
             webSocketDataMap.set(tab_id, wsData);
+            if (listener) {
+              listener();
+            }
           }
           return webSocketDataMap;
         });
-        let listener;
-        webSocketListener.update((webSocketListenerMap) => {
-          listener = webSocketListenerMap.get(tab_id);
-          if (listener) {
-            listener();
-          }
-          return webSocketListenerMap;
-        });
+
         notifications.success("WebSocket disconnected successfully.");
       } catch (e) {
         console.error(e);
@@ -384,6 +379,7 @@ const connectWebSocket = async (
       body: "",
       filter: "All messages",
       url: url,
+      listener: null,
     });
 
     return webSocketDataMap;
@@ -434,9 +430,13 @@ const connectWebSocket = async (
             return webSocketDataMap;
           });
         });
-        webSocketListener.update((webSocketListenerMap) => {
-          webSocketListenerMap.set(tabId, listener);
-          return webSocketListenerMap;
+        webSocketDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tabId);
+          if (wsData) {
+            wsData.listener = listener;
+            webSocketDataMap.set(tabId, wsData);
+          }
+          return webSocketDataMap;
         });
       } catch (e) {
         console.error(e);
