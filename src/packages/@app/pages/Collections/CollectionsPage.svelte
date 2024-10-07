@@ -552,10 +552,11 @@
       }
       return response;
     }}
-    onCollectionFileUpload={async (currentWorkspaceId, file) => {
+    onCollectionFileUpload={async (currentWorkspaceId, file, type) => {
       const response = await _viewModel.collectionFileUpload(
         currentWorkspaceId,
         file,
+        type,
       );
       if (response.isSuccessful) {
         setTimeout(() => {

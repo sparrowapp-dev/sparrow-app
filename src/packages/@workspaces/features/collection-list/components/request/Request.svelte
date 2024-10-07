@@ -96,7 +96,7 @@
   let newRequestName: string = "";
 
   const handleRenameInput = (event) => {
-    newRequestName = event.target.value;
+    newRequestName = event.target.value.trim();
   };
 
   const onRenameBlur = async () => {
