@@ -233,17 +233,14 @@
     const maxFilesExceededMessage = "You can upload up to 5 files only.";
 
     // Safely gather selected files
-    let newFiles = [
-      ...(uploadedImageAttachment.file?.value || []),
-      ...(e?.target?.files || e?.dataTransfer?.files || []),
-    ];
+    let newFiles = Array.from(e?.target?.files || e?.dataTransfer?.files || []);
 
     const maxImageSize = 2097152; // 2MB
     let isSizeExceeded = false;
     let isInvalidType = false;
 
     // Filter valid image files
-    const validFiles = newFiles.filter((file) => {
+    const validNewFiles = newFiles.filter((file) => {
       const fileExtension = file.name?.split(".").pop().toLowerCase();
       if (!fileExtension) return false; // Ignore files without extension
 
@@ -261,13 +258,24 @@
       }
     });
 
-    // Total number of valid files already uploaded
-    let currentFileCount = uploadedImageAttachment.file?.value?.length || 0;
-    let newFileCount = validFiles.length;
+    // Get currently uploaded files
+    const existingFiles = uploadedImageAttachment.file?.value || [];
+
+    // Prevent adding duplicates
+    const newUniqueFiles = validNewFiles.filter(
+      (newFile) =>
+        !existingFiles.some(
+          (existingFile) => existingFile.name === newFile.name,
+        ),
+    );
+
+    // Calculate total file count after adding new unique files
+    let currentFileCount = existingFiles.length;
+    let newFileCount = newUniqueFiles.length;
 
     // Prevent adding more than 5 files in total
     if (currentFileCount + newFileCount > 5) {
-      validFiles.length = 5 - currentFileCount; // Adjust the number of files to keep the total <= 5
+      newUniqueFiles.length = 5 - currentFileCount; // Adjust the number of files to keep the total <= 5
       notifications.error(maxFilesExceededMessage);
     }
 
@@ -279,14 +287,18 @@
       notifications.error(typeErrorMessage);
     }
 
-    // Update the feedback files if no critical errors
+    // Update the feedback files with only new unique files
     if (!isSizeExceeded && !isInvalidType) {
       uploadedImageAttachment.file.value = [
-        ...(uploadedImageAttachment.file?.value || []),
-        ...validFiles,
+        ...existingFiles,
+        ...newUniqueFiles,
       ];
     }
+
+    // Reset the input field after the files are processed
+    e.target.value = ""; // This allows the same file to be uploaded again
   };
+
   const removeCommentAttachment = (index) => {
     uploadedImageAttachment.file.value =
       uploadedImageAttachment.file.value.filter(

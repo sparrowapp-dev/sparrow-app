@@ -5,7 +5,7 @@
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { ImageModal } from "@library/ui/image-modal";
-    import { notifications } from "@library/ui/toast/Toast";
+  import { notifications } from "@library/ui/toast/Toast";
 
   /**
    * @description - The current comment being added or modified by the user.
@@ -53,8 +53,6 @@
 
   let inputId = "reply-input2";
 
-
-
   /**
    * Formats a given date into a human-readable "time ago" string.
    * @param  date - The date to format.
@@ -77,7 +75,6 @@
       return `${seconds} second${seconds > 1 ? "s" : ""} ago`;
     }
   };
-
 
   let uploadReplyAttachment = {
     file: {
@@ -103,10 +100,7 @@
     const maxFilesExceededMessage = "You can upload up to 5 files only.";
 
     // Safely gather selected files
-    let newFiles = [
-      ...(uploadReplyAttachment.file?.value || []),
-      ...(e?.target?.files || e?.dataTransfer?.files || []),
-    ];
+    let newFiles = Array.from(e?.target?.files || e?.dataTransfer?.files || []);
 
     const maxImageSize = 2097152; // 2MB
     let isSizeExceeded = false;
@@ -131,13 +125,24 @@
       }
     });
 
-    // Total number of valid files already uploaded
-    let currentFileCount = uploadReplyAttachment.file?.value?.length || 0;
-    let newFileCount = validFiles.length;
+    // Get currently uploaded files
+    const existingFiles = uploadReplyAttachment.file?.value || [];
+
+    // Prevent adding duplicates (files already uploaded should not be uploaded again)
+    const uniqueNewFiles = validFiles.filter(
+      (newFile) =>
+        !existingFiles.some(
+          (existingFile) => existingFile.name === newFile.name,
+        ),
+    );
+
+    // Total number of files already uploaded
+    let currentFileCount = existingFiles.length;
+    let newFileCount = uniqueNewFiles.length;
 
     // Prevent adding more than 5 files in total
     if (currentFileCount + newFileCount > 5) {
-      validFiles.length = 5 - currentFileCount; // Adjust the number of files to keep the total <= 5
+      uniqueNewFiles.length = 5 - currentFileCount; // Adjust the number of files to keep the total <= 5
       notifications.error(maxFilesExceededMessage);
     }
 
@@ -149,20 +154,19 @@
       notifications.error(typeErrorMessage);
     }
 
-    // Update the feedback files if no critical errors
+    // Update the feedback files with unique new files if no critical errors
     if (!isSizeExceeded && !isInvalidType) {
-      uploadReplyAttachment.file.value = [
-        ...(uploadReplyAttachment.file?.value || []),
-        ...validFiles,
-      ];
+      uploadReplyAttachment.file.value = [...existingFiles, ...uniqueNewFiles];
     }
+
+    // Reset the file input so that the same file can be selected again if needed
+    e.target.value = "";
   };
 
   const removeCommentAttachment = (index) => {
-    uploadReplyAttachment.file.value =
-      uploadReplyAttachment.file.value.filter(
-        (_i, idx) => idx !== index, // Corrected: Use 'idx' to check against the index
-      );
+    uploadReplyAttachment.file.value = uploadReplyAttachment.file.value.filter(
+      (_i, idx) => idx !== index, // Corrected: Use 'idx' to check against the index
+    );
   };
 </script>
 
