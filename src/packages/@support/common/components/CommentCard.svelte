@@ -156,11 +156,6 @@
         ...validFiles,
       ];
     }
-
-    console.log(
-      "This is image upload attachment array",
-      uploadReplyAttachment.file.value,
-    );
   };
 
   const removeCommentAttachment = (index) => {
