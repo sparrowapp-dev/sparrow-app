@@ -187,8 +187,8 @@
 <div style="height:100%; width:100%;">
   <div class="container-data" style="padding: 20px;">
     <div class="headerq">
-      <p style="font-size: 20px; font-weight:700;">Updates</p>
-      <p style="color: var(--text-secondary-50); font-size:14px;">
+      <p class="text-fs-20" style="font-weight:700;">Updates</p>
+      <p class="text-fs-14" style="color: var(--text-secondary-50); ">
         Check out our latest releases designed to boost your productivity and
         efficiency.
       </p>
@@ -322,15 +322,15 @@
                     </div>
                     <div class="tags" style="margin-top: 5px;">
                       {#each event.types as tag}
-                        <span class="tag {getTagClass(tag)}">
+                        <span class="text-fs-10 tag {getTagClass(tag)}">
                           {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
                         >
                       {/each}
                     </div>
                     {#if event.plaintextDetails.split(" ").length > 20}
                       <p
-                        style="font-size: 14px; font-weight:400; line-height:24px; "
-                        class=""
+                        style=" font-weight:400; line-height:24px; "
+                        class="text-fs-14"
                       >
                         {truncateDescription(event.plaintextDetails)}
                         <span
@@ -344,8 +344,8 @@
                       </p>
                     {:else}
                       <p
-                        style="font-size: 14px; font-weight:400; line-height:24px; "
-                        class=""
+                        style=" font-weight:400; line-height:24px; "
+                        class="text-fs-14"
                       >
                         {event.description}
                       </p>
@@ -373,14 +373,18 @@
                       {event.reactions?.like || ""}
                     </div> -->
                         <div
-                          style="cursor:pointer; solid grey;"
+                          style="cursor:pointer;"
                           class="ps-2"
                           on:click={async () => {
                             await open(externalSparrowLinkedin);
                             MixpanelEvent(Events.LinkedIn_Updates_Icon);
                           }}
                         >
-                          <LinkedinIcon height={"18px"} width={"18px"} />
+                          <LinkedinIcon
+                            height={"18px"}
+                            width={"18px"}
+                            color={"var(--icon-secondary-950)"}
+                          />
                         </div>
                       </div>
                     </div>
@@ -463,7 +467,7 @@
                 {/each}
               </div>
 
-              <p style="font-size: 14px; font-weight:400; " class="mt-3">
+              <p style="font-weight:400; " class="mt-3 text-fs-14">
                 {@html marked(selectedEvent.markdownDetails)}
               </p>
 
@@ -489,14 +493,14 @@
                 {selectedEvent.reactions?.like || ""}
               </div> -->
                   <div
-                    style="cursor:pointer; solid grey;"
+                    style="cursor:pointer;"
                     class="ps-2"
                     on:click={async () => {
                       await open(externalSparrowLinkedin);
                       MixpanelEvent(Events.LinkedIn_Updates_Icon);
                     }}
                   >
-                    <LinkedinIcon height={"18px"} width={"18px"} />
+                    <LinkedinIcon height={"18px"} width={"18px"}  color={"var(--icon-secondary-950)"} />
                   </div>
                 </div>
               </div>
@@ -649,7 +653,6 @@
     display: inline-block;
     padding: 1.24px 5px;
     border-radius: 4px;
-    font-size: 10px;
     font-weight: 500;
     margin-right: 6px;
     border: 1px solid;

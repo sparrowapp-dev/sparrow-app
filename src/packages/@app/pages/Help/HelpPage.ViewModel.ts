@@ -453,7 +453,7 @@ class HelpPageViewModel {
 
     let images = [];
     if (imageResponse?.isSuccessful) {
-       images = imageResponse?.data?.data?.map(
+      images = imageResponse?.data?.data?.map(
         (file: { fileUrl: string }) => file?.fileUrl,
       );
     } else {
@@ -529,8 +529,6 @@ class HelpPageViewModel {
       const result = await this.cannyService.createVote(postID, UserId);
       return result;
     }
-
-    let result = this.listVoteUsingPostId(postID);
   };
 
   /**
@@ -592,6 +590,10 @@ class HelpPageViewModel {
     }
   };
 
+  /**
+   * Fetches a list of votes for a specific post ID.
+   * @param {string} postID - The ID of the post to retrieve votes for.
+   */
   public listVoteUsingPostId = async (postID: string) => {
     if (postID) {
       const result = await this.cannyService.listVotesUsingPostId(postID);
@@ -599,6 +601,10 @@ class HelpPageViewModel {
     }
   };
 
+  /**
+   * Fetches the changelog based on the given type.
+   * @param {string} type - The type of changelog to retrieve (e.g., feature, bugfix).
+   */
   public listChangeLog = async (type: string) => {
     const result = await this.cannyService.listChangeLog(type);
     return result;

@@ -2,7 +2,7 @@
   import { user } from "$lib/store";
   import {
     ActivityIcon,
-    CommentGridIcon,
+    BoxBarIcon,
     CommentIcon,
     LikeIcon,
     MessageIcon,
@@ -464,7 +464,7 @@
                   class=""
                   style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
                 >
-                  <CommentGridIcon
+                  <BoxBarIcon
                     height={"30px"}
                     width={"30px"}
                     color={"var(--icon-primary-300)"}
