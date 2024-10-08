@@ -69,6 +69,10 @@
   import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
   import TestFlowExplorerPage from "../TestflowExplorerPage/TestflowExplorerPage.svelte";
   import { TestflowViewModel } from "./Testflow.ViewModel";
+  import { Button, Modal } from "@library/ui";
+  import { isUserFirstSignUp } from "@app/store/user.store";
+  import { WelcomeLogo } from "@common/images";
+  import { WelcomePopup } from "@workspaces/features/welcome-popup";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -154,6 +158,10 @@
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
+    if (value) {
+      _viewModel.createNewTab();
+      isUserFirstSignUp.set(true);
+    }
   });
 
   user.subscribe((value) => {
@@ -327,6 +335,14 @@
     }
   }
 
+  let isWelcomePopupOpen = false;
+  let isTourGuideOpen = false;
+  isUserFirstSignUp.subscribe((value) => {
+    if (value) {
+      isWelcomePopupOpen = value;
+    }
+  });
+
   onDestroy(() => {
     cw.unsubscribe();
   });
@@ -415,7 +431,7 @@
                 {#if $activeTab?.type === ItemType.REQUEST}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
-                      <RestExplorerPage tab={$activeTab} />
+                      <RestExplorerPage bind:isTourGuideOpen tab={$activeTab} />
                     </div>
                   </Motion>
                 {:else if $activeTab?.type === ItemType.COLLECTION}
@@ -492,6 +508,30 @@
   {loader}
   {isGuestUser}
 />
+
+<Modal
+  title={""}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isWelcomePopupOpen}
+  handleModalState={() => {
+    isUserFirstSignUp.set(false);
+    isWelcomePopupOpen = false;
+  }}
+>
+  <WelcomePopup
+    onClickExplore={() => {
+      isUserFirstSignUp.set(false);
+      isWelcomePopupOpen = false;
+    }}
+    onClickTour={() => {
+      isUserFirstSignUp.set(false);
+      isTourGuideOpen = true;
+      isWelcomePopupOpen = false;
+    }}
+  />
+</Modal>
 
 <svelte:window on:keydown={handleKeyPress} />
 <!-- <ImportCollection
@@ -683,5 +723,13 @@
       .collection-splitter .splitpanes__splitter:hover
     ) {
     background-color: var(--bg-primary-200) !important;
+  }
+  .gradient-text {
+    font-size: 18;
+    font-weight: 500;
+    display: inline-block;
+    background: linear-gradient(270deg, #6147ff 2.55%, #1193f0 31.48%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 </style>

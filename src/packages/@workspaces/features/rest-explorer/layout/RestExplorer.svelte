@@ -110,6 +110,7 @@
    */
   export let userRole;
   export let storeData: restExplorerData | undefined;
+  export let isTourGuideOpen = false;
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -136,6 +137,11 @@
   $: {
     if ($tab?.property?.request?.url?.length > 0) {
       isLoading = false;
+    }
+  }
+  $: {
+    if (isTourGuideOpen) {
+      isGuidePopup = true;
     }
   }
   const toggleSaveRequest = (flag: boolean): void => {
@@ -470,12 +476,14 @@
   isOpen={isGuidePopup}
   handleModalState={(flag = false) => {
     isGuidePopup = flag;
+    isTourGuideOpen = false;
   }}
 >
   <div style="position: relative;">
     <Carousel
       handleClosePopup={(flag = false) => {
         isGuidePopup = flag;
+        isTourGuideOpen = false;
       }}
       data={[
         {

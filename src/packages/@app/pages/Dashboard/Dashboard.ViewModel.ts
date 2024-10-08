@@ -286,6 +286,7 @@ export class DashboardViewModel {
     const response = await userLogout();
     if (response.isSuccessful) {
       await this.clientLogout();
+      MixpanelEvent(Events.SIGNOUT);
       return true;
     } else {
       notifications.error(response.message);
