@@ -35,7 +35,7 @@
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <p
         class="text-fs-12 text-center w-100"
-        style="color: var(--text-secondary-50)"
+        style="color: var(--text-secondary-50); font-weight:300;"
       >
         Add Collections to your Workspace to group your requests or send an API
         request directly.
