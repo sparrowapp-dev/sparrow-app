@@ -72,6 +72,8 @@
       notifications.error(errorMessage);
     }
     uploadFeedback.file.value = selectedFiles;
+
+    e.target.value = "";
   };
   const removeFile = (index: number) => {
     const files = Array.from(uploadFeedback.file.value).filter((elem, i) => {

@@ -69,7 +69,6 @@
         searchTerm.trim().length === 0 ||
         product.title.toLowerCase().includes(searchTerm.toLowerCase());
 
-
       // Filter by category
       const matchesCategory =
         type === FeedbackType.ALL_CATEGORY ||
@@ -136,21 +135,6 @@
           }}
           bind:value={searchTerm}
         />
-
-        {#if searchTerm.length != 0}
-          <div
-            class="clear-icon"
-            on:click={() => {
-              searchTerm = "";
-            }}
-          >
-            <CrossIcon
-              height="16px"
-              width="12px"
-              color="var(--icon-secondary-300)"
-            />
-          </div>
-        {/if}
       </div>
 
       <div class="filter">
@@ -213,12 +197,14 @@
                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
                 .join(" ")}
             </div>
-            <div
-              style="background-color: var(--bg-secondary-800); padding:12px;"
-            >
-              {#if filteredFeedbacks?.length == 0 && searchTerm === ""}
+
+            {#if filteredFeedbacks?.length == 0 && searchTerm === ""}
+              <div
+                class=" d-flex align-items-center justify-content-center"
+                style="height: calc(100% - 32px);"
+              >
                 <div
-                  class=""
+                  class="p-3"
                   style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
                 >
                   <MessageDisabledIcon
@@ -228,23 +214,34 @@
                   />
 
                   <p
-                    class="mx-1 text-fs-14 mb-0 text-center"
-                    style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                    class="mx-1 mt-3 text-fs-14 mb-0 text-center"
+                    style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;  text-align:center;"
                   >
                     Share your feedback and check back here for updates.
                   </p>
                 </div>
-              {:else if filteredFeedbacks.length == 0 && searchTerm.length > 0}
+              </div>
+            <!-- {/if} -->
+
+            {:else if filteredFeedbacks.length == 0 && searchTerm.length > 0}
+              <div
+                class="w-100 h-100 mb-4"
+                style="display: flex; align-items-center; justify-content:center;"
+              >
                 <p
-                  class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
-                  style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
+                  class="mx-1 text-fs-12 mb-0 text-center mb-3"
+                  style="display:flex; align-items:center; font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
                 >
-                No Result Found.
-              </p>
-              {:else}
+                  No Result Found.
+                </p>
+              </div>
+            {:else}
+              <div
+                style="background-color: var(--bg-secondary-800); padding:12px;"
+              >
                 <HelpInfoCard {setPostId} status={filteredFeedbacks} />
-              {/if}
-            </div>
+              </div>
+            {/if}
           </div>
         {/each}
       </div>

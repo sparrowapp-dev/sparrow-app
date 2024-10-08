@@ -380,7 +380,7 @@
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "newest"}
           >
-            <span class="text-fs-13">Now</span>
+            <span class="text-fs-13">New</span>
             <div class="tick-icon">
               <TickIcon
                 height={"12px"}

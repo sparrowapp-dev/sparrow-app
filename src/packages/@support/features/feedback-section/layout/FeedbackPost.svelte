@@ -136,7 +136,7 @@
       .sort((a, b) => new Date(b.created) - new Date(a.created)); // Reversed comparison
   }
 
-  const handleSortChange = (id:string) => {
+  const handleSortChange = (id: string) => {
     if (id == "new first") {
       nestedComments = sortCommentsNewToOld(nestedComments);
     } else {
@@ -154,7 +154,7 @@
   let isSubjectEmpty = false;
   let isTextArea = false;
 
-  const handleLogoInputChange = (e:InputEvent) => {
+  const handleLogoInputChange = (e: InputEvent) => {
     const errorMessage =
       "Failed to upload the file. You are allowed to upload only 5 files per feedback.";
 
@@ -221,7 +221,7 @@
 
   let inputId = "attachment-icon-container1";
 
-  const handleInputAttachment = (e:InputEvent) => {
+  const handleInputAttachment = (e: InputEvent) => {
     const errorMessage =
       "Failed to upload the file. You are allowed to upload only 5 files per feedback.";
     const sizeExceededMessage =
@@ -297,7 +297,7 @@
     e.target.value = ""; // This allows the same file to be uploaded again
   };
 
-  const removeCommentAttachment = (index:number) => {
+  const removeCommentAttachment = (index: number) => {
     uploadedImageAttachment.file.value =
       uploadedImageAttachment.file.value.filter(
         (_i, idx) => idx !== index, // Corrected: Use 'idx' to check against the index
@@ -310,7 +310,7 @@
    * @param {string} postId - The ID of the post to add the comment to.
    * @returns {Promise<void>} - A promise that resolves once the comment has been added and comments have been fetched.
    */
-  const handleAddComment = async (postId:string) => {
+  const handleAddComment = async (postId: string) => {
     isCommenting = true;
     commentValue = commentValue.trim();
 
@@ -329,9 +329,8 @@
     isCommenting = false;
 
     MixpanelEvent(Events.Add_Comment);
-    type="new first"
+    type = "new first";
   };
-
 
   const handleCommentInputValue = (e: InputEvent) => {
     commentValue = e.target.value;
@@ -429,7 +428,7 @@
                 {/each}
               </div>
 
-              <div
+              <div class="mb-3"
                 style="display: flex; align-items: center; font-size: 12px; margin-top:10px; color:var(--text-secondary-50) !important;"
               >
                 <span style="padding-left:4px;">{createdAt} </span>
