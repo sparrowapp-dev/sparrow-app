@@ -716,7 +716,7 @@ class RestExplorerViewModel
           response: {
             body: "",
             headers: [],
-            status: ResponseStatusCode.ERROR,
+            status: "",
             time: 0,
             size: 0,
             navigation: ResponseSectionEnum.RESPONSE,
