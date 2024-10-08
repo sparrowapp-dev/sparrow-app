@@ -140,7 +140,7 @@
         {#if !countCheckedList(list)}
           <span class="text-fs-12 text-secondary-200"> Select</span>
         {:else}
-          <div class="me-4 navigator ">
+          <div class="me-4 navigator">
             {#each list as element}
               {#if element.checked}
                 <span class="header-item text-fs-12 py-2 ps-2 pe-0 rounded me-2"
@@ -180,24 +180,27 @@
         class:dropdown-active={isOpen}
         transition:slide={{ duration: 100 }}
       >
-        <div class="d-flex align-items-center px-2 py-2 highlight">
-          <label class="check-box">
-            <input
-              id="select-all-{id}"
-              class="form-check-input mt-0"
-              type="checkbox"
-              bind:checked={controller}
-              on:input={handleCheckAll}
-            />
-            <span class="checkmark"></span>
-          </label>
-          <label
-            for="select-all-{id}"
-            role="button"
-            class="text-fs-12 m-0 ps-2 p-0 text-whiteColor w-100"
-            >Select All</label
-          >
-        </div>
+        {#if list?.length}
+          <div class="d-flex align-items-center px-2 py-2 highlight">
+            <label class="check-box">
+              <input
+                id="select-all-{id}"
+                class="form-check-input mt-0"
+                type="checkbox"
+                bind:checked={controller}
+                on:input={handleCheckAll}
+              />
+              <span class="checkmark"></span>
+            </label>
+            <label
+              for="select-all-{id}"
+              role="button"
+              class="text-fs-12 m-0 ps-2 p-0 text-whiteColor w-100"
+              >Select All</label
+            >
+          </div>
+        {/if}
+
         <hr class="mt-0 mb-1 text-secondary-250" />
         {#each list as item, index}
           <div class="d-flex align-items-center px-2 py-2 highlight">
