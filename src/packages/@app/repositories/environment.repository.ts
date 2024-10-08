@@ -76,15 +76,50 @@ export class EnvironmentRepository {
       .exec();
   };
 
-  public refreshEnvironment = async (data, workspaceId): Promise<void> => {
-    const env = data.map((environment) => {
-      environment["id"] = environment._id;
-      environment["workspaceId"] = workspaceId;
-      delete environment._id;
-      return environment;
-    });
-    await RxDB.getInstance().rxdb.environment.bulkUpsert(env);
+  public refreshEnvironment = async (_environments): Promise<void> => {
+    if ((_environments?.length || 0) > 0) {
+      await RxDB.getInstance()?.rxdb?.environment?.bulkUpsert(_environments);
+    }
     return;
+  };
+
+  /**
+   * Deletes orphan environments that doesn't exists on sparrow backend
+   * @param _workspaceId - workspace id
+   * @param _environmentIds - backend environments Ids to find local orphan environments
+   */
+  public deleteOrphanEnvironments = async (
+    _workspaceId: string,
+    _environmentIds: string[],
+  ) => {
+    // delete left out environments
+    const environments = await RxDB.getInstance()
+      ?.rxdb?.environment.find({
+        selector: {
+          workspaceId: _workspaceId,
+        },
+      })
+      .exec();
+    const environmentsJSON = environments?.map((_environment) => {
+      return _environment.toMutableJSON();
+    });
+    const selectedEnvironmentsToBeDeleted = environmentsJSON
+      ?.filter((_environment) => {
+        for (let i = 0; i < _environmentIds.length; i++) {
+          if (_environmentIds[i] === _environment.id) {
+            return false;
+          }
+        }
+        return true;
+      })
+      .map((_environment) => {
+        return _environment.id;
+      });
+    if ((selectedEnvironmentsToBeDeleted?.length || 0) > 0) {
+      await RxDB.getInstance()?.rxdb?.environment.bulkRemove(
+        selectedEnvironmentsToBeDeleted as string[],
+      );
+    }
   };
 
   /**

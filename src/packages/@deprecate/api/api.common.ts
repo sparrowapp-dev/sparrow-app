@@ -473,7 +473,7 @@ const makeHttpRequestV2 = async (
   headers: string,
   body: string,
   request: string,
-  signal: AbortSignal,
+  signal?: AbortSignal,
 ) => {
   console.table({ url, method, headers, body, request });
   const startTime = performance.now();

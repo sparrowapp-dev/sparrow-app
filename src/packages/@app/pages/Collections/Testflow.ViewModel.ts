@@ -9,6 +9,7 @@ import { TFDefaultEnum } from "@common/types/workspace/testflow";
 import { TestflowService } from "@app/services/testflow.service";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import type { Tab } from "@common/types/workspace";
+import { createDeepCopy } from "$lib/utils/helpers";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -291,9 +292,21 @@ export class TestflowViewModel {
       return;
     }
     const response = await this.testflowService.fetchAllTestflow(workspaceId);
-    if (response.isSuccessful && response.data.data) {
+    if (response?.isSuccessful && response?.data?.data) {
       const testflows = response.data.data;
-      this.testflowRepository.refreshTestflow(testflows, workspaceId);
+      await this.testflowRepository.refreshTestflow(
+        testflows?.map((_testflow: any) => {
+          const testflow = createDeepCopy(_testflow);
+          testflow["workspaceId"] = workspaceId;
+          return testflow;
+        }),
+      );
+      await this.testflowRepository.deleteOrphanTestflows(
+        workspaceId,
+        testflows?.map((_testflow: any) => {
+          return _testflow._id;
+        }),
+      );
     }
     return;
   };
