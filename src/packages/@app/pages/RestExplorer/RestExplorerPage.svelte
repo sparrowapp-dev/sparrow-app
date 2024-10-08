@@ -11,6 +11,7 @@
   import { restExplorerDataStore } from "@workspaces/features/rest-explorer/store";
   import type { restExplorerData } from "@workspaces/features/rest-explorer/store/rest-explorer";
   export let tab;
+  export let isTourGuideOpen = false;
   let isLoginBannerActive = false;
   const _viewModel = new RestExplorerViewModel(tab);
   const environments = _viewModel.environments;
@@ -148,6 +149,7 @@
   bind:requestAuthParameter={_viewModel.authParameter}
   bind:userRole
   storeData={restExplorerData}
+  {isTourGuideOpen}
   {environmentVariables}
   {isGuestUser}
   {isLoginBannerActive}

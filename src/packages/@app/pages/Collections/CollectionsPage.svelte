@@ -69,6 +69,9 @@
   import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
   import TestFlowExplorerPage from "../TestflowExplorerPage/TestflowExplorerPage.svelte";
   import { TestflowViewModel } from "./Testflow.ViewModel";
+  import { Button, Modal } from "@library/ui";
+  import { isUserFirstSignUp } from "@app/store/user.store";
+  import { WelcomeLogo } from "@common/images";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -327,6 +330,14 @@
     }
   }
 
+  let isWelcomePopupOpen = false;
+  let isTourGuideOpen = false;
+  isUserFirstSignUp.subscribe((value) => {
+    if (value) {
+      isWelcomePopupOpen = value;
+    }
+  });
+
   onDestroy(() => {
     cw.unsubscribe();
   });
@@ -415,7 +426,7 @@
                 {#if $activeTab?.type === ItemType.REQUEST}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
-                      <RestExplorerPage tab={$activeTab} />
+                      <RestExplorerPage tab={$activeTab} {isTourGuideOpen} />
                     </div>
                   </Motion>
                 {:else if $activeTab?.type === ItemType.COLLECTION}
@@ -492,6 +503,54 @@
   {loader}
   {isGuestUser}
 />
+
+<Modal
+  title={""}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isWelcomePopupOpen}
+  handleModalState={() => {
+    isUserFirstSignUp.set(false);
+    isWelcomePopupOpen = false;
+  }}
+>
+  <div class="pt-2 pb-4">
+    <div class="d-flex">
+      <WelcomeLogo />
+      <p
+        style="margin-top: 3px; margin-left: 8px; color: var(--text-secondary-100); font-size:18px; font-weight:500;"
+      >
+        Welcome to <span class="gradient-text">Sparrow</span> !
+      </p>
+    </div>
+    <p style="font-size: 16px; color: var(--text-secondary-1000)">
+      Your API journey awaits!<br /> Sparrow app allows you to simplify workflows
+      effortlessly, saving time and effort.
+    </p>
+  </div>
+  <div class="d-flex justify-content-between">
+    <Button
+      title={"Explore Myself"}
+      textStyleProp={"font-size:16px; font-weight:400;"}
+      type={"dark"}
+      onClick={() => {
+        isUserFirstSignUp.set(false);
+        isWelcomePopupOpen = false;
+      }}
+    />
+    <Button
+      title={"Take a Tour"}
+      textStyleProp={"font-size:16px; font-weight:400;"}
+      type={"primary"}
+      onClick={() => {
+        isUserFirstSignUp.set(false);
+        isTourGuideOpen = true;
+        isWelcomePopupOpen = false;
+      }}
+    />
+  </div>
+</Modal>
 
 <svelte:window on:keydown={handleKeyPress} />
 <!-- <ImportCollection
@@ -683,5 +742,13 @@
       .collection-splitter .splitpanes__splitter:hover
     ) {
     background-color: var(--bg-primary-200) !important;
+  }
+  .gradient-text {
+    font-size: 18;
+    font-weight: 500;
+    display: inline-block;
+    background: linear-gradient(270deg, #6147ff 2.55%, #1193f0 31.48%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 </style>

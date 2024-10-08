@@ -12,6 +12,7 @@ import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import ActiveSideBarTabViewModel from "../../Dashboard/ActiveSideBarTab.ViewModel";
 import { GuideRepository } from "@app/repositories/guide.repository";
+import { isUserFirstSignUp } from "@app/store/user.store";
 
 //------------------------------MixPanel-------------------------------//
 
@@ -77,6 +78,7 @@ export async function handleLoginV2(url: string) {
     notifications.success("Login successful!");
     if (event === "register") {
       navigate("/app/collections?first=true");
+      isUserFirstSignUp.set(true);
       _guideRepository.insert({ isActive: true, id: "environment-guide" });
       _guideRepository.insert({ isActive: true, id: "collection-guide" });
     } else {
