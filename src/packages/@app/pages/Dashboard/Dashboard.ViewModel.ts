@@ -245,22 +245,6 @@ export class DashboardViewModel {
     this.refreshTeamsWorkspacesThrottler(_userId);
   };
 
-  public refreshEnvironment = async (workspaceId) => {
-    const isGuestUser = await this.getGuestUserState();
-    if (isGuestUser !== true) {
-      const response =
-        await this.environmentService.fetchAllEnvironments(workspaceId);
-      if (response.isSuccessful && response.data.data) {
-        const environments = response.data.data;
-        await this.environmentRepository.refreshEnvironment(
-          environments,
-          workspaceId,
-        );
-      }
-    }
-    return;
-  };
-
   /**
    * clear local DB and clear guest user details from store
    */
