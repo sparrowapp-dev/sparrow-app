@@ -117,7 +117,7 @@
         </div>
       </div>
       {#if filteredWorkspaces.length > 0}
-        <div class="justify-content-between bottom-0 w-75 d-flex">
+        <div class="bottom-0  d-flex justify-content-end " style="width:53%;">
           <div class="tab-head" style="width: 189.46px;">
             Showing {startIndex} - {endIndex} of {filteredWorkspaces.length}
           </div>
@@ -159,7 +159,7 @@
               />
             </button>
           </div>
-          <div></div>
+
         </div>
       {/if}
     {:else}
