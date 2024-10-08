@@ -173,13 +173,12 @@ export class DashboardViewModel {
     return;
   };
 
-  // sync workspace data with backend server
+  /**
+   * sync workspace data with backend server
+   * @param userId User id
+   */
   public refreshWorkspaces = async (userId: string): Promise<void> => {
-    const workspaces = await this.workspaceRepository.getWorkspacesDocs();
-    const idToEnvironmentMap = {};
-    workspaces.forEach((element) => {
-      idToEnvironmentMap[element._id] = element?.environmentId;
-    });
+    if (!userId) return;
     const response = await this.workspaceService.fetchWorkspaces(userId);
     let isAnyWorkspaceActive: undefined | string = undefined;
     const data = [];
@@ -201,7 +200,8 @@ export class DashboardViewModel {
           updatedBy,
           isNewInvite,
         } = elem;
-        const isActiveWorkspace = await this.checkActiveWorkspace(_id);
+        const isActiveWorkspace =
+          await this.workspaceRepository.checkActiveWorkspace(_id);
         if (isActiveWorkspace) isAnyWorkspaceActive = _id;
         const item = {
           _id,
@@ -214,7 +214,7 @@ export class DashboardViewModel {
             teamId: team.id,
             teamName: team.name,
           },
-          environmentId: idToEnvironmentMap[_id],
+          environmentId: "",
           isActiveWorkspace: isActiveWorkspace,
           createdAt,
           createdBy,
@@ -225,9 +225,15 @@ export class DashboardViewModel {
         data.push(item);
       }
       await this.workspaceRepository.bulkInsertData(data);
+      await this.workspaceRepository.deleteOrphanWorkspaces(
+        data.map((_workspace) => {
+          return _workspace._id;
+        }),
+      );
       if (!isAnyWorkspaceActive) {
-        this.activateInitialWorkspaceWithTeam();
-      } else this.activateWorkspace(isAnyWorkspaceActive);
+        this.workspaceRepository.setActiveWorkspace(data[0]._id);
+        return;
+      }
       return;
     }
   };
