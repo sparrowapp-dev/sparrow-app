@@ -22,6 +22,7 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import Button from "@library/ui/button/Button.svelte";
+  import { isUserFirstSignUp } from "@app/store/user.store";
   let isEntry = false;
 
   let isHover = false;
@@ -154,6 +155,7 @@
           id="try_sparrow_edge"
           onClick={() => {
             skipLoginHandler();
+            isUserFirstSignUp.set(true);
           }}
           title={"Try Sparrow Edge"}
           buttonClassProp={"btn mb-2"}

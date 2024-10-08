@@ -158,10 +158,6 @@
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
-    if (value) {
-      _viewModel.createNewTab();
-      isUserFirstSignUp.set(true);
-    }
   });
 
   user.subscribe((value) => {
@@ -339,6 +335,7 @@
   let isTourGuideOpen = false;
   isUserFirstSignUp.subscribe((value) => {
     if (value) {
+      _viewModel.createNewTab();
       isWelcomePopupOpen = value;
     }
   });
