@@ -223,6 +223,28 @@ export default class CollectionsViewModel {
   };
 
   /**
+   * Create new tab with untracked id with updated Details
+   */
+  public createNewTabWithData = async (_limit = 5) => {
+    if (_limit === 0) return;
+    const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
+    isApiCreatedFirstTime.set(true);
+    if (ws) {
+      const initRequestTab = new InitRequestTab(
+        "UNTRACKED-" + uuidv4(),
+        ws._id,
+      );
+      initRequestTab.updateChatbotState(true);
+      this.tabRepository.createTab(initRequestTab.getValue());
+      moveNavigation("right");
+    } else {
+      setTimeout(() => {
+        this.createNewTabWithData(_limit - 1);
+      }, 2000);
+    }
+  };
+
+  /**
    * Create web socket new tab with untracked id
    */
   private createWebSocketNewTab = async () => {
