@@ -5,6 +5,7 @@ import { ReleaseRepository } from "@app/repositories/release.repository";
 import { CannyIoService } from "@app/services/canny.service";
 import { FeedbackService } from "@app/services/feedback.service";
 import { ReleaseService } from "@app/services/release.service";
+import type { CannyUserType } from "@common/types/canny/canny";
 import { notifications } from "@library/ui/toast/Toast";
 import { DiscordIDs } from "@support/common/constants/discord.constants";
 import { LearnMoreURL } from "@support/common/constants/learnMore.constant";
@@ -136,7 +137,7 @@ class HelpPageViewModel {
    * @returns Promise<any[]> with the authorID.
    */
   public createUser = async () => {
-    let userInfo;
+    let userInfo:CannyUserType | null;
     await user.subscribe((value) => {
       userInfo = value;
     });
@@ -199,7 +200,26 @@ class HelpPageViewModel {
    */
 
   public retrievePostData = async (postID: string) => {
+    let userInfo;
+
+    // Subscribe to the user store (assuming it's a Svelte store or similar)
+    user.subscribe((value) => {
+      userInfo = value;
+    });
+
+    // Retrieve the post data (keeping the full response intact)
     const response = await this.cannyService.retrievePost(postID);
+
+    // Retrieve the votes for the post
+    const voteList = await this.listVoteUsingPostId(postID);
+
+    const votes = voteList?.data?.votes || [];
+
+    // Check if the logged-in user has voted (liked) the post
+    const isLiked = votes.some((vote) => vote.voter?.email === userInfo.email);
+
+    response.data.isPostLiked = isLiked;
+
     return response;
   };
   /**
@@ -400,9 +420,13 @@ class HelpPageViewModel {
     postID: string,
     value: string,
     parentID: string,
+    uploadedImageAttachment: {
+      file: {
+        value: File[];
+      };
+    },
   ) => {
-    let userInfo;
-    await user.subscribe((value) => {
+    let userInfo:CannyUserType | null;    await user.subscribe((value) => {
       userInfo = value;
     });
 
@@ -420,13 +444,31 @@ class HelpPageViewModel {
 
     const authorID = userResponse?.data?.id; // Use the retrieved or newly created user's ID
 
+    // Handle file upload (similar to createPost)
+    const errorMessage = "Failed to upload files. Please try again.";
+    const files = Array.from(uploadedImageAttachment?.file?.value);
+    const formData = new FormData();
+    files.forEach((file) => formData.append("files", file));
+    const imageResponse = await this.feedbackService.fetchuploads(formData);
+
+    let images: string[] = [];
+    if (imageResponse?.isSuccessful) {
+      images = imageResponse?.data?.data?.map(
+        (file: { fileUrl: string }) => file?.fileUrl,
+      );
+    } else {
+      notifications.error(errorMessage);
+      return;
+    }
+
     // Call the create comment API
-    const response = await this.cannyService.createComment(
-      authorID,
-      postID,
+    const response = await this.cannyService.createComment(authorID,
+      postID,{
       value,
       parentID,
-    );
+      imageURLs: images,
+    });
+
     if (response.isSuccessful) {
       notifications.success("Comment added successfully");
     } else {
@@ -524,7 +566,7 @@ class HelpPageViewModel {
    */
 
   public listVote = async (postID: string) => {
-    let userInfo;
+    let userInfo:CannyUserType | null;
     await user.subscribe((value) => {
       userInfo = value;
     });
@@ -547,6 +589,21 @@ class HelpPageViewModel {
     }
   };
 
+  /**
+   * Fetches a list of votes for a specific post ID.
+   * @param {string} postID - The ID of the post to retrieve votes for.
+   */
+  public listVoteUsingPostId = async (postID: string) => {
+    if (postID) {
+      const result = await this.cannyService.listVotesUsingPostId(postID);
+      return result;
+    }
+  };
+
+  /**
+   * Fetches the changelog based on the given type.
+   * @param {string} type - The type of changelog to retrieve (e.g., feature, bugfix).
+   */
   public listChangeLog = async (type: string) => {
     const result = await this.cannyService.listChangeLog(type);
     return result;

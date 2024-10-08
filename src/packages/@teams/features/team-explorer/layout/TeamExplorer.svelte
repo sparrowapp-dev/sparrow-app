@@ -201,7 +201,7 @@
 {#if openTeam}
   <div class="teams-content h-100 bg-secondary-850">
     <div
-      class="content-teams d-flex flex-column h-100 px-md-1 px-lg-3 px-3 pt-5"
+      class="content-teams d-flex flex-column h-100 px-md-1 px-lg-4 px-3 pt-5"
     >
       <div class="" style="padding-left: 14px; padding-right:14px">
         <div
@@ -261,7 +261,7 @@
             {/if}
           </h2>
 
-          <div class="d-flex align-items-end justify-content-end">
+          <div class="d-flex  align-items-end justify-content-end">
             {#if openTeam?.users?.length > 1 && !isGuestUser}
               <p class="d-flex my-auto ms-4 sparrow-fs-12">
                 <PeopleIcon
@@ -279,7 +279,7 @@
                 onClick={() => {
                   isTeamInviteModalOpen = true;
                 }}
-                buttonClassProp={`my-auto px-3 pt-1 ms-4`}
+                buttonClassProp={`my-auto px-3 pt-1 m-2`}
                 buttonStyleProp={`height: 30px;`}
                 disable={isGuestUser}
               />
@@ -288,7 +288,7 @@
                 type={`primary`}
                 loaderSize={17}
                 textStyleProp={"font-size: var(--small-text)"}
-                buttonClassProp={`my-auto ms-4`}
+                buttonClassProp={`my-auto ms-1`}
                 buttonStyleProp={`height: 30px;`}
                 onClick={async () => {
                   await handleCreateNewWorkspace();
