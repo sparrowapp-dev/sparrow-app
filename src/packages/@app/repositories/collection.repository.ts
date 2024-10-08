@@ -149,7 +149,7 @@ export class CollectionRepository {
         : _existingCollection?.primaryBranch;
     });
 
-    if (_collections.length > 0) {
+    if (_collections?.length > 0) {
       const rxDbCollections = _collections.map((_collection) => {
         // If activeSync is enabled, set currentBranch based on idToBranchMap
         if (_collection.activeSync) {
