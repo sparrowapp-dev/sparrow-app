@@ -311,7 +311,7 @@
         let url = window.location.href;
         const params = new URLSearchParams(url.split("?")[1]);
         const isNew = params.get("first");
-        if (isNew === "true") _viewModel.createNewTab();
+        if (isNew === "true") _viewModel.createNewTabWithData();
         count = count + 1;
       }
       value.users?.forEach((user) => {
@@ -335,7 +335,6 @@
   let isTourGuideOpen = false;
   isUserFirstSignUp.subscribe((value) => {
     if (value) {
-      _viewModel.createNewTab();
       isWelcomePopupOpen = value;
     }
   });

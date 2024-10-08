@@ -155,7 +155,7 @@
           id="try_sparrow_edge"
           onClick={() => {
             skipLoginHandler();
-            isUserFirstSignUp.set(true);
+            // isUserFirstSignUp.set(true);
           }}
           title={"Try Sparrow Edge"}
           buttonClassProp={"btn mb-2"}
