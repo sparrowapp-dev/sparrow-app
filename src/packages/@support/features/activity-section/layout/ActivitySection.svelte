@@ -9,8 +9,9 @@
     PostIcon,
     SortIcon,
     TableChart,
+    TickIcon,
   } from "@library/icons";
-  import { UpvoteIcon } from "@support/common/components";
+  import { Upvote } from "@support/common/components";
   import FeedbackPost from "@support/features/feedback-section/layout/FeedbackPost.svelte";
   import { onMount } from "svelte";
   import { SearchIcon } from "$lib/assets/app.asset";
@@ -24,7 +25,7 @@
     FeedbackType,
   } from "@support/common/types/feedback";
   import { tickIcon } from "@library/forms/select/svgs";
-  import { IconFallback } from "@library/ui";
+  import { IconFallback, ImageModal } from "@library/ui";
   import { Like } from "@library/ui/like";
   import {
     ActivityStatusType,
@@ -35,8 +36,8 @@
   import { FormatTime } from "@common/utils/formatTime";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   import ArrowOutward from "@library/icons/ArrowOutward.svelte";
-  import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
-  import { ImageModal } from "@library/ui/image-modal";
+  import { SparrowLogo } from "@common/images";
+  // import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
@@ -325,13 +326,14 @@
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "newest"}
           >
-            <span class="text-fs-13">Newest</span>
-            <img
-              src={tickIcon}
-              alt=""
-              class="pt-1 tick-icon"
-              style="width: 16px; height: 16px;"
-            />
+            <div><span class="text-fs-13">Newest</span></div>
+            <div class="tick-icon">
+              <TickIcon
+                height={"12px"}
+                width={"12px"}
+                color={"var(--icon-primary-300)"}
+              />
+            </div>
           </button>
 
           <button
@@ -342,13 +344,14 @@
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "oldest"}
           >
-            <span class="text-fs-13">Oldest</span>
-            <img
-              src={tickIcon}
-              alt=""
-              class="pt-1 tick-icon"
-              style="width: 16px; height: 16px"
-            />
+            <div><span class="text-fs-13">Oldest</span></div>
+            <div class="tick-icon">
+              <TickIcon
+                height={"12px"}
+                width={"12px"}
+                color={"var(--icon-primary-300)"}
+              />
+            </div>
           </button>
         </div>
       </div>
@@ -426,7 +429,7 @@
                           </div>
                         </div>
                         <div style="">
-                          <UpvoteIcon
+                          <Upvote
                             isHoverRequired={false}
                             upvote={post?.score}
                           />
@@ -661,7 +664,7 @@
                           </div>
                         </div>
                         <div>
-                          <UpvoteIcon
+                          <Upvote
                             isHoverRequired={false}
                             isPostLiked={true}
                             upvote={post?.score}

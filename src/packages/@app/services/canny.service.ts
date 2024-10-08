@@ -199,20 +199,23 @@ export class CannyIoService {
    * @param    parentID - The ID of the parent comment (if this is a reply).
    * @returns {Promise<Object>} The response from the server after creating the comment.
    */
-  public createComment = async (body: object) => {
+  public createComment = async (_authorID:string, _postID:string, option?) => {
     const response = await makeHttpRequestV2(
       `${this.apiUrl}/comments/create`,
       "POST",
       JSON.stringify([]),
       JSON.stringify({
         apiKey: this.apiKey,
-        ...body,
+        authorID: _authorID,
+        postID: _postID,
+        value: option?.value,
+        imageURLs: option?.imageURLs,
+        parentID: option?.parentID,
       }),
       ContentTypeEnum["application/json"],
     );
     return response;
   };
-
 
   /**
    * Retrieves a list of comments for a specific post.

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { LeftIcon, SearchIcon } from "$lib/assets/app.asset";
   import { Input, Select, Textarea } from "@library/forms";
   import {
@@ -16,7 +16,7 @@
     Attachment,
     CommentCard,
     Drop,
-    UpvoteIcon,
+    Upvote,
   } from "@support/common/components";
   import { FeedbackType } from "@support/common/types";
   import { onMount } from "svelte";
@@ -42,7 +42,6 @@
   let post = [];
   let nestedComments = [];
   let postImages = [];
-  let commentImages = [];
   let comments = [];
   let createdAt = "";
   let commentValue = "";
@@ -101,7 +100,6 @@
     createdAt = formatTimeAgo(post?.created);
     postImages = post?.imageURLs;
     comments = await fetchComments(postId);
-    commentImages = comments?.imageURLs;
     isAuthor = userInfo?.email === post?.author?.email;
     feedbackDescription = post?.details;
     feedbackSubject = post?.title;
@@ -138,7 +136,7 @@
       .sort((a, b) => new Date(b.created) - new Date(a.created)); // Reversed comparison
   }
 
-  const handleSortChange = (id) => {
+  const handleSortChange = (id:string) => {
     if (id == "new first") {
       nestedComments = sortCommentsNewToOld(nestedComments);
     } else {
@@ -156,7 +154,7 @@
   let isSubjectEmpty = false;
   let isTextArea = false;
 
-  const handleLogoInputChange = (e) => {
+  const handleLogoInputChange = (e:InputEvent) => {
     const errorMessage =
       "Failed to upload the file. You are allowed to upload only 5 files per feedback.";
 
@@ -223,7 +221,7 @@
 
   let inputId = "attachment-icon-container1";
 
-  const handleInputAttachment = (e) => {
+  const handleInputAttachment = (e:InputEvent) => {
     const errorMessage =
       "Failed to upload the file. You are allowed to upload only 5 files per feedback.";
     const sizeExceededMessage =
@@ -299,11 +297,44 @@
     e.target.value = ""; // This allows the same file to be uploaded again
   };
 
-  const removeCommentAttachment = (index) => {
+  const removeCommentAttachment = (index:number) => {
     uploadedImageAttachment.file.value =
       uploadedImageAttachment.file.value.filter(
         (_i, idx) => idx !== index, // Corrected: Use 'idx' to check against the index
       );
+  };
+
+  /**
+   * Handles adding a comment to the post.
+   *
+   * @param {string} postId - The ID of the post to add the comment to.
+   * @returns {Promise<void>} - A promise that resolves once the comment has been added and comments have been fetched.
+   */
+  const handleAddComment = async (postId:string) => {
+    isCommenting = true;
+    commentValue = commentValue.trim();
+
+    if (commentValue !== "") {
+      await onAddComment(postId, commentValue, null, uploadedImageAttachment);
+    }
+
+    commentValue = "";
+    uploadedImageAttachment = {
+      file: {
+        value: [],
+      },
+    };
+
+    comments = await fetchComments(postId);
+    isCommenting = false;
+
+    MixpanelEvent(Events.Add_Comment);
+    type="new first"
+  };
+
+
+  const handleCommentInputValue = (e: InputEvent) => {
+    commentValue = e.target.value;
   };
 </script>
 
@@ -426,7 +457,7 @@
           </div>
 
           <div class="mt-1" style="cursor: pointer;">
-            <UpvoteIcon
+            <Upvote
               isPostLiked={post?.isPostLiked}
               upvote={post?.score}
               {likePost}
@@ -448,9 +479,7 @@
             id="search-input"
             class={`bg-transparent w-100 border-0 my-auto`}
             placeholder="Leave a comment"
-            on:input={(e) => {
-              commentValue = e.target.value;
-            }}
+            on:input={handleCommentInputValue}
             bind:value={commentValue}
           />
 
@@ -464,28 +493,7 @@
               textStyleProp={"font-size:11px;"}
               buttonStyleProp={`height: 20px; width:35px; justify-content:center;`}
               loader={isCommenting}
-              onClick={async () => {
-                isCommenting = true;
-                commentValue.trim();
-                if (commentValue !== "") {
-                  await onAddComment(
-                    postId,
-                    commentValue,
-                    null,
-                    uploadedImageAttachment,
-                  );
-                }
-                commentValue = "";
-                uploadedImageAttachment = {
-                  file: {
-                    value: [],
-                  },
-                };
-                comments = await fetchComments(postId);
-                isCommenting = false;
-
-                MixpanelEvent(Events.Add_Comment);
-              }}
+              onClick={() => handleAddComment(postId)}
               disable={commentValue.trim() === "" || isCommenting}
             />
           </div>

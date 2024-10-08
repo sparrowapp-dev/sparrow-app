@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { AttachmentIcon, CrossIcon } from "@library/icons";
   import { Button, IconFallback } from "@library/ui";
   import { Attachment, CommentCard } from "@support/common/components";
@@ -86,11 +86,11 @@
    * Updates the comment value with the input from the event.
    * @param {Event} e - The input event.
    */
-  const handleAddCommentInput = (e) => {
+  const handleAddCommentInput = (e: InputEvent) => {
     commentValue = e.target.value;
   };
 
-  const handleInputAttachment = (e) => {
+  const handleInputAttachment = (e: InputEvent) => {
     const errorMessage =
       "Failed to upload the file. You are allowed to upload only 5 files per feedback.";
     const sizeExceededMessage =
@@ -163,10 +163,38 @@
     e.target.value = "";
   };
 
-  const removeCommentAttachment = (index) => {
+  const removeCommentAttachment = (index: number) => {
     uploadReplyAttachment.file.value = uploadReplyAttachment.file.value.filter(
       (_i, idx) => idx !== index, // Corrected: Use 'idx' to check against the index
     );
+  };
+
+  /**
+   * Handles adding a reply to a comment on a post.
+   *
+   * @param {string} postId - The ID of the post where the reply is being added.
+   * @param {object} comment - The comment object to which the reply is being added.
+   * @param {object} uploadReplyAttachment - The attachment associated with the reply.
+   */
+  const handleAddReply = async (postId, comment, uploadReplyAttachment) => {
+    isCommenting = true;
+    commentValue = commentValue.trim();
+
+    if (commentValue !== "") {
+      await onAddComment(
+        postId,
+        commentValue,
+        comment?.id,
+        uploadReplyAttachment,
+      );
+    }
+
+    commentValue = "";
+    uploadReplyAttachment.file.value = [];
+
+    await reloadComments();
+    isReplying = false;
+    isCommenting = false;
   };
 </script>
 
@@ -268,7 +296,7 @@
 
     {#if isReplying}
       <div
-        class={`d-flex align-items-start search-input-container  mb-5 mt-3 p-1 px-2`}
+        class={`d-flex align-items-start search-input-container  mb-3 mt-1 p-1 px-2`}
         style=" display:felx; flex-direction:column;"
       >
         <div class="d-flex justify-content-end" style="width: 100%;">
@@ -293,30 +321,8 @@
               textStyleProp={"font-size:11px;"}
               buttonStyleProp={`height: 20px; width:35px; justify-content:center;`}
               loader={isCommenting}
-              onClick={async () => {
-                isCommenting = true;
-                commentValue.trim();
-                if (commentValue !== "") {
-                  await onAddComment(
-                    postId,
-                    commentValue,
-                    comment?.id,
-                    uploadReplyAttachment,
-                  );
-                }
-                commentValue = "";
-                uploadReplyAttachment = {
-                  file: {
-                    value: [],
-                  },
-                };
-                setTimeout(() => {
-                  isReplying = false;
-                }, 3000);
-                reloadComments();
-                // comments = await fetchComments(postId);
-                isCommenting = false;
-              }}
+              onClick={() =>
+                handleAddReply(postId, comment, uploadReplyAttachment)}
               disable={commentValue.trim() === "" || isCommenting}
             />
           </div>

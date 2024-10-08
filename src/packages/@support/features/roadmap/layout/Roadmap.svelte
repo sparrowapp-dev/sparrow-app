@@ -28,7 +28,7 @@
 
   let feedbackStatus = [];
 
-  let type = "allCategories";
+  let type = FeedbackType.ALL_CATEGORY;
 
   let searchTerm = "";
 
@@ -69,17 +69,16 @@
         searchTerm.trim().length === 0 ||
         product.title.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const productCategory = product?.category?.name || "Uncategorized";
 
       // Filter by category
       const matchesCategory =
-        type === "allCategories" ||
-        (type === "Feature Request" &&
-          product?.category?.name === "Feature Request") ||
-        (type === "UI Improvement" &&
-          product?.category?.name === "UI Improvement") ||
-        (type === "Bug" && product?.category?.name === "Bug") ||
-        (type === "Uncategorized" && productCategory === "Uncategorized");
+        type === FeedbackType.ALL_CATEGORY ||
+        (type === FeedbackType.FEATURE_REQUEST &&
+          product?.category?.name === FeedbackType.FEATURE_REQUEST) ||
+        (type === FeedbackType.UI_IMPROVEMENT &&
+          product?.category?.name === FeedbackType.UI_IMPROVEMENT) ||
+        (type === FeedbackType.BUG &&
+          product?.category?.name === FeedbackType.BUG);
 
       return matchesSearchTerm && matchesCategory;
     }),
@@ -160,7 +159,7 @@
             { name: "Feature Request", id: FeedbackType.FEATURE_REQUEST },
             { name: "UI Improvement", id: FeedbackType.UI_IMPROVEMENT },
             { name: "Bugs", id: FeedbackType.BUG },
-            { name: "All Categories", id: "allCategories" },
+            { name: "All Categories", id: FeedbackType.ALL_CATEGORY },
           ]}
           onclick={(id = "") => {
             type = id;
@@ -235,13 +234,13 @@
                     Share your feedback and check back here for updates.
                   </p>
                 </div>
-              {:else if filteredFeedbacks.length == 0 && searchTerm.length > 0 }
+              {:else if filteredFeedbacks.length == 0 && searchTerm.length > 0}
                 <p
                   class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
                   style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
                 >
-                  No results found.
-                </p>
+                No Result Found.
+              </p>
               {:else}
                 <HelpInfoCard {setPostId} status={filteredFeedbacks} />
               {/if}

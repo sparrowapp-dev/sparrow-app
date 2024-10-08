@@ -269,7 +269,9 @@
       </div>
     {/if}
     {#if isLoading}
+     <div class="mt-5">
       <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+     </div>
     {:else}
       <div>
         {#if showTimeline}

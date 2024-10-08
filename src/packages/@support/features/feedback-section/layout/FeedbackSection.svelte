@@ -1,7 +1,7 @@
 <script lang="ts">
   import { user } from "$lib/store";
-  import { CommentIcon, SortIcon } from "@library/icons";
-  import { UpvoteIcon } from "@support/common/components";
+  import { CommentIcon, SortIcon, TickIcon } from "@library/icons";
+  import { Upvote } from "@support/common/components";
   import FeedbackPost from "./FeedbackPost.svelte";
   import FeedbackDefault from "./FeedbackDefault.svelte";
   import { onMount } from "svelte";
@@ -337,7 +337,7 @@
     </div>
 
     <div
-      class="d-flex gap-4 justify-content-between"
+      class="d-flex gap-5 justify-content-between"
       style=" height:100%; margin-top:51px; "
     >
       <div style="width:129px;  ">
@@ -362,13 +362,14 @@
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "trending"}
           >
-            <span class="text-fs-13">Trending</span>
-            <img
-              src={tickIcon}
-              alt=""
-              class="pt-1 tick-icon"
-              style="width: 16px; height: 16px;"
-            />
+            <div><span class="text-fs-13">Trending</span></div>
+            <div class="tick-icon">
+              <TickIcon
+                height={"12px"}
+                width={"12px"}
+                color={"var(--icon-primary-300)"}
+              />
+            </div>
           </button>
 
           <button
@@ -380,12 +381,13 @@
             class:active={currentSort === "newest"}
           >
             <span class="text-fs-13">Now</span>
-            <img
-              src={tickIcon}
-              alt=""
-              class="pt-1 tick-icon"
-              style="width: 16px; height: 16px"
-            />
+            <div class="tick-icon">
+              <TickIcon
+                height={"12px"}
+                width={"12px"}
+                color={"var(--icon-primary-300)"}
+              />
+            </div>
           </button>
 
           <button
@@ -397,25 +399,23 @@
             class:active={currentSort === "score"}
           >
             <span class="text-fs-13">Top</span>
-            <img
-              src={tickIcon}
-              alt=""
-              class="pt-1 tick-icon"
-              style="width: 16px; height: 16px"
-            />
+            <div class="tick-icon">
+              <TickIcon
+                height={"12px"}
+                width={"12px"}
+                color={"var(--icon-primary-300)"}
+              />
+            </div>
           </button>
         </div>
       </div>
 
       {#if isLoading}
-        <div style="width: 77%;">
+        <div style="" class="w-100">
           <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
         </div>
       {:else if posts?.length > 0}
-        <div
-          class="posts d-flex flex-column"
-          style="gap:26px; width:calc(100% - 187px );"
-        >
+        <div class="posts d-flex flex-column w-100" style="gap:26px; ">
           {#each posts as post}
             <div
               style="display: flex; flex-direction: column; background-color: #151515; padding: 20px;border-radius:2px;"
@@ -459,7 +459,7 @@
                     MixpanelEvent(Events.Upvote_Post);
                   }}
                 >
-                  <UpvoteIcon
+                  <Upvote
                     isPostLiked={post.isPostLiked}
                     {handleUpvote}
                     postID={post.id}
@@ -495,12 +495,14 @@
           {/each}
         </div>
       {:else}
-        <p
-          class=" text-fs-12 mb-0 text-center"
-          style=" margin-right:290px; margin-top:45px; font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
-        >
-          No Result Found
-        </p>
+        <div class="w-100">
+          <p
+            class=" text-fs-12 mb-0 text-center"
+            style="  margin-top:45px; font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+          >
+          No Result Found.
+          </p>
+        </div>
       {/if}
     </div>
   {/if}

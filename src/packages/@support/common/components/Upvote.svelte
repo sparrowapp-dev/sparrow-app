@@ -1,6 +1,5 @@
 <script lang="ts">
-    import { TriangleIcon } from "@library/icons";
-
+  import { TriangleIcon } from "@library/icons";
 
   export let upvote: number;
   export let postID: string;
@@ -64,6 +63,6 @@
   }
   .hover-effect:hover {
     opacity: 70%;
-    background-color: #2e2f3db2;
+    background-color: var(--bg-tertiary-850);
   }
 </style>

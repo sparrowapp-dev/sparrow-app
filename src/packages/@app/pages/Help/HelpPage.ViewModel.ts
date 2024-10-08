@@ -5,6 +5,7 @@ import { ReleaseRepository } from "@app/repositories/release.repository";
 import { CannyIoService } from "@app/services/canny.service";
 import { FeedbackService } from "@app/services/feedback.service";
 import { ReleaseService } from "@app/services/release.service";
+import type { CannyUserType } from "@common/types/canny/canny";
 import { notifications } from "@library/ui/toast/Toast";
 import { DiscordIDs } from "@support/common/constants/discord.constants";
 import { LearnMoreURL } from "@support/common/constants/learnMore.constant";
@@ -136,7 +137,7 @@ class HelpPageViewModel {
    * @returns Promise<any[]> with the authorID.
    */
   public createUser = async () => {
-    let userInfo;
+    let userInfo:CannyUserType | null;
     await user.subscribe((value) => {
       userInfo = value;
     });
@@ -425,8 +426,7 @@ class HelpPageViewModel {
       };
     },
   ) => {
-    let userInfo;
-    await user.subscribe((value) => {
+    let userInfo:CannyUserType | null;    await user.subscribe((value) => {
       userInfo = value;
     });
 
@@ -451,7 +451,7 @@ class HelpPageViewModel {
     files.forEach((file) => formData.append("files", file));
     const imageResponse = await this.feedbackService.fetchuploads(formData);
 
-    let images = [];
+    let images: string[] = [];
     if (imageResponse?.isSuccessful) {
       images = imageResponse?.data?.data?.map(
         (file: { fileUrl: string }) => file?.fileUrl,
@@ -462,9 +462,8 @@ class HelpPageViewModel {
     }
 
     // Call the create comment API
-    const response = await this.cannyService.createComment({
-      authorID,
-      postID,
+    const response = await this.cannyService.createComment(authorID,
+      postID,{
       value,
       parentID,
       imageURLs: images,
@@ -567,7 +566,7 @@ class HelpPageViewModel {
    */
 
   public listVote = async (postID: string) => {
-    let userInfo;
+    let userInfo:CannyUserType | null;
     await user.subscribe((value) => {
       userInfo = value;
     });
