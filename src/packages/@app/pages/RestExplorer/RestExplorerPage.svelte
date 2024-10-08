@@ -148,8 +148,8 @@
   bind:requestAuthHeader={_viewModel.authHeader}
   bind:requestAuthParameter={_viewModel.authParameter}
   bind:userRole
+  bind:isTourGuideOpen
   storeData={restExplorerData}
-  {isTourGuideOpen}
   {environmentVariables}
   {isGuestUser}
   {isLoginBannerActive}

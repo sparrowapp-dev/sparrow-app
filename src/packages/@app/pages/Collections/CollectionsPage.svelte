@@ -157,6 +157,10 @@
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
+    if (value) {
+      _viewModel.createNewTab();
+      isUserFirstSignUp.set(true);
+    }
   });
 
   user.subscribe((value) => {
@@ -426,7 +430,7 @@
                 {#if $activeTab?.type === ItemType.REQUEST}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
-                      <RestExplorerPage tab={$activeTab} {isTourGuideOpen} />
+                      <RestExplorerPage bind:isTourGuideOpen tab={$activeTab} />
                     </div>
                   </Motion>
                 {:else if $activeTab?.type === ItemType.COLLECTION}

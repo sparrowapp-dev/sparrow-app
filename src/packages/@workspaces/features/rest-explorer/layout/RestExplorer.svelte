@@ -476,12 +476,14 @@
   isOpen={isGuidePopup}
   handleModalState={(flag = false) => {
     isGuidePopup = flag;
+    isTourGuideOpen = false;
   }}
 >
   <div style="position: relative;">
     <Carousel
       handleClosePopup={(flag = false) => {
         isGuidePopup = flag;
+        isTourGuideOpen = false;
       }}
       data={[
         {
