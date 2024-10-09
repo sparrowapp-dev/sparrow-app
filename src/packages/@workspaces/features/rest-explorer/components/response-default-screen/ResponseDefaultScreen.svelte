@@ -116,7 +116,6 @@
   .default-screen-scroller {
     overflow-y: hidden;
     transition: overflow 0.3s ease-in-out;
-    padding-right: 10px;
   }
 
   .default-screen-scroller:hover {

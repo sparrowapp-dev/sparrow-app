@@ -37,7 +37,6 @@
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   import ArrowOutward from "@library/icons/ArrowOutward.svelte";
   import { SparrowLogo } from "@common/images";
-  // import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;

@@ -185,7 +185,7 @@
       <!-- 
   --  Testflow Empty screen 
   -->
-      {#if filteredflows && flows.length === 0}
+      {#if filteredflows && flows.length === 0 && !searchData}
         {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
           <div class={`pb-2 px-2`}>
             <p
@@ -249,7 +249,7 @@
           class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
           style="color: var(--text-secondary-550);  font-weight:300; letter-spacing: 0.5px;"
         >
-          No Result Found.
+          It seems we couldn't find the result matching your search query.
         </p>
       {/if}
     </div>

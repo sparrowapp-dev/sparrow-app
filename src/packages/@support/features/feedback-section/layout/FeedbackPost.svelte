@@ -136,7 +136,7 @@
       .sort((a, b) => new Date(b.created) - new Date(a.created)); // Reversed comparison
   }
 
-  const handleSortChange = (id:string) => {
+  const handleSortChange = (id: string) => {
     if (id == "new first") {
       nestedComments = sortCommentsNewToOld(nestedComments);
     } else {
@@ -154,7 +154,7 @@
   let isSubjectEmpty = false;
   let isTextArea = false;
 
-  const handleLogoInputChange = (e:InputEvent) => {
+  const handleLogoInputChange = (e: InputEvent) => {
     const errorMessage =
       "Failed to upload the file. You are allowed to upload only 5 files per feedback.";
 
@@ -221,14 +221,12 @@
 
   let inputId = "attachment-icon-container1";
 
-  const handleInputAttachment = (e:InputEvent) => {
-    const errorMessage =
-      "Failed to upload the file. You are allowed to upload only 5 files per feedback.";
+  const handleInputAttachment = (e: InputEvent) => {
     const sizeExceededMessage =
       "One or more files exceed the size limit of 2MB.";
     const typeErrorMessage =
       "Only image files (jpg, jpeg, png, svg) are allowed.";
-    const maxFilesExceededMessage = "You can upload up to 5 files only.";
+    const maxFilesExceededMessage = "Failed to upload the file. You are allowed to upload only 3 files per comment";
 
     // Safely gather selected files
     let newFiles = Array.from(e?.target?.files || e?.dataTransfer?.files || []);
@@ -272,8 +270,8 @@
     let newFileCount = newUniqueFiles.length;
 
     // Prevent adding more than 5 files in total
-    if (currentFileCount + newFileCount > 5) {
-      newUniqueFiles.length = 5 - currentFileCount; // Adjust the number of files to keep the total <= 5
+    if (currentFileCount + newFileCount > 3) {
+      newUniqueFiles.length = 3 - currentFileCount; // Adjust the number of files to keep the total <= 5
       notifications.error(maxFilesExceededMessage);
     }
 
@@ -297,7 +295,7 @@
     e.target.value = ""; // This allows the same file to be uploaded again
   };
 
-  const removeCommentAttachment = (index:number) => {
+  const removeCommentAttachment = (index: number) => {
     uploadedImageAttachment.file.value =
       uploadedImageAttachment.file.value.filter(
         (_i, idx) => idx !== index, // Corrected: Use 'idx' to check against the index
@@ -310,7 +308,7 @@
    * @param {string} postId - The ID of the post to add the comment to.
    * @returns {Promise<void>} - A promise that resolves once the comment has been added and comments have been fetched.
    */
-  const handleAddComment = async (postId:string) => {
+  const handleAddComment = async (postId: string) => {
     isCommenting = true;
     commentValue = commentValue.trim();
 
@@ -329,9 +327,8 @@
     isCommenting = false;
 
     MixpanelEvent(Events.Add_Comment);
-    type="new first"
+    type = "new first";
   };
-
 
   const handleCommentInputValue = (e: InputEvent) => {
     commentValue = e.target.value;
@@ -429,7 +426,7 @@
                 {/each}
               </div>
 
-              <div
+              <div class="mb-3"
                 style="display: flex; align-items: center; font-size: 12px; margin-top:10px; color:var(--text-secondary-50) !important;"
               >
                 <span style="padding-left:4px;">{createdAt} </span>

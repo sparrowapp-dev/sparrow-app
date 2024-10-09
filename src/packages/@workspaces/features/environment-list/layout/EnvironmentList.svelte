@@ -234,7 +234,7 @@
           </div>
         {/if}
         <div class={`pb-2 px-1`}>
-          {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
+          {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && filteredGlobalEnvironment?.length !== 0}
             <p
               class={`add-env-desc-text mt-2 mb-3 text-fs-12 mb-0 fw-normal text-center`}
               style="color: var(--text-secondary-50)"
@@ -326,7 +326,7 @@
           class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
           style="color: var(--text-secondary-550);  font-weight:300; letter-spacing: 0.5px;"
         >
-          No Result Found.
+          It seems we couldn't find the result matching your search query.
         </p>
       {/if}
     </div>
