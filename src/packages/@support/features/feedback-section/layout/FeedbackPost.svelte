@@ -222,13 +222,11 @@
   let inputId = "attachment-icon-container1";
 
   const handleInputAttachment = (e: InputEvent) => {
-    const errorMessage =
-      "Failed to upload the file. You are allowed to upload only 5 files per feedback.";
     const sizeExceededMessage =
       "One or more files exceed the size limit of 2MB.";
     const typeErrorMessage =
       "Only image files (jpg, jpeg, png, svg) are allowed.";
-    const maxFilesExceededMessage = "You can upload up to 5 files only.";
+    const maxFilesExceededMessage = "Failed to upload the file. You are allowed to upload only 3 files per comment";
 
     // Safely gather selected files
     let newFiles = Array.from(e?.target?.files || e?.dataTransfer?.files || []);
@@ -272,8 +270,8 @@
     let newFileCount = newUniqueFiles.length;
 
     // Prevent adding more than 5 files in total
-    if (currentFileCount + newFileCount > 5) {
-      newUniqueFiles.length = 5 - currentFileCount; // Adjust the number of files to keep the total <= 5
+    if (currentFileCount + newFileCount > 3) {
+      newUniqueFiles.length = 3 - currentFileCount; // Adjust the number of files to keep the total <= 5
       notifications.error(maxFilesExceededMessage);
     }
 
