@@ -32,11 +32,6 @@
       return true;
     return false;
   };
-  $: {
-    if (testflowStore) {
-      console.log(testflowStore);
-    }
-  }
 </script>
 
 <div class="position-relative">
