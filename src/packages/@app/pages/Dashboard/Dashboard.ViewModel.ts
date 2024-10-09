@@ -123,33 +123,68 @@ export class DashboardViewModel {
     this.workspaceRepository.updateWorkspace(workspaceId, { environmentId });
   };
 
-  // sync teams data with backend server
+  /**
+   * sync teams data with backend server
+   * @param userId User id
+   */
   public refreshTeams = async (userId: string): Promise<void> => {
-    let openTeamId: string = "";
-    const teamsData = await this.getTeamData();
-    teamsData.forEach((element) => {
-      const elem = element.toMutableJSON();
-      if (elem.isOpen) openTeamId = elem.teamId;
-    });
+    if (!userId) return;
     const response = await this.teamService.fetchTeams(userId);
+    let isAnyTeamsOpen: undefined | string = undefined;
     if (response?.isSuccessful && response?.data?.data) {
-      const data = response.data.data.map((elem) => {
-        const teamAdapter = new TeamAdapter();
-        return teamAdapter.adapt(elem).getValue();
-      });
-      if (openTeamId) {
-        data.forEach((elem) => {
-          if (elem.teamId === openTeamId) {
-            elem.isOpen = true;
-          } else {
-            elem.isOpen = false;
-          }
-        });
-      } else {
-        data[0].isOpen = true;
+      const data = [];
+      for (const elem of response.data.data) {
+        const {
+          _id,
+          name,
+          users,
+          description,
+          logo,
+          workspaces,
+          owner,
+          admins,
+          createdAt,
+          createdBy,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+        } = elem;
+        const updatedWorkspaces = workspaces.map((workspace) => ({
+          workspaceId: workspace.id,
+          name: workspace.name,
+        }));
+        const isOpenTeam = await this.teamRepository.checkIsTeamOpen(_id);
+        if (isOpenTeam) isAnyTeamsOpen = _id;
+        const item = {
+          teamId: _id,
+          name,
+          users,
+          description,
+          logo,
+          workspaces: updatedWorkspaces,
+          owner,
+          admins,
+          isActiveTeam: false,
+          createdAt,
+          createdBy,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+          isOpen: isOpenTeam,
+        };
+        data.push(item);
       }
 
       await this.teamRepository.bulkInsertData(data);
+      await this.teamRepository.deleteOrphanTeams(
+        data.map((_team) => {
+          return _team.teamId;
+        }),
+      );
+      if (!isAnyTeamsOpen) {
+        this.teamRepository.setOpenTeam(data[0].teamId);
+        return;
+      }
     }
   };
 

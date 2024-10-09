@@ -125,16 +125,11 @@ export class TeamExplorerPageViewModel {
    */
   public refreshTeams = async (userId: string): Promise<void> => {
     if (!userId) return;
-
-    let openTeamId: string = "";
-    const teamsData = await this.teamRepository.getTeamData();
-    teamsData.forEach((element) => {
-      const elem = element.toMutableJSON();
-      if (elem.isOpen) openTeamId = elem.teamId;
-    });
     const response = await this.teamService.fetchTeams(userId);
+    let isAnyTeamsOpen: undefined | string = undefined;
     if (response?.isSuccessful && response?.data?.data) {
-      const data = response.data.data.map((elem) => {
+      const data = [];
+      for (const elem of response.data.data) {
         const {
           _id,
           name,
@@ -154,7 +149,9 @@ export class TeamExplorerPageViewModel {
           workspaceId: workspace.id,
           name: workspace.name,
         }));
-        return {
+        const isOpenTeam = await this.teamRepository.checkIsTeamOpen(_id);
+        if (isOpenTeam) isAnyTeamsOpen = _id;
+        const item = {
           teamId: _id,
           name,
           users,
@@ -169,21 +166,21 @@ export class TeamExplorerPageViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
+          isOpen: isOpenTeam,
         };
-      });
-      if (openTeamId) {
-        data.forEach((elem) => {
-          if (elem.teamId === openTeamId) {
-            elem.isOpen = true;
-          } else {
-            elem.isOpen = false;
-          }
-        });
-      } else {
-        data[0].isOpen = true;
+        data.push(item);
       }
 
       await this.teamRepository.bulkInsertData(data);
+      await this.teamRepository.deleteOrphanTeams(
+        data.map((_team) => {
+          return _team.teamId;
+        }),
+      );
+      if (!isAnyTeamsOpen) {
+        this.teamRepository.setOpenTeam(data[0].teamId);
+        return;
+      }
     }
   };
 
