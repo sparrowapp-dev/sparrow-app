@@ -11,45 +11,75 @@ on:
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
-    permissions: # permission to comment a PR
-      contents: read
-      pull-requests: write
     steps:
       - uses: actions/checkout@v2
         with:
-          # Disabling shallow clone is recommended for improving the relevancy of reporting.
-          fetch-depth: 0
-
-      # Triggering SonarQube analysis; the results are required for the Quality Gate check.
-      - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      
-      # # #If you wish to fail your job when the Quality Gate is red, uncomment the following lines.
-      # # #Check the Quality Gate status.
-      # - name: SonarQube Quality Gate check
-      #   id: sonarqube-quality-gate-check
-      #   uses: sonarsource/sonarqube-quality-gate-action@master
-      # # #Enforce a timeout to fail the step after a specific time.
+          
+      # If you wish to fail your job when the Quality Gate is red, uncomment the
+      # following lines. This would typically be used to fail a deployment.
+      # - uses: sonarsource/sonarqube-quality-gate-action@master
       #   timeout-minutes: 5
       #   env:
       #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} #OPTIONAL
 
-      # #PR Decoration
-      - name: SonarQube Pull Request Comment
-        if: always()
-        uses: campos-pay/sonarqube-pr-comment@main
-        with:
-          sonar_token: ${{ secrets.SONAR_TOKEN }}
-          sonar_host_url: ${{ secrets.SONAR_HOST_URL }}
-          sonar_projectkey: ${{ github.event.repository.name }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          repo_name: ${{ github.repository }}
-          pr_number: ${{ github.event.pull_request.number }}
+# =============== NGINX SIZE ISSUE ============================================================
+# on:
+#   push:
+#     branches:
+#       - development
+#       - sonarqube
+
+#   pull_request:
+#     types: [opened, synchronize, reopened]
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     permissions: # permission to comment a PR
+#       contents: read
+#       pull-requests: write
+#     steps:
+#       - uses: actions/checkout@v2
+#         with:
+#           # Disabling shallow clone is recommended for improving the relevancy of reporting.
+#           fetch-depth: 0
+
+#       # Triggering SonarQube analysis; the results are required for the Quality Gate check.
+#       - name: SonarQube Scan
+#         uses: sonarsource/sonarqube-scan-action@master
+#         env:
+#           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      
+#       # # #If you wish to fail your job when the Quality Gate is red, uncomment the following lines.
+#       # # #Check the Quality Gate status.
+#       # - name: SonarQube Quality Gate check
+#       #   id: sonarqube-quality-gate-check
+#       #   uses: sonarsource/sonarqube-quality-gate-action@master
+#       # # #Enforce a timeout to fail the step after a specific time.
+#       #   timeout-minutes: 5
+#       #   env:
+#       #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#       #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} #OPTIONAL
+
+#       # #PR Decoration
+#       - name: SonarQube Pull Request Comment
+#         if: always()
+#         uses: campos-pay/sonarqube-pr-comment@main
+#         with:
+#           sonar_token: ${{ secrets.SONAR_TOKEN }}
+#           sonar_host_url: ${{ secrets.SONAR_HOST_URL }}
+#           sonar_projectkey: ${{ github.event.repository.name }}
+#           github-token: ${{ secrets.GITHUB_TOKEN }}
+#           repo_name: ${{ github.repository }}
+#           pr_number: ${{ github.event.pull_request.number }}
 
 
 # ========================= ORIGINAL WORKFLOW ================================================
