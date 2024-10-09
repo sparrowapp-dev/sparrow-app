@@ -140,6 +140,7 @@
         {workspace}
         {userType}
         {user}
+        {owner}
         {userId}
         {workspaceCount}
         {handleMemberPopUpSuccess}

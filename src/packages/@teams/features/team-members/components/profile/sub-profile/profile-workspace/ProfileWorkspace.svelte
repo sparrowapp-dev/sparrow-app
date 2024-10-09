@@ -7,6 +7,7 @@
   export let userType;
   export let handleMemberPopUpSuccess;
   export let workspaceCount;
+  export let owner;
 
   /**
    * function to remove member from workspace
@@ -59,9 +60,12 @@
 </script>
 
 <section>
-  <div class="d-flex justify-content-between align-items-center mb-1"
-  style="height: 34px; ">
-    <span style="font-size:12px; font-weight:400; " class="text-whiteColor">{workspace.name}</span
+  <div
+    class="d-flex justify-content-between align-items-center mb-1"
+    style="height: 34px; "
+  >
+    <span style="font-size:12px; font-weight:400; " class="text-whiteColor"
+      >{workspace.name}</span
     >
     <div class="dropdown-workspace-access">
       {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}
@@ -80,14 +84,14 @@
             {
               name: "Remove",
               id: "remove",
-              color:"danger",
+              color: "danger",
             },
           ]}
           onclick={handleDropdown}
           menuItem={"v2"}
           headerTheme={"violet"}
           borderType={"none"}
-          disabled={false}
+          disabled={owner}
           bodyTheme={"violet"}
           headerFontSize={"10px"}
           borderRounded={"4px"}
@@ -115,7 +119,7 @@
             {
               name: "Remove",
               id: "remove",
-              color:"danger",
+              color: "danger",
             },
           ]}
           titleId={workspace.position ? workspace.position : ""}
