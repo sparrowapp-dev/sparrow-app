@@ -65,7 +65,7 @@
    * The currently selected tag for filtering events.
    * Defaults to an empty string, which corresponds to "All".
    */
-  let selectedTag = "";
+  let selectedTag = UpdatesTagType.ALL;
 
   /**
    * Boolean flag to indicate whether events are being loaded.
@@ -187,8 +187,8 @@
 <div style="height:100%; width:100%;">
   <div class="container-data" style="padding: 20px;">
     <div class="headerq">
-      <p style="font-size: 20px; font-weight:700;">Updates</p>
-      <p style="color: var(--text-secondary-50); font-size:14px;">
+      <p class="text-fs-20" style="font-weight:700;">Updates</p>
+      <p class="text-fs-14" style="color: var(--text-secondary-50); ">
         Check out our latest releases designed to boost your productivity and
         efficiency.
       </p>
@@ -201,13 +201,13 @@
             <SearchIcon
               width={14}
               height={14}
-              color={"grey"}
+              color={"var(--icon-secondary-200)"}
               classProp={`my-auto me-3`}
             />
             <input
               type="text"
               id="search-input"
-              class={`bg-transparent w-100 border-0 my-auto`}
+              class={`bg-transparent w-100 border-0 ms-1 my-auto`}
               placeholder="Search updates"
               on:input={handleInput}
             />
@@ -269,7 +269,9 @@
       </div>
     {/if}
     {#if isLoading}
-      <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+      <div class="mt-5">
+        <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+      </div>
     {:else}
       <div>
         {#if showTimeline}
@@ -286,9 +288,9 @@
                   </div>
                   <div class="timeline-circle"></div>
                   <div class="timeline-content">
-                    <div class="d-flex gap-2">
+                    <div class=" d-flex gap-2">
                       <h3
-                        class="text-fs-18"
+                        class="text-fs-18 mb-0"
                         on:click={() => {
                           handleSeeMore(event);
                           MixpanelEvent(Events.Version_Updates);
@@ -296,41 +298,41 @@
                       >
                         {event.title}
                       </h3>
-                      <div
-                        class="link-div"
-                        style="height: 24px; width:24px; cursor:pointer"
-                        on:click={async () => {
-                          await copyToClipBoard(event.url);
-                          notifications.success("Link copied to clipboard!");
-                          MixpanelEvent(Events.Copy_Link);
-                        }}
+                      <Tooltip
+                        title={"Copy link"}
+                        placement={"right"}
+                        distance={10}
+                        show={true}
+                        zIndex={701}
                       >
-                        <Tooltip
-                          title={"Copy link"}
-                          placement={"right"}
-                          distance={4}
-                          show={true}
-                          zIndex={701}
+                        <div
+                          class="link-div d-flex align-items-center justify-content-cetner"
+                          style="height:24px; width:24px; cursor:pointer"
+                          on:click={async () => {
+                            await copyToClipBoard(event.url);
+                            notifications.success("Link copied to clipboard!");
+                            MixpanelEvent(Events.Copy_Link);
+                          }}
                         >
                           <LinkIcon
                             height={"18px"}
                             width={"18px"}
                             color={"var(--text-secondary-100)"}
                           />
-                        </Tooltip>
-                      </div>
+                        </div>
+                      </Tooltip>
                     </div>
-                    <div class="tags">
+                    <div class="tags" style="margin-top: 5px;">
                       {#each event.types as tag}
-                        <span class="tag {getTagClass(tag)}">
+                        <span class="text-fs-10 tag {getTagClass(tag)}">
                           {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
                         >
                       {/each}
                     </div>
                     {#if event.plaintextDetails.split(" ").length > 20}
                       <p
-                        style="font-size: 14px; font-weight:400; line-height:24px; "
-                        class=""
+                        style=" font-weight:400; line-height:24px; "
+                        class="text-fs-14"
                       >
                         {truncateDescription(event.plaintextDetails)}
                         <span
@@ -344,8 +346,8 @@
                       </p>
                     {:else}
                       <p
-                        style="font-size: 14px; font-weight:400; line-height:24px; "
-                        class=""
+                        style=" font-weight:400; line-height:24px; "
+                        class="text-fs-14"
                       >
                         {event.description}
                       </p>
@@ -373,14 +375,18 @@
                       {event.reactions?.like || ""}
                     </div> -->
                         <div
-                          style="cursor:pointer; solid grey;"
+                          style="cursor:pointer;"
                           class="ps-2"
                           on:click={async () => {
                             await open(externalSparrowLinkedin);
                             MixpanelEvent(Events.LinkedIn_Updates_Icon);
                           }}
                         >
-                          <LinkedinIcon height={"18px"} width={"18px"} />
+                          <LinkedinIcon
+                            height={"18px"}
+                            width={"18px"}
+                            color={"var(--icon-secondary-950)"}
+                          />
                         </div>
                       </div>
                     </div>
@@ -425,31 +431,35 @@
 
             <div class="ms-2 timeline-content">
               <div class="d-flex gap-2">
-                <h3>
-                  {selectedEvent.title}
-                </h3>
-                <div
-                  style="height: 24px; width:24px; cursor:pointer"
-                  on:click={async () => {
-                    await copyToClipBoard(selectedEvent.url);
-                    notifications.success("Link copied to clipboard!");
-                    MixpanelEvent(Events.Copy_Link);
-                  }}
+                <p
+                  class="pb-0 mb-1 text-fs-18"
+                  style="font-weight: 700; line-height: 27px;"
                 >
-                  <Tooltip
-                    title={"Link"}
-                    placement={"right"}
-                    distance={20}
-                    show={true}
-                    zIndex={701}
+                  {selectedEvent.title}
+                </p>
+                <Tooltip
+                  title={"Copy link"}
+                  placement={"right"}
+                  distance={10}
+                  show={true}
+                  zIndex={701}
+                >
+                  <div
+                    class="link-div"
+                    style="  height: 24px; width:24px; cursor:pointer"
+                    on:click={async () => {
+                      await copyToClipBoard(selectedEvent.url);
+                      notifications.success("Link copied to clipboard!");
+                      MixpanelEvent(Events.Copy_Link);
+                    }}
                   >
                     <LinkIcon
                       height={"18px"}
                       width={"18px"}
                       color={"var(--text-secondary-100)"}
                     />
-                  </Tooltip>
-                </div>
+                  </div>
+                </Tooltip>
               </div>
               <div class="tags">
                 {#each selectedEvent.types as tag}
@@ -459,7 +469,7 @@
                 {/each}
               </div>
 
-              <p style="font-size: 14px; font-weight:400; " class="mt-3">
+              <p style="font-weight:400; " class="mt-3 text-fs-14">
                 {@html marked(selectedEvent.markdownDetails)}
               </p>
 
@@ -485,14 +495,18 @@
                 {selectedEvent.reactions?.like || ""}
               </div> -->
                   <div
-                    style=" solid grey;"
+                    style="cursor:pointer;"
                     class="ps-2"
                     on:click={async () => {
                       await open(externalSparrowLinkedin);
                       MixpanelEvent(Events.LinkedIn_Updates_Icon);
                     }}
                   >
-                    <LinkedinIcon height={"18px"} width={"18px"} />
+                    <LinkedinIcon
+                      height={"18px"}
+                      width={"18px"}
+                      color={"var(--icon-secondary-950)"}
+                    />
                   </div>
                 </div>
               </div>
@@ -509,9 +523,10 @@
     font-size: 24px;
   }
   .link-div {
+    height: 24px;
     display: flex;
-    align-items: start;
     justify-content: center;
+    align-items: center;
     border-radius: 2px;
   }
   .link-div:hover {
@@ -625,12 +640,6 @@
     color: var(--text-primary-300);
   }
 
-  .timeline-content a {
-    color: var(--text-primary-300);
-    text-decoration: underline;
-    margin-right: 10px;
-  }
-
   .timeline-reactions {
     display: flex;
     align-items: center;
@@ -650,9 +659,8 @@
     display: inline-block;
     padding: 1.24px 5px;
     border-radius: 4px;
-    font-size: 12px;
     font-weight: 500;
-    margin-right: 8px;
+    margin-right: 6px;
     border: 1px solid;
   }
 

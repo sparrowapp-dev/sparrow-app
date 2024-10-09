@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import { GuideRepository } from "@app/repositories/guide.repository";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
+import { createDeepCopy } from "$lib/utils/helpers";
 
 export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -51,9 +52,23 @@ export class EnvironmentViewModel {
     }
     const response =
       await this.environmentService.fetchAllEnvironments(workspaceId);
-    if (response.isSuccessful && response.data.data) {
+    if (response?.isSuccessful && response?.data?.data) {
       const environments = response.data.data;
-      this.environmentRepository.refreshEnvironment(environments, workspaceId);
+      await this.environmentRepository.refreshEnvironment(
+        environments?.map((_environment: any) => {
+          const environment = createDeepCopy(_environment);
+          environment["id"] = environment._id;
+          environment["workspaceId"] = workspaceId;
+          delete environment._id;
+          return environment;
+        }),
+      );
+      await this.environmentRepository.deleteOrphanEnvironments(
+        workspaceId,
+        environments?.map((_environment: any) => {
+          return _environment._id;
+        }),
+      );
     }
     return;
   };

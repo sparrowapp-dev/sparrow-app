@@ -199,27 +199,20 @@ export class CannyIoService {
    * @param    parentID - The ID of the parent comment (if this is a reply).
    * @returns {Promise<Object>} The response from the server after creating the comment.
    */
-  public createComment = async (
-    authorID: string,
-    postID: string,
-    value: string,
-    parentID: string,
-  ) => {
-    const response = await makeRequest(
-      "POST",
+  public createComment = async (_authorID:string, _postID:string, option?) => {
+    const response = await makeHttpRequestV2(
       `${this.apiUrl}/comments/create`,
-      {
-        body: {
-          apiKey: this.apiKey,
-          authorID,
-          postID,
-          value,
-          parentID,
-        },
-        headers: {
-          "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
-        },
-      },
+      "POST",
+      JSON.stringify([]),
+      JSON.stringify({
+        apiKey: this.apiKey,
+        authorID: _authorID,
+        postID: _postID,
+        value: option?.value,
+        imageURLs: option?.imageURLs,
+        parentID: option?.parentID,
+      }),
+      ContentTypeEnum["application/json"],
     );
     return response;
   };
@@ -311,6 +304,26 @@ export class CannyIoService {
       body: {
         apiKey: this.apiKey,
         userID,
+      },
+      headers: {
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+      },
+    });
+
+    return response;
+  };
+
+  /**
+   * Retrieves a list of votes for a post.
+   *
+   * @param    postID - The ID of the post whose votes are being retrieved.
+   * @returns {Promise<Object>} The response from the server with the list of votes.
+   */
+  public listVotesUsingPostId = async (postID: string) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/votes/list`, {
+      body: {
+        apiKey: this.apiKey,
+        postID,
       },
       headers: {
         "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],

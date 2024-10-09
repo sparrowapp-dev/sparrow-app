@@ -92,7 +92,7 @@
           bodyTheme={"violet"}
           headerTheme={"violet"}
           borderType={"none"}
-          disabled={false}
+          disabled={owner}
           headerFontSize={"10px"}
           headerFontWeight={400}
           borderRounded={"4px"}
@@ -107,7 +107,7 @@
           headerTheme={"violet"}
           bodyTheme={"violet"}
           borderType={"none"}
-          disabled={false}
+          disabled={owner}
           headerFontSize={"10px"}
           headerFontWeight={400}
           borderRounded={"4px"}
@@ -140,6 +140,7 @@
         {workspace}
         {userType}
         {user}
+        {owner}
         {userId}
         {workspaceCount}
         {handleMemberPopUpSuccess}

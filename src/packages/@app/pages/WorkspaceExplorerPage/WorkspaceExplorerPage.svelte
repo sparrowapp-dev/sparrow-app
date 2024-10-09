@@ -146,7 +146,7 @@
 <Modal
   title={"Delete Workspace?"}
   type={"dark"}
-  width={"35%"}
+  width={"40%"}
   zIndex={1000}
   isOpen={isDeleteWorkspaceModalOpen}
   handleModalState={(flag) => {

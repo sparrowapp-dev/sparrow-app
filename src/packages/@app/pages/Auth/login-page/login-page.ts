@@ -12,6 +12,7 @@ import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import ActiveSideBarTabViewModel from "../../Dashboard/ActiveSideBarTab.ViewModel";
 import { GuideRepository } from "@app/repositories/guide.repository";
+import { isUserFirstSignUp } from "@app/store/user.store";
 
 //------------------------------MixPanel-------------------------------//
 
@@ -42,10 +43,10 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
     const userDetails = jwtDecode(response.data?.data?.accessToken?.token);
     setUser(jwtDecode(response.data?.data?.accessToken?.token));
     sendUserDataToMixpanel(userDetails);
-    MixpanelEvent(Events.USER_LOGIN, {
-      Login_Method: "Email",
-      Success: response.isSuccessful,
-    });
+    // MixpanelEvent(Events.USER_LOGIN, {
+    //   Login_Method: "Email",
+    //   Success: response.isSuccessful,
+    // });
     notifications.success("Login successful!");
     navigate("/dashboard/workspaces");
     _activeSidebarTabViewModel.addActiveTab("workspaces");
@@ -63,6 +64,7 @@ export async function handleLoginV2(url: string) {
   const accessToken = params.get("accessToken");
   const refreshToken = params.get("refreshToken");
   const event = params.get("event");
+  const method = params.get("method");
 
   if (accessToken && refreshToken) {
     const userDetails = jwtDecode(accessToken);
@@ -70,18 +72,23 @@ export async function handleLoginV2(url: string) {
     setAuthJwt(constants.REF_TOKEN, refreshToken);
     setUser(jwtDecode(accessToken));
     sendUserDataToMixpanel(userDetails);
-    MixpanelEvent(Events.USER_LOGIN, {
-      Login_Method: "Email",
-      Success: true,
-    });
+
     notifications.success("Login successful!");
     if (event === "register") {
       navigate("/app/collections?first=true");
+      isUserFirstSignUp.set(true);
+      MixpanelEvent(Events.USER_SIGNUP, {
+        method: method,
+        Success: true,
+      });
       _guideRepository.insert({ isActive: true, id: "environment-guide" });
       _guideRepository.insert({ isActive: true, id: "collection-guide" });
     } else {
       navigate("/app/collections?first=false");
-
+      MixpanelEvent(Events.USER_LOGIN, {
+        method: method,
+        Success: true,
+      });
       _guideRepository.insert({ isActive: false, id: "environment-guide" });
       _guideRepository.insert({ isActive: false, id: "collection-guide" });
     }

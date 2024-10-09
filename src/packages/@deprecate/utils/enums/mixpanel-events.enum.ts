@@ -106,4 +106,5 @@ export enum Events {
   Edit_Post = "Edit_Post",
   Like_Comment = "Like_Comment",
   Upvote_Post = "Upvote_Post",
+  SIGNOUT = "Signout",
 }

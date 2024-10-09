@@ -86,6 +86,7 @@ import type { CollectionDocType } from "@app/models/collection.model";
 import type { GuideQuery } from "@app/types/user-guide";
 import type { FeatureQuery } from "@app/types/feature-switch";
 import { ReduceQueryParams } from "@workspaces/features/rest-explorer/utils";
+import { createDeepCopy } from "$lib/utils/helpers";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -122,20 +123,25 @@ export default class CollectionsViewModel {
   public fetchCollections = async (workspaceId: string) => {
     const isGuestUser = await this.getGuestUserState();
     if (workspaceId && !isGuestUser) {
-      let isGuestUser;
-      isGuestUserActive.subscribe((value) => {
-        isGuestUser = value;
-      });
-      if (isGuestUser !== true) {
-        const res = await this.collectionService.fetchCollection(workspaceId);
-        if (res.isSuccessful) {
-          this.collectionRepository.bulkInsertData(
-            res.data.data.map((collection: CollectionDto) => {
-              collection["workspaceId"] = workspaceId;
-              return collection;
-            }),
-          );
-        }
+      const res = await this.collectionService.fetchCollection(workspaceId);
+      if (res?.isSuccessful && res?.data?.data) {
+        const collections = res.data.data;
+        await this.collectionRepository.bulkInsertData(
+          workspaceId,
+          collections?.map((_collection: any) => {
+            const collection = createDeepCopy(_collection);
+            collection["workspaceId"] = workspaceId;
+            collection["id"] = _collection._id;
+            delete collection._id;
+            return collection;
+          }),
+        );
+        await this.collectionRepository.deleteOrphanCollections(
+          workspaceId,
+          collections?.map((_collection: any) => {
+            return _collection._id;
+          }),
+        );
       }
     }
   };
@@ -218,6 +224,28 @@ export default class CollectionsViewModel {
     } else {
       setTimeout(() => {
         this.createNewTab(_limit - 1);
+      }, 2000);
+    }
+  };
+
+  /**
+   * Create new tab with untracked id with updated Details
+   */
+  public createNewTabWithData = async (_limit = 5) => {
+    if (_limit === 0) return;
+    const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
+    isApiCreatedFirstTime.set(true);
+    if (ws) {
+      const initRequestTab = new InitRequestTab(
+        "UNTRACKED-" + uuidv4(),
+        ws._id,
+      );
+      initRequestTab.updateChatbotState(true);
+      this.tabRepository.createTab(initRequestTab.getValue());
+      moveNavigation("right");
+    } else {
+      setTimeout(() => {
+        this.createNewTabWithData(_limit - 1);
       }, 2000);
     }
   };
@@ -469,50 +497,6 @@ export default class CollectionsViewModel {
     ids.forEach((id) => {
       this.tabRepository.removeTab(id);
     });
-  };
-
-  /**
-   * Syncs the collections from active and update the repository
-   * @param activeWorkspace: WorkspaceDocument
-   */
-  public syncCollectionsWithBackend = async (
-    activeWorkspace: WorkspaceDocument,
-  ) => {
-    let currentEnvironment: object;
-    if (activeWorkspace) {
-      // await refreshEnv(activeWorkspaceRxDoc?._id);
-      const env: EnvironmentDocument =
-        await this.environmentRepository.readEnvironment(
-          activeWorkspace.get("environmentId"),
-        );
-      if (env) {
-        currentEnvironment = env.toMutableJSON();
-      } else {
-        currentEnvironment = {
-          name: "None",
-          id: "none",
-        };
-      }
-      const workspaceId = activeWorkspace?._id;
-      let isGuestUser;
-      isGuestUserActive.subscribe((value) => {
-        isGuestUser = value;
-      });
-      if (isGuestUser !== true) {
-        const response =
-          await this.collectionService.fetchCollection(workspaceId);
-        if (response.isSuccessful && response.data.data) {
-          const collections = response.data.data;
-          collections.forEach((collection: CollectionDocument) => {
-            collection.workspaceId = workspaceId;
-          });
-          this.collectionRepository.bulkInsertData(collections);
-        } else {
-          notifications.error(response.message);
-        }
-      }
-      return currentEnvironment;
-    }
   };
 
   /**

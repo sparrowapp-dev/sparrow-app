@@ -1,7 +1,13 @@
 <script>
   import { SearchIcon } from "$lib/assets/icons";
   import { Select } from "@library/forms";
-  import { CategoryIcon, CrossIcon, StackIcon } from "@library/icons";
+  import {
+    CategoryIcon,
+    CrossIcon,
+    MessageDisabledIcon,
+    MessageIcon,
+    StackIcon,
+  } from "@library/icons";
   import { Loader } from "@library/ui";
   import HelpInfoCard from "@support/common/components/HelpInfo-Card/HelpInfoCard.svelte";
   import { FeedbackType } from "@support/common/types";
@@ -22,7 +28,7 @@
 
   let feedbackStatus = [];
 
-  let type = "allCategories";
+  let type = FeedbackType.ALL_CATEGORY;
 
   let searchTerm = "";
 
@@ -65,12 +71,13 @@
 
       // Filter by category
       const matchesCategory =
-        type === "allCategories" ||
-        (type === "Feature Request" &&
-          product?.category?.name === "Feature Request") ||
-        (type === "UI Improvement" &&
-          product?.category?.name === "UI Improvement") ||
-        (type === "Bug" && product?.category?.name === "Bug");
+        type === FeedbackType.ALL_CATEGORY ||
+        (type === FeedbackType.FEATURE_REQUEST &&
+          product?.category?.name === FeedbackType.FEATURE_REQUEST) ||
+        (type === FeedbackType.UI_IMPROVEMENT &&
+          product?.category?.name === FeedbackType.UI_IMPROVEMENT) ||
+        (type === FeedbackType.BUG &&
+          product?.category?.name === FeedbackType.BUG);
 
       return matchesSearchTerm && matchesCategory;
     }),
@@ -89,6 +96,7 @@
     if (response) {
       transformPostsToFeedbackStatus(response);
     }
+
     isLoading = false;
   });
 </script>
@@ -115,12 +123,12 @@
           width={14}
           height={14}
           color={"var(--icon-secondary-200)"}
-          classProp={`my-auto me-3`}
+          classProp={`my-auto ms-2`}
         />
         <input
           type="text"
           id="search-input"
-          class={`bg-transparent w-100 border-0 my-auto`}
+          class={`bg-transparent w-100 border-0 ms-1 my-auto`}
           placeholder="Search updates"
           on:input={(e) => {
             searchTerm = e.target.value;
@@ -147,10 +155,10 @@
       <div class="filter">
         <Select
           data={[
-            { name: "All Categories", id: "allCategories" },
             { name: "Feature Request", id: FeedbackType.FEATURE_REQUEST },
             { name: "UI Improvement", id: FeedbackType.UI_IMPROVEMENT },
-            { name: "Bug", id: FeedbackType.BUG },
+            { name: "Bugs", id: FeedbackType.BUG },
+            { name: "All Categories", id: FeedbackType.ALL_CATEGORY },
           ]}
           onclick={(id = "") => {
             type = id;
@@ -180,7 +188,9 @@
     </div>
 
     {#if isLoading}
-      <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+      <div class="mt-5">
+        <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+      </div>
     {:else}
       <div
         class="d-flex justify-content-between gap-3 update-state-section"
@@ -197,31 +207,43 @@
               ).fontColor}; border-bottom:0.5px solid {getColor(status)
                 .fontColor};"
             >
-              {status.charAt(0).toUpperCase() + status.slice(1)}
+              {status
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+                .join(" ")}
             </div>
             <div
-              class=""
               style="background-color: var(--bg-secondary-800); padding:12px;"
             >
-              {#if (filteredFeedbacks?.length == 0 && searchTerm.length > 0) || filteredFeedbacks?.length == 0}
+              {#if filteredFeedbacks?.length == 0 && searchTerm === ""}
+                <div
+                  class=""
+                  style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
+                >
+                  <MessageDisabledIcon
+                    height={"30px"}
+                    width={"30px"}
+                    color={"var(--icon-primary-300)"}
+                  />
+
+                  <p
+                    class="mx-1 text-fs-14 mb-0 text-center"
+                    style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                  >
+                    Share your feedback and check back here for updates.
+                  </p>
+                </div>
+              {:else if filteredFeedbacks.length == 0 && searchTerm.length > 0}
                 <p
                   class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
                   style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
                 >
                   No Result Found.
-                </p>{:else}
+                </p>
+              {:else}
                 <HelpInfoCard {setPostId} status={filteredFeedbacks} />
               {/if}
             </div>
-
-            {#if filteredFeedbackStatus.length == 0 && searchTerm.length >= 0}
-              <p
-                class="mx-1 text-fs-12 mb-0 text-center mb-3 mt-3"
-                style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
-              >
-                No Result Found.
-              </p>
-            {/if}
           </div>
         {/each}
       </div>

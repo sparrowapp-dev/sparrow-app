@@ -288,11 +288,7 @@ export default class WorkspaceExplorerViewModel {
    * @param userId User id
    */
   public refreshWorkspaces = async (userId: string): Promise<void> => {
-    const workspaces = await this.workspaceRepository.getWorkspacesDocs();
-    const idToEnvironmentMap = {};
-    workspaces.forEach((element) => {
-      idToEnvironmentMap[element._id] = element?.environmentId;
-    });
+    if (!userId) return;
     const response = await this.workspaceService.fetchWorkspaces(userId);
     let isAnyWorkspaceActive: undefined | string = undefined;
     const data = [];
@@ -328,7 +324,7 @@ export default class WorkspaceExplorerViewModel {
             teamId: team.id,
             teamName: team.name,
           },
-          environmentId: idToEnvironmentMap[_id],
+          environmentId: "",
           isActiveWorkspace: isActiveWorkspace,
           createdAt,
           createdBy,
@@ -339,10 +335,15 @@ export default class WorkspaceExplorerViewModel {
         data.push(item);
       }
       await this.workspaceRepository.bulkInsertData(data);
+      await this.workspaceRepository.deleteOrphanWorkspaces(
+        data.map((_workspace) => {
+          return _workspace._id;
+        }),
+      );
       if (!isAnyWorkspaceActive) {
-        await this.workspaceRepository.activateInitialWorkspace();
+        this.workspaceRepository.setActiveWorkspace(data[0]._id);
         return;
-      } else this.workspaceRepository.setActiveWorkspace(isAnyWorkspaceActive);
+      }
       return;
     }
   };

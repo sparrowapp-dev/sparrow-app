@@ -19,7 +19,6 @@ import { v4 as uuidv4 } from "uuid";
 import { RequestDataTypeEnum } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
 import { appInsights } from "@app/logger";
-
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const error = (
@@ -165,10 +164,12 @@ const makeRequest = async (
       return await regenerateAuthToken(method, url, requestData);
     } else if (
       e.response?.data?.statusCode === 401 &&
-      e.response.data.message === ErrorMessages.Unauthorized
+      e.response.data.message === ErrorMessages.JWTFailed
     ) {
       const _viewModel = new DashboardViewModel();
       await _viewModel.clientLogout();
+      return error("Unauthorized");
+    } else if (e.response?.data?.statusCode === 401) {
       return error("Unauthorized");
     }
     if (e.code === "ERR_NETWORK") {
@@ -473,7 +474,7 @@ const makeHttpRequestV2 = async (
   headers: string,
   body: string,
   request: string,
-  signal: AbortSignal,
+  signal?: AbortSignal,
 ) => {
   console.table({ url, method, headers, body, request });
   const startTime = performance.now();
