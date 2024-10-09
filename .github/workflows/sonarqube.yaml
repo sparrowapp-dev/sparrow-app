@@ -25,7 +25,7 @@ jobs:
           sonar-project-key: ${{ vars.PROJECT_KEY }}
           sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
           sonar-token: ${{ secrets.SONAR_TOKEN }}
-          github-token: ${{ secrets.PR_GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }} #PR_GITHUB_TOKEN
 
       - name: Output result
         run: |
