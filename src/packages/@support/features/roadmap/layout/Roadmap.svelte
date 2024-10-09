@@ -135,6 +135,21 @@
           }}
           bind:value={searchTerm}
         />
+
+        {#if searchTerm.length != 0}
+          <div
+            class="clear-icon"
+            on:click={() => {
+              searchTerm = "";
+            }}
+          >
+            <CrossIcon
+              height="16px"
+              width="12px"
+              color="var(--icon-secondary-300)"
+            />
+          </div>
+        {/if}
       </div>
 
       <div class="filter">
@@ -221,8 +236,7 @@
                   </p>
                 </div>
               </div>
-            <!-- {/if} -->
-
+              <!-- {/if} -->
             {:else if filteredFeedbacks.length == 0 && searchTerm.length > 0}
               <div
                 class="w-100 h-100 mb-4"
