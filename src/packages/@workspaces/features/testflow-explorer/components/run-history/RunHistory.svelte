@@ -32,6 +32,11 @@
       return true;
     return false;
   };
+  $: {
+    if (testflowStore) {
+      console.log(testflowStore);
+    }
+  }
 </script>
 
 <div class="position-relative">
@@ -94,7 +99,7 @@
         <!-- BODY -->
         <div style="flex:1; overflow:auto;">
           <div class="time-line ms-3">
-            {#if testflowStore?.history}
+            {#if testflowStore?.history && testflowStore?.history?.length > 0}
               {#each testflowStore?.history as history, ind}
                 <div class="position-relative history-selector">
                   <div class="ms-3 mb-1 p-3 bg-tertiary-670 border-radius-2">
@@ -193,6 +198,11 @@
               {/each}
             {/if}
           </div>
+          {#if !testflowStore?.history || testflowStore?.history.length === 0}
+            <p style="font-size: 12px;">
+              You need to run the testflow to see the history.
+            </p>
+          {/if}
         </div>
       </div>
     {/if}
