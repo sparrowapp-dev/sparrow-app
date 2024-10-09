@@ -271,6 +271,12 @@
     };
   });
 
+  const handleBackButton = () => {
+    isPostFetching = true;
+    skip = 0;
+    posts = [];
+    showLoading = true;
+  };
 </script>
 
 <div
@@ -542,6 +548,7 @@
                     on:click={async () => {
                       postId = post?.id;
                       isPostopen = true;
+                      handleBackButton();
                       MixpanelEvent(Events.Feedback_Post);
                     }}
                   >
