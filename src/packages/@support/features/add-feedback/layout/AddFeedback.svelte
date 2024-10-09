@@ -111,6 +111,9 @@
       isExposeFeedbackForm = flag;
       feedbackDescription = "";
       feedbackSubject = "";
+      isSelectEmpty = false;
+      isDescriptionEmpty = false;
+      isSubjectEmpty = false;
       type = FeedbackType.CATEGORY;
       uploadFeedback = {
         file: {
@@ -302,6 +305,9 @@
           buttonClassProp={"me-2"}
           onClick={async () => {
             isExposeFeedbackForm = false;
+            isSelectEmpty = false;
+            isDescriptionEmpty = false;
+            isSubjectEmpty = false;
             feedbackDescription = "";
             feedbackSubject = "";
             type = FeedbackType.CATEGORY;
