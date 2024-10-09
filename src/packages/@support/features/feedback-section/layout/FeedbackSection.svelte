@@ -316,6 +316,7 @@
 
           {#if searchTerm.length != 0}
             <div
+            style="cursor: pointer;"
               class="clear-icon"
               on:click={() => {
                 searchTerm = "";

@@ -4,6 +4,7 @@
     ActivityIcon,
     BoxBarIcon,
     CommentIcon,
+    CrossIcon,
     LikeIcon,
     MessageIcon,
     PostIcon,
@@ -223,7 +224,23 @@
           class={`bg-transparent w-100 ms-1 border-0 my-auto`}
           placeholder="Search updates"
           on:input={(e) => handleInputChange(e.target.value)}
+          bind:value={searchTerm}
         />
+        {#if searchTerm.length != 0}
+          <div
+            style="cursor: pointer;"
+            class="clear-icon"
+            on:click={() => {
+              searchTerm = "";
+            }}
+          >
+            <CrossIcon
+              height="16px"
+              width="12px"
+              color="var(--icon-secondary-300)"
+            />
+          </div>
+        {/if}
       </div>
     </div>
     <div class="d-flex" style="gap: 15px;">
@@ -404,10 +421,9 @@
                             class="title"
                             on:click={() => {
                               (postId = post?.id),
-                              (isPostopen = true),
-                              setPostId("feedback", postId)
+                                (isPostopen = true),
+                                setPostId("feedback", postId);
                               MixpanelEvent(Events.Activity_Post);
-
                             }}
                           >
                             {post?.title}
