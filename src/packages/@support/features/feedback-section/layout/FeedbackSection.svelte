@@ -98,11 +98,16 @@
 
   let isPostopen = isPostopenFromActivity || false;
 
+  let limit = 10; // Define your limit for how many posts to load each time
+  let skip = 0; // Initialize skip to 0 at the beginning
+
   const defaultStaus = "open,under review,planned,in progress,complete";
 
   user.subscribe((value) => {
     userInfo = value;
   });
+
+  let showLoading = true;
 
   /**
    * @description - Fetches posts based on sorting type, search query, and status, then updates the `posts` array.
@@ -115,10 +120,30 @@
     sortType: string,
     searchQuery: string = "",
     status: string,
+    limit: number = 10,
+    skip: number = 0,
   ) => {
     currentSort = sortType;
-    isLoading = true;
-    posts = await fetchPosts(sortType, searchQuery, status);
+    if (showLoading) {
+      isLoading = true;
+    }
+    const newPosts = await fetchPosts(
+      sortType,
+      searchQuery,
+      status,
+      "",
+      limit,
+      skip,
+    );
+    showLoading = false;
+    // Filter out any posts that are already in the posts array (check by ID or unique field)
+    const uniqueNewPosts = newPosts.filter(
+      (newPost) =>
+        !posts.some((existingPost) => existingPost.id === newPost.id),
+    );
+
+    // Append only unique new posts to the existing posts
+    posts = [...posts, ...uniqueNewPosts];
     isLoading = false;
   };
 
@@ -126,7 +151,7 @@
    * @description - Handles upvoting action by refreshing the posts with the current sorting, search term, and status.
    */
   const handleUpvote = () => {
-    getPosts(currentSort, searchTerm, status);
+    getPosts(currentSort, searchTerm, status, limit, skip);
   };
 
   /**
@@ -136,7 +161,7 @@
    */
   const handleInputChange = async (searchQuery: string) => {
     searchTerm = searchQuery;
-    await getPosts(currentSort, searchQuery, status); // Fetch posts with search term
+    await getPosts(currentSort, searchQuery, status, limit, skip); // Fetch posts with search term
   };
 
   /**
@@ -152,7 +177,7 @@
     } else {
       status = _status;
     }
-    await getPosts(currentSort, searchTerm, status);
+    await getPosts(currentSort, searchTerm, status, limit, skip);
   };
 
   /**
@@ -164,11 +189,17 @@
     feedbackType = selectedCategory;
     if (selectedCategory === FeedbackType.ALL_CATEGORY) {
       // Show all posts if "All Categories" is selected
-      await getPosts(currentSort, searchTerm, status);
+      await getPosts(currentSort, searchTerm, status, limit, skip);
     } else {
       // Fetch and filter posts by the selected category
       isLoading = true;
-      const listPosts = await getPosts(currentSort, searchTerm, status);
+      const listPosts = await getPosts(
+        currentSort,
+        searchTerm,
+        status,
+        limit,
+        skip,
+      );
 
       posts = listPosts?.filter((post) => {
         return post?.category?.name === selectedCategory;
@@ -186,17 +217,47 @@
     1000,
   );
 
+  // Function to load more updates
+  const loadMoreUpdates = async () => {
+    if (!isPostopen) {
+      // debugger;
+      skip = posts.length;
+      getPosts(currentSort, searchTerm, status, limit, skip);
+    }
+  };
+
+  let scrollableContainer: HTMLDivElement;
+
+  // Event handler for scrolling
+  const handleScroll = () => {
+    const { scrollTop, scrollHeight, clientHeight } = scrollableContainer;
+
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+      loadMoreUpdates();
+    }
+  };
+
   /**
    * @description - Executes when the component is mounted. Fetches the initial set of posts and resets the `isPostopenFromActivity` flag.
    */
-
   onMount(async () => {
-    getPosts(currentSort, searchTerm, status);
+    getPosts(currentSort, searchTerm, status, limit, skip);
     isPostopenFromActivity = false;
+  });
+
+  onMount(() => {
+    scrollableContainer.addEventListener("scroll", handleScroll);
+    return () => {
+      scrollableContainer.removeEventListener("scroll", handleScroll);
+    };
   });
 </script>
 
-<div style="padding:20px;">
+<div
+  style="padding:20px; overflow:auto "
+  class="h-100"
+  bind:this={scrollableContainer}
+>
   <FeedbackDefault {onAddFeedback} {userInfo} {onInputFeedback} />
   {#if !isPostopen}
     <div
@@ -338,7 +399,7 @@
 
     <div
       class="d-flex gap-5 justify-content-between"
-      style=" height:100%; margin-top:51px; "
+      style="  margin-top:51px; "
     >
       <div style="width:129px;  ">
         <div>
@@ -356,7 +417,7 @@
         >
           <button
             on:click={() => {
-              getPosts("trending", searchTerm, status);
+              getPosts("trending", searchTerm, status, limit, skip);
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
             class="sort-buttons d-flex justify-content-between w-100"
@@ -374,7 +435,7 @@
 
           <button
             on:click={() => {
-              getPosts("newest", searchTerm, status);
+              getPosts("newest", searchTerm, status, limit, skip);
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
             class="sort-buttons d-flex justify-content-between w-100"
@@ -392,7 +453,7 @@
 
           <button
             on:click={() => {
-              getPosts("score", searchTerm, status);
+              getPosts("score", searchTerm, status, limit, skip);
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
             class="sort-buttons d-flex justify-content-between w-100"
@@ -500,7 +561,7 @@
             class=" text-fs-12 mb-0 text-center"
             style="  margin-top:45px; font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
           >
-          No Result Found.
+            No Result Found.
           </p>
         </div>
       {/if}

@@ -137,7 +137,7 @@ class HelpPageViewModel {
    * @returns Promise<any[]> with the authorID.
    */
   public createUser = async () => {
-    let userInfo:CannyUserType | null;
+    let userInfo: CannyUserType | null;
     await user.subscribe((value) => {
       userInfo = value;
     });
@@ -234,6 +234,9 @@ class HelpPageViewModel {
     sort: string,
     search: string,
     status: string,
+    userId: string,
+    limit: number,
+    skip: number,
   ) => {
     const boards = await this.RetrieveBoards();
     const boardID = boards?.data?.boards[0]?.id;
@@ -242,9 +245,12 @@ class HelpPageViewModel {
       sort,
       search,
       status,
+      userId,
+      limit,
+      skip,
     );
     let voteList = await this.listVote();
-    let result = response.data.posts.map((post) => {
+    let result = response.data.posts?.map((post) => {
       const isLiked = voteList.data.votes.some(
         (vote) => vote.post.id === post.id,
       );
@@ -426,7 +432,8 @@ class HelpPageViewModel {
       };
     },
   ) => {
-    let userInfo:CannyUserType | null;    await user.subscribe((value) => {
+    let userInfo: CannyUserType | null;
+    await user.subscribe((value) => {
       userInfo = value;
     });
 
@@ -462,8 +469,7 @@ class HelpPageViewModel {
     }
 
     // Call the create comment API
-    const response = await this.cannyService.createComment(authorID,
-      postID,{
+    const response = await this.cannyService.createComment(authorID, postID, {
       value,
       parentID,
       imageURLs: images,
@@ -566,7 +572,7 @@ class HelpPageViewModel {
    */
 
   public listVote = async (postID: string) => {
-    let userInfo:CannyUserType | null;
+    let userInfo: CannyUserType | null;
     await user.subscribe((value) => {
       userInfo = value;
     });
