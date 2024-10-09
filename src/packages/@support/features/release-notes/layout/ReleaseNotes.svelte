@@ -196,7 +196,7 @@
 
     {#if showTimeline}
       <div class="d-flex justify-content-between page-funationality">
-        <div class="" style="">
+        <div class="" style="cursor:pointer">
           <div class={`d-flex search-input-container rounded py-1 px-2 mb-4`}>
             <SearchIcon
               width={14}
@@ -210,6 +210,7 @@
               class={`bg-transparent w-100 border-0 ms-1 my-auto`}
               placeholder="Search updates"
               on:input={handleInput}
+              bind:value={searchQuery}
             />
 
             {#if searchQuery.length != 0}
