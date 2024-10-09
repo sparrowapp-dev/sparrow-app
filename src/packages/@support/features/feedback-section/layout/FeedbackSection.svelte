@@ -1,6 +1,6 @@
 <script lang="ts">
   import { user } from "$lib/store";
-  import { CommentIcon, SortIcon, TickIcon } from "@library/icons";
+  import { CommentIcon, CrossIcon, SortIcon, TickIcon } from "@library/icons";
   import { Upvote } from "@support/common/components";
   import FeedbackPost from "./FeedbackPost.svelte";
   import FeedbackDefault from "./FeedbackDefault.svelte";
@@ -136,14 +136,16 @@
       skip,
     );
     showLoading = false;
-    // Filter out any posts that are already in the posts array (check by ID or unique field)
-    const uniqueNewPosts = newPosts.filter(
-      (newPost) =>
-        !posts.some((existingPost) => existingPost.id === newPost.id),
-    );
-
-    // Append only unique new posts to the existing posts
-    posts = [...posts, ...uniqueNewPosts];
+    // if (
+    //   feedbackType != FeedbackType.ALL_CATEGORY ||
+    //   feedbackStatusType != FeedbackStatusType.ALL_STATUS ||
+    //   searchTerm != "" ||
+    //   currentSort != "trending"
+    // ) {
+    //   // posts = newPosts;
+    // } else {
+    // }
+    posts = [...posts, ...newPosts]; // Append new posts to the existing posts
     isLoading = false;
   };
 
@@ -161,7 +163,12 @@
    */
   const handleInputChange = async (searchQuery: string) => {
     searchTerm = searchQuery;
+    posts = [];
+    skip = 0;
+    showLoading = true;
+    isPostFetching = true;
     await getPosts(currentSort, searchQuery, status, limit, skip); // Fetch posts with search term
+    isPostFetching = false;
   };
 
   /**
@@ -177,7 +184,12 @@
     } else {
       status = _status;
     }
+    posts = [];
+    isPostFetching = true;
+    skip = 0;
+    showLoading = true;
     await getPosts(currentSort, searchTerm, status, limit, skip);
+    isPostFetching = false;
   };
 
   /**
@@ -189,17 +201,21 @@
     feedbackType = selectedCategory;
     if (selectedCategory === FeedbackType.ALL_CATEGORY) {
       // Show all posts if "All Categories" is selected
+      isPostFetching = true;
+      posts = [];
+      skip = 0;
+      showLoading = true;
       await getPosts(currentSort, searchTerm, status, limit, skip);
+      isPostFetching = false;
     } else {
       // Fetch and filter posts by the selected category
       isLoading = true;
-      const listPosts = await getPosts(
-        currentSort,
-        searchTerm,
-        status,
-        limit,
-        skip,
-      );
+      posts = [];
+      isPostFetching = true;
+      skip = 0;
+      showLoading = true;
+      await getPosts(currentSort, searchTerm, status, limit, skip);
+      isPostFetching = false;
 
       posts = listPosts?.filter((post) => {
         return post?.category?.name === selectedCategory;
@@ -219,20 +235,24 @@
 
   // Function to load more updates
   const loadMoreUpdates = async () => {
-    if (!isPostopen) {
+    if (!isPostopen || searchTerm.length > 0) {
       skip = posts.length;
-      getPosts(currentSort, searchTerm, status, limit, skip);
+      await getPosts(currentSort, searchTerm, status, limit, skip);
     }
   };
 
   let scrollableContainer: HTMLDivElement;
-
+  let isPostFetching = false;
   // Event handler for scrolling
-  const handleScroll = () => {
+  const handleScroll = async () => {
     const { scrollTop, scrollHeight, clientHeight } = scrollableContainer;
 
     if (scrollTop + clientHeight >= scrollHeight - 100) {
-      loadMoreUpdates();
+      if (!isPostFetching) {
+        isPostFetching = true;
+        await loadMoreUpdates();
+        isPostFetching = false;
+      }
     }
   };
 
@@ -250,6 +270,7 @@
       scrollableContainer.removeEventListener("scroll", handleScroll);
     };
   });
+
 </script>
 
 <div
@@ -284,7 +305,24 @@
             on:input={(e) => {
               handleInputChangeDebounced(e.target.value);
             }}
+            bind:value={searchTerm}
           />
+
+          {#if searchTerm.length != 0}
+            <div
+              class="clear-icon"
+              on:click={() => {
+                searchTerm = "";
+                handleInputChangeDebounced(searchTerm);
+              }}
+            >
+              <CrossIcon
+                height="16px"
+                width="12px"
+                color="var(--icon-secondary-300)"
+              />
+            </div>
+          {/if}
         </div>
       </div>
       <div class="d-flex" style="gap:15px;">
@@ -415,8 +453,13 @@
           style="align-items: baseline; gap:10px; margin-top:13px; "
         >
           <button
-            on:click={() => {
-              getPosts("trending", searchTerm, status, limit, skip);
+            on:click={async () => {
+              isPostFetching = true;
+              skip = 0;
+              posts = [];
+              showLoading = true;
+              await getPosts("trending", searchTerm, status, limit, skip);
+              isPostFetching = false;
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
             class="sort-buttons d-flex justify-content-between w-100"
@@ -433,8 +476,13 @@
           </button>
 
           <button
-            on:click={() => {
-              getPosts("newest", searchTerm, status, limit, skip);
+            on:click={async () => {
+              isPostFetching = true;
+              skip = 0;
+              posts = [];
+              showLoading = true;
+              await getPosts("newest", searchTerm, status, limit, skip);
+              isPostFetching = false;
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
             class="sort-buttons d-flex justify-content-between w-100"
@@ -451,8 +499,13 @@
           </button>
 
           <button
-            on:click={() => {
-              getPosts("score", searchTerm, status, limit, skip);
+            on:click={async () => {
+              isPostFetching = true;
+              skip = 0;
+              posts = [];
+              showLoading = true;
+              await getPosts("score", searchTerm, status, limit, skip);
+              isPostFetching = false;
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
             class="sort-buttons d-flex justify-content-between w-100"
