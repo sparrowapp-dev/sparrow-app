@@ -1,12 +1,17 @@
 name: Sonarqube
 
 on:
+  push:
+    branches:
+      - development
+
   pull_request:
       types: [opened, synchronize, reopened]
+  
   workflow_dispatch:
 
 jobs:
-  test:
+  sonarqube:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master # Step for scanning your project
@@ -20,7 +25,7 @@ jobs:
           sonar-project-key: sparrow
           sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
           sonar-token: ${{ secrets.SONAR_TOKEN }}
-          github-token: ${{ secrets.PR_GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }} #PR_GITHUB_TOKEN
 
       - name: Output result
         run: |
