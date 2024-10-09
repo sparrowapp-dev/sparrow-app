@@ -337,7 +337,7 @@
                 <ul>
                   {#each filteredPosts as post}
                     <div
-                    class="mb-4"
+                      class="mb-4"
                       style=" display: flex; flex-direction: column; background-color: #151515; padding: 20px;  border-radius:2px;"
                     >
                       <div
@@ -348,10 +348,9 @@
                             class="title"
                             on:click={() => {
                               (postId = post?.id),
-                              (isPostopen = true),
-                              setPostId("feedback", postId)
+                                (isPostopen = true),
+                                setPostId("feedback", postId);
                               MixpanelEvent(Events.Activity_Post);
-
                             }}
                           >
                             {post?.title}
@@ -361,7 +360,8 @@
                           >
                             <span
                               class="category mt-2"
-                              style="color:{getColor(post?.status)?.fontColor}; border:0.2px solid {getColor(
+                              style="color:{getColor(post?.status)
+                                ?.fontColor}; border:0.2px solid {getColor(
                                 post?.status,
                               )?.fontColor}; "
                             >
@@ -407,7 +407,7 @@
                   class="mx-1 text-fs-12 mb-0 text-center"
                   style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
                 >
-                  No Result Found
+                  No Result Found.
                 </p>
 
                 <hr class="mt-4" style="" />
@@ -501,7 +501,7 @@
                   class="mx-1 text-fs-12 mb-0 text-center"
                   style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
                 >
-                  No Result Found
+                  No Result Found.
                 </p>
               {/if}
 
@@ -590,10 +590,9 @@
                   class="mx-1 text-fs-12 mb-0 text-center mt-4 mb-4"
                   style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
                 >
-                  No Result Found
+                  No Result Found.
                 </p>
               {/if}
-
             </div>
           {/if}
         </div>

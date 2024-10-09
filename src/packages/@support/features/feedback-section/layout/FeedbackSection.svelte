@@ -475,7 +475,7 @@
           class=" text-fs-12 mb-0 text-center"
           style=" margin-left:250px; margin-top:45px; font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
         >
-          No Result Found
+          No Result Found.
         </p>
       {/if}
     </div>

@@ -2148,6 +2148,10 @@ class RestExplorerViewModel
       await this.updateRequestState({
         isDocAlreadyGenerated: true,
       });
+    } else if (response?.message === "Limit reached") {
+      notifications.error(
+        "Failed to generate documentation. Your monthly AI usage limit is reached.",
+      );
     }
     setTimeout(async () => {
       // renders response before disabling the editor

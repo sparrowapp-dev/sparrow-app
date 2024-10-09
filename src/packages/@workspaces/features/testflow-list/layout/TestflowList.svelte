@@ -203,7 +203,6 @@
               on:click={async () => {
                 await onCreateTestflow();
                 MixpanelEvent(Events.Add_New_Flow);
-
               }}
             >
               <PlusIcon
@@ -250,7 +249,7 @@
           class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
           style="color: var(--text-secondary-550);  font-weight:300; letter-spacing: 0.5px;"
         >
-          No Result Found
+          No Result Found.
         </p>
       {/if}
     </div>

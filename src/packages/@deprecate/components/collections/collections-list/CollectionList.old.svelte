@@ -726,7 +726,7 @@
           {/if}
         {/if}
         {#if searchData !== "" && !filteredCollection.length && !filteredFolder.length && !filteredFile.length}
-          <span class="not-found-text mx-auto ellipsis">No results found</span>
+          <span class="not-found-text mx-auto ellipsis">No Result Found.</span>
         {/if}
       </div>
     </div>

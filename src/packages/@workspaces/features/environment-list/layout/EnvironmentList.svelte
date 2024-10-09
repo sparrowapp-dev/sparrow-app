@@ -171,7 +171,7 @@
       />
 
       <p class="ms-2 mb-0 sparrow-fs-13" style="font-weight: 500;">
-        Environment
+        Environments
       </p>
     </div>
     {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
@@ -326,7 +326,7 @@
           class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
           style="color: var(--text-secondary-550);  font-weight:300; letter-spacing: 0.5px;"
         >
-          No Result Found
+          No Result Found.
         </p>
       {/if}
     </div>
