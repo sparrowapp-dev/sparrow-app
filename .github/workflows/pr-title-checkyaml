@@ -1,0 +1,53 @@
+name: "📋 Semantic Pull Requests"
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  enforce-issue-link:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Linked Issue
+        uses: hattan/verify-linked-issue-action@v1.1.5
+        env:
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+        with:
+          message: 'Please attach the issue link'
+
+  main:
+    name: Validate Pull Request title
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR title format
+        id: check-pr-title
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.PR_GITHUB_TOKEN }}
+          script: |
+            const title = context.payload.pull_request.title;
+            const types = [
+              'feat',
+              'fix',
+              'docs',
+              'style',
+              'refactor',
+              'test',
+              'build',
+              'ci',
+              'chore',
+              'revert',
+              'l10n',
+              'taxonomy'
+            ];
+            const regex = new RegExp(`^((${types.join('|')})|story\\([0-9]+\\)): .+`);
+            if (!regex.test(title)) {
+              core.setFailed('PR title does not match required pattern.');
+            }
