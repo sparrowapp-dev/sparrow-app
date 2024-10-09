@@ -220,7 +220,6 @@
   // Function to load more updates
   const loadMoreUpdates = async () => {
     if (!isPostopen) {
-      // debugger;
       skip = posts.length;
       getPosts(currentSort, searchTerm, status, limit, skip);
     }
