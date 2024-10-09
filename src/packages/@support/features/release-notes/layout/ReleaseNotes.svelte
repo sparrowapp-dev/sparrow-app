@@ -270,9 +270,9 @@
       </div>
     {/if}
     {#if isLoading}
-     <div class="mt-5">
-      <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
-     </div>
+      <div class="mt-5">
+        <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+      </div>
     {:else}
       <div>
         {#if showTimeline}
@@ -401,7 +401,7 @@
               class="no-results mt-5 d-flex justify-content-center align-items-center mx-1 text-fs-14 mb-0 text-center"
               style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
             >
-              <p>No results found.</p>
+              <p>No Result Found.</p>
             </div>
           {/if}
         {:else}
@@ -504,7 +504,11 @@
                       MixpanelEvent(Events.LinkedIn_Updates_Icon);
                     }}
                   >
-                    <LinkedinIcon height={"18px"} width={"18px"}  color={"var(--icon-secondary-950)"} />
+                    <LinkedinIcon
+                      height={"18px"}
+                      width={"18px"}
+                      color={"var(--icon-secondary-950)"}
+                    />
                   </div>
                 </div>
               </div>

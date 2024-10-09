@@ -86,8 +86,7 @@
       <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
         <div class="d-flex flex-wrap gap-5 justify-content-between row-gap-0">
           {#if searchQuery !== "" && filteredWorkspaces.length === 0}
-            <span class="not-found-text mx-auto ellipsis"
-              >No results found.</span
+            <span class="not-found-text mx-auto ellipsis">No Result Found.</span
             >
           {/if}
           {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}

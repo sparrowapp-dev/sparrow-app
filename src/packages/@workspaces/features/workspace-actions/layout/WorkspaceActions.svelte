@@ -409,6 +409,7 @@
           handleSearch();
           isExpandCollection = true;
           isExpandEnvironment = true;
+          isExpandTestflow = true;
         }}
         defaultBorderColor="transparent"
         hoveredBorderColor="var(--border-primary-300)"

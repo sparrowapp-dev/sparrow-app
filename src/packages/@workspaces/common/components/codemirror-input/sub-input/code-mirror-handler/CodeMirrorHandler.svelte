@@ -65,7 +65,8 @@
   let localEnvKey = "";
   let codeMirrorEditorDiv: HTMLDivElement;
 
-  const ENVIRONMENT_REGEX = /({{[a-zA-Z0-9-_\s]+}})/g;
+  const ENVIRONMENT_REGEX =
+    /({{[a-zA-Z0-9-_!@#$%^&*()+=\[\]|\\;:'",.<>?/`\s]+}})/g;
 
   type AggregateEnvironment = {
     key: string;
