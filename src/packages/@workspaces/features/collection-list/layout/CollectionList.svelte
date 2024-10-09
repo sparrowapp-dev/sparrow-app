@@ -341,25 +341,27 @@
             </List>
           {/if}
         {:else}
-          <EmptyCollection
-            bind:userRole
-            {onItemCreated}
-            {collectionList}
-            {userRoleInWorkspace}
-            {currentWorkspace}
-            handleCreateApiRequest={() => onItemCreated("request", {})}
-            onImportCollectionPopup={showImportCollectionPopup}
-            isAddCollectionDisabled={isGuestUser}
-            onImportCurlPopup={showImportCurlPopup}
-            {isGuestUser}
-          />
+          {#if searchData.length === 0}
+            <EmptyCollection
+              bind:userRole
+              {onItemCreated}
+              {collectionList}
+              {userRoleInWorkspace}
+              {currentWorkspace}
+              handleCreateApiRequest={() => onItemCreated("request", {})}
+              onImportCollectionPopup={showImportCollectionPopup}
+              isAddCollectionDisabled={isGuestUser}
+              onImportCurlPopup={showImportCurlPopup}
+              {isGuestUser}
+            />
+          {/if}
 
           {#if searchData.length !== 0}
             <p
               class="mx-1 text-fs-12 mb-0 text-center"
               style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
             >
-              No Result Found
+              It seems we couldn't find the result matching your search query.
             </p>
           {/if}
         {/if}
