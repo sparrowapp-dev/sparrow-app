@@ -305,7 +305,7 @@
             workspaceId: collection.workspaceId,
             collection,
           }),
-        displayText: "Open collection",
+        displayText: "Open Collection",
         disabled: false,
         hidden: false,
       },
@@ -313,7 +313,7 @@
         onClick: () => {
           (isRenaming = true), setTimeout(() => inputField.focus(), 100);
         },
-        displayText: "Rename collection",
+        displayText: "Rename Collection",
         disabled: false,
         hidden:
           !(collection?.activeSync && isBranchSynced) &&
@@ -594,7 +594,7 @@
               </div>
             </Tooltip>
 
-            <Tooltip title={"Add Request"} placement={"bottom"} distance={12}>
+            <Tooltip title={"Add REST API"} placement={"bottom"} distance={12}>
               <div
                 class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
                 style="height: 24px; width: 24px;"

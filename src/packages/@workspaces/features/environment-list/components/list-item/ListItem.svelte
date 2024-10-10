@@ -126,7 +126,7 @@
         },
         {
           onClick: renameEnvironment,
-          displayText: "Rename",
+          displayText: "Rename Environment",
           disabled: false,
         },
         {
@@ -322,9 +322,9 @@
       visibility: visible;
       background-color: var(--bg-secondary-400);
     }
-    .threedot-icon-container:hover {
-      background-color: var(--text-tertiary-600);
-    }
+   .threedot-icon-container:hover {
+    background-color: var(--bg-tertiary-500);
+  }
 
     .btn-primary {
       background-color: transparent;
