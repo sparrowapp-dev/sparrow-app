@@ -381,12 +381,14 @@ class HelpPageViewModel {
     userId: string,
     search?: string,
     status?: string,
+    limit?:number
   ) => {
     const response = await this.cannyService.listUsersPost(
       sort,
       userId,
       search,
       status,
+      limit
     );
     return response;
   };

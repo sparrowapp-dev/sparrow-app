@@ -190,7 +190,7 @@
           <div class={`pb-2 px-2`}>
             <p
               class={`add-env-desc-text mb-3 text-fs-12 mb-0 fw-normal text-center`}
-              style="color: var(--text-secondary-50)"
+              style="color: var(--text-secondary-50); font-weight:300;"
             >
               Start with basic test cases to check core functions and build a
               strong testing foundation.

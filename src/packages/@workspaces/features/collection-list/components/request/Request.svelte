@@ -212,7 +212,7 @@
             request: api,
           });
         },
-        displayText: "Open API",
+        displayText: "Open REST API",
         disabled: false,
         hidden: false,
       },
@@ -221,7 +221,7 @@
           isRenaming = true;
           setTimeout(() => inputField.focus(), 100);
         },
-        displayText: "Rename API",
+        displayText: "Rename REST API",
         disabled: false,
         hidden:
           !collection.activeSync ||
