@@ -2070,7 +2070,7 @@ export default class CollectionsViewModel {
         source: "Collection list",
       });
     } else {
-      notifications.error("Failed to delete folder. Plaease try again.");
+      notifications.error("Failed to delete folder. Please try again.");
     }
   };
 
