@@ -336,6 +336,7 @@
   isUserFirstSignUp.subscribe((value) => {
     if (value) {
       isWelcomePopupOpen = value;
+      isExpandCollection = value;
     }
   });
 
