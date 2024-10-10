@@ -53,7 +53,7 @@
     ) {
       toggleSaveRequest(true);
     } else if (x.status === "success") {
-      notifications.success("API request saved");
+      notifications.success("API request saved successfully.");
     }
   };
 

@@ -208,7 +208,7 @@
           currentCollection?.id,
           response.data.data.collection,
         );
-        notifications.success("Collection synced.");
+        notifications.success("Collection synced successfully.");
       } else {
         notifications.error("Failed to sync the collection. Please try again.");
       }
@@ -317,7 +317,9 @@
         notifications.success(`Branch refreshed.`);
       }
     } catch (e) {
-      notifications.error("Failed to fetch branch from repository.");
+      notifications.error(
+        "Failed to fetch branch from repository. Please try again.",
+      );
     }
   };
 </script>

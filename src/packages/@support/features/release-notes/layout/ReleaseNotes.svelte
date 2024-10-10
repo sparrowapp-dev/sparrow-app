@@ -291,7 +291,7 @@
                   <div class="timeline-content">
                     <div class=" d-flex gap-2">
                       <h3
-                      style="cursor: pointer;"
+                        style="cursor: pointer;"
                         class="text-fs-18 mb-0"
                         on:click={() => {
                           handleSeeMore(event);
@@ -312,7 +312,7 @@
                           style="height:24px; width:24px; cursor:pointer"
                           on:click={async () => {
                             await copyToClipBoard(event.url);
-                            notifications.success("Link copied to clipboard!");
+                            notifications.success("Link copied to clipboard.");
                             MixpanelEvent(Events.Copy_Link);
                           }}
                         >
@@ -451,7 +451,7 @@
                     style="  height: 24px; width:24px; cursor:pointer"
                     on:click={async () => {
                       await copyToClipBoard(selectedEvent.url);
-                      notifications.success("Link copied to clipboard!");
+                      notifications.success("Link copied to clipboard.");
                       MixpanelEvent(Events.Copy_Link);
                     }}
                   >

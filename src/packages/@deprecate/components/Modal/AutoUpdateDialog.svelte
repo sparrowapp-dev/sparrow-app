@@ -6,7 +6,7 @@
   import { relaunch } from "@tauri-apps/plugin-process";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import Button from "@library/ui/button/Button.svelte";
-  
+
   let showProgressBar = false;
   let updateAvailable = false;
   let newAppVersion: string | undefined = "";
@@ -43,7 +43,7 @@
         }, WAIT_TIME_BEFORE_RESTART_IN_SECONDS * 1000);
       }
     } catch (e) {
-      notifications.error("Update Failed!");
+      notifications.error("Update Failed.");
       console.error(e);
     } finally {
       showProgressBar = false;

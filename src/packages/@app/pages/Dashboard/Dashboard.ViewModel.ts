@@ -396,7 +396,7 @@ export class DashboardViewModel {
       await this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
       await this.workspaceRepository.setActiveWorkspace(res._id);
       navigate("/dashboard/collections");
-      notifications.success("New Workspace Created");
+      notifications.success("New Workspace created successfully.");
     } else {
       notifications.error(response?.message);
     }

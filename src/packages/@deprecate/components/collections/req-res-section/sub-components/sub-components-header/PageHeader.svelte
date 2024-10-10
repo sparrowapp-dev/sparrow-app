@@ -99,7 +99,7 @@
     const res = await collectionsMethods.saveApiRequest(componentData);
     if (res) {
       collectionsMethods.setRequestSave(true, "api", id);
-      notifications.success("API request saved");
+      notifications.success("API request saved successfully.");
     }
     collectionsMethods.updateTab(false, "saveInProgress", id);
   };

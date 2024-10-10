@@ -11,11 +11,13 @@ export const handleResetPassword = async (
   const response = await resetPassword(resetPasswordCredential);
 
   if (response.isSuccessful) {
-    notifications.success("Password Updated");
+    notifications.success("Password updated successfully.");
     navigate("/login");
   } else {
     if (response.message === "Unauthorized Access") {
-      notifications.error("Old Password and New Password cannot be same");
+      notifications.error(
+        "Old and New Password cannot be same. Please enter a different password.",
+      );
     }
     throw "error login user: " + response.message;
   }

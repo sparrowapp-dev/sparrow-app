@@ -103,7 +103,7 @@
         style="border-radius: 2px;"
         on:click={async () => {
           await copyToClipBoard(externalSparrowLink);
-          notifications.success("Link copied to clipboard!");
+          notifications.success("Link copied to clipboard.");
         }}
       >
         <span class="mx-2">

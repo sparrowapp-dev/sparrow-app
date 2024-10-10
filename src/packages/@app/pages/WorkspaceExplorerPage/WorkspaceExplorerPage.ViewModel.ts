@@ -78,7 +78,7 @@ export default class WorkspaceExplorerViewModel {
       };
       await this.workspaceRepository.updateWorkspace(workspaceId, updatedata);
       await this.tabRepository.updateTabByMongoId(workspaceId, updatedata);
-      notifications.success("Workspace renamed successfully!");
+      // notifications.success("Workspace renamed successfully!");
       return;
     }
   };
@@ -103,7 +103,7 @@ export default class WorkspaceExplorerViewModel {
       const updatedata = {
         description: newDescription,
       };
-      notifications.success("Description updated successfully!");
+      notifications.success("Description updated successfully.");
       await this.workspaceRepository.updateWorkspace(workspaceId, updatedata);
       return;
     }
@@ -202,7 +202,7 @@ export default class WorkspaceExplorerViewModel {
         `Invite sent to ${_invitedUserCount} people for ${_workspaceName}.`,
       );
     } else {
-      notifications.error(`Failed to sent invite. Please try again.`);
+      notifications.error(`Failed to send invite. Please try again.`);
     }
     if (_data.role === WorkspaceRole.WORKSPACE_VIEWER) {
       MixpanelEvent(Events.Invite_To_Workspace_Viewer, {

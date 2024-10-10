@@ -47,9 +47,9 @@ class HelpPageViewModel {
     formData.append("description", feedbackDescription);
     const response = await this.feedbackService.createFeedback(formData);
     if (response.isSuccessful) {
-      notifications.success("Feedback added successfully");
+      notifications.success("Feedback added successfully.");
     } else {
-      notifications.error("Feedback submission failed. Please try again.");
+      notifications.error("Failed to add the feedback. Please try again.");
     }
     MixpanelEvent(Events.USER_FEEDBACK, {
       source: "Feedback",
@@ -277,7 +277,7 @@ class HelpPageViewModel {
       };
     },
   ) => {
-    const errorMessage = "Feedback submission failed. Please try again.";
+    const errorMessage = "Failed to add the feedback. Please try again.";
     const files = Array.from(uploadFeedback?.file?.value);
     const formData = new FormData();
     files.forEach((file) => formData.append("files", file));
@@ -300,7 +300,7 @@ class HelpPageViewModel {
           imageURLs: images,
         });
         if (response.isSuccessful) {
-          notifications.success("Feedback added successfully");
+          notifications.success("Feedback added successfully.");
         } else {
           notifications.error(errorMessage);
         }
@@ -336,7 +336,7 @@ class HelpPageViewModel {
     },
     imageURLsArray: string[], // Add this parameter to receive the image URLs
   ) => {
-    const errorMessage = "Feedback submission failed. Please try again.";
+    const errorMessage = "Failed to add the feedback. Please try again.";
     const files = Array.from(uploadFeedback?.file?.value);
     const formData = new FormData();
     files.forEach((file) => formData.append("files", file));
@@ -363,7 +363,7 @@ class HelpPageViewModel {
         });
 
         if (response.isSuccessful) {
-          notifications.success("Feedback Updated successfully");
+          notifications.success("Feedback updated successfully.");
         } else {
           notifications.error(errorMessage);
         }
@@ -478,7 +478,7 @@ class HelpPageViewModel {
     });
 
     if (response.isSuccessful) {
-      notifications.success("Comment added successfully");
+      notifications.success("Comment added successfully.");
     } else {
       notifications.error("Failed to add comment. Please try again.");
     }

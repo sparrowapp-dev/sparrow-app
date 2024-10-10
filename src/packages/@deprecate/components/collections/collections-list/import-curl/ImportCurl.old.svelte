@@ -72,7 +72,7 @@
       moveNavigation("right");
       onClick(false);
       progressBar.isLoading = false;
-      notifications.success("API request is imported successfully.");
+      notifications.success("API request imported successfully.");
     } else {
       progressBar.isLoading = false;
       if (response.message === "Network Error") {

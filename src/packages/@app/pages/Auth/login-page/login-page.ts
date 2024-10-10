@@ -47,7 +47,7 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
     //   Login_Method: "Email",
     //   Success: response.isSuccessful,
     // });
-    notifications.success("Login successful!");
+    notifications.success("You're logged in successfully.");
     navigate("/dashboard/workspaces");
     _activeSidebarTabViewModel.addActiveTab("workspaces");
     return response;
@@ -73,7 +73,7 @@ export async function handleLoginV2(url: string) {
     setUser(jwtDecode(accessToken));
     sendUserDataToMixpanel(userDetails);
 
-    notifications.success("Login successful!");
+    notifications.success("You're logged in successfully.");
     if (event === "register") {
       navigate("/app/collections?first=true");
       isUserFirstSignUp.set(true);
