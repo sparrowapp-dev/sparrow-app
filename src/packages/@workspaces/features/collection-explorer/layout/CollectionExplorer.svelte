@@ -218,7 +218,7 @@
                 headerHighlight={"hover-active"}
                 borderHighlight={"hover-active"}
                 searchText={"Search Branch"}
-                searchErrorMessage={"No Result Found."}
+                searchErrorMessage={"No result found."}
                 id={"git-branch-select"}
                 data={[
                   ...(collection?.branches ? collection.branches : []).map(

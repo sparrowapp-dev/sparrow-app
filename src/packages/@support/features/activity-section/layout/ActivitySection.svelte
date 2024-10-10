@@ -232,6 +232,7 @@
             class="clear-icon"
             on:click={() => {
               searchTerm = "";
+              applyAllFilters();
             }}
           >
             <CrossIcon

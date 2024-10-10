@@ -63,7 +63,7 @@
   <CodeMirrorInput
     bind:value={requestUrl}
     onUpdateInput={onUpdateRequestUrl}
-    placeholder={"Enter an URL"}
+    placeholder={"Enter a URL"}
     {theme}
     {onUpdateEnvironment}
     {environmentVariables}

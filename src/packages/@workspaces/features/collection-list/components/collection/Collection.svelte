@@ -322,36 +322,6 @@
             : true,
       },
       {
-        onClick: () =>
-          onItemCreated("requestCollection", {
-            workspaceId: collection.workspaceId,
-            collection,
-          }),
-        displayText: "Add New API",
-        disabled: false,
-        hidden: false,
-      },
-      {
-        onClick: () =>
-          onItemCreated("websocketCollection", {
-            workspaceId: collection.workspaceId,
-            collection,
-          }),
-        displayText: "Add New WebSocket",
-        disabled: false,
-        hidden: false,
-      },
-      {
-        onClick: () =>
-          onItemCreated("folder", {
-            workspaceId: collection.workspaceId,
-            collection,
-          }),
-        displayText: "Add Folder",
-        disabled: false,
-        hidden: false,
-      },
-      {
         onClick: () => {
           isCollectionPopup = true;
         },
@@ -392,7 +362,7 @@
             collection,
           });
         },
-        displayText: "Add New API",
+        displayText: "Add New REST API",
         disabled: false,
         hidden: false,
         icon: SyncIcon,
@@ -404,7 +374,7 @@
             collection,
           });
         },
-        displayText: "Add New WebSocket",
+        displayText: "Add WebSocket",
         disabled: false,
         hidden: false,
         icon: SocketIcon,
