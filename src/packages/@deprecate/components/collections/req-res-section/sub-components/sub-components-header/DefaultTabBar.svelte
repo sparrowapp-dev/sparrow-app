@@ -148,7 +148,7 @@
         id: Samplecollection.id,
         name: newCollection.name,
       });
-      notifications.success("New Collection Created");
+      notifications.success("New Collection created successfully.");
       MixpanelEvent(Events.CREATE_COLLECTION, {
         source: collectionSource,
         collectionName: res.data.data.name,

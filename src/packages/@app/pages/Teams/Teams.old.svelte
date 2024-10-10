@@ -207,7 +207,7 @@
       collectionsMethods.handleActiveTab(workspaceObj._id);
       moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
-      notifications.success("New Workspace Created");
+      notifications.success("New Workspace created successfully.");
       isWorkspaceLoaded.set(true);
       let newWorkspace = response.data.data;
       newWorkspace.team.teamId = newWorkspace.team.id;
@@ -285,7 +285,7 @@
         setTimeout(async () => {
           await _viewModel.refreshTeams(userId);
           // await _viewModelWorkspace.refreshWorkspaces(userId);
-          notifications.success("You left a team.");
+          notifications.success("You've left a team.");
           handleLeaveTeamModal();
           isShowMoreVisible = false;
           isLeavingTeam = false;

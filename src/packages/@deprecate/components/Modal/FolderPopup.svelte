@@ -44,7 +44,7 @@
       collectionsMethods.removeMultipleTabs(requestIds);
       closePopup(false);
     } else {
-      notifications.error("Failed to delete the Folder.");
+      notifications.error("Failed to delete folder. Plaease try again.");
       deleteLoader = false;
     }
   };

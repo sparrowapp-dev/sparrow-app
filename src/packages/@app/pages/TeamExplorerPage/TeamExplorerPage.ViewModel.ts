@@ -289,7 +289,7 @@ export class TeamExplorerPageViewModel {
       await this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
       await this.workspaceRepository.setActiveWorkspace(res._id);
       navigate("/dashboard/collections");
-      notifications.success("New Workspace Created");
+      notifications.success("New Workspace created successfully.");
       MixpanelEvent(Events.Create_New_Workspace_TeamPage);
     }
   };
@@ -722,7 +722,7 @@ export class TeamExplorerPageViewModel {
       setTimeout(async () => {
         await this.refreshTeams(userId);
         await this.refreshWorkspaces(userId);
-        notifications.success("You left a team.");
+        notifications.success("You've left a team.");
         resolve();
       }, 500),
     );
@@ -784,7 +784,7 @@ export class TeamExplorerPageViewModel {
         `Invite sent to ${_invitedUserCount} people for ${_workspaceName}.`,
       );
     } else {
-      notifications.error(`Failed to sent invite. Please try again.`);
+      notifications.error(`Failed to send invite. Please try again.`);
     }
     if (_data.role === WorkspaceRole.WORKSPACE_VIEWER) {
       MixpanelEvent(Events.Invite_To_Workspace_Viewer, {

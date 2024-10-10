@@ -413,7 +413,7 @@ const connectWebSocket = async (
           }
           return webSocketDataMap;
         });
-        notifications.success("WebSocket connected successfully");
+        notifications.success("WebSocket connected successfully.");
 
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
         const listener = await listen(`ws_message_${tabId}`, (event) => {

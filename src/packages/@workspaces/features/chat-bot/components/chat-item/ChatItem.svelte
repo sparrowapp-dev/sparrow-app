@@ -123,7 +123,7 @@
         const code = codeElement.textContent || "";
         try {
           await navigator.clipboard.writeText(code);
-          notifications.success("Code copied to clipboard!");
+          notifications.success("Code copied to clipboard.");
         } catch (err) {
           console.error("Failed to copy code: ", err);
         }
@@ -137,7 +137,7 @@
   const handleCopyResponse = async () => {
     try {
       await navigator.clipboard.writeText(message);
-      notifications.success("Response copied to clipboard!");
+      notifications.success("Response copied to clipboard.");
       showTickIcon = true;
       await tick();
       setTimeout(() => {

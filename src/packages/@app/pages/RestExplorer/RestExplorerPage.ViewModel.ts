@@ -1644,7 +1644,7 @@ class RestExplorerViewModel
           });
         }
 
-        notifications.success("Environment Variable Added");
+        notifications.success("Environment variable added successfully.");
         return {
           isSuccessful: true,
         };
@@ -1676,9 +1676,11 @@ class RestExplorerViewModel
           });
         }
 
-        notifications.success("Environment Variable Added");
+        notifications.success("Environment variable added successfully.");
       } else {
-        notifications.error("Failed to add Environment Variable");
+        notifications.error(
+          "Failed to add environment variable. Please try again.",
+        );
       }
       return response;
     } else {
@@ -1727,7 +1729,7 @@ class RestExplorerViewModel
           });
         }
 
-        notifications.success("Environment Variable Added");
+        notifications.success("Environment variable added successfully.");
         return {
           isSuccessful: true,
         };
@@ -1759,9 +1761,11 @@ class RestExplorerViewModel
           });
         }
 
-        notifications.success("Environment Variable Added");
+        notifications.success("Environment variable added successfully.");
       } else {
-        notifications.error("Failed to add Environment Variable");
+        notifications.error(
+          "Failed to add environment variable. Please try again.",
+        );
       }
       return response;
     }
@@ -1831,7 +1835,7 @@ class RestExplorerViewModel
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {
-        notifications.error("Failed to rename collection!");
+        notifications.error("Failed to rename collection. Please try again.");
       }
       return response;
     }
@@ -1907,7 +1911,7 @@ class RestExplorerViewModel
         );
         notifications.success("Folder renamed successfully!");
       } else {
-        notifications.error("Failed to rename folder!");
+        notifications.error("Failed to rename folder. Please try again.");
       }
       return response;
     }

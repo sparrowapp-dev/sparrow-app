@@ -145,11 +145,11 @@ export class TestflowViewModel {
         ...res,
         workspaceId: currentWorkspace._id,
       });
-      notifications.success("New Testflow Created!");
+      notifications.success("New Testflow created successfully.");
       // MixpanelEvent(Events.CREATE_TESTFLOW);
       return;
     } else {
-      notifications.error("Failed to create Testflow. Please try again.");
+      notifications.error("Failed to create testflow. Please try again.");
     }
   };
 

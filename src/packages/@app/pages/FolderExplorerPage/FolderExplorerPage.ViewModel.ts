@@ -297,7 +297,7 @@ class FolderExplorerPage {
       });
       return;
     } else {
-      notifications.error("Failed to create API");
+      notifications.error("Failed to create API request. Please try again.");
     }
   };
 
@@ -335,7 +335,7 @@ class FolderExplorerPage {
         tab.path.folderId,
         res,
       );
-      notifications.success("Description updated successfully!");
+      notifications.success("Description updated successfully.");
       return;
     }
 
@@ -352,9 +352,9 @@ class FolderExplorerPage {
         tab.path.folderId,
         updateFolderElement.data.data,
       );
-      notifications.success("Description updated successfully!");
+      notifications.success("Description updated successfully.");
     } else {
-      notifications.error("Failed to update description!");
+      notifications.error("Failed to update description. Please try again.");
     }
   };
 

@@ -90,7 +90,7 @@
     // write our file
     await writableStream.write(response?.body);
     await writableStream.close();
-    notifications.success("Response downloaded");
+    notifications.success("Response downloaded successfully.");
     MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
   };
 </script>
@@ -253,7 +253,7 @@
               RequestProperty.RESPONSE,
               currentTabId,
             );
-            notifications.success("Response Cleared");
+            notifications.success("Response cleared successfully.");
             MixpanelEvent(Events.CLEAR_API_RESPONSE);
           }}
         >

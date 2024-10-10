@@ -651,7 +651,7 @@ export default class CollectionsViewModel {
             name: newCollection.name,
           },
         );
-        notifications.success("New Collection Created");
+        notifications.success("New Collection created successfully.");
         MixpanelEvent(Events.CREATE_COLLECTION, {
           source: "USER",
           collectionName: response.data.data.name,
@@ -694,7 +694,7 @@ export default class CollectionsViewModel {
         id: initCollectionTab.getValue().id,
         name: newCollection.name,
       });
-      notifications.success("New Collection Created");
+      notifications.success("New Collection created successfully.");
     }
     return response;
   };
@@ -737,7 +737,7 @@ export default class CollectionsViewModel {
       if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {
-        notifications.error("Failed to import cURL. Please try again");
+        notifications.error("Failed to import cURL. Please try again.");
       }
     }
     MixpanelEvent(Events.IMPORT_API_VIA_CURL, {
@@ -1402,7 +1402,7 @@ export default class CollectionsViewModel {
       });
     } else {
       // Show error notification and clean up by deleting the folder locally on failure.
-      notifications.error("Failed to create folder!");
+      notifications.error("Failed to create folder. Plaease try again.");
       this.collectionRepository.deleteRequestOrFolderInCollection(
         collection.id,
         folder.id,
@@ -1447,7 +1447,7 @@ export default class CollectionsViewModel {
         } else if (response.message === "Network Error") {
           notifications.error(response.message);
         } else {
-          notifications.error("Failed to rename collection!");
+          notifications.error("Failed to rename collection. Please try again.");
         }
       }
     } else {
@@ -1464,7 +1464,7 @@ export default class CollectionsViewModel {
         this.updateTab(collection.id, { name: newCollectionName });
         notifications.success("Collection renamed successfully!");
       } else {
-        notifications.error("Failed to rename collection!");
+        notifications.error("Failed to rename collection. Please try again.");
       }
     }
   };
@@ -2005,7 +2005,7 @@ export default class CollectionsViewModel {
       });
     } else {
       notifications.error(
-        response.message ?? "Failed to delete the Collection.",
+        response.message ?? "Failed to delete collection. Please try again.",
       );
     }
   };
@@ -2070,7 +2070,7 @@ export default class CollectionsViewModel {
         source: "Collection list",
       });
     } else {
-      notifications.error("Failed to delete the Folder.");
+      notifications.error("Failed to delete folder. Plaease try again.");
     }
   };
 
@@ -2161,7 +2161,7 @@ export default class CollectionsViewModel {
       });
       return true;
     } else {
-      notifications.error("Failed to delete the Request.");
+      notifications.error("Failed to delete API request. Plaease try again.");
       return false;
     }
   };
@@ -2251,7 +2251,7 @@ export default class CollectionsViewModel {
       });
       return true;
     } else {
-      notifications.error("Failed to delete the WebSocket.");
+      notifications.error("Failed to delete WebSocket. Plaease try again.");
       return false;
     }
   };
@@ -2330,7 +2330,7 @@ export default class CollectionsViewModel {
             collection.id,
             response.data.data.collection,
           );
-          notifications.success("Collection synced.");
+          notifications.success("Collection synced successfully.");
         } else {
           notifications.error(
             "Failed to sync the collection. Please try again.",
@@ -3193,7 +3193,7 @@ export default class CollectionsViewModel {
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {
-        notifications.error("Failed to rename collection!");
+        notifications.error("Failed to rename collection. Please try again.");
       }
       return response;
     }
@@ -3271,7 +3271,7 @@ export default class CollectionsViewModel {
         );
         notifications.success("Folder renamed successfully!");
       } else {
-        notifications.error("Failed to rename folder!");
+        notifications.error("Failed to rename folder. Please try again.");
       }
       return response;
     }
