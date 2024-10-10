@@ -362,7 +362,7 @@
             collection,
           });
         },
-        displayText: "Add New REST API",
+        displayText: "Add REST API",
         disabled: false,
         hidden: false,
         icon: SyncIcon,
