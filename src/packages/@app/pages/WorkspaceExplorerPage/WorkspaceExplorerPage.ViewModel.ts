@@ -78,7 +78,7 @@ export default class WorkspaceExplorerViewModel {
       };
       await this.workspaceRepository.updateWorkspace(workspaceId, updatedata);
       await this.tabRepository.updateTabByMongoId(workspaceId, updatedata);
-      notifications.success("Workspace renamed successfully!");
+      // notifications.success("Workspace renamed successfully!");
       return;
     }
   };

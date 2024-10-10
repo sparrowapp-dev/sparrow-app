@@ -250,7 +250,7 @@ export class TestflowViewModel {
     } else if (response.message === "Network Error") {
       notifications.error(response.message);
     } else {
-      notifications.error("Failed to rename testflow");
+      // notifications.error("Failed to rename testflow");
     }
   };
 

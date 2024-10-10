@@ -1536,7 +1536,7 @@ export default class CollectionsViewModel {
           explorer.id,
           res,
         );
-        notifications.success("Folder renamed successfully!");
+        // notifications.success("Folder renamed successfully!");
 
         this.updateTab(explorer.id, {
           name: newFolderName,
@@ -3174,7 +3174,7 @@ export default class CollectionsViewModel {
         const col: CollectionDocType = colData.toMutableJSON();
         col.name = newCollectionName;
         this.collectionRepository.updateCollection(collectionId, col);
-        notifications.success("Collection renamed successfully!");
+        // notifications.success("Collection renamed successfully!");
         return {
           isSuccessful: true,
         };
@@ -3249,7 +3249,7 @@ export default class CollectionsViewModel {
           folderId,
           res,
         );
-        notifications.success("Folder renamed successfully!");
+        // notifications.success("Folder renamed successfully!");
         return {
           isSuccessful: true,
         };

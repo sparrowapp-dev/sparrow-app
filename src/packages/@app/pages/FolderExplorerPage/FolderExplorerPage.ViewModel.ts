@@ -140,7 +140,7 @@ class FolderExplorerPage {
           folder.id,
           res,
         );
-        notifications.success("Folder renamed successfully!");
+        // notifications.success("Folder renamed successfully!");
         return;
       }
       const response = await this.collectionService.updateFolderInCollection(
@@ -160,7 +160,7 @@ class FolderExplorerPage {
           folder.id,
           response.data.data,
         );
-        notifications.success("Folder renamed successfully!");
+        // notifications.success("Folder renamed successfully!");
       }
     }
   };

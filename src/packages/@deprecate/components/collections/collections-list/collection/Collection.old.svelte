@@ -277,7 +277,7 @@
       if (response.isSuccessful) {
         collectionsMethods.updateCollection(collectionId, response.data.data);
         collectionsMethods.updateTab(newCollectionName, "name", collectionId);
-        notifications.success("Collection renamed successfully!");
+        // notifications.success("Collection renamed successfully!");
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {

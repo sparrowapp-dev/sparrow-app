@@ -94,7 +94,7 @@ class CollectionExplorerPage {
           response.data,
         );
         this.updateTab(this.tab.tabId, { name: newCollectionName });
-        notifications.success("Collection renamed successfully!");
+        // notifications.success("Collection renamed successfully!");
       } else {
         notifications.error("Failed to rename collection. Please try again.");
       }
@@ -112,7 +112,7 @@ class CollectionExplorerPage {
           response.data.data,
         );
         this.updateTab(this.tab.tabId, { name: newCollectionName });
-        notifications.success("Collection renamed successfully!");
+        // notifications.success("Collection renamed successfully!");
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {
