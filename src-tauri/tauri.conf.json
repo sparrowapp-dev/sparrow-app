@@ -39,11 +39,8 @@
     "targets": "all",
     "windows": {
       "wix": {
-        "fragmentPaths": [
-          "./assets/DeepLinkRegistryEntries.wxs",
-          "./assets/CleanupOnUninstall.wxs"
-        ],
-        "componentRefs": ["DeepLinkRegistryEntries", "CleanupAppFolder"]
+        "fragmentPaths": ["./assets/DeepLinkRegistryEntries.wxs"],
+        "componentRefs": ["DeepLinkRegistryEntries"]
       }
     },
     "macOS": {
