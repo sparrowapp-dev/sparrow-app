@@ -152,7 +152,7 @@
     </div>
 
     <Tooltip
-      title={`Add New ${TFDefaultEnum.NAME}`}
+      title={`Add ${TFDefaultEnum.NAME}`}
       placement={"bottom"}
       distance={13}
       show={isHovered}
@@ -212,8 +212,7 @@
               />
               <span
                 style="color: var(--text-secondary-200)"
-                class="ps-2 fw-bold text-fs-12"
-                >Add New {TFDefaultEnum.NAME}</span
+                class="ps-2 fw-bold text-fs-12">Add {TFDefaultEnum.NAME}</span
               >
             </button>
           </div>
