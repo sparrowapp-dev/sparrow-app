@@ -19,6 +19,7 @@ import type {
 import type {
   TFAPIResponseType,
   TFDataStoreType,
+  TFEdgeType,
   TFHistoryAPIResponseStoreType,
   TFHistoryStoreType,
   TFKeyValueStoreType,
@@ -121,9 +122,16 @@ export class TestflowExplorerPageViewModel {
    * Updates the edges in the testflow with debounce to avoid frequent calls
    * @param _edges - edges of the testflow
    */
-  private updateEdgesDebounce = async (_edges: string) => {
+  private updateEdgesDebounce = async (_edges: TFEdgeType[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.testflow.edges = _edges;
+    const edges = _edges.map((elem) => {
+      return {
+        id: elem.id,
+        source: elem.source,
+        target: elem.target,
+      };
+    });
+    progressiveTab.property.testflow.edges = edges;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareTestflowWithServer();
