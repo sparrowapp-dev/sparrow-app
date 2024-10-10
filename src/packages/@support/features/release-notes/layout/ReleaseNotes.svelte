@@ -262,7 +262,7 @@
             headerTheme={"violet2"}
             bodyTheme={"violet"}
             menuItem={"v2"}
-            headerFontSize={"10px"}
+            headerFontSize={"12px"}
             isDropIconFilled={true}
             position={"absolute"}
           />
@@ -399,9 +399,9 @@
           {:else}
             <div
               class="no-results mt-5 d-flex justify-content-center align-items-center mx-1 text-fs-14 mb-0 text-center"
-              style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+              style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
             >
-              <p>No Result Found.</p>
+              <p>No result found.</p>
             </div>
           {/if}
         {:else}

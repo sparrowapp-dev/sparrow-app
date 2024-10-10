@@ -312,7 +312,7 @@
                   class="mx-1 text-fs-12 mb-0 text-center"
                   style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
                 >
-                  No Result Found.
+                No result found.
                 </p>
               </List>
             {/if}
