@@ -38,7 +38,7 @@
   </div>
 
   <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p class="mb-2 text-requestBodyColor">Password</p>
+    <p class="mb-2 text-secondary-100">Password</p>
 
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
