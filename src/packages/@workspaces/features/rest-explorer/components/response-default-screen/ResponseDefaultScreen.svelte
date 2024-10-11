@@ -31,7 +31,7 @@
 <div
   class="{isMainScreen
     ? 'pt-5 pb-3'
-    : ''} response-default h-100 d-flex flex-column justify-content-between align-items-center default-screen-scroller"
+    : ''} response-default h-100 d-flex flex-column justify-content-between align-items-center"
 >
   <div class="">
     <div class="d-flex align-items-center flex-column justify-content-center">
@@ -111,15 +111,5 @@
 <style>
   .cursor-pointer {
     cursor: pointer;
-  }
-
-  .default-screen-scroller {
-    overflow-y: hidden;
-    transition: overflow 0.3s ease-in-out;
-  }
-
-  .default-screen-scroller:hover {
-    padding-right: 0;
-    overflow-y: auto;
   }
 </style>
