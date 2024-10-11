@@ -63,6 +63,7 @@ jobs:
           echo "${{ steps.quality-gate-check.outputs.project-status }}"
           echo "${{ steps.quality-gate-check.outputs.quality-gate-result }}"
 
+          
 # ======================
 # name: Sonarqube
 
