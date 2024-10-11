@@ -186,7 +186,7 @@
         res.data.data,
       );
       createFolderName = constant.newFolder;
-      notifications.success("New Folder Created");
+      notifications.success("New folder created successfully.");
     } else {
       notifications.error(res.message);
     }
@@ -200,7 +200,7 @@
       latestRoute = res.data.latestRoute;
       res.data.addCollection(res.data.storage);
       createCollectionName = constant.newCollection;
-      notifications.success("New Collection Created");
+      notifications.success("New Collection created successfully.");
     } else {
       notifications.error(res.message);
     }
@@ -788,21 +788,23 @@
       {/if}
       <p class="api-url">{componentData?.property.request.url}</p>
     </div>
-    <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>
-    <div style="height:170px; overflow:auto !important;">
-      <div
-        class="pb-1 bg-tertiary-300"
-        id="editor1"
-        style="width:100%;  margin:0px !important; pointer-events: none !important;"
-      >
-        <TextEditor
-          placeholder={"Add a description to help people know about this request."}
-          isReadOnly={true}
-          id={"editor1"}
-          value={requestDescription}
-        />
+    {#if !(componentData?.property.request.method === TabTypeEnum.WEB_SOCKET)}
+      <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>
+      <div style="height:170px; overflow:auto !important;">
+        <div
+          class="pb-1 bg-tertiary-300"
+          id="editor1"
+          style="width:100%;  margin:0px !important; pointer-events: none !important;"
+        >
+          <TextEditor
+            placeholder={"Add a description to help people know about this request."}
+            isReadOnly={true}
+            id={"editor1"}
+            value={requestDescription}
+          />
+        </div>
       </div>
-    </div>
+    {/if}
     <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>
     {#if path.length === 0}
       <p
@@ -916,9 +918,9 @@
               onFinish(res.data.id);
               onClick(false);
               if (type !== saveType.SAVE_DESCRIPTION) {
-                notifications.success("Request is saved successfully");
+                notifications.success("API request saved successfully.");
               } else {
-                notifications.success("Request documentation saved");
+                notifications.success("Documentation saved successfully.");
               }
             } else {
               notifications.error(

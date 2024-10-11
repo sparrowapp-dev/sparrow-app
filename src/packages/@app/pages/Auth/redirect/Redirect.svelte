@@ -124,7 +124,7 @@
     </div>
     <div class="mt-5">
       <p
-        class="cursor-pointer text-center text-secondary-250 sparrow-fs-12 mt-3 mb-1"
+        class=" text-center text-secondary-250 sparrow-fs-12 mt-3 mb-1"
       >
         Version {version}
       </p>

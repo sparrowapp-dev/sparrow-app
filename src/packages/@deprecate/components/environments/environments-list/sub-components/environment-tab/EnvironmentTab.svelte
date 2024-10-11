@@ -109,7 +109,7 @@
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {
-        notifications.error("Failed to rename environment");
+        notifications.error("Failed to rename environment. Please try again.");
       }
     }
     isRenaming = false;

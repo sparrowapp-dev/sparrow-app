@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import { GuideRepository } from "@app/repositories/guide.repository";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
+import { createDeepCopy } from "$lib/utils/helpers";
 
 export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -51,9 +52,23 @@ export class EnvironmentViewModel {
     }
     const response =
       await this.environmentService.fetchAllEnvironments(workspaceId);
-    if (response.isSuccessful && response.data.data) {
+    if (response?.isSuccessful && response?.data?.data) {
       const environments = response.data.data;
-      this.environmentRepository.refreshEnvironment(environments, workspaceId);
+      await this.environmentRepository.refreshEnvironment(
+        environments?.map((_environment: any) => {
+          const environment = createDeepCopy(_environment);
+          environment["id"] = environment._id;
+          environment["workspaceId"] = workspaceId;
+          delete environment._id;
+          return environment;
+        }),
+      );
+      await this.environmentRepository.deleteOrphanEnvironments(
+        workspaceId,
+        environments?.map((_environment: any) => {
+          return _environment._id;
+        }),
+      );
     }
     return;
   };
@@ -98,9 +113,13 @@ export class EnvironmentViewModel {
    * @param localEnvironment - new environment data
    * @returns
    */
-  public onCreateEnvironment = async (localEnvironment) => {
+  public onCreateEnvironment = async () => {
     const currentWorkspace =
       await this.workspaceRepository.getActiveWorkspaceDoc();
+    const localEnvironment =
+      await this.environmentRepository.getEnvironmentByWorkspaceId(
+        currentWorkspace._id,
+      );
     const newEnvironment = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
       name: this.getNextEnvironment(localEnvironment, "New Environment"),
@@ -130,7 +149,7 @@ export class EnvironmentViewModel {
       );
       initEnvironmentTab.setName(newEnvironment.name);
       this.tabRepository.createTab(initEnvironmentTab.getValue());
-      notifications.success("New Environment Created!");
+      notifications.success("New Environment created successfully.");
       return;
     }
     this.environmentRepository.addEnvironment(newEnvironment);
@@ -155,7 +174,7 @@ export class EnvironmentViewModel {
         workspaceId: currentWorkspace._id,
         id: res._id,
       });
-      notifications.success("New Environment Created!");
+      notifications.success("New Environment created successfully.");
       MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
       return;
     } else {
@@ -278,7 +297,7 @@ export class EnvironmentViewModel {
     } else if (response.message === "Network Error") {
       notifications.error(response.message);
     } else {
-      notifications.error("Failed to rename environment");
+      notifications.error("Failed to rename environment. Please try again.");
     }
   };
 

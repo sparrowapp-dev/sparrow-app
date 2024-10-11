@@ -19,6 +19,7 @@ import type {
 import type {
   TFAPIResponseType,
   TFDataStoreType,
+  TFEdgeType,
   TFHistoryAPIResponseStoreType,
   TFHistoryStoreType,
   TFKeyValueStoreType,
@@ -121,9 +122,16 @@ export class TestflowExplorerPageViewModel {
    * Updates the edges in the testflow with debounce to avoid frequent calls
    * @param _edges - edges of the testflow
    */
-  private updateEdgesDebounce = async (_edges: string) => {
+  private updateEdgesDebounce = async (_edges: TFEdgeType[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.testflow.edges = _edges;
+    const edges = _edges.map((elem) => {
+      return {
+        id: elem.id,
+        source: elem.source,
+        target: elem.target,
+      };
+    });
+    progressiveTab.property.testflow.edges = edges;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareTestflowWithServer();
@@ -542,34 +550,31 @@ export class TestflowExplorerPageViewModel {
     });
   };
 
-
   /**
- * Removes nodes with an ID less than the specified ID and updates the testFlowDataStore.
- * @param tabId - The ID of the tab to update.
- * @param id - The ID threshold; nodes with an ID less than this will be removed.
- */
-public deleteNodeResponse = (tabId: string, id: string) => {
-  // Create a deep copy of the current tab data
-  const progressiveTab = createDeepCopy(this._tab.getValue());
+   * Removes nodes with an ID less than the specified ID and updates the testFlowDataStore.
+   * @param tabId - The ID of the tab to update.
+   * @param id - The ID threshold; nodes with an ID less than this will be removed.
+   */
+  public deleteNodeResponse = (tabId: string, id: string) => {
+    // Create a deep copy of the current tab data
+    const progressiveTab = createDeepCopy(this._tab.getValue());
 
-  testFlowDataStore.update((testFlowDataMap) => {
-    // Retrieve the data for the specific tab using tabId
-    const wsData = testFlowDataMap.get(tabId); 
-    
-    // If there is data for this tab, proceed to update the nodes
-    if (wsData) {
-      // Filter out nodes with ID less than the specified ID
-      wsData.nodes = wsData.nodes.filter((node) => node.id < id);
+    testFlowDataStore.update((testFlowDataMap) => {
+      // Retrieve the data for the specific tab using tabId
+      const wsData = testFlowDataMap.get(tabId);
 
-      // Update the testFlowDataStore with the modified data
-      testFlowDataMap.set(tabId, wsData);
-    }
+      // If there is data for this tab, proceed to update the nodes
+      if (wsData) {
+        // Filter out nodes with ID less than the specified ID
+        wsData.nodes = wsData.nodes.filter((node) => node.id < id);
 
-    return testFlowDataMap; // Return the updated data map
-  });
-};
+        // Update the testFlowDataStore with the modified data
+        testFlowDataMap.set(tabId, wsData);
+      }
 
-
+      return testFlowDataMap; // Return the updated data map
+    });
+  };
 
   /**
    * Toggles the expansion of a specific history entry in the test flow.
@@ -657,7 +662,9 @@ public deleteNodeResponse = (tabId: string, id: string) => {
    */
   public updateName = async (_name: string, event = "") => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    if (event === "blur" && _name === "") {
+    const trimmedName = _name.trim();
+
+    if (event === "blur" && trimmedName === "") {
       const data = await this.testflowRepository.readTestflow(
         progressiveTab.id,
       );

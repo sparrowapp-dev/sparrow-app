@@ -54,7 +54,7 @@
       collectionsMethods.removeMultipleTabs(deleteIds);
       deleteLoader = false;
     } else {
-      notifications.error("Failed to delete the Collection.");
+      notifications.error("Failed to delete collection. Please try again.");
       deleteLoader = false;
     }
   };

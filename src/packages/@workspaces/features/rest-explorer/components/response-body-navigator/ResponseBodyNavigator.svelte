@@ -23,7 +23,7 @@
 
   export let response;
   export let apiState;
-  export let onUpdateRequestState;
+  export let onUpdateResponseState;
   export let onClearResponse;
 
   let fileExtension: string;
@@ -50,20 +50,20 @@
   };
 
   const handleTypeDropdown: (tab: string) => void = (tab) => {
-    onUpdateRequestState({ responseBodyLanguage: tab });
+    onUpdateResponseState("responseBodyLanguage", tab);
   };
 
   $: {
     if (apiState) {
-      if (apiState.responseBodyLanguage === RequestDataType.JSON) {
+      if (apiState.bodyLanguage === RequestDataType.JSON) {
         fileExtension = "json";
-      } else if (apiState.responseBodyLanguage === RequestDataType.XML) {
+      } else if (apiState.bodyLanguage === RequestDataType.XML) {
         fileExtension = "xml";
-      } else if (apiState.responseBodyLanguage === RequestDataType.HTML) {
+      } else if (apiState.bodyLanguage === RequestDataType.HTML) {
         fileExtension = "html";
-      } else if (apiState.responseBodyLanguage === RequestDataType.TEXT) {
+      } else if (apiState.bodyLanguage === RequestDataType.TEXT) {
         fileExtension = "txt";
-      } else if (apiState.responseBodyLanguage === RequestDataType.JAVASCRIPT) {
+      } else if (apiState.bodyLanguage === RequestDataType.JAVASCRIPT) {
         fileExtension = "js";
       }
     }
@@ -97,7 +97,7 @@
     // write our file
     await writableStream.write(formatCode(response?.body));
     await writableStream.close();
-    notifications.success("Response downloaded");
+    notifications.success("Response downloaded successfully.");
     MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
   };
 </script>
@@ -112,11 +112,12 @@
         <span
           role="button"
           on:click={() => {
-            onUpdateRequestState({
-              responseBodyFormatter: ResponseFormatter.PRETTY,
-            });
+            onUpdateResponseState(
+              "responseBodyFormatter",
+              ResponseFormatter.PRETTY,
+            );
           }}
-          class="rounded text-fs-12 border-radius-2 px-3 me-3 py-1 btn-formatter {apiState.responseBodyFormatter ===
+          class="rounded text-fs-12 border-radius-2 px-3 me-3 py-1 btn-formatter {apiState.bodyFormatter ===
           ResponseFormatter.PRETTY
             ? 'bg-tertiary-500 text-secondary-100'
             : ''}"
@@ -131,11 +132,12 @@
         <span
           role="button"
           on:click={() => {
-            onUpdateRequestState({
-              responseBodyFormatter: ResponseFormatter.RAW,
-            });
+            onUpdateResponseState(
+              "responseBodyFormatter",
+              ResponseFormatter.RAW,
+            );
           }}
-          class="d-none border-radius-2 px-3 text-fs-12 py-1 btn-formatter {apiState.responseBodyFormatter ===
+          class="d-none border-radius-2 px-3 text-fs-12 py-1 btn-formatter {apiState.bodyFormatter ===
           ResponseFormatter.RAW
             ? 'bg-tertiary-500 text-secondary-100'
             : ''}">Raw</span
@@ -143,18 +145,19 @@
         <span
           role="button"
           on:click={() => {
-            onUpdateRequestState({
-              responseBodyFormatter: ResponseFormatterEnum.PREVIEW,
-            });
+            onUpdateResponseState(
+              "responseBodyFormatter",
+              ResponseFormatterEnum.PREVIEW,
+            );
           }}
-          class="rounded px-2 text-fs-12 py-1 btn-formatter {apiState.responseBodyFormatter ===
+          class="rounded px-2 text-fs-12 py-1 btn-formatter {apiState.bodyFormatter ===
           ResponseFormatterEnum.PREVIEW
             ? 'bg-tertiary-500 text-secondary-100'
             : ''}">Preview</span
         >
       </div>
 
-      {#if apiState.responseBodyFormatter === ResponseFormatter.PRETTY}
+      {#if apiState.bodyFormatter === ResponseFormatter.PRETTY}
         <span class="">
           <WithSelectV3
             id={"hash565"}
@@ -180,7 +183,7 @@
                 id: RequestDataType.TEXT,
               },
             ]}
-            titleId={apiState.responseBodyLanguage}
+            titleId={apiState.bodyLanguage}
             onclick={handleTypeDropdown}
             zIndex={499}
             disabled={false}
@@ -188,7 +191,7 @@
         </span>
       {/if}
     </div>
-    {#if apiState.responseBodyFormatter !== ResponseFormatterEnum.PREVIEW}
+    {#if apiState.bodyFormatter !== ResponseFormatterEnum.PREVIEW}
       <div class="d-flex align-items-center gap-3" style=" height: 32px;">
         <!-- insert controller here -->
         <div class="d-flex gap-2">
@@ -197,7 +200,7 @@
             style="font-size: 10px;"
             on:click={() => {
               onClearResponse();
-              notifications.success("Response Cleared");
+              notifications.success("Response cleared successfully.");
               MixpanelEvent(Events.CLEAR_API_RESPONSE);
             }}
           >
@@ -226,7 +229,7 @@
         <!-- Prettier button -->
         <div
           on:click={() => {
-            notifications.success("Code formatted successfully!");
+            notifications.success("Code formatted successfully.");
           }}
           role="button"
           class="icon-container d-flex align-items-center justify-content-center border-radius-2"

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { user } from "$lib/store";
-  import { CommentIcon, SortIcon } from "@library/icons";
-  import { UpvoteIcon } from "@support/common/components";
+  import { CommentIcon, CrossIcon, SortIcon, TickIcon } from "@library/icons";
+  import { Upvote } from "@support/common/components";
   import FeedbackPost from "./FeedbackPost.svelte";
   import FeedbackDefault from "./FeedbackDefault.svelte";
   import { onMount } from "svelte";
@@ -80,9 +80,9 @@
 
   export let onUpdateFeedback;
 
-  let feedbackType = "";
+  let feedbackType = FeedbackType.ALL_CATEGORY;
 
-  let feedbackStatusType = "";
+  let feedbackStatusType = FeedbackStatusType.ALL_STATUS;
 
   let searchTerm = "";
 
@@ -98,11 +98,16 @@
 
   let isPostopen = isPostopenFromActivity || false;
 
+  let limit = 10; // Define your limit for how many posts to load each time
+  let skip = 0; // Initialize skip to 0 at the beginning
+
   const defaultStaus = "open,under review,planned,in progress,complete";
 
   user.subscribe((value) => {
     userInfo = value;
   });
+
+  let showLoading = true;
 
   /**
    * @description - Fetches posts based on sorting type, search query, and status, then updates the `posts` array.
@@ -115,10 +120,32 @@
     sortType: string,
     searchQuery: string = "",
     status: string,
+    limit: number = 10,
+    skip: number = 0,
   ) => {
     currentSort = sortType;
-    isLoading = true;
-    posts = await fetchPosts(sortType, searchQuery, status);
+    if (showLoading) {
+      isLoading = true;
+    }
+    const newPosts = await fetchPosts(
+      sortType,
+      searchQuery,
+      status,
+      "",
+      limit,
+      skip,
+    );
+    showLoading = false;
+    // if (
+    //   feedbackType != FeedbackType.ALL_CATEGORY ||
+    //   feedbackStatusType != FeedbackStatusType.ALL_STATUS ||
+    //   searchTerm != "" ||
+    //   currentSort != "trending"
+    // ) {
+    //   // posts = newPosts;
+    // } else {
+    // }
+    posts = [...posts, ...newPosts]; // Append new posts to the existing posts
     isLoading = false;
   };
 
@@ -126,7 +153,7 @@
    * @description - Handles upvoting action by refreshing the posts with the current sorting, search term, and status.
    */
   const handleUpvote = () => {
-    getPosts(currentSort, searchTerm, status);
+    getPosts(currentSort, searchTerm, status, limit, skip);
   };
 
   /**
@@ -136,7 +163,12 @@
    */
   const handleInputChange = async (searchQuery: string) => {
     searchTerm = searchQuery;
-    await getPosts(currentSort, searchQuery, status); // Fetch posts with search term
+    posts = [];
+    skip = 0;
+    showLoading = true;
+    isPostFetching = true;
+    await getPosts(currentSort, searchQuery, status, limit, skip); // Fetch posts with search term
+    isPostFetching = false;
   };
 
   /**
@@ -152,7 +184,12 @@
     } else {
       status = _status;
     }
-    await getPosts(currentSort, searchTerm, status);
+    posts = [];
+    isPostFetching = true;
+    skip = 0;
+    showLoading = true;
+    await getPosts(currentSort, searchTerm, status, limit, skip);
+    isPostFetching = false;
   };
 
   /**
@@ -161,16 +198,24 @@
    * @param {string} selectedCategory - The selected category for filtering posts (e.g., "Feature Request", "Bug").
    */
   const handleCategoryChange = async (selectedCategory) => {
-    // debugger;
     feedbackType = selectedCategory;
-
     if (selectedCategory === FeedbackType.ALL_CATEGORY) {
       // Show all posts if "All Categories" is selected
-      await getPosts(currentSort, searchTerm, status);
+      isPostFetching = true;
+      posts = [];
+      skip = 0;
+      showLoading = true;
+      await getPosts(currentSort, searchTerm, status, limit, skip);
+      isPostFetching = false;
     } else {
       // Fetch and filter posts by the selected category
       isLoading = true;
-      const listPosts = await getPosts(currentSort, searchTerm, status);
+      posts = [];
+      isPostFetching = true;
+      skip = 0;
+      showLoading = true;
+      await getPosts(currentSort, searchTerm, status, limit, skip);
+      isPostFetching = false;
 
       posts = listPosts?.filter((post) => {
         return post?.category?.name === selectedCategory;
@@ -188,17 +233,57 @@
     1000,
   );
 
+  // Function to load more updates
+  const loadMoreUpdates = async () => {
+    if (!isPostopen || searchTerm.length > 0) {
+      skip = posts.length;
+      await getPosts(currentSort, searchTerm, status, limit, skip);
+    }
+  };
+
+  let scrollableContainer: HTMLDivElement;
+  let isPostFetching = false;
+  // Event handler for scrolling
+  const handleScroll = async () => {
+    const { scrollTop, scrollHeight, clientHeight } = scrollableContainer;
+
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+      if (!isPostFetching) {
+        isPostFetching = true;
+        await loadMoreUpdates();
+        isPostFetching = false;
+      }
+    }
+  };
+
   /**
    * @description - Executes when the component is mounted. Fetches the initial set of posts and resets the `isPostopenFromActivity` flag.
    */
-
   onMount(async () => {
-    getPosts(currentSort, searchTerm, status);
+    getPosts(currentSort, searchTerm, status, limit, skip);
     isPostopenFromActivity = false;
   });
+
+  onMount(() => {
+    scrollableContainer.addEventListener("scroll", handleScroll);
+    return () => {
+      scrollableContainer.removeEventListener("scroll", handleScroll);
+    };
+  });
+
+  const handleBackButton = () => {
+    isPostFetching = true;
+    skip = 0;
+    posts = [];
+    showLoading = true;
+  };
 </script>
 
-<div style="padding:20px;">
+<div
+  style="padding:20px; overflow:auto "
+  class="h-100"
+  bind:this={scrollableContainer}
+>
   <FeedbackDefault {onAddFeedback} {userInfo} {onInputFeedback} />
   {#if !isPostopen}
     <div
@@ -212,16 +297,39 @@
             MixpanelEvent(Events.Feedback_Search);
           }}
         >
-          <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
+          <SearchIcon
+            width={14}
+            height={14}
+            color={"var(--icon-secondary-200)"}
+            classProp={`my-auto me-1`}
+          />
           <input
             type="text"
             id="search-input"
-            class={`bg-transparent w-100 border-0 my-auto`}
+            class={`bg-transparent w-100 ms-1 border-0 my-auto`}
             placeholder="Search updates"
             on:input={(e) => {
               handleInputChangeDebounced(e.target.value);
             }}
+            bind:value={searchTerm}
           />
+
+          {#if searchTerm.length != 0}
+            <div
+              style="cursor: pointer;"
+              class="clear-icon"
+              on:click={() => {
+                searchTerm = "";
+                handleInputChangeDebounced(searchTerm);
+              }}
+            >
+              <CrossIcon
+                height="16px"
+                width="12px"
+                color="var(--icon-secondary-300)"
+              />
+            </div>
+          {/if}
         </div>
       </div>
       <div class="d-flex" style="gap:15px;">
@@ -234,7 +342,7 @@
                 id: FeedbackType.FEATURE_REQUEST,
               },
               {
-                name: "UX Improvement",
+                name: "UI Improvement",
                 id: FeedbackType.UI_IMPROVEMENT,
               },
               {
@@ -268,7 +376,7 @@
             bodyTheme={"violet"}
             placeholderText={"Categories"}
             menuItem={"v2"}
-            headerFontSize={"10px"}
+            headerFontSize={"12px"}
             isDropIconFilled={true}
             position={"absolute"}
           />
@@ -281,20 +389,20 @@
                 id: FeedbackStatusType.OPEN,
               },
               {
-                name: "Completed",
-                id: FeedbackStatusType.COMPLETED,
-              },
-              {
-                name: "In Progress",
-                id: FeedbackStatusType.IN_PROGRESS,
+                name: "Under Review",
+                id: FeedbackStatusType.UNDER_REVIEW,
               },
               {
                 name: "Planned",
                 id: FeedbackStatusType.PLANNED,
               },
               {
-                name: "Under review",
-                id: FeedbackStatusType.UNDER_REVIEW,
+                name: "In Progress",
+                id: FeedbackStatusType.IN_PROGRESS,
+              },
+              {
+                name: "Complete",
+                id: FeedbackStatusType.COMPLETED,
               },
               {
                 name: "All Status",
@@ -324,7 +432,7 @@
             headerTheme={"violet2"}
             bodyTheme={"violet"}
             menuItem={"v2"}
-            headerFontSize={"10px"}
+            headerFontSize={"12px"}
             isDropIconFilled={true}
             position={"absolute"}
             maxBodyHeight={"205px"}
@@ -333,8 +441,11 @@
       </div>
     </div>
 
-    <div class="d-flex" style=" height:100%; margin-top:51px; ">
-      <div style="width:187px; margin-right:28px; ">
+    <div
+      class="d-flex gap-5 justify-content-between"
+      style="  margin-top:51px; "
+    >
+      <div style="width:129px;  ">
         <div>
           <SortIcon width={"12px"} height={"8px"} />
           <span
@@ -349,52 +460,82 @@
           style="align-items: baseline; gap:10px; margin-top:13px; "
         >
           <button
-            on:click={() => {
-              getPosts("trending", searchTerm, status);
+            on:click={async () => {
+              isPostFetching = true;
+              skip = 0;
+              posts = [];
+              showLoading = true;
+              await getPosts("trending", searchTerm, status, limit, skip);
+              isPostFetching = false;
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "trending"}
           >
-            <span class="text-fs-13">Trending</span>
-            <img src={tickIcon} alt="" class="pt-1 tick-icon" />
+            <div><span class="text-fs-13">Trending</span></div>
+            <div class="tick-icon">
+              <TickIcon
+                height={"12px"}
+                width={"12px"}
+                color={"var(--icon-primary-300)"}
+              />
+            </div>
           </button>
 
           <button
-            on:click={() => {
-              getPosts("newest", searchTerm, status);
+            on:click={async () => {
+              isPostFetching = true;
+              skip = 0;
+              posts = [];
+              showLoading = true;
+              await getPosts("newest", searchTerm, status, limit, skip);
+              isPostFetching = false;
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "newest"}
           >
-            <span class="text-fs-13">Now</span>
-            <img src={tickIcon} alt="" class="pt-1 tick-icon" />
+            <span class="text-fs-13">New</span>
+            <div class="tick-icon">
+              <TickIcon
+                height={"12px"}
+                width={"12px"}
+                color={"var(--icon-primary-300)"}
+              />
+            </div>
           </button>
 
           <button
-            on:click={() => {
-              getPosts("score", searchTerm, status);
+            on:click={async () => {
+              isPostFetching = true;
+              skip = 0;
+              posts = [];
+              showLoading = true;
+              await getPosts("score", searchTerm, status, limit, skip);
+              isPostFetching = false;
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "score"}
           >
             <span class="text-fs-13">Top</span>
-            <img src={tickIcon} alt="" class="pt-1 tick-icon" />
+            <div class="tick-icon">
+              <TickIcon
+                height={"12px"}
+                width={"12px"}
+                color={"var(--icon-primary-300)"}
+              />
+            </div>
           </button>
         </div>
       </div>
 
       {#if isLoading}
-        <div style="width: 77%;">
+        <div style="" class="w-100">
           <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
         </div>
       {:else if posts?.length > 0}
-        <div
-          class="posts d-flex flex-column"
-          style="gap:26px; width:calc(100% - 187px );"
-        >
+        <div class="posts d-flex flex-column w-100" style="gap:26px; ">
           {#each posts as post}
             <div
               style="display: flex; flex-direction: column; background-color: #151515; padding: 20px;border-radius:2px;"
@@ -408,6 +549,7 @@
                     on:click={async () => {
                       postId = post?.id;
                       isPostopen = true;
+                      handleBackButton();
                       MixpanelEvent(Events.Feedback_Post);
                     }}
                   >
@@ -422,10 +564,13 @@
                         .fontColor}; border:0.2px solid {getColor(post?.status)
                         .fontColor}; "
                     >
-                      {post?.status
-                        ? post.status.charAt(0).toUpperCase() +
-                          post.status.slice(1)
-                        : ""}
+                      {post.status
+                        .split(" ")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() + word.slice(1),
+                        )
+                        .join(" ")}
                     </span>
                   </div>
                 </div>
@@ -435,7 +580,7 @@
                     MixpanelEvent(Events.Upvote_Post);
                   }}
                 >
-                  <UpvoteIcon
+                  <Upvote
                     isPostLiked={post.isPostLiked}
                     {handleUpvote}
                     postID={post.id}
@@ -471,12 +616,14 @@
           {/each}
         </div>
       {:else}
-        <p
-          class=" text-fs-12 mb-0 text-center"
-          style=" margin-left:250px; margin-top:45px; font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
-        >
-          No Result Found
-        </p>
+        <div class="w-100">
+          <p
+            class=" text-fs-12 mb-0 text-center"
+            style="  margin-top:45px; font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+          >
+            No result found.
+          </p>
+        </div>
       {/if}
     </div>
   {/if}
@@ -492,6 +639,8 @@
       {handleUpvote}
       {onUpdateFeedback}
       {getColor}
+      likePost={createVote}
+      dislikePost={deleteVote}
     />
   {/if}
 </div>

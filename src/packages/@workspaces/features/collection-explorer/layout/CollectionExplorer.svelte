@@ -184,14 +184,14 @@
             required
             maxlength={100}
             id="renameInputFieldCollection"
-            value={collection?.name}
+            value={collection?.name || "Collection Doesn't Exist."}
             class="bg-transparent input-outline text-fs-18 border-0 text-left w-100 ps-2 py-0"
             disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
               tab?.activeSync}
             on:blur={(event) => {
-              const newValue = event?.target?.value;
+              const newValue = event?.target?.value?.trim();
               const previousValue = tab.name;
-              if (event.target.value === "") {
+              if (newValue === "") {
                 resetInputField();
               } else if (newValue !== previousValue) {
                 onRename(collection, newValue);
@@ -218,7 +218,7 @@
                 headerHighlight={"hover-active"}
                 borderHighlight={"hover-active"}
                 searchText={"Search Branch"}
-                searchErrorMessage={"No results found."}
+                searchErrorMessage={"No result found."}
                 id={"git-branch-select"}
                 data={[
                   ...(collection?.branches ? collection.branches : []).map(

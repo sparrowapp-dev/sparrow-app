@@ -9,7 +9,7 @@
   import { Button, Modal } from "@library/ui";
   import { notifications } from "@library/ui/toast/Toast";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-    import { Drop } from "@support/common/components";
+  import { Drop } from "@support/common/components";
   import { FeedbackType } from "@support/common/types";
 
   export let onAddFeedback;
@@ -29,10 +29,11 @@
   let isDescriptionEmpty = false;
   let isSubjectEmpty = false;
   let isTextArea = false;
+  let isSelectEmpty = false;
 
   const handleLogoInputChange = (e: any) => {
     const errorMessage =
-      "Failed to upload the file. Please check the file size or the format";
+      "Failed to upload the file. You are allowed to upload only 5 files per feedback.";
 
     let targetFile = [
       ...uploadFeedback.file.value,
@@ -42,8 +43,6 @@
     if (targetFile?.length === 0) {
       return;
     }
-    // let vedioCount = 0;
-    // const maxVedioSize = 20971520; // 20 MB
     let isErrorThrown = false;
     const selectedFiles = targetFile.filter((file) => {
       const fileType = `.${(file?.name).split(".").pop().toLowerCase()}`;
@@ -60,22 +59,7 @@
           return false;
         }
         return true;
-      }
-      // else if (fileType === ".mp4") {
-      //   vedioCount = vedioCount + 1;
-      //   if (vedioCount >= 2) {
-      //     // vedio limit exceeded
-      //     isErrorThrown = true;
-      //     return false;
-      //   }
-      //   if (file.size > maxVedioSize) {
-      //     // vedio size exceeded
-      //     isErrorThrown = true;
-      //     return false;
-      //   }
-      //   return true;
-      // }
-      else {
+      } else {
         isErrorThrown = true;
         return false;
       }
@@ -88,6 +72,8 @@
       notifications.error(errorMessage);
     }
     uploadFeedback.file.value = selectedFiles;
+
+    e.target.value = "";
   };
   const removeFile = (index: number) => {
     const files = Array.from(uploadFeedback.file.value).filter((elem, i) => {
@@ -118,13 +104,17 @@
   <Modal
     title={"Add Feedback"}
     type={"dark"}
-    width={"40%"}
+    width={"50%"}
     zIndex={10000}
     isOpen={isExposeFeedbackForm}
     handleModalState={(flag = false) => {
       isExposeFeedbackForm = flag;
       feedbackDescription = "";
       feedbackSubject = "";
+      isSelectEmpty = false;
+      isDescriptionEmpty = false;
+      isSubjectEmpty = false;
+      isTextArea = false;
       type = FeedbackType.CATEGORY;
       uploadFeedback = {
         file: {
@@ -142,16 +132,12 @@
             id: FeedbackType.FEATURE_REQUEST,
           },
           {
-            name: "UX Improvement",
+            name: "UI Improvement",
             id: FeedbackType.UI_IMPROVEMENT,
           },
           {
             name: "Bugs",
             id: FeedbackType.BUG,
-          },
-          {
-            name: "All Categories",
-            id: FeedbackType.ALL_CATEGORY,
           },
         ]}
         iconRequired={true}
@@ -162,6 +148,7 @@
         titleId={type}
         onclick={(id = "") => {
           type = id;
+          isSelectEmpty = false;
         }}
         disabled={false}
         borderType={"none"}
@@ -170,20 +157,28 @@
         headerHighlight={"hover-active"}
         headerHeight={"36px"}
         minBodyWidth={"150px"}
-        minHeaderWidth={"128px"}
+        minHeaderWidth={"161px"}
         maxHeaderWidth={"200px"}
         borderRounded={"4px"}
         headerTheme={"violet2"}
         bodyTheme={"violet"}
         menuItem={"v2"}
-        headerFontSize={"10px"}
+        headerFontSize={"13px"}
         isDropIconFilled={true}
         position={"absolute"}
       />
     </div>
+    {#if isSelectEmpty}
+      <p class="error-message">Please select a feedback category.</p>
+    {/if}
     <div style="">
-      <p class="text-fs-14 mb-0 text-secondary-150">Description</p>
-      <p class="text-fs-12 text-secondary-200 mb-0">
+      <p
+        class="text-fs-14 mb-0"
+        style="color: var(--text-secondary-1000); font-weight: 400;"
+      >
+        Description
+      </p>
+      <p class="text-fs-12 text-secondary-200 mb-1">
         {feedbackDescription.length} / 200
       </p>
 
@@ -216,9 +211,8 @@
           placeholder="Subject"
           maxlength={200}
         />
-        <hr style="margin:0px; padding-bottom:8px;" />
+        <hr class="m-0 ms-2" style="padding-bottom:5px;" />
         <Textarea
-          width={"100%"}
           on:input={() => {
             if (feedbackDescription.length > 0) {
               isDescriptionEmpty = false;
@@ -275,7 +269,7 @@
       </div>
     </div>
     {#if uploadFeedback?.file?.value?.length > 0}
-      <div class="file-scroller mb-2 d-flex gap-1 overflow-auto">
+      <div class="file-scroller mb-2 d-flex gap-1 flex-wrap">
         {#each uploadFeedback.file.value as file, index}
           <div
             class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
@@ -312,6 +306,10 @@
           buttonClassProp={"me-2"}
           onClick={async () => {
             isExposeFeedbackForm = false;
+            isSelectEmpty = false;
+            isDescriptionEmpty = false;
+            isSubjectEmpty = false;
+            isTextArea = false;
             feedbackDescription = "";
             feedbackSubject = "";
             type = FeedbackType.CATEGORY;
@@ -329,6 +327,13 @@
           onClick={async () => {
             isLoading = true;
 
+            // Check if the category is not selected
+            if (type === FeedbackType.CATEGORY) {
+              isSelectEmpty = true; // Mark the select as empty to show an error message
+              isLoading = false;
+              return;
+            }
+
             if (!feedbackDescription || !feedbackSubject) {
               if (!feedbackDescription && !feedbackSubject) {
                 isTextArea = true;
@@ -338,6 +343,7 @@
                 isSubjectEmpty = !feedbackSubject;
                 isDescriptionEmpty = !feedbackDescription;
               }
+
               isLoading = false;
             } else {
               isSubjectEmpty = isDescriptionEmpty = isTextArea = false;

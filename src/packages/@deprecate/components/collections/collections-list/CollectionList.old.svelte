@@ -295,7 +295,7 @@
         id: Samplecollection.id,
         name: newCollection.name,
       });
-      notifications.success("New Collection Created");
+      notifications.success("New Collection created successfully.");
       MixpanelEvent(Events.CREATE_COLLECTION, {
         source: collectionSource,
         collectionName: response.data.data.name,
@@ -726,7 +726,7 @@
           {/if}
         {/if}
         {#if searchData !== "" && !filteredCollection.length && !filteredFolder.length && !filteredFile.length}
-          <span class="not-found-text mx-auto ellipsis">No results found</span>
+          <span class="not-found-text mx-auto ellipsis">No result found.</span>
         {/if}
       </div>
     </div>

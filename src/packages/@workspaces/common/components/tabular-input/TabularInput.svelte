@@ -12,6 +12,7 @@
   import SliderSwitch from "@library/forms/SliderSwitch/SliderSwitch.svelte";
   import { ErrorInfoIcon, Information } from "@library/icons";
   import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
+  import LazyElement from "./LazyElement.svelte";
 
   // exports
   export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
@@ -400,173 +401,19 @@
           </div>
         {/if}
         {#each pairs as element, index (index)}
-          <div
-            aria-label="Toggle Hover"
-            class="sortable > div pair-container"
-            style=" width:100%;"
-            data-list-key={JSON.stringify({
-              name: element.key,
-              description: element.value,
-              checked: element.checked,
-            })}
-          >
-            <div
-              style="padding-top: 1px;  display: flex;flex-direction: column;width:100%;"
-            >
-              <div
-                class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
-                style="padding-top:3px; padding-bottom:3px; height:24px;"
-              >
-                <div style="width:30px; height: 14px;">
-                  {#if pairs.length - 1 != index || !isInputBoxEditable}
-                    <!-- checkbox should be visible to last row in readonly mode -->
-                    <label class="container">
-                      <input
-                        type="checkbox"
-                        bind:checked={element.checked}
-                        on:input={() => {
-                          updateCheck(index);
-                        }}
-                        disabled={!isCheckBoxEditable}
-                      />
-                      <span class="checkmark"></span>
-                    </label>
-                  {/if}
-                </div>
-
-                <div class=" d-flex gap-0" style="width:calc(100% - 120px);">
-                  <div class="w-50 position-relative">
-                    <CodeMirrorInput
-                      bind:value={element.key}
-                      onUpdateInput={() => {
-                        updateParam(index);
-                      }}
-                      disabled={!isInputBoxEditable ? true : false}
-                      placeholder={"Add Key"}
-                      {theme}
-                      {environmentVariables}
-                      {onUpdateEnvironment}
-                    />
-                  </div>
-                  <!-- {#if type === "file"}
-                    <div class="w-50">
-                      <div
-                        class="position-relative rounded p-1 d-flex backgroundColor"
-                        style="height: 27px;"
-                      >
-                        {#if element.value === ""}
-                          <input
-                            type="text"
-                            class="form-control keyValuePair py-1"
-                            readonly
-                            style="z-index:4; font-size:13px;
-                  position: absolute;
-                    top:0;
-                    left:0;
-                    right:0;
-                    bottom:-1;"
-                            placeholder="Choose File"
-                          />
-                          <input
-                            class="form-input"
-                            type="text"
-                            id="formdata-file"
-                            on:click={() => {
-                              uploadFormFile(index);
-                            }}
-                            style="opacity: 0;
-                    position: absolute;
-                    top:0;
-                    left:0;
-                    right:0;
-                    bottom:0;
-                    z-index:10;
-                    "
-                          />
-                        {:else}
-                          <input
-                            type="text"
-                            class="keyValuePair py-1"
-                            readonly
-                            style="z-index:4; font-size:13px;
-                  position: absolute;
-                    top:0;
-                    left:0;
-                    right:0;
-                    bottom:-1;"
-                            placeholder=""
-                          />
-                          <div
-                            class="position-absolute"
-                            style="height:18px; z-index: 5;
-                   
-                    font-size:13px;
-                 
-                    top:0;
-                    left:0px;"
-                          >
-                            <span style="font-size:10px;" class="m-1"
-                              >{element.value}</span
-                            >
-                            <img
-                              src={close}
-                              alt=""
-                              style="cursor:pointer;"
-                              on:click={() => {
-                                removeFormFile(index);
-                              }}
-                            />
-                          </div>
-                        {/if}
-                      </div>
-                    </div>
-                  {:else} -->
-                  <div class="w-50 position-relative">
-                    <CodeMirrorInput
-                      bind:value={element.value}
-                      onUpdateInput={() => {
-                        updateParam(index);
-                      }}
-                      placeholder={"Add Value"}
-                      disabled={!isInputBoxEditable ? true : false}
-                      {theme}
-                      {environmentVariables}
-                      {onUpdateEnvironment}
-                    />
-                  </div>
-                  <!-- {/if} -->
-                </div>
-                <div
-                  class="h-70 d-flex justify-content-center align-items-center"
-                >
-                  <div style="width:40px;">
-                    <div style=" margin-left: 10px; margin-right: 6px;">
-                      {#if pairs.length - 1 != index}
-                        <!-- lists first to last second row -->
-                        {#if isInputBoxEditable}
-                          <Tooltip
-                            title={"Delete"}
-                            placement={"bottom-left"}
-                            distance={10}
-                          >
-                            <button
-                              class="bg-secondary-700 d-flex justify-content-center align-items-center border-0"
-                              style="width: 24px; height:16px; padding-end"
-                              on:click={() => {
-                                deleteParam(index);
-                              }}
-                            >
-                              <img class="trash-icon" src={trashIcon} alt="" />
-                            </button>
-                          </Tooltip>
-                        {/if}
-                      {/if}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <LazyElement
+            {element}
+            {index}
+            {pairs}
+            {theme}
+            {environmentVariables}
+            {onUpdateEnvironment}
+            {updateParam}
+            {updateCheck}
+            {deleteParam}
+            {isInputBoxEditable}
+            {isCheckBoxEditable}
+          />
         {/each}
       </div>
     </div>

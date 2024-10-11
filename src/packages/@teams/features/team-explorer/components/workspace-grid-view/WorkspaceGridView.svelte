@@ -86,8 +86,7 @@
       <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
         <div class="d-flex flex-wrap gap-5 justify-content-between row-gap-0">
           {#if searchQuery !== "" && filteredWorkspaces.length === 0}
-            <span class="not-found-text mx-auto ellipsis"
-              >No results found.</span
+            <span class="not-found-text mx-auto ellipsis">No result found.</span
             >
           {/if}
           {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
@@ -117,7 +116,7 @@
         </div>
       </div>
       {#if filteredWorkspaces.length > 0}
-        <div class="justify-content-between bottom-0 w-75 d-flex">
+        <div class="bottom-0  d-flex justify-content-between " style="width:53%;">
           <div class="tab-head" style="width: 189.46px;">
             Showing {startIndex} - {endIndex} of {filteredWorkspaces.length}
           </div>
@@ -159,7 +158,7 @@
               />
             </button>
           </div>
-          <div></div>
+
         </div>
       {/if}
     {:else}

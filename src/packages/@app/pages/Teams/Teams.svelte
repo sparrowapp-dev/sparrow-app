@@ -20,13 +20,16 @@
   import { Modal } from "@library/ui/modal";
   import { CreateTeam } from "@teams/features";
   import { pagesMotion } from "@app/constants";
+  import { onMount } from "svelte";
+  import { Motion } from "svelte-motion";
+  import { user } from "$lib/store";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
   const setOpenTeam = _viewModel.setOpenTeam;
-  const disableNewInviteTag=  _viewModel.disableNewInviteTag
-  const modifyTeam=  _viewModel.modifyTeam
+  const disableNewInviteTag = _viewModel.disableNewInviteTag;
+  const modifyTeam = _viewModel.modifyTeam;
 
   let isCreateTeamModalOpen: boolean = false;
   const collectionList = _viewModel.collection;
@@ -35,13 +38,20 @@
 
   let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
-  import { onMount } from "svelte";
-  import { Motion } from "svelte-motion";
 
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
+  let userId = "";
+  user.subscribe(async (value) => {
+    if (value) {
+      userId = value._id;
+    }
+  });
 
   onMount(async () => {
+    _viewModel.refreshTeams(userId);
+    _viewModel.refreshWorkspaces(userId);
+
     let githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
     splitter = document.querySelector(".team-splitter .splitpanes__splitter");

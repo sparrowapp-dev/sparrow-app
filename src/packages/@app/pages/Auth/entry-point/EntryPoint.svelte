@@ -22,6 +22,7 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import Button from "@library/ui/button/Button.svelte";
+  import { isUserFirstSignUp } from "@app/store/user.store";
   let isEntry = false;
 
   let isHover = false;
@@ -102,7 +103,7 @@
         style="border-radius: 2px;"
         on:click={async () => {
           await copyToClipBoard(externalSparrowLink);
-          notifications.success("Link copied to clipboard!");
+          notifications.success("Link copied to clipboard.");
         }}
       >
         <span class="mx-2">
@@ -154,6 +155,7 @@
           id="try_sparrow_edge"
           onClick={() => {
             skipLoginHandler();
+            // isUserFirstSignUp.set(true);
           }}
           title={"Try Sparrow Edge"}
           buttonClassProp={"btn mb-2"}
@@ -236,9 +238,7 @@
       <div class="divider-line my-4" />
 
       <div>
-        <p
-          class=" cursor-pointer text-center text-secondary-250 sparrow-fs-14 m-1"
-        >
+        <p class=" text-center text-secondary-250 sparrow-fs-14 m-1">
           Version {version}
         </p>
       </div>

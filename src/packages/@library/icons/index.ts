@@ -96,3 +96,7 @@ export { default as RunIcon } from "./Run.svelte";
 export { default as ArrowRightIcon } from "./ArrowRight.svelte";
 export { default as TableChart } from "./TableChart.svelte";
 export { default as DropIcon } from "./Drop.svelte";
+export { default as MessageIcon } from "./MessageIcon.svelte";
+export { default as MessageDisabledIcon } from "./MessageDisabledIcon.svelte";
+export { default as BoxBarIcon } from "./BoxBarIcon.svelte";
+export { default as PostIcon } from "./PostIcon.svelte";

@@ -112,15 +112,15 @@
             type="text"
             required
             id="renameInputFieldFolder"
-            value={folder?.name}
+            value={folder?.name || "Folder Doesn't Exist."}
             disabled={tab?.source === "SPEC" ||
               userRole === WorkspaceRole.WORKSPACE_VIEWER}
             class="bg-transparent input-outline border-0 text-left w-100 ps-2 py-0 text-fs-18"
             maxlength={100}
             on:blur={(event) => {
-              const newValue = event.target.value;
+              const newValue = event.target.value.trim();
               const previousValue = folder.name;
-              if (event.target.value === "") {
+              if (newValue === "") {
                 resetInputField();
               } else if (newValue !== previousValue) {
                 onRename(collection, folder, newValue);
