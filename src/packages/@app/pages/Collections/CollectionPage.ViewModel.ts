@@ -122,6 +122,23 @@ export default class CollectionsViewModel {
    */
   public fetchCollections = async (workspaceId: string) => {
     const isGuestUser = await this.getGuestUserState();
+    const searchHelper = (tree, collectionItemIds: string[]) => {
+      console.log(tree);
+      if (!tree?.type) {
+        collectionItemIds.push(tree._id);
+      } else {
+        collectionItemIds.push(tree.id);
+      }
+
+      // Recursively search through the tree structure
+      if (tree && tree.items) {
+        for (let j = 0; j < tree.items.length; j++) {
+          searchHelper(tree.items[j], collectionItemIds);
+        }
+      }
+      return;
+    };
+    ///////////////////////////////////////////////////////////////////////
     if (workspaceId && !isGuestUser) {
       const res = await this.collectionService.fetchCollection(workspaceId);
       if (res?.isSuccessful && res?.data?.data) {
@@ -142,8 +159,30 @@ export default class CollectionsViewModel {
             return _collection._id;
           }),
         );
+        const collectionItemIds: string[] = [];
+        for (let i = 0; i < collections.length; i++) {
+          searchHelper(collections[i], collectionItemIds);
+        }
+
+        const tabsTobeDeleted =
+          await this.tabRepository.getIdOfTabsThatDoesntExistAtCollectionLevel(
+            workspaceId,
+            collectionItemIds as string[],
+          );
+
+        return {
+          tabsTObeDeleted: tabsTobeDeleted,
+        };
       }
     }
+    return {};
+  };
+
+  public deleteTabsWithTabIdInAWorkspace = (
+    _workspaceId: string,
+    _tabIds: string[],
+  ) => {
+    this.tabRepository.deleteTabsWithTabIdInAWorkspace(_workspaceId, _tabIds);
   };
 
   /**

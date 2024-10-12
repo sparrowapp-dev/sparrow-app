@@ -48,7 +48,7 @@ export class EnvironmentViewModel {
     });
     const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
     if (isGuestUser) {
-      return;
+      return {};
     }
     const response =
       await this.environmentService.fetchAllEnvironments(workspaceId);
@@ -69,8 +69,18 @@ export class EnvironmentViewModel {
           return _environment._id;
         }),
       );
+      const tabsTobeDeleted =
+        await this.tabRepository.getIdOfTabsThatDoesntExistAtEnvironmentLevel(
+          workspaceId,
+          environments?.map((_environment: any) => {
+            return _environment._id;
+          }),
+        );
+      return {
+        tabsTObeDeleted: tabsTobeDeleted,
+      };
     }
-    return;
+    return {};
   };
 
   /**

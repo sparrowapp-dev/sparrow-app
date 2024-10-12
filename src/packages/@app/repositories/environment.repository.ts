@@ -91,7 +91,7 @@ export class EnvironmentRepository {
   public deleteOrphanEnvironments = async (
     _workspaceId: string,
     _environmentIds: string[],
-  ) => {
+  ): Promise<string[]> => {
     // delete left out environments
     const environments = await RxDB.getInstance()
       ?.rxdb?.environment.find({
@@ -113,13 +113,14 @@ export class EnvironmentRepository {
         return true;
       })
       .map((_environment) => {
-        return _environment.id;
-      });
+        return _environment.id as string;
+      }) as string[];
     if ((selectedEnvironmentsToBeDeleted?.length || 0) > 0) {
       await RxDB.getInstance()?.rxdb?.environment.bulkRemove(
         selectedEnvironmentsToBeDeleted as string[],
       );
     }
+    return selectedEnvironmentsToBeDeleted;
   };
 
   /**

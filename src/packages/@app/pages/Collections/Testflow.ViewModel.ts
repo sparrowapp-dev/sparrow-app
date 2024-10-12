@@ -289,7 +289,7 @@ export class TestflowViewModel {
     });
     const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
     if (isGuestUser) {
-      return;
+      return {};
     }
     const response = await this.testflowService.fetchAllTestflow(workspaceId);
     if (response?.isSuccessful && response?.data?.data) {
@@ -307,8 +307,18 @@ export class TestflowViewModel {
           return _testflow._id;
         }),
       );
+      const tabsTobeDeleted =
+        await this.tabRepository.getIdOfTabsThatDoesntExistAtTestflowLevel(
+          workspaceId,
+          testflows?.map((_testflow: any) => {
+            return _testflow._id;
+          }),
+        );
+      return {
+        tabsTObeDeleted: tabsTobeDeleted,
+      };
     }
-    return;
+    return {};
   };
 
   /**

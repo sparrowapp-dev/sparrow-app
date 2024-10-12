@@ -732,4 +732,204 @@ export class TabRepository {
       })
       .exec();
   };
+
+  /**
+   * Retreives tabId of tabs that doesn't exist at collection level in a Workspace.
+   * includes - Collection, Folder, Http Request, WebSocket Request.
+   * @param _workspaceId - Workspace Id under which these operations should be performed.
+   * @param _collectionItemIds - Updated Collection item Ids that is used to compare with older collection item tabs.
+   * @returns List of tabIds that doesn't exist at Collection level.
+   */
+  public getIdOfTabsThatDoesntExistAtCollectionLevel = async (
+    _workspaceId: string,
+    _collectionItemIds: string[],
+  ): Promise<string[]> => {
+    // Query all the tabs with Workspace Id.
+    const tabs = await RxDB?.getInstance()
+      ?.rxdb?.tab.find({
+        selector: {
+          "path.workspaceId": _workspaceId,
+        },
+      })
+      .exec();
+    // Filter the Testflow tabs that do not exist in _collectionItemIds for further deletion.
+    const collectionTabIdsToBeDeleted = tabs
+      ?.filter((_tab) => {
+        const tabJSON = _tab.toMutableJSON();
+        // Skip deletion if the tab type is not "COLLECTION", "FOLDER", "REQUEST", "WEBSOCKET".
+        if (
+          tabJSON.type !== "COLLECTION" &&
+          tabJSON.type !== "FOLDER" &&
+          tabJSON.type !== "REQUEST" &&
+          tabJSON.type !== "WEBSOCKET"
+        ) {
+          return false;
+        }
+        // Skip deletion if the tab ID starts with "UNTRACKED" (That doesn't exist on backend server).
+        if (tabJSON.id.startsWith("UNTRACKED")) {
+          return false;
+        }
+        // Skip deletion if the Testflow tab exists in _collectionItemIds.
+        if (_collectionItemIds.includes(tabJSON.id)) {
+          return false;
+        }
+        // Otherwise, mark the tab for deletion.
+        return true;
+      })
+      .map((_tab) => {
+        // Return the tabId as a string for deletion.
+        return _tab.tabId as string;
+      }) as string[];
+    return collectionTabIdsToBeDeleted;
+  };
+
+  /**
+   * Retreives tabId of tabs that doesn't exist at Environment level in a Workspace.
+   * includes - Environment.
+   * @param _workspaceId - Workspace Id under which these operations should be performed.
+   * @param _environmentIds - Updated Environment Ids that is used to compare with older Environment tabs.
+   * @returns List of tabIds that doesn't exist at Environment level.
+   */
+  public getIdOfTabsThatDoesntExistAtEnvironmentLevel = async (
+    _workspaceId: string,
+    _environmentIds: string[],
+  ): Promise<string[]> => {
+    // Query all the tabs with Workspace Id.
+    const tabs = await RxDB?.getInstance()
+      ?.rxdb?.tab?.find({
+        selector: {
+          "path.workspaceId": _workspaceId,
+        },
+      })
+      .exec();
+
+    // Filter the Testflow tabs that do not exist in _environmentIds for further deletion.
+    const environmentTabIdsToBeDeleted = tabs
+      ?.filter((_tab) => {
+        const tabJSON = _tab.toMutableJSON();
+        // Skip deletion if the tab type is not "ENVIRONMENT".
+        if (tabJSON.type !== "ENVIRONMENT") {
+          return false;
+        }
+        // Skip deletion if the tab ID starts with "UNTRACKED" (That doesn't exist on backend server).
+        if (tabJSON.id.startsWith("UNTRACKED")) {
+          return false;
+        }
+        // Skip deletion if the Testflow tab exists in _environmentIds.
+        if (_environmentIds.includes(tabJSON.id)) {
+          return false;
+        }
+        // Otherwise, mark the tab for deletion.
+        return true;
+      })
+      .map((_tab) => {
+        // Return the tabId as a string for deletion.
+        return _tab.tabId as string;
+      }) as string[];
+    return environmentTabIdsToBeDeleted;
+  };
+
+  /**
+   * Retreives tabId of tabs that doesn't exist at Testflow level in a Workspace.
+   * includes - Testflow.
+   * @param _workspaceId - Workspace Id under which these operations should be performed.
+   * @param _testflowIds - Updated Testflow Ids that is used to compare with older Testflow tabs.
+   * @returns List of tabIds that doesn't exist at Testflow level.
+   */
+  public getIdOfTabsThatDoesntExistAtTestflowLevel = async (
+    _workspaceId: string,
+    _testflowIds: string[],
+  ): Promise<string[]> => {
+    // Query all the tabs with Workspace Id.
+    const tabs = await RxDB?.getInstance()
+      ?.rxdb?.tab?.find({
+        selector: {
+          "path.workspaceId": _workspaceId,
+        },
+      })
+      .exec();
+
+    // Filter the Testflow tabs that do not exist in _testflowIds for further deletion.
+    const testflowTabIdsToBeDeleted = tabs
+      ?.filter((_tab) => {
+        const tabJSON = _tab.toMutableJSON();
+        // Skip deletion if the tab type is not "TESTFLOW".
+        if (tabJSON.type !== "TESTFLOW") {
+          return false;
+        }
+        // Skip deletion if the tab ID starts with "UNTRACKED" (That doesn't exist on backend server).
+        if (tabJSON.id.startsWith("UNTRACKED")) {
+          return false; // Prevent deletion if tab is UNTRACKED.
+        }
+        // Skip deletion if the Testflow tab exists in _testflowIds.
+        if (_testflowIds.includes(tabJSON.id)) {
+          return false;
+        }
+        // Otherwise, mark the tab for deletion.
+        return true;
+      })
+      .map((_tab) => {
+        // Return the tabId as a string for deletion.
+        return _tab.tabId as string;
+      }) as string[];
+
+    return testflowTabIdsToBeDeleted;
+  };
+
+  /**
+   * Delete multiple tabs in a workspace and elects a new active tab if required.
+   * @param _workspaceId - Workspace Id under which these operations should be performed.
+   * @param _deletabletabIds - Deletable Tab Ids of a same Workspace.
+   */
+  public deleteTabsWithTabIdInAWorkspace = async (
+    _workspaceId: string,
+    _deletabletabIds: string[],
+  ): Promise<void> => {
+    // Query all the tabs with Workspace Id.
+    const tabs = await RxDB?.getInstance()
+      ?.rxdb?.tab?.find({
+        selector: {
+          "path.workspaceId": _workspaceId,
+        },
+      })
+      .exec();
+
+    // Filter the tabs that is not in a deletion list.
+    const tabsNotToBeDeleted = tabs
+      ?.filter((_tab) => {
+        const tabJSON = _tab.toMutableJSON();
+        if (_deletabletabIds.includes(tabJSON.tabId as string)) {
+          return false;
+        }
+        return true;
+      })
+      .map((_tab) => {
+        return _tab.id as string;
+      }) as string[];
+
+    // Check if there are tabs to delete.
+    if (!_deletabletabIds?.length) return;
+
+    // Get active tab for the current workspace.
+    const currentActiveTab = await RxDB?.getInstance()
+      ?.rxdb?.tab.findOne({
+        selector: {
+          isActive: true,
+          "path.workspaceId": _workspaceId,
+        },
+      })
+      .exec();
+
+    // If an active tab exists and is in the deletion list, switch to a non-deletable tab.
+    if (
+      tabsNotToBeDeleted?.length > 0 &&
+      _deletabletabIds.includes(currentActiveTab?.get("tabId"))
+    ) {
+      await this.activeTab(tabsNotToBeDeleted[0] as string, _workspaceId);
+    }
+
+    // Remove deletable tabs.
+    await RxDB?.getInstance()?.rxdb?.tab?.bulkRemove(_deletabletabIds);
+    return;
+  };
 }

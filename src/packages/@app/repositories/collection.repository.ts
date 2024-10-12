@@ -174,7 +174,7 @@ export class CollectionRepository {
   public deleteOrphanCollections = async (
     _workspaceId: string,
     _collectionIds: string[],
-  ) => {
+  ): Promise<string[]> => {
     // delete left out collections
     const collections = await RxDB.getInstance()
       ?.rxdb?.collection.find({
@@ -196,13 +196,14 @@ export class CollectionRepository {
         return true;
       })
       .map((_collection) => {
-        return _collection.id;
-      });
+        return _collection.id as string;
+      }) as string[];
     if ((selectedCollectionsToBeDeleted?.length || 0) > 0) {
       await RxDB.getInstance()?.rxdb?.collection.bulkRemove(
         selectedCollectionsToBeDeleted as string[],
       );
     }
+    return selectedCollectionsToBeDeleted;
   };
 
   /**
