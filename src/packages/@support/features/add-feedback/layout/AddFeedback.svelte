@@ -114,6 +114,7 @@
       isSelectEmpty = false;
       isDescriptionEmpty = false;
       isSubjectEmpty = false;
+      isTextArea = false;
       type = FeedbackType.CATEGORY;
       uploadFeedback = {
         file: {
@@ -131,7 +132,7 @@
             id: FeedbackType.FEATURE_REQUEST,
           },
           {
-            name: "UX Improvement",
+            name: "UI Improvement",
             id: FeedbackType.UI_IMPROVEMENT,
           },
           {
@@ -308,6 +309,7 @@
             isSelectEmpty = false;
             isDescriptionEmpty = false;
             isSubjectEmpty = false;
+            isTextArea = false;
             feedbackDescription = "";
             feedbackSubject = "";
             type = FeedbackType.CATEGORY;

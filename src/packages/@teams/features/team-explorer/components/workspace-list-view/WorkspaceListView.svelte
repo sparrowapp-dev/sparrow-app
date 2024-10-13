@@ -113,7 +113,7 @@
               .toLowerCase()
               .startsWith(filterText.toLowerCase()))
           .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length == 0}
-        <p class="not-found-text mt-3">No Result Found.</p>
+        <p class="not-found-text mt-3">No result found.</p>
       {/if}
     {/if}
   </div>

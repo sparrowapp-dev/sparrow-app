@@ -154,7 +154,7 @@ export class TeamsViewModel {
       await this.teamRepository.setOpenTeam(response.data.data?._id);
       notifications.success(`New team ${team.name} is created.`);
     } else {
-      notifications.error("Failed to create a new team. Please try again.");
+      notifications.error("Failed to create team. Please try again.");
     }
     MixpanelEvent(Events.CREATE_NEW_TEAM);
     return response;

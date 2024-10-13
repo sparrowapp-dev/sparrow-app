@@ -1644,7 +1644,7 @@ class RestExplorerViewModel
           });
         }
 
-        notifications.success("Environment Variable Added");
+        notifications.success("Environment variable added successfully.");
         return {
           isSuccessful: true,
         };
@@ -1676,9 +1676,11 @@ class RestExplorerViewModel
           });
         }
 
-        notifications.success("Environment Variable Added");
+        notifications.success("Environment variable added successfully.");
       } else {
-        notifications.error("Failed to add Environment Variable");
+        notifications.error(
+          "Failed to add environment variable. Please try again.",
+        );
       }
       return response;
     } else {
@@ -1727,7 +1729,7 @@ class RestExplorerViewModel
           });
         }
 
-        notifications.success("Environment Variable Added");
+        notifications.success("Environment variable added successfully.");
         return {
           isSuccessful: true,
         };
@@ -1759,9 +1761,11 @@ class RestExplorerViewModel
           });
         }
 
-        notifications.success("Environment Variable Added");
+        notifications.success("Environment variable added successfully.");
       } else {
-        notifications.error("Failed to add Environment Variable");
+        notifications.error(
+          "Failed to add environment variable. Please try again.",
+        );
       }
       return response;
     }
@@ -1812,7 +1816,7 @@ class RestExplorerViewModel
         col = col.toMutableJSON();
         col.name = newCollectionName;
         this.collectionRepository.updateCollection(collectionId, col);
-        notifications.success("Collection renamed successfully!");
+        // notifications.success("Collection renamed successfully!");
         return {
           isSuccessful: true,
         };
@@ -1827,11 +1831,11 @@ class RestExplorerViewModel
           collectionId,
           response.data.data,
         );
-        notifications.success("Collection renamed successfully!");
+        // notifications.success("Collection renamed successfully!");
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {
-        notifications.error("Failed to rename collection!");
+        notifications.error("Failed to rename collection. Please try again.");
       }
       return response;
     }
@@ -1885,7 +1889,7 @@ class RestExplorerViewModel
           folderId,
           res,
         );
-        notifications.success("Folder renamed successfully!");
+        // notifications.success("Folder renamed successfully!");
         return {
           isSuccessful: true,
         };
@@ -1905,9 +1909,9 @@ class RestExplorerViewModel
           folderId,
           response.data.data,
         );
-        notifications.success("Folder renamed successfully!");
+        // notifications.success("Folder renamed successfully!");
       } else {
-        notifications.error("Failed to rename folder!");
+        notifications.error("Failed to rename folder. Please try again.");
       }
       return response;
     }

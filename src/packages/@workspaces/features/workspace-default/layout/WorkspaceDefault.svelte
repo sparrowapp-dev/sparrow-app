@@ -75,7 +75,7 @@
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <Card
         icon={TreeIcon}
-        label={"Test Flows"}
+        label={"Test Flow"}
         iconColor="var(--text-primary-300)"
         iconSize={"18px"}
         onClick={() => {

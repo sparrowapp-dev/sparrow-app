@@ -132,7 +132,7 @@
         workspaceId: currentWorkspace._id,
         id: res._id,
       });
-      notifications.success("New Environment Created!");
+      notifications.success("New Environment created successfully.");
       MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
       return;
     } else {

@@ -184,7 +184,7 @@
             required
             maxlength={100}
             id="renameInputFieldCollection"
-            value={collection?.name}
+            value={collection?.name || "Collection Doesn't Exist."}
             class="bg-transparent input-outline text-fs-18 border-0 text-left w-100 ps-2 py-0"
             disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
               tab?.activeSync}
@@ -218,7 +218,7 @@
                 headerHighlight={"hover-active"}
                 borderHighlight={"hover-active"}
                 searchText={"Search Branch"}
-                searchErrorMessage={"No Result Found."}
+                searchErrorMessage={"No result found."}
                 id={"git-branch-select"}
                 data={[
                   ...(collection?.branches ? collection.branches : []).map(

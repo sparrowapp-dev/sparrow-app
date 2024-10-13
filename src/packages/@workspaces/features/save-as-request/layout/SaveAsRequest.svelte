@@ -186,7 +186,7 @@
         res.data.data,
       );
       createFolderName = constant.newFolder;
-      notifications.success("New Folder Created");
+      notifications.success("New folder created successfully.");
     } else {
       notifications.error(res.message);
     }
@@ -200,7 +200,7 @@
       latestRoute = res.data.latestRoute;
       res.data.addCollection(res.data.storage);
       createCollectionName = constant.newCollection;
-      notifications.success("New Collection Created");
+      notifications.success("New Collection created successfully.");
     } else {
       notifications.error(res.message);
     }
@@ -918,9 +918,9 @@
               onFinish(res.data.id);
               onClick(false);
               if (type !== saveType.SAVE_DESCRIPTION) {
-                notifications.success("Request is saved successfully");
+                notifications.success("API request saved successfully.");
               } else {
-                notifications.success("Request documentation saved");
+                notifications.success("Documentation saved successfully.");
               }
             } else {
               notifications.error(

@@ -138,7 +138,7 @@
 
         {#if searchTerm.length != 0}
           <div
-          style="cursor: pointer;"
+            style="cursor: pointer;"
             class="clear-icon"
             on:click={() => {
               searchTerm = "";
@@ -245,9 +245,9 @@
               >
                 <p
                   class="mx-1 text-fs-12 mb-0 text-center mb-3"
-                  style="display:flex; align-items:center; font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px; "
+                  style="display:flex; align-items:center; font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px; "
                 >
-                  No Result Found.
+                  No result found.
                 </p>
               </div>
             {:else}

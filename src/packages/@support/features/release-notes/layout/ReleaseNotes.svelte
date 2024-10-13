@@ -262,7 +262,7 @@
             headerTheme={"violet2"}
             bodyTheme={"violet"}
             menuItem={"v2"}
-            headerFontSize={"10px"}
+            headerFontSize={"12px"}
             isDropIconFilled={true}
             position={"absolute"}
           />
@@ -291,7 +291,7 @@
                   <div class="timeline-content">
                     <div class=" d-flex gap-2">
                       <h3
-                      style="cursor: pointer;"
+                        style="cursor: pointer;"
                         class="text-fs-18 mb-0"
                         on:click={() => {
                           handleSeeMore(event);
@@ -312,7 +312,7 @@
                           style="height:24px; width:24px; cursor:pointer"
                           on:click={async () => {
                             await copyToClipBoard(event.url);
-                            notifications.success("Link copied to clipboard!");
+                            notifications.success("Link copied to clipboard.");
                             MixpanelEvent(Events.Copy_Link);
                           }}
                         >
@@ -399,9 +399,9 @@
           {:else}
             <div
               class="no-results mt-5 d-flex justify-content-center align-items-center mx-1 text-fs-14 mb-0 text-center"
-              style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+              style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
             >
-              <p>No Result Found.</p>
+              <p>No result found.</p>
             </div>
           {/if}
         {:else}
@@ -451,7 +451,7 @@
                     style="  height: 24px; width:24px; cursor:pointer"
                     on:click={async () => {
                       await copyToClipBoard(selectedEvent.url);
-                      notifications.success("Link copied to clipboard!");
+                      notifications.success("Link copied to clipboard.");
                       MixpanelEvent(Events.Copy_Link);
                     }}
                   >

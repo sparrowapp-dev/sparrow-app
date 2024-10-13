@@ -305,7 +305,7 @@
             workspaceId: collection.workspaceId,
             collection,
           }),
-        displayText: "Open collection",
+        displayText: "Open Collection",
         disabled: false,
         hidden: false,
       },
@@ -313,43 +313,13 @@
         onClick: () => {
           (isRenaming = true), setTimeout(() => inputField.focus(), 100);
         },
-        displayText: "Rename collection",
+        displayText: "Rename Collection",
         disabled: false,
         hidden:
           !(collection?.activeSync && isBranchSynced) &&
           !(collection?.activeSync && !isBranchSynced)
             ? false
             : true,
-      },
-      {
-        onClick: () =>
-          onItemCreated("requestCollection", {
-            workspaceId: collection.workspaceId,
-            collection,
-          }),
-        displayText: "Add New API",
-        disabled: false,
-        hidden: false,
-      },
-      {
-        onClick: () =>
-          onItemCreated("websocketCollection", {
-            workspaceId: collection.workspaceId,
-            collection,
-          }),
-        displayText: "Add New WebSocket",
-        disabled: false,
-        hidden: false,
-      },
-      {
-        onClick: () =>
-          onItemCreated("folder", {
-            workspaceId: collection.workspaceId,
-            collection,
-          }),
-        displayText: "Add Folder",
-        disabled: false,
-        hidden: false,
       },
       {
         onClick: () => {
@@ -392,7 +362,7 @@
             collection,
           });
         },
-        displayText: "Add New API",
+        displayText: "Add REST API",
         disabled: false,
         hidden: false,
         icon: SyncIcon,
@@ -404,7 +374,7 @@
             collection,
           });
         },
-        displayText: "Add New WebSocket",
+        displayText: "Add WebSocket",
         disabled: false,
         hidden: false,
         icon: SocketIcon,
@@ -624,7 +594,7 @@
               </div>
             </Tooltip>
 
-            <Tooltip title={"Add Request"} placement={"bottom"} distance={12}>
+            <Tooltip title={"Add REST API"} placement={"bottom"} distance={12}>
               <div
                 class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
                 style="height: 24px; width: 24px;"

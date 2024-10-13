@@ -163,7 +163,7 @@ export class EnvironmentViewModel {
       );
       initEnvironmentTab.setName(newEnvironment.name);
       this.tabRepository.createTab(initEnvironmentTab.getValue());
-      notifications.success("New Environment Created!");
+      notifications.success("New Environment created successfully.");
       return;
     }
     this.environmentRepository.addEnvironment(newEnvironment);
@@ -188,7 +188,7 @@ export class EnvironmentViewModel {
         workspaceId: currentWorkspace._id,
         id: res._id,
       });
-      notifications.success("New Environment Created!");
+      notifications.success("New Environment created successfully.");
       MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
       return;
     } else {
@@ -311,7 +311,7 @@ export class EnvironmentViewModel {
     } else if (response.message === "Network Error") {
       notifications.error(response.message);
     } else {
-      notifications.error("Failed to rename environment");
+      notifications.error("Failed to rename environment. Please try again.");
     }
   };
 

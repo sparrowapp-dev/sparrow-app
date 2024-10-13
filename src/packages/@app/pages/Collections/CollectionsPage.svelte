@@ -247,7 +247,7 @@
             loader = false;
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
-            notifications.success("API request saved");
+            notifications.success("API request saved successfully.");
           }
         } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
           const res = await _viewModel.saveSocket(removeTab);
@@ -255,7 +255,7 @@
             loader = false;
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
-            notifications.success("WebSocket request saved");
+            notifications.success("WebSocket request saved successfully.");
           }
         }
         loader = false;
@@ -364,6 +364,7 @@
   isUserFirstSignUp.subscribe((value) => {
     if (value) {
       isWelcomePopupOpen = value;
+      isExpandCollection = value;
     }
   });
 

@@ -18,7 +18,7 @@ const handleRegister = async (userData) => {
       Login_Method: "Email",
       Success: response.isSuccessful,
     });
-    notifications.success("Registration successful!");
+    notifications.success("You've registered successfully.");
     navigate("/welcome");
   } else {
     notifications.error(response.message);

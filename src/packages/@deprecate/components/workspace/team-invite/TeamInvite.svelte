@@ -144,7 +144,7 @@
       !_response?.nonExistingUsers?.length &&
       !_response?.alreadyTeamMember?.length
     ) {
-      notifications.success("Invite sent.");
+      notifications.success("Invite sent successfully.");
     }
   };
 
@@ -185,7 +185,7 @@
           if (response) {
             await refreshMembers(userId, teamId, response);
           } else {
-            notifications.error("Failed to sent invite. Please try again.");
+            notifications.error("Failed to send invite. Please try again.");
           }
         }
       } else {
@@ -198,7 +198,7 @@
         if (response) {
           await refreshMembers(userId, teamId, response);
         } else {
-          notifications.error("Failed to sent invite. Please try again.");
+          notifications.error("Failed to send invite. Please try again.");
         }
       }
     }
