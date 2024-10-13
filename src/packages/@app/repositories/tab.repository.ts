@@ -221,7 +221,7 @@ export class TabRepository {
 
   public getTabWithWorkspaceId = (
     workspaceId: string,
-  ): Observable<TabDocument> | undefined => {
+  ): Observable<TabDocument | null> | undefined => {
     return this.rxdb?.findOne({
       selector: {
         "path.workspaceId": workspaceId,
@@ -291,7 +291,7 @@ export class TabRepository {
    */
   public getTabListWithWorkspaceId = (
     workspaceId: string,
-  ): Observable<TabDocument[]> => {
+  ): Observable<TabDocument[]> | undefined => {
     this.rxdb
       ?.find({
         selector: {
@@ -299,14 +299,14 @@ export class TabRepository {
         },
       })
       .exec()
-      .then((tabs: Tab[]) => {
+      .then((tabs: TabDocument[]) => {
         // elects a new active tab if no tabs is active
         if (tabs?.length > 0) {
           let activeTabsCount = 0;
           let nextElectedTabId = "";
-          tabs.forEach((tab: Tab, index: number) => {
+          tabs.forEach((tab: TabDocument, index: number) => {
             if (!index) {
-              nextElectedTabId = tab.tabId;
+              nextElectedTabId = tab.tabId as string;
             }
             if (tab.isActive) activeTabsCount++;
           });
@@ -744,18 +744,21 @@ export class TabRepository {
     _workspaceId: string,
     _collectionItemIds: string[],
   ): Promise<string[]> => {
-    // Query all the tabs with Workspace Id.
+    // Query all the tabs from the DB. sort is not required, but if we don't use sort it is giving inconsistent results.
+    // If we use selector to filter tabs by workspace Id. it is also giving inconsistent data.
     const tabs = await RxDB?.getInstance()
-      ?.rxdb?.tab.find({
-        selector: {
-          "path.workspaceId": _workspaceId,
-        },
-      })
+      ?.rxdb?.tab.find()
+      .sort({ index: "asc" })
       .exec();
+
     // Filter the Testflow tabs that do not exist in _collectionItemIds for further deletion.
     const collectionTabIdsToBeDeleted = tabs
       ?.filter((_tab) => {
         const tabJSON = _tab.toMutableJSON();
+        // Skip deletion if the tab workspaceId do not belongs to _workspaceId.
+        if (tabJSON.path?.workspaceId !== _workspaceId) {
+          return false;
+        }
         // Skip deletion if the tab type is not "COLLECTION", "FOLDER", "REQUEST", "WEBSOCKET".
         if (
           tabJSON.type !== "COLLECTION" &&
@@ -794,19 +797,21 @@ export class TabRepository {
     _workspaceId: string,
     _environmentIds: string[],
   ): Promise<string[]> => {
-    // Query all the tabs with Workspace Id.
+    // Query all the tabs from the DB. sort is not required, but if we don't use sort it is giving inconsistent results.
+    // If we use selector to filter tabs by workspace Id. it is also giving inconsistent data.
     const tabs = await RxDB?.getInstance()
-      ?.rxdb?.tab?.find({
-        selector: {
-          "path.workspaceId": _workspaceId,
-        },
-      })
+      ?.rxdb?.tab.find()
+      .sort({ index: "asc" })
       .exec();
 
     // Filter the Testflow tabs that do not exist in _environmentIds for further deletion.
     const environmentTabIdsToBeDeleted = tabs
       ?.filter((_tab) => {
         const tabJSON = _tab.toMutableJSON();
+        // Skip deletion if the tab workspaceId do not belongs to _workspaceId.
+        if (tabJSON.path?.workspaceId !== _workspaceId) {
+          return false;
+        }
         // Skip deletion if the tab type is not "ENVIRONMENT".
         if (tabJSON.type !== "ENVIRONMENT") {
           return false;
@@ -840,19 +845,21 @@ export class TabRepository {
     _workspaceId: string,
     _testflowIds: string[],
   ): Promise<string[]> => {
-    // Query all the tabs with Workspace Id.
+    // Query all the tabs from the DB. sort is not required, but if we don't use sort it is giving inconsistent results.
+    // If we use selector to filter tabs by workspace Id. it is also giving inconsistent data.
     const tabs = await RxDB?.getInstance()
-      ?.rxdb?.tab?.find({
-        selector: {
-          "path.workspaceId": _workspaceId,
-        },
-      })
+      ?.rxdb?.tab.find()
+      .sort({ index: "asc" })
       .exec();
 
     // Filter the Testflow tabs that do not exist in _testflowIds for further deletion.
     const testflowTabIdsToBeDeleted = tabs
       ?.filter((_tab) => {
         const tabJSON = _tab.toMutableJSON();
+        // Skip deletion if the tab workspaceId do not belongs to _workspaceId.
+        if (tabJSON.path?.workspaceId !== _workspaceId) {
+          return false;
+        }
         // Skip deletion if the tab type is not "TESTFLOW".
         if (tabJSON.type !== "TESTFLOW") {
           return false;
@@ -885,49 +892,64 @@ export class TabRepository {
     _workspaceId: string,
     _deletabletabIds: string[],
   ): Promise<void> => {
-    // Query all the tabs with Workspace Id.
-    const tabs = await RxDB?.getInstance()
-      ?.rxdb?.tab?.find({
-        selector: {
-          "path.workspaceId": _workspaceId,
-        },
-      })
-      .exec();
-
-    // Filter the tabs that is not in a deletion list.
-    const tabsNotToBeDeleted = tabs
-      ?.filter((_tab) => {
-        const tabJSON = _tab.toMutableJSON();
-        if (_deletabletabIds.includes(tabJSON.tabId as string)) {
-          return false;
-        }
-        return true;
-      })
-      .map((_tab) => {
-        return _tab.id as string;
-      }) as string[];
-
     // Check if there are tabs to delete.
     if (!_deletabletabIds?.length) return;
+    if (!_workspaceId) {
+      console.error("workspace id missing.");
+      return;
+    }
+
+    // Query all the tabs from the DB. sort is not required, but if we don't use sort it is giving inconsistent results.
+    // If we use selector to filter tabs by workspace Id. it is also giving inconsistent data.
+    const tabs =
+      (await RxDB?.getInstance()
+        ?.rxdb?.tab.find()
+        .sort({ index: "asc" })
+        .exec()) || [];
+
+    // Filter the tabs that is not in a deletion list.
+    const tabsNotToBeDeleted = tabs?.filter((_tab) => {
+      const tabJSON = _tab.toMutableJSON();
+      // Skip deletion if the tab workspaceId do not belongs to _workspaceId.
+      if (tabJSON.path?.workspaceId !== _workspaceId) {
+        return false;
+      }
+      if (_deletabletabIds.includes(tabJSON.tabId as string)) {
+        return false;
+      }
+      return true;
+    });
+    const tabsNotToBeDeletedIds = tabsNotToBeDeleted.map((_tab) => {
+      return _tab.get("id") as string;
+    }) as string[];
+    const tabsNotToBeDeletedObjects = tabsNotToBeDeleted.map((_tab, _index) => {
+      const tabJSON = _tab.toMutableJSON();
+      return { ...tabJSON, index: _index };
+    });
 
     // Get active tab for the current workspace.
-    const currentActiveTab = await RxDB?.getInstance()
-      ?.rxdb?.tab.findOne({
-        selector: {
-          isActive: true,
-          "path.workspaceId": _workspaceId,
-        },
-      })
-      .exec();
+    let currentActiveTab: TabDocument | undefined = undefined;
+    for (const _tab of tabs) {
+      const tabJSON = _tab.toMutableJSON();
+      if (tabJSON.path?.workspaceId === _workspaceId && tabJSON.isActive) {
+        currentActiveTab = _tab;
+      }
+    }
+
+    // Bulk upset undeleted tabs to fix indexes.
+    if (tabsNotToBeDeletedObjects?.length > 0) {
+      await RxDB?.getInstance()?.rxdb?.tab.bulkUpsert(
+        tabsNotToBeDeletedObjects,
+      );
+    }
 
     // If an active tab exists and is in the deletion list, switch to a non-deletable tab.
     if (
-      tabsNotToBeDeleted?.length > 0 &&
+      tabsNotToBeDeletedIds?.length > 0 &&
       _deletabletabIds.includes(currentActiveTab?.get("tabId"))
     ) {
-      await this.activeTab(tabsNotToBeDeleted[0] as string, _workspaceId);
+      await this.activeTab(tabsNotToBeDeletedIds[0] as string, _workspaceId);
     }
-
     // Remove deletable tabs.
     await RxDB?.getInstance()?.rxdb?.tab?.bulkRemove(_deletabletabIds);
     return;
