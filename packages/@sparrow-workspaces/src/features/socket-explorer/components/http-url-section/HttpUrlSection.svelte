@@ -44,7 +44,7 @@
     ) {
       toggleSaveRequest(true);
     } else if (x.status === "success") {
-      notifications.success("WebSocket request saved");
+      notifications.success("WebSocket request saved successfully.");
     }
   };
 
@@ -63,7 +63,7 @@
   <CodeMirrorInput
     bind:value={requestUrl}
     onUpdateInput={onUpdateRequestUrl}
-    placeholder={"Enter an URL"}
+    placeholder={"Enter a URL"}
     {theme}
     {onUpdateEnvironment}
     {environmentVariables}

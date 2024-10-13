@@ -247,7 +247,7 @@
 
         if (res.isSuccessful) {
           if (type !== saveType.SAVE_DESCRIPTION) {
-            notifications.success("API request saved");
+            notifications.success("API request saved successfully.");
           }
           collectionsMethods.addRequestOrFolderInCollection(
             path[path.length - 1].id,
@@ -315,7 +315,7 @@
           notifications.error(res.message);
         } else {
           onClick(false);
-          notifications.error("Failed tol save the request!");
+          notifications.error("Failed to save API request. Please try again.");
         }
       } else if (path[path.length - 1].type === ItemType.FOLDER) {
         const _collection = await collectionsMethods.readCollection(path[0].id);
@@ -344,7 +344,7 @@
 
         if (res.isSuccessful) {
           if (type !== saveType.SAVE_DESCRIPTION) {
-            notifications.success("API request saved");
+            notifications.success("API request saved successfully.");
           }
           collectionsMethods.addRequestInFolder(
             path[0].id,
@@ -468,7 +468,7 @@
       storage.id = _id;
       storage.workspaceId = workspace.id;
       collectionsMethods.addCollection(storage);
-      notifications.success("New Collection Created");
+      notifications.success("New Collection created successfully.");
       MixpanelEvent(Events.CREATE_COLLECTION, {
         source: "SaveRequest",
         collectionName: res.data.data.name,

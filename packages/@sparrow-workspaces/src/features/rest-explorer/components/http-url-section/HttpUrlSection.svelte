@@ -14,6 +14,7 @@
   import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
   import { DiskIcon } from "@sparrow/library/icons";
+  // import type { CancelRequestType } from "@workspaces/common/type/actions";
   let componentClass = "";
   export { componentClass as class };
 
@@ -21,6 +22,7 @@
   export let httpMethod: string;
   export let isSendRequestInProgress: boolean;
   export let onSendButtonClicked: SendRequestType;
+  export let onCancelButtonClicked: CancelRequestType;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
   export let onUpdateRequestMethod: UpdateRequestMethodType;
   export let toggleSaveRequest: (flag: boolean) => void;
@@ -50,7 +52,7 @@
     ) {
       toggleSaveRequest(true);
     } else if (x.status === "success") {
-      notifications.success("API request saved");
+      notifications.success("API request saved successfully.");
     }
   };
 
@@ -143,23 +145,32 @@
 
   <!-- Send button -->
   <span class="ps-2"></span>
-  <DropButton
-    title="Send"
-    type="default"
-    disable={isSendRequestInProgress ? true : false}
-    onClick={() => {
-      if (requestUrl === "") {
-        const codeMirrorElement = document.querySelector(
-          ".input-url .cm-editor",
-        );
-        if (codeMirrorElement) {
-          codeMirrorElement.classList.add("url-red-border");
+  {#if !isSendRequestInProgress}
+    <DropButton
+      title="Send"
+      type="default"
+      onClick={() => {
+        if (requestUrl === "") {
+          const codeMirrorElement = document.querySelector(
+            ".input-url .cm-editor",
+          );
+          if (codeMirrorElement) {
+            codeMirrorElement.classList.add("url-red-border");
+          }
+        } else {
+          onSendButtonClicked(environmentVariables);
         }
-      } else {
-        onSendButtonClicked(environmentVariables);
-      }
-    }}
-  />
+      }}
+    />
+  {:else}
+    <DropButton
+      title="Cancel"
+      type="dark"
+      onClick={() => {
+        onCancelButtonClicked();
+      }}
+    />
+  {/if}
 
   <!-- Switch pane layout button -->
   <!-- <ToggleButton
@@ -200,8 +211,8 @@
         color={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
           ? "var(--icon-secondary-380)"
           : isHovered
-            ? "var(--icon-primary-200)"
-            : "var(--icon-secondary-100)"}
+          ? "var(--icon-primary-200)"
+          : "var(--icon-secondary-100)"}
       />
     </button>
   </Tooltip>

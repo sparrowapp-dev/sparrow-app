@@ -66,7 +66,7 @@
     ) {
       visibility = true;
     } else if (x.status === "success") {
-      notifications.success("Documentation updated");
+      notifications.success("Documentation updated successfully.");
       MixpanelEvent(Events.SAVE_API_DOCUMENTATION);
       onUpdateRequestState({
         isExposeEditDescription: !state.isExposeEditDescription,
@@ -78,7 +78,7 @@
     // const res = await collectionsMethods.saveApiRequest(componentData, true);
     // if (res) {
     //   collectionsMethods.setRequestSave(true, "description", id);
-    //   notifications.success("Documentation updated");
+    //   notifications.success("Documentation updated successfully.");
     // }
   };
 

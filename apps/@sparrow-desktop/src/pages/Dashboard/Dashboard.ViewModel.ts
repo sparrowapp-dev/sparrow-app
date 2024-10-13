@@ -117,33 +117,68 @@ export class DashboardViewModel {
     this.workspaceRepository.updateWorkspace(workspaceId, { environmentId });
   };
 
-  // sync teams data with backend server
+  /**
+   * sync teams data with backend server
+   * @param userId User id
+   */
   public refreshTeams = async (userId: string): Promise<void> => {
-    let openTeamId: string = "";
-    const teamsData = await this.getTeamData();
-    teamsData.forEach((element) => {
-      const elem = element.toMutableJSON();
-      if (elem.isOpen) openTeamId = elem.teamId;
-    });
+    if (!userId) return;
     const response = await this.teamService.fetchTeams(userId);
+    let isAnyTeamsOpen: undefined | string = undefined;
     if (response?.isSuccessful && response?.data?.data) {
-      const data = response.data.data.map((elem) => {
-        const teamAdapter = new TeamAdapter();
-        return teamAdapter.adapt(elem).getValue();
-      });
-      if (openTeamId) {
-        data.forEach((elem) => {
-          if (elem.teamId === openTeamId) {
-            elem.isOpen = true;
-          } else {
-            elem.isOpen = false;
-          }
-        });
-      } else {
-        data[0].isOpen = true;
+      const data = [];
+      for (const elem of response.data.data) {
+        const {
+          _id,
+          name,
+          users,
+          description,
+          logo,
+          workspaces,
+          owner,
+          admins,
+          createdAt,
+          createdBy,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+        } = elem;
+        const updatedWorkspaces = workspaces.map((workspace) => ({
+          workspaceId: workspace.id,
+          name: workspace.name,
+        }));
+        const isOpenTeam = await this.teamRepository.checkIsTeamOpen(_id);
+        if (isOpenTeam) isAnyTeamsOpen = _id;
+        const item = {
+          teamId: _id,
+          name,
+          users,
+          description,
+          logo,
+          workspaces: updatedWorkspaces,
+          owner,
+          admins,
+          isActiveTeam: false,
+          createdAt,
+          createdBy,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+          isOpen: isOpenTeam,
+        };
+        data.push(item);
       }
 
       await this.teamRepository.bulkInsertData(data);
+      await this.teamRepository.deleteOrphanTeams(
+        data.map((_team) => {
+          return _team.teamId;
+        }),
+      );
+      if (!isAnyTeamsOpen) {
+        this.teamRepository.setOpenTeam(data[0].teamId);
+        return;
+      }
     }
   };
 
@@ -167,13 +202,12 @@ export class DashboardViewModel {
     return;
   };
 
-  // sync workspace data with backend server
+  /**
+   * sync workspace data with backend server
+   * @param userId User id
+   */
   public refreshWorkspaces = async (userId: string): Promise<void> => {
-    const workspaces = await this.workspaceRepository.getWorkspacesDocs();
-    const idToEnvironmentMap = {};
-    workspaces.forEach((element) => {
-      idToEnvironmentMap[element._id] = element?.environmentId;
-    });
+    if (!userId) return;
     const response = await this.workspaceService.fetchWorkspaces(userId);
     let isAnyWorkspaceActive: undefined | string = undefined;
     const data = [];
@@ -195,7 +229,8 @@ export class DashboardViewModel {
           updatedBy,
           isNewInvite,
         } = elem;
-        const isActiveWorkspace = await this.checkActiveWorkspace(_id);
+        const isActiveWorkspace =
+          await this.workspaceRepository.checkActiveWorkspace(_id);
         if (isActiveWorkspace) isAnyWorkspaceActive = _id;
         const item = {
           _id,
@@ -208,7 +243,7 @@ export class DashboardViewModel {
             teamId: team.id,
             teamName: team.name,
           },
-          environmentId: idToEnvironmentMap[_id],
+          environmentId: "",
           isActiveWorkspace: isActiveWorkspace,
           createdAt,
           createdBy,
@@ -219,9 +254,15 @@ export class DashboardViewModel {
         data.push(item);
       }
       await this.workspaceRepository.bulkInsertData(data);
+      await this.workspaceRepository.deleteOrphanWorkspaces(
+        data.map((_workspace) => {
+          return _workspace._id;
+        }),
+      );
       if (!isAnyWorkspaceActive) {
-        this.activateInitialWorkspaceWithTeam();
-      } else this.activateWorkspace(isAnyWorkspaceActive);
+        this.workspaceRepository.setActiveWorkspace(data[0]._id);
+        return;
+      }
       return;
     }
   };
@@ -237,22 +278,6 @@ export class DashboardViewModel {
 
   public refreshTeamsWorkspaces = async (_userId: string) => {
     this.refreshTeamsWorkspacesThrottler(_userId);
-  };
-
-  public refreshEnvironment = async (workspaceId) => {
-    const isGuestUser = await this.getGuestUserState();
-    if (isGuestUser !== true) {
-      const response =
-        await this.environmentService.fetchAllEnvironments(workspaceId);
-      if (response.isSuccessful && response.data.data) {
-        const environments = response.data.data;
-        await this.environmentRepository.refreshEnvironment(
-          environments,
-          workspaceId,
-        );
-      }
-    }
-    return;
   };
 
   /**
@@ -292,6 +317,7 @@ export class DashboardViewModel {
     const response = await userLogout();
     if (response.isSuccessful) {
       await this.clientLogout();
+      MixpanelEvent(Events.SIGNOUT);
       return true;
     } else {
       notifications.error(response.message);
@@ -360,7 +386,7 @@ export class DashboardViewModel {
       await this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
       await this.workspaceRepository.setActiveWorkspace(res._id);
       navigate("/dashboard/collections");
-      notifications.success("New Workspace Created");
+      notifications.success("New Workspace created successfully.");
     } else {
       notifications.error(response?.message);
     }

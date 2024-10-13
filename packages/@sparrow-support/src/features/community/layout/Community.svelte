@@ -14,10 +14,10 @@
       </p>
     </div>
     <div class="feedback-section active">
-      <h3 class="text-fs-14" style="font-weight : 700 line-height: 21px; ">
+      <h3 class="" style="font-size:14px; font-weight:700 line-height: 21px; ">
         Share your feedback on our product!!
       </h3>
-      <p class="fw-light text-fs-14">
+      <p class="text-fs-12" style="font-weight: 400; ">
         Please let us know how we can make Sparrow the best product for you.
       </p>
     </div>

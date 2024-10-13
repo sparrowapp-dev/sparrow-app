@@ -28,7 +28,7 @@
   export let codeId = "";
   let componentClass = "";
   export { componentClass as class };
-  export let userRole;
+  export let userRole: WorkspaceRole | undefined = undefined;
   export let isFocusedOnMount = false;
 
   const environmentHelper = new EnvironmentHeper();

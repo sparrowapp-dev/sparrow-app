@@ -75,9 +75,11 @@
         payload,
       );
       if (response.isSuccessful) {
-        notifications.success("Environment Variable Added");
+        notifications.success("Environment variable added successfully.");
       } else {
-        notifications.error("Failed to add Environment Variable");
+        notifications.error(
+          "Failed to add environment variable. Please try again.",
+        );
       }
     } else {
       const payload = {
@@ -107,9 +109,11 @@
         payload,
       );
       if (response.isSuccessful) {
-        notifications.success("Environment Variable Added");
+        notifications.success("Environment variable added successfully.");
       } else {
-        notifications.error("Failed to add Environment Variable");
+        notifications.error(
+          "Failed to add environment variable. Please try again.",
+        );
       }
     }
     handleEnvironmentBox(false);

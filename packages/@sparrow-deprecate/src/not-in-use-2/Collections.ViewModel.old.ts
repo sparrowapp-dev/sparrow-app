@@ -390,7 +390,7 @@
 //       this.handleRemoveTab(requestId);
 //       return true;
 //     } else {
-//       notifications.error("Failed to delete the Request.");
+//       notifications.error("Failed to delete API request. Plaease try again.");
 //       return false;
 //     }
 //   };

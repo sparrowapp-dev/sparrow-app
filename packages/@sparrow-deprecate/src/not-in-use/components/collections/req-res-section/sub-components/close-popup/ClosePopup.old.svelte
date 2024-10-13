@@ -65,7 +65,7 @@
       loader = false;
       onFinish(id);
       closeCallback(false);
-      notifications.success("API request saved");
+      notifications.success("API request saved successfully.");
     }
     loader = false;
   };

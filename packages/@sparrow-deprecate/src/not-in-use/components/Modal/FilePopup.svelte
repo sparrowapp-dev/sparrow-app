@@ -42,7 +42,7 @@
         collectionsMethods.handleRemoveTab(request.id);
         closePopup(false);
       } else {
-        notifications.error("Failed to delete the Request.");
+        notifications.error("Failed to delete API request. Plaease try again.");
         deleteLoader = false;
       }
     } else if (workspaceId && collectionId) {
@@ -64,7 +64,7 @@
         collectionsMethods.handleRemoveTab(request.id);
         closePopup(false);
       } else {
-        notifications.error("Failed to delete the Request.");
+        notifications.error("Failed to delete API request. Plaease try again.");
         deleteLoader = false;
       }
     }

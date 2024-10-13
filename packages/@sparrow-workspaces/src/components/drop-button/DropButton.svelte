@@ -9,7 +9,7 @@
   export let loader = false;
   export let textClassProp = "";
   export let textStyleProp = "";
-  export let type: "default" = "default";
+  export let type: "default" | "dark" = "default";
   export let iconRequired = false;
   export let icon = RunIcon;
   export let iconColor = "";
@@ -21,6 +21,7 @@
 
   enum BtnType {
     DEFAULT = "default",
+    DARK = "dark",
   }
 
   // define button variants
@@ -28,6 +29,9 @@
   switch (type) {
     case BtnType.DEFAULT:
       btnClass = "custom-btn-default";
+      break;
+    case BtnType.DARK:
+      btnClass = "custom-btn-dark";
       break;
     default:
       btnClass = "";
@@ -95,5 +99,15 @@
   }
   .main-body.custom-btn-default:active {
     background-color: var(--bg-primary-500);
+  }
+  .main-body.custom-btn-dark {
+    background-color: var(--bg-secondary-400);
+    color: var(--white-color);
+  }
+  .main-body.custom-btn-dark:hover {
+    background-color: var(--bg-secondary-300);
+  }
+  .main-body.custom-btn-dark:active {
+    background-color: var(--bg-secondary-300);
   }
 </style>

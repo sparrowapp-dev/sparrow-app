@@ -77,7 +77,7 @@ export default class WorkspaceExplorerViewModel {
       };
       await this.workspaceRepository.updateWorkspace(workspaceId, updatedata);
       await this.tabRepository.updateTabByMongoId(workspaceId, updatedata);
-      notifications.success("Workspace renamed successfully!");
+      // notifications.success("Workspace renamed successfully!");
       return;
     }
   };
@@ -102,7 +102,7 @@ export default class WorkspaceExplorerViewModel {
       const updatedata = {
         description: newDescription,
       };
-      notifications.success("Description updated successfully!");
+      notifications.success("Description updated successfully.");
       await this.workspaceRepository.updateWorkspace(workspaceId, updatedata);
       return;
     }
@@ -201,7 +201,7 @@ export default class WorkspaceExplorerViewModel {
         `Invite sent to ${_invitedUserCount} people for ${_workspaceName}.`,
       );
     } else {
-      notifications.error(`Failed to sent invite. Please try again.`);
+      notifications.error(`Failed to send invite. Please try again.`);
     }
     if (_data.role === WorkspaceRole.WORKSPACE_VIEWER) {
       MixpanelEvent(Events.Invite_To_Workspace_Viewer, {
@@ -287,11 +287,7 @@ export default class WorkspaceExplorerViewModel {
    * @param userId User id
    */
   public refreshWorkspaces = async (userId: string): Promise<void> => {
-    const workspaces = await this.workspaceRepository.getWorkspacesDocs();
-    const idToEnvironmentMap = {};
-    workspaces.forEach((element) => {
-      idToEnvironmentMap[element._id] = element?.environmentId;
-    });
+    if (!userId) return;
     const response = await this.workspaceService.fetchWorkspaces(userId);
     let isAnyWorkspaceActive: undefined | string = undefined;
     const data = [];
@@ -327,7 +323,7 @@ export default class WorkspaceExplorerViewModel {
             teamId: team.id,
             teamName: team.name,
           },
-          environmentId: idToEnvironmentMap[_id],
+          environmentId: "",
           isActiveWorkspace: isActiveWorkspace,
           createdAt,
           createdBy,
@@ -338,10 +334,15 @@ export default class WorkspaceExplorerViewModel {
         data.push(item);
       }
       await this.workspaceRepository.bulkInsertData(data);
+      await this.workspaceRepository.deleteOrphanWorkspaces(
+        data.map((_workspace) => {
+          return _workspace._id;
+        }),
+      );
       if (!isAnyWorkspaceActive) {
-        await this.workspaceRepository.activateInitialWorkspace();
+        this.workspaceRepository.setActiveWorkspace(data[0]._id);
         return;
-      } else this.workspaceRepository.setActiveWorkspace(isAnyWorkspaceActive);
+      }
       return;
     }
   };

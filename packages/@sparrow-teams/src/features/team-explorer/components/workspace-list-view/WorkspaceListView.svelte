@@ -113,7 +113,7 @@
               .toLowerCase()
               .startsWith(filterText.toLowerCase()))
           .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length == 0}
-        <p class="not-found-text mt-3">No results found.</p>
+        <p class="not-found-text mt-3">No result found.</p>
       {/if}
     {/if}
   </div>
@@ -125,10 +125,10 @@
         .toLowerCase()
         .startsWith(filterText.toLowerCase()))
     .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0 && !isGuestUser}
-    <table class="w-75 bottom-0">
+    <table class="bottom-0" style="width: 53%;">
       <tfoot>
         <tr class="d-flex justify-content-between">
-          <th class="tab-head" style="width: 1;"
+          <th class="tab-head" style=""
             >Showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
               currPage * workspacePerPage,
               data?.filter((item) =>
@@ -138,7 +138,7 @@
               item.name.toLowerCase().startsWith(filterText.toLowerCase()),
             ).length}
           </th>
-          <th class="tab-head tab-change" style="width:189.46px;">
+          <th class="tab-head tab-change" style="">
             <button
               on:click={() => (currPage = 1)}
               class="bg-transparent border-0"
@@ -208,7 +208,6 @@
             >
           </th>
           <!-- <th class="tab-head px-0 ms-0"></th> -->
-          <div></div>
         </tr>
       </tfoot>
     </table>

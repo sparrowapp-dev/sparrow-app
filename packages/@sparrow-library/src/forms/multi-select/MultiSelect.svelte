@@ -176,28 +176,31 @@
 
     {#if isOpen}
       <div
-        class="d-none dropdown-data p-1 rounded"
+        class="d-none dropdown-data p-1 rounded select-data"
         class:dropdown-active={isOpen}
         transition:slide={{ duration: 100 }}
       >
-        <div class="d-flex align-items-center px-2 py-2 highlight">
-          <label class="check-box">
-            <input
-              id="select-all-{id}"
-              class="form-check-input mt-0"
-              type="checkbox"
-              bind:checked={controller}
-              on:input={handleCheckAll}
-            />
-            <span class="checkmark"></span>
-          </label>
-          <label
-            for="select-all-{id}"
-            role="button"
-            class="text-fs-12 m-0 ps-2 p-0 text-whiteColor w-100"
-            >Select All</label
-          >
-        </div>
+        {#if list?.length}
+          <div class="d-flex align-items-center px-2 py-2 highlight">
+            <label class="check-box">
+              <input
+                id="select-all-{id}"
+                class="form-check-input mt-0"
+                type="checkbox"
+                bind:checked={controller}
+                on:input={handleCheckAll}
+              />
+              <span class="checkmark"></span>
+            </label>
+            <label
+              for="select-all-{id}"
+              role="button"
+              class="text-fs-12 m-0 ps-2 p-0 text-whiteColor w-100"
+              >Select All</label
+            >
+          </div>
+        {/if}
+
         <hr class="mt-0 mb-1 text-secondary-250" />
         {#each list as item, index}
           <div class="d-flex align-items-center px-2 py-2 highlight">
@@ -360,5 +363,14 @@
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
+  }
+
+  .select-data {
+    color: white;
+    border: 1px solid rgb(44, 44, 44);
+    transition: 0.3s ease;
+    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
   }
 </style>

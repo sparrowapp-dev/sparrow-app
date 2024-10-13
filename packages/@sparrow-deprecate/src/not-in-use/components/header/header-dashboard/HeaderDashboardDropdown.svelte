@@ -249,7 +249,7 @@
       collectionsMethods.handleActiveTab(response.data.data._id);
       moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
-      notifications.success("New Workspace Created");
+      notifications.success("New Workspace created successfully.");
       isWorkspaceLoaded.set(true);
       navigate("/dashboard/collections");
       activeSideBarTabMethods.updateActiveTab("collections");

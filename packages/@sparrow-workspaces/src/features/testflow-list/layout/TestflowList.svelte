@@ -152,7 +152,7 @@
     </div>
 
     <Tooltip
-      title={`Add New ${TFDefaultEnum.NAME}`}
+      title={`Add ${TFDefaultEnum.NAME}`}
       placement={"bottom"}
       distance={13}
       show={isHovered}
@@ -185,12 +185,12 @@
       <!-- 
   --  Testflow Empty screen 
   -->
-      {#if filteredflows && flows.length === 0}
+      {#if filteredflows && flows.length === 0 && !searchData}
         {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
           <div class={`pb-2 px-2`}>
             <p
               class={`add-env-desc-text mb-3 text-fs-12 mb-0 fw-normal text-center`}
-              style="color: var(--text-secondary-50)"
+              style="color: var(--text-secondary-50); font-weight:300;"
             >
               Start with basic test cases to check core functions and build a
               strong testing foundation.
@@ -212,8 +212,7 @@
               />
               <span
                 style="color: var(--text-secondary-200)"
-                class="ps-2 fw-bold text-fs-12"
-                >Add New {TFDefaultEnum.NAME}</span
+                class="ps-2 fw-bold text-fs-12">Add {TFDefaultEnum.NAME}</span
               >
             </button>
           </div>
@@ -249,7 +248,7 @@
           class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
           style="color: var(--text-secondary-550);  font-weight:300; letter-spacing: 0.5px;"
         >
-          No Result Found
+          It seems we couldn't find the result matching your search query.
         </p>
       {/if}
     </div>

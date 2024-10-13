@@ -48,14 +48,14 @@
     buttonClassProp={`me-1`}
     onClick={async () => {
       workspaceForm.name.isTouched = true;
-      if (!workspaceForm.name.value) return;
+      if (!workspaceForm.name.value.trim()) return;
       if (selectedTeam === "") {
         handleTeamError();
         return;
       }
       workspaceUnderSubmission = true;
       const response = await onCreateWorkspace(
-        workspaceForm.name.value,
+        workspaceForm.name.value.trim(),
         selectedTeam,
       );
       workspaceUnderSubmission = false;

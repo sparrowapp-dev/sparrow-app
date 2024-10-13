@@ -139,7 +139,7 @@ class FolderExplorerPage {
           folder.id,
           res,
         );
-        notifications.success("Folder renamed successfully!");
+        // notifications.success("Folder renamed successfully!");
         return;
       }
       const response = await this.collectionService.updateFolderInCollection(
@@ -159,7 +159,7 @@ class FolderExplorerPage {
           folder.id,
           response.data.data,
         );
-        notifications.success("Folder renamed successfully!");
+        // notifications.success("Folder renamed successfully!");
       }
     }
   };
@@ -296,7 +296,7 @@ class FolderExplorerPage {
       });
       return;
     } else {
-      notifications.error("Failed to create API");
+      notifications.error("Failed to create API request. Please try again.");
     }
   };
 
@@ -334,7 +334,7 @@ class FolderExplorerPage {
         tab.path.folderId,
         res,
       );
-      notifications.success("Description updated successfully!");
+      notifications.success("Description updated successfully.");
       return;
     }
 
@@ -351,9 +351,9 @@ class FolderExplorerPage {
         tab.path.folderId,
         updateFolderElement.data.data,
       );
-      notifications.success("Description updated successfully!");
+      notifications.success("Description updated successfully.");
     } else {
-      notifications.error("Failed to update description!");
+      notifications.error("Failed to update description. Please try again.");
     }
   };
 

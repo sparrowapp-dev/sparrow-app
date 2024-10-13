@@ -6,7 +6,7 @@
   export let likePost: (postId: string) => void;
   export let dislikePost: (postId: string) => void;
   export let isPostLiked: boolean;
-
+  export let isHoverRequired: boolean = true; // Default value is true
   const handleClick = () => {
     if (isPostLiked) {
       dislikePost(postID);
@@ -20,19 +20,29 @@
 </script>
 
 <div
-  class={isPostLiked
-    ? "upvote-container upvoted"
-    : "upvote-container not-upvoted"}
+  class={`
+    upvote-container 
+    ${isPostLiked ? "upvoted" : "not-upvoted"} 
+    ${!isPostLiked && isHoverRequired ? "hover-effect" : ""}
+  `}
   on:click={handleClick}
 >
   <div style="height: 22px; width: 24px; text-align: center;">
     {#if isPostLiked}
-      <TriangleIcon height={"10px"} width={"10px"} color={"blue"} />
+      <TriangleIcon
+        height={"10px"}
+        width={"10px"}
+        color={"var(--icon-primary-300)"}
+      />
     {:else}
-      <TriangleIcon height={"10px"} width={"10px"} color={"white"} />
+      <TriangleIcon
+        height={"10px"}
+        width={"10px"}
+        color={"var(--icon-secondary-100)"}
+      />
     {/if}
   </div>
-  <span style=" font-size: 14px;">{upvote}</span>
+  <span style="font-size: 14px;">{upvote}</span>
 </div>
 
 <style>
@@ -44,19 +54,15 @@
     border-radius: 4px;
     margin-left: 10px;
   }
-
-  /* .upvote-container:hover {
-    opacity: 70%;
-    background-color: #232F3D;
-  } */
-
   .upvoted {
     border: 0.3px solid var(--border-primary-300);
-    color: var(--text-primary-300);
     background-color: var(--bg-primary-650);
   }
-
   .not-upvoted {
     border: 0.3px solid var(--border-secondary-200);
+  }
+  .hover-effect:hover {
+    opacity: 70%;
+    background-color: var(--bg-tertiary-850);
   }
 </style>

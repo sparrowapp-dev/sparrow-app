@@ -131,7 +131,7 @@
       {/each}
     {/if}
     {#if !filteredUser?.length}
-      <p class="not-found-text mt-3">No results found.</p>
+      <p class="not-found-text mt-3">No result found.</p>
     {/if}
   </section>
 </div>

@@ -98,9 +98,9 @@ class CollectionExplorerPage {
           response.data,
         );
         this.updateTab(this.tab.tabId, { name: newCollectionName });
-        notifications.success("Collection renamed successfully!");
+        // notifications.success("Collection renamed successfully!");
       } else {
-        notifications.error("Failed to rename collection!");
+        notifications.error("Failed to rename collection. Please try again.");
       }
       return;
     }
@@ -116,11 +116,11 @@ class CollectionExplorerPage {
           response.data.data,
         );
         this.updateTab(this.tab.tabId, { name: newCollectionName });
-        notifications.success("Collection renamed successfully!");
+        // notifications.success("Collection renamed successfully!");
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {
-        notifications.error("Failed to rename collection!");
+        notifications.error("Failed to rename collection. Please try again.");
       }
     }
   };
@@ -226,7 +226,7 @@ class CollectionExplorerPage {
           collection.id,
           response.data.data.collection,
         );
-        notifications.success("Collection synced.");
+        notifications.success("Collection synced successfully.");
       } else {
         notifications.error("Failed to sync the collection. Please try again.");
       }
@@ -300,7 +300,7 @@ class CollectionExplorerPage {
           collection?.id,
           response.data.data.collection,
         );
-        notifications.success("Collection synced.");
+        notifications.success("Collection synced successfully.");
         return true;
       } else {
         notifications.error("Failed to sync the collection. Please try again.");
@@ -528,7 +528,7 @@ class CollectionExplorerPage {
           description: newDescription,
         },
       );
-      notifications.success("Description updated successfully!");
+      notifications.success("Description updated successfully.");
       return;
     }
     const response = await this.collectionService.updateCollectionData(
@@ -545,11 +545,11 @@ class CollectionExplorerPage {
         data: { description: newDescription },
       };
       await this.collectionRepository.updateCollection(collection.id, res.data);
-      notifications.success("Description updated successfully!");
+      notifications.success("Description updated successfully.");
     } else if (response.message === "Network Error") {
       notifications.error(response.message);
     } else {
-      notifications.error("Failed to update description!");
+      notifications.error("Failed to update description. Please try again.");
     }
   };
 

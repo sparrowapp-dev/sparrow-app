@@ -15,7 +15,7 @@
       },
     },
     {
-      name: "Authenthication",
+      name: "Authentication",
       id: TeamSettingsTabsEnum.AUTHENTICATION,
       visible: true,
       disabled: true,

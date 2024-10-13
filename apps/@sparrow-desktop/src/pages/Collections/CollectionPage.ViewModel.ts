@@ -1,6 +1,7 @@
 import type {
   CollectionDocument,
   EnvironmentDocument,
+  TabDocument,
   WorkspaceDocument,
 } from "../../database/database";
 
@@ -74,6 +75,8 @@ import type { GuideQuery } from "../../types/user-guide";
 import type { FeatureQuery } from "../../types/feature-switch";
 import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/utils";
 
+import { createDeepCopy } from "@sparrow/common/utils";
+
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -106,25 +109,81 @@ export default class CollectionsViewModel {
    * Fetch collections from services and insert to repository
    * @param workspaceId - id of current workspace
    */
-  public fetchCollections = async (workspaceId: string) => {
+  public fetchCollections = async (
+    workspaceId: string,
+  ): Promise<{ collectionItemTabsToBeDeleted?: string[] }> => {
     const isGuestUser = await this.getGuestUserState();
-    if (workspaceId && !isGuestUser) {
-      let isGuestUser;
-      isGuestUserActive.subscribe((value) => {
-        isGuestUser = value;
-      });
-      if (isGuestUser !== true) {
-        const res = await this.collectionService.fetchCollection(workspaceId);
-        if (res.isSuccessful) {
-          this.collectionRepository.bulkInsertData(
-            res.data.data.map((collection: CollectionDto) => {
-              collection["workspaceId"] = workspaceId;
-              return collection;
-            }),
-          );
-        }
-      }
+    if (!workspaceId || isGuestUser) {
+      return {};
     }
+    /**
+     * Iterates throught the Collection and return all the Collection item Ids - COllection, Folder, Http Request, WebSocket Request.
+     * @param _collectionItem - Collection or Collection item (Folder, Http Request, WebSocket Request).
+     * @param _collectionItemIds - Blank list that should be manipulated by this function as a result.
+     * @returns List of COllection item Ids.
+     */
+    const getCollectionItemIds = (
+      _collectionItem: any,
+      _collectionItemIds: string[],
+    ): void => {
+      if (!_collectionItem?.type) {
+        // Collection - object do not have type and holds _id.
+        _collectionItemIds.push(_collectionItem._id);
+      } else {
+        // Folder, Http Request, WebSocket Request - object that holds id.
+        _collectionItemIds.push(_collectionItem.id);
+      }
+
+      // Recursively search through the Collection item structure
+      for (let j = 0; j < _collectionItem?.items?.length; j++) {
+        getCollectionItemIds(_collectionItem.items[j], _collectionItemIds);
+      }
+      return;
+    };
+
+    const res = await this.collectionService.fetchCollection(workspaceId);
+    if (res?.isSuccessful && res?.data?.data) {
+      const collections = res.data.data;
+      await this.collectionRepository.bulkInsertData(
+        workspaceId,
+        collections?.map((_collection: any) => {
+          const collection = createDeepCopy(_collection);
+          collection["workspaceId"] = workspaceId;
+          collection["id"] = _collection._id;
+          delete collection._id;
+          return collection;
+        }),
+      );
+      await this.collectionRepository.deleteOrphanCollections(
+        workspaceId,
+        collections?.map((_collection: any) => {
+          return _collection._id;
+        }),
+      );
+      const collectionItemIds: string[] = [];
+      for (let i = 0; i < collections.length; i++) {
+        getCollectionItemIds(collections[i], collectionItemIds);
+      }
+
+      const collectionItemTabsToBeDeleted =
+        await this.tabRepository.getIdOfTabsThatDoesntExistAtCollectionLevel(
+          workspaceId,
+          collectionItemIds as string[],
+        );
+
+      return {
+        collectionItemTabsToBeDeleted,
+      };
+    }
+
+    return {};
+  };
+
+  public deleteTabsWithTabIdInAWorkspace = (
+    _workspaceId: string,
+    _tabIds: string[],
+  ) => {
+    this.tabRepository.deleteTabsWithTabIdInAWorkspace(_workspaceId, _tabIds);
   };
 
   /**
@@ -142,7 +201,9 @@ export default class CollectionsViewModel {
   public tabs() {
     return this.tabRepository.getTabList();
   }
-  public getTabListWithWorkspaceId(workspaceId: string) {
+  public getTabListWithWorkspaceId(
+    workspaceId: string,
+  ): Observable<TabDocument[]> | undefined {
     return this.tabRepository.getTabListWithWorkspaceId(workspaceId);
   }
 
@@ -169,7 +230,9 @@ export default class CollectionsViewModel {
    * Get active tab(if any)
    * @returns :Observable<any> | undefined - active tab
    */
-  public getActiveTab = (workspaceId: string) => {
+  public getActiveTab = (
+    workspaceId: string,
+  ): Observable<TabDocument | null> | undefined => {
     return this.tabRepository.getTabWithWorkspaceId(workspaceId);
   };
 
@@ -204,6 +267,28 @@ export default class CollectionsViewModel {
     } else {
       setTimeout(() => {
         this.createNewTab(_limit - 1);
+      }, 2000);
+    }
+  };
+
+  /**
+   * Create new tab with untracked id with updated Details
+   */
+  public createNewTabWithData = async (_limit = 5) => {
+    if (_limit === 0) return;
+    const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
+    isApiCreatedFirstTime.set(true);
+    if (ws) {
+      const initRequestTab = new InitRequestTab(
+        "UNTRACKED-" + uuidv4(),
+        ws._id,
+      );
+      initRequestTab.updateChatbotState(true);
+      this.tabRepository.createTab(initRequestTab.getValue());
+      moveNavigation("right");
+    } else {
+      setTimeout(() => {
+        this.createNewTabWithData(_limit - 1);
       }, 2000);
     }
   };
@@ -457,50 +542,6 @@ export default class CollectionsViewModel {
   };
 
   /**
-   * Syncs the collections from active and update the repository
-   * @param activeWorkspace: WorkspaceDocument
-   */
-  public syncCollectionsWithBackend = async (
-    activeWorkspace: WorkspaceDocument,
-  ) => {
-    let currentEnvironment: object;
-    if (activeWorkspace) {
-      // await refreshEnv(activeWorkspaceRxDoc?._id);
-      const env: EnvironmentDocument =
-        await this.environmentRepository.readEnvironment(
-          activeWorkspace.get("environmentId"),
-        );
-      if (env) {
-        currentEnvironment = env.toMutableJSON();
-      } else {
-        currentEnvironment = {
-          name: "None",
-          id: "none",
-        };
-      }
-      const workspaceId = activeWorkspace?._id;
-      let isGuestUser;
-      isGuestUserActive.subscribe((value) => {
-        isGuestUser = value;
-      });
-      if (isGuestUser !== true) {
-        const response =
-          await this.collectionService.fetchCollection(workspaceId);
-        if (response.isSuccessful && response.data.data) {
-          const collections = response.data.data;
-          collections.forEach((collection: CollectionDocument) => {
-            collection.workspaceId = workspaceId;
-          });
-          this.collectionRepository.bulkInsertData(collections);
-        } else {
-          notifications.error(response.message);
-        }
-      }
-      return currentEnvironment;
-    }
-  };
-
-  /**
    * Get list of collections from current active workspace
    * @returns :Observable<CollectionDocument[]> - the list of collection from current active workspace
    */
@@ -652,7 +693,7 @@ export default class CollectionsViewModel {
             name: newCollection.name,
           },
         );
-        notifications.success("New Collection Created");
+        notifications.success("New Collection created successfully.");
         MixpanelEvent(Events.CREATE_COLLECTION, {
           source: "USER",
           collectionName: response.data.data.name,
@@ -695,7 +736,7 @@ export default class CollectionsViewModel {
         id: initCollectionTab.getValue().id,
         name: newCollection.name,
       });
-      notifications.success("New Collection Created");
+      notifications.success("New Collection created successfully.");
     }
     return response;
   };
@@ -738,7 +779,7 @@ export default class CollectionsViewModel {
       if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {
-        notifications.error("Failed to import cURL. Please try again");
+        notifications.error("Failed to import cURL. Please try again.");
       }
     }
     MixpanelEvent(Events.IMPORT_API_VIA_CURL, {
@@ -1403,7 +1444,7 @@ export default class CollectionsViewModel {
       });
     } else {
       // Show error notification and clean up by deleting the folder locally on failure.
-      notifications.error("Failed to create folder!");
+      notifications.error("Failed to create folder. Plaease try again.");
       this.collectionRepository.deleteRequestOrFolderInCollection(
         collection.id,
         folder.id,
@@ -1448,7 +1489,7 @@ export default class CollectionsViewModel {
         } else if (response.message === "Network Error") {
           notifications.error(response.message);
         } else {
-          notifications.error("Failed to rename collection!");
+          notifications.error("Failed to rename collection. Please try again.");
         }
       }
     } else {
@@ -1465,7 +1506,7 @@ export default class CollectionsViewModel {
         this.updateTab(collection.id, { name: newCollectionName });
         notifications.success("Collection renamed successfully!");
       } else {
-        notifications.error("Failed to rename collection!");
+        notifications.error("Failed to rename collection. Please try again.");
       }
     }
   };
@@ -1537,7 +1578,7 @@ export default class CollectionsViewModel {
           explorer.id,
           res,
         );
-        notifications.success("Folder renamed successfully!");
+        // notifications.success("Folder renamed successfully!");
 
         this.updateTab(explorer.id, {
           name: newFolderName,
@@ -2006,7 +2047,7 @@ export default class CollectionsViewModel {
       });
     } else {
       notifications.error(
-        response.message ?? "Failed to delete the Collection.",
+        response.message ?? "Failed to delete collection. Please try again.",
       );
     }
   };
@@ -2071,7 +2112,7 @@ export default class CollectionsViewModel {
         source: "Collection list",
       });
     } else {
-      notifications.error("Failed to delete the Folder.");
+      notifications.error("Failed to delete folder. Please try again.");
     }
   };
 
@@ -2162,7 +2203,7 @@ export default class CollectionsViewModel {
       });
       return true;
     } else {
-      notifications.error("Failed to delete the Request.");
+      notifications.error("Failed to delete API request. Plaease try again.");
       return false;
     }
   };
@@ -2252,7 +2293,7 @@ export default class CollectionsViewModel {
       });
       return true;
     } else {
-      notifications.error("Failed to delete the WebSocket.");
+      notifications.error("Failed to delete WebSocket. Plaease try again.");
       return false;
     }
   };
@@ -2331,7 +2372,7 @@ export default class CollectionsViewModel {
             collection.id,
             response.data.data.collection,
           );
-          notifications.success("Collection synced.");
+          notifications.success("Collection synced successfully.");
         } else {
           notifications.error(
             "Failed to sync the collection. Please try again.",
@@ -2987,16 +3028,25 @@ export default class CollectionsViewModel {
   public collectionFileUpload = async (
     currentWorkspaceId: string,
     file: File,
+    type: string,
   ) => {
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
     if (isGuestUser !== true) {
-      const response = await this.collectionService.importCollectionFromFile(
-        currentWorkspaceId,
-        file,
-      );
+      let response;
+      if (type === "POSTMAN") {
+        response = await this.collectionService.importCollectionFromPostmanFile(
+          currentWorkspaceId,
+          file,
+        );
+      } else {
+        response = await this.collectionService.importCollectionFromFile(
+          currentWorkspaceId,
+          file,
+        );
+      }
       if (response.isSuccessful) {
         const path = {
           workspaceId: currentWorkspaceId,
@@ -3166,7 +3216,7 @@ export default class CollectionsViewModel {
         const col: CollectionDocType = colData.toMutableJSON();
         col.name = newCollectionName;
         this.collectionRepository.updateCollection(collectionId, col);
-        notifications.success("Collection renamed successfully!");
+        // notifications.success("Collection renamed successfully!");
         return {
           isSuccessful: true,
         };
@@ -3185,7 +3235,7 @@ export default class CollectionsViewModel {
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {
-        notifications.error("Failed to rename collection!");
+        notifications.error("Failed to rename collection. Please try again.");
       }
       return response;
     }
@@ -3241,7 +3291,7 @@ export default class CollectionsViewModel {
           folderId,
           res,
         );
-        notifications.success("Folder renamed successfully!");
+        // notifications.success("Folder renamed successfully!");
         return {
           isSuccessful: true,
         };
@@ -3263,7 +3313,7 @@ export default class CollectionsViewModel {
         );
         notifications.success("Folder renamed successfully!");
       } else {
-        notifications.error("Failed to rename folder!");
+        notifications.error("Failed to rename folder. Please try again.");
       }
       return response;
     }

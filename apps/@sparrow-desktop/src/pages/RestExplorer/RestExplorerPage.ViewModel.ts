@@ -84,6 +84,9 @@ import {
   type StatePartial,
   type Conversation,
   MessageTypeEnum,
+  ResponseSectionEnum,
+  RequestDataTypeEnum,
+  ResponseFormatterEnum,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { RequestTabAdapter } from "../../adapter/request-tab";
@@ -96,6 +99,7 @@ import { AiAssistantService } from "../../services/ai-assistant.service";
 import type { GuideQuery } from "../../types/user-guide";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import type { Socket } from "socket.io-client";
+import { restExplorerDataStore } from "@workspaces/features/rest-explorer/store";
 
 class RestExplorerViewModel
   implements
@@ -602,6 +606,42 @@ class RestExplorerViewModel
 
   /**
    *
+   * @param  - response state
+   */
+  public updateResponseState = async (key, val) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (key === "responseNavigation") {
+      restExplorerDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.response.navigation = val;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    } else if (key === "responseBodyLanguage") {
+      restExplorerDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.response.bodyLanguage = val;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    } else if (key === "responseBodyFormatter") {
+      restExplorerDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.response.bodyFormatter = val;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    }
+  };
+
+  /**
+   *
    * @param _auth - request auth
    */
   public updateRequestAuth = async (_auth: Auth) => {
@@ -664,24 +704,64 @@ class RestExplorerViewModel
    * @description send request
    */
   public sendRequest = async (environmentVariables = []) => {
-    this.updateRequestState({ isSendRequestInProgress: true });
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const abortController = new AbortController();
+    restExplorerDataStore.update((restApiDataMap) => {
+      let data = restApiDataMap.get(progressiveTab.tabId);
+      if (data) {
+        data.abortController = abortController;
+      } else {
+        data = {
+          abortController: abortController,
+          response: {
+            body: "",
+            headers: [],
+            status: "",
+            time: 0,
+            size: 0,
+            navigation: ResponseSectionEnum.RESPONSE,
+            bodyLanguage: RequestDataTypeEnum.TEXT,
+            bodyFormatter: ResponseFormatterEnum.PRETTY,
+          },
+          isSendRequestInProgress: false,
+        };
+      }
+      restApiDataMap.set(progressiveTab.tabId, data);
+      return restApiDataMap;
+    });
+    // Create an AbortController for the request
+    const { signal } = abortController; // Extract the signal for the request
+
+    restExplorerDataStore.update((restApiDataMap) => {
+      let data = restApiDataMap.get(progressiveTab?.tabId);
+      if (data) {
+        data.isSendRequestInProgress = true;
+      }
+      restApiDataMap.set(progressiveTab.tabId, data);
+      return restApiDataMap;
+    });
     const start = Date.now();
 
     const decodeData = this._decodeRequest.init(
       this._tab.getValue().property.request,
       environmentVariables.filtered || [],
     );
-    makeHttpRequestV2(...decodeData)
+    makeHttpRequestV2(...decodeData, signal)
       .then((response) => {
         if (response.isSuccessful === false) {
-          this.updateResponse({
-            body: "",
-            headers: [],
-            status: ResponseStatusCode.ERROR,
-            time: 0,
-            size: 0,
+          restExplorerDataStore.update((restApiDataMap) => {
+            const data = restApiDataMap.get(progressiveTab?.tabId);
+            if (data) {
+              data.response.body = "";
+              data.response.headers = [];
+              data.response.status = ResponseStatusCode.ERROR;
+              data.response.time = 0;
+              data.response.size = 0;
+              data.isSendRequestInProgress = false;
+            }
+            restApiDataMap.set(progressiveTab.tabId, data);
+            return restApiDataMap;
           });
-          this.updateRequestState({ isSendRequestInProgress: false });
         } else {
           const end = Date.now();
           const byteLength = new TextEncoder().encode(
@@ -703,33 +783,69 @@ class RestExplorerViewModel
           let responseStatus = response.data.status;
           const bodyLanguage =
             this._decodeRequest.setResponseContentType(responseHeaders);
-          this.updateRequestState({
-            responseBodyLanguage: bodyLanguage,
-            isSendRequestInProgress: false,
+
+          restExplorerDataStore.update((restApiDataMap) => {
+            let data = restApiDataMap.get(progressiveTab?.tabId);
+            if (data) {
+              data.response.body = responseBody;
+              data.response.headers = responseHeaders;
+              data.response.status = responseStatus;
+              data.response.time = duration;
+              data.response.size = responseSizeKB;
+              data.response.bodyLanguage = bodyLanguage;
+              data.isSendRequestInProgress = false;
+            }
+            restApiDataMap.set(progressiveTab.tabId, data);
+            return restApiDataMap;
           });
-
-          const resData = {
-            body: responseBody,
-            headers: responseHeaders,
-            status: responseStatus,
-            time: duration,
-            size: responseSizeKB,
-          };
-
-          this.updateResponse(resData);
         }
       })
       .catch((error) => {
-        this.updateRequestState({ isSendRequestInProgress: false });
+        // Handle cancellation or other errors
+        if (error.name === "AbortError") {
+          return;
+        }
 
-        this.updateResponse({
-          body: "",
-          headers: [],
-          status: ResponseStatusCode.ERROR,
-          time: 0,
-          size: 0,
+        restExplorerDataStore.update((restApiDataMap) => {
+          const data = restApiDataMap.get(progressiveTab?.tabId);
+          if (data) {
+            data.response.body = "";
+            data.response.headers = [];
+            data.response.status = ResponseStatusCode.ERROR;
+            data.response.time = 0;
+            data.response.size = 0;
+            data.isSendRequestInProgress = false;
+          }
+          restApiDataMap.set(progressiveTab.tabId, data);
+          return restApiDataMap;
         });
       });
+  };
+
+  /**
+   * aborts the ongoing api request
+   */
+  public cancelRequest = (): Promise<void> => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    let abortController;
+    restExplorerDataStore.update((restApiDataMap) => {
+      const data = restApiDataMap.get(progressiveTab.tabId);
+      if (data) {
+        abortController = data.abortController;
+      }
+      return restApiDataMap;
+    });
+    if (abortController) {
+      abortController.abort(); // Abort the request using the stored controller
+      restExplorerDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.isSendRequestInProgress = false;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    }
   };
 
   /**
@@ -1528,7 +1644,7 @@ class RestExplorerViewModel
           });
         }
 
-        notifications.success("Environment Variable Added");
+        notifications.success("Environment variable added successfully.");
         return {
           isSuccessful: true,
         };
@@ -1560,9 +1676,11 @@ class RestExplorerViewModel
           });
         }
 
-        notifications.success("Environment Variable Added");
+        notifications.success("Environment variable added successfully.");
       } else {
-        notifications.error("Failed to add Environment Variable");
+        notifications.error(
+          "Failed to add environment variable. Please try again.",
+        );
       }
       return response;
     } else {
@@ -1611,7 +1729,7 @@ class RestExplorerViewModel
           });
         }
 
-        notifications.success("Environment Variable Added");
+        notifications.success("Environment variable added successfully.");
         return {
           isSuccessful: true,
         };
@@ -1643,9 +1761,11 @@ class RestExplorerViewModel
           });
         }
 
-        notifications.success("Environment Variable Added");
+        notifications.success("Environment variable added successfully.");
       } else {
-        notifications.error("Failed to add Environment Variable");
+        notifications.error(
+          "Failed to add environment variable. Please try again.",
+        );
       }
       return response;
     }
@@ -1696,7 +1816,7 @@ class RestExplorerViewModel
         col = col.toMutableJSON();
         col.name = newCollectionName;
         this.collectionRepository.updateCollection(collectionId, col);
-        notifications.success("Collection renamed successfully!");
+        // notifications.success("Collection renamed successfully!");
         return {
           isSuccessful: true,
         };
@@ -1711,11 +1831,11 @@ class RestExplorerViewModel
           collectionId,
           response.data.data,
         );
-        notifications.success("Collection renamed successfully!");
+        // notifications.success("Collection renamed successfully!");
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {
-        notifications.error("Failed to rename collection!");
+        notifications.error("Failed to rename collection. Please try again.");
       }
       return response;
     }
@@ -1769,7 +1889,7 @@ class RestExplorerViewModel
           folderId,
           res,
         );
-        notifications.success("Folder renamed successfully!");
+        // notifications.success("Folder renamed successfully!");
         return {
           isSuccessful: true,
         };
@@ -1789,9 +1909,9 @@ class RestExplorerViewModel
           folderId,
           response.data.data,
         );
-        notifications.success("Folder renamed successfully!");
+        // notifications.success("Folder renamed successfully!");
       } else {
-        notifications.error("Failed to rename folder!");
+        notifications.error("Failed to rename folder. Please try again.");
       }
       return response;
     }
@@ -1888,10 +2008,15 @@ class RestExplorerViewModel
       await this.displayDataInChunks(data.result, 100, 300);
     } else {
       // Update the conversation with an error message
+      let errorMessage = "Something went wrong! Please try again.";
+      if (response.message === "Limit reached") {
+        errorMessage =
+          "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
+      }
       this.updateRequestAIConversation([
         ...(componentData?.property?.request?.ai?.conversations || []),
         {
-          message: "Something went wrong! Please try again.",
+          message: errorMessage,
           messageId: uuidv4(),
           type: MessageTypeEnum.RECEIVER,
           isLiked: false,
@@ -2027,6 +2152,10 @@ class RestExplorerViewModel
       await this.updateRequestState({
         isDocAlreadyGenerated: true,
       });
+    } else if (response?.message === "Limit reached") {
+      notifications.error(
+        "Failed to generate documentation. Your monthly AI usage limit is reached.",
+      );
     }
     setTimeout(async () => {
       // renders response before disabling the editor

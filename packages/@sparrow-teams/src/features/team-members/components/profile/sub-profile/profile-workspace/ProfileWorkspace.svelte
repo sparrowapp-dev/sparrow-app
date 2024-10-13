@@ -7,6 +7,7 @@
   export let userType;
   export let handleMemberPopUpSuccess;
   export let workspaceCount;
+  export let owner;
 
   /**
    * function to remove member from workspace
@@ -90,7 +91,7 @@
           menuItem={"v2"}
           headerTheme={"violet"}
           borderType={"none"}
-          disabled={false}
+          disabled={owner}
           bodyTheme={"violet"}
           headerFontSize={"10px"}
           borderRounded={"4px"}

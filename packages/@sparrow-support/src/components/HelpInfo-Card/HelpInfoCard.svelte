@@ -21,10 +21,12 @@
           <p class="card-title pb-0 mb-0 ellipsis" style="font-weight: 500; ">
             {status.title}
           </p>
-          <span class="category">{status?.category?.name}</span>
+          <span class="category"
+            >{status?.category?.name || "Uncategorized"}</span
+          >
         </div>
 
-        <Upvote upvote={status.score} />
+        <Upvote isHoverRequired={false} upvote={status.score} />
       </div>
     </div>
   {/each}

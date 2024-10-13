@@ -43,7 +43,7 @@
         }, WAIT_TIME_BEFORE_RESTART_IN_SECONDS * 1000);
       }
     } catch (e) {
-      notifications.error("Update Failed!");
+      notifications.error("Update Failed.");
       console.error(e);
     } finally {
       showProgressBar = false;

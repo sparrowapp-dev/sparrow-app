@@ -129,7 +129,7 @@
         },
         {
           onClick: renameTestflow,
-          displayText: "Rename",
+          displayText: "Rename Flow",
           disabled: false,
         },
         {
@@ -271,7 +271,7 @@
           class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
             ? 'threedot-active'
             : ''}"
-          style="transform: rotate(90deg);"
+          style=""
           on:click={(e) => {
             rightClickContextMenu();
           }}
@@ -309,7 +309,7 @@
       background-color: var(--bg-secondary-400);
     }
     .threedot-icon-container:hover {
-      background-color: var(--text-tertiary-600);
+      background-color: var(--text-tertiary-500);
     }
 
     .btn-primary {

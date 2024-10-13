@@ -303,7 +303,7 @@
 
       {#if !filteredWebsocketMessage?.length && (searchData || webSocket.filter !== "All messages")}
         <p class="text-fs-16 text-center text-secondary-200">
-          No results found.
+          No result found.
         </p>
       {/if}
     </div>

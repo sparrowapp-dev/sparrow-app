@@ -280,11 +280,11 @@
       if (response.isSuccessful) {
         collectionsMethods.updateCollection(collectionId, response.data.data);
         collectionsMethods.updateTab(newCollectionName, "name", collectionId);
-        notifications.success("Collection renamed successfully!");
+        // notifications.success("Collection renamed successfully!");
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {
-        notifications.error("Failed to rename collection!");
+        notifications.error("Failed to rename collection. Please try again.");
       }
     }
     isRenaming = false;
@@ -506,7 +506,7 @@
     } else {
       handleCollectionPopUp(false);
       notifications.error(
-        response.message ?? "Failed to delete the Collection.",
+        response.message ?? "Failed to delete collection. Please try again.",
       );
       deleteLoader = false;
     }
@@ -571,7 +571,7 @@
           collection.id,
           response.data.data.collection,
         );
-        notifications.success("Collection synced.");
+        notifications.success("Collection synced successfully.");
       } else {
         notifications.error("Failed to sync the collection. Please try again.");
       }

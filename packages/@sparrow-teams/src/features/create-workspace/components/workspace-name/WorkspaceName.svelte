@@ -47,15 +47,15 @@
     placeholder={NAME_CONFIG.PLACEHOLDER}
     class="text-fs-14 bg-tertiary-300 fw-normal px-2 border-radius-4"
     style="outline:none;"
-    defaultBorderColor={!workspaceForm.name.value &&
+    defaultBorderColor={!workspaceForm.name.value.trim() &&
     workspaceForm.name.isTouched
       ? "var(--border-danger-200)"
       : "transparent"}
-    hoveredBorderColor={!workspaceForm.name.value &&
+    hoveredBorderColor={!workspaceForm.name.value.trim() &&
     workspaceForm.name.isTouched
       ? "var(--border-danger-200)"
       : "transparent"}
-    focusedBorderColor={!workspaceForm.name.value &&
+    focusedBorderColor={!workspaceForm.name.value.trim() &&
     workspaceForm.name.isTouched
       ? "var(--border-danger-200)"
       : "transparent"}
@@ -67,7 +67,7 @@
   <!-- 
       -- Error Messages 
     -->
-  {#if !workspaceForm.name.value && workspaceForm.name.isTouched}
+  {#if !workspaceForm.name.value.trim() && workspaceForm.name.isTouched}
     <p class="mb-0 mt-1 text-fs-12 text-danger-200">
       {NAME_CONFIG.REQUIRED_ERROR_MESSAGE}
     </p>

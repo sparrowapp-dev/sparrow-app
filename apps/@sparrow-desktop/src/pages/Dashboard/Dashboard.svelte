@@ -39,7 +39,7 @@
       await _viewModel.refreshTeamsWorkspaces(value._id);
     }
   });
-  const refreshEnv = _viewModel.refreshEnvironment;
+
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.getActiveWorkspace();
   let workspaceDocuments: Observable<WorkspaceDocument[]>;
@@ -70,7 +70,6 @@
         currentWorkspaceName = activeWorkspaceRxDoc.name;
         currentTeamName = activeWorkspaceRxDoc.team?.teamName;
         currentTeamId = activeWorkspaceRxDoc.team?.teamId;
-        refreshEnv(activeWorkspaceRxDoc?._id);
         const envIdInitiatedToWorkspace =
           activeWorkspaceRxDoc.get("environmentId");
         if (envIdInitiatedToWorkspace) {
@@ -167,7 +166,7 @@
         }, WAIT_TIME_BEFORE_RESTART_IN_SECONDS * 1000);
       }
     } catch (e) {
-      notifications.error("Update Failed!");
+      notifications.error("Update Failed.");
       console.error(e);
     } finally {
       showProgressBar = false;

@@ -18,6 +18,7 @@ import type { Team } from "@sparrow/common/interfaces";
 import { UserService } from "../../services/user.service";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums";
+import { WorkspaceService } from "@app/services/workspace.service";
 
 export class TeamsViewModel {
   constructor() {}
@@ -28,6 +29,7 @@ export class TeamsViewModel {
   private githhubRepoRepository = new GithubRepoReposistory();
   private githubService = new GithubService();
   private guestUserRepository = new GuestUserRepository();
+  private workspaceService = new WorkspaceService();
 
   private collectionRepository = new CollectionRepository();
   private userService = new UserService();
@@ -57,33 +59,66 @@ export class TeamsViewModel {
 
   /**
    * sync teams data with backend server
-   * @param userId - used to query teams with field userId
+   * @param userId User id
    */
   public refreshTeams = async (userId: string): Promise<void> => {
-    let openTeamId: string = "";
-    const teamsData = await this.teamRepository.getTeamData();
-    teamsData.forEach((element) => {
-      const elem = element.toMutableJSON();
-      if (elem.isOpen) openTeamId = elem.teamId;
-    });
+    if (!userId) return;
     const response = await this.teamService.fetchTeams(userId);
+    let isAnyTeamsOpen: undefined | string = undefined;
     if (response?.isSuccessful && response?.data?.data) {
-      const data = response.data.data.map((elem) => {
-        const teamAdapter = new TeamAdapter();
-        return teamAdapter.adapt(elem).getValue();
-      });
-      if (openTeamId) {
-        data.forEach((elem) => {
-          if (elem.teamId === openTeamId) {
-            elem.isOpen = true;
-          } else {
-            elem.isOpen = false;
-          }
-        });
-      } else {
-        data[0].isOpen = true;
+      const data = [];
+      for (const elem of response.data.data) {
+        const {
+          _id,
+          name,
+          users,
+          description,
+          logo,
+          workspaces,
+          owner,
+          admins,
+          createdAt,
+          createdBy,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+        } = elem;
+        const updatedWorkspaces = workspaces.map((workspace) => ({
+          workspaceId: workspace.id,
+          name: workspace.name,
+        }));
+        const isOpenTeam = await this.teamRepository.checkIsTeamOpen(_id);
+        if (isOpenTeam) isAnyTeamsOpen = _id;
+        const item = {
+          teamId: _id,
+          name,
+          users,
+          description,
+          logo,
+          workspaces: updatedWorkspaces,
+          owner,
+          admins,
+          isActiveTeam: false,
+          createdAt,
+          createdBy,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+          isOpen: isOpenTeam,
+        };
+        data.push(item);
       }
+
       await this.teamRepository.bulkInsertData(data);
+      await this.teamRepository.deleteOrphanTeams(
+        data.map((_team) => {
+          return _team.teamId;
+        }),
+      );
+      if (!isAnyTeamsOpen) {
+        this.teamRepository.setOpenTeam(data[0].teamId);
+        return;
+      }
     }
   };
 
@@ -119,7 +154,7 @@ export class TeamsViewModel {
       await this.teamRepository.setOpenTeam(response.data.data?._id);
       notifications.success(`New team ${team.name} is created.`);
     } else {
-      notifications.error("Failed to create a new team. Please try again.");
+      notifications.error("Failed to create team. Please try again.");
     }
     MixpanelEvent(Events.CREATE_NEW_TEAM);
     return response;
@@ -253,5 +288,70 @@ export class TeamsViewModel {
    */
   public modifyTeam = async (teamId: string, team: any): Promise<void> => {
     await this.teamRepository.modifyTeam(teamId, team);
+  };
+
+  /**
+   * sync workspace data with backend server
+   * @param userId User id
+   */
+  public refreshWorkspaces = async (userId: string): Promise<void> => {
+    if (!userId) return;
+    const response = await this.workspaceService.fetchWorkspaces(userId);
+    let isAnyWorkspaceActive: undefined | string = undefined;
+    const data = [];
+    const isSuccessful = response?.isSuccessful;
+    const res = response?.data?.data;
+    if (isSuccessful && res) {
+      for (const elem of res) {
+        const {
+          _id,
+          name,
+          description,
+          users,
+          admins,
+          team,
+          createdAt,
+          createdBy,
+          collection,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+        } = elem;
+        const isActiveWorkspace =
+          await this.workspaceRepository.checkActiveWorkspace(_id);
+        if (isActiveWorkspace) isAnyWorkspaceActive = _id;
+        const item = {
+          _id,
+          name,
+          description,
+          users,
+          collections: collection ? collection : [],
+          admins: admins,
+          team: {
+            teamId: team.id,
+            teamName: team.name,
+          },
+          environmentId: "",
+          isActiveWorkspace: isActiveWorkspace,
+          createdAt,
+          createdBy,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+        };
+        data.push(item);
+      }
+      await this.workspaceRepository.bulkInsertData(data);
+      await this.workspaceRepository.deleteOrphanWorkspaces(
+        data.map((_workspace) => {
+          return _workspace._id;
+        }),
+      );
+      if (!isAnyWorkspaceActive) {
+        this.workspaceRepository.setActiveWorkspace(data[0]._id);
+        return;
+      }
+      return;
+    }
   };
 }

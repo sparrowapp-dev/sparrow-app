@@ -111,7 +111,7 @@
       notifications.error(response.message);
     } else {
       tabName = currentWorkspaceDetails.name;
-      notifications.error("Failed to rename workspace!");
+      notifications.error("Failed to rename workspace. Please try again.");
     }
   };
 

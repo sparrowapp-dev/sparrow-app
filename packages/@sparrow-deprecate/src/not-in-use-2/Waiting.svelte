@@ -21,7 +21,7 @@
     setAuthJwt(constants.REF_TOKEN, refreshToken);
     setUser(jwtDecode(accessToken));
 
-    notifications.success("Login successful!");
+    notifications.success("You're logged in successfully.");
     navigate("/dashboard");
   });
 </script> -->

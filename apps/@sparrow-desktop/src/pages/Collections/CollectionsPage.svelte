@@ -66,6 +66,10 @@
   import TestFlowExplorerPage from "../TestflowExplorerPage/TestflowExplorerPage.svelte";
   import { TestflowViewModel } from "./Testflow.ViewModel";
   import { version } from "../../../src-tauri/tauri.conf.json";
+  import { Button } from "@sparrow/library/ui";
+  import { isUserFirstSignUp } from "@app/store/user.store";
+  // import { WelcomeLogo } from "@common/images";
+  // import { WelcomePopup } from "@workspaces/features/welcome-popup";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -240,7 +244,7 @@
             loader = false;
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
-            notifications.success("API request saved");
+            notifications.success("API request saved successfully.");
           }
         } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
           const res = await _viewModel.saveSocket(removeTab);
@@ -248,7 +252,7 @@
             loader = false;
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
-            notifications.success("WebSocket request saved");
+            notifications.success("WebSocket request saved successfully.");
           }
         }
         loader = false;
@@ -286,16 +290,44 @@
   /**
    * Refreshing collection whenever workspace switches
    */
-  let tabList;
-  let activeTab;
+  let tabList: Observable<TabDocument[]> | undefined;
+  let activeTab: Observable<TabDocument | null> | undefined;
   let prevWorkspaceId = "";
   let count = 0;
-  const cw = currentWorkspace.subscribe((value) => {
+  const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
-        _viewModel.fetchCollections(value?._id);
-        _viewModel2.refreshEnvironment(value?._id);
-        _viewModel3.refreshTestflow(value?._id);
+        Promise.all([
+          _viewModel.fetchCollections(value?._id),
+          _viewModel2.refreshEnvironment(value?._id),
+          _viewModel3.refreshTestflow(value?._id),
+          ,
+        ]).then(
+          ([
+            fetchCollectionsResult,
+            refreshEnvironmentResult,
+            refreshTestflowResult,
+          ]) => {
+            // Handle the results of each API call here
+
+            const collectionTabsToBeDeleted =
+              fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
+            const environmentTabsToBeDeleted =
+              refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
+            const testflowTabsToBeDeleted =
+              refreshTestflowResult?.testflowTabsToBeDeleted || [];
+            const totalTabsToBeDeleted: string[] = [
+              ...collectionTabsToBeDeleted,
+              ...environmentTabsToBeDeleted,
+              ...testflowTabsToBeDeleted,
+            ];
+            _viewModel.deleteTabsWithTabIdInAWorkspace(
+              value?._id,
+              totalTabsToBeDeleted,
+            );
+          },
+        );
+
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
       }
@@ -304,7 +336,7 @@
         let url = window.location.href;
         const params = new URLSearchParams(url.split("?")[1]);
         const isNew = params.get("first");
-        if (isNew === "true") _viewModel.createNewTab();
+        if (isNew === "true") _viewModel.createNewTabWithData();
         count = count + 1;
       }
       value.users?.forEach((user) => {
@@ -323,6 +355,15 @@
       splitter.style.display = "unset";
     }
   }
+
+  let isWelcomePopupOpen = false;
+  let isTourGuideOpen = false;
+  isUserFirstSignUp.subscribe((value) => {
+    if (value) {
+      isWelcomePopupOpen = value;
+      isExpandCollection = value;
+    }
+  });
 
   onDestroy(() => {
     cw.unsubscribe();
@@ -413,7 +454,7 @@
                 {#if $activeTab?.type === ItemType.REQUEST}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
-                      <RestExplorerPage tab={$activeTab} />
+                      <RestExplorerPage bind:isTourGuideOpen tab={$activeTab} />
                     </div>
                   </Motion>
                 {:else if $activeTab?.type === ItemType.COLLECTION}
@@ -491,6 +532,30 @@
   {isGuestUser}
 />
 
+<!-- <Modal
+  title={""}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isWelcomePopupOpen}
+  handleModalState={() => {
+    isUserFirstSignUp.set(false);
+    isWelcomePopupOpen = false;
+  }}
+>
+  <WelcomePopup
+    onClickExplore={() => {
+      isUserFirstSignUp.set(false);
+      isWelcomePopupOpen = false;
+    }}
+    onClickTour={() => {
+      isUserFirstSignUp.set(false);
+      isTourGuideOpen = true;
+      isWelcomePopupOpen = false;
+    }}
+  />
+</Modal> -->
+
 <svelte:window on:keydown={handleKeyPress} />
 <!-- <ImportCollection
     {collectionList}
@@ -550,10 +615,11 @@
       }
       return response;
     }}
-    onCollectionFileUpload={async (currentWorkspaceId, file) => {
+    onCollectionFileUpload={async (currentWorkspaceId, file, type) => {
       const response = await _viewModel.collectionFileUpload(
         currentWorkspaceId,
         file,
+        type,
       );
       if (response.isSuccessful) {
         setTimeout(() => {
@@ -680,5 +746,13 @@
       .collection-splitter .splitpanes__splitter:hover
     ) {
     background-color: var(--bg-primary-200) !important;
+  }
+  .gradient-text {
+    font-size: 18;
+    font-weight: 500;
+    display: inline-block;
+    background: linear-gradient(270deg, #6147ff 2.55%, #1193f0 31.48%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 </style>
