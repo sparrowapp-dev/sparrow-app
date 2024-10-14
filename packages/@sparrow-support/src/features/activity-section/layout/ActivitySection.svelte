@@ -30,6 +30,7 @@
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   import { ArrowOutwardIcon } from "@sparrow/library/icons";
   import { SparrowLogo } from "@sparrow/common/images";
+  import { Upvote } from "../../../components";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
