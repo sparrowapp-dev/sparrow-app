@@ -1,7 +1,13 @@
 <script lang="ts">
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Dropdown, Tooltip } from "@sparrow/library/ui";
   import plus from "@deprecate/assets/plus.svg";
-  import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
+  import {
+    DoubleArrowIcon,
+    GithubIcon,
+    MacIcon,
+    TriangleIcon,
+    WindowsIcon,
+  } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import type { TabDocument, TeamDocument } from "@app/database/database";
   import { RecentWorkspace, RecentApis } from "../../../features";
@@ -10,6 +16,9 @@
   import { List } from "@sparrow/library/ui";
   import { PeopleIcon } from "@deprecate/assets";
   import constants from "@app/constants/constants";
+  import { onMount } from "svelte";
+  import { navigate } from "svelte-navigator";
+
   export let teamList: TeamDocument[] = [];
   export let tabList: TabDocument[] = [];
   export let isCreateTeamModalOpen;
@@ -43,6 +52,37 @@
   }
 
   export let appVersion;
+
+  let isExpandLoginButton = false;
+  let isHovered = false;
+
+  const handleMouseOver = () => {
+    isHovered = true;
+  };
+
+  const handleMouseOut = () => {
+    isHovered = false;
+  };
+
+  let windowOs = true;
+
+  function getOS() {
+    let userAgent = window.navigator.userAgent;
+    if (userAgent.indexOf("Mac") != -1) {
+      windowOs = true;
+    } else if (userAgent.indexOf("Windows") != -1) {
+      windowOs = false;
+    }
+  }
+  onMount(() => {
+    getOS();
+  });
+
+  const accessToken = localStorage.getItem("accessToken");
+  const refreshToken = localStorage.getItem("refreshToken");
+
+  let sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email`;
+  
 </script>
 
 {#if leftPanelController.leftPanelCollapse}
@@ -169,6 +209,85 @@
         </section>
       {/if}
     </div>
+
+    <section>
+      <Dropdown
+        zIndex={600}
+        buttonId="isExpandLoginButton"
+        bind:isMenuOpen={isExpandLoginButton}
+        options={[
+          {
+            name: "Windows",
+            icon: WindowsIcon,
+            iconColor: "var(--icon-primary-300)",
+            color: "var(--text-secondary-100)",
+            iconSize: "13px",
+            onclick: () => {},
+          },
+          {
+            name: "Mac OS",
+            icon: MacIcon,
+            iconColor: "var(--icon-primary-300)",
+            color: "var(--text-secondary-100)",
+            iconSize: "12px",
+            onclick: () => {},
+          },
+        ]}
+        horizontalPosition="left"
+        minWidth={213}
+        verticalPosition="top"
+      >
+        <button
+          id="isExpandLoginButton"
+          class="d-flex align-items-center rounded-1 me-0 mb-0 p-2"
+          style="border:none; cursor:pointer; justify-content:center; height:32px; background-color:var(  --bg-primary-300) ; width:100%; "
+          on:mouseover={handleMouseOver}
+          on:mouseout={handleMouseOut}
+        >
+          <div class="d-flex align-items-center justify-content-center">
+            {#if windowOs}
+              <MacIcon height={"12px"} width={"12px"} color={"white"} />
+            {:else}
+              <WindowsIcon height={"12px"} width={"12px"} color={"white"} />
+            {/if}
+
+            <p
+              class="ms-2 mb-0 text-fs-12"
+              style="font-weight: 500;"
+              on:click={() => {
+                if (sparrowRedirect) {
+                  navigate(sparrowRedirect);
+                } else {
+                  navigate("https://sparrowapp.dev/");
+                }
+              }}
+            >
+              Go to Desktop App
+            </p>
+
+            <div
+              class="ms-3"
+              style="height: 10px;  width:0.1px; background-color:white"
+            ></div>
+
+            <div
+              class="ms-3"
+              style={isExpandLoginButton
+                ? "transform:rotate(0deg);"
+                : "transform:rotate(90deg);"}
+              on:click={() => {
+                isExpandLoginButton = !isExpandLoginButton;
+              }}
+              on:blur={() => {
+                isExpandCollection = false;
+              }}
+            >
+              <TriangleIcon height={"12px"} width={"12px"} color={"white"} />
+            </div>
+          </div>
+        </button>
+      </Dropdown>
+    </section>
 
     <!-- github repo section -->
     <section>
