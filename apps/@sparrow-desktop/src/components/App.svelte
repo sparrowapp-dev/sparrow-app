@@ -4,8 +4,8 @@
   import { Toast } from "@sparrow/library/ui";
   import Authguard from "../routing/Authguard.svelte";
   import Navigate from "../routing/Navigate.svelte";
-  import Dashboard from "@app/pages/Dashboard/Dashboard.svelte";
-  import EntryPoint from "@app/pages/Auth/entry-point/EntryPoint.svelte";
+  import Dashboard from "@app/pages/dashboard-page/Dashboard.svelte";
+  import EntryPoint from "@app/pages/Auth/Auth.svelte";
   import { resizeWindowOnLogin } from "../utils";
   import { registerDeepLinkHandler } from "@app/utils/deeplink/app.deeplink";
   import { onMount } from "svelte";
@@ -13,7 +13,7 @@
   import { handleShortcuts } from "@app/utils/shortcuts";
   import { AppUpdater } from "@sparrow/common/features";
   import { getCurrent } from "@tauri-apps/api/window";
-  import LoginPage from "@app/pages/Auth/login-page/LoginPage.svelte";
+  import LoginPage from "@app/pages/Auth/sub-pages/login-page/LoginPage.svelte";
   import { singleInstanceHandler } from "@app/utils/singleinstance/app.singleinstance";
 
   export let url = "/";
