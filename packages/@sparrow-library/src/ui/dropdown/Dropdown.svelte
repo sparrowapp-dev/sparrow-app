@@ -39,6 +39,8 @@
     left: 0,
   };
 
+  export let verticalPosition: "top" | "bottom" = "bottom";
+
   onMount(() => {
     /**
      * click event to close the dropdown menu if click anywhere if menu is open
@@ -61,12 +63,16 @@
   });
 
   afterUpdate(() => {
-    /**
-     * calculate the position of the menu container
-     */
     const dropdownElement = document.getElementById(buttonId);
     let position = dropdownElement.getBoundingClientRect();
-    menuPosition.top = position.bottom + 10;
+
+    // Adjust menu position based on verticalPosition (top or bottom)
+    if (verticalPosition === "bottom") {
+      menuPosition.top = position.bottom + 10; // Show below the button
+    } else {
+      menuPosition.top = position.top - 50 - dropdownElement.offsetHeight; // Show above the button
+    }
+
     if (horizontalPosition === "right") {
       menuPosition.left = position.left;
     } else {
@@ -76,12 +82,12 @@
 </script>
 
 <div class="position-relative" style="font-size: 12px;">
-  <!-- 
+  <!--
     the button to open the menu container
   -->
   <slot />
 
-  <!-- 
+  <!--
     the menu container
   -->
   {#if isMenuOpen}
@@ -92,7 +98,7 @@
       "
       style="min-width: {minWidth}px; top: {menuPosition.top}px; left: {menuPosition.left}px; z-index: 1000000;"
     >
-      <!-- 
+      <!--
       Menu item
     -->
       {#each options as item}

@@ -102,3 +102,5 @@ export { default as MessageIcon } from "./MessageIcon.svelte";
 export { default as MessageDisabledIcon } from "./MessageDisabledIcon.svelte";
 export { default as BoxBarIcon } from "./BoxBarIcon.svelte";
 export { default as PostIcon } from "./PostIcon.svelte";
+export { default as WindowsIcon } from "./WindowsIcon.svelte";
+export { default as MacIcon } from "./MacIcon.svelte";
