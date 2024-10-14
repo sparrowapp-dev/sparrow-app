@@ -283,13 +283,17 @@ export class TestflowViewModel {
    * @param workspaceId - workspace Id to which testflow belongs
    * @returns
    */
-  public refreshTestflow = async (workspaceId: string) => {
+  public refreshTestflow = async (
+    workspaceId: string,
+  ): Promise<{
+    testflowTabsToBeDeleted?: string[];
+  }> => {
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
     const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
     if (isGuestUser) {
-      return;
+      return {};
     }
     const response = await this.testflowService.fetchAllTestflow(workspaceId);
     if (response?.isSuccessful && response?.data?.data) {
@@ -307,8 +311,18 @@ export class TestflowViewModel {
           return _testflow._id;
         }),
       );
+      const testflowTabsToBeDeleted =
+        await this.tabRepository.getIdOfTabsThatDoesntExistAtTestflowLevel(
+          workspaceId,
+          testflows?.map((_testflow: any) => {
+            return _testflow._id;
+          }),
+        );
+      return {
+        testflowTabsToBeDeleted,
+      };
     }
-    return;
+    return {};
   };
 
   /**

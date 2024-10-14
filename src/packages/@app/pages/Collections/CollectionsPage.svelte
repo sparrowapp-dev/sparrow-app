@@ -293,16 +293,44 @@
   /**
    * Refreshing collection whenever workspace switches
    */
-  let tabList;
-  let activeTab;
+  let tabList : Observable<TabDocument[]> | undefined;
+  let activeTab : Observable<TabDocument | null> | undefined;
   let prevWorkspaceId = "";
   let count = 0;
-  const cw = currentWorkspace.subscribe((value) => {
+  const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
-        _viewModel.fetchCollections(value?._id);
-        _viewModel2.refreshEnvironment(value?._id);
-        _viewModel3.refreshTestflow(value?._id);
+        Promise.all([
+          _viewModel.fetchCollections(value?._id),
+          _viewModel2.refreshEnvironment(value?._id),
+          _viewModel3.refreshTestflow(value?._id),
+          ,
+        ]).then(
+          ([
+            fetchCollectionsResult,
+            refreshEnvironmentResult,
+            refreshTestflowResult,
+          ]) => {
+            // Handle the results of each API call here
+
+            const collectionTabsToBeDeleted =
+              fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
+            const environmentTabsToBeDeleted =
+              refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
+            const testflowTabsToBeDeleted =
+              refreshTestflowResult?.testflowTabsToBeDeleted || [];
+            const totalTabsToBeDeleted: string[] = [
+              ...collectionTabsToBeDeleted,
+              ...environmentTabsToBeDeleted,
+              ...testflowTabsToBeDeleted,
+            ];
+            _viewModel.deleteTabsWithTabIdInAWorkspace(
+              value?._id,
+              totalTabsToBeDeleted,
+            );
+          },
+        );
+
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
       }

@@ -119,7 +119,7 @@ export class TestflowRepository {
   public deleteOrphanTestflows = async (
     _workspaceId: string,
     _testflowIds: string[],
-  ) => {
+  ): Promise<string[]> => {
     // delete left out testflows
     const testflows = await RxDB.getInstance()
       ?.rxdb?.testflow.find({
@@ -141,13 +141,14 @@ export class TestflowRepository {
         return true;
       })
       .map((_testflow) => {
-        return _testflow._id;
-      });
+        return _testflow._id as string;
+      }) as string[];
     if ((selectedTestflowsToBeDeleted?.length || 0) > 0) {
       await RxDB.getInstance()?.rxdb?.testflow?.bulkRemove(
         selectedTestflowsToBeDeleted as string[],
       );
     }
+    return selectedTestflowsToBeDeleted;
   };
 
   /**

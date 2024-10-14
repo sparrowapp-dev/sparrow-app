@@ -170,7 +170,7 @@ export class TestflowExplorerPageViewModel {
     let testflowServer = await this.testflowRepository.readTestflow(
       progressiveTab.id,
     );
-    testflowServer = testflowServer.toMutableJSON();
+    testflowServer = testflowServer?.toMutableJSON();
     // console.log(progressiveTab, testflowServer); will be used for debugging in some time
 
     if (!testflowServer) {

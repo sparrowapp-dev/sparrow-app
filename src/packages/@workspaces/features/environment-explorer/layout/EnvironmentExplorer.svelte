@@ -72,7 +72,7 @@
     const event = await onFetchEnvironmentGuide({
       id: "environment-guide",
     });
-    if (event.isActive === true) {
+    if (event?.isActive === true) {
       isPopoverContainer = true;
     } else {
       isPopoverContainer = false;

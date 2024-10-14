@@ -1,6 +1,7 @@
 import type {
   CollectionDocument,
   EnvironmentDocument,
+  TabDocument,
   WorkspaceDocument,
 } from "@app/database/database";
 
@@ -120,30 +121,81 @@ export default class CollectionsViewModel {
    * Fetch collections from services and insert to repository
    * @param workspaceId - id of current workspace
    */
-  public fetchCollections = async (workspaceId: string) => {
+  public fetchCollections = async (
+    workspaceId: string,
+  ): Promise<{ collectionItemTabsToBeDeleted?: string[] }> => {
     const isGuestUser = await this.getGuestUserState();
-    if (workspaceId && !isGuestUser) {
-      const res = await this.collectionService.fetchCollection(workspaceId);
-      if (res?.isSuccessful && res?.data?.data) {
-        const collections = res.data.data;
-        await this.collectionRepository.bulkInsertData(
-          workspaceId,
-          collections?.map((_collection: any) => {
-            const collection = createDeepCopy(_collection);
-            collection["workspaceId"] = workspaceId;
-            collection["id"] = _collection._id;
-            delete collection._id;
-            return collection;
-          }),
-        );
-        await this.collectionRepository.deleteOrphanCollections(
-          workspaceId,
-          collections?.map((_collection: any) => {
-            return _collection._id;
-          }),
-        );
-      }
+    if (!workspaceId || isGuestUser) {
+      return {};
     }
+    /**
+     * Iterates throught the Collection and return all the Collection item Ids - COllection, Folder, Http Request, WebSocket Request.
+     * @param _collectionItem - Collection or Collection item (Folder, Http Request, WebSocket Request).
+     * @param _collectionItemIds - Blank list that should be manipulated by this function as a result.
+     * @returns List of COllection item Ids.
+     */
+    const getCollectionItemIds = (
+      _collectionItem: any,
+      _collectionItemIds: string[],
+    ): void => {
+      if (!_collectionItem?.type) {
+        // Collection - object do not have type and holds _id.
+        _collectionItemIds.push(_collectionItem._id);
+      } else {
+        // Folder, Http Request, WebSocket Request - object that holds id.
+        _collectionItemIds.push(_collectionItem.id);
+      }
+
+      // Recursively search through the Collection item structure
+      for (let j = 0; j < _collectionItem?.items?.length; j++) {
+        getCollectionItemIds(_collectionItem.items[j], _collectionItemIds);
+      }
+      return;
+    };
+
+    const res = await this.collectionService.fetchCollection(workspaceId);
+    if (res?.isSuccessful && res?.data?.data) {
+      const collections = res.data.data;
+      await this.collectionRepository.bulkInsertData(
+        workspaceId,
+        collections?.map((_collection: any) => {
+          const collection = createDeepCopy(_collection);
+          collection["workspaceId"] = workspaceId;
+          collection["id"] = _collection._id;
+          delete collection._id;
+          return collection;
+        }),
+      );
+      await this.collectionRepository.deleteOrphanCollections(
+        workspaceId,
+        collections?.map((_collection: any) => {
+          return _collection._id;
+        }),
+      );
+      const collectionItemIds: string[] = [];
+      for (let i = 0; i < collections.length; i++) {
+        getCollectionItemIds(collections[i], collectionItemIds);
+      }
+
+      const collectionItemTabsToBeDeleted =
+        await this.tabRepository.getIdOfTabsThatDoesntExistAtCollectionLevel(
+          workspaceId,
+          collectionItemIds as string[],
+        );
+
+      return {
+        collectionItemTabsToBeDeleted,
+      };
+    }
+
+    return {};
+  };
+
+  public deleteTabsWithTabIdInAWorkspace = (
+    _workspaceId: string,
+    _tabIds: string[],
+  ) => {
+    this.tabRepository.deleteTabsWithTabIdInAWorkspace(_workspaceId, _tabIds);
   };
 
   /**
@@ -161,7 +213,9 @@ export default class CollectionsViewModel {
   public tabs() {
     return this.tabRepository.getTabList();
   }
-  public getTabListWithWorkspaceId(workspaceId: string) {
+  public getTabListWithWorkspaceId(
+    workspaceId: string,
+  ): Observable<TabDocument[]> | undefined {
     return this.tabRepository.getTabListWithWorkspaceId(workspaceId);
   }
 
@@ -188,7 +242,9 @@ export default class CollectionsViewModel {
    * Get active tab(if any)
    * @returns :Observable<any> | undefined - active tab
    */
-  public getActiveTab = (workspaceId: string) => {
+  public getActiveTab = (
+    workspaceId: string,
+  ): Observable<TabDocument | null> | undefined => {
     return this.tabRepository.getTabWithWorkspaceId(workspaceId);
   };
 

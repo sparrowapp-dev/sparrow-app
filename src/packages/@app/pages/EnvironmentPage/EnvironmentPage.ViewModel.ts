@@ -42,13 +42,17 @@ export class EnvironmentViewModel {
    * @param workspaceId - workspace Id to which environment belongs
    * @returns
    */
-  public refreshEnvironment = async (workspaceId: string) => {
+  public refreshEnvironment = async (
+    workspaceId: string,
+  ): Promise<{
+    environmentTabsToBeDeleted?: string[];
+  }> => {
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
     const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
     if (isGuestUser) {
-      return;
+      return {};
     }
     const response =
       await this.environmentService.fetchAllEnvironments(workspaceId);
@@ -69,8 +73,18 @@ export class EnvironmentViewModel {
           return _environment._id;
         }),
       );
+      const environmentTabsToBeDeleted =
+        await this.tabRepository.getIdOfTabsThatDoesntExistAtEnvironmentLevel(
+          workspaceId,
+          environments?.map((_environment: any) => {
+            return _environment._id;
+          }),
+        );
+      return {
+        environmentTabsToBeDeleted,
+      };
     }
-    return;
+    return {};
   };
 
   /**
