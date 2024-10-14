@@ -196,7 +196,7 @@
   <Options
     xAxis={testflowTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      testflowTabWrapper.getBoundingClientRect().top - 5,
+      testflowTabWrapper.getBoundingClientRect().top + 20,
       testflowTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
@@ -271,7 +271,7 @@
           class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
             ? 'threedot-active'
             : ''}"
-          style=""
+          style="transform: rotate(90deg);"
           on:click={(e) => {
             rightClickContextMenu();
           }}
