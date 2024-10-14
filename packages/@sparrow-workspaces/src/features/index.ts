@@ -15,3 +15,4 @@ export * from "./environment-list";
 export * from "./collection-list";
 export * from "./environment-explorer";
 export * from "./testflow-explorer";
+export * from "./welcome-popup";

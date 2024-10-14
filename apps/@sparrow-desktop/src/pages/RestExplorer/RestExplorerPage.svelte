@@ -8,8 +8,8 @@
   import { Debounce } from "@sparrow/common/utils";
   import { isGuestUserActive, user } from "@app/store/auth.store";
   import { onMount } from "svelte";
-  import { restExplorerDataStore } from "@workspaces/features/rest-explorer/store";
-  import type { restExplorerData } from "@workspaces/features/rest-explorer/store/rest-explorer";
+  import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
+  import type { restExplorerData } from "@sparrow/workspaces/features/rest-explorer/store";
   export let tab;
   export let isTourGuideOpen = false;
   let isLoginBannerActive = false;
