@@ -5,9 +5,9 @@
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
-  import { Attachment } from "@support/common/components";
-  import { ImageModal } from "@library/ui/image-modal";
-  import { notifications } from "@library/ui/toast/Toast";
+  import { Attachment } from "@sparrow/support/components";
+  import { ImageModal } from "@sparrow/library/ui";
+  import { notifications } from "@sparrow/library/ui";
 
   /**
    * @description - The current comment being added or modified by the user.

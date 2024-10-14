@@ -68,8 +68,8 @@
   import { version } from "../../../src-tauri/tauri.conf.json";
   import { Button } from "@sparrow/library/ui";
   import { isUserFirstSignUp } from "@app/store/user.store";
-  // import { WelcomeLogo } from "@common/images";
-  // import { WelcomePopup } from "@workspaces/features/welcome-popup";
+  import { WelcomeLogo } from "@sparrow/common/images";
+  import { WelcomePopup } from "@sparrow/workspaces/features";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -532,7 +532,7 @@
   {isGuestUser}
 />
 
-<!-- <Modal
+<Modal
   title={""}
   type={"dark"}
   width={"35%"}
@@ -554,7 +554,7 @@
       isWelcomePopupOpen = false;
     }}
   />
-</Modal> -->
+</Modal>
 
 <svelte:window on:keydown={handleKeyPress} />
 <!-- <ImportCollection

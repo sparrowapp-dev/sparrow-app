@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AttachmentIcon } from "@library/icons"; // Import your icon
+  import { AttachmentIcon } from "@sparrow/library/icons"; // Import your icon
 
   // Props: inputId and onFileSelect handler are passed in from the parent component
   export let inputId: string; // Parent will pass a unique id

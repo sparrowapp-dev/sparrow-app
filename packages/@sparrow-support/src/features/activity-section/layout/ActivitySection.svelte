@@ -12,7 +12,6 @@
     TableChart,
     TickIcon,
   } from "@sparrow/library/icons";
-  import { UpvoteIcon } from "@sparrow/support/components";
   import FeedbackPost from "../../../features/feedback-section/layout/FeedbackPost.svelte";
   import { onMount } from "svelte";
   import { SearchIcon } from "@deprecate/assets";
@@ -22,7 +21,6 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   import { FeedbackStatusType, FeedbackType } from "../../../types/feedback";
-  import { TickIcon } from "@sparrow/library/icons";
   import { IconFallback, ImageModal } from "@sparrow/library/ui";
 
   import { ActivityStatusType, ActivityType } from "../../../types/activity";
@@ -31,12 +29,7 @@
   import { FormatTime } from "@sparrow/common/utils";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   import { ArrowOutwardIcon } from "@sparrow/library/icons";
-
-  import { tickIcon } from "@library/forms/select/svgs";
-  import { Like } from "@library/ui/like";
-
-  import ArrowOutward from "@library/icons/ArrowOutward.svelte";
-  import { SparrowLogo } from "@common/images";
+  import { SparrowLogo } from "@sparrow/common/images";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;

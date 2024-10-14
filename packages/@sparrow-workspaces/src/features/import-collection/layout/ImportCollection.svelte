@@ -17,7 +17,7 @@
   import { ContentTypeEnum, ResponseStatusCode } from "@sparrow/common/enums";
   import TickMark from "@deprecate/assets/tick-mark-rounded.svelte";
   import { Drop } from "../components";
-  import { InfoIcon } from "@library/icons";
+  import { InfoIcon } from "@sparrow/library/icons";
 
   export let currentWorkspaceId;
   export let isurl = false;

@@ -14,7 +14,6 @@
   import { Select } from "@sparrow/library/forms";
   import { CategoryIcon, StatusIcon } from "@sparrow/library/icons";
   import { FeedbackType, FeedbackStatusType } from "../../../types/feedback";
-  import { TickIcon } from "@sparrow/library/icons";
   import { Loader } from "@sparrow/library/ui";
   import { Debounce } from "@sparrow/common/utils";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";

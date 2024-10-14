@@ -99,7 +99,7 @@ import { AiAssistantService } from "../../services/ai-assistant.service";
 import type { GuideQuery } from "../../types/user-guide";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import type { Socket } from "socket.io-client";
-import { restExplorerDataStore } from "@workspaces/features/rest-explorer/store";
+import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
 
 class RestExplorerViewModel
   implements

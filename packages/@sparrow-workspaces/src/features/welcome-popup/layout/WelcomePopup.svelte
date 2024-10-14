@@ -1,6 +1,6 @@
 <script>
-  import { WelcomeLogo } from "@common/images";
-  import { Button } from "@library/ui";
+  import { WelcomeLogo } from "@sparrow/common/images";
+  import { Button } from "@sparrow/library/ui";
   export let onClickExplore;
   export let onClickTour;
 </script>

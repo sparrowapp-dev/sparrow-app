@@ -27,7 +27,6 @@
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
   import { Input } from "@sparrow/library/forms";
-  import { version } from "../../../../../../src-tauri/tauri.conf.json";
   import { open } from "@tauri-apps/plugin-shell";
   import constants from "@app/constants/constants";
   import { Tooltip } from "@sparrow/library/ui";
