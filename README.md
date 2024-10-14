@@ -60,10 +60,10 @@ cd sparrow-app
 # Install dependencies and Husky hooks
 yarn
 
-# Copy the desktop app .env.example to .env
+# Copy desktop app .env.example to .env
 cp apps/@sparrow-desktop/.env.example apps/@sparrow-desktop/.env
 
-# Copy the web app .env.example to .env
+# Copy web app .env.example to .env
 cp apps/@sparrow-web/.env.example apps/@sparrow-web/.env
 
 # Run the desktop app in dev mode
