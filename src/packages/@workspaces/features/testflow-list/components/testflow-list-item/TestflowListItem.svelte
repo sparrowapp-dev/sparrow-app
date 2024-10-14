@@ -196,7 +196,7 @@
   <Options
     xAxis={testflowTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      testflowTabWrapper.getBoundingClientRect().top - 5,
+      testflowTabWrapper.getBoundingClientRect().top + 20,
       testflowTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}

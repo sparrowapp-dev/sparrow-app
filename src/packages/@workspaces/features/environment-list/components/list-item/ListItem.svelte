@@ -204,7 +204,7 @@
   <Options
     xAxis={environmentTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      environmentTabWrapper.getBoundingClientRect().top - 5,
+      environmentTabWrapper.getBoundingClientRect().top + 20,
       environmentTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
@@ -322,9 +322,9 @@
       visibility: visible;
       background-color: var(--bg-secondary-400);
     }
-   .threedot-icon-container:hover {
-    background-color: var(--bg-tertiary-500);
-  }
+    .threedot-icon-container:hover {
+      background-color: var(--bg-tertiary-500);
+    }
 
     .btn-primary {
       background-color: transparent;
