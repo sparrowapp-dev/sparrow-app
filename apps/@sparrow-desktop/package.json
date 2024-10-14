@@ -1,0 +1,156 @@
+{
+  "name": "@sparrow/desktop",
+  "private": true,
+  "author": "Sparrow",
+  "description": "The Sparrow App is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and making you a better programmer.",
+  "version": "2.7.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "tauri": "tauri",
+    "prepare": "husky install",
+    "semantic-release": "semantic-release"
+  },
+  "dependencies": {
+    "@codemirror/lang-html": "^6.4.7",
+    "@codemirror/lang-javascript": "^6.2.1",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lang-xml": "^6.0.2",
+    "@codemirror/language": "^6.10.0",
+    "@codemirror/state": "^6.4.0",
+    "@editorjs/code": "^2.9.0",
+    "@editorjs/editorjs": "^2.30.4",
+    "@editorjs/header": "^2.8.7",
+    "@editorjs/inline-code": "^1.5.1",
+    "@editorjs/list": "^1.10.0",
+    "@editorjs/paragraph": "^2.11.6",
+    "@editorjs/underline": "^1.1.0",
+    "@lezer/highlight": "^1.2.0",
+    "@microsoft/applicationinsights-web": "^3.3.1",
+    "@tauri-apps/api": "^2.0.0-beta.0",
+    "@tauri-apps/cli": "^2.0.0-beta.1",
+    "@tauri-apps/plugin-deep-link": "^2.0.0-beta.0",
+    "@tauri-apps/plugin-os": "^2.0.0-beta.0",
+    "@tauri-apps/plugin-process": "^2.0.0-beta.0",
+    "@tauri-apps/plugin-shell": "^2.0.0-beta.1",
+    "@tauri-apps/plugin-updater": "^2.0.0-beta.0",
+    "@tauri-apps/plugin-window": "^2.0.0-alpha.1",
+    "@xyflow/svelte": "^0.1.17",
+    "axios": "^1.5.1",
+    "body-scroll-lock": "^4.0.0-beta.0",
+    "bootstrap": "^5.3.1",
+    "btoa": "^1.2.1",
+    "codemirror": "^6.0.1",
+    "codemirror-json-schema": "^0.6.1",
+    "editorjs-parser": "^1.5.3",
+    "font-awesome": "^4.7.0",
+    "highlight.js": "^11.10.0",
+    "js-beautify": "^1.15.1",
+    "js-yaml": "^4.1.0",
+    "jsoneditor": "^9.10.3",
+    "marked": "^13.0.2",
+    "mixpanel-browser": "^2.48.1",
+    "monaco-editor": "^0.44.0",
+    "path": "^0.12.7",
+    "rxdb": "^14.17.1",
+    "rxjs": "^7.8.1",
+    "socket.io-client": "^4.7.5",
+    "svelte-agnostic-draggable": "^0.2.0",
+    "svelte-file-dropzone": "^2.0.2",
+    "svelte-jsoneditor": "^0.18.9",
+    "svelte-motion": "^0.11.5",
+    "svelte-navigator": "^3.2.2",
+    "svelte-split-pane": "^0.1.2",
+    "svelte-splitpanes": "^0.8.0",
+    "svelte-toasts": "^1.1.2",
+    "uuid": "^9.0.1",
+    "yup": "^1.2.0",
+    "@sparrow/library": "*",
+    "@sparrow/common": "*",
+    "@sparrow/support": "*",
+    "@sparrow/teams": "*",
+    "@sparrow/workspaces": "*"
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/release-notes-generator": "^12.1.0",
+    "@sveltejs/vite-plugin-svelte": "^2.4.2",
+    "@tsconfig/svelte": "^5.0.0",
+    "@types/js-beautify": "^1.14.3",
+    "@types/mixpanel-browser": "^2.49.0",
+    "@types/uuid": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@typescript-eslint/parser": "^6.4.0",
+    "eslint": "^8.54.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.0",
+    "prettier": "3.0.2",
+    "sass": "^1.72.0",
+    "semantic-release": "^23.0.0",
+    "svelte": "^4.0.5",
+    "svelte-check": "^3.4.6",
+    "svelte-loading-spinners": "^0.3.4",
+    "svelte-preprocess": "^5.0.4",
+    "tslib": "^2.6.0",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.4"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  },
+  "repository": "https://github.com/sparrowapp-dev/sparrow-app.git",
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/exec",
+      "@semantic-release/npm",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "CHANGELOG.md",
+            "package.json"
+          ],
+          "message": "chore(release): ${nextRelease.version} [skip ci]"
+        }
+      ],
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            {
+              "path": "/Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/*.dmg",
+              "label": "Sparrow_2.7.0.dmg"
+            },
+            {
+              "path": "msi_files/*.exe",
+              "label": "Sparrow_2.7.0.exe"
+            },
+            {
+              "path": "msi_files/*.msi",
+              "label": "Sparrow_2.7.0.msi"
+            },
+            {
+              "path": "msi_files/*.zip",
+              "label": "Sparrow_2.7.0_x64_en-US.msi.zip"
+            },
+            {
+              "path": "/Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz",
+              "label": "Sparrow.app.tar.gz"
+            }
+          ]
+        }
+      ]
+    ]
+  }
+}
