@@ -77,7 +77,7 @@
     }
     const isUserExist = await onValidateEmail(email); // checks if user exist on server
     if (!isUserExist) {
-      notifications.error("User doesn't exist on sparrow!");
+      // notifications.error("User doesn't exist on sparrow!");
     }
     const isValidEmail =
       validateEmail(email) && !isEmailAlreadyExist && isUserExist;

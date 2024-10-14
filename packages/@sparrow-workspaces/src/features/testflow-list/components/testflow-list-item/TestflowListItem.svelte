@@ -129,7 +129,7 @@
         },
         {
           onClick: renameTestflow,
-          displayText: "Rename",
+          displayText: "Rename Flow",
           disabled: false,
         },
         {
@@ -196,7 +196,7 @@
   <Options
     xAxis={testflowTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      testflowTabWrapper.getBoundingClientRect().top - 5,
+      testflowTabWrapper.getBoundingClientRect().top + 20,
       testflowTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
@@ -309,7 +309,7 @@
       background-color: var(--bg-secondary-400);
     }
     .threedot-icon-container:hover {
-      background-color: var(--text-tertiary-600);
+      background-color: var(--text-tertiary-500);
     }
 
     .btn-primary {

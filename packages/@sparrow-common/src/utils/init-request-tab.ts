@@ -219,6 +219,9 @@ class InitRequestTab {
       ..._state,
     };
   }
+  public updateChatbotState(_isActive: boolean) {
+    this._tab.property.request.state.isChatbotActive = _isActive;
+  }
 }
 
 export { InitRequestTab };

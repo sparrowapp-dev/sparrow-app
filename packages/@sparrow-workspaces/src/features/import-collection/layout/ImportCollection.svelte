@@ -17,6 +17,7 @@
   import { ContentTypeEnum, ResponseStatusCode } from "@sparrow/common/enums";
   import TickMark from "@deprecate/assets/tick-mark-rounded.svelte";
   import { Drop } from "../components";
+  import { InfoIcon } from "@sparrow/library/icons";
 
   export let currentWorkspaceId;
   export let isurl = false;
@@ -84,7 +85,7 @@
       ) {
         isValidClientURL = true;
         const response = await _collectionService.validateImportCollectionURL(
-          importData.replace("localhost", "127.0.0.1") + "-json",
+          importData.replace("localhost", "127.0.0.1"),
         );
         if (response?.data?.status === ResponseStatusCode.OK) {
           try {
@@ -146,22 +147,20 @@
       showFileTypeError: false,
     },
   };
+  let uploadFileType = "";
 
   const validateFileUpload = async (_fileUploadData: string): boolean => {
-    if (validateClientJSON(_fileUploadData)) {
-      const response = await _collectionService.validateImportCollectionInput(
-        "",
-        _fileUploadData,
-      );
+    if (
+      validateClientJSON(_fileUploadData) ||
+      validateClientXML(_fileUploadData)
+    ) {
+      const response =
+        await _collectionService.validateImportCollectionFileUpload(
+          "",
+          _fileUploadData,
+        );
       if (response.isSuccessful) {
-        return true;
-      }
-    } else if (validateClientXML(_fileUploadData)) {
-      const response = await _collectionService.validateImportCollectionInput(
-        "",
-        _fileUploadData,
-      );
-      if (response.isSuccessful) {
+        uploadFileType = response.data.type;
         return true;
       }
     }
@@ -220,7 +219,11 @@
       progressBar.isLoading = true;
       progressBar.isProgress = false;
       progressBar.title = ProgressTitle.IDENTIFYING_SYNTAX;
-      const response = await onCollectionFileUpload(currentWorkspaceId, file);
+      const response = await onCollectionFileUpload(
+        currentWorkspaceId,
+        file,
+        uploadFileType,
+      );
       if (response.isSuccessful) {
         progressBar.title = ProgressTitle.FETCHING_DATA;
         progressBar.isProgress = true;
@@ -277,7 +280,7 @@
       isValidClientURL &&
       isValidServerURL
     ) {
-      const importUrl = importData.replace("localhost", "127.0.0.1") + "-json";
+      const importUrl = importData.replace("localhost", "127.0.0.1");
 
       const response =
         await _collectionService.validateImportCollectionURL(importUrl);
@@ -445,6 +448,15 @@
     repositoryBranch = tabId;
   };
   const debouncedImport = debounce(handleInputField, 1000);
+  let isInfoIconHovered = false;
+
+  const handleMouseEnter = () => {
+    isInfoIconHovered = true;
+  };
+
+  const handleMouseLeave = () => {
+    isInfoIconHovered = false;
+  };
 </script>
 
 <!-- {#if progressBar.isLoading}
@@ -489,6 +501,29 @@
       Upload File
     </label>
   </div>
+  {#if importType === "file"}
+    <div
+      class="info-icon"
+      style="margin-left: auto;"
+      on:mouseenter={handleMouseEnter}
+      on:mouseleave={handleMouseLeave}
+    >
+      <InfoIcon
+        height={"17px"}
+        width={"17px"}
+        color={isInfoIconHovered
+          ? "var(--icon-primary-300)"
+          : "var(--icon-secondary-100)"}
+      />
+      {#if isInfoIconHovered}
+        <div class="tooltip">
+          Nested folders display is not supported.<br />
+          They will be flattened during import.
+          <div class="tooltip-arrow"></div>
+        </div>
+      {/if}
+    </div>
+  {/if}
 </div>
 <br />
 {#if importType === "text"}
@@ -546,7 +581,8 @@
 {#if importType === "file"}
   <div>
     <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
-      Upload YAML/JSON file
+      Upload files in YAML/JSON format, or JSON files exported from Postman
+      (v2.1)
     </p>
   </div>
   <div>
@@ -559,7 +595,7 @@
       inputPlaceholder="Drag and Drop or"
       supportedFileTypes={[".yaml", ".json"]}
       isError={uploadCollection.file.invalid && isInputDataTouched}
-      title={"Drag and Drop your YAML/JSON file or"}
+      title={"Drag & drop your YAML/JSON or Postman (v2.1) JSON file or"}
     />
   </div>
   <div>
@@ -569,10 +605,19 @@
       </p>
     {:else if isInputDataTouched && uploadCollection.file.invalid}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-        Invalid file format. Please upload an OAS file in YAML or JSON format.
+        Invalid file format. Please upload a YAML/JSON (OAS) or Postman v2.1
+        file format.
       </p>
     {/if}
   </div>
+  <div>
+    <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
+      Please upload your Postman collections in v2.1 specification. Currently,
+      we don't support Postman Collection v2.0, and importing this version might
+      result in some data loss.
+    </p>
+  </div>
+ 
 {/if}
 {#if importType === "text" && isValidClientURL && isValidServerURL && false}
   <div>
@@ -778,6 +823,45 @@
     margin-left: 0;
     margin-right: 5px;
     border-width: 2px;
+  }
+  .info-icon {
+    margin-top: 1%;
+    margin-right: 1%;
+    display: inline-block;
+    position: relative;
+  }
+
+  .tooltip {
+    position: absolute;
+    top: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--bg-secondary-530);
+    color: var(--text-secondary-1000);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1;
+    opacity: 1;
+  }
+
+  .tooltip-arrow {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent var(--bg-secondary-530) transparent;
+  }
+
+  .info-icon-container:hover .tooltip {
+    display: block;
+  }
+
+  .info-icon:hover {
+    cursor: pointer;
   }
 
   .enable-active-sync {

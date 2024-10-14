@@ -191,7 +191,7 @@
   let newCollectionName: string = "";
 
   const handleRenameInput = (event: { target: { value: string } }) => {
-    newCollectionName = event.target.value;
+    newCollectionName = event.target.value.trim();
   };
 
   const onRenameBlur = async () => {
@@ -289,7 +289,7 @@
   <Options
     xAxis={collectionTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      collectionTabWrapper.getBoundingClientRect().top + 10,
+      collectionTabWrapper.getBoundingClientRect().top + 20,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={700}
@@ -300,7 +300,7 @@
             workspaceId: collection.workspaceId,
             collection,
           }),
-        displayText: "Open collection",
+        displayText: "Open Collection",
         disabled: false,
         hidden: false,
       },
@@ -308,43 +308,13 @@
         onClick: () => {
           (isRenaming = true), setTimeout(() => inputField.focus(), 100);
         },
-        displayText: "Rename collection",
+        displayText: "Rename Collection",
         disabled: false,
         hidden:
           !(collection?.activeSync && isBranchSynced) &&
           !(collection?.activeSync && !isBranchSynced)
             ? false
             : true,
-      },
-      {
-        onClick: () =>
-          onItemCreated("requestCollection", {
-            workspaceId: collection.workspaceId,
-            collection,
-          }),
-        displayText: "Add New API",
-        disabled: false,
-        hidden: false,
-      },
-      {
-        onClick: () =>
-          onItemCreated("websocketCollection", {
-            workspaceId: collection.workspaceId,
-            collection,
-          }),
-        displayText: "Add New WebSocket",
-        disabled: false,
-        hidden: false,
-      },
-      {
-        onClick: () =>
-          onItemCreated("folder", {
-            workspaceId: collection.workspaceId,
-            collection,
-          }),
-        displayText: "Add Folder",
-        disabled: false,
-        hidden: false,
       },
       {
         onClick: () => {
@@ -387,7 +357,7 @@
             collection,
           });
         },
-        displayText: "Add New API",
+        displayText: "Add REST API",
         disabled: false,
         hidden: false,
         icon: SyncIcon,
@@ -399,7 +369,7 @@
             collection,
           });
         },
-        displayText: "Add New WebSocket",
+        displayText: "Add WebSocket",
         disabled: false,
         hidden: false,
         icon: SocketIcon,
@@ -526,7 +496,7 @@
           class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
             ? 'threedot-active'
             : ''}"
-          style=""
+          style="transform: rotate(90deg);"
           on:click={(e) => {
             rightClickContextMenu(e);
           }}
@@ -618,7 +588,7 @@
               </div>
             </Tooltip>
 
-            <Tooltip title={"Add Request"} placement={"bottom"} distance={12}>
+            <Tooltip title={"Add REST API"} placement={"bottom"} distance={12}>
               <div
                 class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
                 style="height: 24px; width: 24px;"

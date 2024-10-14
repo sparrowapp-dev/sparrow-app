@@ -7,7 +7,7 @@ import constants from "@app/constants/constants";
 import { setAuthJwt } from "@app/utils/jwt";
 import { ErrorMessages } from "@sparrow/common/enums/enums";
 import { invoke } from "@tauri-apps/api/core";
-import { DashboardViewModel } from "@app/pages/Dashboard/Dashboard.ViewModel";
+import { DashboardViewModel } from "@app/pages/dashboard-page/Dashboard.ViewModel";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 import type { MakeRequestResponse } from "@app/types/http-client";
@@ -17,7 +17,6 @@ import { v4 as uuidv4 } from "uuid";
 import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { appInsights } from "@app/logger";
-
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const error = (
@@ -162,10 +161,12 @@ const makeRequest = async (
       return await regenerateAuthToken(method, url, requestData);
     } else if (
       e.response?.data?.statusCode === 401 &&
-      e.response.data.message === ErrorMessages.Unauthorized
+      e.response.data.message === ErrorMessages.JWTFailed
     ) {
       const _viewModel = new DashboardViewModel();
       await _viewModel.clientLogout();
+      return error("Unauthorized");
+    } else if (e.response?.data?.statusCode === 401) {
       return error("Unauthorized");
     }
     if (e.code === "ERR_NETWORK") {
@@ -297,9 +298,11 @@ const disconnectWebSocket = async (tab_id: string) => {
       try {
         // Logic to handle response
         console.log("disconnected", data);
+        let listener;
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
+            listener = wsData.listener;
             wsData.messages.unshift({
               data: `Disconnected from ${url}`,
               transmitter: "disconnector",
@@ -308,9 +311,13 @@ const disconnectWebSocket = async (tab_id: string) => {
             });
             wsData.status = "disconnected";
             webSocketDataMap.set(tab_id, wsData);
+            if (listener) {
+              listener();
+            }
           }
           return webSocketDataMap;
         });
+
         notifications.success("WebSocket disconnected successfully.");
       } catch (e) {
         console.error(e);
@@ -369,6 +376,7 @@ const connectWebSocket = async (
       body: "",
       filter: "All messages",
       url: url,
+      listener: null,
     });
 
     return webSocketDataMap;
@@ -401,12 +409,10 @@ const connectWebSocket = async (
           }
           return webSocketDataMap;
         });
-        notifications.success("WebSocket connected successfully");
+        notifications.success("WebSocket connected successfully.");
 
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
-        listen(`ws_message_${tabId}`, (event) => {
-          console.log("event---->", event);
-
+        const listener = await listen(`ws_message_${tabId}`, (event) => {
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
@@ -420,6 +426,14 @@ const connectWebSocket = async (
             }
             return webSocketDataMap;
           });
+        });
+        webSocketDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tabId);
+          if (wsData) {
+            wsData.listener = listener;
+            webSocketDataMap.set(tabId, wsData);
+          }
+          return webSocketDataMap;
         });
       } catch (e) {
         console.error(e);
@@ -456,73 +470,67 @@ const makeHttpRequestV2 = async (
   headers: string,
   body: string,
   request: string,
+  signal?: AbortSignal,
 ) => {
-  // create a race condition between the timeout and the api call
   console.table({ url, method, headers, body, request });
   const startTime = performance.now();
-  return Promise.race([
-    timeout(apiTimeOut),
-    // Invoke communication
-    invoke("make_http_request_v2", {
+
+  try {
+    const data = await invoke("make_http_request_v2", {
       url,
       method,
       headers,
       body,
       request,
-    }),
-  ])
-    .then(async (data: string) => {
-      const endTime = performance.now();
-      const duration = endTime - startTime;
-      try {
-        const responseBody = JSON.parse(data);
-        const apiResponse = JSON.parse(responseBody.body);
-        console.table(apiResponse);
-        appInsights.trackDependencyData({
-          id: uuidv4(),
-          name: "RPC Duration Metric",
-          duration,
-          success: true,
-          responseCode: parseInt(apiResponse.status),
-          properties: {
-            source: "frontend",
-            type: "RPC_HTTP",
-          },
-        });
-        return success(apiResponse);
-      } catch (e) {
-        console.error(e);
-        appInsights.trackDependencyData({
-          id: uuidv4(),
-          name: "RPC Duration Metric",
-          duration,
-          success: false,
-          responseCode: 400,
-          properties: {
-            source: "frontend",
-            type: "RPC_HTTP",
-          },
-        });
-        return error("error");
-      }
-    })
-    .catch((e) => {
-      const endTime = performance.now();
-      const duration = endTime - startTime;
-      appInsights.trackDependencyData({
+    });
+
+    // Handle the response and update UI accordingly
+    if (signal?.aborted) {
+      throw new Error(); // Ignore response if request was cancelled
+    }
+
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+
+    try {
+      const responseBody = JSON.parse(data);
+      const apiResponse: Response = JSON.parse(responseBody.body) as Response;
+      console.table(apiResponse);
+
+      const appInsightData = {
         id: uuidv4(),
         name: "RPC Duration Metric",
         duration,
-        success: false,
-        responseCode: 400,
+        success: true,
+        responseCode: parseInt(apiResponse.status),
         properties: {
           source: "frontend",
           type: "RPC_HTTP",
         },
-      });
-      console.error(e);
-      return error("error");
+      };
+      appInsights.trackDependencyData(appInsightData);
+      return success(apiResponse);
+    } catch (e) {
+      throw new Error("Error parsing response");
+    }
+  } catch (e) {
+    if (signal?.aborted) {
+      throw new DOMException("Request was aborted", "AbortError");
+    }
+    console.error(e);
+    appInsights.trackDependencyData({
+      id: uuidv4(),
+      name: "RPC Duration Metric",
+      duration: performance.now() - startTime,
+      success: false,
+      responseCode: 400,
+      properties: {
+        source: "frontend",
+        type: "RPC_HTTP",
+      },
     });
+    throw new Error("Error with the request");
+  }
 };
 
 export {

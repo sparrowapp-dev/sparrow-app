@@ -159,7 +159,7 @@
 
   let newFolderName: string = "";
   const handleRenameInput = (event: { target: { value: string } }) => {
-    newFolderName = event.target.value;
+    newFolderName = event.target.value.trim();;
   };
 
   const onRenameBlur = async () => {
@@ -297,7 +297,7 @@
               folder: explorer,
             });
           },
-          displayText: "Add New API",
+          displayText: "Add REST API",
           disabled: false,
           hidden:
             !collection.activeSync ||
@@ -313,7 +313,7 @@
               folder: explorer,
             });
           },
-          displayText: "Add New WebSocket",
+          displayText: "Add WebSocket",
           disabled: false,
           hidden:
             !collection.activeSync ||
@@ -428,7 +428,7 @@
           <Spinner size={"15px"} />
         {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
           <Tooltip
-            title={"Add Request"}
+            title={"Add REST API"}
             placement={"bottom"}
             zIndex={701}
             distance={13}

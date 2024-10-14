@@ -90,7 +90,7 @@
     // write our file
     await writableStream.write(formatCode(response?.body));
     await writableStream.close();
-    notifications.success("Response downloaded");
+    notifications.success("Response downloaded successfully.");
     MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
   };
 </script>
@@ -190,7 +190,7 @@
             style="font-size: 10px;"
             on:click={() => {
               onClearResponse();
-              notifications.success("Response Cleared");
+              notifications.success("Response cleared successfully.");
               MixpanelEvent(Events.CLEAR_API_RESPONSE);
             }}
           >
@@ -219,7 +219,7 @@
         <!-- Prettier button -->
         <div
           on:click={() => {
-            notifications.success("Code formatted successfully!");
+            notifications.success("Code formatted successfully.");
           }}
           role="button"
           class="icon-container d-flex align-items-center justify-content-center border-radius-2"

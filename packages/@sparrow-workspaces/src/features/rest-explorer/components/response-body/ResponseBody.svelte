@@ -8,15 +8,15 @@
   } from "@sparrow/common/types/workspace";
   import { SparrowLogo } from "../../assets/images";
   export let response: Response;
-  export let apiState: State;
+  export let apiState;
 
-  let language = apiState.responseBodyLanguage;
+  let language = apiState.bodyLanguage;
   $: {
     if (apiState) {
-      if (apiState.responseBodyFormatter === "Raw") {
+      if (apiState.bodyFormatter === "Raw") {
         language = RequestDataTypeEnum.TEXT;
       } else {
-        language = apiState.responseBodyLanguage;
+        language = apiState.bodyLanguage;
       }
     }
   }
@@ -26,19 +26,19 @@
   class="d-flex flex-column align-items-start justify-content-between w-100 h-100 response-body"
 >
   <div
-    class="w-100 position-relative {apiState.responseBodyFormatter ===
+    class="w-100 position-relative {apiState.bodyFormatter ===
     ResponseFormatterEnum.PREVIEW
       ? 'h-100'
       : ''}"
   >
-    {#if apiState.responseBodyLanguage === RequestDataTypeEnum.IMAGE}
+    {#if apiState.bodyLanguage === RequestDataTypeEnum.IMAGE}
       <!-- 
         --
         -- Reponse content-type set to image,
         -- 
       -->
       <SparrowLogo />
-    {:else if apiState.responseBodyFormatter === ResponseFormatterEnum.PREVIEW}
+    {:else if apiState.bodyFormatter === ResponseFormatterEnum.PREVIEW}
       <!-- 
         --
         -- Reponse content-type set to HTML preview,

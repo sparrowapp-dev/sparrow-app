@@ -98,3 +98,7 @@ export { default as TableChart } from "./TableChart.svelte";
 export { default as DropIcon } from "./Drop.svelte";
 export { default as AngleLeftIcon } from "./AngleLeft.svelte";
 export { default as AngleRightIcon } from "./AngleRight.svelte";
+export { default as MessageIcon } from "./MessageIcon.svelte";
+export { default as MessageDisabledIcon } from "./MessageDisabledIcon.svelte";
+export { default as BoxBarIcon } from "./BoxBarIcon.svelte";
+export { default as PostIcon } from "./PostIcon.svelte";

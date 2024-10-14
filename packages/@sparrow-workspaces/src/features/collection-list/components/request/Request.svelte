@@ -96,7 +96,7 @@
   let newRequestName: string = "";
 
   const handleRenameInput = (event) => {
-    newRequestName = event.target.value;
+    newRequestName = event.target.value.trim();
   };
 
   const onRenameBlur = async () => {
@@ -212,7 +212,7 @@
             request: api,
           });
         },
-        displayText: "Open API",
+        displayText: "Open REST API",
         disabled: false,
         hidden: false,
       },
@@ -221,7 +221,7 @@
           isRenaming = true;
           setTimeout(() => inputField.focus(), 100);
         },
-        displayText: "Rename API",
+        displayText: "Rename REST API",
         disabled: false,
         hidden:
           !collection.activeSync ||
@@ -334,6 +334,7 @@
         class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
           ? 'threedot-active'
           : ''}"
+          style="transform: rotate(90deg);"
         on:click={(e) => {
           rightClickContextMenu(e);
         }}

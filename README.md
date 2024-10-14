@@ -60,11 +60,17 @@ cd sparrow-app
 # Install dependencies and Husky hooks
 yarn
 
-# Copy .env.example to .env
-cp .env.example .env
+# Copy desktop app .env.example to .env
+cp apps/@sparrow-desktop/.env.example apps/@sparrow-desktop/.env
 
-# Run the app in dev mode
-yarn tauri dev
+# Copy web app .env.example to .env
+cp apps/@sparrow-web/.env.example apps/@sparrow-web/.env
+
+# Run the desktop app in dev mode
+yarn desktop-start
+
+# Run the web app in dev mode
+yarn web-start
 ```
 
 The above command will start the app in development mode and watch for changes on local.

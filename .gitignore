@@ -33,6 +33,8 @@ dist-ssr
 *.sln
 *.sw?
 
+/src-tauri
+
 # env
 .env
 /packages/*/.env

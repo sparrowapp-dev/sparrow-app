@@ -65,7 +65,8 @@
   let localEnvKey = "";
   let codeMirrorEditorDiv: HTMLDivElement;
 
-  const ENVIRONMENT_REGEX = /({{[a-zA-Z0-9-_\s]+}})/g;
+  const ENVIRONMENT_REGEX =
+    /({{[a-zA-Z0-9-_!@#$%^&*()+=\[\]|\\;:'",.<>?/`\s]+}})/g;
 
   type AggregateEnvironment = {
     key: string;
@@ -321,25 +322,41 @@
     });
   }
   onMount(() => {
-    initalizeCodeMirrorEditor(rawValue);
-    if (isFocusedOnMount) codeMirrorView.focus();
+    const initializeAsync = () => {
+      if ("requestIdleCallback" in window) {
+        requestIdleCallback(() => {
+          initalizeCodeMirrorEditor(rawValue);
+          if (isFocusedOnMount) codeMirrorView.focus();
+        });
+      } else {
+        // Fallback to setTimeout for environments where requestIdleCallback is not available
+        setTimeout(() => {
+          initalizeCodeMirrorEditor(rawValue);
+          if (isFocusedOnMount) codeMirrorView.focus();
+        }, 0);
+      }
+    };
+
+    initializeAsync();
   });
 
   afterUpdate(() => {
-    if (rawValue?.toString() !== codeMirrorView.state.doc?.toString()) {
+    if (codeMirrorView) {
+      if (rawValue?.toString() !== codeMirrorView.state.doc?.toString()) {
+        codeMirrorView.dispatch({
+          changes: {
+            from: 0,
+            to: codeMirrorView.state.doc.length,
+            insert: rawValue,
+          },
+        });
+      }
       codeMirrorView.dispatch({
-        changes: {
-          from: 0,
-          to: codeMirrorView.state.doc.length,
-          insert: rawValue,
-        },
+        effects: languageConf.reconfigure([
+          environmentHighlightStyle(filterData),
+        ]),
       });
     }
-    codeMirrorView.dispatch({
-      effects: languageConf.reconfigure([
-        environmentHighlightStyle(filterData),
-      ]),
-    });
   });
 
   const destroyCodeMirrorEditor = () => {

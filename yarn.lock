@@ -7775,6 +7775,11 @@ svelte-hmr@^0.16.0:
   resolved "https://registry.yarnpkg.com/svelte-hmr/-/svelte-hmr-0.16.0.tgz#9f345b7d1c1662f1613747ed7e82507e376c1716"
   integrity sha512-Gyc7cOS3VJzLlfj7wKS0ZnzDVdv3Pn2IuVeJPk9m2skfhcu5bq3wtIZyQGggr7/Iim5rH5cncyQft/kRLupcnA==
 
+svelte-inview@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/svelte-inview/-/svelte-inview-4.0.2.tgz#bbf503cd9ad6645a54f280fe83b3282c48c34d34"
+  integrity sha512-saJp2QRCUEBletGPnI3utxROHqruDGRPfPhtdpNYQwD97P2oCKiVIlZE3tFNEiC7h3nCvU+8czaKWcH1o/axrA==
+
 svelte-jsoneditor@^0.18.9:
   version "0.18.13"
   resolved "https://registry.yarnpkg.com/svelte-jsoneditor/-/svelte-jsoneditor-0.18.13.tgz#88f3c2674c0e5657dca33bd0960af4aa2b3977b1"

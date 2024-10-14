@@ -126,7 +126,7 @@
         },
         {
           onClick: renameEnvironment,
-          displayText: "Rename",
+          displayText: "Rename Environment",
           disabled: false,
         },
         {
@@ -204,7 +204,7 @@
   <Options
     xAxis={environmentTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      environmentTabWrapper.getBoundingClientRect().top - 5,
+      environmentTabWrapper.getBoundingClientRect().top + 20,
       environmentTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
@@ -285,7 +285,7 @@
           class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
             ? 'threedot-active'
             : ''}"
-          style="transform: rotate(90deg);"
+          style=""
           on:click={(e) => {
             rightClickContextMenu(e);
           }}
@@ -323,7 +323,7 @@
       background-color: var(--bg-secondary-400);
     }
     .threedot-icon-container:hover {
-      background-color: var(--text-tertiary-600);
+      background-color: var(--bg-tertiary-500);
     }
 
     .btn-primary {

@@ -3,7 +3,7 @@
   import { type UpdateRequestStateType } from "@sparrow/workspaces/type";
   import { ResponseSectionEnum } from "@sparrow/common/types/workspace";
   export let requestStateSection: string;
-  export let onUpdateRequestState: UpdateRequestStateType;
+  export let onUpdateResponseState;
   export let responseHeadersLength = 0;
 
   let tabs: {
@@ -48,7 +48,7 @@
           : ''}"
         role="tab"
         on:click={() => {
-          onUpdateRequestState({ responseNavigation: tab.id });
+          onUpdateResponseState("responseNavigation", tab.id);
         }}
       >
         <span class="d-flex align-items-center"

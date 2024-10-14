@@ -91,7 +91,7 @@
 
 <style>
   .navigation__link {
-    color: var(--text-secondary-100);
+    color: var(--text-secondary-200);
     background-color: transparent;
     border-bottom: 2px transparent;
   }

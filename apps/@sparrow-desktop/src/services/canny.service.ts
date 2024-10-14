@@ -45,7 +45,8 @@ export class CannyIoService {
     search: string,
     status: string,
     userId: string,
-    limit: number = 40,
+    limit: number = 30,
+    skip: number = 0,
   ) => {
     const response = await makeRequest("POST", `${this.apiUrl}/posts/list`, {
       body: {
@@ -56,6 +57,7 @@ export class CannyIoService {
         search,
         status,
         limit,
+        skip,
       },
       headers: {
         "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
@@ -135,6 +137,7 @@ export class CannyIoService {
     userId: string,
     search?: string,
     status?: string,
+    limit: number = 100,
   ) => {
     const response = await makeRequest("POST", `${this.apiUrl}/posts/list`, {
       body: {
@@ -143,6 +146,7 @@ export class CannyIoService {
         sort,
         status,
         search,
+        limit,
       },
       headers: {
         "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
@@ -200,26 +204,23 @@ export class CannyIoService {
    * @returns {Promise<Object>} The response from the server after creating the comment.
    */
   public createComment = async (
-    authorID: string,
-    postID: string,
-    value: string,
-    parentID: string,
+    _authorID: string,
+    _postID: string,
+    option?,
   ) => {
-    const response = await makeRequest(
-      "POST",
+    const response = await makeHttpRequestV2(
       `${this.apiUrl}/comments/create`,
-      {
-        body: {
-          apiKey: this.apiKey,
-          authorID,
-          postID,
-          value,
-          parentID,
-        },
-        headers: {
-          "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
-        },
-      },
+      "POST",
+      JSON.stringify([]),
+      JSON.stringify({
+        apiKey: this.apiKey,
+        authorID: _authorID,
+        postID: _postID,
+        value: option?.value,
+        imageURLs: option?.imageURLs,
+        parentID: option?.parentID,
+      }),
+      ContentTypeEnum["application/json"],
     );
     return response;
   };
@@ -236,7 +237,7 @@ export class CannyIoService {
   public listComments = async (
     postID: string,
     boardID: string,
-    limit = 10,
+    limit = 20,
     skip = 0,
   ) => {
     const response = await makeRequest("POST", `${this.apiUrl}/comments/list`, {
@@ -306,11 +307,33 @@ export class CannyIoService {
    * @param    postID - The ID of the post whose votes are being retrieved.
    * @returns {Promise<Object>} The response from the server with the list of votes.
    */
-  public listVotes = async (userID: string) => {
+  public listVotes = async (userID: string, limit: number, skip: number) => {
     const response = await makeRequest("POST", `${this.apiUrl}/votes/list`, {
       body: {
         apiKey: this.apiKey,
         userID,
+        limit,
+        skip,
+      },
+      headers: {
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+      },
+    });
+
+    return response;
+  };
+
+  /**
+   * Retrieves a list of votes for a post.
+   *
+   * @param    postID - The ID of the post whose votes are being retrieved.
+   * @returns {Promise<Object>} The response from the server with the list of votes.
+   */
+  public listVotesUsingPostId = async (postID: string) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/votes/list`, {
+      body: {
+        apiKey: this.apiKey,
+        postID,
       },
       headers: {
         "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
