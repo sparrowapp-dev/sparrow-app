@@ -15,14 +15,6 @@ The `@sparrow/desktop` package is responsible for delivering the desktop version
 - **Native Feel**: The desktop app is designed to deliver a native-like experience by utilizing frameworks like Tauri, providing users with an intuitive and familiar interface.
 - **Offline Capability**: Prioritizes offline functionality to allow users to work without internet access and sync their data when connectivity is restored.
 
-## Installation
-
-To install the `@sparrow/desktop` package, use Yarn:
-
-```bash
-yarn add @sparrow/desktop
-```
-
 ## Usage
 After installation, you can import and start using the package within your Tauri or desktop app setup:
 
