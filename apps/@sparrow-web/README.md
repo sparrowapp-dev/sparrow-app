@@ -15,21 +15,13 @@ The `@sparrow/web` package is responsible for delivering the web version of the 
 - **Cross-platform Experience**: Delivers a consistent user experience across different browsers and devices, while maintaining compatibility with the desktop app.
 - **Cloud-first Approach**: Optimized for online use, taking advantage of real-time data synchronization and cloud storage for seamless user experience.
 
-## Installation
-
-To install the `@sparrow/web` package, use Yarn:
-
-```bash
-yarn add @sparrow/web
-```
-
 ## Usage
 After installation, you can import and start using the package within your web app setup:
 
 ```
-import { initializeDesktopApp } from '@sparrow/web';
+import { initializeWebApp } from '@sparrow/web';
 
-initializeDesktopApp({
+initializeWebApp({
   // Your app initialization configuration
 });
 ```
