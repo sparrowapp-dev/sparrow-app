@@ -15,16 +15,8 @@ Manage your team by adding or removing members as needed. Ensure that your team 
 ### 3. **Role Assignment**
 Assign specific roles and permissions to team members. Roles can define what each team member can do, helping to maintain structure and security within the team.
 
-## Installation
-
-To install the `@sparrow/teams` package, use Yarn:
-
-```bash
-yarn add @sparrow/teams
-```
-
 ## Usage
-After installation, you can import and start using the package within your desktop or app setup:
+After installation, you can import and start using the package within your desktop or web app setup:
 
 ```
 import { initializeTeamsApp } from '@sparrow/teams';
