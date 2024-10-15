@@ -16,14 +16,6 @@ The `@sparrow/support` package facilitates user feedback and support mechanisms 
    - The support form allows users to describe their problem and provide necessary details for troubleshooting.
    - Submitted support requests are routed to the appropriate team for review and assistance.
 
-## Installation
-
-To install the `@sparrow/support` package, use Yarn:
-
-```bash
-yarn add @sparrow/support
-```
-
 ## Usage
 After installation, you can import and start using the package within your desktop or web app setup:
 
