@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
-  import { folderIcon as folder } from "@deprecate/assets";
+  import { folderIcon as folder } from "@sparrow/library/assets";
   import { ItemType, RequestMethod } from "@sparrow/common/enums";
   import { CollectionIcon, SocketIcon } from "@sparrow/library/icons";
   export let type: ItemType = ItemType.REQUEST;

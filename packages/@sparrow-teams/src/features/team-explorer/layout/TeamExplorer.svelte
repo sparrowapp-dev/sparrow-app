@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { tableIcon as table } from "@deprecate/assets";
-  import { hamburgerIcon as hamburger } from "@deprecate/assets";
+  import { tableIcon as table } from "@sparrow/library/assets";
+  import { hamburgerIcon as hamburger } from "@sparrow/library/assets";
   import { workspaceView } from "../store/workspace-view";
   import { onDestroy } from "svelte";
-  import { SearchIcon } from "@deprecate/assets";
+  import { SearchIcon } from "@sparrow/library/assets";
   import { base64ToURL } from "@sparrow/common/utils";
-  import { PeopleIcon } from "@deprecate/assets";
+  import { PeopleIcon } from "@sparrow/library/assets";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { TeamRole } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { BookIcon } from "@deprecate/assets";
+  import { BookIcon } from "@sparrow/library/assets";
 
   import { Tooltip } from "@sparrow/library/ui";
   import { onDestroy, onMount } from "svelte";
-  import { saveDescIcon as SaveIcon } from "@deprecate/assets";
-  import { editDescIcon as EditIcon } from "@deprecate/assets";
+  import { saveDescIcon as SaveIcon } from "@sparrow/library/assets";
+  import { editDescIcon as EditIcon } from "@sparrow/library/assets";
 
   import { Events, type WorkspaceRole } from "@sparrow/common/enums";
   import { notifications } from "@sparrow/library/ui";

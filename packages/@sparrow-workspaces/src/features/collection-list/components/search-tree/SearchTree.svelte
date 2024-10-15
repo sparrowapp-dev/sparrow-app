@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { folderIcon as folder } from "@deprecate/assets";
+  import { folderIcon as folder } from "@sparrow/library/assets";
   import Request from "./Request.svelte";
-  import { collectionIconIcon as collectionIcon } from "@deprecate/assets";
+  import { collectionIconIcon as collectionIcon } from "@sparrow/library/assets";
   let folderExpand: boolean = false;
   let collectionExpand: boolean = false;
 

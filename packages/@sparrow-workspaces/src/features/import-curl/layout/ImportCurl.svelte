@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Debounce } from "@sparrow/common/utils";
   import { Modal } from "@sparrow/library/ui";
-  import { TickMarkRoundedIcon as TickMark } from "@deprecate/assets";
+  import { TickMarkRoundedIcon as TickMark } from "@sparrow/library/assets";
   import { Spinner } from "@sparrow/library/ui";
   let importCurl = "";
 

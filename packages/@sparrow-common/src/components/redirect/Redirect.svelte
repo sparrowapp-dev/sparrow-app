@@ -1,7 +1,7 @@
 <script lang="ts">
   import { logoSparrowSquare } from "@sparrow/common/images";
   import { Spinner } from "@sparrow/library/ui";
-  import { leftIconIcon as leftIcon } from "@deprecate/assets";
+  import { leftIconIcon as leftIcon } from "@sparrow/library/assets";
   import constants from "@app/constants/constants";
   import { fly, fade } from "svelte/transition";
   import { onMount } from "svelte";

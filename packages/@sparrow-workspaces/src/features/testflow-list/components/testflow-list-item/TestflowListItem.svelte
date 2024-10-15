@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { dot3Icon as threedotIcon } from "@deprecate/assets";
+  import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
   import { UntrackedItems } from "@sparrow/common/enums/item-type.enum";
   import {
     Button,

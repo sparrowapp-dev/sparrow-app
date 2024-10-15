@@ -20,8 +20,8 @@
    * Role of user in active workspace
    */
   export let userRole;
-  import { angleRightV2Icon as angleRight } from "@deprecate/assets";
-  import { dot3Icon as threedotIcon } from "@deprecate/assets";
+  import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
+  import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
   import {
     ItemType,
     UntrackedItems,
@@ -32,12 +32,12 @@
   import { Button } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { Tooltip } from "@sparrow/library/ui";
-  import { gitBranchIcon } from "@deprecate/assets";
-  import { ReloadCollectionIcon } from "@deprecate/assets";
+  import { gitBranchIcon } from "@sparrow/library/assets";
+  import { ReloadCollectionIcon } from "@sparrow/library/assets";
   import type { CollectionDocument, TabDocument } from "@app/database/database";
   import Folder from "../folder/Folder.svelte";
   import type { Path } from "@sparrow/common/interfaces/request.interface";
-  import { addIcon as AddIcon } from "@deprecate/assets";
+  import { addIcon as AddIcon } from "@sparrow/library/assets";
   import {
     FolderIcon,
     SyncIcon,

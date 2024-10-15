@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { dot3Icon as threedotIcon } from "@deprecate/assets";
-  import { SelectIcon } from "@deprecate/assets";
+  import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
+  import { SelectIcon } from "@sparrow/library/assets";
   import { UntrackedItems } from "@sparrow/common/enums/item-type.enum";
   import { Spinner } from "@sparrow/library/ui";
   import { Modal } from "@sparrow/library/ui";

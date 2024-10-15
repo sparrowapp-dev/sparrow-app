@@ -14,7 +14,7 @@
   import { invoke } from "@tauri-apps/api/core";
   import { Button } from "@sparrow/library/ui";
   import { ContentTypeEnum, ResponseStatusCode } from "@sparrow/common/enums";
-  import { TickMarkRoundedIcon as TickMark } from "@deprecate/assets";
+  import { TickMarkRoundedIcon as TickMark } from "@sparrow/library/assets";
   import { Drop } from "../components";
   import { InfoIcon } from "@sparrow/library/icons";
 

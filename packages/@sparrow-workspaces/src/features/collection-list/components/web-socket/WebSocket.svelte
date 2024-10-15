@@ -19,7 +19,7 @@
   import { UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
 
   // --- SVG
-  import { dot3Icon as threedotIcon } from "@deprecate/assets";
+  import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
 
   // ---- DB
   import type { CollectionDocument } from "@app/database/database";

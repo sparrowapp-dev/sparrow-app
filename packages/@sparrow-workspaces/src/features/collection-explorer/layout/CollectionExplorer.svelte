@@ -56,8 +56,8 @@
   /**
    * Icons and images
    */
-  import { GitBranchIcon } from "@deprecate/assets";
-  import {refreshIcon} from "@deprecate/assets";
+  import { GitBranchIcon } from "@sparrow/library/assets";
+  import {refreshIcon} from "@sparrow/library/assets";
 
   /**
    * Components

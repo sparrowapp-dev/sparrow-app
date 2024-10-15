@@ -1,6 +1,6 @@
 <script lang="ts">
   // ---- Assets
-  import { floppyDiskIcon as floppyDisk } from "@deprecate/assets";
+  import { floppyDiskIcon as floppyDisk } from "@sparrow/library/assets";
 
   // ---- Components
   import {

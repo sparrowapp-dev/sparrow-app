@@ -2,11 +2,11 @@
   import { onDestroy } from "svelte";
 
   // ---- SVG
-  import { folderIcon as folderCloseIcon } from "@deprecate/assets";
-  import { openFolderIcon as folderOpenIcon } from "@deprecate/assets";
-  import { dot3Icon as threedotIcon } from "@deprecate/assets";
+  import { folderIcon as folderCloseIcon } from "@sparrow/library/assets";
+  import { openFolderIcon as folderOpenIcon } from "@sparrow/library/assets";
+  import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
   import { RequestIcon } from "@sparrow/library/icons";
-  import { angleRightV2Icon as angleRight } from "@deprecate/assets";
+  import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
 
   // ---- Components
   import Request from "../request/Request.svelte";

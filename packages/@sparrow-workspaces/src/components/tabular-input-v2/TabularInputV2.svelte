@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { trashIcon } from "@deprecate/assets";
+  import { trashIcon } from "@sparrow/library/assets";
   import editIcon from "../../features/rest-explorer/assets/icons/edit.svg";
   import moreOptions from "../../features/rest-explorer/assets/icons/moreOptions.svg";
   import type {

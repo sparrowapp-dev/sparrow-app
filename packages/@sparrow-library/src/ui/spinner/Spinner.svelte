@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { spinIcon as spin } from "@deprecate/assets";
+  import { spinIcon as spin } from "@sparrow/library/assets";
   export let size: string;
   export let classProp: string = "";
 </script>

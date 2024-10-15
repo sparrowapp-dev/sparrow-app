@@ -21,7 +21,7 @@
    */
   export let onValidateEmail;
 
-  import { closeIconWhiteIcon as closeIconWhite } from "@deprecate/assets";
+  import { closeIconWhiteIcon as closeIconWhite } from "@sparrow/library/assets";
   import { MultiSelect, Select } from "@sparrow/library/forms";
   import { notifications } from "@sparrow/library/ui";
 

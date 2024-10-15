@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CrossIcon as Crossicon } from "@deprecate/assets";
+  import { CrossIcon as Crossicon } from "@sparrow/library/assets";
   export let onClose;
   export let text = " ";
   export let heading = " ";

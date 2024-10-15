@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { infoColorBlueIcon as infoIcon } from "@deprecate/assets";
-  import { beautifyIcon as BeautifyIcon } from "@deprecate/assets";
-  import { crossIcon } from "@deprecate/assets";
+  import { infoColorBlueIcon as infoIcon } from "@sparrow/library/assets";
+  import { beautifyIcon as BeautifyIcon } from "@sparrow/library/assets";
+  import { crossIcon } from "@sparrow/library/assets";
   import { Select } from "@sparrow/library/forms";
   import { RequestDataType, RequestDataset } from "@sparrow/common/enums";
   import { notifications } from "@sparrow/library/ui";

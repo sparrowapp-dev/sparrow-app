@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { doubleAngleLeftIcon as doubleangleLeft } from "@deprecate/assets";
-  import { FilterIcon } from "@deprecate/assets";
-  import { plusWhiteIcon as plusIcon } from "@deprecate/assets";
+  import { doubleAngleLeftIcon as doubleangleLeft } from "@sparrow/library/assets";
+  import { FilterIcon } from "@sparrow/library/assets";
+  import { plusWhiteIcon as plusIcon } from "@sparrow/library/assets";
 
   import { Events, WorkspaceRole } from "@sparrow/common/enums";
   import { Dropdown } from "@sparrow/library/ui";

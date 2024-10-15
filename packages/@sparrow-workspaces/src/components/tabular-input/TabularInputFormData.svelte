@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { trashIcon as trashIcon } from "@deprecate/assets";
+  import { trashIcon as trashIcon } from "@sparrow/library/assets";
   import editIcon from "../../features/rest-explorer/assets/icons/edit.svg";
   import moreOptions from "../../features/rest-explorer/assets/icons/moreOptions.svg";
   import attachFile from "../../features/rest-explorer/assets/icons/attachFile.svg";
@@ -8,7 +8,7 @@
     KeyValuePairWithBase,
   } from "@sparrow/common/interfaces/request.interface";
   import { invoke } from "@tauri-apps/api/core";
-  import { crossIcon as close } from "@deprecate/assets";
+  import { crossIcon as close } from "@sparrow/library/assets";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "..";
   import { Tooltip } from "@sparrow/library/ui";

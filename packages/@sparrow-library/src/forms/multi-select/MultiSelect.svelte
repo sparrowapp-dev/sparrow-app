@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { slide } from "svelte/transition";
-  import { closeIcon } from "@deprecate/assets";
+  import { closeIcon } from "@sparrow/library/assets";
   import type { Data } from "./types";
   import { DownArrowIcon } from "@sparrow/library/icons";
 
