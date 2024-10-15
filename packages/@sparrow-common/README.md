@@ -9,15 +9,6 @@ The `@sparrow/common` package provides a collection of shared utilities and logi
 - **Reusable Functions**: A collection of utility functions that can be used throughout the application for various purposes, such as data manipulation, formatting, and more.
 - **Constants and Configurations**: Common constants and configuration settings that ensure uniformity and ease of maintenance across different parts of the application.
 
-
-## Installation
-
-To install the `@sparrow/common` package, use Yarn:
-
-```bash
-yarn add @sparrow/common
-```
-
 ## Usage
 After installation, you can import and start using the package within your desktop or web app setup:
 
