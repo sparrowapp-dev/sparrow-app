@@ -24,7 +24,7 @@ yarn add @sparrow/web
 ```
 
 ## Usage
-After installation, you can import and start using the package within your Tauri or desktop app setup:
+After installation, you can import and start using the package within your web app setup:
 
 ```
 import { initializeDesktopApp } from '@sparrow/web';
