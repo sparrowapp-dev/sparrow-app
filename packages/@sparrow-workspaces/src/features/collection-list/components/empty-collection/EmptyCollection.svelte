@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Plus from "@deprecate/assets/plus.svelte";
   import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   import {
     PERMISSION_NOT_FOUND_TEXT,

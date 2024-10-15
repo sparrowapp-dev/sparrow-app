@@ -1,18 +1,15 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { ItemType } from "@sparrow/common/enums/item-type.enum";
-  import collectionAsset from "@deprecate/assets/collection.svg";
-  import workspaceAsset from "@deprecate/assets/workspace.svg";
-  import folderAsset from "@deprecate/assets/folder.svg";
-  import leftArrowAsset from "@deprecate/assets/angleLeft.svg";
+  import { angleLeftIcon as leftArrowAsset } from "@deprecate/assets";
   import { searchTreeDocument } from "../utils";
   import { notifications } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
-  import tickIcon from "@deprecate/assets/tick-grey.svg";
-  import crossIcon from "@deprecate/assets/cross-grey.svg";
+  import { tickGreyIcon as tickIcon } from "@deprecate/assets";
+  import { crossGreyIcon as crossIcon } from "@deprecate/assets";
   import { Spinner } from "@sparrow/library/ui";
-  import QuestionIcon from "@deprecate/assets/question.svelte";
+  import { QuestionIcon } from "@deprecate/assets";
   import { Button } from "@sparrow/library/ui";
   import { FileType } from "../components";
   import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";

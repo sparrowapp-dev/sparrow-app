@@ -19,8 +19,8 @@
   import { UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
 
   // --- SVG
-  import threedotIcon from "@deprecate/assets/3dot.svg";
-  import reloadSyncIcon from "@deprecate/assets/reload-sync.svg";
+  import { dot3Icon as threedotIcon } from "@deprecate/assets";
+  import { reloadSyncIcon } from "@deprecate/assets";
 
   // ---- DB
   import type { CollectionDocument } from "@app/database/database";
@@ -334,7 +334,7 @@
         class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
           ? 'threedot-active'
           : ''}"
-          style="transform: rotate(90deg);"
+        style="transform: rotate(90deg);"
         on:click={(e) => {
           rightClickContextMenu(e);
         }}

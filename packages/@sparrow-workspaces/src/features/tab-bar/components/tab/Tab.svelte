@@ -1,12 +1,12 @@
 <script lang="ts">
   // ---- Icon
-  import Crossicon from "@deprecate/assets/crossicon.svelte";
-  import BookIcon from "@deprecate/assets/book.svelte";
+  import { CrossIcon as Crossicon } from "@deprecate/assets";
+  import { BookIcon } from "@deprecate/assets";
   // ----
 
   // ---- SVG
-  import collectionAsset from "@deprecate/assets/collection-nodes.svg";
-  import folderTab from "@deprecate/assets/folder-tab.svg";
+  import { collectionNodesIcon as collectionAsset } from "@deprecate/assets";
+  import { folderTabIcon as folderTab } from "@deprecate/assets";
 
   // ---- helper functions
   import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";

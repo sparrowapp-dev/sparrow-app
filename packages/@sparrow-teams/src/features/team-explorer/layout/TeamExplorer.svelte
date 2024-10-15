@@ -1,6 +1,6 @@
 <script lang="ts">
-  import table from "@deprecate/assets/table.svg";
-  import hamburger from "@deprecate/assets/hamburger.svg";
+  import { tableIcon as table } from "@deprecate/assets";
+  import { hamburgerIcon as hamburger } from "@deprecate/assets";
   import { workspaceView } from "../store/workspace-view";
   import { onDestroy } from "svelte";
   import { SearchIcon } from "@deprecate/assets";
@@ -261,7 +261,7 @@
             {/if}
           </h2>
 
-          <div class="d-flex  align-items-end justify-content-end">
+          <div class="d-flex align-items-end justify-content-end">
             {#if openTeam?.users?.length > 1 && !isGuestUser}
               <p class="d-flex my-auto ms-4 sparrow-fs-12">
                 <PeopleIcon

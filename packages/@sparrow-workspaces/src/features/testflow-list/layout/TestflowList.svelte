@@ -2,7 +2,7 @@
   import { PlusIcon, TreeIcon } from "@sparrow/library/icons";
   import { List, Tooltip } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";
-  import angleRight from "@deprecate/assets/angle-right-v2.svg";
+  import { angleRightV2Icon as angleRight } from "@deprecate/assets";
   import { TestflowListItem } from "../components";
   import type { ScrollList } from "@sparrow/library/ui/list/types";
   import {

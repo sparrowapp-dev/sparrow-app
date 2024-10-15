@@ -6,7 +6,7 @@
   import { eyeHideIcon } from "@deprecate/assets";
   import { eyeShowIcon } from "@deprecate/assets";
   import { authNavigate, handleLoginValidation } from "./login-page";
-  import sparrowicon from "@deprecate/assets/sparrowIcon.svg";
+  import { sparrowIcon } from "@deprecate/assets";
   import { once } from "@tauri-apps/api/event";
   import { Window } from "@tauri-apps/api/window";
 
@@ -264,7 +264,7 @@
   <div
     class="BottomLogo text-white d-flex justify-content-center align-items-center"
   >
-    <img src={sparrowicon} alt="" class="w-50" />
+    <img src={sparrowIcon} alt="" class="w-50" />
   </div>
 </div>
 

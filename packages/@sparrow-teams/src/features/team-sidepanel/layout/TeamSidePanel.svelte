@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Tooltip } from "@sparrow/library/ui";
-  import plus from "@deprecate/assets/plus.svg";
+  import { PlusIcon as plus } from "@deprecate/assets";
   import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import type { TabDocument, TeamDocument } from "@app/database/database";

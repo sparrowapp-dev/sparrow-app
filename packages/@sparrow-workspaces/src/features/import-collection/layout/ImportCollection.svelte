@@ -11,11 +11,10 @@
     validateClientXML,
     validateImportBody,
   } from "@sparrow/common/utils/importCollectionValidations";
-  import linkIcon from "@deprecate/assets/linkIcon.svg";
   import { invoke } from "@tauri-apps/api/core";
   import { Button } from "@sparrow/library/ui";
   import { ContentTypeEnum, ResponseStatusCode } from "@sparrow/common/enums";
-  import TickMark from "@deprecate/assets/tick-mark-rounded.svelte";
+  import { TickMarkRoundedIcon as TickMark } from "@deprecate/assets";
   import { Drop } from "../components";
   import { InfoIcon } from "@sparrow/library/icons";
 
@@ -617,7 +616,6 @@
       result in some data loss.
     </p>
   </div>
- 
 {/if}
 {#if importType === "text" && isValidClientURL && isValidServerURL && false}
   <div>

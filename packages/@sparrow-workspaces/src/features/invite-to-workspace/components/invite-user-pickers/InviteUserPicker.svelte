@@ -1,6 +1,6 @@
 <script lang="ts">
-  import closeIcon from "@deprecate/assets/close-icon-normal.svg";
-  import closeIconWhite from "@deprecate/assets/close-icon-white.svg";
+  import { closeIconIcon as closeIcon } from "@deprecate/assets";
+  import { closeIconWhiteIcon as closeIconWhite } from "@deprecate/assets";
   import { createDynamicComponents } from "@sparrow/common/utils/common.helper";
   import { onDestroy, onMount } from "svelte";
   import { slide } from "svelte/transition";

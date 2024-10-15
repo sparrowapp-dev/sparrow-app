@@ -1,5 +1,5 @@
 <script>
-  import cross from "@deprecate/assets/close.svg";
+  import { closeIcon as cross } from "@deprecate/assets";
   import { QuickHelp } from "@sparrow/common/constants/environment.constant";
   import {
     environmentDropdown,

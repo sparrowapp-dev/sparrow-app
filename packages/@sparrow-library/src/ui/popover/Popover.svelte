@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Crossicon from "@deprecate/assets/crossicon.svelte";
+  import { CrossIcon as Crossicon } from "@deprecate/assets";
   export let onClose;
   export let text = " ";
   export let heading = " ";

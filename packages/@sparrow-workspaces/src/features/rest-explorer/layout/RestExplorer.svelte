@@ -1,7 +1,7 @@
 <script lang="ts">
   // ---- Assets
-  import floppyDisk from "@deprecate/assets/floppy-disk.svg";
-  import angleDown from "@deprecate/assets/angle-down.svg";
+  import { floppyDiskIcon as floppyDisk } from "@deprecate/assets";
+
   // ---- Components
   import {
     HttpUrlSection,

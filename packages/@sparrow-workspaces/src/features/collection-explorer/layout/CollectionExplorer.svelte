@@ -57,7 +57,7 @@
    * Icons and images
    */
   import { GitBranchIcon } from "@deprecate/assets";
-  import refreshIcon from "@deprecate/assets/refresh.svg";
+  import {refreshIcon} from "@deprecate/assets";
 
   /**
    * Components

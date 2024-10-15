@@ -2,13 +2,11 @@
   import { onDestroy } from "svelte";
 
   // ---- SVG
-  import folderCloseIcon from "@deprecate/assets/folder.svg";
-  import folderOpenIcon from "@deprecate/assets/open-folder.svg";
-  import threedotIcon from "@deprecate/assets/3dot.svg";
-  // import AddIcon from "@deprecate/assets/add.svg";
-  // import requestIcon from "@deprecate/assets/create_request.svg";
+  import { folderIcon as folderCloseIcon } from "@deprecate/assets";
+  import { openFolderIcon as folderOpenIcon } from "@deprecate/assets";
+  import { dot3Icon as threedotIcon } from "@deprecate/assets";
   import { RequestIcon } from "@sparrow/library/icons";
-  import angleRight from "@deprecate/assets/angle-right-v2.svg";
+  import { angleRightV2Icon as angleRight } from "@deprecate/assets";
 
   // ---- Components
   import Request from "../request/Request.svelte";
@@ -159,7 +157,7 @@
 
   let newFolderName: string = "";
   const handleRenameInput = (event: { target: { value: string } }) => {
-    newFolderName = event.target.value.trim();;
+    newFolderName = event.target.value.trim();
   };
 
   const onRenameBlur = async () => {

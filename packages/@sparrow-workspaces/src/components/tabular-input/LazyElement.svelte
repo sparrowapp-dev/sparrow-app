@@ -1,6 +1,6 @@
 <script lang="ts">
   import { inview } from "svelte-inview";
-  import trashIcon from "@deprecate/assets/trash-icon.svg";
+  import { trashIcon as trashIcon } from "@deprecate/assets";
   import { CodeMirrorInput } from "../";
   import { Tooltip } from "@sparrow/library/ui";
   import type {

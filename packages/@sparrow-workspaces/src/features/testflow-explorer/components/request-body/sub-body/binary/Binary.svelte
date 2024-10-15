@@ -1,7 +1,7 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
-  import AttachIcon from "@deprecate/assets/attach-file.svg";
-  import CloseIcon from "@deprecate/assets/close.svg";
+  import { attachFileIcon as AttachIcon } from "@deprecate/assets";
+  import { closeIcon as CloseIcon } from "@deprecate/assets";
   let fileName = "";
 
   const extractFileName = (url) => {
