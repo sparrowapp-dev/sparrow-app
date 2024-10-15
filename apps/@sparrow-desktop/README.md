@@ -21,4 +21,23 @@ To install the `@sparrow/desktop` package, use Yarn:
 
 ```bash
 yarn add @sparrow/desktop
+```
+
+## Usage
+After installation, you can import and start using the package within your Electron or desktop app setup:
+
+```
+import { initializeDesktopApp } from '@sparrow/desktop';
+
+initializeDesktopApp({
+  // Your app initialization configuration
+});
+```
+## Dependencies Relationships
+
+- **[@sparrow/library](packages/library/README.md)**: Contains global utilities without app-specific data.
+- **[@sparrow/common](packages/common/README.md)**: Provides shared logic and utilities across the application.
+- **[@sparrow/workspace](packages/workspace/README.md)**: Manages collections, environments, and test flows for the REST API tool.
+- **[@sparrow/teams](packages/teams/README.md)**: Facilitates team collaboration and user management.
+- **[@sparrow/support](packages/support/README.md)**: Handles user feedback and support requests.
 
