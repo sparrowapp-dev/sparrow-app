@@ -15,17 +15,8 @@ The @sparrow/workspaces package is a crucial component of the Sparrow applicatio
 ### 3. Test Flow Execution
 - **Run Predefined Test Flows**: Execute pre-built test flows that validate API behavior across different environments. Automate testing for consistent API responses and ensure everything behaves as expected.
 
-
-## Installation
-
-To install the `@sparrow/workspaces` package, use Yarn:
-
-```bash
-yarn add @sparrow/workspaces
-```
-
 ## Usage
-After installation, you can import and start using the package within your desktop or app setup:
+After installation, you can import and start using the package within your desktop or web app setup:
 
 ```
 import { initializeDesktopApp } from '@sparrow/workspaces';
