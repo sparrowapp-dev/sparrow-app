@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SearchIcon } from "@deprecate/assets";
+  import { SearchIcon } from "@sparrow/library/assets";
   import { CrossIcon } from "@sparrow/library/icons";
   import { Member } from "../components";
   export let openTeam;

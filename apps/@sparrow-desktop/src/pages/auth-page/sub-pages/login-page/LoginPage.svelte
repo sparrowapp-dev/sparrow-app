@@ -2,11 +2,11 @@
   import { Link, navigate } from "svelte-navigator";
   import { setUser } from "@app/store/auth.store";
   import { jwtDecode } from "@app/utils/jwt";
-  import { googleLogoIcon } from "@deprecate/assets";
-  import { eyeHideIcon } from "@deprecate/assets";
-  import { eyeShowIcon } from "@deprecate/assets";
+  import { googleLogoIcon } from "@sparrow/library/assets";
+  import { eyeHideIcon } from "@sparrow/library/assets";
+  import { eyeShowIcon } from "@sparrow/library/assets";
   import { authNavigate, handleLoginValidation } from "./login-page";
-  import sparrowicon from "@deprecate/assets/sparrowIcon.svg";
+  import { sparrowIcon } from "@sparrow/library/assets";
   import { once } from "@tauri-apps/api/event";
   import { Window } from "@tauri-apps/api/window";
 
@@ -264,7 +264,7 @@
   <div
     class="BottomLogo text-white d-flex justify-content-center align-items-center"
   >
-    <img src={sparrowicon} alt="" class="w-50" />
+    <img src={sparrowIcon} alt="" class="w-50" />
   </div>
 </div>
 

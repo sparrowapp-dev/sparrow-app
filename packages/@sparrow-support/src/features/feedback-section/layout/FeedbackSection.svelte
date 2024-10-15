@@ -10,7 +10,7 @@
   import FeedbackPost from "./FeedbackPost.svelte";
   import FeedbackDefault from "./FeedbackDefault.svelte";
   import { onMount } from "svelte";
-  import { SearchIcon } from "@deprecate/assets";
+  import { SearchIcon } from "@sparrow/library/assets";
   import { Select } from "@sparrow/library/forms";
   import { CategoryIcon, StatusIcon } from "@sparrow/library/icons";
   import { FeedbackType, FeedbackStatusType } from "../../../types/feedback";

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LeftIcon, SearchIcon } from "@deprecate/assets";
+  import { LeftIcon, SearchIcon } from "@sparrow/library/assets";
   import { Input, Select, Textarea } from "@sparrow/library/forms";
   import {
     AttachmentIcon,
