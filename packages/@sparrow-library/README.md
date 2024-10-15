@@ -7,7 +7,7 @@ The `@sparrow/library` package serves as a repository for global utilities that 
 
 ## Core Features
 
-- **Utility Functions**: Provides a range of helper functions, such as debouncing and throttling, for better performance.
+- **Utility Functions**: Provides a range of helper functions and ui components for better performance.
 - **No Dependencies**: This package is self-contained and does not depend on other packages.
 
 ## Installation
