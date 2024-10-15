@@ -24,7 +24,7 @@ yarn add @sparrow/desktop
 ```
 
 ## Usage
-After installation, you can import and start using the package within your Electron or desktop app setup:
+After installation, you can import and start using the package within your Tauri or desktop app setup:
 
 ```
 import { initializeDesktopApp } from '@sparrow/desktop';
