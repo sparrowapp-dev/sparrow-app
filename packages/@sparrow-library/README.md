@@ -10,14 +10,6 @@ The `@sparrow/library` package serves as a repository for global utilities that 
 - **Utility Functions**: Provides a range of helper functions and ui components for better performance.
 - **No Dependencies**: This package is self-contained and does not depend on other packages.
 
-## Installation
-
-To install the `@sparrow/library` package, use Yarn:
-
-```bash
-yarn add @sparrow/library
-```
-
 ## Usage
 After installation, you can import and start using the package within your desktop or web app setup:
 
