@@ -1,5 +1,4 @@
 <script lang="ts">
-  //   import linkIcon from "@deprecate/assets/linkIcon.svg";
   //   function handleLinkClick(event) {
   //     event.preventDefault();
   //   }

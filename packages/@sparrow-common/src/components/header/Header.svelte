@@ -131,9 +131,9 @@
   export let user;
   export let onLogout;
 
-  import profile from "@deprecate/assets/profileTab.svg";
-  import hoveredProfile from "@deprecate/assets/profile-hovered.svg";
-  import selectedProfile from "@deprecate/assets/profile-selected.svg";
+  import { profileTabIcon as profile } from "@sparrow/library/assets";
+  import { profileHoveredIcon as hoveredProfile } from "@sparrow/library/assets";
+  import { profileSelectedIcon as selectedProfile } from "@sparrow/library/assets";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",

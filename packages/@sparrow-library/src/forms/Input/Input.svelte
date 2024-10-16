@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SearchIcon } from "@deprecate/assets";
+  import { SearchIcon } from "@sparrow/library/assets";
   import { PencilIcon } from "@sparrow/library/icons";
   import { createEventDispatcher } from "svelte";
 

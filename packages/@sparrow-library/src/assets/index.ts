@@ -30,6 +30,8 @@ export { default as DropdownIcon } from "./dropdown.svelte";
 export { default as StatusErrorIcon } from "./status-error.svelte";
 export { default as StatusSuccessIcon } from "./status-success.svelte";
 export { default as TickMarkRoundedIcon } from "./tick-mark-rounded.svelte";
+export { default as QuestionIcon } from "./question.svelte";
+export { default as FilterIcon } from "./filter.svelte";
 
 // Export all SVG files (camelCase) with "Icon" appended
 export { default as aboutIcon } from "./about.svg";
@@ -133,3 +135,11 @@ export { default as spinIcon } from "./spin.svg";
 export { default as starIcon } from "./star.svg";
 export { default as tableIcon } from "./table.svg";
 export { default as tableColumnIcon } from "./table-column.svg";
+export { default as profileTabIcon } from "./profileTab.svg";
+export { default as closeIcon } from "./close.svg";
+export { default as trashIcon } from "./trash-icon.svg";
+export { default as dot3Icon } from "./3dot.svg";
+
+export { default as gitBranchIcon } from "./git-branch.svg";
+export { default as copyIcon } from "./copy.svg";
+export { default as tickGreyIcon } from "./tick-grey.svg";

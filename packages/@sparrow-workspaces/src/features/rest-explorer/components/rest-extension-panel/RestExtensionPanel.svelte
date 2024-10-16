@@ -1,12 +1,10 @@
 <script lang="ts">
-  import commetIcon from "@deprecate/assets/comment-fill.svg";
-  import codeIcon from "@deprecate/assets/code.svg";
-  import BookIcon from "@deprecate/assets/book.svelte";
+  import { BookIcon } from "@sparrow/library/assets";
 
   import { Tooltip } from "@sparrow/library/ui";
   import { onDestroy, onMount } from "svelte";
-  import SaveIcon from "@deprecate/assets/save-desc.svg";
-  import EditIcon from "@deprecate/assets/edit-desc.svg";
+  import { saveDescIcon as SaveIcon } from "@sparrow/library/assets";
+  import { editDescIcon as EditIcon } from "@sparrow/library/assets";
 
   import { Events, type WorkspaceRole } from "@sparrow/common/enums";
   import { notifications } from "@sparrow/library/ui";

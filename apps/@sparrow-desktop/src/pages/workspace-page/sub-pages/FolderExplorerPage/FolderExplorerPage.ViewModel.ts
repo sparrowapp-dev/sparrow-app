@@ -31,7 +31,6 @@ import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { notifications } from "@sparrow/library/ui";
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { isGuestUserActive } from "@app/store/auth.store";
-// import { generateSampleRequest } from "@deprecate/utils/sample";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class FolderExplorerPage {

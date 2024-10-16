@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Collection, EmptyCollection, SearchTree } from "../components";
-  import doubleangleLeft from "@deprecate/assets/doubleangleLeft.svg";
-  import angleRight from "@deprecate/assets/angle-right-v2.svg";
+  import { doubleAngleLeftIcon as doubleangleLeft } from "@sparrow/library/assets";
+  import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { List } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";

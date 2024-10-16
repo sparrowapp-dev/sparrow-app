@@ -1,6 +1,4 @@
 <script lang="ts">
-  import downloadIcon from "@deprecate/assets/download.svg";
-  import copyIcon from "@deprecate/assets/copy.svg";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import { notifications } from "@sparrow/library/ui";
   import {
@@ -10,7 +8,6 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
-  import BeautifyIcon from "@deprecate/assets/beautify.svg";
   import js_beautify, { html_beautify } from "js-beautify";
   import {
     WithButtonV4,
