@@ -97,6 +97,9 @@
 
   export let onAddMember;
 
+  export let openInDesktop;
+  export let isWebApp;
+
   let selectedView: string = "Grid";
 
   const selectedViewSubscribe = workspaceView.subscribe((value) => {
@@ -382,6 +385,8 @@
               {#if selectedView === TeamViewEnum.LIST}
                 <WorkspaceListView
                   {onAddMember}
+                  {openInDesktop}
+                  {isWebApp}
                   bind:isGuestUser
                   {searchQuery}
                   {openTeam}

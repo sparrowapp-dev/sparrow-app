@@ -19,6 +19,8 @@
 
   export let onDeleteWorkspace;
 
+  export let openInDesktop;
+  export let isWebApp;
   /**
    * Checks if the current user has admin or owner privileges.
    */
@@ -73,6 +75,8 @@
                 {calculateTimeDifferenceInDays}
                 {isAdminOrOwner}
                 {onDeleteWorkspace}
+                {openInDesktop}
+                {isWebApp}
               />
             {/each}
           {/if}

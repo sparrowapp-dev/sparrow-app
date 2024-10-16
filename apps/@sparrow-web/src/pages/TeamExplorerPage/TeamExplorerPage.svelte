@@ -3,12 +3,14 @@
   import { TeamExplorer, TeamInvite } from "@sparrow/teams/features";
   import { TeamExplorerPageViewModel } from "./TeamExplorerPage.ViewModel";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
+  import WelcomePopUpWeb from "../../../../../packages/@sparrow-teams/src/compopnents/download-popup-web/DownloadPopupWeb.svelte";
   import { user } from "@app/store/auth.store";
   import { Modal } from "@sparrow/library/ui";
   import { LeaveTeam } from "@sparrow/teams/features";
   import { DeleteWorkspace } from "@sparrow/common/features";
   import { onMount } from "svelte";
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
+  import { navigate } from "svelte-navigator";
 
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
@@ -65,6 +67,47 @@
     workspaceDetails.users = users;
     isWorkspaceInviteModalOpen = true;
   };
+
+  let isPopupOpen = false;
+  let sparrowRedirect: string;
+  let isWebApp = true;
+
+  onMount(() => {
+    checkIfWebApp();
+    setupRedirect();
+  });
+
+  function checkIfWebApp() {
+    isWebApp = typeof window !== "undefined" && !window.require;
+  }
+
+  function setupRedirect() {
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+    sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email`;
+  }
+
+  function openInDesktop() {
+    if (sparrowRedirect) {
+      isPopupOpen = true;
+
+      window.addEventListener(
+        "blur",
+        () => {
+          isPopupOpen = false;
+        },
+        { once: true },
+      );
+
+      window.location.href = sparrowRedirect;
+    } else {
+      navigate("https://sparrowapp.dev/");
+    }
+  }
+
+  function closeWelcomePopup() {
+    isPopupOpen = false;
+  }
 </script>
 
 <TeamExplorer
@@ -87,7 +130,20 @@
   onRemoveUserFromWorkspace={_viewModel.removeUserFromWorkspace}
   onChangeUserRoleAtWorkspace={_viewModel.changeUserRoleAtWorkspace}
   onUpdateTeam={_viewModel.updateTeam}
+  {openInDesktop}
+  {isWebApp}
 />
+
+<Modal
+  title=""
+  type="dark"
+  width="45%"
+  zIndex={1000}
+  isOpen={isPopupOpen}
+  handleModalState={closeWelcomePopup}
+>
+  <WelcomePopUpWeb />
+</Modal>
 
 <Modal
   title={"Invite Team Members"}

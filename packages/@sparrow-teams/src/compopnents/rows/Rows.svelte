@@ -17,6 +17,7 @@
   let pos = { x: 0, y: 0 };
   let showMenu = false;
   let workspaceTabWrapper: HTMLElement;
+  let isPopupOpen = false;
 
   let menuItems = [];
   let noOfColumns = 180;
@@ -31,7 +32,6 @@
   });
 
   function checkIfWebApp() {
-    // This is a simple check. You might need a more robust method depending on your setup.
     isWebApp = typeof window !== "undefined" && !window.require;
   }
 
@@ -96,14 +96,7 @@
   function closeRightClickContextMenu() {
     showMenu = false;
   }
-
-  function openInDesktop() {
-    if (sparrowRedirect) {
-      navigate(sparrowRedirect);
-    } else {
-      navigate("https://sparrowapp.dev/");
-    }
-  }
+  export let openInDesktop;
 </script>
 
 {#if showMenu}
