@@ -88,43 +88,9 @@
 
   let activeIndex = "";
 
-  const refreshTabs = () => {
-    return [
-      {
-        name: "Workspaces",
-        id: TeamTabsEnum.WORKSPACES,
-        count: $openTeam?.workspaces?.length,
-        visible: true,
-        disabled: isGuestUser === true ? true : false,
-      },
-      {
-        name: "Members",
-        id: TeamTabsEnum.MEMBERS,
-        count: $openTeam?.users?.length,
-        visible: true,
-        disabled: isGuestUser === true ? true : false,
-      },
-      {
-        name: "Settings",
-        id: TeamTabsEnum.SETTINGS,
-        count: 0,
-        visible: $openTeam?.owner === userId,
-        disabled: isGuestUser === true ? true : false,
-      },
-    ];
-  };
-
-  let teamTabs = [];
   $: {
     if ($openTeam) {
       activeIndex = $openTeam.teamId;
-      teamTabs = refreshTabs();
-    }
-  }
-
-  $: {
-    if (isGuestUser) {
-      teamTabs = refreshTabs();
     }
   }
 </script>
