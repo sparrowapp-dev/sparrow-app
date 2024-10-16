@@ -16,6 +16,7 @@
   import { CreateTeam } from "@sparrow/teams/features";
   import { pagesMotion } from "../../constants";
   import { version } from "../../../package.json";
+  import { isUserFirstSignUp } from "../../../../@sparrow-desktop/src/store/user.store";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
@@ -33,6 +34,8 @@
   const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
   import { onMount } from "svelte";
   import { Motion } from "svelte-motion";
+  import { WelcomePopup } from "../../../../../packages/@sparrow-workspaces/src/features/welcome-popup";
+    import WelcomePopUpWeb from "../../../../../packages/@sparrow-teams/src/compopnents/welcome-pop-up-web/WelcomePopUpWeb.svelte";
 
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
@@ -62,6 +65,13 @@
       splitter.style.display = "unset";
     }
   }
+
+  let isWelcomePopupOpen = false;
+  isUserFirstSignUp.subscribe((value) => {
+    if (value) {
+      isWelcomePopupOpen = value;
+    }
+  });
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -126,6 +136,29 @@
       isCreateTeamModalOpen = flag;
     }}
     onCreateTeam={_viewModel.createTeam}
+  />
+</Modal>
+
+<Modal
+  title={""}
+  type={"dark"}
+  width={"45%"}
+  zIndex={1000}
+  isOpen={isWelcomePopupOpen}
+  handleModalState={() => {
+    isUserFirstSignUp.set(false);
+    isWelcomePopupOpen = false;
+  }}
+>
+  <WelcomePopUpWeb
+    onClickExplore={() => {
+      isUserFirstSignUp.set(false);
+      isWelcomePopupOpen = false;
+    }}
+    onClickTour={() => {
+      isUserFirstSignUp.set(false);
+      isWelcomePopupOpen = false;
+    }}
   />
 </Modal>
 
