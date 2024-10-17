@@ -13,7 +13,6 @@
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import constants from "@app/constants/constants";
-
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import Teams from "../Teams/Teams.svelte";

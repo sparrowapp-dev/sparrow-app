@@ -11,7 +11,7 @@
     {#each tabs as tab}
       {#if tab?.visible}
         <button
-          class="navigation__link border-0 sparrow-fs-12 request-tab me-3 {tab.id ===
+          class="navigation__link border-0 sparrow-fs-12 pb-2 request-tab me-3 {tab.id ===
           activeTeamTab
             ? 'tab-active'
             : ''} {tab.disabled ? 'tab-disabled' : ''}"

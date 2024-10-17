@@ -3,28 +3,47 @@
   import { UserProfileList } from "@sparrow/teams/compopnents";
   import { MenuView } from "@sparrow/teams/compopnents";
   import { TeamRole, WorkspaceMemberRole } from "@sparrow/common/enums";
+  import { onMount } from "svelte";
+  import { navigate } from "svelte-navigator";
 
-  export let list;
-  export let activeTeam;
+  export let list: any;
+  export let activeTeam: any;
   export let onOpenCollection: (id: string) => void;
-  export let calculateTimeDifferenceInDays;
-
-  export let onAddMember;
-
-  /**
-   * Checks if the current user has admin or owner privileges.
-   */
+  export let calculateTimeDifferenceInDays: (
+    date1: Date,
+    date2: Date,
+  ) => string;
+  export let onAddMember: (params: {
+    workspaceID: string;
+    workspaceName: string;
+    users: any[];
+  }) => void;
   export let isAdminOrOwner: boolean;
-  export let onDeleteWorkspace;
-
+  export let onDeleteWorkspace: (workspace: any) => void;
+  export let openInDesktop: () => void;
+  export let isWebEnvironment: boolean;
   let pos = { x: 0, y: 0 };
   let showMenu = false;
   let workspaceTabWrapper: HTMLElement;
+  let isPopupOpen = false;
 
   let menuItems = [];
   let noOfColumns = 180;
   let noOfRows = 3;
-  const rightClickContextMenu = (e) => {
+
+  let sparrowRedirect: string;
+
+  onMount(() => {
+    setupRedirect();
+  });
+
+  function setupRedirect() {
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+    sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email`;
+  }
+
+  const rightClickContextMenu = (e: MouseEvent) => {
     e.preventDefault();
     setTimeout(() => {
       const mouseX = workspaceTabWrapper.getBoundingClientRect().right - 15;
@@ -33,6 +52,7 @@
       showMenu = true;
     }, 100);
   };
+
   $: {
     if (isAdminOrOwner) {
       menuItems = [
@@ -100,7 +120,8 @@
     }}
     style="max-width: 15vw; padding-right: 10px;"
     class="tab-data rounded-start py-3 overflow-hidden ellipsis"
-    >{list?.name}
+  >
+    {list?.name}
     {#if list?.isNewInvite}
       <span
         style="font-size:12px; font-weight:700; color:var(--text-primary-300); margin-left:6px"
@@ -115,8 +136,10 @@
       onOpenCollection(list._id);
     }}
     class="tab-data py-3"
-    >{list?.collections?.length ? list.collections.length : 0}</td
   >
+    {list?.collections?.length ? list.collections.length : 0}
+  </td>
+
   {#if activeTeam?.users?.length > 1}
     <td
       on:click={(e) => {
@@ -141,14 +164,28 @@
       </div>
     </td>
   {/if}
+
   <td
     on:click={(e) => {
       e.stopPropagation();
       onOpenCollection(list._id);
     }}
     class="tab-data py-3"
-    >{calculateTimeDifferenceInDays(new Date(), new Date(list?.updatedAt))}</td
   >
+    {calculateTimeDifferenceInDays(new Date(), new Date(list?.updatedAt))}
+  </td>
+
+  <td class="tab-data py-3 position-relative">
+    {#if isWebEnvironment}
+      <button
+        class="open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
+        on:click|stopPropagation={openInDesktop}
+      >
+        Open in Desktop
+      </button>
+    {/if}
+  </td>
+
   <td class="tab-data rounded-end py-3">
     <button
       bind:this={workspaceTabWrapper}
@@ -174,11 +211,11 @@
   .threedot-icon-container {
     visibility: hidden;
     background-color: transparent;
+    z-index: 2;
   }
   tr:hover .threedot-icon-container {
     visibility: visible;
   }
-
   .threedot-active {
     visibility: visible;
     background-color: var(--bg-tertiary-190);
@@ -187,5 +224,28 @@
     font-size: 12px;
     font-weight: 700;
     line-height: 18px;
+  }
+  .open-desktop-btn {
+    position: absolute;
+    top: 50%;
+    right: 30px;
+    transform: translateY(-50%);
+    font-size: 12px;
+    font-weight: 700;
+    background-color: var(--color-primary);
+    color: #3670f7;
+    padding: 5px 10px;
+    visibility: hidden;
+    opacity: 0;
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s;
+  }
+  tr:hover .open-desktop-btn {
+    visibility: visible;
+    opacity: 1;
+  }
+  .open-desktop-btn:hover {
+    background-color: var(--color-primary-dark);
   }
 </style>
