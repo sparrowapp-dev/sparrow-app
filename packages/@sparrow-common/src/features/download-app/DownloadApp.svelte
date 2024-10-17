@@ -1,6 +1,6 @@
 <script>
   import { WelcomeLogo } from "@sparrow/common/images";
-  import { DownloadIcon, DownloadIconWeb } from "@sparrow/library/icons";
+  import DownloadIconWeb from "./icons/DownloadIconWeb.svg";
   import { Button } from "@sparrow/library/ui";
   import { createEventDispatcher, onMount } from "svelte";
   const dispatch = createEventDispatcher();
