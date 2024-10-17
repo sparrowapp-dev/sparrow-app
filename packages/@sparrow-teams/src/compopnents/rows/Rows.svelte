@@ -5,14 +5,24 @@
   import { TeamRole, WorkspaceMemberRole } from "@sparrow/common/enums";
   import { onMount } from "svelte";
   import { navigate } from "svelte-navigator";
+  import { isWebApp } from "../../../../@sparrow-common/src/constants/environmentDetection";
 
-  export let list;
-  export let activeTeam;
+  export let list: any;
+  export let activeTeam: any;
   export let onOpenCollection: (id: string) => void;
-  export let calculateTimeDifferenceInDays;
-  export let onAddMember;
+  export let calculateTimeDifferenceInDays: (
+    date1: Date,
+    date2: Date,
+  ) => string;
+  export let onAddMember: (params: {
+    workspaceID: string;
+    workspaceName: string;
+    users: any[];
+  }) => void;
   export let isAdminOrOwner: boolean;
-  export let onDeleteWorkspace;
+  export let onDeleteWorkspace: (workspace: any) => void;
+  export let openInDesktop: () => void;
+  export let isWebEnvironment: boolean;
 
   let pos = { x: 0, y: 0 };
   let showMenu = false;
@@ -23,17 +33,12 @@
   let noOfColumns = 180;
   let noOfRows = 3;
 
-  let isWebApp = true;
   let sparrowRedirect: string;
 
   onMount(() => {
-    checkIfWebApp();
-    setupRedirect();
+    // This can be removed if isWebEnvironment is now passed as a prop
+    // isWebEnvironment = isWebApp();
   });
-
-  function checkIfWebApp() {
-    isWebApp = typeof window !== "undefined" && !window.require;
-  }
 
   function setupRedirect() {
     const accessToken = localStorage.getItem("accessToken");
@@ -41,7 +46,7 @@
     sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email`;
   }
 
-  const rightClickContextMenu = (e) => {
+  const rightClickContextMenu = (e: MouseEvent) => {
     e.preventDefault();
     setTimeout(() => {
       const mouseX = workspaceTabWrapper.getBoundingClientRect().right - 15;
@@ -96,7 +101,6 @@
   function closeRightClickContextMenu() {
     showMenu = false;
   }
-  export let openInDesktop;
 </script>
 
 {#if showMenu}
@@ -175,7 +179,7 @@
   </td>
 
   <td class="tab-data py-3 position-relative">
-    {#if isWebApp}
+    {#if isWebEnvironment}
       <button
         class="open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
         on:click|stopPropagation={openInDesktop}

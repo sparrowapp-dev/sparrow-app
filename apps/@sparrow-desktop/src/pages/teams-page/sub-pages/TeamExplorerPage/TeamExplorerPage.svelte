@@ -6,10 +6,16 @@
   import { user } from "@app/store/auth.store";
   import { Modal } from "@sparrow/library/ui";
   import { LeaveTeam } from "@sparrow/teams/features";
-
+  import { isWebApp } from "../../../../../../../packages/@sparrow-common/src/constants/environmentDetection";
   import { DeleteWorkspace } from "@sparrow/common/features";
   import { onMount } from "svelte";
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
+
+  let isWebEnvironment = false;
+
+  onMount(() => {
+    isWebEnvironment = isWebApp();
+  });
 
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
@@ -86,6 +92,7 @@
   onRemoveUserFromWorkspace={_viewModel.removeUserFromWorkspace}
   onChangeUserRoleAtWorkspace={_viewModel.changeUserRoleAtWorkspace}
   onUpdateTeam={_viewModel.updateTeam}
+  isWebEnvironment={false}
 />
 
 <Modal

@@ -10,9 +10,13 @@
   import { Table } from "@sparrow/library/ui";
   import { Rows } from "@sparrow/teams/compopnents";
   import { TeamSkeleton } from "../../images";
+  import { onMount } from "svelte";
+  import { isWebApp } from "../../../../../../@sparrow-common/src/constants/environmentDetection";
 
   export let data: any;
   export let openTeam: TeamDocument;
+  export let isWebEnvironment: boolean;
+
   export let onSwitchWorkspace: (id: string) => void;
 
   export let searchQuery;
@@ -20,10 +24,7 @@
   export let onDeleteWorkspace;
 
   export let openInDesktop;
-  export let isWebApp;
-  /**
-   * Checks if the current user has admin or owner privileges.
-   */
+
   export let isAdminOrOwner: boolean;
 
   export let isGuestUser = false;
@@ -43,7 +44,7 @@
   ];
 </script>
 
-<div class=" h-100 d-flex flex-column pb-2">
+<div class="h-100 d-flex flex-column pb-2">
   <div
     class="table-container sparrow-thin-scrollbar overflow-y-auto"
     style="flex:1; overflow:auto;"
@@ -76,7 +77,7 @@
                 {isAdminOrOwner}
                 {onDeleteWorkspace}
                 {openInDesktop}
-                {isWebApp}
+                {isWebEnvironment}
               />
             {/each}
           {/if}

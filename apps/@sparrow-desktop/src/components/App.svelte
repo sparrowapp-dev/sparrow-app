@@ -74,7 +74,7 @@
       <Route path="/*"><Navigate to="/guest/" /></Route>
     </section>
     <section slot="unauthorized">
-      {#if 1}
+      {#if 0}
         <Route path="/init" component={EntryPoint} />
         <Route path="/init/*" component={Dashboard} />
         <Route path="/*"><Navigate to="/init" /></Route>

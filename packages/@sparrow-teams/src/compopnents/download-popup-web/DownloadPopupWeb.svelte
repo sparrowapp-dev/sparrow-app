@@ -8,7 +8,7 @@
   onMount(() => {
     setTimeout(() => {
       visible = true;
-    }, 100);
+    }, 200);
   });
   function openSparrowApp() {
     console.log("Install Sparrow Desktop clicked");
@@ -64,7 +64,6 @@
 
 <style>
   .popup-overlay {
-    position: fixed;
     top: 0;
     left: 0;
     right: 0;
@@ -80,7 +79,7 @@
       visibility 500ms ease;
   }
   .popup-content {
-    background: white;
+    background: #1c1d2b;
     padding: 20px;
     border-radius: 10px;
     opacity: 0;

@@ -11,12 +11,18 @@
   import { onMount } from "svelte";
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
   import { navigate } from "svelte-navigator";
+  import { isWebApp } from "../../../../../packages/@sparrow-common/src/constants/environmentDetection";
 
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
   const _viewModel = new TeamExplorerPageViewModel();
 
   let isWorkspaceInviteModalOpen = false;
+  let isWebEnvironment = true;
+
+  onMount(() => {
+    isWebEnvironment = isWebApp();
+  });
 
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
@@ -70,16 +76,10 @@
 
   let isPopupOpen = false;
   let sparrowRedirect: string;
-  let isWebApp = true;
 
   onMount(() => {
-    checkIfWebApp();
     setupRedirect();
   });
-
-  function checkIfWebApp() {
-    isWebApp = typeof window !== "undefined" && !window.require;
-  }
 
   function setupRedirect() {
     const accessToken = localStorage.getItem("accessToken");
@@ -131,7 +131,7 @@
   onChangeUserRoleAtWorkspace={_viewModel.changeUserRoleAtWorkspace}
   onUpdateTeam={_viewModel.updateTeam}
   {openInDesktop}
-  {isWebApp}
+  isWebEnvironment={true}
 />
 
 <Modal

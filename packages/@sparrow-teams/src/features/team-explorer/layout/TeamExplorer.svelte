@@ -2,7 +2,7 @@
   import { tableIcon as table } from "@sparrow/library/assets";
   import { hamburgerIcon as hamburger } from "@sparrow/library/assets";
   import { workspaceView } from "../store/workspace-view";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { SearchIcon } from "@sparrow/library/assets";
   import { base64ToURL } from "@sparrow/common/utils";
   import { PeopleIcon } from "@sparrow/library/assets";
@@ -10,6 +10,7 @@
   import { TeamRole } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
   import TeamNavigator from "../components/team-navigator/TeamNavigator.svelte";
+  import { isWebApp } from "../../../../../@sparrow-common/src/constants/environmentDetection";
   import {
     TeamTabsEnum,
     TeamViewEnum,
@@ -19,6 +20,8 @@
   import { TeamMembers, TeamSettings } from "@sparrow/teams/features";
   import { CrossIcon, MoreOptions } from "@sparrow/library/icons";
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
+
+  export let isWebEnvironment: boolean;
 
   /**
    * user ID
@@ -98,7 +101,6 @@
   export let onAddMember;
 
   export let openInDesktop;
-  export let isWebApp;
 
   let selectedView: string = "Grid";
 
@@ -385,8 +387,8 @@
               {#if selectedView === TeamViewEnum.LIST}
                 <WorkspaceListView
                   {onAddMember}
+                  {isWebEnvironment}
                   {openInDesktop}
-                  {isWebApp}
                   bind:isGuestUser
                   {searchQuery}
                   {openTeam}
