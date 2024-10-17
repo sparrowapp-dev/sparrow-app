@@ -68,7 +68,6 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -79,7 +78,8 @@
       visibility 500ms ease;
   }
   .popup-content {
-    background: #1c1d2b;
+    /* background: #1c1d2b; */
+    background: transparent;
     padding: 20px;
     border-radius: 10px;
     opacity: 0;

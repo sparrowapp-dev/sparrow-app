@@ -3,7 +3,7 @@
   import { TeamExplorer, TeamInvite } from "@sparrow/teams/features";
   import { TeamExplorerPageViewModel } from "./TeamExplorerPage.ViewModel";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
-  import WelcomePopUpWeb from "../../../../../packages/@sparrow-teams/src/compopnents/download-popup-web/DownloadPopupWeb.svelte";
+  import { DownloadWeb } from "@sparrow/common/components";
   import { user } from "@app/store/auth.store";
   import { Modal } from "@sparrow/library/ui";
   import { LeaveTeam } from "@sparrow/teams/features";
@@ -137,7 +137,7 @@
   isOpen={isPopupOpen}
   handleModalState={closeWelcomePopup}
 >
-  <WelcomePopUpWeb />
+  <DownloadWeb />
 </Modal>
 
 <Modal
