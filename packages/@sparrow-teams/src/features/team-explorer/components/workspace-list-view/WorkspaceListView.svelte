@@ -11,7 +11,6 @@
   import { Rows } from "@sparrow/teams/compopnents";
   import { TeamSkeleton } from "../../images";
   import { onMount } from "svelte";
-  import { isWebApp } from "../../../../../../@sparrow-common/src/constants/environmentDetection";
 
   export let data: any;
   export let openTeam: TeamDocument;

@@ -5,7 +5,6 @@
   import { TeamRole, WorkspaceMemberRole } from "@sparrow/common/enums";
   import { onMount } from "svelte";
   import { navigate } from "svelte-navigator";
-  import { isWebApp } from "../../../../@sparrow-common/src/constants/environmentDetection";
 
   export let list: any;
   export let activeTeam: any;
@@ -23,7 +22,6 @@
   export let onDeleteWorkspace: (workspace: any) => void;
   export let openInDesktop: () => void;
   export let isWebEnvironment: boolean;
-
   let pos = { x: 0, y: 0 };
   let showMenu = false;
   let workspaceTabWrapper: HTMLElement;
@@ -36,8 +34,7 @@
   let sparrowRedirect: string;
 
   onMount(() => {
-    // This can be removed if isWebEnvironment is now passed as a prop
-    // isWebEnvironment = isWebApp();
+    setupRedirect();
   });
 
   function setupRedirect() {

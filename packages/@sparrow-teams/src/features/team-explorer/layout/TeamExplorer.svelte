@@ -10,7 +10,6 @@
   import { TeamRole } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
   import TeamNavigator from "../components/team-navigator/TeamNavigator.svelte";
-  import { isWebApp } from "../../../../../@sparrow-common/src/constants/environmentDetection";
   import {
     TeamTabsEnum,
     TeamViewEnum,
