@@ -33,7 +33,7 @@ jobs:
                 --build-arg VITE_WEB_SPARROW_LINKEDIN=${{ vars.VITE_WEB_SPARROW_LINKEDIN }} \
                 --build-arg VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING=${{ vars.VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING }} \
                 --build-arg VITE_WEB_MARKETING_URL=${{ vars.VITE_WEB_MARKETING_URL }} \
-                -t sparrowprod.azurecr.io/sparrow-marketing-webapp:${{ github.run_number }} .
+                -t sparrowprod.azurecr.io/sparrow-web-dev:${{ github.run_number }} .
 
               docker push sparrowprod.azurecr.io/sparrow-web-dev:${{ github.run_number }}
 
