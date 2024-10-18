@@ -25,7 +25,7 @@
       <Route path="/guest/*" component={Dashboard} />
       <Route path="/*"><Navigate to="/guest/" /></Route>
     </section>
-    <section slot="unauthorized">ACCESS DENIED</section>
+    <!-- <section slot="unauthorized">ACCESS DENIED</section> -->
   </Authguard>
 </Router>
 

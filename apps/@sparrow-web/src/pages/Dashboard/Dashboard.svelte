@@ -138,10 +138,13 @@
     {isLoginBannerActive}
     onLoginUser={handleGuestLogin}
     workspaceDocuments={$workspaceDocuments}
+    teamDocuments={$teamDocuments}
     onCreateWorkspace={() => (isWorkspaceModalOpen = true)}
     onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
+    onSwitchTeam={_viewModel.handleSwitchTeam}
     {user}
     onLogout={_viewModel.handleLogout}
+    isWebApp={true}
   />
 
   <!-- 
