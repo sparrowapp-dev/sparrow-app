@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "desktop-start": "yarn workspace @sparrow/desktop tauri dev",
-    "desktop-build": "yarn workspace @sparrow/desktop tauri build",
+    "desktop-build": "yarn workspace @sparrow/desktop tauri build --debug",
     "web-start": "yarn workspace @sparrow/web dev",
     "web-build": "yarn workspace @sparrow/web build"
   },

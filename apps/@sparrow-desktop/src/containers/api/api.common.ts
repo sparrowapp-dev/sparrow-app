@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { type Method } from "axios";
-import type { RequestData } from "../../../../../packages/@deprecate/src/utils/dto/requestdata";
+import type { RequestData } from "@sparrow/common/dto/requestdata";
 import { getUserToken, getRefToken } from "@app/utils/token";
 import { refreshToken } from "@app/services/auth.service";
 import constants from "@app/constants/constants";
 import { setAuthJwt } from "@app/utils/jwt";
 import { ErrorMessages } from "@sparrow/common/enums/enums";
 import { invoke } from "@tauri-apps/api/core";
-import { DashboardViewModel } from "@app/pages/Dashboard/Dashboard.ViewModel";
+import { DashboardViewModel } from "@app/pages/dashboard-page/Dashboard.ViewModel";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 import type { MakeRequestResponse } from "@app/types/http-client";

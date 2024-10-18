@@ -10,6 +10,8 @@
   import { DeleteWorkspace } from "@sparrow/common/features";
   import { onMount } from "svelte";
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
+  export let activeTeamTab;
+  export let onUpdateActiveTab;
 
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
@@ -19,7 +21,6 @@
 
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
-  const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
   const OnleaveTeam = _viewModel.leaveTeam;
   let userId = "";
   user.subscribe(async (value) => {
@@ -76,9 +77,9 @@
   onAddMember={handleWorkspaceDetails}
   openTeam={$activeTeam}
   workspaces={$workspaces}
-  activeTeamTab={$activeTeamTab}
+  {activeTeamTab}
   onDeleteWorkspace={handleDeleteWorkspace}
-  onUpdateActiveTab={_viewModel.updateActiveTeamTab}
+  {onUpdateActiveTab}
   onCreateWorkspace={_viewModel.handleCreateWorkspace}
   onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
   onRemoveMembersAtTeam={_viewModel.removeMembersAtTeam}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ThreeDotIcon } from "@deprecate/assets";
+  import { ThreeDotIcon } from "@sparrow/library/assets";
   import { UserProfileList } from "@sparrow/teams/compopnents";
   import { MenuView } from "@sparrow/teams/compopnents";
   import { TeamRole, WorkspaceMemberRole } from "@sparrow/common/enums";

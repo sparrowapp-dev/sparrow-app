@@ -1,9 +1,7 @@
 <script lang="ts">
-  import doubleangleLeft from "@deprecate/assets/doubleangleLeft.svg";
-  import FilterIcon from "@deprecate/assets/filter.svelte";
-  import plusIcon from "@deprecate/assets/plus-white.svg";
-  import CreateRequest from "@deprecate/assets/create_request.svg";
-  import CreateCollection from "@deprecate/assets/collections-faded.svg";
+  import { doubleAngleLeftIcon as doubleangleLeft } from "@sparrow/library/assets";
+  import { FilterIcon } from "@sparrow/library/assets";
+  import { plusWhiteIcon as plusIcon } from "@sparrow/library/assets";
 
   import { Events, WorkspaceRole } from "@sparrow/common/enums";
   import { Dropdown } from "@sparrow/library/ui";

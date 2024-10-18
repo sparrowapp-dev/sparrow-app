@@ -1,6 +1,6 @@
 import { throttle } from "@sparrow/common/utils";
 import { platform } from "@tauri-apps/plugin-os";
-import { handleLoginV2 } from "@app/pages/Auth/login-page/login-page";
+import { handleLoginV2 } from "@app/pages/auth-page/sub-pages/login-page/login-page";
 import { listen } from "@tauri-apps/api/event";
 import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import { getCurrent } from "@tauri-apps/api/window";

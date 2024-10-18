@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { DeleteIcon, EditIcon, UploadIcon } from "@deprecate/assets";
+  import { DeleteIcon, EditIcon, UploadIcon } from "@sparrow/library/assets";
   import { base64ToURL, imageDataToURL } from "@sparrow/common/utils";
 
   /**

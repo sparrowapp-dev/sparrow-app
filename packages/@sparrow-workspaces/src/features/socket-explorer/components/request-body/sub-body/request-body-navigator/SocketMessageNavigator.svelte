@@ -1,5 +1,4 @@
 <script lang="ts">
-  import BeautifyIcon from "@deprecate/assets/beautify.svg";
   import { RequestDataType, RequestDataset } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";

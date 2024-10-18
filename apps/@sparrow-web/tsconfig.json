@@ -14,8 +14,8 @@
     "checkJs": true,
     "isolatedModules": true,
     "paths": {
-      "@deprecate/*": ["../../packages/@deprecate/src/*"],
-      "src/*": ["./src/*"]
+      "src/*": ["./src/*"],
+      "@app/*": ["./src/*"]
     }
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],

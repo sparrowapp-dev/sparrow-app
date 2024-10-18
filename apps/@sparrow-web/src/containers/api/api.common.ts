@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { type Method } from "axios";
-import type { RequestData } from "../../../../../packages/@deprecate/src/utils/dto/requestdata";
+import type { RequestData } from "@sparrow/common/dto/requestdata";
 import { getUserToken, getRefToken } from "@app/utils/token";
 import { refreshToken } from "@app/services/auth.service";
 import constants from "@app/constants/constants";
@@ -162,10 +162,12 @@ const makeRequest = async (
       return await regenerateAuthToken(method, url, requestData);
     } else if (
       e.response?.data?.statusCode === 401 &&
-      e.response.data.message === ErrorMessages.Unauthorized
+      e.response.data.message === ErrorMessages.JWTFailed
     ) {
       const _viewModel = new DashboardViewModel();
       await _viewModel.clientLogout();
+      return error("Unauthorized");
+    } else if (e.response?.data?.statusCode === 401) {
       return error("Unauthorized");
     }
     if (e.code === "ERR_NETWORK") {
