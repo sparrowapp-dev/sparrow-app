@@ -620,7 +620,6 @@ export class TeamExplorerPageViewModel {
    * @returns - A promise that resolves when the delete workspace is complete.
    */
   public handleDeleteWorkspace = async (workspace: WorkspaceDocument) => {
-    console.log("workspace inside viewmodel", workspace);
     const isActiveWorkspace =
       await this.workspaceRepository.checkActiveWorkspace(workspace._id);
     const workspaces = await this.workspaceRepository.getWorkspacesDocs();
