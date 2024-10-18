@@ -44,10 +44,14 @@
   export let currentTeamId;
 
   export let workspaceDocuments: WorkspaceDocument[] = [];
+  export let teamDocuments = [];
 
   export let onCreateWorkspace;
 
   export let onSwitchWorkspace;
+  export let onSwitchTeam;
+
+  export let isWebApp = false;
 
   /**
    * callback for Select component
@@ -63,6 +67,10 @@
    */
   let handleWorkspaceDropdown = (tabId: string) => {
     onSwitchWorkspace(tabId);
+  };
+
+  let handleTeamDropdown = (_teamId: string) => {
+    onSwitchTeam(_teamId);
   };
 
   let guestData = [];
@@ -169,7 +177,56 @@
       </div>
     {/if}
     <div class="ms-3">
-      {#if isGuestUser}
+      {#if isWebApp}
+        <Select
+          id={"workspace-dropdown"}
+          data={teamDocuments?.map((_team) => {
+            return {
+              id: _team.teamId,
+              name: _team.name,
+            };
+          })}
+          titleId={teamDocuments?.filter((_team) => {
+            if (_team.isOpen) return true;
+            return false;
+          })[0]?.teamId}
+          onclick={handleTeamDropdown}
+          minHeaderWidth={"auto"}
+          iconRequired={false}
+          isDropIconFilled={true}
+          borderType={"none"}
+          borderActiveType={"none"}
+          headerHighlight={"hover-active"}
+          headerTheme={"transparent"}
+          menuItem={"v2"}
+          headerFontSize={"12px"}
+          maxHeaderWidth={"215px"}
+          minBodyWidth={"200px"}
+          zIndex={200}
+          bodyTheme={"violet"}
+          borderRounded={"2px"}
+          position={"absolute"}
+          maxBodyHeight={"160px"}
+        >
+          <div
+            slot="post-select"
+            class="post-dropdown"
+            style="justify-content: center; align-items:center;"
+          >
+            <!-- <div class="lower-underline"></div>
+            <div class="create-new-workspace" on:click={onCreateWorkspace}>
+              <span>Create New Team</span>
+              <div style="align-content: flex-end;">
+                <PlusIcon
+                  height="16px"
+                  width="16px"
+                  color="var(--icon-primary-300)"
+                />
+              </div>
+            </div> -->
+          </div>
+        </Select>
+      {:else if isGuestUser}
         <Select
           id={"workspace-dropdown"}
           data={guestData}
