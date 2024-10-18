@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: sparrow-web
+  name: sparrow-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sparrow-web
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: sparrow-web
+    spec:
+      containers:
+        - image: sparrowprod.azurecr.io/sparrow-web-dev:_BUILD__ID_
+          name: sparrow-web
+          imagePullPolicy: Always
+          resources: {}
+          ports:
+            - containerPort: 1422
+          env:
+            - name: VITE_WEB_API_URL
+              valueFrom:
+                secretKeyRef:
+                  name: sparrow-web-secret
+                  key: VITE_WEB_API_URL
+            - name: VITE_WEB_API_TIMEOUT
+              valueFrom:
+                secretKeyRef:
+                  name: sparrow-web-secret
+                  key: VITE_WEB_API_TIMEOUT
+            - name: VITE_WEB_ENABLE_MIX_PANEL
+              valueFrom:
+                secretKeyRef:
+                  name: sparrow-web-secret
+                  key: VITE_WEB_ENABLE_MIX_PANEL
+            - name: VITE_WEB_MIX_PANEL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: sparrow-web-secret
+                  key: VITE_WEB_MIX_PANEL_TOKEN
+            - name: VITE_WEB_SPARROW_SUPPORT_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: sparrow-web-secret
+                  key: VITE_WEB_SPARROW_SUPPORT_EMAIL
+            - name: VITE_WEB_AUTH_URL
+              valueFrom:
+                secretKeyRef:
+                  name: sparrow-web-secret
+                  key: VITE_WEB_AUTH_URL
+            - name: VITE_WEB_SPARROW_GITHUB
+              valueFrom:
+                secretKeyRef:
+                  name: sparrow-web-secret
+                  key: VITE_WEB_SPARROW_GITHUB
+            - name: VITE_WEB_SPARROW_DOWNLOAD_LINK
+              valueFrom:
+                secretKeyRef:
+                  name: sparrow-web-secret
+                  key: VITE_WEB_SPARROW_DOWNLOAD_LINK
+            - name: VITE_WEB_RELEASE_NOTES_PAT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: sparrow-web-secret
+                  key: VITE_WEB_RELEASE_NOTES_PAT_TOKEN
+            - name: VITE_WEB_RELEASE_NOTES_API
+              valueFrom:
+                secretKeyRef:
+                  name: sparrow-web-secret
+                  key: VITE_WEB_RELEASE_NOTES_API
+            - name: VITE_WEB_AZURE_CDN_URL
+              valueFrom:
+                secretKeyRef:
+                  name: sparrow-web-secret
+                  key: VITE_WEB_AZURE_CDN_URL
+            - name: VITE_WEB_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: sparrow-web-secret
+                  key: VITE_WEB_BASE_URL
+            - name: VITE_WEB_SPARROW_LINKEDIN
+              valueFrom:
+                secretKeyRef:
+                  name: sparrow-web-secret
+                  key: VITE_WEB_SPARROW_LINKEDIN
+            - name: VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: sparrow-web-secret
+                  key: VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sparrow-web
+  labels:
+    run: sparrow-web
+spec:
+  type: ClusterIP
+  selector:
+    app: sparrow-web
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 1422
