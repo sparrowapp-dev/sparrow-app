@@ -160,7 +160,7 @@
     <!-- 
       --Sidebar to naviagte between collection, environment and help page.
     -->
-    <Sidebar {user} onLogout={_viewModel.handleLogout} />
+    <Sidebar {user} onLogout={_viewModel.handleLogout} type="web" />
     <!-- 
       -- Dashboard renders any of the pages between collection, environment and help.
     -->
