@@ -27,6 +27,8 @@
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
   import { onMount } from "svelte";
   import { Motion } from "svelte-motion";
+  import { isUserFirstSignUp } from "src/store/user.store";
+  import { WelcomePopUpWeb } from "@sparrow/teams/compopnents";
   import { user } from "src/store/auth.store";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
@@ -72,6 +74,12 @@
     }
   }
 
+  let isWelcomePopupOpen = false;
+  isUserFirstSignUp.subscribe((value) => {
+    if (value) {
+      isWelcomePopupOpen = value;
+    }
+  });
   let isGithubStarHover = false;
 
   let activeIndex;
@@ -262,6 +270,20 @@
     }}
     onCreateTeam={_viewModel.createTeam}
   />
+</Modal>
+
+<Modal
+  title={""}
+  type={"dark"}
+  width={"40%"}
+  zIndex={1000}
+  isOpen={isWelcomePopupOpen}
+  handleModalState={() => {
+    isUserFirstSignUp.set(false);
+    isWelcomePopupOpen = false;
+  }}
+>
+  <WelcomePopUpWeb />
 </Modal>
 
 <style>
