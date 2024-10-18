@@ -8,6 +8,7 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { testFlowDataStore } from "../../store";
   import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";
+    import TestFlowTourGuide from "../../../../components/test-flow-tour-guide/TestFlowTourGuide.svelte";
 
   /**
    * The data object containing various handlers and data stores.
@@ -115,7 +116,7 @@
             data.onClick(id);
           }}
         >
-          <span class="btnc py-1 px-3 d-flex align-items-center">
+          <span class="btnc py-1 px-3 d-flex align-items-center" style="position:relative;">
             <span class="text-fs-16 me-2">+</span> <span>Add Block</span>
           </span>
         </span>
@@ -151,5 +152,39 @@
   }
   :global(.svelte-flow__handle) {
     pointer-events: none !important;
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(255, 0, 0, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+    }
+  }
+
+  .pulse-circle {
+    position: relative;
+    display: inline-block;
+  
+    
+  }
+
+  .pulse-circle::before {
+    content: "";
+    background-color: #FF663C  ;
+    opacity: 20%;
+    position: absolute;
+    top: -5px;
+    left: 30px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid red;
+    animation: pulse 1.5s infinite;
+    pointer-events: none; /* Prevents blocking clicks */
   }
 </style>

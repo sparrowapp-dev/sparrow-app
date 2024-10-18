@@ -35,6 +35,11 @@
   } from "@sparrow/workspaces/features";
   import { TestflowList } from "../../testflow-list";
   import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
+  import TestFlowTourGuide from "../../../components/test-flow-tour-guide/TestFlowTourGuide.svelte";
+  import {
+    currentStep,
+    istestFlowTourGuideOpen,
+  } from "../../../../../../apps/@sparrow-desktop/src/store/guide.tour";
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
@@ -266,6 +271,7 @@
             onCreateTestflow();
             MixpanelEvent(Events.LeftPanel_Plus_Icon);
           },
+          isTourGuideActive: false,
         },
       ]
     : [
@@ -325,6 +331,7 @@
             MixpanelEvent(Events.LeftPanel_Plus_Icon);
             isExpandTestflow = true;
           },
+          isTourGuideActive: false,
         },
       ];
 
@@ -338,6 +345,15 @@
   const toggleExpandTestflow = () => {
     isExpandTestflow = !isExpandTestflow;
   };
+
+  const toggleTourGuideActive = () => {
+  addButtonData.forEach(option => {
+    if (option.hasOwnProperty('isTourGuideActive')) {
+      option.isTourGuideActive = !option.isTourGuideActive; // Toggle the value
+    }
+  });
+};
+
 </script>
 
 {#if leftPanelController.leftPanelCollapse}
@@ -370,7 +386,7 @@
 {/if}
 {#if !leftPanelController.leftPanelCollapse}
   <div
-    style="overflow-x: auto; overflow-y: auto"
+    style="overflow-x: auto; overflow-y: auto ; position:relative"
     class={`sidebar h-100 d-flex flex-column bg-secondary-900 scroll`}
   >
     <div
@@ -460,6 +476,45 @@
             </button>
           </Tooltip>
         </Dropdown>
+      {/if}
+
+      {#if $istestFlowTourGuideOpen && $currentStep == 1}
+        <div style="position:fixed; top:50px; left:-12px; z-index:99990;">
+          <TestFlowTourGuide
+            targetId="addButton"
+            title="Congratulations! 🎊1"
+            description="Great work! You’ve got one successful running flow. Below in the table, you’ll find this icon, which will take you to the API if you need to tweak any values."
+            tipPosition="top-left"
+            onNext={() => {
+              currentStep.set(2);
+              addButtonMenu = true;
+              toggleTourGuideActive();
+            }}
+            onClose={() => {
+              istestFlowTourGuideOpen.set(false);
+            }}
+          />
+        </div>
+      {/if}
+
+      {#if $istestFlowTourGuideOpen && $currentStep == 2}
+        <div style="position:fixed; top:210px; left:220px; z-index:9999;">
+          <TestFlowTourGuide
+            targetId="addButton"
+            title="Congratulations! 🎊2"
+            description="Great work! You’ve got one successful running flow. Below in the table, you’ll find this icon, which will take you to the API if you need to tweak any values."
+            tipPosition="left-top"
+            onNext={() => {
+              currentStep.set(3);
+              onCreateTestflow();
+              isExpandTestflow = true;
+              toggleTourGuideActive();
+            }}
+            onClose={() => {
+              istestFlowTourGuideOpen.set(false);
+            }}
+          />
+        </div>
       {/if}
     </div>
 

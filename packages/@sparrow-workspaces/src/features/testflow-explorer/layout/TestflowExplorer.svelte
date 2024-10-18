@@ -56,6 +56,9 @@
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Debounce } from "@sparrow/common/utils";
+  import TestFlowTourGuide from "../../../components/test-flow-tour-guide/TestFlowTourGuide.svelte";
+  import { relative } from "path";
+    import { currentStep, istestFlowTourGuideOpen } from "../../../../../../apps/@sparrow-desktop/src/store/guide.tour";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -664,7 +667,7 @@
           <p class="testing-txt">Testing</p>
         </div>
       {/if}
-      <div style="margin-right: 5px;">
+      <div class="run-btn" style="margin-right: 5px; position:relative;">
         {#if nodesValue > 1}
           <DropButton
             title="Run"
@@ -683,6 +686,24 @@
               MixpanelEvent(Events.Run_TestFlows);
             }}
           />
+        {/if}
+
+        {#if $istestFlowTourGuideOpen && $currentStep == 6}
+          <div style="position:absolute;  top:50px; right:300px">
+            <TestFlowTourGuide
+              targetId="addBlockBtn"
+              title="Ready, Set, Run 🏃🏻‍♂️"
+              description="The flow is almost ready, just waiting for you to hit 'Run' and watch the magic happen! Alternatively, you can use the Start play button to initiate the flow as well."
+              tipPosition="top-right"
+              onNext={async () => {
+                currentStep.set(7)
+                await onClickRun();
+              }}
+              onClose={() => {
+                istestFlowTourGuideOpen.set(false);
+              }}
+            />
+          </div>
         {/if}
       </div>
       <div>
@@ -707,7 +728,7 @@
     tabindex="0"
     on:keydown={handleKeyPress}
     on:click={focusDiv}
-    style="flex:1; overflow:auto; outline: none;"
+    style="flex:1; overflow:auto; outline: none; position:realtive;"
   >
     <SvelteFlow {nodes} {edges} {nodeTypes}>
       <Background
@@ -717,6 +738,58 @@
         gap={20}
       />
     </SvelteFlow>
+
+    {#if $istestFlowTourGuideOpen && $currentStep == 3}
+      <div style="position:absolute; top:250px; left:290px; z-index:1000;">
+        <TestFlowTourGuide
+          targetId="addBlockBtn"
+          title="One Block At A Time 🧱"
+          description="Wow! You’ve made it to the canvas! Now, just click 'Add Block' and you’re almost there."
+          tipPosition="top-left"
+          onNext={() => {
+            currentStep.set(4);
+            createNewNode("1", "undefined");
+          }}
+          onClose={() => {
+            istestFlowTourGuideOpen.set(false);
+          }}
+        />
+      </div>
+    {/if}
+
+    {#if $istestFlowTourGuideOpen && $currentStep ==4}
+      <div style="position:absolute; top:250px; left:620px; z-index:1000;">
+        <TestFlowTourGuide
+          targetId="addBlockBtn"
+          title="Block Added! 👏 "
+          description="Now, just one more step—click on the dropdown to select an API. Don’t worry, we’ve provided a sample API in case you don’t have one ready in your collection."
+          tipPosition="left-top"
+          onNext={() => {
+            currentStep.set(5)
+          }}
+          onClose={() => {
+            istestFlowTourGuideOpen.set(false)
+          }}
+        />
+      </div>
+    {/if}
+
+    {#if $istestFlowTourGuideOpen && $currentStep == 5}
+      <div style="position:absolute; top:280px; left:620px; z-index:1000;">
+        <TestFlowTourGuide
+          targetId="addBlockBtn"
+          title="Sample API waiting...⏱️"
+          description="Ready for you to get selected and move ahead! Just choose it from the dropdown and you’re good to go."
+          tipPosition="left-top"
+          onNext={() => {
+            currentStep.set(6)
+          }}
+          onClose={() => {
+            istestFlowTourGuideOpen.set(false);
+          }}
+        />
+      </div>
+    {/if}
   </div>
   {#if testflowStore?.nodes?.length >= 1 && selectedNode}
     <div class="request-container" style="">

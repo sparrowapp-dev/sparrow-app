@@ -109,6 +109,9 @@
       });
     }
   }
+
+  import { istestFlowTourGuideOpen, currentStep } from "../../../../../../apps/@sparrow-desktop/src/store/guide.tour";
+
 </script>
 
 <div
@@ -203,6 +206,8 @@
               on:click={async () => {
                 await onCreateTestflow();
                 MixpanelEvent(Events.Add_New_Flow);
+                istestFlowTourGuideOpen.set(true);
+                currentStep.set(3);
               }}
             >
               <PlusIcon

@@ -21,6 +21,7 @@
     iconColor: string;
     iconSize: string;
     onclick: () => void;
+    isTourGuideActive: boolean;
   }[];
 
   export let horizontalPosition: "left" | "right" = "right";
@@ -97,7 +98,9 @@
     -->
       {#each options as item}
         <button
-          class="border-0 d-flex p-2 rounded-1 w-100 option-button"
+          class="border-0 d-flex p-2 rounded-1 w-100 option-button {item?.isTourGuideActive
+            ? 'hover-effect'
+            : ''} "
           style="color: {item.color};"
           on:click={() => item.onclick()}
         >
@@ -138,5 +141,8 @@
   }
   .option-button:active {
     background-color: var(--dropdown-option-active);
+  }
+  .hover-effect {
+    background-color: var(--dropdown-option-hover);
   }
 </style>

@@ -2,6 +2,8 @@
   import { ArrowOutwardIcon, CrossIcon } from "@sparrow/library/icons";
   import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
   import { Tooltip } from "@sparrow/library/ui";
+  import TestFlowTourGuide from "../test-flow-tour-guide/TestFlowTourGuide.svelte";
+    import { currentStep, istestFlowTourGuideOpen } from "../../../../../apps/@sparrow-desktop/src/store/guide.tour";
 
   export let selectedNode;
   export let onClose;
@@ -10,7 +12,7 @@
 
 <div
   class="d-flex align-items-center justify-content-between p-1 ps-2 pe-2"
-  style="height:34px; background-color:var(--bg-tertiary-300); border-bottom:1px solid #4B4F6B ; "
+  style="height:34px; background-color:var(--bg-tertiary-300); border-bottom:1px solid #4B4F6B ;"
 >
   <div
     class="d-flex align-items-center justify-content-start gap-2"
@@ -44,14 +46,32 @@
       {selectedNode?.request?.property?.request?.url}
     </p>
   </div>
-  <div class="d-flex gap-2 align-items-center" style="cursor:pointer">
+  <div class="d-flex gap-2 align-items-center" style="cursor:pointer ; ">
     <Tooltip title="Redirect" placement={"bottom"} zIndex={100}>
-      <span on:click={onRedirect} class="pe-2">
+      <span on:click={onRedirect} class="pe-2" style="position:relative;">
         <ArrowOutwardIcon
           width={"8px"}
           height={"8px"}
           color={"var(  --icon-secondary-200)"}
         />
+
+        {#if $istestFlowTourGuideOpen && $currentStep==7}
+          <div style="position:absolute; bottom:230px; right:282px;">
+            <TestFlowTourGuide
+              targetId="addBlockBtn"
+              title="Congratulations! 🎊"
+              description="Great work! You’ve got one successful running flow. Below in the table, you’ll find this icon, which will take you to the API if you need to tweak any values."
+              tipPosition="bottom-right"
+              onNext={()=>{
+                 currentStep.set(null)
+                 
+              }}
+              onClose={() => {
+                istestFlowTourGuideOpen.set(false)
+              }}
+            />
+          </div>
+        {/if}
       </span>
     </Tooltip>
     <Tooltip title="Close" placement={"bottom-left"} zIndex={100}>

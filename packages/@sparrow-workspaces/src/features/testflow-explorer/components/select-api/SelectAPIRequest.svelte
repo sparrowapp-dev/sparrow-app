@@ -6,6 +6,7 @@
   import { onDestroy, onMount } from "svelte";
   import DropdownArrow from "../../icons/DropdownArrow.svelte";
   import { BackArrowIcon } from "../../icons";
+  import { currentStep } from "../../../../../../../apps/@sparrow-desktop/src/store/guide.tour";
   export let name;
   export let method;
   export let collections = [];
@@ -79,8 +80,23 @@
     ignoreClickOutside = false;
   };
 
+  $:{
+    if($currentStep == 6){
+      isOpen=true;
+    }
+    else{
+      isOpen=false;
+    }
+  }
+
   onMount(() => {
     document.addEventListener("click", handleClickOutside);
+    if ($currentStep == 6) {
+      isOpen = true;
+    }
+    else{
+      isOpen =false
+    }
   });
 
   onDestroy(() => {
