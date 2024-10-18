@@ -1,7 +1,10 @@
 <script lang="ts">
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Dropdown, Tooltip } from "@sparrow/library/ui";
+  import {
+    DoubleArrowIcon,
+    GithubIcon,
+  } from "@sparrow/library/icons";
   import { PlusIcon as plus } from "@sparrow/library/assets";
-  import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import type { TabDocument, TeamDocument } from "@app/database/database";
   import { RecentWorkspace, RecentApis } from "../../../features";
@@ -10,6 +13,9 @@
   import { List } from "@sparrow/library/ui";
   import { PeopleIcon } from "@sparrow/library/assets";
   import constants from "@app/constants/constants";
+  import { onMount } from "svelte";
+  import { navigate } from "svelte-navigator";
+
   export let teamList: TeamDocument[] = [];
   export let tabList: TabDocument[] = [];
   export let isCreateTeamModalOpen;
@@ -43,6 +49,7 @@
   }
 
   export let appVersion;
+  
 </script>
 
 {#if leftPanelController.leftPanelCollapse}
@@ -169,6 +176,7 @@
         </section>
       {/if}
     </div>
+
 
     <!-- github repo section -->
     <section>
