@@ -7,6 +7,7 @@ on:
 jobs:
    build:
       runs-on: ubuntu-latest
+      environment: sparrow_web_Dev
       steps:
          - uses: actions/checkout@master
 
