@@ -81,6 +81,15 @@ export class TeamExplorerPageViewModel {
   }
 
   /**
+   * Get the active workspace from the workspace repository.
+   *
+   * @returns The active workspace object.
+   */
+  get activeWorkspace() {
+    return this.workspaceRepository.getActiveWorkspace();
+  }
+
+  /**
    * @description - Update the active team tab
    */
   public updateActiveTeamTab = (tab: string) => {
@@ -324,7 +333,7 @@ export class TeamExplorerPageViewModel {
    * Switch from one workspace to another
    * @param id - Workspace id
    */
-  public handleSwitchWorkspace = async (id: string) => {
+  public handleSwitchWorkspace = async (id: string): Promise<void> => {
     if (!id) return;
     const prevWorkspace = await this.workspaceRepository.readWorkspace(id);
     if (prevWorkspace?.isNewInvite) {
@@ -336,7 +345,8 @@ export class TeamExplorerPageViewModel {
     initWorkspaceTab.updateName(res.name);
     await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
     await this.workspaceRepository.setActiveWorkspace(id);
-    navigate("/dashboard/collections");
+    // Disabling the switching of workspace in web
+    // navigate("/dashboard/collections");
   };
 
   /**
@@ -610,6 +620,7 @@ export class TeamExplorerPageViewModel {
    * @returns - A promise that resolves when the delete workspace is complete.
    */
   public handleDeleteWorkspace = async (workspace: WorkspaceDocument) => {
+    console.log("workspace inside viewmodel", workspace);
     const isActiveWorkspace =
       await this.workspaceRepository.checkActiveWorkspace(workspace._id);
     const workspaces = await this.workspaceRepository.getWorkspacesDocs();

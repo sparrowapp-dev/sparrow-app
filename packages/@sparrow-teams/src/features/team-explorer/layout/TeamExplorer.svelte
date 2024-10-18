@@ -352,11 +352,14 @@
                 <div
                   class={`d-flex search-input-container rounded py-2 px-2 mb-4`}
                 >
-                  <SearchIcon
-                    width={14}
-                    height={14}
-                    classProp={`my-auto me-3`}
-                  />
+                  <div>
+                    <SearchIcon
+                      width={14}
+                      height={14}
+                      classProp={`my-auto me-3`}
+                      color={"var(--icon-secondary-200)"}
+                    />
+                  </div>
                   <input
                     type="text"
                     id="search-input"
