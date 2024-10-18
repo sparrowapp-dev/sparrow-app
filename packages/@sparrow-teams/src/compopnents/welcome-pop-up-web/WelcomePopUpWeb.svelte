@@ -7,26 +7,26 @@
 <div class="pt-2 pb-4">
   <div class="d-flex">
     <WelcomeLogo />
-    <p
-      style="margin-top: 3px; margin-left: 8px; color: var(--text-secondary-100); font-size:18px; font-weight:500;"
+    <p class="text-fs-18"
+      style="margin-top: 3px; margin-left: 8px; color: var(--text-secondary-100);  font-weight:500;"
     >
       Welcome to <span class="gradient-text">Sparrow</span> !
     </p>
   </div>
-  <p style="font-size: 16px; color: var(--text-secondary-1000)" class="pb-0">
+  <p style=" color: var(--text-secondary-1000)" class="text-fs-16 pb-0">
     Your API journey awaits!<br /> Sparrow app allows you to simplify workflows effortlessly,
     saving time and effort.
   </p>
 </div>
 <div class="d-flex justify-content-start">
     
-  <Button
+  <!-- <Button
     title={"Install Sparrow Desktop"}
     textStyleProp={"font-size:16px; font-weight:400;"}
     type={"primary"}
     buttonStartIcon={DownloadIconWeb}
     buttonStartIconStyle={"height:16px; width:16px;"}
-  />
+  /> -->
 </div>
 
 <style>

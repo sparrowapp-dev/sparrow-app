@@ -7,6 +7,7 @@ import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "../utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 import { GuideRepository } from "../repositories/guide.repository";
+import { isUserFirstSignUp } from "src/store/user.store";
 const _guideRepository = new GuideRepository();
 
 export const sendUserDataToMixpanel = (userDetails: {
@@ -47,6 +48,7 @@ export async function handleLogin(url: string) {
       navigate("/app/home");
       _guideRepository.insert({ isActive: true, id: "environment-guide" });
       _guideRepository.insert({ isActive: true, id: "collection-guide" });
+      isUserFirstSignUp.set(true);
     } else {
       navigate("/app/home");
 
