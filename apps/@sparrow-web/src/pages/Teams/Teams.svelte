@@ -12,7 +12,6 @@
   import TeamExplorerPage from "../TeamExplorerPage/TeamExplorerPage.svelte";
   import { TeamsViewModel } from "./Teams.ViewModel";
   import { Modal, Tooltip } from "@sparrow/library/ui";
-  import { CreateTeam } from "@sparrow/teams/features";
   import { pagesMotion } from "../../constants";
   import { version } from "../../../package.json";
 
@@ -20,7 +19,7 @@
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
 
-  let isCreateTeamModalOpen: boolean = false;
+ export let isCreateTeamModalOpen;
 
   let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
@@ -246,23 +245,7 @@
   </div>
 </Motion>
 
-<Modal
-  title={"New Team"}
-  type={"dark"}
-  width={"35%"}
-  zIndex={1000}
-  isOpen={isCreateTeamModalOpen}
-  handleModalState={(flag) => {
-    isCreateTeamModalOpen = flag;
-  }}
->
-  <CreateTeam
-    handleModalState={(flag = false) => {
-      isCreateTeamModalOpen = flag;
-    }}
-    onCreateTeam={_viewModel.createTeam}
-  />
-</Modal>
+
 
 <style>
   .warning-text {

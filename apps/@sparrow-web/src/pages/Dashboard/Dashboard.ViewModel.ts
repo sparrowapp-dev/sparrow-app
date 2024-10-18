@@ -401,4 +401,42 @@ export class DashboardViewModel {
   public connectWebSocket = async () => {
     await this.aiAssistantWebSocketService.connectWebSocket();
   };
+
+  /**
+   * creates a new team
+   * @param name - team name
+   * @param description - team description
+   * @param file - team base-64 icon
+   * @returns
+   */
+  public createTeam = async (name: string, description: string, file: File) => {
+    let userId = "";
+    user.subscribe(async (value) => {
+      if (value) {
+        userId = value._id;
+      }
+    })();
+
+    const team = {
+      name: name,
+      description: description,
+      image: file,
+      owner: userId.toString(),
+      createdAt: new Date().toISOString(),
+      createdBy: userId.toString(),
+    };
+    const response = await this.teamService.createTeam(team);
+
+    if (response?.isSuccessful && response?.data?.data) {
+      const teamAdapter = new TeamAdapter();
+      const adaptedTeam = teamAdapter.adapt(response.data.data).getValue();
+      await this.teamRepository.insert(adaptedTeam);
+      await this.teamRepository.setOpenTeam(response.data.data?._id);
+      notifications.success(`New team ${team.name} is created.`);
+    } else {
+      notifications.error("Failed to create a new team. Please try again.");
+    }
+    MixpanelEvent(Events.CREATE_NEW_TEAM);
+    return response;
+  };
 }
