@@ -8,7 +8,7 @@
   } from "@sparrow/common/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   import { ListItem } from "../components";
-  import angleRight from "@deprecate/assets/angle-right-v2.svg";
+  import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { Tooltip } from "@sparrow/library/ui";
 
   /**

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import dragIcon from "@deprecate/assets/drag.svg";
-  import trashIcon from "@deprecate/assets/trash-icon.svg";
   import type {
     KeyValuePair,
     KeyValuePairWithBase,

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import table from "@deprecate/assets/table.svg";
-  import hamburger from "@deprecate/assets/hamburger.svg";
+  import { tableIcon as table } from "@sparrow/library/assets";
+  import { hamburgerIcon as hamburger } from "@sparrow/library/assets";
   import { workspaceView } from "../store/workspace-view";
   import { onDestroy } from "svelte";
-  import { SearchIcon } from "@deprecate/assets";
+  import { SearchIcon } from "@sparrow/library/assets";
   import { base64ToURL } from "@sparrow/common/utils";
-  import { PeopleIcon } from "@deprecate/assets";
+  import { PeopleIcon } from "@sparrow/library/assets";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { TeamRole } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
@@ -261,7 +261,7 @@
             {/if}
           </h2>
 
-          <div class="d-flex  align-items-end justify-content-end">
+          <div class="d-flex align-items-end justify-content-end">
             {#if openTeam?.users?.length > 1 && !isGuestUser}
               <p class="d-flex my-auto ms-4 sparrow-fs-12">
                 <PeopleIcon

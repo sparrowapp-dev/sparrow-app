@@ -16,6 +16,7 @@
     "./containers": "./src/containers/index.ts",
     "./forms": "./src/forms/index.ts",
     "./icons": "./src/icons/index.ts",
+    "./assets": "./src/assets/index.ts",
     "./typography": "./src/typography/index.ts",
     "./ui": "./src/ui/index.ts",
     "./utils": "./src/utils/index.ts",
