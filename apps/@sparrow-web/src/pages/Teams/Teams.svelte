@@ -19,7 +19,7 @@
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
 
- export let isCreateTeamModalOpen;
+  export let isCreateTeamModalOpen;
 
   let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
@@ -27,13 +27,13 @@
   import { onMount } from "svelte";
   import { Motion } from "svelte-motion";
   import { isUserFirstSignUp } from "src/store/user.store";
-  import { WelcomePopUpWeb } from "@sparrow/teams/compopnents";
   import { user } from "src/store/auth.store";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
   import { ListTeamNavigation } from "@sparrow/teams/features";
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import constants from "../../constants/constants";
+  import { WelcomePopUpWeb } from "@sparrow/common/components";
 
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
@@ -252,8 +252,6 @@
     </Splitpanes>
   </div>
 </Motion>
-
-
 
 <Modal
   title={""}
