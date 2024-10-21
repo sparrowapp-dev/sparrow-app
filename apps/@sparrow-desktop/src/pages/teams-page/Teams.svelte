@@ -13,7 +13,6 @@
   import { TeamsViewModel } from "./Teams.ViewModel";
   import { Modal, Tooltip } from "@sparrow/library/ui";
   import {
-    CreateTeam,
     RecentApis,
     RecentWorkspace,
     TeamList,
@@ -28,6 +27,7 @@
   import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
   import constants from "../../constants/constants";
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
+  import { CreateTeam } from "@sparrow/common/features";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
