@@ -34,7 +34,6 @@
   const OnleaveTeam = _viewModel.leaveTeam;
   let userId = "";
   let userRole = "";
-
   user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
@@ -45,19 +44,7 @@
     name: "",
     users: [],
   };
-
-  interface WorkspaceData {
-    id: string;
-    name: string;
-    users: Array<any>;
-    description: string;
-    team: Record<string, any>;
-    createdAt?: Date;
-    updatedAt?: Date;
-    status?: string;
-  }
-
-  let currentWorkspace: WorkspaceData = {
+  let currentWorkspace = {
     id: "",
     name: "",
     users: [],
@@ -65,6 +52,9 @@
     team: {},
   };
 
+  /**
+   * Find the role of user in active workspace
+   */
   const findUserRole = async () => {
     currentWorkspace?.users?.forEach((value) => {
       if (value.id === userId) {
@@ -73,68 +63,32 @@
     });
   };
 
-  onMount(() => {
-    setupRedirect();
-  });
-
-  const updateWorkspaceData = (data: any) => {
-    if (data?._data) {
-      currentWorkspace = {
-        id: data._data._id || "",
-        name: data._data.name || "",
-        users: data._data.users || [],
-        description: data._data.description || "",
-        team: data._data.team || {},
-        createdAt: data._data.createdAt,
-        updatedAt: data._data.updatedAt,
-        status: data._data.status,
-      };
-      findUserRole();
-      setupRedirect();
-    }
-  };
-
-  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
-    async (value: WorkspaceDocument) => {
-      updateWorkspaceData(value);
-    },
-  );
-
-  activeTeam.subscribe((value) => {
-    if (value) {
-      currentTeam.name = value.name;
-      currentTeam.users = value.users;
-    }
-  });
-
   /**
    * Subscribes to the active workspace and updates the current workspace details
    * and also updates current team details associated with that workspace.
    */
-
-  onMount(() => {
-    setupRedirect();
-  });
   $: {
     setupRedirect();
   }
-  // const activeWorkspaceSubscribe = activeWorkspace.subscribe(
-  //   async (value: WorkspaceDocument) => {
-  //     if (value?._data) {
-  //       currentWorkspace = {
-  //         id: value._data._id || "",
-  //         name: value._data.name || "",
-  //         users: value._data.users || [],
-  //         description: value._data.description || "",
-  //         team: value._data.team || {},
-  //       };
-  //       findUserRole();
-  //       setupRedirect();
-  //     } else {
-  //       console.error("Active workspace data is invalid:", value);
-  //     }
-  //   },
-  // );
+  onMount(() => {
+    setupRedirect();
+  });
+
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      if (value?._data) {
+        currentWorkspace = {
+          id: value._data._id || "",
+          name: value._data.name || "",
+          users: value._data.users || [],
+          description: value._data.description || "",
+          team: value._data.team || {},
+        };
+        findUserRole();
+        setupRedirect();
+      }
+    },
+  );
 
   activeTeam.subscribe((value) => {
     if (value) {
@@ -170,7 +124,6 @@
     workspaceDetails.name = workspaceName;
     workspaceDetails.users = users;
     isWorkspaceInviteModalOpen = true;
-    console.log(workspaceDetails);
   };
 
   let isPopupOpen = false;
