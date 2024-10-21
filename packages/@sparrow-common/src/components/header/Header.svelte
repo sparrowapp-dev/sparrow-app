@@ -53,6 +53,10 @@
 
   export let isWebApp = false;
 
+  export let onCreateTeam
+  
+  export let isCreateTeamModalOpen;
+
   /**
    * callback for Select component
    * @param tabId - selected option id
@@ -213,8 +217,10 @@
             class="post-dropdown"
             style="justify-content: center; align-items:center;"
           >
-            <!-- <div class="lower-underline"></div>
-            <div class="create-new-workspace" on:click={onCreateWorkspace}>
+             <div class="lower-underline"></div>
+            <div class="create-new-workspace" on:click={()=>{
+              isCreateTeamModalOpen=true
+            }}>
               <span>Create New Team</span>
               <div style="align-content: flex-end;">
                 <PlusIcon
@@ -223,7 +229,7 @@
                   color="var(--icon-primary-300)"
                 />
               </div>
-            </div> -->
+            </div>
           </div>
         </Select>
       {:else if isGuestUser}
