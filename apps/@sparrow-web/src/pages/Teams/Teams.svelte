@@ -26,12 +26,14 @@
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
   import { onMount } from "svelte";
   import { Motion } from "svelte-motion";
+  import { isUserFirstSignUp } from "src/store/user.store";
   import { user } from "src/store/auth.store";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
   import { ListTeamNavigation } from "@sparrow/teams/features";
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import constants from "../../constants/constants";
+  import { WelcomePopUpWeb } from "@sparrow/common/components";
 
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
@@ -71,6 +73,12 @@
     }
   }
 
+  let isWelcomePopupOpen = false;
+  isUserFirstSignUp.subscribe((value) => {
+    if (value) {
+      isWelcomePopupOpen = value;
+    }
+  });
   let isGithubStarHover = false;
 
   let activeIndex;
@@ -244,6 +252,20 @@
     </Splitpanes>
   </div>
 </Motion>
+
+<Modal
+  title={""}
+  type={"dark"}
+  width={"40%"}
+  zIndex={1000}
+  isOpen={isWelcomePopupOpen}
+  handleModalState={() => {
+    isUserFirstSignUp.set(false);
+    isWelcomePopupOpen = false;
+  }}
+>
+  <WelcomePopUpWeb />
+</Modal>
 
 <style>
   .warning-text {
