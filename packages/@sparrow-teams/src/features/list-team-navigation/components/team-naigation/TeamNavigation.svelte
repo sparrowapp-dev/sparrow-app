@@ -5,7 +5,7 @@
 </script>
 
 <button
-  class="p-2 ps-4 mb-1 w-100 navigation__link border-0 sparrow-fs-12 request-tab border-radius-4 {tab.id ===
+  class="p-2 mb-1 w-100 navigation__link border-0 sparrow-fs-12 request-tab border-radius-4 {tab.id ===
   activeTeamTab
     ? 'tab-active'
     : ''} {tab.disabled ? 'tab-disabled' : ''}"
@@ -31,6 +31,7 @@
     color: var(--text-secondary-100);
     background-color: transparent;
     border-bottom: 2px transparent;
+    padding-left: 40px !important;
   }
 
   .navigation__link:hover {
@@ -39,9 +40,6 @@
   }
   .tab-active {
     background-color: var(--bg-tertiary-750);
-  }
-  .tab-active-text {
-    color: var(--text-secondary-200);
   }
 
   .tab-disabled {
