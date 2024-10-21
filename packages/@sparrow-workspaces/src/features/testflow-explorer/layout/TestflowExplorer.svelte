@@ -799,7 +799,7 @@
     {/if}
   </div>
   {#if testflowStore?.nodes?.length >= 1 && selectedNode}
-    <div class="request-container" style="">
+    <div class="request-container" style="z-index:10;">
       <div
         class="rounded-2 d-flex flex-column"
         style="background-color:var(--bg-secondary-850); border:1px solid var(--border-tertiary-300);  margin:10px; height:350px;"
@@ -830,7 +830,7 @@
           <TableSidebar {selectedNode} bind:selectedTab />
 
           <!-- Request Data -->
-          <div class="request-rhs-container h-100" style="z-index: 1;">
+          <div class="request-rhs-container h-100">
             {#if selectedTab === "response"}
               <div class="p-2 h-100" style="">
                 <div
@@ -942,7 +942,7 @@
   <div class="p-3" style="position:absolute; z-index:3; bottom:0; right:0;">
     <p
       class="mb-0 pb-0 text-fs-14"
-      style="color: var(--text-primary-300); font-weight:500; cursor:pointer;  z-index: 0; "
+      style="color: var(--text-primary-300); font-weight:500; cursor:pointer;  "
       on:click={() => {
         currentStep.set(1);
         istestFlowTourGuideOpen.set(true);
