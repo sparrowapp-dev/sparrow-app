@@ -3,7 +3,7 @@
   import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
   import { Tooltip } from "@sparrow/library/ui";
   import TestFlowTourGuide from "../test-flow-tour-guide/TestFlowTourGuide.svelte";
-    import { currentStep, istestFlowTourGuideOpen } from "../../../../../apps/@sparrow-desktop/src/store/guide.tour";
+  import { currentStep, istestFlowTourGuideOpen } from "../../../../../apps/@sparrow-desktop/src/store/guide.tour";
 
   export let selectedNode;
   export let onClose;
@@ -55,7 +55,7 @@
           color={"var(  --icon-secondary-200)"}
         />
 
-        {#if $istestFlowTourGuideOpen && $currentStep==7}
+        {#if $istestFlowTourGuideOpen && $currentStep == 7}
           <div style="position:absolute; bottom:240px; right:282px;">
             <TestFlowTourGuide
               targetId="addBlockBtn"
@@ -65,12 +65,11 @@
               pulsePosition={{ top: "210px", left: "250px" }}
               description="Great work! You’ve got one successful running flow. Below in the table, you’ll find this icon, which will take you to the API if you need to tweak any values."
               tipPosition="bottom-right"
-              onNext={()=>{
-                 currentStep.set(null)
-                 
+              onNext={() => {
+                currentStep.set(null);
               }}
               onClose={() => {
-                istestFlowTourGuideOpen.set(false)
+                istestFlowTourGuideOpen.set(false);
               }}
             />
           </div>

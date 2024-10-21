@@ -113,7 +113,7 @@
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
   let searchData: string = "";
-  let addButtonMenu: boolean = true;
+  let addButtonMenu: boolean = false;
   let activeWorkspace: WorkspaceDocument;
   let currentWorkspaceId;
   currentWorkspace.subscribe((value) => {
