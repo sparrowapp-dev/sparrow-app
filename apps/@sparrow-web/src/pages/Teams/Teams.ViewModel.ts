@@ -18,6 +18,7 @@ import type { Team } from "@sparrow/common/interfaces";
 import { UserService } from "../../services/user.service";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums";
+import { BehaviorSubject, Observable } from "rxjs";
 
 export class TeamsViewModel {
   constructor() {}
@@ -31,6 +32,29 @@ export class TeamsViewModel {
 
   private collectionRepository = new CollectionRepository();
   private userService = new UserService();
+  private _activeTeamTab: BehaviorSubject<string> = new BehaviorSubject(
+    "Workspaces",
+  );
+  /**
+   * @description - get the active team tab
+   */
+  public get activeTeamTab(): Observable<string> {
+    return this._activeTeamTab.asObservable();
+  }
+
+  /**
+   * @description - set the active team tab
+   */
+  private set activeTeamTab(value: string) {
+    this._activeTeamTab.next(value);
+  }
+
+  /**
+   * @description - Update the active team tab
+   */
+  public updateActiveTeamTab = (tab: string) => {
+    this.activeTeamTab = tab;
+  };
 
   /**
    * @description - get environment list from local db

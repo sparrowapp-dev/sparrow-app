@@ -33,16 +33,6 @@
 
   let sparrowRedirect: string;
 
-  onMount(() => {
-    setupRedirect();
-  });
-
-  function setupRedirect() {
-    const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
-    sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email`;
-  }
-
   const rightClickContextMenu = (e: MouseEvent) => {
     e.preventDefault();
     setTimeout(() => {

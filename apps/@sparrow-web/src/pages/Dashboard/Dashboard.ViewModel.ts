@@ -26,6 +26,7 @@ import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import { InitWorkspaceTab } from "@sparrow/common/utils";
+import constants from "src/constants/constants";
 
 export class DashboardViewModel {
   constructor() {}
@@ -285,6 +286,7 @@ export class DashboardViewModel {
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();
     clearAuthJwt();
+    window.location.href = constants.WEB_MARKETING_URL;
   };
 
   // logout to backend - expires jwt - auth and refresh tokens
@@ -383,6 +385,14 @@ export class DashboardViewModel {
     await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
     await this.workspaceRepository.setActiveWorkspace(id);
     navigate("/dashboard/collections");
+  };
+
+  /**
+   * Switch from one workspace to another
+   * @param _teamId - team id
+   */
+  public handleSwitchTeam = async (_teamId: string) => {
+    this.teamRepository.setOpenTeam(_teamId);
   };
 
   /**

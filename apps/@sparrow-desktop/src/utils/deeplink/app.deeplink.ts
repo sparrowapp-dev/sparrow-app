@@ -25,6 +25,7 @@ export const deepLinkHandlerWindows = async (
 
 export const deepLinkHandlerMacOs = async (deepLinkUrls: string[]) => {
   if (deepLinkUrls && deepLinkUrls.length) {
+    console.log(deepLinkUrls);
     await handleLoginThrottler(deepLinkUrls[0]);
   }
 };

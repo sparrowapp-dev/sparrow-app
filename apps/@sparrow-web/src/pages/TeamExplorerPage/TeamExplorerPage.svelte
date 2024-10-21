@@ -1,6 +1,10 @@
 <script lang="ts">
   import type { Observable } from "rxjs";
-  import { TeamExplorer, TeamInvite } from "@sparrow/teams/features";
+  import {
+    TeamExplorer,
+    TeamInvite,
+    WorkspaceMembers,
+  } from "@sparrow/teams/features";
   import { TeamExplorerPageViewModel } from "./TeamExplorerPage.ViewModel";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { DownloadApp } from "@sparrow/common/features";
@@ -8,9 +12,13 @@
   import { Modal } from "@sparrow/library/ui";
   import { LeaveTeam } from "@sparrow/teams/features";
   import { DeleteWorkspace } from "@sparrow/common/features";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
+  import { BackIcon } from "@sparrow/library/icons";
   import { navigate } from "svelte-navigator";
+
+  export let activeTeamTab;
+  export let onUpdateActiveTab;
 
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
@@ -21,9 +29,12 @@
 
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
-  const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    _viewModel.activeWorkspace;
   const OnleaveTeam = _viewModel.leaveTeam;
   let userId = "";
+  let userRole = "";
+
   user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
@@ -35,6 +46,96 @@
     users: [],
   };
 
+  interface WorkspaceData {
+    id: string;
+    name: string;
+    users: Array<any>;
+    description: string;
+    team: Record<string, any>;
+    createdAt?: Date;
+    updatedAt?: Date;
+    status?: string;
+  }
+
+  let currentWorkspace: WorkspaceData = {
+    id: "",
+    name: "",
+    users: [],
+    description: "",
+    team: {},
+  };
+
+  const findUserRole = async () => {
+    currentWorkspace?.users?.forEach((value) => {
+      if (value.id === userId) {
+        userRole = value.role;
+      }
+    });
+  };
+
+  onMount(() => {
+    setupRedirect();
+  });
+
+  const updateWorkspaceData = (data: any) => {
+    if (data?._data) {
+      currentWorkspace = {
+        id: data._data._id || "",
+        name: data._data.name || "",
+        users: data._data.users || [],
+        description: data._data.description || "",
+        team: data._data.team || {},
+        createdAt: data._data.createdAt,
+        updatedAt: data._data.updatedAt,
+        status: data._data.status,
+      };
+      findUserRole();
+      setupRedirect();
+    }
+  };
+
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      updateWorkspaceData(value);
+    },
+  );
+
+  activeTeam.subscribe((value) => {
+    if (value) {
+      currentTeam.name = value.name;
+      currentTeam.users = value.users;
+    }
+  });
+
+  /**
+   * Subscribes to the active workspace and updates the current workspace details
+   * and also updates current team details associated with that workspace.
+   */
+
+  onMount(() => {
+    setupRedirect();
+  });
+  $: {
+    setupRedirect();
+  }
+  // const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+  //   async (value: WorkspaceDocument) => {
+  //     if (value?._data) {
+  //       currentWorkspace = {
+  //         id: value._data._id || "",
+  //         name: value._data.name || "",
+  //         users: value._data.users || [],
+  //         description: value._data.description || "",
+  //         team: value._data.team || {},
+  //       };
+  //       findUserRole();
+  //       setupRedirect();
+  //     } else {
+  //       console.error("Active workspace data is invalid:", value);
+  //     }
+  //   },
+  // );
+
   activeTeam.subscribe((value) => {
     if (value) {
       currentTeam.name = value.name;
@@ -45,11 +146,13 @@
   let isTeamInviteModalOpen = false;
   let isLeaveTeamModelOpen = false;
   let isGuestUser;
+  let isWorkspaceOpen = false;
 
   const handleDeleteWorkspace = (workspace: WorkspaceDocument) => {
     selectedWorkspace = workspace;
     isDeleteWorkspaceModalOpen = true;
   };
+
   onMount(async () => {
     _viewModel.refreshTeams(userId);
     _viewModel.refreshWorkspaces(userId);
@@ -67,19 +170,16 @@
     workspaceDetails.name = workspaceName;
     workspaceDetails.users = users;
     isWorkspaceInviteModalOpen = true;
+    console.log(workspaceDetails);
   };
 
   let isPopupOpen = false;
   let sparrowRedirect: string;
 
-  onMount(() => {
-    setupRedirect();
-  });
-
   function setupRedirect() {
-    const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
-    sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email`;
+    const accessToken = localStorage.getItem("AUTH_TOKEN");
+    const refreshToken = localStorage.getItem("REF_TOKEN");
+    sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email&workspaceID=${currentWorkspace.id}`;
   }
 
   function openInDesktop() {
@@ -103,31 +203,84 @@
   function closeWelcomePopup() {
     isPopupOpen = false;
   }
+  onDestroy(() => {
+    activeWorkspaceSubscribe.unsubscribe();
+  });
 </script>
 
-<TeamExplorer
-  bind:isGuestUser
-  bind:userId
-  bind:isTeamInviteModalOpen
-  bind:isLeaveTeamModelOpen
-  onAddMember={handleWorkspaceDetails}
-  openTeam={$activeTeam}
-  workspaces={$workspaces}
-  activeTeamTab={$activeTeamTab}
-  onDeleteWorkspace={handleDeleteWorkspace}
-  onUpdateActiveTab={_viewModel.updateActiveTeamTab}
-  onCreateWorkspace={_viewModel.handleCreateWorkspace}
-  onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
-  onRemoveMembersAtTeam={_viewModel.removeMembersAtTeam}
-  onDemoteToMemberAtTeam={_viewModel.demoteToMemberAtTeam}
-  onPromoteToAdminAtTeam={_viewModel.promoteToAdminAtTeam}
-  onPromoteToOwnerAtTeam={_viewModel.promoteToOwnerAtTeam}
-  onRemoveUserFromWorkspace={_viewModel.removeUserFromWorkspace}
-  onChangeUserRoleAtWorkspace={_viewModel.changeUserRoleAtWorkspace}
-  onUpdateTeam={_viewModel.updateTeam}
-  {openInDesktop}
-  {isWebEnvironment}
-/>
+{#if isWorkspaceOpen}
+  <div class="d-flex h-100" style="width: 100%;">
+    <div
+      class="h-100 d-flex flex-column"
+      style="border-right:2px solid #000000; width: 100%;  padding:24px;"
+    >
+      <div style="align-items:center; margin-left:10px" class="d-flex">
+        <div
+          style="cursor: pointer; align-items:center;"
+          on:click={() => (isWorkspaceOpen = false)}
+        >
+          <BackIcon
+            height={"12px"}
+            width={"7px"}
+            color={"var(--icon-secondary-200)"}
+          />
+          <span
+            color="var(--text-secondary-200)"
+            style="font-size: 12px; margin-left:11px;">{$activeTeam.name}</span
+          >
+        </div>
+        <div>
+          <span
+            style="font-size: 12px; margin-left:10px; color=var(--text-secondary-200)"
+            >/</span
+          >
+          <span
+            style="font-size: 12px; margin-left:6px; color:var(--text-secondary-100); font-weight:400"
+            >{currentWorkspace.name}</span
+          >
+        </div>
+      </div>
+      <WorkspaceMembers
+        bind:isWorkspaceInviteModalOpen
+        users={currentWorkspace.users}
+        workspaceName={currentWorkspace.name}
+        {userRole}
+        onDeleteWorkspace={handleDeleteWorkspace}
+        onChangeUserRoleAtWorkspace={_viewModel.changeUserRoleAtWorkspace}
+        onRemoveUserFromWorkspace={_viewModel.removeUserFromWorkspace}
+        activeWorkspace={$activeWorkspace}
+        {user}
+      />
+    </div>
+  </div>
+{:else}
+  <TeamExplorer
+    bind:isGuestUser
+    bind:userId
+    bind:isTeamInviteModalOpen
+    bind:isLeaveTeamModelOpen
+    onAddMember={handleWorkspaceDetails}
+    openTeam={$activeTeam}
+    workspaces={$workspaces}
+    {activeTeamTab}
+    onDeleteWorkspace={handleDeleteWorkspace}
+    {onUpdateActiveTab}
+    onCreateWorkspace={_viewModel.handleCreateWorkspace}
+    onSwitchWorkspace={async (item) => {
+      await _viewModel.handleSwitchWorkspace(item);
+      isWorkspaceOpen = true;
+    }}
+    onRemoveMembersAtTeam={_viewModel.removeMembersAtTeam}
+    onDemoteToMemberAtTeam={_viewModel.demoteToMemberAtTeam}
+    onPromoteToAdminAtTeam={_viewModel.promoteToAdminAtTeam}
+    onPromoteToOwnerAtTeam={_viewModel.promoteToOwnerAtTeam}
+    onRemoveUserFromWorkspace={_viewModel.removeUserFromWorkspace}
+    onChangeUserRoleAtWorkspace={_viewModel.changeUserRoleAtWorkspace}
+    onUpdateTeam={_viewModel.updateTeam}
+    {openInDesktop}
+    {isWebEnvironment}
+  />
+{/if}
 
 <Modal
   title=""
@@ -186,6 +339,7 @@
         await _viewModel.handleDeleteWorkspace(selectedWorkspace);
       if (response?.isSuccessful) {
         isDeleteWorkspaceModalOpen = false;
+        isWorkspaceOpen = false;
       }
     }}
   />
@@ -226,7 +380,7 @@
     handleInvitePopup={(flag = false) => {
       isWorkspaceInviteModalOpen = flag;
     }}
-    currentWorkspaceDetails={workspaceDetails}
+    currentWorkspaceDetails={currentWorkspace}
     users={currentTeam?.users}
     teamName={currentTeam?.name}
     onInviteUserToWorkspace={_viewModel.inviteUserToWorkspace}
