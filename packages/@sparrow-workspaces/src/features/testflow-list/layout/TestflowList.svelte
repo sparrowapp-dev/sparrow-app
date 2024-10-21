@@ -110,8 +110,10 @@
     }
   }
 
-  import { istestFlowTourGuideOpen, currentStep } from "../../../../../../apps/@sparrow-desktop/src/store/guide.tour";
-
+  import {
+    istestFlowTourGuideOpen,
+    currentStep,
+  } from "../../../stores/guide.tour";
 </script>
 
 <div

@@ -3,7 +3,7 @@
   import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
   import { Tooltip } from "@sparrow/library/ui";
   import TestFlowTourGuide from "../test-flow-tour-guide/TestFlowTourGuide.svelte";
-  import { currentStep, istestFlowTourGuideOpen } from "../../../../../apps/@sparrow-desktop/src/store/guide.tour";
+  import { currentStep, istestFlowTourGuideOpen } from "../../stores";
 
   export let selectedNode;
   export let onClose;

@@ -61,7 +61,7 @@
   import {
     currentStep,
     istestFlowTourGuideOpen,
-  } from "../../../../../../apps/@sparrow-desktop/src/store/guide.tour";
+  } from "../../../stores/guide.tour";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;

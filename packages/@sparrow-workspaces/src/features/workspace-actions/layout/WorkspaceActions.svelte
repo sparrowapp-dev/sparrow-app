@@ -39,7 +39,7 @@
   import {
     currentStep,
     istestFlowTourGuideOpen,
-  } from "../../../../../../apps/@sparrow-desktop/src/store/guide.tour";
+  } from "../../../stores/guide.tour";
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
