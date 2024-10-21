@@ -4,7 +4,7 @@
   import { PeopleIcon } from "@sparrow/library/assets";
 </script>
 
-<div class="d-flex align-items-center p-3 pb-0">
+<div class="d-flex align-items-center p-3 pt-4 pb-0">
   <div class="d-flex align-items-center" style="width: calc(100% - 20px);">
     <span class="team-icon ms-2 me-2">
       {#if openTeam?.logo?.size}
