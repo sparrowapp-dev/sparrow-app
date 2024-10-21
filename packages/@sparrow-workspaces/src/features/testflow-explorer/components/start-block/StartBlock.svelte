@@ -8,8 +8,8 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { testFlowDataStore } from "../../store";
   import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";
-    import TestFlowTourGuide from "../../../../components/test-flow-tour-guide/TestFlowTourGuide.svelte";
-
+  import TestFlowTourGuide from "../../../../components/test-flow-tour-guide/TestFlowTourGuide.svelte";
+  import PulseCircle  from "../../../../../../@sparrow-common/src/components/pulse-circle/PulseCircle.svelte"
   /**
    * The data object containing various handlers and data stores.
    */
@@ -116,7 +116,11 @@
             data.onClick(id);
           }}
         >
-          <span class="btnc py-1 px-3 d-flex align-items-center" style="position:relative;">
+          <span
+            class="btnc py-1 px-3 d-flex align-items-center"
+            style="position:relative;"
+          >
+  
             <span class="text-fs-16 me-2">+</span> <span>Add Block</span>
           </span>
         </span>
@@ -169,13 +173,11 @@
   .pulse-circle {
     position: relative;
     display: inline-block;
-  
-    
   }
 
   .pulse-circle::before {
     content: "";
-    background-color: #FF663C  ;
+    background-color: #ff663c;
     opacity: 20%;
     position: absolute;
     top: -5px;

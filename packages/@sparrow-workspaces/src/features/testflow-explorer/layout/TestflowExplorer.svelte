@@ -58,7 +58,10 @@
   import { Debounce } from "@sparrow/common/utils";
   import TestFlowTourGuide from "../../../components/test-flow-tour-guide/TestFlowTourGuide.svelte";
   import { relative } from "path";
-    import { currentStep, istestFlowTourGuideOpen } from "../../../../../../apps/@sparrow-desktop/src/store/guide.tour";
+  import {
+    currentStep,
+    istestFlowTourGuideOpen,
+  } from "../../../../../../apps/@sparrow-desktop/src/store/guide.tour";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -689,14 +692,15 @@
         {/if}
 
         {#if $istestFlowTourGuideOpen && $currentStep == 6}
-          <div style="position:absolute;  top:50px; right:300px">
+          <div style="position:absolute;  top:60px; right:320px">
             <TestFlowTourGuide
               targetId="addBlockBtn"
               title="Ready, Set, Run 🏃🏻‍♂️"
+              pulsePosition={{ top: "-62px", left: "260px" }}
               description="The flow is almost ready, just waiting for you to hit 'Run' and watch the magic happen! Alternatively, you can use the Start play button to initiate the flow as well."
               tipPosition="top-right"
               onNext={async () => {
-                currentStep.set(7)
+                currentStep.set(7);
                 await onClickRun();
               }}
               onClose={() => {
@@ -740,10 +744,11 @@
     </SvelteFlow>
 
     {#if $istestFlowTourGuideOpen && $currentStep == 3}
-      <div style="position:absolute; top:250px; left:290px; z-index:1000;">
+      <div style="position:absolute; top:250px; left:265px; z-index:1000;">
         <TestFlowTourGuide
           targetId="addBlockBtn"
           title="One Block At A Time 🧱"
+          pulsePosition={{ top: "-55px", left: "30px" }}
           description="Wow! You’ve made it to the canvas! Now, just click 'Add Block' and you’re almost there."
           tipPosition="top-left"
           onNext={() => {
@@ -757,18 +762,19 @@
       </div>
     {/if}
 
-    {#if $istestFlowTourGuideOpen && $currentStep ==4}
-      <div style="position:absolute; top:250px; left:620px; z-index:1000;">
+    {#if $istestFlowTourGuideOpen && $currentStep == 4}
+      <div style="position:absolute; top:240px; left:620px; z-index:1000;">
         <TestFlowTourGuide
           targetId="addBlockBtn"
           title="Block Added! 👏 "
           description="Now, just one more step—click on the dropdown to select an API. Don’t worry, we’ve provided a sample API in case you don’t have one ready in your collection."
           tipPosition="left-top"
+          pulsePosition={{ top: "8px", left: "-140px" }}
           onNext={() => {
-            currentStep.set(5)
+            currentStep.set(5);
           }}
           onClose={() => {
-            istestFlowTourGuideOpen.set(false)
+            istestFlowTourGuideOpen.set(false);
           }}
         />
       </div>
@@ -781,8 +787,9 @@
           title="Sample API waiting...⏱️"
           description="Ready for you to get selected and move ahead! Just choose it from the dropdown and you’re good to go."
           tipPosition="left-top"
+          pulsePosition={{ top: "10px", left: "-140px" }}
           onNext={() => {
-            currentStep.set(6)
+            currentStep.set(6);
           }}
           onClose={() => {
             istestFlowTourGuideOpen.set(false);
@@ -823,7 +830,7 @@
           <TableSidebar {selectedNode} bind:selectedTab />
 
           <!-- Request Data -->
-          <div class="request-rhs-container h-100">
+          <div class="request-rhs-container h-100" style="z-index: 1;">
             {#if selectedTab === "response"}
               <div class="p-2 h-100" style="">
                 <div
@@ -931,6 +938,19 @@
       </div>
     </div>
   {/if}
+
+  <div class="p-3" style="position:absolute; z-index:3; bottom:0; right:0;">
+    <p
+      class="mb-0 pb-0 text-fs-14"
+      style="color: var(--text-primary-300); font-weight:500; cursor:pointer;  z-index: 0; "
+      on:click={() => {
+        currentStep.set(1);
+        istestFlowTourGuideOpen.set(true);
+      }}
+    >
+      Need help?
+    </p>
+  </div>
 </div>
 <!-- <svelte:window on:keydown={handleKeyPress} /> -->
 

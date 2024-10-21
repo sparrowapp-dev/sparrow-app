@@ -113,7 +113,7 @@
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
   let searchData: string = "";
-  let addButtonMenu: boolean = false;
+  let addButtonMenu: boolean = true;
   let activeWorkspace: WorkspaceDocument;
   let currentWorkspaceId;
   currentWorkspace.subscribe((value) => {
@@ -347,13 +347,12 @@
   };
 
   const toggleTourGuideActive = () => {
-  addButtonData.forEach(option => {
-    if (option.hasOwnProperty('isTourGuideActive')) {
-      option.isTourGuideActive = !option.isTourGuideActive; // Toggle the value
-    }
-  });
-};
-
+    addButtonData.forEach((option) => {
+      if (option.hasOwnProperty("isTourGuideActive")) {
+        option.isTourGuideActive = !option.isTourGuideActive; // Toggle the value
+      }
+    });
+  };
 </script>
 
 {#if leftPanelController.leftPanelCollapse}
@@ -482,8 +481,9 @@
         <div style="position:fixed; top:50px; left:-12px; z-index:99990;">
           <TestFlowTourGuide
             targetId="addButton"
-            title="Congratulations! 🎊1"
-            description="Great work! You’ve got one successful running flow. Below in the table, you’ll find this icon, which will take you to the API if you need to tweak any values."
+            title="Getting Started  🎉"
+            pulsePosition={{ top: "-55px", left: "8px" }}
+            description="Welcome! Let’s kick off by creating your test flow. You can add a new flow by clicking here, using the '+' icon, or navigating from the home page. Let's get started!"
             tipPosition="top-left"
             onNext={() => {
               currentStep.set(2);
@@ -501,9 +501,10 @@
         <div style="position:fixed; top:210px; left:220px; z-index:9999;">
           <TestFlowTourGuide
             targetId="addButton"
-            title="Congratulations! 🎊2"
-            description="Great work! You’ve got one successful running flow. Below in the table, you’ll find this icon, which will take you to the API if you need to tweak any values."
+            title="Add Your Flow 🌊"
+            description="Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!"
             tipPosition="left-top"
+            pulsePosition={{ top: "2px", left: "-150px" }}
             onNext={() => {
               currentStep.set(3);
               onCreateTestflow();

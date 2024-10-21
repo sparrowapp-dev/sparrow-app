@@ -81,7 +81,7 @@
   };
 
   $:{
-    if($currentStep == 6){
+    if($currentStep == 5){
       isOpen=true;
     }
     else{
