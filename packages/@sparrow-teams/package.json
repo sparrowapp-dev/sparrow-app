@@ -17,7 +17,8 @@
     "./components": "./src/components/index.ts",
     "./compopnents": "./src/compopnents/index.ts",
     "./constants": "./src/constants/index.ts",
-    "./stores": "./src/stores/index.ts"
+    "./stores": "./src/stores/index.ts",
+    "./constants/TeamTabs.constants": "./src/constants/TeamTabs.constants.ts"
   },
   "devDependencies": {
     "@fontsource/fira-mono": "^4.5.10",
