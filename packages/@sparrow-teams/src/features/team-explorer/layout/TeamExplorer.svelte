@@ -19,6 +19,7 @@
   import { TeamMembers, TeamSettings } from "@sparrow/teams/features";
   import { CrossIcon, MoreOptions } from "@sparrow/library/icons";
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
+  export let isWebApp = false;
 
   /**
    * user ID
@@ -225,7 +226,7 @@
             {/if}
             <span
               class="ms-3 my-auto ellipsis overflow-hidden heading"
-              style="font-size: 24px;"
+              style="font-size: 28px;"
               >{openTeam?.name || ""}
             </span>
 
@@ -313,6 +314,7 @@
               tabs={teamTabs}
               {onUpdateActiveTab}
               {activeTeamTab}
+              {isWebApp}
             />
           </div>
           <div class="teams-menu__right">

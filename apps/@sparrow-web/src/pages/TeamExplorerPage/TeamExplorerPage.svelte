@@ -17,7 +17,7 @@
   import { BackIcon } from "@sparrow/library/icons";
   export let activeTeamTab;
   export let onUpdateActiveTab;
-
+  export let isWebApp = false;
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
   const _viewModel = new TeamExplorerPageViewModel();
@@ -188,6 +188,7 @@
     onRemoveUserFromWorkspace={_viewModel.removeUserFromWorkspace}
     onChangeUserRoleAtWorkspace={_viewModel.changeUserRoleAtWorkspace}
     onUpdateTeam={_viewModel.updateTeam}
+    isWebApp={true}
   />
 {/if}
 

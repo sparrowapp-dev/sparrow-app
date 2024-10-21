@@ -19,7 +19,7 @@
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
 
- export let isCreateTeamModalOpen;
+  export let isCreateTeamModalOpen;
 
   let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
@@ -244,8 +244,6 @@
     </Splitpanes>
   </div>
 </Motion>
-
-
 
 <style>
   .warning-text {
