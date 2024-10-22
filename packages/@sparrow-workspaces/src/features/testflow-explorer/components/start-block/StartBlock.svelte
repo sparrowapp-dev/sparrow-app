@@ -8,8 +8,6 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { testFlowDataStore } from "../../store";
   import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";
-  import TestFlowTourGuide from "../../../../components/test-flow-tour-guide/TestFlowTourGuide.svelte";
-  import PulseCircle from "../../../../../../@sparrow-common/src/components/pulse-circle/PulseCircle.svelte";
   /**
    * The data object containing various handlers and data stores.
    */
@@ -117,9 +115,7 @@
           }}
         >
           <span
-            class="btnc py-1 px-3 d-flex align-items-center"
-            style="position:relative;"
-          >
+            class="btnc py-1 px-3 d-flex align-items-center" >
             <span class="text-fs-16 me-2">+</span> <span>Add Block</span>
           </span>
         </span>

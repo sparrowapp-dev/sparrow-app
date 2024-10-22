@@ -3,7 +3,7 @@
   import { scale } from "svelte/transition";
   import { quintOut, backInOut } from "svelte/easing";
 
-  export let remainOpen;
+  export let isBackgroundClickable;
 
   /**
    * Button ID
@@ -23,7 +23,7 @@
     iconColor: string;
     iconSize: string;
     onclick: () => void;
-    isTourGuideActive: boolean;
+    isHoverConstant: boolean;
   }[];
 
   export let horizontalPosition: "left" | "right" = "right";
@@ -55,7 +55,7 @@
             dropdownElement &&
             !dropdownElement.contains(event.target as Node)
           ) {
-           if(!remainOpen){
+           if(isBackgroundClickable){
             isMenuOpen = false;
            }
           }
@@ -63,8 +63,6 @@
         100,
       );
     });
-
-    console.log("This is remain OPen ", remainOpen);
   });
 
   afterUpdate(() => {
@@ -104,7 +102,7 @@
     -->
       {#each options as item}
         <button
-          class="border-0 d-flex p-2 rounded-1 w-100 option-button {item?.isTourGuideActive
+          class="border-0 d-flex p-2 rounded-1 w-100 option-button {item?.isHoverConstant
             ? 'hover-effect'
             : ''} "
           style="color: {item.color};"

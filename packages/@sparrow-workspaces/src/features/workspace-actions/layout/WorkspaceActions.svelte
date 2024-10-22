@@ -205,14 +205,13 @@
       });
     }
   }
-  let remainOpen = false;
+  let isBackgroundClickable = true;
 
   $: {
     if ($currentStep === 2 && $istestFlowTourGuideOpen) {
-      remainOpen = true;
-      console.log("This is reamin open ", remainOpen);
+      isBackgroundClickable = false;
     } else {
-      remainOpen = false;
+      isBackgroundClickable = true;
       addButtonMenu=false;
     }
   }
@@ -282,7 +281,7 @@
             onCreateTestflow();
             MixpanelEvent(Events.LeftPanel_Plus_Icon);
           },
-          isTourGuideActive: false,
+          isHoverConstant: false,
         },
       ]
     : [
@@ -342,7 +341,7 @@
             MixpanelEvent(Events.LeftPanel_Plus_Icon);
             isExpandTestflow = true;
           },
-          isTourGuideActive: false,
+          isHoverConstant: false,
         },
       ];
 
@@ -359,8 +358,8 @@
 
   const toggleTourGuideActive = () => {
     addButtonData.forEach((option) => {
-      if (option.hasOwnProperty("isTourGuideActive")) {
-        option.isTourGuideActive = !option.isTourGuideActive; // Toggle the value
+      if (option.hasOwnProperty("isHoverConstant")) {
+        option.isHoverConstant = !option.isHoverConstant; // Toggle the value
       }
     });
   };
@@ -465,7 +464,7 @@
         <Dropdown
           zIndex={600}
           buttonId="addButton"
-          bind:remainOpen
+          bind:isBackgroundClickable
           bind:isMenuOpen={addButtonMenu}
           options={addButtonData}
         >
@@ -490,7 +489,7 @@
       {/if}
 
       {#if $istestFlowTourGuideOpen && $currentStep == 1}
-        <div style="position:fixed; top:53px; left:-19px; z-index:99990;">
+        <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
           <TestFlowTourGuide
             targetId="addButton"
             title="Getting Started  🎉"
