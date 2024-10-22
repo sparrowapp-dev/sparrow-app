@@ -3,6 +3,8 @@
   import { scale } from "svelte/transition";
   import { quintOut, backInOut } from "svelte/easing";
 
+  export let isBackgroundClickable=true;
+
   /**
    * Button ID
    */
@@ -21,6 +23,7 @@
     iconColor: string;
     iconSize: string;
     onclick: () => void;
+    isHoverConstant: boolean;
   }[];
 
   export let horizontalPosition: "left" | "right" = "right";
@@ -52,7 +55,9 @@
             dropdownElement &&
             !dropdownElement.contains(event.target as Node)
           ) {
+           if(isBackgroundClickable){
             isMenuOpen = false;
+           }
           }
         },
         100,
@@ -90,14 +95,16 @@
       out:scale={{ start: 0.8, duration: 400 }}
       class="bg-dropdownContainer dropdown-container p-1 rounded-1 position-fixed
       "
-      style="min-width: {minWidth}px; top: {menuPosition.top}px; left: {menuPosition.left}px; z-index: 1000000;"
+      style="min-width: {minWidth}px; top: {menuPosition.top}px; left: {menuPosition.left}px; z-index: 9999;"
     >
       <!-- 
       Menu item
     -->
       {#each options as item}
         <button
-          class="border-0 d-flex p-2 rounded-1 w-100 option-button"
+          class="border-0 d-flex p-2 rounded-1 w-100 option-button {item?.isHoverConstant
+            ? 'hover-effect'
+            : ''} "
           style="color: {item.color};"
           on:click={() => item.onclick()}
         >
@@ -138,5 +145,8 @@
   }
   .option-button:active {
     background-color: var(--dropdown-option-active);
+  }
+  .hover-effect {
+    background-color: var(--dropdown-option-hover);
   }
 </style>
