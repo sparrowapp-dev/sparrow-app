@@ -137,17 +137,19 @@
 
   const WAIT_TIME_BEFORE_RESTART_IN_SECONDS = 5;
 
-  onMount(async () => {
-    try {
-      updater = await check();
-      if (updater?.available) {
-        notifications.info("Update Available");
-        newAppVersion = updater.version;
-        updateAvailable = true;
+  onMount(() => {
+    (async () => {
+      try {
+        updater = await check();
+        if (updater?.available) {
+          notifications.info("Update Available");
+          newAppVersion = updater.version;
+          updateAvailable = true;
+        }
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
-    }
+    })();
   });
 
   const initiateUpdate = async () => {
