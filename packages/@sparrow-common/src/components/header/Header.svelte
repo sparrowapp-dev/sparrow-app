@@ -53,8 +53,6 @@
 
   export let isWebApp = false;
 
-  export let onCreateTeam
-  
   export let isCreateTeamModalOpen;
 
   /**
@@ -184,12 +182,14 @@
       {#if isWebApp}
         <Select
           id={"workspace-dropdown"}
-          data={teamDocuments?.map((_team) => {
-            return {
-              id: _team.teamId,
-              name: _team.name,
-            };
-          })}
+          data={teamDocuments
+            ?.map((_team) => {
+              return {
+                id: _team.teamId,
+                name: _team.name,
+              };
+            })
+            .reverse()}
           titleId={teamDocuments?.filter((_team) => {
             if (_team.isOpen) return true;
             return false;
@@ -217,10 +217,13 @@
             class="post-dropdown"
             style="justify-content: center; align-items:center;"
           >
-             <div class="lower-underline"></div>
-            <div class="create-new-workspace" on:click={()=>{
-              isCreateTeamModalOpen=true
-            }}>
+            <div class="lower-underline"></div>
+            <div
+              class="create-new-workspace"
+              on:click={() => {
+                isCreateTeamModalOpen = true;
+              }}
+            >
               <span>Create New Team</span>
               <div style="align-content: flex-end;">
                 <PlusIcon

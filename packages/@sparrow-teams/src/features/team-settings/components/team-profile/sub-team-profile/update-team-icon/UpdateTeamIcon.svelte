@@ -6,14 +6,24 @@
   export let uploadTeamIcon: IUpdateTeamIcon;
   export let onUpdateTeam: (property: TeamPropertyEnum) => void;
 
-  import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
 
   let os = "";
-  onMount(async () => {
-    os = await platform();
-  });
 
+  const getOS = () => {
+    let userAgent = window.navigator.userAgent;
+    if (userAgent.indexOf("Mac") !== -1) {
+      os = "macos"; // Correct for Mac
+    } else if (userAgent.indexOf("Windows") !== -1) {
+      os = "windows"; // Correct for Windows
+    } else {
+      os = "";
+    }
+  };
+
+  onMount(() => {
+    getOS();
+  });
   /**
    * Handles the change event for the logo input.
    * Validates the file size and type before updating the team icon.
