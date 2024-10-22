@@ -3,7 +3,7 @@
    * Components
    */
   import { IconUploader, FileType } from "..";
-  import { OSDetector } from "../../../../utils";
+  import { OSDetector } from "@sparrow/common/utils";
 
   /**
    * Constants

@@ -7,7 +7,7 @@
   export let onUpdateTeam: (property: TeamPropertyEnum) => void;
 
   import { onMount } from "svelte";
-    import { OSDetector } from "@sparrow/common/utils";
+  import { OSDetector } from "@sparrow/common/utils";
 
   let os = "";
   const osDetector = new OSDetector();
