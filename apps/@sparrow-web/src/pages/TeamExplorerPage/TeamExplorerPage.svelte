@@ -195,6 +195,7 @@
     onRemoveUserFromWorkspace={_viewModel.removeUserFromWorkspace}
     onChangeUserRoleAtWorkspace={_viewModel.changeUserRoleAtWorkspace}
     onUpdateTeam={_viewModel.updateTeam}
+    isWebApp={true}
   />
 {/if}
 
