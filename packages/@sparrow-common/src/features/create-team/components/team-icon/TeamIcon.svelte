@@ -3,6 +3,7 @@
    * Components
    */
   import { IconUploader, FileType } from "..";
+  import { OSDetector } from "../../../../utils";
 
   /**
    * Constants
@@ -26,22 +27,10 @@
   const iconUploaderId: string = "team-file-input";
 
   let os = "";
-
-  const getOS = () => {
-    let userAgent = window.navigator.userAgent;
-    if (userAgent.indexOf("Mac") !== -1) {
-      os = "macos";
-    } else if (userAgent.indexOf("Windows") !== -1) {
-      os = "windows";
-    } else {
-      os = "";
-    }
-
-  
-  };
-
+  const osDetector = new OSDetector();
   onMount(() => {
-    getOS();
+    os = osDetector.getOS();
+    console.log("THis is sos", os);
   });
 
   /**

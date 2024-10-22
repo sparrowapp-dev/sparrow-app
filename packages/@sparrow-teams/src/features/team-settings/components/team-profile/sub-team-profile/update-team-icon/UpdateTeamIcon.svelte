@@ -7,23 +7,15 @@
   export let onUpdateTeam: (property: TeamPropertyEnum) => void;
 
   import { onMount } from "svelte";
+    import { OSDetector } from "@sparrow/common/utils";
 
   let os = "";
-
-  const getOS = () => {
-    let userAgent = window.navigator.userAgent;
-    if (userAgent.indexOf("Mac") !== -1) {
-      os = "macos"; // Correct for Mac
-    } else if (userAgent.indexOf("Windows") !== -1) {
-      os = "windows"; // Correct for Windows
-    } else {
-      os = "";
-    }
-  };
-
+  const osDetector = new OSDetector();
   onMount(() => {
-    getOS();
+    os = osDetector.getOS();
+    console.log("THis is sos", os);
   });
+
   /**
    * Handles the change event for the logo input.
    * Validates the file size and type before updating the team icon.
