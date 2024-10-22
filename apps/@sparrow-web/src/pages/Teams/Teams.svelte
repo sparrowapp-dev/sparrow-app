@@ -1,6 +1,10 @@
 <script lang="ts">
   import type { Observable } from "rxjs";
-  import type { TabDocument, TeamDocument } from "@app/database/database";
+  import type {
+    TabDocument,
+    TeamDocument,
+    WorkspaceDocument,
+  } from "@app/database/database";
 
   import {
     leftPanelWidth,
@@ -35,6 +39,7 @@
   import constants from "../../constants/constants";
   import type { TeamDocType } from "src/models/team.model";
   import { WelcomePopUpWeb } from "@sparrow/common/components";
+  import type { GithubRepoDocType } from "src/models/github-repo.model";
 
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
@@ -114,7 +119,7 @@
   $: {
     if ($openTeam) {
       setTimeout(() => {
-        activeIndex = $openTeam.teamId;
+        activeIndex = $openTeam?.teamId;
         teamTabs = refreshTabs();
       }, 0);
     }
@@ -129,7 +134,7 @@
   let openTeamData: TeamDocType;
   openTeam.subscribe((_team) => {
     if (_team) {
-      const teamJSON = _team.toMutableJSON();
+      const teamJSON = _team?.toMutableJSON();
       setTimeout(() => {
         openTeamData = teamJSON;
       }, 0);
