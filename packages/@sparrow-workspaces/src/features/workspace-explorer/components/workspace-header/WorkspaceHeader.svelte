@@ -67,7 +67,7 @@
           on:blur={(event) => {
             const newValue = event.target.value;
             const previousValue = workspaceName;
-            if (event.target.value === "") {
+            if (event.target.value?.trim() === "") {
               resetInputField();
             } else if (newValue !== previousValue) {
               onUpdateWorkspaceName(workspaceID, newValue);
