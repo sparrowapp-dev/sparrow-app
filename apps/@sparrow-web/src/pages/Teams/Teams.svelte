@@ -32,6 +32,7 @@
   import { ListTeamNavigation } from "@sparrow/teams/features";
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import constants from "../../constants/constants";
+  import type { TeamDocType } from "src/models/team.model";
 
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
@@ -104,8 +105,10 @@
   let teamTabs = [];
   $: {
     if ($openTeam) {
-      activeIndex = $openTeam.teamId;
-      teamTabs = refreshTabs();
+      setTimeout(() => {
+        activeIndex = $openTeam.teamId;
+        teamTabs = refreshTabs();
+      }, 0);
     }
   }
 
@@ -114,6 +117,16 @@
       teamTabs = refreshTabs();
     }
   }
+
+  let openTeamData: TeamDocType;
+  openTeam.subscribe((_team) => {
+    if (_team) {
+      const teamJSON = _team.toMutableJSON();
+      setTimeout(() => {
+        openTeamData = teamJSON;
+      }, 0);
+    }
+  });
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -157,7 +170,6 @@
             </button>
           </div>
         {/if}
-
         {#if !$leftPanelCollapse}
           <div
             class="d-flex flex-column sidebar h-100 d-flex flex-column justify-content-between bg-secondary-900"
@@ -169,7 +181,7 @@
                   tabs={teamTabs}
                   onUpdateActiveTab={_viewModel.updateActiveTeamTab}
                   activeTeamTab={$activeTeamTab}
-                  openTeam={$openTeam}
+                  openTeam={openTeamData}
                 />
               </section>
             </div>
