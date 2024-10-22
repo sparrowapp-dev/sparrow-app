@@ -4,11 +4,11 @@
   import PulseCircle from "../../../../@sparrow-common/src/components/pulse-circle/PulseCircle.svelte";
 
   export let pulsePosition = { top: "0px", left: "0px" };
-  export let targetId; 
-  export let title = ""; 
-  export let description = ""; 
-  export let tipPosition = "top-left"; 
-  export let onNext; 
+  export let targetId;
+  export let title = "";
+  export let description = "";
+  export let tipPosition = "top-left";
+  export let onNext;
   export let onClose;
   export let isPuleCircleRequired = true;
 
@@ -75,7 +75,7 @@
   <!-- Title and content -->
   <h2
     class="text-fs-16"
-    style="font-weight: 600; color:var(--text-primary-300);"
+    style="font-weight: 500; color:var(--text-primary-300);"
   >
     {title}
   </h2>
@@ -89,7 +89,7 @@
   <!-- Next/Done button -->
   <button
     class=" mt-2 rounded-1 text-fs-12"
-    style="font-weight:500; border: none; background-color:#2A2C3C; padding:9px 10px;"
+    style="font-weight:500; border: none; background-color:#2A2C3C; padding:7px 10px;"
     on:click={handleNext}
     >{#if isLastStep}
       Done
