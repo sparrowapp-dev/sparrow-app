@@ -388,7 +388,7 @@ export class DashboardViewModel {
   };
 
   /**
-   * Switch from one workspace to another
+   * Switch from one team to another
    * @param _teamId - team id
    */
   public handleSwitchTeam = async (_teamId: string) => {
