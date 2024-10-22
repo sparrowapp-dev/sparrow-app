@@ -172,7 +172,9 @@
 <div class="d-flex align-items-center justify-content-between pt-3">
   <div class="description sparrow-fs-12 ellipsis">
     <p class="mb-0 text-secondary-200 ellipsis">
-      Workspace<span style="color:white">: {currentWorkspaceDetails.name}</span>
+      Workspace: <span style="color:white">
+        {currentWorkspaceDetails.name}</span
+      >
     </p>
     <p class="text-secondary-200 mb-0 ellipsis">
       Team: <span style="color:white"> {teamName}</span>

@@ -6,3 +6,4 @@ export { default as LoginSignupConfirmation } from "./LoginSingupConfirmation/Lo
 export { default as Updater } from "./updater/Updater.svelte";
 export { default as Background } from "./background/Background.svelte";
 export { default as Redirect } from "./redirect/Redirect.svelte";
+export { default as WelcomePopUpWeb } from "./welcome-pop-up-web/WelcomePopUpWeb.svelte";
