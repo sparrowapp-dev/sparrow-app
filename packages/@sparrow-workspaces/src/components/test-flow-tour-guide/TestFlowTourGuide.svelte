@@ -1,7 +1,7 @@
 <script>
   import { CrossIcon } from "@sparrow/library/assets";
   import { onMount, onDestroy } from "svelte";
-  import PulseCircle from "../../../../@sparrow-common/src/components/pulse-circle/PulseCircle.svelte";
+  import {PulseCircle} from "@sparrow/common/components";
 
   export let pulsePosition = { top: "0px", left: "0px" };
   export let targetId;
