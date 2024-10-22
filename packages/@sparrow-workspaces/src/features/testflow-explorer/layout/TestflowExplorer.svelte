@@ -62,6 +62,7 @@
     currentStep,
     istestFlowTourGuideOpen,
   } from "../../../stores/guide.tour";
+  import { platform } from "@tauri-apps/plugin-os";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -430,6 +431,12 @@
 
   let selectedNode: TFNodeStoreType | undefined;
 
+  // Get the platform
+  const getPlatform = async () => {
+    const os = await platform();
+    return os;
+  };
+
   // Reactive statement to handle selected node updates
   $: {
     if (testflowStore || selectedNodeId) {
@@ -555,9 +562,13 @@
    *
    * @param event - The key press event object.
    */
-  const handleKeyPress = (event: KeyboardEvent) => {
+  const handleKeyPress = async (event: KeyboardEvent) => {
     if (event.key === "Backspace") {
       event.preventDefault();
+      const platform = await getPlatform();
+      if (platform === "macos") {
+        handleDeleteModal(selectedNodeId);
+      }
     }
     if (event.key === "Delete") {
       event.preventDefault();

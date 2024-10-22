@@ -10,32 +10,42 @@
 
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import TeamExplorerPage from "../TeamExplorerPage/TeamExplorerPage.svelte";
-  import { TeamSidePanel } from "@sparrow/teams/features";
   import { TeamsViewModel } from "./Teams.ViewModel";
-  import { Modal } from "@sparrow/library/ui";
-  import { CreateTeam } from "@sparrow/teams/features";
+  import { Modal, Tooltip } from "@sparrow/library/ui";
   import { pagesMotion } from "../../constants";
   import { version } from "../../../package.json";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
-  const setOpenTeam = _viewModel.setOpenTeam;
-  const disableNewInviteTag = _viewModel.disableNewInviteTag;
-  const modifyTeam = _viewModel.modifyTeam;
 
-  let isCreateTeamModalOpen: boolean = false;
-  const collectionList = _viewModel.collection;
-  const onApiClick = _viewModel.handleApiClick;
-  const OnWorkspaceSwitch = _viewModel.handleSwitchWorkspace;
+  export let isCreateTeamModalOpen;
 
   let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
+  const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
   import { onMount } from "svelte";
   import { Motion } from "svelte-motion";
+  import { isUserFirstSignUp } from "src/store/user.store";
+  import { user } from "src/store/auth.store";
+  import { WithButton } from "@sparrow/workspaces/hoc";
+  import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
+  import { ListTeamNavigation } from "@sparrow/teams/features";
+  import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
+  import constants from "../../constants/constants";
+  import { WelcomePopUpWeb } from "@sparrow/common/components";
 
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
+
+  const externalSparrowGithub = constants.SPARROW_GITHUB;
+
+  let userId = "";
+  user.subscribe(async (value) => {
+    if (value) {
+      userId = value._id;
+    }
+  });
 
   onMount(async () => {
     let githubRepo = await _viewModel.getGithubRepo();
@@ -62,6 +72,56 @@
       splitter.style.display = "unset";
     }
   }
+
+  let isWelcomePopupOpen = false;
+  isUserFirstSignUp.subscribe((value) => {
+    if (value) {
+      isWelcomePopupOpen = value;
+    }
+  });
+  let isGithubStarHover = false;
+
+  let activeIndex;
+
+  const refreshTabs = () => {
+    return [
+      {
+        name: "Workspaces",
+        id: TeamTabsEnum.WORKSPACES,
+        count: $openTeam?.workspaces?.length,
+        visible: true,
+        disabled: isGuestUser === true ? true : false,
+      },
+      {
+        name: "Members",
+        id: TeamTabsEnum.MEMBERS,
+        count: $openTeam?.users?.length,
+        visible: true,
+        disabled: isGuestUser === true ? true : false,
+      },
+      {
+        name: "Settings",
+        id: TeamTabsEnum.SETTINGS,
+        count: 0,
+        visible: $openTeam?.owner === userId,
+        disabled: isGuestUser === true ? true : false,
+      },
+    ];
+  };
+
+  let teamTabs = [];
+  $: {
+    if ($openTeam) {
+      activeIndex = $openTeam.teamId;
+      teamTabs = refreshTabs();
+    }
+  }
+
+  $: {
+    if (isGuestUser) {
+      teamTabs = refreshTabs();
+    }
+  }
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -79,54 +139,132 @@
         minSize={20}
         class="bg-secondary-900-important sidebar-left-panel"
       >
-        <TeamSidePanel
-          bind:isGuestUser
-          bind:isCreateTeamModalOpen
-          teamList={$teamList}
-          tabList={$tabList}
-          data={workspaces}
-          githubRepo={githubRepoData}
-          leftPanelController={{
-            leftPanelCollapse: $leftPanelCollapse,
-            handleCollapseCollectionList,
-          }}
-          collectionList={$collectionList}
-          openTeam={$openTeam}
-          {onApiClick}
-          {OnWorkspaceSwitch}
-          {setOpenTeam}
-          {disableNewInviteTag}
-          {modifyTeam}
-          appVersion={version}
-        />
+        {#if $leftPanelCollapse}
+          <div>
+            <button
+              class="d-flex align-items-center justify-content-center border-0 angleRight w-16 position-absolute {$leftPanelCollapse
+                ? 'd-block'
+                : 'd-none'}"
+              style="left:52px; bottom: 20px; width: 20px; height:20px ; background-color:var(--blackColor); z-index: {$leftPanelCollapse
+                ? '2'
+                : '0'}"
+              on:click={() => {
+                handleCollapseCollectionList();
+              }}
+            >
+              <span
+                style="transform: rotate(180deg); "
+                class="position-relative d-flex align-items-center justify-content-center"
+              >
+                <DoubleArrowIcon
+                  height={"10px"}
+                  width={"10px"}
+                  color={"var(--text-primary-200)"}
+                />
+              </span>
+            </button>
+          </div>
+        {/if}
+
+        {#if !$leftPanelCollapse}
+          <div
+            class="d-flex flex-column sidebar h-100 d-flex flex-column justify-content-between bg-secondary-900"
+          >
+            <div style="flex:1; overflow:auto;">
+              <!--Teams list-->
+              <section class="d-flex flex-column" style="max-height:33%;">
+                <ListTeamNavigation
+                  tabs={teamTabs}
+                  onUpdateActiveTab={_viewModel.updateActiveTeamTab}
+                  activeTeamTab={$activeTeamTab}
+                  openTeam={$openTeam}
+                />
+              </section>
+            </div>
+
+            <!-- github repo section -->
+            <section>
+              <div
+                class="p-2 d-flex align-items-center justify-content-between"
+                style="z-index: 4;"
+              >
+                <Tooltip title={"Star Us On GitHub"} placement={"top"}>
+                  <div
+                    class=" px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
+                      ? 'bg-secondary-600'
+                      : ''}"
+                    role="button"
+                    on:mouseenter={() => {
+                      isGithubStarHover = true;
+                    }}
+                    on:mouseleave={() => {
+                      isGithubStarHover = false;
+                    }}
+                    on:click={async () => {
+                      await open(externalSparrowGithub);
+                    }}
+                  >
+                    <GithubIcon
+                      height={"18px"}
+                      width={"18px"}
+                      color={isGithubStarHover
+                        ? "var(--bg-secondary-100)"
+                        : "var(--bg-secondary-200)"}
+                    />
+                    <span
+                      class="ps-2 text-fs-14 {isGithubStarHover
+                        ? 'text-secondary-100'
+                        : 'text-secondary-200'}"
+                    >
+                      {githubRepoData?.stargazers_count || ""}
+                    </span>
+                  </div>
+                </Tooltip>
+
+                <div class="d-flex align-items-center">
+                  <!-- <span class="text-fs-14 text-secondary-200 pe-2"
+                    >v{version}</span
+                  > -->
+                  <WithButton
+                    icon={DoubleArrowIcon}
+                    onClick={() => {
+                      handleCollapseCollectionList();
+                    }}
+                    disable={false}
+                    loader={false}
+                  />
+                </div>
+              </div>
+            </section>
+          </div>
+        {/if}
       </Pane>
       <Pane
         size={$leftPanelCollapse ? 100 : $rightPanelWidth}
         minSize={60}
         class="bg-secondary-800-important"
       >
-        <TeamExplorerPage />
+        <TeamExplorerPage
+          activeTeamTab={$activeTeamTab}
+          onUpdateActiveTab={_viewModel.updateActiveTeamTab}
+        />
       </Pane>
     </Splitpanes>
   </div>
 </Motion>
 
 <Modal
-  title={"New Team"}
+  title={""}
   type={"dark"}
-  width={"35%"}
+  width={"40%"}
   zIndex={1000}
-  isOpen={isCreateTeamModalOpen}
-  handleModalState={(flag) => {
-    isCreateTeamModalOpen = flag;
+  isOpen={isWelcomePopupOpen}
+  handleModalState={() => {
+    isUserFirstSignUp.set(false);
+    isWelcomePopupOpen = false;
   }}
 >
-  <CreateTeam
-    handleModalState={(flag = false) => {
-      isCreateTeamModalOpen = flag;
-    }}
-    onCreateTeam={_viewModel.createTeam}
-  />
+  <WelcomePopUpWeb />
 </Modal>
 
 <style>
@@ -150,5 +288,73 @@
       .team-splitter .splitpanes__splitter:hover
     ) {
     background-color: var(--bg-primary-200) !important;
+  }
+
+  .sidebar-teams-list::-webkit-scrollbar-thumb {
+    background-color: var(--bg-secondary-330);
+  }
+
+  .sidebar-teams-list::-webkit-scrollbar-button {
+    color: var(--bg-secondary-330);
+  }
+  .teams-heading {
+    margin-left: 5px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 21px;
+  }
+  .teams-outer {
+    padding: 6px 5px;
+    background-color: transparent;
+  }
+  .teams-outer.active {
+    background-color: var(--text-tertiary-750);
+  }
+  .new-team-btn {
+    background-color: transparent;
+  }
+  .new-team-btn:hover {
+    background-color: var(--border-color);
+  }
+  .teams-outer:hover {
+    background-color: var(--bg-tertiary-750);
+  }
+
+  .teams-outer:active {
+    background-color: var(--bg-secondary-320);
+  }
+  .teams-outer img {
+    width: 25px;
+    height: 25px;
+    overflow: hidden;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+  .sidebar-teams-list {
+    max-height: 30vh;
+  }
+
+  .sidebar-recentapi-list {
+    max-height: 30vh;
+  }
+  .new-invite {
+    font-size: 12px !important;
+  }
+  .teams-title {
+    width: calc(100% - 40px);
+    text-align: left;
+  }
+
+  .title {
+    width: calc(100% - 40px);
+    text-align: left;
+  }
+  .not-found-text {
+    color: var(--request-arc);
+    font-size: 12px;
+  }
+
+  .github-icon {
+    padding-bottom: 50px !important;
   }
 </style>

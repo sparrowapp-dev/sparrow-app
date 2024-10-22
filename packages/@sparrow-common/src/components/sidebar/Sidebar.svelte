@@ -22,6 +22,7 @@
   export { componentClass as class };
   export let user;
   export let onLogout: () => void;
+  export let type = "desktop";
   let isGuestUser = false;
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
@@ -43,7 +44,7 @@
       defaultLogo: collections,
       hoveredLogo: hoveredCollections,
       selectedLogo: selectedCollections,
-      disabled: false,
+      disabled: type === "web" ? true : false,
       position: "primary",
     },
     {
@@ -52,7 +53,7 @@
       defaultLogo: help,
       hoveredLogo: hoveredHelp,
       selectedLogo: selectedHelp,
-      disabled: isGuestUser ?? false,
+      disabled: type === "web" ? true : (isGuestUser ?? false),
       position: "secondary",
     },
     {

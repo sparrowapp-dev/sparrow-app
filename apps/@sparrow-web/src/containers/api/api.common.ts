@@ -162,10 +162,12 @@ const makeRequest = async (
       return await regenerateAuthToken(method, url, requestData);
     } else if (
       e.response?.data?.statusCode === 401 &&
-      e.response.data.message === ErrorMessages.Unauthorized
+      e.response.data.message === ErrorMessages.JWTFailed
     ) {
       const _viewModel = new DashboardViewModel();
       await _viewModel.clientLogout();
+      return error("Unauthorized");
+    } else if (e.response?.data?.statusCode === 401) {
       return error("Unauthorized");
     }
     if (e.code === "ERR_NETWORK") {
