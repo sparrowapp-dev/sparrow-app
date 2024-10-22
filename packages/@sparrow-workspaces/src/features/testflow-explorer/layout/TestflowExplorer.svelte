@@ -40,6 +40,7 @@
     DropButton,
     TableNavbar,
     TableSidebar,
+    TestFlowTourGuide,
   } from "@sparrow/workspaces/components";
   import { RunIcon } from "@sparrow/library/icons";
   import { Modal } from "@sparrow/library/ui";
@@ -56,11 +57,11 @@
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Debounce } from "@sparrow/common/utils";
-  import TestFlowTourGuide from "../../../components/test-flow-tour-guide/TestFlowTourGuide.svelte";
+
   import { relative } from "path";
   import {
     currentStep,
-    istestFlowTourGuideOpen,
+    isTestFlowTourGuideOpen,
   } from "../../../stores/guide.tour";
   import { platform } from "@tauri-apps/plugin-os";
 
@@ -702,7 +703,7 @@
           />
         {/if}
 
-        {#if $istestFlowTourGuideOpen && $currentStep == 6}
+        {#if $isTestFlowTourGuideOpen && $currentStep == 6}
           <div style="position:absolute;  top:60px; right:320px">
             <TestFlowTourGuide
               targetId="run-btn"
@@ -715,7 +716,7 @@
                 await onClickRun();
               }}
               onClose={() => {
-                istestFlowTourGuideOpen.set(false);
+                isTestFlowTourGuideOpen.set(false);
               }}
             />
           </div>
@@ -754,7 +755,7 @@
       />
     </SvelteFlow>
 
-    {#if $istestFlowTourGuideOpen && $currentStep == 3}
+    {#if $isTestFlowTourGuideOpen && $currentStep == 3}
       <div style="position:absolute; top:260px; left:265px; z-index:1000;">
         <TestFlowTourGuide
           title="One Block At A Time 🧱"
@@ -766,13 +767,13 @@
             createNewNode("1", "undefined");
           }}
           onClose={() => {
-            istestFlowTourGuideOpen.set(false);
+            isTestFlowTourGuideOpen.set(false);
           }}
         />
       </div>
     {/if}
 
-    {#if $istestFlowTourGuideOpen && $currentStep == 4}
+    {#if $isTestFlowTourGuideOpen && $currentStep == 4}
       <div style="position:absolute; top:240px; left:620px; z-index:1000;">
         <TestFlowTourGuide
           title="Block Added! 👏 "
@@ -783,13 +784,13 @@
             currentStep.set(5);
           }}
           onClose={() => {
-            istestFlowTourGuideOpen.set(false);
+            isTestFlowTourGuideOpen.set(false);
           }}
         />
       </div>
     {/if}
 
-    {#if $istestFlowTourGuideOpen && $currentStep == 5}
+    {#if $isTestFlowTourGuideOpen && $currentStep == 5}
       <div style="position:absolute; top:280px; left:620px; z-index:1000;">
         <TestFlowTourGuide
           title="Sample API waiting...⏱️"
@@ -800,7 +801,7 @@
             currentStep.set(6);
           }}
           onClose={() => {
-            istestFlowTourGuideOpen.set(false);
+            isTestFlowTourGuideOpen.set(false);
           }}
         />
       </div>
@@ -953,7 +954,7 @@
       style="color: var(--text-primary-300); font-weight:500; cursor:pointer;  "
       on:click={() => {
         currentStep.set(1);
-        istestFlowTourGuideOpen.set(true);
+        isTestFlowTourGuideOpen.set(true);
       }}
     >
       Need help?

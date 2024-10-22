@@ -3,7 +3,7 @@
   import { scale } from "svelte/transition";
   import { quintOut, backInOut } from "svelte/easing";
 
-  export let isBackgroundClickable;
+  export let isBackgroundClickable=true;
 
   /**
    * Button ID

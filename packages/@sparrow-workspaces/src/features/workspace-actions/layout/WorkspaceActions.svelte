@@ -35,11 +35,12 @@
   } from "@sparrow/workspaces/features";
   import { TestflowList } from "../../testflow-list";
   import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
-  import TestFlowTourGuide from "../../../components/test-flow-tour-guide/TestFlowTourGuide.svelte";
+
   import {
     currentStep,
-    istestFlowTourGuideOpen,
+    isTestFlowTourGuideOpen,
   } from "../../../stores/guide.tour";
+  import { TestFlowTourGuide } from "@sparrow/workspaces/components";
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
@@ -208,11 +209,11 @@
   let isBackgroundClickable = true;
 
   $: {
-    if ($currentStep === 2 && $istestFlowTourGuideOpen) {
+    if ($currentStep === 2 && $isTestFlowTourGuideOpen) {
       isBackgroundClickable = false;
     } else {
       isBackgroundClickable = true;
-      addButtonMenu=false;
+      addButtonMenu = false;
     }
   }
 
@@ -488,7 +489,7 @@
         </Dropdown>
       {/if}
 
-      {#if $istestFlowTourGuideOpen && $currentStep == 1}
+      {#if $isTestFlowTourGuideOpen && $currentStep == 1}
         <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
           <TestFlowTourGuide
             targetId="addButton"
@@ -502,13 +503,13 @@
               toggleTourGuideActive();
             }}
             onClose={() => {
-              istestFlowTourGuideOpen.set(false);
+              isTestFlowTourGuideOpen.set(false);
             }}
           />
         </div>
       {/if}
 
-      {#if $istestFlowTourGuideOpen && $currentStep == 2}
+      {#if $isTestFlowTourGuideOpen && $currentStep == 2}
         <div style="position:fixed; top:200px; left:220px; z-index:9999;">
           <TestFlowTourGuide
             targetId="addButton"
@@ -523,7 +524,7 @@
               toggleTourGuideActive();
             }}
             onClose={() => {
-              istestFlowTourGuideOpen.set(false);
+              isTestFlowTourGuideOpen.set(false);
             }}
           />
         </div>

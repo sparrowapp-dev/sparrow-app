@@ -4,4 +4,4 @@ export {
   leftPanelCollapse,
 } from "./splitpane";
 
-export { istestFlowTourGuideOpen, currentStep } from "./guide.tour";
+export { isTestFlowTourGuideOpen, currentStep } from "./guide.tour";
