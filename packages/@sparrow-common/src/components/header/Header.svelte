@@ -53,6 +53,7 @@
 
   export let isWebApp = false;
 
+  export let onCreateTeam;
 
   export let isCreateTeamModalOpen;
 
@@ -189,7 +190,7 @@
                 id: _team.teamId,
                 name: _team.name,
               };
-            }).reverse()}
+            })}
             titleId={teamDocuments?.filter((_team) => {
               if (_team.isOpen) return true;
               return false;
