@@ -72,7 +72,6 @@
   {#if $istestFlowTourGuideOpen && $currentStep == 7}
   <div style="position:absolute; bottom:250px; right:318px;">
     <TestFlowTourGuide
-      targetId="addBlockBtn"
       isLastStep={true}
       isPuleCircleRequired={false}
       title="Congratulations! 🎊"

@@ -4,12 +4,12 @@
   import PulseCircle from "../../../../@sparrow-common/src/components/pulse-circle/PulseCircle.svelte";
 
   export let pulsePosition = { top: "0px", left: "0px" };
-  export let targetId; // The ID of the target element
-  export let title = ""; // Title for the popup
-  export let description = ""; // Description for the popup
-  export let tipPosition = "top-left"; // Position of the tip (triangle)
-  export let onNext; // Function for the Next button
-  export let onClose; // Function for the Close button
+  export let targetId; 
+  export let title = ""; 
+  export let description = ""; 
+  export let tipPosition = "top-left"; 
+  export let onNext; 
+  export let onClose;
   export let isPuleCircleRequired = true;
 
   export let isLastStep = false;
