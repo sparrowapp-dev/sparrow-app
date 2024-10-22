@@ -43,7 +43,7 @@ export async function handleLogin(url: string) {
       Login_Method: "Email",
       Success: true,
     });
-    notifications.success("Login successful!");
+    notifications.success("Login successful.");
     if (event === "register") {
       navigate("/app/home");
       _guideRepository.insert({ isActive: true, id: "environment-guide" });
@@ -56,6 +56,6 @@ export async function handleLogin(url: string) {
       _guideRepository.insert({ isActive: false, id: "collection-guide" });
     }
   } else {
-    notifications.error("Invalid token!");
+    notifications.error("Invalid token.");
   }
 }
