@@ -13,6 +13,7 @@ export { FormatTime } from "./formatTime";
 export { ParseTime } from "./parse-time";
 export { throttle } from "./throttle";
 export { copyToClipBoard } from "./copyToClipboard";
+export { OSDetector } from "./OSDetector";
 export * from "./auth.helper";
 export * from "./common.helper";
 export * from "./conversion.helper";
