@@ -18,6 +18,7 @@
   import Teams from "../Teams/Teams.svelte";
   import { Modal } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";
+  import { CreateTeam } from "@sparrow/common/features";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -117,6 +118,8 @@
   });
 
   let showProgressBar = false;
+
+  let isCreateTeamModalOpen: boolean = false;
 </script>
 
 <div class="dashboard d-flex flex-column" style="height: 100vh;">
@@ -144,6 +147,7 @@
     {user}
     onLogout={_viewModel.handleLogout}
     isWebApp={true}
+    bind:isCreateTeamModalOpen
   />
 
   <!-- 
@@ -154,6 +158,24 @@
     onClick={handleGuestLogin}
     onClose={handleBannerClose}
   />
+
+  <Modal
+    title={"New Team"}
+    type={"dark"}
+    width={"35%"}
+    zIndex={1000}
+    isOpen={isCreateTeamModalOpen}
+    handleModalState={(flag) => {
+      isCreateTeamModalOpen = flag;
+    }}
+  >
+    <CreateTeam
+      handleModalState={(flag = false) => {
+        isCreateTeamModalOpen = flag;
+      }}
+      onCreateTeam={_viewModel.createTeam}
+    />
+  </Modal>
 
   <!-- 
     -- Application includes collection, environment and help page.

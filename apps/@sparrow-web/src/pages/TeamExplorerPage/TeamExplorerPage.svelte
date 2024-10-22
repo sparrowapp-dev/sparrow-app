@@ -233,6 +233,7 @@
     onUpdateTeam={_viewModel.updateTeam}
     {openInDesktop}
     {isWebEnvironment}
+    isWebApp={true}
   />
 {/if}
 
