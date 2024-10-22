@@ -13,11 +13,6 @@
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
-  import {
-    isTestFlowTourGuideOpen,
-    currentStep,
-  } from "../../../stores/guide.tour";
-
   /**
    * current workspace
    */
@@ -208,8 +203,6 @@
               on:click={async () => {
                 await onCreateTestflow();
                 MixpanelEvent(Events.Add_New_Flow);
-                isTestFlowTourGuideOpen.set(true);
-                currentStep.set(3);
               }}
             >
               <PlusIcon
