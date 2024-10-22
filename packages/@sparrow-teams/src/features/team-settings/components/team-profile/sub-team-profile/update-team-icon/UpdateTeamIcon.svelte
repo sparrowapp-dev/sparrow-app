@@ -6,13 +6,12 @@
   export let uploadTeamIcon: IUpdateTeamIcon;
   export let onUpdateTeam: (property: TeamPropertyEnum) => void;
 
+  import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
-  import { OSDetector } from "@sparrow/common/utils";
 
   let os = "";
-  const osDetector = new OSDetector();
-  onMount(() => {
-    os = osDetector.getOS();
+  onMount(async () => {
+    os = await platform();
   });
 
   /**
