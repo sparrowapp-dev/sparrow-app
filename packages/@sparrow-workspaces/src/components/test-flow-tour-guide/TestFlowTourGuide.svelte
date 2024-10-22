@@ -2,7 +2,7 @@
   import { CrossIcon } from "@sparrow/library/assets";
   import { onMount, onDestroy } from "svelte";
   import PulseCircle from "../../../../@sparrow-common/src/components/pulse-circle/PulseCircle.svelte";
-  
+
   export let pulsePosition = { top: "0px", left: "0px" };
   export let targetId; // The ID of the target element
   export let title = ""; // Title for the popup
@@ -10,7 +10,7 @@
   export let tipPosition = "top-left"; // Position of the tip (triangle)
   export let onNext; // Function for the Next button
   export let onClose; // Function for the Close button
-  export let isPuleCircleRequired=true;
+  export let isPuleCircleRequired = true;
 
   export let isLastStep = false;
 
@@ -57,7 +57,6 @@
 
 <!-- Popup positioned based on the target element -->
 <div class="popup p-4" style="top: {top}px; left: {left}px;">
-
   {#if isPuleCircleRequired}
     <PulseCircle {pulsePosition} />
   {/if}
@@ -67,8 +66,8 @@
   <!-- Close button (X) -->
   <div class="close-icon" on:click={handleClose}>
     <CrossIcon
-      height={"12px"}
-      width={"12px"}
+      height={"11px"}
+      width={"11px"}
       color={"var(--icon-tertiary-100)"}
     />
   </div>
@@ -76,18 +75,21 @@
   <!-- Title and content -->
   <h2
     class="text-fs-16"
-    style="font-weight: 500; color:var(--text-primary-300);"
+    style="font-weight: 600; color:var(--text-primary-300);"
   >
     {title}
   </h2>
-  <p class="text-fs-13" style="line-height: 19.5px; font-weight:400;">
+  <p
+    class="text-fs-13"
+    style="line-height: 19.5px; font-weight:400; color:var(--text-secondary-100);"
+  >
     {description}
   </p>
 
   <!-- Next/Done button -->
   <button
-    class=" mt-2 px-2 py-1 rounded-1 text-fs-12"
-    style="font-weight:400; border: none; background-color:#2A2C3C;"
+    class=" mt-2 rounded-1 text-fs-12"
+    style="font-weight:500; border: none; background-color:#2A2C3C; padding:9px 10px;"
     on:click={handleNext}
     >{#if isLastStep}
       Done
@@ -106,6 +108,7 @@
     height: 100vh;
     background: rgba(0, 0, 0, 0.5); /* Dim background */
     opacity: 50%;
+    z-index: 10000;
   }
 
   .popup {
@@ -113,17 +116,17 @@
     background-color: #1c1d2b;
     border-radius: 8px;
     padding: 16px;
-    color: white;
     max-width: 300px;
     width: 300px;
     font-family: Arial, sans-serif;
-    z-index: 10000000000; /* Ensure it's above the overlay */
+    z-index: 100000;
+    border: 0.3px solid var(--border-tertiary-190);
   }
 
   .popup h2 {
     margin: 0;
     font-size: 18px;
-    color: #3f7ee6;
+    color: var(--text-primary-300);
   }
 
   .popup p {
@@ -137,82 +140,77 @@
     cursor: pointer;
   }
 
-  .popup .next-button {
-    background-color: #3f7ee6;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px;
-    margin-top: 10px;
-    cursor: pointer;
-  }
-
   .popup .tip {
     position: absolute;
-    width: 0;
-    height: 0;
-    border-style: solid;
+    width: 19px;
+    height: 19px;
+
+    background-color: #1c1d2b;
   }
 
   /* Tip positions */
   .tip.top-left {
     top: -10px;
-    left: 20px;
-    border-width: 0 10px 10px 10px;
-    border-color: transparent transparent #1c1d2b transparent;
+    left: 25px;
+    border-left: 0.3px solid var(--border-tertiary-190);
+    border-top: 0.3px solid var(--border-tertiary-190);
+    transform: rotate(45deg);
   }
 
   .tip.top-right {
     top: -10px;
-    right: 20px;
-    border-width: 0 10px 10px 10px;
-    border-color: transparent transparent #1c1d2b transparent;
+    right: 30px;
+    border-left: 0.3px solid var(--border-tertiary-190);
+    border-top: 0.3px solid var(--border-tertiary-190);
+    transform: rotate(45deg);
   }
 
   .tip.bottom-left {
     bottom: -10px;
-    left: 20px;
-    border-width: 10px 10px 0 10px;
-    border-color: #1c1d2b transparent transparent transparent;
+    left: 25px;
+    border-left: 0.3px solid var(--border-tertiary-190);
+    border-top: 0.3px solid var(--border-tertiary-190);
+    transform: rotate(225deg);
   }
 
   .tip.bottom-right {
     bottom: -10px;
-    right: 20px;
-    border-width: 10px 10px 0 10px;
-    border-color: #1c1d2b transparent transparent transparent;
+    right: 25px;
+    border-left: 0.3px solid var(--border-tertiary-190);
+    border-top: 0.3px solid var(--border-tertiary-190);
+    transform: rotate(225deg);
   }
 
   /* New Tip Positions */
   .tip.left-top {
-    top: 20px;
-    left: -8px;
-    border-width: 20px 20px 0 0;
-    border-color: #1c1d2b transparent transparent transparent;
-    transform: rotate(312deg);
+    top: 25px;
+    left: -10px;
+    border-left: 0.3px solid var(--border-tertiary-190);
+    border-top: 0.3px solid var(--border-tertiary-190);
+    transform: rotate(314deg);
   }
 
   .tip.left-bottom {
-    bottom: 20px;
-    left: -8px;
-    border-width: 0 20px 20px 0;
-    border-color: transparent #1c1d2b transparent transparent;
-    transform: rotate(225deg);
+    bottom: 25px;
+    left: -10px;
+    border-left: 0.3px solid var(--border-tertiary-190);
+    border-top: 0.3px solid var(--border-tertiary-190);
+    transform: rotate(314deg);
   }
 
   .tip.right-top {
-    top: 20px;
+    top: 25px;
     right: -10px;
-    border-width: 20px 0 0 20px;
-    border-color: #1c1d2b transparent transparent transparent;
-    transform: rotate(45deg);
+    border-left: 0.3px solid var(--border-tertiary-190);
+    border-top: 0.3px solid var(--border-tertiary-190);
+    transform: rotate(135deg);
   }
 
   .tip.right-bottom {
-    bottom: 20px;
-    right: -8px;
-    border-width: 0 0 20px 20px;
-    border-color: transparent transparent #1c1d2b transparent;
-    transform: rotate(315deg);
+    bottom: 25px;
+    right: -10px;
+    border-left: 0.3px solid var(--border-tertiary-190);
+    border-top: 0.3px solid var(--border-tertiary-190);
+    transform: rotate(135deg);
   }
 </style>

@@ -3,6 +3,8 @@
   import { scale } from "svelte/transition";
   import { quintOut, backInOut } from "svelte/easing";
 
+  export let remainOpen;
+
   /**
    * Button ID
    */
@@ -53,12 +55,16 @@
             dropdownElement &&
             !dropdownElement.contains(event.target as Node)
           ) {
+           if(!remainOpen){
             isMenuOpen = false;
+           }
           }
         },
         100,
       );
     });
+
+    console.log("This is remain OPen ", remainOpen);
   });
 
   afterUpdate(() => {

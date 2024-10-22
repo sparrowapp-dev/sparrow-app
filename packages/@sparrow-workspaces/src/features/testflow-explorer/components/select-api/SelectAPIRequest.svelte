@@ -72,7 +72,13 @@
       dropdownRef &&
       !dropdownRef.contains(event.target as Node)
     ) {
-      isOpen = false;
+
+      if($currentStep == 5){
+      isOpen=true;
+    }
+    else{
+      isOpen=false;
+    }
       arrayData = collections;
       selectedCollection = null;
       selectedFolder = null;

@@ -205,6 +205,17 @@
       });
     }
   }
+  let remainOpen = false;
+
+  $: {
+    if ($currentStep === 2 && $istestFlowTourGuideOpen) {
+      remainOpen = true;
+      console.log("This is reamin open ", remainOpen);
+    } else {
+      remainOpen = false;
+      addButtonMenu=false;
+    }
+  }
 
   onDestroy(() => {});
 
@@ -454,6 +465,7 @@
         <Dropdown
           zIndex={600}
           buttonId="addButton"
+          bind:remainOpen
           bind:isMenuOpen={addButtonMenu}
           options={addButtonData}
         >
@@ -478,11 +490,11 @@
       {/if}
 
       {#if $istestFlowTourGuideOpen && $currentStep == 1}
-        <div style="position:fixed; top:50px; left:-12px; z-index:99990;">
+        <div style="position:fixed; top:53px; left:-19px; z-index:99990;">
           <TestFlowTourGuide
             targetId="addButton"
             title="Getting Started  🎉"
-            pulsePosition={{ top: "-55px", left: "8px" }}
+            pulsePosition={{ top: "-58px", left: "14px" }}
             description="Welcome! Let’s kick off by creating your test flow. You can add a new flow by clicking here, using the '+' icon, or navigating from the home page. Let's get started!"
             tipPosition="top-left"
             onNext={() => {
@@ -498,13 +510,13 @@
       {/if}
 
       {#if $istestFlowTourGuideOpen && $currentStep == 2}
-        <div style="position:fixed; top:210px; left:220px; z-index:9999;">
+        <div style="position:fixed; top:200px; left:220px; z-index:9999;">
           <TestFlowTourGuide
             targetId="addButton"
             title="Add Your Flow 🌊"
             description="Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!"
             tipPosition="left-top"
-            pulsePosition={{ top: "2px", left: "-150px" }}
+            pulsePosition={{ top: "12px", left: "-150px" }}
             onNext={() => {
               currentStep.set(3);
               onCreateTestflow();

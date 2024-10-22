@@ -744,11 +744,11 @@
     </SvelteFlow>
 
     {#if $istestFlowTourGuideOpen && $currentStep == 3}
-      <div style="position:absolute; top:250px; left:265px; z-index:1000;">
+      <div style="position:absolute; top:260px; left:265px; z-index:1000;">
         <TestFlowTourGuide
           targetId="addBlockBtn"
           title="One Block At A Time 🧱"
-          pulsePosition={{ top: "-55px", left: "30px" }}
+          pulsePosition={{ top: "-64px", left: "30px" }}
           description="Wow! You’ve made it to the canvas! Now, just click 'Add Block' and you’re almost there."
           tipPosition="top-left"
           onNext={() => {
