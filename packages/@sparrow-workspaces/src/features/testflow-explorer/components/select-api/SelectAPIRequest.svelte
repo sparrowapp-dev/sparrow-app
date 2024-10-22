@@ -6,7 +6,6 @@
   import { onDestroy, onMount } from "svelte";
   import DropdownArrow from "../../icons/DropdownArrow.svelte";
   import { BackArrowIcon } from "../../icons";
-  import { currentStep } from "../../../../stores/guide.tour";
   export let name;
   export let method;
   export let collections = [];
@@ -72,13 +71,7 @@
       dropdownRef &&
       !dropdownRef.contains(event.target as Node)
     ) {
-
-      if($currentStep == 5){
-      isOpen=true;
-    }
-    else{
-      isOpen=false;
-    }
+      isOpen = false;
       arrayData = collections;
       selectedCollection = null;
       selectedFolder = null;
@@ -86,23 +79,8 @@
     ignoreClickOutside = false;
   };
 
-  $:{
-    if($currentStep == 5){
-      isOpen=true;
-    }
-    else{
-      isOpen=false;
-    }
-  }
-
   onMount(() => {
     document.addEventListener("click", handleClickOutside);
-    if ($currentStep == 6) {
-      isOpen = true;
-    }
-    else{
-      isOpen =false
-    }
   });
 
   onDestroy(() => {
