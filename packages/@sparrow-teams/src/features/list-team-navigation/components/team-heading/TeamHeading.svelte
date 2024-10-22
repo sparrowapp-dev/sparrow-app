@@ -19,7 +19,7 @@
           style={`padding-top: 2px; width: 20px !important; height: 20px !important; display: flex; border: 1px solid #45494D; border-radius: 50%;`}
         >
           <span class="text-fs-12 fw-bold" style="margin-top:-4px;">
-            {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}</span
+            {openTeam?.name[0] ? openTeam?.name[0]?.toUpperCase() : ""}</span
           >
         </div>
       {/if}
@@ -28,7 +28,7 @@
       class="ms-2 fw-bold ellipsis text-secondary-100"
       style="margin-top:-5px;"
     >
-      {openTeam?.name}
+      {openTeam?.name || ""}
     </span>
   </div>
   <div style="width:20px;" class="d-flex align-items-center">
