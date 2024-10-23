@@ -2,7 +2,7 @@
   import { tableIcon as table } from "@sparrow/library/assets";
   import { hamburgerIcon as hamburger } from "@sparrow/library/assets";
   import { workspaceView } from "../store/workspace-view";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import { SearchIcon } from "@sparrow/library/assets";
   import { base64ToURL } from "@sparrow/common/utils";
   import { PeopleIcon } from "@sparrow/library/assets";
