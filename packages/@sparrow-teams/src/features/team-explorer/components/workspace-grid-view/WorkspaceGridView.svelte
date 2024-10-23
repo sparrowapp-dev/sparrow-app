@@ -10,6 +10,8 @@
   import { WorkspaceGrid } from "@sparrow/teams/compopnents";
   import { TeamSkeleton } from "../../images";
 
+  export let openInDesktop: (workspaceID:string) => void;
+  export let isWebEnvironment: boolean;
   export let searchQuery = "";
   export let onAddMember;
   /**
@@ -111,6 +113,8 @@
               {onSwitchWorkspace}
               {isAdminOrOwner}
               {onDeleteWorkspace}
+              {openInDesktop}
+              {isWebEnvironment}
             />
           {/each}
         </div>

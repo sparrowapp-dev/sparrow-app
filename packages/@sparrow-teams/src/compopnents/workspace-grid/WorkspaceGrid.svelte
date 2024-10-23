@@ -2,33 +2,24 @@
   import { ThreeDotIcon } from "@sparrow/library/assets";
   import { formatDateInString } from "../../utils/workspacetimeUtils";
   import { onDestroy } from "svelte";
-  // import Card from "../card/Card.svelte";
-  import { Card } from "..";
+  import Card from "../card/Card.svelte";
   import MenuView from "../menu-view/MenuView.svelte";
-  /**
-   * Data of single workspace
-   */
-  export let workspace: any;
-  /**
-   * Checks if the current user has admin or owner privileges.
-   */
-  export let isAdminOrOwner: boolean;
-  /**
-   * Callback for switching workspace
-   */
-  export let onSwitchWorkspace: (id: string) => void;
-  /**
-   * function to delete workspace
-   */
-  export let onDeleteWorkspace;
 
+  export let workspace: any;
+  export let isAdminOrOwner: boolean;
+  export let onSwitchWorkspace: (id: string) => void;
+  export let onDeleteWorkspace;
   export let onAddMember;
+  export let openInDesktop: (workspaceID: string) => void;
+  export let isWebEnvironment: boolean;
 
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
   let workspaceTabWrapper: HTMLElement;
-
   let menuItems = [];
+  let noOfColumns = 180;
+  let noOfRows = 3;
+
   const handleOpenWorkspace = async () => {
     onSwitchWorkspace(workspace._id);
   };
@@ -40,8 +31,7 @@
   onDestroy(() => {
     window.removeEventListener("click", handleWindowClick);
   });
-  let noOfColumns = 180;
-  let noOfRows = 3;
+
   const rightClickContextMenu = (e) => {
     e.preventDefault();
     setTimeout(() => {
@@ -51,6 +41,7 @@
       showMenu = true;
     }, 100);
   };
+
   $: {
     if (isAdminOrOwner) {
       menuItems = [
@@ -92,6 +83,7 @@
       ];
     }
   }
+
   function closeRightClickContextMenu() {
     showMenu = false;
   }
@@ -101,6 +93,7 @@
   on:click={closeRightClickContextMenu}
   on:contextmenu|preventDefault={closeRightClickContextMenu}
 />
+
 {#if showMenu}
   <MenuView xAxis={pos.x} yAxis={pos.y} {noOfRows} {noOfColumns} {menuItems} />
 {/if}
@@ -115,12 +108,12 @@
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
         ? 'threedot-active'
         : ''}"
-      style="top:15px;
-      right:15px;"
+      style="top:15px; right:15px;"
       on:click={(e) => rightClickContextMenu(e)}
     >
       <ThreeDotIcon />
     </button>
+
     <div
       class="bg-tertiary-750 workspace-card p-4"
       on:click={() => {
@@ -150,6 +143,17 @@
       >
         Last updated on <span>{formatDateInString(workspace?.updatedAt)}</span>
       </p>
+
+      {#if isWebEnvironment}
+        <button
+          class="open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
+          on:click|stopPropagation={() => {
+            openInDesktop(workspace._id);
+          }}
+        >
+          Open in Desktop
+        </button>
+      {/if}
     </div>
   </Card>
 </div>
@@ -192,19 +196,40 @@
   .workspace-card-outer:hover .threedot-icon-container {
     visibility: visible;
   }
-
   .threedot-icon-container:hover {
     background-color: var(--bg-tertiary-500) !important;
   }
-
   .threedot-icon-container:active {
     background-color: var(--bg-tertiary-800) !important;
   }
-
   .threedot-active {
     visibility: visible;
     background-color: var(--bg-tertiary-800) !important;
   }
+
+  .open-desktop-btn {
+    position: absolute;
+    top: 15px;
+    right: 40px;
+    font-size: 12px;
+    font-weight: 500;
+    background-color: var(--color-primary);
+    color: #3670f7;
+    padding: 5px 10px;
+    visibility: hidden;
+    opacity: 0;
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s;
+  }
+  .workspace-card-outer:hover .open-desktop-btn {
+    visibility: visible;
+    opacity: 1;
+  }
+  .open-desktop-btn:hover {
+    background-color: var(--color-primary-dark);
+  }
+
   .workspace-delete-confirmation {
     .btn-close1 {
       background-color: var(--background-color);
