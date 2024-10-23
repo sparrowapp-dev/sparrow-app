@@ -85,11 +85,13 @@
     onUpdateEdges={_viewModel.updateEdges}
     {collectionList}
     onClickRun={_viewModel.handleTestFlowRun}
+    onRunSampleApi={_viewModel.handleSampleTestFlowRun}
     toggleHistoryDetails={_viewModel.toggleHistoryDetails}
     toggleHistoryContainer={_viewModel.toggleHistoryContainer}
     deleteNodeResponse={_viewModel.deleteNodeResponse}
     onRedrectRequest={_viewModel.redirectRequest}
     onUpdateTestFlowName={_viewModel.updateName}
     onSaveTestflow={_viewModel.saveTestflow}
+    handleTestFlowRunEnd={_viewModel.handleTestFlowRunEnd}
   />
 {/if}

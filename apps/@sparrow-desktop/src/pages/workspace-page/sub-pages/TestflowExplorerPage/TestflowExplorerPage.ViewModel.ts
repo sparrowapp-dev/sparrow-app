@@ -1,7 +1,11 @@
 import { makeHttpRequestV2 } from "@app/containers/api/api.common";
 import { ResponseStatusCode } from "@sparrow/common/enums";
 import { environmentType } from "@sparrow/common/enums";
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import {
+  createDeepCopy,
+  InitRequestTab,
+  moveNavigation,
+} from "@sparrow/common/utils";
 import { RequestTabAdapter } from "../../../../adapter";
 import type {
   EnvironmentDocument,
@@ -14,7 +18,7 @@ import { TabRepository } from "../../../../repositories/tab.repository";
 import { TestflowRepository } from "../../../../repositories/testflow.repository";
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { TestflowService } from "../../../../services/testflow.service";
-import type { Tab } from "@sparrow/common/types/workspace";
+import { RequestDataTypeEnum, type Tab } from "@sparrow/common/types/workspace";
 import type {
   ENVDocumentType,
   ENVExtractVariableType,
@@ -302,6 +306,43 @@ export class TestflowExplorerPageViewModel {
   /**
    * Handles running the test flow by processing each node sequentially and recording the results
    */
+  public handleSampleTestFlowRun = () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const adaptedRequest = new InitRequestTab("fewfe", "fewfe");
+    adaptedRequest.updateName("Sample API");
+    adaptedRequest.updateUrl("https://sample-api.com/");
+    const nodes = {
+      id: "2",
+      response: {
+        body: `{"api":"Sample API"}`,
+        headers: [],
+        status: ResponseStatusCode.OK,
+        time: 200,
+        size: 400,
+        responseContentType: RequestDataTypeEnum.JSON,
+      },
+      request: adaptedRequest.getValue(),
+    };
+    console.log(
+      "THis is noded inside view model hand test floe run edn ",
+      nodes,
+    );
+    return nodes;
+  };
+
+  public handleTestFlowRunEnd = () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    testFlowDataStore.update((testFlowDataMap) => {
+      // let wsData = testFlowDataMap.get(progressiveTab.tabId);
+      testFlowDataMap.delete(progressiveTab.tabId);
+      // testFlowDataMap.set(progressiveTab.tabId, wsData);
+      return testFlowDataMap;
+    });
+  };
+
+  /**
+   * Handles running the test flow by processing each node sequentially and recording the results
+   */
   public handleTestFlowRun = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const environments = await this.getActiveEnvironments(
@@ -360,6 +401,7 @@ export class TestflowExplorerPageViewModel {
               element.data.requestId,
             );
         }
+        console.log("THis is request dfDFADSFADSFAFADSFASDF", request);
         if (request) {
           const requestTabAdapter = new RequestTabAdapter();
           const adaptedRequest = requestTabAdapter.adapt(

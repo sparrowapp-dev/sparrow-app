@@ -6,7 +6,10 @@
   import { onDestroy, onMount } from "svelte";
   import DropdownArrow from "../../icons/DropdownArrow.svelte";
   import { BackArrowIcon } from "../../icons";
-  import { currentStep, isTestFlowTourGuideOpen } from "../../../../stores/guide.tour";
+  import {
+    currentStep,
+    isTestFlowTourGuideOpen,
+  } from "../../../../stores/guide.tour";
   export let name;
   export let method;
   export let collections = [];
@@ -17,6 +20,7 @@
       collections = value;
     }
   });
+
   let arrayData = collections;
   let selectedRequest = null;
   let isOpen = false;
@@ -72,13 +76,11 @@
       dropdownRef &&
       !dropdownRef.contains(event.target as Node)
     ) {
-
-      if($currentStep == 5 && $isTestFlowTourGuideOpen){
-      isOpen=true;
-    }
-    else{
-      isOpen=false;
-    }
+      if ($currentStep == 5 && $isTestFlowTourGuideOpen) {
+        isOpen = true;
+      } else {
+        isOpen = false;
+      }
       arrayData = collections;
       selectedCollection = null;
       selectedFolder = null;
@@ -86,34 +88,88 @@
     ignoreClickOutside = false;
   };
 
-  $:{
-    if($currentStep == 5 && $isTestFlowTourGuideOpen){
-      isOpen=true;
-    }
-    else{
-      isOpen=false;
+  $: {
+    if ($currentStep == 5 && $isTestFlowTourGuideOpen) {
+      isOpen = true;
+    } else {
+      isOpen = false;
     }
   }
 
   onMount(() => {
     document.addEventListener("click", handleClickOutside);
-    if ($currentStep == 6 && $isTestFlowTourGuideOpen) {
-      isOpen = true;
-    }
-    else{
-      isOpen =false
-    }
   });
 
   onDestroy(() => {
     document.removeEventListener("click", handleClickOutside);
   });
+
+  const dummyCollection = [
+    {
+      id: "6716111fd15536c0e193a107",
+      name: "Sample Collection",
+      totalRequests: 1,
+      workspaceId: 123,
+      createdAt: "2024-10-21T08:30:23.512Z",
+      createdBy: "User",
+      updatedAt: "2024-10-21T08:30:29.567Z",
+      updatedBy: {
+        id: "6711ff0dd51b907d98952bb2",
+        name: "User",
+      },
+      items: [
+        {
+          id: "7c135cc4-9c98-4d67-9062-76965fb6d52c",
+          name: "Sample API",
+          description: "",
+          type: "REQUEST",
+          request: {
+            method: "GET",
+            url: "https://sample-api.com/",
+            body: {},
+            headers: [],
+            queryParams: [],
+          },
+        },
+      ],
+    },
+  ];
+
+  let showSampleApi = false;
+
+  const test = () => {
+    arrayData = collections;
+  };
+
+  $: {
+    if (($currentStep >= 4 || $currentStep <= 6) && $isTestFlowTourGuideOpen ) {
+      showSampleApi = true;
+      arrayData = dummyCollection;
+    }
+    if ($currentStep === -1) {
+      test();
+    }
+  }
 </script>
 
 <div class="dropdown" bind:this={dropdownRef}>
   <!-- <p>Select API Request</p> -->
   <div on:click={() => (isOpen = !isOpen)} class="dropdown-header">
-    {#if name || method}
+    {#if $currentStep >= 6 && $isTestFlowTourGuideOpen}
+      <div class="d-flex selected-container">
+        <p class="method-container">
+          <span class="text-{getMethodStyle('GET')}">
+            <span
+              class={"request-icon"}
+              style="font-size: 10px; font-weight: 500;">{"GET"}</span
+            >
+          </span>
+        </p>
+        <p style="font-size: 10px; margin-left: 10px;" class="ellipsis">
+          {"Sample API"}
+        </p>
+      </div>
+    {:else if name || method}
       <div class="d-flex selected-container">
         <p class="method-container">
           <span class="text-{getMethodStyle(method)}">
