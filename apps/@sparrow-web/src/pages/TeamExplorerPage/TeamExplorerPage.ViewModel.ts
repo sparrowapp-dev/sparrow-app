@@ -31,13 +31,6 @@ export class TeamExplorerPageViewModel {
   private teamService = new TeamService();
   private guestUserRepository = new GuestUserRepository();
   private userService = new UserService();
-  // public setpRedirect = new w
-    
-  // function setupRedirect() {
-  //   const accessToken = localStorage.getItem("AUTH_TOKEN");
-  //   const refreshToken = localStorage.getItem("REF_TOKEN");
-  //   sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email&workspaceID=${currentWorkspace.id}`;
-  // }
 
   private _activeTeamTab: BehaviorSubject<string> = new BehaviorSubject(
     "Workspaces",
