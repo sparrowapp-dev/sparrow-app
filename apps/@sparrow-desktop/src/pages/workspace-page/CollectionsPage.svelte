@@ -584,14 +584,14 @@
   <Modal
     title="Access Denied"
     type="dark"
-    width="35%"
+    width="50%"
     zIndex={1000}
     isOpen={isAccessDeniedModalOpen}
     handleModalState={handleAccessDeniedClose}
   >
     <div class="py-4">
-      <p class="text-gray-400 mb-4">
-        You do not have access to this workspace. Please check if you are using the correct account or request access from the workspace administrator.
+      <p class=" mb-4">
+        You don't seem to have access to this resourse. Please check if you are using the right account.
       </p>
     </div>
   </Modal>
