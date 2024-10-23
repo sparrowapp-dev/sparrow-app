@@ -182,61 +182,66 @@
     {/if}
     <div class="ms-4">
       {#if isWebApp}
-        <div class="ps-2">
-          <Select
-            id={"workspace-dropdown"}
-            data={teamDocuments?.map((_team) => {
-              return {
-                id: _team.teamId,
-                name: _team.name,
-              };
-            })}
-            titleId={teamDocuments?.filter((_team) => {
-              if (_team.isOpen) return true;
-              return false;
-            })[0]?.teamId}
-            onclick={handleTeamDropdown}
-            minHeaderWidth={"auto"}
-            iconRequired={false}
-            isDropIconFilled={true}
-            borderType={"none"}
-            borderActiveType={"none"}
-            headerHighlight={"hover-active"}
-            headerTheme={"transparent"}
-            menuItem={"v2"}
-            headerFontSize={"12px"}
-            maxHeaderWidth={"215px"}
-            minBodyWidth={"200px"}
-            zIndex={200}
-            bodyTheme={"violet"}
-            borderRounded={"2px"}
-            position={"absolute"}
-            maxBodyHeight={"160px"}
-          >
-            <div
-              slot="post-select"
-              class="post-dropdown"
-              style="justify-content: center; align-items:center;"
+        {#if teamDocuments?.filter((_team) => {
+          if (_team.isOpen) return true;
+          return false;
+        })[0]?.teamId}
+          <div class="ps-2">
+            <Select
+              id={"workspace-dropdown"}
+              data={teamDocuments?.map((_team) => {
+                return {
+                  id: _team.teamId,
+                  name: _team.name,
+                };
+              })}
+              titleId={teamDocuments?.filter((_team) => {
+                if (_team.isOpen) return true;
+                return false;
+              })[0]?.teamId}
+              onclick={handleTeamDropdown}
+              minHeaderWidth={"auto"}
+              iconRequired={false}
+              isDropIconFilled={true}
+              borderType={"none"}
+              borderActiveType={"none"}
+              headerHighlight={"hover-active"}
+              headerTheme={"transparent"}
+              menuItem={"v2"}
+              headerFontSize={"12px"}
+              maxHeaderWidth={"215px"}
+              minBodyWidth={"200px"}
+              zIndex={200}
+              bodyTheme={"violet"}
+              borderRounded={"2px"}
+              position={"absolute"}
+              maxBodyHeight={"160px"}
             >
-              <div class="lower-underline"></div>
               <div
-                class="create-new-workspace"
-                on:click={() => {
-                  isCreateTeamModalOpen = true;
-                }}
+                slot="post-select"
+                class="post-dropdown"
+                style="justify-content: center; align-items:center;"
               >
-                <span>Create New Team</span>
-                <div style="align-content: flex-end;">
-                  <PlusIcon
-                    height="16px"
-                    width="16px"
-                    color="var(--icon-primary-300)"
-                  />
+                <div class="lower-underline"></div>
+                <div
+                  class="create-new-workspace"
+                  on:click={() => {
+                    isCreateTeamModalOpen = true;
+                  }}
+                >
+                  <span>Create New Team</span>
+                  <div style="align-content: flex-end;">
+                    <PlusIcon
+                      height="16px"
+                      width="16px"
+                      color="var(--icon-primary-300)"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </Select>
-        </div>
+            </Select>
+          </div>
+        {/if}
       {:else if isGuestUser}
         <Select
           id={"workspace-dropdown"}
@@ -351,44 +356,46 @@
       </div>
     {/if}
 
-    <Select
-      id={"environment-selector"}
-      data={[
-        {
-          name: "Select Environment",
-          id: "none",
-          type: environmentType.LOCAL,
-          hide: true,
-        },
-        {
-          name: "None",
-          id: "none",
-          display: "none",
-          type: environmentType.LOCAL,
-        },
-        ...environments,
-      ].filter((elem) => {
-        return elem.type === environmentType.LOCAL;
-      })}
-      titleId={currentEnvironment?.id}
-      onclick={handleDropdown}
-      minHeaderWidth={"185px"}
-      iconRequired={true}
-      icon={StackIcon}
-      iconColor={"var(--icon-primary-300)"}
-      isDropIconFilled={true}
-      borderType={"none"}
-      borderActiveType={"none"}
-      headerHighlight={""}
-      headerTheme={"transparent"}
-      menuItem={"v2"}
-      headerFontSize={"12px"}
-      maxHeaderWidth={"185px"}
-      zIndex={200}
-      bodyTheme={"violet"}
-      borderRounded={"2px"}
-      position={"absolute"}
-    />
+    {#if !isWebApp}
+      <Select
+        id={"environment-selector"}
+        data={[
+          {
+            name: "Select Environment",
+            id: "none",
+            type: environmentType.LOCAL,
+            hide: true,
+          },
+          {
+            name: "None",
+            id: "none",
+            display: "none",
+            type: environmentType.LOCAL,
+          },
+          ...environments,
+        ].filter((elem) => {
+          return elem.type === environmentType.LOCAL;
+        })}
+        titleId={currentEnvironment?.id}
+        onclick={handleDropdown}
+        minHeaderWidth={"185px"}
+        iconRequired={true}
+        icon={StackIcon}
+        iconColor={"var(--icon-primary-300)"}
+        isDropIconFilled={true}
+        borderType={"none"}
+        borderActiveType={"none"}
+        headerHighlight={""}
+        headerTheme={"transparent"}
+        menuItem={"v2"}
+        headerFontSize={"12px"}
+        maxHeaderWidth={"185px"}
+        zIndex={200}
+        bodyTheme={"violet"}
+        borderRounded={"2px"}
+        position={"absolute"}
+      />
+    {/if}
 
     {#if !isGuestUser}
       <div class="ms-2 me-1">

@@ -286,7 +286,7 @@ export class DashboardViewModel {
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();
     clearAuthJwt();
-    window.location.href = constants.WEB_MARKETING_URL;
+    window.location.href = constants.SPARROW_AUTH_URL + "/init?source=web";
   };
 
   // logout to backend - expires jwt - auth and refresh tokens

@@ -94,6 +94,7 @@
     if (value) {
       currentTeam.name = value.name;
       currentTeam.users = value.users;
+      isWorkspaceOpen = false;
     }
   });
 
@@ -118,6 +119,12 @@
     name: "",
     users: [],
   };
+
+  $: {
+    if (activeTeamTab) {
+      isWorkspaceOpen = false;
+    }
+  }
 
   const handleWorkspaceDetails = ({ workspaceID, workspaceName, users }) => {
     workspaceDetails.id = workspaceID;
@@ -174,7 +181,7 @@
           />
           <span
             color="var(--text-secondary-200)"
-            style="font-size: 12px; margin-left:11px;">{$activeTeam.name}</span
+            style="font-size: 12px; margin-left:11px;">{$activeTeam?.name}</span
           >
         </div>
         <div>

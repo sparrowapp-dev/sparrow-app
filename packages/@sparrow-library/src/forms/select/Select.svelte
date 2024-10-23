@@ -454,7 +454,7 @@
               : getTextColor(selectedRequest?.color)}"
             style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; {disabled ||
             selectedRequest?.hide
-              ? 'color:var(--text-secondary-370) !important'
+              ? 'color:var(--text-secondary-200) !important'
               : ''}"
           >
             {selectedRequest?.name}
