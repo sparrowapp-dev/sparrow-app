@@ -14,7 +14,6 @@
   const osDetector = new OSDetector();
   onMount(() => {
     os = osDetector.getOS();
-    console.log("THis is OS ", os);
   });
 
   /**
