@@ -7,7 +7,6 @@
   import Dashboard from "@app/pages/dashboard-page/Dashboard.svelte";
   import EntryPoint from "@app/pages/auth-page/Auth.svelte";
   import { resizeWindowOnLogin } from "../utils";
-  // import { registerDeepLinkHandler } from "@app/utils/deeplink/app.deeplink";
   import { onMount } from "svelte";
   import { user } from "@app/store/auth.store";
   import { handleShortcuts } from "@app/utils/shortcuts";
@@ -33,7 +32,6 @@
   onMount(async () => {
     await getCurrent().setFocus();
     await getCurrent().center();
-    // await registerDeepLinkHandler();
     await _viewModel.registerDeepLinkHandler();
     await singleInstanceHandler();
     let isloggedIn;
