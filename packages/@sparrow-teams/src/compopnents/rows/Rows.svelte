@@ -3,11 +3,9 @@
   import { UserProfileList } from "@sparrow/teams/compopnents";
   import { MenuView } from "@sparrow/teams/compopnents";
   import { TeamRole, WorkspaceMemberRole } from "@sparrow/common/enums";
-  import { onMount } from "svelte";
-  import { navigate } from "svelte-navigator";
 
-  export let list: any;
-  export let activeTeam: any;
+  export let list;
+  export let activeTeam;
   export let onOpenCollection: (id: string) => void;
   export let calculateTimeDifferenceInDays: (
     date1: Date,

@@ -1,5 +1,4 @@
 <script>
-  import { WelcomeLogo } from "@sparrow/common/images";
   import DownloadIconWeb from "./icons/DownloadIconWeb.svg";
   import { Button } from "@sparrow/library/ui";
   import constants from "@app/constants/constants";
@@ -11,9 +10,7 @@
   const dispatch = createEventDispatcher();
   let visible = false;
   onMount(() => {
-    setTimeout(() => {
       visible = true;
-    }, 200);
   });
   function openSparrowApp() {
     console.log("Install Sparrow Desktop clicked");
@@ -22,9 +19,7 @@
   }
   function closePopup() {
     visible = false;
-    setTimeout(() => {
       dispatch("close");
-    }, 300);
   }
 </script>
 
@@ -75,9 +70,6 @@
     align-items: center;
     opacity: 0;
     visibility: hidden;
-    transition:
-      opacity 500ms ease,
-      visibility 500ms ease;
   }
   .popup-content {
     /* background: #1c1d2b; */
@@ -86,9 +78,6 @@
     border-radius: 10px;
     opacity: 0;
     transform: scale(0.95);
-    transition:
-      opacity 500ms ease,
-      transform 500ms ease;
   }
   .popup-overlay.visible {
     opacity: 1;
