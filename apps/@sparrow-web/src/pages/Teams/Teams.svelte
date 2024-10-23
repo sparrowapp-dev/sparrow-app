@@ -1,6 +1,10 @@
 <script lang="ts">
   import type { Observable } from "rxjs";
-  import type { TabDocument, TeamDocument } from "@app/database/database";
+  import type {
+    TabDocument,
+    TeamDocument,
+    WorkspaceDocument,
+  } from "@app/database/database";
 
   import {
     leftPanelWidth,
@@ -12,7 +16,6 @@
   import TeamExplorerPage from "../TeamExplorerPage/TeamExplorerPage.svelte";
   import { TeamsViewModel } from "./Teams.ViewModel";
   import { Modal, Tooltip, Dropdown } from "@sparrow/library/ui";
-  import { CreateTeam } from "@sparrow/teams/features";
   import { pagesMotion } from "../../constants";
   import { version } from "../../../package.json";
 
@@ -20,13 +23,14 @@
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
 
-  let isCreateTeamModalOpen: boolean = false;
+  export let isCreateTeamModalOpen;
 
   let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
   import { onMount } from "svelte";
   import { Motion } from "svelte-motion";
+  import { isUserFirstSignUp } from "src/store/user.store";
   import { user } from "src/store/auth.store";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import {
@@ -40,6 +44,10 @@
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import constants from "../../constants/constants";
   import { navigate } from "svelte-navigator";
+  import type { TeamDocType } from "src/models/team.model";
+  import { WelcomePopUpWeb } from "@sparrow/common/components";
+  import type { GithubRepoDocType } from "src/models/github-repo.model";
+
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
 
@@ -78,6 +86,12 @@
     }
   }
 
+  let isWelcomePopupOpen = false;
+  isUserFirstSignUp.subscribe((value) => {
+    if (value) {
+      isWelcomePopupOpen = value;
+    }
+  });
   let isGithubStarHover = false;
 
   let activeIndex;
@@ -111,8 +125,10 @@
   let teamTabs = [];
   $: {
     if ($openTeam) {
-      activeIndex = $openTeam.teamId;
-      teamTabs = refreshTabs();
+      setTimeout(() => {
+        activeIndex = $openTeam?.teamId;
+        teamTabs = refreshTabs();
+      }, 0);
     }
   }
 
@@ -155,6 +171,15 @@
       navigate("https://sparrowapp.dev/");
     }
   };
+  let openTeamData: TeamDocType;
+  openTeam.subscribe((_team) => {
+    if (_team) {
+      const teamJSON = _team?.toMutableJSON();
+      setTimeout(() => {
+        openTeamData = teamJSON;
+      }, 0);
+    }
+  });
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -198,7 +223,6 @@
             </button>
           </div>
         {/if}
-
         {#if !$leftPanelCollapse}
           <div
             class="d-flex flex-column sidebar h-100 d-flex flex-column justify-content-between bg-secondary-900"
@@ -210,7 +234,7 @@
                   tabs={teamTabs}
                   onUpdateActiveTab={_viewModel.updateActiveTeamTab}
                   activeTeamTab={$activeTeamTab}
-                  openTeam={$openTeam}
+                  openTeam={openTeamData}
                 />
               </section>
             </div>
@@ -336,9 +360,9 @@
                 </Tooltip>
 
                 <div class="d-flex align-items-center">
-                  <span class="text-fs-14 text-secondary-200 pe-2"
+                  <!-- <span class="text-fs-14 text-secondary-200 pe-2"
                     >v{version}</span
-                  >
+                  > -->
                   <WithButton
                     icon={DoubleArrowIcon}
                     onClick={() => {
@@ -368,21 +392,17 @@
 </Motion>
 
 <Modal
-  title={"New Team"}
+  title={""}
   type={"dark"}
-  width={"35%"}
+  width={"40%"}
   zIndex={1000}
-  isOpen={isCreateTeamModalOpen}
-  handleModalState={(flag) => {
-    isCreateTeamModalOpen = flag;
+  isOpen={isWelcomePopupOpen}
+  handleModalState={() => {
+    isUserFirstSignUp.set(false);
+    isWelcomePopupOpen = false;
   }}
 >
-  <CreateTeam
-    handleModalState={(flag = false) => {
-      isCreateTeamModalOpen = flag;
-    }}
-    onCreateTeam={_viewModel.createTeam}
-  />
+  <WelcomePopUpWeb />
 </Modal>
 
 <style>

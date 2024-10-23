@@ -190,13 +190,15 @@
             }}
           >
             <div class="d-flex tile w-100 rounded align-items-center">
-              <div class="info d-flex align-items-center w-100">
-                <div
-                  class="icon d-flex align-items-center justify-content-center"
-                >
-                  <span>{user.name[0].toUpperCase()}</span>
+              <div class="info d-flex align-items-center w-100 ellipsis">
+                <div style="width: 10%;">
+                  <div
+                    class="icon d-flex align-items-center justify-content-center ellipsis"
+                  >
+                    <span>{user.name[0].toUpperCase()}</span>
+                  </div>
                 </div>
-                <div class="name px-2 ellipsis">
+                <div class="name pl-1 ellipsis" style="width: 90%;">
                   <span class="sparrow-fs-12 text-whiteColor w-100 ellipsis"
                     >{user.name || ""}</span
                   ><br />
