@@ -23,6 +23,7 @@ const constants = {
     .VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING,
   BASE_URL: import.meta.env.VITE_WEB_BASE_URL,
   WEB_MARKETING_URL: import.meta.env.VITE_WEB_MARKETING_URL,
+  DOCS_URL: import.meta.env.VITE_WEB_SPARROW_DOCS,
 };
 
 export default constants;

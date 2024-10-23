@@ -13,7 +13,7 @@
       {#each tabs as tab}
         {#if tab?.visible && tab.id === activeTeamTab}
           <button
-            class="navigation__link-web border-0 sparrow-fs-12 request-tab me-3"
+            class="navigation__link-web border-0 sparrow-fs-12 request-tab pb-2 me-3"
             role="tab"
           >
             <span
