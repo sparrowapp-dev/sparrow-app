@@ -1,6 +1,8 @@
 <script lang="ts">
   import { Route } from "svelte-navigator";
   import { Pane, Splitpanes } from "svelte-splitpanes";
+  import { userValidationStore } from '@app/store/deviceSync.store';
+
   // ---- Store
   import {
     leftPanelWidth,
@@ -294,6 +296,14 @@
   let activeTab: Observable<TabDocument | null> | undefined;
   let prevWorkspaceId = "";
   let count = 0;
+
+  let isAccessDeniedModalOpen = false;
+  
+  // Add userValidation state
+  let userValidation = {
+    isValid: true,
+    checked: false
+  };
   const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
@@ -325,9 +335,17 @@
               value?._id,
               totalTabsToBeDeleted,
             );
+            const userHasAccess = value.users?.some(user => user.id === userId);
           },
+  
         );
 
+        userValidationStore.subscribe(validation => {
+         if (!validation.isValid && validation.checked) {
+         isAccessDeniedModalOpen = true;
+         isWelcomePopupOpen = false; // Hide welcome popup if it's open
+         }
+      });
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
       }
@@ -347,6 +365,13 @@
     }
   });
 
+
+
+  const handleAccessDeniedClose = () => {
+    isAccessDeniedModalOpen = false;
+    // Optionally reset the validation state
+    userValidationStore.set({ isValid: true, checked: false });
+  };
   $: {
     if (splitter && $leftPanelCollapse === true) {
       splitter.style.display = "none";
@@ -555,6 +580,22 @@
     }}
   />
 </Modal>
+{#if isAccessDeniedModalOpen}
+  <Modal
+    title="Access Denied"
+    type="dark"
+    width="35%"
+    zIndex={1000}
+    isOpen={isAccessDeniedModalOpen}
+    handleModalState={handleAccessDeniedClose}
+  >
+    <div class="py-4">
+      <p class="text-gray-400 mb-4">
+        You do not have access to this workspace. Please check if you are using the correct account or request access from the workspace administrator.
+      </p>
+    </div>
+  </Modal>
+{/if}
 
 <svelte:window on:keydown={handleKeyPress} />
 <!-- <ImportCollection

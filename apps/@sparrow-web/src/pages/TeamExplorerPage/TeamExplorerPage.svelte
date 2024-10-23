@@ -67,12 +67,12 @@
    * Subscribes to the active workspace and updates the current workspace details
    * and also updates current team  details associated with that workspace.
    */
-  $: {
-    setupRedirect();
-  }
-  onMount(() => {
-    setupRedirect();
-  });
+  // $: {
+  //   setupRedirect();
+  // }
+  // onMount(() => {
+  //   setupRedirect();
+  // });
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
@@ -85,7 +85,7 @@
           team: value._data.team || {},
         };
         findUserRole();
-        setupRedirect();
+        // setupRedirect();
       }
     },
   );
@@ -129,30 +129,24 @@
   let isPopupOpen = false;
   let sparrowRedirect: string;
 
-  function setupRedirect() {
-    const accessToken = localStorage.getItem("AUTH_TOKEN");
-    const refreshToken = localStorage.getItem("REF_TOKEN");
-    sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email&workspaceID=${currentWorkspace.id}`;
-    console.log(currentWorkspace.id);
-  }
+  function openInDesktop(workspaceID: string) {
+  isPopupOpen = true; 
+  
+  const handleBlur = () => {
+    clearTimeout(fallbackTimeout);
+    window.removeEventListener("blur", handleBlur);
+    isPopupOpen = false; 
+    _viewModel.setupRedirect(workspaceID); 
+  };
+  
+  window.addEventListener("blur", handleBlur, { once: true });
 
-  function openInDesktop() {
-    if (sparrowRedirect) {
-      isPopupOpen = true;
-
-      window.addEventListener(
-        "blur",
-        () => {
-          isPopupOpen = false;
-        },
-        { once: true },
-      );
-
-      window.location.href = sparrowRedirect;
-    } else {
-      navigate("https://sparrowapp.dev/");
-    }
-  }
+  const fallbackTimeout = setTimeout(() => {
+    window.removeEventListener("blur", handleBlur);
+    isPopupOpen = false; 
+    _viewModel.setupRedirect(workspaceID); 
+  }, ); 
+}
 
   function closeWelcomePopup() {
     isPopupOpen = false;

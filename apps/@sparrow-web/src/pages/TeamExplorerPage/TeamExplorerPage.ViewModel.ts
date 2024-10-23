@@ -21,7 +21,7 @@ import { navigate } from "svelte-navigator";
 import { v4 as uuidv4 } from "uuid";
 
 export class TeamExplorerPageViewModel {
-  constructor() {}
+  constructor() { }
   private teamRepository = new TeamRepository();
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -31,6 +31,13 @@ export class TeamExplorerPageViewModel {
   private teamService = new TeamService();
   private guestUserRepository = new GuestUserRepository();
   private userService = new UserService();
+  // public setpRedirect = new w
+    
+  // function setupRedirect() {
+  //   const accessToken = localStorage.getItem("AUTH_TOKEN");
+  //   const refreshToken = localStorage.getItem("REF_TOKEN");
+  //   sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email&workspaceID=${currentWorkspace.id}`;
+  // }
 
   private _activeTeamTab: BehaviorSubject<string> = new BehaviorSubject(
     "Workspaces",
@@ -811,4 +818,11 @@ export class TeamExplorerPageViewModel {
 
     return response;
   };
+
+  public setupRedirect = (_workspaceId: string) => {
+    const accessToken = localStorage.getItem("AUTH_TOKEN");
+    const refreshToken = localStorage.getItem("REF_TOKEN");
+    const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email&workspaceID=${_workspaceId}`;
+    window.location.href = sparrowRedirect;
+  }
 }

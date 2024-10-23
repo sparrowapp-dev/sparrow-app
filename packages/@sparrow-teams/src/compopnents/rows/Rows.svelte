@@ -20,7 +20,7 @@
   }) => void;
   export let isAdminOrOwner: boolean;
   export let onDeleteWorkspace: (workspace: any) => void;
-  export let openInDesktop: () => void;
+  export let openInDesktop: (workspaceID:string) => void;
   export let isWebEnvironment: boolean;
   let pos = { x: 0, y: 0 };
   let showMenu = false;
@@ -167,13 +167,15 @@
 
   <td class="tab-data py-3 position-relative">
     {#if isWebEnvironment}
-      <button
-        class="open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
-        on:click|stopPropagation={openInDesktop}
-      >
-        Open in Desktop
-      </button>
-    {/if}
+    <button
+      class="open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
+      on:click|stopPropagation={() => {
+        openInDesktop(list._id)
+      }}
+    >
+      Open in Desktop
+    </button>
+  {/if}
   </td>
 
   <td class="tab-data rounded-end py-3">
