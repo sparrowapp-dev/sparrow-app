@@ -7,14 +7,16 @@
   } from "@sparrow/teams/features";
   import { TeamExplorerPageViewModel } from "./TeamExplorerPage.ViewModel";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
+  import { DownloadApp } from "@sparrow/common/features";
   import { user } from "@app/store/auth.store";
   import { Modal } from "@sparrow/library/ui";
   import { LeaveTeam } from "@sparrow/teams/features";
-
   import { DeleteWorkspace } from "@sparrow/common/features";
   import { onDestroy, onMount } from "svelte";
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
   import { BackIcon } from "@sparrow/library/icons";
+  import { navigate } from "svelte-navigator";
+
   export let activeTeamTab;
   export let onUpdateActiveTab;
 
@@ -23,6 +25,7 @@
   const _viewModel = new TeamExplorerPageViewModel();
 
   let isWorkspaceInviteModalOpen = false;
+  let isWebEnvironment = true;
 
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
@@ -60,19 +63,17 @@
     });
   };
 
-  /**
-   * Subscribes to the active workspace and updates the current workspace details
-   * and also updates current team details associated with that workspace.
-   */
+
+
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
-      if (value) {
+      if (value?._data) {
         currentWorkspace = {
-          id: value._data._id,
-          name: value._data.name,
-          users: value._data.users,
-          description: value._data.description,
-          team: value._data.team,
+          id: value._data._id || "",
+          name: value._data.name || "",
+          users: value._data.users || [],
+          description: value._data.description || "",
+          team: value._data.team || {},
         };
         findUserRole();
       }
@@ -121,6 +122,42 @@
     workspaceDetails.users = users;
     isWorkspaceInviteModalOpen = true;
   };
+
+  let isPopupOpen = false;
+
+
+
+function openInDesktop(workspaceID: string) {
+  let appDetected = false;
+
+  // Handle when window loses focus (app opens)
+  const handleBlur = () => {
+    appDetected = true;
+    window.removeEventListener('blur', handleBlur);
+    clearTimeout(detectAppTimeout);
+  };
+
+  window.addEventListener('blur', handleBlur);
+
+  // Try to open the app
+  _viewModel.setupRedirect(workspaceID);
+
+  // Check if app opened after a short delay
+  const detectAppTimeout = setTimeout(() => {
+    window.removeEventListener('blur', handleBlur);
+    
+    // Only show popup if app wasn't detected
+    if (!appDetected) {
+      isPopupOpen = true;
+      console.log('Desktop app not detected - showing download popup');
+    }
+  }, 500);
+}
+
+
+  function closeWelcomePopup() {
+    isPopupOpen = false;
+  }
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
@@ -195,9 +232,22 @@
     onRemoveUserFromWorkspace={_viewModel.removeUserFromWorkspace}
     onChangeUserRoleAtWorkspace={_viewModel.changeUserRoleAtWorkspace}
     onUpdateTeam={_viewModel.updateTeam}
+    {openInDesktop}
+    {isWebEnvironment}
     isWebApp={true}
   />
 {/if}
+
+<Modal
+  title=""
+  type="dark"
+  width="45%"
+  zIndex={1000}
+  isOpen={isPopupOpen}
+  handleModalState={closeWelcomePopup}
+>
+  <DownloadApp />
+</Modal>
 
 <Modal
   title={"Invite Team Members"}

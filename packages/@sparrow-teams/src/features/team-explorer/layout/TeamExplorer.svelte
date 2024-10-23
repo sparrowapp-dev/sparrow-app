@@ -21,6 +21,8 @@
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
   export let isWebApp = false;
 
+  export let isWebEnvironment: boolean;
+  
   /**
    * user ID
    */
@@ -97,6 +99,8 @@
   export let isGuestUser = false;
 
   export let onAddMember;
+
+  export let openInDesktop;
 
   let selectedView: string = "Grid";
 
@@ -352,7 +356,7 @@
             {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
               <div class="pt-2">
                 <div
-                  class={`d-flex search-input-container rounded py-2 px-2 mb-4`}
+                  class={`d-flex search-input-container rounded py-2 px-2 align-items-center mb-4`}
                 >
                   <div>
                     <SearchIcon
@@ -387,6 +391,8 @@
               {#if selectedView === TeamViewEnum.LIST}
                 <WorkspaceListView
                   {onAddMember}
+                  {isWebEnvironment}
+                  {openInDesktop}
                   bind:isGuestUser
                   {searchQuery}
                   {openTeam}
