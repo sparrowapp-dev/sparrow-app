@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Dropdown, Tooltip } from "@sparrow/library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
   import {
     DoubleArrowIcon,
     GithubIcon,
@@ -13,8 +13,6 @@
   import { List } from "@sparrow/library/ui";
   import { PeopleIcon } from "@sparrow/library/assets";
   import constants from "@app/constants/constants";
-  import { onMount } from "svelte";
-  import { navigate } from "svelte-navigator";
 
   export let teamList: TeamDocument[] = [];
   export let tabList: TabDocument[] = [];
@@ -49,7 +47,6 @@
   }
 
   export let appVersion;
-  
 </script>
 
 {#if leftPanelController.leftPanelCollapse}

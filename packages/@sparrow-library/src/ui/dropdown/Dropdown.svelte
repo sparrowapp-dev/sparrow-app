@@ -3,7 +3,7 @@
   import { scale } from "svelte/transition";
   import { quintOut, backInOut } from "svelte/easing";
 
-  export let isBackgroundClickable=true;
+  export let isBackgroundClickable = true;
 
   /**
    * Button ID
@@ -41,9 +41,7 @@
     top: 0,
     left: 0,
   };
-
-  export let verticalPosition: "top" | "bottom" = "bottom";
-
+  
   onMount(() => {
     /**
      * click event to close the dropdown menu if click anywhere if menu is open
@@ -57,9 +55,9 @@
             dropdownElement &&
             !dropdownElement.contains(event.target as Node)
           ) {
-           if(isBackgroundClickable){
-            isMenuOpen = false;
-           }
+            if (isBackgroundClickable) {
+              isMenuOpen = false;
+            }
           }
         },
         100,
@@ -70,13 +68,7 @@
   afterUpdate(() => {
     const dropdownElement = document.getElementById(buttonId);
     let position = dropdownElement.getBoundingClientRect();
-
-    // Adjust menu position based on verticalPosition (top or bottom)
-    if (verticalPosition === "bottom") {
-      menuPosition.top = position.bottom + 10; // Show below the button
-    } else {
-      menuPosition.top = position.top - 50 - dropdownElement.offsetHeight; // Show above the button
-    }
+    menuPosition.top = position.bottom + 10;
 
     if (horizontalPosition === "right") {
       menuPosition.left = position.left;

@@ -37,7 +37,6 @@
     DoubleArrowIcon,
     GithubIcon,
     MacIcon,
-    TriangleIcon,
     WindowsIcon,
   } from "@sparrow/library/icons";
   import { ListTeamNavigation } from "@sparrow/teams/features";
@@ -239,33 +238,7 @@
               </section>
             </div>
 
-            <section>
-              <Dropdown
-                zIndex={600}
-                buttonId="isExpandLoginButton"
-                bind:isMenuOpen={isExpandLoginButton}
-                options={[
-                  {
-                    name: "Windows",
-                    icon: WindowsIcon,
-                    iconColor: "var(--icon-primary-300)",
-                    color: "var(--text-secondary-100)",
-                    iconSize: "13px",
-                    onclick: () => {},
-                  },
-                  {
-                    name: "Mac OS",
-                    icon: MacIcon,
-                    iconColor: "var(--icon-primary-300)",
-                    color: "var(--text-secondary-100)",
-                    iconSize: "12px",
-                    onclick: () => {},
-                  },
-                ]}
-                horizontalPosition="left"
-                minWidth={213}
-                verticalPosition="top"
-              >
+            <section class="ps-1">
                 <button
                   id="isExpandLoginButton"
                   class="d-flex align-items-center rounded-1 me-0 mb-0 p-2"
@@ -291,33 +264,8 @@
                     >
                       Launch Sparrow App
                     </p>
-
-                    <div
-                      class="ms-3"
-                      style="height: 10px;  width:0.1px; background-color:white"
-                    ></div>
-
-                    <div
-                      class="ms-3"
-                      style={isExpandLoginButton
-                        ? "transform:rotate(0deg);"
-                        : "transform:rotate(90deg);"}
-                      on:click={() => {
-                        isExpandLoginButton = !isExpandLoginButton;
-                      }}
-                      on:blur={() => {
-                        isExpandCollection = false;
-                      }}
-                    >
-                      <TriangleIcon
-                        height={"12px"}
-                        width={"12px"}
-                        color={"white"}
-                      />
-                    </div>
                   </div>
                 </button>
-              </Dropdown>
             </section>
 
             <!-- github repo section -->
