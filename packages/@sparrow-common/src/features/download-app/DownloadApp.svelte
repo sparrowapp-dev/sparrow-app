@@ -13,7 +13,6 @@
       visible = true;
   });
   function openSparrowApp() {
-    console.log("Install Sparrow Desktop clicked");
     window.open("https://sparrowapp.dev", "_blank");
     dispatch("close");
   }
@@ -60,25 +59,6 @@
 </div>
 
 <style>
-  .popup-overlay {
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    visibility: hidden;
-  }
-  .popup-content {
-    /* background: #1c1d2b; */
-    background: transparent;
-    padding: 20px;
-    border-radius: 10px;
-    opacity: 0;
-    transform: scale(0.95);
-  }
   .popup-overlay.visible {
     opacity: 1;
     visibility: visible;
@@ -88,15 +68,12 @@
     transform: scale(1);
   }
   .gradient-text {
-    font-size: 18px;
-    font-weight: 500;
     display: inline-block;
     background: linear-gradient(270deg, #6147ff 2.55%, #1193f0 31.48%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   .welcome-text {
-    margin-top: 3px;
     color: var(--text-secondary-100);
     font-size: 20px;
     font-weight: 500;
