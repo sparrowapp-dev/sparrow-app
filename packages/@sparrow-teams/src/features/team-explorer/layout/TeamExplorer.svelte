@@ -23,9 +23,6 @@
 
   export let isWebEnvironment: boolean;
   
-  export let onActiveWorkspace; 
-
-
   /**
    * user ID
    */
@@ -406,7 +403,6 @@
                     );
                   }) || []}
                   {onSwitchWorkspace}
-                  {onActiveWorkspace}
                   {onDeleteWorkspace}
                   isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
                     userRole === TeamRole.TEAM_OWNER}

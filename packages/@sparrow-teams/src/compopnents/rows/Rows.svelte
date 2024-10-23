@@ -25,13 +25,11 @@
   let pos = { x: 0, y: 0 };
   let showMenu = false;
   let workspaceTabWrapper: HTMLElement;
-  let isPopupOpen = false;
 
   let menuItems = [];
   let noOfColumns = 180;
   let noOfRows = 3;
 
-  let sparrowRedirect: string;
 
   const rightClickContextMenu = (e: MouseEvent) => {
     e.preventDefault();

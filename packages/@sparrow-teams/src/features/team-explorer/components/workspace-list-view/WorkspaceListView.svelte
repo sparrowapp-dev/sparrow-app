@@ -20,8 +20,6 @@
 
   export let searchQuery;
 
-  export let onActiveWorkspace;
-
   export let onDeleteWorkspace;
 
   export let openInDesktop;
@@ -77,7 +75,6 @@
                 {calculateTimeDifferenceInDays}
                 {isAdminOrOwner}
                 {onDeleteWorkspace}
-                {onActiveWorkspace}
                 {openInDesktop}
                 {isWebEnvironment}
               />
