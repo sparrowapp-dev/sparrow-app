@@ -35,6 +35,12 @@
   } from "@sparrow/workspaces/features";
   import { TestflowList } from "../../testflow-list";
   import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
+
+  import {
+    currentStep,
+    isTestFlowTourGuideOpen,
+  } from "../../../stores/guide.tour";
+  import { TestFlowTourGuide } from "@sparrow/workspaces/components";
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
@@ -200,6 +206,16 @@
       });
     }
   }
+  let isBackgroundClickable = true;
+
+  $: {
+    if ($currentStep === 2 && $isTestFlowTourGuideOpen) {
+      isBackgroundClickable = false;
+    } else {
+      isBackgroundClickable = true;
+      addButtonMenu = false;
+    }
+  }
 
   onDestroy(() => {});
 
@@ -266,6 +282,7 @@
             onCreateTestflow();
             MixpanelEvent(Events.LeftPanel_Plus_Icon);
           },
+          isHoverConstant: false,
         },
       ]
     : [
@@ -325,6 +342,7 @@
             MixpanelEvent(Events.LeftPanel_Plus_Icon);
             isExpandTestflow = true;
           },
+          isHoverConstant: false,
         },
       ];
 
@@ -337,6 +355,14 @@
   };
   const toggleExpandTestflow = () => {
     isExpandTestflow = !isExpandTestflow;
+  };
+
+  const toggleTourGuideActive = () => {
+    addButtonData.forEach((option) => {
+      if (option.hasOwnProperty("isHoverConstant")) {
+        option.isHoverConstant = !option.isHoverConstant; // Toggle the value
+      }
+    });
   };
 </script>
 
@@ -370,7 +396,7 @@
 {/if}
 {#if !leftPanelController.leftPanelCollapse}
   <div
-    style="overflow-x: auto; overflow-y: auto"
+    style="overflow-x: auto; overflow-y: auto ; position:relative"
     class={`sidebar h-100 d-flex flex-column bg-secondary-900 scroll`}
   >
     <div
@@ -439,6 +465,7 @@
         <Dropdown
           zIndex={600}
           buttonId="addButton"
+          bind:isBackgroundClickable
           bind:isMenuOpen={addButtonMenu}
           options={addButtonData}
         >
@@ -460,6 +487,47 @@
             </button>
           </Tooltip>
         </Dropdown>
+      {/if}
+
+      {#if $isTestFlowTourGuideOpen && $currentStep == 1}
+        <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
+          <TestFlowTourGuide
+            targetId="addButton"
+            title="Getting Started  🎉"
+            pulsePosition={{ top: "-58px", left: "14px" }}
+            description={`Welcome! Let’s kick off by creating your test flow. You can add a new flow by clicking here, using the '+' icon, or navigating from the home page. Let's get started!`}
+            tipPosition="top-left"
+            onNext={() => {
+              currentStep.set(2);
+              addButtonMenu = true;
+              toggleTourGuideActive();
+            }}
+            onClose={() => {
+              isTestFlowTourGuideOpen.set(false);
+            }}
+          />
+        </div>
+      {/if}
+
+      {#if $isTestFlowTourGuideOpen && $currentStep == 2}
+        <div style="position:fixed; top:200px; left:220px; z-index:9999;">
+          <TestFlowTourGuide
+            targetId="addButton"
+            title="Add Your Flow 🌊"
+            description={`Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!`}
+            tipPosition="left-top"
+            pulsePosition={{ top: "12px", left: "-150px" }}
+            onNext={() => {
+              currentStep.set(3);
+              onCreateTestflow();
+              isExpandTestflow = true;
+              toggleTourGuideActive();
+            }}
+            onClose={() => {
+              isTestFlowTourGuideOpen.set(false);
+            }}
+          />
+        </div>
       {/if}
     </div>
 

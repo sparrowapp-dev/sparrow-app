@@ -40,6 +40,7 @@
     DropButton,
     TableNavbar,
     TableSidebar,
+    TestFlowTourGuide,
   } from "@sparrow/workspaces/components";
   import { RunIcon } from "@sparrow/library/icons";
   import { Modal } from "@sparrow/library/ui";
@@ -56,6 +57,11 @@
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Debounce } from "@sparrow/common/utils";
+
+  import {
+    currentStep,
+    isTestFlowTourGuideOpen,
+  } from "../../../stores/guide.tour";
   import { platform } from "@tauri-apps/plugin-os";
 
   // Declaring props for the component
@@ -675,7 +681,7 @@
           <p class="testing-txt">Testing</p>
         </div>
       {/if}
-      <div style="margin-right: 5px;">
+      <div class="run-btn" style="margin-right: 5px; position:relative;">
         {#if nodesValue > 1}
           <DropButton
             title="Run"
@@ -694,6 +700,25 @@
               MixpanelEvent(Events.Run_TestFlows);
             }}
           />
+        {/if}
+
+        {#if $isTestFlowTourGuideOpen && $currentStep == 6}
+          <div style="position:absolute;  top:60px; right:320px">
+            <TestFlowTourGuide
+              targetId="run-btn"
+              title="Ready, Set, Run 🏃🏻‍♂️"
+              pulsePosition={{ top: "-62px", left: "260px" }}
+              description={`The flow is almost ready, just waiting for you to hit 'Run' and watch the magic happen! Alternatively, you can use the Start play button to initiate the flow as well.`}
+              tipPosition="top-right"
+              onNext={async () => {
+                currentStep.set(7);
+                await onClickRun();
+              }}
+              onClose={() => {
+                isTestFlowTourGuideOpen.set(false);
+              }}
+            />
+          </div>
         {/if}
       </div>
       <div>
@@ -718,7 +743,7 @@
     tabindex="0"
     on:keydown={handleKeyPress}
     on:click={focusDiv}
-    style="flex:1; overflow:auto; outline: none;"
+    style="flex:1; overflow:auto; outline: none; position:realtive;"
   >
     <SvelteFlow {nodes} {edges} {nodeTypes}>
       <Background
@@ -728,9 +753,60 @@
         gap={20}
       />
     </SvelteFlow>
+
+    {#if $isTestFlowTourGuideOpen && $currentStep == 3}
+      <div style="position:absolute; top:260px; left:265px; z-index:1000;">
+        <TestFlowTourGuide
+          title="One Block At A Time 🧱"
+          pulsePosition={{ top: "-64px", left: "30px" }}
+          description={`Wow! You’ve made it to the canvas! Now, just click 'Add Block' and you’re almost there.`}
+          tipPosition="top-left"
+          onNext={() => {
+            currentStep.set(4);
+            createNewNode("1", "undefined");
+          }}
+          onClose={() => {
+            isTestFlowTourGuideOpen.set(false);
+          }}
+        />
+      </div>
+    {/if}
+
+    {#if $isTestFlowTourGuideOpen && $currentStep == 4}
+      <div style="position:absolute; top:240px; left:620px; z-index:1000;">
+        <TestFlowTourGuide
+          title="Block Added! 👏 "
+          description={`Now, just one more step—click on the dropdown to select an API. Don’t worry, we’ve provided a sample API in case you don’t have one ready in your collection.`}
+          tipPosition="left-top"
+          pulsePosition={{ top: "8px", left: "-140px" }}
+          onNext={() => {
+            currentStep.set(5);
+          }}
+          onClose={() => {
+            isTestFlowTourGuideOpen.set(false);
+          }}
+        />
+      </div>
+    {/if}
+
+    {#if $isTestFlowTourGuideOpen && $currentStep == 5}
+      <div style="position:absolute; top:280px; left:620px; z-index:1000;">
+        <TestFlowTourGuide
+          title="Sample API waiting...⏱️"
+          description={`Ready for you to get selected and move ahead! Just choose it from the dropdown and you’re good to go.`}          tipPosition="left-top"
+          pulsePosition={{ top: "10px", left: "-140px" }}
+          onNext={() => {
+            currentStep.set(6);
+          }}
+          onClose={() => {
+            isTestFlowTourGuideOpen.set(false);
+          }}
+        />
+      </div>
+    {/if}
   </div>
   {#if testflowStore?.nodes?.length >= 1 && selectedNode}
-    <div class="request-container" style="">
+    <div class="request-container" style="z-index:10;">
       <div
         class="rounded-2 d-flex flex-column"
         style="background-color:var(--bg-secondary-850); border:1px solid var(--border-tertiary-300);  margin:10px; height:350px;"
@@ -869,6 +945,19 @@
       </div>
     </div>
   {/if}
+
+  <div class="p-3" style="position:absolute; z-index:3; bottom:0; right:0;">
+    <p
+      class="mb-0 pb-0 text-fs-14"
+      style="color: var(--text-primary-300); font-weight:500; cursor:pointer;  "
+      on:click={() => {
+        currentStep.set(1);
+        isTestFlowTourGuideOpen.set(true);
+      }}
+    >
+      Need help?
+    </p>
+  </div>
 </div>
 <!-- <svelte:window on:keydown={handleKeyPress} /> -->
 
