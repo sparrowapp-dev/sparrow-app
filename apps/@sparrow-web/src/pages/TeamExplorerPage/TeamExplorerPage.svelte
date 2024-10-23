@@ -63,16 +63,7 @@
     });
   };
 
-  /**
-   * Subscribes to the active workspace and updates the current workspace details
-   * and also updates current team  details associated with that workspace.
-   */
-  // $: {
-  //   setupRedirect();
-  // }
-  // onMount(() => {
-  //   setupRedirect();
-  // });
+
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
@@ -85,7 +76,6 @@
           team: value._data.team || {},
         };
         findUserRole();
-        // setupRedirect();
       }
     },
   );
@@ -134,24 +124,8 @@
   };
 
   let isPopupOpen = false;
-  let sparrowRedirect: string;
 
-// function openInDesktop(workspaceID: string) {
-//   // First try to redirect to Sparrow app
-//   _viewModel.setupRedirect(workspaceID);
-  
-//   // Set a timeout to check if page is still here (app not installed)
-//   const checkRedirect = setTimeout(() => {
-//     // If we're still on the page after 100ms, assume app isn't installed
-//     isPopupOpen = true;
-//     console.log('Desktop app not detected - showing download popup');
-//   }, 100);
 
-//   // Cleanup timeout if page is leaving (app was launched)
-//   window.addEventListener('beforeunload', () => {
-//     clearTimeout(checkRedirect);
-//   }, { once: true });
-// }
 
 function openInDesktop(workspaceID: string) {
   let appDetected = false;
