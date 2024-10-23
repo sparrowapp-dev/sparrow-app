@@ -21,8 +21,12 @@ export const sendUserDataToMixpanel = (userDetails: {
 };
 
 export async function handleLogin(url: string) {
-  if (!url) return;
   const tokens = getAuthJwt();
+  if ((!tokens[0] || !tokens[1]) && !url) {
+    window.location.href = constants.SPARROW_AUTH_URL + "/init?source=web";
+    return;
+  }
+  if (!url) return;
   if (tokens[0] && tokens[1]) {
     // handles case if token already exists in app
     return;
