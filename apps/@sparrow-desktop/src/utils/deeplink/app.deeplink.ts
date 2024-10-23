@@ -29,20 +29,16 @@ const handleLoginThrottler = throttle(handleLoginV2, 5000);
 
 const performAutoLogin = async (accessToken: string, refreshToken: string): Promise<boolean> => {
   try {
-    console.log("Performing auto login...");
-    
     localStorage.setItem(constants.AUTH_TOKEN, accessToken);
     localStorage.setItem(constants.REFRESH_TOKEN, refreshToken);
     
     const userDetails = jwtDecode<JwtPayload>(accessToken);
     
     if (userDetails) {
-      console.log("Auto login successful for user:", userDetails.email);
       return true;
     }
     return false;
   } catch (error) {
-    console.error("Auto login failed:", error);
     return false;
   }
 };
@@ -78,7 +74,6 @@ const validateUserAccess = async (url: string, currentUserAccessToken: string | 
         userValidationStore.set({ isValid: areUsersEqual, checked: true });
         return areUsersEqual;
       } catch (error) {
-        console.error("JWT decode error:", error);
         userValidationStore.set({ isValid: false, checked: true });
         return false;
       }
@@ -87,7 +82,6 @@ const validateUserAccess = async (url: string, currentUserAccessToken: string | 
     userValidationStore.set({ isValid: false, checked: true });
     return false;
   } catch (error) {
-    console.error("User validation error:", error);
     userValidationStore.set({ isValid: false, checked: true });
     return false;
   }
@@ -96,19 +90,15 @@ const validateUserAccess = async (url: string, currentUserAccessToken: string | 
 const handleLoginAndWorkspaceSwitch = async (url: string, workspaceId: string | null) => {
   try {
     // First handle the login
-    console.log("Handling login...");
     await handleLoginThrottler(url);
     
     // After successful login, switch workspace if workspaceId exists
     if (workspaceId) {
-      console.log("Switching to workspace:", workspaceId);
       // Add a small delay to ensure login is completed
       await new Promise(resolve => setTimeout(resolve, 1000));
       await workspaceSwitcher.handleSwitchWorkspace(workspaceId);
-      console.log("Workspace switch completed");
     }
   } catch (error) {
-    console.error("Error in login or workspace switch:", error);
     throw error;
   }
 };
@@ -116,13 +106,11 @@ const handleLoginAndWorkspaceSwitch = async (url: string, workspaceId: string | 
 const processDeepLink = async (url: string) => {
   try {
     await getCurrent().setFocus();
-    console.log("Processing deep link URL:", url);
     
     const params = new URLSearchParams(url.split("?")[1]);
     const currentUserAccessToken = params.get("accessToken");
     const workspaceId = params.get("workspaceID");
     
-    console.log("Found workspaceID:", workspaceId);
     
     const isValidUser = await validateUserAccess(url, currentUserAccessToken);
 
@@ -138,7 +126,6 @@ const processDeepLink = async (url: string) => {
     await handleLoginAndWorkspaceSwitch(url, workspaceId);
     
   } catch (error) {
-    console.error("Deep link processing error:", error);
     Modal.error({
       title: "Error",
       content: "An error occurred while processing your request"

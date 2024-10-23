@@ -136,24 +136,50 @@
   let isPopupOpen = false;
   let sparrowRedirect: string;
 
-  function openInDesktop(workspaceID: string) {
-  isPopupOpen = true; 
+// function openInDesktop(workspaceID: string) {
+//   // First try to redirect to Sparrow app
+//   _viewModel.setupRedirect(workspaceID);
   
-  const handleBlur = () => {
-    clearTimeout(fallbackTimeout);
-    window.removeEventListener("blur", handleBlur);
-    isPopupOpen = false; 
-    _viewModel.setupRedirect(workspaceID); 
-  };
-  
-  window.addEventListener("blur", handleBlur, { once: true });
+//   // Set a timeout to check if page is still here (app not installed)
+//   const checkRedirect = setTimeout(() => {
+//     // If we're still on the page after 100ms, assume app isn't installed
+//     isPopupOpen = true;
+//     console.log('Desktop app not detected - showing download popup');
+//   }, 100);
 
-  const fallbackTimeout = setTimeout(() => {
-    window.removeEventListener("blur", handleBlur);
-    isPopupOpen = false; 
-    _viewModel.setupRedirect(workspaceID); 
-  }, ); 
+//   // Cleanup timeout if page is leaving (app was launched)
+//   window.addEventListener('beforeunload', () => {
+//     clearTimeout(checkRedirect);
+//   }, { once: true });
+// }
+
+function openInDesktop(workspaceID: string) {
+  let appDetected = false;
+
+  // Handle when window loses focus (app opens)
+  const handleBlur = () => {
+    appDetected = true;
+    window.removeEventListener('blur', handleBlur);
+    clearTimeout(detectAppTimeout);
+  };
+
+  window.addEventListener('blur', handleBlur);
+
+  // Try to open the app
+  _viewModel.setupRedirect(workspaceID);
+
+  // Check if app opened after a short delay
+  const detectAppTimeout = setTimeout(() => {
+    window.removeEventListener('blur', handleBlur);
+    
+    // Only show popup if app wasn't detected
+    if (!appDetected) {
+      isPopupOpen = true;
+      console.log('Desktop app not detected - showing download popup');
+    }
+  }, 500);
 }
+
 
   function closeWelcomePopup() {
     isPopupOpen = false;
