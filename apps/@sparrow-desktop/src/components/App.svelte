@@ -7,7 +7,7 @@
   import Dashboard from "@app/pages/dashboard-page/Dashboard.svelte";
   import EntryPoint from "@app/pages/auth-page/Auth.svelte";
   import { resizeWindowOnLogin } from "../utils";
-  import { registerDeepLinkHandler } from "@app/utils/deeplink/app.deeplink";
+  // import { registerDeepLinkHandler } from "@app/utils/deeplink/app.deeplink";
   import { onMount } from "svelte";
   import { user } from "@app/store/auth.store";
   import { handleShortcuts } from "@app/utils/shortcuts";
@@ -15,6 +15,10 @@
   import { getCurrent } from "@tauri-apps/api/window";
   import LoginPage from "@app/pages/auth-page/sub-pages/login-page/LoginPage.svelte";
   import { singleInstanceHandler } from "@app/utils/singleinstance/app.singleinstance";
+  import { AppViewModel } from "./app.ViewModel";
+
+
+  const _viewModel = new AppViewModel();
 
   export let url = "/";
   let isActiveInternet: boolean = true;
@@ -29,7 +33,8 @@
   onMount(async () => {
     await getCurrent().setFocus();
     await getCurrent().center();
-    await registerDeepLinkHandler();
+    // await registerDeepLinkHandler();
+    await _viewModel.registerDeepLinkHandler();
     await singleInstanceHandler();
     let isloggedIn;
     user.subscribe((value) => {
