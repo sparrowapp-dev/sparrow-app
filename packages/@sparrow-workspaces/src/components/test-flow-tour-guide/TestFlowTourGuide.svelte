@@ -4,7 +4,7 @@
   import {PulseCircle} from "@sparrow/common/components";
 
   export let pulsePosition = { top: "0px", left: "0px" };
-  export let targetId;
+  export let targetId="";
   export let title = "";
   export let description = "";
   export let tipPosition = "top-left";
