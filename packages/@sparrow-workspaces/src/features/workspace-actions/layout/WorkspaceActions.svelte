@@ -495,7 +495,7 @@
             targetId="addButton"
             title="Getting Started  🎉"
             pulsePosition={{ top: "-58px", left: "14px" }}
-            description="Welcome! Let’s kick off by creating your test flow. You can add a new flow by clicking here, using the '+' icon, or navigating from the home page. Let's get started!"
+            description={`Welcome! Let’s kick off by creating your test flow. You can add a new flow by clicking here, using the '+' icon, or navigating from the home page. Let's get started!`}
             tipPosition="top-left"
             onNext={() => {
               currentStep.set(2);
@@ -514,7 +514,7 @@
           <TestFlowTourGuide
             targetId="addButton"
             title="Add Your Flow 🌊"
-            description="Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!"
+            description={`Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!`}
             tipPosition="left-top"
             pulsePosition={{ top: "12px", left: "-150px" }}
             onNext={() => {
