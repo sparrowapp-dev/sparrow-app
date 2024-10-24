@@ -82,7 +82,6 @@
 
   export let deleteNodeResponse;
 
-  export let handleTestFlowRunEnd;
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -837,7 +836,6 @@
               selectedNode?.request?.id,
             );
           }}
-          {handleTestFlowRunEnd}
         />
 
         <!-- Request Respone Body -->
@@ -977,7 +975,6 @@
               sampleApiData?.request?.id,
             );
           }}
-          {handleTestFlowRunEnd}
         />
 
         <!-- Request Respone Body -->

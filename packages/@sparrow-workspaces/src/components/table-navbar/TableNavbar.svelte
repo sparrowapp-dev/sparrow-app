@@ -4,18 +4,12 @@
   import { Tooltip } from "@sparrow/library/ui";
   import TestFlowTourGuide from "../test-flow-tour-guide/TestFlowTourGuide.svelte";
   import { currentStep, isTestFlowTourGuideOpen } from "../../stores";
-  import { onMount } from "svelte";
 
   export let selectedNode;
 
   export let onClose;
   export let onRedirect;
 
-  export let handleTestFlowRunEnd;
-
-  onMount(() => {
-    console.log("THis is selected NOde ", selectedNode);
-  });
 </script>
 
 <div
@@ -87,11 +81,9 @@
         onNext={() => {
           currentStep.set(-1);
           isTestFlowTourGuideOpen.set(false);
-          handleTestFlowRunEnd();
         }}
         onClose={() => {
           isTestFlowTourGuideOpen.set(false);
-          handleTestFlowRunEnd();
         }}
       />
     </div>

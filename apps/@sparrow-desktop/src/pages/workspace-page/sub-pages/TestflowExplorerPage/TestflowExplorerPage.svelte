@@ -92,6 +92,5 @@
     onRedrectRequest={_viewModel.redirectRequest}
     onUpdateTestFlowName={_viewModel.updateName}
     onSaveTestflow={_viewModel.saveTestflow}
-    handleTestFlowRunEnd={_viewModel.handleTestFlowRunEnd}
   />
 {/if}

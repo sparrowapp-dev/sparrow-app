@@ -330,16 +330,6 @@ export class TestflowExplorerPageViewModel {
     return nodes;
   };
 
-  public handleTestFlowRunEnd = () => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    testFlowDataStore.update((testFlowDataMap) => {
-      // let wsData = testFlowDataMap.get(progressiveTab.tabId);
-      testFlowDataMap.delete(progressiveTab.tabId);
-      // testFlowDataMap.set(progressiveTab.tabId, wsData);
-      return testFlowDataMap;
-    });
-  };
-
   /**
    * Handles running the test flow by processing each node sequentially and recording the results
    */

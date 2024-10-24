@@ -137,17 +137,17 @@
 
   let showSampleApi = false;
 
-  const test = () => {
+  const ResetActualCollectionValue = () => {
     arrayData = collections;
   };
 
   $: {
-    if (($currentStep >= 4 || $currentStep <= 6) && $isTestFlowTourGuideOpen ) {
+    if (($currentStep >= 4 || $currentStep <= 6) && $isTestFlowTourGuideOpen) {
       showSampleApi = true;
       arrayData = dummyCollection;
     }
     if ($currentStep === -1) {
-      test();
+      ResetActualCollectionValue();
     }
   }
 </script>
