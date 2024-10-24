@@ -137,17 +137,16 @@
     // Try to open the app
     _viewModel.setupRedirect(workspaceID);
 
-  // Check if app opened after a short delay
-  const detectAppTimeout = setTimeout(() => {
-    window.removeEventListener('blur', handleBlur);
-    
-    // Only show popup if app wasn't detected
-    if (!appDetected) {
-      isPopupOpen = true;
-    }
-  }, 500);
-}
+    // Check if app opened after a short delay
+    const detectAppTimeout = setTimeout(() => {
+      window.removeEventListener("blur", handleBlur);
 
+      // Only show popup if app wasn't detected
+      if (!appDetected) {
+        isPopupOpen = true;
+      }
+    }, 500);
+  }
 
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
@@ -228,8 +227,6 @@
     isWebApp={true}
   />
 {/if}
-
-
 
 <Modal
   title={"Invite Team Members"}

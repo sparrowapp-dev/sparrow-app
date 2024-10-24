@@ -159,18 +159,31 @@
     getOS();
   });
 
-  const handleRedirect = () => {
-    try {
-      const accessToken = localStorage.getItem(constants.AUTH_TOKEN);
-      const refreshToken = localStorage.getItem(constants.REF_TOKEN);
-      let sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email`;
-      console.log("inside try ");
-      navigate(sparrowRedirect);
-    } catch (error) {
-      console.log("Inside catch ");
-      navigate("https://sparrowapp.dev/");
-    }
-  };
+  function launchSparrowWebApp(workspaceID: string) {
+    let appDetected = false;
+
+    // Handle when window loses focus (app opens)
+    const handleBlur = () => {
+      appDetected = true;
+      window.removeEventListener("blur", handleBlur);
+      clearTimeout(detectAppTimeout);
+    };
+
+    window.addEventListener("blur", handleBlur);
+
+    // Try to open the app
+    _viewModel.setupRedirect(workspaceID);
+
+    // Check if app opened after a short delay
+    const detectAppTimeout = setTimeout(() => {
+      window.removeEventListener("blur", handleBlur);
+
+      // Only show popup if app wasn't detected
+      if (!appDetected) {
+        isPopupOpen = true;
+      }
+    }, 500);
+  }
 
   let openTeamData: TeamDocType;
   openTeam.subscribe((_team) => {
@@ -183,7 +196,6 @@
   });
 
   let isPopupOpen = false;
-  
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -265,7 +277,7 @@
                   <p
                     class="ms-2 mb-0 text-fs-12"
                     style="font-weight: 500;"
-                    on:click={handleRedirect}
+                    on:click={launchSparrowWebApp}
                   >
                     Launch Sparrow App
                   </p>
