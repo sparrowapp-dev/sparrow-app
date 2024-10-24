@@ -356,7 +356,7 @@
             {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
               <div class="pt-2">
                 <div
-                  class={`d-flex search-input-container rounded py-2 px-2 align-items-center mb-4`}
+                  class={`d-flex search-input-container rounded  align-items-center mb-4`}
                 >
                   <div>
                     <SearchIcon
@@ -369,7 +369,7 @@
                   <input
                     type="text"
                     id="search-input"
-                    class={`bg-transparent w-100 border-0 my-auto`}
+                    class={`bg-transparent w-100 border-0 my-auto ms-2`}
                     placeholder="Search workspaces in {openTeam?.name}"
                     on:input={handleSearchInput}
                     bind:value={searchQuery}
@@ -510,6 +510,7 @@
     font-size: 12px;
     position: relative;
     border: 1px solid transparent;
+    padding: 8px;
   }
   .search-input-container:hover {
     border: 1px solid var(--border-primary-300);
