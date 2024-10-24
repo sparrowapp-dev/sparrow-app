@@ -28,6 +28,29 @@ spec:
           resources: {}
           ports:
             - containerPort: 1422
+          resources:
+            requests:
+              cpu: 100m
+              memory: 600Mi
+            limits:
+              cpu: 500m
+              memory: 700Mi
+          livenessProbe:
+            tcpSocket:
+              port: 1422
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+          readinessProbe:
+            tcpSocket:
+              port: 1422
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
 
 ---
 apiVersion: v1
