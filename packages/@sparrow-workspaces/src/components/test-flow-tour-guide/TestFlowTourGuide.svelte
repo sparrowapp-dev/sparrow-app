@@ -1,7 +1,7 @@
 <script>
   import { CrossIcon } from "@sparrow/library/assets";
   import { onMount, onDestroy } from "svelte";
-  import {PulseCircle} from "@sparrow/common/components";
+  import { PulseCircle } from "@sparrow/common/components";
 
   export let pulsePosition = { top: "0px", left: "0px" };
   export let targetId;
@@ -83,7 +83,7 @@
     class="text-fs-13"
     style="line-height: 19.5px; font-weight:400; color:var(--text-secondary-100);"
   >
-    {description}
+    {@html description}
   </p>
 
   <!-- Next/Done button -->

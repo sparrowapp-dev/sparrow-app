@@ -11,6 +11,11 @@ import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import type { Tab } from "@sparrow/common/types/workspace";
 
 import { createDeepCopy } from "@sparrow/common/utils";
+import {
+  currentStep,
+  isFirstTimeInTestFlow,
+  isTestFlowTourGuideOpen,
+} from "@sparrow/workspaces/stores";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -148,6 +153,16 @@ export class TestflowViewModel {
       });
       notifications.success("New Testflow created successfully.");
       // MixpanelEvent(Events.CREATE_TESTFLOW);
+      let isFirstTimeUsingTestFlow = false;
+      isFirstTimeInTestFlow.subscribe((value) => {
+        isFirstTimeUsingTestFlow = value;
+        console.log("isFirstTimeUsingTestFlow", isFirstTimeUsingTestFlow);
+      });
+      if (isFirstTimeUsingTestFlow) {
+        currentStep.set(3);
+        isTestFlowTourGuideOpen.set(true);
+        isFirstTimeInTestFlow.set(false);
+      }
       return;
     } else {
       notifications.error("Failed to create testflow. Please try again.");

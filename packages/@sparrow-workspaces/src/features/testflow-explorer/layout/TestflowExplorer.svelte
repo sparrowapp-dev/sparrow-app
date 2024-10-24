@@ -708,7 +708,7 @@
               targetId="run-btn"
               title="Ready, Set, Run 🏃🏻‍♂️"
               pulsePosition={{ top: "-62px", left: "260px" }}
-              description={`The flow is almost ready, just waiting for you to hit 'Run' and watch the magic happen! Alternatively, you can use the Start play button to initiate the flow as well.`}
+              description={`The flow is almost ready, just waiting for you to hit 'Run' and watch the magic happen! <br/> Alternatively, you can use the "Start" play button to initiate the flow as well.`}
               tipPosition="top-right"
               onNext={async () => {
                 currentStep.set(7);

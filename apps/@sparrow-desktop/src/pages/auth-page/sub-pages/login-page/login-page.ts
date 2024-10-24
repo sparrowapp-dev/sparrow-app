@@ -12,6 +12,7 @@ import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 import { GuideRepository } from "../../../../repositories/guide.repository";
 
 import { isUserFirstSignUp } from "@app/store/user.store";
+import { isFirstTimeInTestFlow } from "@sparrow/workspaces/stores";
 
 //------------------------------MixPanel-------------------------------//
 
@@ -82,6 +83,7 @@ export async function handleLoginV2(url: string) {
       });
       _guideRepository.insert({ isActive: true, id: "environment-guide" });
       _guideRepository.insert({ isActive: true, id: "collection-guide" });
+      isFirstTimeInTestFlow.set(true);
     } else {
       navigate("/app/collections?first=false");
       MixpanelEvent(Events.USER_LOGIN, {
