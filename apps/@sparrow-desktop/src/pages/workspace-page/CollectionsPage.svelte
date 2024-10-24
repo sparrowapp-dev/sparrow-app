@@ -341,9 +341,9 @@
         );
 
         userValidationStore.subscribe(validation => {
-         if (!validation.isValid && validation.checked) {
+         if (!validation.isValid) {
          isAccessDeniedModalOpen = true;
-         isWelcomePopupOpen = false; // Hide welcome popup if it's open
+         isWelcomePopupOpen = false; 
          }
       });
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);

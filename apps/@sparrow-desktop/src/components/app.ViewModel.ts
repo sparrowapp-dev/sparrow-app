@@ -6,7 +6,6 @@ import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import { getCurrent } from "@tauri-apps/api/window";
 import { Modal } from "@sparrow/library/ui";
 import { userValidationStore } from '@app/store/deviceSync.store';
-// import { TeamExplorerPageViewModel } from "../../../@sparrow-desktop/src/pages/teams-page/sub-pages/TeamExplorerPage/TeamExplorerPage.ViewModel";
 import { jwtDecode } from "../utils/jwt";
 import constants from "@app/constants/constants";
 import { EnvironmentRepository } from "../repositories/environment.repository";
@@ -32,7 +31,10 @@ interface JwtPayload {
   iat: number;
 }
 
+
+
 export class AppViewModel {
+  private guestUserRepository = new GuestUserRepository();
   private workspaceRepository = new WorkspaceRepository();
   private tabRepository = new TabRepository();
     private handleLoginThrottler = throttle(handleLoginV2, 5000);
@@ -50,62 +52,37 @@ export class AppViewModel {
 
   constructor() {}
 
-  // Private method to handle auto login
-  private async performAutoLogin(accessToken: string, refreshToken: string): Promise<boolean> {
-    try {
-      localStorage.setItem(constants.AUTH_TOKEN, accessToken);
-      localStorage.setItem(constants.REFRESH_TOKEN, refreshToken);
-      
-      const userDetails = jwtDecode<JwtPayload>(accessToken);
-      return !!userDetails;
-    } catch (error) {
-      return false;
-    }
-  }
+   /**
+   * Get the guest user state
+   */
+   private getGuestUserState = async () => {
+    const response = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    return response?.getLatest().toMutableJSON().isGuestUser;
+  };
+
 
   // Private method to validate user access
-  private async validateUserAccess(url: string, currentUserAccessToken: string | null): Promise<boolean> {
-    try {
-      const existingUserToken = localStorage.getItem(constants.AUTH_TOKEN);
+  private async validateUserAccess(url: string, webUserAccessToken: string | null): Promise<boolean> {
+      const isGuestUser = await this.getGuestUserState();
+      if (isGuestUser) return false;
+      // different user
+      const desktopUserAccessToken = localStorage.getItem(constants.AUTH_TOKEN);
 
-      // Handle auto login for new users
-      if (!existingUserToken && currentUserAccessToken) {
-        const params = new URLSearchParams(url.split("?")[1]);
-        const refreshToken = params.get("refreshToken");
-        
-        if (refreshToken) {
-          const autoLoginSuccess = await this.performAutoLogin(currentUserAccessToken, refreshToken);
-          userValidationStore.set({ isValid: autoLoginSuccess, checked: true });
-          return autoLoginSuccess;
-        }
-      }
 
       // Validate existing user
-      if (currentUserAccessToken && existingUserToken) {
-        try {
-          const currentUserDetails = jwtDecode<JwtPayload>(currentUserAccessToken);
-          const existingUserDetails = jwtDecode<JwtPayload>(existingUserToken);
+      if (webUserAccessToken && desktopUserAccessToken) {
+          const webAppUserDetails = jwtDecode(webUserAccessToken);
+          const desktopUserDetails = jwtDecode(desktopUserAccessToken);
 
-          if (!currentUserDetails || !existingUserDetails) {
-            userValidationStore.set({ isValid: false, checked: true });
-            return false;
-          }
-
-          const areUsersEqual = currentUserDetails._id === existingUserDetails._id;
-          userValidationStore.set({ isValid: areUsersEqual, checked: true });
-          return areUsersEqual;
-        } catch (error) {
-          userValidationStore.set({ isValid: false, checked: true });
+        if (webAppUserDetails?._id && desktopUserDetails?._id) { 
+          if(webAppUserDetails._id !== desktopUserDetails._id)
           return false;
+          
         }
       }
-
-      userValidationStore.set({ isValid: false, checked: true });
-      return false;
-    } catch (error) {
-      userValidationStore.set({ isValid: false, checked: true });
-      return false;
-    }
+      return true;
   }
 
   // Private method to handle login and workspace switch
@@ -129,18 +106,18 @@ export class AppViewModel {
       
       const isValidUser = await this.validateUserAccess(url, currentUserAccessToken);
 
-      if (!isValidUser && currentUserAccessToken) {
-        Modal.error({
+      if (!isValidUser) {
+        console.error({
           title: "Access Denied",
           content: "Please log out the current user before switching accounts"
         });
+        userValidationStore.set({ isValid: false });
         return;
       }
-
       await this.handleLoginAndWorkspaceSwitch(url, workspaceId);
       
     } catch (error) {
-      Modal.error({
+      console.error({
         title: "Error",
         content: "An error occurred while processing your request"
       });
@@ -157,7 +134,7 @@ export class AppViewModel {
 
   private deepLinkHandlerMacOs = async (deepLinkUrl: string): Promise<void> => {
     if (deepLinkUrl) {
-      await this.processDeepLink(deepLinkUrl);
+      await this.processDeepLink(deepLinkUrl[0]);
     }
   };
 
@@ -165,7 +142,6 @@ export class AppViewModel {
   public async registerDeepLinkHandler(): Promise<void> {
     try {
       const os = await platform();
-      console.log("Registering deep link handler for:", os);
 
       if (os === "windows") {
         await listen("deep-link-urls", this.deepLinkHandlerWindows);
