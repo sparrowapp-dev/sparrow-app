@@ -36,7 +36,7 @@
     bind:value={inputName}
     height={"36px"}
     id={inputId}
-    placeholder={"Workspace Name"}
+    placeholder={"Workspace name"}
     class="text-fs-14 bg-tertiary-300 fw-normal px-2 border-radius-4"
     style="outline:none;"
     defaultBorderColor={inputNameError
