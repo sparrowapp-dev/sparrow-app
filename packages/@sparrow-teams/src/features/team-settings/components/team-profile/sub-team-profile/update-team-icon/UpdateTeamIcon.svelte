@@ -3,15 +3,17 @@
   import { IconUploader } from "..";
   import { TeamPropertyEnum } from "../../../../types";
   import type { UpdateTeamIcon as IUpdateTeamIcon } from "../../../../types";
+  import { OSDetector } from "@sparrow/common/utils";
+
   export let uploadTeamIcon: IUpdateTeamIcon;
   export let onUpdateTeam: (property: TeamPropertyEnum) => void;
 
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
-
   let os = "";
-  onMount(async () => {
-    os = await platform();
+  const osDetector = new OSDetector();
+  onMount(() => {
+    os = osDetector.getOS();
   });
 
   /**
