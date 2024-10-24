@@ -20,9 +20,9 @@
   import { CrossIcon, MoreOptions } from "@sparrow/library/icons";
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
   export let isWebApp = false;
-
-  export let isWebEnvironment: boolean;
   
+  export let isWebEnvironment: boolean;
+
   /**
    * user ID
    */
@@ -412,6 +412,8 @@
                   {onAddMember}
                   bind:isGuestUser
                   {onDeleteWorkspace}
+                  {openInDesktop}
+                  {isWebEnvironment}
                   {searchQuery}
                   workspaces={workspaces.filter((elem) => {
                     return (
