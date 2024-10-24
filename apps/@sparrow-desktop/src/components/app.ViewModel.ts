@@ -64,51 +64,25 @@ export class AppViewModel {
 
 
   // Private method to validate user access
-  private async validateUserAccess(url: string, currentUserAccessToken: string | null): Promise<boolean> {
-    try {
+  private async validateUserAccess(url: string, webUserAccessToken: string | null): Promise<boolean> {
       const isGuestUser = await this.getGuestUserState();
       if (isGuestUser) return false;
       // different user
-      const existingUserToken = localStorage.getItem(constants.AUTH_TOKEN);
+      const desktopUserAccessToken = localStorage.getItem(constants.AUTH_TOKEN);
 
-      // Handle auto login for new users
-      if (!existingUserToken && currentUserAccessToken) {
-        const params = new URLSearchParams(url.split("?")[1]);
-        const refreshToken = params.get("refreshToken");
-        
-        if (refreshToken) {
-          const autoLoginSuccess = await this.performAutoLogin(currentUserAccessToken, refreshToken);
-          userValidationStore.set({ isValid: autoLoginSuccess, checked: true });
-          return autoLoginSuccess;
-        }
-      }
 
       // Validate existing user
-      if (currentUserAccessToken && existingUserToken) {
-        try {
-          const currentUserDetails = jwtDecode<JwtPayload>(currentUserAccessToken);
-          const existingUserDetails = jwtDecode<JwtPayload>(existingUserToken);
+      if (webUserAccessToken && desktopUserAccessToken) {
+          const webAppUserDetails = jwtDecode(webUserAccessToken);
+          const desktopUserDetails = jwtDecode(desktopUserAccessToken);
 
-          if (!currentUserDetails || !existingUserDetails) {
-            userValidationStore.set({ isValid: false, checked: true });
-            return false;
-          }
-
-          const areUsersEqual = currentUserDetails._id === existingUserDetails._id;
-          userValidationStore.set({ isValid: areUsersEqual, checked: true });
-          return areUsersEqual;
-        } catch (error) {
-          userValidationStore.set({ isValid: false, checked: true });
+        if (webAppUserDetails?._id && desktopUserDetails?._id) { 
+          if(webAppUserDetails._id !== desktopUserDetails._id)
           return false;
+          
         }
       }
-
-      userValidationStore.set({ isValid: false, checked: true });
-      return false;
-    } catch (error) {
-      userValidationStore.set({ isValid: false, checked: true });
-      return false;
-    }
+      return true;
   }
 
   // Private method to handle login and workspace switch
@@ -132,18 +106,18 @@ export class AppViewModel {
       
       const isValidUser = await this.validateUserAccess(url, currentUserAccessToken);
 
-      if (!isValidUser && currentUserAccessToken) {
-        Modal.error({
+      if (!isValidUser) {
+        console.error({
           title: "Access Denied",
           content: "Please log out the current user before switching accounts"
         });
+        userValidationStore.set({ isValid: false });
         return;
       }
-
       await this.handleLoginAndWorkspaceSwitch(url, workspaceId);
       
     } catch (error) {
-      Modal.error({
+      console.error({
         title: "Error",
         content: "An error occurred while processing your request"
       });
@@ -168,7 +142,6 @@ export class AppViewModel {
   public async registerDeepLinkHandler(): Promise<void> {
     try {
       const os = await platform();
-      console.log("Registering deep link handler for:", os);
 
       if (os === "windows") {
         await listen("deep-link-urls", this.deepLinkHandlerWindows);
