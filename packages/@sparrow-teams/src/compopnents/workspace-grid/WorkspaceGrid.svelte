@@ -4,6 +4,7 @@
   import { onDestroy } from "svelte";
   import Card from "../card/Card.svelte";
   import MenuView from "../menu-view/MenuView.svelte";
+  import { ArrowForward } from "@sparrow/library/icons";
 
   export let workspace: any;
   export let isAdminOrOwner: boolean;
@@ -152,6 +153,7 @@
           }}
         >
           Open in Desktop
+          <ArrowForward width={"19px"} height={"19px"} color={"blue"} />
         </button>
       {/if}
     </div>
