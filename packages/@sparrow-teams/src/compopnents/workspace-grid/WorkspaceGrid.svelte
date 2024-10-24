@@ -4,6 +4,7 @@
   import { onDestroy } from "svelte";
   import Card from "../card/Card.svelte";
   import MenuView from "../menu-view/MenuView.svelte";
+  import { ArrowForward } from "@sparrow/library/icons";
 
   export let workspace: any;
   export let isAdminOrOwner: boolean;
@@ -152,6 +153,13 @@
           }}
         >
           Open in Desktop
+          <div class="arrow-up">
+            <ArrowForward
+              width={"19px"}
+              height={"19px"}
+              color={"var(--icon-primary-300)"}
+            />
+          </div>
         </button>
       {/if}
     </div>
@@ -162,6 +170,12 @@
   .workspace-card-outer {
     display: contents;
   }
+
+  .arrow-up {
+    position: relative;
+    top: -5px;
+  }
+
   .workspace-card-outer:hover .workspace-card {
     background-color: var(--bg-tertiary-600) !important;
   }
@@ -209,7 +223,7 @@
 
   .open-desktop-btn {
     position: absolute;
-    top: 15px;
+    top: 13px;
     right: 40px;
     font-size: 12px;
     font-weight: 500;
