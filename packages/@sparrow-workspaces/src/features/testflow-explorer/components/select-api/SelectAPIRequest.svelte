@@ -107,7 +107,7 @@
   const dummyCollection = [
     {
       id: "6716111fd15536c0e193a107",
-      name: "Sample Collection",
+      name: "Sample API",
       totalRequests: 1,
       workspaceId: 123,
       createdAt: "2024-10-21T08:30:23.512Z",
