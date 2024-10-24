@@ -50,8 +50,6 @@
         title="Install Sparrow Desktop"
         textStyleProp="font-size:16px; font-weight:400;"
         type="primary"
-        buttonStyleProp={"height:38px; weight:126px; border-color:var(--border-primary-300) !important; font-size:14px; "}
-        buttonClassProp={`mt-2`}
         buttonStartIcon={DownloadIconWeb}
         buttonStartIconStyle="height:16px; width:16px;"
         onClick={openSparrowApp}
