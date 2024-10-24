@@ -65,7 +65,6 @@
           },
           displayText: "Delete Workspace",
           disabled: false,
-          textColor: "var(--text-danger-200)",
         },
       ];
     } else {
