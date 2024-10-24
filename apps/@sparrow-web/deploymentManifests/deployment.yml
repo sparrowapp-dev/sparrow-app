@@ -25,7 +25,6 @@ spec:
         - image: sparrowprod.azurecr.io/sparrow-web-dev:_BUILD__ID_
           name: sparrow-web
           imagePullPolicy: Always
-          resources: {}
           ports:
             - containerPort: 1422
           resources:
