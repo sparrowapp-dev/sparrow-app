@@ -292,7 +292,7 @@
         >
           <span>{user.name[0].toUpperCase()}</span>
         </div>
-        <div class="name px-2">
+        <div class="name px-2" style="width: 80%;">
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
           ><br />
@@ -372,7 +372,7 @@
         >
           <span>{user.name[0].toUpperCase()}</span>
         </div>
-        <div class="name px-2">
+        <div class="name px-2" style="width: 80%;">
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
           ><br />
@@ -445,7 +445,7 @@
         >
           <span>{user.name[0].toUpperCase()}</span>
         </div>
-        <div class="name px-2">
+        <div class="name px-2" style="width: 80%;">
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
           ><br />
