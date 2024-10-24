@@ -159,7 +159,7 @@
     getOS();
   });
 
-  function launchSparrowWebApp(workspaceID: string) {
+  function launchSparrowWebApp() {
     let appDetected = false;
 
     // Handle when window loses focus (app opens)
@@ -172,7 +172,7 @@
     window.addEventListener("blur", handleBlur);
 
     // Try to open the app
-    _viewModel.setupRedirect(workspaceID);
+    _viewModel.setupRedirect();
 
     // Check if app opened after a short delay
     const detectAppTimeout = setTimeout(() => {
