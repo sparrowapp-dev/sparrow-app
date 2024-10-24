@@ -69,7 +69,6 @@
           },
           displayText: "Delete Workspace",
           disabled: false,
-          textColor: "var(--text-danger-200)",
         },
       ];
     } else {
@@ -210,7 +209,7 @@
 
   .open-desktop-btn {
     position: absolute;
-    top: 15px;
+    top: 13px;
     right: 40px;
     font-size: 12px;
     font-weight: 500;

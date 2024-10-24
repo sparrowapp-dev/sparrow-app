@@ -6,7 +6,6 @@
     displayText: string;
     disabled: boolean;
     hidden: boolean;
-    textColor: string;
   }> = [];
   export let noOfRows = 0;
   export let noOfColumns = 0;
@@ -22,7 +21,6 @@
 
     return [firstOptionHeight, secondOptionHeight];
   };
-
   const calculateRightOptionWidth = () => {
     const firstOptionWidth = noOfColumns + 20;
     const secondOptionWidth = noOfColumns;
@@ -68,8 +66,10 @@
               item.disabled && "text-requestBodyColor"
             }`}
             on:click={item.onClick}
-            style={`color: ${item.textColor || (item.displayText === "Delete" ? "var(--request-delete)" : "var(--white-color)")}`}
-            >{item.displayText}</button
+            style={item.displayText === "Delete" ||
+            item.displayText === "Delete Workspace"
+              ? "color: var(--request-delete)"
+              : ""}>{item.displayText}</button
           >
         </li>
       {/each}
@@ -85,6 +85,7 @@
   ul li button {
     background-color: transparent;
     border-radius: 2px;
+    color: var(--white-color);
   }
 
   ul li button:hover {
