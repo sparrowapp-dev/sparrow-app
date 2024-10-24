@@ -64,8 +64,9 @@
     class="d-flex justify-content-between align-items-center mb-1"
     style="height: 34px; "
   >
-    <span style="font-size:12px; font-weight:400; " class="text-whiteColor"
-      >{workspace.name}</span
+    <span
+      style="font-size:12px; font-weight:400; width:calc(100% - 120px);"
+      class="text-whiteColor ellipsis">{workspace.name}</span
     >
     <div class="dropdown-workspace-access">
       {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}

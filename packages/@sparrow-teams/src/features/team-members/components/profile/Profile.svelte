@@ -72,7 +72,7 @@
         <span style="mt-2">{user.name[0].toUpperCase()}</span>
       </div>
 
-      <div class="name px-2">
+      <div class="name px-2 ellipsis" style="width:80%">
         <span class="text-whiteColor sparrow-fs-12"
           >{user.name} {owner ? "(You)" : ""}</span
         ><br />

@@ -63,8 +63,6 @@
     });
   };
 
-
-
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value?._data) {
@@ -125,35 +123,32 @@
 
   let isPopupOpen = false;
 
+  function openInDesktop(workspaceID: string) {
+    let appDetected = false;
 
+    // Handle when window loses focus (app opens)
+    const handleBlur = () => {
+      appDetected = true;
+      window.removeEventListener("blur", handleBlur);
+      clearTimeout(detectAppTimeout);
+    };
 
-function openInDesktop(workspaceID: string) {
-  let appDetected = false;
+    window.addEventListener("blur", handleBlur);
 
-  // Handle when window loses focus (app opens)
-  const handleBlur = () => {
-    appDetected = true;
-    window.removeEventListener('blur', handleBlur);
-    clearTimeout(detectAppTimeout);
-  };
+    // Try to open the app
+    _viewModel.setupRedirect(workspaceID);
 
-  window.addEventListener('blur', handleBlur);
+    // Check if app opened after a short delay
+    const detectAppTimeout = setTimeout(() => {
+      window.removeEventListener("blur", handleBlur);
 
-  // Try to open the app
-  _viewModel.setupRedirect(workspaceID);
-
-  // Check if app opened after a short delay
-  const detectAppTimeout = setTimeout(() => {
-    window.removeEventListener('blur', handleBlur);
-    
-    // Only show popup if app wasn't detected
-    if (!appDetected) {
-      isPopupOpen = true;
-      console.log('Desktop app not detected - showing download popup');
-    }
-  }, 500);
-}
-
+      // Only show popup if app wasn't detected
+      if (!appDetected) {
+        isPopupOpen = true;
+        console.log("Desktop app not detected - showing download popup");
+      }
+    }, 500);
+  }
 
   function closeWelcomePopup() {
     isPopupOpen = false;
@@ -169,7 +164,7 @@ function openInDesktop(workspaceID: string) {
       class="h-100 d-flex flex-column"
       style="border-right:2px solid #000000; width: 100%;  padding:24px;"
     >
-      <div style="align-items:center; margin-left:10px" class="d-flex">
+      <div style="align-items:center; margin-left:10px" class="d-flex ellipsis">
         <div
           style="cursor: pointer; align-items:center;"
           on:click={() => (isWorkspaceOpen = false)}
