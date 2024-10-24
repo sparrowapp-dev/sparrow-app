@@ -721,7 +721,6 @@
               tipPosition="top-right"
               onNext={async () => {
                 currentStep.set(7);
-                await onClickRun();
               }}
               onClose={() => {
                 isTestFlowTourGuideOpen.set(false);
