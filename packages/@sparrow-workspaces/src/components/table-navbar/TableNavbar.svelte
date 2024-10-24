@@ -6,8 +6,10 @@
   import { currentStep, isTestFlowTourGuideOpen } from "../../stores";
 
   export let selectedNode;
+
   export let onClose;
   export let onRedirect;
+
 </script>
 
 <div
@@ -78,6 +80,7 @@
         tipPosition="bottom-right"
         onNext={() => {
           currentStep.set(-1);
+          isTestFlowTourGuideOpen.set(false);
         }}
         onClose={() => {
           isTestFlowTourGuideOpen.set(false);

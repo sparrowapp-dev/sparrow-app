@@ -85,6 +85,7 @@
     onUpdateEdges={_viewModel.updateEdges}
     {collectionList}
     onClickRun={_viewModel.handleTestFlowRun}
+    onRunSampleApi={_viewModel.handleSampleTestFlowRun}
     toggleHistoryDetails={_viewModel.toggleHistoryDetails}
     toggleHistoryContainer={_viewModel.toggleHistoryContainer}
     deleteNodeResponse={_viewModel.deleteNodeResponse}

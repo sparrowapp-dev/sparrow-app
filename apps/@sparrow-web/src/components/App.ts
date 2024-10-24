@@ -38,6 +38,7 @@ export async function handleLogin(url: string) {
 
   if (!accessToken || !refreshToken) {
     window.location.href = constants.SPARROW_AUTH_URL + "/init?source=web";
+    return;
   }
   // handles case if token exist in url
   const userDetails = jwtDecode(accessToken);
