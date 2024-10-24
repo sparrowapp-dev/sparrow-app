@@ -15,7 +15,7 @@
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import TeamExplorerPage from "../TeamExplorerPage/TeamExplorerPage.svelte";
   import { TeamsViewModel } from "./Teams.ViewModel";
-  import { Modal, Tooltip } from "@sparrow/library/ui";
+  import { Modal, Tooltip, Dropdown } from "@sparrow/library/ui";
   import { pagesMotion } from "../../constants";
   import { version } from "../../../package.json";
 
@@ -33,13 +33,20 @@
   import { isUserFirstSignUp } from "src/store/user.store";
   import { user } from "src/store/auth.store";
   import { WithButton } from "@sparrow/workspaces/hoc";
-  import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
+  import {
+    DoubleArrowIcon,
+    GithubIcon,
+    MacIcon,
+    WindowsIcon,
+  } from "@sparrow/library/icons";
   import { ListTeamNavigation } from "@sparrow/teams/features";
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import constants from "../../constants/constants";
+  import { navigate } from "svelte-navigator";
   import type { TeamDocType } from "src/models/team.model";
   import { WelcomePopUpWeb } from "@sparrow/common/components";
   import type { GithubRepoDocType } from "src/models/github-repo.model";
+  import { DownloadApp } from "@sparrow/common/features";
 
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
@@ -131,6 +138,53 @@
     }
   }
 
+  let isExpandLoginButton = false;
+  let isHovered = false;
+  const handleMouseOver = () => {
+    isHovered = true;
+  };
+  const handleMouseOut = () => {
+    isHovered = false;
+  };
+  let windowOs = true;
+  function getOS() {
+    let userAgent = window.navigator.userAgent;
+    if (userAgent.indexOf("Mac") != -1) {
+      windowOs = true;
+    } else if (userAgent.indexOf("Windows") != -1) {
+      windowOs = false;
+    }
+  }
+  onMount(() => {
+    getOS();
+  });
+
+  function launchSparrowWebApp() {
+    let appDetected = false;
+
+    // Handle when window loses focus (app opens)
+    const handleBlur = () => {
+      appDetected = true;
+      window.removeEventListener("blur", handleBlur);
+      clearTimeout(detectAppTimeout);
+    };
+
+    window.addEventListener("blur", handleBlur);
+
+    // Try to open the app
+    _viewModel.setupRedirect();
+
+    // Check if app opened after a short delay
+    const detectAppTimeout = setTimeout(() => {
+      window.removeEventListener("blur", handleBlur);
+
+      // Only show popup if app wasn't detected
+      if (!appDetected) {
+        isPopupOpen = true;
+      }
+    }, 500);
+  }
+
   let openTeamData: TeamDocType;
   openTeam.subscribe((_team) => {
     if (_team) {
@@ -140,6 +194,8 @@
       }, 0);
     }
   });
+
+  let isPopupOpen = false;
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -198,6 +254,36 @@
                 />
               </section>
             </div>
+
+            <section class="ps-1">
+              <button
+                id="isExpandLoginButton"
+                class="d-flex align-items-center rounded-1 me-0 mb-0 p-2"
+                style="border:none; cursor:pointer; justify-content:center; height:32px; background-color:var(  --bg-primary-300) ; width:100%; "
+                on:mouseover={handleMouseOver}
+                on:mouseout={handleMouseOut}
+              >
+                <div class="d-flex align-items-center justify-content-center">
+                  {#if windowOs}
+                    <MacIcon height={"12px"} width={"12px"} color={"white"} />
+                  {:else}
+                    <WindowsIcon
+                      height={"12px"}
+                      width={"12px"}
+                      color={"white"}
+                    />
+                  {/if}
+
+                  <p
+                    class="ms-2 mb-0 text-fs-12"
+                    style="font-weight: 500;"
+                    on:click={launchSparrowWebApp}
+                  >
+                    Launch Sparrow App
+                  </p>
+                </div>
+              </button>
+            </section>
 
             <!-- github repo section -->
             <section>
@@ -264,11 +350,25 @@
         <TeamExplorerPage
           activeTeamTab={$activeTeamTab}
           onUpdateActiveTab={_viewModel.updateActiveTeamTab}
+          bind:isPopupOpen
         />
       </Pane>
     </Splitpanes>
   </div>
 </Motion>
+
+<Modal
+  title=""
+  type="dark"
+  width="45%"
+  zIndex={1000}
+  isOpen={isPopupOpen}
+  handleModalState={() => {
+    isPopupOpen = false;
+  }}
+>
+  <DownloadApp />
+</Modal>
 
 <Modal
   title={""}

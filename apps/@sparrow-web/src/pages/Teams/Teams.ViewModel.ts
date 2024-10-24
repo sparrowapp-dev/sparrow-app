@@ -278,4 +278,11 @@ export class TeamsViewModel {
   public modifyTeam = async (teamId: string, team: any): Promise<void> => {
     await this.teamRepository.modifyTeam(teamId, team);
   };
+
+  public setupRedirect = () => {
+    const accessToken = localStorage.getItem("AUTH_TOKEN");
+    const refreshToken = localStorage.getItem("REF_TOKEN");
+    const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email}`;
+    window.location.href = sparrowRedirect;
+  };
 }
