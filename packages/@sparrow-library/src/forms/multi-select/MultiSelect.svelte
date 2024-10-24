@@ -219,7 +219,7 @@
             <label
               for="multi-select-item-{index}-{id}"
               role="button"
-              class="text-fs-12 m-0 ps-2 p-0 text-whiteColor w-100"
+              class="text-fs-12 m-0 ps-2 p-0 text-whiteColor w-100 ellipsis"
             >
               {item.name}
             </label>
