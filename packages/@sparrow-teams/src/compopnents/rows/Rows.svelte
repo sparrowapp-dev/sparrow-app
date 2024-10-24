@@ -31,8 +31,8 @@
   const rightClickContextMenu = (e: MouseEvent) => {
     e.preventDefault();
     setTimeout(() => {
-      const mouseX = workspaceTabWrapper.getBoundingClientRect().right - 15;
-      const mouseY = workspaceTabWrapper.getBoundingClientRect().top + 28;
+      const mouseX = workspaceTabWrapper.getBoundingClientRect().right;
+      const mouseY = workspaceTabWrapper.getBoundingClientRect().top + 30;
       pos = { x: mouseX, y: mouseY };
       showMenu = true;
     }, 100);
@@ -191,6 +191,7 @@
 <style>
   tr:hover {
     background-color: var(--bg-tertiary-600);
+    cursor: pointer;
   }
   .workspace-list-item td {
     background-color: transparent;
@@ -211,14 +212,14 @@
     font-size: 12px;
     font-weight: 700;
     line-height: 18px;
+    vertical-align: middle;
   }
   .open-desktop-btn {
-    position: absolute;
-    top: 50%;
-    right: 30px;
-    transform: translateY(-50%);
+    /* position: absolute; */
+    /* top: 50%; */
+    /* right: 30px; */
+    /* transform: translateY(-50%); */
     font-size: 12px;
-    font-weight: 700;
     background-color: var(--color-primary);
     color: #3670f7;
     padding: 5px 10px;

@@ -36,8 +36,8 @@
   const rightClickContextMenu = (e) => {
     e.preventDefault();
     setTimeout(() => {
-      const mouseX = workspaceTabWrapper.getBoundingClientRect().right - 15;
-      const mouseY = workspaceTabWrapper.getBoundingClientRect().top + 28;
+      const mouseX = workspaceTabWrapper.getBoundingClientRect().right - 180;
+      const mouseY = workspaceTabWrapper.getBoundingClientRect().top + 30;
       pos = { x: mouseX, y: mouseY };
       showMenu = true;
     }, 100);
@@ -109,7 +109,7 @@
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
         ? 'threedot-active'
         : ''}"
-      style="top:15px; right:15px;"
+      style="top:26px; right:15px;"
       on:click={(e) => rightClickContextMenu(e)}
     >
       <ThreeDotIcon />
@@ -125,7 +125,10 @@
       }`}
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     >
-      <div class="d-flex overflow-hidden justify-content-between">
+      <div
+        class="d-flex overflow-hidden justify-content-between"
+        style={isWebEnvironment ? "width:calc(100% - 130px);" : ""}
+      >
         <h4 class="ellipsis overflow-hidden me-4">{workspace.name}</h4>
       </div>
       <p
@@ -147,7 +150,7 @@
 
       {#if isWebEnvironment}
         <button
-          class="open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
+          class="me-2 open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
           on:click|stopPropagation={() => {
             openInDesktop(workspace._id);
           }}
@@ -223,7 +226,7 @@
 
   .open-desktop-btn {
     position: absolute;
-    top: 13px;
+    top: 24px;
     right: 40px;
     font-size: 12px;
     font-weight: 500;
