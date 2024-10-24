@@ -18,7 +18,7 @@
   }) => void;
   export let isAdminOrOwner: boolean;
   export let onDeleteWorkspace: (workspace: any) => void;
-  export let openInDesktop: (workspaceID:string) => void;
+  export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
   let pos = { x: 0, y: 0 };
   let showMenu = false;
@@ -27,7 +27,6 @@
   let menuItems = [];
   let noOfColumns = 180;
   let noOfRows = 3;
-
 
   const rightClickContextMenu = (e: MouseEvent) => {
     e.preventDefault();
@@ -66,6 +65,7 @@
           },
           displayText: "Delete Workspace",
           disabled: false,
+          textColor: "var(--text-danger-200)",
         },
       ];
     } else {
@@ -163,15 +163,15 @@
 
   <td class="tab-data py-3 position-relative">
     {#if isWebEnvironment}
-    <button
-      class="open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
-      on:click|stopPropagation={() => {
-        openInDesktop(list._id)
-      }}
-    >
-      Open in Desktop
-    </button>
-  {/if}
+      <button
+        class="open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
+        on:click|stopPropagation={() => {
+          openInDesktop(list._id);
+        }}
+      >
+        Open in Desktop
+      </button>
+    {/if}
   </td>
 
   <td class="tab-data rounded-end py-3">
