@@ -11,9 +11,15 @@ const setAuthJwt = (key: string, token: string) => {
   localStorage.setItem(key, token);
 };
 
+const getAuthJwt = () => {
+  const authToken = localStorage.getItem("AUTH_TOKEN");
+  const refToken = localStorage.getItem("REF_TOKEN");
+  return [authToken, refToken];
+};
+
 const clearAuthJwt = (): void => {
   localStorage.removeItem(constants.AUTH_TOKEN);
   localStorage.removeItem(constants.REF_TOKEN);
 };
 
-export { jwtDecode, setAuthJwt, clearAuthJwt };
+export { jwtDecode, setAuthJwt, clearAuthJwt, getAuthJwt };
