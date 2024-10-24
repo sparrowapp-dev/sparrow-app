@@ -11,6 +11,7 @@ export { MarkdownFormatter } from "./parse-markdown-to-texteditor";
 export { SetDataStructure } from "./set-data-structure";
 export { FormatTime } from "./formatTime";
 export { ParseTime } from "./parse-time";
+export { OSDetector } from "./OSDetector";
 export { throttle } from "./throttle";
 export { copyToClipBoard } from "./copyToClipboard";
 export * from "./auth.helper";
