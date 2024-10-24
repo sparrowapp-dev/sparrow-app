@@ -28,7 +28,7 @@ export async function handleLogin(url: string) {
   }
   if (!url) return;
   if (tokens[0] && tokens[1]) {
-    // handles case if token already exists in app
+    // handles case if account already running in app
     return;
   }
   const params = new URLSearchParams(url.split("?")[1]);
@@ -36,30 +36,29 @@ export async function handleLogin(url: string) {
   const refreshToken = params.get("refreshToken");
   const event = params.get("event");
 
-  if (accessToken && refreshToken) {
-    // handles case if token exist in url
-    const userDetails = jwtDecode(accessToken);
-    setAuthJwt(constants.AUTH_TOKEN, accessToken);
-    setAuthJwt(constants.REF_TOKEN, refreshToken);
-    setUser(jwtDecode(accessToken));
-    sendUserDataToMixpanel(userDetails);
-    MixpanelEvent(Events.USER_LOGIN, {
-      Login_Method: "Email",
-      Success: true,
-    });
-    notifications.success("Login successful.");
-    if (event === "register") {
-      navigate("/app/home");
-      _guideRepository.insert({ isActive: true, id: "environment-guide" });
-      _guideRepository.insert({ isActive: true, id: "collection-guide" });
-      isUserFirstSignUp.set(true);
-    } else {
-      navigate("/app/home");
-
-      _guideRepository.insert({ isActive: false, id: "environment-guide" });
-      _guideRepository.insert({ isActive: false, id: "collection-guide" });
-    }
+  if (!accessToken || !refreshToken) {
+    window.location.href = constants.SPARROW_AUTH_URL + "/init?source=web";
+  }
+  // handles case if token exist in url
+  const userDetails = jwtDecode(accessToken);
+  setAuthJwt(constants.AUTH_TOKEN, accessToken);
+  setAuthJwt(constants.REF_TOKEN, refreshToken);
+  setUser(jwtDecode(accessToken));
+  sendUserDataToMixpanel(userDetails);
+  MixpanelEvent(Events.USER_LOGIN, {
+    Login_Method: "Email",
+    Success: true,
+  });
+  // User login successfully
+  if (event === "register") {
+    navigate("/app/home");
+    _guideRepository.insert({ isActive: true, id: "environment-guide" });
+    _guideRepository.insert({ isActive: true, id: "collection-guide" });
+    isUserFirstSignUp.set(true);
   } else {
-    notifications.error("Invalid token.");
+    navigate("/app/home");
+
+    _guideRepository.insert({ isActive: false, id: "environment-guide" });
+    _guideRepository.insert({ isActive: false, id: "collection-guide" });
   }
 }
