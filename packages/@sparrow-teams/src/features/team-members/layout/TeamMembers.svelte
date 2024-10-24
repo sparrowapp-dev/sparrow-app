@@ -68,20 +68,20 @@
 <div class="py-2 h-100 d-flex flex-column">
   <section>
     <div
-      class={`d-flex search-input-container rounded py-2 px-2 mb-4 align-items-center`}
+      class={`d-flex search-input-container rounded mb-4 align-items-center`}
     >
       <div>
         <SearchIcon
           width={14}
           height={14}
-          classProp={`my-auto me-3`}
+          classProp={`my-auto `}
           color={"var(--icon-secondary-200)"}
         />
       </div>
       <input
         type="text"
         id="search-input-team-member"
-        class={`bg-transparent w-100 border-0 my-auto`}
+        class={`bg-transparent ms-2 w-100 border-0 my-auto`}
         placeholder="Search people in {openTeam?.name}"
         bind:value={filterText}
       />
@@ -173,6 +173,7 @@
     font-size: 12px;
     position: relative;
     border: 1px solid transparent;
+    padding: 8px;
   }
 
   .search-input-container > input:focus {

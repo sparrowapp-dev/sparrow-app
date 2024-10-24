@@ -199,7 +199,7 @@
                 return false;
               })[0]?.teamId}
               onclick={handleTeamDropdown}
-              minHeaderWidth={"auto"}
+              minHeaderWidth={"200px"}
               iconRequired={false}
               isDropIconFilled={true}
               borderType={"none"}

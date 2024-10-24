@@ -311,6 +311,7 @@
         class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
           ? 'threedot-active'
           : ''}"
+        style="transform: rotate(90deg);"
         on:click={(e) => {
           rightClickContextMenu(e);
         }}
