@@ -46,6 +46,7 @@
   import type { TeamDocType } from "src/models/team.model";
   import { WelcomePopUpWeb } from "@sparrow/common/components";
   import type { GithubRepoDocType } from "src/models/github-repo.model";
+  import { DownloadApp } from "@sparrow/common/features";
 
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
@@ -170,6 +171,7 @@
       navigate("https://sparrowapp.dev/");
     }
   };
+
   let openTeamData: TeamDocType;
   openTeam.subscribe((_team) => {
     if (_team) {
@@ -179,6 +181,9 @@
       }, 0);
     }
   });
+
+  let isPopupOpen = false;
+  
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -239,33 +244,33 @@
             </div>
 
             <section class="ps-1">
-                <button
-                  id="isExpandLoginButton"
-                  class="d-flex align-items-center rounded-1 me-0 mb-0 p-2"
-                  style="border:none; cursor:pointer; justify-content:center; height:32px; background-color:var(  --bg-primary-300) ; width:100%; "
-                  on:mouseover={handleMouseOver}
-                  on:mouseout={handleMouseOut}
-                >
-                  <div class="d-flex align-items-center justify-content-center">
-                    {#if windowOs}
-                      <MacIcon height={"12px"} width={"12px"} color={"white"} />
-                    {:else}
-                      <WindowsIcon
-                        height={"12px"}
-                        width={"12px"}
-                        color={"white"}
-                      />
-                    {/if}
+              <button
+                id="isExpandLoginButton"
+                class="d-flex align-items-center rounded-1 me-0 mb-0 p-2"
+                style="border:none; cursor:pointer; justify-content:center; height:32px; background-color:var(  --bg-primary-300) ; width:100%; "
+                on:mouseover={handleMouseOver}
+                on:mouseout={handleMouseOut}
+              >
+                <div class="d-flex align-items-center justify-content-center">
+                  {#if windowOs}
+                    <MacIcon height={"12px"} width={"12px"} color={"white"} />
+                  {:else}
+                    <WindowsIcon
+                      height={"12px"}
+                      width={"12px"}
+                      color={"white"}
+                    />
+                  {/if}
 
-                    <p
-                      class="ms-2 mb-0 text-fs-12"
-                      style="font-weight: 500;"
-                      on:click={handleRedirect}
-                    >
-                      Launch Sparrow App
-                    </p>
-                  </div>
-                </button>
+                  <p
+                    class="ms-2 mb-0 text-fs-12"
+                    style="font-weight: 500;"
+                    on:click={handleRedirect}
+                  >
+                    Launch Sparrow App
+                  </p>
+                </div>
+              </button>
             </section>
 
             <!-- github repo section -->
@@ -333,11 +338,25 @@
         <TeamExplorerPage
           activeTeamTab={$activeTeamTab}
           onUpdateActiveTab={_viewModel.updateActiveTeamTab}
+          bind:isPopupOpen
         />
       </Pane>
     </Splitpanes>
   </div>
 </Motion>
+
+<Modal
+  title=""
+  type="dark"
+  width="45%"
+  zIndex={1000}
+  isOpen={isPopupOpen}
+  handleModalState={() => {
+    isPopupOpen = false;
+  }}
+>
+  <DownloadApp />
+</Modal>
 
 <Modal
   title={""}

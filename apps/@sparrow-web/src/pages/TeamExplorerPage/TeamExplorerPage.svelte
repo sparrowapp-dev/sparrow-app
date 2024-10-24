@@ -7,7 +7,6 @@
   } from "@sparrow/teams/features";
   import { TeamExplorerPageViewModel } from "./TeamExplorerPage.ViewModel";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
-  import { DownloadApp } from "@sparrow/common/features";
   import { user } from "@app/store/auth.store";
   import { Modal } from "@sparrow/library/ui";
   import { LeaveTeam } from "@sparrow/teams/features";
@@ -123,7 +122,7 @@
     isWorkspaceInviteModalOpen = true;
   };
 
-  let isPopupOpen = false;
+  export let isPopupOpen = false;
 
 
 
@@ -155,9 +154,6 @@ function openInDesktop(workspaceID: string) {
 }
 
 
-  function closeWelcomePopup() {
-    isPopupOpen = false;
-  }
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
@@ -238,16 +234,7 @@ function openInDesktop(workspaceID: string) {
   />
 {/if}
 
-<Modal
-  title=""
-  type="dark"
-  width="45%"
-  zIndex={1000}
-  isOpen={isPopupOpen}
-  handleModalState={closeWelcomePopup}
->
-  <DownloadApp />
-</Modal>
+
 
 <Modal
   title={"Invite Team Members"}
