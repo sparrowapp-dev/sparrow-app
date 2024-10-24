@@ -137,17 +137,12 @@
 
   let showSampleApi = false;
 
-  const ResetActualCollectionValue = () => {
-    arrayData = collections;
-  };
-
   $: {
     if (($currentStep >= 4 || $currentStep <= 6) && $isTestFlowTourGuideOpen) {
       showSampleApi = true;
-      arrayData = dummyCollection;
     }
-    if ($currentStep === -1) {
-      ResetActualCollectionValue();
+    else{
+      showSampleApi=false;
     }
   }
 </script>
@@ -244,7 +239,48 @@
       </div>
     {/if}
     <div class="scrollable-list">
-      {#if arrayData?.length > 0}
+      {#if showSampleApi}
+        {#each dummyCollection as data}
+          {#if data?.type !== "WEBSOCKET"}
+            <div
+              class="d-flex align-items-center dropdown-single-option"
+              on:click|stopPropagation={() => {
+                handleSelectApi(data);
+              }}
+            >
+              <div
+                style="margin-left: 5px;"
+                class="d-flex align-items-center justify-content-center"
+              >
+                {#if data?.type === "REQUEST"}
+                  <span class="text-{getMethodStyle(data?.request?.method)}">
+                    <span
+                      class={"request-icon"}
+                      style="font-size: 10px; font-weight: 500;"
+                      >{data?.request?.method || ""}</span
+                    >
+                  </span>
+                {:else if data?.type === "FOLDER"}
+                  <FolderIcon2
+                    height={"10px"}
+                    width={"10px"}
+                    color={"var(--icon-secondary-100)"}
+                  />
+                {:else}
+                  <CollectionIcon
+                    height={"10px"}
+                    width={"10px"}
+                    color={"var(--icon-secondary-100)"}
+                  />
+                {/if}
+              </div>
+              <p class="options-txt ellipsis">
+                {data.name}
+              </p>
+            </div>
+          {/if}
+        {/each}
+      {:else if arrayData?.length > 0}
         {#each arrayData as data}
           {#if data?.type !== "WEBSOCKET"}
             <div
