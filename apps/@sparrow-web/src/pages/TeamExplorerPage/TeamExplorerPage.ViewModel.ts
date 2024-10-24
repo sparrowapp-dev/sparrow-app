@@ -21,7 +21,7 @@ import { navigate } from "svelte-navigator";
 import { v4 as uuidv4 } from "uuid";
 
 export class TeamExplorerPageViewModel {
-  constructor() { }
+  constructor() {}
   private teamRepository = new TeamRepository();
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -817,5 +817,5 @@ export class TeamExplorerPageViewModel {
     const refreshToken = localStorage.getItem("REF_TOKEN");
     const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email&workspaceID=${_workspaceId}`;
     window.location.href = sparrowRedirect;
-  }
+  };
 }
