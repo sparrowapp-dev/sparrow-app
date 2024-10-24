@@ -342,8 +342,8 @@
   {/if}
 {/if}
 <div class="d-flex align-items-center justify-content-between mt-4">
-  <div class="description ellipsis">
-    <div class="d-flex gap-2 align-items-center ellipsis">
+  <div class="d-flex align-items-center description ellipsis gap-2">
+    <div class="d-flex align-items-center" style="width: 36px;">
       {#if teamLogo?.size}
         <img
           class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
@@ -352,12 +352,12 @@
           alt=""
         />
       {:else}
-        <span class="me-2">
+        <span class="">
           <IconFallback character={teamName[0]} />
         </span>
       {/if}
-      <p style="font-size:16px;" class="mb-0 ellipsis">{teamName}</p>
     </div>
+    <p style="font-size:16px;" class="mb-0 ellipsis">{teamName}</p>
   </div>
   <div>
     <Button

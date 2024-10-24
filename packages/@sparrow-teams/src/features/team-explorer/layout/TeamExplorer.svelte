@@ -20,7 +20,7 @@
   import { CrossIcon, MoreOptions } from "@sparrow/library/icons";
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
   export let isWebApp = false;
-  
+
   export let isWebEnvironment: boolean;
 
   /**
