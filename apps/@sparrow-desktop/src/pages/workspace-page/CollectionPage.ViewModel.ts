@@ -277,7 +277,7 @@ export default class CollectionsViewModel {
   public createNewTabWithData = async (_limit = 5) => {
     if (_limit === 0) return;
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
-    isApiCreatedFirstTime.set(true);
+    // isApiCreatedFirstTime.set(true);
     if (ws) {
       const initRequestTab = new InitRequestTab(
         "UNTRACKED-" + uuidv4(),
