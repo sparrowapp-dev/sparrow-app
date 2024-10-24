@@ -12,7 +12,7 @@
 <ToastContainer width={"fit-content"} let:data>
   <div
     class=" d-flex border-radius-4 position-relati custom-toast custom-toast-{data.type}"
-    style="width: 100%; min-width: 30vw;"
+    style="max-width: 60vw; min-width: 30vw;"
   >
     <div class="w-100" style="">
       <span class="p-1">
