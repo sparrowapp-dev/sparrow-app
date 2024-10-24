@@ -153,7 +153,13 @@
           }}
         >
           Open in Desktop
-          <ArrowForward width={"19px"} height={"19px"} color={"blue"} />
+          <div class="arrow-up">
+            <ArrowForward
+              width={"19px"}
+              height={"19px"}
+              color={"var(--icon-primary-300)"}
+            />
+          </div>
         </button>
       {/if}
     </div>
@@ -164,6 +170,12 @@
   .workspace-card-outer {
     display: contents;
   }
+
+  .arrow-up {
+    position: relative;
+    top: -5px;
+  }
+
   .workspace-card-outer:hover .workspace-card {
     background-color: var(--bg-tertiary-600) !important;
   }
