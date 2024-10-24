@@ -6,12 +6,12 @@ metadata:
     app: sparrow-web
   name: sparrow-web
 spec:
-  replicas: 1
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 0  
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: sparrow-web
@@ -34,22 +34,22 @@ spec:
             limits:
               cpu: 500m
               memory: 700Mi
-          livenessProbe:
-            tcpSocket:
-              port: 1422
-            initialDelaySeconds: 15
-            periodSeconds: 5
-            timeoutSeconds: 5
-            failureThreshold: 3
-            successThreshold: 1
+          # livenessProbe:
+          #   tcpSocket:
+          #     port: 1422
+          #   initialDelaySeconds: 15
+          #   periodSeconds: 5
+          #   timeoutSeconds: 5
+          #   failureThreshold: 3
+          #   successThreshold: 1
           readinessProbe:
             tcpSocket:
               port: 1422
-            initialDelaySeconds: 10
+            initialDelaySeconds: 30
             periodSeconds: 5
             timeoutSeconds: 5
-            failureThreshold: 3
-            successThreshold: 1
+            # failureThreshold: 3
+            # successThreshold: 1
 
 ---
 apiVersion: v1
