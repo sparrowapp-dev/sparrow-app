@@ -66,7 +66,8 @@
               item.disabled && "text-requestBodyColor"
             }`}
             on:click={item.onClick}
-            style={item.displayText === "Delete"
+            style={item.displayText === "Delete" ||
+            item.displayText === "Delete Workspace"
               ? "color: var(--request-delete)"
               : ""}>{item.displayText}</button
           >
