@@ -6,7 +6,6 @@ import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import { getCurrent } from "@tauri-apps/api/window";
 import { Modal } from "@sparrow/library/ui";
 import { userValidationStore } from '@app/store/deviceSync.store';
-// import { TeamExplorerPageViewModel } from "../../../@sparrow-desktop/src/pages/teams-page/sub-pages/TeamExplorerPage/TeamExplorerPage.ViewModel";
 import { jwtDecode } from "../utils/jwt";
 import constants from "@app/constants/constants";
 import { EnvironmentRepository } from "../repositories/environment.repository";
@@ -32,7 +31,10 @@ interface JwtPayload {
   iat: number;
 }
 
+
+
 export class AppViewModel {
+  private guestUserRepository = new GuestUserRepository();
   private workspaceRepository = new WorkspaceRepository();
   private tabRepository = new TabRepository();
     private handleLoginThrottler = throttle(handleLoginV2, 5000);
@@ -50,22 +52,23 @@ export class AppViewModel {
 
   constructor() {}
 
-  // Private method to handle auto login
-  private async performAutoLogin(accessToken: string, refreshToken: string): Promise<boolean> {
-    try {
-      localStorage.setItem(constants.AUTH_TOKEN, accessToken);
-      localStorage.setItem(constants.REFRESH_TOKEN, refreshToken);
-      
-      const userDetails = jwtDecode<JwtPayload>(accessToken);
-      return !!userDetails;
-    } catch (error) {
-      return false;
-    }
-  }
+   /**
+   * Get the guest user state
+   */
+   private getGuestUserState = async () => {
+    const response = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    return response?.getLatest().toMutableJSON().isGuestUser;
+  };
+
 
   // Private method to validate user access
   private async validateUserAccess(url: string, currentUserAccessToken: string | null): Promise<boolean> {
     try {
+      const isGuestUser = await this.getGuestUserState();
+      if (isGuestUser) return false;
+      // different user
       const existingUserToken = localStorage.getItem(constants.AUTH_TOKEN);
 
       // Handle auto login for new users
@@ -157,7 +160,7 @@ export class AppViewModel {
 
   private deepLinkHandlerMacOs = async (deepLinkUrl: string): Promise<void> => {
     if (deepLinkUrl) {
-      await this.processDeepLink(deepLinkUrl);
+      await this.processDeepLink(deepLinkUrl[0]);
     }
   };
 

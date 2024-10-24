@@ -149,7 +149,6 @@ function openInDesktop(workspaceID: string) {
     // Only show popup if app wasn't detected
     if (!appDetected) {
       isPopupOpen = true;
-      console.log('Desktop app not detected - showing download popup');
     }
   }, 500);
 }
