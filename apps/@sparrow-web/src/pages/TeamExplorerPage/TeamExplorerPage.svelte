@@ -7,6 +7,7 @@
   } from "@sparrow/teams/features";
   import { TeamExplorerPageViewModel } from "./TeamExplorerPage.ViewModel";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
+  import { DownloadApp } from "@sparrow/common/features";
   import { user } from "@app/store/auth.store";
   import { Modal } from "@sparrow/library/ui";
   import { LeaveTeam } from "@sparrow/teams/features";
@@ -120,7 +121,7 @@
     isWorkspaceInviteModalOpen = true;
   };
 
-  export let isPopupOpen = false;
+  let isPopupOpen = false;
 
   function openInDesktop(workspaceID: string) {
     let appDetected = false;
@@ -137,17 +138,21 @@
     // Try to open the app
     _viewModel.setupRedirect(workspaceID);
 
-    // Check if app opened after a short delay
-    const detectAppTimeout = setTimeout(() => {
-      window.removeEventListener("blur", handleBlur);
+  // Check if app opened after a short delay
+  const detectAppTimeout = setTimeout(() => {
+    window.removeEventListener('blur', handleBlur);
+    
+    // Only show popup if app wasn't detected
+    if (!appDetected) {
+      isPopupOpen = true;
+    }
+  }, 500);
+}
 
-      // Only show popup if app wasn't detected
-      if (!appDetected) {
-        isPopupOpen = true;
-      }
-    }, 500);
+
+  function closeWelcomePopup() {
+    isPopupOpen = false;
   }
-
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
@@ -227,6 +232,17 @@
     isWebApp={true}
   />
 {/if}
+
+<Modal
+  title=""
+  type="dark"
+  width="45%"
+  zIndex={1000}
+  isOpen={isPopupOpen}
+  handleModalState={closeWelcomePopup}
+>
+  <DownloadApp />
+</Modal>
 
 <Modal
   title={"Invite Team Members"}
