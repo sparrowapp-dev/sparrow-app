@@ -26,9 +26,10 @@
       file?
     </small>
   </div>
-  <div class="d-flex justify-content-between">
-    <div style="margin-right: 15px;">
+  <div class="row">
+    <div class="col-12 mb-2 col-xl-5 col-xxl-3">
       <Button
+        buttonStyleProp={"width:100%;"}
         title={"Cancel"}
         textClassProp={"fs-6"}
         type={"dark"}
@@ -37,18 +38,20 @@
         }}
       />
     </div>
-    <div class="d-flex">
-      <span style="margin-right: 15px;">
-        <Button
-          title={"Discard Changes"}
-          textClassProp={"fs-6"}
-          type={"dark"}
-          onClick={() => {
-            onDiscard();
-          }}
-        />
-      </span>
+    <div class="col-12 mb-2 col-xl-7 col-xxl-4">
       <Button
+        buttonStyleProp={"width:100%;"}
+        title={"Discard Changes"}
+        textClassProp={"fs-6"}
+        type={"dark"}
+        onClick={() => {
+          onDiscard();
+        }}
+      />
+    </div>
+    <div class="col-12 col-xl-12 col-xxl-5">
+      <Button
+        buttonStyleProp={"width:100%;"}
         disable={isSaveDisabled}
         title={"Save Changes"}
         textClassProp={"fs-6"}

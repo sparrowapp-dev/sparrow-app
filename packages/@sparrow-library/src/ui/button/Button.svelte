@@ -74,7 +74,7 @@
   } `}
   class={`${buttonClassProp} ${
     type !== "other" && type !== "icon"
-      ? "py-1 px-3 border-0 d-flex align-items-center"
+      ? "py-1 px-3 border-0 d-flex align-items-center justify-content-center"
       : ""
   } ${btnClass}`}
   on:click={(e) => {
