@@ -3,6 +3,7 @@
    * Components
    */
   import { IconUploader, FileType } from "..";
+  import { OSDetector } from "@sparrow/common/utils";
 
   /**
    * Constants
@@ -26,11 +27,12 @@
    */
   const iconUploaderId: string = "team-file-input";
 
-  onMount(async () => {
-    os = await platform();
-  });
-
   let os = "";
+
+  const osDetector = new OSDetector();
+  onMount(() => {
+    os = osDetector.getOS();
+  });
 
   /**
    * Validates the uploaded file based on size and type
@@ -80,11 +82,11 @@
     if (!file) return;
 
     //This need to be revisited , this is hack we are providing right now
-    
-    // Explanation :- Here this check is for mac , like the validation is missing in mac when we are uploading pdf file 
-    // so the issue there is when we are uploading the PDF file then in mac it is taking it as a jpeg file with name starts with tempImage + some randowm word 
+
+    // Explanation :- Here this check is for mac , like the validation is missing in mac when we are uploading pdf file
+    // so the issue there is when we are uploading the PDF file then in mac it is taking it as a jpeg file with name starts with tempImage + some randowm word
     // so we have wrote a check for it that if the os is macos and the file name it start with this ("tempImage")  then we are considering it as pdf file and giving the
-     // same error which we used to given when user upload pdf file 
+    // same error which we used to given when user upload pdf file
     if (file?.name.indexOf("tempImage") == 0 && os == "macos") {
       teamForm.file.showFileTypeError = true;
       teamForm.file.invalid = true;

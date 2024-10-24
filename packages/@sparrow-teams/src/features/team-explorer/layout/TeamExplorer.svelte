@@ -22,7 +22,7 @@
   export let isWebApp = false;
 
   export let isWebEnvironment: boolean;
-  
+
   /**
    * user ID
    */
@@ -412,6 +412,8 @@
                   {onAddMember}
                   bind:isGuestUser
                   {onDeleteWorkspace}
+                  {openInDesktop}
+                  {isWebEnvironment}
                   {searchQuery}
                   workspaces={workspaces.filter((elem) => {
                     return (
