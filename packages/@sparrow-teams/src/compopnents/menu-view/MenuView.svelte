@@ -17,7 +17,7 @@
     const extraHeight = 30; // Extra height for additional rows
 
     const firstOptionHeight = baseHeight + (noOfRows - 1) * extraHeight;
-    const secondOptionHeight = firstOptionHeight - 20;
+    const secondOptionHeight = firstOptionHeight - 46;
 
     return [firstOptionHeight, secondOptionHeight];
   };
@@ -55,14 +55,14 @@
 <nav style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:4;">
   <div
     style={`width: ${noOfColumns}px; background-color: var(--bg-tertiary-400)`}
-    class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column border-radius-2 align-items-start justify-content-start text-whiteColor"
+    class="overflow-hidden navbar p-0 d-flex flex-column border-radius-4 align-items-start justify-content-start text-whiteColor"
   >
-    <ul class="p-2 w-100 mb-0">
+    <ul class="p-1 w-100 mb-0">
       {#each menuItems as item}
         <li class="align-items-center {item.hidden ? 'd-none' : 'd-block'}">
           <button
             disabled={item.disabled}
-            class={`w-100 d-flex sparrow-fs-12 border-0 align-items-center px-2 py-2 ${
+            class={`w-100 d-flex sparrow-fs-12 border-0 align-items-center p-2 ${
               item.disabled && "text-requestBodyColor"
             }`}
             on:click={item.onClick}
