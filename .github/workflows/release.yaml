@@ -57,9 +57,9 @@ jobs:
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
-          $content = Get-Content src-tauri/tauri.conf.json -Raw
+          $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
           $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"'
-          Set-Content -Path src-tauri/tauri.conf.json -Value $newContent
+          Set-Content -Path apps/@sparrow-desktop/src-tauri/tauri.conf.json -Value $newContent
         shell: pwsh
 
       - name: Build Tauri App
@@ -74,18 +74,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
       - name: msi sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.sig
+        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.sig
 
       - name: nsis sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis\*.sig
+        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig
 
       - name: sign msi
         run: |
           $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
           $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
           $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
-          Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
-          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.msi"
+          Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
 
       - name: Install AWS CLI
         uses: chrislennon/action-aws-cli@v1.1
@@ -96,8 +96,8 @@ jobs:
 
       - name: Upload files to S3
         run: |
-          aws s3 sync D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-prod --exclude "*" --include "*.zip" --include "*.msi"
-          aws s3 sync D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis s3://sparrow-release-assests-prod --exclude "*" --include "*.exe"
+          aws s3 sync D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-prod --exclude "*" --include "*.zip" --include "*.msi"
+          aws s3 sync D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis s3://sparrow-release-assests-prod --exclude "*" --include "*.exe"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -124,9 +124,9 @@ jobs:
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
-          content=$(<src-tauri/tauri.conf.json)
+          content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
           newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
-          echo "$newContent" > src-tauri/tauri.conf.json
+          echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
         shell: bash
 
       - name: Build Tauri App
@@ -145,7 +145,7 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       - name: dmg sig
-        run: cat /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/*.sig
+        run: cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.sig
 
       - name: Install AWS CLI
         run: |
@@ -154,7 +154,7 @@ jobs:
           aws --version
       - name: Upload & File to S3
         run: |
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*.gz"
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*.gz"
 
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

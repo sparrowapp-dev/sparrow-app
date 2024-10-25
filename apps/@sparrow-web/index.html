@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/src/icons/sparrow-favicon.svg"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Sparrow App</title>
+
+    <link rel="stylesheet" href="./src/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <style>
+      /* Style for the loader */
+      body {
+        background-color: rgb(16, 16, 16);
+      }
+      #init-loader {
+        position: fixed;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s ease;
+      }
+
+      /* Style to hide loader when the page is fully loaded */
+      .loaded #init-loader {
+        display: none;
+      }
+      .load-spin {
+        animation: loader-animation 1s linear infinite;
+      }
+      @keyframes loader-animation {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+    <script>
+      // Hide the loader after the window is fully loaded
+      window.addEventListener("load", function () {
+        document.body.classList.add("loaded");
+      });
+    </script>
+    <div id="init-loader">
+      <div style="color: white; display: flex; align-items: center">
+        <img
+          class="load-spin"
+          src="/src/icons/spin.svg"
+          style="width: 20px; height: 20px"
+          alt="spinner"
+        />
+        <p style="margin: 0 8px">Sparrow Web Loading...</p>
+      </div>
+    </div>
+  </body>
+</html>

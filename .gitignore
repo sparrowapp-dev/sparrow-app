@@ -9,6 +9,16 @@ lerna-debug.log*
 
 node_modules
 dist
+build
+
+/packages/*/node_modules
+/packages/*/dist
+/packages/*/build
+
+/apps/*/node_modules
+/apps/*/dist
+/apps/*/build
+
 dist-ssr
 *.local
 
@@ -23,8 +33,12 @@ dist-ssr
 *.sln
 *.sw?
 
+/src-tauri
+
 # env
 .env
+/packages/*/.env
+/apps/*/.env
 
 #vite
 vite.config.ts.timestamp*
