@@ -3,7 +3,7 @@
   import { scale } from "svelte/transition";
   import { quintOut, backInOut } from "svelte/easing";
 
-  export let isBackgroundClickable=true;
+  export let isBackgroundClickable = true;
 
   /**
    * Button ID
@@ -41,7 +41,7 @@
     top: 0,
     left: 0,
   };
-
+  
   onMount(() => {
     /**
      * click event to close the dropdown menu if click anywhere if menu is open
@@ -55,9 +55,9 @@
             dropdownElement &&
             !dropdownElement.contains(event.target as Node)
           ) {
-           if(isBackgroundClickable){
-            isMenuOpen = false;
-           }
+            if (isBackgroundClickable) {
+              isMenuOpen = false;
+            }
           }
         },
         100,
@@ -66,12 +66,10 @@
   });
 
   afterUpdate(() => {
-    /**
-     * calculate the position of the menu container
-     */
     const dropdownElement = document.getElementById(buttonId);
     let position = dropdownElement.getBoundingClientRect();
     menuPosition.top = position.bottom + 10;
+
     if (horizontalPosition === "right") {
       menuPosition.left = position.left;
     } else {
@@ -81,12 +79,12 @@
 </script>
 
 <div class="position-relative" style="font-size: 12px;">
-  <!-- 
+  <!--
     the button to open the menu container
   -->
   <slot />
 
-  <!-- 
+  <!--
     the menu container
   -->
   {#if isMenuOpen}
@@ -97,7 +95,7 @@
       "
       style="min-width: {minWidth}px; top: {menuPosition.top}px; left: {menuPosition.left}px; z-index: 9999;"
     >
-      <!-- 
+      <!--
       Menu item
     -->
       {#each options as item}

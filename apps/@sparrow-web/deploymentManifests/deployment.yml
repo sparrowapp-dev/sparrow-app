@@ -34,6 +34,7 @@ spec:
             limits:
               cpu: 500m
               memory: 700Mi
+
           # livenessProbe:
           #   tcpSocket:
           #     port: 1422
