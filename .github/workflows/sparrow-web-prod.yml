@@ -1,13 +1,13 @@
-name: Sparrow-web-dev
+name: Sparrow-web-prod
 on:
   push:
     branches:
-      - development
+      - main
 
 jobs:
    build:
       runs-on: ubuntu-latest
-      environment: sparrow_web_Dev
+      environment: sparrow_web_Prod
       steps:
          - uses: actions/checkout@master
 
@@ -59,6 +59,6 @@ jobs:
          - uses: Azure/k8s-deploy@v4
            with:
               action: deploy
-              namespace: sparrow-dev
+              namespace: sparrow-prod
               manifests: |
                  ./apps/@sparrow-web/deploymentManifests/deployment.yml

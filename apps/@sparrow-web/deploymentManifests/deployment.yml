@@ -22,7 +22,7 @@ spec:
         app: sparrow-web
     spec:
       containers:
-        - image: sparrowprod.azurecr.io/sparrow-web-dev:_BUILD__ID_
+        - image: sparrowprod.azurecr.io/sparrow-web:_BUILD__ID_
           name: sparrow-web
           imagePullPolicy: Always
           ports:
