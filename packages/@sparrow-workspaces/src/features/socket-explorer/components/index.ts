@@ -11,3 +11,5 @@ export { default as SocketMessage } from "./request-body/SocketMessage.svelte";
 export { default as ResposneData } from "./response-data/ResponseData.svelte";
 export { default as ResponsePreview } from "./response-preview/ResponsePreview.svelte";
 export { default as ResponsePreviewNavigator } from "./response-preview-navigator/ResponsePreviewNavigator.svelte";
+export { default as SocketEvents } from "./socket-events/SocketEvents.svelte";
+export { default as SocketEventList } from "./event-list/SocketEventList.svelte";

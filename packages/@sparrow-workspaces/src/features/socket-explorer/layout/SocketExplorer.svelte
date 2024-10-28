@@ -33,6 +33,7 @@
   } from "../components";
   import { SocketSectionEnum } from "@sparrow/common/types/workspace/web-socket";
   import ResponseData from "../components/response-data/ResponseData.svelte";
+    import SocketEvents from "../components/socket-events/SocketEvents.svelte";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -140,7 +141,7 @@
                     {webSocket}
                   />
                 {:else if $tab.property.websocket?.state?.socketNavigation === SocketSectionEnum.PARAMETERS}
-                  <SocketParameters
+                  <!-- <SocketParameters
                     isBulkEditActive={$tab?.property?.websocket.state
                       ?.isParameterBulkEditActive}
                     {onUpdateRequestState}
@@ -148,7 +149,8 @@
                     {onUpdateRequestParams}
                     {onUpdateEnvironment}
                     {environmentVariables}
-                  />
+                  /> -->
+                  <SocketEvents/>
                 {:else if $tab.property.websocket?.state?.socketNavigation === SocketSectionEnum.HEADERS}
                   <SocketHeaders
                     isBulkEditActive={$tab?.property?.websocket.state
