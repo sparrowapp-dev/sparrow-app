@@ -1,4 +1,4 @@
-import { TabTypeEnum } from "@sparrow/common/types/workspace";
+import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
 
 class InitEnvironmentTab {

@@ -1,6 +1,6 @@
-export interface MakeRequestResponse {
+export interface MakeRequestResponse<T> {
   status: "success" | "error";
   isSuccessful: boolean;
   message: string;
-  data: any;
+  data: T;
 }

@@ -10,13 +10,12 @@ import {
   ResponseSectionEnum,
   type Auth,
   type Body,
-  type Path,
   type KeyValueChecked,
   type RequestTab,
-  TabTypeEnum,
   FormDataTypeEnum,
   type StatePartial,
 } from "@sparrow/common/types/workspace";
+import { TabTypeEnum, type Path } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
 
 class InitRequestTab {

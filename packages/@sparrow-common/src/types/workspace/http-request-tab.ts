@@ -1,19 +1,3 @@
-import type {
-  ActiveSyncWrapper,
-  DescriptionWrapper,
-  IdWrapper,
-  IndexWrapper,
-  IsActiveWrapper,
-  IsDeletedWrapper,
-  IsSavedWrapper,
-  NameWrapper,
-  PathWrapper,
-  SourceWrapper,
-  TabIdWrapper,
-  TimestampWrapper,
-  TypeWrapper,
-} from "./common";
-
 export enum AuthTypeEnum {
   NO_AUTH = "No Auth",
   API_KEY = "API Key",
@@ -397,22 +381,3 @@ export interface Request
     UrlWrapper,
     AiWrapper,
     HeadersWrapper {}
-
-export interface RequestTab
-  extends ActiveSyncWrapper,
-    DescriptionWrapper,
-    IdWrapper,
-    IndexWrapper,
-    IsActiveWrapper,
-    IsDeletedWrapper,
-    IsSavedWrapper,
-    NameWrapper,
-    PathWrapper,
-    SourceWrapper,
-    TabIdWrapper,
-    TimestampWrapper,
-    TypeWrapper {
-  property: {
-    request: Request;
-  };
-}

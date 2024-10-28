@@ -72,7 +72,7 @@
 
   export let searchData: string = "";
 
-  export let isExpandCollection;
+  export let isExpandCollection: boolean;
 
   export let toggleExpandCollection;
 

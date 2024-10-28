@@ -10,7 +10,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { DashboardViewModel } from "@app/pages/Dashboard/Dashboard.ViewModel";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
-import type { MakeRequestResponse } from "@app/types/http-client";
+import type { HttpClientResponseInterface as MakeRequestResponse } from "@sparrow/common/http-client/client";
 import { listen } from "@tauri-apps/api/event";
 import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
 import { v4 as uuidv4 } from "uuid";

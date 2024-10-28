@@ -9,7 +9,6 @@
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
 
   // ---- Components
-  import Request from "../request/Request.svelte";
   import { Spinner } from "@sparrow/library/ui";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
@@ -43,7 +42,7 @@
   import type { CollectionDocument } from "@app/database/database";
   // import { of } from "rxjs";
   import { isGuestUserActive } from "@app/store/auth.store";
-  import { WebSocket } from "..";
+  import { SocketIO, WebSocket, Request } from "..";
 
   /**
    * Callback for Item created
@@ -321,6 +320,22 @@
         },
         {
           onClick: () => {
+            onItemCreated("socketioFolder", {
+              workspaceId: collection.workspaceId,
+              collection,
+              folder: explorer,
+            });
+          },
+          displayText: "Add Socket.IO",
+          disabled: false,
+          hidden:
+            !collection.activeSync ||
+            (explorer?.source === "USER" && collection.activeSync)
+              ? false
+              : true,
+        },
+        {
+          onClick: () => {
             isFolderPopup = true;
           },
           displayText: "Delete",
@@ -462,7 +477,7 @@
               class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
                 ? 'threedot-active'
                 : ''}"
-                style="transform: rotate(90deg);"
+              style="transform: rotate(90deg);"
               on:click={(e) => {
                 rightClickContextMenu(e);
               }}
@@ -541,6 +556,20 @@
     {:else if explorer.type === ItemType.WEB_SOCKET}
       <div style="cursor:pointer;">
         <WebSocket
+          bind:userRole
+          api={explorer}
+          {onItemRenamed}
+          {onItemDeleted}
+          {onItemOpened}
+          {folder}
+          {collection}
+          {activeTabId}
+          {activeTabPath}
+        />
+      </div>
+    {:else if explorer.type === ItemType.SOCKET_IO}
+      <div style="cursor:pointer;">
+        <SocketIO
           bind:userRole
           api={explorer}
           {onItemRenamed}

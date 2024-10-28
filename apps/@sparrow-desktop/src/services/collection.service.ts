@@ -355,4 +355,47 @@ export class CollectionService {
     });
     return response;
   };
+
+  public addSocketIoInCollection = async (_socketIo) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/collection/socketio`,
+      {
+        body: _socketIo,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateSocketIoInCollection = async (
+    _socketIoId: string,
+    _socketIo,
+  ) => {
+    const response = await makeRequest(
+      "PUT",
+      `${this.apiUrl}/api/collection/socketio/${_socketIoId}`,
+      {
+        body: _socketIo,
+        headers: getAuthHeaders(),
+      },
+    );
+
+    return response;
+  };
+
+  public deleteSocketIoInCollection = async (
+    _socketIoId: string,
+    _socketIo,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${this.apiUrl}/api/collection/socketio/${_socketIoId}`,
+      {
+        body: _socketIo,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

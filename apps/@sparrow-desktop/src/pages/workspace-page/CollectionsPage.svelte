@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Route } from "svelte-navigator";
   import { Pane, Splitpanes } from "svelte-splitpanes";
-  import { userValidationStore } from '@app/store/deviceSync.store';
+  import { userValidationStore } from "@app/store/deviceSync.store";
 
   // ---- Store
   import {
@@ -58,11 +58,8 @@
   import { pagesMotion } from "../../constants";
   import { user } from "@app/store/auth.store";
   import WebSocketExplorerPage from "./sub-pages/WebSocketExplorerPage/WebSocketExplorerPage.svelte";
-  import {
-    TabTypeEnum,
-    type RequestTab,
-    type Tab,
-  } from "@sparrow/common/types/workspace";
+  import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+  import { type Tab } from "@sparrow/common/types/workspace/tab";
   import type { WebSocketTab } from "@sparrow/common/types/workspace/web-socket";
   import EnvironmentExplorerPage from "./sub-pages/EnvironmentExplorer/EnvironmentExplorerPage.svelte";
   import TestFlowExplorerPage from "./sub-pages/TestflowExplorerPage/TestflowExplorerPage.svelte";
@@ -72,6 +69,7 @@
   import { isUserFirstSignUp } from "@app/store/user.store";
   import { WelcomeLogo } from "@sparrow/common/images";
   import { WelcomePopup } from "@sparrow/workspaces/features";
+  import SocketIoExplorerPage from "./sub-pages/SocketIoExplorerPage/SocketIoExplorerPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -298,11 +296,11 @@
   let count = 0;
 
   let isAccessDeniedModalOpen = false;
-  
+
   // Add userValidation state
   let userValidation = {
     isValid: true,
-    checked: false
+    checked: false,
   };
   const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
@@ -335,17 +333,18 @@
               value?._id,
               totalTabsToBeDeleted,
             );
-            const userHasAccess = value.users?.some(user => user.id === userId);
+            const userHasAccess = value.users?.some(
+              (user) => user.id === userId,
+            );
           },
-  
         );
 
-        userValidationStore.subscribe(validation => {
-         if (!validation.isValid) {
-         isAccessDeniedModalOpen = true;
-         isWelcomePopupOpen = false; 
-         }
-      });
+        userValidationStore.subscribe((validation) => {
+          if (!validation.isValid) {
+            isAccessDeniedModalOpen = true;
+            isWelcomePopupOpen = false;
+          }
+        });
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
       }
@@ -364,8 +363,6 @@
       });
     }
   });
-
-
 
   const handleAccessDeniedClose = () => {
     isAccessDeniedModalOpen = false;
@@ -521,6 +518,12 @@
                       <TestFlowExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
+                {:else if $activeTab?.type === ItemType.SOCKET_IO}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <SocketIoExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
                 {:else if !$tabList?.length}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
@@ -591,7 +594,8 @@
   >
     <div class="py-4">
       <p class=" mb-4">
-        You don't seem to have access to this resourse. Please check if you are using the right account.
+        You don't seem to have access to this resourse. Please check if you are
+        using the right account.
       </p>
     </div>
   </Modal>

@@ -13,8 +13,14 @@
   // ----
 
   // ---- Interface
-  import { SocketIcon, StackIcon, TreeIcon } from "@sparrow/library/icons";
-  import { TabTypeEnum, type Tab } from "@sparrow/common/types/workspace";
+  import {
+    SocketIcon,
+    SocketIoIcon,
+    StackIcon,
+    TreeIcon,
+  } from "@sparrow/library/icons";
+  import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+  import { type Tab } from "@sparrow/common/types/workspace/tab";
   // ----
 
   // ------ Props ------
@@ -140,6 +146,14 @@
             height={"14px"}
             width={"14px"}
             color={"var(--icon-secondary-130)"}
+          />
+        </span>
+      {:else if tab.type === TabTypeEnum.SOCKET_IO}
+        <span>
+          <SocketIoIcon
+            height={"14px"}
+            width={"14px"}
+            color={"var(--icon-primary-300)"}
           />
         </span>
       {/if}

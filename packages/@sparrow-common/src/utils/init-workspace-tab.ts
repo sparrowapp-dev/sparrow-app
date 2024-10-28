@@ -1,12 +1,9 @@
 import { v4 as uuidv4 } from "uuid";
-import {
-  TabTypeEnum,
-  type WorkspaceTab,
-  type Path,
-} from "@sparrow/common/types/workspace";
+import { TabTypeEnum, type Path } from "@sparrow/common/types/workspace/tab";
+import type { Tab } from "../types/workspace/tab";
 
 class InitWorkspaceTab {
-  private _tab: WorkspaceTab;
+  private _tab: Tab;
   /**
    *
    * @param _id - Workspace mongo id

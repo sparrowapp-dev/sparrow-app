@@ -7,6 +7,7 @@ export enum ItemType {
   WEB_SOCKET = "WEBSOCKET",
   ENVIRONMENT = "ENVIRONMENT",
   TESTFLOW = "TESTFLOW",
+  SOCKET_IO = "SOCKETIO",
 }
 
 export enum UntrackedItems {
