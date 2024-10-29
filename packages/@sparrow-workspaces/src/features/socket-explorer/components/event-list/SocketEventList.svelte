@@ -1,6 +1,7 @@
 <script lang="ts">
   import { trashIcon } from "@sparrow/library/assets";
   import { Input, Switch } from "@sparrow/library/forms";
+  import { Tooltip } from "@sparrow/library/ui";
 
   // Initialize with one empty entry with a unique ID
   let events = [{ id: 1, inputValue: "", checked: false }];
@@ -62,7 +63,7 @@
             height={"20px"}
             class="text-fs-12 me-5 bg-secondary-600"
             style="outline:none; background-color:transparent;"
-            placeholder="Host"
+            placeholder="Name"
             defaultBorderColor="transparent"
             hoveredBorderColor={"var(--border-primary-300)"}
             focusedBorderColor={"var(--border-primary-300)"}
@@ -78,12 +79,24 @@
       </div>
 
       {#if index !== events.length - 1}
-        <div on:click={() => deleteEntry(index)}>
-          <img class="trash-icon" src={trashIcon} alt="" />
-        </div>
+        <Tooltip title={"Delete"} placement={"bottom-left"} distance={10}>
+          <button
+            class="bg-secondary-700 d-flex justify-content-center align-items-center border-0"
+            style="width: 24px; height:16px; padding-end"
+            on:click={() => deleteEntry(index)}
+          >
+            <img class="trash-icon" src={trashIcon} alt="" />
+          </button>
+        </Tooltip>
       {:else}
         <div style="width: 16px;"></div>
       {/if}
     </div>
   {/each}
 </div>
+
+<style>
+  .trash-icon:hover {
+    background-color: var(--bg-secondary-500);
+  }
+</style>
