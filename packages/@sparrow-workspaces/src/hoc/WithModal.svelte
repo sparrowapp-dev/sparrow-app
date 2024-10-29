@@ -15,7 +15,7 @@
 <Modal
   title={"Save Changes?"}
   type={"dark"}
-  width={"500px"}
+  width={"38%"}
   zIndex={1000}
   {isOpen}
   handleModalState={onModalStateChanged}
