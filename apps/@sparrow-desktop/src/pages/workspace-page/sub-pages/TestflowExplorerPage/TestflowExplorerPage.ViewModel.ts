@@ -19,11 +19,11 @@ import { TestflowRepository } from "../../../../repositories/testflow.repository
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { TestflowService } from "../../../../services/testflow.service";
 import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
-import {type Tab} from "@sparrow/common/types/workspace/tab"
+import { type Tab } from "@sparrow/common/types/workspace/tab";
 import type {
   ENVDocumentType,
   ENVExtractVariableType,
-} from "../../../../../../../packages/@sparrow-common/src/types/workspace/environment-tab";
+} from "@sparrow/common/types/workspace/environment";
 import type {
   TFAPIResponseType,
   TFDataStoreType,
@@ -32,7 +32,7 @@ import type {
   TFHistoryStoreType,
   TFKeyValueStoreType,
   TFNodeType,
-} from "../../../../../../../packages/@sparrow-common/src/types/workspace/testflow-tab";
+} from "@sparrow/common/types/workspace/testflow";
 import { CompareArray, Debounce, ParseTime } from "@sparrow/common/utils";
 import { notifications } from "@sparrow/library/ui";
 import { DecodeRequest } from "@sparrow/workspaces/features/rest-explorer/utils";
