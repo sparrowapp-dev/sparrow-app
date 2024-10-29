@@ -86,7 +86,14 @@ const websocketItems = {
     properties: params,
   },
 };
-
+const socketIoEvents = {
+  event: {
+    type: "string",
+  },
+  listen: {
+    type: "boolean",
+  },
+};
 const socketioItems = {
   url: {
     type: "string",
@@ -94,7 +101,7 @@ const socketioItems = {
   message: {
     type: "string",
   },
-  selectedWebSocketBodyType: {
+  selectedSocketIOBodyType: {
     type: "string",
   },
   queryParams: {
@@ -104,6 +111,10 @@ const socketioItems = {
   headers: {
     type: "array",
     properties: params,
+  },
+  events: {
+    type: "array",
+    properties: socketIoEvents,
   },
 };
 

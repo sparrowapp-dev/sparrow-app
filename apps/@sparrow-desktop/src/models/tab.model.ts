@@ -504,22 +504,33 @@ export const tabSchemaLiteral = {
             message: {
               type: "string",
             },
+            events: {
+              type: "array",
+              properties: {
+                event: {
+                  type: "string",
+                },
+                listen: {
+                  type: "boolean",
+                },
+              },
+            },
             state: {
               type: "object",
               properties: {
-                socketNavigation: {
+                requestNavigation: {
                   type: "string",
                 },
-                socketMessageLanguage: {
+                messageLanguage: {
                   type: "string",
                 },
-                socketLeftSplitterWidthPercentage: {
+                leftSplitterWidthPercentage: {
                   type: "string",
                 },
-                socketRightSplitterWidthPercentage: {
+                rightSplitterWidthPercentage: {
                   type: "string",
                 },
-                isSaveSocketInProgress: {
+                isSaveInProgress: {
                   type: "string",
                 },
                 isParameterBulkEditActive: {
