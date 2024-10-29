@@ -10,7 +10,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { DashboardViewModel } from "@app/pages/dashboard-page/Dashboard.ViewModel";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
-import type { MakeRequestResponse } from "@app/types/http-client";
+import type { HttpClientResponseInterface } from "@app/types/http-client";
 import { listen } from "@tauri-apps/api/event";
 import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
 import { v4 as uuidv4 } from "uuid";
@@ -23,7 +23,7 @@ const error = (
   error: string,
   data?: any,
   tabId: string = "",
-): MakeRequestResponse<any> => {
+): HttpClientResponseInterface<any> => {
   return {
     status: "error",
     isSuccessful: false,
@@ -32,7 +32,7 @@ const error = (
   };
 };
 
-const success = (data: any): MakeRequestResponse<any> => {
+const success = (data: any): HttpClientResponseInterface<any> => {
   return {
     status: "success",
     isSuccessful: true,
@@ -90,7 +90,7 @@ const makeRequest = async (
   url: string,
   requestData?: RequestData,
   includeAxiosData?: boolean,
-): Promise<MakeRequestResponse<any>> => {
+): Promise<HttpClientResponseInterface<any>> => {
   const startTime = performance.now();
   try {
     const response = await axios({

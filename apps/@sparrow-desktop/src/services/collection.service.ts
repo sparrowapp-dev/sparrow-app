@@ -11,6 +11,19 @@ import type {
 } from "@sparrow/common/dto";
 import { ContentTypeEnum } from "@sparrow/common/enums/request.enum";
 import { createApiRequest } from "./rest-api.service";
+import type {
+  HttpClientBackendResponseInterface,
+  HttpClientResponseInterface,
+} from "@app/types/http-client";
+import type {
+  CollectionDtoInterface,
+  CollectionItemDtoInterface,
+} from "@sparrow/common/types/workspace/collection-dto";
+import type {
+  SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
+  SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
+  SocketIORequestDeletePayloadDtoInterface,
+} from "@sparrow/common/types/workspace/socket-io-request-dto";
 
 export class CollectionService {
   constructor() {}
@@ -356,7 +369,15 @@ export class CollectionService {
     return response;
   };
 
-  public addSocketIoInCollection = async (_socketIo) => {
+  public addSocketIoInCollection = async (
+    _socketIo:
+      | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
+      | SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionItemDtoInterface>
+    >
+  > => {
     const response = await makeRequest(
       "POST",
       `${this.apiUrl}/api/collection/socketio`,
@@ -370,8 +391,14 @@ export class CollectionService {
 
   public updateSocketIoInCollection = async (
     _socketIoId: string,
-    _socketIo,
-  ) => {
+    _socketIo:
+      | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
+      | SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionItemDtoInterface>
+    >
+  > => {
     const response = await makeRequest(
       "PUT",
       `${this.apiUrl}/api/collection/socketio/${_socketIoId}`,
@@ -380,14 +407,17 @@ export class CollectionService {
         headers: getAuthHeaders(),
       },
     );
-
     return response;
   };
 
   public deleteSocketIoInCollection = async (
     _socketIoId: string,
-    _socketIo,
-  ) => {
+    _socketIo: SocketIORequestDeletePayloadDtoInterface,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionDtoInterface>
+    >
+  > => {
     const response = await makeRequest(
       "DELETE",
       `${this.apiUrl}/api/collection/socketio/${_socketIoId}`,

@@ -6,7 +6,7 @@ import type {
   addUsersInWorkspacePayload,
 } from "@sparrow/common/dto";
 import type { WorkspaceRole } from "@sparrow/common/enums";
-import type { MakeRequestResponse } from "@app/types/http-client";
+import type { HttpClientResponseInterface } from "@app/types/http-client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const apiUrl: string = constants.API_URL;
 
@@ -50,8 +50,8 @@ export class WorkspaceService {
 
   public deleteWorkspace = async (
     workspaceId: string,
-  ): Promise<MakeRequestResponse> => {
-    const response: MakeRequestResponse = await makeRequest(
+  ): Promise<HttpClientResponseInterface> => {
+    const response: HttpClientResponseInterface = await makeRequest(
       "DELETE",
       `${apiUrl}/api/workspace/${workspaceId}`,
       {
@@ -101,8 +101,8 @@ export class WorkspaceService {
     workspaceId: string,
     userId: string,
     role: WorkspaceRole,
-  ): Promise<MakeRequestResponse> => {
-    const response: MakeRequestResponse = await makeRequest(
+  ): Promise<HttpClientResponseInterface> => {
+    const response: HttpClientResponseInterface = await makeRequest(
       "PUT",
       `${apiUrl}/api/workspace/${workspaceId}/user/${userId}`,
       {
@@ -116,8 +116,8 @@ export class WorkspaceService {
   public removeUserFromWorkspace = async (
     workspaceId: string,
     userId: string,
-  ): Promise<MakeRequestResponse> => {
-    const response: MakeRequestResponse = await makeRequest(
+  ): Promise<HttpClientResponseInterface> => {
+    const response: HttpClientResponseInterface = await makeRequest(
       "DELETE",
       `${apiUrl}/api/workspace/${workspaceId}/user/${userId}`,
       {

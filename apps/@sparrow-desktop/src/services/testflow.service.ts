@@ -1,19 +1,12 @@
 import { getAuthHeaders, makeRequest } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
-import type { MakeRequestResponse } from "@app/types/http-client";
 
-interface BackendResponse<T> {
-  data: T;
-  message: string;
-}
 export class TestflowService {
   constructor() {}
 
   private apiUrl: string = constants.API_URL;
 
-  public fetchAllTestflow = async (
-    workspaceId: string,
-  ): Promise<MakeRequestResponse<BackendResponse<any>>> => {
+  public fetchAllTestflow = async (workspaceId: string) => {
     const response = await makeRequest(
       "GET",
       `${this.apiUrl}/api/workspace/${workspaceId}/testflow`,
