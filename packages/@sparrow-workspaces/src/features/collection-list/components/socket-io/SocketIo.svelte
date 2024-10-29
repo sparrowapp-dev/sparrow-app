@@ -1,30 +1,23 @@
 <script lang="ts">
   // ---- Components
-  import { Spinner } from "@sparrow/library/ui";
-  import { Modal } from "@sparrow/library/ui";
-  import { Button } from "@sparrow/library/ui";
-  import { Tooltip } from "@sparrow/library/ui";
-  import { Options } from "@sparrow/library/ui";
+  import {
+    Spinner,
+    Modal,
+    Button,
+    Tooltip,
+    Options,
+  } from "@sparrow/library/ui";
 
-  // ---- Helper functions
-  import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
-  import { getPathFromUrl } from "@sparrow/common/utils/common.helper";
-
-  // ---- Enum and Interfaces
-  import type {
-    Request,
-    Folder,
-    Path,
-  } from "@sparrow/common/interfaces/request.interface";
-  import { UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
-
-  // --- SVG
+  // --- Icons
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
+  import { SocketIoIcon } from "@sparrow/library/icons";
 
-  // ---- DB
-  import type { CollectionDocument } from "@app/database/database";
-  import { isGuestUserActive } from "@app/store/auth.store";
-  import { SocketIcon, SocketIoIcon } from "@sparrow/library/icons";
+  // --- Types
+  import {
+    type CollectionBaseInterface,
+    type CollectionItemBaseInterface,
+  } from "@sparrow/common/types/workspace/collection-base";
+  import { UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
 
   /**
    * Callback for Item Deleted
@@ -47,15 +40,15 @@
   /**
    * Whole Collection Document
    */
-  export let collection: CollectionDocument;
+  export let collection: CollectionBaseInterface;
   /**
    * Selected folder details
    */
-  export let folder: Folder;
+  export let folder: CollectionItemBaseInterface;
   /**
-   * Selected API details
+   * Selected socketIo details
    */
-  export let api: Request;
+  export let socketIo: CollectionItemBaseInterface;
   /**
    * Current Tab Path
    */
@@ -73,11 +66,6 @@
   let isRenaming = false;
   let deleteLoader: boolean = false;
 
-  let isGuestUser;
-  isGuestUserActive.subscribe((value) => {
-    isGuestUser = value;
-  });
-
   let requestTabWrapper: HTMLElement;
 
   function rightClickContextMenu(e: Event) {
@@ -88,7 +76,7 @@
 
   function handleSelectClick(event: MouseEvent) {
     const selectElement = document.getElementById(
-      `show-more-websocket-${api.id}`,
+      `show-more-socket-io-${socketIo.id}`,
     );
     if (selectElement && !selectElement.contains(event.target as Node)) {
       showMenu = false;
@@ -97,8 +85,9 @@
 
   let newRequestName: string = "";
 
-  const handleRenameInput = (event) => {
-    newRequestName = event.target.value.trim();
+  const handleRenameInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    newRequestName = target.value.trim();
   };
 
   const onRenameBlur = async () => {
@@ -107,7 +96,7 @@
         workspaceId: collection.workspaceId,
         collection,
         folder: folder ? folder : { id: "" },
-        socketio: api,
+        socketio: socketIo,
         newName: newRequestName,
       });
     }
@@ -115,10 +104,10 @@
     newRequestName = "";
   };
 
-  const onRenameInputKeyPress = (event) => {
+  const onRenameInputKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
-        "renameInputFieldFile",
+        "renameInputFieldSocketIo",
       ) as HTMLInputElement;
       inputField.blur();
     }
@@ -141,7 +130,7 @@
   <div class="text-lightGray mb-1 sparrow-fs-12">
     <p>
       Are you sure you want to delete this Socket.IO? <span
-        class="text-whiteColor fw-bold">"{api.name}"</span
+        class="text-whiteColor fw-bold">"{socketIo.name}"</span
       >
       will be removed and cannot be restored.
     </p>
@@ -174,7 +163,7 @@
         onItemDeleted("socket-io", {
           workspaceId: collection.workspaceId,
           collection,
-          socketio: api,
+          socketio: socketIo,
           folder,
         });
         deleteLoader = false;
@@ -199,7 +188,7 @@
             workspaceId: collection.workspaceId,
             collection,
             folder,
-            socketio: api,
+            socketio: socketIo,
           });
         },
         displayText: "Open Socket.IO",
@@ -215,7 +204,7 @@
         disabled: false,
         hidden:
           !collection.activeSync ||
-          (api.source === "USER" && collection.activeSync)
+          (socketIo.source === "USER" && collection.activeSync)
             ? false
             : true,
       },
@@ -227,8 +216,8 @@
         disabled: false,
         hidden:
           !collection.activeSync ||
-          (api.source === "USER" && collection.activeSync) ||
-          api.isDeleted
+          (socketIo.source === "USER" && collection.activeSync) ||
+          socketIo.isDeleted
             ? false
             : true,
       },
@@ -239,7 +228,7 @@
 
 <div
   bind:this={requestTabWrapper}
-  class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {api.id ===
+  class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {socketIo.id ===
   activeTabId
     ? 'active-request-tab'
     : ''} "
@@ -253,12 +242,12 @@
           workspaceId: collection.workspaceId,
           collection,
           folder,
-          socketio: api,
+          socketio: socketIo,
         });
       }
     }}
     style={folder?.id ? "padding-left: 46px;" : "padding-left: 30px;"}
-    class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
+    class="main-file d-flex align-items-center position-relative bg-transparent border-0 {socketIo.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
@@ -274,12 +263,12 @@
 
     {#if isRenaming}
       <input
-        class="py-0 renameInputFieldFile"
+        class="py-0 rename-input-field-socket-io"
         style="font-size: 12px; width: calc(100% - 50px);"
-        id="renameInputFieldFile"
+        id="renameInputFieldSocketIo"
         type="text"
         maxlength={100}
-        value={api.name}
+        value={socketIo.name}
         on:click|stopPropagation={() => {}}
         bind:this={inputField}
         on:input={handleRenameInput}
@@ -288,15 +277,16 @@
       />
     {:else}
       <div
-        class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'} ps-2"
+        class="api-name ellipsis {socketIo?.isDeleted &&
+          'api-name-deleted'} ps-2"
         style="font-size: 12px;"
       >
-        {api.name}
+        {socketIo.name}
       </div>
     {/if}
   </button>
 
-  {#if api.id?.includes(UntrackedItems.UNTRACKED) && !isGuestUser}
+  {#if socketIo.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
     <Tooltip
@@ -307,7 +297,7 @@
       distance={17}
     >
       <button
-        id={`show-more-websocket-${api.id}`}
+        id={`show-more-socket-io-${socketIo.id}`}
         class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
           ? 'threedot-active'
           : ''}"
@@ -430,14 +420,14 @@
   .unclickable {
     pointer-events: none;
   }
-  .renameInputFieldFile {
+  .rename-input-field-socket-io {
     border: none;
     background-color: transparent;
     color: var(--white-color);
     padding-left: 0;
     outline: none;
   }
-  .renameInputFieldFile:focus {
+  .rename-input-field-socket-io:focus {
     border: 1px solid var(--border-primary-300) !important;
   }
   .main-file {

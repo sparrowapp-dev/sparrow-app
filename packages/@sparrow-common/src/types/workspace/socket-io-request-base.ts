@@ -1,13 +1,13 @@
-interface SocketioRequestKeyValueCheckedBaseInterface {
+interface SocketIORequestKeyValueCheckedBaseInterface {
   key: string;
   value: string;
   checked: boolean;
 }
 
-export interface SocketioRequestBaseInterface {
+export interface SocketIORequestBaseInterface {
   url: string;
   message: string;
-  queryParams: SocketioRequestKeyValueCheckedBaseInterface[];
-  headers: SocketioRequestKeyValueCheckedBaseInterface[];
+  queryParams: SocketIORequestKeyValueCheckedBaseInterface[];
+  headers: SocketIORequestKeyValueCheckedBaseInterface[];
   selectedWebSocketBodyType: string;
 }

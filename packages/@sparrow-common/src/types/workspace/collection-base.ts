@@ -1,5 +1,6 @@
+import type { FolderBaseInterface } from "./folder-base";
 import type { HttpRequestBaseInterface } from "./http-request-base";
-import type { SocketioRequestBaseInterface } from "./socket-io-request-base";
+import type { SocketIORequestBaseInterface } from "./socket-io-request-base";
 import type { WebsocketRequestBaseInterface } from "./websocket-request-base";
 
 export interface CollectionItemBaseInterface {
@@ -11,7 +12,8 @@ export interface CollectionItemBaseInterface {
   isDeleted: boolean;
   request?: HttpRequestBaseInterface;
   websocket?: WebsocketRequestBaseInterface;
-  socketio?: SocketioRequestBaseInterface;
+  socketio?: SocketIORequestBaseInterface;
+  folder?: FolderBaseInterface;
   createdAt: string;
   updatedAt: string;
   createdBy: string;
