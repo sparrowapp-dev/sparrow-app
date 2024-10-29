@@ -23,17 +23,16 @@ const error = (
   error: string,
   data?: any,
   tabId: string = "",
-): MakeRequestResponse => {
+): MakeRequestResponse<any> => {
   return {
     status: "error",
     isSuccessful: false,
     message: error,
     data,
-    tabId,
   };
 };
 
-const success = (data: any): MakeRequestResponse => {
+const success = (data: any): MakeRequestResponse<any> => {
   return {
     status: "success",
     isSuccessful: true,
@@ -91,7 +90,7 @@ const makeRequest = async (
   url: string,
   requestData?: RequestData,
   includeAxiosData?: boolean,
-) => {
+): Promise<MakeRequestResponse<any>> => {
   const startTime = performance.now();
   try {
     const response = await axios({

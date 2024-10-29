@@ -1,19 +1,3 @@
-import type {
-  ActiveSyncWrapper,
-  DescriptionWrapper,
-  IdWrapper,
-  IndexWrapper,
-  IsActiveWrapper,
-  IsDeletedWrapper,
-  IsSavedWrapper,
-  NameWrapper,
-  PathWrapper,
-  SourceWrapper,
-  TabIdWrapper,
-  TimestampWrapper,
-  TypeWrapper,
-} from "./common";
-
 export enum AuthTypeEnum {
   NO_AUTH = "No Auth",
   API_KEY = "API Key",
@@ -173,22 +157,4 @@ export enum WebSocketDefault {
 
 export interface WebSocketWrapper {
   websocket: WebSocket;
-}
-export interface WebSocketTab
-  extends ActiveSyncWrapper,
-    DescriptionWrapper,
-    IdWrapper,
-    IndexWrapper,
-    IsActiveWrapper,
-    IsDeletedWrapper,
-    IsSavedWrapper,
-    NameWrapper,
-    PathWrapper,
-    SourceWrapper,
-    TabIdWrapper,
-    TimestampWrapper,
-    TypeWrapper {
-  property: {
-    websocket: WebSocket;
-  };
 }

@@ -18,7 +18,8 @@ import { TabRepository } from "../../../../repositories/tab.repository";
 import { TestflowRepository } from "../../../../repositories/testflow.repository";
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { TestflowService } from "../../../../services/testflow.service";
-import { RequestDataTypeEnum, type Tab } from "@sparrow/common/types/workspace";
+import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
+import { type Tab } from "@sparrow/common/types/workspace/tab";
 import type {
   ENVDocumentType,
   ENVExtractVariableType,

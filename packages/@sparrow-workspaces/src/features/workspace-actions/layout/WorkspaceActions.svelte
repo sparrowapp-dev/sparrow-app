@@ -21,6 +21,7 @@
     VectorIcon,
     BubbleIcon,
     StackIcon,
+    SocketIoIcon,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
@@ -284,6 +285,16 @@
           },
           isHoverConstant: false,
         },
+        {
+          name: "Add Socket.IO",
+          icon: SocketIoIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            onItemCreated("socket-io", {});
+            MixpanelEvent(Events.Add_WebSocket);
+          },
+        },
       ]
     : [
         {
@@ -343,6 +354,16 @@
             isExpandTestflow = true;
           },
           isHoverConstant: false,
+        },
+        {
+          name: "Add Socket.IO",
+          icon: SocketIoIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            onItemCreated("socket-io", {});
+            MixpanelEvent(Events.Add_WebSocket);
+          },
         },
       ];
 

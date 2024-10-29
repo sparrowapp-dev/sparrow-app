@@ -1,6 +1,6 @@
-export interface HttpCResponseType {
+export interface HttpClientResponseInterface<T> {
   status: "success" | "error";
   isSuccessful: boolean;
   message: string;
-  data: any;
+  data: T;
 }

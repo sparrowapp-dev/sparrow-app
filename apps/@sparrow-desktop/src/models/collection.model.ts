@@ -86,6 +86,38 @@ const websocketItems = {
     properties: params,
   },
 };
+const socketIoEvents = {
+  event: {
+    type: "string",
+  },
+  listen: {
+    type: "boolean",
+  },
+};
+const socketioItems = {
+  url: {
+    type: "string",
+  },
+  message: {
+    type: "string",
+  },
+  selectedSocketIOBodyType: {
+    type: "string",
+  },
+  queryParams: {
+    type: "array",
+    properties: params,
+  },
+  headers: {
+    type: "array",
+    properties: params,
+  },
+  events: {
+    type: "array",
+    properties: socketIoEvents,
+  },
+};
+
 const itemsProperties = {
   id: {
     type: "number",
@@ -112,6 +144,10 @@ const itemsProperties = {
   websocket: {
     type: "object",
     properties: websocketItems,
+  },
+  socketio: {
+    type: "object",
+    properties: socketioItems,
   },
   createdAt: {
     type: "date-time",
@@ -142,7 +178,7 @@ export const collectionSchemaLiteral = {
   title: "collection",
   primaryKey: "id",
   type: "object",
-  version: 7,
+  version: 8,
   properties: {
     collectionId: {
       type: "string",

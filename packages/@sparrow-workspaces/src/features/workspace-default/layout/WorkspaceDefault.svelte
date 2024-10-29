@@ -8,6 +8,7 @@
     StackIcon,
     TreeIcon,
     CollectionIcon,
+    SocketIoIcon,
   } from "@sparrow/library/icons";
 
   import SparrowLogo from "../../rest-explorer/assets/images/sparrow-logo.svelte";
@@ -69,6 +70,16 @@
       iconSize={"20px"}
       onClick={() => {
         onItemCreated("web-socket", {});
+        MixpanelEvent(Events.WebSocket_Button);
+      }}
+    />
+    <Card
+      icon={SocketIoIcon}
+      label="Socket.IO"
+      iconColor="var(--text-primary-300)"
+      iconSize={"18px"}
+      onClick={() => {
+        onItemCreated("socket-io", {});
         MixpanelEvent(Events.WebSocket_Button);
       }}
     />

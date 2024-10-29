@@ -44,6 +44,7 @@
     FolderPlusIcon,
     RequestIcon,
     SocketIcon,
+    SocketIoIcon,
   } from "@sparrow/library/icons";
   import { Options } from "@sparrow/library/ui";
   import { isGuestUserActive } from "@app/store/auth.store";
@@ -374,6 +375,18 @@
         hidden: false,
         icon: SocketIcon,
       },
+      {
+        onClick: () => {
+          onItemCreated("socketioCollection", {
+            workspaceId: collection.workspaceId,
+            collection,
+          });
+        },
+        displayText: "Add Socket.IO",
+        disabled: false,
+        hidden: false,
+        icon: SocketIcon,
+      },
     ]}
     {noOfColumns}
   />
@@ -625,6 +638,27 @@
                   height="12px"
                   width="16px"
                   color="var(--request-arc)"
+                />
+              </div>
+            </Tooltip>
+
+            <Tooltip title={"Add Socket.IO"} placement={"bottom"} distance={12}>
+              <div
+                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+                style="height: 24px; width: 24px;"
+                role="button"
+                on:click={() => {
+                  onItemCreated("socketioCollection", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                  });
+                  MixpanelEvent(Events.Collection_WebSocket);
+                }}
+              >
+                <SocketIoIcon
+                  height={"13px"}
+                  width={"13px"}
+                  color={"var(--request-arc)"}
                 />
               </div>
             </Tooltip>

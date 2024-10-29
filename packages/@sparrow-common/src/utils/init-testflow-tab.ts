@@ -1,9 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
-import {
-  TabTypeEnum,
-  type Path,
-  type Tab,
-} from "@sparrow/common/types/workspace";
+import { type Tab } from "@sparrow/common/types/workspace/tab";
+import { TabTypeEnum, type Path } from "@sparrow/common/types/workspace/tab";
 import {
   TFDefaultEnum,
   type TFTabEdgeType,
