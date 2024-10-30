@@ -1,13 +1,10 @@
 import { ContentTypeEnum } from "@sparrow/common/enums";
 import { createDeepCopy } from "@sparrow/common/utils";
-import {
-  RequestDataTypeEnum,
-  type CollectionItemsDto,
-  type Path,
-  type Tab,
-} from "@sparrow/common/types/workspace";
+import { type Path, type Tab } from "@sparrow/common/types/workspace/tab";
+import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
 import { SocketDataTypeEnum } from "@sparrow/common/types/workspace/web-socket";
 import { InitTab } from "@sparrow/common/factory";
+import type { CollectionItemBaseInterface } from "@sparrow/common/types/workspace/collection-base";
 
 /**
  * @class - this class makes request tab compatible with backend server
@@ -71,7 +68,7 @@ export class SocketIoTabAdapter {
     workspaceId: string,
     collectionId: string,
     folderId: string,
-    _socket: CollectionItemsDto,
+    _socket: CollectionItemBaseInterface,
   ): Tab {
     const socket = createDeepCopy(_socket);
     const path: Path = {
@@ -83,18 +80,18 @@ export class SocketIoTabAdapter {
       .socketIo(socket.id, workspaceId)
       .updateName(socket.name)
       .updateDescription(socket.description)
-      .updateUrl(socket.websocket?.url)
-      .updateQueryParams(socket.websocket?.queryParams)
-      .updateHeaders(socket.websocket?.headers)
-      .updateMessage(socket.websocket?.message)
+      .updateUrl(socket.socketio?.url)
+      .updateQueryParams(socket.socketio?.queryParams)
+      .updateHeaders(socket.socketio?.headers)
+      .updateMessage(socket.socketio?.message)
       .updatePath(path);
 
     // parsing message type
-    const selectedSocketBodyType = socket.websocket?.selectedWebSocketBodyType;
+    const selectedSocketBodyType = socket.socketio?.selectedSocketIOBodyType;
     if (selectedSocketBodyType) {
       const messageType = this.setMessageType(selectedSocketBodyType);
       adaptedSocket.updateState({
-        socketMessageLanguage: messageType,
+        messageLanguage: messageType,
       });
     }
 
@@ -108,14 +105,13 @@ export class SocketIoTabAdapter {
    */
   public unadapt(_tab: Partial<Tab>) {
     const socketTab = createDeepCopy(_tab);
-    const messageType =
-      socketTab.property.websocket.state.socketMessageLanguage;
+    const messageType = socketTab.property.socketio.state.messageLanguage;
     return {
-      url: socketTab.property.websocket?.url,
-      message: socketTab.property.websocket?.message,
-      headers: socketTab.property.websocket?.headers,
-      queryParams: socketTab.property.websocket?.queryParams,
-      selectedWebSocketBodyType: this.unsetMessageType(messageType),
+      url: socketTab.property.socketio?.url,
+      message: socketTab.property.socketio?.message,
+      headers: socketTab.property.socketio?.headers,
+      queryParams: socketTab.property.socketio?.queryParams,
+      selectedSocketIOBodyType: this.unsetMessageType(messageType),
     };
   }
 }

@@ -2,7 +2,11 @@
   import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
   import { folderIcon as folder } from "@sparrow/library/assets";
   import { ItemType, RequestMethod } from "@sparrow/common/enums";
-  import { CollectionIcon, SocketIcon } from "@sparrow/library/icons";
+  import {
+    CollectionIcon,
+    SocketIcon,
+    SocketIoIcon,
+  } from "@sparrow/library/icons";
   export let type: ItemType = ItemType.REQUEST;
   export let name = "";
   export let method = RequestMethod.GET;
@@ -22,7 +26,7 @@
       <p class="ellipsis mb-0">{name}</p>
     </div>
   </div>
-{:else if type === ItemType.FOLDER || type === ItemType.COLLECTION || type === ItemType.WEB_SOCKET}
+{:else if type === ItemType.FOLDER || type === ItemType.COLLECTION || type === ItemType.WEB_SOCKET || type === ItemType.SOCKET_IO}
   <div style="height:36px;" class="d-flex align-items-center">
     {#if type === ItemType.FOLDER}
       <div style="width: 40px;">
@@ -39,6 +43,14 @@
     {:else if type === ItemType.WEB_SOCKET}
       <div style="width: 40px;">
         <SocketIcon
+          height={"14px"}
+          width={"18px"}
+          color={"var(--icon-primary-300)"}
+        />
+      </div>
+    {:else if type === ItemType.SOCKET_IO}
+      <div style="width: 40px;">
+        <SocketIoIcon
           height={"14px"}
           width={"18px"}
           color={"var(--icon-primary-300)"}

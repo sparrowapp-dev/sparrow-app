@@ -23,6 +23,7 @@
     FolderIcon2,
     PencilIcon2,
     SocketIcon,
+    SocketIoIcon,
     WorkspaceIcon,
   } from "@sparrow/library/icons";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
@@ -557,6 +558,10 @@
             <div class=" ps-2">
               <FileType name={col.name} type={ItemType.WEB_SOCKET} />
             </div>
+          {:else if col.type === ItemType.SOCKET_IO}
+            <div class=" ps-2">
+              <FileType name={col.name} type={ItemType.SOCKET_IO} />
+            </div>
           {:else}
             <div
               class="item ps-2"
@@ -760,7 +765,7 @@
         Please add the request name to save the request.
       </p>
     {/if}
-    <div class="d-flex pt-3">
+    <div class="d-flex pt-3 pb-3">
       <!-- <ComboText
         value={componentData?.property.request.method}
         comboContainerClassProp={"d-flex flex-start pb-2"}
@@ -776,6 +781,14 @@
             color={"var(--icon-primary-300)"}
           /></span
         >
+      {:else if componentData?.property.request.method === TabTypeEnum.SOCKET_IO}
+        <span class={`text-fs-12 me-3 fw-bold `}
+          ><SocketIoIcon
+            height={"12px"}
+            width={"16px"}
+            color={"var(--icon-primary-300)"}
+          /></span
+        >
       {:else}
         <span
           class={`text-fs-12 me-3 fw-bold text-${getMethodStyle(
@@ -783,7 +796,7 @@
           )}`}>{componentData?.property.request.method}</span
         >
       {/if}
-      <p class="api-url">{componentData?.property.request.url}</p>
+      <p class="api-url mb-0">{componentData?.property.request.url}</p>
     </div>
     {#if !(componentData?.property.request.method === TabTypeEnum.WEB_SOCKET)}
       <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>

@@ -28,7 +28,7 @@ class InitSocketIoTab {
     this._tab = {
       id: _id,
       tabId: uuidv4(),
-      name: SocketIORequestDefaultAliasBaseEnum.NAME,
+      name: "New " + SocketIORequestDefaultAliasBaseEnum.NAME,
       type: TabTypeEnum.SOCKET_IO,
       description: "",
       source: "USER",
