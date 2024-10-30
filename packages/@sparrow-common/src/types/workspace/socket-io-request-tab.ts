@@ -1,3 +1,4 @@
+import type { UnlistenFn } from "@tauri-apps/api/event";
 export enum AuthTypeEnum {
   NO_AUTH = "No Auth",
   API_KEY = "API Key",
@@ -85,20 +86,20 @@ export interface KeyValueChecked
     ValueWrapper,
     CheckedWrapper {}
 
-export interface SocketMessageLanguageWrapper {
-  socketMessageLanguage: SocketDataTypeEnum;
+export interface MessageLanguageWrapper {
+  messageLanguage: SocketDataTypeEnum;
 }
-export interface SocketNavigationWrapper {
-  socketNavigation: SocketSectionEnum;
+export interface RequestNavigationWrapper {
+  requestNavigation: SocketSectionEnum;
 }
-export interface SocketLeftSplitterWidthPercentageWrapper {
-  socketLeftSplitterWidthPercentage: 50;
+export interface LeftSplitterWidthPercentageWrapper {
+  leftSplitterWidthPercentage: 50;
 }
-export interface SocketRightSplitterWidthPercentageWrapper {
-  socketRightSplitterWidthPercentage: 50;
+export interface RightSplitterWidthPercentageWrapper {
+  rightSplitterWidthPercentage: 50;
 }
-export interface IsSaveSocketInProgressWrapper {
-  isSaveSocketInProgress: false;
+export interface IsSaveInProgressWrapper {
+  isSaveInProgress: false;
 }
 export interface IsParameterBulkEditActiveWrapper {
   isParameterBulkEditActive: false;
@@ -107,20 +108,20 @@ export interface IsHeaderBulkEditActiveWrapper {
   isHeaderBulkEditActive: false;
 }
 export interface State
-  extends SocketMessageLanguageWrapper,
-    SocketNavigationWrapper,
-    SocketLeftSplitterWidthPercentageWrapper,
-    SocketRightSplitterWidthPercentageWrapper,
-    IsSaveSocketInProgressWrapper,
+  extends MessageLanguageWrapper,
+    RequestNavigationWrapper,
+    LeftSplitterWidthPercentageWrapper,
+    RightSplitterWidthPercentageWrapper,
+    IsSaveInProgressWrapper,
     IsParameterBulkEditActiveWrapper,
     IsHeaderBulkEditActiveWrapper {}
 
 export interface StatePartial
-  extends Partial<SocketMessageLanguageWrapper>,
-    Partial<SocketNavigationWrapper>,
-    Partial<SocketLeftSplitterWidthPercentageWrapper>,
-    Partial<SocketRightSplitterWidthPercentageWrapper>,
-    Partial<IsSaveSocketInProgressWrapper>,
+  extends Partial<MessageLanguageWrapper>,
+    Partial<RequestNavigationWrapper>,
+    Partial<LeftSplitterWidthPercentageWrapper>,
+    Partial<RightSplitterWidthPercentageWrapper>,
+    Partial<IsSaveInProgressWrapper>,
     Partial<IsParameterBulkEditActiveWrapper>,
     Partial<IsHeaderBulkEditActiveWrapper> {}
 
@@ -154,3 +155,20 @@ export interface SocketIo
 export interface SocketIoWrapper {
   socketio: SocketIo;
 }
+
+export type SocketIORequestMessageTabInterface = {
+  data: string;
+  transmitter: string;
+  timestamp: string;
+  uuid: string;
+};
+export type SocketIORequestOutputTabInterface = {
+  messages: SocketIORequestMessageTabInterface[];
+  status: "connected" | "disconnected" | "connecting" | "disconnecting";
+  search: string;
+  body: string;
+  contentType: string;
+  url: string;
+  filter: "All messages" | "Sent" | "Received";
+  listener: UnlistenFn | null;
+};
