@@ -13,6 +13,7 @@
   import { DiskIcon } from "@sparrow/library/icons";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   let componentClass = "";
   export { componentClass as class };
 
@@ -44,7 +45,9 @@
     ) {
       toggleSaveRequest(true);
     } else if (x.status === "success") {
-      notifications.success("WebSocket request saved successfully.");
+      notifications.success(
+        `${SocketIORequestDefaultAliasBaseEnum.NAME} request saved successfully.`,
+      );
     }
   };
 
