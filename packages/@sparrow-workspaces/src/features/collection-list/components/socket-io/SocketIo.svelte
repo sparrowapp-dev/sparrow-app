@@ -18,6 +18,7 @@
     type CollectionItemBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
   import { UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
   /**
    * Callback for Item Deleted
@@ -120,7 +121,7 @@
 />
 
 <Modal
-  title={"Delete Socket.IO?"}
+  title={`Delete ${SocketIORequestDefaultAliasBaseEnum.NAME}?`}
   type={"danger"}
   width={"35%"}
   zIndex={1000}
@@ -129,9 +130,8 @@
 >
   <div class="text-lightGray mb-1 sparrow-fs-12">
     <p>
-      Are you sure you want to delete this Socket.IO? <span
-        class="text-whiteColor fw-bold">"{socketIo.name}"</span
-      >
+      Are you sure you want to delete this {SocketIORequestDefaultAliasBaseEnum.NAME}?
+      <span class="text-whiteColor fw-bold">"{socketIo.name}"</span>
       will be removed and cannot be restored.
     </p>
   </div>
@@ -191,7 +191,7 @@
             socketio: socketIo,
           });
         },
-        displayText: "Open Socket.IO",
+        displayText: `Open ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
         disabled: false,
         hidden: false,
       },
@@ -200,7 +200,7 @@
           isRenaming = true;
           setTimeout(() => inputField.focus(), 100);
         },
-        displayText: "Rename Socket.IO",
+        displayText: `Rename ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
         disabled: false,
         hidden:
           !collection.activeSync ||

@@ -16,6 +16,7 @@
   import { Card } from "../components";
   import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
   import { WorkspaceRole } from "@sparrow/common/enums";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
   export let showImportCollectionPopup;
   export let onItemCreated;
@@ -75,7 +76,7 @@
     />
     <Card
       icon={SocketIoIcon}
-      label="Socket.IO"
+      label={`${SocketIORequestDefaultAliasBaseEnum.NAME}`}
       iconColor="var(--text-primary-300)"
       iconSize={"18px"}
       onClick={() => {

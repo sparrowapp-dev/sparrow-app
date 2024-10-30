@@ -4,6 +4,10 @@ interface SocketIORequestKeyValueCheckedBaseInterface {
   checked: boolean;
 }
 
+export enum SocketIORequestDefaultAliasBaseEnum {
+  NAME = "Socket.IO",
+}
+
 export interface SocketIORequestBaseInterface {
   url: string;
   message: string;

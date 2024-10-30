@@ -48,6 +48,7 @@
   } from "@sparrow/library/icons";
   import { Options } from "@sparrow/library/ui";
   import { isGuestUserActive } from "@app/store/auth.store";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
   let deletedIds: [string] | [] = [];
   let requestCount = 0;
@@ -382,7 +383,7 @@
             collection,
           });
         },
-        displayText: "Add Socket.IO",
+        displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
         disabled: false,
         hidden: false,
         icon: SocketIcon,
@@ -642,7 +643,11 @@
               </div>
             </Tooltip>
 
-            <Tooltip title={"Add Socket.IO"} placement={"bottom"} distance={12}>
+            <Tooltip
+              title={`Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`}
+              placement={"bottom"}
+              distance={12}
+            >
               <div
                 class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
                 style="height: 24px; width: 24px;"

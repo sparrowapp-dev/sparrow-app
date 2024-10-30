@@ -36,6 +36,7 @@
     CollectionBaseInterface,
     CollectionItemBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
   /**
    * Callback for Item created
@@ -315,7 +316,7 @@
               folder: explorer,
             });
           },
-          displayText: "Add Socket.IO",
+          displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
             !collection.activeSync ||

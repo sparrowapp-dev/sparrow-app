@@ -83,6 +83,7 @@ import type {
   SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
   SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
 } from "@sparrow/common/types/workspace/socket-io-request-dto";
+import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -2770,7 +2771,9 @@ export default class CollectionsViewModel {
     );
 
     if (!response?.isSuccessful) {
-      notifications.error("Failed to delete Socket.IO. Plaease try again.");
+      notifications.error(
+        `Failed to delete ${SocketIORequestDefaultAliasBaseEnum.NAME}. Plaease try again.`,
+      );
       return false;
     }
     if (_folder?.id && _collection.id && _workspaceId) {
@@ -2786,7 +2789,9 @@ export default class CollectionsViewModel {
       );
     }
 
-    notifications.success(`"${_socketIo.name}" Socket.IO deleted.`);
+    notifications.success(
+      `"${_socketIo.name}" ${SocketIORequestDefaultAliasBaseEnum.NAME} deleted.`,
+    );
     this.removeMultipleTabs([_socketIo.id]);
     MixpanelEvent(Events.DELETE_REQUEST, {
       source: "Collection list",

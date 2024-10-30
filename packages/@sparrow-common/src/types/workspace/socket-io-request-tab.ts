@@ -151,10 +151,6 @@ export interface SocketIo
     HeadersWrapper,
     MessageWrapper {}
 
-export enum SocketIoDefault {
-  NAME = "New Socket.IO",
-}
-
 export interface SocketIoWrapper {
   socketio: SocketIo;
 }

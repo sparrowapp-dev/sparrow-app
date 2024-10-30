@@ -42,6 +42,7 @@
     isTestFlowTourGuideOpen,
   } from "../../../stores/guide.tour";
   import { TestFlowTourGuide } from "@sparrow/workspaces/components";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
@@ -290,7 +291,7 @@
       isHoverConstant: false,
     },
     {
-      name: "Add Socket.IO",
+      name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
       icon: SocketIoIcon,
       iconColor: "var(--icon-secondary-130)",
       iconSize: "15px",
