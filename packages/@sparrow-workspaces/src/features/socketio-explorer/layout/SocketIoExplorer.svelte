@@ -57,7 +57,7 @@
   export let onRenameFolder;
   export let onConnect;
   export let onSendMessage;
-  export let webSocket;
+  export let socketIoStoreData;
   export let onDisconnect;
   export let onSearchMessage;
   export let onDeleteMessage;
@@ -88,7 +88,7 @@
         {onSaveSocket}
         {isGuestUser}
         {onConnect}
-        {webSocket}
+        webSocket={socketIoStoreData}
         {onDisconnect}
       />
 
@@ -134,7 +134,7 @@
                     {onUpdateRequestState}
                     {onSendMessage}
                     {onClearInput}
-                    {webSocket}
+                    webSocket={socketIoStoreData}
                   />
                 {:else if $tab.property.socketio?.state?.requestNavigation === SocketSectionEnum.PARAMETERS}
                   <RequestParameters
@@ -172,13 +172,13 @@
             <div class="d-flex flex-column h-100 ps-2" style="overflow:auto;">
               <div class="h-100 d-flex flex-column">
                 <div style="flex:1; overflow:auto;">
-                  {#if !webSocket}
+                  {#if !socketIoStoreData}
                     <ResponseDefaultScreen />
                   {:else}
                     <div class="h-100 flex-column">
                       <div style="overflow:auto; height:50%;">
                         <ResponseData
-                          {webSocket}
+                          webSocket={socketIoStoreData}
                           {onSearchMessage}
                           {onDeleteMessage}
                           {onUpdateMessageBody}
@@ -189,12 +189,12 @@
                       <div style="overflow:auto; height:50%;">
                         <div class="h-100 d-flex flex-column">
                           <ResponsePreviewNavigator
-                            {webSocket}
+                            webSocket={socketIoStoreData}
                             {onUpdateContentType}
                           />
                           <div class="pt-2"></div>
                           <div style="flex:1; overflow:auto;">
-                            <ResponsePreview {webSocket} />
+                            <ResponsePreview webSocket={socketIoStoreData} />
                           </div>
                         </div>
                       </div>

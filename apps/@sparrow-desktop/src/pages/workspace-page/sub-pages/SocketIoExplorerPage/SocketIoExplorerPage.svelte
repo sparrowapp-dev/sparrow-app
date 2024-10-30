@@ -1,8 +1,5 @@
 <script lang="ts">
-  import {
-    SocketExplorer,
-    SocketIoExplorer,
-  } from "@sparrow/workspaces/features";
+  import { SocketIoExplorer } from "@sparrow/workspaces/features";
   import { environmentType } from "@sparrow/common/enums";
 
   // ---- View Model
@@ -144,7 +141,7 @@
   collections={_viewModel.collection}
   bind:tab={_viewModel.tab}
   bind:userRole
-  webSocket={socketIoData}
+  socketIoStoreData={socketIoData}
   {environmentVariables}
   {isGuestUser}
   {isLoginBannerActive}
