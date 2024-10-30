@@ -127,12 +127,17 @@ class SocketIoExplorerPageViewModel {
           progressiveTab.id,
         )) as CollectionItemBaseInterface;
     }
-    const requestServer = new SocketIoTabAdapter().adapt(
-      progressiveTab.path.workspaceId,
-      progressiveTab.path.collectionId,
-      progressiveTab.path.folderId,
-      clientCollectionItem,
-    );
+
+    let requestServer;
+    if (clientCollectionItem) {
+      requestServer = new SocketIoTabAdapter().adapt(
+        progressiveTab.path.workspaceId,
+        progressiveTab.path.collectionId,
+        progressiveTab.path.folderId,
+        clientCollectionItem,
+      );
+    }
+
     if (!requestServer) result = false;
     // description
     else if (requestServer.description !== progressiveTab.description) {
