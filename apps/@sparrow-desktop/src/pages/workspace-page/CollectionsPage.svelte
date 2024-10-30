@@ -60,7 +60,6 @@
   import WebSocketExplorerPage from "./sub-pages/WebSocketExplorerPage/WebSocketExplorerPage.svelte";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import { type Tab } from "@sparrow/common/types/workspace/tab";
-  import type { WebSocketTab } from "@sparrow/common/types/workspace/web-socket";
   import EnvironmentExplorerPage from "./sub-pages/EnvironmentExplorer/EnvironmentExplorerPage.svelte";
   import TestFlowExplorerPage from "./sub-pages/TestflowExplorerPage/TestflowExplorerPage.svelte";
   import { TestflowViewModel } from "./Testflow.ViewModel";

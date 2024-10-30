@@ -1,12 +1,12 @@
 import { getAuthHeaders, makeRequest } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
-import type { MakeRequestResponse } from "@app/types/http-client";
+import type { HttpClientResponseInterface } from "@app/types/http-client";
 
 const apiUrl: string = constants.API_URL;
 export class UserService {
   constructor() {}
   public disableNewInviteTag = async (userId: string, teamId: string) => {
-    const response: MakeRequestResponse = await makeRequest(
+    const response: HttpClientResponseInterface = await makeRequest(
       "GET",
       `${apiUrl}/api/team/${teamId}/user/${userId}/disableTeamNewInvite`,
       {
@@ -27,7 +27,7 @@ export class UserService {
     userId: string,
     workspaceId: string,
   ) => {
-    const response: MakeRequestResponse = await makeRequest(
+    const response: HttpClientResponseInterface = await makeRequest(
       "GET",
       `${apiUrl}/api/workspace/${workspaceId}/user/${userId}/disableWorkspaceNewInvite`,
       {
@@ -44,7 +44,7 @@ export class UserService {
    * @return A promise that resolves to the server's response.
    */
   public validateUserEmail = async (email: string) => {
-    const response: MakeRequestResponse = await makeRequest(
+    const response: HttpClientResponseInterface = await makeRequest(
       "GET",
       `${apiUrl}/api/user/email/${email}`,
       {

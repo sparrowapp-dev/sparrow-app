@@ -13,7 +13,7 @@ import { moveNavigation } from "@sparrow/common/utils";
 import { navigate } from "svelte-navigator";
 import { InitWorkspaceTab } from "@sparrow/common/utils";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import type { MakeRequestResponse } from "@app/types/http-client";
+import type { HttpClientResponseInterface } from "@app/types/http-client";
 import type { Team } from "@sparrow/common/interfaces";
 import { UserService } from "../../services/user.service";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -261,7 +261,7 @@ export class TeamsViewModel {
     user.subscribe((value) => {
       loggedInUserId = value?._id;
     });
-    const response: MakeRequestResponse =
+    const response: HttpClientResponseInterface =
       await this.userService.disableNewInviteTag(loggedInUserId, teamId);
     if (response.isSuccessful === true) {
       return response.data.data;

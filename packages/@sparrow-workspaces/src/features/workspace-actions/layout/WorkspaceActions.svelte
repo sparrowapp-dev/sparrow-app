@@ -42,6 +42,7 @@
     isTestFlowTourGuideOpen,
   } from "../../../stores/guide.tour";
   import { TestFlowTourGuide } from "@sparrow/workspaces/components";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
@@ -117,7 +118,7 @@
   let searchData: string = "";
   let addButtonMenu: boolean = false;
   let activeWorkspace: WorkspaceDocument;
-  let currentWorkspaceId;
+  let currentWorkspaceId = "";
   currentWorkspace.subscribe((value) => {
     if (value?._data) {
       currentWorkspaceId = value._data._id;
@@ -220,152 +221,86 @@
 
   onDestroy(() => {});
 
-  const addButtonData = isGuestUser
-    ? [
-        {
-          name: "Add Collection",
-          icon: CollectionIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "13px",
-          onclick: () => {
-            onItemCreated("collection", {
-              workspaceId: currentWorkspaceId,
-              collection: collectionList,
-            });
-            isExpandCollection = true;
-          },
-        },
-        {
-          name: "Add REST API",
-          icon: VectorIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "12px",
-          onclick: () => onItemCreated("request", {}),
-        },
-        {
-          name: "Import cURL",
-          icon: BubbleIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            MixpanelEvent(Events.IMPORT_CURL, {
-              source: "curl import popup",
-            });
-            showImportCurlPopup();
-          },
-        },
-        {
-          name: "Add WebSocket",
-          icon: SocketIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            onItemCreated("web-socket", {});
-            MixpanelEvent(Events.Add_WebSocket);
-          },
-        },
-        {
-          name: "Add Environment",
-          icon: StackIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            isExpandEnvironment = true;
-            onCreateEnvironment();
-          },
-        },
-        {
-          name: `Add ${TFDefaultEnum.FULL_NAME}`,
-          icon: TreeIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            onCreateTestflow();
-            MixpanelEvent(Events.LeftPanel_Plus_Icon);
-          },
-          isHoverConstant: false,
-        },
-        {
-          name: "Add Socket.IO",
-          icon: SocketIoIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            onItemCreated("socket-io", {});
-            MixpanelEvent(Events.Add_WebSocket);
-          },
-        },
-      ]
-    : [
-        {
-          name: "Add Collection",
-          icon: CollectionIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "13px",
-          onclick: () => {
-            showImportCollectionPopup();
-            isExpandCollection = true;
-          },
-        },
-        {
-          name: "Add REST API",
-          icon: VectorIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "12px",
-          onclick: () => onItemCreated("request", {}),
-        },
-        {
-          name: "Import cURL",
-          icon: BubbleIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            MixpanelEvent(Events.IMPORT_CURL, {
-              source: "curl import popup",
-            });
-            showImportCurlPopup();
-          },
-        },
-        {
-          name: "Add WebSocket",
-          icon: SocketIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => onItemCreated("web-socket", {}),
-        },
-        {
-          name: "Add Environment",
-          icon: StackIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            isExpandEnvironment = true;
-            onCreateEnvironment();
-          },
-        },
-        {
-          name: `Add ${TFDefaultEnum.FULL_NAME}`,
-          icon: TreeIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            onCreateTestflow();
-            MixpanelEvent(Events.LeftPanel_Plus_Icon);
-            isExpandTestflow = true;
-          },
-          isHoverConstant: false,
-        },
-        {
-          name: "Add Socket.IO",
-          icon: SocketIoIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            onItemCreated("socket-io", {});
-            MixpanelEvent(Events.Add_WebSocket);
-          },
-        },
-      ];
+  const addButtonData = [
+    {
+      name: "Add Collection",
+      icon: CollectionIcon,
+      iconColor: "var(--icon-secondary-130)",
+      iconSize: "13px",
+      onclick: () => {
+        if (isGuestUser) {
+          onItemCreated("collection", {
+            workspaceId: currentWorkspaceId,
+            collection: collectionList,
+          });
+        } else {
+          showImportCollectionPopup();
+        }
+        isExpandCollection = true;
+      },
+    },
+    {
+      name: "Add REST API",
+      icon: VectorIcon,
+      iconColor: "var(--icon-secondary-130)",
+      iconSize: "12px",
+      onclick: () => onItemCreated("request", {}),
+    },
+    {
+      name: "Import cURL",
+      icon: BubbleIcon,
+      iconColor: "var(--icon-secondary-130)",
+      iconSize: "15px",
+      onclick: () => {
+        MixpanelEvent(Events.IMPORT_CURL, {
+          source: "curl import popup",
+        });
+        showImportCurlPopup();
+      },
+    },
+    {
+      name: "Add WebSocket",
+      icon: SocketIcon,
+      iconColor: "var(--icon-secondary-130)",
+      iconSize: "15px",
+      onclick: () => {
+        onItemCreated("web-socket", {});
+        MixpanelEvent(Events.Add_WebSocket);
+      },
+    },
+    {
+      name: "Add Environment",
+      icon: StackIcon,
+      iconColor: "var(--icon-secondary-130)",
+      iconSize: "15px",
+      onclick: () => {
+        isExpandEnvironment = true;
+        onCreateEnvironment();
+      },
+    },
+    {
+      name: `Add ${TFDefaultEnum.FULL_NAME}`,
+      icon: TreeIcon,
+      iconColor: "var(--icon-secondary-130)",
+      iconSize: "15px",
+      onclick: () => {
+        onCreateTestflow();
+        MixpanelEvent(Events.LeftPanel_Plus_Icon);
+        isExpandTestflow = true;
+      },
+      isHoverConstant: false,
+    },
+    {
+      name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+      icon: SocketIoIcon,
+      iconColor: "var(--icon-secondary-130)",
+      iconSize: "15px",
+      onclick: () => {
+        onItemCreated("socket-io", {});
+        MixpanelEvent(Events.Add_WebSocket);
+      },
+    },
+  ];
 
   const toggleExpandCollection = () => {
     isExpandCollection = !isExpandCollection;

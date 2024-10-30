@@ -77,6 +77,13 @@ import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/ut
 
 import { createDeepCopy } from "@sparrow/common/utils";
 import { SocketIoTabAdapter } from "../../adapter";
+import { CollectionItemTypeDtoEnum } from "@sparrow/common/types/workspace/collection-dto";
+import type {
+  SocketIORequestDeletePayloadDtoInterface,
+  SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
+  SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
+} from "@sparrow/common/types/workspace/socket-io-request-dto";
+import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -1101,59 +1108,36 @@ export default class CollectionsViewModel {
     _workspaceId: string,
     _collection: CollectionDto,
   ) => {
-    const socketIoTab = new InitTab().socketIo(
-      UntrackedItems.UNTRACKED + uuidv4(),
-      _workspaceId,
-    );
-
-    let userSource = {};
-    if (_collection?.activeSync) {
-      userSource = {
-        currentBranch: _collection?.currentBranch
-          ? _collection?.currentBranch
-          : _collection?.primaryBranch,
-        source: "USER",
-      };
-    }
-    const socketIoOfCollectionPayload = {
-      collectionId: _collection.id,
-      workspaceId: _workspaceId,
-      ...userSource,
-      items: {
-        name: socketIoTab.getValue().name,
-        type: socketIoTab.getValue().type,
-        description: "",
-        socketio: {},
-      },
-    };
-    await this.collectionRepository.addRequestOrFolderInCollection(
-      _collection.id as string,
+    const socketIoTab = new InitTab().socketIo(uuidv4(), _workspaceId);
+    const socketIoOfCollectionPayload: SocketIORequestCreateUpdateInCollectionPayloadDtoInterface =
       {
-        ...socketIoOfCollectionPayload.items,
-        id: socketIoTab.getValue().id,
-      },
-    );
+        collectionId: _collection.id,
+        workspaceId: _workspaceId,
+        currentBranch: _collection.activeSync
+          ? _collection.currentBranch
+          : undefined,
+        source: _collection.activeSync ? "USER" : undefined,
+        items: {
+          name: socketIoTab.getValue().name,
+          type: CollectionItemTypeDtoEnum.SOCKETIO,
+          description: "",
+          socketio: {},
+        },
+      };
+
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
 
     if (isGuestUser === true) {
-      const res =
-        await this.collectionRepository.readRequestOrFolderInCollection(
-          socketIoOfCollectionPayload.collectionId as string,
-          socketIoTab.getValue().id,
-        );
-      if (res) {
-        res.id = uuidv4();
-      }
-      await this.collectionRepository.updateRequestOrFolderInCollection(
+      await this.collectionRepository.addRequestOrFolderInCollection(
         _collection.id as string,
-        socketIoTab.getValue().id,
-        res,
+        {
+          ...socketIoOfCollectionPayload.items,
+          id: socketIoTab.getValue().id,
+        },
       );
-
-      socketIoTab.updateId(res?.id as string);
       socketIoTab.updatePath({
         workspaceId: _workspaceId,
         collectionId: _collection.id,
@@ -1167,20 +1151,21 @@ export default class CollectionsViewModel {
       });
       return;
     }
-    return;
+
     const response = await this.collectionService.addSocketIoInCollection(
       socketIoOfCollectionPayload,
     );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
 
-      this.collectionRepository.updateRequestOrFolderInCollection(
+      await this.collectionRepository.addRequestOrFolderInCollection(
         _collection.id as string,
-        socketIoTab.getValue().id,
-        res,
+        {
+          ...res,
+        },
       );
 
-      socketIoTab.updateId(res.id);
+      socketIoTab.updateId(res.id as string);
       socketIoTab.updatePath({
         workspaceId: _workspaceId,
         collectionId: _collection.id,
@@ -1457,67 +1442,50 @@ export default class CollectionsViewModel {
     _collection: CollectionDto,
     _folder: CollectionItemsDto,
   ) => {
-    const socketIoTab = new InitTab().socketIo(
-      UntrackedItems.UNTRACKED + uuidv4(),
-      _workspaceId,
-    );
+    const socketIoTab = new InitTab().socketIo(uuidv4(), _workspaceId);
 
-    let userSource = {};
-    if (_collection.activeSync && _folder?.source === "USER") {
-      userSource = {
-        currentBranch: _collection.currentBranch
-          ? _collection.currentBranch
-          : _collection.primaryBranch,
-        source: "USER",
-      };
-    }
-    const socketIoOfCollectionAndFolderPayload = {
-      collectionId: _collection.id,
-      workspaceId: _workspaceId,
-      ...userSource,
-      folderId: _folder.id,
-      items: {
-        name: _folder.name,
-        type: ItemType.FOLDER,
-        id: _folder.id,
-        items: {
-          name: socketIoTab.getValue().name,
-          type: socketIoTab.getValue().type,
-          description: "",
-          socketio: {},
-        },
-      },
-    };
-
-    await this.collectionRepository.addRequestInFolder(
-      socketIoOfCollectionAndFolderPayload.collectionId,
-      socketIoOfCollectionAndFolderPayload.folderId,
+    const socketIoInFolderPayload: SocketIORequestCreateUpdateInFolderPayloadDtoInterface =
       {
-        ...socketIoOfCollectionAndFolderPayload.items.items,
-        id: socketIoTab.getValue().id,
-      },
-    );
+        collectionId: _collection.id,
+        workspaceId: _workspaceId,
+        currentBranch:
+          _collection.activeSync && _folder.source === "USER"
+            ? _collection.currentBranch
+            : undefined,
+        source:
+          _collection.activeSync && _folder.source === "USER"
+            ? _folder.source
+            : undefined,
+        folderId: _folder.id,
+        items: {
+          name: _folder.name,
+          type: CollectionItemTypeDtoEnum.FOLDER,
+          id: _folder.id,
+          items: {
+            name: socketIoTab.getValue().name,
+            type: CollectionItemTypeDtoEnum.SOCKETIO,
+            description: "",
+            socketio: {},
+          },
+        },
+      };
+
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
 
     if (isGuestUser === true) {
-      const res = (await this.collectionRepository.readRequestInFolder(
-        socketIoOfCollectionAndFolderPayload.collectionId,
-        socketIoOfCollectionAndFolderPayload.folderId,
-        socketIoTab.getValue().id,
-      )) as CollectionItemsDto;
-      res.id = uuidv4();
-      this.collectionRepository.updateRequestInFolder(
-        socketIoOfCollectionAndFolderPayload.collectionId,
-        socketIoOfCollectionAndFolderPayload.folderId,
-        socketIoTab.getValue().id,
-        res,
+      await this.collectionRepository.addRequestInFolder(
+        socketIoInFolderPayload.collectionId,
+        socketIoInFolderPayload.folderId as string,
+        {
+          ...socketIoInFolderPayload?.items?.items,
+          id: socketIoTab.getValue().id,
+        },
       );
 
       socketIoTab
-        .updateId(res.id)
         .updatePath({
           workspaceId: _workspaceId,
           collectionId: _collection.id,
@@ -1532,22 +1500,22 @@ export default class CollectionsViewModel {
       });
       return;
     }
-    return;
     const response = await this.collectionService.addSocketIoInCollection(
-      socketIoOfCollectionAndFolderPayload,
+      socketIoInFolderPayload,
     );
     if (response.isSuccessful && response.data.data) {
       const request = response.data.data;
 
-      this.collectionRepository.updateRequestInFolder(
-        socketIoOfCollectionAndFolderPayload.collectionId,
-        socketIoOfCollectionAndFolderPayload.folderId,
-        socketIoTab.getValue().id,
-        request,
+      await this.collectionRepository.addRequestInFolder(
+        socketIoInFolderPayload.collectionId,
+        socketIoInFolderPayload.folderId as string,
+        {
+          ...request,
+        },
       );
 
       socketIoTab
-        .updateId(request.id)
+        .updateId(request?.id as string)
         .updatePath({
           workspaceId: _workspaceId,
           collectionId: _collection.id,
@@ -1563,8 +1531,8 @@ export default class CollectionsViewModel {
       return;
     } else {
       this.collectionRepository.deleteRequestInFolder(
-        socketIoOfCollectionAndFolderPayload.collectionId,
-        socketIoOfCollectionAndFolderPayload.folderId,
+        socketIoInFolderPayload.collectionId,
+        socketIoInFolderPayload.folderId as string,
         socketIoTab.getValue().id,
       );
     }
@@ -2254,16 +2222,7 @@ export default class CollectionsViewModel {
     _socketIo: CollectionItemsDto,
     _newSocketIoName: string,
   ) => {
-    let userSource = {};
-    if (_socketIo.source === "USER") {
-      userSource = {
-        currentBranch: _collection.currentBranch
-          ? _collection.currentBranch
-          : _collection.primaryBranch,
-        source: "USER",
-      };
-    }
-    let isGuestUser;
+    let isGuestUser = true;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
@@ -2316,21 +2275,37 @@ export default class CollectionsViewModel {
       }
       return;
     }
-    return;
     if (!_newSocketIoName) {
       return;
     }
     if (_collection.id && _workspaceId && !_folder.id) {
-      const storage = _socketIo;
-      storage.name = _newSocketIoName;
       const response = await this.collectionService.updateSocketIoInCollection(
         _socketIo.id,
         {
           collectionId: _collection.id,
           workspaceId: _workspaceId,
-          ...userSource,
-          items: storage,
-        },
+          currentBranch:
+            _collection.activeSync && _socketIo.source === "USER"
+              ? _collection.currentBranch
+              : undefined,
+          source:
+            _collection.activeSync && _socketIo.source === "USER"
+              ? _socketIo.source
+              : undefined,
+          items: {
+            createdAt: _socketIo.createdAt,
+            createdBy: _socketIo.createdBy,
+            description: _socketIo.description,
+            id: _socketIo.id,
+            isDeleted: _socketIo.isDeleted,
+            name: _newSocketIoName,
+            socketio: _socketIo.socketio,
+            source: _socketIo.source,
+            type: _socketIo.type,
+            updatedAt: _socketIo.updatedAt,
+            updatedBy: _socketIo.updatedBy,
+          },
+        } as SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
       );
       if (!response?.isSuccessful) {
         return;
@@ -2349,22 +2324,39 @@ export default class CollectionsViewModel {
       return;
     }
     if (_collection.id && _workspaceId && _folder.id) {
-      const storage = _socketIo;
-      storage.name = _newSocketIoName;
       const response = await this.collectionService.updateSocketIoInCollection(
         _socketIo.id,
         {
           collectionId: _collection.id,
           workspaceId: _workspaceId,
-          ...userSource,
+          currentBranch:
+            _collection?.activeSync && _socketIo?.source === "USER"
+              ? _collection?.currentBranch
+              : undefined,
+          source:
+            _collection?.activeSync && _socketIo?.source === "USER"
+              ? _socketIo?.source
+              : undefined,
           folderId: _folder.id,
           items: {
             name: _folder.name,
             id: _folder.id,
-            type: ItemType.FOLDER,
-            items: storage,
+            type: CollectionItemTypeDtoEnum.FOLDER,
+            items: {
+              createdAt: _socketIo.createdAt,
+              createdBy: _socketIo.createdBy,
+              description: _socketIo.description,
+              id: _socketIo.id,
+              isDeleted: _socketIo.isDeleted,
+              name: _newSocketIoName,
+              socketio: _socketIo.socketio,
+              source: _socketIo.source,
+              type: _socketIo.type,
+              updatedAt: _socketIo.updatedAt,
+              updatedBy: _socketIo.updatedBy,
+            },
           },
-        },
+        } as SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
       );
       if (!response?.isSuccessful) {
         return;
@@ -2742,20 +2734,7 @@ export default class CollectionsViewModel {
       };
     }
 
-    let requestObject = {
-      collectionId: _collection.id,
-      workspaceId: _workspaceId,
-      folderId: "",
-      ...userSource,
-    };
-
-    if (_folder && _collection.id && _workspaceId) {
-      requestObject = {
-        ...requestObject,
-        folderId: _folder.id,
-      };
-    }
-    let isGuestUser;
+    let isGuestUser = true;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
@@ -2778,34 +2757,41 @@ export default class CollectionsViewModel {
 
       return true;
     }
-    return false;
     const response = await this.collectionService.deleteSocketIoInCollection(
       _socketIo.id,
-      requestObject,
+      {
+        collectionId: _collection.id,
+        workspaceId: _workspaceId,
+        folderId: _folder?.id ? _folder?.id : undefined,
+        source: _collection.activeSync ? _socketIo?.source : undefined,
+        currentBranch: _collection.activeSync
+          ? _collection.currentBranch
+          : undefined,
+      } as SocketIORequestDeletePayloadDtoInterface,
     );
 
     if (!response?.isSuccessful) {
-      notifications.error("Failed to delete Socket.IO. Plaease try again.");
+      notifications.error(
+        `Failed to delete ${SocketIORequestDefaultAliasBaseEnum.NAME}. Plaease try again.`,
+      );
       return false;
     }
-    if (
-      requestObject.folderId &&
-      requestObject.collectionId &&
-      requestObject.workspaceId
-    ) {
+    if (_folder?.id && _collection.id && _workspaceId) {
       await this.collectionRepository.deleteRequestInFolder(
-        requestObject.collectionId,
-        requestObject.folderId,
+        _collection.id,
+        _folder.id,
         _socketIo.id,
       );
-    } else if (requestObject.workspaceId && requestObject.collectionId) {
+    } else if (_workspaceId && _collection.id) {
       await this.collectionRepository.deleteRequestOrFolderInCollection(
-        requestObject.collectionId,
+        _collection.id,
         _socketIo.id,
       );
     }
 
-    notifications.success(`"${_socketIo.name}" Socket.IO deleted.`);
+    notifications.success(
+      `"${_socketIo.name}" ${SocketIORequestDefaultAliasBaseEnum.NAME} deleted.`,
+    );
     this.removeMultipleTabs([_socketIo.id]);
     MixpanelEvent(Events.DELETE_REQUEST, {
       source: "Collection list",
