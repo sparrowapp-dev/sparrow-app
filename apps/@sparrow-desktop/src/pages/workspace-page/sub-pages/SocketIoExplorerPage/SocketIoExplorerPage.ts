@@ -5,11 +5,7 @@ import {
   DecodeWebsocket,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
-import {
-  CompareArray,
-  Debounce,
-  InitWebSocketTab,
-} from "@sparrow/common/utils";
+import { CompareArray, Debounce } from "@sparrow/common/utils";
 
 // ---- DB
 import type {
@@ -38,22 +34,23 @@ import { EnvironmentService } from "../../../../services/environment.service";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import {
   type KeyValueChecked,
-  type Path,
   type KeyValue,
   type StatePartial,
-  type Tab,
-  type CollectionItemsDto,
 } from "@sparrow/common/types/workspace";
+import { type Path, type Tab } from "@sparrow/common/types/workspace/tab";
 import { notifications } from "@sparrow/library/ui";
 import { CollectionService } from "../../../../services/collection.service";
 import { GuestUserRepository } from "../../../../repositories/guest-user.repository";
 import { isGuestUserActive } from "@app/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
-import { SocketTabAdapter } from "../../../../adapter/socket-tab";
 import type { CollectionDocType } from "../../../../models/collection.model";
 import { WebSocketService } from "../../../../services/web-socket.service";
-import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
+import { socketIoDataStore } from "@sparrow/workspaces/features/socketio-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
+import { SocketIoTabAdapter } from "@app/adapter";
+import { CollectionItemTypeDtoEnum } from "@sparrow/common/types/workspace/collection-dto";
+import type { CollectionItemBaseInterface } from "@sparrow/common/types/workspace/collection-base";
+import { SocketTabAdapter } from "@app/adapter/socket-tab";
 
 class SocketIoExplorerPageViewModel {
   /**
@@ -115,20 +112,27 @@ class SocketIoExplorerPageViewModel {
   private compareRequestWithServerDebounced = async () => {
     let result = true;
     const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
-    let requestServer: CollectionItemsDto;
+    let clientCollectionItem: CollectionItemBaseInterface;
     if (progressiveTab.path.folderId) {
-      requestServer = (await this.collectionRepository.readRequestInFolder(
-        progressiveTab.path.collectionId,
-        progressiveTab.path.folderId,
-        progressiveTab.id,
-      )) as CollectionItemsDto;
+      clientCollectionItem =
+        (await this.collectionRepository.readRequestInFolder(
+          progressiveTab.path.collectionId,
+          progressiveTab.path.folderId,
+          progressiveTab.id,
+        )) as CollectionItemBaseInterface;
     } else {
-      requestServer =
+      clientCollectionItem =
         (await this.collectionRepository.readRequestOrFolderInCollection(
           progressiveTab.path.collectionId,
           progressiveTab.id,
-        )) as CollectionItemsDto;
+        )) as CollectionItemBaseInterface;
     }
+    const requestServer = new SocketIoTabAdapter().adapt(
+      progressiveTab.path.workspaceId,
+      progressiveTab.path.collectionId,
+      progressiveTab.path.folderId,
+      clientCollectionItem,
+    );
     if (!requestServer) result = false;
     // description
     else if (requestServer.description !== progressiveTab.description) {
@@ -139,15 +143,16 @@ class SocketIoExplorerPageViewModel {
       result = false;
     }
     // url
-    else if (requestServer?.socketio) {
+    else if (requestServer.property?.socketio) {
       if (
-        requestServer.socketio.url !== progressiveTab.property.socketio?.url
+        requestServer.property.socketio.url !==
+        progressiveTab.property.socketio?.url
       ) {
         result = false;
       }
       // message
       else if (
-        requestServer.socketio.message !==
+        requestServer.property.socketio.message !==
         progressiveTab.property.socketio?.message
       ) {
         result = false;
@@ -156,17 +161,23 @@ class SocketIoExplorerPageViewModel {
       // headers
       else if (
         !this.compareArray.init(
-          requestServer.socketio.headers,
+          requestServer.property.socketio.headers,
           progressiveTab.property.socketio?.headers,
         )
       ) {
         result = false;
       } else if (
         !this.compareArray.init(
-          requestServer.socketio.queryParams,
+          requestServer.property.socketio.queryParams,
           progressiveTab.property.socketio?.queryParams,
         )
       ) {
+        result = false;
+      } else if (
+        requestServer.property.socketio.state.messageLanguage !==
+        progressiveTab.property.socketio?.state.messageLanguage
+      ) {
+        // debugger;
         result = false;
       }
     }
@@ -387,6 +398,7 @@ class SocketIoExplorerPageViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
   };
 
   /**
@@ -407,7 +419,7 @@ class SocketIoExplorerPageViewModel {
   public readRequestOrFolderInCollection = async (
     collectionId: string,
     uuid: string,
-  ): Promise<CollectionItemsDto | undefined> => {
+  ): Promise<CollectionItemBaseInterface | undefined> => {
     return await this.collectionRepository.readRequestOrFolderInCollection(
       collectionId,
       uuid,
@@ -552,7 +564,7 @@ class SocketIoExplorerPageViewModel {
         name: string;
         totalRequests: number;
         createdBy: string;
-        items?: CollectionItemsDto[];
+        items?: CollectionItemBaseInterface[];
         updatedBy: string;
         createdAt: string;
         updatedAt: string;
@@ -646,7 +658,7 @@ class SocketIoExplorerPageViewModel {
     }
     const _id = componentData.id;
 
-    const socketTabAdapter = new SocketTabAdapter();
+    const socketTabAdapter = new SocketIoTabAdapter();
     const unadaptedSocket = socketTabAdapter.unadapt(componentData);
     // Save overall api
 
@@ -654,7 +666,7 @@ class SocketIoExplorerPageViewModel {
       id: _id,
       name: componentData?.name,
       description: componentData?.description,
-      type: ItemType.WEB_SOCKET,
+      type: ItemType.SOCKET_IO,
     };
 
     let folderSource;
@@ -668,13 +680,13 @@ class SocketIoExplorerPageViewModel {
         type: ItemType.FOLDER,
         items: {
           ...socketMetaData,
-          websocket: unadaptedSocket,
+          socketio: unadaptedSocket,
         },
       };
     } else {
       itemSource = {
         ...socketMetaData,
-        websocket: unadaptedSocket,
+        socketio: unadaptedSocket,
       };
     }
 
@@ -688,8 +700,8 @@ class SocketIoExplorerPageViewModel {
         id: progressiveTab.id,
         name: socketMetaData.name,
         description: socketMetaData.description,
-        type: ItemType.WEB_SOCKET,
-        websocket: unadaptedSocket,
+        type: ItemType.SOCKET_IO,
+        socketio: unadaptedSocket,
         updatedAt: "",
         updatedBy: "Guest User",
       };
@@ -716,7 +728,7 @@ class SocketIoExplorerPageViewModel {
         message: "",
       };
     }
-    const res = await this.collectionService.updateSocketInCollection(_id, {
+    const res = await this.collectionService.updateSocketIoInCollection(_id, {
       collectionId: collectionId,
       workspaceId: workspaceId,
       ...folderSource,
@@ -835,13 +847,13 @@ class SocketIoExplorerPageViewModel {
     let userSource = {};
     // const _id = componentData.id;
     if (path.length > 0) {
-      const socketTabAdapter = new SocketTabAdapter();
+      const socketTabAdapter = new SocketIoTabAdapter();
       const unadaptedSocket = socketTabAdapter.unadapt(componentData);
       const req = {
         id: uuidv4(),
         name: tabName,
         description,
-        type: ItemType.WEB_SOCKET,
+        type: ItemType.SOCKET_IO,
         socketio: unadaptedSocket,
         source: "USER",
         isDeleted: false,
@@ -918,15 +930,15 @@ class SocketIoExplorerPageViewModel {
             },
           };
         }
-        const res = await this.collectionService.addSocketInCollection({
+        const res = await this.collectionService.addSocketIoInCollection({
           collectionId: path[path.length - 1].id,
           workspaceId: _workspaceMeta.id,
           ...userSource,
           items: {
             name: tabName,
             description,
-            type: ItemType.WEB_SOCKET,
-            websocket: unadaptedSocket,
+            type: CollectionItemTypeDtoEnum.SOCKETIO,
+            socketio: unadaptedSocket,
           },
         });
         if (res.isSuccessful) {
@@ -962,7 +974,7 @@ class SocketIoExplorerPageViewModel {
             /**
              * Create new copy of the existing request
              */
-            const initSocketTab = new InitWebSocketTab(
+            const initSocketTab = new InitTab().socketIo(
               res.data.data.id,
               "UNTRACKED-",
             );
@@ -1049,7 +1061,7 @@ class SocketIoExplorerPageViewModel {
             },
           };
         }
-        const res = await this.collectionService.addSocketInCollection({
+        const res = await this.collectionService.addSocketIoInCollection({
           collectionId: path[0].id,
           workspaceId: _workspaceMeta.id,
           folderId: path[path.length - 1].id,
@@ -1061,8 +1073,8 @@ class SocketIoExplorerPageViewModel {
             items: {
               name: tabName,
               description,
-              type: ItemType.WEB_SOCKET,
-              websocket: unadaptedSocket,
+              type: CollectionItemTypeDtoEnum.SOCKETIO,
+              socketio: unadaptedSocket,
             },
           },
         });
@@ -1447,7 +1459,6 @@ class SocketIoExplorerPageViewModel {
   };
 
   public connectWebsocket = async (environmentVariables) => {
-    return;
     const websocketData = this._tab.getValue();
 
     const decodeData = new DecodeWebsocket().init(
@@ -1455,7 +1466,7 @@ class SocketIoExplorerPageViewModel {
       environmentVariables?.filtered || [],
     );
 
-    return await this.webSocketService.connectWebsocket(
+    return await this.collectionService.connectSocketIo(
       decodeData[0] as string,
       websocketData.tabId,
       decodeData[1],
@@ -1463,13 +1474,13 @@ class SocketIoExplorerPageViewModel {
   };
   public disconnectWebsocket = async () => {
     const websocketData = this._tab.getValue();
-    return await this.webSocketService.disconnectWebsocket(
+    return await this.collectionService.disconnectSocketIo(
       websocketData?.tabId,
     );
   };
   public sendMessageWebsocket = async () => {
     const websocketData = this._tab.getValue();
-    return await this.webSocketService.sendMessageWebsocket(
+    return await this.collectionService.sendMessageSocketIo(
       websocketData.tabId,
       websocketData.property.socketio?.message as string,
     );
@@ -1477,7 +1488,7 @@ class SocketIoExplorerPageViewModel {
 
   public searchMessages = async (_search: string) => {
     const websocketData = this._tab.getValue();
-    webSocketDataStore.update((webSocketDataMap) => {
+    socketIoDataStore.update((webSocketDataMap) => {
       const wsData = webSocketDataMap.get(websocketData.tabId);
       if (wsData) {
         wsData.search = _search;
@@ -1489,7 +1500,7 @@ class SocketIoExplorerPageViewModel {
 
   public deleteMessages = async () => {
     const websocketData = this._tab.getValue();
-    webSocketDataStore.update((webSocketDataMap) => {
+    socketIoDataStore.update((webSocketDataMap) => {
       const wsData = webSocketDataMap.get(websocketData.tabId);
       if (wsData) {
         wsData.search = "";
@@ -1504,7 +1515,7 @@ class SocketIoExplorerPageViewModel {
 
   public updateContentType = async (_contentType: string) => {
     const websocketData = this._tab.getValue();
-    webSocketDataStore.update((webSocketDataMap) => {
+    socketIoDataStore.update((webSocketDataMap) => {
       const wsData = webSocketDataMap.get(websocketData.tabId);
       if (wsData) {
         wsData.contentType = _contentType;
@@ -1516,7 +1527,7 @@ class SocketIoExplorerPageViewModel {
 
   public updateMessageBody = async (_body: string) => {
     const websocketData = this._tab.getValue();
-    webSocketDataStore.update((webSocketDataMap) => {
+    socketIoDataStore.update((webSocketDataMap) => {
       const wsData = webSocketDataMap.get(websocketData.tabId);
       if (wsData) {
         wsData.body = _body;
@@ -1528,7 +1539,7 @@ class SocketIoExplorerPageViewModel {
 
   public updateFilterType = async (_filterType: string) => {
     const websocketData = this._tab.getValue();
-    webSocketDataStore.update((webSocketDataMap) => {
+    socketIoDataStore.update((webSocketDataMap) => {
       const wsData = webSocketDataMap.get(websocketData.tabId);
       if (wsData) {
         wsData.filter = _filterType;
