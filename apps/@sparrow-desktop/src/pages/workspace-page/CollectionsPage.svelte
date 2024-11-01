@@ -546,6 +546,7 @@
                           _viewModel3.handleCreateTestflow();
                           isExpandTestflow = true;
                         }}
+                        bind:isExpandCollection
                         showImportCollectionPopup={() =>
                           (isImportCollectionPopup = true)}
                         onItemCreated={_viewModel.handleCreateItem}
