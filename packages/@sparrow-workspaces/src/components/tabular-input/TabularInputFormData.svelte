@@ -22,6 +22,7 @@
   export let onUpdateEnvironment;
   export let isCheckBoxEditable = true;
   export let isTopHeaderRequired = true;
+  export let isBulkEditRequired = false;
   export let isInputBoxEditable = true;
   let pairs: KeyValuePair[] | KeyValuePairWithBase[] = keyValue;
   let controller: boolean = false;
@@ -163,126 +164,80 @@
 </script>
 
 <div
-  class="mb-0 me-0 w-100 bg-secondary-700  py-0 border-radius-2 section-layout"
+  class="mb-0 me-0 w-100 bg-secondary-700 py-0 border-radius-2 section-layout"
+  style="overflow:hidden;"
 >
   <div
-    class="d-flex gap-3 ps-3 align-items-center w-100 {!isTopHeaderRequired
+    class="d-flex align-items-center w-100 {!isTopHeaderRequired
       ? 'd-none'
       : ''}"
-    style="background-color:var(--bg-secondary-880);"
+    style="position:relative; background-color:var(--bg-secondary-880); height:26px;"
   >
-    <div style="width:30px; margin-left: 5px;  ">
-      <label class="container">
-        <input
-          type="checkbox"
-          disabled={pairs.length === 1 || !isCheckBoxEditable}
-          bind:checked={controller}
-          on:input={handleCheckAll}
-        />
-        <span class="checkmark"></span>
-      </label>
-    </div>
-    <div
-      class="d-flex pair-title bg-secondary-700 align-items-center w-100"
-      style="font-size: 12px; font-weight: 500; background-color:var(--bg-secondary-880);"
-    >
-      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-2">Key</p>
-      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1">Value</p>
-    </div>
-    <div class="pe-1 d-flex">
-      <button class="bg-transparent border-0 d-flex d-none" style="">
-        <p
-          class="text-nowrap text-primary-300 mb-0 me-2"
-          style="font-size: 10px;"
-        >
-          Bulk Edit
-        </p>
-        <img
-          class="my-auto d-none"
-          src={editIcon}
-          alt="Edit Icon"
-          style="height: 10px; width: 10px;"
-        />
-      </button>
-      <button class="bg-transparent border-0 d-flex d-none" style="">
-        <img
-          class="my-auto"
-          src={moreOptions}
-          alt="Edit Icon"
-          style="height: 10px; width: 10px;"
-        />
-      </button>
-      <div class="h-75 pe-1">
-        <button class="border-0" style="width:40px;" />
-      </div>
-    </div>
-  </div>
-
-  <div
-    class="w-100 "
-    style="display:block; position:relative;
-      width:200px;    
-      "
-  >
-
-  
-    {#if readable.key || readable.value}
+    <div aria-label="Toggle Hover" class="sortable > div" style=" width:100%;">
       <div
-        aria-label="Toggle Hover"
-        class="sortable > div"
-        style=" width:100%;"
+        class=""
+        style=" padding-top: 1px;  display: flex; flex-direction: column;width:100%;"
       >
         <div
-          style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
+          class="px-3 d-flex w-100 align-items-center justify-content-center gap-3"
+          style="padding-top:3px; padding-bottom:3px; height:24px;  "
         >
-          <div
-            class="d-flex w-100 align-items-center justify-content-center gap-3"
-          >
-            <div style="width:30px;">
+          <div style="width:30px; height: 14px;">
+            <label class="container">
               <input
-                class="form-check-input"
                 type="checkbox"
-                disabled
-                checked={true}
+                disabled={pairs.length === 1 || !isCheckBoxEditable}
+                bind:checked={controller}
+                on:input={handleCheckAll}
               />
-            </div>
+              <span class="checkmark"></span>
+            </label>
+          </div>
 
-            <div class="d-flex gap-0" style="width:calc(100% - 120px)">
-              <div class="w-50 position-relative">
-                <input
-                  type="text"
-                  placeholder=""
-                  class=" keyValuePair py-1 w-100"
-                  style="font-size: 12px;"
-                  disabled
-                  bind:value={readable.key}
-                />
-              </div>
-              <div class="w-50 position-relative">
-                <input
-                  type="text"
-                  placeholder=""
-                  class=" keyValuePair py-1 w-100"
-                  style="font-size: 12px;"
-                  disabled
-                  bind:value={readable.value}
-                />
-              </div>
+          <div class="d-flex gap-0" style="flex:1;">
+            <div
+              class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
+              style="padding-left: 6px;"
+            >
+              Key
             </div>
-            <div class="h-75 pe-1">
-              <button class=" border-0" style="width:40px;" />
+            <div
+              class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
+              style="padding-left: 56px;"
+            >
+              Value
+            </div>
+          </div>
+          <div style="width:140px;" class="d-flex align-items-center">
+            <div class="w-100 d-flex">
+              <div class="w-100 d-flex justify-content-end">
+                <button
+                  class="bg-transparent border-0 mt-1 d-flex {!isBulkEditRequired
+                    ? 'invisible'
+                    : ''}"
+                  style=""
+                >
+                  <p
+                    class="text-nowrap text-primary-300 mb-0 me-0"
+                    style="font-size: 10px; font-weight:400;"
+                  >
+                    Bulk Edit
+                  </p>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    {/if}
+    </div>
+  </div>
+  <div class="w-100" style="display:block; position:relative;">
     {#if pairs}
       {#each pairs as element, index}
         <div
           aria-label="Toggle Hover"
-          class="sortable > div pair-container ps-3"
-          style=" width:100%; border-bottom:1px solid var(--border-secondary-315);
-  "
+          class="sortable > div"
+          style=" width:100%; border-top:1px solid var(--border-secondary-315);"
           data-list-key={JSON.stringify({
             name: element.key,
             description: element.value,
@@ -290,11 +245,12 @@
           })}
         >
           <div
-            style="padding-top: 1px;  display: flex;flex-direction: column;width:100%;"
+            class="element-row"
+            style="display: flex; flex-direction: column;width:100%;"
           >
             <div
-              class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
-              style="padding-top:3px; padding-bottom:3px; height:24px; padding-bottom:3px;"
+              class="px-3 d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
+              style="padding-top:3px; padding-bottom:3px; height:24px;"
             >
               <div style="width:30px; height: 14px;">
                 {#if pairs.length - 1 != index || !isInputBoxEditable}
@@ -312,7 +268,7 @@
                 {/if}
               </div>
 
-              <div class=" d-flex gap-0" style="width:calc(100% - 120px)">
+              <div class=" d-flex gap-0" style="flex:1;">
                 <div class="w-50 position-relative d-flex align-items-center">
                   <CodeMirrorInput
                     bind:value={element.key}
@@ -327,7 +283,7 @@
                   />
                 </div>
                 {#if element.type === "file"}
-                  <div class="w-50">
+                  <div class="w-50 position-relative d-flex align-items-center">
                     <div
                       class="position-relative rounded p-1 d-flex backgroundColor"
                     >
@@ -353,7 +309,7 @@
                     </div>
                   </div>
                 {:else}
-                  <div class="w-50 position-relative">
+                  <div class="w-50 position-relative d-flex align-items-center">
                     <CodeMirrorInput
                       bind:value={element.value}
                       onUpdateInput={() => {
@@ -368,7 +324,10 @@
                   </div>
                 {/if}
               </div>
-              <div class="h-75 d-flex align-items-center" style="width:48px;">
+              <div
+                class="d-flex align-items-center justify-content-between"
+                style="width:40px;"
+              >
                 {#if pairs.length - 1 != index}
                   {#if isInputBoxEditable}
                     <Tooltip
@@ -379,28 +338,34 @@
                       placement="bottom-left"
                     >
                       <button
-                        class="me-1 d-flex align-items-center justify-content-center bg-secondary-700 border-0 {isInputBoxEditable &&
+                        class="d-flex align-items-center justify-content-center bg-secondary-700 border-0 {isInputBoxEditable &&
                         element.type == 'text' &&
                         element.value == ''
                           ? 'opacity-1'
                           : 'opacity-0 pe-none'}"
-                        style="width:20px; height:16px;"
+                        style="width:16px; height:16px; padding:2px;"
                         on:click={() => {
                           uploadFormFile(index);
                         }}
                       >
-                        <img src={attachFile} alt="" />
+                        <img
+                          src={attachFile}
+                          style="height:100%; width: 100%;"
+                        />
                       </button>
                     </Tooltip>
                     <Tooltip title="Delete" placement="bottom-left">
                       <button
-                        class="me-1 d-flex align-items-center justify-content-center bg-secondary-700 border-0"
-                        style="width:20px; height:16px;"
+                        class="d-flex align-items-center justify-content-center bg-secondary-700 border-0"
+                        style="width:16px; height:16px;"
                         on:click={() => {
                           deleteParam(index);
                         }}
                       >
-                        <img src={trashIcon} alt="" />
+                        <img
+                          src={trashIcon}
+                          style="height:100%; width: 100%;"
+                        />
                       </button>
                     </Tooltip>
                   {:else}
@@ -422,12 +387,9 @@
     border-radius: 0;
     border: 1px solid transparent;
   }
-  .pair-container:nth-child(odd) {
-    margin-top: -1px;
-  }
-  .section-layout {
-    border-top: 1px solid var(--border-secondary-500);
-    border-bottom: 1px solid var(--border-secondary-500);
+
+  .sortable:first-child {
+    border-top: none !important;
   }
 
   /* The container */

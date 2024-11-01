@@ -40,7 +40,7 @@
   on:inview_change={handleChange}
   aria-label="Toggle Hover"
   class="sortable > div pair-container lazy-element"
-  style=" width:100%;"
+  style=" width:100%; border-top :1px solid var(--border-secondary-315);"
   data-list-key={JSON.stringify({
     name: element.key,
     description: element.value,
@@ -48,12 +48,9 @@
   })}
 >
   {#if isInView}
-    <div
-      class=""
-      style="padding-left:7px; padding-top: 1px;  display: flex;flex-direction: column;width:100%; border-bottom:1px solid var(--border-secondary-315);"
-    >
+    <div class="" style="display: flex; flex-direction: column;width:100%; ">
       <div
-        class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
+        class="px-3 d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
         style="padding-top:3px; padding-bottom:3px; height:24px;  "
       >
         <div style="width:30px; height: 14px;">
@@ -73,7 +70,7 @@
           {/if}
         </div>
 
-        <div class=" d-flex gap-0" style="width:calc(100% - 120px);">
+        <div class="d-flex gap-0" style="flex:1;">
           <div class="w-50 position-relative">
             <CodeMirrorInput
               bind:value={element.key}
@@ -100,11 +97,13 @@
               {onUpdateEnvironment}
             />
           </div>
-          <!-- {/if} -->
         </div>
-        <div class="h-70 d-flex justify-content-center align-items-center">
-          <div style="width:40px;">
-            <div style=" margin-left: 10px; margin-right: 6px;">
+        <div
+          style="width:16px;"
+          class="d-flex justify-content-center align-items-center"
+        >
+          <div class="d-flex" style="width:16px;">
+            <div class="d-flex">
               {#if pairs.length - 1 != index}
                 <!-- lists first to last second row -->
                 {#if isInputBoxEditable}
@@ -114,13 +113,13 @@
                     distance={10}
                   >
                     <button
-                      class="bg-secondary-700 d-flex justify-content-center align-items-center border-0"
-                      style="width: 24px; height:16px; padding-end"
+                      class="trash-icon bg-secondary-700 border-radius-2 d-flex justify-content-center align-items-center border-0"
+                      style="width: 16px; height:16px; padding-end"
                       on:click={() => {
                         deleteParam(index);
                       }}
                     >
-                      <img class="trash-icon" src={trashIcon} alt="" />
+                      <img src={trashIcon} style="height: 100%; width: 100%;" />
                     </button>
                   </Tooltip>
                 {/if}
@@ -137,13 +136,8 @@
 </div>
 
 <style>
-  .keyValuePair {
-    background-color: transparent;
-    border-radius: 0;
-    border: 1px solid transparent;
-  }
-  .pair-container:nth-child(odd) {
-    margin-top: -1px;
+  .sortable:first-child {
+    border-top: none !important;
   }
 
   /* The container */
@@ -217,9 +211,6 @@
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
-  }
-  .trash-icon:hover {
-    background-color: var(--bg-secondary-500);
   }
 
   .skelton-parent {
