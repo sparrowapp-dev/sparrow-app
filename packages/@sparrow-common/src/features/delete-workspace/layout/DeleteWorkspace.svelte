@@ -59,7 +59,7 @@
 
   <div
     class="d-flex align-items-center justify-content-between gap-3 mt-2 pb-3 mb-0 rounded ellipsis"
-    style="font-size: 16px; display:flex; flex-wrap:wrap;"
+    style="font-size: 16px;"
   >
     <div class="d-flex "> 
       {#if openTeam?.logo?.size}
