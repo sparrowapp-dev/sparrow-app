@@ -49,11 +49,12 @@
 >
   {#if isInView}
     <div
-      style="padding-top: 1px;  display: flex;flex-direction: column;width:100%;"
+      class=""
+      style="padding-left:7px; padding-top: 1px;  display: flex;flex-direction: column;width:100%; border-bottom:1px solid var(--border-secondary-315);"
     >
       <div
         class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
-        style="padding-top:3px; padding-bottom:3px; height:24px;"
+        style="padding-top:3px; padding-bottom:3px; height:24px;  "
       >
         <div style="width:30px; height: 14px;">
           {#if pairs.length - 1 != index || !isInputBoxEditable}
@@ -227,5 +228,9 @@
     padding: 2px 20px 2px 0px;
     margin: 0px;
     gap: 10%;
+  }
+
+  .pair-wrapper:not(:last-child) {
+    border-bottom: 1px solid #2d2d2d;
   }
 </style>
