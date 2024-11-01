@@ -386,7 +386,7 @@
         displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
         disabled: false,
         hidden: false,
-        icon: SocketIcon,
+        icon: SocketIoIcon,
       },
     ]}
     {noOfColumns}
