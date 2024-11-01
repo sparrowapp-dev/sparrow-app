@@ -25,6 +25,7 @@
   export let handleCreateEnvironment;
   export let onCreateTestflow;
   export let userRole;
+  export let isExpandCollection;
 
   let currentWorkspaceId: string;
 
@@ -52,6 +53,7 @@
           } else {
             showImportCollectionPopup();
           }
+          isExpandCollection = true;
         }}
       />
     {/if}

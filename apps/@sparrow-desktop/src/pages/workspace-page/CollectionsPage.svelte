@@ -69,6 +69,7 @@
   import { WelcomeLogo } from "@sparrow/common/images";
   import { WelcomePopup } from "@sparrow/workspaces/features";
   import SocketIoExplorerPage from "./sub-pages/SocketIoExplorerPage/SocketIoExplorerPage.svelte";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -178,7 +179,8 @@
       (tab?.type === TabTypeEnum.REQUEST ||
         tab?.type === TabTypeEnum.WEB_SOCKET ||
         tab?.type === TabTypeEnum.ENVIRONMENT ||
-        tab?.type === TabTypeEnum.TESTFLOW) &&
+        tab?.type === TabTypeEnum.TESTFLOW ||
+        tab?.type === TabTypeEnum.SOCKET_IO) &&
       !tab?.isSaved
     ) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
@@ -231,7 +233,8 @@
       }
     } else if (
       removeTab.type === TabTypeEnum.REQUEST ||
-      removeTab.type === TabTypeEnum.WEB_SOCKET
+      removeTab.type === TabTypeEnum.WEB_SOCKET ||
+      removeTab.type === TabTypeEnum.SOCKET_IO
     ) {
       if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
         const id = removeTab?.id;
@@ -252,6 +255,16 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
             notifications.success("WebSocket request saved successfully.");
+          }
+        } else if (removeTab.type === TabTypeEnum.SOCKET_IO) {
+          const res = await _viewModel.saveSocketIo(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+            notifications.success(
+              `${SocketIORequestDefaultAliasBaseEnum.NAME} request saved successfully.`,
+            );
           }
         }
         loader = false;
@@ -529,7 +542,11 @@
                       <WorkspaceDefault
                         {currentWorkspace}
                         {handleCreateEnvironment}
-                        onCreateTestflow={_viewModel3.handleCreateTestflow}
+                        onCreateTestflow={() => {
+                          _viewModel3.handleCreateTestflow();
+                          isExpandTestflow = true;
+                        }}
+                        bind:isExpandCollection
                         showImportCollectionPopup={() =>
                           (isImportCollectionPopup = true)}
                         onItemCreated={_viewModel.handleCreateItem}
@@ -730,11 +747,15 @@
       ? removeTab.property.request?.method
       : removeTab.type === TabTypeEnum.WEB_SOCKET
       ? TabTypeEnum.WEB_SOCKET
+      : removeTab.type === TabTypeEnum.SOCKET_IO
+      ? TabTypeEnum.SOCKET_IO
       : ""}
     requestUrl={removeTab.type === TabTypeEnum.REQUEST
       ? removeTab.property.request?.url
       : removeTab.type === TabTypeEnum.WEB_SOCKET
       ? removeTab?.property?.websocket?.url
+      : removeTab.type === TabTypeEnum.SOCKET_IO
+      ? removeTab?.property?.socketio?.url
       : ""}
     requestName={removeTab.name}
     requestDescription={removeTab.description}
@@ -756,6 +777,18 @@
         return res;
       } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
         const res = await _viewModel.saveAsSocket(
+          _workspaceMeta,
+          path,
+          tabName,
+          description,
+          removeTab,
+        );
+        if (res?.status === "success") {
+          _viewModel.handleRemoveTab(removeTab.id);
+        }
+        return res;
+      } else if (removeTab.type === TabTypeEnum.SOCKET_IO) {
+        const res = await _viewModel.saveAsSocketIo(
           _workspaceMeta,
           path,
           tabName,

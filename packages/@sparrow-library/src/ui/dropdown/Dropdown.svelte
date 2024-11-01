@@ -41,7 +41,7 @@
     top: 0,
     left: 0,
   };
-  
+
   onMount(() => {
     /**
      * click event to close the dropdown menu if click anywhere if menu is open
@@ -100,7 +100,7 @@
     -->
       {#each options as item}
         <button
-          class="border-0 d-flex p-2 rounded-1 w-100 option-button {item?.isHoverConstant
+          class="border-0 d-flex align-items-center p-2 rounded-1 w-100 option-button {item?.isHoverConstant
             ? 'hover-effect'
             : ''} "
           style="color: {item.color};"
@@ -112,7 +112,7 @@
               alt=""
               style="width: 15px; height: 15px; margin: auto 10px auto 5px;"
             /> -->
-            <span class="me-2">
+            <span class="me-2 d-flex align-items-center">
               <svelte:component
                 this={item.icon}
                 height={item.iconSize}

@@ -927,11 +927,7 @@
             if (res.status === "success") {
               onFinish(res.data.id);
               onClick(false);
-              if (type !== saveType.SAVE_DESCRIPTION) {
-                notifications.success("API request saved successfully.");
-              } else {
-                notifications.success("Documentation saved successfully.");
-              }
+              notifications.success("Request saved successfully.");
             } else {
               notifications.error(
                 "Failed to save the request. Please try again",

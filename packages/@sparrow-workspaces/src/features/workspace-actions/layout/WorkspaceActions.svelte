@@ -269,6 +269,16 @@
       },
     },
     {
+      name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+      icon: SocketIoIcon,
+      iconColor: "var(--icon-secondary-130)",
+      iconSize: "14px",
+      onclick: () => {
+        onItemCreated("socket-io", {});
+        MixpanelEvent(Events.Add_WebSocket);
+      },
+    },
+    {
       name: "Add Environment",
       icon: StackIcon,
       iconColor: "var(--icon-secondary-130)",
@@ -289,16 +299,6 @@
         isExpandTestflow = true;
       },
       isHoverConstant: false,
-    },
-    {
-      name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
-      icon: SocketIoIcon,
-      iconColor: "var(--icon-secondary-130)",
-      iconSize: "15px",
-      onclick: () => {
-        onItemCreated("socket-io", {});
-        MixpanelEvent(Events.Add_WebSocket);
-      },
     },
   ];
 
