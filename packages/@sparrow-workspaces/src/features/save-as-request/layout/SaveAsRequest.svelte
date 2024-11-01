@@ -765,7 +765,7 @@
         Please add the request name to save the request.
       </p>
     {/if}
-    <div class="d-flex pt-3 pb-3">
+    <div class="d-flex pt-2 pb-4">
       <!-- <ComboText
         value={componentData?.property.request.method}
         comboContainerClassProp={"d-flex flex-start pb-2"}
@@ -800,14 +800,14 @@
     </div>
     {#if !(componentData?.property.request.method === TabTypeEnum.WEB_SOCKET)}
       <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>
-      <div style="height:170px; overflow:auto !important;">
+      <div style="height:77px; overflow:hidden !important;">
         <div
-          class="pb-1 bg-tertiary-300"
+          class="pb-1 bg-tertiary-300 text-fs-10"
           id="editor1"
-          style="width:100%;  margin:0px !important; pointer-events: none !important;"
+          style="width:100%;  margin:0px !important; pointer-events: none !important; opacity:0.5;"
         >
           <TextEditor
-            placeholder={"Add a description to help people know about this request."}
+            placeholder={"Give a description to help people know about this request"}
             isReadOnly={true}
             id={"editor1"}
             value={requestDescription}
@@ -815,7 +815,7 @@
         </div>
       </div>
     {/if}
-    <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>
+    <p class="save-text-clr pt-3 mb-1 sparrow-fs-12">Saving to</p>
     {#if path.length === 0}
       <p
         class=" {isSaveTouched
