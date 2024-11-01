@@ -229,8 +229,4 @@
     margin: 0px;
     gap: 10%;
   }
-
-  .pair-wrapper:not(:last-child) {
-    border-bottom: 1px solid #2d2d2d;
-  }
 </style>
