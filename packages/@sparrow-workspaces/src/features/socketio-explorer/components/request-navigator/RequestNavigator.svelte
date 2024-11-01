@@ -79,7 +79,7 @@
           ><span>{tab.name}</span>
           {#if tab.count}
             <span class="ms-1"></span>
-            <Label textColor={"var(--text-primary-300)"}  backgroundColor={"var( --text-tertiary-300)"} number={tab.count} />
+            <Label textColor={"var(--text-primary-300)"}  backgroundColor={"var(--bg-tertiary-300)"} number={tab.count} />
           {/if}
         </span>
       </button>
