@@ -9,7 +9,6 @@
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
 
   // ---- Components
-  import Request from "../request/Request.svelte";
   import { Spinner } from "@sparrow/library/ui";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
@@ -21,16 +20,9 @@
     ItemType,
     UntrackedItems,
   } from "@sparrow/common/enums/item-type.enum";
-  import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
-  import {
-    workspaceLevelPermissions,
-    PERMISSION_NOT_FOUND_TEXT,
-  } from "@sparrow/common/constants/permissions.constant";
+
   import { WorkspaceRole } from "@sparrow/common/enums";
-  import type {
-    Folder,
-    Path,
-  } from "@sparrow/common/interfaces/request.interface";
+  import type { Path } from "@sparrow/common/interfaces/request.interface";
 
   // ---- Store
   // import { selectMethodsStore } from "@app/store/auth.store/methods";
@@ -39,11 +31,12 @@
   // import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   // import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
-  // ---- DB
-  import type { CollectionDocument } from "@app/database/database";
-  // import { of } from "rxjs";
-  import { isGuestUserActive } from "@app/store/auth.store";
-  import { WebSocket } from "..";
+  import { WebSocket, Request, SocketIo } from "..";
+  import type {
+    CollectionBaseInterface,
+    CollectionItemBaseInterface,
+  } from "@sparrow/common/types/workspace/collection-base";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
   /**
    * Callback for Item created
@@ -72,7 +65,7 @@
   /**
    * Whole Collection Document
    */
-  export let collection: CollectionDocument;
+  export let collection: CollectionBaseInterface;
   /**
    * Role of user in workspace
    */
@@ -84,8 +77,8 @@
   /**
    * Selected folder details
    */
-  export let explorer: Folder;
-  export let folder: Folder | null = null;
+  export let explorer: CollectionItemBaseInterface;
+  export let folder: CollectionItemBaseInterface;
   export let activeTabId: string;
   export let searchData: string;
   /**
@@ -103,10 +96,6 @@
   let requestCount: number;
   let requestIds: [string] | [] = [];
   let folderTabWrapper: HTMLElement;
-  let isGuestUser: boolean;
-  isGuestUserActive.subscribe((value) => {
-    isGuestUser = value;
-  });
 
   $: {
     if (searchData) {
@@ -198,7 +187,7 @@
     width={"35%"}
     zIndex={1000}
     isOpen={isFolderPopup}
-    handleModalState={(flag) => (isFolderPopup = flag)}
+    handleModalState={(flag = false) => (isFolderPopup = flag)}
   >
     <div class="text-lightGray mb-1 sparrow-fs-14">
       <p>
@@ -321,6 +310,22 @@
         },
         {
           onClick: () => {
+            onItemCreated("socketioFolder", {
+              workspaceId: collection.workspaceId,
+              collection,
+              folder: explorer,
+            });
+          },
+          displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+          disabled: false,
+          hidden:
+            !collection.activeSync ||
+            (explorer?.source === "USER" && collection.activeSync)
+              ? false
+              : true,
+        },
+        {
+          onClick: () => {
             isFolderPopup = true;
           },
           displayText: "Delete",
@@ -422,7 +427,7 @@
           {/if}
         </button>
 
-        {#if explorer.id.includes(UntrackedItems.UNTRACKED) && !isGuestUser}
+        {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
           <Spinner size={"15px"} />
         {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
           <Tooltip
@@ -462,7 +467,7 @@
               class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
                 ? 'threedot-active'
                 : ''}"
-                style="transform: rotate(90deg);"
+              style="transform: rotate(90deg);"
               on:click={(e) => {
                 rightClickContextMenu(e);
               }}
@@ -543,6 +548,20 @@
         <WebSocket
           bind:userRole
           api={explorer}
+          {onItemRenamed}
+          {onItemDeleted}
+          {onItemOpened}
+          {folder}
+          {collection}
+          {activeTabId}
+          {activeTabPath}
+        />
+      </div>
+    {:else if explorer.type === ItemType.SOCKET_IO}
+      <div style="cursor:pointer;">
+        <SocketIo
+          bind:userRole
+          socketIo={explorer}
           {onItemRenamed}
           {onItemDeleted}
           {onItemOpened}

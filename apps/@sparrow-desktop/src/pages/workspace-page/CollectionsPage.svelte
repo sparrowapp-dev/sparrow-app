@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Route } from "svelte-navigator";
   import { Pane, Splitpanes } from "svelte-splitpanes";
-  import { userValidationStore } from '@app/store/deviceSync.store';
+  import { userValidationStore } from "@app/store/deviceSync.store";
 
   // ---- Store
   import {
@@ -58,12 +58,8 @@
   import { pagesMotion } from "../../constants";
   import { user } from "@app/store/auth.store";
   import WebSocketExplorerPage from "./sub-pages/WebSocketExplorerPage/WebSocketExplorerPage.svelte";
-  import {
-    TabTypeEnum,
-    type RequestTab,
-    type Tab,
-  } from "@sparrow/common/types/workspace";
-  import type { WebSocketTab } from "@sparrow/common/types/workspace/web-socket";
+  import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+  import { type Tab } from "@sparrow/common/types/workspace/tab";
   import EnvironmentExplorerPage from "./sub-pages/EnvironmentExplorer/EnvironmentExplorerPage.svelte";
   import TestFlowExplorerPage from "./sub-pages/TestflowExplorerPage/TestflowExplorerPage.svelte";
   import { TestflowViewModel } from "./Testflow.ViewModel";
@@ -72,6 +68,8 @@
   import { isUserFirstSignUp } from "@app/store/user.store";
   import { WelcomeLogo } from "@sparrow/common/images";
   import { WelcomePopup } from "@sparrow/workspaces/features";
+  import SocketIoExplorerPage from "./sub-pages/SocketIoExplorerPage/SocketIoExplorerPage.svelte";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -181,7 +179,8 @@
       (tab?.type === TabTypeEnum.REQUEST ||
         tab?.type === TabTypeEnum.WEB_SOCKET ||
         tab?.type === TabTypeEnum.ENVIRONMENT ||
-        tab?.type === TabTypeEnum.TESTFLOW) &&
+        tab?.type === TabTypeEnum.TESTFLOW ||
+        tab?.type === TabTypeEnum.SOCKET_IO) &&
       !tab?.isSaved
     ) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
@@ -234,7 +233,8 @@
       }
     } else if (
       removeTab.type === TabTypeEnum.REQUEST ||
-      removeTab.type === TabTypeEnum.WEB_SOCKET
+      removeTab.type === TabTypeEnum.WEB_SOCKET ||
+      removeTab.type === TabTypeEnum.SOCKET_IO
     ) {
       if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
         const id = removeTab?.id;
@@ -255,6 +255,16 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
             notifications.success("WebSocket request saved successfully.");
+          }
+        } else if (removeTab.type === TabTypeEnum.SOCKET_IO) {
+          const res = await _viewModel.saveSocketIo(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+            notifications.success(
+              `${SocketIORequestDefaultAliasBaseEnum.NAME} request saved successfully.`,
+            );
           }
         }
         loader = false;
@@ -298,11 +308,11 @@
   let count = 0;
 
   let isAccessDeniedModalOpen = false;
-  
+
   // Add userValidation state
   let userValidation = {
     isValid: true,
-    checked: false
+    checked: false,
   };
   const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
@@ -335,17 +345,18 @@
               value?._id,
               totalTabsToBeDeleted,
             );
-            const userHasAccess = value.users?.some(user => user.id === userId);
+            const userHasAccess = value.users?.some(
+              (user) => user.id === userId,
+            );
           },
-  
         );
 
-        userValidationStore.subscribe(validation => {
-         if (!validation.isValid) {
-         isAccessDeniedModalOpen = true;
-         isWelcomePopupOpen = false; 
-         }
-      });
+        userValidationStore.subscribe((validation) => {
+          if (!validation.isValid) {
+            isAccessDeniedModalOpen = true;
+            isWelcomePopupOpen = false;
+          }
+        });
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
       }
@@ -364,8 +375,6 @@
       });
     }
   });
-
-
 
   const handleAccessDeniedClose = () => {
     isAccessDeniedModalOpen = false;
@@ -521,13 +530,23 @@
                       <TestFlowExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
+                {:else if $activeTab?.type === ItemType.SOCKET_IO}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <SocketIoExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
                 {:else if !$tabList?.length}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WorkspaceDefault
                         {currentWorkspace}
                         {handleCreateEnvironment}
-                        onCreateTestflow={_viewModel3.handleCreateTestflow}
+                        onCreateTestflow={() => {
+                          _viewModel3.handleCreateTestflow();
+                          isExpandTestflow = true;
+                        }}
+                        bind:isExpandCollection
                         showImportCollectionPopup={() =>
                           (isImportCollectionPopup = true)}
                         onItemCreated={_viewModel.handleCreateItem}
@@ -591,7 +610,8 @@
   >
     <div class="py-4">
       <p class=" mb-4">
-        You don't seem to have access to this resourse. Please check if you are using the right account.
+        You don't seem to have access to this resourse. Please check if you are
+        using the right account.
       </p>
     </div>
   </Modal>
@@ -727,11 +747,15 @@
       ? removeTab.property.request?.method
       : removeTab.type === TabTypeEnum.WEB_SOCKET
       ? TabTypeEnum.WEB_SOCKET
+      : removeTab.type === TabTypeEnum.SOCKET_IO
+      ? TabTypeEnum.SOCKET_IO
       : ""}
     requestUrl={removeTab.type === TabTypeEnum.REQUEST
       ? removeTab.property.request?.url
       : removeTab.type === TabTypeEnum.WEB_SOCKET
       ? removeTab?.property?.websocket?.url
+      : removeTab.type === TabTypeEnum.SOCKET_IO
+      ? removeTab?.property?.socketio?.url
       : ""}
     requestName={removeTab.name}
     requestDescription={removeTab.description}
@@ -753,6 +777,18 @@
         return res;
       } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
         const res = await _viewModel.saveAsSocket(
+          _workspaceMeta,
+          path,
+          tabName,
+          description,
+          removeTab,
+        );
+        if (res?.status === "success") {
+          _viewModel.handleRemoveTab(removeTab.id);
+        }
+        return res;
+      } else if (removeTab.type === TabTypeEnum.SOCKET_IO) {
+        const res = await _viewModel.saveAsSocketIo(
           _workspaceMeta,
           path,
           tabName,

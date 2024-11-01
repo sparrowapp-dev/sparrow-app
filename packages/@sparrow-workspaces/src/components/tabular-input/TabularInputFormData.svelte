@@ -163,14 +163,15 @@
 </script>
 
 <div
-  class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
+  class="mb-0 me-0 w-100 bg-secondary-700  py-0 border-radius-2 section-layout"
 >
   <div
-    class="d-flex gap-3 align-items-center w-100 {!isTopHeaderRequired
+    class="d-flex gap-3 ps-3 align-items-center w-100 {!isTopHeaderRequired
       ? 'd-none'
       : ''}"
+    style="background-color:var(--bg-secondary-880);"
   >
-    <div style="width:30px; margin-left: 5px;">
+    <div style="width:30px; margin-left: 5px;  ">
       <label class="container">
         <input
           type="checkbox"
@@ -183,7 +184,7 @@
     </div>
     <div
       class="d-flex pair-title bg-secondary-700 align-items-center w-100"
-      style="font-size: 12px; font-weight: 500;"
+      style="font-size: 12px; font-weight: 500; background-color:var(--bg-secondary-880);"
     >
       <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-2">Key</p>
       <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1">Value</p>
@@ -218,11 +219,13 @@
   </div>
 
   <div
-    class="w-100"
+    class="w-100 "
     style="display:block; position:relative;
-      width:200px;
+      width:200px;    
       "
   >
+
+  
     {#if readable.key || readable.value}
       <div
         aria-label="Toggle Hover"
@@ -277,8 +280,9 @@
       {#each pairs as element, index}
         <div
           aria-label="Toggle Hover"
-          class="sortable > div pair-container"
-          style=" width:100%;"
+          class="sortable > div pair-container ps-3"
+          style=" width:100%; border-bottom:1px solid var(--border-secondary-315);
+  "
           data-list-key={JSON.stringify({
             name: element.key,
             description: element.value,

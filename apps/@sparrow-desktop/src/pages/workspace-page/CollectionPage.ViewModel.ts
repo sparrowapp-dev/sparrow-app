@@ -63,12 +63,12 @@ import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { isGuestUserActive } from "@app/store/auth.store";
 import { InitTab } from "@sparrow/common/factory";
 import type {
-  CollectionArgsDto,
-  CollectionDto,
-  CollectionItemsDto,
-  RequestDto,
-  Tab,
-} from "@sparrow/common/types/workspace";
+  CollectionBaseInterface as CollectionDto,
+  CollectionArgsBaseInterface as CollectionArgsDto,
+  CollectionItemBaseInterface as CollectionItemsDto,
+} from "@sparrow/common/types/workspace/collection-base";
+import type { HttpRequestBaseInterface as RequestDto } from "@sparrow/common/types/workspace/http-request-base";
+import { type Tab } from "@sparrow/common/types/workspace/tab";
 import { SocketTabAdapter } from "../../adapter/socket-tab";
 import type { CollectionDocType } from "../../models/collection.model";
 import type { GuideQuery } from "../../types/user-guide";
@@ -76,6 +76,14 @@ import type { FeatureQuery } from "../../types/feature-switch";
 import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/utils";
 
 import { createDeepCopy } from "@sparrow/common/utils";
+import { SocketIoTabAdapter } from "../../adapter";
+import { CollectionItemTypeDtoEnum } from "@sparrow/common/types/workspace/collection-dto";
+import type {
+  SocketIORequestDeletePayloadDtoInterface,
+  SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
+  SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
+} from "@sparrow/common/types/workspace/socket-io-request-dto";
+import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -301,6 +309,22 @@ export default class CollectionsViewModel {
     if (ws) {
       this.tabRepository.createTab(
         this.initTab.webSocket("UNTRACKED-" + uuidv4(), ws._id).getValue(),
+      );
+      moveNavigation("right");
+      MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
+    } else {
+      console.error("No active workspace found!");
+    }
+  };
+
+  /**
+   * Create web socket new tab with untracked id
+   */
+  private createSocketIoNewTab = async () => {
+    const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
+    if (ws) {
+      this.tabRepository.createTab(
+        this.initTab.socketIo("UNTRACKED-" + uuidv4(), ws._id).getValue(),
       );
       moveNavigation("right");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
@@ -1076,6 +1100,95 @@ export default class CollectionsViewModel {
   };
 
   /**
+   * Handle creating a new socket io in a collection
+   * @param _workspaceId - workspace id
+   * @param _collection - the collection in which new socket io is going to be created
+   */
+  private handleCreateSocketIoInCollection = async (
+    _workspaceId: string,
+    _collection: CollectionDto,
+  ) => {
+    const socketIoTab = new InitTab().socketIo(uuidv4(), _workspaceId);
+    const socketIoOfCollectionPayload: SocketIORequestCreateUpdateInCollectionPayloadDtoInterface =
+      {
+        collectionId: _collection.id,
+        workspaceId: _workspaceId,
+        currentBranch: _collection.activeSync
+          ? _collection.currentBranch
+          : undefined,
+        source: _collection.activeSync ? "USER" : undefined,
+        items: {
+          name: socketIoTab.getValue().name,
+          type: CollectionItemTypeDtoEnum.SOCKETIO,
+          description: "",
+          socketio: {},
+        },
+      };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      await this.collectionRepository.addRequestOrFolderInCollection(
+        _collection.id as string,
+        {
+          ...socketIoOfCollectionPayload.items,
+          id: socketIoTab.getValue().id,
+        },
+      );
+      socketIoTab.updatePath({
+        workspaceId: _workspaceId,
+        collectionId: _collection.id,
+        folderId: "",
+      });
+      socketIoTab.updateIsSave(true);
+      await this.tabRepository.createTab(socketIoTab.getValue());
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    }
+
+    const response = await this.collectionService.addSocketIoInCollection(
+      socketIoOfCollectionPayload,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+
+      await this.collectionRepository.addRequestOrFolderInCollection(
+        _collection.id as string,
+        {
+          ...res,
+        },
+      );
+
+      socketIoTab.updateId(res.id as string);
+      socketIoTab.updatePath({
+        workspaceId: _workspaceId,
+        collectionId: _collection.id,
+        folderId: "",
+      });
+      socketIoTab.updateIsSave(true);
+
+      this.tabRepository.createTab(socketIoTab.getValue());
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    } else {
+      this.collectionRepository.deleteRequestOrFolderInCollection(
+        _collection.id,
+        socketIoTab.getValue().id,
+      );
+      notifications.error(response.message);
+    }
+  };
+
+  /**
    * Handles creating a new request in a folder
    * @param workspaceId :string
    * @param collection :CollectionDocument - the collection in which new request is going to be created
@@ -1314,6 +1427,113 @@ export default class CollectionsViewModel {
         requestObj.collectionId,
         requestObj.folderId,
         websocket.getValue().id,
+      );
+    }
+  };
+
+  /**
+   * Handles creating a new socket io in a folder
+   * @param _workspaceId - the workspace id in which new socket io is going to be created
+   * @param _collection - the collection in which new socket io is going to be created
+   * @param _folder - the folder in which new socket io is going to be created
+   */
+  private handleCreateSocketIoInFolder = async (
+    _workspaceId: string,
+    _collection: CollectionDto,
+    _folder: CollectionItemsDto,
+  ) => {
+    const socketIoTab = new InitTab().socketIo(uuidv4(), _workspaceId);
+
+    const socketIoInFolderPayload: SocketIORequestCreateUpdateInFolderPayloadDtoInterface =
+      {
+        collectionId: _collection.id,
+        workspaceId: _workspaceId,
+        currentBranch:
+          _collection.activeSync && _folder.source === "USER"
+            ? _collection.currentBranch
+            : undefined,
+        source:
+          _collection.activeSync && _folder.source === "USER"
+            ? _folder.source
+            : undefined,
+        folderId: _folder.id,
+        items: {
+          name: _folder.name,
+          type: CollectionItemTypeDtoEnum.FOLDER,
+          id: _folder.id,
+          items: {
+            name: socketIoTab.getValue().name,
+            type: CollectionItemTypeDtoEnum.SOCKETIO,
+            description: "",
+            socketio: {},
+          },
+        },
+      };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      await this.collectionRepository.addRequestInFolder(
+        socketIoInFolderPayload.collectionId,
+        socketIoInFolderPayload.folderId as string,
+        {
+          ...socketIoInFolderPayload?.items?.items,
+          id: socketIoTab.getValue().id,
+        },
+      );
+
+      socketIoTab
+        .updatePath({
+          workspaceId: _workspaceId,
+          collectionId: _collection.id,
+          folderId: _folder.id,
+        })
+        .updateIsSave(true);
+      this.tabRepository.createTab(socketIoTab.getValue());
+
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    }
+    const response = await this.collectionService.addSocketIoInCollection(
+      socketIoInFolderPayload,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const request = response.data.data;
+
+      await this.collectionRepository.addRequestInFolder(
+        socketIoInFolderPayload.collectionId,
+        socketIoInFolderPayload.folderId as string,
+        {
+          ...request,
+        },
+      );
+
+      socketIoTab
+        .updateId(request?.id as string)
+        .updatePath({
+          workspaceId: _workspaceId,
+          collectionId: _collection.id,
+          folderId: _folder.id,
+        })
+        .updateIsSave(true);
+      this.tabRepository.createTab(socketIoTab.getValue());
+
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    } else {
+      this.collectionRepository.deleteRequestInFolder(
+        socketIoInFolderPayload.collectionId,
+        socketIoInFolderPayload.folderId as string,
+        socketIoTab.getValue().id,
       );
     }
   };
@@ -1631,6 +1851,30 @@ export default class CollectionsViewModel {
       websocket,
     );
     this.tabRepository.createTab(adaptedSocket);
+    moveNavigation("right");
+  };
+
+  /**
+   * Handles opening a socket io on a tab
+   * @param _workspaceId  Workspace id of which tab belongs to.
+   * @param _collection  Collection of which tab belongs to.
+   * @param _folder Folder of which tab belongs to.
+   * @param _socketIo Socket Io meta data
+   */
+  public handleOpenSocketIoTab = (
+    _workspaceId: string,
+    _collection: CollectionDto,
+    _folder: CollectionItemsDto,
+    _socketIo: CollectionItemsDto,
+  ) => {
+    const socketIoTabAdapter = new SocketIoTabAdapter();
+    const adaptedSocketIo = socketIoTabAdapter.adapt(
+      _workspaceId || "",
+      _collection?.id || "",
+      _folder?.id || "",
+      _socketIo,
+    );
+    this.tabRepository.createTab(adaptedSocketIo);
     moveNavigation("right");
   };
 
@@ -1964,6 +2208,175 @@ export default class CollectionsViewModel {
   };
 
   /**
+   * Handles renaming a socket io
+   * @param _workspaceId
+   * @param _collection The collection in which the request is saved
+   * @param _folder The folder in which the request is saved(if request if saved inside a folder)
+   * @param _socketIo The request which is going to be renamed
+   * @param _newSocketIoName The new name of the request
+   */
+  private handleRenameSocketIO = async (
+    _workspaceId: string,
+    _collection: CollectionDto,
+    _folder: CollectionItemsDto,
+    _socketIo: CollectionItemsDto,
+    _newSocketIoName: string,
+  ) => {
+    let isGuestUser = true;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (_collection.id && _workspaceId && !_folder.id) {
+        const response =
+          await this.collectionRepository.readRequestOrFolderInCollection(
+            _collection.id,
+            _socketIo.id,
+          );
+        if (response) {
+          response.name = _newSocketIoName;
+        }
+        await this.collectionRepository.updateRequestOrFolderInCollection(
+          _collection.id,
+          _socketIo.id,
+          response,
+        );
+        this.updateTab(_socketIo.id, {
+          name: _newSocketIoName,
+        });
+        MixpanelEvent(Events.RENAME_REQUEST, {
+          source: "Collection list",
+        });
+        return;
+      }
+      if (_collection.id && _workspaceId && _folder.id) {
+        const response = await this.collectionRepository.readRequestInFolder(
+          _collection.id,
+          _folder.id,
+          _socketIo.id,
+        );
+        if (response) {
+          response.name = _newSocketIoName;
+        }
+        await this.collectionRepository.updateRequestInFolder(
+          _collection.id,
+          _folder.id,
+          _socketIo.id,
+          response,
+        );
+        this.updateTab(_socketIo.id, {
+          name: _newSocketIoName,
+        });
+        MixpanelEvent(Events.RENAME_REQUEST, {
+          source: "Collection list",
+        });
+        return;
+      }
+      return;
+    }
+    if (!_newSocketIoName) {
+      return;
+    }
+    if (_collection.id && _workspaceId && !_folder.id) {
+      const response = await this.collectionService.updateSocketIoInCollection(
+        _socketIo.id,
+        {
+          collectionId: _collection.id,
+          workspaceId: _workspaceId,
+          currentBranch:
+            _collection.activeSync && _socketIo.source === "USER"
+              ? _collection.currentBranch
+              : undefined,
+          source:
+            _collection.activeSync && _socketIo.source === "USER"
+              ? _socketIo.source
+              : undefined,
+          items: {
+            createdAt: _socketIo.createdAt,
+            createdBy: _socketIo.createdBy,
+            description: _socketIo.description,
+            id: _socketIo.id,
+            isDeleted: _socketIo.isDeleted,
+            name: _newSocketIoName,
+            socketio: _socketIo.socketio,
+            source: _socketIo.source,
+            type: _socketIo.type,
+            updatedAt: _socketIo.updatedAt,
+            updatedBy: _socketIo.updatedBy,
+          },
+        } as SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
+      );
+      if (!response?.isSuccessful) {
+        return;
+      }
+      this.collectionRepository.updateRequestOrFolderInCollection(
+        _collection.id,
+        _socketIo.id,
+        response.data.data,
+      );
+      this.updateTab(_socketIo.id, {
+        name: _newSocketIoName,
+      });
+      MixpanelEvent(Events.RENAME_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    }
+    if (_collection.id && _workspaceId && _folder.id) {
+      const response = await this.collectionService.updateSocketIoInCollection(
+        _socketIo.id,
+        {
+          collectionId: _collection.id,
+          workspaceId: _workspaceId,
+          currentBranch:
+            _collection?.activeSync && _socketIo?.source === "USER"
+              ? _collection?.currentBranch
+              : undefined,
+          source:
+            _collection?.activeSync && _socketIo?.source === "USER"
+              ? _socketIo?.source
+              : undefined,
+          folderId: _folder.id,
+          items: {
+            name: _folder.name,
+            id: _folder.id,
+            type: CollectionItemTypeDtoEnum.FOLDER,
+            items: {
+              createdAt: _socketIo.createdAt,
+              createdBy: _socketIo.createdBy,
+              description: _socketIo.description,
+              id: _socketIo.id,
+              isDeleted: _socketIo.isDeleted,
+              name: _newSocketIoName,
+              socketio: _socketIo.socketio,
+              source: _socketIo.source,
+              type: _socketIo.type,
+              updatedAt: _socketIo.updatedAt,
+              updatedBy: _socketIo.updatedBy,
+            },
+          },
+        } as SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
+      );
+      if (!response?.isSuccessful) {
+        return;
+      }
+      this.collectionRepository.updateRequestInFolder(
+        _collection.id,
+        _folder.id,
+        _socketIo.id,
+        response.data.data,
+      );
+      this.updateTab(_socketIo.id, {
+        name: _newSocketIoName,
+      });
+      MixpanelEvent(Events.RENAME_REQUEST, {
+        source: "Collection list",
+      });
+    }
+  };
+
+  /**
    * Handles loading the collection from local repository from active branch
    * @param collection :CollectionDocument
    * @returns :{ activeSyncLoad: boolean; isBranchSynced: boolean }
@@ -2254,11 +2667,13 @@ export default class CollectionsViewModel {
           folder.id,
           websocket.id,
         );
+        this.removeMultipleTabs([websocket.id]);
       } else {
         await this.collectionRepository.deleteRequestOrFolderInCollection(
           collection.id,
           websocket.id,
         );
+        this.removeMultipleTabs([websocket.id]);
       }
 
       return true;
@@ -2296,6 +2711,92 @@ export default class CollectionsViewModel {
       notifications.error("Failed to delete WebSocket. Plaease try again.");
       return false;
     }
+  };
+
+  /**
+   * Handle deleting request from repository as well as backend
+   * @param _workspaceId :string
+   * @param _collection :CollectionDocument - The collection in which the request is saved
+   * @param _socketIo : - The request to be deleted
+   * @param _folder : - The folder in which the request is saved(if is saved in a folder)
+   * @returns :void
+   */
+  private handleDeleteSocketIO = async (
+    _workspaceId: string,
+    _collection: CollectionDto,
+    _socketIo: CollectionItemsDto,
+    _folder: CollectionItemsDto,
+  ): Promise<boolean> => {
+    let userSource = {};
+    if (_collection.activeSync) {
+      userSource = {
+        currentBranch: _collection.currentBranch,
+      };
+    }
+
+    let isGuestUser = true;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (_folder) {
+        await this.collectionRepository.deleteRequestInFolder(
+          _collection.id,
+          _folder.id,
+          _socketIo.id,
+        );
+        this.removeMultipleTabs([_socketIo.id]);
+      } else {
+        await this.collectionRepository.deleteRequestOrFolderInCollection(
+          _collection.id,
+          _socketIo.id,
+        );
+        this.removeMultipleTabs([_socketIo.id]);
+      }
+
+      return true;
+    }
+    const response = await this.collectionService.deleteSocketIoInCollection(
+      _socketIo.id,
+      {
+        collectionId: _collection.id,
+        workspaceId: _workspaceId,
+        folderId: _folder?.id ? _folder?.id : undefined,
+        source: _collection.activeSync ? _socketIo?.source : undefined,
+        currentBranch: _collection.activeSync
+          ? _collection.currentBranch
+          : undefined,
+      } as SocketIORequestDeletePayloadDtoInterface,
+    );
+
+    if (!response?.isSuccessful) {
+      notifications.error(
+        `Failed to delete ${SocketIORequestDefaultAliasBaseEnum.NAME}. Plaease try again.`,
+      );
+      return false;
+    }
+    if (_folder?.id && _collection.id && _workspaceId) {
+      await this.collectionRepository.deleteRequestInFolder(
+        _collection.id,
+        _folder.id,
+        _socketIo.id,
+      );
+    } else if (_workspaceId && _collection.id) {
+      await this.collectionRepository.deleteRequestOrFolderInCollection(
+        _collection.id,
+        _socketIo.id,
+      );
+    }
+
+    notifications.success(
+      `"${_socketIo.name}" ${SocketIORequestDefaultAliasBaseEnum.NAME} deleted.`,
+    );
+    this.removeMultipleTabs([_socketIo.id]);
+    MixpanelEvent(Events.DELETE_REQUEST, {
+      source: "Collection list",
+    });
+    return true;
   };
 
   /**
@@ -2809,6 +3310,22 @@ export default class CollectionsViewModel {
           args.folder as CollectionItemsDto,
         );
         break;
+      case "socket-io":
+        await this.createSocketIoNewTab();
+        break;
+      case "socketioCollection":
+        await this.handleCreateSocketIoInCollection(
+          args.workspaceId,
+          args.collection as CollectionDto,
+        );
+        break;
+      case "socketioFolder":
+        await this.handleCreateSocketIoInFolder(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+        );
+        break;
     }
     return response;
   };
@@ -2851,6 +3368,14 @@ export default class CollectionsViewModel {
           args.workspaceId,
           args.collection as CollectionDto,
           args.websocket as CollectionItemsDto,
+          args.folder as CollectionItemsDto,
+        );
+        break;
+      case "socket-io":
+        this.handleDeleteSocketIO(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.socketio as CollectionItemsDto,
           args.folder as CollectionItemsDto,
         );
         break;
@@ -2897,6 +3422,15 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
           args.websocket as CollectionItemsDto,
+          args.newName as string,
+        );
+        break;
+      case "socket-io":
+        this.handleRenameSocketIO(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.socketio as CollectionItemsDto,
           args.newName as string,
         );
         break;
@@ -2956,6 +3490,14 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
           args.websocket as CollectionItemsDto,
+        );
+        break;
+      case "socket-io":
+        this.handleOpenSocketIoTab(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.socketio as CollectionItemsDto,
         );
         break;
     }
@@ -3625,6 +4167,299 @@ export default class CollectionsViewModel {
         status: "error",
         message: res.message,
       };
+    }
+  };
+
+  /**
+   * Save Request
+   * @param saveDescriptionOnly - refers save overall request data or only description as a documentation purpose.
+   * @returns save status
+   */
+  public saveSocketIo = async (componentData: Tab) => {
+    const { folderId, collectionId, workspaceId } = componentData.path;
+
+    if (!workspaceId || !collectionId) {
+      return {
+        status: "error",
+        message: "request is not a part of any workspace or collection",
+      };
+    }
+    const _collection = await this.readCollection(collectionId);
+    let userSource = {};
+    if (_collection?.activeSync && componentData?.source === "USER") {
+      userSource = {
+        currentBranch: _collection?.currentBranch,
+        source: "USER",
+      };
+    }
+    const _id = componentData.id;
+
+    const socketTabAdapter = new SocketIoTabAdapter();
+    const unadaptedSocket = socketTabAdapter.unadapt(componentData);
+    // Save overall api
+
+    const socketMetaData = {
+      id: _id,
+      name: componentData?.name,
+      description: componentData?.description,
+      type: ItemType.SOCKET_IO,
+    };
+
+    let folderSource;
+    let itemSource;
+    if (folderId) {
+      folderSource = {
+        folderId: folderId,
+      };
+      itemSource = {
+        id: folderId,
+        type: ItemType.FOLDER,
+        items: {
+          ...socketMetaData,
+          socketio: unadaptedSocket,
+        },
+      };
+    } else {
+      itemSource = {
+        ...socketMetaData,
+        socketio: unadaptedSocket,
+      };
+    }
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser === true) {
+      const data = {
+        id: _id,
+        name: socketMetaData.name,
+        description: socketMetaData.description,
+        type: ItemType.SOCKET_IO,
+        socketio: unadaptedSocket,
+        updatedAt: "",
+        updatedBy: "Guest User",
+      };
+
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          _id,
+          data,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          _id,
+          data,
+        );
+      }
+      return {
+        status: "success",
+        message: "",
+      };
+    }
+    const res = await this.collectionService.updateSocketIoInCollection(_id, {
+      collectionId: collectionId,
+      workspaceId: workspaceId,
+      ...folderSource,
+      ...userSource,
+      items: itemSource,
+    });
+
+    if (res.isSuccessful) {
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          _id,
+          res.data.data,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          _id,
+          res.data.data,
+        );
+      }
+      return {
+        status: "success",
+        message: res.message,
+      };
+    } else {
+      return {
+        status: "error",
+        message: res.message,
+      };
+    }
+  };
+
+  /**
+   *
+   * @param _workspaceMeta - workspace meta data
+   * @param path - request stack path
+   * @param tabName - request name
+   * @param description - request description
+   * @param type - save over all request or description only
+   */
+  public saveAsSocketIo = async (
+    _workspaceMeta: {
+      id: string;
+      name: string;
+    },
+    path: {
+      name: string;
+      id: string;
+      type: string;
+    }[],
+    tabName: string,
+    description: string,
+    componentData: Tab,
+  ) => {
+    let userSource = {};
+    // const _id = componentData.id;
+    if (path.length > 0) {
+      const socketTabAdapter = new SocketIoTabAdapter();
+      const unadaptedSocket = socketTabAdapter.unadapt(componentData);
+      const req = {
+        id: uuidv4(),
+        name: tabName,
+        description,
+        type: ItemType.SOCKET_IO,
+        socketio: unadaptedSocket,
+        source: "USER",
+        isDeleted: false,
+        createdBy: "Guest User",
+        updatedBy: "Guest User",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      if (path[path.length - 1].type === ItemType.COLLECTION) {
+        /**
+         * handle request at collection level
+         */
+        const _collection = await this.readCollection(path[path.length - 1].id);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
+        let isGuestUser;
+        isGuestUserActive.subscribe((value) => {
+          isGuestUser = value;
+        });
+
+        if (isGuestUser == true) {
+          this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
+
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+        }
+        const res = await this.collectionService.addSocketIoInCollection({
+          collectionId: path[path.length - 1].id,
+          workspaceId: _workspaceMeta.id,
+          ...userSource,
+          items: {
+            name: tabName,
+            description,
+            type: CollectionItemTypeDtoEnum.SOCKETIO,
+            socketio: unadaptedSocket,
+          },
+        });
+        if (res.isSuccessful) {
+          this.addRequestOrFolderInCollection(
+            path[path.length - 1].id,
+            res.data.data,
+          );
+
+          return {
+            status: "success",
+            message: res.message,
+            data: {
+              id: res.data.data.id,
+            },
+          };
+        } else {
+          return {
+            status: "error",
+            message: res.message,
+          };
+        }
+      } else if (path[path.length - 1].type === ItemType.FOLDER) {
+        /**
+         * handle request at folder level
+         */
+        const _collection = await this.readCollection(path[0].id);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
+        let isGuestUser;
+        isGuestUserActive.subscribe((value) => {
+          isGuestUser = value;
+        });
+
+        if (isGuestUser == true) {
+          this.collectionRepository.addRequestInFolder(
+            path[0].id,
+            path[path.length - 1].id,
+            req,
+          );
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+        }
+        const res = await this.collectionService.addSocketIoInCollection({
+          collectionId: path[0].id,
+          workspaceId: _workspaceMeta.id,
+          folderId: path[path.length - 1].id,
+          ...userSource,
+          items: {
+            id: path[path.length - 1].id,
+            name: path[path.length - 1].name,
+            type: CollectionItemTypeDtoEnum.FOLDER,
+            items: {
+              name: tabName,
+              description,
+              type: CollectionItemTypeDtoEnum.SOCKETIO,
+              socketio: unadaptedSocket,
+            },
+          },
+        });
+        if (res.isSuccessful) {
+          this.collectionRepository.addRequestInFolder(
+            path[0].id,
+            path[path.length - 1].id,
+            res.data.data,
+          );
+          return {
+            status: "success",
+            message: res.message,
+            data: {
+              id: res.data.data.id,
+            },
+          };
+        } else {
+          return {
+            status: "error",
+            message: res.message,
+          };
+        }
+      }
+      MixpanelEvent(Events.SAVE_API_REQUEST);
     }
   };
 }

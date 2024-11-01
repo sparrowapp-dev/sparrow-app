@@ -2,7 +2,7 @@ import { user } from "@app/store/auth.store";
 import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
 import type { InviteBody } from "@sparrow/common/dto/team-dto";
 import { Events, UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
-import type { MakeRequestResponse } from "@app/types/http-client";
+import type { HttpClientResponseInterface } from "@app/types/http-client";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import type { WorkspaceDocument } from "../../database/database";
 import { CollectionRepository } from "../../repositories/collection.repository";
@@ -315,7 +315,7 @@ export class TeamExplorerPageViewModel {
     user.subscribe((value) => {
       loggedInUserId = value?._id;
     });
-    const response: MakeRequestResponse =
+    const response: HttpClientResponseInterface =
       await this.userService.disableWorkspaceNewInviteTag(
         loggedInUserId,
         workspaceId,

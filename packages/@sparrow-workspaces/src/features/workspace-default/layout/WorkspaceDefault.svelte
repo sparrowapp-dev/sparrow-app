@@ -8,6 +8,7 @@
     StackIcon,
     TreeIcon,
     CollectionIcon,
+    SocketIoIcon,
   } from "@sparrow/library/icons";
 
   import SparrowLogo from "../../rest-explorer/assets/images/sparrow-logo.svelte";
@@ -15,6 +16,7 @@
   import { Card } from "../components";
   import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
   import { WorkspaceRole } from "@sparrow/common/enums";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
   export let showImportCollectionPopup;
   export let onItemCreated;
@@ -23,6 +25,7 @@
   export let handleCreateEnvironment;
   export let onCreateTestflow;
   export let userRole;
+  export let isExpandCollection;
 
   let currentWorkspaceId: string;
 
@@ -50,6 +53,7 @@
           } else {
             showImportCollectionPopup();
           }
+          isExpandCollection = true;
         }}
       />
     {/if}
@@ -69,6 +73,16 @@
       iconSize={"20px"}
       onClick={() => {
         onItemCreated("web-socket", {});
+        MixpanelEvent(Events.WebSocket_Button);
+      }}
+    />
+    <Card
+      icon={SocketIoIcon}
+      label={`${SocketIORequestDefaultAliasBaseEnum.NAME}`}
+      iconColor="var(--text-primary-300)"
+      iconSize={"18px"}
+      onClick={() => {
+        onItemCreated("socket-io", {});
         MixpanelEvent(Events.WebSocket_Button);
       }}
     />

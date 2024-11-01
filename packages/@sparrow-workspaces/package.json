@@ -18,6 +18,7 @@
     "./features/rest-explorer/utils": "./src/features/rest-explorer/utils/index.ts",
     "./features/rest-explorer/store": "./src/features/rest-explorer/store/index.ts",
     "./features/socket-explorer/store": "./src/features/socket-explorer/store/index.ts",
+    "./features/socketio-explorer/store": "./src/features/socketio-explorer/store/index.ts",
     "./components": "./src/components/index.ts",
     "./constants": "./src/constants/index.ts",
     "./hoc": "./src/hoc/index.ts",

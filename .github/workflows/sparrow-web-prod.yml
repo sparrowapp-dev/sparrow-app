@@ -1,0 +1,64 @@
+name: Sparrow-web-prod
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+   build:
+      runs-on: ubuntu-latest
+      environment: sparrow_web_Prod
+      steps:
+         - uses: actions/checkout@master
+
+         - uses: Azure/docker-login@v1
+           with:
+              login-server: sparrowprod.azurecr.io
+              username: ${{ secrets.REGISTRY_USERNAME }}
+              password: ${{ secrets.REGISTRY_PASSWORD }}
+
+         - run: |
+              docker build -f ./apps/@sparrow-web/Dockerfile \
+                --build-arg PORT=${{ vars.PORT }} \
+                --build-arg VITE_WEB_API_URL=${{ vars.VITE_WEB_API_URL }} \
+                --build-arg VITE_WEB_API_TIMEOUT=${{ vars.VITE_WEB_API_TIMEOUT }} \
+                --build-arg VITE_WEB_ENABLE_MIX_PANEL=${{ vars.VITE_WEB_ENABLE_MIX_PANEL }} \
+                --build-arg VITE_WEB_MIX_PANEL_TOKEN=${{ vars.VITE_WEB_MIX_PANEL_TOKEN }} \
+                --build-arg VITE_WEB_SPARROW_SUPPORT_EMAIL=${{ vars.VITE_WEB_SPARROW_SUPPORT_EMAIL }} \
+                --build-arg VITE_WEB_AUTH_URL=${{ vars.VITE_WEB_AUTH_URL }} \
+                --build-arg VITE_WEB_SPARROW_GITHUB=${{ vars.VITE_WEB_SPARROW_GITHUB }} \
+                --build-arg VITE_WEB_SPARROW_DOWNLOAD_LINK=${{ vars.VITE_WEB_SPARROW_DOWNLOAD_LINK }} \
+                --build-arg VITE_WEB_RELEASE_NOTES_API=${{ vars.VITE_WEB_RELEASE_NOTES_API }} \
+                --build-arg VITE_WEB_AZURE_CDN_URL=${{ vars.VITE_WEB_AZURE_CDN_URL }} \
+                --build-arg VITE_WEB_BASE_URL=${{ vars.VITE_WEB_BASE_URL }} \
+                --build-arg VITE_WEB_SPARROW_LINKEDIN=${{ vars.VITE_WEB_SPARROW_LINKEDIN }} \
+                --build-arg VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING=${{ vars.VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING }} \
+                --build-arg VITE_WEB_MARKETING_URL=${{ vars.VITE_WEB_MARKETING_URL }} \
+                --build-arg VITE_WEB_SPARROW_DOCS=${{ vars.VITE_WEB_SPARROW_DOCS }} \
+                -t sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }} .
+
+              docker push sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }}
+
+   deploy:
+      needs: build
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@master
+         - uses: richardrigutins/replace-in-files@v1
+           with:
+              files: "./apps/@sparrow-web/deploymentManifests/deployment.yml"
+              search-text: '_BUILD__ID_'
+              replacement-text: '${{ github.run_number }}'
+
+         - uses: azure/setup-kubectl@v2.0
+
+         - uses: Azure/k8s-set-context@v2
+           with:
+              kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+         - uses: Azure/k8s-deploy@v4
+           with:
+              action: deploy
+              namespace: sparrow-prod
+              manifests: |
+                 ./apps/@sparrow-web/deploymentManifests/deployment.yml

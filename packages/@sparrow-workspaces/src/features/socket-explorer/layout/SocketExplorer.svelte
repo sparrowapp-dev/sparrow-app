@@ -19,7 +19,8 @@
     UpdateParamsType,
     UpdateRequestUrlType,
   } from "@sparrow/workspaces/type";
-  import { TabTypeEnum, type Tab } from "@sparrow/common/types/workspace";
+  import { type Tab } from "@sparrow/common/types/workspace/tab";
+  import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
 
   import {
     HttpUrlSection,

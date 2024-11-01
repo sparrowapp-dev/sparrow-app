@@ -6,6 +6,7 @@ import {
   InitTestflowTab,
   InitWebSocketTab,
 } from "@sparrow/common/utils";
+import { InitSocketIoTab } from "../utils/init-socket-io-tab";
 // import { InitWorkspaceTab } from "@sparrow/common/utils/init-workspace-tab";
 
 class InitTab {
@@ -23,6 +24,14 @@ class InitTab {
    */
   public webSocket = (_id: string, _workspaceId: string) => {
     return new InitWebSocketTab(_id, _workspaceId);
+  };
+
+  /**
+   * @param _id - environment mongo document id
+   * @param _workspaceId - Workspace mongo id to which environment belongs to
+   */
+  public socketIo = (_id: string, _workspaceId: string) => {
+    return new InitSocketIoTab(_id, _workspaceId);
   };
 
   /**

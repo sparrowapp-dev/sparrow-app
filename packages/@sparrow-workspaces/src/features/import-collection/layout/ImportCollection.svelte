@@ -36,7 +36,6 @@
 
   let isInputDataTouched = false;
   let isTextEmpty: boolean = true;
-  let isFileEmpty: boolean = true;
   let isSyntaxError: boolean = false;
   let importData: string = "";
   let importType: string = "text";
@@ -51,7 +50,6 @@
   const handleError = () => {
     isSyntaxError = false;
     isTextEmpty = false;
-    isFileEmpty = false;
   };
 
   let isimportDataLoading = false;
@@ -192,7 +190,6 @@
     uploadCollection.file.showFileTypeError = false;
     uploadCollection.file.invalid = false;
     uploadCollection.file.value = targetFile && targetFile[0];
-    isFileEmpty = false;
 
     // Read the file content
     const reader = new FileReader();
@@ -336,8 +333,9 @@
       importType === "file" &&
       uploadCollection?.file?.value?.length === 0
     ) {
-      isFileEmpty = true;
       uploadCollection.file.invalid = true;
+      uploadCollection.file.showFileSizeError = false;
+      uploadCollection.file.showFileTypeError = false;
     }
     isLoading = false;
   };
@@ -598,14 +596,14 @@
     />
   </div>
   <div>
-    {#if isInputDataTouched && uploadCollection.file.invalid && isFileEmpty}
-      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-        Please upload a file to import collection.
-      </p>
-    {:else if isInputDataTouched && uploadCollection.file.invalid}
+    {#if isInputDataTouched && uploadCollection.file.invalid && (uploadCollection.file.showFileSizeError || uploadCollection.file.showFileTypeError)}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         Invalid file format. Please upload a YAML/JSON (OAS) or Postman v2.1
         file format.
+      </p>
+    {:else if isInputDataTouched && uploadCollection.file.invalid}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        Please upload a file to import collection.
       </p>
     {/if}
   </div>

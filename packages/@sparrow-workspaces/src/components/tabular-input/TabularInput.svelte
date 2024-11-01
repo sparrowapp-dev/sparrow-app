@@ -273,13 +273,13 @@
 <div class="outer-section">
   {#if !isBulkEditActive}
     <div
-      class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
+      class="mb-0 me-0 w-100 bg-secondary-700 py-0 border-radius-2 section-layout"
     >
       <div
-        class="d-flex gap-3 py-1 mb-1 align-items-center w-100 ps-2 {!isTopHeaderRequired
+        class="d-flex gap-3 py-1 mb-1 align-items-center w-100 ps-3 {!isTopHeaderRequired
           ? 'd-none'
           : ''}"
-        style="height:26px;"
+        style="height:26px;  background-color:var(--bg-secondary-880);"
       >
         <div style="width:30px;">
           <!-- <input
@@ -300,7 +300,7 @@
         </div>
         <div
           class="d-flex pair-title bg-secondary-700 align-items-center w-100"
-          style="font-size: 12px; font-weight: 500;"
+          style="font-size: 12px; font-weight: 500;  background-color:var(--bg-secondary-880);"
         >
           <p
             class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1"
@@ -309,7 +309,7 @@
             Key
           </p>
           <p
-            class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-0 ms-3"
+            class="mb-0  w-50 text-secondary-200 text-fs-12 p-1 ps-1 ms-3"
             style="font-weight: 1000;"
           >
             Value
