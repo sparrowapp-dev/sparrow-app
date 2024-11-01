@@ -542,7 +542,10 @@
                       <WorkspaceDefault
                         {currentWorkspace}
                         {handleCreateEnvironment}
-                        onCreateTestflow={_viewModel3.handleCreateTestflow}
+                        onCreateTestflow={() => {
+                          _viewModel3.handleCreateTestflow();
+                          isExpandTestflow = true;
+                        }}
                         showImportCollectionPopup={() =>
                           (isImportCollectionPopup = true)}
                         onItemCreated={_viewModel.handleCreateItem}

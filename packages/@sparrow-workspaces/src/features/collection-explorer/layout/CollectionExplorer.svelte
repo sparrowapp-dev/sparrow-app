@@ -57,7 +57,7 @@
    * Icons and images
    */
   import { GitBranchIcon } from "@sparrow/library/assets";
-  import {refreshIcon} from "@sparrow/library/assets";
+  import { refreshIcon } from "@sparrow/library/assets";
 
   /**
    * Components
@@ -184,7 +184,7 @@
             required
             maxlength={100}
             id="renameInputFieldCollection"
-            value={collection?.name || "Collection Doesn't Exist."}
+            value={collection?.name || ""}
             class="bg-transparent input-outline text-fs-18 border-0 text-left w-100 ps-2 py-0"
             disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
               tab?.activeSync}

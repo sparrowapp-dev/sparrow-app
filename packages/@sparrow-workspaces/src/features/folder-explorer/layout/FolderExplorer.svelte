@@ -112,7 +112,7 @@
             type="text"
             required
             id="renameInputFieldFolder"
-            value={folder?.name || "Folder Doesn't Exist."}
+            value={folder?.name || ""}
             disabled={tab?.source === "SPEC" ||
               userRole === WorkspaceRole.WORKSPACE_VIEWER}
             class="bg-transparent input-outline border-0 text-left w-100 ps-2 py-0 text-fs-18"
@@ -149,7 +149,7 @@
 
     <div class="d-flex gap-4 mb-4 ps-2">
       <div class="d-flex align-items-center gap-2">
-        <span class="fs-4 text-plusButton">{totalRequests}</span>
+        <span class="fs-4 text-primary-300">{totalRequests}</span>
         <p style="font-size: 12px;" class="mb-0">API Requests</p>
       </div>
     </div>
