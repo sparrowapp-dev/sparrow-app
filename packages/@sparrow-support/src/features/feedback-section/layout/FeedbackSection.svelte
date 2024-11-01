@@ -293,7 +293,7 @@
     >
       <div>
         <div
-          class={`d-flex search-input-container rounded py-1 px-2 mb-2`}
+          class={`d-flex align-items-center search-input-container rounded py-1 px-2 mb-2`}
           on:click={() => {
             MixpanelEvent(Events.Feedback_Search);
           }}
@@ -332,6 +332,8 @@
             </div>
           {/if}
         </div>
+
+     
       </div>
       <div class="d-flex" style="gap:15px;">
         <div>
