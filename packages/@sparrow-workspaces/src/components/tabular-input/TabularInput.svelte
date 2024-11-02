@@ -13,7 +13,7 @@
   import LazyElement from "./LazyElement.svelte";
 
   // exports
-  export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
+  export let keyValue: KeyValuePair[];
   export let callback: (pairs: KeyValuePair[]) => void;
   export let readable: { key: string; value: string } = {
     key: "",
