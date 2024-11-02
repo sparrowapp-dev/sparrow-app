@@ -276,7 +276,7 @@
           <div class="w-100 d-flex">
             <div class="w-100 d-flex justify-content-end">
               <button
-                class="bg-transparent border-0 mt-1 d-flex {!isBulkEditRequired
+                class="bg-transparent border-0 d-flex {!isBulkEditRequired
                   ? 'invisible'
                   : ''}"
                 style=""
@@ -338,10 +338,11 @@
   {:else}
     <!-- Bulk Edit section Start -->
     <section>
-      <div class="d-flex flex-column" style="height: 234px; font-size:12px;">
+      <div class="d-flex flex-column" style="font-size:12px;">
+        <!-- Bulk Edit Heading -->
         <div
           class="d-flex align-items-center"
-          style="justify-content: space-between;"
+          style="justify-content: space-between; padding-top:3px; padding-bottom:8px;"
         >
           <!-- Bulk Edit Text  -->
           <div class="d-flex align-items-center">
@@ -456,10 +457,10 @@
                 </div>
               {/if}
 
-              <button class="bg-transparent border-0 mt-2 d-flex">
+              <button class="bg-transparent border-0 d-flex align-items-center">
                 <p
-                  class="text-nowrap text-primary-300 mb-2"
-                  style="font-size: 10px; font-weight:400;"
+                  class="text-nowrap text-primary-300 mb-0"
+                  style="font-size: 10px; font-weight:400; margin-top:3px;"
                 >
                   Bulk Edit
                 </p>
@@ -481,7 +482,7 @@
               bind:value={bulkText}
               on:change={handleBulkTextarea}
               {enableKeyValueHighlighting}
-              class={`px-2 sparrow-fs-18 outline-none`}
+              class={`sparrow-fs-18 me-0 outline-none`}
               placeholder={bulkEditPlaceholder}
             />
           {/if}
