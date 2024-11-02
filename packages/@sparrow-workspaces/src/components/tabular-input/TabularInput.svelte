@@ -341,17 +341,13 @@
       <div class="d-flex flex-column" style="font-size:12px;">
         <!-- Bulk Edit Heading -->
         <div
-          class="d-flex align-items-center"
-          style="justify-content: space-between; padding-top:3px; padding-bottom:8px;"
+          class="px-3 d-flex align-items-center"
+          style="justify-content: space-between; padding-top:3px; padding-bottom:3px; background-color: var(--bg-secondary-880)"
         >
           <!-- Bulk Edit Text  -->
           <div class="d-flex align-items-center">
-            <div
-              class="ps-1 me-1"
-              style="font-size:12px; font-weight:500; color:var(--sparrow-text-color);"
-            >
-              Bulk Edit
-            </div>
+            <p class="mb-0 text-fs-12 fw-bold text-secondary-200">Bulk Edit</p>
+
             <div>
               {#if isBulkEditHeaderInfoRequired}
                 <div
@@ -408,7 +404,7 @@
 
           <!-- Bulk Edit Button -->
           {#if bulkEditPlaceholder}
-            <div class="pe-0 d-flex align-items-center gap-1 bulkEdit-btn-div">
+            <div class="pe-0 d-flex align-items-center gap-1">
               {#if !isValidSyntax}
                 <div
                   class="d-flex align-items-center justify-content-center position-relative border-radius-3 me-1"
@@ -499,10 +495,6 @@
     padding-bottom: 3px;
     background-color: var(--bg-secondary-880);
     height: 26px;
-  }
-
-  .bulkEdit-btn-div {
-    margin-right: 16px;
   }
 
   /* The checkbox-parent */
