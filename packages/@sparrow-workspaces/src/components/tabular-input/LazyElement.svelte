@@ -38,94 +38,76 @@
 <div
   use:inview={options}
   on:inview_change={handleChange}
-  aria-label="Toggle Hover"
-  class="sortable > div pair-container lazy-element"
-  style=" width:100%; border-top :1px solid var(--border-secondary-315);"
-  data-list-key={JSON.stringify({
-    name: element.key,
-    description: element.value,
-    checked: element.checked,
-  })}
+  class="w-100 pair-data-row px-3 d-flex align-items-center gap-3"
 >
   {#if isInView}
-    <div class="" style="display: flex; flex-direction: column;width:100%; ">
-      <div
-        class="px-3 d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
-        style="padding-top:3px; padding-bottom:3px; height:24px;  "
-      >
-        <div style="width:30px; height: 14px;">
-          {#if pairs.length - 1 != index || !isInputBoxEditable}
-            <!-- checkbox should be visible to last row in readonly mode -->
-            <label class="container">
-              <input
-                type="checkbox"
-                bind:checked={element.checked}
-                on:input={() => {
-                  updateCheck(index);
-                }}
-                disabled={!isCheckBoxEditable}
-              />
-              <span class="checkmark"></span>
-            </label>
-          {/if}
-        </div>
+    <div style="height:14px; width:14px;">
+      {#if pairs.length - 1 != index || !isInputBoxEditable}
+        <!-- checkbox should be visible to last row in readonly mode -->
+        <label class="checkbox-parent">
+          <input
+            type="checkbox"
+            bind:checked={element.checked}
+            on:input={() => {
+              updateCheck(index);
+            }}
+            disabled={!isCheckBoxEditable}
+          />
+          <span class="checkmark"></span>
+        </label>
+      {/if}
+    </div>
 
-        <div class="d-flex gap-0" style="flex:1;">
-          <div class="w-50 position-relative">
-            <CodeMirrorInput
-              bind:value={element.key}
-              onUpdateInput={() => {
-                updateParam(index);
-              }}
-              disabled={!isInputBoxEditable ? true : false}
-              placeholder={"Add Key"}
-              {theme}
-              {environmentVariables}
-              {onUpdateEnvironment}
-            />
-          </div>
-          <div class="w-50 position-relative">
-            <CodeMirrorInput
-              bind:value={element.value}
-              onUpdateInput={() => {
-                updateParam(index);
-              }}
-              placeholder={"Add Value"}
-              disabled={!isInputBoxEditable ? true : false}
-              {theme}
-              {environmentVariables}
-              {onUpdateEnvironment}
-            />
-          </div>
-        </div>
-        <div
-          style="width:16px;"
-          class="d-flex justify-content-center align-items-center"
-        >
-          <div class="d-flex" style="width:16px;">
-            <div class="d-flex">
-              {#if pairs.length - 1 != index}
-                <!-- lists first to last second row -->
-                {#if isInputBoxEditable}
-                  <Tooltip
-                    title={"Delete"}
-                    placement={"bottom-left"}
-                    distance={10}
-                  >
-                    <button
-                      class="trash-icon bg-secondary-700 border-radius-2 d-flex justify-content-center align-items-center border-0"
-                      style="width: 16px; height:16px; padding-end"
-                      on:click={() => {
-                        deleteParam(index);
-                      }}
-                    >
-                      <img src={trashIcon} style="height: 100%; width: 100%;" />
-                    </button>
-                  </Tooltip>
-                {/if}
-              {/if}
-            </div>
-          </div>
+    <div class="d-flex gap-0" style="flex:1;">
+      <div class="w-50 position-relative">
+        <CodeMirrorInput
+          bind:value={element.key}
+          onUpdateInput={() => {
+            updateParam(index);
+          }}
+          disabled={!isInputBoxEditable ? true : false}
+          placeholder={"Add Key"}
+          {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
+        />
+      </div>
+      <div class="w-50 position-relative">
+        <CodeMirrorInput
+          bind:value={element.value}
+          onUpdateInput={() => {
+            updateParam(index);
+          }}
+          placeholder={"Add Value"}
+          disabled={!isInputBoxEditable ? true : false}
+          {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
+        />
+      </div>
+    </div>
+    <div
+      style="width:16px;"
+      class="d-flex justify-content-center align-items-center"
+    >
+      <div class="d-flex" style="width:16px;">
+        <div class="d-flex">
+          {#if pairs.length - 1 != index}
+            <!-- lists first to last second row -->
+            {#if isInputBoxEditable}
+              <Tooltip title={"Delete"} placement={"bottom"} distance={10}>
+                <button
+                  class="trash-icon bg-secondary-700 border-radius-2 d-flex justify-content-center align-items-center border-0"
+                  style="width: 16px; height:16px; padding-end"
+                  on:click={() => {
+                    deleteParam(index);
+                  }}
+                >
+                  <img src={trashIcon} style="height: 100%; width: 100%;" />
+                </button>
+              </Tooltip>
+            {/if}
+          {/if}
         </div>
       </div>
     </div>
@@ -136,12 +118,20 @@
 </div>
 
 <style>
-  .sortable:first-child {
+  .pair-data-row:first-child {
     border-top: none !important;
+    height: 24px !important;
+  }
+  .pair-data-row {
+    border-top: 1px solid var(--border-secondary-315);
+    padding-top: 3px;
+    padding-bottom: 3px;
+    height: calc(24px + 1px); /* Extra 1px In case of border */
+    background-color: var(--bg-secondary-700);
   }
 
-  /* The container */
-  .container {
+  /* The checkbox-parent */
+  .checkbox-parent {
     display: block;
     position: relative;
     padding-left: 35px;
@@ -155,7 +145,7 @@
   }
 
   /* Hide the browser's default checkbox */
-  .container input {
+  .checkbox-parent input {
     position: absolute;
     opacity: 0;
     cursor: pointer;
@@ -166,7 +156,7 @@
   }
 
   /* Create a custom checkbox */
-  .checkmark {
+  .checkbox-parent .checkmark {
     position: absolute;
     top: 0;
     left: 0;
@@ -178,30 +168,30 @@
   }
 
   /* On mouse-over, add a grey background color */
-  /* .container:hover input ~ .checkmark {
+  /* .checkbox-parent:hover input ~ .checkmark {
     background-color: #ccc;
   } */
 
   /* When the checkbox is checked, add a blue background */
-  .container input:checked ~ .checkmark {
+  .checkbox-parent input:checked ~ .checkmark {
     border: none;
     background-color: var(--bg-primary-300);
   }
 
   /* Create the checkmark/indicator (hidden when not checked) */
-  .checkmark:after {
+  .checkbox-parent .checkmark:after {
     content: "";
     position: absolute;
     display: none;
   }
 
   /* Show the checkmark when checked */
-  .container input:checked ~ .checkmark:after {
+  .checkbox-parent input:checked ~ .checkmark:after {
     display: block;
   }
 
   /* Style the checkmark/indicator */
-  .container .checkmark:after {
+  .checkbox-parent .checkmark:after {
     left: 5px;
     top: 2px;
     width: 4px;

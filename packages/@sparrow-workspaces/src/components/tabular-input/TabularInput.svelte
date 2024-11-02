@@ -119,42 +119,6 @@
     callback(pairs);
   };
 
-  // const extractFileName = (url) => {
-  //   const parts = url.split("\\");
-  //   const fileName = parts[parts.length - 1];
-  //   return fileName;
-  // };
-
-  // const uploadFormFile = async (index) => {
-  //   const filePathResponse = await invoke("fetch_file_command");
-  //   if (filePathResponse !== "Canceled") {
-  //     const filename = extractFileName(filePathResponse);
-  //     const updatedFilePath = filePathResponse;
-  //     let filteredPair = pairs.map((elem, i) => {
-  //       if (i == index) {
-  //         elem.value = filename;
-  //         elem.base = updatedFilePath;
-  //       }
-  //       return elem;
-  //     });
-  //     pairs = filteredPair;
-  //     callback(pairs);
-  //     updateParam(index);
-  //   }
-  // };
-
-  // const removeFormFile = (index) => {
-  //   let filteredPair = pairs.map((elem, i) => {
-  //     if (i == index) {
-  //       elem.value = "";
-  //       elem.base = "";
-  //     }
-  //     return elem;
-  //   });
-  //   pairs = filteredPair;
-  //   callback(pairs);
-  // };
-
   const handleCheckAll = (): void => {
     let flag: boolean;
     if (controller === true) {
@@ -272,80 +236,64 @@
 
 <div class="outer-section">
   {#if !isBulkEditActive}
-    <div
-      class="mb-0 me-0 w-100 bg-secondary-700 py-0 border-radius-2 section-layout"
+    <section
+      class="mb-0 me-0 w-100 py-0 border-radius-2 section-layout"
       style="overflow:hidden;"
     >
       <div
-        class="w-100 {!isTopHeaderRequired
+        class="w-100 d-flex align-items-center px-3 gap-3 pair-header-row {!isTopHeaderRequired
           ? 'd-none'
-          : 'd-flex align-items-center'}"
-        style="position:relative; background-color:var(--bg-secondary-880); height:26px;"
+          : ''}"
+        style="position:relative;"
       >
-        <div
-          aria-label="Toggle Hover"
-          class="sortable > div"
-          style=" width:100%;"
-        >
+        <div style="height:14px; width:14px;">
+          <label class="checkbox-parent">
+            <input
+              type="checkbox"
+              disabled={pairs.length === 1 || !isCheckBoxEditable}
+              bind:checked={controller}
+              on:input={handleCheckAll}
+            />
+            <span class="checkmark"></span>
+          </label>
+        </div>
+
+        <div class="d-flex gap-0" style="flex:1;">
           <div
-            class=""
-            style=" padding-top: 1px;  display: flex; flex-direction: column;width:100%;"
+            class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
+            style="padding-left: 6px;"
           >
-            <div
-              class="px-3 d-flex w-100 align-items-center justify-content-center gap-3"
-              style="padding-top:3px; padding-bottom:3px; height:24px;  "
-            >
-              <div style="width:30px; height: 14px;">
-                <label class="container">
-                  <input
-                    type="checkbox"
-                    disabled={pairs.length === 1 || !isCheckBoxEditable}
-                    bind:checked={controller}
-                    on:input={handleCheckAll}
-                  />
-                  <span class="checkmark"></span>
-                </label>
-              </div>
-
-              <div class="d-flex gap-0" style="flex:1;">
-                <div
-                  class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
-                  style="padding-left: 6px;"
+            Key
+          </div>
+          <div
+            class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
+            style="padding-left: 68px;"
+          >
+            Value
+          </div>
+        </div>
+        <div style="width:140px;" class="d-flex align-items-center">
+          <div class="w-100 d-flex">
+            <div class="w-100 d-flex justify-content-end">
+              <button
+                class="bg-transparent border-0 mt-1 d-flex {!isBulkEditRequired
+                  ? 'invisible'
+                  : ''}"
+                style=""
+              >
+                <p
+                  class="text-nowrap text-primary-300 mb-0 me-0"
+                  style="font-size: 10px; font-weight:400;"
                 >
-                  Key
-                </div>
-                <div
-                  class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
-                  style="padding-left: 68px;"
-                >
-                  Value
-                </div>
-              </div>
-              <div style="width:140px;" class="d-flex align-items-center">
-                <div class="w-100 d-flex">
-                  <div class="w-100 d-flex justify-content-end">
-                    <button
-                      class="bg-transparent border-0 mt-1 d-flex {!isBulkEditRequired
-                        ? 'invisible'
-                        : ''}"
-                      style=""
-                    >
-                      <p
-                        class="text-nowrap text-primary-300 mb-0 me-0"
-                        style="font-size: 10px; font-weight:400;"
-                      >
-                        Bulk Edit
-                      </p>
+                  Bulk Edit
+                </p>
 
-                      <Switch
-                        bind:checked={bulkToggle}
-                        onClick={handleBulkTextUpdate}
-                        onChange={toggleBulkEdit}
-                      />
-                    </button>
-                  </div>
-                </div>
-              </div>
+                <Switch
+                  bind:checked={bulkToggle}
+                  onClick={handleBulkTextUpdate}
+                  onChange={toggleBulkEdit}
+                />
+              </button>
             </div>
           </div>
         </div>
@@ -386,10 +334,10 @@
           />
         {/each}
       </div>
-    </div>
+    </section>
   {:else}
     <!-- Bulk Edit section Start -->
-    <div>
+    <section>
       <div class="d-flex flex-column" style="height: 234px; font-size:12px;">
         <div
           class="d-flex align-items-center"
@@ -540,21 +488,26 @@
         </div>
         <!-- Bulk Edit TextArea end -->
       </div>
-    </div>
+    </section>
   {/if}
 </div>
 
 <style>
+  .pair-header-row {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    background-color: var(--bg-secondary-880);
+    height: 26px;
+  }
+
   .bulkEdit-btn-div {
     margin-right: 16px;
   }
 
-  /* The container */
-  .container {
+  /* The checkbox-parent */
+  .checkbox-parent {
     display: block;
     position: relative;
-    padding-left: 35px;
-    margin-bottom: 12px;
     cursor: pointer;
     font-size: 22px;
     -webkit-user-select: none;
@@ -564,7 +517,7 @@
   }
 
   /* Hide the browser's default checkbox */
-  .container input {
+  .checkbox-parent input {
     position: absolute;
     opacity: 0;
     cursor: pointer;
@@ -575,7 +528,7 @@
   }
 
   /* Create a custom checkbox */
-  .checkmark {
+  .checkbox-parent .checkmark {
     position: absolute;
     top: 0;
     left: 0;
@@ -587,30 +540,30 @@
   }
 
   /* On mouse-over, add a grey background color */
-  /* .container:hover input ~ .checkmark {
+  /* .checkbox-parent:hover input ~ .checkmark {
     background-color: #ccc;
   } */
 
   /* When the checkbox is checked, add a blue background */
-  .container input:checked ~ .checkmark {
+  .checkbox-parent input:checked ~ .checkmark {
     border: none;
     background-color: var(--bg-primary-300);
   }
 
   /* Create the checkmark/indicator (hidden when not checked) */
-  .checkmark:after {
+  .checkbox-parent .checkmark:after {
     content: "";
     position: absolute;
     display: none;
   }
 
   /* Show the checkmark when checked */
-  .container input:checked ~ .checkmark:after {
+  .checkbox-parent input:checked ~ .checkmark:after {
     display: block;
   }
 
   /* Style the checkmark/indicator */
-  .container .checkmark:after {
+  .checkbox-parent .checkmark:after {
     left: 5px;
     top: 2px;
     width: 4px;
