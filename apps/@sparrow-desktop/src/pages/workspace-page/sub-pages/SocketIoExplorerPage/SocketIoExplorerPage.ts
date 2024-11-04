@@ -341,6 +341,18 @@ class SocketIoExplorerPageViewModel {
 
   /**
    *
+   * @param _headers - request headers
+   */
+  public upadateEvents = async (_events: KeyValueChecked[]) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.socketio.headers = _events;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
+  /**
+   *
    * @param _params - request query parameters
    * @param _effectURL - lag that effect request url
    */
