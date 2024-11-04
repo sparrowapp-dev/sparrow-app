@@ -164,8 +164,13 @@
                   />
                 {:else if $tab.property.socketio?.state?.requestNavigation === SocketSectionEnum.EVENTS}
                   <RequestEvents
-                   onEventsChange= {onUpdateEvents}
-                    events={$tab.property.socketio.events}
+                    callback={(pairs) => {
+                      onUpdateEvents(pairs);
+                    }}
+                    keyValue={$tab.property.socketio.events}
+                    {onUpdateRequestState}
+                    {environmentVariables}
+                    {onUpdateEnvironment}
                   />
                 {/if}
               </div>
