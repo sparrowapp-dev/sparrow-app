@@ -72,7 +72,7 @@
     >
       <div
         class="ps-5 d-flex bg-secondary-700 align-items-center w-100"
-        style="font-size: 12px; font-weight: 500; background-color:#1B1B1B;"
+        style="font-size: 12px; font-weight: 500; background-color:var(--bg-secondary-880);"
       >
         <p
           class="mb-0 w-50 text-secondary-200 text-fs-12 p-1"

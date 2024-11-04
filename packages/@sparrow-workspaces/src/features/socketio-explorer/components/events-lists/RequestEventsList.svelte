@@ -9,17 +9,15 @@
   export let updateParam;
   export let updateCheck;
   export let deleteParam;
-
- 
 </script>
 
-<div style="background-color: #161617;">
+<div style="background-color: var(--bg-secondary-700);">
   <div
     class="ps-5 pe-2 d-flex justify-content-between align-items-center bg-secondary-700 w-100"
     style="font-size: 12px; font-weight: 500; margin-bottom: 4px;"
   >
     <div
-      class="position-relative  w-50 d-flex justify-content-between align-items-center"
+      class="position-relative w-50 d-flex justify-content-between align-items-center"
     >
       <div class="w-100 me-2 ms-1">
         <Input
