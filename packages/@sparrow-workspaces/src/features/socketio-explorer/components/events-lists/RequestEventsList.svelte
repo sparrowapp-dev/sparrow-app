@@ -8,8 +8,8 @@
     ScrollDirection,
     Options,
   } from "svelte-inview";
-    import { Switch } from "@sparrow/library/forms";
-    import { CodeMirrorInput } from "../../../../components";
+  import { Switch } from "@sparrow/library/forms";
+  import { CodeMirrorInput } from "../../../../components";
 
   export let element;
   export let index;
@@ -57,7 +57,12 @@
           />
           <span class="checkmark"></span>
         </label> -->
-        <Switch checked={element.listen} on:click={() => updateCheck(index)} />
+        <Switch
+          checked={element.listen}
+          onChange={() => {
+            updateCheck(index);
+          }}
+        />
       {/if}
     </div>
 

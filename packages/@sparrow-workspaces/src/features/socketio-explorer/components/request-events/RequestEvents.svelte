@@ -6,6 +6,7 @@
 
   import RequestEventsList from "../events-lists/RequestEventsList.svelte";
   import { TabularInputTheme } from "../../../../utils";
+  import type { EventsValues } from "@sparrow/common/types/workspace/socket-io-request-tab";
 
   // exports
   export let keyValue: KeyValuePair[];
@@ -17,7 +18,7 @@
   export let isTopHeaderRequired = true;
   export let isInputBoxEditable = true;
 
-  let pairs: KeyValuePair[] = keyValue;
+  let pairs: EventsValues[] = keyValue;
   let controller: boolean = false;
 
   const theme = new TabularInputTheme().build();
@@ -35,20 +36,20 @@
     pairs = [];
     pairs = keyValue;
     controller = false;
-    if (pairs.length > 1) {
-      let isUncheckedExist: boolean = false;
-      for (let i = 0; i < pairs.length - 1; i++) {
-        if (pairs[i].checked === false) {
-          isUncheckedExist = true;
-          break;
-        }
-      }
-      if (isUncheckedExist) {
-        controller = false;
-      } else {
-        controller = true;
-      }
-    }
+    // if (pairs.length > 1) {
+    //   let isUncheckedExist: boolean = false;
+    //   for (let i = 0; i < pairs.length - 1; i++) {
+    //     if (pairs[i].listen === false) {
+    //       isUncheckedExist = true;
+    //       break;
+    //     }
+    //   }
+    //   if (isUncheckedExist) {
+    //     controller = false;
+    //   } else {
+    //     controller = true;
+    //   }
+    // }
   };
 
   const updateParam = (index: number): void => {
@@ -59,10 +60,10 @@
       // but codemirror internally invokes this function and updates key value
       // so one more extra check here for read only mode
       isInputBoxEditable &&
-      (pairs[index].key !== "")
+      pairs[index].event !== ""
     ) {
-      pairs[pairs.length - 1].checked = true;
-      pairs.push({ key: "", value: "", checked: false });
+      pairs[pairs.length - 1].listen = true;
+      pairs.push({ event: "", listen: false });
       pairs = pairs;
     }
     callback(pairs);
@@ -80,15 +81,14 @@
     }
     callback(pairs);
     setTimeout(() => {
-      pairs[pairs.length - 1].key = "";
-      pairs[pairs.length - 1].value = "";
+      pairs[pairs.length - 1].event = "";
     }, 0);
   };
 
   const updateCheck = (index: number): void => {
     let filteredKeyValue = pairs.map((elem, i) => {
       if (i === index) {
-        elem.checked = !elem.checked;
+        elem.listen = !elem.listen;
       }
       return elem;
     });
