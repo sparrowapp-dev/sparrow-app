@@ -13,7 +13,7 @@
   import LazyElement from "./LazyElement.svelte";
 
   // exports
-  export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
+  export let keyValue: KeyValuePair[];
   export let callback: (pairs: KeyValuePair[]) => void;
   export let readable: { key: string; value: string } = {
     key: "",
@@ -118,42 +118,6 @@
     pairs = filteredKeyValue;
     callback(pairs);
   };
-
-  // const extractFileName = (url) => {
-  //   const parts = url.split("\\");
-  //   const fileName = parts[parts.length - 1];
-  //   return fileName;
-  // };
-
-  // const uploadFormFile = async (index) => {
-  //   const filePathResponse = await invoke("fetch_file_command");
-  //   if (filePathResponse !== "Canceled") {
-  //     const filename = extractFileName(filePathResponse);
-  //     const updatedFilePath = filePathResponse;
-  //     let filteredPair = pairs.map((elem, i) => {
-  //       if (i == index) {
-  //         elem.value = filename;
-  //         elem.base = updatedFilePath;
-  //       }
-  //       return elem;
-  //     });
-  //     pairs = filteredPair;
-  //     callback(pairs);
-  //     updateParam(index);
-  //   }
-  // };
-
-  // const removeFormFile = (index) => {
-  //   let filteredPair = pairs.map((elem, i) => {
-  //     if (i == index) {
-  //       elem.value = "";
-  //       elem.base = "";
-  //     }
-  //     return elem;
-  //   });
-  //   pairs = filteredPair;
-  //   callback(pairs);
-  // };
 
   const handleCheckAll = (): void => {
     let flag: boolean;
@@ -272,23 +236,18 @@
 
 <div class="outer-section">
   {#if !isBulkEditActive}
-    <div
-      class="mb-0 me-0 w-100 bg-secondary-700 py-0 border-radius-2 section-layout"
+    <section
+      class="mb-0 me-0 w-100 py-0 border-radius-2 section-layout"
+      style="overflow:hidden;"
     >
       <div
-        class="d-flex gap-3 py-1 mb-1 align-items-center w-100 ps-3 {!isTopHeaderRequired
+        class="w-100 d-flex align-items-center px-3 pair-header-row {!isTopHeaderRequired
           ? 'd-none'
           : ''}"
-        style="height:26px;  background-color:var(--bg-secondary-880);"
+        style="position:relative;"
       >
-        <div style="width:30px;">
-          <!-- <input
-      class="form-check-input"
-      type="checkbox"
-      bind:checked={controller}
-      on:input={handleCheckAll}
-    /> -->
-          <label class="container">
+        <div style="height:14px; width:14px;" class="me-3">
+          <label class="checkbox-parent">
             <input
               type="checkbox"
               disabled={pairs.length === 1 || !isCheckBoxEditable}
@@ -298,26 +257,30 @@
             <span class="checkmark"></span>
           </label>
         </div>
-        <div
-          class="d-flex pair-title bg-secondary-700 align-items-center w-100"
-          style="font-size: 12px; font-weight: 500;  background-color:var(--bg-secondary-880);"
-        >
-          <p
-            class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1"
-            style="font-weight: 1000;"
+
+        <div class="d-flex gap-0" style="width: calc(100% - 188px);">
+          <div
+            class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
+            style="padding-left: 6px;"
           >
             Key
-          </p>
-          <p
-            class="mb-0  w-50 text-secondary-200 text-fs-12 p-1 ps-1 ms-3"
-            style="font-weight: 1000;"
+          </div>
+          <div
+            class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
+            style="padding-left: 68px;"
           >
             Value
-          </p>
-
-          {#if isBulkEditRequired}
-            <div class="me-3">
-              <button class="bg-transparent border-0 mt-1 d-flex" style="">
+          </div>
+        </div>
+        <div style="width:140px;" class="ms-3 d-flex align-items-center">
+          <div class="w-100 d-flex">
+            <div class="w-100 d-flex justify-content-end">
+              <button
+                class="bg-transparent border-0 d-flex {!isBulkEditRequired
+                  ? 'invisible'
+                  : ''}"
+                style=""
+              >
                 <p
                   class="text-nowrap text-primary-300 mb-0 me-0"
                   style="font-size: 10px; font-weight:400;"
@@ -332,71 +295,28 @@
                 />
               </button>
             </div>
-          {/if}
-
-          {#if !isBulkEditRequired}
-            <div class="h-75 pe-1">
-              <button class=" border-0" style="width:70px;" />
-            </div>
-          {/if}
+          </div>
         </div>
       </div>
-      <div
-        class="w-100"
-        style="display:block; position:relative;
-    width:200px;
-    "
-      >
+      <div class="w-100" style="display:block; position:relative;">
         {#if readable.key || readable.value}
-          <div
-            aria-label="Toggle Hover"
-            class="sortable > div"
-            style=" width:100%;"
-          >
-            <div
-              style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
-            >
-              <div
-                class="d-flex w-100 align-items-center justify-content-center gap-3"
-                style="padding-top:3px; padding-bottom:3px; height:24px;"
-              >
-                <div style="width:30px;">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    disabled
-                    checked={true}
-                  />
-                </div>
-
-                <div class="d-flex gap-0" style="width:calc(100% - 120px)">
-                  <div class="w-50 position-relative">
-                    <input
-                      type="text"
-                      placeholder=""
-                      class=" keyValuePair ps-1 py-1 w-100"
-                      style="font-size: 12px;"
-                      disabled
-                      bind:value={readable.key}
-                    />
-                  </div>
-                  <div class="w-50 position-relative">
-                    <input
-                      type="text"
-                      placeholder=""
-                      class=" keyValuePair ps-1 py-1 w-100"
-                      style="font-size: 12px;"
-                      disabled
-                      bind:value={readable.value}
-                    />
-                  </div>
-                </div>
-                <div class="h-75 pe-1">
-                  <button class=" border-0" style="width:40px;" />
-                </div>
-              </div>
-            </div>
-          </div>
+          <LazyElement
+            element={{
+              key: readable.key,
+              value: readable.value,
+              checked: true,
+            }}
+            index={0}
+            pairs={[]}
+            {theme}
+            {environmentVariables}
+            onUpdateEnvironment={() => {}}
+            updateParam={() => {}}
+            updateCheck={() => {}}
+            deleteParam={() => {}}
+            isInputBoxEditable={false}
+            isCheckBoxEditable={false}
+          />
         {/if}
         {#each pairs as element, index (index)}
           <LazyElement
@@ -414,23 +334,20 @@
           />
         {/each}
       </div>
-    </div>
+    </section>
   {:else}
     <!-- Bulk Edit section Start -->
-    <div>
-      <div class="d-flex flex-column" style="height: 234px; font-size:12px;">
+    <section>
+      <div class="d-flex flex-column" style="font-size:12px;">
+        <!-- Bulk Edit Heading -->
         <div
-          class="d-flex align-items-center"
-          style="justify-content: space-between;"
+          class="px-3 d-flex align-items-center"
+          style="justify-content: space-between; padding-top:3px; padding-bottom:3px; background-color: var(--bg-secondary-880)"
         >
           <!-- Bulk Edit Text  -->
           <div class="d-flex align-items-center">
-            <div
-              class="ps-1 me-1"
-              style="font-size:12px; font-weight:500; color:var(--sparrow-text-color);"
-            >
-              Bulk Edit
-            </div>
+            <p class="mb-0 text-fs-12 fw-bold text-secondary-200">Bulk Edit</p>
+
             <div>
               {#if isBulkEditHeaderInfoRequired}
                 <div
@@ -487,7 +404,7 @@
 
           <!-- Bulk Edit Button -->
           {#if bulkEditPlaceholder}
-            <div class="pe-0 d-flex align-items-center gap-1 bulkEdit-btn-div">
+            <div class="pe-0 d-flex align-items-center gap-1">
               {#if !isValidSyntax}
                 <div
                   class="d-flex align-items-center justify-content-center position-relative border-radius-3 me-1"
@@ -536,10 +453,10 @@
                 </div>
               {/if}
 
-              <button class="bg-transparent border-0 mt-2 d-flex">
+              <button class="bg-transparent border-0 d-flex align-items-center">
                 <p
-                  class="text-nowrap text-primary-300 mb-2"
-                  style="font-size: 10px; font-weight:400;"
+                  class="text-nowrap text-primary-300 mb-0"
+                  style="font-size: 10px; font-weight:400; margin-top:3px;"
                 >
                   Bulk Edit
                 </p>
@@ -561,41 +478,29 @@
               bind:value={bulkText}
               on:change={handleBulkTextarea}
               {enableKeyValueHighlighting}
-              class={`px-2 sparrow-fs-18 outline-none`}
+              class={`sparrow-fs-18 me-0 outline-none`}
               placeholder={bulkEditPlaceholder}
             />
           {/if}
         </div>
         <!-- Bulk Edit TextArea end -->
       </div>
-    </div>
+    </section>
   {/if}
 </div>
 
 <style>
-  .bulkEdit-btn-div {
-    margin-right: 16px;
+  .pair-header-row {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    background-color: var(--bg-secondary-880);
+    height: 26px;
   }
 
-  .keyValuePair {
-    background-color: transparent;
-    border-radius: 0;
-    border: 1px solid transparent;
-  }
-  .pair-container:nth-child(odd) {
-    margin-top: -1px;
-  }
-  .section-layout {
-    border-top: 1px solid var(--border-secondary-500);
-    border-bottom: 1px solid var(--border-secondary-500);
-  }
-
-  /* The container */
-  .container {
+  /* The checkbox-parent */
+  .checkbox-parent {
     display: block;
     position: relative;
-    padding-left: 35px;
-    margin-bottom: 12px;
     cursor: pointer;
     font-size: 22px;
     -webkit-user-select: none;
@@ -605,7 +510,7 @@
   }
 
   /* Hide the browser's default checkbox */
-  .container input {
+  .checkbox-parent input {
     position: absolute;
     opacity: 0;
     cursor: pointer;
@@ -616,7 +521,7 @@
   }
 
   /* Create a custom checkbox */
-  .checkmark {
+  .checkbox-parent .checkmark {
     position: absolute;
     top: 0;
     left: 0;
@@ -628,30 +533,30 @@
   }
 
   /* On mouse-over, add a grey background color */
-  /* .container:hover input ~ .checkmark {
+  /* .checkbox-parent:hover input ~ .checkmark {
     background-color: #ccc;
   } */
 
   /* When the checkbox is checked, add a blue background */
-  .container input:checked ~ .checkmark {
+  .checkbox-parent input:checked ~ .checkmark {
     border: none;
     background-color: var(--bg-primary-300);
   }
 
   /* Create the checkmark/indicator (hidden when not checked) */
-  .checkmark:after {
+  .checkbox-parent .checkmark:after {
     content: "";
     position: absolute;
     display: none;
   }
 
   /* Show the checkmark when checked */
-  .container input:checked ~ .checkmark:after {
+  .checkbox-parent input:checked ~ .checkmark:after {
     display: block;
   }
 
   /* Style the checkmark/indicator */
-  .container .checkmark:after {
+  .checkbox-parent .checkmark:after {
     left: 5px;
     top: 2px;
     width: 4px;
