@@ -99,80 +99,7 @@
   let isBulkEditLoaded = false;
 </script>
 
-<div class="outer-section">
-  <section
-    class="mb-0 me-0 w-100 py-0 border-radius-2 section-layout"
-    style="overflow:hidden;"
-  >
-    <div
-      class="w-100 d-flex align-items-center px-3 pair-header-row {!isTopHeaderRequired
-        ? 'd-none'
-        : ''}"
-      style="position:relative;"
-    >
-      <div style="height:14px; width:14px;" class="me-3"></div>
-
-      <div class="d-flex gap-0" style="width: calc(100% - 188px);">
-        <div
-          class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
-          style="padding-left: 6px;"
-        >
-          Key
-        </div>
-        <div
-          class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
-          style="padding-left: 68px;"
-        >
-          Value
-        </div>
-      </div>
-      <div style="width:140px;" class="ms-3 d-flex align-items-center">
-        <div class="w-100 d-flex">
-          <div class="w-100 d-flex justify-content-end"></div>
-        </div>
-      </div>
-    </div>
-    <div class="w-100" style="display:block; position:relative;">
-      {#each pairs as element, index (index)}
-        <RequestEventsList
-          {element}
-          {index}
-          {pairs}
-          {theme}
-          {environmentVariables}
-          {onUpdateEnvironment}
-          {updateParam}
-          {updateCheck}
-          {deleteParam}
-          {isInputBoxEditable}
-          {isCheckBoxEditable}
-        />
-      {/each}
-    </div>
-  </section>
-</div>
-
-<!-- <script lang="ts">
-  import RequestEventsList from "../events-lists/RequestEventsList.svelte";
-  import { onMount } from "svelte";
-  import type { EventsValues } from "@sparrow/common/types/workspace/socket-io-request-tab";
-
-  export let events;
-
-  export let onEventsChange;
-
-  const handleEventChange = (pairs: any[]): void => {
-    onEventsChange(pairs);
-  };
-
-  //  export let callback;
-
-  let pairs: EventsValues;
-
-  export let isTopHeaderRequired = true;
-</script> -->
-
-<!-- <div class="outer-section">
+ <div class="outer-section">
   <div
     class="mb-0 me-0 w-100 bg-secondary-700 py-0 border-radius-2 section-layout"
   >
@@ -183,7 +110,7 @@
       style="height:26px; "
     >
       <div
-        class="ps-4 d-flex bg-secondary-700 align-items-center w-100"
+        class="ps-5 d-flex bg-secondary-700 align-items-center w-100"
         style="font-size: 12px; font-weight: 500; background-color:#1B1B1B;"
       >
         <p
@@ -206,9 +133,25 @@
       </div>
     </div>
 
-    <RequestEventsList pairs={events} callback={handleEventChange} />
+      <div class="w-100" style="display:block; position:relative;">
+      {#each pairs as element, index (index)}
+        <RequestEventsList
+          {element}
+          {index}
+          {pairs}
+          {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          {updateParam}
+          {updateCheck}
+          {deleteParam}
+          {isInputBoxEditable}
+          {isCheckBoxEditable}
+        />
+      {/each}
+    </div>
   </div>
-</div> -->
+</div>
 
 <!-- <style>
   .section-layout {
