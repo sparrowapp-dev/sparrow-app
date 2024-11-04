@@ -361,10 +361,9 @@
     height: 24px !important;
   }
   .pair-data-row {
-    border-top: 1px solid var(--border-secondary-315);
     padding-top: 3px;
     padding-bottom: 3px;
-    height: calc(24px + 1px); /* Extra 1px In case of border */
+    height: calc(24px);
     background-color: var(--bg-secondary-700);
   }
 
