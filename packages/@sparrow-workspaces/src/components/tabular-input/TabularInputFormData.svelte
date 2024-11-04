@@ -351,6 +351,7 @@
 
 <style>
   .pair-header-row {
+    border-top: 0.5px solid var(--border-secondary-315);
     padding-top: 3px;
     padding-bottom: 3px;
     background-color: var(--bg-secondary-880);
