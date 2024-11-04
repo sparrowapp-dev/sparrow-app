@@ -1,64 +1,26 @@
 <script lang="ts">
   import type {
     KeyValuePair,
-    KeyValuePairWithBase,
   } from "@sparrow/common/interfaces/request.interface";
 
   import RequestEventsList from "../events-lists/RequestEventsList.svelte";
-  import { TabularInputTheme } from "../../../../utils";
   import type { EventsValues } from "@sparrow/common/types/workspace/socket-io-request-tab";
 
   // exports
-  export let keyValue: KeyValuePair[];
-  export let callback: (pairs: KeyValuePair[]) => void;
-  export let environmentVariables;
-  export let onUpdateEnvironment;
+  export let keyValue: EventsValues[];
+  export let callback: (pairs: EventsValues[]) => void;
 
-  export let isCheckBoxEditable = true;
   export let isTopHeaderRequired = true;
   export let isInputBoxEditable = true;
 
   let pairs: EventsValues[] = keyValue;
-  let controller: boolean = false;
 
-  const theme = new TabularInputTheme().build();
 
-  $: {
-    if (keyValue) {
-      identifySelectAllState();
-    }
-  }
-
-  /**
-   * @description - calculates the select all checkbox state - weather checked or not
-   */
-  const identifySelectAllState = () => {
-    pairs = [];
-    pairs = keyValue;
-    controller = false;
-    // if (pairs.length > 1) {
-    //   let isUncheckedExist: boolean = false;
-    //   for (let i = 0; i < pairs.length - 1; i++) {
-    //     if (pairs[i].listen === false) {
-    //       isUncheckedExist = true;
-    //       break;
-    //     }
-    //   }
-    //   if (isUncheckedExist) {
-    //     controller = false;
-    //   } else {
-    //     controller = true;
-    //   }
-    // }
-  };
 
   const updateParam = (index: number): void => {
     pairs = pairs;
     if (
       pairs.length - 1 === index &&
-      // although in readonly mode input is disabled
-      // but codemirror internally invokes this function and updates key value
-      // so one more extra check here for read only mode
       isInputBoxEditable &&
       pairs[index].event !== ""
     ) {
@@ -96,7 +58,6 @@
     callback(pairs);
   };
 
-  let isBulkEditLoaded = false;
 </script>
 
  <div class="outer-section">
@@ -139,103 +100,13 @@
           {element}
           {index}
           {pairs}
-          {theme}
-          {environmentVariables}
-          {onUpdateEnvironment}
           {updateParam}
           {updateCheck}
           {deleteParam}
-          {isInputBoxEditable}
-          {isCheckBoxEditable}
         />
       {/each}
     </div>
   </div>
 </div>
 
-<!-- <style>
-  .section-layout {
-    border-top: 1px solid var(--border-secondary-500);
-    border-bottom: 1px solid var(--border-secondary-500);
-  }
-</style> -->
 
-<style>
-  .pair-header-row {
-    padding-top: 3px;
-    padding-bottom: 3px;
-    background-color: var(--bg-secondary-880);
-    height: 26px;
-  }
-
-  /* The checkbox-parent */
-  .checkbox-parent {
-    display: block;
-    position: relative;
-    cursor: pointer;
-    font-size: 22px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-
-  /* Hide the browser's default checkbox */
-  .checkbox-parent input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* Create a custom checkbox */
-  .checkbox-parent .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 14px;
-    width: 14px;
-    border-radius: 3px;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* On mouse-over, add a grey background color */
-  /* .checkbox-parent:hover input ~ .checkmark {
-    background-color: #ccc;
-  } */
-
-  /* When the checkbox is checked, add a blue background */
-  .checkbox-parent input:checked ~ .checkmark {
-    border: none;
-    background-color: var(--bg-primary-300);
-  }
-
-  /* Create the checkmark/indicator (hidden when not checked) */
-  .checkbox-parent .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-  }
-
-  /* Show the checkmark when checked */
-  .checkbox-parent input:checked ~ .checkmark:after {
-    display: block;
-  }
-
-  /* Style the checkmark/indicator */
-  .checkbox-parent .checkmark:after {
-    left: 5px;
-    top: 2px;
-    width: 4px;
-    height: 8px;
-    border: solid var(--text-secondary-800);
-    border-width: 0 2px 2px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
-  }
-</style>

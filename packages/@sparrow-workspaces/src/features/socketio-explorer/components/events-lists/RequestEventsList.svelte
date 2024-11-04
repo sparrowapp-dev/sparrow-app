@@ -1,40 +1,16 @@
 <script lang="ts">
-  import { inview } from "svelte-inview";
   import { trashIcon as trashIcon } from "@sparrow/library/assets";
-  // import { CodeMirrorInput } from "../";
   import { Tooltip } from "@sparrow/library/ui";
-  import type {
-    ObserverEventDetails,
-    ScrollDirection,
-    Options,
-  } from "svelte-inview";
   import { Input, Switch } from "@sparrow/library/forms";
-  import { CodeMirrorInput } from "../../../../components";
 
   export let element;
   export let index;
   export let pairs;
-  export let theme;
-  export let environmentVariables;
-  export let onUpdateEnvironment;
   export let updateParam;
   export let updateCheck;
   export let deleteParam;
-  export let isInputBoxEditable;
-  export let isCheckBoxEditable;
 
-  let isInView: boolean = false;
-  let scrollDirection: ScrollDirection | any;
-  const options: Options = {
-    rootMargin: "0px",
-    unobserveOnEnter: true,
-    threshold: 0.5,
-  };
-
-  const handleChange = ({ detail }: CustomEvent<ObserverEventDetails>) => {
-    isInView = detail.inView;
-    scrollDirection = detail?.scrollDirection?.vertical;
-  };
+ 
 </script>
 
 <div style="background-color: #161617;">

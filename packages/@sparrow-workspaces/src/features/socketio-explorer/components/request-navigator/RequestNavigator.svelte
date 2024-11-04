@@ -37,15 +37,16 @@
         count: 0,
       },
       {
+        name: "Events",
+        id: SocketSectionEnum.EVENTS,
+        count: _eventsLength - 1,
+      },
+      {
         name: "Parameters",
         id: SocketSectionEnum.PARAMETERS,
         count: _paramsLength - 1,
       },
-      {
-        name: "Events",
-        id: SocketSectionEnum.EVENTS,
-        count: _eventsLength-1,
-      },
+
       {
         name: "Headers",
         id: SocketSectionEnum.HEADERS,

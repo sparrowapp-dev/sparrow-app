@@ -168,9 +168,6 @@
                       onUpdateEvents(pairs);
                     }}
                     keyValue={$tab.property.socketio.events}
-                    {onUpdateRequestState}
-                    {environmentVariables}
-                    {onUpdateEnvironment}
                   />
                 {/if}
               </div>
