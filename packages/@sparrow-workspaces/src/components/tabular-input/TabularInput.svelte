@@ -241,12 +241,12 @@
       style="overflow:hidden;"
     >
       <div
-        class="w-100 d-flex align-items-center px-3 gap-3 pair-header-row {!isTopHeaderRequired
+        class="w-100 d-flex align-items-center px-3 pair-header-row {!isTopHeaderRequired
           ? 'd-none'
           : ''}"
         style="position:relative;"
       >
-        <div style="height:14px; width:14px;">
+        <div style="height:14px; width:14px;" class="me-3">
           <label class="checkbox-parent">
             <input
               type="checkbox"
@@ -258,7 +258,7 @@
           </label>
         </div>
 
-        <div class="d-flex gap-0" style="flex:1;">
+        <div class="d-flex gap-0" style="width: calc(100% - 188px);">
           <div
             class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
             style="padding-left: 6px;"
@@ -272,7 +272,7 @@
             Value
           </div>
         </div>
-        <div style="width:140px;" class="d-flex align-items-center">
+        <div style="width:140px;" class="ms-3 d-flex align-items-center">
           <div class="w-100 d-flex">
             <div class="w-100 d-flex justify-content-end">
               <button

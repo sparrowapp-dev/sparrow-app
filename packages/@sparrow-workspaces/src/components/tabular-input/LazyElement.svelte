@@ -38,10 +38,10 @@
 <div
   use:inview={options}
   on:inview_change={handleChange}
-  class="w-100 pair-data-row px-3 d-flex align-items-center gap-3"
+  class="w-100 pair-data-row px-3 d-flex align-items-center"
 >
   {#if isInView}
-    <div style="height:14px; width:14px;">
+    <div style="height:14px; width:14px;" class="me-3">
       {#if pairs.length - 1 != index || !isInputBoxEditable}
         <!-- checkbox should be visible to last row in readonly mode -->
         <label class="checkbox-parent">
@@ -58,7 +58,7 @@
       {/if}
     </div>
 
-    <div class="d-flex gap-0" style="flex:1;">
+    <div class="d-flex" style="width: calc(100% - 64px);">
       <div class="w-50 position-relative">
         <CodeMirrorInput
           bind:value={element.key}
@@ -88,7 +88,7 @@
     </div>
     <div
       style="width:16px;"
-      class="d-flex justify-content-center align-items-center"
+      class="ms-3 d-flex justify-content-center align-items-center"
     >
       <div class="d-flex" style="width:16px;">
         <div class="d-flex">
