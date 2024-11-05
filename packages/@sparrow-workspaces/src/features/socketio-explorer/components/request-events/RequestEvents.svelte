@@ -75,22 +75,19 @@
         style="font-size: 12px; font-weight: 500; background-color:var(--bg-secondary-880);"
       >
         <p
-          class="mb-0 w-50 text-secondary-200 text-fs-12 p-1"
+          class="mb-0 w-50 text-secondary-200 text-fs-12 "
           style="font-weight: 1000;"
         >
           Key
         </p>
 
         <p
-          class="mb-0 w-50 text-secondary-200 text-fs-12 ps-0 ms-3"
+          class="mb-0 w-50 text-secondary-200 text-fs-12 p-1"
           style="font-weight: 1000;"
         >
           Listen
         </p>
 
-        <div class="h-75 pe-2">
-          <button class=" border-0" style="width:70px;" />
-        </div>
       </div>
     </div>
 

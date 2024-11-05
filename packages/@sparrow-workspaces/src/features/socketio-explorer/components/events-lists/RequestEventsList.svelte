@@ -13,13 +13,13 @@
 
 <div style="background-color: var(--bg-secondary-700);">
   <div
-    class="ps-5 pe-2 d-flex justify-content-between align-items-center bg-secondary-700 w-100"
+    class="ps-5 d-flex justify-content-between align-items-center bg-secondary-700 w-100"
     style="font-size: 12px; font-weight: 500; margin-bottom: 4px;"
   >
     <div
-      class="position-relative w-50 d-flex justify-content-between align-items-center"
+      class="position-relative  w-50 d-flex justify-content-between align-items-center"
     >
-      <div class="w-100 me-2 ms-1">
+      <div class="w-100">
         <Input
           id={`environment-search}`}
           type="text"
@@ -36,7 +36,10 @@
           isEditIconRequired={false}
         />
       </div>
-      <div class="me-1 mt-1">
+    </div>
+
+    <div class=" ps-1 d-flex w-50 justify-content-between">
+      <div>
         {#if true}
           <Switch
             checked={element.listen}
@@ -48,19 +51,21 @@
           <div style="width: 24px;"></div>
         {/if}
       </div>
-    </div>
 
-    {#if index !== pairs.length - 1}
-      <Tooltip title={"Delete"} placement={"bottom-left"} distance={10}>
-        <button
-          class="bg-secondary-700 d-flex justify-content-center align-items-center border-0"
-          style="width: 24px; height:16px; padding-end"
-          on:click={() => deleteParam(index)}
-        >
-          <img class="trash-icon" src={trashIcon} alt="" />
-        </button>
-      </Tooltip>
-    {/if}
+      <div class="pe-2">
+        {#if index !== pairs.length - 1}
+          <Tooltip title={"Delete"} placement={"bottom-left"} distance={10}>
+            <button
+              class="bg-secondary-700 d-flex justify-content-center align-items-center border-0"
+              style="width: 24px; height:16px;"
+              on:click={() => deleteParam(index)}
+            >
+              <img class="trash-icon" src={trashIcon} alt="" />
+            </button>
+          </Tooltip>
+        {/if}
+      </div>
+    </div>
   </div>
 </div>
 
