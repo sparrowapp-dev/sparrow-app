@@ -4,6 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 const windowSettingRepository = new WindowSettingReposistory();
 
 export async function zoomIn() {
+  await invoke("connect_socket_io", {url: "http://localhost:3005"})
   let windowScaleFactor =
     await windowSettingRepository.getWindowSetting("windowScaleFactor");
   windowScaleFactor = windowScaleFactor

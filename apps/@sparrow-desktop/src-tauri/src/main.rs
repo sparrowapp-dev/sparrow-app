@@ -47,6 +47,7 @@ mod utils;
 
 // External Imports
 use formdata_handler::make_formdata_request;
+use futures::FutureExt;
 use json_handler::make_json_request;
 use nfd::Response;
 use raw_handler::make_text_request;
@@ -60,6 +61,7 @@ use serde_json::json;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::process::Command;
+use std::result;
 use tauri::Manager;
 use tauri::Window;
 use url_fetch_handler::import_swagger_url;
@@ -85,12 +87,19 @@ use tokio_tungstenite::tungstenite::protocol::Message;
 use tokio_tungstenite::tungstenite::protocol::WebSocketConfig;
 use tokio_tungstenite::WebSocketStream;
 use tokio_tungstenite::{connect_async, Connector};
+use std::time::Duration;
 #[cfg(target_os = "macos")]
 #[macro_use]
 extern crate objc;
 
 // socket.io imports
-use rust_socketio::{ClientBuilder, Payload as SocketIoPayload};
+// use rust_socketio::{ClientBuilder, Payload as SocketIoPayload};
+use rust_socketio::{
+    asynchronous::{Client as SocketClient, ClientBuilder},
+    TransportType,
+    Payload as SocketIoPayload,
+};
+
 
 // Commands
 #[tauri::command]
@@ -725,58 +734,56 @@ struct SocketIOResponse {
 }
 
 #[tauri::command]
-async fn connect_socket_io(
-    url: String,
-    event: String,
-    state: tauri::State<'_, Arc<AppState>>,
-) -> Result<String, String> {
-    // Create a new Socket.IO client
-    let socket = ClientBuilder::new(&url)
-        .on("message", |payload: SocketIoPayload, socket| {
+async fn connect_socket_io(url: String) -> Result<String, String> {
+    let namespace = "/".to_string();
+    let socket_url = format!("{}{}", url, namespace);
+
+    let callback = |payload: SocketIoPayload, socket: SocketClient| {
+        async move {
             match payload {
-                SocketIoPayload::Text(msg) => println!("Received message: {:?}", msg),
-                SocketIoPayload::Binary(bin_data) => {
-                    println!("Received binary data: {:#?}", bin_data)
-                }
-                _ => println!("Received unknown payload type"),
+                SocketIoPayload::String(str) => println!("Received: {}", str),
+                SocketIoPayload::Text(str) => println!("Received: {:#?}", str),
+                SocketIoPayload::Binary(bin_data) => println!("Received bytes: {:#?}", bin_data),
             }
-            socket
-                .emit("ack", json!({"status": "received"}))
-                .expect("Server unreachable");
-        })
-        .on("error", |err, _| eprintln!("Error: {:#?}", err))
-        .connect()
-        .expect("Connection failed");
+            // socket.emit("message", json!({"got ack": true}))
+            //     .await
+            //     .expect("Server unreachable");
+        }
+        .boxed()
+    };
 
-    // emit to the "foo" event
-    // let json_payload = json!({"token": 123});
-    // socket
-    //     .emit("foo", json_payload)
-    //     .expect("Server unreachable");
-    // Listen for the specified event
-    // let client_clone = socket.clone();
-    // let event_clone = event.clone();
+    println!("{}", &socket_url);
 
-    // Spawn a new task to listen for messages
-    // tokio::spawn(async move {
-    //     let socket = client_clone;
-    //     socket.on(event_clone, |data| {
-    //         // Handle the incoming data
-    //         println!("Received data: {:?}", data);
-    //     });
-    // });
+    // Create a new Socket.IO client
+    let socket = ClientBuilder::new(&socket_url)
+        .reconnect(false)
+        .auth(json!({}))
+        .transport_type(TransportType::Websocket)
+        .on("message", callback)
+        .on("error", |err: SocketIoPayload, _| {
+            async move { eprintln!("Error: {:#?}", err) }.boxed()
+        });
 
-    // Create a success response
-    let response: SocketIOResponse = SocketIOResponse {
+    let connected_socket = socket.connect().await.map_err(|e| format!("Connection failed: {}", e))?;
+
+     // Log the successful connection
+    let result = connected_socket.emit_with_ack("message", "data", Duration::from_secs(10),callback).await;
+
+    let response_value = match result {
+        Ok(value) => value,
+        Err(err) => todo!("{}", err),
+    };
+
+    println!("{:?}", response_value);
+     
+    // Successful connection response
+    let response = SocketIOResponse {
         is_successful: true,
-        message: format!("Connected to Socket.IO server at {}", url),
+        message: format!("Connected to Socket.IO server at {}", socket_url),
     };
 
     // Serialize the response to a JSON string and return it
-    let response_json = serde_json::to_string(&response)
-        .map_err(|e| format!("Failed to serialize response: {}", e))?;
-
-    Ok(response_json)
+    serde_json::to_string(&response).map_err(|e| format!("Failed to serialize response: {}", e))
 }
 
 // Driver Function
@@ -813,7 +820,6 @@ fn main() {
             #[cfg(desktop)]
             app.handle()
                 .plugin(tauri_plugin_updater::Builder::new().build())?;
-            let app_handle = app.handle().clone();
             app.manage(Arc::new(AppState {
                 connections: Mutex::new(std::collections::HashMap::new()),
             }));
