@@ -23,8 +23,6 @@
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
 
-  export let isCreateTeamModalOpen;
-
   let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
@@ -61,6 +59,9 @@
   });
 
   onMount(async () => {
+    _viewModel.refreshTeams(userId);
+    _viewModel.refreshWorkspaces(userId);
+
     let githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
     splitter = document.querySelector(".team-splitter .splitpanes__splitter");

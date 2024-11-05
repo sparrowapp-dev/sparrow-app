@@ -139,9 +139,56 @@ export class TeamRepository {
   /**
    * sync / refresh teams data
    */
-  public bulkInsertData = async (data: any): Promise<void> => {
-    await RxDB.getInstance().rxdb.team.bulkUpsert(data);
+  public bulkInsertData = async (_teams: any[]): Promise<void> => {
+    if (_teams?.length > 0) {
+      await RxDB.getInstance()?.rxdb?.team.bulkUpsert(_teams);
+    }
     return;
+  };
+
+  /**
+   * Check team is open or not
+   */
+  public checkIsTeamOpen = async (_teamId: string): Promise<boolean> => {
+    const team = await RxDB.getInstance()
+      ?.rxdb?.team.findOne({
+        selector: {
+          teamId: _teamId,
+          isOpen: true,
+        },
+      })
+      .exec();
+    return team ? true : false;
+  };
+
+  /**
+   * Deletes orphan teams that doesn't exists on sparrow backend
+   * @param _workspaceId - workspace id
+   * @param _teamIds - backend team Ids to find local orphan teams
+   */
+  public deleteOrphanTeams = async (_teamIds: string[]) => {
+    // delete left out teams
+    const teams = await RxDB.getInstance()?.rxdb?.team.find().exec();
+    const teamsJSON = teams?.map((_team) => {
+      return _team.toMutableJSON();
+    });
+    const selectedTeamsToBeDeleted = teamsJSON
+      ?.filter((_team) => {
+        for (let i = 0; i < _teamIds.length; i++) {
+          if (_teamIds[i] === _team.teamId) {
+            return false;
+          }
+        }
+        return true;
+      })
+      .map((_team) => {
+        return _team.teamId;
+      });
+    if ((selectedTeamsToBeDeleted?.length || 0) > 0) {
+      await RxDB.getInstance()?.rxdb?.team.bulkRemove(
+        selectedTeamsToBeDeleted as string[],
+      );
+    }
   };
 
   /**
