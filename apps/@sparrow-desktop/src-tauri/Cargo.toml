@@ -30,6 +30,7 @@ reqwest = { version = "0.11", features = [
     "multipart",
     "stream",
 ] }
+rust_socketio = "*"
 http = "0.2"
 hyper = { version = "0.14", features = ["client", "http1", "http2"] }
 hyper-tls = "0.5"

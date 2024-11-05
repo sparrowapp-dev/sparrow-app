@@ -4,14 +4,10 @@ import { handleLoginV2 } from "@app/pages/auth-page/sub-pages/login-page/login-p
 import { listen } from "@tauri-apps/api/event";
 import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import { getCurrent } from "@tauri-apps/api/window";
-import { Modal } from "@sparrow/library/ui";
 import { userValidationStore } from "@app/store/deviceSync.store";
 import { getAuthJwt, jwtDecode } from "../utils/jwt";
 import constants from "@app/constants/constants";
-import { EnvironmentRepository } from "../repositories/environment.repository";
 import { WorkspaceRepository } from "../repositories/workspace.repository";
-import { EnvironmentService } from "../services/environment.service";
-import { InitTab } from "@sparrow/common/factory";
 import { GuestUserRepository } from "../repositories/guest-user.repository";
 import { TabRepository } from "../repositories/tab.repository";
 import { navigate } from "svelte-navigator";
@@ -21,14 +17,6 @@ interface DeepLinkHandlerWindowsPayload {
   payload: {
     url: string;
   };
-}
-
-interface JwtPayload {
-  _id: string;
-  email: string;
-  name: string;
-  exp: number;
-  iat: number;
 }
 
 export class AppViewModel {
@@ -101,10 +89,10 @@ export class AppViewModel {
     }
   }
 
-  private handleLoginAndWorkspaceSwitchThrottler = throttle(
-    this.handleLoginAndWorkspaceSwitch,
-    5000,
-  );
+  private handleLoginAndWorkspaceSwitchThrottler = (
+    url: string,
+    workspaceId: string | null,
+  ) => throttle(this.handleLoginAndWorkspaceSwitch(url, workspaceId), 5000);
 
   // Private method to process deep link
   private async processDeepLink(url: string): Promise<void> {
@@ -113,6 +101,17 @@ export class AppViewModel {
       const params = new URLSearchParams(url.split("?")[1]);
       const currentUserAccessToken = params.get("accessToken");
       const workspaceId = params.get("workspaceID");
+      const importCollectionMetadata = params.get(
+        "importCollectionFromSwagger",
+      );
+
+      if (importCollectionMetadata) {
+        const importCollectionMetadataJson = JSON.parse(
+          importCollectionMetadata,
+        );
+        console.log(importCollectionMetadataJson);
+        return;
+      }
 
       const isValidUser = await this.validateUserAccess(currentUserAccessToken);
 
@@ -130,7 +129,8 @@ export class AppViewModel {
     }
   }
 
-  private processDeepLinkThrottler = throttle(this.processDeepLink, 5000);
+  private processDeepLinkThrottler = (url: string) =>
+    throttle(this.processDeepLink(url), 5000);
 
   // Private platform-specific handlers
   private deepLinkHandlerWindows = async (
@@ -142,7 +142,9 @@ export class AppViewModel {
     }
   };
 
-  private deepLinkHandlerMacOs = async (deepLinkUrl: string): Promise<void> => {
+  private deepLinkHandlerMacOs = async (
+    deepLinkUrl: string[],
+  ): Promise<void> => {
     if (deepLinkUrl) {
       await this.processDeepLinkThrottler(deepLinkUrl[0]);
     }

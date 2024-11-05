@@ -89,6 +89,9 @@ use tokio_tungstenite::{connect_async, Connector};
 #[macro_use]
 extern crate objc;
 
+// socket.io imports
+use rust_socketio::{ClientBuilder, Payload as SocketIoPayload};
+
 // Commands
 #[tauri::command]
 fn zoom_window(window: tauri::Window, scale_factor: f64) {
@@ -532,20 +535,20 @@ async fn connect_websocket(
         .header(UPGRADE, "websocket")
         .header(CONNECTION, "Upgrade");
 
-        // Add custom headers to the request
+    // Add custom headers to the request
     for (key, value) in headers_key_value_map.iter() {
         req_builder = req_builder.header(
             key,
             HeaderValue::from_str(value).map_err(|e| format!("Invalid header value: {}", e))?,
         );
     }
-   
+
     // Unwrap the body
     let req = req_builder
         .body(hyper::Body::empty())
         .map_err(|e| format!("Failed to build request: {}", e))?;
 
-    // Send the HTTP request and await the response to check if upgrade to websocket is possible or not. 
+    // Send the HTTP request and await the response to check if upgrade to websocket is possible or not.
     let response = client
         .request(req)
         .await
@@ -715,6 +718,67 @@ async fn disconnect_websocket(
     }
 }
 
+#[derive(Serialize)]
+struct SocketIOResponse {
+    is_successful: bool,
+    message: String,
+}
+
+#[tauri::command]
+async fn connect_socket_io(
+    url: String,
+    event: String,
+    state: tauri::State<'_, Arc<AppState>>,
+) -> Result<String, String> {
+    // Create a new Socket.IO client
+    let socket = ClientBuilder::new(&url)
+        .on("message", |payload: SocketIoPayload, socket| {
+            match payload {
+                SocketIoPayload::Text(msg) => println!("Received message: {:?}", msg),
+                SocketIoPayload::Binary(bin_data) => {
+                    println!("Received binary data: {:#?}", bin_data)
+                }
+                _ => println!("Received unknown payload type"),
+            }
+            socket
+                .emit("ack", json!({"status": "received"}))
+                .expect("Server unreachable");
+        })
+        .on("error", |err, _| eprintln!("Error: {:#?}", err))
+        .connect()
+        .expect("Connection failed");
+
+    // emit to the "foo" event
+    // let json_payload = json!({"token": 123});
+    // socket
+    //     .emit("foo", json_payload)
+    //     .expect("Server unreachable");
+    // Listen for the specified event
+    // let client_clone = socket.clone();
+    // let event_clone = event.clone();
+
+    // Spawn a new task to listen for messages
+    // tokio::spawn(async move {
+    //     let socket = client_clone;
+    //     socket.on(event_clone, |data| {
+    //         // Handle the incoming data
+    //         println!("Received data: {:?}", data);
+    //     });
+    // });
+
+    // Create a success response
+    let response: SocketIOResponse = SocketIOResponse {
+        is_successful: true,
+        message: format!("Connected to Socket.IO server at {}", url),
+    };
+
+    // Serialize the response to a JSON string and return it
+    let response_json = serde_json::to_string(&response)
+        .map_err(|e| format!("Failed to serialize response: {}", e))?;
+
+    Ok(response_json)
+}
+
 // Driver Function
 fn main() {
     // Initiate Tauri Runtime
@@ -767,7 +831,8 @@ fn main() {
             make_http_request_v2,
             connect_websocket,
             send_websocket_message,
-            disconnect_websocket
+            disconnect_websocket,
+            connect_socket_io
         ])
         .on_page_load(|wry_window, _payload| {
             if wry_window.url().host_str() == Some("www.google.com") {
