@@ -8,3 +8,4 @@ export { default as RequestMessage } from "./request-body/RequestMessage.svelte"
 export { default as ResponseData } from "./response-data/ResponseData.svelte";
 export { default as ResponsePreview } from "./response-preview/ResponsePreview.svelte";
 export { default as ResponsePreviewNavigator } from "./response-preview-navigator/ResponsePreviewNavigator.svelte";
+export { default as RequestEvents } from "./request-events/RequestEvents.svelte";
