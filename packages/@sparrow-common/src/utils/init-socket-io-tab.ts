@@ -153,6 +153,17 @@ class InitSocketIoTab {
     }
     return this;
   }
+
+  public updateEventName(_eventName: EventsValues[]) {
+    if (!_eventName) {
+      return this;
+    }
+    if (this._tab?.property?.socketio) {
+      this._tab.property.socketio.eventName = _eventName;
+    }
+    return this;
+  }
+
   public updateMessage(_message: string) {
     if (typeof _message !== "string") {
       return this;
