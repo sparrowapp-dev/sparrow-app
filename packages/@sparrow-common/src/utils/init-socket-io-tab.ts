@@ -8,7 +8,7 @@ import {
   SocketDataTypeEnum,
   SocketSectionEnum,
   type State,
-} from "@sparrow/common/types/workspace/web-socket";
+} from "@sparrow/common/types/workspace/socket-io-request-tab";
 import { v4 as uuidv4 } from "uuid";
 import { SocketIORequestDefaultAliasBaseEnum } from "../types/workspace/socket-io-request-base";
 
@@ -42,6 +42,12 @@ class InitSocketIoTab {
               key: "",
               value: "",
               checked: false,
+            },
+          ],
+          events: [
+            {
+              event: "",
+              listen: false,
             },
           ],
           queryParams: [

@@ -6,12 +6,12 @@
     {
       "label": "ui:dev",
       "type": "shell",
-      // `dev` keeps running in the background
-      // ideally you should also configure a `problemMatcher`
-      // see https://code.visualstudio.com/docs/editor/tasks#_can-a-background-task-be-used-as-a-prelaunchtask-in-launchjson
       "problemMatcher": {
         "base": "$tsc",
-        "fileLocation": ["relative", "${workspaceFolder}"],
+        "fileLocation": [
+          "relative",
+          "${workspaceFolder}/apps/@sparrow-desktop"
+        ],
         "pattern": {
           "regexp": "^(ERROR|WARNING|INFO|DEBUG)(.*)$",
           "severity": 1,
@@ -20,16 +20,52 @@
         }
       },
       "isBackground": true,
-      // change this to your `beforeDevCommand`:
       "command": "yarn",
-      "args": ["dev"]
+      "args": ["desktop-start"]
     },
     {
       "label": "ui:build",
       "type": "shell",
-      // change this to your `beforeBuildCommand`:
       "command": "yarn",
-      "args": ["build"]
+      "args": ["desktop-build"]
+    },
+    {
+      "label": "core:buildDebug",
+      "type": "shell",
+      "command": "cargo",
+      "args": [
+        "build",
+        "--manifest-path=./apps/@sparrow-desktop/src-tauri/Cargo.toml",
+        "--no-default-features"
+      ],
+      "problemMatcher": ["$rustc"]
+    },
+    {
+      "label": "ui:dev&core:buildDebug",
+      "dependsOn": ["core:buildDebug", "ui:dev"]
+    },
+    {
+      "label": "build:debug",
+      "type": "cargo",
+      "command": "build"
+    },
+    {
+      "label": "ui:dev",
+      "type": "shell",
+      // `dev` keeps running in the background
+      // ideally you should also configure a `problemMatcher`
+      // see https://code.visualstudio.com/docs/editor/tasks#_can-a-background-task-be-used-as-a-prelaunchtask-in-launchjson
+      "isBackground": true,
+      // change this to your `beforeDevCommand`:
+      "command": "yarn",
+      "args": ["desktop-start"]
+    },
+    {
+      "label": "dev",
+      "dependsOn": ["build:debug", "ui:dev"],
+      "group": {
+        "kind": "build"
+      }
     }
   ]
 }

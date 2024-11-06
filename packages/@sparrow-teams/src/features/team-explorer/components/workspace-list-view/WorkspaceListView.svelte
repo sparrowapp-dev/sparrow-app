@@ -15,15 +15,23 @@
   export let data: any;
   export let openTeam: TeamDocument;
   export let isWebEnvironment: boolean;
+
   export let onSwitchWorkspace: (id: string) => void;
+
   export let searchQuery;
+
   export let onDeleteWorkspace;
+
   export let openInDesktop;
+
   export let isAdminOrOwner: boolean;
+
   export let isGuestUser = false;
+
   export let onAddMember;
 
   let filterText = "";
+
   let workspacePerPage: number = 10,
     currPage = 1;
   const tableHeaderContent = [
@@ -35,28 +43,14 @@
     "",
   ];
 
-  $: sortedAndFilteredData = data 
-    ? [...data]
-        .sort((a, b) => {
-          // First try to sort by lastModified
-          if (a.lastModified && b.lastModified) {
-            return new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime();
-          }
-          // Fallback to updatedAt
-          if (a.updatedAt && b.updatedAt) {
-            return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-          }
-          // Last fallback to lastUpdated
-          if (a.lastUpdated && b.lastUpdated) {
-            return new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime();
-          }
-          return 0;
-        })
-        .filter(item => item.name.toLowerCase().startsWith(filterText.toLowerCase()))
-    : [];
-
-  $: paginatedData = sortedAndFilteredData
-    .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage);
+  // Function to sort workspaces by last updated time
+  const sortByLastUpdated = (workspaces) => {
+    return workspaces.sort((a, b) => {
+      const aTime = new Date(a.lastUpdated).getTime();
+      const bTime = new Date(b.lastUpdated).getTime();
+      return bTime - aTime; // Descending order (most recent first)
+    });
+  };
 </script>
 
 <div class="h-100 d-flex flex-column pb-2">
@@ -75,7 +69,11 @@
       >
         <tbody class="overflow-y-auto position-relative z-0">
           {#if data}
-            {#each paginatedData as list, index}
+            {#each sortByLastUpdated(data.slice())
+              .filter((item) => item.name
+                  .toLowerCase()
+                  .startsWith(filterText.toLowerCase()))
+              .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
               <Rows
                 {onAddMember}
                 {list}
@@ -119,21 +117,33 @@
     {#if !isGuestUser}
       {#if searchQuery == "" && data && data?.length === 0}
         <p class="not-found-text mt-3">Add Workspaces to this team</p>
-      {:else if searchQuery !== "" && paginatedData.length === 0}
+      {:else if searchQuery !== "" && sortByLastUpdated(data.slice())
+          .filter((item) => item.name
+              .toLowerCase()
+              .startsWith(filterText.toLowerCase()))
+          .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length == 0}
         <p class="not-found-text mt-3">No result found.</p>
       {/if}
     {/if}
   </div>
 
-  {#if paginatedData.length > 0 && !isGuestUser}
+  {#if sortByLastUpdated(data.slice())
+    .filter((item) => item.name
+        .toLowerCase()
+        .startsWith(filterText.toLowerCase()))
+    .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0 && !isGuestUser}
     <table class="bottom-0" style="width: 53%;">
       <tfoot>
         <tr class="d-flex justify-content-between">
           <th class="tab-head" style=""
             >Showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
               currPage * workspacePerPage,
-              sortedAndFilteredData.length,
-            )} of {sortedAndFilteredData.length}
+              data?.filter((item) =>
+                item.name.toLowerCase().startsWith(filterText.toLowerCase()),
+              ).length,
+            )} of {data?.filter((item) =>
+              item.name.toLowerCase().startsWith(filterText.toLowerCase()),
+            ).length}
           </th>
           <th class="tab-head tab-change" style="">
             <button
@@ -156,23 +166,49 @@
               on:click={() => {
                 if (
                   currPage <
-                  Math.ceil(sortedAndFilteredData.length / workspacePerPage)
+                  Math.ceil(
+                    data?.filter((item) =>
+                      item.name
+                        .toLowerCase()
+                        .startsWith(filterText.toLowerCase()),
+                    ).length / workspacePerPage,
+                  )
                 )
                   currPage += 1;
               }}
               class="bg-transparent border-0"
               ><RightIcon
-                color={currPage === Math.ceil(sortedAndFilteredData.length / workspacePerPage)
+                color={currPage ===
+                Math.ceil(
+                  data?.filter((item) =>
+                    item.name
+                      .toLowerCase()
+                      .startsWith(filterText.toLowerCase()),
+                  ).length / workspacePerPage,
+                )
                   ? "var(--border-secondary-200)"
                   : "white"}
               /></button
             >
             <button
               on:click={() =>
-                (currPage = Math.ceil(sortedAndFilteredData.length / workspacePerPage))}
+                (currPage = Math.ceil(
+                  data?.filter((item) =>
+                    item.name
+                      .toLowerCase()
+                      .startsWith(filterText.toLowerCase()),
+                  ).length / workspacePerPage,
+                ))}
               class="bg-transparent border-0"
               ><DoubleRightIcon
-                color={currPage === Math.ceil(sortedAndFilteredData.length / workspacePerPage)
+                color={currPage ===
+                Math.ceil(
+                  data?.filter((item) =>
+                    item.name
+                      .toLowerCase()
+                      .startsWith(filterText.toLowerCase()),
+                  ).length / workspacePerPage,
+                )
                   ? "var(--border-secondary-200)"
                   : "white"}
               /></button
@@ -184,7 +220,7 @@
   {/if}
 </div>
 
-<style> 
+<style>
   .not-found-text {
     color: var(--text-secondary-200);
     font-size: 16px;
