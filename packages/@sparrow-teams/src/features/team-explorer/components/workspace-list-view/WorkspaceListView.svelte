@@ -184,7 +184,7 @@
   {/if}
 </div>
 
-<style>
+<style> 
   .not-found-text {
     color: var(--text-secondary-200);
     font-size: 16px;
