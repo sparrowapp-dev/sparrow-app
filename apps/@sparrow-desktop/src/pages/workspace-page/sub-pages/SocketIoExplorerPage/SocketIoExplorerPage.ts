@@ -51,6 +51,7 @@ import { SocketIoTabAdapter } from "@app/adapter";
 import { CollectionItemTypeDtoEnum } from "@sparrow/common/types/workspace/collection-dto";
 import type { CollectionItemBaseInterface } from "@sparrow/common/types/workspace/collection-base";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
+import type { EventsValues } from "@sparrow/common/types/workspace/socket-io-request-tab";
 
 class SocketIoExplorerPageViewModel {
   /**
@@ -161,6 +162,13 @@ class SocketIoExplorerPageViewModel {
         progressiveTab.property.socketio?.message
       ) {
         result = false;
+      } else if (
+        !this.compareArray.init(
+          requestServer.property.socketio.events,
+          progressiveTab.property.socketio?.events,
+        )
+      ) {
+        result = false;
       }
 
       // headers
@@ -243,6 +251,26 @@ class SocketIoExplorerPageViewModel {
       const reducedURL = new ReduceRequestURL(_url);
       await this.updateParams(reducedURL.getQueryParameters(), false);
     }
+    this.compareRequestWithServer();
+  };
+
+  
+  /**
+   *
+   * @param  _eventName - request event  name
+   */
+  public updateRequestEventName = async (
+    _eventName: string,
+  ) => {
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+
+
+    if (progressiveTab?.property?.socketio) {
+      progressiveTab.property.socketio.eventName = _eventName;
+    }
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+   
     this.compareRequestWithServer();
   };
 
@@ -334,6 +362,18 @@ class SocketIoExplorerPageViewModel {
   public updateHeaders = async (_headers: KeyValueChecked[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.socketio.headers = _headers;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
+  /**
+   *
+   * @param _events - request events
+   */
+  public upadateEvents = async (_events: EventsValues[]) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.socketio.events = _events;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();

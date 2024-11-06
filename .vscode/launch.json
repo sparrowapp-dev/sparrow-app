@@ -11,7 +11,7 @@
       "cargo": {
         "args": [
           "build",
-          "--manifest-path=./src-tauri/Cargo.toml",
+          "--manifest-path=./apps/@sparrow-desktop/src-tauri/Cargo.toml",
           "--no-default-features"
         ]
       },
@@ -23,10 +23,34 @@
       "request": "launch",
       "name": "Tauri Production Debug",
       "cargo": {
-        "args": ["build", "--release", "--manifest-path=./src-tauri/Cargo.toml"]
+        "args": [
+          "build",
+          "--release",
+          "--manifest-path=./apps/@sparrow-desktop/src-tauri/Cargo.toml"
+        ]
       },
       // task for the `beforeBuildCommand` if used, must be configured in `.vscode/tasks.json`
       "preLaunchTask": "ui:build"
+    },
+    {
+      // this configuration works only on Windows
+      "name": "Tauri Frontend (Windows)",
+      "type": "msedge",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceFolder}/apps/@sparrow-desktop/src-tauri/target/debug/Sparrow.exe", // Path to your app in debug mode
+      "useWebView": true,
+      "webRoot": "${workspaceFolder}",
+      "preLaunchTask": "ui:dev&core:buildDebug"
+    },
+    {
+      "name": "Launch App Debug",
+      "type": "cppvsdbg",
+      "request": "launch",
+      // change the exe name to your actual exe name
+      // (to debug release builds, change `target/debug` to `release/debug`)
+      "program": "${workspaceRoot}/apps/@sparrow-desktop/src-tauri/target/debug/Sparrow.exe",
+      "cwd": "${workspaceRoot}/apps/@sparrow-desktop",
+      "preLaunchTask": "ui:dev"
     }
   ]
 }

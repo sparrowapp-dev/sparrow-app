@@ -350,7 +350,7 @@ export class TeamExplorerPageViewModel {
   };
 
   /**
-   * Invites new user to the team
+   * Invites new user to the team.
    * @param _teamId - Team id in which users are invited.
    * @param _inviteBody - New team meta data.
    * @param _userId - Used id to be invited.

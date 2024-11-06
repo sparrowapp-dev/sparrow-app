@@ -7,8 +7,9 @@ import {
 import {
   SocketDataTypeEnum,
   SocketSectionEnum,
+  type EventsValues,
   type State,
-} from "@sparrow/common/types/workspace/web-socket";
+} from "@sparrow/common/types/workspace/socket-io-request-tab";
 import { v4 as uuidv4 } from "uuid";
 import { SocketIORequestDefaultAliasBaseEnum } from "../types/workspace/socket-io-request-base";
 
@@ -44,6 +45,12 @@ class InitSocketIoTab {
               checked: false,
             },
           ],
+          events: [
+            {
+              event: "",
+              listen: false,
+            },
+          ],
           queryParams: [
             {
               key: "",
@@ -64,6 +71,7 @@ class InitSocketIoTab {
             },
           ],
           message: "",
+          eventName:"",
           state: {
             requestNavigation: SocketSectionEnum.MESSAGE,
             messageLanguage: SocketDataTypeEnum.TEXT,
@@ -133,6 +141,15 @@ class InitSocketIoTab {
     }
     if (this._tab?.property?.socketio) {
       this._tab.property.socketio.headers = _headers;
+    }
+    return this;
+  }
+  public updateEvents(_events: EventsValues[]) {
+    if (!_events) {
+      return this;
+    }
+    if (this._tab?.property?.socketio) {
+      this._tab.property.socketio.events = _events;
     }
     return this;
   }
