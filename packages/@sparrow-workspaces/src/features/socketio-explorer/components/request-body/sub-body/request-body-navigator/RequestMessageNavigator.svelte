@@ -11,8 +11,8 @@
   export let onSendMessage;
   export let webSocket;
   export let body;
-  export let onUpdateRequestEventName
-  export let requestEventName
+  export let onUpdateRequestEventName;
+  export let requestEventName;
 
   let handleRawDropDown = (tab: string) => {
     onUpdateRequestState({ messageLanguage: tab });
@@ -48,30 +48,29 @@
     />
   </div>
   <Input
-  bind:value={requestEventName}
-  id="collection-list-search"
-  width={"100%"}
-  height={"24px"}
-  type="teritiary"
-  on:input={() => {
-    onUpdateRequestEventName(requestEventName);
-  }}
-  
-  defaultBorderColor="transparent"
-  hoveredBorderColor="var(--border-primary-300)"
-  focusedBorderColor={"var(--border-primary-300)"}
-  class="text-fs-12 bg-tertiary-400 border-radius-2 ellipsis fw-normal px-2"
-  style="outline:none;"
-  placeholder="Enter name"
-/>
-<Button
-  title="Send"
-  buttonStyleProp="width: 48px; position: relative; top: 1px; height: 24px; font-size: 12px; padding: 11px !important; border-radius: 2px !important; " 
-  disable={webSocket?.status !== "connected" || !body}
-  onClick={() => {
-    onSendMessage();
-    MixpanelEvent(Events.Send_WebSocket_Request);
-  }}
-  type={"primary"}
-/>
+    bind:value={requestEventName}
+    id="collection-list-search"
+    width={"100%"}
+    height={"24px"}
+    type="teritiary"
+    on:input={() => {
+      onUpdateRequestEventName(requestEventName);
+    }}
+    defaultBorderColor="transparent"
+    hoveredBorderColor="var(--border-primary-300)"
+    focusedBorderColor={"var(--border-primary-300)"}
+    class="text-fs-12 bg-tertiary-400 border-radius-2 ellipsis fw-normal px-2"
+    style="outline:none;"
+    placeholder="Event name"
+  />
+  <Button
+    title="Send"
+    buttonStyleProp="width: 48px; position: relative; top: 1px; height: 24px; font-size: 12px; padding: 11px !important; border-radius: 2px !important; "
+    disable={webSocket?.status !== "connected"}
+    onClick={() => {
+      onSendMessage();
+      MixpanelEvent(Events.Send_WebSocket_Request);
+    }}
+    type={"primary"}
+  />
 </div>
