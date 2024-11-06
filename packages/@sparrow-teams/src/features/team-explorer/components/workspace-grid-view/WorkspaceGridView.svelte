@@ -45,35 +45,14 @@
   let filterText = "";
   let currPage = 1;
 
-  // Helper function to get timestamp from workspace
-  const getLastUpdatedTime = (workspace: WorkspaceDocument) => {
-    // Try different possible date fields
-    return new Date(
-      workspace.lastModified || 
-      workspace.updatedAt || 
-      workspace.lastUpdated || 
-      workspace.createdAt || 
-      0
-    ).getTime();
-  };
-
-  // filters the workspaces based on the search query and sorts by last updated
+  // filters the workspaces based on the search query
   $: filteredWorkspaces = workspaces
     .filter(
       (item) =>
         typeof item.name === "string" &&
         item.name.toLowerCase().includes(searchQuery.toLowerCase()),
     )
-    .sort((a, b) => {
-      // First sort by last updated time (most recent first)
-      const timeA = getLastUpdatedTime(a);
-      const timeB = getLastUpdatedTime(b);
-      if (timeA !== timeB) {
-        return timeB - timeA;
-      }
-      // If timestamps are equal, fallback to alphabetical sorting
-      return a.name.localeCompare(b.name);
-    });
+    .sort((a, b) => a.name.localeCompare(b.name)); // will arrange workspace aplhabetically
 
   // This will split workspaces into pages
   $: paginatedWorkspaces = (() => {
@@ -109,7 +88,8 @@
       <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
         <div class="d-flex flex-wrap gap-5 justify-content-between row-gap-0">
           {#if searchQuery !== "" && filteredWorkspaces.length === 0}
-            <span class="not-found-text mx-auto ellipsis">No result found.</span>
+            <span class="not-found-text mx-auto ellipsis">No result found.</span
+            >
           {/if}
           {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
             <Button
@@ -182,6 +162,7 @@
               />
             </button>
           </div>
+
         </div>
       {/if}
     {:else}
@@ -249,5 +230,3 @@
     }
   }
 </style>
-
-
