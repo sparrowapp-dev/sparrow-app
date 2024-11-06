@@ -53,6 +53,7 @@
     height: 300px;
     border: 1px solid transparent !important;
     border-radius: 4px !important;
+    
   }
   textarea:focus,
   textarea:hover {
