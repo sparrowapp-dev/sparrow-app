@@ -314,9 +314,13 @@ const sendSocketIoMessage = async (
 
         socketIoDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
+          let asdf = [];
+          asdf.push(_eventName);
+          asdf.push(message || "(empty)");
+          const r = JSON.stringify(asdf);
           if (wsData) {
             wsData.messages.unshift({
-              data: message,
+              data: r,
               transmitter: "sender",
               timestamp: formatTime(new Date()),
               uuid: uuidv4(),
@@ -684,7 +688,11 @@ const connectSocketIo = async (
                 break;
               }
             }
-            if (socketIOresponse.startsWith("42") && isIncludeInResponse) {
+            if (
+              socketIOresponse.startsWith("42") &&
+              isIncludeInResponse &&
+              socketIoResponseArray[1]
+            ) {
               socketIoDataStore.update((webSocketDataMap) => {
                 const wsData = webSocketDataMap.get(tabId);
                 if (wsData) {

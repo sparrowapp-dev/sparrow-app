@@ -1521,10 +1521,11 @@ class SocketIoExplorerPageViewModel {
   };
   public sendMessageWebsocket = async () => {
     const websocketData = this._tab.getValue();
+
     return await this.collectionService.sendMessageSocketIo(
       websocketData.tabId,
       websocketData.property.socketio?.message as string,
-      (websocketData.property.socketio?.eventName as string) || "first",
+      (websocketData.property.socketio?.eventName as string) || "message",
     );
   };
 

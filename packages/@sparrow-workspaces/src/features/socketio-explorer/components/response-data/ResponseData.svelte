@@ -83,6 +83,10 @@
    * @returns - The HTML string with highlighted text
    */
   const highlightSearchText = (text: string, search: string): string => {
+    try {
+      const asf = JSON.parse(text);
+      text = "[" + asf[0] + "]" + " " + asf[1];
+    } catch (e) {}
     if (!search) return text;
     const regex = new RegExp(`(${search})`, "gi");
     return text.replace(
@@ -244,14 +248,39 @@
           style="cursor: pointer;"
           on:click={() => {
             onUpdateMessageBody(message.uuid);
+            // debugger;
+
+            try {
+              let parse = JSON.parse(message.data);
+              if (parse[1] === "(empty)") {
+                onUpdateContentType(RequestDataTypeEnum.TEXT);
+                return;
+              }
+
+              try {
+                if (parse[1]) {
+                  JSON.parse(parse[1]);
+                  onUpdateContentType(RequestDataTypeEnum.JSON);
+                  return;
+                }
+              } catch (e) {
+                onUpdateContentType(RequestDataTypeEnum.TEXT);
+                return;
+              }
+            } catch (e) {
+              onUpdateContentType(RequestDataTypeEnum.TEXT);
+              return;
+            }
 
             try {
               if (message.data) {
                 JSON.parse(message.data);
                 onUpdateContentType(RequestDataTypeEnum.JSON);
+                return;
               }
             } catch (e) {
               onUpdateContentType(RequestDataTypeEnum.TEXT);
+              return;
             }
           }}
         >

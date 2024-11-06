@@ -39,8 +39,28 @@
    * @description Copy API response to users clipboard.
    */
 
+  const currentMessage = (uuid: string) => {
+    if (webSocket) {
+      const message = webSocket.messages.find(
+        (message: SocketIORequestMessageTabInterface) => message.uuid === uuid,
+      );
+      let messageData = message?.data || "";
+      try {
+        let parse = JSON.parse(messageData);
+        if (parse[1] === "(empty)") {
+          return "\n";
+        }
+        messageData = `${parse[1]}`;
+      } catch (e) {}
+
+      return messageData;
+    }
+    return "";
+  };
+
   const handleCopy = async () => {
-    await copyToClipBoard(formatCode(webSocket?.body));
+    const data = currentMessage(webSocket.body);
+    await copyToClipBoard(formatCode(data));
     notifications.success("Copied to clipboard");
     MixpanelEvent(Events.COPY_API_RESPONSE);
   };
@@ -85,7 +105,8 @@
     });
     const writableStream = await newHandle.createWritable();
     // write our file
-    await writableStream.write(formatCode(webSocket?.body));
+    const data = currentMessage(webSocket.body);
+    await writableStream.write(formatCode(data));
     await writableStream.close();
     notifications.success("Exported successfully.");
     MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
