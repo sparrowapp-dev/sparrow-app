@@ -407,7 +407,7 @@
             collection?.activeSync}
           id="updateCollectionDescField"
           value={collection?.description || ""}
-          class="bg-transparent border-0 text-textColor text-fs-12 collection-area input-outline w-100 p-2"
+          class="bg-transparent border-0  text-fs-12 collection-area input-outline w-100 p-2"
           placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
           on:blur={(event) => {
             if (collection?.description !== event.target.value) {
@@ -449,10 +449,11 @@
   textarea {
     outline-color: var(--text-primary-600);
     border: none;
-    border-radius: 8px !important;
+    border-radius: 4px !important;
+    color: var(--text-secondary-1000);
   }
   textarea::placeholder {
-    color: var(--text-color);
+    color: var(--text-secondary-550)
   }
 
   .input-outline:focus,
