@@ -254,6 +254,26 @@ class SocketIoExplorerPageViewModel {
     this.compareRequestWithServer();
   };
 
+  
+  /**
+   *
+   * @param  _eventName - request event  name
+   */
+  public updateRequestEventName = async (
+    _eventName: string,
+  ) => {
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+
+
+    if (progressiveTab?.property?.socketio) {
+      progressiveTab.property.socketio.eventName = _eventName;
+    }
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+   
+    this.compareRequestWithServer();
+  };
+
   /**
    *
    * @param _path - request path

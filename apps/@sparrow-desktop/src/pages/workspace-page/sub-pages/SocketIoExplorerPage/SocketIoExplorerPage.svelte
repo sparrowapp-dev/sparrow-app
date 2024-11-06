@@ -146,6 +146,7 @@
   {isGuestUser}
   {isLoginBannerActive}
   onUpdateRequestUrl={_viewModel.updateRequestUrl}
+  onUpdateRequestEventName={_viewModel.updateRequestEventName}
   onUpdateRequestParams={_viewModel.updateParams}
   onUpdateRequestName={_viewModel.updateRequestName}
   onUpdateHeaders={_viewModel.updateHeaders}
