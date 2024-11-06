@@ -85,6 +85,13 @@ use tokio_tungstenite::tungstenite::protocol::Message;
 use tokio_tungstenite::tungstenite::protocol::WebSocketConfig;
 use tokio_tungstenite::WebSocketStream;
 use tokio_tungstenite::{connect_async, Connector};
+
+// Socket.IO imports
+use rust_socketio::{
+    client as SocketClient, ClientBuilder, Payload as SocketPayload, TransportType,
+};
+use tokio::sync::Mutex as SocketMutex;
+
 #[cfg(target_os = "macos")]
 #[macro_use]
 extern crate objc;
@@ -532,20 +539,20 @@ async fn connect_websocket(
         .header(UPGRADE, "websocket")
         .header(CONNECTION, "Upgrade");
 
-        // Add custom headers to the request
+    // Add custom headers to the request
     for (key, value) in headers_key_value_map.iter() {
         req_builder = req_builder.header(
             key,
             HeaderValue::from_str(value).map_err(|e| format!("Invalid header value: {}", e))?,
         );
     }
-   
+
     // Unwrap the body
     let req = req_builder
         .body(hyper::Body::empty())
         .map_err(|e| format!("Failed to build request: {}", e))?;
 
-    // Send the HTTP request and await the response to check if upgrade to websocket is possible or not. 
+    // Send the HTTP request and await the response to check if upgrade to websocket is possible or not.
     let response = client
         .request(req)
         .await
@@ -715,6 +722,330 @@ async fn disconnect_websocket(
     }
 }
 
+#[derive(Clone)]
+struct SocketIoConnection {
+    sender: UnboundedSender<String>,
+    disconnect_handle: Arc<SocketMutex<Option<tokio::sync::oneshot::Sender<()>>>>,
+}
+
+struct SocketIoAppState {
+    connections: SocketMutex<HashMap<String, SocketIoConnection>>,
+}
+
+#[derive(Serialize)]
+struct SocketIoResponse {
+    is_successful: bool,
+    status_code: u16,
+    message: String,
+}
+
+#[tauri::command]
+async fn connect_socketio(
+    url: String,
+    namespace: String,
+    tabid: String,
+    headers: String, // JSON headers
+    state: tauri::State<'_, Arc<SocketIoAppState>>,
+    app_handle: tauri::AppHandle,
+) -> Result<String, String> {
+    // Deserialize the JSON string into a Vec<KeyValue>
+    let headers_key_values: Vec<KeyValue> =
+        serde_json::from_str(&headers).map_err(|e| format!("Failed to parse headers: {}", e))?;
+
+    let mut headers_key_value_map: HashMap<String, String> = HashMap::new();
+    for kv in headers_key_values {
+        headers_key_value_map.insert(kv.key, kv.value);
+    }
+
+    // Construct proper Socket.IO URL for initial WebSocket connection
+    let ws_protocol = if url.starts_with("https://") {
+        "wss://"
+    } else {
+        "ws://"
+    };
+    let base_url = url.replace("http://", "").replace("https://", "");
+
+    let full_url = format!(
+        "{}{}/socket.io/?EIO=4&transport=websocket",
+        ws_protocol, base_url
+    );
+
+    println!("Attempting to connect to: {}", full_url); // Debug log
+
+    // Add default WebSocket headers
+    let mut request = Request::builder()
+        .uri(&full_url)
+        .header("Upgrade", "websocket")
+        .header("Connection", "Upgrade");
+
+    // Add custom headers
+    for (key, value) in headers_key_value_map.iter() {
+        if let Ok(header_value) = HeaderValue::from_str(value) {
+            request = request.header(key, header_value);
+        }
+    }
+
+    // Connect directly using tokio-tungstenite
+    let (ws_stream, _) = connect_async(full_url)
+        .await
+        .map_err(|e| format!("WebSocket connection failed: {:?}", e))?;
+
+    println!("WebSocket connection established"); // Debug log
+
+    let (write, read) = ws_stream.split();
+    let write = Arc::new(Mutex::new(write));
+
+    // Create channel for sending messages
+    let (tx, mut rx) = mpsc::unbounded_channel::<String>();
+
+    // Create channel for disconnect signal
+    let (disconnect_tx, disconnect_rx) = tokio::sync::oneshot::channel();
+    let disconnect_handle = Arc::new(SocketMutex::new(Some(disconnect_tx)));
+
+    // Send the Socket.IO connection packet with namespace
+    let connect_msg = format!("40{}", namespace);
+
+    {
+        let mut writer = write.lock().await;
+        writer
+            .send(Message::Text(connect_msg.clone()))
+            .await
+            .map_err(|e| format!("Failed to send connect message: {:?}", e))?;
+        println!("Sent connect message: {}", connect_msg); // Debug log
+    }
+
+    // Set up message handling
+    // Create SocketIoConnection instance
+    let connection = SocketIoConnection {
+        sender: tx,
+        disconnect_handle: Arc::clone(&disconnect_handle),
+    };
+
+    // Store the connection in app state
+    {
+        let mut connections = state.connections.lock().await;
+        connections.insert(tabid.clone(), connection);
+    }
+
+    // Spawn a task to handle incoming messages
+    let write_clone = Arc::clone(&write);
+    tokio::spawn(async move {
+        while let Some(msg) = rx.recv().await {
+            let mut writer = write_clone.lock().await;
+            if let Err(e) = writer.send(Message::Text(msg.clone())).await {
+                eprintln!("Failed to send message: {:?}", e);
+            } else {
+                println!("Successfully sent message: {}", msg); // Debug log
+            }
+        }
+    });
+
+    // COmmenting the ping/pong handler {if required can be used in future}
+    // Improved ping/pong handler
+    // let write_clone_for_ping = Arc::clone(&write);
+    // tokio::spawn(async move {
+    //     let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(25));
+    //     loop {
+    //         interval.tick().await;
+    //         let mut writer = write_clone_for_ping.lock().await;
+    //         // Send proper Socket.IO ping packet (2 is the ping packet type in Socket.IO v4)
+    //         if let Err(e) = writer.send(Message::Text("2".to_string())).await {
+    //             eprintln!("Failed to send ping: {:?}", e);
+    //             break;
+    //         }
+    //         println!("Sent ping packet");
+    //     }
+    // });
+
+    // Improved message receiver with proper ping/pong handling
+    let app_handle_clone = app_handle.clone();
+    let tabid_clone = tabid.clone();
+    tokio::spawn(async move {
+        let mut read_stream = read;
+
+        tokio::select! {
+            _ = async {
+                while let Some(Ok(msg)) = read_stream.next().await {
+                    match msg {
+                        Message::Text(text) => {
+                            // Handle different Socket.IO packet types
+                            if text.starts_with('2') {
+                                // Received ping, send pong
+                                let mut writer = write.lock().await;
+                                let _ = writer.send(Message::Text("3".to_string())).await;
+                                println!("Received ping, sent pong");
+                            } else if text.starts_with('3') {
+                                // Received pong
+                                println!("Received pong");
+                            } else {
+                                // Regular message, emit to frontend
+                                let _ = app_handle_clone.emit(
+                                    &format!("socket-message-{}", tabid_clone),
+                                    text
+                                );
+                            }
+                        }
+                        Message::Close(frame) => {
+                            println!("Received close frame: {:?}", frame);
+                            break;
+                        }
+                        _ => {}
+                    }
+                }
+            } => {}
+            _ = disconnect_rx => {
+                println!("Disconnect signal received for {}", tabid_clone);
+            }
+        }
+    });
+
+    let response = SocketIoResponse {
+        is_successful: true,
+        status_code: 200,
+        message: "Socket.IO connected successfully".to_string(),
+    };
+
+    Ok(serde_json::to_string(&response).map_err(|e| format!("Serialization failed: {}", e))?)
+}
+
+#[tauri::command]
+async fn send_socketio_message(
+    tabid: String,
+    namespace: String,
+    event: String,
+    message: String,
+    state: tauri::State<'_, Arc<SocketIoAppState>>,
+) -> Result<String, String> {
+    // Get the connection for the specified tabid
+    let connections = state.connections.lock().await;
+    let connection = connections
+        .get(&tabid)
+        .ok_or_else(|| format!("No Socket.IO connection found for tab ID: {}", tabid))?;
+
+    if connection.sender.is_closed() {
+        return Err("Connection is not active. Cannot send message.".to_string());
+    }
+
+    let message_json = serde_json::to_string(&message)
+        .map_err(|e| format!("Failed to serialize message: {}", e))?;
+    let socket_message = if event.is_empty() {
+        format!("42{}", message_json) // Unnamed event message
+    } else {
+        format!("42{},[\"{}\",{}]", namespace, event, message_json) // Named event message
+    };
+
+    // Send the message through the connection's sender
+    connection
+        .sender
+        .send(socket_message.clone())
+        .map_err(|e| format!("Failed to send message: {}", e))?;
+
+    // Create and return the response
+    let response = SocketIoResponse {
+        is_successful: true,
+        status_code: 200,
+        message: format!("Message sent successfully to event: {}", event),
+    };
+
+    serde_json::to_string(&response).map_err(|e| format!("Failed to serialize response: {}", e))
+}
+
+#[derive(Serialize)]
+struct SocketIoDisconnectResponse {
+    is_successful: bool,
+    status_code: u16,
+    message: String,
+}
+
+#[tauri::command]
+async fn disconnect_socketio(
+    tabid: String,
+    state: tauri::State<'_, Arc<SocketIoAppState>>,
+) -> Result<String, String> {
+    let mut connections = state.connections.lock().await;
+
+    if let Some(connection) = connections.remove(&tabid) {
+        // Access the disconnect handle
+        let mut handle_lock = connection.disconnect_handle.lock().await;
+
+        // Check if there is a Sender inside the Option
+        if let Some(sender) = std::mem::take(&mut *handle_lock) {
+            // Send the signal to close the Socket.IO connection
+            let _ = sender.send(());
+        }
+
+        // Create a success response
+        let response = SocketIoDisconnectResponse {
+            is_successful: true,
+            status_code: 200,
+            message: "Socket.IO connection disconnected successfully".to_string(),
+        };
+
+        // Serialize the response to a JSON string and return it
+        let response_json = serde_json::to_string(&response)
+            .map_err(|e| format!("Failed to serialize response: {}", e))?;
+
+        return Ok(response_json);
+    } else {
+        // Return an error if the connection was not found
+        let response = SocketIoDisconnectResponse {
+            is_successful: false,
+            status_code: 404,
+            message: "Socket.IO connection not found".to_string(),
+        };
+
+        // Serialize the error response to a JSON string and return it
+        let response_json = serde_json::to_string(&response)
+            .map_err(|e| format!("Failed to serialize response: {}", e))?;
+
+        return Err(response_json);
+    }
+}
+
+// Commenting the listen function as we will segregate the responses for events in frontend.
+// #[tauri::command]
+// async fn listen_socketio_event(
+//     tabid: String,
+//     event_name: String,
+//     state: tauri::State<'_, Arc<SocketIoAppState>>,
+//     app_handle: tauri::AppHandle,
+// ) -> Result<String, String> {
+//     let connections = state.connections.lock().await;
+
+//     if let Some(connection) = connections.get(&tabid) {
+//         let client_clone = connection.client_builder.clone(); // This is Arc<Client>
+//         let event_name_clone = event_name.clone();
+//         let app_handle_clone = app_handle.clone();
+
+//         // Dereference client_clone before the async block
+//         let client = (*client_clone).clone(); // Clone the underlying Client
+
+//         // Create a new listener for the specified event
+//         tokio::spawn(async move {
+//             // Dereference client_clone to access Client's methods
+//             client.on(event_name_clone.as_str(), {
+//                 let app_handle_clone = app_handle.clone(); // Clone app_handle for use in the closure
+//                 move |payload, _| {
+//                     if let SocketPayload::Text(text) = payload {
+//                         // Emit message to frontend in Tauri
+//                         app_handle_clone
+//                             .emit(&format!("socketio_message_{}", tabid), text)
+//                             .unwrap();
+//                     }
+//                 }
+//             });
+//         });
+
+//         // Create a success response
+//         let response = format!("Listening for event '{}'", event_name);
+//         Ok(response)
+//     } else {
+//         // Return an error if the connection was not found
+//         let response = format!("Socket.IO connection not found for tab ID: {}", tabid);
+//         Err(response)
+//     }
+// }
+
 // Driver Function
 fn main() {
     // Initiate Tauri Runtime
@@ -753,6 +1084,9 @@ fn main() {
             app.manage(Arc::new(AppState {
                 connections: Mutex::new(std::collections::HashMap::new()),
             }));
+            app.manage(Arc::new(SocketIoAppState {
+                connections: Mutex::new(std::collections::HashMap::new()),
+            }));
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -767,7 +1101,10 @@ fn main() {
             make_http_request_v2,
             connect_websocket,
             send_websocket_message,
-            disconnect_websocket
+            disconnect_websocket,
+            connect_socketio,
+            send_socketio_message,
+            disconnect_socketio,
         ])
         .on_page_load(|wry_window, _payload| {
             if wry_window.url().host_str() == Some("www.google.com") {
