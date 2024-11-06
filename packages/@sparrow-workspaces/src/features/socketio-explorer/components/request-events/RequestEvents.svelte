@@ -1,7 +1,4 @@
 <script lang="ts">
-  import type {
-    KeyValuePair,
-  } from "@sparrow/common/interfaces/request.interface";
 
   import RequestEventsList from "../events-lists/RequestEventsList.svelte";
   import type { EventsValues } from "@sparrow/common/types/workspace/socket-io-request-tab";

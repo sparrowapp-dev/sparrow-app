@@ -162,6 +162,13 @@ class SocketIoExplorerPageViewModel {
         progressiveTab.property.socketio?.message
       ) {
         result = false;
+      } else if (
+        !this.compareArray.init(
+          requestServer.property.socketio.events,
+          progressiveTab.property.socketio?.events,
+        )
+      ) {
+        result = false;
       }
 
       // headers
@@ -342,7 +349,7 @@ class SocketIoExplorerPageViewModel {
 
   /**
    *
-   * @param _headers - request headers
+   * @param _events - request events
    */
   public upadateEvents = async (_events: EventsValues[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
