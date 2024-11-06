@@ -7,6 +7,7 @@ import {
 import {
   SocketDataTypeEnum,
   SocketSectionEnum,
+  type EventsValues,
   type State,
 } from "@sparrow/common/types/workspace/socket-io-request-tab";
 import { v4 as uuidv4 } from "uuid";
@@ -139,6 +140,15 @@ class InitSocketIoTab {
     }
     if (this._tab?.property?.socketio) {
       this._tab.property.socketio.headers = _headers;
+    }
+    return this;
+  }
+  public updateEvents(_events: EventsValues[]) {
+    if (!_events) {
+      return this;
+    }
+    if (this._tab?.property?.socketio) {
+      this._tab.property.socketio.events = _events;
     }
     return this;
   }
