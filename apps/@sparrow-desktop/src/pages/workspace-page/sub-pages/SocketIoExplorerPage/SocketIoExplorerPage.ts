@@ -1508,6 +1508,7 @@ class SocketIoExplorerPageViewModel {
     return await this.collectionService.sendMessageSocketIo(
       websocketData.tabId,
       websocketData.property.socketio?.message as string,
+      (websocketData.property.socketio?.eventName as string) || "first",
     );
   };
 
