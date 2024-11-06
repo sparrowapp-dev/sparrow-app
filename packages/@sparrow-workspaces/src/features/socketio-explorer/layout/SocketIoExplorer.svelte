@@ -36,6 +36,7 @@
   export let tab: Observable<Tab>;
   export let collections: Observable<any[]>;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
+  export let onUpdateRequestEventName
   export let onUpdateRequestParams: UpdateParamsType;
   export let onUpdateMessage;
   export let onUpdateHeaders: UpdateHeadersType;
@@ -135,6 +136,8 @@
                     {onSendMessage}
                     {onClearInput}
                     webSocket={socketIoStoreData}
+                    {onUpdateRequestEventName}
+                    requestEventName={$tab.property.socketio?.eventName}
                   />
                 {:else if $tab.property.socketio?.state?.requestNavigation === SocketSectionEnum.PARAMETERS}
                   <RequestParameters

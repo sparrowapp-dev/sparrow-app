@@ -11,6 +11,8 @@
   export let onSendMessage;
   export let webSocket;
   export let body;
+  export let onUpdateRequestEventName
+  export let requestEventName
 
   let handleRawDropDown = (tab: string) => {
     onUpdateRequestState({ messageLanguage: tab });
@@ -46,10 +48,14 @@
     />
   </div>
   <Input
+  bind:value={requestEventName}
   id="collection-list-search"
-  width={"65%"}
+  width={"100%"}
   height={"24px"}
   type="teritiary"
+  on:input={() => {
+    onUpdateRequestEventName(requestEventName);
+  }}
   
   defaultBorderColor="transparent"
   hoveredBorderColor="var(--border-primary-300)"
@@ -69,13 +75,3 @@
   type={"primary"}
 />
 </div>
-
-
-
-<!-- bind:value={searchData}
-on:input={(e) => {
-  handleSearch();
-  isExpandCollection = true;
-  isExpandEnvironment = true;
-  isExpandTestflow = true;
-}} -->

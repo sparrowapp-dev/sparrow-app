@@ -64,6 +64,7 @@ class InitSocketIoTab {
             },
           ],
           message: "",
+          eventName:"",
           state: {
             requestNavigation: SocketSectionEnum.MESSAGE,
             messageLanguage: SocketDataTypeEnum.TEXT,
