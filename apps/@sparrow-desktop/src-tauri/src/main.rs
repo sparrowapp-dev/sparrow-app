@@ -78,6 +78,7 @@ use hyper::{Client as OtherClient, Request};
 use hyper_tls::HttpsConnector;
 use native_tls::TlsConnector;
 use std::sync::Arc;
+use std::time::Duration;
 use tauri::AppHandle;
 use tauri::State;
 use tokio::sync::mpsc::{self, UnboundedSender};
@@ -87,7 +88,6 @@ use tokio_tungstenite::tungstenite::protocol::Message;
 use tokio_tungstenite::tungstenite::protocol::WebSocketConfig;
 use tokio_tungstenite::WebSocketStream;
 use tokio_tungstenite::{connect_async, Connector};
-use std::time::Duration;
 #[cfg(target_os = "macos")]
 #[macro_use]
 extern crate objc;
@@ -96,10 +96,8 @@ extern crate objc;
 // use rust_socketio::{ClientBuilder, Payload as SocketIoPayload};
 use rust_socketio::{
     asynchronous::{Client as SocketClient, ClientBuilder},
-    TransportType,
-    Payload as SocketIoPayload,
+    Payload as SocketIoPayload, TransportType,
 };
-
 
 // Commands
 #[tauri::command]
@@ -734,40 +732,36 @@ struct SocketIOResponse {
 }
 
 #[tauri::command]
-async fn connect_socket_io(url: String) -> Result<String, String> {
-    let namespace = "/".to_string();
-    let socket_url = format!("{}{}", url, namespace);
+async fn connect_socket_io_v4(url: String, namespace: Option<String>) -> Result<String, String> {
+    let namespace_path = namespace.unwrap_or_else(|| "/".to_string());
 
-    let callback = |payload: SocketIoPayload, socket: SocketClient| {
+    let callback = |_event, payload: SocketIoPayload, _socket: SocketClient| {
         async move {
             match payload {
                 SocketIoPayload::String(str) => println!("Received: {}", str),
                 SocketIoPayload::Text(str) => println!("Received: {:#?}", str),
                 SocketIoPayload::Binary(bin_data) => println!("Received bytes: {:#?}", bin_data),
             }
-            // socket.emit("message", json!({"got ack": true}))
-            //     .await
-            //     .expect("Server unreachable");
         }
         .boxed()
     };
 
-    println!("{}", &socket_url);
-
     // Create a new Socket.IO client
-    let socket = ClientBuilder::new(&socket_url)
+    let socket = ClientBuilder::new(&url)
+        .namespace(&namespace_path)
         .reconnect(false)
         .auth(json!({}))
         .transport_type(TransportType::Websocket)
-        .on("message", callback)
-        .on("error", |err: SocketIoPayload, _| {
-            async move { eprintln!("Error: {:#?}", err) }.boxed()
-        });
+        .on_any(callback);
 
-    let connected_socket = socket.connect().await.map_err(|e| format!("Connection failed: {}", e))?;
+    // Connect to the client
+    let connected_socket = socket
+        .connect()
+        .await
+        .map_err(|e| format!("Connection failed: {}", e))?;
 
-     // Log the successful connection
-    let result = connected_socket.emit_with_ack("message", "data", Duration::from_secs(10),callback).await;
+    // Test Emit to check the global handler - START - should be removed in the future
+    let result = connected_socket.emit("message", "Some data").await;
 
     let response_value = match result {
         Ok(value) => value,
@@ -775,11 +769,12 @@ async fn connect_socket_io(url: String) -> Result<String, String> {
     };
 
     println!("{:?}", response_value);
-     
-    // Successful connection response
+    // Test Emit to check the global handler - END - should be removed in the future
+
+    // Create successful connection response
     let response = SocketIOResponse {
         is_successful: true,
-        message: format!("Connected to Socket.IO server at {}", socket_url),
+        message: format!("Connected to Socket.IO server at {}", url),
     };
 
     // Serialize the response to a JSON string and return it
@@ -838,7 +833,7 @@ fn main() {
             connect_websocket,
             send_websocket_message,
             disconnect_websocket,
-            connect_socket_io
+            connect_socket_io_v4
         ])
         .on_page_load(|wry_window, _payload| {
             if wry_window.url().host_str() == Some("www.google.com") {
