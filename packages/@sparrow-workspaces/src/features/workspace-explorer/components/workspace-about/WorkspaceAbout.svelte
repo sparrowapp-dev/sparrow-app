@@ -35,7 +35,7 @@
     <textarea
       disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
       id="updateWorkspaceDescField"
-      class="bg-transparent border-0 text-textColor text-fs-12 input-outline shadow-none w-100 p-2"
+      class="bg-transparent border-0 text-fs-12 input-outline shadow-none w-100 p-2"
       value={workspaceDescription || ""}
       placeholder="This is your personal workspace. Describe the objectives of the workspace and how it is meant to be used. Or create a comprehensive API documentation by including links to your collections and requests. Start typing."
       on:blur={(event) => {
@@ -52,6 +52,8 @@
     outline: none;
     height: 300px;
     border: 1px solid transparent !important;
+    border-radius: 4px !important;
+    
   }
   textarea:focus,
   textarea:hover {
