@@ -159,7 +159,7 @@
           tab?.source === "SPEC"}
         id="updateFolderDescField"
         style="margin-top: -2px;"
-        class="bg-transparent border-0 text-textColor text-fs-12 h-50 input-outline shadow-none w-100 p-2"
+        class="bg-transparent border-0 text-fs-12 h-50 input-outline shadow-none w-100 p-2"
         value={folder?.description || ""}
         placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
         on:blur={(event) => {
@@ -198,9 +198,14 @@
   .input-outline {
     border-radius: 0%;
   }
-  textarea::placeholder {
-    color: var(--text-color);
+  textarea {
+    border-radius: 4px !important;
+    color: var(--text-secondary-1000);
   }
+  textarea::placeholder {
+    color: var(--text-secondary-550);
+  }
+
   .input-outline:hover {
     outline: 1px solid var(--sparrow-blue);
   }
