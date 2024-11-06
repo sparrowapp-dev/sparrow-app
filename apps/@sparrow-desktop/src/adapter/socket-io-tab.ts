@@ -83,6 +83,7 @@ export class SocketIoTabAdapter {
       .updateUrl(socket.socketio?.url)
       .updateQueryParams(socket.socketio?.queryParams)
       .updateEvents(socket.socketio?.events)
+      .updateEventName(socket.socketio?.eventName)
       .updateHeaders(socket.socketio?.headers)
       .updateMessage(socket.socketio?.message)
       .updatePath(path);
@@ -110,6 +111,7 @@ export class SocketIoTabAdapter {
     return {
       url: socketTab.property.socketio?.url,
       message: socketTab.property.socketio?.message,
+      eventName:socketTab.property.socketio?.eventName,
       headers: socketTab.property.socketio?.headers,
       events: socketTab.property.socketio?.events,
       queryParams: socketTab.property.socketio?.queryParams,
