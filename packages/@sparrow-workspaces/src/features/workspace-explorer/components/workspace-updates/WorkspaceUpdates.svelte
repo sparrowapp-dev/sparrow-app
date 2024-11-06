@@ -97,7 +97,7 @@
               class="d-flex mt-1"
               style="color: var( --text-secondary-200); font-weight:400; font-size:12px; justify-content:space-between"
             >
-              <p>{update.detailsUpdatedBy}</p>
+              <p  class="ellipsis w-50">{update.detailsUpdatedBy}</p>
               <p>{timeAgo(update.createdAt)}</p>
             </div>
           </div>
