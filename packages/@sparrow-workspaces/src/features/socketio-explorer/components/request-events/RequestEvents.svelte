@@ -73,14 +73,14 @@
       >
         <p
           class="mb-0 w-50 text-secondary-200 text-fs-12 "
-          style="font-weight: 1000;"
+          style="font-weight: 500;"
         >
-          Key
+          Event
         </p>
 
         <p
           class="mb-0 w-50 text-secondary-200 text-fs-12 p-1"
-          style="font-weight: 1000;"
+          style="font-weight: 500;"
         >
           Listen
         </p>
