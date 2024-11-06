@@ -13,6 +13,8 @@
   export let onSendMessage;
   export let onClearInput;
   export let webSocket;
+  export let onUpdateRequestEventName;
+  export let requestEventName;
 </script>
 
 <div class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative">
@@ -22,6 +24,8 @@
     {onSendMessage}
     {webSocket}
     {body}
+    {onUpdateRequestEventName}
+    {requestEventName}
   />
   <div style="flex:1; overflow:auto;">
     <div class="d-flex flex-column h-100">
