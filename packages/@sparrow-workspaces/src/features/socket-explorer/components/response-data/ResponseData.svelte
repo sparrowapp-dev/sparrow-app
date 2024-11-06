@@ -24,6 +24,8 @@
   export let onUpdateFilterType;
   let searchData = webSocket.search;
 
+  let currentFilterType = "All messages";
+
   let filteredWebsocketMessage = [];
   const filterWebsocketResponse = () => {
     filteredWebsocketMessage = webSocket.messages
@@ -190,6 +192,7 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("All messages");
+                currentFilterType="All messages";
               },
             },
             {
@@ -200,6 +203,7 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("Sent");
+                currentFilterType="Sent";
               },
             },
             {
@@ -210,6 +214,8 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("Received");
+                currentFilterType="Received";
+
               },
             },
           ]}
@@ -222,8 +228,15 @@
               isFilterDropdownActive = !isFilterDropdownActive;
             }}
           >
-            <span class="text-fs-12 pe-2 text-tertiary-100">Filter Message</span
-            >
+            {#if currentFilterType === "All messages"}
+              <span class="text-fs-12 pe-2 text-tertiary-100">All Messages</span
+              >
+            {:else if currentFilterType === "Sent"}
+              <span class="text-fs-12 pe-2 text-secondary-100">Sent</span>
+            {:else if currentFilterType === "Received"}
+              <span class="text-fs-12 pe-2 text-secondary-100">Received</span>
+            {/if}
+            
             <DownArrowIcon
               height={"16px"}
               width={"16px"}
