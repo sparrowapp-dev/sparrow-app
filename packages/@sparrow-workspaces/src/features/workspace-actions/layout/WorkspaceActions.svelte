@@ -275,7 +275,9 @@
       iconSize: "14px",
       onclick: () => {
         onItemCreated("socket-io", {});
-        MixpanelEvent(Events.Add_WebSocket);
+        MixpanelEvent(Events.Add_SocketIO, {
+          description: "Add Socket.IO From + Icon in Left Panel",
+        });
       },
     },
     {

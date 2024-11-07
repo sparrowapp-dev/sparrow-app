@@ -69,7 +69,9 @@
     disable={webSocket?.status !== "connected"}
     onClick={() => {
       onSendMessage();
-      MixpanelEvent(Events.Send_WebSocket_Request);
+      MixpanelEvent(Events.Send_SocketIO_Request, {
+        description: "Clicked on Send message button in Socket.IO.",
+      });
     }}
     type={"primary"}
   />

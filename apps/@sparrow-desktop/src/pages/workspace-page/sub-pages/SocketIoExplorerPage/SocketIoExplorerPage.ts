@@ -162,7 +162,14 @@ class SocketIoExplorerPageViewModel {
         progressiveTab.property.socketio?.message
       ) {
         result = false;
-      } else if (
+      }
+      else if (
+        requestServer.property.socketio.eventName !==
+        progressiveTab.property.socketio?.eventName
+      ) {
+        result = false;
+      }
+      else if (
         !this.compareArray.init(
           requestServer.property.socketio.events,
           progressiveTab.property.socketio?.events,
