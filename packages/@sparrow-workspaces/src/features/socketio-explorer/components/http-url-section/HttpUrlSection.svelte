@@ -95,10 +95,10 @@
       } else {
         if (webSocket?.status === "connected") {
           onDisconnect();
-          MixpanelEvent(Events.WebSocket_Disconnected);
+          MixpanelEvent(Events.SocketIO_Disconnected);
         } else if (webSocket?.status === "disconnected" || !webSocket?.status) {
           onConnect(environmentVariables);
-          MixpanelEvent(Events.WebSocket_Connected);
+          MixpanelEvent(Events.SocketIO_Connected);
         }
       }
     }}

@@ -283,9 +283,40 @@ export class WorkspaceRepository {
         idToEnvironmentMap[workspaceCopy._id] ?? "";
       return workspaceCopy;
     });
-
-    await RxDB.getInstance().rxdb.workspace.bulkUpsert(revisedWorkspaces);
+    if ((revisedWorkspaces?.length || 0) > 0) {
+      await RxDB.getInstance().rxdb.workspace.bulkUpsert(revisedWorkspaces);
+    }
     return;
+  };
+
+  /**
+   * Deletes orphan workspaces that doesn't exists on sparrow backend
+   * @param _workspaceId - workspace id
+   * @param _environmentIds - backend  workspaces Ids to find local orphan workspaces
+   */
+  public deleteOrphanWorkspaces = async (_workspaceIds: string[]) => {
+    // delete left out workspaces
+    const workspaces = await RxDB.getInstance()?.rxdb?.workspace.find().exec();
+    const workspacesJSON = workspaces?.map((_workspace) => {
+      return _workspace.toMutableJSON();
+    });
+    const selectedWorkspacesToBeDeleted = workspacesJSON
+      ?.filter((_workspace) => {
+        for (let i = 0; i < _workspaceIds.length; i++) {
+          if (_workspaceIds[i] === _workspace._id) {
+            return false;
+          }
+        }
+        return true;
+      })
+      .map((_workspace) => {
+        return _workspace._id;
+      });
+    if ((selectedWorkspacesToBeDeleted?.length || 0) > 0) {
+      await RxDB.getInstance()?.rxdb?.workspace.bulkRemove(
+        selectedWorkspacesToBeDeleted as string[],
+      );
+    }
   };
 
   public updateUserRoleInWorkspace = async (

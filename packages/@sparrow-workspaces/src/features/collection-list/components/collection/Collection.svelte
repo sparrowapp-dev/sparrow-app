@@ -657,7 +657,9 @@
                     workspaceId: collection.workspaceId,
                     collection,
                   });
-                  MixpanelEvent(Events.Collection_WebSocket);
+                  MixpanelEvent(Events.Collection_SocketIO, {
+                    description: "Created Socket.IO inside collection.",
+                  });
                 }}
               >
                 <SocketIoIcon

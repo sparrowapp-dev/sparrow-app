@@ -107,4 +107,10 @@ export enum Events {
   Like_Comment = "Like_Comment",
   Upvote_Post = "Upvote_Post",
   SIGNOUT = "Signout",
+  SocketIO_Button = "SocketIO_Button",
+  Add_SocketIO = "Add_SocketIO",
+  Collection_SocketIO = "Collection_SocketIO",
+  SocketIO_Connected = "SocketIO_Connected",
+  SocketIO_Disconnected = "SocketIO_Disconnected",
+  Send_SocketIO_Request = "Send_SocketIO_Request",
 }
