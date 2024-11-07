@@ -168,6 +168,7 @@ export interface SocketIo
     UrlWrapper,
     HeadersWrapper,
     MessageWrapper,
+    EventsWrapper,
     EventNameWrapper {}
 
 export interface SocketIoWrapper {
