@@ -327,7 +327,6 @@ export default class CollectionsViewModel {
         this.initTab.socketIo("UNTRACKED-" + uuidv4(), ws._id).getValue(),
       );
       moveNavigation("right");
-      MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
     } else {
       console.error("No active workspace found!");
     }
