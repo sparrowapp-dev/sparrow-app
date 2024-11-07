@@ -83,7 +83,10 @@
       iconSize={"18px"}
       onClick={() => {
         onItemCreated("socket-io", {});
-        MixpanelEvent(Events.WebSocket_Button);
+        MixpanelEvent(Events.SocketIO_Button, {
+          description: "Socket Io created from Default screen page.",
+          location: "Default Page",
+        });
       }}
     />
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}

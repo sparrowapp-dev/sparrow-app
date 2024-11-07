@@ -91,6 +91,7 @@ use rust_socketio::{
     client as SocketClient, ClientBuilder, Payload as SocketPayload, TransportType,
 };
 use tokio::sync::Mutex as SocketMutex;
+use tokio::time::{timeout, Duration};
 
 #[cfg(target_os = "macos")]
 #[macro_use]
@@ -792,7 +793,7 @@ async fn connect_socketio(
 
     println!("WebSocket connection established"); // Debug log
 
-    let (write, read) = ws_stream.split();
+    let (write, mut read) = ws_stream.split();
     let write = Arc::new(Mutex::new(write));
 
     // Create channel for sending messages
@@ -807,12 +808,26 @@ async fn connect_socketio(
 
     {
         let mut writer = write.lock().await;
-        writer
-            .send(Message::Text(connect_msg.clone()))
-            .await
-            .map_err(|e| format!("Failed to send connect message: {:?}", e))?;
+        if let Err(e) = writer.send(Message::Text(connect_msg.clone())).await {
+            return Err(format!("Failed to send connect message: {:?}", e).into());
+        }
         println!("Sent connect message: {}", connect_msg); // Debug log
     }
+
+    // Wait for namespace acknowledgment
+    let ack_result = timeout(Duration::from_secs(5), async {
+        while let Some(Ok(msg)) = read.next().await {
+            if let Message::Text(text) = msg {
+                if text.starts_with("40") && text.contains(&namespace) {
+                    println!("Namespace acknowledged by server.");
+                    return Ok(());
+                }
+            }
+        }
+        Err("Namespace acknowledgment not received".to_string())
+    })
+    .await
+    .map_err(|_| "Timeout while waiting for namespace acknowledgment".to_string())??;
 
     // Set up message handling
     // Create SocketIoConnection instance
