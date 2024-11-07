@@ -96,6 +96,16 @@
       `<span class="highlight-websocket-message-search">$1</span>`,
     );
   };
+
+  // Function to safely parse message data
+  function safeParseMessageData(data) {
+    try {
+      cons;
+      return JSON.parse(data);
+    } catch {
+      return data; // If parsing fails, return the original data
+    }
+  }
 </script>
 
 <div class="h-100 d-flex flex-column">
@@ -196,7 +206,7 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("All messages");
-                currentFilterType="All messages";
+                currentFilterType = "All messages";
               },
             },
             {
@@ -207,7 +217,7 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("Sent");
-                currentFilterType="Sent";
+                currentFilterType = "Sent";
               },
             },
             {
@@ -218,7 +228,7 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("Received");
-                currentFilterType="Received";
+                currentFilterType = "Received";
               },
             },
           ]}
@@ -254,6 +264,14 @@
   <div style="flex:1; overflow:auto;" bind:this={listContainer}>
     <div>
       {#each filteredWebsocketMessage as message}
+        <div>
+          <pre>{JSON.stringify(
+              safeParseMessageData(message.data),
+              null,
+              2,
+            )}</pre>
+          <!-- Use JSON.stringify for pretty-printing if it's an object -->
+        </div>
         <div
           class="response-message d-flex align-items-center"
           style="cursor: pointer;"

@@ -60,6 +60,7 @@ use serde_json::json;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::process::Command;
+use tauri::Event;
 use tauri::Manager;
 use tauri::Window;
 use url_fetch_handler::import_swagger_url;
@@ -88,10 +89,14 @@ use tokio_tungstenite::{connect_async, Connector};
 
 // Socket.IO imports
 use rust_socketio::{
-    client as SocketClient, ClientBuilder, Payload as SocketPayload, TransportType,
+    asynchronous::{Client as SocketClient, ClientBuilder},
+    Event as SocketIoEvent, Payload as SocketIoPayload, TransportType,
 };
+
 use tokio::sync::Mutex as SocketMutex;
 use tokio::time::{timeout, Duration};
+
+use futures_util::FutureExt;
 
 #[cfg(target_os = "macos")]
 #[macro_use]
@@ -498,6 +503,9 @@ struct TabConnection {
 struct AppState {
     connections: Mutex<std::collections::HashMap<String, TabConnection>>,
 }
+struct AppStateV2 {
+    connections: SocketMutex<HashMap<String, SocketClient>>,
+}
 
 #[derive(Serialize)]
 struct WebSocketResponse {
@@ -737,6 +745,12 @@ struct SocketIoAppState {
 struct SocketIoResponse {
     is_successful: bool,
     status_code: u16,
+    message: String,
+}
+
+#[derive(Serialize)]
+struct SocketIOResponseV2 {
+    is_successful: bool,
     message: String,
 }
 
@@ -1061,6 +1075,187 @@ async fn disconnect_socketio(
 //     }
 // }
 
+#[tauri::command]
+async fn connect_socket_io_v2(
+    url: String,
+    namespace: String,
+    tabid: String,
+    headers: String,
+    state: tauri::State<'_, Arc<AppStateV2>>,
+    app_handle: tauri::AppHandle,
+) -> Result<String, String> {
+    // Deserialize the JSON string into a HashMap
+
+    println!("{}", &url);
+    println!("{}", &namespace);
+
+    // Deserialize the JSON string into a Vec<KeyValue>
+    let header_vec: Vec<KeyValue> =
+        serde_json::from_str(&headers).map_err(|e| format!("Failed to parse headers: {}", e))?;
+
+    // Create a HashMap from the Vec<KeyValue>
+    let mut headers_map = HashMap::new();
+    for header in header_vec {
+        headers_map.insert(header.key, header.value);
+    }
+
+    let tabid_clone = tabid.clone(); // Assuming tabid is available in the scope
+
+    let socket_event_listener = move |event: SocketIoEvent,
+                                      payload: SocketIoPayload,
+                                      socket: SocketClient| {
+        let app_handle_clone = app_handle.clone(); // Assuming app_handle is available in the scope
+        let tabid_clone = tabid.clone(); // Assuming tabid is available in the scope
+
+        async move {
+            // Create a message JSON object
+            let message_json = match payload {
+                SocketIoPayload::String(str) => {
+                    json!({
+                        "event": event.as_str(),
+                        "message": str
+                    })
+                }
+                SocketIoPayload::Text(str) => {
+                    json!({
+                        "event": event.as_str(),
+                        "message": str
+                    })
+                }
+                SocketIoPayload::Binary(bin_data) => {
+                    json!({
+                        "event": event.as_str(),
+                        "message": bin_data
+                    })
+                }
+                _ => {
+                    json!({
+                        "event": event.as_str(),
+                        "message": format!("Received unknown payload type on {}", event)
+                    })
+                }
+            };
+
+            // Emit the message JSON to the app
+            let _ = app_handle_clone.emit(&format!("socket-message-{}", tabid_clone), message_json);
+        }
+        .boxed()
+    };
+
+    // Create a new Socket.IO client
+    let mut builder = ClientBuilder::new(&url)
+        .namespace(&namespace)
+        .reconnect(false)
+        .auth(json!({}))
+        .transport_type(TransportType::Websocket)
+        .on_any(socket_event_listener);
+
+    // Iterate through headers and add each to the builder
+    for (key, value) in headers_map {
+        builder = builder.opening_header(key, value); // Add each header
+    }
+
+    // Connect to the client
+    let socket = builder
+        .connect()
+        .await
+        .map_err(|e| format!("Connection failed: {}", e))?;
+
+    // Store the connected client in the shared state
+    {
+        let mut clients = state.connections.lock().await; // Await the lock acquisition
+        clients.insert(tabid_clone, socket);
+    }
+
+    // Create successful connection response
+    let response = SocketIoResponse {
+        is_successful: true,
+        status_code: 200,
+        message: "Socket.IO connected successfully".to_string(),
+    };
+
+    // Serialize the response to a JSON string and return it
+    serde_json::to_string(&response).map_err(|e| format!("Failed to serialize response: {}", e))
+}
+
+#[tauri::command]
+async fn disconnect_socket_io_v2(
+    tabid: String,
+    state: tauri::State<'_, Arc<AppStateV2>>,
+) -> Result<String, String> {
+    let mut clients = state.connections.lock().await;
+    let response;
+
+    if let Some(client) = clients.remove(&tabid) {
+        // Assuming you have a method to disconnect the client properly
+        client
+            .disconnect()
+            .await
+            .map_err(|e| format!("Failed to disconnect: {}", e))?;
+
+        // Create a success response
+        response = SocketIoDisconnectResponse {
+            is_successful: true,
+            status_code: 200,
+            message: "Socket.IO connection disconnected successfully".to_string(),
+        };
+    } else {
+        response = SocketIoDisconnectResponse {
+            is_successful: false,
+            status_code: 404,
+            message: "Socket.IO connection not found".to_string(),
+        };
+    }
+
+    // Serialize the response to a JSON string and return it
+    let response_json = serde_json::to_string(&response)
+        .map_err(|e| format!("Failed to serialize response: {}", e))?;
+
+    return Ok(response_json);
+}
+
+#[tauri::command]
+async fn send_socket_io_message_v2(
+    tabid: String,
+    event: String,
+    message: String,
+    state: tauri::State<'_, Arc<AppStateV2>>,
+) -> Result<String, String> {
+    // Acquire the lock on the shared state
+    let clients = state.connections.lock().await;
+
+    // Check if the client for the given tabId exists
+    if let Some(client) = clients.get(&tabid) {
+        // Emit the message to the specified Socket.IO event
+        client
+            .emit(event.clone(), message) // Emit the message with the event name
+            .await
+            .map_err(|e| format!("Failed to send message: {}", e))?;
+
+        // Create the response
+        let response = SocketIoResponse {
+            is_successful: true,
+            status_code: 200,
+            message: format!("Message sent successfully to event: {}", event),
+        };
+
+        // Serialize the response to a JSON string
+        return serde_json::to_string(&response)
+            .map_err(|e| format!("Failed to serialize response: {}", e));
+    } else {
+        // Create a disconnect response if no client is found
+        let response = SocketIoDisconnectResponse {
+            is_successful: false,
+            status_code: 404,
+            message: "Socket.IO connection not found".to_string(),
+        };
+
+        // Serialize the response to a JSON string
+        return serde_json::to_string(&response)
+            .map_err(|e| format!("Failed to serialize response: {}", e));
+    }
+}
+
 // Driver Function
 fn main() {
     // Initiate Tauri Runtime
@@ -1102,6 +1297,9 @@ fn main() {
             app.manage(Arc::new(SocketIoAppState {
                 connections: Mutex::new(std::collections::HashMap::new()),
             }));
+            app.manage(Arc::new(AppStateV2 {
+                connections: Mutex::new(std::collections::HashMap::new()),
+            }));
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -1120,6 +1318,9 @@ fn main() {
             connect_socketio,
             send_socketio_message,
             disconnect_socketio,
+            connect_socket_io_v2,
+            disconnect_socket_io_v2,
+            send_socket_io_message_v2
         ])
         .on_page_load(|wry_window, _payload| {
             if wry_window.url().host_str() == Some("www.google.com") {

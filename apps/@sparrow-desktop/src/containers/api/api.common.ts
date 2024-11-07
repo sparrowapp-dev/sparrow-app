@@ -301,13 +301,13 @@ const sendSocketIoMessage = async (
     return webSocketDataMap;
   });
   let urlObject = new URL(url);
-  await invoke("send_socketio_message", {
+  await invoke("send_socket_io_message_v2", {
     tabid: tab_id,
-    namespace: urlObject.pathname || "/",
     event: _eventName,
     message: message,
   })
     .then(async (data: string) => {
+      console.log(data);
       try {
         // Logic to handle response
         console.log("sent", JSON.parse(data));
@@ -417,7 +417,7 @@ const disconnectSocketIo = async (tab_id: string) => {
     }
     return webSocketDataMap;
   });
-  await invoke("disconnect_socketio", { tabid: tab_id })
+  await invoke("disconnect_socket_io_v2", { tabid: tab_id })
     .then(async (data: string) => {
       try {
         // Logic to handle response
@@ -627,7 +627,7 @@ const connectSocketIo = async (
     );
     return;
   }
-  await invoke("connect_socketio", {
+  await invoke("connect_socket_io_v2", {
     url: urlObject.origin || "",
     namespace: urlObject.pathname || "/",
     tabid: tabId,
@@ -635,6 +635,7 @@ const connectSocketIo = async (
   })
     .then(async (data: string) => {
       try {
+        console.log(data);
         // Logic to handle response
         if (data) {
           const dt = JSON.parse(data);
@@ -643,6 +644,7 @@ const connectSocketIo = async (
         // Store the WebSocket and initialize data
         socketIoDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tabId);
+          console.log("wsData====> ", wsData);
           if (wsData) {
             wsData.messages.unshift({
               data: `Connected from ${url}`,
@@ -653,6 +655,7 @@ const connectSocketIo = async (
             wsData.status = "connected";
             webSocketDataMap.set(tabId, wsData);
           }
+          console.log("webSocketDataMap====> ", webSocketDataMap);
           return webSocketDataMap;
         });
         notifications.success(
@@ -668,42 +671,38 @@ const connectSocketIo = async (
                 res("resolved");
               }, 10);
             });
+            console.log("EVENT ====> ", event);
             const tabData = await tabRepository.getTabByTabId(tabId);
             const tabDataJSON = tabData?.toMutableJSON();
             let socketIOresponse = event.payload;
-            const match = socketIOresponse.match(/\[.*\]/);
-            let socketIoResponseArray;
-            if (match) {
-              socketIoResponseArray = JSON.parse(match[0]);
-            }
-
+            let eventName = socketIOresponse.event;
+            let message = socketIOresponse.message;
             let tabEvents = tabDataJSON.property.socketio?.events;
             let isIncludeInResponse = false;
             for (let i = 0; i < tabEvents.length; i++) {
-              if (
-                tabEvents[i].listen &&
-                tabEvents[i].event === socketIoResponseArray[0]
-              ) {
+              if (tabEvents[i].listen && tabEvents[i].event === eventName) {
                 isIncludeInResponse = true;
                 break;
               }
             }
-            if (
-              socketIOresponse.startsWith("42") &&
-              isIncludeInResponse &&
-              socketIoResponseArray[1]
-            ) {
+            console.log("socketIOresponse ===> ", socketIOresponse);
+            console.log("isIncludeInResponse ===> ", isIncludeInResponse);
+            console.log("message ===> ", message);
+            console.log("message[0] ===> ", message[0]);
+
+            if (socketIOresponse && isIncludeInResponse && message) {
               socketIoDataStore.update((webSocketDataMap) => {
                 const wsData = webSocketDataMap.get(tabId);
                 if (wsData) {
                   wsData.messages.unshift({
-                    data: JSON.stringify(socketIoResponseArray),
+                    data: JSON.stringify([eventName, message[0]]),
                     transmitter: "receiver",
                     timestamp: formatTime(new Date()),
                     uuid: uuidv4(),
                   });
                   webSocketDataMap.set(tabId, wsData);
                 }
+                console.log("webSocketDataMap ====> ", webSocketDataMap);
                 return webSocketDataMap;
               });
             }
