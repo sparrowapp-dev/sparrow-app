@@ -84,11 +84,14 @@
    */
   const highlightSearchText = (text: string, search: string): string => {
     if (!search) return text;
-    const regex = new RegExp(`(${search})`, "gi");
-    return text.replace(
-      regex,
-      `<span class="highlight-websocket-message-search">$1</span>`,
-    );
+    try {
+      const regex = new RegExp(`(${search})`, "gi");
+      return text.replace(
+        regex,
+        `<span class="highlight-websocket-message-search">$1</span>`,
+      );
+    } catch (e) {}
+    return text;
   };
 </script>
 

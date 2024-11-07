@@ -15,7 +15,7 @@
     WithSelectV2,
   } from "@sparrow/workspaces/hoc";
   import { Tooltip } from "@sparrow/library/ui";
-  import { CopyIcon, DownloadIcon } from "@sparrow/library/icons";
+  import { CopyIcon, DownloadIcon2 } from "@sparrow/library/icons";
   import type { SocketIORequestMessageTabInterface } from "@sparrow/common/types/workspace/socket-io-request-tab";
 
   export let webSocket;
@@ -195,7 +195,7 @@
       <!-- Download button -->
       <Tooltip title={"Download"}>
         <WithButtonV4
-          icon={DownloadIcon}
+          icon={DownloadIcon2}
           onClick={handleDownloaded}
           disable={false}
           loader={false}
