@@ -97,13 +97,29 @@
     );
   };
 
-  // Function to safely parse message data
-  function safeParseMessageData(data) {
+  function handleMessageClick(message) {
+    onUpdateMessageBody(message.uuid);
+    
+    // Try to parse the message.data as JSON
     try {
-      cons;
-      return JSON.parse(data);
-    } catch {
-      return data; // If parsing fails, return the original data
+      const parsedData = JSON.parse(message.data);
+
+      // Check if parsedData is an object or contains a specific value
+      if (typeof parsedData === "object") {
+        // Handle specific case for the second item being "(empty)"
+        if (parsedData[1] === "(empty)") {
+          onUpdateContentType(RequestDataTypeEnum.TEXT);
+          return;
+        }
+        // If it is a valid JSON object, update content type
+        onUpdateContentType(RequestDataTypeEnum.JSON);
+      } else {
+        // If it's a string, update content type to JSON
+        onUpdateContentType(RequestDataTypeEnum.JSON);
+      }
+    } catch (e) {
+      // If JSON parsing fails, assume it's plain text
+      onUpdateContentType(RequestDataTypeEnum.TEXT);
     }
   }
 </script>
@@ -264,55 +280,11 @@
   <div style="flex:1; overflow:auto;" bind:this={listContainer}>
     <div>
       {#each filteredWebsocketMessage as message}
-        <div>
-          <pre>{JSON.stringify(
-              safeParseMessageData(message.data),
-              null,
-              2,
-            )}</pre>
-          <!-- Use JSON.stringify for pretty-printing if it's an object -->
-        </div>
         <div
-          class="response-message d-flex align-items-center"
-          style="cursor: pointer;"
-          on:click={() => {
-            onUpdateMessageBody(message.uuid);
-            // debugger;
-
-            try {
-              let parse = JSON.parse(message.data);
-              if (parse[1] === "(empty)") {
-                onUpdateContentType(RequestDataTypeEnum.TEXT);
-                return;
-              }
-
-              try {
-                if (parse[1]) {
-                  JSON.parse(parse[1]);
-                  onUpdateContentType(RequestDataTypeEnum.JSON);
-                  return;
-                }
-              } catch (e) {
-                onUpdateContentType(RequestDataTypeEnum.TEXT);
-                return;
-              }
-            } catch (e) {
-              onUpdateContentType(RequestDataTypeEnum.TEXT);
-              return;
-            }
-
-            try {
-              if (message.data) {
-                JSON.parse(message.data);
-                onUpdateContentType(RequestDataTypeEnum.JSON);
-                return;
-              }
-            } catch (e) {
-              onUpdateContentType(RequestDataTypeEnum.TEXT);
-              return;
-            }
-          }}
-        >
+        class="response-message d-flex align-items-center"
+        style="cursor: pointer;"
+        on:click={() => handleMessageClick(message)}
+      >
           <span
             class="p-2 d-flex align-items-center"
             style="width: 35px !important;"
