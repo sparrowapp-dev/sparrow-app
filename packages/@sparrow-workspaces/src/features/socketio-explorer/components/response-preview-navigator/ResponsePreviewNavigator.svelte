@@ -59,7 +59,7 @@
   };
 
   const handleCopy = async () => {
-    const data = currentMessage(webSocket.body);
+    const data = currentMessage(webSocket?.body);
     await copyToClipBoard(formatCode(data));
     notifications.success("Copied to clipboard");
     MixpanelEvent(Events.COPY_API_RESPONSE);
@@ -98,14 +98,14 @@
 
   const handleDownloaded = async () => {
     const newHandle = await window.showSaveFilePicker({
-      suggestedName: `api_response.${fileExtension}`,
+      suggestedName: `socketio_response.${fileExtension}`,
       accept: {
         extensions: ["txt", "json", "xml", "js", "html"],
       },
     });
     const writableStream = await newHandle.createWritable();
     // write our file
-    const data = currentMessage(webSocket.body);
+    const data = currentMessage(webSocket?.body);
     await writableStream.write(formatCode(data));
     await writableStream.close();
     notifications.success("Exported successfully.");
