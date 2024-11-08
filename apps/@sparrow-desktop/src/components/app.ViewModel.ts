@@ -1,5 +1,5 @@
 import { throttle } from "@sparrow/common/utils";
-import { platform } from "@tauri-apps/plugin-os";
+
 import { handleLoginV2 } from "@app/pages/auth-page/sub-pages/login-page/login-page";
 import { listen } from "@tauri-apps/api/event";
 import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
@@ -16,6 +16,7 @@ import { GuestUserRepository } from "../repositories/guest-user.repository";
 import { TabRepository } from "../repositories/tab.repository";
 import { navigate } from "svelte-navigator";
 import { InitWorkspaceTab } from "@sparrow/common/utils";
+import { platform } from "@tauri-apps/plugin-os";
 
 interface DeepLinkHandlerWindowsPayload {
   payload: {

@@ -13,6 +13,8 @@
   import { beautifyIcon as BeautifyIcon } from "@sparrow/library/assets";
   import js_beautify, { html_beautify } from "js-beautify";
   import { WithSelectV3 } from "@sparrow/workspaces/hoc";
+  import { invoke } from "@tauri-apps/api/core";
+  import { save } from "@tauri-apps/plugin-dialog";
 
   export let response;
   export let apiState;
@@ -75,24 +77,82 @@
     return unindentedLines.join("\n");
   };
 
+  // const handleDownloaded = async () => {
+  //   const blobToBase64 = async (blob: Blob) => {
+  //     return new Promise((resolve, reject) => {
+  //       const reader = new FileReader();
+  //       reader.onloadend = () => {
+  //         resolve((reader.result as string).split(",")[1]);
+  //       };
+  //       reader.onerror = reject;
+  //       reader.readAsDataURL(blob);
+  //     });
+  //   };
+
+  //   const saveFile = async (blob: Blob, fileName: string) => {
+  //     if (window.isTauri) {
+  //       const base64Data = await blobToBase64(blob);
+  //       await invoke(`save_file`, { filename: fileName, data: base64Data });
+  //     } else {
+  //       // saveAs(blob, fileName);
+  //     }
+  //   };
+
+  //   return { saveFile };
+  // };
+
   const handleDownloaded = async () => {
-    const newHandle = await window.showSaveFilePicker({
-      suggestedName: `api_response_${
-        response?.status ? response?.status : ""
-      }_${response?.time ? response?.time : "0"}ms_${
-        response?.size ? response?.size : "0"
-      }kb.${fileExtension}`,
-      accept: {
-        extensions: ["txt", "json", "xml", "js", "html"],
-      },
+    // Open a save file dialog
+    const newHandle = await save({
+      defaultPath: `api_response_${response?.status || ""}_${response?.time || "0"}ms_${response?.size || "0"}kb.${fileExtension}`,
+      filters: [
+        {
+          name: "Text Files",
+          extensions: ["txt", "json", "xml", "js", "html"],
+        },
+      ],
     });
-    const writableStream = await newHandle.createWritable();
-    // write our file
-    await writableStream.write(formatCode(response?.body));
-    await writableStream.close();
-    notifications.success("Response downloaded successfully.");
-    MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
+    console.log(newHandle);
+    // if (newHandle) {
+    //   // Create a writable stream
+    //   const writableStream = await newHandle.createWritable();
+
+    //   // Write the file content
+    //   await writableStream.write(formatCode(response?.body));
+
+    //   // Close the writable stream
+    //   await writableStream.close();
+
+    //   // Notify the user of success
+    //   notifications.success("Response downloaded successfully.");
+
+    //   // Track the download event
+    //   MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
+    // } else {
+    //   // Handle the case where the user canceled the save dialog
+    //   console.log("Save operation was canceled.");
+    // }
   };
+
+  // const handleDownloaded = async () => {
+  //   console.log("HETY");
+  //   const newHandle = await window.showSaveFilePicker({
+  //     suggestedName: `api_response_${
+  //       response?.status ? response?.status : ""
+  //     }_${response?.time ? response?.time : "0"}ms_${
+  //       response?.size ? response?.size : "0"
+  //     }kb.${fileExtension}`,
+  //     accept: {
+  //       extensions: ["txt", "json", "xml", "js", "html"],
+  //     },
+  //   });
+  //   const writableStream = await newHandle.createWritable();
+  //   // write our file
+  //   await writableStream.write(formatCode(response?.body));
+  //   await writableStream.close();
+  //   notifications.success("Response downloaded successfully.");
+  //   MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
+  // };
 </script>
 
 <div class="d-flex flex-column align-items-start justify-content-between w-100">

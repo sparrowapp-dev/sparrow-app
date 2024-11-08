@@ -20,7 +20,7 @@
 use brotli::Decompressor;
 use flate2::read::GzDecoder;
 use reqwest::Response;
-use std::io::{self, Read};
+use std::io::Read;
 
 /// Decode the response body, handling gzipped and brotli content if necessary.
 ///

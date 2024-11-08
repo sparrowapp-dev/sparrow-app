@@ -60,36 +60,24 @@ use serde_json::json;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::process::Command;
+use tauri::Emitter;
 use tauri::Manager;
-use tauri::Window;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
 use utils::response_decoder::decode_response_body;
 
 // Web socket imports
 use futures_util::{SinkExt, StreamExt};
-use http::header;
-use hyper::client::HttpConnector;
 use hyper::header::HeaderValue;
 use hyper::header::{CONNECTION, UPGRADE};
 use hyper::{Client as OtherClient, Request};
 use hyper_tls::HttpsConnector;
-use native_tls::TlsConnector;
 use std::sync::Arc;
-use tauri::AppHandle;
-use tauri::State;
 use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::sync::Mutex;
-use tokio_tungstenite::client_async;
+use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
-use tokio_tungstenite::tungstenite::protocol::WebSocketConfig;
-use tokio_tungstenite::WebSocketStream;
-use tokio_tungstenite::{connect_async, Connector};
 
-// Socket.IO imports
-use rust_socketio::{
-    client as SocketClient, ClientBuilder, Payload as SocketPayload, TransportType,
-};
 use tokio::sync::Mutex as SocketMutex;
 use tokio::time::{timeout, Duration};
 
@@ -107,10 +95,10 @@ fn zoom_window(window: tauri::Window, scale_factor: f64) {
             webview.controller().SetZoomFactor(scale_factor).unwrap();
         }
 
-        #[cfg(target_os = "macos")]
-        unsafe {
-            let () = msg_send![webview.inner(), setPageZoom: scale_factor];
-        }
+        // #[cfg(target_os = "macos")]
+        // unsafe {
+        //     let () = msg_send![webview.inner(), setPageZoom: scale_factor];
+        // }
     });
 }
 
@@ -604,10 +592,11 @@ async fn connect_websocket(
             _ = async {
                 while let Some(message) = read.next().await {
                     if let Ok(msg) = message {
+                        let event = format!("ws_message_{}", svelte_tabid);
                         if let Message::Text(text) = msg {
                             app_handle_clone
-                                .emit(&format!("ws_message_{}", svelte_tabid), text)
-                                .unwrap();
+                            .emit(event.as_str(), text)
+                            .unwrap();
                         }
                     }
                 }
@@ -1122,15 +1111,17 @@ fn main() {
             disconnect_socketio,
         ])
         .on_page_load(|wry_window, _payload| {
-            if wry_window.url().host_str() == Some("www.google.com") {
-                wry_window
-                    .emit(
-                        "receive-login",
-                        Payload {
-                            url: _payload.url().to_string(),
-                        },
-                    )
-                    .unwrap();
+            if let Ok(url) = wry_window.url() {
+                if url.host_str() == Some("www.google.com") {
+                    wry_window
+                        .emit(
+                            "receive-login",
+                            Payload {
+                                url: _payload.url().to_string(),
+                            },
+                        )
+                        .unwrap();
+                }
             }
         })
         .run(tauri::generate_context!())

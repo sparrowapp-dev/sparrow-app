@@ -16,7 +16,6 @@
   import { singleInstanceHandler } from "@app/utils/singleinstance/app.singleinstance";
   import { AppViewModel } from "./app.ViewModel";
 
-
   const _viewModel = new AppViewModel();
 
   export let url = "/";
