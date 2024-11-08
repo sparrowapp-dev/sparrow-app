@@ -663,6 +663,34 @@ const connectSocketIo = async (
         const listener = await listen(
           `socket-message-${tabId}`,
           async (event) => {
+            console.log("response from rust----->", event);
+            try {
+              const parsedPayload = JSON.parse(event?.payload);
+              console.log("for disconnection", parsedPayload);
+              if (parsedPayload?.event === "disconnect") {
+                // disconnectSocketIo(tabId);
+                socketIoDataStore.update((webSocketDataMap) => {
+                  const wsData = webSocketDataMap.get(tabId);
+                  if (wsData) {
+                    const disconnectListener = wsData.listener;
+                    wsData.messages.unshift({
+                      data: `Disconnected from ${url}`,
+                      transmitter: "disconnector",
+                      timestamp: formatTime(new Date()),
+                      uuid: uuidv4(),
+                    });
+                    wsData.status = "disconnected";
+                    webSocketDataMap.set(tabId, wsData);
+                    if (disconnectListener) {
+                      disconnectListener();
+                    }
+                  }
+                  return webSocketDataMap;
+                });
+              }
+            } catch (error) {
+              console.log("inside catch---->");
+            }
             await new Promise((res, rej) => {
               setTimeout(() => {
                 res("resolved");

@@ -90,6 +90,7 @@ use tokio_tungstenite::{connect_async, Connector};
 use rust_socketio::{
     client as SocketClient, ClientBuilder, Payload as SocketPayload, TransportType,
 };
+use std::time::Instant;
 use tokio::sync::Mutex as SocketMutex;
 use tokio::time::{timeout, Duration};
 
@@ -268,7 +269,8 @@ async fn make_http_request_v2(
     body: &str,
     request: &str,
 ) -> Result<String, String> {
-    let result = make_request_v2(url, method, headers, body, request).await;
+    let result: Result<String, std::io::Error> =
+        make_request_v2(url, method, headers, body, request).await;
 
     // Convert the result to a string for response formatting
     let result_value = match result {
@@ -740,6 +742,31 @@ struct SocketIoResponse {
     message: String,
 }
 
+// Helper function to handle disconnection
+async fn handle_disconnect(
+    app_handle: &tauri::AppHandle,
+    tabid: &str,
+    state: &Arc<SocketIoAppState>,
+    reason: &str,
+) {
+    // Remove connection from state
+    let mut connections = state.connections.lock().await;
+    connections.remove(tabid);
+
+    // Emit disconnect event with reason
+    let disconnect_payload = serde_json::json!({
+        "event": "disconnect",
+        "reason": reason
+    });
+
+    let _ = app_handle.emit(
+        &format!("socket-message-{}", tabid),
+        disconnect_payload.to_string(),
+    );
+
+    println!("Socket disconnected for tab {}: {}", tabid, reason);
+}
+
 #[tauri::command]
 async fn connect_socketio(
     url: String,
@@ -875,41 +902,82 @@ async fn connect_socketio(
     // Improved message receiver with proper ping/pong handling
     let app_handle_clone = app_handle.clone();
     let tabid_clone = tabid.clone();
+    let state_clone = Arc::clone(&state.inner());
+
+    // Create shared last_pong timestamp
+    let last_pong = Arc::new(Mutex::new(Instant::now()));
+    let last_pong_clone = last_pong.clone();
+
     tokio::spawn(async move {
         let mut read_stream = read;
+        let timeout_duration = Duration::from_secs(35); // Adjust timeout as needed
+
+        // Create a interval check for connection health
+        let mut health_check = tokio::time::interval(Duration::from_secs(5));
 
         tokio::select! {
             _ = async {
-                while let Some(Ok(msg)) = read_stream.next().await {
-                    match msg {
-                        Message::Text(text) => {
-                            // Handle different Socket.IO packet types
-                            if text.starts_with('2') {
-                                // Received ping, send pong
-                                let mut writer = write.lock().await;
-                                let _ = writer.send(Message::Text("3".to_string())).await;
-                                println!("Received ping, sent pong");
-                            } else if text.starts_with('3') {
-                                // Received pong
-                                println!("Received pong");
-                            } else {
-                                // Regular message, emit to frontend
-                                let _ = app_handle_clone.emit(
-                                    &format!("socket-message-{}", tabid_clone),
-                                    text
-                                );
+                while let Some(result) = read_stream.next().await {
+                    match result {
+                        Ok(msg) => {
+                            match msg {
+                                Message::Text(text) => {
+                                    // Update last_pong time when receiving any message
+                                    *last_pong.lock().await = Instant::now();
+
+                                    if text.starts_with('2') {
+                                        // Received ping, send pong
+                                        let mut writer = write.lock().await;
+                                        let _ = writer.send(Message::Text("3".to_string())).await;
+                                        println!("Received ping, sent pong");
+                                    } else if text.starts_with('3') {
+                                        println!("Received pong");
+                                    } else if text.starts_with("41") {
+                                        let _ = app_handle_clone.emit(
+                                            &format!("socket-message-{}", tabid_clone),
+                                            text
+                                        );
+                                    } else {
+                                        let _ = app_handle_clone.emit(
+                                            &format!("socket-message-{}", tabid_clone),
+                                            text
+                                        );
+                                    }
+                                }
+                                Message::Close(frame) => {
+                                    handle_disconnect(&app_handle_clone, &tabid_clone, &state_clone, "Server closed connection").await;
+                                    break;
+                                }
+                                Message::Ping(_) | Message::Pong(_) => {
+                                    *last_pong.lock().await = Instant::now();
+                                }
+                                _ => {}
                             }
                         }
-                        Message::Close(frame) => {
-                            println!("Received close frame: {:?}", frame);
+                        Err(e) => {
+                            println!("WebSocket error: {}", e);
+                            // handle_disconnect(&app_handle_clone, &tabid_clone, &state_clone, &format!("WebSocket error: {}", e)).await;
                             break;
                         }
-                        _ => {}
+                    }
+                }
+
+                // If we break out of the while loop, it means the connection was lost
+                handle_disconnect(&app_handle_clone, &tabid_clone, &state_clone, "Connection lost").await;
+            } => {}
+            _ = async {
+                loop {
+                    health_check.tick().await;
+                    let last_seen = last_pong_clone.lock().await.elapsed();
+                    if last_seen > timeout_duration {
+                        handle_disconnect(&app_handle_clone, &tabid_clone, &state_clone, "Connection timeout - no response from server").await;
+                        break;
                     }
                 }
             } => {}
             _ = disconnect_rx => {
                 println!("Disconnect signal received for {}", tabid_clone);
+                // handle_disconnect(&app_handle_clone, &tabid_clone, &state_clone, "Client initiated disconnect").await;
             }
         }
     });
