@@ -1,4 +1,4 @@
-import type { RequestDataTypeEnum } from "./request";
+import type { RequestDataTypeEnum } from "./http-request-tab";
 import type { Tab } from "./tab";
 
 /**

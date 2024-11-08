@@ -21,7 +21,7 @@
     MoreOptions,
     VerticalGridIcon,
   } from "@sparrow/library/icons";
-  import { TabTypeEnum } from "@sparrow/common/types/workspace";
+  import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
 
   // ------ Props ------
   /**

@@ -13,8 +13,14 @@
   // ----
 
   // ---- Interface
-  import { SocketIcon, StackIcon, TreeIcon } from "@sparrow/library/icons";
-  import { TabTypeEnum, type Tab } from "@sparrow/common/types/workspace";
+  import {
+    SocketIcon,
+    SocketIoIcon,
+    StackIcon,
+    TreeIcon,
+  } from "@sparrow/library/icons";
+  import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+  import { type Tab } from "@sparrow/common/types/workspace/tab";
   // ----
 
   // ------ Props ------
@@ -142,6 +148,14 @@
             color={"var(--icon-secondary-130)"}
           />
         </span>
+      {:else if tab.type === TabTypeEnum.SOCKET_IO}
+        <span>
+          <SocketIoIcon
+            height={"14px"}
+            width={"14px"}
+            color={"var(--icon-primary-300)"}
+          />
+        </span>
       {/if}
       <span
         class="font-weight-normal ms-1 text-fs-12 {!tab.isActive
@@ -152,7 +166,7 @@
         {tab.name}
       </span>
     </button>
-    {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
+    {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
       {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
         <span
           class="my-auto mx-1 opacity-1"

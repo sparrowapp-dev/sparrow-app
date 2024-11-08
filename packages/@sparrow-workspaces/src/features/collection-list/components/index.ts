@@ -4,3 +4,4 @@ export { default as Request } from "./request/Request.svelte";
 export { default as SearchTree } from "./search-tree/SearchTree.svelte";
 export { default as EmptyCollection } from "./empty-collection/EmptyCollection.svelte";
 export { default as WebSocket } from "./web-socket/WebSocket.svelte";
+export { default as SocketIo } from "./socket-io/SocketIo.svelte";

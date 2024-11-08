@@ -646,6 +646,26 @@ export class TabRepository {
       })
       .exec();
   };
+  z;
+
+  /**
+   * Retrieves a tab by its unique identifier.
+   *
+   * This function searches for a tab within the provided array of tabs based on the given `tabId`.
+   *
+   * @param {string} _id - The unique identifier of the tab to retrieve.
+   * @returns {{ id: string, [key: string]: any } | undefined} - The tab object with the matching `tabId`.
+   */
+
+  public getTabByTabId = async (_id: string): Promise<TabDocument> => {
+    return await RxDB?.getInstance()
+      ?.rxdb?.tab.findOne({
+        selector: {
+          tabId: _id,
+        },
+      })
+      .exec();
+  };
 
   /**
    * Removes tabs from the RxDB database that match the given query.

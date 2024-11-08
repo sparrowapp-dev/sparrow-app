@@ -2,7 +2,7 @@ import { user } from "@app/store/auth.store";
 import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
 import type { InviteBody } from "@sparrow/common/dto/team-dto";
 import { Events, UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
-import type { MakeRequestResponse } from "@app/types/http-client";
+import type { HttpClientResponseInterface } from "@app/types/http-client";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import type { WorkspaceDocument } from "../../database/database";
 import { CollectionRepository } from "../../repositories/collection.repository";
@@ -134,16 +134,11 @@ export class TeamExplorerPageViewModel {
    */
   public refreshTeams = async (userId: string): Promise<void> => {
     if (!userId) return;
-
-    let openTeamId: string = "";
-    const teamsData = await this.teamRepository.getTeamData();
-    teamsData.forEach((element) => {
-      const elem = element.toMutableJSON();
-      if (elem.isOpen) openTeamId = elem.teamId;
-    });
     const response = await this.teamService.fetchTeams(userId);
+    let isAnyTeamsOpen: undefined | string = undefined;
     if (response?.isSuccessful && response?.data?.data) {
-      const data = response.data.data.map((elem) => {
+      const data = [];
+      for (const elem of response.data.data) {
         const {
           _id,
           name,
@@ -163,7 +158,9 @@ export class TeamExplorerPageViewModel {
           workspaceId: workspace.id,
           name: workspace.name,
         }));
-        return {
+        const isOpenTeam = await this.teamRepository.checkIsTeamOpen(_id);
+        if (isOpenTeam) isAnyTeamsOpen = _id;
+        const item = {
           teamId: _id,
           name,
           users,
@@ -178,21 +175,21 @@ export class TeamExplorerPageViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
+          isOpen: isOpenTeam,
         };
-      });
-      if (openTeamId) {
-        data.forEach((elem) => {
-          if (elem.teamId === openTeamId) {
-            elem.isOpen = true;
-          } else {
-            elem.isOpen = false;
-          }
-        });
-      } else {
-        data[0].isOpen = true;
+        data.push(item);
       }
 
       await this.teamRepository.bulkInsertData(data);
+      await this.teamRepository.deleteOrphanTeams(
+        data.map((_team) => {
+          return _team.teamId;
+        }),
+      );
+      if (!isAnyTeamsOpen) {
+        this.teamRepository.setOpenTeam(data[0].teamId);
+        return;
+      }
     }
   };
 
@@ -202,11 +199,6 @@ export class TeamExplorerPageViewModel {
    */
   public refreshWorkspaces = async (userId: string): Promise<void> => {
     if (!userId) return;
-    const workspaces = await this.workspaceRepository.getWorkspacesDocs();
-    const idToEnvironmentMap = {};
-    workspaces.forEach((element) => {
-      idToEnvironmentMap[element._id] = element?.environmentId;
-    });
     const response = await this.workspaceService.fetchWorkspaces(userId);
     let isAnyWorkspaceActive: undefined | string = undefined;
     const data = [];
@@ -242,7 +234,7 @@ export class TeamExplorerPageViewModel {
             teamId: team.id,
             teamName: team.name,
           },
-          environmentId: idToEnvironmentMap[_id],
+          environmentId: "",
           isActiveWorkspace: isActiveWorkspace,
           createdAt,
           createdBy,
@@ -253,10 +245,15 @@ export class TeamExplorerPageViewModel {
         data.push(item);
       }
       await this.workspaceRepository.bulkInsertData(data);
+      await this.workspaceRepository.deleteOrphanWorkspaces(
+        data.map((_workspace) => {
+          return _workspace._id;
+        }),
+      );
       if (!isAnyWorkspaceActive) {
-        await this.workspaceRepository.activateInitialWorkspace();
+        this.workspaceRepository.setActiveWorkspace(data[0]._id);
         return;
-      } else this.workspaceRepository.setActiveWorkspace(isAnyWorkspaceActive);
+      }
       return;
     }
   };
@@ -315,7 +312,7 @@ export class TeamExplorerPageViewModel {
     user.subscribe((value) => {
       loggedInUserId = value?._id;
     });
-    const response: MakeRequestResponse =
+    const response: HttpClientResponseInterface =
       await this.userService.disableWorkspaceNewInviteTag(
         loggedInUserId,
         workspaceId,
@@ -350,7 +347,7 @@ export class TeamExplorerPageViewModel {
   };
 
   /**
-   * Invites new user to the team
+   * Invites new user to the team.
    * @param _teamId - Team id in which users are invited.
    * @param _inviteBody - New team meta data.
    * @param _userId - Used id to be invited.

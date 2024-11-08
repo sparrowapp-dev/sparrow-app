@@ -181,6 +181,35 @@
   ]);
 
   /**
+   * Handles the paste event in the CodeMirror editor.
+   *
+   * This function retrieves text data from the clipboard, sanitizes it
+   * by removing newline characters, and inserts it at the current cursor
+   * position in the CodeMirror editor.
+   *
+   * @param  event - The paste event containing the clipboard data.
+   */
+  const handlePaste = (event: ClipboardEvent): void => {
+    event.preventDefault(); // Prevent the default paste behavior
+    // Access the clipboard data directly
+    navigator.clipboard
+      .readText()
+      .then((text) => {
+        // Remove newline characters from the pasted text
+        const sanitizedData = text.replace(/\n/g, " ");
+        codeMirrorView?.dispatch({
+          changes: {
+            from: codeMirrorView.state.selection.main.from,
+            insert: sanitizedData,
+          },
+        });
+      })
+      .catch((err) => {
+        console.error("Failed to read clipboard contents: ", err);
+      });
+  };
+
+  /**
    * @description - handles event listeners
    */
   const handleEventsRegister = EditorView.domEventHandlers({
@@ -197,6 +226,8 @@
     keydown: (event, view: EditorView) => {
       handleKeyDownChange(event);
     },
+
+    paste: handlePaste, // triggers paste event
   });
 
   /**

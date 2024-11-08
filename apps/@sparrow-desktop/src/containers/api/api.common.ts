@@ -10,30 +10,34 @@ import { invoke } from "@tauri-apps/api/core";
 import { DashboardViewModel } from "@app/pages/dashboard-page/Dashboard.ViewModel";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
-import type { MakeRequestResponse } from "@app/types/http-client";
+import type { HttpClientResponseInterface } from "@app/types/http-client";
 import { listen } from "@tauri-apps/api/event";
 import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
 import { v4 as uuidv4 } from "uuid";
 import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { appInsights } from "@app/logger";
+import { socketIoDataStore } from "@sparrow/workspaces/features/socketio-explorer/store";
+import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+import { TabRepository } from "@app/repositories/tab.repository";
 const apiTimeOut = constants.API_SEND_TIMEOUT;
+
+const tabRepository = new TabRepository();
 
 const error = (
   error: string,
   data?: any,
   tabId: string = "",
-): MakeRequestResponse => {
+): HttpClientResponseInterface<any> => {
   return {
     status: "error",
     isSuccessful: false,
     message: error,
     data,
-    tabId,
   };
 };
 
-const success = (data: any): MakeRequestResponse => {
+const success = (data: any): HttpClientResponseInterface<any> => {
   return {
     status: "success",
     isSuccessful: true,
@@ -91,7 +95,7 @@ const makeRequest = async (
   url: string,
   requestData?: RequestData,
   includeAxiosData?: boolean,
-) => {
+): Promise<HttpClientResponseInterface<any>> => {
   const startTime = performance.now();
   try {
     const response = await axios({
@@ -276,6 +280,67 @@ const sendMessage = async (tab_id: string, message: string) => {
 };
 
 /**
+ * Sends a WebSocket message to a specific tab and handles the response.
+ *
+ * @param tab_id - The ID of the tab to which the message should be sent.
+ * @param message - The message to be sent to the web socket.
+ *
+ */
+const sendSocketIoMessage = async (
+  tab_id: string,
+  message: string,
+  _eventName: string,
+) => {
+  // debugger;
+  let url = "";
+  socketIoDataStore.update((webSocketDataMap) => {
+    const wsData = webSocketDataMap.get(tab_id);
+    if (wsData) {
+      url = wsData.url;
+    }
+    return webSocketDataMap;
+  });
+  let urlObject = new URL(url);
+  await invoke("send_socketio_message", {
+    tabid: tab_id,
+    namespace: urlObject.pathname || "/",
+    event: _eventName,
+    message: message,
+  })
+    .then(async (data: string) => {
+      try {
+        // Logic to handle response
+        console.log("sent", JSON.parse(data));
+
+        socketIoDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tab_id);
+          let asdf = [];
+          asdf.push(_eventName);
+          asdf.push(message || "(empty)");
+          const r = JSON.stringify(asdf);
+          if (wsData) {
+            wsData.messages.unshift({
+              data: r,
+              transmitter: "sender",
+              timestamp: formatTime(new Date()),
+              uuid: uuidv4(),
+            });
+            webSocketDataMap.set(tab_id, wsData);
+          }
+          return webSocketDataMap;
+        });
+      } catch (e) {
+        console.error(e);
+        return error("error");
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+      return error("error");
+    });
+};
+
+/**
  * Disconnects a WebSocket connection for a specific tab and handles the response.
  *
  * @param tab_id - The ID of the tab for which the WebSocket connection should be disconnected.
@@ -330,6 +395,69 @@ const disconnectWebSocket = async (tab_id: string) => {
     .catch((e) => {
       console.error(e);
       notifications.error("Failed to disconnect WebSocket. Please try again.");
+      return error("error");
+    });
+};
+
+/**
+ * Disconnects a WebSocket connection for a specific tab and handles the response.
+ *
+ * @param tab_id - The ID of the tab for which the WebSocket connection should be disconnected.
+ *
+ */
+const disconnectSocketIo = async (tab_id: string) => {
+  let url = "";
+  socketIoDataStore.update((webSocketDataMap) => {
+    const wsData = webSocketDataMap.get(tab_id);
+    if (wsData) {
+      url = wsData.url;
+      wsData.status = "disconnecting";
+      wsData.url = "";
+      webSocketDataMap.set(tab_id, wsData);
+    }
+    return webSocketDataMap;
+  });
+  await invoke("disconnect_socketio", { tabid: tab_id })
+    .then(async (data: string) => {
+      try {
+        // Logic to handle response
+        console.log("disconnected", data);
+        let listener;
+        socketIoDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tab_id);
+          if (wsData) {
+            listener = wsData.listener;
+            wsData.messages.unshift({
+              data: `Disconnected from ${url}`,
+              transmitter: "disconnector",
+              timestamp: formatTime(new Date()),
+              uuid: uuidv4(),
+            });
+            wsData.status = "disconnected";
+            webSocketDataMap.set(tab_id, wsData);
+            if (listener) {
+              listener();
+            }
+          }
+          return webSocketDataMap;
+        });
+
+        notifications.success(
+          `${SocketIORequestDefaultAliasBaseEnum.NAME} disconnected successfully.`,
+        );
+      } catch (e) {
+        console.error(e);
+        notifications.error(
+          `Failed to disconnect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
+        );
+        return error("error");
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+      notifications.error(
+        `Failed to disconnect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
+      );
       return error("error");
     });
 };
@@ -455,6 +583,162 @@ const connectWebSocket = async (
 };
 
 /**
+ * Connects to a WebSocket at a specified URL for a specific tab and handles the response.
+ *
+ * @param {string} url - The WebSocket server URL to connect to.
+ * @param {string} tabId - The ID of the tab for which the WebSocket connection should be established.
+ * @param {string} requestHeaders - The request headers to be sent with the WebSocket connection.
+ *
+ * @description
+ * The function also sets up a listener for messages from the WebSocket connection.
+ */
+const connectSocketIo = async (
+  url: string,
+  tabId: string,
+  requestHeaders: string,
+) => {
+  console.table({ url, tabId, requestHeaders });
+  socketIoDataStore.update((webSocketDataMap) => {
+    webSocketDataMap.set(tabId, {
+      messages: [],
+      status: "connecting",
+      search: "",
+      contentType: RequestDataTypeEnum.TEXT,
+      body: "",
+      filter: "All messages",
+      url: url,
+      listener: null,
+    });
+
+    return webSocketDataMap;
+  });
+
+  let urlObject;
+  try {
+    urlObject = new URL(url);
+  } catch (e) {
+    console.error(e);
+    socketIoDataStore.update((webSocketDataMap) => {
+      webSocketDataMap.delete(tabId);
+      return webSocketDataMap;
+    });
+    notifications.error(
+      `Failed to connect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
+    );
+    return;
+  }
+  await invoke("connect_socketio", {
+    url: urlObject.origin || "",
+    namespace: urlObject.pathname || "/",
+    tabid: tabId,
+    headers: requestHeaders,
+  })
+    .then(async (data: string) => {
+      try {
+        // Logic to handle response
+        if (data) {
+          const dt = JSON.parse(data);
+          console.log(dt);
+        }
+        // Store the WebSocket and initialize data
+        socketIoDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tabId);
+          if (wsData) {
+            wsData.messages.unshift({
+              data: `Connected from ${url}`,
+              transmitter: "connecter",
+              timestamp: formatTime(new Date()),
+              uuid: uuidv4(),
+            });
+            wsData.status = "connected";
+            webSocketDataMap.set(tabId, wsData);
+          }
+          return webSocketDataMap;
+        });
+        notifications.success(
+          `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
+        );
+
+        // All the response of particular web socket can be listened here. (Can be shifted to another place)
+        const listener = await listen(
+          `socket-message-${tabId}`,
+          async (event) => {
+            await new Promise((res, rej) => {
+              setTimeout(() => {
+                res("resolved");
+              }, 10);
+            });
+            const tabData = await tabRepository.getTabByTabId(tabId);
+            const tabDataJSON = tabData?.toMutableJSON();
+            let socketIOresponse = event.payload;
+            const match = socketIOresponse.match(/\[.*\]/);
+            let socketIoResponseArray;
+            if (match) {
+              socketIoResponseArray = JSON.parse(match[0]);
+            }
+
+            let tabEvents = tabDataJSON.property.socketio?.events;
+            let isIncludeInResponse = false;
+            for (let i = 0; i < tabEvents.length; i++) {
+              if (
+                tabEvents[i].listen &&
+                tabEvents[i].event === socketIoResponseArray[0]
+              ) {
+                isIncludeInResponse = true;
+                break;
+              }
+            }
+            if (
+              socketIOresponse.startsWith("42") &&
+              isIncludeInResponse &&
+              socketIoResponseArray[1]
+            ) {
+              socketIoDataStore.update((webSocketDataMap) => {
+                const wsData = webSocketDataMap.get(tabId);
+                if (wsData) {
+                  wsData.messages.unshift({
+                    data: JSON.stringify(socketIoResponseArray),
+                    transmitter: "receiver",
+                    timestamp: formatTime(new Date()),
+                    uuid: uuidv4(),
+                  });
+                  webSocketDataMap.set(tabId, wsData);
+                }
+                return webSocketDataMap;
+              });
+            }
+          },
+        );
+        socketIoDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tabId);
+          if (wsData) {
+            wsData.listener = listener;
+            webSocketDataMap.set(tabId, wsData);
+          }
+          return webSocketDataMap;
+        });
+      } catch (e) {
+        console.error(e);
+        notifications.error(
+          `Failed to fetch ${SocketIORequestDefaultAliasBaseEnum.NAME} response. Please try again.`,
+        );
+        return error("error");
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+      socketIoDataStore.update((webSocketDataMap) => {
+        webSocketDataMap.delete(tabId);
+        return webSocketDataMap;
+      });
+      notifications.error(
+        `Failed to connect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
+      );
+      return error("error");
+    });
+};
+
+/**
  * Invoke RPC Communication
  * @param url - Request URL
  * @param method - Request Method
@@ -543,5 +827,8 @@ export {
   connectWebSocket,
   sendMessage,
   disconnectWebSocket,
+  sendSocketIoMessage,
+  connectSocketIo,
+  disconnectSocketIo,
   // getHeaders,
 };

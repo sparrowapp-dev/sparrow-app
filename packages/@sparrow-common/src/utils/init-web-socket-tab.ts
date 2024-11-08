@@ -1,8 +1,5 @@
-import {
-  type Path,
-  type KeyValueChecked,
-  TabTypeEnum,
-} from "@sparrow/common/types/workspace";
+import { type KeyValueChecked } from "@sparrow/common/types/workspace";
+import { TabTypeEnum, type Path } from "@sparrow/common/types/workspace/tab";
 import {
   SocketDataTypeEnum,
   SocketSectionEnum,
