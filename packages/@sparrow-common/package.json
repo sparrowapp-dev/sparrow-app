@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/common",
-  "version": "0.0.1",
+  "version": "2.11.0",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
