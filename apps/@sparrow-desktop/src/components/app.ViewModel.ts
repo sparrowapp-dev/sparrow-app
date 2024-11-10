@@ -3,7 +3,7 @@ import { throttle } from "@sparrow/common/utils";
 import { handleLoginV2 } from "@app/pages/auth-page/sub-pages/login-page/login-page";
 import { listen } from "@tauri-apps/api/event";
 import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
-import { getCurrent } from "@tauri-apps/api/window";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { Modal } from "@sparrow/library/ui";
 import { userValidationStore } from "@app/store/deviceSync.store";
 import { getAuthJwt, jwtDecode } from "../utils/jwt";
@@ -110,7 +110,7 @@ export class AppViewModel {
   // Private method to process deep link
   private async processDeepLink(url: string): Promise<void> {
     try {
-      await getCurrent().setFocus();
+      await getCurrentWindow().setFocus();
       const params = new URLSearchParams(url.split("?")[1]);
       const currentUserAccessToken = params.get("accessToken");
       const workspaceId = params.get("workspaceID");

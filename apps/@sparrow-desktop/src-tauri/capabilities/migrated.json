@@ -35,7 +35,9 @@
     "core:webview:default",
     "core:webview:allow-set-webview-focus",
     "shell:allow-open",
-    "dialog:allow-save"
+    "dialog:allow-save",
+    "fs:allow-write-file",
+    "fs:allow-write-text-file"
   ],
   "platforms": ["linux", "macOS", "windows", "android", "iOS"]
 }

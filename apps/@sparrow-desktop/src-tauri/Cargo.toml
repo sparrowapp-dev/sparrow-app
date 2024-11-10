@@ -47,6 +47,7 @@ tauri-plugin-process = "2.0.0-rc"
 tauri-plugin-single-instance = "2.0.0-rc"
 tauri-plugin-shell = "2.0.0-rc"
 tauri-plugin-dialog = "2.0.3"
+tauri-plugin-fs = "2.0.3"
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = "0.2"
 
