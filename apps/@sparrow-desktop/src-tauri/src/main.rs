@@ -87,22 +87,6 @@ extern crate objc;
 
 // Commands
 #[tauri::command]
-fn zoom_window(window: tauri::Window, scale_factor: f64) {
-    let main_webview = window.get_webview_window("main").unwrap();
-    let _ = main_webview.with_webview(move |webview| {
-        #[cfg(windows)]
-        unsafe {
-            webview.controller().SetZoomFactor(scale_factor).unwrap();
-        }
-
-        // #[cfg(target_os = "macos")]
-        // unsafe {
-        //     let () = msg_send![webview.inner(), setPageZoom: scale_factor];
-        // }
-    });
-}
-
-#[tauri::command]
 fn fetch_swagger_url_command(url: &str, headers: &str, workspaceid: &str) -> Value {
     let response = import_swagger_url(url, headers, workspaceid);
     let response_value = match response {
@@ -1103,7 +1087,6 @@ fn main() {
             fetch_folder_command,
             close_oauth_window,
             make_http_request,
-            zoom_window,
             make_http_request_v2,
             connect_websocket,
             send_websocket_message,

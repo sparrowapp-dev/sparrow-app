@@ -34,6 +34,7 @@
     "core:webview:allow-internal-toggle-devtools",
     "core:webview:default",
     "core:webview:allow-set-webview-focus",
+    "core:webview:allow-set-webview-zoom",
     "shell:allow-open",
     "dialog:allow-save",
     "fs:allow-write-file",
