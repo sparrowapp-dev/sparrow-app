@@ -363,11 +363,11 @@ const disconnectWebSocket = async (tab_id: string) => {
       try {
         // Logic to handle response
         console.log("disconnected", data);
-        let listener;
+        let msgListner;
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
-            listener = wsData.listener;
+            msgListner = wsData.msgListner;
             wsData.messages.unshift({
               data: `Disconnected from ${url}`,
               transmitter: "disconnector",
@@ -376,8 +376,8 @@ const disconnectWebSocket = async (tab_id: string) => {
             });
             wsData.status = "disconnected";
             webSocketDataMap.set(tab_id, wsData);
-            if (listener) {
-              listener();
+            if (msgListner) {
+              msgListner();
             }
           }
           return webSocketDataMap;
@@ -422,11 +422,11 @@ const disconnectSocketIo = async (tab_id: string) => {
       try {
         // Logic to handle response
         console.log("disconnected", data);
-        let listener;
+        let msgListner;
         socketIoDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
-            listener = wsData.listener;
+            msgListner = wsData.msgListner;
             wsData.messages.unshift({
               data: `Disconnected from ${url}`,
               transmitter: "disconnector",
@@ -435,8 +435,8 @@ const disconnectSocketIo = async (tab_id: string) => {
             });
             wsData.status = "disconnected";
             webSocketDataMap.set(tab_id, wsData);
-            if (listener) {
-              listener();
+            if (msgListner) {
+              msgListner();
             }
           }
           return webSocketDataMap;
@@ -485,12 +485,8 @@ const convertWebSocketUrl = (url: string) => {
  * @param {string} requestHeaders - The request headers to be sent with the WebSocket connection.
  *
  * @description
- * The function also sets up a listener for messages from the WebSocket connection.
+ * The function also sets up a msgListner for messages from the WebSocket connection.
  */
-
-let listenerGracefulDisconnect: any = null;
-let listenerError: any = null;
-let listener: any = null;
 
 const connectWebSocket = async (
   url: string,
@@ -509,7 +505,7 @@ const connectWebSocket = async (
       body: "",
       filter: "All messages",
       url: url,
-      listener: null,
+      msgListner: null,
     });
 
     return webSocketDataMap;
@@ -544,25 +540,12 @@ const connectWebSocket = async (
         });
         notifications.success("WebSocket connected successfully.");
 
-        if (listenerError) {
-          await removeListener(`ws_error_${tabId}`, listenerError);
-        }
-        if (listenerGracefulDisconnect) {
-          await removeListener(
-            `ws_graceful_disconnect_${tabId}`,
-            listenerGracefulDisconnect,
-          );
-        }
-        if (listener) {
-          await removeListener(`ws_message_${tabId}`, listener);
-        }
-
-        listenerError = await listen(`ws_error_${tabId}`, (event) => {
+        const listenerError = await listen(`ws_error_${tabId}`, (event) => {
           console.log("abrupt disconnection");
           // Additional logic for error handling and cleanup can go here.
         });
 
-        listenerGracefulDisconnect = await listen(
+        const listenerGracefulDisconnect = await listen(
           `ws_graceful_disconnect_${tabId}`,
           (event) => {
             console.dir(webSocketDataStore);
@@ -571,7 +554,7 @@ const connectWebSocket = async (
         );
 
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
-        listener = await listen(`ws_message_${tabId}`, (event) => {
+        const msgListner = await listen(`ws_message_${tabId}`, (event) => {
           console.dir(event);
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
@@ -590,7 +573,7 @@ const connectWebSocket = async (
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tabId);
           if (wsData) {
-            wsData.listener = listener;
+            wsData.msgListner = msgListner;
             webSocketDataMap.set(tabId, wsData);
           }
           return webSocketDataMap;
@@ -622,7 +605,7 @@ const connectWebSocket = async (
  * @param {string} requestHeaders - The request headers to be sent with the WebSocket connection.
  *
  * @description
- * The function also sets up a listener for messages from the WebSocket connection.
+ * The function also sets up a msgListner for messages from the WebSocket connection.
  */
 const connectSocketIo = async (
   url: string,
@@ -639,7 +622,7 @@ const connectSocketIo = async (
       body: "",
       filter: "All messages",
       url: url,
-      listener: null,
+      msgListner: null,
     });
 
     return webSocketDataMap;
@@ -692,7 +675,7 @@ const connectSocketIo = async (
         );
 
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
-        const listener = await listen(
+        const msgListner = await listen(
           `socket-message-${tabId}`,
           async (event) => {
             await new Promise((res, rej) => {
@@ -744,7 +727,7 @@ const connectSocketIo = async (
         socketIoDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tabId);
           if (wsData) {
-            wsData.listener = listener;
+            wsData.msgListner = msgListner;
             webSocketDataMap.set(tabId, wsData);
           }
           return webSocketDataMap;

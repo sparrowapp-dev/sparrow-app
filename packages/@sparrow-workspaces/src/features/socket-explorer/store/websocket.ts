@@ -15,7 +15,9 @@ export type WebSocketData = {
   contentType: string;
   url: string;
   filter: "All messages" | "Sent" | "Received";
-  listener: UnlistenFn | null;
+  msgListner: UnlistenFn | null;
+  closeListner: UnlistenFn | null;
+  errListner: UnlistenFn | null;
 };
 
 export const webSocketDataStore = writable<Map<string, WebSocketData>>(
