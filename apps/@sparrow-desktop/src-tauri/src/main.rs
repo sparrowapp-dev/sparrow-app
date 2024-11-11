@@ -624,6 +624,7 @@ async fn connect_websocket(
                                 .unwrap();
                             break;
                         },
+                        
                         _ => {}
                     }
                 }
