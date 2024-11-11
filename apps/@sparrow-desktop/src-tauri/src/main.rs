@@ -593,6 +593,7 @@ async fn connect_websocket(
         },
     );
 
+    // Clone the tabid to avoid moving
     let svelte_tabid = tabid.clone();
     let app_handle_clone = app_handle.clone();
     tokio::spawn(async move {
@@ -603,25 +604,40 @@ async fn connect_websocket(
             }
             _ = async {
                 while let Some(message) = read.next().await {
-                    if let Ok(msg) = message {
-                        if let Message::Text(text) = msg {
+                    match message {
+                        Ok(Message::Text(text)) => {
                             app_handle_clone
                                 .emit(&format!("ws_message_{}", svelte_tabid), text)
                                 .unwrap();
-                        }
+                        },
+                        Ok(Message::Close(frame)) => {
+                            println!("WebSocket connection closed gracefully for tab: {}", svelte_tabid);
+                            app_handle_clone
+                                .emit(&format!("ws_graceful_disconnect_{}", svelte_tabid), format!("Disconnection detected: {:?}","error"))
+                                .unwrap();
+                            break;
+                        },
+                        Err(e) => {
+                            println!("Abrupt disconnection detected for tab {}: {:?}", svelte_tabid, e);
+                            app_handle_clone
+                                .emit(&format!("ws_error_{}", svelte_tabid), format!("Disconnection detected: {:?}", e))
+                                .unwrap();
+                            break;
+                        },
+                        _ => {}
                     }
                 }
             } => {}
         }
     });
 
+    // Clone the tabid for this async task as well
+    let svelte_tabid_clone = tabid.clone();
     tokio::spawn(async move {
         while let Some(msg) = rx.recv().await {
-            write
-                .send(Message::Text(msg))
-                .await
-                .map_err(|e| format!("Failed to send message: {}", e))
-                .unwrap();
+            if let Err(e) = write.send(Message::Text(msg)).await {
+                println!("Error sending message for tab {}: {:?}", svelte_tabid_clone, e);
+            }
         }
     });
 
@@ -631,7 +647,6 @@ async fn connect_websocket(
         status_code: 200,
         message: "Connected Successfully".to_string(),
         headers: Some(response_headers),
-        // initial_data: Some(initial_data),
     };
 
     // Serialize the response to a JSON string and return it
@@ -640,6 +655,8 @@ async fn connect_websocket(
 
     Ok(response_json)
 }
+
+
 
 #[tauri::command]
 async fn send_websocket_message(

@@ -539,8 +539,21 @@ const connectWebSocket = async (
         });
         notifications.success("WebSocket connected successfully.");
 
+        const listenerError = await listen(`ws_error_${tabId}`, (event) => {
+          console.log("abrupt disconnection");
+          // Additional logic for error handling and cleanup can go here.
+        });
+
+        const listenerGracefulDisconnect = await listen(
+          `ws_graceful_disconnect_${tabId}`,
+          (event) => {
+            console.log("gracefull disconnection");
+          },
+        );
+
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
         const listener = await listen(`ws_message_${tabId}`, (event) => {
+          console.dir(event);
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
