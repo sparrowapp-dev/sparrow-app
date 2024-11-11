@@ -11,7 +11,7 @@ import { DashboardViewModel } from "@app/pages/dashboard-page/Dashboard.ViewMode
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 import type { HttpClientResponseInterface } from "@app/types/http-client";
-import { listen } from "@tauri-apps/api/event";
+import { listen, once } from "@tauri-apps/api/event";
 import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
 import { v4 as uuidv4 } from "uuid";
 import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
@@ -540,15 +540,16 @@ const connectWebSocket = async (
         });
         notifications.success("WebSocket connected successfully.");
 
-        const listenerError = await listen(`ws_error_${tabId}`, (event) => {
+        const listenerError = await once(`ws_error_${tabId}`, (event) => {
+          notifications.error("abrupt disconnection");
           console.log("abrupt disconnection");
           // Additional logic for error handling and cleanup can go here.
         });
 
-        const listenerGracefulDisconnect = await listen(
+        const listenerGracefulDisconnect = await once(
           `ws_graceful_disconnect_${tabId}`,
           (event) => {
-            console.dir(webSocketDataStore);
+            notifications.error("gracefull disconnection");
             console.log("gracefull disconnection");
           },
         );
