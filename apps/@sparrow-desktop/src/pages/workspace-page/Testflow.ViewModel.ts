@@ -8,7 +8,7 @@ import type { TFRxDocumentType } from "../../models/testflow.model";
 import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
 import { TestflowService } from "../../services/testflow.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import type { Tab } from "@sparrow/common/types/workspace";
+import type { Tab } from "@sparrow/common/types/workspace/tab";
 
 import { createDeepCopy } from "@sparrow/common/utils";
 import {
@@ -89,7 +89,7 @@ export class TestflowViewModel {
             requestId: "",
             folderId: "",
             method: "",
-            name: "",
+            name: "Start",
           },
           position: { x: 100, y: 200 },
         },
@@ -133,6 +133,8 @@ export class TestflowViewModel {
             requestId: "",
             collectionId: "",
             folderId: "",
+            method: "",
+            name: "Start",
           },
         },
       ],
