@@ -22,4 +22,26 @@ const clearAuthJwt = (): void => {
   localStorage.removeItem(constants.REF_TOKEN);
 };
 
-export { jwtDecode, setAuthJwt, clearAuthJwt, getAuthJwt };
+/**
+ * Retrieves the authenticated client's user information.
+ *
+ * @returns An object containing the user's properties.
+ */
+const getClientUser = (): {
+  email: string;
+  name: string;
+  id: string;
+} => {
+  // Get the authentication JWT from storage or another source
+  const jwt = getAuthJwt();
+
+  // Decode the JWT to extract user information
+  const user = jwtDecode(jwt[0] as string);
+  return {
+    email: user.email,
+    name: user.name,
+    id: user._id,
+  };
+};
+
+export { jwtDecode, setAuthJwt, clearAuthJwt, getAuthJwt, getClientUser };
