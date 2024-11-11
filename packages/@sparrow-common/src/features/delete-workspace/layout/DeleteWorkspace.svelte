@@ -59,7 +59,7 @@
 
   <div
     class="d-flex align-items-center justify-content-between gap-3 mt-2 pb-3 mb-0 rounded ellipsis"
-    style="font-size: 16px;"
+    style="font-size: 16px;`"
   >
     <div class="d-flex ellipsis">
       {#if openTeam?.logo?.size}
@@ -83,7 +83,7 @@
         </p>
       </div>
     </div>
-    <div class="d-flex">
+    <div class="d-flex " >
       <Button
         title={"Cancel"}
         textStyleProp={"font-size: 16px"}

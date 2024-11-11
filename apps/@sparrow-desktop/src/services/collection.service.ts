@@ -445,7 +445,11 @@ export class CollectionService {
   public disconnectSocketIo = async (_tabId: string) => {
     return disconnectSocketIo(_tabId);
   };
-  public sendMessageSocketIo = async (_tabId: string, _message: string) => {
-    return sendSocketIoMessage(_tabId, _message);
+  public sendMessageSocketIo = async (
+    _tabId: string,
+    _message: string,
+    _eventName: string,
+  ) => {
+    return sendSocketIoMessage(_tabId, _message, _eventName);
   };
 }

@@ -93,6 +93,7 @@
         />
       {:else if workspaceNavigatorId === "settings"}
         <WorkspaceSetting
+          workspaceName={currentWorkspace.name}
           users={currentWorkspace?.users}
           {currentWorkspace}
           {onRemoveUserFromWorkspace}

@@ -15,7 +15,7 @@
     WithSelectV2,
   } from "@sparrow/workspaces/hoc";
   import { Tooltip } from "@sparrow/library/ui";
-  import { CopyIcon, DownloadIcon } from "@sparrow/library/icons";
+  import { CopyIcon, DownloadIcon2 } from "@sparrow/library/icons";
   import type { SocketIORequestMessageTabInterface } from "@sparrow/common/types/workspace/socket-io-request-tab";
 
   export let webSocket;
@@ -39,8 +39,28 @@
    * @description Copy API response to users clipboard.
    */
 
+  const currentMessage = (uuid: string) => {
+    if (webSocket) {
+      const message = webSocket.messages.find(
+        (message: SocketIORequestMessageTabInterface) => message.uuid === uuid,
+      );
+      let messageData = message?.data || "";
+      try {
+        let parse = JSON.parse(messageData);
+        if (parse[1] === "(empty)") {
+          return "\n";
+        }
+        messageData = `${parse[1]}`;
+      } catch (e) {}
+
+      return messageData;
+    }
+    return "";
+  };
+
   const handleCopy = async () => {
-    await copyToClipBoard(formatCode(webSocket?.body));
+    const data = currentMessage(webSocket?.body);
+    await copyToClipBoard(formatCode(data));
     notifications.success("Copied to clipboard");
     MixpanelEvent(Events.COPY_API_RESPONSE);
   };
@@ -78,14 +98,15 @@
 
   const handleDownloaded = async () => {
     const newHandle = await window.showSaveFilePicker({
-      suggestedName: `api_response.${fileExtension}`,
+      suggestedName: `socketio_response.${fileExtension}`,
       accept: {
         extensions: ["txt", "json", "xml", "js", "html"],
       },
     });
     const writableStream = await newHandle.createWritable();
     // write our file
-    await writableStream.write(formatCode(webSocket?.body));
+    const data = currentMessage(webSocket?.body);
+    await writableStream.write(formatCode(data));
     await writableStream.close();
     notifications.success("Exported successfully.");
     MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
@@ -174,7 +195,7 @@
       <!-- Download button -->
       <Tooltip title={"Download"}>
         <WithButtonV4
-          icon={DownloadIcon}
+          icon={DownloadIcon2}
           onClick={handleDownloaded}
           disable={false}
           loader={false}

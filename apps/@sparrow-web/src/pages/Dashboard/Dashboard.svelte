@@ -30,6 +30,7 @@
       await _viewModel.refreshTeamsWorkspaces(value._id);
     }
   });
+
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.getActiveWorkspace();
   let workspaceDocuments: Observable<WorkspaceDocument[]>;

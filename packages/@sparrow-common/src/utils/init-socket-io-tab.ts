@@ -7,6 +7,7 @@ import {
 import {
   SocketDataTypeEnum,
   SocketSectionEnum,
+  type EventsValues,
   type State,
 } from "@sparrow/common/types/workspace/socket-io-request-tab";
 import { v4 as uuidv4 } from "uuid";
@@ -70,6 +71,7 @@ class InitSocketIoTab {
             },
           ],
           message: "",
+          eventName: "",
           state: {
             requestNavigation: SocketSectionEnum.MESSAGE,
             messageLanguage: SocketDataTypeEnum.TEXT,
@@ -142,6 +144,26 @@ class InitSocketIoTab {
     }
     return this;
   }
+  public updateEvents(_events: EventsValues[]) {
+    if (!_events) {
+      return this;
+    }
+    if (this._tab?.property?.socketio) {
+      this._tab.property.socketio.events = _events;
+    }
+    return this;
+  }
+
+  public updateEventName(_eventName: EventsValues[]) {
+    if (!_eventName) {
+      return this;
+    }
+    if (this._tab?.property?.socketio) {
+      this._tab.property.socketio.eventName = _eventName;
+    }
+    return this;
+  }
+
   public updateMessage(_message: string) {
     if (typeof _message !== "string") {
       return this;

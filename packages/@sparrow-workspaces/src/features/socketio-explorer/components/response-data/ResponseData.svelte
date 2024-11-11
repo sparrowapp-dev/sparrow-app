@@ -24,11 +24,17 @@
   export let onUpdateFilterType;
   let searchData = webSocket.search;
 
+  let currentFilterType = "All messages";
+
   let filteredWebsocketMessage = [];
   const filterWebsocketResponse = () => {
     filteredWebsocketMessage = webSocket.messages
       .filter((message) => {
-        if (message.data.toLowerCase().includes(searchData.toLowerCase())) {
+        if (
+          parseMessageData(message.data)
+            .toLowerCase()
+            .includes(searchData.toLowerCase())
+        ) {
           return true;
         }
         return false;
@@ -80,15 +86,33 @@
    * @description - Highlights the searched text
    * @param text - The text to be highlighted
    * @param search - The search term
+   * @example -  ("[message] hii", "hii")
    * @returns - The HTML string with highlighted text
    */
   const highlightSearchText = (text: string, search: string): string => {
     if (!search) return text;
-    const regex = new RegExp(`(${search})`, "gi");
-    return text.replace(
-      regex,
-      `<span class="highlight-websocket-message-search">$1</span>`,
-    );
+    try {
+      // Escape special characters in search string
+      const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(`(${escapedSearch})`, "gi");
+      return text.replace(
+        regex,
+        `<span class="highlight-websocket-message-search">$1</span>`,
+      );
+    } catch (e) {}
+    return text;
+  };
+
+  /**
+   * Parse "["data","data"]" into "[data] data"
+   * @param text - response message string for socket io
+   */
+  const parseMessageData = (text: string): string => {
+    try {
+      const asf = JSON.parse(text);
+      text = "[" + asf[0] + "]" + " " + asf[1];
+    } catch (e) {}
+    return text;
   };
 </script>
 
@@ -190,6 +214,7 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("All messages");
+                currentFilterType="All messages";
               },
             },
             {
@@ -200,6 +225,7 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("Sent");
+                currentFilterType="Sent";
               },
             },
             {
@@ -210,6 +236,7 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("Received");
+                currentFilterType="Received";
               },
             },
           ]}
@@ -222,8 +249,14 @@
               isFilterDropdownActive = !isFilterDropdownActive;
             }}
           >
-            <span class="text-fs-12 pe-2 text-tertiary-100">Filter Message</span
-            >
+            {#if currentFilterType === "All messages"}
+              <span class="text-fs-12 pe-2 text-tertiary-100">All Messages</span
+              >
+            {:else if currentFilterType === "Sent"}
+              <span class="text-fs-12 pe-2 text-secondary-100">Sent</span>
+            {:else if currentFilterType === "Received"}
+              <span class="text-fs-12 pe-2 text-secondary-100">Received</span>
+            {/if}
             <DownArrowIcon
               height={"16px"}
               width={"16px"}
@@ -246,12 +279,24 @@
             onUpdateMessageBody(message.uuid);
 
             try {
-              if (message.data) {
-                JSON.parse(message.data);
-                onUpdateContentType(RequestDataTypeEnum.JSON);
+              let parse = JSON.parse(message.data);
+              if (parse[1] === "(empty)") {
+                onUpdateContentType(RequestDataTypeEnum.TEXT);
+                return;
+              }
+
+              try {
+                if (parse[1]) {
+                  JSON.parse(parse[1]);
+                  onUpdateContentType(RequestDataTypeEnum.JSON);
+                  return;
+                }
+              } catch (e) {
+                throw "Not able to parse JSON";
               }
             } catch (e) {
               onUpdateContentType(RequestDataTypeEnum.TEXT);
+              return;
             }
           }}
         >
@@ -295,7 +340,10 @@
             class="ellipsis text-fs-12 mb-0"
             style="margin-left: 8px; line-height: 1; width: calc(100% - 145px);"
           >
-            {@html highlightSearchText(message?.data, searchData)}
+            {@html highlightSearchText(
+              parseMessageData(message?.data),
+              searchData,
+            )}
           </p>
           <!-- </div> -->
         </div>

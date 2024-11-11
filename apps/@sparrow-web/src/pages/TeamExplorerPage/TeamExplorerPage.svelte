@@ -96,8 +96,6 @@
   };
 
   onMount(async () => {
-    _viewModel.refreshTeams(userId);
-    _viewModel.refreshWorkspaces(userId);
     isGuestUser = await _viewModel.getGuestUser();
   });
 

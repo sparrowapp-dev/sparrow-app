@@ -18,7 +18,16 @@
       const message = webSocket.messages.find(
         (message: SocketIORequestMessageTabInterface) => message.uuid === uuid,
       );
-      return message?.data;
+      let messageData = message?.data || "";
+      try {
+        let parse = JSON.parse(messageData);
+        if (parse[1] === "(empty)") {
+          return "\n";
+        }
+        messageData = `${parse[1]}`;
+      } catch (e) {}
+
+      return messageData;
     }
     return "";
   };

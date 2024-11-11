@@ -145,6 +145,10 @@ export interface MessageWrapper {
   message: string;
 }
 
+export interface EventNameWrapper {
+  eventName: string;
+}
+
 export interface eventKeyWrapper {
   event: string;
 }
@@ -164,7 +168,8 @@ export interface SocketIo
     UrlWrapper,
     HeadersWrapper,
     MessageWrapper,
-    EventsWrapper {}
+    EventsWrapper,
+    EventNameWrapper {}
 
 export interface SocketIoWrapper {
   socketio: SocketIo;
