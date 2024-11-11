@@ -543,16 +543,40 @@ const connectWebSocket = async (
         const listenerError = await once(`ws_error_${tabId}`, (event) => {
           notifications.error("abrupt disconnection");
           console.log("abrupt disconnection");
-          // Additional logic for error handling and cleanup can go here.
         });
 
-        const listenerGracefulDisconnect = await once(
-          `ws_graceful_disconnect_${tabId}`,
-          (event) => {
-            notifications.error("gracefull disconnection");
-            console.log("gracefull disconnection");
-          },
-        );
+        await once(`ws_graceful_disconnect_${tabId}`, (event) => {
+          webSocketDataStore.update((webSocketDataMap) => {
+            const wsData = webSocketDataMap.get(tabId);
+
+            if (wsData) {
+              let msgListner: any = wsData.msgListner;
+
+              wsData.messages.unshift({
+                data: `Disconnected from ${url}`,
+
+                transmitter: "disconnector",
+
+                timestamp: formatTime(new Date()),
+
+                uuid: uuidv4(),
+              });
+
+              wsData.status = "disconnected";
+
+              webSocketDataMap.set(tabId, wsData);
+
+              if (msgListner) {
+                msgListner();
+              }
+            }
+
+            return webSocketDataMap;
+          });
+
+          notifications.error("Connection Lost");
+          console.log("gracefull disconnection");
+        });
 
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
         const msgListner = await listen(`ws_message_${tabId}`, (event) => {
