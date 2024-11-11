@@ -14,11 +14,12 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { TeamService } from "../../services/team.service";
 import { UserService } from "../../services/user.service";
 import { WorkspaceService } from "../../services/workspace.service";
-import { InitWorkspaceTab } from "@sparrow/common/utils";
+import { InitWorkspaceTab, Sleep } from "@sparrow/common/utils";
 import { notifications } from "@sparrow/library/ui";
 import { BehaviorSubject, Observable } from "rxjs";
 import { navigate } from "svelte-navigator";
 import { v4 as uuidv4 } from "uuid";
+import { getClientUser } from "../../utils/jwt";
 
 export class TeamExplorerPageViewModel {
   constructor() {}
@@ -290,17 +291,20 @@ export class TeamExplorerPageViewModel {
         ...res,
         id: res._id,
       });
-      user.subscribe(async (value) => {
-        if (value) {
-          await this.refreshTeams(value._id);
-          await this.refreshWorkspaces(value._id);
-        }
-      });
+
+      await new Sleep().setTime(2000).exec();
+      const clientUserId = getClientUser().id;
+      if (clientUserId) {
+        await this.refreshTeams(clientUserId);
+        await this.refreshWorkspaces(clientUserId);
+      }
+
       const initWorkspaceTab = new InitWorkspaceTab(res._id, res._id);
       initWorkspaceTab.updateName(res.name);
       await this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
       await this.workspaceRepository.setActiveWorkspace(res._id);
-      navigate("/dashboard/collections");
+      // this will be removed when we unlock collection in web app.
+      // navigate("collections");
       notifications.success("New Workspace Created");
       MixpanelEvent(Events.Create_New_Workspace_TeamPage);
     }
