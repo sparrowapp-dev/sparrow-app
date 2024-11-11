@@ -115,6 +115,7 @@ jobs:
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           rustup install 1.76.0
           rustup default 1.76.0
+          rustup target add x86_64-apple-darwin
 
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
