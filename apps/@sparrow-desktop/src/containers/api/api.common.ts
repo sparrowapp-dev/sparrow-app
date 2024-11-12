@@ -541,6 +541,7 @@ const connectWebSocket = async (
 
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
         const listener = await listen(`ws_message_${tabId}`, (event) => {
+          console.dir(event);
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
