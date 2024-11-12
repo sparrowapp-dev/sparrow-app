@@ -491,22 +491,29 @@ async fn connect_websocket(
 ) -> Result<String, String> {
     println!("inside the websocket");
 
+    // Deserialize the JSON string into a Vec<KeyValue>
     let headers_key_values: Vec<KeyValue> =
         serde_json::from_str(&headers).map_err(|e| format!("Failed to parse headers: {}", e))?;
 
+    // Create a HashMap to store key-value pairs
     let mut headers_key_value_map: HashMap<String, String> = HashMap::new();
+
+    // Iterate over key_values and add key-value pairs to the map
     for kv in headers_key_values {
         headers_key_value_map.insert(kv.key, kv.value);
     }
 
+    // Create an HTTPS connector and client
     let https = HttpsConnector::new();
     let client: OtherClient<_, hyper::Body> = OtherClient::builder().build::<_, hyper::Body>(https);
 
+    // Build the HTTP request to upgrade to WebSocket
     let mut req_builder = Request::builder()
         .uri(&httpurl)
         .header(UPGRADE, "websocket")
         .header(CONNECTION, "Upgrade");
 
+    // Add custom headers to the request
     for (key, value) in headers_key_value_map.iter() {
         req_builder = req_builder.header(
             key,
@@ -514,23 +521,28 @@ async fn connect_websocket(
         );
     }
 
+    // Unwrap the body
     let req = req_builder
         .body(hyper::Body::empty())
         .map_err(|e| format!("Failed to build request: {}", e))?;
 
+    // Send the HTTP request and await the response to check if upgrade to websocket is possible or not.
     let response = client
         .request(req)
         .await
         .map_err(|e| format!("Failed to request: {}", e))?;
 
+    // Check if the upgrade to WebSocket was successful
     if response.status() != 101 {
         return Err(format!("Failed to upgrade: {:?}", response.status()));
     }
 
+    // Establish the WebSocket connection and convert the response into a WebSocket stream
     let (ws_stream, response) = connect_async(url)
         .await
         .map_err(|e| format!("Failed to connect: {}", e))?;
 
+    // Extract headers from the response
     let mut response_headers = HashMap::new();
     for (key, value) in response.headers() {
         if let Ok(header_value) = value.to_str() {
@@ -538,11 +550,11 @@ async fn connect_websocket(
         }
     }
 
-    // Wrap `write` in an Arc<Mutex<_>> so it can be shared across tasks
-    let (write, mut read) = ws_stream.split();
-    let write = Arc::new(Mutex::new(write));
+    // Split the WebSocket stream into read and write halves
+    let (mut write, mut read) = ws_stream.split();
 
     let (tx, mut rx) = mpsc::unbounded_channel::<String>();
+
     let (disconnect_tx, disconnect_rx) = tokio::sync::oneshot::channel();
     let disconnect_handle = Arc::new(Mutex::new(Some(disconnect_tx)));
 
@@ -554,74 +566,64 @@ async fn connect_websocket(
         },
     );
 
+    // Clone the tabid to avoid moving
     let svelte_tabid = tabid.clone();
     let app_handle_clone = app_handle.clone();
+    tokio::spawn(async move {
+        tokio::select! {
+            _ = disconnect_rx => {
+                // Handle disconnection here
+                println!("WebSocket connection closed for tab: {}", svelte_tabid);
+            }
+            _ = async {
+                while let Some(message) = read.next().await {
+                    match message {
+                        Ok(Message::Text(text)) => {
+                            app_handle_clone
+                                .emit(&format!("ws_message_{}", svelte_tabid), text)
+                                .unwrap();
+                        },
+                        Ok(Message::Close(frame)) => {
+                            println!("WebSocket connection closed gracefully for tab: {}", svelte_tabid);
+                            let close_status = format!("Connection closed gracefully for tab: {} with frame: {:?}", svelte_tabid, frame);
 
-    let ping_interval = interval(Duration::from_secs(5));
-    let pong_timeout = Duration::from_secs(10);
+                         app_handle_clone
+                             .emit(&format!("ws_message_{}", svelte_tabid), format!("{{\"status\":\"disconnected\",\"message\": \"{}\"}}", close_status))
+                             .unwrap();
 
-    tokio::spawn({
-        let write = write.clone();
-        async move {
-            tokio::select! {
-                _ = disconnect_rx => {
-                    println!("WebSocket connection closed for tab: {}", svelte_tabid);
-                }
-                _ = async {
-                    let mut ping_interval = ping_interval;
-                    loop {
-                        tokio::select! {
-                            Some(message) = read.next() => {
-                                if let Ok(msg) = message {
-                                    let event = format!("ws_message_{}", svelte_tabid);
-                                    match msg {
-                                        Message::Text(text) => {
-                                            app_handle_clone.emit(event.as_str(), text).unwrap();
-                                        }
-                                        Message::Ping(_) => {
-                                            // Respond with Pong without emitting to the UI
-                                            let mut write = write.lock().await;
-                                            write.send(Message::Pong(Vec::new())).await.unwrap();
-                                        }
-                                        Message::Pong(_) => {
-                                            // Do not emit Pong message to UI
-                                            // Just reset any disconnection handling if necessary
-                                        }
-                                        _ => {}
-                                    }
-                                }
-                            },
-                            _ = ping_interval.tick() => {
-                                let mut write = write.lock().await;
-                                if write.send(Message::Ping(Vec::new())).await.is_err() {
-                                    println!("Failed to send Ping, closing connection");
-                                    break;
-                                }
+                            break;
+                        },
+                        Err(e) => {
+                            println!("Abrupt disconnection detected for tab {}: {:?}", svelte_tabid, e);
+                            let error_status = format!("Abrupt disconnection detected for tab {}: {:?}", svelte_tabid, e);
+                            app_handle_clone
 
-                                // Wait for Pong within timeout period
-                                if timeout(pong_timeout, read.next()).await.is_err() {
-                                    println!("Pong response timed out; disconnecting");
-                                    app_handle_clone.emit(format!("ws_message_{}", svelte_tabid).as_str(), "{\"status\":\"disconnected\"}").unwrap();
-                                    break;
-                                }
-                            }
-                        }
+                                .emit(&format!("ws_message_{}", svelte_tabid), format!("{{\"status\":\"disconnected\",\"message\": \"{}\"}}", error_status))
+                                .unwrap();
+
+                            break;
+                        },
+                        _ => {}
                     }
-                } => {}
+                }
+            } => {}
+        }
+    });
+
+    // Clone the tabid for this async task as well
+    let svelte_tabid_clone = tabid.clone();
+    tokio::spawn(async move {
+        while let Some(msg) = rx.recv().await {
+            if let Err(e) = write.send(Message::Text(msg)).await {
+                println!(
+                    "Error sending message for tab {}: {:?}",
+                    svelte_tabid_clone, e
+                );
             }
         }
     });
 
-    tokio::spawn({
-        let write = write.clone();
-        async move {
-            while let Some(msg) = rx.recv().await {
-                let mut write = write.lock().await;
-                write.send(Message::Text(msg)).await.unwrap();
-            }
-        }
-    });
-
+    // Create a success response
     let response = WebSocketResponse {
         is_successful: true,
         status_code: 200,
@@ -629,6 +631,7 @@ async fn connect_websocket(
         headers: Some(response_headers),
     };
 
+    // Serialize the response to a JSON string and return it
     let response_json = serde_json::to_string(&response)
         .map_err(|e| format!("Failed to serialize response: {}", e))?;
 
