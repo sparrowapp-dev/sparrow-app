@@ -32,49 +32,58 @@
   let isSelectEmpty = false;
 
   const handleLogoInputChange = (e: any) => {
-    const errorMessage =
-      "Failed to upload the file. You are allowed to upload only 5 files per feedback.";
+    const maxImageSize = 2097152; // 2 MB
+    const maxFiles = 5;
+    const formatErrorMessage =
+      "This file type isn’t supported. Upload in SVG, JPEG, JPG, or PNG.";
+    const sizeErrorMessage = "Upload limit exceeded. Choose a file under 2 MB.";
+    const limitErrorMessage = `Upload limit reached! You can upload up to ${maxFiles} files.`;
 
-    let targetFile = [
+    let targetFiles = [
       ...uploadFeedback.file.value,
       ...(e?.target?.files || e?.dataTransfer?.files),
     ];
-    const maxImageSize = 2097152; // 2 MB
-    if (targetFile?.length === 0) {
-      return;
-    }
-    let isErrorThrown = false;
-    const selectedFiles = targetFile.filter((file) => {
+
+    if (targetFiles.length === 0) return;
+
+    let selectedFiles = [];
+    let isFormatError = false;
+    let isSizeError = false;
+    let isLimitError = false;
+
+    selectedFiles = targetFiles.filter((file) => {
       const fileType = `.${(file?.name).split(".").pop().toLowerCase()}`;
 
       if (
-        fileType === ".jpg" ||
-        fileType === ".jpeg" ||
-        fileType === ".png" ||
-        fileType === ".svg"
+        fileType !== ".jpg" &&
+        fileType !== ".jpeg" &&
+        fileType !== ".png" &&
+        fileType !== ".svg"
       ) {
-        if (file.size > maxImageSize) {
-          // image size exceeded
-          isErrorThrown = true;
-          return false;
-        }
-        return true;
-      } else {
-        isErrorThrown = true;
+        isFormatError = true;
         return false;
       }
+      if (file.size > maxImageSize) {
+        isSizeError = true;
+        return false;
+      }
+      return true;
     });
-    if (selectedFiles.length > 5) {
-      selectedFiles.length = 5;
-      isErrorThrown = true;
+
+    if (selectedFiles.length > maxFiles) {
+      selectedFiles.length = maxFiles;
+      isLimitError = true;
     }
-    if (isErrorThrown) {
-      notifications.error(errorMessage);
-    }
+
+    if (isFormatError) notifications.error(formatErrorMessage);
+    if (isSizeError) notifications.error(sizeErrorMessage);
+    if (isLimitError) notifications.error(limitErrorMessage);
+
     uploadFeedback.file.value = selectedFiles;
 
     e.target.value = "";
   };
+
   const removeFile = (index: number) => {
     const files = Array.from(uploadFeedback.file.value).filter((elem, i) => {
       if (i !== index) {

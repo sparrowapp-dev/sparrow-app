@@ -235,6 +235,7 @@ class HelpPageViewModel {
     search: string,
     status: string,
     userId: string,
+    currentCategory: string,
     limit: number,
     skip: number,
   ) => {
@@ -256,7 +257,13 @@ class HelpPageViewModel {
       );
       return { ...post, isPostLiked: isLiked };
     });
-    return result;
+
+    // debugger
+    const filteredResult = currentCategory
+      ? result?.filter((post) => post.category?.name === currentCategory)
+      : result;
+
+    return filteredResult;
   };
 
   /**
