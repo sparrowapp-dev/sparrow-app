@@ -15,7 +15,7 @@
     WithSelectV2,
   } from "@sparrow/workspaces/hoc";
   import { Tooltip } from "@sparrow/library/ui";
-  import { CopyIcon, DownloadIcon } from "@sparrow/library/icons";
+  import { CopyIcon, DownloadIcon2 } from "@sparrow/library/icons";
   import type { SocketIORequestMessageTabInterface } from "@sparrow/common/types/workspace/socket-io-request-tab";
 
   export let webSocket;
@@ -59,7 +59,7 @@
   };
 
   const handleCopy = async () => {
-    const data = currentMessage(webSocket.body);
+    const data = currentMessage(webSocket?.body);
     await copyToClipBoard(formatCode(data));
     notifications.success("Copied to clipboard");
     MixpanelEvent(Events.COPY_API_RESPONSE);
@@ -98,14 +98,14 @@
 
   const handleDownloaded = async () => {
     const newHandle = await window.showSaveFilePicker({
-      suggestedName: `api_response.${fileExtension}`,
+      suggestedName: `socketio_response.${fileExtension}`,
       accept: {
         extensions: ["txt", "json", "xml", "js", "html"],
       },
     });
     const writableStream = await newHandle.createWritable();
     // write our file
-    const data = currentMessage(webSocket.body);
+    const data = currentMessage(webSocket?.body);
     await writableStream.write(formatCode(data));
     await writableStream.close();
     notifications.success("Exported successfully.");
@@ -195,7 +195,7 @@
       <!-- Download button -->
       <Tooltip title={"Download"}>
         <WithButtonV4
-          icon={DownloadIcon}
+          icon={DownloadIcon2}
           onClick={handleDownloaded}
           disable={false}
           loader={false}
