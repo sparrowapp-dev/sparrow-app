@@ -526,6 +526,7 @@
         } else {
           confirmationError = "";
           handleMemberOwnershipPopUpSuccess();
+          confirmationText = "";
         }
       }}
     />

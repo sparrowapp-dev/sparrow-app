@@ -10,6 +10,7 @@
 
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
+  import FileType from "../../../../../../compopnents/file-type/FileType.svelte";
   let os = "";
   const osDetector = new OSDetector();
   onMount(() => {
@@ -130,6 +131,13 @@
     />
   </div>
   {#if uploadTeamIcon.file.showFileTypeError}
+    <div class="d-flex">
+      {#each ICON_CONFIG.FILE_TYPES as fileType (fileType)}
+        <span class="me-4">
+          <FileType {fileType} />
+        </span>
+      {/each}
+    </div>
     <!-- Error message for unsupported file type -->
     <p class=" text-danger-200 mt-2 text-fs-12">
       {ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
