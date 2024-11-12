@@ -60,6 +60,7 @@ use serde_json::json;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::process::Command;
+use tauri::Emitter;
 use tauri::Manager;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
@@ -92,22 +93,6 @@ use futures_util::FutureExt;
 extern crate objc;
 
 // Commands
-#[tauri::command]
-fn zoom_window(window: tauri::Window, scale_factor: f64) {
-    let main_webview = window.get_webview_window("main").unwrap();
-    let _ = main_webview.with_webview(move |webview| {
-        #[cfg(windows)]
-        unsafe {
-            webview.controller().SetZoomFactor(scale_factor).unwrap();
-        }
-
-        #[cfg(target_os = "macos")]
-        unsafe {
-            let () = msg_send![webview.inner(), setPageZoom: scale_factor];
-        }
-    });
-}
-
 #[tauri::command]
 fn fetch_swagger_url_command(url: &str, headers: &str, workspaceid: &str) -> Value {
     let response = import_swagger_url(url, headers, workspaceid);
@@ -601,10 +586,11 @@ async fn connect_websocket(
             _ = async {
                 while let Some(message) = read.next().await {
                     if let Ok(msg) = message {
+                        let event = format!("ws_message_{}", svelte_tabid);
                         if let Message::Text(text) = msg {
                             app_handle_clone
-                                .emit(&format!("ws_message_{}", svelte_tabid), text)
-                                .unwrap();
+                            .emit(event.as_str(), text)
+                            .unwrap();
                         }
                     }
                 }
@@ -919,6 +905,8 @@ fn main() {
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             app.emit(
                 "single-instance",
@@ -961,7 +949,6 @@ fn main() {
             fetch_folder_command,
             close_oauth_window,
             make_http_request,
-            zoom_window,
             make_http_request_v2,
             connect_websocket,
             send_websocket_message,
@@ -971,15 +958,17 @@ fn main() {
             send_socket_io_message
         ])
         .on_page_load(|wry_window, _payload| {
-            if wry_window.url().host_str() == Some("www.google.com") {
-                wry_window
-                    .emit(
-                        "receive-login",
-                        Payload {
-                            url: _payload.url().to_string(),
-                        },
-                    )
-                    .unwrap();
+            if let Ok(url) = wry_window.url() {
+                if url.host_str() == Some("www.google.com") {
+                    wry_window
+                        .emit(
+                            "receive-login",
+                            Payload {
+                                url: _payload.url().to_string(),
+                            },
+                        )
+                        .unwrap();
+                }
             }
         })
         .run(tauri::generate_context!())
