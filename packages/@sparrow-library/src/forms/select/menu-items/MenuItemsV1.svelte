@@ -34,7 +34,7 @@
   }}
 >
   <p
-    class="m-0 p-0 {getTextColor(list?.color)}  {isMenuItemHover &&
+    class="m-0 p-0 {getTextColor(list?.color)} ellipsis {isMenuItemHover &&
     !list?.color
       ? 'highlight-menu-item'
       : ''}"
