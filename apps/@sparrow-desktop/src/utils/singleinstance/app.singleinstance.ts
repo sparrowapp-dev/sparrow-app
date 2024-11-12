@@ -1,9 +1,9 @@
 import { listen } from "@tauri-apps/api/event";
-import { getCurrent } from "@tauri-apps/api/window";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 export const singleInstanceHandlerWindows = async () => {
-  await getCurrent().setFocus();
-  await getCurrent().center();
+  await getCurrentWindow().setFocus();
+  await getCurrentWindow().center();
 };
 
 export const singleInstanceHandler = async () => {
