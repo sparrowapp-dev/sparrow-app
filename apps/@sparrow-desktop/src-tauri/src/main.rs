@@ -452,11 +452,6 @@ struct Payload {
     url: String,
 }
 
-#[derive(Clone, serde::Serialize)]
-struct OnClosePayload {
-    message: String,
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 struct MyResponse {
     tab_id: String,
@@ -710,12 +705,6 @@ async fn disconnect_websocket(
 struct SocketIoResponse {
     is_successful: bool,
     status_code: u16,
-    message: String,
-}
-
-#[derive(Serialize)]
-struct SocketIOResponseV2 {
-    is_successful: bool,
     message: String,
 }
 
