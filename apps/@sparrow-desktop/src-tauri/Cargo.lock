@@ -3730,9 +3730,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a6a8672db895d567b3c0b8a4c0d3e98113ebb32badf6ce66004e743e5ee1e1e"
 dependencies = [
  "adler32",
+ "async-stream",
  "backoff",
  "base64 0.21.7",
  "bytes",
+ "futures-util",
  "log",
  "native-tls",
  "rand 0.8.5",
@@ -3740,6 +3742,7 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror",
+ "tokio",
  "url",
 ]
 

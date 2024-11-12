@@ -40,7 +40,7 @@ native-tls = "0.2"
 tungstenite = "0.20.1"
 url = "2.2"
 futures = "0.3"
-rust_socketio = "0.6.0"
+rust_socketio = { version = "*", features = ["async"] }
 tauri-plugin-os = "2.0.0-rc"
 tauri-plugin-updater = "2.0.0-rc"
 tauri-plugin-process = "2.0.0-rc"
