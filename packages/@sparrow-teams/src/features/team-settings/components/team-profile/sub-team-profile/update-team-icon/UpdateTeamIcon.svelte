@@ -131,6 +131,10 @@
     />
   </div>
   {#if uploadTeamIcon.file.showFileTypeError}
+    <!-- Error message for unsupported file type -->
+    <p class=" text-danger-200 mt-2 text-fs-12">
+      {ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
+    </p>
     <div class="d-flex">
       {#each ICON_CONFIG.FILE_TYPES as fileType (fileType)}
         <span class="me-4">
@@ -138,10 +142,6 @@
         </span>
       {/each}
     </div>
-    <!-- Error message for unsupported file type -->
-    <p class=" text-danger-200 mt-2 text-fs-12">
-      {ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
-    </p>
   {:else if uploadTeamIcon.file.showFileSizeError}
     <!-- Error message for file size exceeding the limit -->
     <p class=" text-danger-200 mt-2 text-fs-12">

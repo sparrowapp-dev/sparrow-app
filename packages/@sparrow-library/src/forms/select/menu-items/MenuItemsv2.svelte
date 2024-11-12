@@ -127,12 +127,11 @@
 <style>
   .select-option-container {
     width: 100%;
-    min-height: 48px;
   }
 
   .content-wrapper {
     flex: 1;
-    min-width: 0; /* Important for text truncation */
+    min-width: 0; 
   }
 
   .option-name {
