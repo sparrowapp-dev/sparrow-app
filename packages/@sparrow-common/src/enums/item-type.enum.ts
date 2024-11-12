@@ -8,6 +8,7 @@ export enum ItemType {
   ENVIRONMENT = "ENVIRONMENT",
   TESTFLOW = "TESTFLOW",
   SOCKET_IO = "SOCKETIO",
+  GRAPHQL = "GRAPHQL",
 }
 
 export enum UntrackedItems {

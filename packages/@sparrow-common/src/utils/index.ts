@@ -3,6 +3,7 @@ export { InitCollectionTab } from "./init-collection-tab";
 export { InitEnvironmentTab } from "./init-environment-tab";
 export { InitWorkspaceTab } from "./init-workspace-tab";
 export { InitFolderTab } from "./init-folder-tab";
+export { InitGraphqlTab } from "./init-graphql-tab";
 export { Debounce } from "./debounce";
 export { CompareArray } from "./compare-array";
 export { InitWebSocketTab } from "./init-web-socket-tab";

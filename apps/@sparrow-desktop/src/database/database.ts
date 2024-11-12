@@ -226,6 +226,9 @@ export class RxDB {
           14: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          15: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       collection: {

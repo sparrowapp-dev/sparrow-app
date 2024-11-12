@@ -37,6 +37,7 @@
     CollectionItemBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+  import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
   /**
    * Callback for Item created
@@ -326,6 +327,22 @@
         },
         {
           onClick: () => {
+            onItemCreated("graphqlFolder", {
+              workspaceId: collection.workspaceId,
+              collection,
+              folder: explorer,
+            });
+          },
+          displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+          disabled: false,
+          hidden:
+            !collection.activeSync ||
+            (explorer?.source === "USER" && collection.activeSync)
+              ? false
+              : true,
+        },
+        {
+          onClick: () => {
             isFolderPopup = true;
           },
           displayText: "Delete",
@@ -570,6 +587,21 @@
           {activeTabId}
           {activeTabPath}
         />
+      </div>
+    {:else if explorer.type === ItemType.GRAPHQL}
+      <div style="cursor:pointer;">
+        <!-- <SocketIo
+          bind:userRole
+          socketIo={explorer}
+          {onItemRenamed}
+          {onItemDeleted}
+          {onItemOpened}
+          {folder}
+          {collection}
+          {activeTabId}
+          {activeTabPath}
+        /> -->
+        gql
       </div>
     {/if}
   {/if}

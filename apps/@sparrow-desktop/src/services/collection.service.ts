@@ -30,6 +30,11 @@ import type {
   SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
   SocketIORequestDeletePayloadDtoInterface,
 } from "@sparrow/common/types/workspace/socket-io-request-dto";
+import type {
+  GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface,
+  GraphqlRequestCreateUpdateInFolderPayloadDtoInterface,
+  GraphqlRequestDeletePayloadDtoInterface,
+} from "@sparrow/common/types/workspace/graphql-request-dto";
 
 export class CollectionService {
   constructor() {}
@@ -451,5 +456,65 @@ export class CollectionService {
     _eventName: string,
   ) => {
     return sendSocketIoMessage(_tabId, _message, _eventName);
+  };
+
+  public addGraphqlInCollection = async (
+    _graphql:
+      | GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface
+      | GraphqlRequestCreateUpdateInFolderPayloadDtoInterface,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionItemDtoInterface>
+    >
+  > => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/collection/graphql`,
+      {
+        body: _graphql,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateGraphqlInCollection = async (
+    _graphqlId: string,
+    _graphql:
+      | GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface
+      | GraphqlRequestCreateUpdateInFolderPayloadDtoInterface,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionItemDtoInterface>
+    >
+  > => {
+    const response = await makeRequest(
+      "PUT",
+      `${this.apiUrl}/api/collection/graphql/${_graphqlId}`,
+      {
+        body: _graphql,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public deleteGraphqlInCollection = async (
+    _graphqlId: string,
+    _graphql: GraphqlRequestDeletePayloadDtoInterface,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionDtoInterface>
+    >
+  > => {
+    const response = await makeRequest(
+      "DELETE",
+      `${this.apiUrl}/api/collection/graphql/${_graphqlId}`,
+      {
+        body: _graphql,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
   };
 }

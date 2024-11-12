@@ -84,6 +84,7 @@ import type {
   SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
 } from "@sparrow/common/types/workspace/socket-io-request-dto";
 import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+import type { GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface } from "@sparrow/common/types/workspace/graphql-request-dto";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -325,6 +326,21 @@ export default class CollectionsViewModel {
     if (ws) {
       this.tabRepository.createTab(
         this.initTab.socketIo("UNTRACKED-" + uuidv4(), ws._id).getValue(),
+      );
+      moveNavigation("right");
+    } else {
+      console.error("No active workspace found!");
+    }
+  };
+
+  /**
+   * Create web socket new tab with untracked id
+   */
+  private createGraphqlNewTab = async () => {
+    const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
+    if (ws) {
+      this.tabRepository.createTab(
+        this.initTab.graphQl("UNTRACKED-" + uuidv4(), ws._id).getValue(),
       );
       moveNavigation("right");
     } else {
@@ -1188,6 +1204,95 @@ export default class CollectionsViewModel {
   };
 
   /**
+   * Handle creating a new graphql in a collection
+   * @param _workspaceId - workspace id
+   * @param _collection - the collection in which new graphql is going to be created
+   */
+  private handleCreateGraphqlInCollection = async (
+    _workspaceId: string,
+    _collection: CollectionDto,
+  ) => {
+    const graphqlTab = new InitTab().graphQl(uuidv4(), _workspaceId);
+    const graphqlOfCollectionPayload: GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface =
+      {
+        collectionId: _collection.id,
+        workspaceId: _workspaceId,
+        currentBranch: _collection.activeSync
+          ? _collection.currentBranch
+          : undefined,
+        source: _collection.activeSync ? "USER" : undefined,
+        items: {
+          name: graphqlTab.getValue().name,
+          type: CollectionItemTypeDtoEnum.GRAPHQL,
+          description: "",
+          graphql: {},
+        },
+      };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      await this.collectionRepository.addRequestOrFolderInCollection(
+        _collection.id as string,
+        {
+          ...graphqlOfCollectionPayload.items,
+          id: graphqlTab.getValue().id,
+        },
+      );
+      graphqlTab.updatePath({
+        workspaceId: _workspaceId,
+        collectionId: _collection.id,
+        folderId: "",
+      });
+      graphqlTab.updateIsSave(true);
+      await this.tabRepository.createTab(graphqlTab.getValue());
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    }
+
+    const response = await this.collectionService.addGraphqlInCollection(
+      graphqlOfCollectionPayload,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+
+      await this.collectionRepository.addRequestOrFolderInCollection(
+        _collection.id as string,
+        {
+          ...res,
+        },
+      );
+
+      graphqlTab.updateId(res.id as string);
+      graphqlTab.updatePath({
+        workspaceId: _workspaceId,
+        collectionId: _collection.id,
+        folderId: "",
+      });
+      graphqlTab.updateIsSave(true);
+
+      this.tabRepository.createTab(graphqlTab.getValue());
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    } else {
+      this.collectionRepository.deleteRequestOrFolderInCollection(
+        _collection.id,
+        graphqlTab.getValue().id,
+      );
+      notifications.error(response.message);
+    }
+  };
+
+  /**
    * Handles creating a new request in a folder
    * @param workspaceId :string
    * @param collection :CollectionDocument - the collection in which new request is going to be created
@@ -1227,7 +1332,7 @@ export default class CollectionsViewModel {
           type: sampleRequest.getValue().type,
           description: "",
           request: {
-            method: sampleRequest.getValue().property.request.method,
+            method: sampleRequest.getValue().property.request?.method,
           } as RequestDto,
         },
       },
@@ -3319,6 +3424,22 @@ export default class CollectionsViewModel {
         );
         break;
       case "socketioFolder":
+        await this.handleCreateSocketIoInFolder(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+        );
+        break;
+      case "graphql":
+        await this.createGraphqlNewTab();
+        break;
+      case "graphqlCollection":
+        await this.handleCreateGraphqlInCollection(
+          args.workspaceId,
+          args.collection as CollectionDto,
+        );
+        break;
+      case "graphqlFolder":
         await this.handleCreateSocketIoInFolder(
           args.workspaceId,
           args.collection as CollectionDto,
