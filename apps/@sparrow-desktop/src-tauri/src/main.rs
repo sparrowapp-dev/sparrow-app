@@ -75,8 +75,8 @@ use hyper_tls::HttpsConnector;
 use std::sync::Arc;
 use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::sync::Mutex;
-use tokio_tungstenite::tungstenite::protocol::Message;
 use tokio_tungstenite::connect_async;
+use tokio_tungstenite::tungstenite::protocol::Message;
 
 // Socket.IO imports
 use rust_socketio::{
@@ -715,8 +715,6 @@ struct SocketIoDisconnectResponse {
     message: String,
 }
 
-
-
 #[tauri::command]
 async fn connect_socket_io(
     url: String,
@@ -789,11 +787,14 @@ async fn connect_socket_io(
 
     // Store the connected client in the shared state
     {
-        let mut clients = state.connections.lock().await; // Await the lock acquisition
+        let tabid_clone_clone = tabid_clone.clone();
 
         // Remove Tab ID if already exists in state and then add a new entry
-        clients.remove(&tabid_clone);
-        clients.insert(tabid_clone, socket);
+        let _ = disconnect_socket_io(tabid_clone, state.clone()).await;
+
+        let mut clients = state.connections.lock().await; // Await the lock acquisition
+
+        clients.insert(tabid_clone_clone, socket);
     }
 
     // Create successful connection response
