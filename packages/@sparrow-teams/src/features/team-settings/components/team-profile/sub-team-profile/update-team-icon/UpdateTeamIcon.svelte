@@ -10,7 +10,7 @@
 
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
-  import FileType from "../../../../../../compopnents/file-type/FileType.svelte";
+  import { FileType } from "../../../../../../compopnents";
   let os = "";
   const osDetector = new OSDetector();
   onMount(() => {

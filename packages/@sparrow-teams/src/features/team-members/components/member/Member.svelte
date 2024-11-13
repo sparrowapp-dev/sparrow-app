@@ -431,6 +431,8 @@
   isOpen={memberPopObj.isMemberOwnershipPopup}
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberOwnershipPopup");
+    confirmationText = "";
+    confirmationError="";
   }}
 >
   <div style="font-size: 14px;" class="text-lightGray mb-1">
@@ -526,7 +528,7 @@
         } else {
           confirmationError = "";
           handleMemberOwnershipPopUpSuccess();
-          confirmationText = "";
+          
         }
       }}
     />
@@ -541,6 +543,7 @@
   isOpen={memberPopObj.isMemberInfoPopup}
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberInfoPopup");
+ 
   }}
 >
   <Profile
