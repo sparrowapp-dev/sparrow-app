@@ -75,8 +75,8 @@ use hyper_tls::HttpsConnector;
 use std::sync::Arc;
 use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::sync::Mutex;
-use tokio_tungstenite::tungstenite::protocol::Message;
 use tokio_tungstenite::connect_async;
+use tokio_tungstenite::tungstenite::protocol::Message;
 
 // Socket.IO imports
 use rust_socketio::{
@@ -715,8 +715,6 @@ struct SocketIoDisconnectResponse {
     message: String,
 }
 
-
-
 #[tauri::command]
 async fn connect_socket_io(
     url: String,
@@ -731,13 +729,20 @@ async fn connect_socket_io(
     let header_vec: Vec<KeyValue> =
         serde_json::from_str(&headers).map_err(|e| format!("Failed to parse headers: {}", e))?;
 
+    // Clone tabid so it can be used at multiple places
     let tabid_clone = tabid.clone();
+    let tabid_clone_clone = tabid.clone();
+
+    // Clone app_handle so it can be used at multiple places
+    let app_handle_clone = app_handle.clone();
+    let app_handle_clone_clone = app_handle.clone();
+
 
     let socket_event_listener = move |event: SocketIoEvent,
                                       payload: SocketIoPayload,
                                       _socket: SocketClient| {
-        let app_handle_clone = app_handle.clone();
-        let tabid_clone = tabid.clone();
+        let app_handle_clone = app_handle_clone.clone();
+        let tabid_clone = tabid_clone.clone();
 
         async move {
             // Create a message JSON object
@@ -771,6 +776,20 @@ async fn connect_socket_io(
     // Create a new Socket.IO client
     let mut builder = ClientBuilder::new(&url)
         .namespace(&namespace)
+        .on("error", move |err, _| {
+            // Clone tabid_clone and app_handle_clone for use in the error handler closure
+            let tabid_clone = tabid_clone_clone.clone();
+            let app_handle_clone = app_handle_clone_clone.clone();
+
+            async move {
+                // Emit error message on error event
+                let _ = app_handle_clone.emit(
+                    &format!("socket-disconnect-{}", tabid_clone),
+                    json!({ "message": format!("Error: {:#?}", err) }),
+                );
+            }
+            .boxed()
+        })
         .reconnect(false)
         .auth(json!({}))
         .transport_type(TransportType::Websocket)
@@ -789,11 +808,14 @@ async fn connect_socket_io(
 
     // Store the connected client in the shared state
     {
-        let mut clients = state.connections.lock().await; // Await the lock acquisition
+        let tabid_clone_clone = tabid.clone();
 
         // Remove Tab ID if already exists in state and then add a new entry
-        clients.remove(&tabid_clone);
-        clients.insert(tabid_clone, socket);
+        let _ = disconnect_socket_io(tabid.clone(), state.clone()).await;
+
+        let mut clients = state.connections.lock().await; // Await the lock acquisition
+
+        clients.insert(tabid_clone_clone, socket);
     }
 
     // Create successful connection response
