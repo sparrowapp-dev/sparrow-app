@@ -60,7 +60,7 @@
         on:input={() => {}}
         width={"300px"}
         style="outline:none; width:358px; font-size:12px !important; height:32px; background-color: var(--bg-tertiary-750); border-radius:4px;"
-        placeholder={`Search People in def ${workspaceName}`}
+        placeholder={`Search People in ${workspaceName}`}
         defaultBorderColor="transparent"
         hoveredBorderColor={"var(--border-primary-300)"}
         focusedBorderColor={"var(--border-primary-300)"}
