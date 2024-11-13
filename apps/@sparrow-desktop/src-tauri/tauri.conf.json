@@ -7,7 +7,6 @@
       {
         "center": true,
         "decorations": true,
-        "fileDropEnabled": false,
         "fullscreen": false,
         "label": "main",
         "minHeight": 700,
@@ -79,9 +78,10 @@
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDJCRkNBNDkwNUI2NjMwMDcKUldRSE1HWmJrS1Q4S3l4Slo5KzhUNGZoSXdlZmNuRDk3Qkh6NmY5aWJiKzU5a2FUUnQ2UlJhZUIK"
     },
     "deep-link": {
-      "domains": []
+      "mobile": [],
+      "desktop": []
     }
   },
   "productName": "Sparrow",
-  "version": "2.10.0"
+  "version": "2.11.0"
 }

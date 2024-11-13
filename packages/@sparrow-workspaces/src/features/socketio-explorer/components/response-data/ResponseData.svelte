@@ -114,6 +114,32 @@
     } catch (e) {}
     return text;
   };
+
+  function handleMessageClick(message) {
+    onUpdateMessageBody(message.uuid);
+    
+    // Try to parse the message.data as JSON
+    try {
+      const parsedData = JSON.parse(message.data);
+
+      // Check if parsedData is an object or contains a specific value
+      if (typeof parsedData === "object") {
+        // Handle specific case for the second item being "(empty)"
+        if (parsedData[1] === "(empty)") {
+          onUpdateContentType(RequestDataTypeEnum.TEXT);
+          return;
+        }
+        // If it is a valid JSON object, update content type
+        onUpdateContentType(RequestDataTypeEnum.JSON);
+      } else {
+        // If it's a string, update content type to JSON
+        onUpdateContentType(RequestDataTypeEnum.JSON);
+      }
+    } catch (e) {
+      // If JSON parsing fails, assume it's plain text
+      onUpdateContentType(RequestDataTypeEnum.TEXT);
+    }
+  }
 </script>
 
 <div class="h-100 d-flex flex-column">
@@ -214,7 +240,7 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("All messages");
-                currentFilterType="All messages";
+                currentFilterType = "All messages";
               },
             },
             {
@@ -225,7 +251,7 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("Sent");
-                currentFilterType="Sent";
+                currentFilterType = "Sent";
               },
             },
             {
@@ -236,7 +262,7 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("Received");
-                currentFilterType="Received";
+                currentFilterType = "Received";
               },
             },
           ]}
@@ -273,33 +299,10 @@
     <div>
       {#each filteredWebsocketMessage as message}
         <div
-          class="response-message d-flex align-items-center"
-          style="cursor: pointer;"
-          on:click={() => {
-            onUpdateMessageBody(message.uuid);
-
-            try {
-              let parse = JSON.parse(message.data);
-              if (parse[1] === "(empty)") {
-                onUpdateContentType(RequestDataTypeEnum.TEXT);
-                return;
-              }
-
-              try {
-                if (parse[1]) {
-                  JSON.parse(parse[1]);
-                  onUpdateContentType(RequestDataTypeEnum.JSON);
-                  return;
-                }
-              } catch (e) {
-                throw "Not able to parse JSON";
-              }
-            } catch (e) {
-              onUpdateContentType(RequestDataTypeEnum.TEXT);
-              return;
-            }
-          }}
-        >
+        class="response-message d-flex align-items-center"
+        style="cursor: pointer;"
+        on:click={() => handleMessageClick(message)}
+      >
           <span
             class="p-2 d-flex align-items-center"
             style="width: 35px !important;"

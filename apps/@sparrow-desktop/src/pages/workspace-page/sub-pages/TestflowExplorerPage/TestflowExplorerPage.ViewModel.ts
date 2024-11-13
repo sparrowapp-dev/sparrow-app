@@ -324,10 +324,6 @@ export class TestflowExplorerPageViewModel {
       },
       request: adaptedRequest.getValue(),
     };
-    console.log(
-      "THis is noded inside view model hand test floe run edn ",
-      nodes,
-    );
     return nodes;
   };
 
@@ -392,7 +388,7 @@ export class TestflowExplorerPageViewModel {
               element.data.requestId,
             );
         }
-        console.log("THis is request dfDFADSFADSFAFADSFASDF", request);
+
         if (request) {
           const requestTabAdapter = new RequestTabAdapter();
           const adaptedRequest = requestTabAdapter.adapt(
@@ -553,9 +549,11 @@ export class TestflowExplorerPageViewModel {
       }
       return testFlowDataMap;
     });
-    notifications.success(
-      `Test Completed: ${successRequests} Passed, ${failedRequests} Failed`,
-    );
+    if (nodes.length >= 2) {
+      notifications.success(
+        `Test Completed: ${successRequests} Passed, ${failedRequests} Failed`,
+      );
+    }
   };
 
   /**

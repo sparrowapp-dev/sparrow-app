@@ -35,7 +35,7 @@
   "rust-analyzer.procMacro.attributes.enable": true,
   "rust-analyzer.procMacro.enable": true,
   "rust-analyzer.linkedProjects": [
-    "apps\\@sparrow-desktop\\src-tauri\\Cargo.toml" // Update this path as needed
+    "apps/@sparrow-desktop/src-tauri/Cargo.toml" // Update this path as needed
   ],
   "rust-analyzer.server.path": null
 }
