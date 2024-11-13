@@ -259,6 +259,9 @@ export class RxDB {
           8: function (oldDoc: CollectionDocument) {
             return oldDoc;
           },
+          9: function (oldDoc: CollectionDocument) {
+            return oldDoc;
+          },
         },
       },
       activesidebartab: {

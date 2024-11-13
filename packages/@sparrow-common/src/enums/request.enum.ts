@@ -28,7 +28,7 @@ export enum ResponseStatusCode {
 }
 
 export enum RequestDefault {
-  NAME = "API Request Name",
+  NAME = "REST API",
   METHOD = RequestMethod.GET,
 }
 

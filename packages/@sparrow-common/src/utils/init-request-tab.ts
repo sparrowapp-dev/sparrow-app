@@ -32,7 +32,7 @@ class InitRequestTab {
     this._tab = {
       id: _id,
       tabId: uuidv4(),
-      name: RequestDefault.NAME,
+      name: "New " + RequestDefault.NAME,
       type: TabTypeEnum.REQUEST,
       description: "",
       source: "USER",

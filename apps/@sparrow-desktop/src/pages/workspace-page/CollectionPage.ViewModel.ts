@@ -84,7 +84,12 @@ import type {
   SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
 } from "@sparrow/common/types/workspace/socket-io-request-dto";
 import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
-import type { GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface } from "@sparrow/common/types/workspace/graphql-request-dto";
+import type {
+  GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface,
+  GraphqlRequestCreateUpdateInFolderPayloadDtoInterface,
+  GraphqlRequestDeletePayloadDtoInterface,
+} from "@sparrow/common/types/workspace/graphql-request-dto";
+import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -1643,6 +1648,113 @@ export default class CollectionsViewModel {
   };
 
   /**
+   * Handles creating a new GraphQL request in a folder
+   * @param _workspaceId - the workspace id in which new GraphQL request is going to be created
+   * @param _collection - the collection in which new GraphQL request is going to be created
+   * @param _folder - the folder in which new GraphQL request is going to be created
+   */
+  private handleCreateGraphqlInFolder = async (
+    _workspaceId: string,
+    _collection: CollectionDto,
+    _folder: CollectionItemsDto,
+  ) => {
+    const graphqlTab = new InitTab().graphQl(uuidv4(), _workspaceId);
+
+    const graphqlInFolderPayload: GraphqlRequestCreateUpdateInFolderPayloadDtoInterface =
+      {
+        collectionId: _collection.id,
+        workspaceId: _workspaceId,
+        currentBranch:
+          _collection.activeSync && _folder.source === "USER"
+            ? _collection.currentBranch
+            : undefined,
+        source:
+          _collection.activeSync && _folder.source === "USER"
+            ? _folder.source
+            : undefined,
+        folderId: _folder.id,
+        items: {
+          name: _folder.name,
+          type: CollectionItemTypeDtoEnum.FOLDER,
+          id: _folder.id,
+          items: {
+            name: graphqlTab.getValue().name,
+            type: CollectionItemTypeDtoEnum.GRAPHQL,
+            description: "",
+            graphql: {},
+          },
+        },
+      };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      await this.collectionRepository.addRequestInFolder(
+        graphqlInFolderPayload.collectionId,
+        graphqlInFolderPayload.folderId as string,
+        {
+          ...graphqlInFolderPayload?.items?.items,
+          id: graphqlTab.getValue().id,
+        },
+      );
+
+      graphqlTab
+        .updatePath({
+          workspaceId: _workspaceId,
+          collectionId: _collection.id,
+          folderId: _folder.id,
+        })
+        .updateIsSave(true);
+      this.tabRepository.createTab(graphqlTab.getValue());
+
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    }
+    const response = await this.collectionService.addGraphqlInCollection(
+      graphqlInFolderPayload,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const request = response.data.data;
+
+      await this.collectionRepository.addRequestInFolder(
+        graphqlInFolderPayload.collectionId,
+        graphqlInFolderPayload.folderId as string,
+        {
+          ...request,
+        },
+      );
+
+      graphqlTab
+        .updateId(request?.id as string)
+        .updatePath({
+          workspaceId: _workspaceId,
+          collectionId: _collection.id,
+          folderId: _folder.id,
+        })
+        .updateIsSave(true);
+      this.tabRepository.createTab(graphqlTab.getValue());
+
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    } else {
+      this.collectionRepository.deleteRequestInFolder(
+        graphqlInFolderPayload.collectionId,
+        graphqlInFolderPayload.folderId as string,
+        graphqlTab.getValue().id,
+      );
+    }
+  };
+
+  /**
    * Handles creating a new folder in a collection
    * @param workspaceId :string
    * @param collection :CollectionDocument - the collection in which new folder is going to be created
@@ -2481,6 +2593,175 @@ export default class CollectionsViewModel {
   };
 
   /**
+   * Handles renaming a GraphQL
+   * @param _workspaceId
+   * @param _collection The collection in which the GraphQL request is saved
+   * @param _folder The folder in which the GraphQL request is saved (if request if saved inside a folder)
+   * @param _graphql The GraphQL request which is going to be renamed
+   * @param _newSocketIoName The new name of the GraphQL request
+   */
+  private handleRenameGraphql = async (
+    _workspaceId: string,
+    _collection: CollectionDto,
+    _folder: CollectionItemsDto,
+    _graphql: CollectionItemsDto,
+    _newGraphqlName: string,
+  ) => {
+    let isGuestUser = true;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (_collection.id && _workspaceId && !_folder.id) {
+        const response =
+          await this.collectionRepository.readRequestOrFolderInCollection(
+            _collection.id,
+            _graphql.id,
+          );
+        if (response) {
+          response.name = _newGraphqlName;
+        }
+        await this.collectionRepository.updateRequestOrFolderInCollection(
+          _collection.id,
+          _graphql.id,
+          response,
+        );
+        this.updateTab(_graphql.id, {
+          name: _newGraphqlName,
+        });
+        MixpanelEvent(Events.RENAME_REQUEST, {
+          source: "Collection list",
+        });
+        return;
+      }
+      if (_collection.id && _workspaceId && _folder.id) {
+        const response = await this.collectionRepository.readRequestInFolder(
+          _collection.id,
+          _folder.id,
+          _graphql.id,
+        );
+        if (response) {
+          response.name = _newGraphqlName;
+        }
+        await this.collectionRepository.updateRequestInFolder(
+          _collection.id,
+          _folder.id,
+          _graphql.id,
+          response,
+        );
+        this.updateTab(_graphql.id, {
+          name: _newGraphqlName,
+        });
+        MixpanelEvent(Events.RENAME_REQUEST, {
+          source: "Collection list",
+        });
+        return;
+      }
+      return;
+    }
+    if (!_newGraphqlName) {
+      return;
+    }
+    if (_collection.id && _workspaceId && !_folder.id) {
+      const response = await this.collectionService.updateGraphqlInCollection(
+        _graphql.id,
+        {
+          collectionId: _collection.id,
+          workspaceId: _workspaceId,
+          currentBranch:
+            _collection.activeSync && _graphql.source === "USER"
+              ? _collection.currentBranch
+              : undefined,
+          source:
+            _collection.activeSync && _graphql.source === "USER"
+              ? _graphql.source
+              : undefined,
+          items: {
+            createdAt: _graphql.createdAt,
+            createdBy: _graphql.createdBy,
+            description: _graphql.description,
+            id: _graphql.id,
+            isDeleted: _graphql.isDeleted,
+            name: _newGraphqlName,
+            graphql: _graphql.graphql,
+            source: _graphql.source,
+            type: _graphql.type,
+            updatedAt: _graphql.updatedAt,
+            updatedBy: _graphql.updatedBy,
+          },
+        } as GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface,
+      );
+      if (!response?.isSuccessful) {
+        return;
+      }
+      this.collectionRepository.updateRequestOrFolderInCollection(
+        _collection.id,
+        _graphql.id,
+        response.data.data,
+      );
+      this.updateTab(_graphql.id, {
+        name: _newGraphqlName,
+      });
+      MixpanelEvent(Events.RENAME_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    }
+    if (_collection.id && _workspaceId && _folder.id) {
+      const response = await this.collectionService.updateGraphqlInCollection(
+        _graphql.id,
+        {
+          collectionId: _collection.id,
+          workspaceId: _workspaceId,
+          currentBranch:
+            _collection?.activeSync && _graphql?.source === "USER"
+              ? _collection?.currentBranch
+              : undefined,
+          source:
+            _collection?.activeSync && _graphql?.source === "USER"
+              ? _graphql?.source
+              : undefined,
+          folderId: _folder.id,
+          items: {
+            name: _folder.name,
+            id: _folder.id,
+            type: CollectionItemTypeDtoEnum.FOLDER,
+            items: {
+              createdAt: _graphql.createdAt,
+              createdBy: _graphql.createdBy,
+              description: _graphql.description,
+              id: _graphql.id,
+              isDeleted: _graphql.isDeleted,
+              name: _newGraphqlName,
+              graphql: _graphql.graphql,
+              source: _graphql.source,
+              type: _graphql.type,
+              updatedAt: _graphql.updatedAt,
+              updatedBy: _graphql.updatedBy,
+            },
+          },
+        } as GraphqlRequestCreateUpdateInFolderPayloadDtoInterface,
+      );
+      if (!response?.isSuccessful) {
+        return;
+      }
+      this.collectionRepository.updateRequestInFolder(
+        _collection.id,
+        _folder.id,
+        _graphql.id,
+        response.data.data,
+      );
+      this.updateTab(_graphql.id, {
+        name: _newGraphqlName,
+      });
+      MixpanelEvent(Events.RENAME_REQUEST, {
+        source: "Collection list",
+      });
+    }
+  };
+
+  /**
    * Handles loading the collection from local repository from active branch
    * @param collection :CollectionDocument
    * @returns :{ activeSyncLoad: boolean; isBranchSynced: boolean }
@@ -2897,6 +3178,92 @@ export default class CollectionsViewModel {
       `"${_socketIo.name}" ${SocketIORequestDefaultAliasBaseEnum.NAME} deleted.`,
     );
     this.removeMultipleTabs([_socketIo.id]);
+    MixpanelEvent(Events.DELETE_REQUEST, {
+      source: "Collection list",
+    });
+    return true;
+  };
+
+  /**
+   * Handle deleting GraphQL request from repository as well as backend
+   * @param _workspaceId
+   * @param _collection The collection in which the GraphQL request is saved
+   * @param _graphql  The GraphQL request to be deleted
+   * @param _folder The folder in which the GraphQL request is saved (if is saved in a folder)
+   * @returns
+   */
+  private handleDeleteGraphql = async (
+    _workspaceId: string,
+    _collection: CollectionDto,
+    _graphql: CollectionItemsDto,
+    _folder: CollectionItemsDto,
+  ): Promise<boolean> => {
+    let userSource = {};
+    if (_collection.activeSync) {
+      userSource = {
+        currentBranch: _collection.currentBranch,
+      };
+    }
+
+    let isGuestUser = true;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (_folder) {
+        await this.collectionRepository.deleteRequestInFolder(
+          _collection.id,
+          _folder.id,
+          _graphql.id,
+        );
+        this.removeMultipleTabs([_graphql.id]);
+      } else {
+        await this.collectionRepository.deleteRequestOrFolderInCollection(
+          _collection.id,
+          _graphql.id,
+        );
+        this.removeMultipleTabs([_graphql.id]);
+      }
+
+      return true;
+    }
+    const response = await this.collectionService.deleteGraphqlInCollection(
+      _graphql.id,
+      {
+        collectionId: _collection.id,
+        workspaceId: _workspaceId,
+        folderId: _folder?.id ? _folder?.id : undefined,
+        source: _collection.activeSync ? _graphql?.source : undefined,
+        currentBranch: _collection.activeSync
+          ? _collection.currentBranch
+          : undefined,
+      } as GraphqlRequestDeletePayloadDtoInterface,
+    );
+
+    if (!response?.isSuccessful) {
+      notifications.error(
+        `Failed to delete ${GraphqlRequestDefaultAliasBaseEnum.NAME}. Plaease try again.`,
+      );
+      return false;
+    }
+    if (_folder?.id && _collection.id && _workspaceId) {
+      await this.collectionRepository.deleteRequestInFolder(
+        _collection.id,
+        _folder.id,
+        _graphql.id,
+      );
+    } else if (_workspaceId && _collection.id) {
+      await this.collectionRepository.deleteRequestOrFolderInCollection(
+        _collection.id,
+        _graphql.id,
+      );
+    }
+
+    notifications.success(
+      `"${_graphql.name}" ${GraphqlRequestDefaultAliasBaseEnum.NAME} deleted.`,
+    );
+    this.removeMultipleTabs([_graphql.id]);
     MixpanelEvent(Events.DELETE_REQUEST, {
       source: "Collection list",
     });
@@ -3440,7 +3807,7 @@ export default class CollectionsViewModel {
         );
         break;
       case "graphqlFolder":
-        await this.handleCreateSocketIoInFolder(
+        await this.handleCreateGraphqlInFolder(
           args.workspaceId,
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
@@ -3499,6 +3866,14 @@ export default class CollectionsViewModel {
           args.folder as CollectionItemsDto,
         );
         break;
+      case "graphql":
+        this.handleDeleteGraphql(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.graphql as CollectionItemsDto,
+          args.folder as CollectionItemsDto,
+        );
+        break;
     }
   };
 
@@ -3551,6 +3926,15 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
           args.socketio as CollectionItemsDto,
+          args.newName as string,
+        );
+        break;
+      case "graphql":
+        this.handleRenameGraphql(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.graphql as CollectionItemsDto,
           args.newName as string,
         );
         break;

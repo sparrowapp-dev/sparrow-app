@@ -1,51 +1,31 @@
-interface HttpRequestKeyValueCheckedWithBaseBaseInterface {
-  key: string;
-  value: string;
-  checked: boolean;
-  base: string;
-}
-interface HttpRequestKeyValueCheckedBaseInterface {
+interface GraphqlRequestKeyValueCheckedBaseInterface {
   key: string;
   value: string;
   checked: boolean;
 }
 
-interface HttpRequestBodyBaseInterface {
-  raw?: string;
-  urlencoded?: HttpRequestKeyValueCheckedBaseInterface[];
-  formdata?: {
-    text: HttpRequestKeyValueCheckedBaseInterface[];
-    file: HttpRequestKeyValueCheckedWithBaseBaseInterface[];
-  };
-}
-
-interface HttpRequestBasicAuthBaseInterface {
+interface GraphqlRequestBasicAuthBaseInterface {
   username?: string;
   password?: string;
 }
 
-interface HttpRequestApiKeyBaseInterface {
+interface GraphqlRequestApiKeyBaseInterface {
   authKey: string;
   authValue: string;
-  addTo: string;
 }
 
-interface HttpRequestAuthBaseInterface {
+interface GraphqlRequestAuthBaseInterface {
   bearerToken?: string;
-  basicAuth?: HttpRequestBasicAuthBaseInterface;
-  apiKey?: HttpRequestApiKeyBaseInterface;
+  basicAuth?: GraphqlRequestBasicAuthBaseInterface;
+  apiKey?: GraphqlRequestApiKeyBaseInterface;
 }
 
-export interface HttpRequestBaseInterface {
-  method: string;
-  operationId: string;
+export interface GraphqlRequestBaseInterface {
   url: string;
-  body: HttpRequestBodyBaseInterface[];
-  selectedRequestBodyType: string;
-  selectedRequestAuthType: string;
-  queryParams: HttpRequestKeyValueCheckedBaseInterface[];
-  auth: HttpRequestAuthBaseInterface;
-  headers: HttpRequestKeyValueCheckedBaseInterface[];
+  query: string;
+  schema: string;
+  auth: GraphqlRequestAuthBaseInterface;
+  headers: GraphqlRequestKeyValueCheckedBaseInterface[];
 }
 
 export enum GraphqlRequestDefaultAliasBaseEnum {

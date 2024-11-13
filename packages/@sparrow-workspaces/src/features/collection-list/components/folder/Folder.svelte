@@ -31,7 +31,7 @@
   // import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   // import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
-  import { WebSocket, Request, SocketIo } from "..";
+  import { WebSocket, Request, SocketIo, Graphql } from "..";
   import type {
     CollectionBaseInterface,
     CollectionItemBaseInterface,
@@ -590,9 +590,9 @@
       </div>
     {:else if explorer.type === ItemType.GRAPHQL}
       <div style="cursor:pointer;">
-        <!-- <SocketIo
+        <Graphql
           bind:userRole
-          socketIo={explorer}
+          graphql={explorer}
           {onItemRenamed}
           {onItemDeleted}
           {onItemOpened}
@@ -600,8 +600,7 @@
           {collection}
           {activeTabId}
           {activeTabPath}
-        /> -->
-        gql
+        />
       </div>
     {/if}
   {/if}
