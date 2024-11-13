@@ -324,7 +324,7 @@ export default class CollectionsViewModel {
   };
 
   /**
-   * Create web socket new tab with untracked id
+   * Create socket io new tab with untracked id
    */
   private createSocketIoNewTab = async () => {
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
@@ -339,7 +339,7 @@ export default class CollectionsViewModel {
   };
 
   /**
-   * Create web socket new tab with untracked id
+   * Create graphql new tab with untracked id
    */
   private createGraphqlNewTab = async () => {
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();

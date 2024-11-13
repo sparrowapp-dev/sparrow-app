@@ -36,7 +36,7 @@ class InitTab {
   };
 
   /**
-   * @param _id - environment mongo document id
+   * @param _id - graphql mongo document id
    * @param _workspaceId - Workspace mongo id to which environment belongs to
    */
   public graphQl = (_id: string, _workspaceId: string) => {
