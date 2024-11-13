@@ -37,6 +37,17 @@
       });
     }
   }
+
+  let searchedUsers = [];
+  $: {
+    searchedUsers = filteredUser.filter((user) => {
+      return (
+        user.email.includes(search) ||
+        user.name.includes(search) ||
+        user.role.includes(search)
+      );
+    });
+  }
 </script>
 
 <div class="workspace-setting h-100" style="padding-top:0;">
@@ -49,7 +60,7 @@
         on:input={() => {}}
         width={"300px"}
         style="outline:none; width:358px; font-size:12px !important; height:32px; background-color: var(--bg-tertiary-750); border-radius:4px;"
-        placeholder={`Search People in ${workspaceName}`}
+        placeholder={`Search People in def ${workspaceName}`}
         defaultBorderColor="transparent"
         hoveredBorderColor={"var(--border-primary-300)"}
         focusedBorderColor={"var(--border-primary-300)"}
@@ -57,7 +68,24 @@
     </div>
     <Member user={activeUser} isActiveUser={true} />
     <hr />
-    {#if !filteredUser?.length}
+    {#if !searchedUsers.length && search}
+      <div class="skeleton-parent">
+        <p class="skeleton-text" style="margin-top: 10px;">No result found.</p>
+      </div>
+    {:else if searchedUsers.length}
+      {#each filteredUser as user}
+        {#if user.email.includes(search) || user.name.includes(search) || user.role.includes(search)}
+          <Member
+            {user}
+            {activeUser}
+            isActiveUser={false}
+            {currentWorkspace}
+            {onChangeUserRoleAtWorkspace}
+            {onRemoveUserFromWorkspace}
+          />
+        {/if}
+      {/each}
+    {:else if !filteredUser?.length}
       <div class="skeleton-parent">
         <p class="skeleton-text">
           Once you invite people to this workspace, you will see them listed
@@ -71,19 +99,6 @@
           style="margin-top:8px;"
         />
       </div>
-    {:else}
-      {#each filteredUser as user}
-        {#if user.email.includes(search) || user.name.includes(search) || user.role.includes(search)}
-          <Member
-            {user}
-            {activeUser}
-            isActiveUser={false}
-            {currentWorkspace}
-            {onChangeUserRoleAtWorkspace}
-            {onRemoveUserFromWorkspace}
-          />
-        {/if}
-      {/each}
     {/if}
   </div>
 </div>
