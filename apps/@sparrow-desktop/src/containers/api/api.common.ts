@@ -670,6 +670,11 @@ const connectSocketIo = async (
           `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
         );
 
+        // Auto disconnect listener
+        await listen(`socket-disconnect-${tabId}`, async () => {
+          return removeSocketDataFromMap(tabId, url);
+        });
+
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
         const listener = await listen(
           `socket-message-${tabId}`,
