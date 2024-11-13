@@ -412,7 +412,8 @@
                   <ImageModal
                     isOpen={isImageOpen}
                     type={"dark"}
-                    width={"40%"}
+                    width={"50%"}
+                    height={"60%"}
                     zIndex={10000}
                     handleModalState={(flag = false) => {
                       isImageOpen = flag;
@@ -421,7 +422,7 @@
                     <img
                       src={currentImage}
                       alt="post image"
-                      style="width:100%; height:100%;"
+                      style="width: 100%; height: 100%; object-fit: cover;"
                     />
                   </ImageModal>
                 {/each}

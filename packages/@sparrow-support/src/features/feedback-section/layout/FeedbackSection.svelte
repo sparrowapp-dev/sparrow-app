@@ -110,6 +110,7 @@
 
   let showLoading = true;
 
+  let currentCategory = "";
   /**
    * @description - Fetches posts based on sorting type, search query, and status, then updates the `posts` array.
    *
@@ -121,9 +122,11 @@
     sortType: string,
     searchQuery: string = "",
     status: string,
+    currentCategory: string,
     limit: number = 10,
     skip: number = 0,
   ) => {
+    console.log("This is skop ", skip);
     currentSort = sortType;
     if (showLoading) {
       isLoading = true;
@@ -133,6 +136,7 @@
       searchQuery,
       status,
       "",
+      currentCategory,
       limit,
       skip,
     );
@@ -154,7 +158,8 @@
    * @description - Handles upvoting action by refreshing the posts with the current sorting, search term, and status.
    */
   const handleUpvote = () => {
-    getPosts(currentSort, searchTerm, status, limit, skip);
+    getPosts(currentSort, searchTerm, status, currentCategory, limit, skip);
+    skip = skip + 10;
   };
 
   /**
@@ -168,8 +173,16 @@
     skip = 0;
     showLoading = true;
     isPostFetching = true;
-    await getPosts(currentSort, searchQuery, status, limit, skip); // Fetch posts with search term
+    await getPosts(
+      currentSort,
+      searchQuery,
+      status,
+      currentCategory,
+      limit,
+      skip,
+    ); // Fetch posts with search term
     isPostFetching = false;
+    skip = skip + 10;
   };
 
   /**
@@ -189,7 +202,15 @@
     isPostFetching = true;
     skip = 0;
     showLoading = true;
-    await getPosts(currentSort, searchTerm, status, limit, skip);
+    await getPosts(
+      currentSort,
+      searchTerm,
+      status,
+      currentCategory,
+      limit,
+      skip,
+    );
+    skip = skip + 10;
     isPostFetching = false;
   };
 
@@ -200,13 +221,15 @@
    */
   const handleCategoryChange = async (selectedCategory) => {
     feedbackType = selectedCategory;
+    currentCategory = selectedCategory;
     if (selectedCategory === FeedbackType.ALL_CATEGORY) {
       // Show all posts if "All Categories" is selected
       isPostFetching = true;
       posts = [];
       skip = 0;
       showLoading = true;
-      await getPosts(currentSort, searchTerm, status, limit, skip);
+      await getPosts(currentSort, searchTerm, status, "", limit, skip);
+      skip = skip + 10;
       isPostFetching = false;
     } else {
       // Fetch and filter posts by the selected category
@@ -215,12 +238,16 @@
       isPostFetching = true;
       skip = 0;
       showLoading = true;
-      await getPosts(currentSort, searchTerm, status, limit, skip);
+      await getPosts(
+        currentSort,
+        searchTerm,
+        status,
+        currentCategory,
+        limit,
+        skip,
+      );
+      skip = skip + 10;
       isPostFetching = false;
-
-      posts = listPosts?.filter((post) => {
-        return post?.category?.name === selectedCategory;
-      });
       isLoading = false;
     }
   };
@@ -237,8 +264,17 @@
   // Function to load more updates
   const loadMoreUpdates = async () => {
     if (!isPostopen || searchTerm.length > 0) {
-      skip = posts.length;
-      await getPosts(currentSort, searchTerm, status, limit, skip);
+      // skip = posts.length;
+      await getPosts(
+        currentSort,
+        searchTerm,
+        status,
+        currentCategory,
+        limit,
+        skip,
+      );
+
+      skip = skip + 10;
     }
   };
 
@@ -261,7 +297,8 @@
    * @description - Executes when the component is mounted. Fetches the initial set of posts and resets the `isPostopenFromActivity` flag.
    */
   onMount(async () => {
-    getPosts(currentSort, searchTerm, status, limit, skip);
+    getPosts(currentSort, searchTerm, status, currentCategory, limit, skip);
+    skip = skip + 10;
     isPostopenFromActivity = false;
   });
 
@@ -293,7 +330,7 @@
     >
       <div>
         <div
-          class={`d-flex search-input-container rounded py-1 px-2 mb-2`}
+          class={`d-flex align-items-center search-input-container rounded py-1 px-2 mb-2`}
           on:click={() => {
             MixpanelEvent(Events.Feedback_Search);
           }}
@@ -466,7 +503,15 @@
               skip = 0;
               posts = [];
               showLoading = true;
-              await getPosts("trending", searchTerm, status, limit, skip);
+              await getPosts(
+                "trending",
+                searchTerm,
+                status,
+                currentCategory,
+                limit,
+                skip,
+              );
+              skip = skip + 10;
               isPostFetching = false;
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
@@ -474,13 +519,15 @@
             class:active={currentSort === "trending"}
           >
             <div><span class="text-fs-13">Trending</span></div>
-            <div class="tick-icon">
-              <TickIcon
-                height={"12px"}
-                width={"12px"}
-                color={"var(--icon-primary-300)"}
-              />
-            </div>
+            {#if currentSort === "trending"}
+              <div class="d-flex align-items-center">
+                <TickIcon
+                  height={"12px"}
+                  width={"12px"}
+                  color={"var(--icon-primary-300)"}
+                />
+              </div>
+            {/if}
           </button>
 
           <button
@@ -489,7 +536,15 @@
               skip = 0;
               posts = [];
               showLoading = true;
-              await getPosts("newest", searchTerm, status, limit, skip);
+              await getPosts(
+                "newest",
+                searchTerm,
+                status,
+                currentCategory,
+                limit,
+                skip,
+              );
+              skip = skip + 10;
               isPostFetching = false;
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
@@ -497,13 +552,15 @@
             class:active={currentSort === "newest"}
           >
             <span class="text-fs-13">New</span>
-            <div class="tick-icon">
-              <TickIcon
-                height={"12px"}
-                width={"12px"}
-                color={"var(--icon-primary-300)"}
-              />
-            </div>
+            {#if currentSort === "newest"}
+              <div class="d-flex align-items-center">
+                <TickIcon
+                  height={"12px"}
+                  width={"12px"}
+                  color={"var(--icon-primary-300)"}
+                />
+              </div>
+            {/if}
           </button>
 
           <button
@@ -512,7 +569,15 @@
               skip = 0;
               posts = [];
               showLoading = true;
-              await getPosts("score", searchTerm, status, limit, skip);
+              await getPosts(
+                "score",
+                searchTerm,
+                status,
+                currentCategory,
+                limit,
+                skip,
+              );
+              skip = skip + 10;
               isPostFetching = false;
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
@@ -520,13 +585,15 @@
             class:active={currentSort === "score"}
           >
             <span class="text-fs-13">Top</span>
-            <div class="tick-icon">
-              <TickIcon
-                height={"12px"}
-                width={"12px"}
-                color={"var(--icon-primary-300)"}
-              />
-            </div>
+            {#if currentSort === "score"}
+              <div class="d-flex align-items-center">
+                <TickIcon
+                  height={"12px"}
+                  width={"12px"}
+                  color={"var(--icon-primary-300)"}
+                />
+              </div>
+            {/if}
           </button>
         </div>
       </div>
