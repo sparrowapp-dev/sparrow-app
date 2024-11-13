@@ -140,6 +140,8 @@
   export let placeholderText = "";
   export let isHeaderCombined = false;
 
+  export let isArrowIconRequired=true;
+
   let selectHeaderWrapper: HTMLElement;
   let selectBodyWrapper: HTMLElement;
 
@@ -461,7 +463,7 @@
           </span>
         {/if}
       </p>
-      <span class="d-flex ps-2" class:select-logo-active={isOpen}>
+      <span class="d-flex ps-2 {!isArrowIconRequired ? "d-none" :""}" class:select-logo-active={isOpen}>
         {#if isDropIconFilled}
           <ArrowIcon
             width={"12"}

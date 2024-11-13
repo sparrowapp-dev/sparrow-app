@@ -5,6 +5,13 @@
   export let data;
   export let openTeam;
   export let OnWorkspaceSwitch;
+
+  // Sort the data by updatedAt in descending order
+  $data.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+  // Slice the data to get the top 5 entries
+  const topFiveWorkspaces = $data.slice(0, 5);
+  
 </script>
 
 <!-- <section class="d-flex flex-column h-100"> -->
@@ -14,7 +21,7 @@
 <div class="sidebar-workspace-list" style="flex:1; overflow:auto;">
   {#if $data}
     <List height={"100%"} overflowY={"auto"} classProps={"px-1 py-0"}>
-      {#each $data.slice().reverse() as list, index}
+      {#each topFiveWorkspaces as list , index}
         {#if index < constants.WORKSPACE_LIMIT}
           <div
             class="recentWorkspace-tab"
