@@ -10,6 +10,7 @@
 
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
+  import { FileType } from "../../../../../../compopnents";
   let os = "";
   const osDetector = new OSDetector();
   onMount(() => {
@@ -134,6 +135,13 @@
     <p class=" text-danger-200 mt-2 text-fs-12">
       {ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
     </p>
+    <div class="d-flex">
+      {#each ICON_CONFIG.FILE_TYPES as fileType (fileType)}
+        <span class="me-4">
+          <FileType {fileType} />
+        </span>
+      {/each}
+    </div>
   {:else if uploadTeamIcon.file.showFileSizeError}
     <!-- Error message for file size exceeding the limit -->
     <p class=" text-danger-200 mt-2 text-fs-12">

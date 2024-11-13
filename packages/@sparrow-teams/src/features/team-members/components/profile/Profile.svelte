@@ -95,6 +95,7 @@
           headerFontSize={"10px"}
           headerFontWeight={400}
           borderRounded={"4px"}
+          isArrowIconRequired={!owner}
         />
       {:else if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_ADMIN)}
         <Select
@@ -110,6 +111,7 @@
           headerFontSize={"10px"}
           headerFontWeight={400}
           borderRounded={"4px"}
+          isArrowIconRequired={!owner}
         />
       {:else}
         <Select
@@ -123,6 +125,7 @@
           disabled={true}
           headerFontSize={"10px"}
           position={"absolute"}
+          isArrowIconRequired={false}
         />
       {/if}
     </div>

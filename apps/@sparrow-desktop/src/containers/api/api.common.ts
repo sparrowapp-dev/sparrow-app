@@ -573,7 +573,7 @@ const connectWebSocket = async (
       search: "",
       contentType: RequestDataTypeEnum.TEXT,
       body: "",
-      filter: "All messages",
+      filter: "All Messages",
       url: url,
       listener: null,
     });
@@ -676,7 +676,7 @@ const connectSocketIo = async (
       search: "",
       contentType: RequestDataTypeEnum.TEXT,
       body: "",
-      filter: "All messages",
+      filter: "All Messages",
       url: url,
       connectListener: null,
       disconnectListener: null,
