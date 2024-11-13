@@ -24,7 +24,7 @@
   export let onUpdateFilterType;
   let searchData = webSocket.search;
 
-  let currentFilterType = "All messages";
+  let currentFilterType = webSocket.filter;
 
   let filteredWebsocketMessage = [];
   const filterWebsocketResponse = () => {
@@ -195,7 +195,7 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("All messages");
-                currentFilterType="All messages";
+                currentFilterType= webSocket.filter
               },
             },
             {
@@ -206,7 +206,7 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("Sent");
-                currentFilterType="Sent";
+                currentFilterType=webSocket.filter
               },
             },
             {
@@ -217,7 +217,7 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("Received");
-                currentFilterType="Received";
+                currentFilterType= webSocket.filter
 
               },
             },
