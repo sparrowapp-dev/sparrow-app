@@ -14,6 +14,7 @@
 
   // ---- Interface
   import {
+    GraphIcon,
     SocketIcon,
     SocketIoIcon,
     StackIcon,
@@ -156,6 +157,14 @@
             color={"var(--icon-primary-300)"}
           />
         </span>
+      {:else if tab.type === TabTypeEnum.GRAPHQL}
+        <span>
+          <GraphIcon
+            height={"14px"}
+            width={"14px"}
+            color={"var(--icon-danger-1100)"}
+          />
+        </span>
       {/if}
       <span
         class="font-weight-normal ms-1 text-fs-12 {!tab.isActive
@@ -166,7 +175,7 @@
         {tab.name}
       </span>
     </button>
-    {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
+    {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
       {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
         <span
           class="my-auto mx-1 opacity-1"

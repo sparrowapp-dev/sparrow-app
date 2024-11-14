@@ -22,6 +22,7 @@
     BubbleIcon,
     StackIcon,
     SocketIoIcon,
+    GraphIcon,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
@@ -43,6 +44,7 @@
   } from "../../../stores/guide.tour";
   import { TestFlowTourGuide } from "@sparrow/workspaces/components";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+  import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
@@ -275,6 +277,18 @@
       iconSize: "14px",
       onclick: () => {
         onItemCreated("socket-io", {});
+        MixpanelEvent(Events.Add_SocketIO, {
+          description: "Add Socket.IO From + Icon in Left Panel",
+        });
+      },
+    },
+    {
+      name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+      icon: GraphIcon,
+      iconColor: "var(--icon-secondary-130)",
+      iconSize: "14px",
+      onclick: () => {
+        onItemCreated("graphql", {});
         MixpanelEvent(Events.Add_SocketIO, {
           description: "Add Socket.IO From + Icon in Left Panel",
         });

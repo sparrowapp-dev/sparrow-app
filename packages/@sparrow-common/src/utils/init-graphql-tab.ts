@@ -1,17 +1,6 @@
-import { RequestDefault } from "@sparrow/common/enums";
 import {
-  AuthSectionEnum,
-  AuthTypeEnum,
-  RequestDataTypeEnum,
-  RequestDatasetEnum,
-  RequestMethodEnum,
-  RequestSectionEnum,
-  ResponseFormatterEnum,
-  ResponseSectionEnum,
   type Auth,
-  type Body,
   type KeyValueChecked,
-  FormDataTypeEnum,
   type StatePartial,
 } from "@sparrow/common/types/workspace";
 import {
@@ -20,8 +9,13 @@ import {
   type Path,
 } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
+import {
+  GraphqlRequestAuthTypeTabEnum,
+  GraphqlRequestSectionTabEnum,
+} from "../types/workspace/graphql-request-tab";
+import { GraphqlRequestDefaultAliasBaseEnum } from "../types/workspace/graphql-request-base";
 
-class InitRequestTab {
+class InitGraphqlTab {
   private _tab: Tab;
   /**
    *
@@ -32,43 +26,18 @@ class InitRequestTab {
     this._tab = {
       id: _id,
       tabId: uuidv4(),
-      name: "New " + RequestDefault.NAME,
-      type: TabTypeEnum.REQUEST,
+      name: "New " + GraphqlRequestDefaultAliasBaseEnum.NAME,
+      type: TabTypeEnum.GRAPHQL,
       description: "",
       source: "USER",
       isDeleted: false,
       activeSync: false,
       property: {
-        request: {
-          method: RequestMethodEnum.GET,
-          body: {
-            raw: "",
-            urlencoded: [
-              {
-                key: "",
-                value: "",
-                checked: false,
-              },
-            ],
-            formdata: [
-              {
-                key: "",
-                value: "",
-                base: "",
-                checked: false,
-                type: FormDataTypeEnum.TEXT,
-              },
-            ],
-          },
+        graphql: {
           url: "",
+          query: "",
+          schema: "",
           headers: [
-            {
-              key: "",
-              value: "",
-              checked: false,
-            },
-          ],
-          queryParams: [
             {
               key: "",
               value: "",
@@ -99,27 +68,11 @@ class InitRequestTab {
             },
           ],
           state: {
-            requestBodyLanguage: RequestDataTypeEnum.TEXT,
-            requestBodyNavigation: RequestDatasetEnum.NONE,
-            requestAuthNavigation: AuthTypeEnum.NO_AUTH,
-            requestNavigation: RequestSectionEnum.PARAMETERS,
-            responseNavigation: ResponseSectionEnum.RESPONSE,
-            responseBodyLanguage: RequestDataTypeEnum.TEXT,
-            responseBodyFormatter: ResponseFormatterEnum.PRETTY,
-            requestExtensionNavigation: "",
+            requestNavigation: GraphqlRequestSectionTabEnum.QUERY,
+            requestAuthNavigation: GraphqlRequestAuthTypeTabEnum.NO_AUTH,
             requestLeftSplitterWidthPercentage: 50,
             requestRightSplitterWidthPercentage: 50,
-            isExposeEditDescription: true,
-            isSendRequestInProgress: false,
-            isSaveDescriptionInProgress: false,
-            isSaveRequestInProgress: false,
-            isParameterBulkEditActive: false,
             isHeaderBulkEditActive: false,
-            isChatbotActive: false,
-            isChatbotSuggestionsActive: true,
-            isChatbotGeneratingResponse: false,
-            isDocGenerating: false,
-            isDocAlreadyGenerated: false,
           },
           auth: {
             bearerToken: "",
@@ -130,20 +83,7 @@ class InitRequestTab {
             apiKey: {
               authKey: "",
               authValue: "",
-              addTo: AuthSectionEnum.HEADER,
             },
-          },
-          ai: {
-            prompt: "",
-            conversations: [],
-            threadId: "",
-          },
-          response: {
-            headers: [],
-            status: "",
-            body: "",
-            time: 0,
-            size: 0,
           },
         },
       },
@@ -164,58 +104,50 @@ class InitRequestTab {
   public getValue(): Tab {
     return this._tab;
   }
-  public getSpacificValue(_value: string) {
-    return this._tab[_value];
-  }
   public updateId(_id: string) {
     this._tab.id = _id;
+    return this;
   }
   public updateName(_name: string) {
     this._tab.name = _name;
+    return this;
   }
   public updateDescription(_description: string) {
     this._tab.description = _description;
+    return this;
   }
   public updatePath(_path: Path) {
     this._tab.path = _path;
+    return this;
   }
   public updateUrl(_url: string) {
     if (_url && this._tab.property.request) {
       this._tab.property.request.url = _url;
     }
+    return this;
   }
-  public updateMethod(_method: RequestMethodEnum) {
-    if (_method && this._tab.property.request) {
-      this._tab.property.request.method = _method;
-    }
-  }
-  public updateBody(_body: Body) {
-    if (_body && this._tab.property.request) {
-      this._tab.property.request.body = _body;
-    }
-  }
-  public updateQueryParams(_queryParams: KeyValueChecked[]) {
-    if (_queryParams && this._tab.property.request) {
-      this._tab.property.request.queryParams = _queryParams;
-    }
-  }
+
   public updateHeaders(_headers: KeyValueChecked[]) {
     if (_headers && this._tab.property.request) {
       this._tab.property.request.headers = _headers;
     }
+    return this;
   }
   public updateAuth(_auth: Auth) {
     if (_auth && this._tab.property.request) {
       this._tab.property.request.auth = _auth;
     }
+    return this;
   }
   public updateAutoGeneratedHeaders(_autoGeneratedHeaders: KeyValueChecked[]) {
     if (this._tab.property.request) {
       this._tab.property.request.autoGeneratedHeaders = _autoGeneratedHeaders;
     }
+    return this;
   }
   public updateIsSave(_isSave: boolean) {
     this._tab.isSaved = _isSave;
+    return this;
   }
   public updateState(_state: StatePartial) {
     if (this._tab.property.request) {
@@ -224,12 +156,8 @@ class InitRequestTab {
         ..._state,
       };
     }
-  }
-  public updateChatbotState(_isActive: boolean) {
-    if (this._tab.property.request?.state) {
-      this._tab.property.request.state.isChatbotActive = _isActive;
-    }
+    return this;
   }
 }
 
-export { InitRequestTab };
+export { InitGraphqlTab };

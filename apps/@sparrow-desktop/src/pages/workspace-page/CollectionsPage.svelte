@@ -536,6 +536,10 @@
                       <SocketIoExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
+                {:else if $activeTab?.type === ItemType.GRAPHQL}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>GraphQL will render here</div>
+                  </Motion>
                 {:else if !$tabList?.length}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>

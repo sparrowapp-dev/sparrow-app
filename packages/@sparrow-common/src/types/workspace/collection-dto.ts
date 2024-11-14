@@ -8,6 +8,7 @@ export enum CollectionItemTypeDtoEnum {
   REQUEST = "REQUEST",
   WEBSOCKET = "WEBSOCKET",
   SOCKETIO = "SOCKETIO",
+  GRAPHQL = "GRAPHQL",
 }
 
 export enum CollectionSourceTypeDtoEnum {
