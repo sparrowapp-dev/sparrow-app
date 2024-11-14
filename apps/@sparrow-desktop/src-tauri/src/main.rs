@@ -79,7 +79,6 @@ use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
 
 use tokio::sync::Mutex as SocketMutex;
-use tokio::time::interval;
 use tokio::time::{timeout, Duration};
 
 #[cfg(target_os = "macos")]
