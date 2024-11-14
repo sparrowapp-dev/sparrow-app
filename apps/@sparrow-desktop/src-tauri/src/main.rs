@@ -846,12 +846,12 @@ async fn disconnect_socket_io(
 ) -> Result<String, String> {
     let mut clients = state.connections.lock().await;
     let response;
-    let _ = app_handle.emit(
-        &format!("socket-disconnect-{}", &tabid),
-        json!({ "message":"Socket.IO connection disconnected successfully".to_string()})
-    );
-        
+
     if let Some(client) = clients.remove(&tabid) {
+        let _ = app_handle.emit(
+            &format!("socket-disconnect-{}", &tabid),
+            json!({ "message":"Socket.IO connection disconnected successfully".to_string()}),
+        );
 
         // Assuming you have a method to disconnect the client properly
         client
