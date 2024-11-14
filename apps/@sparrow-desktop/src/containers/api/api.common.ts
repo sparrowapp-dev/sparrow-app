@@ -479,7 +479,6 @@ function updateSocketDataStore(tabId, data, transmitter, status = "") {
     const wsData = webSocketDataMap.get(tabId);
     console.log(wsData.status);
     if (wsData) {
-      // if (transmitter === "disconnector" && wsData.status === "connected")
       wsData.messages.unshift({
         data,
         transmitter,
