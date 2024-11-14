@@ -93,6 +93,7 @@
           headerTheme={"violet"}
           borderType={"none"}
           disabled={owner}
+          isArrowIconRequired={!owner}
           bodyTheme={"violet"}
           headerFontSize={"10px"}
           borderRounded={"4px"}
@@ -130,6 +131,7 @@
           bodyTheme={"violet"}
           borderType={"none"}
           disabled={true}
+          isArrowIconRequired={false}
           headerFontSize={"10px"}
         />
       {/if}

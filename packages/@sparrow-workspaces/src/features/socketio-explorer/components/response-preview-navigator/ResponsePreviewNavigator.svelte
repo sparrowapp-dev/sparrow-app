@@ -123,7 +123,7 @@
       } else if (message?.transmitter === "receiver") {
         return "Received";
       } else if (message?.transmitter === "sender") {
-        return "Send";
+        return "Sent";
       } else {
         return "Type";
       }

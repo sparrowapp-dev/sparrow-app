@@ -102,10 +102,7 @@
 
 <div class="main-container d-flex h-100" style="overflow:auto;">
   <div class="my-collection d-flex flex-column w-100 z-3">
-    <Tooltip
-      title={PERMISSION_NOT_FOUND_TEXT}
-      show={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-    >
+   
       <div class="d-flex gap-2 mb-4">
         <div class="d-flex flex-column flex-grow-1">
           <input
@@ -145,7 +142,7 @@
           >
         </div>
       </div>
-    </Tooltip>
+  
 
     <div class="d-flex gap-4 mb-4 ps-2">
       <div class="d-flex align-items-center gap-2">

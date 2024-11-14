@@ -14,7 +14,7 @@ export type WebSocketData = {
   body: string;
   contentType: string;
   url: string;
-  filter: "All messages" | "Sent" | "Received";
+  filter: "All Messages" | "Sent" | "Received";
   listener: UnlistenFn | null;
 };
 

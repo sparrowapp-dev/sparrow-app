@@ -252,9 +252,6 @@ const sendMessage = async (tab_id: string, message: string) => {
   await invoke("send_websocket_message", { tabid: tab_id, message: message })
     .then(async (data: string) => {
       try {
-        // Logic to handle response
-        console.log("sent", JSON.parse(data));
-
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
@@ -301,17 +298,14 @@ const sendSocketIoMessage = async (
     return webSocketDataMap;
   });
   let urlObject = new URL(url);
-  await invoke("send_socketio_message", {
+  await invoke("send_socket_io_message", {
     tabid: tab_id,
-    namespace: urlObject.pathname || "/",
     event: _eventName,
     message: message,
   })
     .then(async (data: string) => {
       try {
         // Logic to handle response
-        console.log("sent", JSON.parse(data));
-
         socketIoDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
           let asdf = [];
@@ -331,12 +325,18 @@ const sendSocketIoMessage = async (
         });
       } catch (e) {
         console.error(e);
-        return error("error");
+        notifications.error(
+          `Failed to send message over ${SocketIORequestDefaultAliasBaseEnum.NAME} connection. Please try again.`,
+        );
+        return removeSocketDataFromMap(tab_id, url);
       }
     })
     .catch((e) => {
       console.error(e);
-      return error("error");
+      notifications.error(
+        `Failed to send message over ${SocketIORequestDefaultAliasBaseEnum.NAME} connection. Please try again.`,
+      );
+      return removeSocketDataFromMap(tab_id, url);
     });
 };
 
@@ -362,7 +362,6 @@ const disconnectWebSocket = async (tab_id: string) => {
     .then(async (data: string) => {
       try {
         // Logic to handle response
-        console.log("disconnected", data);
         let listener;
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
@@ -399,6 +398,117 @@ const disconnectWebSocket = async (tab_id: string) => {
     });
 };
 
+const addSocketDataToMap = (tabId, url) => {
+  try {
+    updateSocketDataStore(
+      tabId,
+      `Connected from ${url}`,
+      "connecter",
+      "connected",
+    );
+    notifications.success(
+      `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const removeSocketDataFromMap = (tab_id, url, err = "") => {
+  socketIoDataStore.update((webSocketDataMap) => {
+    const wsData = webSocketDataMap.get(tab_id);
+
+    // If no websocket data exists for the given tab_id, return the map as is
+    if (!wsData) return webSocketDataMap;
+
+    const { connectListener, disconnectListener, messageListener } = wsData;
+
+    if (err && err.includes("Invalid")) {
+      // Clean up listeners and delete the socket data
+      connectListener?.();
+      disconnectListener?.();
+      messageListener?.();
+      webSocketDataMap.delete(tab_id);
+
+      notifications.error(
+        `Failed to connect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
+      );
+    } else {
+      updateSocketDataStore(
+        tab_id,
+        `Disconnected from ${url}`,
+        "disconnector",
+        "disconnected",
+      );
+
+      connectListener?.();
+      disconnectListener?.();
+      messageListener?.();
+    }
+
+    return webSocketDataMap;
+  });
+};
+
+// Function to update process socket io messages
+async function processMessageEvent(tabId, event) {
+  // Simulate delay
+  await new Promise((resolve) => setTimeout(resolve, 10));
+
+  // Retrieve tab data and check event inclusion
+  const tabData = await tabRepository.getTabByTabId(tabId);
+  const tabDataJSON = tabData?.toMutableJSON();
+  const socketIOresponse = event.payload;
+  const eventName = socketIOresponse.event;
+  const message = socketIOresponse.message;
+
+  // Check if event should be included
+  const isIncludeInResponse = tabDataJSON?.property.socketio?.events.some(
+    (tabEvent) => tabEvent.listen && tabEvent.event === eventName,
+  );
+
+  // Update WebSocket data store if conditions are met
+  if (socketIOresponse && isIncludeInResponse && message) {
+    updateSocketDataStore(tabId, eventName, message);
+  }
+}
+
+// Function to update WebSocket data store
+function updateSocketDataStore(tabId, data, transmitter, status = "") {
+  socketIoDataStore.update((webSocketDataMap) => {
+    const wsData = webSocketDataMap.get(tabId);
+    console.log(wsData.status);
+    if (wsData) {
+      wsData.messages.unshift({
+        data,
+        transmitter,
+        timestamp: formatTime(new Date()),
+        uuid: uuidv4(),
+      });
+      if (status && status.length) wsData.status = status;
+      webSocketDataMap.set(tabId, wsData);
+    }
+    return webSocketDataMap;
+  });
+}
+
+const storeListenerstoMap = (
+  connectListener,
+  disconnectListener,
+  messageListener,
+  tabId,
+) => {
+  socketIoDataStore.update((webSocketDataMap) => {
+    const wsData = webSocketDataMap.get(tabId);
+    if (wsData) {
+      wsData.connectListener = connectListener;
+      wsData.disconnectListener = disconnectListener;
+      wsData.messageListener = messageListener;
+    }
+    return webSocketDataMap;
+  });
+};
+
 /**
  * Disconnects a WebSocket connection for a specific tab and handles the response.
  *
@@ -409,6 +519,7 @@ const disconnectSocketIo = async (tab_id: string) => {
   let url = "";
   socketIoDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
+
     if (wsData) {
       url = wsData.url;
       wsData.status = "disconnecting";
@@ -417,40 +528,26 @@ const disconnectSocketIo = async (tab_id: string) => {
     }
     return webSocketDataMap;
   });
-  await invoke("disconnect_socketio", { tabid: tab_id })
+  await invoke("disconnect_socket_io", { tabid: tab_id })
     .then(async (data: string) => {
       try {
         // Logic to handle response
-        console.log("disconnected", data);
-        let listener;
-        socketIoDataStore.update((webSocketDataMap) => {
-          const wsData = webSocketDataMap.get(tab_id);
-          if (wsData) {
-            listener = wsData.listener;
-            wsData.messages.unshift({
-              data: `Disconnected from ${url}`,
-              transmitter: "disconnector",
-              timestamp: formatTime(new Date()),
-              uuid: uuidv4(),
-            });
-            wsData.status = "disconnected";
-            webSocketDataMap.set(tab_id, wsData);
-            if (listener) {
-              listener();
-            }
-          }
-          return webSocketDataMap;
-        });
+        const response = JSON.parse(data);
 
-        notifications.success(
-          `${SocketIORequestDefaultAliasBaseEnum.NAME} disconnected successfully.`,
-        );
+        if (response.is_successful) {
+          notifications.success(
+            `${SocketIORequestDefaultAliasBaseEnum.NAME} disconnected successfully.`,
+          );
+        } else {
+          notifications.error(
+            `Failed to disconnect ${SocketIORequestDefaultAliasBaseEnum.NAME}. ${response.message}`,
+          );
+        }
       } catch (e) {
         console.error(e);
         notifications.error(
           `Failed to disconnect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
         );
-        return error("error");
       }
     })
     .catch((e) => {
@@ -458,7 +555,7 @@ const disconnectSocketIo = async (tab_id: string) => {
       notifications.error(
         `Failed to disconnect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
       );
-      return error("error");
+      return removeSocketDataFromMap(tab_id, url);
     });
 };
 
@@ -502,7 +599,7 @@ const connectWebSocket = async (
       search: "",
       contentType: RequestDataTypeEnum.TEXT,
       body: "",
-      filter: "All messages",
+      filter: "All Messages",
       url: url,
       listener: null,
     });
@@ -605,9 +702,11 @@ const connectSocketIo = async (
       search: "",
       contentType: RequestDataTypeEnum.TEXT,
       body: "",
-      filter: "All messages",
+      filter: "All Messages",
       url: url,
-      listener: null,
+      connectListener: null,
+      disconnectListener: null,
+      messageListener: null,
     });
 
     return webSocketDataMap;
@@ -618,105 +717,45 @@ const connectSocketIo = async (
     urlObject = new URL(url);
   } catch (e) {
     console.error(e);
-    socketIoDataStore.update((webSocketDataMap) => {
-      webSocketDataMap.delete(tabId);
-      return webSocketDataMap;
-    });
-    notifications.error(
-      `Failed to connect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
-    );
+    removeSocketDataFromMap(tabId, url);
     return;
   }
-  await invoke("connect_socketio", {
+
+  // Connect Listener
+  const connectListener = await listen(`socket-connect-${tabId}`, async () => {
+    return addSocketDataToMap(tabId, urlObject.origin);
+  });
+  // Disconnect listener
+  const disconnectListener = await listen(
+    `socket-disconnect-${tabId}`,
+    async (data) => {
+      console.log(new Date());
+      const err = data.payload.message;
+      return removeSocketDataFromMap(tabId, url, err);
+    },
+  );
+  // Handle message listener
+  const messageListener = await listen(`socket-message-${tabId}`, (event) =>
+    processMessageEvent(tabId, event),
+  );
+
+  // store listeners inside map against tab id for future removal
+  storeListenerstoMap(
+    connectListener,
+    disconnectListener,
+    messageListener,
+    tabId,
+  );
+
+  await invoke("connect_socket_io", {
     url: urlObject.origin || "",
     namespace: urlObject.pathname || "/",
     tabid: tabId,
     headers: requestHeaders,
   })
-    .then(async (data: string) => {
+    .then(async () => {
       try {
-        // Logic to handle response
-        if (data) {
-          const dt = JSON.parse(data);
-          console.log(dt);
-        }
-        // Store the WebSocket and initialize data
-        socketIoDataStore.update((webSocketDataMap) => {
-          const wsData = webSocketDataMap.get(tabId);
-          if (wsData) {
-            wsData.messages.unshift({
-              data: `Connected from ${url}`,
-              transmitter: "connecter",
-              timestamp: formatTime(new Date()),
-              uuid: uuidv4(),
-            });
-            wsData.status = "connected";
-            webSocketDataMap.set(tabId, wsData);
-          }
-          return webSocketDataMap;
-        });
-        notifications.success(
-          `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
-        );
-
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
-        const listener = await listen(
-          `socket-message-${tabId}`,
-          async (event) => {
-            await new Promise((res, rej) => {
-              setTimeout(() => {
-                res("resolved");
-              }, 10);
-            });
-            const tabData = await tabRepository.getTabByTabId(tabId);
-            const tabDataJSON = tabData?.toMutableJSON();
-            let socketIOresponse = event.payload;
-            const match = socketIOresponse.match(/\[.*\]/);
-            let socketIoResponseArray;
-            if (match) {
-              socketIoResponseArray = JSON.parse(match[0]);
-            }
-
-            let tabEvents = tabDataJSON.property.socketio?.events;
-            let isIncludeInResponse = false;
-            for (let i = 0; i < tabEvents.length; i++) {
-              if (
-                tabEvents[i].listen &&
-                tabEvents[i].event === socketIoResponseArray[0]
-              ) {
-                isIncludeInResponse = true;
-                break;
-              }
-            }
-            if (
-              socketIOresponse.startsWith("42") &&
-              isIncludeInResponse &&
-              socketIoResponseArray[1]
-            ) {
-              socketIoDataStore.update((webSocketDataMap) => {
-                const wsData = webSocketDataMap.get(tabId);
-                if (wsData) {
-                  wsData.messages.unshift({
-                    data: JSON.stringify(socketIoResponseArray),
-                    transmitter: "receiver",
-                    timestamp: formatTime(new Date()),
-                    uuid: uuidv4(),
-                  });
-                  webSocketDataMap.set(tabId, wsData);
-                }
-                return webSocketDataMap;
-              });
-            }
-          },
-        );
-        socketIoDataStore.update((webSocketDataMap) => {
-          const wsData = webSocketDataMap.get(tabId);
-          if (wsData) {
-            wsData.listener = listener;
-            webSocketDataMap.set(tabId, wsData);
-          }
-          return webSocketDataMap;
-        });
       } catch (e) {
         console.error(e);
         notifications.error(
@@ -727,13 +766,7 @@ const connectSocketIo = async (
     })
     .catch((e) => {
       console.error(e);
-      socketIoDataStore.update((webSocketDataMap) => {
-        webSocketDataMap.delete(tabId);
-        return webSocketDataMap;
-      });
-      notifications.error(
-        `Failed to connect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
-      );
+      removeSocketDataFromMap(tabId, url, "Invalid");
       return error("error");
     });
 };
