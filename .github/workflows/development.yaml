@@ -67,7 +67,8 @@ jobs:
           yarn cache clean
           npm install -g pnpm
           yarn install
-          yarn tauri build --debug
+          yarn desktop-build
+          # yarn tauri build --debug
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
@@ -133,7 +134,8 @@ jobs:
         run: |
           yarn cache clean
           yarn install
-          yarn tauri build --debug
+          yarn desktop-build
+          # yarn tauri build --debug
         env:
           APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
           APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
