@@ -58,6 +58,7 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_json::Value;
+use std::any::Any;
 use std::collections::HashMap;
 use std::process::Command;
 use tauri::Emitter;
@@ -723,8 +724,10 @@ async fn connect_socket_io(
     headers: String,
     state: tauri::State<'_, Arc<SocketIoAppState>>,
     app_handle: tauri::AppHandle,
-) -> Result<String, String> {
-    // Deserialize the JSON string into a HashMap
+) -> Result<(), String> {
+    // Create a weak reference of set
+    let state_weak = Arc::downgrade(&state);
+
     // Deserialize the JSON string into a Vec<KeyValue>
     let header_vec: Vec<KeyValue> =
         serde_json::from_str(&headers).map_err(|e| format!("Failed to parse headers: {}", e))?;
@@ -732,11 +735,12 @@ async fn connect_socket_io(
     // Clone tabid so it can be used at multiple places
     let tabid_clone = tabid.clone();
     let tabid_clone_clone = tabid.clone();
+    let tabid_clone_clone_clone = tabid.clone();
 
     // Clone app_handle so it can be used at multiple places
     let app_handle_clone = app_handle.clone();
     let app_handle_clone_clone = app_handle.clone();
-
+    let app_handle_clone_clone_clone = app_handle.clone();
 
     let socket_event_listener = move |event: SocketIoEvent,
                                       payload: SocketIoPayload,
@@ -766,9 +770,35 @@ async fn connect_socket_io(
                     })
                 }
             };
-            
+
             // Emit the message JSON to the app
             let _ = app_handle_clone.emit(&format!("socket-message-{}", tabid_clone), message_json);
+        }
+        .boxed()
+    };
+
+    let socket_connected = move |_payload: SocketIoPayload, _socket: SocketClient| {
+        let app_handle_clone = app_handle_clone_clone_clone.clone();
+        let tabid_clone = tabid_clone_clone_clone.clone();
+
+        // Fetch the strong reference to set
+        let state_strong = state_weak.upgrade().expect("State was dropped prematurely");
+
+        async move {
+            // When successfully connected, update the state with the client
+            println!("Connected to Socket.IO with tabid: {}", tabid_clone);
+
+            // Store the connected client in the shared state
+            {
+                let mut clients = state_strong.connections.lock().await; // Await the lock acquisition
+                clients.insert(tabid_clone.clone(), _socket.clone()); // Insert the client into the state
+            }
+
+            // Emit a success message to notify frontend
+            let _ = app_handle_clone.emit(
+                &format!("socket-connect-{}", tabid_clone),
+                json!({ "message": "Successfully connected to the server" }),
+            );
         }
         .boxed()
     };
@@ -776,13 +806,11 @@ async fn connect_socket_io(
     // Create a new Socket.IO client
     let mut builder = ClientBuilder::new(&url)
         .namespace(&namespace)
-        .on("error", move |err, _| {
-            // Clone tabid_clone and app_handle_clone for use in the error handler closure
+        .on(SocketIoEvent::Error, move |err, _| {
             let tabid_clone = tabid_clone_clone.clone();
             let app_handle_clone = app_handle_clone_clone.clone();
 
             async move {
-                // Emit error message on error event
                 let _ = app_handle_clone.emit(
                     &format!("socket-disconnect-{}", tabid_clone),
                     json!({ "message": format!("Error: {:#?}", err) }),
@@ -790,6 +818,7 @@ async fn connect_socket_io(
             }
             .boxed()
         })
+        .on(SocketIoEvent::Connect, socket_connected)
         .reconnect(false)
         .auth(json!({}))
         .transport_type(TransportType::Websocket)
@@ -801,43 +830,29 @@ async fn connect_socket_io(
     }
 
     // Connect to the client
-    let socket = builder
+    let _socket = builder
         .connect()
         .await
         .map_err(|e| format!("Connection failed: {}", e))?;
 
-    // Store the connected client in the shared state
-    {
-        let tabid_clone_clone = tabid.clone();
-
-        // Remove Tab ID if already exists in state and then add a new entry
-        let _ = disconnect_socket_io(tabid.clone(), state.clone()).await;
-
-        let mut clients = state.connections.lock().await; // Await the lock acquisition
-
-        clients.insert(tabid_clone_clone, socket);
-    }
-
-    // Create successful connection response
-    let response = SocketIoResponse {
-        is_successful: true,
-        status_code: 200,
-        message: "Socket.IO connected successfully".to_string(),
-    };
-
-    // Serialize the response to a JSON string and return it
-    serde_json::to_string(&response).map_err(|e| format!("Failed to serialize response: {}", e))
+    Ok(())
 }
 
 #[tauri::command]
 async fn disconnect_socket_io(
     tabid: String,
     state: tauri::State<'_, Arc<SocketIoAppState>>,
+    app_handle: tauri::AppHandle,
 ) -> Result<String, String> {
     let mut clients = state.connections.lock().await;
     let response;
 
     if let Some(client) = clients.remove(&tabid) {
+        let _ = app_handle.emit(
+            &format!("socket-disconnect-{}", &tabid),
+            json!({ "message":"Socket.IO connection disconnected successfully".to_string()}),
+        );
+
         // Assuming you have a method to disconnect the client properly
         client
             .disconnect()
