@@ -2,8 +2,8 @@
 import {
   ReduceRequestURL,
   ReduceQueryParams,
-  DecodeWebsocket,
-} from "@sparrow/workspaces/features/rest-explorer/utils";
+  DecodeSocketio,
+} from "@sparrow/workspaces/features/socketio-explorer/utils";
 import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 
@@ -162,14 +162,12 @@ class SocketIoExplorerPageViewModel {
         progressiveTab.property.socketio?.message
       ) {
         result = false;
-      }
-      else if (
+      } else if (
         requestServer.property.socketio.eventName !==
         progressiveTab.property.socketio?.eventName
       ) {
         result = false;
-      }
-      else if (
+      } else if (
         !this.compareArray.init(
           requestServer.property.socketio.events,
           progressiveTab.property.socketio?.events,
@@ -1509,7 +1507,7 @@ class SocketIoExplorerPageViewModel {
   public connectWebsocket = async (environmentVariables) => {
     const websocketData = this._tab.getValue();
 
-    const decodeData = new DecodeWebsocket().init(
+    const decodeData = new DecodeSocketio().init(
       this._tab.getValue().property.socketio,
       environmentVariables?.filtered || [],
     );

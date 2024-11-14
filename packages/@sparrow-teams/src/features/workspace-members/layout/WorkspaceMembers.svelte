@@ -63,6 +63,17 @@
       });
     }
   }
+
+  let searchedUsers = [];
+  $: {
+    searchedUsers = filteredUser.filter((user) => {
+      return (
+        user.email.includes(search) ||
+        user.name.includes(search) ||
+        user.role.includes(search)
+      );
+    });
+  }
 </script>
 
 <Header
@@ -90,26 +101,31 @@
     </div>
     <Member user={activeUser} isActiveUser={true} />
     <hr />
-    {#if !filteredUser?.length}
+
+    {#if !searchedUsers.length && search}
+      <div class="skeleton-parent">
+        <p class="skeleton-text" style="margin-top: 10px;">
+          No result found.
+        </p>
+      </div>
+    {:else if searchedUsers.length}
+      {#each searchedUsers as user}
+        <Member
+          {user}
+          {activeUser}
+          isActiveUser={false}
+          {activeWorkspace}
+          {onChangeUserRoleAtWorkspace}
+          {onRemoveUserFromWorkspace}
+        />
+      {/each}
+    {:else if !filteredUser?.length}
       <div class="skeleton-parent">
         <p class="skeleton-text" style="margin-top: 10px;">
           Once you invite people to this workspace, you will see them listed
           here. Add people and manage their access by clicking to invite.
         </p>
       </div>
-    {:else}
-      {#each filteredUser as user}
-        {#if user.email.includes(search) || user.name.includes(search) || user.role.includes(search)}
-          <Member
-            {user}
-            {activeUser}
-            isActiveUser={false}
-            {activeWorkspace}
-            {onChangeUserRoleAtWorkspace}
-            {onRemoveUserFromWorkspace}
-          />
-        {/if}
-      {/each}
     {/if}
   </div>
 </div>

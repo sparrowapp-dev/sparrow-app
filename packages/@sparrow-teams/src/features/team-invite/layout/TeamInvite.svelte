@@ -67,10 +67,23 @@
     return false;
   };
 
+  const isEmailAlreadyAdded = (email: string) => {
+    for (let i = 0; i < emailstoBeSentArr.length; i++) {
+      if (email.toLowerCase() === emailstoBeSentArr[i].toLowerCase()) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const handleEmailOnAdd = async (email: string) => {
     email = email.replace(",", "");
     email = email.trim();
 
+    if (isEmailAlreadyAdded(email)) {
+      currentEmailEntered = "";
+      return;
+    }
     const isEmailAlreadyExist = isEmailAlreadyExistInTeam(email);
     if (isEmailAlreadyExist) {
       notifications.error("User already in team!");
@@ -234,7 +247,7 @@
       class="input-container text-fs-12"
       on:keyup={(event) => {
         if (
-          (event.key === "," || event.key === "Enter" || event.key === " ") &&
+          (event.key === "," || event.key === "Enter") &&
           currentEmailEntered &&
           currentEmailEntered.trim() != "" &&
           currentEmailEntered.trim() != ","
@@ -285,7 +298,7 @@
       {
         name: "Editor",
         id: WorkspaceRole.WORKSPACE_EDITOR,
-        description: "Add & edit resources within a workspace",
+        description: "Add & edit resources within a workspace.",
       },
       {
         name: "Viewer",

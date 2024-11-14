@@ -1,4 +1,5 @@
 import type { FolderBaseInterface } from "./folder-base";
+import type { GraphqlRequestBaseInterface } from "./graphql-request-base";
 import type { HttpRequestBaseInterface } from "./http-request-base";
 import type { SocketIORequestBaseInterface } from "./socket-io-request-base";
 import type { WebsocketRequestBaseInterface } from "./websocket-request-base";
@@ -13,6 +14,7 @@ export interface CollectionItemBaseInterface {
   request?: HttpRequestBaseInterface;
   websocket?: WebsocketRequestBaseInterface;
   socketio?: SocketIORequestBaseInterface;
+  graphql?: GraphqlRequestBaseInterface;
   folder?: FolderBaseInterface;
   createdAt: string;
   updatedAt: string;
@@ -54,6 +56,7 @@ export interface CollectionArgsBaseInterface {
   request?: CollectionItemBaseInterface;
   websocket?: CollectionItemBaseInterface;
   socketio?: CollectionItemBaseInterface;
+  graphql?: CollectionItemBaseInterface;
   newName?: string;
   importCurl?: string;
   deletedIds?: string[];

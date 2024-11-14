@@ -115,7 +115,7 @@
     <div class="d-flex justify-content-between page-funationality">
       <div
         style="margin-bottom: 37px;"
-        class={`d-flex search-input-container rounded py-1 px-2 `}
+        class={`d-flex  search-input-container rounded py-1 px-2 `}
         on:click={() => {
           MixpanelEvent(Events.Roadmap_Search);
         }}

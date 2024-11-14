@@ -13,6 +13,9 @@
   import { beautifyIcon as BeautifyIcon } from "@sparrow/library/assets";
   import js_beautify, { html_beautify } from "js-beautify";
   import { WithSelectV3 } from "@sparrow/workspaces/hoc";
+  import { invoke } from "@tauri-apps/api/core";
+  import { save } from "@tauri-apps/plugin-dialog";
+  import { writeTextFile, BaseDirectory } from '@tauri-apps/plugin-fs';
 
   export let response;
   export let apiState;
@@ -76,23 +79,28 @@
   };
 
   const handleDownloaded = async () => {
-    const newHandle = await window.showSaveFilePicker({
-      suggestedName: `api_response_${
-        response?.status ? response?.status : ""
-      }_${response?.time ? response?.time : "0"}ms_${
-        response?.size ? response?.size : "0"
-      }kb.${fileExtension}`,
-      accept: {
-        extensions: ["txt", "json", "xml", "js", "html"],
-      },
+    // Open a save file dialog
+    const path = await save({
+      defaultPath: `api_response_${response?.status || ""}_${response?.time || "0"}ms_${response?.size || "0"}kb.${fileExtension}`,
+      filters: [
+        {
+          name: "Text Files",
+          extensions: ["txt", "json", "xml", "js", "html"],
+        },
+      ],
     });
-    const writableStream = await newHandle.createWritable();
-    // write our file
-    await writableStream.write(formatCode(response?.body));
-    await writableStream.close();
-    notifications.success("Response downloaded successfully.");
-    MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
+    console.log(path);
+     // Check if a path was selected
+  if (path) {
+    const contents = JSON.stringify(formatCode(response?.body));
+    await writeTextFile(path, contents, {
+      baseDir: BaseDirectory.AppConfig,
+    });
+  } else {
+    console.log("Save dialog was canceled or no path was selected.");
+  }
   };
+
 </script>
 
 <div class="d-flex flex-column align-items-start justify-content-between w-100">

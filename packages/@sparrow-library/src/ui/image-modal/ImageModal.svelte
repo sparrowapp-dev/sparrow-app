@@ -14,6 +14,8 @@
    */
   export let zIndex = 1000;
   export let width = "35%";
+  export let height = "35%";
+
   export let isCrossButton = true;
   /**
    * Callback function to close the modal.
@@ -40,7 +42,7 @@
 
     <div
       class="sparrow-modal-container-data gap-2"
-      style={`z-index: ${zIndex + 2}; width: ${width}`}
+      style={`z-index: ${zIndex + 2}; width: ${width}; max-height: ${height}; overflow:auto; `}
     >
       <div
         class="sparrow-modal-header justify-content-between d-flex align-items-start"
@@ -53,7 +55,7 @@
             <h3 class="sparrow-modal-heading fw-normal ellipsis">{title}</h3>
           {/if}
         </div>
-        {#if isCrossButton}
+        <!-- {#if isCrossButton}
           <button
             class="sparrow-modal-close-icon-btn border-0 d-flex justify-content-center align-items-center"
             style="height: 30px; width:30px; "
@@ -61,7 +63,7 @@
           >
             <CrossIcon width="17px" height="17px" />
           </button>
-        {/if}
+        {/if} -->
       </div>
 
       <div class="sparrow-modal-body">
@@ -104,7 +106,7 @@
   }
 
   .sparrow-modal-container-data {
-    background-color: var(--bg-tertiary-400);
+    // background-color: var(--bg-tertiary-400);
     border-radius: 6px;
     position: relative;
   }
