@@ -58,6 +58,7 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_json::Value;
+use std::any::Any;
 use std::collections::HashMap;
 use std::process::Command;
 use tauri::Emitter;
@@ -805,7 +806,7 @@ async fn connect_socket_io(
     // Create a new Socket.IO client
     let mut builder = ClientBuilder::new(&url)
         .namespace(&namespace)
-        .on("error", move |err, _| {
+        .on(SocketIoEvent::Error, move |err, _| {
             let tabid_clone = tabid_clone_clone.clone();
             let app_handle_clone = app_handle_clone_clone.clone();
 
@@ -841,11 +842,17 @@ async fn connect_socket_io(
 async fn disconnect_socket_io(
     tabid: String,
     state: tauri::State<'_, Arc<SocketIoAppState>>,
+    app_handle: tauri::AppHandle,
 ) -> Result<String, String> {
     let mut clients = state.connections.lock().await;
     let response;
-
+    let _ = app_handle.emit(
+        &format!("socket-disconnect-{}", &tabid),
+        json!({ "message":"Socket.IO connection disconnected successfully".to_string()})
+    );
+        
     if let Some(client) = clients.remove(&tabid) {
+
         // Assuming you have a method to disconnect the client properly
         client
             .disconnect()
