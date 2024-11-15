@@ -13,11 +13,6 @@
   const handleAuthChange = () => {
     callback({ apiKey: apiData });
   };
-
-  const handleOptionChange = (event) => {
-    apiData.addTo = event.target.value;
-    callback({ apiKey: apiData });
-  };
 </script>
 
 <div>
@@ -25,30 +20,6 @@
     The authorization header will be automatically generated when you send the
     request.
   </p>
-</div>
-<div class="pt-2 d-flex gap-3">
-  <div class="radio text-fs-12 d-flex align-items-center">
-    <input
-      id="radio-1"
-      name="radio"
-      type="radio"
-      value={AuthSection.HEADER}
-      bind:group={apiData.addTo}
-      on:change={handleOptionChange}
-    />
-    <label for="radio-1" class="radio-label"> Add to Header </label>
-  </div>
-  <div class="radio text-fs-12 d-flex align-items-center">
-    <input
-      id="radio-2"
-      name="radio"
-      type="radio"
-      value={AuthSection.QUERY_PARAMETER}
-      bind:group={apiData.addTo}
-      on:click={handleOptionChange}
-    />
-    <label for="radio-2" class="radio-label"> Add to Parameter </label>
-  </div>
 </div>
 <div class="d-flex flex-column w-100 ps-1 pt-4 pe-1">
   <div class="mb-3" style="font-size: 12px; font-weight:500">
