@@ -855,6 +855,124 @@ const makeHttpRequestV2 = async (
   }
 };
 
+/**
+ * Function to convert schema into required type. (Will shift to util in future, DO NOT REMOVE IT.)
+ */
+const formatGraphQLSchema = (introspectionData) => {
+  const schema = {};
+  introspectionData.__schema?.types?.forEach((type) => {
+    // Ignore built-in types like __Schema, __Type, etc.
+    if (type?.name?.startsWith("__")) return;
+
+    // Create header comments for the types
+    const headerComment = type?.description ? `"""${type?.description}"""` : "";
+    const typeDef = [];
+
+    switch (type?.kind) {
+      case "OBJECT":
+        // Special handling for Query, Mutation, and Subscription
+        if (["Query", "Mutation", "Subscription"].includes(type?.name)) {
+          typeDef.push(`type ${type?.name} {`);
+          type?.fields?.forEach((field) => {
+            const args = field?.args
+              .map((arg) => `${arg?.name}: ${formatFieldType(arg?.type)}`)
+              .join(", ");
+            const fieldComment = field?.description
+              ? `"""${field?.description}"""`
+              : "";
+            typeDef.push(`  ${fieldComment}`);
+            typeDef.push(
+              `  ${field?.name}(${args}): ${formatFieldType(field?.type)}${
+                field?.type?.kind === "NON_NULL" ? "!" : ""
+              }`,
+            );
+          });
+          typeDef.push("}");
+        } else {
+          typeDef.push(`type ${type?.name} {`);
+          type?.fields?.forEach((field) => {
+            const fieldComment = field?.description
+              ? `"""${field?.description}"""`
+              : "";
+            typeDef.push(`  ${fieldComment}`);
+            typeDef.push(
+              `  ${field?.name}: ${formatFieldType(field?.type)}${
+                field?.type?.kind === "NON_NULL" ? "!" : ""
+              }`,
+            );
+          });
+          typeDef.push("}");
+        }
+        break;
+
+      case "INPUT_OBJECT":
+        typeDef.push(`input ${type.name} {`);
+        type.inputFields.forEach((field) => {
+          const fieldComment = field.description
+            ? `"""${field.description}"""`
+            : "";
+          typeDef.push(`  ${fieldComment}`);
+          typeDef.push(
+            `  ${field.name}: ${formatFieldType(field.type)}${
+              field.type.kind === "NON_NULL" ? "!" : ""
+            }`,
+          );
+        });
+        typeDef.push("}");
+        break;
+
+      case "SCALAR":
+        typeDef.push(`scalar ${type.name}`);
+        break;
+
+      default:
+        break;
+    }
+
+    // Store the formatted type definition in the schema object
+    schema[type?.name] = headerComment
+      ? `${headerComment}\n${typeDef.join("\n")}`
+      : typeDef.join("\n");
+  });
+
+  // Combine all the types into a single schema string
+  return Object.values(schema).join("\n\n");
+};
+
+// Helper function to format field types, handling nested types and non-null markers
+const formatFieldType = (type) => {
+  if (type?.kind === "NON_NULL") return `${formatFieldType(type?.ofType)}!`;
+  if (type?.kind === "LIST") return `[${formatFieldType(type?.ofType)}]`;
+  return type?.name || type?.ofType?.name || "";
+};
+
+/**
+ * Invoke RPC Function to fetch graphql result.
+ * @param url - Request URL
+ * @param headers - Request Header
+ * @param body - Request GraphQL Query
+ */
+const makeGraphQLRequest = async (
+  url: string,
+  headers: string,
+  body: string,
+) => {
+  try {
+    const data = await invoke("send_graphql_request", {
+      url,
+      headers,
+      query: body,
+    });
+    const parsedResponse = JSON.parse(data);
+    const parsedBody = JSON.parse(parsedResponse.body);
+    // Example Function call to format schema DO NOT REMOVE IT.
+    // const formattedSchema = formatGraphQLSchema(parsedBody.data);
+    // console.log(formattedSchema);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export {
   makeRequest,
   getAuthHeaders,
@@ -868,5 +986,6 @@ export {
   sendSocketIoMessage,
   connectSocketIo,
   disconnectSocketIo,
+  makeGraphQLRequest,
   // getHeaders,
 };
