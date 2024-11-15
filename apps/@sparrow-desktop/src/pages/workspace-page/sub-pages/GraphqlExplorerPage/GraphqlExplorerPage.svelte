@@ -4,12 +4,11 @@
 
   // ---- View Model
   import GraphqlExplorerViewModel from "./GraphqlExplorerPage.ViewModel";
-  import { RestExplorer, ChatBot } from "@sparrow/workspaces/features";
   import { Debounce } from "@sparrow/common/utils";
   import { isGuestUserActive, user } from "@app/store/auth.store";
   import { onMount } from "svelte";
-  import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
-  import type { restExplorerData } from "@sparrow/workspaces/features/rest-explorer/store";
+  import { graphqlExplorerDataStore } from "@sparrow/workspaces/features/graphql-explorer/store";
+  import type { graphqlExplorerData } from "@sparrow/workspaces/features/graphql-explorer/store";
   import { GraphqlExplorer } from "@sparrow/workspaces/features";
   export let tab;
   export let isTourGuideOpen = false;
@@ -137,8 +136,8 @@
     }
   });
 
-  let restExplorerData: restExplorerData | undefined;
-  restExplorerDataStore.subscribe((webSocketMap) => {
+  let restExplorerData: graphqlExplorerData | undefined;
+  graphqlExplorerDataStore.subscribe((webSocketMap) => {
     restExplorerData = webSocketMap.get(tab.tabId);
   });
 </script>
@@ -158,7 +157,6 @@
   onCancelRequest={_viewModel.cancelRequest}
   onUpdateRequestUrl={_viewModel.updateRequestUrl}
   onUpdateRequestMethod={_viewModel.updateRequestMethod}
-  onUpdateRequestParams={_viewModel.updateParams}
   onUpdateRequestName={_viewModel.updateRequestName}
   onUpdateRequestBody={_viewModel.updateRequestBody}
   onUpdateRequestAuth={_viewModel.updateRequestAuth}

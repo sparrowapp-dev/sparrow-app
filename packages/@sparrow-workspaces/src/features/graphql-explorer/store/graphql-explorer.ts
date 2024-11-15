@@ -15,6 +15,6 @@ export type graphqlExplorerData = {
   isSendRequestInProgress: boolean;
 };
 
-export const restExplorerDataStore = writable<Map<string, graphqlExplorerData>>(
-  new Map(),
-);
+export const graphqlExplorerDataStore = writable<
+  Map<string, graphqlExplorerData>
+>(new Map());
