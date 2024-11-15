@@ -73,6 +73,7 @@ import type { GuideQuery } from "../../../../types/user-guide";
 import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.ws.service";
 import type { Socket } from "socket.io-client";
 import { graphqlExplorerDataStore } from "@sparrow/workspaces/features/graphql-explorer/store";
+import { InitTab } from "@sparrow/common/factory";
 
 class GraphqlExplorerViewModel {
   /**
@@ -188,9 +189,15 @@ class GraphqlExplorerViewModel {
     ) {
       result = false;
     }
-    // method
+    // query
     else if (
-      requestServer.graphql.method !== progressiveTab.property.graphql.method
+      requestServer.graphql.query !== progressiveTab.property.graphql.query
+    ) {
+      result = false;
+    }
+    // schema
+    else if (
+      requestServer.graphql.schema !== progressiveTab.property.graphql.schema
     ) {
       result = false;
     }
@@ -205,13 +212,6 @@ class GraphqlExplorerViewModel {
     else if (
       requestServer.graphql.auth.apiKey.authValue !==
       progressiveTab.property.graphql.auth.apiKey.authValue
-    ) {
-      result = false;
-    }
-    // addTo
-    else if (
-      requestServer.graphql.auth.apiKey.addTo !==
-      progressiveTab.property.graphql.auth.apiKey.addTo
     ) {
       result = false;
     }
@@ -236,50 +236,11 @@ class GraphqlExplorerViewModel {
     ) {
       result = false;
     }
-    // raw code
-    else if (
-      requestServer.graphql.body.raw !==
-      progressiveTab.property.graphql.body.raw
-    ) {
-      result = false;
-    }
-    // url encode
-    else if (
-      !this.compareArray.init(
-        requestServer.graphql.body.urlencoded,
-        progressiveTab.property.graphql.body.urlencoded,
-      )
-    ) {
-      result = false;
-    }
-    // form data
-    else if (
-      !this.compareArray.init(
-        requestServer.graphql.body.formdata.text,
-        unadaptedRequest.body.formdata.text,
-      )
-    ) {
-      result = false;
-    } else if (
-      !this.compareArray.init(
-        requestServer.graphql.body.formdata.file,
-        unadaptedRequest.body.formdata.file,
-      )
-    ) {
-      result = false;
-    }
     // headers
     else if (
       !this.compareArray.init(
         requestServer.graphql.headers,
         progressiveTab.property.graphql.headers,
-      )
-    ) {
-      result = false;
-    } else if (
-      !this.compareArray.init(
-        requestServer.graphql.queryParams,
-        progressiveTab.property.graphql.queryParams,
       )
     ) {
       result = false;
@@ -962,7 +923,7 @@ class GraphqlExplorerViewModel {
       id: _id,
       name: componentData?.name,
       description: componentData?.description,
-      type: ItemType.REQUEST,
+      type: ItemType.GRAPHQL,
     };
 
     let folderSource;
@@ -976,13 +937,13 @@ class GraphqlExplorerViewModel {
         type: ItemType.FOLDER,
         items: {
           ...requestMetaData,
-          request: unadaptedRequest,
+          graphql: unadaptedRequest,
         },
       };
     } else {
       itemSource = {
         ...requestMetaData,
-        request: unadaptedRequest,
+        graphql: unadaptedRequest,
       };
     }
 
@@ -997,7 +958,7 @@ class GraphqlExplorerViewModel {
         name: requestMetaData.name,
         description: requestMetaData.description,
         type: "REQUEST",
-        request: unadaptedRequest,
+        graphql: unadaptedRequest,
         updatedAt: "",
         updatedBy: "Guest User",
       };
@@ -1024,7 +985,7 @@ class GraphqlExplorerViewModel {
         message: "",
       };
     }
-    const res = await updateCollectionRequest(_id, folderId, collectionId, {
+    const res = await this.collectionService.updateGraphqlInCollection(_id, {
       collectionId: collectionId,
       workspaceId: workspaceId,
       ...folderSource,
@@ -1150,8 +1111,8 @@ class GraphqlExplorerViewModel {
         id: uuidv4(),
         name: tabName,
         description,
-        type: ItemType.REQUEST,
-        request: unadaptedRequest,
+        type: ItemType.GRAPHQL,
+        graphql: unadaptedRequest,
         source: "USER",
         isDeleted: false,
         createdBy: "Guest User",
@@ -1205,14 +1166,13 @@ class GraphqlExplorerViewModel {
             /**
              * Create new copy of the existing request
              */
-            const initRequestTab = new InitRequestTab(req.id, "UNTRACKED-");
+            const initRequestTab = new InitTab().graphQl(req.id, "UNTRACKED-");
             initRequestTab.updateName(req.name);
             initRequestTab.updateDescription(req.description);
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(req.graphql.url);
-            initRequestTab.updateMethod(req.graphql.method);
-            initRequestTab.updateBody(req.graphql.body);
-            initRequestTab.updateQueryParams(req.graphql.queryParams);
+            initRequestTab.updateQuery(req.graphql.query);
+            initRequestTab.updateSchema(req.graphql.schema);
             initRequestTab.updateAuth(req.graphql.auth);
             initRequestTab.updateHeaders(req.graphql.headers);
 
@@ -1226,17 +1186,16 @@ class GraphqlExplorerViewModel {
               id: req.id,
             },
           };
-          return;
         }
-        const res = await insertCollectionRequest({
+        const res = await this.collectionService.addGraphqlInCollection({
           collectionId: path[path.length - 1].id,
           workspaceId: _workspaceMeta.id,
           ...userSource,
           items: {
             name: tabName,
             description,
-            type: ItemType.REQUEST,
-            request: unadaptedRequest,
+            type: ItemType.GRAPHQL,
+            graphql: unadaptedRequest,
           },
         });
         if (res.isSuccessful) {
@@ -1272,7 +1231,7 @@ class GraphqlExplorerViewModel {
             /**
              * Create new copy of the existing request
              */
-            const initRequestTab = new InitRequestTab(
+            const initRequestTab = new InitTab().graphQl(
               res.data.data.id,
               "UNTRACKED-",
             );
@@ -1280,9 +1239,8 @@ class GraphqlExplorerViewModel {
             initRequestTab.updateDescription(res.data.data.description);
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(res.data.data.graphql.url);
-            initRequestTab.updateMethod(res.data.data.graphql.method);
-            initRequestTab.updateBody(res.data.data.graphql.body);
-            initRequestTab.updateQueryParams(res.data.data.graphql.queryParams);
+            initRequestTab.updateQuery(res.data.data.graphql.query);
+            initRequestTab.updateSchema(res.data.data.graphql.schema);
             initRequestTab.updateAuth(res.data.data.graphql.auth);
             initRequestTab.updateHeaders(res.data.data.graphql.headers);
 
@@ -1342,14 +1300,13 @@ class GraphqlExplorerViewModel {
               progressiveTab,
             );
           } else {
-            const initRequestTab = new InitRequestTab(req.id, "UNTRACKED-");
+            const initRequestTab = new InitTab().graphQl(req.id, "UNTRACKED-");
             initRequestTab.updateName(req.name);
             initRequestTab.updateDescription(req.description);
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(req.graphql.url);
-            initRequestTab.updateMethod(req.graphql.method);
-            initRequestTab.updateBody(req.graphql.body);
-            initRequestTab.updateQueryParams(req.graphql.queryParams);
+            initRequestTab.updateQuery(req.graphql.query);
+            initRequestTab.updateSchema(req.graphql.schema);
             initRequestTab.updateAuth(req.graphql.auth);
             initRequestTab.updateHeaders(req.graphql.headers);
             this.tabRepository.createTab(initRequestTab.getValue());
@@ -1363,7 +1320,7 @@ class GraphqlExplorerViewModel {
             },
           };
         }
-        const res = await insertCollectionRequest({
+        const res = await this.collectionService.addGraphqlInCollection({
           collectionId: path[0].id,
           workspaceId: _workspaceMeta.id,
           folderId: path[path.length - 1].id,
@@ -1375,8 +1332,8 @@ class GraphqlExplorerViewModel {
             items: {
               name: tabName,
               description,
-              type: ItemType.REQUEST,
-              request: unadaptedRequest,
+              type: ItemType.GRAPHQL,
+              graphql: unadaptedRequest,
             },
           },
         });
@@ -1405,7 +1362,7 @@ class GraphqlExplorerViewModel {
             this.tab = progressiveTab;
             this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
           } else {
-            const initRequestTab = new InitRequestTab(
+            const initRequestTab = new InitTab().graphQl(
               res.data.data.id,
               "UNTRACKED-",
             );
@@ -1413,9 +1370,8 @@ class GraphqlExplorerViewModel {
             initRequestTab.updateDescription(res.data.data.description);
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(res.data.data.graphql.url);
-            initRequestTab.updateMethod(res.data.data.graphql.method);
-            initRequestTab.updateBody(res.data.data.graphql.body);
-            initRequestTab.updateQueryParams(res.data.data.graphql.queryParams);
+            initRequestTab.updateQuery(res.data.data.graphql.query);
+            initRequestTab.updateSchema(res.data.data.graphql.schema);
             initRequestTab.updateAuth(res.data.data.graphql.auth);
             initRequestTab.updateHeaders(res.data.data.graphql.headers);
             this.tabRepository.createTab(initRequestTab.getValue());

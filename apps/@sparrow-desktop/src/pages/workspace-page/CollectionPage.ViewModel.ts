@@ -76,7 +76,7 @@ import type { FeatureQuery } from "../../types/feature-switch";
 import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/utils";
 
 import { createDeepCopy } from "@sparrow/common/utils";
-import { SocketIoTabAdapter } from "../../adapter";
+import { GraphqlTabAdapter, SocketIoTabAdapter } from "../../adapter";
 import { CollectionItemTypeDtoEnum } from "@sparrow/common/types/workspace/collection-dto";
 import type {
   SocketIORequestDeletePayloadDtoInterface,
@@ -2053,6 +2053,28 @@ export default class CollectionsViewModel {
    * @param request : - The request going to be opened on tab
    * @param path : - The path to the request
    */
+  public handleOpenGraphqlTab = (
+    workspaceId: string,
+    collection: CollectionDto,
+    folder: CollectionItemsDto,
+    _graphql: CollectionItemsDto,
+  ) => {
+    const requestTabAdapter = new GraphqlTabAdapter();
+    const adaptedRequest = requestTabAdapter.adapt(
+      workspaceId || "",
+      collection?.id || "",
+      folder?.id || "",
+      _graphql,
+    );
+    this.tabRepository.createTab(adaptedRequest);
+    moveNavigation("right");
+  };
+
+  /**
+   * Handles opening a request on a tab
+   * @param request : - The request going to be opened on tab
+   * @param path : - The path to the request
+   */
   public handleOpenWebSocket = (
     workspaceId: string,
     collection: CollectionDto,
@@ -4002,6 +4024,14 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
           args.socketio as CollectionItemsDto,
+        );
+        break;
+      case "graphql":
+        this.handleOpenGraphqlTab(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.graphql as CollectionItemsDto,
         );
         break;
     }

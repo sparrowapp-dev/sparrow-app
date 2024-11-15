@@ -118,13 +118,13 @@ class InitGraphqlTab {
   }
   public updateQuery(_query: string) {
     if (_query && this._tab.property.graphql) {
-      this._tab.property.graphql.url = _query;
+      this._tab.property.graphql.query = _query;
     }
     return this;
   }
   public updateSchema(_schema: string) {
     if (_schema && this._tab.property.graphql) {
-      this._tab.property.graphql.url = _schema;
+      this._tab.property.graphql.schema = _schema;
     }
     return this;
   }
