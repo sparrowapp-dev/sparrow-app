@@ -248,7 +248,6 @@ function formatTime(date) {
  *
  */
 const sendMessage = async (tab_id: string, message: string) => {
-  // debugger;
   await invoke("send_websocket_message", { tabid: tab_id, message: message })
     .then(async (data: string) => {
       try {
@@ -288,7 +287,6 @@ const sendSocketIoMessage = async (
   message: string,
   _eventName: string,
 ) => {
-  // debugger;
   let url = "";
   socketIoDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
@@ -469,7 +467,11 @@ async function processMessageEvent(tabId, event) {
 
   // Update WebSocket data store if conditions are met
   if (socketIOresponse && isIncludeInResponse && message) {
-    updateSocketDataStore(tabId, eventName, message);
+    updateSocketDataStore(
+      tabId,
+      JSON.stringify([eventName, message[0]]),
+      "receiver",
+    );
   }
 }
 
@@ -589,7 +591,6 @@ const connectWebSocket = async (
   tabId: string,
   requestHeaders: string,
 ) => {
-  // debugger;
   const httpurl = convertWebSocketUrl(url);
   console.table({ url, httpurl, tabId, requestHeaders });
   webSocketDataStore.update((webSocketDataMap) => {
@@ -714,23 +715,27 @@ const connectSocketIo = async (
 
   let urlObject;
   try {
-    urlObject = new URL(url);
+    let validUrl = url;
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      validUrl = "http://" + url;
+    }
+    urlObject = new URL(validUrl);
   } catch (e) {
-    console.error(e);
-    removeSocketDataFromMap(tabId, url);
+    console.error("Invalid host name", e);
+    removeSocketDataFromMap(tabId, url, "Invalid");
     return;
   }
 
   // Connect Listener
   const connectListener = await listen(`socket-connect-${tabId}`, async () => {
-    return addSocketDataToMap(tabId, urlObject.origin);
+    return addSocketDataToMap(tabId, url);
   });
   // Disconnect listener
   const disconnectListener = await listen(
     `socket-disconnect-${tabId}`,
     async (data) => {
-      console.log(new Date());
       const err = data.payload.message;
+      console.log("invalid namespace", err);
       return removeSocketDataFromMap(tabId, url, err);
     },
   );
@@ -765,7 +770,7 @@ const connectSocketIo = async (
       }
     })
     .catch((e) => {
-      console.error(e);
+      console.error("Invalid host name", e);
       removeSocketDataFromMap(tabId, url, "Invalid");
       return error("error");
     });
