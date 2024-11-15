@@ -9,8 +9,6 @@ export type graphqlExplorerData = {
     time: number;
     size: number;
     navigation: string;
-    bodyLanguage: string;
-    bodyFormatter: string;
   };
   isSendRequestInProgress: boolean;
 };

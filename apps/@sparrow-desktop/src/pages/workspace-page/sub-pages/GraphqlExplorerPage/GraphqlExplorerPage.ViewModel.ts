@@ -33,7 +33,10 @@ import {
 import type { CreateDirectoryPostBody } from "@sparrow/common/dto";
 
 // ---- Service
-import { makeHttpRequestV2 } from "@app/containers/api/api.common";
+import {
+  makeGraphQLRequest,
+  makeHttpRequestV2,
+} from "@app/containers/api/api.common";
 import {
   insertCollection,
   insertCollectionDirectory,
@@ -333,6 +336,21 @@ class GraphqlExplorerViewModel {
 
   /**
    *
+   * @param _query - request query
+   */
+  public updateRequestQuery = async (_query: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    // if (_url === progressiveTab.property.graphql.url) {
+    //   return;
+    // }
+    progressiveTab.property.graphql.query = _query;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
+  /**
+   *
    * @param _path - request path
    */
   private updateRequestPath = async (_path: Path) => {
@@ -502,24 +520,6 @@ class GraphqlExplorerViewModel {
         restApiDataMap.set(progressiveTab.tabId, data);
         return restApiDataMap;
       });
-    } else if (key === "responseBodyLanguage") {
-      graphqlExplorerDataStore.update((restApiDataMap) => {
-        const data = restApiDataMap.get(progressiveTab?.tabId);
-        if (data) {
-          data.response.bodyLanguage = val;
-        }
-        restApiDataMap.set(progressiveTab.tabId, data);
-        return restApiDataMap;
-      });
-    } else if (key === "responseBodyFormatter") {
-      graphqlExplorerDataStore.update((restApiDataMap) => {
-        const data = restApiDataMap.get(progressiveTab?.tabId);
-        if (data) {
-          data.response.bodyFormatter = val;
-        }
-        restApiDataMap.set(progressiveTab.tabId, data);
-        return restApiDataMap;
-      });
     }
   };
 
@@ -584,7 +584,6 @@ class GraphqlExplorerViewModel {
    */
   public sendRequest = async (environmentVariables = []) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    debugger;
     const abortController = new AbortController();
     graphqlExplorerDataStore.update((restApiDataMap) => {
       let data = restApiDataMap.get(progressiveTab.tabId);
@@ -600,8 +599,6 @@ class GraphqlExplorerViewModel {
             time: 0,
             size: 0,
             navigation: ResponseSectionEnum.RESPONSE,
-            bodyLanguage: RequestDataTypeEnum.TEXT,
-            bodyFormatter: ResponseFormatterEnum.PRETTY,
           },
           isSendRequestInProgress: false,
         };
@@ -626,59 +623,39 @@ class GraphqlExplorerViewModel {
       this._tab.getValue().property.graphql,
       environmentVariables.filtered || [],
     );
-    makeHttpRequestV2(...decodeData, signal)
+    makeGraphQLRequest(decodeData[0], decodeData[1], decodeData[2], signal)
       .then((response) => {
-        if (response.isSuccessful === false) {
-          graphqlExplorerDataStore.update((restApiDataMap) => {
-            const data = restApiDataMap.get(progressiveTab?.tabId);
-            if (data) {
-              data.response.body = "";
-              data.response.headers = [];
-              data.response.status = ResponseStatusCode.ERROR;
-              data.response.time = 0;
-              data.response.size = 0;
-              data.isSendRequestInProgress = false;
-            }
-            restApiDataMap.set(progressiveTab.tabId, data);
-            return restApiDataMap;
-          });
-        } else {
-          const end = Date.now();
-          const byteLength = new TextEncoder().encode(
-            JSON.stringify(response),
-          ).length;
-          const responseSizeKB = byteLength / 1024;
-          const duration = end - start;
-          const responseBody = response.data.body;
-          const formattedHeaders = Object.entries(
-            response?.data?.headers || {},
-          );
-          const responseHeaders = [];
-          formattedHeaders.forEach((elem) => {
-            responseHeaders.push({
-              key: elem[0],
-              value: elem[1],
-            });
-          });
-          let responseStatus = response.data.status;
-          const bodyLanguage =
-            this._decodeGraphql.setResponseContentType(responseHeaders);
+        const end = Date.now();
+        const byteLength = new TextEncoder().encode(
+          JSON.stringify(response),
+        ).length;
+        const responseSizeKB = byteLength / 1024;
+        const duration = end - start;
 
-          graphqlExplorerDataStore.update((restApiDataMap) => {
-            let data = restApiDataMap.get(progressiveTab?.tabId);
-            if (data) {
-              data.response.body = responseBody;
-              data.response.headers = responseHeaders;
-              data.response.status = responseStatus;
-              data.response.time = duration;
-              data.response.size = responseSizeKB;
-              data.response.bodyLanguage = bodyLanguage;
-              data.isSendRequestInProgress = false;
-            }
-            restApiDataMap.set(progressiveTab.tabId, data);
-            return restApiDataMap;
+        const responseBody = response.data.body;
+        const formattedHeaders = Object.entries(response?.data?.headers || {});
+        const responseHeaders = [];
+        formattedHeaders.forEach((elem) => {
+          responseHeaders.push({
+            key: elem[0],
+            value: elem[1],
           });
-        }
+        });
+        let responseStatus = response.data.status;
+
+        graphqlExplorerDataStore.update((restApiDataMap) => {
+          let data = restApiDataMap.get(progressiveTab?.tabId);
+          if (data) {
+            data.response.body = responseBody;
+            data.response.headers = responseHeaders;
+            data.response.status = responseStatus;
+            data.response.time = duration;
+            data.response.size = responseSizeKB;
+            data.isSendRequestInProgress = false;
+          }
+          restApiDataMap.set(progressiveTab.tabId, data);
+          return restApiDataMap;
+        });
       })
       .catch((error) => {
         // Handle cancellation or other errors

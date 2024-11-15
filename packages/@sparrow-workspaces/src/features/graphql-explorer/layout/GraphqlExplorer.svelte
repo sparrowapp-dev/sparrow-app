@@ -16,6 +16,7 @@
     RequestName,
     ResponseStatus,
     ResponseBody,
+    RequestQuery,
   } from "../components";
   import { Loader } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
@@ -78,6 +79,7 @@
   export let onSaveAsRequest: SaveAsRequestType;
   export let onCreateFolder: CreateFolderType;
   export let onCreateCollection: CreateCollectionType;
+  export let onUpdateRequestQuery;
   export let onUpdateEnvironment;
   export let environmentVariables;
   export let isGuestUser = false;
@@ -214,7 +216,11 @@
                 />
                 <div style="flex:1; overflow:auto;" class="p-0">
                   {#if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.QUERY}
-                    QUERY
+                    <RequestQuery
+                      value={$tab.property.graphql.query}
+                      {onUpdateRequestQuery}
+                      updateBeautifiedState={() => {}}
+                    />
                   {:else if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.Schema}
                     SCHEMA
                   {:else if $tab.property.graphql?.state?.requestNavigation === RequestSectionEnum.HEADERS}
@@ -280,21 +286,11 @@
                           {onUpdateResponseState}
                           responseHeadersLength={storeData?.response.headers
                             ?.length || 0}
+                          response={storeData?.response}
                         />
                         {#if storeData?.response.navigation === ResponseSectionEnum.RESPONSE}
-                          {#if storeData?.response.bodyLanguage !== "Image"}
-                            <ResponseBodyNavigator
-                              response={storeData?.response}
-                              apiState={storeData?.response}
-                              {onUpdateResponseState}
-                              {onClearResponse}
-                            />
-                          {/if}
                           <div style="flex:1; overflow:auto;">
-                            <ResponseBody
-                              response={storeData?.response}
-                              apiState={storeData?.response}
-                            />
+                            <ResponseBody response={storeData?.response} />
                           </div>
                         {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
                           <div style="flex:1; overflow:auto;">

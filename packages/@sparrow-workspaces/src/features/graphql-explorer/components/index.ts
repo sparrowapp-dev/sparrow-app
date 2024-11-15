@@ -10,3 +10,4 @@ export { default as ResponseBodyNavigator } from "./response-body-navigator/Resp
 export { default as ResponseBody } from "./response-body/ResponseBody.svelte";
 export { default as RequestName } from "./request-name/RequestName.svelte";
 export { default as ResponseStatus } from "./response-status/ResponseStatus.svelte";
+export { default as RequestQuery } from "./request-query/RequestQuery.svelte";

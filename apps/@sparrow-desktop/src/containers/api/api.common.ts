@@ -956,6 +956,7 @@ const makeGraphQLRequest = async (
   url: string,
   headers: string,
   body: string,
+  signal?: AbortSignal,
 ) => {
   try {
     const data = await invoke("send_graphql_request", {
@@ -963,13 +964,24 @@ const makeGraphQLRequest = async (
       headers,
       query: body,
     });
-    const parsedResponse = JSON.parse(data);
-    const parsedBody = JSON.parse(parsedResponse.body);
+    if (signal?.aborted) {
+      throw new Error(); // Ignore response if request was cancelled
+    }
+    try {
+      const parsedResponse = JSON.parse(data);
+      return success(parsedResponse);
+    } catch (e) {
+      throw new Error("Error parsing response");
+    }
     // Example Function call to format schema DO NOT REMOVE IT.
     // const formattedSchema = formatGraphQLSchema(parsedBody.data);
     // console.log(formattedSchema);
   } catch (error) {
+    if (signal?.aborted) {
+      throw new DOMException("Request was aborted", "AbortError");
+    }
     console.error(error);
+    throw new Error("Error with the request");
   }
 };
 

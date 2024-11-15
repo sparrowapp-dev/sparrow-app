@@ -156,6 +156,7 @@
   onSendRequest={_viewModel.sendRequest}
   onCancelRequest={_viewModel.cancelRequest}
   onUpdateRequestUrl={_viewModel.updateRequestUrl}
+  onUpdateRequestQuery={_viewModel.updateRequestQuery}
   onUpdateRequestMethod={_viewModel.updateRequestMethod}
   onUpdateRequestName={_viewModel.updateRequestName}
   onUpdateRequestBody={_viewModel.updateRequestBody}
