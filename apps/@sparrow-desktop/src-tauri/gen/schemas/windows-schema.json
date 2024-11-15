@@ -41,7 +41,6 @@
         "identifier": {
           "description": "Identifier of the capability.",
           "type": "string"
-
         },
         "description": {
           "description": "Description of the capability.",
