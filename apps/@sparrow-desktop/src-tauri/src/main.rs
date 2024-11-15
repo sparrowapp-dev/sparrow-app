@@ -923,6 +923,88 @@ async fn send_socket_io_message(
     }
 }
 
+/// Sends a GraphQL request to a specified URL with given headers and query, returning the server's response.
+///
+/// # Arguments
+///
+/// * `url` - The URL endpoint of the GraphQL server.
+/// * `headers` - A JSON string representing headers as key-value pairs for the request.
+/// * `query` - The GraphQL query to execute.
+///
+/// # Returns
+///
+/// * `Ok(String)` - A JSON string with the response, including status, headers, and body if the request is successful.
+/// * `Err(String)` - An error message if the request fails or there is an issue with serialization/deserialization.
+///
+/// # Example
+///
+/// ```rust
+/// let result = send_graphql_request("https://api.example.com/graphql", "{\"Authorization\":\"Bearer token\"}", "{ myQuery }").await;
+/// ```
+#[tauri::command]
+async fn send_graphql_request(url: &str, headers: &str, query: &str) -> Result<String, String> {
+    // Initialize an HTTP client for making requests.
+    let client = Client::new();
+
+    // Deserialize the JSON string `headers` into a Vec of key-value pairs.
+    // Each key-value pair is represented by the KeyValue struct.
+    let headers_key_values: Vec<KeyValue> = serde_json::from_str(headers).unwrap();
+
+    // Create a HashMap to store key-value pairs
+    let mut headers_key_value_map: HashMap<String, String> = HashMap::new();
+
+    // Iterate over key_values and add key-value pairs to the map
+    for kv in headers_key_values {
+        headers_key_value_map.insert(kv.key, kv.value);
+    }
+
+    // Send the request with the introspection query
+    let mut request_builder = client.post(url);
+
+    // Add parsed headers to the request
+    for (key, value) in headers_key_value_map.iter() {
+        request_builder = request_builder.header(key, value);
+    }
+
+    // Send the request with the provided GraphQL query.
+    // This converts `query` into a JSON body with a "query" field.
+    let response = request_builder
+        .json(&json!({ "query": query }))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    // Capture the HTTP status of the response.
+    let status = response.status();
+    // Clone response headers for processing.
+    let response_headers = response.headers().clone();
+    // Extract response value from response
+    let response_text_result = decode_response_body(response).await;
+    let response_text = match response_text_result {
+        Ok(value) => value,
+        Err(err) => format!("Error: {}", err),
+    };
+
+    // Convert headers to JSON format for the final response structure.
+    let headers_json: Value = response_headers
+        .iter()
+        .map(|(name, value)| (name.to_string(), value.to_str().unwrap_or("").to_string()))
+        .collect();
+
+    // Format the final response JSON structure, including status, headers, and body.
+    let formatted_response = json!({
+        "status": status.to_string(),
+        "headers": headers_json,
+        "body": response_text,
+    });
+
+    // Serialize the final response JSON to a string.
+    return match serde_json::to_string(&formatted_response) {
+        Ok(value) => Ok(value.to_string()),
+        Err(err) => Err(err.to_string()),
+    };
+}
+
 // Driver Function
 fn main() {
     // Initiate Tauri Runtime
@@ -981,7 +1063,8 @@ fn main() {
             disconnect_websocket,
             connect_socket_io,
             disconnect_socket_io,
-            send_socket_io_message
+            send_socket_io_message,
+            send_graphql_request
         ])
         .on_page_load(|wry_window, _payload| {
             if let Ok(url) = wry_window.url() {
