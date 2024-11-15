@@ -59,6 +59,7 @@
 
   import type { CancelRequestType } from "@workspaces/common/type/actions";
   import { GraphqlRequestSectionTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
+  import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
 
   export let tab: Observable<any>;
   export let collections: Observable<CollectionDocument[]>;
@@ -327,7 +328,7 @@
       onClick={(flag = false) => {
         isExposeSaveAsRequest = flag;
       }}
-      requestMethod={$tab.property.graphql?.method}
+      requestMethod={TabTypeEnum.GRAPHQL}
       requestUrl={$tab.property.graphql?.url}
       requestName={$tab.name}
       requestDescription={$tab.description}

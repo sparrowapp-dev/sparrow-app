@@ -4,6 +4,7 @@
   import { ItemType, RequestMethod } from "@sparrow/common/enums";
   import {
     CollectionIcon,
+    GraphIcon,
     SocketIcon,
     SocketIoIcon,
   } from "@sparrow/library/icons";
@@ -26,7 +27,7 @@
       <p class="ellipsis mb-0">{name}</p>
     </div>
   </div>
-{:else if type === ItemType.FOLDER || type === ItemType.COLLECTION || type === ItemType.WEB_SOCKET || type === ItemType.SOCKET_IO}
+{:else if type === ItemType.FOLDER || type === ItemType.COLLECTION || type === ItemType.WEB_SOCKET || type === ItemType.SOCKET_IO || type === ItemType.GRAPHQL}
   <div style="height:36px;" class="d-flex align-items-center">
     {#if type === ItemType.FOLDER}
       <div style="width: 40px;">
@@ -54,6 +55,14 @@
           height={"14px"}
           width={"18px"}
           color={"var(--icon-primary-300)"}
+        />
+      </div>
+    {:else if type === ItemType.GRAPHQL}
+      <div style="width: 40px;">
+        <GraphIcon
+          height={"14px"}
+          width={"18px"}
+          color={"var(--icon-danger-1100)"}
         />
       </div>
     {/if}
