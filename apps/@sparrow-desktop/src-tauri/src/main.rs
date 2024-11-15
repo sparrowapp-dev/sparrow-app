@@ -58,9 +58,9 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_json::Value;
-use std::any::Any;
 use std::collections::HashMap;
 use std::process::Command;
+use std::time::Duration;
 use tauri::Emitter;
 use tauri::Manager;
 use url_fetch_handler::import_swagger_url;
@@ -90,7 +90,6 @@ use tokio::sync::Mutex as SocketMutex;
 use futures_util::FutureExt;
 
 #[cfg(target_os = "macos")]
-#[macro_use]
 extern crate objc;
 
 // Commands
@@ -716,6 +715,26 @@ struct SocketIoDisconnectResponse {
     message: String,
 }
 
+async fn is_server_connected(state: Arc<SocketIoAppState>, tabid: String) -> bool {
+    // Lock the state to access the connections map
+    let clients = state.connections.lock().await;
+
+    // Try to retrieve the connection for the provided tabid
+    if let Some(connection) = clients.get(&tabid) {
+        // Create a callback for the ping event
+        let ping_callback = move |_, _| async move {}.boxed();
+
+        // Attempt to send a ping and check the result
+        connection
+            .emit_with_ack("ping", "pong", Duration::ZERO, ping_callback)
+            .await
+            .map(|_| true)
+            .unwrap_or_else(|_| false)
+    } else {
+        false
+    }
+}
+
 #[tauri::command]
 async fn connect_socket_io(
     url: String,
@@ -725,23 +744,27 @@ async fn connect_socket_io(
     state: tauri::State<'_, Arc<SocketIoAppState>>,
     app_handle: tauri::AppHandle,
 ) -> Result<(), String> {
-    // Create a weak reference of set
-    let state_weak = Arc::downgrade(&state);
+    // If connection exists for a tabid, remove it from the state
+    let mut clients = state.connections.lock().await;
+    if clients.contains_key(&tabid) {
+        clients.remove(&tabid);
+    }
 
-    // Deserialize the JSON string into a Vec<KeyValue>
-    let header_vec: Vec<KeyValue> =
-        serde_json::from_str(&headers).map_err(|e| format!("Failed to parse headers: {}", e))?;
+    // Create weak references of socket set for future use at multiple places
+    let state_weak = Arc::downgrade(&state);
+    let state_weak_2 = Arc::downgrade(&state);
 
     // Clone tabid so it can be used at multiple places
     let tabid_clone = tabid.clone();
-    let tabid_clone_clone = tabid.clone();
-    let tabid_clone_clone_clone = tabid.clone();
+    let tabid_clone_2 = tabid.clone();
+    let tabid_clone_3 = tabid.clone();
 
     // Clone app_handle so it can be used at multiple places
     let app_handle_clone = app_handle.clone();
-    let app_handle_clone_clone = app_handle.clone();
-    let app_handle_clone_clone_clone = app_handle.clone();
+    let app_handle_clone_2 = app_handle.clone();
+    let app_handle_clone_3 = app_handle.clone();
 
+    // Listeners(Closures) for various cases like for handling incoming messages, error, disconnection and connection
     let socket_event_listener = move |event: SocketIoEvent,
                                       payload: SocketIoPayload,
                                       _socket: SocketClient| {
@@ -778,8 +801,8 @@ async fn connect_socket_io(
     };
 
     let socket_connected = move |_payload: SocketIoPayload, _socket: SocketClient| {
-        let app_handle_clone = app_handle_clone_clone_clone.clone();
-        let tabid_clone = tabid_clone_clone_clone.clone();
+        let app_handle_clone = app_handle_clone_3.clone();
+        let tabid_clone = tabid_clone_3.clone();
 
         // Fetch the strong reference to set
         let state_strong = state_weak.upgrade().expect("State was dropped prematurely");
@@ -803,26 +826,38 @@ async fn connect_socket_io(
         .boxed()
     };
 
-    // Create a new Socket.IO client
-    let mut builder = ClientBuilder::new(&url)
-        .namespace(&namespace)
-        .on(SocketIoEvent::Error, move |err, _| {
-            let tabid_clone = tabid_clone_clone.clone();
-            let app_handle_clone = app_handle_clone_clone.clone();
+    let socket_errored = move |err: SocketIoPayload, _| {
+        let tabid_clone = tabid_clone_2.clone();
+        let app_handle_clone = app_handle_clone_2.clone();
+        let state_strong = state_weak_2
+            .upgrade()
+            .expect("State was dropped prematurely");
+        async move {
+            let connected = is_server_connected(state_strong, tabid_clone.clone()).await;
 
-            async move {
+            // If socket_io server is not connected, that means it was a abrupt socket.io server disconnection and we need to emit the disconnect event
+            if !connected {
                 let _ = app_handle_clone.emit(
                     &format!("socket-disconnect-{}", tabid_clone),
                     json!({ "message": format!("Error: {:#?}", err) }),
                 );
             }
-            .boxed()
-        })
+        }
+        .boxed()
+    };
+
+    // Create a new Socket.IO client
+    let mut builder = ClientBuilder::new(&url)
+        .namespace(&namespace)
+        .on(SocketIoEvent::Error, socket_errored)
         .on(SocketIoEvent::Connect, socket_connected)
         .reconnect(false)
-        .auth(json!({}))
         .transport_type(TransportType::Websocket)
         .on_any(socket_event_listener);
+
+    // Deserialize the JSON string into a Vec<KeyValue>
+    let header_vec: Vec<KeyValue> =
+        serde_json::from_str(&headers).map_err(|e| format!("Failed to parse headers: {}", e))?;
 
     // Iterate through headers and add each to the builder
     for header in header_vec {
