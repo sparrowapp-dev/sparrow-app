@@ -619,6 +619,7 @@ class GraphqlExplorerViewModel {
         });
       })
       .catch((error) => {
+        console.error(error);
         // Handle cancellation or other errors
         if (error.name === "AbortError") {
           return;

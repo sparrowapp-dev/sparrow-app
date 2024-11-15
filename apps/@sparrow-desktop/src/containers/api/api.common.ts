@@ -953,36 +953,40 @@ const formatFieldType = (type) => {
  * @param body - Request GraphQL Query
  */
 const makeGraphQLRequest = async (
-  url: string,
-  headers: string,
-  body: string,
-  signal?: AbortSignal,
-) => {
+  _url: string,
+  _headers: string,
+  _query: string,
+  _signal?: AbortSignal,
+): Promise<
+  HttpClientResponseInterface<{
+    body: string;
+    headers: string;
+    status: string;
+  }>
+> => {
+  let httpResponse: any;
   try {
-    const data = await invoke("send_graphql_request", {
-      url,
-      headers,
-      query: body,
+    httpResponse = await invoke("send_graphql_request", {
+      url: _url,
+      headers: _headers,
+      query: _query,
     });
-    if (signal?.aborted) {
-      throw new Error(); // Ignore response if request was cancelled
-    }
-    try {
-      const parsedResponse = JSON.parse(data);
-      return success(parsedResponse);
-    } catch (e) {
-      throw new Error("Error parsing response");
-    }
-    // Example Function call to format schema DO NOT REMOVE IT.
-    // const formattedSchema = formatGraphQLSchema(parsedBody.data);
-    // console.log(formattedSchema);
-  } catch (error) {
-    if (signal?.aborted) {
-      throw new DOMException("Request was aborted", "AbortError");
-    }
-    console.error(error);
-    throw new Error("Error with the request");
+  } catch (err) {
+    throw new Error(err as string);
   }
+  if (_signal?.aborted) {
+    // Ignore response if request was cancelled
+    throw new DOMException("Request was aborted", "AbortError");
+  }
+  try {
+    const parsedResponse = JSON.parse(httpResponse);
+    return success(parsedResponse);
+  } catch (err) {
+    throw err;
+  }
+  // Example Function call to format schema DO NOT REMOVE IT.
+  // const formattedSchema = formatGraphQLSchema(parsedBody.data);
+  // console.log(formattedSchema);
 };
 
 export {
