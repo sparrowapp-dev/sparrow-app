@@ -17,3 +17,4 @@ export * from "./environment-explorer";
 export * from "./testflow-explorer";
 export * from "./welcome-popup";
 export * from "./socketio-explorer";
+export * from "./graphql-explorer";
