@@ -4,12 +4,7 @@ import {
   ReduceAuthHeader,
 } from "@sparrow/workspaces/features/graphql-explorer/utils";
 import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
-import {
-  CompareArray,
-  Debounce,
-  InitRequestTab,
-  MarkdownFormatter,
-} from "@sparrow/common/utils";
+import { CompareArray, Debounce } from "@sparrow/common/utils";
 
 // ---- DB
 import type {
@@ -24,12 +19,7 @@ import { CollectionRepository } from "../../../../repositories/collection.reposi
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { EnvironmentRepository } from "../../../../repositories/environment.repository";
 import { BehaviorSubject, Observable } from "rxjs";
-import {
-  Events,
-  ItemType,
-  ResponseStatusCode,
-  UntrackedItems,
-} from "@sparrow/common/enums";
+import { Events, ItemType, ResponseStatusCode } from "@sparrow/common/enums";
 import type { CreateDirectoryPostBody } from "@sparrow/common/dto";
 
 // ---- Service
@@ -44,14 +34,7 @@ import { EnvironmentService } from "../../../../services/environment.service";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
 import {
-  type Auth,
-  type Body,
-  type KeyValueChecked,
-  type Response,
   type KeyValue,
-  type StatePartial,
-  type Conversation,
-  MessageTypeEnum,
   ResponseSectionEnum,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
@@ -59,24 +42,23 @@ import { GraphqlTabAdapter } from "../../../../adapter";
 import { GuideRepository } from "../../../../repositories/guide.repository";
 import { CollectionService } from "../../../../services/collection.service";
 import { GuestUserRepository } from "../../../../repositories/guest-user.repository";
-import { isGuestUserActive } from "@app/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
-import { AiAssistantService } from "../../../../services/ai-assistant.service";
 import type { GuideQuery } from "../../../../types/user-guide";
-import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.ws.service";
-import type { Socket } from "socket.io-client";
 import { graphqlExplorerDataStore } from "@sparrow/workspaces/features/graphql-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
 import type { Path, Tab } from "@sparrow/common/types/workspace/tab";
 import type {
   GraphqlRequestAuthTabInterface,
   GraphqlRequestHeadersTabInterface,
+  GraphqlRequestKeyValueCheckedTabInterface,
   GraphqlRequestStateTabInterface,
   GraphqlRequestTabInterface,
 } from "@sparrow/common/types/workspace/graphql-request-tab";
-import { CollectionItemTypeDtoEnum } from "@sparrow/common/types/workspace/collection-dto";
-import { type EnvironmentFilteredVariableBaseInterface } from "@sparrow/common/types/workspace/environment-base";
-import type { GraphqlRequestMetaDataDtoInterface } from "@sparrow/common/types/workspace/graphql-request-dto";
+import {
+  type EnvironmentFilteredVariableBaseInterface,
+  type EnvironmentLocalGlobalJoinBaseInterface,
+} from "@sparrow/common/types/workspace/environment-base";
+import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 class GraphqlExplorerViewModel {
   /**
    * Repository
@@ -94,8 +76,6 @@ class GraphqlExplorerViewModel {
    */
   private environmentService = new EnvironmentService();
   private collectionService = new CollectionService();
-  private aiAssistentService = new AiAssistantService();
-  private aiAssistentWebSocketService = new AiAssistantWebSocketService();
   /**
    * Utils
    */
@@ -270,15 +250,15 @@ class GraphqlExplorerViewModel {
     this.compareRequestWithServerDebounced,
     1000,
   );
+
   /**
-   *
-   * @returns guest user
+   * Get the guest user state
    */
-  public getGuestUser = async () => {
+  private getGuestUserState = async () => {
     const response = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
-    return response?.getLatest().toMutableJSON();
+    return response?.getLatest().toMutableJSON().isGuestUser;
   };
 
   /**
@@ -303,9 +283,6 @@ class GraphqlExplorerViewModel {
    */
   public updateRequestQuery = async (_query: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    // if (_url === progressiveTab.property.graphql.url) {
-    //   return;
-    // }
     progressiveTab.property.graphql.query = _query;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
@@ -379,63 +356,12 @@ class GraphqlExplorerViewModel {
   };
 
   /**
-   * Updates the AI prompt in the request property of the current tab.
-   *
-   * @param  _prompt - The new AI prompt to set.
-   * @returns A promise that resolves when the update is complete.
-   */
-  public updateRequestAIPrompt = async (_prompt: string) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.graphql.ai.prompt = _prompt;
-    this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-  };
-
-  /**
-   * Updates the AI thread ID in the request property of the current tab.
-   *
-   * @param _threadId - The new AI thread ID to set.
-   * @returns A promise that resolves when the update is complete.
-   */
-  public updateRequestAIThread = async (_threadId: string) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.graphql.ai.threadId = _threadId;
-    this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-  };
-
-  /**
-   * Updates the AI conversations in the request property of the current tab.
-   *
-   * @param _conversations - The new AI conversations to set.
-   * @returns  A promise that resolves when the update is complete.
-   */
-  public updateRequestAIConversation = async (
-    _conversations: Conversation[],
-  ) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.graphql.ai.conversations = _conversations;
-    this.tab = progressiveTab;
-    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-  };
-
-  /**
-   *
-   * @param method request method
-   */
-  public updateRequestMethod = async (method: string) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.graphql.method = method;
-    this.tab = progressiveTab;
-    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    this.compareRequestWithServer();
-  };
-
-  /**
    *
    * @param _headers - request headers
    */
-  public updateHeaders = async (_headers: KeyValueChecked[]) => {
+  public updateHeaders = async (
+    _headers: GraphqlRequestKeyValueCheckedTabInterface[],
+  ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.graphql.headers = _headers;
     this.tab = progressiveTab;
@@ -447,7 +373,9 @@ class GraphqlExplorerViewModel {
    *
    * @param headers - request auto generated headers
    */
-  public updateAutoGeneratedHeaders = async (headers: KeyValueChecked[]) => {
+  public updateAutoGeneratedHeaders = async (
+    headers: GraphqlRequestKeyValueCheckedTabInterface[],
+  ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.graphql.autoGeneratedHeaders = headers;
     this.tab = progressiveTab;
@@ -458,7 +386,9 @@ class GraphqlExplorerViewModel {
    *
    * @param _state - request state
    */
-  public updateRequestState = async (_state: StatePartial) => {
+  public updateRequestState = async (
+    _state: Partial<GraphqlRequestStateTabInterface>,
+  ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.graphql.state = {
       ...progressiveTab.property.graphql.state,
@@ -503,32 +433,6 @@ class GraphqlExplorerViewModel {
       progressiveTab.property.graphql.auth,
     ).getValue();
     this.compareRequestWithServer();
-  };
-
-  /**
-   *
-   * @param _body - request body
-   */
-  public updateRequestBody = async (_body: Body) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.graphql.body = {
-      ...progressiveTab.property.graphql.body,
-      ..._body,
-    };
-    this.tab = progressiveTab;
-    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    this.compareRequestWithServer();
-  };
-
-  /**
-   *
-   * @param _response response
-   */
-  public updateResponse = async (_response: Response) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.graphql.response = _response;
-    this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
   /**
@@ -585,6 +489,12 @@ class GraphqlExplorerViewModel {
       this._tab.getValue().property?.graphql as GraphqlRequestTabInterface,
       _environmentVariables,
     );
+    console.log(`GraphQL Request initiated with the following details:`);
+    console.table({
+      url: decodeData[0],
+      headers: decodeData[1],
+      query: decodeData[2],
+    });
     makeGraphQLRequest(decodeData[0], decodeData[1], decodeData[2], signal)
       .then((response) => {
         const end = Date.now();
@@ -745,10 +655,7 @@ class GraphqlExplorerViewModel {
       ...userSource,
     };
 
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
+    const isGuestUser = await this.getGuestUserState();
 
     if (isGuestUser == true) {
       const data = {
@@ -823,14 +730,12 @@ class GraphqlExplorerViewModel {
       workspaceId: _workspaceMeta.id,
     };
 
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
+    const isGuestUser = await this.getGuestUserState();
 
     if (isGuestUser == true) {
-      const data = {
-        _id: uuidv4(),
+      const collectionId = uuidv4();
+      const newCollection = {
+        id: collectionId,
         name: _collectionName,
         totalRequests: 0,
         createdBy: "Guest User",
@@ -840,25 +745,21 @@ class GraphqlExplorerViewModel {
         // updatedAt: new Date().toISOString,
         createdAt: "",
         createdby: "",
+        workspaceId: _workspaceMeta.id,
       };
       const latestRoute = {
-        id: data._id,
+        id: collectionId,
       };
-      const storage = data;
-      const _id = data._id;
-      delete storage._id;
-      storage.id = _id;
-      storage.workspaceId = _workspaceMeta.id;
       MixpanelEvent(Events.CREATE_COLLECTION, {
         source: "SaveRequest",
-        collectionName: data.name,
-        collectionId: data._id,
+        collectionName: newCollection.name,
+        collectionId: newCollection.id,
       });
       return {
         status: "success",
         data: {
           latestRoute,
-          storage,
+          storage: newCollection,
           addCollection: this.addCollection,
         },
       };
@@ -901,8 +802,8 @@ class GraphqlExplorerViewModel {
    * @returns save status
    */
   public saveRequest = async () => {
-    const componentData = this._tab.getValue();
-    const { folderId, collectionId, workspaceId } = componentData.path as Path;
+    const graphqlTabData = this._tab.getValue();
+    const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
 
     if (!workspaceId || !collectionId) {
       return {
@@ -910,82 +811,49 @@ class GraphqlExplorerViewModel {
         message: "request is not a part of any workspace or collection",
       };
     }
-    const _collection = await this.readCollection(collectionId);
-    let userSource = {};
-    if (_collection?.activeSync && componentData?.source === "USER") {
-      userSource = {
-        currentBranch: _collection?.currentBranch,
-        source: "USER",
-      };
-    }
-    const _id = componentData.id;
 
     const graphqlTabAdapter = new GraphqlTabAdapter();
-    const unadaptedRequest = graphqlTabAdapter.unadapt(componentData as Tab);
-    // Save overall api
+    const unadaptedRequest = graphqlTabAdapter.unadapt(graphqlTabData as Tab);
 
-    const requestMetaData = {
-      id: _id,
-      name: componentData?.name,
-      description: componentData?.description,
-      type: CollectionItemTypeDtoEnum.GRAPHQL,
-    };
-
-    let folderSource;
-    let itemSource;
-    if (folderId) {
-      folderSource = {
-        folderId: folderId,
-      };
-      itemSource = {
-        id: folderId,
-        type: CollectionItemTypeDtoEnum.FOLDER,
-        items: {
-          ...requestMetaData,
-          graphql: unadaptedRequest as GraphqlRequestMetaDataDtoInterface,
+    const isGuestUser = await this.getGuestUserState();
+    /**
+     * Handle save GraphQL Request for guest user
+     */
+    if (isGuestUser) {
+      const guestGraphqlRequest = {
+        id: graphqlTabData.id,
+        name: graphqlTabData.name,
+        description: graphqlTabData.description,
+        type: CollectionItemTypeBaseEnum.GRAPHQL,
+        graphql: {
+          url: unadaptedRequest.url as string,
+          query: unadaptedRequest.query,
+          schema: unadaptedRequest.schema,
+          headers: unadaptedRequest.headers,
+          auth: unadaptedRequest.auth,
         },
-      };
-    } else {
-      itemSource = {
-        ...requestMetaData,
-        graphql: unadaptedRequest as GraphqlRequestMetaDataDtoInterface,
-      };
-    }
-
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
-    if (isGuestUser === true) {
-      const progressiveTab = this._tab.getValue();
-      const data = {
-        id: progressiveTab.id,
-        name: requestMetaData.name,
-        description: requestMetaData.description,
-        type: "REQUEST",
-        graphql: unadaptedRequest,
         updatedAt: "",
         updatedBy: "Guest User",
       };
 
-      progressiveTab.isSaved = true;
-      this.tab = progressiveTab;
+      graphqlTabData.isSaved = true;
+      this.tab = graphqlTabData;
       await this.tabRepository.updateTab(
-        progressiveTab.tabId as string,
-        progressiveTab,
+        graphqlTabData.tabId as string,
+        graphqlTabData,
       );
       if (!folderId) {
         this.collectionRepository.updateRequestOrFolderInCollection(
           collectionId,
-          _id as string,
-          data,
+          graphqlTabData.id as string,
+          guestGraphqlRequest,
         );
       } else {
         this.collectionRepository.updateRequestInFolder(
           collectionId,
           folderId,
-          _id as string,
-          data,
+          graphqlTabData.id as string,
+          guestGraphqlRequest,
         );
       }
       return {
@@ -993,36 +861,47 @@ class GraphqlExplorerViewModel {
         message: "",
       };
     }
+
+    /**
+     * Handle save GraphQL Request for registered user
+     */
+
+    const graphqlPayload = {
+      name: graphqlTabData?.name as string,
+      description: graphqlTabData?.description as string,
+      url: unadaptedRequest.url as string,
+      query: unadaptedRequest.query,
+      schema: unadaptedRequest.schema,
+      headers: unadaptedRequest.headers,
+      auth: unadaptedRequest.auth,
+    };
+
     const res = await this.collectionService.updateGraphqlInCollection(
-      _id as string,
-      {
-        collectionId: collectionId,
-        workspaceId: workspaceId,
-        ...folderSource,
-        ...userSource,
-        items: itemSource,
-      },
+      graphqlTabData.id as string,
+      collectionId,
+      workspaceId,
+      graphqlPayload,
+      folderId,
     );
 
     if (res.isSuccessful) {
-      const progressiveTab = this._tab.getValue();
-      progressiveTab.isSaved = true;
-      this.tab = progressiveTab;
+      graphqlTabData.isSaved = true;
+      this.tab = graphqlTabData;
       await this.tabRepository.updateTab(
-        progressiveTab.tabId as string,
-        progressiveTab,
+        graphqlTabData.tabId as string,
+        graphqlTabData,
       );
       if (!folderId) {
         this.collectionRepository.updateRequestOrFolderInCollection(
           collectionId,
-          _id as string,
+          graphqlTabData.id as string,
           res.data.data,
         );
       } else {
         this.collectionRepository.updateRequestInFolder(
           collectionId,
           folderId,
-          _id as string,
+          graphqlTabData.id as string,
           res.data.data,
         );
       }
@@ -1145,10 +1024,7 @@ class GraphqlExplorerViewModel {
             source: "USER",
           };
         }
-        let isGuestUser;
-        isGuestUserActive.subscribe((value) => {
-          isGuestUser = value;
-        });
+        const isGuestUser = await this.getGuestUserState();
 
         if (isGuestUser == true) {
           this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
@@ -1212,7 +1088,7 @@ class GraphqlExplorerViewModel {
           items: {
             name: tabName,
             description,
-            type: CollectionItemTypeDtoEnum.GRAPHQL,
+            type: CollectionItemTypeBaseEnum.GRAPHQL,
             graphql: unadaptedRequest,
           },
         });
@@ -1300,10 +1176,7 @@ class GraphqlExplorerViewModel {
             source: "USER",
           };
         }
-        let isGuestUser;
-        isGuestUserActive.subscribe((value) => {
-          isGuestUser = value;
-        });
+        const isGuestUser = await this.getGuestUserState();
 
         if (isGuestUser == true) {
           this.addRequestInFolder(path[0].id, path[path.length - 1].id, req);
@@ -1360,12 +1233,11 @@ class GraphqlExplorerViewModel {
           ...userSource,
           items: {
             id: path[path.length - 1].id,
-            name: path[path.length - 1].name,
-            type: CollectionItemTypeDtoEnum.FOLDER,
+            type: CollectionItemTypeBaseEnum.FOLDER,
             items: {
               name: tabName,
               description,
-              type: CollectionItemTypeDtoEnum.GRAPHQL,
+              type: CollectionItemTypeBaseEnum.GRAPHQL,
               graphql: unadaptedRequest,
             },
           },
@@ -1449,13 +1321,10 @@ class GraphqlExplorerViewModel {
    */
   public updateEnvironment = async (
     isGlobalVariable: boolean,
-    environmentVariables,
+    environmentVariables: EnvironmentLocalGlobalJoinBaseInterface,
     newVariableObj: KeyValue,
   ) => {
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
+    const isGuestUser = await this.getGuestUserState();
     if (isGlobalVariable) {
       // api payload
       let payload = {
@@ -1664,10 +1533,7 @@ class GraphqlExplorerViewModel {
     collectionId: string,
     newCollectionName: string,
   ) => {
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
+    const isGuestUser = await this.getGuestUserState();
     if (newCollectionName) {
       if (isGuestUser == true) {
         let collection =
@@ -1731,10 +1597,7 @@ class GraphqlExplorerViewModel {
           source: "USER",
         };
       }
-      let isGuestUser;
-      isGuestUserActive.subscribe((value) => {
-        isGuestUser = value;
-      });
+      const isGuestUser = await this.getGuestUserState();
       if (isGuestUser === true) {
         const res =
           await this.collectionRepository.readRequestOrFolderInCollection(

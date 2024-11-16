@@ -38,7 +38,7 @@
       </div>
       <div class="d-flex flex-column align-items-center">
         <p class="text-secondary-200 fw-bold text-fs-14 mb-5">
-          Click Send to get a Response
+          Run a query to get response
         </p>
       </div>
     </div>

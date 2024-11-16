@@ -1,7 +1,7 @@
 interface EnvValuePair {
   key: string;
   value: string;
-  chcecked: boolean;
+  checked: boolean;
 }
 export interface CreateEnvironmentPostBody {
   name: string;

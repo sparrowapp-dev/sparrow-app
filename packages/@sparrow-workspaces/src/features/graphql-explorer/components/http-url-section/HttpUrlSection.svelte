@@ -1,44 +1,27 @@
 <script lang="ts">
-  import { RequestMethod, WorkspaceRole } from "@sparrow/common/enums";
-
-  import { Select } from "@sparrow/library/forms";
-  import type {
-    SaveRequestType,
-    SendRequestType,
-    UpdateRequestMethodType,
-    UpdateRequestUrlType,
-  } from "@sparrow/workspaces/type";
   import { notifications } from "@sparrow/library/ui";
   import { DropButton } from "@sparrow/workspaces/components";
   import { CodeMirrorInput } from "../../../../components";
   import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
   import { DiskIcon } from "@sparrow/library/icons";
-  // import type { CancelRequestType } from "@workspaces/common/type/actions";
+  import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+
   let componentClass = "";
   export { componentClass as class };
-
   export let requestUrl: string;
-  export let isSendRequestInProgress: boolean;
-  export let onSendButtonClicked: SendRequestType;
-  export let onCancelButtonClicked: CancelRequestType;
-  export let onUpdateRequestUrl: UpdateRequestUrlType;
-  export let onUpdateRequestMethod: UpdateRequestMethodType;
-  export let toggleSaveRequest: (flag: boolean) => void;
-  export let onSaveRequest: SaveRequestType;
+  export let isSendRequestInProgress;
+  export let onSendButtonClicked;
+  export let onCancelButtonClicked;
+  export let onUpdateRequestUrl;
+  export let toggleSaveRequest;
+  export let onSaveRequest;
   export let environmentVariables;
   export let onUpdateEnvironment;
   export let isSave;
-  /**
-   * Role of user in active workspace
-   */
-  export let userRole;
+  export let isGraphqlEditable;
 
   const theme = new UrlInputTheme().build();
-  const handleDropdown = (tab: string) => {
-    onUpdateRequestMethod(tab);
-  };
-
   /**
    * @description - save request handler
    */
@@ -50,7 +33,9 @@
     ) {
       toggleSaveRequest(true);
     } else if (x.status === "success") {
-      notifications.success("API request saved successfully.");
+      notifications.success(
+        `${GraphqlRequestDefaultAliasBaseEnum.NAME} request saved successfully.`,
+      );
     }
   };
 
@@ -87,7 +72,6 @@
     {environmentVariables}
     codeId={"url"}
     class={"input-url"}
-    {userRole}
     isFocusedOnMount={true}
   />
 
@@ -106,7 +90,7 @@
             codeMirrorElement.classList.add("url-red-border");
           }
         } else {
-          onSendButtonClicked(environmentVariables?.filtered);
+          onSendButtonClicked(environmentVariables?.filtered || []);
         }
       }}
     />
@@ -120,43 +104,21 @@
     />
   {/if}
 
-  <!-- Switch pane layout button -->
-  <!-- <ToggleButton
-    selectedToggleId={splitterDirection}
-    toggleButtons={[
-      {
-        name: "",
-        id: "vertical",
-        icon: tableColumnIcon,
-      },
-      {
-        name: "",
-        id: "horizontal",
-        icon: barIcon,
-      },
-    ]}
-    on:click={(e) => {
-      onUpdateRequestState({ requestSplitterDirection: e.detail });
-    }}
-  /> -->
   <Tooltip title={"Save"} placement={"bottom"} distance={12} zIndex={10}>
     <button
       class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
       on:click={handleSaveRequest}
       on:mouseenter={handleMouseEnter}
       on:mouseleave={handleMouseLeave}
-      disabled={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
-        ? true
-        : false}
-      style="background-color: {isSave ||
-      userRole === WorkspaceRole.WORKSPACE_VIEWER
+      disabled={isSave || !isGraphqlEditable ? true : false}
+      style="background-color: {isSave || !isGraphqlEditable
         ? 'var(--icon-secondary-550)'
         : 'var(--bg-secondary-400)'}; color: white;"
     >
       <DiskIcon
         height={22}
         width={22}
-        color={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
+        color={isSave || !isGraphqlEditable
           ? "var(--icon-secondary-380)"
           : isHovered
             ? "var(--icon-primary-200)"

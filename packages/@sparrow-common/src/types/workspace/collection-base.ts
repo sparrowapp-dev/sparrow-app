@@ -4,11 +4,19 @@ import type { HttpRequestBaseInterface } from "./http-request-base";
 import type { SocketIORequestBaseInterface } from "./socket-io-request-base";
 import type { WebsocketRequestBaseInterface } from "./websocket-request-base";
 
+export enum CollectionItemTypeBaseEnum {
+  FOLDER = "FOLDER",
+  REQUEST = "REQUEST",
+  WEBSOCKET = "WEBSOCKET",
+  SOCKETIO = "SOCKETIO",
+  GRAPHQL = "GRAPHQL",
+}
+
 export interface CollectionItemBaseInterface {
   id: string;
   name: string;
   description: string;
-  type: string;
+  type: CollectionItemTypeBaseEnum;
   source: string;
   isDeleted: boolean;
   request?: HttpRequestBaseInterface;

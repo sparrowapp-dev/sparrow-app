@@ -21,9 +21,10 @@ import type {
   HttpClientBackendResponseInterface,
   HttpClientResponseInterface,
 } from "@app/types/http-client";
-import type {
-  CollectionDtoInterface,
-  CollectionItemDtoInterface,
+import {
+  CollectionItemTypeDtoEnum,
+  type CollectionDtoInterface,
+  type CollectionItemDtoInterface,
 } from "@sparrow/common/types/workspace/collection-dto";
 import type {
   SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
@@ -31,9 +32,11 @@ import type {
   SocketIORequestDeletePayloadDtoInterface,
 } from "@sparrow/common/types/workspace/socket-io-request-dto";
 import type {
+  GraphqlRequestAuthDtoInterface,
   GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface,
   GraphqlRequestCreateUpdateInFolderPayloadDtoInterface,
   GraphqlRequestDeletePayloadDtoInterface,
+  GraphqlRequestKeyValueDtoInterface,
 } from "@sparrow/common/types/workspace/graphql-request-dto";
 
 export class CollectionService {
@@ -480,19 +483,74 @@ export class CollectionService {
 
   public updateGraphqlInCollection = async (
     _graphqlId: string,
-    _graphql:
-      | GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface
-      | GraphqlRequestCreateUpdateInFolderPayloadDtoInterface,
+    _collectionId: string,
+    _workspaceId: string,
+    _graphql: {
+      name: string;
+      description: string;
+      url: string;
+      query?: string;
+      schema?: string;
+      headers?: GraphqlRequestKeyValueDtoInterface[];
+      auth?: GraphqlRequestAuthDtoInterface;
+    },
+    _folderId?: string,
   ): Promise<
     HttpClientResponseInterface<
       HttpClientBackendResponseInterface<CollectionItemDtoInterface>
     >
   > => {
+    let graphqlBody:
+      | GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface
+      | GraphqlRequestCreateUpdateInFolderPayloadDtoInterface;
+
+    if (_folderId) {
+      graphqlBody = {
+        collectionId: _collectionId,
+        workspaceId: _workspaceId,
+        folderId: _folderId,
+        items: {
+          id: _folderId,
+          type: CollectionItemTypeDtoEnum.FOLDER,
+          items: {
+            id: _graphqlId,
+            name: _graphql.name as string,
+            description: _graphql?.description,
+            type: CollectionItemTypeDtoEnum.GRAPHQL,
+            graphql: {
+              url: _graphql.url,
+              query: _graphql.query,
+              schema: _graphql.schema,
+              headers: _graphql.headers,
+              auth: _graphql.auth,
+            },
+          },
+        },
+      };
+    } else {
+      graphqlBody = {
+        collectionId: _collectionId,
+        workspaceId: _workspaceId,
+        items: {
+          id: _graphqlId,
+          name: _graphql?.name as string,
+          description: _graphql?.description,
+          type: CollectionItemTypeDtoEnum.GRAPHQL,
+          graphql: {
+            url: _graphql.url,
+            query: _graphql.query,
+            schema: _graphql.schema,
+            headers: _graphql.headers,
+            auth: _graphql.auth,
+          },
+        },
+      };
+    }
     const response = await makeRequest(
       "PUT",
       `${this.apiUrl}/api/collection/graphql/${_graphqlId}`,
       {
-        body: _graphql,
+        body: graphqlBody,
         headers: getAuthHeaders(),
       },
     );
