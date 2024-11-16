@@ -1,13 +1,21 @@
 import { type Auth, type KeyValue } from "@sparrow/common/types/workspace";
 import {
   GraphqlRequestAuthTypeTabEnum,
+  type GraphqlRequestAuthTabInterface,
   type GraphqlRequestStateTabInterface,
 } from "@sparrow/common/types/workspace/graphql-request-tab";
 
 class ReduceAuthHeader {
-  private authHeader: KeyValue;
-  constructor(_state: GraphqlRequestStateTabInterface, _auth: Auth) {
-    const authValue: { key: string; value: string } = {
+  private authHeader = {
+    key: "",
+    value: "",
+  };
+
+  constructor(
+    _state: GraphqlRequestStateTabInterface,
+    _auth: GraphqlRequestAuthTabInterface,
+  ) {
+    const authValue = {
       key: "",
       value: "",
     };
@@ -37,9 +45,12 @@ class ReduceAuthHeader {
     }
     this.authHeader = authValue;
   }
-  public getValue() {
+  public getValue = (): {
+    key: string;
+    value: string;
+  } => {
     return this.authHeader;
-  }
+  };
 }
 
 export { ReduceAuthHeader };

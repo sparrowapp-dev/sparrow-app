@@ -833,6 +833,7 @@ const makeHttpRequestV2 = async (
       appInsights.trackDependencyData(appInsightData);
       return success(apiResponse);
     } catch (e) {
+      console.error(e);
       throw new Error("Error parsing response");
     }
   } catch (e) {
@@ -960,11 +961,12 @@ const makeGraphQLRequest = async (
 ): Promise<
   HttpClientResponseInterface<{
     body: string;
-    headers: string;
+    headers: object;
     status: string;
   }>
 > => {
-  let httpResponse: any;
+  let httpResponse: string;
+  const abortGraphqlRequestErrorMessage = `Running GraphQL Request with url ${_url} is aborted by the user`;
   try {
     httpResponse = await invoke("send_graphql_request", {
       url: _url,
@@ -972,11 +974,15 @@ const makeGraphQLRequest = async (
       query: _query,
     });
   } catch (err) {
+    if (_signal?.aborted) {
+      // Check if request is aborted after request fails
+      throw new DOMException(abortGraphqlRequestErrorMessage, "AbortError");
+    }
     throw new Error(err as string);
   }
   if (_signal?.aborted) {
-    // Ignore response if request was cancelled
-    throw new DOMException("Request was aborted", "AbortError");
+    // Check if request is aborted after request success
+    throw new DOMException(abortGraphqlRequestErrorMessage, "AbortError");
   }
   try {
     const parsedResponse = JSON.parse(httpResponse);
@@ -1003,5 +1009,4 @@ export {
   connectSocketIo,
   disconnectSocketIo,
   makeGraphQLRequest,
-  // getHeaders,
 };

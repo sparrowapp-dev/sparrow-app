@@ -106,7 +106,7 @@
             codeMirrorElement.classList.add("url-red-border");
           }
         } else {
-          onSendButtonClicked(environmentVariables);
+          onSendButtonClicked(environmentVariables?.filtered);
         }
       }}
     />

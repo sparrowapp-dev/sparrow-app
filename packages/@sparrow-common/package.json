@@ -43,6 +43,7 @@
     "./types/workspace/collection": "./src/types/workspace/collection-tab.ts",
     "./types/workspace/collection-dto": "./src/types/workspace/collection-dto.ts",
     "./types/workspace/environment": "./src/types/workspace/environment-tab.ts",
+    "./types/workspace/environment-base": "./src/types/workspace/environment-base.ts",
     "./types/workspace/folder": "./src/types/workspace/folder-tab.ts",
     "./types/workspace/tab": "./src/types/workspace/tab.ts",
     "./types/workspace/testflow": "./src/types/workspace/testflow-tab.ts",

@@ -33,15 +33,10 @@ import {
 import type { CreateDirectoryPostBody } from "@sparrow/common/dto";
 
 // ---- Service
-import {
-  makeGraphQLRequest,
-  makeHttpRequestV2,
-} from "@app/containers/api/api.common";
+import { makeGraphQLRequest } from "@app/containers/api/api.common";
 import {
   insertCollection,
   insertCollectionDirectory,
-  insertCollectionRequest,
-  updateCollectionRequest,
 } from "../../../../services/collection";
 import { EnvironmentService } from "../../../../services/environment.service";
 
@@ -58,8 +53,6 @@ import {
   type Conversation,
   MessageTypeEnum,
   ResponseSectionEnum,
-  RequestDataTypeEnum,
-  ResponseFormatterEnum,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { GraphqlTabAdapter } from "../../../../adapter";
@@ -74,7 +67,16 @@ import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.w
 import type { Socket } from "socket.io-client";
 import { graphqlExplorerDataStore } from "@sparrow/workspaces/features/graphql-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
-
+import type { Path, Tab } from "@sparrow/common/types/workspace/tab";
+import type {
+  GraphqlRequestAuthTabInterface,
+  GraphqlRequestHeadersTabInterface,
+  GraphqlRequestStateTabInterface,
+  GraphqlRequestTabInterface,
+} from "@sparrow/common/types/workspace/graphql-request-tab";
+import { CollectionItemTypeDtoEnum } from "@sparrow/common/types/workspace/collection-dto";
+import { type EnvironmentFilteredVariableBaseInterface } from "@sparrow/common/types/workspace/environment-base";
+import type { GraphqlRequestMetaDataDtoInterface } from "@sparrow/common/types/workspace/graphql-request-dto";
 class GraphqlExplorerViewModel {
   /**
    * Repository
@@ -106,7 +108,7 @@ class GraphqlExplorerViewModel {
     value: "",
   });
 
-  private _tab: BehaviorSubject<RequestTab> = new BehaviorSubject({});
+  private _tab = new BehaviorSubject<Partial<Tab>>({});
 
   public constructor(doc: TabDocument) {
     if (doc?.isActive) {
@@ -116,8 +118,10 @@ class GraphqlExplorerViewModel {
         delete t.index;
         this.tab = t;
         this.authHeader = new ReduceAuthHeader(
-          this._tab.getValue().property.graphql?.state,
-          this._tab.getValue().property.graphql?.auth,
+          this._tab.getValue().property?.graphql
+            ?.state as GraphqlRequestStateTabInterface,
+          this._tab.getValue().property?.graphql
+            ?.auth as GraphqlRequestAuthTabInterface,
         ).getValue();
       }, 0);
     }
@@ -131,11 +135,11 @@ class GraphqlExplorerViewModel {
     return this.environmentRepository.getEnvironment();
   }
 
-  public get tab(): Observable<RequestTab> {
+  public get tab(): Observable<Partial<Tab>> {
     return this._tab.asObservable();
   }
 
-  private set tab(value: RequestTab) {
+  private set tab(value: Partial<Tab>) {
     this._tab.next(value);
   }
 
@@ -157,11 +161,9 @@ class GraphqlExplorerViewModel {
    */
   private compareRequestWithServerDebounced = async () => {
     let result = true;
-    const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
-    const requestTabAdapter = new GraphqlTabAdapter();
-    const unadaptedRequest = requestTabAdapter.unadapt(progressiveTab);
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
     let requestServer;
-    if (progressiveTab.path.folderId) {
+    if (progressiveTab?.path?.folderId) {
       requestServer = await this.collectionRepository.readRequestInFolder(
         progressiveTab.path.collectionId,
         progressiveTab.path.folderId,
@@ -185,54 +187,54 @@ class GraphqlExplorerViewModel {
     }
     // url
     else if (
-      requestServer.graphql.url !== progressiveTab.property.graphql.url
+      requestServer.graphql.url !== progressiveTab.property.graphql?.url
     ) {
       result = false;
     }
     // query
     else if (
-      requestServer.graphql.query !== progressiveTab.property.graphql.query
+      requestServer.graphql.query !== progressiveTab.property.graphql?.query
     ) {
       result = false;
     }
     // schema
     else if (
-      requestServer.graphql.schema !== progressiveTab.property.graphql.schema
+      requestServer.graphql.schema !== progressiveTab.property.graphql?.schema
     ) {
       result = false;
     }
     // auth key
     else if (
       requestServer.graphql.auth.apiKey.authKey !==
-      progressiveTab.property.graphql.auth.apiKey.authKey
+      progressiveTab.property.graphql?.auth.apiKey.authKey
     ) {
       result = false;
     }
     // auth value
     else if (
       requestServer.graphql.auth.apiKey.authValue !==
-      progressiveTab.property.graphql.auth.apiKey.authValue
+      progressiveTab.property.graphql?.auth.apiKey.authValue
     ) {
       result = false;
     }
     // username
     else if (
       requestServer.graphql.auth.basicAuth.username !==
-      progressiveTab.property.graphql.auth.basicAuth.username
+      progressiveTab.property.graphql?.auth.basicAuth.username
     ) {
       result = false;
     }
     // password
     else if (
       requestServer.graphql.auth.basicAuth.password !==
-      progressiveTab.property.graphql.auth.basicAuth.password
+      progressiveTab.property.graphql?.auth.basicAuth.password
     ) {
       result = false;
     }
     // bearer tokem
     else if (
       requestServer.graphql.auth.bearerToken !==
-      progressiveTab.property.graphql.auth.bearerToken
+      progressiveTab.property.graphql?.auth.bearerToken
     ) {
       result = false;
     }
@@ -240,7 +242,7 @@ class GraphqlExplorerViewModel {
     else if (
       !this.compareArray.init(
         requestServer.graphql.headers,
-        progressiveTab.property.graphql.headers,
+        progressiveTab.property.graphql?.headers,
       )
     ) {
       result = false;
@@ -470,15 +472,15 @@ class GraphqlExplorerViewModel {
    *
    * @param  - response state
    */
-  public updateResponseState = async (key, val) => {
+  public updateResponseState = async (key: string, val: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     if (key === "responseNavigation") {
       graphqlExplorerDataStore.update((restApiDataMap) => {
         const data = restApiDataMap.get(progressiveTab?.tabId);
         if (data) {
           data.response.navigation = val;
+          restApiDataMap.set(progressiveTab.tabId, data);
         }
-        restApiDataMap.set(progressiveTab.tabId, data);
         return restApiDataMap;
       });
     }
@@ -488,7 +490,7 @@ class GraphqlExplorerViewModel {
    *
    * @param _auth - request auth
    */
-  public updateRequestAuth = async (_auth: Auth) => {
+  public updateRequestAuth = async (_auth: GraphqlRequestAuthTabInterface) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.graphql.auth = {
       ...progressiveTab.property.graphql.auth,
@@ -533,17 +535,16 @@ class GraphqlExplorerViewModel {
    * @description clear response of a request
    */
   public clearResponse = async () => {
-    const response: Response = new InitRequestTab(
-      UntrackedItems.UNTRACKED,
-      "UNTRACKED-",
-    ).getValue().property.graphql.response;
-    this.updateResponse(response);
+    return;
   };
 
   /**
-   * @description send request
+   * Initiates GraphQL Request to the server.
+   * @param _environmentVariables - Environment variables to be embedded in the GraphQL Request.
    */
-  public sendRequest = async (environmentVariables = []) => {
+  public sendRequest = async (
+    _environmentVariables: EnvironmentFilteredVariableBaseInterface[] = [],
+  ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const abortController = new AbortController();
     graphqlExplorerDataStore.update((restApiDataMap) => {
@@ -568,21 +569,21 @@ class GraphqlExplorerViewModel {
       return restApiDataMap;
     });
     // Create an AbortController for the request
-    const { signal } = abortController; // Extract the signal for the request
+    const { signal } = abortController;
 
     graphqlExplorerDataStore.update((restApiDataMap) => {
       let data = restApiDataMap.get(progressiveTab?.tabId);
       if (data) {
         data.isSendRequestInProgress = true;
+        restApiDataMap.set(progressiveTab.tabId, data);
       }
-      restApiDataMap.set(progressiveTab.tabId, data);
       return restApiDataMap;
     });
     const start = Date.now();
 
     const decodeData = this._decodeGraphql.init(
-      this._tab.getValue().property.graphql,
-      environmentVariables.filtered || [],
+      this._tab.getValue().property?.graphql as GraphqlRequestTabInterface,
+      _environmentVariables,
     );
     makeGraphQLRequest(decodeData[0], decodeData[1], decodeData[2], signal)
       .then((response) => {
@@ -595,7 +596,10 @@ class GraphqlExplorerViewModel {
 
         const responseBody = response.data.body;
         const formattedHeaders = Object.entries(response?.data?.headers || {});
-        const responseHeaders = [];
+        const responseHeaders: {
+          key: string;
+          value: string;
+        }[] = [];
         formattedHeaders.forEach((elem) => {
           responseHeaders.push({
             key: elem[0],
@@ -613,8 +617,8 @@ class GraphqlExplorerViewModel {
             data.response.time = duration;
             data.response.size = responseSizeKB;
             data.isSendRequestInProgress = false;
+            restApiDataMap.set(progressiveTab.tabId, data);
           }
-          restApiDataMap.set(progressiveTab.tabId, data);
           return restApiDataMap;
         });
       })
@@ -634,8 +638,8 @@ class GraphqlExplorerViewModel {
             data.response.time = 0;
             data.response.size = 0;
             data.isSendRequestInProgress = false;
+            restApiDataMap.set(progressiveTab.tabId, data);
           }
-          restApiDataMap.set(progressiveTab.tabId, data);
           return restApiDataMap;
         });
       });
@@ -644,9 +648,9 @@ class GraphqlExplorerViewModel {
   /**
    * aborts the ongoing api request
    */
-  public cancelRequest = (): Promise<void> => {
+  public cancelRequest = async (): Promise<void> => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    let abortController;
+    let abortController: AbortController | undefined = undefined;
     graphqlExplorerDataStore.update((restApiDataMap) => {
       const data = restApiDataMap.get(progressiveTab.tabId);
       if (data) {
@@ -655,13 +659,13 @@ class GraphqlExplorerViewModel {
       return restApiDataMap;
     });
     if (abortController) {
-      abortController.abort(); // Abort the request using the stored controller
+      (abortController as AbortController)?.abort(); // Abort the request using the stored controller
       graphqlExplorerDataStore.update((restApiDataMap) => {
         const data = restApiDataMap.get(progressiveTab?.tabId);
         if (data) {
           data.isSendRequestInProgress = false;
+          restApiDataMap.set(progressiveTab.tabId, data);
         }
-        restApiDataMap.set(progressiveTab.tabId, data);
         return restApiDataMap;
       });
     }
@@ -897,8 +901,8 @@ class GraphqlExplorerViewModel {
    * @returns save status
    */
   public saveRequest = async () => {
-    const componentData: RequestTab = this._tab.getValue();
-    const { folderId, collectionId, workspaceId } = componentData.path;
+    const componentData = this._tab.getValue();
+    const { folderId, collectionId, workspaceId } = componentData.path as Path;
 
     if (!workspaceId || !collectionId) {
       return {
@@ -916,15 +920,15 @@ class GraphqlExplorerViewModel {
     }
     const _id = componentData.id;
 
-    const requestTabAdapter = new GraphqlTabAdapter();
-    const unadaptedRequest = requestTabAdapter.unadapt(componentData);
+    const graphqlTabAdapter = new GraphqlTabAdapter();
+    const unadaptedRequest = graphqlTabAdapter.unadapt(componentData as Tab);
     // Save overall api
 
     const requestMetaData = {
       id: _id,
       name: componentData?.name,
       description: componentData?.description,
-      type: ItemType.GRAPHQL,
+      type: CollectionItemTypeDtoEnum.GRAPHQL,
     };
 
     let folderSource;
@@ -935,16 +939,16 @@ class GraphqlExplorerViewModel {
       };
       itemSource = {
         id: folderId,
-        type: ItemType.FOLDER,
+        type: CollectionItemTypeDtoEnum.FOLDER,
         items: {
           ...requestMetaData,
-          graphql: unadaptedRequest,
+          graphql: unadaptedRequest as GraphqlRequestMetaDataDtoInterface,
         },
       };
     } else {
       itemSource = {
         ...requestMetaData,
-        graphql: unadaptedRequest,
+        graphql: unadaptedRequest as GraphqlRequestMetaDataDtoInterface,
       };
     }
 
@@ -966,18 +970,21 @@ class GraphqlExplorerViewModel {
 
       progressiveTab.isSaved = true;
       this.tab = progressiveTab;
-      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      await this.tabRepository.updateTab(
+        progressiveTab.tabId as string,
+        progressiveTab,
+      );
       if (!folderId) {
         this.collectionRepository.updateRequestOrFolderInCollection(
           collectionId,
-          _id,
+          _id as string,
           data,
         );
       } else {
         this.collectionRepository.updateRequestInFolder(
           collectionId,
           folderId,
-          _id,
+          _id as string,
           data,
         );
       }
@@ -986,30 +993,36 @@ class GraphqlExplorerViewModel {
         message: "",
       };
     }
-    const res = await this.collectionService.updateGraphqlInCollection(_id, {
-      collectionId: collectionId,
-      workspaceId: workspaceId,
-      ...folderSource,
-      ...userSource,
-      items: itemSource,
-    });
+    const res = await this.collectionService.updateGraphqlInCollection(
+      _id as string,
+      {
+        collectionId: collectionId,
+        workspaceId: workspaceId,
+        ...folderSource,
+        ...userSource,
+        items: itemSource,
+      },
+    );
 
     if (res.isSuccessful) {
       const progressiveTab = this._tab.getValue();
       progressiveTab.isSaved = true;
       this.tab = progressiveTab;
-      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      await this.tabRepository.updateTab(
+        progressiveTab.tabId as string,
+        progressiveTab,
+      );
       if (!folderId) {
         this.collectionRepository.updateRequestOrFolderInCollection(
           collectionId,
-          _id,
+          _id as string,
           res.data.data,
         );
       } else {
         this.collectionRepository.updateRequestInFolder(
           collectionId,
           folderId,
-          _id,
+          _id as string,
           res.data.data,
         );
       }
@@ -1106,8 +1119,8 @@ class GraphqlExplorerViewModel {
     let userSource = {};
     const _id = componentData.id;
     if (path.length > 0) {
-      const requestTabAdapter = new GraphqlTabAdapter();
-      const unadaptedRequest = requestTabAdapter.unadapt(componentData);
+      const graphqlTabAdapter = new GraphqlTabAdapter();
+      const unadaptedRequest = graphqlTabAdapter.unadapt(componentData as Tab);
       let req = {
         id: uuidv4(),
         name: tabName,
@@ -1146,8 +1159,8 @@ class GraphqlExplorerViewModel {
             workspaceId: _workspaceMeta.id,
           };
           if (
-            !componentData.path.workspaceId ||
-            !componentData.path.collectionId
+            !componentData.path?.workspaceId ||
+            !componentData.path?.collectionId
           ) {
             /**
              * Update existing request
@@ -1160,7 +1173,7 @@ class GraphqlExplorerViewModel {
             progressiveTab.isSaved = true;
             this.tab = progressiveTab;
             await this.tabRepository.updateTab(
-              progressiveTab.tabId,
+              progressiveTab.tabId as string,
               progressiveTab,
             );
           } else {
@@ -1171,11 +1184,15 @@ class GraphqlExplorerViewModel {
             initRequestTab.updateName(req.name);
             initRequestTab.updateDescription(req.description);
             initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(req.graphql.url);
-            initRequestTab.updateQuery(req.graphql.query);
-            initRequestTab.updateSchema(req.graphql.schema);
-            initRequestTab.updateAuth(req.graphql.auth);
-            initRequestTab.updateHeaders(req.graphql.headers);
+            initRequestTab.updateUrl(req.graphql.url as string);
+            initRequestTab.updateQuery(req.graphql.query as string);
+            initRequestTab.updateSchema(req.graphql.schema as string);
+            initRequestTab.updateAuth(
+              req.graphql.auth as GraphqlRequestAuthTabInterface,
+            );
+            initRequestTab.updateHeaders(
+              req.graphql.headers as GraphqlRequestHeadersTabInterface[],
+            );
 
             this.tabRepository.createTab(initRequestTab.getValue());
             moveNavigation("right");
@@ -1195,7 +1212,7 @@ class GraphqlExplorerViewModel {
           items: {
             name: tabName,
             description,
-            type: ItemType.GRAPHQL,
+            type: CollectionItemTypeDtoEnum.GRAPHQL,
             graphql: unadaptedRequest,
           },
         });
@@ -1211,21 +1228,23 @@ class GraphqlExplorerViewModel {
             workspaceId: _workspaceMeta.id,
           };
           if (
-            !componentData.path.workspaceId ||
-            !componentData.path.collectionId
+            !componentData.path?.workspaceId ||
+            !componentData.path?.collectionId
           ) {
             /**
              * Update existing request
              */
             await this.updateRequestName(res.data.data.name);
-            await this.updateRequestDescription(res.data.data.description);
+            await this.updateRequestDescription(
+              res.data.data.description as string,
+            );
             await this.updateRequestPath(expectedPath);
-            await this.updateRequestId(res.data.data.id);
+            await this.updateRequestId(res.data.data.id as string);
             const progressiveTab = this._tab.getValue();
             progressiveTab.isSaved = true;
             this.tab = progressiveTab;
             await this.tabRepository.updateTab(
-              progressiveTab.tabId,
+              progressiveTab.tabId as string,
               progressiveTab,
             );
           } else {
@@ -1233,17 +1252,26 @@ class GraphqlExplorerViewModel {
              * Create new copy of the existing request
              */
             const initRequestTab = new InitTab().graphQl(
-              res.data.data.id,
+              res.data.data.id as string,
               "UNTRACKED-",
             );
             initRequestTab.updateName(res.data.data.name);
-            initRequestTab.updateDescription(res.data.data.description);
+            initRequestTab.updateDescription(
+              res.data.data.description as string,
+            );
             initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(res.data.data.graphql.url);
-            initRequestTab.updateQuery(res.data.data.graphql.query);
-            initRequestTab.updateSchema(res.data.data.graphql.schema);
-            initRequestTab.updateAuth(res.data.data.graphql.auth);
-            initRequestTab.updateHeaders(res.data.data.graphql.headers);
+            initRequestTab.updateUrl(res.data.data.graphql?.url as string);
+            initRequestTab.updateQuery(res.data.data.graphql?.query as string);
+            initRequestTab.updateSchema(
+              res.data.data.graphql?.schema as string,
+            );
+            initRequestTab.updateAuth(
+              res.data.data.graphql?.auth as GraphqlRequestAuthTabInterface,
+            );
+            initRequestTab.updateHeaders(
+              res.data.data.graphql
+                ?.headers as GraphqlRequestHeadersTabInterface[],
+            );
 
             this.tabRepository.createTab(initRequestTab.getValue());
             moveNavigation("right");
@@ -1286,8 +1314,8 @@ class GraphqlExplorerViewModel {
             workspaceId: _workspaceMeta.id,
           };
           if (
-            !componentData.path.workspaceId ||
-            !componentData.path.collectionId
+            !componentData.path?.workspaceId ||
+            !componentData.path?.collectionId
           ) {
             await this.updateRequestName(req.name);
             await this.updateRequestDescription(req.description);
@@ -1297,7 +1325,7 @@ class GraphqlExplorerViewModel {
             progressiveTab.isSaved = true;
             this.tab = progressiveTab;
             await this.tabRepository.updateTab(
-              progressiveTab.tabId,
+              progressiveTab.tabId as string,
               progressiveTab,
             );
           } else {
@@ -1305,11 +1333,15 @@ class GraphqlExplorerViewModel {
             initRequestTab.updateName(req.name);
             initRequestTab.updateDescription(req.description);
             initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(req.graphql.url);
-            initRequestTab.updateQuery(req.graphql.query);
-            initRequestTab.updateSchema(req.graphql.schema);
-            initRequestTab.updateAuth(req.graphql.auth);
-            initRequestTab.updateHeaders(req.graphql.headers);
+            initRequestTab.updateUrl(req.graphql?.url as string);
+            initRequestTab.updateQuery(req.graphql?.query as string);
+            initRequestTab.updateSchema(req.graphql?.schema as string);
+            initRequestTab.updateAuth(
+              req.graphql?.auth as GraphqlRequestAuthTabInterface,
+            );
+            initRequestTab.updateHeaders(
+              req.graphql?.headers as GraphqlRequestHeadersTabInterface[],
+            );
             this.tabRepository.createTab(initRequestTab.getValue());
             moveNavigation("right");
           }
@@ -1329,11 +1361,11 @@ class GraphqlExplorerViewModel {
           items: {
             id: path[path.length - 1].id,
             name: path[path.length - 1].name,
-            type: ItemType.FOLDER,
+            type: CollectionItemTypeDtoEnum.FOLDER,
             items: {
               name: tabName,
               description,
-              type: ItemType.GRAPHQL,
+              type: CollectionItemTypeDtoEnum.GRAPHQL,
               graphql: unadaptedRequest,
             },
           },
@@ -1351,30 +1383,42 @@ class GraphqlExplorerViewModel {
             workspaceId: _workspaceMeta.id,
           };
           if (
-            !componentData.path.workspaceId ||
-            !componentData.path.collectionId
+            !componentData.path?.workspaceId ||
+            !componentData.path?.collectionId
           ) {
             this.updateRequestName(res.data.data.name);
-            this.updateRequestDescription(res.data.data.description);
+            this.updateRequestDescription(res.data.data.description as string);
             this.updateRequestPath(expectedPath);
-            this.updateRequestId(res.data.data.id);
+            this.updateRequestId(res.data.data.id as string);
             const progressiveTab = this._tab.getValue();
             progressiveTab.isSaved = true;
             this.tab = progressiveTab;
-            this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+            this.tabRepository.updateTab(
+              progressiveTab.tabId as string,
+              progressiveTab,
+            );
           } else {
             const initRequestTab = new InitTab().graphQl(
-              res.data.data.id,
+              res.data.data.id as string,
               "UNTRACKED-",
             );
             initRequestTab.updateName(res.data.data.name);
-            initRequestTab.updateDescription(res.data.data.description);
+            initRequestTab.updateDescription(
+              res.data.data.description as string,
+            );
             initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(res.data.data.graphql.url);
-            initRequestTab.updateQuery(res.data.data.graphql.query);
-            initRequestTab.updateSchema(res.data.data.graphql.schema);
-            initRequestTab.updateAuth(res.data.data.graphql.auth);
-            initRequestTab.updateHeaders(res.data.data.graphql.headers);
+            initRequestTab.updateUrl(res.data.data.graphql?.url as string);
+            initRequestTab.updateQuery(res.data.data.graphql?.query as string);
+            initRequestTab.updateSchema(
+              res.data.data.graphql?.schema as string,
+            );
+            initRequestTab.updateAuth(
+              res.data.data.graphql?.auth as GraphqlRequestAuthTabInterface,
+            );
+            initRequestTab.updateHeaders(
+              res.data.data.graphql
+                ?.headers as GraphqlRequestHeadersTabInterface[],
+            );
             this.tabRepository.createTab(initRequestTab.getValue());
             moveNavigation("right");
           }
@@ -1464,7 +1508,7 @@ class GraphqlExplorerViewModel {
         };
       }
       const response = await this.environmentService.updateEnvironment(
-        this._tab.getValue().path.workspaceId,
+        this._tab.getValue().path?.workspaceId as string,
         environmentVariables.global.id,
         payload,
       );
@@ -1550,7 +1594,7 @@ class GraphqlExplorerViewModel {
       }
       // api response
       const response = await this.environmentService.updateEnvironment(
-        this._tab.getValue().path.workspaceId,
+        this._tab.getValue().path?.workspaceId as string,
         environmentVariables.local.id,
         payload,
       );
@@ -1626,8 +1670,9 @@ class GraphqlExplorerViewModel {
     });
     if (newCollectionName) {
       if (isGuestUser == true) {
-        let col = await this.collectionRepository.readCollection(collectionId);
-        col = col.toMutableJSON();
+        let collection =
+          await this.collectionRepository.readCollection(collectionId);
+        let col = collection.toMutableJSON();
         col.name = newCollectionName;
         this.collectionRepository.updateCollection(collectionId, col);
         // notifications.success("Collection renamed successfully!");
@@ -1732,339 +1777,12 @@ class GraphqlExplorerViewModel {
   };
 
   /**
-   * Updates the message property of the last conversation in chunks.
-   *
-   * This function takes a string `data`, divides it into chunks of size `chunkSize`,
-   * and appends each chunk to the last conversation message in the component's data.
-   * The chunks are appended at intervals specified by `delay`.
-   *
-   * @param data - The string data to be displayed in chunks.
-   * @param chunkSize - The number of characters per chunk.
-   * @param delay - The delay in milliseconds between each chunk display.
-   */
-  private displayDataInChunks = async (data, chunkSize, delay) => {
-    let index = 0;
-
-    const sleep = (ms: number) =>
-      new Promise((resolve) => setTimeout(resolve, ms));
-    const displayNextChunk = async () => {
-      if (index < data.length) {
-        const chunk = data.slice(index, index + chunkSize);
-        const componentData = this._tab.getValue();
-        const length =
-          componentData?.property?.graphql?.ai?.conversations.length;
-        componentData.property.graphql.ai.conversations[length - 1].message =
-          componentData.property.graphql.ai.conversations[length - 1].message +
-          chunk;
-        await this.updateRequestAIConversation([
-          ...componentData.property.graphql.ai.conversations,
-        ]);
-        index += chunkSize;
-        await sleep(delay);
-        await displayNextChunk();
-      }
-    };
-
-    await displayNextChunk();
-  };
-
-  /**
    * Get workspace data through workspace id
    * @param workspaceId - id of workspace
    * @returns - workspace document
    */
   public getWorkspaceById = async (workspaceId: string) => {
     return await this.workspaceRepository.readWorkspace(workspaceId);
-  };
-
-  /**
-   * Generates an AI response based on the given prompt.
-   *
-   * @param prompt - The prompt to send to the AI assistant service.
-   * @returns A promise that resolves to the response from the AI assistant service.
-   */
-  public generateAiResponse = async (prompt = "") => {
-    // Set the request state to indicate that a response is being generated
-    await this.updateRequestState({ isChatbotGeneratingResponse: true });
-    const componentData = this._tab.getValue();
-    const apiData = {
-      body: componentData.property.graphql.body,
-      headers: componentData.property.graphql.headers,
-      method: componentData.property.graphql.method,
-      queryParams: componentData.property.graphql.queryParams,
-      url: componentData.property.graphql.url,
-      auth: componentData.property.graphql.auth,
-    };
-
-    // Call the AI assistant service to generate a response
-    const response = await this.aiAssistentService.generateAiResponse({
-      text: prompt,
-      instructions: `You are an AI Assistant, responsible for answering API related queries. Give the response only in markdown format. Only answer questions related to the provided API data and API Management. Give to the point and concise responses, only give explanations when they are asked for. Always follow best practices for REST API and answer accordingly. Utilize the provided api data ${JSON.stringify(
-        apiData,
-      )}. Never return the result same as prompt.`,
-      threadId: componentData?.property?.graphql?.ai?.threadId,
-    });
-    if (response.isSuccessful) {
-      const data = response.data.data;
-      // Update the AI thread ID and conversation with the new data
-      await this.updateRequestAIThread(data.threadId);
-      await this.updateRequestAIConversation([
-        ...(componentData?.property?.graphql?.ai?.conversations || []),
-        {
-          message: "",
-          messageId: data.messageId,
-          type: MessageTypeEnum.RECEIVER,
-          isLiked: false,
-          isDisliked: false,
-          status: true,
-        },
-      ]);
-      await this.displayDataInChunks(data.result, 100, 300);
-    } else {
-      // Update the conversation with an error message
-      let errorMessage = "Something went wrong! Please try again.";
-      if (response.message === "Limit reached") {
-        errorMessage =
-          "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
-      }
-      this.updateRequestAIConversation([
-        ...(componentData?.property?.graphql?.ai?.conversations || []),
-        {
-          message: errorMessage,
-          messageId: uuidv4(),
-          type: MessageTypeEnum.RECEIVER,
-          isLiked: false,
-          isDisliked: false,
-          status: false,
-        },
-      ]);
-    }
-    // Set the request state to indicate that the response generation is complete
-    await this.updateRequestState({ isChatbotGeneratingResponse: false });
-    return response;
-  };
-
-  /*
-   * Generates stream wise an AI response based on the given prompt.
-   *
-   * @param prompt - The prompt to send to the AI assistant service.
-   * @returns A promise that resolves to the response from the AI assistant service.
-   */
-  public generateStreamAiResponse = async (prompt = "") => {
-    // Set the request state to indicate that a response is being generated
-    await this.updateRequestState({ isChatbotGeneratingResponse: true });
-    let componentData = this._tab.getValue();
-    const apiData = {
-      body: componentData.property.graphql.body,
-      headers: componentData.property.graphql.headers,
-      method: componentData.property.graphql.method,
-      queryParams: componentData.property.graphql.queryParams,
-      url: componentData.property.graphql.url,
-      auth: componentData.property.graphql.auth,
-    };
-    const socketValue: Socket =
-      await this.aiAssistentWebSocketService.sendPromptMessage({
-        text: prompt,
-        instructions: `You are an AI Assistant, responsible for answering API related queries. Give the response only in markdown format. Only answer questions related to the provided API data and API Management. Give to the point and concise responses, only give explanations when they are asked for. Always follow best practices for REST API and answer accordingly. Utilize the provided api data ${JSON.stringify(
-          apiData,
-        )}. Never return the result same as prompt.`,
-        tabId: componentData.tabId,
-        threadId: componentData?.property?.graphql?.ai?.threadId,
-      });
-    let updatePromise = Promise.resolve(); // Initialize a promise chain
-    socketValue.off(`aiResponse_${componentData.tabId}`);
-    socketValue?.on(`aiResponse_${componentData.tabId}`, async (response) => {
-      updatePromise = updatePromise.then(async () => {
-        // Check if the conversation already contains the messageId
-        componentData = this._tab.getValue();
-        const existingMessageIndex =
-          componentData.property.graphql.ai.conversations.findIndex((conv) => {
-            return conv.messageId === response.messageId;
-          });
-        if (existingMessageIndex === -1 && response?.status) {
-          // If the messageId does not exist, add a new message entry
-
-          await this.updateRequestAIThread(response.threadId);
-          await this.updateRequestAIConversation([
-            ...componentData.property.graphql.ai.conversations,
-            {
-              messageId: response.messageId,
-              message: response.result,
-              type: MessageTypeEnum.RECEIVER,
-              isLiked: false,
-              isDisliked: false,
-              status: true,
-            },
-          ]);
-        } else if (response?.status) {
-          componentData.property.graphql.ai.conversations[
-            existingMessageIndex
-          ].message =
-            componentData.property.graphql.ai.conversations[
-              existingMessageIndex
-            ].message + response.result;
-          await this.updateRequestAIConversation([
-            ...componentData.property.graphql.ai.conversations,
-          ]);
-        }
-        if (response?.status === "Completed") {
-          await this.updateRequestState({
-            isChatbotGeneratingResponse: false,
-          });
-        }
-        if (response?.status === "Failed") {
-          await this.updateRequestState({
-            isChatbotGeneratingResponse: false,
-          });
-          // Update the conversation with an error message
-          this.updateRequestAIConversation([
-            ...(componentData?.property?.graphql?.ai?.conversations || []),
-            {
-              message: "Something went wrong! Please try again.",
-              messageId: uuidv4(),
-              type: MessageTypeEnum.RECEIVER,
-              isLiked: false,
-              isDisliked: false,
-              status: false,
-            },
-          ]);
-        }
-      });
-    });
-  };
-
-  /**
-   * Generates documentation for the particular API Request Tab.
-   *
-   * @param prompt - The prompt to be used for generating the documentation.
-   * @returns - The response from the AI assistant service.
-   */
-
-  public generateDocumentation = async (prompt = "") => {
-    await this.updateRequestState({ isDocGenerating: true });
-    const componentData = this._tab.getValue();
-    const apiData = {
-      body: componentData.property.graphql.body,
-      headers: componentData.property.graphql.headers,
-      method: componentData.property.graphql.method,
-      queryParams: componentData.property.graphql.queryParams,
-      url: componentData.property.graphql.url,
-      auth: componentData.property.graphql.auth,
-    };
-    prompt += `. Utilize the provided api data ${JSON.stringify(apiData)}`;
-    const response = await this.aiAssistentService.generateAiResponse({
-      text: prompt,
-      instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown.`,
-    });
-    if (response.isSuccessful) {
-      const formatter = new MarkdownFormatter();
-      const formattedData = await formatter.FormatData(
-        response.data.data.result,
-      );
-      const stringifyData = JSON.stringify(formattedData.blocks);
-      await this.updateRequestDescription(stringifyData);
-      await this.updateRequestState({
-        isDocAlreadyGenerated: true,
-      });
-    } else if (response?.message === "Limit reached") {
-      notifications.error(
-        "Failed to generate documentation. Your monthly AI usage limit is reached.",
-      );
-    }
-    setTimeout(async () => {
-      // renders response before disabling the editor
-      await this.updateRequestState({ isDocGenerating: false });
-    }, 1000);
-  };
-
-  /**
-   * Toggles the like or dislike status of a chat message.
-   *
-   * @param _messageId - The ID of the message to update.
-   * @param  _flag - The flag indicating whether the message is liked (true) or disliked (false).
-   */
-  public toggleChatMessageLike = (_messageId: string, _flag: boolean) => {
-    const componentData = this._tab.getValue();
-    const data = componentData?.property?.graphql?.ai;
-    this.aiAssistentService.updateAiStats(data.threadId, _messageId, _flag);
-
-    // Map through the conversations and update the like or dislike status of the specified message
-    const convo = data?.conversations?.map((elem) => {
-      if (elem.messageId === _messageId) {
-        if (_flag) {
-          elem.isLiked = true;
-          elem.isDisliked = false;
-        } else {
-          elem.isLiked = false;
-          elem.isDisliked = true;
-        }
-      }
-      return elem;
-    });
-    this.updateRequestAIConversation(convo);
-  };
-
-  /**
-   * Refreshes the tab data by updating conversations and chatbot state from the server.
-   *
-   * @param tab - The tab data from the server to refresh the current tab data with.
-   */
-  public refreshTabData = (tab: RequestTab) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-
-    if (progressiveTab?.property?.graphql?.ai?.conversations) {
-      // Handles AiConversationClient state
-      const AiConversationClient =
-        progressiveTab?.property?.graphql?.ai.conversations;
-      const AiConversationServer = tab.property.graphql.ai.conversations;
-      if (AiConversationServer.length > AiConversationClient.length) {
-        progressiveTab.property.graphql.ai.conversations =
-          tab.property.graphql.ai.conversations;
-        this.tab = progressiveTab;
-      }
-    }
-    if (progressiveTab?.property?.graphql?.state) {
-      // Handles isChatbotGeneratingResponseClient state
-      const isChatbotGeneratingResponseClient =
-        progressiveTab?.property?.graphql?.state?.isChatbotGeneratingResponse;
-      const isChatbotGeneratingResponseServer =
-        tab.property.graphql.state.isChatbotGeneratingResponse;
-      if (
-        isChatbotGeneratingResponseServer !== isChatbotGeneratingResponseClient
-      ) {
-        progressiveTab.property.graphql.state.isChatbotGeneratingResponse =
-          tab.property.graphql.state.isChatbotGeneratingResponse;
-        this.tab = progressiveTab;
-      }
-      // Handles isDocGenerating state
-      const isDocGeneratingClient =
-        progressiveTab?.property?.graphql?.state?.isDocGenerating;
-      const isDocGeneratingServer = tab.property.graphql.state.isDocGenerating;
-      if (isDocGeneratingServer !== isDocGeneratingClient) {
-        progressiveTab.property.graphql.state.isDocGenerating =
-          tab.property.graphql.state.isDocGenerating;
-        this.tab = progressiveTab;
-      }
-      // Handles isDocAlreadyGeneratedClient state
-      const isDocAlreadyGeneratedClient =
-        progressiveTab?.property?.graphql?.state?.isDocAlreadyGenerated;
-      const isDocAlreadyGeneratedServer =
-        tab.property.graphql.state.isDocAlreadyGenerated;
-      if (isDocAlreadyGeneratedServer !== isDocAlreadyGeneratedClient) {
-        progressiveTab.property.graphql.state.isDocAlreadyGenerated =
-          tab.property.graphql.state.isDocAlreadyGenerated;
-        this.tab = progressiveTab;
-      }
-    }
-    if (progressiveTab) {
-      // Handles apiDescriptionClient state
-      const apiDescriptionClient = progressiveTab?.description;
-      const apiDescriptionServer = tab.description;
-      if (apiDescriptionServer !== apiDescriptionClient) {
-        progressiveTab.description = tab.description;
-        this.tab = progressiveTab;
-      }
-    }
   };
 }
 
