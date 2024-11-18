@@ -156,4 +156,5 @@
   onUpdateEnvironment={_viewModel.updateEnvironment}
   onRenameCollection={_viewModel.handleRenameCollection}
   onRenameFolder={_viewModel.handleRenameFolder}
+  onClearQuery={_viewModel.clearQuery}
 />

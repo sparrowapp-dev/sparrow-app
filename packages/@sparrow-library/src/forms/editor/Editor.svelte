@@ -7,7 +7,8 @@
   import { createEventDispatcher } from "svelte";
   import { placeholder as CreatePlaceHolder } from "@codemirror/view";
 
-  export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" = "Text";
+  export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
+    "Text";
   export let value = "";
   export let isEditable = true;
   export let isFormatted = false;

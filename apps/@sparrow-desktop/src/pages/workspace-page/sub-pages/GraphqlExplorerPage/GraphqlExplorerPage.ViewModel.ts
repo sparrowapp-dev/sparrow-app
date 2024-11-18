@@ -1647,6 +1647,14 @@ class GraphqlExplorerViewModel {
   public getWorkspaceById = async (workspaceId: string) => {
     return await this.workspaceRepository.readWorkspace(workspaceId);
   };
+
+  /**
+   * Clears GraphQL request query
+   */
+  public clearQuery = async () => {
+    await this.updateRequestQuery("");
+    notifications.success("Cleared Query successfully.");
+  };
 }
 
 export default GraphqlExplorerViewModel;
