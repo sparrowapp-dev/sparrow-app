@@ -1,1 +1,0 @@
-export { default as WorkspaceDefault } from "./WorkspaceDefault.svelte";
