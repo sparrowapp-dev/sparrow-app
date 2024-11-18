@@ -3,6 +3,7 @@
   import { RequestSectionEnum } from "@sparrow/common/types/workspace";
   import { Label } from "@sparrow/library/ui";
   import { SocketSectionEnum } from "@sparrow/common/types/workspace/web-socket";
+  import { Navigator } from "../../../../components";
   export let requestStateSection: string | undefined;
   export let paramsLength = 0;
   export let headersLength = 0;
@@ -59,49 +60,12 @@
       );
     }
   }
+  const onTabClick = (tabId: ResponseSectionEnum) => {
+    onUpdateRequestState({ socketNavigation: tabId });
+  };
 </script>
 
-<div class="pb-2">
-  <!-- Tabs -->
-  <div class="d-flex mb-2">
-    {#each tabs as tab}
-      <button
-        class="navigation__link border-0 sparrow-fs-12 request-tab me-3 {tab.id ===
-        requestStateSection
-          ? 'tab-active'
-          : ''}"
-        role="tab"
-        on:click={() => {
-          onUpdateRequestState({ socketNavigation: tab.id });
-        }}
-      >
-        <span class="d-flex align-items-center ps-1 pe-1"
-          ><span>{tab.name}</span>
-          {#if tab.count}
-            <span class="ms-1"></span>
-            <Label number={tab.count} />
-          {/if}
-        </span>
-      </button>
-    {/each}
-  </div>
-</div>
+
+<Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
 
 <!-- <svelte:window on:keydown={handleKeyPress} /> -->
-
-<style>
-  .navigation__link {
-    color: var(--text-secondary-200);
-    background-color: transparent;
-    border-bottom: 2px transparent;
-  }
-
-  .navigation__link:hover {
-    background-color: var(--text-secondary-500);
-    border-radius: 2px;
-  }
-  .tab-active {
-    color: var(--text-secondary-100);
-    border-bottom: 2px solid var(--border-primary-300) !important;
-  }
-</style>

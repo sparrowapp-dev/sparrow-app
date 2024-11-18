@@ -103,6 +103,15 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   release_macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: 'x86_64-apple-darwin'
+            prefix: 'arch -x86_64'
+          - arch: 'aarch64-apple-darwin'
+            prefix: ''
+
     runs-on: macos-latest
     environment: development
     needs: release_win
@@ -148,7 +157,7 @@ jobs:
 
       - name: Build Universal build for MAC
         run: |
-          arch -x86_64 yarn tauri build --target universal-apple-darwin --debug --verbose
+          ${{ matrix.arch_prefix }} yarn desktop-build-mac-universal
         env:
           APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
           APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
