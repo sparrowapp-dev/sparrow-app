@@ -45,30 +45,32 @@
           placeholder={""}
         />
       </div>
-      <div
-        style="border-top: 1px solid var(--border-secondary-400);"
-        class="pt-2 pb-2 d-flex justify-content-between"
-      >
-        <div></div>
-        <div>
-          <span
-            class="input-cleaner px-2 border-radius-2 py-1 text-fs-12 text-secondary-200"
-            role="button"
-            on:click={() => {
-              onClearQuery();
-            }}
-          >
-            <span class="me-2"
-              ><CleanerIcon
-                height={"14px"}
-                width={"12px"}
-                color={"var(--text-secondary-200)"}
-              /></span
+      {#if value}
+        <div
+          style="border-top: 1px solid var(--border-secondary-400);"
+          class="pt-2 pb-2 d-flex justify-content-between"
+        >
+          <div></div>
+          <div>
+            <span
+              class="input-cleaner px-2 border-radius-2 py-1 text-fs-12 text-secondary-200"
+              role="button"
+              on:click={() => {
+                onClearQuery();
+              }}
             >
-            Clear Query</span
-          >
+              <span class="me-2"
+                ><CleanerIcon
+                  height={"14px"}
+                  width={"12px"}
+                  color={"var(--text-secondary-200)"}
+                /></span
+              >
+              Clear Query</span
+            >
+          </div>
         </div>
-      </div>
+      {/if}
     </div>
   </div>
 </div>
