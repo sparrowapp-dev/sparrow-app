@@ -54,6 +54,7 @@ export enum RequestDataType {
   HTML = "HTML",
   TEXT = "Text",
   JAVASCRIPT = "JavaScript",
+  GRAPHQL = "Graphql",
   IMAGE = "Image",
 }
 

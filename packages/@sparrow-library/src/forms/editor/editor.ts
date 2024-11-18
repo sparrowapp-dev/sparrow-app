@@ -86,6 +86,27 @@ const handleCodeMirrorSyntaxFormat = (
         beautifySyntaxCallback(false);
       }
       break;
+    case RequestDataType.GRAPHQL:
+      if (codeMirrorView) {
+        let payload = {};
+        if (isFormatted) {
+          payload = {
+            changes: {
+              from: 0,
+              to: codeMirrorView.state.doc.length,
+              insert: js_beautify(value),
+            },
+          };
+        }
+        codeMirrorView.dispatch({
+          effects: languageConf.reconfigure(
+            javascript({ jsx: false, typescript: false }),
+          ),
+          ...payload,
+        });
+        beautifySyntaxCallback(false);
+      }
+      break;
     case RequestDataType.JSON:
       if (codeMirrorView) {
         let payload = {};

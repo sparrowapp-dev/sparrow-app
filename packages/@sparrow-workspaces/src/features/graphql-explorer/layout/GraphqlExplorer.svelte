@@ -28,7 +28,7 @@
     ResponseSectionEnum,
     type KeyValue,
   } from "@sparrow/common/types/workspace";
-  import { requestSplitterDirection, type graphqlExplorerData } from "../store";
+  import { type graphqlExplorerData } from "../store";
 
   import { Modal } from "@sparrow/library/ui";
   import { ResponseStatusCode } from "@sparrow/common/enums";
@@ -60,6 +60,7 @@
   export let onRenameCollection;
   export let onRenameFolder;
   export let isGraphqlEditable;
+  export let onClearQuery;
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
@@ -139,9 +140,7 @@
           <Splitpanes
             class="rest-splitter w-100 h-100"
             id={"rest-splitter"}
-            horizontal={$requestSplitterDirection === "horizontal"
-              ? true
-              : false}
+            horizontal={false}
             dblClickSplitter={false}
             on:resize={(e) => {
               onUpdateRequestState({
@@ -159,12 +158,7 @@
               class="position-relative bg-secondary-850-important"
             >
               <!-- Request Pane -->
-              <div
-                class="h-100 d-flex flex-column position-relative {$requestSplitterDirection ===
-                'horizontal'
-                  ? 'pb-1'
-                  : 'pe-2'}"
-              >
+              <div class="h-100 d-flex flex-column position-relative pe-2">
                 <RequestNavigator
                   requestStateSection={$tab.property.graphql?.state
                     ?.requestNavigation}
@@ -179,7 +173,7 @@
                     <RequestQuery
                       value={$tab.property.graphql.query}
                       {onUpdateRequestQuery}
-                      updateBeautifiedState={() => {}}
+                      {onClearQuery}
                     />
                   {:else if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.Schema}
                     SCHEMA
@@ -218,13 +212,7 @@
               class="bg-secondary-850-important position-relative"
             >
               <!-- Response Pane -->
-              <div
-                class="d-flex flex-column h-100 {$requestSplitterDirection ===
-                'horizontal'
-                  ? 'pt-1'
-                  : 'ps-2'}"
-                style="overflow:auto;"
-              >
+              <div class="d-flex flex-column h-100 ps-2" style="overflow:auto;">
                 <div class="h-100 d-flex flex-column">
                   <div style="flex:1; overflow:auto;">
                     {#if storeData?.isSendRequestInProgress}
