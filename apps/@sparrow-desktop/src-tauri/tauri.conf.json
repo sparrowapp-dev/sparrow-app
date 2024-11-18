@@ -42,7 +42,6 @@
         "componentRefs": ["DeepLinkRegistryEntries"]
       }
     },
-    "createUpdaterArtifacts": true,
     "macOS": {
       "dmg": {
         "background": "./icons/background.png",
