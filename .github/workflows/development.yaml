@@ -112,7 +112,7 @@ jobs:
           - arch: 'aarch64-apple-darwin'
             prefix: ''
 
-    runs-on: ${{ matrix.platform }}
+    runs-on: macos-latest
     environment: development
     needs: release_win
 
