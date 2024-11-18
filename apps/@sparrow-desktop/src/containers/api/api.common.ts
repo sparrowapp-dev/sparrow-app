@@ -833,6 +833,7 @@ const makeHttpRequestV2 = async (
       appInsights.trackDependencyData(appInsightData);
       return success(apiResponse);
     } catch (e) {
+      console.error(e);
       throw new Error("Error parsing response");
     }
   } catch (e) {
@@ -953,24 +954,45 @@ const formatFieldType = (type) => {
  * @param body - Request GraphQL Query
  */
 const makeGraphQLRequest = async (
-  url: string,
-  headers: string,
-  body: string,
-) => {
+  _url: string,
+  _headers: string,
+  _query: string,
+  _signal?: AbortSignal,
+): Promise<
+  HttpClientResponseInterface<{
+    body: string;
+    headers: object;
+    status: string;
+  }>
+> => {
+  let httpResponse: string;
+  const abortGraphqlRequestErrorMessage = `Running GraphQL Request with url ${_url} is aborted by the user`;
   try {
-    const data = await invoke("send_graphql_request", {
-      url,
-      headers,
-      query: body,
+    httpResponse = await invoke("send_graphql_request", {
+      url: _url,
+      headers: _headers,
+      query: _query,
     });
-    const parsedResponse = JSON.parse(data);
-    const parsedBody = JSON.parse(parsedResponse.body);
-    // Example Function call to format schema DO NOT REMOVE IT.
-    // const formattedSchema = formatGraphQLSchema(parsedBody.data);
-    // console.log(formattedSchema);
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    if (_signal?.aborted) {
+      // Check if request is aborted after request fails
+      throw new DOMException(abortGraphqlRequestErrorMessage, "AbortError");
+    }
+    throw new Error(err as string);
   }
+  if (_signal?.aborted) {
+    // Check if request is aborted after request success
+    throw new DOMException(abortGraphqlRequestErrorMessage, "AbortError");
+  }
+  try {
+    const parsedResponse = JSON.parse(httpResponse);
+    return success(parsedResponse);
+  } catch (err) {
+    throw err;
+  }
+  // Example Function call to format schema DO NOT REMOVE IT.
+  // const formattedSchema = formatGraphQLSchema(parsedBody.data);
+  // console.log(formattedSchema);
 };
 
 export {
@@ -987,5 +1009,4 @@ export {
   connectSocketIo,
   disconnectSocketIo,
   makeGraphQLRequest,
-  // getHeaders,
 };

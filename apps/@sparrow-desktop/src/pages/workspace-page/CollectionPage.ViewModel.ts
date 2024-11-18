@@ -1,6 +1,5 @@
 import type {
   CollectionDocument,
-  EnvironmentDocument,
   TabDocument,
   WorkspaceDocument,
 } from "../../database/database";
@@ -62,10 +61,11 @@ import { FeatureSwitchRepository } from "../../repositories/feature-switch.repos
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { isGuestUserActive } from "@app/store/auth.store";
 import { InitTab } from "@sparrow/common/factory";
-import type {
-  CollectionBaseInterface as CollectionDto,
-  CollectionArgsBaseInterface as CollectionArgsDto,
-  CollectionItemBaseInterface as CollectionItemsDto,
+import {
+  type CollectionBaseInterface as CollectionDto,
+  type CollectionArgsBaseInterface as CollectionArgsDto,
+  type CollectionItemBaseInterface as CollectionItemsDto,
+  CollectionItemTypeBaseEnum,
 } from "@sparrow/common/types/workspace/collection-base";
 import type { HttpRequestBaseInterface as RequestDto } from "@sparrow/common/types/workspace/http-request-base";
 import { type Tab } from "@sparrow/common/types/workspace/tab";
@@ -76,8 +76,7 @@ import type { FeatureQuery } from "../../types/feature-switch";
 import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/utils";
 
 import { createDeepCopy } from "@sparrow/common/utils";
-import { SocketIoTabAdapter } from "../../adapter";
-import { CollectionItemTypeDtoEnum } from "@sparrow/common/types/workspace/collection-dto";
+import { GraphqlTabAdapter, SocketIoTabAdapter } from "../../adapter";
 import type {
   SocketIORequestDeletePayloadDtoInterface,
   SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
@@ -85,9 +84,11 @@ import type {
 } from "@sparrow/common/types/workspace/socket-io-request-dto";
 import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 import type {
+  GraphqlRequestAuthDtoInterface,
   GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface,
   GraphqlRequestCreateUpdateInFolderPayloadDtoInterface,
   GraphqlRequestDeletePayloadDtoInterface,
+  GraphqlRequestKeyValueDtoInterface,
 } from "@sparrow/common/types/workspace/graphql-request-dto";
 import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
@@ -1139,7 +1140,7 @@ export default class CollectionsViewModel {
         source: _collection.activeSync ? "USER" : undefined,
         items: {
           name: socketIoTab.getValue().name,
-          type: CollectionItemTypeDtoEnum.SOCKETIO,
+          type: CollectionItemTypeBaseEnum.SOCKETIO,
           description: "",
           socketio: {},
         },
@@ -1228,7 +1229,7 @@ export default class CollectionsViewModel {
         source: _collection.activeSync ? "USER" : undefined,
         items: {
           name: graphqlTab.getValue().name,
-          type: CollectionItemTypeDtoEnum.GRAPHQL,
+          type: CollectionItemTypeBaseEnum.GRAPHQL,
           description: "",
           graphql: {},
         },
@@ -1568,11 +1569,11 @@ export default class CollectionsViewModel {
         folderId: _folder.id,
         items: {
           name: _folder.name,
-          type: CollectionItemTypeDtoEnum.FOLDER,
+          type: CollectionItemTypeBaseEnum.FOLDER,
           id: _folder.id,
           items: {
             name: socketIoTab.getValue().name,
-            type: CollectionItemTypeDtoEnum.SOCKETIO,
+            type: CollectionItemTypeBaseEnum.SOCKETIO,
             description: "",
             socketio: {},
           },
@@ -1675,11 +1676,11 @@ export default class CollectionsViewModel {
         folderId: _folder.id,
         items: {
           name: _folder.name,
-          type: CollectionItemTypeDtoEnum.FOLDER,
+          type: CollectionItemTypeBaseEnum.FOLDER,
           id: _folder.id,
           items: {
             name: graphqlTab.getValue().name,
-            type: CollectionItemTypeDtoEnum.GRAPHQL,
+            type: CollectionItemTypeBaseEnum.GRAPHQL,
             description: "",
             graphql: {},
           },
@@ -2053,6 +2054,28 @@ export default class CollectionsViewModel {
    * @param request : - The request going to be opened on tab
    * @param path : - The path to the request
    */
+  public handleOpenGraphqlTab = (
+    workspaceId: string,
+    collection: CollectionDto,
+    folder: CollectionItemsDto,
+    _graphql: CollectionItemsDto,
+  ) => {
+    const requestTabAdapter = new GraphqlTabAdapter();
+    const adaptedRequest = requestTabAdapter.adapt(
+      workspaceId || "",
+      collection?.id || "",
+      folder?.id || "",
+      _graphql,
+    );
+    this.tabRepository.createTab(adaptedRequest);
+    moveNavigation("right");
+  };
+
+  /**
+   * Handles opening a request on a tab
+   * @param request : - The request going to be opened on tab
+   * @param path : - The path to the request
+   */
   public handleOpenWebSocket = (
     workspaceId: string,
     collection: CollectionDto,
@@ -2126,7 +2149,7 @@ export default class CollectionsViewModel {
     let totalRequest: number = 0;
     if (collection.items) {
       collection.items.map((item: CollectionItemsDto) => {
-        if (item.type === ItemType.REQUEST) {
+        if (item.type === CollectionItemTypeBaseEnum.REQUEST) {
           totalRequest++;
         } else {
           totalFolder++;
@@ -2557,7 +2580,7 @@ export default class CollectionsViewModel {
           items: {
             name: _folder.name,
             id: _folder.id,
-            type: CollectionItemTypeDtoEnum.FOLDER,
+            type: CollectionItemTypeBaseEnum.FOLDER,
             items: {
               createdAt: _socketIo.createdAt,
               createdBy: _socketIo.createdBy,
@@ -2663,34 +2686,24 @@ export default class CollectionsViewModel {
     if (!_newGraphqlName) {
       return;
     }
+
+    const graphqlPayload = {
+      name: _newGraphqlName as string,
+      description: _graphql?.description as string,
+      url: _graphql.graphql?.url as string,
+      query: _graphql.graphql?.query,
+      schema: _graphql.graphql?.schema,
+      headers: _graphql.graphql
+        ?.headers as GraphqlRequestKeyValueDtoInterface[],
+      auth: _graphql.graphql?.auth as GraphqlRequestAuthDtoInterface,
+    };
+
     if (_collection.id && _workspaceId && !_folder.id) {
       const response = await this.collectionService.updateGraphqlInCollection(
         _graphql.id,
-        {
-          collectionId: _collection.id,
-          workspaceId: _workspaceId,
-          currentBranch:
-            _collection.activeSync && _graphql.source === "USER"
-              ? _collection.currentBranch
-              : undefined,
-          source:
-            _collection.activeSync && _graphql.source === "USER"
-              ? _graphql.source
-              : undefined,
-          items: {
-            createdAt: _graphql.createdAt,
-            createdBy: _graphql.createdBy,
-            description: _graphql.description,
-            id: _graphql.id,
-            isDeleted: _graphql.isDeleted,
-            name: _newGraphqlName,
-            graphql: _graphql.graphql,
-            source: _graphql.source,
-            type: _graphql.type,
-            updatedAt: _graphql.updatedAt,
-            updatedBy: _graphql.updatedBy,
-          },
-        } as GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface,
+        _collection.id,
+        _workspaceId,
+        graphqlPayload,
       );
       if (!response?.isSuccessful) {
         return;
@@ -2711,37 +2724,10 @@ export default class CollectionsViewModel {
     if (_collection.id && _workspaceId && _folder.id) {
       const response = await this.collectionService.updateGraphqlInCollection(
         _graphql.id,
-        {
-          collectionId: _collection.id,
-          workspaceId: _workspaceId,
-          currentBranch:
-            _collection?.activeSync && _graphql?.source === "USER"
-              ? _collection?.currentBranch
-              : undefined,
-          source:
-            _collection?.activeSync && _graphql?.source === "USER"
-              ? _graphql?.source
-              : undefined,
-          folderId: _folder.id,
-          items: {
-            name: _folder.name,
-            id: _folder.id,
-            type: CollectionItemTypeDtoEnum.FOLDER,
-            items: {
-              createdAt: _graphql.createdAt,
-              createdBy: _graphql.createdBy,
-              description: _graphql.description,
-              id: _graphql.id,
-              isDeleted: _graphql.isDeleted,
-              name: _newGraphqlName,
-              graphql: _graphql.graphql,
-              source: _graphql.source,
-              type: _graphql.type,
-              updatedAt: _graphql.updatedAt,
-              updatedBy: _graphql.updatedBy,
-            },
-          },
-        } as GraphqlRequestCreateUpdateInFolderPayloadDtoInterface,
+        _collection.id,
+        _workspaceId,
+        graphqlPayload,
+        _folder.id,
       );
       if (!response?.isSuccessful) {
         return;
@@ -4004,6 +3990,14 @@ export default class CollectionsViewModel {
           args.socketio as CollectionItemsDto,
         );
         break;
+      case "graphql":
+        this.handleOpenGraphqlTab(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.graphql as CollectionItemsDto,
+        );
+        break;
     }
   };
 
@@ -4706,7 +4700,7 @@ export default class CollectionsViewModel {
       id: _id,
       name: componentData?.name,
       description: componentData?.description,
-      type: ItemType.SOCKET_IO,
+      type: CollectionItemTypeBaseEnum.SOCKETIO,
     };
 
     let folderSource;
@@ -4717,7 +4711,7 @@ export default class CollectionsViewModel {
       };
       itemSource = {
         id: folderId,
-        type: ItemType.FOLDER,
+        type: CollectionItemTypeBaseEnum.FOLDER,
         items: {
           ...socketMetaData,
           socketio: unadaptedSocket,
@@ -4770,7 +4764,9 @@ export default class CollectionsViewModel {
       ...folderSource,
       ...userSource,
       items: itemSource,
-    });
+    } as
+      | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
+      | SocketIORequestCreateUpdateInFolderPayloadDtoInterface);
 
     if (res.isSuccessful) {
       if (!folderId) {
@@ -4873,8 +4869,17 @@ export default class CollectionsViewModel {
           items: {
             name: tabName,
             description,
-            type: CollectionItemTypeDtoEnum.SOCKETIO,
-            socketio: unadaptedSocket,
+            type: CollectionItemTypeBaseEnum.SOCKETIO,
+            socketio: {
+              url: unadaptedSocket.url,
+              message: unadaptedSocket.message,
+              eventName: unadaptedSocket.eventName,
+              events: unadaptedSocket.events,
+              queryParams: unadaptedSocket.queryParams,
+              headers: unadaptedSocket.headers,
+              selectedSocketIOBodyType:
+                unadaptedSocket.selectedSocketIOBodyType,
+            },
           },
         });
         if (res.isSuccessful) {
@@ -4934,12 +4939,21 @@ export default class CollectionsViewModel {
           items: {
             id: path[path.length - 1].id,
             name: path[path.length - 1].name,
-            type: CollectionItemTypeDtoEnum.FOLDER,
+            type: CollectionItemTypeBaseEnum.FOLDER,
             items: {
               name: tabName,
               description,
-              type: CollectionItemTypeDtoEnum.SOCKETIO,
-              socketio: unadaptedSocket,
+              type: CollectionItemTypeBaseEnum.SOCKETIO,
+              socketio: {
+                url: unadaptedSocket.url,
+                message: unadaptedSocket.message,
+                eventName: unadaptedSocket.eventName,
+                events: unadaptedSocket.events,
+                queryParams: unadaptedSocket.queryParams,
+                headers: unadaptedSocket.headers,
+                selectedSocketIOBodyType:
+                  unadaptedSocket.selectedSocketIOBodyType,
+              },
             },
           },
         });

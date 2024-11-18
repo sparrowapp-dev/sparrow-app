@@ -48,10 +48,16 @@ import { WebSocketService } from "../../../../services/web-socket.service";
 import { socketIoDataStore } from "@sparrow/workspaces/features/socketio-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
 import { SocketIoTabAdapter } from "@app/adapter";
-import { CollectionItemTypeDtoEnum } from "@sparrow/common/types/workspace/collection-dto";
-import type { CollectionItemBaseInterface } from "@sparrow/common/types/workspace/collection-base";
+import {
+  CollectionItemTypeBaseEnum,
+  type CollectionItemBaseInterface,
+} from "@sparrow/common/types/workspace/collection-base";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
 import type { EventsValues } from "@sparrow/common/types/workspace/socket-io-request-tab";
+import type {
+  SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
+  SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
+} from "@sparrow/common/types/workspace/socket-io-request-dto";
 
 class SocketIoExplorerPageViewModel {
   /**
@@ -75,7 +81,7 @@ class SocketIoExplorerPageViewModel {
    * Utils
    */
 
-  private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
+  private _tab = new BehaviorSubject<Partial<Tab>>({});
 
   public constructor(doc: TabDocument) {
     if (doc?.isActive) {
@@ -96,11 +102,11 @@ class SocketIoExplorerPageViewModel {
     return this.environmentRepository.getEnvironment();
   }
 
-  public get tab(): Observable<Tab> {
+  public get tab(): Observable<Partial<Tab>> {
     return this._tab.asObservable();
   }
 
-  private set tab(value: Tab) {
+  private set tab(value: Partial<Tab>) {
     this._tab.next(value);
   }
 
@@ -685,8 +691,8 @@ class SocketIoExplorerPageViewModel {
    * @returns save status
    */
   public saveSocket = async () => {
-    const componentData: Tab = this._tab.getValue();
-    const { folderId, collectionId, workspaceId } = componentData.path;
+    const componentData = this._tab.getValue();
+    const { folderId, collectionId, workspaceId } = componentData.path as Path;
 
     if (!workspaceId || !collectionId) {
       return {
@@ -712,7 +718,7 @@ class SocketIoExplorerPageViewModel {
       id: _id,
       name: componentData?.name,
       description: componentData?.description,
-      type: ItemType.SOCKET_IO,
+      type: CollectionItemTypeBaseEnum.SOCKETIO,
     };
 
     let folderSource;
@@ -723,7 +729,7 @@ class SocketIoExplorerPageViewModel {
       };
       itemSource = {
         id: folderId,
-        type: ItemType.FOLDER,
+        type: CollectionItemTypeBaseEnum.FOLDER,
         items: {
           ...socketMetaData,
           socketio: unadaptedSocket,
@@ -746,7 +752,7 @@ class SocketIoExplorerPageViewModel {
         id: progressiveTab.id,
         name: socketMetaData.name,
         description: socketMetaData.description,
-        type: ItemType.SOCKET_IO,
+        type: CollectionItemTypeBaseEnum.SOCKETIO,
         socketio: unadaptedSocket,
         updatedAt: "",
         updatedBy: "Guest User",
@@ -780,7 +786,9 @@ class SocketIoExplorerPageViewModel {
       ...folderSource,
       ...userSource,
       items: itemSource,
-    });
+    } as
+      | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
+      | SocketIORequestCreateUpdateInFolderPayloadDtoInterface);
 
     if (res.isSuccessful) {
       const progressiveTab = this._tab.getValue();
@@ -983,7 +991,7 @@ class SocketIoExplorerPageViewModel {
           items: {
             name: tabName,
             description,
-            type: CollectionItemTypeDtoEnum.SOCKETIO,
+            type: CollectionItemTypeBaseEnum.SOCKETIO,
             socketio: unadaptedSocket,
           },
         });
@@ -1115,11 +1123,11 @@ class SocketIoExplorerPageViewModel {
           items: {
             id: path[path.length - 1].id,
             name: path[path.length - 1].name,
-            type: ItemType.FOLDER,
+            type: CollectionItemTypeBaseEnum.FOLDER,
             items: {
               name: tabName,
               description,
-              type: CollectionItemTypeDtoEnum.SOCKETIO,
+              type: CollectionItemTypeBaseEnum.SOCKETIO,
               socketio: unadaptedSocket,
             },
           },
@@ -1249,7 +1257,7 @@ class SocketIoExplorerPageViewModel {
         };
       }
       const response = await this.environmentService.updateEnvironment(
-        this._tab.getValue().path.workspaceId,
+        this._tab.getValue().path?.workspaceId as string,
         environmentVariables.global.id,
         payload,
       );
@@ -1335,7 +1343,7 @@ class SocketIoExplorerPageViewModel {
       }
       // api response
       const response = await this.environmentService.updateEnvironment(
-        this._tab.getValue().path.workspaceId,
+        this._tab.getValue().path?.workspaceId as string,
         environmentVariables.local.id,
         payload,
       );

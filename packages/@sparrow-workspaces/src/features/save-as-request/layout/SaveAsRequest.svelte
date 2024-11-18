@@ -21,6 +21,7 @@
   import {
     CollectionIcon,
     FolderIcon2,
+    GraphIcon,
     PencilIcon2,
     SocketIcon,
     SocketIoIcon,
@@ -562,6 +563,10 @@
             <div class=" ps-2">
               <FileType name={col.name} type={ItemType.SOCKET_IO} />
             </div>
+          {:else if col.type === ItemType.GRAPHQL}
+            <div class=" ps-2">
+              <FileType name={col.name} type={ItemType.GRAPHQL} />
+            </div>
           {:else}
             <div
               class="item ps-2"
@@ -787,6 +792,14 @@
             height={"12px"}
             width={"16px"}
             color={"var(--icon-primary-300)"}
+          /></span
+        >
+      {:else if componentData?.property.request.method === TabTypeEnum.GRAPHQL}
+        <span class={`text-fs-12 me-3 fw-bold `}
+          ><GraphIcon
+            height={"12px"}
+            width={"16px"}
+            color={"var(--icon-danger-1100)"}
           /></span
         >
       {:else}

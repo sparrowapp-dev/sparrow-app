@@ -154,7 +154,7 @@ class InitSocketIoTab {
     return this;
   }
 
-  public updateEventName(_eventName: EventsValues[]) {
+  public updateEventName(_eventName: string) {
     if (!_eventName) {
       return this;
     }

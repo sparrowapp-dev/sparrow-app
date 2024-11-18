@@ -70,6 +70,7 @@
   import { WelcomePopup } from "@sparrow/workspaces/features";
   import SocketIoExplorerPage from "./sub-pages/SocketIoExplorerPage/SocketIoExplorerPage.svelte";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+  import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -538,7 +539,12 @@
                   </Motion>
                 {:else if $activeTab?.type === ItemType.GRAPHQL}
                   <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>GraphQL will render here</div>
+                    <div class="h-100" use:motion>
+                      <GraphqlExplorerPage
+                        bind:isTourGuideOpen
+                        tab={$activeTab}
+                      />
+                    </div>
                   </Motion>
                 {:else if !$tabList?.length}
                   <Motion {...scaleMotionProps} let:motion>

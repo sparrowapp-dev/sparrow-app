@@ -37,7 +37,7 @@
   export let tab: Observable<Tab>;
   export let collections: Observable<any[]>;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
-  export let onUpdateRequestEventName
+  export let onUpdateRequestEventName;
   export let onUpdateRequestParams: UpdateParamsType;
   export let onUpdateMessage;
   export let onUpdateHeaders: UpdateHeadersType;

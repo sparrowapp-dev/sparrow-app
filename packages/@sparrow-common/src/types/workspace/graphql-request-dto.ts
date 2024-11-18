@@ -1,7 +1,5 @@
-import type {
-  CollectionItemTypeDtoEnum,
-  CollectionSourceTypeDtoEnum,
-} from "./collection-dto";
+import type { CollectionItemTypeBaseEnum } from "./collection-base";
+import { CollectionSourceTypeDtoEnum } from "./collection-dto";
 
 export interface GraphqlRequestKeyValueDtoInterface {
   key: string;
@@ -41,7 +39,7 @@ export interface GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface {
     id?: string;
     name: string;
     description?: string;
-    type: CollectionItemTypeDtoEnum.GRAPHQL;
+    type: CollectionItemTypeBaseEnum.GRAPHQL;
     source?: CollectionSourceTypeDtoEnum;
     graphql?: GraphqlRequestMetaDataDtoInterface;
     isDeleted?: boolean;
@@ -60,14 +58,14 @@ export interface GraphqlRequestCreateUpdateInFolderPayloadDtoInterface {
   folderId?: string;
   source?: GraphqlRequestSourceDtoType;
   items?: {
-    name: string;
-    type: CollectionItemTypeDtoEnum.FOLDER;
+    name?: string;
+    type: CollectionItemTypeBaseEnum.FOLDER;
     id: string;
     items?: {
       id?: string;
       name: string;
       description?: string;
-      type: CollectionItemTypeDtoEnum.GRAPHQL;
+      type: CollectionItemTypeBaseEnum.GRAPHQL;
       source?: CollectionSourceTypeDtoEnum;
       graphql?: GraphqlRequestMetaDataDtoInterface;
       isDeleted?: boolean;
