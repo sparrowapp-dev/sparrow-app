@@ -498,7 +498,7 @@
    * @returns- The updated request navigation.
    */
   const updateActiveTabInsideRequestBody = (tab: string) => {
-    if (tab === "Body") {
+    if (tab === "Request Body") {
       requestNavigation = "Request Body";
     } else if (tab === "Headers") {
       requestNavigation = "Headers";
