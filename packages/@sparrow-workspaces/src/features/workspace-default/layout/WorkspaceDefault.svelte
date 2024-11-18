@@ -106,6 +106,15 @@
     />
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <Card
+        icon={StackIcon}
+        label="Environment"
+        iconColor="var(--text-primary-300)"
+        iconSize={"18px"}
+        onClick={handleCreateEnvironment}
+      />
+    {/if}
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+      <Card
         icon={TreeIcon}
         label={"Test Flow"}
         iconColor="var(--text-primary-300)"
@@ -114,15 +123,6 @@
           onCreateTestflow();
           MixpanelEvent(Events.Default_Screen_TestFlows);
         }}
-      />
-    {/if}
-    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-      <Card
-        icon={StackIcon}
-        label="Environment"
-        iconColor="var(--text-primary-300)"
-        iconSize={"18px"}
-        onClick={handleCreateEnvironment}
       />
     {/if}
   </div>
