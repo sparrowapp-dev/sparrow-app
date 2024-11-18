@@ -1,0 +1,21 @@
+<script lang="ts">
+  export let color: string = "white",
+    width: number = 14,
+    height: number = 16,
+    classProp: string = "";
+</script>
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  {width}
+  {height}
+  viewBox="0 0 14 16"
+  fill="none"
+  class={`${classProp}`}
+  style={`cursor: pointer;`}
+>
+  <path
+    d="M8 2.5C8 1.94687 7.55312 1.5 7 1.5C6.44688 1.5 6 1.94687 6 2.5V7H1.5C0.946875 7 0.5 7.44688 0.5 8C0.5 8.55312 0.946875 9 1.5 9H6V13.5C6 14.0531 6.44688 14.5 7 14.5C7.55312 14.5 8 14.0531 8 13.5V9H12.5C13.0531 9 13.5 8.55312 13.5 8C13.5 7.44688 13.0531 7 12.5 7H8V2.5Z"
+    fill={color}
+  />
+</svg>
