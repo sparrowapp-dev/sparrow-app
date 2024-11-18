@@ -17,6 +17,8 @@
   import { Tooltip } from "@sparrow/library/ui";
   import { CopyIcon, DownloadIcon2 } from "@sparrow/library/icons";
   import type { WebSocketMessage } from "../../store/websocket";
+  import { save } from "@tauri-apps/plugin-dialog";
+  import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
 
   export let webSocket;
   export let onUpdateContentType;
@@ -56,7 +58,7 @@
   const handleCopy = async () => {
     const selectedMessage = currentMessage(webSocket?.body);
     await copyToClipBoard(formatCode(selectedMessage));
-    notifications.success("Copied to clipboard");
+    notifications.success("Copied to Clipboard.");
     MixpanelEvent(Events.COPY_API_RESPONSE);
   };
 
@@ -92,20 +94,29 @@
   };
 
   const handleDownloaded = async () => {
-    const newHandle = await window.showSaveFilePicker({
-      suggestedName: `websocket_response.${fileExtension}`,
-      accept: {
-        extensions: ["txt", "json", "xml", "js", "html"],
-      },
+    // Open a save file dialog
+    const path = await save({
+      defaultPath: `websocket_response.${fileExtension}`,
+      filters: [
+        {
+          name: "Text Files",
+          extensions: ["txt", "json", "xml", "js", "html"],
+        },
+      ],
     });
-    const writableStream = await newHandle.createWritable();
-    // write our file
-    const selectedMessage = currentMessage(webSocket?.body);
-    await writableStream.write(formatCode(selectedMessage));
-    await writableStream.close();
-    notifications.success("Exported successfully.");
-    MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
+    // Check if a path was selected
+    if (path) {
+      const selectedMessage = currentMessage(webSocket?.body);
+      const contents = formatCode(selectedMessage);
+      await writeTextFile(path, contents, {
+        baseDir: BaseDirectory.AppConfig,
+      });
+      notifications.success("Exported successfully.");
+    } else {
+      console.error("Save dialog was canceled or no path was selected.");
+    }
   };
+
   const currentTransmitter = (uuid: string) => {
     if (webSocket) {
       const message = webSocket.messages.find(
@@ -173,13 +184,6 @@
     <div class="d-flex align-items-center gap-2">
       <!-- Copy button -->
       <Tooltip title={"Copy"}>
-        <!-- <div
-          on:click={handleCopy}
-          role="button"
-          class="icon-container d-flex align-items-center justify-content-center border-radius-2"
-        >
-          <img src={copyIcon} style="height:12px; width:12px;" />
-        </div> -->
         <WithButtonV4
           icon={CopyIcon}
           onClick={handleCopy}
@@ -188,7 +192,7 @@
         />
       </Tooltip>
       <!-- Download button -->
-      <Tooltip title={"Download"}>
+      <Tooltip title={"Export"}>
         <WithButtonV4
           icon={DownloadIcon2}
           onClick={handleDownloaded}

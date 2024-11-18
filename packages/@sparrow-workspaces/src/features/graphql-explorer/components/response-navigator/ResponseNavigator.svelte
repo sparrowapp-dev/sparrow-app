@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Label, notifications } from "@sparrow/library/ui";
+  import { Label, notifications, Tooltip } from "@sparrow/library/ui";
   import { ResponseSectionEnum } from "@sparrow/common/types/workspace";
   import { copyToClipBoard } from "@sparrow/common/utils";
 
@@ -12,6 +12,8 @@
   import js_beautify, { html_beautify } from "js-beautify";
   import { save } from "@tauri-apps/plugin-dialog";
   import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
+  import { WithButtonV6 } from "../../../../hoc";
+  import { CopyIcon, DownloadIcon2 } from "@sparrow/library/icons";
   export let requestStateSection: string;
   export let onUpdateResponseState;
   export let responseHeadersLength = 0;
@@ -48,7 +50,7 @@
 
   export let response;
 
-  let fileExtension: "json";
+  let fileExtension = "json";
 
   /**
    * @description - formats the code
@@ -67,7 +69,7 @@
 
   const handleCopy = async () => {
     await copyToClipBoard(formatCode(response?.body));
-    notifications.success("Copied to Clipboard");
+    notifications.success("Copied to Clipboard.");
     MixpanelEvent(Events.COPY_API_RESPONSE);
   };
 
@@ -98,10 +100,11 @@
     });
     // Check if a path was selected
     if (path) {
-      const contents = JSON.stringify(formatCode(response?.body));
+      const contents = formatCode(response?.body);
       await writeTextFile(path, contents, {
         baseDir: BaseDirectory.AppConfig,
       });
+      notifications.success("Exported successfully.");
     } else {
       console.error("Save dialog was canceled or no path was selected.");
     }
@@ -140,27 +143,25 @@
       style="top:55.4px;  margin-top: -1px;"
     >
       <div class="d-flex gap-3 align-items-center justify-content-center"></div>
-      <div class="d-flex align-items-center gap-3" style=" height: 32px;">
-        <!-- insert controller here -->
-
-        <!-- Download button -->
-        <div
-          on:click={handleDownloaded}
-          role="button"
-          class="icon-container d-flex align-items-center justify-content-center border-radius-2"
-          style="height: 32px; width: 32px;"
-        >
-          <img src={downloadIcon} style="height:16px; width:16px;" />
-        </div>
+      <div class="d-flex align-items-center gap-2" style=" height: 32px;">
         <!-- Copy button -->
-        <div
-          on:click={handleCopy}
-          role="button"
-          class="icon-container d-flex align-items-center justify-content-center border-radius-2"
-          style="height: 32px; width: 32px;"
-        >
-          <img src={copyIcon} style="height:16px; width:16px;" />
-        </div>
+        <Tooltip title={"Copy"}>
+          <WithButtonV6
+            icon={CopyIcon}
+            onClick={handleCopy}
+            disable={false}
+            loader={false}
+          />
+        </Tooltip>
+        <!-- Download button -->
+        <Tooltip title={"Export"}>
+          <WithButtonV6
+            icon={DownloadIcon2}
+            onClick={handleDownloaded}
+            disable={false}
+            loader={false}
+          />
+        </Tooltip>
       </div>
     </div>
   </div>
