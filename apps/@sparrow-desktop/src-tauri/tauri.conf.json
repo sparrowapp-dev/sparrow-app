@@ -67,6 +67,7 @@
   "identifier": "dev.sparrowapp.desktop",
   "plugins": {
     "updater": {
+      "createUpdaterArtifacts": true,
       "windows": {
         "installMode": "passive"
       },
