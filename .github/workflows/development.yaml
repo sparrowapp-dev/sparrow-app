@@ -148,7 +148,7 @@ jobs:
 
       - name: Build Universal build for MAC
         run: |
-          arch -x86_64 yarn tauri build --target universal-apple-darwin --debug --verbose
+          yarn desktop-build-mac-universal
         env:
           APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
           APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
