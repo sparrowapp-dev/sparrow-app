@@ -12,6 +12,7 @@
   import js_beautify, { html_beautify } from "js-beautify";
   import { save } from "@tauri-apps/plugin-dialog";
   import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
+  import { Navigator } from "../../../../components";
   export let requestStateSection: string;
   export let onUpdateResponseState;
   export let responseHeadersLength = 0;
@@ -106,32 +107,14 @@
       console.error("Save dialog was canceled or no path was selected.");
     }
   };
+
+  const onTabClick = (tabId: ResponseSectionEnum) => {
+    onUpdateResponseState("responseNavigation", tabId);
+  };
 </script>
 
 <div class="py-2 d-flex">
-  <!-- Tabs -->
-  <div class="d-flex mb-2">
-    {#each tabs as tab}
-      <button
-        class="navigation__link border-0 me-2 sparrow-fs-12 me-4 request-tab {tab.id ===
-        requestStateSection
-          ? 'tab-active'
-          : ''}"
-        role="tab"
-        on:click={() => {
-          onUpdateResponseState("responseNavigation", tab.id);
-        }}
-      >
-        <span class="d-flex align-items-center"
-          ><span>{tab.name}</span>
-          {#if tab.count}
-            <span class="ms-1"></span>
-            <Label number={tab.count} />
-          {/if}
-        </span>
-      </button>
-    {/each}
-  </div>
+  <Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
   <div
     class="d-flex flex-column align-items-start justify-content-between w-100"
   >
@@ -165,36 +148,3 @@
     </div>
   </div>
 </div>
-
-<style>
-  .navigation__link {
-    color: var(--text-secondary-100);
-    background-color: transparent;
-    border-bottom: 2px transparent;
-    padding: 2px;
-  }
-  .navigation__link:hover {
-    background-color: var(--text-secondary-500);
-    border-radius: 2px;
-  }
-  .tab-active {
-    color: var(--text-secondary-100);
-    border-bottom: 2px solid var(--border-primary-300) !important;
-  }
-
-  .response-container {
-    flex-wrap: wrap;
-    background-color: transparent;
-  }
-
-  .icon-container {
-    height: 24px;
-    width: 24px;
-  }
-  .icon-container:hover {
-    background-color: var(--bg-secondary-550);
-  }
-  .icon-container:active {
-    background-color: var(--bg-secondary-600);
-  }
-</style>

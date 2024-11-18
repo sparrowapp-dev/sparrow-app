@@ -2,6 +2,7 @@
   import { Label } from "@sparrow/library/ui";
   import { type UpdateRequestStateType } from "@sparrow/workspaces/type";
   import { ResponseSectionEnum } from "@sparrow/common/types/workspace";
+  import { Navigator } from "../../../../components";
   export let requestStateSection: string;
   export let onUpdateResponseState;
   export let responseHeadersLength = 0;
@@ -35,47 +36,10 @@
       tabs = refreshTabs(responseHeadersLength);
     }
   }
+
+  const onTabClick = (tabId: ResponseSectionEnum) => {
+    onUpdateResponseState("responseNavigation", tabId);
+  };
 </script>
 
-<div class="py-2">
-  <!-- Tabs -->
-  <div class="d-flex mb-2">
-    {#each tabs as tab}
-      <button
-        class="navigation__link border-0 me-2 sparrow-fs-12 me-4 request-tab {tab.id ===
-        requestStateSection
-          ? 'tab-active'
-          : ''}"
-        role="tab"
-        on:click={() => {
-          onUpdateResponseState("responseNavigation", tab.id);
-        }}
-      >
-        <span class="d-flex align-items-center"
-          ><span>{tab.name}</span>
-          {#if tab.count}
-            <span class="ms-1"></span>
-            <Label number={tab.count} />
-          {/if}
-        </span>
-      </button>
-    {/each}
-  </div>
-</div>
-
-<style>
-  .navigation__link {
-    color: var(--text-secondary-100);
-    background-color: transparent;
-    border-bottom: 2px transparent;
-    padding: 2px;
-  }
-  .navigation__link:hover {
-    background-color: var(--text-secondary-500);
-    border-radius: 2px;
-  }
-  .tab-active {
-    color: var(--text-secondary-100);
-    border-bottom: 2px solid var(--border-primary-300) !important;
-  }
-</style>
+<Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
