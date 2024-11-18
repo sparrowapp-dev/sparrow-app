@@ -135,7 +135,6 @@ jobs:
           yarn cache clean
           yarn install
           yarn desktop-build
-          # yarn tauri build --debug
         env:
           APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
           APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
@@ -147,9 +146,9 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
-      - name: Build Intel-based Tauri App (x86_64)
+      - name: Build Universal build for MAC
         run: |
-          arch -x86_64 yarn tauri build --target x86_64-apple-darwin --debug
+          arch -x86_64 yarn tauri build --target universal-apple-darwin --debug --verbose
         env:
           APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
           APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
