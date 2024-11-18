@@ -107,10 +107,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest'
-            arch: 'aarch64-apple-darwin'
-          - platform: 'macos-latest'
-            arch: 'x86_64-apple-darwin'
+          - arch: 'x86_64-apple-darwin'
+            prefix: 'arch -x86_64'
+          - arch: 'aarch64-apple-darwin'
+            prefix: ''
 
     runs-on: ${{ matrix.platform }}
     environment: development
