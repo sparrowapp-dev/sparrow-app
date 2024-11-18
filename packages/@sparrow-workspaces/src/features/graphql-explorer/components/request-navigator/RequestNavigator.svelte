@@ -97,7 +97,11 @@
           ><span>{tab.name}</span>
           {#if tab.count}
             <span class="ms-1"></span>
-            <Label number={tab.count} />
+            <Label
+              textColor={"var(--text-primary-350)"}
+              backgroundColor={"var(--bg-tertiary-300)"}
+              number={tab.count}
+            />
           {/if}
         </span>
       </button>
@@ -109,7 +113,7 @@
 
 <style>
   .navigation__link {
-    color: var(--text-secondary-100);
+    color: var(--text-secondary-200);
     background-color: transparent;
     border-bottom: 2px transparent;
   }
