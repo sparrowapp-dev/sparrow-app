@@ -113,4 +113,9 @@ export enum Events {
   SocketIO_Connected = "SocketIO_Connected",
   SocketIO_Disconnected = "SocketIO_Disconnected",
   Send_SocketIO_Request = "Send_SocketIO_Request",
+  GraphQL_button = "GraphQL_button",
+  Add_GraphQL = "Add_GraphQL",
+  Collection_GraphQL = "Collection_GraphQL",
+  Send_GraphQL_Query = "Send_GraphQL_Query",
+  Save_GraphQL_Request = "Save_GraphQL_Request",
 }
