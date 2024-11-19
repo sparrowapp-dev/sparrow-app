@@ -2,7 +2,7 @@
   import { downloadIcon } from "@sparrow/library/assets";
   import { copyIcon } from "@sparrow/library/assets";
   import { copyToClipBoard } from "@sparrow/common/utils";
-  import { notifications } from "@sparrow/library/ui";
+  import { notifications, Tooltip } from "@sparrow/library/ui";
   import {
     RequestDataType,
     ResponseFormatter,
@@ -12,7 +12,10 @@
   import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
   import { beautifyIcon as BeautifyIcon } from "@sparrow/library/assets";
   import js_beautify, { html_beautify } from "js-beautify";
-  import { WithSelectV3 } from "@sparrow/workspaces/hoc";
+  import { WithButtonV6, WithSelectV3 } from "@sparrow/workspaces/hoc";
+  import { save } from "@tauri-apps/plugin-dialog";
+  import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
+  import { CopyIcon, DownloadIcon2 } from "@sparrow/library/icons";
 
   export let response;
   export let apiState;
@@ -38,7 +41,7 @@
 
   const handleCopy = async () => {
     await copyToClipBoard(formatCode(response?.body));
-    notifications.success("Copied to Clipboard");
+    notifications.success("Copied to Clipboard.");
     MixpanelEvent(Events.COPY_API_RESPONSE);
   };
 
@@ -76,22 +79,30 @@
   };
 
   const handleDownloaded = async () => {
-    const newHandle = await window.showSaveFilePicker({
-      suggestedName: `api_response_${
+    // Open a save file dialog
+    const path = await save({
+      defaultPath: `api_response_${
         response?.status ? response?.status : ""
       }_${response?.time ? response?.time : "0"}ms_${
         response?.size ? response?.size : "0"
       }kb.${fileExtension}`,
-      accept: {
-        extensions: ["txt", "json", "xml", "js", "html"],
-      },
+      filters: [
+        {
+          name: "Text Files",
+          extensions: ["txt", "json", "xml", "js", "html"],
+        },
+      ],
     });
-    const writableStream = await newHandle.createWritable();
-    // write our file
-    await writableStream.write(formatCode(response?.body));
-    await writableStream.close();
-    notifications.success("Response downloaded successfully.");
-    MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
+    // Check if a path was selected
+    if (path) {
+      const contents = formatCode(response?.body);
+      await writeTextFile(path, contents, {
+        baseDir: BaseDirectory.AppConfig,
+      });
+      notifications.success("Exported successfully.");
+    } else {
+      console.error("Save dialog was canceled or no path was selected.");
+    }
   };
 </script>
 
@@ -182,7 +193,7 @@
       {/if}
     </div>
     {#if apiState.responseBodyFormatter !== ResponseFormatterEnum.PREVIEW}
-      <div class="d-flex align-items-center gap-3" style=" height: 32px;">
+      <div class="d-flex align-items-center gap-2" style=" height: 32px;">
         <!-- insert controller here -->
         <div class="d-flex gap-2">
           <button
@@ -198,35 +209,24 @@
           </button>
         </div>
 
-        <!-- Download button -->
-        <div
-          on:click={handleDownloaded}
-          role="button"
-          class="icon-container d-flex align-items-center justify-content-center border-radius-2"
-          style="height: 32px; width: 32px;"
-        >
-          <img src={downloadIcon} style="height:16px; width:16px;" />
-        </div>
         <!-- Copy button -->
-        <div
-          on:click={handleCopy}
-          role="button"
-          class="icon-container d-flex align-items-center justify-content-center border-radius-2"
-          style="height: 32px; width: 32px;"
-        >
-          <img src={copyIcon} style="height:16px; width:16px;" />
-        </div>
-        <!-- Prettier button -->
-        <div
-          on:click={() => {
-            notifications.success("Code formatted successfully.");
-          }}
-          role="button"
-          class="icon-container d-flex align-items-center justify-content-center border-radius-2"
-          style="height: 32px; width: 32px;"
-        >
-          <img src={BeautifyIcon} style="height:12px; width:12px;" />
-        </div>
+        <Tooltip title={"Copy"}>
+          <WithButtonV6
+            icon={CopyIcon}
+            onClick={handleCopy}
+            disable={false}
+            loader={false}
+          />
+        </Tooltip>
+        <!-- Download button -->
+        <Tooltip title={"Export"}>
+          <WithButtonV6
+            icon={DownloadIcon2}
+            onClick={handleDownloaded}
+            disable={false}
+            loader={false}
+          />
+        </Tooltip>
       </div>
     {/if}
   </div>

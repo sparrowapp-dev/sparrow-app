@@ -81,7 +81,7 @@
       <input
         type="text"
         id="search-input-team-member"
-        class={`bg-transparent ms-2 w-100 border-0 my-auto`}
+        class={`bg-transparent ms-2 w-100 border-0 my-auto  ellipsis`}
         placeholder="Search people in {openTeam?.name}"
         bind:value={filterText}
       />

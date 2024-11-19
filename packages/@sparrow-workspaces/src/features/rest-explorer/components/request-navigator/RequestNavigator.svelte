@@ -2,6 +2,7 @@
   import { type UpdateRequestStateType } from "@sparrow/workspaces/type";
   import { RequestSectionEnum } from "@sparrow/common/types/workspace";
   import { Label } from "@sparrow/library/ui";
+  import { Navigator } from "../../../../components";
   export let requestStateSection: string;
   export let authParameterLength = 0;
   export let authHeaderLength = 0;
@@ -91,33 +92,13 @@
       });
     }
   };
+
+  const onTabClick = (tabId: ResponseSectionEnum) => {
+    onUpdateRequestState({ requestNavigation: tabId });
+  };
 </script>
 
-<div class="pb-2">
-  <!-- Tabs -->
-  <div class="d-flex mb-2">
-    {#each tabs as tab}
-      <button
-        class="navigation__link border-0 sparrow-fs-12 request-tab me-3 {tab.id ===
-        requestStateSection
-          ? 'tab-active'
-          : ''}"
-        role="tab"
-        on:click={() => {
-          onUpdateRequestState({ requestNavigation: tab.id });
-        }}
-      >
-        <span class="d-flex align-items-center ps-1 pe-1"
-          ><span>{tab.name}</span>
-          {#if tab.count}
-            <span class="ms-1"></span>
-            <Label number={tab.count} />
-          {/if}
-        </span>
-      </button>
-    {/each}
-  </div>
-</div>
+<Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
