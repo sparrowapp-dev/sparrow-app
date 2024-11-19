@@ -779,7 +779,7 @@
         
       /> -->
       {#if componentData?.property.request.method === TabTypeEnum.WEB_SOCKET}
-        <span class={`text-fs-12 me-3 fw-bold `}
+        <span class={`text-fs-12 me-2 fw-bold `}
           ><SocketIcon
             height={"12px"}
             width={"16px"}
@@ -787,7 +787,7 @@
           /></span
         >
       {:else if componentData?.property.request.method === TabTypeEnum.SOCKET_IO}
-        <span class={`text-fs-12 me-3 fw-bold `}
+        <span class={`text-fs-12 me-2 fw-bold `}
           ><SocketIoIcon
             height={"12px"}
             width={"16px"}
@@ -795,7 +795,7 @@
           /></span
         >
       {:else if componentData?.property.request.method === TabTypeEnum.GRAPHQL}
-        <span class={`text-fs-12 me-3 fw-bold `}
+        <span class={`text-fs-12 me-2 fw-bold `}
           ><GraphIcon
             height={"12px"}
             width={"16px"}
@@ -804,12 +804,12 @@
         >
       {:else}
         <span
-          class={`text-fs-12 me-3 fw-bold text-${getMethodStyle(
+          class={`text-fs-12 me-2 fw-bold text-${getMethodStyle(
             componentData?.property.request.method,
           )}`}>{componentData?.property.request.method}</span
         >
       {/if}
-      <p class="api-url mb-0">{componentData?.property.request.url}</p>
+      <p class="api-url mb-0" style="color: var( --text-secondary-100);">{componentData?.property.request.url}</p>
     </div>
     {#if !(componentData?.property.request.method === TabTypeEnum.WEB_SOCKET)}
       <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>

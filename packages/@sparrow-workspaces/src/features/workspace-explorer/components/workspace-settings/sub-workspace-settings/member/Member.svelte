@@ -199,10 +199,10 @@
   </div>
   <div
     class="d-flex flex-column"
-    style="width:calc(100% - 100px); font-size:12px; "
+    style="width:calc(100% - 130px); font-size:12px; "
   >
     <div style="color: var(--text-secondary-100);">
-      <p class="mb-0 username-text">
+      <p class="mb-0 username-text ellipsis">
         {user?.name}
         {#if isActiveUser}
           (You)
