@@ -71,6 +71,9 @@
   import SocketIoExplorerPage from "./sub-pages/SocketIoExplorerPage/SocketIoExplorerPage.svelte";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
+  import {
+  GraphqlRequestDefaultAliasBaseEnum,
+} from "@sparrow/common/types/workspace/graphql-request-base";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -181,7 +184,8 @@
         tab?.type === TabTypeEnum.WEB_SOCKET ||
         tab?.type === TabTypeEnum.ENVIRONMENT ||
         tab?.type === TabTypeEnum.TESTFLOW ||
-        tab?.type === TabTypeEnum.SOCKET_IO) &&
+        tab?.type === TabTypeEnum.SOCKET_IO ||
+        tab?.type === TabTypeEnum.GRAPHQL) &&
       !tab?.isSaved
     ) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
@@ -235,7 +239,8 @@
     } else if (
       removeTab.type === TabTypeEnum.REQUEST ||
       removeTab.type === TabTypeEnum.WEB_SOCKET ||
-      removeTab.type === TabTypeEnum.SOCKET_IO
+      removeTab.type === TabTypeEnum.SOCKET_IO ||
+      removeTab.type === TabTypeEnum.GRAPHQL
     ) {
       if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
         const id = removeTab?.id;
@@ -265,6 +270,17 @@
             isPopupClosed = false;
             notifications.success(
               `${SocketIORequestDefaultAliasBaseEnum.NAME} request saved successfully.`,
+            );
+          }
+        }
+        else if (removeTab.type === TabTypeEnum.GRAPHQL) {
+          const res = await _viewModel.saveGraphql(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+            notifications.success(
+              `${GraphqlRequestDefaultAliasBaseEnum.NAME} request saved successfully.`,
             );
           }
         }
@@ -756,6 +772,8 @@
       ? TabTypeEnum.WEB_SOCKET
       : removeTab.type === TabTypeEnum.SOCKET_IO
       ? TabTypeEnum.SOCKET_IO
+      : removeTab.type === TabTypeEnum.GRAPHQL
+      ? TabTypeEnum.GRAPHQL
       : ""}
     requestUrl={removeTab.type === TabTypeEnum.REQUEST
       ? removeTab.property.request?.url
@@ -763,6 +781,8 @@
       ? removeTab?.property?.websocket?.url
       : removeTab.type === TabTypeEnum.SOCKET_IO
       ? removeTab?.property?.socketio?.url
+      : removeTab.type === TabTypeEnum.GRAPHQL
+      ? removeTab?.property?.graphql?.url
       : ""}
     requestName={removeTab.name}
     requestDescription={removeTab.description}
@@ -796,6 +816,19 @@
         return res;
       } else if (removeTab.type === TabTypeEnum.SOCKET_IO) {
         const res = await _viewModel.saveAsSocketIo(
+          _workspaceMeta,
+          path,
+          tabName,
+          description,
+          removeTab,
+        );
+        if (res?.status === "success") {
+          _viewModel.handleRemoveTab(removeTab.id);
+        }
+        return res;
+      }
+      else if (removeTab.type === TabTypeEnum.GRAPHQL) {
+        const res = await _viewModel.saveAsGraphql(
           _workspaceMeta,
           path,
           tabName,

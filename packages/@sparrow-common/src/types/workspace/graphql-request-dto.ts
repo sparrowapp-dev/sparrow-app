@@ -1,5 +1,6 @@
 import type { CollectionItemTypeBaseEnum } from "./collection-base";
 import { CollectionSourceTypeDtoEnum } from "./collection-dto";
+import type { GraphqlRequestAuthModeBaseEnum } from "./graphql-request-base";
 
 export interface GraphqlRequestKeyValueDtoInterface {
   key: string;
@@ -27,6 +28,7 @@ export interface GraphqlRequestMetaDataDtoInterface {
   schema?: string;
   headers?: GraphqlRequestKeyValueDtoInterface[];
   auth?: GraphqlRequestAuthDtoInterface;
+  selectedGraphqlAuthType?: GraphqlRequestAuthModeBaseEnum;
 }
 
 export interface GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface {

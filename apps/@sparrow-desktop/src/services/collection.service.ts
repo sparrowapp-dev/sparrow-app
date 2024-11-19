@@ -38,6 +38,8 @@ import type {
   GraphqlRequestDeletePayloadDtoInterface,
   GraphqlRequestKeyValueDtoInterface,
 } from "@sparrow/common/types/workspace/graphql-request-dto";
+import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+import type { HttpRequestAuthModeBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
 export class CollectionService {
   constructor() {}
@@ -493,6 +495,7 @@ export class CollectionService {
       schema?: string;
       headers?: GraphqlRequestKeyValueDtoInterface[];
       auth?: GraphqlRequestAuthDtoInterface;
+      selectedGraphqlAuthType: HttpRequestAuthModeBaseEnum;
     },
     _folderId?: string,
   ): Promise<
@@ -511,18 +514,19 @@ export class CollectionService {
         folderId: _folderId,
         items: {
           id: _folderId,
-          type: CollectionItemTypeDtoEnum.FOLDER,
+          type: CollectionItemTypeBaseEnum.FOLDER,
           items: {
             id: _graphqlId,
             name: _graphql.name as string,
             description: _graphql?.description,
-            type: CollectionItemTypeDtoEnum.GRAPHQL,
+            type: CollectionItemTypeBaseEnum.GRAPHQL,
             graphql: {
               url: _graphql.url,
               query: _graphql.query,
               schema: _graphql.schema,
               headers: _graphql.headers,
               auth: _graphql.auth,
+              selectedGraphqlAuthType: _graphql.selectedGraphqlAuthType,
             },
           },
         },
@@ -535,13 +539,14 @@ export class CollectionService {
           id: _graphqlId,
           name: _graphql?.name as string,
           description: _graphql?.description,
-          type: CollectionItemTypeDtoEnum.GRAPHQL,
+          type: CollectionItemTypeBaseEnum.GRAPHQL,
           graphql: {
             url: _graphql.url,
             query: _graphql.query,
             schema: _graphql.schema,
             headers: _graphql.headers,
             auth: _graphql.auth,
+            selectedGraphqlAuthType: _graphql.selectedGraphqlAuthType,
           },
         },
       };
