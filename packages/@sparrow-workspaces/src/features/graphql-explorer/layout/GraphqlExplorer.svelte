@@ -66,6 +66,7 @@
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
+  let isSchemaFetching = false;
   $: {
     if ($tab?.property?.graphql?.url?.length > 0) {
       isLoading = false;
@@ -75,7 +76,9 @@
     isExposeSaveAsRequest = flag;
   };
   const handleFetchSchema = async () => {
+    isSchemaFetching = true;
     await onFetchSchema(environmentVariables?.filtered || []);
+    isSchemaFetching = false;
   };
 </script>
 
@@ -186,6 +189,7 @@
                       onRefreshSchema={handleFetchSchema}
                       isFetched={$tab.property.graphql.state
                         .isRequestSchemaFetched}
+                      {isSchemaFetching}
                     />
                   {:else if $tab.property.graphql?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                     <RequestHeaders

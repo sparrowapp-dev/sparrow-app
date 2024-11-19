@@ -271,7 +271,6 @@ class GraphqlExplorerViewModel {
    * @param _effectQueryParams  - flag that effect request query parameter
    */
   public updateRequestUrl = async (_url: string) => {
-    console.log("updated request url");
     const progressiveTab = createDeepCopy(this._tab.getValue());
     if (_url === progressiveTab.property.graphql.url) {
       return;
@@ -293,7 +292,7 @@ class GraphqlExplorerViewModel {
 
   private updateRequestSchemaThrottlerDebounce = new Debounce().debounce(
     this.updateRequestSchemaThrottle,
-    2000,
+    1000,
   );
 
   /**
@@ -309,7 +308,7 @@ class GraphqlExplorerViewModel {
   };
 
   /**
-   * Function to convert schema into required type. (Will shift to util in future, DO NOT REMOVE IT.)
+   * Function to convert schema into required type.
    */
   private formatGraphQLSchema = (introspectionData) => {
     const schema = {};
@@ -363,15 +362,15 @@ class GraphqlExplorerViewModel {
           break;
 
         case "INPUT_OBJECT":
-          typeDef.push(`input ${type.name} {`);
-          type.inputFields.forEach((field) => {
-            const fieldComment = field.description
-              ? `"""${field.description}"""`
+          typeDef.push(`input ${type?.name} {`);
+          type?.inputFields?.forEach((field) => {
+            const fieldComment = field?.description
+              ? `"""${field?.description}"""`
               : "";
             typeDef.push(`  ${fieldComment}`);
             typeDef.push(
-              `  ${field.name}: ${this.formatFieldType(field.type)}${
-                field.type.kind === "NON_NULL" ? "!" : ""
+              `  ${field?.name}: ${this.formatFieldType(field?.type)}${
+                field?.type?.kind === "NON_NULL" ? "!" : ""
               }`,
             );
           });
@@ -379,7 +378,7 @@ class GraphqlExplorerViewModel {
           break;
 
         case "SCALAR":
-          typeDef.push(`scalar ${type.name}`);
+          typeDef.push(`scalar ${type?.name}`);
           break;
 
         default:
@@ -393,7 +392,7 @@ class GraphqlExplorerViewModel {
     });
 
     // Combine all the types into a single schema string
-    return Object.values(schema).join("\n\n");
+    return Object.values(schema)?.join("\n\n");
   };
 
   // Helper function to format field types, handling nested types and non-null markers
@@ -417,8 +416,8 @@ class GraphqlExplorerViewModel {
   };
 
   /**
-   *
-   * @param _query - request query
+   * Updated GraphQL Schema by fetching it.
+   * @param _environmentVariables - Environment variables to be embedded in the GraphQL Request.
    */
   public updateRequestSchema = async (
     _environmentVariables: EnvironmentFilteredVariableBaseInterface[] = [],
@@ -494,7 +493,6 @@ class GraphqlExplorerViewModel {
       const responseBody = response.data.body;
       const parsedResponse = JSON.parse(responseBody);
       const formattedSchema = this.formatGraphQLSchema(parsedResponse.data);
-      console.log("responsebody-----", formattedSchema);
       progressiveTab.property.graphql.schema = formattedSchema;
       progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
       this.tab = progressiveTab;
@@ -509,23 +507,6 @@ class GraphqlExplorerViewModel {
         "Failed to fetch schema. Please check the URL and try again.",
       );
     }
-
-    // makeGraphQLRequest(decodeData[0], decodeData[1], schemaQuery)
-    //   .then(async (response) => {
-    //     const responseBody = response.data.body;
-    //     const parsedResponse = JSON.parse(responseBody);
-    //     const formattedSchema = this.formatGraphQLSchema(parsedResponse.data);
-    //     console.log("responsebody-----", formattedSchema);
-    //     progressiveTab.property.graphql.schema = formattedSchema;
-    //     this.tab = progressiveTab;
-    //     await this.tabRepository.updateTab(
-    //       progressiveTab.tabId,
-    //       progressiveTab,
-    //     );
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //   });
   };
 
   /**

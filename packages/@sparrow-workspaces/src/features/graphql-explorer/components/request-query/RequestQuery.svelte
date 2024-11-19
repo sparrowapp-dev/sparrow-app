@@ -34,16 +34,18 @@
             <img src={beautifyIcon} style="height:10px; width:10px;" />
           </div>
         {/if}
-        <Editor
-          bind:lang
-          bind:value
-          on:change={handleCodeMirrorChange}
-          isEditable={true}
-          class="m-0"
-          {isBodyBeautified}
-          beautifySyntaxCallback={updateBeautifiedState}
-          placeholder={""}
-        />
+        <div>
+          <Editor
+            bind:lang
+            bind:value
+            on:change={handleCodeMirrorChange}
+            isEditable={true}
+            class="m-0"
+            {isBodyBeautified}
+            beautifySyntaxCallback={updateBeautifiedState}
+            placeholder={""}
+          />
+        </div>
       </div>
       {#if value}
         <div
