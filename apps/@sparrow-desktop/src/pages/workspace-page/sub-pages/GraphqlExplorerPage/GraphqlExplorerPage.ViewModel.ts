@@ -3,7 +3,11 @@ import {
   DecodeGraphql,
   ReduceAuthHeader,
 } from "@sparrow/workspaces/features/graphql-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import {
+  createDeepCopy,
+  moveNavigation,
+  throttle,
+} from "@sparrow/common/utils";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 
 // ---- DB
@@ -267,6 +271,7 @@ class GraphqlExplorerViewModel {
    * @param _effectQueryParams  - flag that effect request query parameter
    */
   public updateRequestUrl = async (_url: string) => {
+    console.log("updated request url");
     const progressiveTab = createDeepCopy(this._tab.getValue());
     if (_url === progressiveTab.property.graphql.url) {
       return;
@@ -275,7 +280,21 @@ class GraphqlExplorerViewModel {
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
+    if (_url && _url?.trim() !== "") {
+      this.updateRequestSchemaThrottlerDebounce();
+    }
   };
+
+  private updateRequestSchemaThrottle = async (
+    _environmentVariables?: EnvironmentFilteredVariableBaseInterface[],
+  ) => {
+    this.updateRequestSchema(_environmentVariables);
+  };
+
+  private updateRequestSchemaThrottlerDebounce = new Debounce().debounce(
+    this.updateRequestSchemaThrottle,
+    2000,
+  );
 
   /**
    *
@@ -290,6 +309,102 @@ class GraphqlExplorerViewModel {
   };
 
   /**
+   * Function to convert schema into required type. (Will shift to util in future, DO NOT REMOVE IT.)
+   */
+  private formatGraphQLSchema = (introspectionData) => {
+    const schema = {};
+    introspectionData.__schema?.types?.forEach((type) => {
+      // Ignore built-in types like __Schema, __Type, etc.
+      if (type?.name?.startsWith("__")) return;
+
+      // Create header comments for the types
+      const headerComment = type?.description
+        ? `"""${type?.description}"""`
+        : "";
+      const typeDef = [];
+
+      switch (type?.kind) {
+        case "OBJECT":
+          // Special handling for Query, Mutation, and Subscription
+          if (["Query", "Mutation", "Subscription"].includes(type?.name)) {
+            typeDef.push(`type ${type?.name} {`);
+            type?.fields?.forEach((field) => {
+              const args = field?.args
+                .map(
+                  (arg) => `${arg?.name}: ${this.formatFieldType(arg?.type)}`,
+                )
+                .join(", ");
+              const fieldComment = field?.description
+                ? `"""${field?.description}"""`
+                : "";
+              typeDef.push(`  ${fieldComment}`);
+              typeDef.push(
+                `  ${field?.name}(${args}): ${this.formatFieldType(
+                  field?.type,
+                )}${field?.type?.kind === "NON_NULL" ? "!" : ""}`,
+              );
+            });
+            typeDef.push("}");
+          } else {
+            typeDef.push(`type ${type?.name} {`);
+            type?.fields?.forEach((field) => {
+              const fieldComment = field?.description
+                ? `"""${field?.description}"""`
+                : "";
+              typeDef.push(`  ${fieldComment}`);
+              typeDef.push(
+                `  ${field?.name}: ${this.formatFieldType(field?.type)}${
+                  field?.type?.kind === "NON_NULL" ? "!" : ""
+                }`,
+              );
+            });
+            typeDef.push("}");
+          }
+          break;
+
+        case "INPUT_OBJECT":
+          typeDef.push(`input ${type.name} {`);
+          type.inputFields.forEach((field) => {
+            const fieldComment = field.description
+              ? `"""${field.description}"""`
+              : "";
+            typeDef.push(`  ${fieldComment}`);
+            typeDef.push(
+              `  ${field.name}: ${this.formatFieldType(field.type)}${
+                field.type.kind === "NON_NULL" ? "!" : ""
+              }`,
+            );
+          });
+          typeDef.push("}");
+          break;
+
+        case "SCALAR":
+          typeDef.push(`scalar ${type.name}`);
+          break;
+
+        default:
+          break;
+      }
+
+      // Store the formatted type definition in the schema object
+      schema[type?.name] = headerComment
+        ? `${headerComment}\n${typeDef.join("\n")}`
+        : typeDef.join("\n");
+    });
+
+    // Combine all the types into a single schema string
+    return Object.values(schema).join("\n\n");
+  };
+
+  // Helper function to format field types, handling nested types and non-null markers
+  private formatFieldType = (type) => {
+    if (type?.kind === "NON_NULL")
+      return `${this.formatFieldType(type?.ofType)}!`;
+    if (type?.kind === "LIST") return `[${this.formatFieldType(type?.ofType)}]`;
+    return type?.name || type?.ofType?.name || "";
+  };
+
+  /**
    *
    * @param _path - request path
    */
@@ -299,6 +414,118 @@ class GraphqlExplorerViewModel {
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
+  };
+
+  /**
+   *
+   * @param _query - request query
+   */
+  public updateRequestSchema = async (
+    _environmentVariables: EnvironmentFilteredVariableBaseInterface[] = [],
+  ) => {
+    console.log("inside fetch shcmea");
+    const decodeData = this._decodeGraphql.init(
+      this._tab.getValue().property?.graphql as GraphqlRequestTabInterface,
+      _environmentVariables,
+    );
+    console.log(`GraphQL Request initiated with the following details:`);
+    console.table({
+      url: decodeData[0],
+      headers: decodeData[1],
+      query: decodeData[2],
+    });
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const schemaQuery = `{
+            __schema {
+                types {
+                    kind
+                    name
+                    description
+                    fields(includeDeprecated: true) {
+                        name
+                        description
+                        type {
+                            name
+                            kind
+                            ofType {
+                                name
+                                kind
+                            }
+                        }
+                        args {
+                            name
+                            description
+                            type {
+                                name
+                                kind
+                                ofType {
+                                    name
+                                    kind
+                                }
+                            }
+                            defaultValue
+                        }
+                    }
+                    inputFields {
+                        name
+                        description
+                        type {
+                            name
+                            kind
+                            ofType {
+                                name
+                                kind
+                            }
+                        }
+                    }
+                    enumValues {
+                        name
+                        description
+                    }
+                }
+            }
+        }`;
+    try {
+      const response = await makeGraphQLRequest(
+        decodeData[0],
+        decodeData[1],
+        schemaQuery,
+      );
+      const responseBody = response.data.body;
+      const parsedResponse = JSON.parse(responseBody);
+      const formattedSchema = this.formatGraphQLSchema(parsedResponse.data);
+      console.log("responsebody-----", formattedSchema);
+      progressiveTab.property.graphql.schema = formattedSchema;
+      progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      notifications.success("Schema fetched successfully.");
+    } catch (error) {
+      console.error(error);
+      progressiveTab.property.graphql.state.isRequestSchemaFetched = false;
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      notifications.error(
+        "Failed to fetch schema. Please check the URL and try again.",
+      );
+    }
+
+    // makeGraphQLRequest(decodeData[0], decodeData[1], schemaQuery)
+    //   .then(async (response) => {
+    //     const responseBody = response.data.body;
+    //     const parsedResponse = JSON.parse(responseBody);
+    //     const formattedSchema = this.formatGraphQLSchema(parsedResponse.data);
+    //     console.log("responsebody-----", formattedSchema);
+    //     progressiveTab.property.graphql.schema = formattedSchema;
+    //     this.tab = progressiveTab;
+    //     await this.tabRepository.updateTab(
+    //       progressiveTab.tabId,
+    //       progressiveTab,
+    //     );
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //   });
   };
 
   /**
