@@ -76,17 +76,17 @@ jobs:
 
       - name: msi sig
         run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.sig
-    
+
       - name: nsis sig
         run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig
 
       - name: sign msi
         run: |
-           $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
-           $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
-           $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
-           Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
-           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
+          $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
+          $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
+          $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
+          Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
 
       - name: Install AWS CLI
         uses: chrislennon/action-aws-cli@v1.1
@@ -103,15 +103,6 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   release_macos:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - arch: 'x86_64-apple-darwin'
-            prefix: 'arch -x86_64'
-          - arch: 'aarch64-apple-darwin'
-            prefix: ''
-
     runs-on: macos-latest
     environment: development
     needs: release_win
@@ -144,6 +135,7 @@ jobs:
           yarn cache clean
           yarn install
           yarn desktop-build
+          # yarn tauri build --debug
         env:
           APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
           APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
@@ -155,9 +147,9 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
-      - name: Build Universal build for MAC
+      - name: Build Intel-based Tauri App (x86_64)
         run: |
-          ${{ matrix.arch_prefix }} yarn desktop-build-mac-universal
+          arch -x86_64 yarn tauri build --target x86_64-apple-darwin --debug
         env:
           APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
           APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
