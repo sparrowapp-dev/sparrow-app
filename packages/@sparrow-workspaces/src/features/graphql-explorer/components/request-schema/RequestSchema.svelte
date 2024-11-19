@@ -118,6 +118,6 @@
   /* Rotating class */
   .rotating {
     animation: rotate 1s linear infinite;
-    display: inline-block; /* Ensure it behaves correctly in the layout */
+    display: inline-block;
   }
 </style>

@@ -422,7 +422,6 @@ class GraphqlExplorerViewModel {
   public updateRequestSchema = async (
     _environmentVariables: EnvironmentFilteredVariableBaseInterface[] = [],
   ) => {
-    console.log("inside fetch shcmea");
     const decodeData = this._decodeGraphql.init(
       this._tab.getValue().property?.graphql as GraphqlRequestTabInterface,
       _environmentVariables,
