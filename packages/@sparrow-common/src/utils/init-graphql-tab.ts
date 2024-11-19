@@ -60,6 +60,7 @@ class InitGraphqlTab {
             requestNavigation: GraphqlRequestSectionTabEnum.QUERY,
             requestAuthNavigation: GraphqlRequestAuthTypeTabEnum.NO_AUTH,
             requestLeftSplitterWidthPercentage: 50,
+            isRequestSchemaFetched: false,
             requestRightSplitterWidthPercentage: 50,
             isHeaderBulkEditActive: false,
           },
