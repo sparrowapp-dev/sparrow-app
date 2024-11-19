@@ -51,7 +51,6 @@
           <button
             class="input-cleaner px-2 border-radius-2 py-1 text-fs-12 text-secondary-200"
             on:click={async () => {
-              console.log("clicked");
               onRefreshSchema();
             }}
             disabled={isSchemaFetching}
