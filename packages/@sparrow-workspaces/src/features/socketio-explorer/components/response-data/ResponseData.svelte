@@ -1,5 +1,6 @@
 <script lang="ts">
   import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
+  import type { SocketIORequestMessageTabInterface } from "@sparrow/common/types/workspace/socket-io-request-tab";
   import { Input } from "@sparrow/library/forms";
   import {
     ArrowInsertIcon,
@@ -24,11 +25,10 @@
   export let onUpdateFilterType;
   let searchData = webSocket.search;
 
-
-  let filteredWebsocketMessage = [];
+  let filteredWebsocketMessage: SocketIORequestMessageTabInterface[] = [];
   const filterWebsocketResponse = () => {
     filteredWebsocketMessage = webSocket.messages
-      .filter((message) => {
+      .filter((message: SocketIORequestMessageTabInterface) => {
         if (
           parseMessageData(message.data)
             .toLowerCase()
@@ -38,7 +38,7 @@
         }
         return false;
       })
-      .filter((message) => {
+      .filter((message: SocketIORequestMessageTabInterface) => {
         if (
           webSocket.filter === "All Messages" ||
           (message.transmitter === "sender" && webSocket.filter === "Sent") ||
@@ -114,31 +114,30 @@
     return text;
   };
 
-  function handleMessageClick(message) {
+  const handleMessageClick = (message: SocketIORequestMessageTabInterface) => {
     onUpdateMessageBody(message.uuid);
-    
-    // Try to parse the message.data as JSON
-    try {
-      const parsedData = JSON.parse(message.data);
 
-      // Check if parsedData is an object or contains a specific value
-      if (typeof parsedData === "object") {
-        // Handle specific case for the second item being "(empty)"
-        if (parsedData[1] === "(empty)") {
-          onUpdateContentType(RequestDataTypeEnum.TEXT);
+    try {
+      let parse = JSON.parse(message.data);
+      if (parse[1] === "(empty)") {
+        onUpdateContentType(RequestDataTypeEnum.TEXT);
+        return;
+      }
+
+      try {
+        if (parse[1]) {
+          JSON.parse(parse[1]);
+          onUpdateContentType(RequestDataTypeEnum.JSON);
           return;
         }
-        // If it is a valid JSON object, update content type
-        onUpdateContentType(RequestDataTypeEnum.JSON);
-      } else {
-        // If it's a string, update content type to JSON
-        onUpdateContentType(RequestDataTypeEnum.JSON);
+      } catch (e) {
+        throw "Not able to parse JSON";
       }
     } catch (e) {
-      // If JSON parsing fails, assume it's plain text
       onUpdateContentType(RequestDataTypeEnum.TEXT);
+      return;
     }
-  }
+  };
 </script>
 
 <div class="h-100 d-flex flex-column">
@@ -213,7 +212,7 @@
           height={"33px"}
           type="search"
           bind:value={searchData}
-          on:input={(e) => {
+          on:input={() => {
             onSearchMessage(searchData);
           }}
           defaultBorderColor="transparent"
@@ -272,10 +271,13 @@
             }}
           >
             {#if webSocket.filter === "All Messages"}
-              <span class="text-fs-12 pe-2 text-tertiary-100">{webSocket.filter}</span
+              <span class="text-fs-12 pe-2 text-tertiary-100"
+                >{webSocket.filter}</span
               >
             {:else}
-              <span class="text-fs-12 pe-2 text-secondary-100">{webSocket.filter}</span>
+              <span class="text-fs-12 pe-2 text-secondary-100"
+                >{webSocket.filter}</span
+              >
             {/if}
             <DownArrowIcon
               height={"16px"}
@@ -293,10 +295,10 @@
     <div>
       {#each filteredWebsocketMessage as message}
         <div
-        class="response-message d-flex align-items-center"
-        style="cursor: pointer;"
-        on:click={() => handleMessageClick(message)}
-      >
+          class="response-message d-flex align-items-center"
+          style="cursor: pointer;"
+          on:click={() => handleMessageClick(message)}
+        >
           <span
             class="p-2 d-flex align-items-center"
             style="width: 35px !important;"

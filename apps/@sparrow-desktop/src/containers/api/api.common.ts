@@ -469,7 +469,12 @@ async function processMessageEvent(tabId, event) {
   if (socketIOresponse && isIncludeInResponse && message) {
     updateSocketDataStore(
       tabId,
-      JSON.stringify([eventName, message[0]]),
+      JSON.stringify([
+        eventName,
+        typeof message[0] === "string"
+          ? message[0]
+          : JSON.stringify(message[0]),
+      ]),
       "receiver",
     );
   }
