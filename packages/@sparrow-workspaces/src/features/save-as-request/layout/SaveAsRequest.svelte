@@ -809,9 +809,11 @@
           )}`}>{componentData?.property.request.method}</span
         >
       {/if}
-      <p class="api-url mb-0" style="color: var( --text-secondary-100);">{componentData?.property.request.url}</p>
+      <p class="api-url mb-0" style="color: var( --text-secondary-100);">
+        {componentData?.property.request.url}
+      </p>
     </div>
-    {#if !(componentData?.property.request.method === TabTypeEnum.WEB_SOCKET)}
+    {#if !(componentData?.property.request.method === TabTypeEnum.WEB_SOCKET || componentData?.property.request.method === TabTypeEnum.GRAPHQL || componentData?.property.request.method === TabTypeEnum.SOCKET_IO)}
       <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>
       <div style="height:77px; overflow:hidden !important;">
         <div
