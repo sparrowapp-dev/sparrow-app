@@ -90,7 +90,11 @@ import type {
   GraphqlRequestDeletePayloadDtoInterface,
   GraphqlRequestKeyValueDtoInterface,
 } from "@sparrow/common/types/workspace/graphql-request-dto";
-import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+import {
+  GraphqlRequestDefaultAliasBaseEnum,
+  GraphqlRequestAuthModeBaseEnum,
+} from "@sparrow/common/types/workspace/graphql-request-base";
+import type { Path } from "@sparrow/common/interfaces/request.interface";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -2696,6 +2700,8 @@ export default class CollectionsViewModel {
       headers: _graphql.graphql
         ?.headers as GraphqlRequestKeyValueDtoInterface[],
       auth: _graphql.graphql?.auth as GraphqlRequestAuthDtoInterface,
+      selectedGraphqlAuthType: _graphql?.graphql
+        ?.selectedGraphqlAuthType as GraphqlRequestAuthModeBaseEnum,
     };
 
     if (_collection.id && _workspaceId && !_folder.id) {
@@ -4978,6 +4984,274 @@ export default class CollectionsViewModel {
         }
       }
       MixpanelEvent(Events.SAVE_API_REQUEST);
+    }
+  };
+
+  /**
+   *
+   * @param _workspaceMeta - workspace meta data.
+   * @param path - request stack path.
+   * @param tabName - request name.
+   * @param description - request description.
+   * @param componentData - GraphQL request tab data.
+   */
+  public saveAsGraphql = async (
+    _workspaceMeta: {
+      id: string;
+      name: string;
+    },
+    path: {
+      name: string;
+      id: string;
+      type: string;
+    }[],
+    tabName: string,
+    description: string,
+    componentData: Tab,
+  ) => {
+    let userSource = {};
+    if (path.length > 0) {
+      const graphqlTabAdapter = new GraphqlTabAdapter();
+      const unadaptedRequest = graphqlTabAdapter.unadapt(componentData as Tab);
+      let req = {
+        id: uuidv4(),
+        name: tabName,
+        description,
+        type: ItemType.GRAPHQL,
+        graphql: unadaptedRequest,
+        source: "USER",
+        isDeleted: false,
+        createdBy: "Guest User",
+        updatedBy: "Guest User",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      if (path[path.length - 1].type === ItemType.COLLECTION) {
+        /**
+         * handle request at collection level
+         */
+        const _collection = await this.readCollection(path[path.length - 1].id);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
+        const isGuestUser = await this.getGuestUserState();
+
+        if (isGuestUser == true) {
+          this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+        }
+        const res = await this.collectionService.addGraphqlInCollection({
+          collectionId: path[path.length - 1].id,
+          workspaceId: _workspaceMeta.id,
+          ...userSource,
+          items: {
+            name: tabName,
+            description,
+            type: CollectionItemTypeBaseEnum.GRAPHQL,
+            graphql: unadaptedRequest,
+          },
+        });
+        if (res.isSuccessful) {
+          this.addRequestOrFolderInCollection(
+            path[path.length - 1].id,
+            res.data.data,
+          );
+          return {
+            status: "success",
+            message: res.message,
+            data: {
+              id: res.data.data.id,
+            },
+          };
+        } else {
+          return {
+            status: "error",
+            message: res.message,
+          };
+        }
+      } else if (path[path.length - 1].type === ItemType.FOLDER) {
+        /**
+         * handle request at folder level
+         */
+        const _collection = await this.readCollection(path[0].id);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
+        const isGuestUser = await this.getGuestUserState();
+
+        if (isGuestUser == true) {
+          this.collectionRepository.addRequestInFolder(
+            path[0].id,
+            path[path.length - 1].id,
+            req,
+          );
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+        }
+        const res = await this.collectionService.addGraphqlInCollection({
+          collectionId: path[0].id,
+          workspaceId: _workspaceMeta.id,
+          folderId: path[path.length - 1].id,
+          ...userSource,
+          items: {
+            id: path[path.length - 1].id,
+            type: CollectionItemTypeBaseEnum.FOLDER,
+            items: {
+              name: tabName,
+              description,
+              type: CollectionItemTypeBaseEnum.GRAPHQL,
+              graphql: unadaptedRequest,
+            },
+          },
+        });
+        if (res.isSuccessful) {
+          this.collectionRepository.addRequestInFolder(
+            path[0].id,
+            path[path.length - 1].id,
+            res.data.data,
+          );
+
+          return {
+            status: "success",
+            message: res.message,
+            data: {
+              id: res.data.data.id,
+            },
+          };
+        } else {
+          return {
+            status: "error",
+            message: res.message,
+          };
+        }
+      }
+      MixpanelEvent(Events.SAVE_API_REQUEST);
+    }
+  };
+
+  /**
+   * Save saveGraphql Request
+   * @param graphqlTabData - refers save overall graphql tab data
+   * @returns save status
+   */
+  public saveGraphql = async (graphqlTabData: Tab) => {
+    const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
+
+    if (!workspaceId || !collectionId) {
+      return {
+        status: "error",
+        message: "request is not a part of any workspace or collection",
+      };
+    }
+
+    const graphqlTabAdapter = new GraphqlTabAdapter();
+    const unadaptedRequest = graphqlTabAdapter.unadapt(graphqlTabData as Tab);
+
+    const isGuestUser = await this.getGuestUserState();
+    /**
+     * Handle save GraphQL Request for guest user
+     */
+    if (isGuestUser) {
+      const guestGraphqlRequest = {
+        id: graphqlTabData.id,
+        name: graphqlTabData.name,
+        description: graphqlTabData.description,
+        type: CollectionItemTypeBaseEnum.GRAPHQL,
+        graphql: {
+          url: unadaptedRequest.url as string,
+          query: unadaptedRequest.query,
+          schema: unadaptedRequest.schema,
+          headers: unadaptedRequest.headers,
+          auth: unadaptedRequest.auth,
+          selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
+        },
+        updatedAt: "",
+        updatedBy: "Guest User",
+      };
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          graphqlTabData.id as string,
+          guestGraphqlRequest,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          graphqlTabData.id as string,
+          guestGraphqlRequest,
+        );
+      }
+      return {
+        status: "success",
+        message: "",
+      };
+    }
+
+    /**
+     * Handle save GraphQL Request for registered user
+     */
+
+    const graphqlPayload = {
+      name: graphqlTabData?.name as string,
+      description: graphqlTabData?.description as string,
+      url: unadaptedRequest.url as string,
+      query: unadaptedRequest.query,
+      schema: unadaptedRequest.schema,
+      headers: unadaptedRequest.headers,
+      auth: unadaptedRequest.auth,
+      selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
+    };
+
+    const res = await this.collectionService.updateGraphqlInCollection(
+      graphqlTabData.id as string,
+      collectionId,
+      workspaceId,
+      graphqlPayload,
+      folderId,
+    );
+
+    if (res.isSuccessful) {
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          graphqlTabData.id as string,
+          res.data.data,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          graphqlTabData.id as string,
+          res.data.data,
+        );
+      }
+      return {
+        status: "success",
+        message: res.message,
+      };
+    } else {
+      return {
+        status: "error",
+        message: res.message,
+      };
     }
   };
 }

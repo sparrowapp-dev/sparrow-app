@@ -177,6 +177,13 @@ class GraphqlExplorerViewModel {
     ) {
       result = false;
     }
+    // auth state
+    else if (
+      requestServer.graphql.selectedGraphqlAuthType !==
+      progressiveTab.property.graphql?.state.requestAuthNavigation
+    ) {
+      result = false;
+    }
     // schema
     else if (
       requestServer.graphql.schema !== progressiveTab.property.graphql?.schema
@@ -396,6 +403,7 @@ class GraphqlExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
   };
 
   /**
@@ -831,6 +839,7 @@ class GraphqlExplorerViewModel {
           schema: unadaptedRequest.schema,
           headers: unadaptedRequest.headers,
           auth: unadaptedRequest.auth,
+          selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
         },
         updatedAt: "",
         updatedBy: "Guest User",
@@ -874,6 +883,7 @@ class GraphqlExplorerViewModel {
       schema: unadaptedRequest.schema,
       headers: unadaptedRequest.headers,
       auth: unadaptedRequest.auth,
+      selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
     };
 
     const res = await this.collectionService.updateGraphqlInCollection(
