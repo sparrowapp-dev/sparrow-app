@@ -370,7 +370,7 @@
         </span>
       {/if}
     </div>
-    <p style="font-size:16px;" class="mb-0 ellipsis">{teamName}</p>
+    <p style="font-size:16px;" class="mb-0 ellipsis me-e">{teamName}</p>
   </div>
   <div>
     <Button
