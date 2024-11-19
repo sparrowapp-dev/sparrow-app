@@ -151,7 +151,9 @@
     style="top:55.4px;  margin-top: -1px;"
   >
     <div class="d-flex gap-3 align-items-center justify-content-center">
-      <span class="text-fs-12"> {MessageTransmitter} </span>
+      <span class="text-fs-12" style="color: var(--text-secondary-100);">
+        {MessageTransmitter}
+      </span>
       <span class="">
         <WithSelectV2
           id={"hashdew565"}
