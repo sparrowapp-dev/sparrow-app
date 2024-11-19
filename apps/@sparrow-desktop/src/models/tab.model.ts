@@ -384,6 +384,9 @@ export const tabSchemaLiteral = {
                 isHeaderBulkEditActive: {
                   type: "boolean",
                 },
+                isRequestSchemaFetched: {
+                  type: "boolean",
+                },
               },
             },
             auth: {

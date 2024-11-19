@@ -33,6 +33,10 @@ export interface GraphqlRequestIsBulkHeaderWrapperTabInterface {
   isHeaderBulkEditActive: boolean;
 }
 
+export interface GraphqlRequestIsRequestSchemaFetchedWrapperTabInterface {
+  isRequestSchemaFetched: boolean;
+}
+
 export interface GraphqlRequestUsernameWrapperTabInterface {
   username: string;
 }
@@ -75,7 +79,8 @@ export interface GraphqlRequestStateTabInterface
     GraphqlRequestAuthNavigationWrapperTabInterface,
     GraphqlRequestLeftSplitterWidthPercentageWrapperTabInterface,
     GraphqlRequestRightSplitterWidthPercentageWrapperTabInterface,
-    GraphqlRequestIsBulkHeaderWrapperTabInterface {}
+    GraphqlRequestIsBulkHeaderWrapperTabInterface,
+    GraphqlRequestIsRequestSchemaFetchedWrapperTabInterface {}
 
 export interface GraphqlRequestStateWrapperTabInterface {
   state: GraphqlRequestStateTabInterface;

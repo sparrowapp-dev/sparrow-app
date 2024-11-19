@@ -556,10 +556,7 @@
                 {:else if $activeTab?.type === ItemType.GRAPHQL}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
-                      <GraphqlExplorerPage
-                        bind:isTourGuideOpen
-                        tab={$activeTab}
-                      />
+                      <GraphqlExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
                 {:else if !$tabList?.length}

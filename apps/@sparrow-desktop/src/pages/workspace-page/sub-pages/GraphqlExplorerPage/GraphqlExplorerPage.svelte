@@ -157,4 +157,5 @@
   onRenameCollection={_viewModel.handleRenameCollection}
   onRenameFolder={_viewModel.handleRenameFolder}
   onClearQuery={_viewModel.clearQuery}
+  onFetchSchema={_viewModel.updateRequestSchema}
 />

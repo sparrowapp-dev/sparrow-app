@@ -16,6 +16,7 @@
     ResponseStatus,
     ResponseBody,
     RequestQuery,
+    RequestSchema,
   } from "../components";
   import { Loader } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
@@ -61,9 +62,11 @@
   export let onRenameFolder;
   export let isGraphqlEditable;
   export let onClearQuery;
+  export let onFetchSchema;
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
+  let isSchemaFetching = false;
   $: {
     if ($tab?.property?.graphql?.url?.length > 0) {
       isLoading = false;
@@ -71,6 +74,11 @@
   }
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
+  };
+  const handleFetchSchema = async () => {
+    isSchemaFetching = true;
+    await onFetchSchema(environmentVariables?.filtered || []);
+    isSchemaFetching = false;
   };
 </script>
 
@@ -176,7 +184,13 @@
                       {onClearQuery}
                     />
                   {:else if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.Schema}
-                    SCHEMA
+                    <RequestSchema
+                      value={$tab.property.graphql.schema}
+                      onRefreshSchema={handleFetchSchema}
+                      isFetched={$tab.property.graphql.state
+                        .isRequestSchemaFetched}
+                      {isSchemaFetching}
+                    />
                   {:else if $tab.property.graphql?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                     <RequestHeaders
                       isBulkEditActive={$tab?.property?.graphql.state

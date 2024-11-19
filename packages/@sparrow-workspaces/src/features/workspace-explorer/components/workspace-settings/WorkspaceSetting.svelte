@@ -54,7 +54,7 @@
   <div class="d-flex flex-column" style="">
     <div class="pb-3">
       <Input
-        class="search-area text-fs-12 rounded p-2"
+        class="search-area text-fs-12 rounded p-2 ellipsis"
         type="search"
         bind:value={search}
         on:input={() => {}}

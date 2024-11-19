@@ -110,3 +110,5 @@ export { default as BackIcon } from "./BackIcon.svelte";
 export { default as ArrowForward } from "./ArrowForward.svelte";
 export { default as SocketIoIcon } from "./SocketIo.svelte";
 export { default as GraphIcon } from "./Graph.svelte";
+export { default as RefreshSchemaIcon } from "./RefreshSchema.svelte";
+export { default as WarningIcon } from "./Warning.svelte";
