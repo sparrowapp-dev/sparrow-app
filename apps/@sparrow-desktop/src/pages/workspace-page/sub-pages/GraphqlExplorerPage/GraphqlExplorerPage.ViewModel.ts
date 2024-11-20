@@ -294,7 +294,7 @@ class GraphqlExplorerViewModel {
   private updateRequestSchemaThrottle = async (
     _environmentVariables?: EnvironmentFilteredVariableBaseInterface[],
   ) => {
-    this.updateRequestSchema(_environmentVariables);
+    this.updateRequestSchema(_environmentVariables, false);
   };
 
   private updateRequestSchemaThrottlerDebounce = new Debounce().debounce(
@@ -428,6 +428,7 @@ class GraphqlExplorerViewModel {
    */
   public updateRequestSchema = async (
     _environmentVariables: EnvironmentFilteredVariableBaseInterface[] = [],
+    isFailedNotificationVisible: boolean = true,
   ) => {
     const decodeData = this._decodeGraphql.init(
       this._tab.getValue().property?.graphql as GraphqlRequestTabInterface,
@@ -506,12 +507,18 @@ class GraphqlExplorerViewModel {
       notifications.success("Schema fetched successfully.");
     } catch (error) {
       console.error(error);
-      progressiveTab.property.graphql.state.isRequestSchemaFetched = false;
-      this.tab = progressiveTab;
-      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-      notifications.error(
-        "Failed to fetch schema. Please check the URL and try again.",
+      const newProgressiveTab = createDeepCopy(this._tab.getValue());
+      newProgressiveTab.property.graphql.state.isRequestSchemaFetched = false;
+      this.tab = newProgressiveTab;
+      await this.tabRepository.updateTab(
+        newProgressiveTab.tabId,
+        newProgressiveTab,
       );
+      if (isFailedNotificationVisible) {
+        notifications.error(
+          "Failed to fetch schema. Please check the URL and try again.",
+        );
+      }
     }
   };
 
