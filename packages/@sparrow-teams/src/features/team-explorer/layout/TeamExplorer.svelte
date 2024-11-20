@@ -154,6 +154,7 @@
       findUserType();
       teamTabs = refreshTabs();
       if (previousTeamId !== openTeam?.teamId) {
+        searchQuery = "";
         onUpdateActiveTab(TeamTabsEnum.WORKSPACES);
       }
       previousTeamId = openTeam?.teamId;
