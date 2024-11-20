@@ -972,13 +972,41 @@ const makeGraphQLRequest = async (
 > => {
   let httpResponse: string;
   const abortGraphqlRequestErrorMessage = `Running GraphQL Request with url ${_url} is aborted by the user`;
+  const startTime = performance.now();
   try {
     httpResponse = await invoke("send_graphql_request", {
       url: _url,
       headers: _headers,
       query: _query,
     });
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    const appInsightData = {
+      id: uuidv4(),
+      name: "RPC Duration Metric",
+      duration,
+      success: true,
+      responseCode: 200,
+      properties: {
+        source: "frontend",
+        type: "RPC_GRAPHQL",
+      },
+    };
+    appInsights.trackDependencyData(appInsightData);
   } catch (err) {
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    appInsights.trackDependencyData({
+      id: uuidv4(),
+      name: "RPC Duration Metric",
+      duration: duration,
+      success: false,
+      responseCode: 400,
+      properties: {
+        source: "frontend",
+        type: "RPC_GRAPHQL",
+      },
+    });
     if (_signal?.aborted) {
       // Check if request is aborted after request fails
       throw new DOMException(abortGraphqlRequestErrorMessage, "AbortError");
@@ -995,9 +1023,6 @@ const makeGraphQLRequest = async (
   } catch (err) {
     throw err;
   }
-  // Example Function call to format schema DO NOT REMOVE IT.
-  // const formattedSchema = formatGraphQLSchema(parsedBody.data);
-  // console.log(formattedSchema);
 };
 
 export {
