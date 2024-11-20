@@ -160,71 +160,92 @@ class GraphqlExplorerViewModel {
           progressiveTab.id,
         );
     }
-    if (!requestServer) result = false;
+    let graphqlServerTab = new InitTab().graphQl("uuid", "uuid");
+    let graphqlTabData;
+    if (requestServer) {
+      graphqlTabData = graphqlServerTab
+        .updateName(requestServer.name)
+        .updateDescription(requestServer.description)
+        .updateUrl(requestServer.graphql.url)
+        .updateQuery(requestServer.graphql.query)
+        .updateState({
+          requestAuthNavigation: requestServer.graphql.selectedGraphqlAuthType,
+        })
+        .updateSchema(requestServer.graphql.schema)
+        .updateAuth(requestServer.graphql.auth)
+        .updateHeaders(requestServer.graphql.headers)
+        .getValue();
+    } else {
+      graphqlTabData = graphqlServerTab.getValue();
+    }
+
     // description
-    else if (requestServer.description !== progressiveTab.description) {
+    if (graphqlTabData.description !== progressiveTab.description) {
       result = false;
     }
     // name
-    else if (requestServer.name !== progressiveTab.name) {
+    else if (graphqlTabData.name !== progressiveTab.name) {
       result = false;
     }
     // url
     else if (
-      requestServer.graphql.url !== progressiveTab.property.graphql?.url
+      graphqlTabData.property.graphql?.url !==
+      progressiveTab.property.graphql?.url
     ) {
       result = false;
     }
     // query
     else if (
-      requestServer.graphql.query !== progressiveTab.property.graphql?.query
+      graphqlTabData.property.graphql?.query !==
+      progressiveTab.property.graphql?.query
     ) {
       result = false;
     }
     // auth state
     else if (
-      requestServer.graphql.selectedGraphqlAuthType !==
+      graphqlTabData.property.graphql?.state.requestAuthNavigation !==
       progressiveTab.property.graphql?.state.requestAuthNavigation
     ) {
       result = false;
     }
     // schema
     else if (
-      requestServer.graphql.schema !== progressiveTab.property.graphql?.schema
+      graphqlTabData.property.graphql?.schema !==
+      progressiveTab.property.graphql?.schema
     ) {
       result = false;
     }
     // auth key
     else if (
-      requestServer.graphql.auth.apiKey.authKey !==
+      graphqlTabData.property.graphql?.auth.apiKey.authKey !==
       progressiveTab.property.graphql?.auth.apiKey.authKey
     ) {
       result = false;
     }
     // auth value
     else if (
-      requestServer.graphql.auth.apiKey.authValue !==
+      graphqlTabData.property.graphql?.auth.apiKey.authValue !==
       progressiveTab.property.graphql?.auth.apiKey.authValue
     ) {
       result = false;
     }
     // username
     else if (
-      requestServer.graphql.auth.basicAuth.username !==
+      graphqlTabData.property.graphql?.auth.basicAuth.username !==
       progressiveTab.property.graphql?.auth.basicAuth.username
     ) {
       result = false;
     }
     // password
     else if (
-      requestServer.graphql.auth.basicAuth.password !==
+      graphqlTabData.property.graphql?.auth.basicAuth.password !==
       progressiveTab.property.graphql?.auth.basicAuth.password
     ) {
       result = false;
     }
     // bearer tokem
     else if (
-      requestServer.graphql.auth.bearerToken !==
+      graphqlTabData.property.graphql?.auth.bearerToken !==
       progressiveTab.property.graphql?.auth.bearerToken
     ) {
       result = false;
@@ -232,7 +253,7 @@ class GraphqlExplorerViewModel {
     // headers
     else if (
       !this.compareArray.init(
-        requestServer.graphql.headers,
+        graphqlTabData.property.graphql?.headers,
         progressiveTab.property.graphql?.headers,
       )
     ) {
