@@ -289,8 +289,8 @@
       iconSize: "14px",
       onclick: () => {
         onItemCreated("graphql", {});
-        MixpanelEvent(Events.Add_SocketIO, {
-          description: "Add Socket.IO From + Icon in Left Panel",
+        MixpanelEvent(Events.Add_GraphQL, {
+          description: "Add GraphQL From + Icon in Left Panel",
         });
       },
     },

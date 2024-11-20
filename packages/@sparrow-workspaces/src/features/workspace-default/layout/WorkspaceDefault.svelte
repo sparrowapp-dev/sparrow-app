@@ -98,7 +98,7 @@
       iconSize={"18px"}
       onClick={() => {
         onItemCreated("graphql", {});
-        MixpanelEvent(Events.SocketIO_Button, {
+        MixpanelEvent(Events.GraphQL_button, {
           description: "Socket Io created from Default screen page.",
           location: "Default Page",
         });
