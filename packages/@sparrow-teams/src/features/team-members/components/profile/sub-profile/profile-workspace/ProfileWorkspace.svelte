@@ -21,16 +21,12 @@
   const handleDropdown = async (id) => {
     if (id === "remove") {
       // perform remove operations
-      if (workspaceCount === 1) {
-        handleMemberPopUpSuccess();
-      } else {
-        await onRemoveUserFromWorkspace(
-          workspace._id,
-          workspace.name,
-          user.id,
-          user.name,
-        );
-      }
+      await onRemoveUserFromWorkspace(
+        workspace._id,
+        workspace.name,
+        user.id,
+        user.name,
+      );
     } else if (
       workspace.position === WorkspaceRole.WORKSPACE_EDITOR &&
       id === WorkspaceRole.WORKSPACE_VIEWER
