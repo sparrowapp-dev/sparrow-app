@@ -698,8 +698,8 @@
                     workspaceId: collection.workspaceId,
                     collection,
                   });
-                  MixpanelEvent(Events.Collection_SocketIO, {
-                    description: "Created Socket.IO inside collection.",
+                  MixpanelEvent(Events.Collection_GraphQL, {
+                    description: "Created GraphQL inside collection.",
                   });
                 }}
               >

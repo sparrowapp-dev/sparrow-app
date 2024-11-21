@@ -6,6 +6,8 @@
   import { Tooltip } from "@sparrow/library/ui";
   import { DiskIcon } from "@sparrow/library/icons";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { Events } from "@sparrow/common/enums";
 
   let componentClass = "";
   export { componentClass as class };
@@ -92,6 +94,10 @@
         } else {
           onSendButtonClicked(environmentVariables?.filtered || []);
         }
+
+        MixpanelEvent(Events.Send_GraphQL_Query, {
+          description: "Send GraphQL Query",
+        });
       }}
     />
   {:else}
@@ -107,7 +113,12 @@
   <Tooltip title={"Save"} placement={"bottom"} distance={12} zIndex={10}>
     <button
       class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
-      on:click={handleSaveRequest}
+      on:click={() => {
+        handleSaveRequest();
+        MixpanelEvent(Events.Save_GraphQL_Request, {
+          description: "Save GraphQL Request",
+        });
+      }}
       on:mouseenter={handleMouseEnter}
       on:mouseleave={handleMouseLeave}
       disabled={isSave || !isGraphqlEditable ? true : false}
