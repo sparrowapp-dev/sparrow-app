@@ -1045,6 +1045,7 @@ class GraphqlExplorerViewModel {
    * @returns save status
    */
   public saveRequest = async () => {
+    MixpanelEvent(Events.Save_GraphQL_Request);
     const graphqlTabData = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
 
@@ -1553,7 +1554,7 @@ class GraphqlExplorerViewModel {
           };
         }
       }
-      MixpanelEvent(Events.SAVE_API_REQUEST);
+      MixpanelEvent(Events.Save_GraphQL_Request);
     }
   };
 
