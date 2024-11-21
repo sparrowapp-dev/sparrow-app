@@ -34,7 +34,7 @@
     isMenuItemHover = false;
   }}
 >
-  <div class="d-flex">
+  <div class="d-flex ellipsis">
     <div
       class="img-logo-container me-2 overflow-hidden w-10"
       style="min-width: 20px;"
