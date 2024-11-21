@@ -5142,7 +5142,7 @@ export default class CollectionsViewModel {
           };
         }
       }
-      MixpanelEvent(Events.SAVE_API_REQUEST);
+      MixpanelEvent(Events.Save_GraphQL_Request);
     }
   };
 
@@ -5152,6 +5152,7 @@ export default class CollectionsViewModel {
    * @returns save status
    */
   public saveGraphql = async (graphqlTabData: Tab) => {
+    MixpanelEvent(Events.Save_GraphQL_Request);
     const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
 
     if (!workspaceId || !collectionId) {

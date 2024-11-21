@@ -18,9 +18,8 @@
     };
     altCommands = {
       "Edit link": altKey + " + L",
-      "Add Parameter": altKey + " + P",
+      "Add Query": altKey + " + Q",
       "Add Header": altKey + " + H",
-      "Edit Body": altKey + " + B",
     };
   });
   let isExpandShortcuts = false;
@@ -63,7 +62,7 @@
       {/if}
     {/each}
     {#each Object.entries(altCommands) as [key, value]}
-      {#if key === "Edit link" || key === "Add Parameter" || isExpandShortcuts}
+      {#if key === "Edit link" || key === "Add Query" || isExpandShortcuts}
         <!-- <span class="me-3"></span> -->
         <div class="px-4">
           <ComboText

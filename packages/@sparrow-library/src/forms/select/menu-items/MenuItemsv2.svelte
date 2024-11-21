@@ -24,7 +24,7 @@
   export let selectedRequest: {
     id: string;
   };
- /**
+  /**
    * Ticked mark icon
    */
   export let tickIcon: any;
@@ -103,7 +103,7 @@
 >
   <div class="content-wrapper">
     <p
-      class="m-0 p-0 option-name {getTextColor(
+      class="m-0 p-0 option-name ellipsis {getTextColor(
         list?.color,
       )} {extractBodyTextHighlight(list.id, selectedRequest?.id)}"
     >
@@ -116,9 +116,7 @@
     {/if}
   </div>
   {#if selectedRequest?.id === list.id}
-    <span
-      class="d-flex align-items-center justify-content-center tick-icon"
-    >
+    <span class="d-flex align-items-center justify-content-center tick-icon">
       <img src={tickIcon} alt="" />
     </span>
   {/if}
@@ -131,7 +129,7 @@
 
   .content-wrapper {
     flex: 1;
-    min-width: 0; 
+    min-width: 0;
   }
 
   .option-name {
@@ -145,7 +143,7 @@
 
   .description {
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -203,7 +203,7 @@ class DecodeGraphql {
    */
   public init(
     request: GraphqlRequestTabInterface,
-    environmentVariables: EnvironmentFilteredVariableBaseInterface[],
+    environmentVariables: EnvironmentFilteredVariableBaseInterface[] = [],
   ): string[] {
     return [
       this.extractURL(
