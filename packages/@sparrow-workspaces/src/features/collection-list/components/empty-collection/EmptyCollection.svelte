@@ -67,19 +67,19 @@
             class="ps-2 text-fs-12 fw-bold">Add Collection</span
           >
         </button>
-        <p
-          class="import-curl w-100 d-flex justify-content-center align-items-center border-radius-2"
-          style="color: var(--text-secondary-100);"
-          role="button"
-          on:click={() => {
-            onImportCurlPopup();
-          }}
-        >
-          <span style="color: var(--text-secondary-100)" class="ps-2 text-fs-12"
-            >Import cURL</span
-          >
-        </p>
       {/if}
+      <p
+        class="import-curl w-100 d-flex justify-content-center align-items-center border-radius-2"
+        style="color: var(--text-secondary-100);"
+        role="button"
+        on:click={() => {
+          onImportCurlPopup();
+        }}
+      >
+        <span style="color: var(--text-secondary-100)" class="ps-2 text-fs-12"
+          >Import cURL</span
+        >
+      </p>
     </div>
   </List>
 </div>
