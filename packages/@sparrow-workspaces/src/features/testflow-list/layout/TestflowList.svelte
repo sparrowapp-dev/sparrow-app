@@ -173,8 +173,8 @@
         on:click|stopPropagation={handleCreateTestflow}
       >
         <PlusIcon
-          height={"18px"}
-          width={"18px"}
+          height={"22px"}
+          width={"22px"}
           color={"var( --white-color)"}
         />
       </button>
@@ -295,7 +295,7 @@
 
   .testflow-active:hover {
     visibility: visible;
-    background-color: var(--bg-tertiary-190);
+    background-color: var( --bg-secondary-420);
   }
   .testflow-active:active {
     visibility: visible;

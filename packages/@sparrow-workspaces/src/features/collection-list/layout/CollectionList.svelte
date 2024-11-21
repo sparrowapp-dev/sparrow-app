@@ -382,7 +382,7 @@
 
   .collections-active:active {
     visibility: visible;
-    background-color: var(--bg-tertiary-190);
+    background-color: var( --bg-secondary-420);
   }
 
   .add-button {

@@ -336,7 +336,7 @@
 
   .environment-active:hover {
     visibility: visible;
-    background-color: var(--bg-tertiary-190);
+    background-color: var( --bg-secondary-420);
   }
   .environment-active:active {
     visibility: visible;
