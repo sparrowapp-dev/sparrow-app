@@ -20,7 +20,7 @@
   };
 </script>
 
-<div class="d-flex flex-column align-items-start justify-content-between w-100">
+<div class="d-flex flex-column align-items-start justify-content-between w-100 mb-2">
   <div
     class="response-container d-flex align-items-center justify-content-between z-1 p-2 w-100 position-sticky border-radius-2"
     style="top:55.4px;  margin-top: -1px;"

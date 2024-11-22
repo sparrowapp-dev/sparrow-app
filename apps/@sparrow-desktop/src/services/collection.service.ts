@@ -21,15 +21,25 @@ import type {
   HttpClientBackendResponseInterface,
   HttpClientResponseInterface,
 } from "@app/types/http-client";
-import type {
-  CollectionDtoInterface,
-  CollectionItemDtoInterface,
+import {
+  CollectionItemTypeDtoEnum,
+  type CollectionDtoInterface,
+  type CollectionItemDtoInterface,
 } from "@sparrow/common/types/workspace/collection-dto";
 import type {
   SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
   SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
   SocketIORequestDeletePayloadDtoInterface,
 } from "@sparrow/common/types/workspace/socket-io-request-dto";
+import type {
+  GraphqlRequestAuthDtoInterface,
+  GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface,
+  GraphqlRequestCreateUpdateInFolderPayloadDtoInterface,
+  GraphqlRequestDeletePayloadDtoInterface,
+  GraphqlRequestKeyValueDtoInterface,
+} from "@sparrow/common/types/workspace/graphql-request-dto";
+import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+import type { HttpRequestAuthModeBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
 export class CollectionService {
   constructor() {}
@@ -451,5 +461,123 @@ export class CollectionService {
     _eventName: string,
   ) => {
     return sendSocketIoMessage(_tabId, _message, _eventName);
+  };
+
+  public addGraphqlInCollection = async (
+    _graphql:
+      | GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface
+      | GraphqlRequestCreateUpdateInFolderPayloadDtoInterface,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionItemDtoInterface>
+    >
+  > => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/collection/graphql`,
+      {
+        body: _graphql,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateGraphqlInCollection = async (
+    _graphqlId: string,
+    _collectionId: string,
+    _workspaceId: string,
+    _graphql: {
+      name: string;
+      description: string;
+      url: string;
+      query?: string;
+      schema?: string;
+      headers?: GraphqlRequestKeyValueDtoInterface[];
+      auth?: GraphqlRequestAuthDtoInterface;
+      selectedGraphqlAuthType: HttpRequestAuthModeBaseEnum;
+    },
+    _folderId?: string,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionItemDtoInterface>
+    >
+  > => {
+    let graphqlBody:
+      | GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface
+      | GraphqlRequestCreateUpdateInFolderPayloadDtoInterface;
+
+    if (_folderId) {
+      graphqlBody = {
+        collectionId: _collectionId,
+        workspaceId: _workspaceId,
+        folderId: _folderId,
+        items: {
+          id: _folderId,
+          type: CollectionItemTypeBaseEnum.FOLDER,
+          items: {
+            id: _graphqlId,
+            name: _graphql.name as string,
+            description: _graphql?.description,
+            type: CollectionItemTypeBaseEnum.GRAPHQL,
+            graphql: {
+              url: _graphql.url,
+              query: _graphql.query,
+              schema: _graphql.schema,
+              headers: _graphql.headers,
+              auth: _graphql.auth,
+              selectedGraphqlAuthType: _graphql.selectedGraphqlAuthType,
+            },
+          },
+        },
+      };
+    } else {
+      graphqlBody = {
+        collectionId: _collectionId,
+        workspaceId: _workspaceId,
+        items: {
+          id: _graphqlId,
+          name: _graphql?.name as string,
+          description: _graphql?.description,
+          type: CollectionItemTypeBaseEnum.GRAPHQL,
+          graphql: {
+            url: _graphql.url,
+            query: _graphql.query,
+            schema: _graphql.schema,
+            headers: _graphql.headers,
+            auth: _graphql.auth,
+            selectedGraphqlAuthType: _graphql.selectedGraphqlAuthType,
+          },
+        },
+      };
+    }
+    const response = await makeRequest(
+      "PUT",
+      `${this.apiUrl}/api/collection/graphql/${_graphqlId}`,
+      {
+        body: graphqlBody,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public deleteGraphqlInCollection = async (
+    _graphqlId: string,
+    _graphql: GraphqlRequestDeletePayloadDtoInterface,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionDtoInterface>
+    >
+  > => {
+    const response = await makeRequest(
+      "DELETE",
+      `${this.apiUrl}/api/collection/graphql/${_graphqlId}`,
+      {
+        body: _graphql,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
   };
 }

@@ -1,3 +1,4 @@
+import type { GraphqlRequestMetaDataDtoInterface } from "./graphql-request-dto";
 import type { HttpRequestMetaDataDtoInterface } from "./http-request-dto";
 import type { SocketIORequestMetaDataDtoInterface } from "./socket-io-request-dto";
 import type { WebSocketRequestMetaDataDtoInterface } from "./websocket-request-dto";
@@ -8,6 +9,7 @@ export enum CollectionItemTypeDtoEnum {
   REQUEST = "REQUEST",
   WEBSOCKET = "WEBSOCKET",
   SOCKETIO = "SOCKETIO",
+  GRAPHQL = "GRAPHQL",
 }
 
 export enum CollectionSourceTypeDtoEnum {
@@ -25,6 +27,7 @@ export interface CollectionItemDtoInterface {
   request?: HttpRequestMetaDataDtoInterface;
   websocket?: WebSocketRequestMetaDataDtoInterface;
   socketio?: SocketIORequestMetaDataDtoInterface;
+  graphql?: GraphqlRequestMetaDataDtoInterface;
   isDeleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;

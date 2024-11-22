@@ -11,27 +11,27 @@
   import { Rows } from "@sparrow/teams/compopnents";
   import { TeamSkeleton } from "../../images";
   import { onMount } from "svelte";
- 
+
   export let data: any;
   export let openTeam: TeamDocument;
   export let isWebEnvironment: boolean;
- 
+
   export let onSwitchWorkspace: (id: string) => void;
- 
+
   export let searchQuery;
- 
+
   export let onDeleteWorkspace;
- 
+
   export let openInDesktop;
- 
+
   export let isAdminOrOwner: boolean;
- 
+
   export let isGuestUser = false;
- 
+
   export let onAddMember;
- 
+
   let filterText = "";
- 
+
   let workspacePerPage: number = 10,
     currPage = 1;
   const tableHeaderContent = [
@@ -43,7 +43,7 @@
     "",
   ];
 </script>
- 
+
 <div class="h-100 d-flex flex-column pb-2">
   <div
     class="table-container sparrow-thin-scrollbar overflow-y-auto"
@@ -107,10 +107,14 @@
         />
       </div>
     {/if}
- 
+
     {#if !isGuestUser}
       {#if searchQuery == "" && data && data?.length === 0}
-        <p class="not-found-text mt-3">Add Workspaces to this team</p>
+        <p class="not-found-text mt-3">
+          {isAdminOrOwner
+            ? "Add Workspaces to this team."
+            : "You don't have access to any workspace in this team."}
+        </p>
       {:else if searchQuery !== "" && data
           .slice()
           .reverse()
@@ -122,7 +126,7 @@
       {/if}
     {/if}
   </div>
- 
+
   {#if data
     .slice()
     .reverse()
@@ -218,7 +222,7 @@
     </table>
   {/if}
 </div>
- 
+
 <style>
   .not-found-text {
     color: var(--text-secondary-200);
@@ -226,7 +230,7 @@
     font-weight: 400;
     text-align: center;
   }
- 
+
   .tab-data {
     font-size: 12px;
     font-weight: 500;

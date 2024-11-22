@@ -10,7 +10,7 @@
   import { WorkspaceGrid } from "@sparrow/teams/compopnents";
   import { TeamSkeleton } from "../../images";
 
-  export let openInDesktop: (workspaceID:string) => void;
+  export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
   export let searchQuery = "";
   export let onAddMember;
@@ -87,7 +87,11 @@
     {#if !isGuestUser}
       <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
         <div class="d-flex flex-wrap gap-5 justify-content-between row-gap-0">
-          {#if searchQuery !== "" && filteredWorkspaces.length === 0}
+          {#if searchQuery == "" && filteredWorkspaces.length === 0 && !isAdminOrOwner}
+            <p class="not-found-text mx-auto mt-3">
+              You don't have access to any workspace in this team.
+            </p>
+          {:else if searchQuery !== "" && filteredWorkspaces.length === 0}
             <span class="not-found-text mx-auto ellipsis">No result found.</span
             >
           {/if}
@@ -120,7 +124,7 @@
         </div>
       </div>
       {#if filteredWorkspaces.length > 0}
-        <div class="bottom-0  d-flex justify-content-between " style="width:53%;">
+        <div class="bottom-0 d-flex justify-content-between" style="width:53%;">
           <div class="tab-head" style="width: 189.46px;">
             Showing {startIndex} - {endIndex} of {filteredWorkspaces.length}
           </div>
@@ -162,7 +166,6 @@
               />
             </button>
           </div>
-
         </div>
       {/if}
     {:else}

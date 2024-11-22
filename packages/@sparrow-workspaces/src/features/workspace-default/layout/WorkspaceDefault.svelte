@@ -9,6 +9,7 @@
     TreeIcon,
     CollectionIcon,
     SocketIoIcon,
+    GraphIcon,
   } from "@sparrow/library/icons";
 
   import SparrowLogo from "../../rest-explorer/assets/images/sparrow-logo.svelte";
@@ -17,6 +18,7 @@
   import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+  import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
   export let showImportCollectionPopup;
   export let onItemCreated;
@@ -89,6 +91,28 @@
         });
       }}
     />
+    <Card
+      icon={GraphIcon}
+      label={`${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
+      iconColor="var(--text-primary-300)"
+      iconSize={"18px"}
+      onClick={() => {
+        onItemCreated("graphql", {});
+        MixpanelEvent(Events.GraphQL_button, {
+          description: "Socket Io created from Default screen page.",
+          location: "Default Page",
+        });
+      }}
+    />
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+      <Card
+        icon={StackIcon}
+        label="Environment"
+        iconColor="var(--text-primary-300)"
+        iconSize={"18px"}
+        onClick={handleCreateEnvironment}
+      />
+    {/if}
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <Card
         icon={TreeIcon}
@@ -101,15 +125,6 @@
         }}
       />
     {/if}
-    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-      <Card
-        icon={StackIcon}
-        label="Environment"
-        iconColor="var(--text-primary-300)"
-        iconSize={"18px"}
-        onClick={handleCreateEnvironment}
-      />
-    {/if}
   </div>
 </div>
 
@@ -119,7 +134,7 @@
     flex-direction: column;
     align-items: center;
     height: 100%;
-    padding: 124px 325px 24px;
+    padding: 124px 35px 24px;
   }
 
   .logo {
@@ -130,5 +145,7 @@
   .cards {
     display: flex;
     gap: 19px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 </style>

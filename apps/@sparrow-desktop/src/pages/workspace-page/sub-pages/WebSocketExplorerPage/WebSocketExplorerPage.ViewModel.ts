@@ -3,7 +3,7 @@ import {
   ReduceRequestURL,
   ReduceQueryParams,
   DecodeWebsocket,
-} from "@sparrow/workspaces/features/rest-explorer/utils";
+} from "@sparrow/workspaces/features/socket-explorer/utils";
 import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import {
   CompareArray,

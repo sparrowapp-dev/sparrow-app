@@ -82,7 +82,6 @@
 
   export let deleteNodeResponse;
 
-
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
   const edges = writable<TFEdgeHandlerType[]>([]);
@@ -499,7 +498,7 @@
    * @returns- The updated request navigation.
    */
   const updateActiveTabInsideRequestBody = (tab: string) => {
-    if (tab === "Body") {
+    if (tab === "Request Body") {
       requestNavigation = "Request Body";
     } else if (tab === "Headers") {
       requestNavigation = "Headers";
@@ -620,7 +619,7 @@
   /**
    * Handles the drag enter event and updates all nodes to set `parentDrag` to true.
    */
-  const handleDragEnter = () => {
+  const handleDragEnter = new Debounce().debounce(() => {
     nodes.update((nodes) => {
       return nodes.map((node, index, array) => ({
         ...node,
@@ -630,7 +629,7 @@
         },
       }));
     });
-  };
+  }, 200);
 
   /**
    * Handles the drag end event with a debounce of 1000 milliseconds
@@ -646,7 +645,7 @@
         },
       })),
     );
-  }, 1000);
+  }, 200);
 
   /**
    * Cleanup function to be called when the component is destroyed.
@@ -670,7 +669,6 @@
 <div
   class="h-100 d-flex flex-column position-relative"
   on:dragenter={handleDragEnter}
-  on:dragleave={handleDragEnd}
   on:drop={handleDragEnd}
 >
   <div class="p-3" style="position:absolute; z-index:3; top:0;">

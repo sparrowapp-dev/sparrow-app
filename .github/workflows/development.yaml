@@ -48,12 +48,12 @@ jobs:
         with:
           dotnet-version: 3.1
 
-      - name: Install Rust 1.76.0
+      - name: Install Rust 1.82.0
         run: |
           Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
           .\rustup-init.exe -y
-          rustup install 1.76.0
-          rustup default 1.76.0
+          rustup install 1.82.0
+          rustup default 1.82.0
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
@@ -67,7 +67,8 @@ jobs:
           yarn cache clean
           npm install -g pnpm
           yarn install
-          yarn tauri build --debug
+          yarn desktop-build
+          # yarn tauri build --debug
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
@@ -110,11 +111,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Install Rust 1.76.0
+      - name: Install Rust 1.82.0
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          rustup install 1.76.0
-          rustup default 1.76.0
+          rustup install 1.82.0
+          rustup default 1.82.0
+          rustup target add x86_64-apple-darwin
 
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
@@ -132,7 +134,7 @@ jobs:
         run: |
           yarn cache clean
           yarn install
-          yarn tauri build --debug
+          yarn desktop-build
         env:
           APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
           APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
@@ -145,14 +147,16 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       - name: file content
-        run: cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.sig
+        run: |
+          cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.sig
 
       - name: Install AWS CLI
         run: |
           curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
           sudo installer -pkg AWSCLIV2.pkg -target /
           aws --version
-      - name: Upload & downlode File to S3
+
+      - name: Upload & download File to S3
         run: |
           aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.gz"
 

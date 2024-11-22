@@ -43,6 +43,8 @@ export class TestflowService {
         requestId: string;
         collectionId: string;
         folderId: string;
+        method: string;
+        name: String;
       };
     }[];
   }) => {

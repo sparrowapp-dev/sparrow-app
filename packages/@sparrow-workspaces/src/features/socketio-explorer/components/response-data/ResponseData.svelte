@@ -1,5 +1,6 @@
 <script lang="ts">
   import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
+  import type { SocketIORequestMessageTabInterface } from "@sparrow/common/types/workspace/socket-io-request-tab";
   import { Input } from "@sparrow/library/forms";
   import {
     ArrowInsertIcon,
@@ -24,12 +25,10 @@
   export let onUpdateFilterType;
   let searchData = webSocket.search;
 
-  let currentFilterType = "All messages";
-
-  let filteredWebsocketMessage = [];
+  let filteredWebsocketMessage: SocketIORequestMessageTabInterface[] = [];
   const filterWebsocketResponse = () => {
     filteredWebsocketMessage = webSocket.messages
-      .filter((message) => {
+      .filter((message: SocketIORequestMessageTabInterface) => {
         if (
           parseMessageData(message.data)
             .toLowerCase()
@@ -39,9 +38,9 @@
         }
         return false;
       })
-      .filter((message) => {
+      .filter((message: SocketIORequestMessageTabInterface) => {
         if (
-          webSocket.filter === "All messages" ||
+          webSocket.filter === "All Messages" ||
           (message.transmitter === "sender" && webSocket.filter === "Sent") ||
           (message.transmitter === "receiver" &&
             webSocket.filter === "Received")
@@ -113,6 +112,31 @@
       text = "[" + asf[0] + "]" + " " + asf[1];
     } catch (e) {}
     return text;
+  };
+
+  const handleMessageClick = (message: SocketIORequestMessageTabInterface) => {
+    onUpdateMessageBody(message.uuid);
+
+    try {
+      let parse = JSON.parse(message.data);
+      if (parse[1] === "(empty)") {
+        onUpdateContentType(RequestDataTypeEnum.TEXT);
+        return;
+      }
+
+      try {
+        if (parse[1]) {
+          JSON.parse(parse[1]);
+          onUpdateContentType(RequestDataTypeEnum.JSON);
+          return;
+        }
+      } catch (e) {
+        throw "Not able to parse JSON";
+      }
+    } catch (e) {
+      onUpdateContentType(RequestDataTypeEnum.TEXT);
+      return;
+    }
   };
 </script>
 
@@ -188,7 +212,7 @@
           height={"33px"}
           type="search"
           bind:value={searchData}
-          on:input={(e) => {
+          on:input={() => {
             onSearchMessage(searchData);
           }}
           defaultBorderColor="transparent"
@@ -207,14 +231,13 @@
           minWidth={175}
           options={[
             {
-              name: "All messages",
+              name: "All Messages",
               icon: BlankIcon,
               iconColor: "",
               iconSize: "13px",
               color: "var(--text-secondary-100)",
               onclick: () => {
-                onUpdateFilterType("All messages");
-                currentFilterType="All messages";
+                onUpdateFilterType("All Messages");
               },
             },
             {
@@ -225,7 +248,6 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("Sent");
-                currentFilterType="Sent";
               },
             },
             {
@@ -236,7 +258,6 @@
               color: "var(--text-secondary-100)",
               onclick: () => {
                 onUpdateFilterType("Received");
-                currentFilterType="Received";
               },
             },
           ]}
@@ -249,13 +270,14 @@
               isFilterDropdownActive = !isFilterDropdownActive;
             }}
           >
-            {#if currentFilterType === "All messages"}
-              <span class="text-fs-12 pe-2 text-tertiary-100">All Messages</span
+            {#if webSocket.filter === "All Messages"}
+              <span class="text-fs-12 pe-2 text-tertiary-100"
+                >{webSocket.filter}</span
               >
-            {:else if currentFilterType === "Sent"}
-              <span class="text-fs-12 pe-2 text-secondary-100">Sent</span>
-            {:else if currentFilterType === "Received"}
-              <span class="text-fs-12 pe-2 text-secondary-100">Received</span>
+            {:else}
+              <span class="text-fs-12 pe-2 text-secondary-100"
+                >{webSocket.filter}</span
+              >
             {/if}
             <DownArrowIcon
               height={"16px"}
@@ -275,30 +297,7 @@
         <div
           class="response-message d-flex align-items-center"
           style="cursor: pointer;"
-          on:click={() => {
-            onUpdateMessageBody(message.uuid);
-
-            try {
-              let parse = JSON.parse(message.data);
-              if (parse[1] === "(empty)") {
-                onUpdateContentType(RequestDataTypeEnum.TEXT);
-                return;
-              }
-
-              try {
-                if (parse[1]) {
-                  JSON.parse(parse[1]);
-                  onUpdateContentType(RequestDataTypeEnum.JSON);
-                  return;
-                }
-              } catch (e) {
-                throw "Not able to parse JSON";
-              }
-            } catch (e) {
-              onUpdateContentType(RequestDataTypeEnum.TEXT);
-              return;
-            }
-          }}
+          on:click={() => handleMessageClick(message)}
         >
           <span
             class="p-2 d-flex align-items-center"
@@ -349,7 +348,7 @@
         </div>
       {/each}
 
-      {#if !filteredWebsocketMessage?.length && (searchData || webSocket.filter !== "All messages")}
+      {#if !filteredWebsocketMessage?.length && (searchData || webSocket.filter !== "All Messages")}
         <p class="text-fs-16 text-center text-secondary-200">
           No result found.
         </p>

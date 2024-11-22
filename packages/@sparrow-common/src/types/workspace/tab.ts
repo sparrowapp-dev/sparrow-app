@@ -5,6 +5,7 @@ import type { WorkspaceWrapper } from "./workspace-tab";
 import type { WebSocketWrapper } from "./websocket-request-tab";
 import type { TFTabItemWrapperType } from "./testflow-tab";
 import type { SocketIoWrapper } from "./socket-io-request-tab";
+import type { GraphqlRequestWrapperTabInterface } from "./graphql-request-tab";
 
 export enum TabTypeEnum {
   FOLDER = "FOLDER",
@@ -16,6 +17,7 @@ export enum TabTypeEnum {
   ENVIRONMENT = "ENVIRONMENT",
   TESTFLOW = "TESTFLOW",
   SOCKET_IO = "SOCKETIO",
+  GRAPHQL = "GRAPHQL",
 }
 export interface WorkspaceIdWrapper {
   workspaceId: string;
@@ -77,7 +79,8 @@ export interface Property
     Partial<WorkspaceWrapper>,
     Partial<WebSocketWrapper>,
     Partial<TFTabItemWrapperType>,
-    Partial<SocketIoWrapper> {}
+    Partial<SocketIoWrapper>,
+    Partial<GraphqlRequestWrapperTabInterface> {}
 
 export interface PropertyWrapper {
   property: Property;

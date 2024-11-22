@@ -2,6 +2,7 @@ import {
   InitCollectionTab,
   InitEnvironmentTab,
   InitFolderTab,
+  InitGraphqlTab,
   InitRequestTab,
   InitTestflowTab,
   InitWebSocketTab,
@@ -32,6 +33,14 @@ class InitTab {
    */
   public socketIo = (_id: string, _workspaceId: string) => {
     return new InitSocketIoTab(_id, _workspaceId);
+  };
+
+  /**
+   * @param _id - graphql mongo document id
+   * @param _workspaceId - Workspace mongo id to which environment belongs to
+   */
+  public graphQl = (_id: string, _workspaceId: string) => {
+    return new InitGraphqlTab(_id, _workspaceId);
   };
 
   /**
@@ -67,7 +76,7 @@ class InitTab {
    */
   public workspace = (_id: string) => {
     //   return new InitWorkspaceTab(_id);
-    console.error("workspace tab not impemented yet!");
+    console.error(_id, "workspace tab not impemented yet!");
   };
 }
 

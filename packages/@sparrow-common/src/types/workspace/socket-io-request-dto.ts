@@ -1,7 +1,6 @@
-import type {
-  CollectionItemTypeDtoEnum,
-  CollectionSourceTypeDtoEnum,
-} from "./collection-dto";
+import type { CollectionItemTypeBaseEnum } from "./collection-base";
+import type { CollectionSourceTypeDtoEnum } from "./collection-dto";
+import type { SocketIORequestBodyModeBaseEnum } from "./socket-io-request-base";
 
 export enum SocketIORequestBodyModeDtoEnum {
   NONE = "none",
@@ -27,7 +26,8 @@ export interface SocketIORequestKeyValueDtoInterface {
 export interface SocketIORequestMetaDataDtoInterface {
   url?: string;
   message?: string;
-  selectedSocketIOBodyType?: SocketIORequestBodyModeDtoEnum;
+  eventName?: string;
+  selectedSocketIOBodyType?: SocketIORequestBodyModeBaseEnum;
   queryParams?: SocketIORequestKeyValueDtoInterface[];
   headers?: SocketIORequestKeyValueDtoInterface[];
   events?: SocketIORequestEventsDtoInterface[];
@@ -43,7 +43,7 @@ export interface SocketIORequestCreateUpdateInCollectionPayloadDtoInterface {
     id?: string;
     name: string;
     description?: string;
-    type: CollectionItemTypeDtoEnum.SOCKETIO;
+    type: CollectionItemTypeBaseEnum.SOCKETIO;
     source?: CollectionSourceTypeDtoEnum;
     socketio?: SocketIORequestMetaDataDtoInterface;
     isDeleted?: boolean;
@@ -63,13 +63,13 @@ export interface SocketIORequestCreateUpdateInFolderPayloadDtoInterface {
   source?: SocketIORequestSourceDtoType;
   items?: {
     name: string;
-    type: CollectionItemTypeDtoEnum.FOLDER;
+    type: CollectionItemTypeBaseEnum.FOLDER;
     id: string;
     items?: {
       id?: string;
       name: string;
       description?: string;
-      type: CollectionItemTypeDtoEnum.SOCKETIO;
+      type: CollectionItemTypeBaseEnum.SOCKETIO;
       source?: CollectionSourceTypeDtoEnum;
       socketio?: SocketIORequestMetaDataDtoInterface;
       isDeleted?: boolean;

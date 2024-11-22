@@ -262,8 +262,8 @@
   {#if currentBlock}
     <div class="px-3 pb-2 d-flex">
       <!-- Response status -->
-      <span
-        class="d-flex align-items-center me-2 text-fs-8 text-{checkIfRequestSucceed(
+      <div
+        class="d-flex align-items-center gap-1 me-2 text-fs-8 text-{checkIfRequestSucceed(
           currentBlock,
         )
           ? 'getColor'
@@ -271,16 +271,16 @@
       >
         <DotIcon
           color={checkIfRequestSucceed(currentBlock) ? "#69D696" : "#FF7878"}
-          height={"6px"}
+          height={"8px"}
           width={"6px"}
         />
-        <span class="ms-1">
+        <span class="">
           {currentBlock?.response?.status.split(" ")[0] || ""}
         </span>
-      </span>
+      </div>
       <!-- Response time -->
-      <span
-        class="d-flex align-items-center me-2 text-fs-8 text-{checkIfRequestSucceed(
+      <div
+        class="d-flex align-items-center gap-1 me-2 text-fs-8 text-{checkIfRequestSucceed(
           currentBlock,
         )
           ? 'getColor'
@@ -289,12 +289,12 @@
         <ClockIcon
           color={checkIfRequestSucceed(currentBlock) ? "#69D696" : "#FF7878"}
           height={"7px"}
-          width={"7px"}
+          width={"8px"}
         />
-        <span class="ms-1">
+        <span>
           {parseTime.convertMilliseconds(currentBlock?.response?.time) || ""}
         </span>
-      </span>
+      </div>
     </div>
   {/if}
   <!-- ------------- -->
@@ -344,7 +344,7 @@
   </div>
   <Handle type="source" position={Position.Right} />
   <!-- Circular arrow button by clicking this a new block adds -->
-  {#if isAddBlockVisible}
+  {#if !isDropHereVisible && isAddBlockVisible}
     <div class="add-block-btn py-5 ps-2 pe-5" style="position: absolute;   ">
       <span
         on:click={() => {

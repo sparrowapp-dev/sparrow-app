@@ -7,29 +7,23 @@
   export let collectionList;
   export let data;
   export let onApiClick;
+
+  // Helper to filter, sort by time, and get the top 5 APIs
+  $: filteredApis = tabList
+    ?.filter((tab) => tab.type === ItemType.REQUEST)
+    ?.sort((a, b) => new Date(b.time) - new Date(a.time)) // Sort descending by time
+    ?.slice(0, 5)
+    ?.reverse(); // Get only the top 5
 </script>
 
-<!-- <section class="d-flex flex-columh-100"> -->
 <div class="d-flex justify-content-between p-3 pb-0">
   <h6 class="teams-heading ms-2">Recent APIs</h6>
 </div>
 
 <div class="sidebar-recentapi-list" style="flex:1; overflow: auto;">
-  {#if tabList?.filter((tab) => {
-    if (tab.type === ItemType.REQUEST) {
-      return true;
-    } else {
-      return false;
-    }
-  })?.length}
+  {#if filteredApis?.length}
     <List height={"100%"} overflowY={"auto"} classProps={"px-2 py-0"}>
-      {#each tabList?.filter((tab) => {
-        if (tab.type === ItemType.REQUEST) {
-          return true;
-        } else {
-          return false;
-        }
-      }) as api, index}
+      {#each filteredApis as api, index}
         <ApiListItem {api} {data} {onApiClick} {collectionList} />
       {/each}
     </List>
@@ -38,8 +32,6 @@
   {/if}
 </div>
 <hr class="mb-0 pb-0" />
-
-<!-- </section> -->
 
 <style>
   .sidebar-recentapi-list::-webkit-scrollbar-thumb {

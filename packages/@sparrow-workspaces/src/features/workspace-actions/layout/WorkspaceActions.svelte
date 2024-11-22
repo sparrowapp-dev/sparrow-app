@@ -22,6 +22,7 @@
     BubbleIcon,
     StackIcon,
     SocketIoIcon,
+    GraphIcon,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
@@ -43,6 +44,7 @@
   } from "../../../stores/guide.tour";
   import { TestFlowTourGuide } from "@sparrow/workspaces/components";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+  import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
@@ -281,6 +283,18 @@
       },
     },
     {
+      name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+      icon: GraphIcon,
+      iconColor: "var(--icon-secondary-130)",
+      iconSize: "14px",
+      onclick: () => {
+        onItemCreated("graphql", {});
+        MixpanelEvent(Events.Add_GraphQL, {
+          description: "Add GraphQL From + Icon in Left Panel",
+        });
+      },
+    },
+    {
       name: "Add Environment",
       icon: StackIcon,
       iconColor: "var(--icon-secondary-130)",
@@ -468,7 +482,7 @@
       {/if}
 
       {#if $isTestFlowTourGuideOpen && $currentStep == 2}
-        <div style="position:fixed; top:200px; left:220px; z-index:9999;">
+        <div style="position:fixed; top:268px; left:220px; z-index:9999;">
           <TestFlowTourGuide
             targetId="addButton"
             title="Add Your Flow 🌊"

@@ -30,7 +30,7 @@ class InitTestflowTab {
               id: "1",
               type: "startBlock",
               data: {
-                name: "Start",
+                name: "",
                 collectionId: "",
                 folderId: "",
                 requestId: "",

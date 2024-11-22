@@ -1,18 +1,28 @@
 import type { FolderBaseInterface } from "./folder-base";
+import type { GraphqlRequestBaseInterface } from "./graphql-request-base";
 import type { HttpRequestBaseInterface } from "./http-request-base";
 import type { SocketIORequestBaseInterface } from "./socket-io-request-base";
 import type { WebsocketRequestBaseInterface } from "./websocket-request-base";
+
+export enum CollectionItemTypeBaseEnum {
+  FOLDER = "FOLDER",
+  REQUEST = "REQUEST",
+  WEBSOCKET = "WEBSOCKET",
+  SOCKETIO = "SOCKETIO",
+  GRAPHQL = "GRAPHQL",
+}
 
 export interface CollectionItemBaseInterface {
   id: string;
   name: string;
   description: string;
-  type: string;
+  type: CollectionItemTypeBaseEnum;
   source: string;
   isDeleted: boolean;
   request?: HttpRequestBaseInterface;
   websocket?: WebsocketRequestBaseInterface;
   socketio?: SocketIORequestBaseInterface;
+  graphql?: GraphqlRequestBaseInterface;
   folder?: FolderBaseInterface;
   createdAt: string;
   updatedAt: string;
@@ -54,6 +64,7 @@ export interface CollectionArgsBaseInterface {
   request?: CollectionItemBaseInterface;
   websocket?: CollectionItemBaseInterface;
   socketio?: CollectionItemBaseInterface;
+  graphql?: CollectionItemBaseInterface;
   newName?: string;
   importCurl?: string;
   deletedIds?: string[];

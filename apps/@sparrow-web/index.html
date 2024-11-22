@@ -18,9 +18,6 @@
     />
     <style>
       /* Style for the loader */
-      body {
-        background-color: rgb(16, 16, 16);
-      }
       #init-loader {
         position: fixed;
         left: 0;
@@ -31,6 +28,7 @@
         align-items: center;
         justify-content: center;
         transition: 0.3s ease;
+        background-color: rgb(16, 16, 16);
       }
 
       /* Style to hide loader when the page is fully loaded */
@@ -56,7 +54,10 @@
     <script>
       // Hide the loader after the window is fully loaded
       window.addEventListener("load", function () {
-        document.body.classList.add("loaded");
+        setTimeout(() => {
+          // delay web app render by 2 sec on load to fetch essential app data
+          document.body.classList.add("loaded");
+        }, 2000);
       });
     </script>
     <div id="init-loader">
@@ -67,7 +68,17 @@
           style="width: 20px; height: 20px"
           alt="spinner"
         />
-        <p style="margin: 0 8px">Sparrow Web Loading...</p>
+        <p
+          style="
+            margin: 0 8px;
+            font-family:
+              Times New Roman,
+              Times,
+              serif !important;
+          "
+        >
+          Sparrow Web Loading...
+        </p>
       </div>
     </div>
   </body>

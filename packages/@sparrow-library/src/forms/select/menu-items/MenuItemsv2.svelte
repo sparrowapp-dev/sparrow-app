@@ -95,37 +95,71 @@
   on:mouseup={() => {
     isMenuItemClicked = false;
   }}
-  class="d-flex px-2 py-2 justify-content-between highlight border-radius-2 {extractHeaderHighlight(
+  class="d-flex px-2 py-2 justify-content-between highlight border-radius-2 select-option-container {extractHeaderHighlight(
     bodyTheme,
     isMenuItemHover,
     isMenuItemClicked,
   )}"
 >
-  <p
-    class="m-0 p-0 {getTextColor(
-      list?.color,
-    )} ellipsis {extractBodyTextHighlight(list.id, selectedRequest?.id)}"
-    style="font-size: 12px;"
-  >
-    {list.name}<br />
-    {#if list.description}
-      <small class="text-textColor">{list.description}</small>
-    {/if}
-  </p>
-  {#if selectedRequest?.id === list.id}
-    <span
-      class="d-flex align-items-center justify-content-center"
-      style="height:16px; width:16px;"
+  <div class="content-wrapper">
+    <p
+      class="m-0 p-0 option-name ellipsis {getTextColor(
+        list?.color,
+      )} {extractBodyTextHighlight(list.id, selectedRequest?.id)}"
     >
-      <!-- <CheckIcon
-        color={highlightTickedItem ? "var(--text-primary-200)" : "white"}
-      /> -->
+      {list.name}
+    </p>
+    {#if list.description}
+      <div class="description-wrapper">
+        <small class="text-textColor description">{list.description}</small>
+      </div>
+    {/if}
+  </div>
+  {#if selectedRequest?.id === list.id}
+    <span class="d-flex align-items-center justify-content-center tick-icon">
       <img src={tickIcon} alt="" />
     </span>
   {/if}
 </div>
 
 <style>
+  .select-option-container {
+    width: 100%;
+  }
+
+  .content-wrapper {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .option-name {
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  .description-wrapper {
+    width: 100%;
+  }
+
+  .description {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    font-size: 11px;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  .tick-icon {
+    height: 16px;
+    width: 16px;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+
   /* hover states */
   .select-hover-highlight-dark-btn {
     background-color: var(--dull-background-color);

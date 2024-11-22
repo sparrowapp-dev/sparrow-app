@@ -154,6 +154,7 @@
       findUserType();
       teamTabs = refreshTabs();
       if (previousTeamId !== openTeam?.teamId) {
+        searchQuery = "";
         onUpdateActiveTab(TeamTabsEnum.WORKSPACES);
       }
       previousTeamId = openTeam?.teamId;
@@ -369,7 +370,7 @@
                   <input
                     type="text"
                     id="search-input"
-                    class={`bg-transparent w-100 border-0 my-auto ms-2`}
+                    class={`bg-transparent w-100 border-0 my-auto ms-2 ellipsis`}
                     placeholder="Search workspaces in {openTeam?.name}"
                     on:input={handleSearchInput}
                     bind:value={searchQuery}

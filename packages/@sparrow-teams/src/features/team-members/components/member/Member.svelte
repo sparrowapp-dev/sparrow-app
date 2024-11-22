@@ -431,6 +431,8 @@
   isOpen={memberPopObj.isMemberOwnershipPopup}
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberOwnershipPopup");
+    confirmationText = "";
+    confirmationError="";
   }}
 >
   <div style="font-size: 14px;" class="text-lightGray mb-1">
@@ -526,6 +528,7 @@
         } else {
           confirmationError = "";
           handleMemberOwnershipPopUpSuccess();
+          
         }
       }}
     />
@@ -540,6 +543,7 @@
   isOpen={memberPopObj.isMemberInfoPopup}
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberInfoPopup");
+ 
   }}
 >
   <Profile
@@ -595,6 +599,7 @@
         borderType={"none"}
         headerFontSize={"10px"}
         disabled={owner}
+        isArrowIconRequired={!owner}
         borderRounded={"4px"}
       />
     {:else if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_ADMIN)}
@@ -608,8 +613,10 @@
         bodyTheme={"violet"}
         borderType={"none"}
         disabled={owner}
+        isArrowIconRequired={!owner}
         headerFontSize={"10px"}
         borderRounded={"4px"}
+        
       />
     {:else}
       <Select
@@ -622,6 +629,7 @@
         borderType={"none"}
         disabled={true}
         headerFontSize={"10px"}
+        isArrowIconRequired={false}
       />
     {/if}
   </div>

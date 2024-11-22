@@ -21,6 +21,7 @@
   import {
     CollectionIcon,
     FolderIcon2,
+    GraphIcon,
     PencilIcon2,
     SocketIcon,
     SocketIoIcon,
@@ -28,6 +29,8 @@
   } from "@sparrow/library/icons";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import { TextEditor } from "@sparrow/library/forms";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+  import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
   export let onClick;
   export let onFinish = (id: string) => {};
@@ -562,6 +565,10 @@
             <div class=" ps-2">
               <FileType name={col.name} type={ItemType.SOCKET_IO} />
             </div>
+          {:else if col.type === ItemType.GRAPHQL}
+            <div class=" ps-2">
+              <FileType name={col.name} type={ItemType.GRAPHQL} />
+            </div>
           {:else}
             <div
               class="item ps-2"
@@ -691,90 +698,89 @@
         Request Name <span class="text-dangerColor">*</span>
       </p>
     </div>
-    <div class="pb-2 pt-1 position-relative">
-      <input
-        type="text"
-        style="width: 100%; border: 1px solid var(--border-secondary-400); {tabName?.length ===
-        0
-          ? `outline: 1px solid #FE8C98`
-          : ``}"
-        placeholder="Enter request name"
-        class="py-2 ps-3 pe-5 bg-tertiary-300 outline-0 border-radius-2 sparrow-fs-12"
-        bind:value={tabName}
-        autofocus
-      />
-      <div class="position-absolute" style="top:9px; right: 10px;">
-        <span
-          id="3456-dropdown900"
-          style=""
-          class="instruction-btn {instructionEnabled
-            ? 'bg-tertiary-650'
-            : ''} rounded d-flex align-items-center justify-content-center position-relative"
+    <div class="mb-2">
+      <div class="position-relative">
+        <input
+          type="text"
+          style="width: 100%; border: 1px solid var(--border-secondary-400); {tabName?.length ===
+          0
+            ? `outline: 1px solid #FE8C98`
+            : ``}"
+          placeholder="Enter request name"
+          class="mb-2 py-2 ps-3 pe-5 bg-tertiary-300 outline-0 border-radius-2 sparrow-fs-12"
+          bind:value={tabName}
+          autofocus
+        />
+        <div
+          class="position-absolute"
+          style="top:50%; transform: translateY(-68%); right: 10px;"
         >
           <span
-            on:click={() => {
-              instructionEnabled = !instructionEnabled;
-            }}
+            id="3456-dropdown900"
+            style=""
+            class="instruction-btn {instructionEnabled
+              ? 'bg-tertiary-650'
+              : ''} rounded d-flex align-items-center justify-content-center position-relative"
           >
-            <QuestionIcon color={"var(--sparrow-text-color)"} />
-          </span>
-          {#if instructionEnabled}
-            <div
-              style="z-index: 10;"
-              class="bg-tertiary-300 api-name-usage p-3"
+            <span
+              on:click={() => {
+                instructionEnabled = !instructionEnabled;
+              }}
             >
-              <div class="d-flex justify-content-between">
-                <p class="text-whiteColor">Best Practices</p>
-                <img
-                  src={crossIcon}
-                  on:click={() => {
-                    instructionEnabled = !instructionEnabled;
-                  }}
-                  class="mb-4 cursor-pointer"
-                  alt=""
-                />
-              </div>
-              <p class="save-as-instructions">
-                {bestPractice}
-              </p>
-              <div class="d-flex">
-                <div class="w-50">
-                  <p class="save-as-instructions m-0">Do's:</p>
-                  <ol class="save-as-instructions">
-                    {#each dos as para}
-                      <li>{para}</li>
-                    {/each}
-                  </ol>
+              <QuestionIcon color={"var(--sparrow-text-color)"} />
+            </span>
+            {#if instructionEnabled}
+              <div
+                style="z-index: 10;"
+                class="bg-tertiary-300 api-name-usage p-3"
+              >
+                <div class="d-flex justify-content-between">
+                  <p class="text-whiteColor">Best Practices</p>
+                  <img
+                    src={crossIcon}
+                    on:click={() => {
+                      instructionEnabled = !instructionEnabled;
+                    }}
+                    class="mb-4 cursor-pointer"
+                    alt=""
+                  />
                 </div>
-                <div class="w-50">
-                  <p class="save-as-instructions m-0">Don'ts:</p>
-                  <ol class="save-as-instructions">
-                    {#each donts as para}
-                      <li>{para}</li>
-                    {/each}
-                  </ol>
+                <p class="save-as-instructions">
+                  {bestPractice}
+                </p>
+                <div class="d-flex">
+                  <div class="w-50">
+                    <p class="save-as-instructions m-0">Do's:</p>
+                    <ol class="save-as-instructions">
+                      {#each dos as para}
+                        <li>{para}</li>
+                      {/each}
+                    </ol>
+                  </div>
+                  <div class="w-50">
+                    <p class="save-as-instructions m-0">Don'ts:</p>
+                    <ol class="save-as-instructions">
+                      {#each donts as para}
+                        <li>{para}</li>
+                      {/each}
+                    </ol>
+                  </div>
                 </div>
               </div>
-            </div>
-          {/if}
-        </span>
+            {/if}
+          </span>
+        </div>
       </div>
+      {#if tabName?.length === 0}
+        <p class="tabname-error-text text-dangerColor">
+          Please add the request name to save the request.
+        </p>
+      {/if}
     </div>
-    {#if tabName?.length === 0}
-      <p class="tabname-error-text text-dangerColor">
-        Please add the request name to save the request.
-      </p>
-    {/if}
-    <div class="d-flex pt-2 pb-4">
-      <!-- <ComboText
-        value={componentData?.property.request.method}
-        comboContainerClassProp={"d-flex flex-start pb-2"}
-        singleTextClassProp={"rounded d-flex align-items-center py-2 px-3 justify-content-center"}
-        valueClassProp=
-        
-      /> -->
+
+    <div class="d-flex mb-4 ps-3">
       {#if componentData?.property.request.method === TabTypeEnum.WEB_SOCKET}
-        <span class={`text-fs-12 me-3 fw-bold `}
+        <span class={`text-fs-12 me-2 fw-bold `}
           ><SocketIcon
             height={"12px"}
             width={"16px"}
@@ -782,25 +788,35 @@
           /></span
         >
       {:else if componentData?.property.request.method === TabTypeEnum.SOCKET_IO}
-        <span class={`text-fs-12 me-3 fw-bold `}
+        <span class={`text-fs-12 me-2 fw-bold `}
           ><SocketIoIcon
             height={"12px"}
             width={"16px"}
             color={"var(--icon-primary-300)"}
           /></span
         >
+      {:else if componentData?.property.request.method === TabTypeEnum.GRAPHQL}
+        <span class={`text-fs-12 me-2 fw-bold `}
+          ><GraphIcon
+            height={"12px"}
+            width={"16px"}
+            color={"var(--icon-danger-1100)"}
+          /></span
+        >
       {:else}
         <span
-          class={`text-fs-12 me-3 fw-bold text-${getMethodStyle(
+          class={`text-fs-12 me-2 fw-bold text-${getMethodStyle(
             componentData?.property.request.method,
           )}`}>{componentData?.property.request.method}</span
         >
       {/if}
-      <p class="api-url mb-0">{componentData?.property.request.url}</p>
+      <p class="api-url mb-0" style="color: var( --text-secondary-100);">
+        {componentData?.property.request.url}
+      </p>
     </div>
-    {#if !(componentData?.property.request.method === TabTypeEnum.WEB_SOCKET)}
+    {#if !(componentData?.property.request.method === TabTypeEnum.WEB_SOCKET || componentData?.property.request.method === TabTypeEnum.GRAPHQL || componentData?.property.request.method === TabTypeEnum.SOCKET_IO)}
       <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>
-      <div style="height:77px; overflow:hidden !important;">
+      <div style="height:77px; overflow:hidden !important;" class="mb-3">
         <div
           class="pb-1 bg-tertiary-300 text-fs-10"
           id="editor1"
@@ -815,7 +831,7 @@
         </div>
       </div>
     {/if}
-    <p class="save-text-clr pt-3 mb-1 sparrow-fs-12">Saving to</p>
+    <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>
     {#if path.length === 0}
       <p
         class=" {isSaveTouched
@@ -927,11 +943,52 @@
             if (res.status === "success") {
               onFinish(res.data.id);
               onClick(false);
-              notifications.success("Request saved successfully.");
+
+              if (
+                componentData?.property.request.method ===
+                TabTypeEnum.WEB_SOCKET
+              ) {
+                notifications.success("WebSocket request saved successfully.");
+              } else if (
+                componentData?.property.request.method === TabTypeEnum.SOCKET_IO
+              ) {
+                notifications.success(
+                  `${SocketIORequestDefaultAliasBaseEnum.NAME} request saved successfully.`,
+                );
+              } else if (
+                componentData?.property.request.method === TabTypeEnum.GRAPHQL
+              ) {
+                notifications.success(
+                  `${GraphqlRequestDefaultAliasBaseEnum.NAME} request saved successfully.`,
+                );
+              } else {
+                notifications.success(`REST API request saved successfully.`);
+              }
             } else {
-              notifications.error(
-                "Failed to save the request. Please try again",
-              );
+              if (
+                componentData?.property.request.method ===
+                TabTypeEnum.WEB_SOCKET
+              ) {
+                notifications.error(
+                  `Failed to save WebSocket request. Please try again.`,
+                );
+              } else if (
+                componentData?.property.request.method === TabTypeEnum.SOCKET_IO
+              ) {
+                notifications.error(
+                  `Failed to save ${SocketIORequestDefaultAliasBaseEnum.NAME} request. Please try again.`,
+                );
+              } else if (
+                componentData?.property.request.method === TabTypeEnum.GRAPHQL
+              ) {
+                notifications.error(
+                  `Failed to save ${GraphqlRequestDefaultAliasBaseEnum.NAME} request. Please try again.`,
+                );
+              } else {
+                notifications.error(
+                  `Failed to save REST API request. Please try again.`,
+                );
+              }
             }
             isLoading = false;
           }

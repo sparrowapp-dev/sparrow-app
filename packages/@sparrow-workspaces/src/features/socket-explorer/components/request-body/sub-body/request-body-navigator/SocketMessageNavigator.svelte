@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { RequestDataType, RequestDataset } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
-  import { notifications } from "@sparrow/library/ui";
   import { WithSelect } from "@sparrow/workspaces/hoc";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import { SocketDataTypeEnum } from "@sparrow/common/types/workspace/web-socket";
   export let onUpdateRequestState;
   export let requestState;
   export let onSendMessage;
@@ -23,19 +22,19 @@
       data={[
         {
           name: "Text",
-          id: RequestDataType.TEXT,
+          id: SocketDataTypeEnum.TEXT,
         },
         {
           name: "JSON",
-          id: RequestDataType.JSON,
+          id: SocketDataTypeEnum.JSON,
         },
         {
           name: "HTML",
-          id: RequestDataType.HTML,
+          id: SocketDataTypeEnum.HTML,
         },
         {
           name: "XML",
-          id: RequestDataType.XML,
+          id: SocketDataTypeEnum.XML,
         },
       ]}
       titleId={requestState.socketMessageLanguage}

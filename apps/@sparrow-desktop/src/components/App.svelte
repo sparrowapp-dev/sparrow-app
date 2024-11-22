@@ -11,11 +11,10 @@
   import { user } from "@app/store/auth.store";
   import { handleShortcuts } from "@app/utils/shortcuts";
   import { AppUpdater } from "@sparrow/common/features";
-  import { getCurrent } from "@tauri-apps/api/window";
+  import { getCurrentWindow } from "@tauri-apps/api/window";
   import LoginPage from "@app/pages/auth-page/sub-pages/login-page/LoginPage.svelte";
   import { singleInstanceHandler } from "@app/utils/singleinstance/app.singleinstance";
   import { AppViewModel } from "./app.ViewModel";
-
 
   const _viewModel = new AppViewModel();
 
@@ -30,8 +29,8 @@
   };
 
   onMount(async () => {
-    await getCurrent().setFocus();
-    await getCurrent().center();
+    await getCurrentWindow().setFocus();
+    await getCurrentWindow().center();
     await _viewModel.registerDeepLinkHandler();
     await singleInstanceHandler();
     let isloggedIn;

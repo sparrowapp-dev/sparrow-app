@@ -173,118 +173,113 @@
     class="my-collection d-flex flex-column w-100 z-3"
     style=" min-width: 450px"
   >
-    <Tooltip
-      title={PERMISSION_NOT_FOUND_TEXT}
-      show={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-    >
-      <div class="d-flex gap-2 mb-4">
-        <div class="d-flex flex-column flex-grow-1">
-          <input
-            type="text"
-            required
-            maxlength={100}
-            id="renameInputFieldCollection"
-            value={collection?.name || ""}
-            class="bg-transparent input-outline text-fs-18 border-0 text-left w-100 ps-2 py-0"
-            disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-              tab?.activeSync}
-            on:blur={(event) => {
-              const newValue = event?.target?.value?.trim();
-              const previousValue = tab.name;
-              if (newValue === "") {
-                resetInputField();
-              } else if (newValue !== previousValue) {
-                onRename(collection, newValue);
-              }
-            }}
-            on:keydown={(event) => {
-              if (event.key === "Enter") {
-                onRenameInputKeyPress();
-              }
-            }}
-          />
-          {#if tab?.activeSync}
-            <div class="d-flex">
-              <Select
-                isError={false}
-                iconRequired={true}
-                icon={GitBranchIcon}
-                borderRounded={true}
-                search={true}
-                borderType={"none"}
-                borderActiveType={"all"}
-                headerTheme={"transparent"}
-                bodyTheme={"dark"}
-                headerHighlight={"hover-active"}
-                borderHighlight={"hover-active"}
-                searchText={"Search Branch"}
-                searchErrorMessage={"No result found."}
-                id={"git-branch-select"}
-                data={[
-                  ...(collection?.branches ? collection.branches : []).map(
-                    (elem) => {
-                      elem.id = elem.name;
-                      return elem;
-                    },
-                  ),
-                  {
-                    name: collection?.primaryBranch,
-                    id: collection?.primaryBranch,
+    <div class="d-flex gap-2 mb-4">
+      <div class="d-flex flex-column flex-grow-1">
+        <input
+          type="text"
+          required
+          maxlength={100}
+          id="renameInputFieldCollection"
+          value={collection?.name || ""}
+          class="bg-transparent input-outline text-fs-18 border-0 text-left w-100 ps-2 py-0"
+          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+            tab?.activeSync}
+          on:blur={(event) => {
+            const newValue = event?.target?.value?.trim();
+            const previousValue = tab.name;
+            if (newValue === "") {
+              resetInputField();
+            } else if (newValue !== previousValue) {
+              onRename(collection, newValue);
+            }
+          }}
+          on:keydown={(event) => {
+            if (event.key === "Enter") {
+              onRenameInputKeyPress();
+            }
+          }}
+        />
+        {#if tab?.activeSync}
+          <div class="d-flex">
+            <Select
+              isError={false}
+              iconRequired={true}
+              icon={GitBranchIcon}
+              borderRounded={true}
+              search={true}
+              borderType={"none"}
+              borderActiveType={"all"}
+              headerTheme={"transparent"}
+              bodyTheme={"dark"}
+              headerHighlight={"hover-active"}
+              borderHighlight={"hover-active"}
+              searchText={"Search Branch"}
+              searchErrorMessage={"No result found."}
+              id={"git-branch-select"}
+              data={[
+                ...(collection?.branches ? collection.branches : []).map(
+                  (elem) => {
+                    elem.id = elem.name;
+                    return elem;
                   },
-                ].filter(
-                  (value, index, self) =>
-                    index === self.findIndex((t) => t.id === value.id),
-                )}
-                titleId={collection?.currentBranch
-                  ? collection?.currentBranch
-                  : collection?.primaryBranch}
-                onclick={(value) => onBranchChanged(collection, value)}
-                maxBodyHeight={"150px"}
-                minHeaderWidth={"190px"}
-                maxHeaderWidth={"250px"}
-              >
-                <div slot="pre-select">
-                  <div class="d-flex justify-content-between p-2">
-                    <small class="text-textColor fw-normal"
-                      >Switch branches</small
-                    >
-                    <small class="text-textColor fw-normal"
-                      >{[
-                        ...(collection.branches ? collection.branches : []).map(
-                          (elem) => {
-                            elem.id = elem.name;
-                            return elem;
-                          },
-                        ),
-                        {
-                          name: collection?.primaryBranch,
-                          id: collection?.primaryBranch,
+                ),
+                {
+                  name: collection?.primaryBranch,
+                  id: collection?.primaryBranch,
+                },
+              ].filter(
+                (value, index, self) =>
+                  index === self.findIndex((t) => t.id === value.id),
+              )}
+              titleId={collection?.currentBranch
+                ? collection?.currentBranch
+                : collection?.primaryBranch}
+              onclick={(value) => onBranchChanged(collection, value)}
+              maxBodyHeight={"150px"}
+              minHeaderWidth={"190px"}
+              maxHeaderWidth={"250px"}
+            >
+              <div slot="pre-select">
+                <div class="d-flex justify-content-between p-2">
+                  <small class="text-textColor fw-normal">Switch branches</small
+                  >
+                  <small class="text-textColor fw-normal"
+                    >{[
+                      ...(collection.branches ? collection.branches : []).map(
+                        (elem) => {
+                          elem.id = elem.name;
+                          return elem;
                         },
-                      ].filter(
-                        (value, index, self) =>
-                          index === self.findIndex((t) => t.id === value.id),
-                      ).length} branches</small
-                    >
-                  </div>
+                      ),
+                      {
+                        name: collection?.primaryBranch,
+                        id: collection?.primaryBranch,
+                      },
+                    ].filter(
+                      (value, index, self) =>
+                        index === self.findIndex((t) => t.id === value.id),
+                    ).length} branches</small
+                  >
                 </div>
-                <div slot="post-select" class="d-none">
-                  <hr class="mb-2 mt-2" />
-                  <p class="sparrow-fs-12 text-textColor mb-2 ps-2 pe-2">
-                    View all Branches
-                  </p>
-                </div>
-              </Select>
-              <button
-                class="ms-2 p-1 border-0 rounded d-flex justify-content-center align-items-center btn btn-dark"
-                on:click={() => {
-                  onCollectionRefetched(collection);
-                }}
-              >
-                <img src={refreshIcon} alt="refetch" />
-              </button>
-            </div>
-            <div class="pt-2 ps-2 d-flex align-items-center">
-              <!-- {#if currentWorkspace?.users}
+              </div>
+              <div slot="post-select" class="d-none">
+                <hr class="mb-2 mt-2" />
+                <p class="sparrow-fs-12 text-textColor mb-2 ps-2 pe-2">
+                  View all Branches
+                </p>
+              </div>
+            </Select>
+            <button
+              class="ms-2 p-1 border-0 rounded d-flex justify-content-center align-items-center btn btn-dark"
+              on:click={() => {
+                onCollectionRefetched(collection);
+              }}
+            >
+              <img src={refreshIcon} alt="refetch" />
+            </button>
+          </div>
+          <div class="pt-2 ps-2 d-flex align-items-center">
+            <!-- {#if currentWorkspace?.users}
                 <div class="d-flex">
                   <UserProfileList
                     width={25}
@@ -296,54 +291,53 @@
                   />
                 </div>
               {/if} -->
-              <div class="ps-2">
-                <p class="sparrow-fs-12 mb-0">
-                  <span class="text-textColor"> Last updated on: </span>
-                  {lastUpdated}
-                  <span class="text-textColor">by:</span>
-                  {collection?.updatedBy?.name}
-                </p>
-              </div>
+            <div class="ps-2">
+              <p class="sparrow-fs-12 mb-0">
+                <span class="text-textColor"> Last updated on: </span>
+                {lastUpdated}
+                <span class="text-textColor">by:</span>
+                {collection?.updatedBy?.name}
+              </p>
             </div>
-          {/if}
-        </div>
-        <div class="d-flex flex-row">
-          {#if collection?.activeSync}
-            <div class="d-flex flex-column justify-content-center">
-              <Button
-                disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-                  refreshCollectionLoader}
-                title={`Sync Collection`}
-                type="dark"
-                loader={refreshCollectionLoader}
-                buttonClassProp={`me-2`}
-                onClick={async () => {
-                  refreshCollectionLoader = true;
-                  if (await onCollectionSynced(collection)) {
-                    isSynced = true;
-                  } else {
-                    isSynced = false;
-                  }
-                  refreshCollectionLoader = false;
-                }}
-              />
-            </div>
-          {/if}
-
-          <div class="d-flex flex-column justify-content-center">
-            {#if !collection?.activeSync || isSynced}
-              <button
-                disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-                class="btn add-button rounded mx-1 border-0 text-align-right py-1"
-                style="max-height:60px; width:200px; margin-top: -2px;"
-                on:click={() => onCreateAPIRequest(collection)}
-                >New Request</button
-              >
-            {/if}
           </div>
+        {/if}
+      </div>
+      <div class="d-flex flex-row">
+        {#if collection?.activeSync}
+          <div class="d-flex flex-column justify-content-center">
+            <Button
+              disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+                refreshCollectionLoader}
+              title={`Sync Collection`}
+              type="dark"
+              loader={refreshCollectionLoader}
+              buttonClassProp={`me-2`}
+              onClick={async () => {
+                refreshCollectionLoader = true;
+                if (await onCollectionSynced(collection)) {
+                  isSynced = true;
+                } else {
+                  isSynced = false;
+                }
+                refreshCollectionLoader = false;
+              }}
+            />
+          </div>
+        {/if}
+
+        <div class="d-flex flex-column justify-content-center">
+          {#if !collection?.activeSync || isSynced}
+            <button
+              disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+              class="btn add-button rounded mx-1 border-0 text-align-right py-1"
+              style="max-height:60px; width:200px; margin-top: -2px;"
+              on:click={() => onCreateAPIRequest(collection)}
+              >New Request</button
+            >
+          {/if}
         </div>
       </div>
-    </Tooltip>
+    </div>
     {#if collection?.activeSync && !isSynced}
       <div
         class={`"d-flex"
@@ -407,7 +401,7 @@
             collection?.activeSync}
           id="updateCollectionDescField"
           value={collection?.description || ""}
-          class="bg-transparent border-0  text-fs-12 collection-area input-outline w-100 p-2"
+          class="bg-transparent border-0 text-fs-12 collection-area input-outline w-100 p-2"
           placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
           on:blur={(event) => {
             if (collection?.description !== event.target.value) {
@@ -453,7 +447,7 @@
     color: var(--text-secondary-1000);
   }
   textarea::placeholder {
-    color: var(--text-secondary-550)
+    color: var(--text-secondary-550);
   }
 
   .input-outline:focus,

@@ -169,10 +169,15 @@ class DecodeRequest {
 
     // Add auth header if it exists
     if (authHeader.key || authHeader.value) {
-      combinedHeaders.unshift({
+      combinedHeaders.push({
         ...authHeader,
       });
     }
+
+    // Conclude presedence of headers
+    // 1. Auth Section
+    // 2. Header Section
+    // 3. Auto Generated Section
 
     // removes header with same key attribute
     const uniqueHeaders = new SetDataStructure().pushArrayOfObjects(

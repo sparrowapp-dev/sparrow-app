@@ -4,31 +4,135 @@ import {
   type RxJsonSchema,
 } from "rxdb";
 
-const SchemaObject = {};
 const requestBody = {
-  type: {
+  raw: {
     type: "string",
   },
-  schema: {
+  urlencoded: {
+    type: "array",
+    items: {
+      type: "object",
+      properties: {
+        key: {
+          type: "string",
+        },
+        value: {
+          type: "string",
+        },
+        checked: {
+          type: "boolean",
+        },
+      },
+    },
+  },
+  formdata: {
     type: "object",
-    properties: SchemaObject,
+    properties: {
+      text: {
+        type: "array",
+        properties: {
+          key: {
+            type: "string",
+          },
+          value: {
+            type: "string",
+          },
+          checked: {
+            type: "boolean",
+          },
+        },
+      },
+      file: {
+        type: "array",
+        properties: {
+          key: {
+            type: "string",
+          },
+          value: {
+            type: "string",
+          },
+          checked: {
+            type: "boolean",
+          },
+          base: {
+            type: "string",
+          },
+        },
+      },
+    },
   },
 };
+
 const params = {
-  name: {
+  key: {
     type: "string",
   },
-  description: {
+  value: {
     type: "string",
   },
-  required: {
+  checked: {
     type: "boolean",
   },
-  schema: {
+};
+
+const httpRequestAuth = {
+  bearerToken: {
+    type: "string",
+  },
+  basicAuth: {
     type: "object",
-    properties: SchemaObject,
+    properties: {
+      username: {
+        type: "string",
+      },
+      password: {
+        type: "string",
+      },
+    },
+  },
+  apiKey: {
+    type: "object",
+    properties: {
+      authKey: {
+        type: "string",
+      },
+      authValue: {
+        type: "string",
+      },
+      addTo: {
+        type: "string",
+      },
+    },
   },
 };
+const graphqlRequestAuth = {
+  bearerToken: {
+    type: "string",
+  },
+  basicAuth: {
+    type: "object",
+    properties: {
+      username: {
+        type: "string",
+      },
+      password: {
+        type: "string",
+      },
+    },
+  },
+  apiKey: {
+    type: "object",
+    properties: {
+      authKey: {
+        type: "string",
+      },
+      authValue: {
+        type: "string",
+      },
+    },
+  },
+};
+
 const requestItems = {
   method: {
     type: "string",
@@ -54,12 +158,8 @@ const requestItems = {
     properties: params,
   },
   auth: {
-    type: "array",
-    properties: params,
-  },
-  pathParams: {
-    type: "array",
-    properties: params,
+    type: "object",
+    properties: httpRequestAuth,
   },
   headers: {
     type: "array",
@@ -118,6 +218,26 @@ const socketioItems = {
   },
 };
 
+const graphqlItems = {
+  url: {
+    type: "string",
+  },
+  query: {
+    type: "string",
+  },
+  schema: {
+    type: "string",
+  },
+  headers: {
+    type: "array",
+    properties: params,
+  },
+  auth: {
+    type: "object",
+    properties: graphqlRequestAuth,
+  },
+};
+
 const itemsProperties = {
   id: {
     type: "number",
@@ -149,6 +269,11 @@ const itemsProperties = {
     type: "object",
     properties: socketioItems,
   },
+  graphql: {
+    type: "object",
+    properties: graphqlItems,
+  },
+
   createdAt: {
     type: "date-time",
   },
@@ -178,7 +303,7 @@ export const collectionSchemaLiteral = {
   title: "collection",
   primaryKey: "id",
   type: "object",
-  version: 8,
+  version: 9,
   properties: {
     collectionId: {
       type: "string",

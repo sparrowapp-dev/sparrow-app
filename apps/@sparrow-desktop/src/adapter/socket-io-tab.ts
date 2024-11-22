@@ -5,6 +5,10 @@ import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
 import { SocketDataTypeEnum } from "@sparrow/common/types/workspace/web-socket";
 import { InitTab } from "@sparrow/common/factory";
 import type { CollectionItemBaseInterface } from "@sparrow/common/types/workspace/collection-base";
+import {
+  type SocketIORequestBaseInterface,
+  SocketIORequestBodyModeBaseEnum,
+} from "@sparrow/common/types/workspace/socket-io-request-base";
 
 /**
  * @class - this class makes request tab compatible with backend server
@@ -12,45 +16,39 @@ import type { CollectionItemBaseInterface } from "@sparrow/common/types/workspac
 export class SocketIoTabAdapter {
   constructor() {}
 
-  private setMessageType = (input: string) => {
+  private setMessageType = (input: string): SocketDataTypeEnum => {
     let result = SocketDataTypeEnum.TEXT;
     switch (input) {
-      case ContentTypeEnum["application/json"]:
+      case SocketIORequestBodyModeBaseEnum["application/json"]:
         result = SocketDataTypeEnum.JSON;
         break;
-      case ContentTypeEnum["application/xml"]:
+      case SocketIORequestBodyModeBaseEnum["application/xml"]:
         result = SocketDataTypeEnum.XML;
         break;
-      case ContentTypeEnum["application/javascript"]:
-        result = SocketDataTypeEnum.JAVASCRIPT;
-        break;
-      case ContentTypeEnum["text/plain"]:
+      case SocketIORequestBodyModeBaseEnum["text/plain"]:
         result = SocketDataTypeEnum.TEXT;
         break;
-      case ContentTypeEnum["text/html"]:
+      case SocketIORequestBodyModeBaseEnum["text/html"]:
         result = SocketDataTypeEnum.HTML;
         break;
     }
     return result;
   };
 
-  unsetMessageType = (input: string) => {
-    let contentType: ContentTypeEnum = ContentTypeEnum["text/plain"];
+  unsetMessageType = (input: string): SocketIORequestBodyModeBaseEnum => {
+    let contentType = SocketIORequestBodyModeBaseEnum["text/plain"];
     switch (input) {
       case RequestDataTypeEnum.JSON:
-        contentType = ContentTypeEnum["application/json"];
+        contentType = SocketIORequestBodyModeBaseEnum["application/json"];
         break;
       case RequestDataTypeEnum.XML:
-        contentType = ContentTypeEnum["application/xml"];
+        contentType = SocketIORequestBodyModeBaseEnum["text/html"];
         break;
       case RequestDataTypeEnum.HTML:
-        contentType = ContentTypeEnum["text/html"];
-        break;
-      case RequestDataTypeEnum.JAVASCRIPT:
-        contentType = ContentTypeEnum["application/javascript"];
+        contentType = SocketIORequestBodyModeBaseEnum["text/html"];
         break;
       case RequestDataTypeEnum.TEXT:
-        contentType = ContentTypeEnum["text/plain"];
+        contentType = SocketIORequestBodyModeBaseEnum["text/plain"];
         break;
     }
     return contentType;
@@ -105,13 +103,13 @@ export class SocketIoTabAdapter {
    * @param _tab - request backend data
    * @returns
    */
-  public unadapt(_tab: Partial<Tab>) {
+  public unadapt(_tab: Partial<Tab>): SocketIORequestBaseInterface {
     const socketTab = createDeepCopy(_tab);
     const messageType = socketTab.property.socketio.state.messageLanguage;
     return {
       url: socketTab.property.socketio?.url,
       message: socketTab.property.socketio?.message,
-      eventName:socketTab.property.socketio?.eventName,
+      eventName: socketTab.property.socketio?.eventName,
       headers: socketTab.property.socketio?.headers,
       events: socketTab.property.socketio?.events,
       queryParams: socketTab.property.socketio?.queryParams,
