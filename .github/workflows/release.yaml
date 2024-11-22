@@ -48,12 +48,12 @@ jobs:
         with:
           dotnet-version: 3.1
 
-      - name: Install Rust 1.76.0
+      - name: Install Rust 1.82.0
         run: |
           Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
           .\rustup-init.exe -y
-          rustup install 1.76.0
-          rustup default 1.76.0
+          rustup install 1.82.0
+          rustup default 1.82.0
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
@@ -67,7 +67,8 @@ jobs:
           yarn cache clean
           npm install -g pnpm
           yarn install
-          yarn tauri build --debug
+          yarn desktop-build
+          # yarn tauri build --debug
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
@@ -111,11 +112,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Install Rust 1.76.0
+      - name: Install Rust 1.82.0
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          rustup install 1.76.0
-          rustup default 1.76.0
+          rustup install 1.82.0
+          rustup default 1.82.0
 
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
@@ -131,8 +132,10 @@ jobs:
 
       - name: Build Tauri App
         run: |
+          yarn cache clean
           yarn install
-          yarn tauri build --debug
+          yarn desktop-build
+          # yarn tauri build --debug
         env:
           APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
           APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
