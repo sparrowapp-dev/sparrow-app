@@ -133,9 +133,9 @@
 </script>
 
 <div
-  class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
+  class="mb-0 me-0 w-100 bg-secondary-700  py-0 border-radius-2 section-layout"
 >
-  <div class="d-flex gap-3 align-items-center w-100 pe-2" style="height: 26px;">
+  <div class="d-flex gap-3 align-items-center w-100 pe-2 ps-3 pair-header-row " style="height: 26px;">
     <div style="width:30px; margin-left: 0px;">
       <label
         class="container d-block position-relative"
@@ -151,7 +151,7 @@
       </label>
     </div>
     <div
-      class="d-flex pair-title bg-secondary-700 align-items-center w-100"
+      class="d-flex pair-title  align-items-center w-100 pair-header-row  "
       style="font-size: 12px; font-weight: 500;"
     >
       <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1">Variable</p>
@@ -191,7 +191,7 @@
       {#each pairs as element, index}
         <div
           aria-label="Toggle Hover"
-          class="w-100 {element.key
+          class="w-100 ps-3 {element.key
             .toLowerCase()
             .includes(search.toLowerCase()) ||
           element.value.toLowerCase().includes(search.toLowerCase())
@@ -289,6 +289,15 @@
 {/if}
 
 <style>
+
+.pair-header-row {
+    border-top: 0.5px solid var(--border-secondary-315);
+    padding-top: 3px;
+    padding-bottom: 3px;
+    background-color: var(--bg-secondary-880);
+    height: 26px;
+  }
+
   .pair-container:nth-child(odd) {
     margin-top: -1px;
   }
