@@ -77,7 +77,7 @@
   }}
   class="d-inline-block position-relative pt-1 individual-tab bg-transparent border-0"
   style="width: {tabWidth}px; height:35px; margin-left:{index === 0
-    ? '10px'
+    ? '4px'
     : ''}"
   on:mousedown={handleMouseDown}
 >
