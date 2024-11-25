@@ -49,7 +49,7 @@
     },
     {
       route: "/app/help",
-      heading: "Help",
+      heading: "Community",
       defaultLogo: help,
       hoveredLogo: hoveredHelp,
       selectedLogo: selectedHelp,
