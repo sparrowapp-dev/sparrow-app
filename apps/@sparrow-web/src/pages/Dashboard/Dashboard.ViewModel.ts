@@ -4,7 +4,7 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { EnvironmentService } from "../../services/environment.service";
 import { TeamService } from "../../services/team.service";
 import { WorkspaceService } from "../../services/workspace.service";
-import { throttle } from "@sparrow/common/utils";
+import { Sleep, throttle } from "@sparrow/common/utils";
 import { notifications } from "@sparrow/library/ui";
 import { isGuestUserActive, setUser, user } from "@app/store/auth.store";
 import { TabRepository } from "../../repositories/tab.repository";
@@ -13,7 +13,7 @@ import {
   type TeamDocument,
   type WorkspaceDocument,
 } from "../../database/database";
-import { clearAuthJwt } from "@app/utils/jwt";
+import { clearAuthJwt, getClientUser } from "@app/utils/jwt";
 import { userLogout } from "../../services/auth.service";
 import { FeatureSwitchService } from "../../services/feature-switch.service";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
@@ -377,17 +377,18 @@ export class DashboardViewModel {
         ...res,
         id: res._id,
       });
-      user.subscribe(async (value) => {
-        if (value) {
-          await this.refreshTeams(value._id);
-          await this.refreshWorkspaces(value._id);
-        }
-      });
+      await new Sleep().setTime(2000).exec();
+      const clientUserId = getClientUser().id;
+      if (clientUserId) {
+        await this.refreshTeams(clientUserId);
+        await this.refreshWorkspaces(clientUserId);
+      }
+
       const initWorkspaceTab = new InitWorkspaceTab(res._id, res._id);
       initWorkspaceTab.updateName(res.name);
       await this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
       await this.workspaceRepository.setActiveWorkspace(res._id);
-      navigate("/dashboard/collections");
+      navigate("collections");
       notifications.success("New Workspace created successfully.");
     } else {
       notifications.error(response?.message);

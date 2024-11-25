@@ -202,7 +202,7 @@
     style="margin-top:5px; flex:1;"
   >
     <div
-      class="d-flex align-items-center pe-2 rounded-1"
+      class="d-flex align-items-center pe-2 border-radius-2"
       style="cursor:pointer; justify-content: space-between; height:32px;
       background-color: {isHovered
         ? 'var(--dropdown-option-hover)'

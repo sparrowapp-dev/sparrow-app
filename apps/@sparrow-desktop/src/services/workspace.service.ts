@@ -50,8 +50,8 @@ export class WorkspaceService {
 
   public deleteWorkspace = async (
     workspaceId: string,
-  ): Promise<HttpClientResponseInterface> => {
-    const response: HttpClientResponseInterface = await makeRequest(
+  ): Promise<HttpClientResponseInterface<any>> => {
+    const response = await makeRequest(
       "DELETE",
       `${apiUrl}/api/workspace/${workspaceId}`,
       {
@@ -101,8 +101,8 @@ export class WorkspaceService {
     workspaceId: string,
     userId: string,
     role: WorkspaceRole,
-  ): Promise<HttpClientResponseInterface> => {
-    const response: HttpClientResponseInterface = await makeRequest(
+  ): Promise<HttpClientResponseInterface<any>> => {
+    const response = await makeRequest(
       "PUT",
       `${apiUrl}/api/workspace/${workspaceId}/user/${userId}`,
       {
@@ -116,8 +116,8 @@ export class WorkspaceService {
   public removeUserFromWorkspace = async (
     workspaceId: string,
     userId: string,
-  ): Promise<HttpClientResponseInterface> => {
-    const response: HttpClientResponseInterface = await makeRequest(
+  ): Promise<HttpClientResponseInterface<any>> => {
+    const response = await makeRequest(
       "DELETE",
       `${apiUrl}/api/workspace/${workspaceId}/user/${userId}`,
       {

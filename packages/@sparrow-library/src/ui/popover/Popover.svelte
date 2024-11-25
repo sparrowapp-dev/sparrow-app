@@ -1,42 +1,29 @@
 <script lang="ts">
   import { CrossIcon as Crossicon } from "@sparrow/library/assets";
   export let onClose;
-  export let text = " ";
   export let heading = " ";
   let isGuidePopup = false;
 </script>
 
 <div
-  class="container d-flex flex-column"
-  style="position:relative; background-color:#1C1D2B; border-radius:4px; "
+  class="p-container d-flex flex-column bg-tertiary-750"
+  style="position:relative; border-radius:4px; "
 >
   <button
-    class="cross-btn b-0 border-0"
-    style="position:absolute; right:10px; top:2px; background-color:transparent "
+    class="d-flex align-items-center justify-content-center b-0 border-0"
+    style="height:24px; width:24px; position:absolute; right:4px; top:4px; background-color:transparent;"
     on:click={onClose}
   >
-    <Crossicon />
+    <Crossicon height={"12px"} width={"12px"} />
   </button>
-  <div class="heading">{heading}</div>
-  <p class="description">
+  <p class="fw-bold text-fs-14 mb-2">{heading}</p>
+  <div>
     <slot />
-  </p>
+  </div>
 </div>
 
 <style>
-  .container {
-    margin-bottom: 10px;
-  }
-  .heading {
-    padding-top: 10px;
-    padding-left: 10px;
-    font-weight: 700;
-  }
-  .description {
-    padding-top: 5px;
-    padding-left: 10px;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 18px;
+  .p-container {
+    padding: 16px 16px;
   }
 </style>
