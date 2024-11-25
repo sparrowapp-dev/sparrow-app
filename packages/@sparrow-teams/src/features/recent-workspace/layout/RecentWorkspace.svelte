@@ -11,7 +11,6 @@
 
   // Slice the data to get the top 5 entries
   const topFiveWorkspaces = $data.slice(0, 5);
-  
 </script>
 
 <!-- <section class="d-flex flex-column h-100"> -->
@@ -21,7 +20,7 @@
 <div class="sidebar-workspace-list" style="flex:1; overflow:auto;">
   {#if $data}
     <List height={"100%"} overflowY={"auto"} classProps={"px-1 py-0"}>
-      {#each topFiveWorkspaces as list , index}
+      {#each topFiveWorkspaces as list, index}
         {#if index < constants.WORKSPACE_LIMIT}
           <div
             class="recentWorkspace-tab"
@@ -38,14 +37,14 @@
                   class="list-name mb-0 ellipsis overflow-hidden ellipsis"
                   style="font-size: 12px; font-weight:700"
                 >
-                  {list.name}
+                  {list?.name || ""}
                 </p>
 
                 <p
                   class="team-name mb-0 title fw-bold ellipsis overflow-hidden"
                   style="font-size: 12px; color:var( --sparrow-text-color)"
                 >
-                  {list?.team?.teamName}
+                  {list?.team?.teamName || ""}
                 </p>
               </div>
 
