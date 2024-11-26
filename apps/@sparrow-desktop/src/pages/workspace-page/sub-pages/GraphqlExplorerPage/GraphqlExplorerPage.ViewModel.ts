@@ -519,6 +519,7 @@ class GraphqlExplorerViewModel {
         const isCustomType = !isScalarType(typeName);
 
         let result = {
+          id: uuidv4(), // Add UUID to the top-level object
           name: fieldName,
           parentName: parentName,
           description: field.description,
@@ -536,6 +537,7 @@ class GraphqlExplorerViewModel {
             const isArgCustomType = !isScalarType(argTypeName);
 
             const argResult = {
+              id: uuidv4(), // Add UUID to argument objects
               name: arg.name,
               type: argTypeName,
               description: arg.description,
@@ -554,7 +556,13 @@ class GraphqlExplorerViewModel {
               );
               const argObjectFields = processObjectType(argTypeName, depth + 1);
 
-              argResult.items = argInputFields || argObjectFields || [];
+              // Add UUID to nested items
+              argResult.items = (argInputFields || argObjectFields || []).map(
+                (item) => ({
+                  ...item,
+                  id: uuidv4(),
+                }),
+              );
             }
 
             return argResult;
@@ -569,12 +577,22 @@ class GraphqlExplorerViewModel {
           const inputFields = processInputObjectType(typeName, depth + 1);
           const objectFields = processObjectType(typeName, depth + 1);
 
-          // Add nested type fields to items array
+          // Add nested type fields to items array with UUID
           if (inputFields) {
-            result.items.push(...inputFields);
+            result.items.push(
+              ...inputFields.map((item) => ({
+                ...item,
+                id: uuidv4(),
+              })),
+            );
           }
           if (objectFields) {
-            result.items.push(...objectFields);
+            result.items.push(
+              ...objectFields.map((item) => ({
+                ...item,
+                id: uuidv4(),
+              })),
+            );
           }
         }
 
@@ -686,22 +704,6 @@ class GraphqlExplorerViewModel {
       );
       const responseBody = response.data.body;
       const parsedResponse = JSON.parse(responseBody);
-      console.log("response -----", parsedResponse);
-      try {
-        const transformedSchema = await this.transformSchema(
-          parsedResponse.data,
-        );
-        console.log("Schema transformed successfully", transformedSchema);
-        setTimeout(async () => {
-          const transformedSchema2 = await this.transformSchema(
-            parsedResponse.data,
-          );
-          console.log("Schema transformed successfully2", transformedSchema2);
-        }, 3000);
-      } catch (error) {
-        console.error("Error transforming schema:", error);
-      }
-      return;
       const formattedSchema = this.formatGraphQLSchema(parsedResponse.data);
       progressiveTab.property.graphql.schema = formattedSchema;
       progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
