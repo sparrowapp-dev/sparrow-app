@@ -112,3 +112,8 @@ export { default as SocketIoIcon } from "./SocketIo.svelte";
 export { default as GraphIcon } from "./Graph.svelte";
 export { default as RefreshSchemaIcon } from "./RefreshSchema.svelte";
 export { default as WarningIcon } from "./Warning.svelte";
+export { default as MiniMizeIcon } from "./MiniMize.svelte";
+export { default as DoubleResizeIcon } from "./DoubleResize.svelte";
+export { default as CrossIconV2 } from "./CrossIconV2.svelte";
+export { default as ExpandIcon } from "./Expand.svelte";
+export { default as SquareIcon } from "./Square.svelte";

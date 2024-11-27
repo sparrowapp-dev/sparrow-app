@@ -1,10 +1,10 @@
 <script lang="ts">
   import { Select } from "@sparrow/library/forms";
   import {
-    CloudOffIcon,
     SparrowEdgeIcon,
     StackIcon,
   } from "@sparrow/library/icons";
+  import { getCurrentWindow } from "@tauri-apps/api/window";
   import { environmentType } from "@sparrow/common/enums";
   import { SparrowIcon } from "@sparrow/library/icons";
   import constants from "@app/constants/constants";
@@ -52,8 +52,8 @@
   export let onSwitchTeam;
 
   export let isWebApp = false;
-
-
+ 
+ 
   export let isCreateTeamModalOpen;
 
   /**
@@ -142,9 +142,14 @@
   export let user;
   export let onLogout;
 
-  import { profileTabIcon as profile } from "@sparrow/library/assets";
+  import {
+    profileTabIcon as profile,
+  } from "@sparrow/library/assets";
   import { profileHoveredIcon as hoveredProfile } from "@sparrow/library/assets";
   import { profileSelectedIcon as selectedProfile } from "@sparrow/library/assets";
+  import { onMount } from "svelte";
+  import CustomHeader from "./custom-header-button/CustomHeader.svelte";
+  import { OSDetector } from "../../utils";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",
@@ -155,13 +160,53 @@
     user,
   };
 
+  let isMaximizeWindow: boolean = false;
+
   let showProfileModal = false;
+
+  const appWindow = getCurrentWindow();
+
+  let titlebar; // Reference to the title bar element
+
+  function handleMouseDown(e: MouseEvent) {
+  // Check if the target or any parent element matches the exclusion criteria
+  if (
+    e.buttons === 1 &&
+    !e.target.closest(".no-drag") // Prevent dragging for elements with the "no-drag" class
+  ) {
+    if (e.detail === 2) {
+      isMaximizeWindow = !isMaximizeWindow;
+      appWindow.toggleMaximize(); // Maximize on double click
+    }
+    else{
+      appWindow.startDragging(); // Start dragging on single click
+      isMaximizeWindow=false;
+    }
+  }
+}
+
+  let isWindows = false;
+  let os = "";
+  const osDetector = new OSDetector();
+  onMount(() => {
+    os = osDetector.getOS();
+    if (os === "windows") {
+      isWindows = true;
+    }
+  });
+
 </script>
 
 <header
-  class="app-header ps-1 pe-3 d-flex align-items-center justify-content-between"
+  bind:this={titlebar}
+  id="titlebar"
+  class=" titlebar app-header ps-1 d-flex align-items-center justify-content-between"
+  on:mousedown={handleMouseDown}
 >
-  <div class="d-flex ms-3 justify-content-cdenter align-items-center">
+  <div class="d-flex ms-1 justify-content-cdenter align-items-center no-drag">
+    {#if !isWindows}
+      <CustomHeader  isWindows={false}  />
+    {/if}
     {#if isGuestUser}
       <div>
         <SparrowEdgeIcon
@@ -171,7 +216,7 @@
         />
       </div>
     {:else}
-      <div>
+      <div class="ms-3">
         <SparrowIcon
           height="17px"
           width="17px"
@@ -179,7 +224,7 @@
         />
       </div>
     {/if}
-    <div class="ms-4">
+    <div class="ms-2  no-drag">
       {#if isWebApp}
         {#if teamDocuments?.filter((_team) => {
           if (_team.isOpen) return true;
@@ -188,12 +233,14 @@
           <div class="ps-2">
             <Select
               id={"workspace-dropdown"}
-              data={teamDocuments?.map((_team) => {
-                return {
-                  id: _team.teamId,
-                  name: _team.name,
-                };
-              }).reverse()}
+              data={teamDocuments
+                ?.map((_team) => {
+                  return {
+                    id: _team.teamId,
+                    name: _team.name,
+                  };
+                })
+                .reverse()}
               titleId={teamDocuments?.filter((_team) => {
                 if (_team.isOpen) return true;
                 return false;
@@ -342,7 +389,7 @@
     </div>
   </div>
 
-  <div class="d-flex align-items-center" style="position: relative;">
+  <div class="d-flex align-items-center no-drag" style="position: relative;">
     {#if isGuestUser && isLoginBannerActive === false}
       <PopupHint />
 
@@ -406,10 +453,17 @@
         />
       </div>
     {/if}
+
+    {#if isWindows}
+      <div class="d-flex gap-3  me-1 no-drag">
+        <CustomHeader bind:isMaximizeWindow  {isWindows} />
+      </div>
+    {/if}
   </div>
 </header>
 
 <style>
+
   header {
     height: 44px;
     background-color: var(--bg-secondary-850);
