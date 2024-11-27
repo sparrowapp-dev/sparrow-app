@@ -724,12 +724,6 @@ class GraphqlExplorerViewModel {
       );
       const responseBody = response.data.body;
       const parsedResponse = JSON.parse(responseBody);
-      try {
-        const data = await this.transformSchema(parsedResponse.data);
-        console.log("data----", data);
-      } catch (error) {
-        console.log("erroe", error);
-      }
       const formattedSchema = this.formatGraphQLSchema(parsedResponse.data);
       progressiveTab.property.graphql.schema = formattedSchema;
       progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
