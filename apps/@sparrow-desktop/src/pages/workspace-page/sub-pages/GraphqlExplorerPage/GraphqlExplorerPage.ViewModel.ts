@@ -462,6 +462,24 @@ class GraphqlExplorerViewModel {
       return typeObj.name;
     }
 
+    // Determine default value based on type
+    function getDefaultValue(typeName) {
+      // Provide default values based on type
+      switch (typeName) {
+        case "String":
+          return "";
+        case "Int":
+        case "Float":
+          return 0;
+        case "Boolean":
+          return false;
+        case "ID":
+          return null;
+        default:
+          return null;
+      }
+    }
+
     // Helper function to determine if a type is a scalar
     function isScalarType(typeName) {
       const scalarTypes = ["String", "Int", "Float", "Boolean", "ID"];
@@ -527,6 +545,7 @@ class GraphqlExplorerViewModel {
           itemType: defaultItemType,
           isNonNull: field.type.kind === "NON_NULL",
           isSelected: false,
+          value: getDefaultValue(typeName),
           items: [],
         };
 
@@ -545,6 +564,7 @@ class GraphqlExplorerViewModel {
               isNonNull: arg.type.kind === "NON_NULL",
               isSelected: false,
               defaultValue: arg.defaultValue,
+              value: getDefaultValue(argTypeName),
               items: [],
             };
 
@@ -704,6 +724,12 @@ class GraphqlExplorerViewModel {
       );
       const responseBody = response.data.body;
       const parsedResponse = JSON.parse(responseBody);
+      try {
+        const data = await this.transformSchema(parsedResponse.data);
+        console.log("data----", data);
+      } catch (error) {
+        console.log("erroe", error);
+      }
       const formattedSchema = this.formatGraphQLSchema(parsedResponse.data);
       progressiveTab.property.graphql.schema = formattedSchema;
       progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
