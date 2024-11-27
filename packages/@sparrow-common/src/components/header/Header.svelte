@@ -179,7 +179,7 @@
       appWindow.toggleMaximize(); // Maximize on double click
     }
     else{
-      appWindow.startDragging(); // Start dragging on single click
+      appWindow.startDragging(); 
       isMaximizeWindow=false;
     }
   }
