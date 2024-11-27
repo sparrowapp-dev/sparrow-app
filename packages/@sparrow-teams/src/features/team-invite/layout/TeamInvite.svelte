@@ -314,6 +314,7 @@
     borderRounded={"4px"}
     headerFontWeight={400}
     headerFontSize={"12px"}
+    flex-grow="{1};"
     isError={roleError && selectedRole === defaultRole}
   />
 </div>
