@@ -21,6 +21,7 @@
    * environment list
    */
   export let environments;
+
   /**
    * selected environment
    */
@@ -99,7 +100,7 @@
   let multipleAgentData = [
     {
       name: "Cloud Agent",
-      id: "Clound Agent",
+      id: "Cloud Agent",
       displayName: "Cloud Agent",
       description:
         "Run requests via the cloud for faster performance and reduced load on your device.",
