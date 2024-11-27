@@ -3979,20 +3979,20 @@ export default class CollectionsViewModel {
         );
         break;
       case "socket-io":
-        this.handleOpenSocketIoTab(
-          args.workspaceId,
-          args.collection as CollectionDto,
-          args.folder as CollectionItemsDto,
-          args.socketio as CollectionItemsDto,
-        );
+        // this.handleOpenSocketIoTab(
+        //   args.workspaceId,
+        //   args.collection as CollectionDto,
+        //   args.folder as CollectionItemsDto,
+        //   args.socketio as CollectionItemsDto,
+        // );
         break;
       case "graphql":
-        this.handleOpenGraphqlTab(
-          args.workspaceId,
-          args.collection as CollectionDto,
-          args.folder as CollectionItemsDto,
-          args.graphql as CollectionItemsDto,
-        );
+        // this.handleOpenGraphqlTab(
+        //   args.workspaceId,
+        //   args.collection as CollectionDto,
+        //   args.folder as CollectionItemsDto,
+        //   args.graphql as CollectionItemsDto,
+        // );
         break;
     }
   };

@@ -76,6 +76,8 @@
 
   export let toggleExpandCollection;
 
+  export let isWebApp = false;
+
   let collectionListDocument: CollectionDocument[];
 
   let activeWorkspace: WorkspaceDocument;
@@ -294,6 +296,7 @@
                     collection={col}
                     {activeTabId}
                     {searchData}
+                    {isWebApp}
                   />
                 {/each}
               </List>
@@ -333,6 +336,7 @@
                   {activeTabPath}
                   collection={col}
                   {activeTabId}
+                  {isWebApp}
                 />
               {/each}
             </List>

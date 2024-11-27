@@ -86,6 +86,7 @@
    * Role of user in active workspace
    */
   export let userRole;
+  export let isWebApp = false;
 
   let expand: boolean = false;
   let showFolderAPIButtons: boolean = true;
@@ -304,7 +305,7 @@
           displayText: "Add WebSocket",
           disabled: false,
           hidden:
-            !collection.activeSync ||
+            (!isWebApp && !collection.activeSync) ||
             (explorer?.source === "USER" && collection.activeSync)
               ? false
               : true,
@@ -320,7 +321,7 @@
           displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            !collection.activeSync ||
+            (!isWebApp && !collection.activeSync) ||
             (explorer?.source === "USER" && collection.activeSync)
               ? false
               : true,
@@ -336,7 +337,7 @@
           displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            !collection.activeSync ||
+            (!isWebApp && !collection.activeSync) ||
             (explorer?.source === "USER" && collection.activeSync)
               ? false
               : true,
@@ -509,6 +510,7 @@
               explorer={exp}
               folder={explorer}
               {activeTabId}
+              {isWebApp}
             />
           {/each}
           {#if !explorer?.items?.length}
@@ -560,7 +562,7 @@
           {activeTabPath}
         />
       </div>
-    {:else if explorer.type === ItemType.WEB_SOCKET}
+    {:else if explorer.type === ItemType.WEB_SOCKET && !isWebApp}
       <div style="cursor:pointer;">
         <WebSocket
           bind:userRole
@@ -574,7 +576,7 @@
           {activeTabPath}
         />
       </div>
-    {:else if explorer.type === ItemType.SOCKET_IO}
+    {:else if explorer.type === ItemType.SOCKET_IO && !isWebApp}
       <div style="cursor:pointer;">
         <SocketIo
           bind:userRole
@@ -588,7 +590,7 @@
           {activeTabPath}
         />
       </div>
-    {:else if explorer.type === ItemType.GRAPHQL}
+    {:else if explorer.type === ItemType.GRAPHQL && !isWebApp}
       <div style="cursor:pointer;">
         <Graphql
           bind:userRole

@@ -224,14 +224,15 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
           }
-        } else if (removeTab.type === TabTypeEnum.TESTFLOW) {
-          const res = await _viewModel3.saveTestflow(removeTab);
-          if (res) {
-            loader = false;
-            _viewModel.handleRemoveTab(id);
-            isPopupClosed = false;
-          }
         }
+        // else if (removeTab.type === TabTypeEnum.TESTFLOW) {
+        //   const res = await _viewModel3.saveTestflow(removeTab);
+        //   if (res) {
+        //     loader = false;
+        //     _viewModel.handleRemoveTab(id);
+        //     isPopupClosed = false;
+        //   }
+        // }
         loader = false;
       }
     } else if (
@@ -334,13 +335,15 @@
         Promise.all([
           _viewModel.fetchCollections(value?._id),
           _viewModel2.refreshEnvironment(value?._id),
-          _viewModel3.refreshTestflow(value?._id),
+          // _viewModel3.refreshTestflow(value?._id),
+          ,
           ,
         ]).then(
           ([
             fetchCollectionsResult,
             refreshEnvironmentResult,
-            refreshTestflowResult,
+            // refreshTestflowResult,
+            ,
           ]) => {
             // Handle the results of each API call here
 
@@ -348,12 +351,12 @@
               fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
             const environmentTabsToBeDeleted =
               refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
-            const testflowTabsToBeDeleted =
-              refreshTestflowResult?.testflowTabsToBeDeleted || [];
+            // const testflowTabsToBeDeleted =
+            //   refreshTestflowResult?.testflowTabsToBeDeleted || [];
             const totalTabsToBeDeleted: string[] = [
               ...collectionTabsToBeDeleted,
               ...environmentTabsToBeDeleted,
-              ...testflowTabsToBeDeleted,
+              // ...testflowTabsToBeDeleted,
             ];
             _viewModel.deleteTabsWithTabIdInAWorkspace(
               value?._id,
@@ -475,6 +478,7 @@
           bind:isExpandEnvironment
           bind:isExpandTestflow
           appVersion={"version"}
+          isWebApp={true}
         />
       </Pane>
       <Pane
@@ -532,7 +536,7 @@
                       />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.WEB_SOCKET}
+                  <!-- {:else if $activeTab?.type === ItemType.WEB_SOCKET}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WebSocketExplorerPage tab={$activeTab} />
@@ -555,7 +559,7 @@
                     <div class="h-100" use:motion>
                       <GraphqlExplorerPage tab={$activeTab} />
                     </div>
-                  </Motion>
+                  </Motion> -->
                 {:else if !$tabList?.length}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
@@ -563,8 +567,8 @@
                         {currentWorkspace}
                         {handleCreateEnvironment}
                         onCreateTestflow={() => {
-                          _viewModel3.handleCreateTestflow();
-                          isExpandTestflow = true;
+                          // _viewModel3.handleCreateTestflow();
+                          // isExpandTestflow = true;
                         }}
                         bind:isExpandCollection
                         showImportCollectionPopup={() =>
@@ -572,6 +576,7 @@
                         onItemCreated={_viewModel.handleCreateItem}
                         {isGuestUser}
                         {userRole}
+                        isWebApp={true}
                       />
                     </div>
                   </Motion>
@@ -799,43 +804,44 @@
           _viewModel.handleRemoveTab(removeTab.id);
         }
         return res;
-      } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
-        const res = await _viewModel.saveAsSocket(
-          _workspaceMeta,
-          path,
-          tabName,
-          description,
-          removeTab,
-        );
-        if (res?.status === "success") {
-          _viewModel.handleRemoveTab(removeTab.id);
-        }
-        return res;
-      } else if (removeTab.type === TabTypeEnum.SOCKET_IO) {
-        const res = await _viewModel.saveAsSocketIo(
-          _workspaceMeta,
-          path,
-          tabName,
-          description,
-          removeTab,
-        );
-        if (res?.status === "success") {
-          _viewModel.handleRemoveTab(removeTab.id);
-        }
-        return res;
-      } else if (removeTab.type === TabTypeEnum.GRAPHQL) {
-        const res = await _viewModel.saveAsGraphql(
-          _workspaceMeta,
-          path,
-          tabName,
-          description,
-          removeTab,
-        );
-        if (res?.status === "success") {
-          _viewModel.handleRemoveTab(removeTab.id);
-        }
-        return res;
       }
+      // else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
+      //   const res = await _viewModel.saveAsSocket(
+      //     _workspaceMeta,
+      //     path,
+      //     tabName,
+      //     description,
+      //     removeTab,
+      //   );
+      //   if (res?.status === "success") {
+      //     _viewModel.handleRemoveTab(removeTab.id);
+      //   }
+      //   return res;
+      // } else if (removeTab.type === TabTypeEnum.SOCKET_IO) {
+      //   const res = await _viewModel.saveAsSocketIo(
+      //     _workspaceMeta,
+      //     path,
+      //     tabName,
+      //     description,
+      //     removeTab,
+      //   );
+      //   if (res?.status === "success") {
+      //     _viewModel.handleRemoveTab(removeTab.id);
+      //   }
+      //   return res;
+      // } else if (removeTab.type === TabTypeEnum.GRAPHQL) {
+      //   const res = await _viewModel.saveAsGraphql(
+      //     _workspaceMeta,
+      //     path,
+      //     tabName,
+      //     description,
+      //     removeTab,
+      //   );
+      //   if (res?.status === "success") {
+      //     _viewModel.handleRemoveTab(removeTab.id);
+      //   }
+      //   return res;
+      // }
     }}
     onCreateFolder={_viewModel.createFolderFromSaveAs}
     onCreateCollection={_viewModel.createCollectionFromSaveAs}

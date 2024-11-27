@@ -182,6 +182,7 @@
   onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
   onGenerateDocumentation={_viewModel.generateDocumentation}
+  isWebApp={true}
 />
 {#if !isGuestUser}
   <ChatBot
