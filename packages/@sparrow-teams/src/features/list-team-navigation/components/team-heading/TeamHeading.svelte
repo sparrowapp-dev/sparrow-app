@@ -2,6 +2,7 @@
   export let openTeam;
   import { base64ToURL } from "@sparrow/common/utils";
   import { PeopleIcon } from "@sparrow/library/assets";
+  import { IconFallback } from "@sparrow/library/ui";
 </script>
 
 <div class="d-flex align-items-center p-3 pt-4 pb-0">
@@ -16,11 +17,11 @@
         />{:else}
         <div
           class={`d-flex text-defaultColor text-center my-auto align-items-center justify-content-center profile-circle bg-tertiary-750 border-secondary-300`}
-          style={`padding-top: 2px; width: 20px !important; height: 20px !important; display: flex; border: 1px solid #45494D; border-radius: 50%;`}
+          style={`width: 20px !important; height: 20px !important; display: flex; border: 1px solid #45494D; border-radius: 50%;`}
         >
-          <span class="text-fs-12 fw-bold" style="margin-top:-4px;">
-            {openTeam?.name[0] ? openTeam?.name[0]?.toUpperCase() : ""}</span
-          >
+          <span class="text-fs-12 fw-bold">
+            {openTeam?.name[0] ? openTeam?.name[0]?.toUpperCase() : ""}
+          </span>
         </div>
       {/if}
     </span>

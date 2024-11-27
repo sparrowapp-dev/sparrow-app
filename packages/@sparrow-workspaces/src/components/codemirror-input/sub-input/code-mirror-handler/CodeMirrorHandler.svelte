@@ -196,11 +196,16 @@
       .readText()
       .then((text) => {
         // Remove newline characters from the pasted text
-        const sanitizedData = text.replace(/\n/g, " ");
+        const sanitizedData = text.replace(/\r?\n/g, " ");
         codeMirrorView?.dispatch({
           changes: {
             from: codeMirrorView.state.selection.main.from,
+            to: codeMirrorView.state.selection.main.to,
             insert: sanitizedData,
+          },
+          selection: {
+            anchor:
+              codeMirrorView.state.selection.main.from + sanitizedData.length,
           },
         });
       })

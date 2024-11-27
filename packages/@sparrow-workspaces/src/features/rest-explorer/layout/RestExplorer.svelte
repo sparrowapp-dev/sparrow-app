@@ -53,7 +53,6 @@
     RequestSectionEnum,
     ResponseSectionEnum,
     type KeyValue,
-    type RequestTab,
   } from "@sparrow/common/types/workspace";
   import { requestSplitterDirection } from "../store";
   import { Popover } from "@sparrow/library/ui";
@@ -69,8 +68,9 @@
 
   import type { CancelRequestType } from "@workspaces/common/type/actions";
   import type { restExplorerData } from "../store/rest-explorer";
+  import type { Tab } from "@sparrow/common/types/workspace/tab";
 
-  export let tab: Observable<RequestTab>;
+  export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;
   export let requestAuthParameter: Observable<KeyValue>;
@@ -217,10 +217,9 @@
         {#if isPopoverContainer}
           <Popover
             onClose={closeCollectionHelpText}
-            heading={`Welcome to Sparrow!`}
-            text={` `}
+            heading={`Welcome to Sparrow`}
           >
-            <p>
+            <p class="mb-0 text-fs-12">
               Your one-stop solution for API testing and management. Start
               organizing your API requests into collections, utilize environment
               variables, and streamline your development process. Get started
@@ -229,7 +228,7 @@
                 on:click={() => {
                   isGuidePopup = true;
                 }}
-                class="link btn p-0 border-0"
+                class="link p-0 border-0"
                 style="font-size: 12px;"
                 >See how it works.
               </span>
@@ -542,7 +541,8 @@
     background-color: var(--bg-primary-200) !important;
   }
   .link {
-    color: var(--bg-primary-300);
+    color: var(--text-primary-300);
     text-decoration: underline;
+    cursor: pointer;
   }
 </style>

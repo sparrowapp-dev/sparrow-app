@@ -533,7 +533,7 @@
         {/if}
 
         {#if $isTestFlowTourGuideOpen && $currentStep == 2}
-          <div style="position:fixed; top:200px; left:220px; z-index:9999;">
+          <div style="position:fixed; top:268px; left:220px; z-index:9999;">
             <TestFlowTourGuide
               targetId="addButton"
               title="Add Your Flow 🌊"

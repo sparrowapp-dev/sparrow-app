@@ -142,7 +142,7 @@
   style="font-weight: 500;"
 >
   <div
-    class="d-flex align-items-center rounded-1 me-0 mb-0 pe-2"
+    class="d-flex align-items-center border-radius-2 me-0 mb-0 pe-2"
     style="cursor:pointer; justify-content: space-between; height:32px;
       background-color: {isHovered
       ? 'var(--dropdown-option-hover)'
@@ -336,7 +336,7 @@
 
   .environment-active:hover {
     visibility: visible;
-    background-color: var(--bg-tertiary-190);
+    background-color: var( --bg-secondary-420);
   }
   .environment-active:active {
     visibility: visible;
