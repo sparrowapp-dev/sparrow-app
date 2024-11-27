@@ -1260,9 +1260,6 @@ export default class CollectionsViewModel {
       graphqlTab.updateIsSave(true);
       await this.tabRepository.createTab(graphqlTab.getValue());
       moveNavigation("right");
-      MixpanelEvent(Events.CREATE_REQUEST, {
-        source: "Collection list",
-      });
       return;
     }
 
@@ -1289,9 +1286,7 @@ export default class CollectionsViewModel {
 
       this.tabRepository.createTab(graphqlTab.getValue());
       moveNavigation("right");
-      MixpanelEvent(Events.CREATE_REQUEST, {
-        source: "Collection list",
-      });
+
       return;
     } else {
       this.collectionRepository.deleteRequestOrFolderInCollection(
@@ -1716,9 +1711,7 @@ export default class CollectionsViewModel {
       this.tabRepository.createTab(graphqlTab.getValue());
 
       moveNavigation("right");
-      MixpanelEvent(Events.CREATE_REQUEST, {
-        source: "Collection list",
-      });
+
       return;
     }
     const response = await this.collectionService.addGraphqlInCollection(
@@ -1746,9 +1739,6 @@ export default class CollectionsViewModel {
       this.tabRepository.createTab(graphqlTab.getValue());
 
       moveNavigation("right");
-      MixpanelEvent(Events.CREATE_REQUEST, {
-        source: "Collection list",
-      });
       return;
     } else {
       this.collectionRepository.deleteRequestInFolder(

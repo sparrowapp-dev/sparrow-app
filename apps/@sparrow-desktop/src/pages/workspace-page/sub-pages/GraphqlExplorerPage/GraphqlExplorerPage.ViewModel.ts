@@ -443,6 +443,190 @@ class GraphqlExplorerViewModel {
     this.compareRequestWithServer();
   };
 
+  private transformSchema = async (schemaData) => {
+    const types = schemaData.__schema.types;
+    const processedTypes = new Set();
+
+    // Helper function to resolve nested types
+    function resolveType(typeObj) {
+      if (!typeObj) return null;
+
+      // Handle nested types (NON_NULL, LIST)
+      if (typeObj.kind === "NON_NULL") {
+        return resolveType(typeObj.ofType);
+      }
+      if (typeObj.kind === "LIST") {
+        return resolveType(typeObj.ofType);
+      }
+
+      return typeObj.name;
+    }
+
+    // Helper function to determine if a type is a scalar
+    function isScalarType(typeName) {
+      const scalarTypes = ["String", "Int", "Float", "Boolean", "ID"];
+      return scalarTypes.includes(typeName) || typeName?.startsWith("__");
+    }
+
+    // Process input object types
+    function processInputObjectType(typeName, depth = 0) {
+      if (processedTypes.has(typeName)) return null;
+
+      const inputType = types.find((t) => t.name === typeName);
+      if (!inputType?.inputFields) return null;
+
+      processedTypes.add(typeName);
+      const result = processFields(
+        inputType.inputFields,
+        typeName,
+        depth + 1,
+        "inputField",
+      );
+      processedTypes.delete(typeName);
+      return result;
+    }
+
+    // Process object types
+    function processObjectType(typeName, depth = 0) {
+      if (processedTypes.has(typeName)) return null;
+
+      const objectType = types.find((t) => t.name === typeName);
+      if (!objectType?.fields) return null;
+
+      processedTypes.add(typeName);
+      const result = processFields(
+        objectType.fields,
+        typeName,
+        depth + 1,
+        "field",
+      );
+      processedTypes.delete(typeName);
+      return result;
+    }
+
+    // Recursive field processing
+    function processFields(
+      fields,
+      parentName,
+      depth = 0,
+      defaultItemType = "field",
+    ) {
+      if (!fields) return [];
+
+      return fields.map((field) => {
+        const fieldName = field.name;
+        const typeName = resolveType(field.type);
+        const isCustomType = !isScalarType(typeName);
+
+        let result = {
+          id: uuidv4(), // Add UUID to the top-level object
+          name: fieldName,
+          parentName: parentName,
+          description: field.description,
+          type: typeName,
+          itemType: defaultItemType,
+          isNonNull: field.type.kind === "NON_NULL",
+          isSelected: false,
+          items: [],
+        };
+
+        // Process arguments directly into items array
+        if (field.args && field.args.length > 0) {
+          const argumentItems = field.args.map((arg) => {
+            const argTypeName = resolveType(arg.type);
+            const isArgCustomType = !isScalarType(argTypeName);
+
+            const argResult = {
+              id: uuidv4(), // Add UUID to argument objects
+              name: arg.name,
+              type: argTypeName,
+              description: arg.description,
+              itemType: "argument",
+              isNonNull: arg.type.kind === "NON_NULL",
+              isSelected: false,
+              defaultValue: arg.defaultValue,
+              items: [],
+            };
+
+            // Process nested argument types
+            if (isArgCustomType) {
+              const argInputFields = processInputObjectType(
+                argTypeName,
+                depth + 1,
+              );
+              const argObjectFields = processObjectType(argTypeName, depth + 1);
+
+              // Add UUID to nested items
+              argResult.items = (argInputFields || argObjectFields || []).map(
+                (item) => ({
+                  ...item,
+                  id: uuidv4(),
+                }),
+              );
+            }
+
+            return argResult;
+          });
+
+          // Add arguments to items array
+          result.items.push(...argumentItems);
+        }
+
+        // Process nested custom types
+        if (isCustomType) {
+          const inputFields = processInputObjectType(typeName, depth + 1);
+          const objectFields = processObjectType(typeName, depth + 1);
+
+          // Add nested type fields to items array with UUID
+          if (inputFields) {
+            result.items.push(
+              ...inputFields.map((item) => ({
+                ...item,
+                id: uuidv4(),
+              })),
+            );
+          }
+          if (objectFields) {
+            result.items.push(
+              ...objectFields.map((item) => ({
+                ...item,
+                id: uuidv4(),
+              })),
+            );
+          }
+        }
+
+        return result;
+      });
+    }
+
+    // Find main types
+    const queryType = types.find((t) => t.name === "Query");
+    const mutationType = types.find((t) => t.name === "Mutation");
+    const subscriptionType = types.find((t) => t.name === "Subscription");
+
+    // Reset processed types before starting
+    processedTypes.clear();
+
+    const result = {
+      Query: {
+        items: queryType ? processFields(queryType.fields, "Query") : [],
+      },
+      Mutation: {
+        items: mutationType
+          ? processFields(mutationType.fields, "Mutation")
+          : [],
+      },
+      Subscription: {
+        items: subscriptionType
+          ? processFields(subscriptionType.fields, "Subscription")
+          : [],
+      },
+    };
+
+    return result;
+  };
+
   /**
    * Updated GraphQL Schema by fetching it.
    * @param _environmentVariables - Environment variables to be embedded in the GraphQL Request.

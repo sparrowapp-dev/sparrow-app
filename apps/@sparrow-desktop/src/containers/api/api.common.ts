@@ -644,19 +644,41 @@ const connectWebSocket = async (
 
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
         const listener = await listen(`ws_message_${tabId}`, (event) => {
-          webSocketDataStore.update((webSocketDataMap) => {
-            const wsData = webSocketDataMap.get(tabId);
-            if (wsData) {
-              wsData.messages.unshift({
-                data: event.payload,
-                transmitter: "receiver",
-                timestamp: formatTime(new Date()),
-                uuid: uuidv4(),
-              });
-              webSocketDataMap.set(tabId, wsData);
-            }
-            return webSocketDataMap;
-          });
+          if (event?.payload?.type === "disconnect") {
+            let disconnectListener;
+            webSocketDataStore.update((webSocketDataMap) => {
+              const wsData = webSocketDataMap.get(tabId);
+              if (wsData) {
+                disconnectListener = wsData.listener;
+                wsData.messages.unshift({
+                  data: `Disconnected from ${url}`,
+                  transmitter: "disconnector",
+                  timestamp: formatTime(new Date()),
+                  uuid: uuidv4(),
+                });
+                wsData.status = "disconnected";
+                webSocketDataMap.set(tabId, wsData);
+                if (disconnectListener) {
+                  disconnectListener();
+                }
+              }
+              return webSocketDataMap;
+            });
+          } else {
+            webSocketDataStore.update((webSocketDataMap) => {
+              const wsData = webSocketDataMap.get(tabId);
+              if (wsData) {
+                wsData.messages.unshift({
+                  data: event?.payload?.data,
+                  transmitter: "receiver",
+                  timestamp: formatTime(new Date()),
+                  uuid: uuidv4(),
+                });
+                webSocketDataMap.set(tabId, wsData);
+              }
+              return webSocketDataMap;
+            });
+          }
         });
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tabId);

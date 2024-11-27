@@ -575,17 +575,58 @@ async fn connect_websocket(
     tokio::spawn(async move {
         tokio::select! {
             _ = disconnect_rx => {
-                // Handle disconnection here
-                println!("WebSocket connection closed for tab: {}", svelte_tabid);
+                // Handle manual disconnection
+                println!("WebSocket connection manually closed for tab: {}", svelte_tabid);
             }
             _ = async {
                 while let Some(message) = read.next().await {
-                    if let Ok(msg) = message {
-                        let event = format!("ws_message_{}", svelte_tabid);
-                        if let Message::Text(text) = msg {
-                            app_handle_clone
-                            .emit(event.as_str(), text)
-                            .unwrap();
+                    match message {
+                        Ok(msg) => {
+                            match msg {
+                                Message::Text(text) => {
+                                    let event = format!("ws_message_{}", svelte_tabid);
+                                    let payload = json!({
+                                        "type": "message",
+                                        "data": text,
+                                    });
+                                    app_handle_clone.emit(event.as_str(), payload).unwrap();
+                                }
+                                Message::Close(close_frame) => {
+                                    // Handle server disconnection
+                                    let event = format!("ws_message_{}", svelte_tabid);
+                                    let close_reason = close_frame
+                                        .as_ref()
+                                        .map(|frame| frame.reason.to_string())
+                                        .unwrap_or("No reason provided".to_string());
+
+                                    println!(
+                                        "Server closed WebSocket connection for tab: {}, reason: {}",
+                                        svelte_tabid,
+                                        close_reason
+                                    );
+
+                                    let payload = json!({
+                                        "type": "disconnect",
+                                        "data": close_reason,
+                                    });
+                                    app_handle_clone.emit(event.as_str(), payload).unwrap();
+                                    break;
+                                }
+                                _ => {}
+                            }
+                        }
+                        Err(err) => {
+                            // Handle errors (like connection reset, etc.)
+                            let event = format!("ws_message_{}", svelte_tabid);
+                            let error_message = format!("WebSocket error: {}", err);
+                            println!("Error for tab {}: {}", svelte_tabid, error_message);
+
+                            let payload = json!({
+                                "type": "disconnect",
+                                "data": error_message,
+                            });
+                            app_handle_clone.emit(event.as_str(), payload).unwrap();
+                            break;
                         }
                     }
                 }
