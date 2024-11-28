@@ -64,6 +64,7 @@
   export let isGraphqlEditable;
   export let onClearQuery;
   export let onFetchSchema;
+  export let updateSchema;
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
@@ -198,7 +199,6 @@
                           <RequestQuery
                             value={$tab.property.graphql.query}
                             {onUpdateRequestQuery}
-                            {onClearQuery}
                           />
                         {:else if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.Schema}
                           <RequestSchema
@@ -262,7 +262,6 @@
                             <ResponseErrorScreen />
                           {:else if storeData?.response.status}
                             <div class="h-100 d-flex flex-column">
-                              <ResponseStatus response={storeData.response} />
                               <ResponseNavigator
                                 requestStateSection={storeData?.response
                                   .navigation}
@@ -298,7 +297,21 @@
               size={50}
               class="position-relative bg-secondary-850-important"
             >
-              <div class="h-100"><GenerateQuery /></div>
+              <div class="h-100 d-flex flex-column">
+                <div class="mb-2">
+                  <ResponseStatus
+                    response={storeData?.response}
+                    {onClearQuery}
+                    value={$tab.property.graphql.query}
+                  />
+                </div>
+                <div style="flex:1; overflow: auto;">
+                  <GenerateQuery
+                    schema={$tab.property.graphql.schema}
+                    {updateSchema}
+                  />
+                </div>
+              </div>
             </Pane>
           </Splitpanes>
         {:else}

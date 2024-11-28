@@ -1,140 +1,64 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { WithSelect } from "../../../../hoc";
-  import {
-    AngleLeftIcon,
-    AngleRightIcon,
-    ArrowRightIcon,
-  } from "@sparrow/library/icons";
+  import { AngleLeftIcon } from "@sparrow/library/icons";
+  import { Input } from "@sparrow/library/forms";
 
   interface TreeNode {
     name: string;
     value: string;
-    items?: TreeNode[];
+    items: TreeNode[];
     id: string;
-    checked: boolean;
-    parentId?: string;
+    isSelected: boolean;
+    parentNodeId: string;
+    parentNodeName: string;
+    itemType: string;
   }
 
-  let data = [
-    {
-      name: "asif",
-      value: "",
-      id: 1,
-      checked: false,
-      items: [
-        {
-          name: "q",
-          value: "",
-          id: 2,
-          checked: false,
-          items: [],
-        },
-        {
-          name: "w",
-          value: "",
-          id: 3,
-          checked: false,
-          items: [],
-        },
-        {
-          name: "r",
-          value: "",
-          id: 4,
-          checked: false,
-          items: [
-            {
-              name: "5",
-              value: "",
-              id: 5,
-              checked: false,
-              items: [],
-            },
-            {
-              name: "6",
-              value: "",
-              id: 6,
-              checked: false,
-              items: [],
-            },
-            {
-              name: "7",
-              value: "",
-              id: 7,
-              checked: false,
-              items: [],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      name: "var",
-      value: "",
-      id: 8,
-      checked: false,
-      items: [
-        {
-          name: "b",
-          value: "",
-          id: 9,
-          checked: false,
-          items: [],
-        },
-        {
-          name: "g",
-          value: "",
-          id: 10,
-          checked: false,
-          items: [],
-        },
-        {
-          name: "k",
-          value: "",
-          id: 11,
-          checked: false,
-          items: [],
-        },
-      ],
-    },
-    {
-      name: "nj",
-      value: "",
-      id: 12,
-      checked: false,
-      items: [
-        {
-          name: "e",
-          value: "",
-          id: 13,
-          checked: false,
-          items: [],
-        },
-        {
-          name: "r",
-          value: "",
-          id: 14,
-          checked: false,
-          items: [],
-        },
-        {
-          name: "t",
-          value: "",
-          id: 15,
-          checked: false,
-          items: [],
-        },
-      ],
-    },
-  ];
+  interface ResponseQueryNode {
+    name: string;
+    value: string;
+    items?: ResponseQueryNode[];
+    id: string;
+    isSelected: boolean;
+    parentNodeId: string;
+    parentNodeName: string;
+    isLeafNode: boolean;
+    itemType: string;
+  }
 
-  function levelOrderTraversalByLevel(data: TreeNode[]): TreeNode[][] {
-    const queue: TreeNode[] = [...data]; // Initialize queue with the root nodes
-    const result: TreeNode[][] = []; // To store nodes level by level
+  export let schema;
+  export let updateSchema;
+
+  let data: TreeNode[];
+  $: {
+    if (schema) {
+      try {
+        data = JSON.parse(schema)?.Query?.items;
+        res = levelOrderTraversalByLevel(data, searchData);
+      } catch (e) {
+        console.error(e);
+      }
+      // debugger;
+    }
+  }
+
+  function levelOrderTraversalByLevel(
+    data: TreeNode[],
+    _searchData: string,
+  ): ResponseQueryNode[][] {
+    console.log("raw data", data);
+    if (!data) return [];
+    const searchedData = data.filter((item) => {
+      if (item.name.includes(searchData)) return true;
+      return false;
+    });
+    const queue: TreeNode[] = [...searchedData]; // Initialize queue with the root nodes
+    const result: ResponseQueryNode[][] = []; // To store nodes level by level
 
     while (queue.length > 0) {
       const levelSize = queue.length; // Number of nodes at the current level
-      const currentLevel: TreeNode[] = []; // Array to store nodes of this level
+      const currentLevel: ResponseQueryNode[] = []; // Array to store nodes of this level
 
       for (let i = 0; i < levelSize; i++) {
         const currentNode = queue.shift()!; // Dequeue the next node
@@ -142,20 +66,22 @@
           id: currentNode.id,
           name: currentNode.name,
           value: currentNode.value,
-          checked: currentNode.checked,
-          parentId: currentNode.parentId,
-          parentName: currentNode.parentName,
+          isSelected: currentNode.isSelected,
+          parentNodeId: currentNode.parentNodeId,
+          parentNodeName: currentNode.parentNodeName,
+          isLeafNode: currentNode?.items?.length ? false : true,
+          itemType: currentNode.itemType,
         }); // Add the full object to the current level array
 
         // Enqueue children
         if (currentNode.items && currentNode.items.length > 0) {
           //   queue.push(...currentNode.items);
-          if (currentNode.checked) {
+          if (currentNode.isSelected) {
             currentNode.items.forEach((elem) => {
               queue.push({
                 ...elem,
-                parentId: currentNode.id,
-                parentName: currentNode.name,
+                parentNodeId: currentNode.id,
+                parentNodeName: currentNode.name,
               });
             });
           }
@@ -168,19 +94,52 @@
 
     return result;
   }
-  let res = [];
+  let res: ResponseQueryNode[][] = [];
   onMount(() => {
-    res = levelOrderTraversalByLevel(data);
+    // res = levelOrderTraversalByLevel(data);
   });
 
+  const uncheckAllTheNodes = (item: TreeNode) => {
+    item.isSelected = false;
+    item.value = "";
+    for (let j = 0; j < item?.items?.length; j++) {
+      uncheckAllTheNodes(item.items[j]);
+    }
+  };
+
   const handleCheck = (id: string, level: number) => {
-    const toggleCheckAtLevel = (items: any[], currentLevel: number) => {
+    const toggleCheckAtLevel = (
+      items: any[],
+      currentLevel: number,
+    ): TreeNode[] => {
       if (currentLevel === level) {
         // If we're at the desired level, uncheck all items and check the one with the given id
-        return items.map((item) => ({
-          ...item,
-          checked: item.id === id, // Check the item with the matching id, uncheck others
-        }));
+        let isLeafNode = true;
+        let isChecked = false;
+        items.forEach((item) => {
+          if (item.id === id && item.items.length) {
+            isLeafNode = false;
+          }
+          if (item.id === id && item.isSelected) {
+            isChecked = true;
+          }
+        });
+        if (isChecked) {
+          items.forEach((item) => {
+            if (item.id === id) uncheckAllTheNodes(item);
+          });
+          return items;
+        }
+
+        if (!isLeafNode) {
+          items.forEach((item) => {
+            if (item.items.length) item.isSelected = false;
+          });
+        }
+        items.forEach((item) => {
+          if (item.id === id) item.isSelected = true;
+        });
+        return items;
       }
 
       // If we're not at the desired level, recurse into the `items` array
@@ -192,21 +151,49 @@
 
     // Update the data with the modified check state
     data = toggleCheckAtLevel(data, 0); // Start at level 1 (root level)
-    res = levelOrderTraversalByLevel(data);
+    // res = levelOrderTraversalByLevel(data);
+    const s = JSON.parse(schema);
+    s.Query.items = data;
+    updateSchema(JSON.stringify(s));
   };
+
+  const handleInput = (_id: string, _value: string) => {
+    const searchFieldById = (item: TreeNode): boolean => {
+      if (item.id === _id) {
+        item.value = _value;
+        return true;
+      }
+      for (let j = 0; j < item?.items?.length; j++) {
+        if (searchFieldById(item.items[j])) {
+          return true;
+        }
+      }
+      return false;
+    };
+    for (let i = 0; i < data.length; i++) {
+      if (searchFieldById(data[i])) {
+        const s = JSON.parse(schema);
+        s.Query.items = data;
+        updateSchema(JSON.stringify(s));
+        return;
+      }
+    }
+  };
+
+  const handleinputField = (e: Event, _id: string) =>
+    handleInput(_id, (e.target as HTMLInputElement).value);
+
+  let searchData = "";
 </script>
 
 <div class="d-flex flex-column h-100">
-  <div>
-    <p class="text-fs-12 mb-0 py-2">Clear Query</p>
-  </div>
   <div
     class="d-flex"
     style="border-top:1px solid var(--border-secondary-500); border-bottom:1px solid var(--border-secondary-500);"
   >
     <div
-      class="d-flex py-3 pe-3"
-      style="min-width: 272px; border-right: 1px solid var(--border-secondary-500);"
+      class="d-flex align-items-center py-3 pe-3"
+      style="min-width: 272px; max-width: 272px; border-right: 1px solid var(--border-secondary-500);"
     >
       <WithSelect
         id={"hash9few99"}
@@ -227,6 +214,23 @@
         }}
         disabled={false}
       />
+      <div class="ms-2" style="margin-top: -4px;">
+        <Input
+          id="collectiofen-list-search"
+          width={"100%"}
+          height={"24px"}
+          type="search"
+          searchIconColor={"var(--icon-secondary-170 )"}
+          bind:value={searchData}
+          on:input={(e) => {}}
+          defaultBorderColor="transparent"
+          hoveredBorderColor="var(--border-primary-300)"
+          focusedBorderColor={"var(--border-primary-300)"}
+          class="text-fs-12 bg-tertiary-400 border-radius-2 ellipsis fw-normal px-2"
+          style="outline:none;"
+          placeholder="Search"
+        />
+      </div>
     </div>
     <div class="py-3 ps-3 h-100 d-flex align-items-center">
       <p class="mb-0 text-secondary-200 text-fs-12">folder / folder / folder</p>
@@ -241,16 +245,15 @@
     >
       {#each res as r, index}
         <div
-          class="{index === 0 ? 'p-3 ps-0' : 'p-3'} h-100"
-          style="min-width: 272px; overflow: auto; border-right:1px solid var(--border-secondary-500);
-    
+          class="fields-column h-100 ellipsis"
+          style="min-width: 272px; max-width: 272px; overflow: auto; border-right:1px solid var(--border-secondary-500);
     "
         >
           <div class="d-flex flex-column h-100">
-            <div>
-              {#if r[0]?.parentName}
-                <p class="mb-0 text-fs-12">
-                  {r[0].parentName}
+            <div class="ellipsis">
+              {#if r[0]?.parentNodeName}
+                <p class="mb-0 text-fs-12 ellipsis">
+                  {r[0].parentNodeName}
                 </p>
                 <hr class="mt-2" />
               {/if}
@@ -259,39 +262,78 @@
               {#each r as t}
                 <div
                   class="d-flex align-items-center attribute-row border-radius-2 py-1 px-2 justify-content-between mb-1"
+                  on:click={(e) => {
+                    e.preventDefault();
+                    handleCheck(t.id, index);
+                  }}
                 >
-                  <div class="d-flex align-items-center">
-                    <div style="height:14px; width:14px;" class="me-3">
+                  <div
+                    class="d-flex align-items-center"
+                    style="width:calc(100% - 20px);"
+                  >
+                    <div style="height:14px; width:14px;" class="me-2">
                       <label class="checkbox-parent">
-                        <input
-                          type="checkbox"
-                          bind:checked={t.checked}
-                          on:input={() => {
-                            handleCheck(t.id, index);
-                          }}
-                        />
+                        <input type="checkbox" bind:checked={t.isSelected} />
                         <span class="checkmark"></span>
                       </label>
                     </div>
-                    <p class="text-fs-12 mb-0">
-                      {t.name}
+
+                    <p
+                      class="d-flex align-items-center text-fs-12 mb-0 ellipsis"
+                      style="width: calc(100% - 14px);"
+                    >
+                      <span class="ellipsis">
+                        {t.name}
+                      </span>
+                      {#if t.isLeafNode && t.itemType === "inputField"}
+                        <span class="ms-3 text-fs-8 text-primary-300">
+                          ARG
+                        </span>
+                      {/if}
                     </p>
                   </div>
-                  <span
-                    class="d-flex align-items-center justify-content-center"
-                  >
-                    <AngleLeftIcon
-                      height={"8px"}
-                      width={"8px"}
-                      color="var(--text-secondary-200)"
-                    />
-                  </span>
+                  {#if !t.isLeafNode}
+                    <span
+                      class="d-flex align-items-center justify-content-center"
+                    >
+                      <AngleLeftIcon
+                        height={"8px"}
+                        width={"8px"}
+                        color="var(--text-secondary-200)"
+                      />
+                    </span>
+                  {/if}
                 </div>
+                {#if t.isLeafNode && t.itemType === "inputField" && t.isSelected}
+                  <div class="ps-4 pe-3 mb-2">
+                    <input
+                      type="text"
+                      style="border:1px solid grey; outline:none;"
+                      class="w-100 bg-transparent border-radius-2 px-2 py-1 text-fs-12"
+                      placeholder="Enter value"
+                      value={t.value || ""}
+                      on:input={(e) => {
+                        handleinputField(e, t?.id);
+                      }}
+                    />
+                  </div>
+                {/if}
               {/each}
             </div>
           </div>
         </div>
       {/each}
+      {#if searchData && !res?.length}
+        <div
+          class="fields-column h-100 ellipsis"
+          style="min-width: 272px; max-width: 272px; overflow: auto; border-right:1px solid var(--border-secondary-500);
+    "
+        >
+          <p class="text-fs-12 text-secondary-200" style="text-align: center;">
+            No result found.
+          </p>
+        </div>
+      {/if}
     </div>
   </div>
 </div>
@@ -337,20 +379,20 @@
     background-color: #ccc;
   } */
 
-  /* When the checkbox is checked, add a blue background */
+  /* When the checkbox is isSelected, add a blue background */
   .checkbox-parent input:checked ~ .checkmark {
     border: none;
     background-color: var(--bg-primary-300);
   }
 
-  /* Create the checkmark/indicator (hidden when not checked) */
+  /* Create the checkmark/indicator (hidden when not isSelected) */
   .checkbox-parent .checkmark:after {
     content: "";
     position: absolute;
     display: none;
   }
 
-  /* Show the checkmark when checked */
+  /* Show the checkmark when isSelected */
   .checkbox-parent input:checked ~ .checkmark:after {
     display: block;
   }
@@ -368,6 +410,16 @@
     transform: rotate(45deg);
   }
   .attribute-row:hover {
-    background-color: var(--bg-secondary-600);
+    background-color: var(--bg-secondary-700);
   }
+  .fields-column {
+    padding: 12px;
+  }
+  .fields-column:first-child {
+    padding-left: 0px;
+  }
+  /* .fields-column:last-child {
+    padding-right: 0px;
+    border-right: none !important;
+  } */
 </style>
