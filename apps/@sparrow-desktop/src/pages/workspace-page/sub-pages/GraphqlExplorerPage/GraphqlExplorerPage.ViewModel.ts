@@ -488,7 +488,7 @@ class GraphqlExplorerViewModel {
 
     // Process input object types
     function processInputObjectType(typeName, depth = 0) {
-      if (processedTypes.has(typeName)) return null;
+      if (processedTypes.has(typeName) || depth > 10) return null;
 
       const inputType = types.find((t) => t.name === typeName);
       if (!inputType?.inputFields) return null;
@@ -506,7 +506,7 @@ class GraphqlExplorerViewModel {
 
     // Process object types
     function processObjectType(typeName, depth = 0) {
-      if (processedTypes.has(typeName)) return null;
+      if (processedTypes.has(typeName) || depth > 10) return null;
 
       const objectType = types.find((t) => t.name === typeName);
       if (!objectType?.fields) return null;
@@ -529,7 +529,7 @@ class GraphqlExplorerViewModel {
       depth = 0,
       defaultItemType = "field",
     ) {
-      if (!fields) return [];
+      if (!fields || depth > 10) return [];
 
       return fields.map((field) => {
         const fieldName = field.name;
@@ -647,6 +647,62 @@ class GraphqlExplorerViewModel {
     return result;
   };
 
+  private generateGraphQLQuery = async (json, operationName = "Query") => {
+    // Helper function to process arguments
+    function processArguments(items) {
+      return items
+        .filter((item) => item.itemType === "argument" && item.isSelected)
+        .map((arg) => {
+          const inputFields = processInputFields(arg.items);
+          const value =
+            inputFields.length > 0
+              ? `{ ${inputFields} }`
+              : arg.value !== null
+              ? JSON.stringify(arg.value)
+              : "null";
+
+          return `${arg.name}: ${value}`;
+        })
+        .join(", ");
+    }
+
+    // Helper function to process input fields (nested arguments)
+    function processInputFields(items) {
+      return items
+        .filter((input) => input.isSelected)
+        .map((input) => {
+          const value =
+            input.value !== null ? JSON.stringify(input.value) : "null";
+          return `${input.name}: ${value}`;
+        })
+        .join(", ");
+    }
+
+    // Helper function to process fields and nested fields
+    function processFields(items) {
+      return items
+        .filter((item) => item.itemType === "field" && item.isSelected)
+        .map((field) => {
+          const args = processArguments(field.items); // Process arguments
+          const subFields = processFields(field.items); // Process nested fields
+
+          const fieldWithArgs = args ? `${field.name}(${args})` : field.name;
+
+          // Combine the field with its nested fields (if any)
+          return subFields
+            ? `${fieldWithArgs} { ${subFields} }`
+            : fieldWithArgs;
+        })
+        .join(" ");
+    }
+
+    // Generate the query
+    const queryBody = processFields(json.items);
+    return `${
+      operationName === "Query" ? `query` : "mutation"
+    } ${operationName} {\n  ${queryBody}\n}`;
+  };
+
   /**
    * Updated GraphQL Schema by fetching it.
    * @param _environmentVariables - Environment variables to be embedded in the GraphQL Request.
@@ -724,6 +780,7 @@ class GraphqlExplorerViewModel {
       );
       const responseBody = response.data.body;
       const parsedResponse = JSON.parse(responseBody);
+
       const formattedSchema = this.formatGraphQLSchema(parsedResponse.data);
       progressiveTab.property.graphql.schema = formattedSchema;
       progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
