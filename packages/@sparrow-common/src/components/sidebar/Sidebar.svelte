@@ -44,7 +44,7 @@
       defaultLogo: collections,
       hoveredLogo: hoveredCollections,
       selectedLogo: selectedCollections,
-      disabled: type === "web" ? true : false,
+      disabled: false,
       position: "primary",
     },
     {

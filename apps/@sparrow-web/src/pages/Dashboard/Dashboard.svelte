@@ -19,6 +19,7 @@
   import { Modal } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";
   import { CreateTeam } from "@sparrow/common/features";
+  import CollectionsPage from "../workspace-page/CollectionsPage.svelte";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -188,6 +189,10 @@
       -- Dashboard renders any of the pages between collection, environment and help.
     -->
     <section style="flex:1; overflow:auto;">
+      <!-- Route for Collections -->
+      <Route path="/collections/*">
+        <CollectionsPage />
+      </Route>
       <!-- Route for Team and workspaces - Home Tab -->
       <Route path="/home/*"><Teams /></Route>
 

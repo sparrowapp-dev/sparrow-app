@@ -111,6 +111,7 @@
   export let userRole;
   export let storeData: restExplorerData | undefined;
   export let isTourGuideOpen = false;
+  export let isWebApp = false;
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -357,16 +358,16 @@
                 <div class="h-100 d-flex flex-column">
                   <div style="flex:1; overflow:auto;">
                     {#if storeData?.isSendRequestInProgress}
-                      <ResponseDefaultScreen />
+                      <ResponseDefaultScreen {isWebApp} />
                       <div
                         style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
                       >
                         <Loader loaderSize={"20px"} />
                       </div>
                     {:else if !storeData?.response.status}
-                      <ResponseDefaultScreen />
+                      <ResponseDefaultScreen {isWebApp} />
                     {:else if storeData?.response.status === ResponseStatusCode.ERROR}
-                      <ResponseErrorScreen />
+                      <ResponseErrorScreen {isWebApp} />
                     {:else if storeData?.response.status}
                       <div class="h-100 d-flex flex-column">
                         <ResponseStatus response={storeData.response} />
