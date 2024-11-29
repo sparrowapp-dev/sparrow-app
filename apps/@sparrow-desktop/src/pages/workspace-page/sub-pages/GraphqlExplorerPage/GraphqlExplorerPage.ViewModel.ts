@@ -780,9 +780,8 @@ class GraphqlExplorerViewModel {
       );
       const responseBody = response.data.body;
       const parsedResponse = JSON.parse(responseBody);
-
-      const formattedSchema = this.formatGraphQLSchema(parsedResponse.data);
-      progressiveTab.property.graphql.schema = formattedSchema;
+      const formattedSchema = await this.transformSchema(parsedResponse.data);
+      progressiveTab.property.graphql.schema = JSON.stringify(formattedSchema);
       progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
@@ -867,6 +866,18 @@ class GraphqlExplorerViewModel {
   ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.graphql.headers = _headers;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
+  /**
+   *
+   * @param _headers - request headers
+   */
+  public updateSchema = async (_schema: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.graphql.schema = _schema;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
