@@ -25,7 +25,9 @@
   };
 </script>
 
-<div class="d-flex flex-column align-items-start justify-content-between w-100">
+<div
+  class="d-flex border-radius-2 bg-tertiary-400 flex-column align-items-start justify-content-between w-100"
+>
   <div
     class="response-container d-flex align-items-center justify-content-between z-1 p-2 w-100 position-sticky border-radius-2"
     style="top:55.4px;  margin-top: -1px;"
@@ -45,7 +47,7 @@
             color={"var(--text-secondary-200)"}
           /></span
         >
-        <span style="margin-top: 3px;" class="fw-bold"> Clear Query </span>
+        <span style="margin-top: 3px; font-weight: 500;"> Clear Query </span>
       </button>
     </div>
     {#if response && response?.status}
@@ -148,7 +150,6 @@
 <style>
   .response-container {
     flex-wrap: wrap;
-    background-color: var(--bg-tertiary-400);
   }
 
   .time-primary1 {

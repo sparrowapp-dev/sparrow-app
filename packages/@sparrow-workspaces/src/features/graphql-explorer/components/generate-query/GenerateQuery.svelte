@@ -3,6 +3,7 @@
   import { WithSelect } from "../../../../hoc";
   import { AngleLeftIcon } from "@sparrow/library/icons";
   import { Input } from "@sparrow/library/forms";
+  import { trashIcon } from "@sparrow/library/assets";
 
   interface TreeNode {
     name: string;
@@ -310,17 +311,39 @@
                   {/if}
                 </div>
                 {#if t.isLeafNode && t.itemType === "inputField" && t.isSelected}
-                  <div class="ps-4 pe-3 mb-2">
+                  <div class="ps-4 pe-3 mb-2 position-relative">
                     <input
                       type="text"
                       style="border:1px solid grey; outline:none;"
-                      class="w-100 bg-transparent border-radius-2 px-2 py-1 text-fs-12"
+                      class="arg-input w-100 bg-transparent border-radius-2 px-2 pe-3 py-1 text-fs-12"
                       placeholder="Enter value"
                       value={t.value || ""}
                       on:input={(e) => {
                         handleinputField(e, t?.id);
                       }}
                     />
+                    {#if t?.value}
+                      <span
+                        class="position-absolute"
+                        style="top:0px; right: 22px"
+                        on:click={() => {
+                          handleinputField(
+                            {
+                              target: {
+                                value: "",
+                              },
+                            },
+                            t?.id,
+                          );
+                        }}
+                      >
+                        <img
+                          src={trashIcon}
+                          style="height: 100%; width: 100%;"
+                          class="trashicon"
+                        />
+                      </span>
+                    {/if}
                   </div>
                 {/if}
               {/each}
@@ -432,4 +455,19 @@
     padding-right: 0px;
     border-right: none !important;
   } */
+  .arg-input {
+    /* background-color: var(--bg-secondary-850) !important; */
+    border: 1px solid var(--border-secondary-370) !important;
+    padding-right: 25px !important;
+  }
+  .arg-input:hover,
+  .arg-input:focus {
+    background-color: var(--bg-tertiary-750) !important;
+    border: 1px solid var(--border-primary-300) !important;
+  }
+  hr {
+    height: 4px !important;
+    background-color: var(--bg-secondary-600) !important;
+    border: none !important;
+  }
 </style>

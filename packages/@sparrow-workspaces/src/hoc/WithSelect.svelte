@@ -41,7 +41,7 @@
   headerHeight={"24px"}
   minBodyWidth={"150px"}
   borderRounded={"4px"}
-  headerTheme={"dark-violet"}
+  headerTheme={"violet"}
   bodyTheme={"violet"}
   menuItem={"v2"}
   headerFontSize={"10px"}

@@ -298,7 +298,7 @@
               class="position-relative bg-secondary-850-important"
             >
               <div class="h-100 d-flex flex-column">
-                <div class="mb-2">
+                <div class="mb-2 pt-1">
                   <ResponseStatus
                     response={storeData?.response}
                     {onClearQuery}
