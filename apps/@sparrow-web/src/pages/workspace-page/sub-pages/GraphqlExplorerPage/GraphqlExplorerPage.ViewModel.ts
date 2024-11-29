@@ -27,7 +27,7 @@ import { Events, ItemType, ResponseStatusCode } from "@sparrow/common/enums";
 import type { CreateDirectoryPostBody } from "@sparrow/common/dto";
 
 // ---- Service
-import { makeGraphQLRequest } from "@app/containers/api/api.common";
+// import { makeGraphQLRequest } from "@app/containers/api/api.common";
 import {
   insertCollection,
   insertCollectionDirectory,
@@ -42,7 +42,7 @@ import {
   ResponseSectionEnum,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
-import { GraphqlTabAdapter } from "../../../../adapter";
+// import { GraphqlTabAdapter } from "../../../../adapter";
 import { GuideRepository } from "../../../../repositories/guide.repository";
 import { CollectionService } from "../../../../services/collection.service";
 import { GuestUserRepository } from "../../../../repositories/guest-user.repository";
@@ -443,365 +443,105 @@ class GraphqlExplorerViewModel {
     this.compareRequestWithServer();
   };
 
-  private transformSchema = async (schemaData) => {
-    const types = schemaData.__schema.types;
-    const processedTypes = new Set();
-
-    // Helper function to resolve nested types
-    function resolveType(typeObj) {
-      if (!typeObj) return null;
-
-      // Handle nested types (NON_NULL, LIST)
-      if (typeObj.kind === "NON_NULL") {
-        return resolveType(typeObj.ofType);
-      }
-      if (typeObj.kind === "LIST") {
-        return resolveType(typeObj.ofType);
-      }
-
-      return typeObj.name;
-    }
-
-    // Determine default value based on type
-    function getDefaultValue(typeName) {
-      // Provide default values based on type
-      switch (typeName) {
-        case "String":
-          return "";
-        case "Int":
-        case "Float":
-          return 0;
-        case "Boolean":
-          return false;
-        case "ID":
-          return null;
-        default:
-          return null;
-      }
-    }
-
-    // Helper function to determine if a type is a scalar
-    function isScalarType(typeName) {
-      const scalarTypes = ["String", "Int", "Float", "Boolean", "ID"];
-      return scalarTypes.includes(typeName) || typeName?.startsWith("__");
-    }
-
-    // Process input object types
-    function processInputObjectType(typeName, depth = 0) {
-      if (processedTypes.has(typeName) || depth > 10) return null;
-
-      const inputType = types.find((t) => t.name === typeName);
-      if (!inputType?.inputFields) return null;
-
-      processedTypes.add(typeName);
-      const result = processFields(
-        inputType.inputFields,
-        typeName,
-        depth + 1,
-        "inputField",
-      );
-      processedTypes.delete(typeName);
-      return result;
-    }
-
-    // Process object types
-    function processObjectType(typeName, depth = 0) {
-      if (processedTypes.has(typeName) || depth > 10) return null;
-
-      const objectType = types.find((t) => t.name === typeName);
-      if (!objectType?.fields) return null;
-
-      processedTypes.add(typeName);
-      const result = processFields(
-        objectType.fields,
-        typeName,
-        depth + 1,
-        "field",
-      );
-      processedTypes.delete(typeName);
-      return result;
-    }
-
-    // Recursive field processing
-    function processFields(
-      fields,
-      parentName,
-      depth = 0,
-      defaultItemType = "field",
-    ) {
-      if (!fields || depth > 10) return [];
-
-      return fields.map((field) => {
-        const fieldName = field.name;
-        const typeName = resolveType(field.type);
-        const isCustomType = !isScalarType(typeName);
-
-        let result = {
-          id: uuidv4(), // Add UUID to the top-level object
-          name: fieldName,
-          parentName: parentName,
-          description: field.description,
-          type: typeName,
-          itemType: defaultItemType,
-          isNonNull: field.type.kind === "NON_NULL",
-          isSelected: false,
-          value: getDefaultValue(typeName),
-          items: [],
-        };
-
-        // Process arguments directly into items array
-        if (field.args && field.args.length > 0) {
-          const argumentItems = field.args.map((arg) => {
-            const argTypeName = resolveType(arg.type);
-            const isArgCustomType = !isScalarType(argTypeName);
-
-            const argResult = {
-              id: uuidv4(), // Add UUID to argument objects
-              name: arg.name,
-              type: argTypeName,
-              description: arg.description,
-              itemType: "argument",
-              isNonNull: arg.type.kind === "NON_NULL",
-              isSelected: false,
-              defaultValue: arg.defaultValue,
-              value: getDefaultValue(argTypeName),
-              items: [],
-            };
-
-            // Process nested argument types
-            if (isArgCustomType) {
-              const argInputFields = processInputObjectType(
-                argTypeName,
-                depth + 1,
-              );
-              const argObjectFields = processObjectType(argTypeName, depth + 1);
-
-              // Add UUID to nested items
-              argResult.items = (argInputFields || argObjectFields || []).map(
-                (item) => ({
-                  ...item,
-                  id: uuidv4(),
-                }),
-              );
-            }
-
-            return argResult;
-          });
-
-          // Add arguments to items array
-          result.items.push(...argumentItems);
-        }
-
-        // Process nested custom types
-        if (isCustomType) {
-          const inputFields = processInputObjectType(typeName, depth + 1);
-          const objectFields = processObjectType(typeName, depth + 1);
-
-          // Add nested type fields to items array with UUID
-          if (inputFields) {
-            result.items.push(
-              ...inputFields.map((item) => ({
-                ...item,
-                id: uuidv4(),
-              })),
-            );
-          }
-          if (objectFields) {
-            result.items.push(
-              ...objectFields.map((item) => ({
-                ...item,
-                id: uuidv4(),
-              })),
-            );
-          }
-        }
-
-        return result;
-      });
-    }
-
-    // Find main types
-    const queryType = types.find((t) => t.name === "Query");
-    const mutationType = types.find((t) => t.name === "Mutation");
-    const subscriptionType = types.find((t) => t.name === "Subscription");
-
-    // Reset processed types before starting
-    processedTypes.clear();
-
-    const result = {
-      Query: {
-        items: queryType ? processFields(queryType.fields, "Query") : [],
-      },
-      Mutation: {
-        items: mutationType
-          ? processFields(mutationType.fields, "Mutation")
-          : [],
-      },
-      Subscription: {
-        items: subscriptionType
-          ? processFields(subscriptionType.fields, "Subscription")
-          : [],
-      },
-    };
-
-    return result;
-  };
-
-  private generateGraphQLQuery = async (json, operationName = "Query") => {
-    // Helper function to process arguments
-    function processArguments(items) {
-      return items
-        .filter((item) => item.itemType === "argument" && item.isSelected)
-        .map((arg) => {
-          const inputFields = processInputFields(arg.items);
-          const value =
-            inputFields.length > 0
-              ? `{ ${inputFields} }`
-              : arg.value !== null
-              ? JSON.stringify(arg.value)
-              : "null";
-
-          return `${arg.name}: ${value}`;
-        })
-        .join(", ");
-    }
-
-    // Helper function to process input fields (nested arguments)
-    function processInputFields(items) {
-      return items
-        .filter((input) => input.isSelected)
-        .map((input) => {
-          const value =
-            input.value !== null ? JSON.stringify(input.value) : "null";
-          return `${input.name}: ${value}`;
-        })
-        .join(", ");
-    }
-
-    // Helper function to process fields and nested fields
-    function processFields(items) {
-      return items
-        .filter((item) => item.itemType === "field" && item.isSelected)
-        .map((field) => {
-          const args = processArguments(field.items); // Process arguments
-          const subFields = processFields(field.items); // Process nested fields
-
-          const fieldWithArgs = args ? `${field.name}(${args})` : field.name;
-
-          // Combine the field with its nested fields (if any)
-          return subFields
-            ? `${fieldWithArgs} { ${subFields} }`
-            : fieldWithArgs;
-        })
-        .join(" ");
-    }
-
-    // Generate the query
-    const queryBody = processFields(json.items);
-    return `${
-      operationName === "Query" ? `query` : "mutation"
-    } ${operationName} {\n  ${queryBody}\n}`;
-  };
-
   /**
    * Updated GraphQL Schema by fetching it.
    * @param _environmentVariables - Environment variables to be embedded in the GraphQL Request.
    */
-  public updateRequestSchema = async (
-    _environmentVariables: EnvironmentFilteredVariableBaseInterface[] = [],
-    isFailedNotificationVisible: boolean = true,
-  ) => {
-    const decodeData = this._decodeGraphql.init(
-      this._tab.getValue().property?.graphql as GraphqlRequestTabInterface,
-      _environmentVariables,
-    );
-    console.log(`GraphQL Request initiated with the following details:`);
-    console.table({
-      url: decodeData[0],
-      headers: decodeData[1],
-      query: decodeData[2],
-    });
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    const schemaQuery = `{
-            __schema {
-                types {
-                    kind
-                    name
-                    description
-                    fields(includeDeprecated: true) {
-                        name
-                        description
-                        type {
-                            name
-                            kind
-                            ofType {
-                                name
-                                kind
-                            }
-                        }
-                        args {
-                            name
-                            description
-                            type {
-                                name
-                                kind
-                                ofType {
-                                    name
-                                    kind
-                                }
-                            }
-                            defaultValue
-                        }
-                    }
-                    inputFields {
-                        name
-                        description
-                        type {
-                            name
-                            kind
-                            ofType {
-                                name
-                                kind
-                            }
-                        }
-                    }
-                    enumValues {
-                        name
-                        description
-                    }
-                }
-            }
-        }`;
-    try {
-      const response = await makeGraphQLRequest(
-        decodeData[0],
-        decodeData[1],
-        schemaQuery,
-      );
-      const responseBody = response.data.body;
-      const parsedResponse = JSON.parse(responseBody);
-      const formattedSchema = await this.transformSchema(parsedResponse.data);
-      progressiveTab.property.graphql.schema = JSON.stringify(formattedSchema);
-      progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
-      this.tab = progressiveTab;
-      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-      notifications.success("Schema fetched successfully.");
-    } catch (error) {
-      console.error(error);
-      const newProgressiveTab = createDeepCopy(this._tab.getValue());
-      newProgressiveTab.property.graphql.state.isRequestSchemaFetched = false;
-      this.tab = newProgressiveTab;
-      await this.tabRepository.updateTab(
-        newProgressiveTab.tabId,
-        newProgressiveTab,
-      );
-      if (isFailedNotificationVisible) {
-        notifications.error(
-          "Failed to fetch schema. Please check the URL and try again.",
-        );
-      }
-    }
-  };
+  // public updateRequestSchema = async (
+  //   _environmentVariables: EnvironmentFilteredVariableBaseInterface[] = [],
+  //   isFailedNotificationVisible: boolean = true,
+  // ) => {
+  //   const decodeData = this._decodeGraphql.init(
+  //     this._tab.getValue().property?.graphql as GraphqlRequestTabInterface,
+  //     _environmentVariables,
+  //   );
+  //   console.log(`GraphQL Request initiated with the following details:`);
+  //   console.table({
+  //     url: decodeData[0],
+  //     headers: decodeData[1],
+  //     query: decodeData[2],
+  //   });
+  //   const progressiveTab = createDeepCopy(this._tab.getValue());
+  //   const schemaQuery = `{
+  //           __schema {
+  //               types {
+  //                   kind
+  //                   name
+  //                   description
+  //                   fields(includeDeprecated: true) {
+  //                       name
+  //                       description
+  //                       type {
+  //                           name
+  //                           kind
+  //                           ofType {
+  //                               name
+  //                               kind
+  //                           }
+  //                       }
+  //                       args {
+  //                           name
+  //                           description
+  //                           type {
+  //                               name
+  //                               kind
+  //                               ofType {
+  //                                   name
+  //                                   kind
+  //                               }
+  //                           }
+  //                           defaultValue
+  //                       }
+  //                   }
+  //                   inputFields {
+  //                       name
+  //                       description
+  //                       type {
+  //                           name
+  //                           kind
+  //                           ofType {
+  //                               name
+  //                               kind
+  //                           }
+  //                       }
+  //                   }
+  //                   enumValues {
+  //                       name
+  //                       description
+  //                   }
+  //               }
+  //           }
+  //       }`;
+  //   try {
+  //     const response = await makeGraphQLRequest(
+  //       decodeData[0],
+  //       decodeData[1],
+  //       schemaQuery,
+  //     );
+  //     const responseBody = response.data.body;
+  //     const parsedResponse = JSON.parse(responseBody);
+  //     const formattedSchema = this.formatGraphQLSchema(parsedResponse.data);
+  //     progressiveTab.property.graphql.schema = formattedSchema;
+  //     progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
+  //     this.tab = progressiveTab;
+  //     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  //     notifications.success("Schema fetched successfully.");
+  //   } catch (error) {
+  //     console.error(error);
+  //     const newProgressiveTab = createDeepCopy(this._tab.getValue());
+  //     newProgressiveTab.property.graphql.state.isRequestSchemaFetched = false;
+  //     this.tab = newProgressiveTab;
+  //     await this.tabRepository.updateTab(
+  //       newProgressiveTab.tabId,
+  //       newProgressiveTab,
+  //     );
+  //     if (isFailedNotificationVisible) {
+  //       notifications.error(
+  //         "Failed to fetch schema. Please check the URL and try again.",
+  //       );
+  //     }
+  //   }
+  // };
 
   /**
    *
@@ -866,18 +606,6 @@ class GraphqlExplorerViewModel {
   ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.graphql.headers = _headers;
-    this.tab = progressiveTab;
-    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    this.compareRequestWithServer();
-  };
-
-  /**
-   *
-   * @param _headers - request headers
-   */
-  public updateSchema = async (_schema: string) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.graphql.schema = _schema;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -961,114 +689,114 @@ class GraphqlExplorerViewModel {
    * Initiates GraphQL Request to the server.
    * @param _environmentVariables - Environment variables to be embedded in the GraphQL Request.
    */
-  public sendRequest = async (
-    _environmentVariables: EnvironmentFilteredVariableBaseInterface[] = [],
-  ) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    const abortController = new AbortController();
-    graphqlExplorerDataStore.update((restApiDataMap) => {
-      let data = restApiDataMap.get(progressiveTab.tabId);
-      if (data) {
-        data.abortController = abortController;
-      } else {
-        data = {
-          abortController: abortController,
-          response: {
-            body: "",
-            headers: [],
-            status: "",
-            time: 0,
-            size: 0,
-            navigation: ResponseSectionEnum.RESPONSE,
-          },
-          isSendRequestInProgress: false,
-        };
-      }
-      restApiDataMap.set(progressiveTab.tabId, data);
-      return restApiDataMap;
-    });
-    // Create an AbortController for the request
-    const { signal } = abortController;
+  // public sendRequest = async (
+  //   _environmentVariables: EnvironmentFilteredVariableBaseInterface[] = [],
+  // ) => {
+  //   const progressiveTab = createDeepCopy(this._tab.getValue());
+  //   const abortController = new AbortController();
+  //   graphqlExplorerDataStore.update((restApiDataMap) => {
+  //     let data = restApiDataMap.get(progressiveTab.tabId);
+  //     if (data) {
+  //       data.abortController = abortController;
+  //     } else {
+  //       data = {
+  //         abortController: abortController,
+  //         response: {
+  //           body: "",
+  //           headers: [],
+  //           status: "",
+  //           time: 0,
+  //           size: 0,
+  //           navigation: ResponseSectionEnum.RESPONSE,
+  //         },
+  //         isSendRequestInProgress: false,
+  //       };
+  //     }
+  //     restApiDataMap.set(progressiveTab.tabId, data);
+  //     return restApiDataMap;
+  //   });
+  //   // Create an AbortController for the request
+  //   const { signal } = abortController;
 
-    graphqlExplorerDataStore.update((restApiDataMap) => {
-      let data = restApiDataMap.get(progressiveTab?.tabId);
-      if (data) {
-        data.isSendRequestInProgress = true;
-        restApiDataMap.set(progressiveTab.tabId, data);
-      }
-      return restApiDataMap;
-    });
-    const start = Date.now();
+  //   graphqlExplorerDataStore.update((restApiDataMap) => {
+  //     let data = restApiDataMap.get(progressiveTab?.tabId);
+  //     if (data) {
+  //       data.isSendRequestInProgress = true;
+  //       restApiDataMap.set(progressiveTab.tabId, data);
+  //     }
+  //     return restApiDataMap;
+  //   });
+  //   const start = Date.now();
 
-    const decodeData = this._decodeGraphql.init(
-      this._tab.getValue().property?.graphql as GraphqlRequestTabInterface,
-      _environmentVariables,
-    );
-    console.log(`GraphQL Request initiated with the following details:`);
-    console.table({
-      url: decodeData[0],
-      headers: decodeData[1],
-      query: decodeData[2],
-    });
-    makeGraphQLRequest(decodeData[0], decodeData[1], decodeData[2], signal)
-      .then((response) => {
-        const end = Date.now();
-        const byteLength = new TextEncoder().encode(
-          JSON.stringify(response),
-        ).length;
-        const responseSizeKB = byteLength / 1024;
-        const duration = end - start;
+  //   const decodeData = this._decodeGraphql.init(
+  //     this._tab.getValue().property?.graphql as GraphqlRequestTabInterface,
+  //     _environmentVariables,
+  //   );
+  //   console.log(`GraphQL Request initiated with the following details:`);
+  //   console.table({
+  //     url: decodeData[0],
+  //     headers: decodeData[1],
+  //     query: decodeData[2],
+  //   });
+  //   makeGraphQLRequest(decodeData[0], decodeData[1], decodeData[2], signal)
+  //     .then((response) => {
+  //       const end = Date.now();
+  //       const byteLength = new TextEncoder().encode(
+  //         JSON.stringify(response),
+  //       ).length;
+  //       const responseSizeKB = byteLength / 1024;
+  //       const duration = end - start;
 
-        const responseBody = response.data.body;
-        const formattedHeaders = Object.entries(response?.data?.headers || {});
-        const responseHeaders: {
-          key: string;
-          value: string;
-        }[] = [];
-        formattedHeaders.forEach((elem) => {
-          responseHeaders.push({
-            key: elem[0],
-            value: elem[1],
-          });
-        });
-        let responseStatus = response.data.status;
+  //       const responseBody = response.data.body;
+  //       const formattedHeaders = Object.entries(response?.data?.headers || {});
+  //       const responseHeaders: {
+  //         key: string;
+  //         value: string;
+  //       }[] = [];
+  //       formattedHeaders.forEach((elem) => {
+  //         responseHeaders.push({
+  //           key: elem[0],
+  //           value: elem[1],
+  //         });
+  //       });
+  //       let responseStatus = response.data.status;
 
-        graphqlExplorerDataStore.update((restApiDataMap) => {
-          let data = restApiDataMap.get(progressiveTab?.tabId);
-          if (data) {
-            data.response.body = responseBody;
-            data.response.headers = responseHeaders;
-            data.response.status = responseStatus;
-            data.response.time = duration;
-            data.response.size = responseSizeKB;
-            data.isSendRequestInProgress = false;
-            restApiDataMap.set(progressiveTab.tabId, data);
-          }
-          return restApiDataMap;
-        });
-      })
-      .catch((error) => {
-        console.error(error);
-        // Handle cancellation or other errors
-        if (error.name === "AbortError") {
-          return;
-        }
+  //       graphqlExplorerDataStore.update((restApiDataMap) => {
+  //         let data = restApiDataMap.get(progressiveTab?.tabId);
+  //         if (data) {
+  //           data.response.body = responseBody;
+  //           data.response.headers = responseHeaders;
+  //           data.response.status = responseStatus;
+  //           data.response.time = duration;
+  //           data.response.size = responseSizeKB;
+  //           data.isSendRequestInProgress = false;
+  //           restApiDataMap.set(progressiveTab.tabId, data);
+  //         }
+  //         return restApiDataMap;
+  //       });
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //       // Handle cancellation or other errors
+  //       if (error.name === "AbortError") {
+  //         return;
+  //       }
 
-        graphqlExplorerDataStore.update((restApiDataMap) => {
-          const data = restApiDataMap.get(progressiveTab?.tabId);
-          if (data) {
-            data.response.body = "";
-            data.response.headers = [];
-            data.response.status = ResponseStatusCode.ERROR;
-            data.response.time = 0;
-            data.response.size = 0;
-            data.isSendRequestInProgress = false;
-            restApiDataMap.set(progressiveTab.tabId, data);
-          }
-          return restApiDataMap;
-        });
-      });
-  };
+  //       graphqlExplorerDataStore.update((restApiDataMap) => {
+  //         const data = restApiDataMap.get(progressiveTab?.tabId);
+  //         if (data) {
+  //           data.response.body = "";
+  //           data.response.headers = [];
+  //           data.response.status = ResponseStatusCode.ERROR;
+  //           data.response.time = 0;
+  //           data.response.size = 0;
+  //           data.isSendRequestInProgress = false;
+  //           restApiDataMap.set(progressiveTab.tabId, data);
+  //         }
+  //         return restApiDataMap;
+  //       });
+  //     });
+  // };
 
   /**
    * aborts the ongoing api request
@@ -1316,124 +1044,124 @@ class GraphqlExplorerViewModel {
    * @param saveDescriptionOnly - refers save overall request data or only description as a documentation purpose.
    * @returns save status
    */
-  public saveRequest = async () => {
-    MixpanelEvent(Events.Save_GraphQL_Request);
-    const graphqlTabData = this._tab.getValue();
-    const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
+  // public saveRequest = async () => {
+  //   MixpanelEvent(Events.Save_GraphQL_Request);
+  //   const graphqlTabData = this._tab.getValue();
+  //   const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
 
-    if (!workspaceId || !collectionId) {
-      return {
-        status: "error",
-        message: "request is not a part of any workspace or collection",
-      };
-    }
+  //   if (!workspaceId || !collectionId) {
+  //     return {
+  //       status: "error",
+  //       message: "request is not a part of any workspace or collection",
+  //     };
+  //   }
 
-    const graphqlTabAdapter = new GraphqlTabAdapter();
-    const unadaptedRequest = graphqlTabAdapter.unadapt(graphqlTabData as Tab);
+  //   const graphqlTabAdapter = new GraphqlTabAdapter();
+  //   const unadaptedRequest = graphqlTabAdapter.unadapt(graphqlTabData as Tab);
 
-    const isGuestUser = await this.getGuestUserState();
-    /**
-     * Handle save GraphQL Request for guest user
-     */
-    if (isGuestUser) {
-      const guestGraphqlRequest = {
-        id: graphqlTabData.id,
-        name: graphqlTabData.name,
-        description: graphqlTabData.description,
-        type: CollectionItemTypeBaseEnum.GRAPHQL,
-        graphql: {
-          url: unadaptedRequest.url as string,
-          query: unadaptedRequest.query,
-          schema: unadaptedRequest.schema,
-          headers: unadaptedRequest.headers,
-          auth: unadaptedRequest.auth,
-          selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
-        },
-        updatedAt: "",
-        updatedBy: "Guest User",
-      };
+  //   const isGuestUser = await this.getGuestUserState();
+  //   /**
+  //    * Handle save GraphQL Request for guest user
+  //    */
+  //   if (isGuestUser) {
+  //     const guestGraphqlRequest = {
+  //       id: graphqlTabData.id,
+  //       name: graphqlTabData.name,
+  //       description: graphqlTabData.description,
+  //       type: CollectionItemTypeBaseEnum.GRAPHQL,
+  //       graphql: {
+  //         url: unadaptedRequest.url as string,
+  //         query: unadaptedRequest.query,
+  //         schema: unadaptedRequest.schema,
+  //         headers: unadaptedRequest.headers,
+  //         auth: unadaptedRequest.auth,
+  //         selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
+  //       },
+  //       updatedAt: "",
+  //       updatedBy: "Guest User",
+  //     };
 
-      graphqlTabData.isSaved = true;
-      this.tab = graphqlTabData;
-      await this.tabRepository.updateTab(
-        graphqlTabData.tabId as string,
-        graphqlTabData,
-      );
-      if (!folderId) {
-        this.collectionRepository.updateRequestOrFolderInCollection(
-          collectionId,
-          graphqlTabData.id as string,
-          guestGraphqlRequest,
-        );
-      } else {
-        this.collectionRepository.updateRequestInFolder(
-          collectionId,
-          folderId,
-          graphqlTabData.id as string,
-          guestGraphqlRequest,
-        );
-      }
-      return {
-        status: "success",
-        message: "",
-      };
-    }
+  //     graphqlTabData.isSaved = true;
+  //     this.tab = graphqlTabData;
+  //     await this.tabRepository.updateTab(
+  //       graphqlTabData.tabId as string,
+  //       graphqlTabData,
+  //     );
+  //     if (!folderId) {
+  //       this.collectionRepository.updateRequestOrFolderInCollection(
+  //         collectionId,
+  //         graphqlTabData.id as string,
+  //         guestGraphqlRequest,
+  //       );
+  //     } else {
+  //       this.collectionRepository.updateRequestInFolder(
+  //         collectionId,
+  //         folderId,
+  //         graphqlTabData.id as string,
+  //         guestGraphqlRequest,
+  //       );
+  //     }
+  //     return {
+  //       status: "success",
+  //       message: "",
+  //     };
+  //   }
 
-    /**
-     * Handle save GraphQL Request for registered user
-     */
+  //   /**
+  //    * Handle save GraphQL Request for registered user
+  //    */
 
-    const graphqlPayload = {
-      name: graphqlTabData?.name as string,
-      description: graphqlTabData?.description as string,
-      url: unadaptedRequest.url as string,
-      query: unadaptedRequest.query,
-      schema: unadaptedRequest.schema,
-      headers: unadaptedRequest.headers,
-      auth: unadaptedRequest.auth,
-      selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
-    };
+  //   const graphqlPayload = {
+  //     name: graphqlTabData?.name as string,
+  //     description: graphqlTabData?.description as string,
+  //     url: unadaptedRequest.url as string,
+  //     query: unadaptedRequest.query,
+  //     schema: unadaptedRequest.schema,
+  //     headers: unadaptedRequest.headers,
+  //     auth: unadaptedRequest.auth,
+  //     selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
+  //   };
 
-    const res = await this.collectionService.updateGraphqlInCollection(
-      graphqlTabData.id as string,
-      collectionId,
-      workspaceId,
-      graphqlPayload,
-      folderId,
-    );
+  //   const res = await this.collectionService.updateGraphqlInCollection(
+  //     graphqlTabData.id as string,
+  //     collectionId,
+  //     workspaceId,
+  //     graphqlPayload,
+  //     folderId,
+  //   );
 
-    if (res.isSuccessful) {
-      graphqlTabData.isSaved = true;
-      this.tab = graphqlTabData;
-      await this.tabRepository.updateTab(
-        graphqlTabData.tabId as string,
-        graphqlTabData,
-      );
-      if (!folderId) {
-        this.collectionRepository.updateRequestOrFolderInCollection(
-          collectionId,
-          graphqlTabData.id as string,
-          res.data.data,
-        );
-      } else {
-        this.collectionRepository.updateRequestInFolder(
-          collectionId,
-          folderId,
-          graphqlTabData.id as string,
-          res.data.data,
-        );
-      }
-      return {
-        status: "success",
-        message: res.message,
-      };
-    } else {
-      return {
-        status: "error",
-        message: res.message,
-      };
-    }
-  };
+  //   if (res.isSuccessful) {
+  //     graphqlTabData.isSaved = true;
+  //     this.tab = graphqlTabData;
+  //     await this.tabRepository.updateTab(
+  //       graphqlTabData.tabId as string,
+  //       graphqlTabData,
+  //     );
+  //     if (!folderId) {
+  //       this.collectionRepository.updateRequestOrFolderInCollection(
+  //         collectionId,
+  //         graphqlTabData.id as string,
+  //         res.data.data,
+  //       );
+  //     } else {
+  //       this.collectionRepository.updateRequestInFolder(
+  //         collectionId,
+  //         folderId,
+  //         graphqlTabData.id as string,
+  //         res.data.data,
+  //       );
+  //     }
+  //     return {
+  //       status: "success",
+  //       message: res.message,
+  //     };
+  //   } else {
+  //     return {
+  //       status: "error",
+  //       message: res.message,
+  //     };
+  //   }
+  // };
 
   /**
    *
@@ -1499,336 +1227,336 @@ class GraphqlExplorerViewModel {
    * @param description - request description
    * @param type - save over all request or description only
    */
-  public saveAsRequest = async (
-    _workspaceMeta: {
-      id: string;
-      name: string;
-    },
-    path: {
-      name: string;
-      id: string;
-      type: string;
-    }[],
-    tabName: string,
-    description: string,
-  ) => {
-    const componentData = this._tab.getValue();
-    let userSource = {};
-    const _id = componentData.id;
-    if (path.length > 0) {
-      const graphqlTabAdapter = new GraphqlTabAdapter();
-      const unadaptedRequest = graphqlTabAdapter.unadapt(componentData as Tab);
-      let req = {
-        id: uuidv4(),
-        name: tabName,
-        description,
-        type: ItemType.GRAPHQL,
-        graphql: unadaptedRequest,
-        source: "USER",
-        isDeleted: false,
-        createdBy: "Guest User",
-        updatedBy: "Guest User",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      if (path[path.length - 1].type === ItemType.COLLECTION) {
-        /**
-         * handle request at collection level
-         */
-        const _collection = await this.readCollection(path[path.length - 1].id);
-        if (_collection?.activeSync) {
-          userSource = {
-            currentBranch: _collection?.currentBranch,
-            source: "USER",
-          };
-        }
-        const isGuestUser = await this.getGuestUserState();
+  // public saveAsRequest = async (
+  //   _workspaceMeta: {
+  //     id: string;
+  //     name: string;
+  //   },
+  //   path: {
+  //     name: string;
+  //     id: string;
+  //     type: string;
+  //   }[],
+  //   tabName: string,
+  //   description: string,
+  // ) => {
+  //   const componentData = this._tab.getValue();
+  //   let userSource = {};
+  //   const _id = componentData.id;
+  //   if (path.length > 0) {
+  //     const graphqlTabAdapter = new GraphqlTabAdapter();
+  //     const unadaptedRequest = graphqlTabAdapter.unadapt(componentData as Tab);
+  //     let req = {
+  //       id: uuidv4(),
+  //       name: tabName,
+  //       description,
+  //       type: ItemType.GRAPHQL,
+  //       graphql: unadaptedRequest,
+  //       source: "USER",
+  //       isDeleted: false,
+  //       createdBy: "Guest User",
+  //       updatedBy: "Guest User",
+  //       createdAt: new Date().toISOString(),
+  //       updatedAt: new Date().toISOString(),
+  //     };
+  //     if (path[path.length - 1].type === ItemType.COLLECTION) {
+  //       /**
+  //        * handle request at collection level
+  //        */
+  //       const _collection = await this.readCollection(path[path.length - 1].id);
+  //       if (_collection?.activeSync) {
+  //         userSource = {
+  //           currentBranch: _collection?.currentBranch,
+  //           source: "USER",
+  //         };
+  //       }
+  //       const isGuestUser = await this.getGuestUserState();
 
-        if (isGuestUser == true) {
-          this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
-          const expectedPath = {
-            folderId: "",
-            folderName: "",
-            collectionId: path[path.length - 1].id,
-            workspaceId: _workspaceMeta.id,
-          };
-          if (
-            !componentData.path?.workspaceId ||
-            !componentData.path?.collectionId
-          ) {
-            /**
-             * Update existing request
-             */
-            this.updateRequestName(req.name);
-            this.updateRequestDescription(req.description);
-            this.updateRequestPath(expectedPath);
-            this.updateRequestId(req.id);
-            const progressiveTab = this._tab.getValue();
-            progressiveTab.isSaved = true;
-            this.tab = progressiveTab;
-            await this.tabRepository.updateTab(
-              progressiveTab.tabId as string,
-              progressiveTab,
-            );
-          } else {
-            /**
-             * Create new copy of the existing request
-             */
-            const initRequestTab = new InitTab().graphQl(req.id, "UNTRACKED-");
-            initRequestTab.updateName(req.name);
-            initRequestTab.updateDescription(req.description);
-            initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(req.graphql.url as string);
-            initRequestTab.updateQuery(req.graphql.query as string);
-            initRequestTab.updateSchema(req.graphql.schema as string);
-            initRequestTab.updateAuth(
-              req.graphql.auth as GraphqlRequestAuthTabInterface,
-            );
-            initRequestTab.updateHeaders(
-              req.graphql.headers as GraphqlRequestHeadersTabInterface[],
-            );
+  //       if (isGuestUser == true) {
+  //         this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
+  //         const expectedPath = {
+  //           folderId: "",
+  //           folderName: "",
+  //           collectionId: path[path.length - 1].id,
+  //           workspaceId: _workspaceMeta.id,
+  //         };
+  //         if (
+  //           !componentData.path?.workspaceId ||
+  //           !componentData.path?.collectionId
+  //         ) {
+  //           /**
+  //            * Update existing request
+  //            */
+  //           this.updateRequestName(req.name);
+  //           this.updateRequestDescription(req.description);
+  //           this.updateRequestPath(expectedPath);
+  //           this.updateRequestId(req.id);
+  //           const progressiveTab = this._tab.getValue();
+  //           progressiveTab.isSaved = true;
+  //           this.tab = progressiveTab;
+  //           await this.tabRepository.updateTab(
+  //             progressiveTab.tabId as string,
+  //             progressiveTab,
+  //           );
+  //         } else {
+  //           /**
+  //            * Create new copy of the existing request
+  //            */
+  //           const initRequestTab = new InitTab().graphQl(req.id, "UNTRACKED-");
+  //           initRequestTab.updateName(req.name);
+  //           initRequestTab.updateDescription(req.description);
+  //           initRequestTab.updatePath(expectedPath);
+  //           initRequestTab.updateUrl(req.graphql.url as string);
+  //           initRequestTab.updateQuery(req.graphql.query as string);
+  //           initRequestTab.updateSchema(req.graphql.schema as string);
+  //           initRequestTab.updateAuth(
+  //             req.graphql.auth as GraphqlRequestAuthTabInterface,
+  //           );
+  //           initRequestTab.updateHeaders(
+  //             req.graphql.headers as GraphqlRequestHeadersTabInterface[],
+  //           );
 
-            this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
-          }
-          return {
-            status: "success",
-            message: "success",
-            data: {
-              id: req.id,
-            },
-          };
-        }
-        const res = await this.collectionService.addGraphqlInCollection({
-          collectionId: path[path.length - 1].id,
-          workspaceId: _workspaceMeta.id,
-          ...userSource,
-          items: {
-            name: tabName,
-            description,
-            type: CollectionItemTypeBaseEnum.GRAPHQL,
-            graphql: unadaptedRequest,
-          },
-        });
-        if (res.isSuccessful) {
-          this.addRequestOrFolderInCollection(
-            path[path.length - 1].id,
-            res.data.data,
-          );
-          const expectedPath = {
-            folderId: "",
-            folderName: "",
-            collectionId: path[path.length - 1].id,
-            workspaceId: _workspaceMeta.id,
-          };
-          if (
-            !componentData.path?.workspaceId ||
-            !componentData.path?.collectionId
-          ) {
-            /**
-             * Update existing request
-             */
-            await this.updateRequestName(res.data.data.name);
-            await this.updateRequestDescription(
-              res.data.data.description as string,
-            );
-            await this.updateRequestPath(expectedPath);
-            await this.updateRequestId(res.data.data.id as string);
-            const progressiveTab = this._tab.getValue();
-            progressiveTab.isSaved = true;
-            this.tab = progressiveTab;
-            await this.tabRepository.updateTab(
-              progressiveTab.tabId as string,
-              progressiveTab,
-            );
-          } else {
-            /**
-             * Create new copy of the existing request
-             */
-            const initRequestTab = new InitTab().graphQl(
-              res.data.data.id as string,
-              "UNTRACKED-",
-            );
-            initRequestTab.updateName(res.data.data.name);
-            initRequestTab.updateDescription(
-              res.data.data.description as string,
-            );
-            initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(res.data.data.graphql?.url as string);
-            initRequestTab.updateQuery(res.data.data.graphql?.query as string);
-            initRequestTab.updateSchema(
-              res.data.data.graphql?.schema as string,
-            );
-            initRequestTab.updateAuth(
-              res.data.data.graphql?.auth as GraphqlRequestAuthTabInterface,
-            );
-            initRequestTab.updateHeaders(
-              res.data.data.graphql
-                ?.headers as GraphqlRequestHeadersTabInterface[],
-            );
+  //           this.tabRepository.createTab(initRequestTab.getValue());
+  //           moveNavigation("right");
+  //         }
+  //         return {
+  //           status: "success",
+  //           message: "success",
+  //           data: {
+  //             id: req.id,
+  //           },
+  //         };
+  //       }
+  //       const res = await this.collectionService.addGraphqlInCollection({
+  //         collectionId: path[path.length - 1].id,
+  //         workspaceId: _workspaceMeta.id,
+  //         ...userSource,
+  //         items: {
+  //           name: tabName,
+  //           description,
+  //           type: CollectionItemTypeBaseEnum.GRAPHQL,
+  //           graphql: unadaptedRequest,
+  //         },
+  //       });
+  //       if (res.isSuccessful) {
+  //         this.addRequestOrFolderInCollection(
+  //           path[path.length - 1].id,
+  //           res.data.data,
+  //         );
+  //         const expectedPath = {
+  //           folderId: "",
+  //           folderName: "",
+  //           collectionId: path[path.length - 1].id,
+  //           workspaceId: _workspaceMeta.id,
+  //         };
+  //         if (
+  //           !componentData.path?.workspaceId ||
+  //           !componentData.path?.collectionId
+  //         ) {
+  //           /**
+  //            * Update existing request
+  //            */
+  //           await this.updateRequestName(res.data.data.name);
+  //           await this.updateRequestDescription(
+  //             res.data.data.description as string,
+  //           );
+  //           await this.updateRequestPath(expectedPath);
+  //           await this.updateRequestId(res.data.data.id as string);
+  //           const progressiveTab = this._tab.getValue();
+  //           progressiveTab.isSaved = true;
+  //           this.tab = progressiveTab;
+  //           await this.tabRepository.updateTab(
+  //             progressiveTab.tabId as string,
+  //             progressiveTab,
+  //           );
+  //         } else {
+  //           /**
+  //            * Create new copy of the existing request
+  //            */
+  //           const initRequestTab = new InitTab().graphQl(
+  //             res.data.data.id as string,
+  //             "UNTRACKED-",
+  //           );
+  //           initRequestTab.updateName(res.data.data.name);
+  //           initRequestTab.updateDescription(
+  //             res.data.data.description as string,
+  //           );
+  //           initRequestTab.updatePath(expectedPath);
+  //           initRequestTab.updateUrl(res.data.data.graphql?.url as string);
+  //           initRequestTab.updateQuery(res.data.data.graphql?.query as string);
+  //           initRequestTab.updateSchema(
+  //             res.data.data.graphql?.schema as string,
+  //           );
+  //           initRequestTab.updateAuth(
+  //             res.data.data.graphql?.auth as GraphqlRequestAuthTabInterface,
+  //           );
+  //           initRequestTab.updateHeaders(
+  //             res.data.data.graphql
+  //               ?.headers as GraphqlRequestHeadersTabInterface[],
+  //           );
 
-            this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
-          }
-          return {
-            status: "success",
-            message: res.message,
-            data: {
-              id: res.data.data.id,
-            },
-          };
-        } else {
-          return {
-            status: "error",
-            message: res.message,
-          };
-        }
-      } else if (path[path.length - 1].type === ItemType.FOLDER) {
-        /**
-         * handle request at folder level
-         */
-        const _collection = await this.readCollection(path[0].id);
-        if (_collection?.activeSync) {
-          userSource = {
-            currentBranch: _collection?.currentBranch,
-            source: "USER",
-          };
-        }
-        const isGuestUser = await this.getGuestUserState();
+  //           this.tabRepository.createTab(initRequestTab.getValue());
+  //           moveNavigation("right");
+  //         }
+  //         return {
+  //           status: "success",
+  //           message: res.message,
+  //           data: {
+  //             id: res.data.data.id,
+  //           },
+  //         };
+  //       } else {
+  //         return {
+  //           status: "error",
+  //           message: res.message,
+  //         };
+  //       }
+  //     } else if (path[path.length - 1].type === ItemType.FOLDER) {
+  //       /**
+  //        * handle request at folder level
+  //        */
+  //       const _collection = await this.readCollection(path[0].id);
+  //       if (_collection?.activeSync) {
+  //         userSource = {
+  //           currentBranch: _collection?.currentBranch,
+  //           source: "USER",
+  //         };
+  //       }
+  //       const isGuestUser = await this.getGuestUserState();
 
-        if (isGuestUser == true) {
-          this.addRequestInFolder(path[0].id, path[path.length - 1].id, req);
-          const expectedPath = {
-            folderId: path[path.length - 1].id,
-            folderName: path[path.length - 1].name,
-            collectionId: path[0].id,
-            workspaceId: _workspaceMeta.id,
-          };
-          if (
-            !componentData.path?.workspaceId ||
-            !componentData.path?.collectionId
-          ) {
-            await this.updateRequestName(req.name);
-            await this.updateRequestDescription(req.description);
-            await this.updateRequestPath(expectedPath);
-            await this.updateRequestId(req.id);
-            const progressiveTab = this._tab.getValue();
-            progressiveTab.isSaved = true;
-            this.tab = progressiveTab;
-            await this.tabRepository.updateTab(
-              progressiveTab.tabId as string,
-              progressiveTab,
-            );
-          } else {
-            const initRequestTab = new InitTab().graphQl(req.id, "UNTRACKED-");
-            initRequestTab.updateName(req.name);
-            initRequestTab.updateDescription(req.description);
-            initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(req.graphql?.url as string);
-            initRequestTab.updateQuery(req.graphql?.query as string);
-            initRequestTab.updateSchema(req.graphql?.schema as string);
-            initRequestTab.updateAuth(
-              req.graphql?.auth as GraphqlRequestAuthTabInterface,
-            );
-            initRequestTab.updateHeaders(
-              req.graphql?.headers as GraphqlRequestHeadersTabInterface[],
-            );
-            this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
-          }
-          return {
-            status: "success",
-            message: "success",
-            data: {
-              id: req.id,
-            },
-          };
-        }
-        const res = await this.collectionService.addGraphqlInCollection({
-          collectionId: path[0].id,
-          workspaceId: _workspaceMeta.id,
-          folderId: path[path.length - 1].id,
-          ...userSource,
-          items: {
-            id: path[path.length - 1].id,
-            type: CollectionItemTypeBaseEnum.FOLDER,
-            items: {
-              name: tabName,
-              description,
-              type: CollectionItemTypeBaseEnum.GRAPHQL,
-              graphql: unadaptedRequest,
-            },
-          },
-        });
-        if (res.isSuccessful) {
-          this.addRequestInFolder(
-            path[0].id,
-            path[path.length - 1].id,
-            res.data.data,
-          );
-          const expectedPath = {
-            folderId: path[path.length - 1].id,
-            folderName: path[path.length - 1].name,
-            collectionId: path[0].id,
-            workspaceId: _workspaceMeta.id,
-          };
-          if (
-            !componentData.path?.workspaceId ||
-            !componentData.path?.collectionId
-          ) {
-            this.updateRequestName(res.data.data.name);
-            this.updateRequestDescription(res.data.data.description as string);
-            this.updateRequestPath(expectedPath);
-            this.updateRequestId(res.data.data.id as string);
-            const progressiveTab = this._tab.getValue();
-            progressiveTab.isSaved = true;
-            this.tab = progressiveTab;
-            this.tabRepository.updateTab(
-              progressiveTab.tabId as string,
-              progressiveTab,
-            );
-          } else {
-            const initRequestTab = new InitTab().graphQl(
-              res.data.data.id as string,
-              "UNTRACKED-",
-            );
-            initRequestTab.updateName(res.data.data.name);
-            initRequestTab.updateDescription(
-              res.data.data.description as string,
-            );
-            initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(res.data.data.graphql?.url as string);
-            initRequestTab.updateQuery(res.data.data.graphql?.query as string);
-            initRequestTab.updateSchema(
-              res.data.data.graphql?.schema as string,
-            );
-            initRequestTab.updateAuth(
-              res.data.data.graphql?.auth as GraphqlRequestAuthTabInterface,
-            );
-            initRequestTab.updateHeaders(
-              res.data.data.graphql
-                ?.headers as GraphqlRequestHeadersTabInterface[],
-            );
-            this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
-          }
-          return {
-            status: "success",
-            message: res.message,
-            data: {
-              id: res.data.data.id,
-            },
-          };
-        } else {
-          return {
-            status: "error",
-            message: res.message,
-          };
-        }
-      }
-      MixpanelEvent(Events.Save_GraphQL_Request);
-    }
-  };
+  //       if (isGuestUser == true) {
+  //         this.addRequestInFolder(path[0].id, path[path.length - 1].id, req);
+  //         const expectedPath = {
+  //           folderId: path[path.length - 1].id,
+  //           folderName: path[path.length - 1].name,
+  //           collectionId: path[0].id,
+  //           workspaceId: _workspaceMeta.id,
+  //         };
+  //         if (
+  //           !componentData.path?.workspaceId ||
+  //           !componentData.path?.collectionId
+  //         ) {
+  //           await this.updateRequestName(req.name);
+  //           await this.updateRequestDescription(req.description);
+  //           await this.updateRequestPath(expectedPath);
+  //           await this.updateRequestId(req.id);
+  //           const progressiveTab = this._tab.getValue();
+  //           progressiveTab.isSaved = true;
+  //           this.tab = progressiveTab;
+  //           await this.tabRepository.updateTab(
+  //             progressiveTab.tabId as string,
+  //             progressiveTab,
+  //           );
+  //         } else {
+  //           const initRequestTab = new InitTab().graphQl(req.id, "UNTRACKED-");
+  //           initRequestTab.updateName(req.name);
+  //           initRequestTab.updateDescription(req.description);
+  //           initRequestTab.updatePath(expectedPath);
+  //           initRequestTab.updateUrl(req.graphql?.url as string);
+  //           initRequestTab.updateQuery(req.graphql?.query as string);
+  //           initRequestTab.updateSchema(req.graphql?.schema as string);
+  //           initRequestTab.updateAuth(
+  //             req.graphql?.auth as GraphqlRequestAuthTabInterface,
+  //           );
+  //           initRequestTab.updateHeaders(
+  //             req.graphql?.headers as GraphqlRequestHeadersTabInterface[],
+  //           );
+  //           this.tabRepository.createTab(initRequestTab.getValue());
+  //           moveNavigation("right");
+  //         }
+  //         return {
+  //           status: "success",
+  //           message: "success",
+  //           data: {
+  //             id: req.id,
+  //           },
+  //         };
+  //       }
+  //       const res = await this.collectionService.addGraphqlInCollection({
+  //         collectionId: path[0].id,
+  //         workspaceId: _workspaceMeta.id,
+  //         folderId: path[path.length - 1].id,
+  //         ...userSource,
+  //         items: {
+  //           id: path[path.length - 1].id,
+  //           type: CollectionItemTypeBaseEnum.FOLDER,
+  //           items: {
+  //             name: tabName,
+  //             description,
+  //             type: CollectionItemTypeBaseEnum.GRAPHQL,
+  //             graphql: unadaptedRequest,
+  //           },
+  //         },
+  //       });
+  //       if (res.isSuccessful) {
+  //         this.addRequestInFolder(
+  //           path[0].id,
+  //           path[path.length - 1].id,
+  //           res.data.data,
+  //         );
+  //         const expectedPath = {
+  //           folderId: path[path.length - 1].id,
+  //           folderName: path[path.length - 1].name,
+  //           collectionId: path[0].id,
+  //           workspaceId: _workspaceMeta.id,
+  //         };
+  //         if (
+  //           !componentData.path?.workspaceId ||
+  //           !componentData.path?.collectionId
+  //         ) {
+  //           this.updateRequestName(res.data.data.name);
+  //           this.updateRequestDescription(res.data.data.description as string);
+  //           this.updateRequestPath(expectedPath);
+  //           this.updateRequestId(res.data.data.id as string);
+  //           const progressiveTab = this._tab.getValue();
+  //           progressiveTab.isSaved = true;
+  //           this.tab = progressiveTab;
+  //           this.tabRepository.updateTab(
+  //             progressiveTab.tabId as string,
+  //             progressiveTab,
+  //           );
+  //         } else {
+  //           const initRequestTab = new InitTab().graphQl(
+  //             res.data.data.id as string,
+  //             "UNTRACKED-",
+  //           );
+  //           initRequestTab.updateName(res.data.data.name);
+  //           initRequestTab.updateDescription(
+  //             res.data.data.description as string,
+  //           );
+  //           initRequestTab.updatePath(expectedPath);
+  //           initRequestTab.updateUrl(res.data.data.graphql?.url as string);
+  //           initRequestTab.updateQuery(res.data.data.graphql?.query as string);
+  //           initRequestTab.updateSchema(
+  //             res.data.data.graphql?.schema as string,
+  //           );
+  //           initRequestTab.updateAuth(
+  //             res.data.data.graphql?.auth as GraphqlRequestAuthTabInterface,
+  //           );
+  //           initRequestTab.updateHeaders(
+  //             res.data.data.graphql
+  //               ?.headers as GraphqlRequestHeadersTabInterface[],
+  //           );
+  //           this.tabRepository.createTab(initRequestTab.getValue());
+  //           moveNavigation("right");
+  //         }
+  //         return {
+  //           status: "success",
+  //           message: res.message,
+  //           data: {
+  //             id: res.data.data.id,
+  //           },
+  //         };
+  //       } else {
+  //         return {
+  //           status: "error",
+  //           message: res.message,
+  //         };
+  //       }
+  //     }
+  //     MixpanelEvent(Events.Save_GraphQL_Request);
+  //   }
+  // };
 
   /**
    *

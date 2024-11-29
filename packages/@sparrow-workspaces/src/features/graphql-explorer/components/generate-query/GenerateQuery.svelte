@@ -221,20 +221,24 @@
           width={"100%"}
           height={"24px"}
           type="search"
-          searchIconColor={"var(--icon-secondary-170 )"}
+          searchIconColor={"var(--icon-secondary-300 )"}
           bind:value={searchData}
           on:input={(e) => {}}
           defaultBorderColor="transparent"
           hoveredBorderColor="var(--border-primary-300)"
           focusedBorderColor={"var(--border-primary-300)"}
-          class="text-fs-12 bg-tertiary-400 border-radius-2 ellipsis fw-normal px-2"
+          class="text-fs-12 bg-tertiary-750 border-radius-2 ellipsis fw-normal px-2"
+          placeholderColor={"var(--text-secondary-200)"}
           style="outline:none;"
           placeholder="Search"
+          iconSize={"12px"}
         />
       </div>
     </div>
     <div class="py-3 ps-3 h-100 d-flex align-items-center">
-      <p class="mb-0 text-secondary-200 text-fs-12">folder / folder / folder</p>
+      <p class="mb-0 text-secondary-200 text-fs-12">
+        <!-- folder / folder / folder -->
+      </p>
     </div>
   </div>
   <div class="" style="flex:1; overflow:auto;">
@@ -377,7 +381,7 @@
     width: 14px;
     border-radius: 3px;
     background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
+    border: 2px solid var(--text-secondary-370);
   }
 
   /* On mouse-over, add a grey background color */

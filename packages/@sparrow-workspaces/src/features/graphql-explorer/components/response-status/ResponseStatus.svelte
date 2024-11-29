@@ -45,7 +45,7 @@
             color={"var(--text-secondary-200)"}
           /></span
         >
-        <span style="margin-top: 3px;"> Clear Query </span>
+        <span style="margin-top: 3px;" class="fw-bold"> Clear Query </span>
       </button>
     </div>
     {#if response && response?.status}
