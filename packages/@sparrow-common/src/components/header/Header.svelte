@@ -1,9 +1,6 @@
 <script lang="ts">
   import { Select } from "@sparrow/library/forms";
-  import {
-    SparrowEdgeIcon,
-    StackIcon,
-  } from "@sparrow/library/icons";
+  import { SparrowEdgeIcon, StackIcon } from "@sparrow/library/icons";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { environmentType } from "@sparrow/common/enums";
   import { SparrowIcon } from "@sparrow/library/icons";
@@ -52,8 +49,7 @@
   export let onSwitchTeam;
 
   export let isWebApp = false;
- 
- 
+
   export let isCreateTeamModalOpen;
 
   /**
@@ -142,9 +138,7 @@
   export let user;
   export let onLogout;
 
-  import {
-    profileTabIcon as profile,
-  } from "@sparrow/library/assets";
+  import { profileTabIcon as profile } from "@sparrow/library/assets";
   import { profileHoveredIcon as hoveredProfile } from "@sparrow/library/assets";
   import { profileSelectedIcon as selectedProfile } from "@sparrow/library/assets";
   import { onMount } from "svelte";
@@ -160,30 +154,30 @@
     user,
   };
 
-  let isMaximizeWindow: boolean = false;
 
   let showProfileModal = false;
 
-  const appWindow = getCurrentWindow();
+  let appWindow;
+
+  if (isWebApp === false) {
+    appWindow = getCurrentWindow();
+  }
 
   let titlebar; // Reference to the title bar element
 
   function handleMouseDown(e: MouseEvent) {
-  // Check if the target or any parent element matches the exclusion criteria
-  if (
-    e.buttons === 1 &&
-    !e.target.closest(".no-drag") // Prevent dragging for elements with the "no-drag" class
-  ) {
-    if (e.detail === 2) {
-      isMaximizeWindow = !isMaximizeWindow;
-      appWindow.toggleMaximize(); // Maximize on double click
-    }
-    else{
-      appWindow.startDragging(); 
-      isMaximizeWindow=false;
+    // Check if the target or any parent element matches the exclusion criteria
+    if (
+      e.buttons === 1 &&
+      !e.target.closest(".no-drag") // Prevent dragging for elements with the "no-drag" class
+    ) {
+      if (e.detail === 2) {
+        appWindow.toggleMaximize(); // Maximize on double click
+      } else {
+        appWindow.startDragging();
+      }
     }
   }
-}
 
   let isWindows = false;
   let os = "";
@@ -192,9 +186,10 @@
     os = osDetector.getOS();
     if (os === "windows") {
       isWindows = true;
+    } else {
+      isWindows = false;
     }
   });
-
 </script>
 
 <header
@@ -204,9 +199,12 @@
   on:mousedown={handleMouseDown}
 >
   <div class="d-flex ms-1 justify-content-cdenter align-items-center no-drag">
-    {#if !isWindows}
-      <CustomHeader  isWindows={false}  />
+    {#if isWebApp === false}
+      {#if isWindows === false}
+        <CustomHeader isWindows={false} {isWebApp} />
+      {/if}
     {/if}
+
     {#if isGuestUser}
       <div>
         <SparrowEdgeIcon
@@ -224,7 +222,7 @@
         />
       </div>
     {/if}
-    <div class="ms-2  no-drag">
+    <div class="ms-2 no-drag">
       {#if isWebApp}
         {#if teamDocuments?.filter((_team) => {
           if (_team.isOpen) return true;
@@ -454,16 +452,17 @@
       </div>
     {/if}
 
-    {#if isWindows}
-      <div class="d-flex gap-3  me-1 no-drag">
-        <CustomHeader bind:isMaximizeWindow  {isWindows} />
-      </div>
+    {#if isWebApp === false}
+      {#if isWindows}
+        <div class="d-flex gap-3 me-1 no-drag">
+          <CustomHeader {isWindows} {isWebApp} />
+        </div>
+      {/if}
     {/if}
   </div>
 </header>
 
 <style>
-
   header {
     height: 44px;
     background-color: var(--bg-secondary-850);

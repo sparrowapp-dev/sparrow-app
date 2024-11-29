@@ -7,12 +7,16 @@
     SquareIcon,
   } from "@sparrow/library/icons";
   import { getCurrentWindow } from "@tauri-apps/api/window";
+    import { onDestroy } from "svelte";
 
   export let isWindows = true;
 
-  export let isMaximizeWindow = false;
+  export let isWebApp = false;
 
-  const appWindow = getCurrentWindow();
+  let appWindow;
+  if (!isWebApp) {
+    appWindow = getCurrentWindow();
+  }
 
   const onMinimize = () => {
     appWindow.minimize();
@@ -24,8 +28,31 @@
 
   const toggleSize = () => {
     appWindow.toggleMaximize();
-    isMaximizeWindow = !isMaximizeWindow;
   };
+
+  let hoveredButton = "";
+  const handleMouseEnter = (buttonName) => {
+    hoveredButton = buttonName;
+  };
+
+  const handleMouseLeave = () => {
+    hoveredButton = null;
+  };
+
+  let isMaximizeWindow = false;
+
+  const checkSize = async () => {
+    isMaximizeWindow = await appWindow.isMaximized();
+    console.log("isMaximizeWindow", isMaximizeWindow);
+  };
+
+  // Add event listener for window resize
+  const unlistenResize = appWindow.onResized(checkSize);
+
+  // Cleanup listener when component is destroyed
+  onDestroy(() => {
+    unlistenResize.then((f) => f());
+  });
 </script>
 
 {#if isWindows}
@@ -34,12 +61,16 @@
     <div class="controller-btn">
       <button
         on:click={onMinimize}
+        on:mouseenter={() => handleMouseEnter("minimize")}
+        on:mouseleave={handleMouseLeave}
         class="custom-header-button button-minus border-0 py-1 px-1"
       >
         <MiniMizeIcon
           height={"10"}
           width={"10"}
-          color={"var(--text-secondary-300)"}
+          color={hoveredButton === "minimize"
+            ? "white"
+            : "var(--text-secondary-200)"}
         />
       </button>
     </div>
@@ -47,6 +78,8 @@
     <div class="controller-btn">
       <button
         on:click={toggleSize}
+        on:mouseenter={() => handleMouseEnter("resize")}
+        on:mouseleave={handleMouseLeave}
         class="custom-header-button button-resize border-0 py-1 px-1"
         id="resize-button"
       >
@@ -54,13 +87,17 @@
           <DoubleResizeIcon
             height={"10"}
             width={"10"}
-            color={"var(--text-secondary-300)"}
+            color={hoveredButton === "resize"
+              ? "white"
+              : "var(--text-secondary-200)"}
           />
         {:else}
           <SquareIcon
             height={"10"}
             width={"10"}
-            color={"var(--text-secondary-300)"}
+            color={hoveredButton === "resize"
+              ? "white"
+              : "var(--text-secondary-200)"}
           />
         {/if}
       </button>
@@ -69,12 +106,16 @@
     <div class="controller-btn">
       <button
         on:click={onClose}
+        on:mouseenter={() => handleMouseEnter("close")}
+        on:mouseleave={handleMouseLeave}
         class="custom-header-button button-close border-0 py-1 px-1"
       >
         <CrossIconV2
           height={"10"}
           width={"10"}
-          color={"var(--text-secondary-300)"}
+          color={hoveredButton === "close"
+            ? "white"
+            : "var(--text-secondary-200)"}
         />
       </button>
     </div>
@@ -83,31 +124,19 @@
   <!-- Mac Style Buttons -->
   <div class="d-flex mac-container me-2">
     <div on:click={onClose} class="mac-nav">
-      <div class="icon ">
-        <CrossIconV2
-          height={"6"}
-          width={"6"}
-          color={"#285F17"}
-        />
+      <div class="icon">
+        <CrossIconV2 height={"6"} width={"6"} color={"#285F17"} />
       </div>
     </div>
     <div on:click={onMinimize} class="mac-nav">
       <div class="icon">
-        <MiniMizeIcon
-          height={"6"}
-          width={"6"}
-          color={"black"}
-        />
+        <MiniMizeIcon height={"6"} width={"6"} color={"black"} />
       </div>
     </div>
     <div on:click={toggleSize} id="resize-button" class="mac-nav">
       <div class="icon">
-        <ExpandIcon
-          height={"6"}
-          width={"6"}
-          color={"#285F17"}/>
+        <ExpandIcon height={"6"} width={"6"} color={"#285F17"} />
       </div>
-    
     </div>
   </div>
 {/if}
@@ -121,10 +150,10 @@
     display: block; /* Show the icon when the container is hovered */
   }
 
-  .icon{
+  .icon {
     display: flex;
     align-items: center;
-    justify-content: center;  
+    justify-content: center;
   }
 
   .mac-nav {
@@ -137,17 +166,17 @@
   }
 
   .mac-nav:nth-child(1) {
-    background-color: #EC6A5E;
+    background-color: #ec6a5e;
   }
 
   .mac-nav:nth-child(2) {
-    background-color: #F5BE4F;
+    background-color: #f5be4f;
     margin: 0 10px;
   }
 
   .mac-nav:nth-child(3) {
-    background-color: #62C554;
-    margin-left: 1pxz
+    background-color: #62c554;
+    margin-left: 1pxz;
   }
 
   .custom-header-button {
@@ -160,7 +189,6 @@
     display: flex;
     align-items: center;
   }
-
 
   .button-minus,
   .button-resize,
@@ -175,14 +203,11 @@
   }
 
   .button-close:hover {
-    background-color: rgb(207, 12, 12);
+    background-color: #e81123;
   }
- 
- 
- 
+
   .controller-btn button {
     height: 42px;
     width: 42px;
   }
- 
 </style>
