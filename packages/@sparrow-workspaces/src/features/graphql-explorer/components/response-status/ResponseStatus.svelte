@@ -48,7 +48,7 @@
         <span style="margin-top: 3px;"> Clear Query </span>
       </button>
     </div>
-    {#if response}
+    {#if response && response?.status}
       <div class="d-flex align-items-center gap-2">
         <!-- insert controller here -->
         <div class="d-flex align-items-center gap-2">

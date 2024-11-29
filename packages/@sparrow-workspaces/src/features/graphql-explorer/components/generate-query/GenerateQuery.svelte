@@ -50,7 +50,8 @@
     console.log("raw data", data);
     if (!data) return [];
     const searchedData = data.filter((item) => {
-      if (item.name.includes(searchData)) return true;
+      if (item.name.toLowerCase().includes(searchData.toLowerCase()))
+        return true;
       return false;
     });
     const queue: TreeNode[] = [...searchedData]; // Initialize queue with the root nodes
@@ -329,9 +330,14 @@
           style="min-width: 272px; max-width: 272px; overflow: auto; border-right:1px solid var(--border-secondary-500);
     "
         >
-          <p class="text-fs-12 text-secondary-200" style="text-align: center;">
-            No result found.
-          </p>
+          <div class="h-100 d-flex align-items-center justify-content-center">
+            <p
+              class="text-fs-12 text-secondary-200"
+              style="text-align: center;"
+            >
+              No result found.
+            </p>
+          </div>
         </div>
       {/if}
     </div>
