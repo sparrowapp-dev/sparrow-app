@@ -448,7 +448,7 @@ const connectWebSocket = async (
  * @param method - Request Method
  * @param headers - Request Headers
  * @param body - Request Body
- * @param request - Request Body Type
+ * @param contentType - Request Body Type
  * @param tabId - Tab ID
  * @returns
  */
@@ -457,15 +457,14 @@ const makeHttpRequestV2 = async (
   method: string,
   headers: string,
   body: string,
-  request: string,
+  contentType: string,
   signal?: AbortSignal,
 ) => {
-  console.table({ url, method, headers, body, request });
+  console.table({ url, method, headers, body, contentType });
   const startTime = performance.now();
 
   // Fetch the agent state from local storage
   const selectedAgent = localStorage.getItem("selectedAgent");
-  console.log();
 
   try {
     let data;
@@ -476,9 +475,9 @@ const makeHttpRequestV2 = async (
           method,
           headers,
           body,
-          request,
+          contentType,
         },
-        url: "https://dev-proxy.sparrowapp.dev/proxy/http-request",
+        url: constants.PROXY_SERVICE,
         method: "POST",
       });
     } else {
@@ -487,9 +486,9 @@ const makeHttpRequestV2 = async (
         url,
         data: {},
       });
-      debugger;
     }
-    // Handle the response and update UI accordingly
+
+    // Abort signal check
     if (signal?.aborted) {
       throw new Error(); // Ignore response if request was cancelled
     }
@@ -498,11 +497,22 @@ const makeHttpRequestV2 = async (
     const duration = endTime - startTime;
 
     try {
-      console.log(data);
+      // Handle response
+      let responseData;
+      if (typeof data.data.data !== "string") {
+        responseData = JSON.stringify(data.data.data);
+      } else {
+        responseData = data.data.data; // Don't modify non-JSON data
+      }
+
+      if (!data.data.status) {
+        throw new Error("Error parsing response");
+      }
+
       return success({
-        body: data.data,
-        status: "200 OK",
-        headers: data.headers,
+        body: responseData,
+        status: data.data.status,
+        headers: data.data.headers,
       });
     } catch (e) {
       console.error(e);
