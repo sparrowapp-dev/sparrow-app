@@ -32,28 +32,28 @@
     itemType: string;
   }
 
-  let data: TreeNode[];
-  let res: ResponseQueryNode[][] = [];
+  let querySchema: TreeNode[];
+  let queryBuilder: ResponseQueryNode[][] = [];
 
   $: {
     if (schema) {
       try {
-        data = JSON.parse(schema)?.Query?.items || [];
-        res = levelOrderTraversalByLevel(data, searchData);
+        querySchema = JSON.parse(schema)?.Query?.items || [];
+        queryBuilder = levelOrderTraversalByLevel(querySchema, searchData);
       } catch (e) {
-        data = [];
-        res = [];
+        querySchema = [];
+        queryBuilder = [];
         console.error(e);
       }
     }
   }
 
   const levelOrderTraversalByLevel = (
-    data: TreeNode[],
+    _data: TreeNode[],
     _searchData: string,
   ): ResponseQueryNode[][] => {
-    if (!data) return [];
-    const searchedData = data.filter((item) => {
+    if (!_data) return [];
+    const searchedData = _data.filter((item) => {
       if (item.name.toLowerCase().includes(searchData.toLowerCase()))
         return true;
       return false;
@@ -99,48 +99,39 @@
     return result;
   };
 
-  /**
-   *
-   * @param items
-   * @param currentLevel
-   * @param _id
-   * @param _level
-   * @param _isExpandedNode - determines if you have to expands the current node or collapse all current node along with all the child nodes.
-   * @param _isLeafNode
-   */
   const expandNodeAtSameLevel = (
-    items: any[],
-    currentLevel: number,
+    _items: TreeNode[],
+    _currentLevel: number,
     _id: string,
     _level: number,
     _isLeafNode: boolean,
   ): TreeNode[] => {
-    if (currentLevel === _level) {
+    if (_currentLevel === _level) {
       let isTargetLevel = false;
-      items.forEach((item) => {
+      _items.forEach((item) => {
         if (item.id === _id) {
           isTargetLevel = true;
         }
       });
       if (isTargetLevel) {
         if (!_isLeafNode) {
-          items.forEach((item) => {
+          _items.forEach((item) => {
             if (item.items.length) item.isExpanded = false;
           });
         }
-        items.forEach((item) => {
+        _items.forEach((item) => {
           if (item.id === _id) item.isExpanded = true;
         });
-        return items;
+        return _items;
       }
     }
 
     // If we're not at the desired level, recurse into the `items` array
-    return items.map((item) => ({
+    return _items.map((item) => ({
       ...item,
       items: expandNodeAtSameLevel(
         item.items,
-        currentLevel + 1,
+        _currentLevel + 1,
         _id,
         _level,
         _isLeafNode,
@@ -149,20 +140,20 @@
   };
 
   const collapseAllTheChildNodes = (
-    items: any[],
-    currentLevel: number,
+    _items: TreeNode[],
+    _currentLevel: number,
     _id: string,
     _level: number,
   ): TreeNode[] => {
-    if (currentLevel === _level) {
+    if (_currentLevel === _level) {
       let isTargetLevel = false;
-      items.forEach((item) => {
+      _items.forEach((item) => {
         if (item.id === _id) {
           isTargetLevel = true;
         }
       });
       if (isTargetLevel) {
-        items.forEach((item) => {
+        _items.forEach((item) => {
           if (item.id === _id) {
             const collapseChildNodes = (item: TreeNode) => {
               item.isExpanded = false;
@@ -173,14 +164,14 @@
             collapseChildNodes(item);
           }
         });
-        return items;
+        return _items;
       }
     }
-    return items.map((item) => ({
+    return _items.map((item) => ({
       ...item,
       items: collapseAllTheChildNodes(
         item.items,
-        currentLevel + 1,
+        _currentLevel + 1,
         _id,
         _level,
       ),
@@ -196,40 +187,36 @@
     // Update the data with the modified check state
 
     if (_isExpandedNode) {
-      data = collapseAllTheChildNodes(data, 0, _id, _level);
+      querySchema = collapseAllTheChildNodes(querySchema, 0, _id, _level);
     } else {
-      data = expandNodeAtSameLevel(data, 0, _id, _level, _isLeafNode);
+      querySchema = expandNodeAtSameLevel(
+        querySchema,
+        0,
+        _id,
+        _level,
+        _isLeafNode,
+      );
     }
     const s = JSON.parse(schema);
-    s.Query.items = data;
+    s.Query.items = querySchema;
     updateSchema(JSON.stringify(s));
   };
 
-  /**
-   *
-   * @param item
-   * @param id
-   */
-  const checksAllTheParentNodes = (item: TreeNode, id: string) => {
-    if (item.id === id) {
-      item.isSelected = true;
+  const checksAllTheParentNodes = (_item: TreeNode, _id: string) => {
+    if (_item.id === _id) {
+      _item.isSelected = true;
       return true;
     }
-    for (let j = 0; j < item?.items?.length; j++) {
-      if (checksAllTheParentNodes(item.items[j], id)) {
-        item.items[j].isSelected = true;
+    for (let j = 0; j < _item?.items?.length; j++) {
+      if (checksAllTheParentNodes(_item.items[j], _id)) {
+        _item.items[j].isSelected = true;
         return true;
       }
     }
   };
 
-  /**
-   *
-   * @param item
-   * @param id
-   */
-  const unchecksAllTheChildNodes = (item: TreeNode, id: string) => {
-    if (item.id === id) {
+  const unchecksAllTheChildNodes = (_item: TreeNode, _id: string) => {
+    if (_item.id === _id) {
       const uncheckChildNodes = (item: TreeNode) => {
         item.isSelected = false;
         item.value = "";
@@ -237,78 +224,77 @@
           uncheckChildNodes(item.items[j]);
         }
       };
-      uncheckChildNodes(item);
+      uncheckChildNodes(_item);
       return true;
     }
-    for (let j = 0; j < item?.items?.length; j++) {
-      if (unchecksAllTheChildNodes(item.items[j], id)) {
+    for (let j = 0; j < _item?.items?.length; j++) {
+      if (unchecksAllTheChildNodes(_item.items[j], _id)) {
         return true;
       }
     }
   };
 
-  /**
-   * Toogles query builder checkboxes
-   * @param id
-   * @param level
-   * @param _isCheckedNode
-   * @param _isLeafNode
-   */
   const handleQBuilderCheckboxCheckedOrUnchecked = (
-    id: string,
-    level: number,
+    _id: string,
+    _level: number,
     _isCheckedNode: boolean,
     _isLeafNode: boolean,
   ) => {
     if (_isCheckedNode) {
       // Unchecks all the child nodes.
-      for (let i = 0; i < data.length; i++) {
-        if (unchecksAllTheChildNodes(data[i], id)) {
+      for (let i = 0; i < querySchema.length; i++) {
+        if (unchecksAllTheChildNodes(querySchema[i], _id)) {
           break;
         }
       }
     } else {
       // Expands the current node.
-      data = expandNodeAtSameLevel(data, 0, id, level, _isLeafNode);
+      querySchema = expandNodeAtSameLevel(
+        querySchema,
+        0,
+        _id,
+        _level,
+        _isLeafNode,
+      );
       // Checks all the parent nodes.
-      for (let i = 0; i < data.length; i++) {
-        if (checksAllTheParentNodes(data[i], id)) {
-          data[i].isSelected = true;
+      for (let i = 0; i < querySchema.length; i++) {
+        if (checksAllTheParentNodes(querySchema[i], _id)) {
+          querySchema[i].isSelected = true;
           break;
         }
       }
     }
 
     const s = JSON.parse(schema);
-    s.Query.items = data;
+    s.Query.items = querySchema;
     updateSchema(JSON.stringify(s));
   };
 
   const handleInput = (_id: string, _value: string) => {
-    const searchFieldById = (item: TreeNode): boolean => {
-      if (item.id === _id) {
-        item.value = _value;
+    const searchFieldById = (_item: TreeNode): boolean => {
+      if (_item.id === _id) {
+        _item.value = _value;
         return true;
       }
-      for (let j = 0; j < item?.items?.length; j++) {
-        if (searchFieldById(item.items[j])) {
+      for (let j = 0; j < _item?.items?.length; j++) {
+        if (searchFieldById(_item.items[j])) {
           return true;
         }
       }
       return false;
     };
-    for (let i = 0; i < data.length; i++) {
-      if (searchFieldById(data[i])) {
+    for (let i = 0; i < querySchema.length; i++) {
+      if (searchFieldById(querySchema[i])) {
         const s = JSON.parse(schema);
-        s.Query.items = data;
+        s.Query.items = querySchema;
         updateSchema(JSON.stringify(s));
         return;
       }
     }
   };
 
-  const handleBuilderInputboxChange = (e: Event, _id: string) =>
-    handleInput(_id, (e.target as HTMLInputElement).value);
+  const handleBuilderInputboxChange = (_e: Event, _id: string) =>
+    handleInput(_id, (_e.target as HTMLInputElement).value);
 
   let searchData = "";
 </script>
@@ -374,7 +360,7 @@
     ;
         flex-wrap: nowrap;"
     >
-      {#each res as r, index}
+      {#each queryBuilder as r, index}
         <div
           class="fields-column h-100 ellipsis"
           style="min-width: 272px; max-width: 272px; overflow: auto; border-right:1px solid var(--border-secondary-500);
@@ -498,7 +484,7 @@
           </div>
         </div>
       {/each}
-      {#if searchData && !res?.length}
+      {#if searchData && !queryBuilder?.length}
         <div
           class="fields-column h-100 ellipsis"
           style="min-width: 272px; max-width: 272px; overflow: auto; border-right:1px solid var(--border-secondary-500);
