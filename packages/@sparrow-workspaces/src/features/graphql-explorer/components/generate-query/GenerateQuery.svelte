@@ -32,8 +32,9 @@
     itemType: string;
   }
 
-  let querySchema: TreeNode[];
+  let querySchema: TreeNode[] = [];
   let queryBuilder: ResponseQueryNode[][] = [];
+  let searchData = "";
 
   $: {
     if (schema) {
@@ -48,6 +49,12 @@
     }
   }
 
+  /**
+   * Performs a level-order traversal on the tree structure and returns nodes grouped by level.
+   * @param _data - Array of tree nodes to traverse.
+   * @param _searchData - Search term for filtering nodes.
+   * @returns An array of arrays, where each inner array represents a tree level.
+   */
   const levelOrderTraversalByLevel = (
     _data: TreeNode[],
     _searchData: string,
@@ -95,10 +102,18 @@
 
       result.push(currentLevel); // Add the current level to the result
     }
-
     return result;
   };
 
+  /**
+   * Toggles node expansion and collapse, ensuring only one node per level is expanded.
+   * @param _items - Array of tree nodes to modify.
+   * @param _currentLevel - Current depth level of the tree.
+   * @param _id - ID of the target node to expand.
+   * @param _level - The target depth level.
+   * @param _isLeafNode - Whether the target node is a leaf node.
+   * @returns Modified array of tree nodes.
+   */
   const expandNodeAtSameLevel = (
     _items: TreeNode[],
     _currentLevel: number,
@@ -139,6 +154,14 @@
     }));
   };
 
+  /**
+   * Collapses all child nodes recursively for a given parent node.
+   * @param _items - Array of tree nodes to modify.
+   * @param _currentLevel - Current depth level of the tree.
+   * @param _id - ID of the target node.
+   * @param _level - The target depth level.
+   * @returns Modified array of tree nodes.
+   */
   const collapseAllTheChildNodes = (
     _items: TreeNode[],
     _currentLevel: number,
@@ -178,6 +201,13 @@
     }));
   };
 
+  /**
+   * Handles expand/collapse toggling of a query builder node.
+   * @param _id - ID of the target node.
+   * @param _level - Depth level of the target node.
+   * @param _isExpandedNode - Whether the target node is currently expanded.
+   * @param _isLeafNode - Whether the target node is a leaf node.
+   */
   const handleQBuilderCheckboxExpandOrCollapse = (
     _id: string,
     _level: number,
@@ -202,6 +232,12 @@
     updateSchema(JSON.stringify(s));
   };
 
+  /**
+   * Marks the target node and all its parent nodes as selected in a tree structure.
+   * @param _item - The current tree node being traversed.
+   * @param _id - The ID of the target node to find and mark as selected.
+   * @returns `true` if the target node or its parent nodes are found and selected; otherwise, `false`.
+   */
   const checksAllTheParentNodes = (_item: TreeNode, _id: string) => {
     if (_item.id === _id) {
       _item.isSelected = true;
@@ -215,6 +251,13 @@
     }
   };
 
+  /**
+   * Unselects the specified node and all its child nodes in a tree structure.
+   * Also clears their `value` property.
+   * @param _item - The current tree node being traversed.
+   * @param _id - The ID of the target node to find and unselect along with its child nodes.
+   * @returns `true` if the target node is found and processed; otherwise, `false`.
+   */
   const unchecksAllTheChildNodes = (_item: TreeNode, _id: string) => {
     if (_item.id === _id) {
       const uncheckChildNodes = (item: TreeNode) => {
@@ -234,6 +277,16 @@
     }
   };
 
+  /**
+   * Handles the logic when a checkbox is checked or unchecked in a query builder.
+   * It updates the tree structure accordingly by expanding or collapsing nodes
+   * and marking their selection state.
+   *
+   * @param _id - The ID of the node being checked or unchecked.
+   * @param _level - The level of the node in the tree.
+   * @param _isCheckedNode - Boolean indicating whether the node is checked or unchecked.
+   * @param _isLeafNode - Boolean indicating whether the node is a leaf (has no children).
+   */
   const handleQBuilderCheckboxCheckedOrUnchecked = (
     _id: string,
     _level: number,
@@ -270,6 +323,14 @@
     updateSchema(JSON.stringify(s));
   };
 
+  /**
+   * Handles input change by updating the value of a specific field in the tree structure
+   * based on the provided ID. It searches the tree recursively for the node with the matching ID
+   * and updates its value. Once updated, it updates the schema with the new value.
+   *
+   * @param _id - The ID of the node whose value is being updated.
+   * @param _value - The new value to be set for the node with the specified ID.
+   */
   const handleInput = (_id: string, _value: string) => {
     const searchFieldById = (_item: TreeNode): boolean => {
       if (_item.id === _id) {
@@ -293,10 +354,16 @@
     }
   };
 
-  const handleBuilderInputboxChange = (_e: Event, _id: string) =>
+  /**
+   * Handles input box change event by invoking the `handleInput` function to update
+   * the value of the node in the tree structure. The value from the event target
+   * (input box) is passed along with the node ID to update the corresponding node.
+   *
+   * @param _e - The event object that contains the input value from the input box.
+   * @param _id - The ID of the node to be updated.
+   */
+  const handleQBuilderInputboxChange = (_e: Event, _id: string) =>
     handleInput(_id, (_e.target as HTMLInputElement).value);
-
-  let searchData = "";
 </script>
 
 <div class="d-flex flex-column h-100">
@@ -452,7 +519,7 @@
                       placeholder="Enter value"
                       value={t.value || ""}
                       on:input={(e) => {
-                        handleBuilderInputboxChange(e, t?.id);
+                        handleQBuilderInputboxChange(e, t?.id);
                       }}
                     />
                     {#if t?.value}
@@ -460,7 +527,7 @@
                         class="position-absolute"
                         style="top:0px; right: 22px"
                         on:click={() => {
-                          handleBuilderInputboxChange(
+                          handleQBuilderInputboxChange(
                             {
                               target: {
                                 value: "",
