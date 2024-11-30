@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { WithSelect } from "../../../../hoc";
   import { AngleLeftIcon } from "@sparrow/library/icons";
   import { Input } from "@sparrow/library/forms";
   import { trashIcon } from "@sparrow/library/assets";
+
+  export let schema;
+  export let updateSchema;
 
   interface TreeNode {
     name: string;
@@ -30,27 +32,26 @@
     itemType: string;
   }
 
-  export let schema;
-  export let updateSchema;
-
   let data: TreeNode[];
+  let res: ResponseQueryNode[][] = [];
+
   $: {
     if (schema) {
       try {
-        data = JSON.parse(schema)?.Query?.items;
+        data = JSON.parse(schema)?.Query?.items || [];
         res = levelOrderTraversalByLevel(data, searchData);
       } catch (e) {
+        data = [];
+        res = [];
         console.error(e);
       }
-      // debugger;
     }
   }
 
-  function levelOrderTraversalByLevel(
+  const levelOrderTraversalByLevel = (
     data: TreeNode[],
     _searchData: string,
-  ): ResponseQueryNode[][] {
-    console.log("raw data", data);
+  ): ResponseQueryNode[][] => {
     if (!data) return [];
     const searchedData = data.filter((item) => {
       if (item.name.toLowerCase().includes(searchData.toLowerCase()))
@@ -80,7 +81,6 @@
 
         // Enqueue children
         if (currentNode.items && currentNode.items.length > 0) {
-          //   queue.push(...currentNode.items);
           if (currentNode.isExpanded) {
             currentNode.items.forEach((elem) => {
               queue.push({
@@ -94,131 +94,191 @@
       }
 
       result.push(currentLevel); // Add the current level to the result
-      console.log("levels ", currentLevel);
     }
 
     return result;
-  }
-  let res: ResponseQueryNode[][] = [];
-  onMount(() => {
-    // res = levelOrderTraversalByLevel(data);
-  });
-
-  const collapseAllTheNodes = (item: TreeNode) => {
-    item.isExpanded = false;
-    for (let j = 0; j < item?.items?.length; j++) {
-      collapseAllTheNodes(item.items[j]);
-    }
   };
 
-  const handleExpand = (id: string, level: number) => {
-    const toggleCheckAtLevel = (
-      items: any[],
-      currentLevel: number,
-    ): TreeNode[] => {
-      if (currentLevel === level) {
-        // If we're at the desired level, uncheck all items and check the one with the given id
-        let isLeafNode = true;
-        let isChecked = false;
-        items.forEach((item) => {
-          if (item.id === id && item.items.length) {
-            isLeafNode = false;
-          }
-          if (item.id === id && item.isExpanded) {
-            isChecked = true;
-          }
-        });
-        if (isChecked) {
-          items.forEach((item) => {
-            if (item.id === id) collapseAllTheNodes(item);
-          });
-          return items;
+  /**
+   *
+   * @param items
+   * @param currentLevel
+   * @param _id
+   * @param _level
+   * @param _isExpandedNode - determines if you have to expands the current node or collapse all current node along with all the child nodes.
+   * @param _isLeafNode
+   */
+  const expandNodeAtSameLevel = (
+    items: any[],
+    currentLevel: number,
+    _id: string,
+    _level: number,
+    _isLeafNode: boolean,
+  ): TreeNode[] => {
+    if (currentLevel === _level) {
+      let isTargetLevel = false;
+      items.forEach((item) => {
+        if (item.id === _id) {
+          isTargetLevel = true;
         }
-
-        if (!isLeafNode) {
+      });
+      if (isTargetLevel) {
+        if (!_isLeafNode) {
           items.forEach((item) => {
             if (item.items.length) item.isExpanded = false;
           });
         }
         items.forEach((item) => {
-          if (item.id === id) item.isExpanded = true;
+          if (item.id === _id) item.isExpanded = true;
         });
         return items;
       }
+    }
 
-      // If we're not at the desired level, recurse into the `items` array
-      return items.map((item) => ({
-        ...item,
-        items: toggleCheckAtLevel(item.items, currentLevel + 1),
-      }));
-    };
+    // If we're not at the desired level, recurse into the `items` array
+    return items.map((item) => ({
+      ...item,
+      items: expandNodeAtSameLevel(
+        item.items,
+        currentLevel + 1,
+        _id,
+        _level,
+        _isLeafNode,
+      ),
+    }));
+  };
 
+  const collapseAllTheChildNodes = (
+    items: any[],
+    currentLevel: number,
+    _id: string,
+    _level: number,
+  ): TreeNode[] => {
+    if (currentLevel === _level) {
+      let isTargetLevel = false;
+      items.forEach((item) => {
+        if (item.id === _id) {
+          isTargetLevel = true;
+        }
+      });
+      if (isTargetLevel) {
+        items.forEach((item) => {
+          if (item.id === _id) {
+            const collapseChildNodes = (item: TreeNode) => {
+              item.isExpanded = false;
+              for (let j = 0; j < item?.items?.length; j++) {
+                collapseChildNodes(item.items[j]);
+              }
+            };
+            collapseChildNodes(item);
+          }
+        });
+        return items;
+      }
+    }
+    return items.map((item) => ({
+      ...item,
+      items: collapseAllTheChildNodes(
+        item.items,
+        currentLevel + 1,
+        _id,
+        _level,
+      ),
+    }));
+  };
+
+  const handleQBuilderCheckboxExpandOrCollapse = (
+    _id: string,
+    _level: number,
+    _isExpandedNode: boolean,
+    _isLeafNode: boolean,
+  ) => {
     // Update the data with the modified check state
-    data = toggleCheckAtLevel(data, 0); // Start at level 1 (root level)
-    // res = levelOrderTraversalByLevel(data);
+
+    if (_isExpandedNode) {
+      data = collapseAllTheChildNodes(data, 0, _id, _level);
+    } else {
+      data = expandNodeAtSameLevel(data, 0, _id, _level, _isLeafNode);
+    }
     const s = JSON.parse(schema);
     s.Query.items = data;
     updateSchema(JSON.stringify(s));
   };
 
-  const uncheckAllTheNodes = (item: TreeNode) => {
-    item.isSelected = false;
-    item.value = "";
+  /**
+   *
+   * @param item
+   * @param id
+   */
+  const checksAllTheParentNodes = (item: TreeNode, id: string) => {
+    if (item.id === id) {
+      item.isSelected = true;
+      return true;
+    }
     for (let j = 0; j < item?.items?.length; j++) {
-      uncheckAllTheNodes(item.items[j]);
+      if (checksAllTheParentNodes(item.items[j], id)) {
+        item.items[j].isSelected = true;
+        return true;
+      }
     }
   };
 
-  const handleCheck = (id: string, level: number) => {
-    const toggleCheckAtLevel = (
-      items: any[],
-      currentLevel: number,
-    ): TreeNode[] => {
-      if (currentLevel === level) {
-        debugger;
-        // If we're at the desired level, uncheck all items and check the one with the given id
-        let isChecked = false;
-        let isLeafNode = true;
-        items.forEach((item) => {
-          if (item.id === id && item.items.length) {
-            isLeafNode = false;
-          }
-          if (item.id === id && item.isSelected) {
-            isChecked = true;
-          }
-        });
-        if (isChecked) {
-          items.forEach((item) => {
-            if (item.id === id) uncheckAllTheNodes(item);
-          });
-          return items;
+  /**
+   *
+   * @param item
+   * @param id
+   */
+  const unchecksAllTheChildNodes = (item: TreeNode, id: string) => {
+    if (item.id === id) {
+      const uncheckChildNodes = (item: TreeNode) => {
+        item.isSelected = false;
+        item.value = "";
+        for (let j = 0; j < item?.items?.length; j++) {
+          uncheckChildNodes(item.items[j]);
         }
-
-        if (!isLeafNode) {
-          items.forEach((item) => {
-            if (item.items.length) item.isExpanded = false;
-          });
-        }
-
-        items.forEach((item) => {
-          if (item.id === id) {
-            item.isSelected = true;
-            item.isExpanded = true;
-          }
-        });
-        return items;
+      };
+      uncheckChildNodes(item);
+      return true;
+    }
+    for (let j = 0; j < item?.items?.length; j++) {
+      if (unchecksAllTheChildNodes(item.items[j], id)) {
+        return true;
       }
+    }
+  };
 
-      // If we're not at the desired level, recurse into the `items` array
-      return items.map((item) => ({
-        ...item,
-        items: toggleCheckAtLevel(item.items, currentLevel + 1),
-      }));
-    };
+  /**
+   * Toogles query builder checkboxes
+   * @param id
+   * @param level
+   * @param _isCheckedNode
+   * @param _isLeafNode
+   */
+  const handleQBuilderCheckboxCheckedOrUnchecked = (
+    id: string,
+    level: number,
+    _isCheckedNode: boolean,
+    _isLeafNode: boolean,
+  ) => {
+    if (_isCheckedNode) {
+      // Unchecks all the child nodes.
+      for (let i = 0; i < data.length; i++) {
+        if (unchecksAllTheChildNodes(data[i], id)) {
+          break;
+        }
+      }
+    } else {
+      // Expands the current node.
+      data = expandNodeAtSameLevel(data, 0, id, level, _isLeafNode);
+      // Checks all the parent nodes.
+      for (let i = 0; i < data.length; i++) {
+        if (checksAllTheParentNodes(data[i], id)) {
+          data[i].isSelected = true;
+          break;
+        }
+      }
+    }
 
-    // Update the data with the modified check state
-    data = toggleCheckAtLevel(data, 0); // Start at level 1 (root level)
-    // res = levelOrderTraversalByLevel(data);
     const s = JSON.parse(schema);
     s.Query.items = data;
     updateSchema(JSON.stringify(s));
@@ -247,7 +307,7 @@
     }
   };
 
-  const handleinputField = (e: Event, _id: string) =>
+  const handleBuilderInputboxChange = (e: Event, _id: string) =>
     handleInput(_id, (e.target as HTMLInputElement).value);
 
   let searchData = "";
@@ -338,7 +398,12 @@
                     : ""}
                   on:click={(e) => {
                     e.preventDefault();
-                    handleExpand(t.id, index);
+                    handleQBuilderCheckboxExpandOrCollapse(
+                      t.id,
+                      index,
+                      t.isExpanded,
+                      t.isLeafNode,
+                    );
                   }}
                 >
                   <div
@@ -352,7 +417,12 @@
                         e.preventDefault();
                         e.stopPropagation();
 
-                        handleCheck(t.id, index);
+                        handleQBuilderCheckboxCheckedOrUnchecked(
+                          t.id,
+                          index,
+                          t.isSelected,
+                          t.isLeafNode,
+                        );
                       }}
                     >
                       <label class="checkbox-parent">
@@ -387,7 +457,7 @@
                     </span>
                   {/if}
                 </div>
-                {#if t.isLeafNode && t.itemType === "inputField" && t.isExpanded}
+                {#if t.isLeafNode && t.itemType === "inputField" && t.isSelected}
                   <div class="ps-4 pe-3 mb-2 position-relative">
                     <input
                       type="text"
@@ -396,7 +466,7 @@
                       placeholder="Enter value"
                       value={t.value || ""}
                       on:input={(e) => {
-                        handleinputField(e, t?.id);
+                        handleBuilderInputboxChange(e, t?.id);
                       }}
                     />
                     {#if t?.value}
@@ -404,7 +474,7 @@
                         class="position-absolute"
                         style="top:0px; right: 22px"
                         on:click={() => {
-                          handleinputField(
+                          handleBuilderInputboxChange(
                             {
                               target: {
                                 value: "",
