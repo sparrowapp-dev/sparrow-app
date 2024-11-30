@@ -10,6 +10,7 @@
     value: string;
     items: TreeNode[];
     id: string;
+    isExpanded: boolean;
     isSelected: boolean;
     parentNodeId: string;
     parentNodeName: string;
@@ -21,6 +22,7 @@
     value: string;
     items?: ResponseQueryNode[];
     id: string;
+    isExpanded: boolean;
     isSelected: boolean;
     parentNodeId: string;
     parentNodeName: string;
@@ -68,6 +70,7 @@
           id: currentNode.id,
           name: currentNode.name,
           value: currentNode.value,
+          isExpanded: currentNode.isExpanded,
           isSelected: currentNode.isSelected,
           parentNodeId: currentNode.parentNodeId,
           parentNodeName: currentNode.parentNodeName,
@@ -78,7 +81,7 @@
         // Enqueue children
         if (currentNode.items && currentNode.items.length > 0) {
           //   queue.push(...currentNode.items);
-          if (currentNode.isSelected) {
+          if (currentNode.isExpanded) {
             currentNode.items.forEach((elem) => {
               queue.push({
                 ...elem,
@@ -101,6 +104,63 @@
     // res = levelOrderTraversalByLevel(data);
   });
 
+  const collapseAllTheNodes = (item: TreeNode) => {
+    item.isExpanded = false;
+    for (let j = 0; j < item?.items?.length; j++) {
+      collapseAllTheNodes(item.items[j]);
+    }
+  };
+
+  const handleExpand = (id: string, level: number) => {
+    const toggleCheckAtLevel = (
+      items: any[],
+      currentLevel: number,
+    ): TreeNode[] => {
+      if (currentLevel === level) {
+        // If we're at the desired level, uncheck all items and check the one with the given id
+        let isLeafNode = true;
+        let isChecked = false;
+        items.forEach((item) => {
+          if (item.id === id && item.items.length) {
+            isLeafNode = false;
+          }
+          if (item.id === id && item.isExpanded) {
+            isChecked = true;
+          }
+        });
+        if (isChecked) {
+          items.forEach((item) => {
+            if (item.id === id) collapseAllTheNodes(item);
+          });
+          return items;
+        }
+
+        if (!isLeafNode) {
+          items.forEach((item) => {
+            if (item.items.length) item.isExpanded = false;
+          });
+        }
+        items.forEach((item) => {
+          if (item.id === id) item.isExpanded = true;
+        });
+        return items;
+      }
+
+      // If we're not at the desired level, recurse into the `items` array
+      return items.map((item) => ({
+        ...item,
+        items: toggleCheckAtLevel(item.items, currentLevel + 1),
+      }));
+    };
+
+    // Update the data with the modified check state
+    data = toggleCheckAtLevel(data, 0); // Start at level 1 (root level)
+    // res = levelOrderTraversalByLevel(data);
+    const s = JSON.parse(schema);
+    s.Query.items = data;
+    updateSchema(JSON.stringify(s));
+  };
+
   const uncheckAllTheNodes = (item: TreeNode) => {
     item.isSelected = false;
     item.value = "";
@@ -115,9 +175,10 @@
       currentLevel: number,
     ): TreeNode[] => {
       if (currentLevel === level) {
+        debugger;
         // If we're at the desired level, uncheck all items and check the one with the given id
-        let isLeafNode = true;
         let isChecked = false;
+        let isLeafNode = true;
         items.forEach((item) => {
           if (item.id === id && item.items.length) {
             isLeafNode = false;
@@ -135,11 +196,15 @@
 
         if (!isLeafNode) {
           items.forEach((item) => {
-            if (item.items.length) item.isSelected = false;
+            if (item.items.length) item.isExpanded = false;
           });
         }
+
         items.forEach((item) => {
-          if (item.id === id) item.isSelected = true;
+          if (item.id === id) {
+            item.isSelected = true;
+            item.isExpanded = true;
+          }
         });
         return items;
       }
@@ -268,16 +333,28 @@
               {#each r as t}
                 <div
                   class="d-flex align-items-center attribute-row border-radius-2 py-1 px-2 justify-content-between mb-1"
+                  style={t.isExpanded && !t?.isLeafNode
+                    ? "background-color: var(--bg-secondary-600) !important;"
+                    : ""}
                   on:click={(e) => {
                     e.preventDefault();
-                    handleCheck(t.id, index);
+                    handleExpand(t.id, index);
                   }}
                 >
                   <div
                     class="d-flex align-items-center"
                     style="width:calc(100% - 20px);"
                   >
-                    <div style="height:14px; width:14px;" class="me-2">
+                    <div
+                      style="height:14px; width:14px;"
+                      class="me-2"
+                      on:click={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        handleCheck(t.id, index);
+                      }}
+                    >
                       <label class="checkbox-parent">
                         <input type="checkbox" bind:checked={t.isSelected} />
                         <span class="checkmark"></span>
@@ -310,7 +387,7 @@
                     </span>
                   {/if}
                 </div>
-                {#if t.isLeafNode && t.itemType === "inputField" && t.isSelected}
+                {#if t.isLeafNode && t.itemType === "inputField" && t.isExpanded}
                   <div class="ps-4 pe-3 mb-2 position-relative">
                     <input
                       type="text"
@@ -412,20 +489,20 @@
     background-color: #ccc;
   } */
 
-  /* When the checkbox is isSelected, add a blue background */
+  /* When the checkbox is isExpanded, add a blue background */
   .checkbox-parent input:checked ~ .checkmark {
     border: none;
     background-color: var(--bg-primary-300);
   }
 
-  /* Create the checkmark/indicator (hidden when not isSelected) */
+  /* Create the checkmark/indicator (hidden when not isExpanded) */
   .checkbox-parent .checkmark:after {
     content: "";
     position: absolute;
     display: none;
   }
 
-  /* Show the checkmark when isSelected */
+  /* Show the checkmark when isExpanded */
   .checkbox-parent input:checked ~ .checkmark:after {
     display: block;
   }
