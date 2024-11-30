@@ -331,7 +331,7 @@
    * @param _id - The ID of the node whose value is being updated.
    * @param _value - The new value to be set for the node with the specified ID.
    */
-  const handleInput = (_id: string, _value: string) => {
+  const updateAttributeInputData = (_id: string, _value: string) => {
     const searchFieldById = (_item: TreeNode): boolean => {
       if (_item.id === _id) {
         _item.value = _value;
@@ -355,7 +355,7 @@
   };
 
   /**
-   * Handles input box change event by invoking the `handleInput` function to update
+   * Handles input box change event by invoking the `updateAttributeInputData` function to update
    * the value of the node in the tree structure. The value from the event target
    * (input box) is passed along with the node ID to update the corresponding node.
    *
@@ -363,7 +363,7 @@
    * @param _id - The ID of the node to be updated.
    */
   const handleQBuilderInputboxChange = (_e: Event, _id: string) =>
-    handleInput(_id, (_e.target as HTMLInputElement).value);
+    updateAttributeInputData(_id, (_e.target as HTMLInputElement).value);
 </script>
 
 <div class="d-flex flex-column h-100">
@@ -524,17 +524,11 @@
                     />
                     {#if t?.value}
                       <span
+                        role="button"
                         class="position-absolute"
                         style="top:0px; right: 22px"
                         on:click={() => {
-                          handleQBuilderInputboxChange(
-                            {
-                              target: {
-                                value: "",
-                              },
-                            },
-                            t?.id,
-                          );
+                          updateAttributeInputData(t?.id, "");
                         }}
                       >
                         <img
