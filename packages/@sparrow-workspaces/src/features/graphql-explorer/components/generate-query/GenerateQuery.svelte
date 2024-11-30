@@ -7,10 +7,10 @@
   export let schema;
   export let updateSchema;
 
-  interface TreeNode {
+  interface QuerySchema {
     name: string;
     value: string;
-    items: TreeNode[];
+    items: QuerySchema[];
     id: string;
     isExpanded: boolean;
     isSelected: boolean;
@@ -19,10 +19,10 @@
     itemType: string;
   }
 
-  interface ResponseQueryNode {
+  interface QueryBuilder {
     name: string;
     value: string;
-    items?: ResponseQueryNode[];
+    items?: QueryBuilder[];
     id: string;
     isExpanded: boolean;
     isSelected: boolean;
@@ -32,8 +32,8 @@
     itemType: string;
   }
 
-  let querySchema: TreeNode[] = [];
-  let queryBuilder: ResponseQueryNode[][] = [];
+  let querySchema: QuerySchema[] = [];
+  let queryBuilder: QueryBuilder[][] = [];
   let searchData = "";
 
   $: {
@@ -56,34 +56,46 @@
    * @returns An array of arrays, where each inner array represents a tree level.
    */
   const levelOrderTraversalByLevel = (
-    _data: TreeNode[],
+    _data: QuerySchema[],
     _searchData: string,
-  ): ResponseQueryNode[][] => {
-    if (!_data) return [];
+  ): QueryBuilder[][] => {
+    const result: QueryBuilder[][] = []; // To store nodes level by level
+    if (!_data) return result;
     const searchedData = _data.filter((item) => {
       if (item.name.toLowerCase().includes(searchData.toLowerCase()))
         return true;
       return false;
     });
-    const queue: TreeNode[] = [...searchedData]; // Initialize queue with the root nodes
-    const result: ResponseQueryNode[][] = []; // To store nodes level by level
+    const queue: QuerySchema[] = [...searchedData]; // Initialize queue with the root nodes
 
     while (queue.length > 0) {
       const levelSize = queue.length; // Number of nodes at the current level
-      const currentLevel: ResponseQueryNode[] = []; // Array to store nodes of this level
+      const currentLevel: QueryBuilder[] = []; // Array to store nodes of this level
 
       for (let i = 0; i < levelSize; i++) {
         const currentNode = queue.shift()!; // Dequeue the next node
+        const {
+          id,
+          name,
+          value,
+          isExpanded,
+          isSelected,
+          parentNodeId,
+          parentNodeName,
+          items,
+          itemType,
+        } = currentNode;
+
         currentLevel.push({
-          id: currentNode.id,
-          name: currentNode.name,
-          value: currentNode.value,
-          isExpanded: currentNode.isExpanded,
-          isSelected: currentNode.isSelected,
-          parentNodeId: currentNode.parentNodeId,
-          parentNodeName: currentNode.parentNodeName,
-          isLeafNode: currentNode?.items?.length ? false : true,
-          itemType: currentNode.itemType,
+          id: id,
+          name: name,
+          value: value,
+          isExpanded: isExpanded,
+          isSelected: isSelected,
+          parentNodeId: parentNodeId,
+          parentNodeName: parentNodeName,
+          isLeafNode: items?.length ? false : true,
+          itemType: itemType,
         }); // Add the full object to the current level array
 
         // Enqueue children
@@ -115,12 +127,12 @@
    * @returns Modified array of tree nodes.
    */
   const expandNodeAtSameLevel = (
-    _items: TreeNode[],
+    _items: QuerySchema[],
     _currentLevel: number,
     _id: string,
     _level: number,
     _isLeafNode: boolean,
-  ): TreeNode[] => {
+  ): QuerySchema[] => {
     if (_currentLevel === _level) {
       let isTargetLevel = false;
       _items.forEach((item) => {
@@ -163,11 +175,11 @@
    * @returns Modified array of tree nodes.
    */
   const collapseAllTheChildNodes = (
-    _items: TreeNode[],
+    _items: QuerySchema[],
     _currentLevel: number,
     _id: string,
     _level: number,
-  ): TreeNode[] => {
+  ): QuerySchema[] => {
     if (_currentLevel === _level) {
       let isTargetLevel = false;
       _items.forEach((item) => {
@@ -178,7 +190,7 @@
       if (isTargetLevel) {
         _items.forEach((item) => {
           if (item.id === _id) {
-            const collapseChildNodes = (item: TreeNode) => {
+            const collapseChildNodes = (item: QuerySchema) => {
               item.isExpanded = false;
               for (let j = 0; j < item?.items?.length; j++) {
                 collapseChildNodes(item.items[j]);
@@ -238,7 +250,7 @@
    * @param _id - The ID of the target node to find and mark as selected.
    * @returns `true` if the target node or its parent nodes are found and selected; otherwise, `false`.
    */
-  const checksAllTheParentNodes = (_item: TreeNode, _id: string) => {
+  const checksAllTheParentNodes = (_item: QuerySchema, _id: string) => {
     if (_item.id === _id) {
       _item.isSelected = true;
       return true;
@@ -258,9 +270,9 @@
    * @param _id - The ID of the target node to find and unselect along with its child nodes.
    * @returns `true` if the target node is found and processed; otherwise, `false`.
    */
-  const unchecksAllTheChildNodes = (_item: TreeNode, _id: string) => {
+  const unchecksAllTheChildNodes = (_item: QuerySchema, _id: string) => {
     if (_item.id === _id) {
-      const uncheckChildNodes = (item: TreeNode) => {
+      const uncheckChildNodes = (item: QuerySchema) => {
         item.isSelected = false;
         item.value = "";
         for (let j = 0; j < item?.items?.length; j++) {
@@ -332,7 +344,7 @@
    * @param _value - The new value to be set for the node with the specified ID.
    */
   const updateAttributeInputData = (_id: string, _value: string) => {
-    const searchFieldById = (_item: TreeNode): boolean => {
+    const searchFieldById = (_item: QuerySchema): boolean => {
       if (_item.id === _id) {
         _item.value = _value;
         return true;
