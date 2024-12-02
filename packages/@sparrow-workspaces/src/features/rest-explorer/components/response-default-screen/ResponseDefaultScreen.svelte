@@ -4,11 +4,17 @@
   import { onMount } from "svelte";
   import { SparrowLogo } from "@sparrow/common/images";
   export let isMainScreen = false;
+  export let isWebApp = false;
 
   let ctrlCommands: { [key: string]: string } = {};
   let altCommands: { [key: string]: string } = {};
   onMount(async () => {
-    const platformName = await platform();
+    let platformName;
+    if (isWebApp) {
+      platformName = "windowsos";
+    } else {
+      platformName = await platform();
+    }
     let controlKey = platformName === "macos" ? "cmd" : "ctrl";
     let altKey = platformName === "macos" ? "option" : "alt";
     ctrlCommands = {

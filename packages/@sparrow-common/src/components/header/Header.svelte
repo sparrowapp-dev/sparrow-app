@@ -399,46 +399,46 @@
       </div>
     {/if}
 
-    {#if !isWebApp}
-      <Select
-        id={"environment-selector"}
-        data={[
-          {
-            name: "Select Environment",
-            id: "none",
-            type: environmentType.LOCAL,
-            hide: true,
-          },
-          {
-            name: "None",
-            id: "none",
-            display: "none",
-            type: environmentType.LOCAL,
-          },
-          ...environments,
-        ].filter((elem) => {
-          return elem.type === environmentType.LOCAL;
-        })}
-        titleId={currentEnvironment?.id}
-        onclick={handleDropdown}
-        minHeaderWidth={"185px"}
-        iconRequired={true}
-        icon={StackIcon}
-        iconColor={"var(--icon-primary-300)"}
-        isDropIconFilled={true}
-        borderType={"none"}
-        borderActiveType={"none"}
-        headerHighlight={""}
-        headerTheme={"transparent"}
-        menuItem={"v2"}
-        headerFontSize={"12px"}
-        maxHeaderWidth={"185px"}
-        zIndex={200}
-        bodyTheme={"violet"}
-        borderRounded={"2px"}
-        position={"absolute"}
-      />
-    {/if}
+    <!-- {#if !isWebApp} -->
+    <Select
+      id={"environment-selector"}
+      data={[
+        {
+          name: "Select Environment",
+          id: "none",
+          type: environmentType.LOCAL,
+          hide: true,
+        },
+        {
+          name: "None",
+          id: "none",
+          display: "none",
+          type: environmentType.LOCAL,
+        },
+        ...environments,
+      ].filter((elem) => {
+        return elem.type === environmentType.LOCAL;
+      })}
+      titleId={currentEnvironment?.id}
+      onclick={handleDropdown}
+      minHeaderWidth={"185px"}
+      iconRequired={true}
+      icon={StackIcon}
+      iconColor={"var(--icon-primary-300)"}
+      isDropIconFilled={true}
+      borderType={"none"}
+      borderActiveType={"none"}
+      headerHighlight={""}
+      headerTheme={"transparent"}
+      menuItem={"v2"}
+      headerFontSize={"12px"}
+      maxHeaderWidth={"185px"}
+      zIndex={200}
+      bodyTheme={"violet"}
+      borderRounded={"2px"}
+      position={"absolute"}
+    />
+    <!-- {/if} -->
 
     {#if !isGuestUser}
       <div class="ms-2 me-1">
