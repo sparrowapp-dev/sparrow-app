@@ -18,12 +18,12 @@
    */
   export let options: {
     name: String;
-    icon: any;
+    icon?: any;
     color: String;
-    iconColor: string;
-    iconSize: string;
+    iconColor?: string;
+    iconSize?: string;
     onclick: () => void;
-    isHoverConstant: boolean;
+    isHoverConstant?: boolean;
   }[];
 
   export let horizontalPosition: "left" | "right" = "right";

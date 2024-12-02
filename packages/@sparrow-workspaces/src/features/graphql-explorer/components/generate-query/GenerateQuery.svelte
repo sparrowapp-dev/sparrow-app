@@ -1,8 +1,10 @@
 <script lang="ts">
   import { WithSelect } from "../../../../hoc";
-  import { AngleLeftIcon } from "@sparrow/library/icons";
+  import { AngleLeftIcon, ThreeDotIcon } from "@sparrow/library/icons";
   import { Input } from "@sparrow/library/forms";
   import { trashIcon } from "@sparrow/library/assets";
+  import { Dropdown } from "@sparrow/library/ui";
+  import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
 
   export let schema;
   export let updateSchema;
@@ -32,15 +34,25 @@
     itemType: string;
   }
 
+  interface Breadcrum {
+    id: string;
+    name: String;
+  }
+
   let querySchema: QuerySchema[] = [];
   let queryBuilder: QueryBuilder[][] = [];
-  let searchData = "";
+  let breadcrum: Breadcrum[][] = [];
+  let isBreadcrumDropdownVisible: boolean = false;
+  let isBreadcrumDropdownHovered: boolean = false;
+  let searchData: string = "";
 
   $: {
     if (schema) {
       try {
         querySchema = JSON.parse(schema)?.Query?.items || [];
-        queryBuilder = levelOrderTraversalByLevel(querySchema, searchData);
+        queryBuilder = calculateQueryBuilder(querySchema, searchData);
+        breadcrum = calculateBreadcrumPath(queryBuilder, 3);
+        console.log(breadcrum);
       } catch (e) {
         querySchema = [];
         queryBuilder = [];
@@ -50,16 +62,74 @@
   }
 
   /**
+   * Calculates the breadcrumb path from the query builder's data structure.
+   * The function iterates over the query builder and extracts the parent node
+   * name and ID for each level, creating breadcrumb elements to represent the
+   * path through the query structure.
+   *
+   * @param _queryBuilder - A 2D array of QueryBuilder elements representing
+   *                        the levels of a query structure. Defaults to an
+   *                        empty array if not provided.
+   * @param _breadcrumMaxWrapper - Max size at which breadcrum wraps.
+   * @returns An array of `Breadcrum` objects, each containing a `name` and `id`
+   *          representing the breadcrumb path.
+   */
+  const calculateBreadcrumPath = (
+    _queryBuilder: QueryBuilder[][] = [],
+    _breadcrumMaxWrapper: number = 3,
+  ): Breadcrum[][] => {
+    let result: Breadcrum[][] = [];
+    if (_queryBuilder?.length < 2) {
+      return result;
+    }
+
+    if (_queryBuilder.length - 1 <= _breadcrumMaxWrapper) {
+      result.push([]);
+      for (let i = 1; i < _queryBuilder.length; i++) {
+        result[0].push({
+          name: _queryBuilder[i][0].parentNodeName,
+          id: _queryBuilder[i][0].parentNodeId,
+        });
+      }
+    } else {
+      result.push([], [], []);
+      for (let i = 1; i < _queryBuilder.length; i++) {
+        if (i === 1) {
+          result[0].push({
+            name: _queryBuilder[i][0].parentNodeName,
+            id: _queryBuilder[i][0].parentNodeId,
+          });
+        } else if (
+          i === _queryBuilder.length - 1 ||
+          i === _queryBuilder.length - 2
+        ) {
+          result[2].push({
+            name: _queryBuilder[i][0].parentNodeName,
+            id: _queryBuilder[i][0].parentNodeId,
+          });
+        } else {
+          result[1].push({
+            name: _queryBuilder[i][0].parentNodeName,
+            id: _queryBuilder[i][0].parentNodeId,
+          });
+        }
+      }
+    }
+    return result;
+  };
+
+  /**
    * Performs a level-order traversal on the tree structure and returns nodes grouped by level.
    * @param _data - Array of tree nodes to traverse.
    * @param _searchData - Search term for filtering nodes.
    * @returns An array of arrays, where each inner array represents a tree level.
    */
-  const levelOrderTraversalByLevel = (
+  const calculateQueryBuilder = (
     _data: QuerySchema[],
     _searchData: string,
   ): QueryBuilder[][] => {
     const result: QueryBuilder[][] = []; // To store nodes level by level
+    const breadcrum = [];
     if (!_data) return result;
     const searchedData = _data.filter((item) => {
       if (item.name.toLowerCase().includes(searchData.toLowerCase()))
@@ -335,6 +405,31 @@
     updateSchema(JSON.stringify(s));
   };
 
+  const navigateToBreadcrumPath = (_id: string) => {
+    const searchFieldById = (_item: QuerySchema): boolean => {
+      if (_item.id === _id) {
+        _item.items.forEach((item) => {
+          item.isExpanded = false;
+        });
+        return true;
+      }
+      for (let j = 0; j < _item?.items?.length; j++) {
+        if (searchFieldById(_item.items[j])) {
+          return true;
+        }
+      }
+      return false;
+    };
+    for (let i = 0; i < querySchema.length; i++) {
+      if (searchFieldById(querySchema[i])) {
+        const s = JSON.parse(schema);
+        s.Query.items = querySchema;
+        updateSchema(JSON.stringify(s));
+        return;
+      }
+    }
+  };
+
   /**
    * Handles input change by updating the value of a specific field in the tree structure
    * based on the provided ID. It searches the tree recursively for the node with the matching ID
@@ -408,13 +503,12 @@
       />
       <div class="ms-2" style="margin-top: -4px;">
         <Input
-          id="collectiofen-list-search"
+          id="graphql-query-search"
           width={"100%"}
           height={"24px"}
           type="search"
           searchIconColor={"var(--icon-secondary-300 )"}
           bind:value={searchData}
-          on:input={(e) => {}}
           defaultBorderColor="transparent"
           hoveredBorderColor="var(--border-primary-300)"
           focusedBorderColor={"var(--border-primary-300)"}
@@ -428,7 +522,96 @@
     </div>
     <div class="py-3 ps-3 h-100 d-flex align-items-center">
       <p class="mb-0 text-secondary-200 text-fs-12">
-        <!-- folder / folder / folder -->
+        {#each breadcrum as bread, index}
+          {#if index === 0}
+            {#each bread as slice, index}
+              {#if breadcrum.length === 1 && index === bread.length - 1}
+                <span
+                  class="bread-item-active"
+                  on:click={() => {
+                    navigateToBreadcrumPath(slice.id);
+                  }}
+                >
+                  {slice.name}
+                </span>
+              {:else}
+                <span
+                  class="bread-item"
+                  on:click={() => {
+                    navigateToBreadcrumPath(slice.id);
+                  }}
+                >
+                  {slice.name} <span class="px-3">/</span>
+                </span>
+              {/if}
+            {/each}
+          {/if}
+          {#if index === 1}
+            <span class="d-inline-block">
+              <Dropdown
+                buttonId="gql-breadcrum-dropdown"
+                bind:isMenuOpen={isBreadcrumDropdownVisible}
+                horizontalPosition="right"
+                minWidth={175}
+                options={breadcrum[1].map((item) => {
+                  return {
+                    name: item.name,
+                    color: "var(--text-secondary-100)",
+                    onclick: () => navigateToBreadcrumPath(item.id),
+                  };
+                })}
+              >
+                <button
+                  on:mouseenter={() => {
+                    isBreadcrumDropdownHovered = true;
+                  }}
+                  on:mouseleave={() => {
+                    isBreadcrumDropdownHovered = false;
+                  }}
+                  id="gql-breadcrum-dropdown"
+                  class="border-0 pt-0 border-radius-4 {isBreadcrumDropdownVisible
+                    ? 'bread-parent'
+                    : ''}"
+                  style="background-color: transparent; height:24px; width:24px;"
+                  on:click={() => {
+                    isBreadcrumDropdownVisible = !isBreadcrumDropdownVisible;
+                  }}
+                >
+                  <ThreeDotIcon
+                    color={isBreadcrumDropdownVisible ||
+                    isBreadcrumDropdownHovered
+                      ? "var(--icon-secondary-100)"
+                      : "var(--icon-secondary-950)"}
+                  />
+                </button>
+              </Dropdown>
+            </span>
+            <span class="px-3">/</span>
+          {/if}
+          {#if index === 2}
+            {#each bread as slice, index}
+              {#if index === bread.length - 1}
+                <span
+                  class="bread-item-active"
+                  on:click={() => {
+                    navigateToBreadcrumPath(slice.id);
+                  }}
+                >
+                  {slice.name}
+                </span>
+              {:else}
+                <span
+                  class="bread-item"
+                  on:click={() => {
+                    navigateToBreadcrumPath(slice.id);
+                  }}
+                >
+                  {slice.name} <span class="px-3">/</span>
+                </span>
+              {/if}
+            {/each}
+          {/if}
+        {/each}
       </p>
     </div>
   </div>
@@ -675,5 +858,16 @@
     height: 4px !important;
     background-color: var(--bg-secondary-600) !important;
     border: none !important;
+  }
+  .bread-parent {
+    background-color: var(--bg-tertiary-300) !important;
+  }
+  .bread-item-active {
+    cursor: pointer;
+    color: var(--text-secondary-100) !important;
+  }
+  .bread-item {
+    cursor: pointer;
+    color: var(--text-secondary-550) !important;
   }
 </style>
