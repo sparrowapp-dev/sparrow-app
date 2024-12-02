@@ -72,7 +72,7 @@
   }
 
   /**
-   * Saves Query and Mutation to databse.
+   * Saves Query and Mutation to database.
    */
   const saveSchemaToDatabase = () => {
     const s = JSON.parse(schema);
