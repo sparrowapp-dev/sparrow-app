@@ -51,7 +51,7 @@
       try {
         querySchema = JSON.parse(schema)?.Query?.items || [];
         queryBuilder = calculateQueryBuilder(querySchema, searchData);
-        breadcrum = calculateBreadcrumPath(queryBuilder, 3);
+        breadcrum = calculateBreadcrumPath(queryBuilder, 5);
         console.log(breadcrum);
       } catch (e) {
         querySchema = [];
@@ -76,7 +76,7 @@
    */
   const calculateBreadcrumPath = (
     _queryBuilder: QueryBuilder[][] = [],
-    _breadcrumMaxWrapper: number = 3,
+    _breadcrumMaxWrapper: number = 5,
   ): Breadcrum[][] => {
     let result: Breadcrum[][] = [];
     if (_queryBuilder?.length < 2) {
@@ -101,7 +101,9 @@
           });
         } else if (
           i === _queryBuilder.length - 1 ||
-          i === _queryBuilder.length - 2
+          i === _queryBuilder.length - 2 ||
+          i === _queryBuilder.length - 3 ||
+          i === _queryBuilder.length - 4
         ) {
           result[2].push({
             name: _queryBuilder[i][0].parentNodeName,
@@ -405,7 +407,11 @@
     updateSchema(JSON.stringify(s));
   };
 
-  const navigateToBreadcrumPath = (_id: string) => {
+  /**
+   * Naigates the query builder to the qunique column id.
+   * @param _id - id of the column.
+   */
+  const navigateToBreadcrumPath = (_id: string): void => {
     const searchFieldById = (_item: QuerySchema): boolean => {
       if (_item.id === _id) {
         _item.items.forEach((item) => {
@@ -520,7 +526,10 @@
         />
       </div>
     </div>
-    <div class="py-3 ps-3 h-100 d-flex align-items-center">
+    <div
+      class="py-3 ps-3 h-100 d-flex align-items-center overflow-auto"
+      style="white-space: nowrap;"
+    >
       <p class="mb-0 text-secondary-200 text-fs-12">
         {#each breadcrum as bread, index}
           {#if index === 0}
