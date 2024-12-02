@@ -55,6 +55,7 @@
     "codemirror-json-schema": "^0.6.1",
     "editorjs-parser": "^1.5.3",
     "font-awesome": "^4.7.0",
+    "graphql": "^16.9.0",
     "highlight.js": "^11.10.0",
     "js-beautify": "^1.15.1",
     "js-yaml": "^4.1.0",
