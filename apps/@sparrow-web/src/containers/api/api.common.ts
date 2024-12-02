@@ -460,84 +460,101 @@ const makeHttpRequestV2 = async (
   contentType: string,
   signal?: AbortSignal,
 ) => {
-  console.table({ url, method, headers, body, contentType });
   const startTime = performance.now();
-
-  // Fetch the agent state from local storage
   const selectedAgent = localStorage.getItem("selectedAgent");
-
   try {
-    let data;
+    let response;
     if (selectedAgent === "Cloud Agent") {
-      data = await axios({
-        data: {
-          url,
-          method,
-          headers,
-          body,
-          contentType,
-        },
-        url: constants.PROXY_SERVICE,
+      response = await axios({
+        data: { url, method, headers, body, contentType },
+        url: "http://localhost:3000/proxy/http-request",
         method: "POST",
       });
+      console.log("Cloud agent Response : ", response);
     } else {
-      data = await axios({
-        method,
-        url,
-        data: {},
-      });
+      try {
+        const axiosResponse = await axios({
+          method,
+          url,
+          data: body || {},
+          headers: headers ? JSON.parse(headers) : {},
+          validateStatus: function (status) {
+            return true;
+          },
+        });
+        console.log("Browser Agent Response : ", axiosResponse);
+        response = {
+          ...axiosResponse,
+          data: {
+            status: `${axiosResponse.status} ${axiosResponse.statusText}`,
+            data: axiosResponse.data,
+            headers: Object.fromEntries(Object.entries(axiosResponse.headers)),
+          },
+          status: 200,
+          statusText: "OK",
+        };
+      } catch (axiosError: any) {
+        const error = axiosError;
+        response = {
+          data: {
+            status: `${error.response?.status || 500} ${error.response?.statusText || "Error"}`,
+            data: error.response?.data || error.message,
+            headers: error.response?.headers
+              ? Object.fromEntries(Object.entries(error.response.headers))
+              : {},
+          },
+          status: 200,
+          statusText: "OK",
+          headers: error.response?.headers || {},
+          config: error.config,
+        };
+      }
     }
-
-    // Abort signal check
     if (signal?.aborted) {
-      throw new Error(); // Ignore response if request was cancelled
+      throw new DOMException("Request was aborted", "AbortError");
     }
-
     const endTime = performance.now();
     const duration = endTime - startTime;
-
     try {
-      // Handle response
       let responseData;
-      if (typeof data.data.data !== "string") {
-        responseData = JSON.stringify(data.data.data);
+      if (typeof response.data.data !== "string") {
+        responseData = JSON.stringify(response.data.data);
       } else {
-        responseData = data.data.data; // Don't modify non-JSON data
+        responseData = response.data.data;
       }
-
-      if (!data.data.status) {
-        throw new Error("Error parsing response");
-      }
-
+      appInsights.trackDependencyData({
+        id: uuidv4(),
+        name: "RPC Duration Metric",
+        duration: duration,
+        success: true,
+        responseCode: parseInt(response.data.status),
+        properties: { source: "frontend", type: "RPC_HTTP" },
+      });
       return success({
         body: responseData,
-        status: data.data.status,
-        headers: data.data.headers,
+        status: response.data.status,
+        headers: response.data.headers,
       });
     } catch (e) {
-      console.error(e);
+      console.error("Response parsing error:", e);
       throw new Error("Error parsing response");
     }
   } catch (e) {
     if (signal?.aborted) {
       throw new DOMException("Request was aborted", "AbortError");
     }
-    console.error(e);
+    console.error("Request error:", e);
     appInsights.trackDependencyData({
       id: uuidv4(),
       name: "RPC Duration Metric",
       duration: performance.now() - startTime,
       success: false,
       responseCode: 400,
-      properties: {
-        source: "frontend",
-        type: "RPC_HTTP",
-      },
+      properties: { source: "frontend", type: "RPC_HTTP" },
     });
     throw new Error("Error with the request");
   }
 };
-
 export {
   makeRequest,
   getAuthHeaders,

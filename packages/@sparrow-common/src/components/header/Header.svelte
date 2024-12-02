@@ -76,12 +76,12 @@
 
   let handleAgentDropdown = (tabId: string) => {
     localStorage.setItem("selectedAgent", tabId);
-    multipleagentvar = tabId;
+    multipleAgentvar = tabId;
   };
 
   $: {
-    if (multipleagentvar) {
-      localStorage.setItem("selectedAgent", multipleagentvar);
+    if (multipleAgentvar) {
+      localStorage.setItem("selectedAgent", multipleAgentvar);
     }
   }
   let handleTeamDropdown = (_teamId: string) => {
@@ -103,7 +103,7 @@
       id: "Cloud Agent",
       displayName: "Cloud Agent",
       description:
-        "Run requests via the cloud for faster performance and reduced load on your device.",
+        "Send an HTTP request through Sparrow's secure cloud server.",
     },
     {
       name: "Browser Agent",
@@ -114,7 +114,7 @@
     },
   ];
 
-  let multipleagentvar = (() => {
+  let multipleAgentvar = (() => {
     const storedAgent = localStorage.getItem("selectedAgent");
     return storedAgent || multipleAgentData[0]?.id;
   })();
@@ -396,7 +396,7 @@
     <Select
       id={"multiple-agent"}
       data={multipleAgentData}
-      titleId={`${multipleagentvar}`}
+      titleId={`${multipleAgentvar}`}
       onclick={handleAgentDropdown}
       minHeaderWidth={"232px"}
       iconRequired={true}
@@ -418,27 +418,30 @@
       maxBodyHeight={"300px"}
     >
       <div slot="pre-select" class="pre-dropdown">
-        <div class="select-agent">
+        <div
+          class="d-flex justify-content-between align-items-center select-agent"
+        >
           <div>Select Sparrow Agent</div>
         </div>
         <div class="upper-underline"></div>
       </div>
       <div
         slot="post-select"
-        class="post-dropdown"
-        style="justify-content: center; align-items:center; flex-direction:row"
+        class="post-dropdown d-flex justify-content-center align-items-center flex-column"
       >
         <div class="lower-underline"></div>
-        <div class="download-area">
-          <div class="download-sparrow-button dowload-section">
+        <div class="download-area w-100">
+          <div
+            class="download-sparrow-button dowload-section d-flex justify-content-between"
+          >
             <p class="download-text">
-              Download Sparrow Desktop <span class="description">
+              Download Sparrow Desktop <span class="description text-fs-10">
                 Effortlessly test requests with the desktop app. No agents
                 required.
               </span>
             </p>
           </div>
-          <div class="download-area">
+          <div class="d-flex align-items-center">
             <SparrowIcon
               height="32px"
               width="32px"
@@ -446,16 +449,22 @@
             />
           </div>
         </div>
-        <div class="download-btn">
-          <p>Download Now</p>
-          <div>
-            <ArrowRightIcon
-              height="15px"
-              width="11px"
-              color="var(--icon-primary-300)"
-            />
+        <a
+          href={constants.WEB_MARKETING_URL}
+          target="_blank"
+          class="text-decoration-none d-flex align-items-center align-self-start gap-2 mt-1 download-btn"
+        >
+          <div class="gap-2 d-flex">
+            <p>Download Now</p>
+            <div>
+              <ArrowRightIcon
+                height="15px"
+                width="11px"
+                color="var(--icon-primary-300)"
+              />
+            </div>
           </div>
-        </div>
+        </a>
       </div>
     </Select>
     <!-- {#if !isWebApp} -->
@@ -519,7 +528,6 @@
   }
 
   .description {
-    font-size: 10px;
     color: var(--text-secondary-200);
   }
 
@@ -554,7 +562,7 @@
   }
 
   .download-btn {
-    color: #3670f7;
+    color: var(--text-primary-300);
     padding: 0 0 0px 12px;
     font-size: 14px;
     display: flex;
@@ -565,7 +573,7 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-    color: #ffffff;
+    color: var(--text-secondary-100);
     cursor: pointer;
     font-size: 12px;
     font-weight: 400;
@@ -576,7 +584,7 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-    color: #ffffff;
+    color: var(--text-secondary-100);
     cursor: pointer;
     padding: 10px;
     font-size: 12px;
