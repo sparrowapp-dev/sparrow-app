@@ -12,6 +12,12 @@ export enum GraphqlRequestSectionTabEnum {
   HEADERS = "Headers",
 }
 
+export enum GraphqlRequestOperationTabEnum {
+  QUERY = "Query",
+  MUTATION = "Mutation",
+  SUBSCRIPTION = "Subscription",
+}
+
 export interface GraphqlRequestKeyWrapperTabInterface {
   key: string;
 }
@@ -27,6 +33,13 @@ export interface GraphqlRequestLeftSplitterWidthPercentageWrapperTabInterface {
 }
 export interface GraphqlRequestRightSplitterWidthPercentageWrapperTabInterface {
   requestRightSplitterWidthPercentage: number;
+}
+
+export interface GraphqlRequestBuilderLeftSplitterWidthPercentageWrapperTabInterface {
+  requestBuilderLeftSplitterWidthPercentage: number;
+}
+export interface GraphqlRequestBuilderRightSplitterWidthPercentageWrapperTabInterface {
+  requestBuilderRightSplitterWidthPercentage: number;
 }
 
 export interface GraphqlRequestIsBulkHeaderWrapperTabInterface {
@@ -56,6 +69,9 @@ export interface GraphqlRequestBearerTokenWrapperTabInterface {
 export interface GraphqlRequestUrlWrapperTabInterface {
   url: string;
 }
+export interface GraphqlRequestOperationSearchWrapperTabInterface {
+  operationSearch: string;
+}
 export interface GraphqlRequestQueryWrapperTabInterface {
   query: string;
 }
@@ -71,6 +87,9 @@ export interface GraphqlRequestKeyValueCheckedTabInterface
 export interface GraphqlRequestNavigationWrapperTabInterface {
   requestNavigation: GraphqlRequestSectionTabEnum;
 }
+export interface GraphqlRequestOperationNavigationWrapperTabInterface {
+  operationNavigation: GraphqlRequestOperationTabEnum;
+}
 export interface GraphqlRequestAuthNavigationWrapperTabInterface {
   requestAuthNavigation: GraphqlRequestAuthTypeTabEnum;
 }
@@ -80,7 +99,10 @@ export interface GraphqlRequestStateTabInterface
     GraphqlRequestLeftSplitterWidthPercentageWrapperTabInterface,
     GraphqlRequestRightSplitterWidthPercentageWrapperTabInterface,
     GraphqlRequestIsBulkHeaderWrapperTabInterface,
-    GraphqlRequestIsRequestSchemaFetchedWrapperTabInterface {}
+    GraphqlRequestIsRequestSchemaFetchedWrapperTabInterface,
+    GraphqlRequestBuilderLeftSplitterWidthPercentageWrapperTabInterface,
+    GraphqlRequestBuilderRightSplitterWidthPercentageWrapperTabInterface,
+    GraphqlRequestOperationNavigationWrapperTabInterface {}
 
 export interface GraphqlRequestStateWrapperTabInterface {
   state: GraphqlRequestStateTabInterface;
@@ -132,4 +154,5 @@ export interface GraphqlRequestTabInterface
     GraphqlRequestUrlWrapperTabInterface,
     GraphqlRequestQueryWrapperTabInterface,
     GraphqlRequestSchemaWrapperTabInterface,
-    GraphqlRequestHeadersWrapperTabInterface {}
+    GraphqlRequestHeadersWrapperTabInterface,
+    GraphqlRequestOperationSearchWrapperTabInterface {}
