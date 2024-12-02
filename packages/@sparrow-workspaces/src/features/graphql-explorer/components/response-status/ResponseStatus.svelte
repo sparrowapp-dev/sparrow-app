@@ -10,6 +10,8 @@
   export let onClearQuery;
   export let value;
 
+  let isClearQueryHovered: boolean = false;
+
   /**
    * Checks if the current request was successful based on the response status.
    * @param _status - The current status of the request.
@@ -34,8 +36,16 @@
   >
     <div>
       <button
+        on:mouseenter={() => {
+          isClearQueryHovered = true;
+        }}
+        on:mouseleave={() => {
+          isClearQueryHovered = false;
+        }}
         disabled={!value}
-        class="d-flex align-items-center input-cleaner bg-transparent px-2 border-radius-2 py-1 text-fs-12 text-secondary-200 border-0"
+        class="d-flex align-items-center input-cleaner bg-transparent px-2 border-radius-2 py-1 text-fs-12 {isClearQueryHovered
+          ? 'text-secondary-100'
+          : 'text-secondary-200'} border-0"
         on:click={() => {
           onClearQuery();
         }}
@@ -44,7 +54,9 @@
           ><CleanerIcon
             height={"14px"}
             width={"12px"}
-            color={"var(--text-secondary-200)"}
+            color={isClearQueryHovered
+              ? "var(--icon-secondary-100)"
+              : "var(--icon-secondary-200)"}
           /></span
         >
         <span style="margin-top: 3px; font-weight: 500;"> Clear Query </span>

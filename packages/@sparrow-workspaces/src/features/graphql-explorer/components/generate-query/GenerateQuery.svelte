@@ -1,26 +1,31 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { WithSelect } from "../../../../hoc";
-  import { AngleLeftIcon } from "@sparrow/library/icons";
+  import { AngleLeftIcon, ThreeDotIcon } from "@sparrow/library/icons";
   import { Input } from "@sparrow/library/forms";
   import { trashIcon } from "@sparrow/library/assets";
+  import { Dropdown } from "@sparrow/library/ui";
 
-  interface TreeNode {
+  export let schema;
+  export let updateSchema;
+
+  interface QuerySchema {
     name: string;
     value: string;
-    items: TreeNode[];
+    items: QuerySchema[];
     id: string;
+    isExpanded: boolean;
     isSelected: boolean;
     parentNodeId: string;
     parentNodeName: string;
     itemType: string;
   }
 
-  interface ResponseQueryNode {
+  interface QueryBuilder {
     name: string;
     value: string;
-    items?: ResponseQueryNode[];
+    items?: QueryBuilder[];
     id: string;
+    isExpanded: boolean;
     isSelected: boolean;
     parentNodeId: string;
     parentNodeName: string;
@@ -28,57 +33,144 @@
     itemType: string;
   }
 
-  export let schema;
-  export let updateSchema;
+  interface Breadcrum {
+    id: string;
+    name: String;
+  }
 
-  let data: TreeNode[];
+  let querySchema: QuerySchema[] = [];
+  let queryBuilder: QueryBuilder[][] = [];
+  let breadcrum: Breadcrum[][] = [];
+  let isBreadcrumDropdownVisible: boolean = false;
+  let isBreadcrumDropdownHovered: boolean = false;
+  let isQueryInputFocused: boolean = false;
+  let searchData: string = "";
+
   $: {
     if (schema) {
       try {
-        data = JSON.parse(schema)?.Query?.items;
-        res = levelOrderTraversalByLevel(data, searchData);
+        querySchema = JSON.parse(schema)?.Query?.items || [];
+        queryBuilder = calculateQueryBuilder(querySchema, searchData);
+        breadcrum = calculateBreadcrumPath(queryBuilder, 3);
+        console.log(breadcrum);
       } catch (e) {
+        querySchema = [];
+        queryBuilder = [];
         console.error(e);
       }
-      // debugger;
     }
   }
 
-  function levelOrderTraversalByLevel(
-    data: TreeNode[],
+  /**
+   * Calculates the breadcrumb path from the query builder's data structure.
+   * The function iterates over the query builder and extracts the parent node
+   * name and ID for each level, creating breadcrumb elements to represent the
+   * path through the query structure.
+   *
+   * @param _queryBuilder - A 2D array of QueryBuilder elements representing
+   *                        the levels of a query structure. Defaults to an
+   *                        empty array if not provided.
+   * @param _breadcrumMaxWrapper - Max size at which breadcrum wraps.
+   * @returns An array of `Breadcrum` objects, each containing a `name` and `id`
+   *          representing the breadcrumb path.
+   */
+  const calculateBreadcrumPath = (
+    _queryBuilder: QueryBuilder[][] = [],
+    _breadcrumMaxWrapper: number = 5,
+  ): Breadcrum[][] => {
+    let result: Breadcrum[][] = [];
+    if (_queryBuilder?.length < 2) {
+      return result;
+    }
+
+    if (_queryBuilder.length - 1 <= _breadcrumMaxWrapper) {
+      result.push([]);
+      for (let i = 1; i < _queryBuilder.length; i++) {
+        result[0].push({
+          name: _queryBuilder[i][0].parentNodeName,
+          id: _queryBuilder[i][0].parentNodeId,
+        });
+      }
+    } else {
+      result.push([], [], []);
+      for (let i = 1; i < _queryBuilder.length; i++) {
+        if (i === 1) {
+          result[0].push({
+            name: _queryBuilder[i][0].parentNodeName,
+            id: _queryBuilder[i][0].parentNodeId,
+          });
+        } else if (
+          i === _queryBuilder.length - 1 ||
+          i === _queryBuilder.length - 2
+        ) {
+          result[2].push({
+            name: _queryBuilder[i][0].parentNodeName,
+            id: _queryBuilder[i][0].parentNodeId,
+          });
+        } else {
+          result[1].push({
+            name: _queryBuilder[i][0].parentNodeName,
+            id: _queryBuilder[i][0].parentNodeId,
+          });
+        }
+      }
+    }
+    return result;
+  };
+
+  /**
+   * Performs a level-order traversal on the tree structure and returns nodes grouped by level.
+   * @param _data - Array of tree nodes to traverse.
+   * @param _searchData - Search term for filtering nodes.
+   * @returns An array of arrays, where each inner array represents a tree level.
+   */
+  const calculateQueryBuilder = (
+    _data: QuerySchema[],
     _searchData: string,
-  ): ResponseQueryNode[][] {
-    console.log("raw data", data);
-    if (!data) return [];
-    const searchedData = data.filter((item) => {
+  ): QueryBuilder[][] => {
+    const result: QueryBuilder[][] = []; // To store nodes level by level
+    const breadcrum = [];
+    if (!_data) return result;
+    const searchedData = _data.filter((item) => {
       if (item.name.toLowerCase().includes(searchData.toLowerCase()))
         return true;
       return false;
     });
-    const queue: TreeNode[] = [...searchedData]; // Initialize queue with the root nodes
-    const result: ResponseQueryNode[][] = []; // To store nodes level by level
+    const queue: QuerySchema[] = [...searchedData]; // Initialize queue with the root nodes
 
     while (queue.length > 0) {
       const levelSize = queue.length; // Number of nodes at the current level
-      const currentLevel: ResponseQueryNode[] = []; // Array to store nodes of this level
+      const currentLevel: QueryBuilder[] = []; // Array to store nodes of this level
 
       for (let i = 0; i < levelSize; i++) {
         const currentNode = queue.shift()!; // Dequeue the next node
+        const {
+          id,
+          name,
+          value,
+          isExpanded,
+          isSelected,
+          parentNodeId,
+          parentNodeName,
+          items,
+          itemType,
+        } = currentNode;
+
         currentLevel.push({
-          id: currentNode.id,
-          name: currentNode.name,
-          value: currentNode.value,
-          isSelected: currentNode.isSelected,
-          parentNodeId: currentNode.parentNodeId,
-          parentNodeName: currentNode.parentNodeName,
-          isLeafNode: currentNode?.items?.length ? false : true,
-          itemType: currentNode.itemType,
+          id: id,
+          name: name,
+          value: value,
+          isExpanded: isExpanded,
+          isSelected: isSelected,
+          parentNodeId: parentNodeId,
+          parentNodeName: parentNodeName,
+          isLeafNode: items?.length ? false : true,
+          itemType: itemType,
         }); // Add the full object to the current level array
 
         // Enqueue children
         if (currentNode.items && currentNode.items.length > 0) {
-          //   queue.push(...currentNode.items);
-          if (currentNode.isSelected) {
+          if (currentNode.isExpanded) {
             currentNode.items.forEach((elem) => {
               queue.push({
                 ...elem,
@@ -91,101 +183,298 @@
       }
 
       result.push(currentLevel); // Add the current level to the result
-      console.log("levels ", currentLevel);
     }
-
     return result;
-  }
-  let res: ResponseQueryNode[][] = [];
-  onMount(() => {
-    // res = levelOrderTraversalByLevel(data);
-  });
-
-  const uncheckAllTheNodes = (item: TreeNode) => {
-    item.isSelected = false;
-    item.value = "";
-    for (let j = 0; j < item?.items?.length; j++) {
-      uncheckAllTheNodes(item.items[j]);
-    }
   };
 
-  const handleCheck = (id: string, level: number) => {
-    const toggleCheckAtLevel = (
-      items: any[],
-      currentLevel: number,
-    ): TreeNode[] => {
-      if (currentLevel === level) {
-        // If we're at the desired level, uncheck all items and check the one with the given id
-        let isLeafNode = true;
-        let isChecked = false;
-        items.forEach((item) => {
-          if (item.id === id && item.items.length) {
-            isLeafNode = false;
-          }
-          if (item.id === id && item.isSelected) {
-            isChecked = true;
-          }
-        });
-        if (isChecked) {
-          items.forEach((item) => {
-            if (item.id === id) uncheckAllTheNodes(item);
-          });
-          return items;
+  /**
+   * Toggles node expansion and collapse, ensuring only one node per level is expanded.
+   * @param _items - Array of tree nodes to modify.
+   * @param _currentLevel - Current depth level of the tree.
+   * @param _id - ID of the target node to expand.
+   * @param _level - The target depth level.
+   * @param _isLeafNode - Whether the target node is a leaf node.
+   * @returns Modified array of tree nodes.
+   */
+  const expandNodeAtSameLevel = (
+    _items: QuerySchema[],
+    _currentLevel: number,
+    _id: string,
+    _level: number,
+    _isLeafNode: boolean,
+  ): QuerySchema[] => {
+    if (_currentLevel === _level) {
+      let isTargetLevel = false;
+      _items.forEach((item) => {
+        if (item.id === _id) {
+          isTargetLevel = true;
         }
-
-        if (!isLeafNode) {
-          items.forEach((item) => {
-            if (item.items.length) item.isSelected = false;
+      });
+      if (isTargetLevel) {
+        if (!_isLeafNode) {
+          _items.forEach((item) => {
+            if (item.items.length) item.isExpanded = false;
           });
         }
-        items.forEach((item) => {
-          if (item.id === id) item.isSelected = true;
+        _items.forEach((item) => {
+          if (item.id === _id) item.isExpanded = true;
         });
-        return items;
+        return _items;
       }
+    }
 
-      // If we're not at the desired level, recurse into the `items` array
-      return items.map((item) => ({
-        ...item,
-        items: toggleCheckAtLevel(item.items, currentLevel + 1),
-      }));
-    };
+    // If we're not at the desired level, recurse into the `items` array
+    return _items.map((item) => ({
+      ...item,
+      items: expandNodeAtSameLevel(
+        item.items,
+        _currentLevel + 1,
+        _id,
+        _level,
+        _isLeafNode,
+      ),
+    }));
+  };
 
+  /**
+   * Collapses all child nodes recursively for a given parent node.
+   * @param _items - Array of tree nodes to modify.
+   * @param _currentLevel - Current depth level of the tree.
+   * @param _id - ID of the target node.
+   * @param _level - The target depth level.
+   * @returns Modified array of tree nodes.
+   */
+  const collapseAllTheChildNodes = (
+    _items: QuerySchema[],
+    _currentLevel: number,
+    _id: string,
+    _level: number,
+  ): QuerySchema[] => {
+    if (_currentLevel === _level) {
+      let isTargetLevel = false;
+      _items.forEach((item) => {
+        if (item.id === _id) {
+          isTargetLevel = true;
+        }
+      });
+      if (isTargetLevel) {
+        _items.forEach((item) => {
+          if (item.id === _id) {
+            const collapseChildNodes = (item: QuerySchema) => {
+              item.isExpanded = false;
+              for (let j = 0; j < item?.items?.length; j++) {
+                collapseChildNodes(item.items[j]);
+              }
+            };
+            collapseChildNodes(item);
+          }
+        });
+        return _items;
+      }
+    }
+    return _items.map((item) => ({
+      ...item,
+      items: collapseAllTheChildNodes(
+        item.items,
+        _currentLevel + 1,
+        _id,
+        _level,
+      ),
+    }));
+  };
+
+  /**
+   * Handles expand/collapse toggling of a query builder node.
+   * @param _id - ID of the target node.
+   * @param _level - Depth level of the target node.
+   * @param _isExpandedNode - Whether the target node is currently expanded.
+   * @param _isLeafNode - Whether the target node is a leaf node.
+   */
+  const handleQBuilderCheckboxExpandOrCollapse = (
+    _id: string,
+    _level: number,
+    _isExpandedNode: boolean,
+    _isLeafNode: boolean,
+  ) => {
     // Update the data with the modified check state
-    data = toggleCheckAtLevel(data, 0); // Start at level 1 (root level)
-    // res = levelOrderTraversalByLevel(data);
+
+    if (_isExpandedNode) {
+      querySchema = collapseAllTheChildNodes(querySchema, 0, _id, _level);
+    } else {
+      querySchema = expandNodeAtSameLevel(
+        querySchema,
+        0,
+        _id,
+        _level,
+        _isLeafNode,
+      );
+    }
     const s = JSON.parse(schema);
-    s.Query.items = data;
+    s.Query.items = querySchema;
     updateSchema(JSON.stringify(s));
   };
 
-  const handleInput = (_id: string, _value: string) => {
-    const searchFieldById = (item: TreeNode): boolean => {
-      if (item.id === _id) {
-        item.value = _value;
+  /**
+   * Marks the target node and all its parent nodes as selected in a tree structure.
+   * @param _item - The current tree node being traversed.
+   * @param _id - The ID of the target node to find and mark as selected.
+   * @returns `true` if the target node or its parent nodes are found and selected; otherwise, `false`.
+   */
+  const checksAllTheParentNodes = (_item: QuerySchema, _id: string) => {
+    if (_item.id === _id) {
+      _item.isSelected = true;
+      return true;
+    }
+    for (let j = 0; j < _item?.items?.length; j++) {
+      if (checksAllTheParentNodes(_item.items[j], _id)) {
+        _item.items[j].isSelected = true;
         return true;
       }
-      for (let j = 0; j < item?.items?.length; j++) {
-        if (searchFieldById(item.items[j])) {
+    }
+  };
+
+  /**
+   * Unselects the specified node and all its child nodes in a tree structure.
+   * Also clears their `value` property.
+   * @param _item - The current tree node being traversed.
+   * @param _id - The ID of the target node to find and unselect along with its child nodes.
+   * @returns `true` if the target node is found and processed; otherwise, `false`.
+   */
+  const unchecksAllTheChildNodes = (_item: QuerySchema, _id: string) => {
+    if (_item.id === _id) {
+      const uncheckChildNodes = (item: QuerySchema) => {
+        item.isSelected = false;
+        item.value = "";
+        for (let j = 0; j < item?.items?.length; j++) {
+          uncheckChildNodes(item.items[j]);
+        }
+      };
+      uncheckChildNodes(_item);
+      return true;
+    }
+    for (let j = 0; j < _item?.items?.length; j++) {
+      if (unchecksAllTheChildNodes(_item.items[j], _id)) {
+        return true;
+      }
+    }
+  };
+
+  /**
+   * Handles the logic when a checkbox is checked or unchecked in a query builder.
+   * It updates the tree structure accordingly by expanding or collapsing nodes
+   * and marking their selection state.
+   *
+   * @param _id - The ID of the node being checked or unchecked.
+   * @param _level - The level of the node in the tree.
+   * @param _isCheckedNode - Boolean indicating whether the node is checked or unchecked.
+   * @param _isLeafNode - Boolean indicating whether the node is a leaf (has no children).
+   */
+  const handleQBuilderCheckboxCheckedOrUnchecked = (
+    _id: string,
+    _level: number,
+    _isCheckedNode: boolean,
+    _isLeafNode: boolean,
+  ) => {
+    if (_isCheckedNode) {
+      // Unchecks all the child nodes.
+      for (let i = 0; i < querySchema.length; i++) {
+        if (unchecksAllTheChildNodes(querySchema[i], _id)) {
+          break;
+        }
+      }
+    } else {
+      // Expands the current node.
+      querySchema = expandNodeAtSameLevel(
+        querySchema,
+        0,
+        _id,
+        _level,
+        _isLeafNode,
+      );
+      // Checks all the parent nodes.
+      for (let i = 0; i < querySchema.length; i++) {
+        if (checksAllTheParentNodes(querySchema[i], _id)) {
+          querySchema[i].isSelected = true;
+          break;
+        }
+      }
+    }
+
+    const s = JSON.parse(schema);
+    s.Query.items = querySchema;
+    updateSchema(JSON.stringify(s));
+  };
+
+  /**
+   * Naigates the query builder to the qunique column id.
+   * @param _id - id of the column.
+   */
+  const navigateToBreadcrumPath = (_id: string): void => {
+    const searchFieldById = (_item: QuerySchema): boolean => {
+      if (_item.id === _id) {
+        _item.items.forEach((item) => {
+          item.isExpanded = false;
+        });
+        return true;
+      }
+      for (let j = 0; j < _item?.items?.length; j++) {
+        if (searchFieldById(_item.items[j])) {
           return true;
         }
       }
       return false;
     };
-    for (let i = 0; i < data.length; i++) {
-      if (searchFieldById(data[i])) {
+    for (let i = 0; i < querySchema.length; i++) {
+      if (searchFieldById(querySchema[i])) {
         const s = JSON.parse(schema);
-        s.Query.items = data;
+        s.Query.items = querySchema;
         updateSchema(JSON.stringify(s));
         return;
       }
     }
   };
 
-  const handleinputField = (e: Event, _id: string) =>
-    handleInput(_id, (e.target as HTMLInputElement).value);
+  /**
+   * Handles input change by updating the value of a specific field in the tree structure
+   * based on the provided ID. It searches the tree recursively for the node with the matching ID
+   * and updates its value. Once updated, it updates the schema with the new value.
+   *
+   * @param _id - The ID of the node whose value is being updated.
+   * @param _value - The new value to be set for the node with the specified ID.
+   */
+  const updateAttributeInputData = (_id: string, _value: string) => {
+    const searchFieldById = (_item: QuerySchema): boolean => {
+      if (_item.id === _id) {
+        _item.value = _value;
+        return true;
+      }
+      for (let j = 0; j < _item?.items?.length; j++) {
+        if (searchFieldById(_item.items[j])) {
+          return true;
+        }
+      }
+      return false;
+    };
+    for (let i = 0; i < querySchema.length; i++) {
+      if (searchFieldById(querySchema[i])) {
+        const s = JSON.parse(schema);
+        s.Query.items = querySchema;
+        updateSchema(JSON.stringify(s));
+        return;
+      }
+    }
+  };
 
-  let searchData = "";
+  /**
+   * Handles input box change event by invoking the `updateAttributeInputData` function to update
+   * the value of the node in the tree structure. The value from the event target
+   * (input box) is passed along with the node ID to update the corresponding node.
+   *
+   * @param _e - The event object that contains the input value from the input box.
+   * @param _id - The ID of the node to be updated.
+   */
+  const handleQBuilderInputboxChange = (_e: Event, _id: string) =>
+    updateAttributeInputData(_id, (_e.target as HTMLInputElement).value);
 </script>
 
 <div class="d-flex flex-column h-100">
@@ -218,13 +507,12 @@
       />
       <div class="ms-2" style="margin-top: -4px;">
         <Input
-          id="collectiofen-list-search"
+          id="graphql-query-search"
           width={"100%"}
           height={"24px"}
           type="search"
           searchIconColor={"var(--icon-secondary-300 )"}
           bind:value={searchData}
-          on:input={(e) => {}}
           defaultBorderColor="transparent"
           hoveredBorderColor="var(--border-primary-300)"
           focusedBorderColor={"var(--border-primary-300)"}
@@ -236,9 +524,101 @@
         />
       </div>
     </div>
-    <div class="py-3 ps-3 h-100 d-flex align-items-center">
+    <div
+      class="py-3 ps-3 h-100 d-flex align-items-center overflow-auto"
+      style="white-space: nowrap;"
+    >
       <p class="mb-0 text-secondary-200 text-fs-12">
-        <!-- folder / folder / folder -->
+        {#each breadcrum as bread, index}
+          {#if index === 0}
+            {#each bread as slice, index}
+              {#if breadcrum.length === 1 && index === bread.length - 1}
+                <span
+                  class="bread-item-active"
+                  on:click={() => {
+                    navigateToBreadcrumPath(slice.id);
+                  }}
+                >
+                  {slice.name}
+                </span>
+              {:else}
+                <span
+                  class="bread-item"
+                  on:click={() => {
+                    navigateToBreadcrumPath(slice.id);
+                  }}
+                >
+                  {slice.name} <span class="px-3">/</span>
+                </span>
+              {/if}
+            {/each}
+          {/if}
+          {#if index === 1}
+            <span class="d-inline-block">
+              <Dropdown
+                buttonId="gql-breadcrum-dropdown"
+                bind:isMenuOpen={isBreadcrumDropdownVisible}
+                horizontalPosition="right"
+                minWidth={175}
+                options={breadcrum[1].map((item) => {
+                  return {
+                    name: item.name,
+                    color: "var(--text-secondary-100)",
+                    onclick: () => navigateToBreadcrumPath(item.id),
+                  };
+                })}
+              >
+                <button
+                  on:mouseenter={() => {
+                    isBreadcrumDropdownHovered = true;
+                  }}
+                  on:mouseleave={() => {
+                    isBreadcrumDropdownHovered = false;
+                  }}
+                  id="gql-breadcrum-dropdown"
+                  class="border-0 pt-0 border-radius-4 {isBreadcrumDropdownVisible
+                    ? 'bread-parent'
+                    : ''}"
+                  style="background-color: transparent; height:24px; width:24px;"
+                  on:click={() => {
+                    isBreadcrumDropdownVisible = !isBreadcrumDropdownVisible;
+                  }}
+                >
+                  <ThreeDotIcon
+                    color={isBreadcrumDropdownVisible ||
+                    isBreadcrumDropdownHovered
+                      ? "var(--icon-secondary-100)"
+                      : "var(--icon-secondary-950)"}
+                  />
+                </button>
+              </Dropdown>
+            </span>
+            <span class="px-3">/</span>
+          {/if}
+          {#if index === 2}
+            {#each bread as slice, index}
+              {#if index === bread.length - 1}
+                <span
+                  class="bread-item-active"
+                  on:click={() => {
+                    navigateToBreadcrumPath(slice.id);
+                  }}
+                >
+                  {slice.name}
+                </span>
+              {:else}
+                <span
+                  class="bread-item"
+                  on:click={() => {
+                    navigateToBreadcrumPath(slice.id);
+                  }}
+                >
+                  {slice.name} <span class="px-3">/</span>
+                </span>
+              {/if}
+            {/each}
+          {/if}
+        {/each}
       </p>
     </div>
   </div>
@@ -249,7 +629,7 @@
     ;
         flex-wrap: nowrap;"
     >
-      {#each res as r, index}
+      {#each queryBuilder as r, index}
         <div
           class="fields-column h-100 ellipsis"
           style="min-width: 272px; max-width: 272px; overflow: auto; border-right:1px solid var(--border-secondary-500);
@@ -268,16 +648,38 @@
               {#each r as t}
                 <div
                   class="d-flex align-items-center attribute-row border-radius-2 py-1 px-2 justify-content-between mb-1"
+                  style={t.isExpanded && !t?.isLeafNode
+                    ? "background-color: var(--bg-secondary-600) !important;"
+                    : ""}
                   on:click={(e) => {
                     e.preventDefault();
-                    handleCheck(t.id, index);
+                    handleQBuilderCheckboxExpandOrCollapse(
+                      t.id,
+                      index,
+                      t.isExpanded,
+                      t.isLeafNode,
+                    );
                   }}
                 >
                   <div
                     class="d-flex align-items-center"
                     style="width:calc(100% - 20px);"
                   >
-                    <div style="height:14px; width:14px;" class="me-2">
+                    <div
+                      style="height:14px; width:14px;"
+                      class="me-2"
+                      on:click={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        handleQBuilderCheckboxCheckedOrUnchecked(
+                          t.id,
+                          index,
+                          t.isSelected,
+                          t.isLeafNode,
+                        );
+                      }}
+                    >
                       <label class="checkbox-parent">
                         <input type="checkbox" bind:checked={t.isSelected} />
                         <span class="checkmark"></span>
@@ -311,7 +713,7 @@
                   {/if}
                 </div>
                 {#if t.isLeafNode && t.itemType === "inputField" && t.isSelected}
-                  <div class="ps-4 pe-3 mb-2 position-relative">
+                  <div class="input-parent ps-4 pe-3 mb-2 position-relative">
                     <input
                       type="text"
                       style="border:1px solid grey; outline:none;"
@@ -319,22 +721,24 @@
                       placeholder="Enter value"
                       value={t.value || ""}
                       on:input={(e) => {
-                        handleinputField(e, t?.id);
+                        handleQBuilderInputboxChange(e, t?.id);
+                      }}
+                      on:focus={() => {
+                        isQueryInputFocused = true;
+                      }}
+                      on:blur={() => {
+                        setTimeout(() => {
+                          isQueryInputFocused = false;
+                        }, 200);
                       }}
                     />
-                    {#if t?.value}
+                    {#if t?.value && isQueryInputFocused}
                       <span
-                        class="position-absolute"
+                        role="button"
+                        class="trash-container position-absolute"
                         style="top:0px; right: 22px"
                         on:click={() => {
-                          handleinputField(
-                            {
-                              target: {
-                                value: "",
-                              },
-                            },
-                            t?.id,
-                          );
+                          updateAttributeInputData(t?.id, "");
                         }}
                       >
                         <img
@@ -351,7 +755,7 @@
           </div>
         </div>
       {/each}
-      {#if searchData && !res?.length}
+      {#if searchData && !queryBuilder?.length}
         <div
           class="fields-column h-100 ellipsis"
           style="min-width: 272px; max-width: 272px; overflow: auto; border-right:1px solid var(--border-secondary-500);
@@ -407,25 +811,20 @@
     border: 2px solid var(--text-secondary-370);
   }
 
-  /* On mouse-over, add a grey background color */
-  /* .checkbox-parent:hover input ~ .checkmark {
-    background-color: #ccc;
-  } */
-
-  /* When the checkbox is isSelected, add a blue background */
+  /* When the checkbox is isExpanded, add a blue background */
   .checkbox-parent input:checked ~ .checkmark {
     border: none;
     background-color: var(--bg-primary-300);
   }
 
-  /* Create the checkmark/indicator (hidden when not isSelected) */
+  /* Create the checkmark/indicator (hidden when not isExpanded) */
   .checkbox-parent .checkmark:after {
     content: "";
     position: absolute;
     display: none;
   }
 
-  /* Show the checkmark when isSelected */
+  /* Show the checkmark when isExpanded */
   .checkbox-parent input:checked ~ .checkmark:after {
     display: block;
   }
@@ -442,6 +841,9 @@
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
   }
+  .attribute-row {
+    height: 28px;
+  }
   .attribute-row:hover {
     background-color: var(--bg-secondary-700);
   }
@@ -451,16 +853,12 @@
   .fields-column:first-child {
     padding-left: 0px;
   }
-  /* .fields-column:last-child {
-    padding-right: 0px;
-    border-right: none !important;
-  } */
+
   .arg-input {
-    /* background-color: var(--bg-secondary-850) !important; */
     border: 1px solid var(--border-secondary-370) !important;
     padding-right: 25px !important;
   }
-  .arg-input:hover,
+
   .arg-input:focus {
     background-color: var(--bg-tertiary-750) !important;
     border: 1px solid var(--border-primary-300) !important;
@@ -469,5 +867,16 @@
     height: 4px !important;
     background-color: var(--bg-secondary-600) !important;
     border: none !important;
+  }
+  .bread-parent {
+    background-color: var(--bg-tertiary-300) !important;
+  }
+  .bread-item-active {
+    cursor: pointer;
+    color: var(--text-secondary-100) !important;
+  }
+  .bread-item {
+    cursor: pointer;
+    color: var(--text-secondary-550) !important;
   }
 </style>
