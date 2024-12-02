@@ -113,3 +113,4 @@ export { default as SocketIoIcon } from "./SocketIo.svelte";
 export { default as GraphIcon } from "./Graph.svelte";
 export { default as RefreshSchemaIcon } from "./RefreshSchema.svelte";
 export { default as WarningIcon } from "./Warning.svelte";
+export { default as ThreeDotIcon } from "./ThreeDot.svelte";
