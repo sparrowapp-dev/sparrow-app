@@ -142,8 +142,8 @@
   import { profileHoveredIcon as hoveredProfile } from "@sparrow/library/assets";
   import { profileSelectedIcon as selectedProfile } from "@sparrow/library/assets";
   import { onMount } from "svelte";
-  import CustomHeader from "./custom-header-button/CustomHeader.svelte";
   import { OSDetector } from "../../utils";
+    import WindowAction from "./window-action/WindowAction.svelte";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",
@@ -153,7 +153,6 @@
     disabled: isGuestUser ?? false,
     user,
   };
-
 
   let showProfileModal = false;
 
@@ -169,10 +168,10 @@
     // Check if the target or any parent element matches the exclusion criteria
     if (
       e.buttons === 1 &&
-      !e.target.closest(".no-drag") // Prevent dragging for elements with the "no-drag" class
+      !e.target.closest(".no-drag")
     ) {
       if (e.detail === 2) {
-        appWindow.toggleMaximize(); // Maximize on double click
+        appWindow.toggleMaximize(); 
       } else {
         appWindow.startDragging();
       }
@@ -201,7 +200,7 @@
   <div class="d-flex ms-1 justify-content-cdenter align-items-center no-drag">
     {#if isWebApp === false}
       {#if isWindows === false}
-        <CustomHeader isWindows={false} {isWebApp} />
+        <WindowAction isWindows={false} {isWebApp} />
       {/if}
     {/if}
 
@@ -455,7 +454,7 @@
     {#if isWebApp === false}
       {#if isWindows}
         <div class="d-flex gap-3 me-1 no-drag">
-          <CustomHeader {isWindows} {isWebApp} />
+          <WindowAction {isWindows} {isWebApp} />
         </div>
       {/if}
     {/if}

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import {
     CrossIconV2,
     DoubleResizeIcon,
@@ -11,12 +11,9 @@
 
   export let isWindows = true;
 
-  export let isWebApp = false;
 
-  let appWindow;
-  if (!isWebApp) {
-    appWindow = getCurrentWindow();
-  }
+   let  appWindow = getCurrentWindow();
+  
 
   const onMinimize = () => {
     appWindow.minimize();
@@ -31,19 +28,18 @@
   };
 
   let hoveredButton = "";
-  const handleMouseEnter = (buttonName) => {
+  const handleMouseEnter = (buttonName:string) => {
     hoveredButton = buttonName;
   };
 
   const handleMouseLeave = () => {
-    hoveredButton = null;
+    hoveredButton = "";
   };
 
   let isMaximizeWindow = false;
 
   const checkSize = async () => {
     isMaximizeWindow = await appWindow.isMaximized();
-    console.log("isMaximizeWindow", isMaximizeWindow);
   };
 
   // Add event listener for window resize

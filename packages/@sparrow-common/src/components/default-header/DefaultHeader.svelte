@@ -6,30 +6,8 @@
   import { SparrowIcon } from "@sparrow/library/icons";
 
   import { onMount } from "svelte";
-  import CustomHeader from "../header/custom-header-button/CustomHeader.svelte";
   import { OSDetector } from "../../utils";
-
-  let isMaximizeWindow: boolean = true;
-
-  const appWindow = getCurrentWindow();
-
-  let titlebar; // Reference to the title bar element
-
-  function handleMouseDown(e: MouseEvent) {
-    // Check if the target or any parent element matches the exclusion criteria
-    if (
-      e.buttons === 1 &&
-      !e.target.closest(".no-drag") // Prevent dragging for elements with the "no-drag" class
-    ) {
-      if (e.detail === 2) {
-        isMaximizeWindow = !isMaximizeWindow;
-        appWindow.toggleMaximize(); // Maximize on double click
-      } else {
-        appWindow.startDragging(); // Start dragging on single click
-        isMaximizeWindow = false;
-      }
-    }
-  }
+  import WindowAction from "../header/window-action/WindowAction.svelte";
 
   let isWindows = false;
   let os = "";
@@ -40,16 +18,31 @@
       isWindows = true;
     }
   });
+
+  const appWindow = getCurrentWindow();
+
+  let titlebar;
+
+  function handleMouseDown(e: MouseEvent) {
+    if (e.buttons === 1 && !e.target.closest(".no-drag")) {
+      if (e.detail === 2) {
+        appWindow.toggleMaximize();
+      } else {
+        appWindow.startDragging();
+      }
+    }
+  }
 </script>
 
 <header
+  bind:this={titlebar}
   id="titlebar"
   class="titlebar app-header ps-1 d-flex align-items-center justify-content-between gap-5"
   on:mousedown={handleMouseDown}
 >
   <div class="d-flex ms-3 justify-content-cdenter align-items-center no-drag">
     {#if !isWindows}
-      <CustomHeader  {isWindows} />
+      <WindowAction isWindows={false} />
     {/if}
 
     <div>
@@ -64,7 +57,7 @@
   <div class="d-flex align-items-center no-drag" style="position: relative;">
     {#if isWindows}
       <div class="d-flex gap-3 ms-4 me-1 no-drag">
-        <CustomHeader bind:isMaximizeWindow isWindows={true} />
+        <WindowAction isWindows={true} />
       </div>
     {/if}
   </div>
