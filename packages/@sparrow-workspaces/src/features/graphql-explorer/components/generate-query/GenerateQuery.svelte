@@ -4,7 +4,6 @@
   import { Input } from "@sparrow/library/forms";
   import { trashIcon } from "@sparrow/library/assets";
   import { Dropdown } from "@sparrow/library/ui";
-  import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
 
   export let schema;
   export let updateSchema;
@@ -44,6 +43,7 @@
   let breadcrum: Breadcrum[][] = [];
   let isBreadcrumDropdownVisible: boolean = false;
   let isBreadcrumDropdownHovered: boolean = false;
+  let isQueryInputFocused: boolean = false;
   let searchData: string = "";
 
   $: {
@@ -51,7 +51,7 @@
       try {
         querySchema = JSON.parse(schema)?.Query?.items || [];
         queryBuilder = calculateQueryBuilder(querySchema, searchData);
-        breadcrum = calculateBreadcrumPath(queryBuilder, 5);
+        breadcrum = calculateBreadcrumPath(queryBuilder, 3);
         console.log(breadcrum);
       } catch (e) {
         querySchema = [];
@@ -101,9 +101,7 @@
           });
         } else if (
           i === _queryBuilder.length - 1 ||
-          i === _queryBuilder.length - 2 ||
-          i === _queryBuilder.length - 3 ||
-          i === _queryBuilder.length - 4
+          i === _queryBuilder.length - 2
         ) {
           result[2].push({
             name: _queryBuilder[i][0].parentNodeName,
@@ -725,8 +723,16 @@
                       on:input={(e) => {
                         handleQBuilderInputboxChange(e, t?.id);
                       }}
+                      on:focus={() => {
+                        isQueryInputFocused = true;
+                      }}
+                      on:blur={() => {
+                        setTimeout(() => {
+                          isQueryInputFocused = false;
+                        }, 200);
+                      }}
                     />
-                    {#if t?.value}
+                    {#if t?.value && isQueryInputFocused}
                       <span
                         role="button"
                         class="trash-container position-absolute"
@@ -805,11 +811,6 @@
     border: 2px solid var(--text-secondary-370);
   }
 
-  /* On mouse-over, add a grey background color */
-  /* .checkbox-parent:hover input ~ .checkmark {
-    background-color: #ccc;
-  } */
-
   /* When the checkbox is isExpanded, add a blue background */
   .checkbox-parent input:checked ~ .checkmark {
     border: none;
@@ -852,12 +853,8 @@
   .fields-column:first-child {
     padding-left: 0px;
   }
-  /* .fields-column:last-child {
-    padding-right: 0px;
-    border-right: none !important;
-  } */
+
   .arg-input {
-    /* background-color: var(--bg-secondary-850) !important; */
     border: 1px solid var(--border-secondary-370) !important;
     padding-right: 25px !important;
   }
@@ -881,13 +878,5 @@
   .bread-item {
     cursor: pointer;
     color: var(--text-secondary-550) !important;
-  }
-
-  .trash-container {
-    display: none;
-  }
-
-  .input-parent:focus-within .trash-container {
-    display: inline;
   }
 </style>
