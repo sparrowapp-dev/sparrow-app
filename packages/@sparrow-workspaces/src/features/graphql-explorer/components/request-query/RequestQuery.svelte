@@ -10,7 +10,6 @@
   const handleCodeMirrorChange = (e: CustomEvent<string>) => {
     onUpdateRequestQuery(e.detail);
   };
-  export let onClearQuery;
   let isBodyBeautified = false;
   const updateBeautifiedState = (value: boolean) => {
     isBodyBeautified = value;
@@ -47,38 +46,6 @@
           />
         </div>
       </div>
-      {#if value}
-        <div
-          style="border-top: 1px solid var(--border-secondary-400);"
-          class="pt-2 pb-2 d-flex justify-content-between"
-        >
-          <div></div>
-          <div>
-            <span
-              class="input-cleaner px-2 border-radius-2 py-1 text-fs-12 text-secondary-200"
-              role="button"
-              on:click={() => {
-                onClearQuery();
-              }}
-            >
-              <span class="me-2"
-                ><CleanerIcon
-                  height={"14px"}
-                  width={"12px"}
-                  color={"var(--text-secondary-200)"}
-                /></span
-              >
-              Clear Query</span
-            >
-          </div>
-        </div>
-      {/if}
     </div>
   </div>
 </div>
-
-<style>
-  .input-cleaner:hover {
-    background-color: var(--bg-tertiary-400);
-  }
-</style>
