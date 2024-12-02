@@ -67,13 +67,15 @@
 
   afterUpdate(() => {
     const dropdownElement = document.getElementById(buttonId);
-    let position = dropdownElement.getBoundingClientRect();
-    menuPosition.top = position.bottom + 10;
+    if (dropdownElement) {
+      let position = dropdownElement.getBoundingClientRect();
+      menuPosition.top = position.bottom + 10;
 
-    if (horizontalPosition === "right") {
-      menuPosition.left = position.left;
-    } else {
-      menuPosition.left = position.left - minWidth + position.width;
+      if (horizontalPosition === "right") {
+        menuPosition.left = position.left;
+      } else {
+        menuPosition.left = position.left - minWidth + position.width;
+      }
     }
   });
 </script>

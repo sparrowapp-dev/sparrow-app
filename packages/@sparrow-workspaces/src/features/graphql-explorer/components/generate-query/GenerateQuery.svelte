@@ -706,7 +706,7 @@
                   {/if}
                 </div>
                 {#if t.isLeafNode && t.itemType === "inputField" && t.isSelected}
-                  <div class="ps-4 pe-3 mb-2 position-relative">
+                  <div class="input-parent ps-4 pe-3 mb-2 position-relative">
                     <input
                       type="text"
                       style="border:1px solid grey; outline:none;"
@@ -720,7 +720,7 @@
                     {#if t?.value}
                       <span
                         role="button"
-                        class="position-absolute"
+                        class="trash-container position-absolute"
                         style="top:0px; right: 22px"
                         on:click={() => {
                           updateAttributeInputData(t?.id, "");
@@ -831,6 +831,9 @@
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
   }
+  .attribute-row {
+    height: 28px;
+  }
   .attribute-row:hover {
     background-color: var(--bg-secondary-700);
   }
@@ -849,7 +852,7 @@
     border: 1px solid var(--border-secondary-370) !important;
     padding-right: 25px !important;
   }
-  .arg-input:hover,
+
   .arg-input:focus {
     background-color: var(--bg-tertiary-750) !important;
     border: 1px solid var(--border-primary-300) !important;
@@ -869,5 +872,13 @@
   .bread-item {
     cursor: pointer;
     color: var(--text-secondary-550) !important;
+  }
+
+  .trash-container {
+    display: none;
+  }
+
+  .input-parent:focus-within .trash-container {
+    display: inline;
   }
 </style>
