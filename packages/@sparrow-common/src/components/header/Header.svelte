@@ -200,7 +200,7 @@
   <div class="d-flex ms-1 justify-content-cdenter align-items-center no-drag">
     {#if isWebApp === false}
       {#if isWindows === false}
-        <WindowAction isWindows={false} {isWebApp} />
+        <WindowAction isWindows={false} />
       {/if}
     {/if}
 
@@ -454,7 +454,7 @@
     {#if isWebApp === false}
       {#if isWindows}
         <div class="d-flex gap-3 me-1 no-drag">
-          <WindowAction {isWindows} {isWebApp} />
+          <WindowAction isWindows={true}  />
         </div>
       {/if}
     {/if}
