@@ -324,6 +324,34 @@ class GraphqlExplorerViewModel {
     1000,
   );
 
+  public updateSchemaAsPerQuery = async () => {
+    try {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const query = progressiveTab.property.graphql.query;
+      try {
+        // Check if the query is valid by attempting to parse it
+        parse(query);
+      } catch (error) {
+        console.error("not a valid query");
+        return;
+      }
+      const reverseJson = await this.reverseGraphQLToJSON(query);
+      console.log("reverseJSON----", reverseJson);
+      const parsedSchema = JSON.parse(progressiveTab.property.graphql.schema);
+      const updatedJSON = await this.compareAndUpdateFirstJSON(
+        parsedSchema.Query,
+        reverseJson?.items,
+      );
+      console.log("updatedJSON", updatedJSON);
+      const stringifiedUpdatedJSON = JSON.stringify(updatedJSON);
+      progressiveTab.property.graphql.schema = stringifiedUpdatedJSON;
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
   /**
    *
    * @param _query - request query
@@ -333,6 +361,7 @@ class GraphqlExplorerViewModel {
     progressiveTab.property.graphql.query = _query;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    // await this.updateSchemaAsPerQuery();
     this.compareRequestWithServer();
   };
 
@@ -798,6 +827,38 @@ class GraphqlExplorerViewModel {
     return firstJSON; // Return the updated first JSON
   };
 
+  private compareAndUpdateFetchedJson = async (previous, current) => {
+    const updateItems = (prevItems, currItems) => {
+      currItems.forEach((currItem) => {
+        // Find a matching item in the previous JSON by name
+        const matchingPrevItem = prevItems.find(
+          (prevItem) => prevItem.name === currItem.name,
+        );
+
+        if (matchingPrevItem) {
+          // Update isSelected and value
+          currItem.isSelected = matchingPrevItem.isSelected;
+          currItem.value = matchingPrevItem.value;
+
+          // Recursively update nested items
+          if (currItem.items && matchingPrevItem.items) {
+            updateItems(matchingPrevItem.items, currItem.items);
+          }
+        }
+      });
+    };
+
+    // Compare and update for both Query and Mutation sections
+    if (previous?.Query?.items && current?.Query?.items) {
+      updateItems(previous.Query.items, current.Query.items);
+    }
+    if (previous?.Mutation?.items && current?.Mutation?.items) {
+      updateItems(previous.Mutation.items, current.Mutation.items);
+    }
+    // Return the updated current JSON
+    return current;
+  };
+
   /**
    * Updated GraphQL Schema by fetching it.
    * @param _environmentVariables - Environment variables to be embedded in the GraphQL Request.
@@ -876,7 +937,17 @@ class GraphqlExplorerViewModel {
       const responseBody = response.data.body;
       const parsedResponse = JSON.parse(responseBody);
       const formattedSchema = await this.transformSchema(parsedResponse.data);
-      progressiveTab.property.graphql.schema = JSON.stringify(formattedSchema);
+      let previousSchema;
+      try {
+        previousSchema = JSON.parse(progressiveTab.property.graphql.schema);
+      } catch (error) {
+        console.log("Previous Schema not parsed", error);
+      }
+      const parsedSchema = await this.compareAndUpdateFetchedJson(
+        previousSchema,
+        formattedSchema,
+      );
+      progressiveTab.property.graphql.schema = JSON.stringify(parsedSchema);
       progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
@@ -966,6 +1037,22 @@ class GraphqlExplorerViewModel {
     this.compareRequestWithServer();
   };
 
+  public updateQueryAsPerSchema = async () => {
+    try {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const parsedSchema = JSON.parse(progressiveTab.property.graphql.schema);
+      const _query = await this.generateGraphQLQuery(
+        parsedSchema.Query,
+        "Query",
+      );
+      progressiveTab.property.graphql.query = _query;
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    } catch (error) {
+      console.error("error", error);
+    }
+  };
+
   /**
    *
    * @param _headers - request headers
@@ -975,6 +1062,7 @@ class GraphqlExplorerViewModel {
     progressiveTab.property.graphql.schema = _schema;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.updateQueryAsPerSchema();
     this.compareRequestWithServer();
   };
 
