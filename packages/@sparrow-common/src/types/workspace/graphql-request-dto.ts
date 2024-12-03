@@ -26,6 +26,7 @@ export interface GraphqlRequestMetaDataDtoInterface {
   url?: string;
   query?: string;
   schema?: string;
+  variables?: string;
   headers?: GraphqlRequestKeyValueDtoInterface[];
   auth?: GraphqlRequestAuthDtoInterface;
   selectedGraphqlAuthType?: GraphqlRequestAuthModeBaseEnum;

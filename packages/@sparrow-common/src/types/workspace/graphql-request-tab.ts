@@ -10,6 +10,7 @@ export enum GraphqlRequestSectionTabEnum {
   Schema = "Schema",
   AUTHORIZATION = "Authorization",
   HEADERS = "Headers",
+  VARIABLES = "Variables",
 }
 
 export enum GraphqlRequestOperationTabEnum {
@@ -77,6 +78,10 @@ export interface GraphqlRequestQueryWrapperTabInterface {
 }
 export interface GraphqlRequestSchemaWrapperTabInterface {
   schema: string;
+}
+
+export interface GraphqlRequestVariablesWrapperTabInterface {
+  variables: string;
 }
 
 export interface GraphqlRequestKeyValueCheckedTabInterface
@@ -155,4 +160,5 @@ export interface GraphqlRequestTabInterface
     GraphqlRequestQueryWrapperTabInterface,
     GraphqlRequestSchemaWrapperTabInterface,
     GraphqlRequestHeadersWrapperTabInterface,
+    GraphqlRequestVariablesWrapperTabInterface,
     GraphqlRequestOperationSearchWrapperTabInterface {}

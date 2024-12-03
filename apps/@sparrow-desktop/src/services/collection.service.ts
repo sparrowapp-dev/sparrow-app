@@ -493,6 +493,7 @@ export class CollectionService {
       url: string;
       query?: string;
       schema?: string;
+      variables?: string;
       headers?: GraphqlRequestKeyValueDtoInterface[];
       auth?: GraphqlRequestAuthDtoInterface;
       selectedGraphqlAuthType: HttpRequestAuthModeBaseEnum;
@@ -524,6 +525,7 @@ export class CollectionService {
               url: _graphql.url,
               query: _graphql.query,
               schema: _graphql.schema,
+              variables: _graphql.variables,
               headers: _graphql.headers,
               auth: _graphql.auth,
               selectedGraphqlAuthType: _graphql.selectedGraphqlAuthType,
@@ -544,6 +546,7 @@ export class CollectionService {
             url: _graphql.url,
             query: _graphql.query,
             schema: _graphql.schema,
+            variables: _graphql.variables,
             headers: _graphql.headers,
             auth: _graphql.auth,
             selectedGraphqlAuthType: _graphql.selectedGraphqlAuthType,

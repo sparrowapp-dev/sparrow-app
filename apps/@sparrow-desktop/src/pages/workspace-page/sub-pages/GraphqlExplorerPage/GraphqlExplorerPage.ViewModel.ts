@@ -51,12 +51,13 @@ import type { GuideQuery } from "../../../../types/user-guide";
 import { graphqlExplorerDataStore } from "@sparrow/workspaces/features/graphql-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
 import type { Path, Tab } from "@sparrow/common/types/workspace/tab";
-import type {
-  GraphqlRequestAuthTabInterface,
-  GraphqlRequestHeadersTabInterface,
-  GraphqlRequestKeyValueCheckedTabInterface,
-  GraphqlRequestStateTabInterface,
-  GraphqlRequestTabInterface,
+import {
+  GraphqlRequestOperationTabEnum,
+  type GraphqlRequestAuthTabInterface,
+  type GraphqlRequestHeadersTabInterface,
+  type GraphqlRequestKeyValueCheckedTabInterface,
+  type GraphqlRequestStateTabInterface,
+  type GraphqlRequestTabInterface,
 } from "@sparrow/common/types/workspace/graphql-request-tab";
 import {
   type EnvironmentFilteredVariableBaseInterface,
@@ -173,6 +174,7 @@ class GraphqlExplorerViewModel {
           requestAuthNavigation: requestServer.graphql.selectedGraphqlAuthType,
         })
         .updateSchema(requestServer.graphql.schema)
+        .updateVariables(requestServer.graphql.variables)
         .updateAuth(requestServer.graphql.auth)
         .updateHeaders(requestServer.graphql.headers)
         .getValue();
@@ -213,6 +215,13 @@ class GraphqlExplorerViewModel {
     else if (
       graphqlTabData.property.graphql?.schema !==
       progressiveTab.property.graphql?.schema
+    ) {
+      result = false;
+    }
+    // variables
+    else if (
+      graphqlTabData.property.graphql?.variables !==
+      progressiveTab.property.graphql?.variables
     ) {
       result = false;
     }
@@ -982,6 +991,18 @@ class GraphqlExplorerViewModel {
   };
 
   /**
+   * Updates variables in the RxDB
+   * @param _variables - stringified json of variables
+   */
+  public updateRequestVariables = async (_variables: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.graphql.variables = _variables;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
+  /**
    *
    * @param _id - request mongo id
    */
@@ -1053,10 +1074,19 @@ class GraphqlExplorerViewModel {
     try {
       const progressiveTab = createDeepCopy(this._tab.getValue());
       const parsedSchema = JSON.parse(progressiveTab.property.graphql.schema);
-      const _query = await this.generateGraphQLQuery(
-        parsedSchema.Query,
-        "Query",
-      );
+      let _query;
+      if (
+        progressiveTab.property.graphql.state.operationNavigation ===
+        GraphqlRequestOperationTabEnum.QUERY
+      ) {
+        _query = await this.generateGraphQLQuery(parsedSchema.Query, "Query");
+      } else {
+        _query = await this.generateGraphQLQuery(
+          parsedSchema.Mutation,
+          "Mutation",
+        );
+      }
+
       progressiveTab.property.graphql.query = _query;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
@@ -1204,8 +1234,15 @@ class GraphqlExplorerViewModel {
       url: decodeData[0],
       headers: decodeData[1],
       query: decodeData[2],
+      variables: decodeData[3],
     });
-    makeGraphQLRequest(decodeData[0], decodeData[1], decodeData[2], signal)
+    makeGraphQLRequest(
+      decodeData[0],
+      decodeData[1],
+      decodeData[2],
+      decodeData[3],
+      signal,
+    )
       .then((response) => {
         const end = Date.now();
         const byteLength = new TextEncoder().encode(
@@ -1540,6 +1577,7 @@ class GraphqlExplorerViewModel {
           url: unadaptedRequest.url as string,
           query: unadaptedRequest.query,
           schema: unadaptedRequest.schema,
+          variables: unadaptedRequest.variables,
           headers: unadaptedRequest.headers,
           auth: unadaptedRequest.auth,
           selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
@@ -1584,6 +1622,7 @@ class GraphqlExplorerViewModel {
       url: unadaptedRequest.url as string,
       query: unadaptedRequest.query,
       schema: unadaptedRequest.schema,
+      variables: unadaptedRequest.variables,
       headers: unadaptedRequest.headers,
       auth: unadaptedRequest.auth,
       selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
@@ -1776,6 +1815,7 @@ class GraphqlExplorerViewModel {
             initRequestTab.updateUrl(req.graphql.url as string);
             initRequestTab.updateQuery(req.graphql.query as string);
             initRequestTab.updateSchema(req.graphql.schema as string);
+            initRequestTab.updateVariables(req.graphql.variables as string);
             initRequestTab.updateAuth(
               req.graphql.auth as GraphqlRequestAuthTabInterface,
             );
@@ -1854,6 +1894,9 @@ class GraphqlExplorerViewModel {
             initRequestTab.updateSchema(
               res.data.data.graphql?.schema as string,
             );
+            initRequestTab.updateVariables(
+              res.data.data.graphql?.variables as string,
+            );
             initRequestTab.updateAuth(
               res.data.data.graphql?.auth as GraphqlRequestAuthTabInterface,
             );
@@ -1921,6 +1964,7 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(req.graphql?.url as string);
             initRequestTab.updateQuery(req.graphql?.query as string);
+            initRequestTab.updateVariables(req.graphql?.variables as string);
             initRequestTab.updateSchema(req.graphql?.schema as string);
             initRequestTab.updateAuth(
               req.graphql?.auth as GraphqlRequestAuthTabInterface,
@@ -1994,6 +2038,9 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(res.data.data.graphql?.url as string);
             initRequestTab.updateQuery(res.data.data.graphql?.query as string);
+            initRequestTab.updateVariables(
+              res.data.data.graphql?.variables as string,
+            );
             initRequestTab.updateSchema(
               res.data.data.graphql?.schema as string,
             );
