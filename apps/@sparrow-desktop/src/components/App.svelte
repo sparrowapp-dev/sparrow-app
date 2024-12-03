@@ -15,6 +15,7 @@
   import LoginPage from "@app/pages/auth-page/sub-pages/login-page/LoginPage.svelte";
   import { singleInstanceHandler } from "@app/utils/singleinstance/app.singleinstance";
   import { AppViewModel } from "./app.ViewModel";
+  import constants from "@app/constants/constants";
 
   const _viewModel = new AppViewModel();
 
@@ -76,7 +77,7 @@
       <Route path="/*"><Navigate to="/guest/" /></Route>
     </section>
     <section slot="unauthorized">
-      {#if 1}
+      {#if constants.SIMPLIFIED_LOGIN != "true"}
         <Route path="/init" component={EntryPoint} />
         <Route path="/init/*" component={Dashboard} />
         <Route path="/*"><Navigate to="/init" /></Route>
