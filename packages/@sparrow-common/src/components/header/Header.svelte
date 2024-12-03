@@ -143,7 +143,7 @@
   import { profileSelectedIcon as selectedProfile } from "@sparrow/library/assets";
   import { onMount } from "svelte";
   import { OSDetector } from "../../utils";
-    import WindowAction from "./window-action/WindowAction.svelte";
+  import WindowAction from "./window-action/WindowAction.svelte";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",
@@ -166,12 +166,9 @@
 
   function handleMouseDown(e: MouseEvent) {
     // Check if the target or any parent element matches the exclusion criteria
-    if (
-      e.buttons === 1 &&
-      !e.target.closest(".no-drag")
-    ) {
+    if (e.buttons === 1 && !e.target.closest(".no-drag")) {
       if (e.detail === 2) {
-        appWindow.toggleMaximize(); 
+        appWindow.toggleMaximize();
       } else {
         appWindow.startDragging();
       }
@@ -454,7 +451,7 @@
     {#if isWebApp === false}
       {#if isWindows}
         <div class="d-flex gap-3 me-1 no-drag">
-          <WindowAction isWindows={true}  />
+          <WindowAction isWindows={true} />
         </div>
       {/if}
     {/if}
