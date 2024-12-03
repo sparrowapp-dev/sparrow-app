@@ -33,7 +33,11 @@
         id: GraphqlRequestSectionTabEnum.QUERY,
         count: 0,
       },
-      // { name: "Schema", id: GraphqlRequestSectionTabEnum.Schema, count: 0 },
+      {
+        name: "Variables",
+        id: GraphqlRequestSectionTabEnum.VARIABLES,
+        count: 0,
+      },
       {
         name: "Headers",
         id: GraphqlRequestSectionTabEnum.HEADERS,

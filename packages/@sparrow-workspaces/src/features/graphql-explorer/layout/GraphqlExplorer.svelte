@@ -38,6 +38,7 @@
   import { GraphqlRequestSectionTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import { WarningIcon } from "@sparrow/library/icons";
+  import RequestVariables from "../components/request-variables/RequestVariables.svelte";
 
   export let tab;
   export let collections;
@@ -66,6 +67,8 @@
   export let onClearQuery;
   export let onFetchSchema;
   export let updateSchema;
+  export let onUpdateVariables;
+  export let updateOperationSearch;
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
@@ -153,11 +156,19 @@
             id={""}
             horizontal={true}
             dblClickSplitter={false}
-            on:resize={(e) => {}}
+            on:resize={(e) => {
+              onUpdateRequestState({
+                requestBuilderLeftSplitterWidthPercentage: e.detail[0].size,
+              });
+              onUpdateRequestState({
+                requestBuilderRightSplitterWidthPercentage: e.detail[1].size,
+              });
+            }}
           >
             <Pane
               minSize={30}
-              size={50}
+              size={$tab.property.graphql?.state
+                ?.requestBuilderLeftSplitterWidthPercentage}
               class="position-relative bg-secondary-850-important"
             >
               <div class="h-100">
@@ -203,14 +214,11 @@
                             value={$tab.property.graphql.query}
                             {onUpdateRequestQuery}
                           />
-                          <!-- {:else if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.Schema}
-                          <RequestSchema
-                            value={$tab.property.graphql.schema}
-                            onRefreshSchema={handleFetchSchema}
-                            isFetched={$tab.property.graphql.state
-                              .isRequestSchemaFetched}
-                            {isSchemaFetching}
-                          /> -->
+                        {:else if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.VARIABLES}
+                          <RequestVariables
+                            value={$tab.property.graphql.variables}
+                            onUpdateRequestVariable={onUpdateVariables}
+                          />
                         {:else if $tab.property.graphql?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                           <RequestHeaders
                             isBulkEditActive={$tab?.property?.graphql.state
@@ -297,7 +305,8 @@
             >
             <Pane
               minSize={30}
-              size={50}
+              size={$tab.property.graphql?.state
+                ?.requestBuilderRightSplitterWidthPercentage}
               class="position-relative bg-secondary-850-important"
             >
               <div class="h-100 d-flex flex-column">
@@ -313,6 +322,11 @@
                     <GenerateQuery
                       schema={$tab.property.graphql.schema}
                       {updateSchema}
+                      requestOperationSection={$tab.property.graphql?.state
+                        ?.operationNavigation}
+                      {onUpdateRequestState}
+                      operationSearch={$tab.property.graphql?.operationSearch}
+                      {updateOperationSearch}
                     />
                   {:else}
                     <div style="flex: 1;">

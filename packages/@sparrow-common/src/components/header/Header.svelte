@@ -6,6 +6,7 @@
     StackIcon,
     CheckCircle,
   } from "@sparrow/library/icons";
+  import { getCurrentWindow } from "@tauri-apps/api/window";
   import { environmentType } from "@sparrow/common/enums";
   import { SparrowIcon } from "@sparrow/library/icons";
   import { ArrowRightIcon } from "@sparrow/library/icons";
@@ -179,6 +180,9 @@
   import { profileTabIcon as profile } from "@sparrow/library/assets";
   import { profileHoveredIcon as hoveredProfile } from "@sparrow/library/assets";
   import { profileSelectedIcon as selectedProfile } from "@sparrow/library/assets";
+  import { onMount } from "svelte";
+  import { OSDetector } from "../../utils";
+  import WindowAction from "./window-action/WindowAction.svelte";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",
@@ -190,12 +194,51 @@
   };
 
   let showProfileModal = false;
+
+  let appWindow;
+
+  if (isWebApp === false) {
+    appWindow = getCurrentWindow();
+  }
+
+  let titlebar; // Reference to the title bar element
+
+  function handleMouseDown(e: MouseEvent) {
+    // Check if the target or any parent element matches the exclusion criteria
+    if (e.buttons === 1 && !e.target.closest(".no-drag")) {
+      if (e.detail === 2) {
+        appWindow.toggleMaximize();
+      } else {
+        appWindow.startDragging();
+      }
+    }
+  }
+
+  let isWindows = false;
+  let os = "";
+  const osDetector = new OSDetector();
+  onMount(() => {
+    os = osDetector.getOS();
+    if (os === "windows") {
+      isWindows = true;
+    } else {
+      isWindows = false;
+    }
+  });
 </script>
 
 <header
-  class="app-header ps-1 pe-3 d-flex align-items-center justify-content-between"
+  bind:this={titlebar}
+  id="titlebar"
+  class=" titlebar app-header ps-1 d-flex align-items-center justify-content-between"
 >
-  <div class="d-flex ms-3 justify-content-cdenter align-items-center">
+  <div class="d-flex ms-1 justify-content-cdenter align-items-center no-drag">
+    <!-- {#if isWebApp === false}
+      {#if isWindows === false}
+        <WindowAction isWindows={false} />
+      {/if}
+    {/if} -->
+
     {#if isGuestUser}
       <div>
         <SparrowEdgeIcon
@@ -205,7 +248,7 @@
         />
       </div>
     {:else}
-      <div>
+      <div class="ms-3">
         <SparrowIcon
           height="17px"
           width="17px"
@@ -213,7 +256,7 @@
         />
       </div>
     {/if}
-    <div class="ms-4">
+    <div class="ms-2 no-drag">
       {#if isWebApp}
         {#if teamDocuments?.filter((_team) => {
           if (_team.isOpen) return true;
@@ -378,7 +421,7 @@
     </div>
   </div>
 
-  <div class="d-flex align-items-center" style="position: relative;">
+  <div class="d-flex align-items-center no-drag" style="position: relative;">
     {#if isGuestUser && isLoginBannerActive === false}
       <PopupHint />
 
@@ -518,6 +561,14 @@
         />
       </div>
     {/if}
+
+    <!-- {#if isWebApp === false}
+      {#if isWindows}
+        <div class="d-flex gap-3 me-1 no-drag">
+          <WindowAction isWindows={true} />
+        </div>
+      {/if}
+    {/if} -->
   </div>
 </header>
 

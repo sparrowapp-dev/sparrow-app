@@ -51,12 +51,13 @@ import type { GuideQuery } from "../../../../types/user-guide";
 import { graphqlExplorerDataStore } from "@sparrow/workspaces/features/graphql-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
 import type { Path, Tab } from "@sparrow/common/types/workspace/tab";
-import type {
-  GraphqlRequestAuthTabInterface,
-  GraphqlRequestHeadersTabInterface,
-  GraphqlRequestKeyValueCheckedTabInterface,
-  GraphqlRequestStateTabInterface,
-  GraphqlRequestTabInterface,
+import {
+  GraphqlRequestOperationTabEnum,
+  type GraphqlRequestAuthTabInterface,
+  type GraphqlRequestHeadersTabInterface,
+  type GraphqlRequestKeyValueCheckedTabInterface,
+  type GraphqlRequestStateTabInterface,
+  type GraphqlRequestTabInterface,
 } from "@sparrow/common/types/workspace/graphql-request-tab";
 import {
   type EnvironmentFilteredVariableBaseInterface,
@@ -173,6 +174,7 @@ class GraphqlExplorerViewModel {
           requestAuthNavigation: requestServer.graphql.selectedGraphqlAuthType,
         })
         .updateSchema(requestServer.graphql.schema)
+        .updateVariables(requestServer.graphql.variables)
         .updateAuth(requestServer.graphql.auth)
         .updateHeaders(requestServer.graphql.headers)
         .getValue();
@@ -213,6 +215,13 @@ class GraphqlExplorerViewModel {
     else if (
       graphqlTabData.property.graphql?.schema !==
       progressiveTab.property.graphql?.schema
+    ) {
+      result = false;
+    }
+    // variables
+    else if (
+      graphqlTabData.property.graphql?.variables !==
+      progressiveTab.property.graphql?.variables
     ) {
       result = false;
     }
@@ -311,6 +320,18 @@ class GraphqlExplorerViewModel {
     if (_url && _url?.trim() !== "") {
       this.updateRequestSchemaThrottlerDebounce();
     }
+  };
+
+  /**
+   * update operation search to db
+   * @param _search  - search data
+   */
+  public updateRequestOperationSearch = async (_search: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.graphql.operationSearch = _search;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    // this.compareRequestWithServer();
   };
 
   private updateRequestSchemaThrottle = async (
@@ -518,7 +539,7 @@ class GraphqlExplorerViewModel {
 
     // Process input object types
     function processInputObjectType(typeName, depth = 0) {
-      if (processedTypes.has(typeName) || depth > 10) return null;
+      if (processedTypes.has(typeName) || depth > 8) return null;
 
       const inputType = types.find((t) => t.name === typeName);
       if (!inputType?.inputFields) return null;
@@ -536,7 +557,7 @@ class GraphqlExplorerViewModel {
 
     // Process object types
     function processObjectType(typeName, depth = 0) {
-      if (processedTypes.has(typeName) || depth > 10) return null;
+      if (processedTypes.has(typeName) || depth > 8) return null;
 
       const objectType = types.find((t) => t.name === typeName);
       if (!objectType?.fields) return null;
@@ -559,7 +580,7 @@ class GraphqlExplorerViewModel {
       depth = 0,
       defaultItemType = "field",
     ) {
-      if (!fields || depth > 10) return [];
+      if (!fields || depth > 8) return [];
 
       return fields.map((field) => {
         const fieldName = field.name;
@@ -569,11 +590,9 @@ class GraphqlExplorerViewModel {
         let result = {
           id: uuidv4(), // Add UUID to the top-level object
           name: fieldName,
-          parentName: parentName,
           description: field.description,
           type: typeName,
           itemType: defaultItemType,
-          isNonNull: field.type.kind === "NON_NULL",
           isSelected: false,
           isExpanded: false,
           value: getDefaultValue(typeName),
@@ -592,7 +611,6 @@ class GraphqlExplorerViewModel {
               type: argTypeName,
               description: arg.description,
               itemType: "argument",
-              isNonNull: arg.type.kind === "NON_NULL",
               isSelected: false,
               isExpanded: false,
               defaultValue: arg.defaultValue,
@@ -621,7 +639,7 @@ class GraphqlExplorerViewModel {
           });
 
           // Add arguments to items array
-          result.items.push(...argumentItems);
+          result.items.push(...argumentItems?.slice(0, 20));
         }
 
         // Process nested custom types
@@ -632,18 +650,22 @@ class GraphqlExplorerViewModel {
           // Add nested type fields to items array with UUID
           if (inputFields) {
             result.items.push(
-              ...inputFields.map((item) => ({
-                ...item,
-                id: uuidv4(),
-              })),
+              ...inputFields
+                .map((item) => ({
+                  ...item,
+                  id: uuidv4(),
+                }))
+                ?.slice(0, 20),
             );
           }
           if (objectFields) {
             result.items.push(
-              ...objectFields.map((item) => ({
-                ...item,
-                id: uuidv4(),
-              })),
+              ...objectFields
+                .map((item) => ({
+                  ...item,
+                  id: uuidv4(),
+                }))
+                ?.slice(0, 20),
             );
           }
         }
@@ -655,25 +677,28 @@ class GraphqlExplorerViewModel {
     // Find main types
     const queryType = types.find((t) => t.name === "Query");
     const mutationType = types.find((t) => t.name === "Mutation");
-    const subscriptionType = types.find((t) => t.name === "Subscription");
+    // const subscriptionType = types.find((t) => t.name === "Subscription");
 
     // Reset processed types before starting
     processedTypes.clear();
 
     const result = {
       Query: {
-        items: queryType ? processFields(queryType.fields, "Query") : [],
+        items: queryType
+          ? processFields(queryType.fields, "Query").slice(0, 100)
+          : [],
       },
       Mutation: {
         items: mutationType
-          ? processFields(mutationType.fields, "Mutation")
+          ? processFields(mutationType.fields, "Mutation").slice(0, 100)
           : [],
       },
-      Subscription: {
-        items: subscriptionType
-          ? processFields(subscriptionType.fields, "Subscription")
-          : [],
-      },
+      // Disabling subscription for now as it's support is not provided
+      // Subscription: {
+      //   items: subscriptionType
+      //     ? processFields(subscriptionType.fields, "Subscription")
+      //     : [],
+      // },
     };
 
     return result;
@@ -713,21 +738,22 @@ class GraphqlExplorerViewModel {
     }
 
     // Helper function to process fields and nested fields
-    function processFields(items) {
+    function processFields(items, indentLevel = 1) {
+      const indent = "  ".repeat(indentLevel); // Define indentation level
       return items
         .filter((item) => item.itemType === "field" && item.isSelected)
         .map((field) => {
           const args = processArguments(field.items); // Process arguments
-          const subFields = processFields(field.items); // Process nested fields
+          const subFields = processFields(field.items, indentLevel + 1); // Process nested fields
 
           const fieldWithArgs = args ? `${field.name}(${args})` : field.name;
 
           // Combine the field with its nested fields (if any)
           return subFields
-            ? `${fieldWithArgs} { ${subFields} }`
-            : fieldWithArgs;
+            ? `${indent}${fieldWithArgs} {\n${subFields}\n${indent}}`
+            : `${indent}${fieldWithArgs}`;
         })
-        .join(" ");
+        .join("\n");
     }
 
     // Generate the query
@@ -762,11 +788,9 @@ class GraphqlExplorerViewModel {
         return {
           id: field.name.value, // You can use a UUID generator if needed
           name: field.name.value,
-          parentName: null, // Populate parent name if needed
           description: null, // No description in query, set null
           type: null, // Type is not available in query, set null
           itemType: "field",
-          isNonNull: false, // Default value
           isSelected: true, // Since it's part of the query, it's selected
           value: null, // Default value
           items: [...args, ...nestedFields],
@@ -947,6 +971,7 @@ class GraphqlExplorerViewModel {
         previousSchema,
         formattedSchema,
       );
+
       progressiveTab.property.graphql.schema = JSON.stringify(parsedSchema);
       progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
       this.tab = progressiveTab;
@@ -967,6 +992,18 @@ class GraphqlExplorerViewModel {
         );
       }
     }
+  };
+
+  /**
+   * Updates variables in the RxDB
+   * @param _variables - stringified json of variables
+   */
+  public updateRequestVariables = async (_variables: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.graphql.variables = _variables;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
   };
 
   /**
@@ -1041,10 +1078,19 @@ class GraphqlExplorerViewModel {
     try {
       const progressiveTab = createDeepCopy(this._tab.getValue());
       const parsedSchema = JSON.parse(progressiveTab.property.graphql.schema);
-      const _query = await this.generateGraphQLQuery(
-        parsedSchema.Query,
-        "Query",
-      );
+      let _query;
+      if (
+        progressiveTab.property.graphql.state.operationNavigation ===
+        GraphqlRequestOperationTabEnum.QUERY
+      ) {
+        _query = await this.generateGraphQLQuery(parsedSchema.Query, "Query");
+      } else {
+        _query = await this.generateGraphQLQuery(
+          parsedSchema.Mutation,
+          "Mutation",
+        );
+      }
+
       progressiveTab.property.graphql.query = _query;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
@@ -1192,8 +1238,15 @@ class GraphqlExplorerViewModel {
       url: decodeData[0],
       headers: decodeData[1],
       query: decodeData[2],
+      variables: decodeData[3],
     });
-    makeGraphQLRequest(decodeData[0], decodeData[1], decodeData[2], signal)
+    makeGraphQLRequest(
+      decodeData[0],
+      decodeData[1],
+      decodeData[2],
+      decodeData[3],
+      signal,
+    )
       .then((response) => {
         const end = Date.now();
         const byteLength = new TextEncoder().encode(
@@ -1528,6 +1581,7 @@ class GraphqlExplorerViewModel {
           url: unadaptedRequest.url as string,
           query: unadaptedRequest.query,
           schema: unadaptedRequest.schema,
+          variables: unadaptedRequest.variables,
           headers: unadaptedRequest.headers,
           auth: unadaptedRequest.auth,
           selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
@@ -1572,6 +1626,7 @@ class GraphqlExplorerViewModel {
       url: unadaptedRequest.url as string,
       query: unadaptedRequest.query,
       schema: unadaptedRequest.schema,
+      variables: unadaptedRequest.variables,
       headers: unadaptedRequest.headers,
       auth: unadaptedRequest.auth,
       selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
@@ -1764,6 +1819,7 @@ class GraphqlExplorerViewModel {
             initRequestTab.updateUrl(req.graphql.url as string);
             initRequestTab.updateQuery(req.graphql.query as string);
             initRequestTab.updateSchema(req.graphql.schema as string);
+            initRequestTab.updateVariables(req.graphql.variables as string);
             initRequestTab.updateAuth(
               req.graphql.auth as GraphqlRequestAuthTabInterface,
             );
@@ -1842,6 +1898,9 @@ class GraphqlExplorerViewModel {
             initRequestTab.updateSchema(
               res.data.data.graphql?.schema as string,
             );
+            initRequestTab.updateVariables(
+              res.data.data.graphql?.variables as string,
+            );
             initRequestTab.updateAuth(
               res.data.data.graphql?.auth as GraphqlRequestAuthTabInterface,
             );
@@ -1909,6 +1968,7 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(req.graphql?.url as string);
             initRequestTab.updateQuery(req.graphql?.query as string);
+            initRequestTab.updateVariables(req.graphql?.variables as string);
             initRequestTab.updateSchema(req.graphql?.schema as string);
             initRequestTab.updateAuth(
               req.graphql?.auth as GraphqlRequestAuthTabInterface,
@@ -1982,6 +2042,9 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(res.data.data.graphql?.url as string);
             initRequestTab.updateQuery(res.data.data.graphql?.query as string);
+            initRequestTab.updateVariables(
+              res.data.data.graphql?.variables as string,
+            );
             initRequestTab.updateSchema(
               res.data.data.graphql?.schema as string,
             );

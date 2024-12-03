@@ -4,9 +4,14 @@
   import { Input } from "@sparrow/library/forms";
   import { trashIcon } from "@sparrow/library/assets";
   import { Dropdown } from "@sparrow/library/ui";
+  import { GraphqlRequestOperationTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
 
   export let schema;
   export let updateSchema;
+  export let requestOperationSection;
+  export let onUpdateRequestState;
+  export let operationSearch = "";
+  export let updateOperationSearch;
 
   interface QuerySchema {
     name: string;
@@ -44,22 +49,42 @@
   let isBreadcrumDropdownVisible: boolean = false;
   let isBreadcrumDropdownHovered: boolean = false;
   let isQueryInputFocused: boolean = false;
-  let searchData: string = "";
 
   $: {
-    if (schema) {
-      try {
-        querySchema = JSON.parse(schema)?.Query?.items || [];
-        queryBuilder = calculateQueryBuilder(querySchema, searchData);
-        breadcrum = calculateBreadcrumPath(queryBuilder, 3);
-        console.log(breadcrum);
-      } catch (e) {
-        querySchema = [];
-        queryBuilder = [];
-        console.error(e);
+    try {
+      if (requestOperationSection) {
+        if (requestOperationSection === GraphqlRequestOperationTabEnum.QUERY) {
+          querySchema = JSON.parse(schema)?.Query?.items || [];
+        } else if (
+          requestOperationSection === GraphqlRequestOperationTabEnum.MUTATION
+        ) {
+          querySchema = JSON.parse(schema)?.Mutation?.items || [];
+        }
+        queryBuilder = calculateQueryBuilder(querySchema, operationSearch);
+        breadcrum = calculateBreadcrumPath(queryBuilder, 5);
       }
+    } catch (e) {
+      querySchema = [];
+      queryBuilder = [];
+      breadcrum = [];
+      console.error(e);
     }
   }
+
+  /**
+   * Saves Query and Mutation to database.
+   */
+  const saveSchemaToDatabase = () => {
+    const s = JSON.parse(schema);
+    if (requestOperationSection === GraphqlRequestOperationTabEnum.QUERY) {
+      s.Query.items = querySchema;
+    } else if (
+      requestOperationSection === GraphqlRequestOperationTabEnum.MUTATION
+    ) {
+      s.Mutation.items = querySchema;
+    }
+    updateSchema(JSON.stringify(s));
+  };
 
   /**
    * Calculates the breadcrumb path from the query builder's data structure.
@@ -101,7 +126,9 @@
           });
         } else if (
           i === _queryBuilder.length - 1 ||
-          i === _queryBuilder.length - 2
+          i === _queryBuilder.length - 2 ||
+          i === _queryBuilder.length - 3 ||
+          i === _queryBuilder.length - 4
         ) {
           result[2].push({
             name: _queryBuilder[i][0].parentNodeName,
@@ -129,10 +156,9 @@
     _searchData: string,
   ): QueryBuilder[][] => {
     const result: QueryBuilder[][] = []; // To store nodes level by level
-    const breadcrum = [];
     if (!_data) return result;
     const searchedData = _data.filter((item) => {
-      if (item.name.toLowerCase().includes(searchData.toLowerCase()))
+      if (item.name.toLowerCase().includes(_searchData.toLowerCase()))
         return true;
       return false;
     });
@@ -309,9 +335,7 @@
         _isLeafNode,
       );
     }
-    const s = JSON.parse(schema);
-    s.Query.items = querySchema;
-    updateSchema(JSON.stringify(s));
+    saveSchemaToDatabase();
   };
 
   /**
@@ -400,9 +424,7 @@
       }
     }
 
-    const s = JSON.parse(schema);
-    s.Query.items = querySchema;
-    updateSchema(JSON.stringify(s));
+    saveSchemaToDatabase();
   };
 
   /**
@@ -426,9 +448,7 @@
     };
     for (let i = 0; i < querySchema.length; i++) {
       if (searchFieldById(querySchema[i])) {
-        const s = JSON.parse(schema);
-        s.Query.items = querySchema;
-        updateSchema(JSON.stringify(s));
+        saveSchemaToDatabase();
         return;
       }
     }
@@ -457,9 +477,7 @@
     };
     for (let i = 0; i < querySchema.length; i++) {
       if (searchFieldById(querySchema[i])) {
-        const s = JSON.parse(schema);
-        s.Query.items = querySchema;
-        updateSchema(JSON.stringify(s));
+        saveSchemaToDatabase();
         return;
       }
     }
@@ -491,17 +509,17 @@
         data={[
           {
             name: "Query",
-            id: "Query",
+            id: GraphqlRequestOperationTabEnum.QUERY,
           },
           {
             name: "Mutation",
-            id: "Mutation",
+            id: GraphqlRequestOperationTabEnum.MUTATION,
           },
         ]}
         zIndex={499}
-        titleId={"Query"}
+        titleId={requestOperationSection}
         onclick={(id = "") => {
-          // onUpdateRequestState({ requestAuthNavigation: id });
+          onUpdateRequestState({ operationNavigation: id });
         }}
         disabled={false}
       />
@@ -512,7 +530,10 @@
           height={"24px"}
           type="search"
           searchIconColor={"var(--icon-secondary-300 )"}
-          bind:value={searchData}
+          bind:value={operationSearch}
+          on:input={() => {
+            updateOperationSearch(operationSearch);
+          }}
           defaultBorderColor="transparent"
           hoveredBorderColor="var(--border-primary-300)"
           focusedBorderColor={"var(--border-primary-300)"}
@@ -755,7 +776,7 @@
           </div>
         </div>
       {/each}
-      {#if searchData && !queryBuilder?.length}
+      {#if operationSearch && !queryBuilder?.length}
         <div
           class="fields-column h-100 ellipsis"
           style="min-width: 272px; max-width: 272px; overflow: auto; border-right:1px solid var(--border-secondary-500);
