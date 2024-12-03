@@ -450,7 +450,7 @@
     <!-- {#if isWebApp === false}
       {#if isWindows}
         <div class="d-flex gap-3 me-1 no-drag">
-          <WindowAction isWindows={true}  />
+          <WindowAction isWindows={true} />
         </div>
       {/if}
     {/if} -->

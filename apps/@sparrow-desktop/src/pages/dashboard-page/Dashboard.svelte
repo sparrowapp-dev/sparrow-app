@@ -194,6 +194,7 @@
     onCreateWorkspace={() => (isWorkspaceModalOpen = true)}
     onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
     {user}
+    isWebApp={false}
     onLogout={_viewModel.handleLogout}
   />
 
