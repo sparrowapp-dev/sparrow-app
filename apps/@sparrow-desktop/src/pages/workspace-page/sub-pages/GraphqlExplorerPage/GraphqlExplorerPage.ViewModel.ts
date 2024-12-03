@@ -1549,7 +1549,6 @@ class GraphqlExplorerViewModel {
    * @returns save status
    */
   public saveRequest = async () => {
-    console.log("save request");
     MixpanelEvent(Events.Save_GraphQL_Request);
     const graphqlTabData = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
@@ -1564,7 +1563,6 @@ class GraphqlExplorerViewModel {
     const graphqlTabAdapter = new GraphqlTabAdapter();
     const unadaptedRequest = graphqlTabAdapter.unadapt(graphqlTabData as Tab);
 
-    console.log("unadaptedRequest2", unadaptedRequest);
     const isGuestUser = await this.getGuestUserState();
     /**
      * Handle save GraphQL Request for guest user
@@ -1629,7 +1627,6 @@ class GraphqlExplorerViewModel {
       auth: unadaptedRequest.auth,
       selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
     };
-    console.log("graphqlPayload", graphqlPayload);
 
     const res = await this.collectionService.updateGraphqlInCollection(
       graphqlTabData.id as string,
@@ -1749,8 +1746,6 @@ class GraphqlExplorerViewModel {
     tabName: string,
     description: string,
   ) => {
-    debugger;
-    console.log("inside save");
     const componentData = this._tab.getValue();
     let userSource = {};
     const _id = componentData.id;
@@ -1839,7 +1834,6 @@ class GraphqlExplorerViewModel {
             },
           };
         }
-        console.log("unadaptedRequest", unadaptedRequest);
         const res = await this.collectionService.addGraphqlInCollection({
           collectionId: path[path.length - 1].id,
           workspaceId: _workspaceMeta.id,
