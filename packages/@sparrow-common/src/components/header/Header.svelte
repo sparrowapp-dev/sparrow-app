@@ -1,9 +1,15 @@
 <script lang="ts">
   import { Select } from "@sparrow/library/forms";
-  import { SparrowEdgeIcon, StackIcon } from "@sparrow/library/icons";
+  import {
+    CloudOffIcon,
+    SparrowEdgeIcon,
+    StackIcon,
+    CheckCircle,
+  } from "@sparrow/library/icons";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { environmentType } from "@sparrow/common/enums";
   import { SparrowIcon } from "@sparrow/library/icons";
+  import { ArrowRightIcon } from "@sparrow/library/icons";
   import constants from "@app/constants/constants";
   import type { WorkspaceDocument } from "@app/database/database";
   import { PlusIcon } from "@sparrow/library/icons";
@@ -16,6 +22,7 @@
    * environment list
    */
   export let environments;
+
   /**
    * selected environment
    */
@@ -68,6 +75,16 @@
     onSwitchWorkspace(tabId);
   };
 
+  let handleAgentDropdown = (tabId: string) => {
+    localStorage.setItem("selectedAgent", tabId);
+    multipleAgentvar = tabId;
+  };
+
+  $: {
+    if (multipleAgentvar) {
+      localStorage.setItem("selectedAgent", multipleAgentvar);
+    }
+  }
   let handleTeamDropdown = (_teamId: string) => {
     onSwitchTeam(_teamId);
   };
@@ -80,6 +97,28 @@
       description: currentTeamName,
     },
   ];
+
+  let multipleAgentData = [
+    {
+      name: "Cloud Agent",
+      id: "Cloud Agent",
+      displayName: "Cloud Agent",
+      description:
+        "Send an HTTP request through Sparrow's secure cloud server.",
+    },
+    {
+      name: "Browser Agent",
+      id: "Browser Agent",
+      displayName: "Browser Agent",
+      description:
+        "Run requests directly from your browser, ideal for local testing.",
+    },
+  ];
+
+  let multipleAgentvar = (() => {
+    const storedAgent = localStorage.getItem("selectedAgent");
+    return storedAgent || multipleAgentData[0]?.id;
+  })();
 
   const createSetFromArray = (arr, key) => {
     const seen = new Set();
@@ -396,6 +435,82 @@
       </div>
     {/if}
 
+    <!-- Multiple Agent Dropdown -->
+
+    <Select
+      id={"multiple-agent"}
+      data={multipleAgentData}
+      titleId={`${multipleAgentvar}`}
+      onclick={handleAgentDropdown}
+      minHeaderWidth={"232px"}
+      iconRequired={true}
+      icon={CheckCircle}
+      iconColor={"#69D696"}
+      isDropIconFilled={true}
+      borderType={"none"}
+      borderActiveType={"none"}
+      headerHighlight={"hover-active"}
+      headerTheme={"transparent"}
+      menuItem={"v2"}
+      headerFontSize={"12px"}
+      maxHeaderWidth={"12px"}
+      zIndex={200}
+      bodyTheme={"violet"}
+      borderRounded={"2px"}
+      position={"absolute"}
+      isHeaderCombined={false}
+      maxBodyHeight={"300px"}
+    >
+      <div slot="pre-select" class="pre-dropdown">
+        <div
+          class="d-flex justify-content-between align-items-center select-agent"
+        >
+          <div>Select Sparrow Agent</div>
+        </div>
+        <div class="upper-underline"></div>
+      </div>
+      <div
+        slot="post-select"
+        class="post-dropdown d-flex justify-content-center align-items-center flex-column"
+      >
+        <div class="lower-underline"></div>
+        <div class="download-area w-100">
+          <div
+            class="download-sparrow-button dowload-section d-flex justify-content-between"
+          >
+            <p class="download-text">
+              Download Sparrow Desktop <span class="description text-fs-10">
+                Effortlessly test requests with the desktop app. No agents
+                required.
+              </span>
+            </p>
+          </div>
+          <div class="d-flex align-items-center">
+            <SparrowIcon
+              height="32px"
+              width="32px"
+              color="var(--primary-btn-color)"
+            />
+          </div>
+        </div>
+        <a
+          href={constants.WEB_MARKETING_URL}
+          target="_blank"
+          class="text-decoration-none d-flex align-items-center align-self-start gap-2 mt-1 download-btn"
+        >
+          <div class="gap-2 d-flex">
+            <p>Download Now</p>
+            <div>
+              <ArrowRightIcon
+                height="15px"
+                width="11px"
+                color="var(--icon-primary-300)"
+              />
+            </div>
+          </div>
+        </a>
+      </div>
+    </Select>
     <!-- {#if !isWebApp} -->
     <Select
       id={"environment-selector"}
@@ -463,6 +578,11 @@
     height: 44px;
     background-color: var(--bg-secondary-850);
   }
+
+  .description {
+    color: var(--text-secondary-200);
+  }
+
   .join-txt {
     font-size: 12px;
     padding-left: 12px;
@@ -491,6 +611,50 @@
     font-weight: 400;
     padding: 10px;
     text-align: center;
+  }
+
+  .download-btn {
+    color: var(--text-primary-300);
+    padding: 0 0 0px 12px;
+    font-size: 14px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .dowload-section {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    color: var(--text-secondary-100);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 10px;
+  }
+
+  .select-agent {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    color: var(--text-secondary-100);
+    cursor: pointer;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .download-text {
+    margin: 0;
+  }
+  .download-area {
+    display: flex;
+    justify-content: center;
+    align-self: center;
+  }
+
+  .download-sparrow-button {
+    display: flex;
+    flex-direction: row;
   }
 
   .create-new-workspace {

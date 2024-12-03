@@ -858,6 +858,7 @@ const makeHttpRequestV2 = async (
         },
       };
       appInsights.trackDependencyData(appInsightData);
+      console.log("api response : ", apiResponse);
       return success(apiResponse);
     } catch (e) {
       console.error(e);
