@@ -539,7 +539,7 @@ class GraphqlExplorerViewModel {
 
     // Process input object types
     function processInputObjectType(typeName, depth = 0) {
-      if (processedTypes.has(typeName) || depth > 10) return null;
+      if (processedTypes.has(typeName) || depth > 8) return null;
 
       const inputType = types.find((t) => t.name === typeName);
       if (!inputType?.inputFields) return null;
@@ -557,7 +557,7 @@ class GraphqlExplorerViewModel {
 
     // Process object types
     function processObjectType(typeName, depth = 0) {
-      if (processedTypes.has(typeName) || depth > 10) return null;
+      if (processedTypes.has(typeName) || depth > 8) return null;
 
       const objectType = types.find((t) => t.name === typeName);
       if (!objectType?.fields) return null;
@@ -580,7 +580,7 @@ class GraphqlExplorerViewModel {
       depth = 0,
       defaultItemType = "field",
     ) {
-      if (!fields || depth > 10) return [];
+      if (!fields || depth > 8) return [];
 
       return fields.map((field) => {
         const fieldName = field.name;
@@ -590,11 +590,9 @@ class GraphqlExplorerViewModel {
         let result = {
           id: uuidv4(), // Add UUID to the top-level object
           name: fieldName,
-          parentName: parentName,
           description: field.description,
           type: typeName,
           itemType: defaultItemType,
-          isNonNull: field.type.kind === "NON_NULL",
           isSelected: false,
           isExpanded: false,
           value: getDefaultValue(typeName),
@@ -613,7 +611,6 @@ class GraphqlExplorerViewModel {
               type: argTypeName,
               description: arg.description,
               itemType: "argument",
-              isNonNull: arg.type.kind === "NON_NULL",
               isSelected: false,
               isExpanded: false,
               defaultValue: arg.defaultValue,
@@ -642,7 +639,7 @@ class GraphqlExplorerViewModel {
           });
 
           // Add arguments to items array
-          result.items.push(...argumentItems);
+          result.items.push(...argumentItems?.slice(0, 20));
         }
 
         // Process nested custom types
@@ -653,18 +650,22 @@ class GraphqlExplorerViewModel {
           // Add nested type fields to items array with UUID
           if (inputFields) {
             result.items.push(
-              ...inputFields.map((item) => ({
-                ...item,
-                id: uuidv4(),
-              })),
+              ...inputFields
+                .map((item) => ({
+                  ...item,
+                  id: uuidv4(),
+                }))
+                ?.slice(0, 20),
             );
           }
           if (objectFields) {
             result.items.push(
-              ...objectFields.map((item) => ({
-                ...item,
-                id: uuidv4(),
-              })),
+              ...objectFields
+                .map((item) => ({
+                  ...item,
+                  id: uuidv4(),
+                }))
+                ?.slice(0, 20),
             );
           }
         }
@@ -676,25 +677,28 @@ class GraphqlExplorerViewModel {
     // Find main types
     const queryType = types.find((t) => t.name === "Query");
     const mutationType = types.find((t) => t.name === "Mutation");
-    const subscriptionType = types.find((t) => t.name === "Subscription");
+    // const subscriptionType = types.find((t) => t.name === "Subscription");
 
     // Reset processed types before starting
     processedTypes.clear();
 
     const result = {
       Query: {
-        items: queryType ? processFields(queryType.fields, "Query") : [],
+        items: queryType
+          ? processFields(queryType.fields, "Query").slice(0, 100)
+          : [],
       },
       Mutation: {
         items: mutationType
-          ? processFields(mutationType.fields, "Mutation")
+          ? processFields(mutationType.fields, "Mutation").slice(0, 100)
           : [],
       },
-      Subscription: {
-        items: subscriptionType
-          ? processFields(subscriptionType.fields, "Subscription")
-          : [],
-      },
+      // Disabling subscription for now as it's support is not provided
+      // Subscription: {
+      //   items: subscriptionType
+      //     ? processFields(subscriptionType.fields, "Subscription")
+      //     : [],
+      // },
     };
 
     return result;
@@ -734,21 +738,22 @@ class GraphqlExplorerViewModel {
     }
 
     // Helper function to process fields and nested fields
-    function processFields(items) {
+    function processFields(items, indentLevel = 1) {
+      const indent = "  ".repeat(indentLevel); // Define indentation level
       return items
         .filter((item) => item.itemType === "field" && item.isSelected)
         .map((field) => {
           const args = processArguments(field.items); // Process arguments
-          const subFields = processFields(field.items); // Process nested fields
+          const subFields = processFields(field.items, indentLevel + 1); // Process nested fields
 
           const fieldWithArgs = args ? `${field.name}(${args})` : field.name;
 
           // Combine the field with its nested fields (if any)
           return subFields
-            ? `${fieldWithArgs} { ${subFields} }`
-            : fieldWithArgs;
+            ? `${indent}${fieldWithArgs} {\n${subFields}\n${indent}}`
+            : `${indent}${fieldWithArgs}`;
         })
-        .join(" ");
+        .join("\n");
     }
 
     // Generate the query
@@ -783,11 +788,9 @@ class GraphqlExplorerViewModel {
         return {
           id: field.name.value, // You can use a UUID generator if needed
           name: field.name.value,
-          parentName: null, // Populate parent name if needed
           description: null, // No description in query, set null
           type: null, // Type is not available in query, set null
           itemType: "field",
-          isNonNull: false, // Default value
           isSelected: true, // Since it's part of the query, it's selected
           value: null, // Default value
           items: [...args, ...nestedFields],
@@ -968,6 +971,7 @@ class GraphqlExplorerViewModel {
         previousSchema,
         formattedSchema,
       );
+
       progressiveTab.property.graphql.schema = JSON.stringify(parsedSchema);
       progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
       this.tab = progressiveTab;
