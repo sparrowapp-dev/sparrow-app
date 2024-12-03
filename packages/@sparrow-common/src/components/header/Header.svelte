@@ -231,13 +231,14 @@
   bind:this={titlebar}
   id="titlebar"
   class=" titlebar app-header ps-1 d-flex align-items-center justify-content-between"
+  on:mousedown={handleMouseDown}
 >
   <div class="d-flex ms-1 justify-content-cdenter align-items-center no-drag">
-    <!-- {#if isWebApp === false}
+    {#if isWebApp === false}
       {#if isWindows === false}
         <WindowAction isWindows={false} />
       {/if}
-    {/if} -->
+    {/if}
 
     {#if isGuestUser}
       <div>
@@ -562,13 +563,13 @@
       </div>
     {/if}
 
-    <!-- {#if isWebApp === false}
+    {#if isWebApp === false}
       {#if isWindows}
         <div class="d-flex gap-3 me-1 no-drag">
           <WindowAction isWindows={true} />
         </div>
       {/if}
-    {/if} -->
+    {/if}
   </div>
 </header>
 
