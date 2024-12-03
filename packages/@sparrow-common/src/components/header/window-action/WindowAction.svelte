@@ -7,13 +7,11 @@
     SquareIcon,
   } from "@sparrow/library/icons";
   import { getCurrentWindow } from "@tauri-apps/api/window";
-    import { onDestroy } from "svelte";
+  import { onDestroy } from "svelte";
 
   export let isWindows = true;
 
-
-   let  appWindow = getCurrentWindow();
-  
+  let appWindow = getCurrentWindow();
 
   const onMinimize = () => {
     appWindow.minimize();
@@ -23,12 +21,24 @@
     appWindow.close();
   };
 
-  const toggleSize = () => {
-    appWindow.toggleMaximize();
+  const toggleSize = async () => {
+    if (!isWindows) {
+      // macOS: Use fullscreen
+      const isFullscreen = await appWindow.isFullscreen();
+      appWindow.setFullscreen(!isFullscreen);
+    } else {
+      // Other platforms: Use maximize
+      const isMaximized = await appWindow.isMaximized();
+      if (isMaximized) {
+        appWindow.unmaximize();
+      } else {
+        appWindow.maximize();
+      }
+    }
   };
 
   let hoveredButton = "";
-  const handleMouseEnter = (buttonName:string) => {
+  const handleMouseEnter = (buttonName: string) => {
     hoveredButton = buttonName;
   };
 
@@ -42,13 +52,19 @@
     isMaximizeWindow = await appWindow.isMaximized();
   };
 
-  // Add event listener for window resize
-  const unlistenResize = appWindow.onResized(checkSize);
+  if (isWindows) {
+    try {
+      // Add event listener for window resize
+      const unlistenResize = appWindow.onResized(checkSize);
 
-  // Cleanup listener when component is destroyed
-  onDestroy(() => {
-    unlistenResize.then((f) => f());
-  });
+      // // Cleanup listener when component is destroyed
+      onDestroy(() => {
+        unlistenResize.then((f) => f());
+      });
+    } catch {
+      console.log("Insidie catch");
+    }
+  }
 </script>
 
 {#if isWindows}
