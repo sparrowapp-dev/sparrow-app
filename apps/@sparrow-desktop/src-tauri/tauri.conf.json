@@ -6,7 +6,7 @@
     "windows": [
       {
         "center": true,
-        "decorations": false,
+        "decorations": true,
         "fullscreen": false,
         "label": "main",
         "minHeight": 700,

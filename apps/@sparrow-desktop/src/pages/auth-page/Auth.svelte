@@ -4,7 +4,7 @@
     logoSparrowSquare,
     sparrowLogoBackground,
   } from "@sparrow/common/images";
-  import {  DefaultHeader, Redirect } from "@sparrow/common/components";
+  import { DefaultHeader, Redirect } from "@sparrow/common/components";
   import constants from "@app/constants/constants";
   import { StarIcon } from "@sparrow/library/icons";
   import { StarFilledIcon } from "@sparrow/library/icons";
@@ -71,7 +71,7 @@
   };
 </script>
 
-<DefaultHeader />
+<!-- <DefaultHeader /> -->
 
 {#if isEntry}
   <Redirect
