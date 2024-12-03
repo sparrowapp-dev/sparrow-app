@@ -524,11 +524,11 @@ const makeHttpRequestV2 = async (
       }
       appInsights.trackDependencyData({
         id: uuidv4(),
-        name: "RPC Duration Metric",
+        name: "Cloud Agent Duration Metric",
         duration: duration,
         success: true,
         responseCode: parseInt(response.data.status),
-        properties: { source: "frontend", type: "RPC_HTTP" },
+        properties: { source: "frontend", type: "CA_HTTP" },
       });
       return success({
         body: responseData,
@@ -546,11 +546,11 @@ const makeHttpRequestV2 = async (
     console.error("Request error:", e);
     appInsights.trackDependencyData({
       id: uuidv4(),
-      name: "RPC Duration Metric",
+      name: "Browser Agent Duration Metric",
       duration: performance.now() - startTime,
       success: false,
       responseCode: 400,
-      properties: { source: "frontend", type: "RPC_HTTP" },
+      properties: { source: "frontend", type: "BA_HTTP" },
     });
     throw new Error("Error with the request");
   }
