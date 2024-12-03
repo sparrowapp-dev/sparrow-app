@@ -321,6 +321,18 @@ class GraphqlExplorerViewModel {
     }
   };
 
+  /**
+   * update operation search to db
+   * @param _search  - search data
+   */
+  public updateRequestOperationSearch = async (_search: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.graphql.operationSearch = _search;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    // this.compareRequestWithServer();
+  };
+
   private updateRequestSchemaThrottle = async (
     _environmentVariables?: EnvironmentFilteredVariableBaseInterface[],
   ) => {
@@ -583,6 +595,7 @@ class GraphqlExplorerViewModel {
           itemType: defaultItemType,
           isNonNull: field.type.kind === "NON_NULL",
           isSelected: false,
+          isExpanded: false,
           value: getDefaultValue(typeName),
           items: [],
         };
@@ -601,6 +614,7 @@ class GraphqlExplorerViewModel {
               itemType: "argument",
               isNonNull: arg.type.kind === "NON_NULL",
               isSelected: false,
+              isExpanded: false,
               defaultValue: arg.defaultValue,
               value: getDefaultValue(argTypeName),
               items: [],

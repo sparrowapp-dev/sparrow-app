@@ -68,6 +68,7 @@
   export let onFetchSchema;
   export let updateSchema;
   export let onUpdateVariables;
+  export let updateOperationSearch;
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
@@ -155,11 +156,19 @@
             id={""}
             horizontal={true}
             dblClickSplitter={false}
-            on:resize={(e) => {}}
+            on:resize={(e) => {
+              onUpdateRequestState({
+                requestBuilderLeftSplitterWidthPercentage: e.detail[0].size,
+              });
+              onUpdateRequestState({
+                requestBuilderRightSplitterWidthPercentage: e.detail[1].size,
+              });
+            }}
           >
             <Pane
               minSize={30}
-              size={50}
+              size={$tab.property.graphql?.state
+                ?.requestBuilderLeftSplitterWidthPercentage}
               class="position-relative bg-secondary-850-important"
             >
               <div class="h-100">
@@ -296,7 +305,8 @@
             >
             <Pane
               minSize={30}
-              size={50}
+              size={$tab.property.graphql?.state
+                ?.requestBuilderRightSplitterWidthPercentage}
               class="position-relative bg-secondary-850-important"
             >
               <div class="h-100 d-flex flex-column">
@@ -312,6 +322,11 @@
                     <GenerateQuery
                       schema={$tab.property.graphql.schema}
                       {updateSchema}
+                      requestOperationSection={$tab.property.graphql?.state
+                        ?.operationNavigation}
+                      {onUpdateRequestState}
+                      operationSearch={$tab.property.graphql?.operationSearch}
+                      {updateOperationSearch}
                     />
                   {:else}
                     <div style="flex: 1;">

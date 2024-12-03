@@ -8,7 +8,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 15,
+  version: 16,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -369,10 +369,16 @@ export const tabSchemaLiteral = {
                 },
               },
             },
+            operationSearch: {
+              type: "string",
+            },
             state: {
               type: "object",
               properties: {
                 requestNavigation: {
+                  type: "string",
+                },
+                operationNavigation: {
                   type: "string",
                 },
                 requestAuthNavigation: {
@@ -382,6 +388,12 @@ export const tabSchemaLiteral = {
                   type: "number",
                 },
                 requestRightSplitterWidthPercentage: {
+                  type: "number",
+                },
+                requestBuilderLeftSplitterWidthPercentage: {
+                  type: "number",
+                },
+                requestBuilderRightSplitterWidthPercentage: {
                   type: "number",
                 },
                 isHeaderBulkEditActive: {
