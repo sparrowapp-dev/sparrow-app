@@ -250,7 +250,6 @@ const sendMessage = async (tab_id: string, message: string) => {
     .then(async (data: string) => {
       try {
         // Logic to handle response
-        console.log("sent", JSON.parse(data));
 
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
@@ -298,7 +297,6 @@ const disconnectWebSocket = async (tab_id: string) => {
     .then(async (data: string) => {
       try {
         // Logic to handle response
-        console.log("disconnected", data);
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
@@ -386,7 +384,6 @@ const connectWebSocket = async (
         // Logic to handle response
         if (data) {
           const dt = JSON.parse(data);
-          console.log(dt);
         }
         // Store the WebSocket and initialize data
         webSocketDataStore.update((webSocketDataMap) => {
@@ -407,8 +404,6 @@ const connectWebSocket = async (
 
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
         listen(`ws_message_${tabId}`, (event) => {
-          console.log("event---->", event);
-
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
@@ -470,7 +465,6 @@ const makeHttpRequestV2 = async (
         url: constants.PROXY_SERVICE,
         method: "POST",
       });
-      console.log("Cloud agent Response : ", response);
     } else {
       try {
         const axiosResponse = await axios({
@@ -482,7 +476,6 @@ const makeHttpRequestV2 = async (
             return true;
           },
         });
-        console.log("Browser Agent Response : ", axiosResponse);
         response = {
           ...axiosResponse,
           data: {
