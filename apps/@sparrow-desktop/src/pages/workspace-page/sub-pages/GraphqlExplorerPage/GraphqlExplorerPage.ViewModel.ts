@@ -51,12 +51,13 @@ import type { GuideQuery } from "../../../../types/user-guide";
 import { graphqlExplorerDataStore } from "@sparrow/workspaces/features/graphql-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
 import type { Path, Tab } from "@sparrow/common/types/workspace/tab";
-import type {
-  GraphqlRequestAuthTabInterface,
-  GraphqlRequestHeadersTabInterface,
-  GraphqlRequestKeyValueCheckedTabInterface,
-  GraphqlRequestStateTabInterface,
-  GraphqlRequestTabInterface,
+import {
+  GraphqlRequestOperationTabEnum,
+  type GraphqlRequestAuthTabInterface,
+  type GraphqlRequestHeadersTabInterface,
+  type GraphqlRequestKeyValueCheckedTabInterface,
+  type GraphqlRequestStateTabInterface,
+  type GraphqlRequestTabInterface,
 } from "@sparrow/common/types/workspace/graphql-request-tab";
 import {
   type EnvironmentFilteredVariableBaseInterface,
@@ -1073,10 +1074,19 @@ class GraphqlExplorerViewModel {
     try {
       const progressiveTab = createDeepCopy(this._tab.getValue());
       const parsedSchema = JSON.parse(progressiveTab.property.graphql.schema);
-      const _query = await this.generateGraphQLQuery(
-        parsedSchema.Query,
-        "Query",
-      );
+      let _query;
+      if (
+        progressiveTab.property.graphql.state.operationNavigation ===
+        GraphqlRequestOperationTabEnum.QUERY
+      ) {
+        _query = await this.generateGraphQLQuery(parsedSchema.Query, "Query");
+      } else {
+        _query = await this.generateGraphQLQuery(
+          parsedSchema.Mutation,
+          "Mutation",
+        );
+      }
+
       progressiveTab.property.graphql.query = _query;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
