@@ -173,6 +173,7 @@ class GraphqlExplorerViewModel {
           requestAuthNavigation: requestServer.graphql.selectedGraphqlAuthType,
         })
         .updateSchema(requestServer.graphql.schema)
+        .updateVariables(requestServer.graphql.variables)
         .updateAuth(requestServer.graphql.auth)
         .updateHeaders(requestServer.graphql.headers)
         .getValue();
@@ -213,6 +214,13 @@ class GraphqlExplorerViewModel {
     else if (
       graphqlTabData.property.graphql?.schema !==
       progressiveTab.property.graphql?.schema
+    ) {
+      result = false;
+    }
+    // variables
+    else if (
+      graphqlTabData.property.graphql?.variables !==
+      progressiveTab.property.graphql?.variables
     ) {
       result = false;
     }
@@ -968,6 +976,18 @@ class GraphqlExplorerViewModel {
   };
 
   /**
+   * Updates variables in the RxDB
+   * @param _variables - stringified json of variables
+   */
+  public updateRequestVariables = async (_variables: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.graphql.variables = _variables;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
+  /**
    *
    * @param _id - request mongo id
    */
@@ -1190,8 +1210,15 @@ class GraphqlExplorerViewModel {
       url: decodeData[0],
       headers: decodeData[1],
       query: decodeData[2],
+      variables: decodeData[3],
     });
-    makeGraphQLRequest(decodeData[0], decodeData[1], decodeData[2], signal)
+    makeGraphQLRequest(
+      decodeData[0],
+      decodeData[1],
+      decodeData[2],
+      decodeData[3],
+      signal,
+    )
       .then((response) => {
         const end = Date.now();
         const byteLength = new TextEncoder().encode(
@@ -1498,6 +1525,7 @@ class GraphqlExplorerViewModel {
    * @returns save status
    */
   public saveRequest = async () => {
+    console.log("save request");
     MixpanelEvent(Events.Save_GraphQL_Request);
     const graphqlTabData = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
@@ -1512,6 +1540,7 @@ class GraphqlExplorerViewModel {
     const graphqlTabAdapter = new GraphqlTabAdapter();
     const unadaptedRequest = graphqlTabAdapter.unadapt(graphqlTabData as Tab);
 
+    console.log("unadaptedRequest2", unadaptedRequest);
     const isGuestUser = await this.getGuestUserState();
     /**
      * Handle save GraphQL Request for guest user
@@ -1526,6 +1555,7 @@ class GraphqlExplorerViewModel {
           url: unadaptedRequest.url as string,
           query: unadaptedRequest.query,
           schema: unadaptedRequest.schema,
+          variables: unadaptedRequest.variables,
           headers: unadaptedRequest.headers,
           auth: unadaptedRequest.auth,
           selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
@@ -1570,10 +1600,12 @@ class GraphqlExplorerViewModel {
       url: unadaptedRequest.url as string,
       query: unadaptedRequest.query,
       schema: unadaptedRequest.schema,
+      variables: unadaptedRequest.variables,
       headers: unadaptedRequest.headers,
       auth: unadaptedRequest.auth,
       selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
     };
+    console.log("graphqlPayload", graphqlPayload);
 
     const res = await this.collectionService.updateGraphqlInCollection(
       graphqlTabData.id as string,
@@ -1693,6 +1725,8 @@ class GraphqlExplorerViewModel {
     tabName: string,
     description: string,
   ) => {
+    debugger;
+    console.log("inside save");
     const componentData = this._tab.getValue();
     let userSource = {};
     const _id = componentData.id;
@@ -1762,6 +1796,7 @@ class GraphqlExplorerViewModel {
             initRequestTab.updateUrl(req.graphql.url as string);
             initRequestTab.updateQuery(req.graphql.query as string);
             initRequestTab.updateSchema(req.graphql.schema as string);
+            initRequestTab.updateVariables(req.graphql.variables as string);
             initRequestTab.updateAuth(
               req.graphql.auth as GraphqlRequestAuthTabInterface,
             );
@@ -1780,6 +1815,7 @@ class GraphqlExplorerViewModel {
             },
           };
         }
+        console.log("unadaptedRequest", unadaptedRequest);
         const res = await this.collectionService.addGraphqlInCollection({
           collectionId: path[path.length - 1].id,
           workspaceId: _workspaceMeta.id,
@@ -1839,6 +1875,9 @@ class GraphqlExplorerViewModel {
             initRequestTab.updateQuery(res.data.data.graphql?.query as string);
             initRequestTab.updateSchema(
               res.data.data.graphql?.schema as string,
+            );
+            initRequestTab.updateVariables(
+              res.data.data.graphql?.variables as string,
             );
             initRequestTab.updateAuth(
               res.data.data.graphql?.auth as GraphqlRequestAuthTabInterface,
@@ -1907,6 +1946,7 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(req.graphql?.url as string);
             initRequestTab.updateQuery(req.graphql?.query as string);
+            initRequestTab.updateVariables(req.graphql?.variables as string);
             initRequestTab.updateSchema(req.graphql?.schema as string);
             initRequestTab.updateAuth(
               req.graphql?.auth as GraphqlRequestAuthTabInterface,
@@ -1980,6 +2020,9 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(res.data.data.graphql?.url as string);
             initRequestTab.updateQuery(res.data.data.graphql?.query as string);
+            initRequestTab.updateVariables(
+              res.data.data.graphql?.variables as string,
+            );
             initRequestTab.updateSchema(
               res.data.data.graphql?.schema as string,
             );

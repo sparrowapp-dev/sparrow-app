@@ -159,4 +159,5 @@
   onClearQuery={_viewModel.clearQuery}
   onFetchSchema={_viewModel.updateRequestSchema}
   updateSchema={_viewModel.updateSchema}
+  onUpdateVariables={_viewModel.updateRequestVariables}
 />

@@ -38,6 +38,7 @@
   import { GraphqlRequestSectionTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import { WarningIcon } from "@sparrow/library/icons";
+  import RequestVariables from "../components/request-variables/RequestVariables.svelte";
 
   export let tab;
   export let collections;
@@ -66,6 +67,7 @@
   export let onClearQuery;
   export let onFetchSchema;
   export let updateSchema;
+  export let onUpdateVariables;
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
@@ -203,14 +205,11 @@
                             value={$tab.property.graphql.query}
                             {onUpdateRequestQuery}
                           />
-                          <!-- {:else if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.Schema}
-                          <RequestSchema
-                            value={$tab.property.graphql.schema}
-                            onRefreshSchema={handleFetchSchema}
-                            isFetched={$tab.property.graphql.state
-                              .isRequestSchemaFetched}
-                            {isSchemaFetching}
-                          /> -->
+                        {:else if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.VARIABLES}
+                          <RequestVariables
+                            value={$tab.property.graphql.variables}
+                            onUpdateRequestVariable={onUpdateVariables}
+                          />
                         {:else if $tab.property.graphql?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                           <RequestHeaders
                             isBulkEditActive={$tab?.property?.graphql.state
