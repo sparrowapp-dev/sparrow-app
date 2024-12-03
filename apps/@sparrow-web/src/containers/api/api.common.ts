@@ -460,9 +460,10 @@ const makeHttpRequestV2 = async (
   try {
     let response;
     if (selectedAgent === "Cloud Agent") {
+      const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
       response = await axios({
         data: { url, method, headers, body, contentType },
-        url: constants.PROXY_SERVICE,
+        url: proxyUrl,
         method: "POST",
       });
     } else {
