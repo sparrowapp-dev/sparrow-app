@@ -2459,7 +2459,7 @@ class GraphqlExplorerViewModel {
         await this.updateSchema(JSON.stringify(JSONSchema));
 
       }catch(e){
-        console.log(e);
+        console.error(e);
       }
     }
     if(progressiveTab.property.graphql?.state.operationNavigation === GraphqlRequestOperationTabEnum.MUTATION){
@@ -2472,7 +2472,7 @@ class GraphqlExplorerViewModel {
         JSONSchema.Mutation.items = querySchema;
         await this.updateSchema(JSON.stringify(JSONSchema));
       }catch(e){
-        console.log(e);
+        console.error(e);
       }
     }
     await this.updateRequestQuery(query);
