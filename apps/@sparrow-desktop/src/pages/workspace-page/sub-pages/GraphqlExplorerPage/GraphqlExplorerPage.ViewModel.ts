@@ -539,7 +539,7 @@ class GraphqlExplorerViewModel {
 
     // Process input object types
     function processInputObjectType(typeName, depth = 0) {
-      if (processedTypes.has(typeName) || depth > 8) return null;
+      if (processedTypes.has(typeName) || depth > 7) return null;
 
       const inputType = types.find((t) => t.name === typeName);
       if (!inputType?.inputFields) return null;
@@ -557,7 +557,7 @@ class GraphqlExplorerViewModel {
 
     // Process object types
     function processObjectType(typeName, depth = 0) {
-      if (processedTypes.has(typeName) || depth > 8) return null;
+      if (processedTypes.has(typeName) || depth > 7) return null;
 
       const objectType = types.find((t) => t.name === typeName);
       if (!objectType?.fields) return null;
@@ -580,7 +580,7 @@ class GraphqlExplorerViewModel {
       depth = 0,
       defaultItemType = "field",
     ) {
-      if (!fields || depth > 8) return [];
+      if (!fields || depth > 7) return [];
 
       return fields.map((field) => {
         const fieldName = field.name;
@@ -639,7 +639,7 @@ class GraphqlExplorerViewModel {
           });
 
           // Add arguments to items array
-          result.items.push(...argumentItems?.slice(0, 20));
+          result.items.push(...argumentItems?.slice(0, 15));
         }
 
         // Process nested custom types
@@ -655,7 +655,7 @@ class GraphqlExplorerViewModel {
                   ...item,
                   id: uuidv4(),
                 }))
-                ?.slice(0, 20),
+                ?.slice(0, 15),
             );
           }
           if (objectFields) {
@@ -665,7 +665,7 @@ class GraphqlExplorerViewModel {
                   ...item,
                   id: uuidv4(),
                 }))
-                ?.slice(0, 20),
+                ?.slice(0, 15),
             );
           }
         }
@@ -685,12 +685,12 @@ class GraphqlExplorerViewModel {
     const result = {
       Query: {
         items: queryType
-          ? processFields(queryType.fields, "Query").slice(0, 100)
+          ? processFields(queryType.fields, "Query").slice(0, 70)
           : [],
       },
       Mutation: {
         items: mutationType
-          ? processFields(mutationType.fields, "Mutation").slice(0, 100)
+          ? processFields(mutationType.fields, "Mutation").slice(0, 70)
           : [],
       },
       // Disabling subscription for now as it's support is not provided
@@ -960,23 +960,44 @@ class GraphqlExplorerViewModel {
       );
       const responseBody = response.data.body;
       const parsedResponse = JSON.parse(responseBody);
-      const formattedSchema = await this.transformSchema(parsedResponse.data);
-      let previousSchema;
-      try {
-        previousSchema = JSON.parse(progressiveTab.property.graphql.schema);
-      } catch (error) {
-        console.log("Previous Schema not parsed", error);
-      }
-      const parsedSchema = await this.compareAndUpdateFetchedJson(
-        previousSchema,
-        formattedSchema,
-      );
+      this.transformSchema(parsedResponse.data)
+        .then(async (formattedSchema) => {
+          let previousSchema;
+          try {
+            previousSchema = JSON.parse(progressiveTab.property.graphql.schema);
+          } catch (error) {
+            console.log("Previous Schema not parsed", error);
+          }
+          const parsedSchema = await this.compareAndUpdateFetchedJson(
+            previousSchema,
+            formattedSchema,
+          );
 
-      progressiveTab.property.graphql.schema = JSON.stringify(parsedSchema);
-      progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
-      this.tab = progressiveTab;
-      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-      notifications.success("Schema fetched successfully.");
+          progressiveTab.property.graphql.schema = JSON.stringify(parsedSchema);
+          progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
+          this.tab = progressiveTab;
+          await this.tabRepository.updateTab(
+            progressiveTab.tabId,
+            progressiveTab,
+          );
+          notifications.success("Schema fetched successfully.");
+        })
+        .catch(async (error) => {
+          console.error(error);
+          const newProgressiveTab = createDeepCopy(this._tab.getValue());
+          newProgressiveTab.property.graphql.state.isRequestSchemaFetched =
+            false;
+          this.tab = newProgressiveTab;
+          await this.tabRepository.updateTab(
+            newProgressiveTab.tabId,
+            newProgressiveTab,
+          );
+          if (isFailedNotificationVisible) {
+            notifications.error(
+              "Failed to fetch schema. Please check the URL and try again.",
+            );
+          }
+        });
     } catch (error) {
       console.error(error);
       const newProgressiveTab = createDeepCopy(this._tab.getValue());
