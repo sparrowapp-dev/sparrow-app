@@ -864,6 +864,7 @@
     color: var(--white-color);
     padding-left: 0;
     outline: none;
+    border-radius: 2px !important;
   }
   .renameInputFieldCollection:focus {
     border: 1px solid var(--border-primary-300) !important;

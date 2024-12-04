@@ -278,7 +278,7 @@
     {:else}
       <div
         class="api-name ellipsis {graphql?.isDeleted &&
-          'api-name-deleted'} ps-2"
+          'api-name-deleted'}"
         style="font-size: 12px;"
       >
         {graphql.name}
@@ -426,6 +426,7 @@
     color: var(--white-color);
     padding-left: 0;
     outline: none;
+    border-radius: 2px !important;
   }
   .rename-input-field-graphql:focus {
     border: 1px solid var(--border-primary-300) !important;
