@@ -17,8 +17,14 @@
   };
 </script>
 
-<div style="height: 509px;">
-  <div class=" d-flex flex-column" style="gap:19.72px; height:480px;">
+<div
+  class="d-flex flex-column justify-content-between"
+  style="min-height: 530px; height: 100%;"
+>
+  <div
+    class=" d-flex flex-column"
+    style="gap:19.72px; min-height:480px; height:100%"
+  >
     <div style="height: 276px; padding:auto; padding-top:0px;">
       {#if !navigator.onLine}
         <div class="fallback-message">
