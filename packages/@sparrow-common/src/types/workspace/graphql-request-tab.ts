@@ -51,6 +51,10 @@ export interface GraphqlRequestIsRequestSchemaFetchedWrapperTabInterface {
   isRequestSchemaFetched: boolean;
 }
 
+export interface GraphqlRequestIsQueryExplorerChangedWrapperTabInterface {
+  isQueryExplorerChanged: boolean;
+}
+
 export interface GraphqlRequestUsernameWrapperTabInterface {
   username: string;
 }
@@ -105,6 +109,7 @@ export interface GraphqlRequestStateTabInterface
     GraphqlRequestRightSplitterWidthPercentageWrapperTabInterface,
     GraphqlRequestIsBulkHeaderWrapperTabInterface,
     GraphqlRequestIsRequestSchemaFetchedWrapperTabInterface,
+    GraphqlRequestIsQueryExplorerChangedWrapperTabInterface,
     GraphqlRequestBuilderLeftSplitterWidthPercentageWrapperTabInterface,
     GraphqlRequestBuilderRightSplitterWidthPercentageWrapperTabInterface,
     GraphqlRequestOperationNavigationWrapperTabInterface {}

@@ -402,6 +402,9 @@ export const tabSchemaLiteral = {
                 isRequestSchemaFetched: {
                   type: "boolean",
                 },
+                isQueryExplorerChanged: {
+                  type: "boolean",
+                },
               },
             },
             auth: {
