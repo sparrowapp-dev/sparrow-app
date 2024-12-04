@@ -177,7 +177,7 @@
         <button
           on:click={onNewTabRequested}
           role="button"
-          class="d-flex layout align-items-center border-radius-2 justify-content-center border-0 py-auto"
+          class="d-flex layout my-auto relative top-2 align-items-center border-radius-2 p-0 justify-content-center border-0 py-auto"
           style="height:24px; width:24px; background-color: transparent;"
         >
           <PlusIcon
