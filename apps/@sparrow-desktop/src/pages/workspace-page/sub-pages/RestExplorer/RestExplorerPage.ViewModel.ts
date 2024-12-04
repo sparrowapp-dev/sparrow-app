@@ -100,6 +100,7 @@ import type { GuideQuery } from "../../../../types/user-guide";
 import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.ws.service";
 import type { Socket } from "socket.io-client";
 import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
+import { InitTab } from "@sparrow/common/factory";
 
 class RestExplorerViewModel
   implements
@@ -225,8 +226,7 @@ class RestExplorerViewModel
   private compareRequestWithServerDebounced = async () => {
     let result = true;
     const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
-    const requestTabAdapter = new RequestTabAdapter();
-    const unadaptedRequest = requestTabAdapter.unadapt(progressiveTab);
+
     let requestServer;
     if (progressiveTab.path.folderId) {
       requestServer = await this.collectionRepository.readRequestInFolder(
@@ -241,72 +241,87 @@ class RestExplorerViewModel
           progressiveTab.id,
         );
     }
-    if (!requestServer) result = false;
+
+    let requestTabData;
+
+    if (requestServer) {
+      requestTabData = new RequestTabAdapter().adapt(
+        progressiveTab.path.workspaceId,
+        progressiveTab.path.collectionId,
+        progressiveTab.path.folderId,
+        requestServer,
+      );
+    } else {
+      requestTabData = new InitTab().request("uuid", "uuid").getValue();
+    }
+
     // description
-    else if (requestServer.description !== progressiveTab.description) {
+    if (requestTabData.description !== progressiveTab.description) {
       result = false;
     }
     // name
-    else if (requestServer.name !== progressiveTab.name) {
+    else if (requestTabData.name !== progressiveTab.name) {
       result = false;
     }
     // url
     else if (
-      requestServer.request.url !== progressiveTab.property.request.url
+      requestTabData.property.request?.url !==
+      progressiveTab.property.request.url
     ) {
       result = false;
     }
     // method
     else if (
-      requestServer.request.method !== progressiveTab.property.request.method
+      requestTabData.property.request?.method !==
+      progressiveTab.property.request.method
     ) {
       result = false;
     }
     // auth key
     else if (
-      requestServer.request.auth.apiKey.authKey !==
+      requestTabData.property.request?.auth.apiKey.authKey !==
       progressiveTab.property.request.auth.apiKey.authKey
     ) {
       result = false;
     }
     // auth value
     else if (
-      requestServer.request.auth.apiKey.authValue !==
+      requestTabData.property.request?.auth.apiKey.authValue !==
       progressiveTab.property.request.auth.apiKey.authValue
     ) {
       result = false;
     }
     // addTo
     else if (
-      requestServer.request.auth.apiKey.addTo !==
+      requestTabData.property.request?.auth.apiKey.addTo !==
       progressiveTab.property.request.auth.apiKey.addTo
     ) {
       result = false;
     }
     // username
     else if (
-      requestServer.request.auth.basicAuth.username !==
+      requestTabData.property.request?.auth.basicAuth.username !==
       progressiveTab.property.request.auth.basicAuth.username
     ) {
       result = false;
     }
     // password
     else if (
-      requestServer.request.auth.basicAuth.password !==
+      requestTabData.property.request?.auth.basicAuth.password !==
       progressiveTab.property.request.auth.basicAuth.password
     ) {
       result = false;
     }
     // bearer tokem
     else if (
-      requestServer.request.auth.bearerToken !==
+      requestTabData.property.request?.auth.bearerToken !==
       progressiveTab.property.request.auth.bearerToken
     ) {
       result = false;
     }
     // raw code
     else if (
-      requestServer.request.body.raw !==
+      requestTabData.property.request?.body.raw !==
       progressiveTab.property.request.body.raw
     ) {
       result = false;
@@ -314,7 +329,7 @@ class RestExplorerViewModel
     // url encode
     else if (
       !this.compareArray.init(
-        requestServer.request.body.urlencoded,
+        requestTabData.property.request?.body.urlencoded,
         progressiveTab.property.request.body.urlencoded,
       )
     ) {
@@ -323,35 +338,52 @@ class RestExplorerViewModel
     // form data
     else if (
       !this.compareArray.init(
-        requestServer.request.body.formdata.text,
-        unadaptedRequest.body.formdata.text,
-      )
-    ) {
-      result = false;
-    } else if (
-      !this.compareArray.init(
-        requestServer.request.body.formdata.file,
-        unadaptedRequest.body.formdata.file,
+        requestTabData.property.request?.body.formdata,
+        progressiveTab.property.request.body.formdata,
       )
     ) {
       result = false;
     }
+
     // headers
     else if (
       !this.compareArray.init(
-        requestServer.request.headers,
+        requestTabData.property.request?.headers,
         progressiveTab.property.request.headers,
       )
     ) {
       result = false;
     } else if (
       !this.compareArray.init(
-        requestServer.request.queryParams,
+        requestTabData.property.request?.queryParams,
         progressiveTab.property.request.queryParams,
       )
     ) {
       result = false;
     }
+
+    // auth state
+    else if (
+      requestTabData.property.request?.state.requestAuthNavigation !==
+      progressiveTab.property.request?.state.requestAuthNavigation
+    ) {
+      result = false;
+    }
+    // body state
+    else if (
+      requestTabData.property.request?.state.requestBodyNavigation !==
+      progressiveTab.property.request?.state.requestBodyNavigation
+    ) {
+      result = false;
+    }
+    // response state
+    else if (
+      requestTabData.property.request?.state.requestBodyLanguage !==
+      progressiveTab.property.request?.state.requestBodyLanguage
+    ) {
+      result = false;
+    }
+
     // result
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
@@ -602,6 +634,7 @@ class RestExplorerViewModel
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
   };
 
   /**

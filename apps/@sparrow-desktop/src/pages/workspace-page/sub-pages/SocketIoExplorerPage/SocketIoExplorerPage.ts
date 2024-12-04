@@ -143,6 +143,8 @@ class SocketIoExplorerPageViewModel {
         progressiveTab.path.folderId,
         clientCollectionItem,
       );
+    } else {
+      requestServer = new InitTab().socketIo("uuid", "uuid").getValue();
     }
 
     if (!requestServer) result = false;

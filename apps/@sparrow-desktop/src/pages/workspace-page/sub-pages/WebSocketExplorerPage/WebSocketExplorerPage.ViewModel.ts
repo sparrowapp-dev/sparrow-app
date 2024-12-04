@@ -54,6 +54,7 @@ import type { CollectionDocType } from "../../../../models/collection.model";
 import { WebSocketService } from "../../../../services/web-socket.service";
 import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
+import { RequestTabAdapter } from "@app/adapter";
 
 class RestExplorerViewModel {
   /**
@@ -114,7 +115,9 @@ class RestExplorerViewModel {
 
   private compareRequestWithServerDebounced = async () => {
     let result = true;
+    // debugger;
     const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+
     let requestServer: CollectionItemsDto;
     if (progressiveTab.path.folderId) {
       requestServer = (await this.collectionRepository.readRequestInFolder(
@@ -129,25 +132,40 @@ class RestExplorerViewModel {
           progressiveTab.id,
         )) as CollectionItemsDto;
     }
-    if (!requestServer) result = false;
-    // description
-    else if (requestServer.description !== progressiveTab.description) {
+
+    let requestTabData;
+
+    if (requestServer) {
+      requestTabData = new SocketTabAdapter().adapt(
+        progressiveTab.path.workspaceId,
+        progressiveTab.path.collectionId,
+        progressiveTab.path.folderId,
+        requestServer,
+      );
+    } else {
+      requestTabData = new InitTab().webSocket("uuid", "uuid").getValue();
+    }
+    console.log("this is request tab data ", requestTabData);
+
+    //description
+    if (requestTabData.description !== progressiveTab.description) {
       result = false;
     }
     // name
-    else if (requestServer.name !== progressiveTab.name) {
+    else if (requestTabData.name !== progressiveTab.name) {
       result = false;
     }
     // url
-    else if (requestServer?.websocket) {
+    else if (requestTabData.property.websocket) {
       if (
-        requestServer.websocket.url !== progressiveTab.property.websocket?.url
+        requestTabData.property.websocket.url !==
+        progressiveTab.property.websocket?.url
       ) {
         result = false;
       }
       // message
       else if (
-        requestServer.websocket.message !==
+        requestTabData.property.websocket.message !==
         progressiveTab.property.websocket?.message
       ) {
         result = false;
@@ -156,18 +174,23 @@ class RestExplorerViewModel {
       // headers
       else if (
         !this.compareArray.init(
-          requestServer.websocket.headers,
+          requestTabData.property.websocket.headers,
           progressiveTab.property.websocket?.headers,
         )
       ) {
         result = false;
       } else if (
         !this.compareArray.init(
-          requestServer.websocket.queryParams,
+          requestTabData.property.websocket.queryParams,
           progressiveTab.property.websocket?.queryParams,
         )
       ) {
         result = false;
+      } else if (
+        requestTabData.property.websocket?.state.requestBodyLanguage !==
+        progressiveTab.property.websocket?.state.requestBodyLanguage
+      ) {
+        return false;
       }
     }
 
@@ -239,7 +262,6 @@ class RestExplorerViewModel {
     progressiveTab.path = _path;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    this.compareRequestWithServer();
   };
 
   /**
@@ -387,6 +409,7 @@ class RestExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
   };
 
   /**
