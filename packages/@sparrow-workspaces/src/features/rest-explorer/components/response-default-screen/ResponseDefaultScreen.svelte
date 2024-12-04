@@ -9,24 +9,39 @@
   let ctrlCommands: { [key: string]: string } = {};
   let altCommands: { [key: string]: string } = {};
   onMount(async () => {
-    let platformName;
-    if (isWebApp) {
-      platformName = "windowsos";
-    } else {
+    let platformName: string;
+
+    try {
+      // First, try Tauri platform detection
       platformName = await platform();
+    } catch {
+      // Fallback to browser-based detection
+      const userAgent = navigator.userAgent.toLowerCase();
+      if (userAgent.includes("mac")) {
+        platformName = "macos";
+      } else if (userAgent.includes("win")) {
+        platformName = "windows";
+      } else if (userAgent.includes("linux")) {
+        platformName = "linux";
+      } else {
+        platformName = "unknown";
+      }
     }
-    let controlKey = platformName === "macos" ? "cmd" : "ctrl";
-    let altKey = platformName === "macos" ? "option" : "alt";
+
+    const controlKey = platformName === "macos" ? "cmd" : "ctrl";
+    const altKey = platformName === "macos" ? "option" : "alt";
+
     ctrlCommands = {
-      "Send Request": controlKey + " + Enter",
-      "New Request": controlKey + " + N",
-      "Save Request": controlKey + " + S",
+      "Send Request": `${controlKey} + Enter`,
+      "New Request": `${controlKey} + N`,
+      "Save Request": `${controlKey} + S`,
     };
+
     altCommands = {
-      "Edit link": altKey + " + L",
-      "Add Parameter": altKey + " + P",
-      "Add Header": altKey + " + H",
-      "Edit Body": altKey + " + B",
+      "Edit link": `${altKey} + L`,
+      "Add Parameter": `${altKey} + P`,
+      "Add Header": `${altKey} + H`,
+      "Edit Body": `${altKey} + B`,
     };
   });
   let isExpandShortcuts = false;
