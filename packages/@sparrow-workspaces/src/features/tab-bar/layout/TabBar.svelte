@@ -171,7 +171,7 @@
     {/if}
     <div
       class="d-flex ps-1 align-items-center justify-content-center my-auto"
-      style="height: 24px;"
+      style="height: 24px; "
     >
       <Tooltip title={"New"} placement={"bottom"} distance={10} zIndex={20}>
         <button
