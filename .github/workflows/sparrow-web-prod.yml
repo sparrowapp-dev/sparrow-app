@@ -35,6 +35,7 @@ jobs:
                 --build-arg VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING=${{ vars.VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING }} \
                 --build-arg VITE_WEB_MARKETING_URL=${{ vars.VITE_WEB_MARKETING_URL }} \
                 --build-arg VITE_WEB_SPARROW_DOCS=${{ vars.VITE_WEB_SPARROW_DOCS }} \
+                --build-arg VITE_WEB_PROXY_SERVICE=${{ vars.VITE_WEB_PROXY_SERVICE }} \
                 -t sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }} .
 
               docker push sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }}
