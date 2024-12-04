@@ -702,7 +702,6 @@ class GraphqlExplorerViewModel {
 
   // This function will generate the GraphQL Query from json object.
   private generateGraphQLQuery = async (json, operationName = "Query") => {
-    console.log("json-----", json);
     // Helper function to process arguments
     function processArguments(items) {
       return items
@@ -1135,6 +1134,7 @@ class GraphqlExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.updateQueryAsPerSchema();
     this.compareRequestWithServer();
   };
 
@@ -2412,7 +2412,46 @@ class GraphqlExplorerViewModel {
    * Clears GraphQL request query
    */
   public clearQuery = async () => {
-    await this.updateRequestQuery("");
+    const unchecksAllTheChildNodes = (_item => {
+      _item.isSelected = false;
+      
+      for (let j = 0; j < _item?.items?.length; j++) {
+        unchecksAllTheChildNodes(_item.items[j])
+      }
+    });
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    const query = "";
+    const schema = progressiveTab.property.graphql?.schema;
+    
+    if(progressiveTab.property.graphql?.state.operationNavigation === GraphqlRequestOperationTabEnum.QUERY){
+      try{
+        const JSONSchema = JSON.parse(schema as string);
+        const querySchema = JSONSchema?.Query?.items || [];
+        for(let i = 0; i < querySchema.length; i++){
+          unchecksAllTheChildNodes(querySchema[i]);
+        }
+        JSONSchema.Query.items = querySchema;
+        await this.updateSchema(JSON.stringify(JSONSchema));
+
+      }catch(e){
+        console.log(e);
+      }
+    }
+    if(progressiveTab.property.graphql?.state.operationNavigation === GraphqlRequestOperationTabEnum.MUTATION){
+      try{
+        const JSONSchema = JSON.parse(schema as string);
+        const querySchema = JSONSchema?.Mutation?.items || [];
+        for(let i = 0; i < querySchema.length; i++){
+          unchecksAllTheChildNodes(querySchema[i]);
+        }
+        JSONSchema.Mutation.items = querySchema;
+        await this.updateSchema(JSON.stringify(JSONSchema));
+      }catch(e){
+        console.log(e);
+      }
+    }
+    await this.updateRequestQuery(query);
+    
     notifications.success("Cleared Query successfully.");
   };
 }
