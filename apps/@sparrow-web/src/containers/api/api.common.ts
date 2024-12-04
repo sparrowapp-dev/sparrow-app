@@ -468,11 +468,55 @@ const makeHttpRequestV2 = async (
       });
     } else {
       try {
+        let jsonHeader;
+        try {
+          jsonHeader = JSON.parse(headers);
+        } catch (error) {
+          jsonHeader = {};
+        }
+        const headersObject = jsonHeader.reduce((acc, header) => {
+          if (header.checked !== false) {
+            // Include only headers that are checked or do not have a `checked` property
+            acc[header.key] = header.value;
+          }
+          return acc;
+        }, {});
+        let requestData = body || {};
+
+        if (contentType === "multipart/form-data") {
+          const formData = new FormData();
+          const parsedBody = JSON.parse(body);
+          (parsedBody || []).forEach((field) => {
+            if (field.checked !== false) {
+              formData.append(field.key, field.value);
+            }
+          });
+          requestData = formData;
+
+          // Remove Content-Type header to let Axios set it automatically with boundary
+          delete headersObject["Content-Type"];
+        } else if (contentType === "application/x-www-form-urlencoded") {
+          const urlSearchParams = new URLSearchParams();
+          const parsedBody = JSON.parse(body);
+          (parsedBody || []).forEach((field) => {
+            if (field.checked !== false) {
+              urlSearchParams.append(field.key, field.value);
+            }
+          });
+          requestData = urlSearchParams;
+        } else if (
+          contentType === "application/json" ||
+          contentType === "text/plain"
+        ) {
+          // Add Content-Type to headersObject explicitly
+          headersObject["Content-Type"] = contentType;
+        }
+
         const axiosResponse = await axios({
           method,
           url,
-          data: body || {},
-          headers: headers ? JSON.parse(headers) : {},
+          data: requestData || {},
+          headers: { ...headersObject },
           validateStatus: function (status) {
             return true;
           },
