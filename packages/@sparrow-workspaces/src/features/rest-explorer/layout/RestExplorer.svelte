@@ -301,6 +301,7 @@
                       {onUpdateRequestState}
                       {onUpdateEnvironment}
                       {environmentVariables}
+                      {isWebApp}
                     />
                   {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                     <RequestHeaders
