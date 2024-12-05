@@ -24,22 +24,20 @@
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
 
-  // Function to update the editor view when changes occur
-  const updateExtensionView = EditorView.updateListener.of((update) => {
-    const userInput = update.state.doc.toString();
-    dispatch("change", userInput);
-  });
-
   function initalizeCodeMirrorEditor(value: string) {
     let extensions: Extension[];
     extensions = [
       basicSetup,
       basicTheme,
-      updateExtensionView,
       languageConf.of([]),
       EditorView.lineWrapping, // Enable line wrapping
       EditorState.readOnly.of(!isEditable ? true : false),
       CreatePlaceHolder(placeholder),
+      EditorView.domEventHandlers({
+        input: (event) => {
+          dispatch("change", event.target.innerText); // Dispatch blur event to the parent component
+        },
+      }),
     ];
 
     let state = EditorState.create({
