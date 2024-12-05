@@ -109,6 +109,7 @@ class GraphqlExplorerViewModel {
           this._tab.getValue().property?.graphql
             ?.auth as GraphqlRequestAuthTabInterface,
         ).getValue();
+        this.updateQueryAsPerSchema();
       }, 0);
     }
   }
@@ -515,6 +516,8 @@ class GraphqlExplorerViewModel {
   private transformSchema = async (schemaData) => {
     const types = schemaData.__schema.types;
     const processedTypes = new Set();
+    const maxItemLength = 15;
+    const maxDepthLength = 8;
 
     // Helper function to resolve nested types
     function resolveType(typeObj) {
@@ -557,7 +560,7 @@ class GraphqlExplorerViewModel {
 
     // Process input object types
     function processInputObjectType(typeName, depth = 0) {
-      if (processedTypes.has(typeName) || depth > 7) return null;
+      if (processedTypes.has(typeName) || depth > maxDepthLength) return null;
 
       const inputType = types.find((t) => t.name === typeName);
       if (!inputType?.inputFields) return null;
@@ -575,7 +578,7 @@ class GraphqlExplorerViewModel {
 
     // Process object types
     function processObjectType(typeName, depth = 0) {
-      if (processedTypes.has(typeName) || depth > 7) return null;
+      if (processedTypes.has(typeName) || depth > maxDepthLength) return null;
 
       const objectType = types.find((t) => t.name === typeName);
       if (!objectType?.fields) return null;
@@ -598,7 +601,7 @@ class GraphqlExplorerViewModel {
       depth = 0,
       defaultItemType = "field",
     ) {
-      if (!fields || depth > 7) return [];
+      if (!fields || depth > maxDepthLength) return [];
 
       return fields.map((field) => {
         const fieldName = field.name;
@@ -657,7 +660,7 @@ class GraphqlExplorerViewModel {
           });
 
           // Add arguments to items array
-          result.items.push(...argumentItems?.slice(0, 15));
+          result.items.push(...argumentItems?.slice(0, maxItemLength));
         }
 
         // Process nested custom types
@@ -673,7 +676,7 @@ class GraphqlExplorerViewModel {
                   ...item,
                   id: uuidv4(),
                 }))
-                ?.slice(0, 15),
+                ?.slice(0, maxItemLength),
             );
           }
           if (objectFields) {
@@ -683,7 +686,7 @@ class GraphqlExplorerViewModel {
                   ...item,
                   id: uuidv4(),
                 }))
-                ?.slice(0, 15),
+                ?.slice(0, maxItemLength),
             );
           }
         }
