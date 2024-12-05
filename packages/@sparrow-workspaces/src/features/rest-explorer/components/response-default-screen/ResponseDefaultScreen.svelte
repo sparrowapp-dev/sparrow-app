@@ -12,12 +12,11 @@
   let altCommands: { [key: string]: string } = {};
 
   const osDetector = new OSDetector();
-  onMount(() => {
-    platformName = osDetector.getOS();
-  });
 
   onMount(async () => {
-    const controlKey = platformName === "windows" ? "cmd" : "ctrl";
+    platformName = osDetector.getOS();
+
+    const controlKey = platformName === "macos" ? "cmd" : "ctrl";
     const altKey = platformName === "macos" ? "option" : "alt";
 
     ctrlCommands = {
