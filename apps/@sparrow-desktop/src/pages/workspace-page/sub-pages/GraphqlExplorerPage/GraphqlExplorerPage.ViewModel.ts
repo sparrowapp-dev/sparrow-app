@@ -2037,6 +2037,7 @@ class GraphqlExplorerViewModel {
           items: {
             id: path[path.length - 1].id,
             type: CollectionItemTypeBaseEnum.FOLDER,
+            name: path[path.length - 1].name,
             items: {
               name: tabName,
               description,
