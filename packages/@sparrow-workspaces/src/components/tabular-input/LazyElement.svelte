@@ -97,8 +97,8 @@
             {#if isInputBoxEditable}
               <Tooltip title={"Delete"} placement={"bottom"} distance={10}>
                 <button
-                  class="trash-icon bg-secondary-700 border-radius-2 d-flex justify-content-center align-items-center border-0"
-                  style="width: 16px; height:16px; padding-end"
+                  class="trash-icon bg-secondary-700 border-radius-2 d-flex justify-content-center align-items-center p-0 border-0"
+                  style="width: 16px; height:16px; "
                   on:click={() => {
                     deleteParam(index);
                   }}

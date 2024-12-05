@@ -191,7 +191,7 @@
             heading={`Welcome to Environments!`}
             text={` `}
             onClose={closeEnvHelpText}
-            ><p>
+            ><p style="font-size: 12px;">
               Environments allow you to manage different sets of configuration
               variables for various stages of your application (e.g.
               Development, Staging, Production). This helps in organizing and

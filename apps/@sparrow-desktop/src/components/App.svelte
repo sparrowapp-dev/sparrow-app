@@ -38,7 +38,6 @@
       isloggedIn = value;
     });
 
-    resizeWindowOnLogin();
     window.addEventListener(
       "dragover",
       function (e) {

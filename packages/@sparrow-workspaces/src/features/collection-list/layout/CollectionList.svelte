@@ -247,7 +247,7 @@
         >
           <button
             style="height: 24px; width:24px;"
-            class="add-icon-container border-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
+            class="add-icon-container border-0 p-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
               ? 'collections-active'
               : 'collections-inactive'}"
             disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
@@ -386,7 +386,7 @@
 
   .collections-active:active {
     visibility: visible;
-    background-color: var( --bg-secondary-420);
+    background-color: var(--bg-secondary-420);
   }
 
   .add-button {

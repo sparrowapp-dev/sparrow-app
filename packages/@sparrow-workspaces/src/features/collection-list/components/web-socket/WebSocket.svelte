@@ -288,7 +288,7 @@
       />
     {:else}
       <div
-        class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'} ps-2"
+        class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
         style="font-size: 12px;"
       >
         {api.name}
@@ -436,6 +436,7 @@
     color: var(--white-color);
     padding-left: 0;
     outline: none;
+    border-radius: 2px !important;
   }
   .renameInputFieldFile:focus {
     border: 1px solid var(--border-primary-300) !important;
