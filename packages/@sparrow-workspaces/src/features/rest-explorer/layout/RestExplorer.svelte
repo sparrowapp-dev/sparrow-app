@@ -301,6 +301,7 @@
                       {onUpdateRequestState}
                       {onUpdateEnvironment}
                       {environmentVariables}
+                      {isWebApp}
                     />
                   {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                     <RequestHeaders
@@ -384,6 +385,7 @@
                               apiState={storeData?.response}
                               {onUpdateResponseState}
                               {onClearResponse}
+                              {isWebApp}
                             />
                           {/if}
                           <div style="flex:1; overflow:auto;">

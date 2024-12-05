@@ -25,6 +25,7 @@
   export let isTopHeaderRequired = true;
   export let isBulkEditRequired = false;
   export let isInputBoxEditable = true;
+  export let isWebApp = false;
   let pairs = keyValue;
   let controller: boolean = false;
 
@@ -302,31 +303,33 @@
           >
             {#if pairs.length - 1 != index}
               {#if isInputBoxEditable}
-                <Tooltip
-                  title="Attach"
-                  show={isInputBoxEditable &&
-                    element.type == "text" &&
-                    element.value == ""}
-                  placement="bottom"
-                >
-                  <button
-                    class="d-flex align-items-center justify-content-center bg-secondary-700 border-0 {isInputBoxEditable &&
-                    element.type == 'text' &&
-                    element.value == ''
-                      ? 'opacity-1'
-                      : 'opacity-0 pe-none'}"
-                    style="width:16px; height:16px; padding:2px;"
-                    on:click={() => {
-                      uploadFormFile(index);
-                    }}
+                {#if !isWebApp}
+                  <Tooltip
+                    title="Attach"
+                    show={isInputBoxEditable &&
+                      element.type == "text" &&
+                      element.value == ""}
+                    placement="bottom"
                   >
-                    <AttachmentIcon
-                      height={"12px"}
-                      width={"12px"}
-                      color={"var(--icon-secondary-200)"}
-                    />
-                  </button>
-                </Tooltip>
+                    <button
+                      class="d-flex align-items-center justify-content-center bg-secondary-700 border-0 {isInputBoxEditable &&
+                      element.type == 'text' &&
+                      element.value == ''
+                        ? 'opacity-1'
+                        : 'opacity-0 pe-none'}"
+                      style="width:16px; height:16px; padding:2px;"
+                      on:click={() => {
+                        uploadFormFile(index);
+                      }}
+                    >
+                      <AttachmentIcon
+                        height={"12px"}
+                        width={"12px"}
+                        color={"var(--icon-secondary-200)"}
+                      />
+                    </button>
+                  </Tooltip>
+                {/if}
                 <Tooltip title="Delete" placement="bottom">
                   <button
                     class="d-flex align-items-center p-0 justify-content-center bg-secondary-700 border-0"
