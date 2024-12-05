@@ -109,6 +109,7 @@ class GraphqlExplorerViewModel {
           this._tab.getValue().property?.graphql
             ?.auth as GraphqlRequestAuthTabInterface,
         ).getValue();
+        this.updateQueryAsPerSchema();
       }, 0);
     }
   }
