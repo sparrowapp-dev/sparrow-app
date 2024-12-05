@@ -83,7 +83,7 @@
 >
   <div
     class=" w-100 d-flex justify-content-between px-2 border-upper-radius"
-    style="margin-left: -3px;  background-color: {tab.isActive
+    style="margin-left: -1px;  background-color: {tab.isActive
       ? 'var(--bg-secondary-850)'
       : 'transparent'};"
   >

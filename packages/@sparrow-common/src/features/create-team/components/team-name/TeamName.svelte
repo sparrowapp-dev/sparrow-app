@@ -41,6 +41,7 @@
     bind:value={teamForm.name.value}
     on:blur={() => {
       teamForm.name.isTouched = true;
+      teamForm.name.value = teamForm.name.value.trim(); // Trim the value on blur
     }}
     height={"36px"}
     id={inputId}

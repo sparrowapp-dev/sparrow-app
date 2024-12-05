@@ -535,7 +535,7 @@ const makeHttpRequestV2 = async (
         const error = axiosError;
         response = {
           data: {
-            status: `${error.response?.status || 500} ${error.response?.statusText || "Error"}`,
+            status: `${error.response.status} ${error.response.statusText}`,
             data: error.response?.data || error.message,
             headers: error.response?.headers
               ? Object.fromEntries(Object.entries(error.response.headers))
@@ -560,6 +560,10 @@ const makeHttpRequestV2 = async (
       } else {
         responseData = response.data.data;
       }
+      if (!response.data.status) {
+        throw new Error("Error parsing response");
+      }
+
       appInsights.trackDependencyData({
         id: uuidv4(),
         name: "Cloud Agent Duration Metric",
@@ -581,6 +585,7 @@ const makeHttpRequestV2 = async (
     if (signal?.aborted) {
       throw new DOMException("Request was aborted", "AbortError");
     }
+
     console.error("Request error:", e);
     appInsights.trackDependencyData({
       id: uuidv4(),

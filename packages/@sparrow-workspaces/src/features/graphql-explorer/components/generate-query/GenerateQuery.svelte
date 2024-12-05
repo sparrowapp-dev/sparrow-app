@@ -750,7 +750,7 @@
                       on:blur={() => {
                         setTimeout(() => {
                           isQueryInputFocused = false;
-                        }, 200);
+                        }, 400);
                       }}
                     />
                     {#if t?.value && isQueryInputFocused}
