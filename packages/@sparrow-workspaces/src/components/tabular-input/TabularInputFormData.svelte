@@ -329,7 +329,7 @@
                 </Tooltip>
                 <Tooltip title="Delete" placement="bottom">
                   <button
-                    class="d-flex align-items-center justify-content-center bg-secondary-700 border-0"
+                    class="d-flex align-items-center p-0 justify-content-center bg-secondary-700 border-0"
                     style="width:16px; height:16px;"
                     on:click={() => {
                       deleteParam(index);
