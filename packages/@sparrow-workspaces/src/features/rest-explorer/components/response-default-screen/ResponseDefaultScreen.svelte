@@ -1,34 +1,23 @@
 <script lang="ts">
   import { ComboText } from "@sparrow/workspaces/components";
-  import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
   import { SparrowLogo } from "@sparrow/common/images";
+  import { OSDetector } from "@sparrow/common/utils";
+
   export let isMainScreen = false;
   export let isWebApp = false;
+  let platformName = "";
 
   let ctrlCommands: { [key: string]: string } = {};
   let altCommands: { [key: string]: string } = {};
+
+  const osDetector = new OSDetector();
+  onMount(() => {
+    platformName = osDetector.getOS();
+  });
+
   onMount(async () => {
-    let platformName: string;
-
-    try {
-      // First, try Tauri platform detection
-      platformName = await platform();
-    } catch {
-      // Fallback to browser-based detection
-      const userAgent = navigator.userAgent.toLowerCase();
-      if (userAgent.includes("mac")) {
-        platformName = "macos";
-      } else if (userAgent.includes("win")) {
-        platformName = "windows";
-      } else if (userAgent.includes("linux")) {
-        platformName = "linux";
-      } else {
-        platformName = "unknown";
-      }
-    }
-
-    const controlKey = platformName === "macos" ? "cmd" : "ctrl";
+    const controlKey = platformName === "windows" ? "cmd" : "ctrl";
     const altKey = platformName === "macos" ? "option" : "alt";
 
     ctrlCommands = {
