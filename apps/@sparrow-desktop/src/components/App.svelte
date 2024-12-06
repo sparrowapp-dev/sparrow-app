@@ -15,7 +15,7 @@
   import LoginPage from "@app/pages/auth-page/sub-pages/login-page/LoginPage.svelte";
   import { singleInstanceHandler } from "@app/utils/singleinstance/app.singleinstance";
   import { AppViewModel } from "./app.ViewModel";
-  import { setScaleFactorToDb } from "@app/utils/zoom";
+  import { getScaleFactor, setScaleFactorToDb } from "@app/utils/zoom";
 
   const _viewModel = new AppViewModel();
 
@@ -33,7 +33,7 @@
     await _viewModel.registerDeepLinkHandler();
     await singleInstanceHandler();
     await maximizeWindow();
-    await setScaleFactorToDb("1");
+    await setScaleFactorToDb(await getScaleFactor());
     let isloggedIn;
     user.subscribe((value) => {
       isloggedIn = value;

@@ -16,6 +16,7 @@
   export let onUpdateRequestBody;
   export let onUpdateRequestState;
   export let method;
+  export let isWebApp = false;
   let isBodyBeautified = false;
   const updateBeautifiedState = (value: boolean) => {
     isBodyBeautified = value;
@@ -54,6 +55,7 @@
         {environmentVariables}
         {onUpdateEnvironment}
         formData={body.formdata}
+        {isWebApp}
       />
     {:else if requestState.requestBodyNavigation === RequestDataset.BINARY}
       <Binary />
