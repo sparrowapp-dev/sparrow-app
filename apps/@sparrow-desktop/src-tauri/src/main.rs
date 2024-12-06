@@ -365,7 +365,6 @@ async fn make_request_v2(
         response_body = base64::encode(bytes); // convert bytes to base64 string effiecient for transmission / no data willl not get currupted.
     } else {
         //if data is non binary handle it as standrd flow
-        println!("it is an non binary response");
         let response_text_result = decode_response_body(response_value).await;
 
         // Preserve your original assignment style
@@ -374,8 +373,6 @@ async fn make_request_v2(
             Err(err) => format!("Error: {}", err),
         };
     }
-
-    println!("{:?}", response_body);
 
     // Map headers into json
     let response_headers_json: serde_json::Value = response_headers
