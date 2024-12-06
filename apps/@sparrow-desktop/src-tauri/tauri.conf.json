@@ -3,10 +3,12 @@
     "security": {
       "csp": null
     },
+    "macOSPrivateApi": true,
     "windows": [
       {
         "center": true,
         "decorations": false,
+        "transparent": true,
         "fullscreen": false,
         "label": "main",
         "minHeight": 700,
@@ -14,7 +16,12 @@
         "resizable": true,
         "title": "Sparrow",
         "shadow": true,
-        "focus": true
+        "focus": true,
+        "windowEffects": {
+          "effects": ["hudWindow"],
+          "radius": 10
+        },
+        "dragDropEnabled": false
       }
     ],
     "withGlobalTauri": false
