@@ -38,7 +38,9 @@
     "shell:allow-open",
     "dialog:allow-save",
     "fs:allow-write-file",
-    "fs:allow-write-text-file"
+    "fs:allow-write-text-file",
+    "core:window:allow-set-max-size",
+    "core:window:allow-set-position"
   ],
   "platforms": ["linux", "macOS", "windows", "android", "iOS"]
 }

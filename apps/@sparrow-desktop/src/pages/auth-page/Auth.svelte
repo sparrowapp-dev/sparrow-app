@@ -4,7 +4,7 @@
     logoSparrowSquare,
     sparrowLogoBackground,
   } from "@sparrow/common/images";
-  import { Redirect } from "@sparrow/common/components";
+  import { DefaultHeader, Redirect } from "@sparrow/common/components";
   import constants from "@app/constants/constants";
   import { StarIcon } from "@sparrow/library/icons";
   import { StarFilledIcon } from "@sparrow/library/icons";
@@ -22,7 +22,6 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import { Button } from "@sparrow/library/ui";
-
   let isEntry = false;
 
   let isHover = false;
@@ -71,6 +70,8 @@
     }
   };
 </script>
+
+<DefaultHeader />
 
 {#if isEntry}
   <Redirect

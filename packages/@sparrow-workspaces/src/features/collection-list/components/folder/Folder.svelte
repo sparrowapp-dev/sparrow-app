@@ -86,6 +86,7 @@
    * Role of user in active workspace
    */
   export let userRole;
+  export let isWebApp = false;
 
   let expand: boolean = false;
   let showFolderAPIButtons: boolean = true;
@@ -304,7 +305,7 @@
           displayText: "Add WebSocket",
           disabled: false,
           hidden:
-            !collection.activeSync ||
+            (!isWebApp && !collection.activeSync) ||
             (explorer?.source === "USER" && collection.activeSync)
               ? false
               : true,
@@ -320,7 +321,7 @@
           displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            !collection.activeSync ||
+            (!isWebApp && !collection.activeSync) ||
             (explorer?.source === "USER" && collection.activeSync)
               ? false
               : true,
@@ -336,7 +337,7 @@
           displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            !collection.activeSync ||
+            (!isWebApp && !collection.activeSync) ||
             (explorer?.source === "USER" && collection.activeSync)
               ? false
               : true,
@@ -370,7 +371,7 @@
       >
         <button
           style="padding-left: 30px;"
-          class="main-folder pe-2 d-flex align-items-center pe-0 border-0 bg-transparent"
+          class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
           on:click|preventDefault={() => {
             if (!isRenaming) {
@@ -481,7 +482,7 @@
           >
             <button
               id={`show-more-folder-${explorer.id}`}
-              class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+              class="threedot-icon-container border-0 p-0 rounded d-flex justify-content-center align-items-center {showMenu
                 ? 'threedot-active'
                 : ''}"
               style="transform: rotate(90deg);"
@@ -509,6 +510,7 @@
               explorer={exp}
               folder={explorer}
               {activeTabId}
+              {isWebApp}
             />
           {/each}
           {#if !explorer?.items?.length}
@@ -560,7 +562,7 @@
           {activeTabPath}
         />
       </div>
-    {:else if explorer.type === ItemType.WEB_SOCKET}
+    {:else if explorer.type === ItemType.WEB_SOCKET && !isWebApp}
       <div style="cursor:pointer;">
         <WebSocket
           bind:userRole
@@ -574,7 +576,7 @@
           {activeTabPath}
         />
       </div>
-    {:else if explorer.type === ItemType.SOCKET_IO}
+    {:else if explorer.type === ItemType.SOCKET_IO && !isWebApp}
       <div style="cursor:pointer;">
         <SocketIo
           bind:userRole
@@ -588,7 +590,7 @@
           {activeTabPath}
         />
       </div>
-    {:else if explorer.type === ItemType.GRAPHQL}
+    {:else if explorer.type === ItemType.GRAPHQL && !isWebApp}
       <div style="cursor:pointer;">
         <Graphql
           bind:userRole
@@ -698,6 +700,7 @@
     color: var(--white-color);
     padding-left: 0;
     outline: none;
+    border-radius: 2px !important;
   }
   .renameInputFieldFolder:focus {
     border: 1px solid var(--border-primary-300) !important;

@@ -240,7 +240,7 @@
       </button>
       {#if isRenaming}
         <input
-          class="py-0 renameInputFieldCollection text-fs-12 w-100"
+          class="py-0  renameInputFieldCollection text-fs-12 w-100"
           id="renameInputFieldTestflow"
           type="text"
           value={flow.name}
@@ -327,7 +327,7 @@
       color: var(--white-color);
       background-color: transparent;
       padding-left: 0;
-      border-radius: 0 !important;
+      border-radius: 2px !important;
       outline: none !important;
     }
     .renameInputFieldCollection:focus {

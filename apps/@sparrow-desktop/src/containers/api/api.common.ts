@@ -858,6 +858,7 @@ const makeHttpRequestV2 = async (
         },
       };
       appInsights.trackDependencyData(appInsightData);
+      console.log("api response : ", apiResponse);
       return success(apiResponse);
     } catch (e) {
       console.error(e);
@@ -984,6 +985,7 @@ const makeGraphQLRequest = async (
   _url: string,
   _headers: string,
   _query: string,
+  _variables?: string,
   _signal?: AbortSignal,
 ): Promise<
   HttpClientResponseInterface<{
@@ -1000,6 +1002,7 @@ const makeGraphQLRequest = async (
       url: _url,
       headers: _headers,
       query: _query,
+      variables: _variables || "{}",
     });
     const endTime = performance.now();
     const duration = endTime - startTime;

@@ -55,7 +55,7 @@
   <div>
     {#if !isBulkEditActive}
       <div class="d-flex align-items-center py-3">
-        <span class="text-primary-200 fw-bold generated-para me-2">
+        <span class="text-primary-300 fw-bold generated-para me-2">
           Show auto-generated headers
         </span>
         <div class="form-check form-switch custom-switch">
@@ -132,7 +132,7 @@
   }
 
   input:checked + .slider {
-    background-color: var(--bg-primary-200);
+    background-color: var(--bg-primary-300);
   }
 
   input:checked + .slider:before {

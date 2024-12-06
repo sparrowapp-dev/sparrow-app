@@ -51,18 +51,20 @@ import type { GuideQuery } from "../../../../types/user-guide";
 import { graphqlExplorerDataStore } from "@sparrow/workspaces/features/graphql-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
 import type { Path, Tab } from "@sparrow/common/types/workspace/tab";
-import type {
-  GraphqlRequestAuthTabInterface,
-  GraphqlRequestHeadersTabInterface,
-  GraphqlRequestKeyValueCheckedTabInterface,
-  GraphqlRequestStateTabInterface,
-  GraphqlRequestTabInterface,
+import {
+  GraphqlRequestOperationTabEnum,
+  type GraphqlRequestAuthTabInterface,
+  type GraphqlRequestHeadersTabInterface,
+  type GraphqlRequestKeyValueCheckedTabInterface,
+  type GraphqlRequestStateTabInterface,
+  type GraphqlRequestTabInterface,
 } from "@sparrow/common/types/workspace/graphql-request-tab";
 import {
   type EnvironmentFilteredVariableBaseInterface,
   type EnvironmentLocalGlobalJoinBaseInterface,
 } from "@sparrow/common/types/workspace/environment-base";
 import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+import { parse } from "graphql";
 class GraphqlExplorerViewModel {
   /**
    * Repository
@@ -107,6 +109,7 @@ class GraphqlExplorerViewModel {
           this._tab.getValue().property?.graphql
             ?.auth as GraphqlRequestAuthTabInterface,
         ).getValue();
+        this.updateQueryAsPerSchema();
       }, 0);
     }
   }
@@ -172,6 +175,7 @@ class GraphqlExplorerViewModel {
           requestAuthNavigation: requestServer.graphql.selectedGraphqlAuthType,
         })
         .updateSchema(requestServer.graphql.schema)
+        .updateVariables(requestServer.graphql.variables)
         .updateAuth(requestServer.graphql.auth)
         .updateHeaders(requestServer.graphql.headers)
         .getValue();
@@ -212,6 +216,13 @@ class GraphqlExplorerViewModel {
     else if (
       graphqlTabData.property.graphql?.schema !==
       progressiveTab.property.graphql?.schema
+    ) {
+      result = false;
+    }
+    // variables
+    else if (
+      graphqlTabData.property.graphql?.variables !==
+      progressiveTab.property.graphql?.variables
     ) {
       result = false;
     }
@@ -312,6 +323,18 @@ class GraphqlExplorerViewModel {
     }
   };
 
+  /**
+   * update operation search to db
+   * @param _search  - search data
+   */
+  public updateRequestOperationSearch = async (_search: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.graphql.operationSearch = _search;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    // this.compareRequestWithServer();
+  };
+
   private updateRequestSchemaThrottle = async (
     _environmentVariables?: EnvironmentFilteredVariableBaseInterface[],
   ) => {
@@ -323,6 +346,52 @@ class GraphqlExplorerViewModel {
     1000,
   );
 
+  public updateSchemaAsPerQuery = async () => {
+    try {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const query = progressiveTab.property.graphql.query;
+      try {
+        // Check if the query is valid by attempting to parse it
+        parse(query);
+      } catch (error) {
+        console.error("not a valid query");
+        return;
+      }
+      const reverseJson = await this.reverseGraphQLToJSON(query);
+      const parsedSchema = JSON.parse(progressiveTab.property.graphql.schema);
+      let updatedJSON;
+      if (
+        progressiveTab.property.graphql.state.operationNavigation ===
+        GraphqlRequestOperationTabEnum.QUERY
+      ) {
+        updatedJSON = await this.compareAndUpdateFirstJSON(
+          parsedSchema.Query,
+          reverseJson?.items,
+        );
+      } else {
+        updatedJSON = await this.compareAndUpdateFirstJSON(
+          parsedSchema.Mutation,
+          reverseJson?.items,
+        );
+      }
+      let updatedQueryMutationJSON = parsedSchema;
+      if (
+        progressiveTab.property.graphql.state.operationNavigation ===
+        GraphqlRequestOperationTabEnum.QUERY
+      ) {
+        updatedQueryMutationJSON.Query = updatedJSON;
+      } else {
+        updatedQueryMutationJSON.Mutation = updatedJSON;
+      }
+      const stringifiedUpdatedJSON = JSON.stringify(updatedQueryMutationJSON);
+      progressiveTab.property.graphql.schema = stringifiedUpdatedJSON;
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
   /**
    *
    * @param _query - request query
@@ -332,6 +401,7 @@ class GraphqlExplorerViewModel {
     progressiveTab.property.graphql.query = _query;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.updateSchemaAsPerQuery();
     this.compareRequestWithServer();
   };
 
@@ -443,6 +513,397 @@ class GraphqlExplorerViewModel {
     this.compareRequestWithServer();
   };
 
+  private transformSchema = async (schemaData) => {
+    const types = schemaData.__schema.types;
+    const processedTypes = new Set();
+    const maxItemLength = 15;
+    const maxDepthLength = 8;
+
+    // Helper function to resolve nested types
+    function resolveType(typeObj) {
+      if (!typeObj) return null;
+
+      // Handle nested types (NON_NULL, LIST)
+      if (typeObj.kind === "NON_NULL") {
+        return resolveType(typeObj.ofType);
+      }
+      if (typeObj.kind === "LIST") {
+        return resolveType(typeObj.ofType);
+      }
+
+      return typeObj.name;
+    }
+
+    // Determine default value based on type
+    function getDefaultValue(typeName) {
+      // Provide default values based on type
+      switch (typeName) {
+        case "String":
+          return "";
+        case "Int":
+        case "Float":
+          return 0;
+        case "Boolean":
+          return false;
+        case "ID":
+          return null;
+        default:
+          return null;
+      }
+    }
+
+    // Helper function to determine if a type is a scalar
+    function isScalarType(typeName) {
+      const scalarTypes = ["String", "Int", "Float", "Boolean", "ID"];
+      return scalarTypes.includes(typeName) || typeName?.startsWith("__");
+    }
+
+    // Process input object types
+    function processInputObjectType(typeName, depth = 0) {
+      if (processedTypes.has(typeName) || depth > maxDepthLength) return null;
+
+      const inputType = types.find((t) => t.name === typeName);
+      if (!inputType?.inputFields) return null;
+
+      processedTypes.add(typeName);
+      const result = processFields(
+        inputType.inputFields,
+        typeName,
+        depth + 1,
+        "inputField",
+      );
+      processedTypes.delete(typeName);
+      return result;
+    }
+
+    // Process object types
+    function processObjectType(typeName, depth = 0) {
+      if (processedTypes.has(typeName) || depth > maxDepthLength) return null;
+
+      const objectType = types.find((t) => t.name === typeName);
+      if (!objectType?.fields) return null;
+
+      processedTypes.add(typeName);
+      const result = processFields(
+        objectType.fields,
+        typeName,
+        depth + 1,
+        "field",
+      );
+      processedTypes.delete(typeName);
+      return result;
+    }
+
+    // Recursive field processing
+    function processFields(
+      fields,
+      parentName,
+      depth = 0,
+      defaultItemType = "field",
+    ) {
+      if (!fields || depth > maxDepthLength) return [];
+
+      return fields.map((field) => {
+        const fieldName = field.name;
+        const typeName = resolveType(field.type);
+        const isCustomType = !isScalarType(typeName);
+
+        let result = {
+          id: uuidv4(), // Add UUID to the top-level object
+          name: fieldName,
+          description: field.description,
+          type: typeName,
+          itemType: defaultItemType,
+          isSelected: false,
+          isExpanded: false,
+          value: getDefaultValue(typeName),
+          items: [],
+        };
+
+        // Process arguments directly into items array
+        if (field.args && field.args.length > 0) {
+          const argumentItems = field.args.map((arg) => {
+            const argTypeName = resolveType(arg.type);
+            const isArgCustomType = !isScalarType(argTypeName);
+
+            const argResult = {
+              id: uuidv4(), // Add UUID to argument objects
+              name: arg.name,
+              type: argTypeName,
+              description: arg.description,
+              itemType: "argument",
+              isSelected: false,
+              isExpanded: false,
+              defaultValue: arg.defaultValue,
+              value: getDefaultValue(argTypeName),
+              items: [],
+            };
+
+            // Process nested argument types
+            if (isArgCustomType) {
+              const argInputFields = processInputObjectType(
+                argTypeName,
+                depth + 1,
+              );
+              const argObjectFields = processObjectType(argTypeName, depth + 1);
+
+              // Add UUID to nested items
+              argResult.items = (argInputFields || argObjectFields || []).map(
+                (item) => ({
+                  ...item,
+                  id: uuidv4(),
+                }),
+              );
+            }
+
+            return argResult;
+          });
+
+          // Add arguments to items array
+          result.items.push(...argumentItems?.slice(0, maxItemLength));
+        }
+
+        // Process nested custom types
+        if (isCustomType) {
+          const inputFields = processInputObjectType(typeName, depth + 1);
+          const objectFields = processObjectType(typeName, depth + 1);
+
+          // Add nested type fields to items array with UUID
+          if (inputFields) {
+            result.items.push(
+              ...inputFields
+                .map((item) => ({
+                  ...item,
+                  id: uuidv4(),
+                }))
+                ?.slice(0, maxItemLength),
+            );
+          }
+          if (objectFields) {
+            result.items.push(
+              ...objectFields
+                .map((item) => ({
+                  ...item,
+                  id: uuidv4(),
+                }))
+                ?.slice(0, maxItemLength),
+            );
+          }
+        }
+
+        return result;
+      });
+    }
+
+    // Find main types
+    const queryType = types.find((t) => t.name === "Query");
+    const mutationType = types.find((t) => t.name === "Mutation");
+    // const subscriptionType = types.find((t) => t.name === "Subscription");
+
+    // Reset processed types before starting
+    processedTypes.clear();
+
+    const result = {
+      Query: {
+        items: queryType
+          ? processFields(queryType.fields, "Query").slice(0, 70)
+          : [],
+      },
+      Mutation: {
+        items: mutationType
+          ? processFields(mutationType.fields, "Mutation").slice(0, 70)
+          : [],
+      },
+      // Disabling subscription for now as it's support is not provided
+      // Subscription: {
+      //   items: subscriptionType
+      //     ? processFields(subscriptionType.fields, "Subscription")
+      //     : [],
+      // },
+    };
+
+    return result;
+  };
+
+  // This function will generate the GraphQL Query from json object.
+  private generateGraphQLQuery = async (json, operationName = "Query") => {
+    // Helper function to process arguments
+    function processArguments(items) {
+      return items
+        .filter((item) => item.itemType === "argument" && item.isSelected)
+        .map((arg) => {
+          const inputFields = processInputFields(arg.items);
+          const value =
+            inputFields.length > 0
+              ? `{ ${inputFields} }`
+              : arg.value !== null
+              ? JSON.stringify(arg.value)
+              : "null";
+
+          return `${arg.name}: ${value}`;
+        })
+        .join(", ");
+    }
+
+    // Helper function to process input fields (nested arguments)
+    function processInputFields(items) {
+      return items
+        .filter((input) => input.isSelected)
+        .map((input) => {
+          const value =
+            input.value !== null ? JSON.stringify(input.value) : "null";
+          return `${input.name}: ${value}`;
+        })
+        .join(", ");
+    }
+
+    // Helper function to process fields and nested fields
+    function processFields(items, indentLevel = 1) {
+      const indent = "  ".repeat(indentLevel); // Define indentation level
+      return items
+        .filter((item) => item.itemType === "field" && item.isSelected)
+        .map((field) => {
+          const args = processArguments(field.items); // Process arguments
+          const subFields = processFields(field.items, indentLevel + 1); // Process nested fields
+
+          const fieldWithArgs = args ? `${field.name}(${args})` : field.name;
+
+          // Combine the field with its nested fields (if any)
+          return subFields
+            ? `${indent}${fieldWithArgs} {\n${subFields}\n${indent}}`
+            : `${indent}${fieldWithArgs}`;
+        })
+        .join("\n");
+    }
+
+    // Generate the query
+    const queryBody = processFields(json.items);
+    return `${
+      operationName === "Query" ? `query` : "mutation"
+    } ${operationName} {\n  ${queryBody}\n}`;
+  };
+
+  // This function will reverse the GraphQL query to JSON object.
+  private reverseGraphQLToJSON = (query) => {
+    // Helper to process arguments
+    const processArguments = (args) => {
+      return args.map((arg) => ({
+        name: arg.name.value,
+        itemType: "argument",
+        isSelected: true,
+        value: arg.value.kind === "StringValue" ? arg.value.value : null,
+        items: [],
+      }));
+    };
+
+    // Helper to process fields
+    const processFields = (fields) => {
+      return fields.map((field) => {
+        const args = field.arguments ? processArguments(field.arguments) : [];
+        const nestedFields =
+          field.selectionSet && field.selectionSet.selections
+            ? processFields(field.selectionSet.selections)
+            : [];
+
+        return {
+          id: field.name.value, // You can use a UUID generator if needed
+          name: field.name.value,
+          description: null, // No description in query, set null
+          type: null, // Type is not available in query, set null
+          itemType: "field",
+          isSelected: true, // Since it's part of the query, it's selected
+          value: null, // Default value
+          items: [...args, ...nestedFields],
+        };
+      });
+    };
+
+    // Parse the query
+    const parsedQuery = parse(query);
+
+    // Entry point: process the main operation
+    const operation = parsedQuery.definitions[0];
+    const operationName = operation?.name ? operation?.name?.value : "Query";
+    const fields = processFields(operation.selectionSet.selections);
+
+    return {
+      operationName,
+      items: fields,
+    };
+  };
+
+  // This function will compare and update the main JSON with the new generated JSON.
+  private compareAndUpdateFirstJSON = (firstJSON, secondJSONItems) => {
+    // Create a helper function to recursively process nested items
+    function processItems(firstItems, secondItems) {
+      // Create a map of secondItems for quick lookup by name
+      const secondMap = new Map();
+      for (const secondItem of secondItems) {
+        secondMap.set(secondItem.name, secondItem);
+      }
+
+      for (const firstItem of firstItems) {
+        const secondItem = secondMap.get(firstItem.name);
+
+        // If `isSelected` is true in the first item but it doesn't exist in the second JSON, set `isSelected` to false
+        if (firstItem.isSelected && !secondItem) {
+          firstItem.isSelected = false;
+        }
+
+        // If the object exists in both, update its value
+        if (secondItem) {
+          firstItem.value = secondItem.value;
+          firstItem.isSelected = secondItem.isSelected;
+
+          // Recursively process nested items
+          if (
+            Array.isArray(firstItem.items) &&
+            Array.isArray(secondItem.items)
+          ) {
+            processItems(firstItem.items, secondItem.items);
+          }
+        }
+      }
+    }
+
+    // Start processing with the top-level items
+    processItems(firstJSON.items, secondJSONItems);
+
+    return firstJSON; // Return the updated first JSON
+  };
+
+  private compareAndUpdateFetchedJson = async (previous, current) => {
+    const updateItems = (prevItems, currItems) => {
+      currItems.forEach((currItem) => {
+        // Find a matching item in the previous JSON by name
+        const matchingPrevItem = prevItems.find(
+          (prevItem) => prevItem.name === currItem.name,
+        );
+
+        if (matchingPrevItem) {
+          // Update isSelected and value
+          currItem.isSelected = matchingPrevItem.isSelected;
+          currItem.value = matchingPrevItem.value;
+
+          // Recursively update nested items
+          if (currItem.items && matchingPrevItem.items) {
+            updateItems(matchingPrevItem.items, currItem.items);
+          }
+        }
+      });
+    };
+
+    // Compare and update for both Query and Mutation sections
+    if (previous?.Query?.items && current?.Query?.items) {
+      updateItems(previous.Query.items, current.Query.items);
+    }
+    if (previous?.Mutation?.items && current?.Mutation?.items) {
+      updateItems(previous.Mutation.items, current.Mutation.items);
+    }
+    // Return the updated current JSON
+    return current;
+  };
+
   /**
    * Updated GraphQL Schema by fetching it.
    * @param _environmentVariables - Environment variables to be embedded in the GraphQL Request.
@@ -520,12 +981,44 @@ class GraphqlExplorerViewModel {
       );
       const responseBody = response.data.body;
       const parsedResponse = JSON.parse(responseBody);
-      const formattedSchema = this.formatGraphQLSchema(parsedResponse.data);
-      progressiveTab.property.graphql.schema = formattedSchema;
-      progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
-      this.tab = progressiveTab;
-      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-      notifications.success("Schema fetched successfully.");
+      this.transformSchema(parsedResponse.data)
+        .then(async (formattedSchema) => {
+          let previousSchema;
+          try {
+            previousSchema = JSON.parse(progressiveTab.property.graphql.schema);
+          } catch (error) {
+            console.log("Previous Schema not parsed", error);
+          }
+          const parsedSchema = await this.compareAndUpdateFetchedJson(
+            previousSchema,
+            formattedSchema,
+          );
+
+          progressiveTab.property.graphql.schema = JSON.stringify(parsedSchema);
+          progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
+          this.tab = progressiveTab;
+          await this.tabRepository.updateTab(
+            progressiveTab.tabId,
+            progressiveTab,
+          );
+          notifications.success("Schema fetched successfully.");
+        })
+        .catch(async (error) => {
+          console.error(error);
+          const newProgressiveTab = createDeepCopy(this._tab.getValue());
+          newProgressiveTab.property.graphql.state.isRequestSchemaFetched =
+            false;
+          this.tab = newProgressiveTab;
+          await this.tabRepository.updateTab(
+            newProgressiveTab.tabId,
+            newProgressiveTab,
+          );
+          if (isFailedNotificationVisible) {
+            notifications.error(
+              "Failed to fetch schema. Please check the URL and try again.",
+            );
+          }
+        });
     } catch (error) {
       console.error(error);
       const newProgressiveTab = createDeepCopy(this._tab.getValue());
@@ -541,6 +1034,18 @@ class GraphqlExplorerViewModel {
         );
       }
     }
+  };
+
+  /**
+   * Updates variables in the RxDB
+   * @param _variables - stringified json of variables
+   */
+  public updateRequestVariables = async (_variables: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.graphql.variables = _variables;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
   };
 
   /**
@@ -611,6 +1116,44 @@ class GraphqlExplorerViewModel {
     this.compareRequestWithServer();
   };
 
+  public updateQueryAsPerSchema = async () => {
+    try {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const parsedSchema = JSON.parse(progressiveTab.property.graphql.schema);
+      let _query;
+      if (
+        progressiveTab.property.graphql.state.operationNavigation ===
+        GraphqlRequestOperationTabEnum.QUERY
+      ) {
+        _query = await this.generateGraphQLQuery(parsedSchema.Query, "Query");
+      } else {
+        _query = await this.generateGraphQLQuery(
+          parsedSchema.Mutation,
+          "Mutation",
+        );
+      }
+
+      progressiveTab.property.graphql.query = _query;
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    } catch (error) {
+      console.error("error", error);
+    }
+  };
+
+  /**
+   *
+   * @param _headers - request headers
+   */
+  public updateSchema = async (_schema: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.graphql.schema = _schema;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.updateQueryAsPerSchema();
+    this.compareRequestWithServer();
+  };
+
   /**
    *
    * @param headers - request auto generated headers
@@ -638,6 +1181,9 @@ class GraphqlExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    if (_state?.operationNavigation) {
+      await this.updateQueryAsPerSchema();
+    }
     this.compareRequestWithServer();
   };
 
@@ -737,8 +1283,15 @@ class GraphqlExplorerViewModel {
       url: decodeData[0],
       headers: decodeData[1],
       query: decodeData[2],
+      variables: decodeData[3],
     });
-    makeGraphQLRequest(decodeData[0], decodeData[1], decodeData[2], signal)
+    makeGraphQLRequest(
+      decodeData[0],
+      decodeData[1],
+      decodeData[2],
+      decodeData[3],
+      signal,
+    )
       .then((response) => {
         const end = Date.now();
         const byteLength = new TextEncoder().encode(
@@ -1073,6 +1626,7 @@ class GraphqlExplorerViewModel {
           url: unadaptedRequest.url as string,
           query: unadaptedRequest.query,
           schema: unadaptedRequest.schema,
+          variables: unadaptedRequest.variables,
           headers: unadaptedRequest.headers,
           auth: unadaptedRequest.auth,
           selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
@@ -1117,6 +1671,7 @@ class GraphqlExplorerViewModel {
       url: unadaptedRequest.url as string,
       query: unadaptedRequest.query,
       schema: unadaptedRequest.schema,
+      variables: unadaptedRequest.variables,
       headers: unadaptedRequest.headers,
       auth: unadaptedRequest.auth,
       selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
@@ -1309,6 +1864,7 @@ class GraphqlExplorerViewModel {
             initRequestTab.updateUrl(req.graphql.url as string);
             initRequestTab.updateQuery(req.graphql.query as string);
             initRequestTab.updateSchema(req.graphql.schema as string);
+            initRequestTab.updateVariables(req.graphql.variables as string);
             initRequestTab.updateAuth(
               req.graphql.auth as GraphqlRequestAuthTabInterface,
             );
@@ -1387,6 +1943,9 @@ class GraphqlExplorerViewModel {
             initRequestTab.updateSchema(
               res.data.data.graphql?.schema as string,
             );
+            initRequestTab.updateVariables(
+              res.data.data.graphql?.variables as string,
+            );
             initRequestTab.updateAuth(
               res.data.data.graphql?.auth as GraphqlRequestAuthTabInterface,
             );
@@ -1454,6 +2013,7 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(req.graphql?.url as string);
             initRequestTab.updateQuery(req.graphql?.query as string);
+            initRequestTab.updateVariables(req.graphql?.variables as string);
             initRequestTab.updateSchema(req.graphql?.schema as string);
             initRequestTab.updateAuth(
               req.graphql?.auth as GraphqlRequestAuthTabInterface,
@@ -1480,6 +2040,7 @@ class GraphqlExplorerViewModel {
           items: {
             id: path[path.length - 1].id,
             type: CollectionItemTypeBaseEnum.FOLDER,
+            name: path[path.length - 1].name,
             items: {
               name: tabName,
               description,
@@ -1527,6 +2088,9 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(res.data.data.graphql?.url as string);
             initRequestTab.updateQuery(res.data.data.graphql?.query as string);
+            initRequestTab.updateVariables(
+              res.data.data.graphql?.variables as string,
+            );
             initRequestTab.updateSchema(
               res.data.data.graphql?.schema as string,
             );
@@ -1898,7 +2462,51 @@ class GraphqlExplorerViewModel {
    * Clears GraphQL request query
    */
   public clearQuery = async () => {
-    await this.updateRequestQuery("");
+    const unchecksAllTheChildNodes = (_item) => {
+      _item.isSelected = false;
+
+      for (let j = 0; j < _item?.items?.length; j++) {
+        unchecksAllTheChildNodes(_item.items[j]);
+      }
+    };
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    const query = "";
+    const schema = progressiveTab.property.graphql?.schema;
+
+    if (
+      progressiveTab.property.graphql?.state.operationNavigation ===
+      GraphqlRequestOperationTabEnum.QUERY
+    ) {
+      try {
+        const JSONSchema = JSON.parse(schema as string);
+        const querySchema = JSONSchema?.Query?.items || [];
+        for (let i = 0; i < querySchema.length; i++) {
+          unchecksAllTheChildNodes(querySchema[i]);
+        }
+        JSONSchema.Query.items = querySchema;
+        await this.updateSchema(JSON.stringify(JSONSchema));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    if (
+      progressiveTab.property.graphql?.state.operationNavigation ===
+      GraphqlRequestOperationTabEnum.MUTATION
+    ) {
+      try {
+        const JSONSchema = JSON.parse(schema as string);
+        const querySchema = JSONSchema?.Mutation?.items || [];
+        for (let i = 0; i < querySchema.length; i++) {
+          unchecksAllTheChildNodes(querySchema[i]);
+        }
+        JSONSchema.Mutation.items = querySchema;
+        await this.updateSchema(JSON.stringify(JSONSchema));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    await this.updateRequestQuery(query);
+
     notifications.success("Cleared Query successfully.");
   };
 }

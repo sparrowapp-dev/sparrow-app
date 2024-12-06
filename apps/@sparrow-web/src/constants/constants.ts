@@ -24,6 +24,7 @@ const constants = {
   BASE_URL: import.meta.env.VITE_WEB_BASE_URL,
   WEB_MARKETING_URL: import.meta.env.VITE_WEB_MARKETING_URL,
   DOCS_URL: import.meta.env.VITE_WEB_SPARROW_DOCS,
+  PROXY_SERVICE: import.meta.env.VITE_WEB_PROXY_SERVICE,
 };
 
 export default constants;

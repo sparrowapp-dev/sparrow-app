@@ -77,13 +77,13 @@
   }}
   class="d-inline-block position-relative pt-1 individual-tab bg-transparent border-0"
   style="width: {tabWidth}px; height:35px; margin-left:{index === 0
-    ? '10px'
+    ? '4px'
     : ''}"
   on:mousedown={handleMouseDown}
 >
   <div
     class=" w-100 d-flex justify-content-between px-2 border-upper-radius"
-    style="margin-left: -3px;  background-color: {tab.isActive
+    style="margin-left: -1px;  background-color: {tab.isActive
       ? 'var(--bg-secondary-850)'
       : 'transparent'};"
   >

@@ -63,8 +63,6 @@
 
   let isTabSaved: boolean;
 
-  export let isGuestUser = false;
-
   let activeTabType: string;
 
   const getActiveTabType = (tabList) => {
@@ -94,11 +92,10 @@
   let scrollerWidth: number;
   let moreOption: boolean = false;
   let viewChange: boolean = false;
-  let showContainer = false;
 </script>
 
 <button
-  class="tab border-0 w-100 bg-blackColor d-flex"
+  class="tab border-0 ps-3 pe-3 w-100 bg-blackColor d-flex"
   style="cursor: default;"
   on:drop|preventDefault={(event) => {
     onDropEvent(event);
@@ -110,25 +107,23 @@
     bind:offsetWidth={scrollerParent}
   >
     {#if scrolable}
-      <div class="d-inline-block" style="height:35px; width:35px;">
+      <div
+        class="d-inline-block my-auto pe-1 position-relative"
+        style="height:24px;"
+      >
         <button
           on:click={() => {
             tabBarScroller("left");
           }}
           role="button"
-          class=" btn border-0 ps-0 pe-2 py-auto h-100 w-100"
-          style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:2px; "
+          class="layout d-flex align-items-center justify-content-center border-radius-2 border-0"
+          style="width:24px; transform: rotate(180deg); background-color: transparent; height:24px;"
         >
-          <div
-            class="left-btn d-flex justify-content-center align-items-center"
-            style="height: 22px; width:22px;"
-          >
-            <AngleLeftIcon
-              height={"12px"}
-              width={"24px"}
-              color="var(--text-secondary-200)"
-            />
-          </div>
+          <AngleLeftIcon
+            height={"12px"}
+            width={"12px"}
+            color="var(--text-secondary-200)"
+          />
         </button>
       </div>
     {/if}
@@ -155,127 +150,96 @@
     </button>
     {#if scrolable}
       <div
-        class="d-inline-block position-relative"
-        style="height:35px; width:35px;"
+        class="d-inline-block my-auto ps-1 position-relative"
+        style="height:24px;"
       >
-        <div
-          class="position-absolute"
-          style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; left: 0;"
-        />
         <button
           on:click={() => {
             tabBarScroller("right");
           }}
           role="button"
-          class=" btn border-0 ps-1 pe-1 py-auto h-100 w-100"
-          style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:22px;"
+          class="layout d-flex align-items-center justify-content-center border-radius-2 border-0"
+          style="width:24px; transform: rotate(180deg); background-color: transparent; height:24px;"
         >
-          <div
-            class="right-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
-            style="height: 22px; width:22px;"
-          >
-            <AngleRightIcon
-              height={"12px"}
-              width={"24px"}
-              color="var(--text-secondary-200)"
-            />
-          </div>
+          <AngleRightIcon
+            height={"12px"}
+            width={"12px"}
+            color="var(--text-secondary-200)"
+          />
         </button>
-        <div
-          class="position-absolute"
-          style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
-        />
       </div>
     {/if}
-    <!-- {#if tabList.length < 1}
-      <div class="d-inline-flex ms-2" style="height:35px;">
-        <Button
-          title="New Request"
-          onClick={onNewTabRequested}
-          buttonClassProp={"btn border-0 ps-1 pe-1 pt-1 py-0 h-100 w-100"}
-          textStyleProp="font-size: 14px;"
-        />
-      </div>
-    {/if} -->
-    <div class="d-inline-flex" style="height:35px; width:35px;">
-      <Tooltip
-        title={"Add Request"}
-        placement={"bottom"}
-        distance={10}
-        zIndex={20}
-      >
+    <div
+      class="d-flex ps-1 align-items-center justify-content-center my-auto"
+      style="height: 24px; "
+    >
+      <Tooltip title={"New"} placement={"bottom"} distance={10} zIndex={20}>
         <button
           on:click={onNewTabRequested}
           role="button"
-          class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
-          style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:22px;"
+          class="d-flex layout my-auto relative top-2 align-items-center border-radius-2 p-0 justify-content-center border-0 py-auto"
+          style="height:24px; width:24px; background-color: transparent;"
         >
-          <div
-            class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
-            style="height: 22px; width:22px;"
-          >
-            <PlusIcon
-              height={"24px"}
-              width={"24px"}
-              color="var(--text-secondary-200)"
-            />
-          </div>
+          <PlusIcon
+            height={"22px"}
+            width={"22px"}
+            color="var(--text-secondary-200)"
+          />
         </button>
       </Tooltip>
     </div>
-    <div class=" d-flex ms-auto my-auto me-2 {!tabList.length ? 'd-none' : ''}">
+    <div class="d-flex ms-auto my-auto {!tabList.length ? 'd-none' : ''}">
       {#if activeTabType === TabTypeEnum.REQUEST}
         <!-- QuickHelp Button -->
-        <div>
-          <button
-            role="button"
-            class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
-            on:click={async () => {
-              const event = await onFetchCollectionGuide({
-                id: "collection-guide",
-              });
-              const guideData = event?.getLatest().toMutableJSON();
-              if (guideData?.isActive === false) {
-                onUpdateCollectionGuide(
-                  {
-                    id: "collection-guide",
-                  },
-                  true,
-                );
-              } else {
-                onUpdateCollectionGuide(
-                  {
-                    id: "collection-guide",
-                  },
-                  false,
-                );
-              }
-            }}
+        <div
+          class="d-flex align-items-center ms-auto ps-1"
+          style="height: 24px;"
+        >
+          <Tooltip
+            title={"Quick Help"}
+            distance={10}
+            placement={"bottom"}
+            zIndex={10}
           >
-            <Tooltip
-              title={"Quick Help"}
-              distance={10}
-              placement={"bottom"}
-              zIndex={10}
+            <button
+              role="button"
+              class="layout border-0 border-radius-2 d-flex align-items-center justify-content-center"
+              style="height: 24px; width:24px; background-color: transparent;"
+              on:click={async () => {
+                const event = await onFetchCollectionGuide({
+                  id: "collection-guide",
+                });
+                const guideData = event?.getLatest().toMutableJSON();
+                if (guideData?.isActive === false) {
+                  onUpdateCollectionGuide(
+                    {
+                      id: "collection-guide",
+                    },
+                    true,
+                  );
+                } else {
+                  onUpdateCollectionGuide(
+                    {
+                      id: "collection-guide",
+                    },
+                    false,
+                  );
+                }
+              }}
             >
-              <div
-                class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
-                style="height: 24px; width:24px;"
-              >
-                <HelpIcon
-                  height={"16px"}
-                  width={"16px"}
-                  color={"var(--text-secondary-200)"}
-                />
-              </div>
-            </Tooltip>
-          </button>
+              <HelpIcon
+                height={"16px"}
+                width={"16px"}
+                color={"var(--text-secondary-200)"}
+              />
+            </button>
+          </Tooltip>
         </div>
 
         <!-- Split button -->
         <div
-          class="layout d-flex align-items-center ms-auto mt-1"
-          style="height: 24px; "
+          class="d-flex align-items-center ms-auto ps-1"
+          style="height: 24px;"
         >
           <Dropdown
             buttonId="viewChange"
@@ -310,7 +274,8 @@
             >
               <button
                 id="viewChange"
-                class="border-0 bg-transparent pt-0 rounded"
+                class="border-0 pt-0 border-radius-2 layout"
+                style="background-color: transparent; height:24px; width:24px;"
                 on:click={() => {
                   viewChange = !viewChange;
                 }}
@@ -318,11 +283,11 @@
                 {#if $requestSplitterDirection === "horizontal"}
                   <HorizontalGridIcon
                     color={"var(--icon-secondary-200)"}
-                    height={13}
+                    height={12}
                   />
                 {:else}
                   <VerticalGridIcon
-                    height={13}
+                    height={12}
                     color="var(--icon-secondary-200)"
                   />
                 {/if}
@@ -365,20 +330,7 @@
   .tab-scroller::-webkit-scrollbar {
     display: none;
   }
-  .right-btn:hover {
-    background-color: var(--tab-bar-hover);
-    border-radius: 2px;
-  }
-  .left-btn:hover {
-    background-color: var(--tab-bar-hover);
-    border-radius: 2px;
-  }
-  .plus-btn:hover {
-    background-color: var(--tab-bar-hover);
-    border-radius: 2px;
-  }
   .layout:hover {
-    background-color: var(--tab-bar-hover);
-    border-radius: 2px;
+    background-color: var(--tab-bar-hover) !important;
   }
 </style>

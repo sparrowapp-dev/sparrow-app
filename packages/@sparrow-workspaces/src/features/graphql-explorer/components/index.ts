@@ -11,3 +11,5 @@ export { default as RequestName } from "./request-name/RequestName.svelte";
 export { default as ResponseStatus } from "./response-status/ResponseStatus.svelte";
 export { default as RequestQuery } from "./request-query/RequestQuery.svelte";
 export { default as RequestSchema } from "./request-schema/RequestSchema.svelte";
+export { default as GenerateQuery } from "./generate-query/GenerateQuery.svelte";
+export { default as RequestVariables } from "./request-variables/RequestVariables.svelte";

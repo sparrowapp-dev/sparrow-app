@@ -18,12 +18,12 @@
    */
   export let options: {
     name: String;
-    icon: any;
+    icon?: any;
     color: String;
-    iconColor: string;
-    iconSize: string;
+    iconColor?: string;
+    iconSize?: string;
     onclick: () => void;
-    isHoverConstant: boolean;
+    isHoverConstant?: boolean;
   }[];
 
   export let horizontalPosition: "left" | "right" = "right";
@@ -67,13 +67,15 @@
 
   afterUpdate(() => {
     const dropdownElement = document.getElementById(buttonId);
-    let position = dropdownElement.getBoundingClientRect();
-    menuPosition.top = position.bottom + 10;
+    if (dropdownElement) {
+      let position = dropdownElement.getBoundingClientRect();
+      menuPosition.top = position.bottom + 10;
 
-    if (horizontalPosition === "right") {
-      menuPosition.left = position.left;
-    } else {
-      menuPosition.left = position.left - minWidth + position.width;
+      if (horizontalPosition === "right") {
+        menuPosition.left = position.left;
+      } else {
+        menuPosition.left = position.left - minWidth + position.width;
+      }
     }
   });
 </script>

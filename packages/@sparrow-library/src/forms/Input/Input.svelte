@@ -53,6 +53,7 @@
   export let maxlength = 500;
 
   export let searchIconColor = "var(--defaultcolor)";
+  export let iconSize = "14px";
 
   /**
    * Unique id for input
@@ -126,7 +127,7 @@
     class=" w-100 {componentClass}"
     {placeholder}
     style=" {componentStyle} height: 100%; {type === 'search'
-      ? 'padding-left:35px !important;'
+      ? `padding-left:${height} !important;`
       : ''} {type === 'text' && isEditIconRequired && isHovered
       ? 'padding-right:35px !important;'
       : ''} border-color:{extractBorderHighlight(
@@ -140,15 +141,21 @@
   />
   {#if type === "search"}
     <span
-      class="position-absolute"
-      style="top: 50%; left: 10px; transform: translateY(-50%);"
+      class="position-absolute d-flex align-items-center justify-content-center m-0 p-0"
+      style="top: 0; left: 0; bottom: 0; width: {height}; "
     >
-      <SearchIcon height={14} width={14} color={searchIconColor} />
+      <span style="margin-top:1px;">
+        <SearchIcon
+          height={iconSize}
+          width={iconSize}
+          color={searchIconColor}
+        />
+      </span>
     </span>
   {/if}
   {#if type === "text" && isHovered && isEditIconRequired && !disabled}
     <span class="position-absolute" style="top:2px; right: 10px">
-      <PencilIcon height={"14px"} width={"14px"} color={"white"} />
+      <PencilIcon height={iconSize} width={iconSize} color={"white"} />
     </span>
   {/if}
 </div>

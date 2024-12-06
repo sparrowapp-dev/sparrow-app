@@ -80,6 +80,7 @@ export class GraphqlTabAdapter {
     adaptedRequest.updateUrl(request.graphql?.url);
     adaptedRequest.updateQuery(request.graphql?.query);
     adaptedRequest.updateSchema(request.graphql?.schema);
+    adaptedRequest.updateVariables(request.graphql?.variables);
     adaptedRequest.updateAuth(request.graphql?.auth);
     adaptedRequest.updateHeaders(request.graphql?.headers);
     adaptedRequest.updatePath(path);
@@ -102,6 +103,7 @@ export class GraphqlTabAdapter {
       headers: requestTab.property.graphql?.headers,
       query: requestTab.property.graphql?.query,
       schema: requestTab.property.graphql?.schema,
+      variables: requestTab.property.graphql?.variables,
       auth: requestTab.property.graphql?.auth,
       selectedGraphqlAuthType: this.unsetAuthType(
         requestTab.property?.graphql?.state

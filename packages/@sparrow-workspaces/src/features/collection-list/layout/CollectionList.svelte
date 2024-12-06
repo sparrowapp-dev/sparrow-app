@@ -76,6 +76,8 @@
 
   export let toggleExpandCollection;
 
+  export let isWebApp = false;
+
   let collectionListDocument: CollectionDocument[];
 
   let activeWorkspace: WorkspaceDocument;
@@ -202,7 +204,7 @@
     style="margin-top:5px; flex:1;"
   >
     <div
-      class="d-flex align-items-center pe-2 rounded-1"
+      class="d-flex align-items-center pe-2 border-radius-2"
       style="cursor:pointer; justify-content: space-between; height:32px;
       background-color: {isHovered
         ? 'var(--dropdown-option-hover)'
@@ -245,7 +247,7 @@
         >
           <button
             style="height: 24px; width:24px;"
-            class="add-icon-container border-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
+            class="add-icon-container border-0 p-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
               ? 'collections-active'
               : 'collections-inactive'}"
             disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
@@ -294,6 +296,7 @@
                     collection={col}
                     {activeTabId}
                     {searchData}
+                    {isWebApp}
                   />
                 {/each}
               </List>
@@ -333,6 +336,7 @@
                   {activeTabPath}
                   collection={col}
                   {activeTabId}
+                  {isWebApp}
                 />
               {/each}
             </List>
@@ -382,7 +386,7 @@
 
   .collections-active:active {
     visibility: visible;
-    background-color: var( --bg-secondary-420);
+    background-color: var(--bg-secondary-420);
   }
 
   .add-button {

@@ -113,6 +113,7 @@
   export let onDeleteTestflow;
   export let onUpdateTestflow;
   export let onOpenTestflow;
+  export let isWebApp = false;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -223,100 +224,149 @@
 
   onDestroy(() => {});
 
-  const addButtonData = [
-    {
-      name: "Add Collection",
-      icon: CollectionIcon,
-      iconColor: "var(--icon-secondary-130)",
-      iconSize: "13px",
-      onclick: () => {
-        if (isGuestUser) {
-          onItemCreated("collection", {
-            workspaceId: currentWorkspaceId,
-            collection: collectionList,
-          });
-        } else {
-          showImportCollectionPopup();
-        }
-        isExpandCollection = true;
-      },
-    },
-    {
-      name: "Add REST API",
-      icon: VectorIcon,
-      iconColor: "var(--icon-secondary-130)",
-      iconSize: "12px",
-      onclick: () => onItemCreated("request", {}),
-    },
-    {
-      name: "Import cURL",
-      icon: BubbleIcon,
-      iconColor: "var(--icon-secondary-130)",
-      iconSize: "15px",
-      onclick: () => {
-        MixpanelEvent(Events.IMPORT_CURL, {
-          source: "curl import popup",
-        });
-        showImportCurlPopup();
-      },
-    },
-    {
-      name: "Add WebSocket",
-      icon: SocketIcon,
-      iconColor: "var(--icon-secondary-130)",
-      iconSize: "15px",
-      onclick: () => {
-        onItemCreated("web-socket", {});
-        MixpanelEvent(Events.Add_WebSocket);
-      },
-    },
-    {
-      name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
-      icon: SocketIoIcon,
-      iconColor: "var(--icon-secondary-130)",
-      iconSize: "14px",
-      onclick: () => {
-        onItemCreated("socket-io", {});
-        MixpanelEvent(Events.Add_SocketIO, {
-          description: "Add Socket.IO From + Icon in Left Panel",
-        });
-      },
-    },
-    {
-      name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
-      icon: GraphIcon,
-      iconColor: "var(--icon-secondary-130)",
-      iconSize: "14px",
-      onclick: () => {
-        onItemCreated("graphql", {});
-        MixpanelEvent(Events.Add_GraphQL, {
-          description: "Add GraphQL From + Icon in Left Panel",
-        });
-      },
-    },
-    {
-      name: "Add Environment",
-      icon: StackIcon,
-      iconColor: "var(--icon-secondary-130)",
-      iconSize: "15px",
-      onclick: () => {
-        isExpandEnvironment = true;
-        onCreateEnvironment();
-      },
-    },
-    {
-      name: `Add ${TFDefaultEnum.FULL_NAME}`,
-      icon: TreeIcon,
-      iconColor: "var(--icon-secondary-130)",
-      iconSize: "15px",
-      onclick: () => {
-        onCreateTestflow();
-        MixpanelEvent(Events.LeftPanel_Plus_Icon);
-        isExpandTestflow = true;
-      },
-      isHoverConstant: false,
-    },
-  ];
+  const addButtonData = isWebApp
+    ? [
+        {
+          name: "Add Collection",
+          icon: CollectionIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "13px",
+          onclick: () => {
+            if (isGuestUser) {
+              onItemCreated("collection", {
+                workspaceId: currentWorkspaceId,
+                collection: collectionList,
+              });
+            } else {
+              showImportCollectionPopup();
+            }
+            isExpandCollection = true;
+          },
+        },
+        {
+          name: "Add REST API",
+          icon: VectorIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "12px",
+          onclick: () => onItemCreated("request", {}),
+        },
+        {
+          name: "Import cURL",
+          icon: BubbleIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            MixpanelEvent(Events.IMPORT_CURL, {
+              source: "curl import popup",
+            });
+            showImportCurlPopup();
+          },
+        },
+        {
+          name: "Add Environment",
+          icon: StackIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            isExpandEnvironment = true;
+            onCreateEnvironment();
+          },
+        },
+      ]
+    : [
+        {
+          name: "Add Collection",
+          icon: CollectionIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "13px",
+          onclick: () => {
+            if (isGuestUser) {
+              onItemCreated("collection", {
+                workspaceId: currentWorkspaceId,
+                collection: collectionList,
+              });
+            } else {
+              showImportCollectionPopup();
+            }
+            isExpandCollection = true;
+          },
+        },
+        {
+          name: "Add REST API",
+          icon: VectorIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "12px",
+          onclick: () => onItemCreated("request", {}),
+        },
+        {
+          name: "Import cURL",
+          icon: BubbleIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            MixpanelEvent(Events.IMPORT_CURL, {
+              source: "curl import popup",
+            });
+            showImportCurlPopup();
+          },
+        },
+        {
+          name: "Add WebSocket",
+          icon: SocketIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            onItemCreated("web-socket", {});
+            MixpanelEvent(Events.Add_WebSocket);
+          },
+        },
+        {
+          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+          icon: SocketIoIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "14px",
+          onclick: () => {
+            onItemCreated("socket-io", {});
+            MixpanelEvent(Events.Add_SocketIO, {
+              description: "Add Socket.IO From + Icon in Left Panel",
+            });
+          },
+        },
+        {
+          name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+          icon: GraphIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "14px",
+          onclick: () => {
+            onItemCreated("graphql", {});
+            MixpanelEvent(Events.Add_GraphQL, {
+              description: "Add GraphQL From + Icon in Left Panel",
+            });
+          },
+        },
+        {
+          name: "Add Environment",
+          icon: StackIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            isExpandEnvironment = true;
+            onCreateEnvironment();
+          },
+        },
+        {
+          name: `Add ${TFDefaultEnum.FULL_NAME}`,
+          icon: TreeIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            onCreateTestflow();
+            MixpanelEvent(Events.LeftPanel_Plus_Icon);
+            isExpandTestflow = true;
+          },
+          isHoverConstant: false,
+        },
+      ];
 
   const toggleExpandCollection = () => {
     isExpandCollection = !isExpandCollection;
@@ -404,7 +454,7 @@
           handleSearch();
           isExpandCollection = true;
           isExpandEnvironment = true;
-          isExpandTestflow = true;
+          // isExpandTestflow = true;
         }}
         defaultBorderColor="transparent"
         hoveredBorderColor="var(--border-primary-300)"
@@ -461,45 +511,47 @@
         </Dropdown>
       {/if}
 
-      {#if $isTestFlowTourGuideOpen && $currentStep == 1}
-        <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
-          <TestFlowTourGuide
-            targetId="addButton"
-            title="Getting Started  🎉"
-            pulsePosition={{ top: "-58px", left: "14px" }}
-            description={`Welcome! Let’s kick off by creating your test flow. You can add a new flow by clicking here, using the '+' icon, or navigating from the home page. Let's get started!`}
-            tipPosition="top-left"
-            onNext={() => {
-              currentStep.set(2);
-              addButtonMenu = true;
-              toggleTourGuideActive();
-            }}
-            onClose={() => {
-              isTestFlowTourGuideOpen.set(false);
-            }}
-          />
-        </div>
-      {/if}
+      {#if !isWebApp}
+        {#if $isTestFlowTourGuideOpen && $currentStep == 1}
+          <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
+            <TestFlowTourGuide
+              targetId="addButton"
+              title="Getting Started  🎉"
+              pulsePosition={{ top: "-58px", left: "14px" }}
+              description={`Welcome! Let’s kick off by creating your test flow. You can add a new flow by clicking here, using the '+' icon, or navigating from the home page. Let's get started!`}
+              tipPosition="top-left"
+              onNext={() => {
+                currentStep.set(2);
+                addButtonMenu = true;
+                toggleTourGuideActive();
+              }}
+              onClose={() => {
+                isTestFlowTourGuideOpen.set(false);
+              }}
+            />
+          </div>
+        {/if}
 
-      {#if $isTestFlowTourGuideOpen && $currentStep == 2}
-        <div style="position:fixed; top:268px; left:220px; z-index:9999;">
-          <TestFlowTourGuide
-            targetId="addButton"
-            title="Add Your Flow 🌊"
-            description={`Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!`}
-            tipPosition="left-top"
-            pulsePosition={{ top: "12px", left: "-150px" }}
-            onNext={() => {
-              currentStep.set(3);
-              onCreateTestflow();
-              isExpandTestflow = true;
-              toggleTourGuideActive();
-            }}
-            onClose={() => {
-              isTestFlowTourGuideOpen.set(false);
-            }}
-          />
-        </div>
+        {#if $isTestFlowTourGuideOpen && $currentStep == 2}
+          <div style="position:fixed; top:268px; left:220px; z-index:9999;">
+            <TestFlowTourGuide
+              targetId="addButton"
+              title="Add Your Flow 🌊"
+              description={`Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!`}
+              tipPosition="left-top"
+              pulsePosition={{ top: "12px", left: "-150px" }}
+              onNext={() => {
+                currentStep.set(3);
+                onCreateTestflow();
+                isExpandTestflow = true;
+                toggleTourGuideActive();
+              }}
+              onClose={() => {
+                isTestFlowTourGuideOpen.set(false);
+              }}
+            />
+          </div>
+        {/if}
       {/if}
     </div>
 
@@ -533,6 +585,7 @@
           {searchData}
           {toggleExpandCollection}
           bind:isExpandCollection
+          {isWebApp}
         />
       </div>
 
@@ -565,25 +618,29 @@
 
       <!-- Testflow Section -->
 
-      <div
-        class="ps-1"
-        style=" overflow:auto; {isExpandTestflow ? 'flex:1;' : ''}"
-      >
-        <TestflowList
-          testflows={$testflows}
-          loggedUserRoleInWorkspace={userRole}
-          {onCreateTestflow}
-          {onDeleteTestflow}
-          {onUpdateTestflow}
-          {onOpenTestflow}
-          currentWorkspace={activeWorkspace}
-          {searchData}
-          {activeTabId}
-          {toggleExpandTestflow}
-          bind:isExpandTestflow
-        />
-      </div>
-      <hr class="my-1 ms-1 me-0" />
+      {#if !isWebApp}
+        <div
+          class="ps-1"
+          style=" overflow:auto; {isExpandTestflow ? 'flex:1;' : ''}"
+        >
+          <TestflowList
+            testflows={$testflows}
+            loggedUserRoleInWorkspace={userRole}
+            {onCreateTestflow}
+            {onDeleteTestflow}
+            {onUpdateTestflow}
+            {onOpenTestflow}
+            currentWorkspace={activeWorkspace}
+            {searchData}
+            {activeTabId}
+            {toggleExpandTestflow}
+            bind:isExpandTestflow
+          />
+        </div>
+
+        <hr class="my-1 ms-1 me-0" />
+      {/if}
+
       <!-- <hr class="mt-1 mb-0 ms-1 me-0" /> -->
     </div>
 
@@ -630,7 +687,10 @@
       <div class="d-flex align-items-center">
         <!--Disabling the version feature switch as it was just for testing purpose, can be used for implementation example-->
         <!-- {#if isAppVersionVisible} -->
-        <span class="text-fs-14 text-secondary-200 pe-2">v{appVersion}</span>
+        {#if !isWebApp}
+          <span class="text-fs-14 text-secondary-200 pe-2">v{appVersion}</span>
+        {/if}
+
         <!-- {/if} -->
         <WithButton
           icon={DoubleArrowIcon}

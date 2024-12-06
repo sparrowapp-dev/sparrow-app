@@ -6,7 +6,7 @@
   import Navigate from "../routing/Navigate.svelte";
   import Dashboard from "@app/pages/dashboard-page/Dashboard.svelte";
   import EntryPoint from "@app/pages/auth-page/Auth.svelte";
-  import { resizeWindowOnLogin } from "../utils";
+  import { maximizeWindow } from "../utils";
   import { onMount } from "svelte";
   import { user } from "@app/store/auth.store";
   import { handleShortcuts } from "@app/utils/shortcuts";
@@ -15,6 +15,7 @@
   import LoginPage from "@app/pages/auth-page/sub-pages/login-page/LoginPage.svelte";
   import { singleInstanceHandler } from "@app/utils/singleinstance/app.singleinstance";
   import { AppViewModel } from "./app.ViewModel";
+  import { getScaleFactor, setScaleFactorToDb } from "@app/utils/zoom";
 
   const _viewModel = new AppViewModel();
 
@@ -29,16 +30,15 @@
   };
 
   onMount(async () => {
-    await getCurrentWindow().setFocus();
-    await getCurrentWindow().center();
     await _viewModel.registerDeepLinkHandler();
     await singleInstanceHandler();
+    await maximizeWindow();
+    await setScaleFactorToDb(await getScaleFactor());
     let isloggedIn;
     user.subscribe((value) => {
       isloggedIn = value;
     });
 
-    resizeWindowOnLogin();
     window.addEventListener(
       "dragover",
       function (e) {

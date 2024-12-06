@@ -180,7 +180,7 @@
           style="height: 10px; width: 10px;"
         />
       </button>
-      <div class="h-75 pe-1">
+      <div class="h-75 pe-1 invisible">
         <button class="border-0" style="width:40px;" />
       </div>
     </div>
@@ -340,7 +340,7 @@
   /* When the checkbox is checked, add a blue background */
   .container input:checked ~ .checkmark {
     border: none;
-    background-color: var(--text-primary-200);
+    background-color: var(--text-primary-300);
   }
 
   /* Create the checkmark/indicator (hidden when not checked) */

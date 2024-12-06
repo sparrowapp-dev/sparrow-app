@@ -250,7 +250,6 @@ const sendMessage = async (tab_id: string, message: string) => {
     .then(async (data: string) => {
       try {
         // Logic to handle response
-        console.log("sent", JSON.parse(data));
 
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
@@ -298,7 +297,6 @@ const disconnectWebSocket = async (tab_id: string) => {
     .then(async (data: string) => {
       try {
         // Logic to handle response
-        console.log("disconnected", data);
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
@@ -386,7 +384,6 @@ const connectWebSocket = async (
         // Logic to handle response
         if (data) {
           const dt = JSON.parse(data);
-          console.log(dt);
         }
         // Store the WebSocket and initialize data
         webSocketDataStore.update((webSocketDataMap) => {
@@ -407,8 +404,6 @@ const connectWebSocket = async (
 
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
         listen(`ws_message_${tabId}`, (event) => {
-          console.log("event---->", event);
-
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
@@ -448,7 +443,7 @@ const connectWebSocket = async (
  * @param method - Request Method
  * @param headers - Request Headers
  * @param body - Request Body
- * @param request - Request Body Type
+ * @param contentType - Request Body Type
  * @param tabId - Tab ID
  * @returns
  */
@@ -457,76 +452,152 @@ const makeHttpRequestV2 = async (
   method: string,
   headers: string,
   body: string,
-  request: string,
+  contentType: string,
+  signal?: AbortSignal,
 ) => {
-  // create a race condition between the timeout and the api call
-  console.table({ url, method, headers, body, request });
   const startTime = performance.now();
-  return Promise.race([
-    timeout(apiTimeOut),
-    // Invoke communication
-    invoke("make_http_request_v2", {
-      url,
-      method,
-      headers,
-      body,
-      request,
-    }),
-  ])
-    .then(async (data: string) => {
-      const endTime = performance.now();
-      const duration = endTime - startTime;
+  const selectedAgent = localStorage.getItem("selectedAgent");
+  try {
+    let response;
+    if (selectedAgent === "Cloud Agent") {
+      const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
+      response = await axios({
+        data: { url, method, headers, body, contentType },
+        url: proxyUrl,
+        method: "POST",
+      });
+    } else {
       try {
-        const responseBody = JSON.parse(data);
-        const apiResponse = JSON.parse(responseBody.body);
-        console.table(apiResponse);
-        appInsights.trackDependencyData({
-          id: uuidv4(),
-          name: "RPC Duration Metric",
-          duration,
-          success: true,
-          responseCode: parseInt(apiResponse.status),
-          properties: {
-            source: "frontend",
-            type: "RPC_HTTP",
+        let jsonHeader;
+        try {
+          jsonHeader = JSON.parse(headers);
+        } catch (error) {
+          jsonHeader = {};
+        }
+        const headersObject = jsonHeader.reduce((acc, header) => {
+          if (header.checked !== false) {
+            // Include only headers that are checked or do not have a `checked` property
+            acc[header.key] = header.value;
+          }
+          return acc;
+        }, {});
+        let requestData = body || {};
+
+        if (contentType === "multipart/form-data") {
+          const formData = new FormData();
+          const parsedBody = JSON.parse(body);
+          (parsedBody || []).forEach((field) => {
+            if (field.checked !== false) {
+              formData.append(field.key, field.value);
+            }
+          });
+          requestData = formData;
+
+          // Remove Content-Type header to let Axios set it automatically with boundary
+          delete headersObject["Content-Type"];
+        } else if (contentType === "application/x-www-form-urlencoded") {
+          const urlSearchParams = new URLSearchParams();
+          const parsedBody = JSON.parse(body);
+          (parsedBody || []).forEach((field) => {
+            if (field.checked !== false) {
+              urlSearchParams.append(field.key, field.value);
+            }
+          });
+          requestData = urlSearchParams;
+        } else if (
+          contentType === "application/json" ||
+          contentType === "text/plain"
+        ) {
+          // Add Content-Type to headersObject explicitly
+          headersObject["Content-Type"] = contentType;
+        }
+
+        const axiosResponse = await axios({
+          method,
+          url,
+          data: requestData || {},
+          headers: { ...headersObject },
+          validateStatus: function (status) {
+            return true;
           },
         });
-        return success(apiResponse);
-      } catch (e) {
-        console.error(e);
-        appInsights.trackDependencyData({
-          id: uuidv4(),
-          name: "RPC Duration Metric",
-          duration,
-          success: false,
-          responseCode: 400,
-          properties: {
-            source: "frontend",
-            type: "RPC_HTTP",
+        response = {
+          ...axiosResponse,
+          data: {
+            status: `${axiosResponse.status} ${axiosResponse.statusText}`,
+            data: axiosResponse.data,
+            headers: Object.fromEntries(Object.entries(axiosResponse.headers)),
           },
-        });
-        return error("error");
+          status: 200,
+          statusText: "OK",
+        };
+      } catch (axiosError: any) {
+        const error = axiosError;
+        response = {
+          data: {
+            status: `${error.response.status} ${error.response.statusText}`,
+            data: error.response?.data || error.message,
+            headers: error.response?.headers
+              ? Object.fromEntries(Object.entries(error.response.headers))
+              : {},
+          },
+          status: 200,
+          statusText: "OK",
+          headers: error.response?.headers || {},
+          config: error.config,
+        };
       }
-    })
-    .catch((e) => {
-      const endTime = performance.now();
-      const duration = endTime - startTime;
+    }
+    if (signal?.aborted) {
+      throw new DOMException("Request was aborted", "AbortError");
+    }
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    try {
+      let responseData;
+      if (typeof response.data.data !== "string") {
+        responseData = JSON.stringify(response.data.data);
+      } else {
+        responseData = response.data.data;
+      }
+      if (!response.data.status) {
+        throw new Error("Error parsing response");
+      }
+
       appInsights.trackDependencyData({
         id: uuidv4(),
-        name: "RPC Duration Metric",
-        duration,
-        success: false,
-        responseCode: 400,
-        properties: {
-          source: "frontend",
-          type: "RPC_HTTP",
-        },
+        name: "Cloud Agent Duration Metric",
+        duration: duration,
+        success: true,
+        responseCode: parseInt(response.data.status),
+        properties: { source: "frontend", type: "CA_HTTP" },
       });
-      console.error(e);
-      return error("error");
-    });
-};
+      return success({
+        body: responseData,
+        status: response.data.status,
+        headers: response.data.headers,
+      });
+    } catch (e) {
+      console.error("Response parsing error:", e);
+      throw new Error("Error parsing response");
+    }
+  } catch (e) {
+    if (signal?.aborted) {
+      throw new DOMException("Request was aborted", "AbortError");
+    }
 
+    console.error("Request error:", e);
+    appInsights.trackDependencyData({
+      id: uuidv4(),
+      name: "Browser Agent Duration Metric",
+      duration: performance.now() - startTime,
+      success: false,
+      responseCode: 400,
+      properties: { source: "frontend", type: "BA_HTTP" },
+    });
+    throw new Error("Error with the request");
+  }
+};
 export {
   makeRequest,
   getAuthHeaders,

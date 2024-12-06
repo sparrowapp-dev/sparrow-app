@@ -53,7 +53,6 @@
     RequestSectionEnum,
     ResponseSectionEnum,
     type KeyValue,
-    type RequestTab,
   } from "@sparrow/common/types/workspace";
   import { requestSplitterDirection } from "../store";
   import { Popover } from "@sparrow/library/ui";
@@ -69,8 +68,9 @@
 
   import type { CancelRequestType } from "@workspaces/common/type/actions";
   import type { restExplorerData } from "../store/rest-explorer";
+  import type { Tab } from "@sparrow/common/types/workspace/tab";
 
-  export let tab: Observable<RequestTab>;
+  export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;
   export let requestAuthParameter: Observable<KeyValue>;
@@ -111,6 +111,7 @@
   export let userRole;
   export let storeData: restExplorerData | undefined;
   export let isTourGuideOpen = false;
+  export let isWebApp = false;
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -216,10 +217,9 @@
         {#if isPopoverContainer}
           <Popover
             onClose={closeCollectionHelpText}
-            heading={`Welcome to Sparrow!`}
-            text={` `}
+            heading={`Welcome to Sparrow`}
           >
-            <p>
+            <p class="mb-0 text-fs-12">
               Your one-stop solution for API testing and management. Start
               organizing your API requests into collections, utilize environment
               variables, and streamline your development process. Get started
@@ -228,7 +228,7 @@
                 on:click={() => {
                   isGuidePopup = true;
                 }}
-                class="link btn p-0 border-0"
+                class="link p-0 border-0"
                 style="font-size: 12px;"
                 >See how it works.
               </span>
@@ -301,6 +301,7 @@
                       {onUpdateRequestState}
                       {onUpdateEnvironment}
                       {environmentVariables}
+                      {isWebApp}
                     />
                   {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                     <RequestHeaders
@@ -358,16 +359,16 @@
                 <div class="h-100 d-flex flex-column">
                   <div style="flex:1; overflow:auto;">
                     {#if storeData?.isSendRequestInProgress}
-                      <ResponseDefaultScreen />
+                      <ResponseDefaultScreen {isWebApp} />
                       <div
                         style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
                       >
                         <Loader loaderSize={"20px"} />
                       </div>
                     {:else if !storeData?.response.status}
-                      <ResponseDefaultScreen />
+                      <ResponseDefaultScreen {isWebApp} />
                     {:else if storeData?.response.status === ResponseStatusCode.ERROR}
-                      <ResponseErrorScreen />
+                      <ResponseErrorScreen {isWebApp} />
                     {:else if storeData?.response.status}
                       <div class="h-100 d-flex flex-column">
                         <ResponseStatus response={storeData.response} />
@@ -384,6 +385,7 @@
                               apiState={storeData?.response}
                               {onUpdateResponseState}
                               {onClearResponse}
+                              {isWebApp}
                             />
                           {/if}
                           <div style="flex:1; overflow:auto;">
@@ -541,7 +543,8 @@
     background-color: var(--bg-primary-200) !important;
   }
   .link {
-    color: var(--bg-primary-300);
+    color: var(--text-primary-300);
     text-decoration: underline;
+    cursor: pointer;
   }
 </style>

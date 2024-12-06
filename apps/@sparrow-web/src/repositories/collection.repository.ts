@@ -128,59 +128,82 @@ export class CollectionRepository {
   };
 
   public async bulkInsertData(
-    col: any[],
-    recursionLimit = 5,
-    _revisedCollection = [],
+    _workspaceId: string,
+    _collections: any[],
   ): Promise<void> {
-    let revisedCollections = _revisedCollection;
-    // Base case: if recursion limit is reached, stop recursion
-    if (recursionLimit === 0) {
-      return;
-    }
+    const existingCollections = await RxDB.getInstance()
+      ?.rxdb?.collection.find({
+        selector: {
+          workspaceId: _workspaceId,
+        },
+      })
+      .exec();
 
-    const data = await RxDB.getInstance().rxdb.collection.find().exec();
-
-    // Extract relevant information from fetched data
+    // Extract relevant information from the existing collections
     const idToBranchMap = {};
-    data.forEach((element) => {
+    existingCollections?.forEach((_existingCollection) => {
       // Store either currentBranch or primaryBranch for each id
-      idToBranchMap[element.id] = element?.currentBranch
-        ? element.currentBranch
-        : element?.primaryBranch;
+      idToBranchMap[_existingCollection.id] = _existingCollection?.currentBranch
+        ? _existingCollection.currentBranch
+        : _existingCollection?.primaryBranch;
     });
 
-    if (col.length > 0) {
-      if (recursionLimit === 5) {
-        revisedCollections = col.map((collectionObj) => {
-          const temp = JSON.parse(JSON.stringify(collectionObj));
+    if (_collections?.length > 0) {
+      const rxDbCollections = _collections.map((_collection) => {
+        // If activeSync is enabled, set currentBranch based on idToBranchMap
+        if (_collection.activeSync) {
+          _collection["currentBranch"] = idToBranchMap[_collection.id]
+            ? idToBranchMap[_collection.id]
+            : _collection.primaryBranch;
+        }
 
-          temp["id"] = temp._id;
-
-          // If activeSync is enabled, set currentBranch based on idToBranchMap
-          if (temp.activeSync) {
-            temp["currentBranch"] = idToBranchMap[temp.id]
-              ? idToBranchMap[temp.id]
-              : temp.primaryBranch;
-          }
-
-          // Remove _id field to avoid conflicts during insertion
-          delete temp._id;
-          return temp;
-        });
+        return _collection;
+      });
+      if ((rxDbCollections?.length || 0) > 0) {
+        await RxDB.getInstance()?.rxdb?.collection.bulkUpsert(rxDbCollections);
       }
-
-      // try {
-      // await this.clearCollections();
-
-      await RxDB.getInstance().rxdb.collection.bulkUpsert(revisedCollections);
-      // } catch (e) {
-      // If an error occurs during insertion, retry with reduced recursion limit
-      await this.bulkInsertData(col, recursionLimit - 1, revisedCollections);
-      // }
-    } else {
-      // await this.clearCollections();
     }
   }
+
+  /**
+   * Deletes orphan collections that doesn't exists on sparrow backend
+   * @param _workspaceId - workspace id
+   * @param _collectionIds - backend collections Ids to find local orphan collections
+   */
+  public deleteOrphanCollections = async (
+    _workspaceId: string,
+    _collectionIds: string[],
+  ): Promise<string[]> => {
+    // delete left out collections
+    const collections = await RxDB.getInstance()
+      ?.rxdb?.collection.find({
+        selector: {
+          workspaceId: _workspaceId,
+        },
+      })
+      .exec();
+    const collectionsJSON = collections?.map((_collection) => {
+      return _collection.toMutableJSON();
+    });
+    const selectedCollectionsToBeDeleted = collectionsJSON
+      ?.filter((_collection) => {
+        for (let i = 0; i < _collectionIds.length; i++) {
+          if (_collectionIds[i] === _collection.id) {
+            return false;
+          }
+        }
+        return true;
+      })
+      .map((_collection) => {
+        return _collection.id as string;
+      }) as string[];
+    if ((selectedCollectionsToBeDeleted?.length || 0) > 0) {
+      await RxDB.getInstance()?.rxdb?.collection.bulkRemove(
+        selectedCollectionsToBeDeleted as string[],
+      );
+    }
+    return selectedCollectionsToBeDeleted;
+  };
 
   /**
    * @description

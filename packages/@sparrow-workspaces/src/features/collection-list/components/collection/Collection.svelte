@@ -20,6 +20,7 @@
    * Role of user in active workspace
    */
   export let userRole;
+  export let isWebApp = false;
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
   import {
@@ -375,7 +376,7 @@
         },
         displayText: "Add WebSocket",
         disabled: false,
-        hidden: false,
+        hidden: isWebApp ? true : false,
         icon: SocketIcon,
       },
       {
@@ -387,7 +388,7 @@
         },
         displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
         disabled: false,
-        hidden: false,
+        hidden: isWebApp ? true : false,
         icon: SocketIoIcon,
       },
       {
@@ -399,7 +400,7 @@
         },
         displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
         disabled: false,
-        hidden: false,
+        hidden: isWebApp ? true : false,
         icon: GraphIcon,
       },
     ]}
@@ -521,7 +522,7 @@
       >
         <button
           id={`show-more-collection-${collection.id}`}
-          class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+          class="threedot-icon-container border-0 p-0 ms-1 rounded d-flex justify-content-center align-items-center {showMenu
             ? 'threedot-active'
             : ''}"
           style="transform: rotate(90deg);"
@@ -586,6 +587,7 @@
             {explorer}
             {activeTabId}
             {searchData}
+            {isWebApp}
           />
         {/each}
         {#if !collection?.items?.length}
@@ -636,80 +638,86 @@
               </div>
             </Tooltip>
 
-            <Tooltip title={"Add WebSocket"} placement={"bottom"} distance={12}>
-              <div
-                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                style="height: 24px; width: 24px;"
-                role="button"
-                on:click={() => {
-                  onItemCreated("websocketCollection", {
-                    workspaceId: collection.workspaceId,
-                    collection,
-                  });
-                  MixpanelEvent(Events.Collection_WebSocket);
-                }}
+            {#if !isWebApp}
+              <Tooltip
+                title={"Add WebSocket"}
+                placement={"bottom"}
+                distance={12}
               >
-                <SocketIcon
-                  height="12px"
-                  width="16px"
-                  color="var(--request-arc)"
-                />
-              </div>
-            </Tooltip>
+                <div
+                  class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+                  style="height: 24px; width: 24px;"
+                  role="button"
+                  on:click={() => {
+                    onItemCreated("websocketCollection", {
+                      workspaceId: collection.workspaceId,
+                      collection,
+                    });
+                    MixpanelEvent(Events.Collection_WebSocket);
+                  }}
+                >
+                  <SocketIcon
+                    height="12px"
+                    width="16px"
+                    color="var(--request-arc)"
+                  />
+                </div>
+              </Tooltip>
 
-            <Tooltip
-              title={`Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`}
-              placement={"bottom"}
-              distance={12}
-            >
-              <div
-                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                style="height: 24px; width: 24px;"
-                role="button"
-                on:click={() => {
-                  onItemCreated("socketioCollection", {
-                    workspaceId: collection.workspaceId,
-                    collection,
-                  });
-                  MixpanelEvent(Events.Collection_SocketIO, {
-                    description: "Created Socket.IO inside collection.",
-                  });
-                }}
+              <Tooltip
+                title={`Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`}
+                placement={"bottom"}
+                distance={12}
               >
-                <SocketIoIcon
-                  height={"13px"}
-                  width={"13px"}
-                  color={"var(--request-arc)"}
-                />
-              </div>
-            </Tooltip>
+                <div
+                  class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+                  style="height: 24px; width: 24px;"
+                  role="button"
+                  on:click={() => {
+                    onItemCreated("socketioCollection", {
+                      workspaceId: collection.workspaceId,
+                      collection,
+                    });
+                    MixpanelEvent(Events.Collection_SocketIO, {
+                      description: "Created Socket.IO inside collection.",
+                    });
+                  }}
+                >
+                  <SocketIoIcon
+                    height={"13px"}
+                    width={"13px"}
+                    color={"var(--request-arc)"}
+                  />
+                </div>
+              </Tooltip>
 
-            <Tooltip
-              title={`Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
-              placement={"bottom"}
-              distance={12}
-            >
-              <div
-                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                style="height: 24px; width: 24px;"
-                role="button"
-                on:click={() => {
-                  onItemCreated("graphqlCollection", {
-                    workspaceId: collection.workspaceId,
-                    collection,
-                  });
-                  MixpanelEvent(Events.Collection_GraphQL, {
-                    description: "Created GraphQL inside collection.",
-                  });
-                }}
+              <Tooltip
+                title={`Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
+                placement={"bottom"}
+                distance={12}
               >
-                <GraphIcon
-                  height={"13px"}
-                  width={"13px"}
-                  color={"var(--request-arc)"}
-                />
-              </div>
-            </Tooltip>
+                <div
+                  class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+                  style="height: 24px; width: 24px;"
+                  role="button"
+                  on:click={() => {
+                    onItemCreated("graphqlCollection", {
+                      workspaceId: collection.workspaceId,
+                      collection,
+                    });
+                    MixpanelEvent(Events.Collection_GraphQL, {
+                      description: "Created GraphQL inside collection.",
+                    });
+                  }}
+                >
+                  <GraphIcon
+                    height={"13px"}
+                    width={"13px"}
+                    color={"var(--request-arc)"}
+                  />
+                </div>
+              </Tooltip>
+            {/if}
           {/if}
         </div>
         <!-- {#if showFolderAPIButtons}
@@ -856,6 +864,7 @@
     color: var(--white-color);
     padding-left: 0;
     outline: none;
+    border-radius: 2px !important;
   }
   .renameInputFieldCollection:focus {
     border: 1px solid var(--border-primary-300) !important;

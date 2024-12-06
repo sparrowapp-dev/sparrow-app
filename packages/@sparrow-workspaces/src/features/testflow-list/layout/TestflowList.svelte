@@ -124,7 +124,7 @@
   --  Testflow Header 
   -->
   <div
-    class="d-flex align-items-center rounded-1 me-0 mb-0 pe-2"
+    class="d-flex align-items-center border-radius-2 me-0 mb-0 pe-2"
     style="cursor:pointer; justify-content: space-between; height:32px;
         background-color: {isHovered
       ? 'var(--dropdown-option-hover)'

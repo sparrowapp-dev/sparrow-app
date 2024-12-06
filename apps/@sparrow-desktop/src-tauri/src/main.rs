@@ -1006,6 +1006,7 @@ async fn send_socket_io_message(
 /// * `url` - The URL endpoint of the GraphQL server.
 /// * `headers` - A JSON string representing headers as key-value pairs for the request.
 /// * `query` - The GraphQL query to execute.
+/// * `variables` - Variables to be passed with query(Optional).
 ///
 /// # Returns
 ///
@@ -1018,7 +1019,12 @@ async fn send_socket_io_message(
 /// let result = send_graphql_request("https://api.example.com/graphql", "{\"Authorization\":\"Bearer token\"}", "{ myQuery }").await;
 /// ```
 #[tauri::command]
-async fn send_graphql_request(url: &str, headers: &str, query: &str) -> Result<String, String> {
+async fn send_graphql_request(
+    url: &str,
+    headers: &str,
+    query: &str,
+    variables: Option<String>,
+) -> Result<String, String> {
     // Initialize an HTTP client for making requests.
     let client = Client::new();
 
@@ -1042,10 +1048,20 @@ async fn send_graphql_request(url: &str, headers: &str, query: &str) -> Result<S
         request_builder = request_builder.header(key, value);
     }
 
+    // Construct the JSON body with `query` and optional `variables`.
+    let request_body = if let Some(vars) = variables {
+        json!({
+            "query": query,
+            "variables": serde_json::from_str::<Value>(&vars).map_err(|e| e.to_string())?
+        })
+    } else {
+        json!({ "query": query })
+    };
+
     // Send the request with the provided GraphQL query.
     // This converts `query` into a JSON body with a "query" field.
     let response = request_builder
-        .json(&json!({ "query": query }))
+        .json(&request_body)
         .send()
         .await
         .map_err(|e| e.to_string())?;

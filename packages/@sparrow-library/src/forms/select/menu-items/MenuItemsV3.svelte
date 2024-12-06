@@ -23,6 +23,17 @@
   export let getTextColor: (color: string) => {};
 
   let isMenuItemHover = false;
+
+  /**
+   * @description - add classes to ticked options
+   * @param _id - item id (rows iteration)
+   * @param _selectedId - selected item id
+   */
+  const extractBodyTextHighlight = (_id: string, _selectedId: string) => {
+    if (_id === _selectedId && tickIcon) {
+      return `select-ticked-highlight-text`;
+    } else return "";
+  };
 </script>
 
 <div
@@ -34,9 +45,9 @@
     isMenuItemHover = false;
   }}
 >
-  <div class="d-flex ellipsis">
+  <div class="d-flex ellipsis align-items-center">
     <div
-      class="img-logo-container me-2 overflow-hidden w-10"
+      class="img-logo-container me-2 overflow-hidden w-10 "
       style="min-width: 20px;"
     >
       {#if list.logo == "" || list.logo == undefined}
@@ -47,14 +58,14 @@
           {list.name[0] ? list.name[0].toUpperCase() : ""}
         </div>
       {:else}
-        <img class="w-100" src={list.logo} alt="sparrow-dropdown-img" />
+        <img class="w-100" style="border-radius: 50%; height:20px ; width:20px;  overflow:hidden !important; " src={list.logo} alt="sparrow-dropdown-img" />
       {/if}
     </div>
     <p
       class="m-0 p-0 {getTextColor(list?.color)} ellipsis {isMenuItemHover &&
       !list?.color
         ? 'highlight-menu-item'
-        : ''}"
+        : ''}  {extractBodyTextHighlight(list.id, selectedRequest?.id)}"
       style="font-size: 12px;"
     >
       {list.name}<br />
@@ -70,16 +81,19 @@
 
 <style>
   .highlight:hover {
-    background-color: var(--dull-background-color);
+    background-color: var(--bg-tertiary-600);
   }
-  .highlight-menu-item {
+  /* .highlight-menu-item {
     color: var(--send-button) !important;
-  }
+  } */
   .highlight {
     cursor: pointer;
   }
   .img-logo-container {
     width: 20px !important;
-    height: 20px !important;
+  }
+
+  .select-ticked-highlight-text {
+    color: var(--text-primary-300) !important;
   }
 </style>

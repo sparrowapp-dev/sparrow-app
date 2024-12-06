@@ -222,12 +222,14 @@
                 src={base64ToURL(openTeam?.logo)}
                 alt=""
               />{:else}
-              <p
+              <div
                 class={`text-defaultColor w-25 text-center my-auto align-items-center justify-content-center profile-circle bg-tertiary-750 border-secondary-300 border-2`}
-                style={`font-size: 24px; padding-top: 2px; width: 40px !important; height: 40px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
+                style={`font-size: 24px; width: 40px !important; height: 40px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
               >
-                {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
-              </p>
+                <span class="text-fs-24">
+                  {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
+                </span>
+              </div>
             {/if}
             <span
               class="ms-3 my-auto ellipsis overflow-hidden heading"

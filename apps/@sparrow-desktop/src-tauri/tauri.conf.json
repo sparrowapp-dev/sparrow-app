@@ -6,7 +6,7 @@
     "windows": [
       {
         "center": true,
-        "decorations": true,
+        "decorations": false,
         "fullscreen": false,
         "label": "main",
         "minHeight": 700,
@@ -84,5 +84,5 @@
     }
   },
   "productName": "Sparrow",
-  "version": "2.12.0"
+  "version": "2.13.0"
 }

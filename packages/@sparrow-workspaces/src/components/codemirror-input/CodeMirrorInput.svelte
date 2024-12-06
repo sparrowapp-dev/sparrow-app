@@ -45,7 +45,7 @@
     if (trackCursor) {
       if (trackParanthesis.length === 2)
         filterData = environmentHelper.filterEnvironments(
-          environmentVariables.filtered,
+          environmentVariables?.filtered || [],
           value,
           trackParanthesis,
           trackCursor,
@@ -54,7 +54,7 @@
     if (trackParanthesis) {
       if (trackParanthesis.length === 2 && trackCursor)
         filterData = environmentHelper.filterEnvironments(
-          environmentVariables.filtered,
+          environmentVariables?.filtered || [],
           value,
           trackParanthesis,
           trackCursor,
@@ -104,7 +104,7 @@
   {handleInputChange}
   handleKeyUpChange={handleKeyUpValue}
   handleKeyDownChange={handleKeyPress}
-  filterData={environmentVariables.filtered}
+  filterData={environmentVariables?.filtered || []}
   bind:environmentAxisX
   bind:environmentAxisY
   {handleEnvironmentBox}

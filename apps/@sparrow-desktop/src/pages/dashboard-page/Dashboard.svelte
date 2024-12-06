@@ -194,6 +194,7 @@
     onCreateWorkspace={() => (isWorkspaceModalOpen = true)}
     onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
     {user}
+    isWebApp={false}
     onLogout={_viewModel.handleLogout}
   />
 
@@ -231,7 +232,7 @@
     <!-- 
       -- Dashboard renders any of the pages between collection, environment and help.
     -->
-    <section style="flex:1; overflow:auto;">
+    <section style="flex:1; overflow:hidden;">
       <!-- Route for Collections -->
       <Route path="/collections/*">
         <CollectionsPage />
