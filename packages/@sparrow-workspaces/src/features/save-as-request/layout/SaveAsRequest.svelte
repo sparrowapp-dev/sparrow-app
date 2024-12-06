@@ -454,7 +454,7 @@
             <div class="d-flex">
               {#if !createDirectoryLoader}
                 <button
-                  class="icon-btn {createCollectionName.length > 0
+                  class="icon-btn {createCollectionName.trim().length > 0
                     ? ''
                     : 'unclickable'}"
                   on:click={() => {
@@ -502,7 +502,7 @@
             <div class="d-flex">
               {#if !createDirectoryLoader}
                 <button
-                  class="icon-btn {createFolderName.length > 0
+                  class="icon-btn {createFolderName.trim().length > 0
                     ? ''
                     : 'unclickable'}"
                   on:click={() => {
