@@ -12,7 +12,6 @@ export async function zoomIn() {
     ? +windowScaleFactor._data.value + 0.2
     : 1.2;
   if (windowScaleFactor < MAX_ZOOM_SCALE_FACTOR) {
-    await getCurrentWebview().setZoom(windowScaleFactor);
     setScaleFactorToDb(windowScaleFactor);
   }
 }
@@ -24,14 +23,20 @@ export async function zoomOut() {
     ? +windowScaleFactor._data.value - 0.2
     : 1.0;
   if (windowScaleFactor > MIN_ZOOM_SCALE_FACTOR) {
-    await getCurrentWebview().setZoom(windowScaleFactor);
     setScaleFactorToDb(windowScaleFactor);
   }
 }
 
 export async function setScaleFactorToDb(windowScaleFactor: string) {
+  await getCurrentWebview().setZoom(+windowScaleFactor);
   await windowSettingRepository.setWindowSetting(
     "windowScaleFactor",
     windowScaleFactor,
   );
+}
+
+export async function getScaleFactor() {
+  const windowScaleFactor =
+    await windowSettingRepository.getWindowSetting("windowScaleFactor");
+  return windowScaleFactor._data.value ?? "1";
 }
