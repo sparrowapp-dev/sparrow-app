@@ -187,8 +187,8 @@ class RestExplorerViewModel {
       ) {
         result = false;
       } else if (
-        requestTabData.property.websocket?.state.requestBodyLanguage !==
-        progressiveTab.property.websocket?.state.requestBodyLanguage
+        requestTabData.property.websocket?.state.messageLanguage !==
+        progressiveTab.property.websocket?.state.messageLanguage
       ) {
         return false;
       }
