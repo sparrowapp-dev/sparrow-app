@@ -20,6 +20,7 @@
       }
     }
   }
+  let imageHasError = false;
 </script>
 
 <div
@@ -32,12 +33,17 @@
       : ''}"
   >
     {#if apiState.bodyLanguage === RequestDataTypeEnum.IMAGE}
-      <!-- 
-        --
-        -- Reponse content-type set to image,
-        -- 
-      -->
-      <SparrowLogo />
+      {#if !imageHasError}
+        <!-- render image from base64 -->
+        <img
+          src={`data:image/jpeg;base64,${response.body}`}
+          alt="Sparrow logo"
+          on:error={() => (imageHasError = true)}
+        />
+      {:else}
+        <!-- if any error render sparrow logo -->
+        <SparrowLogo />
+      {/if}
     {:else if apiState.bodyFormatter === ResponseFormatterEnum.PREVIEW}
       <!-- 
         --
