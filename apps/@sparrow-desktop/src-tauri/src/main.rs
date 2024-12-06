@@ -46,6 +46,7 @@ mod urlencoded_handler;
 mod utils;
 
 // External Imports
+use base64;
 use formdata_handler::make_formdata_request;
 use json_handler::make_json_request;
 use nfd::Response;
@@ -345,8 +346,36 @@ async fn make_request_v2(
     // Extract status code from response
     let response_status = response_value.status().clone();
 
-    // Extract response value from response
-    let response_text_result = decode_response_body(response_value).await;
+    //check is data binary
+
+    let is_binary = response_headers
+        .get("content-type")
+        .map(|v| v.to_str().unwrap_or("").starts_with("image/"))
+        .unwrap_or(false);
+
+    let response_body;
+
+    if is_binary {
+        //extract bytes from respose body for further conversion
+        let bytes = response_value
+            .bytes()
+            .await
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+
+        response_body = base64::encode(bytes); // convert bytes to base64 string effiecient for transmission / no data willl not get currupted.
+    } else {
+        //if data is non binary handle it as standrd flow
+        println!("it is an non binary response");
+        let response_text_result = decode_response_body(response_value).await;
+
+        // Preserve your original assignment style
+        response_body = match response_text_result {
+            Ok(value) => value,
+            Err(err) => format!("Error: {}", err),
+        };
+    }
+
+    println!("{:?}", response_body);
 
     // Map headers into json
     let response_headers_json: serde_json::Value = response_headers
@@ -354,16 +383,11 @@ async fn make_request_v2(
         .map(|(name, value)| (name.to_string(), value.to_str().unwrap()))
         .collect();
 
-    let response_text = match response_text_result {
-        Ok(value) => value,
-        Err(err) => format!("Error: {}", err),
-    };
-
     // Combining all the parameters
     let combined_json = json!({
         "headers": response_headers_json,
         "status": response_status.to_string(),
-        "body": response_text,
+        "body": response_body,   // body data can be base64 string or text
     });
 
     return Ok(combined_json.to_string());
