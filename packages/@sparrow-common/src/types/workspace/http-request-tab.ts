@@ -190,12 +190,16 @@ export interface ResponseTimeWrapper {
 export interface ResponseSizeWrapper {
   size: number;
 }
+export interface ResponseContentTypeWrapper {
+  contentType: string;
+}
 
 export interface Response
   extends ResponseStatusWrapper,
     ResponseHeadersWrapper,
     ResponseBodyWrapper,
     ResponseTimeWrapper,
+    ResponseContentTypeWrapper,
     ResponseSizeWrapper {}
 
 export interface ResponseWrapper {

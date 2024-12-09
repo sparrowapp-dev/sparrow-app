@@ -4242,6 +4242,7 @@ name = "sparrow-app"
 version = "0.0.0"
 dependencies = [
  "anyhow",
+ "base64 0.21.7",
  "brotli 3.4.0",
  "dotenv",
  "flate2",

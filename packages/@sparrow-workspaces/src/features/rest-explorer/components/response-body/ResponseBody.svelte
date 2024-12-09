@@ -20,6 +20,8 @@
       }
     }
   }
+  let imageHasError = false;
+  const contentType = response.contentType;
 </script>
 
 <div
@@ -32,12 +34,22 @@
       : ''}"
   >
     {#if apiState.bodyLanguage === RequestDataTypeEnum.IMAGE}
-      <!-- 
-        --
-        -- Reponse content-type set to image,
-        -- 
-      -->
-      <SparrowLogo />
+      {#if !imageHasError}
+        <!-- render image from base64 -->
+        <img
+          src={`data:${contentType};base64,${response.body}`}
+          alt="Sparrow logo"
+          on:error={() => (imageHasError = true)}
+        />
+      {:else}
+        <!-- if any error render sparrow logo -->
+        <div class="d-flex flex-column">
+          <SparrowLogo />
+          <span class="mt-2 text-secondary-200 fw-bold text-fs-14 mb-5"
+            >Unable to load image</span
+          >
+        </div>
+      {/if}
     {:else if apiState.bodyFormatter === ResponseFormatterEnum.PREVIEW}
       <!-- 
         --
