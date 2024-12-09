@@ -10,6 +10,7 @@ export type restExplorerData = {
     size: number;
     navigation: string;
     bodyLanguage: string;
+    contentType: string;
     bodyFormatter: string;
   };
   isSendRequestInProgress: boolean;

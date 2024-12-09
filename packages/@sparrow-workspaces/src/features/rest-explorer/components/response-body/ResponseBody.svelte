@@ -21,6 +21,7 @@
     }
   }
   let imageHasError = false;
+  const contentType = response.contentType;
 </script>
 
 <div
@@ -36,13 +37,18 @@
       {#if !imageHasError}
         <!-- render image from base64 -->
         <img
-          src={`data:image/jpeg;base64,${response.body}`}
+          src={`data:${contentType};base64,${response.body}`}
           alt="Sparrow logo"
           on:error={() => (imageHasError = true)}
         />
       {:else}
         <!-- if any error render sparrow logo -->
-        <SparrowLogo />
+        <div class="d-flex flex-column">
+          <SparrowLogo />
+          <span class="mt-2 text-secondary-200 fw-bold text-fs-14 mb-5"
+            >Unable to load image</span
+          >
+        </div>
       {/if}
     {:else if apiState.bodyFormatter === ResponseFormatterEnum.PREVIEW}
       <!-- 
