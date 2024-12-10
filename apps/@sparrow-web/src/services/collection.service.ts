@@ -1,8 +1,11 @@
 import {
+  connectSocketIo,
+  disconnectSocketIo,
   // connectSocketIo,
   // disconnectSocketIo,
   getAuthHeaders,
   makeRequest,
+  sendSocketIoMessage,
   // sendSocketIoMessage,
 } from "@app/containers/api/api.common";
 import { CollectionRepository } from "../repositories/collection.repository";
@@ -579,5 +582,23 @@ export class CollectionService {
       },
     );
     return response;
+  };
+
+  public connectSocketIo = async (
+    _url: string,
+    _tabId: string,
+    _headers: string,
+  ) => {
+    return connectSocketIo(_url, _tabId, _headers);
+  };
+  public disconnectSocketIo = async (_tabId: string) => {
+    return disconnectSocketIo(_tabId);
+  };
+  public sendMessageSocketIo = async (
+    _tabId: string,
+    _message: string,
+    _eventName: string,
+  ) => {
+    return sendSocketIoMessage(_tabId, _message, _eventName);
   };
 }
