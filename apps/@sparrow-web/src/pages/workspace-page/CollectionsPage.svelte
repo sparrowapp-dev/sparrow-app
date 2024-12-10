@@ -731,6 +731,7 @@
       }
       return response;
     }}
+    isWebApp={true}
   />
 </Modal>
 
