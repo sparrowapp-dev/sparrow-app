@@ -350,11 +350,12 @@ export class CannyIoService {
    * @returns {Promise<Object>} - A promise that resolves to the response object from the API call.
    */
 
-  public listChangeLog = async (type: string) => {
+  public listChangeLog = async (type: string, limit: number = 25) => {
     const response = await makeRequest("POST", `${this.apiUrl}/entries/list`, {
       body: {
         apiKey: this.apiKey,
         type,
+        limit,
       },
       headers: {
         "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
