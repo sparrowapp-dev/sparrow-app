@@ -793,7 +793,6 @@ class RestExplorerViewModel
               data.response.time = duration;
               data.response.size = responseSizeKB;
               data.response.bodyLanguage = bodyLanguage;
-              data.response.contentType = response.data.headers["content-type"];
               data.isSendRequestInProgress = false;
             }
             restApiDataMap.set(progressiveTab.tabId, data);

@@ -21,7 +21,6 @@
     }
   }
   let imageHasError = false;
-  const contentType = response.contentType;
 </script>
 
 <div
