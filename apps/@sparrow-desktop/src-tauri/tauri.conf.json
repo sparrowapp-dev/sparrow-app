@@ -15,7 +15,8 @@
         "title": "Sparrow",
         "shadow": true,
         "focus": true,
-        "dragDropEnabled": false
+        "dragDropEnabled": false,
+        "maximized": true
       }
     ],
     "withGlobalTauri": false

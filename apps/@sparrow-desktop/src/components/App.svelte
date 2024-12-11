@@ -32,7 +32,6 @@
   onMount(async () => {
     await _viewModel.registerDeepLinkHandler();
     await singleInstanceHandler();
-    await maximizeWindow();
     await setScaleFactorToDb(await getScaleFactor());
     let isloggedIn;
     user.subscribe((value) => {
