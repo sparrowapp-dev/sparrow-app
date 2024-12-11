@@ -176,22 +176,11 @@ jobs:
         run: |
           npm install -g appcenter-cli@latest
 
-      - name: Get Branch Name
-        id: pr_branch
-        run: |
-          if [[ -n "${{ github.head_ref }}" ]]; then
-            echo "::set-output name=branch::${{ github.head_ref }}"
-          else
-            echo "::set-output name=branch::${{ github.ref_name }}"
-          fi
-
       - name: Upload to App Center
         run: |
           appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
-          branch_name="${{ steps.pr_branch.outputs.branch }}"
-          echo "Branch Name: $branch_name"
-          appcenter distribute release -f /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg -g Collaborators --app techdome/Sparrow-1 --build-version test-${branch_name} --build-number ${{ github.run_number }}
-          appcenter distribute release -f msi_files/*.msi -g Collaborators --app techdome/Sparrow --build-version test-${branch_name} --build-number ${{ github.run_number }}
+          appcenter distribute release -f /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg -g Collaborators --app techdome/Sparrow-1 --build-version test --build-number ${{ github.run_number }}
+          appcenter distribute release -f msi_files/*.msi -g Collaborators --app techdome/Sparrow --build-version test --build-number ${{ github.run_number }}
       - name: status check and upload
         uses: neonidian/teams-notify-build-status@v3
         if: always()
