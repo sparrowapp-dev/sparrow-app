@@ -8077,13 +8077,6 @@ svelte-split-pane@^0.1.2:
   resolved "https://registry.yarnpkg.com/svelte-split-pane/-/svelte-split-pane-0.1.2.tgz#aae94c583fdcf80e3ceaefc31755f3c49886e6a8"
   integrity sha512-JluEydC9v2DetyhlwCF3CdqAkET8XPHP7WeWbl4lVLOg55avDOhoS5U6BRhvWd104HOqhUcCSz+7Nveyjmzjeg==
 
-svelte-splitpanes@^0.8.0:
-  version "0.8.3"
-  resolved "https://registry.yarnpkg.com/svelte-splitpanes/-/svelte-splitpanes-0.8.3.tgz#2956257264ce5467916d53ffd98634c2d29e6f47"
-  integrity sha512-6zWbT1cE/vn+/Da2ka/OSgA5IYv+uw9tvHN5BdbZkFctYy/5+EFrA7tR+YqFAsto2+clNWXk2OB+xTo/bmzxTg==
-  dependencies:
-    esm-env-robust "0.0.3"
-
 svelte-splitpanes@^8.0.9:
   version "8.0.9"
   resolved "https://registry.yarnpkg.com/svelte-splitpanes/-/svelte-splitpanes-8.0.9.tgz#4103765febb58f847db8ef115e0e1b91462fc70b"
