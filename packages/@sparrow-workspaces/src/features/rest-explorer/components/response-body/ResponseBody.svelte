@@ -37,7 +37,7 @@
       {#if !imageHasError}
         <!-- render image from base64 -->
         <img
-          src={`data:${contentType};base64,${response.body}`}
+          src={response.body}
           alt="Sparrow logo"
           on:error={() => (imageHasError = true)}
         />
@@ -45,7 +45,7 @@
         <!-- if any error render sparrow logo -->
         <div class="d-flex flex-column">
           <SparrowLogo />
-          <span class="mt-2 text-secondary-200 fw-bold text-fs-14 mb-5"
+          <span class="mt-2 text-secondary-200 fw-bold text-fs-14 mt-4"
             >Unable to load image</span
           >
         </div>

@@ -348,10 +348,13 @@ async fn make_request_v2(
 
     //check is data binary
 
-    let is_binary = response_headers
+    let content_type = response_headers
         .get("content-type")
-        .map(|v| v.to_str().unwrap_or("").starts_with("image/"))
-        .unwrap_or(false);
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("")
+        .to_string();
+
+    let is_binary = content_type.starts_with("image/");
 
     let response_body;
 
@@ -362,12 +365,14 @@ async fn make_request_v2(
             .await
             .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
 
-        response_body = base64::encode(bytes); // convert bytes to base64 string effiecient for transmission / no data willl not get currupted.
+        let base64_string = base64::encode(bytes); // convert bytes to base64 string effiecient for transmission / no data willl not get currupted.
+
+        //create src from content type and base64 string
+        response_body = format!("data:{};base64,{}", content_type, base64_string);
     } else {
         //if data is non binary handle it as standrd flow
         let response_text_result = decode_response_body(response_value).await;
 
-        // Preserve your original assignment style
         response_body = match response_text_result {
             Ok(value) => value,
             Err(err) => format!("Error: {}", err),
