@@ -3,12 +3,10 @@
     "security": {
       "csp": null
     },
-    "macOSPrivateApi": true,
     "windows": [
       {
         "center": true,
         "decorations": false,
-        "transparent": true,
         "fullscreen": false,
         "label": "main",
         "minHeight": 700,
@@ -17,10 +15,6 @@
         "title": "Sparrow",
         "shadow": true,
         "focus": true,
-        "windowEffects": {
-          "effects": ["hudWindow"],
-          "radius": 10
-        },
         "dragDropEnabled": false
       }
     ],
@@ -34,6 +28,7 @@
   },
   "bundle": {
     "licenseFile": "agpl-3.0.txt",
+    "createUpdaterArtifacts": true,
     "active": true,
     "icon": [
       "icons/32x32.png",
