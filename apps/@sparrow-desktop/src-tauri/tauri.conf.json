@@ -29,7 +29,6 @@
   },
   "bundle": {
     "licenseFile": "agpl-3.0.txt",
-    "createUpdaterArtifacts": true,
     "active": true,
     "icon": [
       "icons/32x32.png",
@@ -70,7 +69,6 @@
   "identifier": "dev.sparrowapp.desktop",
   "plugins": {
     "updater": {
-      "createUpdaterArtifacts": true,
       "windows": {
         "installMode": "passive"
       },
