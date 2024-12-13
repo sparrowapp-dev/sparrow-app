@@ -582,13 +582,13 @@
                       />
                     </div>
                   </Motion>
-                  <!-- {:else if $activeTab?.type === ItemType.WEB_SOCKET}
+                {:else if $activeTab?.type === ItemType.WEB_SOCKET}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WebSocketExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.TESTFLOW}
+                  <!-- {:else if $activeTab?.type === ItemType.TESTFLOW}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <TestFlowExplorerPage tab={$activeTab} />
