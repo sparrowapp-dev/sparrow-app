@@ -460,18 +460,63 @@ const makeHttpRequestV2 = async (
   try {
     let response;
     if (selectedAgent === "Cloud Agent") {
+      const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
       response = await axios({
         data: { url, method, headers, body, contentType },
-        url: constants.PROXY_SERVICE,
+        url: proxyUrl,
         method: "POST",
       });
     } else {
       try {
+        let jsonHeader;
+        try {
+          jsonHeader = JSON.parse(headers);
+        } catch (error) {
+          jsonHeader = {};
+        }
+        const headersObject = jsonHeader.reduce((acc, header) => {
+          if (header.checked !== false) {
+            // Include only headers that are checked or do not have a `checked` property
+            acc[header.key] = header.value;
+          }
+          return acc;
+        }, {});
+        let requestData = body || {};
+
+        if (contentType === "multipart/form-data") {
+          const formData = new FormData();
+          const parsedBody = JSON.parse(body);
+          (parsedBody || []).forEach((field) => {
+            if (field.checked !== false) {
+              formData.append(field.key, field.value);
+            }
+          });
+          requestData = formData;
+
+          // Remove Content-Type header to let Axios set it automatically with boundary
+          delete headersObject["Content-Type"];
+        } else if (contentType === "application/x-www-form-urlencoded") {
+          const urlSearchParams = new URLSearchParams();
+          const parsedBody = JSON.parse(body);
+          (parsedBody || []).forEach((field) => {
+            if (field.checked !== false) {
+              urlSearchParams.append(field.key, field.value);
+            }
+          });
+          requestData = urlSearchParams;
+        } else if (
+          contentType === "application/json" ||
+          contentType === "text/plain"
+        ) {
+          // Add Content-Type to headersObject explicitly
+          headersObject["Content-Type"] = contentType;
+        }
+
         const axiosResponse = await axios({
           method,
           url,
-          data: body || {},
-          headers: headers ? JSON.parse(headers) : {},
+          data: requestData || {},
+          headers: { ...headersObject },
           validateStatus: function (status) {
             return true;
           },
@@ -490,7 +535,7 @@ const makeHttpRequestV2 = async (
         const error = axiosError;
         response = {
           data: {
-            status: `${error.response?.status || 500} ${error.response?.statusText || "Error"}`,
+            status: `${error.response.status} ${error.response.statusText}`,
             data: error.response?.data || error.message,
             headers: error.response?.headers
               ? Object.fromEntries(Object.entries(error.response.headers))
@@ -515,6 +560,10 @@ const makeHttpRequestV2 = async (
       } else {
         responseData = response.data.data;
       }
+      if (!response.data.status) {
+        throw new Error("Error parsing response");
+      }
+
       appInsights.trackDependencyData({
         id: uuidv4(),
         name: "Cloud Agent Duration Metric",
@@ -536,6 +585,7 @@ const makeHttpRequestV2 = async (
     if (signal?.aborted) {
       throw new DOMException("Request was aborted", "AbortError");
     }
+
     console.error("Request error:", e);
     appInsights.trackDependencyData({
       id: uuidv4(),

@@ -28,6 +28,7 @@
   export let collectionList;
   export let onCollectionFileUpload;
   export let onImportCollectionURL;
+  export let isWebApp = false;
 
   const ProgressTitle = {
     IDENTIFYING_SYNTAX: "Identifying Syntax...",
@@ -525,9 +526,15 @@
 <br />
 {#if importType === "text"}
   <div>
-    <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
-      Paste your OAS text or Swagger/Localhost Link
-    </p>
+    {#if isWebApp}
+      <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
+        Paste your OAS text
+      </p>
+    {:else}
+      <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
+        Paste your OAS text or Swagger/Localhost Link
+      </p>
+    {/if}
   </div>
   <div class="textarea-div rounded border-0 position-relative">
     <textarea
@@ -540,7 +547,9 @@
       on:blur={() => {
         isInputDataTouched = true;
       }}
-      placeholder="Example - OpenAPI JSON text or http://localhost:8080/api-docs"
+      placeholder={isWebApp
+        ? "Example - OpenAPI JSON text"
+        : "Example - OpenAPI JSON text or http://localhost:8080/api-docs"}
       bind:value={importData}
       class="text-area mb-0 border-0 text-fs-12 rounded bg-tertiary-300 pe-4 ps-2 pb-2 pt-2"
       style={!isValidServerDeployedURL &&

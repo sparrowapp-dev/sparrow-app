@@ -3,6 +3,7 @@
 
   import { scale, fade } from "svelte/transition";
   import { downloadWarningIcon as warningIcon } from "@sparrow/library/assets";
+  import { onDestroy } from "svelte";
 
   export let isOpen = false;
   export let title: string;
@@ -18,6 +19,25 @@
    * Callback function to close the modal.
    */
   export let handleModalState: (flag: boolean) => void;
+
+  const trapTab = (event: KeyboardEvent) => {
+    if (event.key === "Tab") {
+      event.preventDefault();
+    }
+  };
+
+  $: {
+    if (isOpen) {
+      document.addEventListener("keydown", trapTab);
+    } else {
+      document.removeEventListener("keydown", trapTab);
+    }
+  }
+
+  // Cleanup listener when the component is destroyed
+  onDestroy(() => {
+    document.removeEventListener("keydown", trapTab);
+  });
 </script>
 
 {#if isOpen}

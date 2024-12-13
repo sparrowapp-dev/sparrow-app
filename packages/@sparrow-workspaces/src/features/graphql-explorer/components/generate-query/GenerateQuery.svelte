@@ -61,7 +61,7 @@
           querySchema = JSON.parse(schema)?.Mutation?.items || [];
         }
         queryBuilder = calculateQueryBuilder(querySchema, operationSearch);
-        breadcrum = calculateBreadcrumPath(queryBuilder, 5);
+        breadcrum = calculateBreadcrumPath(queryBuilder, 3);
       }
     } catch (e) {
       querySchema = [];
@@ -101,7 +101,7 @@
    */
   const calculateBreadcrumPath = (
     _queryBuilder: QueryBuilder[][] = [],
-    _breadcrumMaxWrapper: number = 5,
+    _breadcrumMaxWrapper: number = 3,
   ): Breadcrum[][] => {
     let result: Breadcrum[][] = [];
     if (_queryBuilder?.length < 2) {
@@ -126,9 +126,7 @@
           });
         } else if (
           i === _queryBuilder.length - 1 ||
-          i === _queryBuilder.length - 2 ||
-          i === _queryBuilder.length - 3 ||
-          i === _queryBuilder.length - 4
+          i === _queryBuilder.length - 2
         ) {
           result[2].push({
             name: _queryBuilder[i][0].parentNodeName,
@@ -750,7 +748,7 @@
                       on:blur={() => {
                         setTimeout(() => {
                           isQueryInputFocused = false;
-                        }, 200);
+                        }, 400);
                       }}
                     />
                     {#if t?.value && isQueryInputFocused}

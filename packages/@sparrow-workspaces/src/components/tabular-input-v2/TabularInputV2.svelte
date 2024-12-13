@@ -180,7 +180,7 @@
           style="height: 10px; width: 10px;"
         />
       </button>
-      <div class="h-75 pe-1">
+      <div class="h-75 pe-1 invisible">
         <button class="border-0" style="width:40px;" />
       </div>
     </div>
