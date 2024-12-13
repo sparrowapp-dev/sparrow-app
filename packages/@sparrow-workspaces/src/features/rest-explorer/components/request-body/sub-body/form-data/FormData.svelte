@@ -5,6 +5,7 @@
   export let onUpdateRequestBody;
   export let environmentVariables;
   export let onUpdateEnvironment;
+  export let isWebApp = false;
 
   const handleFormDataChange = (pairs) => {
     onUpdateRequestBody({
@@ -19,5 +20,6 @@
     callback={handleFormDataChange}
     {environmentVariables}
     {onUpdateEnvironment}
+    {isWebApp}
   />
 </section>

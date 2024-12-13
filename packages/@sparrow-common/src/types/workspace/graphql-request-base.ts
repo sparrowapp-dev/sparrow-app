@@ -33,6 +33,7 @@ export interface GraphqlRequestBaseInterface {
   schema: string;
   auth: GraphqlRequestAuthBaseInterface;
   headers: GraphqlRequestKeyValueCheckedBaseInterface[];
+  variables: string,
   selectedGraphqlAuthType?: GraphqlRequestAuthModeBaseEnum;
 }
 
