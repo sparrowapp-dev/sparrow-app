@@ -32,6 +32,7 @@
   } from "@sparrow/workspaces/features";
   import { WithModal } from "@sparrow/workspaces/hoc";
   import { notifications } from "@sparrow/library/ui";
+  import { DownloadApp } from "@sparrow/common/features";
 
   // ---- Interface, enum & constants
   import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
@@ -72,11 +73,13 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import { TeamsViewModel } from "../Teams/Teams.ViewModel";
 
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
   const _viewModel3 = new TestflowViewModel();
+  const _viewModel4 = new TeamsViewModel();
 
   let currentWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
@@ -419,6 +422,47 @@
   onDestroy(() => {
     cw.unsubscribe();
   });
+
+  let windowOs = true;
+  function getOS() {
+    let userAgent = window.navigator.userAgent;
+    if (userAgent.indexOf("Mac") != -1) {
+      windowOs = true;
+    } else if (userAgent.indexOf("Windows") != -1) {
+      windowOs = false;
+    }
+  }
+  onMount(() => {
+    getOS();
+  });
+
+  let isPopupOpen = false;
+
+  function launchSparrowWebApp() {
+    let appDetected = false;
+
+    // Handle when window loses focus (app opens)
+    const handleBlur = () => {
+      appDetected = true;
+      window.removeEventListener("blur", handleBlur);
+      clearTimeout(detectAppTimeout);
+    };
+
+    window.addEventListener("blur", handleBlur);
+
+    // Try to open the app
+    _viewModel4.setupRedirect();
+
+    // Check if app opened after a short delay
+    const detectAppTimeout = setTimeout(() => {
+      window.removeEventListener("blur", handleBlur);
+
+      // Only show popup if app wasn't detected
+      if (!appDetected) {
+        isPopupOpen = true;
+      }
+    }, 500);
+  }
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -442,6 +486,8 @@
           {collectionList}
           {currentWorkspace}
           {isAppVersionVisible}
+          {windowOs}
+          {launchSparrowWebApp}
           {isGuestUser}
           leftPanelController={{
             leftPanelCollapse: $leftPanelCollapse,
@@ -851,6 +897,20 @@
   />
 </Modal>
 
+<!-- Download the Desktop app -->
+<Modal
+  title=""
+  type="dark"
+  width="45%"
+  zIndex={1000}
+  isOpen={isPopupOpen}
+  handleModalState={() => {
+    isPopupOpen = false;
+  }}
+>
+  <DownloadApp />
+</Modal>
+
 <style>
   :global(.collection-splitter .splitpanes__splitter) {
     width: 6px !important;
@@ -862,9 +922,9 @@
     border-bottom: 0 !important;
   }
   :global(
-      .collection-splitter .splitpanes__splitter:active,
-      .collection-splitter .splitpanes__splitter:hover
-    ) {
+    .collection-splitter .splitpanes__splitter:active,
+    .collection-splitter .splitpanes__splitter:hover
+  ) {
     background-color: var(--bg-primary-200) !important;
   }
   .gradient-text {

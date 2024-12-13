@@ -16,6 +16,7 @@
     CollectionIcon,
     DoubleArrowIcon,
     GithubIcon,
+    WindowsIcon,
     SocketIcon,
     TreeIcon,
     VectorIcon,
@@ -23,6 +24,7 @@
     StackIcon,
     SocketIoIcon,
     GraphIcon,
+    MacIcon,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
@@ -109,6 +111,10 @@
   export let onCreateTestflow;
 
   export let testflows;
+
+  export let windowOs: boolean = false;
+
+  export let launchSparrowWebApp: () => void;
 
   export let onDeleteTestflow;
   export let onUpdateTestflow;
@@ -648,7 +654,7 @@
 
     <!-- <hr class="ms-2 me-2 mb-0 mt-0" /> -->
     <div
-      class="p-2 d-flex align-items-center justify-content-between"
+      class="px-3 py-2 d-flex align-items-center justify-content-between"
       style="z-index: 4;"
     >
       <Tooltip title={"Star Us On GitHub"} placement={"top"}>
@@ -703,6 +709,27 @@
           loader={false}
         />
       </div>
+    </div>
+
+    <!-- Launch sparrow desktop -->
+    <div class="px-3 pb-3">
+      <button
+        id="isExpandLoginButton"
+        class="d-flex align-items-center rounded-1 me-0 mb-0 p-2"
+        style="border:none; cursor:pointer; justify-content:center; height:32px; background-color:var(  --bg-primary-300) ; width:100%; "
+        on:click={launchSparrowWebApp}
+      >
+        <div class="d-flex align-items-center justify-content-center">
+          {#if windowOs}
+            <MacIcon height={"12px"} width={"12px"} color={"white"} />
+          {:else}
+            <WindowsIcon height={"12px"} width={"12px"} color={"white"} />
+          {/if}
+          <p class="ms-2 mb-0 text-fs-12" style="font-weight: 500;">
+            Launch Sparrow App
+          </p>
+        </div>
+      </button>
     </div>
   </div>
 {/if}
