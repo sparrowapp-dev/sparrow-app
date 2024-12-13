@@ -76,6 +76,7 @@
       }
     },
   );
+  let isWorkspaceOpen = false;
 
   activeTeam.subscribe((value) => {
     if (value) {
@@ -88,7 +89,6 @@
   let isTeamInviteModalOpen = false;
   let isLeaveTeamModelOpen = false;
   let isGuestUser;
-  let isWorkspaceOpen = false;
 
   const handleDeleteWorkspace = (workspace: WorkspaceDocument) => {
     selectedWorkspace = workspace;

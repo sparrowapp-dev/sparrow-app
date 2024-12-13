@@ -5,7 +5,7 @@ import { notifications } from "@sparrow/library/ui";
 import { navigate } from "svelte-navigator";
 import { jwtDecode, setAuthJwt } from "@app/utils/jwt";
 import { setUser } from "@app/store/auth.store";
-import { resizeWindowOnLogOut, resizeWindowOnLogin } from "../../../../utils";
+import { resizeWindowOnLogOut, maximizeWindow } from "../../../../utils";
 import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
@@ -37,7 +37,7 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
   const response = await loginUser(loginCredentials);
 
   if (response.isSuccessful) {
-    resizeWindowOnLogin();
+    await maximizeWindow();
     setAuthJwt(constants.AUTH_TOKEN, response?.data?.data?.accessToken.token);
     setAuthJwt(constants.REF_TOKEN, response?.data?.data?.refreshToken.token);
     const userDetails = jwtDecode(response.data?.data?.accessToken?.token);
@@ -94,7 +94,7 @@ export async function handleLoginV2(url: string) {
       _guideRepository.insert({ isActive: false, id: "collection-guide" });
     }
     // _activeSidebarTabViewModel.addActiveTab("collections");
-    await resizeWindowOnLogin();
+    await maximizeWindow();
   } else {
     notifications.error("Invalid token!");
   }

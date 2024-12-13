@@ -1,1 +1,1 @@
-export { resizeWindowOnLogOut, resizeWindowOnLogin } from "./window-resize";
+export { resizeWindowOnLogOut, maximizeWindow } from "./window-resize";

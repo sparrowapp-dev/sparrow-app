@@ -218,7 +218,7 @@
   let isFolderNameEditable = false;
 </script>
 
-<div class="url d-flex align-items-center pt-3">
+<div class="url d-flex align-items-center pt-4">
   <p class="ellipsis mb-3 ps-3">
     {#if path.length > 0}
       <span
@@ -1051,9 +1051,11 @@
   }
   .api-name-usage {
     position: absolute;
-    top: -5px;
-    right: 30px;
+    top: -150px;
+    right: 5px;
     width: 2000%;
+    height: 140px;
+    overflow-y: auto;
     border-radius: 8px;
     box-shadow: 0px 16px 48px 0px #0000002d;
   }
