@@ -189,7 +189,7 @@ export type SocketIORequestOutputTabInterface = {
   contentType: string;
   url: string;
   filter: "All Messages" | "Sent" | "Received";
-  connectListener: UnlistenFn | null;
-  disconnectListener: UnlistenFn | null;
-  messageListener: UnlistenFn | null;
+  connectListener?: any;
+  disconnectListener?: any;
+  messageListener?: any;
 };

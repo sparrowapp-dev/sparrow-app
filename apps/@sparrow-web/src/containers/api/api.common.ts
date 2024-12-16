@@ -612,7 +612,6 @@ async function processMessageEvent(tabId, event) {
   // Retrieve tab data and check event inclusion
   const tabData = await tabRepository.getTabByTabId(tabId);
   const tabDataJSON = tabData?.toMutableJSON();
-  console.log(event,"event");
   const socketIOresponse = event.payload;
   const eventName = socketIOresponse.event;
   const message = socketIOresponse.message;
@@ -643,7 +642,6 @@ const storeListenerstoMap = (
   _tabId: string,
 ) => {
   socketIoDataStore.update((webSocketDataMap) => {
-    console.log(webSocketDataMap,"-----------------------------------");
     const wsData = webSocketDataMap.get(_tabId);
     if (wsData) {
       wsData.connectListener = _socketIoInstance;
@@ -666,7 +664,7 @@ const addSocketDataToMap = (tabId, url) => {
       `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
     );
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -674,7 +672,6 @@ const addSocketDataToMap = (tabId, url) => {
 function updateSocketDataStore(tabId, data, transmitter, status = "") {
   socketIoDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tabId);
-    console.log(wsData.status);
     if (wsData) {
       wsData.messages.unshift({
         data,
@@ -696,11 +693,8 @@ const removeSocketDataFromMap = (tab_id, url, err = "") => {
     // If no websocket data exists for the given tab_id, return the map as is
     if (!wsData) return webSocketDataMap;
 
-    const { connectListener, disconnectListener, messageListener } = wsData;
-
     if (err && err.includes("Invalid")) {
       // Clean up listeners and delete the socket data
-      connectListener.disconnect();
       webSocketDataMap.delete(tab_id);
 
       notifications.error(
@@ -713,8 +707,6 @@ const removeSocketDataFromMap = (tab_id, url, err = "") => {
         "disconnector",
         "disconnected",
       );
-
-      connectListener.disconnect();
     }
 
     return webSocketDataMap;
@@ -740,48 +732,6 @@ const sendSocketIoMessage = async (
     }
     return webSocketDataMap;
   });
-  // let urlObject = new URL(url);
-  // await invoke("send_socket_io_message", {
-  //   tabid: tab_id,
-  //   event: _eventName,
-  //   message: message,
-  // })
-  //   .then(async (data: string) => {
-  //     try {
-  //       // Logic to handle response
-  //       socketIoDataStore.update((webSocketDataMap) => {
-  //         const wsData = webSocketDataMap.get(tab_id);
-  //         let asdf = [];
-  //         asdf.push(_eventName);
-  //         asdf.push(message || "(empty)");
-  //         const r = JSON.stringify(asdf);
-  //         if (wsData) {
-  //           wsData.messages.unshift({
-  //             data: r,
-  //             transmitter: "sender",
-  //             timestamp: formatTime(new Date()),
-  //             uuid: uuidv4(),
-  //           });
-  //           webSocketDataMap.set(tab_id, wsData);
-  //         }
-  //         return webSocketDataMap;
-  //       });
-  //     } catch (e) {
-  //       console.error(e);
-  //       notifications.error(
-  //         `Failed to send message over ${SocketIORequestDefaultAliasBaseEnum.NAME} connection. Please try again.`,
-  //       );
-  //       return removeSocketDataFromMap(tab_id, url);
-  //     }
-  //   })
-  //   .catch((e) => {
-  //     console.error(e);
-  //     notifications.error(
-  //       `Failed to send message over ${SocketIORequestDefaultAliasBaseEnum.NAME} connection. Please try again.`,
-  //     );
-  //     return removeSocketDataFromMap(tab_id, url);
-  //   });
-
 
     socketIoDataStore.update((webSocketDataMap) => {
      const wsData = webSocketDataMap.get(tab_id);
@@ -819,7 +769,7 @@ const connectSocketIo = async (
   tabId: string,
   requestHeaders: string,
 ) => {
-  console.table({ url, tabId, requestHeaders });
+  console.table({ URL: url, Headers: requestHeaders });
   socketIoDataStore.update((webSocketDataMap) => {
     webSocketDataMap.set(tabId, {
       messages: [],
@@ -843,39 +793,18 @@ const connectSocketIo = async (
     }
     urlObject = new URL(validUrl);
   } catch (e) {
-    console.error("Invalid host name", e);
+    console.error(e);
     removeSocketDataFromMap(tabId, url, "Invalid");
     return;
   }
 
-  // Connect Listener
-  // const connectListener = await listen(`socket-connect-${tabId}`, async () => {
-  //   return addSocketDataToMap(tabId, url);
-  // });
-  // // Disconnect listener
-  // const disconnectListener = await listen(
-  //   `socket-disconnect-${tabId}`,
-  //   async (data) => {
-  //     const err = data.payload.message;
-  //     console.log("invalid namespace", err);
-  //     return removeSocketDataFromMap(tabId, url, err);
-  //   },
-  // );
-  // // Handle message listener
-  // const messageListener = await listen(`socket-message-${tabId}`, (event) =>
-  //   processMessageEvent(tabId, event),
-  // );
-
-  
-  
-  
   const socketIoInstance = io("http://localhost:9001/", {
     path: "/socket.io", // Path to the WebSocket gateway
     transports: ["websocket"], // Ensure the transport is set to WebSocket
     query: {
-      targetUrl: urlObject.origin || "", // Replace with the real Socket.IO server URL
-      namespace: urlObject.pathname || "/", // Replace with the namespace you are connecting to
-      headers: JSON.stringify({ authorization: "Bearer your_token" }), // Example headers if required
+      targetUrl: urlObject.origin || "", 
+      namespace: urlObject.pathname || "/", 
+      headers: requestHeaders 
     },
   });
   // const socketIoInstance  = io(urlObject.origin || "");
@@ -887,28 +816,32 @@ const connectSocketIo = async (
   );
   
   socketIoInstance.onAny((event, args) => {
-    console.log(`Received event: ${event}`, args);
-    console.log(tabId,"==================================================");
-    processMessageEvent(tabId, {
-      payload: {
-        event: event,
-        message: args
-      }
-    });
-  });
-  
-
-  // Listen for connection
-  socketIoInstance.on("connect", () => {
-    addSocketDataToMap(tabId, url);
-    console.log("Socket connected:", socketIoInstance.id); // Logs the unique socket ID
+    if(event === "sparrow_internal_connect_error"){ // connect error listener
+      console.error(new DOMException(args + " (URL Issue)", "ConnectError"));
+      removeSocketDataFromMap(tabId, url, "Invalid");
+    }
+    else if(event === "sparrow_internal_connect"){ // connect listener
+      addSocketDataToMap(tabId, url);
+    }
+    else if(event === "sparrow_internal_disconnect"){ // disconnect listener
+      console.error(new DOMException(args + " (Connection Lost)", "DisconnectError"));
+      removeSocketDataFromMap(tabId, url, "");
+    }
+    else{
+      processMessageEvent(tabId, {
+        payload: {
+          event: event,
+          message: args
+        }
+      });
+    }
   });
 
   // Listen for disconnection
-  socketIoInstance.on("disconnect", (reason) => {
-    console.log("Socket disconnected:", reason);
-    removeSocketDataFromMap(tabId, url, "");
-  });
+  // socketIoInstance.on("disconnect", (err) => {
+  //   console.error(new Error(err));
+  //   removeSocketDataFromMap(tabId, url, "");
+  // });
 };
 
 /**
@@ -919,23 +852,23 @@ const connectSocketIo = async (
  */
 const disconnectSocketIo = async (tab_id: string) => {
   let url = "";
-  socketIoDataStore.update((webSocketDataMap) => {
-    const wsData = webSocketDataMap.get(tab_id);
+  socketIoDataStore.update((socketIoDataMap) => {
+    const wsData = socketIoDataMap.get(tab_id);
 
     if (wsData) {
       url = wsData.url;
       wsData.status = "disconnecting";
       wsData.url = "";
-      webSocketDataMap.set(tab_id, wsData);
+      socketIoDataMap.set(tab_id, wsData);
     }
-    return webSocketDataMap;
+    return socketIoDataMap;
   });
 
     socketIoDataStore.update((webSocketDataMap) => {
       const wsData = webSocketDataMap.get(tab_id);
        if (wsData) {
          const socketInsta = wsData.connectListener;
-         socketInsta.disconnect();
+         socketInsta?.emit("sparrow_internal_disconnect","client io disconnect");
        } 
        return webSocketDataMap;
      });
