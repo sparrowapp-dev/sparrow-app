@@ -245,41 +245,66 @@ function formatTime(date) {
  *
  */
 const sendMessage = async (tab_id: string, message: string) => {
-  // debugger;
-  await invoke("send_websocket_message", { tabid: tab_id, message: message })
-    .then(async (data: string) => {
-      try {
-        // Logic to handle response
+  const selectedAgent = localStorage.getItem("selectedAgent");
 
-        webSocketDataStore.update((webSocketDataMap) => {
-          const wsData = webSocketDataMap.get(tab_id);
-          if (wsData) {
-            wsData.messages.unshift({
-              data: message,
-              transmitter: "sender",
-              timestamp: formatTime(new Date()),
-              uuid: uuidv4(),
-            });
-            webSocketDataMap.set(tab_id, wsData);
-          }
-          return webSocketDataMap;
-        });
-      } catch (e) {
+  if (typeof window !== "undefined" && selectedAgent === "Browser Agent") {
+    try {
+      const ws = (window as any).webSocketInstances?.[tab_id];
+      if (!ws) {
+        throw new Error("WebSocket not connected");
+      }
+
+      ws.send(message);
+      webSocketDataStore.update((webSocketDataMap) => {
+        const wsData = webSocketDataMap.get(tab_id);
+        if (wsData) {
+          wsData.messages.unshift({
+            data: message,
+            transmitter: "sender",
+            timestamp: formatTime(new Date()),
+            uuid: uuidv4(),
+          });
+          webSocketDataMap.set(tab_id, wsData);
+        }
+        return webSocketDataMap;
+      });
+    } catch (e) {
+      console.error(e);
+      notifications.error("Failed to send message");
+      return error("error");
+    }
+  } else {
+    // Existing Tauri implementation
+    await invoke("send_websocket_message", { tabid: tab_id, message: message })
+      .then(async (data: string) => {
+        try {
+          webSocketDataStore.update((webSocketDataMap) => {
+            const wsData = webSocketDataMap.get(tab_id);
+            if (wsData) {
+              wsData.messages.unshift({
+                data: message,
+                transmitter: "sender",
+                timestamp: formatTime(new Date()),
+                uuid: uuidv4(),
+              });
+              webSocketDataMap.set(tab_id, wsData);
+            }
+            return webSocketDataMap;
+          });
+        } catch (e) {
+          console.error(e);
+          return error("error");
+        }
+      })
+      .catch((e) => {
         console.error(e);
         return error("error");
-      }
-    })
-    .catch((e) => {
-      console.error(e);
-      return error("error");
-    });
+      });
+  }
 };
 
 /**
  * Disconnects a WebSocket connection for a specific tab and handles the response.
- *
- * @param tab_id - The ID of the tab for which the WebSocket connection should be disconnected.
- *
  */
 const disconnectWebSocket = async (tab_id: string) => {
   let url = "";
@@ -293,10 +318,16 @@ const disconnectWebSocket = async (tab_id: string) => {
     }
     return webSocketDataMap;
   });
-  await invoke("disconnect_websocket", { tabid: tab_id })
-    .then(async (data: string) => {
-      try {
-        // Logic to handle response
+
+  const selectedAgent = localStorage.getItem("selectedAgent");
+
+  if (typeof window !== "undefined" && selectedAgent === "Browser Agent") {
+    try {
+      const ws = (window as any).webSocketInstances?.[tab_id];
+      if (ws) {
+        ws.close();
+        delete (window as any).webSocketInstances[tab_id];
+
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
           if (wsData) {
@@ -312,20 +343,56 @@ const disconnectWebSocket = async (tab_id: string) => {
           return webSocketDataMap;
         });
         notifications.success("WebSocket disconnected successfully.");
-      } catch (e) {
+      }
+    } catch (e) {
+      console.error(e);
+      notifications.error("Failed to disconnect WebSocket. Please try again.");
+      return error("error");
+    }
+  } else {
+    // Existing Tauri implementation
+    await invoke("disconnect_websocket", { tabid: tab_id })
+      .then(async (data: string) => {
+        try {
+          webSocketDataStore.update((webSocketDataMap) => {
+            const wsData = webSocketDataMap.get(tab_id);
+            if (wsData) {
+              wsData.messages.unshift({
+                data: `Disconnected from ${url}`,
+                transmitter: "disconnector",
+                timestamp: formatTime(new Date()),
+                uuid: uuidv4(),
+              });
+              wsData.status = "disconnected";
+              webSocketDataMap.set(tab_id, wsData);
+            }
+            return webSocketDataMap;
+          });
+          notifications.success("WebSocket disconnected successfully.");
+        } catch (e) {
+          console.error(e);
+          notifications.error(
+            "Failed to disconnect WebSocket. Please try again.",
+          );
+          return error("error");
+        }
+      })
+      .catch((e) => {
         console.error(e);
         notifications.error(
           "Failed to disconnect WebSocket. Please try again.",
         );
         return error("error");
-      }
-    })
-    .catch((e) => {
-      console.error(e);
-      notifications.error("Failed to disconnect WebSocket. Please try again.");
-      return error("error");
-    });
+      });
+  }
 };
+
+/**
+ * Disconnects a WebSocket connection for a specific tab and handles the response.
+ *
+ * @param tab_id - The ID of the tab for which the WebSocket connection should be disconnected.
+ *
+ */
 
 const convertWebSocketUrl = (url: string) => {
   // Check if the URL starts with 'wss://'
@@ -357,58 +424,63 @@ const connectWebSocket = async (
   tabId: string,
   requestHeaders: string,
 ) => {
-  // debugger;
-  const httpurl = convertWebSocketUrl(url);
-  console.table({ url, httpurl, tabId, requestHeaders });
-  webSocketDataStore.update((webSocketDataMap) => {
-    webSocketDataMap.set(tabId, {
-      messages: [],
-      status: "connecting",
-      search: "",
-      contentType: RequestDataTypeEnum.TEXT,
-      body: "",
-      filter: "All Messages",
-      url: url,
-    });
+  const selectedAgent = localStorage.getItem("selectedAgent");
 
-    return webSocketDataMap;
-  });
-  await invoke("connect_websocket", {
-    url: url,
-    httpurl: httpurl,
-    tabid: tabId,
-    headers: requestHeaders,
-  })
-    .then(async (data: string) => {
-      try {
-        // Logic to handle response
-        if (data) {
-          const dt = JSON.parse(data);
-        }
-        // Store the WebSocket and initialize data
-        webSocketDataStore.update((webSocketDataMap) => {
-          const wsData = webSocketDataMap.get(tabId);
-          if (wsData) {
-            wsData.messages.unshift({
-              data: `Connected from ${url}`,
-              transmitter: "connecter",
-              timestamp: formatTime(new Date()),
-              uuid: uuidv4(),
-            });
-            wsData.status = "connected";
-            webSocketDataMap.set(tabId, wsData);
-          }
-          return webSocketDataMap;
+  if (selectedAgent === "Browser Agent") {
+    try {
+      // Parse headers
+      const headers = JSON.parse(requestHeaders);
+
+      // Initialize webSocket data
+      webSocketDataStore.update((webSocketDataMap) => {
+        webSocketDataMap.set(tabId, {
+          messages: [],
+          status: "connecting",
+          search: "",
+          contentType: RequestDataTypeEnum.TEXT,
+          body: "",
+          filter: "All Messages",
+          url: url,
         });
-        notifications.success("WebSocket connected successfully");
+        return webSocketDataMap;
+      });
 
-        // All the response of particular web socket can be listened here. (Can be shifted to another place)
-        listen(`ws_message_${tabId}`, (event) => {
+      // Create WebSocket instance
+      const ws = new WebSocket(url);
+
+      // Store WS instance
+      if (typeof window !== "undefined") {
+        (window as any).webSocketInstances =
+          (window as any).webSocketInstances || {};
+        (window as any).webSocketInstances[tabId] = ws;
+      }
+
+      return new Promise((resolve, reject) => {
+        ws.onopen = () => {
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
               wsData.messages.unshift({
-                data: event.payload,
+                data: `Connected to ${url}`,
+                transmitter: "connecter",
+                timestamp: formatTime(new Date()),
+                uuid: uuidv4(),
+              });
+              wsData.status = "connected";
+              webSocketDataMap.set(tabId, wsData);
+            }
+            return webSocketDataMap;
+          });
+          notifications.success("WebSocket connected successfully");
+          resolve();
+        };
+
+        ws.onmessage = (event) => {
+          webSocketDataStore.update((webSocketDataMap) => {
+            const wsData = webSocketDataMap.get(tabId);
+            if (wsData) {
+              wsData.messages.unshift({
+                data: event.data,
                 transmitter: "receiver",
                 timestamp: formatTime(new Date()),
                 uuid: uuidv4(),
@@ -417,26 +489,85 @@ const connectWebSocket = async (
             }
             return webSocketDataMap;
           });
-        });
-      } catch (e) {
-        console.error(e);
-        notifications.error(
-          "Failed to fetch WebSocket response. Please try again.",
-        );
-        return error("error");
-      }
-    })
-    .catch((e) => {
-      console.error(e);
-      webSocketDataStore.update((webSocketDataMap) => {
-        webSocketDataMap.delete(tabId);
-        return webSocketDataMap;
-      });
-      notifications.error("Failed to connect WebSocket. Please try again.");
-      return error("error");
-    });
-};
+        };
 
+        ws.onerror = (error) => {
+          console.error("WebSocket error:", error);
+          webSocketDataStore.update((webSocketDataMap) => {
+            webSocketDataMap.delete(tabId);
+            return webSocketDataMap;
+          });
+          reject(new Error("Failed to connect to WebSocket"));
+        };
+      });
+    } catch (error) {
+      console.error(error);
+      notifications.error("Failed to connect WebSocket");
+      throw error;
+    }
+  } else {
+    // Existing Tauri implementation
+    await invoke("connect_websocket", {
+      url: url,
+      httpurl: convertWebSocketUrl(url),
+      tabid: tabId,
+      headers: requestHeaders,
+    })
+      .then(async (data: string) => {
+        try {
+          if (data) {
+            const dt = JSON.parse(data);
+          }
+          webSocketDataStore.update((webSocketDataMap) => {
+            const wsData = webSocketDataMap.get(tabId);
+            if (wsData) {
+              wsData.messages.unshift({
+                data: `Connected from ${url}`,
+                transmitter: "connecter",
+                timestamp: formatTime(new Date()),
+                uuid: uuidv4(),
+              });
+              wsData.status = "connected";
+              webSocketDataMap.set(tabId, wsData);
+            }
+            return webSocketDataMap;
+          });
+          notifications.success("WebSocket connected successfully");
+
+          listen(`ws_message_${tabId}`, (event) => {
+            webSocketDataStore.update((webSocketDataMap) => {
+              const wsData = webSocketDataMap.get(tabId);
+              if (wsData) {
+                wsData.messages.unshift({
+                  data: event.payload,
+                  transmitter: "receiver",
+                  timestamp: formatTime(new Date()),
+                  uuid: uuidv4(),
+                });
+                webSocketDataMap.set(tabId, wsData);
+              }
+              return webSocketDataMap;
+            });
+          });
+        } catch (e) {
+          console.error(e);
+          notifications.error(
+            "Failed to fetch WebSocket response. Please try again.",
+          );
+          return error("error");
+        }
+      })
+      .catch((e) => {
+        console.error(e);
+        webSocketDataStore.update((webSocketDataMap) => {
+          webSocketDataMap.delete(tabId);
+          return webSocketDataMap;
+        });
+        notifications.error("Failed to connect WebSocket. Please try again.");
+        return error("error");
+      });
+  }
+};
 /**
  * Invoke RPC Communication
  * @param url - Request URL
