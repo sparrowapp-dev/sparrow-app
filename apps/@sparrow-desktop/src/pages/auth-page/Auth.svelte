@@ -154,7 +154,7 @@
       class=""
       style="display: flex ; flex-direction:column; align-items:center;"
     >
-      <div class="d-flex" style="height:44px; width:100%;">
+      <div class="d-flex" style="height:44px; width:100%; margin-top:44px;">
         <button
           class="btn btn-primary w-100 text-blackColor border-0"
           on:click={() => {
@@ -334,7 +334,7 @@
   }
 
   .divider .text {
-    margin: 0 10px;
+    margin: 0 4px;
     color: #bfc0d2;
     font-size: 14px;
   }
