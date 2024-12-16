@@ -388,7 +388,7 @@
         },
         displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
         disabled: false,
-        hidden: isWebApp ? true : false,
+        hidden: false,
         icon: SocketIoIcon,
       },
       {
@@ -638,6 +638,32 @@
               </div>
             </Tooltip>
 
+            <Tooltip
+              title={`Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`}
+              placement={"bottom"}
+              distance={12}
+            >
+              <div
+                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+                style="height: 24px; width: 24px;"
+                role="button"
+                on:click={() => {
+                  onItemCreated("socketioCollection", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                  });
+                  MixpanelEvent(Events.Collection_SocketIO, {
+                    description: "Created Socket.IO inside collection.",
+                  });
+                }}
+              >
+                <SocketIoIcon
+                  height={"13px"}
+                  width={"13px"}
+                  color={"var(--request-arc)"}
+                />
+              </div>
+            </Tooltip>
             {#if !isWebApp}
               <Tooltip
                 title={"Add WebSocket"}
@@ -660,33 +686,6 @@
                     height="12px"
                     width="16px"
                     color="var(--request-arc)"
-                  />
-                </div>
-              </Tooltip>
-
-              <Tooltip
-                title={`Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`}
-                placement={"bottom"}
-                distance={12}
-              >
-                <div
-                  class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                  style="height: 24px; width: 24px;"
-                  role="button"
-                  on:click={() => {
-                    onItemCreated("socketioCollection", {
-                      workspaceId: collection.workspaceId,
-                      collection,
-                    });
-                    MixpanelEvent(Events.Collection_SocketIO, {
-                      description: "Created Socket.IO inside collection.",
-                    });
-                  }}
-                >
-                  <SocketIoIcon
-                    height={"13px"}
-                    width={"13px"}
-                    color={"var(--request-arc)"}
                   />
                 </div>
               </Tooltip>

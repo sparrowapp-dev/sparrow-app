@@ -5,7 +5,6 @@
   import { OSDetector } from "@sparrow/common/utils";
 
   export let isMainScreen = false;
-  export let isWebApp = false;
   let platformName = "";
 
   let ctrlCommands: { [key: string]: string } = {};

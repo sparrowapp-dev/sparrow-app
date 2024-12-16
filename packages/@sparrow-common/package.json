@@ -39,6 +39,7 @@
     "./types/workspace/socket-io-request-dto": "./src/types/workspace/socket-io-request-dto.ts",
     "./types/workspace/socket-io-request-tab": "./src/types/workspace/socket-io-request-tab.ts",
     "./types/workspace/websocket-request-base": "./src/types/workspace/websocket-request-base.ts",
+    "./types/workspace/workspace-base": "./src/types/workspace/workspace-base.ts",
     "./types/workspace/websocket-request-dto": "./src/types/workspace/websocket-request-dto.ts",
     "./types/workspace/collection": "./src/types/workspace/collection-tab.ts",
     "./types/workspace/collection-dto": "./src/types/workspace/collection-dto.ts",

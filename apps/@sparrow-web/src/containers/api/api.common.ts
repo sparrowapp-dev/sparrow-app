@@ -21,6 +21,9 @@ import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/works
 import { socketIoDataStore } from "../../../../../packages/@sparrow-workspaces/src/features/socketio-explorer/store/socketio";
 import io from "socket.io-client";
 import { TabRepository } from "src/repositories/tab.repository";
+import { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
+import { SocketIORequestMessageTransmitterTabEnum, SocketIORequestStatusTabEnum, type EventsValues } from "@sparrow/common/types/workspace/socket-io-request-tab";
+import { Sleep } from "@sparrow/common/utils";
 const tabRepository = new TabRepository();
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
@@ -604,271 +607,368 @@ const makeHttpRequestV2 = async (
 };
 
 
-// Function to update process socket io messages
-async function processMessageEvent(tabId, event) {
-  // Simulate delay
-  await new Promise((resolve) => setTimeout(resolve, 10));
+/**
+ * Processes a Socket.IO message event for a specific tab, determining if the event should be included in the response.
+ * @param _tabId - The unique identifier of the tab for which the event is being processed.
+ * @param _event - The event object containing the payload with the event name and message data.
+ * @returns A promise that resolves to a JSON string containing the event name and message (if included), or an empty string if the event is not included.
+ */
+const processMessageEvent = async(_tabId: string, _event:{
+  payload: {
+    event: string,
+    message: any[]
+  }
+}): Promise<string> => {
+  await new Sleep().setTime(10);
 
   // Retrieve tab data and check event inclusion
-  const tabData = await tabRepository.getTabByTabId(tabId);
+  const tabData = await tabRepository.getTabByTabId(_tabId);
   const tabDataJSON = tabData?.toMutableJSON();
-  const socketIOresponse = event.payload;
+  const socketIOresponse = _event.payload;
   const eventName = socketIOresponse.event;
   const message = socketIOresponse.message;
 
   // Check if event should be included
   const isIncludeInResponse = tabDataJSON?.property.socketio?.events.some(
-    (tabEvent) => tabEvent.listen && tabEvent.event === eventName,
+    (tabEvent: EventsValues) => tabEvent.listen && tabEvent.event === eventName,
   );
 
   // Update WebSocket data store if conditions are met
   if (socketIOresponse && isIncludeInResponse && message) {
-    updateSocketDataStore(
-      tabId,
-      JSON.stringify([
-        eventName,
-        typeof message[0] === "string"
-          ? message[0]
-          : JSON.stringify(message[0]),
-      ]),
-      "receiver",
-    );
+    return JSON.stringify([
+      eventName,
+      typeof message[0] === "string"
+        ? message[0]
+        : JSON.stringify(message[0]),
+    ]);
   }
+  return "";
 }
 
+/**
+ * Generates a message indicating a successful connection to a specified URL.
+ * @param _url - The URL of the connection.
+ * @returns A message indicating the connection was established.
+ */
+const processConnectEvent = (_url: string): string =>{
+  return `Connected from ${_url}`;
+}
 
-const storeListenerstoMap = (
- _socketIoInstance,
+/**
+ * Generates a message indicating a disconnection from a specified URL.
+ * @param _url - The URL of the disconnection. 
+ * @returns A message indicating the disconnection occurred.
+ */
+const processDisconnectEvent = (_url: string): string =>{
+  return `Disconnected from ${_url}`;
+}
+
+/**
+ * Adds a Socket.IO listener to the map associated with a specific tab ID.
+ * @param _socketIo - The Socket.IO instance or listener to be associated with the tab.
+ * @param _tabId - The unique identifier of the tab for which the listener is being set.
+ */
+const insertSocketIoListenerToMap = (
+ _socketIo :any,
   _tabId: string,
 ) => {
   socketIoDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(_tabId);
     if (wsData) {
-      wsData.connectListener = _socketIoInstance;
+      wsData.connectListener = _socketIo;
       webSocketDataMap.set(_tabId, wsData);
     }
     return webSocketDataMap;
   });
 };
 
-
-const addSocketDataToMap = (tabId, url) => {
-  try {
-    updateSocketDataStore(
-      tabId,
-      `Connected from ${url}`,
-      "connecter",
-      "connected",
-    );
-    notifications.success(
-      `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
-    );
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-// Function to update WebSocket data store
-function updateSocketDataStore(tabId, data, transmitter, status = "") {
-  socketIoDataStore.update((webSocketDataMap) => {
-    const wsData = webSocketDataMap.get(tabId);
+/**
+ * Inserts a new Socket.IO data message into the map associated with a given tab ID.
+ * Updates the tab's status if the transmitter indicates a connection or disconnection event.
+ * @param _tabId - The unique identifier of the tab for which the data is being updated.
+ * @param _data - The data message to be inserted into the Socket.IO map.
+ * @param _transmitter - The transmitter type indicating the origin or purpose of the message (e.g., CONNECTER, DISCONNECTOR).
+ */
+const insertSocketIoDataToMap = (_tabId: string, _data: string, _transmitter: SocketIORequestMessageTransmitterTabEnum) => {
+  socketIoDataStore.update((SocketIoDataMap) => {
+    const wsData = SocketIoDataMap.get(_tabId);
     if (wsData) {
       wsData.messages.unshift({
-        data,
-        transmitter,
+        data: _data,
+        transmitter: _transmitter,
         timestamp: formatTime(new Date()),
         uuid: uuidv4(),
       });
-      if (status && status.length) wsData.status = status;
-      webSocketDataMap.set(tabId, wsData);
+      if( _transmitter === SocketIORequestMessageTransmitterTabEnum.CONNECTER){
+        wsData.status = SocketIORequestStatusTabEnum.CONNECTED;
+      }
+      else if( _transmitter === SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR){
+        wsData.status = SocketIORequestStatusTabEnum.DISCONNECTED;
+      }
+      SocketIoDataMap.set(_tabId, wsData);
     }
-    return webSocketDataMap;
+    return SocketIoDataMap;
   });
 }
 
-const removeSocketDataFromMap = (tab_id, url, err = "") => {
-  socketIoDataStore.update((webSocketDataMap) => {
-    const wsData = webSocketDataMap.get(tab_id);
-
+/**
+ * Removes Socket.IO from the tab data Map.
+ * @param _tabId - Tab Id as a key to which data should be cleared from Map.
+ */
+const removeSocketIoDataFromMap = (_tabId: string): void => {
+  socketIoDataStore.update((socketIoDataMap) => {
+    const wsData = socketIoDataMap.get(_tabId);
     // If no websocket data exists for the given tab_id, return the map as is
-    if (!wsData) return webSocketDataMap;
-
-    if (err && err.includes("Invalid")) {
-      // Clean up listeners and delete the socket data
-      webSocketDataMap.delete(tab_id);
-
-      notifications.error(
-        `Failed to connect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
-      );
-    } else {
-      updateSocketDataStore(
-        tab_id,
-        `Disconnected from ${url}`,
-        "disconnector",
-        "disconnected",
-      );
-    }
-
-    return webSocketDataMap;
+    if (!wsData) return socketIoDataMap;
+    // Clean up listeners and delete the socket data
+    socketIoDataMap.delete(_tabId);
+    notifications.error(
+      `Failed to connect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
+    );
+    return socketIoDataMap;
   });
 };
+
 /**
- * Sends a WebSocket message to a specific tab and handles the response.
- *
- * @param tab_id - The ID of the tab to which the message should be sent.
- * @param message - The message to be sent to the web socket.
+ * Sends a Socket.IO event and message to a specific tab and handles the response.
+ * @param _tabId - The ID of the tab to which the message should be sent.
+ * @param _eventMessage - The event message to be sent to the SocketIO.
+ * @param _eventName - The event name to be sent to the SocketIO.
  *
  */
 const sendSocketIoMessage = async (
-  tab_id: string,
-  message: string,
+  _tabId: string,
+  _eventMessage: string,
   _eventName: string,
-) => {
+): Promise<void> => {
   let url = "";
-  socketIoDataStore.update((webSocketDataMap) => {
-    const wsData = webSocketDataMap.get(tab_id);
+  socketIoDataStore.update((socketIoDataMap) => {
+    const wsData = socketIoDataMap.get(_tabId);
     if (wsData) {
       url = wsData.url;
     }
-    return webSocketDataMap;
+    return socketIoDataMap;
   });
 
     socketIoDataStore.update((webSocketDataMap) => {
-     const wsData = webSocketDataMap.get(tab_id);
-      let asdf = [];
-      asdf.push(_eventName);
-      asdf.push(message || "(empty)");
-      const r = JSON.stringify(asdf);
+     const wsData = webSocketDataMap.get(_tabId);
+      const event = [];
+      event.push(_eventName);
+      event.push(_eventMessage || "(empty)");
       if (wsData) {
         const socketInsta = wsData.connectListener;
-        socketInsta.emit(_eventName, message);
+        socketInsta.emit(_eventName, _eventMessage);
         wsData.messages.unshift({
-          data: r,
-          transmitter: "sender",
+          data: JSON.stringify(event),
+          transmitter: SocketIORequestMessageTransmitterTabEnum.SENDER,
           timestamp: formatTime(new Date()),
           uuid: uuidv4(),
         });
-        webSocketDataMap.set(tab_id, wsData);
+        webSocketDataMap.set(_tabId, wsData);
       } 
       return webSocketDataMap;
     });
 };
 
 /**
- * Connects to a WebSocket at a specified URL for a specific tab and handles the response.
- *
- * @param {string} url - The WebSocket server URL to connect to.
- * @param {string} tabId - The ID of the tab for which the WebSocket connection should be established.
- * @param {string} requestHeaders - The request headers to be sent with the WebSocket connection.
- *
- * @description
- * The function also sets up a listener for messages from the WebSocket connection.
- */
+ * Connects to a Socket.IO at a specified URL for a specific tab and handles the response.
+ * @param _url - Socket.IO server URL to connect.
+ * @param _tabId - ID of the tab for which the Socket.IO connection should be established.
+ * @param _headers - Headers to be sent with the Socket.IO connection.
+*/
 const connectSocketIo = async (
-  url: string,
-  tabId: string,
-  requestHeaders: string,
-) => {
-  console.table({ URL: url, Headers: requestHeaders });
+  _url: string,
+  _tabId: string,
+  _headers: string,
+): Promise<void> => {
+  console.table({ URL: _url, Headers: _headers });
+  const selectedAgent = localStorage.getItem("selectedAgent") as WorkspaceUserAgentBaseEnum;
   socketIoDataStore.update((webSocketDataMap) => {
-    webSocketDataMap.set(tabId, {
+    webSocketDataMap.set(_tabId, {
       messages: [],
-      status: "connecting",
+      agent: selectedAgent,
+      status: SocketIORequestStatusTabEnum.CONNECTING,
       search: "",
       contentType: RequestDataTypeEnum.TEXT,
       body: "",
       filter: "All Messages",
-      url: url,
+      url: _url,
       connectListener: null,
     });
 
     return webSocketDataMap;
   });
 
-  let urlObject;
+  let urlObject: URL;
   try {
-    let validUrl = url;
-    if (!url.startsWith("http://") && !url.startsWith("https://")) {
-      validUrl = "http://" + url;
+    let validUrl = _url;
+    if (!_url.startsWith("http://") && !_url.startsWith("https://")) {
+      validUrl = "http://" + _url;
     }
     urlObject = new URL(validUrl);
   } catch (e) {
     console.error(e);
-    removeSocketDataFromMap(tabId, url, "Invalid");
+    removeSocketIoDataFromMap(_tabId);
     return;
   }
-
-  const socketIoInstance = io("http://localhost:9001/", {
-    path: "/socket.io", // Path to the WebSocket gateway
-    transports: ["websocket"], // Ensure the transport is set to WebSocket
-    query: {
-      targetUrl: urlObject.origin || "", 
-      namespace: urlObject.pathname || "/", 
-      headers: requestHeaders 
-    },
-  });
-  // const socketIoInstance  = io(urlObject.origin || "");
-
-  // store listeners inside map against tab id for future removal
-  storeListenerstoMap(
-    socketIoInstance,
-    tabId,
-  );
+  constants.API_URL
+  if (selectedAgent === WorkspaceUserAgentBaseEnum.CLOUD_AGENT) {
+    const proxySocketIO = io(`${constants.SOCKET_IO_API_URL}/`, {
+      path: "/socket.io", // Path to the WebSocket gateway
+      transports: ["websocket"], // Ensure the transport is set to WebSocket
+      query: {
+        targetUrl: urlObject.origin || "", 
+        namespace: urlObject.pathname || "/", 
+        headers: _headers 
+      },
+      reconnection: false, 
+    });
   
-  socketIoInstance.onAny((event, args) => {
-    if(event === "sparrow_internal_connect_error"){ // connect error listener
-      console.error(new DOMException(args + " (URL Issue)", "ConnectError"));
-      removeSocketDataFromMap(tabId, url, "Invalid");
-    }
-    else if(event === "sparrow_internal_connect"){ // connect listener
-      addSocketDataToMap(tabId, url);
-    }
-    else if(event === "sparrow_internal_disconnect"){ // disconnect listener
-      console.error(new DOMException(args + " (Connection Lost)", "DisconnectError"));
-      removeSocketDataFromMap(tabId, url, "");
-    }
-    else{
-      processMessageEvent(tabId, {
+    // store listeners inside map against tab id for future removal
+    insertSocketIoListenerToMap(
+      proxySocketIO,
+      _tabId,
+    );
+    
+    proxySocketIO.onAny(async(event, args) => {
+      if(event === "sparrow_internal_connect_error"){ // Connect_error listener from the target Socket.IO.
+        console.error(new DOMException(args + " (URL Issue)", "ConnectError"));
+        removeSocketIoDataFromMap(_tabId);
+      }
+      else if(event === "sparrow_internal_connect"){ // Connect listener from the target Socket.IO.
+        const message = processConnectEvent(_url);
+        insertSocketIoDataToMap(
+          _tabId,
+          message,
+          SocketIORequestMessageTransmitterTabEnum.CONNECTER,
+        );
+        notifications.success(
+          `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
+        );
+      }
+      else if(event === "sparrow_internal_disconnect"){ // Disconnect listener from the target Socket.IO.
+        console.error(new DOMException(args + " (Connection Lost)", "DisconnectError"));
+         const message = processDisconnectEvent(_url);
+          insertSocketIoDataToMap(
+            _tabId,
+            message,
+            SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR,
+          );
+      }
+      else{ // Message listener from the target Socket.IO.
+        const message = await processMessageEvent(_tabId, {
+          payload: {
+            event: event,
+            message: args
+          }
+        });
+        if(message){
+          insertSocketIoDataToMap(_tabId, message, SocketIORequestMessageTransmitterTabEnum.RECEIVER);
+        }
+      }
+    });
+
+     // Listen for connect_error events from the proxy Socket.IO.
+     proxySocketIO.on("connect_error", (err) => {
+      console.error(new DOMException(err + " (Proxy Failed)", "ConnectError"));
+      removeSocketIoDataFromMap(_tabId);
+    });
+
+  }
+  else{
+    const parsedHeaders = JSON.parse(_headers as string);
+      const headersObject: { [key: string]: string } = parsedHeaders.reduce((acc: Record<string, string> , { key, value }: {key: string, value: string}) => {
+        acc[key] = value;
+        return acc;
+      }, {} as { [key: string]: string });
+    delete headersObject["Sec-WebSocket-Key"];
+    delete headersObject["Sec-WebSocket-Version"];
+
+    const targetSocketIO = io(`${urlObject.origin || ""}${urlObject.pathname || "/"}`, {
+      transports: ["websocket"],  
+      query: headersObject,
+      reconnection: false, 
+    });
+
+     // store listeners inside map against tab id for future removal
+     insertSocketIoListenerToMap(
+      targetSocketIO ,
+      _tabId,
+    );
+
+    // Listen for connect events from the target Socket.IO.
+    targetSocketIO.on("connect", () => {
+      const message = processConnectEvent(_url);
+      insertSocketIoDataToMap(
+        _tabId,
+        message,
+        SocketIORequestMessageTransmitterTabEnum.CONNECTER,
+      );
+      notifications.success(
+        `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
+      );
+    });
+    
+    // Listen for connect_error events from the target Socket.IO.
+    targetSocketIO.on("connect_error", (err) => {
+      console.error(new DOMException(err + " (URL Issue)", "ConnectError"));
+      removeSocketIoDataFromMap(_tabId);
+    });
+    
+    // Listen for disconnect events from the target Socket.IO.
+    targetSocketIO.on("disconnect", (err) => {
+      console.error(new DOMException(err + " (Connection Lost)", "DisconnectError"));
+       const message = processDisconnectEvent(_url);
+      insertSocketIoDataToMap(
+        _tabId,
+        message,
+        SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR,
+      );
+    });
+
+    // Listen for all dynamic events from the target Socket.IO.
+    targetSocketIO.onAny(async(event: string, ...args: any[]) => {
+      const message = await processMessageEvent(_tabId, {
         payload: {
           event: event,
           message: args
         }
       });
-    }
-  });
-
-  // Listen for disconnection
-  // socketIoInstance.on("disconnect", (err) => {
-  //   console.error(new Error(err));
-  //   removeSocketDataFromMap(tabId, url, "");
-  // });
+      if(message){
+        insertSocketIoDataToMap(_tabId, message, SocketIORequestMessageTransmitterTabEnum.RECEIVER);
+      }
+    });
+  }
 };
 
 /**
- * Disconnects a WebSocket connection for a specific tab and handles the response.
- *
- * @param tab_id - The ID of the tab for which the WebSocket connection should be disconnected.
- *
+ * Disconnects a Socket.IO connection for a specific tab and handles the response.
+ * @param _tabId - The ID of the tab for which the Socket.IO connection should be disconnected.
  */
-const disconnectSocketIo = async (tab_id: string) => {
+const disconnectSocketIo = async (_tabId: string): Promise<void> => {
   let url = "";
   socketIoDataStore.update((socketIoDataMap) => {
-    const wsData = socketIoDataMap.get(tab_id);
+    const wsData = socketIoDataMap.get(_tabId);
 
     if (wsData) {
       url = wsData.url;
-      wsData.status = "disconnecting";
+      wsData.status = SocketIORequestStatusTabEnum.DISCONNECTING;
       wsData.url = "";
-      socketIoDataMap.set(tab_id, wsData);
+      socketIoDataMap.set(_tabId, wsData);
     }
     return socketIoDataMap;
   });
 
     socketIoDataStore.update((webSocketDataMap) => {
-      const wsData = webSocketDataMap.get(tab_id);
+      const wsData = webSocketDataMap.get(_tabId);
        if (wsData) {
          const socketInsta = wsData.connectListener;
-         socketInsta?.emit("sparrow_internal_disconnect","client io disconnect");
+        if(wsData.agent === WorkspaceUserAgentBaseEnum.CLOUD_AGENT){
+          socketInsta?.emit("sparrow_internal_disconnect","client io disconnect");
+        }
+        else{
+          socketInsta?.disconnect();
+        }
        } 
        return webSocketDataMap;
      });

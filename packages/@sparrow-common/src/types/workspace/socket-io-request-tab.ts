@@ -1,4 +1,5 @@
 import type { UnlistenFn } from "@tauri-apps/api/event";
+import type { WorkspaceUserAgentBaseEnum } from "./workspace-base";
 export enum AuthTypeEnum {
   NO_AUTH = "No Auth",
   API_KEY = "API Key",
@@ -174,16 +175,30 @@ export interface SocketIo
 export interface SocketIoWrapper {
   socketio: SocketIo;
 }
+export enum SocketIORequestMessageTransmitterTabEnum {
+  DISCONNECTOR = "disconnector",
+  CONNECTER = "connecter",
+  RECEIVER =  "receiver",
+  SENDER =  "sender"
+}
+
+export enum SocketIORequestStatusTabEnum {
+  CONNECTED = "connected",
+  DISCONNECTED = "disconnected",
+  CONNECTING =  "connecting",
+  DISCONNECTING =  "disconnecting"
+}
 
 export type SocketIORequestMessageTabInterface = {
   data: string;
-  transmitter: string;
+  transmitter: SocketIORequestMessageTransmitterTabEnum;
   timestamp: string;
   uuid: string;
 };
 export type SocketIORequestOutputTabInterface = {
   messages: SocketIORequestMessageTabInterface[];
-  status: "connected" | "disconnected" | "connecting" | "disconnecting";
+  status: SocketIORequestStatusTabEnum
+  agent: WorkspaceUserAgentBaseEnum,
   search: string;
   body: string;
   contentType: string;
