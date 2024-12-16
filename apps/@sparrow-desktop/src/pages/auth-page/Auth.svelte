@@ -188,7 +188,7 @@
 
       <div
         class="mb-2 mt-2 w-[266px]"
-        style="padding-top:14px; text-align:center; font-size:12px; color:var(--text-secondary-1030);  width: 100%;
+        style=" text-align:center; font-size:12px; color:var(--text-secondary-1030);  width: 100%;
       font-size: 12px; font-weight:400;
       "
       >
