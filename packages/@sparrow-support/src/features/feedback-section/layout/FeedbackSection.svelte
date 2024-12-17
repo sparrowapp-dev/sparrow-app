@@ -221,7 +221,8 @@
    */
   const handleCategoryChange = async (selectedCategory) => {
     feedbackType = selectedCategory;
-    currentCategory = selectedCategory;
+    currentCategory =
+      selectedCategory === FeedbackType.ALL_CATEGORY ? "" : selectedCategory;
     if (selectedCategory === FeedbackType.ALL_CATEGORY) {
       // Show all posts if "All Categories" is selected
       isPostFetching = true;

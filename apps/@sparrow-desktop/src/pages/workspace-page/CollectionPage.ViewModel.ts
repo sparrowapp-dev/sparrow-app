@@ -2690,6 +2690,7 @@ export default class CollectionsViewModel {
       headers: _graphql.graphql
         ?.headers as GraphqlRequestKeyValueDtoInterface[],
       auth: _graphql.graphql?.auth as GraphqlRequestAuthDtoInterface,
+      variables: _graphql.graphql?.variables,
       selectedGraphqlAuthType: _graphql?.graphql
         ?.selectedGraphqlAuthType as GraphqlRequestAuthModeBaseEnum,
     };
@@ -5103,6 +5104,7 @@ export default class CollectionsViewModel {
           items: {
             id: path[path.length - 1].id,
             type: CollectionItemTypeBaseEnum.FOLDER,
+            name: path[path.length - 1].name,
             items: {
               name: tabName,
               description,
@@ -5208,6 +5210,7 @@ export default class CollectionsViewModel {
       schema: unadaptedRequest.schema,
       headers: unadaptedRequest.headers,
       auth: unadaptedRequest.auth,
+      variables: unadaptedRequest.variables,
       selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
     };
 

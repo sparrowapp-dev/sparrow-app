@@ -186,7 +186,7 @@
           style="height: 24px; width:24px;"
           disabled={loggedUserRoleInWorkspace ===
             WorkspaceRole.WORKSPACE_VIEWER}
-          class="add-icon-container border-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
+          class="add-icon-container border-0 p-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
             ? 'environment-active'
             : 'environment-inactive'}"
           on:click|stopPropagation={handleCreateEnvironment}
@@ -336,7 +336,7 @@
 
   .environment-active:hover {
     visibility: visible;
-    background-color: var( --bg-secondary-420);
+    background-color: var(--bg-secondary-420);
   }
   .environment-active:active {
     visibility: visible;

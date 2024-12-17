@@ -176,9 +176,14 @@ jobs:
         run: |
           npm install -g appcenter-cli@latest
 
-      - name: Get PR Branch Name
+      - name: Get Branch Name
         id: pr_branch
-        run: echo "::set-output name=branch::$(echo ${{ github.head_ref }})"
+        run: |
+          if [[ -n "${{ github.head_ref }}" ]]; then
+            echo "::set-output name=branch::${{ github.head_ref }}"
+          else
+            echo "::set-output name=branch::${{ github.ref_name }}"
+          fi
 
       - name: Upload to App Center
         run: |

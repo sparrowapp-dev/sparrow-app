@@ -71,7 +71,7 @@
   };
 </script>
 
-<!-- <DefaultHeader /> -->
+<DefaultHeader />
 
 {#if isEntry}
   <Redirect

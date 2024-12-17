@@ -1,32 +1,34 @@
 <script lang="ts">
   import { ComboText } from "@sparrow/workspaces/components";
-  import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
   import { SparrowLogo } from "@sparrow/common/images";
+  import { OSDetector } from "@sparrow/common/utils";
+
   export let isMainScreen = false;
-  export let isWebApp = false;
+  let platformName = "";
 
   let ctrlCommands: { [key: string]: string } = {};
   let altCommands: { [key: string]: string } = {};
+
+  const osDetector = new OSDetector();
+
   onMount(async () => {
-    let platformName;
-    if (isWebApp) {
-      platformName = "windowsos";
-    } else {
-      platformName = await platform();
-    }
-    let controlKey = platformName === "macos" ? "cmd" : "ctrl";
-    let altKey = platformName === "macos" ? "option" : "alt";
+    platformName = osDetector.getOS();
+
+    const controlKey = platformName === "macos" ? "cmd" : "ctrl";
+    const altKey = platformName === "macos" ? "option" : "alt";
+
     ctrlCommands = {
-      "Send Request": controlKey + " + Enter",
-      "New Request": controlKey + " + N",
-      "Save Request": controlKey + " + S",
+      "Send Request": `${controlKey} + Enter`,
+      "New Request": `${controlKey} + N`,
+      "Save Request": `${controlKey} + S`,
     };
+
     altCommands = {
-      "Edit link": altKey + " + L",
-      "Add Parameter": altKey + " + P",
-      "Add Header": altKey + " + H",
-      "Edit Body": altKey + " + B",
+      "Edit link": `${altKey} + L`,
+      "Add Parameter": `${altKey} + P`,
+      "Add Header": `${altKey} + H`,
+      "Edit Body": `${altKey} + B`,
     };
   });
   let isExpandShortcuts = false;

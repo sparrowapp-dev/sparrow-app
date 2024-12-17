@@ -17,7 +17,14 @@ import { v4 as uuidv4 } from "uuid";
 import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { appInsights } from "@app/logger";
-
+import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+import { socketIoDataStore } from "../../../../../packages/@sparrow-workspaces/src/features/socketio-explorer/store/socketio";
+import io from "socket.io-client";
+import { TabRepository } from "src/repositories/tab.repository";
+import { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
+import { SocketIORequestMessageTransmitterTabEnum, SocketIORequestStatusTabEnum, type EventsValues } from "@sparrow/common/types/workspace/socket-io-request-tab";
+import { Sleep } from "@sparrow/common/utils";
+const tabRepository = new TabRepository();
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const error = (
@@ -460,18 +467,63 @@ const makeHttpRequestV2 = async (
   try {
     let response;
     if (selectedAgent === "Cloud Agent") {
+      const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
       response = await axios({
         data: { url, method, headers, body, contentType },
-        url: constants.PROXY_SERVICE,
+        url: proxyUrl,
         method: "POST",
       });
     } else {
       try {
+        let jsonHeader;
+        try {
+          jsonHeader = JSON.parse(headers);
+        } catch (error) {
+          jsonHeader = {};
+        }
+        const headersObject = jsonHeader.reduce((acc, header) => {
+          if (header.checked !== false) {
+            // Include only headers that are checked or do not have a `checked` property
+            acc[header.key] = header.value;
+          }
+          return acc;
+        }, {});
+        let requestData = body || {};
+
+        if (contentType === "multipart/form-data") {
+          const formData = new FormData();
+          const parsedBody = JSON.parse(body);
+          (parsedBody || []).forEach((field) => {
+            if (field.checked !== false) {
+              formData.append(field.key, field.value);
+            }
+          });
+          requestData = formData;
+
+          // Remove Content-Type header to let Axios set it automatically with boundary
+          delete headersObject["Content-Type"];
+        } else if (contentType === "application/x-www-form-urlencoded") {
+          const urlSearchParams = new URLSearchParams();
+          const parsedBody = JSON.parse(body);
+          (parsedBody || []).forEach((field) => {
+            if (field.checked !== false) {
+              urlSearchParams.append(field.key, field.value);
+            }
+          });
+          requestData = urlSearchParams;
+        } else if (
+          contentType === "application/json" ||
+          contentType === "text/plain"
+        ) {
+          // Add Content-Type to headersObject explicitly
+          headersObject["Content-Type"] = contentType;
+        }
+
         const axiosResponse = await axios({
           method,
           url,
-          data: body || {},
-          headers: headers ? JSON.parse(headers) : {},
+          data: requestData || {},
+          headers: { ...headersObject },
           validateStatus: function (status) {
             return true;
           },
@@ -490,7 +542,7 @@ const makeHttpRequestV2 = async (
         const error = axiosError;
         response = {
           data: {
-            status: `${error.response?.status || 500} ${error.response?.statusText || "Error"}`,
+            status: `${error.response.status} ${error.response.statusText}`,
             data: error.response?.data || error.message,
             headers: error.response?.headers
               ? Object.fromEntries(Object.entries(error.response.headers))
@@ -515,6 +567,10 @@ const makeHttpRequestV2 = async (
       } else {
         responseData = response.data.data;
       }
+      if (!response.data.status) {
+        throw new Error("Error parsing response");
+      }
+
       appInsights.trackDependencyData({
         id: uuidv4(),
         name: "Cloud Agent Duration Metric",
@@ -536,6 +592,7 @@ const makeHttpRequestV2 = async (
     if (signal?.aborted) {
       throw new DOMException("Request was aborted", "AbortError");
     }
+
     console.error("Request error:", e);
     appInsights.trackDependencyData({
       id: uuidv4(),
@@ -548,6 +605,376 @@ const makeHttpRequestV2 = async (
     throw new Error("Error with the request");
   }
 };
+
+
+/**
+ * Processes a Socket.IO message event for a specific tab, determining if the event should be included in the response.
+ * @param _tabId - The unique identifier of the tab for which the event is being processed.
+ * @param _event - The event object containing the payload with the event name and message data.
+ * @returns A promise that resolves to a JSON string containing the event name and message (if included), or an empty string if the event is not included.
+ */
+const processMessageEvent = async(_tabId: string, _event:{
+  payload: {
+    event: string,
+    message: any[]
+  }
+}): Promise<string> => {
+  await new Sleep().setTime(10);
+
+  // Retrieve tab data and check event inclusion
+  const tabData = await tabRepository.getTabByTabId(_tabId);
+  const tabDataJSON = tabData?.toMutableJSON();
+  const socketIOresponse = _event.payload;
+  const eventName = socketIOresponse.event;
+  const message = socketIOresponse.message;
+
+  // Check if event should be included
+  const isIncludeInResponse = tabDataJSON?.property.socketio?.events.some(
+    (tabEvent: EventsValues) => tabEvent.listen && tabEvent.event === eventName,
+  );
+
+  // Update WebSocket data store if conditions are met
+  if (socketIOresponse && isIncludeInResponse && message) {
+    return JSON.stringify([
+      eventName,
+      typeof message[0] === "string"
+        ? message[0]
+        : JSON.stringify(message[0]),
+    ]);
+  }
+  return "";
+}
+
+/**
+ * Generates a message indicating a successful connection to a specified URL.
+ * @param _url - The URL of the connection.
+ * @returns A message indicating the connection was established.
+ */
+const processConnectEvent = (_url: string): string =>{
+  return `Connected from ${_url}`;
+}
+
+/**
+ * Generates a message indicating a disconnection from a specified URL.
+ * @param _url - The URL of the disconnection. 
+ * @returns A message indicating the disconnection occurred.
+ */
+const processDisconnectEvent = (_url: string): string =>{
+  return `Disconnected from ${_url}`;
+}
+
+/**
+ * Adds a Socket.IO listener to the map associated with a specific tab ID.
+ * @param _socketIo - The Socket.IO instance or listener to be associated with the tab.
+ * @param _tabId - The unique identifier of the tab for which the listener is being set.
+ */
+const insertSocketIoListenerToMap = (
+ _socketIo :any,
+  _tabId: string,
+) => {
+  socketIoDataStore.update((webSocketDataMap) => {
+    const wsData = webSocketDataMap.get(_tabId);
+    if (wsData) {
+      wsData.connectListener = _socketIo;
+      webSocketDataMap.set(_tabId, wsData);
+    }
+    return webSocketDataMap;
+  });
+};
+
+/**
+ * Inserts a new Socket.IO data message into the map associated with a given tab ID.
+ * Updates the tab's status if the transmitter indicates a connection or disconnection event.
+ * @param _tabId - The unique identifier of the tab for which the data is being updated.
+ * @param _data - The data message to be inserted into the Socket.IO map.
+ * @param _transmitter - The transmitter type indicating the origin or purpose of the message (e.g., CONNECTER, DISCONNECTOR).
+ */
+const insertSocketIoDataToMap = (_tabId: string, _data: string, _transmitter: SocketIORequestMessageTransmitterTabEnum) => {
+  socketIoDataStore.update((SocketIoDataMap) => {
+    const wsData = SocketIoDataMap.get(_tabId);
+    if (wsData) {
+      wsData.messages.unshift({
+        data: _data,
+        transmitter: _transmitter,
+        timestamp: formatTime(new Date()),
+        uuid: uuidv4(),
+      });
+      if( _transmitter === SocketIORequestMessageTransmitterTabEnum.CONNECTER){
+        wsData.status = SocketIORequestStatusTabEnum.CONNECTED;
+      }
+      else if( _transmitter === SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR){
+        wsData.status = SocketIORequestStatusTabEnum.DISCONNECTED;
+      }
+      SocketIoDataMap.set(_tabId, wsData);
+    }
+    return SocketIoDataMap;
+  });
+}
+
+/**
+ * Removes Socket.IO from the tab data Map.
+ * @param _tabId - Tab Id as a key to which data should be cleared from Map.
+ */
+const removeSocketIoDataFromMap = (_tabId: string): void => {
+  socketIoDataStore.update((socketIoDataMap) => {
+    const wsData = socketIoDataMap.get(_tabId);
+    // If no websocket data exists for the given tab_id, return the map as is
+    if (!wsData) return socketIoDataMap;
+    // Clean up listeners and delete the socket data
+    socketIoDataMap.delete(_tabId);
+    notifications.error(
+      `Failed to connect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
+    );
+    return socketIoDataMap;
+  });
+};
+
+/**
+ * Sends a Socket.IO event and message to a specific tab and handles the response.
+ * @param _tabId - The ID of the tab to which the message should be sent.
+ * @param _eventMessage - The event message to be sent to the SocketIO.
+ * @param _eventName - The event name to be sent to the SocketIO.
+ *
+ */
+const sendSocketIoMessage = async (
+  _tabId: string,
+  _eventMessage: string,
+  _eventName: string,
+): Promise<void> => {
+  let url = "";
+  socketIoDataStore.update((socketIoDataMap) => {
+    const wsData = socketIoDataMap.get(_tabId);
+    if (wsData) {
+      url = wsData.url;
+    }
+    return socketIoDataMap;
+  });
+
+    socketIoDataStore.update((webSocketDataMap) => {
+     const wsData = webSocketDataMap.get(_tabId);
+      const event = [];
+      event.push(_eventName);
+      event.push(_eventMessage || "(empty)");
+      if (wsData) {
+        const socketInsta = wsData.connectListener;
+        socketInsta.emit(_eventName, _eventMessage);
+        wsData.messages.unshift({
+          data: JSON.stringify(event),
+          transmitter: SocketIORequestMessageTransmitterTabEnum.SENDER,
+          timestamp: formatTime(new Date()),
+          uuid: uuidv4(),
+        });
+        webSocketDataMap.set(_tabId, wsData);
+      } 
+      return webSocketDataMap;
+    });
+};
+
+/**
+ * Connects to a Socket.IO at a specified URL for a specific tab and handles the response.
+ * @param _url - Socket.IO server URL to connect.
+ * @param _tabId - ID of the tab for which the Socket.IO connection should be established.
+ * @param _headers - Headers to be sent with the Socket.IO connection.
+*/
+const connectSocketIo = async (
+  _url: string,
+  _tabId: string,
+  _headers: string,
+): Promise<void> => {
+  console.table({ URL: _url, Headers: _headers });
+  const selectedAgent = localStorage.getItem("selectedAgent") as WorkspaceUserAgentBaseEnum;
+  socketIoDataStore.update((webSocketDataMap) => {
+    webSocketDataMap.set(_tabId, {
+      messages: [],
+      agent: selectedAgent,
+      status: SocketIORequestStatusTabEnum.CONNECTING,
+      search: "",
+      contentType: RequestDataTypeEnum.TEXT,
+      body: "",
+      filter: "All Messages",
+      url: _url,
+      connectListener: null,
+    });
+
+    return webSocketDataMap;
+  });
+
+  let urlObject: URL;
+  try {
+    let validUrl = _url;
+    if (!_url.startsWith("http://") && !_url.startsWith("https://")) {
+      validUrl = "http://" + _url;
+    }
+    urlObject = new URL(validUrl);
+  } catch (e) {
+    console.error(e);
+    removeSocketIoDataFromMap(_tabId);
+    return;
+  }
+  constants.API_URL
+  if (selectedAgent === WorkspaceUserAgentBaseEnum.CLOUD_AGENT) {
+    const proxySocketIO = io(`${constants.SOCKET_IO_API_URL}/`, {
+      path: "/socket.io", // Path to the WebSocket gateway
+      transports: ["websocket"], // Ensure the transport is set to WebSocket
+      query: {
+        targetUrl: urlObject.origin || "", 
+        namespace: urlObject.pathname || "/", 
+        headers: _headers 
+      },
+      reconnection: false, 
+    });
+  
+    // store listeners inside map against tab id for future removal
+    insertSocketIoListenerToMap(
+      proxySocketIO,
+      _tabId,
+    );
+    
+    proxySocketIO.onAny(async(event, args) => {
+      if(event === "sparrow_internal_connect_error"){ // Connect_error listener from the target Socket.IO.
+        console.error(new DOMException(args + " (URL Issue)", "ConnectError"));
+        removeSocketIoDataFromMap(_tabId);
+      }
+      else if(event === "sparrow_internal_connect"){ // Connect listener from the target Socket.IO.
+        const message = processConnectEvent(_url);
+        insertSocketIoDataToMap(
+          _tabId,
+          message,
+          SocketIORequestMessageTransmitterTabEnum.CONNECTER,
+        );
+        notifications.success(
+          `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
+        );
+      }
+      else if(event === "sparrow_internal_disconnect"){ // Disconnect listener from the target Socket.IO.
+        console.error(new DOMException(args + " (Connection Lost)", "DisconnectError"));
+         const message = processDisconnectEvent(_url);
+          insertSocketIoDataToMap(
+            _tabId,
+            message,
+            SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR,
+          );
+      }
+      else{ // Message listener from the target Socket.IO.
+        const message = await processMessageEvent(_tabId, {
+          payload: {
+            event: event,
+            message: args
+          }
+        });
+        if(message){
+          insertSocketIoDataToMap(_tabId, message, SocketIORequestMessageTransmitterTabEnum.RECEIVER);
+        }
+      }
+    });
+
+     // Listen for connect_error events from the proxy Socket.IO.
+     proxySocketIO.on("connect_error", (err) => {
+      console.error(new DOMException(err + " (Proxy Failed)", "ConnectError"));
+      removeSocketIoDataFromMap(_tabId);
+    });
+
+  }
+  else{
+    const parsedHeaders = JSON.parse(_headers as string);
+      const headersObject: { [key: string]: string } = parsedHeaders.reduce((acc: Record<string, string> , { key, value }: {key: string, value: string}) => {
+        acc[key] = value;
+        return acc;
+      }, {} as { [key: string]: string });
+    delete headersObject["Sec-WebSocket-Key"];
+    delete headersObject["Sec-WebSocket-Version"];
+
+    const targetSocketIO = io(`${urlObject.origin || ""}${urlObject.pathname || "/"}`, {
+      transports: ["websocket"],  
+      query: headersObject,
+      reconnection: false, 
+    });
+
+     // store listeners inside map against tab id for future removal
+     insertSocketIoListenerToMap(
+      targetSocketIO ,
+      _tabId,
+    );
+
+    // Listen for connect events from the target Socket.IO.
+    targetSocketIO.on("connect", () => {
+      const message = processConnectEvent(_url);
+      insertSocketIoDataToMap(
+        _tabId,
+        message,
+        SocketIORequestMessageTransmitterTabEnum.CONNECTER,
+      );
+      notifications.success(
+        `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
+      );
+    });
+    
+    // Listen for connect_error events from the target Socket.IO.
+    targetSocketIO.on("connect_error", (err) => {
+      console.error(new DOMException(err + " (URL Issue)", "ConnectError"));
+      removeSocketIoDataFromMap(_tabId);
+    });
+    
+    // Listen for disconnect events from the target Socket.IO.
+    targetSocketIO.on("disconnect", (err) => {
+      console.error(new DOMException(err + " (Connection Lost)", "DisconnectError"));
+       const message = processDisconnectEvent(_url);
+      insertSocketIoDataToMap(
+        _tabId,
+        message,
+        SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR,
+      );
+    });
+
+    // Listen for all dynamic events from the target Socket.IO.
+    targetSocketIO.onAny(async(event: string, ...args: any[]) => {
+      const message = await processMessageEvent(_tabId, {
+        payload: {
+          event: event,
+          message: args
+        }
+      });
+      if(message){
+        insertSocketIoDataToMap(_tabId, message, SocketIORequestMessageTransmitterTabEnum.RECEIVER);
+      }
+    });
+  }
+};
+
+/**
+ * Disconnects a Socket.IO connection for a specific tab and handles the response.
+ * @param _tabId - The ID of the tab for which the Socket.IO connection should be disconnected.
+ */
+const disconnectSocketIo = async (_tabId: string): Promise<void> => {
+  let url = "";
+  socketIoDataStore.update((socketIoDataMap) => {
+    const wsData = socketIoDataMap.get(_tabId);
+
+    if (wsData) {
+      url = wsData.url;
+      wsData.status = SocketIORequestStatusTabEnum.DISCONNECTING;
+      wsData.url = "";
+      socketIoDataMap.set(_tabId, wsData);
+    }
+    return socketIoDataMap;
+  });
+
+    socketIoDataStore.update((webSocketDataMap) => {
+      const wsData = webSocketDataMap.get(_tabId);
+       if (wsData) {
+         const socketInsta = wsData.connectListener;
+        if(wsData.agent === WorkspaceUserAgentBaseEnum.CLOUD_AGENT){
+          socketInsta?.emit("sparrow_internal_disconnect","client io disconnect");
+        }
+        else{
+          socketInsta?.disconnect();
+        }
+       } 
+       return webSocketDataMap;
+     });
+};
+
+
 export {
   makeRequest,
   getAuthHeaders,
@@ -558,5 +985,7 @@ export {
   connectWebSocket,
   sendMessage,
   disconnectWebSocket,
-  // getHeaders,
+  sendSocketIoMessage,
+  connectSocketIo,
+  disconnectSocketIo,
 };

@@ -26,8 +26,16 @@
 
   // Function to update the editor view when changes occur
   const updateExtensionView = EditorView.updateListener.of((update) => {
-    const userInput = update.state.doc.toString();
-    dispatch("change", userInput);
+    if (update.docChanged) {
+      const isAutoChange = update?.transactions?.some((transaction) =>
+        transaction?.annotations?.some((annotation) => annotation?.autoChange),
+      );
+      if (!isAutoChange) {
+        // only hits for input, blur etc type of events.
+        const content = update.state.doc.toString(); // Get the new content
+        dispatch("change", content); // Dispatch the new content to parent.
+      }
+    }
   });
 
   function initalizeCodeMirrorEditor(value: string) {
@@ -35,8 +43,8 @@
     extensions = [
       basicSetup,
       basicTheme,
-      updateExtensionView,
       languageConf.of([]),
+      updateExtensionView,
       EditorView.lineWrapping, // Enable line wrapping
       EditorState.readOnly.of(!isEditable ? true : false),
       CreatePlaceHolder(placeholder),
@@ -71,6 +79,7 @@
           to: codeMirrorView.state.doc.length,
           insert: value,
         },
+        annotations: [{ autoChange: true }],
       });
     }
     handleCodeMirrorSyntaxFormat(

@@ -321,7 +321,7 @@
           displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            (!isWebApp && !collection.activeSync) ||
+            !collection.activeSync ||
             (explorer?.source === "USER" && collection.activeSync)
               ? false
               : true,
@@ -371,7 +371,7 @@
       >
         <button
           style="padding-left: 30px;"
-          class="main-folder pe-2 d-flex align-items-center pe-0 border-0 bg-transparent"
+          class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
           on:click|preventDefault={() => {
             if (!isRenaming) {
@@ -482,7 +482,7 @@
           >
             <button
               id={`show-more-folder-${explorer.id}`}
-              class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+              class="threedot-icon-container border-0 p-0 rounded d-flex justify-content-center align-items-center {showMenu
                 ? 'threedot-active'
                 : ''}"
               style="transform: rotate(90deg);"
@@ -562,7 +562,7 @@
           {activeTabPath}
         />
       </div>
-    {:else if explorer.type === ItemType.WEB_SOCKET && !isWebApp}
+    {:else if explorer.type === ItemType.WEB_SOCKET}
       <div style="cursor:pointer;">
         <WebSocket
           bind:userRole
@@ -576,7 +576,7 @@
           {activeTabPath}
         />
       </div>
-    {:else if explorer.type === ItemType.SOCKET_IO && !isWebApp}
+    {:else if explorer.type === ItemType.SOCKET_IO}
       <div style="cursor:pointer;">
         <SocketIo
           bind:userRole
@@ -700,6 +700,7 @@
     color: var(--white-color);
     padding-left: 0;
     outline: none;
+    border-radius: 2px !important;
   }
   .renameInputFieldFolder:focus {
     border: 1px solid var(--border-primary-300) !important;

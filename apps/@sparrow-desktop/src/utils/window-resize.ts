@@ -1,18 +1,11 @@
-import { platform } from "@tauri-apps/plugin-os";
 import { currentMonitor, getCurrentWindow } from "@tauri-apps/api/window";
 
-export const resizeWindowOnLogin = async () => {
+export const maximizeWindow = async () => {
   const isMaximized = await getCurrentWindow().isMaximized();
   if (!isMaximized) {
-    const platformName = await platform();
-    if (platformName == "macos") {
-      const resizeButton = document.getElementById("resize-button");
-      if (resizeButton) {
-        resizeButton.click();
-      }
-    } else {
-      await getCurrentWindow().maximize();
-    }
+    await getCurrentWindow().toggleMaximize();
+    await getCurrentWindow().setFocus();
+    await getCurrentWindow().center();
   }
 };
 
