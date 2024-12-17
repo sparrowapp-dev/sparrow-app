@@ -14,7 +14,9 @@
         "resizable": true,
         "title": "Sparrow",
         "shadow": true,
-        "focus": true
+        "focus": true,
+        "dragDropEnabled": false,
+        "maximized": true
       }
     ],
     "withGlobalTauri": false
@@ -67,7 +69,6 @@
   "identifier": "dev.sparrowapp.desktop",
   "plugins": {
     "updater": {
-      "createUpdaterArtifacts": true,
       "windows": {
         "installMode": "passive"
       },
@@ -84,5 +85,5 @@
     }
   },
   "productName": "Sparrow",
-  "version": "2.12.0"
+  "version": "2.13.0"
 }

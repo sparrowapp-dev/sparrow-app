@@ -38,5 +38,5 @@ export async function setScaleFactorToDb(windowScaleFactor: string) {
 export async function getScaleFactor() {
   const windowScaleFactor =
     await windowSettingRepository.getWindowSetting("windowScaleFactor");
-  return windowScaleFactor._data.value ?? "1";
+  return (windowScaleFactor && windowScaleFactor._data.value) ?? "1";
 }

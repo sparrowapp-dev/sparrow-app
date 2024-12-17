@@ -12,6 +12,12 @@
     leftPanelCollapse,
   } from "@sparrow/teams/stores";
 
+  import {
+    RecentApis,
+    RecentWorkspace,
+    TeamList,
+  } from "@sparrow/teams/features";
+
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import TeamExplorerPage from "../TeamExplorerPage/TeamExplorerPage.svelte";
   import { TeamsViewModel } from "./Teams.ViewModel";
@@ -22,7 +28,14 @@
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
+  const setOpenTeam = _viewModel.setOpenTeam;
+  const disableNewInviteTag = _viewModel.disableNewInviteTag;
+  const modifyTeam = _viewModel.modifyTeam;
 
+  let isCreateTeamModalOpen: boolean = false;
+  const collectionList = _viewModel.collection;
+  const onApiClick = _viewModel.handleApiClick;
+  const OnWorkspaceSwitch = _viewModel.handleSwitchWorkspace;
   let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
@@ -97,45 +110,9 @@
 
   let activeIndex;
 
-  const refreshTabs = () => {
-    return [
-      {
-        name: "Workspaces",
-        id: TeamTabsEnum.WORKSPACES,
-        count: $openTeam?.workspaces?.length,
-        visible: true,
-        disabled: isGuestUser === true ? true : false,
-      },
-      {
-        name: "Members",
-        id: TeamTabsEnum.MEMBERS,
-        count: $openTeam?.users?.length,
-        visible: true,
-        disabled: isGuestUser === true ? true : false,
-      },
-      {
-        name: "Settings",
-        id: TeamTabsEnum.SETTINGS,
-        count: 0,
-        visible: $openTeam?.owner === userId,
-        disabled: isGuestUser === true ? true : false,
-      },
-    ];
-  };
-
-  let teamTabs = [];
   $: {
     if ($openTeam) {
-      setTimeout(() => {
-        activeIndex = $openTeam?.teamId;
-        teamTabs = refreshTabs();
-      }, 0);
-    }
-  }
-
-  $: {
-    if (isGuestUser) {
-      teamTabs = refreshTabs();
+      activeIndex = $openTeam?.teamId;
     }
   }
 
@@ -246,14 +223,35 @@
           >
             <div style="flex:1; overflow:auto;">
               <!--Teams list-->
-              <section class="d-flex flex-column" style="max-height:33%;">
-                <ListTeamNavigation
-                  tabs={teamTabs}
-                  onUpdateActiveTab={_viewModel.updateActiveTeamTab}
-                  activeTeamTab={$activeTeamTab}
-                  openTeam={openTeamData}
-                />
-              </section>
+              <TeamList
+                bind:isCreateTeamModalOpen
+                {isGuestUser}
+                {setOpenTeam}
+                teamList={$teamList}
+                {disableNewInviteTag}
+                {modifyTeam}
+                bind:activeIndex
+              />
+              <!-- Recent APIs-->
+              {#if !isGuestUser}
+                <section class="d-flex flex-column" style="max-height:33%;">
+                  <RecentApis
+                    tabList={$tabList}
+                    data={workspaces}
+                    collectionList={$collectionList}
+                    {onApiClick}
+                  />
+                </section>
+
+                <!-- Recent Workspace Section -->
+                <section class="d-flex flex-column" style="max-height:33%;">
+                  <RecentWorkspace
+                    data={workspaces}
+                    {openTeam}
+                    {OnWorkspaceSwitch}
+                  />
+                </section>
+              {/if}
             </div>
 
             <!-- github repo section -->

@@ -5,7 +5,7 @@
   export let isCreateTeamModalOpen;
   export let isGuestUser;
   export let setOpenTeam;
-  export let teamList;
+  export let teamList = [];
   export let disableNewInviteTag;
   export let modifyTeam;
   export let activeIndex;
