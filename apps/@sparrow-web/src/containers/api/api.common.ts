@@ -258,13 +258,14 @@ function formatTime(date) {
 const sendMessage = async (tab_id: string, message: string) => {
   const selectedAgent = localStorage.getItem("selectedAgent");
 
-  if (selectedAgent === "Browser Agent") {
-    try {
-      let listener;
-      webSocketDataStore.update((webSocketDataMap) => {
-        const wsData = webSocketDataMap.get(tab_id);
-        if (wsData) {
-          listener = wsData.listener;
+  try {
+    let listener;
+    webSocketDataStore.update((webSocketDataMap) => {
+      const wsData = webSocketDataMap.get(tab_id);
+      if (wsData) {
+        listener = wsData.listener;
+        // Check for the original agent type from the store, not the currently selected agent
+        if (wsData.agent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT) {
           wsData.messages.unshift({
             data: message,
             transmitter: "sender",
@@ -274,40 +275,41 @@ const sendMessage = async (tab_id: string, message: string) => {
           listener.send(message);
           webSocketDataMap.set(tab_id, wsData);
         }
-        return webSocketDataMap;
-      });
-    } catch (e) {
-      console.error(e);
-      notifications.error("Failed to send message");
-      return error("error");
-    }
-  } else if (selectedAgent === "Cloud Agent") {
-    try {
-      const proxyUrl = "http://localhost:3000/proxy/ws-message";
-      await axios.post(proxyUrl, {
-        tabId: tab_id,
-        message: message,
-      });
-
-      webSocketDataStore.update((webSocketDataMap) => {
-        const wsData = webSocketDataMap.get(tab_id);
-        if (wsData) {
-          wsData.messages.unshift({
-            data: message,
-            transmitter: "sender",
-            timestamp: formatTime(new Date()),
-            uuid: uuidv4(),
-          });
-          webSocketDataMap.set(tab_id, wsData);
-        }
-        return webSocketDataMap;
-      });
-    } catch (e) {
-      console.error(e);
-      notifications.error("Failed to send message");
-      return error("error");
-    }
+      }
+      return webSocketDataMap;
+    });
+  } catch (e) {
+    console.error(e);
+    notifications.error("Failed to send message");
+    return error("error");
   }
+
+  // else if (selectedAgent === "Cloud Agent") {
+  //   try {
+  //     const proxyUrl = "http://localhost:3000/proxy/ws-message";
+  //     await axios.post(proxyUrl, {
+  //       tabId: tab_id,
+  //       message: message,
+  //     });
+  //     webSocketDataStore.update((webSocketDataMap) => {
+  //       const wsData = webSocketDataMap.get(tab_id);
+  //       if (wsData) {
+  //         wsData.messages.unshift({
+  //           data: message,
+  //           transmitter: "sender",
+  //           timestamp: formatTime(new Date()),
+  //           uuid: uuidv4(),
+  //         });
+  //         webSocketDataMap.set(tab_id, wsData);
+  //       }
+  //       return webSocketDataMap;
+  //     });
+  //   } catch (e) {
+  //     console.error(e);
+  //     notifications.error("Failed to send message");
+  //     return error("error");
+  //   }
+  // }
 };
 
 /**
@@ -332,7 +334,6 @@ const disconnectWebSocket = async (tab_id: string) => {
     if (wsData) {
       const socketInsta = wsData.listener;
       if (wsData.agent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT) {
-        debugger;
         wsData.messages.unshift({
           data: `Disconnected from ${url}`,
           transmitter: "disconnector",
@@ -346,37 +347,6 @@ const disconnectWebSocket = async (tab_id: string) => {
     }
     return webSocketDataMap;
   });
-
-  const selectedAgent = localStorage.getItem("selectedAgent");
-
-  if (selectedAgent === "Browser Agent") {
-    try {
-      let listener;
-      webSocketDataStore.update((webSocketDataMap) => {
-        const wsData = webSocketDataMap.get(tab_id);
-        if (wsData) {
-          listener = wsData.listener;
-          wsData.messages.unshift({
-            data: `Disconnected from ${url}`,
-            transmitter: "disconnector",
-            timestamp: formatTime(new Date()),
-            uuid: uuidv4(),
-          });
-          wsData.status = "disconnected";
-          webSocketDataMap.set(tab_id, wsData);
-          if (listener) {
-            listener.close();
-          }
-        }
-        return webSocketDataMap;
-      });
-      notifications.success("WebSocket disconnected successfully.");
-    } catch (e) {
-      console.error(e);
-      notifications.error("Failed to disconnect WebSocket. Please try again.");
-      return error("error");
-    }
-  }
 
   // else if (selectedAgent === "Cloud Agent") {
   //   try {
@@ -467,6 +437,13 @@ const connectWebSocket = async (
 
       const ws = new WebSocket(url);
 
+      ws.addEventListener("close", (event) => {
+        console.log("WebSocket closed", event);
+      });
+      ws.addEventListener("error", (event) => {
+        debugger;
+        console.log("WebSocket errorred", event);
+      });
       webSocketDataStore.update((webSocketDataMap) => {
         const wsData = webSocketDataMap.get(tabId);
         if (wsData) {
@@ -520,9 +497,16 @@ const connectWebSocket = async (
           });
           reject(new Error("Failed to connect to WebSocket"));
         };
+        ws.onclose = () => {
+          disconnectWebSocket(tabId);
+        };
       });
     } catch (error) {
       console.error(error);
+      webSocketDataStore.update((webSocketDataMap) => {
+        webSocketDataMap.delete(tabId);
+        return webSocketDataMap;
+      });
       notifications.error("Failed to connect WebSocket");
       throw error;
     }
