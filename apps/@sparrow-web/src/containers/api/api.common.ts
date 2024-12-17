@@ -247,14 +247,37 @@ function formatTime(date) {
 const sendMessage = async (tab_id: string, message: string) => {
   const selectedAgent = localStorage.getItem("selectedAgent");
 
-  if (typeof window !== "undefined" && selectedAgent === "Browser Agent") {
+  if (selectedAgent === "Browser Agent") {
     try {
-      const ws = (window as any).webSocketInstances?.[tab_id];
-      if (!ws) {
-        throw new Error("WebSocket not connected");
-      }
+      let listener;
+      webSocketDataStore.update((webSocketDataMap) => {
+        const wsData = webSocketDataMap.get(tab_id);
+        if (wsData) {
+          listener = wsData.listener;
+          wsData.messages.unshift({
+            data: message,
+            transmitter: "sender",
+            timestamp: formatTime(new Date()),
+            uuid: uuidv4(),
+          });
+          listener.send(message);
+          webSocketDataMap.set(tab_id, wsData);
+        }
+        return webSocketDataMap;
+      });
+    } catch (e) {
+      console.error(e);
+      notifications.error("Failed to send message");
+      return error("error");
+    }
+  } else if (selectedAgent === "Cloud Agent") {
+    try {
+      const proxyUrl = "http://localhost:3000/proxy/ws-message";
+      await axios.post(proxyUrl, {
+        tabId: tab_id,
+        message: message,
+      });
 
-      ws.send(message);
       webSocketDataStore.update((webSocketDataMap) => {
         const wsData = webSocketDataMap.get(tab_id);
         if (wsData) {
@@ -273,33 +296,6 @@ const sendMessage = async (tab_id: string, message: string) => {
       notifications.error("Failed to send message");
       return error("error");
     }
-  } else {
-    // Existing Tauri implementation
-    await invoke("send_websocket_message", { tabid: tab_id, message: message })
-      .then(async (data: string) => {
-        try {
-          webSocketDataStore.update((webSocketDataMap) => {
-            const wsData = webSocketDataMap.get(tab_id);
-            if (wsData) {
-              wsData.messages.unshift({
-                data: message,
-                transmitter: "sender",
-                timestamp: formatTime(new Date()),
-                uuid: uuidv4(),
-              });
-              webSocketDataMap.set(tab_id, wsData);
-            }
-            return webSocketDataMap;
-          });
-        } catch (e) {
-          console.error(e);
-          return error("error");
-        }
-      })
-      .catch((e) => {
-        console.error(e);
-        return error("error");
-      });
   }
 };
 
@@ -321,69 +317,58 @@ const disconnectWebSocket = async (tab_id: string) => {
 
   const selectedAgent = localStorage.getItem("selectedAgent");
 
-  if (typeof window !== "undefined" && selectedAgent === "Browser Agent") {
+  if (selectedAgent === "Browser Agent") {
     try {
-      const ws = (window as any).webSocketInstances?.[tab_id];
-      if (ws) {
-        ws.close();
-        delete (window as any).webSocketInstances[tab_id];
-
-        webSocketDataStore.update((webSocketDataMap) => {
-          const wsData = webSocketDataMap.get(tab_id);
-          if (wsData) {
-            wsData.messages.unshift({
-              data: `Disconnected from ${url}`,
-              transmitter: "disconnector",
-              timestamp: formatTime(new Date()),
-              uuid: uuidv4(),
-            });
-            wsData.status = "disconnected";
-            webSocketDataMap.set(tab_id, wsData);
+      let listener;
+      webSocketDataStore.update((webSocketDataMap) => {
+        const wsData = webSocketDataMap.get(tab_id);
+        if (wsData) {
+          listener = wsData.listener;
+          wsData.messages.unshift({
+            data: `Disconnected from ${url}`,
+            transmitter: "disconnector",
+            timestamp: formatTime(new Date()),
+            uuid: uuidv4(),
+          });
+          wsData.status = "disconnected";
+          webSocketDataMap.set(tab_id, wsData);
+          if (listener) {
+            listener.close();
           }
-          return webSocketDataMap;
-        });
-        notifications.success("WebSocket disconnected successfully.");
-      }
+        }
+        return webSocketDataMap;
+      });
+      notifications.success("WebSocket disconnected successfully.");
     } catch (e) {
       console.error(e);
       notifications.error("Failed to disconnect WebSocket. Please try again.");
       return error("error");
     }
-  } else {
-    // Existing Tauri implementation
-    await invoke("disconnect_websocket", { tabid: tab_id })
-      .then(async (data: string) => {
-        try {
-          webSocketDataStore.update((webSocketDataMap) => {
-            const wsData = webSocketDataMap.get(tab_id);
-            if (wsData) {
-              wsData.messages.unshift({
-                data: `Disconnected from ${url}`,
-                transmitter: "disconnector",
-                timestamp: formatTime(new Date()),
-                uuid: uuidv4(),
-              });
-              wsData.status = "disconnected";
-              webSocketDataMap.set(tab_id, wsData);
-            }
-            return webSocketDataMap;
+  } else if (selectedAgent === "Cloud Agent") {
+    try {
+      const proxyUrl = "http://localhost:3000/proxy/ws-disconnect";
+      await axios.post(proxyUrl, { tabId: tab_id });
+
+      webSocketDataStore.update((webSocketDataMap) => {
+        const wsData = webSocketDataMap.get(tab_id);
+        if (wsData) {
+          wsData.messages.unshift({
+            data: `Disconnected from ${url}`,
+            transmitter: "disconnector",
+            timestamp: formatTime(new Date()),
+            uuid: uuidv4(),
           });
-          notifications.success("WebSocket disconnected successfully.");
-        } catch (e) {
-          console.error(e);
-          notifications.error(
-            "Failed to disconnect WebSocket. Please try again.",
-          );
-          return error("error");
+          wsData.status = "disconnected";
+          webSocketDataMap.set(tab_id, wsData);
         }
-      })
-      .catch((e) => {
-        console.error(e);
-        notifications.error(
-          "Failed to disconnect WebSocket. Please try again.",
-        );
-        return error("error");
+        return webSocketDataMap;
       });
+      notifications.success("WebSocket disconnected successfully.");
+    } catch (e) {
+      console.error(e);
+      notifications.error("Failed to disconnect WebSocket. Please try again.");
+      return error("error");
+    }
   }
 };
 
@@ -428,10 +413,8 @@ const connectWebSocket = async (
 
   if (selectedAgent === "Browser Agent") {
     try {
-      // Parse headers
       const headers = JSON.parse(requestHeaders);
 
-      // Initialize webSocket data
       webSocketDataStore.update((webSocketDataMap) => {
         webSocketDataMap.set(tabId, {
           messages: [],
@@ -445,15 +428,16 @@ const connectWebSocket = async (
         return webSocketDataMap;
       });
 
-      // Create WebSocket instance
       const ws = new WebSocket(url);
 
-      // Store WS instance
-      if (typeof window !== "undefined") {
-        (window as any).webSocketInstances =
-          (window as any).webSocketInstances || {};
-        (window as any).webSocketInstances[tabId] = ws;
-      }
+      webSocketDataStore.update((webSocketDataMap) => {
+        const wsData = webSocketDataMap.get(tabId);
+        if (wsData) {
+          wsData.listener = ws;
+          webSocketDataMap.set(tabId, wsData);
+        }
+        return webSocketDataMap;
+      });
 
       return new Promise((resolve, reject) => {
         ws.onopen = () => {
@@ -505,69 +489,91 @@ const connectWebSocket = async (
       notifications.error("Failed to connect WebSocket");
       throw error;
     }
-  } else {
-    // Existing Tauri implementation
-    await invoke("connect_websocket", {
-      url: url,
-      httpurl: convertWebSocketUrl(url),
-      tabid: tabId,
-      headers: requestHeaders,
-    })
-      .then(async (data: string) => {
-        try {
-          if (data) {
-            const dt = JSON.parse(data);
+  } else if (selectedAgent === "Cloud Agent") {
+    try {
+      webSocketDataStore.update((webSocketDataMap) => {
+        webSocketDataMap.set(tabId, {
+          messages: [],
+          status: "connecting",
+          search: "",
+          contentType: RequestDataTypeEnum.TEXT,
+          body: "",
+          filter: "All Messages",
+          url: url,
+        });
+        return webSocketDataMap;
+      });
+
+      const proxyUrl = "http://localhost:9000/proxy/ws-connect";
+      const response = await axios.post(proxyUrl, {
+        tabId,
+        targetUrl: url,
+        headers: requestHeaders,
+      });
+
+      if (response.data.success) {
+        webSocketDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tabId);
+          if (wsData) {
+            wsData.messages.unshift({
+              data: `Connected to ${url}`,
+              transmitter: "connecter",
+              timestamp: formatTime(new Date()),
+              uuid: uuidv4(),
+            });
+            wsData.status = "connected";
+            webSocketDataMap.set(tabId, wsData);
           }
+          return webSocketDataMap;
+        });
+        notifications.success("WebSocket connected successfully");
+
+        // Set up event source for receiving messages
+        const eventSource = new EventSource(
+          `http://localhost:3000/proxy/ws-events/${tabId}`,
+        );
+
+        eventSource.onmessage = (event) => {
+          const data = JSON.parse(event.data);
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
               wsData.messages.unshift({
-                data: `Connected from ${url}`,
-                transmitter: "connecter",
+                data: data.message,
+                transmitter: "receiver",
                 timestamp: formatTime(new Date()),
                 uuid: uuidv4(),
               });
-              wsData.status = "connected";
               webSocketDataMap.set(tabId, wsData);
             }
             return webSocketDataMap;
           });
-          notifications.success("WebSocket connected successfully");
+        };
 
-          listen(`ws_message_${tabId}`, (event) => {
-            webSocketDataStore.update((webSocketDataMap) => {
-              const wsData = webSocketDataMap.get(tabId);
-              if (wsData) {
-                wsData.messages.unshift({
-                  data: event.payload,
-                  transmitter: "receiver",
-                  timestamp: formatTime(new Date()),
-                  uuid: uuidv4(),
-                });
-                webSocketDataMap.set(tabId, wsData);
-              }
-              return webSocketDataMap;
-            });
+        eventSource.onerror = () => {
+          eventSource.close();
+          webSocketDataStore.update((webSocketDataMap) => {
+            const wsData = webSocketDataMap.get(tabId);
+            if (wsData) {
+              wsData.status = "disconnected";
+              webSocketDataMap.set(tabId, wsData);
+            }
+            return webSocketDataMap;
           });
-        } catch (e) {
-          console.error(e);
-          notifications.error(
-            "Failed to fetch WebSocket response. Please try again.",
-          );
-          return error("error");
-        }
-      })
-      .catch((e) => {
-        console.error(e);
-        webSocketDataStore.update((webSocketDataMap) => {
-          webSocketDataMap.delete(tabId);
-          return webSocketDataMap;
-        });
-        notifications.error("Failed to connect WebSocket. Please try again.");
-        return error("error");
+        };
+      }
+    } catch (error) {
+      console.error(error);
+      notifications.error("Failed to connect WebSocket");
+      webSocketDataStore.update((webSocketDataMap) => {
+        webSocketDataMap.delete(tabId);
+        return webSocketDataMap;
       });
+      throw error;
+    }
   }
 };
+
 /**
  * Invoke RPC Communication
  * @param url - Request URL
@@ -591,7 +597,8 @@ const makeHttpRequestV2 = async (
   try {
     let response;
     if (selectedAgent === "Cloud Agent") {
-      const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
+      // const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
+      const proxyUrl = "http://localhost:3000/proxy/http-request";
       response = await axios({
         data: { url, method, headers, body, contentType },
         url: proxyUrl,
