@@ -376,7 +376,7 @@
         },
         displayText: "Add WebSocket",
         disabled: false,
-        hidden: isWebApp ? true : false,
+        hidden: false,
         icon: SocketIcon,
       },
       {

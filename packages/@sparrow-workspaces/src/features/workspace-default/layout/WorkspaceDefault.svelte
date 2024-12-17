@@ -70,6 +70,16 @@
       }}
     />
     <Card
+      icon={SocketIcon}
+      label="WebSocket"
+      iconColor="var(--text-primary-300)"
+      iconSize={"20px"}
+      onClick={() => {
+        onItemCreated("web-socket", {});
+        MixpanelEvent(Events.WebSocket_Button);
+      }}
+    />
+    <Card
       icon={SocketIoIcon}
       label={`${SocketIORequestDefaultAliasBaseEnum.NAME}`}
       iconColor="var(--text-primary-300)"
@@ -83,16 +93,6 @@
       }}
     />
     {#if !isWebApp}
-      <Card
-        icon={SocketIcon}
-        label="WebSocket"
-        iconColor="var(--text-primary-300)"
-        iconSize={"20px"}
-        onClick={() => {
-          onItemCreated("web-socket", {});
-          MixpanelEvent(Events.WebSocket_Button);
-        }}
-      />
       <Card
         icon={GraphIcon}
         label={`${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
