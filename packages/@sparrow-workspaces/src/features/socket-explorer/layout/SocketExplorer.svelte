@@ -67,7 +67,7 @@
   export let onUpdateContentType;
   export let onClearInput;
   export let onUpdateFilterType;
-
+  export let isWebApp = false;
   let isExposeSaveAsSocket = false;
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsSocket = flag;
@@ -195,7 +195,7 @@
                         <div class="h-100 d-flex flex-column">
                           <ResponsePreviewNavigator
                             {webSocket}
-                            isWebApp={true}
+                            {isWebApp}
                             {onUpdateContentType}
                           />
                           <div class="pt-2"></div>

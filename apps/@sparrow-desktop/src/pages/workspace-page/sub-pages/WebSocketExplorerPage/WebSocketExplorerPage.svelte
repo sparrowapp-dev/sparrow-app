@@ -145,6 +145,7 @@
   webSocket={webSocketData}
   {environmentVariables}
   {isGuestUser}
+  isWebApp={true}
   {isLoginBannerActive}
   onUpdateRequestUrl={_viewModel.updateRequestUrl}
   onUpdateRequestParams={_viewModel.updateParams}
