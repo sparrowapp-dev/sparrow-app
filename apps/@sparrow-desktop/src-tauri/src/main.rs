@@ -86,13 +86,19 @@ use rust_socketio::{
     Event as SocketIoEvent, Payload as SocketIoPayload, TransportType,
 };
 use tokio::sync::Mutex as SocketMutex;
+use tauri_plugin_os::platform;
+
 
 // MacOs Window Titlebar Config Imports
-use cocoa::appkit::{NSWindow, NSWindowButton, NSWindowStyleMask, NSWindowTitleVisibility};
-use tauri::{Runtime, WebviewWindow};
-use tauri_plugin_os::platform;
+#[cfg(target_os = "macos")]
 #[macro_use]
 extern crate objc;
+extern crate cocoa;
+
+#[cfg(target_os = "macos")]
+use cocoa::appkit::{NSWindow, NSWindowButton, NSWindowStyleMask, NSWindowTitleVisibility};
+use tauri::{Runtime, WebviewWindow};
+
 
 pub trait WindowExt {
     fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool);
@@ -100,6 +106,7 @@ pub trait WindowExt {
 }
 
 // Implementation for WebviewWindow
+#[cfg(target_os = "macos")]
 impl<R: Runtime> WindowExt for WebviewWindow<R> {
     fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool) {
         unsafe {
@@ -152,6 +159,18 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
                 let _: () = msg_send![button, setHidden: visibility];
             }
         }
+    }
+}
+
+// Windows/Linux placeholder implementation (no-op)
+#[cfg(not(target_os = "macos"))]
+impl<R: Runtime> WindowExt for WebviewWindow<R> {
+    fn set_transparent_titlebar(&self, _title_transparent: bool, _remove_toolbar: bool) {
+        // No-op: Not supported on Windows or Linux
+    }
+
+    fn set_toolbar_visibility(&self, _visible: bool) {
+        // No-op: Not supported on Windows or Linux
     }
 }
 
