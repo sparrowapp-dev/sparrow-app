@@ -88,14 +88,9 @@ use rust_socketio::{
 use tokio::sync::Mutex as SocketMutex;
 
 // MacOs Window Titlebar Config Imports
-#[cfg(target_os = "macos")]
 use cocoa::appkit::{NSWindow, NSWindowButton, NSWindowStyleMask, NSWindowTitleVisibility};
-use objc::runtime::NO;
-#[cfg(target_os = "macos")]
-use objc::runtime::YES;
 use tauri::{Runtime, WebviewWindow};
 use tauri_plugin_os::platform;
-#[cfg(target_os = "macos")]
 #[macro_use]
 extern crate objc;
 
