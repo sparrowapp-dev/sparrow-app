@@ -48,6 +48,5 @@ tauri-plugin-shell = "2.2.0"
 tauri-plugin-dialog = "2.2.0"
 tauri-plugin-fs = "2.2.0"
 tauri-plugin-deep-link = "2.2.0"
-[target.'cfg(target_os = "macos")'.dependencies]
 objc = "0.2"
 cocoa = "0.26.0"
