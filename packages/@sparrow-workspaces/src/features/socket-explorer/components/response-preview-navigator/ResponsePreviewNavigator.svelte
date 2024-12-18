@@ -22,6 +22,7 @@
 
   export let webSocket;
   export let onUpdateContentType;
+  export let isWebApp = false;
 
   let fileExtension: string;
   let MessageTransmitter = "Type";
@@ -194,14 +195,17 @@
         />
       </Tooltip>
       <!-- Download button -->
-      <Tooltip title={"Export"}>
-        <WithButtonV4
-          icon={DownloadIcon2}
-          onClick={handleDownloaded}
-          disable={false}
-          loader={false}
-        />
-      </Tooltip>
+
+      {#if isWebApp === true}
+        <Tooltip title={"Export"}>
+          <WithButtonV4
+            icon={DownloadIcon2}
+            onClick={handleDownloaded}
+            disable={false}
+            loader={false}
+          />
+        </Tooltip>
+      {/if}
     </div>
   </div>
 </div>
