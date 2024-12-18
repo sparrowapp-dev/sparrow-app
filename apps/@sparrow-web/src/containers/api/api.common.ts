@@ -334,14 +334,6 @@ const disconnectWebSocket = async (tab_id: string) => {
     if (wsData) {
       const socketInsta = wsData.listener;
       if (wsData.agent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT) {
-        wsData.messages.unshift({
-          data: `Disconnected from ${url}`,
-          transmitter: "disconnector",
-          timestamp: formatTime(new Date()),
-          uuid: uuidv4(),
-        });
-        wsData.status = "disconnected";
-        webSocketDataMap.set(tab_id, wsData);
         socketInsta.close();
       }
     }
@@ -437,13 +429,6 @@ const connectWebSocket = async (
 
       const ws = new WebSocket(url);
 
-      ws.addEventListener("close", (event) => {
-        console.log("WebSocket closed", event);
-      });
-      ws.addEventListener("error", (event) => {
-        debugger;
-        console.log("WebSocket errorred", event);
-      });
       webSocketDataStore.update((webSocketDataMap) => {
         const wsData = webSocketDataMap.get(tabId);
         if (wsData) {
@@ -495,10 +480,22 @@ const connectWebSocket = async (
             webSocketDataMap.delete(tabId);
             return webSocketDataMap;
           });
-          reject(new Error("Failed to connect to WebSocket"));
         };
         ws.onclose = () => {
-          disconnectWebSocket(tabId);
+          webSocketDataStore.update((webSocketDataMap) => {
+            const wsData = webSocketDataMap.get(tabId);
+            if (wsData) {
+              wsData.messages.unshift({
+                data: `Disconnected from ${url}`,
+                transmitter: "disconnector",
+                timestamp: formatTime(new Date()),
+                uuid: uuidv4(),
+              });
+              wsData.status = "disconnected";
+              webSocketDataMap.set(tabId, wsData);
+            }
+            return webSocketDataMap;
+          });
         };
       });
     } catch (error) {
