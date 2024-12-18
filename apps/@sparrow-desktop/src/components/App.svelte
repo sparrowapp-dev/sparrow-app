@@ -16,6 +16,9 @@
   import { singleInstanceHandler } from "@app/utils/singleinstance/app.singleinstance";
   import { AppViewModel } from "./app.ViewModel";
   import { getScaleFactor, setScaleFactorToDb } from "@app/utils/zoom";
+  import { listen } from "@tauri-apps/api/event";
+  import { getCurrentWindow } from "@tauri-apps/api/window";
+  import { invoke } from "@tauri-apps/api/core";
 
   const _viewModel = new AppViewModel();
 
@@ -29,7 +32,18 @@
     } else isActiveInternet = true;
   };
 
+  // Hide Toolbar when window is restored from maximized state
+  async function setupMaximizeToggleListener() {
+    listen("tauri://resize", async () => {
+      const isMaximized = await getCurrentWindow().isFullscreen();
+      if (!isMaximized) {
+        await invoke("hide_toolbar");
+      }
+    });
+  }
+
   onMount(async () => {
+    setupMaximizeToggleListener();
     await _viewModel.registerDeepLinkHandler();
     await singleInstanceHandler();
     await setScaleFactorToDb(await getScaleFactor());

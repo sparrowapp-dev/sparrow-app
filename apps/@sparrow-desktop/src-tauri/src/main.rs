@@ -80,19 +80,113 @@ use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
 
 // Socket.IO imports
+use futures_util::FutureExt;
 use rust_socketio::{
     asynchronous::{Client as SocketClient, ClientBuilder},
     Event as SocketIoEvent, Payload as SocketIoPayload, TransportType,
 };
-
 use tokio::sync::Mutex as SocketMutex;
 
-use futures_util::FutureExt;
-
+// MacOs Window Titlebar Config Imports
 #[cfg(target_os = "macos")]
+use cocoa::appkit::{NSWindow, NSWindowButton, NSWindowStyleMask, NSWindowTitleVisibility};
+use objc::runtime::NO;
+#[cfg(target_os = "macos")]
+use objc::runtime::YES;
+use tauri::{Runtime, WebviewWindow};
+use tauri_plugin_os::platform;
+#[cfg(target_os = "macos")]
+#[macro_use]
 extern crate objc;
 
+pub trait WindowExt {
+    #[cfg(target_os = "macos")]
+    fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool);
+    fn show_toolbar(&self);
+    fn hide_toolbar(&self);
+}
+
+// Funtion to hide default titlebar in macos
+impl<R: Runtime> WindowExt for WebviewWindow<R> {
+    #[cfg(target_os = "macos")]
+    fn set_transparent_titlebar(&self, title_transparent: bool, remove_tool_bar: bool) {
+        unsafe {
+            let id = self.ns_window().unwrap() as cocoa::base::id;
+            NSWindow::setTitlebarAppearsTransparent_(id, cocoa::base::YES);
+            let mut style_mask = id.styleMask();
+            style_mask.set(
+                NSWindowStyleMask::NSFullSizeContentViewWindowMask,
+                title_transparent,
+            );
+
+            id.setStyleMask_(style_mask);
+
+            if remove_tool_bar {
+                let close_button = id.standardWindowButton_(NSWindowButton::NSWindowCloseButton);
+                let _: () = msg_send![close_button, setHidden: YES];
+                let min_button =
+                    id.standardWindowButton_(NSWindowButton::NSWindowMiniaturizeButton);
+                let _: () = msg_send![min_button, setHidden: YES];
+                let zoom_button = id.standardWindowButton_(NSWindowButton::NSWindowZoomButton);
+                let _: () = msg_send![zoom_button, setHidden: YES];
+            }
+
+            id.setTitleVisibility_(if title_transparent {
+                NSWindowTitleVisibility::NSWindowTitleHidden
+            } else {
+                NSWindowTitleVisibility::NSWindowTitleVisible
+            });
+
+            id.setTitlebarAppearsTransparent_(if title_transparent {
+                cocoa::base::YES
+            } else {
+                cocoa::base::NO
+            });
+        }
+    }
+
+    #[cfg(target_os = "macos")]
+    fn show_toolbar(&self) {
+        unsafe {
+            let id = self.ns_window().unwrap() as cocoa::base::id;
+
+            let close_button = id.standardWindowButton_(NSWindowButton::NSWindowCloseButton);
+            let _: () = msg_send![close_button, setHidden: NO];
+            let min_button = id.standardWindowButton_(NSWindowButton::NSWindowMiniaturizeButton);
+            let _: () = msg_send![min_button, setHidden: NO];
+            let zoom_button = id.standardWindowButton_(NSWindowButton::NSWindowZoomButton);
+            let _: () = msg_send![zoom_button, setHidden: NO];
+        }
+    }
+
+    #[cfg(target_os = "macos")]
+    fn hide_toolbar(&self) {
+        unsafe {
+            let id = self.ns_window().unwrap() as cocoa::base::id;
+
+            let close_button = id.standardWindowButton_(NSWindowButton::NSWindowCloseButton);
+            let _: () = msg_send![close_button, setHidden: YES];
+            let min_button = id.standardWindowButton_(NSWindowButton::NSWindowMiniaturizeButton);
+            let _: () = msg_send![min_button, setHidden: YES];
+            let zoom_button = id.standardWindowButton_(NSWindowButton::NSWindowZoomButton);
+            let _: () = msg_send![zoom_button, setHidden: YES];
+        }
+    }
+}
+
 // Commands
+#[cfg(target_os = "macos")]
+#[tauri::command]
+fn hide_toolbar(window: tauri::WebviewWindow) {
+    window.hide_toolbar();
+}
+
+#[cfg(target_os = "macos")]
+#[tauri::command]
+fn show_toolbar(window: tauri::WebviewWindow) {
+    window.show_toolbar();
+}
+
 #[tauri::command]
 fn fetch_swagger_url_command(url: &str, headers: &str, workspaceid: &str) -> Value {
     let response = import_swagger_url(url, headers, workspaceid);
@@ -1139,6 +1233,25 @@ fn main() {
             app.manage(Arc::new(SocketIoAppState {
                 connections: Mutex::new(std::collections::HashMap::new()),
             }));
+
+            // Hide Titlebar for MacOS and close the additional window
+            let platform_name = platform();
+            if platform_name == "macos" {
+                // Fetch tauri windows
+                let macos_window = app.get_webview_window("main").unwrap();
+                let windows_window: WebviewWindow = app.get_webview_window("windows").unwrap();
+
+                // Close Windows window which has decoration set to false
+                let _ = windows_window.close();
+
+                // Hide Titlebar
+                macos_window.set_transparent_titlebar(true, true);
+            } else {
+                // Close Mac window which has decoration set to true
+                let macos_window = app.get_webview_window("main").unwrap();
+                let _ = macos_window.close();
+            }
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -1156,7 +1269,9 @@ fn main() {
             connect_socket_io,
             disconnect_socket_io,
             send_socket_io_message,
-            send_graphql_request
+            send_graphql_request,
+            show_toolbar,
+            hide_toolbar
         ])
         .on_page_load(|wry_window, _payload| {
             if let Ok(url) = wry_window.url() {
