@@ -88,26 +88,19 @@ use rust_socketio::{
 use tokio::sync::Mutex as SocketMutex;
 
 // MacOs Window Titlebar Config Imports
-#[cfg(target_os = "macos")]
 use cocoa::appkit::{NSWindow, NSWindowButton, NSWindowStyleMask, NSWindowTitleVisibility};
-use objc::runtime::NO;
-#[cfg(target_os = "macos")]
-use objc::runtime::YES;
 use tauri::{Runtime, WebviewWindow};
 use tauri_plugin_os::platform;
-#[cfg(target_os = "macos")]
 #[macro_use]
 extern crate objc;
 
 pub trait WindowExt {
-    #[cfg(target_os = "macos")]
     fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool);
     fn set_toolbar_visibility(&self, visible: bool);
 }
 
 // Implementation for WebviewWindow
 impl<R: Runtime> WindowExt for WebviewWindow<R> {
-    #[cfg(target_os = "macos")]
     fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool) {
         unsafe {
             let id = self.ns_window().unwrap() as cocoa::base::id;
@@ -140,7 +133,6 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
         }
     }
 
-    #[cfg(target_os = "macos")]
     fn set_toolbar_visibility(&self, visible: bool) {
         unsafe {
             let id = self.ns_window().unwrap() as cocoa::base::id;
@@ -164,13 +156,11 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
 }
 
 // Commands
-#[cfg(target_os = "macos")]
 #[tauri::command]
 fn hide_toolbar(window: tauri::WebviewWindow) {
     window.set_toolbar_visibility(false);
 }
 
-#[cfg(target_os = "macos")]
 #[tauri::command]
 fn show_toolbar(window: tauri::WebviewWindow) {
     window.set_toolbar_visibility(true);
