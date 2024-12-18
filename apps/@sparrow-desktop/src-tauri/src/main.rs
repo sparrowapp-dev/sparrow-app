@@ -88,11 +88,14 @@ use rust_socketio::{
 use tokio::sync::Mutex as SocketMutex;
 
 // MacOs Window Titlebar Config Imports
+#[macro_use]
+extern crate objc;
+extern crate cocoa;
+
 use cocoa::appkit::{NSWindow, NSWindowButton, NSWindowStyleMask, NSWindowTitleVisibility};
 use tauri::{Runtime, WebviewWindow};
 use tauri_plugin_os::platform;
-#[macro_use]
-extern crate objc;
+
 
 pub trait WindowExt {
     fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool);
