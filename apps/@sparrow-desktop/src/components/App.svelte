@@ -18,6 +18,7 @@
   import { getScaleFactor, setScaleFactorToDb } from "@app/utils/zoom";
   import { listen } from "@tauri-apps/api/event";
   import { invoke } from "@tauri-apps/api/core";
+  import { platform } from "@tauri-apps/plugin-os";
 
   const _viewModel = new AppViewModel();
 
@@ -32,17 +33,19 @@
   };
 
   // Hide Toolbar when window is restored from maximized state
-  async function setupMaximizeToggleListener() {
-    listen("tauri://resize", async () => {
-      const isMaximized = await getCurrentWindow().isFullscreen();
-      if (!isMaximized) {
-        await invoke("hide_toolbar");
-      }
-    });
+  async function setupMaximizeToggleListenerForMac() {
+    if (platform() === "macos") {
+      listen("tauri://resize", async () => {
+        const isMaximized = await getCurrentWindow().isFullscreen();
+        if (!isMaximized) {
+          await invoke("hide_toolbar");
+        }
+      });
+    }
   }
 
   onMount(async () => {
-    setupMaximizeToggleListener();
+    setupMaximizeToggleListenerForMac();
     await _viewModel.registerDeepLinkHandler();
     await singleInstanceHandler();
     await setScaleFactorToDb(await getScaleFactor());
