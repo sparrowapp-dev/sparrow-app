@@ -102,33 +102,28 @@ extern crate objc;
 pub trait WindowExt {
     #[cfg(target_os = "macos")]
     fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool);
-    fn show_toolbar(&self);
-    fn hide_toolbar(&self);
+    fn set_toolbar_visibility(&self, visible: bool);
 }
 
-// Funtion to hide default titlebar in macos
+// Implementation for WebviewWindow
 impl<R: Runtime> WindowExt for WebviewWindow<R> {
     #[cfg(target_os = "macos")]
-    fn set_transparent_titlebar(&self, title_transparent: bool, remove_tool_bar: bool) {
+    fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool) {
         unsafe {
             let id = self.ns_window().unwrap() as cocoa::base::id;
+
+            // Set titlebar transparency
             NSWindow::setTitlebarAppearsTransparent_(id, cocoa::base::YES);
             let mut style_mask = id.styleMask();
             style_mask.set(
                 NSWindowStyleMask::NSFullSizeContentViewWindowMask,
                 title_transparent,
             );
-
             id.setStyleMask_(style_mask);
 
-            if remove_tool_bar {
-                let close_button = id.standardWindowButton_(NSWindowButton::NSWindowCloseButton);
-                let _: () = msg_send![close_button, setHidden: YES];
-                let min_button =
-                    id.standardWindowButton_(NSWindowButton::NSWindowMiniaturizeButton);
-                let _: () = msg_send![min_button, setHidden: YES];
-                let zoom_button = id.standardWindowButton_(NSWindowButton::NSWindowZoomButton);
-                let _: () = msg_send![zoom_button, setHidden: YES];
+            // Adjust toolbar visibility
+            if remove_toolbar {
+                self.set_toolbar_visibility(false);
             }
 
             id.setTitleVisibility_(if title_transparent {
@@ -146,30 +141,24 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
     }
 
     #[cfg(target_os = "macos")]
-    fn show_toolbar(&self) {
+    fn set_toolbar_visibility(&self, visible: bool) {
         unsafe {
             let id = self.ns_window().unwrap() as cocoa::base::id;
 
-            let close_button = id.standardWindowButton_(NSWindowButton::NSWindowCloseButton);
-            let _: () = msg_send![close_button, setHidden: NO];
-            let min_button = id.standardWindowButton_(NSWindowButton::NSWindowMiniaturizeButton);
-            let _: () = msg_send![min_button, setHidden: NO];
-            let zoom_button = id.standardWindowButton_(NSWindowButton::NSWindowZoomButton);
-            let _: () = msg_send![zoom_button, setHidden: NO];
-        }
-    }
+            let visibility = if visible {
+                cocoa::base::NO
+            } else {
+                cocoa::base::YES
+            };
+            let buttons = [
+                id.standardWindowButton_(NSWindowButton::NSWindowCloseButton),
+                id.standardWindowButton_(NSWindowButton::NSWindowMiniaturizeButton),
+                id.standardWindowButton_(NSWindowButton::NSWindowZoomButton),
+            ];
 
-    #[cfg(target_os = "macos")]
-    fn hide_toolbar(&self) {
-        unsafe {
-            let id = self.ns_window().unwrap() as cocoa::base::id;
-
-            let close_button = id.standardWindowButton_(NSWindowButton::NSWindowCloseButton);
-            let _: () = msg_send![close_button, setHidden: YES];
-            let min_button = id.standardWindowButton_(NSWindowButton::NSWindowMiniaturizeButton);
-            let _: () = msg_send![min_button, setHidden: YES];
-            let zoom_button = id.standardWindowButton_(NSWindowButton::NSWindowZoomButton);
-            let _: () = msg_send![zoom_button, setHidden: YES];
+            for button in buttons {
+                let _: () = msg_send![button, setHidden: visibility];
+            }
         }
     }
 }
@@ -178,13 +167,13 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
 #[cfg(target_os = "macos")]
 #[tauri::command]
 fn hide_toolbar(window: tauri::WebviewWindow) {
-    window.hide_toolbar();
+    window.set_toolbar_visibility(false);
 }
 
 #[cfg(target_os = "macos")]
 #[tauri::command]
 fn show_toolbar(window: tauri::WebviewWindow) {
-    window.show_toolbar();
+    window.set_toolbar_visibility(true);
 }
 
 #[tauri::command]

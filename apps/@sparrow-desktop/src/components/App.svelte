@@ -17,7 +17,6 @@
   import { AppViewModel } from "./app.ViewModel";
   import { getScaleFactor, setScaleFactorToDb } from "@app/utils/zoom";
   import { listen } from "@tauri-apps/api/event";
-  import { getCurrentWindow } from "@tauri-apps/api/window";
   import { invoke } from "@tauri-apps/api/core";
 
   const _viewModel = new AppViewModel();
