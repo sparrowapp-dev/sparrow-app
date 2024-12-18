@@ -1,0 +1,156 @@
+version: "3.8"
+
+services:
+  # MongoDB
+  mongo:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: sparowapp
+      MONGO_INITDB_ROOT_PASSWORD: sparrow123
+    networks:
+      - localnet
+
+  # Kafka
+  kafka:
+    image: bitnami/kafka:3.4.1
+    hostname: kafka
+    ports:
+      - "9092:9092"
+    volumes:
+      - "kafka_data:/bitnami"
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092,EXTERNAL://kafka:9094
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@localhost:9093
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_CFG_NUM_PARTITIONS=2
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - KAFKA_MESSAGE_MAX_BYTES=1000000
+    networks:
+      - localnet
+
+  # App
+  app:
+    image: sparrowapi/sparrow-api:v2
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./:/src
+    networks:
+      - localnet
+    depends_on:
+      - mongo
+      - kafka
+    environment:
+      # APP
+      PORT: 9000
+      APP_ENV: DEV
+      APP_URL: http://localhost
+
+      # AUTH
+      JWT_SECRET_KEY: webtoken-secret-key
+      JWT_EXPIRATION_TIME: 2400
+
+      # DATABASE
+      DB_URL: mongodb://sparowapp:sparrow123@mongo:27017
+
+      # Google OAuth
+      GOOGLE_CLIENT_ID: google-client-id
+      GOOGLE_CLIENT_SECRET: google-client-secret
+      GOOGLE_APP_URL: google-app-url
+      LOGIN_REDIRECT_URL: login-redirect-url
+      GOOGLE_ACCESS_TYPE: google-access-type
+
+      # EXPIRY TIME FOR EMAIL VALIDATION CODE/LINK
+      EMAIL_VALIDATION_CODE_EXPIRY_TIME: ""
+
+      # KAFKA
+      KAFKA_BROKER: kafka:9094
+
+      # EMAIL
+      SMTP_SENDER_EMAIL: ""
+      SMTP_SENDER_PASSWORD: ""
+      SMTP_MAIL_HOST: ""
+      SMTP_MAIL_PORT: ""
+      SMTP_MAIL_SECURE: ""
+      SMTP_USER_NAME: ""
+
+      # REFRESH TOKEN
+      REFRESH_TOKEN_SECRET_KEY: refresh-token-secret
+      REFRESH_TOKEN_EXPIRATION_TIME: 604800
+      REFRESH_TOKEN_MAX_LIMIT: 50
+
+      # APP UPDATER
+      APP_UPDATE_AVAILABLE: false
+      APP_VERSION: ""
+      WINDOWS_APP_SIGNATURE: ""
+      WINDOWS_APP_URL: ""
+      MAC_APPLE_SILICON_APP_SIGNATURE: ""
+      MAC_APPLE_SILICON_APP_URL: ""
+      MAC_INTEL_APP_SIGNATURE: ""
+      MAC_INTEL_APP_URL: ""
+
+      # SUPPORT
+      SPARROW_EMAIL: contactus@sparrowapp.dev
+
+      # AZURE SERVICES
+      AZURE_CONNECTION_STRING: ""
+      AZURE_INSIGHTS_CONNECTION_STRING: ""
+      FEEDBACK_BLOB_CONTAINER: ""
+
+      # AI SUPPORT
+      AZURE_OPENAI_ENDPOINT: ""
+      AZURE_OPENAI_API_KEY: ""
+      AZURE_OPENAI_DEPLOYMENT: ""
+      AZURE_OPENAI_API_VERSION: ""
+      AZURE_OPENAI_MAX_TOKENS: ""
+      AZURE_OPENAI_MONTHLY_TOKEN_LIMIT: ""
+
+      # Hubspot
+      HUBSPOT_BASEURL: ""
+      HUBSPOT_INTEGRATION_ENABLED: ""
+      HUBSPOT_PORTALID: ""
+      HUBSPOT_FORMID: ""
+
+  # Sparrow Auth
+  auth:
+    image: sparrowapi/sparrow-auth:v1
+    ports:
+      - "80:80"
+    networks:
+      - localnet
+    depends_on:
+      - mongo
+      - kafka
+    environment:
+      AUTH_SERVICE_PORT: 80
+      JWT_SECRET: auth-jwt-secret
+      DB_URL: mongodb://sparowapp:sparrow123@mongo:27017
+      VITE_API_URL: "http://localhost:9000"
+      VITE_SPARROW_SUPPORT_EMAIL: "support@example.dev"
+      VITE_SPARROW_OAUTH: "http://localhost:9000/api/auth/google/callback"
+      VITE_ENABLE_MIX_PANEL: "false"
+      VITE_MIX_PANEL_TOKEN: ""
+      VITE_TERMS_OF_SERVICE: "https://example.dev/termsandconditions"
+      VITE_SPARROW_WEB_URL: "http://localhost:1422"
+      VITE_SPARROW_PRIVACY_POLICY: "https://example.com/privacy-policy"
+
+volumes:
+  kafka_data:
+    driver: local
+
+networks:
+  localnet:
+    driver: bridge
