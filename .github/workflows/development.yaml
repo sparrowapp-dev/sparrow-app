@@ -3,7 +3,7 @@ name: Development release
 on:
   push:
     branches:
-      - development
+      - pratik/dev
   workflow_dispatch:
 
 env:
@@ -25,6 +25,7 @@ env:
   VITE_SPARROW_LINKEDIN: ${{ vars.VITE_SPARROW_LINKEDIN }}
   VITE_WEB_SOCKET_IO_API_URL: ${{ vars.VITE_WEB_SOCKET_IO_API_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+  CI: true
 
 jobs:
   release_win:
