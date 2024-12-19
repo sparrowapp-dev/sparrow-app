@@ -547,9 +547,7 @@
       on:blur={() => {
         isInputDataTouched = true;
       }}
-      placeholder={isWebApp
-        ? "Example - OpenAPI JSON text"
-        : "Example - OpenAPI JSON text or http://localhost:8080/api-docs"}
+      placeholder={"Example - OpenAPI JSON text or http://localhost:8080/api-docs"}
       bind:value={importData}
       class="text-area mb-0 border-0 text-fs-12 rounded bg-tertiary-300 pe-4 ps-2 pb-2 pt-2"
       style={!isValidServerDeployedURL &&
