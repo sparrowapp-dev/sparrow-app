@@ -4246,6 +4246,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "brotli 3.5.0",
+ "cocoa",
  "dotenv",
  "flate2",
  "futures",
