@@ -375,12 +375,6 @@ const connectWebSocket = async (
         return webSocketDataMap;
       });
 
-      // Create WebSocket with protocols if specified
-      const ws =
-        protocols.length > 0
-          ? new WebSocket(url, protocols)
-          : new WebSocket(url);
-
       // Update store with WebSocket instance
       webSocketDataStore.update((webSocketDataMap) => {
         const wsData = webSocketDataMap.get(tabId);
@@ -403,15 +397,7 @@ const connectWebSocket = async (
                 uuid: uuidv4(),
               });
               wsData.status = "connected";
-              // Add information about used protocols if any
-              if (ws.protocol) {
-                wsData.messages.unshift({
-                  data: `Using protocol: ${ws.protocol}`,
-                  transmitter: "info",
-                  timestamp: formatTime(new Date()),
-                  uuid: uuidv4(),
-                });
-              }
+
               webSocketDataMap.set(tabId, wsData);
             }
             return webSocketDataMap;
@@ -442,8 +428,6 @@ const connectWebSocket = async (
             webSocketDataMap.delete(tabId);
             return webSocketDataMap;
           });
-          notifications.error("WebSocket connection failed");
-          reject(error);
         };
 
         ws.onclose = () => {
