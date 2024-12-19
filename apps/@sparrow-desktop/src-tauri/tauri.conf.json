@@ -15,6 +15,7 @@
         "title": "Sparrow",
         "shadow": true,
         "focus": true,
+        "dragDropEnabled": false,
         "maximized": true
       },
       {
