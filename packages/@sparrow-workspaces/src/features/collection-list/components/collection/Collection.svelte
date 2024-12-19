@@ -92,6 +92,10 @@
     }, 100);
   }
 
+  function handleScroll() {
+    showMenu = false;
+  }
+
   function handleSelectClick(event: MouseEvent) {
     const selectElement = document.getElementById(
       `show-more-collection-${collection.id}`,
@@ -124,6 +128,7 @@
   // });
   onDestroy(() => {
     // selectedMethodUnsubscibe();
+    window.removeEventListener("scroll", handleScroll);
   });
 
   $: {
