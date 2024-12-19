@@ -2,7 +2,7 @@
   "identifier": "migrated",
   "description": "permissions that were migrated from v1",
   "context": "local",
-  "windows": ["main"],
+  "windows": ["main", "windows"],
   "permissions": [
     "core:path:default",
     "core:event:default",

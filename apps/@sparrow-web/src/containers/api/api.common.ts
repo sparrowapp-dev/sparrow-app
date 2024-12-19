@@ -283,33 +283,6 @@ const sendMessage = async (tab_id: string, message: string) => {
     notifications.error("Failed to send message");
     return error("error");
   }
-
-  // else if (selectedAgent === "Cloud Agent") {
-  //   try {
-  //     const proxyUrl = "http://localhost:3000/proxy/ws-message";
-  //     await axios.post(proxyUrl, {
-  //       tabId: tab_id,
-  //       message: message,
-  //     });
-  //     webSocketDataStore.update((webSocketDataMap) => {
-  //       const wsData = webSocketDataMap.get(tab_id);
-  //       if (wsData) {
-  //         wsData.messages.unshift({
-  //           data: message,
-  //           transmitter: "sender",
-  //           timestamp: formatTime(new Date()),
-  //           uuid: uuidv4(),
-  //         });
-  //         webSocketDataMap.set(tab_id, wsData);
-  //       }
-  //       return webSocketDataMap;
-  //     });
-  //   } catch (e) {
-  //     console.error(e);
-  //     notifications.error("Failed to send message");
-  //     return error("error");
-  //   }
-  // }
 };
 
 /**
@@ -339,33 +312,6 @@ const disconnectWebSocket = async (tab_id: string) => {
     }
     return webSocketDataMap;
   });
-
-  // else if (selectedAgent === "Cloud Agent") {
-  //   try {
-  //     const proxyUrl = "http://localhost:3000/proxy/ws-disconnect";
-  //     await axios.post(proxyUrl, { tabId: tab_id });
-
-  //     webSocketDataStore.update((webSocketDataMap) => {
-  //       const wsData = webSocketDataMap.get(tab_id);
-  //       if (wsData) {
-  //         wsData.messages.unshift({
-  //           data: `Disconnected from ${url}`,
-  //           transmitter: "disconnector",
-  //           timestamp: formatTime(new Date()),
-  //           uuid: uuidv4(),
-  //         });
-  //         wsData.status = "disconnected";
-  //         webSocketDataMap.set(tab_id, wsData);
-  //       }
-  //       return webSocketDataMap;
-  //     });
-  //     notifications.success("WebSocket disconnected successfully.");
-  //   } catch (e) {
-  //     console.error(e);
-  //     notifications.error("Failed to disconnect WebSocket. Please try again.");
-  //     return error("error");
-  //   }
-  // }
 };
 
 /**
