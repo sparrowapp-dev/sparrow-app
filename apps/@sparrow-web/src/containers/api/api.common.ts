@@ -357,8 +357,10 @@ const connectWebSocket = async (
 
   if (selectedAgent === "Browser Agent") {
     try {
+      // Parse the headers string to array of header objects
       const headers = JSON.parse(requestHeaders);
 
+      // Initialize WebSocket store
       webSocketDataStore.update((webSocketDataMap) => {
         webSocketDataMap.set(tabId, {
           messages: [],
@@ -373,8 +375,7 @@ const connectWebSocket = async (
         return webSocketDataMap;
       });
 
-      const ws = new WebSocket(url);
-
+      // Update store with WebSocket instance
       webSocketDataStore.update((webSocketDataMap) => {
         const wsData = webSocketDataMap.get(tabId);
         if (wsData) {
@@ -396,6 +397,7 @@ const connectWebSocket = async (
                 uuid: uuidv4(),
               });
               wsData.status = "connected";
+
               webSocketDataMap.set(tabId, wsData);
             }
             return webSocketDataMap;
@@ -427,6 +429,7 @@ const connectWebSocket = async (
             return webSocketDataMap;
           });
         };
+
         ws.onclose = () => {
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
@@ -445,7 +448,7 @@ const connectWebSocket = async (
         };
       });
     } catch (error) {
-      console.error(error);
+      console.error("WebSocket connection error:", error);
       webSocketDataStore.update((webSocketDataMap) => {
         webSocketDataMap.delete(tabId);
         return webSocketDataMap;
