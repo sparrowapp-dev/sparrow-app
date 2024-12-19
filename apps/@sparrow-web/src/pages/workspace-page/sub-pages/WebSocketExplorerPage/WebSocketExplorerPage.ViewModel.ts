@@ -1447,33 +1447,33 @@ class RestExplorerViewModel {
     return await this.workspaceRepository.readWorkspace(workspaceId);
   };
 
-  // public connectWebsocket = async (environmentVariables) => {
-  //   const websocketData = this._tab.getValue();
+  public connectWebsocket = async (environmentVariables) => {
+    const websocketData = this._tab.getValue();
 
-  //   const decodeData = new DecodeWebsocket().init(
-  //     this._tab.getValue().property.websocket,
-  //     environmentVariables?.filtered || [],
-  //   );
+    const decodeData = new DecodeWebsocket().init(
+      this._tab.getValue().property.websocket,
+      environmentVariables?.filtered || [],
+    );
 
-  //   return await this.webSocketService.connectWebsocket(
-  //     decodeData[0] as string,
-  //     websocketData.tabId,
-  //     decodeData[1],
-  //   );
-  // };
-  // public disconnectWebsocket = async () => {
-  //   const websocketData = this._tab.getValue();
-  //   return await this.webSocketService.disconnectWebsocket(
-  //     websocketData?.tabId,
-  //   );
-  // };
-  // public sendMessageWebsocket = async () => {
-  //   const websocketData = this._tab.getValue();
-  //   return await this.webSocketService.sendMessageWebsocket(
-  //     websocketData.tabId,
-  //     websocketData.property.websocket?.message as string,
-  //   );
-  // };
+    return await this.collectionService.connectWebsocket(
+      decodeData[0] as string,
+      websocketData.tabId,
+      decodeData[1],
+    );
+  };
+  public disconnectWebsocket = async () => {
+    const websocketData = this._tab.getValue();
+    return await this.collectionService.disconnectWebsocket(
+      websocketData?.tabId,
+    );
+  };
+  public sendMessageWebsocket = async () => {
+    const websocketData = this._tab.getValue();
+    return await this.collectionService.sendMessageWebsocket(
+      websocketData.tabId,
+      websocketData.property.websocket?.message as string,
+    );
+  };
 
   public searchMessages = async (_search: string) => {
     const websocketData = this._tab.getValue();

@@ -664,32 +664,27 @@
                 />
               </div>
             </Tooltip>
-            {#if !isWebApp}
-              <Tooltip
-                title={"Add WebSocket"}
-                placement={"bottom"}
-                distance={12}
+            <Tooltip title={"Add WebSocket"} placement={"bottom"} distance={12}>
+              <div
+                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+                style="height: 24px; width: 24px;"
+                role="button"
+                on:click={() => {
+                  onItemCreated("websocketCollection", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                  });
+                  MixpanelEvent(Events.Collection_WebSocket);
+                }}
               >
-                <div
-                  class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                  style="height: 24px; width: 24px;"
-                  role="button"
-                  on:click={() => {
-                    onItemCreated("websocketCollection", {
-                      workspaceId: collection.workspaceId,
-                      collection,
-                    });
-                    MixpanelEvent(Events.Collection_WebSocket);
-                  }}
-                >
-                  <SocketIcon
-                    height="12px"
-                    width="16px"
-                    color="var(--request-arc)"
-                  />
-                </div>
-              </Tooltip>
-
+                <SocketIcon
+                  height="12px"
+                  width="16px"
+                  color="var(--request-arc)"
+                />
+              </div>
+            </Tooltip>
+            {#if !isWebApp}
               <Tooltip
                 title={`Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
                 placement={"bottom"}
