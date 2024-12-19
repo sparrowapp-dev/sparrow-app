@@ -360,30 +360,6 @@ const connectWebSocket = async (
       // Parse the headers string to array of header objects
       const headers = JSON.parse(requestHeaders);
 
-      // Filter and process headers that are supported by WebSocket
-      const protocols: string[] = [];
-      const validHeaders = new Set([
-        "Sec-WebSocket-Protocol",
-        "Sec-WebSocket-Version",
-        "Sec-WebSocket-Key",
-        "Sec-WebSocket-Accept",
-      ]);
-
-      // Extract WebSocket protocols from headers
-      headers.forEach(
-        (header: { key: string; value: string; checked: boolean }) => {
-          if (header.checked !== false) {
-            if (header.key === "Sec-WebSocket-Protocol") {
-              // Split protocol string and add to protocols array
-              const protocolValues = header.value
-                .split(",")
-                .map((p) => p.trim());
-              protocols.push(...protocolValues);
-            }
-          }
-        },
-      );
-
       // Initialize WebSocket store
       webSocketDataStore.update((webSocketDataMap) => {
         webSocketDataMap.set(tabId, {
