@@ -73,13 +73,11 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
-  import { TeamsViewModel } from "../Teams/Teams.ViewModel";
 
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
   const _viewModel3 = new TestflowViewModel();
-  const _viewModel4 = new TeamsViewModel();
 
   let currentWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
@@ -451,7 +449,7 @@
     window.addEventListener("blur", handleBlur);
 
     // Try to open the app
-    _viewModel4.setupRedirect();
+    _viewModel.setupRedirect();
 
     // Check if app opened after a short delay
     const detectAppTimeout = setTimeout(() => {
