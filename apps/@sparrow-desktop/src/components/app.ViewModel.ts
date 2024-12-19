@@ -218,7 +218,7 @@ export class AppViewModel {
   };
 
   // Private method to process deep link
-  public async processDeepLink(url: string): Promise<void> {
+  private async processDeepLink(url: string): Promise<void> {
     try {
       await getCurrentWindow().setFocus();
       const params = new URLSearchParams(url.split("?")[1]);
