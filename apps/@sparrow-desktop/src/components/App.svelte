@@ -47,7 +47,6 @@
   onMount(async () => {
     setupMaximizeToggleListenerForMac();
     await _viewModel.registerDeepLinkHandler();
-    const loginWithToken = _viewModel.processDeepLink;
     await singleInstanceHandler();
     await setScaleFactorToDb(await getScaleFactor());
     let isloggedIn;
