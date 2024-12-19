@@ -547,7 +547,9 @@
       on:blur={() => {
         isInputDataTouched = true;
       }}
-      placeholder={"Example - OpenAPI JSON text or http://localhost:8080/api-docs"}
+      placeholder={isWebApp
+        ? "Example - OpenAPI JSON text"
+        : "Example - OpenAPI JSON text or http://localhost:8080/api-docs"}
       bind:value={importData}
       class="text-area mb-0 border-0 text-fs-12 rounded bg-tertiary-300 pe-4 ps-2 pb-2 pt-2"
       style={!isValidServerDeployedURL &&
@@ -571,7 +573,9 @@
   </div>
   {#if !importData && isInputDataTouched && !isimportDataLoading}
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-      Please paste your OpenAPI specification text or Swagger/localhost link.
+      {isWebApp
+        ? "Please paste your OpenAPI specification text."
+        : "Please paste your OpenAPI specification text or Swagger/localhost link."}
     </p>
   {:else if (!isimportDataLoading && isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched) || (!isimportDataLoading && isValidClientURL && !isValidServerURL && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
