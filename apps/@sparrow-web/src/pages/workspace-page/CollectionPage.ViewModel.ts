@@ -76,7 +76,7 @@ import type { FeatureQuery } from "../../types/feature-switch";
 import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/utils";
 
 import { createDeepCopy } from "@sparrow/common/utils";
-// import { GraphqlTabAdapter, SocketIoTabAdapter } from "../../adapter";
+import { GraphqlTabAdapter , SocketIoTabAdapter } from "../../adapter";
 import type {
   SocketIORequestDeletePayloadDtoInterface,
   SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
@@ -94,7 +94,7 @@ import {
   GraphqlRequestDefaultAliasBaseEnum,
   GraphqlRequestAuthModeBaseEnum,
 } from "@sparrow/common/types/workspace/graphql-request-base";
-// import type { Path } from "@sparrow/common/interfaces/request.interface";
+import type { Path } from "@sparrow/common/interfaces/request.interface";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -2048,22 +2048,22 @@ export default class CollectionsViewModel {
    * @param request : - The request going to be opened on tab
    * @param path : - The path to the request
    */
-  // public handleOpenGraphqlTab = (
-  //   workspaceId: string,
-  //   collection: CollectionDto,
-  //   folder: CollectionItemsDto,
-  //   _graphql: CollectionItemsDto,
-  // ) => {
-  //   const requestTabAdapter = new GraphqlTabAdapter();
-  //   const adaptedRequest = requestTabAdapter.adapt(
-  //     workspaceId || "",
-  //     collection?.id || "",
-  //     folder?.id || "",
-  //     _graphql,
-  //   );
-  //   this.tabRepository.createTab(adaptedRequest);
-  //   moveNavigation("right");
-  // };
+  public handleOpenGraphqlTab = (
+    workspaceId: string,
+    collection: CollectionDto,
+    folder: CollectionItemsDto,
+    _graphql: CollectionItemsDto,
+  ) => {
+    const requestTabAdapter = new GraphqlTabAdapter();
+    const adaptedRequest = requestTabAdapter.adapt(
+      workspaceId || "",
+      collection?.id || "",
+      folder?.id || "",
+      _graphql,
+    );
+    this.tabRepository.createTab(adaptedRequest);
+    moveNavigation("right");
+  };
 
   /**
    * Handles opening a request on a tab
@@ -2094,22 +2094,22 @@ export default class CollectionsViewModel {
    * @param _folder Folder of which tab belongs to.
    * @param _socketIo Socket Io meta data
    */
-  // public handleOpenSocketIoTab = (
-  //   _workspaceId: string,
-  //   _collection: CollectionDto,
-  //   _folder: CollectionItemsDto,
-  //   _socketIo: CollectionItemsDto,
-  // ) => {
-  //   const socketIoTabAdapter = new SocketIoTabAdapter();
-  //   const adaptedSocketIo = socketIoTabAdapter.adapt(
-  //     _workspaceId || "",
-  //     _collection?.id || "",
-  //     _folder?.id || "",
-  //     _socketIo,
-  //   );
-  //   this.tabRepository.createTab(adaptedSocketIo);
-  //   moveNavigation("right");
-  // };
+  public handleOpenSocketIoTab = (
+    _workspaceId: string,
+    _collection: CollectionDto,
+    _folder: CollectionItemsDto,
+    _socketIo: CollectionItemsDto,
+  ) => {
+    const socketIoTabAdapter = new SocketIoTabAdapter();
+    const adaptedSocketIo = socketIoTabAdapter.adapt(
+      _workspaceId || "",
+      _collection?.id || "",
+      _folder?.id || "",
+      _socketIo,
+    );
+    this.tabRepository.createTab(adaptedSocketIo);
+    moveNavigation("right");
+  };
 
   public handleOpenFolder = (
     workspaceId: string,
@@ -2690,6 +2690,7 @@ export default class CollectionsViewModel {
       headers: _graphql.graphql
         ?.headers as GraphqlRequestKeyValueDtoInterface[],
       auth: _graphql.graphql?.auth as GraphqlRequestAuthDtoInterface,
+      variables: _graphql.graphql?.variables,
       selectedGraphqlAuthType: _graphql?.graphql
         ?.selectedGraphqlAuthType as GraphqlRequestAuthModeBaseEnum,
     };
@@ -3979,20 +3980,20 @@ export default class CollectionsViewModel {
         );
         break;
       case "socket-io":
-        // this.handleOpenSocketIoTab(
-        //   args.workspaceId,
-        //   args.collection as CollectionDto,
-        //   args.folder as CollectionItemsDto,
-        //   args.socketio as CollectionItemsDto,
-        // );
+        this.handleOpenSocketIoTab(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.socketio as CollectionItemsDto,
+        );
         break;
       case "graphql":
-        // this.handleOpenGraphqlTab(
-        //   args.workspaceId,
-        //   args.collection as CollectionDto,
-        //   args.folder as CollectionItemsDto,
-        //   args.graphql as CollectionItemsDto,
-        // );
+        this.handleOpenGraphqlTab(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.graphql as CollectionItemsDto,
+        );
         break;
     }
   };
@@ -4669,127 +4670,127 @@ export default class CollectionsViewModel {
    * @param saveDescriptionOnly - refers save overall request data or only description as a documentation purpose.
    * @returns save status
    */
-  // public saveSocketIo = async (componentData: Tab) => {
-  //   const { folderId, collectionId, workspaceId } = componentData.path;
+  public saveSocketIo = async (componentData: Tab) => {
+    const { folderId, collectionId, workspaceId } = componentData.path;
 
-  //   if (!workspaceId || !collectionId) {
-  //     return {
-  //       status: "error",
-  //       message: "request is not a part of any workspace or collection",
-  //     };
-  //   }
-  //   const _collection = await this.readCollection(collectionId);
-  //   let userSource = {};
-  //   if (_collection?.activeSync && componentData?.source === "USER") {
-  //     userSource = {
-  //       currentBranch: _collection?.currentBranch,
-  //       source: "USER",
-  //     };
-  //   }
-  //   const _id = componentData.id;
+    if (!workspaceId || !collectionId) {
+      return {
+        status: "error",
+        message: "request is not a part of any workspace or collection",
+      };
+    }
+    const _collection = await this.readCollection(collectionId);
+    let userSource = {};
+    if (_collection?.activeSync && componentData?.source === "USER") {
+      userSource = {
+        currentBranch: _collection?.currentBranch,
+        source: "USER",
+      };
+    }
+    const _id = componentData.id;
 
-  //   const socketTabAdapter = new SocketIoTabAdapter();
-  //   const unadaptedSocket = socketTabAdapter.unadapt(componentData);
-  //   // Save overall api
+    const socketTabAdapter = new SocketIoTabAdapter();
+    const unadaptedSocket = socketTabAdapter.unadapt(componentData);
+    // Save overall api
 
-  //   const socketMetaData = {
-  //     id: _id,
-  //     name: componentData?.name,
-  //     description: componentData?.description,
-  //     type: CollectionItemTypeBaseEnum.SOCKETIO,
-  //   };
+    const socketMetaData = {
+      id: _id,
+      name: componentData?.name,
+      description: componentData?.description,
+      type: CollectionItemTypeBaseEnum.SOCKETIO,
+    };
 
-  //   let folderSource;
-  //   let itemSource;
-  //   if (folderId) {
-  //     folderSource = {
-  //       folderId: folderId,
-  //     };
-  //     itemSource = {
-  //       id: folderId,
-  //       type: CollectionItemTypeBaseEnum.FOLDER,
-  //       items: {
-  //         ...socketMetaData,
-  //         socketio: unadaptedSocket,
-  //       },
-  //     };
-  //   } else {
-  //     itemSource = {
-  //       ...socketMetaData,
-  //       socketio: unadaptedSocket,
-  //     };
-  //   }
+    let folderSource;
+    let itemSource;
+    if (folderId) {
+      folderSource = {
+        folderId: folderId,
+      };
+      itemSource = {
+        id: folderId,
+        type: CollectionItemTypeBaseEnum.FOLDER,
+        items: {
+          ...socketMetaData,
+          socketio: unadaptedSocket,
+        },
+      };
+    } else {
+      itemSource = {
+        ...socketMetaData,
+        socketio: unadaptedSocket,
+      };
+    }
 
-  //   let isGuestUser;
-  //   isGuestUserActive.subscribe((value) => {
-  //     isGuestUser = value;
-  //   });
-  //   if (isGuestUser === true) {
-  //     const data = {
-  //       id: _id,
-  //       name: socketMetaData.name,
-  //       description: socketMetaData.description,
-  //       type: ItemType.SOCKET_IO,
-  //       socketio: unadaptedSocket,
-  //       updatedAt: "",
-  //       updatedBy: "Guest User",
-  //     };
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser === true) {
+      const data = {
+        id: _id,
+        name: socketMetaData.name,
+        description: socketMetaData.description,
+        type: ItemType.SOCKET_IO,
+        socketio: unadaptedSocket,
+        updatedAt: "",
+        updatedBy: "Guest User",
+      };
 
-  //     if (!folderId) {
-  //       this.collectionRepository.updateRequestOrFolderInCollection(
-  //         collectionId,
-  //         _id,
-  //         data,
-  //       );
-  //     } else {
-  //       this.collectionRepository.updateRequestInFolder(
-  //         collectionId,
-  //         folderId,
-  //         _id,
-  //         data,
-  //       );
-  //     }
-  //     return {
-  //       status: "success",
-  //       message: "",
-  //     };
-  //   }
-  //   const res = await this.collectionService.updateSocketIoInCollection(_id, {
-  //     collectionId: collectionId,
-  //     workspaceId: workspaceId,
-  //     ...folderSource,
-  //     ...userSource,
-  //     items: itemSource,
-  //   } as
-  //     | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
-  //     | SocketIORequestCreateUpdateInFolderPayloadDtoInterface);
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          _id,
+          data,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          _id,
+          data,
+        );
+      }
+      return {
+        status: "success",
+        message: "",
+      };
+    }
+    const res = await this.collectionService.updateSocketIoInCollection(_id, {
+      collectionId: collectionId,
+      workspaceId: workspaceId,
+      ...folderSource,
+      ...userSource,
+      items: itemSource,
+    } as
+      | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
+      | SocketIORequestCreateUpdateInFolderPayloadDtoInterface);
 
-  //   if (res.isSuccessful) {
-  //     if (!folderId) {
-  //       this.collectionRepository.updateRequestOrFolderInCollection(
-  //         collectionId,
-  //         _id,
-  //         res.data.data,
-  //       );
-  //     } else {
-  //       this.collectionRepository.updateRequestInFolder(
-  //         collectionId,
-  //         folderId,
-  //         _id,
-  //         res.data.data,
-  //       );
-  //     }
-  //     return {
-  //       status: "success",
-  //       message: res.message,
-  //     };
-  //   } else {
-  //     return {
-  //       status: "error",
-  //       message: res.message,
-  //     };
-  //   }
-  // };
+    if (res.isSuccessful) {
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          _id,
+          res.data.data,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          _id,
+          res.data.data,
+        );
+      }
+      return {
+        status: "success",
+        message: res.message,
+      };
+    } else {
+      return {
+        status: "error",
+        message: res.message,
+      };
+    }
+  };
 
   /**
    *
@@ -4799,183 +4800,183 @@ export default class CollectionsViewModel {
    * @param description - request description
    * @param type - save over all request or description only
    */
-  // public saveAsSocketIo = async (
-  //   _workspaceMeta: {
-  //     id: string;
-  //     name: string;
-  //   },
-  //   path: {
-  //     name: string;
-  //     id: string;
-  //     type: string;
-  //   }[],
-  //   tabName: string,
-  //   description: string,
-  //   componentData: Tab,
-  // ) => {
-  //   let userSource = {};
-  //   // const _id = componentData.id;
-  //   if (path.length > 0) {
-  //     const socketTabAdapter = new SocketIoTabAdapter();
-  //     const unadaptedSocket = socketTabAdapter.unadapt(componentData);
-  //     const req = {
-  //       id: uuidv4(),
-  //       name: tabName,
-  //       description,
-  //       type: ItemType.SOCKET_IO,
-  //       socketio: unadaptedSocket,
-  //       source: "USER",
-  //       isDeleted: false,
-  //       createdBy: "Guest User",
-  //       updatedBy: "Guest User",
-  //       createdAt: new Date().toISOString(),
-  //       updatedAt: new Date().toISOString(),
-  //     };
-  //     if (path[path.length - 1].type === ItemType.COLLECTION) {
-  //       /**
-  //        * handle request at collection level
-  //        */
-  //       const _collection = await this.readCollection(path[path.length - 1].id);
-  //       if (_collection?.activeSync) {
-  //         userSource = {
-  //           currentBranch: _collection?.currentBranch,
-  //           source: "USER",
-  //         };
-  //       }
-  //       let isGuestUser;
-  //       isGuestUserActive.subscribe((value) => {
-  //         isGuestUser = value;
-  //       });
+  public saveAsSocketIo = async (
+    _workspaceMeta: {
+      id: string;
+      name: string;
+    },
+    path: {
+      name: string;
+      id: string;
+      type: string;
+    }[],
+    tabName: string,
+    description: string,
+    componentData: Tab,
+  ) => {
+    let userSource = {};
+    // const _id = componentData.id;
+    if (path.length > 0) {
+      const socketTabAdapter = new SocketIoTabAdapter();
+      const unadaptedSocket = socketTabAdapter.unadapt(componentData);
+      const req = {
+        id: uuidv4(),
+        name: tabName,
+        description,
+        type: ItemType.SOCKET_IO,
+        socketio: unadaptedSocket,
+        source: "USER",
+        isDeleted: false,
+        createdBy: "Guest User",
+        updatedBy: "Guest User",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      if (path[path.length - 1].type === ItemType.COLLECTION) {
+        /**
+         * handle request at collection level
+         */
+        const _collection = await this.readCollection(path[path.length - 1].id);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
+        let isGuestUser;
+        isGuestUserActive.subscribe((value) => {
+          isGuestUser = value;
+        });
 
-  //       if (isGuestUser == true) {
-  //         this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
+        if (isGuestUser == true) {
+          this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
 
-  //         return {
-  //           status: "success",
-  //           message: "success",
-  //           data: {
-  //             id: req.id,
-  //           },
-  //         };
-  //       }
-  //       const res = await this.collectionService.addSocketIoInCollection({
-  //         collectionId: path[path.length - 1].id,
-  //         workspaceId: _workspaceMeta.id,
-  //         ...userSource,
-  //         items: {
-  //           name: tabName,
-  //           description,
-  //           type: CollectionItemTypeBaseEnum.SOCKETIO,
-  //           socketio: {
-  //             url: unadaptedSocket.url,
-  //             message: unadaptedSocket.message,
-  //             eventName: unadaptedSocket.eventName,
-  //             events: unadaptedSocket.events,
-  //             queryParams: unadaptedSocket.queryParams,
-  //             headers: unadaptedSocket.headers,
-  //             selectedSocketIOBodyType:
-  //               unadaptedSocket.selectedSocketIOBodyType,
-  //           },
-  //         },
-  //       });
-  //       if (res.isSuccessful) {
-  //         this.addRequestOrFolderInCollection(
-  //           path[path.length - 1].id,
-  //           res.data.data,
-  //         );
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+        }
+        const res = await this.collectionService.addSocketIoInCollection({
+          collectionId: path[path.length - 1].id,
+          workspaceId: _workspaceMeta.id,
+          ...userSource,
+          items: {
+            name: tabName,
+            description,
+            type: CollectionItemTypeBaseEnum.SOCKETIO,
+            socketio: {
+              url: unadaptedSocket.url,
+              message: unadaptedSocket.message,
+              eventName: unadaptedSocket.eventName,
+              events: unadaptedSocket.events,
+              queryParams: unadaptedSocket.queryParams,
+              headers: unadaptedSocket.headers,
+              selectedSocketIOBodyType:
+                unadaptedSocket.selectedSocketIOBodyType,
+            },
+          },
+        });
+        if (res.isSuccessful) {
+          this.addRequestOrFolderInCollection(
+            path[path.length - 1].id,
+            res.data.data,
+          );
 
-  //         return {
-  //           status: "success",
-  //           message: res.message,
-  //           data: {
-  //             id: res.data.data.id,
-  //           },
-  //         };
-  //       } else {
-  //         return {
-  //           status: "error",
-  //           message: res.message,
-  //         };
-  //       }
-  //     } else if (path[path.length - 1].type === ItemType.FOLDER) {
-  //       /**
-  //        * handle request at folder level
-  //        */
-  //       const _collection = await this.readCollection(path[0].id);
-  //       if (_collection?.activeSync) {
-  //         userSource = {
-  //           currentBranch: _collection?.currentBranch,
-  //           source: "USER",
-  //         };
-  //       }
-  //       let isGuestUser;
-  //       isGuestUserActive.subscribe((value) => {
-  //         isGuestUser = value;
-  //       });
+          return {
+            status: "success",
+            message: res.message,
+            data: {
+              id: res.data.data.id,
+            },
+          };
+        } else {
+          return {
+            status: "error",
+            message: res.message,
+          };
+        }
+      } else if (path[path.length - 1].type === ItemType.FOLDER) {
+        /**
+         * handle request at folder level
+         */
+        const _collection = await this.readCollection(path[0].id);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
+        let isGuestUser;
+        isGuestUserActive.subscribe((value) => {
+          isGuestUser = value;
+        });
 
-  //       if (isGuestUser == true) {
-  //         this.collectionRepository.addRequestInFolder(
-  //           path[0].id,
-  //           path[path.length - 1].id,
-  //           req,
-  //         );
-  //         return {
-  //           status: "success",
-  //           message: "success",
-  //           data: {
-  //             id: req.id,
-  //           },
-  //         };
-  //       }
-  //       const res = await this.collectionService.addSocketIoInCollection({
-  //         collectionId: path[0].id,
-  //         workspaceId: _workspaceMeta.id,
-  //         folderId: path[path.length - 1].id,
-  //         ...userSource,
-  //         items: {
-  //           id: path[path.length - 1].id,
-  //           name: path[path.length - 1].name,
-  //           type: CollectionItemTypeBaseEnum.FOLDER,
-  //           items: {
-  //             name: tabName,
-  //             description,
-  //             type: CollectionItemTypeBaseEnum.SOCKETIO,
-  //             socketio: {
-  //               url: unadaptedSocket.url,
-  //               message: unadaptedSocket.message,
-  //               eventName: unadaptedSocket.eventName,
-  //               events: unadaptedSocket.events,
-  //               queryParams: unadaptedSocket.queryParams,
-  //               headers: unadaptedSocket.headers,
-  //               selectedSocketIOBodyType:
-  //                 unadaptedSocket.selectedSocketIOBodyType,
-  //             },
-  //           },
-  //         },
-  //       });
-  //       if (res.isSuccessful) {
-  //         this.collectionRepository.addRequestInFolder(
-  //           path[0].id,
-  //           path[path.length - 1].id,
-  //           res.data.data,
-  //         );
-  //         return {
-  //           status: "success",
-  //           message: res.message,
-  //           data: {
-  //             id: res.data.data.id,
-  //           },
-  //         };
-  //       } else {
-  //         return {
-  //           status: "error",
-  //           message: res.message,
-  //         };
-  //       }
-  //     }
-  //     MixpanelEvent(Events.SAVE_API_REQUEST);
-  //   }
-  // };
+        if (isGuestUser == true) {
+          this.collectionRepository.addRequestInFolder(
+            path[0].id,
+            path[path.length - 1].id,
+            req,
+          );
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+        }
+        const res = await this.collectionService.addSocketIoInCollection({
+          collectionId: path[0].id,
+          workspaceId: _workspaceMeta.id,
+          folderId: path[path.length - 1].id,
+          ...userSource,
+          items: {
+            id: path[path.length - 1].id,
+            name: path[path.length - 1].name,
+            type: CollectionItemTypeBaseEnum.FOLDER,
+            items: {
+              name: tabName,
+              description,
+              type: CollectionItemTypeBaseEnum.SOCKETIO,
+              socketio: {
+                url: unadaptedSocket.url,
+                message: unadaptedSocket.message,
+                eventName: unadaptedSocket.eventName,
+                events: unadaptedSocket.events,
+                queryParams: unadaptedSocket.queryParams,
+                headers: unadaptedSocket.headers,
+                selectedSocketIOBodyType:
+                  unadaptedSocket.selectedSocketIOBodyType,
+              },
+            },
+          },
+        });
+        if (res.isSuccessful) {
+          this.collectionRepository.addRequestInFolder(
+            path[0].id,
+            path[path.length - 1].id,
+            res.data.data,
+          );
+          return {
+            status: "success",
+            message: res.message,
+            data: {
+              id: res.data.data.id,
+            },
+          };
+        } else {
+          return {
+            status: "error",
+            message: res.message,
+          };
+        }
+      }
+      MixpanelEvent(Events.SAVE_API_REQUEST);
+    }
+  };
 
   /**
    *
@@ -4985,264 +4986,266 @@ export default class CollectionsViewModel {
    * @param description - request description.
    * @param componentData - GraphQL request tab data.
    */
-  // public saveAsGraphql = async (
-  //   _workspaceMeta: {
-  //     id: string;
-  //     name: string;
-  //   },
-  //   path: {
-  //     name: string;
-  //     id: string;
-  //     type: string;
-  //   }[],
-  //   tabName: string,
-  //   description: string,
-  //   componentData: Tab,
-  // ) => {
-  //   let userSource = {};
-  //   if (path.length > 0) {
-  //     const graphqlTabAdapter = new GraphqlTabAdapter();
-  //     const unadaptedRequest = graphqlTabAdapter.unadapt(componentData as Tab);
-  //     let req = {
-  //       id: uuidv4(),
-  //       name: tabName,
-  //       description,
-  //       type: ItemType.GRAPHQL,
-  //       graphql: unadaptedRequest,
-  //       source: "USER",
-  //       isDeleted: false,
-  //       createdBy: "Guest User",
-  //       updatedBy: "Guest User",
-  //       createdAt: new Date().toISOString(),
-  //       updatedAt: new Date().toISOString(),
-  //     };
-  //     if (path[path.length - 1].type === ItemType.COLLECTION) {
-  //       /**
-  //        * handle request at collection level
-  //        */
-  //       const _collection = await this.readCollection(path[path.length - 1].id);
-  //       if (_collection?.activeSync) {
-  //         userSource = {
-  //           currentBranch: _collection?.currentBranch,
-  //           source: "USER",
-  //         };
-  //       }
-  //       const isGuestUser = await this.getGuestUserState();
+  public saveAsGraphql = async (
+    _workspaceMeta: {
+      id: string;
+      name: string;
+    },
+    path: {
+      name: string;
+      id: string;
+      type: string;
+    }[],
+    tabName: string,
+    description: string,
+    componentData: Tab,
+  ) => {
+    let userSource = {};
+    if (path.length > 0) {
+      const graphqlTabAdapter = new GraphqlTabAdapter();
+      const unadaptedRequest = graphqlTabAdapter.unadapt(componentData as Tab);
+      let req = {
+        id: uuidv4(),
+        name: tabName,
+        description,
+        type: ItemType.GRAPHQL,
+        graphql: unadaptedRequest,
+        source: "USER",
+        isDeleted: false,
+        createdBy: "Guest User",
+        updatedBy: "Guest User",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      if (path[path.length - 1].type === ItemType.COLLECTION) {
+        /**
+         * handle request at collection level
+         */
+        const _collection = await this.readCollection(path[path.length - 1].id);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
+        const isGuestUser = await this.getGuestUserState();
 
-  //       if (isGuestUser == true) {
-  //         this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
-  //         return {
-  //           status: "success",
-  //           message: "success",
-  //           data: {
-  //             id: req.id,
-  //           },
-  //         };
-  //       }
-  //       const res = await this.collectionService.addGraphqlInCollection({
-  //         collectionId: path[path.length - 1].id,
-  //         workspaceId: _workspaceMeta.id,
-  //         ...userSource,
-  //         items: {
-  //           name: tabName,
-  //           description,
-  //           type: CollectionItemTypeBaseEnum.GRAPHQL,
-  //           graphql: unadaptedRequest,
-  //         },
-  //       });
-  //       if (res.isSuccessful) {
-  //         this.addRequestOrFolderInCollection(
-  //           path[path.length - 1].id,
-  //           res.data.data,
-  //         );
-  //         return {
-  //           status: "success",
-  //           message: res.message,
-  //           data: {
-  //             id: res.data.data.id,
-  //           },
-  //         };
-  //       } else {
-  //         return {
-  //           status: "error",
-  //           message: res.message,
-  //         };
-  //       }
-  //     } else if (path[path.length - 1].type === ItemType.FOLDER) {
-  //       /**
-  //        * handle request at folder level
-  //        */
-  //       const _collection = await this.readCollection(path[0].id);
-  //       if (_collection?.activeSync) {
-  //         userSource = {
-  //           currentBranch: _collection?.currentBranch,
-  //           source: "USER",
-  //         };
-  //       }
-  //       const isGuestUser = await this.getGuestUserState();
+        if (isGuestUser == true) {
+          this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+        }
+        const res = await this.collectionService.addGraphqlInCollection({
+          collectionId: path[path.length - 1].id,
+          workspaceId: _workspaceMeta.id,
+          ...userSource,
+          items: {
+            name: tabName,
+            description,
+            type: CollectionItemTypeBaseEnum.GRAPHQL,
+            graphql: unadaptedRequest,
+          },
+        });
+        if (res.isSuccessful) {
+          this.addRequestOrFolderInCollection(
+            path[path.length - 1].id,
+            res.data.data,
+          );
+          return {
+            status: "success",
+            message: res.message,
+            data: {
+              id: res.data.data.id,
+            },
+          };
+        } else {
+          return {
+            status: "error",
+            message: res.message,
+          };
+        }
+      } else if (path[path.length - 1].type === ItemType.FOLDER) {
+        /**
+         * handle request at folder level
+         */
+        const _collection = await this.readCollection(path[0].id);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
+        const isGuestUser = await this.getGuestUserState();
 
-  //       if (isGuestUser == true) {
-  //         this.collectionRepository.addRequestInFolder(
-  //           path[0].id,
-  //           path[path.length - 1].id,
-  //           req,
-  //         );
-  //         return {
-  //           status: "success",
-  //           message: "success",
-  //           data: {
-  //             id: req.id,
-  //           },
-  //         };
-  //       }
-  //       const res = await this.collectionService.addGraphqlInCollection({
-  //         collectionId: path[0].id,
-  //         workspaceId: _workspaceMeta.id,
-  //         folderId: path[path.length - 1].id,
-  //         ...userSource,
-  //         items: {
-  //           id: path[path.length - 1].id,
-  //           type: CollectionItemTypeBaseEnum.FOLDER,
-  //           items: {
-  //             name: tabName,
-  //             description,
-  //             type: CollectionItemTypeBaseEnum.GRAPHQL,
-  //             graphql: unadaptedRequest,
-  //           },
-  //         },
-  //       });
-  //       if (res.isSuccessful) {
-  //         this.collectionRepository.addRequestInFolder(
-  //           path[0].id,
-  //           path[path.length - 1].id,
-  //           res.data.data,
-  //         );
+        if (isGuestUser == true) {
+          this.collectionRepository.addRequestInFolder(
+            path[0].id,
+            path[path.length - 1].id,
+            req,
+          );
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+        }
+        const res = await this.collectionService.addGraphqlInCollection({
+          collectionId: path[0].id,
+          workspaceId: _workspaceMeta.id,
+          folderId: path[path.length - 1].id,
+          ...userSource,
+          items: {
+            id: path[path.length - 1].id,
+            type: CollectionItemTypeBaseEnum.FOLDER,
+            name: path[path.length - 1].name,
+            items: {
+              name: tabName,
+              description,
+              type: CollectionItemTypeBaseEnum.GRAPHQL,
+              graphql: unadaptedRequest,
+            },
+          },
+        });
+        if (res.isSuccessful) {
+          this.collectionRepository.addRequestInFolder(
+            path[0].id,
+            path[path.length - 1].id,
+            res.data.data,
+          );
 
-  //         return {
-  //           status: "success",
-  //           message: res.message,
-  //           data: {
-  //             id: res.data.data.id,
-  //           },
-  //         };
-  //       } else {
-  //         return {
-  //           status: "error",
-  //           message: res.message,
-  //         };
-  //       }
-  //     }
-  //     MixpanelEvent(Events.Save_GraphQL_Request);
-  //   }
-  // };
+          return {
+            status: "success",
+            message: res.message,
+            data: {
+              id: res.data.data.id,
+            },
+          };
+        } else {
+          return {
+            status: "error",
+            message: res.message,
+          };
+        }
+      }
+      MixpanelEvent(Events.Save_GraphQL_Request);
+    }
+  };
 
   /**
    * Save saveGraphql Request
    * @param graphqlTabData - refers save overall graphql tab data
    * @returns save status
    */
-  // public saveGraphql = async (graphqlTabData: Tab) => {
-  //   MixpanelEvent(Events.Save_GraphQL_Request);
-  //   const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
+  public saveGraphql = async (graphqlTabData: Tab) => {
+    MixpanelEvent(Events.Save_GraphQL_Request);
+    const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
 
-  //   if (!workspaceId || !collectionId) {
-  //     return {
-  //       status: "error",
-  //       message: "request is not a part of any workspace or collection",
-  //     };
-  //   }
+    if (!workspaceId || !collectionId) {
+      return {
+        status: "error",
+        message: "request is not a part of any workspace or collection",
+      };
+    }
 
-  //   const graphqlTabAdapter = new GraphqlTabAdapter();
-  //   const unadaptedRequest = graphqlTabAdapter.unadapt(graphqlTabData as Tab);
+    const graphqlTabAdapter = new GraphqlTabAdapter();
+    const unadaptedRequest = graphqlTabAdapter.unadapt(graphqlTabData as Tab);
 
-  //   const isGuestUser = await this.getGuestUserState();
-  //   /**
-  //    * Handle save GraphQL Request for guest user
-  //    */
-  //   if (isGuestUser) {
-  //     const guestGraphqlRequest = {
-  //       id: graphqlTabData.id,
-  //       name: graphqlTabData.name,
-  //       description: graphqlTabData.description,
-  //       type: CollectionItemTypeBaseEnum.GRAPHQL,
-  //       graphql: {
-  //         url: unadaptedRequest.url as string,
-  //         query: unadaptedRequest.query,
-  //         schema: unadaptedRequest.schema,
-  //         headers: unadaptedRequest.headers,
-  //         auth: unadaptedRequest.auth,
-  //         selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
-  //       },
-  //       updatedAt: "",
-  //       updatedBy: "Guest User",
-  //     };
-  //     if (!folderId) {
-  //       this.collectionRepository.updateRequestOrFolderInCollection(
-  //         collectionId,
-  //         graphqlTabData.id as string,
-  //         guestGraphqlRequest,
-  //       );
-  //     } else {
-  //       this.collectionRepository.updateRequestInFolder(
-  //         collectionId,
-  //         folderId,
-  //         graphqlTabData.id as string,
-  //         guestGraphqlRequest,
-  //       );
-  //     }
-  //     return {
-  //       status: "success",
-  //       message: "",
-  //     };
-  //   }
+    const isGuestUser = await this.getGuestUserState();
+    /**
+     * Handle save GraphQL Request for guest user
+     */
+    if (isGuestUser) {
+      const guestGraphqlRequest = {
+        id: graphqlTabData.id,
+        name: graphqlTabData.name,
+        description: graphqlTabData.description,
+        type: CollectionItemTypeBaseEnum.GRAPHQL,
+        graphql: {
+          url: unadaptedRequest.url as string,
+          query: unadaptedRequest.query,
+          schema: unadaptedRequest.schema,
+          headers: unadaptedRequest.headers,
+          auth: unadaptedRequest.auth,
+          selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
+        },
+        updatedAt: "",
+        updatedBy: "Guest User",
+      };
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          graphqlTabData.id as string,
+          guestGraphqlRequest,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          graphqlTabData.id as string,
+          guestGraphqlRequest,
+        );
+      }
+      return {
+        status: "success",
+        message: "",
+      };
+    }
 
-  //   /**
-  //    * Handle save GraphQL Request for registered user
-  //    */
+    /**
+     * Handle save GraphQL Request for registered user
+     */
 
-  //   const graphqlPayload = {
-  //     name: graphqlTabData?.name as string,
-  //     description: graphqlTabData?.description as string,
-  //     url: unadaptedRequest.url as string,
-  //     query: unadaptedRequest.query,
-  //     schema: unadaptedRequest.schema,
-  //     headers: unadaptedRequest.headers,
-  //     auth: unadaptedRequest.auth,
-  //     selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
-  //   };
+    const graphqlPayload = {
+      name: graphqlTabData?.name as string,
+      description: graphqlTabData?.description as string,
+      url: unadaptedRequest.url as string,
+      query: unadaptedRequest.query,
+      schema: unadaptedRequest.schema,
+      headers: unadaptedRequest.headers,
+      auth: unadaptedRequest.auth,
+      variables: unadaptedRequest.variables,
+      selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
+    };
 
-  //   const res = await this.collectionService.updateGraphqlInCollection(
-  //     graphqlTabData.id as string,
-  //     collectionId,
-  //     workspaceId,
-  //     graphqlPayload,
-  //     folderId,
-  //   );
+    const res = await this.collectionService.updateGraphqlInCollection(
+      graphqlTabData.id as string,
+      collectionId,
+      workspaceId,
+      graphqlPayload,
+      folderId,
+    );
 
-  //   if (res.isSuccessful) {
-  //     if (!folderId) {
-  //       this.collectionRepository.updateRequestOrFolderInCollection(
-  //         collectionId,
-  //         graphqlTabData.id as string,
-  //         res.data.data,
-  //       );
-  //     } else {
-  //       this.collectionRepository.updateRequestInFolder(
-  //         collectionId,
-  //         folderId,
-  //         graphqlTabData.id as string,
-  //         res.data.data,
-  //       );
-  //     }
-  //     return {
-  //       status: "success",
-  //       message: res.message,
-  //     };
-  //   } else {
-  //     return {
-  //       status: "error",
-  //       message: res.message,
-  //     };
-  //   }
-  // };
+    if (res.isSuccessful) {
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          graphqlTabData.id as string,
+          res.data.data,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          graphqlTabData.id as string,
+          res.data.data,
+        );
+      }
+      return {
+        status: "success",
+        message: res.message,
+      };
+    } else {
+      return {
+        status: "error",
+        message: res.message,
+      };
+    }
+  };
 }

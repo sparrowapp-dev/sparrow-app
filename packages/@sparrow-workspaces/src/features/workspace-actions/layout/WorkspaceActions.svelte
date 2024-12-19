@@ -278,6 +278,18 @@
             onCreateEnvironment();
           },
         },
+        {
+          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+          icon: SocketIoIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "14px",
+          onclick: () => {
+            onItemCreated("socket-io", {});
+            MixpanelEvent(Events.Add_SocketIO, {
+              description: "Add Socket.IO From + Icon in Left Panel",
+            });
+          },
+        },
       ]
     : [
         {
