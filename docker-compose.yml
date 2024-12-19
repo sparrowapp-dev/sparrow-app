@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+  # MongoDB
+  mongo:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+    networks:
+      - localnet
+
+  # Kafka
+  kafka:
+    image: bitnami/kafka:3.4.1
+    hostname: kafka
+    ports:
+      - "9092:9092"
+    volumes:
+      - "kafka_data:/bitnami"
+    env_file:
+      - .env
+    networks:
+      - localnet
+
+  # App
+  api:
+    image: sparrowapi/sparrow-api:v2
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./:/src
+    networks:
+      - localnet
+    depends_on:
+      - mongo
+      - kafka
+    env_file:
+      - .env
+
+  # Sparrow Auth
+  auth:
+    image: sparrowapi/sparrow-auth:v1
+    ports:
+      - "80:80"
+    networks:
+      - localnet
+    depends_on:
+      - mongo
+      - kafka
+    env_file:
+      - .env
+
+volumes:
+  kafka_data:
+    driver: local
+
+networks:
+  localnet:
+    driver: bridge
