@@ -6,15 +6,14 @@
   import Navigate from "../routing/Navigate.svelte";
   import Dashboard from "@app/pages/dashboard-page/Dashboard.svelte";
   import EntryPoint from "@app/pages/auth-page/Auth.svelte";
-  import { maximizeWindow } from "../utils";
   import { onMount } from "svelte";
   import { user } from "@app/store/auth.store";
   import { handleShortcuts } from "@app/utils/shortcuts";
   import { AppUpdater } from "@sparrow/common/features";
-  import { getCurrentWindow } from "@tauri-apps/api/window";
   import LoginPage from "@app/pages/auth-page/sub-pages/login-page/LoginPage.svelte";
   import { singleInstanceHandler } from "@app/utils/singleinstance/app.singleinstance";
   import { AppViewModel } from "./app.ViewModel";
+  import constants from "@app/constants/constants";
   import { getScaleFactor, setScaleFactorToDb } from "@app/utils/zoom";
   import { listen } from "@tauri-apps/api/event";
   import { invoke } from "@tauri-apps/api/core";
@@ -91,7 +90,7 @@
       <Route path="/*"><Navigate to="/guest/" /></Route>
     </section>
     <section slot="unauthorized">
-      {#if 1}
+      {#if constants.SIMPLIFIED_LOGIN != "true"}
         <Route path="/init" component={EntryPoint} />
         <Route path="/init/*" component={Dashboard} />
         <Route path="/*"><Navigate to="/init" /></Route>
