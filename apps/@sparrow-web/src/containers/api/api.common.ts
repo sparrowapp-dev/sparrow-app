@@ -454,87 +454,6 @@ const connectWebSocket = async (
       throw error;
     }
   } else if (selectedAgent === "Cloud Agent") {
-    try {
-      webSocketDataStore.update((webSocketDataMap) => {
-        webSocketDataMap.set(tabId, {
-          messages: [],
-          status: "connecting",
-          search: "",
-          contentType: RequestDataTypeEnum.TEXT,
-          body: "",
-          filter: "All Messages",
-          url: url,
-        });
-        return webSocketDataMap;
-      });
-
-      const proxyUrl = "http://localhost:9000/proxy/ws-connect";
-      const response = await axios.post(proxyUrl, {
-        tabId,
-        targetUrl: url,
-        headers: requestHeaders,
-      });
-
-      if (response.data.success) {
-        webSocketDataStore.update((webSocketDataMap) => {
-          const wsData = webSocketDataMap.get(tabId);
-          if (wsData) {
-            wsData.messages.unshift({
-              data: `Connected to ${url}`,
-              transmitter: "connecter",
-              timestamp: formatTime(new Date()),
-              uuid: uuidv4(),
-            });
-            wsData.status = "connected";
-            webSocketDataMap.set(tabId, wsData);
-          }
-          return webSocketDataMap;
-        });
-        notifications.success("WebSocket connected successfully");
-
-        // Set up event source for receiving messages
-        const eventSource = new EventSource(
-          `http://localhost:3000/proxy/ws-events/${tabId}`,
-        );
-
-        eventSource.onmessage = (event) => {
-          const data = JSON.parse(event.data);
-          webSocketDataStore.update((webSocketDataMap) => {
-            const wsData = webSocketDataMap.get(tabId);
-            if (wsData) {
-              wsData.messages.unshift({
-                data: data.message,
-                transmitter: "receiver",
-                timestamp: formatTime(new Date()),
-                uuid: uuidv4(),
-              });
-              webSocketDataMap.set(tabId, wsData);
-            }
-            return webSocketDataMap;
-          });
-        };
-
-        eventSource.onerror = () => {
-          eventSource.close();
-          webSocketDataStore.update((webSocketDataMap) => {
-            const wsData = webSocketDataMap.get(tabId);
-            if (wsData) {
-              wsData.status = "disconnected";
-              webSocketDataMap.set(tabId, wsData);
-            }
-            return webSocketDataMap;
-          });
-        };
-      }
-    } catch (error) {
-      console.error(error);
-      notifications.error("Failed to connect WebSocket");
-      webSocketDataStore.update((webSocketDataMap) => {
-        webSocketDataMap.delete(tabId);
-        return webSocketDataMap;
-      });
-      throw error;
-    }
   }
 };
 
@@ -561,8 +480,7 @@ const makeHttpRequestV2 = async (
   try {
     let response;
     if (selectedAgent === "Cloud Agent") {
-      // const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
-      const proxyUrl = "http://localhost:3000/proxy/http-request";
+      const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
       response = await axios({
         data: { url, method, headers, body, contentType },
         url: proxyUrl,
@@ -746,7 +664,7 @@ const processMessageEvent = async (
  * @returns A message indicating the connection was established.
  */
 const processConnectEvent = (_url: string): string => {
-  return `Connected from ${_url}`;
+  return `Connected to ${_url}`;
 };
 
 /**
