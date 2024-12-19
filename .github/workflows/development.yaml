@@ -23,7 +23,9 @@ env:
   VITE_CANNY_URL: ${{ vars.VITE_CANNY_URL }}
   VITE_BASE_URL: ${{ vars.VITE_BASE_URL }}
   VITE_SPARROW_LINKEDIN: ${{ vars.VITE_SPARROW_LINKEDIN }}
+  VITE_WEB_SOCKET_IO_API_URL: ${{ vars.VITE_WEB_SOCKET_IO_API_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+  CI: false
 
 jobs:
   release_win:
@@ -61,6 +63,9 @@ jobs:
           $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"'
           Set-Content -Path apps/@sparrow-desktop/src-tauri/tauri.conf.json -Value $newContent
         shell: pwsh
+
+      - name: Increase Yarn network timeout
+        run: yarn config set network-timeout 600000
 
       - name: Build Tauri App
         run: |
@@ -130,6 +135,9 @@ jobs:
           echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
         shell: bash
 
+      - name: Increase Yarn network timeout
+        run: yarn config set network-timeout 600000
+
       - name: Build Tauri App
         run: |
           yarn cache clean
@@ -145,6 +153,7 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CI: false
 
       - name: file content
         run: |

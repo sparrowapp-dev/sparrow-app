@@ -74,6 +74,8 @@
   let isTokenFormEnabled = false;
   let isTokenErrorMessage = false;
   let isTokenValidationLoading = false;
+
+  let isPressed = false;
 </script>
 
 <DefaultHeader />
@@ -122,7 +124,12 @@
     >
       <div class="d-flex" style="height:44px; width:100%; margin-top:44px;">
         <button
-          class="btn btn-primary w-100 text-blackColor border-0"
+          on:mousedown={() => (isPressed = true)}
+          on:mouseup={() => (isPressed = false)}
+          on:mouseleave={() => (isPressed = false)}
+          class="btn btn-primary w-100 border-0 {isPressed
+            ? 'shadow-pressed'
+            : 'shadow-none'}"
           on:click={() => {
             handleRedirect(true);
             openDefaultBrowser();
@@ -329,13 +336,23 @@
     font-weight: 400;
     font-size: 14px;
     background: var(--bg-secondary-100);
-    color: var(--text-primary-300);
+    color: var(--text-secondary-900);
     border: 1px solid #ffffff;
   }
 
   .btn-primary:hover {
     background-color: #6147ff; /* purple-600 */
     border-color: transparent;
+    color: var(--text-secondary-100);
+  }
+
+  .btn-primary.shadow-none {
+    box-shadow: none;
+  }
+
+  .btn-primary.shadow-pressed {
+    box-shadow: inset 0px 0px 12px 5px rgba(0, 0, 0, 0.55);
+    border: 0.4px solid white !important;
   }
 
   .btn-primary:active {
