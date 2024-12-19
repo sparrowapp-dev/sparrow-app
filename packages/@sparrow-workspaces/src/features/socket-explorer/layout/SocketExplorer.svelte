@@ -51,6 +51,7 @@
   export let onUpdateEnvironment;
   export let environmentVariables;
   export let isGuestUser = false;
+  export let isWebApp;
   /**
    * Role of user in active workspace
    */

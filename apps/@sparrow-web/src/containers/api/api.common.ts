@@ -357,8 +357,34 @@ const connectWebSocket = async (
 
   if (selectedAgent === "Browser Agent") {
     try {
+      // Parse the headers string to array of header objects
       const headers = JSON.parse(requestHeaders);
 
+      // Filter and process headers that are supported by WebSocket
+      const protocols: string[] = [];
+      const validHeaders = new Set([
+        "Sec-WebSocket-Protocol",
+        "Sec-WebSocket-Version",
+        "Sec-WebSocket-Key",
+        "Sec-WebSocket-Accept",
+      ]);
+
+      // Extract WebSocket protocols from headers
+      headers.forEach(
+        (header: { key: string; value: string; checked: boolean }) => {
+          if (header.checked !== false) {
+            if (header.key === "Sec-WebSocket-Protocol") {
+              // Split protocol string and add to protocols array
+              const protocolValues = header.value
+                .split(",")
+                .map((p) => p.trim());
+              protocols.push(...protocolValues);
+            }
+          }
+        },
+      );
+
+      // Initialize WebSocket store
       webSocketDataStore.update((webSocketDataMap) => {
         webSocketDataMap.set(tabId, {
           messages: [],
@@ -373,8 +399,13 @@ const connectWebSocket = async (
         return webSocketDataMap;
       });
 
-      const ws = new WebSocket(url);
+      // Create WebSocket with protocols if specified
+      const ws =
+        protocols.length > 0
+          ? new WebSocket(url, protocols)
+          : new WebSocket(url);
 
+      // Update store with WebSocket instance
       webSocketDataStore.update((webSocketDataMap) => {
         const wsData = webSocketDataMap.get(tabId);
         if (wsData) {
@@ -396,6 +427,15 @@ const connectWebSocket = async (
                 uuid: uuidv4(),
               });
               wsData.status = "connected";
+              // Add information about used protocols if any
+              if (ws.protocol) {
+                wsData.messages.unshift({
+                  data: `Using protocol: ${ws.protocol}`,
+                  transmitter: "info",
+                  timestamp: formatTime(new Date()),
+                  uuid: uuidv4(),
+                });
+              }
               webSocketDataMap.set(tabId, wsData);
             }
             return webSocketDataMap;
@@ -426,13 +466,16 @@ const connectWebSocket = async (
             webSocketDataMap.delete(tabId);
             return webSocketDataMap;
           });
+          notifications.error("WebSocket connection failed");
+          reject(error);
         };
-        ws.onclose = () => {
+
+        ws.onclose = (event) => {
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
               wsData.messages.unshift({
-                data: `Disconnected from ${url}`,
+                data: `Disconnected from ${url} (Code: ${event.code})`,
                 transmitter: "disconnector",
                 timestamp: formatTime(new Date()),
                 uuid: uuidv4(),
@@ -445,7 +488,7 @@ const connectWebSocket = async (
         };
       });
     } catch (error) {
-      console.error(error);
+      console.error("WebSocket connection error:", error);
       webSocketDataStore.update((webSocketDataMap) => {
         webSocketDataMap.delete(tabId);
         return webSocketDataMap;
