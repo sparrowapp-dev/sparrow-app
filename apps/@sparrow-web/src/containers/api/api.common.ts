@@ -470,12 +470,12 @@ const connectWebSocket = async (
           reject(error);
         };
 
-        ws.onclose = (event) => {
+        ws.onclose = () => {
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
               wsData.messages.unshift({
-                data: `Disconnected from ${url} (Code: ${event.code})`,
+                data: `Disconnected from ${url}`,
                 transmitter: "disconnector",
                 timestamp: formatTime(new Date()),
                 uuid: uuidv4(),
