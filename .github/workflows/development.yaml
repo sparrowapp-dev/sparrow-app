@@ -3,7 +3,7 @@ name: Development release
 on:
   push:
     branches:
-      - pratik/dev
+      - development
   workflow_dispatch:
 
 env:
