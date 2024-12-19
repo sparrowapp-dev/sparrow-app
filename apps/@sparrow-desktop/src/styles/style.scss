@@ -101,6 +101,7 @@ $theme-grey-8A9299: #8a9299;
 $theme-grey-999999: #999999;
 $theme-grey-9CA0B2: #9ca0b2;
 $theme-grey-CCCCCC: #cccccc;
+$theme-grey-CCCCCCE5: #cccccce5;
 $theme-grey-888888: #888888;
 $theme-grey-83899F: #83899f;
 $theme-grey-808080: #808080;
@@ -299,6 +300,7 @@ $theme-green-00A86B: #00a86b;
   --text-secondary-850: #{$theme-grey-121212};
   --text-secondary-900: #{$theme-grey-000000};
   --text-secondary-1000: #{$theme-grey-CCCCCC};
+  --text-secondary-1030: #{$theme-grey-CCCCCCE5};
   --text-secondary-1100: #{$theme-grey-2B343D};
 
   --text-tertiary-100: #{$theme-violet-676A80};
@@ -602,6 +604,8 @@ $sparrow-font-sizes: (
   // 19px in rem
   20: 1.25rem,
   // 20px in rem
+  24: 1.5rem,
+  // 24px in rem
   28: 1.75rem,
   // 28px in rem
   36: 2.25rem,

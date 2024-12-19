@@ -456,6 +456,7 @@ async function processMessageEvent(tabId, event) {
   // Retrieve tab data and check event inclusion
   const tabData = await tabRepository.getTabByTabId(tabId);
   const tabDataJSON = tabData?.toMutableJSON();
+  console.log(event,"event");
   const socketIOresponse = event.payload;
   const eventName = socketIOresponse.event;
   const message = socketIOresponse.message;

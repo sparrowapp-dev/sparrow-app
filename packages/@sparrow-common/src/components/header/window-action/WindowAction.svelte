@@ -6,6 +6,7 @@
     MiniMizeIcon,
     SquareIcon,
   } from "@sparrow/library/icons";
+  import { invoke } from "@tauri-apps/api/core";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { onDestroy } from "svelte";
 
@@ -34,6 +35,11 @@
   const toggleSize = async () => {
     if (!isWindows) {
       const currentFullscreenState = await appWindow.isFullscreen();
+
+      // Show original Toolbar when window is maximized
+      if (!currentFullscreenState) {
+        await invoke("show_toolbar");
+      }
 
       // Toggle fullscreen mode
       await appWindow.setFullscreen(!currentFullscreenState);

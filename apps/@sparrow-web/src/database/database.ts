@@ -127,6 +127,11 @@ export class RxDB {
       },
       tab: {
         schema: tabSchema,
+        migrationStrategies: {
+          1: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+        },
       },
       collection: {
         schema: collectionSchema,

@@ -2,11 +2,17 @@
   import { notifications } from "@sparrow/library/ui";
   import {
     logoSparrowSquare,
+    SparrowBackgroundV2,
     sparrowLogoBackground,
   } from "@sparrow/common/images";
   import { DefaultHeader, Redirect } from "@sparrow/common/components";
   import constants from "@app/constants/constants";
-  import { StarIcon } from "@sparrow/library/icons";
+  import {
+    AISparkle,
+    AiSparkleIconV2,
+    AiSparkleIconV3,
+    StarIcon,
+  } from "@sparrow/library/icons";
   import { StarFilledIcon } from "@sparrow/library/icons";
   import { CopyIcon } from "@sparrow/library/icons";
   import { ExternalLinkIcon } from "@sparrow/library/icons";
@@ -69,6 +75,8 @@
       });
     }
   };
+
+  let isPressed = false;
 </script>
 
 <DefaultHeader />
@@ -121,62 +129,88 @@
   >
 {:else}
   <Background>
-    <div
-      class="text-white d-flex justify-content-center align-items-center bg-primary-300"
-      style="height: 60px; width: 60px; border-radius: 6px;"
-    >
-      <img src={logoSparrowSquare} alt="" class="" />
-    </div>
-    <p
-      class="container-header pt-4 pb-4 sparrow-fs-28 sparrow-fw-600 text-whiteColor text-center ms-2 me-2"
-      style="font-weight: 500;"
-    >
-      Welcome to <span class="text-primary-300">Sparrow!</span>
-    </p>
-    <div class="mb-1" style="height:40px;">
-      <button
-        class="btn btn-primary mb-3 w-100 text-whiteColor border-0"
-        on:click={() => {
-          handleRedirect(true);
-          openDefaultBrowser();
-        }}
-        id="create_account_or_sign_in"
-      >
-        Create an Account or Sign In</button
-      >
-    </div>
-    <div class="mb-1">
+    <div class="d-flex align-items-start gap-2">
       <div
-        class="mb-2"
-        style="text-align:center; font-size:12px; color:var(  --text-secondary-350);"
+        class="text-white d-flex justify-content-center align-items-center bg-primary-300"
+        style="height: 25px; width: 25px; border-radius: 6px;"
       >
-        or
-      </div>
-      <div style="height:32px;">
-        <Button
-          id="try_sparrow_edge"
-          onClick={() => {
-            skipLoginHandler();
-            // isUserFirstSignUp.set(true);
-          }}
-          title={"Try Sparrow Edge"}
-          buttonClassProp={"btn mb-2"}
-          type={"teritiary"}
-          buttonStyleProp={"height:32px; weight:126px; border-color:var( --border-primary-300) !important; font-size:13px; "}
+        <img
+          height="17px"
+          width="17px"
+          src={logoSparrowSquare}
+          alt=""
+          class=""
         />
       </div>
-    </div>
-    <div
-      class="mb-2 mt-2 w-[266px]"
-      style="text-align:center; font-size:12px; color:var(  --text-secondary-350); padding: 5% 0px; width: 80%;
-      font-size: 12px;
-      "
-    >
-      Sparrow Edge: Your instant, no-signup API testing tool stripped down to
-      the essentials.
+      <p style="font-weight:500;">Sparrow</p>
     </div>
 
-    <div class="w-100 d-flex align-items-center justify-content-center">
+    <div style="display: flex ; flex-direction:column; align-items:center;">
+      <p
+        class="container-header text-fs-24 sparrow-fw-600 text-whiteColor text-center ms-2 me-2 mb-1"
+        style="font-weight: 400; padding-top:20px; line-height:28px; text-align:center;"
+      >
+        Welcome to Sparrow!
+      </p>
+      <p class="sparrow-fs-12 mt-0" style="color: var(--text-secondary-200);">
+        The only API Sidekick you need
+      </p>
+    </div>
+
+    <div
+      class=""
+      style="display: flex ; flex-direction:column; align-items:center;"
+    >
+      <div class="d-flex" style="height:44px; width:100%; margin-top:44px;">
+        <button
+          on:mousedown={() => (isPressed = true)}
+          on:mouseup={() => (isPressed = false)}
+          on:mouseleave={() => (isPressed = false)}
+          class="btn btn-primary w-100 border-0 {isPressed ? 'shadow-pressed' : 'shadow-none'}"
+          on:click={() => {
+            handleRedirect(true);
+            openDefaultBrowser();
+          }}
+          id="create_account_or_sign_in"
+        >
+          Login or Create</button
+        >
+      </div>
+
+      <div class="divider w-100">
+        <span class="line"></span>
+        <span class="text" style="color:var(--text-secondary-200)">Or</span>
+        <span class="line"></span>
+      </div>
+
+      <div class="d-flex" style="height:44px; width:100%;">
+        <button
+          class="btn btn-secondary w-100 text-whiteColor"
+          style=""
+          on:click={() => {
+            skipLoginHandler();
+          }}
+          id="create_account_or_sign_in"
+        >
+          Try Sparrow Edge</button
+        >
+      </div>
+
+      <div
+        class="mb-2 mt-2 w-[266px]"
+        style=" text-align:center; font-size:12px; color:var(--text-secondary-1030);  width: 100%;
+      font-size: 12px; font-weight:400;
+      "
+      >
+        <AiSparkleIconV2 height={"20"} width={"20"} /> Instantly test APIs without
+        signing up-just the essentials to get started fast.
+      </div>
+    </div>
+
+    <div
+      class="w-100 d-flex align-items-center justify-content-center"
+      style="margin-top: 64px;"
+    >
       {#if os === "windows"}
         <a
           href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
@@ -193,7 +227,7 @@
             await open(externalSparrowLink + "/support");
           }}
           role="button"
-          class="px-2 sparrow-fs-12 text-secondary-250">Need Help?</a
+          class="link-button px-2 sparrow-fs-12">Need Help?</a
         >
         <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
         <a
@@ -201,49 +235,9 @@
           on:click={async () => {
             await open(externalSparrowLink + "/support");
           }}
-          class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
+          class="px-2 link-button sparrow-fs-12">Report Issue</a
         >
       {/if}
-    </div>
-    <div slot="outside">
-      <div
-        class="mb button-text text-center sparrow-fs-16 gap-1 d-flex cursor-pointer mt-5 d-flex justify-content-center align-items-center mb-5 object-fit-cover"
-        on:click={async () => {
-          await open(externalSparrowGithub);
-        }}
-      >
-        <div
-          class="d-flex align-items-center"
-          on:mouseenter={() => {
-            isHover = true;
-          }}
-          on:mouseleave={() => {
-            isHover = false;
-          }}
-        >
-          <div class="me-1">
-            {#if isHover}
-              <StarFilledIcon />
-            {:else}
-              <StarIcon />
-            {/if}
-          </div>
-
-          <p
-            class="{isHover ? 'star-text-hover' : ''} mb-0"
-            style="margin-top:3px; "
-          >
-            Star us on GitHub
-          </p>
-        </div>
-      </div>
-      <div class="divider-line my-4" />
-
-      <div>
-        <p class=" text-center text-secondary-250 sparrow-fs-14 m-1">
-          Version {version}
-        </p>
-      </div>
     </div>
   </Background>
 {/if}
@@ -253,20 +247,10 @@
         right:0; z-index:-100 !important"
   class="w-100 position-fixed bg-blackColor"
 >
-  <img src={sparrowLogoBackground} alt="" style="height:100%; width:100%;" />
+  <img src={SparrowBackgroundV2} alt="" style="height:100%; width:100%;" />
 </div>
 
 <style>
-  .btn-primary {
-    background: var(--bg-primary-300);
-  }
-  .btn-primary:hover {
-    background: var(--text-primary-400);
-  }
-  .btn-primary:active {
-    background: var(--button-active);
-  }
-
   a {
     text-decoration: none;
   }
@@ -277,35 +261,101 @@
   .cursor-pointer {
     cursor: pointer;
   }
-  .divider-line {
-    height: 2px;
-    width: 80vw;
-    margin: 0 auto;
-    background: linear-gradient(
-      90deg,
-      var(--bg-secondary-900) 0%,
-      #354366 51.5%,
-      var(--bg-secondary-900) 100%
-    );
+
+  button {
+    transition: all 300ms ease-in-out;
   }
 
-  .check-for-update {
-    background: linear-gradient(
-      90deg,
-      var(--bg-primary-250) 0%,
-      var(--bg-primary-300) 100%
-    );
-    background-clip: text;
-    color: transparent;
+  .btn-primary {
+    font-weight: 400;
+    font-size: 14px;
+    background: var(--bg-secondary-100);
+    color: var(--text-secondary-900);
+    border: 1px solid #ffffff;
   }
-  .star-text-hover {
-    color: var(--text-primary-300);
-    text-decoration: underline;
+
+  .btn-primary:hover {
+    background-color: #6147ff; /* purple-600 */
+    border-color: transparent;
+    color: var(--text-secondary-100);
   }
-  .btn-guest {
-    color: var(--text-primary-300);
-    text-decoration: underline;
-    font-size: 13px;
+
+  .btn-primary.shadow-none {
+    box-shadow: none;
+  }
+
+  .btn-primary.shadow-pressed {
+    box-shadow: inset 0px 0px 12px 5px rgba(0, 0, 0, 0.55);
+    border: 0.4px solid white !important;
+  }
+
+  .btn-primary:active {
+    box-shadow: inset 0px 0px 12px 5px rgba(0, 0, 0, 0.55);
+  }
+  .btn-primary:disabled {
+    background-color: var(--bg-secondary-100);
+    border: 1px solid #ffffff;
+  }
+
+  .btn-secondary {
+    font-weight: 400;
+    font-size: 14px;
+    background-color: transparent;
+    border: 1px solid rgba(214, 211, 209, 0.9);
+    border-radius: 8px;
+  }
+
+  .btn-secondary:hover {
+    background-color: #6147ff;
+    border-color: transparent;
+  }
+
+  .btn-secondary:active {
+    box-shadow: inset 0px 0px 12px 5px rgba(0, 0, 0, 0.55);
+    transition: all 100ms ease-in-out;
+  }
+
+  .btn-secondary:disabled {
+    background-color: transparent;
+    border: 1px solid rgba(214, 211, 209, 0.9);
+  }
+
+  .link-button {
+    color: #62636c;
+    font-weight: 400;
+    font-size: 14px;
     cursor: pointer;
+  }
+
+  .link-button:hover {
+    color: var(--text-primary-300);
+  }
+
+  .link-button:active {
+    color: var(--text-primary-300);
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+    font-family: Arial, sans-serif;
+  }
+
+  .divider .line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, #62636c00, #bfc0d2);
+  }
+
+  .divider .line:last-child {
+    background: linear-gradient(to left, #62636c00, #bfc0d2);
+  }
+
+  .divider .text {
+    margin: 0 4px;
+    color: #bfc0d2;
+    font-size: 14px;
   }
 </style>

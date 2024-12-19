@@ -44,15 +44,13 @@ import { GuestUserRepository } from "../../../../repositories/guest-user.reposit
 import { isGuestUserActive } from "@app/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
 import type { CollectionDocType } from "../../../../models/collection.model";
-// import { WebSocketService } from "../../../../services/web-socket.service";
 import { socketIoDataStore } from "@sparrow/workspaces/features/socketio-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
-// import { SocketIoTabAdapter } from "@app/adapter";
+import { SocketIoTabAdapter } from "@app/adapter";
 import {
   CollectionItemTypeBaseEnum,
   type CollectionItemBaseInterface,
 } from "@sparrow/common/types/workspace/collection-base";
-// import { SocketTabAdapter } from "@app/adapter/socket-tab";
 import type { EventsValues } from "@sparrow/common/types/workspace/socket-io-request-tab";
 import type {
   SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
@@ -69,7 +67,6 @@ class SocketIoExplorerPageViewModel {
   private tabRepository = new TabRepository();
   private guestUserRepository = new GuestUserRepository();
   private compareArray = new CompareArray();
-  // private webSocketService = new WebSocketService();
 
   /**
    * Service
@@ -116,119 +113,119 @@ class SocketIoExplorerPageViewModel {
    * @return A promise that resolves when the comparison is complete.
    */
 
-  // private compareRequestWithServerDebounced = async () => {
-  //   let result = true;
-  //   const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
-  //   let clientCollectionItem: CollectionItemBaseInterface;
-  //   if (progressiveTab.path.folderId) {
-  //     clientCollectionItem =
-  //       (await this.collectionRepository.readRequestInFolder(
-  //         progressiveTab.path.collectionId,
-  //         progressiveTab.path.folderId,
-  //         progressiveTab.id,
-  //       )) as CollectionItemBaseInterface;
-  //   } else {
-  //     clientCollectionItem =
-  //       (await this.collectionRepository.readRequestOrFolderInCollection(
-  //         progressiveTab.path.collectionId,
-  //         progressiveTab.id,
-  //       )) as CollectionItemBaseInterface;
-  //   }
+  private compareRequestWithServerDebounced = async () => {
+    let result = true;
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    let clientCollectionItem: CollectionItemBaseInterface;
+    if (progressiveTab.path.folderId) {
+      clientCollectionItem =
+        (await this.collectionRepository.readRequestInFolder(
+          progressiveTab.path.collectionId,
+          progressiveTab.path.folderId,
+          progressiveTab.id,
+        )) as CollectionItemBaseInterface;
+    } else {
+      clientCollectionItem =
+        (await this.collectionRepository.readRequestOrFolderInCollection(
+          progressiveTab.path.collectionId,
+          progressiveTab.id,
+        )) as CollectionItemBaseInterface;
+    }
 
-  //   let requestServer;
-  //   if (clientCollectionItem) {
-  //     requestServer = new SocketIoTabAdapter().adapt(
-  //       progressiveTab.path.workspaceId,
-  //       progressiveTab.path.collectionId,
-  //       progressiveTab.path.folderId,
-  //       clientCollectionItem,
-  //     );
-  //   }
+    let requestServer;
+    if (clientCollectionItem) {
+      requestServer = new SocketIoTabAdapter().adapt(
+        progressiveTab.path.workspaceId,
+        progressiveTab.path.collectionId,
+        progressiveTab.path.folderId,
+        clientCollectionItem,
+      );
+    }
 
-  //   if (!requestServer) result = false;
-  //   // description
-  //   else if (requestServer.description !== progressiveTab.description) {
-  //     result = false;
-  //   }
-  //   // name
-  //   else if (requestServer.name !== progressiveTab.name) {
-  //     result = false;
-  //   }
-  //   // url
-  //   else if (requestServer.property?.socketio) {
-  //     if (
-  //       requestServer.property.socketio.url !==
-  //       progressiveTab.property.socketio?.url
-  //     ) {
-  //       result = false;
-  //     }
-  //     // message
-  //     else if (
-  //       requestServer.property.socketio.message !==
-  //       progressiveTab.property.socketio?.message
-  //     ) {
-  //       result = false;
-  //     } else if (
-  //       requestServer.property.socketio.eventName !==
-  //       progressiveTab.property.socketio?.eventName
-  //     ) {
-  //       result = false;
-  //     } else if (
-  //       !this.compareArray.init(
-  //         requestServer.property.socketio.events,
-  //         progressiveTab.property.socketio?.events,
-  //       )
-  //     ) {
-  //       result = false;
-  //     }
+    if (!requestServer) result = false;
+    // description
+    else if (requestServer.description !== progressiveTab.description) {
+      result = false;
+    }
+    // name
+    else if (requestServer.name !== progressiveTab.name) {
+      result = false;
+    }
+    // url
+    else if (requestServer.property?.socketio) {
+      if (
+        requestServer.property.socketio.url !==
+        progressiveTab.property.socketio?.url
+      ) {
+        result = false;
+      }
+      // message
+      else if (
+        requestServer.property.socketio.message !==
+        progressiveTab.property.socketio?.message
+      ) {
+        result = false;
+      } else if (
+        requestServer.property.socketio.eventName !==
+        progressiveTab.property.socketio?.eventName
+      ) {
+        result = false;
+      } else if (
+        !this.compareArray.init(
+          requestServer.property.socketio.events,
+          progressiveTab.property.socketio?.events,
+        )
+      ) {
+        result = false;
+      }
 
-  //     // headers
-  //     else if (
-  //       !this.compareArray.init(
-  //         requestServer.property.socketio.headers,
-  //         progressiveTab.property.socketio?.headers,
-  //       )
-  //     ) {
-  //       result = false;
-  //     } else if (
-  //       !this.compareArray.init(
-  //         requestServer.property.socketio.queryParams,
-  //         progressiveTab.property.socketio?.queryParams,
-  //       )
-  //     ) {
-  //       result = false;
-  //     } else if (
-  //       requestServer.property.socketio.state.messageLanguage !==
-  //       progressiveTab.property.socketio?.state.messageLanguage
-  //     ) {
-  //       // debugger;
-  //       result = false;
-  //     }
-  //   }
+      // headers
+      else if (
+        !this.compareArray.init(
+          requestServer.property.socketio.headers,
+          progressiveTab.property.socketio?.headers,
+        )
+      ) {
+        result = false;
+      } else if (
+        !this.compareArray.init(
+          requestServer.property.socketio.queryParams,
+          progressiveTab.property.socketio?.queryParams,
+        )
+      ) {
+        result = false;
+      } else if (
+        requestServer.property.socketio.state.messageLanguage !==
+        progressiveTab.property.socketio?.state.messageLanguage
+      ) {
+        // debugger;
+        result = false;
+      }
+    }
 
-  //   // result
-  //   if (result) {
-  //     this.tabRepository.updateTab(progressiveTab.tabId, {
-  //       isSaved: true,
-  //     });
-  //     progressiveTab.isSaved = true;
-  //     this.tab = progressiveTab;
-  //   } else {
-  //     this.tabRepository.updateTab(progressiveTab.tabId, {
-  //       isSaved: false,
-  //     });
-  //     progressiveTab.isSaved = false;
-  //     this.tab = progressiveTab;
-  //   }
-  // };
+    // result
+    if (result) {
+      this.tabRepository.updateTab(progressiveTab.tabId, {
+        isSaved: true,
+      });
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+    } else {
+      this.tabRepository.updateTab(progressiveTab.tabId, {
+        isSaved: false,
+      });
+      progressiveTab.isSaved = false;
+      this.tab = progressiveTab;
+    }
+  };
 
   /**
    * Debounced method to compare the current request tab with the server version.
    */
-  // private compareRequestWithServer = new Debounce().debounce(
-  //   this.compareRequestWithServerDebounced,
-  //   1000,
-  // );
+  private compareRequestWithServer = new Debounce().debounce(
+    this.compareRequestWithServerDebounced,
+    1000,
+  );
   /**
    *
    * @returns guest user
@@ -262,7 +259,7 @@ class SocketIoExplorerPageViewModel {
       const reducedURL = new ReduceRequestURL(_url);
       await this.updateParams(reducedURL.getQueryParameters(), false);
     }
-    // this.compareRequestWithServer();
+    this.compareRequestWithServer();
   };
 
   /**
@@ -278,7 +275,7 @@ class SocketIoExplorerPageViewModel {
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
 
-    // this.compareRequestWithServer();
+    this.compareRequestWithServer();
   };
 
   /**
@@ -290,7 +287,7 @@ class SocketIoExplorerPageViewModel {
     progressiveTab.path = _path;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    // this.compareRequestWithServer();
+    this.compareRequestWithServer();
   };
 
   /**
@@ -302,7 +299,7 @@ class SocketIoExplorerPageViewModel {
     progressiveTab.id = _id;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    // this.compareRequestWithServer();
+    this.compareRequestWithServer();
   };
 
   /**
@@ -320,7 +317,7 @@ class SocketIoExplorerPageViewModel {
         "Failed to update the documentation. Please try again",
       );
     }
-    // this.compareRequestWithServer();
+    this.compareRequestWithServer();
   };
 
   /**
@@ -335,7 +332,7 @@ class SocketIoExplorerPageViewModel {
     progressiveTab.property.socketio.message = _message;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    // this.compareRequestWithServer();
+    this.compareRequestWithServer();
   };
 
   /**
@@ -359,7 +356,7 @@ class SocketIoExplorerPageViewModel {
     progressiveTab.name = _name;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    // this.compareRequestWithServer();
+    this.compareRequestWithServer();
   };
 
   /**
@@ -371,7 +368,7 @@ class SocketIoExplorerPageViewModel {
     progressiveTab.property.socketio.headers = _headers;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    // this.compareRequestWithServer();
+    this.compareRequestWithServer();
   };
 
   /**
@@ -383,7 +380,7 @@ class SocketIoExplorerPageViewModel {
     progressiveTab.property.socketio.events = _events;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    // this.compareRequestWithServer();
+    this.compareRequestWithServer();
   };
 
   /**
@@ -424,7 +421,7 @@ class SocketIoExplorerPageViewModel {
         );
       }
     }
-    // this.compareRequestWithServer();
+    this.compareRequestWithServer();
   };
 
   /**
@@ -450,7 +447,7 @@ class SocketIoExplorerPageViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    // this.compareRequestWithServer();
+    this.compareRequestWithServer();
   };
 
   /**
@@ -690,136 +687,136 @@ class SocketIoExplorerPageViewModel {
    * @param saveDescriptionOnly - refers save overall request data or only description as a documentation purpose.
    * @returns save status
    */
-  // public saveSocket = async () => {
-  //   const componentData = this._tab.getValue();
-  //   const { folderId, collectionId, workspaceId } = componentData.path as Path;
+  public saveSocket = async () => {
+    const componentData = this._tab.getValue();
+    const { folderId, collectionId, workspaceId } = componentData.path as Path;
 
-  //   if (!workspaceId || !collectionId) {
-  //     return {
-  //       status: "error",
-  //       message: "request is not a part of any workspace or collection",
-  //     };
-  //   }
-  //   const _collection = await this.readCollection(collectionId);
-  //   let userSource = {};
-  //   if (_collection?.activeSync && componentData?.source === "USER") {
-  //     userSource = {
-  //       currentBranch: _collection?.currentBranch,
-  //       source: "USER",
-  //     };
-  //   }
-  //   const _id = componentData.id;
+    if (!workspaceId || !collectionId) {
+      return {
+        status: "error",
+        message: "request is not a part of any workspace or collection",
+      };
+    }
+    const _collection = await this.readCollection(collectionId);
+    let userSource = {};
+    if (_collection?.activeSync && componentData?.source === "USER") {
+      userSource = {
+        currentBranch: _collection?.currentBranch,
+        source: "USER",
+      };
+    }
+    const _id = componentData.id;
 
-  //   const socketTabAdapter = new SocketIoTabAdapter();
-  //   const unadaptedSocket = socketTabAdapter.unadapt(componentData);
-  //   // Save overall api
+    const socketTabAdapter = new SocketIoTabAdapter();
+    const unadaptedSocket = socketTabAdapter.unadapt(componentData);
+    // Save overall api
 
-  //   const socketMetaData = {
-  //     id: _id,
-  //     name: componentData?.name,
-  //     description: componentData?.description,
-  //     type: CollectionItemTypeBaseEnum.SOCKETIO,
-  //   };
+    const socketMetaData = {
+      id: _id,
+      name: componentData?.name,
+      description: componentData?.description,
+      type: CollectionItemTypeBaseEnum.SOCKETIO,
+    };
 
-  //   let folderSource;
-  //   let itemSource;
-  //   if (folderId) {
-  //     folderSource = {
-  //       folderId: folderId,
-  //     };
-  //     itemSource = {
-  //       id: folderId,
-  //       type: CollectionItemTypeBaseEnum.FOLDER,
-  //       items: {
-  //         ...socketMetaData,
-  //         socketio: unadaptedSocket,
-  //       },
-  //     };
-  //   } else {
-  //     itemSource = {
-  //       ...socketMetaData,
-  //       socketio: unadaptedSocket,
-  //     };
-  //   }
+    let folderSource;
+    let itemSource;
+    if (folderId) {
+      folderSource = {
+        folderId: folderId,
+      };
+      itemSource = {
+        id: folderId,
+        type: CollectionItemTypeBaseEnum.FOLDER,
+        items: {
+          ...socketMetaData,
+          socketio: unadaptedSocket,
+        },
+      };
+    } else {
+      itemSource = {
+        ...socketMetaData,
+        socketio: unadaptedSocket,
+      };
+    }
 
-  //   let isGuestUser;
-  //   isGuestUserActive.subscribe((value) => {
-  //     isGuestUser = value;
-  //   });
-  //   if (isGuestUser === true) {
-  //     const progressiveTab = this._tab.getValue();
-  //     const data = {
-  //       id: progressiveTab.id,
-  //       name: socketMetaData.name,
-  //       description: socketMetaData.description,
-  //       type: CollectionItemTypeBaseEnum.SOCKETIO,
-  //       socketio: unadaptedSocket,
-  //       updatedAt: "",
-  //       updatedBy: "Guest User",
-  //     };
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser === true) {
+      const progressiveTab = this._tab.getValue();
+      const data = {
+        id: progressiveTab.id,
+        name: socketMetaData.name,
+        description: socketMetaData.description,
+        type: CollectionItemTypeBaseEnum.SOCKETIO,
+        socketio: unadaptedSocket,
+        updatedAt: "",
+        updatedBy: "Guest User",
+      };
 
-  //     progressiveTab.isSaved = true;
-  //     this.tab = progressiveTab;
-  //     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-  //     if (!folderId) {
-  //       this.collectionRepository.updateRequestOrFolderInCollection(
-  //         collectionId,
-  //         _id,
-  //         data,
-  //       );
-  //     } else {
-  //       this.collectionRepository.updateRequestInFolder(
-  //         collectionId,
-  //         folderId,
-  //         _id,
-  //         data,
-  //       );
-  //     }
-  //     return {
-  //       status: "success",
-  //       message: "",
-  //     };
-  //   }
-  //   const res = await this.collectionService.updateSocketIoInCollection(_id, {
-  //     collectionId: collectionId,
-  //     workspaceId: workspaceId,
-  //     ...folderSource,
-  //     ...userSource,
-  //     items: itemSource,
-  //   } as
-  //     | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
-  //     | SocketIORequestCreateUpdateInFolderPayloadDtoInterface);
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          _id,
+          data,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          _id,
+          data,
+        );
+      }
+      return {
+        status: "success",
+        message: "",
+      };
+    }
+    const res = await this.collectionService.updateSocketIoInCollection(_id, {
+      collectionId: collectionId,
+      workspaceId: workspaceId,
+      ...folderSource,
+      ...userSource,
+      items: itemSource,
+    } as
+      | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
+      | SocketIORequestCreateUpdateInFolderPayloadDtoInterface);
 
-  //   if (res.isSuccessful) {
-  //     const progressiveTab = this._tab.getValue();
-  //     progressiveTab.isSaved = true;
-  //     this.tab = progressiveTab;
-  //     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-  //     if (!folderId) {
-  //       this.collectionRepository.updateRequestOrFolderInCollection(
-  //         collectionId,
-  //         _id,
-  //         res.data.data,
-  //       );
-  //     } else {
-  //       this.collectionRepository.updateRequestInFolder(
-  //         collectionId,
-  //         folderId,
-  //         _id,
-  //         res.data.data,
-  //       );
-  //     }
-  //     return {
-  //       status: "success",
-  //       message: res.message,
-  //     };
-  //   } else {
-  //     return {
-  //       status: "error",
-  //       message: res.message,
-  //     };
-  //   }
-  // };
+    if (res.isSuccessful) {
+      const progressiveTab = this._tab.getValue();
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          _id,
+          res.data.data,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          _id,
+          res.data.data,
+        );
+      }
+      return {
+        status: "success",
+        message: res.message,
+      };
+    } else {
+      return {
+        status: "error",
+        message: res.message,
+      };
+    }
+  };
 
   /**
    *
@@ -883,311 +880,311 @@ class SocketIoExplorerPageViewModel {
    * @param description - request description
    * @param type - save over all request or description only
    */
-  // public saveAsSocket = async (
-  //   _workspaceMeta: {
-  //     id: string;
-  //     name: string;
-  //   },
-  //   path: {
-  //     name: string;
-  //     id: string;
-  //     type: string;
-  //   }[],
-  //   tabName: string,
-  //   description: string,
-  // ) => {
-  //   // return;
-  //   const componentData = this._tab.getValue();
-  //   let userSource = {};
-  //   // const _id = componentData.id;
-  //   if (path.length > 0) {
-  //     const socketTabAdapter = new SocketIoTabAdapter();
-  //     const unadaptedSocket = socketTabAdapter.unadapt(componentData);
-  //     const req = {
-  //       id: uuidv4(),
-  //       name: tabName,
-  //       description,
-  //       type: ItemType.SOCKET_IO,
-  //       socketio: unadaptedSocket,
-  //       source: "USER",
-  //       isDeleted: false,
-  //       createdBy: "Guest User",
-  //       updatedBy: "Guest User",
-  //       createdAt: new Date().toISOString(),
-  //       updatedAt: new Date().toISOString(),
-  //     };
-  //     if (path[path.length - 1].type === ItemType.COLLECTION) {
-  //       /**
-  //        * handle request at collection level
-  //        */
-  //       const _collection = await this.readCollection(path[path.length - 1].id);
-  //       if (_collection?.activeSync) {
-  //         userSource = {
-  //           currentBranch: _collection?.currentBranch,
-  //           source: "USER",
-  //         };
-  //       }
-  //       let isGuestUser;
-  //       isGuestUserActive.subscribe((value) => {
-  //         isGuestUser = value;
-  //       });
+  public saveAsSocket = async (
+    _workspaceMeta: {
+      id: string;
+      name: string;
+    },
+    path: {
+      name: string;
+      id: string;
+      type: string;
+    }[],
+    tabName: string,
+    description: string,
+  ) => {
+    // return;
+    const componentData = this._tab.getValue();
+    let userSource = {};
+    // const _id = componentData.id;
+    if (path.length > 0) {
+      const socketTabAdapter = new SocketIoTabAdapter();
+      const unadaptedSocket = socketTabAdapter.unadapt(componentData);
+      const req = {
+        id: uuidv4(),
+        name: tabName,
+        description,
+        type: ItemType.SOCKET_IO,
+        socketio: unadaptedSocket,
+        source: "USER",
+        isDeleted: false,
+        createdBy: "Guest User",
+        updatedBy: "Guest User",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      if (path[path.length - 1].type === ItemType.COLLECTION) {
+        /**
+         * handle request at collection level
+         */
+        const _collection = await this.readCollection(path[path.length - 1].id);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
+        let isGuestUser;
+        isGuestUserActive.subscribe((value) => {
+          isGuestUser = value;
+        });
 
-  //       if (isGuestUser == true) {
-  //         this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
-  //         const expectedPath = {
-  //           folderId: "",
-  //           folderName: "",
-  //           collectionId: path[path.length - 1].id,
-  //           workspaceId: _workspaceMeta.id,
-  //         };
-  //         if (
-  //           !componentData.path.workspaceId ||
-  //           !componentData.path.collectionId
-  //         ) {
-  //           /**
-  //            * Update existing request
-  //            */
-  //           this.updateRequestName(req.name);
-  //           this.updateRequestDescription(req.description);
-  //           this.updateRequestPath(expectedPath);
-  //           this.updateRequestId(req.id);
-  //           const progressiveTab = this._tab.getValue();
-  //           progressiveTab.isSaved = true;
-  //           this.tab = progressiveTab;
-  //           await this.tabRepository.updateTab(
-  //             progressiveTab.tabId,
-  //             progressiveTab,
-  //           );
-  //         } else {
-  //           /**
-  //            * Create new copy of the existing request
-  //            */
-  //           const initWebSocketTab = new InitTab().socketIo(
-  //             req.id,
-  //             "UNTRACKED-",
-  //           );
-  //           initWebSocketTab.updateName(req.name);
-  //           initWebSocketTab.updateDescription(req.description);
-  //           initWebSocketTab.updatePath(expectedPath);
-  //           initWebSocketTab.updateUrl(req.socketio.url);
-  //           initWebSocketTab.updateQueryParams(req.socketio.queryParams);
-  //           initWebSocketTab.updateHeaders(req.socketio.headers);
+        if (isGuestUser == true) {
+          this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
+          const expectedPath = {
+            folderId: "",
+            folderName: "",
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+          };
+          if (
+            !componentData.path.workspaceId ||
+            !componentData.path.collectionId
+          ) {
+            /**
+             * Update existing request
+             */
+            this.updateRequestName(req.name);
+            this.updateRequestDescription(req.description);
+            this.updateRequestPath(expectedPath);
+            this.updateRequestId(req.id);
+            const progressiveTab = this._tab.getValue();
+            progressiveTab.isSaved = true;
+            this.tab = progressiveTab;
+            await this.tabRepository.updateTab(
+              progressiveTab.tabId,
+              progressiveTab,
+            );
+          } else {
+            /**
+             * Create new copy of the existing request
+             */
+            const initWebSocketTab = new InitTab().socketIo(
+              req.id,
+              "UNTRACKED-",
+            );
+            initWebSocketTab.updateName(req.name);
+            initWebSocketTab.updateDescription(req.description);
+            initWebSocketTab.updatePath(expectedPath);
+            initWebSocketTab.updateUrl(req.socketio.url);
+            initWebSocketTab.updateQueryParams(req.socketio.queryParams);
+            initWebSocketTab.updateHeaders(req.socketio.headers);
 
-  //           this.tabRepository.createTab(initWebSocketTab.getValue());
-  //           moveNavigation("right");
-  //         }
-  //         return {
-  //           status: "success",
-  //           message: "success",
-  //           data: {
-  //             id: req.id,
-  //           },
-  //         };
-  //       }
-  //       const res = await this.collectionService.addSocketIoInCollection({
-  //         collectionId: path[path.length - 1].id,
-  //         workspaceId: _workspaceMeta.id,
-  //         ...userSource,
-  //         items: {
-  //           name: tabName,
-  //           description,
-  //           type: CollectionItemTypeBaseEnum.SOCKETIO,
-  //           socketio: unadaptedSocket,
-  //         },
-  //       });
-  //       if (res.isSuccessful) {
-  //         this.addRequestOrFolderInCollection(
-  //           path[path.length - 1].id,
-  //           res.data.data,
-  //         );
-  //         const expectedPath = {
-  //           folderId: "",
-  //           folderName: "",
-  //           collectionId: path[path.length - 1].id,
-  //           workspaceId: _workspaceMeta.id,
-  //         };
-  //         if (
-  //           !componentData.path.workspaceId ||
-  //           !componentData.path.collectionId
-  //         ) {
-  //           /**
-  //            * Update existing request
-  //            */
-  //           await this.updateRequestName(res.data.data.name);
-  //           await this.updateRequestDescription(res.data.data.description);
-  //           await this.updateRequestPath(expectedPath);
-  //           await this.updateRequestId(res.data.data.id);
-  //           const progressiveTab = this._tab.getValue();
-  //           progressiveTab.isSaved = true;
-  //           this.tab = progressiveTab;
-  //           await this.tabRepository.updateTab(
-  //             progressiveTab.tabId,
-  //             progressiveTab,
-  //           );
-  //         } else {
-  //           /**
-  //            * Create new copy of the existing request
-  //            */
-  //           const initSocketTab = new InitTab().socketIo(
-  //             res.data.data.id,
-  //             "UNTRACKED-",
-  //           );
-  //           initSocketTab.updateName(res.data.data.name);
-  //           initSocketTab.updateDescription(res.data.data.description);
-  //           initSocketTab.updatePath(expectedPath);
-  //           initSocketTab.updateUrl(res.data.data.socketio.url);
-  //           initSocketTab.updateMessage(res.data.data.socketio.message);
-  //           initSocketTab.updateQueryParams(res.data.data.socketio.queryParams);
-  //           initSocketTab.updateHeaders(res.data.data.socketio.headers);
+            this.tabRepository.createTab(initWebSocketTab.getValue());
+            moveNavigation("right");
+          }
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+        }
+        const res = await this.collectionService.addSocketIoInCollection({
+          collectionId: path[path.length - 1].id,
+          workspaceId: _workspaceMeta.id,
+          ...userSource,
+          items: {
+            name: tabName,
+            description,
+            type: CollectionItemTypeBaseEnum.SOCKETIO,
+            socketio: unadaptedSocket,
+          },
+        });
+        if (res.isSuccessful) {
+          this.addRequestOrFolderInCollection(
+            path[path.length - 1].id,
+            res.data.data,
+          );
+          const expectedPath = {
+            folderId: "",
+            folderName: "",
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+          };
+          if (
+            !componentData.path.workspaceId ||
+            !componentData.path.collectionId
+          ) {
+            /**
+             * Update existing request
+             */
+            await this.updateRequestName(res.data.data.name);
+            await this.updateRequestDescription(res.data.data.description);
+            await this.updateRequestPath(expectedPath);
+            await this.updateRequestId(res.data.data.id);
+            const progressiveTab = this._tab.getValue();
+            progressiveTab.isSaved = true;
+            this.tab = progressiveTab;
+            await this.tabRepository.updateTab(
+              progressiveTab.tabId,
+              progressiveTab,
+            );
+          } else {
+            /**
+             * Create new copy of the existing request
+             */
+            const initSocketTab = new InitTab().socketIo(
+              res.data.data.id,
+              "UNTRACKED-",
+            );
+            initSocketTab.updateName(res.data.data.name);
+            initSocketTab.updateDescription(res.data.data.description);
+            initSocketTab.updatePath(expectedPath);
+            initSocketTab.updateUrl(res.data.data.socketio.url);
+            initSocketTab.updateMessage(res.data.data.socketio.message);
+            initSocketTab.updateQueryParams(res.data.data.socketio.queryParams);
+            initSocketTab.updateHeaders(res.data.data.socketio.headers);
 
-  //           this.tabRepository.createTab(initSocketTab.getValue());
-  //           moveNavigation("right");
-  //         }
-  //         return {
-  //           status: "success",
-  //           message: res.message,
-  //           data: {
-  //             id: res.data.data.id,
-  //           },
-  //         };
-  //       } else {
-  //         return {
-  //           status: "error",
-  //           message: res.message,
-  //         };
-  //       }
-  //     } else if (path[path.length - 1].type === ItemType.FOLDER) {
-  //       /**
-  //        * handle request at folder level
-  //        */
-  //       const _collection = await this.readCollection(path[0].id);
-  //       if (_collection?.activeSync) {
-  //         userSource = {
-  //           currentBranch: _collection?.currentBranch,
-  //           source: "USER",
-  //         };
-  //       }
-  //       let isGuestUser;
-  //       isGuestUserActive.subscribe((value) => {
-  //         isGuestUser = value;
-  //       });
+            this.tabRepository.createTab(initSocketTab.getValue());
+            moveNavigation("right");
+          }
+          return {
+            status: "success",
+            message: res.message,
+            data: {
+              id: res.data.data.id,
+            },
+          };
+        } else {
+          return {
+            status: "error",
+            message: res.message,
+          };
+        }
+      } else if (path[path.length - 1].type === ItemType.FOLDER) {
+        /**
+         * handle request at folder level
+         */
+        const _collection = await this.readCollection(path[0].id);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
+        let isGuestUser;
+        isGuestUserActive.subscribe((value) => {
+          isGuestUser = value;
+        });
 
-  //       if (isGuestUser == true) {
-  //         this.addRequestInFolder(path[0].id, path[path.length - 1].id, req);
-  //         const expectedPath = {
-  //           folderId: path[path.length - 1].id,
-  //           folderName: path[path.length - 1].name,
-  //           collectionId: path[0].id,
-  //           workspaceId: _workspaceMeta.id,
-  //         };
-  //         if (
-  //           !componentData.path.workspaceId ||
-  //           !componentData.path.collectionId
-  //         ) {
-  //           await this.updateRequestName(req.name);
-  //           await this.updateRequestDescription(req.description);
-  //           await this.updateRequestPath(expectedPath);
-  //           await this.updateRequestId(req.id);
-  //           const progressiveTab = this._tab.getValue();
-  //           progressiveTab.isSaved = true;
-  //           this.tab = progressiveTab;
-  //           await this.tabRepository.updateTab(
-  //             progressiveTab.tabId,
-  //             progressiveTab,
-  //           );
-  //         } else {
-  //           const initSocketTab = new InitTab().socketIo(req.id, "UNTRACKED-");
-  //           initSocketTab.updateName(req.name);
-  //           initSocketTab.updateDescription(req.description);
-  //           initSocketTab.updatePath(expectedPath);
-  //           initSocketTab.updateUrl(req.socketio.url);
-  //           initSocketTab.updateMessage(req.socketio.message);
-  //           initSocketTab.updateQueryParams(req.socketio.queryParams);
-  //           initSocketTab.updateHeaders(req.socketio.headers);
-  //           this.tabRepository.createTab(initSocketTab.getValue());
-  //           moveNavigation("right");
-  //         }
-  //         return {
-  //           status: "success",
-  //           message: "success",
-  //           data: {
-  //             id: req.id,
-  //           },
-  //         };
-  //       }
-  //       const res = await this.collectionService.addSocketIoInCollection({
-  //         collectionId: path[0].id,
-  //         workspaceId: _workspaceMeta.id,
-  //         folderId: path[path.length - 1].id,
-  //         ...userSource,
-  //         items: {
-  //           id: path[path.length - 1].id,
-  //           name: path[path.length - 1].name,
-  //           type: CollectionItemTypeBaseEnum.FOLDER,
-  //           items: {
-  //             name: tabName,
-  //             description,
-  //             type: CollectionItemTypeBaseEnum.SOCKETIO,
-  //             socketio: unadaptedSocket,
-  //           },
-  //         },
-  //       });
-  //       if (res.isSuccessful) {
-  //         this.addRequestInFolder(
-  //           path[0].id,
-  //           path[path.length - 1].id,
-  //           res.data.data,
-  //         );
-  //         const expectedPath = {
-  //           folderId: path[path.length - 1].id,
-  //           folderName: path[path.length - 1].name,
-  //           collectionId: path[0].id,
-  //           workspaceId: _workspaceMeta.id,
-  //         };
-  //         if (
-  //           !componentData.path.workspaceId ||
-  //           !componentData.path.collectionId
-  //         ) {
-  //           this.updateRequestName(res.data.data.name);
-  //           this.updateRequestDescription(res.data.data.description);
-  //           this.updateRequestPath(expectedPath);
-  //           this.updateRequestId(res.data.data.id);
-  //           const progressiveTab = this._tab.getValue();
-  //           progressiveTab.isSaved = true;
-  //           this.tab = progressiveTab;
-  //           this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-  //         } else {
-  //           const initSocketTab = new InitTab().socketIo(
-  //             res.data.data.id,
-  //             "UNTRACKED-",
-  //           );
-  //           initSocketTab.updateName(res.data.data.name);
-  //           initSocketTab.updateDescription(res.data.data.description);
-  //           initSocketTab.updatePath(expectedPath);
-  //           initSocketTab.updateUrl(res.data.data.socketio.url);
-  //           initSocketTab.updateMessage(res.data.data.socketio.message);
-  //           initSocketTab.updateQueryParams(res.data.data.socketio.queryParams);
-  //           initSocketTab.updateHeaders(res.data.data.socketio.headers);
-  //           this.tabRepository.createTab(initSocketTab.getValue());
-  //           moveNavigation("right");
-  //         }
-  //         return {
-  //           status: "success",
-  //           message: res.message,
-  //           data: {
-  //             id: res.data.data.id,
-  //           },
-  //         };
-  //       } else {
-  //         return {
-  //           status: "error",
-  //           message: res.message,
-  //         };
-  //       }
-  //     }
-  //     MixpanelEvent(Events.SAVE_API_REQUEST);
-  //   }
-  // };
+        if (isGuestUser == true) {
+          this.addRequestInFolder(path[0].id, path[path.length - 1].id, req);
+          const expectedPath = {
+            folderId: path[path.length - 1].id,
+            folderName: path[path.length - 1].name,
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+          };
+          if (
+            !componentData.path.workspaceId ||
+            !componentData.path.collectionId
+          ) {
+            await this.updateRequestName(req.name);
+            await this.updateRequestDescription(req.description);
+            await this.updateRequestPath(expectedPath);
+            await this.updateRequestId(req.id);
+            const progressiveTab = this._tab.getValue();
+            progressiveTab.isSaved = true;
+            this.tab = progressiveTab;
+            await this.tabRepository.updateTab(
+              progressiveTab.tabId,
+              progressiveTab,
+            );
+          } else {
+            const initSocketTab = new InitTab().socketIo(req.id, "UNTRACKED-");
+            initSocketTab.updateName(req.name);
+            initSocketTab.updateDescription(req.description);
+            initSocketTab.updatePath(expectedPath);
+            initSocketTab.updateUrl(req.socketio.url);
+            initSocketTab.updateMessage(req.socketio.message);
+            initSocketTab.updateQueryParams(req.socketio.queryParams);
+            initSocketTab.updateHeaders(req.socketio.headers);
+            this.tabRepository.createTab(initSocketTab.getValue());
+            moveNavigation("right");
+          }
+          return {
+            status: "success",
+            message: "success",
+            data: {
+              id: req.id,
+            },
+          };
+        }
+        const res = await this.collectionService.addSocketIoInCollection({
+          collectionId: path[0].id,
+          workspaceId: _workspaceMeta.id,
+          folderId: path[path.length - 1].id,
+          ...userSource,
+          items: {
+            id: path[path.length - 1].id,
+            name: path[path.length - 1].name,
+            type: CollectionItemTypeBaseEnum.FOLDER,
+            items: {
+              name: tabName,
+              description,
+              type: CollectionItemTypeBaseEnum.SOCKETIO,
+              socketio: unadaptedSocket,
+            },
+          },
+        });
+        if (res.isSuccessful) {
+          this.addRequestInFolder(
+            path[0].id,
+            path[path.length - 1].id,
+            res.data.data,
+          );
+          const expectedPath = {
+            folderId: path[path.length - 1].id,
+            folderName: path[path.length - 1].name,
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+          };
+          if (
+            !componentData.path.workspaceId ||
+            !componentData.path.collectionId
+          ) {
+            this.updateRequestName(res.data.data.name);
+            this.updateRequestDescription(res.data.data.description);
+            this.updateRequestPath(expectedPath);
+            this.updateRequestId(res.data.data.id);
+            const progressiveTab = this._tab.getValue();
+            progressiveTab.isSaved = true;
+            this.tab = progressiveTab;
+            this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+          } else {
+            const initSocketTab = new InitTab().socketIo(
+              res.data.data.id,
+              "UNTRACKED-",
+            );
+            initSocketTab.updateName(res.data.data.name);
+            initSocketTab.updateDescription(res.data.data.description);
+            initSocketTab.updatePath(expectedPath);
+            initSocketTab.updateUrl(res.data.data.socketio.url);
+            initSocketTab.updateMessage(res.data.data.socketio.message);
+            initSocketTab.updateQueryParams(res.data.data.socketio.queryParams);
+            initSocketTab.updateHeaders(res.data.data.socketio.headers);
+            this.tabRepository.createTab(initSocketTab.getValue());
+            moveNavigation("right");
+          }
+          return {
+            status: "success",
+            message: res.message,
+            data: {
+              id: res.data.data.id,
+            },
+          };
+        } else {
+          return {
+            status: "error",
+            message: res.message,
+          };
+        }
+      }
+      MixpanelEvent(Events.SAVE_API_REQUEST);
+    }
+  };
 
   /**
    *

@@ -35,6 +35,7 @@
 </script>
 
 <header
+  data-tauri-drag-region
   bind:this={titlebar}
   id="titlebar"
   class="titlebar app-header ps-1 d-flex align-items-center justify-content-between gap-5"

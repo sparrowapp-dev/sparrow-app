@@ -4247,6 +4247,7 @@ dependencies = [
  "anyhow",
  "base64 0.21.7",
  "brotli 3.5.0",
+ "cocoa",
  "dotenv",
  "flate2",
  "futures",
