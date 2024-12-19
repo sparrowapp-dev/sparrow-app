@@ -6,7 +6,7 @@
     "windows": [
       {
         "center": true,
-        "decorations": false,
+        "decorations": true,
         "fullscreen": false,
         "label": "main",
         "minHeight": 700,
@@ -17,9 +17,23 @@
         "focus": true,
         "dragDropEnabled": false,
         "maximized": true
+      },
+      {
+        "center": true,
+        "decorations": false,
+        "fullscreen": false,
+        "label": "windows",
+        "minHeight": 700,
+        "minWidth": 1200,
+        "resizable": true,
+        "title": "Sparrow",
+        "shadow": true,
+        "focus": true,
+        "dragDropEnabled": false,
+        "maximized": true
       }
     ],
-    "withGlobalTauri": false
+    "withGlobalTauri": true
   },
   "build": {
     "beforeBuildCommand": "yarn build",
