@@ -301,7 +301,7 @@ export class TeamExplorerPageViewModel {
       await this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
       await this.workspaceRepository.setActiveWorkspace(res._id);
       // this will be removed when we unlock collection in web app.
-      // navigate("collections");
+      navigate("collections");
       notifications.success("New Workspace Created");
       MixpanelEvent(Events.Create_New_Workspace_TeamPage);
     }
@@ -347,7 +347,7 @@ export class TeamExplorerPageViewModel {
     await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
     await this.workspaceRepository.setActiveWorkspace(id);
     // Disabling the switching of workspace in web
-    // navigate("/dashboard/collections");
+    navigate("/app/collections");
   };
 
   /**
