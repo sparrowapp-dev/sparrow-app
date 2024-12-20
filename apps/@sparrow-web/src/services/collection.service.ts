@@ -1,12 +1,12 @@
 import {
   connectSocketIo,
+  connectWebSocket,
   disconnectSocketIo,
-  // connectSocketIo,
-  // disconnectSocketIo,
+  disconnectWebSocket,
   getAuthHeaders,
   makeRequest,
+  sendMessage,
   sendSocketIoMessage,
-  // sendSocketIoMessage,
 } from "@app/containers/api/api.common";
 import { CollectionRepository } from "../repositories/collection.repository";
 import constants from "@app/constants/constants";
@@ -563,6 +563,20 @@ export class CollectionService {
       },
     );
     return response;
+  };
+
+  public connectWebsocket = async (
+    _url: string,
+    _tabId: string,
+    _headers: string,
+  ) => {
+    return connectWebSocket(_url, _tabId, _headers);
+  };
+  public disconnectWebsocket = async (_tabId: string) => {
+    return disconnectWebSocket(_tabId);
+  };
+  public sendMessageWebsocket = async (_tabId: string, _message: string) => {
+    return sendMessage(_tabId, _message);
   };
 
   public deleteGraphqlInCollection = async (

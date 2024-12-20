@@ -104,7 +104,7 @@
       id: "Cloud Agent",
       displayName: "Cloud Agent",
       description:
-        "Send an HTTP request through Sparrow's secure cloud server.",
+        "Send a request through Sparrow's secure cloud server. Not supported for Websockets.",
     },
     {
       name: "Browser Agent",
@@ -379,7 +379,7 @@
         data={multipleAgentData}
         titleId={`${multipleAgentvar}`}
         onclick={handleAgentDropdown}
-        minHeaderWidth={"232px"}
+        minHeaderWidth={"252px"}
         iconRequired={true}
         icon={CheckCircle}
         iconColor={"#69D696"}
@@ -397,6 +397,7 @@
         position={"absolute"}
         isHeaderCombined={false}
         maxBodyHeight={"300px"}
+        minBodyWidth={"275px"}
       >
         <div slot="pre-select" class="pre-dropdown">
           <div
