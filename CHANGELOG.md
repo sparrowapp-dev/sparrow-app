@@ -1,3 +1,58 @@
+# [2.14.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.13.0...v2.14.0) (2024-12-20)
+
+
+### Bug Fixes
+
+* added merge changes ([9d6fe71](https://github.com/sparrowapp-dev/sparrow-app/commit/9d6fe716cfad65be37f480d2bb54bae173db6ce7))
+* completed browser agent functionality in webapp with all bug fixes ([d8f83dd](https://github.com/sparrowapp-dev/sparrow-app/commit/d8f83dd7cb27197ba2a478996061fc79ef25084d))
+* disabled cloud agent in web socket [] ([c64cbad](https://github.com/sparrowapp-dev/sparrow-app/commit/c64cbad8b00297b18c9120a411e3e7d9ad0442a5))
+* disabled proxy agent in ws send message [] ([8682823](https://github.com/sparrowapp-dev/sparrow-app/commit/868282385e9ec8fef7d389df7c29a505d1a423a1))
+* empty branch name[] ([2663ff5](https://github.com/sparrowapp-dev/sparrow-app/commit/2663ff5bac2c86820924acc91336ee7e0ddaffc6))
+* empty branch name[] ([7dc758b](https://github.com/sparrowapp-dev/sparrow-app/commit/7dc758b8b760187ce156e1e2cc7dbf6bfccb75ba))
+* fixed color issue ([b38277a](https://github.com/sparrowapp-dev/sparrow-app/commit/b38277a2a7095c9876ebe7fde4a4bde2ec3ec7a3))
+* fixed feedback filter issue  [[#2136](https://github.com/sparrowapp-dev/sparrow-app/issues/2136)] ([1c51ff1](https://github.com/sparrowapp-dev/sparrow-app/commit/1c51ff120882bb66e2881e546f3a5493c7636067))
+* fixed mac custom header icon visibility [] ([81ff37b](https://github.com/sparrowapp-dev/sparrow-app/commit/81ff37b775d3c304bfc8d4b76e2992015304b781))
+* fixed margin [[#2157](https://github.com/sparrowapp-dev/sparrow-app/issues/2157)] ([9134071](https://github.com/sparrowapp-dev/sparrow-app/commit/9134071225f67b6fa835ae6c6186768c6eb11ada))
+* fixed padding [[#2157](https://github.com/sparrowapp-dev/sparrow-app/issues/2157)] ([ad7fd4a](https://github.com/sparrowapp-dev/sparrow-app/commit/ad7fd4a7f541580ae3a826149e28e12d220a297e))
+* fixed the empty name issue in saving collection and folder from save popup [[#2125](https://github.com/sparrowapp-dev/sparrow-app/issues/2125)] ([ffa1ed0](https://github.com/sparrowapp-dev/sparrow-app/commit/ffa1ed0589d80a5ba182242705a88a746f479ff6))
+* fixed the empty name issue in saving collection and folder from save popup [[#2125](https://github.com/sparrowapp-dev/sparrow-app/issues/2125)] ([21e8586](https://github.com/sparrowapp-dev/sparrow-app/commit/21e858639dfae0ca1a6a44116600aad9738fc63d))
+* iswebapp import ([d08695c](https://github.com/sparrowapp-dev/sparrow-app/commit/d08695cc65ff054b6caa22518204707fb5e8134d))
+* iswebapp import ([7f58754](https://github.com/sparrowapp-dev/sparrow-app/commit/7f587540d635f06664de9c195f8613b0b1a01841))
+* mac dmg installer alignment ([9dc68e7](https://github.com/sparrowapp-dev/sparrow-app/commit/9dc68e7818087c6c56f06a1d20bc0be11be31e67))
+* mac rounded corners ([37e3bb8](https://github.com/sparrowapp-dev/sparrow-app/commit/37e3bb861be80646ceb2c70726f2193fad02dbb4))
+* mac rounded corners ([66dfa40](https://github.com/sparrowapp-dev/sparrow-app/commit/66dfa40324457a076a03f48731d51763392f5a2e))
+* mac rounded corners ([58d7861](https://github.com/sparrowapp-dev/sparrow-app/commit/58d78619d50c35d2d1307cfdf452a6dc6a9aa16d))
+* mac rounded corners ([ec100bc](https://github.com/sparrowapp-dev/sparrow-app/commit/ec100bcabdc0b022e39b7568c17df63f7ba39630))
+* mac rounded corners ([34e020d](https://github.com/sparrowapp-dev/sparrow-app/commit/34e020d627192e7dd2f2f621b5d8798188f8bfcc))
+* merge pull changes [] ([db06422](https://github.com/sparrowapp-dev/sparrow-app/commit/db0642205ff424e6d38a7b161c08e3d02fb3e1e0))
+* modified mixpanel event property [] ([3441a66](https://github.com/sparrowapp-dev/sparrow-app/commit/3441a66ab2c2d3ec958084d39957b715b61fb451))
+* modified mixpanel event property [] ([bfabe90](https://github.com/sparrowapp-dev/sparrow-app/commit/bfabe90e5881db946686d5cac8a24cb660656e0e))
+* removed [target.'cfg(target_os = macos)'.dependencies] ([f2aa057](https://github.com/sparrowapp-dev/sparrow-app/commit/f2aa0573697c10096b069b9ef911af6cb145fa23))
+* resolved all comments ([819a5eb](https://github.com/sparrowapp-dev/sparrow-app/commit/819a5ebab1defba791bc701664a65443112e2775))
+* save socket io and ws from top tab [] ([24c8064](https://github.com/sparrowapp-dev/sparrow-app/commit/24c8064a095829237ad9123d23b5c377a6125202))
+* ui bugs ([616cebc](https://github.com/sparrowapp-dev/sparrow-app/commit/616cebc94d69b30b7611d91bff72fbbf613c2b55))
+
+
+### Features
+
+* add cocoa as a extern crate[] ([b553de5](https://github.com/sparrowapp-dev/sparrow-app/commit/b553de50ce9713079e97f6b22b99b029436d4bea))
+* add cocoa as a extern crate[] ([ef0432b](https://github.com/sparrowapp-dev/sparrow-app/commit/ef0432ba003be2e9974b074225a613df4add36b4))
+* add cocoa as a extern crate[] ([21e0282](https://github.com/sparrowapp-dev/sparrow-app/commit/21e028257cfd51a27394c61cfc7b9fa187a66fa2))
+* add cocoa as a extern crate[] ([89507f8](https://github.com/sparrowapp-dev/sparrow-app/commit/89507f8734f64fbaaadc4492c85faea92702ee51))
+* added sparrow edge functionality from auth [[#2159](https://github.com/sparrowapp-dev/sparrow-app/issues/2159)] ([a7f0c29](https://github.com/sparrowapp-dev/sparrow-app/commit/a7f0c29c143934225059c972d8dc4c9899d8595b))
+* added team members and settings tab [] ([26b1464](https://github.com/sparrowapp-dev/sparrow-app/commit/26b1464ee0ae53490c0051b970aaa2b0bfff8e84))
+* added windows as a valid webview[] ([cfa7b89](https://github.com/sparrowapp-dev/sparrow-app/commit/cfa7b890e5c559ae6b35a187c68f232bc420d247))
+* enable socket io functionality at workspace [[#2182](https://github.com/sparrowapp-dev/sparrow-app/issues/2182)] ([144e8d4](https://github.com/sparrowapp-dev/sparrow-app/commit/144e8d4e67fc708ff4b9737b8fc5eddcf771af66))
+* implement socket io browser agent client [[#2182](https://github.com/sparrowapp-dev/sparrow-app/issues/2182)] ([d390f4d](https://github.com/sparrowapp-dev/sparrow-app/commit/d390f4d1451ff7069b72187c2022aab6955c307c))
+* implement socket io cloud proxy agent client [[#2182](https://github.com/sparrowapp-dev/sparrow-app/issues/2182)] ([bfa5267](https://github.com/sparrowapp-dev/sparrow-app/commit/bfa52674ccfba6dde79b141a53b4f9dd3f668b8c))
+* implement socket io with proxy ([9cbbdf7](https://github.com/sparrowapp-dev/sparrow-app/commit/9cbbdf776137fe526921fde0323d96a64448777a))
+* login desktop with token feature [[#2192](https://github.com/sparrowapp-dev/sparrow-app/issues/2192)] ([4ab6f62](https://github.com/sparrowapp-dev/sparrow-app/commit/4ab6f626d956482ecac2468947685d3d62245013))
+* revamped first init page [[#2157](https://github.com/sparrowapp-dev/sparrow-app/issues/2157)] ([9b0b4ff](https://github.com/sparrowapp-dev/sparrow-app/commit/9b0b4ff1dcac04fdc550e22df0a46a56692c0162))
+* revert tauri  cli package to beta[] ([c88a211](https://github.com/sparrowapp-dev/sparrow-app/commit/c88a21182b64a9552b5797e323431f5b05bc076b))
+* revert tauri  cli package to beta[] ([8f6e452](https://github.com/sparrowapp-dev/sparrow-app/commit/8f6e4524e099342cc86bac0966e96059e8740253))
+* upgrade app version ([73bcf95](https://github.com/sparrowapp-dev/sparrow-app/commit/73bcf95636b53ef794cce146694da6443916dfc9))
+* websocket functionality in browser agent ([8a75077](https://github.com/sparrowapp-dev/sparrow-app/commit/8a750774d73afda70d881b22303259f73a7ce156))
+
 # [2.13.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.12.0...v2.13.0) (2024-12-06)
 
 
