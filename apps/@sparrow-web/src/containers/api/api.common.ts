@@ -274,6 +274,15 @@ const sendMessage = async (tab_id: string, message: string) => {
           });
           listener.send(message);
           webSocketDataMap.set(tab_id, wsData);
+        } else {
+          wsData.messages.unshift({
+            data: message,
+            transmitter: "sender",
+            timestamp: formatTime(new Date()),
+            uuid: uuidv4(),
+          });
+          listener.emit("message", message);
+          webSocketDataMap.set(tab_id, wsData);
         }
       }
       return webSocketDataMap;
@@ -308,6 +317,11 @@ const disconnectWebSocket = async (tab_id: string) => {
       const socketInsta = wsData.listener;
       if (wsData.agent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT) {
         socketInsta.close();
+      } else {
+        socketInsta?.emit(
+          "sparrow_internal_disconnect",
+          "client io disconnect",
+        );
       }
     }
     return webSocketDataMap;
@@ -354,26 +368,25 @@ const connectWebSocket = async (
   const selectedAgent = localStorage.getItem(
     "selectedAgent",
   ) as WorkspaceUserAgentBaseEnum;
+  // Initialize WebSocket store
+  webSocketDataStore.update((webSocketDataMap) => {
+    webSocketDataMap.set(tabId, {
+      messages: [],
+      status: "connecting",
+      agent: selectedAgent,
+      search: "",
+      contentType: RequestDataTypeEnum.TEXT,
+      body: "",
+      filter: "All Messages",
+      url: url,
+    });
+    return webSocketDataMap;
+  });
 
   if (selectedAgent === "Browser Agent") {
     try {
       // Parse the headers string to array of header objects
       const headers = JSON.parse(requestHeaders);
-
-      // Initialize WebSocket store
-      webSocketDataStore.update((webSocketDataMap) => {
-        webSocketDataMap.set(tabId, {
-          messages: [],
-          status: "connecting",
-          agent: selectedAgent,
-          search: "",
-          contentType: RequestDataTypeEnum.TEXT,
-          body: "",
-          filter: "All Messages",
-          url: url,
-        });
-        return webSocketDataMap;
-      });
 
       // Update store with WebSocket instance
       webSocketDataStore.update((webSocketDataMap) => {
@@ -456,7 +469,112 @@ const connectWebSocket = async (
       notifications.error("Failed to connect WebSocket");
       throw error;
     }
-  } else if (selectedAgent === "Cloud Agent") {
+  } else if (selectedAgent === WorkspaceUserAgentBaseEnum.CLOUD_AGENT) {
+    const proxySocketIO = io(`${constants.SOCKET_IO_API_URL}/`, {
+      path: "/socket.io", // Path to the WebSocket gateway
+      transports: ["websocket"], // Ensure the transport is set to WebSocket
+      query: {
+        targetUrl: url || "",
+        namespace: "/",
+        headers: requestHeaders,
+        targetType: "websocket",
+      },
+      reconnection: false,
+    });
+
+    // Update store with WebSocket instance
+    webSocketDataStore.update((webSocketDataMap) => {
+      const wsData = webSocketDataMap.get(tabId);
+      if (wsData) {
+        wsData.listener = proxySocketIO;
+        webSocketDataMap.set(tabId, wsData);
+      }
+      return webSocketDataMap;
+    });
+
+    proxySocketIO.onAny(async (event, args) => {
+      if (event === "sparrow_internal_connect_error") {
+        // Connect_error listener from the target Socket.IO.
+        console.error(new DOMException(args + " (URL Issue)", "ConnectError"));
+        // removeSocketIoDataFromMap(_tabId);
+        webSocketDataStore.update((webSocketDataMap) => {
+          webSocketDataMap.delete(tabId);
+          return webSocketDataMap;
+        });
+        notifications.error("Failed to connect WebSocket");
+      } else if (event === "sparrow_internal_connect") {
+        webSocketDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tabId);
+          if (wsData) {
+            wsData.messages.unshift({
+              data: `Connected to ${url}`,
+              transmitter: "connecter",
+              timestamp: formatTime(new Date()),
+              uuid: uuidv4(),
+            });
+            wsData.status = "connected";
+
+            webSocketDataMap.set(tabId, wsData);
+          }
+          return webSocketDataMap;
+        });
+        notifications.success("WebSocket connected successfully");
+      } else if (event === "sparrow_internal_disconnect") {
+        // Disconnect listener from the target Socket.IO.
+        console.error(
+          new DOMException(args + " (Connection Lost)", "DisconnectError"),
+        );
+        webSocketDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tabId);
+          if (wsData) {
+            wsData.messages.unshift({
+              data: `Disconnected from ${url}`,
+              transmitter: "disconnector",
+              timestamp: formatTime(new Date()),
+              uuid: uuidv4(),
+            });
+            wsData.status = "disconnected";
+            webSocketDataMap.set(tabId, wsData);
+          }
+          return webSocketDataMap;
+        });
+      } else {
+        try {
+          const parsed = JSON.parse(args);
+
+          // Access the `data` array
+          const bufferData = parsed.data;
+
+          // Convert the buffer data to a string
+          const result = String.fromCharCode(...bufferData);
+          webSocketDataStore.update((webSocketDataMap) => {
+            const wsData = webSocketDataMap.get(tabId);
+            if (wsData) {
+              wsData.messages.unshift({
+                data: result,
+                transmitter: "receiver",
+                timestamp: formatTime(new Date()),
+                uuid: uuidv4(),
+              });
+              webSocketDataMap.set(tabId, wsData);
+            }
+            return webSocketDataMap;
+          });
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    });
+
+    // Listen for connect_error events from the proxy Socket.IO.
+    proxySocketIO.on("connect_error", (err) => {
+      console.error(new DOMException(err + " (Proxy Failed)", "ConnectError"));
+      webSocketDataStore.update((webSocketDataMap) => {
+        webSocketDataMap.delete(tabId);
+        return webSocketDataMap;
+      });
+      notifications.error("Failed to connect WebSocket");
+    });
   }
 };
 
@@ -840,6 +958,7 @@ const connectSocketIo = async (
         targetUrl: urlObject.origin || "",
         namespace: urlObject.pathname || "/",
         headers: _headers,
+        targetType: "socketio",
       },
       reconnection: false,
     });
