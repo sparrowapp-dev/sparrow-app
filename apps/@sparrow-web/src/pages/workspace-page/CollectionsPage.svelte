@@ -536,25 +536,25 @@
                       />
                     </div>
                   </Motion>
-                  <!-- {:else if $activeTab?.type === ItemType.WEB_SOCKET}
+                {:else if $activeTab?.type === ItemType.WEB_SOCKET}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WebSocketExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.TESTFLOW}
+                  <!-- {:else if $activeTab?.type === ItemType.TESTFLOW}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <TestFlowExplorerPage tab={$activeTab} />
                     </div>
-                  </Motion>
+                  </Motion> -->
                 {:else if $activeTab?.type === ItemType.SOCKET_IO}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <SocketIoExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.GRAPHQL}
+                  <!-- {:else if $activeTab?.type === ItemType.GRAPHQL}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <GraphqlExplorerPage tab={$activeTab} />
@@ -805,20 +805,32 @@
           _viewModel.handleRemoveTab(removeTab.id);
         }
         return res;
+      } else if (removeTab.type === TabTypeEnum.SOCKET_IO) {
+        const res = await _viewModel.saveAsSocketIo(
+          _workspaceMeta,
+          path,
+          tabName,
+          description,
+          removeTab,
+        );
+        if (res?.status === "success") {
+          _viewModel.handleRemoveTab(removeTab.id);
+        }
+        return res;
+      } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
+        const res = await _viewModel.saveAsSocket(
+          _workspaceMeta,
+          path,
+          tabName,
+          description,
+          removeTab,
+        );
+        if (res?.status === "success") {
+          _viewModel.handleRemoveTab(removeTab.id);
+        }
+        return res;
       }
-      // else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
-      //   const res = await _viewModel.saveAsSocket(
-      //     _workspaceMeta,
-      //     path,
-      //     tabName,
-      //     description,
-      //     removeTab,
-      //   );
-      //   if (res?.status === "success") {
-      //     _viewModel.handleRemoveTab(removeTab.id);
-      //   }
-      //   return res;
-      // } else if (removeTab.type === TabTypeEnum.SOCKET_IO) {
+      // else if (removeTab.type === TabTypeEnum.SOCKET_IO) {
       //   const res = await _viewModel.saveAsSocketIo(
       //     _workspaceMeta,
       //     path,
@@ -862,9 +874,9 @@
     border-bottom: 0 !important;
   }
   :global(
-      .collection-splitter .splitpanes__splitter:active,
-      .collection-splitter .splitpanes__splitter:hover
-    ) {
+    .collection-splitter .splitpanes__splitter:active,
+    .collection-splitter .splitpanes__splitter:hover
+  ) {
     background-color: var(--bg-primary-200) !important;
   }
   .gradient-text {

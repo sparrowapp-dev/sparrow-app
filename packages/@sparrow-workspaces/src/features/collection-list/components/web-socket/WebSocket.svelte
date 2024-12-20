@@ -308,7 +308,7 @@
     >
       <button
         id={`show-more-websocket-${api.id}`}
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+        class="threedot-icon-container border-0 rounded d-flex p-0 justify-content-center align-items-center {showMenu
           ? 'threedot-active'
           : ''}"
         style="transform: rotate(90deg);"

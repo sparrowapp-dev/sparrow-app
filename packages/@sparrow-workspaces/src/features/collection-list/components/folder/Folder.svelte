@@ -305,7 +305,7 @@
           displayText: "Add WebSocket",
           disabled: false,
           hidden:
-            (!isWebApp && !collection.activeSync) ||
+            !collection.activeSync ||
             (explorer?.source === "USER" && collection.activeSync)
               ? false
               : true,
@@ -321,7 +321,7 @@
           displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            (!isWebApp && !collection.activeSync) ||
+            !collection.activeSync ||
             (explorer?.source === "USER" && collection.activeSync)
               ? false
               : true,
@@ -562,7 +562,7 @@
           {activeTabPath}
         />
       </div>
-    {:else if explorer.type === ItemType.WEB_SOCKET && !isWebApp}
+    {:else if explorer.type === ItemType.WEB_SOCKET}
       <div style="cursor:pointer;">
         <WebSocket
           bind:userRole
@@ -576,7 +576,7 @@
           {activeTabPath}
         />
       </div>
-    {:else if explorer.type === ItemType.SOCKET_IO && !isWebApp}
+    {:else if explorer.type === ItemType.SOCKET_IO}
       <div style="cursor:pointer;">
         <SocketIo
           bind:userRole

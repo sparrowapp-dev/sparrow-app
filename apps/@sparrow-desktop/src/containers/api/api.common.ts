@@ -400,7 +400,7 @@ const addSocketDataToMap = (tabId, url) => {
   try {
     updateSocketDataStore(
       tabId,
-      `Connected from ${url}`,
+      `Connected to ${url}`,
       "connecter",
       "connected",
     );
@@ -456,6 +456,7 @@ async function processMessageEvent(tabId, event) {
   // Retrieve tab data and check event inclusion
   const tabData = await tabRepository.getTabByTabId(tabId);
   const tabDataJSON = tabData?.toMutableJSON();
+  console.log(event, "event");
   const socketIOresponse = event.payload;
   const eventName = socketIOresponse.event;
   const message = socketIOresponse.message;
@@ -630,7 +631,7 @@ const connectWebSocket = async (
           const wsData = webSocketDataMap.get(tabId);
           if (wsData) {
             wsData.messages.unshift({
-              data: `Connected from ${url}`,
+              data: `Connected to ${url}`,
               transmitter: "connecter",
               timestamp: formatTime(new Date()),
               uuid: uuidv4(),

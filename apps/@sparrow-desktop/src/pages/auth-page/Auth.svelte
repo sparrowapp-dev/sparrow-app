@@ -1,12 +1,21 @@
 <script lang="ts">
-  import { notifications } from "@sparrow/library/ui";
+  import axios, { type Method } from "axios";
+  import { notifications, Spinner } from "@sparrow/library/ui";
   import {
     logoSparrowSquare,
+    SparrowBackgroundV2,
     sparrowLogoBackground,
   } from "@sparrow/common/images";
   import { DefaultHeader, Redirect } from "@sparrow/common/components";
   import constants from "@app/constants/constants";
-  import { StarIcon } from "@sparrow/library/icons";
+  import {
+    AISparkle,
+    AiSparkleIconV2,
+    AiSparkleIconV3,
+    ArrowRightIcon,
+    CopyIcon2,
+    StarIcon,
+  } from "@sparrow/library/icons";
   import { StarFilledIcon } from "@sparrow/library/icons";
   import { CopyIcon } from "@sparrow/library/icons";
   import { ExternalLinkIcon } from "@sparrow/library/icons";
@@ -21,19 +30,11 @@
   import { isGuestUserActive, navigationState } from "@app/store/auth.store";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
-  import { Button } from "@sparrow/library/ui";
+  import { leftIconIcon } from "@sparrow/library/assets";
+  import { jwtDecode } from "@app/utils/jwt";
+  import { handleLoginV2 } from "./sub-pages/login-page/login-page";
   let isEntry = false;
-
   let isHover = false;
-  let redirectRules = {
-    title: "Opening Web Browser...",
-    description: "",
-    message: ``,
-    isSpinner: true,
-    buttonText: "Open Desktop App",
-    buttonClick: () => {},
-    loadingMessage: "Please wait while we sign you in....",
-  };
   let externalSparrowLink = `${constants.SPARROW_AUTH_URL}`;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
   const _viewModel = new AuthViewModel();
@@ -69,204 +70,253 @@
       });
     }
   };
+  let token = "";
+  let isTokenFormEnabled = false;
+  let isTokenErrorMessage = false;
+  let isTokenValidationLoading = false;
+
+  let isPressed = false;
 </script>
 
 <DefaultHeader />
 
-{#if isEntry}
-  <Redirect
-    title={redirectRules.title}
-    description={redirectRules.description}
-    message={redirectRules.message}
-    isSpinner={redirectRules.isSpinner}
-    buttonText={redirectRules.buttonText}
-    buttonClick={redirectRules.buttonClick}
-    loadingMessage={redirectRules.loadingMessage}
-    callback={handleRedirect}
-    appVersion={version}
-  >
-    <p class="sparrow-fs-16">
-      If your browser doesn’t open automatically, please visit
-      <span
-        on:click={openDefaultBrowser}
-        class="text-primary-300 cursor-pointer text-decoration-underline"
-        >Sparrow website
-        <span class="mx-2">
-          <ExternalLinkIcon
-            width="16px"
-            height="16px"
-            color="var(--icon-primary-300)"
-          />
-        </span>
-      </span>
-      to sign In or copy URL
-      <span
-        class="text-primary-300 cursor-pointer text-decoration-underline"
-        style="border-radius: 2px;"
-        on:click={async () => {
-          await copyToClipBoard(externalSparrowLink);
-          notifications.success("Link copied to clipboard.");
+<Background>
+  {#if isTokenFormEnabled}
+    <div style="position:absolute; top:0; left: 28px; top:28px;">
+      <button
+        style="width: 33px; height:33px; border-radius: 10px; border: 1px solid  var(--border-secondary-300); outline:none;"
+        class="d-flex align-items-center justify-content-center bg-transparent"
+        on:click={() => {
+          isTokenFormEnabled = false;
+          token = "";
         }}
       >
-        <span class="mx-2">
-          <CopyIcon
-            width="18px"
-            height="18px"
-            color="var(--icon-primary-300)"
-          />
-        </span>
-        Copy</span
-      >
-    </p></Redirect
-  >
-{:else}
-  <Background>
+        <img src={leftIconIcon} class="" />
+      </button>
+    </div>
+  {/if}
+  <div class="d-flex align-items-start gap-2">
     <div
       class="text-white d-flex justify-content-center align-items-center bg-primary-300"
-      style="height: 60px; width: 60px; border-radius: 6px;"
+      style="height: 25px; width: 25px; border-radius: 6px;"
     >
-      <img src={logoSparrowSquare} alt="" class="" />
+      <img height="17px" width="17px" src={logoSparrowSquare} alt="" class="" />
     </div>
+    <p style="font-weight:500;">Sparrow</p>
+  </div>
+
+  <div style="display: flex ; flex-direction:column; align-items:center;">
     <p
-      class="container-header pt-4 pb-4 sparrow-fs-28 sparrow-fw-600 text-whiteColor text-center ms-2 me-2"
-      style="font-weight: 500;"
+      class="container-header text-fs-24 sparrow-fw-600 text-whiteColor text-center ms-2 me-2 mb-1"
+      style="font-weight: 400; padding-top:20px; line-height:28px; text-align:center;"
     >
-      Welcome to <span class="text-primary-300">Sparrow!</span>
+      Welcome to Sparrow!
     </p>
-    <div class="mb-1" style="height:40px;">
-      <button
-        class="btn btn-primary mb-3 w-100 text-whiteColor border-0"
-        on:click={() => {
-          handleRedirect(true);
-          openDefaultBrowser();
-        }}
-        id="create_account_or_sign_in"
-      >
-        Create an Account or Sign In</button
-      >
-    </div>
-    <div class="mb-1">
-      <div
-        class="mb-2"
-        style="text-align:center; font-size:12px; color:var(  --text-secondary-350);"
-      >
-        or
-      </div>
-      <div style="height:32px;">
-        <Button
-          id="try_sparrow_edge"
-          onClick={() => {
-            skipLoginHandler();
-            // isUserFirstSignUp.set(true);
-          }}
-          title={"Try Sparrow Edge"}
-          buttonClassProp={"btn mb-2"}
-          type={"teritiary"}
-          buttonStyleProp={"height:32px; weight:126px; border-color:var( --border-primary-300) !important; font-size:13px; "}
-        />
-      </div>
-    </div>
+    <p class="sparrow-fs-12 mt-0" style="color: var(--text-secondary-200);">
+      The only API Sidekick you need
+    </p>
+  </div>
+
+  {#if !isTokenFormEnabled}
     <div
-      class="mb-2 mt-2 w-[266px]"
-      style="text-align:center; font-size:12px; color:var(  --text-secondary-350); padding: 5% 0px; width: 80%;
-      font-size: 12px;
-      "
+      class=""
+      style="display: flex ; flex-direction:column; align-items:center;"
     >
-      Sparrow Edge: Your instant, no-signup API testing tool stripped down to
-      the essentials.
-    </div>
+      <div class="d-flex" style="height:44px; width:100%; margin-top:44px;">
+        <button
+          on:mousedown={() => (isPressed = true)}
+          on:mouseup={() => (isPressed = false)}
+          on:mouseleave={() => (isPressed = false)}
+          class="btn btn-primary w-100 border-0 {isPressed
+            ? 'shadow-pressed'
+            : 'shadow-none'}"
+          on:click={() => {
+            handleRedirect(true);
+            openDefaultBrowser();
+            isTokenFormEnabled = true;
+          }}
+          id="create_account_or_sign_in"
+        >
+          Login or Create</button
+        >
+      </div>
 
-    <div class="w-100 d-flex align-items-center justify-content-center">
-      {#if os === "windows"}
-        <a
-          href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
-          class="px-2 sparrow-fs-12 text-secondary-250">Need Help?</a
-        >
-        <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
-        <a
-          href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
-          class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
-        >
-      {:else}
-        <a
-          on:click={async () => {
-            await open(externalSparrowLink + "/support");
+      <div class="divider w-100">
+        <span class="line"></span>
+        <span class="text" style="color:var(--text-secondary-200)">Or</span>
+        <span class="line"></span>
+      </div>
+
+      <div class="d-flex" style="height:44px; width:100%;">
+        <button
+          class="btn btn-secondary w-100 text-whiteColor"
+          style=""
+          on:click={() => {
+            skipLoginHandler();
           }}
-          role="button"
-          class="px-2 sparrow-fs-12 text-secondary-250">Need Help?</a
+          id="create_account_or_sign_in"
         >
-        <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
-        <a
-          role="button"
-          on:click={async () => {
-            await open(externalSparrowLink + "/support");
-          }}
-          class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
+          Try Sparrow Edge</button
         >
-      {/if}
-    </div>
-    <div slot="outside">
+      </div>
+
       <div
-        class="mb button-text text-center sparrow-fs-16 gap-1 d-flex cursor-pointer mt-5 d-flex justify-content-center align-items-center mb-5 object-fit-cover"
-        on:click={async () => {
-          await open(externalSparrowGithub);
-        }}
+        class="mb-2 mt-2 w-[266px]"
+        style=" text-align:center; font-size:12px; color:var(--text-secondary-1030);  width: 100%;
+      font-size: 12px; font-weight:400;
+      "
       >
-        <div
-          class="d-flex align-items-center"
-          on:mouseenter={() => {
-            isHover = true;
+        <AiSparkleIconV2 height={"20"} width={"20"} /> Instantly test APIs without
+        signing up-just the essentials to get started fast.
+      </div>
+    </div>
+  {:else}
+    <div
+      class="w-100"
+      style="display: flex ; flex-direction:column; align-items:center;"
+    >
+      <div class="w-100">
+        <label
+          for="exampleInputEmail1"
+          class="form-label text-lightGray text-fs-12 d-flex"
+          >Token
+          <p class="ms-1 mb-0 sparrow-fw-600 text-dangerColor">*</p>
+        </label>
+        <!-- <img src={starIcon} alt="" class="mb-3" style="width: 7px;" /> -->
+        <input
+          type="email"
+          class="form-control py-2 text-fs-12-important"
+          style={isTokenErrorMessage
+            ? "border: 1px solid var(--border-danger-200)"
+            : ""}
+          placeholder="Enter your token"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="none"
+          bind:value={token}
+          on:input={() => {
+            isTokenErrorMessage = false;
           }}
-          on:mouseleave={() => {
-            isHover = false;
-          }}
-        >
-          <div class="me-1">
-            {#if isHover}
-              <StarFilledIcon />
-            {:else}
-              <StarIcon />
-            {/if}
-          </div>
-
-          <p
-            class="{isHover ? 'star-text-hover' : ''} mb-0"
-            style="margin-top:3px; "
+          on:blur={async () => {}}
+        />
+        {#if isTokenErrorMessage}
+          <small class="text-danger-200 text-fs-12"
+            >Invalid or expired code.</small
           >
-            Star us on GitHub
+        {/if}
+      </div>
+
+      <div class="d-flex" style="height:44px; width:100%; margin-top:15px;">
+        <button
+          class="btn d-flex justify-content-center align-items-center btn-primary w-100 text-blackColor border-0"
+          on:click={async () => {
+            const params = new URLSearchParams(token.split("?")[1]);
+            const accessToken = params.get("accessToken");
+            const refreshToken = params.get("refreshToken");
+            const userDetails = jwtDecode(accessToken);
+            const apiUrl = constants.API_URL;
+            const userId = userDetails?._id;
+            const userEmail = userDetails?.email;
+            if (!userEmail || !userId || !accessToken || !refreshToken) {
+              isTokenErrorMessage = true;
+              return;
+            }
+            try {
+              isTokenValidationLoading = true;
+              await axios({
+                method: "GET",
+                url: `${apiUrl}/api/team/user/${userId}`,
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                },
+              });
+              isTokenErrorMessage = false;
+              handleLoginV2(token);
+            } catch (e) {
+              isTokenErrorMessage = true;
+            } finally {
+              isTokenValidationLoading = false;
+            }
+          }}
+          id="create_account_or_sign_in"
+          disabled={!token || isTokenValidationLoading}
+        >
+          {#if isTokenValidationLoading}
+            <Spinner size={"16px"} />
+          {:else}
+            Login
+          {/if}
+        </button>
+      </div>
+      <div class="sparrow-fw-400 sparrow-fs-16" style="margin-top: 6px;">
+        <div
+          style="text-align:center; max-width: 370px;"
+          class="text-lightGray mt-4 sparrow-fw-300 sparrow-fs-12"
+        >
+          <p>
+            <span
+              role="button"
+              on:click={async () => {
+                await copyToClipBoard(externalSparrowLink);
+                notifications.success("Link copied to clipboard.");
+              }}
+            >
+              <CopyIcon2 height={"14px"} width={"16px"} color={"#CCCCCCE5"} />
+              <span
+                style="text-decoration: underline; text-underline-offset: 4px;"
+                >copy</span
+              >
+            </span>
+            the link if you are facing any issue in redirecting to the login page.
           </p>
         </div>
       </div>
-      <div class="divider-line my-4" />
-
-      <div>
-        <p class=" text-center text-secondary-250 sparrow-fs-14 m-1">
-          Version {version}
-        </p>
-      </div>
     </div>
-  </Background>
-{/if}
+  {/if}
+
+  <div
+    class="w-100 d-flex align-items-center justify-content-center"
+    style="margin-top: 64px;"
+  >
+    {#if os === "windows"}
+      <a
+        href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
+        class="px-2 sparrow-fs-12 text-secondary-250">Need Help?</a
+      >
+      <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
+      <a
+        href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
+        class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
+      >
+    {:else}
+      <a
+        on:click={async () => {
+          await open(externalSparrowLink + "/support");
+        }}
+        role="button"
+        class="link-button px-2 sparrow-fs-12">Need Help?</a
+      >
+      <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
+      <a
+        role="button"
+        on:click={async () => {
+          await open(externalSparrowLink + "/support");
+        }}
+        class="px-2 link-button sparrow-fs-12">Report Issue</a
+      >
+    {/if}
+  </div>
+</Background>
 
 <div
   style="height: 100vh; top:0; left:0;
         right:0; z-index:-100 !important"
   class="w-100 position-fixed bg-blackColor"
 >
-  <img src={sparrowLogoBackground} alt="" style="height:100%; width:100%;" />
+  <img src={SparrowBackgroundV2} alt="" style="height:100%; width:100%;" />
 </div>
 
 <style>
-  .btn-primary {
-    background: var(--bg-primary-300);
-  }
-  .btn-primary:hover {
-    background: var(--text-primary-400);
-  }
-  .btn-primary:active {
-    background: var(--button-active);
-  }
-
   a {
     text-decoration: none;
   }
@@ -277,35 +327,109 @@
   .cursor-pointer {
     cursor: pointer;
   }
-  .divider-line {
-    height: 2px;
-    width: 80vw;
-    margin: 0 auto;
-    background: linear-gradient(
-      90deg,
-      var(--bg-secondary-900) 0%,
-      #354366 51.5%,
-      var(--bg-secondary-900) 100%
-    );
+
+  button {
+    transition: all 300ms ease-in-out;
   }
 
-  .check-for-update {
-    background: linear-gradient(
-      90deg,
-      var(--bg-primary-250) 0%,
-      var(--bg-primary-300) 100%
-    );
-    background-clip: text;
-    color: transparent;
+  .btn-primary {
+    font-weight: 400;
+    font-size: 14px;
+    background: var(--bg-secondary-100);
+    color: var(--text-secondary-900);
+    border: 1px solid #ffffff;
   }
-  .star-text-hover {
-    color: var(--text-primary-300);
-    text-decoration: underline;
+
+  .btn-primary:hover {
+    background-color: #6147ff; /* purple-600 */
+    border-color: transparent;
+    color: var(--text-secondary-100);
   }
-  .btn-guest {
-    color: var(--text-primary-300);
-    text-decoration: underline;
-    font-size: 13px;
+
+  .btn-primary.shadow-none {
+    box-shadow: none;
+  }
+
+  .btn-primary.shadow-pressed {
+    box-shadow: inset 0px 0px 12px 5px rgba(0, 0, 0, 0.55);
+    border: 0.4px solid white !important;
+  }
+
+  .btn-primary:active {
+    box-shadow: inset 0px 0px 12px 5px rgba(0, 0, 0, 0.55);
+  }
+  .btn-primary:disabled {
+    background-color: var(--bg-secondary-100);
+    border: 1px solid #ffffff;
+  }
+
+  .btn-secondary {
+    font-weight: 400;
+    font-size: 14px;
+    background-color: transparent;
+    border: 1px solid rgba(214, 211, 209, 0.9);
+    border-radius: 8px;
+  }
+
+  .btn-secondary:hover {
+    background-color: #6147ff;
+    border-color: transparent;
+  }
+
+  .btn-secondary:active {
+    box-shadow: inset 0px 0px 12px 5px rgba(0, 0, 0, 0.55);
+    transition: all 100ms ease-in-out;
+  }
+
+  .btn-secondary:disabled {
+    background-color: transparent;
+    border: 1px solid rgba(214, 211, 209, 0.9);
+  }
+
+  .link-button {
+    color: #62636c;
+    font-weight: 400;
+    font-size: 14px;
     cursor: pointer;
+  }
+
+  .link-button:hover {
+    color: var(--text-primary-300);
+  }
+
+  .link-button:active {
+    color: var(--text-primary-300);
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+    font-family: Arial, sans-serif;
+  }
+
+  .divider .line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, #62636c00, #bfc0d2);
+  }
+
+  .divider .line:last-child {
+    background: linear-gradient(to left, #62636c00, #bfc0d2);
+  }
+
+  .divider .text {
+    margin: 0 4px;
+    color: #bfc0d2;
+    font-size: 14px;
+  }
+
+  input {
+    background-color: transparent !important;
+    outline: none;
+  }
+  button:disabled {
+    opacity: 0.7;
   }
 </style>
