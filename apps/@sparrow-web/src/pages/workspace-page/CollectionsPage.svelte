@@ -32,6 +32,7 @@
   } from "@sparrow/workspaces/features";
   import { WithModal } from "@sparrow/workspaces/hoc";
   import { notifications } from "@sparrow/library/ui";
+  import { DownloadApp } from "@sparrow/common/features";
 
   // ---- Interface, enum & constants
   import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
@@ -419,6 +420,47 @@
   onDestroy(() => {
     cw.unsubscribe();
   });
+
+  let windowOs = true;
+  function getOS() {
+    let userAgent = window.navigator.userAgent;
+    if (userAgent.indexOf("Mac") != -1) {
+      windowOs = true;
+    } else if (userAgent.indexOf("Windows") != -1) {
+      windowOs = false;
+    }
+  }
+  onMount(() => {
+    getOS();
+  });
+
+  let isPopupOpen = false;
+
+  function launchSparrowWebApp() {
+    let appDetected = false;
+
+    // Handle when window loses focus (app opens)
+    const handleBlur = () => {
+      appDetected = true;
+      window.removeEventListener("blur", handleBlur);
+      clearTimeout(detectAppTimeout);
+    };
+
+    window.addEventListener("blur", handleBlur);
+
+    // Try to open the app
+    _viewModel.setupRedirect();
+
+    // Check if app opened after a short delay
+    const detectAppTimeout = setTimeout(() => {
+      window.removeEventListener("blur", handleBlur);
+
+      // Only show popup if app wasn't detected
+      if (!appDetected) {
+        isPopupOpen = true;
+      }
+    }, 500);
+  }
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -442,6 +484,8 @@
           {collectionList}
           {currentWorkspace}
           {isAppVersionVisible}
+          {windowOs}
+          {launchSparrowWebApp}
           {isGuestUser}
           leftPanelController={{
             leftPanelCollapse: $leftPanelCollapse,
@@ -861,6 +905,20 @@
     onRenameCollection={_viewModel.handleSaveAsRenameCollection}
     onRenameFolder={_viewModel.handleSaveAsRenameFolder}
   />
+</Modal>
+
+<!-- Download the Desktop app -->
+<Modal
+  title=""
+  type="dark"
+  width="45%"
+  zIndex={1000}
+  isOpen={isPopupOpen}
+  handleModalState={() => {
+    isPopupOpen = false;
+  }}
+>
+  <DownloadApp />
 </Modal>
 
 <style>
