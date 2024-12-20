@@ -940,7 +940,7 @@
               requestDescription,
               type,
             );
-            if (res.status === "success") {
+            if (res?.status === "success") {
               onFinish(res.data.id);
               onClick(false);
 
