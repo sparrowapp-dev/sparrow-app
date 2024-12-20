@@ -375,6 +375,7 @@ const connectWebSocket = async (
         return webSocketDataMap;
       });
 
+      const ws = new WebSocket(url);
       // Update store with WebSocket instance
       webSocketDataStore.update((webSocketDataMap) => {
         const wsData = webSocketDataMap.get(tabId);
