@@ -257,6 +257,7 @@ function formatTime(date) {
  */
 const sendMessage = async (tab_id: string, message: string) => {
   // const selectedAgent = localStorage.getItem("selectedAgent");
+  console.log("message", message);
 
   try {
     let listener;
@@ -265,16 +266,16 @@ const sendMessage = async (tab_id: string, message: string) => {
       if (wsData) {
         listener = wsData.listener;
         // Check for the original agent type from the store, not the currently selected agent
-        if (wsData.agent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT) {
-          wsData.messages.unshift({
-            data: message,
-            transmitter: "sender",
-            timestamp: formatTime(new Date()),
-            uuid: uuidv4(),
-          });
-          listener.send(message);
-          webSocketDataMap.set(tab_id, wsData);
-        }
+        // if (wsData.agent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT) {
+        wsData.messages.unshift({
+          data: message,
+          transmitter: "sender",
+          timestamp: formatTime(new Date()),
+          uuid: uuidv4(),
+        });
+        listener.send(message);
+        webSocketDataMap.set(tab_id, wsData);
+        // }
       }
       return webSocketDataMap;
     });
