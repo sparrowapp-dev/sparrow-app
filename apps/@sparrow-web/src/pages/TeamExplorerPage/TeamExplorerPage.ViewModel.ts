@@ -347,7 +347,7 @@ export class TeamExplorerPageViewModel {
     await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
     await this.workspaceRepository.setActiveWorkspace(id);
     // Disabling the switching of workspace in web
-    // navigate("/dashboard/collections");
+    navigate("/app/collections");
   };
 
   /**
