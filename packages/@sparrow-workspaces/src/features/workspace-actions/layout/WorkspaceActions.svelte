@@ -269,6 +269,16 @@
           },
         },
         {
+          name: "Add WebSocket",
+          icon: SocketIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            onItemCreated("web-socket", {});
+            MixpanelEvent(Events.Add_WebSocket);
+          },
+        },
+        {
           name: "Add Environment",
           icon: StackIcon,
           iconColor: "var(--icon-secondary-130)",

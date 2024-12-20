@@ -51,6 +51,7 @@
   export let onUpdateEnvironment;
   export let environmentVariables;
   export let isGuestUser = false;
+  export let isWebApp;
   /**
    * Role of user in active workspace
    */
@@ -67,7 +68,6 @@
   export let onUpdateContentType;
   export let onClearInput;
   export let onUpdateFilterType;
-
   let isExposeSaveAsSocket = false;
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsSocket = flag;
@@ -195,6 +195,7 @@
                         <div class="h-100 d-flex flex-column">
                           <ResponsePreviewNavigator
                             {webSocket}
+                            {isWebApp}
                             {onUpdateContentType}
                           />
                           <div class="pt-2"></div>
@@ -270,9 +271,9 @@
     border-right: 0 !important;
   }
   :global(
-      .rest-splitter .splitpanes__splitter:active,
-      .rest-splitter .splitpanes__splitter:hover
-    ) {
+    .rest-splitter .splitpanes__splitter:active,
+    .rest-splitter .splitpanes__splitter:hover
+  ) {
     background-color: var(--bg-primary-200) !important;
   }
 </style>
