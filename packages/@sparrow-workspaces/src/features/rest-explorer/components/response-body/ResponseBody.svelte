@@ -36,6 +36,7 @@
       {#if !imageHasError}
         <!-- render image from base64 -->
         <img
+          loading="lazy"
           src={response.body}
           alt="Sparrow logo"
           on:error={() => (imageHasError = true)}

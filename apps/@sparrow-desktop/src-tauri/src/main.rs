@@ -348,7 +348,7 @@ async fn make_request_v2(
 
     //check is data binary
 
-    let content_type = response_headers
+    let mut content_type = response_headers
         .get("content-type")
         .and_then(|v| v.to_str().ok())
         .unwrap_or("")
@@ -359,13 +359,30 @@ async fn make_request_v2(
     let response_body;
 
     if is_binary {
-        //extract bytes from respose body for further conversion
-        let bytes = response_value
-            .bytes()
-            .await
-            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+        let base64_string;
 
-        let base64_string = base64::encode(bytes); // convert bytes to base64 string effiecient for transmission / no data willl not get currupted.
+        if content_type.contains("svg") {
+            content_type = "image/svg+xml".to_string();
+
+            let response_text_result = decode_response_body(response_value).await;
+
+            let svg_string = match response_text_result {
+                Ok(value) => value,
+                Err(err) => format!("Error: {}", err),
+            };
+
+            println!("{}", svg_string);
+
+            base64_string = base64::encode(svg_string);
+        } else {
+            //extract bytes from respose body for further conversion
+            let bytes = response_value
+                .bytes()
+                .await
+                .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+
+            base64_string = base64::encode(bytes); // convert bytes to base64 string effiecient for transmission / no data willl not get currupted.
+        }
 
         //create src from content type and base64 string
         response_body = format!("data:{};base64,{}", content_type, base64_string);
