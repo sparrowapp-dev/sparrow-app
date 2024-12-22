@@ -2,7 +2,7 @@
   "identifier": "migrated",
   "description": "permissions that were migrated from v1",
   "context": "local",
-  "windows": ["main"],
+  "windows": ["main", "windows"],
   "permissions": [
     "core:path:default",
     "core:event:default",
@@ -25,6 +25,7 @@
     "core:window:allow-set-fullscreen",
     "core:window:allow-set-focus",
     "core:window:allow-start-dragging",
+    "core:window:allow-start-resize-dragging",
     "os:allow-platform",
     "deep-link:allow-get-current",
     "core:window:allow-set-shadow",

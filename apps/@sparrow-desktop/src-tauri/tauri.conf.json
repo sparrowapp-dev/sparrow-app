@@ -6,7 +6,7 @@
     "windows": [
       {
         "center": true,
-        "decorations": false,
+        "decorations": true,
         "fullscreen": false,
         "label": "main",
         "minHeight": 700,
@@ -14,10 +14,26 @@
         "resizable": true,
         "title": "Sparrow",
         "shadow": true,
-        "focus": true
+        "focus": true,
+        "dragDropEnabled": false,
+        "maximized": true
+      },
+      {
+        "center": true,
+        "decorations": false,
+        "fullscreen": false,
+        "label": "windows",
+        "minHeight": 700,
+        "minWidth": 1200,
+        "resizable": true,
+        "title": "Sparrow",
+        "shadow": true,
+        "focus": true,
+        "dragDropEnabled": false,
+        "maximized": true
       }
     ],
-    "withGlobalTauri": false
+    "withGlobalTauri": true
   },
   "build": {
     "beforeBuildCommand": "yarn build",
@@ -55,7 +71,7 @@
         },
         "windowSize": {
           "height": 500,
-          "width": 700
+          "width": 770
         },
         "windowPosition": {
           "x": 400,
@@ -67,7 +83,6 @@
   "identifier": "dev.sparrowapp.desktop",
   "plugins": {
     "updater": {
-      "createUpdaterArtifacts": true,
       "windows": {
         "installMode": "passive"
       },
@@ -84,5 +99,5 @@
     }
   },
   "productName": "Sparrow",
-  "version": "2.12.0"
+  "version": "2.14.0"
 }

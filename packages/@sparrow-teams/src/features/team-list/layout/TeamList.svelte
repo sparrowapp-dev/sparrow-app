@@ -5,7 +5,7 @@
   export let isCreateTeamModalOpen;
   export let isGuestUser;
   export let setOpenTeam;
-  export let teamList;
+  export let teamList = [];
   export let disableNewInviteTag;
   export let modifyTeam;
   export let activeIndex;
@@ -20,7 +20,7 @@
     <div>
       <Tooltip title="New Team" placement={"bottom"} distance={10}>
         <button
-          class="new-team-btn d-flex align-items-center justify-content-center rounded border-0"
+          class="new-team-btn d-flex align-items-center justify-content-center p-0 rounded border-0"
           on:click={() => {
             isCreateTeamModalOpen = true;
           }}

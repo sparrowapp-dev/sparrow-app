@@ -6,12 +6,22 @@
     MiniMizeIcon,
     SquareIcon,
   } from "@sparrow/library/icons";
+  import { invoke } from "@tauri-apps/api/core";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { onDestroy } from "svelte";
 
   export let isWindows = true;
 
   let appWindow = getCurrentWindow();
+
+  let hoveredButton = "";
+  const handleMouseEnter = (buttonName: string) => {
+    hoveredButton = buttonName;
+  };
+
+  const handleMouseLeave = () => {
+    hoveredButton = "";
+  };
 
   const onMinimize = () => {
     appWindow.minimize();
@@ -20,12 +30,23 @@
   const onClose = () => {
     appWindow.close();
   };
+  let isFullscreen: boolean = false;
 
   const toggleSize = async () => {
     if (!isWindows) {
-      // macOS: Use fullscreen
-      const isFullscreen = await appWindow.isFullscreen();
-      appWindow.setFullscreen(!isFullscreen);
+      const currentFullscreenState = await appWindow.isFullscreen();
+
+      // Show original Toolbar when window is maximized
+      if (!currentFullscreenState) {
+        await invoke("show_toolbar");
+      }
+
+      // Toggle fullscreen mode
+      await appWindow.setFullscreen(!currentFullscreenState);
+
+      // Update isFullscreen state
+      isFullscreen = !currentFullscreenState;
+      console.log("Updated fullscreen state:", isFullscreen);
     } else {
       // Other platforms: Use maximize
       const isMaximized = await appWindow.isMaximized();
@@ -35,15 +56,6 @@
         appWindow.maximize();
       }
     }
-  };
-
-  let hoveredButton = "";
-  const handleMouseEnter = (buttonName: string) => {
-    hoveredButton = buttonName;
-  };
-
-  const handleMouseLeave = () => {
-    hoveredButton = "";
   };
 
   let isMaximizeWindow = false;
@@ -64,6 +76,16 @@
     } catch {
       console.log("Insidie catch");
     }
+  }
+
+  if (!isWindows) {
+    const unlistenResize = appWindow.onResized(async () => {
+      isFullscreen = await appWindow.isFullscreen();
+    });
+
+    onDestroy(() => {
+      unlistenResize.then((f) => f());
+    });
   }
 </script>
 
@@ -134,26 +156,33 @@
   </div>
 {:else}
   <!-- Mac Style Buttons -->
-  <div class="d-flex mac-container me-2">
-    <div on:click={onClose} class="mac-nav">
-      <div class="icon">
-        <CrossIconV2 height={"6"} width={"6"} color={"#285F17"} />
+  <div class="d-flex mac-container me-2" class:notivisible={isFullscreen}>
+    <div class="d-flex">
+      <div on:click={onClose} class="mac-nav">
+        <div class="icon">
+          <CrossIconV2 height={"6"} width={"6"} color={"#285F17"} />
+        </div>
       </div>
-    </div>
-    <div on:click={onMinimize} class="mac-nav">
-      <div class="icon">
-        <MiniMizeIcon height={"6"} width={"6"} color={"black"} />
+      <div on:click={onMinimize} class="mac-nav">
+        <div class="icon">
+          <MiniMizeIcon height={"6"} width={"6"} color={"black"} />
+        </div>
       </div>
-    </div>
-    <div on:click={toggleSize} id="resize-button" class="mac-nav">
-      <div class="icon">
-        <ExpandIcon height={"6"} width={"6"} color={"#285F17"} />
+      <div on:click={toggleSize} id="resize-button" class="mac-nav">
+        <div class="icon">
+          <ExpandIcon height={"6"} width={"6"} color={"#285F17"} />
+        </div>
       </div>
     </div>
   </div>
 {/if}
 
 <style>
+  .notivisible {
+    opacity: 0 !important;
+    height: 20px !important;
+    background-color: red;
+  }
   .mac-nav .icon {
     display: none; /* Hide the icons by default */
     margin-bottom: 1px;

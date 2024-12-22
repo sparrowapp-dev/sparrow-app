@@ -76,6 +76,7 @@
       }
     },
   );
+  let isWorkspaceOpen = false;
 
   activeTeam.subscribe((value) => {
     if (value) {
@@ -88,7 +89,6 @@
   let isTeamInviteModalOpen = false;
   let isLeaveTeamModelOpen = false;
   let isGuestUser;
-  let isWorkspaceOpen = false;
 
   const handleDeleteWorkspace = (workspace: WorkspaceDocument) => {
     selectedWorkspace = workspace;
@@ -211,7 +211,7 @@
     onCreateWorkspace={_viewModel.handleCreateWorkspace}
     onSwitchWorkspace={async (item) => {
       await _viewModel.handleSwitchWorkspace(item);
-      isWorkspaceOpen = true;
+      // isWorkspaceOpen = true;
     }}
     onRemoveMembersAtTeam={_viewModel.removeMembersAtTeam}
     onDemoteToMemberAtTeam={_viewModel.demoteToMemberAtTeam}

@@ -69,30 +69,30 @@
         onItemCreated("request", {});
       }}
     />
+    <Card
+      icon={SocketIcon}
+      label="WebSocket"
+      iconColor="var(--text-primary-300)"
+      iconSize={"20px"}
+      onClick={() => {
+        onItemCreated("web-socket", {});
+        MixpanelEvent(Events.WebSocket_Button);
+      }}
+    />
+    <Card
+      icon={SocketIoIcon}
+      label={`${SocketIORequestDefaultAliasBaseEnum.NAME}`}
+      iconColor="var(--text-primary-300)"
+      iconSize={"18px"}
+      onClick={() => {
+        onItemCreated("socket-io", {});
+        MixpanelEvent(Events.SocketIO_Button, {
+          description: "Socket Io created from Default screen page.",
+          location: "Default Page",
+        });
+      }}
+    />
     {#if !isWebApp}
-      <Card
-        icon={SocketIcon}
-        label="WebSocket"
-        iconColor="var(--text-primary-300)"
-        iconSize={"20px"}
-        onClick={() => {
-          onItemCreated("web-socket", {});
-          MixpanelEvent(Events.WebSocket_Button);
-        }}
-      />
-      <Card
-        icon={SocketIoIcon}
-        label={`${SocketIORequestDefaultAliasBaseEnum.NAME}`}
-        iconColor="var(--text-primary-300)"
-        iconSize={"18px"}
-        onClick={() => {
-          onItemCreated("socket-io", {});
-          MixpanelEvent(Events.SocketIO_Button, {
-            description: "Socket Io created from Default screen page.",
-            location: "Default Page",
-          });
-        }}
-      />
       <Card
         icon={GraphIcon}
         label={`${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
