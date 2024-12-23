@@ -17,7 +17,12 @@ import { TabRepository } from "../repositories/tab.repository";
 import { navigate } from "svelte-navigator";
 import { InitWorkspaceTab } from "@sparrow/common/utils";
 import { platform } from "@tauri-apps/plugin-os";
-
+import { v4 as uuidv4 } from "uuid";
+import { isGuestUserActive } from "@app/store/auth.store";
+import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+import { Events } from "@sparrow/common/enums";
+import { TeamRepository } from "@app/repositories/team.repository";
+import { GuideRepository } from "@app/repositories/guide.repository";
 interface DeepLinkHandlerWindowsPayload {
   payload: {
     url: string;
@@ -36,6 +41,9 @@ export class AppViewModel {
   private guestUserRepository = new GuestUserRepository();
   private workspaceRepository = new WorkspaceRepository();
   private tabRepository = new TabRepository();
+  private teamRepository = new TeamRepository();
+  private environmentRepository = new EnvironmentRepository();
+  private guideRepository = new GuideRepository();
 
   private workspaceSwitcher = async (id: string) => {
     if (!id) return;
@@ -53,6 +61,18 @@ export class AppViewModel {
   };
 
   constructor() {}
+
+  /**
+   * add guest user in local db
+   */
+  public addGuestUser = async () => {
+    await this.guestUserRepository.insert({
+      id: uuidv4(),
+      name: "guestUser",
+      isGuestUser: true,
+      isBannerActive: true,
+    });
+  };
 
   /**
    * Get the guest user state
@@ -107,14 +127,112 @@ export class AppViewModel {
     5000,
   );
 
+  /**
+   *
+   * @param data query to find details
+   * @returns data from guest user repository
+   */
+  public findUser = async (data) => {
+    const res = await this.guestUserRepository.findOne(data);
+    return res;
+  };
+
+  /**
+   * create dummy team and workspace for guest user
+   */
+  private createGuestUserTeamWorkspace = async () => {
+    const response = await this.findUser({ name: "guestUser" });
+    const user = response?.getLatest().toMutableJSON();
+    const teamId = uuidv4();
+    const workspaceId = uuidv4();
+    const dummyTeam = {
+      teamId: teamId,
+      name: "Team",
+      workspaces: [{ name: "My Workspace", workspaceId: workspaceId }],
+      users: [{ id: user.id, name: user.name, email: "", role: "owner" }],
+      owner: user.id,
+      admins: [],
+      isActiveTeam: true,
+      isOpen: true,
+      isNewInvite: false,
+      createdAt: new Date().toISOString(),
+      createdBy: user.id,
+      updatedAt: new Date().toISOString(),
+      updatedBy: user.id,
+    };
+    await this.teamRepository.createTeam(dummyTeam);
+    const dummyWorkspace = {
+      _id: workspaceId,
+      name: "My Workspace",
+      team: {
+        teamId: teamId,
+        teamName: "Team",
+      },
+      admins: [{ id: user.id, name: user.name }],
+      users: [{ id: user.id, name: user.name, email: "", role: "admin" }],
+      createdAt: new Date().toISOString(),
+      createdBy: user.id,
+      isActiveWorkspace: true,
+      isNewInvite: false,
+      environmentId: "",
+      collections: [],
+    };
+    await this.workspaceRepository.addWorkspace(dummyWorkspace);
+    const environmentId = uuidv4();
+    const newEnvironment = {
+      id: environmentId,
+      name: "Global Variables",
+      variable: [
+        {
+          key: "",
+          value: "",
+          checked: true,
+        },
+      ],
+      isActive: false,
+      type: "GLOBAL",
+      workspaceId: workspaceId,
+      createdAt: new Date().toISOString(),
+      createdBy: "username",
+      updatedBy: "username",
+      updatedAt: "2024-07-16T11:12:55.920Z",
+    };
+
+    this.environmentRepository.addEnvironment(newEnvironment);
+
+    this.guideRepository.insert({ isActive: true, id: "environment-guide" });
+    this.guideRepository.insert({ isActive: true, id: "collection-guide" });
+  };
+
+  private skipLoginHandler = async () => {
+    // Save Guest User in local DB
+    const response = await this.getGuestUserState();
+    if (response) {
+      await this.createGuestUserTeamWorkspace();
+      isGuestUserActive.set(true);
+      navigate("/guest/collections");
+      MixpanelEvent(Events.CONTINUE_WITHOUT_SIGNUP, {
+        source: "Sparrow Auth",
+      });
+    }
+  };
+
   // Private method to process deep link
   private async processDeepLink(url: string): Promise<void> {
     try {
       await getCurrentWindow().setFocus();
       const params = new URLSearchParams(url.split("?")[1]);
       const currentUserAccessToken = params.get("accessToken");
+      const existingAccessToken = localStorage.getItem("AUTH_TOKEN");
       const workspaceId = params.get("workspaceID");
-
+      const isSparrowEdge = params.get("isSparrowEdge");
+      if (isSparrowEdge === "true" && !existingAccessToken) {
+        await this.addGuestUser();
+        setTimeout(async () => {
+          await this.skipLoginHandler();
+        }, 1000);
+        return;
+      }
       const isValidUser = await this.validateUserAccess(currentUserAccessToken);
 
       if (!isValidUser) {
