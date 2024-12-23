@@ -18,7 +18,7 @@
 
 ## Variable Declarations
 
-- Use descriptive and specific names for variables, functions, and classes. For example, isCreateWorkspaceModalOpen is preferred over isModalOpen, as it clearly conveys the variable's purpose and context.
+- Use descriptive and specific names for variables, functions, and classes.
 
   ```
     // ✅ Preferred
