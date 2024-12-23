@@ -19,7 +19,13 @@
     "desktop-build": "yarn workspace @sparrow/desktop tauri build --debug",
     "desktop-build-mac-universal": "yarn workspace @sparrow/desktop tauri build --target universal-apple-darwin --debug --verbose",
     "web-start": "yarn workspace @sparrow/web dev",
-    "web-build": "yarn workspace @sparrow/web build"
+    "web-build": "yarn workspace @sparrow/web build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down -v",
+    "docker:up:mongo": "docker compose up mongo --build -d",
+    "docker:up:kafka": "docker compose up kafka --build -d",
+    "docker:up:api": "docker compose up api --build -d",
+    "docker:up:auth": "docker compose up auth --build -d"
   },
   "dependencies": {
     "@codemirror/lang-html": "^6.4.7",

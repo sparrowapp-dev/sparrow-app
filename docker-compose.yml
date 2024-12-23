@@ -7,7 +7,7 @@ services:
     ports:
       - "27017:27017"
     env_file:
-      - .env
+      - .env.docker-setup
     networks:
       - localnet
 
@@ -20,26 +20,24 @@ services:
     volumes:
       - "kafka_data:/bitnami"
     env_file:
-      - .env
+      - .env.docker-setup
     networks:
       - localnet
 
-  # App
+  # Sparrow Api Server
   api:
     image: sparrowapi/sparrow-api:v2
     ports:
       - "9000:9000"
-    volumes:
-      - ./:/src
     networks:
       - localnet
     depends_on:
       - mongo
       - kafka
     env_file:
-      - .env
+      - .env.docker-setup
 
-  # Sparrow Auth
+  # Sparrow Auth Server
   auth:
     image: sparrowapi/sparrow-auth:v1
     ports:
@@ -50,7 +48,7 @@ services:
       - mongo
       - kafka
     env_file:
-      - .env
+      - .env.docker-setup
 
 volumes:
   kafka_data:
