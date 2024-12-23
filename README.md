@@ -32,6 +32,7 @@ Sparrow is your next go-to API development buddy which can help you test, debug,
 
 To install this project, you will need to have the following installed on your machine :
 
+![Docker](https://img.shields.io/badge/-Docker-black?style=for-the-badge&logoColor=white&logo=docker&color=2496ED)
 ![NODE](https://img.shields.io/badge/-Node.js-black?style=for-the-badge&logoColor=white&logo=nodedotjs&color=339933)
 ![Yarn](https://img.shields.io/badge/-Yarn-black?style=for-the-badge&logoColor=white&logo=yarn&color=2C8EBB)
 ![Rust](https://img.shields.io/badge/-Rust-black?style=for-the-badge&logoColor=white&logo=rust&color=000000)
@@ -41,14 +42,16 @@ Check if you already have the prerequisites installed by running the below comma
 1. Node: node -v
 2. Yarn: yarn check
 3. Rust: rustc --version
+4. Docker(Optional): docker --version
 
 Install the required dependencies by heading over to the links below,
 
 1. [Node](https://nodejs.org/en)
 2. [Tauri](https://tauri.app/v1/guides/getting-started/prerequisites)
 3. [Yarn](https://classic.yarnpkg.com/lang/en/docs/install)
+4. [Docker](https://docs.docker.com/desktop/)
 
-Then, run the following commands :
+### Prerequisite:
 
 ```bash
 # Clone the repo
@@ -65,7 +68,34 @@ cp apps/@sparrow-desktop/.env.example apps/@sparrow-desktop/.env
 
 # Copy web app .env.example to .env
 cp apps/@sparrow-web/.env.example apps/@sparrow-web/.env
+```
 
+### Docker Method
+
+- To install all services(mongo + kafka + api server + auth server) as docker containers, run:
+
+  `yarn docker:up `
+
+- To install individual services, run:
+
+        yarn docker:<SERVICE NAME>
+
+  - `yarn docker:mongo` - Runs only mongo in a docker container
+  - `yarn docker:kafka` - Runs only kafka in a docker container
+  - `yarn docker:api` - Runs only the api server
+  - `yarn docker:auth` - Runs only the auth service
+
+### Non-Docker Method
+
+```bash
+# Install dependencies
+	pnpm i
+
+# Run App in development mode
+	pnpm start:dev
+```
+
+```bash
 # Run the desktop app in dev mode
 yarn desktop-start
 
