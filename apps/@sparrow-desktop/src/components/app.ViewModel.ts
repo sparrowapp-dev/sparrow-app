@@ -212,7 +212,7 @@ export class AppViewModel {
       isGuestUserActive.set(true);
       navigate("/guest/collections");
       MixpanelEvent(Events.CONTINUE_WITHOUT_SIGNUP, {
-        source: "Entry Page",
+        source: "Sparrow Auth",
       });
     }
   };
