@@ -24,6 +24,7 @@
   import { Modal, Tooltip, Dropdown } from "@sparrow/library/ui";
   import { pagesMotion } from "../../constants";
   import { version } from "../../../package.json";
+  import { CreateTeam } from "@sparrow/common/features";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
@@ -108,7 +109,7 @@
   });
   let isGithubStarHover = false;
 
-  let activeIndex;
+  let activeIndex = "";
 
   $: {
     if ($openTeam) {
@@ -380,6 +381,24 @@
   <WelcomePopUpWeb />
 </Modal>
 
+<Modal
+  title={"New Team"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isCreateTeamModalOpen}
+  handleModalState={(flag) => {
+    isCreateTeamModalOpen = flag;
+  }}
+>
+  <CreateTeam
+    handleModalState={(flag = false) => {
+      isCreateTeamModalOpen = flag;
+    }}
+    onCreateTeam={_viewModel.createTeam}
+  />
+</Modal>
+
 <style>
   .warning-text {
     color: var(--colors-neutral-text-3, #ccc);
@@ -397,9 +416,9 @@
     border-bottom: 0 !important;
   }
   :global(
-      .team-splitter .splitpanes__splitter:active,
-      .team-splitter .splitpanes__splitter:hover
-    ) {
+    .team-splitter .splitpanes__splitter:active,
+    .team-splitter .splitpanes__splitter:hover
+  ) {
     background-color: var(--bg-primary-200) !important;
   }
 

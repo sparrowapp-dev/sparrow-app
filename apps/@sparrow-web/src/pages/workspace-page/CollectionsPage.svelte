@@ -849,20 +849,32 @@
           _viewModel.handleRemoveTab(removeTab.id);
         }
         return res;
+      } else if (removeTab.type === TabTypeEnum.SOCKET_IO) {
+        const res = await _viewModel.saveAsSocketIo(
+          _workspaceMeta,
+          path,
+          tabName,
+          description,
+          removeTab,
+        );
+        if (res?.status === "success") {
+          _viewModel.handleRemoveTab(removeTab.id);
+        }
+        return res;
+      } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
+        const res = await _viewModel.saveAsSocket(
+          _workspaceMeta,
+          path,
+          tabName,
+          description,
+          removeTab,
+        );
+        if (res?.status === "success") {
+          _viewModel.handleRemoveTab(removeTab.id);
+        }
+        return res;
       }
-      // else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
-      //   const res = await _viewModel.saveAsSocket(
-      //     _workspaceMeta,
-      //     path,
-      //     tabName,
-      //     description,
-      //     removeTab,
-      //   );
-      //   if (res?.status === "success") {
-      //     _viewModel.handleRemoveTab(removeTab.id);
-      //   }
-      //   return res;
-      // } else if (removeTab.type === TabTypeEnum.SOCKET_IO) {
+      // else if (removeTab.type === TabTypeEnum.SOCKET_IO) {
       //   const res = await _viewModel.saveAsSocketIo(
       //     _workspaceMeta,
       //     path,
