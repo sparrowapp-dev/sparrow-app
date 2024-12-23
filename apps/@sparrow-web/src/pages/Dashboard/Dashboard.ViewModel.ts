@@ -285,6 +285,7 @@ export class DashboardViewModel {
    * clear local DB and clear guest user details from store
    */
   public clearLocalDB = async (): Promise<void> => {
+    console.log("clearDB--------");
     setUser(null);
     isGuestUserActive.set(false);
     await this.tabRepository.clearTabs();
