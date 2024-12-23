@@ -46,7 +46,12 @@
    * @param event - keyboard events
    */
   const handleKeyPress = (event: KeyboardEvent) => {
-    if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
+    const conditionSave = !isSave || !isGraphqlEditable ? true : false;
+    if (
+      conditionSave &&
+      (event.metaKey || event.ctrlKey) &&
+      event.code === "KeyS"
+    ) {
       handleSaveRequest();
     } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
       onSendButtonClicked(environmentVariables);

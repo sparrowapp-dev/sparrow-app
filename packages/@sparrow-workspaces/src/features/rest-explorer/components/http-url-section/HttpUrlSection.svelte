@@ -61,7 +61,13 @@
    * @param event - keyboard events
    */
   const handleKeyPress = (event: KeyboardEvent) => {
-    if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
+    const conditionSave =
+      !isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER ? true : false;
+    if (
+      conditionSave &&
+      (event.metaKey || event.ctrlKey) &&
+      event.code === "KeyS"
+    ) {
       handleSaveRequest();
     } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
       onSendButtonClicked(environmentVariables);
@@ -211,8 +217,8 @@
         color={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
           ? "var(--icon-secondary-380)"
           : isHovered
-          ? "var(--icon-primary-200)"
-          : "var(--icon-secondary-100)"}
+            ? "var(--icon-primary-200)"
+            : "var(--icon-secondary-100)"}
       />
     </button>
   </Tooltip>
