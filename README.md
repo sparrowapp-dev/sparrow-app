@@ -66,9 +66,6 @@ cp apps/@sparrow-desktop/.env.example apps/@sparrow-desktop/.env
 # Copy web app .env.example to .env
 cp apps/@sparrow-web/.env.example apps/@sparrow-web/.env
 
-# [OPTIONAL] Simplified Login (Bypassing Standard Authentication)
-SET VITE_SIMPLIFIED_LOGIN=true in .env file
-
 # Run the desktop app in dev mode
 yarn desktop-start
 

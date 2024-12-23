@@ -22,7 +22,6 @@ env:
   VITE_CANNY_API: ${{ vars.VITE_CANNY_API }}
   VITE_CANNY_URL: ${{ vars.VITE_CANNY_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-  VITE_SIMPLIFIED_LOGIN: ${{ vars.VITE_SIMPLIFIED_LOGIN }}
 
 jobs:
   release_win:

@@ -22,7 +22,6 @@ const constants = {
   AZURE_INSIGHTS_CONNECTION_STRING: import.meta.env
     .VITE_AZURE_INSIGHTS_CONNECTION_STRING,
   BASE_URL: import.meta.env.VITE_BASE_URL,
-  SIMPLIFIED_LOGIN: import.meta.env.VITE_SIMPLIFIED_LOGIN,
 };
 
 export default constants;
