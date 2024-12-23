@@ -46,9 +46,9 @@
    * @param event - keyboard events
    */
   const handleKeyPress = (event: KeyboardEvent) => {
-    const conditionSave = !isSave || !isGraphqlEditable ? true : false;
+    const isSaveDisabled = isSave || !isGraphqlEditable ? true : false;
     if (
-      conditionSave &&
+      !isSaveDisabled &&
       (event.metaKey || event.ctrlKey) &&
       event.code === "KeyS"
     ) {

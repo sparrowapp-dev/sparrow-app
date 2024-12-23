@@ -61,10 +61,10 @@
    * @param event - keyboard events
    */
   const handleKeyPress = (event: KeyboardEvent) => {
-    const conditionSave =
-      !isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER ? true : false;
+    const isSaveDisabled =
+      isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER ? true : false;
     if (
-      conditionSave &&
+      !isSaveDisabled &&
       (event.metaKey || event.ctrlKey) &&
       event.code === "KeyS"
     ) {
