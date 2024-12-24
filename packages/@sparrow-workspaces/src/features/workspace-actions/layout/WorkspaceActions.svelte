@@ -47,7 +47,7 @@
   import { TestFlowTourGuide } from "@sparrow/workspaces/components";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
-  import { LanuchSparrowAppButton } from "@sparrow/common/components";
+  import { LaunchSparrowAppDesktop } from "@sparrow/common/components";
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
@@ -143,13 +143,6 @@
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   let collectionFilter: any = [];
-  let isHovered = false;
-  const handleMouseOver = () => {
-    isHovered = true;
-  };
-  const handleMouseOut = () => {
-    isHovered = false;
-  };
   /**
    * @description - performs searching on a single collection
    */
@@ -743,12 +736,7 @@
 
     <!-- Launch sparrow desktop -->
     {#if isWebApp}
-      <LanuchSparrowAppButton
-        {launchSparrowWebApp}
-        {handleMouseOver}
-        {handleMouseOut}
-        {windowOs}
-      />
+      <LaunchSparrowAppDesktop {launchSparrowWebApp} />
     {/if}
   </div>
 {/if}

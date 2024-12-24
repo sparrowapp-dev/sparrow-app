@@ -1,9 +1,19 @@
 <script>
   import { MacIcon, WindowsIcon } from "@sparrow/library/icons";
-  export let windowOs;
-  export let handleMouseOver;
-  export let handleMouseOut;
+  import { onMount } from "svelte";
   export let launchSparrowWebApp;
+  let windowOs = true;
+  function getOS() {
+    let userAgent = window.navigator.userAgent;
+    if (userAgent.indexOf("Mac") != -1) {
+      windowOs = true;
+    } else if (userAgent.indexOf("Windows") != -1) {
+      windowOs = false;
+    }
+  }
+  onMount(() => {
+    getOS();
+  });
 </script>
 
 <section class="px-3 pb-3">
@@ -11,8 +21,6 @@
     id="isExpandLoginButton"
     class="d-flex align-items-center rounded-1 me-0 mb-0 p-2"
     style="border:none; cursor:pointer; justify-content:center; height:32px; background-color:var(--bg-primary-300); width:100%;"
-    on:mouseover={handleMouseOver}
-    on:mouseout={handleMouseOut}
     on:click={launchSparrowWebApp}
   >
     <div class="d-flex align-items-center justify-content-center">

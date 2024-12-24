@@ -25,7 +25,7 @@
   import { pagesMotion } from "../../constants";
   import { version } from "../../../package.json";
   import { CreateTeam } from "@sparrow/common/features";
-  import { LanuchSparrowAppButton } from "@sparrow/common/components";
+  import { LaunchSparrowAppDesktop } from "@sparrow/common/components";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
@@ -119,13 +119,6 @@
   }
 
   let isExpandLoginButton = false;
-  let isHovered = false;
-  const handleMouseOver = () => {
-    isHovered = true;
-  };
-  const handleMouseOut = () => {
-    isHovered = false;
-  };
   let windowOs = true;
   function getOS() {
     let userAgent = window.navigator.userAgent;
@@ -311,12 +304,7 @@
               </div>
             </section>
             <!-- Launch sparrow desktop -->
-            <LanuchSparrowAppButton
-              {windowOs}
-              {handleMouseOver}
-              {handleMouseOut}
-              {launchSparrowWebApp}
-            />
+            <LaunchSparrowAppDesktop {launchSparrowWebApp} />
           </div>
         {/if}
       </Pane>
