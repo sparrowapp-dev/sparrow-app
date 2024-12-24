@@ -1,11 +1,9 @@
-import { loginUser } from "../../../../services/auth.service";
 import constants from "@app/constants/constants";
-import type { loginUserPostBody } from "@sparrow/common/dto";
 import { notifications } from "@sparrow/library/ui";
 import { navigate } from "svelte-navigator";
 import { jwtDecode, setAuthJwt } from "@app/utils/jwt";
 import { setUser } from "@app/store/auth.store";
-import { resizeWindowOnLogOut, maximizeWindow } from "../../../../utils";
+import { maximizeWindow } from "../../../../utils";
 import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
@@ -29,36 +27,8 @@ export const navigateToRegister = () => {
 };
 
 export const authNavigate = async () => {};
-// const _activeSidebarTabViewModel = new ActiveSideBarTabViewModel();
 const _guideRepository = new GuideRepository();
 
-//---------------- Handle Login ------------------//
-const handleLogin = async (loginCredentials: loginUserPostBody) => {
-  const response = await loginUser(loginCredentials);
-
-  if (response.isSuccessful) {
-    await maximizeWindow();
-    setAuthJwt(constants.AUTH_TOKEN, response?.data?.data?.accessToken.token);
-    setAuthJwt(constants.REF_TOKEN, response?.data?.data?.refreshToken.token);
-    const userDetails = jwtDecode(response.data?.data?.accessToken?.token);
-    setUser(jwtDecode(response.data?.data?.accessToken?.token));
-    sendUserDataToMixpanel(userDetails);
-    // MixpanelEvent(Events.USER_LOGIN, {
-    //   Login_Method: "Email",
-    //   Success: response.isSuccessful,
-    // });
-    notifications.success("You're logged in successfully.");
-    navigate("/dashboard/workspaces");
-    // _activeSidebarTabViewModel.addActiveTab("workspaces");
-    return response;
-  } else {
-    navigate("/");
-    resizeWindowOnLogOut();
-    // isResponseError.set(true);
-    notifications.error(response.message);
-    throw "error login user: " + response.message;
-  }
-};
 export async function handleLoginV2(url: string) {
   const params = new URLSearchParams(url.split("?")[1]);
   const accessToken = params.get("accessToken");
@@ -99,18 +69,3 @@ export async function handleLoginV2(url: string) {
     notifications.error("Invalid token!");
   }
 }
-
-//------------------------- Handle Login Validation -----------------//
-export const handleLoginValidation = async (
-  loginCredentials: loginUserPostBody,
-) => {
-  // const { isError, errorObject } = await checkValidation(
-  //   loginSchema,
-  //   loginCredentials,
-  // );
-  // if (isError) {
-  //   return errorObject;
-  // }
-
-  return handleLogin(loginCredentials);
-};
