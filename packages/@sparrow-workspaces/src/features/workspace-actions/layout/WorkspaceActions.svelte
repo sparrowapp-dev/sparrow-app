@@ -16,7 +16,6 @@
     CollectionIcon,
     DoubleArrowIcon,
     GithubIcon,
-    WindowsIcon,
     SocketIcon,
     TreeIcon,
     VectorIcon,
@@ -24,7 +23,6 @@
     StackIcon,
     SocketIoIcon,
     GraphIcon,
-    MacIcon,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
@@ -47,7 +45,7 @@
   import { TestFlowTourGuide } from "@sparrow/workspaces/components";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
-  import { LaunchSparrowAppDesktop } from "@sparrow/common/components";
+  import { LaunchDesktop } from "@sparrow/common/components";
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
@@ -112,8 +110,6 @@
   export let onCreateTestflow;
 
   export let testflows;
-
-  export let windowOs: boolean = false;
 
   export let launchSparrowWebApp: () => void;
 
@@ -736,7 +732,7 @@
 
     <!-- Launch sparrow desktop -->
     {#if isWebApp}
-      <LaunchSparrowAppDesktop {launchSparrowWebApp} />
+      <LaunchDesktop {launchSparrowWebApp} />
     {/if}
   </div>
 {/if}

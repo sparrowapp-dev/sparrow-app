@@ -421,19 +421,6 @@
     cw.unsubscribe();
   });
 
-  let windowOs = true;
-  function getOS() {
-    let userAgent = window.navigator.userAgent;
-    if (userAgent.indexOf("Mac") != -1) {
-      windowOs = true;
-    } else if (userAgent.indexOf("Windows") != -1) {
-      windowOs = false;
-    }
-  }
-  onMount(() => {
-    getOS();
-  });
-
   let isPopupOpen = false;
 
   function launchSparrowWebApp() {
@@ -484,7 +471,6 @@
           {collectionList}
           {currentWorkspace}
           {isAppVersionVisible}
-          {windowOs}
           {launchSparrowWebApp}
           {isGuestUser}
           leftPanelController={{

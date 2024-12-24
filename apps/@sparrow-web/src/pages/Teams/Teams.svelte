@@ -25,7 +25,7 @@
   import { pagesMotion } from "../../constants";
   import { version } from "../../../package.json";
   import { CreateTeam } from "@sparrow/common/features";
-  import { LaunchSparrowAppDesktop } from "@sparrow/common/components";
+  import { LaunchDesktop } from "@sparrow/common/components";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
@@ -46,12 +46,7 @@
   import { isUserFirstSignUp } from "src/store/user.store";
   import { user } from "src/store/auth.store";
   import { WithButton } from "@sparrow/workspaces/hoc";
-  import {
-    DoubleArrowIcon,
-    GithubIcon,
-    MacIcon,
-    WindowsIcon,
-  } from "@sparrow/library/icons";
+  import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
   import { ListTeamNavigation } from "@sparrow/teams/features";
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import constants from "../../constants/constants";
@@ -119,18 +114,6 @@
   }
 
   let isExpandLoginButton = false;
-  let windowOs = true;
-  function getOS() {
-    let userAgent = window.navigator.userAgent;
-    if (userAgent.indexOf("Mac") != -1) {
-      windowOs = true;
-    } else if (userAgent.indexOf("Windows") != -1) {
-      windowOs = false;
-    }
-  }
-  onMount(() => {
-    getOS();
-  });
 
   function launchSparrowWebApp() {
     let appDetected = false;
@@ -304,7 +287,7 @@
               </div>
             </section>
             <!-- Launch sparrow desktop -->
-            <LaunchSparrowAppDesktop {launchSparrowWebApp} />
+            <LaunchDesktop {launchSparrowWebApp} />
           </div>
         {/if}
       </Pane>
