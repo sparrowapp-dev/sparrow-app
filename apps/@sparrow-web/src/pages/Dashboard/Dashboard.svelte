@@ -81,13 +81,16 @@
     isPopupOpen = flag;
   };
 
-  const handleLogin = () => {
-    _viewModel.clearLocalDB();
+  const handleLogin = async () => {
+    await _viewModel.clearLocalDB();
     navigationState.set("guestUser");
     openDefaultBrowser();
-    navigate("/init");
+    console.log("inside handler login in web");
+    navigate(`${constants.SPARROW_AUTH_URL}/init?source=web`);
+    // window.location.href = constants.SPARROW_AUTH_URL + "/init?source=web";
     MixpanelEvent(Events.LOCAL_SIGNUP, {
       source: "Dashboard",
+      platform: "Web App",
     });
   };
 
