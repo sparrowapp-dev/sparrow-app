@@ -9,3 +9,4 @@ export { default as Redirect } from "./redirect/Redirect.svelte";
 export { default as PulseCircle } from "./pulse-circle/PulseCircle.svelte";
 export { default as WelcomePopUpWeb } from "./welcome-pop-up-web/WelcomePopUpWeb.svelte";
 export { default as DefaultHeader } from "./default-header/DefaultHeader.svelte";
+export { default as LanuchSparrowAppButton } from "./lanuch-button/LaunchSparrowAppButton.svelte";

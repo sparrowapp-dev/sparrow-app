@@ -47,6 +47,7 @@
   import { TestFlowTourGuide } from "@sparrow/workspaces/components";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import { LanuchSparrowAppButton } from "@sparrow/common/components";
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
@@ -142,6 +143,13 @@
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   let collectionFilter: any = [];
+  let isHovered = false;
+  const handleMouseOver = () => {
+    isHovered = true;
+  };
+  const handleMouseOut = () => {
+    isHovered = false;
+  };
   /**
    * @description - performs searching on a single collection
    */
@@ -735,25 +743,12 @@
 
     <!-- Launch sparrow desktop -->
     {#if isWebApp}
-      <div class="px-3 pb-3">
-        <button
-          id="isExpandLoginButton"
-          class="d-flex align-items-center rounded-1 me-0 mb-0 p-2"
-          style="border:none; cursor:pointer; justify-content:center; height:32px; background-color:var(  --bg-primary-300) ; width:100%; "
-          on:click={launchSparrowWebApp}
-        >
-          <div class="d-flex align-items-center justify-content-center">
-            {#if windowOs}
-              <MacIcon height={"12px"} width={"12px"} color={"white"} />
-            {:else}
-              <WindowsIcon height={"12px"} width={"12px"} color={"white"} />
-            {/if}
-            <p class="ms-2 mb-0 text-fs-12" style="font-weight: 500;">
-              Launch Sparrow App
-            </p>
-          </div>
-        </button>
-      </div>
+      <LanuchSparrowAppButton
+        {launchSparrowWebApp}
+        {handleMouseOver}
+        {handleMouseOut}
+        {windowOs}
+      />
     {/if}
   </div>
 {/if}
