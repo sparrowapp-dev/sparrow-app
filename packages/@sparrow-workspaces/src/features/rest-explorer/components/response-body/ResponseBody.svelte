@@ -40,6 +40,7 @@
           src={response.body}
           alt="Sparrow logo"
           on:error={() => (imageHasError = true)}
+          style="max-width:100%;"
         />
       {:else}
         <!-- if any error render sparrow logo -->

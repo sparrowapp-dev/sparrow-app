@@ -1,31 +1,31 @@
 <script lang="ts">
-  import { logoSparrowSquare } from "@sparrow/common/images";
-  import { Spinner } from "@sparrow/library/ui";
-  import { leftIconIcon as leftIcon } from "@sparrow/library/assets";
-  import constants from "@app/constants/constants";
-  import { fly, fade } from "svelte/transition";
-  import { onMount } from "svelte";
-  import { platform } from "@tauri-apps/plugin-os";
-  import { open } from "@tauri-apps/plugin-shell";
-  export let title = "Title";
-  export let description = "Description";
-  export let message = "Detailed Message";
-  export let isSpinner = true;
-  export let buttonText = "Button";
-  export let buttonClick = () => {};
-  export let loadingMessage = "";
-  export let callback;
+  // import { logoSparrowSquare } from "@sparrow/common/images";
+  // import { Spinner } from "@sparrow/library/ui";
+  // import { leftIconIcon as leftIcon } from "@sparrow/library/assets";
+  // import constants from "@app/constants/constants";
+  // import { fly, fade } from "svelte/transition";
+  // import { onMount } from "svelte";
+  // import { platform } from "@tauri-apps/plugin-os";
+  // import { open } from "@tauri-apps/plugin-shell";
+  // export let title = "Title";
+  // export let description = "Description";
+  // export let message = "Detailed Message";
+  // export let isSpinner = true;
+  // export let buttonText = "Button";
+  // export let buttonClick = () => {};
+  // export let loadingMessage = "";
+  // export let callback;
 
-  let os = "";
-  let externalSparrowLink = `${constants.SPARROW_AUTH_URL}`;
-  onMount(async () => {
-    os = await platform();
-  });
-  export let appVersion = "";
+  // let os = "";
+  // let externalSparrowLink = `${constants.SPARROW_AUTH_URL}`;
+  // onMount(async () => {
+  //   os = await platform();
+  // });
+  // export let appVersion = "";
 </script>
 
 <!-- <Header /> -->
-<div
+<!-- <div
   class="d-flex align-items-center justify-content-center z-2"
   style="height: 100vh;"
   transition:fade={{ delay: 0, duration: 100 }}
@@ -128,7 +128,7 @@
       </p>
     </div>
   </div>
-</div>
+</div> -->
 
 <style>
   .background-overlay {
