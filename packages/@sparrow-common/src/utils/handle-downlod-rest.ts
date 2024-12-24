@@ -35,7 +35,10 @@ const handleDownloadResponse = async (
 
     URL.revokeObjectURL(url);
 
-    notifications.success("Exported successfully.");
+    setTimeout(() => {
+      //toast message afer some delay to make sure not getting popup imidiately
+      notifications.success("Exported successfully.");
+    }, 1000);
 
     return "success";
   } catch (error) {
