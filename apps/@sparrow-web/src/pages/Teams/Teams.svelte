@@ -115,7 +115,7 @@
 
   let isExpandLoginButton = false;
 
-  function launchSparrowWebApp() {
+  const launchSparrowWebApp = () => {
     let appDetected = false;
 
     // Handle when window loses focus (app opens)
@@ -139,7 +139,7 @@
         isPopupOpen = true;
       }
     }, 500);
-  }
+  };
 
   let openTeamData: TeamDocType;
   openTeam.subscribe((_team) => {

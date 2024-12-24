@@ -421,9 +421,9 @@
     cw.unsubscribe();
   });
 
-  let isPopupOpen = false;
+  let isLaunchAppModalOpen = false;
 
-  function launchSparrowWebApp() {
+  const launchSparrowWebApp = () => {
     let appDetected = false;
 
     // Handle when window loses focus (app opens)
@@ -444,10 +444,10 @@
 
       // Only show popup if app wasn't detected
       if (!appDetected) {
-        isPopupOpen = true;
+        isLaunchAppModalOpen = true;
       }
     }, 500);
-  }
+  };
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -899,9 +899,9 @@
   type="dark"
   width="45%"
   zIndex={1000}
-  isOpen={isPopupOpen}
+  isOpen={isLaunchAppModalOpen}
   handleModalState={() => {
-    isPopupOpen = false;
+    isLaunchAppModalOpen = false;
   }}
 >
   <DownloadApp />
