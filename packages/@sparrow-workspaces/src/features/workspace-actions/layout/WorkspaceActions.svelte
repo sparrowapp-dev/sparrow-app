@@ -45,6 +45,7 @@
   import { TestFlowTourGuide } from "@sparrow/workspaces/components";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import { LaunchDesktop } from "@sparrow/common/components";
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
@@ -109,6 +110,8 @@
   export let onCreateTestflow;
 
   export let testflows;
+
+  export let launchSparrowWebApp: () => void;
 
   export let onDeleteTestflow;
   export let onUpdateTestflow;
@@ -670,7 +673,7 @@
 
     <!-- <hr class="ms-2 me-2 mb-0 mt-0" /> -->
     <div
-      class="p-2 d-flex align-items-center justify-content-between"
+      class="px-3 py-2 d-flex align-items-center justify-content-between"
       style="z-index: 4;"
     >
       <Tooltip title={"Star Us On GitHub"} placement={"top"}>
@@ -726,6 +729,11 @@
         />
       </div>
     </div>
+
+    <!-- Launch sparrow desktop -->
+    {#if isWebApp}
+      <LaunchDesktop {launchSparrowWebApp} />
+    {/if}
   </div>
 {/if}
 

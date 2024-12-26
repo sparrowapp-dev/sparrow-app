@@ -321,7 +321,6 @@
               tabs={teamTabs}
               {onUpdateActiveTab}
               {activeTeamTab}
-              {isWebApp}
             />
           </div>
           <div class="teams-menu__right">

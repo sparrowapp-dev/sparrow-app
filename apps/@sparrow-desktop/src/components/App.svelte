@@ -12,7 +12,6 @@
   import { handleShortcuts } from "@app/utils/shortcuts";
   import { AppUpdater } from "@sparrow/common/features";
   import { getCurrentWindow } from "@tauri-apps/api/window";
-  import LoginPage from "@app/pages/auth-page/sub-pages/login-page/LoginPage.svelte";
   import { singleInstanceHandler } from "@app/utils/singleinstance/app.singleinstance";
   import { AppViewModel } from "./app.ViewModel";
   import { getScaleFactor, setScaleFactorToDb } from "@app/utils/zoom";
@@ -91,14 +90,9 @@
       <Route path="/*"><Navigate to="/guest/" /></Route>
     </section>
     <section slot="unauthorized">
-      {#if 1}
-        <Route path="/init" component={EntryPoint} />
-        <Route path="/init/*" component={Dashboard} />
-        <Route path="/*"><Navigate to="/init" /></Route>
-      {:else}
-        <Route path="/login" component={LoginPage} />
-        <Route path="/*"><Navigate to="/login" /></Route>
-      {/if}
+      <Route path="/init" component={EntryPoint} />
+      <Route path="/init/*" component={Dashboard} />
+      <Route path="/*"><Navigate to="/init" /></Route>
     </section>
   </Authguard>
 </Router>

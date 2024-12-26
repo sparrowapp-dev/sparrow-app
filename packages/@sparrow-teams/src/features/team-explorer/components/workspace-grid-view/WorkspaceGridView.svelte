@@ -52,7 +52,11 @@
         typeof item.name === "string" &&
         item.name.toLowerCase().includes(searchQuery.toLowerCase()),
     )
-    .sort((a, b) => a.name.localeCompare(b.name)); // will arrange workspace aplhabetically
+    .sort(
+      (a, b) =>
+        new Date(b._data.updatedAt).getTime() -
+        new Date(a._data.updatedAt).getTime(),
+    );
 
   // This will split workspaces into pages
   $: paginatedWorkspaces = (() => {

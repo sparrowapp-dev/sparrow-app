@@ -46,7 +46,8 @@
     id: "none",
   };
 
-  let externalSparrowLink = `${constants.SPARROW_AUTH_URL}`;
+  let externalSparrowLink =
+    `${constants.SPARROW_AUTH_URL}` + "/init?source=desktop";
   let isPopupOpen = false;
   let isLoginBannerActive = false;
   let isGuestUser = false;
