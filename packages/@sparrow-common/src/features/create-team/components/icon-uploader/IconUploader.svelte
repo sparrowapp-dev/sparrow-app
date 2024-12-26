@@ -103,10 +103,10 @@
       {/if}
       <div class="align-items-end justify-content-end d-flex gap-2">
         <button on:click={editValue} class="edit-btn border-0 p-2 rounded">
-          <EditIcon />
+          <EditIcon height={16} width={16} />
         </button>
         <button on:click={resetValue} class="del-btn border-0 p-2 rounded">
-          <DeleteIcon />
+          <DeleteIcon height={16} width={16} />
         </button>
       </div>
     </div>
@@ -164,8 +164,8 @@
     .edit-btn,
     .del-btn {
       background-color: transparent;
-      height: 24px;
-      width: 24px;
+      height: 28px;
+      width: 28px;
       display: flex;
       align-items: center;
     }
