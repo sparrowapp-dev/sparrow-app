@@ -414,14 +414,13 @@
           <div class="lower-underline"></div>
           <div class="download-area w-100">
             <div
-              class="download-sparrow-button dowload-section d-flex justify-content-between"
+              class="download-sparrow-button dowload-section d-flex flex-column justify-content-between"
             >
-              <p class="download-text">
-                Download Sparrow Desktop <span class="description text-fs-10">
-                  Effortlessly test requests with the desktop app. No agents
-                  required.
-                </span>
-              </p>
+              <p class="download-text mb-1">Download Sparrow Desktop</p>
+              <span class="description text-fs-10">
+                Effortlessly test requests with the desktop app. No agents
+                required.
+              </span>
             </div>
             <div class="d-flex align-items-center">
               <SparrowIcon
