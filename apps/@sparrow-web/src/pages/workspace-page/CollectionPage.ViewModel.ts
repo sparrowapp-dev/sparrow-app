@@ -76,7 +76,7 @@ import type { FeatureQuery } from "../../types/feature-switch";
 import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/utils";
 
 import { createDeepCopy } from "@sparrow/common/utils";
-import { GraphqlTabAdapter , SocketIoTabAdapter } from "../../adapter";
+import { GraphqlTabAdapter, SocketIoTabAdapter } from "../../adapter";
 import type {
   SocketIORequestDeletePayloadDtoInterface,
   SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
@@ -5247,5 +5247,12 @@ export default class CollectionsViewModel {
         message: res.message,
       };
     }
+  };
+
+  public setupRedirect = () => {
+    const accessToken = localStorage.getItem("AUTH_TOKEN");
+    const refreshToken = localStorage.getItem("REF_TOKEN");
+    const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email}`;
+    window.location.href = sparrowRedirect;
   };
 }
