@@ -215,26 +215,41 @@
           style="padding-bottom: 10px;"
         >
           <h2 class="d-flex ellipsis overflow-visible team-title">
-            {#if openTeam?.logo?.size}
-              <img
-                class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
-                style="width: 40px !important; height: 40px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-                src={base64ToURL(openTeam?.logo)}
-                alt=""
-              />{:else}
+            {#if !isGuestUser}
+              {#if openTeam?.logo?.size}
+                <img
+                  class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
+                  style="width: 40px !important; height: 40px !important; padding-top: 2px; display: flex; border-radius: 50%;"
+                  src={base64ToURL(openTeam?.logo)}
+                  alt=""
+                />{:else}
+                <div
+                  class={`text-defaultColor w-25 text-center my-auto align-items-center justify-content-center profile-circle bg-tertiary-750 border-secondary-300 border-2`}
+                  style={`font-size: 24px; width: 40px !important; height: 40px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
+                >
+                  <span class="text-fs-24">
+                    {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
+                  </span>
+                </div>
+              {/if}
+            {:else}
               <div
                 class={`text-defaultColor w-25 text-center my-auto align-items-center justify-content-center profile-circle bg-tertiary-750 border-secondary-300 border-2`}
                 style={`font-size: 24px; width: 40px !important; height: 40px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
               >
                 <span class="text-fs-24">
-                  {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
+                  {"T"}
                 </span>
               </div>
             {/if}
             <span
               class="ms-3 my-auto ellipsis overflow-hidden heading"
               style="font-size: 28px;"
-              >{openTeam?.name || ""}
+              >{#if isGuestUser}
+                Team
+              {:else}
+                {openTeam?.name || ""}
+              {/if}
             </span>
 
             <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
@@ -318,6 +333,7 @@
             style="padding-bottom: 4px;"
           >
             <TeamNavigator
+              {isGuestUser}
               tabs={teamTabs}
               {onUpdateActiveTab}
               {activeTeamTab}

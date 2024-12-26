@@ -3,6 +3,7 @@
   export let tabs = [];
   export let activeTeamTab: string;
   export let onUpdateActiveTab: (data: string) => void;
+  export let isGuestUser: boolean;
 </script>
 
 <div class="">
@@ -29,7 +30,7 @@
               : ''}"
             style="font-size: 12px; font-weight:700"
             ><span>{tab.name}</span>
-            {#if tab.count}
+            {#if tab.count && !isGuestUser}
               <span class="ms-1"></span>
               <Label number={tab.count} />
             {/if}
