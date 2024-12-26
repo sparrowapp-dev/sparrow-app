@@ -218,7 +218,7 @@
   let isFolderNameEditable = false;
 </script>
 
-<div class="url d-flex align-items-center pt-4">
+<div class="url d-flex align-items-center pt-3">
   <p class="ellipsis mb-3 ps-3">
     {#if path.length > 0}
       <span
@@ -699,7 +699,7 @@
       </p>
     </div>
     <div class="mb-2">
-      <div class="position-relative">
+      <div class="position-relative" style="z-index: 11;">
         <input
           type="text"
           style="width: 100%; border: 1px solid var(--border-secondary-400); {tabName?.length ===
@@ -1051,11 +1051,9 @@
   }
   .api-name-usage {
     position: absolute;
-    top: -150px;
-    right: 5px;
+    top: -5px;
+    right: 30px;
     width: 2000%;
-    height: 140px;
-    overflow-y: auto;
     border-radius: 8px;
     box-shadow: 0px 16px 48px 0px #0000002d;
   }
