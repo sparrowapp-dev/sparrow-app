@@ -374,84 +374,82 @@
     {/if}
 
     <!-- Multiple Agent Dropdown -->
-    {#if !isGuestUser}
-      {#if isWebApp}
-        <Select
-          id={"multiple-agent"}
-          data={multipleAgentData}
-          titleId={`${multipleAgentvar}`}
-          onclick={handleAgentDropdown}
-          minHeaderWidth={"252px"}
-          iconRequired={true}
-          icon={CheckCircle}
-          iconColor={"#69D696"}
-          isDropIconFilled={true}
-          borderType={"none"}
-          borderActiveType={"none"}
-          headerHighlight={"hover-active"}
-          headerTheme={"transparent"}
-          menuItem={"v2"}
-          headerFontSize={"12px"}
-          maxHeaderWidth={"12px"}
-          zIndex={200}
-          bodyTheme={"violet"}
-          borderRounded={"2px"}
-          position={"absolute"}
-          isHeaderCombined={false}
-          maxBodyHeight={"300px"}
-          minBodyWidth={"275px"}
-        >
-          <div slot="pre-select" class="pre-dropdown">
-            <div
-              class="d-flex justify-content-between align-items-center select-agent"
-            >
-              <div>Select Sparrow Agent</div>
-            </div>
-            <div class="upper-underline"></div>
-          </div>
+    {#if isWebApp}
+      <Select
+        id={"multiple-agent"}
+        data={multipleAgentData}
+        titleId={`${multipleAgentvar}`}
+        onclick={handleAgentDropdown}
+        minHeaderWidth={"252px"}
+        iconRequired={true}
+        icon={CheckCircle}
+        iconColor={"#69D696"}
+        isDropIconFilled={true}
+        borderType={"none"}
+        borderActiveType={"none"}
+        headerHighlight={"hover-active"}
+        headerTheme={"transparent"}
+        menuItem={"v2"}
+        headerFontSize={"12px"}
+        maxHeaderWidth={"12px"}
+        zIndex={200}
+        bodyTheme={"violet"}
+        borderRounded={"2px"}
+        position={"absolute"}
+        isHeaderCombined={false}
+        maxBodyHeight={"300px"}
+        minBodyWidth={"275px"}
+      >
+        <div slot="pre-select" class="pre-dropdown">
           <div
-            slot="post-select"
-            class="post-dropdown d-flex justify-content-center align-items-center flex-column"
+            class="d-flex justify-content-between align-items-center select-agent"
           >
-            <div class="lower-underline"></div>
-            <div class="download-area w-100">
-              <div
-                class="download-sparrow-button dowload-section d-flex justify-content-between"
-              >
-                <p class="download-text">
-                  Download Sparrow Desktop <span class="description text-fs-10">
-                    Effortlessly test requests with the desktop app. No agents
-                    required.
-                  </span>
-                </p>
-              </div>
-              <div class="d-flex align-items-center">
-                <SparrowIcon
-                  height="32px"
-                  width="32px"
-                  color="var(--primary-btn-color)"
+            <div>Select Sparrow Agent</div>
+          </div>
+          <div class="upper-underline"></div>
+        </div>
+        <div
+          slot="post-select"
+          class="post-dropdown d-flex justify-content-center align-items-center flex-column"
+        >
+          <div class="lower-underline"></div>
+          <div class="download-area w-100">
+            <div
+              class="download-sparrow-button dowload-section d-flex justify-content-between"
+            >
+              <p class="download-text">
+                Download Sparrow Desktop <span class="description text-fs-10">
+                  Effortlessly test requests with the desktop app. No agents
+                  required.
+                </span>
+              </p>
+            </div>
+            <div class="d-flex align-items-center">
+              <SparrowIcon
+                height="32px"
+                width="32px"
+                color="var(--primary-btn-color)"
+              />
+            </div>
+          </div>
+          <a
+            href={constants.WEB_MARKETING_URL}
+            target="_blank"
+            class="text-decoration-none d-flex align-items-center align-self-start gap-2 mt-1 download-btn"
+          >
+            <div class="gap-2 d-flex">
+              <p>Download Now</p>
+              <div>
+                <ArrowRightIcon
+                  height="15px"
+                  width="11px"
+                  color="var(--icon-primary-300)"
                 />
               </div>
             </div>
-            <a
-              href={constants.WEB_MARKETING_URL}
-              target="_blank"
-              class="text-decoration-none d-flex align-items-center align-self-start gap-2 mt-1 download-btn"
-            >
-              <div class="gap-2 d-flex">
-                <p>Download Now</p>
-                <div>
-                  <ArrowRightIcon
-                    height="15px"
-                    width="11px"
-                    color="var(--icon-primary-300)"
-                  />
-                </div>
-              </div>
-            </a>
-          </div>
-        </Select>
-      {/if}
+          </a>
+        </div>
+      </Select>
     {/if}
     <!-- {#if !isWebApp} -->
     <Select

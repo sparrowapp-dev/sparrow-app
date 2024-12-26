@@ -53,34 +53,21 @@
           }}
         >
           <div class=" d-flex w-100 overflow-hidden">
-            {#if !isGuestUser}
-              {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
-                <p
-                  class={`m-0 sparrow-fs-15 text-defaultColor me-2 align-items-center justify-content-center bg-transparent border-defaultColor `}
-                  style={`padding-top: 2px; width: 25px !important; height: 25px !important; display: flex; border: 1px solid var(--defaultcolor); border-radius: 50%;  font-weight:700;`}
-                >
-                  {team.name[0] ? team.name[0].toUpperCase() : ""}
-                </p>
-              {:else}
-                <img src={base64ToURL(team.logo)} alt="" />
-              {/if}
-            {:else}
+            {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
               <p
                 class={`m-0 sparrow-fs-15 text-defaultColor me-2 align-items-center justify-content-center bg-transparent border-defaultColor `}
                 style={`padding-top: 2px; width: 25px !important; height: 25px !important; display: flex; border: 1px solid var(--defaultcolor); border-radius: 50%;  font-weight:700;`}
               >
-                {"T"}
+                {team.name[0] ? team.name[0].toUpperCase() : ""}
               </p>
+            {:else}
+              <img src={base64ToURL(team.logo)} alt="" />
             {/if}
             <p
               style="font-weight: 700;"
               class="ellipsis ms-1 sparrow-fs-12 text-left teams-title overflow-hidden my-auto"
             >
-              {#if isGuestUser}
-                {"Team"}
-              {:else}
-                {team.name || ""}
-              {/if}
+              {team.name || ""}
             </p>
           </div>
           {#if team.isNewInvite}
