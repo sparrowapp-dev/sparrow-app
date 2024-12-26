@@ -85,7 +85,6 @@
     await _viewModel.clearLocalDB();
     navigationState.set("guestUser");
     openDefaultBrowser();
-    console.log("inside handler login in web");
     setTimeout(() => {
       window.location.href = constants.SPARROW_AUTH_URL + "/init?source=web";
     }, 200);

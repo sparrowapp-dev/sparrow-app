@@ -131,7 +131,6 @@ const createGuestUserTeamWorkspace = async () => {
 export async function handleLogin(url: string) {
   const tokens = getAuthJwt();
   if ((!tokens[0] || !tokens[1]) && !url) {
-    console.log("inside first if", url);
     const guestUser = await getGuestUserState();
     if (guestUser) {
       return;
@@ -161,7 +160,6 @@ export async function handleLogin(url: string) {
   const event = params.get("event");
 
   if (!accessToken || !refreshToken) {
-    console.log("inside if", url);
     window.location.href = constants.SPARROW_AUTH_URL + "/init?source=web";
     return;
   }
@@ -171,7 +169,6 @@ export async function handleLogin(url: string) {
   setAuthJwt(constants.REF_TOKEN, refreshToken);
   setUser(jwtDecode(accessToken));
   sendUserDataToMixpanel(userDetails);
-  console.log("token exists", accessToken);
 
   MixpanelEvent(Events.USER_LOGIN, {
     Login_Method: "Email",
