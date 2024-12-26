@@ -130,7 +130,6 @@ const createGuestUserTeamWorkspace = async () => {
 
 export async function handleLogin(url: string) {
   const tokens = getAuthJwt();
-  // debugger;
   if ((!tokens[0] || !tokens[1]) && !url) {
     console.log("inside first if", url);
     const guestUser = await getGuestUserState();
@@ -149,7 +148,9 @@ export async function handleLogin(url: string) {
     // window.location.href = constants.SPARROW_AUTH_URL + "/init?source=web";
     // return;
   }
-  if (!url) return;
+  if (!url) {
+    return;
+  }
   if (tokens[0] && tokens[1]) {
     // handles case if account already running in app
     return;
