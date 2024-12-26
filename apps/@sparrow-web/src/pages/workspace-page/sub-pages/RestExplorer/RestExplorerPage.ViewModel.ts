@@ -722,7 +722,6 @@ class RestExplorerViewModel
             navigation: ResponseSectionEnum.RESPONSE,
             bodyLanguage: RequestDataTypeEnum.TEXT,
             bodyFormatter: ResponseFormatterEnum.PRETTY,
-            contentType: "",
           },
           isSendRequestInProgress: false,
         };
@@ -759,7 +758,6 @@ class RestExplorerViewModel
               data.response.time = 0;
               data.response.size = 0;
               data.isSendRequestInProgress = false;
-              data.response.contentType = "";
             }
             restApiDataMap.set(progressiveTab.tabId, data);
             return restApiDataMap;
@@ -796,7 +794,6 @@ class RestExplorerViewModel
               data.response.size = responseSizeKB;
               data.response.bodyLanguage = bodyLanguage;
               data.isSendRequestInProgress = false;
-              data.response.contentType = response.data.headers["content-type"];
             }
             restApiDataMap.set(progressiveTab.tabId, data);
             return restApiDataMap;

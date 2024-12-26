@@ -11,7 +11,7 @@ import { notifications } from "@sparrow/library/ui";
 
 const handleDownloadResponse = async (
   _data: string,
-  _contentType: string,
+  _contentType: string | undefined,
   _fileNameWithExtention: string,
 ): Promise<string> => {
   try {

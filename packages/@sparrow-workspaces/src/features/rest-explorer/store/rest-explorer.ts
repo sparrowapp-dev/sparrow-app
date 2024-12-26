@@ -11,7 +11,6 @@ export type restExplorerData = {
     navigation: string;
     bodyLanguage: string;
     bodyFormatter: string;
-    contentType: string;
   };
   isSendRequestInProgress: boolean;
 };

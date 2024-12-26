@@ -30,6 +30,10 @@
   let fileExtension: string;
   let formatedBody: string;
   let fileNameWithExtension: string;
+  // travers array of object and get content-type value
+  const contentType: string | undefined = response.headers.find(
+    (header: { key: string; value: string }) => header.key === "content-type",
+  )?.value;
 
   /**
    * @description - formats the code
@@ -245,7 +249,7 @@
               onClick={() =>
                 handleDownloadResponse(
                   formatedBody,
-                  response.contentType,
+                  contentType,
                   fileNameWithExtension,
                 )}
               disable={false}
