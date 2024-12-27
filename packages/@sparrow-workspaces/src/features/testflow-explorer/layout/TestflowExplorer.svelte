@@ -27,8 +27,8 @@
   import {
     RequestSectionEnum,
     type CollectionDto,
-    type Tab,
   } from "@sparrow/common/types/workspace";
+  import { type Tab } from "@sparrow/common/types/workspace/tab";
 
   import "@xyflow/svelte/dist/style.css";
   import { onDestroy, onMount } from "svelte";
@@ -50,6 +50,7 @@
     TFDataStoreType,
     TFEdgeHandlerType,
     TFEdgeType,
+    TFNodeHandlerType,
     TFNodeStoreType,
     TFNodeType,
     TFResponseStateType,
@@ -232,7 +233,9 @@
     if (id === "1") return;
     isDeleteNodeModalOpen = true;
     deletedNodeId = id;
-    let filteredNodes = $nodes.filter((node) => node.id === id);
+    let filteredNodes = $nodes.filter(
+      (node) => node.id === id,
+    ) as unknown as TFNodeHandlerType[];
     deleteNodeName = filteredNodes[0]?.data?.name;
     countNextDeletedNode(id);
   };
@@ -658,7 +661,7 @@
     edgesSubscriber();
   });
 
-  let sampleApiData;
+  let sampleApiData: TFNodeStoreType;
   onMount(() => {
     setTimeout(() => {
       sampleApiData = onRunSampleApi();
@@ -769,7 +772,7 @@
           tipPosition="top-left"
           onNext={() => {
             currentStep.set(4);
-            createNewNode("1", "undefined");
+            createNewNode("1");
           }}
           onClose={() => {
             isTestFlowTourGuideOpen.set(false);
@@ -1113,7 +1116,7 @@
   width={"540px"}
   zIndex={1000}
   isOpen={isDeleteNodeModalOpen}
-  handleModalState={(flag) => {
+  handleModalState={(flag = false) => {
     isDeleteNodeModalOpen = flag;
   }}
 >
