@@ -5,6 +5,8 @@
   import { Tooltip } from "@sparrow/library/ui";
   import { onMount } from "svelte";
 
+  export let isWebApp;
+
   let showMessage = true;
 
   onMount(() => {
@@ -22,7 +24,9 @@
 {#if showMessage}
   <div class="tooltip-dropdown-div"></div>
   <div>
-    <div class="tooltip-dropdown-data">
+    <div
+      class={isWebApp ? "tooltip-dropdown-data-web" : "tooltip-dropdown-data"}
+    >
       <p style="margin-bottom:0px">
         You are using Sparrow <span style="color:var(--text-primary-300)"
           >Edge</span
@@ -60,7 +64,6 @@
   .tooltip-dropdown-data {
     font-weight: 400;
     z-index: 1;
-
     gap: 6px;
     top: 40px;
     border-radius: 3px;
@@ -73,5 +76,21 @@
     width: 335px;
     font-size: 12px;
     background-color: var(--bg-tertiary-400);
+  }
+  .tooltip-dropdown-data-web {
+    font-weight: 400;
+    z-index: 1;
+    gap: 6px;
+    top: 40px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    height: 25px;
+    width: 335px;
+    font-size: 12px;
+    background-color: var(--bg-tertiary-400);
+    left: -20px;
   }
 </style>
