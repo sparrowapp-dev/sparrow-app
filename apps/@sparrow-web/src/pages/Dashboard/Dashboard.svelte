@@ -85,9 +85,9 @@
     await _viewModel.clearLocalDB();
     navigationState.set("guestUser");
     openDefaultBrowser();
-    console.log("inside handler login in web");
-    navigate(`${constants.SPARROW_AUTH_URL}/init?source=web`);
-    // window.location.href = constants.SPARROW_AUTH_URL + "/init?source=web";
+    setTimeout(() => {
+      window.location.href = constants.SPARROW_AUTH_URL + "/init?source=web";
+    }, 200);
     MixpanelEvent(Events.LOCAL_SIGNUP, {
       source: "Dashboard",
       platform: "Web App",

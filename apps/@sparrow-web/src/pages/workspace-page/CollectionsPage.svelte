@@ -225,15 +225,14 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
           }
+        } else if (removeTab.type === TabTypeEnum.TESTFLOW) {
+          const res = await _viewModel3.saveTestflow(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
         }
-        // else if (removeTab.type === TabTypeEnum.TESTFLOW) {
-        //   const res = await _viewModel3.saveTestflow(removeTab);
-        //   if (res) {
-        //     loader = false;
-        //     _viewModel.handleRemoveTab(id);
-        //     isPopupClosed = false;
-        //   }
-        // }
         loader = false;
       }
     } else if (
@@ -336,14 +335,12 @@
         Promise.all([
           _viewModel.fetchCollections(value?._id),
           _viewModel2.refreshEnvironment(value?._id),
-          // _viewModel3.refreshTestflow(value?._id),
-          ,
-          ,
+          _viewModel3.refreshTestflow(value?._id),
         ]).then(
           ([
             fetchCollectionsResult,
             refreshEnvironmentResult,
-            // refreshTestflowResult,
+            refreshTestflowResult,
             ,
           ]) => {
             // Handle the results of each API call here
@@ -352,12 +349,12 @@
               fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
             const environmentTabsToBeDeleted =
               refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
-            // const testflowTabsToBeDeleted =
-            //   refreshTestflowResult?.testflowTabsToBeDeleted || [];
+            const testflowTabsToBeDeleted =
+              refreshTestflowResult?.testflowTabsToBeDeleted || [];
             const totalTabsToBeDeleted: string[] = [
               ...collectionTabsToBeDeleted,
               ...environmentTabsToBeDeleted,
-              // ...testflowTabsToBeDeleted,
+              ...testflowTabsToBeDeleted,
             ];
             _viewModel.deleteTabsWithTabIdInAWorkspace(
               value?._id,
@@ -597,8 +594,8 @@
                         {currentWorkspace}
                         {handleCreateEnvironment}
                         onCreateTestflow={() => {
-                          // _viewModel3.handleCreateTestflow();
-                          // isExpandTestflow = true;
+                          _viewModel3.handleCreateTestflow();
+                          isExpandTestflow = true;
                         }}
                         bind:isExpandCollection
                         showImportCollectionPopup={() =>
