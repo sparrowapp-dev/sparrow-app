@@ -282,7 +282,7 @@
       <Tooltip placement="bottom" title="More" distance={17} show={!showMenu}>
         <button
           id={`show-more-environment-${env?.id}`}
-          class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+          class="threedot-icon-container p-0 border-0 rounded d-flex justify-content-center align-items-center {showMenu
             ? 'threedot-active'
             : ''}"
           style=""
@@ -343,7 +343,6 @@
       padding-left: 0;
       border-radius: 2px !important;
       outline: none !important;
-
     }
     .renameInputFieldCollection:focus {
       border: 1px solid var(--border-primary-300);
