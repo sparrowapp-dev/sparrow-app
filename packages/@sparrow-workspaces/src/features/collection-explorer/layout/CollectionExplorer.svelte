@@ -169,10 +169,7 @@
       />
     </div>
   </Modal>
-  <div
-    class="my-collection d-flex flex-column w-100 z-3"
-    style=" min-width: 450px"
-  >
+  <div class="my-collection d-flex flex-column w-100" style=" min-width: 450px">
     <div class="d-flex gap-2 mb-4">
       <div class="d-flex flex-column flex-grow-1">
         <input

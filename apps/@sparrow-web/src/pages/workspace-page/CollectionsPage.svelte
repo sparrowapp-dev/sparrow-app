@@ -758,6 +758,8 @@
       }
       return response;
     }}
+    onValidateLocalHostUrl={_viewModel.validateLocalHostURL}
+    onValidateDeployedURL={_viewModel.validateDeployedURL}
     isWebApp={true}
   />
 </Modal>
