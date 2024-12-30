@@ -60,11 +60,10 @@
   .tooltip-dropdown-data {
     font-weight: 400;
     z-index: 1;
-
     gap: 6px;
     top: 40px;
     border-radius: 3px;
-    right: 245px;
+    left: 150px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -73,5 +72,6 @@
     width: 335px;
     font-size: 12px;
     background-color: var(--bg-tertiary-400);
+    transform: translateX(-50%);
   }
 </style>
