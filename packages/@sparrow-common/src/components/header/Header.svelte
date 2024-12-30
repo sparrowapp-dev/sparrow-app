@@ -397,8 +397,8 @@
         borderRounded={"2px"}
         position={"absolute"}
         isHeaderCombined={false}
-        maxBodyHeight={"300px"}
-        minBodyWidth={"275px"}
+        maxBodyHeight={"279px"}
+        minBodyWidth={"240px"}
       >
         <div slot="pre-select" class="pre-dropdown">
           <div
