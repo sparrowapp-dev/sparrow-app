@@ -27,7 +27,6 @@
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
   import { Input } from "@sparrow/library/forms";
-  import { open } from "@tauri-apps/plugin-shell";
   import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import {

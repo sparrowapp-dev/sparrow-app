@@ -72,6 +72,7 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import { open } from "@tauri-apps/plugin-shell";
   import constants from "@app/constants/constants";
 
   const _viewModel = new CollectionsViewModel();
