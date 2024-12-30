@@ -362,7 +362,7 @@
 
   <div class="d-flex align-items-center no-drag" style="position: relative;">
     {#if isGuestUser && isLoginBannerActive === false}
-      <PopupHint {isWebApp} />
+      <PopupHint />
 
       <div
         style="background-color:#313233; justify-content:center; align-items:center; margin-right:10px; margin-left:10px; border-radius:2px"
