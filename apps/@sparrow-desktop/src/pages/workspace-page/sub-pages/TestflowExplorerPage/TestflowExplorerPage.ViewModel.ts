@@ -31,6 +31,7 @@ import type {
   TFHistoryAPIResponseStoreType,
   TFHistoryStoreType,
   TFKeyValueStoreType,
+  TFNodeStoreType,
   TFNodeType,
 } from "@sparrow/common/types/workspace/testflow";
 import { CompareArray, Debounce, ParseTime } from "@sparrow/common/utils";
@@ -307,7 +308,7 @@ export class TestflowExplorerPageViewModel {
   /**
    * Handles running the test flow by processing each node sequentially and recording the results
    */
-  public handleSampleTestFlowRun = () => {
+  public handleSampleTestFlowRun = (): TFNodeStoreType => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const adaptedRequest = new InitRequestTab("fewfe", "fewfe");
     adaptedRequest.updateName("Sample API");
