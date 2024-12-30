@@ -569,12 +569,12 @@
                       <WebSocketExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                  <!-- {:else if $activeTab?.type === ItemType.TESTFLOW}
+                {:else if $activeTab?.type === ItemType.TESTFLOW}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <TestFlowExplorerPage tab={$activeTab} />
                     </div>
-                  </Motion> -->
+                  </Motion>
                 {:else if $activeTab?.type === ItemType.SOCKET_IO}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
