@@ -71,9 +71,8 @@
   import SocketIoExplorerPage from "./sub-pages/SocketIoExplorerPage/SocketIoExplorerPage.svelte";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
-  import {
-  GraphqlRequestDefaultAliasBaseEnum,
-} from "@sparrow/common/types/workspace/graphql-request-base";
+  import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import constants from "@app/constants/constants";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -108,6 +107,7 @@
 
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
+  const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   environments.subscribe((value) => {
     if (value) {
@@ -120,6 +120,10 @@
       currentWOrkspaceValue = value;
     }
   });
+
+  const navigateToGithub = async () => {
+    await open(externalSparrowGithub);
+  };
 
   const mapEnvironmentToWorkspace = (_env, _workspaceId) => {
     if (_env && _workspaceId) {
@@ -272,8 +276,7 @@
               `${SocketIORequestDefaultAliasBaseEnum.NAME} request saved successfully.`,
             );
           }
-        }
-        else if (removeTab.type === TabTypeEnum.GRAPHQL) {
+        } else if (removeTab.type === TabTypeEnum.GRAPHQL) {
           const res = await _viewModel.saveGraphql(removeTab);
           if (res) {
             loader = false;
@@ -440,6 +443,7 @@
           bind:scrollList
           bind:userRole
           {collectionList}
+          {navigateToGithub}
           {currentWorkspace}
           {isAppVersionVisible}
           {isGuestUser}
@@ -826,8 +830,7 @@
           _viewModel.handleRemoveTab(removeTab.id);
         }
         return res;
-      }
-      else if (removeTab.type === TabTypeEnum.GRAPHQL) {
+      } else if (removeTab.type === TabTypeEnum.GRAPHQL) {
         const res = await _viewModel.saveAsGraphql(
           _workspaceMeta,
           path,
