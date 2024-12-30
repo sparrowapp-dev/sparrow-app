@@ -317,7 +317,6 @@
             style="padding-bottom: 4px;"
           >
             <TeamNavigator
-              {isGuestUser}
               tabs={teamTabs}
               {onUpdateActiveTab}
               {activeTeamTab}
