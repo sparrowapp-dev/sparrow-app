@@ -102,11 +102,17 @@
         <img class="rounded p-2" src={imageDataToURL(value)} alt="" />
       {/if}
       <div class="align-items-end justify-content-end d-flex gap-2">
-        <button on:click={editValue} class="edit-btn border-0 p-2 rounded">
-          <EditIcon height={16} width={16} />
+        <button
+          on:click={editValue}
+          class="edit-btn border-0 p-1 rounded align-items-center justify-content-center d-flex"
+        >
+          <EditIcon height={12} width={12} />
         </button>
-        <button on:click={resetValue} class="del-btn border-0 p-2 rounded">
-          <DeleteIcon height={16} width={16} />
+        <button
+          on:click={resetValue}
+          class="del-btn border-0 p-1 rounded align-items-center justify-content-center d-flex"
+        >
+          <DeleteIcon height={12} width={12} />
         </button>
       </div>
     </div>
@@ -164,8 +170,8 @@
     .edit-btn,
     .del-btn {
       background-color: transparent;
-      height: 28px;
-      width: 28px;
+      height: 24px;
+      width: 24px;
       display: flex;
       align-items: center;
     }
