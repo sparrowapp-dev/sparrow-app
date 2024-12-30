@@ -292,7 +292,7 @@
       )} {api?.isDeleted && 'api-method-deleted'}"
       style="font-size: 12px;"
     >
-      {api.request.method?.toUpperCase()}
+      {api.request.method?.toUpperCase()==="DELETE" ? "DEL" : api.request.method?.toUpperCase()}
     </div>
 
     {#if isRenaming}
