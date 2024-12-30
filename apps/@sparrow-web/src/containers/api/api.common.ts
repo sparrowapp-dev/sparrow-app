@@ -478,10 +478,10 @@ const makeHttpRequestV2 = async (
   headers: string,
   body: string,
   contentType: string,
+  selectedAgent: WorkspaceUserAgentBaseEnum,
   signal?: AbortSignal,
 ) => {
   const startTime = performance.now();
-  const selectedAgent = localStorage.getItem("selectedAgent");
   try {
     let response;
     if (selectedAgent === "Cloud Agent") {
