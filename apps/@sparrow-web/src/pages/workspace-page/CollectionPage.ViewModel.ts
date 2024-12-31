@@ -95,6 +95,8 @@ import {
   GraphqlRequestAuthModeBaseEnum,
 } from "@sparrow/common/types/workspace/graphql-request-base";
 import type { Path } from "@sparrow/common/interfaces/request.interface";
+import { makeHttpRequestV2, makeRequest } from "src/containers/api/api.common";
+import { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -5254,5 +5256,71 @@ export default class CollectionsViewModel {
     const refreshToken = localStorage.getItem("REF_TOKEN");
     const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email}`;
     window.location.href = sparrowRedirect;
+  };
+
+  /**
+   * Validates a localhost URL by making a GET request.
+   *
+   * @param url - The localhost URL to validate.
+   * @returns A promise that resolves with the response of the validation request.
+   */
+  public validateLocalHostURL = async (url: string) => {
+    const response = await makeRequest("GET", url, undefined, true);
+    return response;
+  };
+
+  /**
+   * Validates a deployed URL by making a GET request with specific headers.
+   *
+   * @param url - The deployed URL to validate.
+   * @returns  A promise that resolves with the response of the validation request.
+   */
+  public validateDeployedURL = async (url: string) => {
+    const headers = [
+      { key: "Accept-Encoding", value: "gzip, br", checked: true },
+      {
+        key: "User-Agent",
+        value:
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+        checked: true,
+      },
+      { key: "Connection", value: "keep-alive", checked: true },
+      { key: "Accept", value: "*/*", checked: true },
+    ];
+    const response = await makeHttpRequestV2(
+      url,
+      "GET",
+      JSON.stringify(headers),
+      "",
+      "text/plain",
+      WorkspaceUserAgentBaseEnum.CLOUD_AGENT,
+    );
+    return response;
+  };
+
+  /**
+   * Validate the data of local host URL if it follows Open API Specification or not.
+   * @param data - Open API Text Data
+   * @returns A promise that resolves with the response of the validation request.
+   */
+  public validateLocalHostURLInput = async (data: any) => {
+    const response = await this.collectionService.validateImportCollectionInput(
+      "",
+      data?.data?.data,
+    );
+    return response;
+  };
+
+  /**
+   * Validate the data of deployed URL if it follows Open API Specification or not.
+   * @param data - Open API Text Data
+   * @returns A promise that resolves with the response of the validation request.
+   */
+  public validateDeployedURLInput = async (data: any) => {
+    const response = await this.collectionService.validateImportCollectionInput(
+      "",
+      JSON.parse(data?.data?.body),
+    );
+    return response;
   };
 }

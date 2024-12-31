@@ -27,8 +27,6 @@
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
   import { Input } from "@sparrow/library/forms";
-  import { open } from "@tauri-apps/plugin-shell";
-  import constants from "@app/constants/constants";
   import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import {
@@ -57,6 +55,7 @@
   export let onItemOpened: (entityType: string, args: any) => void;
 
   export let onBranchSwitched: (collection: CollectionDocument) => void;
+  export let navigateToGithub: () => void;
   export let onRefetchCollection: (
     workspaceId: string,
     collection: CollectionDocument,
@@ -136,7 +135,6 @@
   export let isExpandTestflow = false;
 
   let isGithubStarHover = false;
-  const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   let collectionFilter: any = [];
   /**
@@ -576,7 +574,7 @@
             title="Add Your Flow 🌊"
             description={`Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!`}
             tipPosition="left-top"
-            pulsePosition={{ top: "12px", left: "-150px" }}
+            pulsePosition={{ top: isWebApp ? "-20px" : "12px", left: "-150px" }}
             onNext={() => {
               currentStep.set(3);
               onCreateTestflow();
@@ -697,9 +695,7 @@
           on:mouseleave={() => {
             isGithubStarHover = false;
           }}
-          on:click={async () => {
-            await open(externalSparrowGithub);
-          }}
+          on:click={navigateToGithub}
         >
           <GithubIcon
             height={"18px"}
