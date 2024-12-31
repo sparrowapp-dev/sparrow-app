@@ -176,8 +176,8 @@
       <img
         src={TeamSkeleton}
         alt="Team-Skelton"
-        width="96%"
-        height="90%"
+        width="100%"
+        height="100%"
         style="padding-bottom:100px;"
       />
     {/if}
