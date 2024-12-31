@@ -574,7 +574,7 @@
             title="Add Your Flow 🌊"
             description={`Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!`}
             tipPosition="left-top"
-            pulsePosition={{ top: "12px", left: "-150px" }}
+            pulsePosition={{ top: isWebApp ? "-20px" : "12px", left: "-150px" }}
             onNext={() => {
               currentStep.set(3);
               onCreateTestflow();
