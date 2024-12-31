@@ -27,7 +27,7 @@ import {
   SocketIORequestStatusTabEnum,
   type EventsValues,
 } from "@sparrow/common/types/workspace/socket-io-request-tab";
-import { Sleep } from "@sparrow/common/utils";
+import { Base64Converter, Sleep } from "@sparrow/common/utils";
 const tabRepository = new TabRepository();
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
@@ -511,11 +511,21 @@ const makeHttpRequestV2 = async (
         if (contentType === "multipart/form-data") {
           const formData = new FormData();
           const parsedBody = JSON.parse(body);
-          (parsedBody || []).forEach((field) => {
-            if (field.checked !== false) {
+          for (const field of parsedBody || []) {
+            if (field.checked && field?.base?.startsWith("data:")) {
+              const asf = await new Base64Converter().base64ToFile(
+                field.base,
+                field.value,
+              );
+              formData.append(field.key, asf);
+              debugger;
+            } else if (field.checked) {
               formData.append(field.key, field.value);
             }
-          });
+          }
+          for (const [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+          }
           requestData = formData;
 
           // Remove Content-Type header to let Axios set it automatically with boundary
