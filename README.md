@@ -30,6 +30,8 @@ Sparrow is your next go-to API development buddy which can help you test, debug,
 
 ## <a name="installation">🔨 Installation</a>
 
+### Prerequisite:
+
 To install this project, you will need to have the following installed on your machine :
 
 ![Docker](https://img.shields.io/badge/-Docker-black?style=for-the-badge&logoColor=white&logo=docker&color=2496ED)
@@ -51,7 +53,9 @@ Install the required dependencies by heading over to the links below,
 3. [Yarn](https://classic.yarnpkg.com/lang/en/docs/install)
 4. [Docker](https://docs.docker.com/desktop/)
 
-### Prerequisite:
+### Installation Steps:
+
+#### -> Required Steps
 
 ```bash
 # Clone the repo
@@ -70,7 +74,9 @@ cp apps/@sparrow-desktop/.env.example apps/@sparrow-desktop/.env
 cp apps/@sparrow-web/.env.example apps/@sparrow-web/.env
 ```
 
-### Docker Method
+After completing the required steps of setting up the app, follow one of the below methods to setup the required services:
+
+#### -> [METHOD 1] Docker Method
 
 - To install all services(mongo + kafka + api server + auth server) as docker containers, run:
 
@@ -85,15 +91,16 @@ cp apps/@sparrow-web/.env.example apps/@sparrow-web/.env
   - `yarn docker:api` - Runs only the api server
   - `yarn docker:auth` - Runs only the auth service
 
-### Non-Docker Method
+#### -> [METHOD 2] Non-Docker Method
 
-```bash
-# Install dependencies
-	pnpm i
+- Go to following repositories of individual services and check their README in order to setup them on your local.
 
-# Run App in development mode
-	pnpm start:dev
-```
+  - [Sparrow API](https://github.com/sparrowapp-dev/sparrow-api)
+  - [Sparrow Auth](https://github.com/sparrowapp-dev/sparrow-app-auth)
+
+Point to remember: `Mongo and Kafka setup is included in Sparrow API setup.`
+
+### Run The App
 
 ```bash
 # Run the desktop app in dev mode
@@ -104,8 +111,6 @@ yarn web-start
 ```
 
 The above command will start the app in development mode and watch for changes on local.
-
-Follow [this](https://github.com/sparrowapp-dev/sparrow-api/blob/main/README.md) guide to set up the backend server.
 
 ## <a name="recommended-ide-setup">👨‍💻 Recommended IDE Setup</a>
 
