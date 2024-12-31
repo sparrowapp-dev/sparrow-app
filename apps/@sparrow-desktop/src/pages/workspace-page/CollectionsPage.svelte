@@ -73,6 +73,10 @@
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
+  import { open } from "@tauri-apps/plugin-shell";
+  import constants from "@app/constants/constants";
+
+
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -106,6 +110,7 @@
 
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
+  const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   environments.subscribe((value) => {
     if (value) {
@@ -118,6 +123,10 @@
       currentWOrkspaceValue = value;
     }
   });
+
+  const navigateToGithub = async () => {
+    await open(externalSparrowGithub);
+  };
 
   const mapEnvironmentToWorkspace = (_env, _workspaceId) => {
     if (_env && _workspaceId) {
@@ -437,6 +446,7 @@
           bind:scrollList
           bind:userRole
           {collectionList}
+          {navigateToGithub}
           {currentWorkspace}
           {isAppVersionVisible}
           {isGuestUser}
