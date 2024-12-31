@@ -28,6 +28,7 @@
   import constants from "../../constants/constants";
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import { CreateTeam } from "@sparrow/common/features";
+  import { open } from "@tauri-apps/plugin-shell";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
