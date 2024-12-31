@@ -760,6 +760,8 @@
     }}
     onValidateLocalHostUrl={_viewModel.validateLocalHostURL}
     onValidateDeployedURL={_viewModel.validateDeployedURL}
+    onValidateDeployedURLInput={_viewModel.validateDeployedURLInput}
+    onValidateLocalHostURLInput={_viewModel.validateLocalHostURLInput}
     isWebApp={true}
   />
 </Modal>

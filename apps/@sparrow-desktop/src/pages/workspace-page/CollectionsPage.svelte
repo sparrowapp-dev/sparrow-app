@@ -71,9 +71,7 @@
   import SocketIoExplorerPage from "./sub-pages/SocketIoExplorerPage/SocketIoExplorerPage.svelte";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
-  import {
-  GraphqlRequestDefaultAliasBaseEnum,
-} from "@sparrow/common/types/workspace/graphql-request-base";
+  import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -272,8 +270,7 @@
               `${SocketIORequestDefaultAliasBaseEnum.NAME} request saved successfully.`,
             );
           }
-        }
-        else if (removeTab.type === TabTypeEnum.GRAPHQL) {
+        } else if (removeTab.type === TabTypeEnum.GRAPHQL) {
           const res = await _viewModel.saveGraphql(removeTab);
           if (res) {
             loader = false;
@@ -729,6 +726,10 @@
       }
       return response;
     }}
+    onValidateLocalHostUrl={_viewModel.validateLocalHostURL}
+    onValidateDeployedURL={_viewModel.validateDeployedURL}
+    onValidateDeployedURLInput={_viewModel.validateURLInput}
+    onValidateLocalHostURLInput={_viewModel.validateURLInput}
   />
 </Modal>
 
@@ -826,8 +827,7 @@
           _viewModel.handleRemoveTab(removeTab.id);
         }
         return res;
-      }
-      else if (removeTab.type === TabTypeEnum.GRAPHQL) {
+      } else if (removeTab.type === TabTypeEnum.GRAPHQL) {
         const res = await _viewModel.saveAsGraphql(
           _workspaceMeta,
           path,

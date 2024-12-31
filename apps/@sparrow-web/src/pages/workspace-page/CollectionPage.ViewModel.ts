@@ -5297,4 +5297,30 @@ export default class CollectionsViewModel {
     );
     return response;
   };
+
+  /**
+   * Validate the data of local host URL if it follows Open API Specification or not.
+   * @param data - Open API Text Data
+   * @returns A promise that resolves with the response of the validation request.
+   */
+  public validateLocalHostURLInput = async (data: any) => {
+    const response = await this.collectionService.validateImportCollectionInput(
+      "",
+      data?.data?.data,
+    );
+    return response;
+  };
+
+  /**
+   * Validate the data of deployed URL if it follows Open API Specification or not.
+   * @param data - Open API Text Data
+   * @returns A promise that resolves with the response of the validation request.
+   */
+  public validateDeployedURLInput = async (data: any) => {
+    const response = await this.collectionService.validateImportCollectionInput(
+      "",
+      JSON.parse(data?.data?.body),
+    );
+    return response;
+  };
 }

@@ -31,6 +31,8 @@
   export let isWebApp = false;
   export let onValidateLocalHostUrl;
   export let onValidateDeployedURL;
+  export let onValidateDeployedURLInput;
+  export let onValidateLocalHostURLInput;
 
   const ProgressTitle = {
     IDENTIFYING_SYNTAX: "Identifying Syntax...",
@@ -84,25 +86,13 @@
         importData.includes("://localhost")
       ) {
         isValidClientURL = true;
-        let response;
-        if (isWebApp) {
-          response = await onValidateLocalHostUrl(importData);
-        } else {
-          response = await _collectionService.validateImportCollectionURL(
-            importData.replace("localhost", "127.0.0.1"),
-          );
-        }
+        const response = await onValidateLocalHostUrl(importData);
         if (
           response?.data?.status === ResponseStatusCode.OK ||
           (response?.status === "success" && isWebApp)
         ) {
           try {
-            const res = await _collectionService.validateImportCollectionInput(
-              "",
-              isWebApp
-                ? response?.data?.data
-                : JSON.parse(response?.data?.response),
-            );
+            const res = await onValidateLocalHostURLInput(response);
             if (res?.isSuccessful) {
               isValidServerURL = true;
             }
@@ -110,21 +100,10 @@
         }
       } else {
         isValidClientDeployedURL = true;
-        let response;
-        if (isWebApp) {
-          response = await onValidateDeployedURL(importData);
-        } else {
-          response =
-            await _collectionService.validateImportCollectionURL(importData);
-        }
+        const response = await onValidateDeployedURL(importData);
         if (response?.data?.status === ResponseStatusCode.OK) {
           try {
-            const res = await _collectionService.validateImportCollectionInput(
-              "",
-              isWebApp
-                ? JSON.parse(response?.data?.body)
-                : JSON.parse(response?.data?.response),
-            );
+            const res = await onValidateDeployedURLInput(response);
             if (res.isSuccessful) {
               isValidServerDeployedURL = true;
             }
@@ -280,13 +259,8 @@
       isValidClientDeployedURL &&
       isValidServerDeployedURL
     ) {
-      let response;
-      if (isWebApp) {
-        response = await onValidateDeployedURL(importData);
-      } else {
-        response =
-          await _collectionService.validateImportCollectionURL(importData);
-      }
+      const response = await onValidateDeployedURL(importData);
+
       if (response?.data?.status === ResponseStatusCode.OK) {
         handleImportJsonObject(
           ContentTypeEnum["application/json"],
@@ -300,16 +274,7 @@
       isValidServerURL
     ) {
       const importUrl = importData.replace("localhost", "127.0.0.1");
-
-      let response;
-      if (isWebApp) {
-        response = await onValidateLocalHostUrl(importData);
-      } else {
-        response = await _collectionService.validateImportCollectionURL(
-          importData.replace("localhost", "127.0.0.1"),
-        );
-      }
-
+      const response = await onValidateLocalHostUrl(importData);
       if (
         !activeSync &&
         (response?.data?.status === ResponseStatusCode.OK ||
