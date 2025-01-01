@@ -647,7 +647,7 @@
         },
       }));
     });
-  }, 200);
+  }, 300);
 
   /**
    * Handles the drag end event with a debounce of 1000 milliseconds
@@ -663,7 +663,7 @@
         },
       })),
     );
-  }, 200);
+  }, 300);
 
   /**
    * Cleanup function to be called when the component is destroyed.
@@ -686,8 +686,20 @@
 
 <div
   class="h-100 d-flex flex-column position-relative"
-  on:dragenter={handleDragEnter}
-  on:drop={handleDragEnd}
+  on:dragenter={(e) => {
+    // Listens item enter.
+    e.preventDefault();
+    handleDragEnter();
+  }}
+  on:drop={(e) => {
+    // listens item drop.
+    e.preventDefault();
+    handleDragEnd();
+  }}
+  on:dragover={(e) => {
+    // Necessary to enable dropping.
+    e.preventDefault();
+  }}
 >
   <div class="p-3" style="position:absolute; z-index:3; top:0;">
     <!-- INSERT NAME COMPONENT HERE -->
