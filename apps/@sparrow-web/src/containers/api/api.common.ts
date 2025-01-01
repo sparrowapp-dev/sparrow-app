@@ -497,34 +497,38 @@ const makeHttpRequestV2 = async (
         try {
           jsonHeader = JSON.parse(headers);
         } catch (error) {
-          jsonHeader = {};
+          jsonHeader = [];
         }
-        const headersObject = jsonHeader.reduce((acc, header) => {
-          if (header.checked !== false) {
-            // Include only headers that are checked or do not have a `checked` property
+        const headersObject = jsonHeader.reduce(
+          (
+            acc: Record<string, string>,
+            header: { key: string; value: string },
+          ) => {
             acc[header.key] = header.value;
-          }
-          return acc;
-        }, {});
+            return acc;
+          },
+          {},
+        );
         let requestData = body || {};
 
         if (contentType === "multipart/form-data") {
           const formData = new FormData();
           const parsedBody = JSON.parse(body);
           for (const field of parsedBody || []) {
-            if (field.checked && field?.base?.startsWith("data:")) {
-              const asf = await new Base64Converter().base64ToFile(
-                field.base,
-                field.value,
-              );
-              formData.append(field.key, asf);
-              debugger;
-            } else if (field.checked) {
+            try {
+              if (field?.base) {
+                const file = await new Base64Converter().base64ToFile(
+                  field.base,
+                  field.value,
+                );
+                formData.append(field.key, file);
+              } else {
+                formData.append(field.key, field.value);
+              }
+            } catch (e) {
+              console.error(e);
               formData.append(field.key, field.value);
             }
-          }
-          for (const [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
           }
           requestData = formData;
 
@@ -533,11 +537,11 @@ const makeHttpRequestV2 = async (
         } else if (contentType === "application/x-www-form-urlencoded") {
           const urlSearchParams = new URLSearchParams();
           const parsedBody = JSON.parse(body);
-          (parsedBody || []).forEach((field) => {
-            if (field.checked !== false) {
+          (parsedBody || []).forEach(
+            (field: { key: string; value: string }) => {
               urlSearchParams.append(field.key, field.value);
-            }
-          });
+            },
+          );
           requestData = urlSearchParams;
         } else if (
           contentType === "application/json" ||
@@ -557,14 +561,11 @@ const makeHttpRequestV2 = async (
           },
         });
         response = {
-          ...axiosResponse,
           data: {
             status: `${axiosResponse.status} ${axiosResponse.statusText}`,
             data: axiosResponse.data,
             headers: Object.fromEntries(Object.entries(axiosResponse.headers)),
           },
-          status: 200,
-          statusText: "OK",
         };
       } catch (axiosError: any) {
         const error = axiosError;
@@ -576,10 +577,6 @@ const makeHttpRequestV2 = async (
               ? Object.fromEntries(Object.entries(error.response.headers))
               : {},
           },
-          status: 200,
-          statusText: "OK",
-          headers: error.response?.headers || {},
-          config: error.config,
         };
       }
     }
