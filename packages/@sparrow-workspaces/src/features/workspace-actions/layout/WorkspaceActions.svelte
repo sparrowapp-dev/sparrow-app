@@ -568,13 +568,13 @@
       {/if}
 
       {#if $isTestFlowTourGuideOpen && $currentStep == 2}
-        <div style="position:fixed; top:268px; left:220px; z-index:9999;">
+        <div style="position:fixed; top:234px; left:220px; z-index:9999;">
           <TestFlowTourGuide
             targetId="addButton"
             title="Add Your Flow 🌊"
             description={`Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!`}
             tipPosition="left-top"
-            pulsePosition={{ top: isWebApp ? "-20px" : "12px", left: "-150px" }}
+            pulsePosition={{ top: isWebApp ? "10px" : "12px", left: "-150px" }}
             onNext={() => {
               currentStep.set(3);
               onCreateTestflow();
