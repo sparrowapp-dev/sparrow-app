@@ -80,7 +80,7 @@
   export let onRedrectRequest;
   export let onUpdateTestFlowName;
   export let onSaveTestflow;
-
+  export let isWebApp;
   export let deleteNodeResponse;
 
   // Writable stores for nodes and edges
@@ -249,9 +249,8 @@
 
     // handles run from from start button click
     if (_id === "0") {
-      unselectNodes();
       await onClickRun();
-      selectedNodeId = "2";
+      selectFirstNode();
       MixpanelEvent(Events.Run_TestFlows);
       return;
     }
@@ -469,8 +468,8 @@
   } as unknown as NodeTypes;
   let nodesValue = 1;
 
-  let selectedNodeName: string = "";
-  let selectedNodeId = "1";
+  let selectedNodeName = "";
+  let selectedNodeId = "";
 
   // Subscribe to changes in the nodes
   const nodesSubscriber = nodes.subscribe((val: Node[]) => {
@@ -482,6 +481,8 @@
     if (node) {
       selectedNodeName = node?.data?.name as string;
       selectedNodeId = node.id;
+    } else {
+      (selectedNodeName = ""), (selectedNodeId = "");
     }
   });
 
@@ -607,8 +608,22 @@
       });
       return _nodes;
     });
-    selectedNodeId = "1";
-    selectedNode = undefined;
+  };
+
+  /**
+   * Select all the existing nodes
+   */
+  const selectFirstNode = () => {
+    nodes.update((_nodes: Node[] | any[]) => {
+      _nodes.forEach((_nodeItem, index) => {
+        if (index === 1) {
+          _nodeItem.selected = true;
+        } else {
+          _nodeItem.selected = false;
+        }
+      });
+      return _nodes;
+    });
   };
 
   let divElement: HTMLElement;
@@ -632,7 +647,7 @@
         },
       }));
     });
-  }, 200);
+  }, 300);
 
   /**
    * Handles the drag end event with a debounce of 1000 milliseconds
@@ -648,7 +663,7 @@
         },
       })),
     );
-  }, 200);
+  }, 300);
 
   /**
    * Cleanup function to be called when the component is destroyed.
@@ -671,8 +686,20 @@
 
 <div
   class="h-100 d-flex flex-column position-relative"
-  on:dragenter={handleDragEnter}
-  on:drop={handleDragEnd}
+  on:dragenter={(e) => {
+    // Listens item enter.
+    e.preventDefault();
+    handleDragEnter();
+  }}
+  on:drop={(e) => {
+    // listens item drop.
+    e.preventDefault();
+    handleDragEnd();
+  }}
+  on:dragover={(e) => {
+    // Necessary to enable dropping.
+    e.preventDefault();
+  }}
 >
   <div class="p-3" style="position:absolute; z-index:3; top:0;">
     <!-- INSERT NAME COMPONENT HERE -->
@@ -706,7 +733,7 @@
             onClick={async () => {
               unselectNodes();
               await onClickRun();
-              selectedNodeId = "2";
+              selectFirstNode();
               MixpanelEvent(Events.Run_TestFlows);
             }}
           />
@@ -874,6 +901,7 @@
                                 apiState={responseState}
                                 {onUpdateRequestState}
                                 onClearResponse={() => {}}
+                                {isWebApp}
                               />
                             {/if}
                             <div style="flex:1; overflow:auto;">
@@ -1013,6 +1041,7 @@
                                 apiState={responseState}
                                 {onUpdateRequestState}
                                 onClearResponse={() => {}}
+                                {isWebApp}
                               />
                             {/if}
                             <div style="flex:1; overflow:auto;">

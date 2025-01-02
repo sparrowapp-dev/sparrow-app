@@ -21,6 +21,7 @@
   export let apiState;
   export let onUpdateRequestState;
   export let onClearResponse;
+  export let isWebApp;
 
   let fileExtension: string;
 
@@ -219,14 +220,16 @@
           />
         </Tooltip>
         <!-- Download button -->
-        <Tooltip title={"Export"}>
-          <WithButtonV6
-            icon={DownloadIcon2}
-            onClick={handleDownloaded}
-            disable={false}
-            loader={false}
-          />
-        </Tooltip>
+        {#if !isWebApp}
+          <Tooltip title={"Export"}>
+            <WithButtonV6
+              icon={DownloadIcon2}
+              onClick={handleDownloaded}
+              disable={false}
+              loader={false}
+            />
+          </Tooltip>
+        {/if}
       </div>
     {/if}
   </div>
