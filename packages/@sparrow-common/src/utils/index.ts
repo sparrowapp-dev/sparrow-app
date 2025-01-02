@@ -15,6 +15,7 @@ export { ParseTime } from "./parse-time";
 export { OSDetector } from "./OSDetector";
 export { throttle } from "./throttle";
 export { copyToClipBoard } from "./copyToClipboard";
+export { handleDownloadResponse } from "./handle-downlod-rest";
 export { Sleep } from "./sleep";
 export * from "./auth.helper";
 export * from "./common.helper";
