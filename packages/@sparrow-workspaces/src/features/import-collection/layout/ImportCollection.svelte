@@ -565,9 +565,7 @@
   </div>
   {#if !importData && isInputDataTouched && !isimportDataLoading}
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-      {isWebApp
-        ? "Please paste your OpenAPI specification text."
-        : "Please paste your OpenAPI specification text or Swagger/localhost link."}
+      Please paste your OpenAPI specification text or Swagger/localhost link.
     </p>
   {:else if (!isimportDataLoading && isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched) || (!isimportDataLoading && isValidClientURL && !isValidServerURL && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
