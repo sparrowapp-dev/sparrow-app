@@ -68,6 +68,8 @@
    * id of the active tab
    */
   export let activeTabId;
+  export let activeTabType;
+
   export let userRoleInWorkspace;
   export let currentWorkspace: Observable<WorkspaceDocument>;
   export let leftPanelController: {
@@ -610,6 +612,7 @@
           {userRoleInWorkspace}
           {activeTabPath}
           {activeTabId}
+          {activeTabType}
           {showImportCollectionPopup}
           {onItemCreated}
           {onItemDeleted}

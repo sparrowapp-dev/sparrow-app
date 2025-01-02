@@ -65,6 +65,7 @@
    * Role of user in workspace
    */
   export let userRole;
+  export let activeTabType;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -248,7 +249,7 @@
 {/if}
 
 <div
-  draggable={true}
+  draggable={activeTabType === "TESTFLOW" ? true : false}
   on:dragstart={(event) => {
     dragStart(event, collection);
   }}

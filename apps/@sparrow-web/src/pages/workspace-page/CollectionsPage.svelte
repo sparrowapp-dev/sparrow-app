@@ -487,6 +487,7 @@
           }}
           activeTabPath={$activeTab?.path}
           activeTabId={$activeTab?.id}
+          activeTabType={$activeTab?.type}
           showImportCollectionPopup={() => (isImportCollectionPopup = true)}
           showImportCurlPopup={() => (isImportCurlPopup = true)}
           onItemCreated={_viewModel.handleCreateItem}
