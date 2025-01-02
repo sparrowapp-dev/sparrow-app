@@ -208,14 +208,23 @@
   // Filter collections based on the current tab's workspace ID
   const collectionsSubscriber = collectionList.subscribe((value) => {
     if (value) {
-      collectionListDocument = value;
-      collectionListDocument = collectionListDocument?.filter(
+      collectionListDocument = value?.filter(
         (value) => value.workspaceId === $tab?.path?.workspaceId,
       );
       filteredCollections.set(
         collectionListDocument as unknown as CollectionDto[],
       );
       syncNodesWithCollectionList();
+    }
+  });
+
+  let limitNodesChange = 0;
+  nodes.subscribe((nodes) => {
+    if (nodes?.length > 0) {
+      if (!limitNodesChange) {
+        syncNodesWithCollectionList();
+        limitNodesChange = limitNodesChange + 1;
+      }
     }
   });
 
@@ -342,31 +351,6 @@
       const dbNodes = $tab?.property?.testflow?.nodes as TFNodeType[];
       let res = [];
       for (let i = 0; i < dbNodes.length; i++) {
-        let request;
-        if (collectionListDocument) {
-          const collection = collectionListDocument.find(
-            (col) => col.id === dbNodes[i].data.collectionId,
-          );
-          if (collection) {
-            if (
-              dbNodes[i].data.folderId &&
-              dbNodes[i].data.folderId?.length > 0
-            ) {
-              const folder = collection?.items?.find(
-                (fol) => fol.id === dbNodes[i].data.folderId,
-              );
-              if (folder) {
-                request = folder.items.find(
-                  (req) => req.id === dbNodes[i].data.requestId,
-                );
-              }
-            } else {
-              request = collection?.items?.find(
-                (req) => req.id === dbNodes[i].data.requestId,
-              );
-            }
-          }
-        }
         res.push({
           id: dbNodes[i].id,
           type: dbNodes[i].type,
@@ -399,8 +383,8 @@
             onOpenDeleteModal: function (id: string) {
               handleDeleteModal(id);
             },
-            name: request?.name ?? dbNodes[i].data?.name,
-            method: request?.request?.method ?? dbNodes[i].data?.method,
+            name: dbNodes[i].data?.name,
+            method: dbNodes[i].data?.method,
             collectionId: dbNodes[i].data?.collectionId,
             requestId: dbNodes[i].data?.requestId,
             folderId: dbNodes[i].data?.folderId,

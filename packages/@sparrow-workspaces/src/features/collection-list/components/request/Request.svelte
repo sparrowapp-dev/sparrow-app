@@ -65,6 +65,7 @@
    * Role of user in workspace
    */
   export let userRole;
+  export let activeTabType;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -248,14 +249,17 @@
 {/if}
 
 <div
-  draggable={true}
-  on:dragstart={(event) => dragStart(event, collection)}
+  draggable={activeTabType === "TESTFLOW" ? true : false}
+  on:dragstart={(event) => {
+    dragStart(event, collection);
+  }}
   bind:this={requestTabWrapper}
-  class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {api.id ===
+  class="d-flex draggable align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
     : ''} "
-  style="height:32px;"
+  style="height:32px;
+"
 >
   <button
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
@@ -292,7 +296,9 @@
       )} {api?.isDeleted && 'api-method-deleted'}"
       style="font-size: 12px;"
     >
-      {api.request.method?.toUpperCase()==="DELETE" ? "DEL" : api.request.method?.toUpperCase()}
+      {api.request.method?.toUpperCase() === "DELETE"
+        ? "DEL"
+        : api.request.method?.toUpperCase()}
     </div>
 
     {#if isRenaming}
@@ -481,5 +487,9 @@
     .delete-ticker {
       background-color: var(--selected-active-sidebar) !important;
     }
+  }
+
+  .draggable:active {
+    opacity: 0.9;
   }
 </style>

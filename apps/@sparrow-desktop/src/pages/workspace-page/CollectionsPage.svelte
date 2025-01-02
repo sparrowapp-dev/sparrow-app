@@ -76,7 +76,6 @@
   import { open } from "@tauri-apps/plugin-shell";
   import constants from "@app/constants/constants";
 
-
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -460,6 +459,7 @@
           }}
           activeTabPath={$activeTab?.path}
           activeTabId={$activeTab?.id}
+          activeTabType={$activeTab?.type}
           showImportCollectionPopup={() => (isImportCollectionPopup = true)}
           showImportCurlPopup={() => (isImportCurlPopup = true)}
           onItemCreated={_viewModel.handleCreateItem}
