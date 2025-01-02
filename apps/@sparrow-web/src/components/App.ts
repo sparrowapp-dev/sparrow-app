@@ -176,12 +176,12 @@ export async function handleLogin(url: string) {
   });
   // User login successfully
   if (event === "register") {
-    navigate("/app/home");
+    navigate("/app/collections");
     _guideRepository.insert({ isActive: true, id: "environment-guide" });
     _guideRepository.insert({ isActive: true, id: "collection-guide" });
     isUserFirstSignUp.set(true);
   } else {
-    navigate("/app/home");
+    navigate("/app/collections");
 
     _guideRepository.insert({ isActive: false, id: "environment-guide" });
     _guideRepository.insert({ isActive: false, id: "collection-guide" });
