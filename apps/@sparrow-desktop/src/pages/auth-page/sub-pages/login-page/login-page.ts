@@ -64,7 +64,7 @@ export async function handleLoginV2(url: string) {
       _guideRepository.insert({ isActive: false, id: "collection-guide" });
     }
     // _activeSidebarTabViewModel.addActiveTab("collections");
-    await maximizeWindow();
+    // await maximizeWindow();
   } else {
     notifications.error("Invalid token!");
   }
