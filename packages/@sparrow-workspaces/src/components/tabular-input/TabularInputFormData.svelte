@@ -162,6 +162,8 @@
         callback(pairs);
         updateParam(selectedFileIndex);
       }
+      // Reset the input to allow re-uploading the same file
+      target.value = "";
     });
   });
 
