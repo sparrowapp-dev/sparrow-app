@@ -296,7 +296,7 @@
               style="width:100%; height:26px; background-color:var(--bg-primary-300);"
             >
               <button
-                class="mb-1 p-1 d-flex justify-content-center align-items-center"
+                class="p-1 d-flex justify-content-center align-items-center"
                 style="width:100%; height:100%; text-decoration:none; outline:none !important; background-color:transparent; border:none; font-size:12px;"
               >
                 Create an Account or Sign In
