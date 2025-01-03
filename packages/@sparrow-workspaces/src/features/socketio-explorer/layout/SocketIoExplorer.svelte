@@ -207,6 +207,7 @@
                           <ResponsePreviewNavigator
                             webSocket={socketIoStoreData}
                             {onUpdateContentType}
+                            {isWebApp}
                           />
                           <div class="pt-2"></div>
                           <div style="flex:1; overflow:auto;">
@@ -281,9 +282,9 @@
     border-right: 0 !important;
   }
   :global(
-      .rest-splitter .splitpanes__splitter:active,
-      .rest-splitter .splitpanes__splitter:hover
-    ) {
+    .rest-splitter .splitpanes__splitter:active,
+    .rest-splitter .splitpanes__splitter:hover
+  ) {
     background-color: var(--bg-primary-200) !important;
   }
 </style>
