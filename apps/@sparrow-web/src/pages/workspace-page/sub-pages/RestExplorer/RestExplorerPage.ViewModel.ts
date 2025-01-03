@@ -100,6 +100,7 @@ import type { GuideQuery } from "../../../../types/user-guide";
 import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.ws.service";
 import type { Socket } from "socket.io-client";
 import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
+import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 
 class RestExplorerViewModel
   implements
@@ -746,7 +747,10 @@ class RestExplorerViewModel
       this._tab.getValue().property.request,
       environmentVariables.filtered || [],
     );
-    makeHttpRequestV2(...decodeData, signal)
+    const selectedAgent = localStorage.getItem(
+      "selectedAgent",
+    ) as WorkspaceUserAgentBaseEnum;
+    makeHttpRequestV2(...decodeData, selectedAgent, signal)
       .then((response) => {
         if (response.isSuccessful === false) {
           restExplorerDataStore.update((restApiDataMap) => {

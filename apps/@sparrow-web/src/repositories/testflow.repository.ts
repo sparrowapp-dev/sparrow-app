@@ -103,15 +103,52 @@ export class TestflowRepository {
    * @returns A promise that resolves once the testflows are upserted.
    */
   public refreshTestflow = async (
-    data: TFRxDocumentType[],
-    workspaceId: string,
+    _testflows: TFRxDocumentType[],
   ): Promise<void> => {
-    const testflows = data.map((_testflow) => {
-      _testflow["workspaceId"] = workspaceId;
-      return _testflow;
-    });
-    await this.rxdb?.bulkUpsert(testflows);
+    if ((_testflows?.length || 0) > 0) {
+      await this.rxdb?.bulkUpsert(_testflows);
+    }
     return;
+  };
+
+  /**
+   * Deletes orphan testflows that doesn't exists on sparrow backend
+   * @param _workspaceId - workspace id
+   * @param _testflowIds - backend testflow Ids to find local orphan testflows
+   */
+  public deleteOrphanTestflows = async (
+    _workspaceId: string,
+    _testflowIds: string[],
+  ): Promise<string[]> => {
+    // delete left out testflows
+    const testflows = await RxDB.getInstance()
+      ?.rxdb?.testflow.find({
+        selector: {
+          workspaceId: _workspaceId,
+        },
+      })
+      .exec();
+    const testflowsJSON = testflows?.map((_testflow) => {
+      return _testflow.toMutableJSON();
+    });
+    const selectedTestflowsToBeDeleted = testflowsJSON
+      ?.filter((_testflow) => {
+        for (let i = 0; i < _testflowIds.length; i++) {
+          if (_testflowIds[i] === _testflow._id) {
+            return false;
+          }
+        }
+        return true;
+      })
+      .map((_testflow) => {
+        return _testflow._id as string;
+      }) as string[];
+    if ((selectedTestflowsToBeDeleted?.length || 0) > 0) {
+      await RxDB.getInstance()?.rxdb?.testflow?.bulkRemove(
+        selectedTestflowsToBeDeleted as string[],
+      );
+    }
+    return selectedTestflowsToBeDeleted;
   };
 
   /**

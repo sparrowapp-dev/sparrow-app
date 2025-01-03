@@ -31,6 +31,7 @@ import type {
   TFHistoryAPIResponseStoreType,
   TFHistoryStoreType,
   TFKeyValueStoreType,
+  TFNodeStoreType,
   TFNodeType,
 } from "@sparrow/common/types/workspace/testflow";
 import { CompareArray, Debounce, ParseTime } from "@sparrow/common/utils";
@@ -38,6 +39,7 @@ import { notifications } from "@sparrow/library/ui";
 import { DecodeRequest } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
 import { BehaviorSubject, Observable } from "rxjs";
+import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -307,7 +309,7 @@ export class TestflowExplorerPageViewModel {
   /**
    * Handles running the test flow by processing each node sequentially and recording the results
    */
-  public handleSampleTestFlowRun = () => {
+  public handleSampleTestFlowRun = (): TFNodeStoreType => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const adaptedRequest = new InitRequestTab("fewfe", "fewfe");
     adaptedRequest.updateName("Sample API");
@@ -331,6 +333,9 @@ export class TestflowExplorerPageViewModel {
    * Handles running the test flow by processing each node sequentially and recording the results
    */
   public handleTestFlowRun = async () => {
+    const selectedAgent = localStorage.getItem(
+      "selectedAgent",
+    ) as WorkspaceUserAgentBaseEnum;
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const environments = await this.getActiveEnvironments(
       progressiveTab.path.workspaceId,
@@ -410,6 +415,7 @@ export class TestflowExplorerPageViewModel {
               decodeData[2],
               decodeData[3],
               decodeData[4],
+              selectedAgent,
             );
             const end = Date.now();
             const duration = end - start;

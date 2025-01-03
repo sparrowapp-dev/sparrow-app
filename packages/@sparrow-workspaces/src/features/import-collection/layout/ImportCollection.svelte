@@ -29,6 +29,10 @@
   export let onCollectionFileUpload;
   export let onImportCollectionURL;
   export let isWebApp = false;
+  export let onValidateLocalHostUrl;
+  export let onValidateDeployedURL;
+  export let onValidateDeployedURLInput;
+  export let onValidateLocalHostURLInput;
 
   const ProgressTitle = {
     IDENTIFYING_SYNTAX: "Identifying Syntax...",
@@ -82,32 +86,24 @@
         importData.includes("://localhost")
       ) {
         isValidClientURL = true;
-        const response = await _collectionService.validateImportCollectionURL(
-          importData.replace("localhost", "127.0.0.1"),
-        );
-        if (response?.data?.status === ResponseStatusCode.OK) {
+        const response = await onValidateLocalHostUrl(importData);
+        if (
+          response?.data?.status === ResponseStatusCode.OK ||
+          (response?.status === "success" && isWebApp)
+        ) {
           try {
-            const res = await _collectionService.validateImportCollectionInput(
-              "",
-              JSON.parse(response?.data?.response),
-            );
-            if (res.isSuccessful) {
+            const res = await onValidateLocalHostURLInput(response);
+            if (res?.isSuccessful) {
               isValidServerURL = true;
-            } else {
-              notifications.error(res.message);
             }
           } catch (e) {}
         }
       } else {
         isValidClientDeployedURL = true;
-        const response =
-          await _collectionService.validateImportCollectionURL(importData);
+        const response = await onValidateDeployedURL(importData);
         if (response?.data?.status === ResponseStatusCode.OK) {
           try {
-            const res = await _collectionService.validateImportCollectionInput(
-              "",
-              JSON.parse(response?.data?.response),
-            );
+            const res = await onValidateDeployedURLInput(response);
             if (res.isSuccessful) {
               isValidServerDeployedURL = true;
             }
@@ -263,12 +259,12 @@
       isValidClientDeployedURL &&
       isValidServerDeployedURL
     ) {
-      const response =
-        await _collectionService.validateImportCollectionURL(importData);
+      const response = await onValidateDeployedURL(importData);
+
       if (response?.data?.status === ResponseStatusCode.OK) {
         handleImportJsonObject(
           ContentTypeEnum["application/json"],
-          response.data.response,
+          isWebApp ? response?.data?.body : response.data.response,
         );
       }
     } else if (
@@ -278,13 +274,17 @@
       isValidServerURL
     ) {
       const importUrl = importData.replace("localhost", "127.0.0.1");
-
-      const response =
-        await _collectionService.validateImportCollectionURL(importUrl);
-      if (!activeSync && response?.data?.status === ResponseStatusCode.OK) {
+      const response = await onValidateLocalHostUrl(importData);
+      if (
+        !activeSync &&
+        (response?.data?.status === ResponseStatusCode.OK ||
+          response?.status === "success")
+      ) {
         const requestBody = {
           urlData: {
-            data: JSON.parse(response.data.response),
+            data: isWebApp
+              ? response?.data?.data
+              : JSON.parse(response.data.response),
             headers: response.data.headers,
           },
           url: importUrl,
@@ -526,15 +526,9 @@
 <br />
 {#if importType === "text"}
   <div>
-    {#if isWebApp}
-      <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
-        Paste your OAS text
-      </p>
-    {:else}
-      <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
-        Paste your OAS text or Swagger/Localhost Link
-      </p>
-    {/if}
+    <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
+      Paste your OAS text or Swagger/Localhost Link
+    </p>
   </div>
   <div class="textarea-div rounded border-0 position-relative">
     <textarea
@@ -547,9 +541,7 @@
       on:blur={() => {
         isInputDataTouched = true;
       }}
-      placeholder={isWebApp
-        ? "Example - OpenAPI JSON text"
-        : "Example - OpenAPI JSON text or http://localhost:8080/api-docs"}
+      placeholder={"Example - OpenAPI JSON text or http://localhost:8080/api-docs-json"}
       bind:value={importData}
       class="text-area mb-0 border-0 text-fs-12 rounded bg-tertiary-300 pe-4 ps-2 pb-2 pt-2"
       style={!isValidServerDeployedURL &&
@@ -573,9 +565,7 @@
   </div>
   {#if !importData && isInputDataTouched && !isimportDataLoading}
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-      {isWebApp
-        ? "Please paste your OpenAPI specification text."
-        : "Please paste your OpenAPI specification text or Swagger/localhost link."}
+      Please paste your OpenAPI specification text or Swagger/localhost link.
     </p>
   {:else if (!isimportDataLoading && isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched) || (!isimportDataLoading && isValidClientURL && !isValidServerURL && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">

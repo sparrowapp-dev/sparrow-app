@@ -82,6 +82,7 @@
   export let folder: CollectionItemBaseInterface;
   export let activeTabId: string;
   export let searchData: string;
+  export let activeTabType;
   /**
    * Role of user in active workspace
    */
@@ -504,6 +505,7 @@
               {onItemDeleted}
               {onItemRenamed}
               {onItemOpened}
+              {activeTabType}
               {collection}
               {userRoleInWorkspace}
               {activeTabPath}
@@ -556,6 +558,7 @@
           {onItemRenamed}
           {onItemDeleted}
           {onItemOpened}
+          {activeTabType}
           {folder}
           {collection}
           {activeTabId}
