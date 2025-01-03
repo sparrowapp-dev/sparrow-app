@@ -27,7 +27,7 @@ import {
   SocketIORequestStatusTabEnum,
   type EventsValues,
 } from "@sparrow/common/types/workspace/socket-io-request-tab";
-import { Sleep } from "@sparrow/common/utils";
+import { Base64Converter, Sleep } from "@sparrow/common/utils";
 const tabRepository = new TabRepository();
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
@@ -256,7 +256,8 @@ function formatTime(date) {
  *
  */
 const sendMessage = async (tab_id: string, message: string) => {
-  const selectedAgent = localStorage.getItem("selectedAgent");
+  // const selectedAgent = localStorage.getItem("selectedAgent");
+  console.log("message", message);
 
   try {
     let listener;
@@ -265,16 +266,16 @@ const sendMessage = async (tab_id: string, message: string) => {
       if (wsData) {
         listener = wsData.listener;
         // Check for the original agent type from the store, not the currently selected agent
-        if (wsData.agent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT) {
-          wsData.messages.unshift({
-            data: message,
-            transmitter: "sender",
-            timestamp: formatTime(new Date()),
-            uuid: uuidv4(),
-          });
-          listener.send(message);
-          webSocketDataMap.set(tab_id, wsData);
-        }
+        // if (wsData.agent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT) {
+        wsData.messages.unshift({
+          data: message,
+          transmitter: "sender",
+          timestamp: formatTime(new Date()),
+          uuid: uuidv4(),
+        });
+        listener.send(message);
+        webSocketDataMap.set(tab_id, wsData);
+        // }
       }
       return webSocketDataMap;
     });
@@ -306,9 +307,9 @@ const disconnectWebSocket = async (tab_id: string) => {
 
     if (wsData) {
       const socketInsta = wsData.listener;
-      if (wsData.agent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT) {
-        socketInsta.close();
-      }
+      // if (wsData.agent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT) {
+      socketInsta.close();
+      // }
     }
     return webSocketDataMap;
   });
@@ -354,111 +355,111 @@ const connectWebSocket = async (
   const selectedAgent = localStorage.getItem(
     "selectedAgent",
   ) as WorkspaceUserAgentBaseEnum;
+  // if (selectedAgent === "Browser Agent") {
 
-  if (selectedAgent === "Browser Agent") {
-    try {
-      // Parse the headers string to array of header objects
-      const headers = JSON.parse(requestHeaders);
+  try {
+    // Parse the headers string to array of header objects
+    const headers = JSON.parse(requestHeaders);
 
-      // Initialize WebSocket store
-      webSocketDataStore.update((webSocketDataMap) => {
-        webSocketDataMap.set(tabId, {
-          messages: [],
-          status: "connecting",
-          agent: selectedAgent,
-          search: "",
-          contentType: RequestDataTypeEnum.TEXT,
-          body: "",
-          filter: "All Messages",
-          url: url,
+    // Initialize WebSocket store
+    webSocketDataStore.update((webSocketDataMap) => {
+      webSocketDataMap.set(tabId, {
+        messages: [],
+        status: "connecting",
+        agent: selectedAgent,
+        search: "",
+        contentType: RequestDataTypeEnum.TEXT,
+        body: "",
+        filter: "All Messages",
+        url: url,
+      });
+      return webSocketDataMap;
+    });
+
+    const ws = new WebSocket(url);
+    // Update store with WebSocket instance
+    webSocketDataStore.update((webSocketDataMap) => {
+      const wsData = webSocketDataMap.get(tabId);
+      if (wsData) {
+        wsData.listener = ws;
+        webSocketDataMap.set(tabId, wsData);
+      }
+      return webSocketDataMap;
+    });
+
+    return new Promise((resolve, reject) => {
+      ws.onopen = () => {
+        webSocketDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tabId);
+          if (wsData) {
+            wsData.messages.unshift({
+              data: `Connected to ${url}`,
+              transmitter: "connecter",
+              timestamp: formatTime(new Date()),
+              uuid: uuidv4(),
+            });
+            wsData.status = "connected";
+
+            webSocketDataMap.set(tabId, wsData);
+          }
+          return webSocketDataMap;
         });
-        return webSocketDataMap;
-      });
+        notifications.success("WebSocket connected successfully");
+        resolve();
+      };
 
-      const ws = new WebSocket(url);
-      // Update store with WebSocket instance
-      webSocketDataStore.update((webSocketDataMap) => {
-        const wsData = webSocketDataMap.get(tabId);
-        if (wsData) {
-          wsData.listener = ws;
-          webSocketDataMap.set(tabId, wsData);
-        }
-        return webSocketDataMap;
-      });
+      ws.onmessage = (event) => {
+        webSocketDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tabId);
+          if (wsData) {
+            wsData.messages.unshift({
+              data: event.data,
+              transmitter: "receiver",
+              timestamp: formatTime(new Date()),
+              uuid: uuidv4(),
+            });
+            webSocketDataMap.set(tabId, wsData);
+          }
+          return webSocketDataMap;
+        });
+      };
 
-      return new Promise((resolve, reject) => {
-        ws.onopen = () => {
-          webSocketDataStore.update((webSocketDataMap) => {
-            const wsData = webSocketDataMap.get(tabId);
-            if (wsData) {
-              wsData.messages.unshift({
-                data: `Connected to ${url}`,
-                transmitter: "connecter",
-                timestamp: formatTime(new Date()),
-                uuid: uuidv4(),
-              });
-              wsData.status = "connected";
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+        webSocketDataStore.update((webSocketDataMap) => {
+          webSocketDataMap.delete(tabId);
+          return webSocketDataMap;
+        });
+      };
 
-              webSocketDataMap.set(tabId, wsData);
-            }
-            return webSocketDataMap;
-          });
-          notifications.success("WebSocket connected successfully");
-          resolve();
-        };
-
-        ws.onmessage = (event) => {
-          webSocketDataStore.update((webSocketDataMap) => {
-            const wsData = webSocketDataMap.get(tabId);
-            if (wsData) {
-              wsData.messages.unshift({
-                data: event.data,
-                transmitter: "receiver",
-                timestamp: formatTime(new Date()),
-                uuid: uuidv4(),
-              });
-              webSocketDataMap.set(tabId, wsData);
-            }
-            return webSocketDataMap;
-          });
-        };
-
-        ws.onerror = (error) => {
-          console.error("WebSocket error:", error);
-          webSocketDataStore.update((webSocketDataMap) => {
-            webSocketDataMap.delete(tabId);
-            return webSocketDataMap;
-          });
-        };
-
-        ws.onclose = () => {
-          webSocketDataStore.update((webSocketDataMap) => {
-            const wsData = webSocketDataMap.get(tabId);
-            if (wsData) {
-              wsData.messages.unshift({
-                data: `Disconnected from ${url}`,
-                transmitter: "disconnector",
-                timestamp: formatTime(new Date()),
-                uuid: uuidv4(),
-              });
-              wsData.status = "disconnected";
-              webSocketDataMap.set(tabId, wsData);
-            }
-            return webSocketDataMap;
-          });
-        };
-      });
-    } catch (error) {
-      console.error("WebSocket connection error:", error);
-      webSocketDataStore.update((webSocketDataMap) => {
-        webSocketDataMap.delete(tabId);
-        return webSocketDataMap;
-      });
-      notifications.error("Failed to connect WebSocket");
-      throw error;
-    }
-  } else if (selectedAgent === "Cloud Agent") {
+      ws.onclose = () => {
+        webSocketDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tabId);
+          if (wsData) {
+            wsData.messages.unshift({
+              data: `Disconnected from ${url}`,
+              transmitter: "disconnector",
+              timestamp: formatTime(new Date()),
+              uuid: uuidv4(),
+            });
+            wsData.status = "disconnected";
+            webSocketDataMap.set(tabId, wsData);
+          }
+          return webSocketDataMap;
+        });
+      };
+    });
+  } catch (error) {
+    console.error("WebSocket connection error:", error);
+    webSocketDataStore.update((webSocketDataMap) => {
+      webSocketDataMap.delete(tabId);
+      return webSocketDataMap;
+    });
+    notifications.error("Failed to connect WebSocket");
+    throw error;
   }
+  // } else if (selectedAgent === "Cloud Agent") {
+  // }
 };
 
 /**
@@ -477,10 +478,10 @@ const makeHttpRequestV2 = async (
   headers: string,
   body: string,
   contentType: string,
+  selectedAgent: WorkspaceUserAgentBaseEnum,
   signal?: AbortSignal,
 ) => {
   const startTime = performance.now();
-  const selectedAgent = localStorage.getItem("selectedAgent");
   try {
     let response;
     if (selectedAgent === "Cloud Agent") {
@@ -496,25 +497,39 @@ const makeHttpRequestV2 = async (
         try {
           jsonHeader = JSON.parse(headers);
         } catch (error) {
-          jsonHeader = {};
+          jsonHeader = [];
         }
-        const headersObject = jsonHeader.reduce((acc, header) => {
-          if (header.checked !== false) {
-            // Include only headers that are checked or do not have a `checked` property
+        const headersObject = jsonHeader.reduce(
+          (
+            acc: Record<string, string>,
+            header: { key: string; value: string },
+          ) => {
             acc[header.key] = header.value;
-          }
-          return acc;
-        }, {});
+            return acc;
+          },
+          {},
+        );
         let requestData = body || {};
 
         if (contentType === "multipart/form-data") {
           const formData = new FormData();
           const parsedBody = JSON.parse(body);
-          (parsedBody || []).forEach((field) => {
-            if (field.checked !== false) {
+          for (const field of parsedBody || []) {
+            try {
+              if (field?.base) {
+                const file = await new Base64Converter().base64ToFile(
+                  field.base,
+                  field.value,
+                );
+                formData.append(field.key, file);
+              } else {
+                formData.append(field.key, field.value);
+              }
+            } catch (e) {
+              console.error(e);
               formData.append(field.key, field.value);
             }
-          });
+          }
           requestData = formData;
 
           // Remove Content-Type header to let Axios set it automatically with boundary
@@ -522,11 +537,11 @@ const makeHttpRequestV2 = async (
         } else if (contentType === "application/x-www-form-urlencoded") {
           const urlSearchParams = new URLSearchParams();
           const parsedBody = JSON.parse(body);
-          (parsedBody || []).forEach((field) => {
-            if (field.checked !== false) {
+          (parsedBody || []).forEach(
+            (field: { key: string; value: string }) => {
               urlSearchParams.append(field.key, field.value);
-            }
-          });
+            },
+          );
           requestData = urlSearchParams;
         } else if (
           contentType === "application/json" ||
@@ -546,14 +561,11 @@ const makeHttpRequestV2 = async (
           },
         });
         response = {
-          ...axiosResponse,
           data: {
             status: `${axiosResponse.status} ${axiosResponse.statusText}`,
             data: axiosResponse.data,
             headers: Object.fromEntries(Object.entries(axiosResponse.headers)),
           },
-          status: 200,
-          statusText: "OK",
         };
       } catch (axiosError: any) {
         const error = axiosError;
@@ -565,10 +577,6 @@ const makeHttpRequestV2 = async (
               ? Object.fromEntries(Object.entries(error.response.headers))
               : {},
           },
-          status: 200,
-          statusText: "OK",
-          headers: error.response?.headers || {},
-          config: error.config,
         };
       }
     }

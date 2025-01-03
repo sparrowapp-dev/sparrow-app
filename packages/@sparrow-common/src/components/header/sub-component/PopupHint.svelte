@@ -22,13 +22,16 @@
 {#if showMessage}
   <div class="tooltip-dropdown-div"></div>
   <div>
-    <div class="tooltip-dropdown-data">
+    <div class="tooltip-dropdown-data px-2 d-flex align-items-center">
       <p style="margin-bottom:0px">
         You are using Sparrow <span style="color:var(--text-primary-300)"
           >Edge</span
         >, Sign in to enjoy all features!
       </p>
-      <div class="CrossIcon-container" on:click={hideMessage}>
+      <div
+        class="CrossIcon-container d-flex align-items-center justify-content-center"
+        on:click={hideMessage}
+      >
         <CrossIconRounded height="12px" width="12px" />
       </div>
     </div>
@@ -60,18 +63,18 @@
   .tooltip-dropdown-data {
     font-weight: 400;
     z-index: 1;
-
     gap: 6px;
     top: 40px;
     border-radius: 3px;
-    right: 245px;
+    left: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     position: absolute;
     height: 25px;
-    width: 335px;
+    width: auto;
     font-size: 12px;
     background-color: var(--bg-tertiary-400);
+    transform: translateX(-47%);
   }
 </style>

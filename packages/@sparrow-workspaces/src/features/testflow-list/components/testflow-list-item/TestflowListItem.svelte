@@ -240,7 +240,7 @@
       </button>
       {#if isRenaming}
         <input
-          class="py-0  renameInputFieldCollection text-fs-12 w-100"
+          class="py-0 renameInputFieldCollection text-fs-12 w-100"
           id="renameInputFieldTestflow"
           type="text"
           value={flow.name}
@@ -268,7 +268,7 @@
       <Tooltip placement="bottom" title="More" distance={17} show={!showMenu}>
         <button
           id={`show-more-testflow-${flow?._id}`}
-          class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+          class="threedot-icon-container p-0 border-0 rounded d-flex justify-content-center align-items-center {showMenu
             ? 'threedot-active'
             : ''}"
           style="transform: rotate(90deg);"

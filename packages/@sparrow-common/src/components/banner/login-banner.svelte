@@ -120,6 +120,7 @@
     align-items: center;
     gap: 8px;
     margin-left: 24px;
+    z-index: 0;
   }
   .txt-dark {
     font-weight: 500;

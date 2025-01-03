@@ -104,7 +104,7 @@
       id: "Cloud Agent",
       displayName: "Cloud Agent",
       description:
-        "Send an HTTP request through Sparrow's secure cloud server.",
+        "Send a request through Sparrow's secure cloud server. Not supported for Websockets.",
     },
     {
       name: "Browser Agent",
@@ -274,6 +274,7 @@
           menuItem={"v2"}
           headerFontSize={"12px"}
           maxHeaderWidth={"215px"}
+          headerFontWeight={700}
           zIndex={200}
           bodyTheme={"violet"}
           borderRounded={"2px"}
@@ -295,8 +296,8 @@
               style="width:100%; height:26px; background-color:var(--bg-primary-300);"
             >
               <button
-                class="mb-1"
-                style="width:100%; height:100%; text-decoration:none; outline:none !important; background-color:transparent;  border:none; font-size:12px;"
+                class="p-1 d-flex justify-content-center align-items-center"
+                style="width:100%; height:100%; text-decoration:none; outline:none !important; background-color:transparent; border:none; font-size:12px;"
               >
                 Create an Account or Sign In
               </button>
@@ -379,7 +380,7 @@
         data={multipleAgentData}
         titleId={`${multipleAgentvar}`}
         onclick={handleAgentDropdown}
-        minHeaderWidth={"232px"}
+        minHeaderWidth={"252px"}
         iconRequired={true}
         icon={CheckCircle}
         iconColor={"#69D696"}
@@ -396,7 +397,8 @@
         borderRounded={"2px"}
         position={"absolute"}
         isHeaderCombined={false}
-        maxBodyHeight={"300px"}
+        maxBodyHeight={"279px"}
+        minBodyWidth={"240px"}
       >
         <div slot="pre-select" class="pre-dropdown">
           <div
@@ -413,14 +415,13 @@
           <div class="lower-underline"></div>
           <div class="download-area w-100">
             <div
-              class="download-sparrow-button dowload-section d-flex justify-content-between"
+              class="download-sparrow-button dowload-section d-flex flex-column justify-content-between"
             >
-              <p class="download-text">
-                Download Sparrow Desktop <span class="description text-fs-10">
-                  Effortlessly test requests with the desktop app. No agents
-                  required.
-                </span>
-              </p>
+              <p class="download-text mb-1">Download Sparrow Desktop</p>
+              <span class="description text-fs-10">
+                Effortlessly test requests with the desktop app. No agents
+                required.
+              </span>
             </div>
             <div class="d-flex align-items-center">
               <SparrowIcon

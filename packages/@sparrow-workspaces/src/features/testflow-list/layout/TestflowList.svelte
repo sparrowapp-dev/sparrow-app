@@ -167,7 +167,7 @@
         style="height: 24px; width:24px;"
         class="{loggedUserRoleInWorkspace === WorkspaceRole.WORKSPACE_VIEWER
           ? 'd-none'
-          : ''} add-icon-container border-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
+          : ''} add-icon-container border-0 rounded-1 d-flex p-0 justify-content-center align-items-center {isHovered
           ? 'testflow-active'
           : 'testflow-inactive'}"
         on:click|stopPropagation={handleCreateTestflow}
@@ -295,7 +295,7 @@
 
   .testflow-active:hover {
     visibility: visible;
-    background-color: var( --bg-secondary-420);
+    background-color: var(--bg-secondary-420);
   }
   .testflow-active:active {
     visibility: visible;

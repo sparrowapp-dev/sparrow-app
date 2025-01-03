@@ -67,7 +67,7 @@
               style="font-weight: 700;"
               class="ellipsis ms-1 sparrow-fs-12 text-left teams-title overflow-hidden my-auto"
             >
-              {team.name}
+              {team.name || ""}
             </p>
           </div>
           {#if team.isNewInvite}
