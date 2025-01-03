@@ -293,7 +293,7 @@
             <div
               on:click={onLoginUser}
               class="btn d-flex justify-content-center align-items-center"
-              style="width:100%; height:30px; background-color:var(--bg-primary-300);"
+              style="width:100%; height:26px; background-color:var(--bg-primary-300);"
             >
               <button
                 class="d-flex justify-content-center align-items-center"
