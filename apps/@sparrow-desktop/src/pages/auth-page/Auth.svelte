@@ -4,9 +4,8 @@
   import {
     logoSparrowSquare,
     SparrowBackgroundV2,
-    sparrowLogoBackground,
   } from "@sparrow/common/images";
-  import { DefaultHeader, Redirect } from "@sparrow/common/components";
+  import { DefaultHeader } from "@sparrow/common/components";
   import constants from "@app/constants/constants";
   import {
     AISparkle,
@@ -35,7 +34,9 @@
   import { handleLoginV2 } from "./sub-pages/login-page/login-page";
   let isEntry = false;
   let isHover = false;
-  let externalSparrowLink = `${constants.SPARROW_AUTH_URL}`;
+  let externalSparrowLink =
+    `${constants.SPARROW_AUTH_URL}` + "/init?source=desktop";
+  let externalHelpLink = `${constants.SPARROW_AUTH_URL}` + "/support";
   const externalSparrowGithub = constants.SPARROW_GITHUB;
   const _viewModel = new AuthViewModel();
   const openDefaultBrowser = async () => {
@@ -291,7 +292,7 @@
     {:else}
       <a
         on:click={async () => {
-          await open(externalSparrowLink + "/support");
+          await open(externalHelpLink);
         }}
         role="button"
         class="link-button px-2 sparrow-fs-12">Need Help?</a
@@ -300,7 +301,7 @@
       <a
         role="button"
         on:click={async () => {
-          await open(externalSparrowLink + "/support");
+          await open(externalHelpLink);
         }}
         class="px-2 link-button sparrow-fs-12">Report Issue</a
       >

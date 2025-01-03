@@ -16,6 +16,7 @@
   export let userRoleInWorkspace: WorkspaceRole;
   export let collection: CollectionDocument;
   export let searchData = "";
+  export let activeTabType;
   /**
    * Role of user in active workspace
    */
@@ -585,6 +586,7 @@
             {userRoleInWorkspace}
             {activeTabPath}
             {explorer}
+            {activeTabType}
             {activeTabId}
             {searchData}
             {isWebApp}

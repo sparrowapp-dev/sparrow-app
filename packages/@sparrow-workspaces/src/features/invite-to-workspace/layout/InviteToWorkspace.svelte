@@ -120,7 +120,7 @@
     isError={showErrors && emailstoBeSentArr.length === 0}
   />
   {#if showErrors && emailstoBeSentArr.length === 0}
-    <p class="error-text mb-0 sparrow-fs-12">Email ID cannot be Empty.</p>
+    <p class="error-text mb-0 sparrow-fs-12">Email ID cannot be empty.</p>
   {/if}
 </div>
 <div class="mt-4">
@@ -160,7 +160,7 @@
     isError={showErrors && selectedRole === defaultRole}
   />
   {#if showErrors && selectedRole === defaultRole}
-    <p class="error-text sparrow-fs-12">Role Cannot Be Empty</p>
+    <p class="error-text sparrow-fs-12">Role cannot be empty.</p>
   {/if}
 </div>
 <div class="text-secondary-200 mt-2 sparrow-fs-12">

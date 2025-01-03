@@ -16,6 +16,7 @@ export { OSDetector } from "./OSDetector";
 export { throttle } from "./throttle";
 export { copyToClipBoard } from "./copyToClipboard";
 export { Sleep } from "./sleep";
+export { Base64Converter } from "./base64Converter";
 export * from "./auth.helper";
 export * from "./common.helper";
 export * from "./conversion.helper";

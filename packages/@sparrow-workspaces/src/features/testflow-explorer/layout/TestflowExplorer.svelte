@@ -27,8 +27,8 @@
   import {
     RequestSectionEnum,
     type CollectionDto,
-    type Tab,
   } from "@sparrow/common/types/workspace";
+  import { type Tab } from "@sparrow/common/types/workspace/tab";
 
   import "@xyflow/svelte/dist/style.css";
   import { onDestroy, onMount } from "svelte";
@@ -50,6 +50,7 @@
     TFDataStoreType,
     TFEdgeHandlerType,
     TFEdgeType,
+    TFNodeHandlerType,
     TFNodeStoreType,
     TFNodeType,
     TFResponseStateType,
@@ -79,7 +80,7 @@
   export let onRedrectRequest;
   export let onUpdateTestFlowName;
   export let onSaveTestflow;
-
+  export let isWebApp;
   export let deleteNodeResponse;
 
   // Writable stores for nodes and edges
@@ -207,14 +208,23 @@
   // Filter collections based on the current tab's workspace ID
   const collectionsSubscriber = collectionList.subscribe((value) => {
     if (value) {
-      collectionListDocument = value;
-      collectionListDocument = collectionListDocument?.filter(
+      collectionListDocument = value?.filter(
         (value) => value.workspaceId === $tab?.path?.workspaceId,
       );
       filteredCollections.set(
         collectionListDocument as unknown as CollectionDto[],
       );
       syncNodesWithCollectionList();
+    }
+  });
+
+  let limitNodesChange = 0;
+  nodes.subscribe((nodes) => {
+    if (nodes?.length > 0) {
+      if (!limitNodesChange) {
+        syncNodesWithCollectionList();
+        limitNodesChange = limitNodesChange + 1;
+      }
     }
   });
 
@@ -232,7 +242,9 @@
     if (id === "1") return;
     isDeleteNodeModalOpen = true;
     deletedNodeId = id;
-    let filteredNodes = $nodes.filter((node) => node.id === id);
+    let filteredNodes = $nodes.filter(
+      (node) => node.id === id,
+    ) as unknown as TFNodeHandlerType[];
     deleteNodeName = filteredNodes[0]?.data?.name;
     countNextDeletedNode(id);
   };
@@ -246,9 +258,8 @@
 
     // handles run from from start button click
     if (_id === "0") {
-      unselectNodes();
       await onClickRun();
-      selectedNodeId = "2";
+      selectFirstNode();
       MixpanelEvent(Events.Run_TestFlows);
       return;
     }
@@ -340,31 +351,6 @@
       const dbNodes = $tab?.property?.testflow?.nodes as TFNodeType[];
       let res = [];
       for (let i = 0; i < dbNodes.length; i++) {
-        let request;
-        if (collectionListDocument) {
-          const collection = collectionListDocument.find(
-            (col) => col.id === dbNodes[i].data.collectionId,
-          );
-          if (collection) {
-            if (
-              dbNodes[i].data.folderId &&
-              dbNodes[i].data.folderId?.length > 0
-            ) {
-              const folder = collection?.items?.find(
-                (fol) => fol.id === dbNodes[i].data.folderId,
-              );
-              if (folder) {
-                request = folder.items.find(
-                  (req) => req.id === dbNodes[i].data.requestId,
-                );
-              }
-            } else {
-              request = collection?.items?.find(
-                (req) => req.id === dbNodes[i].data.requestId,
-              );
-            }
-          }
-        }
         res.push({
           id: dbNodes[i].id,
           type: dbNodes[i].type,
@@ -397,8 +383,8 @@
             onOpenDeleteModal: function (id: string) {
               handleDeleteModal(id);
             },
-            name: request?.name ?? dbNodes[i].data?.name,
-            method: request?.request?.method ?? dbNodes[i].data?.method,
+            name: dbNodes[i].data?.name,
+            method: dbNodes[i].data?.method,
             collectionId: dbNodes[i].data?.collectionId,
             requestId: dbNodes[i].data?.requestId,
             folderId: dbNodes[i].data?.folderId,
@@ -466,8 +452,8 @@
   } as unknown as NodeTypes;
   let nodesValue = 1;
 
-  let selectedNodeName: string = "";
-  let selectedNodeId = "1";
+  let selectedNodeName = "";
+  let selectedNodeId = "";
 
   // Subscribe to changes in the nodes
   const nodesSubscriber = nodes.subscribe((val: Node[]) => {
@@ -479,6 +465,8 @@
     if (node) {
       selectedNodeName = node?.data?.name as string;
       selectedNodeId = node.id;
+    } else {
+      (selectedNodeName = ""), (selectedNodeId = "");
     }
   });
 
@@ -604,8 +592,22 @@
       });
       return _nodes;
     });
-    selectedNodeId = "1";
-    selectedNode = undefined;
+  };
+
+  /**
+   * Select all the existing nodes
+   */
+  const selectFirstNode = () => {
+    nodes.update((_nodes: Node[] | any[]) => {
+      _nodes.forEach((_nodeItem, index) => {
+        if (index === 1) {
+          _nodeItem.selected = true;
+        } else {
+          _nodeItem.selected = false;
+        }
+      });
+      return _nodes;
+    });
   };
 
   let divElement: HTMLElement;
@@ -629,7 +631,7 @@
         },
       }));
     });
-  }, 200);
+  }, 300);
 
   /**
    * Handles the drag end event with a debounce of 1000 milliseconds
@@ -645,7 +647,7 @@
         },
       })),
     );
-  }, 200);
+  }, 300);
 
   /**
    * Cleanup function to be called when the component is destroyed.
@@ -658,7 +660,7 @@
     edgesSubscriber();
   });
 
-  let sampleApiData;
+  let sampleApiData: TFNodeStoreType;
   onMount(() => {
     setTimeout(() => {
       sampleApiData = onRunSampleApi();
@@ -668,8 +670,20 @@
 
 <div
   class="h-100 d-flex flex-column position-relative"
-  on:dragenter={handleDragEnter}
-  on:drop={handleDragEnd}
+  on:dragenter={(e) => {
+    // Listens item enter.
+    e.preventDefault();
+    handleDragEnter();
+  }}
+  on:drop={(e) => {
+    // listens item drop.
+    e.preventDefault();
+    handleDragEnd();
+  }}
+  on:dragover={(e) => {
+    // Necessary to enable dropping.
+    e.preventDefault();
+  }}
 >
   <div class="p-3" style="position:absolute; z-index:3; top:0;">
     <!-- INSERT NAME COMPONENT HERE -->
@@ -703,7 +717,7 @@
             onClick={async () => {
               unselectNodes();
               await onClickRun();
-              selectedNodeId = "2";
+              selectFirstNode();
               MixpanelEvent(Events.Run_TestFlows);
             }}
           />
@@ -769,7 +783,7 @@
           tipPosition="top-left"
           onNext={() => {
             currentStep.set(4);
-            createNewNode("1", "undefined");
+            createNewNode("1");
           }}
           onClose={() => {
             isTestFlowTourGuideOpen.set(false);
@@ -871,6 +885,7 @@
                                 apiState={responseState}
                                 {onUpdateRequestState}
                                 onClearResponse={() => {}}
+                                {isWebApp}
                               />
                             {/if}
                             <div style="flex:1; overflow:auto;">
@@ -1010,6 +1025,7 @@
                                 apiState={responseState}
                                 {onUpdateRequestState}
                                 onClearResponse={() => {}}
+                                {isWebApp}
                               />
                             {/if}
                             <div style="flex:1; overflow:auto;">
@@ -1113,7 +1129,7 @@
   width={"540px"}
   zIndex={1000}
   isOpen={isDeleteNodeModalOpen}
-  handleModalState={(flag) => {
+  handleModalState={(flag = false) => {
     isDeleteNodeModalOpen = flag;
   }}
 >

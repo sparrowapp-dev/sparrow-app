@@ -32,6 +32,7 @@
   } from "@sparrow/workspaces/features";
   import { WithModal } from "@sparrow/workspaces/hoc";
   import { notifications } from "@sparrow/library/ui";
+  import { DownloadApp } from "@sparrow/common/features";
 
   // ---- Interface, enum & constants
   import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
@@ -72,6 +73,7 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import constants from "src/constants/constants";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -106,6 +108,7 @@
 
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
+  const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   environments.subscribe((value) => {
     if (value) {
@@ -118,6 +121,10 @@
       currentWOrkspaceValue = value;
     }
   });
+
+  const navigateToGithub = async () => {
+    await open(externalSparrowGithub);
+  };
 
   const mapEnvironmentToWorkspace = (_env, _workspaceId) => {
     if (_env && _workspaceId) {
@@ -224,15 +231,14 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
           }
+        } else if (removeTab.type === TabTypeEnum.TESTFLOW) {
+          const res = await _viewModel3.saveTestflow(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
         }
-        // else if (removeTab.type === TabTypeEnum.TESTFLOW) {
-        //   const res = await _viewModel3.saveTestflow(removeTab);
-        //   if (res) {
-        //     loader = false;
-        //     _viewModel.handleRemoveTab(id);
-        //     isPopupClosed = false;
-        //   }
-        // }
         loader = false;
       }
     } else if (
@@ -335,14 +341,12 @@
         Promise.all([
           _viewModel.fetchCollections(value?._id),
           _viewModel2.refreshEnvironment(value?._id),
-          // _viewModel3.refreshTestflow(value?._id),
-          ,
-          ,
+          _viewModel3.refreshTestflow(value?._id),
         ]).then(
           ([
             fetchCollectionsResult,
             refreshEnvironmentResult,
-            // refreshTestflowResult,
+            refreshTestflowResult,
             ,
           ]) => {
             // Handle the results of each API call here
@@ -351,12 +355,12 @@
               fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
             const environmentTabsToBeDeleted =
               refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
-            // const testflowTabsToBeDeleted =
-            //   refreshTestflowResult?.testflowTabsToBeDeleted || [];
+            const testflowTabsToBeDeleted =
+              refreshTestflowResult?.testflowTabsToBeDeleted || [];
             const totalTabsToBeDeleted: string[] = [
               ...collectionTabsToBeDeleted,
               ...environmentTabsToBeDeleted,
-              // ...testflowTabsToBeDeleted,
+              ...testflowTabsToBeDeleted,
             ];
             _viewModel.deleteTabsWithTabIdInAWorkspace(
               value?._id,
@@ -419,6 +423,34 @@
   onDestroy(() => {
     cw.unsubscribe();
   });
+
+  let isLaunchAppModalOpen = false;
+
+  const launchSparrowWebApp = () => {
+    let appDetected = false;
+
+    // Handle when window loses focus (app opens)
+    const handleBlur = () => {
+      appDetected = true;
+      window.removeEventListener("blur", handleBlur);
+      clearTimeout(detectAppTimeout);
+    };
+
+    window.addEventListener("blur", handleBlur);
+
+    // Try to open the app
+    _viewModel.setupRedirect();
+
+    // Check if app opened after a short delay
+    const detectAppTimeout = setTimeout(() => {
+      window.removeEventListener("blur", handleBlur);
+
+      // Only show popup if app wasn't detected
+      if (!appDetected) {
+        isLaunchAppModalOpen = true;
+      }
+    }, 500);
+  };
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -441,7 +473,9 @@
           bind:userRole
           {collectionList}
           {currentWorkspace}
+          {navigateToGithub}
           {isAppVersionVisible}
+          {launchSparrowWebApp}
           {isGuestUser}
           leftPanelController={{
             leftPanelCollapse: $leftPanelCollapse,
@@ -453,6 +487,7 @@
           }}
           activeTabPath={$activeTab?.path}
           activeTabId={$activeTab?.id}
+          activeTabType={$activeTab?.type}
           showImportCollectionPopup={() => (isImportCollectionPopup = true)}
           showImportCurlPopup={() => (isImportCurlPopup = true)}
           onItemCreated={_viewModel.handleCreateItem}
@@ -542,12 +577,12 @@
                       <WebSocketExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                  <!-- {:else if $activeTab?.type === ItemType.TESTFLOW}
+                {:else if $activeTab?.type === ItemType.TESTFLOW}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <TestFlowExplorerPage tab={$activeTab} />
                     </div>
-                  </Motion> -->
+                  </Motion>
                 {:else if $activeTab?.type === ItemType.SOCKET_IO}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
@@ -567,8 +602,8 @@
                         {currentWorkspace}
                         {handleCreateEnvironment}
                         onCreateTestflow={() => {
-                          // _viewModel3.handleCreateTestflow();
-                          // isExpandTestflow = true;
+                          _viewModel3.handleCreateTestflow();
+                          isExpandTestflow = true;
                         }}
                         bind:isExpandCollection
                         showImportCollectionPopup={() =>
@@ -731,6 +766,10 @@
       }
       return response;
     }}
+    onValidateLocalHostUrl={_viewModel.validateLocalHostURL}
+    onValidateDeployedURL={_viewModel.validateDeployedURL}
+    onValidateDeployedURLInput={_viewModel.validateDeployedURLInput}
+    onValidateLocalHostURLInput={_viewModel.validateLocalHostURLInput}
     isWebApp={true}
   />
 </Modal>
@@ -861,6 +900,20 @@
     onRenameCollection={_viewModel.handleSaveAsRenameCollection}
     onRenameFolder={_viewModel.handleSaveAsRenameFolder}
   />
+</Modal>
+
+<!-- Download the Desktop app -->
+<Modal
+  title=""
+  type="dark"
+  width="45%"
+  zIndex={1000}
+  isOpen={isLaunchAppModalOpen}
+  handleModalState={() => {
+    isLaunchAppModalOpen = false;
+  }}
+>
+  <DownloadApp />
 </Modal>
 
 <style>

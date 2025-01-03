@@ -1,9 +1,6 @@
 <script lang="ts">
   import { Tooltip } from "@sparrow/library/ui";
-  import {
-    DoubleArrowIcon,
-    GithubIcon,
-  } from "@sparrow/library/icons";
+  import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
   import { PlusIcon as plus } from "@sparrow/library/assets";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import type { TabDocument, TeamDocument } from "@app/database/database";
@@ -173,7 +170,6 @@
         </section>
       {/if}
     </div>
-
 
     <!-- github repo section -->
     <section>
