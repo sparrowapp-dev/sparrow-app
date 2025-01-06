@@ -24,6 +24,8 @@
   import { Modal, Tooltip, Dropdown } from "@sparrow/library/ui";
   import { pagesMotion } from "../../constants";
   import { version } from "../../../package.json";
+  import { CreateTeam } from "@sparrow/common/features";
+  import { LaunchDesktop } from "@sparrow/common/components";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
@@ -44,12 +46,7 @@
   import { isUserFirstSignUp } from "src/store/user.store";
   import { user } from "src/store/auth.store";
   import { WithButton } from "@sparrow/workspaces/hoc";
-  import {
-    DoubleArrowIcon,
-    GithubIcon,
-    MacIcon,
-    WindowsIcon,
-  } from "@sparrow/library/icons";
+  import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
   import { ListTeamNavigation } from "@sparrow/teams/features";
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import constants from "../../constants/constants";
@@ -108,7 +105,7 @@
   });
   let isGithubStarHover = false;
 
-  let activeIndex;
+  let activeIndex = "";
 
   $: {
     if ($openTeam) {
@@ -117,27 +114,8 @@
   }
 
   let isExpandLoginButton = false;
-  let isHovered = false;
-  const handleMouseOver = () => {
-    isHovered = true;
-  };
-  const handleMouseOut = () => {
-    isHovered = false;
-  };
-  let windowOs = true;
-  function getOS() {
-    let userAgent = window.navigator.userAgent;
-    if (userAgent.indexOf("Mac") != -1) {
-      windowOs = true;
-    } else if (userAgent.indexOf("Windows") != -1) {
-      windowOs = false;
-    }
-  }
-  onMount(() => {
-    getOS();
-  });
 
-  function launchSparrowWebApp() {
+  const launchSparrowWebApp = () => {
     let appDetected = false;
 
     // Handle when window loses focus (app opens)
@@ -161,7 +139,7 @@
         isPopupOpen = true;
       }
     }, 500);
-  }
+  };
 
   let openTeamData: TeamDocType;
   openTeam.subscribe((_team) => {
@@ -309,32 +287,7 @@
               </div>
             </section>
             <!-- Launch sparrow desktop -->
-            <section class="px-3 pb-3">
-              <button
-                id="isExpandLoginButton"
-                class="d-flex align-items-center rounded-1 me-0 mb-0 p-2"
-                style="border:none; cursor:pointer; justify-content:center; height:32px; background-color:var(  --bg-primary-300) ; width:100%; "
-                on:mouseover={handleMouseOver}
-                on:mouseout={handleMouseOut}
-                on:click={launchSparrowWebApp}
-              >
-                <div class="d-flex align-items-center justify-content-center">
-                  {#if windowOs}
-                    <MacIcon height={"12px"} width={"12px"} color={"white"} />
-                  {:else}
-                    <WindowsIcon
-                      height={"12px"}
-                      width={"12px"}
-                      color={"white"}
-                    />
-                  {/if}
-
-                  <p class="ms-2 mb-0 text-fs-12" style="font-weight: 500;">
-                    Launch Sparrow App
-                  </p>
-                </div>
-              </button>
-            </section>
+            <LaunchDesktop {launchSparrowWebApp} />
           </div>
         {/if}
       </Pane>
@@ -380,6 +333,24 @@
   <WelcomePopUpWeb />
 </Modal>
 
+<Modal
+  title={"New Team"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isCreateTeamModalOpen}
+  handleModalState={(flag) => {
+    isCreateTeamModalOpen = flag;
+  }}
+>
+  <CreateTeam
+    handleModalState={(flag = false) => {
+      isCreateTeamModalOpen = flag;
+    }}
+    onCreateTeam={_viewModel.createTeam}
+  />
+</Modal>
+
 <style>
   .warning-text {
     color: var(--colors-neutral-text-3, #ccc);
@@ -397,9 +368,9 @@
     border-bottom: 0 !important;
   }
   :global(
-      .team-splitter .splitpanes__splitter:active,
-      .team-splitter .splitpanes__splitter:hover
-    ) {
+    .team-splitter .splitpanes__splitter:active,
+    .team-splitter .splitpanes__splitter:hover
+  ) {
     background-color: var(--bg-primary-200) !important;
   }
 

@@ -236,7 +236,6 @@
               style="font-size: 28px;"
               >{openTeam?.name || ""}
             </span>
-
             <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
             {#if !isGuestUser}
               {#if userRole !== "owner"}
@@ -321,7 +320,6 @@
               tabs={teamTabs}
               {onUpdateActiveTab}
               {activeTeamTab}
-              {isWebApp}
             />
           </div>
           <div class="teams-menu__right">

@@ -27,8 +27,6 @@
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
   import { Input } from "@sparrow/library/forms";
-  import { open } from "@tauri-apps/plugin-shell";
-  import constants from "@app/constants/constants";
   import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import {
@@ -45,6 +43,7 @@
   import { TestFlowTourGuide } from "@sparrow/workspaces/components";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import { LaunchDesktop } from "@sparrow/common/components";
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
@@ -56,6 +55,7 @@
   export let onItemOpened: (entityType: string, args: any) => void;
 
   export let onBranchSwitched: (collection: CollectionDocument) => void;
+  export let navigateToGithub: () => void;
   export let onRefetchCollection: (
     workspaceId: string,
     collection: CollectionDocument,
@@ -68,6 +68,8 @@
    * id of the active tab
    */
   export let activeTabId;
+  export let activeTabType;
+
   export let userRoleInWorkspace;
   export let currentWorkspace: Observable<WorkspaceDocument>;
   export let leftPanelController: {
@@ -110,6 +112,8 @@
 
   export let testflows;
 
+  export let launchSparrowWebApp: () => void;
+
   export let onDeleteTestflow;
   export let onUpdateTestflow;
   export let onOpenTestflow;
@@ -133,7 +137,6 @@
   export let isExpandTestflow = false;
 
   let isGithubStarHover = false;
-  const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   let collectionFilter: any = [];
   /**
@@ -273,16 +276,6 @@
           },
         },
         {
-          name: "Add Environment",
-          icon: StackIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            isExpandEnvironment = true;
-            onCreateEnvironment();
-          },
-        },
-        {
           name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
           icon: SocketIoIcon,
           iconColor: "var(--icon-secondary-130)",
@@ -293,6 +286,29 @@
               description: "Add Socket.IO From + Icon in Left Panel",
             });
           },
+        },
+        {
+          name: "Add Environment",
+          icon: StackIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            isExpandEnvironment = true;
+            onCreateEnvironment();
+          },
+        },
+
+        {
+          name: `Add ${TFDefaultEnum.FULL_NAME}`,
+          icon: TreeIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            onCreateTestflow();
+            MixpanelEvent(Events.LeftPanel_Plus_Icon);
+            isExpandTestflow = true;
+          },
+          isHoverConstant: false,
         },
       ]
     : [
@@ -472,11 +488,11 @@
         type="search"
         searchIconColor={"var(--icon-secondary-170 )"}
         bind:value={searchData}
-        on:input={(e) => {
+        on:input={() => {
           handleSearch();
           isExpandCollection = true;
           isExpandEnvironment = true;
-          // isExpandTestflow = true;
+          isExpandTestflow = true;
         }}
         defaultBorderColor="transparent"
         hoveredBorderColor="var(--border-primary-300)"
@@ -533,47 +549,45 @@
         </Dropdown>
       {/if}
 
-      {#if !isWebApp}
-        {#if $isTestFlowTourGuideOpen && $currentStep == 1}
-          <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
-            <TestFlowTourGuide
-              targetId="addButton"
-              title="Getting Started  🎉"
-              pulsePosition={{ top: "-58px", left: "14px" }}
-              description={`Welcome! Let’s kick off by creating your test flow. You can add a new flow by clicking here, using the '+' icon, or navigating from the home page. Let's get started!`}
-              tipPosition="top-left"
-              onNext={() => {
-                currentStep.set(2);
-                addButtonMenu = true;
-                toggleTourGuideActive();
-              }}
-              onClose={() => {
-                isTestFlowTourGuideOpen.set(false);
-              }}
-            />
-          </div>
-        {/if}
+      {#if $isTestFlowTourGuideOpen && $currentStep == 1}
+        <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
+          <TestFlowTourGuide
+            targetId="addButton"
+            title="Getting Started  🎉"
+            pulsePosition={{ top: "-58px", left: "14px" }}
+            description={`Welcome! Let’s kick off by creating your test flow. You can add a new flow by clicking here, using the '+' icon, or navigating from the home page. Let's get started!`}
+            tipPosition="top-left"
+            onNext={() => {
+              currentStep.set(2);
+              addButtonMenu = true;
+              toggleTourGuideActive();
+            }}
+            onClose={() => {
+              isTestFlowTourGuideOpen.set(false);
+            }}
+          />
+        </div>
+      {/if}
 
-        {#if $isTestFlowTourGuideOpen && $currentStep == 2}
-          <div style="position:fixed; top:268px; left:220px; z-index:9999;">
-            <TestFlowTourGuide
-              targetId="addButton"
-              title="Add Your Flow 🌊"
-              description={`Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!`}
-              tipPosition="left-top"
-              pulsePosition={{ top: "12px", left: "-150px" }}
-              onNext={() => {
-                currentStep.set(3);
-                onCreateTestflow();
-                isExpandTestflow = true;
-                toggleTourGuideActive();
-              }}
-              onClose={() => {
-                isTestFlowTourGuideOpen.set(false);
-              }}
-            />
-          </div>
-        {/if}
+      {#if $isTestFlowTourGuideOpen && $currentStep == 2}
+        <div style="position:fixed; top:234px; left:220px; z-index:9999;">
+          <TestFlowTourGuide
+            targetId="addButton"
+            title="Add Your Flow 🌊"
+            description={`Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!`}
+            tipPosition="left-top"
+            pulsePosition={{ top: isWebApp ? "10px" : "12px", left: "-150px" }}
+            onNext={() => {
+              currentStep.set(3);
+              onCreateTestflow();
+              isExpandTestflow = true;
+              toggleTourGuideActive();
+            }}
+            onClose={() => {
+              isTestFlowTourGuideOpen.set(false);
+            }}
+          />
+        </div>
       {/if}
     </div>
 
@@ -598,6 +612,7 @@
           {userRoleInWorkspace}
           {activeTabPath}
           {activeTabId}
+          {activeTabType}
           {showImportCollectionPopup}
           {onItemCreated}
           {onItemDeleted}
@@ -640,28 +655,26 @@
 
       <!-- Testflow Section -->
 
-      {#if !isWebApp}
-        <div
-          class="ps-1"
-          style=" overflow:auto; {isExpandTestflow ? 'flex:1;' : ''}"
-        >
-          <TestflowList
-            testflows={$testflows}
-            loggedUserRoleInWorkspace={userRole}
-            {onCreateTestflow}
-            {onDeleteTestflow}
-            {onUpdateTestflow}
-            {onOpenTestflow}
-            currentWorkspace={activeWorkspace}
-            {searchData}
-            {activeTabId}
-            {toggleExpandTestflow}
-            bind:isExpandTestflow
-          />
-        </div>
+      <div
+        class="ps-1"
+        style=" overflow:auto; {isExpandTestflow ? 'flex:1;' : ''}"
+      >
+        <TestflowList
+          testflows={$testflows}
+          loggedUserRoleInWorkspace={userRole}
+          {onCreateTestflow}
+          {onDeleteTestflow}
+          {onUpdateTestflow}
+          {onOpenTestflow}
+          currentWorkspace={activeWorkspace}
+          {searchData}
+          {activeTabId}
+          {toggleExpandTestflow}
+          bind:isExpandTestflow
+        />
+      </div>
 
-        <hr class="my-1 ms-1 me-0" />
-      {/if}
+      <hr class="my-1 ms-1 me-0" />
 
       <!-- <hr class="mt-1 mb-0 ms-1 me-0" /> -->
     </div>
@@ -670,7 +683,7 @@
 
     <!-- <hr class="ms-2 me-2 mb-0 mt-0" /> -->
     <div
-      class="p-2 d-flex align-items-center justify-content-between"
+      class="px-3 py-2 d-flex align-items-center justify-content-between"
       style="z-index: 4;"
     >
       <Tooltip title={"Star Us On GitHub"} placement={"top"}>
@@ -685,9 +698,7 @@
           on:mouseleave={() => {
             isGithubStarHover = false;
           }}
-          on:click={async () => {
-            await open(externalSparrowGithub);
-          }}
+          on:click={navigateToGithub}
         >
           <GithubIcon
             height={"18px"}
@@ -726,6 +737,11 @@
         />
       </div>
     </div>
+
+    <!-- Launch sparrow desktop -->
+    {#if isWebApp}
+      <LaunchDesktop {launchSparrowWebApp} />
+    {/if}
   </div>
 {/if}
 

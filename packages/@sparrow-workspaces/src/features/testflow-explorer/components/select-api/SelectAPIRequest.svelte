@@ -140,9 +140,8 @@
   $: {
     if (($currentStep >= 4 || $currentStep <= 6) && $isTestFlowTourGuideOpen) {
       showSampleApi = true;
-    }
-    else{
-      showSampleApi=false;
+    } else {
+      showSampleApi = false;
     }
   }
 </script>
@@ -241,7 +240,7 @@
     <div class="scrollable-list">
       {#if showSampleApi}
         {#each dummyCollection as data}
-          {#if data?.type !== "WEBSOCKET"}
+          {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
             <div
               class="d-flex align-items-center dropdown-single-option"
               on:click|stopPropagation={() => {
@@ -280,9 +279,12 @@
             </div>
           {/if}
         {/each}
-      {:else if arrayData?.length > 0}
+      {:else if arrayData?.filter((data) => {
+        if (data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER") return true;
+        return false;
+      })?.length > 0}
         {#each arrayData as data}
-          {#if data?.type !== "WEBSOCKET"}
+          {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
             <div
               class="d-flex align-items-center dropdown-single-option"
               on:click|stopPropagation={() => {

@@ -27,9 +27,12 @@ import {
   SocketIORequestStatusTabEnum,
   type EventsValues,
 } from "@sparrow/common/types/workspace/socket-io-request-tab";
-import { Sleep } from "@sparrow/common/utils";
+import { Base64Converter, Sleep } from "@sparrow/common/utils";
 const tabRepository = new TabRepository();
 const apiTimeOut = constants.API_SEND_TIMEOUT;
+
+const isEnableWebSocketCloud = false;
+const isEnableSocketIoCloud = false;
 
 const error = (
   error: string,
@@ -256,8 +259,6 @@ function formatTime(date) {
  *
  */
 const sendMessage = async (tab_id: string, message: string) => {
-  const selectedAgent = localStorage.getItem("selectedAgent");
-
   try {
     let listener;
     webSocketDataStore.update((webSocketDataMap) => {
@@ -265,7 +266,10 @@ const sendMessage = async (tab_id: string, message: string) => {
       if (wsData) {
         listener = wsData.listener;
         // Check for the original agent type from the store, not the currently selected agent
-        if (wsData.agent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT) {
+        if (
+          wsData.agent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT ||
+          !isEnableWebSocketCloud
+        ) {
           wsData.messages.unshift({
             data: message,
             transmitter: "sender",
@@ -309,13 +313,14 @@ const disconnectWebSocket = async (tab_id: string) => {
     }
     return webSocketDataMap;
   });
-
   webSocketDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
-
     if (wsData) {
       const socketInsta = wsData.listener;
-      if (wsData.agent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT) {
+      if (
+        wsData.agent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT ||
+        !isEnableWebSocketCloud
+      ) {
         socketInsta.close();
       } else {
         socketInsta?.emit(
@@ -383,11 +388,12 @@ const connectWebSocket = async (
     return webSocketDataMap;
   });
 
-  if (selectedAgent === "Browser Agent") {
+  if (
+    selectedAgent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT ||
+    !isEnableWebSocketCloud
+  ) {
     try {
-      // Parse the headers string to array of header objects
-      const headers = JSON.parse(requestHeaders);
-
+      const ws = new WebSocket(url);
       // Update store with WebSocket instance
       webSocketDataStore.update((webSocketDataMap) => {
         const wsData = webSocketDataMap.get(tabId);
@@ -416,15 +422,30 @@ const connectWebSocket = async (
             return webSocketDataMap;
           });
           notifications.success("WebSocket connected successfully");
-          resolve();
+          resolve("");
         };
 
-        ws.onmessage = (event) => {
+        ws.onmessage = async (event) => {
+          let result: string;
+
+          if (event.data instanceof Blob) {
+            // Convert Blob to text
+            result = await event.data.text();
+          } else if (typeof event.data === "string") {
+            // Use directly if it's already a string
+            result = event.data;
+          } else if (typeof event.data === "object" && event.data !== null) {
+            // Convert object to string (JSON.stringify)
+            result = JSON.stringify(event.data);
+          } else {
+            result = "";
+          }
+
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
               wsData.messages.unshift({
-                data: event.data,
+                data: result,
                 transmitter: "receiver",
                 timestamp: formatTime(new Date()),
                 uuid: uuidv4(),
@@ -470,7 +491,7 @@ const connectWebSocket = async (
       throw error;
     }
   } else if (selectedAgent === WorkspaceUserAgentBaseEnum.CLOUD_AGENT) {
-    const proxySocketIO = io(`${constants.SOCKET_IO_API_URL}/`, {
+    const proxySocketIO = io(`${constants.PROXY_SERVICE}/`, {
       path: "/socket.io", // Path to the WebSocket gateway
       transports: ["websocket"], // Ensure the transport is set to WebSocket
       query: {
@@ -594,10 +615,10 @@ const makeHttpRequestV2 = async (
   headers: string,
   body: string,
   contentType: string,
+  selectedAgent: WorkspaceUserAgentBaseEnum,
   signal?: AbortSignal,
 ) => {
   const startTime = performance.now();
-  const selectedAgent = localStorage.getItem("selectedAgent");
   try {
     let response;
     if (selectedAgent === "Cloud Agent") {
@@ -613,25 +634,39 @@ const makeHttpRequestV2 = async (
         try {
           jsonHeader = JSON.parse(headers);
         } catch (error) {
-          jsonHeader = {};
+          jsonHeader = [];
         }
-        const headersObject = jsonHeader.reduce((acc, header) => {
-          if (header.checked !== false) {
-            // Include only headers that are checked or do not have a `checked` property
+        const headersObject = jsonHeader.reduce(
+          (
+            acc: Record<string, string>,
+            header: { key: string; value: string },
+          ) => {
             acc[header.key] = header.value;
-          }
-          return acc;
-        }, {});
+            return acc;
+          },
+          {},
+        );
         let requestData = body || {};
 
         if (contentType === "multipart/form-data") {
           const formData = new FormData();
           const parsedBody = JSON.parse(body);
-          (parsedBody || []).forEach((field) => {
-            if (field.checked !== false) {
+          for (const field of parsedBody || []) {
+            try {
+              if (field?.base) {
+                const file = await new Base64Converter().base64ToFile(
+                  field.base,
+                  field.value,
+                );
+                formData.append(field.key, file);
+              } else {
+                formData.append(field.key, field.value);
+              }
+            } catch (e) {
+              console.error(e);
               formData.append(field.key, field.value);
             }
-          });
+          }
           requestData = formData;
 
           // Remove Content-Type header to let Axios set it automatically with boundary
@@ -639,11 +674,11 @@ const makeHttpRequestV2 = async (
         } else if (contentType === "application/x-www-form-urlencoded") {
           const urlSearchParams = new URLSearchParams();
           const parsedBody = JSON.parse(body);
-          (parsedBody || []).forEach((field) => {
-            if (field.checked !== false) {
+          (parsedBody || []).forEach(
+            (field: { key: string; value: string }) => {
               urlSearchParams.append(field.key, field.value);
-            }
-          });
+            },
+          );
           requestData = urlSearchParams;
         } else if (
           contentType === "application/json" ||
@@ -663,14 +698,11 @@ const makeHttpRequestV2 = async (
           },
         });
         response = {
-          ...axiosResponse,
           data: {
             status: `${axiosResponse.status} ${axiosResponse.statusText}`,
             data: axiosResponse.data,
             headers: Object.fromEntries(Object.entries(axiosResponse.headers)),
           },
-          status: 200,
-          statusText: "OK",
         };
       } catch (axiosError: any) {
         const error = axiosError;
@@ -682,10 +714,6 @@ const makeHttpRequestV2 = async (
               ? Object.fromEntries(Object.entries(error.response.headers))
               : {},
           },
-          status: 200,
-          statusText: "OK",
-          headers: error.response?.headers || {},
-          config: error.config,
         };
       }
     }
@@ -950,8 +978,71 @@ const connectSocketIo = async (
     return;
   }
   constants.API_URL;
-  if (selectedAgent === WorkspaceUserAgentBaseEnum.CLOUD_AGENT) {
-    const proxySocketIO = io(`${constants.SOCKET_IO_API_URL}/`, {
+  if (
+    selectedAgent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT ||
+    !isEnableSocketIoCloud
+  ) {
+    const targetSocketIO = io(
+      `${urlObject.origin || ""}${urlObject.pathname || "/"}`,
+      {
+        transports: ["websocket"],
+        reconnection: false,
+      },
+    );
+
+    // store listeners inside map against tab id for future removal
+    insertSocketIoListenerToMap(targetSocketIO, _tabId);
+
+    // Listen for connect events from the target Socket.IO.
+    targetSocketIO.on("connect", () => {
+      const message = processConnectEvent(_url);
+      insertSocketIoDataToMap(
+        _tabId,
+        message,
+        SocketIORequestMessageTransmitterTabEnum.CONNECTER,
+      );
+      notifications.success(
+        `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
+      );
+    });
+
+    // Listen for connect_error events from the target Socket.IO.
+    targetSocketIO.on("connect_error", (err) => {
+      console.error(new DOMException(err + " (URL Issue)", "ConnectError"));
+      removeSocketIoDataFromMap(_tabId);
+    });
+
+    // Listen for disconnect events from the target Socket.IO.
+    targetSocketIO.on("disconnect", (err) => {
+      console.error(
+        new DOMException(err + " (Connection Lost)", "DisconnectError"),
+      );
+      const message = processDisconnectEvent(_url);
+      insertSocketIoDataToMap(
+        _tabId,
+        message,
+        SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR,
+      );
+    });
+
+    // Listen for all dynamic events from the target Socket.IO.
+    targetSocketIO.onAny(async (event: string, ...args: any[]) => {
+      const message = await processMessageEvent(_tabId, {
+        payload: {
+          event: event,
+          message: args,
+        },
+      });
+      if (message) {
+        insertSocketIoDataToMap(
+          _tabId,
+          message,
+          SocketIORequestMessageTransmitterTabEnum.RECEIVER,
+        );
+      }
+    });
+  } else {
+    const proxySocketIO = io(`${constants.PROXY_SERVICE}/`, {
       path: "/socket.io", // Path to the WebSocket gateway
       transports: ["websocket"], // Ensure the transport is set to WebSocket
       query: {
@@ -1016,81 +1107,6 @@ const connectSocketIo = async (
       console.error(new DOMException(err + " (Proxy Failed)", "ConnectError"));
       removeSocketIoDataFromMap(_tabId);
     });
-  } else {
-    const parsedHeaders = JSON.parse(_headers as string);
-    const headersObject: { [key: string]: string } = parsedHeaders.reduce(
-      (
-        acc: Record<string, string>,
-        { key, value }: { key: string; value: string },
-      ) => {
-        acc[key] = value;
-        return acc;
-      },
-      {} as { [key: string]: string },
-    );
-    delete headersObject["Sec-WebSocket-Key"];
-    delete headersObject["Sec-WebSocket-Version"];
-
-    const targetSocketIO = io(
-      `${urlObject.origin || ""}${urlObject.pathname || "/"}`,
-      {
-        transports: ["websocket"],
-        query: headersObject,
-        reconnection: false,
-      },
-    );
-
-    // store listeners inside map against tab id for future removal
-    insertSocketIoListenerToMap(targetSocketIO, _tabId);
-
-    // Listen for connect events from the target Socket.IO.
-    targetSocketIO.on("connect", () => {
-      const message = processConnectEvent(_url);
-      insertSocketIoDataToMap(
-        _tabId,
-        message,
-        SocketIORequestMessageTransmitterTabEnum.CONNECTER,
-      );
-      notifications.success(
-        `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
-      );
-    });
-
-    // Listen for connect_error events from the target Socket.IO.
-    targetSocketIO.on("connect_error", (err) => {
-      console.error(new DOMException(err + " (URL Issue)", "ConnectError"));
-      removeSocketIoDataFromMap(_tabId);
-    });
-
-    // Listen for disconnect events from the target Socket.IO.
-    targetSocketIO.on("disconnect", (err) => {
-      console.error(
-        new DOMException(err + " (Connection Lost)", "DisconnectError"),
-      );
-      const message = processDisconnectEvent(_url);
-      insertSocketIoDataToMap(
-        _tabId,
-        message,
-        SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR,
-      );
-    });
-
-    // Listen for all dynamic events from the target Socket.IO.
-    targetSocketIO.onAny(async (event: string, ...args: any[]) => {
-      const message = await processMessageEvent(_tabId, {
-        payload: {
-          event: event,
-          message: args,
-        },
-      });
-      if (message) {
-        insertSocketIoDataToMap(
-          _tabId,
-          message,
-          SocketIORequestMessageTransmitterTabEnum.RECEIVER,
-        );
-      }
-    });
   }
 };
 
@@ -1116,13 +1132,16 @@ const disconnectSocketIo = async (_tabId: string): Promise<void> => {
     const wsData = webSocketDataMap.get(_tabId);
     if (wsData) {
       const socketInsta = wsData.connectListener;
-      if (wsData.agent === WorkspaceUserAgentBaseEnum.CLOUD_AGENT) {
+      if (
+        wsData.agent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT ||
+        !isEnableSocketIoCloud
+      ) {
+        socketInsta?.disconnect();
+      } else {
         socketInsta?.emit(
           "sparrow_internal_disconnect",
           "client io disconnect",
         );
-      } else {
-        socketInsta?.disconnect();
       }
     }
     return webSocketDataMap;

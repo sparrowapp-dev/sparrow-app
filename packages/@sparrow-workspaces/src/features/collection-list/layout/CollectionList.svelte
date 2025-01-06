@@ -77,6 +77,7 @@
   export let toggleExpandCollection;
 
   export let isWebApp = false;
+  export let activeTabType;
 
   let collectionListDocument: CollectionDocument[];
 
@@ -293,6 +294,7 @@
                     {onRefetchCollection}
                     {userRoleInWorkspace}
                     {activeTabPath}
+                    {activeTabType}
                     collection={col}
                     {activeTabId}
                     {searchData}
@@ -334,6 +336,7 @@
                   {onRefetchCollection}
                   {userRoleInWorkspace}
                   {activeTabPath}
+                  {activeTabType}
                   collection={col}
                   {activeTabId}
                   {isWebApp}

@@ -1,6 +1,6 @@
 <script lang="ts">
   // ---- Icon
-  import { CrossIcon as Crossicon } from "@sparrow/library/assets";
+  import { CrossIcon, CrossIcon as Crossicon } from "@sparrow/library/assets";
   import { BookIcon } from "@sparrow/library/assets";
   // ----
 
@@ -14,6 +14,7 @@
 
   // ---- Interface
   import {
+    CrossIconV2,
     GraphIcon,
     SocketIcon,
     SocketIoIcon,
@@ -75,14 +76,14 @@
   on:dragstart={() => {
     onDragStart(index);
   }}
-  class="d-inline-block position-relative pt-1 individual-tab bg-transparent border-0"
+  class="d-inline-block p-0 position-relative pt-1 individual-tab bg-transparent border-0"
   style="width: {tabWidth}px; height:35px; margin-left:{index === 0
     ? '4px'
     : ''}"
   on:mousedown={handleMouseDown}
 >
   <div
-    class=" w-100 d-flex justify-content-between px-2 border-upper-radius"
+    class=" w-100 d-flex justify-content-between px-2 border-upper-radius h-100 align-items-center"
     style="margin-left: -1px;  background-color: {tab.isActive
       ? 'var(--bg-secondary-850)'
       : 'transparent'};"
@@ -93,7 +94,7 @@
           onTabSelected(tab.id);
         }
       }}
-      class="position-relative border-0 ellipsis"
+      class="position-relative p-0 border-0 ellipsis"
       style="width: 100%;
         text-align: left; font-weight:700; background-color:transparent;"
     >
@@ -178,23 +179,21 @@
     {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
       {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
         <span
-          class="my-auto mx-1 opacity-1"
+          class="m-1 opacity-1"
           style="height: 6px; aspect-ratio: 1; background-color: var(--tab-unsave-icon); border-radius: 50%;"
         />
       {/if}
     {/if}
 
     <button
-      class="cross-icon-btn {// toggle cross icon for inactive tabs
-      !tab.isActive
-        ? 'inactive-close-btn'
-        : ''} btn d-flex align-items-center px-1"
+      class="cross-icon-btn p-0 d-flex align-items-center justify-content-center {// toggle cross icon for inactive tabs
+      !tab.isActive ? 'inactive-close-btn' : ''} btn"
       on:click={() => {
         onTabClosed(tab.id, tab);
       }}
-      style="overflow:hidden; height: 18px; width:22px; margin-top:7px; margin-bottom:6px;"
+      style="overflow:hidden; height: 18px; width:18px;"
     >
-      <Crossicon />
+      <CrossIconV2 height={"9px"} width={"9px"} />
     </button>
     {#if !tab.isActive}
       <div

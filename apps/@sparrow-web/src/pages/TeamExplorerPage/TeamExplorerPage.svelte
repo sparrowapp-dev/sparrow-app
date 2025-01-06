@@ -211,7 +211,7 @@
     onCreateWorkspace={_viewModel.handleCreateWorkspace}
     onSwitchWorkspace={async (item) => {
       await _viewModel.handleSwitchWorkspace(item);
-      isWorkspaceOpen = true;
+      // isWorkspaceOpen = true;
     }}
     onRemoveMembersAtTeam={_viewModel.removeMembersAtTeam}
     onDemoteToMemberAtTeam={_viewModel.demoteToMemberAtTeam}
