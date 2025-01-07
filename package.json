@@ -8,6 +8,7 @@
   "workspaces": [
     "./apps/@sparrow-web",
     "./apps/@sparrow-desktop",
+    "./apps/@sparrow-admin",
     "./packages/@sparrow-library",
     "./packages/@sparrow-common",
     "./packages/@sparrow-teams",
@@ -19,7 +20,9 @@
     "desktop-build": "yarn workspace @sparrow/desktop tauri build --debug",
     "desktop-build-mac-universal": "yarn workspace @sparrow/desktop tauri build --target universal-apple-darwin --debug --verbose",
     "web-start": "yarn workspace @sparrow/web dev",
-    "web-build": "yarn workspace @sparrow/web build"
+    "web-build": "yarn workspace @sparrow/web build",
+    "admin-start": "yarn workspace @sparrow/admin dev",
+    "admin-build": "yarn workspace @sparrow/admin build"
   },
   "dependencies": {
     "@codemirror/lang-html": "^6.4.7",

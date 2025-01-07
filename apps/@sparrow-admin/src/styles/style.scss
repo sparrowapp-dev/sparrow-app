@@ -1,0 +1,937 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100&family=Roboto:wght@100&display=swap");
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+
+$sparrow-blue: #3670f7;
+$sparrow-yellow: #f9b001;
+$sparrow-black: #000000;
+$sparrow-success: #8dc599;
+$sparrow-error: #e5acb2;
+$sparrow-default: #45494d;
+$sparrow-danger: #fe8c98;
+$sparrow-white: #ffffff;
+$sparrow-light-gray: #cccccc;
+$sparrow-gradient: red;
+$sparrow-background: #19191a;
+$sparrow-primary-btn: #1193f0;
+$sparrow-background-light: #1e1e1e;
+$sparrow-background-dark: #1e1e1e;
+$sparrow-background-dropdown: #141414;
+$sparrow-plusbutton: #85c2ff;
+$sparrow-border-color: #313233;
+$sparrow-get: #69d696;
+$sparrow-put: #9685ff;
+$sparrow-post: #ffe47e;
+$sparrow-delete: #ff7878;
+$sparrow-trac: #fba574;
+$sparrow-head: #69d696;
+$sparrow-con: #58c6b9;
+$sparrow-patc: #df77f9;
+$sparrow-opt: #f15ea5;
+$sparrow-arc: #8a9299;
+$sparrow-request-body: #8a9299;
+$sparrow-send-button: #85c2ff;
+$sparrow-send-hoverbutton: #04416d;
+$sparrow-button-background: #2d2c2c;
+$sparrow-button-color: #e5e5e5;
+$sparrow-button-disabled: #636566;
+$sparrow-input-slider-button: #1d3650;
+$sparrow-dull-background: #232424;
+$sparrow-bottom-border: #85c2ff;
+$sparrow-cancel-hover: #31323360;
+$sparrow-delete-hover: #f16674;
+$sparrow-background-hover: rgba(0, 0, 0, 0.706);
+$sparrow-button-pressed: #1d3650;
+$sparrow-text-color: #8a9299;
+$sparrow-key-value-pair: #262626;
+$sparrow-selectedSideBarTab: #11253a;
+$sparrow-selectedSideBarTab: #11253a;
+$sparrow-recentApiText: #f3e4e4d7;
+$sparrow-errorTextColor: #fe8c98;
+$sparrow-editor-operator-color: #fe2e2e;
+$sparrow-editor-bool-color: #82db42;
+$sparrow-editor-name-color: #9cdcfe;
+$sparrow-editor-varible-color: #eccd43;
+$sparrow-editor-bracket-color: #9217f6;
+$sparrow-editor-square-bracket-color: #ff8000;
+$sparrow-editor-number-color: #8dc599;
+$sparrow-editor-angle-bracket-color: #636566;
+$sparrow-editor-tag-color: #246bb8;
+$sparrow-editor-string-color: #ce9178;
+$sparrow-email-invite-bg-color: #1e1e1e;
+$sparrow-dropdown-border-color: rgb(44, 44, 44);
+$sparrow-small-text-size: 0.75rem;
+$sparrow-base-text-size: 0.875rem;
+$sparrow-medium-text-size: 1.125rem;
+$sparrow-right-click-menu: #232527;
+$sparrow-active-sync: #8dc599;
+$deleted-api-method: #939699;
+$button-active: #1d3650;
+$sparrow-nav-bar-active-slash: #4661fa;
+$sparrow-nav-bar-hover-background: #29303c;
+$right-border: #313233;
+$sparrow-dropdown: #3670f7;
+$sparrow-dropdown-hover: #5980dc;
+$sparrow-dropdown-container: #22232e;
+$sparrow-dropdown-option-hover: #2e2f3d;
+$sparrow-dropdown-option-active: #1c1d27;
+$sparrow-send-button-line: #d3d1d154;
+$sparrow-tab-request-default: #324035;
+$sparrow-tab-request-text-default: #4a4d4f;
+$sparrow-tab-unsave-icon: #cb4a4a;
+$sparrow-cross-icon: #f5f5f5;
+
+$sparrow-bg-container: #8989890d;
+$sparrow-bg-container-border: #313233;
+$sparrow-bg-container-one: #1392f0;
+$sparrow-bg-container-two: #4165f9;
+$sparrow-bg-container-three: #5652fd;
+$sparrow-bg-container-four: #376ff7;
+
+$theme-grey-ffffff: #ffffff;
+$theme-grey-F5F5F5: #f5f5f5;
+$theme-grey-e5e5e5: #e5e5e5;
+$theme-grey-C4CBDA: #c4cbda;
+$theme-grey-d7d7d7: #d7d7d7;
+$theme-grey-A5B5CA: #a5b5ca;
+$theme-grey-B6B5B5: #b6b5b5;
+$theme-grey-8A9299: #8a9299;
+$theme-grey-999999: #999999;
+$theme-grey-9CA0B2: #9ca0b2;
+$theme-grey-CCCCCC: #cccccc;
+$theme-grey-888888: #888888;
+$theme-grey-83899F: #83899f;
+$theme-grey-808080: #808080;
+$theme-grey-636566: #636566;
+$theme-grey-60616B: #60616b;
+$theme-grey-484848: #484848;
+$theme-grey-4D4D4D: #4D4D4D;
+$theme-grey-4e4e4e: #4e4e4e;
+$theme-grey-45494D: #45494d;
+$theme-grey-353646: #353646;
+$theme-grey-333333: #333333;
+$theme-grey-3E415A: #3e415a;
+$theme-grey-313233: #313233;
+$theme-grey-2B343D: #2b343d;
+$theme-grey-272727: #272727;
+$theme-grey-212222: #212222;
+$theme-grey-1A1A1A: #1a1a1a;
+$theme-grey-161617: #161617;
+$theme-grey-1E1E1E: #1E1E1E;
+$theme-grey-151515: #151515;
+$theme-grey-000000: #000000;
+$theme-grey-191919: #191919;
+$theme-grey-121212: #121212;
+$theme-grey-1D1D20: #1D1D20;
+
+
+$theme-blue-F5F6F8: #f5f6f8;
+$theme-blue-B0B0B0: #b0b0b0;
+$theme-blue-9CDCFE: #9cdcfe;
+$theme-blue-85C2FF: #85c2ff;
+$theme-blue-87b9f7: #87b9f7;
+$theme-blue-5980DC: #5980dc;
+$theme-blue-1193F0: #1193f0;
+$theme-blue-3670F7: #3670f7;
+$theme-blue-0B5ED7: #0b5ed7;
+$theme-blue-2B5ED4: #2b5ed4;
+$theme-blue-DF77F9: #df77f9;
+$theme-blue-303F4F: #303f4f;
+$theme-blue-1D3650: #1d3650;
+$theme-blue-1E263B: #1e263b;
+$theme-blue-74AEF6: #74aef6;
+$theme-blue-11253a: #11253a;
+$theme-blue-1E2A47: #1e2a47;
+$theme-blue-007bff: #007bff;
+
+$theme-violet-676A80: #676a80;
+$theme-violet-37394E: #37394e;
+$theme-violet-2A2C3C: #2a2c3c;
+$theme-violet-22232E: #22232e;
+$theme-violet-272831: #272831;
+$theme-violet-2E2F3D: #2e2f3d;
+$theme-violet-3e3f51: #3e3f51;
+$theme-violet-323548: #323548;
+$theme-violet-262834: #262834;
+$theme-violet-1c1d27: #1c1d27;
+$theme-violet-1C1D2B: #1c1d2b;
+$theme-violet-363849: #363849;
+
+
+
+$theme-red-e5acb2: #e5acb2;
+$theme-red-fe8c98: #fe8c98;
+$theme-red-ff7878: #ff7878;
+$theme-red-f16674: #f16674;
+$theme-red-fc6574: #fc6574;
+$theme-red-ef5262: #ef5262;
+$theme-red-f34b5c: #f34b5c;
+$theme-red-f33346: #f33346;
+$theme-red-fe2e2e: #fe2e2e;
+$theme-red-6f2828: #6f2828;
+$theme-red-312325: #312325;
+$theme-red-230408: #230408;
+$theme-red-2B1C1D: #2b1c1d;
+
+$theme-green-8dc599: #8dc599;
+$theme-green-00A86B: #00a86b;
+
+
+:root {
+  --tab-bar-hover: #{$sparrow-email-invite-bg-color};
+  --blackColor: #{$sparrow-black};
+  --defaultcolor: #{$sparrow-default};
+  --recentApiText: #{$sparrow-recentApiText};
+  --primary-btn-color: #{$sparrow-primary-btn};
+  --success-color: #{$sparrow-success};
+  --button-color: #{$sparrow-request-body};
+  --send-button: #{$sparrow-send-button};
+  --send1-hoverbutton: #{$sparrow-send-hoverbutton};
+  --white-color: #{$sparrow-white};
+  --background-color: #{$sparrow-background};
+  --dull-background-color: #{$sparrow-dull-background};
+  --background-light: #{$sparrow-background-light};
+  --background-dark: #{$sparrow-background-dark};
+  --background-dropdown: #{$sparrow-background-dropdown};
+  --border-color: #{$sparrow-border-color};
+  --request-get: #{$sparrow-get};
+  --request-put: #{$sparrow-put};
+  --request-post: #{$sparrow-post};
+  --request-delete: #{$sparrow-delete};
+  --request-arc: #{$sparrow-arc};
+  --request-trac: #{$sparrow-trac};
+  --request-head: #{$sparrow-head};
+  --request-con: #{$sparrow-con};
+  --request-patc: #{$sparrow-patc};
+  --request-opt: #{$sparrow-opt};
+  --workspace-hover-color: #{$sparrow-plusbutton};
+  --sparrow-bottom-border: #{$sparrow-bottom-border};
+  --sparrow-input-slider-button: #{$sparrow-input-slider-button};
+  --dangerColor: #{$sparrow-danger};
+  --cancel-hover: #{$sparrow-cancel-hover};
+  --delete-hover: #{$sparrow-delete-hover};
+  --background-hover: #{$sparrow-background-hover};
+  --button-pressed: #{$sparrow-button-pressed};
+  --keyvalue-pair: #{$sparrow-key-value-pair};
+  --selected-active-sidebar: #{$sparrow-selectedSideBarTab};
+  --sparrow-blue: #{$sparrow-blue};
+  --sparrow-button-background: #{$sparrow-button-background};
+  --editor-operator: #{$sparrow-editor-operator-color};
+  --editor-bool: #{$sparrow-editor-bool-color};
+  --editor-name: #{$sparrow-editor-name-color};
+  --editor-variable: #{$sparrow-editor-varible-color};
+  --editor-bracket: #{$sparrow-editor-bracket-color};
+  --editor-square-bracket: #{$sparrow-editor-square-bracket-color};
+  --error--color: #{$sparrow-errorTextColor};
+  --sparrow-text-color: #{$sparrow-text-color};
+  --editor-number: #{$sparrow-editor-number-color};
+  --editor-angle-bracket: #{$sparrow-editor-angle-bracket-color};
+  --editor-tag-color: #{$sparrow-editor-tag-color};
+  --editor-string-color: #{$sparrow-editor-string-color};
+  --base-text: #{$sparrow-base-text-size};
+  --small-text: #{$sparrow-small-text-size};
+  --medium-text: #{$sparrow-medium-text-size};
+  --right-click-menu: #{$sparrow-right-click-menu};
+  --button-disabled: #{$sparrow-button-disabled};
+  --active-sync-btn: #{$sparrow-active-sync};
+  --deleted-api-method: #{$deleted-api-method};
+  --button-active: #{$button-active};
+  --nav-bar-active-slash: #{$sparrow-nav-bar-active-slash};
+  --nav-bar-hover-background: #{$sparrow-nav-bar-hover-background};
+  --right-border: #{$right-border};
+  --dropdown-button: #{$sparrow-dropdown};
+  --dropdown-hover: #{$sparrow-dropdown-hover};
+  --dropdown-container: #{$sparrow-dropdown-container};
+  --dropdown-option-hover: #{$sparrow-dropdown-option-hover};
+  --dropdown-option-active: #{$sparrow-dropdown-option-active};
+  --save-button-line: #{$sparrow-send-button-line};
+  --tab-request-default: #{$sparrow-tab-request-default};
+  --tab-request-text-default: #{$sparrow-tab-request-text-default};
+  --tab-request-divider-line: #{$sparrow-key-value-pair};
+  --tab-unsave-icon: #{$sparrow-tab-unsave-icon};
+  --cross-icon: #{$sparrow-cross-icon};
+
+  --bg-conatiner: #{$sparrow-bg-container};
+  --bg-container-border: #{$sparrow-bg-container-border};
+  --bg-container-one: #{$sparrow-bg-container-one};
+  --bg-container-two: #{$sparrow-bg-container-two};
+  --bg-container-three: #{$sparrow-bg-container-three};
+  --bg-container-four: #{$sparrow-bg-container-four};
+
+  //
+  //
+  // Sets text color
+  //
+  //
+  --text-primary-100: #{$theme-blue-9CDCFE};
+  --text-primary-150: #{$theme-blue-85C2FF};
+  --text-primary-200: #{$theme-blue-1193F0};
+  --text-primary-250: #{$theme-blue-B0B0B0};
+  --text-primary-300: #{$theme-blue-3670F7};
+  --text-primary-350: #{$theme-blue-74AEF6};
+  --text-primary-400: #{$theme-blue-0B5ED7};
+  --text-primary-440: #{$theme-blue-DF77F9};
+  --text-primary-500: #{$theme-blue-87b9f7};
+  --text-primary-600: #{$theme-blue-007bff};
+
+  --text-secondary-50: #{$theme-grey-999999};
+  --text-secondary-100: #{$theme-grey-ffffff};
+  --text-secondary-110: #{$theme-grey-F5F5F5};
+  --text-secondary-150: #{$theme-grey-e5e5e5};
+  --text-secondary-200: #{$theme-grey-8A9299};
+  --text-secondary-250: #{$theme-grey-83899F};
+  --text-secondary-270: #{$theme-grey-d7d7d7};
+  --text-secondary-290: #{$theme-grey-484848};
+  --text-secondary-300: #{$theme-grey-45494D};
+  --text-secondary-350: #{$theme-grey-636566};
+  --text-secondary-370: #{$theme-grey-60616B};
+  --text-secondary-400: #{$theme-grey-313233};
+  --text-secondary-450: #{$theme-grey-191919};
+  --text-secondary-500: #{$theme-grey-272727};
+  --text-secondary-550: #{$theme-grey-808080};
+  --text-secondary-600: #{$theme-grey-212222};
+  --text-secondary-700: #{$theme-grey-161617};
+  --text-secondary-800: #{$theme-grey-151515};
+  --text-secondary-850: #{$theme-grey-121212};
+  --text-secondary-900: #{$theme-grey-000000};
+  --text-secondary-1000: #{$theme-grey-CCCCCC};
+  --text-secondary-1100: #{$theme-grey-2B343D};
+
+  --text-tertiary-100: #{$theme-violet-676A80};
+  --text-tertiary-190: #{$theme-violet-37394E};
+  --text-tertiary-200: #{$theme-violet-323548};
+  --text-tertiary-300: #{$theme-violet-2A2C3C};
+  --text-tertiary-400: #{$theme-violet-22232E};
+  --text-tertiary-500: #{$theme-violet-272831};
+  --text-tertiary-600: #{$theme-violet-2E2F3D};
+  --text-tertiary-700: #{$theme-violet-1c1d27};
+  --text-tertiary-750: #{$theme-violet-1C1D2B};
+
+
+  --text-success-200: #{$theme-green-00A86B};
+
+
+  --text-danger-100: #{$theme-red-e5acb2};
+  --text-danger-200: #{$theme-red-fe8c98};
+  --text-danger-300: #{$theme-red-ff7878};
+  --text-danger-400: #{$theme-red-f16674};
+  --text-danger-500: #{$theme-red-fc6574};
+  --text-danger-600: #{$theme-red-ef5262};
+  --text-danger-700: #{$theme-red-f34b5c};
+  --text-danger-800: #{$theme-red-f33346};
+  --text-danger-850: #{$theme-red-6f2828};
+  --text-danger-900: #{$theme-red-fe2e2e};
+  --text-danger-1000: #{$theme-red-312325};
+  --text-danger-1200: #{$theme-red-2B1C1D};
+
+  //
+  //
+  // Sets background color
+  //
+  //
+  --bg-primary-100: #{$theme-blue-9CDCFE};
+  --bg-primary-150: #{$theme-blue-F5F6F8};
+  --bg-primary-200: #{$theme-blue-1193F0};
+  --bg-primary-250: #{$theme-blue-5980DC};
+  --bg-primary-300: #{$theme-blue-3670F7};
+  --bg-primary-400: #{$theme-blue-0B5ED7};
+  --bg-primary-500: #{$theme-blue-2B5ED4};
+  --bg-primary-600: #{$theme-blue-1D3650};
+  --bg-primary-650: #{$theme-blue-1E263B};
+  --bg-primary-700: #{$theme-blue-11253a};
+  --bg-primary-800: #{$theme-blue-1E2A47};
+
+  --bg-secondary-100: #{$theme-grey-ffffff};
+  --bg-secondary-110: #{$theme-grey-F5F5F5};
+  --bg-secondary-150: #{$theme-grey-e5e5e5};
+  --bg-secondary-200: #{$theme-grey-8A9299};
+  --bg-secondary-270: #{$theme-grey-d7d7d7};
+  --bg-secondary-290: #{$theme-grey-484848};
+  --bg-secondary-300: #{$theme-grey-45494D};
+  --bg-secondary-320: #{$theme-grey-353646};
+  --bg-secondary-330: #{$theme-grey-333333};
+  --bg-secondary-350: #{$theme-grey-888888};
+  --bg-secondary-400: #{$theme-grey-313233};
+  --bg-secondary-420: #{$theme-grey-3E415A};
+  --bg-secondary-450: #{$theme-grey-191919};
+  --bg-secondary-500: #{$theme-grey-272727};
+  --bg-secondary-550: #{$theme-grey-1A1A1A};
+  --bg-secondary-600: #{$theme-grey-212222};
+  --bg-secondary-700: #{$theme-grey-161617};
+  --bg-secondary-750: #{$theme-grey-4D4D4D};
+  --bg-secondary-800: #{$theme-grey-151515};
+  --bg-secondary-850: #{$theme-grey-121212};
+  --bg-secondary-870: #{$theme-grey-1D1D20};
+  --bg-secondary-900: #{$theme-grey-000000};
+  --bg-secondary-950: #{$theme-grey-808080};
+  --bg-secondary-970: #{$theme-grey-1E1E1E};
+  --bg-secondary-1000: #{$theme-grey-CCCCCC};
+  --bg-secondary-1100: #{$theme-grey-2B343D};
+
+  --bg-tertiary-100: #{$theme-violet-676A80};
+  --bg-tertiary-190: #{$theme-violet-37394E};
+  --bg-tertiary-300: #{$theme-violet-2A2C3C};
+  --bg-tertiary-400: #{$theme-violet-22232E};
+  --bg-tertiary-500: #{$theme-violet-272831};
+  --bg-tertiary-600: #{$theme-violet-2E2F3D};
+  --bg-tertiary-630: #{$theme-violet-3e3f51};
+  --bg-tertiary-650: #{$theme-violet-323548};
+  --bg-tertiary-670: #{$theme-violet-262834};
+  --bg-tertiary-700: #{$theme-violet-1c1d27};
+  --bg-tertiary-750: #{$theme-violet-1C1D2B};
+  --bg-tertiary-800: #{$theme-violet-363849};
+
+  --bg-danger-100: #{$theme-red-e5acb2};
+  --bg-danger-200: #{$theme-red-fe8c98};
+  --bg-danger-300: #{$theme-red-ff7878};
+  --bg-danger-400: #{$theme-red-f16674};
+  --bg-danger-500: #{$theme-red-fc6574};
+  --bg-danger-600: #{$theme-red-ef5262};
+  --bg-danger-700: #{$theme-red-f34b5c};
+  --bg-danger-800: #{$theme-red-f33346};
+  --bg-danger-900: #{$theme-red-fe2e2e};
+  --bg-danger-1000: #{$theme-red-312325};
+  --bg-danger-1100: #{$theme-red-230408};
+  --bg-danger-1200: #{$theme-red-2B1C1D};
+
+  //
+  //
+  // Sets border color
+  //
+  //
+  --border-primary-100: #{$theme-blue-9CDCFE};
+  --border-primary-200: #{$theme-blue-1193F0};
+  --border-primary-300: #{$theme-blue-3670F7};
+  --border-primary-400: #{$theme-blue-0B5ED7};
+  --border-primary-900: #{$theme-blue-303F4F};
+
+  --border-secondary-50: #{$theme-grey-999999};
+  --border-secondary-100: #{$theme-grey-ffffff};
+  --border-secondary-110: #{$theme-grey-F5F5F5};
+  --border-secondary-150: #{$theme-grey-e5e5e5};
+  --border-secondary-200: #{$theme-grey-8A9299};
+  --border-secondary-290: #{$theme-grey-484848};
+  --border-secondary-295: #{$theme-grey-4e4e4e};
+  --border-secondary-300: #{$theme-grey-636566};
+  --border-secondary-310: #{$theme-grey-636566};
+  --border-secondary-320: #{$theme-grey-353646};
+  --border-secondary-400: #{$theme-grey-313233};
+  --border-secondary-450: #{$theme-grey-191919};
+  --border-secondary-500: #{$theme-grey-272727};
+  --border-secondary-600: #{$theme-grey-212222};
+  --border-secondary-700: #{$theme-grey-161617};
+  --border-secondary-800: #{$theme-grey-151515};
+  --border-secondary-900: #{$theme-grey-000000};
+  --border-secondary-950: #{$theme-grey-808080};
+  --border-secondary-1100: #{$theme-grey-2B343D};
+
+  --border-tertiary-100: #{$theme-violet-676A80};
+  --border-tertiary-190: #{$theme-violet-37394E};
+  --border-tertiary-300: #{$theme-violet-2A2C3C};
+  --border-tertiary-400: #{$theme-violet-22232E};
+  --border-tertiary-500: #{$theme-violet-272831};
+  --border-tertiary-600: #{$theme-violet-2E2F3D};
+  --border-tertiary-700: #{$theme-violet-1c1d27};
+  --border-tertiary-750: #{$theme-violet-1C1D2B};
+
+
+  --border-success-200: #{$theme-green-00A86B};
+
+
+
+  --border-danger-100: #{$theme-red-e5acb2};
+  --border-danger-200: #{$theme-red-fe8c98};
+  --border-danger-300: #{$theme-red-ff7878};
+  --border-danger-400: #{$theme-red-f16674};
+  --border-danger-500: #{$theme-red-fc6574};
+  --border-danger-600: #{$theme-red-ef5262};
+  --border-danger-700: #{$theme-red-f34b5c};
+  --border-danger-800: #{$theme-red-f33346};
+  --border-danger-900: #{$theme-red-fe2e2e};
+  --border-danger-1000: #{$theme-red-312325};
+  --border-danger-1200: #{$theme-red-2B1C1D};
+
+  //
+  //
+  // Sets icon color
+  //
+  //
+  --icon-primary-100: #{$theme-blue-9CDCFE};
+  --icon-primary-200: #{$theme-blue-1193F0};
+  --icon-primary-300: #{$theme-blue-3670F7};
+  --icon-primary-400: #{$theme-blue-0B5ED7};
+  --icon-primary-440: #{$theme-blue-DF77F9};
+  --icon-primary-900: #{$theme-blue-303F4F};
+
+  --icon-secondary-100: #{$theme-grey-ffffff};
+  --icon-secondary-110: #{$theme-grey-F5F5F5};
+  --icon-secondary-130: #{$theme-grey-A5B5CA};
+  --icon-secondary-150: #{$theme-grey-e5e5e5};
+  --icon-secondary-170: #{$theme-grey-9CA0B2};
+  --icon-secondary-200: #{$theme-grey-8A9299};
+  --icon-secondary-220: #{$theme-grey-60616B};
+  --icon-secondary-290: #{$theme-grey-484848};
+  --icon-secondary-300: #{$theme-grey-45494D};
+  --icon-secondary-380: #{$theme-grey-333333};
+  --icon-secondary-400: #{$theme-grey-313233};
+  --icon-secondary-450: #{$theme-grey-191919};
+  --icon-secondary-500: #{$theme-grey-272727};
+  --icon-secondary-550: #{$theme-grey-1A1A1A};
+  --icon-secondary-600: #{$theme-grey-212222};
+  --icon-secondary-700: #{$theme-grey-161617};
+  --icon-secondary-800: #{$theme-grey-151515};
+  --icon-secondary-900: #{$theme-grey-000000};
+  --icon-secondary-950: #{$theme-grey-808080};
+  --icon-secondary-1000: #{$theme-grey-CCCCCC};
+  --icon-secondary-1100: #{$theme-grey-2B343D};
+
+  --icon-tertiary-100: #{$theme-violet-676A80};
+  --icon-tertiary-190: #{$theme-violet-37394E};
+  --icon-tertiary-300: #{$theme-violet-2A2C3C};
+  --icon-tertiary-400: #{$theme-violet-22232E};
+  --icon-tertiary-500: #{$theme-violet-272831};
+  --icon-tertiary-600: #{$theme-violet-2E2F3D};
+  --icon-tertiary-700: #{$theme-violet-1c1d27};
+  --icon-tertiary-750: #{$theme-violet-1C1D2B};
+
+  --icon-danger-100: #{$theme-red-e5acb2};
+  --icon-danger-200: #{$theme-red-fe8c98};
+  --icon-danger-300: #{$theme-red-ff7878};
+  --icon-danger-400: #{$theme-red-f16674};
+  --icon-danger-500: #{$theme-red-fc6574};
+  --icon-danger-600: #{$theme-red-ef5262};
+  --icon-danger-700: #{$theme-red-f34b5c};
+  --icon-danger-800: #{$theme-red-f33346};
+  --icon-danger-900: #{$theme-red-fe2e2e};
+  --icon-danger-1000: #{$theme-red-312325};
+
+  --icon-success-100: #{$theme-green-8dc599};
+}
+
+// $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
+
+$theme-colors: map-merge($theme-colors,
+    ("primaryColor": $theme-blue-3670F7,
+      "recentApiText": $sparrow-recentApiText,
+
+      "secondaryColor": $sparrow-yellow,
+      "blackColor": $sparrow-black,
+      "successColor": $sparrow-success,
+      "borderColor": $sparrow-error,
+      "defaultColor": $sparrow-default,
+      "dangerColor": $sparrow-danger,
+      "whiteColor": $sparrow-white,
+      "lightGray": $sparrow-light-gray,
+      "backgroundColor": $sparrow-background,
+      "backgroundLight": $sparrow-background-light,
+      "backgroundDark": $sparrow-background-dark,
+      "backgroundDropdown": $sparrow-background-dropdown,
+      "plusButton": $sparrow-plusbutton,
+      "lightBackground": $sparrow-border-color,
+      "requestBodyColor": $sparrow-request-body,
+      "labelColor": $sparrow-send-button,
+      "buttonBackColor": $sparrow-button-background,
+      "buttonColor": $sparrow-button-color,
+      "redColor": $sparrow-gradient,
+      "getColor": $sparrow-get,
+      "putColor": $sparrow-put,
+      "postColor": $sparrow-post,
+      "deleteColor": $sparrow-delete,
+      "headColor": $sparrow-head,
+      "patchColor": $sparrow-patc,
+      "optionsColor": $sparrow-opt,
+      "textColor": $sparrow-text-color,
+      "keyValuePairColor": $sparrow-key-value-pair,
+      "dullBackground": $sparrow-dull-background,
+      "sparrowBottomBorder": $sparrow-bottom-border,
+      "emailInviteBackgroundColor": $sparrow-email-invite-bg-color,
+      "dropdownBorderColor": $sparrow-dropdown-border-color,
+      "activeSyncBtn": $sparrow-active-sync,
+      "dropdownButton": $sparrow-dropdown,
+      "dropdownHover": $sparrow-dropdown-hover,
+      "dropdownContainer": $sparrow-dropdown-container,
+      "dropdownOptionHover": $sparrow-dropdown-option-hover,
+      "dropdownOptionActive": $sparrow-dropdown-option-active,
+      "saveButtonLine": $sparrow-send-button-line,
+
+      "sparrowBgContainer": $sparrow-bg-container,
+      "sparrowBgContainerBorder": $sparrow-bg-container-border,
+      "sparrowBgContainerOne": $sparrow-bg-container-one,
+      "sparrowBgContainerTwo": $sparrow-bg-container-two,
+      "sparrowBgContainerThree": $sparrow-bg-container-three,
+      "sparrowBgContainerFour": $sparrow-bg-container-four,
+    ));
+
+// Define a map for font sizes in pixels
+$sparrow-font-sizes: (
+  6: 0.4rem,
+  // 6px in rem
+  8: 0.5rem,
+  // 8px in rem
+  9: 0.5625rem,
+  // 9px in rem
+  10: 0.625rem,
+  // 10px in rem
+  11: 0.6875rem,
+  // 11px in rem
+  12: 0.75rem,
+  // 12px in rem
+  13: 0.8125rem,
+  // 13px in rem
+  14: 0.875rem,
+  // 14px in rem
+  15: 0.9375rem,
+  // 15px in rem
+  16: 1rem,
+  // 16px in rem
+  17: 1.0625rem,
+  // 17px in rem
+  18: 1.125rem,
+  // 18px in rem
+  19: 1.1875rem,
+  // 19px in rem
+  20: 1.25rem,
+  // 20px in rem
+  28: 1.75rem,
+  // 28px in rem
+  36: 2.25rem,
+  // 36px in rem,
+);
+
+// Define a map for border radius in pixels
+$sparrow-border-radius: (
+  1: 1px,
+  2: 2px,
+  3: 3px,
+  4: 4px,
+  5: 5px,
+  6: 6px,
+);
+
+// Define a map for text colors
+$sparrow-text-colors: (
+  primary-100: $theme-blue-9CDCFE,
+  primary-150: $theme-blue-85C2FF,
+  primary-200: $theme-blue-1193F0,
+  primary-300: $theme-blue-3670F7,
+  primary-400: $theme-blue-0B5ED7,
+
+  secondary-100: $theme-grey-ffffff,
+  secondary-110: $theme-grey-F5F5F5,
+  secondary-150: $theme-grey-e5e5e5,
+  secondary-170: $theme-grey-C4CBDA,
+  secondary-180: $theme-grey-B6B5B5,
+  secondary-200: $theme-grey-8A9299,
+  secondary-250: $theme-grey-636566,
+  secondary-270: $theme-grey-60616B,
+  secondary-290: $theme-grey-484848,
+  secondary-300: $theme-grey-45494D,
+  secondary-400: $theme-grey-313233,
+  secondary-500: $theme-grey-272727,
+  secondary-550: $theme-grey-1A1A1A,
+  secondary-600: $theme-grey-212222,
+  secondary-700: $theme-grey-161617,
+  secondary-800: $theme-grey-151515,
+  secondary-850: $theme-grey-121212,
+  secondary-900: $theme-grey-000000,
+  secondary-1000: $theme-grey-CCCCCC,
+  secondary-1100: $theme-grey-2B343D,
+
+  tertiary-100: $theme-violet-676A80,
+  tertiary-190: $theme-violet-37394E,
+  tertiary-300: $theme-violet-2A2C3C,
+  tertiary-400: $theme-violet-22232E,
+  tertiary-500: $theme-violet-272831,
+  tertiary-600: $theme-violet-2E2F3D,
+  tertiary-700: $theme-violet-1c1d27,
+  tertiary-750: $theme-violet-1C1D2B,
+
+  danger-100: $theme-red-e5acb2,
+  danger-200: $theme-red-fe8c98,
+  danger-300: $theme-red-ff7878,
+  danger-400: $theme-red-f16674,
+  danger-500: $theme-red-fc6574,
+  danger-600: $theme-red-ef5262,
+  danger-700: $theme-red-f34b5c,
+  danger-800: $theme-red-f33346,
+  danger-900: $theme-red-fe2e2e,
+  danger-1000: $theme-red-312325,
+);
+
+// Define a map for background colors
+$sparrow-bg-colors: (
+  primary-100: $theme-blue-9CDCFE,
+  primary-200: $theme-blue-1193F0,
+  primary-300: $theme-blue-3670F7,
+  primary-400: $theme-blue-0B5ED7,
+
+  secondary-100: $theme-grey-ffffff,
+  secondary-110: $theme-grey-F5F5F5,
+  secondary-150: $theme-grey-e5e5e5,
+  secondary-170: $theme-grey-C4CBDA,
+  secondary-180: $theme-grey-B6B5B5,
+  secondary-200: $theme-grey-8A9299,
+  secondary-290: $theme-grey-484848,
+  secondary-300: $theme-grey-45494D,
+  secondary-400: $theme-grey-313233,
+  secondary-500: $theme-grey-272727,
+  secondary-550: $theme-grey-1A1A1A,
+  secondary-600: $theme-grey-212222,
+  secondary-700: $theme-grey-161617,
+  secondary-800: $theme-grey-151515,
+  secondary-850: $theme-grey-121212,
+  secondary-900: $theme-grey-000000,
+  secondary-1000: $theme-grey-CCCCCC,
+  secondary-1100: $theme-grey-2B343D,
+
+  tertiary-100: $theme-violet-676A80,
+  tertiary-190: $theme-violet-37394E,
+  tertiary-300: $theme-violet-2A2C3C,
+  tertiary-400: $theme-violet-22232E,
+  tertiary-500: $theme-violet-272831,
+  tertiary-600: $theme-violet-2E2F3D,
+  tertiary-650: $theme-violet-323548,
+  tertiary-670: $theme-violet-262834,
+  tertiary-700: $theme-violet-1c1d27,
+  tertiary-750: $theme-violet-1C1D2B,
+
+  danger-100: $theme-red-e5acb2,
+  danger-200: $theme-red-fe8c98,
+  danger-300: $theme-red-ff7878,
+  danger-400: $theme-red-f16674,
+  danger-500: $theme-red-fc6574,
+  danger-600: $theme-red-ef5262,
+  danger-700: $theme-red-f34b5c,
+  danger-800: $theme-red-f33346,
+  danger-900: $theme-red-fe2e2e,
+  danger-1000: $theme-red-312325,
+);
+
+// Define a map for border colors
+$sparrow-border-colors: (
+  primary-100: $theme-blue-9CDCFE,
+  primary-200: $theme-blue-1193F0,
+  primary-300: $theme-blue-3670F7,
+  primary-400: $theme-blue-0B5ED7,
+
+  secondary-100: $theme-grey-ffffff,
+  secondary-110: $theme-grey-F5F5F5,
+  secondary-150: $theme-grey-e5e5e5,
+  secondary-170: $theme-grey-C4CBDA,
+  secondary-180: $theme-grey-B6B5B5,
+  secondary-200: $theme-grey-8A9299,
+  secondary-290: $theme-grey-484848,
+  secondary-300: $theme-grey-45494D,
+  secondary-400: $theme-grey-313233,
+  secondary-500: $theme-grey-272727,
+  secondary-550: $theme-grey-1A1A1A,
+  secondary-600: $theme-grey-212222,
+  secondary-700: $theme-grey-161617,
+  secondary-800: $theme-grey-151515,
+  secondary-900: $theme-grey-000000,
+  secondary-1000: $theme-grey-CCCCCC,
+  secondary-1100: $theme-grey-2B343D,
+
+  tertiary-100: $theme-violet-676A80,
+  tertiary-190: $theme-violet-37394E,
+  tertiary-300: $theme-violet-2A2C3C,
+  tertiary-400: $theme-violet-22232E,
+  tertiary-500: $theme-violet-272831,
+  tertiary-600: $theme-violet-2E2F3D,
+  tertiary-700: $theme-violet-1c1d27,
+  tertiary-750: $theme-violet-1C1D2B,
+
+  danger-100: $theme-red-e5acb2,
+  danger-200: $theme-red-fe8c98,
+  danger-300: $theme-red-ff7878,
+  danger-400: $theme-red-f16674,
+  danger-500: $theme-red-fc6574,
+  danger-600: $theme-red-ef5262,
+  danger-700: $theme-red-f34b5c,
+  danger-800: $theme-red-f33346,
+  danger-900: $theme-red-fe2e2e,
+  danger-1000: $theme-red-312325,
+);
+
+// Generate utility classes
+@each $size, $value in $sparrow-font-sizes {
+  .sparrow-fs-#{$size} {
+    font-size: $value;
+  }
+
+  .text-fs-#{$size} {
+    font-size: $value;
+  }
+
+  .text-fs-#{$size}-important {
+    font-size: $value !important;
+  }
+}
+
+@each $radius, $value in $sparrow-border-radius {
+  .border-radius-#{$radius} {
+    border-radius: $value;
+  }
+}
+
+@each $color, $value in $sparrow-text-colors {
+  .text-#{$color} {
+    color: $value;
+  }
+}
+
+@each $background, $value in $sparrow-bg-colors {
+  .bg-#{$background} {
+    background-color: $value;
+  }
+
+  .bg-#{$background}-important {
+    background-color: $value !important;
+  }
+}
+
+@each $border, $value in $sparrow-border-colors {
+  .border-#{$border} {
+    border-color: $value;
+  }
+}
+
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/root";
+@import "bootstrap";
+
+body {
+  background-color: var(--background-color) !important;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a,
+li,
+span {
+  word-wrap: break-word;
+}
+
+.border-error {
+  border-color: $sparrow-error;
+  border-width: 3px;
+}
+
+.border-success {
+  border-color: $sparrow-success;
+  border-width: 1px;
+}
+
+.border-default {
+  border-color: $sparrow-default;
+  border-width: 1px;
+}
+
+.border-color {
+  border-color: #313233;
+  width: 1px;
+}
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Customize scrollbar for WebKit browsers */
+
+/* Set the width of the scrollbar */
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+/* Make the scrollbar track (background) transparent */
+::-webkit-scrollbar-track {
+  background: transparent;
+  width: 5px;
+}
+
+/* Customize the scrollbar thumb (the draggable part) */
+::-webkit-scrollbar-thumb {
+  background-color: var(--bg-secondary-350);
+  border-radius: 10px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+  width: 5px !important;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Customize the scrollbar buttons (arrows) */
+::-webkit-scrollbar-button {
+  border: none;
+  height: 8px;
+  width: 5px;
+}
+
+/* Up arrow */
+::-webkit-scrollbar-button:vertical:start:decrement {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgdmlld0JveD0iMCAwIDEwIDYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik01LjU4ODc4IDAuNzQ0MTQxQzUuMjYzMjYgMC40MTg2MiA0LjczNDYxIDAuNDE4NjIgNC40MDkwOSAwLjc0NDE0MUwxLjA3NTc2IDQuMDc3NDdDMC44MzYxNzMgNC4zMTcwNiAwLjc2NTg2IDQuNjczODMgMC44OTYwNjggNC45ODYzM0MxLjAyNjI4IDUuMjk4ODMgMS4zMjgzNiA1LjUwMTk1IDEuNjY2OTAgNS41MDE5NUg4LjMzMzU3QzguNjY5NTEgNS41MDE5NSA4Ljk3NDE5IDUuMjk4ODMgOS4xMDQwIDQuOTg2MzNDOS4yMzQ2MSA0LjY3MzgzIDkuMTYxNjkgNC4zMTcwNiA4LjkyNDcyIDQuMDc3NDdMNS41OTEzOCAwLjc0NDE0MUg1LjU4ODc4WiIgZmlsbD0iIzY3NkE4MCIvPgo8L3N2Zz4K");
+  display: block;
+  background-size: 12px;
+  background-position: center;
+  /* Adjusted size */
+}
+
+/* Down arrow */
+::-webkit-scrollbar-button:vertical:end:increment {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTQiIHZpZXdCb3g9IjAgMCAxMCAxNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzYxNTVfMjEyMzkpIj4KPHBhdGggZD0iTTQuNDExNjEgOS4yNTc4MUM0LjczNzEzIDkuNTgzMzMgNS4yNjU3NyA5LjU4MzMzIDUuNTkxMjkgOS4yNTc4MUw4LjkyNDYzIDUuOTI0NDhDOS4xNjQyMSA1LjY4NDkgOS4yMzQ1MiA1LjMyODEzIDkuMTA0MzEgNS4wMTU2M0M4Ljk3NDExIDQuNzAzMTMgOC42NzIwMiA0LjUgOC4zMzM0OCA0LjVMMDEuNjY2ODEgNC41MDI2MEMxLjMzMDg4IDQuNTAyNiAxLjAyNjE5IDQuNzA1NzMgMC44OTU5ODEgNS4wMTgyM0MwLjc2NTc3MyA1LjMzMDczIDAuODM4Njg5IDUuNjg3NSAxLjA3NTY3IDUuOTI3MDhMNC40MDkwMDkgOS4yNjA0Mkw0LjQxMTYxIDkuMjU3ODFaIiBmaWxsPSIjNjc2QTgwIi8+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfNjE1NV8yMTIzOSI+CjxyZWN0IHdpZHRoPSI4LjMzMzMzIiBoZWlnaHQ9IjEzLjMzMzMiIGZpbGw9IndoaXRlIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjgzMzQ5NiAwLjMzMzk4NCkiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K");
+  display: block;
+  background-size: 12px;
+  background-position: center;
+}
+
+.env-highlight {
+  &.env-found {
+    color: var(--text-primary-400);
+    cursor: pointer;
+  }
+
+  &.env-found:hover {
+    color: var(--primary-btn-color);
+    background-color: var(--selected-active-sidebar);
+  }
+
+  &.env-not-found {
+    color: var(--text-danger-200);
+    cursor: pointer;
+  }
+
+  &.env-not-found:hover {
+    color: var(--dangerColor);
+    background-color: var(--bg-danger-1100);
+  }
+
+  &.hover-found {
+    color: var(--text-primary-200);
+  }
+
+  &.hover-not-found {
+    color: var(--text-danger-200);
+  }
+}
+
+textarea {
+  resize: none;
+}
+
+button:disabled {
+  pointer-events: none !important;
+  opacity: 0.7;
+}
