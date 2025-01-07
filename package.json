@@ -12,14 +12,17 @@
     "./packages/@sparrow-common",
     "./packages/@sparrow-teams",
     "./packages/@sparrow-workspaces",
-    "./packages/@sparrow-support"
+    "./packages/@sparrow-support",
+    "./packages/@sparrow-storybook"
   ],
   "scripts": {
     "desktop-start": "yarn workspace @sparrow/desktop tauri dev",
     "desktop-build": "yarn workspace @sparrow/desktop tauri build --debug",
     "desktop-build-mac-universal": "yarn workspace @sparrow/desktop tauri build --target universal-apple-darwin --debug --verbose",
     "web-start": "yarn workspace @sparrow/web dev",
-    "web-build": "yarn workspace @sparrow/web build"
+    "web-build": "yarn workspace @sparrow/web build",
+    "storybook-start": "yarn workspace @sparrow/storybook storybook",
+    "storybook-build": "yarn workspace @sparrow/storybook storybook"
   },
   "dependencies": {
     "@codemirror/lang-html": "^6.4.7",
