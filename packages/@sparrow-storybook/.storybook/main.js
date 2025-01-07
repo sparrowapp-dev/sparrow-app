@@ -6,7 +6,6 @@ const config = {
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
   ],
-  staticDirs: ["../public"],
   framework: {
     name: "@storybook/svelte-vite",
     options: {},
