@@ -1,16 +1,9 @@
 {
   "name": "@sparrow/storybook",
   "version": "1.0.0",
-  "description": "Starter template to get up and running quickly with Svelte and Storybook",
+  "description": "",
   "private": true,
-  "author": "Chromatic <https://chromatic.com/>",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/chromaui/intro-storybook-svelte-template"
-  },
-  "bugs": {
-    "url": "https://github.com/chromaui/intro-storybook-svelte-template/issues"
-  },
+  "author": "",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -18,7 +11,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
+    "build-storybook": "storybook build --output-dir dist",
     "init-msw": "msw init public/"
   },
   "devDependencies": {
