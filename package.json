@@ -22,7 +22,7 @@
     "web-start": "yarn workspace @sparrow/web dev",
     "web-build": "yarn workspace @sparrow/web build",
     "storybook-start": "yarn workspace @sparrow/storybook storybook",
-    "storybook-build": "yarn workspace @sparrow/storybook storybook"
+    "storybook-build": "yarn workspace @sparrow/storybook build-storybook"
   },
   "dependencies": {
     "@codemirror/lang-html": "^6.4.7",

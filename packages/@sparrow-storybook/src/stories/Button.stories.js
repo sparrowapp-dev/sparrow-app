@@ -3,7 +3,7 @@ import { Button } from '@sparrow/library/ui';  // Adjust import based on your pa
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories
 export default {
-  title: 'Example/Button',
+  title: 'Components/Button',
   component: Button,
   tags: ['autodocs'],
   argTypes: {
