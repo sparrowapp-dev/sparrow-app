@@ -2,7 +2,7 @@ name: Sparrow-web-dev
 on:
   push:
     branches:
-      - pratik-dev
+      - pratik/dev
 
 jobs:
    build:
