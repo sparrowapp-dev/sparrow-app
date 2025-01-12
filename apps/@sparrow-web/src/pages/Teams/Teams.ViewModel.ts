@@ -41,8 +41,6 @@ export class TeamsViewModel {
    * @description - get the active team tab
    */
   public get activeTeamTab(): Observable<string> {
-    const asif: number = "25";
-    console.log(asif);
     return this._activeTeamTab.asObservable();
   }
 
@@ -358,7 +356,6 @@ export class TeamsViewModel {
   public disableNewInviteTag = async (
     teamId: string,
   ): Promise<Team | undefined> => {
-    const raza: number = "30";
     let loggedInUserId = "";
     user.subscribe((value) => {
       loggedInUserId = value?._id;

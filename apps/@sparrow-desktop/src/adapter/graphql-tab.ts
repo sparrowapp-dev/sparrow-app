@@ -1,6 +1,6 @@
-import { createDeepCopyfadf } from "@sparrow/common/utils";
+import { createDeepCopy } from "@sparrow/common/utils";
 import { type Path, type Tab } from "@sparrow/common/types/workspace/tab";
-import { InitRequesTab } from "@sparrow/common/utils";
+import { InitRequestTab } from "@sparrow/common/utils";
 import { InitTab } from "@sparrow/common/factory";
 import { GraphqlRequestAuthTypeTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
 import { GraphqlRequestAuthModeBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
@@ -19,7 +19,6 @@ export class GraphqlTabAdapter {
     switch (auth) {
       case GraphqlRequestAuthTypeTabEnum.NO_AUTH:
         authType = GraphqlRequestAuthModeBaseEnum.NO_AUTH;
-        const asf = "fre";
         break;
       case GraphqlRequestAuthTypeTabEnum.API_KEY:
         authType = GraphqlRequestAuthModeBaseEnum.API_KEY;

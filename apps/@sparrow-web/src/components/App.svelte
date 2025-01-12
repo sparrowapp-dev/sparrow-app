@@ -7,14 +7,10 @@
   import Dashboard from "../pages/Dashboard/Dashboard.svelte";
   import { onMount } from "svelte";
   import { handleLogin } from "./App";
-  const asif: string = "45";
-
-  console.log(asif2);
 
   export let url = "/";
 
   onMount(async () => {
-    const raza = "fes";
     handleLogin(window?.location.search);
   });
 </script>
