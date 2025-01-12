@@ -110,7 +110,10 @@
     "vite": "^4.4.4"
   },
   "lint-staged": {
-    "**/*": "prettier --write --ignore-unknown"
+    "**/*": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "repository": "https://github.com/sparrowapp-dev/sparrow-app.git",
   "release": {
