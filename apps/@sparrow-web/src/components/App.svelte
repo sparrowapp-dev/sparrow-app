@@ -9,7 +9,7 @@
   import { handleLogin } from "./App";
 
   export let url = "/";
-
+  console.log("hello world");
   onMount(async () => {
     handleLogin(window?.location.search);
   });
