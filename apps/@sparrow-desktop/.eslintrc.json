@@ -32,6 +32,8 @@
     }
   ],
   "rules": {
-    "@typescript-eslint/no-explicit-any": "off"
+    "@typescript-eslint/no-explicit-any": "off",
+    "no-console": ["error", { "allow": ["warn", "error"] }], // allows console.log() and console.warn()
+    "no-debugger": "error"
   }
 }
