@@ -15,7 +15,7 @@
   });
 </script>
 
-<Router {url
+<Router {ur
   <Authguard>
     <section slot="loggedIn">
       <Route path="/app/*" component={Dashboard} />
