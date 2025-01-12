@@ -33,6 +33,7 @@
   ],
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
-    "no-unused-vars": "warn"
+    "no-console": ["error", { "allow": ["warn", "error"] }], // allows console.log() and console.warn()
+    "no-debugger": "error"
   }
 }
