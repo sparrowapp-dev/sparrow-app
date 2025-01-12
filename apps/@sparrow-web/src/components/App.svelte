@@ -7,7 +7,8 @@
   import Dashboard from "../pages/Dashboard/Dashboard.svelte";
   import { onMount } from "svelte";
   import { handleLogin } from "./App";
-  // const asif: number = "45";
+  const asif: string = "45";
+  console.log(asif);
 
   export let url = "/";
 

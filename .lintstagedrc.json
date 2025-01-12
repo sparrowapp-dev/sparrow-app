@@ -1,5 +1,5 @@
 {
-  "*.{js,ts,svelte,css,json,md}": [
+  "*.{js,ts,svelte,css,md}": [
     "prettier --write --ignore-pattern '!**/.lintstagedrc.json'",
     "eslint --fix --ignore-pattern '!**/.lintstagedrc.json'"
   ]
