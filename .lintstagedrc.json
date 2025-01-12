@@ -1,3 +1,6 @@
 {
-  "*.ts": ["prettier --write", "eslint"]
+  "*.{js,ts,svelte,css,json,md}": [
+    "prettier --write --ignore-pattern '!**/.lintstagedrc.json'",
+    "eslint --fix --ignore-pattern '!**/.lintstagedrc.json'"
+  ]
 }

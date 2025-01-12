@@ -11,11 +11,11 @@
   export let url = "/";
 
   onMount(async () => {
-    handleLogin(window.location.search);
+    handleLogin(window?.location.search);
   });
 </script>
 
-<Router {ur
+<Router {url}>
   <Authguard>
     <section slot="loggedIn">
       <Route path="/app/*" component={Dashboard} />

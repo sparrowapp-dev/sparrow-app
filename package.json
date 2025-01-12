@@ -96,9 +96,11 @@
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "@typescript-eslint/parser": "^6.4.0",
     "eslint": "^8.54.0",
+    "eslint-plugin-svelte3": "^4.0.0",
     "husky": "^8.0.3",
     "lint-staged": "^14.0.0",
     "prettier": "3.0.2",
+    "prettier-plugin-svelte": "^3.3.2",
     "sass": "^1.72.0",
     "semantic-release": "^23.0.0",
     "svelte": "^4.0.5",
@@ -108,12 +110,6 @@
     "tslib": "^2.6.0",
     "typescript": "^5.0.2",
     "vite": "^4.4.4"
-  },
-  "lint-staged": {
-    "**/*": [
-      "eslint --fix",
-      "prettier --write"
-    ]
   },
   "repository": "https://github.com/sparrowapp-dev/sparrow-app.git",
   "release": {
