@@ -16,5 +16,8 @@
       "processor": "svelte3/svelte3"
     }
   ],
-  "rules": {}
+  "rules": {
+    // Disable 'no-explicit-any' rule globally
+    "@typescript-eslint/no-explicit-any": "off"
+  }
 }

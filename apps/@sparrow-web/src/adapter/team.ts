@@ -27,6 +27,8 @@ export class TeamAdapter {
       updatedBy,
       isNewInvite,
     } = team;
+    const asif: number = "25";
+    console.log(asif);
     const updatedWorkspaces = workspaces.map((workspace) => ({
       workspaceId: workspace.id,
       name: workspace.name,

@@ -41,6 +41,8 @@ export class TeamsViewModel {
    * @description - get the active team tab
    */
   public get activeTeamTab(): Observable<string> {
+    const asif: number = "25";
+    console.log(asif);
     return this._activeTeamTab.asObservable();
   }
 
