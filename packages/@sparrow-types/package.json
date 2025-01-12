@@ -45,5 +45,11 @@
     "svelte-toasts": "^1.1.2",
     "uuid": "^9.0.1",
     "yup": "^1.2.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,svelte,css,json}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }

@@ -66,5 +66,11 @@
     "yup": "^1.2.0",
     "@sparrow/library": "*",
     "@sparrow/common": "*"
+  },
+  "lint-staged": {
+    "*.{js,ts,svelte,css,json}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }

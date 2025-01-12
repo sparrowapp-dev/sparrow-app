@@ -49,5 +49,11 @@
     "@sparrow/library": "*",
     "@sparrow/common": "*",
     "@sparrow/teams": "*"
+  },
+  "lint-staged": {
+    "*.{js,ts,svelte,css,json}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }

@@ -23,6 +23,7 @@
     "web-build": "yarn workspace @sparrow/web build",
     "storybook-start": "yarn workspace @sparrow/storybook storybook",
     "storybook-build": "yarn workspace @sparrow/storybook build-storybook",
+    "preinstall": "node -e \"require('events').EventEmitter.defaultMaxListeners = 20\"",
     "postinstall": "husky install"
   },
   "dependencies": {
@@ -93,10 +94,10 @@
     "@types/js-beautify": "^1.14.3",
     "@types/mixpanel-browser": "^2.49.0",
     "@types/uuid": "^9.0.8",
-    "@typescript-eslint/eslint-plugin": "^8.19.1",
-    "@typescript-eslint/parser": "^8.19.1",
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@typescript-eslint/parser": "^6.4.0",
     "babel-eslint": "^10.1.0",
-    "eslint": "^9.18.0",
+    "eslint": "^8.54.0",
     "eslint-plugin-svelte": "^2.46.1",
     "eslint-plugin-svelte3": "^4.0.0",
     "husky": "^8.0.3",
