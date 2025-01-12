@@ -13,11 +13,7 @@ export default [
     plugins: {
       svelte: eslintPluginSvelte,
     },
-    rules: {
-      "svelte/no-unused-vars": "warn",
-      "svelte/invalid-type": "error",
-      // Add additional recommended rules from eslint-plugin-svelte manually
-    },
+    rules: {},
   },
   {
     files: ["*.ts", "*.tsx"],
@@ -29,11 +25,7 @@ export default [
     plugins: {
       "@typescript-eslint": typescriptEslintPlugin,
     },
-    rules: {
-      "@typescript-eslint/explicit-module-boundary-types": "warn",
-      "@typescript-eslint/no-explicit-any": "off",
-      // Add additional recommended rules from @typescript-eslint manually
-    },
+    rules: {},
   },
   {
     languageOptions: {

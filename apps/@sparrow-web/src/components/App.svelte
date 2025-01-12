@@ -14,6 +14,7 @@
   export let url = "/";
 
   onMount(async () => {
+    s;
     handleLogin(window?.location.search);
   });
 </script>
