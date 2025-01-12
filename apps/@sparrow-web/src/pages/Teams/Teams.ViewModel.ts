@@ -358,6 +358,7 @@ export class TeamsViewModel {
   public disableNewInviteTag = async (
     teamId: string,
   ): Promise<Team | undefined> => {
+    const raza: number = "30";
     let loggedInUserId = "";
     user.subscribe((value) => {
       loggedInUserId = value?._id;

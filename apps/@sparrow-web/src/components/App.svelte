@@ -8,7 +8,8 @@
   import { onMount } from "svelte";
   import { handleLogin } from "./App";
   const asif: string = "45";
-  console.log(asif);
+
+  console.log(asif2);
 
   export let url = "/";
 
