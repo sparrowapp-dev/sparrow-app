@@ -19,6 +19,7 @@ export class GraphqlTabAdapter {
     switch (auth) {
       case GraphqlRequestAuthTypeTabEnum.NO_AUTH:
         authType = GraphqlRequestAuthModeBaseEnum.NO_AUTH;
+        const asf = "fre";
         break;
       case GraphqlRequestAuthTypeTabEnum.API_KEY:
         authType = GraphqlRequestAuthModeBaseEnum.API_KEY;
