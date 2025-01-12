@@ -14,7 +14,7 @@
   export let url = "/";
 
   onMount(async () => {
-    s;
+    const raza = "fes";
     handleLogin(window?.location.search);
   });
 </script>
