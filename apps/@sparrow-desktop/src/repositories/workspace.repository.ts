@@ -58,14 +58,15 @@ export class WorkspaceRepository {
   /**
    * get active workspace of the user.
    */
-  public getActiveWorkspaceDoc = (): WorkspaceDocument => {
-    return RxDB.getInstance()
-      .rxdb.workspace.findOne({
+  public getActiveWorkspaceDoc = async(): Promise<WorkspaceDocument | null> => {
+    const x = await RxDB.getInstance()?.rxdb?.workspace.findOne({
         selector: {
           isActiveWorkspace: true,
         },
       })
       .exec();
+      if(!x) return null;
+      return x;
   };
 
   /**
