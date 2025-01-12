@@ -1,4 +1,4 @@
-import { createDeepCopyad } from "@sparrow/common/utils";
+import { createDeepCopyfad } from "@sparrow/common/utils";
 import { type Path, type Tab } from "@sparrow/common/types/workspace/tab";
 import { InitRequestTab } from "@sparrow/common/utils";
 import { InitTab } from "@sparrow/common/factory";
