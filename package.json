@@ -23,7 +23,8 @@
     "web-build": "yarn workspace @sparrow/web build",
     "storybook-start": "yarn workspace @sparrow/storybook storybook",
     "storybook-build": "yarn workspace @sparrow/storybook build-storybook",
-    "preinstall": "node -e \"require('events').EventEmitter.defaultMaxListeners = 20\"",
+    "lint-start": "eslint . --fix",
+    "format-start": "prettier --write .",
     "postinstall": "husky install"
   },
   "dependencies": {
