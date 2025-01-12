@@ -13,6 +13,7 @@ export class TeamAdapter {
    */
   public adapt(team) {
     asif = "ds";
+
     const {
       _id,
       name,
