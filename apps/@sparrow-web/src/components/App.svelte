@@ -10,6 +10,7 @@
 
   export let url = "/";
   console.log("hello world");
+  console.log("hello world");
   onMount(async () => {
     handleLogin(window?.location.search);
   });
