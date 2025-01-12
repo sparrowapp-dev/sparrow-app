@@ -12,8 +12,6 @@ export class TeamAdapter {
    * @returns  The current instance of the object with the adapted team.
    */
   public adapt(team) {
-    asif = "ds";
-
     const {
       _id,
       name,
