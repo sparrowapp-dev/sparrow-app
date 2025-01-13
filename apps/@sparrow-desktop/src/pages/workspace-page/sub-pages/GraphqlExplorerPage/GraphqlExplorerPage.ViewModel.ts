@@ -1620,7 +1620,6 @@ class GraphqlExplorerViewModel {
    * @returns save status
    */
   public saveRequest = async () => {
-    console.log("save reques");
     MixpanelEvent(Events.Save_GraphQL_Request);
     const graphqlTabData = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
@@ -1820,7 +1819,6 @@ class GraphqlExplorerViewModel {
     tabName: string,
     description: string,
   ) => {
-    console.log("save as request");
     const componentData = this._tab.getValue();
     let userSource = {};
     const _id = componentData.id;
