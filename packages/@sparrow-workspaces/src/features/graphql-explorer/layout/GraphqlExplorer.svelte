@@ -35,7 +35,10 @@
   import { Modal } from "@sparrow/library/ui";
   import { ResponseStatusCode } from "@sparrow/common/enums";
 
-  import { GraphqlRequestSectionTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
+  import {
+    GraphqlRequestOperationTabEnum,
+    GraphqlRequestSectionTabEnum,
+  } from "@sparrow/common/types/workspace/graphql-request-tab";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import { WarningIcon } from "@sparrow/library/icons";
   import RequestVariables from "../components/request-variables/RequestVariables.svelte";
@@ -211,7 +214,11 @@
                       <div style="flex:1; overflow:auto;" class="p-0">
                         {#if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.QUERY}
                           <RequestQuery
-                            value={$tab.property.graphql.query}
+                            value={$tab.property.graphql.state
+                              .operationNavigation ===
+                            GraphqlRequestOperationTabEnum.MUTATION
+                              ? $tab.property.graphql.mutation
+                              : $tab.property.graphql.query}
                             {onUpdateRequestQuery}
                           />
                         {:else if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.VARIABLES}
@@ -314,7 +321,10 @@
                   <ResponseStatus
                     response={storeData?.response}
                     {onClearQuery}
-                    value={$tab.property.graphql.query}
+                    value={$tab.property.graphql.state.operationNavigation ===
+                    GraphqlRequestOperationTabEnum.MUTATION
+                      ? $tab.property.graphql.mutation
+                      : $tab.property.graphql.query}
                   />
                 </div>
                 <div style="flex:1; overflow: auto;">
@@ -410,9 +420,9 @@
     border-right: 0 !important;
   }
   :global(
-      .graph-rest-splitter > .splitpanes__splitter:active,
-      .graph-rest-splitter > .splitpanes__splitter:hover
-    ) {
+    .graph-rest-splitter > .splitpanes__splitter:active,
+    .graph-rest-splitter > .splitpanes__splitter:hover
+  ) {
     background-color: var(--bg-primary-200) !important;
   }
   :global(.graph-ql-splitter.splitpanes--vertical > .splitpanes__splitter) {
@@ -434,9 +444,9 @@
     border-right: 0 !important;
   }
   :global(
-      .graph-ql-splitter > .splitpanes__splitter:active,
-      .graph-ql-splitter > .splitpanes__splitter:hover
-    ) {
+    .graph-ql-splitter > .splitpanes__splitter:active,
+    .graph-ql-splitter > .splitpanes__splitter:hover
+  ) {
     background-color: var(--bg-primary-200) !important;
   }
   .link {

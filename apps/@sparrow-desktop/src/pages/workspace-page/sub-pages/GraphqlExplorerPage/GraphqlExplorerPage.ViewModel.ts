@@ -109,7 +109,7 @@ class GraphqlExplorerViewModel {
           this._tab.getValue().property?.graphql
             ?.auth as GraphqlRequestAuthTabInterface,
         ).getValue();
-        this.updateQueryAsPerSchema();
+        // this.updateQueryAsPerSchema();
       }, 0);
     }
   }
@@ -349,7 +349,15 @@ class GraphqlExplorerViewModel {
   public updateSchemaAsPerQuery = async () => {
     try {
       const progressiveTab = createDeepCopy(this._tab.getValue());
-      const query = progressiveTab.property.graphql.query;
+      let query;
+      if (
+        progressiveTab.property.graphql.state.operationNavigation ===
+        GraphqlRequestOperationTabEnum.MUTATION
+      ) {
+        query = progressiveTab.property.graphql.mutation;
+      } else {
+        query = progressiveTab.property.graphql.query;
+      }
       try {
         // Check if the query is valid by attempting to parse it
         parse(query);
@@ -398,7 +406,14 @@ class GraphqlExplorerViewModel {
    */
   public updateRequestQuery = async (_query: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.graphql.query = _query;
+    if (
+      progressiveTab.property.graphql.state.operationNavigation ===
+      GraphqlRequestOperationTabEnum.QUERY
+    ) {
+      progressiveTab.property.graphql.query = _query;
+    } else {
+      progressiveTab.property.graphql.mutation = _query;
+    }
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     await this.updateSchemaAsPerQuery();
@@ -1132,8 +1147,14 @@ class GraphqlExplorerViewModel {
           "Mutation",
         );
       }
-
-      progressiveTab.property.graphql.query = _query;
+      if (
+        progressiveTab.property.graphql.state.operationNavigation ===
+        GraphqlRequestOperationTabEnum.QUERY
+      ) {
+        progressiveTab.property.graphql.query = _query;
+      } else {
+        progressiveTab.property.graphql.mutation = _query;
+      }
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } catch (error) {
