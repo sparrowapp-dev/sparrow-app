@@ -491,6 +491,7 @@ export class CollectionService {
       name: string;
       description: string;
       url: string;
+      mutation?: string;
       query?: string;
       schema?: string;
       variables?: string;
@@ -524,6 +525,7 @@ export class CollectionService {
             graphql: {
               url: _graphql.url,
               query: _graphql.query,
+              mutation: _graphql.mutation,
               schema: _graphql.schema,
               variables: _graphql.variables,
               headers: _graphql.headers,
@@ -545,6 +547,7 @@ export class CollectionService {
           graphql: {
             url: _graphql.url,
             query: _graphql.query,
+            mutation: _graphql.mutation,
             schema: _graphql.schema,
             variables: _graphql.variables,
             headers: _graphql.headers,

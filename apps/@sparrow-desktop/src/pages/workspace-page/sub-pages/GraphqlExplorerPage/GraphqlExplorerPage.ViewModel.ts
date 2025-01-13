@@ -171,6 +171,7 @@ class GraphqlExplorerViewModel {
         .updateDescription(requestServer.description)
         .updateUrl(requestServer.graphql.url)
         .updateQuery(requestServer.graphql.query)
+        .updateMutation(requestServer.graphql.mutation)
         .updateState({
           requestAuthNavigation: requestServer.graphql.selectedGraphqlAuthType,
         })
@@ -1202,9 +1203,9 @@ class GraphqlExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    if (_state?.operationNavigation) {
-      await this.updateQueryAsPerSchema();
-    }
+    // if (_state?.operationNavigation) {
+    //   await this.updateQueryAsPerSchema();
+    // }
     this.compareRequestWithServer();
   };
 
@@ -1619,6 +1620,7 @@ class GraphqlExplorerViewModel {
    * @returns save status
    */
   public saveRequest = async () => {
+    console.log("save reques");
     MixpanelEvent(Events.Save_GraphQL_Request);
     const graphqlTabData = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
@@ -1646,6 +1648,7 @@ class GraphqlExplorerViewModel {
         graphql: {
           url: unadaptedRequest.url as string,
           query: unadaptedRequest.query,
+          mutation: unadaptedRequest.mutation,
           schema: unadaptedRequest.schema,
           variables: unadaptedRequest.variables,
           headers: unadaptedRequest.headers,
@@ -1691,6 +1694,7 @@ class GraphqlExplorerViewModel {
       description: graphqlTabData?.description as string,
       url: unadaptedRequest.url as string,
       query: unadaptedRequest.query,
+      mutation: unadaptedRequest.mutation,
       schema: unadaptedRequest.schema,
       variables: unadaptedRequest.variables,
       headers: unadaptedRequest.headers,
@@ -1816,6 +1820,7 @@ class GraphqlExplorerViewModel {
     tabName: string,
     description: string,
   ) => {
+    console.log("save as request");
     const componentData = this._tab.getValue();
     let userSource = {};
     const _id = componentData.id;
@@ -1884,6 +1889,7 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(req.graphql.url as string);
             initRequestTab.updateQuery(req.graphql.query as string);
+            initRequestTab.updateMutation(req.graphql.mutation as string);
             initRequestTab.updateSchema(req.graphql.schema as string);
             initRequestTab.updateVariables(req.graphql.variables as string);
             initRequestTab.updateAuth(
@@ -1961,6 +1967,9 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(res.data.data.graphql?.url as string);
             initRequestTab.updateQuery(res.data.data.graphql?.query as string);
+            initRequestTab.updateMutation(
+              res.data.data.graphql?.mutation as string,
+            );
             initRequestTab.updateSchema(
               res.data.data.graphql?.schema as string,
             );
@@ -2034,6 +2043,7 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(req.graphql?.url as string);
             initRequestTab.updateQuery(req.graphql?.query as string);
+            initRequestTab.updateMutation(req.graphql?.mutation as string);
             initRequestTab.updateVariables(req.graphql?.variables as string);
             initRequestTab.updateSchema(req.graphql?.schema as string);
             initRequestTab.updateAuth(
@@ -2109,6 +2119,9 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(res.data.data.graphql?.url as string);
             initRequestTab.updateQuery(res.data.data.graphql?.query as string);
+            initRequestTab.updateMutation(
+              res.data.data.graphql?.mutation as string,
+            );
             initRequestTab.updateVariables(
               res.data.data.graphql?.variables as string,
             );
