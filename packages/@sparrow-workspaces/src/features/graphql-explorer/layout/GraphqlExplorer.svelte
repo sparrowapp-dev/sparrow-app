@@ -220,6 +220,14 @@
                               ? $tab.property.graphql.mutation
                               : $tab.property.graphql.query}
                             {onUpdateRequestQuery}
+                            isError={$tab.property.graphql.state
+                              ?.isQueryInvalid}
+                            errorMessage={$tab.property.graphql.state
+                              ?.queryErrorMessage}
+                            errorStartIndex={$tab.property.graphql.state
+                              ?.queryErrorStartIndex}
+                            errorEndIndex={$tab.property.graphql.state
+                              ?.queryErrorEndIndex}
                           />
                         {:else if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.VARIABLES}
                           <RequestVariables

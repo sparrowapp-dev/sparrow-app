@@ -7,6 +7,10 @@
     "Graphql";
   export let value = "";
   export let onUpdateRequestQuery: (data: string) => void = () => {};
+  export let isError = false;
+  export let errorMessage = "";
+  export let errorStartIndex = 0;
+  export let errorEndIndex = 0;
   const handleCodeMirrorChange = (e: CustomEvent<string>) => {
     onUpdateRequestQuery(e.detail);
   };
@@ -43,6 +47,10 @@
             {isBodyBeautified}
             beautifySyntaxCallback={updateBeautifiedState}
             placeholder={""}
+            isErrorVisible={isError}
+            {errorMessage}
+            {errorStartIndex}
+            {errorEndIndex}
           />
         </div>
       </div>

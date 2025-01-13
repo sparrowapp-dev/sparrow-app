@@ -21,6 +21,7 @@
     "@codemirror/lang-xml": "^6.0.2",
     "@codemirror/language": "^6.10.0",
     "@codemirror/state": "^6.4.0",
+    "@codemirror/lint": "^6.8.4",
     "@editorjs/code": "^2.9.0",
     "@editorjs/editorjs": "^2.30.4",
     "@editorjs/header": "^2.8.7",

@@ -70,6 +70,10 @@ class InitGraphqlTab {
             requestBuilderLeftSplitterWidthPercentage: 50,
             requestBuilderRightSplitterWidthPercentage: 50,
             operationNavigation: GraphqlRequestOperationTabEnum.QUERY,
+            isQueryInvalid: false,
+            queryErrorStartIndex: 0,
+            queryErrorEndIndex: 0,
+            queryErrorMessage: "",
           },
           auth: {
             bearerToken: "",

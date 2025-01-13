@@ -64,7 +64,7 @@ import {
   type EnvironmentLocalGlobalJoinBaseInterface,
 } from "@sparrow/common/types/workspace/environment-base";
 import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
-import { parse } from "graphql";
+import { parse, GraphQLError } from "graphql";
 class GraphqlExplorerViewModel {
   /**
    * Repository
@@ -418,6 +418,7 @@ class GraphqlExplorerViewModel {
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     await this.updateSchemaAsPerQuery();
+    this.updateQueryErrorState();
     this.compareRequestWithServer();
   };
 
@@ -1190,6 +1191,126 @@ class GraphqlExplorerViewModel {
   };
 
   /**
+   * Updates the error state of GraphQL Query to know whether query is valid graphql query or not.
+   */
+  private updateQueryErrorState = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (
+      progressiveTab.property.graphql.state.operationNavigation ===
+      GraphqlRequestOperationTabEnum.QUERY
+    ) {
+      try {
+        await parse(progressiveTab.property.graphql.query);
+        progressiveTab.property.graphql.state.isQueryInvalid = false;
+      } catch (error) {
+        if (error instanceof GraphQLError) {
+          const locations = error.locations;
+          if (locations && locations.length > 0) {
+            // Convert line/column to character index
+            const start = this.getCharacterIndex(
+              progressiveTab.property.graphql.query,
+              locations[0].line,
+              locations[0].column,
+            );
+
+            // For the end index, we'll try to capture the problematic token
+            // If not available, we'll use start + 1 as a fallback
+            let end = start;
+            if (error.nodes && error.nodes[0]) {
+              end = error.nodes[0].end;
+            } else {
+              // Try to find the next non-alphanumeric character as the end
+              end = this.findNextBreakpoint(
+                progressiveTab.property.graphql.query,
+                start,
+              );
+            }
+            progressiveTab.property.graphql.state.queryErrorStartIndex = start;
+            progressiveTab.property.graphql.state.queryErrorEndIndex = end;
+            progressiveTab.property.graphql.state.queryErrorMessage =
+              error?.message || "Invalid Query";
+          }
+        }
+        progressiveTab.property.graphql.state.isQueryInvalid = true;
+      }
+    } else {
+      try {
+        await parse(progressiveTab.property.graphql.mutation);
+        progressiveTab.property.graphql.state.isQueryInvalid = false;
+      } catch (error) {
+        if (error instanceof GraphQLError) {
+          const locations = error.locations;
+          if (locations && locations.length > 0) {
+            // Convert line/column to character index
+            const start = this.getCharacterIndex(
+              progressiveTab.property.graphql.mutation,
+              locations[0].line,
+              locations[0].column,
+            );
+
+            // For the end index, we'll try to capture the problematic token
+            // If not available, we'll use start + 1 as a fallback
+            let end = start;
+            if (error.nodes && error.nodes[0]) {
+              end = error.nodes[0].end;
+            } else {
+              // Try to find the next non-alphanumeric character as the end
+              end = this.findNextBreakpoint(
+                progressiveTab.property.graphql.mutation,
+                start,
+              );
+            }
+            progressiveTab.property.graphql.state.queryErrorStartIndex = start;
+            progressiveTab.property.graphql.state.queryErrorEndIndex = end;
+            progressiveTab.property.graphql.state.queryErrorMessage =
+              error?.message || "Invalid Query";
+          }
+        }
+        progressiveTab.property.graphql.state.isQueryInvalid = true;
+      }
+    }
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
+  // Helper function to convert line/column to character index
+  private getCharacterIndex(
+    text: string,
+    line: number,
+    column: number,
+  ): number {
+    const lines = text.split("\n");
+    let index = 0;
+
+    // Add up lengths of all previous lines
+    for (let i = 0; i < line - 1; i++) {
+      index += lines[i].length + 1; // +1 for the newline character
+    }
+
+    // Add the column position in the current line
+    index += column - 1;
+
+    return index;
+  }
+
+  // Helper function to find the next suitable ending position for the error range
+  private findNextBreakpoint(text: string, start: number): number {
+    const maxLength = 20; // Maximum length to look ahead
+    let end = start + 1;
+
+    while (end < text.length && end < start + maxLength) {
+      const char = text[end];
+      // Stop at whitespace or special characters
+      if (/[\s{}()[\]:,]/.test(char)) {
+        break;
+      }
+      end++;
+    }
+
+    return end;
+  }
+
+  /**
    *
    * @param _state - request state
    */
@@ -1206,6 +1327,9 @@ class GraphqlExplorerViewModel {
     // if (_state?.operationNavigation) {
     //   await this.updateQueryAsPerSchema();
     // }
+    setTimeout(() => {
+      this.updateQueryErrorState();
+    }, 1000);
     this.compareRequestWithServer();
   };
 

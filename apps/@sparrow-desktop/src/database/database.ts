@@ -236,6 +236,12 @@ export class RxDB {
             if (oldDoc?.property?.graphql) {
               oldDoc.property.graphql.mutation = "";
             }
+            if (oldDoc?.property?.graphql?.state) {
+              oldDoc.property.graphql.state.isQueryInvalid = false;
+              oldDoc.property.graphql.state.queryErrorStartIndex = 0;
+              oldDoc.property.graphql.state.queryErrorEndIndex = 0;
+              oldDoc.property.graphql.state.queryErrorMessage = "";
+            }
             return oldDoc;
           },
         },
