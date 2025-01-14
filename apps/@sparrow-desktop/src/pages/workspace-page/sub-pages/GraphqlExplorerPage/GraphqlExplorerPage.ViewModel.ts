@@ -1193,21 +1193,25 @@ class GraphqlExplorerViewModel {
   /**
    * Updates the error state of GraphQL Query to know whether query is valid graphql query or not.
    */
-  private updateQueryErrorState = async () => {
+  public updateQueryErrorState = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
+    let isQueryInvalid = false;
+    let start = 0;
+    let end = 0;
+    let queryErrorMessage = "";
     if (
       progressiveTab.property.graphql.state.operationNavigation ===
       GraphqlRequestOperationTabEnum.QUERY
     ) {
       try {
         await parse(progressiveTab.property.graphql.query);
-        progressiveTab.property.graphql.state.isQueryInvalid = false;
+        isQueryInvalid = false;
       } catch (error) {
         if (error instanceof GraphQLError) {
           const locations = error.locations;
           if (locations && locations.length > 0) {
             // Convert line/column to character index
-            const start = this.getCharacterIndex(
+            const startIndex = this.getCharacterIndex(
               progressiveTab.property.graphql.query,
               locations[0].line,
               locations[0].column,
@@ -1215,34 +1219,33 @@ class GraphqlExplorerViewModel {
 
             // For the end index, we'll try to capture the problematic token
             // If not available, we'll use start + 1 as a fallback
-            let end = start;
+            let endIndex = startIndex;
             if (error.nodes && error.nodes[0]) {
-              end = error.nodes[0].end;
+              endIndex = error.nodes[0].endIndex;
             } else {
               // Try to find the next non-alphanumeric character as the end
-              end = this.findNextBreakpoint(
+              endIndex = this.findNextBreakpoint(
                 progressiveTab.property.graphql.query,
-                start,
+                startIndex,
               );
             }
-            progressiveTab.property.graphql.state.queryErrorStartIndex = start;
-            progressiveTab.property.graphql.state.queryErrorEndIndex = end;
-            progressiveTab.property.graphql.state.queryErrorMessage =
-              error?.message || "Invalid Query";
+            start = startIndex;
+            end = endIndex;
+            queryErrorMessage = error?.message || "";
+            isQueryInvalid = true;
           }
         }
-        progressiveTab.property.graphql.state.isQueryInvalid = true;
       }
     } else {
       try {
         await parse(progressiveTab.property.graphql.mutation);
-        progressiveTab.property.graphql.state.isQueryInvalid = false;
+        isQueryInvalid = false;
       } catch (error) {
         if (error instanceof GraphQLError) {
           const locations = error.locations;
           if (locations && locations.length > 0) {
             // Convert line/column to character index
-            const start = this.getCharacterIndex(
+            const startIndex = this.getCharacterIndex(
               progressiveTab.property.graphql.mutation,
               locations[0].line,
               locations[0].column,
@@ -1250,27 +1253,25 @@ class GraphqlExplorerViewModel {
 
             // For the end index, we'll try to capture the problematic token
             // If not available, we'll use start + 1 as a fallback
-            let end = start;
+            let endIndex = startIndex;
             if (error.nodes && error.nodes[0]) {
-              end = error.nodes[0].end;
+              endIndex = error.nodes[0].endIndex;
             } else {
               // Try to find the next non-alphanumeric character as the end
-              end = this.findNextBreakpoint(
+              endIndex = this.findNextBreakpoint(
                 progressiveTab.property.graphql.mutation,
-                start,
+                startIndex,
               );
             }
-            progressiveTab.property.graphql.state.queryErrorStartIndex = start;
-            progressiveTab.property.graphql.state.queryErrorEndIndex = end;
-            progressiveTab.property.graphql.state.queryErrorMessage =
-              error?.message || "Invalid Query";
+            start = startIndex;
+            end = endIndex;
+            queryErrorMessage = error?.message || "";
+            isQueryInvalid = true;
           }
         }
-        progressiveTab.property.graphql.state.isQueryInvalid = true;
       }
     }
-    this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    return { isQueryInvalid, start, end, queryErrorMessage };
   };
 
   // Helper function to convert line/column to character index

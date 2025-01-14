@@ -405,18 +405,6 @@ export const tabSchemaLiteral = {
                 isRequestSchemaFetched: {
                   type: "boolean",
                 },
-                isQueryInvalid: {
-                  type: "boolean",
-                },
-                queryErrorStartIndex: {
-                  type: "number",
-                },
-                queryErrorEndIndex: {
-                  type: "number",
-                },
-                queryErrorMessage: {
-                  type: "string",
-                },
               },
             },
             auth: {

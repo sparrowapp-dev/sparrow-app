@@ -51,22 +51,6 @@ export interface GraphqlRequestIsRequestSchemaFetchedWrapperTabInterface {
   isRequestSchemaFetched: boolean;
 }
 
-export interface GraphqlRequestIsQueryInvalidWrapperTabInterface {
-  isQueryInvalid: boolean;
-}
-
-export interface GraphqlRequestQueryErrorStartIndexWrapperTabInterface {
-  queryErrorStartIndex: number;
-}
-
-export interface GraphqlRequestQueryErrorEndIndexWrapperTabInterface {
-  queryErrorEndIndex: number;
-}
-
-export interface GraphqlRequestQueryErrorMessageWrapperTabInterface {
-  queryErrorMessage: string;
-}
-
 export interface GraphqlRequestUsernameWrapperTabInterface {
   username: string;
 }
@@ -124,10 +108,6 @@ export interface GraphqlRequestStateTabInterface
     GraphqlRequestRightSplitterWidthPercentageWrapperTabInterface,
     GraphqlRequestIsBulkHeaderWrapperTabInterface,
     GraphqlRequestIsRequestSchemaFetchedWrapperTabInterface,
-    GraphqlRequestIsQueryInvalidWrapperTabInterface,
-    GraphqlRequestQueryErrorStartIndexWrapperTabInterface,
-    GraphqlRequestQueryErrorEndIndexWrapperTabInterface,
-    GraphqlRequestQueryErrorMessageWrapperTabInterface,
     GraphqlRequestBuilderLeftSplitterWidthPercentageWrapperTabInterface,
     GraphqlRequestBuilderRightSplitterWidthPercentageWrapperTabInterface,
     GraphqlRequestOperationNavigationWrapperTabInterface {}
