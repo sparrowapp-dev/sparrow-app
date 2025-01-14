@@ -76,6 +76,9 @@ export interface GraphqlRequestOperationSearchWrapperTabInterface {
 export interface GraphqlRequestQueryWrapperTabInterface {
   query: string;
 }
+export interface GraphqlRequestMutationWrapperTabInterface {
+  mutation: string;
+}
 export interface GraphqlRequestSchemaWrapperTabInterface {
   schema: string;
 }
@@ -158,6 +161,7 @@ export interface GraphqlRequestTabInterface
     GraphqlRequestAuthWrapperTabInterface,
     GraphqlRequestUrlWrapperTabInterface,
     GraphqlRequestQueryWrapperTabInterface,
+    GraphqlRequestMutationWrapperTabInterface,
     GraphqlRequestSchemaWrapperTabInterface,
     GraphqlRequestHeadersWrapperTabInterface,
     GraphqlRequestVariablesWrapperTabInterface,

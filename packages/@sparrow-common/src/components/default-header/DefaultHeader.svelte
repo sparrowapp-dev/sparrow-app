@@ -57,7 +57,7 @@
 
   <div class="d-flex align-items-center no-drag" style="position: relative;">
     {#if isWindows}
-      <div class="d-flex gap-3 ms-4 me-1 no-drag">
+      <div class="d-flex gap-3 ms-4 no-drag">
         <WindowAction isWindows={true} />
       </div>
     {/if}

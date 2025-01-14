@@ -25,6 +25,7 @@ export type GraphqlRequestSourceDtoType = "SPEC" | "USER";
 export interface GraphqlRequestMetaDataDtoInterface {
   url?: string;
   query?: string;
+  mutation?: string;
   schema?: string;
   variables?: string;
   headers?: GraphqlRequestKeyValueDtoInterface[];

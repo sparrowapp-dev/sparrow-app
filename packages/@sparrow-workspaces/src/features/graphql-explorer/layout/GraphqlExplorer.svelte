@@ -35,10 +35,14 @@
   import { Modal } from "@sparrow/library/ui";
   import { ResponseStatusCode } from "@sparrow/common/enums";
 
-  import { GraphqlRequestSectionTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
+  import {
+    GraphqlRequestOperationTabEnum,
+    GraphqlRequestSectionTabEnum,
+  } from "@sparrow/common/types/workspace/graphql-request-tab";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import { WarningIcon } from "@sparrow/library/icons";
   import RequestVariables from "../components/request-variables/RequestVariables.svelte";
+  import { onMount } from "svelte";
 
   export let tab;
   export let collections;
@@ -69,22 +73,74 @@
   export let updateSchema;
   export let onUpdateVariables;
   export let updateOperationSearch;
+  export let checkQueryErrorStatus;
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
   let isSchemaFetching = false;
+  let isQueryInvalid = false;
+  let errorStartIndex = 0;
+  let errorEndIndex = 0;
+  let queryErrorMessage = "";
   $: {
     if ($tab?.property?.graphql?.url?.length > 0) {
       isLoading = false;
     }
   }
+
+  /**
+   * Toggles the "Save As Request" flag.
+   */
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
+
+  /**
+   * Handles the process of fetching the GraphQL schema.
+   * Sets the `isSchemaFetching` flag while fetching and resets it after completion.
+   */
   const handleFetchSchema = async () => {
     isSchemaFetching = true;
     await onFetchSchema(environmentVariables?.filtered || []);
     isSchemaFetching = false;
+  };
+
+  /**
+   * Checks and handles the query error status.
+   * Updates error-related variables if the query is invalid.
+   */
+  const handleQueryErrorStatus = async () => {
+    const errorStatus = await checkQueryErrorStatus();
+    if (errorStatus?.isQueryInvalid) {
+      isQueryInvalid = true;
+      errorStartIndex = errorStatus.start;
+      errorEndIndex = errorStatus.end;
+      queryErrorMessage = errorStatus.queryErrorMessage;
+    } else {
+      isQueryInvalid = false;
+    }
+  };
+  onMount(async () => {
+    setTimeout(async () => {
+      await handleQueryErrorStatus();
+    }, 200);
+  });
+
+  /**
+   * Updates the request query and checks for query errors.
+   */
+  const handleUpdateRequestQuery = async (data: string) => {
+    await onUpdateRequestQuery(data);
+    await handleQueryErrorStatus();
+  };
+
+  /**
+   * Updates the request state and resets the query error status.
+   */
+  const handleUpdateRequestState = async (data: any) => {
+    isQueryInvalid = false;
+    await onUpdateRequestState(data);
+    await handleQueryErrorStatus();
   };
 </script>
 
@@ -211,8 +267,16 @@
                       <div style="flex:1; overflow:auto;" class="p-0">
                         {#if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.QUERY}
                           <RequestQuery
-                            value={$tab.property.graphql.query}
-                            {onUpdateRequestQuery}
+                            value={$tab.property.graphql.state
+                              .operationNavigation ===
+                            GraphqlRequestOperationTabEnum.MUTATION
+                              ? $tab.property.graphql.mutation
+                              : $tab.property.graphql.query}
+                            onUpdateRequestQuery={handleUpdateRequestQuery}
+                            isError={isQueryInvalid}
+                            errorMessage={queryErrorMessage}
+                            {errorStartIndex}
+                            {errorEndIndex}
                           />
                         {:else if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.VARIABLES}
                           <RequestVariables
@@ -314,7 +378,10 @@
                   <ResponseStatus
                     response={storeData?.response}
                     {onClearQuery}
-                    value={$tab.property.graphql.query}
+                    value={$tab.property.graphql.state.operationNavigation ===
+                    GraphqlRequestOperationTabEnum.MUTATION
+                      ? $tab.property.graphql.mutation
+                      : $tab.property.graphql.query}
                   />
                 </div>
                 <div style="flex:1; overflow: auto;">
@@ -324,7 +391,7 @@
                       {updateSchema}
                       requestOperationSection={$tab.property.graphql?.state
                         ?.operationNavigation}
-                      {onUpdateRequestState}
+                      onUpdateRequestState={handleUpdateRequestState}
                       operationSearch={$tab.property.graphql?.operationSearch}
                       {updateOperationSearch}
                     />
@@ -410,9 +477,9 @@
     border-right: 0 !important;
   }
   :global(
-      .graph-rest-splitter > .splitpanes__splitter:active,
-      .graph-rest-splitter > .splitpanes__splitter:hover
-    ) {
+    .graph-rest-splitter > .splitpanes__splitter:active,
+    .graph-rest-splitter > .splitpanes__splitter:hover
+  ) {
     background-color: var(--bg-primary-200) !important;
   }
   :global(.graph-ql-splitter.splitpanes--vertical > .splitpanes__splitter) {
@@ -434,9 +501,9 @@
     border-right: 0 !important;
   }
   :global(
-      .graph-ql-splitter > .splitpanes__splitter:active,
-      .graph-ql-splitter > .splitpanes__splitter:hover
-    ) {
+    .graph-ql-splitter > .splitpanes__splitter:active,
+    .graph-ql-splitter > .splitpanes__splitter:hover
+  ) {
     background-color: var(--bg-primary-200) !important;
   }
   .link {

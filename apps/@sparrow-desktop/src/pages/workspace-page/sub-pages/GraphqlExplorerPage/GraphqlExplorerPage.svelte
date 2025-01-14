@@ -161,4 +161,5 @@
   updateSchema={_viewModel.updateSchema}
   onUpdateVariables={_viewModel.updateRequestVariables}
   updateOperationSearch={_viewModel.updateRequestOperationSearch}
+  checkQueryErrorStatus={_viewModel.updateQueryErrorState}
 />

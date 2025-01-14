@@ -64,7 +64,7 @@ import {
   type EnvironmentLocalGlobalJoinBaseInterface,
 } from "@sparrow/common/types/workspace/environment-base";
 import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
-import { parse } from "graphql";
+import { parse, GraphQLError } from "graphql";
 class GraphqlExplorerViewModel {
   /**
    * Repository
@@ -109,7 +109,7 @@ class GraphqlExplorerViewModel {
           this._tab.getValue().property?.graphql
             ?.auth as GraphqlRequestAuthTabInterface,
         ).getValue();
-        this.updateQueryAsPerSchema();
+        // this.updateQueryAsPerSchema();
       }, 0);
     }
   }
@@ -171,6 +171,7 @@ class GraphqlExplorerViewModel {
         .updateDescription(requestServer.description)
         .updateUrl(requestServer.graphql.url)
         .updateQuery(requestServer.graphql.query)
+        .updateMutation(requestServer.graphql.mutation)
         .updateState({
           requestAuthNavigation: requestServer.graphql.selectedGraphqlAuthType,
         })
@@ -349,7 +350,15 @@ class GraphqlExplorerViewModel {
   public updateSchemaAsPerQuery = async () => {
     try {
       const progressiveTab = createDeepCopy(this._tab.getValue());
-      const query = progressiveTab.property.graphql.query;
+      let query;
+      if (
+        progressiveTab.property.graphql.state.operationNavigation ===
+        GraphqlRequestOperationTabEnum.MUTATION
+      ) {
+        query = progressiveTab.property.graphql.mutation;
+      } else {
+        query = progressiveTab.property.graphql.query;
+      }
       try {
         // Check if the query is valid by attempting to parse it
         parse(query);
@@ -398,10 +407,18 @@ class GraphqlExplorerViewModel {
    */
   public updateRequestQuery = async (_query: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.graphql.query = _query;
+    if (
+      progressiveTab.property.graphql.state.operationNavigation ===
+      GraphqlRequestOperationTabEnum.QUERY
+    ) {
+      progressiveTab.property.graphql.query = _query;
+    } else {
+      progressiveTab.property.graphql.mutation = _query;
+    }
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     await this.updateSchemaAsPerQuery();
+    this.updateQueryErrorState();
     this.compareRequestWithServer();
   };
 
@@ -1132,8 +1149,14 @@ class GraphqlExplorerViewModel {
           "Mutation",
         );
       }
-
-      progressiveTab.property.graphql.query = _query;
+      if (
+        progressiveTab.property.graphql.state.operationNavigation ===
+        GraphqlRequestOperationTabEnum.QUERY
+      ) {
+        progressiveTab.property.graphql.query = _query;
+      } else {
+        progressiveTab.property.graphql.mutation = _query;
+      }
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } catch (error) {
@@ -1168,6 +1191,127 @@ class GraphqlExplorerViewModel {
   };
 
   /**
+   * Updates the error state of GraphQL Query to know whether query is valid graphql query or not.
+   */
+  public updateQueryErrorState = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    let isQueryInvalid = false;
+    let start = 0;
+    let end = 0;
+    let queryErrorMessage = "";
+    if (
+      progressiveTab.property.graphql.state.operationNavigation ===
+      GraphqlRequestOperationTabEnum.QUERY
+    ) {
+      try {
+        await parse(progressiveTab.property.graphql.query);
+        isQueryInvalid = false;
+      } catch (error) {
+        if (error instanceof GraphQLError) {
+          const locations = error.locations;
+          if (locations && locations.length > 0) {
+            // Convert line/column to character index
+            const startIndex = this.getCharacterIndex(
+              progressiveTab.property.graphql.query,
+              locations[0].line,
+              locations[0].column,
+            );
+
+            // For the end index, we'll try to capture the problematic token
+            // If not available, we'll use start + 1 as a fallback
+            let endIndex = startIndex;
+            if (error.nodes && error.nodes[0]) {
+              endIndex = error.nodes[0].endIndex;
+            } else {
+              // Try to find the next non-alphanumeric character as the end
+              endIndex = this.findNextBreakpoint(
+                progressiveTab.property.graphql.query,
+                startIndex,
+              );
+            }
+            start = startIndex;
+            end = endIndex;
+            queryErrorMessage = error?.message || "";
+            isQueryInvalid = true;
+          }
+        }
+      }
+    } else {
+      try {
+        await parse(progressiveTab.property.graphql.mutation);
+        isQueryInvalid = false;
+      } catch (error) {
+        if (error instanceof GraphQLError) {
+          const locations = error.locations;
+          if (locations && locations.length > 0) {
+            // Convert line/column to character index
+            const startIndex = this.getCharacterIndex(
+              progressiveTab.property.graphql.mutation,
+              locations[0].line,
+              locations[0].column,
+            );
+
+            // For the end index, we'll try to capture the problematic token
+            // If not available, we'll use start + 1 as a fallback
+            let endIndex = startIndex;
+            if (error.nodes && error.nodes[0]) {
+              endIndex = error.nodes[0].endIndex;
+            } else {
+              // Try to find the next non-alphanumeric character as the end
+              endIndex = this.findNextBreakpoint(
+                progressiveTab.property.graphql.mutation,
+                startIndex,
+              );
+            }
+            start = startIndex;
+            end = endIndex;
+            queryErrorMessage = error?.message || "";
+            isQueryInvalid = true;
+          }
+        }
+      }
+    }
+    return { isQueryInvalid, start, end, queryErrorMessage };
+  };
+
+  // Helper function to convert line/column to character index
+  private getCharacterIndex(
+    text: string,
+    line: number,
+    column: number,
+  ): number {
+    const lines = text.split("\n");
+    let index = 0;
+
+    // Add up lengths of all previous lines
+    for (let i = 0; i < line - 1; i++) {
+      index += lines[i].length + 1; // +1 for the newline character
+    }
+
+    // Add the column position in the current line
+    index += column - 1;
+
+    return index;
+  }
+
+  // Helper function to find the next suitable ending position for the error range
+  private findNextBreakpoint(text: string, start: number): number {
+    const maxLength = 20; // Maximum length to look ahead
+    let end = start + 1;
+
+    while (end < text.length && end < start + maxLength) {
+      const char = text[end];
+      // Stop at whitespace or special characters
+      if (/[\s{}()[\]:,]/.test(char)) {
+        break;
+      }
+      end++;
+    }
+
+    return end;
+  }
+
+  /**
    *
    * @param _state - request state
    */
@@ -1181,9 +1325,12 @@ class GraphqlExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    if (_state?.operationNavigation) {
-      await this.updateQueryAsPerSchema();
-    }
+    // if (_state?.operationNavigation) {
+    //   await this.updateQueryAsPerSchema();
+    // }
+    setTimeout(() => {
+      this.updateQueryErrorState();
+    }, 1000);
     this.compareRequestWithServer();
   };
 
@@ -1625,6 +1772,7 @@ class GraphqlExplorerViewModel {
         graphql: {
           url: unadaptedRequest.url as string,
           query: unadaptedRequest.query,
+          mutation: unadaptedRequest.mutation,
           schema: unadaptedRequest.schema,
           variables: unadaptedRequest.variables,
           headers: unadaptedRequest.headers,
@@ -1670,6 +1818,7 @@ class GraphqlExplorerViewModel {
       description: graphqlTabData?.description as string,
       url: unadaptedRequest.url as string,
       query: unadaptedRequest.query,
+      mutation: unadaptedRequest.mutation,
       schema: unadaptedRequest.schema,
       variables: unadaptedRequest.variables,
       headers: unadaptedRequest.headers,
@@ -1863,6 +2012,7 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(req.graphql.url as string);
             initRequestTab.updateQuery(req.graphql.query as string);
+            initRequestTab.updateMutation(req.graphql.mutation as string);
             initRequestTab.updateSchema(req.graphql.schema as string);
             initRequestTab.updateVariables(req.graphql.variables as string);
             initRequestTab.updateAuth(
@@ -1940,6 +2090,9 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(res.data.data.graphql?.url as string);
             initRequestTab.updateQuery(res.data.data.graphql?.query as string);
+            initRequestTab.updateMutation(
+              res.data.data.graphql?.mutation as string,
+            );
             initRequestTab.updateSchema(
               res.data.data.graphql?.schema as string,
             );
@@ -2013,6 +2166,7 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(req.graphql?.url as string);
             initRequestTab.updateQuery(req.graphql?.query as string);
+            initRequestTab.updateMutation(req.graphql?.mutation as string);
             initRequestTab.updateVariables(req.graphql?.variables as string);
             initRequestTab.updateSchema(req.graphql?.schema as string);
             initRequestTab.updateAuth(
@@ -2088,6 +2242,9 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(res.data.data.graphql?.url as string);
             initRequestTab.updateQuery(res.data.data.graphql?.query as string);
+            initRequestTab.updateMutation(
+              res.data.data.graphql?.mutation as string,
+            );
             initRequestTab.updateVariables(
               res.data.data.graphql?.variables as string,
             );
