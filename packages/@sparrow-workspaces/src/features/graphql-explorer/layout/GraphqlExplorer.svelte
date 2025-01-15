@@ -118,10 +118,15 @@
       queryErrorMessage = errorStatus.queryErrorMessage;
     } else {
       isQueryInvalid = false;
+      errorStartIndex = 0;
+      errorEndIndex = 0;
     }
   };
   onMount(async () => {
     setTimeout(async () => {
+      isQueryInvalid = false;
+      errorStartIndex = 0;
+      errorEndIndex = 0;
       await handleQueryErrorStatus();
     }, 200);
   });
@@ -130,6 +135,9 @@
    * Updates the request query and checks for query errors.
    */
   const handleUpdateRequestQuery = async (data: string) => {
+    isQueryInvalid = false;
+    errorStartIndex = 0;
+    errorEndIndex = 0;
     await onUpdateRequestQuery(data);
     await handleQueryErrorStatus();
   };
@@ -139,6 +147,8 @@
    */
   const handleUpdateRequestState = async (data: any) => {
     isQueryInvalid = false;
+    errorStartIndex = 0;
+    errorEndIndex = 0;
     await onUpdateRequestState(data);
     await handleQueryErrorStatus();
   };
