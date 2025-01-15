@@ -2,7 +2,7 @@ name: Sparrow-web-dev
 on:
   push:
     branches:
-      - pratik/dev
+      - development
 
 jobs:
    build:
@@ -18,7 +18,7 @@ jobs:
               password: ${{ secrets.REGISTRY_PASSWORD }}
 
          - run: |
-              docker build -f ./apps/@sparrow-web/Dockerfile \
+              docker build -f ./Dockerfile \
                 --build-arg PORT=${{ vars.PORT }} \
                 --build-arg VITE_WEB_API_URL=${{ vars.VITE_WEB_API_URL }} \
                 --build-arg VITE_WEB_API_TIMEOUT=${{ vars.VITE_WEB_API_TIMEOUT }} \
@@ -56,7 +56,7 @@ jobs:
 
          - uses: Azure/k8s-set-context@v2
            with:
-              kubeconfig: ${{ secrets.New_KUBE_CONFIG }}
+              kubeconfig: ${{ secrets.KUBE_CONFIG }}
 
          - uses: Azure/k8s-deploy@v4
            with:

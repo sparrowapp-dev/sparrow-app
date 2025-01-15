@@ -21,6 +21,7 @@
     "desktop-build-mac-universal": "yarn workspace @sparrow/desktop tauri build --target universal-apple-darwin --debug --verbose",
     "web-start": "yarn workspace @sparrow/web dev",
     "web-build": "yarn workspace @sparrow/web build",
+    "web-preview": "yarn workspace @sparrow/web preview",
     "storybook-start": "yarn workspace @sparrow/storybook storybook",
     "storybook-build": "yarn workspace @sparrow/storybook build-storybook"
   },
