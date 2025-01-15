@@ -144,7 +144,7 @@
       class="position-absolute d-flex align-items-center justify-content-center m-0 p-0"
       style="top: 0; left: 0; bottom: 0; width: {height}; "
     >
-      <span style="margin-top:1px;">
+      <span class="SearchIconClass" style="margin-top:1px;">
         <SearchIcon
           height={iconSize}
           width={iconSize}
@@ -161,6 +161,9 @@
 </div>
 
 <style>
+  .SearchIconClass {
+    display: flex;
+  }
   input {
     caret-color: var(--border-primary-300);
     border: 1px solid transparent;
