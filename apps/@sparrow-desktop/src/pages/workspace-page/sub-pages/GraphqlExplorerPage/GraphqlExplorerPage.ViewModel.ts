@@ -849,6 +849,78 @@ class GraphqlExplorerViewModel {
     };
   };
 
+  /**
+   * Processes a GraphQL query and compares it with the provided schema JSON.
+   * Converts the query structure into a JSON-like representation with metadata
+   * such as selected fields, arguments, and schema validation.
+   *
+   * @param query - The GraphQL query string to be processed.
+   * @param schemaJson - The schema JSON used to validate and enrich the query structure.
+   * @returns A JSON-like representation of the query, enriched with schema details.
+   */
+  private reverseAndCompareGraphQLToJSON = (query, schemaJson) => {
+    // Helper to process arguments
+    const processArguments = (args, schemaArgs) => {
+      return args.map((arg) => {
+        const schemaArg = schemaArgs.find((a) => a.name === arg.name.value);
+        return {
+          name: arg.name.value,
+          itemType: "argument",
+          isSelected: true,
+          value: arg.value.kind === "StringValue" ? arg.value.value : null,
+          isUserAdded: !schemaArg, // Mark as user-added if not in schema
+          items: [],
+        };
+      });
+    };
+
+    // Helper to process fields recursively
+    const processFields = (fields, schemaFields) => {
+      return fields.map((field) => {
+        const schemaField =
+          schemaFields.find((f) => f.name === field.name.value) || {};
+        const args = field.arguments
+          ? processArguments(field.arguments, schemaField.items || [])
+          : [];
+        const nestedFields =
+          field.selectionSet && field.selectionSet.selections
+            ? processFields(
+                field.selectionSet.selections,
+                schemaField.items || [],
+              )
+            : [];
+
+        return {
+          id: field.name.value, // Use a UUID generator if needed
+          name: field.name.value,
+          description: schemaField.description || null, // Use schema description if available
+          type: schemaField.type || null, // Use schema type if available
+          itemType: "field",
+          isSelected: true, // Since it's part of the query, it's selected
+          value: null, // Default value
+          isUserAdded: !schemaField.name, // Mark as user-added if not in schema
+          items: [...args, ...nestedFields],
+        };
+      });
+    };
+
+    // Parse the query
+    const parsedQuery = parse(query);
+
+    // Entry point: process the main operation
+    const operation = parsedQuery.definitions[0];
+    const operationName = operation?.name ? operation?.name?.value : "Query";
+    const fields = processFields(
+      operation.selectionSet.selections,
+      schemaJson.items,
+    );
+
+    return {
+      operationName,
+      items: fields,
+    };
+  };
+
   // This function will compare and update the main JSON with the new generated JSON.
   private compareAndUpdateFirstJSON = (firstJSON, secondJSONItems) => {
     // Create a helper function to recursively process nested items
@@ -1133,6 +1205,61 @@ class GraphqlExplorerViewModel {
     this.compareRequestWithServer();
   };
 
+  /**
+   * Merges two JSON structures (`realJson` and `schemaJson`) recursively.
+   * The merged structure retains selected items from `realJson` and
+   * adds user-added items from `schemaJson` that are not already present.
+   *
+   * @param realJson - The JSON structure representing the real data.
+   * @param schemaJson - The JSON structure representing the schema data.
+   * @returns The merged JSON structure.
+   */
+  private mergeJson = async (realJson, schemaJson) => {
+    // Helper function to find matching schema item by name
+    const findSchemaItem = (schemaItems, name) =>
+      schemaItems.find((item) => item.name === name);
+
+    // Recursive function to merge items
+    const mergeItems = (realItems, schemaItems) => {
+      const result = [];
+
+      // Process items from realJson
+      realItems.forEach((realItem) => {
+        const schemaItem = findSchemaItem(schemaItems, realItem.name);
+
+        // Add realItem if it's selected
+        if (realItem.isSelected) {
+          const mergedItem = {
+            ...realItem,
+            items: mergeItems(realItem.items || [], schemaItem?.items || []),
+          };
+          result.push(mergedItem);
+        }
+      });
+
+      // Process user-added items from schemaJson
+      schemaItems.forEach((schemaItem) => {
+        if (schemaItem.isUserAdded) {
+          const existingItem = result.find(
+            (item) => item.name === schemaItem.name,
+          );
+          if (!existingItem) {
+            const newItem = {
+              ...schemaItem,
+              items: mergeItems([], schemaItem.items || []),
+            };
+            result.push(newItem);
+          }
+        }
+      });
+
+      return result;
+    };
+
+    // Start merging from the top level
+    return mergeItems(realJson, schemaJson);
+  };
+
   public updateQueryAsPerSchema = async () => {
     try {
       const progressiveTab = createDeepCopy(this._tab.getValue());
@@ -1142,19 +1269,45 @@ class GraphqlExplorerViewModel {
         progressiveTab.property.graphql.state.operationNavigation ===
         GraphqlRequestOperationTabEnum.QUERY
       ) {
-        _query = await this.generateGraphQLQuery(parsedSchema.Query, "Query");
-      } else {
-        _query = await this.generateGraphQLQuery(
-          parsedSchema.Mutation,
-          "Mutation",
-        );
-      }
-      if (
-        progressiveTab.property.graphql.state.operationNavigation ===
-        GraphqlRequestOperationTabEnum.QUERY
-      ) {
+        try {
+          const existingJson = this.reverseAndCompareGraphQLToJSON(
+            progressiveTab.property.graphql.query,
+            parsedSchema.Query,
+          );
+          const newJSon = await this.mergeJson(
+            parsedSchema.Query.items,
+            existingJson.items,
+          );
+          const newQuery = await this.generateGraphQLQuery(
+            { items: newJSon },
+            "Query",
+          );
+          _query = newQuery;
+        } catch (error) {
+          _query = await this.generateGraphQLQuery(parsedSchema.Query, "Query");
+        }
         progressiveTab.property.graphql.query = _query;
       } else {
+        try {
+          const existingJson = this.reverseAndCompareGraphQLToJSON(
+            progressiveTab.property.graphql.mutation,
+            parsedSchema.Mutation,
+          );
+          const newJSon = await this.mergeJson(
+            parsedSchema.Mutation.items,
+            existingJson.items,
+          );
+          const newQuery = await this.generateGraphQLQuery(
+            { items: newJSon },
+            "Mutation",
+          );
+          _query = newQuery;
+        } catch (error) {
+          _query = await this.generateGraphQLQuery(
+            parsedSchema.Mutation,
+            "Mutation",
+          );
+        }
         progressiveTab.property.graphql.mutation = _query;
       }
       this.tab = progressiveTab;

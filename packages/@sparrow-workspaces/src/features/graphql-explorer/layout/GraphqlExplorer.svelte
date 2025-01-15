@@ -118,10 +118,15 @@
       queryErrorMessage = errorStatus.queryErrorMessage;
     } else {
       isQueryInvalid = false;
+      errorStartIndex = 0;
+      errorEndIndex = 0;
     }
   };
   onMount(async () => {
     setTimeout(async () => {
+      isQueryInvalid = false;
+      errorStartIndex = 0;
+      errorEndIndex = 0;
       await handleQueryErrorStatus();
     }, 200);
   });
@@ -130,6 +135,9 @@
    * Updates the request query and checks for query errors.
    */
   const handleUpdateRequestQuery = async (data: string) => {
+    isQueryInvalid = false;
+    errorStartIndex = 0;
+    errorEndIndex = 0;
     await onUpdateRequestQuery(data);
     await handleQueryErrorStatus();
   };
@@ -139,7 +147,17 @@
    */
   const handleUpdateRequestState = async (data: any) => {
     isQueryInvalid = false;
+    errorStartIndex = 0;
+    errorEndIndex = 0;
     await onUpdateRequestState(data);
+    await handleQueryErrorStatus();
+  };
+
+  const handleUpdateSchema = async (data: any) => {
+    isQueryInvalid = false;
+    errorStartIndex = 0;
+    errorEndIndex = 0;
+    await updateSchema(data);
     await handleQueryErrorStatus();
   };
 </script>
@@ -388,7 +406,7 @@
                   {#if $tab.property.graphql.state.isRequestSchemaFetched}
                     <GenerateQuery
                       schema={$tab.property.graphql.schema}
-                      {updateSchema}
+                      updateSchema={handleUpdateSchema}
                       requestOperationSection={$tab.property.graphql?.state
                         ?.operationNavigation}
                       onUpdateRequestState={handleUpdateRequestState}
