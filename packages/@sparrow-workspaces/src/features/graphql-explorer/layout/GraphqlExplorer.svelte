@@ -152,6 +152,14 @@
     await onUpdateRequestState(data);
     await handleQueryErrorStatus();
   };
+
+  const handleUpdateSchema = async (data: any) => {
+    isQueryInvalid = false;
+    errorStartIndex = 0;
+    errorEndIndex = 0;
+    await updateSchema(data);
+    await handleQueryErrorStatus();
+  };
 </script>
 
 {#if $tab.tabId}
@@ -398,7 +406,7 @@
                   {#if $tab.property.graphql.state.isRequestSchemaFetched}
                     <GenerateQuery
                       schema={$tab.property.graphql.schema}
-                      {updateSchema}
+                      updateSchema={handleUpdateSchema}
                       requestOperationSection={$tab.property.graphql?.state
                         ?.operationNavigation}
                       onUpdateRequestState={handleUpdateRequestState}
