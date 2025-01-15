@@ -5,7 +5,6 @@
 </script>
 
 <svg
-  display="flex"
   {width}
   {height}
   viewBox="0 0 16 16"
