@@ -67,6 +67,8 @@ WORKDIR /usr/share/nginx/html
 # Copy build output from builder stage
 COPY --from=builder /app/apps/@sparrow-web/dist /usr/share/nginx/html
 
+COPY ./apps/@sparrow-web/nginx.conf /etc/nginx/nginx.conf
+
 # Expose port 80
 EXPOSE 80
 
