@@ -8,12 +8,12 @@
   "workspaces": [
     "./apps/@sparrow-web",
     "./apps/@sparrow-desktop",
+    "./apps/@sparrow-storybook",
     "./packages/@sparrow-library",
     "./packages/@sparrow-common",
     "./packages/@sparrow-teams",
     "./packages/@sparrow-workspaces",
-    "./packages/@sparrow-support",
-    "./packages/@sparrow-storybook"
+    "./packages/@sparrow-support"
   ],
   "scripts": {
     "desktop-start": "yarn workspace @sparrow/desktop tauri dev",
