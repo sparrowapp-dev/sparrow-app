@@ -849,6 +849,15 @@ class GraphqlExplorerViewModel {
     };
   };
 
+  /**
+   * Processes a GraphQL query and compares it with the provided schema JSON.
+   * Converts the query structure into a JSON-like representation with metadata
+   * such as selected fields, arguments, and schema validation.
+   *
+   * @param query - The GraphQL query string to be processed.
+   * @param schemaJson - The schema JSON used to validate and enrich the query structure.
+   * @returns A JSON-like representation of the query, enriched with schema details.
+   */
   private reverseAndCompareGraphQLToJSON = (query, schemaJson) => {
     // Helper to process arguments
     const processArguments = (args, schemaArgs) => {
@@ -1196,6 +1205,15 @@ class GraphqlExplorerViewModel {
     this.compareRequestWithServer();
   };
 
+  /**
+   * Merges two JSON structures (`realJson` and `schemaJson`) recursively.
+   * The merged structure retains selected items from `realJson` and
+   * adds user-added items from `schemaJson` that are not already present.
+   *
+   * @param realJson - The JSON structure representing the real data.
+   * @param schemaJson - The JSON structure representing the schema data.
+   * @returns The merged JSON structure.
+   */
   private mergeJson = async (realJson, schemaJson) => {
     // Helper function to find matching schema item by name
     const findSchemaItem = (schemaItems, name) =>
