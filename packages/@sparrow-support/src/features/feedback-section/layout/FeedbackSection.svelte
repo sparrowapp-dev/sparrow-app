@@ -284,8 +284,8 @@
   // Event handler for scrolling
   const handleScroll = async () => {
     const { scrollTop, scrollHeight, clientHeight } = scrollableContainer;
-
-    if (scrollTop + clientHeight >= scrollHeight - 100) {
+  
+    if (scrollTop + clientHeight >= scrollHeight - 3000) {
       if (!isPostFetching) {
         isPostFetching = true;
         await loadMoreUpdates();

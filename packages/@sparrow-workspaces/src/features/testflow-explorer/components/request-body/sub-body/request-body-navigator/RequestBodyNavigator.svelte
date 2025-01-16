@@ -32,7 +32,7 @@
         >For GET requests, it's uncommon to use a request body. Some frameworks
         support the request body for GET method, but it is generally not
         recommended to use.</small
-      >
+      >y
       <div
         class="cross-button d-flex align-items-center justify-content-center"
       >
