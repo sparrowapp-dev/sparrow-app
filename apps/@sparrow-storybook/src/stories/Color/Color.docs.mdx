@@ -1,0 +1,26 @@
+import { Meta } from "@storybook/addon-docs";
+import { Markdown } from "@storybook/blocks";
+
+import Sparrow1 from "../assets/color-sparrow1.svg";
+
+<Meta title="Components/Color/Documentation" />;
+
+# Color
+
+<div className="color-component">
+  <img src={Sparrow1} alt="Sparrow Icon" className="icon" />
+</div>
+<style jsx>{`
+  .color-component {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+  }
+  .icon {
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    background-color: #2c2c2e;
+  }
+`}</style>
