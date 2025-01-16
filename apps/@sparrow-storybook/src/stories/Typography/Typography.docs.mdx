@@ -1,0 +1,276 @@
+import { Meta } from "@storybook/addon-docs";
+import { Markdown } from "@storybook/blocks";
+import  Typography1a  from '../assets/Typography1a.png'
+import Sparrow1 from "../assets/logos-sparrow1.svg";
+import  Typography1b  from '../assets/Typography1b.png'
+import  Typob1  from '../assets/typob1.png'
+import  typob2  from '../assets/typob2.png'
+import  Typoc1  from '../assets/Typoc1.png'
+import  Typoc2  from '../assets/typoc2.png'
+import  typod1  from '../assets/typod1.png'
+import  typod2  from '../assets/typod2.png'
+
+<Meta title="Components/Typography/Documentation" />;
+
+# Font Family
+
+
+### Primary Font
+
+# Inter
+
+### Font Weights
+
+
+<div style={{ background: "black" }}>
+  <img src={Typography1a} alt="Sparrow Icon" className="icon" />
+</div>
+
+
+
+- ### Purpose
+  - Used for general UI elements to provide a clean, modern, and highly legible design.
+  - Ensures consistency across various interface components.
+
+- ### Usage
+  - **Headings**: Titles and section headers.
+  - **Body Text**: Descriptive and instructional text.
+  - **Labels**: Input fields, dropdowns, and form labels.
+  - **Buttons**: Call-to-action and navigation buttons.
+
+- ### Benefits
+  - **Highly Legible**: Clear letterforms and optimal spacing for better readability.
+  - **Versatile**: Wide range of weights for a strong typographic hierarchy.
+  - **Accessible**: Designed for digital screens, ensuring clarity across resolutions.
+
+### Secondary Font
+
+# JetBrains Mono
+
+### Font Weights
+
+<div style={{ background: "black" }}>
+  <img src={Typography1b} alt="Sparrow Icon" className="icon" />
+</div>
+
+- ### Purpose
+  - Used for technical and code-specific content to enhance readability and provide a developer-friendly aesthetic.
+  - Differentiates code elements from general text seamlessly.
+
+- ### Usage
+  - **Code Snippets**: Blocks of code displayed in the app.
+  - **Inline Code**: Short technical text embedded within body text.
+  - **Technical Scripts**: Developer-focused content or configurations.
+
+- ### Benefits
+  - **Code-Optimized**: Distinct characters reduce ambiguity (e.g., l, 1, I).
+  - **Enhanced Readability**: Features a larger x-height and ligatures for better scanning of operators and symbols.
+  - **Developer-Friendly**: A modern look tailored to developer workflows while maintaining functional clarity.
+
+---
+
+# Desktop Website - Text Style
+Minimum font size for desktop: **14px**
+
+### Primary font
+# Aileron
+**When to Use Aileron**
+  - Headings, titles, and attention-grabbing elements.
+  - Areas requiring emphasis or branding.
+
+<div style={{ background: "black" }}>
+    <img src={Typob1} alt="icon" />
+</div>
+
+  ### Heading Styles Table
+
+<Markdown>
+{`
+  | Style name        | Font Size (px) | Line Height | Paragraph Spacing | Font Weight | Usage                                      |
+  |-------------------|----------------|-------------|-------------------|-------------|--------------------------------------------|
+  | heading-hero-400  | 52             | Auto        | -                 | Regular (400) | For large hero sections or banners.        |
+  | heading-lg-400    | 42             | Auto        | -                 | Regular (400) | For primary headings on a page.            |
+  | heading-md-600    | 24             | Auto        | -                 | Semi bold (600) | For subheadings or section titles.         |
+  | heading-sm-700    | 20             | Auto        | -                 | Bold (700) | For smaller headings or supporting titles. |`}
+</Markdown>
+
+  ### Secondary font
+  # Inter
+  **When to Use Inter**
+ - Paragraphs, body text, or content-heavy sections, or button labels.
+ - Captions, annotations, and supplementary information.
+
+ 
+<div style={{ background: "black" }} >
+    <img src={typob2} alt="icon" />
+</div>
+<Markdown>
+{`
+| Style name        | Font Size (px) | Line Height | Paragraph Spacing | Font Weight | Usage                                      |
+  |-------------------|----------------|-------------|-------------------|-------------|--------------------------------------------|
+  | body-lg-400       | 18             | 143%        | -                 | Regular (400) | For main content or long paragraphs. Also used for links. |
+  | body-md-500       | 16             | 150%        | -                 | Medium (500) | For secondary text, short-form content or button labels & links. |
+  | body-md-400       | 16             | 150%        | -                 | Regular (400) | Use for medium paragraph |
+  | body-sm-400       | 14             | 143%        | -                 | Regular (400) | For annotations, or captions.             |
+
+`}
+</Markdown>
+  
+
+
+---
+  
+
+# Mobile Website - Text Style    
+**Minimum font size for mobile:** 12px
+
+### Primary font
+# Aileron
+
+### When to Use Aileron
+  - Headings, titles, and attention-grabbing elements.  
+  - Areas requiring emphasis or branding.
+
+<div style={{ background: "black" }}>
+  <img src={Typoc1} alt="Sparrow Icon" className="icon" />
+</div>
+
+<Markdown>
+  {`
+
+  | Style name         | Font Size (px) | Line Height | Font Weight    | Usage                                        |
+  |--------------------|----------------|-------------|----------------|----------------------------------------------|
+  | heading-hero-400   | 30             | Auto        | Regular (400)  | For large hero sections or banners.          |
+  | heading-lg-400     | 28             | Auto        | Regular (400)  | For primary headings on a page.              |
+  | heading-md-600     | 20             | Auto        | Semi bold (600)| For subheadings or section titles.           |
+  | heading-sm-600     | 18             | Auto        | Semi bold (600)| For smaller headings or supporting titles.   |
+   `}
+</Markdown>
+
+### Secondary font
+# Inter
+
+### When to Use Inter
+  - Paragraphs, body text, or content-heavy sections, or button labels.  
+  - Captions, annotations, and supplementary information.
+
+<div style={{ background: "black" }}>
+  <img src={Typoc2} alt="Sparrow Icon" className="icon"  />
+</div>
+
+<Markdown>
+  {`
+
+  | Style name         | Font Size (px) | Line Height  | Font Weight    | Usage                                        |
+  |--------------------|----------------|--------------|----------------|----------------------------------------------|
+  | body-lg-400        | 14             | 28 (200%)    | Regular (400)  | For main content or long paragraphs. Also used for links. |
+  | body-md-400        | 12             | 18 (150%)    | Regular (400)  | For secondary text, short-form content or button labels & links. |
+  | body-sm-600        | 12             | 18 (150%)    | Semibold (600) | For annotations, or captions.               |
+  `}
+</Markdown>
+
+---
+
+# App - Text Style - 1440px & below
+### Minimum font size for desktop: 12px | Base Value: 14 | Scale: 1.125
+
+Optimized for smaller screens and compact layouts, ensuring readability without overwhelming the user interface.
+### Primary font
+# Inter
+### When to Use Inter
+- Headings: Titles and section headers.
+- Body Text: Descriptive and instructional text.
+- Labels: Input fields, dropdowns, and form labels.
+- Buttons: Call-to-action and navigation buttons.
+
+
+<div style={{ background: "black" }}>
+  <img src={typod1} alt="Sparrow Icon" className="icon" />
+</div>
+
+<Markdown>
+{`
+Style name | Font Size (px) | Line Height | Paragraph Spacing (px) | Font Weight | Usage
+---|---|---|---|---|---
+heading-xl-600 | 28 (2.000rem) | 120% | - | Semi bold (600) | Main headers, page titles.
+heading-lg-600 | 20 (1.429rem) | 120% | - | Semi bold (600) | Section headers, modal titles.
+label-lg-500 | 16 (1.143rem) | 150% | - | Medium (500) | Large action buttons.
+label-md-400 | 14 (1.000rem) | 143% | - | Regular (400) | Form labels, primary inputs.
+label-md-500 | 14 (1.000rem) | 143% | - | Medium (500) | Medium action buttons/inks, interactive title
+label-sm-500 | 12 (0.857rem) | 150% | - | Medium (500) | supporting title, form labels or input
+label-sm-600 | 12 (0.857rem) | 150% | - | Semi bold (600) | Small action buttons/links
+paragraph-md-400 | 14 (1.000rem) | 143% | 13 (0.9*font size) | Regular (400) | Modal sub text, info text
+paragraph-sm-400 | 12 (0.857rem) | 150% | 11 (0.9*font size) | Regular (400) | For multiple lines sentences.
+caption-sm-400 | 12 (0.857rem) | 150% | - | Regular (400) | Input hints, instructions, error messages, helper text.`}
+</Markdown>
+
+###  Secondary font
+# JetBrains Mono
+
+### When to Use JetBrains Mono
+- Code Snippets: Blocks of code displayed in the app.
+- Inline Code: Short technical text embedded within body text.
+- Technical Scripts: Developer-focused content or configurations.
+
+<div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+  <div style={{ background: 'black' }}>
+    <img src={typod2} alt="Sparrow Icon" className="icon" />
+  </div>
+</div>
+
+
+<Markdown>
+{`
+Style name | Font Size (px) | Line Height | Font Weight | Usage
+---|---|---|---|---|---
+code-default-400  | 12 (0.857rem) | 150%  | Regular (400)  |Inline code snippets, technical labels, or logs |
+`}
+</Markdown>
+
+
+---
+
+# App - Text Style (Above 1440px)
+
+### Minimum font size for desktop: 14px | Base Value: 16 | Scale: 1.125
+
+### Primary Font 
+# Inter
+
+### Where to Use Inter
+- Primary text, titles, and section headers.
+- Used for larger text sizes to ensure readability.
+- Default font for paragraph text, form labels, and captions.
+- Set base font size: 16px, and use font scale.
+
+<Markdown>
+{`
+| **Style Name**       | **Font Size (px)** | **Line Height** | **Paragraph Spacing (px)** | **Font Weight**     | **Usage**                                     |
+|----------------------|--------------------|-----------------|----------------------------|---------------------|---------------------------------------------|
+| heading-xl-600       | 28 (2.000rem)      | 120%            | -                          | Semi bold (600)     | Main headers, page titles.                  |
+| heading-lg-600       | 20 (1.429rem)      | 120%            | -                          | Semi bold (600)     | Section headers, modal titles.              |
+| label-lg-500         | 16 (1.143rem)      | 150%            | -                          | Medium (500)        | Large action buttons.                       |
+| label-md-400         | 14 (1.000rem)      | 143%            | -                          | Regular (400)       | Form labels, primary inputs.                |
+| label-md-500         | 14 (1.000rem)      | 143%            | -                          | Medium (500)        | Medium action buttons/links, interactive title.|
+| label-sm-500         | 12 (0.857rem)      | 150%            | -                          | Medium (500)        | Supporting title, form labels or inputs.    |
+| label-sm-600         | 12 (0.857rem)      | 150%            | -                          | Semi bold (600)     | Small action buttons/links.                 |
+| paragraph-md-400     | 14 (1.000rem)      | 143%            | 13 (0.9 * font size)       | Regular (400)       | Modal subtext, info text.                   |
+| paragraph-sm-400     | 12 (0.857rem)      | 150%            | 11 (0.9 * font size)       | Regular (400)       | For multi-line sentences.                   |
+| caption-sm-400       | 12 (0.857rem)      | 150%            | -                          | Regular (400)       | Input hints, instructions, error messages, helper text. |`}
+</Markdown>
+
+### Secondary Font
+# JetBrains Mono
+
+### Where to Use JetBrains Mono
+- Code snippets, inline code, or technical text in the app.
+- Developer-specific design-focused content where readability is essential.
+
+<Markdown>
+{`
+| **Style Name**       | **Font Size (px)** | **Line Height** | **Font Weight**  | **Usage**                                         |
+|----------------------|--------------------|-----------------|------------------|-------------------------------------------------|
+| code-default-400     | 12 (0.857rem)      | 150%            | Regular (400)    | Inline code snippets, technical labels, or logs.
+`}
+</Markdown>
+
