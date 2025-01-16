@@ -1,7 +1,7 @@
 import { Meta } from "@storybook/addon-docs";
 import { Markdown } from "@storybook/blocks";
 
-<Meta title="Components/Shadow/Documentation" />;
+<Meta title="Components/Shadow/Documentation" />
 
 <div class ="main" >
 <div class="header">
@@ -94,140 +94,140 @@ import { Markdown } from "@storybook/blocks";
             </table>
         </div>
     </div>
+
 </div>
 </div>
 
 <style jsx>{`
-    .main{
-        background-color: white;
-        font-family: 'Roboto', sans-serif;
-    }
+  .main {
+    background-color: white;
+    font-family: "Roboto", sans-serif;
+  }
 
-    .header {
-        background: #f8f9fa;
-        height: 136px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+  .header {
+    background: #f8f9fa;
+    height: 136px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-    .header p {
-        color: #212529;
-        font-size: 48px;
-        font-weight: 700;
-        text-transform: capitalize;
-        line-height: 72px;
-        margin: 0;
-    }
+  .header p {
+    color: #212529;
+    font-size: 48px;
+    font-weight: 700;
+    text-transform: capitalize;
+    line-height: 72px;
+    margin: 0;
+  }
 
-    .container {
-        background: white;
-        padding: 50px;
-    }
+  .container {
+    background: white;
+    padding: 50px;
+  }
 
-    .section {
-        height: auto;
-        margin-bottom: 32px;
-    }
+  .section {
+    height: auto;
+    margin-bottom: 32px;
+  }
 
-    .introduction {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
+  .introduction {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
 
-    .introduction p {
-        color: #212529;
-    }
+  .introduction p {
+    color: #212529;
+  }
 
-    .introduction .title {
-        font-weight: 600;
-        font-size: 48px;
-        line-height: 48px;
-    }
-    .introduction .title p {
-        font-weight: 600;
-        font-size: 48px;
-        line-height: 48px;
-    }
+  .introduction .title {
+    font-weight: 600;
+    font-size: 48px;
+    line-height: 48px;
+  }
+  .introduction .title p {
+    font-weight: 600;
+    font-size: 48px;
+    line-height: 48px;
+  }
 
+  .introduction .description {
+    font-size: 16px;
+    line-height: 24px;
+  }
 
-    .introduction .description {
-        font-size: 16px;
-        line-height: 24px;
-    }
+  .usage-section {
+    padding: 32px 0;
+  }
 
-    .usage-section {
-        padding: 32px 0;
-    }
+  .usage-box {
+    background-color: white;
+    color: #212529;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 32px;
+  }
 
-    .usage-box {
-        background-color: white;
-        color: #212529;
-        padding: 16px;
-        border-radius: 8px;
-        margin-bottom: 32px;
-    }
+  .usage-box h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
 
-    .usage-box h2 {
-        font-size: 32px;
-        font-weight: 700;
-        margin-bottom: 12px;
-    }
+  .usage-box ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    font-size: 16px;
+    line-height: 24px;
+  }
 
-    .usage-box ul {
-        list-style-type: disc;
-        padding-left: 20px;
-        font-size: 16px;
-        line-height: 24px;
-    }
+  .table-container {
+    overflow-x: auto;
+    margin: 20px 0;
+    padding-right: 30px;
+    background: #f8f9fa;
+  }
 
-    .table-container {
-        overflow-x: auto;
-        margin: 20px 0;
-        padding-right: 30px;
-        background: #f8f9fa;
-    }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #f7fafc;
+    color: #212529;
+    text-align: left;
+  }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        background-color: #F7FAFC;
-        color: #212529;
-        text-align: left;
-    }
+  th,
+  td {
+    padding: 12px;
+    border: 1px solid #dee2e6;
+  }
 
-    th, td {
-        padding: 12px;
-        border: 1px solid #dee2e6;
-    }
+  .example {
+    width: 100px;
+    height: 100px;
+    background-color: #f7fafc;
+  }
 
-    .example {
+  .shadow-4 {
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+    background-color: #181c26;
+  }
 
-        width: 100px;
-        height: 100px;
-        background-color:#F7FAFC;
-    }
+  .shadow-8 {
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.24);
+    background-color: #181c26;
+  }
 
-    .shadow-4 {
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
-        background-color:#181c26;
-    }
+  .shadow-16 {
+    box-shadow: 0px 16px 32px rgba(0, 0, 0, 0.2);
+    background-color: #181c26;
+  }
 
-    .shadow-8 {
-        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.24);
-         background-color:#181c26;
-    }
-
-    .shadow-16 {
-        box-shadow: 0px 16px 32px rgba(0, 0, 0, 0.2);
-         background-color:#181c26;
-    }
-
-    .example-content {
-        background-color: #F7FAFC;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+  .example-content {
+    background-color: #f7fafc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 `}</style>
