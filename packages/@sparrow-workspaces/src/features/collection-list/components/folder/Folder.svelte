@@ -508,7 +508,7 @@
               This folder is empty
             </p>
           {/if}
-          <!-- {#if showFolderAPIButtons && explorer?.source === "USER"}
+          <!-- {#if  showFolderAPIButtons && explorer?.source === "USER"}
             <div class="mt-2 mb-2 ms-0">
               <Tooltip
                 classProp="mt-2 mb-2 ms-0"
