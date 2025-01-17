@@ -1,3 +1,43 @@
+# [2.16.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.15.0...v2.16.0) (2025-01-17)
+
+
+### Bug Fixes
+
+* added comments [] ([a6877c4](https://github.com/sparrowapp-dev/sparrow-app/commit/a6877c41060f8b3490506c91dcb148abae7e6731))
+* added flow to not overwrite valid query [[#2420](https://github.com/sparrowapp-dev/sparrow-app/issues/2420)] ([67ff4af](https://github.com/sparrowapp-dev/sparrow-app/commit/67ff4afabb82110d849c462c19c19c35df5a8b75))
+* added missing content [] ([6ae0bcc](https://github.com/sparrowapp-dev/sparrow-app/commit/6ae0bcc9a36ccd862f18049131e5144eab281564))
+* added mutation tab in graphql and fixed known bugs [[#2419](https://github.com/sparrowapp-dev/sparrow-app/issues/2419)] ([8bb917a](https://github.com/sparrowapp-dev/sparrow-app/commit/8bb917aecac759ce9bdd60eb3b95a410a9dfb780))
+* fixed styles path in web app and app freeze on update schema [[#2103](https://github.com/sparrowapp-dev/sparrow-app/issues/2103)] ([2037846](https://github.com/sparrowapp-dev/sparrow-app/commit/2037846fc24bf1e13f7b233702924ddd3f3abd7f))
+* fixed the saved mutation flow [[#2419](https://github.com/sparrowapp-dev/sparrow-app/issues/2419)] ([4066ecf](https://github.com/sparrowapp-dev/sparrow-app/commit/4066ecf7f9cd9df954824bd7d0703ecf877cd316))
+* merge pull changes [] ([5320162](https://github.com/sparrowapp-dev/sparrow-app/commit/5320162ad383152126163be1dfc966abff5840c4))
+* remove unused icons ([c601a56](https://github.com/sparrowapp-dev/sparrow-app/commit/c601a56bdee05032442ee1d3a90821f3aaeaab36))
+* remove unused icons ([f519589](https://github.com/sparrowapp-dev/sparrow-app/commit/f519589318e46894e09dcab6142b5b144b6f35e7))
+* removed consoles [] ([dcd1fd8](https://github.com/sparrowapp-dev/sparrow-app/commit/dcd1fd829100bdc62b385a21bef51eb04767c6fd))
+* removed unwanted fields from local db [] ([d2ff5ae](https://github.com/sparrowapp-dev/sparrow-app/commit/d2ff5ae8fb2b07e4a737b979b42fede9f6a6e24b))
+* storybook fixes [] ([e8e2f29](https://github.com/sparrowapp-dev/sparrow-app/commit/e8e2f29c7e79a45946bb3dae2489eae59cce5494))
+* ui fix in storybook [] ([6cbcbbc](https://github.com/sparrowapp-dev/sparrow-app/commit/6cbcbbc4cbaf266c4f2601cc9db9974ecd7fd1d2))
+* updated the import path for the typography [] ([460d475](https://github.com/sparrowapp-dev/sparrow-app/commit/460d475bdca8e46ccdb59fc33e1c0a9679dc8f88))
+
+
+### Features
+
+* add storybook build server ([71cbb19](https://github.com/sparrowapp-dev/sparrow-app/commit/71cbb1927f0a98acbb8a6325a84c166e614a43cf))
+* added colour palette and iconography documentation in storybook [[#2414](https://github.com/sparrowapp-dev/sparrow-app/issues/2414)] ([9135b46](https://github.com/sparrowapp-dev/sparrow-app/commit/9135b463283721925059185aad41ee365f0092e8))
+* added error linting in code mirror for graphql [[#2420](https://github.com/sparrowapp-dev/sparrow-app/issues/2420)] ([0d46327](https://github.com/sparrowapp-dev/sparrow-app/commit/0d463276f80a93fa372c7fe0a27e7b697eb1bc77))
+* added logos and layout storybook docuentation [[#2411](https://github.com/sparrowapp-dev/sparrow-app/issues/2411)] ([fbf6c50](https://github.com/sparrowapp-dev/sparrow-app/commit/fbf6c50fb3bafd219cb11af820e76948bf08df2f))
+* changed location of storybook folder [] ([e560f72](https://github.com/sparrowapp-dev/sparrow-app/commit/e560f72fcb182be60e8b6b6f8ccb105440315656))
+* implement websocket cloud agent ([b8ceeda](https://github.com/sparrowapp-dev/sparrow-app/commit/b8ceeda225b7f7945af348298fcb63a59ce71a27))
+* integrate storybook ([ee19fc6](https://github.com/sparrowapp-dev/sparrow-app/commit/ee19fc6080c4dc41e84b995132936b607b5197a4))
+* Merge branch 'development' of https://github.com/sparrowapp-dev/sparrow-app into feat/implement-websocket-cloud-agent ([097540d](https://github.com/sparrowapp-dev/sparrow-app/commit/097540d78007fdba33441ed8b690d9cfc2b1a513))
+* remove license ([da9d19b](https://github.com/sparrowapp-dev/sparrow-app/commit/da9d19bb34957594b0405efb0c6d44897ba01d8e))
+* Run button icon and text is not properly aligned in webapp ([4d491ae](https://github.com/sparrowapp-dev/sparrow-app/commit/4d491ae4030c4107d448c859ed55fa74079cb601))
+* Search Icon is not properly aligned with text ([05c5d3e](https://github.com/sparrowapp-dev/sparrow-app/commit/05c5d3eb9699f178b63d10a3e677c2bfd78da9c8))
+* Search Icon is not properly aligned with text ([1a607f2](https://github.com/sparrowapp-dev/sparrow-app/commit/1a607f23a48a94f7938f9200f5fabf1cb2e3faf6))
+* Search Icon is not properly aligned with text ([c6b6a04](https://github.com/sparrowapp-dev/sparrow-app/commit/c6b6a04eaafcb4fa75770bd9f06b7623ac9fbd64))
+* Search Icon is not properly aligned with text ([803f4d1](https://github.com/sparrowapp-dev/sparrow-app/commit/803f4d130766939487a260ab11d5d4cf81adafc3))
+* set storybook configuration ([9a9341d](https://github.com/sparrowapp-dev/sparrow-app/commit/9a9341db4bbb188b552fac4eb031fdacccf6255b))
+* upgrade sparrow version to v2.16.0 [] ([463858c](https://github.com/sparrowapp-dev/sparrow-app/commit/463858cc7a53a1214194b345e901adf321d94ddc))
+
 # [2.15.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.14.0...v2.15.0) (2025-01-03)
 
 
