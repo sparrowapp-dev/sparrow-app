@@ -1,7 +1,10 @@
 <script lang="ts">
   import { downloadIcon } from "@sparrow/library/assets";
   import { copyIcon } from "@sparrow/library/assets";
-  import { copyToClipBoard } from "@sparrow/common/utils";
+  import {
+    copyToClipBoard,
+    handleDownloadResponse,
+  } from "@sparrow/common/utils";
   import { notifications, Tooltip } from "@sparrow/library/ui";
   import {
     RequestDataType,
@@ -25,6 +28,12 @@
   export let isWebApp = false;
 
   let fileExtension: string;
+  let formatedBody: string;
+  let fileNameWithExtension: string;
+  // travers array of object and get content-type value
+  const contentType: string | undefined = response.headers.find(
+    (header: { key: string; value: string }) => header.key === "content-type",
+  )?.value;
 
   /**
    * @description - formats the code
@@ -52,6 +61,7 @@
   };
 
   $: {
+    console.log("renderd");
     if (apiState) {
       if (apiState.bodyLanguage === RequestDataType.JSON) {
         fileExtension = "json";
@@ -65,6 +75,10 @@
         fileExtension = "js";
       }
     }
+    // build complete file name with extension will be used for export in desttop-app and web-app;
+    fileNameWithExtension = `api_response_${response?.status || ""}_${response?.time || "0"}ms_${response?.size || "0"}kb.${fileExtension}`;
+
+    formatedBody = formatCode(response?.body); //pre formate body for exporting
   }
   /**
    * @description - remove indentation from the string
@@ -83,7 +97,7 @@
   const handleDownloaded = async () => {
     // Open a save file dialog
     const path = await save({
-      defaultPath: `api_response_${response?.status || ""}_${response?.time || "0"}ms_${response?.size || "0"}kb.${fileExtension}`,
+      defaultPath: fileNameWithExtension,
       filters: [
         {
           name: "Text Files",
@@ -93,7 +107,7 @@
     });
     // Check if a path was selected
     if (path) {
-      const contents = formatCode(response?.body);
+      const contents = formatedBody;
       await writeTextFile(path, contents, {
         baseDir: BaseDirectory.AppConfig,
       });
@@ -224,6 +238,20 @@
             <WithButtonV6
               icon={DownloadIcon2}
               onClick={handleDownloaded}
+              disable={false}
+              loader={false}
+            />
+          </Tooltip>
+        {:else}
+          <Tooltip title={"Export"}>
+            <WithButtonV6
+              icon={DownloadIcon2}
+              onClick={() =>
+                handleDownloadResponse(
+                  formatedBody,
+                  contentType,
+                  fileNameWithExtension,
+                )}
               disable={false}
               loader={false}
             />

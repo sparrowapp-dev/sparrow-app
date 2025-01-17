@@ -1,0 +1,349 @@
+import { Meta } from "@storybook/addon-docs";
+import { Markdown } from "@storybook/blocks";
+
+import sparrow1 from "../assets/icon-sparrow1.svg";
+import sparrow2 from "../assets/icon-sparrow2.svg";
+import sparrow3 from "../assets/icon-sparrow3.svg";
+import sparrow4 from "../assets/icon-sparrow4.svg";
+import sparrow5 from "../assets/icon-sparrow5.svg";
+import sparrow6 from "../assets/icon-sparrow6.svg";
+
+<Meta title="Components/Iconography/Documentation" />
+
+# Introduction
+
+Sparrow application embraces **Microsoft Fluent Icons** to ensure a modern, cohesive, and accessible
+visual language. Fluent icons are designed to be simple, familiar, and legible across various sizes and
+platforms, aligning with our commitment to an intuitive and consistent user experience.
+
+## Why Fluent Icons?
+
+<div className="features-grid">
+  <div className="feature">
+    <h3>Consistency</h3>
+    <p>Seamlessly integrates with our design system, ensuring visual harmony across components.</p>
+  </div>
+
+{" "}
+
+<div className="feature">
+  <h3>Accessibility</h3>
+  <p>
+    Optimized for clarity at different sizes, enhancing readability for all
+    users.
+  </p>
+</div>
+
+{" "}
+
+<div className="feature">
+  <h3>Scalability</h3>
+  <p>
+    A wide library of icons supports our growing feature set and diverse use
+    cases.
+  </p>
+</div>
+
+  <div className="feature">
+    <h3>Customizable</h3>
+    <p>Easily adjustable to match the brand's color palette and themes.</p>
+  </div>
+</div>
+
+## Usage Principle
+
+<div className="principles">
+  <div className="principle">
+    <h4>Clarity</h4>
+    <p>Use icons to complement text and improve comprehension, not as a replacement for essential information.</p>
+  </div>
+
+{" "}
+
+<div className="principle">
+  <h4>Consistency</h4>
+  <p>
+    Maintain uniform size, weight, and placement across the interface for a
+    polished look.
+  </p>
+</div>
+
+{" "}
+
+<div className="principle">
+  <h4>Accessibility</h4>
+  <p>
+    Pair icons with tooltips or labels to ensure inclusivity and understanding.
+  </p>
+</div>
+
+  <div className="principle">
+    <h4>Simplicity</h4>
+    <p>Avoid overloading the interface with excessive icons; focus on critical actions and information.</p>
+  </div>
+</div>
+
+# Style Variations
+
+<div className="table-container">
+  <table className="style-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Example</th>
+        <th>Usage</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>regular-icon</td>
+        <td>Standard appearance with outlined or hollow styling.</td>
+        <td>
+          <img
+            src={sparrow1}
+            alt="Regular Icon Example"
+            className="icon-example"
+          />
+        </td>
+        <td>Default state for most UI components.</td>
+      </tr>
+      <tr>
+        <td>filled-icon</td>
+        <td>
+          Solid icons used for high emphasis and active states. (e.g., selected
+          navigation)
+        </td>
+        <td>
+          <img
+            src={sparrow2}
+            alt="Filled Icon Example"
+            className="icon-example"
+          />
+        </td>
+        <td>Used in navigation selections, buttons, and emphasis states.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+# Sizes
+
+<div className="table-container">
+  <table className="size-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Example</th>
+        <th>Usage</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>icon-size-12</td>
+        <td>
+          <img
+            src={sparrow3}
+            alt="12px Icon Example"
+            className="icon-example"
+          />
+        </td>
+        <td>
+          Can be used in compact designs or for non-interactive elements (e.g.,
+          tooltips, badges).
+        </td>
+      </tr>
+      <tr>
+        <td>icon-size-16</td>
+        <td>
+          <img
+            src={sparrow4}
+            alt="16px Icon Example"
+            className="icon-example"
+          />
+        </td>
+        <td>
+          Small UI components (e.g., labels, status indicators, compact
+          toolbars).
+        </td>
+      </tr>
+      <tr>
+        <td>icon-size-20</td>
+        <td>
+          <img
+            src={sparrow5}
+            alt="20px Icon Example"
+            className="icon-example"
+          />
+        </td>
+        <td>Medium-sized UI components requiring slight emphasis.</td>
+      </tr>
+      <tr>
+        <td>icon-size-24</td>
+        <td>
+          <img
+            src={sparrow6}
+            alt="24px Icon Example"
+            className="icon-example"
+          />
+        </td>
+        <td>
+          Default size for most UI components like close for medium to large
+          screen components.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Accessibility and Touch Target Guidelines
+
+<div className="principles">
+  <div className="principle">
+    <h4>Minimum Touch Target Size</h4>
+    <p>Ensure all interactive elements have a touch target of at least 24x24 px, as per WCAG guidelines.</p>
+  </div>
+
+{" "}
+
+<div className="principle">
+  <h4>Spacing Between Elements</h4>
+  <p>
+    Maintain adequate spacing between adjacent touch targets to prevent
+    accidental interactions.
+  </p>
+</div>
+
+{" "}
+
+<div className="principle">
+  <h4>Interactive Icons</h4>
+  <p>
+    For smaller icons (e.g., 16x16 px), ensure they are placed within a larger
+    clickable area (minimum 24x24 px) to meet touch target requirements.
+  </p>
+</div>
+
+{" "}
+
+<div className="principle">
+  <h4>Descriptive Labels</h4>
+  <p>
+    Pair icons with text or tooltips where necessary to enhance usability and
+    accessibility for users with disabilities.
+  </p>
+</div>
+
+  <div className="principle">
+    <h4>Contrast and Clarity</h4>
+    <p>cons should meet WCAG contrast ratio standards and be visually distinct to support clarity and usability.</p>
+  </div>
+</div>
+
+<style jsx>{`
+  .table-container {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+    background-color: #ffffff;
+  }
+
+  .style-table,
+  .size-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    color: #1c1c1e;
+  }
+
+  .style-table th,
+  .style-table td,
+  .size-table th,
+  .size-table td {
+    padding: 1rem;
+    border: 1px solid #2c2c2e;
+    text-align: left;
+    color: #ffffff;
+  }
+
+  .style-table th,
+  .size-table th {
+    background-color: #ffffff;
+    font-weight: 600;
+  }
+
+  .icon-example {
+    width: auto;
+    height: 24px;
+    object-fit: contain;
+  }
+
+  h1 {
+    color: #ffffff;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+  td img {
+    background-color: #2c2c2e;
+  }
+`}</style>
+
+<style jsx>{`
+  .features-grid {
+    display: grid;
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .feature {
+    background-color: #1c1c1e;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #2c2c2e;
+  }
+
+  .feature h3 {
+    color: #ffffff;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .feature p {
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .principles {
+    display: grid;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .principle {
+    background-color: #1c1c1e;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #2c2c2e;
+  }
+
+  .principle h4 {
+    color: #ffffff;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .principle p {
+    color: #ffffff;
+    margin: 0;
+  }
+
+  h1,
+  h2 {
+    color: #ffffff;
+  }
+
+  @media (min-width: 768px) {
+    .features-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+`}</style>

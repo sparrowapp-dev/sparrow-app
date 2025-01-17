@@ -1,7 +1,8 @@
-FROM node:20-alpine
+# Stage 1: Build
+FROM node:20.8.1 as builder
+
+# Set the working directory
 WORKDIR /app
-COPY . .
-RUN yarn install
 
 ARG PORT
 ARG VITE_WEB_API_URL
@@ -41,37 +42,35 @@ ENV VITE_WEB_SPARROW_DOCS=$VITE_WEB_SPARROW_DOCS
 ENV VITE_WEB_PROXY_SERVICE=$VITE_WEB_PROXY_SERVICE
 ENV VITE_WEB_SOCKET_IO_API_URL=$VITE_WEB_SOCKET_IO_API_URL
 
+# Copy root-level files
+COPY package.json yarn.lock ./
 
-EXPOSE 1422
+# Copy packages folder
+COPY packages ./packages
 
-CMD ["yarn", "web-start"]
+# Copy apps folder
+COPY apps/@sparrow-web ./apps/@sparrow-web
 
-# # Stage 1: Build the application
-# FROM node:20-alpine AS builder
+# Install dependencies (using yarn to respect the workspace setup)
+RUN yarn install --frozen-lockfile
 
-# # Set the working directory inside the container
-# WORKDIR .
+# Build the web app
+WORKDIR /app/apps/@sparrow-web
+RUN yarn build
 
-# # Copy all files to the working directory
-# COPY . .
+# Stage 2: Serve
+FROM nginx:alpine as runner
 
-# # Install dependencies
-# RUN yarn install
+# Set working directory in Nginx
+WORKDIR /usr/share/nginx/html
 
-# # Build the project
-# RUN yarn web-build
+# Copy build output from builder stage
+COPY --from=builder /app/apps/@sparrow-web/dist /usr/share/nginx/html
 
-# # Stage 2: Serve the built static files
-# FROM nginx:alpine
+COPY ./apps/@sparrow-web/nginx.conf /etc/nginx/nginx.conf
 
-# # Copy the build files from the builder stage to Nginx's html folder
-# # COPY --from=builder ./apps/@sparrow-web/dist /usr/share/nginx/html
-# # COPY --from=builder ./dist /usr/share/nginx/html
-# COPY --from=builder ./apps/@sparrow-web/dist /usr/share/nginx/html
+# Expose port 80
+EXPOSE 80
 
-
-# # Expose the port Nginx will serve on
-# EXPOSE 1422
-
-# # Start Nginx
-# CMD ["nginx", "-g", "daemon off;"]
+# Start Nginx server
+CMD ["nginx", "-g", "daemon off;"]
