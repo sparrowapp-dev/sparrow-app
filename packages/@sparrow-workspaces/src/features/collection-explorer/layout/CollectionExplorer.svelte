@@ -25,6 +25,9 @@
     totalFolders: number;
     totalRequests: number;
     lastUpdated: string;
+    totalWebSocket: number;
+    totalSocketIo: number;
+    totalGraphQl: number;
   }>;
   /**
    * Callback to refetch collection from local
@@ -36,6 +39,7 @@
   export let onBranchChanged: (
     collection: CollectionDocument,
     newBranch: string,
+    c,
   ) => void;
   /**
    * Callback to rename collection
@@ -79,6 +83,7 @@
    * Role of user in active workspace
    */
   export let userRole;
+  export let isWebApp = false;
 
   /**
    * Local variables
@@ -91,17 +96,24 @@
   let lastUpdated: string = "";
   let totalFolders: number = 0;
   let totalRequests: number = 0;
+  let totalWebSocket: number = 0;
+  let totalSocketIo: number = 0;
+  let totalGraphQl: number = 0;
 
   /**
    * Function to update isSynced, totalRequests and totalFolders, and lastUpdated
    */
   const updateLastUpdateAndCount = async () => {
     const res = await getLastUpdatedAndCount(collection);
+
     if (res) {
       isSynced = res.isSynced;
       lastUpdated = res.lastUpdated;
       totalFolders = res.totalFolders;
       totalRequests = res.totalRequests;
+      totalWebSocket = res.totalWebSocket;
+      totalSocketIo = res.totalSocketIo;
+      totalGraphQl = res.totalGraphQl;
     }
   };
 
@@ -387,12 +399,28 @@
     >
       <div class="d-flex gap-4 mb-4 ps-2">
         <div class="d-flex align-items-center gap-2">
-          <span class="fs-4 highlighted-number">{totalRequests}</span>
-          <p style="font-size: 12px;" class="mb-0">API Requests</p>
+          <span class="fs-4 highlighted-number">{totalFolders}</span>
+          <p style="font-size: 12px;" class="mb-0">Folders</p>
         </div>
         <div class="d-flex align-items-center gap-2">
-          <span class="fs-4 highlighted-number">{totalFolders}</span>
-          <p style="font-size: 12px;" class="mb-0">Folder</p>
+          <span class="fs-4 highlighted-number">{totalRequests}</span>
+          <p style="font-size: 12px;" class="mb-0">REST</p>
+        </div>
+        {#if !isWebApp}
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="fs-4 highlighted-number">{totalGraphQl}</span>
+              <p style="font-size: 12px;" class="mb-0">GraphQL</p>
+            </div>
+          </div>
+        {/if}
+        <div class="d-flex align-items-center gap-2">
+          <span class="fs-4 highlighted-number">{totalWebSocket}</span>
+          <p style="font-size: 12px;" class="mb-0">WebSocket</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="fs-4 highlighted-number">{totalSocketIo}</span>
+          <p style="font-size: 12px;" class="mb-0">Socket.IO</p>
         </div>
       </div>
       <div class="d-flex align-items-start ps-0 h-100">
