@@ -6,7 +6,7 @@
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
-  export let onBranchSwitched: (collection: CollectionBaseInterface) => void;
+  export let onBranchSwitched: (collection: CollectionBaseInterface) => any;
   export let onRefetchCollection: (
     workspaceId: string,
     collection: CollectionBaseInterface,
@@ -71,36 +71,36 @@
 
   /**
    * Handle position of the context menu
-   * @param e: Event
    */
-  function rightClickContextMenu(e: Event) {
+  const rightClickContextMenu = () => {
     setTimeout(() => {
       showMenu = !showMenu;
     }, 100);
-  }
+  };
 
-  function rightClickContextMenu2(e: Event) {
+  const rightClickContextMenu2 = () => {
     setTimeout(() => {
       showAddItemMenu = !showAddItemMenu;
     }, 100);
-  }
+  };
 
-  function handleSelectClick(event: MouseEvent) {
+  const handleSelectClick = (event: MouseEvent) => {
     const selectElement = document.getElementById(
       `show-more-collection-${collection.id}`,
     );
     if (selectElement && !selectElement.contains(event.target as Node)) {
       showMenu = false;
     }
-  }
-  function handleSelectClick2(event: MouseEvent) {
+  };
+
+  const handleSelectClick2 = (event: MouseEvent) => {
     const selectElement = document.getElementById(
       `add-item-collection-${collection.id}`,
     );
     if (selectElement && !selectElement.contains(event.target as Node)) {
       showAddItemMenu = false;
     }
-  }
+  };
 
   /**
    * Handle selected methods from filter
@@ -404,7 +404,7 @@
 >
   <button
     class="d-flex ps-2 main-collection align-items-center bg-transparent border-0"
-    on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+    on:contextmenu|preventDefault={rightClickContextMenu}
     on:click|preventDefault={() => {
       if (!isRenaming) {
         visibility = !visibility;
@@ -491,9 +491,7 @@
           class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center {showAddItemMenu
             ? 'add-item-active'
             : ''}"
-          on:click={(e) => {
-            rightClickContextMenu2(e);
-          }}
+          on:click={rightClickContextMenu2}
         >
           <img height="12px" width="12px" src={AddIcon} alt="AddIcon" />
         </button>
@@ -512,9 +510,7 @@
             ? 'threedot-active'
             : ''}"
           style="transform: rotate(90deg);"
-          on:click={(e) => {
-            rightClickContextMenu(e);
-          }}
+          on:click={rightClickContextMenu}
         >
           <img src={threedotIcon} alt="threedotIcon" />
         </button>
@@ -590,6 +586,8 @@
                 class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
                 style="height: 24px; width: 24px; "
                 role="button"
+                tabindex="0"
+                on:keydown={() => {}}
                 on:click={() => {
                   onItemCreated("folder", {
                     workspaceId: collection.workspaceId,

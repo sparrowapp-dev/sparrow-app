@@ -1,23 +1,24 @@
 <script lang="ts">
   // ---- SVG
-  import { folderIcon as folderCloseIcon } from "@sparrow/library/assets";
-  import { openFolderIcon as folderOpenIcon } from "@sparrow/library/assets";
-  import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
+  import {
+    folderIcon as folderCloseIcon,
+    openFolderIcon as folderOpenIcon,
+    dot3Icon as threedotIcon,
+    angleRightV2Icon as angleRight,
+  } from "@sparrow/library/assets";
   import { RequestIcon } from "@sparrow/library/icons";
-  import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
 
   // ---- Components
-  import { Spinner } from "@sparrow/library/ui";
-  import { Modal } from "@sparrow/library/ui";
-  import { Button } from "@sparrow/library/ui";
-  import { Options } from "@sparrow/library/ui";
-  import { Tooltip } from "@sparrow/library/ui";
+  import {
+    Spinner,
+    Modal,
+    Button,
+    Options,
+    Tooltip,
+  } from "@sparrow/library/ui";
 
   // ---- Enum, Constants and Interface
-  import {
-    ItemType,
-    UntrackedItems,
-  } from "@sparrow/common/enums/item-type.enum";
+  import { UntrackedItems } from "@sparrow/common/enums/item-type.enum";
 
   import { WorkspaceRole } from "@sparrow/common/enums";
   import type { Path } from "@sparrow/common/interfaces/request.interface";
@@ -123,7 +124,7 @@
   //   }
   // });
 
-  function rightClickContextMenu(e: Event) {
+  function rightClickContextMenu() {
     setTimeout(() => {
       showMenu = !showMenu;
     }, 100);
@@ -361,7 +362,7 @@
         <button
           style="padding-left: 30px;"
           class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
-          on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+          on:contextmenu|preventDefault={rightClickContextMenu}
           on:click|preventDefault={() => {
             if (!isRenaming) {
               if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
@@ -475,9 +476,7 @@
                 ? 'threedot-active'
                 : ''}"
               style="transform: rotate(90deg);"
-              on:click={(e) => {
-                rightClickContextMenu(e);
-              }}
+              on:click={rightClickContextMenu}
             >
               <img src={threedotIcon} alt="threedotIcon" />
             </button>
@@ -508,7 +507,7 @@
               This folder is empty
             </p>
           {/if}
-          <!-- {#if  showFolderAPIButtons && explorer?.source === "USER"}
+          <!-- {#if   showFolderAPIButtons && explorer?.source === "USER"}
             <div class="mt-2 mb-2 ms-0">
               <Tooltip
                 classProp="mt-2 mb-2 ms-0"

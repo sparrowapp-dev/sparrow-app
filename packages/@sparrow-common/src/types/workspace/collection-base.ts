@@ -28,7 +28,7 @@ export interface CollectionItemBaseInterface {
   updatedAt: string;
   createdBy: string;
   updatedBy: string;
-  items?: CollectionItemBaseInterface;
+  items: CollectionItemBaseInterface[];
 }
 
 interface Branch {
