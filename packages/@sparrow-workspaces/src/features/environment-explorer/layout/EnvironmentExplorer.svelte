@@ -20,7 +20,7 @@
     SearchVariable,
   } from "@sparrow/workspaces/constants";
   import { WithButtonV3 } from "@sparrow/workspaces/hoc";
-
+  export let azureBlobCDN;
   /**
    * selected environmet to be shown on API
    */
@@ -249,21 +249,21 @@
           heading: "Step  1: Introduction to Environment",
           subheading:
             "Environments allow you to manage configuration variables for different stages of your application, such as development, staging, and production.",
-          gif: `${IntroToEnvironment}`,
+          gif: `${azureBlobCDN}${IntroToEnvironment}`,
         },
         {
           id: 2,
           heading: "Step  2: Creating a New Environment",
           subheading:
             "Creating a new environment is simple. Follow these steps to set up an environment tailored to your needs.",
-          gif: `${CreateENV}`,
+          gif: `${azureBlobCDN}${CreateENV}`,
         },
         {
           id: 3,
           heading: "Step 3: Search and apply Environment Variables",
           subheading:
             "Easily search and apply variables from global or selected environment in the REST API tool, to streamline your API testing process.",
-          gif: `${SearchVariable}`,
+          gif: `${azureBlobCDN}${SearchVariable}`,
         },
       ]}
       handleClosePopup={(flag = false) => {

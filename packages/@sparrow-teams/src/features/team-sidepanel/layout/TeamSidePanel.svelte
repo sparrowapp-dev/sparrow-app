@@ -9,7 +9,6 @@
   import { base64ToURL } from "@sparrow/common/utils";
   import { List } from "@sparrow/library/ui";
   import { PeopleIcon } from "@sparrow/library/assets";
-  import constants from "@app/constants/constants";
 
   export let teamList: TeamDocument[] = [];
   export let tabList: TabDocument[] = [];
@@ -26,7 +25,7 @@
   export let disableNewInviteTag;
   export let modifyTeam;
 
-  const externalSparrowGithub = constants.SPARROW_GITHUB;
+  // const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   export let leftPanelController: {
     leftPanelCollapse: boolean;
@@ -190,7 +189,7 @@
               isGithubStarHover = false;
             }}
             on:click={async () => {
-              await open(externalSparrowGithub);
+              // await open(externalSparrowGithub);
             }}
           >
             <GithubIcon
