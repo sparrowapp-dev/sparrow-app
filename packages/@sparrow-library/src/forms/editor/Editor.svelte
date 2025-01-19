@@ -6,6 +6,8 @@
   import { EditorView } from "codemirror";
   import { createEventDispatcher } from "svelte";
   import { placeholder as CreatePlaceHolder } from "@codemirror/view";
+  import { linter } from "@codemirror/lint";
+  import type { Diagnostic } from "@codemirror/lint";
 
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
     "Text";
@@ -16,11 +18,16 @@
   export let beautifySyntaxCallback: (value: boolean) => void = () => {};
   export { componentClass as class };
   export let placeholder = "";
+  export let isErrorVisible = false; // Determines if errors should be shown
+  export let errorMessage = ""; // Error message to display if `isErrorVisible` is true
+  export let errorStartIndex = 0;
+  export let errorEndIndex = 0;
 
   const dispatch = createEventDispatcher();
 
   let componentClass = "";
   const languageConf = new Compartment();
+  const lintConf = new Compartment(); // Compartment for linting
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
 
@@ -38,12 +45,32 @@
     }
   });
 
+  // Create diagnostics based on the error message
+  function createDiagnostics(doc: string): Diagnostic[] {
+    if (isErrorVisible && errorMessage) {
+      return [
+        {
+          from: errorStartIndex,
+          to: errorEndIndex,
+          message: errorMessage,
+          severity: "error",
+        },
+      ];
+    }
+    return [];
+  }
+
+  const lintExtension = linter((view) =>
+    createDiagnostics(view.state.doc.toString()),
+  );
+
   function initalizeCodeMirrorEditor(value: string) {
     let extensions: Extension[];
     extensions = [
       basicSetup,
       basicTheme,
       languageConf.of([]),
+      lintConf.of([]), // Add lint compartment
       updateExtensionView,
       EditorView.lineWrapping, // Enable line wrapping
       EditorState.readOnly.of(!isEditable ? true : false),
@@ -64,6 +91,15 @@
     if (codeMirrorView) {
       codeMirrorView.destroy(); // Destroy the editor view
     }
+  }
+
+  function updateLinting() {
+    // Reconfigure linting dynamically based on `isErrorVisible` and `errorMessage`
+    codeMirrorView.dispatch({
+      effects: lintConf.reconfigure(
+        isErrorVisible && errorMessage ? [lintExtension] : [],
+      ),
+    });
   }
 
   onMount(() => {
@@ -90,6 +126,7 @@
       value,
       beautifySyntaxCallback,
     );
+    updateLinting(); // Update linting whenever the component updates
   });
 
   // Run whenever isBodyBeautified changes to format request body syntax

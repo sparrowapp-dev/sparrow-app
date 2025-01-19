@@ -232,6 +232,12 @@ export class RxDB {
           16: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          17: function (oldDoc: TabDocument) {
+            if (oldDoc?.property?.graphql) {
+              oldDoc.property.graphql.mutation = "";
+            }
+            return oldDoc;
+          },
         },
       },
       collection: {
