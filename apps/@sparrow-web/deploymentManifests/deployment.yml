@@ -26,7 +26,7 @@ spec:
           name: sparrow-web
           imagePullPolicy: Always
           ports:
-            - containerPort: 1422
+            - containerPort: 80
           resources:
             requests:
               cpu: 100m
@@ -45,7 +45,7 @@ spec:
           #   successThreshold: 1
           readinessProbe:
             tcpSocket:
-              port: 1422
+              port: 80
             initialDelaySeconds: 30
             periodSeconds: 5
             timeoutSeconds: 5
@@ -66,4 +66,4 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 1422
+      targetPort: 80

@@ -1,0 +1,314 @@
+import { Meta } from "@storybook/addon-docs";
+import { Markdown } from "@storybook/blocks";
+
+<Meta title="Components/Spacing/Documentation" />
+
+# Padding, Margin, Gap & Corner Radius
+
+<div class="container">
+          <div class="section">
+            
+            #    Introduction
+          
+            <p >
+                Spacing is a fundamental aspect of design that ensures balance, clarity, and visual appeal in interfaces. Proper use of spacing helps in organizing content, improving readability, and creating a harmonious layout for elements or components.
+            </p>
+          </div>
+         
+          <div class="section">
+            # Spacing Formula
+            <p>
+                The formula for calculating spacing based on a multiplier is straightforward:
+            </p>
+            <p class="highlight">
+                Spacing Value (px) = Base Unit (8px) × Multiplier
+            </p>
+            <p>
+                Base Unit = 8px
+                Multiplier = Defined scaling value (progressively increasing)
+                Example: If the multiplier is 0.5, the spacing value is calculated as:
+                <span>8 × 0.5 = 4px</span>
+            </p>
+          </div>
+
+          <div class="section">
+            # Usage 
+            <h2> 1.Padding</h2>
+            <p>
+            Padding is space inside an element, between its content and boundary. For example, adding padding to a button makes it feel more clickable. Here are common padding directions:
+            </p>
+            <ul>
+                <li>padding-top (pt): Space at the top of the content.</li>
+                <li>padding-right (pr): Space on the right side.</li>
+                <li>padding-bottom (pb): Space at the bottom.</li>
+                <li>padding-left (pl): Space on the left side.</li>
+                <li>padding-top-bottom (py): Space on the top and bottom.</li>
+                <li>padding-left-right (px): Space on the left and right.</li>
+            </ul>
+        </div>
+        <div class="section">
+            
+            <div class="description">
+              Padding defines the inner spacing within an element, ensuring appropriate white space between its content and border.
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Padding Value</th>
+                  <th>Usage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>padding-0</td>
+                  <td>0px</td>
+                  <td>Used for components that do not require padding, such as plain text or tightly packed content.</td>
+                </tr>
+                <tr>
+                  <td>padding-8</td>
+                  <td>8px</td>
+                  <td>Suitable for small components like buttons or cards with minimal spacing.</td>
+                </tr>
+                <tr>
+                  <td>padding-16</td>
+                  <td>16px</td>
+                  <td>Standard padding value for consistent spacing inside most containers or components.</td>
+                </tr>
+                <tr>
+                  <td>padding-24</td>
+                  <td>24px</td>
+                  <td>Ideal for moderate padding inside larger containers or card elements.</td>
+                </tr>
+                <tr>
+                  <td>padding-32</td>
+                  <td>32px</td>
+                  <td>Used for larger containers or sections that require significant internal spacing.</td>
+                </tr>
+                <tr>
+                  <td>padding-40</td>
+                  <td>40px</td>
+                  <td>Applied to large components requiring extra spacing, such as hero sections.</td>
+                </tr>
+                <tr>
+                  <td>padding-56</td>
+                  <td>56px</td>
+                  <td>Best for extra-large components or panels requiring significant whitespace for readability.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+
+        <div class="section">
+
+          <h2> 2. Margins</h2>
+          <p>
+            Space outside an element, separating it from other elements. 
+            </p>
+
+           <ul>
+    <li>margin-top (mt): Space at the top.</li>
+    <li>margin-right (mr): Space on the right side.</li>
+    <li>margin-bottom (mb): Space at the bottom.</li>
+    <li>margin-left (ml): Space on the left side.</li>
+    <li>margin-top-bottom (my): Space on the top and bottom.</li>
+    <li>margin-left-right (mx): Space on the left and right.</li>
+</ul> 
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Margin Value</th>
+                <th>Usage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>margin-auto / margin-justify</td>
+                <td>auto / space-between</td>
+                <td>Used to center components or dynamically align elements in containers.</td>
+              </tr>
+              <tr>
+                <td>margin-16</td>
+                <td>16px</td>
+                <td>Used for small to medium-sized devices</td>
+              </tr>
+              <tr>
+                <td>margin-24</td>
+                <td>24px</td>
+                <td>Ideal for medium to large devices, used between sections or to add breathing space.</td>
+              </tr>
+              <tr>
+                <td>margin-32</td>
+                <td>32px</td>
+                <td>Applied for larger spacing on desktops, especially for section margins or wider containers.</td>
+              </tr>
+              <tr>
+                <td>margin-40</td>
+                <td>40px</td>
+                <td>Used for extra-large spacing</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+
+        <div class="section">
+          <h2> 3.Gap</h2>
+          <div class="description">
+            Space between items in grids or flex containers, eliminating the need for manual adjustments.
+          </div>
+          <div class="gap-info">
+            <p><span class="highlight">row-gap:</span> Space between rows in a grid or flex container.</p>
+            <p><span class="highlight">column-gap:</span> Space between columns in a grid or flex container.</p>
+            <p><span class="highlight">gap:</span> Combined shorthand for row and column gaps.</p>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Gap Value</th>
+                <th>Usage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>gap-0</td>
+                <td>0px</td>
+                <td>Used for no gap</td>
+              </tr>
+              <tr>
+                <td>gap-2</td>
+                <td>2px</td>
+                <td>Use for minimal gaps, such as between grouped items.</td>
+              </tr>
+              <tr>
+                <td>gap-4</td>
+                <td>4px</td>
+                <td>Use for small gaps in tightly packed grids or flex items.</td>
+              </tr>
+              <tr>
+                <td>gap-8</td>
+                <td>8px</td>
+                <td>Standard gap for spacing between elements in grids or flex layouts.</td>
+              </tr>
+              <tr>
+                <td>gap-12</td>
+                <td>12px</td>
+                <td>Use for moderate spacing in grid or card layouts.</td>
+              </tr>
+              <tr>
+                <td>gap-16</td>
+                <td>16px</td>
+                <td>Ideal for larger gaps, ensuring proper separation in layouts.</td>
+              </tr>
+              <tr>
+                <td>gap-20</td>
+                <td>20px</td>
+                <td>Use for significant gaps between larger elements or sections.</td>
+              </tr>
+              <tr>
+                <td>gap-24</td>
+                <td>24px</td>
+                <td>Use for significant gaps between larger elements or sections.</td>
+              </tr>
+              <tr>
+                <td>gap-32</td>
+                <td>32px</td>
+                <td>Suitable for wide separations in complex grids or flex containers.</td>
+              </tr>
+              <tr>
+                <td>gap-36</td>
+                <td>36px</td>
+                <td>Used for extra-large components like containers or large panels.</td>
+              </tr>
+              <tr>
+                <td>gap-40</td>
+                <td>40px</td>
+                <td>For the largest gaps in design layouts, such as between full-width sections.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+</div>
+
+
+<style jsx>
+  {`
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section {
+      margin-bottom: 40px;
+      margin-top: 32px;
+    }
+    h1 {
+      font-size: 48px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: black;
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #111;
+    }
+
+    .description {
+      margin-bottom: 24px;
+      line-height: 1.6;
+      color: #555;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .table th {
+      background: #f9fafb;
+      text-align: left;
+      padding: 12px 24px;
+      font-weight: 600;
+      color: #111;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .table td {
+      padding: 16px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      color: #333;
+    }
+
+    .table tr:nth-child(even) {
+      background: #f9fafb;
+    }
+
+    .table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .highlight {
+      font-weight: 600;
+      color: #111;
+    }
+
+    .gap-info {
+      margin: 24px 0;
+      line-height: 1.6;
+    }
+    h1 {
+      font-size: 48px;
+    }
+  `}
+</style>

@@ -1,0 +1,233 @@
+import { Meta } from "@storybook/addon-docs";
+import { Markdown } from "@storybook/blocks";
+
+<Meta title="Components/Shadow/Documentation" />
+
+<div class ="main" >
+<div class="header">
+    <p>Shadows</p>
+</div>
+
+<div class="container">
+    <div class="section">
+        <div class="introduction">
+            <div class="title">
+                <p>Introduction</p>
+            </div>
+            <div class="description">
+                <p>
+                    Shadows in dark mode enhance visual hierarchy, define clear separation between elements, and add subtle
+                    depth to interfaces—all while preserving a modern, sleek aesthetic.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="usage-section">
+        <div class="usage-box">
+            <h2>Usage</h2>
+            <ul>
+                <li>Pair shadows with soft highlights to mimic real-world lighting.</li>
+                <li>Lower the opacity of shadows to prevent harsh contrasts.</li>
+                <li>Increase the blur radius to create diffused, softer edges.</li>
+            </ul>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Example</th>
+                        <th>Corner Radius Value</th>
+                        <th>Code</th>
+                        <th>Usage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>shadow-4</td>
+                        <td class="example-content">
+                            <div class="example shadow-4"></div>
+                        </td>
+                        <td>
+                            X: 0, Y: 4
+                            Blur: 8
+                            Spread: 0
+                            Color: #000000
+                            Opacity: 30%
+                        </td>
+                        <td>0px 4px 8px rgba(0, 0, 0, 0.3)</td>
+                        <td>Use for low-elevation elements, such as buttons, small cards, or text input fields, to provide subtle depth.</td>
+                    </tr>
+                    <tr>
+                        <td>shadow-8</td>
+                        <td class="example-content">
+                            <div class="example shadow-8"></div>
+                        </td>
+                        <td>
+                            X: 0, Y: 8
+                            Blur: 16
+                            Spread: 0
+                            Color: #000000
+                            Opacity: 24%
+                        </td>
+                        <td>0px 8px 16px rgba(0, 0, 0, 0.24)</td>
+                        <td>Ideal for mid-elevation elements, such as dropdown menus, tooltips, or small modals.</td>
+                    </tr>
+                    <tr>
+                        <td>shadow-16</td>
+                        <td class="example-content">
+                            <div class="example shadow-16"></div>
+                        </td>
+                        <td>
+                            X: 0, Y: 16
+                            Blur: 32
+                            Spread: 0
+                            Color: #000000
+                            Opacity: 20%
+                        </td>
+                        <td>0px 16px 32px rgba(0, 0, 0, 0.2)</td>
+                        <td>Designed for high-elevation elements, such as large modals, popovers, toasts, or side panels.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</div>
+
+<style jsx>{`
+  .main {
+    background-color: white;
+    font-family: "Roboto", sans-serif;
+  }
+
+  .header {
+    background: #f8f9fa;
+    height: 136px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .header p {
+    color: #212529;
+    font-size: 48px;
+    font-weight: 700;
+    text-transform: capitalize;
+    line-height: 72px;
+    margin: 0;
+  }
+
+  .container {
+    background: white;
+    padding: 50px;
+  }
+
+  .section {
+    height: auto;
+    margin-bottom: 32px;
+  }
+
+  .introduction {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .introduction p {
+    color: #212529;
+  }
+
+  .introduction .title {
+    font-weight: 600;
+    font-size: 48px;
+    line-height: 48px;
+  }
+  .introduction .title p {
+    font-weight: 600;
+    font-size: 48px;
+    line-height: 48px;
+  }
+
+  .introduction .description {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .usage-section {
+    padding: 32px 0;
+  }
+
+  .usage-box {
+    background-color: white;
+    color: #212529;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 32px;
+  }
+
+  .usage-box h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .usage-box ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .table-container {
+    overflow-x: auto;
+    margin: 20px 0;
+    padding-right: 30px;
+    background: #f8f9fa;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #f7fafc;
+    color: #212529;
+    text-align: left;
+  }
+
+  th,
+  td {
+    padding: 12px;
+    border: 1px solid #dee2e6;
+  }
+
+  .example {
+    width: 100px;
+    height: 100px;
+    background-color: #f7fafc;
+  }
+
+  .shadow-4 {
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+    background-color: #181c26;
+  }
+
+  .shadow-8 {
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.24);
+    background-color: #181c26;
+  }
+
+  .shadow-16 {
+    box-shadow: 0px 16px 32px rgba(0, 0, 0, 0.2);
+    background-color: #181c26;
+  }
+
+  .example-content {
+    background-color: #f7fafc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+`}</style>

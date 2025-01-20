@@ -46,10 +46,10 @@
   style="background-color: transparent; {componentStyle}"
 >
   <div
-    class="d-flex justify-content-center h-100 border-radius-2 overflow-hidden"
+    class="d-flex justify-item-center h-100 border-radius-2 overflow-hidden"
   >
     <button
-      class="main-body py-1 px-3 h-100 border-0 {btnClass}"
+      class="main-body d-flex align-items-center justify-content-space-between py-1 px-3 h-100 border-0 {btnClass} "
       on:click={(e) => {
         if (!disable) {
           onClick(e);
@@ -62,7 +62,7 @@
         </span>
       {:else if !loader}
         {#if iconRequired}
-          <span
+          <span  class="d-flex me-2"
             ><Icon
               height={iconHeight}
               width={iconWidth}
