@@ -3,7 +3,6 @@
   import type { Observable } from "rxjs";
   import { PeopleIcon } from "@sparrow/library/assets";
   import { List } from "@sparrow/library/ui";
-  import constants from "@app/constants/constants";
 
   export let data: Observable<any[]>;
   export let openTeam: any | null = null;
@@ -50,7 +49,7 @@
   {:else}
     <List height={"100%"} overflowY={"auto"} classProps={"px-1 py-0"}>
       {#each topFiveWorkspaces as list, index}
-        {#if index < constants.WORKSPACE_LIMIT}
+        {#if index < 5}
           <div
             class="recentWorkspace-tab"
             on:click={() => OnWorkspaceSwitch(list._id)}
