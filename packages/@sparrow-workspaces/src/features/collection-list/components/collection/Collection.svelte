@@ -56,6 +56,9 @@
   let deletedIds: string[] = [];
   let requestCount = 0;
   let folderCount = 0;
+  let graphQLCount = 0;
+  let webSocketCount = 0;
+  let socketIoCount = 0;
   let visibility = false;
   let isActiveSyncEnabled = true;
   let isBranchSynced: boolean = false;
@@ -132,16 +135,40 @@
       deletedIds = [];
       requestCount = 0;
       folderCount = 0;
+      graphQLCount = 0;
+      webSocketCount = 0;
+      socketIoCount = 0;
       collection?.items?.forEach((item: any) => {
         if (item.type === ItemType.FOLDER) {
           deletedIds.push(item.id);
           folderCount++;
-          requestCount += item.items.length;
+
           for (let i = 0; i < item.items.length; i++) {
-            deletedIds.push(item.items[i].id);
+            if (item.items[i].type === ItemType.REQUEST) {
+              requestCount++;
+              deletedIds.push(item.items[i].id);
+            } else if (item.items[i].type === ItemType.GRAPHQL) {
+              graphQLCount++;
+              deletedIds.push(item.items[i].id);
+            } else if (item.items[i].type === ItemType.WEB_SOCKET) {
+              webSocketCount++;
+              deletedIds.push(item.items[i].id);
+            } else if (item.items[i].type === ItemType.SOCKET_IO) {
+              socketIoCount++;
+              deletedIds.push(item.items[i].id);
+            }
           }
         } else if (item.type === ItemType.REQUEST) {
           requestCount++;
+          deletedIds.push(item.id);
+        } else if (item.type === ItemType.GRAPHQL) {
+          graphQLCount++;
+          deletedIds.push(item.id);
+        } else if (item.type === ItemType.SOCKET_IO) {
+          socketIoCount++;
+          deletedIds.push(item.id);
+        } else if (item.type === ItemType.WEB_SOCKET) {
+          webSocketCount++;
           deletedIds.push(item.id);
         }
       });
@@ -235,12 +262,26 @@
   </div>
   <div class="d-flex gap-3 sparrow-fs-12">
     <div class="d-flex gap-1">
-      <span class="text-plusButton">{requestCount}</span>
-      <p>API Requests</p>
-    </div>
-    <div class="d-flex gap-1">
       <span class="text-plusButton">{folderCount}</span>
       <p>Folder</p>
+    </div>
+    <div class="d-flex gap-1">
+      <span class="text-plusButton">{requestCount}</span>
+      <p>REST</p>
+    </div>
+    {#if !isWebApp}
+      <div class="d-flex gap-1">
+        <span class="text-plusButton">{graphQLCount}</span>
+        <p>GraphQL</p>
+      </div>
+    {/if}
+    <div class="d-flex gap-1">
+      <span class="text-plusButton">{webSocketCount}</span>
+      <p>WebSocket</p>
+    </div>
+    <div class="d-flex gap-1">
+      <span class="text-plusButton">{socketIoCount}</span>
+      <p>Socket.IO</p>
     </div>
   </div>
   <div

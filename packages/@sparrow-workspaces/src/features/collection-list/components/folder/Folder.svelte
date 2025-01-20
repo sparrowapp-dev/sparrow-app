@@ -89,6 +89,9 @@
   let noOfColumns = 180;
   let isRenaming = false;
   let requestCount: number;
+  let graghQlCount: number;
+  let webSocketCount: number;
+  let socketIoCount: number;
   let requestIds: string[] = [];
   let folderTabWrapper: HTMLElement;
 
@@ -104,13 +107,27 @@
     if (explorer) {
       requestIds = [];
       requestCount = 0;
-      requestCount = explorer?.items?.length || 0;
-      if (explorer?.items) {
-        requestIds = explorer?.items?.map((element: { id: any }) => {
-          return element.id;
+      graghQlCount = 0;
+      socketIoCount = 0;
+      webSocketCount = 0;
+
+      if (explorer.items) {
+        explorer.items.forEach((item: any) => {
+          if (item.type === CollectionItemTypeBaseEnum.REQUEST) {
+            requestCount++;
+            requestIds.push(item.id);
+          } else if (item.type === CollectionItemTypeBaseEnum.GRAPHQL) {
+            graghQlCount++;
+            requestIds.push(item.id);
+          } else if (item.type === CollectionItemTypeBaseEnum.WEBSOCKET) {
+            webSocketCount++;
+            requestIds.push(item.id);
+          } else if (item.type === CollectionItemTypeBaseEnum.SOCKETIO) {
+            socketIoCount++;
+            requestIds.push(item.id);
+          }
         });
       }
-      requestIds.push(explorer?.id);
     }
   }
 
@@ -192,7 +209,21 @@
     <div class="d-flex gap-3 sparrow-fs-12">
       <div class="d-flex gap-1">
         <span class="text-plusButton">{requestCount}</span>
-        <p>API Requests</p>
+        <p>REST</p>
+      </div>
+      {#if !isWebApp}
+        <div class="d-flex gap-1">
+          <span class="text-plusButton">{graghQlCount}</span>
+          <p>GraphQL</p>
+        </div>
+      {/if}
+      <div class="d-flex gap-1">
+        <span class="text-plusButton">{webSocketCount}</span>
+        <p>WebSocket</p>
+      </div>
+      <div class="d-flex gap-1">
+        <span class="text-plusButton">{socketIoCount}</span>
+        <p>Socket.IO</p>
       </div>
     </div>
     <div
@@ -276,7 +307,7 @@
               folder: explorer,
             });
           },
-          displayText: "Add REST API",
+          displayText: "Add REST",
           disabled: false,
           hidden:
             !collection.activeSync ||
