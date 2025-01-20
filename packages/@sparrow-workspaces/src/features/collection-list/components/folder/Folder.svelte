@@ -1,40 +1,33 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
-
   // ---- SVG
-  import { folderIcon as folderCloseIcon } from "@sparrow/library/assets";
-  import { openFolderIcon as folderOpenIcon } from "@sparrow/library/assets";
-  import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
+  import {
+    folderIcon as folderCloseIcon,
+    openFolderIcon as folderOpenIcon,
+    dot3Icon as threedotIcon,
+    angleRightV2Icon as angleRight,
+  } from "@sparrow/library/assets";
   import { RequestIcon } from "@sparrow/library/icons";
-  import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
 
   // ---- Components
-  import { Spinner } from "@sparrow/library/ui";
-  import { Modal } from "@sparrow/library/ui";
-  import { Button } from "@sparrow/library/ui";
-  import { Options } from "@sparrow/library/ui";
-  import { Tooltip } from "@sparrow/library/ui";
+  import {
+    Spinner,
+    Modal,
+    Button,
+    Options,
+    Tooltip,
+  } from "@sparrow/library/ui";
 
   // ---- Enum, Constants and Interface
-  import {
-    ItemType,
-    UntrackedItems,
-  } from "@sparrow/common/enums/item-type.enum";
+  import { UntrackedItems } from "@sparrow/common/enums/item-type.enum";
 
   import { WorkspaceRole } from "@sparrow/common/enums";
   import type { Path } from "@sparrow/common/interfaces/request.interface";
 
-  // ---- Store
-  // import { selectMethodsStore } from "@app/store/auth.store/methods";
-
-  // ---- Helper Functions
-  // import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
-  // import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-
   import { WebSocket, Request, SocketIo, Graphql } from "..";
-  import type {
-    CollectionBaseInterface,
-    CollectionItemBaseInterface,
+  import {
+    CollectionItemTypeBaseEnum,
+    type CollectionBaseInterface,
+    type CollectionItemBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
@@ -79,7 +72,7 @@
    * Selected folder details
    */
   export let explorer: CollectionItemBaseInterface;
-  export let folder: CollectionItemBaseInterface;
+  export let folder: CollectionItemBaseInterface | null = null;
   export let activeTabId: string;
   export let searchData: string;
   export let activeTabType;
@@ -90,7 +83,6 @@
   export let isWebApp = false;
 
   let expand: boolean = false;
-  let showFolderAPIButtons: boolean = true;
   let deleteLoader: boolean = false;
   let showMenu: boolean = false;
   let isFolderPopup: boolean = false;
@@ -100,7 +92,7 @@
   let graghQlCount: number;
   let webSocketCount: number;
   let socketIoCount: number;
-  let requestIds: [string] | [] = [];
+  let requestIds: string[] = [];
   let folderTabWrapper: HTMLElement;
 
   $: {
@@ -121,16 +113,16 @@
 
       if (explorer.items) {
         explorer.items.forEach((item: any) => {
-          if (item.type === ItemType.REQUEST) {
+          if (item.type === CollectionItemTypeBaseEnum.REQUEST) {
             requestCount++;
             requestIds.push(item.id);
-          } else if (item.type === ItemType.GRAPHQL) {
-            graphQLCount++;
+          } else if (item.type === CollectionItemTypeBaseEnum.GRAPHQL) {
+            graghQlCount++;
             requestIds.push(item.id);
-          } else if (item.type === ItemType.WEB_SOCKET) {
+          } else if (item.type === CollectionItemTypeBaseEnum.WEBSOCKET) {
             webSocketCount++;
             requestIds.push(item.id);
-          } else if (item.type === ItemType.SOCKET_IO) {
+          } else if (item.type === CollectionItemTypeBaseEnum.SOCKETIO) {
             socketIoCount++;
             requestIds.push(item.id);
           }
@@ -149,7 +141,7 @@
   //   }
   // });
 
-  function rightClickContextMenu(e: Event) {
+  function rightClickContextMenu() {
     setTimeout(() => {
       showMenu = !showMenu;
     }, 100);
@@ -165,8 +157,9 @@
   }
 
   let newFolderName: string = "";
-  const handleRenameInput = (event: { target: { value: string } }) => {
-    newFolderName = event.target.value.trim();
+  const handleRenameInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    newFolderName = target.value.trim();
   };
 
   const onRenameBlur = async () => {
@@ -190,10 +183,6 @@
       inputField.blur();
     }
   };
-
-  onDestroy(() => {
-    // selectedMethodUnsubscibe();
-  });
 </script>
 
 <svelte:window
@@ -404,7 +393,7 @@
         <button
           style="padding-left: 30px;"
           class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
-          on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+          on:contextmenu|preventDefault={rightClickContextMenu}
           on:click|preventDefault={() => {
             if (!isRenaming) {
               if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
@@ -518,9 +507,7 @@
                 ? 'threedot-active'
                 : ''}"
               style="transform: rotate(90deg);"
-              on:click={(e) => {
-                rightClickContextMenu(e);
-              }}
+              on:click={rightClickContextMenu}
             >
               <img src={threedotIcon} alt="threedotIcon" />
             </button>
@@ -529,9 +516,9 @@
       </div>
       <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
         <div class="sub-files">
-          {#each explorer.items as exp}
+          {#each explorer?.items || [] as exp}
             <svelte:self
-              bind:userRole
+              {userRole}
               {onItemCreated}
               {onItemDeleted}
               {onItemRenamed}
@@ -551,7 +538,7 @@
               This folder is empty
             </p>
           {/if}
-          <!-- {#if showFolderAPIButtons && explorer?.source === "USER"}
+          <!-- {#if   showFolderAPIButtons && explorer?.source === "USER"}
             <div class="mt-2 mb-2 ms-0">
               <Tooltip
                 classProp="mt-2 mb-2 ms-0"
@@ -581,10 +568,10 @@
           {/if} -->
         </div>
       </div>
-    {:else if explorer.type === "REQUEST"}
+    {:else if explorer.type === CollectionItemTypeBaseEnum.REQUEST}
       <div style="cursor:pointer;">
         <Request
-          bind:userRole
+          {userRole}
           api={explorer}
           {onItemRenamed}
           {onItemDeleted}
@@ -593,13 +580,12 @@
           {folder}
           {collection}
           {activeTabId}
-          {activeTabPath}
         />
       </div>
-    {:else if explorer.type === ItemType.WEB_SOCKET}
+    {:else if explorer.type === CollectionItemTypeBaseEnum.WEBSOCKET}
       <div style="cursor:pointer;">
         <WebSocket
-          bind:userRole
+          {userRole}
           api={explorer}
           {onItemRenamed}
           {onItemDeleted}
@@ -607,13 +593,12 @@
           {folder}
           {collection}
           {activeTabId}
-          {activeTabPath}
         />
       </div>
-    {:else if explorer.type === ItemType.SOCKET_IO}
+    {:else if explorer.type === CollectionItemTypeBaseEnum.SOCKETIO}
       <div style="cursor:pointer;">
         <SocketIo
-          bind:userRole
+          {userRole}
           socketIo={explorer}
           {onItemRenamed}
           {onItemDeleted}
@@ -621,13 +606,12 @@
           {folder}
           {collection}
           {activeTabId}
-          {activeTabPath}
         />
       </div>
-    {:else if explorer.type === ItemType.GRAPHQL && !isWebApp}
+    {:else if explorer.type === CollectionItemTypeBaseEnum.GRAPHQL && !isWebApp}
       <div style="cursor:pointer;">
         <Graphql
-          bind:userRole
+          {userRole}
           graphql={explorer}
           {onItemRenamed}
           {onItemDeleted}
@@ -635,7 +619,6 @@
           {folder}
           {collection}
           {activeTabId}
-          {activeTabPath}
         />
       </div>
     {/if}

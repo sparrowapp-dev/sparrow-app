@@ -10,7 +10,6 @@
   import { environmentType } from "@sparrow/common/enums";
   import { SparrowIcon } from "@sparrow/library/icons";
   import { ArrowRightIcon } from "@sparrow/library/icons";
-  import constants from "@app/constants/constants";
   import type { WorkspaceDocument } from "@app/database/database";
   import { PlusIcon } from "@sparrow/library/icons";
   import { navigate } from "svelte-navigator";
@@ -22,7 +21,7 @@
    * environment list
    */
   export let environments;
-
+  export let onMarketingRedirect = () => {};
   /**
    * selected environment
    */
@@ -138,7 +137,7 @@
         return false;
       })
       .reverse()
-      .slice(0, constants.WORKSPACE_LIMIT)
+      .slice(0, 5)
       .map((workspace) => {
         const workspaceObj = {
           id: workspace._id,
@@ -153,7 +152,7 @@
       description: currentTeamName,
     });
     const res = createSetFromArray(workspaces, "id");
-    if (res.length > constants.WORKSPACE_LIMIT) {
+    if (res.length > 5) {
       res.shift();
     }
     workspaceData = res;
@@ -431,9 +430,8 @@
               />
             </div>
           </div>
-          <a
-            href={constants.WEB_MARKETING_URL}
-            target="_blank"
+          <span
+            on:click={onMarketingRedirect}
             class="text-decoration-none d-flex align-items-center align-self-start gap-2 mt-1 download-btn"
           >
             <div class="gap-2 d-flex">
@@ -446,7 +444,7 @@
                 />
               </div>
             </div>
-          </a>
+          </span>
         </div>
       </Select>
     {/if}

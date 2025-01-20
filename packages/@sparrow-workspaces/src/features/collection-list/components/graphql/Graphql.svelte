@@ -45,7 +45,7 @@
   /**
    * Selected folder details
    */
-  export let folder: CollectionItemBaseInterface;
+  export let folder: CollectionItemBaseInterface | null;
   /**
    * Selected graphql details
    */
@@ -277,8 +277,7 @@
       />
     {:else}
       <div
-        class="api-name ellipsis {graphql?.isDeleted &&
-          'api-name-deleted'}"
+        class="api-name ellipsis {graphql?.isDeleted && 'api-name-deleted'}"
         style="font-size: 12px;"
       >
         {graphql.name}
