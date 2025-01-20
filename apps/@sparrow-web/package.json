@@ -7,8 +7,8 @@
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest",
-    "lint": "prettier --check . && eslint .",
-    "format": "prettier --write ."
+    "lint": "eslint . --fix",
+    "pretty": "prettier --write ."
   },
   "private": true,
   "main": "src/main.ts",

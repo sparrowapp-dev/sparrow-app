@@ -12,7 +12,9 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "tauri": "tauri",
     "prepare": "husky install",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "lint": "eslint . --fix",
+    "pretty": "prettier --write ."
   },
   "dependencies": {
     "@codemirror/lang-html": "^6.4.7",
