@@ -797,7 +797,7 @@ class GraphqlExplorerViewModel {
   };
 
   // This function will reverse the GraphQL query to JSON object.
-  private reverseGraphQLToJSON = async (query) => {
+  private reverseGraphQLToJSON = (query) => {
     // Helper to process arguments
     const processArguments = (args) => {
       return args.map((arg) => {
