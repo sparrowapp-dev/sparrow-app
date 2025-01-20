@@ -3,11 +3,7 @@ import {
   DecodeGraphql,
   ReduceAuthHeader,
 } from "@sparrow/workspaces/features/graphql-explorer/utils";
-import {
-  createDeepCopy,
-  moveNavigation,
-  throttle,
-} from "@sparrow/common/utils";
+import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 
 // ---- DB
@@ -801,16 +797,83 @@ class GraphqlExplorerViewModel {
   };
 
   // This function will reverse the GraphQL query to JSON object.
-  private reverseGraphQLToJSON = (query) => {
+  private reverseGraphQLToJSON = async (query) => {
     // Helper to process arguments
     const processArguments = (args) => {
-      return args.map((arg) => ({
-        name: arg.name.value,
-        itemType: "argument",
-        isSelected: true,
-        value: arg.value.kind === "StringValue" ? arg.value.value : null,
-        items: [],
-      }));
+      return args.map((arg) => {
+        let items = [];
+
+        // Handle different kinds of argument values
+        switch (arg.value.kind) {
+          case "StringValue":
+            // For StringValue, set value directly
+            return {
+              name: arg.name.value,
+              itemType: "argument",
+              isSelected: true,
+              value: arg.value.value, // Set value for StringValue
+              items: [], // No nested items
+            };
+          case "ObjectValue":
+            // For ObjectValue, process nested fields and place them in items
+            items = processObjectFields(arg.value.fields);
+            return {
+              name: arg.name.value,
+              itemType: "argument",
+              isSelected: true,
+              value: null, // Set value to null for ObjectValue
+              items: items, // Place nested fields in items
+            };
+          default:
+            // Handle other types if needed
+            return {
+              name: arg.name.value,
+              itemType: "argument",
+              isSelected: true,
+              value: null,
+              items: [],
+            };
+        }
+      });
+    };
+
+    // Helper to process object fields
+    const processObjectFields = (fields) => {
+      return fields.map((field) => {
+        let items = [];
+
+        // Handle different kinds of field values
+        switch (field.value.kind) {
+          case "StringValue":
+            // For StringValue, set value directly
+            return {
+              name: field.name.value,
+              itemType: "field",
+              isSelected: true,
+              value: field.value.value, // Set value for StringValue
+              items: [], // No nested items
+            };
+          case "ObjectValue":
+            // For ObjectValue, process nested fields and place them in items
+            items = processObjectFields(field.value.fields);
+            return {
+              name: field.name.value,
+              itemType: "field",
+              isSelected: true,
+              value: null, // Set value to null for ObjectValue
+              items: items, // Place nested fields in items
+            };
+          default:
+            // Handle other types if needed
+            return {
+              name: field.name.value,
+              itemType: "field",
+              isSelected: true,
+              value: null,
+              items: [],
+            };
+        }
+      });
     };
 
     // Helper to process fields
