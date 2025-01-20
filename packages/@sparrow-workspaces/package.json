@@ -7,8 +7,8 @@
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest",
-    "lint": "prettier --check . && eslint .",
-    "format": "prettier --write ."
+    "lint": "eslint . --fix",
+    "pretty": "prettier --write ."
   },
   "private": true,
   "main": "src/main.ts",
@@ -66,5 +66,11 @@
     "yup": "^1.2.0",
     "@sparrow/library": "*",
     "@sparrow/common": "*"
+  },
+  "lint-staged": {
+    "*.{js,ts,svelte,css,json}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }

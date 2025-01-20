@@ -12,7 +12,9 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build --output-dir dist",
-    "init-msw": "msw init public/"
+    "init-msw": "msw init public/",
+    "lint": "eslint . --fix",
+    "pretty": "prettier --write ."
   },
   "devDependencies": {
     "@storybook/addon-essentials": "^8.3.2",
@@ -31,5 +33,11 @@
   },
   "resolutions": {
     "jackspeak": "2.1.1"
+  },
+  "lint-staged": {
+    "*.{js,ts,svelte,css,json}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }

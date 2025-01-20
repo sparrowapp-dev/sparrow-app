@@ -12,7 +12,9 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "tauri": "tauri",
     "prepare": "husky install",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "lint": "eslint . --fix",
+    "pretty": "prettier --write ."
   },
   "dependencies": {
     "@codemirror/lang-html": "^6.4.7",
@@ -104,7 +106,10 @@
     "vite": "^4.4.4"
   },
   "lint-staged": {
-    "**/*": "prettier --write --ignore-unknown"
+    "*.{js,ts,svelte,css,json}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   },
   "repository": "https://github.com/sparrowapp-dev/sparrow-app.git",
   "release": {
