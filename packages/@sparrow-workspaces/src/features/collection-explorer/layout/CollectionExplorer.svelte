@@ -39,7 +39,6 @@
   export let onBranchChanged: (
     collection: CollectionDocument,
     newBranch: string,
-    c,
   ) => void;
   /**
    * Callback to rename collection
