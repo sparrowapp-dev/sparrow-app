@@ -1,71 +1,18 @@
 <script lang="ts">
   // ---- Icons ----
-  import {
-    home,
-    hoveredHome,
-    selectedHome,
-    settings,
-    selectedSettings,
-    hoveredSettings,
-    collections,
-    hoveredCollections,
-    selectedCollections,
-    help,
-    hoveredHelp,
-    selectedHelp,
-  } from "./common";
 
   import SidebarItem, { type SidebarItemObj } from "./SidebarItem.svelte";
-  import { isGuestUserActive } from "@app/store/auth.store";
+  // import { isGuestUserActive } from "@app/store/auth.store";
 
   let componentClass = "";
   export { componentClass as class };
   export let user;
+  export let sidebarItems: SidebarItemObj[] = [];
+  export let isGuestUser;
   export let onLogout: () => void;
   export let type = "desktop";
-  let isGuestUser = false;
-  isGuestUserActive.subscribe((value) => {
-    isGuestUser = value;
-  });
 
-  let sidebarItems: SidebarItemObj[] = [
-    {
-      route: !isGuestUser ? "/app/home" : "/guest/home",
-      heading: "Home",
-      defaultLogo: home,
-      hoveredLogo: hoveredHome,
-      selectedLogo: selectedHome,
-      disabled: false,
-      position: "primary",
-    },
-    {
-      route: !isGuestUser ? "/app/collections" : "/guest/collections",
-      heading: "Workspace",
-      defaultLogo: collections,
-      hoveredLogo: hoveredCollections,
-      selectedLogo: selectedCollections,
-      disabled: false,
-      position: "primary",
-    },
-    {
-      route: "/app/help",
-      heading: "Community",
-      defaultLogo: help,
-      hoveredLogo: hoveredHelp,
-      selectedLogo: selectedHelp,
-      disabled: type === "web" ? true : (isGuestUser ?? false),
-      position: "secondary",
-    },
-    {
-      route: "/app/setting",
-      heading: "Setting",
-      defaultLogo: settings,
-      hoveredLogo: hoveredSettings,
-      selectedLogo: selectedSettings,
-      disabled: true,
-      position: "secondary",
-    },
-  ];
+  // console.log(data);
 
   let primarySidebarItems = sidebarItems.filter(
     (item) => item.position === "primary",

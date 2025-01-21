@@ -1,0 +1,492 @@
+import { Meta } from "@storybook/addon-docs";
+import { Markdown } from "@storybook/blocks";
+  import {
+    home,
+    hoveredHome,
+    selectedHome,
+    settings,
+    selectedSettings,
+    hoveredSettings,
+    collections,
+    hoveredCollections,
+    selectedCollections,
+    help,
+    hoveredHelp,
+    selectedHelp,
+  } from "../../../../../packages/@sparrow-common/src/components/sidebar/common";
+
+<Meta title="Components/Navigation-rail/Documentation" />
+<div class="header">
+        
+          # Navigation Rails
+        
+    </div>
+
+<div class="body">
+    <div class="container">
+     <div class="section">
+  <h2>Introduction</h2>
+  <ul>
+  Sparrow Navigation Rail is designed to provide an intuitive and space-efficient navigation experience, focusing on a clean and minimal interface. It uses icons only for primary navigation and displays accompanying text as a tooltip on hover, ensuring clarity without sacrificing screen space. 
+   </ul>
+</div>
+     
+ <div class="section">
+  <h2>Core Features</h2>
+  <ul>
+    <li><h3 class ="h3Class">Icon-Only Navigation: </h3>Uses universally recognizable icons without permanent text labels</li>
+    <li><h3 class ="h3Class">Tooltips on Hover:</h3> Text labels appear as tooltips for added context.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>Best Practices</h2>
+  <ul>
+    <li><h3 class ="h3Class">Icon Clarity:</h3> Use universally understood or contextually relevant icons to reduce reliance on tooltips.</li>
+    <li><h3 class ="h3Class">Consistent Placement:</h3> Ensure tooltips appear predictably next to icons for a seamless user experience.</li>
+  </ul>
+</div>
+         <div class="section">
+            <h2 >
+             # Transition - Sliding Indicator
+            </h2>
+
+            <ul>
+              <li> <h3 class ="h3Class">Effect: </h3> Smooth transition along the Y-axis.</li>
+              <li> <h3 class ="h3Class">Duration: </h3> 250ms.</li>
+              <li><h3 class ="h3Class"> Easing:</h3>Ease-out.</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>
+             # Nav Option States
+             </h2>
+         
+        <table class="table">
+          <thead>
+              <tr>
+                  <th>State</th>
+                  <th>Example</th>
+                  <th>Style</th>
+                  <th>Tooltip Behavior</th>
+                  <th>Color & Opacity</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <td>navitem-default</td>
+                  <td class="td-img"><span class = "colorBgImg"><img src={home} alt="Home Icon" width="20" height="20" /></span></td>
+                  <td>Regular</td>
+                  <td>Shown on hover</td>
+                  <td>
+                      <div class="color-box">
+                          <span class="label">navitem-bg-default</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> surface/700 </span> <span class ="surfaceEBox"> = #14181F </span></span>
+                      </div>
+                      <div class="color-box">
+                          <span class="label">navitem-icon-default</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> neutral/200 </span> <span class ="surfaceEBox"> = #B6B7B9 </span></span>
+                         
+                      </div>
+                  </td>
+              </tr>
+              <tr>
+                  <td>navitem-hover</td>
+                  <td class="td-img"> <span class = "colorBgImg"><img src={hoveredHome} alt="Home Icon" width="20" height="20" /></span></td>
+                  <td>Filled</td>
+                  <td>Tooltip displayed on hover</td>
+                  <td>
+                      <div class="color-box">
+                          <span class="label">navitem-bg-hover</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> surface/500 </span> <span class ="surfaceEBox"> = #1D212B</span></span>
+                          
+                      </div>
+                      <div class="color-box">
+                          <span class="label">navitem-icon-hover</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> neutral/white</span> <span class ="surfaceEBox"> = #FFFFFF </span></span>
+                         
+                      </div>
+                  </td>
+              </tr>
+              <tr>
+                  <td>navitem-pressed</td>
+                  <td class="td-img"> <span class = "colorBgImg"><img src={selectedHome} alt="Home Icon" width="20" height="20" /></span></td>
+                  <td>Filled</td>
+                  <td>No tooltip displayed</td>
+                  <td>
+                      <div class="color-box">
+                          <span class="label">navitem-bg-pressed</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> surface/700 </span> <span class ="surfaceEBox"> = #14181F </span></span>
+                         
+                      </div>
+                      <div class="color-box">
+                          <span class="label">navitem-icon-pressed</span>
+                          <span class ="gradientClass"><span class ="surfaceBox"> gradient </span> </span>
+                          
+                      </div>
+                  </td>
+              </tr>
+              <tr>
+                  <td>navitem-selected</td>
+                  <td class="td-img"><span class = "colorBgImg1"><img src={selectedHome} alt="Home Icon" width="20" height="20" /></span></td>
+                  <td>Filled</td>
+                  <td>Shown on hover</td>
+                  <td>
+                      <div class="color-box">
+                          <span class="label">navitem-bg-selected</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> surface/700 </span> <span class ="surfaceEBox"> = #14181F </span></span>
+                         
+                      </div>
+                      <div class="color-box">
+                          <span class="label">navitem-icon-selected</span>
+                          <span class ="gradientClass" ><span class ="surfaceBox"> gradient</span> </span>
+                         
+                      </div>
+                      <div class="color-box">
+                          <span class="label">navitem-stroke-indicator</span>
+                          <span class ="gradientClass" ><span class ="surfaceBox"> gradient</span> </span>
+                         
+                      </div>
+                  </td>
+              </tr>
+              <tr>
+                <td>navitem-selected-Hover</td>
+                <td class="td-img" > <span class = "colorBgImg1"><img src={home} alt="Home Icon" width="20" height="20" /> </span></td>
+                <td>Filled</td>
+                <td>Tooltip displayed on hover</td>
+                <td>
+                    <div class="color-box">
+                        <span class="label">navitem-bg-selected</span>
+                        <span class ="surfaceBBox" ><span class ="surfaceBox"> surface/500 </span> <span class ="surfaceEBox"> = #1D212B </span></span>
+                       
+                    </div>
+                    <div class="color-box">
+                        <span class="label">navitem-icon-selected</span>
+                        <span class ="gradientClass" ><span class ="surfaceBox"> gradient </span> </span>
+                       
+                    </div>
+                    <div class="color-box">
+                      <span class="label">navitem-stroke-indicator</span>
+                      <span class ="gradientClass" ><span class ="surfaceBox"> gradient</span> </span>
+                      
+                  </div>
+                </td>
+            </tr>
+              <tr>
+                  <td>navitem-selected-focused</td>
+                  <td class="td-img"> <span class = "colorBgImg2"><img src={home} alt="Home Icon" width="20" height="20" /></span> </td>
+                  <td>Filled</td>
+                  <td>Displayed on focus or via keyboard navigation</td>
+                  <td>
+                      <div class="color-box">
+                          <span class="label">navitem-bg-selected</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> surface/500 </span> <span class ="surfaceEBox"> = #1D212B </span></span>
+                         
+                      </div>
+                      <div class="color-box">
+                          <span class="label">navitem-icon-selected</span>
+                          <span class ="gradientClass" ><span class ="surfaceBox"> gradient</span> </span>
+                        
+                      </div>
+                      <div class="color-box">
+                          <span class="label">navitem-stroke-indicator</span>
+                          <span class ="gradientClass" ><span class ="surfaceBox"> gradient </span></span>
+                         
+                      </div>
+                  </td>
+              </tr>
+              <tr>
+                  <td>navitem-disabled</td>
+                  <td class="td-img"> <span class = "colorBgImg"><img class = "icon-disabled" src={home} alt="Home Icon" width="20" height="20" /></span></td>
+                  <td>Regular</td>
+                  <td>Shown on hover</td>
+                  <td>
+                      <div class="color-box">
+                          <span class="label">navitem-bg-disabled</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> surface/700 </span> <span class ="surfaceEBox"> = #14181F</span></span>
+                        
+                      </div>
+                      <div class="color-box">
+                          <span class="label">navitem-icon-disabled</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> surface/50 </span> <span class ="surfaceEBox"> = #414858 </span></span>
+                         
+                      </div>
+                  </td>
+              </tr>
+              <tr>
+                  <td>navitem-disabled-hover</td>
+                  <td class="td-img"><span class = "colorBgImg"> <img  class = "icon-disabled" src={hoveredHome} alt="Home Icon" width="20" height="20"  /> </span></td>
+                  <td>Regular</td>
+                  <td>Shown on hover</td>
+                  <td>
+                      <div class="color-box">
+                          <span class="label">navitem-bg-disabled-hover</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> surface/500 </span> <span class ="surfaceEBox"> = #1D212B</span></span>
+                          
+                      </div>
+                      <div class="color-box">
+                          <span class="label">navitem-icon-disabled</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> surface/50 </span> <span class ="surfaceEBox"> = #414858</span></span>
+                          
+                      </div>
+                  </td>
+              </tr>
+              <tr>
+                  <td>navitem-disabled-focused</td>
+                  <td class="td-img"><span class = "colorBgImg">  <img class = "icon-disabled" src={selectedHome} alt="Home Icon" width="20" height="20" /></span></td>
+                  <td>Regular</td>
+                  <td>Displayed on focus or via keyboard navigation</td>
+                  <td>
+                      <div class="color-box">
+                          <span class="label">navitem-bg-disabled</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> surface/700 </span> <span class ="surfaceEBox"> = #14181F</span></span>
+                          
+                      </div>
+                      <div class="color-box">
+                          <span class="label">navitem-icon-disabled</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> surface/50 </span> <span class ="surfaceEBox"> = #414858 </span></span>
+                        
+                      </div>
+                      <div class="color-box">
+                          <span class="label">navitem-border-focused</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> blue/300 </span> <span class ="surfaceEBox"> = #6894F9 </span></span>
+                        
+                      </div>
+                  </td>
+              </tr>
+              <tr>
+                  <td>navitem-focused</td>
+                  <td class="td-img"> <span class="colorBgImg"><img src={hoveredHome} alt="Home Icon" width="20" height="20" /></span></td>
+                  <td>Filled</td>
+                  <td>Displayed on focus</td>
+                  <td>
+                      <div class="color-box">
+                          <span class="label">navitem-bg-focused</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> surface/500 </span> <span class ="surfaceEBox"> = #1D212B </span></span>
+                          
+                      </div>
+                      <div class="color-box">
+                          <span class="label">navitem-icon-focused</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> neutral/white </span> <span class ="surfaceEBox"> = #FFFFFF </span></span>
+                      </div>
+                      <div class="color-box">
+                          <span class="label">navitem-border-focused</span>
+                          <span class ="surfaceBBox" ><span class ="surfaceBox"> blue/300 </span> <span class ="surfaceEBox"> = #6894F9 </span></span>
+                          
+                      </div>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+          </div>
+       
+         <div class="section">
+         <h2>
+         # Additional Info
+         </h2>
+         <ul>
+          <li>
+            The focused state appears with tooltip when navigating using keyboard keys.
+          </li>
+          <li>
+            The same focused state appears for selected and disabled options.
+          </li>
+         </ul>
+       </div>   
+
+       <div class="section">
+        <h2>
+        # Target Size
+        </h2>
+        <ul>
+         <li>
+          Ensure each nav item has a minimum target size of 48px x 48px (WCAG2.1).This provides enough space for users with limited mobility.
+          
+         </li>
+        
+        </ul>
+      </div>           
+    </div>
+</div>
+
+    <style jsx>{`
+    .header h1{
+         text-align: center;
+         margin: auto;
+         padding: 32px;
+         background-color: white;
+         font-size:48px;
+         line-height:72px;
+    }
+    
+          .body{
+            font-style:Roboto;
+          }
+        
+    
+        
+  .container {
+    max-width: 1200px;
+  }
+
+  .section {
+    margin-bottom: 40px;
+  }
+  .container .section h2{
+    font-size:32px;
+    font-style:Roboto;
+    font-weight:600;
+    line-height:48px;
+  }
+ 
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #111;
+   
+  }
+  .h3Class{
+    margin-right:10px;
+    
+  }
+
+  .description {
+    margin-bottom: 24px;
+    line-height: 1.6;
+    color: #555;
+  }
+   .icon-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed; 
+  }
+  .td-img{
+    display:flex;
+    justify-content:center;
+    margin-top:20px;
+}
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color:#F7FAFC;
+  }
+
+  .table th {
+    text-align: left;
+    padding: 12px 24px;
+    font-weight: 600;
+    color: #111;
+    border-bottom: 1px solid #e5e7eb;
+     background-color:#F7FAFC;
+  }
+
+  .table td {
+    padding: 16px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #333;
+     background-color:#F7FAFC;
+    
+  }
+  .table tbody {
+     border: 1px solid #e5e7eb;
+  }
+  .colorBgImg {
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  background-color: #31353f; 
+  width: 48px; 
+  height: 48px;
+  
+}
+.colorBgImg1 {
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  background-color: #31353f; 
+  border-left: 2px solid #11ADF0;
+  width: 48px; 
+  height: 48px;
+  
+}
+.colorBgImg2 {
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  background-color: #31353f; 
+  border-left: 2px solid #11ADF0;
+  border-right: 1px solid #11ADF0;
+  border-top: 1px solid #11ADF0;
+  border-bottom:1px solid #11ADF0;
+  width: 48px; 
+  height: 48px;
+  
+}
+.surfaceBBox{
+    display:flex;
+    flex-direction:row;
+    justify-content:center;
+    align-items:center;
+
+}
+.surfaceEBox{
+   font-size:16px;
+   font-weight:400;
+   line-height:24px;
+
+}
+.surfaceBox{
+    width:106px;
+    height:32px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:14px;
+    line-height:20.02px;
+    font-weight:500;
+    border:1px solid gray;
+    margin-right:5px;
+    border-radius:5px;
+}
+.gradientClass{
+    margin-left:15px;
+}
+
+   ul {
+    list-style-type: disc;
+    padding-left: 20px;
+  }
+   li::before {
+    content: "•";
+    margin-right:5px; 
+  }
+  li {
+    display: flex;
+    align-items: center;
+  }
+ 
+ .color-box {
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    color: black; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+}
+.color-box .label {
+    font-weight: 600;
+    color: #70A4FF; 
+    font-size: 16px;
+    line-height:24px;
+}
+`}</style>
+

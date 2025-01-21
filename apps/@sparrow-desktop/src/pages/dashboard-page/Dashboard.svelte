@@ -26,6 +26,22 @@
   import Teams from "../teams-page/Teams.svelte";
   import { Modal } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";
+  import {
+    home,
+    hoveredHome,
+    selectedHome,
+    settings,
+    selectedSettings,
+    hoveredSettings,
+    collections,
+    hoveredCollections,
+    selectedCollections,
+    help,
+    hoveredHelp,
+    selectedHelp,
+  } from "../../../../../packages/@sparrow-common/src/components/sidebar/common";
+  import { type SidebarItemObj } from "../../../../../packages/@sparrow-common/src/components/sidebar/SidebarItem.svelte";
+  import { isGuestUserActive } from "@app/store/auth.store";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -172,6 +188,50 @@
       updateAvailable = false;
     }
   };
+
+  isGuestUserActive.subscribe((value) => {
+    isGuestUser = value;
+  });
+
+  let sidebarItems: SidebarItemObj[] = [
+    {
+      route: !isGuestUser ? "/app/home" : "/guest/home",
+      heading: "Home",
+      defaultLogo: home, // Replace with actual image paths
+      hoveredLogo: hoveredHome,
+      selectedLogo: selectedHome,
+      disabled: false,
+      position: "primary",
+    },
+    {
+      route: !isGuestUser ? "/app/collections" : "/guest/collections",
+      heading: "Workspace",
+      defaultLogo: collections,
+      hoveredLogo: hoveredCollections,
+      selectedLogo: selectedCollections,
+      disabled: false,
+      position: "primary",
+    },
+    {
+      route: "/app/help",
+      heading: "Community",
+      defaultLogo: help,
+      hoveredLogo: hoveredHelp,
+      selectedLogo: selectedHelp,
+      disabled: false,
+      position: "secondary",
+    },
+    {
+      route: "/app/setting",
+      heading: "Setting",
+      defaultLogo: settings,
+      hoveredLogo: hoveredSettings,
+      selectedLogo: selectedSettings,
+      disabled: true,
+      position: "secondary",
+    },
+  ];
+  // let mahi = { mahiSingh: "mahi" };
 </script>
 
 <div class="dashboard d-flex flex-column" style="height: 100vh;">
@@ -229,7 +289,12 @@
     <!-- 
       --Sidebar to naviagte between collection, environment and help page.
     -->
-    <Sidebar {user} onLogout={_viewModel.handleLogout} />
+    <Sidebar
+      {user}
+      {sidebarItems}
+      {isGuestUser}
+      onLogout={_viewModel.handleLogout}
+    />
     <!-- 
       -- Dashboard renders any of the pages between collection, environment and help.
     -->

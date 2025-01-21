@@ -11,7 +11,7 @@
 </script>
 
 <script lang="ts">
-  import { Link } from "svelte-navigator";
+  import { Link, Router } from "svelte-navigator";
   import { Tooltip } from "@sparrow/library/ui";
 
   /**
@@ -32,37 +32,39 @@
     (item.heading === "Setting" || item.heading === "Help")
   )}
 >
-  <div class="sidebar-item-parent" class:disabled={item.disabled}>
-    <Link
-      to={item.route}
-      getProps={({ isCurrent, isPartiallyCurrent }) => {
-        isRouteActive = isCurrent || isPartiallyCurrent;
-        return {
-          class: `d-flex mb-1 flex-column text-decoration-none align-items-center justify-content-center ${
-            item.disabled ? "disabled" : ""
-          }`,
-        };
-      }}
-    >
-      <div
-        class="sidebar-item"
-        style="--default-logo: url('{item.defaultLogo}'); --hovered-logo: url('{item.hoveredLogo ||
-          item.defaultLogo}'); --selected-logo: url('{item.selectedLogo ||
-          item.defaultLogo}');"
+  <Router>
+    <div class="sidebar-item-parent" class:disabled={item.disabled}>
+      <Link
+        to={item.route}
+        getProps={({ isCurrent, isPartiallyCurrent }) => {
+          isRouteActive = isCurrent || isPartiallyCurrent;
+          return {
+            class: `d-flex mb-1 flex-column text-decoration-none align-items-center justify-content-center ${
+              item.disabled ? "disabled" : ""
+            }`,
+          };
+        }}
       >
-        <div class="d-flex" style="align-items: center;">
-          {#if isRouteActive}
-            <div class="active-indicator"></div>
-          {/if}
-          <img
-            class="sidebar-logo {isRouteActive ? 'selected' : ''}"
-            src={item.defaultLogo}
-            alt={item.heading}
-          />
+        <div
+          class="sidebar-item"
+          style="--default-logo: url('{item.defaultLogo}'); --hovered-logo: url('{item.hoveredLogo ||
+            item.defaultLogo}'); --selected-logo: url('{item.selectedLogo ||
+            item.defaultLogo}');"
+        >
+          <div class="d-flex" style="align-items: center;">
+            {#if isRouteActive}
+              <div class="active-indicator"></div>
+            {/if}
+            <img
+              class="sidebar-logo {isRouteActive ? 'selected' : ''}"
+              src={item.defaultLogo}
+              alt={item.heading}
+            />
+          </div>
         </div>
-      </div>
-    </Link>
-  </div>
+      </Link>
+    </div>
+  </Router>
 </Tooltip>
 
 <style>
