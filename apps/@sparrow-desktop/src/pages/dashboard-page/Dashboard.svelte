@@ -26,6 +26,12 @@
   import Teams from "../teams-page/Teams.svelte";
   import { Modal } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";
+  import { fade } from 'svelte/transition';
+  import GlobalSearchWrapper from "../../../../../packages/@sparrow-common/src/components/popup/global-search/GlobalSearchWrapper.svelte";
+  import GlobalSearch from "../../../../../packages/@sparrow-common/src/components/popup/global-search/GlobalSearch.svelte";
+
+  
+
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -41,6 +47,7 @@
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.getActiveWorkspace();
   let workspaceDocuments: Observable<WorkspaceDocument[]>;
+
 
   let currentEnvironment = {
     id: "none",
@@ -87,6 +94,7 @@
   const onModalStateChanged = (flag: boolean) => {
     isPopupOpen = flag;
   };
+  
 
   const handleLogin = () => {
     _viewModel.clearLocalDB();
@@ -101,6 +109,7 @@
   const handleGuestLogin = () => {
     isPopupOpen = true;
   };
+
 
   const handleBannerClose = async () => {
     await _viewModel.updateGuestBannerState();
@@ -135,8 +144,19 @@
   let updateAvailable = false;
   let newAppVersion: string | undefined = "";
   let updater: Update | null;
+  let isGlobalSearchOpen=false;
 
   const WAIT_TIME_BEFORE_RESTART_IN_SECONDS = 5;
+
+  // Function to handle the click on the search bar
+  const handleViewGlobalSearch = () => {
+    isGlobalSearchOpen = true;
+  };
+
+  // Function to close the GlobalSearch component
+  const closeGlobalSearch = () => {
+    isGlobalSearchOpen = false;
+  };
 
   onMount(async () => {
     try {
@@ -175,9 +195,31 @@
 </script>
 
 <div class="dashboard d-flex flex-column" style="height: 100vh;">
-  <!-- 
-    -- Top Header having app icon and name
-  -->
+  {#if isGlobalSearchOpen}
+    <!-- Render GlobalSearch when isGlobalSearchOpen is true -->
+    <div 
+      class="global-search-overlay"
+      transition:fade={{ duration: 300 }}
+      
+    >
+
+      <div 
+        class="global-search-container"
+        
+        transition:fade={{ duration: 300, delay: 150 }}
+      >
+        <GlobalSearch on:close={closeGlobalSearch} />
+      </div>
+    </div>
+    <div 
+      class="blur-background" 
+      transition:fade={{ duration: 300 }}
+      on:click={closeGlobalSearch}
+    ></div>
+  
+
+  {/if}
+
   <Header
     environments={$environments?.filter((element) => {
       return element?.workspaceId === currentWorkspaceId;
@@ -197,7 +239,11 @@
     {user}
     isWebApp={false}
     onLogout={_viewModel.handleLogout}
+    isGlobalSearchOpen={isGlobalSearchOpen}
+    onSearchClick={handleViewGlobalSearch}
+    
   />
+
 
   <!--
     -- App Updater Banner - shows app updater for new version upgrade.
@@ -249,6 +295,7 @@
       <Route path="/*"><Navigate to="collections" /></Route>
     </section>
   </div>
+  
 </div>
 
 <Modal
@@ -283,3 +330,43 @@
     onCreateWorkspace={_viewModel.handleCreateWorkspace}
   />
 </Modal>
+
+<style>
+   .content {
+    transition: filter 300ms ease-out;
+  }
+
+  .blurred {
+    filter: blur(20px);
+  }
+
+  .global-search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 60px;
+    z-index: 1000;
+  }
+
+  .global-search-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .blur-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    z-index: 10;
+  }
+
+</style>
