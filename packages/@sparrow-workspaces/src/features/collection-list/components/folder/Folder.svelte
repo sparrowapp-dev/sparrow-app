@@ -482,7 +482,7 @@
         {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
           <Tooltip
             title={"Add REST API"}
-            placement={"bottom"}
+            placement={"bottom-center"}
             zIndex={701}
             distance={13}
           >
@@ -507,7 +507,7 @@
 
           <Tooltip
             title={"More"}
-            placement={"bottom"}
+            placement={"bottom-center"}
             zIndex={701}
             distance={17}
             show={!showMenu}

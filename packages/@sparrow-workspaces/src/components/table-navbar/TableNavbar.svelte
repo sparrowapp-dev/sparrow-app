@@ -9,7 +9,6 @@
 
   export let onClose;
   export let onRedirect;
-
 </script>
 
 <div
@@ -49,7 +48,7 @@
     </p>
   </div>
   <div class="d-flex gap-2 align-items-center" style="cursor:pointer ; ">
-    <Tooltip title="Redirect" placement={"bottom"} zIndex={100}>
+    <Tooltip title="Redirect" placement={"bottom-center"} zIndex={100}>
       <span on:click={onRedirect} class="pe-2">
         <ArrowOutwardIcon
           width={"8px"}

@@ -277,8 +277,7 @@
       />
     {:else}
       <div
-        class="api-name ellipsis {graphql?.isDeleted &&
-          'api-name-deleted'}"
+        class="api-name ellipsis {graphql?.isDeleted && 'api-name-deleted'}"
         style="font-size: 12px;"
       >
         {graphql.name}
@@ -292,7 +291,7 @@
     <Tooltip
       title={"More"}
       show={!showMenu}
-      placement={"bottom"}
+      placement={"bottom-center"}
       zIndex={701}
       distance={17}
     >

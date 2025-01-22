@@ -530,14 +530,14 @@
     <Spinner size={"15px"} />
   {:else}
     <!-- <Tooltip
-      placement="bottom"
+      placement="bottom-center"
       title="More options"
       styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
     > -->
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <Tooltip
         title={"Add Options"}
-        placement={"bottom"}
+        placement={"bottom-center"}
         distance={13}
         show={!showAddItemMenu}
         zIndex={701}
@@ -557,7 +557,7 @@
 
       <Tooltip
         title={"More"}
-        placement={"bottom"}
+        placement={"bottom-center"}
         distance={17}
         zIndex={701}
         show={!showMenu}
@@ -579,7 +579,7 @@
     {/if}
 
     {#if isActiveSyncEnabled && collection?.activeSync}
-      <Tooltip placement="bottom" title="Sync" styleProp="left: 25%;">
+      <Tooltip placement="bottom-center" title="Sync" styleProp="left: 25%;">
         <button
           class="sync-button p-1 border-0 rounded"
           on:click={() => {
@@ -641,7 +641,11 @@
 
         <div class="d-flex gap-2 ps-1 ms-4">
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-            <Tooltip title={"Add Folder"} placement={"bottom"} distance={12}>
+            <Tooltip
+              title={"Add Folder"}
+              placement={"bottom-center"}
+              distance={12}
+            >
               <div
                 class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
                 style="height: 24px; width: 24px; "
@@ -661,7 +665,11 @@
               </div>
             </Tooltip>
 
-            <Tooltip title={"Add REST API"} placement={"bottom"} distance={12}>
+            <Tooltip
+              title={"Add REST API"}
+              placement={"bottom-center"}
+              distance={12}
+            >
               <div
                 class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
                 style="height: 24px; width: 24px;"
@@ -683,7 +691,7 @@
 
             <Tooltip
               title={`Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`}
-              placement={"bottom"}
+              placement={"bottom-center"}
               distance={12}
             >
               <div
@@ -707,7 +715,11 @@
                 />
               </div>
             </Tooltip>
-            <Tooltip title={"Add WebSocket"} placement={"bottom"} distance={12}>
+            <Tooltip
+              title={"Add WebSocket"}
+              placement={"bottom-center"}
+              distance={12}
+            >
               <div
                 class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
                 style="height: 24px; width: 24px;"
@@ -730,7 +742,7 @@
             {#if !isWebApp}
               <Tooltip
                 title={`Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
-                placement={"bottom"}
+                placement={"bottom-center"}
                 distance={12}
               >
                 <div
@@ -760,7 +772,7 @@
         <!-- {#if showFolderAPIButtons}
           <div class="mt-2 mb-2 d-flex">
             <Tooltip
-              placement="bottom"
+              placement="bottom-center"
               title={!hasWorkpaceLevelPermission(
                 userRoleInWorkspace,
                 workspaceLevelPermissions.SAVE_REQUEST,
@@ -785,7 +797,7 @@
               </button>
             </Tooltip>
             <Tooltip
-              placement="bottom"
+              placement="bottom-center"
               title={!hasWorkpaceLevelPermission(
                 userRoleInWorkspace,
                 workspaceLevelPermissions.SAVE_REQUEST,

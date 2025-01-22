@@ -177,7 +177,7 @@
     {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
       <Tooltip
         title={"Add Environment"}
-        placement={"bottom"}
+        placement={"bottom-center"}
         distance={13}
         show={isHovered}
         zIndex={701}

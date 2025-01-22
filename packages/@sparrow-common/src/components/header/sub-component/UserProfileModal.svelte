@@ -74,7 +74,7 @@
 {#if !isGuestUser}
   <Tooltip
     title="Profile"
-    placement="bottom"
+    placement="bottom-center"
     distance={20}
     zIndex={5}
     show={!showProfileModal}

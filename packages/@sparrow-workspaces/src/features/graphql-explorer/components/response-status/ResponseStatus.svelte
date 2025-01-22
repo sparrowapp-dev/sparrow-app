@@ -68,7 +68,7 @@
         <div class="d-flex align-items-center gap-2">
           <Tooltip
             title="HTTP Status - {response.status}"
-            placement={"bottom"}
+            placement={"bottom-center"}
             zIndex={500}
             distance={20}
           >
@@ -97,7 +97,7 @@
           </Tooltip>
           <Tooltip
             title="Response Time"
-            placement={"bottom"}
+            placement={"bottom-center"}
             zIndex={500}
             distance={20}
           >
@@ -138,7 +138,7 @@
           </Tooltip>
           <Tooltip
             title="Response Size"
-            placement={"bottom"}
+            placement={"bottom-center"}
             zIndex={500}
             distance={20}
           >

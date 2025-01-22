@@ -1,21 +1,29 @@
 <script lang="ts">
   export let title = "Tooltip";
+  export let subtext = "";
   export let styleProp = "";
   export let show = true;
   export let placement:
-    | "left"
-    | "right"
-    | "top"
-    | "bottom"
+    | "left-center"
+    | "right-center"
+    | "top-center"
+    | "bottom-center"
+    | "top-left"
+    | "top-right"
+    | "bottom-left"
     | "bottom-right"
-    | "bottom-left" = "bottom";
+    | "left-top"
+    | "left-bottom"
+    | "right-top"
+    | "right-bottom" = "bottom-center";
   export let zIndex = 1;
   export let transitionTime = "0.3s";
   export let spacing = "4px 10px";
-  export let borderRadius = "2px";
+  export let borderRadius = "4px";
   export let distance = 10;
   export let fontSize = "12px";
   export let delay = 50;
+  export let type: "small" | "medium" = "small";
 
   let top = "unset";
   let left = "unset";
@@ -25,8 +33,25 @@
   let isHover = false;
   let isDelayed = false;
 
+  const getTypeStyles = () => {
+    if (type === "small") {
+      return {
+        borderRadius: "4px",
+        boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)",
+        maxWidth: "220px",
+        titleClass: "",
+      };
+    }
+    return {
+      borderRadius: "6px",
+      boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.24)",
+      maxWidth: "300px",
+      titleClass: "font-bold",
+    };
+  };
+
   const toggleTooltip = () => {
-    if (placement === "right") {
+    if (placement === "right-center") {
       top =
         (
           (tooltipWrapper.getBoundingClientRect().top +
@@ -38,7 +63,7 @@
         "px";
       right = "unset";
       bottom = "unset";
-    } else if (placement === "left") {
+    } else if (placement === "left-center") {
       top =
         (
           (tooltipWrapper.getBoundingClientRect().top +
@@ -55,7 +80,7 @@
         ).toString() + "px";
       left = "unset";
       bottom = "unset";
-    } else if (placement === "top") {
+    } else if (placement === "top-center") {
       left =
         (
           (tooltipWrapper.getBoundingClientRect().right +
@@ -70,7 +95,7 @@
         ).toString() + "px";
       right = "unset";
       top = "unset";
-    } else if (placement === "bottom") {
+    } else if (placement === "bottom-center") {
       left =
         (
           (tooltipWrapper.getBoundingClientRect().right +
@@ -82,68 +107,178 @@
         "px";
       bottom = "unset";
       right = "unset";
-    } else if (placement === "bottom-left") {
+    } else if (placement === "bottom-right") {
       left = tooltipWrapper.getBoundingClientRect().right.toString() + "px";
       top =
         (tooltipWrapper.getBoundingClientRect().bottom + distance).toString() +
         "px";
       bottom = "unset";
       right = "unset";
-    } else if (placement === "bottom-right") {
+    } else if (placement === "bottom-left") {
       left = tooltipWrapper.getBoundingClientRect().left.toString() + "px";
       top =
         (tooltipWrapper.getBoundingClientRect().bottom + distance).toString() +
         "px";
       bottom = "unset";
       right = "unset";
+    } else if (placement === "top-left") {
+      left = tooltipWrapper.getBoundingClientRect().left.toString() + "px";
+      bottom =
+        (
+          window.innerHeight -
+          tooltipWrapper.getBoundingClientRect().top +
+          distance
+        ).toString() + "px";
+      right = "unset";
+      top = "unset";
+    } else if (placement === "top-right") {
+      left = tooltipWrapper.getBoundingClientRect().right.toString() + "px";
+      bottom =
+        (
+          window.innerHeight -
+          tooltipWrapper.getBoundingClientRect().top +
+          distance
+        ).toString() + "px";
+      right = "unset";
+      top = "unset";
+    } else if (placement === "right-bottom") {
+      // Position at the right side, aligned to bottom
+      bottom =
+        (
+          window.innerHeight - tooltipWrapper.getBoundingClientRect().bottom
+        ).toString() + "px";
+      left =
+        (tooltipWrapper.getBoundingClientRect().right + distance).toString() +
+        "px";
+      top = "unset";
+      right = "unset";
+    } else if (placement === "right-top") {
+      // Position at the right side, aligned to top
+      top = tooltipWrapper.getBoundingClientRect().top.toString() + "px";
+      left =
+        (tooltipWrapper.getBoundingClientRect().right + distance).toString() +
+        "px";
+      right = "unset";
+      bottom = "unset";
+    } else if (placement === "left-top") {
+      top = tooltipWrapper.getBoundingClientRect().top.toString() + "px";
+      right =
+        (
+          window.innerWidth -
+          tooltipWrapper.getBoundingClientRect().left +
+          distance
+        ).toString() + "px";
+      left = "unset";
+      bottom = "unset";
+    } else if (placement === "left-bottom") {
+      bottom =
+        (
+          window.innerHeight - tooltipWrapper.getBoundingClientRect().bottom
+        ).toString() + "px";
+      right =
+        (
+          window.innerWidth -
+          tooltipWrapper.getBoundingClientRect().left +
+          distance
+        ).toString() + "px";
+      top = "unset";
+      left = "unset";
     }
   };
+  $: styles = getTypeStyles();
 </script>
 
 {#if show}
   <span
     class="{isHover
       ? `tooltip-text-hover ${'tooltip-text-hover-' + placement.toString()}`
-      : ''} tooltip-text invisible m-auto text-center bg-tertiary-700 text-lightGray position-fixed justify-content-center align-items-center opacity-0
+      : ''} tooltip-text invisible m-auto text-center text-lightGray position-fixed justify-content-center align-items-center opacity-0
  {placement.toString()} "
-    style="top: {top}; left: {left}; right: {right}; bottom: {bottom}; transition: {transitionTime} ; padding:{spacing}; font-size:{fontSize}; z-index : {zIndex} ; border-radius: {borderRadius}; {styleProp} width: fit-content;"
-    >{@html title}
-    {#if placement === "left"}
+    style="top: {top}; left: {left}; right: {right}; bottom: {bottom}; transition: {transitionTime} ; padding:{spacing}; font-size:{fontSize}; z-index : {zIndex} ; 
+           border-radius: {styles.borderRadius}; 
+           box-shadow: {styles.boxShadow}; {styleProp}
+           max-width: {styles.maxWidth}; white-space: normal; word-wrap: break-word; background-color:#31353F"
+  >
+    <div class="{styles.titleClass} title-txt">{@html title}</div>
+    {#if type === "medium" && subtext}
+      <div class="subtext">{@html subtext}</div>
+    {/if}
+    {#if placement === "left-center"}
       <span
         class="position-absolute tooltip-square border-radius-2"
         style="top:50%; right:5px; transform: translateX(100%) translateY(-50%) rotate(45deg);"
       >
       </span>
-    {:else if placement === "top"}
+    {:else if placement === "top-center"}
       <span
         class="position-absolute tooltip-square border-radius-2"
         style="bottom:5px; left:50%; transform: translateX(-50%) translateY(100%) rotate(45deg);"
       >
       </span>
-    {:else if placement === "right"}
+    {:else if placement === "right-center"}
       <span
         class="position-absolute tooltip-square border-radius-2"
         style="top:50%; left:5px; transform: translateX(-100%) translateY(-50%) rotate(45deg);"
       >
       </span>
-    {:else if placement === "bottom"}
+    {:else if placement === "bottom-center"}
       <span
         class="position-absolute tooltip-square border-radius-2"
         style="top:5px; left:50%; transform: translateX(-50%) translateY(-100%) rotate(45deg); "
       >
       </span>
-    {:else if placement === "bottom-left"}
+    {:else if placement === "bottom-right"}
       <span
         class="position-absolute tooltip-square border-radius-2"
         style="top:5px; right:10px; transform: translateY(-100%) rotate(45deg);"
       >
       </span>
-    {:else if placement === "bottom-right"}
+    {:else if placement === "bottom-left"}
       <span
         class="position-absolute tooltip-square border-radius-2"
         style="top:5px; left:10px; transform: translateY(-100%) rotate(45deg);"
       >
       </span>
+    {:else if placement === "top-right"}
+      <span
+        class="position-absolute tooltip-square border-radius-2"
+        style="bottom:-15px; right:10px; transform: translateY(-100%) rotate(45deg);"
+      >
+      </span>
+    {:else if placement === "top-left"}
+      <span
+        class="position-absolute tooltip-square border-radius-2"
+        style="bottom:-15px; left:10px; transform: translateY(-100%) rotate(45deg);"
+      >
+      </span>
+    {:else if placement === "right-bottom"}
+      <span
+        class="position-absolute tooltip-square"
+        style="top:{type === 'medium'
+          ? '80%'
+          : '30%'}; left:5px; transform: translateX(-100%) rotate(45deg);"
+      ></span>
+    {:else if placement === "right-top"}
+      <span
+        class="position-absolute tooltip-square"
+        style="top:{type === 'medium'
+          ? '15%'
+          : '30%'}; left:5px; transform: translateX(-100%) rotate(45deg);"
+      ></span>
+    {:else if placement === "left-bottom"}
+      <span
+        class="position-absolute tooltip-square"
+        style="top:{type === 'medium'
+          ? '80%'
+          : '50%'}; right:5px; transform: translateX(100%) translateY(-50%) rotate(45deg);"
+      ></span>
+    {:else if placement === "left-top"}
+      <span
+        class="position-absolute tooltip-square"
+        style="top:{type === 'medium'
+          ? '15%'
+          : '50%'}; right:5px; transform: translateX(100%) translateY(-50%) rotate(45deg);"
+      ></span>
     {/if}
   </span>
 {/if}
@@ -169,31 +304,39 @@
 </div>
 
 <style>
-  .top {
+  .top-center,
+  .top-right,
+  .top-left {
     transform: translateX(-50%) scale(0.5);
   }
-  .left {
+  .left-center {
     transform: translateY(-50%) scale(0.5);
   }
-  .right {
+  .right-center {
     transform: translateY(-50%) scale(0.5);
   }
-  .bottom {
+  .bottom-center {
     transform: translateX(-50%) scale(0.5);
   }
-  .bottom-left {
+  .bottom-right {
     transform: translateX(-100%) scale(0.5);
   }
 
-  .tooltip-text-hover-bottom-left {
+  .tooltip-text-hover-bottom-right {
     transform: translateX(-100%) scale(1);
   }
 
-  .bottom-right {
+  .bottom-left {
     transform: translateX(0) scale(0.5);
   }
 
-  .tooltip-text-hover-bottom-right {
+  .tooltip-text-hover-bottom-left {
+    transform: translateX(0) scale(1);
+  }
+  .tooltip-text-hover-top-right {
+    transform: translateX(-100%) scale(1);
+  }
+  .tooltip-text-hover-top-left {
     transform: translateX(0) scale(1);
   }
   .tooltip-text {
@@ -206,21 +349,35 @@
     visibility: visible !important;
     opacity: 1 !important;
   }
-  .tooltip-text-hover-top {
+  .tooltip-text-hover-top-center {
     transform: translateX(-50%) scale(1);
   }
-  .tooltip-text-hover-left {
+  .tooltip-text-hover-left-center {
     transform: translateY(-50%) scale(1);
   }
-  .tooltip-text-hover-right {
+  .tooltip-text-hover-right-center {
     transform: translateY(-50%) scale(1);
   }
-  .tooltip-text-hover-bottom {
+  .tooltip-text-hover-bottom-center {
     transform: translateX(-50%) scale(1);
+  }
+  .tooltip-text-hover-right-top,
+  .tooltip-text-hover-right-bottom {
+    transform: translateX(0) scale(1);
   }
   .tooltip-square {
     height: 10px;
     width: 10px;
-    background-color: var(--bg-tertiary-700);
+    background-color: #31353f;
+  }
+  .subtext {
+    margin-top: 4px;
+    color: #b6b7b9;
+  }
+  .font-bold {
+    font-weight: 600;
+  }
+  .title-txt {
+    color: #ffffff;
   }
 </style>
