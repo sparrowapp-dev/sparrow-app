@@ -1,31 +1,30 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { RxDB } from "../../../../../../apps/@sparrow-desktop/src/database/database";
-  
   import getIcon from "../../../../static/getIcon.png";
   import hexIcon from "../../../../static/iconHex.png";
   import folderIcon from "../../../../static/folderIcon.png";
   import environmentIcon from "../../../../static/envLayer.png";
   import collectionIcon from "../../../../static/collectionStack.png";
   import workspaceIcon from "../../../../static/workspaceBoard.png";
+  import { WorkspaceRepository} from "../../../../../../apps/@sparrow-desktop/src/repositories/workspace.repository";
   import type {
     CollectionDocument,
     EnvironmentDocument,
     WorkspaceDocument,
   } from "@app/database/database";
 
-  import{ CollectionRepository} from "../../../../../../apps/@sparrow-desktop/src/repositories/collection.repository";
-  import { useTree } from './CollectionList';
-  export let searchQuery = "";
-  export let filteredCollection = [];
-  export let filteredFolder = [];
-  export let filteredRequest = [];
   
- export let recentCollection: RecentItem | null = null;
-  export let recentEnvironment: RecentItem | null = null;
-  export let recentFolder: RecentItem | null = null;
-  export let recentWorkspace: RecentItem | null = null;
-  
+export let searchQuery = "";
+export let filteredCollection = [];
+export let filteredFolder = [];
+export let filteredRequest = [];
+
+export let recentEnvironment: RecentItem | null = null;
+export let recentWorkspace: RecentItem | null = null;
+
+let filteredWorkspaces = [];
+let workspaceRepository = new WorkspaceRepository();
 
   interface RecentItem {
     title: string;
@@ -40,35 +39,39 @@ $: console.log("The search query: recnet ", searchQuery);
 $: console.log("filteredCollection is recent ", filteredCollection);
 $: console.log("filteredFolder s\is", filteredFolder);
 $: console.log("filteredRequest is", filteredRequest);
+$: console.log("filteredWorkspace is", filteredWorkspaces);
+
+$: {
+  updateWorkspaces(searchQuery);
+}
 
 
-  // Hardcoded recent requests as per original code
-  const recentRequests: RecentItem[] = [
-    {
-      title: "Pet Hospitality",
-      workspace: "techdome",
-      collection: "my workspace / new collection",
-      url: "https://strapi.techdome.io/api/getPetHospitality",
-      method: "GET",
-    },
-    {
-      title: "Pet Hospitality",
-      workspace: "techdome",
-      collection: "domigo / new collection",
-      url: "https://strapi.techdome.io/graphql",
-    },
-    {
-      title: "New Socket.io",
-      workspace: "techdome",
-      collection: "domigo / new collection",
-      url: "https://strapi.techdome.io/graphql",
-    },
-  ];
+async function updateWorkspaces(query: string) {
+  try {
+    filteredWorkspaces = await workspaceRepository.searchWorkspaces(query);
+  } catch (error) {
+    console.error('Error fetching workspaces:', error);
+    filteredWorkspaces = [];
+  }
+}
+
+onMount(async () => {
+  // Initially load recent workspaces
+  try {
+    filteredWorkspaces = await workspaceRepository.getRecentWorkspaces();
+  } catch (error) {
+    console.error('Error fetching recent workspaces:', error);
+  }
+});
+ 
 </script>
 
 <div class="recent-items-container">
   <div class="recent-section">
-    <div class="section-header">
+    
+
+   {#if filteredRequest.length > 0}
+   <div class="section-header">
       <span class="section-title">Recent Requests</span>
       <div class="keyboard-shortcut">
         <div class="shortcut-key">
@@ -82,8 +85,6 @@ $: console.log("filteredRequest is", filteredRequest);
         <span class="key">A</span>
       </div>
     </div>
-
-   {#if filteredRequest}
     {#each filteredRequest as request}
       <div class="request-item">
         <div class="request-method">
@@ -98,14 +99,14 @@ $: console.log("filteredRequest is", filteredRequest);
             <span class="request-title">{request.tree.name}</span>
             <span class="request-path">{request.path}</span>
           </div>
-          <span class="request-url">{request.url}</span>
+          <span class="request-url">{request.tree.request.url ||""}</span>
         </div>
       </div>
     {/each}
    {/if}
   </div>
 
-  {#if recentCollection}
+  {#if filteredCollection[0]}
     <div style="display:flex;flex-direction:column; gap:8px;">
       <span class="section-title">Recent Collection</span>
       <div class="request-item">
@@ -114,9 +115,9 @@ $: console.log("filteredRequest is", filteredRequest);
         </div>
         <div class="request-details">
           <div class="request-header">
-            <span class="request-title">{recentCollection.title}</span>
+            <span class="request-title">{filteredCollection[0]?.tree.name}</span>
             <span class="request-path">
-              {recentCollection.workspace} / {recentCollection.environment} / {recentCollection.collection}
+            {filteredCollection[0]?.path}
             </span>
           </div>
         </div>
@@ -143,7 +144,7 @@ $: console.log("filteredRequest is", filteredRequest);
     </div>
   {/if}
 
-  {#if recentFolder}
+  {#if filteredFolder[0]}
     <div style="display:flex;flex-direction:column; gap:8px;">
       <span class="section-title">Recent Folder</span>
       <div class="request-item">
@@ -152,9 +153,9 @@ $: console.log("filteredRequest is", filteredRequest);
         </div>
         <div class="request-details">
           <div class="request-header">
-            <span class="request-title">{recentFolder.title}</span>
+            <span class="request-title">{filteredFolder[0].tree.name}</span>
             <span class="request-path">
-              {recentFolder.workspace} / {recentFolder.environment} / {recentFolder.collection}
+              {filteredFolder[0].path}
             </span>
           </div>
         </div>

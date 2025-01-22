@@ -10,6 +10,8 @@
   export let searchQuery ="";
 
 
+  $: console.log("filtered workspace is", filteredWorkspace);
+
 </script>
 
 <div class="suggestions-container">

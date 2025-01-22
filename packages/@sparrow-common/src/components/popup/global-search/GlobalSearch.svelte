@@ -4,6 +4,7 @@ import { SearchSuggestions } from '.';
 import type { SearchSuggestion } from './types';
 import { useTree } from './CollectionList';
 import { CollectionRepository } from "../../../../../../apps/@sparrow-desktop/src/repositories/collection.repository";
+import { WorkspaceRepository} from "../../../../../../apps/@sparrow-desktop/src/repositories/workspace.repository";
  import { RxDB } from "../../../../../../apps/@sparrow-desktop/src/database/database";
 import type { CollectionDocument } from "../database/database";
 import { Observable } from "rxjs";
@@ -11,6 +12,7 @@ import { Observable } from "rxjs";
 
 // Initialize collection repository
 const collectionRepository = new CollectionRepository();
+const workspaceRepository = new WorkspaceRepository();
 
 // Helper function to transform collection document
 const getCollectionDocument = (elem: CollectionDocument) => {
@@ -31,6 +33,12 @@ const getCollectionDocument = (elem: CollectionDocument) => {
     localRepositoryPath: elem.localRepositoryPath,
   };
 };
+
+// const getWorkspaces =()=>{
+//  try{
+  
+//  }
+// }
 
 let searchQuery = "";
 let filteredCollection = [];
@@ -92,10 +100,6 @@ function handleSearch() {
 
 export let onClose = () => {};
 
-
-
-
-
 const suggestions: SearchSuggestion[] = [
   { type: 'workspace', label: 'Workspaces', icon: 'https://cdn.builder.io/api/v1/image/assets/TEMP/c9e3b8ce930d2dde3842ed5ca04a75616e392bff32f0d062f8ea194b68597baa?apiKey=805a55f7a8524d998fb01daccbae8123&' },
   { type: 'collection', label: 'Collections', icon: 'https://cdn.builder.io/api/v1/image/assets/TEMP/afb77cd264163df7720a2d6d41977ef9e65b4da234a3c2ecaf095ab73b397e70?apiKey=805a55f7a8524d998fb01daccbae8123&' },
@@ -106,6 +110,7 @@ const suggestions: SearchSuggestion[] = [
 ];
 onMount(() => {
    handleSearch();
+   
 });
 
 </script>

@@ -107,45 +107,62 @@ const searchHelper: (
   folderDetails,
 ) => {
   if (tree.name.toLowerCase().includes(searchText.toLowerCase())) {
-    if (tree.type === "REQUEST") {
+    // Check limits before pushing new items
+    if (tree.type === "REQUEST" && file.length < 3) {
       file.push({
         tree: JSON.parse(JSON.stringify(tree)),
         collectionId,
         folderDetails,
         path: createPath(path),
+        updatedAt: new Date(tree.updatedAt || Date.now()),
       });
-    } else if (tree.type === "FOLDER") {
+    } else if (tree.type === "FOLDER" && folder.length < 1) {
       folder.push({
         tree: JSON.parse(JSON.stringify(tree)),
         collectionId,
         path: createPath(path),
+        updatedAt: new Date(tree.updatedAt || Date.now()),
       });
-    } else {
+    } else if (
+      collection.length < 1 &&
+      tree.type !== "FOLDER" &&
+      tree.type !== "REQUEST"
+    ) {
       collection.push({
         tree: JSON.parse(JSON.stringify(tree)),
         collectionId,
         path: createPath(path),
+        updatedAt: new Date(tree.updatedAt || Date.now()),
       });
     }
   }
 
-  // Recursively search through the tree structure
-  if (tree && tree.items) {
-    for (let j = 0; j < tree.items.length; j++) {
-      path.push(tree.name); // Recursive backtracking
-      searchHelper(
-        tree.items[j],
-        searchText,
-        collection,
-        folder,
-        file,
-        collectionId,
-        path,
-        tree.type === "FOLDER" ? { id: tree.id, name: tree.name } : {},
-      );
-      path.pop();
+  // Only continue searching if we haven't reached all limits
+  if (file.length < 3 || folder.length < 1 || collection.length < 1) {
+    // Recursively search through the tree structure
+    if (tree && tree.items) {
+      for (let j = 0; j < tree.items.length; j++) {
+        path.push(tree.name); // Recursive backtracking
+        searchHelper(
+          tree.items[j],
+          searchText,
+          collection,
+          folder,
+          file,
+          collectionId,
+          path,
+          tree.type === "FOLDER" ? { id: tree.id, name: tree.name } : {},
+        );
+        path.pop();
+      }
     }
   }
+
+  // Sort results by updatedAt before returning
+  file.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+  folder.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+  collection.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+
   return;
 };
 
@@ -226,29 +243,42 @@ const useTree = (): any[] => {
   ) => {
     const filteredByMethodTrees = [];
     tree = collectionData;
-    console.log("current search ttext is", searchText);
-    if (searchText.trim()=="" ) {
-      const {
-        latestCollections,
-        latestFolders,
-        latestRequests,
-        latestWorkspaces,
-      } = getLatestItemsByType(tree);
+    console.log("current search text is", searchText);
 
-      collection.push(...latestCollections);
-      folder.push(...latestFolders);
-      file.push(...latestRequests);
+    if (searchText.trim() === "") {
+      // Clear existing arrays before populating with latest items
+      collection.length = 0;
+      folder.length = 0;
+      file.length = 0;
 
-      // Combine all latest items for the store
-      latestItemsStore.set([
-        ...latestWorkspaces,
-        ...latestCollections,
-        ...latestFolders,
-        ...latestRequests,
-      ]);
+      // Get latest items and ensure they're properly sorted
+      const latestItems = getLatestItemsByType(tree);
+
+      // Ensure we're getting the most recently updated items
+      if (latestItems.latestCollections.length > 0) {
+        collection.push(...latestItems.latestCollections);
+      }
+      if (latestItems.latestFolders.length > 0) {
+        folder.push(...latestItems.latestFolders);
+      }
+      if (latestItems.latestRequests.length > 0) {
+        file.push(...latestItems.latestRequests);
+      }
+
+      // Update the latestItemsStore with all items
+      latestItemsStore.set(
+        [
+          ...latestItems.latestWorkspaces,
+          ...latestItems.latestCollections,
+          ...latestItems.latestFolders,
+          ...latestItems.latestRequests,
+        ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()),
+      );
+
       return;
     }
-    // iterate through the tree and filter according to api methods selected
+
+    // Rest of the existing search logic remains unchanged
     if (selectedAPIMethods.length > 0) {
       for (let i = 0; i < tree.length; i++) {
         const path = [];
@@ -261,8 +291,8 @@ const useTree = (): any[] => {
         filteredByMethodTrees.push(...treeCol);
       }
     }
+
     let filteredTrees = [];
-    // iterate through the tree and remove empty collection and folder on filter
     if (filteredByMethodTrees.length > 0) {
       filteredTrees = filteredByMethodTrees.filter((collectionObj) => {
         if (collectionObj.items.length > 0) {
@@ -281,8 +311,9 @@ const useTree = (): any[] => {
     } else {
       filteredTrees = tree;
     }
+
     selectedMethodsCollectionStore.update(() => filteredTrees);
-    // Iterate through the tree to find the target folder and add the item
+
     for (let i = 0; i < filteredTrees.length; i++) {
       const path = [];
       if (workspacePath) {
