@@ -368,16 +368,16 @@
   .tooltip-square {
     height: 10px;
     width: 10px;
-    background-color: #31353f;
+    background-color: var(--surface-100);
   }
   .subtext {
     margin-top: 4px;
-    color: #b6b7b9;
+    color: var(--neutral-200);
   }
   .font-bold {
     font-weight: 600;
   }
   .title-txt {
-    color: #ffffff;
+    color: var(--neutral-50);
   }
 </style>
