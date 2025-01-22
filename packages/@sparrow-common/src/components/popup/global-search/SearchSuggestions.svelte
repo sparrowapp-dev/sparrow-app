@@ -3,11 +3,18 @@
   import {SuggestionTags} from '.';
   import {RecentItems} from '.';
   export let suggestions: SearchSuggestion[];
+  export let filteredCollection = [];
+  export let filteredFolder = [];
+  export let filteredRequest = [];
+  export let filteredWorkspace = [];
+  export let searchQuery ="";
+
+
 </script>
 
 <div class="suggestions-container">
   <SuggestionTags {suggestions} />
-  <RecentItems />
+  <RecentItems { searchQuery} {filteredCollection} {filteredFolder} {filteredRequest} {filteredWorkspace}/>
 </div>
 
 <style>

@@ -1,6 +1,48 @@
 <script lang="ts">
-  import type { RecentItem } from "./types";
+  import { onMount } from 'svelte';
+  import { RxDB } from "../../../../../../apps/@sparrow-desktop/src/database/database";
+  
+  import getIcon from "../../../../static/getIcon.png";
+  import hexIcon from "../../../../static/iconHex.png";
+  import folderIcon from "../../../../static/folderIcon.png";
+  import environmentIcon from "../../../../static/envLayer.png";
+  import collectionIcon from "../../../../static/collectionStack.png";
+  import workspaceIcon from "../../../../static/workspaceBoard.png";
+  import type {
+    CollectionDocument,
+    EnvironmentDocument,
+    WorkspaceDocument,
+  } from "@app/database/database";
 
+  import{ CollectionRepository} from "../../../../../../apps/@sparrow-desktop/src/repositories/collection.repository";
+  import { useTree } from './CollectionList';
+  export let searchQuery = "";
+  export let filteredCollection = [];
+  export let filteredFolder = [];
+  export let filteredRequest = [];
+  
+ export let recentCollection: RecentItem | null = null;
+  export let recentEnvironment: RecentItem | null = null;
+  export let recentFolder: RecentItem | null = null;
+  export let recentWorkspace: RecentItem | null = null;
+  
+
+  interface RecentItem {
+    title: string;
+    workspace: string;
+    collection?: string;
+    environment?: string;
+    url?: string;
+    method?: string;
+  }
+
+$: console.log("The search query: recnet ", searchQuery);
+$: console.log("filteredCollection is recent ", filteredCollection);
+$: console.log("filteredFolder s\is", filteredFolder);
+$: console.log("filteredRequest is", filteredRequest);
+
+
+  // Hardcoded recent requests as per original code
   const recentRequests: RecentItem[] = [
     {
       title: "Pet Hospitality",
@@ -14,50 +56,12 @@
       workspace: "techdome",
       collection: "domigo / new collection",
       url: "https://strapi.techdome.io/graphql",
-      icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/518cb90db7c525768eab63e5ae3650ccaf35d05d4f8b8e806be7c98112a2c1f7?apiKey=805a55f7a8524d998fb01daccbae8123&",
     },
     {
       title: "New Socket.io",
       workspace: "techdome",
       collection: "domigo / new collection",
       url: "https://strapi.techdome.io/graphql",
-      icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/ab1b51e51d752ffcc170a36a193d24128a6e66e9152ef1efa05cd7f96023e45b?apiKey=805a55f7a8524d998fb01daccbae8123&",
-    },
-  ];
-
-  const recentCollection: RecentItem = [
-    {
-      title: "Pet Hospitality",
-      workspace: "techdome",
-      collection: "my workspace / new collection",
-      environment: "new environment",
-    },
-  ];
-
-  const recentWorkspace: RecentItem = [
-    {
-      title: "Pet Hospitality",
-      workspace: "techdome",
-      collection: " new collection",
-      environment: "new environment",
-    },
-  ];
-
-  const recentEnvironment: RecentItem = [
-    {
-      title: "Pet Hospitality",
-      workspace: "techdome",
-      collection: " new collection",
-      environment: "new environment",
-    },
-  ];
-
-  const RecentFolder: RecentItem = [
-    {
-      title: "Pet Hospitality",
-      workspace: "techdome",
-      collection: "new collection",
-      environment: "new environment",
     },
   ];
 </script>
@@ -79,117 +83,103 @@
       </div>
     </div>
 
-    {#each recentRequests as request}
+   {#if filteredRequest}
+    {#each filteredRequest as request}
       <div class="request-item">
         <div class="request-method">
           {#if request.method}
-            <span class="method-label">{request.method}</span>
+            <span class="method-label">{request.tree.name}</span>
           {:else}
-            <img src={request.icon} alt="" class="request-icon" />
+            <img src={hexIcon} alt="" class="request-icon" />
           {/if}
         </div>
         <div class="request-details">
           <div class="request-header">
-            <span class="request-title">{request.title}</span>
-            <span class="request-path"
-              >{request.workspace} / {request.collection}</span
-            >
+            <span class="request-title">{request.tree.name}</span>
+            <span class="request-path">{request.path}</span>
           </div>
           <span class="request-url">{request.url}</span>
         </div>
       </div>
     {/each}
+   {/if}
   </div>
-  <!-- // other recent items -->
-  <div style="display:flex;flex-direction:column; gap:8px;">
-    <span class="section-title">Recent Collection</span>
-    <div class="request-item">
-      <div class="request-method">
-        {#if recentCollection[0].method}
-          <span class="method-label">{recentCollection[0].method}</span>
-        {:else}
-          <img src={recentCollection[0].icon} alt="" class="request-icon" />
-        {/if}
-      </div>
-      <div class="request-details">
-        <div class="request-header">
-          <span class="request-title">{recentCollection[0].title}</span>
-          <span class="request-path"
-            >{recentCollection[0].workspace} / {recentCollection[0].environment}
-            / {recentCollection[0].collection}</span
-          >
+
+  {#if recentCollection}
+    <div style="display:flex;flex-direction:column; gap:8px;">
+      <span class="section-title">Recent Collection</span>
+      <div class="request-item">
+        <div class="request-method">
+          <img src={collectionIcon} alt="" class="other-icon" />
+        </div>
+        <div class="request-details">
+          <div class="request-header">
+            <span class="request-title">{recentCollection.title}</span>
+            <span class="request-path">
+              {recentCollection.workspace} / {recentCollection.environment} / {recentCollection.collection}
+            </span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  {/if}
 
-  <div style="display:flex;flex-direction:column; gap:8px;">
-    <span class="section-title">Recent Environment</span>
-    <div class="request-item">
-      <div class="request-method">
-        {#if recentEnvironment[0].method}
-          <span class="method-label">{recentEnvironment[0].method}</span>
-        {:else}
-          <img src={recentEnvironment[0].icon} alt="" class="request-icon" />
-        {/if}
-      </div>
-      <div class="request-details">
-        <div class="request-header">
-          <span class="request-title">{recentEnvironment[0].title}</span>
-          <span class="request-path"
-            >{recentEnvironment[0].workspace} / {recentEnvironment[0]
-              .environment} / {recentEnvironment[0].collection}</span
-          >
+  {#if recentEnvironment}
+    <div style="display:flex;flex-direction:column; gap:8px;">
+      <span class="section-title">Recent Environment</span>
+      <div class="request-item">
+        <div class="request-method">
+          <img src={environmentIcon} alt="" class="other-icon" />
+        </div>
+        <div class="request-details">
+          <div class="request-header">
+            <span class="request-title">{recentEnvironment.title}</span>
+            <span class="request-path">
+              {recentEnvironment.workspace} / {recentEnvironment.environment} / {recentEnvironment.collection}
+            </span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  {/if}
 
-  <div style="display:flex;flex-direction:column; gap:8px;">
-    <span class="section-title">Recent Folder</span>
-    <div class="request-item">
-      <div class="request-method">
-        {#if RecentFolder[0].method}
-          <span class="method-label">{RecentFolder[0].method}</span>
-        {:else}
-          <img src={RecentFolder[0].icon} alt="" class="request-icon" />
-        {/if}
-      </div>
-      <div class="request-details">
-        <div class="request-header">
-          <span class="request-title">{RecentFolder[0].title}</span>
-          <span class="request-path"
-            >{RecentFolder[0].workspace} / {RecentFolder[0].environment} / {RecentFolder[0]
-              .collection}</span
-          >
+  {#if recentFolder}
+    <div style="display:flex;flex-direction:column; gap:8px;">
+      <span class="section-title">Recent Folder</span>
+      <div class="request-item">
+        <div class="request-method">
+          <img src={folderIcon} alt="" class="other-icon" />
+        </div>
+        <div class="request-details">
+          <div class="request-header">
+            <span class="request-title">{recentFolder.title}</span>
+            <span class="request-path">
+              {recentFolder.workspace} / {recentFolder.environment} / {recentFolder.collection}
+            </span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  {/if}
 
-  <div style="display:flex;flex-direction:column; gap:8px;">
-    <span class="section-title">Recent Workspace</span>
-    <div class="request-item">
-      <div class="request-method">
-        {#if recentWorkspace[0].method}
-          <span class="method-label">{recentWorkspace[0].method}</span>
-        {:else}
-          <img src={recentWorkspace[0].icon} alt="" class="request-icon" />
-        {/if}
-      </div>
-      <div class="request-details">
-        <div class="request-header">
-          <span class="request-title">{recentWorkspace[0].title}</span>
-          <span class="request-path"
-            >{recentWorkspace[0].workspace} / {recentWorkspace[0].environment} /
-            {recentWorkspace[0].collection}</span
-          >
+  {#if recentWorkspace}
+    <div style="display:flex;flex-direction:column; gap:8px;">
+      <span class="section-title">Recent Workspace</span>
+      <div class="request-item">
+        <div class="request-method">
+          <img src={workspaceIcon} alt="" class="other-icon" />
+        </div>
+        <div class="request-details">
+          <div class="request-header">
+            <span class="request-title">{recentWorkspace.title}</span>
+            <span class="request-path">
+              {recentWorkspace.workspace} / {recentWorkspace.environment} / {recentWorkspace.collection}
+            </span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Similar sections for Collections, Environments, Folders, and Workspace -->
+  {/if}
 </div>
 
 <style>
@@ -197,6 +187,7 @@
     display: flex;
     flex-direction: column;
     padding: 8px;
+    gap: 12px;
   }
 
   .recent-section {
@@ -213,9 +204,7 @@
 
   .section-title {
     color: var(--Neutral-500, #62656a);
-    font:
-      400 12px Inter,
-      sans-serif;
+    font: 400 12px Inter, sans-serif;
   }
 
   .keyboard-shortcut {
@@ -240,9 +229,7 @@
     background-color: rgba(24, 28, 38, 1);
     color: var(--Neutral-100, #d8d8d9);
     padding: 2px 4px;
-    font:
-      400 12px Inter,
-      sans-serif;
+    font: 400 12px Inter, sans-serif;
   }
 
   .request-item {
@@ -266,14 +253,12 @@
 
   .method-label {
     color: rgba(105, 214, 150, 1);
-    font:
-      700 12px Roboto,
-      sans-serif;
+    font: 700 12px Roboto, sans-serif;
   }
 
-  .request-icon {
-    width: 20px;
-    height: 20px;
+  .request-icon, .other-icon {
+    width: 16px;
+    height: 16px;
   }
 
   .request-details {
@@ -292,22 +277,16 @@
 
   .request-title {
     color: var(--Neutral-300, #9b9da1);
-    font:
-      400 12px Inter,
-      sans-serif;
+    font: 400 12px Inter, sans-serif;
   }
 
   .request-path {
     color: var(--Neutral-500, #62656a);
-    font:
-      400 12px Inter,
-      sans-serif;
+    font: 400 12px Inter, sans-serif;
   }
 
   .request-url {
     color: var(--Blue-300, #6894f9);
-    font:
-      400 12px Inter,
-      sans-serif;
+    font: 400 12px Inter, sans-serif;
   }
 </style>

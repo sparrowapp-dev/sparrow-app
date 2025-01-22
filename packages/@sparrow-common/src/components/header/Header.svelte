@@ -60,7 +60,7 @@
   export let isWebApp = false;
 
   export let isCreateTeamModalOpen;
-  let searchQuery = "";
+  export let searchQuery = "";
   export let onSearchClick;
 
   /**

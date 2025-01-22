@@ -26,14 +26,11 @@
   import Teams from "../teams-page/Teams.svelte";
   import { Modal } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";
-  import { fade } from 'svelte/transition';
+  import { fade } from "svelte/transition";
   import GlobalSearchWrapper from "../../../../../packages/@sparrow-common/src/components/popup/global-search/GlobalSearchWrapper.svelte";
   import GlobalSearch from "../../../../../packages/@sparrow-common/src/components/popup/global-search/GlobalSearch.svelte";
 
-  
-
-
-  const _viewModel = new DashboardViewModel();
+const _viewModel = new DashboardViewModel();
   let userId;
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
@@ -43,11 +40,9 @@
       await _viewModel.refreshTeamsWorkspaces(value._id);
     }
   });
-
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.getActiveWorkspace();
   let workspaceDocuments: Observable<WorkspaceDocument[]>;
-
 
   let currentEnvironment = {
     id: "none",
@@ -94,7 +89,6 @@
   const onModalStateChanged = (flag: boolean) => {
     isPopupOpen = flag;
   };
-  
 
   const handleLogin = () => {
     _viewModel.clearLocalDB();
@@ -109,7 +103,6 @@
   const handleGuestLogin = () => {
     isPopupOpen = true;
   };
-
 
   const handleBannerClose = async () => {
     await _viewModel.updateGuestBannerState();
@@ -126,7 +119,7 @@
     }
     workspaceDocuments = await _viewModel.workspaces();
     teamDocuments = await _viewModel.getTeams();
-    // Disabling web socket for now due to issues in release_v1 deployment, can be enabled in future if required.
+     // Disabling web socket for now due to issues in release_v1 deployment, can be enabled in future if required.
     // await _viewModel.connectWebSocket();
   });
 
@@ -144,7 +137,7 @@
   let updateAvailable = false;
   let newAppVersion: string | undefined = "";
   let updater: Update | null;
-  let isGlobalSearchOpen=false;
+  let isGlobalSearchOpen = false;
 
   const WAIT_TIME_BEFORE_RESTART_IN_SECONDS = 5;
 
@@ -194,30 +187,23 @@
   };
 </script>
 
-<div class="dashboard d-flex flex-column" style="height: 100vh;">
+<div class="dashboard d-flex flex-column" style="height: 100vh;"> 
   {#if isGlobalSearchOpen}
     <!-- Render GlobalSearch when isGlobalSearchOpen is true -->
-    <div 
-      class="global-search-overlay"
-      transition:fade={{ duration: 300 }}
-      
-    >
-
-      <div 
+    <div class="global-search-overlay" transition:fade={{ duration: 300 }}>
+      <div
         class="global-search-container"
-        
         transition:fade={{ duration: 300, delay: 150 }}
       >
-        <GlobalSearch on:close={closeGlobalSearch} />
+        <!-- <GlobalSearch on:close={closeGlobalSearch} /> -->
+       <GlobalSearch on:close={closeGlobalSearch} />
       </div>
     </div>
-    <div 
-      class="blur-background" 
+    <div
+      class="blur-background"
       transition:fade={{ duration: 300 }}
       on:click={closeGlobalSearch}
     ></div>
-  
-
   {/if}
 
   <Header
@@ -241,9 +227,7 @@
     onLogout={_viewModel.handleLogout}
     isGlobalSearchOpen={isGlobalSearchOpen}
     onSearchClick={handleViewGlobalSearch}
-    
   />
-
 
   <!--
     -- App Updater Banner - shows app updater for new version upgrade.
@@ -295,7 +279,6 @@
       <Route path="/*"><Navigate to="collections" /></Route>
     </section>
   </div>
-  
 </div>
 
 <Modal
@@ -368,5 +351,4 @@
     background-color: rgba(0, 0, 0, 0.2);
     z-index: 10;
   }
-
 </style>

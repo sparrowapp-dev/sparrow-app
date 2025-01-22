@@ -1,5 +1,7 @@
 <script lang="ts">
   let searchInput: HTMLInputElement;
+  export let searchQuery = "";
+  export let handleSearch = () => {};
 </script>
 
 <div class="search-bar">
@@ -8,12 +10,13 @@
       <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/13f8c62a2200b0c9780f05496f0d498ddf7086155ff1c2c93885909581f33660?apiKey=805a55f7a8524d998fb01daccbae8123&" alt="" class="search-icon" />
     </div>
     <div class="input-wrapper">
-      <span class="cursor"></span>
+      
       <label for="searchInput" class="visually-hidden">Search</label>
       <input 
         type="text"
-        id="searchInput"
-        bind:this={searchInput}
+        id="searchInput"  
+        bind:value={searchQuery}
+        on:input={handleSearch}
         class="search-input"
         placeholder="Search"
         aria-label="Search"
@@ -67,11 +70,7 @@
     gap: 2px;
   }
 
-  .cursor {
-    background-color: rgba(104, 148, 249, 1);
-    width: 1px;
-    height: 18px;
-  }
+ 
 
   .search-input {
     background: transparent;

@@ -48,14 +48,15 @@ export class DashboardViewModel {
   public setOpenTeam = async (teamId) => {
     await this.teamRepository.setOpenTeam(teamId);
   };
-
+  
   /**
    * Get the active workspace
    * @returns - the active workspace
-   */
-  public getActiveWorkspace = () => {
-    return this.workspaceRepository.getActiveWorkspace();
+  */
+ public getActiveWorkspace = () => {
+   return this.workspaceRepository.getActiveWorkspace();
   };
+ 
 
   /**
    * @description - get environment list from local db
