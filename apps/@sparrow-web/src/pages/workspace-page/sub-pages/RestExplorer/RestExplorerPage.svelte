@@ -10,6 +10,7 @@
   import { onMount } from "svelte";
   import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
   import type { restExplorerData } from "@sparrow/workspaces/features/rest-explorer/store";
+  import constants from "../../../../constants/constants";
   export let tab;
   export let isTourGuideOpen = false;
   let isLoginBannerActive = false;
@@ -183,6 +184,7 @@
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
   onGenerateDocumentation={_viewModel.generateDocumentation}
   isWebApp={true}
+  azureBlobCDN={constants.AZURE_CDN_URL}
 />
 {#if !isGuestUser}
   <ChatBot

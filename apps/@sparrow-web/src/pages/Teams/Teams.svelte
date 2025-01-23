@@ -316,7 +316,17 @@
     isPopupOpen = false;
   }}
 >
-  <DownloadApp />
+  <DownloadApp
+    onInstallRedirect={() => {
+      window.open(constants.WEB_MARKETING_URL, "_blank");
+    }}
+    onGithubRedirect={() => {
+      window.open(constants.SPARROW_GITHUB, "_blank");
+    }}
+    onDocsRedirect={() => {
+      window.open(constants.DOCS_URL, "_blank");
+    }}
+  />
 </Modal>
 
 <Modal

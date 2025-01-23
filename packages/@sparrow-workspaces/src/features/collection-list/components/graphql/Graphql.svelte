@@ -45,7 +45,7 @@
   /**
    * Selected folder details
    */
-  export let folder: CollectionItemBaseInterface;
+  export let folder: CollectionItemBaseInterface | null;
   /**
    * Selected graphql details
    */

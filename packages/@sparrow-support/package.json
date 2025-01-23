@@ -61,7 +61,7 @@
   "lint-staged": {
     "*.{js,ts,svelte,css,json}": [
       "prettier --write",
-      "eslint --fix --ignore-pattern '!**/.lintstagedrc.json'"
+      "eslint --fix"
     ]
   }
 }

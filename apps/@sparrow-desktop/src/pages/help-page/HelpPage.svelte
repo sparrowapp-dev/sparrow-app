@@ -22,6 +22,8 @@
   import { ActivitySection } from "@sparrow/support/features";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import constants from "../../constants/constants";
+  import { open } from "@tauri-apps/plugin-shell";
 
   /**
    * @description - Prevents the default context menu from appearing on right-click.
@@ -253,7 +255,19 @@
                 bind:isPostopenFromActivity
               />
             {:else if activeTab === "updates"}
-              <ReleaseNotes listChangeLog={_viewModel.listChangeLog} />
+              <ReleaseNotes
+                listChangeLog={_viewModel.listChangeLog}
+                onLinkedInRedirect={async () => {
+                  await open(constants.SPARROW_LINKEDIN);
+                  MixpanelEvent(Events.LinkedIn_Updates_Icon);
+                }}
+                onReleaseNoteRedirect={async (title) => {
+                  const version = title.match(/v\d+\.\d+\.\d+/)[0];
+                  const releaseNoteUrl = `${constants.SPARROW_GITHUB}/sparrow-app/releases/tag/${version}`;
+                  await open(releaseNoteUrl);
+                  MixpanelEvent(Events.Github_Updates);
+                }}
+              />
             {:else if activeTab === "roadmap"}
               <Roadmap
                 {setPostId}
