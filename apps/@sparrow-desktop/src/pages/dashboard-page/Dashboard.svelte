@@ -195,6 +195,7 @@
 
   let sidebarItems: SidebarItemObj[] = [
     {
+      id: "Home",
       route: !isGuestUser ? "/app/home" : "/guest/home",
       heading: "Home",
       defaultLogo: home, // Replace with actual image paths
@@ -204,6 +205,7 @@
       position: "primary",
     },
     {
+      id: "Workspace",
       route: !isGuestUser ? "/app/collections" : "/guest/collections",
       heading: "Workspace",
       defaultLogo: collections,
@@ -213,15 +215,17 @@
       position: "primary",
     },
     {
+      id: "Community",
       route: "/app/help",
       heading: "Community",
       defaultLogo: help,
       hoveredLogo: hoveredHelp,
       selectedLogo: selectedHelp,
-      disabled: false,
+      disabled: !isGuestUser ? false : true,
       position: "secondary",
     },
     {
+      id: "Setting",
       route: "/app/setting",
       heading: "Setting",
       defaultLogo: settings,
@@ -293,6 +297,7 @@
       {user}
       {sidebarItems}
       {isGuestUser}
+      isVisible={isLoginBannerActive}
       onLogout={_viewModel.handleLogout}
     />
     <!-- 

@@ -1,5 +1,6 @@
 <script lang="ts" context="module">
   export type SidebarItemObj = {
+    id: string;
     route: string;
     heading: string;
     defaultLogo: string;
@@ -19,6 +20,7 @@
    */
   export let item: SidebarItemObj;
   export let isGuestUser;
+  export let slidebarPlace;
 
   let isRouteActive = false;
 </script>
@@ -35,9 +37,12 @@
   <Router>
     <div class="sidebar-item-parent" class:disabled={item.disabled}>
       <Link
+        class="delay-class"
+        id="divHeight"
         to={item.route}
         getProps={({ isCurrent, isPartiallyCurrent }) => {
           isRouteActive = isCurrent || isPartiallyCurrent;
+          slidebarPlace(isRouteActive, item.id);
           return {
             class: `d-flex mb-1 flex-column text-decoration-none align-items-center justify-content-center ${
               item.disabled ? "disabled" : ""
@@ -52,9 +57,6 @@
             item.defaultLogo}');"
         >
           <div class="d-flex" style="align-items: center;">
-            {#if isRouteActive}
-              <div class="active-indicator"></div>
-            {/if}
             <img
               class="sidebar-logo {isRouteActive ? 'selected' : ''}"
               src={item.defaultLogo}
@@ -68,6 +70,9 @@
 </Tooltip>
 
 <style>
+  .delay-class {
+    transition: top 250ms ease-in-out 150ms;
+  }
   .sidebar-item img {
     height: 20px;
     width: 20px;
@@ -89,15 +94,6 @@
     pointer-events: none !important;
     opacity: 0.3;
   }
-
-  .active-indicator {
-    background-color: var(--nav-bar-active-slash);
-    position: fixed;
-    height: 38px;
-    width: 2px;
-    left: 5px;
-  }
-
   .sidebar-logo {
     content: var(--default-logo);
   }
