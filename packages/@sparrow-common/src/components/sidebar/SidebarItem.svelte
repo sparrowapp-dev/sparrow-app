@@ -1,14 +1,4 @@
 <script lang="ts" context="module">
-  export type SidebarItemObj = {
-    id: string;
-    route: string;
-    heading: string;
-    defaultLogo: string;
-    hoveredLogo?: string;
-    selectedLogo?: string;
-    disabled: boolean;
-    position: "primary" | "secondary";
-  };
 </script>
 
 <script lang="ts">

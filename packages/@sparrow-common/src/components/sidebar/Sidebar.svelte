@@ -2,8 +2,23 @@
   import { afterUpdate, onMount } from "svelte";
 
   // ---- Icons ----
+  import {
+    home,
+    hoveredHome,
+    selectedHome,
+    settings,
+    selectedSettings,
+    hoveredSettings,
+    collections,
+    hoveredCollections,
+    selectedCollections,
+    help,
+    hoveredHelp,
+    selectedHelp,
+  } from "./common";
 
-  import SidebarItem, { type SidebarItemObj } from "./SidebarItem.svelte";
+  import SidebarItem from "./SidebarItem.svelte";
+  import { type SidebarItemObj } from "../../types/sidebar/sidebar-base";
 
   // import { isGuestUserActive } from "@app/store/auth.store";
 
@@ -28,7 +43,26 @@
   }
   let event1 = "";
 
-  onMount(() => {});
+  sidebarItems.forEach((item) => {
+    if (item.id === "Home") {
+      item.defaultLogo = home;
+      item.hoveredLogo = hoveredHome;
+      item.selectedLogo = selectedHome;
+    } else if (item.id === "Workspace") {
+      item.defaultLogo = collections;
+      item.hoveredLogo = hoveredCollections;
+      item.selectedLogo = selectedCollections;
+    } else if (item.id === "Community") {
+      item.defaultLogo = help;
+      item.hoveredLogo = hoveredHelp;
+      item.selectedLogo = selectedHelp;
+    } else if (item.id === "Setting") {
+      item.defaultLogo = settings;
+      item.hoveredLogo = hoveredSettings;
+      item.selectedLogo = selectedSettings;
+    }
+  });
+
   let primarySidebarItems = sidebarItems.filter(
     (item) => item.position === "primary",
   );
@@ -87,7 +121,7 @@
     align-items: center;
     justify-content: space-between;
     width: 54px;
-    background-color: var(--bg-secondary-850);
+    background-color: var(--bg-ds-surface-700);
     padding: 5px 0px 0px 0px;
   }
 

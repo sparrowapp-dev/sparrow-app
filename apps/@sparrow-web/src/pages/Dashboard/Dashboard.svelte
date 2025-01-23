@@ -20,21 +20,11 @@
   import { CreateWorkspace } from "@sparrow/teams/features";
   import { CreateTeam } from "@sparrow/common/features";
   import CollectionsPage from "../workspace-page/CollectionsPage.svelte";
+
   import {
-    home,
-    hoveredHome,
-    selectedHome,
-    settings,
-    selectedSettings,
-    hoveredSettings,
-    collections,
-    hoveredCollections,
-    selectedCollections,
-    help,
-    hoveredHelp,
-    selectedHelp,
-  } from "../../../../../packages/@sparrow-common/src/components/sidebar/common";
-  import { type SidebarItemObj } from "../../../../../packages/@sparrow-common/src/components/sidebar/SidebarItem.svelte";
+    type SidebarItemObj,
+    SidebarItemPositionBaseEnum,
+  } from "@sparrow/common/types/sidebar/sidebar-base";
   import { isGuestUserActive } from "@app/store/auth.store";
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -147,41 +137,41 @@
       id: "Home",
       route: !isGuestUser ? "/app/home" : "/guest/home",
       heading: "Home",
-      defaultLogo: home, // Replace with actual image paths
-      hoveredLogo: hoveredHome,
-      selectedLogo: selectedHome,
+      defaultLogo: "home", // Replace with actual image paths
+      hoveredLogo: "hoveredHome",
+      selectedLogo: "selectedHome",
       disabled: false,
-      position: "primary",
+      position: SidebarItemPositionBaseEnum.PRIMARY,
     },
     {
       id: "Workspace",
       route: !isGuestUser ? "/app/collections" : "/guest/collections",
       heading: "Workspace",
-      defaultLogo: collections,
-      hoveredLogo: hoveredCollections,
-      selectedLogo: selectedCollections,
+      defaultLogo: "collections",
+      hoveredLogo: "hoveredCollections",
+      selectedLogo: "selectedCollections",
       disabled: false,
-      position: "primary",
+      position: SidebarItemPositionBaseEnum.PRIMARY,
     },
     {
       id: "Community",
       route: "/app/help",
       heading: "Community",
-      defaultLogo: help,
-      hoveredLogo: hoveredHelp,
-      selectedLogo: selectedHelp,
+      defaultLogo: "help",
+      hoveredLogo: "hoveredHelp",
+      selectedLogo: "selectedHelp",
       disabled: true,
-      position: "secondary",
+      position: SidebarItemPositionBaseEnum.SECONDARY,
     },
     {
       id: "Setting",
       route: "/app/setting",
       heading: "Setting",
-      defaultLogo: settings,
-      hoveredLogo: hoveredSettings,
-      selectedLogo: selectedSettings,
+      defaultLogo: "settings",
+      hoveredLogo: "hoveredSettings",
+      selectedLogo: "selectedSettings",
       disabled: true,
-      position: "secondary",
+      position: SidebarItemPositionBaseEnum.SECONDARY,
     },
   ];
 </script>

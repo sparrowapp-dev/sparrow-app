@@ -26,23 +26,12 @@
   import Teams from "../teams-page/Teams.svelte";
   import { Modal } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";
-  import {
-    home,
-    hoveredHome,
-    selectedHome,
-    settings,
-    selectedSettings,
-    hoveredSettings,
-    collections,
-    hoveredCollections,
-    selectedCollections,
-    help,
-    hoveredHelp,
-    selectedHelp,
-  } from "../../../../../packages/@sparrow-common/src/components/sidebar/common";
-  import { type SidebarItemObj } from "../../../../../packages/@sparrow-common/src/components/sidebar/SidebarItem.svelte";
   import { isGuestUserActive } from "@app/store/auth.store";
-
+  import {
+    type SidebarItemObj,
+    SidebarItemPositionBaseEnum,
+  } from "@sparrow/common/types/sidebar/sidebar-base";
+  // import {} from "@sparrow/common/";
   const _viewModel = new DashboardViewModel();
   let userId;
   const userUnsubscribe = user.subscribe(async (value) => {
@@ -198,41 +187,41 @@
       id: "Home",
       route: !isGuestUser ? "/app/home" : "/guest/home",
       heading: "Home",
-      defaultLogo: home, // Replace with actual image paths
-      hoveredLogo: hoveredHome,
-      selectedLogo: selectedHome,
+      defaultLogo: "home", // Replace with actual image paths
+      hoveredLogo: "hoveredHome",
+      selectedLogo: "selectedHome",
       disabled: false,
-      position: "primary",
+      position: SidebarItemPositionBaseEnum.PRIMARY,
     },
     {
       id: "Workspace",
       route: !isGuestUser ? "/app/collections" : "/guest/collections",
       heading: "Workspace",
-      defaultLogo: collections,
-      hoveredLogo: hoveredCollections,
-      selectedLogo: selectedCollections,
+      defaultLogo: "collections",
+      hoveredLogo: "hoveredCollections",
+      selectedLogo: "selectedCollections",
       disabled: false,
-      position: "primary",
+      position: SidebarItemPositionBaseEnum.PRIMARY,
     },
     {
       id: "Community",
       route: "/app/help",
       heading: "Community",
-      defaultLogo: help,
-      hoveredLogo: hoveredHelp,
-      selectedLogo: selectedHelp,
+      defaultLogo: "help",
+      hoveredLogo: "hoveredHelp",
+      selectedLogo: "selectedHelp",
       disabled: !isGuestUser ? false : true,
-      position: "secondary",
+      position: SidebarItemPositionBaseEnum.SECONDARY,
     },
     {
       id: "Setting",
       route: "/app/setting",
       heading: "Setting",
-      defaultLogo: settings,
-      hoveredLogo: hoveredSettings,
-      selectedLogo: selectedSettings,
+      defaultLogo: "settings",
+      hoveredLogo: "hoveredSettings",
+      selectedLogo: "selectedSettings",
       disabled: true,
-      position: "secondary",
+      position: SidebarItemPositionBaseEnum.SECONDARY,
     },
   ];
   // let mahi = { mahiSingh: "mahi" };
