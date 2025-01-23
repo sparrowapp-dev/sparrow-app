@@ -210,6 +210,7 @@ class DecodeRequest {
     datatype: RequestDatasetEnum,
     rawData: RequestDataTypeEnum,
     body: Body,
+    environmentVariables: [],
   ): string => {
     const { raw, urlencoded, formdata } = body;
     if (datatype === RequestDatasetEnum.RAW) {
@@ -223,8 +224,11 @@ class DecodeRequest {
         formdata.map((pair) => {
           if (pair.type == "text") {
             return {
-              key: pair.key,
-              value: pair.value,
+              key: this.setEnvironmentVariables(pair.key, environmentVariables),
+              value: this.setEnvironmentVariables(
+                pair.value,
+                environmentVariables,
+              ),
               checked: pair.checked,
             };
           }
@@ -234,7 +238,7 @@ class DecodeRequest {
         formdata.map((pair) => {
           if (pair.type == "file") {
             return {
-              key: pair.key,
+              key: this.setEnvironmentVariables(pair.key, environmentVariables),
               value: pair.value,
               checked: pair.checked,
               base: pair.base,
@@ -250,7 +254,10 @@ class DecodeRequest {
       bodyArray.push(...fileBodyArray);
       return JSON.stringify(bodyArray);
     } else if (datatype === RequestDatasetEnum.URLENCODED) {
-      return JSON.stringify(this.extractKeyValue(urlencoded));
+      return this.setEnvironmentVariables(
+        JSON.stringify(this.extractKeyValue(urlencoded)),
+        environmentVariables,
+      );
     } else if (datatype === RequestDatasetEnum.NONE) {
       return "";
     }
@@ -347,12 +354,10 @@ class DecodeRequest {
         ),
         environmentVariables,
       ),
-      this.setEnvironmentVariables(
-        this.extractBody(
-          request.state.requestBodyNavigation,
-          request.state.requestBodyLanguage,
-          request.body,
-        ),
+      this.extractBody(
+        request.state.requestBodyNavigation,
+        request.state.requestBodyLanguage,
+        request.body,
         environmentVariables,
       ),
       this.extractDataType(
