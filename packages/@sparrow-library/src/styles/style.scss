@@ -608,8 +608,7 @@ $sparrow-font-sizes: (
   // 24px in rem
   28: 1.75rem,
   // 28px in rem
-  36: 2.25rem,
-  // 36px in rem,
+  36: 2.25rem, // 36px in rem,
 );
 
 // Define a map for border radius in pixels
@@ -951,238 +950,616 @@ button:disabled {
   opacity: 0.7;
 }
 
-
 // ---- Color Pallete for System Design
-$blue-50: #DBE5FE;
-$blue-100: #C2D4FD;
-$blue-200: #8AACFA;
-$blue-300: #6894F9;
-$blue-400: #3670F7;
-$blue-500: #2854B9;
-$blue-600: #1F418F;
-$blue-700: #18336F;
-$blue-800: #10224B;
-$blue-900: #0A142D;
+$blue-50: #dbe5fe;
+$blue-100: #c2d4fd;
+$blue-200: #8aacfa;
+$blue-300: #6894f9;
+$blue-400: #3670f7;
+$blue-500: #2854b9;
+$blue-600: #1f418f;
+$blue-700: #18336f;
+$blue-800: #10224b;
+$blue-900: #0a142d;
 
-
-$purple-50: #E2DEFF;
-$purple-100: #CFC7FF;
-$purple-200: #A394FF;
-$purple-300: #8975FF;
-$purple-400: #6147FF;
-$purple-500: #4935BF;
+$purple-50: #e2deff;
+$purple-100: #cfc7ff;
+$purple-200: #a394ff;
+$purple-300: #8975ff;
+$purple-400: #6147ff;
+$purple-500: #4935bf;
 $purple-600: #382994;
-$purple-700: #2C2073;
-$purple-800: #1D154D;
-$purple-900: #110D2E;
+$purple-700: #2c2073;
+$purple-800: #1d154d;
+$purple-900: #110d2e;
 
+$green-50: #d4eddc;
+$green-100: #bce6ca;
+$green-200: #9cdeb2;
+$green-300: #6ce096;
+$green-400: #33cc7a;
+$green-500: #1ab259;
+$green-600: #1a8948;
+$green-700: #14522e;
+$green-800: #113b21;
+$green-900: #0f2416;
 
-$green-50: #D4EDDC;
-$green-100: #BCE6CA;
-$green-200: #9CDEB2;
-$green-300: #6CE096;
-$green-400: #33CC7A;
-$green-500: #1AB259;
-$green-600: #1A8948;
-$green-700: #14522E;
-$green-800: #113B21;
-$green-900: #0F2416;
+$red-50: #fddad8;
+$red-100: #fab7b7;
+$red-200: #f79b97;
+$red-300: #f37472;
+$red-400: #eb5651;
+$red-500: #ae2b29;
+$red-600: #841f1f;
+$red-700: #621b18;
+$red-800: #3d1514;
+$red-900: #240f0f;
 
-
-$red-50: #FDDAD8;
-$red-100: #FAB7B7;
-$red-200: #F79B97;
-$red-300: #F37472;
-$red-400: #EB5651;
-$red-500: #AE2B29;
-$red-600: #841F1F;
-$red-700: #621B18;
-$red-800: #3D1514;
-$red-900: #240F0F;
-
-
-$yellow-50: #FFF3CC;
-$yellow-100: #FEEDB5;
-$yellow-200: #FCE392;
-$yellow-300: #F6D86F;
-$yellow-400: #ECC551;
-$yellow-500: #D6A81F;
-$yellow-600: #98781B;
+$yellow-50: #fff3cc;
+$yellow-100: #feedb5;
+$yellow-200: #fce392;
+$yellow-300: #f6d86f;
+$yellow-400: #ecc551;
+$yellow-500: #d6a81f;
+$yellow-600: #98781b;
 $yellow-700: #655215;
-$yellow-800: #3D3212;
-$yellow-900: #251F0E;
+$yellow-800: #3d3212;
+$yellow-900: #251f0e;
 
-
-$orange-50: #FBE6DA;
-$orange-100: #F8D5C1;
-$orange-200: #F2AE88;
-$orange-300: #EF9765;
-$orange-400: #E97432;
-$orange-500: #AF5725;
-$orange-600: #87431D;
+$orange-50: #fbe6da;
+$orange-100: #f8d5c1;
+$orange-200: #f2ae88;
+$orange-300: #ef9765;
+$orange-400: #e97432;
+$orange-500: #af5725;
+$orange-600: #87431d;
 $orange-700: #693417;
-$orange-800: #46230F;
-$orange-900: #2A1509;
+$orange-800: #46230f;
+$orange-900: #2a1509;
 
-
-$pink-50: #F5D8EA;
-$pink-100: #EFBDDB;
-$pink-200: #E081BB;
-$pink-300: #D75CA7;
-$pink-400: #CA2689;
-$pink-500: #971C67;
+$pink-50: #f5d8ea;
+$pink-100: #efbddb;
+$pink-200: #e081bb;
+$pink-300: #d75ca7;
+$pink-400: #ca2689;
+$pink-500: #971c67;
 $pink-600: #751650;
-$pink-700: #5B113E;
-$pink-800: #3D0B29;
+$pink-700: #5b113e;
+$pink-800: #3d0b29;
 $pink-900: #240719;
 
-
-$cyan-50: #DCEFF4;
-$cyan-100: #B5DEEE;
-$cyan-200: #89CDE6;
-$cyan-300: #5EC5ED;
-$cyan-400: #11ADF0;
-$cyan-500: #2B9ACA;
-$cyan-600: #2B6F88;
-$cyan-700: #214D5E;
+$cyan-50: #dceff4;
+$cyan-100: #b5deee;
+$cyan-200: #89cde6;
+$cyan-300: #5ec5ed;
+$cyan-400: #11adf0;
+$cyan-500: #2b9aca;
+$cyan-600: #2b6f88;
+$cyan-700: #214d5e;
 $cyan-800: #153139;
-$cyan-900: #0F2024;
+$cyan-900: #0f2024;
 
-
-$neutral-50: #FFFFFF;
-$neutral-100: #D1D1D2;
-$neutral-200: #B6B7B9;
-$neutral-300: #9B9DA1;
-$neutral-400: #82858A;
-$neutral-500: #62656A;
-$neutral-600: #3D3F43;
-$neutral-700: #2A2C32;
-$neutral-800: #181A20;
-$neutral-900: #0B0C0F;
-
+$neutral-50: #ffffff;
+$neutral-100: #d1d1d2;
+$neutral-200: #b6b7b9;
+$neutral-300: #9b9da1;
+$neutral-400: #82858a;
+$neutral-500: #62656a;
+$neutral-600: #3d3f43;
+$neutral-700: #2a2c32;
+$neutral-800: #181a20;
+$neutral-900: #0b0c0f;
 
 $surface-50: #414858;
-$surface-100: #31353F;
-$surface-200: #2D2E39;
+$surface-100: #31353f;
+$surface-200: #2d2e39;
 $surface-300: #272935;
 $surface-400: #222630;
-$surface-500: #1D212B;
-$surface-600: #181C26;
-$surface-700: #14181F;
+$surface-500: #1d212b;
+$surface-600: #181c26;
+$surface-700: #14181f;
 $surface-800: #101318;
-$surface-900: #0B0C0F;
-
+$surface-900: #0b0c0f;
 
 // ---- Use this for colors
+// icon type will be used for Icon colors.
+// bg for Background Colors. 
+// text for Text Colors. 
+// border for Border Colors. 
+// Utility color will be used for all other unknown scenerios. 
 :root {
-    --blue-50: #{$blue-50};
-    --blue-100: #{$blue-100};
-    --blue-200: #{$blue-200};
-    --blue-300: #{$blue-300};
-    --blue-400: #{$blue-400};
-    --blue-500: #{$blue-500};
-    --blue-600: #{$blue-600};
-    --blue-700: #{$blue-700};
-    --blue-800: #{$blue-800};
-    --blue-900: #{$blue-900};
-  
-    --purple-50: #{$purple-50};
-    --purple-100: #{$purple-100};
-    --purple-200: #{$purple-200};
-    --purple-300: #{$purple-300};
-    --purple-400: #{$purple-400};
-    --purple-500: #{$purple-500};
-    --purple-600: #{$purple-600};
-    --purple-700: #{$purple-700};
-    --purple-800: #{$purple-800};
-    --purple-900: #{$purple-900};
-  
-    --green-50: #{$green-50};
-    --green-100: #{$green-100};
-    --green-200: #{$green-200};
-    --green-300: #{$green-300};
-    --green-400: #{$green-400};
-    --green-500: #{$green-500};
-    --green-600: #{$green-600};
-    --green-700: #{$green-700};
-    --green-800: #{$green-800};
-    --green-900: #{$green-900};
-  
-    --red-50: #{$red-50};
-    --red-100: #{$red-100};
-    --red-200: #{$red-200};
-    --red-300: #{$red-300};
-    --red-400: #{$red-400};
-    --red-500: #{$red-500};
-    --red-600: #{$red-600};
-    --red-700: #{$red-700};
-    --red-800: #{$red-800};
-    --red-900: #{$red-900};
-  
-    --yellow-50: #{$yellow-50};
-    --yellow-100: #{$yellow-100};
-    --yellow-200: #{$yellow-200};
-    --yellow-300: #{$yellow-300};
-    --yellow-400: #{$yellow-400};
-    --yellow-500: #{$yellow-500};
-    --yellow-600: #{$yellow-600};
-    --yellow-700: #{$yellow-700};
-    --yellow-800: #{$yellow-800};
-    --yellow-900: #{$yellow-900};
-  
-    --orange-50: #{$orange-50};
-    --orange-100: #{$orange-100};
-    --orange-200: #{$orange-200};
-    --orange-300: #{$orange-300};
-    --orange-400: #{$orange-400};
-    --orange-500: #{$orange-500};
-    --orange-600: #{$orange-600};
-    --orange-700: #{$orange-700};
-    --orange-800: #{$orange-800};
-    --orange-900: #{$orange-900};
-  
-    --pink-50: #{$pink-50};
-    --pink-100: #{$pink-100};
-    --pink-200: #{$pink-200};
-    --pink-300: #{$pink-300};
-    --pink-400: #{$pink-400};
-    --pink-500: #{$pink-500};
-    --pink-600: #{$pink-600};
-    --pink-700: #{$pink-700};
-    --pink-800: #{$pink-800};
-    --pink-900: #{$pink-900};
-  
-    --cyan-50: #{$cyan-50};
-    --cyan-100: #{$cyan-100};
-    --cyan-200: #{$cyan-200};
-    --cyan-300: #{$cyan-300};
-    --cyan-400: #{$cyan-400};
-    --cyan-500: #{$cyan-500};
-    --cyan-600: #{$cyan-600};
-    --cyan-700: #{$cyan-700};
-    --cyan-800: #{$cyan-800};
-    --cyan-900: #{$cyan-900};
-  
-    --neutral-50: #{$neutral-50};
-    --neutral-100: #{$neutral-100};
-    --neutral-200: #{$neutral-200};
-    --neutral-300: #{$neutral-300};
-    --neutral-400: #{$neutral-400};
-    --neutral-500: #{$neutral-500};
-    --neutral-600: #{$neutral-600};
-    --neutral-700: #{$neutral-700};
-    --neutral-800: #{$neutral-800};
-    --neutral-900: #{$neutral-900};
-  
-    --surface-50: #{$surface-50};
-    --surface-100: #{$surface-100};
-    --surface-200: #{$surface-200};
-    --surface-300: #{$surface-300};
-    --surface-400: #{$surface-400};
-    --surface-500: #{$surface-500};
-    --surface-600: #{$surface-600};
-    --surface-700: #{$surface-700};
-    --surface-800: #{$surface-800};
-    --surface-900: #{$surface-900};
+  --bg-ds-primary-50: #{$blue-50};
+  --bg-ds-primary-100: #{$blue-100};
+  --bg-ds-primary-200: #{$blue-200};
+  --bg-ds-primary-300: #{$blue-300};
+  --bg-ds-primary-400: #{$blue-400};
+  --bg-ds-primary-500: #{$blue-500};
+  --bg-ds-primary-600: #{$blue-600};
+  --bg-ds-primary-700: #{$blue-700};
+  --bg-ds-primary-800: #{$blue-800};
+  --bg-ds-primary-900: #{$blue-900};
+
+  --icon-ds-primary-50: #{$blue-50};
+  --icon-ds-primary-100: #{$blue-100};
+  --icon-ds-primary-200: #{$blue-200};
+  --icon-ds-primary-300: #{$blue-300};
+  --icon-ds-primary-400: #{$blue-400};
+  --icon-ds-primary-500: #{$blue-500};
+  --icon-ds-primary-600: #{$blue-600};
+  --icon-ds-primary-700: #{$blue-700};
+  --icon-ds-primary-800: #{$blue-800};
+  --icon-ds-primary-900: #{$blue-900};
+
+  --text-ds-primary-50: #{$blue-50};
+  --text-ds-primary-100: #{$blue-100};
+  --text-ds-primary-200: #{$blue-200};
+  --text-ds-primary-300: #{$blue-300};
+  --text-ds-primary-400: #{$blue-400};
+  --text-ds-primary-500: #{$blue-500};
+  --text-ds-primary-600: #{$blue-600};
+  --text-ds-primary-700: #{$blue-700};
+  --text-ds-primary-800: #{$blue-800};
+  --text-ds-primary-900: #{$blue-900};
+
+  --border-ds-primary-50: #{$blue-50};
+  --border-ds-primary-100: #{$blue-100};
+  --border-ds-primary-200: #{$blue-200};
+  --border-ds-primary-300: #{$blue-300};
+  --border-ds-primary-400: #{$blue-400};
+  --border-ds-primary-500: #{$blue-500};
+  --border-ds-primary-600: #{$blue-600};
+  --border-ds-primary-700: #{$blue-700};
+  --border-ds-primary-800: #{$blue-800};
+  --border-ds-primary-900: #{$blue-900};
+
+  --utility-ds-primary-50: #{$blue-50};
+  --utility-ds-primary-100: #{$blue-100};
+  --utility-ds-primary-200: #{$blue-200};
+  --utility-ds-primary-300: #{$blue-300};
+  --utility-ds-primary-400: #{$blue-400};
+  --utility-ds-primary-500: #{$blue-500};
+  --utility-ds-primary-600: #{$blue-600};
+  --utility-ds-primary-700: #{$blue-700};
+  --utility-ds-primary-800: #{$blue-800};
+  --utility-ds-primary-900: #{$blue-900};
+
+  --bg-ds-secondary-50: #{$purple-50};
+  --bg-ds-secondary-100: #{$purple-100};
+  --bg-ds-secondary-200: #{$purple-200};
+  --bg-ds-secondary-300: #{$purple-300};
+  --bg-ds-secondary-400: #{$purple-400};
+  --bg-ds-secondary-500: #{$purple-500};
+  --bg-ds-secondary-600: #{$purple-600};
+  --bg-ds-secondary-700: #{$purple-700};
+  --bg-ds-secondary-800: #{$purple-800};
+  --bg-ds-secondary-900: #{$purple-900};
+
+  --icon-ds-secondary-50: #{$purple-50};
+  --icon-ds-secondary-100: #{$purple-100};
+  --icon-ds-secondary-200: #{$purple-200};
+  --icon-ds-secondary-300: #{$purple-300};
+  --icon-ds-secondary-400: #{$purple-400};
+  --icon-ds-secondary-500: #{$purple-500};
+  --icon-ds-secondary-600: #{$purple-600};
+  --icon-ds-secondary-700: #{$purple-700};
+  --icon-ds-secondary-800: #{$purple-800};
+  --icon-ds-secondary-900: #{$purple-900};
+
+  --text-ds-secondary-50: #{$purple-50};
+  --text-ds-secondary-100: #{$purple-100};
+  --text-ds-secondary-200: #{$purple-200};
+  --text-ds-secondary-300: #{$purple-300};
+  --text-ds-secondary-400: #{$purple-400};
+  --text-ds-secondary-500: #{$purple-500};
+  --text-ds-secondary-600: #{$purple-600};
+  --text-ds-secondary-700: #{$purple-700};
+  --text-ds-secondary-800: #{$purple-800};
+  --text-ds-secondary-900: #{$purple-900};
+
+  --border-ds-secondary-50: #{$purple-50};
+  --border-ds-secondary-100: #{$purple-100};
+  --border-ds-secondary-200: #{$purple-200};
+  --border-ds-secondary-300: #{$purple-300};
+  --border-ds-secondary-400: #{$purple-400};
+  --border-ds-secondary-500: #{$purple-500};
+  --border-ds-secondary-600: #{$purple-600};
+  --border-ds-secondary-700: #{$purple-700};
+  --border-ds-secondary-800: #{$purple-800};
+  --border-ds-secondary-900: #{$purple-900};
+
+  --utility-ds-secondary-50: #{$purple-50};
+  --utility-ds-secondary-100: #{$purple-100};
+  --utility-ds-secondary-200: #{$purple-200};
+  --utility-ds-secondary-300: #{$purple-300};
+  --utility-ds-secondary-400: #{$purple-400};
+  --utility-ds-secondary-500: #{$purple-500};
+  --utility-ds-secondary-600: #{$purple-600};
+  --utility-ds-secondary-700: #{$purple-700};
+  --utility-ds-secondary-800: #{$purple-800};
+  --utility-ds-secondary-900: #{$purple-900};
+
+  --bg-ds-danger-50: #{$red-50};
+  --bg-ds-danger-100: #{$red-100};
+  --bg-ds-danger-200: #{$red-200};
+  --bg-ds-danger-300: #{$red-300};
+  --bg-ds-danger-400: #{$red-400};
+  --bg-ds-danger-500: #{$red-500};
+  --bg-ds-danger-600: #{$red-600};
+  --bg-ds-danger-700: #{$red-700};
+  --bg-ds-danger-800: #{$red-800};
+  --bg-ds-danger-900: #{$red-900};
+
+  --icon-ds-danger-50: #{$red-50};
+  --icon-ds-danger-100: #{$red-100};
+  --icon-ds-danger-200: #{$red-200};
+  --icon-ds-danger-300: #{$red-300};
+  --icon-ds-danger-400: #{$red-400};
+  --icon-ds-danger-500: #{$red-500};
+  --icon-ds-danger-600: #{$red-600};
+  --icon-ds-danger-700: #{$red-700};
+  --icon-ds-danger-800: #{$red-800};
+  --icon-ds-danger-900: #{$red-900};
+
+  --text-ds-danger-50: #{$red-50};
+  --text-ds-danger-100: #{$red-100};
+  --text-ds-danger-200: #{$red-200};
+  --text-ds-danger-300: #{$red-300};
+  --text-ds-danger-400: #{$red-400};
+  --text-ds-danger-500: #{$red-500};
+  --text-ds-danger-600: #{$red-600};
+  --text-ds-danger-700: #{$red-700};
+  --text-ds-danger-800: #{$red-800};
+  --text-ds-danger-900: #{$red-900};
+
+  --border-ds-danger-50: #{$red-50};
+  --border-ds-danger-100: #{$red-100};
+  --border-ds-danger-200: #{$red-200};
+  --border-ds-danger-300: #{$red-300};
+  --border-ds-danger-400: #{$red-400};
+  --border-ds-danger-500: #{$red-500};
+  --border-ds-danger-600: #{$red-600};
+  --border-ds-danger-700: #{$red-700};
+  --border-ds-danger-800: #{$red-800};
+  --border-ds-danger-900: #{$red-900};
+
+  --utility-ds-danger-50: #{$red-50};
+  --utility-ds-danger-100: #{$red-100};
+  --utility-ds-danger-200: #{$red-200};
+  --utility-ds-danger-300: #{$red-300};
+  --utility-ds-danger-400: #{$red-400};
+  --utility-ds-danger-500: #{$red-500};
+  --utility-ds-danger-600: #{$red-600};
+  --utility-ds-danger-700: #{$red-700};
+  --utility-ds-danger-800: #{$red-800};
+  --utility-ds-danger-900: #{$red-900};
+
+  --bg-ds-warning-50: #{$yellow-50};
+  --bg-ds-warning-100: #{$yellow-100};
+  --bg-ds-warning-200: #{$yellow-200};
+  --bg-ds-warning-300: #{$yellow-300};
+  --bg-ds-warning-400: #{$yellow-400};
+  --bg-ds-warning-500: #{$yellow-500};
+  --bg-ds-warning-600: #{$yellow-600};
+  --bg-ds-warning-700: #{$yellow-700};
+  --bg-ds-warning-800: #{$yellow-800};
+  --bg-ds-warning-900: #{$yellow-900};
+
+  --icon-ds-warning-50: #{$yellow-50};
+  --icon-ds-warning-100: #{$yellow-100};
+  --icon-ds-warning-200: #{$yellow-200};
+  --icon-ds-warning-300: #{$yellow-300};
+  --icon-ds-warning-400: #{$yellow-400};
+  --icon-ds-warning-500: #{$yellow-500};
+  --icon-ds-warning-600: #{$yellow-600};
+  --icon-ds-warning-700: #{$yellow-700};
+  --icon-ds-warning-800: #{$yellow-800};
+  --icon-ds-warning-900: #{$yellow-900};
+
+  --text-ds-warning-50: #{$yellow-50};
+  --text-ds-warning-100: #{$yellow-100};
+  --text-ds-warning-200: #{$yellow-200};
+  --text-ds-warning-300: #{$yellow-300};
+  --text-ds-warning-400: #{$yellow-400};
+  --text-ds-warning-500: #{$yellow-500};
+  --text-ds-warning-600: #{$yellow-600};
+  --text-ds-warning-700: #{$yellow-700};
+  --text-ds-warning-800: #{$yellow-800};
+  --text-ds-warning-900: #{$yellow-900};
+
+  --border-ds-warning-50: #{$yellow-50};
+  --border-ds-warning-100: #{$yellow-100};
+  --border-ds-warning-200: #{$yellow-200};
+  --border-ds-warning-300: #{$yellow-300};
+  --border-ds-warning-400: #{$yellow-400};
+  --border-ds-warning-500: #{$yellow-500};
+  --border-ds-warning-600: #{$yellow-600};
+  --border-ds-warning-700: #{$yellow-700};
+  --border-ds-warning-800: #{$yellow-800};
+  --border-ds-warning-900: #{$yellow-900};
+
+  --utility-ds-warning-50: #{$yellow-50};
+  --utility-ds-warning-100: #{$yellow-100};
+  --utility-ds-warning-200: #{$yellow-200};
+  --utility-ds-warning-300: #{$yellow-300};
+  --utility-ds-warning-400: #{$yellow-400};
+  --utility-ds-warning-500: #{$yellow-500};
+  --utility-ds-warning-600: #{$yellow-600};
+  --utility-ds-warning-700: #{$yellow-700};
+  --utility-ds-warning-800: #{$yellow-800};
+  --utility-ds-warning-900: #{$yellow-900};
+
+  --bg-ds-tertiary-50: #{$orange-50};
+  --bg-ds-tertiary-100: #{$orange-100};
+  --bg-ds-tertiary-200: #{$orange-200};
+  --bg-ds-tertiary-300: #{$orange-300};
+  --bg-ds-tertiary-400: #{$orange-400};
+  --bg-ds-tertiary-500: #{$orange-500};
+  --bg-ds-tertiary-600: #{$orange-600};
+  --bg-ds-tertiary-700: #{$orange-700};
+  --bg-ds-tertiary-800: #{$orange-800};
+  --bg-ds-tertiary-900: #{$orange-900};
+
+  --icon-ds-tertiary-50: #{$orange-50};
+  --icon-ds-tertiary-100: #{$orange-100};
+  --icon-ds-tertiary-200: #{$orange-200};
+  --icon-ds-tertiary-300: #{$orange-300};
+  --icon-ds-tertiary-400: #{$orange-400};
+  --icon-ds-tertiary-500: #{$orange-500};
+  --icon-ds-tertiary-600: #{$orange-600};
+  --icon-ds-tertiary-700: #{$orange-700};
+  --icon-ds-tertiary-800: #{$orange-800};
+  --icon-ds-tertiary-900: #{$orange-900};
+
+  --text-ds-tertiary-50: #{$orange-50};
+  --text-ds-tertiary-100: #{$orange-100};
+  --text-ds-tertiary-200: #{$orange-200};
+  --text-ds-tertiary-300: #{$orange-300};
+  --text-ds-tertiary-400: #{$orange-400};
+  --text-ds-tertiary-500: #{$orange-500};
+  --text-ds-tertiary-600: #{$orange-600};
+  --text-ds-tertiary-700: #{$orange-700};
+  --text-ds-tertiary-800: #{$orange-800};
+  --text-ds-tertiary-900: #{$orange-900};
+
+  --border-ds-tertiary-50: #{$orange-50};
+  --border-ds-tertiary-100: #{$orange-100};
+  --border-ds-tertiary-200: #{$orange-200};
+  --border-ds-tertiary-300: #{$orange-300};
+  --border-ds-tertiary-400: #{$orange-400};
+  --border-ds-tertiary-500: #{$orange-500};
+  --border-ds-tertiary-600: #{$orange-600};
+  --border-ds-tertiary-700: #{$orange-700};
+  --border-ds-tertiary-800: #{$orange-800};
+  --border-ds-tertiary-900: #{$orange-900};
+
+  --utility-ds-tertiary-50: #{$orange-50};
+  --utility-ds-tertiary-100: #{$orange-100};
+  --utility-ds-tertiary-200: #{$orange-200};
+  --utility-ds-tertiary-300: #{$orange-300};
+  --utility-ds-tertiary-400: #{$orange-400};
+  --utility-ds-tertiary-500: #{$orange-500};
+  --utility-ds-tertiary-600: #{$orange-600};
+  --utility-ds-tertiary-700: #{$orange-700};
+  --utility-ds-tertiary-800: #{$orange-800};
+  --utility-ds-tertiary-900: #{$orange-900};
+
+  --bg-ds-accent-50: #{$pink-50};
+  --bg-ds-accent-100: #{$pink-100};
+  --bg-ds-accent-200: #{$pink-200};
+  --bg-ds-accent-300: #{$pink-300};
+  --bg-ds-accent-400: #{$pink-400};
+  --bg-ds-accent-500: #{$pink-500};
+  --bg-ds-accent-600: #{$pink-600};
+  --bg-ds-accent-700: #{$pink-700};
+  --bg-ds-accent-800: #{$pink-800};
+  --bg-ds-accent-900: #{$pink-900};
+
+  --icon-ds-accent-50: #{$pink-50};
+  --icon-ds-accent-100: #{$pink-100};
+  --icon-ds-accent-200: #{$pink-200};
+  --icon-ds-accent-300: #{$pink-300};
+  --icon-ds-accent-400: #{$pink-400};
+  --icon-ds-accent-500: #{$pink-500};
+  --icon-ds-accent-600: #{$pink-600};
+  --icon-ds-accent-700: #{$pink-700};
+  --icon-ds-accent-800: #{$pink-800};
+  --icon-ds-accent-900: #{$pink-900};
+
+  --text-ds-accent-50: #{$pink-50};
+  --text-ds-accent-100: #{$pink-100};
+  --text-ds-accent-200: #{$pink-200};
+  --text-ds-accent-300: #{$pink-300};
+  --text-ds-accent-400: #{$pink-400};
+  --text-ds-accent-500: #{$pink-500};
+  --text-ds-accent-600: #{$pink-600};
+  --text-ds-accent-700: #{$pink-700};
+  --text-ds-accent-800: #{$pink-800};
+  --text-ds-accent-900: #{$pink-900};
+
+  --border-ds-accent-50: #{$pink-50};
+  --border-ds-accent-100: #{$pink-100};
+  --border-ds-accent-200: #{$pink-200};
+  --border-ds-accent-300: #{$pink-300};
+  --border-ds-accent-400: #{$pink-400};
+  --border-ds-accent-500: #{$pink-500};
+  --border-ds-accent-600: #{$pink-600};
+  --border-ds-accent-700: #{$pink-700};
+  --border-ds-accent-800: #{$pink-800};
+  --border-ds-accent-900: #{$pink-900};
+
+  --utility-ds-accent-50: #{$pink-50};
+  --utility-ds-accent-100: #{$pink-100};
+  --utility-ds-accent-200: #{$pink-200};
+  --utility-ds-accent-300: #{$pink-300};
+  --utility-ds-accent-400: #{$pink-400};
+  --utility-ds-accent-500: #{$pink-500};
+  --utility-ds-accent-600: #{$pink-600};
+  --utility-ds-accent-700: #{$pink-700};
+  --utility-ds-accent-800: #{$pink-800};
+  --utility-ds-accent-900: #{$pink-900};
+
+  --bg-ds-info-50: #{$cyan-50};
+  --bg-ds-info-100: #{$cyan-100};
+  --bg-ds-info-200: #{$cyan-200};
+  --bg-ds-info-300: #{$cyan-300};
+  --bg-ds-info-400: #{$cyan-400};
+  --bg-ds-info-500: #{$cyan-500};
+  --bg-ds-info-600: #{$cyan-600};
+  --bg-ds-info-700: #{$cyan-700};
+  --bg-ds-info-800: #{$cyan-800};
+  --bg-ds-info-900: #{$cyan-900};
+
+  --icon-ds-info-50: #{$cyan-50};
+  --icon-ds-info-100: #{$cyan-100};
+  --icon-ds-info-200: #{$cyan-200};
+  --icon-ds-info-300: #{$cyan-300};
+  --icon-ds-info-400: #{$cyan-400};
+  --icon-ds-info-500: #{$cyan-500};
+  --icon-ds-info-600: #{$cyan-600};
+  --icon-ds-info-700: #{$cyan-700};
+  --icon-ds-info-800: #{$cyan-800};
+  --icon-ds-info-900: #{$cyan-900};
+
+  --text-ds-info-50: #{$cyan-50};
+  --text-ds-info-100: #{$cyan-100};
+  --text-ds-info-200: #{$cyan-200};
+  --text-ds-info-300: #{$cyan-300};
+  --text-ds-info-400: #{$cyan-400};
+  --text-ds-info-500: #{$cyan-500};
+  --text-ds-info-600: #{$cyan-600};
+  --text-ds-info-700: #{$cyan-700};
+  --text-ds-info-800: #{$cyan-800};
+  --text-ds-info-900: #{$cyan-900};
+
+  --border-ds-info-50: #{$cyan-50};
+  --border-ds-info-100: #{$cyan-100};
+  --border-ds-info-200: #{$cyan-200};
+  --border-ds-info-300: #{$cyan-300};
+  --border-ds-info-400: #{$cyan-400};
+  --border-ds-info-500: #{$cyan-500};
+  --border-ds-info-600: #{$cyan-600};
+  --border-ds-info-700: #{$cyan-700};
+  --border-ds-info-800: #{$cyan-800};
+  --border-ds-info-900: #{$cyan-900};
+
+  --utility-ds-info-50: #{$cyan-50};
+  --utility-ds-info-100: #{$cyan-100};
+  --utility-ds-info-200: #{$cyan-200};
+  --utility-ds-info-300: #{$cyan-300};
+  --utility-ds-info-400: #{$cyan-400};
+  --utility-ds-info-500: #{$cyan-500};
+  --utility-ds-info-600: #{$cyan-600};
+  --utility-ds-info-700: #{$cyan-700};
+  --utility-ds-info-800: #{$cyan-800};
+  --utility-ds-info-900: #{$cyan-900};
+
+  --bg-ds-neutral-50: #{$neutral-50};
+  --bg-ds-neutral-100: #{$neutral-100};
+  --bg-ds-neutral-200: #{$neutral-200};
+  --bg-ds-neutral-300: #{$neutral-300};
+  --bg-ds-neutral-400: #{$neutral-400};
+  --bg-ds-neutral-500: #{$neutral-500};
+  --bg-ds-neutral-600: #{$neutral-600};
+  --bg-ds-neutral-700: #{$neutral-700};
+  --bg-ds-neutral-800: #{$neutral-800};
+  --bg-ds-neutral-900: #{$neutral-900};
+
+  --icon-ds-neutral-50: #{$neutral-50};
+  --icon-ds-neutral-100: #{$neutral-100};
+  --icon-ds-neutral-200: #{$neutral-200};
+  --icon-ds-neutral-300: #{$neutral-300};
+  --icon-ds-neutral-400: #{$neutral-400};
+  --icon-ds-neutral-500: #{$neutral-500};
+  --icon-ds-neutral-600: #{$neutral-600};
+  --icon-ds-neutral-700: #{$neutral-700};
+  --icon-ds-neutral-800: #{$neutral-800};
+  --icon-ds-neutral-900: #{$neutral-900};
+
+  --text-ds-neutral-50: #{$neutral-50};
+  --text-ds-neutral-100: #{$neutral-100};
+  --text-ds-neutral-200: #{$neutral-200};
+  --text-ds-neutral-300: #{$neutral-300};
+  --text-ds-neutral-400: #{$neutral-400};
+  --text-ds-neutral-500: #{$neutral-500};
+  --text-ds-neutral-600: #{$neutral-600};
+  --text-ds-neutral-700: #{$neutral-700};
+  --text-ds-neutral-800: #{$neutral-800};
+  --text-ds-neutral-900: #{$neutral-900};
+
+  --border-ds-neutral-50: #{$neutral-50};
+  --border-ds-neutral-100: #{$neutral-100};
+  --border-ds-neutral-200: #{$neutral-200};
+  --border-ds-neutral-300: #{$neutral-300};
+  --border-ds-neutral-400: #{$neutral-400};
+  --border-ds-neutral-500: #{$neutral-500};
+  --border-ds-neutral-600: #{$neutral-600};
+  --border-ds-neutral-700: #{$neutral-700};
+  --border-ds-neutral-800: #{$neutral-800};
+  --border-ds-neutral-900: #{$neutral-900};
+
+  --utility-ds-neutral-50: #{$neutral-50};
+  --utility-ds-neutral-100: #{$neutral-100};
+  --utility-ds-neutral-200: #{$neutral-200};
+  --utility-ds-neutral-300: #{$neutral-300};
+  --utility-ds-neutral-400: #{$neutral-400};
+  --utility-ds-neutral-500: #{$neutral-500};
+  --utility-ds-neutral-600: #{$neutral-600};
+  --utility-ds-neutral-700: #{$neutral-700};
+  --utility-ds-neutral-800: #{$neutral-800};
+  --utility-ds-neutral-900: #{$neutral-900};
+
+  --bg-ds-surface-50: #{$surface-50};
+  --bg-ds-surface-100: #{$surface-100};
+  --bg-ds-surface-200: #{$surface-200};
+  --bg-ds-surface-300: #{$surface-300};
+  --bg-ds-surface-400: #{$surface-400};
+  --bg-ds-surface-500: #{$surface-500};
+  --bg-ds-surface-600: #{$surface-600};
+  --bg-ds-surface-700: #{$surface-700};
+  --bg-ds-surface-800: #{$surface-800};
+  --bg-ds-surface-900: #{$surface-900};
+
+  --icon-ds-surface-50: #{$surface-50};
+  --icon-ds-surface-100: #{$surface-100};
+  --icon-ds-surface-200: #{$surface-200};
+  --icon-ds-surface-300: #{$surface-300};
+  --icon-ds-surface-400: #{$surface-400};
+  --icon-ds-surface-500: #{$surface-500};
+  --icon-ds-surface-600: #{$surface-600};
+  --icon-ds-surface-700: #{$surface-700};
+  --icon-ds-surface-800: #{$surface-800};
+  --icon-ds-surface-900: #{$surface-900};
+
+  --text-ds-surface-50: #{$surface-50};
+  --text-ds-surface-100: #{$surface-100};
+  --text-ds-surface-200: #{$surface-200};
+  --text-ds-surface-300: #{$surface-300};
+  --text-ds-surface-400: #{$surface-400};
+  --text-ds-surface-500: #{$surface-500};
+  --text-ds-surface-600: #{$surface-600};
+  --text-ds-surface-700: #{$surface-700};
+  --text-ds-surface-800: #{$surface-800};
+  --text-ds-surface-900: #{$surface-900};
+
+  --border-ds-surface-50: #{$surface-50};
+  --border-ds-surface-100: #{$surface-100};
+  --border-ds-surface-200: #{$surface-200};
+  --border-ds-surface-300: #{$surface-300};
+  --border-ds-surface-400: #{$surface-400};
+  --border-ds-surface-500: #{$surface-500};
+  --border-ds-surface-600: #{$surface-600};
+  --border-ds-surface-700: #{$surface-700};
+  --border-ds-surface-800: #{$surface-800};
+  --border-ds-surface-900: #{$surface-900};
+
+  --utility-ds-surface-50: #{$surface-50};
+  --utility-ds-surface-100: #{$surface-100};
+  --utility-ds-surface-200: #{$surface-200};
+  --utility-ds-surface-300: #{$surface-300};
+  --utility-ds-surface-400: #{$surface-400};
+  --utility-ds-surface-500: #{$surface-500};
+  --utility-ds-surface-600: #{$surface-600};
+  --utility-ds-surface-700: #{$surface-700};
+  --utility-ds-surface-800: #{$surface-800};
+  --utility-ds-surface-900: #{$surface-900};
 }
-  

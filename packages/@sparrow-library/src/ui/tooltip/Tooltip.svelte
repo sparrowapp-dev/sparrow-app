@@ -19,11 +19,9 @@
   export let zIndex = 1;
   export let transitionTime = "0.3s";
   export let spacing = "4px 10px";
-  export let borderRadius = "4px";
   export let distance = 10;
-  export let fontSize = "12px";
   export let delay = 50;
-  export let type: "small" | "medium" = "small";
+  export let size: "small" | "medium" = "small";
 
   let top = "unset";
   let left = "unset";
@@ -34,7 +32,7 @@
   let isDelayed = false;
 
   const getTypeStyles = () => {
-    if (type === "small") {
+    if (size === "small") {
       return {
         borderRadius: "4px",
         boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)",
@@ -192,15 +190,15 @@
   <span
     class="{isHover
       ? `tooltip-text-hover ${'tooltip-text-hover-' + placement.toString()}`
-      : ''} tooltip-text invisible m-auto text-center text-lightGray position-fixed justify-content-center align-items-center opacity-0
+      : ''} tooltip-text invisible m-auto text-center position-fixed justify-content-center align-items-center opacity-0
  {placement.toString()} "
-    style="top: {top}; left: {left}; right: {right}; bottom: {bottom}; transition: {transitionTime} ; padding:{spacing}; font-size:{fontSize}; z-index : {zIndex} ; 
+    style="top: {top}; left: {left}; right: {right}; bottom: {bottom}; transition: {transitionTime} ; padding:{spacing}; font-size:12px; z-index : {zIndex} ; 
            border-radius: {styles.borderRadius}; 
            box-shadow: {styles.boxShadow}; {styleProp}
-           max-width: {styles.maxWidth}; white-space: normal; word-wrap: break-word; background-color:#31353F"
+           max-width: {styles.maxWidth}; white-space: normal; word-wrap: break-word; background-color:var(--bg-ds-surface-100)"
   >
     <div class="{styles.titleClass} title-txt">{@html title}</div>
-    {#if type === "medium" && subtext}
+    {#if size === "medium" && subtext}
       <div class="subtext">{@html subtext}</div>
     {/if}
     {#if placement === "left-center"}
@@ -254,28 +252,28 @@
     {:else if placement === "right-bottom"}
       <span
         class="position-absolute tooltip-square"
-        style="top:{type === 'medium'
+        style="top:{size === 'medium'
           ? '80%'
           : '30%'}; left:5px; transform: translateX(-100%) rotate(45deg);"
       ></span>
     {:else if placement === "right-top"}
       <span
         class="position-absolute tooltip-square"
-        style="top:{type === 'medium'
+        style="top:{size === 'medium'
           ? '15%'
           : '30%'}; left:5px; transform: translateX(-100%) rotate(45deg);"
       ></span>
     {:else if placement === "left-bottom"}
       <span
         class="position-absolute tooltip-square"
-        style="top:{type === 'medium'
+        style="top:{size === 'medium'
           ? '80%'
           : '50%'}; right:5px; transform: translateX(100%) translateY(-50%) rotate(45deg);"
       ></span>
     {:else if placement === "left-top"}
       <span
         class="position-absolute tooltip-square"
-        style="top:{type === 'medium'
+        style="top:{size === 'medium'
           ? '15%'
           : '50%'}; right:5px; transform: translateX(100%) translateY(-50%) rotate(45deg);"
       ></span>
@@ -368,16 +366,16 @@
   .tooltip-square {
     height: 10px;
     width: 10px;
-    background-color: var(--surface-100);
+    background-color: var(--bg-ds-surface-100);
   }
   .subtext {
     margin-top: 4px;
-    color: var(--neutral-200);
+    color: var(--text-ds-neutral-200);
   }
   .font-bold {
     font-weight: 600;
   }
   .title-txt {
-    color: var(--neutral-50);
+    color: var(--text-ds-neutral-50);
   }
 </style>
