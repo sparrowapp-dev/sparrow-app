@@ -82,10 +82,10 @@ Tooltips should maintain a consistent style across the application, ensuring the
 
 <Markdown>
   {`
-| Size | Tooltip Height | Padding (X x Y) | Gap | Width Range | Corner Radius | Font Size | Description | Use Case |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Small | Hug | 12 x 4 px | 0px | 56 - 128 px | 4 px | label Row 2 paragraphs/sm-400 = 12px reg | Tooltips for buttons and icons should be concise and limited to a single line, while tooltips for truncated text can span up to a maximum of two lines to ensure simplicity. | For button, icon, truncated text, etc... |
-| Medium | Hug | 12 x 8 px | 4px | 128 - 256 px | 6 px | heading Row 2 labels/sm-600 = 12px bold sub-heading paragraph/sm-400 = 12px reg | The medium tooltip contains a heading and subtext. The heading should be concise, fitting within a single line for clarity. The subtext can span multiple lines, allowing for more detailed information without exceeding a maximum of two lines to maintain readability. | For info message, hint message, etc... |
+| Size | Tooltip Height | Padding (X x Y) | Gap | Width Range | Corner Radius | Font Size | Arrow Size(w x h) | Shadow | Description | Use Case |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Small | Hug | 12 x 4 px | 0px | 56 - 128 px | 4 px | label Row 2 paragraphs/sm-400 = 12px reg | 4 x 8px (horizontal) 8 x 4px (vertical) | shadow-4 0px, 4px, 8px, rgb(0,0,0,0.3) | Tooltips for buttons and icons should be concise and limited to a single line, while tooltips for truncated text can span up to a maximum of two lines to ensure simplicity. | For button, icon, truncated text, etc... |
+| Medium | Hug | 12 x 8 px | 4px | 128 - 256 px | 6 px | heading Row 2 labels/sm-600 = 12px bold sub-heading paragraph/sm-400 = 12px reg | 6 x 12px (hor) 12 x 6px (ver) | shadow-8 0px, 8px, 16px, rgb(0,0,0,0.24) | The medium tooltip contains a heading and subtext. The heading should be concise, fitting within a single line for clarity. The subtext can span multiple lines, allowing for more detailed information without exceeding a maximum of two lines to maintain readability. | For info message, hint message, etc... |
 `}
 </Markdown>
 
