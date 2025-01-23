@@ -31,7 +31,7 @@
   import { Spinner } from "@sparrow/library/ui";
   import { onDestroy, onMount } from "svelte";
   import { Modal } from "@sparrow/library/ui";
-  import { Button } from "@sparrow/library/ui";
+  import { ButtonV3 } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { Tooltip } from "@sparrow/library/ui";
   import { gitBranchIcon } from "@sparrow/library/assets";
@@ -287,7 +287,7 @@
   <div
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
   >
-    <Button
+    <ButtonV3
       disable={deleteLoader}
       title={"Cancel"}
       textStyleProp={"font-size: var(--base-text)"}
@@ -298,12 +298,12 @@
       }}
     />
 
-    <Button
+    <ButtonV3
       disable={deleteLoader}
       title={"Delete"}
       textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
-      type={"danger"}
+      type={"other"}
       loader={deleteLoader}
       onClick={() => {
         onItemDeleted("collection", {
