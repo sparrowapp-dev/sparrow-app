@@ -347,10 +347,13 @@ class DecodeRequest {
         ),
         environmentVariables,
       ),
-      this.extractBody(
-        request.state.requestBodyNavigation,
-        request.state.requestBodyLanguage,
-        request.body,
+      this.setEnvironmentVariables(
+        this.extractBody(
+          request.state.requestBodyNavigation,
+          request.state.requestBodyLanguage,
+          request.body,
+        ),
+        environmentVariables,
       ),
       this.extractDataType(
         request.state.requestBodyNavigation,
