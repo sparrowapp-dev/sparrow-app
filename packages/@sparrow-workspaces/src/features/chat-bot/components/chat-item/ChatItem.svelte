@@ -224,7 +224,7 @@
             -- LIKE / DISLIKE
             -- 
             -->
-            <Tooltip placement="top" title="Like" distance={13}>
+            <Tooltip placement="top-center" title="Like" distance={13}>
               <span
                 role="button"
                 class="action-button d-flex align-items-center justify-content-center border-radius-4"
@@ -240,7 +240,7 @@
                 />
               </span>
             </Tooltip>
-            <Tooltip placement="top" title="Dislike" distance={13}>
+            <Tooltip placement="top-center" title="Dislike" distance={13}>
               <span
                 class="action-button d-flex align-items-center justify-content-center border-radius-4"
                 role="button"
@@ -275,7 +275,7 @@
         -- 
         -->
         {#if isLastRecieverMessage}
-          <Tooltip placement="top" title="Regenerate" distance={13}>
+          <Tooltip placement="top-center" title="Regenerate" distance={13}>
             <button
               class="action-button d-flex align-items-center justify-content-center border-radius-4"
               on:click={regenerateAiResponse}
@@ -285,7 +285,7 @@
           </Tooltip>
         {/if}
         <Tooltip
-          placement="top"
+          placement="top-center"
           title={showTickIcon ? "Copied" : "Copy"}
           distance={13}
         >
@@ -313,12 +313,12 @@
   }
 
   :global(
-      .message-wrapper .markdown p,
-      .message-wrapper .markdown li,
-      .message-wrapper .markdown a,
-      .message-wrapper .markdown span,
-      .message-wrapper .markdown code
-    ) {
+    .message-wrapper .markdown p,
+    .message-wrapper .markdown li,
+    .message-wrapper .markdown a,
+    .message-wrapper .markdown span,
+    .message-wrapper .markdown code
+  ) {
     font-size: 12px;
   }
   :global(.message-wrapper .markdown pre) {

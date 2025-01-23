@@ -26,7 +26,7 @@
 </script>
 
 <Tooltip
-  placement="right"
+  placement="right-center"
   title={item.disabled ? "Coming Soon" : item.heading}
   zIndex={600}
   show={!(
