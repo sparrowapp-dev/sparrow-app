@@ -303,7 +303,7 @@
       title={"Delete"}
       textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
-      type={"other"}
+      type={"primary"}
       loader={deleteLoader}
       onClick={() => {
         onItemDeleted("collection", {

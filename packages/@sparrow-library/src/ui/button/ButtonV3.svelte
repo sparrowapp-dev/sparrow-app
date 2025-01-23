@@ -22,6 +22,7 @@
     | "transparent"
     | "outline"
     | "teritiary"
+    | "underline"
     | "other"
     | "icon" = "other";
   export let id = "";
@@ -35,6 +36,7 @@
     OTHER = "other",
     ICON = "icon",
     TERITIARY = "teritiary",
+    Underline = "underline",
   }
 
   // define button variants
@@ -45,6 +47,10 @@
       break;
     case BtnType.Outline:
       btnClass = "custom-btn-outline";
+      break;
+    case BtnType.Underline:
+      btnClass = "custom-btn-underline";
+      break;
     case BtnType.DARK:
       btnClass = "custom-btn-dark";
       break;
@@ -79,7 +85,7 @@
   } `}
   class={`${buttonClassProp} ${
     type !== "other" && type !== "icon"
-      ? "py-1 px-3 border-0 d-flex align-items-center"
+      ? "py-1 px-3  d-flex align-items-center"
       : ""
   } ${btnClass}`}
   on:click={(e) => {
@@ -116,8 +122,9 @@
     background-color: var(--blackColor);
   }
   .custom-btn-primary {
-    background-color: var(--bg-primary-300);
+    background-color: var(--bg-primary-400);
     color: var(--white-color);
+    border-width: 0px;
   }
   .custom-btn-dark {
     background-color: var(--bg-tertiary-300);
@@ -128,8 +135,18 @@
     color: var(--white-color);
   }
   .custom-btn-primary:hover {
-    background-color: var(--bg-primary-250);
+    background-color: var(--bg-primary-300);
     color: var(--white-color);
+  }
+  .custom-btn-outline {
+    background-color: transparent;
+    border-width: 1px;
+  }
+  .custom-btn-underline {
+    background-color: transparent;
+    border-width: 0px;
+    text-decoration: underline;
+    text-underline-offset: 5px;
   }
   .custom-btn-primary:active {
     background-color: var(--bg-primary-600);
