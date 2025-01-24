@@ -15,7 +15,7 @@
     help,
     hoveredHelp,
     selectedHelp,
-  } from "./common";
+  } from "../../images";
 
   import SidebarItem from "./SidebarItem.svelte";
   import { type SidebarItemObj } from "../../types/sidebar/sidebar-base";
@@ -129,7 +129,11 @@
     padding: 0px;
   }
   .active-indicator {
-    background-color: var(--nav-bar-active-slash);
+    background: linear-gradient(
+      90deg,
+      var(--bg-ds-info-400) 0%,
+      var(--bg-ds-secondary-400) 100%
+    );
     position: absolute;
     height: 38px;
     width: 2px;
