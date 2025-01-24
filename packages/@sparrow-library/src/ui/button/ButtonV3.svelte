@@ -13,6 +13,7 @@
   export let buttonStartIcon: string | undefined = undefined;
   export let buttonStartIconStyle = "";
   export let allowChild = false;
+  export let tooltipText = "Button is disabled";
   export let type:
     | "primary"
     | "secondary"
@@ -36,6 +37,7 @@
     TRANSPARENT = "transparent",
     OTHER = "other",
     ICON = "icon",
+    Disable = "disable",
     TERITIARY = "teritiary",
     Underline = "underline",
   }
@@ -43,40 +45,59 @@
   // define button variants
 
   let btnClass = "";
-  switch (type) {
-    case BtnType.PRIMARY:
-      btnClass = "custom-btn-primary";
-      break;
-    case BtnType.Secondary:
-      btnClass = "custom-btn-secondary";
-      break;
-    case BtnType.Outline:
-      btnClass = "custom-btn-outline";
-      break;
-    case BtnType.Underline:
-      btnClass = "custom-btn-underline";
-      break;
-    case BtnType.DARK:
-      btnClass = "custom-btn-dark";
-      break;
-    case BtnType.DANGER:
-      btnClass = "custom-btn-danger";
-      break;
-    case BtnType.VIOLET:
-      btnClass = "custom-btn-violet";
-      break;
-    case BtnType.TRANSPARENT:
-      btnClass = "custom-btn-transparent";
-      break;
-    case BtnType.ICON:
-      btnClass = "sparrow-icon-btn";
-      break;
-    case BtnType.TERITIARY:
-      btnClass = "custom-btn-teritiary";
-      break;
-    default:
-      btnClass = "";
-      break;
+  if (!disable) {
+    switch (type) {
+      case BtnType.PRIMARY:
+        btnClass = "custom-btn-primary";
+        break;
+      case BtnType.Secondary:
+        btnClass = "custom-btn-secondary";
+        break;
+      case BtnType.Outline:
+        btnClass = "custom-btn-outline";
+        break;
+      case BtnType.Underline:
+        btnClass = "custom-btn-underline";
+        break;
+      case BtnType.DARK:
+        btnClass = "custom-btn-dark";
+        break;
+      case BtnType.DANGER:
+        btnClass = "custom-btn-danger";
+        break;
+      case BtnType.VIOLET:
+        btnClass = "custom-btn-violet";
+        break;
+      case BtnType.TRANSPARENT:
+        btnClass = "custom-btn-transparent";
+        break;
+      case BtnType.ICON:
+        btnClass = "sparrow-icon-btn";
+        break;
+      case BtnType.TERITIARY:
+        btnClass = "custom-btn-teritiary";
+        break;
+      default:
+        btnClass = "";
+        break;
+    }
+  } else {
+    switch (type) {
+      case BtnType.PRIMARY:
+        btnClass = "custom-btn-primary-disable";
+        break;
+      case BtnType.Secondary:
+        btnClass = "custom-btn-secondary-disable";
+        break;
+      case BtnType.DANGER:
+        btnClass = "custom-btn-danger-disable";
+        break;
+      case BtnType.Secondary:
+        btnClass = "custom-btn-secondary-disable";
+      default:
+        btnClass = "";
+        break;
+    }
   }
 </script>
 
@@ -119,6 +140,10 @@
 </button>
 
 <style lang="scss">
+  .button-wrapper {
+    position: relative;
+    display: inline-block;
+  }
   .sparrow-icon-btn {
     background-color: transparent;
     border: 0px;
@@ -132,19 +157,25 @@
     border-width: 0px;
   }
   .custom-btn-secondary {
-    background-color:;
+    background-color: var(--bg-ds-surface-300);
+    color: var(--white-color);
+    border-width: 0px;
   }
   .custom-btn-dark {
     background-color: var(--bg-tertiary-300);
     color: var(--white-color);
+    border-width: 0px;
   }
   .custom-btn-violet {
     background-color: var(--bg-tertiary-300);
     color: var(--white-color);
+    border-width: 0px;
   }
+
   .custom-btn-primary:hover {
-    background-color: var(--icon-primary-250);
+    background-color: var(--bg-ds-primary-300);
     color: var(--white-color);
+    border-width: 0px;
   }
   .custom-btn-outline {
     background-color: transparent;
@@ -164,17 +195,19 @@
     background-color: var(--bg-tertiary-100);
   }
   .custom-btn-danger {
-    background-color: var(--dangerColor);
-    color: var(--blackColor);
+    background-color: var(--bg-ds-danger-400);
+    color: var(--white-color);
+    border-width: 0px;
   }
   .custom-btn-danger:hover {
     background-color: var(--delete-hover);
   }
+  .custom-btn-danger:active {
+    background-color: var(--bg-ds-danger-600);
+  }
   .custom-btn-transparent {
     background-color: transparent;
     color: var(--white-color);
-  }
-  .custom-btn-transparent:hover {
   }
   .custom-btn-teritiary {
     color: var(--text-primary-300);
@@ -184,5 +217,19 @@
     color: var(--white-color);
     background-color: var(--bg-primary-300);
     border: 1px solid var(--border-primary-200) !important;
+  }
+  .custom-btn-danger-disable {
+    background-color: var(--bg-ds-danger-700);
+    border-width: 0px;
+  }
+  .custom-btn-primary-disable {
+    background-color: var(--bg-ds-primary-700);
+    color: var(--white-color);
+    border-width: 0px;
+  }
+  .custom-btn-secondary-disable {
+    background-color: var(--bg-ds-surface-400);
+    color: var(--white-color);
+    border-width: 0px;
   }
 </style>

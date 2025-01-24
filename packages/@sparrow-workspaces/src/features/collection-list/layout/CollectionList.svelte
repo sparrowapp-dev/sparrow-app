@@ -241,7 +241,7 @@
       {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
         <Tooltip
           title={"Add Collection"}
-          placement={"bottom"}
+          placement={"bottom-center"}
           distance={13}
           show={isHovered}
           zIndex={701}

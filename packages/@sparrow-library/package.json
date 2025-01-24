@@ -20,7 +20,8 @@
     "./typography": "./src/typography/index.ts",
     "./ui": "./src/ui/index.ts",
     "./utils": "./src/utils/index.ts",
-    "./ui/list/types": "./src/ui/list/types.ts"
+    "./ui/list/types": "./src/ui/list/types.ts",
+    "./styles": "./src/styles/style.scss"
   },
   "devDependencies": {
     "@fontsource/fira-mono": "^4.5.10",

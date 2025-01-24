@@ -531,7 +531,7 @@
         >
           <Tooltip
             title={"Add Options"}
-            placement={"bottom"}
+            placement={"bottom-center"}
             distance={12}
             show={!addButtonMenu}
             zIndex={10}
@@ -686,7 +686,7 @@
       class="px-3 py-2 d-flex align-items-center justify-content-between"
       style="z-index: 4;"
     >
-      <Tooltip title={"Star Us On GitHub"} placement={"top"}>
+      <Tooltip title={"Star Us On GitHub"} placement={"top-center"}>
         <div
           class="px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
             ? 'bg-secondary-600'
