@@ -299,7 +299,7 @@
     />
 
     <ButtonV3
-      disable={deleteLoader}
+      disable={true}
       title={"Delete"}
       textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}

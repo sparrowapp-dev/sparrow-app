@@ -28,6 +28,7 @@
   export let id = "";
   enum BtnType {
     PRIMARY = "primary",
+    Secondary = "secondary",
     DARK = "dark",
     DANGER = "danger",
     Outline = "outline",
@@ -40,10 +41,14 @@
   }
 
   // define button variants
+
   let btnClass = "";
   switch (type) {
     case BtnType.PRIMARY:
       btnClass = "custom-btn-primary";
+      break;
+    case BtnType.Secondary:
+      btnClass = "custom-btn-secondary";
       break;
     case BtnType.Outline:
       btnClass = "custom-btn-outline";
@@ -87,7 +92,7 @@
     type !== "other" && type !== "icon"
       ? "py-1 px-3  d-flex align-items-center"
       : ""
-  } ${btnClass}`}
+  } ${btnClass} `}
   on:click={(e) => {
     onClick(e);
   }}
@@ -125,6 +130,9 @@
     background-color: var(--bg-primary-400);
     color: var(--white-color);
     border-width: 0px;
+  }
+  .custom-btn-secondary {
+    background-color:;
   }
   .custom-btn-dark {
     background-color: var(--bg-tertiary-300);
