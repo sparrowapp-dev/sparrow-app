@@ -209,7 +209,7 @@
     max-width: 47.5%;
     max-height: 32%;
     border-radius: 8px;
-    color: white; /* Add this line */
+    color: white; /* Modified this line */
     }
 
     :global(.add-new-workspace.empty) {
@@ -219,7 +219,7 @@
     :global(.add-new-workspace:hover) {
         border: 2px dashed var(--border-primary-300);
         background: var(--bg-tertiary-600);
-        color: white; /* Modify this line */
+        color: white; /* Modified this line */
         background-clip: initial;
         -webkit-background-clip: initial;
         -webkit-text-fill-color: initial;
