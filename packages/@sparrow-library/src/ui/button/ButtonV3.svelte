@@ -135,7 +135,7 @@
     color: var(--white-color);
   }
   .custom-btn-primary:hover {
-    background-color: var(--bg-primary-300);
+    background-color: var(--icon-primary-250);
     color: var(--white-color);
   }
   .custom-btn-outline {
