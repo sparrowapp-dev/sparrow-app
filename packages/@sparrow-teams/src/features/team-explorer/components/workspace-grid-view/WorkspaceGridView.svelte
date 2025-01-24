@@ -19,7 +19,7 @@
    */
   export let workspaces: WorkspaceDocument[] = [];
   /**
-   * Currently active team
+   * Callback for creating a new workspace
    */
   export let onCreateNewWorkspace;
   /**
@@ -34,18 +34,27 @@
    * Checks if the current user has admin or owner privileges.
    */
   export let isAdminOrOwner: boolean;
-
   /**
    * Flag to check if user is guest user
    */
   export let isGuestUser = false;
 
   export let isWorkspaceCreationInProgress = false;
-  let workspacePerPage = 5;
-  let filterText = "";
-  let currPage = 1;
 
-  // filters the workspaces based on the search query
+  let currPage = 1;
+  let oldSearchQuery = "";
+
+  // We'll show 5 items on the first page, then 6 on each subsequent page:
+  const firstPageCount = 5;
+  const subsequentPageCount = 6;
+
+  // Whenever searchQuery changes, reset to page 1
+  $: if (searchQuery !== oldSearchQuery) {
+    currPage = 1;
+    oldSearchQuery = searchQuery;
+  }
+
+  // Filters the workspaces based on the search query
   $: filteredWorkspaces = workspaces
     .filter(
       (item) =>
@@ -58,32 +67,44 @@
         new Date(a._data.updatedAt).getTime(),
     );
 
-  // This will split workspaces into pages
+  // Splits workspaces into pages
   $: paginatedWorkspaces = (() => {
     if (currPage === 1) {
-      return filteredWorkspaces.slice(0, 5);
+      return filteredWorkspaces.slice(0, firstPageCount);
     } else {
-      const startIndex = 5 + (currPage - 2) * 6;
-      return filteredWorkspaces.slice(startIndex, startIndex + 6); //will check the start index based on current page
+      const startIndex = firstPageCount + (currPage - 2) * subsequentPageCount;
+      return filteredWorkspaces.slice(
+        startIndex,
+        startIndex + subsequentPageCount,
+      );
     }
   })();
 
-  // This will calculate the total number of pages
+  // Calculate the total number of pages
   $: totalPages = (() => {
     const total = filteredWorkspaces.length;
-    if (total <= 5) return 1;
-    return Math.ceil((total - 5) / 6) + 1;
+    if (total <= firstPageCount) return 1;
+    return Math.ceil((total - firstPageCount) / subsequentPageCount) + 1;
   })();
 
-  $: startIndex = currPage === 1 ? 1 : 5 + (currPage - 2) * 6 + 1;
-  $: endIndex = Math.min(
-    currPage === 1 ? 5 : startIndex + 5,
-    filteredWorkspaces.length,
-  );
-
+  // Keep currPage within [1, totalPages]
   const setPageWithinBounds = (newPage: number) => {
     currPage = Math.max(1, Math.min(newPage, totalPages));
   };
+
+  // Whenever totalPages or filteredWorkspaces change, clamp currPage
+  $: setPageWithinBounds(currPage);
+
+  // For display in "Showing X - Y of Z"
+  $: startIndex =
+    currPage === 1
+      ? 1
+      : firstPageCount + (currPage - 2) * subsequentPageCount + 1;
+
+  $: endIndex = Math.min(
+    currPage === 1 ? firstPageCount : startIndex + (subsequentPageCount - 1),
+    filteredWorkspaces.length,
+  );
 </script>
 
 <div class="h-100 pb-2">
@@ -107,7 +128,7 @@
               disable={isWorkspaceCreationInProgress}
               buttonClassProp="sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace"
               buttonStyleProp="min-height: 132px;"
-              onClick={async () => {
+              onclick={async () => {
                 isWorkspaceCreationInProgress = true;
                 await onCreateNewWorkspace();
                 isWorkspaceCreationInProgress = false;
@@ -130,6 +151,7 @@
       {#if filteredWorkspaces.length > 0}
         <div class="bottom-0 d-flex justify-content-between" style="width:53%;">
           <div class="tab-head" style="width: 189.46px;">
+            <!-- Display text for pagination -->
             Showing {startIndex} - {endIndex} of {filteredWorkspaces.length}
           </div>
           <div class="tab-head tab-change">
