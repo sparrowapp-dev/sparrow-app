@@ -41,7 +41,6 @@
       divHeight = rect.top;
     }
   }
-  let event1 = "";
 
   sidebarItems.forEach((item) => {
     if (item.id === "Home") {
@@ -69,8 +68,23 @@
   let secondarySidebarItems = sidebarItems.filter(
     (item) => item.position === "secondary",
   );
+
+  let screenWidth = window.innerWidth;
+
+  function handleResize() {
+    screenWidth = window.innerWidth;
+    logPositions(initialId);
+  }
+
+  onMount(() => {
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  });
   let initialId = "";
   afterUpdate(() => {
+    console.log("clicked");
     if (initialId) {
       logPositions(initialId);
     }
