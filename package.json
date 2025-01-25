@@ -116,7 +116,6 @@
     "eslint": "^8.54.0",
     "eslint-plugin-svelte": "^2.46.1",
     "eslint-plugin-svelte3": "^4.0.0",
-    "eslint-plugin-unused-imports": "^4.1.4",
     "husky": "^8.0.3",
     "lint-staged": "^14.0.0",
     "prettier": "3.0.2",
@@ -130,7 +129,8 @@
     "svelte-preprocess": "^5.0.4",
     "tslib": "^2.6.0",
     "typescript": "^5.0.2",
-    "vite": "^4.4.4"
+    "vite": "^4.4.4",
+    "vite-plugin-eslint": "^1.8.1"
   },
   "repository": "https://github.com/sparrowapp-dev/sparrow-app.git",
   "release": {

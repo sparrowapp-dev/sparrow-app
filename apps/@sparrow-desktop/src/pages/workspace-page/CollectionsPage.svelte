@@ -339,7 +339,6 @@
           _viewModel.fetchCollections(value?._id),
           _viewModel2.refreshEnvironment(value?._id),
           _viewModel3.refreshTestflow(value?._id),
-          ,
         ]).then(
           ([
             fetchCollectionsResult,

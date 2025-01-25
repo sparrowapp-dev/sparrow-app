@@ -189,7 +189,6 @@ const makeRequest = async (
       return error(e.response?.data?.message);
     }
     return error(e);
-  } finally {
   }
 };
 

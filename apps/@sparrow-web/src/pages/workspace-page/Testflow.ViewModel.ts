@@ -158,7 +158,6 @@ export class TestflowViewModel {
       let isFirstTimeUsingTestFlow = false;
       isFirstTimeInTestFlow.subscribe((value) => {
         isFirstTimeUsingTestFlow = value;
-        console.log("isFirstTimeUsingTestFlow", isFirstTimeUsingTestFlow);
       });
       if (isFirstTimeUsingTestFlow) {
         currentStep.set(3);
