@@ -154,7 +154,7 @@ import { Tooltip } from "@sparrow/library/ui";
           </div>
 
           <div class="position-relative">
-            <Tooltip title="Save" placement="bottom" distance={10}>
+            <Tooltip title="Save" placement="bottom-center" distance={10}>
               <WithButtonV3
                 icon={SaveIcon}
                 onClick={onSaveEnvironment}
@@ -168,7 +168,7 @@ import { Tooltip } from "@sparrow/library/ui";
             </Tooltip>
           </div>
           <span>
-            <Tooltip title="Help" placement="bottom" distance={10}>
+            <Tooltip title="Help" placement="bottom-center" distance={10}>
               <WithButtonV3
                 icon={HelpIcon}
                 onClick={() => {

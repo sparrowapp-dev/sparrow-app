@@ -156,7 +156,7 @@
 
     <Tooltip
       title={`Add ${TFDefaultEnum.NAME}`}
-      placement={"bottom"}
+      placement={"bottom-center"}
       distance={13}
       show={isHovered}
       zIndex={701}

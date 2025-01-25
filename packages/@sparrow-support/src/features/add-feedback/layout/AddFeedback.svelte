@@ -96,7 +96,7 @@
 </script>
 
 <div class=" w-100">
-  <Tooltip title="Feedback" placement="top" distance={13}>
+  <Tooltip title="Feedback" placement="top-center" distance={13}>
     <button
       on:click={() => {
         const res = onAddFeedback();

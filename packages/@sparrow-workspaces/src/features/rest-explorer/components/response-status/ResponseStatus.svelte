@@ -19,7 +19,9 @@
   };
 </script>
 
-<div class="d-flex flex-column align-items-start justify-content-between w-100 mb-2">
+<div
+  class="d-flex flex-column align-items-start justify-content-between w-100 mb-2"
+>
   <div
     class="response-container d-flex align-items-center justify-content-between z-1 p-2 w-100 position-sticky border-radius-2"
     style="top:55.4px;  margin-top: -1px;"
@@ -29,7 +31,7 @@
       <div class="d-flex align-items-center gap-2">
         <Tooltip
           title="HTTP Status - {response.status}"
-          placement={"bottom"}
+          placement={"bottom-center"}
           zIndex={500}
           distance={20}
         >
@@ -58,7 +60,7 @@
         </Tooltip>
         <Tooltip
           title="Response Time"
-          placement={"bottom"}
+          placement={"bottom-center"}
           zIndex={500}
           distance={20}
         >
@@ -99,7 +101,7 @@
         </Tooltip>
         <Tooltip
           title="Response Size"
-          placement={"bottom"}
+          placement={"bottom-center"}
           zIndex={500}
           distance={20}
         >

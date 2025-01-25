@@ -57,7 +57,6 @@
   };
 
   $: {
-    console.log("renderd");
     if (apiState) {
       if (apiState.bodyLanguage === RequestDataType.JSON) {
         fileExtension = "json";

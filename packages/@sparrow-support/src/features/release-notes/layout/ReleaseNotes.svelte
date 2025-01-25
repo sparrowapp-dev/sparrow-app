@@ -292,7 +292,7 @@
                       </h3>
                       <Tooltip
                         title={"Copy link"}
-                        placement={"right"}
+                        placement={"right-center"}
                         distance={10}
                         show={true}
                         zIndex={701}
@@ -424,7 +424,7 @@
                 </p>
                 <Tooltip
                   title={"Copy link"}
-                  placement={"right"}
+                  placement={"right-center"}
                   distance={10}
                   show={true}
                   zIndex={701}

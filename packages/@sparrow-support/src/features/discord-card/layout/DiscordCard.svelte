@@ -35,7 +35,7 @@ export let onJoin;
     class="w-100"
     style="padding-top:10px; padding-left:19px; padding-right:19px;"
   >
-    <Tooltip title="Join Community" placement="bottom" distance={15}>
+    <Tooltip title="Join Community" placement="bottom-center" distance={15}>
       <div
         class="w-100 join-button d-flex justify-content-center align-items-center gap-8 align-self-center"
         role="button"
@@ -59,7 +59,7 @@ export let onJoin;
     class="d-flex p-2 gap-2 align-items-center pt-2"
     style=" height: 44px;  color:var(--text-secondary-50);  "
   >
-    <Tooltip placement="right" title="Coming Soon">
+    <Tooltip placement="right-center" title="Coming Soon">
       <span style=""> <SettingIcon color={"var(--text-secondary-50)"} /> </span>
       <span class="text-fs-14">Support</span>
     </Tooltip>
@@ -68,7 +68,7 @@ export let onJoin;
     class="d-flex p-2 gap-2 align-items-center"
     style="height: 44px; color:var(--text-secondary-50)"
   >
-    <Tooltip placement="right" title="Coming Soon">
+    <Tooltip placement="right-center" title="Coming Soon">
       <span> <HelpCenterIcon color={"var(--text-secondary-50)"} /> </span>
       <span class="text-fs-14">Help Center</span>
     </Tooltip>
