@@ -33,8 +33,9 @@
   ],
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
+    "svelte/valid-compile":"off",
     "unused-imports/no-unused-imports": "error", // Automatically remove unused imports
-    "no-console": ["error", { "allow": ["warn", "error"] }], // allows console.log() and console.warn()
+    "no-console": ["error", { "allow": ["warn", "error", "info", "debug", "trace", "table", "group", "groupEnd"] }], // allows dependency array
     "no-debugger": "error"
   }
 }

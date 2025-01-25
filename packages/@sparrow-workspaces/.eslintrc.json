@@ -3,7 +3,7 @@
     "browser": true,
     "es2021": true
   },
-  "plugins": ["svelte", "@typescript-eslint"],
+  "plugins": ["svelte", "@typescript-eslint", "unused-imports"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
@@ -32,12 +32,10 @@
     }
   ],
   "rules": {
-    "@typescript-eslint/no-explicit-any": "off", // Allow use of any in typescript
-    "svelte/valid-compile": "off", // allow use of unwanted styling in svelte UI
-    "no-console": [
-      "error",
-      { "allow": ["warn", "error", "table", "info", "debug"] }
-    ], // Restricts use of console.log()
-    "no-debugger": "error" // Restricts use of debugger
+    "@typescript-eslint/no-explicit-any": "off",
+    "svelte/valid-compile":"off",
+    "unused-imports/no-unused-imports": "error", // Automatically remove unused imports
+    "no-console": ["error", { "allow": ["warn", "error", "info", "debug", "trace", "table", "group", "groupEnd"] }], // allows dependency array
+    "no-debugger": "error"
   }
 }
