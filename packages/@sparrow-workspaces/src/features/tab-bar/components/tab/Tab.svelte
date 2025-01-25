@@ -1,6 +1,5 @@
 <script lang="ts">
   // ---- Icon
-  import { CrossIcon, CrossIcon as Crossicon } from "@sparrow/library/assets";
   import { BookIcon } from "@sparrow/library/assets";
   // ----
 

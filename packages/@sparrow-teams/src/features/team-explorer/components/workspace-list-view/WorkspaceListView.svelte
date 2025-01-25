@@ -10,9 +10,8 @@
   import { Table } from "@sparrow/library/ui";
   import { Rows } from "@sparrow/teams/compopnents";
   import { TeamSkeleton } from "../../images";
-  import { onMount } from "svelte";
-
-  export let data: any;
+  
+export let data: any;
   export let openTeam: TeamDocument;
   export let isWebEnvironment: boolean;
 

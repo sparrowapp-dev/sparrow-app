@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { CrossIcon } from "@sparrow/library/icons";
-
-  import { scale, fade } from "svelte/transition";
+  
+import { scale, fade } from "svelte/transition";
   import { downloadWarningIcon as warningIcon } from "@sparrow/library/assets";
   import { onDestroy } from "svelte";
 

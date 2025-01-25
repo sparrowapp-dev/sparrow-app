@@ -1,6 +1,5 @@
 <script lang="ts">
   import { getMethodStyle } from "@sparrow/common/utils";
-  import { onMount } from "svelte";
   export let api: any;
   export let data: any;
   export let collectionList;

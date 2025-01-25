@@ -1,9 +1,8 @@
 <script lang="ts">
   import { afterUpdate, onMount } from "svelte";
   import { scale } from "svelte/transition";
-  import { quintOut, backInOut } from "svelte/easing";
-
-  export let isBackgroundClickable = true;
+  
+export let isBackgroundClickable = true;
 
   /**
    * Button ID

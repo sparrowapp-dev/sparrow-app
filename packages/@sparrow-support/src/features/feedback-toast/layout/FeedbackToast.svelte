@@ -1,9 +1,8 @@
 <script>
   import { Ellipse } from "@sparrow/library/icons";
   import { LogoSymbol } from "@sparrow/library/icons";
-  import { ArrowUnfilledIcon } from "@sparrow/library/icons";
-
-  let isReadMore = false;
+  
+let isReadMore = false;
 </script>
 
 <div class="p-3 mt-1" style="background-color: black;">

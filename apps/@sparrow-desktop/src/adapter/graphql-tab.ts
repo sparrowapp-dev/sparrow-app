@@ -1,6 +1,5 @@
 import { createDeepCopy } from "@sparrow/common/utils";
 import { type Path, type Tab } from "@sparrow/common/types/workspace/tab";
-import { InitRequestTab } from "@sparrow/common/utils";
 import { InitTab } from "@sparrow/common/factory";
 import { GraphqlRequestAuthTypeTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
 import { GraphqlRequestAuthModeBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";

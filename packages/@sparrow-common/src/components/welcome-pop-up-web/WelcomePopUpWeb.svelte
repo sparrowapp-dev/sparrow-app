@@ -1,8 +1,6 @@
 <script>
   import { WelcomeLogo } from "@sparrow/common/images";
-    import { DownloadIcon, DownloadIconWeb } from "@sparrow/library/icons";
-  import { Button } from "@sparrow/library/ui";
-</script>
+    </script>
 
 <div class="pt-2 pb-4">
   <div class="d-flex">

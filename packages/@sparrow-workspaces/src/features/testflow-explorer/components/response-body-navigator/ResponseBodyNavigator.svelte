@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { downloadIcon } from "@sparrow/library/assets";
-  import { copyIcon } from "@sparrow/library/assets";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import { notifications, Tooltip } from "@sparrow/library/ui";
   import {
@@ -10,7 +8,6 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
-  import { beautifyIcon as BeautifyIcon } from "@sparrow/library/assets";
   import js_beautify, { html_beautify } from "js-beautify";
   import { WithButtonV6, WithSelectV3 } from "@sparrow/workspaces/hoc";
   import { save } from "@tauri-apps/plugin-dialog";

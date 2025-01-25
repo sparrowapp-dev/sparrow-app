@@ -26,7 +26,6 @@
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
   import constants from "../../constants/constants";
-  import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import { CreateTeam } from "@sparrow/common/features";
   import { open } from "@tauri-apps/plugin-shell";
 

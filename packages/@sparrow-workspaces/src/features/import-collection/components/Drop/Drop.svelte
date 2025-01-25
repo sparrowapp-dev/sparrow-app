@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { DeleteIcon, EditIcon, UploadIcon } from "@sparrow/library/assets";
-  import { base64ToURL, imageDataToURL } from "@sparrow/common/utils";
+  import { UploadIcon } from "@sparrow/library/assets";
   import { CrossIcon } from "@sparrow/library/assets";
 
   export let value: any = [];

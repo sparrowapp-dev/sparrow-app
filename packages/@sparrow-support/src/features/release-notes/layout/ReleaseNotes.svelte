@@ -7,7 +7,6 @@
     FilterIcon,
     LinkedinIcon,
     LinkIcon,
-    ThumbIcon,
   } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   import { marked } from "marked";

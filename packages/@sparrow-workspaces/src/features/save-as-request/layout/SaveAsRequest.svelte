@@ -4,7 +4,6 @@
   import { angleLeftIcon as leftArrowAsset } from "@sparrow/library/assets";
   import { searchTreeDocument } from "../utils";
   import { notifications } from "@sparrow/library/ui";
-  import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
   import { tickGreyIcon as tickIcon } from "@sparrow/library/assets";
   import { crossGreyIcon as crossIcon } from "@sparrow/library/assets";

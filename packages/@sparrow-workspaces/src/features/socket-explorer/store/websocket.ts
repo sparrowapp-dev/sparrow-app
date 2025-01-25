@@ -1,5 +1,4 @@
 import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
-import type { UnlistenFn } from "@tauri-apps/api/event";
 import { writable } from "svelte/store";
 
 export type WebSocketMessage = {

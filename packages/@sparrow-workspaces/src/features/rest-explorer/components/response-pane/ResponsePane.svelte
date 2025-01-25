@@ -1,6 +1,5 @@
 <script lang="ts">
   // TODO: Change location for default page component
-  import { RequestDataType, ResponseFormatter } from "@sparrow/common/enums";
   import type { Response } from "@sparrow/common/interfaces/request.interface";
 
   export let response: Response | undefined = undefined;

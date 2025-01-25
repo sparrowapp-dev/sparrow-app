@@ -1,7 +1,6 @@
 <script>
   import { CrossIcon } from "@sparrow/library/icons";
   import { RocketIcon } from "@sparrow/library/icons";
-  import { Link } from "svelte-navigator";
   export let isVisible = true;
   export let onClose;
   export let onClick;

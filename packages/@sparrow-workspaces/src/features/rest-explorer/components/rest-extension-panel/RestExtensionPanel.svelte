@@ -1,8 +1,7 @@
 <script lang="ts">
   import { BookIcon } from "@sparrow/library/assets";
 
-  import { Tooltip } from "@sparrow/library/ui";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import { saveDescIcon as SaveIcon } from "@sparrow/library/assets";
   import { editDescIcon as EditIcon } from "@sparrow/library/assets";
 
@@ -11,13 +10,10 @@
 
   import { workspaceLevelPermissions } from "@sparrow/common/constants/permissions.constant";
   import {
-    getMethodStyle,
     hasWorkpaceLevelPermission,
   } from "@sparrow/common/utils";
-  import { Modal } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "@app/database/database";
-  import type { Observable } from "rxjs";
   // import { SaveAsRequest } from "../../../../features";
   /////////////////////////////////////////////////////////////////
   export let onSaveAsRequest;

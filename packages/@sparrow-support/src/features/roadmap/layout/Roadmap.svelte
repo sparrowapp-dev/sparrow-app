@@ -5,8 +5,6 @@
     CategoryIcon,
     CrossIcon,
     MessageDisabledIcon,
-    MessageIcon,
-    StackIcon,
   } from "@sparrow/library/icons";
   import { Loader } from "@sparrow/library/ui";
   import HelpInfoCard from "../../../components/HelpInfo-Card/HelpInfoCard.svelte";

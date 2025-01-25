@@ -3,7 +3,6 @@
   import { List } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import {
-    PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
   } from "@sparrow/common/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";

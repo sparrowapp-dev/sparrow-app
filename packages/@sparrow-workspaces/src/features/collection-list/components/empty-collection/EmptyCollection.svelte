@@ -1,11 +1,7 @@
 <script lang="ts">
-  import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
-  import {
-    PERMISSION_NOT_FOUND_TEXT,
-    workspaceLevelPermissions,
-  } from "@sparrow/common/constants/permissions.constant";
-  import { WorkspaceRole } from "@sparrow/common/enums";
-  import { Tooltip } from "@sparrow/library/ui";
+  
+
+import { WorkspaceRole } from "@sparrow/common/enums";
   import { List } from "@sparrow/library/ui";
   import { PlusIcon } from "@sparrow/library/icons";
 

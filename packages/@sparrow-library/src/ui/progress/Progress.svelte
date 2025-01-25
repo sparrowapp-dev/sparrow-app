@@ -1,5 +1,5 @@
 <script>
-  import { fade, fly } from "svelte/transition";
+  import { fade } from "svelte/transition";
   export let onClick;
   export let title = "";
   export let isProgress = true;

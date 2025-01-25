@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { Select } from "@sparrow/library/forms";
-  import { AuthSection } from "@sparrow/common/enums/authorization.enum";
   import type { ApiKey } from "@sparrow/common/interfaces/request.interface";
   import { CodeMirrorInput } from "@sparrow/workspaces/components";
   import { AuthInputTheme } from "@sparrow/workspaces/utils";

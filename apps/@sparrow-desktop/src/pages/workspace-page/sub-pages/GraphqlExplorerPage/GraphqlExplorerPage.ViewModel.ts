@@ -6,7 +6,6 @@ import {
 import {
   createDeepCopy,
   moveNavigation,
-  throttle,
 } from "@sparrow/common/utils";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 

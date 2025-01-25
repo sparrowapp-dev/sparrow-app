@@ -6,7 +6,7 @@ import { TeamService } from "../../services/team.service";
 import { WorkspaceService } from "../../services/workspace.service";
 import { Sleep, throttle } from "@sparrow/common/utils";
 import { notifications } from "@sparrow/library/ui";
-import { isGuestUserActive, setUser, user } from "@app/store/auth.store";
+import { isGuestUserActive, setUser } from "@app/store/auth.store";
 import { TabRepository } from "../../repositories/tab.repository";
 import {
   RxDB,
@@ -19,7 +19,6 @@ import { FeatureSwitchService } from "../../services/feature-switch.service";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { v4 as uuidv4 } from "uuid";
-import { TeamAdapter } from "../../adapter";
 import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";

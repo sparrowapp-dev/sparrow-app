@@ -7,16 +7,11 @@
   import { Options } from "@sparrow/library/ui";
 
   // ---- Helper functions
-  import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
-  import { getPathFromUrl } from "@sparrow/common/utils/common.helper";
+  
+// ---- Enum and Interfaces
+  
 
-  // ---- Enum and Interfaces
-  import type {
-    Request,
-    Folder,
-    Path,
-  } from "@sparrow/common/interfaces/request.interface";
-  import { UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
+import { UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
 
   // --- SVG
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";

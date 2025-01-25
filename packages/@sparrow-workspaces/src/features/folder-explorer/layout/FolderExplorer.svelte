@@ -56,9 +56,8 @@
   /**
    * Components
    */
-  import { Tooltip } from "@sparrow/library/ui";
-
-  /**
+  
+/**
    * Types
    */
   import type { CollectionDocument, TabDocument } from "@app/database/database";
@@ -67,7 +66,6 @@
   /**
    * Constants
    */
-  import { PERMISSION_NOT_FOUND_TEXT } from "@sparrow/common/constants/permissions.constant";
   import { WorkspaceRole } from "@sparrow/common/enums";
 
   /**

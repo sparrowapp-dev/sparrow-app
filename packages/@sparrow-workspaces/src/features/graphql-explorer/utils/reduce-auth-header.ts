@@ -1,4 +1,3 @@
-import { type Auth, type KeyValue } from "@sparrow/common/types/workspace";
 import {
   GraphqlRequestAuthTypeTabEnum,
   type GraphqlRequestAuthTabInterface,

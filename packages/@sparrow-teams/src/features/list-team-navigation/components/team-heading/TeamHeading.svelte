@@ -2,8 +2,7 @@
   export let openTeam;
   import { base64ToURL } from "@sparrow/common/utils";
   import { PeopleIcon } from "@sparrow/library/assets";
-  import { IconFallback } from "@sparrow/library/ui";
-</script>
+  </script>
 
 <div class="d-flex align-items-center p-3 pt-4 pb-0">
   <div class="d-flex align-items-center" style="width: calc(100% - 20px);">

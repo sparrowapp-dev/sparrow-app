@@ -4,7 +4,6 @@
     RequestDataTypeEnum,
     ResponseFormatterEnum,
     type Response,
-    type State,
   } from "@sparrow/common/types/workspace";
   import { SparrowLogo } from "../../assets/images";
   export let response: Response;

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Label, Tooltip } from "@sparrow/library/ui";
+  import { Label } from "@sparrow/library/ui";
   export let tabs = [];
   export let activeTeamTab: string;
   export let onUpdateActiveTab: (data: string) => void;

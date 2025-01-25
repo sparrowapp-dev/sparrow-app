@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Collection, EmptyCollection, SearchTree } from "../components";
+  import { Collection, EmptyCollection } from "../components";
   import { doubleAngleLeftIcon as doubleangleLeft } from "@sparrow/library/assets";
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { WorkspaceRole } from "@sparrow/common/enums";
@@ -7,13 +7,10 @@
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
-    EnvironmentDocument,
-    TabDocument,
     WorkspaceDocument,
   } from "@app/database/database";
   import type {
     Folder,
-    Path,
     Request as RequestType,
   } from "@sparrow/common/interfaces/request.interface";
   import { onDestroy } from "svelte";

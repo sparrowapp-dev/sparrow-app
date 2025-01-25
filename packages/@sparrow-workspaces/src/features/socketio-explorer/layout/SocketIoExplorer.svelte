@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Loader } from "@sparrow/library/ui";
   import { Modal } from "@sparrow/library/ui";
   import { Splitpanes, Pane } from "svelte-splitpanes";
 

@@ -4,14 +4,11 @@ import { handleLoginV2 } from "@app/pages/auth-page/sub-pages/login-page/login-p
 import { listen } from "@tauri-apps/api/event";
 import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { Modal } from "@sparrow/library/ui";
 import { userValidationStore } from "@app/store/deviceSync.store";
 import { getAuthJwt, jwtDecode } from "../utils/jwt";
 import constants from "@app/constants/constants";
 import { EnvironmentRepository } from "../repositories/environment.repository";
 import { WorkspaceRepository } from "../repositories/workspace.repository";
-import { EnvironmentService } from "../services/environment.service";
-import { InitTab } from "@sparrow/common/factory";
 import { GuestUserRepository } from "../repositories/guest-user.repository";
 import { TabRepository } from "../repositories/tab.repository";
 import { navigate } from "svelte-navigator";

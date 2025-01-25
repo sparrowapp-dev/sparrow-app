@@ -5,7 +5,6 @@
   import { WithButton } from "@sparrow/workspaces/hoc";
   import type { TabDocument, TeamDocument } from "@app/database/database";
   import { RecentWorkspace, RecentApis } from "../../../features";
-  import { open } from "@tauri-apps/plugin-shell";
   import { base64ToURL } from "@sparrow/common/utils";
   import { List } from "@sparrow/library/ui";
   import { PeopleIcon } from "@sparrow/library/assets";

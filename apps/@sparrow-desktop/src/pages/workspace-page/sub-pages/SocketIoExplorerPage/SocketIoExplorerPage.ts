@@ -52,7 +52,6 @@ import {
   CollectionItemTypeBaseEnum,
   type CollectionItemBaseInterface,
 } from "@sparrow/common/types/workspace/collection-base";
-import { SocketTabAdapter } from "@app/adapter/socket-tab";
 import type { EventsValues } from "@sparrow/common/types/workspace/socket-io-request-tab";
 import type {
   SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,

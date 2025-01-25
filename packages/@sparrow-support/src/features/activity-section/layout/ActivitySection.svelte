@@ -1,11 +1,9 @@
 <script lang="ts">
   import { user } from "@app/store/auth.store";
   import {
-    ActivityIcon,
     BoxBarIcon,
     CommentIcon,
     CrossIcon,
-    LikeIcon,
     MessageIcon,
     PostIcon,
     SortIcon,
@@ -16,15 +14,14 @@
   import { onMount } from "svelte";
   import { SearchIcon } from "@sparrow/library/assets";
   import { Select } from "@sparrow/library/forms";
-  import { CategoryIcon, StatusIcon } from "@sparrow/library/icons";
+  import { CategoryIcon } from "@sparrow/library/icons";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
-  import { FeedbackStatusType, FeedbackType } from "../../../types/feedback";
+  import { FeedbackType } from "../../../types/feedback";
   import { IconFallback, ImageModal } from "@sparrow/library/ui";
 
   import { ActivityStatusType, ActivityType } from "../../../types/activity";
-  import { Spinner } from "@sparrow/library/ui";
   import { Loader } from "@sparrow/library/ui";
   import { FormatTime } from "@sparrow/common/utils";
   const formatTimeAgo = new FormatTime().formatTimeAgo;

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { of, type Observable } from "rxjs";
+  import { type Observable } from "rxjs";
   import { TestflowExplorerPageViewModel } from "./TestflowExplorerPage.ViewModel";
   import { TestflowExplorer } from "@sparrow/workspaces/features";
   import type { CollectionDocument } from "@app/database/database";

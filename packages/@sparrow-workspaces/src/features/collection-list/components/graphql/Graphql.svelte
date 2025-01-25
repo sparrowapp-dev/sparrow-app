@@ -10,7 +10,7 @@
 
   // --- Icons
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
-  import { GraphIcon, SocketIoIcon } from "@sparrow/library/icons";
+  import { GraphIcon } from "@sparrow/library/icons";
 
   // --- Types
   import {

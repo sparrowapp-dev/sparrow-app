@@ -3,15 +3,12 @@
   import { notifications } from "@sparrow/library/ui";
   import {
     RequestDataType,
-    ResponseFormatter,
   } from "@sparrow/common/enums/request.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
-  import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
   import js_beautify, { html_beautify } from "js-beautify";
   import {
     WithButtonV4,
-    WithSelect,
     WithSelectV2,
   } from "@sparrow/workspaces/hoc";
   import { Tooltip } from "@sparrow/library/ui";

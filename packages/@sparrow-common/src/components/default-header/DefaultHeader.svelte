@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { Select } from "@sparrow/library/forms";
-
-  import { getCurrentWindow } from "@tauri-apps/api/window";
+  
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
   import { SparrowIcon } from "@sparrow/library/icons";
 

@@ -1,12 +1,9 @@
 <script lang="ts">
   import type {
     KeyValuePair,
-    KeyValuePairWithBase,
   } from "@sparrow/common/interfaces/request.interface";
   import { TabularInputTheme } from "../../utils";
-  import { CodeMirrorInput } from "../";
   import { onMount } from "svelte";
-  import { Tooltip } from "@sparrow/library/ui";
   import { Switch } from "@sparrow/library/forms";
   import { ErrorInfoIcon, Information } from "@sparrow/library/icons";
   import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";

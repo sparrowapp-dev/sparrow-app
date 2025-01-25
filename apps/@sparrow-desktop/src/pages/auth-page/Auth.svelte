@@ -1,5 +1,5 @@
 <script lang="ts">
-  import axios, { type Method } from "axios";
+  import axios from "axios";
   import { notifications, Spinner } from "@sparrow/library/ui";
   import {
     logoSparrowSquare,
@@ -8,19 +8,11 @@
   import { DefaultHeader } from "@sparrow/common/components";
   import constants from "@app/constants/constants";
   import {
-    AISparkle,
     AiSparkleIconV2,
-    AiSparkleIconV3,
-    ArrowRightIcon,
     CopyIcon2,
-    StarIcon,
   } from "@sparrow/library/icons";
-  import { StarFilledIcon } from "@sparrow/library/icons";
-  import { CopyIcon } from "@sparrow/library/icons";
-  import { ExternalLinkIcon } from "@sparrow/library/icons";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import { open } from "@tauri-apps/plugin-shell";
-  import { version } from "../../../src-tauri/tauri.conf.json";
   import { Background } from "@sparrow/common/components";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";

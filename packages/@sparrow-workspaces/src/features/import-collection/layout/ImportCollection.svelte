@@ -5,7 +5,6 @@
   import { Select } from "@sparrow/library/forms";
   import {
     debounce,
-    isUrlValid,
     validateClientJSON,
     validateClientURL,
     validateClientXML,

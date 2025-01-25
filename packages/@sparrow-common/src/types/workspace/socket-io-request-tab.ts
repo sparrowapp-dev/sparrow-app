@@ -1,4 +1,3 @@
-import type { UnlistenFn } from "@tauri-apps/api/event";
 import type { WorkspaceUserAgentBaseEnum } from "./workspace-base";
 export enum AuthTypeEnum {
   NO_AUTH = "No Auth",

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Select } from "@sparrow/library/forms";
   import {
-    CloudOffIcon,
     SparrowEdgeIcon,
     StackIcon,
     CheckCircle,

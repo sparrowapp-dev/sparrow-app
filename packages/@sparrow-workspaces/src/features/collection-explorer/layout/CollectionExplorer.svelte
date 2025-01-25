@@ -67,13 +67,11 @@
    */
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
-  import { Tooltip } from "@sparrow/library/ui";
   import { Select } from "@sparrow/library/forms";
 
   /**
    * Enums
    */
-  import { PERMISSION_NOT_FOUND_TEXT } from "@sparrow/common/constants/permissions.constant";
   import type { CollectionDocument, TabDocument } from "@app/database/database";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import type { CollectionDto } from "@sparrow/common/types/workspace";

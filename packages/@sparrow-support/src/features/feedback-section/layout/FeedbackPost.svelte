@@ -1,13 +1,11 @@
 <script lang="ts">
-  import { LeftIcon, SearchIcon } from "@sparrow/library/assets";
+  import { LeftIcon } from "@sparrow/library/assets";
   import { Input, Select, Textarea } from "@sparrow/library/forms";
   import {
     AttachmentIcon,
-    CategoryIcon,
     CrossIcon,
     MessageIcon,
     SortIcon,
-    StatusIcon,
   } from "@sparrow/library/icons";
 
   import { Button, IconFallback, Loader, Modal } from "@sparrow/library/ui";

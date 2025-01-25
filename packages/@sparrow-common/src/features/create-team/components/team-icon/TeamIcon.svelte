@@ -14,7 +14,6 @@
    * Types
    */
   import type { TeamForm } from "../../types";
-  import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
 
   /**

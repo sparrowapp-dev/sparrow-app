@@ -1,10 +1,8 @@
 <script lang="ts">
-  import { type UpdateRequestStateType } from "@sparrow/workspaces/type";
   import {
     RequestSectionEnum,
     ResponseSectionEnum,
   } from "@sparrow/common/types/workspace";
-  import { Label } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   import { Navigator } from "../../../../components";
   export let authParameterLength = 0;

@@ -1,5 +1,4 @@
 import { RxDB } from "../database/database";
-import type { FeatureSwitchDocType } from "../models/feature-switch.model";
 import type { UpdatesDocType } from "../models/updates.model";
 import type { Observable } from "rxjs";
 

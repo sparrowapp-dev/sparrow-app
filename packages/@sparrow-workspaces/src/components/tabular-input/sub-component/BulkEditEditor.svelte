@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterUpdate, onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { basicSetup, basicTheme } from "./bulk-edit-theme";
   import { EditorState, Compartment, type Extension } from "@codemirror/state";
   import { EditorView } from "codemirror";

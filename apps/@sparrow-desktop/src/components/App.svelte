@@ -6,7 +6,6 @@
   import Navigate from "../routing/Navigate.svelte";
   import Dashboard from "@app/pages/dashboard-page/Dashboard.svelte";
   import EntryPoint from "@app/pages/auth-page/Auth.svelte";
-  import { maximizeWindow } from "../utils";
   import { onMount } from "svelte";
   import { user } from "@app/store/auth.store";
   import { handleShortcuts } from "@app/utils/shortcuts";

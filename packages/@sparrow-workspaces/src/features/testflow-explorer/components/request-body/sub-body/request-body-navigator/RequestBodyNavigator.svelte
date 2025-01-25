@@ -1,9 +1,7 @@
 <script lang="ts">
   import { infoColorBlueIcon as infoIcon } from "@sparrow/library/assets";
   import { crossIcon } from "@sparrow/library/assets";
-  import { Select } from "@sparrow/library/forms";
   import { RequestDataType, RequestDataset } from "@sparrow/common/enums";
-  import { notifications } from "@sparrow/library/ui";
   import { WithSelect } from "@sparrow/workspaces/hoc";
   export let method = "";
   export let onUpdateRequestState;

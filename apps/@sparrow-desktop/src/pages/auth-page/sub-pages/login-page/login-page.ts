@@ -3,7 +3,6 @@ import { notifications } from "@sparrow/library/ui";
 import { navigate } from "svelte-navigator";
 import { jwtDecode, setAuthJwt } from "@app/utils/jwt";
 import { setUser } from "@app/store/auth.store";
-import { maximizeWindow } from "../../../../utils";
 import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
