@@ -1204,7 +1204,7 @@ class SocketIoExplorerPageViewModel {
     });
     if (isGlobalVariable) {
       // api payload
-      let payload = {
+      const payload = {
         name: environmentVariables.global.name,
         variable: [
           ...environmentVariables.global.variable,
@@ -1234,11 +1234,11 @@ class SocketIoExplorerPageViewModel {
           payload,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           environmentVariables.global.id,
         );
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = payload.variable;
           envTab.isSaved = true;
@@ -1265,12 +1265,12 @@ class SocketIoExplorerPageViewModel {
           response.data.data,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           response.data.data._id,
         );
 
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = response.data.data.variable;
           envTab.isSaved = true;
@@ -1318,12 +1318,12 @@ class SocketIoExplorerPageViewModel {
           payload,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           environmentVariables.local.id,
         );
 
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = payload.variable;
           envTab.isSaved = true;
@@ -1351,11 +1351,11 @@ class SocketIoExplorerPageViewModel {
           response.data.data,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           response.data.data._id,
         );
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = response.data.data.variable;
           envTab.isSaved = true;

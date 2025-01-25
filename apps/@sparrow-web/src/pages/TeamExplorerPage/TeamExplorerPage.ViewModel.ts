@@ -504,7 +504,7 @@ export class TeamExplorerPageViewModel {
     const res = await this.teamRepository.getTeamData();
     let count = 0;
     for (let index = 0; index < res.length; index++) {
-      let ownerId = res[index]._data.owner;
+      const ownerId = res[index]._data.owner;
 
       if (ownerId === userId) {
         count++;

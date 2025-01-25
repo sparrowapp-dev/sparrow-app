@@ -40,7 +40,7 @@
 
   interface Breadcrum {
     id: string;
-    name: String;
+    name: string;
   }
 
   let querySchema: QuerySchema[] = [];

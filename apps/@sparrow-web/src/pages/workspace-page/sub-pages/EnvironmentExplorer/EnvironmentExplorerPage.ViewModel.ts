@@ -96,7 +96,7 @@ export class EnvironmentExplorerViewModel {
     let result = true;
     const progressiveTab = createDeepCopy(this._tab.getValue());
 
-    let environmentServer = await this.environmentRepository.readEnvironment(
+    const environmentServer = await this.environmentRepository.readEnvironment(
       progressiveTab.id,
     );
 

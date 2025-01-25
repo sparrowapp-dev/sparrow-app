@@ -768,7 +768,7 @@ export class TestflowExplorerPageViewModel {
       );
 
       testFlowDataStore.update((testFlowDataMap) => {
-        let wsData = testFlowDataMap.get(progressiveTab?.tabId as string); // Retrieve data for the current tab
+        const wsData = testFlowDataMap.get(progressiveTab?.tabId as string); // Retrieve data for the current tab
 
         // Update existing data or initialize if not found
         if (wsData) {
@@ -821,7 +821,7 @@ export class TestflowExplorerPageViewModel {
       }
     }
     testFlowDataStore.update((testFlowDataMap) => {
-      let wsData = testFlowDataMap.get(progressiveTab?.tabId as string); // Retrieve data for the current tab
+      const wsData = testFlowDataMap.get(progressiveTab?.tabId as string); // Retrieve data for the current tab
 
       // Update existing data or initialize if not found
       if (wsData) {

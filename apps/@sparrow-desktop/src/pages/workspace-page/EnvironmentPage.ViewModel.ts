@@ -284,7 +284,7 @@ export class EnvironmentViewModel {
       this.environmentRepository.updateEnvironment(env.id, {
         name: newEnvironmentName,
       });
-      let currentTab = await this.tabRepository.getTabById(env.id);
+      const currentTab = await this.tabRepository.getTabById(env.id);
       if (currentTab) {
         await this.tabRepository.updateTab(currentTab?.tabId as string, {
           name: newEnvironmentName,
@@ -303,7 +303,7 @@ export class EnvironmentViewModel {
       this.environmentRepository.updateEnvironment(env.id, {
         name: newEnvironmentName,
       });
-      let currentTab = await this.tabRepository.getTabById(env.id);
+      const currentTab = await this.tabRepository.getTabById(env.id);
       if (currentTab) {
         await this.tabRepository.updateTab(currentTab.tabId as string, {
           name: newEnvironmentName,

@@ -22,7 +22,7 @@ import { ContentTypeEnum } from "../enums";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 let tree: any[];
 const filterTree: Collection[] = [];
-let selectedAPIMethods: string[] = [];
+const selectedAPIMethods: string[] = [];
 // selectMethodsStore.subscribe((value) => {
 //   if (value) {
 //     selectedAPIMethods = value;

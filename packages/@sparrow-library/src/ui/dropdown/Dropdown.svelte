@@ -17,9 +17,9 @@
    * Options of the menu
    */
   export let options: {
-    name: String;
+    name: string;
     icon?: any;
-    color: String;
+    color: string;
     iconColor?: string;
     iconSize?: string;
     onclick: () => void;

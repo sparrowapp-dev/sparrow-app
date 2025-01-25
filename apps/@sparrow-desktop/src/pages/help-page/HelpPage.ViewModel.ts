@@ -123,7 +123,7 @@ class HelpPageViewModel {
    */
   public getAllReleaseNotes = async () => {
     const releaseNotes = await this.releaseRepository.findAll();
-    let response = releaseNotes
+    const response = releaseNotes
       .map((value) => {
         return value.toMutableJSON();
       })
@@ -250,8 +250,8 @@ class HelpPageViewModel {
       limit,
       skip,
     );
-    let voteList = await this.listVote();
-    let result = response.data.posts?.map((post) => {
+    const voteList = await this.listVote();
+    const result = response.data.posts?.map((post) => {
       const isLiked = voteList.data.votes.some(
         (vote) => vote.post.id === post.id,
       );

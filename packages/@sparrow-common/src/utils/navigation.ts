@@ -12,7 +12,7 @@ export const moveNavigation = (direction: string) => {
     sideScroll(navigation, "left", 25, 100, 50);
   } else {
     let count = 0;
-    let scroll = setInterval(() => {
+    const scroll = setInterval(() => {
       count++;
       if (count === 5){
         clearInterval(scroll)

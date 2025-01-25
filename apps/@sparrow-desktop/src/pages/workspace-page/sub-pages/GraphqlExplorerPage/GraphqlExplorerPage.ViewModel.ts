@@ -163,7 +163,7 @@ class GraphqlExplorerViewModel {
           progressiveTab.id,
         );
     }
-    let graphqlServerTab = new InitTab().graphQl("uuid", "uuid");
+    const graphqlServerTab = new InitTab().graphQl("uuid", "uuid");
     let graphqlTabData;
     if (requestServer) {
       graphqlTabData = graphqlServerTab
@@ -383,7 +383,7 @@ class GraphqlExplorerViewModel {
           reverseJson?.items,
         );
       }
-      let updatedQueryMutationJSON = parsedSchema;
+      const updatedQueryMutationJSON = parsedSchema;
       if (
         progressiveTab.property.graphql.state.operationNavigation ===
         GraphqlRequestOperationTabEnum.QUERY
@@ -625,7 +625,7 @@ class GraphqlExplorerViewModel {
         const typeName = resolveType(field.type);
         const isCustomType = !isScalarType(typeName);
 
-        let result = {
+        const result = {
           id: uuidv4(), // Add UUID to the top-level object
           name: fieldName,
           description: field.description,
@@ -1565,7 +1565,7 @@ class GraphqlExplorerViewModel {
     const { signal } = abortController;
 
     graphqlExplorerDataStore.update((restApiDataMap) => {
-      let data = restApiDataMap.get(progressiveTab?.tabId);
+      const data = restApiDataMap.get(progressiveTab?.tabId);
       if (data) {
         data.isSendRequestInProgress = true;
         restApiDataMap.set(progressiveTab.tabId, data);
@@ -1612,10 +1612,10 @@ class GraphqlExplorerViewModel {
             value: elem[1],
           });
         });
-        let responseStatus = response.data.status;
+        const responseStatus = response.data.status;
 
         graphqlExplorerDataStore.update((restApiDataMap) => {
-          let data = restApiDataMap.get(progressiveTab?.tabId);
+          const data = restApiDataMap.get(progressiveTab?.tabId);
           if (data) {
             data.response.body = responseBody;
             data.response.headers = responseHeaders;
@@ -2103,7 +2103,7 @@ class GraphqlExplorerViewModel {
     if (path.length > 0) {
       const graphqlTabAdapter = new GraphqlTabAdapter();
       const unadaptedRequest = graphqlTabAdapter.unadapt(componentData as Tab);
-      let req = {
+      const req = {
         id: uuidv4(),
         name: tabName,
         description,
@@ -2447,7 +2447,7 @@ class GraphqlExplorerViewModel {
     const isGuestUser = await this.getGuestUserState();
     if (isGlobalVariable) {
       // api payload
-      let payload = {
+      const payload = {
         name: environmentVariables.global.name,
         variable: [
           ...environmentVariables.global.variable,
@@ -2477,11 +2477,11 @@ class GraphqlExplorerViewModel {
           payload,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           environmentVariables.global.id,
         );
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = payload.variable;
           envTab.isSaved = true;
@@ -2508,12 +2508,12 @@ class GraphqlExplorerViewModel {
           response.data.data,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           response.data.data._id,
         );
 
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = response.data.data.variable;
           envTab.isSaved = true;
@@ -2561,12 +2561,12 @@ class GraphqlExplorerViewModel {
           payload,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           environmentVariables.local.id,
         );
 
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = payload.variable;
           envTab.isSaved = true;
@@ -2594,7 +2594,7 @@ class GraphqlExplorerViewModel {
           response.data.data,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           response.data.data._id,
         );
         if (currentTab) {
@@ -2656,9 +2656,9 @@ class GraphqlExplorerViewModel {
     const isGuestUser = await this.getGuestUserState();
     if (newCollectionName) {
       if (isGuestUser == true) {
-        let collection =
+        const collection =
           await this.collectionRepository.readCollection(collectionId);
-        let col = collection.toMutableJSON();
+        const col = collection.toMutableJSON();
         col.name = newCollectionName;
         this.collectionRepository.updateCollection(collectionId, col);
         // notifications.success("Collection renamed successfully!");

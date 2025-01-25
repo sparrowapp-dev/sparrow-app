@@ -734,7 +734,7 @@ class RestExplorerViewModel
     const { signal } = abortController; // Extract the signal for the request
 
     restExplorerDataStore.update((restApiDataMap) => {
-      let data = restApiDataMap.get(progressiveTab?.tabId);
+      const data = restApiDataMap.get(progressiveTab?.tabId);
       if (data) {
         data.isSendRequestInProgress = true;
       }
@@ -784,12 +784,12 @@ class RestExplorerViewModel
               value: elem[1],
             });
           });
-          let responseStatus = response.data.status;
+          const responseStatus = response.data.status;
           const bodyLanguage =
             this._decodeRequest.setResponseContentType(responseHeaders);
 
           restExplorerDataStore.update((restApiDataMap) => {
-            let data = restApiDataMap.get(progressiveTab?.tabId);
+            const data = restApiDataMap.get(progressiveTab?.tabId);
             if (data) {
               data.response.body = responseBody;
               data.response.headers = responseHeaders;
@@ -1293,7 +1293,7 @@ class RestExplorerViewModel
     if (path.length > 0) {
       const requestTabAdapter = new RequestTabAdapter();
       const unadaptedRequest = requestTabAdapter.unadapt(componentData);
-      let req = {
+      const req = {
         id: uuidv4(),
         name: tabName,
         description,
@@ -1604,7 +1604,7 @@ class RestExplorerViewModel
     });
     if (isGlobalVariable) {
       // api payload
-      let payload = {
+      const payload = {
         name: environmentVariables.global.name,
         variable: [
           ...environmentVariables.global.variable,
@@ -1634,11 +1634,11 @@ class RestExplorerViewModel
           payload,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           environmentVariables.global.id,
         );
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = payload.variable;
           envTab.isSaved = true;
@@ -1665,12 +1665,12 @@ class RestExplorerViewModel
           response.data.data,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           response.data.data._id,
         );
 
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = response.data.data.variable;
           envTab.isSaved = true;
@@ -1718,12 +1718,12 @@ class RestExplorerViewModel
           payload,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           environmentVariables.local.id,
         );
 
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = payload.variable;
           envTab.isSaved = true;
@@ -1751,7 +1751,7 @@ class RestExplorerViewModel
           response.data.data,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           response.data.data._id,
         );
         if (currentTab) {

@@ -295,7 +295,7 @@ const sendSocketIoMessage = async (
     }
     return webSocketDataMap;
   });
-  let urlObject = new URL(url);
+  const urlObject = new URL(url);
   await invoke("send_socket_io_message", {
     tabid: tab_id,
     event: _eventName,
@@ -306,7 +306,7 @@ const sendSocketIoMessage = async (
         // Logic to handle response
         socketIoDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
-          let asdf = [];
+          const asdf = [];
           asdf.push(_eventName);
           asdf.push(message || "(empty)");
           const r = JSON.stringify(asdf);

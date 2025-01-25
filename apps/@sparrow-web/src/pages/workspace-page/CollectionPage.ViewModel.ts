@@ -5006,7 +5006,7 @@ export default class CollectionsViewModel {
     if (path.length > 0) {
       const graphqlTabAdapter = new GraphqlTabAdapter();
       const unadaptedRequest = graphqlTabAdapter.unadapt(componentData as Tab);
-      let req = {
+      const req = {
         id: uuidv4(),
         name: tabName,
         description,
