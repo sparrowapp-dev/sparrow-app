@@ -25,7 +25,6 @@ import type {
   HttpClientResponseInterface,
 } from "@app/types/http-client";
 import {
-  CollectionItemTypeDtoEnum,
   type CollectionDtoInterface,
   type CollectionItemDtoInterface,
 } from "@sparrow/common/types/workspace/collection-dto";

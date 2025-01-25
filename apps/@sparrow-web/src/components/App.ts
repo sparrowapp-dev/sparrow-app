@@ -1,5 +1,4 @@
 import constants from "../constants/constants";
-import { notifications } from "@sparrow/library/ui";
 import { navigate } from "svelte-navigator";
 import { jwtDecode, setAuthJwt, getAuthJwt } from "../utils/jwt";
 import { isGuestUserActive, setUser } from "../store/auth.store";

@@ -42,7 +42,6 @@
   import { EnvironmentViewModel } from "@app/pages/workspace-page/EnvironmentPage.ViewModel";
 
   // ---- helpers
-  import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   import type { TabDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { onMount } from "svelte";
@@ -50,7 +49,6 @@
 
   import type {
     CollectionDocument,
-    EnvironmentDocument,
     WorkspaceDocument,
   } from "@app/database/database";
   import type { GithubRepoDocType } from "../../models/github-repo.model";
@@ -65,13 +63,10 @@
   import TestFlowExplorerPage from "./sub-pages/TestflowExplorerPage/TestflowExplorerPage.svelte";
   import { TestflowViewModel } from "./Testflow.ViewModel";
   // import { version } from "../../../src-tauri/tauri.conf.json";
-  import { Button } from "@sparrow/library/ui";
   import { isUserFirstSignUp } from "@app/store/user.store";
-  import { WelcomeLogo } from "@sparrow/common/images";
   import { WelcomePopup } from "@sparrow/workspaces/features";
   import SocketIoExplorerPage from "./sub-pages/SocketIoExplorerPage/SocketIoExplorerPage.svelte";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
-  import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import constants from "src/constants/constants";
 

@@ -4,7 +4,7 @@
     LoginBanner,
     LoginSignupConfirmation,
   } from "@sparrow/common/components";
-  import { Route, navigate } from "svelte-navigator";
+  import { Route } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import { DashboardViewModel } from "./Dashboard.ViewModel";
   import { navigationState, user } from "@app/store/auth.store";

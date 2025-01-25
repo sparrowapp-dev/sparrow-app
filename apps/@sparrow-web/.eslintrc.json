@@ -3,7 +3,7 @@
     "browser": true,
     "es2021": true
   },
-  "plugins": ["svelte", "@typescript-eslint"],
+  "plugins": ["svelte", "@typescript-eslint", "unused-imports"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
@@ -33,6 +33,7 @@
   ],
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
+    "unused-imports/no-unused-imports": "error", // Automatically remove unused imports
     "no-console": ["error", { "allow": ["warn", "error"] }], // allows console.log() and console.warn()
     "no-debugger": "error"
   }

@@ -14,9 +14,8 @@
   import { onDestroy, onMount } from "svelte";
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
   import { BackIcon } from "@sparrow/library/icons";
-  import { navigate } from "svelte-navigator";
-
-  export let activeTeamTab;
+  
+export let activeTeamTab;
   export let onUpdateActiveTab;
 
   let isDeleteWorkspaceModalOpen = false;

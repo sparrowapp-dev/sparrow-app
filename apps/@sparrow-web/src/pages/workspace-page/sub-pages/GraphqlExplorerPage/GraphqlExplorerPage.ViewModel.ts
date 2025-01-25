@@ -5,8 +5,6 @@ import {
 } from "@sparrow/workspaces/features/graphql-explorer/utils";
 import {
   createDeepCopy,
-  moveNavigation,
-  throttle,
 } from "@sparrow/common/utils";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 
@@ -23,7 +21,7 @@ import { CollectionRepository } from "../../../../repositories/collection.reposi
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { EnvironmentRepository } from "../../../../repositories/environment.repository";
 import { BehaviorSubject, Observable } from "rxjs";
-import { Events, ItemType, ResponseStatusCode } from "@sparrow/common/enums";
+import { Events } from "@sparrow/common/enums";
 import type { CreateDirectoryPostBody } from "@sparrow/common/dto";
 
 // ---- Service
@@ -39,7 +37,6 @@ import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
 import {
   type KeyValue,
-  ResponseSectionEnum,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 // import { GraphqlTabAdapter } from "../../../../adapter";
@@ -53,16 +50,13 @@ import { InitTab } from "@sparrow/common/factory";
 import type { Path, Tab } from "@sparrow/common/types/workspace/tab";
 import type {
   GraphqlRequestAuthTabInterface,
-  GraphqlRequestHeadersTabInterface,
   GraphqlRequestKeyValueCheckedTabInterface,
   GraphqlRequestStateTabInterface,
-  GraphqlRequestTabInterface,
 } from "@sparrow/common/types/workspace/graphql-request-tab";
 import {
   type EnvironmentFilteredVariableBaseInterface,
   type EnvironmentLocalGlobalJoinBaseInterface,
 } from "@sparrow/common/types/workspace/environment-base";
-import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 class GraphqlExplorerViewModel {
   /**
    * Repository

@@ -21,9 +21,8 @@
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import TeamExplorerPage from "../TeamExplorerPage/TeamExplorerPage.svelte";
   import { TeamsViewModel } from "./Teams.ViewModel";
-  import { Modal, Tooltip, Dropdown } from "@sparrow/library/ui";
+  import { Modal, Tooltip } from "@sparrow/library/ui";
   import { pagesMotion } from "../../constants";
-  import { version } from "../../../package.json";
   import { CreateTeam } from "@sparrow/common/features";
   import { LaunchDesktop } from "@sparrow/common/components";
 
@@ -47,10 +46,7 @@
   import { user } from "src/store/auth.store";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
-  import { ListTeamNavigation } from "@sparrow/teams/features";
-  import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import constants from "../../constants/constants";
-  import { navigate } from "svelte-navigator";
   import type { TeamDocType } from "src/models/team.model";
   import { WelcomePopUpWeb } from "@sparrow/common/components";
   import type { GithubRepoDocType } from "src/models/github-repo.model";

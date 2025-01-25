@@ -7,7 +7,6 @@ import { environmentType } from "@sparrow/common/enums/environment.enum";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { InitTab } from "@sparrow/common/factory";
 import { v4 as uuidv4 } from "uuid";
-import { GuideRepository } from "../../repositories/guide.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { TabRepository } from "../../repositories/tab.repository";
 

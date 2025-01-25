@@ -1,4 +1,3 @@
-import { ContentTypeEnum } from "@sparrow/common/enums";
 import { createDeepCopy } from "@sparrow/common/utils";
 import { type Path, type Tab } from "@sparrow/common/types/workspace/tab";
 import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";

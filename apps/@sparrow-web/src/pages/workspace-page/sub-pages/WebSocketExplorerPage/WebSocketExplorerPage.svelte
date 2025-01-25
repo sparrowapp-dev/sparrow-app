@@ -4,11 +4,9 @@
 
   // ---- View Model
   import WebSocketViewModel from "./WebSocketExplorerPage.ViewModel";
-  import { RestExplorer, ChatBot } from "@sparrow/workspaces/features";
   import { Debounce } from "@sparrow/common/utils";
   import { isGuestUserActive, user } from "@app/store/auth.store";
   import { onMount } from "svelte";
-  import type { Tab } from "@sparrow/common/types/workspace";
   import type { TabDocument, WorkspaceDocument } from "@app/database/database";
   import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
   export let tab: TabDocument;

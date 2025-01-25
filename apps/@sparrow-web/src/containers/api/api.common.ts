@@ -11,7 +11,6 @@ import { DashboardViewModel } from "@app/pages/Dashboard/Dashboard.ViewModel";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 import type { HttpClientResponseInterface as HttpClientResponseInterface } from "@sparrow/common/http-client/client";
-import { listen } from "@tauri-apps/api/event";
 import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
 import { v4 as uuidv4 } from "uuid";
 import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
