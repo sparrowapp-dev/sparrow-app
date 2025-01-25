@@ -34,6 +34,7 @@
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
     "svelte/valid-compile":"off",
+    "@typescript-eslint/no-unused-vars":"off",
     "no-console": ["error", { "allow": ["warn", "error", "info", "debug", "trace", "table", "group", "groupEnd"] }], // allows dependency array
     "no-debugger": "error"
   }
