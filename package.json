@@ -127,6 +127,7 @@
     "svelte-eslint-parser": "^0.43.0",
     "svelte-loading-spinners": "^0.3.4",
     "svelte-preprocess": "^5.0.4",
+    "ts-migrate": "^0.1.35",
     "tslib": "^2.6.0",
     "typescript": "^5.0.2",
     "vite": "^4.4.4",

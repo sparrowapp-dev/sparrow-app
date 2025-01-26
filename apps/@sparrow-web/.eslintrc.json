@@ -19,8 +19,57 @@
         "extraFileExtensions": [".svelte"],
         "ecmaVersion": "latest",
         "sourceType": "module"
+      },
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-this-alias": "off",
+        "@typescript-eslint/ban-types": "off",
+        "svelte/valid-compile": "off",
+        "no-prototype-builtins": "off",
+        "svelte/no-at-html-tags": "off",
+        "no-irregular-whitespace": "off",
+        "no-empty": "off",
+        "no-undef": "off",
+        "no-useless-escape": "off",
+        "svelte/no-dupe-style-properties": "off",
+        "svelte/no-shorthand-style-property-overrides": "off",
+        "no-dupe-keys": "off",
+        "no-unsafe-optional-chaining": "off",
+        "prefer-rest-params": "off",
+        "no-import-assign": "off",
+        "no-useless-catch": "off",
+        "no-unused-labels": "off",
+        "@typescript-eslint/explicit-module-boundary-types": ["off"],
+        "@typescript-eslint/typedef": [
+          "off",
+          {
+            "parameter": true,
+            "arrowParameter": true,
+            "propertyDeclaration": true,
+            "variableDeclaration": false,
+            "memberVariableDeclaration": false
+          }
+        ],
+        "no-console": [
+          "warn",
+          {
+            "allow": [
+              "warn",
+              "error",
+              "info",
+              "debug",
+              "trace",
+              "table",
+              "group",
+              "groupEnd"
+            ]
+          }
+        ], // allows dependency array
+        "no-debugger": "warn"
       }
     },
+    
     {
       "files": ["*.ts"],
       "parser": "@typescript-eslint/parser",
@@ -28,44 +77,55 @@
         "ecmaVersion": "latest",
         "sourceType": "module",
         "project": null
+      },
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-this-alias": "off",
+        "@typescript-eslint/ban-types": "off",
+        "svelte/valid-compile": "off",
+        "no-prototype-builtins": "off",
+        "svelte/no-at-html-tags": "off",
+        "no-irregular-whitespace": "off",
+        "no-empty": "off",
+        "no-undef": "off",
+        "no-useless-escape": "off",
+        "svelte/no-dupe-style-properties": "off",
+        "svelte/no-shorthand-style-property-overrides": "off",
+        "no-dupe-keys": "off",
+        "no-unsafe-optional-chaining": "off",
+        "prefer-rest-params": "off",
+        "no-import-assign": "off",
+        "no-useless-catch": "off",
+        "no-unused-labels": "off",
+        "@typescript-eslint/explicit-module-boundary-types": ["off"],
+        "@typescript-eslint/typedef": [
+          "error",
+          {
+            "parameter": true,
+            "arrowParameter": true,
+            "propertyDeclaration": true,
+            "variableDeclaration": false,
+            "memberVariableDeclaration": false
+          }
+        ],
+        "no-console": [
+          "warn",
+          {
+            "allow": [
+              "warn",
+              "error",
+              "info",
+              "debug",
+              "trace",
+              "table",
+              "group",
+              "groupEnd"
+            ]
+          }
+        ], // allows dependency array
+        "no-debugger": "warn"
       }
     }
-  ],
-  "rules": {
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-unused-vars": "off",
-    "@typescript-eslint/no-this-alias": "off",
-    "@typescript-eslint/ban-types": "off",
-    "svelte/valid-compile": "off",
-    "no-prototype-builtins": "off",
-    "svelte/no-at-html-tags": "off",
-    "no-irregular-whitespace": "off",
-    "no-empty": "off",
-    "no-undef": "off",
-    "no-useless-escape": "off",
-    "svelte/no-dupe-style-properties": "off",
-    "svelte/no-shorthand-style-property-overrides": "off",
-    "no-dupe-keys": "off",
-    "no-unsafe-optional-chaining": "off",
-    "prefer-rest-params": "off",
-    "no-import-assign": "off",
-    "no-useless-catch": "off",
-    "no-unused-labels": "off",
-    "no-console": [
-      "warn",
-      {
-        "allow": [
-          "warn",
-          "error",
-          "info",
-          "debug",
-          "trace",
-          "table",
-          "group",
-          "groupEnd"
-        ]
-      }
-    ], // allows dependency array
-    "no-debugger": "warn"
-  }
+  ]
 }
