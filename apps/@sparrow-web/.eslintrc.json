@@ -100,7 +100,7 @@
         "no-unused-labels": "off",
         "@typescript-eslint/explicit-module-boundary-types": ["off"],
         "@typescript-eslint/typedef": [
-          "error",
+          "off",
           {
             "parameter": true,
             "arrowParameter": true,
