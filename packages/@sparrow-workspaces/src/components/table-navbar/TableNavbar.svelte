@@ -57,7 +57,7 @@
         />
       </span>
     </Tooltip>
-    <Tooltip title="Close" placement={"bottom-left"} zIndex={100}>
+    <Tooltip title="Close" placement={"bottom-right"} zIndex={100}>
       <span on:click={onClose} class="pe-2">
         <CrossIcon
           width={"14px"}
