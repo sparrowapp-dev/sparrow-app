@@ -1,8 +1,24 @@
 export enum SidebarItemPositionBaseEnum {
-    PRIMARY= "primary",
-    SECONDARY="secondary",
-}
-export interface SidebarItemBaseInfterface  {
+    PRIMARY = "primary",
+    SECONDARY = "secondary",
+  }
+  
+  export enum SidebarItemImgEnum {
+    HOME = "Home",
+    WORKSPACE = "Workspace",
+    COMMUNITY = "Community",
+    SETTING = "Setting",
+  }
+  
+  export interface SidebarItemBaseInterface {
+    id: string;
+    route: string;
+    heading: string;
+    disabled: boolean;
+    position: SidebarItemPositionBaseEnum;
+  }
+  
+  export interface SidebarItemBaseAllIconInterface {
     id: string;
     route: string;
     heading: string;
@@ -11,4 +27,5 @@ export interface SidebarItemBaseInfterface  {
     selectedLogo?: string;
     disabled: boolean;
     position: SidebarItemPositionBaseEnum;
-  };
+  }
+  

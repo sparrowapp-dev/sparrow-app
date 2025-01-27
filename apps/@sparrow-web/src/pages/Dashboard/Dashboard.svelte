@@ -1,9 +1,9 @@
 <script lang="ts">
   import {
-    Sidebar,
     LoginBanner,
     LoginSignupConfirmation,
   } from "@sparrow/common/components";
+  import { Sidebar } from "@sparrow/common/features";
   import { Route, navigate } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import { DashboardViewModel } from "./Dashboard.ViewModel";
@@ -22,7 +22,7 @@
   import CollectionsPage from "../workspace-page/CollectionsPage.svelte";
 
   import {
-    type SidebarItemObj,
+    type SidebarItemBaseInterface,
     SidebarItemPositionBaseEnum,
   } from "@sparrow/common/types/sidebar/sidebar-base";
   import { isGuestUserActive } from "@app/store/auth.store";
@@ -132,14 +132,11 @@
     isGuestUser = value;
   });
 
-  let sidebarItems: SidebarItemObj[] = [
+  let sidebarItems: SidebarItemBaseInterface = [
     {
       id: "Home",
       route: !isGuestUser ? "/app/home" : "/guest/home",
       heading: "Home",
-      defaultLogo: "home", // Replace with actual image paths
-      hoveredLogo: "hoveredHome",
-      selectedLogo: "selectedHome",
       disabled: false,
       position: SidebarItemPositionBaseEnum.PRIMARY,
     },
@@ -147,9 +144,6 @@
       id: "Workspace",
       route: !isGuestUser ? "/app/collections" : "/guest/collections",
       heading: "Workspace",
-      defaultLogo: "collections",
-      hoveredLogo: "hoveredCollections",
-      selectedLogo: "selectedCollections",
       disabled: false,
       position: SidebarItemPositionBaseEnum.PRIMARY,
     },
@@ -157,9 +151,6 @@
       id: "Community",
       route: "/app/help",
       heading: "Community",
-      defaultLogo: "help",
-      hoveredLogo: "hoveredHelp",
-      selectedLogo: "selectedHelp",
       disabled: true,
       position: SidebarItemPositionBaseEnum.SECONDARY,
     },
@@ -167,9 +158,6 @@
       id: "Setting",
       route: "/app/setting",
       heading: "Setting",
-      defaultLogo: "settings",
-      hoveredLogo: "hoveredSettings",
-      selectedLogo: "selectedSettings",
       disabled: true,
       position: SidebarItemPositionBaseEnum.SECONDARY,
     },

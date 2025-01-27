@@ -15,21 +15,28 @@
     help,
     hoveredHelp,
     selectedHelp,
-  } from "../../images";
+  } from "../images";
 
-  import SidebarItem from "./SidebarItem.svelte";
-  import { type SidebarItemObj } from "../../types/sidebar/sidebar-base";
+  import SidebarItem from "../components/SidebarItem.svelte";
+  import {
+    type SidebarItemBaseInfterface,
+    SidebarItemImgEnum,
+    SidebarItemPositionBaseEnum,
+    type SidebarItemBaseAllIconInterface,
+  } from "../../../types/sidebar/sidebar-base";
 
   // import { isGuestUserActive } from "@app/store/auth.store";
 
   let componentClass = "";
   export { componentClass as class };
   export let user;
-  export let sidebarItems: SidebarItemObj[] = [];
+  export let sidebarItems: SidebarItemBaseInfterface[] = [];
   export let isGuestUser;
   export let isVisible = true;
   export let onLogout: () => void;
   export let type = "desktop";
+
+  const SidebarImageItem: SidebarItemBaseAllIconInterface[] = [];
 
   let divHeight = 0;
 
@@ -43,38 +50,43 @@
   }
 
   sidebarItems.forEach((item) => {
-    if (item.id === "Home") {
-      item.defaultLogo = home;
-      item.hoveredLogo = hoveredHome;
-      item.selectedLogo = selectedHome;
-    } else if (item.id === "Workspace") {
-      item.defaultLogo = collections;
-      item.hoveredLogo = hoveredCollections;
-      item.selectedLogo = selectedCollections;
-    } else if (item.id === "Community") {
-      item.defaultLogo = help;
-      item.hoveredLogo = hoveredHelp;
-      item.selectedLogo = selectedHelp;
-    } else if (item.id === "Setting") {
-      item.defaultLogo = settings;
-      item.hoveredLogo = hoveredSettings;
-      item.selectedLogo = selectedSettings;
+    const sidebarItemWithIcons: SidebarItemBaseAllIconInterface = {
+      ...item,
+      defaultLogo: "",
+      hoveredLogo: "",
+      selectedLogo: "",
+    };
+
+    if (item.id === SidebarItemImgEnum.HOME) {
+      sidebarItemWithIcons.defaultLogo = home;
+      sidebarItemWithIcons.hoveredLogo = hoveredHome;
+      sidebarItemWithIcons.selectedLogo = selectedHome;
+    } else if (item.id === SidebarItemImgEnum.WORKSPACE) {
+      sidebarItemWithIcons.defaultLogo = collections;
+      sidebarItemWithIcons.hoveredLogo = hoveredCollections;
+      sidebarItemWithIcons.selectedLogo = selectedCollections;
+    } else if (item.id === SidebarItemImgEnum.COMMUNITY) {
+      sidebarItemWithIcons.defaultLogo = help;
+      sidebarItemWithIcons.hoveredLogo = hoveredHelp;
+      sidebarItemWithIcons.selectedLogo = selectedHelp;
+    } else if (item.id === SidebarItemImgEnum.SETTING) {
+      sidebarItemWithIcons.defaultLogo = settings;
+      sidebarItemWithIcons.hoveredLogo = hoveredSettings;
+      sidebarItemWithIcons.selectedLogo = selectedSettings;
     }
+
+    SidebarImageItem.push(sidebarItemWithIcons);
   });
-
-  let primarySidebarItems = sidebarItems.filter(
-    (item) => item.position === "primary",
+  let primarySidebarItems = SidebarImageItem.filter(
+    (item) => item.position === SidebarItemPositionBaseEnum.PRIMARY,
   );
-  let secondarySidebarItems = sidebarItems.filter(
-    (item) => item.position === "secondary",
+  let secondarySidebarItems = SidebarImageItem.filter(
+    (item) => item.position === SidebarItemPositionBaseEnum.SECONDARY,
   );
 
-  let screenWidth = window.innerWidth;
-
-  function handleResize() {
-    screenWidth = window.innerWidth;
+  const handleResize = () => {
     logPositions(initialId);
-  }
+  };
 
   onMount(() => {
     window.addEventListener("resize", handleResize);
@@ -82,7 +94,9 @@
       window.removeEventListener("resize", handleResize);
     };
   });
+
   let initialId = "";
+
   afterUpdate(() => {
     console.log("clicked");
     if (initialId) {
@@ -90,7 +104,9 @@
     }
   });
 
-  const slidebarPlace = (idCheck, id) => {
+  //* @param idCheck - Boolean indicating whether the ID is valid.
+  // * @param id - The ID to process.
+  const slidebarPlace = (idCheck: boolean, id: string) => {
     if (idCheck) {
       initialId = id;
       logPositions(id);
