@@ -224,7 +224,11 @@
         -webkit-background-clip: initial;
         -webkit-text-fill-color: initial;
     }
-
+    .not-found-text {
+        color: var(--request-arc);
+        font-size: 16px;
+        text-align: center;
+    }
   @media only screen and (max-width: 1100px) {
     .search-input-container {
       width: 50vw;
