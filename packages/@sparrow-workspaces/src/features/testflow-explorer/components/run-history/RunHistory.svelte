@@ -39,7 +39,7 @@
     <Tooltip
       title="History"
       show={!testflowStore?.isRunHistoryEnable}
-      placement="bottom-left"
+      placement="bottom-right"
       distance={10}
     >
       <WithButtonV5
