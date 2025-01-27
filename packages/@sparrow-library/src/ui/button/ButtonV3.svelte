@@ -13,7 +13,9 @@
   export let buttonStartIcon: string | undefined = undefined;
   export let buttonStartIconStyle = "";
   export let allowChild = false;
-  export let tooltipText = "Button is disabled";
+
+  // Generate the sizeStyleProp based on length and breadth props
+
   export let type:
     | "primary"
     | "secondary"
@@ -109,11 +111,11 @@
       ? "border-radius: 4px; padding: 6px 12px; white-space: nowrap;"
       : ""
   } `}
-  class={`${buttonClassProp} ${
+  class={`${buttonClassProp}  ${
     type !== "other" && type !== "icon"
-      ? "py-1 px-3  d-flex align-items-center"
+      ? "py-1 px-3 d-flex align-items-center"
       : ""
-  } ${btnClass} `}
+  } ${btnClass}`}
   on:click={(e) => {
     onClick(e);
   }}
@@ -122,7 +124,7 @@
     <img
       src={buttonStartIcon}
       class="me-2"
-      style={`${buttonStartIconStyle} height: 20px; width:20px;`}
+      style={`${buttonStartIconStyle} height: 20px; width: 20px;`}
       alt="icon"
     />
   {/if}
