@@ -1,9 +1,9 @@
 <script lang="ts">
   import {
-    Sidebar,
     LoginBanner,
     LoginSignupConfirmation,
   } from "@sparrow/common/components";
+  import { Sidebar } from "@sparrow/common/features";
   import { Route, navigate } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import { DashboardViewModel } from "./Dashboard.ViewModel";
@@ -21,6 +21,12 @@
   import { CreateTeam } from "@sparrow/common/features";
   import CollectionsPage from "../workspace-page/CollectionsPage.svelte";
 
+  import {
+    type SidebarItemBaseInterface,
+    SidebarItemPositionBaseEnum,
+    SidebarItemIdEnum,
+  } from "@sparrow/common/types/sidebar/sidebar-base";
+  import { isGuestUserActive } from "@app/store/auth.store";
   const _viewModel = new DashboardViewModel();
   let userId;
   const userUnsubscribe = user.subscribe(async (value) => {
@@ -123,6 +129,40 @@
   let showProgressBar = false;
 
   let isCreateTeamModalOpen: boolean = false;
+  isGuestUserActive.subscribe((value) => {
+    isGuestUser = value;
+  });
+
+  let sidebarItems: SidebarItemBaseInterface = [
+    {
+      id: SidebarItemIdEnum.HOME,
+      route: !isGuestUser ? "/app/home" : "/guest/home",
+      heading: "Home",
+      disabled: false,
+      position: SidebarItemPositionBaseEnum.PRIMARY,
+    },
+    {
+      id: SidebarItemIdEnum.WORKSPACE,
+      route: !isGuestUser ? "/app/collections" : "/guest/collections",
+      heading: "Workspace",
+      disabled: false,
+      position: SidebarItemPositionBaseEnum.PRIMARY,
+    },
+    {
+      id: SidebarItemIdEnum.COMMUNITY,
+      route: "/app/help",
+      heading: "Community",
+      disabled: true,
+      position: SidebarItemPositionBaseEnum.SECONDARY,
+    },
+    {
+      id: SidebarItemIdEnum.SETTING,
+      route: "/app/setting",
+      heading: "Setting",
+      disabled: true,
+      position: SidebarItemPositionBaseEnum.SECONDARY,
+    },
+  ];
 </script>
 
 <div class="dashboard d-flex flex-column" style="height: 100vh;">
@@ -151,6 +191,9 @@
     onLogout={_viewModel.handleLogout}
     isWebApp={true}
     bind:isCreateTeamModalOpen
+    onMarketingRedirect={() => {
+      window.open(constants.WEB_MARKETING_URL, "_blank");
+    }}
   />
 
   <!-- 
@@ -187,7 +230,13 @@
     <!-- 
       --Sidebar to naviagte between collection, environment and help page.
     -->
-    <Sidebar {user} onLogout={_viewModel.handleLogout} type="web" />
+    <Sidebar
+      {user}
+      {sidebarItems}
+      isVisible={isLoginBannerActive}
+      onLogout={_viewModel.handleLogout}
+      type="web"
+    />
     <!-- 
       -- Dashboard renders any of the pages between collection, environment and help.
     -->

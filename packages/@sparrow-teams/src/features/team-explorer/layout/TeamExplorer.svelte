@@ -253,7 +253,7 @@
                   >
                     <Tooltip
                       title={"Leave Team"}
-                      placement={"bottom"}
+                      placement={"bottom-center"}
                       distance={12}
                       show={!leaveButtonMenu}
                       zIndex={10}

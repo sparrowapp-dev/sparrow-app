@@ -36,6 +36,16 @@ interface HttpRequestAuthBaseInterface {
   apiKey?: HttpRequestApiKeyBaseInterface;
 }
 
+export enum HttpRequestMethodBaseEnum {
+  GET = "GET",
+  POST = "POST",
+  PUT = "PUT",
+  DELETE = "DELETE",
+  PATCH = "PATCH",
+  HEAD = "HEAD",
+  OPTIONS = "OPTIONS",
+}
+
 export interface HttpRequestBaseInterface {
   method: string;
   operationId: string;

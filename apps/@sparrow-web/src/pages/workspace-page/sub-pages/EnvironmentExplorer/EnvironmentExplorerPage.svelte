@@ -4,6 +4,7 @@
   import { Debounce } from "@sparrow/common/utils";
   import { user } from "@app/store/auth.store";
   import type { WorkspaceDocument } from "@app/database/database";
+  import constants from "../../../../constants/constants";
   /**
    * environment opened tab object
    */
@@ -56,4 +57,5 @@
   onSaveEnvironment={_viewModel.saveEnvironment}
   onFetchEnvironmentGuide={_viewModel.fetchEnvironmentGuide}
   onUpdateEnvironmentGuide={_viewModel.updateEnvironmentGuide}
+  azureBlobCDN={constants.AZURE_CDN_URL}
 />

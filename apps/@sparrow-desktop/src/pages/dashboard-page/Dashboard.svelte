@@ -1,9 +1,9 @@
 <script lang="ts">
   import {
-    Sidebar,
     LoginBanner,
     LoginSignupConfirmation,
   } from "@sparrow/common/components";
+  import { Sidebar } from "@sparrow/common/features";
   import { Route, navigate } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../workspace-page/CollectionsPage.svelte";
@@ -26,10 +26,18 @@
   import Teams from "../teams-page/Teams.svelte";
   import { Modal } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";
+
   import { fade } from "svelte/transition";
   import GlobalSearch from "../../../../../packages/@sparrow-common/src/components/popup/global-search/GlobalSearch.svelte";
   import { TeamsViewModel } from "../teams-page/Teams.ViewModel";
   
+
+  import { isGuestUserActive } from "@app/store/auth.store";
+  import {
+    type SidebarItemBaseInterface,
+    SidebarItemPositionBaseEnum,
+    SidebarItemIdEnum,
+  } from "@sparrow/common/types/sidebar/sidebar-base";
 
 
 const _viewModel = new DashboardViewModel();
@@ -192,7 +200,44 @@ const _viewModel = new DashboardViewModel();
     }
   };
 
+
    $: console.log("hide state", hideGlobalSearch);
+
+  isGuestUserActive.subscribe((value) => {
+    isGuestUser = value;
+  });
+
+  let sidebarItems: SidebarItemBaseInterface[] = [
+    {
+      id: SidebarItemIdEnum.HOME,
+      route: !isGuestUser ? "/app/home" : "/guest/home",
+      heading: "Home",
+      disabled: false,
+      position: SidebarItemPositionBaseEnum.PRIMARY,
+    },
+    {
+      id: SidebarItemIdEnum.WORKSPACE,
+      route: !isGuestUser ? "/app/collections" : "/guest/collections",
+      heading: "Workspace",
+      disabled: false,
+      position: SidebarItemPositionBaseEnum.PRIMARY,
+    },
+    {
+      id: SidebarItemIdEnum.COMMUNITY,
+      route: "/app/help",
+      heading: "Community",
+      disabled: !isGuestUser ? false : true,
+      position: SidebarItemPositionBaseEnum.SECONDARY,
+    },
+    {
+      id: SidebarItemIdEnum.SETTING,
+      route: "/app/setting",
+      heading: "Setting",
+      disabled: true,
+      position: SidebarItemPositionBaseEnum.SECONDARY,
+    },
+  ];
+  // let mahi = { mahiSingh: "mahi" };
 </script>
 
 
@@ -263,7 +308,12 @@ const _viewModel = new DashboardViewModel();
     <!-- 
       --Sidebar to naviagte between collection, environment and help page.
     -->
-    <Sidebar {user} onLogout={_viewModel.handleLogout} />
+    <Sidebar
+      {user}
+      {sidebarItems}
+      isVisible={isLoginBannerActive}
+      onLogout={_viewModel.handleLogout}
+    />
     <!-- 
       -- Dashboard renders any of the pages between collection, environment and help.
     -->

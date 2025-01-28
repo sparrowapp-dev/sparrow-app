@@ -1,4 +1,5 @@
-export { default as home } from "./home-icon.svg"
+
+export { default as home } from "./home-icon.svg";
 export { default as hoveredHome } from "./home-hovered.svg";
 export { default as selectedHome } from "./home-selected.svg";
 

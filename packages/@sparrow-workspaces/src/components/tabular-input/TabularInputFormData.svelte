@@ -345,7 +345,7 @@
                   show={isInputBoxEditable &&
                     element.type == "text" &&
                     element.value == ""}
-                  placement="bottom"
+                  placement="bottom-center"
                 >
                   <button
                     class="d-flex align-items-center justify-content-center bg-secondary-700 border-0 {isInputBoxEditable &&
@@ -366,7 +366,7 @@
                   </button>
                 </Tooltip>
                 <!-- {/if} -->
-                <Tooltip title="Delete" placement="bottom">
+                <Tooltip title="Delete" placement="bottom-center">
                   <button
                     class="d-flex align-items-center p-0 justify-content-center bg-secondary-700 border-0"
                     style="width:16px; height:16px;"

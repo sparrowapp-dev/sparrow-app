@@ -173,7 +173,12 @@
       class="d-flex ps-1 align-items-center justify-content-center my-auto"
       style="height: 24px; "
     >
-      <Tooltip title={"New"} placement={"bottom"} distance={10} zIndex={20}>
+      <Tooltip
+        title={"New"}
+        placement={"bottom-center"}
+        distance={10}
+        zIndex={20}
+      >
         <button
           on:click={onNewTabRequested}
           role="button"
@@ -198,7 +203,7 @@
           <Tooltip
             title={"Quick Help"}
             distance={10}
-            placement={"bottom"}
+            placement={"bottom-center"}
             zIndex={10}
           >
             <button
@@ -267,7 +272,7 @@
           >
             <Tooltip
               title={"Layout"}
-              placement={"left"}
+              placement={"left-center"}
               distance={12}
               show={!viewChange}
               zIndex={10}

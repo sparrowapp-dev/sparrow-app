@@ -238,7 +238,7 @@
                 class="p-2 d-flex align-items-center justify-content-between"
                 style="z-index: 4;"
               >
-                <Tooltip title={"Star Us On GitHub"} placement={"top"}>
+                <Tooltip title={"Star Us On GitHub"} placement={"top-center"}>
                   <div
                     class=" px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
                       ? 'bg-secondary-600'
@@ -316,7 +316,17 @@
     isPopupOpen = false;
   }}
 >
-  <DownloadApp />
+  <DownloadApp
+    onInstallRedirect={() => {
+      window.open(constants.WEB_MARKETING_URL, "_blank");
+    }}
+    onGithubRedirect={() => {
+      window.open(constants.SPARROW_GITHUB, "_blank");
+    }}
+    onDocsRedirect={() => {
+      window.open(constants.DOCS_URL, "_blank");
+    }}
+  />
 </Modal>
 
 <Modal

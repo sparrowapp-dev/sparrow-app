@@ -6,15 +6,15 @@
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
-  export let onBranchSwitched: (collection: CollectionDocument) => void;
+  export let onBranchSwitched: (collection: CollectionBaseInterface) => any;
   export let onRefetchCollection: (
     workspaceId: string,
-    collection: CollectionDocument,
+    collection: CollectionBaseInterface,
   ) => void;
   export let activeTabPath: Path;
   export let activeTabId: string;
   export let userRoleInWorkspace: WorkspaceRole;
-  export let collection: CollectionDocument;
+  export let collection: CollectionBaseInterface;
   export let searchData = "";
   export let activeTabType;
   /**
@@ -36,7 +36,6 @@
   import { Tooltip } from "@sparrow/library/ui";
   import { gitBranchIcon } from "@sparrow/library/assets";
   import { ReloadCollectionIcon } from "@sparrow/library/assets";
-  import type { CollectionDocument, TabDocument } from "@app/database/database";
   import Folder from "../folder/Folder.svelte";
   import type { Path } from "@sparrow/common/interfaces/request.interface";
   import { addIcon as AddIcon } from "@sparrow/library/assets";
@@ -50,65 +49,61 @@
     GraphIcon,
   } from "@sparrow/library/icons";
   import { Options } from "@sparrow/library/ui";
-  import { isGuestUserActive } from "@app/store/auth.store";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import type { CollectionBaseInterface } from "@sparrow/common/types/workspace/collection-base";
 
-  let deletedIds: [string] | [] = [];
+  let deletedIds: string[] = [];
   let requestCount = 0;
   let folderCount = 0;
+  let graphQLCount = 0;
+  let webSocketCount = 0;
+  let socketIoCount = 0;
   let visibility = false;
   let isActiveSyncEnabled = true;
   let isBranchSynced: boolean = false;
-  let menuItems: [any];
   let isRenaming = false;
   let activeSyncLoad: boolean = false;
   let isSyncBtnHovered = false;
-  let pos = { x: 0, y: 0 };
   let isCollectionPopup: boolean = false;
   let showMenu: boolean = false;
   let showAddItemMenu = false;
   let noOfColumns = 180;
-  let noOfRows = 5;
   let inputField: HTMLInputElement;
   let collectionTabWrapper: HTMLElement;
-  let isGuestUser: boolean;
-  isGuestUserActive.subscribe((value) => {
-    isGuestUser = value;
-  });
 
   /**
    * Handle position of the context menu
-   * @param e: Event
    */
-  function rightClickContextMenu(e: Event) {
+  const rightClickContextMenu = () => {
     setTimeout(() => {
       showMenu = !showMenu;
     }, 100);
-  }
+  };
 
-  function rightClickContextMenu2(e: Event) {
+  const rightClickContextMenu2 = () => {
     setTimeout(() => {
       showAddItemMenu = !showAddItemMenu;
     }, 100);
-  }
+  };
 
-  function handleSelectClick(event: MouseEvent) {
+  const handleSelectClick = (event: MouseEvent) => {
     const selectElement = document.getElementById(
       `show-more-collection-${collection.id}`,
     );
     if (selectElement && !selectElement.contains(event.target as Node)) {
       showMenu = false;
     }
-  }
-  function handleSelectClick2(event: MouseEvent) {
+  };
+
+  const handleSelectClick2 = (event: MouseEvent) => {
     const selectElement = document.getElementById(
       `add-item-collection-${collection.id}`,
     );
     if (selectElement && !selectElement.contains(event.target as Node)) {
       showAddItemMenu = false;
     }
-  }
+  };
 
   /**
    * Handle selected methods from filter
@@ -140,16 +135,40 @@
       deletedIds = [];
       requestCount = 0;
       folderCount = 0;
+      graphQLCount = 0;
+      webSocketCount = 0;
+      socketIoCount = 0;
       collection?.items?.forEach((item: any) => {
         if (item.type === ItemType.FOLDER) {
           deletedIds.push(item.id);
           folderCount++;
-          requestCount += item.items.length;
+
           for (let i = 0; i < item.items.length; i++) {
-            deletedIds.push(item.items[i].id);
+            if (item.items[i].type === ItemType.REQUEST) {
+              requestCount++;
+              deletedIds.push(item.items[i].id);
+            } else if (item.items[i].type === ItemType.GRAPHQL) {
+              graphQLCount++;
+              deletedIds.push(item.items[i].id);
+            } else if (item.items[i].type === ItemType.WEB_SOCKET) {
+              webSocketCount++;
+              deletedIds.push(item.items[i].id);
+            } else if (item.items[i].type === ItemType.SOCKET_IO) {
+              socketIoCount++;
+              deletedIds.push(item.items[i].id);
+            }
           }
         } else if (item.type === ItemType.REQUEST) {
           requestCount++;
+          deletedIds.push(item.id);
+        } else if (item.type === ItemType.GRAPHQL) {
+          graphQLCount++;
+          deletedIds.push(item.id);
+        } else if (item.type === ItemType.SOCKET_IO) {
+          socketIoCount++;
+          deletedIds.push(item.id);
+        } else if (item.type === ItemType.WEB_SOCKET) {
+          webSocketCount++;
           deletedIds.push(item.id);
         }
       });
@@ -188,16 +207,12 @@
   }
 
   let deleteLoader: boolean = false;
-  const getFeatures = async () => {
-    isActiveSyncEnabled = await commonService.isFeatureEnabled(
-      "isActiveSyncEnabled",
-    );
-  };
   let refreshCollectionLoader = false;
   let newCollectionName: string = "";
 
-  const handleRenameInput = (event: { target: { value: string } }) => {
-    newCollectionName = event.target.value.trim();
+  const handleRenameInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    newCollectionName = target.value.trim();
   };
 
   const onRenameBlur = async () => {
@@ -227,9 +242,6 @@
   on:contextmenu|preventDefault={handleSelectClick}
   on:click={handleSelectClick2}
   on:contextmenu|preventDefault={handleSelectClick2}
-  on:load={() => {
-    getFeatures();
-  }}
 />
 
 <Modal
@@ -250,12 +262,26 @@
   </div>
   <div class="d-flex gap-3 sparrow-fs-12">
     <div class="d-flex gap-1">
-      <span class="text-plusButton">{requestCount}</span>
-      <p>API Requests</p>
-    </div>
-    <div class="d-flex gap-1">
       <span class="text-plusButton">{folderCount}</span>
       <p>Folder</p>
+    </div>
+    <div class="d-flex gap-1">
+      <span class="text-plusButton">{requestCount}</span>
+      <p>REST</p>
+    </div>
+    {#if !isWebApp}
+      <div class="d-flex gap-1">
+        <span class="text-plusButton">{graphQLCount}</span>
+        <p>GraphQL</p>
+      </div>
+    {/if}
+    <div class="d-flex gap-1">
+      <span class="text-plusButton">{webSocketCount}</span>
+      <p>WebSocket</p>
+    </div>
+    <div class="d-flex gap-1">
+      <span class="text-plusButton">{socketIoCount}</span>
+      <p>Socket.IO</p>
     </div>
   </div>
   <div
@@ -419,7 +445,7 @@
 >
   <button
     class="d-flex ps-2 main-collection align-items-center bg-transparent border-0"
-    on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+    on:contextmenu|preventDefault={rightClickContextMenu}
     on:click|preventDefault={() => {
       if (!isRenaming) {
         visibility = !visibility;
@@ -485,18 +511,18 @@
       </div>
     {/if}
   </button>
-  {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED) && !isGuestUser}
+  {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
     <!-- <Tooltip
-      placement="bottom"
+      placement="bottom-center"
       title="More options"
       styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
     > -->
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <Tooltip
         title={"Add Options"}
-        placement={"bottom"}
+        placement={"bottom-center"}
         distance={13}
         show={!showAddItemMenu}
         zIndex={701}
@@ -506,9 +532,7 @@
           class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center {showAddItemMenu
             ? 'add-item-active'
             : ''}"
-          on:click={(e) => {
-            rightClickContextMenu2(e);
-          }}
+          on:click={rightClickContextMenu2}
         >
           <img height="12px" width="12px" src={AddIcon} alt="AddIcon" />
         </button>
@@ -516,7 +540,7 @@
 
       <Tooltip
         title={"More"}
-        placement={"bottom"}
+        placement={"bottom-center"}
         distance={17}
         zIndex={701}
         show={!showMenu}
@@ -527,9 +551,7 @@
             ? 'threedot-active'
             : ''}"
           style="transform: rotate(90deg);"
-          on:click={(e) => {
-            rightClickContextMenu(e);
-          }}
+          on:click={rightClickContextMenu}
         >
           <img src={threedotIcon} alt="threedotIcon" />
         </button>
@@ -538,7 +560,7 @@
     {/if}
 
     {#if isActiveSyncEnabled && collection?.activeSync}
-      <Tooltip placement="bottom" title="Sync" styleProp="left: 25%;">
+      <Tooltip placement="bottom-center" title="Sync" styleProp="left: 25%;">
         <button
           class="sync-button p-1 border-0 rounded"
           on:click={() => {
@@ -577,7 +599,7 @@
       <div class="sub-folders ps-0">
         {#each collection.items as explorer}
           <Folder
-            bind:userRole
+            {userRole}
             {onItemCreated}
             {onItemDeleted}
             {onItemRenamed}
@@ -600,11 +622,17 @@
 
         <div class="d-flex gap-2 ps-1 ms-4">
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-            <Tooltip title={"Add Folder"} placement={"bottom"} distance={12}>
+            <Tooltip
+              title={"Add Folder"}
+              placement={"bottom-center"}
+              distance={12}
+            >
               <div
                 class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
                 style="height: 24px; width: 24px; "
                 role="button"
+                tabindex="0"
+                on:keydown={() => {}}
                 on:click={() => {
                   onItemCreated("folder", {
                     workspaceId: collection.workspaceId,
@@ -620,7 +648,11 @@
               </div>
             </Tooltip>
 
-            <Tooltip title={"Add REST API"} placement={"bottom"} distance={12}>
+            <Tooltip
+              title={"Add REST API"}
+              placement={"bottom-center"}
+              distance={12}
+            >
               <div
                 class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
                 style="height: 24px; width: 24px;"
@@ -642,7 +674,7 @@
 
             <Tooltip
               title={`Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`}
-              placement={"bottom"}
+              placement={"bottom-center"}
               distance={12}
             >
               <div
@@ -666,7 +698,11 @@
                 />
               </div>
             </Tooltip>
-            <Tooltip title={"Add WebSocket"} placement={"bottom"} distance={12}>
+            <Tooltip
+              title={"Add WebSocket"}
+              placement={"bottom-center"}
+              distance={12}
+            >
               <div
                 class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
                 style="height: 24px; width: 24px;"
@@ -689,7 +725,7 @@
             {#if !isWebApp}
               <Tooltip
                 title={`Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
-                placement={"bottom"}
+                placement={"bottom-center"}
                 distance={12}
               >
                 <div
@@ -719,7 +755,7 @@
         <!-- {#if showFolderAPIButtons}
           <div class="mt-2 mb-2 d-flex">
             <Tooltip
-              placement="bottom"
+              placement="bottom-center"
               title={!hasWorkpaceLevelPermission(
                 userRoleInWorkspace,
                 workspaceLevelPermissions.SAVE_REQUEST,
@@ -744,7 +780,7 @@
               </button>
             </Tooltip>
             <Tooltip
-              placement="bottom"
+              placement="bottom-center"
               title={!hasWorkpaceLevelPermission(
                 userRoleInWorkspace,
                 workspaceLevelPermissions.SAVE_REQUEST,
