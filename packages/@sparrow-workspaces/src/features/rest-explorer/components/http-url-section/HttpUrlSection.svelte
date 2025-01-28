@@ -61,7 +61,13 @@
    * @param event - keyboard events
    */
   const handleKeyPress = (event: KeyboardEvent) => {
-    if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
+    const isSaveDisabled =
+      isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER ? true : false;
+    if (
+      !isSaveDisabled &&
+      (event.metaKey || event.ctrlKey) &&
+      event.code === "KeyS"
+    ) {
       handleSaveRequest();
     } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
       onSendButtonClicked(environmentVariables);
@@ -191,7 +197,7 @@
       onUpdateRequestState({ requestSplitterDirection: e.detail });
     }}
   /> -->
-  <Tooltip title={"Save"} placement={"bottom"} distance={12} zIndex={10}>
+  <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
     <button
       class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
       on:click={handleSaveRequest}
@@ -211,8 +217,8 @@
         color={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
           ? "var(--icon-secondary-380)"
           : isHovered
-          ? "var(--icon-primary-200)"
-          : "var(--icon-secondary-100)"}
+            ? "var(--icon-primary-200)"
+            : "var(--icon-secondary-100)"}
       />
     </button>
   </Tooltip>

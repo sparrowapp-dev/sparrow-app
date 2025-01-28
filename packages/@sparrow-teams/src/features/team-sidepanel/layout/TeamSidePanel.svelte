@@ -1,9 +1,6 @@
 <script lang="ts">
   import { Tooltip } from "@sparrow/library/ui";
-  import {
-    DoubleArrowIcon,
-    GithubIcon,
-  } from "@sparrow/library/icons";
+  import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
   import { PlusIcon as plus } from "@sparrow/library/assets";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import type { TabDocument, TeamDocument } from "@app/database/database";
@@ -12,7 +9,6 @@
   import { base64ToURL } from "@sparrow/common/utils";
   import { List } from "@sparrow/library/ui";
   import { PeopleIcon } from "@sparrow/library/assets";
-  import constants from "@app/constants/constants";
 
   export let teamList: TeamDocument[] = [];
   export let tabList: TabDocument[] = [];
@@ -29,7 +25,7 @@
   export let disableNewInviteTag;
   export let modifyTeam;
 
-  const externalSparrowGithub = constants.SPARROW_GITHUB;
+  // const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   export let leftPanelController: {
     leftPanelCollapse: boolean;
@@ -90,7 +86,7 @@
         >
           <h6 class="teams-heading ms-2 px-1">Teams</h6>
           <div>
-            <Tooltip title="New Team" placement={"bottom"} distance={10}>
+            <Tooltip title="New Team" placement={"bottom-center"} distance={10}>
               <button
                 class="new-team-btn rounded border-0"
                 on:click={() => {
@@ -174,14 +170,13 @@
       {/if}
     </div>
 
-
     <!-- github repo section -->
     <section>
       <div
         class="p-2 d-flex align-items-center justify-content-between"
         style="z-index: 4;"
       >
-        <Tooltip title={"Star Us On GitHub"} placement={"top"}>
+        <Tooltip title={"Star Us On GitHub"} placement={"top-center"}>
           <div
             class=" px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
               ? 'bg-secondary-600'
@@ -194,7 +189,7 @@
               isGithubStarHover = false;
             }}
             on:click={async () => {
-              await open(externalSparrowGithub);
+              // await open(externalSparrowGithub);
             }}
           >
             <GithubIcon

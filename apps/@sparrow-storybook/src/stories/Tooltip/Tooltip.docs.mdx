@@ -1,0 +1,122 @@
+import { Meta } from "@storybook/addon-docs";
+import { Markdown } from "@storybook/blocks";
+
+<Meta title="Components/Tooltip/Documentation" />
+
+# Tooltip
+
+# Introduction
+
+Tooltips are compact, informative elements that appear when users hover over, focus on, or tap a specific element. They deliver supplementary information without overwhelming the user interface.
+The Sparrow design system provides tooltips in different variants and supports multiple positional options for versatile usage.
+
+## Transition Details
+
+<Markdown>
+  {`
+| Transition Type | Property | Start State | End State | Additional Notes |
+| --- | --- | --- | --- | --- |
+| Slide-in fade | Translate: y-axis | -10 px or 10px | 0 | The tooltip flows up-down or down-up depending on its position. |
+| Slide-in fade | Translate: x-axis | -10px or 10px | 0 | The tooltip flows right-left or left-right depending on its position. |
+| | Opacity | 0 | 1 | - |
+| | Duration | 300 ms | - | - |
+| | Easing | Ease out | - | - |
+| | Appearance | - | - | Appears near trigger element |
+`}
+</Markdown>
+
+## Usage Guidelines
+
+1. When to Use
+- Use tooltips to provide extra information or clarification for a specific UI element.
+- Avoid relying on tooltips for critical information necessary for task completion.
+
+2. How to Use
+- Ensure the tooltip appears close to the element it describes.
+- Activate tooltips on hover, focus, or tap interactions. 
+- Keep the text brief and to the point.
+
+3. Accessibility Considerations
+- Ensure tooltips are navigable using a keyboard and accessible to screen readers.
+- Use attributes like aria-label or aria-describedby to associate tooltips with their elements.
+- Maintain high contrast between text and background for all themes.
+- A tooltip should appear when users are navigating through the interface using a keyboard. The purpose of this "keyboard hover" tooltip is to assist users who rely on keyboards instead of a mouse for interaction.
+
+## Implementation Notes
+
+1. Positioning
+- The tooltip aligns dynamically based on the specified position (top, bottom, left, right, top left, bottom right & bottom left).
+- Ensure sufficient spacing between the tooltip and other elements to prevent overlap.
+
+2. Responsive Design
+- Tooltips should adapt to different screen sizes and orientations.
+- Verify that tooltips remain visible within the screen boundaries for all positions.
+
+
+# Tooltip Specifications
+
+# Introduction
+
+1. **Heading and Subheading**: Ensuring consistency in typography and hierarchy between tooltip titles and descriptions.
+
+2. **Default State**: Establishing the standard appearance of tooltips, including background, text color, spacing, and size.
+
+3. **Position**: Providing options for tooltip placement relative to the anchor element (default, top, bottom, left, right).
+
+4. **Arrow Visibility and Alignment**: Managing the display of arrows and their alignment (top, center, bottom, right, left) to visually connect tooltips to their anchors.
+
+<Markdown>
+  {`
+| Element | Color | Use Case |
+| --- | --- | --- |
+| tooltip-container | tooltip-bg: surface100 = #31353f | A solid background color with sufficient contrast against the text. |
+| tooltip-label | tooltip-text: neutral/white = #FFFFFF | High-contrast text color for readability. |
+| tooltip-text | tooltip-text: neutral/white = #FFFFFF | High-contrast text color for readability. |
+| tooltip-subtext | tooltip-subtext: neutral/200 = #B8B789 | Color of the subheading text in the tooltip. |
+`}
+</Markdown>
+
+## Tooltip Sizes and Configuration
+
+Tooltips should maintain a consistent style across the application, ensuring they remain unobtrusive yet informative. The default state includes:
+
+<Markdown>
+  {`
+| Size | Tooltip Height | Padding (X x Y) | Gap | Width Range | Corner Radius | Font Size | Arrow Size(w x h) | Shadow | Description | Use Case |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Small | Hug | 12 x 4 px | 0px | 56 - 128 px | 4 px | label Row 2 paragraphs/sm-400 = 12px reg | 4 x 8px (horizontal) 8 x 4px (vertical) | shadow-4 0px, 4px, 8px, rgb(0,0,0,0.3) | Tooltips for buttons and icons should be concise and limited to a single line, while tooltips for truncated text can span up to a maximum of two lines to ensure simplicity. | For button, icon, truncated text, etc... |
+| Medium | Hug | 12 x 8 px | 4px | 128 - 256 px | 6 px | heading Row 2 labels/sm-600 = 12px bold sub-heading paragraph/sm-400 = 12px reg | 6 x 12px (hor) 12 x 6px (ver) | shadow-8 0px, 8px, 16px, rgb(0,0,0,0.24) | The medium tooltip contains a heading and subtext. The heading should be concise, fitting within a single line for clarity. The subtext can span multiple lines, allowing for more detailed information without exceeding a maximum of two lines to maintain readability. | For info message, hint message, etc... |
+`}
+</Markdown>
+
+
+# Tooltip Properties
+
+Tooltips include various customizable properties to ensure flexibility and consistency across use cases. These properties are outlined in the table below:
+
+## Small Tooltip:
+
+<Markdown>
+  {`
+| Property | Value | Description |
+| --- | --- | --- |
+| Position | default, top, right, bottom, left | Sets the tooltip's position relative to the anchor element. |
+| Arrow Align | none, center, left, right, top, bottom | Aligns the arrow relative to the tooltip's edge. |
+| Label | text | The text content displayed within the tooltip. |
+`}
+</Markdown>
+
+## Medium Tooltip:
+
+<Markdown>
+  {`
+| Property | Value | Description |
+| --- | --- | --- |
+| Position | default, top, right, bottom, left | Sets the tooltip's position relative to the anchor element. |
+| Arrow Align | none, center, left, right, top, bottom | Aligns the arrow relative to the tooltip's edge. |
+| Heading (Boolean) | true / false | Toggles the visibility of the tooltip heading. |
+| Sub Heading (Boolean) | true / false | Toggles the visibility of the tooltip subheading. |
+| Text | text | The text content displayed within the tooltip. |
+| Subtext | text | The subtext content displayed within the tooltip. |
+`}
+</Markdown>

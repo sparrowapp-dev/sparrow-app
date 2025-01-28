@@ -117,10 +117,10 @@
         onClick={handleCreateEnvironment}
       />
     {/if}
-    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isWebApp}
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <Card
         icon={TreeIcon}
-        label={"Test Flow"}
+        label={TFDefaultEnum.FULL_NAME}
         iconColor="var(--text-primary-300)"
         iconSize={"18px"}
         onClick={() => {

@@ -45,7 +45,7 @@
   /**
    * Selected folder details
    */
-  export let folder: CollectionItemBaseInterface;
+  export let folder: CollectionItemBaseInterface | null;
   /**
    * Selected socketIo details
    */
@@ -277,8 +277,7 @@
       />
     {:else}
       <div
-        class="api-name ellipsis {socketIo?.isDeleted &&
-          'api-name-deleted'} "
+        class="api-name ellipsis {socketIo?.isDeleted && 'api-name-deleted'} "
         style="font-size: 12px;"
       >
         {socketIo.name}
@@ -292,13 +291,13 @@
     <Tooltip
       title={"More"}
       show={!showMenu}
-      placement={"bottom"}
+      placement={"bottom-center"}
       zIndex={701}
       distance={17}
     >
       <button
         id={`show-more-socket-io-${socketIo.id}`}
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+        class="threedot-icon-container border-0 p-0 rounded d-flex justify-content-center align-items-center {showMenu
           ? 'threedot-active'
           : ''}"
         style="transform: rotate(90deg);"

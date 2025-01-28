@@ -8,23 +8,18 @@
 
   // ---- Helper functions
   import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
-  import { getPathFromUrl } from "@sparrow/common/utils/common.helper";
 
-  // ---- Enum and Interfaces
-  import type {
-    Request,
-    Folder,
-    Path,
-  } from "@sparrow/common/interfaces/request.interface";
   import { UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
 
   // --- SVG
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
   import { reloadSyncIcon } from "@sparrow/library/assets";
 
-  // ---- DB
-  import type { CollectionDocument } from "@app/database/database";
-  import { isGuestUserActive } from "@app/store/auth.store";
+  import type {
+    CollectionBaseInterface,
+    CollectionItemBaseInterface,
+  } from "@sparrow/common/types/workspace/collection-base";
+  import { HttpRequestMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
   /**
    * Callback for Item Deleted
@@ -47,15 +42,15 @@
   /**
    * Whole Collection Document
    */
-  export let collection: CollectionDocument;
+  export let collection: CollectionBaseInterface;
   /**
    * Selected folder details
    */
-  export let folder: Folder;
+  export let folder: CollectionItemBaseInterface | null;
   /**
    * Selected API details
    */
-  export let api: Request;
+  export let api: CollectionItemBaseInterface;
   /**
    * Current Tab Path
    */
@@ -65,6 +60,7 @@
    * Role of user in workspace
    */
   export let userRole;
+  export let activeTabType;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -72,11 +68,6 @@
   let inputField: HTMLInputElement;
   let isRenaming = false;
   let deleteLoader: boolean = false;
-
-  let isGuestUser;
-  isGuestUserActive.subscribe((value) => {
-    isGuestUser = value;
-  });
 
   let requestTabWrapper: HTMLElement;
 
@@ -95,8 +86,9 @@
 
   let newRequestName: string = "";
 
-  const handleRenameInput = (event) => {
-    newRequestName = event.target.value.trim();
+  const handleRenameInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    newRequestName = target.value.trim();
   };
 
   const onRenameBlur = async () => {
@@ -113,7 +105,7 @@
     newRequestName = "";
   };
 
-  const onRenameInputKeyPress = (event) => {
+  const onRenameInputKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
         "renameInputFieldFile",
@@ -122,17 +114,24 @@
     }
   };
 
-  const dragStart = (event, collection) => {
+  const dragStart = (event: DragEvent, collection: CollectionBaseInterface) => {
     const data = {
       workspaceId: collection.workspaceId,
       collectionId: collection.id,
       folderId: folder?.id ?? "",
       requestId: api.id,
       name: api.name,
-      method: api.request.method,
+      method: api?.request?.method,
     };
-    event.dataTransfer.setData("text/plain", JSON.stringify(data));
+    event.dataTransfer?.setData("text/plain", JSON.stringify(data));
   };
+
+  let httpMethodUIStyle = "";
+  $: {
+    httpMethodUIStyle = getMethodStyle(
+      api?.request?.method as HttpRequestMethodBaseEnum,
+    );
+  }
 </script>
 
 <svelte:window
@@ -248,14 +247,17 @@
 {/if}
 
 <div
-  draggable={true}
-  on:dragstart={(event) => dragStart(event, collection)}
+  draggable={activeTabType === "TESTFLOW" ? true : false}
+  on:dragstart={(event) => {
+    dragStart(event, collection);
+  }}
   bind:this={requestTabWrapper}
-  class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {api.id ===
+  class="d-flex draggable align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
     : ''} "
-  style="height:32px;"
+  style="height:32px;
+"
 >
   <button
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
@@ -287,12 +289,13 @@
       <img src={reloadSyncIcon} class="ms-2 d-none" alt="" />
     {/if}
     <div
-      class="api-method text-{getMethodStyle(
-        api.request.method,
-      )} {api?.isDeleted && 'api-method-deleted'}"
+      class="api-method text-{httpMethodUIStyle} {api?.isDeleted &&
+        'api-method-deleted'}"
       style="font-size: 12px;"
     >
-      {api.request.method?.toUpperCase()}
+      {api.request?.method?.toUpperCase() === "DELETE"
+        ? "DEL"
+        : api.request?.method?.toUpperCase()}
     </div>
 
     {#if isRenaming}
@@ -319,13 +322,13 @@
     {/if}
   </button>
 
-  {#if api.id?.includes(UntrackedItems.UNTRACKED) && !isGuestUser}
+  {#if api.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
     <Tooltip
       title={"More"}
       show={!showMenu}
-      placement={"bottom"}
+      placement={"bottom-center"}
       zIndex={701}
       distance={17}
     >
@@ -481,5 +484,9 @@
     .delete-ticker {
       background-color: var(--selected-active-sidebar) !important;
     }
+  }
+
+  .draggable:active {
+    opacity: 0.9;
   }
 </style>

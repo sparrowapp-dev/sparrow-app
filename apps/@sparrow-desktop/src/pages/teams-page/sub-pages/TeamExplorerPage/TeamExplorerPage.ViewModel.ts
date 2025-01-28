@@ -335,7 +335,7 @@ export class TeamExplorerPageViewModel {
     initWorkspaceTab.updateName(res.name);
     await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
     await this.workspaceRepository.setActiveWorkspace(id);
-    navigate("/dashboard/collections");
+    navigate("collections");
   };
 
   /**

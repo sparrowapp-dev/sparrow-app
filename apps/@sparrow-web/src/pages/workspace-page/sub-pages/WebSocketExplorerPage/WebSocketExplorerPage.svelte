@@ -146,6 +146,7 @@
   {environmentVariables}
   {isGuestUser}
   {isLoginBannerActive}
+  isWebApp={true}
   onUpdateRequestUrl={_viewModel.updateRequestUrl}
   onUpdateRequestParams={_viewModel.updateParams}
   onUpdateRequestName={_viewModel.updateRequestName}

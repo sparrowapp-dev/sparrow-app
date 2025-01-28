@@ -1,23 +1,23 @@
-import { RequestMethodEnum } from "@sparrow/common/types/workspace";
+import { HttpRequestMethodBaseEnum } from "../types/workspace/http-request-base";
 
-const createDeepCopy = (data) => {
+const createDeepCopy = (data: any) => {
   return JSON.parse(JSON.stringify(data));
 };
 
-const getMethodStyle = (method: RequestMethodEnum | undefined) => {
-  if (method === RequestMethodEnum.GET) {
+const getMethodStyle = (method: HttpRequestMethodBaseEnum) => {
+  if (method === HttpRequestMethodBaseEnum.GET) {
     return "getColor";
-  } else if (method === RequestMethodEnum.DELETE) {
+  } else if (method === HttpRequestMethodBaseEnum.DELETE) {
     return "deleteColor";
-  } else if (method === RequestMethodEnum.HEAD) {
+  } else if (method === HttpRequestMethodBaseEnum.HEAD) {
     return "headColor";
-  } else if (method === RequestMethodEnum.OPTIONS) {
+  } else if (method === HttpRequestMethodBaseEnum.OPTIONS) {
     return "optionsColor";
-  } else if (method === RequestMethodEnum.PATCH) {
+  } else if (method === HttpRequestMethodBaseEnum.PATCH) {
     return "patchColor";
-  } else if (method === RequestMethodEnum.POST) {
+  } else if (method === HttpRequestMethodBaseEnum.POST) {
     return "postColor";
-  } else if (method === RequestMethodEnum.PUT) {
+  } else if (method === HttpRequestMethodBaseEnum.PUT) {
     return "putColor";
   } else {
     return "";

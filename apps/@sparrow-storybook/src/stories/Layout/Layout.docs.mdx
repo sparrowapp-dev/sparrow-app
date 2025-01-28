@@ -1,0 +1,96 @@
+import { Meta } from "@storybook/addon-docs";
+import { Markdown } from "@storybook/blocks";
+
+<Meta title="Components/Layout/Documentation" />
+
+# Layout
+
+A layout organizes content on the screen, ensuring consistency, clarity, and a balanced user interface.
+
+## Responsive Grid Layout
+
+A responsive grid layout ensures a consistent and scalable structure for organizing content across multiple devices and screen sizes. It uses columns, gutters, and margins to create a harmonious and predictable design system.
+
+- **Columns**: Columns are the building blocks of the grid system.
+
+  - **Behavior**: Columns adjust their width dynamically based on screen size.
+
+- **Gutters**: Gutters are the spaces between columns. They ensure content doesn't feel cramped:
+
+  - Mobile: 16px
+  - Tablet/Desktop: 24px
+
+- **Margins**: Margins create padding around the layout to keep content visually separate from the screen edges.
+  - Small: 16px
+  - Large: 32px
+
+## Responsive Grid Layout for Website
+
+The following table shows responsive grids for websites with different screen widths.
+
+<Markdown>
+  {`
+| Device Width/Sizes     | Columns | Body    | Gutter         | Margins        |
+| ---------------------- | ------- | ------- | -------------- | -------------- |
+| Mobile                 | 4    | Scaling | 16 px     | 16 px     |
+| Small Tablet (600-900) | 8   | Scaling | 24 px | 32 px |
+| Large Tablet (900+)    | 12  | 840 px    | 24 px | Scaling |
+| Desktop (<=1440)        | 12  | Scaling | 24 px | 130 px  |
+| Desktop (1440+)        | 12  | 1180 | 24 px | Scaling        |
+`}
+</Markdown>
+
+## Responsive Grid Layout for Application
+
+The following table outlines responsive grids for applications with different screen widths.
+
+<Markdown>
+  {`
+| Device Width/Sizes | Columns | Body    | Gutter | Margins        |
+| ------------------ | ------- | ------- | ------ | -------------- |
+| Desktop (<1440)    | 1     | Scaling | -      | 16 px     |
+| Desktop (1440+)    | 1     | Scaling | -      | 24 px |
+`}
+</Markdown>
+
+## Layout Regions
+
+Our application's interface is divided into three key regions:
+
+**Top Bar**: A dedicated area that serves as a global navigation and provides utility actions.
+
+**Navigation Bar**: This section contains the primary navigation elements, enabling users to access different modules within the application.
+
+**Body**: The main workspace area where users perform their primary interactions with the application.
+
+## Body Region
+
+The Body Region serves as the primary content area for displaying core UI comp1nts, information, and interactions. It utilizes a consistent layout grid to ensure alignment, responsiveness, and visual hierarchy across different screen sizes.
+
+## Responsive Grid Layout for Body Region
+
+The Body Region follows a `stretch` layout grid system, ensuring adaptability for various screen sizes.
+
+### Breakpoints for Body Layout - Vertical
+
+<Markdown>
+  {`
+| Device Width/Sizes | Columns (counts) | Type    | Gutter      | Margins        |
+| ------------------ | ---------------- | ------- | ----------- | -------------- |
+| Desktop (<=1440)    | 8            | Stretch | 16     | 16 px     |
+| Desktop (1440+)    | 12           | Stretch | 24 | 24 px |
+`}
+</Markdown>
+The layout can be referenced in the body grid layout vertical example.
+
+### Breakpoints for Body Layout - Horizontal:
+
+<Markdown>
+  {`
+| Device Width/Sizes | Columns (counts) | Type    | Gutter      | Margins        |
+| ------------------ | ---------------- | ------- | ----------- | -------------- |
+| Desktop (<=1440)    | 8            | Stretch | 16     | 16 px     |
+| Desktop (1440+)    | 12           | Stretch | 24 | 24 px |
+`}
+</Markdown>
+The layout can be referenced in the body grid layout horizontal example.

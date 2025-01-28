@@ -46,7 +46,12 @@
    * @param event - keyboard events
    */
   const handleKeyPress = (event: KeyboardEvent) => {
-    if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
+    const isSaveDisabled = isSave || !isGraphqlEditable ? true : false;
+    if (
+      !isSaveDisabled &&
+      (event.metaKey || event.ctrlKey) &&
+      event.code === "KeyS"
+    ) {
       handleSaveRequest();
     } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
       onSendButtonClicked(environmentVariables);
@@ -110,7 +115,7 @@
     />
   {/if}
 
-  <Tooltip title={"Save"} placement={"bottom"} distance={12} zIndex={10}>
+  <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
     <button
       class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
       on:click={() => {

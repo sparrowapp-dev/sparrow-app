@@ -236,7 +236,6 @@
               style="font-size: 28px;"
               >{openTeam?.name || ""}
             </span>
-
             <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
             {#if !isGuestUser}
               {#if userRole !== "owner"}
@@ -254,7 +253,7 @@
                   >
                     <Tooltip
                       title={"Leave Team"}
-                      placement={"bottom"}
+                      placement={"bottom-center"}
                       distance={12}
                       show={!leaveButtonMenu}
                       zIndex={10}
@@ -321,7 +320,6 @@
               tabs={teamTabs}
               {onUpdateActiveTab}
               {activeTeamTab}
-              {isWebApp}
             />
           </div>
           <div class="teams-menu__right">

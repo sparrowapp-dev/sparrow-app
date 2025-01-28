@@ -10,7 +10,6 @@
   import { environmentType } from "@sparrow/common/enums";
   import { SparrowIcon } from "@sparrow/library/icons";
   import { ArrowRightIcon } from "@sparrow/library/icons";
-  import constants from "@app/constants/constants";
   import type { WorkspaceDocument } from "@app/database/database";
   import { PlusIcon } from "@sparrow/library/icons";
   import { navigate } from "svelte-navigator";
@@ -22,7 +21,7 @@
    * environment list
    */
   export let environments;
-
+  export let onMarketingRedirect = () => {};
   /**
    * selected environment
    */
@@ -104,7 +103,7 @@
       id: "Cloud Agent",
       displayName: "Cloud Agent",
       description:
-        "Send an HTTP request through Sparrow's secure cloud server.",
+        "Send a request through Sparrow's secure cloud server. Only supports HTTP request.",
     },
     {
       name: "Browser Agent",
@@ -138,7 +137,7 @@
         return false;
       })
       .reverse()
-      .slice(0, constants.WORKSPACE_LIMIT)
+      .slice(0, 5)
       .map((workspace) => {
         const workspaceObj = {
           id: workspace._id,
@@ -153,7 +152,7 @@
       description: currentTeamName,
     });
     const res = createSetFromArray(workspaces, "id");
-    if (res.length > constants.WORKSPACE_LIMIT) {
+    if (res.length > 5) {
       res.shift();
     }
     workspaceData = res;
@@ -264,7 +263,7 @@
           data={guestData}
           titleId={`${currentWorkspaceId}`}
           onclick={() => {}}
-          minHeaderWidth={"205px"}
+          minHeaderWidth={"212px"}
           iconRequired={false}
           isDropIconFilled={true}
           borderType={"none"}
@@ -274,6 +273,7 @@
           menuItem={"v2"}
           headerFontSize={"12px"}
           maxHeaderWidth={"215px"}
+          headerFontWeight={700}
           zIndex={200}
           bodyTheme={"violet"}
           borderRounded={"2px"}
@@ -295,8 +295,8 @@
               style="width:100%; height:26px; background-color:var(--bg-primary-300);"
             >
               <button
-                class="mb-1"
-                style="width:100%; height:100%; text-decoration:none; outline:none !important; background-color:transparent;  border:none; font-size:12px;"
+                class="d-flex justify-content-center align-items-center"
+                style="width:100%; height:100%; text-decoration:none; outline:none !important; background-color:transparent; border:none; font-size:12px; padding:0px;"
               >
                 Create an Account or Sign In
               </button>
@@ -379,7 +379,7 @@
         data={multipleAgentData}
         titleId={`${multipleAgentvar}`}
         onclick={handleAgentDropdown}
-        minHeaderWidth={"232px"}
+        minHeaderWidth={"262px"}
         iconRequired={true}
         icon={CheckCircle}
         iconColor={"#69D696"}
@@ -396,7 +396,8 @@
         borderRounded={"2px"}
         position={"absolute"}
         isHeaderCombined={false}
-        maxBodyHeight={"300px"}
+        maxBodyHeight={"279px"}
+        minBodyWidth={"240px"}
       >
         <div slot="pre-select" class="pre-dropdown">
           <div
@@ -413,14 +414,13 @@
           <div class="lower-underline"></div>
           <div class="download-area w-100">
             <div
-              class="download-sparrow-button dowload-section d-flex justify-content-between"
+              class="download-sparrow-button dowload-section d-flex flex-column justify-content-between"
             >
-              <p class="download-text">
-                Download Sparrow Desktop <span class="description text-fs-10">
-                  Effortlessly test requests with the desktop app. No agents
-                  required.
-                </span>
-              </p>
+              <p class="download-text mb-1">Download Sparrow Desktop</p>
+              <span class="description text-fs-10">
+                Effortlessly test requests with the desktop app. No agents
+                required.
+              </span>
             </div>
             <div class="d-flex align-items-center">
               <SparrowIcon
@@ -430,9 +430,8 @@
               />
             </div>
           </div>
-          <a
-            href={constants.WEB_MARKETING_URL}
-            target="_blank"
+          <span
+            on:click={onMarketingRedirect}
             class="text-decoration-none d-flex align-items-center align-self-start gap-2 mt-1 download-btn"
           >
             <div class="gap-2 d-flex">
@@ -445,7 +444,7 @@
                 />
               </div>
             </div>
-          </a>
+          </span>
         </div>
       </Select>
     {/if}
@@ -503,7 +502,7 @@
 
     {#if isWebApp === false}
       {#if isWindows}
-        <div class="d-flex gap-3 me-1 no-drag">
+        <div class="d-flex gap-3 no-drag">
           <WindowAction isWindows={true} />
         </div>
       {/if}

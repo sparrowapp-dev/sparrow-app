@@ -1,14 +1,14 @@
 {
   "name": "@sparrow/web",
-  "version": "2.13.0",
+  "version": "2.16.0",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 1422",
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest",
-    "lint": "prettier --check . && eslint .",
-    "format": "prettier --write ."
+    "lint": "eslint . --fix",
+    "pretty": "prettier --write ."
   },
   "private": true,
   "main": "src/main.ts",
@@ -33,7 +33,7 @@
     "typescript": "^5.0.0",
     "vite": "^5.0.3",
     "vitest": "^1.2.0",
-    "socket.io-client":"^4.x"
+    "socket.io-client": "^4.x"
   },
   "type": "module",
   "dependencies": {
@@ -49,5 +49,11 @@
     "@sparrow/library": "*",
     "@sparrow/common": "*",
     "@sparrow/teams": "*"
+  },
+  "lint-staged": {
+    "*.{js,ts,svelte,css,json}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }

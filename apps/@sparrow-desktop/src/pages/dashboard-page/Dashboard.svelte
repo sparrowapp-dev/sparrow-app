@@ -1,9 +1,9 @@
 <script lang="ts">
   import {
-    Sidebar,
     LoginBanner,
     LoginSignupConfirmation,
   } from "@sparrow/common/components";
+  import { Sidebar } from "@sparrow/common/features";
   import { Route, navigate } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../workspace-page/CollectionsPage.svelte";
@@ -26,6 +26,12 @@
   import Teams from "../teams-page/Teams.svelte";
   import { Modal } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";
+  import { isGuestUserActive } from "@app/store/auth.store";
+  import {
+    type SidebarItemBaseInterface,
+    SidebarItemPositionBaseEnum,
+    SidebarItemIdEnum,
+  } from "@sparrow/common/types/sidebar/sidebar-base";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -46,7 +52,8 @@
     id: "none",
   };
 
-  let externalSparrowLink = `${constants.SPARROW_AUTH_URL}`;
+  let externalSparrowLink =
+    `${constants.SPARROW_AUTH_URL}` + "/init?source=desktop";
   let isPopupOpen = false;
   let isLoginBannerActive = false;
   let isGuestUser = false;
@@ -171,6 +178,42 @@
       updateAvailable = false;
     }
   };
+
+  isGuestUserActive.subscribe((value) => {
+    isGuestUser = value;
+  });
+
+  let sidebarItems: SidebarItemBaseInterface[] = [
+    {
+      id: SidebarItemIdEnum.HOME,
+      route: !isGuestUser ? "/app/home" : "/guest/home",
+      heading: "Home",
+      disabled: false,
+      position: SidebarItemPositionBaseEnum.PRIMARY,
+    },
+    {
+      id: SidebarItemIdEnum.WORKSPACE,
+      route: !isGuestUser ? "/app/collections" : "/guest/collections",
+      heading: "Workspace",
+      disabled: false,
+      position: SidebarItemPositionBaseEnum.PRIMARY,
+    },
+    {
+      id: SidebarItemIdEnum.COMMUNITY,
+      route: "/app/help",
+      heading: "Community",
+      disabled: !isGuestUser ? false : true,
+      position: SidebarItemPositionBaseEnum.SECONDARY,
+    },
+    {
+      id: SidebarItemIdEnum.SETTING,
+      route: "/app/setting",
+      heading: "Setting",
+      disabled: true,
+      position: SidebarItemPositionBaseEnum.SECONDARY,
+    },
+  ];
+  // let mahi = { mahiSingh: "mahi" };
 </script>
 
 <div class="dashboard d-flex flex-column" style="height: 100vh;">
@@ -228,7 +271,12 @@
     <!-- 
       --Sidebar to naviagte between collection, environment and help page.
     -->
-    <Sidebar {user} onLogout={_viewModel.handleLogout} />
+    <Sidebar
+      {user}
+      {sidebarItems}
+      isVisible={isLoginBannerActive}
+      onLogout={_viewModel.handleLogout}
+    />
     <!-- 
       -- Dashboard renders any of the pages between collection, environment and help.
     -->

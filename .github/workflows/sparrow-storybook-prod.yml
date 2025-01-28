@@ -1,0 +1,46 @@
+name: Sparrow-storybook-prod
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+   build:
+      runs-on: ubuntu-latest
+      environment: sparrow_storybook_Prod
+      steps:
+         - uses: actions/checkout@master
+
+         - uses: Azure/docker-login@v1
+           with:
+              login-server: sparrowprod.azurecr.io
+              username: ${{ secrets.REGISTRY_USERNAME }}
+              password: ${{ secrets.REGISTRY_PASSWORD }}
+
+         - run: |
+              docker build -f ./Storybook.Dockerfile -t sparrowprod.azurecr.io/sparrow-storybook:${{ github.run_number }} .
+              docker push sparrowprod.azurecr.io/sparrow-storybook:${{ github.run_number }}
+
+   deploy:
+      needs: build
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@master
+         - uses: richardrigutins/replace-in-files@v1
+           with:
+              files: "./apps/@sparrow-storybook/deploymentManifests/deployment.yml"
+              search-text: '_BUILD__ID_'
+              replacement-text: '${{ github.run_number }}'
+
+         - uses: azure/setup-kubectl@v2.0
+
+         - uses: Azure/k8s-set-context@v2
+           with:
+              kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+         - uses: Azure/k8s-deploy@v4
+           with:
+              action: deploy
+              namespace: sparrow-prod
+              manifests: |
+                 ./apps/@sparrow-storybook/deploymentManifests/deployment.yml

@@ -7,6 +7,8 @@
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "..";
   import { Tooltip } from "@sparrow/library/ui";
+  import { onMount } from "svelte";
+  import { Base64Converter } from "@sparrow/common/utils";
   export let keyValue: {
     key: string;
     value: string;
@@ -113,7 +115,14 @@
     return fileName;
   };
 
+  let fileInput: HTMLInputElement;
+  let selectedFileIndex = 0;
   const uploadFormFile = async (index: number) => {
+    if (isWebApp) {
+      selectedFileIndex = index;
+      fileInput?.click();
+      return;
+    }
     const filePathResponse = (await invoke("fetch_file_command")) as string;
     if (filePathResponse !== "Canceled") {
       const filename = extractFileName(filePathResponse);
@@ -131,6 +140,32 @@
       updateParam(index);
     }
   };
+
+  onMount(() => {
+    fileInput = document.getElementById("fileInput") as HTMLInputElement;
+    fileInput?.addEventListener("change", async (event: Event) => {
+      const target = event.target as HTMLInputElement;
+      const files = target.files;
+      if (files?.length) {
+        const filename = files[0].name;
+        const base64Converter = new Base64Converter();
+        const data = await base64Converter.fileToBase64(files[0]);
+        let filteredPair = pairs.map((elem, i) => {
+          if (i == selectedFileIndex) {
+            elem.type = "file";
+            elem.value = filename;
+            elem.base = data;
+          }
+          return elem;
+        });
+        pairs = filteredPair;
+        callback(pairs);
+        updateParam(selectedFileIndex);
+      }
+      // Reset the input to allow re-uploading the same file
+      target.value = "";
+    });
+  });
 
   const removeFormFile = (index: number) => {
     let filteredPair = pairs.map((elem, i) => {
@@ -165,6 +200,7 @@
   };
 </script>
 
+<input type="file" id="fileInput" style="display: none" />
 <div
   class="mb-0 me-0 w-100 py-0 border-radius-2 section-layout"
   style="overflow:hidden;"
@@ -303,34 +339,34 @@
           >
             {#if pairs.length - 1 != index}
               {#if isInputBoxEditable}
-                {#if !isWebApp}
-                  <Tooltip
-                    title="Attach"
-                    show={isInputBoxEditable &&
-                      element.type == "text" &&
-                      element.value == ""}
-                    placement="bottom"
+                <!-- {#if !isWebApp} -->
+                <Tooltip
+                  title="Attach"
+                  show={isInputBoxEditable &&
+                    element.type == "text" &&
+                    element.value == ""}
+                  placement="bottom-center"
+                >
+                  <button
+                    class="d-flex align-items-center justify-content-center bg-secondary-700 border-0 {isInputBoxEditable &&
+                    element.type == 'text' &&
+                    element.value == ''
+                      ? 'opacity-1'
+                      : 'opacity-0 pe-none'}"
+                    style="width:16px; height:16px; padding:2px;"
+                    on:click={() => {
+                      uploadFormFile(index);
+                    }}
                   >
-                    <button
-                      class="d-flex align-items-center justify-content-center bg-secondary-700 border-0 {isInputBoxEditable &&
-                      element.type == 'text' &&
-                      element.value == ''
-                        ? 'opacity-1'
-                        : 'opacity-0 pe-none'}"
-                      style="width:16px; height:16px; padding:2px;"
-                      on:click={() => {
-                        uploadFormFile(index);
-                      }}
-                    >
-                      <AttachmentIcon
-                        height={"12px"}
-                        width={"12px"}
-                        color={"var(--icon-secondary-200)"}
-                      />
-                    </button>
-                  </Tooltip>
-                {/if}
-                <Tooltip title="Delete" placement="bottom">
+                    <AttachmentIcon
+                      height={"12px"}
+                      width={"12px"}
+                      color={"var(--icon-secondary-200)"}
+                    />
+                  </button>
+                </Tooltip>
+                <!-- {/if} -->
+                <Tooltip title="Delete" placement="bottom-center">
                   <button
                     class="d-flex align-items-center p-0 justify-content-center bg-secondary-700 border-0"
                     style="width:16px; height:16px;"

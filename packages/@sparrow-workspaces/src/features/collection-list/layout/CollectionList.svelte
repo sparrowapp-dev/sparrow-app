@@ -77,6 +77,7 @@
   export let toggleExpandCollection;
 
   export let isWebApp = false;
+  export let activeTabType;
 
   let collectionListDocument: CollectionDocument[];
 
@@ -240,7 +241,7 @@
       {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
         <Tooltip
           title={"Add Collection"}
-          placement={"bottom"}
+          placement={"bottom-center"}
           distance={13}
           show={isHovered}
           zIndex={701}
@@ -293,6 +294,7 @@
                     {onRefetchCollection}
                     {userRoleInWorkspace}
                     {activeTabPath}
+                    {activeTabType}
                     collection={col}
                     {activeTabId}
                     {searchData}
@@ -334,6 +336,7 @@
                   {onRefetchCollection}
                   {userRoleInWorkspace}
                   {activeTabPath}
+                  {activeTabType}
                   collection={col}
                   {activeTabId}
                   {isWebApp}

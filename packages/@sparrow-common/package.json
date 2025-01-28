@@ -1,14 +1,14 @@
 {
   "name": "@sparrow/common",
-  "version": "2.13.0",
+  "version": "2.16.0",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest",
-    "lint": "prettier --check . && eslint .",
-    "format": "prettier --write ."
+    "lint": "eslint . --fix",
+    "pretty": "prettier --write ."
   },
   "private": true,
   "main": "src/main.ts",
@@ -27,6 +27,7 @@
     "./utils/navigation": "./src/utils/navigation.ts",
     "./utils/team.helper": "./src/utils/team.helper.ts",
     "./utils/importCollectionValidations": "./src/utils/importCollectionValidations.ts",
+    "./types/sidebar/sidebar-base":"./src/types/sidebar/sidebar-base.ts",
     "./types/workspace": "./src/types/workspace/http-request-tab.ts",
     "./types/workspace/collection-base": "./src/types/workspace/collection-base.ts",
     "./types/workspace/http-request-base": "./src/types/workspace/http-request-base.ts",
@@ -115,5 +116,11 @@
     "uuid": "^9.0.1",
     "yup": "^1.2.0",
     "@sparrow/library": "*"
+  },
+  "lint-staged": {
+    "*.{js,ts,svelte,css,json}": [
+      "prettier --write",
+      "eslint --fix'"
+    ]
   }
 }

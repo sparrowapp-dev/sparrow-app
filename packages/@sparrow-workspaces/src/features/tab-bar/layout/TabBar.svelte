@@ -95,7 +95,7 @@
 </script>
 
 <button
-  class="tab border-0 ps-3 pe-3 w-100 bg-blackColor d-flex"
+  class="tab border-0 ps-3 py-0 pe-3 w-100 bg-blackColor d-flex"
   style="cursor: default;"
   on:drop|preventDefault={(event) => {
     onDropEvent(event);
@@ -116,7 +116,7 @@
             tabBarScroller("left");
           }}
           role="button"
-          class="layout d-flex align-items-center justify-content-center border-radius-2 border-0"
+          class="layout p-0 d-flex align-items-center justify-content-center border-radius-2 border-0"
           style="width:24px; transform: rotate(180deg); background-color: transparent; height:24px;"
         >
           <AngleLeftIcon
@@ -129,7 +129,7 @@
     {/if}
     <button
       on:dragover|preventDefault
-      class=" d-inline-block tab-scroller border-0 bg-transparent"
+      class=" d-inline-block tab-scroller p-0 border-0 bg-transparent"
       bind:offsetWidth={scrollerWidth}
       id="tab-scroller"
       style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 75px); "
@@ -158,7 +158,7 @@
             tabBarScroller("right");
           }}
           role="button"
-          class="layout d-flex align-items-center justify-content-center border-radius-2 border-0"
+          class="layout d-flex p-0 align-items-center justify-content-center border-radius-2 border-0"
           style="width:24px; transform: rotate(180deg); background-color: transparent; height:24px;"
         >
           <AngleRightIcon
@@ -173,7 +173,12 @@
       class="d-flex ps-1 align-items-center justify-content-center my-auto"
       style="height: 24px; "
     >
-      <Tooltip title={"New"} placement={"bottom"} distance={10} zIndex={20}>
+      <Tooltip
+        title={"New"}
+        placement={"bottom-center"}
+        distance={10}
+        zIndex={20}
+      >
         <button
           on:click={onNewTabRequested}
           role="button"
@@ -198,12 +203,12 @@
           <Tooltip
             title={"Quick Help"}
             distance={10}
-            placement={"bottom"}
+            placement={"bottom-center"}
             zIndex={10}
           >
             <button
               role="button"
-              class="layout border-0 border-radius-2 d-flex align-items-center justify-content-center"
+              class="layout border-0 p-0 border-radius-2 d-flex align-items-center justify-content-center"
               style="height: 24px; width:24px; background-color: transparent;"
               on:click={async () => {
                 const event = await onFetchCollectionGuide({
@@ -267,14 +272,14 @@
           >
             <Tooltip
               title={"Layout"}
-              placement={"left"}
+              placement={"left-center"}
               distance={12}
               show={!viewChange}
               zIndex={10}
             >
               <button
                 id="viewChange"
-                class="border-0 pt-0 border-radius-2 layout"
+                class="border-0 p-0 pt-0 border-radius-2 d-flex align-items-center justify-content-center layout"
                 style="background-color: transparent; height:24px; width:24px;"
                 on:click={() => {
                   viewChange = !viewChange;
@@ -304,7 +309,7 @@
           >
             <button
               id="moreOptions"
-              class="border-0 bg-transparent pt-1 rounded d-none"
+              class="border-0 bg-transparent p-0 rounded d-none"
               on:click={() => {
                 moreOption = !moreOption;
               }}

@@ -28,6 +28,7 @@
   import constants from "../../constants/constants";
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import { CreateTeam } from "@sparrow/common/features";
+  import { open } from "@tauri-apps/plugin-shell";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
@@ -180,7 +181,7 @@
                 class="p-2 d-flex align-items-center justify-content-between"
                 style="z-index: 4;"
               >
-                <Tooltip title={"Star Us On GitHub"} placement={"top"}>
+                <Tooltip title={"Star Us On GitHub"} placement={"top-center"}>
                   <div
                     class=" px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
                       ? 'bg-secondary-600'

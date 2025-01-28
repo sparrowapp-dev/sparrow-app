@@ -46,6 +46,7 @@ mod urlencoded_handler;
 mod utils;
 
 // External Imports
+use base64;
 use formdata_handler::make_formdata_request;
 use json_handler::make_json_request;
 use nfd::Response;
@@ -439,8 +440,55 @@ async fn make_request_v2(
     // Extract status code from response
     let response_status = response_value.status().clone();
 
-    // Extract response value from response
-    let response_text_result = decode_response_body(response_value).await;
+    //check is data binary
+
+    let mut content_type = response_headers
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("")
+        .to_string();
+
+    let is_binary = content_type.starts_with("image/");
+
+    let response_body;
+
+    if is_binary {
+        let base64_string;
+
+        if content_type.contains("svg") {
+            content_type = "image/svg+xml".to_string();
+
+            let response_text_result = decode_response_body(response_value).await;
+
+            let svg_string = match response_text_result {
+                Ok(value) => value,
+                Err(err) => format!("Error: {}", err),
+            };
+
+            println!("{}", svg_string);
+
+            base64_string = base64::encode(svg_string);
+        } else {
+            //extract bytes from respose body for further conversion
+            let bytes = response_value
+                .bytes()
+                .await
+                .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+
+            base64_string = base64::encode(bytes); // convert bytes to base64 string effiecient for transmission / no data willl not get currupted.
+        }
+
+        //create src from content type and base64 string
+        response_body = format!("data:{};base64,{}", content_type, base64_string);
+    } else {
+        //if data is non binary handle it as standrd flow
+        let response_text_result = decode_response_body(response_value).await;
+
+        response_body = match response_text_result {
+            Ok(value) => value,
+            Err(err) => format!("Error: {}", err),
+        };
+    }
 
     // Map headers into json
     let response_headers_json: serde_json::Value = response_headers
@@ -448,16 +496,11 @@ async fn make_request_v2(
         .map(|(name, value)| (name.to_string(), value.to_str().unwrap()))
         .collect();
 
-    let response_text = match response_text_result {
-        Ok(value) => value,
-        Err(err) => format!("Error: {}", err),
-    };
-
     // Combining all the parameters
     let combined_json = json!({
         "headers": response_headers_json,
         "status": response_status.to_string(),
-        "body": response_text,
+        "body": response_body,   // body data can be base64 string or text
     });
 
     return Ok(combined_json.to_string());

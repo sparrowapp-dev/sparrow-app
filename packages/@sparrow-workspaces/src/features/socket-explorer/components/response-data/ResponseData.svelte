@@ -146,7 +146,7 @@
               loader={false}
             />
           </Tooltip>
-          <Tooltip title={"Delete"}>
+          <Tooltip title={"Delete"} placement="bottom-right">
             <WithButtonV4
               icon={DustbinIcon}
               onClick={() => {

@@ -36,6 +36,7 @@ class InitGraphqlTab {
         graphql: {
           url: "",
           query: "",
+          mutation: "",
           schema: "",
           headers: [
             {
@@ -125,6 +126,12 @@ class InitGraphqlTab {
   public updateQuery(_query: string) {
     if (_query && this._tab.property.graphql) {
       this._tab.property.graphql.query = _query;
+    }
+    return this;
+  }
+  public updateMutation(_mutation: string) {
+    if (_mutation && this._tab.property.graphql) {
+      this._tab.property.graphql.mutation = _mutation;
     }
     return this;
   }

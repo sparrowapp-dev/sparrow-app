@@ -66,7 +66,7 @@
               .filter((item) => item.name
                   .toLowerCase()
                   .startsWith(filterText.toLowerCase()))
-              .sort((a, b) => a.name.localeCompare(b.name))
+              .sort((a, b) => new Date(b._data.updatedAt).getTime() - new Date(a._data.updatedAt).getTime())
               .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
               <Rows
                 {onAddMember}

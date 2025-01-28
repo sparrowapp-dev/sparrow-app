@@ -18,9 +18,9 @@
   >
     <h6 class="teams-heading ms-2 px-1">Teams</h6>
     <div>
-      <Tooltip title="New Team" placement={"bottom"} distance={10}>
+      <Tooltip title="New Team" placement={"bottom-center"} distance={10}>
         <button
-          class="new-team-btn d-flex align-items-center justify-content-center rounded border-0"
+          class="new-team-btn d-flex align-items-center justify-content-center p-0 rounded border-0"
           on:click={() => {
             isCreateTeamModalOpen = true;
           }}
@@ -67,7 +67,7 @@
               style="font-weight: 700;"
               class="ellipsis ms-1 sparrow-fs-12 text-left teams-title overflow-hidden my-auto"
             >
-              {team.name}
+              {team.name || ""}
             </p>
           </div>
           {#if team.isNewInvite}

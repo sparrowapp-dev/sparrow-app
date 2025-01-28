@@ -3,11 +3,7 @@ import {
   DecodeGraphql,
   ReduceAuthHeader,
 } from "@sparrow/workspaces/features/graphql-explorer/utils";
-import {
-  createDeepCopy,
-  moveNavigation,
-  throttle,
-} from "@sparrow/common/utils";
+import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 
 // ---- DB
@@ -64,7 +60,7 @@ import {
   type EnvironmentLocalGlobalJoinBaseInterface,
 } from "@sparrow/common/types/workspace/environment-base";
 import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
-import { parse } from "graphql";
+import { parse, GraphQLError } from "graphql";
 class GraphqlExplorerViewModel {
   /**
    * Repository
@@ -109,7 +105,7 @@ class GraphqlExplorerViewModel {
           this._tab.getValue().property?.graphql
             ?.auth as GraphqlRequestAuthTabInterface,
         ).getValue();
-        this.updateQueryAsPerSchema();
+        // this.updateQueryAsPerSchema();
       }, 0);
     }
   }
@@ -171,6 +167,7 @@ class GraphqlExplorerViewModel {
         .updateDescription(requestServer.description)
         .updateUrl(requestServer.graphql.url)
         .updateQuery(requestServer.graphql.query)
+        .updateMutation(requestServer.graphql.mutation)
         .updateState({
           requestAuthNavigation: requestServer.graphql.selectedGraphqlAuthType,
         })
@@ -349,7 +346,15 @@ class GraphqlExplorerViewModel {
   public updateSchemaAsPerQuery = async () => {
     try {
       const progressiveTab = createDeepCopy(this._tab.getValue());
-      const query = progressiveTab.property.graphql.query;
+      let query;
+      if (
+        progressiveTab.property.graphql.state.operationNavigation ===
+        GraphqlRequestOperationTabEnum.MUTATION
+      ) {
+        query = progressiveTab.property.graphql.mutation;
+      } else {
+        query = progressiveTab.property.graphql.query;
+      }
       try {
         // Check if the query is valid by attempting to parse it
         parse(query);
@@ -398,10 +403,18 @@ class GraphqlExplorerViewModel {
    */
   public updateRequestQuery = async (_query: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.graphql.query = _query;
+    if (
+      progressiveTab.property.graphql.state.operationNavigation ===
+      GraphqlRequestOperationTabEnum.QUERY
+    ) {
+      progressiveTab.property.graphql.query = _query;
+    } else {
+      progressiveTab.property.graphql.mutation = _query;
+    }
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     await this.updateSchemaAsPerQuery();
+    this.updateQueryErrorState();
     this.compareRequestWithServer();
   };
 
@@ -787,13 +800,80 @@ class GraphqlExplorerViewModel {
   private reverseGraphQLToJSON = (query) => {
     // Helper to process arguments
     const processArguments = (args) => {
-      return args.map((arg) => ({
-        name: arg.name.value,
-        itemType: "argument",
-        isSelected: true,
-        value: arg.value.kind === "StringValue" ? arg.value.value : null,
-        items: [],
-      }));
+      return args.map((arg) => {
+        let items = [];
+
+        // Handle different kinds of argument values
+        switch (arg.value.kind) {
+          case "StringValue":
+            // For StringValue, set value directly
+            return {
+              name: arg.name.value,
+              itemType: "argument",
+              isSelected: true,
+              value: arg.value.value, // Set value for StringValue
+              items: [], // No nested items
+            };
+          case "ObjectValue":
+            // For ObjectValue, process nested fields and place them in items
+            items = processObjectFields(arg.value.fields);
+            return {
+              name: arg.name.value,
+              itemType: "argument",
+              isSelected: true,
+              value: null, // Set value to null for ObjectValue
+              items: items, // Place nested fields in items
+            };
+          default:
+            // Handle other types if needed
+            return {
+              name: arg.name.value,
+              itemType: "argument",
+              isSelected: true,
+              value: null,
+              items: [],
+            };
+        }
+      });
+    };
+
+    // Helper to process object fields
+    const processObjectFields = (fields) => {
+      return fields.map((field) => {
+        let items = [];
+
+        // Handle different kinds of field values
+        switch (field.value.kind) {
+          case "StringValue":
+            // For StringValue, set value directly
+            return {
+              name: field.name.value,
+              itemType: "field",
+              isSelected: true,
+              value: field.value.value, // Set value for StringValue
+              items: [], // No nested items
+            };
+          case "ObjectValue":
+            // For ObjectValue, process nested fields and place them in items
+            items = processObjectFields(field.value.fields);
+            return {
+              name: field.name.value,
+              itemType: "field",
+              isSelected: true,
+              value: null, // Set value to null for ObjectValue
+              items: items, // Place nested fields in items
+            };
+          default:
+            // Handle other types if needed
+            return {
+              name: field.name.value,
+              itemType: "field",
+              isSelected: true,
+              value: null,
+              items: [],
+            };
+        }
+      });
     };
 
     // Helper to process fields
@@ -825,6 +905,78 @@ class GraphqlExplorerViewModel {
     const operation = parsedQuery.definitions[0];
     const operationName = operation?.name ? operation?.name?.value : "Query";
     const fields = processFields(operation.selectionSet.selections);
+
+    return {
+      operationName,
+      items: fields,
+    };
+  };
+
+  /**
+   * Processes a GraphQL query and compares it with the provided schema JSON.
+   * Converts the query structure into a JSON-like representation with metadata
+   * such as selected fields, arguments, and schema validation.
+   *
+   * @param query - The GraphQL query string to be processed.
+   * @param schemaJson - The schema JSON used to validate and enrich the query structure.
+   * @returns A JSON-like representation of the query, enriched with schema details.
+   */
+  private reverseAndCompareGraphQLToJSON = (query, schemaJson) => {
+    // Helper to process arguments
+    const processArguments = (args, schemaArgs) => {
+      return args.map((arg) => {
+        const schemaArg = schemaArgs.find((a) => a.name === arg.name.value);
+        return {
+          name: arg.name.value,
+          itemType: "argument",
+          isSelected: true,
+          value: arg.value.kind === "StringValue" ? arg.value.value : null,
+          isUserAdded: !schemaArg, // Mark as user-added if not in schema
+          items: [],
+        };
+      });
+    };
+
+    // Helper to process fields recursively
+    const processFields = (fields, schemaFields) => {
+      return fields.map((field) => {
+        const schemaField =
+          schemaFields.find((f) => f.name === field.name.value) || {};
+        const args = field.arguments
+          ? processArguments(field.arguments, schemaField.items || [])
+          : [];
+        const nestedFields =
+          field.selectionSet && field.selectionSet.selections
+            ? processFields(
+                field.selectionSet.selections,
+                schemaField.items || [],
+              )
+            : [];
+
+        return {
+          id: field.name.value, // Use a UUID generator if needed
+          name: field.name.value,
+          description: schemaField.description || null, // Use schema description if available
+          type: schemaField.type || null, // Use schema type if available
+          itemType: "field",
+          isSelected: true, // Since it's part of the query, it's selected
+          value: null, // Default value
+          isUserAdded: !schemaField.name, // Mark as user-added if not in schema
+          items: [...args, ...nestedFields],
+        };
+      });
+    };
+
+    // Parse the query
+    const parsedQuery = parse(query);
+
+    // Entry point: process the main operation
+    const operation = parsedQuery.definitions[0];
+    const operationName = operation?.name ? operation?.name?.value : "Query";
+    const fields = processFields(
+      operation.selectionSet.selections,
+      schemaJson.items,
+    );
 
     return {
       operationName,
@@ -1116,6 +1268,61 @@ class GraphqlExplorerViewModel {
     this.compareRequestWithServer();
   };
 
+  /**
+   * Merges two JSON structures (`realJson` and `schemaJson`) recursively.
+   * The merged structure retains selected items from `realJson` and
+   * adds user-added items from `schemaJson` that are not already present.
+   *
+   * @param realJson - The JSON structure representing the real data.
+   * @param schemaJson - The JSON structure representing the schema data.
+   * @returns The merged JSON structure.
+   */
+  private mergeJson = async (realJson, schemaJson) => {
+    // Helper function to find matching schema item by name
+    const findSchemaItem = (schemaItems, name) =>
+      schemaItems.find((item) => item.name === name);
+
+    // Recursive function to merge items
+    const mergeItems = (realItems, schemaItems) => {
+      const result = [];
+
+      // Process items from realJson
+      realItems.forEach((realItem) => {
+        const schemaItem = findSchemaItem(schemaItems, realItem.name);
+
+        // Add realItem if it's selected
+        if (realItem.isSelected) {
+          const mergedItem = {
+            ...realItem,
+            items: mergeItems(realItem.items || [], schemaItem?.items || []),
+          };
+          result.push(mergedItem);
+        }
+      });
+
+      // Process user-added items from schemaJson
+      schemaItems.forEach((schemaItem) => {
+        if (schemaItem.isUserAdded) {
+          const existingItem = result.find(
+            (item) => item.name === schemaItem.name,
+          );
+          if (!existingItem) {
+            const newItem = {
+              ...schemaItem,
+              items: mergeItems([], schemaItem.items || []),
+            };
+            result.push(newItem);
+          }
+        }
+      });
+
+      return result;
+    };
+
+    // Start merging from the top level
+    return mergeItems(realJson, schemaJson);
+  };
+
   public updateQueryAsPerSchema = async () => {
     try {
       const progressiveTab = createDeepCopy(this._tab.getValue());
@@ -1125,15 +1332,47 @@ class GraphqlExplorerViewModel {
         progressiveTab.property.graphql.state.operationNavigation ===
         GraphqlRequestOperationTabEnum.QUERY
       ) {
-        _query = await this.generateGraphQLQuery(parsedSchema.Query, "Query");
+        try {
+          const existingJson = this.reverseAndCompareGraphQLToJSON(
+            progressiveTab.property.graphql.query,
+            parsedSchema.Query,
+          );
+          const newJSon = await this.mergeJson(
+            parsedSchema.Query.items,
+            existingJson.items,
+          );
+          const newQuery = await this.generateGraphQLQuery(
+            { items: newJSon },
+            "Query",
+          );
+          _query = newQuery;
+        } catch (error) {
+          _query = await this.generateGraphQLQuery(parsedSchema.Query, "Query");
+        }
+        progressiveTab.property.graphql.query = _query;
       } else {
-        _query = await this.generateGraphQLQuery(
-          parsedSchema.Mutation,
-          "Mutation",
-        );
+        try {
+          const existingJson = this.reverseAndCompareGraphQLToJSON(
+            progressiveTab.property.graphql.mutation,
+            parsedSchema.Mutation,
+          );
+          const newJSon = await this.mergeJson(
+            parsedSchema.Mutation.items,
+            existingJson.items,
+          );
+          const newQuery = await this.generateGraphQLQuery(
+            { items: newJSon },
+            "Mutation",
+          );
+          _query = newQuery;
+        } catch (error) {
+          _query = await this.generateGraphQLQuery(
+            parsedSchema.Mutation,
+            "Mutation",
+          );
+        }
+        progressiveTab.property.graphql.mutation = _query;
       }
-
-      progressiveTab.property.graphql.query = _query;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } catch (error) {
@@ -1168,6 +1407,127 @@ class GraphqlExplorerViewModel {
   };
 
   /**
+   * Updates the error state of GraphQL Query to know whether query is valid graphql query or not.
+   */
+  public updateQueryErrorState = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    let isQueryInvalid = false;
+    let start = 0;
+    let end = 0;
+    let queryErrorMessage = "";
+    if (
+      progressiveTab.property.graphql.state.operationNavigation ===
+      GraphqlRequestOperationTabEnum.QUERY
+    ) {
+      try {
+        await parse(progressiveTab.property.graphql.query);
+        isQueryInvalid = false;
+      } catch (error) {
+        if (error instanceof GraphQLError) {
+          const locations = error.locations;
+          if (locations && locations.length > 0) {
+            // Convert line/column to character index
+            const startIndex = this.getCharacterIndex(
+              progressiveTab.property.graphql.query,
+              locations[0].line,
+              locations[0].column,
+            );
+
+            // For the end index, we'll try to capture the problematic token
+            // If not available, we'll use start + 1 as a fallback
+            let endIndex = startIndex;
+            if (error.nodes && error.nodes[0]) {
+              endIndex = error.nodes[0].endIndex;
+            } else {
+              // Try to find the next non-alphanumeric character as the end
+              endIndex = this.findNextBreakpoint(
+                progressiveTab.property.graphql.query,
+                startIndex,
+              );
+            }
+            start = startIndex;
+            end = endIndex;
+            queryErrorMessage = error?.message || "";
+            isQueryInvalid = true;
+          }
+        }
+      }
+    } else {
+      try {
+        await parse(progressiveTab.property.graphql.mutation);
+        isQueryInvalid = false;
+      } catch (error) {
+        if (error instanceof GraphQLError) {
+          const locations = error.locations;
+          if (locations && locations.length > 0) {
+            // Convert line/column to character index
+            const startIndex = this.getCharacterIndex(
+              progressiveTab.property.graphql.mutation,
+              locations[0].line,
+              locations[0].column,
+            );
+
+            // For the end index, we'll try to capture the problematic token
+            // If not available, we'll use start + 1 as a fallback
+            let endIndex = startIndex;
+            if (error.nodes && error.nodes[0]) {
+              endIndex = error.nodes[0].endIndex;
+            } else {
+              // Try to find the next non-alphanumeric character as the end
+              endIndex = this.findNextBreakpoint(
+                progressiveTab.property.graphql.mutation,
+                startIndex,
+              );
+            }
+            start = startIndex;
+            end = endIndex;
+            queryErrorMessage = error?.message || "";
+            isQueryInvalid = true;
+          }
+        }
+      }
+    }
+    return { isQueryInvalid, start, end, queryErrorMessage };
+  };
+
+  // Helper function to convert line/column to character index
+  private getCharacterIndex(
+    text: string,
+    line: number,
+    column: number,
+  ): number {
+    const lines = text.split("\n");
+    let index = 0;
+
+    // Add up lengths of all previous lines
+    for (let i = 0; i < line - 1; i++) {
+      index += lines[i].length + 1; // +1 for the newline character
+    }
+
+    // Add the column position in the current line
+    index += column - 1;
+
+    return index;
+  }
+
+  // Helper function to find the next suitable ending position for the error range
+  private findNextBreakpoint(text: string, start: number): number {
+    const maxLength = 20; // Maximum length to look ahead
+    let end = start + 1;
+
+    while (end < text.length && end < start + maxLength) {
+      const char = text[end];
+      // Stop at whitespace or special characters
+      if (/[\s{}()[\]:,]/.test(char)) {
+        break;
+      }
+      end++;
+    }
+
+    return end;
+  }
+
+  /**
    *
    * @param _state - request state
    */
@@ -1181,9 +1541,12 @@ class GraphqlExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    if (_state?.operationNavigation) {
-      await this.updateQueryAsPerSchema();
-    }
+    // if (_state?.operationNavigation) {
+    //   await this.updateQueryAsPerSchema();
+    // }
+    setTimeout(() => {
+      this.updateQueryErrorState();
+    }, 1000);
     this.compareRequestWithServer();
   };
 
@@ -1625,6 +1988,7 @@ class GraphqlExplorerViewModel {
         graphql: {
           url: unadaptedRequest.url as string,
           query: unadaptedRequest.query,
+          mutation: unadaptedRequest.mutation,
           schema: unadaptedRequest.schema,
           variables: unadaptedRequest.variables,
           headers: unadaptedRequest.headers,
@@ -1670,6 +2034,7 @@ class GraphqlExplorerViewModel {
       description: graphqlTabData?.description as string,
       url: unadaptedRequest.url as string,
       query: unadaptedRequest.query,
+      mutation: unadaptedRequest.mutation,
       schema: unadaptedRequest.schema,
       variables: unadaptedRequest.variables,
       headers: unadaptedRequest.headers,
@@ -1863,6 +2228,7 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(req.graphql.url as string);
             initRequestTab.updateQuery(req.graphql.query as string);
+            initRequestTab.updateMutation(req.graphql.mutation as string);
             initRequestTab.updateSchema(req.graphql.schema as string);
             initRequestTab.updateVariables(req.graphql.variables as string);
             initRequestTab.updateAuth(
@@ -1940,6 +2306,9 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(res.data.data.graphql?.url as string);
             initRequestTab.updateQuery(res.data.data.graphql?.query as string);
+            initRequestTab.updateMutation(
+              res.data.data.graphql?.mutation as string,
+            );
             initRequestTab.updateSchema(
               res.data.data.graphql?.schema as string,
             );
@@ -2013,6 +2382,7 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(req.graphql?.url as string);
             initRequestTab.updateQuery(req.graphql?.query as string);
+            initRequestTab.updateMutation(req.graphql?.mutation as string);
             initRequestTab.updateVariables(req.graphql?.variables as string);
             initRequestTab.updateSchema(req.graphql?.schema as string);
             initRequestTab.updateAuth(
@@ -2088,6 +2458,9 @@ class GraphqlExplorerViewModel {
             initRequestTab.updatePath(expectedPath);
             initRequestTab.updateUrl(res.data.data.graphql?.url as string);
             initRequestTab.updateQuery(res.data.data.graphql?.query as string);
+            initRequestTab.updateMutation(
+              res.data.data.graphql?.mutation as string,
+            );
             initRequestTab.updateVariables(
               res.data.data.graphql?.variables as string,
             );
