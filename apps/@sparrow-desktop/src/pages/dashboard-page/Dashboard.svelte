@@ -30,6 +30,7 @@
   import {
     type SidebarItemBaseInterface,
     SidebarItemPositionBaseEnum,
+    SidebarItemIdEnum,
   } from "@sparrow/common/types/sidebar/sidebar-base";
 
   const _viewModel = new DashboardViewModel();
@@ -184,28 +185,28 @@
 
   let sidebarItems: SidebarItemBaseInterface[] = [
     {
-      id: "Home",
+      id: SidebarItemIdEnum.HOME,
       route: !isGuestUser ? "/app/home" : "/guest/home",
       heading: "Home",
       disabled: false,
       position: SidebarItemPositionBaseEnum.PRIMARY,
     },
     {
-      id: "Workspace",
+      id: SidebarItemIdEnum.WORKSPACE,
       route: !isGuestUser ? "/app/collections" : "/guest/collections",
       heading: "Workspace",
       disabled: false,
       position: SidebarItemPositionBaseEnum.PRIMARY,
     },
     {
-      id: "Community",
+      id: SidebarItemIdEnum.COMMUNITY,
       route: "/app/help",
       heading: "Community",
       disabled: !isGuestUser ? false : true,
       position: SidebarItemPositionBaseEnum.SECONDARY,
     },
     {
-      id: "Setting",
+      id: SidebarItemIdEnum.SETTING,
       route: "/app/setting",
       heading: "Setting",
       disabled: true,
@@ -273,7 +274,6 @@
     <Sidebar
       {user}
       {sidebarItems}
-      {isGuestUser}
       isVisible={isLoginBannerActive}
       onLogout={_viewModel.handleLogout}
     />

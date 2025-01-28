@@ -3,6 +3,11 @@ import {
     Sidebar
   } from "@sparrow/common/features";
  
+  import {
+    SidebarItemPositionBaseEnum,
+    SidebarItemIdEnum,
+  } from "@sparrow/common/types/sidebar/sidebar-base";  
+
 
 export default {
   title: 'Components/Navigation-rail',
@@ -16,30 +21,30 @@ export const defaultIcon = {
           {
             route: true ? "/app/home" : "/guest/home",
             heading: "Home",
-            id :"Home",
+            id :SidebarItemIdEnum.HOME,
             disabled: false,
-            position: "primary",
+            position: SidebarItemPositionBaseEnum.PRIMARY,
           },
           {
             route: true ? "/app/collections" : "/guest/collections",
-            id:"Workspace",
+            id:SidebarItemIdEnum.WORKSPACE,
         heading: "Workspace",
         disabled: false,
-        position: "primary",
+        position: SidebarItemPositionBaseEnum.PRIMARY,
           },
           {
             route: "/app/help",
-            id:"Community",
+            id:SidebarItemIdEnum.COMMUNITY,
             heading: "Community",
             disabled: false,
-            position: "secondary",
+            position: SidebarItemPositionBaseEnum.SECONDARY,
           },
           {
             route: "/app/setting",
-            id:"Setting",
+            id:SidebarItemIdEnum.SETTING,
            heading: "Setting",
            disabled: false,
-           position: "secondary",
+           position: SidebarItemPositionBaseEnum.SECONDARY,
            },
         ]
     }
@@ -50,30 +55,30 @@ export const disabledIcon = {
         {
           route: true ? "/app/home" : "/guest/home",
           heading: "Home",
-          id:"Home",
+          id:SidebarItemIdEnum.HOME,
           disabled: true,
-          position: "primary",
+          position: SidebarItemPositionBaseEnum.PRIMARY,
         },
         {
           route: true ? "/app/collections" : "/guest/collections",
-      heading: "Workspace",
-      id:"Workspace",
-      disabled: true,
-      position: "primary",
+          heading: "Workspace",
+          id:SidebarItemIdEnum.WORKSPACE,
+          disabled: true,
+          position:SidebarItemPositionBaseEnum.PRIMARY ,
         },
         {
           route: "/app/help",
           heading: "Community",
-          id: "Community",
+          id: SidebarItemIdEnum.COMMUNITY,
           disabled: true,
-          position: "secondary",
+          position: SidebarItemPositionBaseEnum.SECONDARY,
         },
         {
           route: "/app/setting",
          heading: "Setting",
-         id:      "Setting",
+         id:      SidebarItemIdEnum.SETTING,
          disabled: true,
-         position: "secondary",
+         position: SidebarItemPositionBaseEnum.SECONDARY,
          },
       ]
   }
@@ -84,31 +89,30 @@ export const semibottomUpIcon = {
         {
           route: true ? "/app/home" : "/guest/home",
           heading: "Home",
-          id: "Home",
+          id: SidebarItemIdEnum.HOME,
           disabled: false,
-          position: "primary",
+          position: SidebarItemPositionBaseEnum.PRIMARY,
         },
         {
           route: true ? "/app/collections" : "/guest/collections",
-      heading: "Workspace",
-      id:  "Workspace",
-      disabled: false,
-      position: "primary",
+          heading: "Workspace",
+          id:  SidebarItemIdEnum.WORKSPACE,
+          disabled: false,
+          position: SidebarItemPositionBaseEnum.PRIMARY,
         },
         {
           route: "/app/help",
           heading: "Community",
-          id: "Community",
+          id: SidebarItemIdEnum.COMMUNITY,
           disabled: true,
-          position: "secondary",
+          position: SidebarItemPositionBaseEnum.SECONDARY,
         },
         {
           route: "/app/setting",
-         heading: "Setting",
-         id: "Setting",
- 
-         disabled: true,
-         position: "secondary",
+          heading: "Setting",
+          id: SidebarItemIdEnum.SETTING,
+          disabled: true,
+          position: SidebarItemPositionBaseEnum.SECONDARY,
          },
       ]
   }
@@ -119,30 +123,30 @@ export const semiBottomDownIcon = {
         {
           route: true ? "/app/home" : "/guest/home",
           heading: "Home",
-          id: "Home",
+          id: SidebarItemIdEnum.HOME,
           disabled: true,
-          position: "primary",
+          position: SidebarItemPositionBaseEnum.PRIMARY,
         },
         {
           route: true ? "/app/collections" : "/guest/collections",
-      heading: "Workspace",
-      id: "Workspace",
-      disabled: true,
-      position: "primary",
+          heading: "Workspace",
+          id: SidebarItemIdEnum.WORKSPACE,
+          disabled: true,
+          position: SidebarItemPositionBaseEnum.PRIMARY,
         },
         {
           route: "/app/help",
           heading: "Community",
-          id: "Community",
+          id: SidebarItemIdEnum.COMMUNITY,
           disabled: false,
-          position: "secondary",
+          position: SidebarItemPositionBaseEnum.SECONDARY,
         },
         {
           route: "/app/setting",
-         heading: "Setting",
-         id: "Setting",
-         disabled: false,
-         position: "secondary",
+          heading: "Setting",
+          id: SidebarItemIdEnum.SETTING,
+          disabled: false,
+          position: SidebarItemPositionBaseEnum.SECONDARY,
          },
       ]
   }

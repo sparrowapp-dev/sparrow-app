@@ -1,6 +1,3 @@
-<script lang="ts" context="module">
-</script>
-
 <script lang="ts">
   import { Link, Router } from "svelte-navigator";
   import { Tooltip } from "@sparrow/library/ui";
@@ -9,7 +6,6 @@
    * List of side bar Items
    */
   export let item: SidebarItemObj;
-  export let isGuestUser;
   export let slidebarPlace;
 
   let isRouteActive = false;
@@ -19,16 +15,12 @@
   placement="right-center"
   title={item.disabled ? "Coming Soon" : item.heading}
   zIndex={600}
-  show={!(
-    isGuestUser &&
-    (item.heading === "Setting" || item.heading === "Help")
-  )}
 >
   <Router>
     <div class="sidebar-item-parent" class:disabled={item.disabled}>
       <Link
         class="delay-class"
-        id="divHeight"
+        id={item.id}
         to={item.route}
         getProps={({ isCurrent, isPartiallyCurrent }) => {
           isRouteActive = isCurrent || isPartiallyCurrent;
@@ -76,7 +68,7 @@
   }
 
   .sidebar-item:hover {
-    background-color: var(--nav-bar-hover-background);
+    background-color: var(--bg-ds-surface-500);
     opacity: 1;
   }
 

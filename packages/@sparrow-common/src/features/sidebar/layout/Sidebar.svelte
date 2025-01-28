@@ -16,27 +16,26 @@
     hoveredHelp,
     selectedHelp,
   } from "../images";
-
   import SidebarItem from "../components/SidebarItem.svelte";
+
   import {
-    type SidebarItemBaseInfterface,
+    type SidebarItemBaseInterface,
     SidebarItemImgEnum,
     SidebarItemPositionBaseEnum,
     type SidebarItemBaseAllIconInterface,
   } from "../../../types/sidebar/sidebar-base";
 
+  export let sidebarItems: SidebarItemBaseInterface[] = [];
+  const SidebarImageItem: SidebarItemBaseAllIconInterface[] = [];
   // import { isGuestUserActive } from "@app/store/auth.store";
 
   let componentClass = "";
   export { componentClass as class };
   export let user;
-  export let sidebarItems: SidebarItemBaseInfterface[] = [];
   export let isGuestUser;
   export let isVisible = true;
   export let onLogout: () => void;
   export let type = "desktop";
-
-  const SidebarImageItem: SidebarItemBaseAllIconInterface[] = [];
 
   let divHeight = 0;
 
@@ -57,26 +56,35 @@
       selectedLogo: "",
     };
 
-    if (item.id === SidebarItemImgEnum.HOME) {
-      sidebarItemWithIcons.defaultLogo = home;
-      sidebarItemWithIcons.hoveredLogo = hoveredHome;
-      sidebarItemWithIcons.selectedLogo = selectedHome;
-    } else if (item.id === SidebarItemImgEnum.WORKSPACE) {
-      sidebarItemWithIcons.defaultLogo = collections;
-      sidebarItemWithIcons.hoveredLogo = hoveredCollections;
-      sidebarItemWithIcons.selectedLogo = selectedCollections;
-    } else if (item.id === SidebarItemImgEnum.COMMUNITY) {
-      sidebarItemWithIcons.defaultLogo = help;
-      sidebarItemWithIcons.hoveredLogo = hoveredHelp;
-      sidebarItemWithIcons.selectedLogo = selectedHelp;
-    } else if (item.id === SidebarItemImgEnum.SETTING) {
-      sidebarItemWithIcons.defaultLogo = settings;
-      sidebarItemWithIcons.hoveredLogo = hoveredSettings;
-      sidebarItemWithIcons.selectedLogo = selectedSettings;
+    switch (item.id) {
+      case SidebarItemImgEnum.HOME:
+        sidebarItemWithIcons.defaultLogo = home;
+        sidebarItemWithIcons.hoveredLogo = hoveredHome;
+        sidebarItemWithIcons.selectedLogo = selectedHome;
+        break;
+
+      case SidebarItemImgEnum.WORKSPACE:
+        sidebarItemWithIcons.defaultLogo = collections;
+        sidebarItemWithIcons.hoveredLogo = hoveredCollections;
+        sidebarItemWithIcons.selectedLogo = selectedCollections;
+        break;
+
+      case SidebarItemImgEnum.COMMUNITY:
+        sidebarItemWithIcons.defaultLogo = help;
+        sidebarItemWithIcons.hoveredLogo = hoveredHelp;
+        sidebarItemWithIcons.selectedLogo = selectedHelp;
+        break;
+
+      case SidebarItemImgEnum.SETTING:
+        sidebarItemWithIcons.defaultLogo = settings;
+        sidebarItemWithIcons.hoveredLogo = hoveredSettings;
+        sidebarItemWithIcons.selectedLogo = selectedSettings;
+        break;
     }
 
     SidebarImageItem.push(sidebarItemWithIcons);
   });
+
   let primarySidebarItems = SidebarImageItem.filter(
     (item) => item.position === SidebarItemPositionBaseEnum.PRIMARY,
   );
@@ -96,9 +104,7 @@
   });
 
   let initialId = "";
-
   afterUpdate(() => {
-    console.log("clicked");
     if (initialId) {
       logPositions(initialId);
     }
@@ -107,6 +113,7 @@
   //* @param idCheck - Boolean indicating whether the ID is valid.
   // * @param id - The ID to process.
   const slidebarPlace = (idCheck: boolean, id: string) => {
+    console.log(idCheck, id);
     if (idCheck) {
       initialId = id;
       logPositions(id);
@@ -116,13 +123,11 @@
 
 <div class={`sidebar ${componentClass}`}>
   <div class="active-indicator" style="top:{divHeight + 2}px"></div>
-
   <div class="primary-sidebar-items">
     {#each primarySidebarItems as item (item.route)}
       <div id={`sidebar-item-${item.id}`}>
         <SidebarItem
           {item}
-          {isGuestUser}
           {slidebarPlace}
           on:click={(event) => handleCompo(event.detail)}
         />
@@ -134,7 +139,6 @@
       <div id={`sidebar-item-${item.id}`}>
         <SidebarItem
           {item}
-          {isGuestUser}
           {slidebarPlace}
           on:click={(event) => handleCompo(event.detail)}
         />
