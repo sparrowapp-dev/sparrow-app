@@ -409,7 +409,7 @@ export class DashboardViewModel {
     initWorkspaceTab.updateName(ws.name);
     await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
     await this.workspaceRepository.setActiveWorkspace(id);
-    navigate("/dashboard/collections");
+    navigate("collections");
   };
 
   /**
