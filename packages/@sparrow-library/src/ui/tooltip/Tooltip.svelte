@@ -31,6 +31,9 @@
   let isHover = false;
   let isDelayed = false;
 
+  /**
+   * Return the style for small or medium type of tooltip
+   */
   const getTypeStyles = () => {
     if (size === "small") {
       return {
