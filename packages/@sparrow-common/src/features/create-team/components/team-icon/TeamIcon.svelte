@@ -128,13 +128,13 @@
   <!-- 
     -- Title 
   -->
-  <span class="text-fs-14 text-secondary-1000">{ICON_CONFIG.TITLE}</span>
+  <span class="text-fs-14 upload-file-title">{ICON_CONFIG.TITLE}</span>
 
   <!-- 
     -- Description 
   -->
   {#if !(!Array.isArray(teamForm.file.value) && teamForm.file.value.size > 0)}
-    <p class="mb-2 text-fs-12 text-secondary-200">
+    <p class="mb-2 text-fs-12 upload-file-description">
       {ICON_CONFIG.DESCRIPTION}
     </p>
   {/if}
@@ -157,25 +157,72 @@
   <!-- 
     -- Error Messages 
   -->
-  <div>
-    {#if teamForm.file.showFileSizeError}
-      <p class="mb-2 mt-1 text-fs-12 text-danger-200">
-        {ICON_CONFIG.SIZE_EXCEED_ERROR_MESSAGE}
-      </p>
-    {:else if teamForm.file.showFileTypeError}
-      <p class="mb-2 mt-1 text-fs-12 text-danger-200">
-        {ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
-      </p>
-      <!-- 
+  <div class="Messages-container">
+    <div>
+      {#if teamForm.file.showFileSizeError}
+        <p class="mb-2 text-fs-12 message-error-text">
+          {ICON_CONFIG.SIZE_EXCEED_ERROR_MESSAGE}
+        </p>
+      {:else if teamForm.file.showFileTypeError}
+        <p class="mb-2 text-fs-12 message-error-text">
+          {ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
+        </p>
+        <!-- 
         -- Supportes File Types Button 
       -->
-      <div class="d-flex">
-        {#each ICON_CONFIG.FILE_TYPES as fileType (fileType)}
-          <span class="me-4">
-            <FileType {fileType} />
-          </span>
-        {/each}
-      </div>
-    {/if}
+        <div class="d-flex">
+          {#each ICON_CONFIG.FILE_TYPES as fileType (fileType)}
+            <span class="me-2">
+              <FileType {fileType} />
+            </span>
+          {/each}
+        </div>
+      {/if}
+    </div>
+    <div class="upload-max-file-content">
+      <p
+        class={`mb-2 text-fs-12 ${teamForm.file.showFileSizeError ? "upload-max-file-text-error" : "upload-max-file-text"}`}
+      >
+        Max file size: 2MB
+      </p>
+    </div>
   </div>
 </div>
+
+<style lang="scss">
+  .upload-file-title {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    line-height: 20.02px;
+    text-align: left;
+    color: var(--text-ds-neutral-200);
+  }
+  .upload-file-description {
+    color: var(--text-ds-neutral-400);
+    font-weight: 400;
+    line-height: 18px;
+  }
+  .Messages-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .message-error-text {
+    color: var(--text-ds-danger-300);
+    word-break: break-word;
+  }
+  .upload-max-file-content {
+    font-size: 12px;
+    font-size: "inter";
+    font-weight: 400;
+    font-family: "Inter", sans-serif;
+    line-height: 18px;
+    white-space: nowrap;
+  }
+  .upload-max-file-text {
+    color: var(--text-ds-neutral-400);
+  }
+  .upload-max-file-text-error {
+    color: var(--text-ds-danger-300);
+  }
+</style>
