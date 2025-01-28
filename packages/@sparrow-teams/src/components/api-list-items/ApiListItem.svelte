@@ -7,6 +7,7 @@
   export let onApiClick;
 
   const handleApiClick = (api) => {
+    console.log("api", api);
     onApiClick(api);
   };
 </script>

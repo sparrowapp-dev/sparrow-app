@@ -527,17 +527,16 @@ public getLatestUpdatedFolder = async (collectionId?: string): Promise<Collectio
   let collections;
   
   if (collectionId) {
-    // Search in specific collection
     collections = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
-          id: collectionId
+          id: collectionId,
         }
       })
       .exec();
+    
     collections = collections ? [collections] : [];
   } else {
-    // Search across all collections
     collections = await RxDB.getInstance()
       .rxdb.collection.find()
       .exec();
@@ -546,7 +545,6 @@ public getLatestUpdatedFolder = async (collectionId?: string): Promise<Collectio
   let latestFolder: CollectionItemsDto | null = null;
   let latestUpdateTime = 0;
 
-  // Iterate through all collections and their items to find the latest folder
   collections.forEach(collection => {
     const findLatestInItems = (items: CollectionItemsDto[]) => {
       items.forEach(item => {
@@ -556,8 +554,6 @@ public getLatestUpdatedFolder = async (collectionId?: string): Promise<Collectio
             latestUpdateTime = itemUpdateTime;
             latestFolder = item;
           }
-          
-          // If folder has nested items, search through them as well
           if (item.items && Array.isArray(item.items)) {
             findLatestInItems(item.items);
           }
@@ -569,7 +565,6 @@ public getLatestUpdatedFolder = async (collectionId?: string): Promise<Collectio
       findLatestInItems(collection.items);
     }
   });
-
   return latestFolder;
 };
 

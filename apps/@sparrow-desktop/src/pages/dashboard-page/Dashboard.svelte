@@ -27,8 +27,10 @@
   import { Modal } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";
   import { fade } from "svelte/transition";
-  import GlobalSearchWrapper from "../../../../../packages/@sparrow-common/src/components/popup/global-search/GlobalSearchWrapper.svelte";
   import GlobalSearch from "../../../../../packages/@sparrow-common/src/components/popup/global-search/GlobalSearch.svelte";
+  import { TeamsViewModel } from "../teams-page/Teams.ViewModel";
+  
+
 
 const _viewModel = new DashboardViewModel();
   let userId;
@@ -54,9 +56,13 @@ const _viewModel = new DashboardViewModel();
   let isLoginBannerActive = false;
   let isGuestUser = false;
   let isWorkspaceModalOpen = false;
+  let hideGlobalSearch = false;
 
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
+  };
+  let handlehideGlobalSearch = (val:boolean) => {
+    hideGlobalSearch = val;
   };
 
   let currentWorkspaceId = "";
@@ -185,26 +191,24 @@ const _viewModel = new DashboardViewModel();
       updateAvailable = false;
     }
   };
+
+   $: console.log("hide state", hideGlobalSearch);
 </script>
 
-<div class="dashboard d-flex flex-column" style="height: 100vh;"> 
-  {#if isGlobalSearchOpen}
-    <!-- Render GlobalSearch when isGlobalSearchOpen is true -->
-    <div class="global-search-overlay" transition:fade={{ duration: 300 }}>
+
+   {#if (isGlobalSearchOpen && (!hideGlobalSearch))}
+    <div class="global-search-overlay" transition:fade={{ duration: 300 }}
+    on:mousedown|self={closeGlobalSearch} >
       <div
         class="global-search-container"
         transition:fade={{ duration: 300, delay: 150 }}
       >
-        <!-- <GlobalSearch on:close={closeGlobalSearch} /> -->
-       <GlobalSearch on:close={closeGlobalSearch} />
+       <GlobalSearch {closeGlobalSearch} {handlehideGlobalSearch}/>
       </div>
     </div>
-    <div
-      class="blur-background"
-      transition:fade={{ duration: 300 }}
-      on:click={closeGlobalSearch}
-    ></div>
+ 
   {/if}
+  <div class="dashboard d-flex flex-column  {isGlobalSearchOpen ? 'blurred' : ''}" style="height: 100vh;"> 
 
   <Header
     environments={$environments?.filter((element) => {
@@ -315,12 +319,13 @@ const _viewModel = new DashboardViewModel();
 </Modal>
 
 <style>
-   .content {
+    .dashboard {
     transition: filter 300ms ease-out;
   }
 
   .blurred {
     filter: blur(20px);
+    pointer-events: none;
   }
 
   .global-search-overlay {
@@ -340,6 +345,13 @@ const _viewModel = new DashboardViewModel();
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
+  }
+
+  .global-search-content {
+    position: relative;
+    z-index: 1001;
+    filter: none;
+    pointer-events: auto;
   }
 
   .blur-background {

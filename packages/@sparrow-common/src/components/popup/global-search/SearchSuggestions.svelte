@@ -1,22 +1,36 @@
 <script lang="ts">
-  import type { SearchSuggestion } from './types';
-  import {SuggestionTags} from '.';
-  import {RecentItems} from '.';
+  import type { SearchSuggestion } from "./types";
+  import { SuggestionTags } from ".";
+  import { RecentItems } from ".";
   export let suggestions: SearchSuggestion[];
   export let filteredCollection = [];
   export let filteredFolder = [];
   export let filteredRequest = [];
   export let filteredWorkspace = [];
-  export let searchQuery ="";
-
-
+  export let searchQuery = "";
+  export let handlehideGlobalSearch;
+  let selectedType = "";
+  export let closeGlobalSearch;
+  export let workspaceDetailsMap: Record<
+    string,
+    { teamName: string; workspaceName: string }
+  > = {};
   $: console.log("filtered workspace is", filteredWorkspace);
-
 </script>
 
 <div class="suggestions-container">
-  <SuggestionTags {suggestions} />
-  <RecentItems { searchQuery} {filteredCollection} {filteredFolder} {filteredRequest} {filteredWorkspace}/>
+  <SuggestionTags {suggestions} bind:selectedType />
+  <RecentItems
+    {searchQuery}
+    {filteredCollection}
+    {filteredFolder}
+    {filteredRequest}
+    {filteredWorkspace}
+    {selectedType}
+    {closeGlobalSearch}
+    {handlehideGlobalSearch}
+    {workspaceDetailsMap}
+  />
 </div>
 
 <style>

@@ -1,15 +1,26 @@
 <script lang="ts">
-  import type { SearchSuggestion } from './types';
-  
-  export let suggestions: SearchSuggestion[];
+import type { SearchSuggestion } from "./types";
+
+export let suggestions: SearchSuggestion[];
+export let selectedType = "";
+
+const handleTagClick = (label: string) => {
+  if (selectedType === label) {
+    selectedType = "";
+  } else {
+    selectedType = label;
+  }
+};
 </script>
 
 <div class="tags-container">
   {#each suggestions as suggestion}
-    <button 
+    <button
       class="suggestion-tag"
       role="button"
+      class:selected={selectedType === suggestion.label}
       tabindex="0"
+      on:click={() => handleTagClick(suggestion.label)}
     >
       <div class="tag-icon-wrapper">
         <img src={suggestion.icon} alt="" class="tag-icon" />
@@ -29,6 +40,12 @@
     flex-wrap: wrap;
     padding: 8px;
   }
+  
+
+  .suggestion-tag.selected {
+    border: 1px solid #6894f9;
+    background-color: #31353F;
+  }
 
   .suggestion-tag {
     border: none;
@@ -42,6 +59,10 @@
     min-width: 72px;
   }
 
+  .suggestion-tag:hover {
+    background-color: #31353F;
+  }
+
   .tag-icon-wrapper {
     display: flex;
     align-items: center;
@@ -52,11 +73,18 @@
   .tag-icon {
     width: 16px;
     height: 16px;
+    
   }
 
   .tag-label {
     color: var(--Neutral-200, #b6b7b9);
-    font: 500 12px Inter, sans-serif;
+    font:
+      500 12px Inter,
+      sans-serif;
+  }
+  .suggestion-tag:hover .tag-label {
+    color: var(--Neutral-200, #ffffff);
+    
   }
 
   @media (max-width: 991px) {

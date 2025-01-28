@@ -223,6 +223,7 @@ class RestExplorerViewModel
    * @return A promise that resolves when the comparison is complete.
    */
   private compareRequestWithServerDebounced = async () => {
+    console.log("called compareRequestWithServerDebounced");
     let result = true;
     const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
     const requestTabAdapter = new RequestTabAdapter();

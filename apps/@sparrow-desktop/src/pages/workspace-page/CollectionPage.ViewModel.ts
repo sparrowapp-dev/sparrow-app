@@ -2032,6 +2032,7 @@ export default class CollectionsViewModel {
     folder: CollectionItemsDto,
     request: CollectionItemsDto,
   ) => {
+    console.log("opening request", request);
     const requestTabAdapter = new RequestTabAdapter();
     const adaptedRequest = requestTabAdapter.adapt(
       workspaceId || "",
@@ -2054,6 +2055,7 @@ export default class CollectionsViewModel {
     folder: CollectionItemsDto,
     _graphql: CollectionItemsDto,
   ) => {
+    console.log("opening graph ql");
     const requestTabAdapter = new GraphqlTabAdapter();
     const adaptedRequest = requestTabAdapter.adapt(
       workspaceId || "",

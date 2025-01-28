@@ -2,19 +2,25 @@
   let searchInput: HTMLInputElement;
   export let searchQuery = "";
   export let handleSearch = () => {};
+  import keyCommand from "../../../../static/keyCommand.png";
+  import SearchIcon from "../../../../static/Search.png";
+
 </script>
 
 <div class="search-bar">
   <div class="search-input-wrapper">
     <div class="icon-wrapper">
-      <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/13f8c62a2200b0c9780f05496f0d498ddf7086155ff1c2c93885909581f33660?apiKey=805a55f7a8524d998fb01daccbae8123&" alt="" class="search-icon" />
+      <img
+        src={SearchIcon}
+        alt=""
+        class="search-icon"
+      />
     </div>
     <div class="input-wrapper">
-      
       <label for="searchInput" class="visually-hidden">Search</label>
-      <input 
+      <input
         type="text"
-        id="searchInput"  
+        id="searchInput"
         bind:value={searchQuery}
         on:input={handleSearch}
         class="search-input"
@@ -25,7 +31,7 @@
   </div>
   <div class="keyboard-shortcut">
     <div class="shortcut-key">
-      <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/f47f7a2f6011ca132b561b5ff754edeec46a5f8d29a864d4188fda2fc37cb0a9?apiKey=805a55f7a8524d998fb01daccbae8123&" alt="" class="shortcut-icon" />
+      <img src={keyCommand} alt="" class="shortcut-icon" />
     </div>
     <span class="key">F</span>
   </div>
@@ -36,7 +42,7 @@
     border-radius: 2px 2px 0 0;
     background-color: rgba(20, 24, 31, 1);
     display: flex;
-    min-height: 44px;
+
     width: 100%;
     align-items: center;
     justify-content: space-between;
@@ -48,6 +54,7 @@
     display: flex;
     gap: 8px;
     align-items: center;
+    width: 100%;
   }
 
   .icon-wrapper {
@@ -68,49 +75,23 @@
     display: flex;
     align-items: center;
     gap: 2px;
+    width: 100%;
   }
-
- 
 
   .search-input {
     background: transparent;
     border: none;
-    color: var(--Neutral-500, #62656a);
-    font: 400 14px/1 Inter, sans-serif;
+    color: var(--Neutral-500, #B6B7B9);
+    font:
+      400 14px/1 Inter,
+      sans-serif;
     outline: none;
-  }
-
-  .keyboard-shortcut {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-  }
-
-  .shortcut-key {
-    border-radius: 4px;
-    background-color: rgba(24, 28, 38, 1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    padding: 0 2px;
+    width: 100%;
   }
 
   .shortcut-icon {
     width: 16px;
     height: 16px;
-  }
-
-  .key {
-    border-radius: 4px;
-    background-color: rgba(24, 28, 38, 1);
-    color: var(--Neutral-100, #d8d8d9);
-    text-align: center;
-    width: 24px;
-    height: 24px;
-    padding: 4px;
-    font: 500 12px Inter, sans-serif;
   }
 
   .visually-hidden {
@@ -122,5 +103,38 @@
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     border: 0;
+  }
+
+  .keyboard-shortcut {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .shortcut-key {
+    border-radius: 4px;
+    background-color: #181c26;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 4px;
+  }
+
+  .key {
+    border-radius: 4px;
+    background-color: #181c26;
+    color: var(--Neutral-100, #b6b7b9);
+    padding: 2px 4px;
+    font:
+      400 12px Inter,
+      sans-serif;
+    line-height: 18px;
+    min-height: 24px;
+    min-width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 </style>

@@ -419,7 +419,7 @@ export class WorkspaceRepository {
     return await RxDB.getInstance()
       .rxdb.workspace.find({
         sort: [{ updatedAt: 'desc' }],
-        limit: 1
+        limit: 3
       })
       .exec();
   }
@@ -434,7 +434,7 @@ export class WorkspaceRepository {
           { description: { $regex: searchRegex } }
         ]
       },
-      limit: 5
+      limit: 3
     })
     .exec();
 };
@@ -443,8 +443,17 @@ public getRecentWorkspaces = async (limit: number = 5): Promise<WorkspaceDocumen
   return await RxDB.getInstance()
     .rxdb.workspace.find({
       sort: [{ updatedAt: 'desc' }],
-      limit : 5,
+      limit : 3,
     })
     .exec();
+};
+
+public fetchWorkspaceDetails  = async (workspaceId: string): Promise<{teamName: string, workspaceName: string}> => {
+  const workspace = await this.readWorkspace(workspaceId);
+  
+  return {
+    teamName: workspace?.team?.teamName || '',
+    workspaceName: workspace?.name || ''
+  };
 };
 }

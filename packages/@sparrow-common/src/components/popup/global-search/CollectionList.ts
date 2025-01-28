@@ -34,20 +34,30 @@ export enum ItemType {
   SOCKET_IO = "SOCKETIO",
   GRAPHQL = "GRAPHQL",
 }
-
-/**
- * Recursive helper function to modify the tree data structure by adding files or folders.
- */
+const getRequestUrl = (tree: any): string => {
+  switch (tree.type) {
+    case ItemType.GRAPHQL:
+      return tree.graphql?.url || "";
+    case ItemType.SOCKET_IO:
+      return tree.socketio?.url || "";
+    case ItemType.WEB_SOCKET:
+      return tree.websocket?.url || "";
+    case ItemType.REQUEST:
+      return tree.request?.url || "";
+    default:
+      return "";
+  }
+};
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const helper: (
+const helper = (
   tree: any,
   folderId: string,
   type: string,
   name: string,
   id: string,
   method?: string,
-) => number = (tree, folderId, type, name, id, method?) => {
+) => {
   if (tree._id === folderId || tree.id === folderId) {
     if (type === "REQUEST") {
       tree.items.push({
@@ -57,8 +67,8 @@ const helper: (
         request: {
           method: method,
         },
-        folderId,
-        folderName: name,
+        folderId: tree.id, // Use the parent folder's ID
+        folderName: tree.name, // Use the parent folder's name
       });
     } else if (type === "FOLDER") {
       tree.items.push({
@@ -72,7 +82,6 @@ const helper: (
     return 0;
   }
 
-  // Recursively search through the tree structure
   if (tree && tree.items) {
     for (let j = 0; j < tree.items.length; j++) {
       if (!helper(tree.items[j], folderId, type, name, id, method)) return 0;
@@ -82,12 +91,12 @@ const helper: (
 };
 
 const createPath: (path: string[]) => string = (path) => {
-  const res = "/" + path.join("/");
+  const res = path.join(" / ");
   return res;
 };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const searchHelper: (
+const searchHelper = (
   tree: any,
   searchText: string,
   collection: any[],
@@ -95,75 +104,126 @@ const searchHelper: (
   file: any[],
   collectionId: string,
   path: string[],
-  folderDetails: Record<string, string>,
-) => void = (
-  tree,
-  searchText,
-  collection,
-  folder,
-  file,
-  collectionId,
-  path,
-  folderDetails,
+  folderDetails: any,
+  workspaceMap = {},
+  currentWorkspaceId = tree.workspaceId,
 ) => {
+  if (tree.workspaceId) {
+    const workspaceDetails = workspaceMap[tree.workspaceId];
+    if (workspaceDetails) {
+      path.push(workspaceDetails.teamName);
+      path.push(workspaceDetails.workspaceName);
+    }
+  }
+
   if (tree.name.toLowerCase().includes(searchText.toLowerCase())) {
-    // Check limits before pushing new items
-    if (tree.type === "REQUEST" && file.length < 3) {
-      file.push({
-        tree: JSON.parse(JSON.stringify(tree)),
+    if (
+      (tree.type === ItemType.REQUEST ||
+        tree.type === ItemType.GRAPHQL ||
+        tree.type === ItemType.SOCKET_IO ||
+        tree.type === ItemType.WEB_SOCKET) &&
+      file.length < 3
+    ) {
+      let currentFolderDetails =
+        tree.folderId && tree.folderName
+          ? { id: tree.folderId, name: tree.folderName }
+          : tree.parentFolder
+            ? { id: tree.parentFolder.id, name: tree.parentFolder.name }
+            : folderDetails;
+
+      // Determine the appropriate method based on request type
+      const requestMethod =
+        tree.type === ItemType.REQUEST
+          ? tree.request?.method // Use actual HTTP method for REST requests
+          : tree.type; // Use type as method for other request types
+
+      const requestData = {
+        tree: JSON.parse(
+          JSON.stringify({
+            ...tree,
+            folderId: currentFolderDetails?.id,
+            folderName: currentFolderDetails?.name,
+            request: {
+              ...tree.request,
+              url: getRequestUrl(tree),
+              method: requestMethod,
+            },
+          }),
+        ),
         collectionId,
-        folderDetails,
+        folderDetails: currentFolderDetails,
         path: createPath(path),
         updatedAt: new Date(tree.updatedAt || Date.now()),
-      });
-    } else if (tree.type === "FOLDER" && folder.length < 1) {
+        workspaceId: currentWorkspaceId,
+        type: tree.type,
+      };
+
+      file.push(requestData);
+    } else if (tree.type === ItemType.FOLDER && folder.length < 1) {
       folder.push({
         tree: JSON.parse(JSON.stringify(tree)),
         collectionId,
         path: createPath(path),
         updatedAt: new Date(tree.updatedAt || Date.now()),
+        workspaceId: currentWorkspaceId,
       });
     } else if (
       collection.length < 1 &&
-      tree.type !== "FOLDER" &&
-      tree.type !== "REQUEST"
+      tree.type !== ItemType.FOLDER &&
+      !Object.values([
+        ItemType.REQUEST,
+        ItemType.GRAPHQL,
+        ItemType.SOCKET_IO,
+        ItemType.WEB_SOCKET,
+      ]).includes(tree.type)
     ) {
       collection.push({
         tree: JSON.parse(JSON.stringify(tree)),
         collectionId,
         path: createPath(path),
         updatedAt: new Date(tree.updatedAt || Date.now()),
+        workspaceId: currentWorkspaceId,
       });
     }
   }
 
-  // Only continue searching if we haven't reached all limits
   if (file.length < 3 || folder.length < 1 || collection.length < 1) {
-    // Recursively search through the tree structure
     if (tree && tree.items) {
       for (let j = 0; j < tree.items.length; j++) {
-        path.push(tree.name); // Recursive backtracking
+        path.push(tree.name);
+        const newFolderDetails =
+          tree.type === ItemType.FOLDER
+            ? { id: tree.id || tree._id, name: tree.name }
+            : folderDetails;
+
+        const childItem = tree.items[j];
+        if (tree.type === ItemType.FOLDER) {
+          childItem.parentFolder = {
+            id: tree.id || tree._id,
+            name: tree.name,
+          };
+        }
+
         searchHelper(
-          tree.items[j],
+          childItem,
           searchText,
           collection,
           folder,
           file,
           collectionId,
           path,
-          tree.type === "FOLDER" ? { id: tree.id, name: tree.name } : {},
+          newFolderDetails,
+          workspaceMap,
+          currentWorkspaceId,
         );
         path.pop();
       }
     }
   }
 
-  // Sort results by updatedAt before returning
   file.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
   folder.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
   collection.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
-
-  return;
 };
 
 const sortHelperMethod: (
@@ -233,6 +293,8 @@ const useTree = (): any[] => {
     file: any[],
     collectionData: any[],
     workspacePath?: string,
+    workspaceMap?: Record<string, { teamName: string; workspaceName: string }>,
+    
   ) => void = (
     searchText,
     collection,
@@ -240,10 +302,12 @@ const useTree = (): any[] => {
     file,
     collectionData,
     workspacePath,
+    workspaceMap = {},
+    currentWorkspaceId,
   ) => {
     const filteredByMethodTrees = [];
     tree = collectionData;
-    console.log("current search text is", searchText);
+    console.log("current search text is", tree);
 
     if (searchText.trim() === "") {
       // Clear existing arrays before populating with latest items
@@ -252,7 +316,7 @@ const useTree = (): any[] => {
       file.length = 0;
 
       // Get latest items and ensure they're properly sorted
-      const latestItems = getLatestItemsByType(tree);
+      const latestItems = getLatestItemsByType(tree, workspaceMap);
 
       // Ensure we're getting the most recently updated items
       if (latestItems.latestCollections.length > 0) {
@@ -316,9 +380,7 @@ const useTree = (): any[] => {
 
     for (let i = 0; i < filteredTrees.length; i++) {
       const path = [];
-      if (workspacePath) {
-        path.push(workspacePath);
-      }
+
       searchHelper(
         filteredTrees[i],
         searchText,
@@ -328,6 +390,7 @@ const useTree = (): any[] => {
         filteredTrees[i].id,
         path,
         {},
+        workspaceMap,
       );
     }
     return;
@@ -335,7 +398,13 @@ const useTree = (): any[] => {
   return [insertNode, insertHead, searchNode];
 };
 
-const getLatestItemsByType = (tree: any[]) => {
+const getLatestItemsByType = (
+  tree: any[],
+  workspaceMap: Record<
+    string,
+    { teamName: string; workspaceName: string }
+  > = {},
+) => {
   const collections: any[] = [];
   const folders: any[] = [];
   const requests: any[] = [];
@@ -345,61 +414,89 @@ const getLatestItemsByType = (tree: any[]) => {
     node: any,
     path: string[] = [],
     collectionId: string = "",
+    currentWorkspaceId: string | null = null,
   ) => {
     if (!node) return;
 
+    if (node.workspaceId) {
+      const workspaceDetails = workspaceMap[node.workspaceId];
+      if (workspaceDetails) {
+        path.push(workspaceDetails.teamName);
+        path.push(workspaceDetails.workspaceName);
+      }
+    }
+
+    const workspaceId = node.workspaceId || currentWorkspaceId;
+
+    // Determine the appropriate method based on request type
+    const requestMethod =
+      node.type === ItemType.REQUEST
+        ? node.request?.method // Use actual HTTP method for REST requests
+        : node.type; // Use type as method for other request types
+
     const itemData = {
-      tree: JSON.parse(JSON.stringify(node)),
+      tree: JSON.parse(
+        JSON.stringify({
+          ...node,
+          request: {
+            ...node.request,
+            url: getRequestUrl(node),
+            method: requestMethod,
+          },
+        }),
+      ),
       collectionId: collectionId || node.id,
       path: createPath(path),
-      updatedAt: new Date(node.updatedAt || Date.now()), // Fallback to current time if no updatedAt
-      folderDetails:
-        node.type === ItemType.REQUEST
-          ? {
-              id: path[path.length - 1]?.id,
-              name: path[path.length - 1]?.name,
-            }
-          : {},
+      updatedAt: new Date(node.updatedAt || Date.now()),
+      workspaceId,
+      type: node.type,
+      folderDetails: [
+        ItemType.REQUEST,
+        ItemType.SOCKET_IO,
+        ItemType.WEB_SOCKET,
+        ItemType.GRAPHQL,
+      ].includes(node.type)
+        ? { id: path[path.length - 1]?.id, name: path[path.length - 1]?.name }
+        : {},
     };
 
-    // Sort items into their respective arrays
     switch (node.type) {
-      case ItemType.COLLECTION:
-        collections.push(itemData);
-        break;
       case ItemType.FOLDER:
         folders.push(itemData);
         break;
       case ItemType.REQUEST:
+      case ItemType.SOCKET_IO:
+      case ItemType.WEB_SOCKET:
+      case ItemType.GRAPHQL:
         requests.push(itemData);
         break;
       case ItemType.WORKSPACE:
         workspaces.push(itemData);
         break;
+      default:
+        if (!node.type) {
+          collections.push(itemData);
+        }
+        break;
     }
 
-    // Recursively process child items
     if (node.items) {
       const newPath = [...path, node.name];
       node.items.forEach((item: any) => {
-        extractItems(item, newPath, collectionId || node.id);
+        extractItems(item, newPath, collectionId || node.id, workspaceId);
       });
     }
   };
 
-  // Process all trees
   tree.forEach((node) => extractItems(node));
 
-  // Sort function for all arrays
   const sortByDate = (a: any, b: any) =>
     b.updatedAt.getTime() - a.updatedAt.getTime();
 
-  // Return specific numbers of each type
   return {
-    latestWorkspaces: workspaces.sort(sortByDate).slice(0, 1), // 1 workspace
-    latestCollections: collections.sort(sortByDate).slice(0, 1), // 1 collection
-    latestFolders: folders.sort(sortByDate).slice(0, 1), // 1 folder
-    latestRequests: requests.sort(sortByDate).slice(0, 3), // 3 requests
+    latestCollections: collections.sort(sortByDate).slice(0, 3),
+    latestFolders: folders.sort(sortByDate).slice(0, 3),
+    latestRequests: requests.sort(sortByDate).slice(0, 3),
   };
 };
 
@@ -430,3 +527,4 @@ const getNextName: (list: any[], type: string, name: string) => any = (
 };
 
 export { useTree, getNextName };
+export { searchHelper, getLatestItemsByType };

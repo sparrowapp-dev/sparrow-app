@@ -166,4 +166,38 @@ export class TestflowRepository {
       })
       .exec();
   };
+
+  public searchTestflows = async (
+    _query: string
+  ): Promise<TFRxHandlerType[] | undefined> => {
+    const testflows = await this.rxdb
+      ?.find({
+        selector: {
+          name: {
+            $regex: new RegExp(_query, 'i')
+          }
+        }
+      })
+      .exec();
+    
+    return testflows;
+  };
+
+  /**
+   * Retrieves the most recently updated test flows.
+   *
+   * @param _limit - The maximum number of test flows to return (defaults to 5).
+   * @returns A promise that resolves to an array of the most recent test flow documents.
+   */
+  public getRecentTestflows = async (
+    _limit: number = 5
+  ): Promise<TFRxHandlerType[] | undefined> => {
+    const testflows = await this.rxdb
+      ?.find()
+      .sort({ updatedAt: 'desc' })
+      .limit(_limit)
+      .exec();
+    
+    return testflows;
+  };
 }
