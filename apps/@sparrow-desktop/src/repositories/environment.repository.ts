@@ -153,4 +153,42 @@ export class EnvironmentRepository {
       })
       .exec();
   };
+
+    public searchEnvironments = async (searchQuery: string): Promise<EnvironmentDocument[]> => {
+    if (!searchQuery.trim()) {
+      // If search query is empty, return recently updated environments
+      return await RxDB.getInstance()
+        .rxdb.environment.find({
+          sort: [{ updatedAt: "desc" }],
+          limit: 3,
+        })
+        .exec();
+    }
+
+    // If there's a search query, filter environments by name or workspace ID
+    const searchRegex = new RegExp(searchQuery, "i");
+    return await RxDB.getInstance()
+      .rxdb.environment.find({
+        selector: {
+          $or: [
+            { name: { $regex: searchRegex } },
+            { workspaceId: { $regex: searchRegex } },
+          ],
+        },
+        limit: 3,
+      })
+      .exec();
+  };
+
+
+  public getRecentEnvironments = async (limit: number = 5): Promise<EnvironmentDocument[]> => {
+    return await RxDB.getInstance()
+      .rxdb.environment.find({
+        sort: [{ updatedAt: "desc" }],
+        limit: 3,
+      })
+      .exec();
+  };
 }
+
+

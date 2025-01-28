@@ -496,4 +496,76 @@ export class CollectionRepository {
   public clearCollections = async (): Promise<any> => {
     return RxDB.getInstance().rxdb.collection.find().remove();
   };
+
+  public getLatestUpdatedCollection = async (): Promise<CollectionDocument | null> => {
+  const result = await RxDB.getInstance()
+    .rxdb.collection.find({
+      selector: {}, // Match all documents
+      sort: [{ updatedAt: 'desc' }], // Sort by 'updatedAt' in descending order
+      limit: 1 // Return only one document
+    })
+    .exec();
+
+  return result.length > 0 ? result[0] : null; // Return the single document or null if none found
+  };
+  
+  public getLatestUpdatedCollection = async (): Promise<CollectionDocument | null> => {
+  return await RxDB.getInstance()
+    .rxdb.collection.findOne({
+      selector: {},
+      sort: [{ updatedAt: 'desc' }]
+    })
+    .exec();
+};
+
+/**
+ * @description
+ * Returns the most recently updated folder from a specific collection or across all collections
+ * @param collectionId Optional - If provided, searches only within that collection
+ */
+public getLatestUpdatedFolder = async (collectionId?: string): Promise<CollectionItemsDto | null> => {
+  let collections;
+  
+  if (collectionId) {
+    collections = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        }
+      })
+      .exec();
+    
+    collections = collections ? [collections] : [];
+  } else {
+    collections = await RxDB.getInstance()
+      .rxdb.collection.find()
+      .exec();
+  }
+
+  let latestFolder: CollectionItemsDto | null = null;
+  let latestUpdateTime = 0;
+
+  collections.forEach(collection => {
+    const findLatestInItems = (items: CollectionItemsDto[]) => {
+      items.forEach(item => {
+        if (item.type === ItemType.FOLDER) {
+          const itemUpdateTime = new Date(item.updatedAt).getTime();
+          if (itemUpdateTime > latestUpdateTime) {
+            latestUpdateTime = itemUpdateTime;
+            latestFolder = item;
+          }
+          if (item.items && Array.isArray(item.items)) {
+            findLatestInItems(item.items);
+          }
+        }
+      });
+    };
+
+    if (collection.items && Array.isArray(collection.items)) {
+      findLatestInItems(collection.items);
+    }
+  });
+  return latestFolder;
+};
+
 }
