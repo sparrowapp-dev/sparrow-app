@@ -1,4 +1,5 @@
 /** @type { import('@storybook/svelte').Preview } */
+import "@sparrow/library/styles";
 const preview = {
   actions: { argTypesRegex: "^on.*" },
   parameters: {

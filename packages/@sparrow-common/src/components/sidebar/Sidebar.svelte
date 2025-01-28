@@ -16,7 +16,8 @@
   } from "./common";
 
   import SidebarItem, { type SidebarItemObj } from "./SidebarItem.svelte";
-  import { isGuestUserActive } from "@app/store/auth.store";
+
+  // import { isGuestUserActive } from "@app/store/auth.store";
 
   let componentClass = "";
   export { componentClass as class };
@@ -24,9 +25,9 @@
   export let onLogout: () => void;
   export let type = "desktop";
   let isGuestUser = false;
-  isGuestUserActive.subscribe((value) => {
-    isGuestUser = value;
-  });
+  // isGuestUserActive.subscribe((value) => {
+  //   isGuestUser = value;
+  // });
 
   let sidebarItems: SidebarItemObj[] = [
     {

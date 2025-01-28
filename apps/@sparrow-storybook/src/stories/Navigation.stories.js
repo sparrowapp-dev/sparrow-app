@@ -1,7 +1,7 @@
 // import { Navigation } from "@sparrow/library/ui";
 
 import {
-    Sidebar,
+    Sidebar
   } from "@sparrow/common/components";
 
 export default {
