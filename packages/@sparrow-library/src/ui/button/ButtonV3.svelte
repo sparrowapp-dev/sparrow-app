@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { stringify } from "uuid";
   import Spinner from "../spinner/Spinner.svelte";
 
   export let title = "";
@@ -18,8 +19,7 @@
   export let iconSize = 16;
   export let frontIconSize = 20;
   export let endIconSize = 20;
-  export let iconImage: string | undefined = undefined;
-
+  export let buttonIcon: string | undefined = undefined;
   export let size: "small" | "medium" | "large" | "other";
   let buttonSize = 24;
   if (size === "small") {
@@ -105,7 +105,7 @@
           btnClass = "custom-btn-outline-primary";
           break;
         case BtnType.Secondary:
-          btnClass = "custom-btn-secondary-diable";
+          btnClass = "custom-btn-secondary";
           break;
         case BtnType.OutlineSecondary:
           btnClass = "custom-btn-outline-secondary";
@@ -238,10 +238,10 @@
     onClick(e);
   }}
 >
-  {#if (type === "icon-primary") | (type === "icon-secondary") | (type === "icon-danger")}
+  {#if type === "icon-primary" || type === "icon-secondary" || type === "icon-danger" || type === "outline-icon-danger" || type === "outline-icon-primary" || type === "outline-icon-secondary" || type === "teritiary-icon-regular" || type === "teritiary-icon-danger"}
     <img
-      src={iconImage}
-      style={`height: ${iconSize}; width: ${iconSize}px; border-radius: 50%; `}
+      src={buttonIcon}
+      style={`height: ${iconSize}px; width: ${iconSize}px; border-radius: 50%; `}
       alt="icon"
     />
   {/if}
@@ -432,20 +432,29 @@
     color: var(--white-color);
     border-width: 0px;
   }
-  .custom-btn-outline-primary-disable {
-    background-color: transparent;
-    color: var(--text-ds-primary-600);
-    border-width: 1px;
-    border-color: var(--border-ds-surface-400);
+  .custom-btn-primary:hover {
+    background-color: var(--bg-ds-primary-300);
+    color: var(--white-color);
+    border-width: 0px;
   }
+  .custom-btn-primary:active {
+    background-color: var(--bg-ds-primary-600);
+    color: var(--white-color);
+  }
+  .custom-btn-primary-disable {
+    background-color: var(--bg-ds-primary-700);
+    color: var(--text-ds-neutral-400);
+    border-width: 0px;
+  }
+
   .custom-btn-outline-primary {
     background-color: transparent;
-    color: var(--bg-primary-400);
+    color: var(--bg-ds-primary-300);
     border-width: 1px;
     border-color: var(--border-ds-surface-500);
   }
   .custom-btn-outline-primary:hover {
-    background-color: var(--bg-primary-400);
+    background-color: var(--bg-ds-primary-400);
     color: var(--white-color);
     border-width: 0px;
   }
@@ -454,23 +463,47 @@
     color: var(--white-color);
     border-width: 0px;
   }
+  .custom-btn-outline-primary-disable {
+    background-color: transparent;
+    color: var(--text-ds-primary-600);
+    border-width: 1px;
+    border-color: var(--border-ds-surface-400);
+  }
   .custom-btn-secondary {
     background-color: var(--bg-ds-surface-300);
     color: var(--white-color);
+    border-width: 0px;
+  }
+  .custom-btn-secondary:hover {
+    background-color: var(--bg-ds-surface-100);
+    color: var(--white-color);
+    border-width: 0px;
+  }
+  .custom-btn-secondary:active {
+    background-color: var(--bg-ds-surface-400);
+    color: var(--white-color);
+    border-width: 0px;
+  }
+  .custom-btn-secondary-disable {
+    background-color: var(--bg-ds-surface-700);
+    color: var(--text-ds-neutral-400);
     border-width: 0px;
   }
   .custom-btn-outline-secondary {
     background-color: transparent;
     border-color: var(--border-ds-surface-50);
     border-width: 1px;
+    color: var(--white-color);
   }
   .custom-btn-outline-secondary:hover {
     background-color: var(--bg-ds-surface-300);
     border-width: 0px;
+    color: var(--white-color);
   }
   .custom-btn-outline-secondary:active {
     background-color: var(--bg-ds-surface-400);
     border-width: 0px;
+    color: var(--white-color);
   }
   .custom-btn-outline-secondary-disable {
     background-color: var(--bg-ds-surface-400);
@@ -490,11 +523,6 @@
     border-width: 0px;
   }
 
-  .custom-btn-primary:hover {
-    background-color: var(--bg-ds-primary-300);
-    color: var(--white-color);
-    border-width: 0px;
-  }
   .custom-btn-outline {
     background-color: transparent;
     border-width: 1px;
@@ -505,17 +533,28 @@
     text-decoration: underline;
     text-underline-offset: 5px;
   }
-  .custom-btn-primary:active {
-    background-color: var(--bg-primary-600);
-    color: var(--white-color);
-  }
+
   .custom-btn-dark:hover {
     background-color: var(--bg-tertiary-100);
   }
   .custom-btn-danger {
+    background-color: var(--bg-ds-danger-500);
+    color: var(--white-color);
+    border-width: 0px;
+  }
+  .custom-btn-danger:hover {
     background-color: var(--bg-ds-danger-400);
     color: var(--white-color);
     border-width: 0px;
+  }
+  .custom-btn-danger:active {
+    background-color: var(--bg-ds-danger-600);
+    color: var(--white-color);
+  }
+  .custom-btn-danger-disable {
+    background-color: var(--bg-ds-danger-700);
+    border-width: 0px;
+    color: var(--text-ds-neutral-400);
   }
   .custom-btn-outline-danger {
     background-color: transparent;
@@ -533,12 +572,7 @@
     color: var(--white-color);
     border-width: 0px;
   }
-  .custom-btn-danger:hover {
-    background-color: var(--delete-hover);
-  }
-  .custom-btn-danger:active {
-    background-color: var(--bg-ds-danger-600);
-  }
+
   .custom-btn-transparent {
     background-color: transparent;
     color: var(--white-color);
@@ -579,20 +613,7 @@
     color: var(--text-ds-danger-700);
     border-width: 0px;
   }
-  .custom-btn-danger-disable {
-    background-color: var(--bg-ds-danger-700);
-    border-width: 0px;
-  }
-  .custom-btn-primary-disable {
-    background-color: var(--bg-ds-primary-700);
-    color: var(--white-color);
-    border-width: 0px;
-  }
-  .custom-btn-secondary-disable {
-    background-color: var(--bg-ds-surface-400);
-    color: var(--white-color);
-    border-width: 0px;
-  }
+
   .custom-btn-outline-danger-disable {
     background-color: transparent;
     color: var(--text-ds-danger-700);
