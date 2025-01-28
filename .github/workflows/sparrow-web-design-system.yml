@@ -37,9 +37,9 @@ jobs:
                 --build-arg VITE_WEB_SPARROW_DOCS=${{ vars.VITE_WEB_SPARROW_DOCS }} \
                 --build-arg VITE_WEB_PROXY_SERVICE=${{ vars.VITE_WEB_PROXY_SERVICE }} \
                 --build-arg VITE_WEB_SOCKET_IO_API_URL=${{ vars.VITE_WEB_SOCKET_IO_API_URL }} \
-                -t sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }} .
+                -t sparrowprod.azurecr.io/sparrow-web-design-system:${{ github.run_number }} .
 
-              docker push sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }}
+              docker push sparrowprod.azurecr.io/sparrow-web-design-system:${{ github.run_number }}
 
    deploy:
       needs: build
@@ -48,7 +48,7 @@ jobs:
          - uses: actions/checkout@master
          - uses: richardrigutins/replace-in-files@v1
            with:
-              files: "./apps/@sparrow-web/deploymentManifests/deployment.yml"
+              files: "./apps/@sparrow-web/deploymentManifests/design-system.yml"
               search-text: '_BUILD__ID_'
               replacement-text: '${{ github.run_number }}'
 
@@ -63,4 +63,4 @@ jobs:
               action: deploy
               namespace: sparrow-dev
               manifests: |
-                 ./apps/@sparrow-web/deploymentManifests/deployment.yml
+                 ./apps/@sparrow-web/deploymentManifests/design-system.yml
