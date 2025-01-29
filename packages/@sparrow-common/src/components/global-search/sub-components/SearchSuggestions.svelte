@@ -9,13 +9,11 @@
   export let filteredWorkspace = [];
   export let searchQuery = "";
   export let handlehideGlobalSearch;
-  let selectedType = "";
   export let closeGlobalSearch;
   export let workspaceDetailsMap: Record<
     string,
     { teamName: string; workspaceName: string }
   > = {};
-  $: console.log("filtered workspace is", filteredWorkspace);
   export let checkActiveWorkspace;
   export let handleSwitchWorkspaceModal;
   export let handleGlobalSearchRequestNavigation;
@@ -30,6 +28,7 @@
   export let recentTestflow;
   export let recentEnvironment;
   export let recentWorkspace;
+  export let selectedType;
 </script>
 
 <div class="suggestions-container">
@@ -63,7 +62,7 @@
 
 <style>
   .suggestions-container {
-    background: var(--Surface-700, #14181f);
+    background: var(--bg-ds-surface-700);
     box-shadow: 0px 16px 32px 0px rgba(0, 0, 0, 0.4);
     display: flex;
     width: 100%;

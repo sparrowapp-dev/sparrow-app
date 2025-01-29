@@ -18,7 +18,6 @@
     display: flex;
     gap: 8px;
     padding: 16px;
-    /* background-color: #14181f; */
     flex-direction: column;
   }
 
@@ -27,7 +26,7 @@
     margin-top: 10px;
     align-items: center;
     justify-content: center;
-    color: #9b9da1;
+    color: var(--text-ds-neutral-300);
     font-weight: 400;
     font-size: 12px;
     line-height: 18px;

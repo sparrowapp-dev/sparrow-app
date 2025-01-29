@@ -1,8 +1,12 @@
 <script lang="ts">
   let searchInput: HTMLInputElement;
   export let searchQuery = "";
+
   export let handleSearch = () => {};
   import {keyCommand , SearchIcon} from "@sparrow/common/images";
+  let hideKEY = false;
+  $: hideKEY = searchQuery.trim().length > 0;
+  
 </script>
 
 <div class="search-bar">
@@ -20,29 +24,33 @@
         class="search-input"
         placeholder="Search"
         aria-label="Search"
+        autocomplete="off"
       />
     </div>
   </div>
+  {#if !hideKEY}
   <div class="keyboard-shortcut">
     <div class="shortcut-key">
       <img src={keyCommand} alt="" class="shortcut-icon" />
     </div>
     <span class="key">F</span>
   </div>
+  {/if}
 </div>
 
 <style>
   .search-bar {
     border-radius: 2px 2px 0 0;
-    background-color: rgba(20, 24, 31, 1);
+    background-color:var(--bg-ds-surface-700);
     display: flex;
 
     width: 100%;
     align-items: center;
     justify-content: space-between;
     padding: 10px 8px;
-    border: 1px solid rgba(49, 53, 63, 1);
+    border: 1px solid var(--bg-ds-surface-100);
   }
+ 
 
   .search-input-wrapper {
     display: flex;
@@ -75,13 +83,15 @@
   .search-input {
     background: transparent;
     border: none;
-    color: var(--Neutral-500, #b6b7b9);
+    color: var(--bg-ds-neutral-500);
     font:
       400 14px/1 Inter,
       sans-serif;
     outline: none;
     width: 100%;
+    caret-color: var(--text-ds-primary-300);
   }
+  
 
   .shortcut-icon {
     width: 16px;
@@ -107,7 +117,7 @@
 
   .shortcut-key {
     border-radius: 4px;
-    background-color: #181c26;
+    background-color: var(--bg-ds-surface-600);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -118,8 +128,8 @@
 
   .key {
     border-radius: 4px;
-    background-color: #181c26;
-    color: var(--Neutral-100, #b6b7b9);
+    background-color: var(--bg-ds-surface-600);
+    color: var(--text-ds-neutral-200);
     padding: 2px 4px;
     font:
       400 12px Inter,
