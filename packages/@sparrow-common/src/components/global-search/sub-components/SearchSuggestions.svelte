@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { SearchSuggestion } from "./types";
-  import { SuggestionTags } from ".";
-  import { RecentItems } from ".";
+  import type { SearchSuggestion } from "./types/types";
+  import SuggestionTags from "./SuggestionTags.svelte";
+  import RecentItems from "./RecentItems.svelte";
   export let suggestions: SearchSuggestion[];
   export let filteredCollection = [];
   export let filteredFolder = [];

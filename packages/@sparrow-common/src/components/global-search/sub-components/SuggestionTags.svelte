@@ -1,16 +1,16 @@
 <script lang="ts">
-import type { SearchSuggestion } from "./types";
+  import type { SearchSuggestion } from "./types/types";
 
-export let suggestions: SearchSuggestion[];
-export let selectedType = "";
+  export let suggestions: SearchSuggestion[];
+  export let selectedType = "";
 
-const handleTagClick = (label: string) => {
-  if (selectedType === label) {
-    selectedType = "";
-  } else {
-    selectedType = label;
-  }
-};
+  const handleTagClick = (label: string) => {
+    if (selectedType === label) {
+      selectedType = "";
+    } else {
+      selectedType = label;
+    }
+  };
 </script>
 
 <div class="tags-container">
@@ -40,11 +40,10 @@ const handleTagClick = (label: string) => {
     flex-wrap: wrap;
     padding: 8px;
   }
-  
 
   .suggestion-tag.selected {
     border: 1px solid #6894f9;
-    background-color: #31353F;
+    background-color: #31353f;
   }
 
   .suggestion-tag {
@@ -60,7 +59,7 @@ const handleTagClick = (label: string) => {
   }
 
   .suggestion-tag:hover {
-    background-color: #31353F;
+    background-color: #31353f;
   }
 
   .tag-icon-wrapper {
@@ -73,7 +72,6 @@ const handleTagClick = (label: string) => {
   .tag-icon {
     width: 16px;
     height: 16px;
-    
   }
 
   .tag-label {
@@ -84,7 +82,6 @@ const handleTagClick = (label: string) => {
   }
   .suggestion-tag:hover .tag-label {
     color: var(--Neutral-200, #ffffff);
-    
   }
 
   @media (max-width: 991px) {
