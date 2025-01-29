@@ -122,7 +122,7 @@
 </script>
 
 <div class={`sidebar ${componentClass}`}>
-  <div class="active-indicator" style="top:{divHeight + 2}px"></div>
+  <div class="active-indicator" style="top:{divHeight + 3}px"></div>
   <div class="primary-sidebar-items">
     {#each primarySidebarItems as item (item.route)}
       <div id={`sidebar-item-${item.id}`}>
@@ -171,7 +171,7 @@
     position: absolute;
     height: 38px;
     width: 2px;
-    left: 5px;
+    left: 4.5px;
     opacity: 1;
     transition: top 250ms ease-out;
     z-index: 10;
