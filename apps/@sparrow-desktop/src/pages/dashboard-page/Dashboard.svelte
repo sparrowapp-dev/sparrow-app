@@ -35,8 +35,11 @@
   import { OSDetector } from "@sparrow/common/utils";
 
   import { fade } from "svelte/transition";
+<<<<<<< HEAD
   import { TeamsViewModel } from "../teams-page/Teams.ViewModel";
 
+=======
+>>>>>>> 9b302441a968fe6673179762e02b51c81a14a10f
   import { isGuestUserActive } from "@app/store/auth.store";
   import {
     type SidebarItemBaseInterface,
@@ -321,7 +324,7 @@ const setSelectedType =(value)=> {
       position: SidebarItemPositionBaseEnum.SECONDARY,
     },
   ];
-  // let mahi = { mahiSingh: "mahi" };
+
   const handleWorkspaceSwitch = async () => {
     await _viewModel.activateWorkspace(switchWorkspaceId);
     handlehideGlobalSearch(false);
@@ -384,11 +387,13 @@ const setSelectedType =(value)=> {
         );
         return;
       }
-
       await _viewModel.switchAndCreateCollectionTab(workspaceId, collection);
       closeGlobalSearch();
       handlehideGlobalSearch(false);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9b302441a968fe6673179762e02b51c81a14a10f
     } catch (error) {
       closeGlobalSearch();
       handlehideGlobalSearch(false);
@@ -433,19 +438,17 @@ const setSelectedType =(value)=> {
       );
 
       if (!isActiveWorkspace) {
+<<<<<<< HEAD
         // handlehideGlobalSearch(true);
         // const workspaceData = await _viewModel.getWorkspaceById(workspace._id);
         // handleSwitchWorkspaceModal(workspaceData.name, "Folder", workspace._id);
 
         // Create new tab for the workspace
+=======
+>>>>>>> 9b302441a968fe6673179762e02b51c81a14a10f
         _viewModel.switchAndCreateWorkspaceTab(workspace);
         closeGlobalSearch();
         handlehideGlobalSearch(false);
-        // Navigate and show success notification
-        // navigate("collections");
-        // notifications.success(
-        //   `Workspace "${workspace.name}" opened successfully.`,
-        // );
       }
 
       // Additional workspace opening logic here if needed
@@ -476,19 +479,14 @@ const setSelectedType =(value)=> {
           environment.workspace,
         );
       }
-
       await _viewModel.switchAndCreateEnvironmentTab(environment);
       closeGlobalSearch();
       handlehideGlobalSearch(false);
-      // notifications.success(
-      //   `Environment "${environment.title}" opened successfully.`,
-      // );
     } catch (error) {
       closeGlobalSearch();
       handlehideGlobalSearch(false);
       console.error("Error opening environment:", error);
       notifications.error("Failed to open environment.");
-      // throw error;
     }
   };
 
@@ -509,14 +507,12 @@ const setSelectedType =(value)=> {
           testflow.workspaceId,
         );
       }
-
       const existingTab = await _viewModel.getTabByID(testflow._id);
       if (existingTab?._data?.isActive) {
         handlehideGlobalSearch(false);
         closeGlobalSearch();
         return;
       }
-
       await _viewModel.switchAndCreateTestflowTab(testflow);
       closeGlobalSearch();
       handlehideGlobalSearch(false);
@@ -557,7 +553,11 @@ const setSelectedType =(value)=> {
         recentWorkspace={_viewModel.getRecentWorkspace}
         recentEnvironment={_viewModel.getRecentEnvironment}
         recentTestflow={_viewModel.getRecentTestflow}
+<<<<<<< HEAD
         {selectedType}
+=======
+        handleSearchNode={(...args) => _viewModel.searchNode(...args)}
+>>>>>>> 9b302441a968fe6673179762e02b51c81a14a10f
       />
     </div>
   </div>

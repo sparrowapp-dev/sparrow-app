@@ -1,8 +1,7 @@
 <script lang="ts">
   import SearchBar from "./sub-components/SearchBar.svelte";
   import SearchSuggestions from "./sub-components/SearchSuggestions.svelte";
-  import type { SearchSuggestion } from "./types/types";
-  import { useTree } from "./CollectionList";
+  import type { SearchSuggestion } from "./sub-components/types/types";
   import type { CollectionDocument } from "@app/database/database";
   import { onMount } from "svelte";
   import {
@@ -31,7 +30,12 @@
   export let recentTestflow;
   export let recentEnvironment;
   export let recentWorkspace;
+<<<<<<< HEAD
   export let selectedType;
+=======
+  export let handleSearchNode;
+  export let handlehideGlobalSearch;
+>>>>>>> 9b302441a968fe6673179762e02b51c81a14a10f
 
   let workspaceDetailsMap: Record<
     string,
@@ -77,14 +81,16 @@
     }
   });
 
-  const [, , searchNode] = useTree();
-
   const handleSearch = () => {
     filteredCollection.length = 0;
     filteredFolder.length = 0;
     filteredRequest.length = 0;
 
+<<<<<<< HEAD
     searchNode(
+=======
+    handleSearchNode(
+>>>>>>> 9b302441a968fe6673179762e02b51c81a14a10f
       searchQuery,
       filteredCollection,
       filteredFolder,
@@ -94,9 +100,6 @@
       workspaceDetailsMap,
     );
   };
-
-  export let onClose = () => {};
-  export let handlehideGlobalSearch;
 
   const suggestions: SearchSuggestion[] = [
     {

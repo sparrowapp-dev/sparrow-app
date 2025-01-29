@@ -1,8 +1,8 @@
 import { EnvironmentRepository } from "../../repositories/environment.repository";
 import { TeamRepository } from "../../repositories/team.repository";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
-import {TestflowRepository} from "../../repositories/testflow.repository";
-import {CollectionRepository} from "../../repositories/collection.repository";
+import { TestflowRepository } from "../../repositories/testflow.repository";
+import { CollectionRepository } from "../../repositories/collection.repository";
 import { EnvironmentService } from "../../services/environment.service";
 import { TeamService } from "../../services/team.service";
 import { WorkspaceService } from "../../services/workspace.service";
@@ -26,14 +26,17 @@ import { GraphqlTabAdapter, RequestTabAdapter, SocketIoTabAdapter } from "../../
 import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-import { Events } from "@sparrow/common/enums";
+import { Events, ItemType } from "@sparrow/common/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import { InitWorkspaceTab } from "@sparrow/common/utils";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
 
 
 export class DashboardViewModel {
-  constructor() { }
+  private tree: any[];
+  constructor() {
+    this.tree = [];
+  }
   private teamRepository = new TeamRepository();
   private workspaceRepository = new WorkspaceRepository();
   private teamService = new TeamService();
@@ -613,30 +616,372 @@ export class DashboardViewModel {
     moveNavigation("right");
   }
 
-  public searchWorkspace = async (query: string): Promise<WorkspaceDocument[]> => { 
+  public searchWorkspace = async (query: string): Promise<WorkspaceDocument[]> => {
     const workspaces = await this.workspaceRepository.searchWorkspaces(query);
     return workspaces;
   }
 
-  public searchEnvironment = async (query: string): Promise<EnvironmentDocument[]> => { 
+  public searchEnvironment = async (query: string): Promise<EnvironmentDocument[]> => {
     const environments = await this.environmentRepository.searchEnvironments(query);
     return environments;
   }
 
-  public searchTestflow = async (query: string): Promise<any> => { 
+  public searchTestflow = async (query: string): Promise<any> => {
     const environments = await this.testflowRepository.searchTestflows(query);
     return environments;
   }
 
-  public getRecentWorkspace = async (): Promise<WorkspaceDocument[]> => { 
+  public getRecentWorkspace = async (): Promise<WorkspaceDocument[]> => {
     return this.workspaceRepository.getRecentWorkspaces();
   }
 
-  public getRecentEnvironment = async (): Promise<EnvironmentDocument[]> => { 
+  public getRecentEnvironment = async (): Promise<EnvironmentDocument[]> => {
     return this.environmentRepository.getRecentEnvironments();
   }
 
-  public getRecentTestflow = async (): Promise<any> => { 
+  public getRecentTestflow = async (): Promise<any> => {
     return this.testflowRepository.getRecentTestflows();
+  }
+
+
+  /**
+   * Gets the request URL based on the type of request in the tree node
+   * @param tree - The tree node containing request information
+   * @returns The URL string for the request, or empty string if not found
+   * @private
+   */
+  private getRequestUrl(tree: any): string {
+    switch (tree.type) {
+      case ItemType.GRAPHQL:
+        return tree.graphql?.url || "";
+      case ItemType.SOCKET_IO:
+        return tree.socketio?.url || "";
+      case ItemType.WEB_SOCKET:
+        return tree.websocket?.url || "";
+      case ItemType.REQUEST:
+        return tree.request?.url || "";
+      default:
+        return "";
+    }
+  }
+
+  /**
+   * Creates a path string from an array of path segments
+   * @param path - Array of path segments
+   * @returns Joined path string with segments separated by " / "
+   * @private
+   */
+  private createPath(path: string[]): string {
+    return path.join(" / ");
+  }
+
+  /**
+   * Helper method to recursively search through the tree structure
+   * @param tree - Current tree node being searched
+   * @param searchText - Text to search for
+   * @param collection - Array to store found collections
+   * @param folder - Array to store found folders
+   * @param file - Array to store found files/requests
+   * @param collectionId - ID of the current collection
+   * @param path - Current path in the tree
+   * @param folderDetails - Details of the current folder
+   * @param workspaceMap - Map of workspace IDs to workspace details
+   * @param currentWorkspaceId - ID of the current workspace
+   * @private
+   */
+  private searchHelper(
+    tree: any,
+    searchText: string,
+    collection: any[],
+    folder: any[],
+    file: any[],
+    collectionId: string,
+    path: string[],
+    folderDetails: any,
+    workspaceMap: Record<string, { teamName: string; workspaceName: string }> = {},
+    currentWorkspaceId = tree.workspaceId,
+  ): void {
+    if (tree.workspaceId) {
+      const workspaceDetails = workspaceMap[tree.workspaceId];
+      if (workspaceDetails) {
+        path.push(workspaceDetails.teamName);
+        path.push(workspaceDetails.workspaceName);
+      }
+    }
+
+    if (tree.name.toLowerCase().includes(searchText.toLowerCase())) {
+      if (
+        (tree.type === ItemType.REQUEST ||
+          tree.type === ItemType.GRAPHQL ||
+          tree.type === ItemType.SOCKET_IO ||
+          tree.type === ItemType.WEB_SOCKET) &&
+        file.length < 3
+      ) {
+        let currentFolderDetails =
+          tree.folderId && tree.folderName
+            ? { id: tree.folderId, name: tree.folderName }
+            : tree.parentFolder
+              ? { id: tree.parentFolder.id, name: tree.parentFolder.name }
+              : folderDetails;
+
+        const requestMethod =
+          tree.type === ItemType.REQUEST
+            ? tree.request?.method
+            : tree.type;
+
+        const requestData = {
+          tree: JSON.parse(
+            JSON.stringify({
+              ...tree,
+              folderId: currentFolderDetails?.id,
+              folderName: currentFolderDetails?.name,
+              request: {
+                ...tree.request,
+                url: this.getRequestUrl(tree),
+                method: requestMethod,
+              },
+            }),
+          ),
+          collectionId,
+          folderDetails: currentFolderDetails,
+          path: this.createPath(path),
+          updatedAt: new Date(tree.updatedAt || Date.now()),
+          workspaceId: currentWorkspaceId,
+          type: tree.type,
+        };
+
+        file.push(requestData);
+      } else if (tree.type === ItemType.FOLDER && folder.length < 1) {
+        folder.push({
+          tree: JSON.parse(JSON.stringify(tree)),
+          collectionId,
+          path: this.createPath(path),
+          updatedAt: new Date(tree.updatedAt || Date.now()),
+          workspaceId: currentWorkspaceId,
+        });
+      } else if (
+        collection.length < 1 &&
+        tree.type !== ItemType.FOLDER &&
+        !Object.values([
+          ItemType.REQUEST,
+          ItemType.GRAPHQL,
+          ItemType.SOCKET_IO,
+          ItemType.WEB_SOCKET,
+        ]).includes(tree.type)
+      ) {
+        collection.push({
+          tree: JSON.parse(JSON.stringify(tree)),
+          collectionId,
+          path: this.createPath(path),
+          updatedAt: new Date(tree.updatedAt || Date.now()),
+          workspaceId: currentWorkspaceId,
+        });
+      }
+    }
+
+    if (file.length < 3 || folder.length < 1 || collection.length < 1) {
+      if (tree && tree.items) {
+        for (let j = 0; j < tree.items.length; j++) {
+          path.push(tree.name);
+          const newFolderDetails =
+            tree.type === ItemType.FOLDER
+              ? { id: tree.id || tree._id, name: tree.name }
+              : folderDetails;
+
+          const childItem = tree.items[j];
+          if (tree.type === ItemType.FOLDER) {
+            childItem.parentFolder = {
+              id: tree.id || tree._id,
+              name: tree.name,
+            };
+          }
+
+          this.searchHelper(
+            childItem,
+            searchText,
+            collection,
+            folder,
+            file,
+            collectionId,
+            path,
+            newFolderDetails,
+            workspaceMap,
+            currentWorkspaceId,
+          );
+          path.pop();
+        }
+      }
+    }
+
+    file.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+    folder.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+    collection.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+  }
+
+  /**
+   * Gets the latest items of each type from the tree
+   * @param tree - Array of tree nodes to search
+   * @param workspaceMap - Map of workspace IDs to workspace details
+   * @returns Object containing arrays of latest collections, folders, and requests
+   * @private
+   */
+  private getLatestItemsByType(
+    tree: any[],
+    workspaceMap: Record<string, { teamName: string; workspaceName: string }> = {},
+  ) {
+    const collections: any[] = [];
+    const folders: any[] = [];
+    const requests: any[] = [];
+    const workspaces: any[] = [];
+
+    const extractItems = (
+      node: any,
+      path: string[] = [],
+      collectionId: string = "",
+      currentWorkspaceId: string | null = null,
+    ) => {
+      if (!node) return;
+
+      if (node.workspaceId) {
+        const workspaceDetails = workspaceMap[node.workspaceId];
+        if (workspaceDetails) {
+          path.push(workspaceDetails.teamName);
+          path.push(workspaceDetails.workspaceName);
+        }
+      }
+
+      const workspaceId = node.workspaceId || currentWorkspaceId;
+
+      const requestMethod =
+        node.type === ItemType.REQUEST
+          ? node.request?.method
+          : node.type;
+
+      const itemData = {
+        tree: JSON.parse(
+          JSON.stringify({
+            ...node,
+            request: {
+              ...node.request,
+              url: this.getRequestUrl(node),
+              method: requestMethod,
+            },
+          }),
+        ),
+        collectionId: collectionId || node.id,
+        path: this.createPath(path),
+        updatedAt: new Date(node.updatedAt || Date.now()),
+        workspaceId,
+        type: node.type,
+        folderDetails: [
+          ItemType.REQUEST,
+          ItemType.SOCKET_IO,
+          ItemType.WEB_SOCKET,
+          ItemType.GRAPHQL,
+        ].includes(node.type)
+          ? { id: path[path.length - 1]?.id, name: path[path.length - 1]?.name }
+          : {},
+      };
+
+      switch (node.type) {
+        case ItemType.FOLDER:
+          folders.push(itemData);
+          break;
+        case ItemType.REQUEST:
+        case ItemType.SOCKET_IO:
+        case ItemType.WEB_SOCKET:
+        case ItemType.GRAPHQL:
+          requests.push(itemData);
+          break;
+        case ItemType.WORKSPACE:
+          workspaces.push(itemData);
+          break;
+        default:
+          if (!node.type) {
+            collections.push(itemData);
+          }
+          break;
+      }
+
+      if (node.items) {
+        const newPath = [...path, node.name];
+        node.items.forEach((item: any) => {
+          extractItems(item, newPath, collectionId || node.id, workspaceId);
+        });
+      }
+    };
+
+    tree.forEach((node) => extractItems(node));
+
+    const sortByDate = (a: any, b: any) =>
+      b.updatedAt.getTime() - a.updatedAt.getTime();
+
+    return {
+      latestCollections: collections.sort(sortByDate).slice(0, 3),
+      latestFolders: folders.sort(sortByDate).slice(0, 3),
+      latestRequests: requests.sort(sortByDate).slice(0, 3),
+    };
+  }
+
+  /**
+   * Main search method that handles searching through the tree structure
+   * @param searchText - Text to search for
+   * @param collection - Array to store found collections
+   * @param folder - Array to store found folders
+   * @param file - Array to store found files/requests
+   * @param collectionData - Array of collection data to search through
+   * @param workspacePath - Optional workspace path
+   * @param workspaceMap - Map of workspace IDs to workspace details
+   * @public
+   */
+  public searchNode(
+    searchText: string,
+    collection: any[],
+    folder: any[],
+    file: any[],
+    collectionData: any[],
+    workspacePath?: string,
+    workspaceMap: Record<string, { teamName: string; workspaceName: string }> = {},
+  ): void {
+    this.tree = collectionData;
+
+    if (searchText.trim() === "") {
+      // Clear existing arrays before populating with latest items
+      collection.length = 0;
+      folder.length = 0;
+      file.length = 0;
+
+      // Get latest items and ensure they're properly sorted
+      const latestItems = this.getLatestItemsByType(this.tree, workspaceMap);
+
+      // Ensure we're getting the most recently updated items
+      if (latestItems.latestCollections.length > 0) {
+        collection.push(...latestItems.latestCollections);
+      }
+      if (latestItems.latestFolders.length > 0) {
+        folder.push(...latestItems.latestFolders);
+      }
+      if (latestItems.latestRequests.length > 0) {
+        file.push(...latestItems.latestRequests);
+      }
+
+      return;
+    }
+
+    for (let i = 0; i < this.tree.length; i++) {
+      const path: string[] = [];
+
+      this.searchHelper(
+        this.tree[i],
+        searchText,
+        collection,
+        folder,
+        file,
+        this.tree[i].id,
+        path,
+        {},
+        workspaceMap,
+      );
+    }
   }
 }

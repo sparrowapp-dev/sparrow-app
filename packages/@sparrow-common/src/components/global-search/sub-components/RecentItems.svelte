@@ -141,7 +141,6 @@
       filteredWorkspaces = filteredWorkspaces.map(
         (workspace) => workspace._data,
       );
-      console.log("filteredWorkspaces", filteredWorkspaces);
 
       const recentTestflows = await recentTestflow();
       filteredTestflows = recentTestflows.map((testflow) => testflow._data);
