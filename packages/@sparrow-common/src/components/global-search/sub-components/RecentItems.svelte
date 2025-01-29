@@ -446,7 +446,7 @@
       {/if}
       {#if filteredEnvironments?.length > 0}
         <div class="section-header">
-          <span class="section-title">Recent Environment</span>
+          <span class="section-title">Environment</span>
           <div class="keyboard-shortcut">
             <div class="shortcut-key">
               <img src={keyCommand} alt="" class="shortcut-icon" />
@@ -502,7 +502,7 @@
       {/if}
       {#if filteredWorkspaces?.length > 0}
         <div class="section-header">
-          <span class="section-title">Recent Workspaces</span>
+          <span class="section-title">Workspaces</span>
           <div class="keyboard-shortcut">
             <div class="shortcut-key">
               <img src={keyCommand} alt="" class="shortcut-icon" />
@@ -755,8 +755,8 @@
     flex-direction: column;
     padding: 8px;
     gap: 4px;
+    overflow-y: auto;
   }
-
   .recent-section {
     margin-bottom: 12px;
   }

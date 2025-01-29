@@ -69,6 +69,7 @@
     flex-direction: column;
     flex: 1;
     gap: var(--gap-gap-4, 4px);
+    overflow-y: auto;
   }
 
   @media (max-width: 991px) {
