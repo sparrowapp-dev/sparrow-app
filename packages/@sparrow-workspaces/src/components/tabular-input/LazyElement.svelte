@@ -95,7 +95,11 @@
           {#if pairs.length - 1 != index}
             <!-- lists first to last second row -->
             {#if isInputBoxEditable}
-              <Tooltip title={"Delete"} placement={"bottom"} distance={10}>
+              <Tooltip
+                title={"Delete"}
+                placement={"bottom-center"}
+                distance={10}
+              >
                 <button
                   class="trash-icon bg-secondary-700 border-radius-2 d-flex justify-content-center align-items-center p-0 border-0"
                   style="width: 16px; height:16px; "

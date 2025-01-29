@@ -40,7 +40,7 @@
 
 <Tooltip
   title={"You are using Sparrow <span style='color:var(--text-primary-300);'>Edge</span>, Sign in to enjoy all features!"}
-  placement="bottom"
+  placement="bottom-center"
   show={!showMessage}
 >
   <CloudOffIcon height="19px" width="23px" color="var(--icon-secondary-290)" />
