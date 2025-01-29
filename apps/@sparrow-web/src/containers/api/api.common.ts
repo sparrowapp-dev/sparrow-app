@@ -119,7 +119,7 @@ const makeRequest = async (
     const duration = endTime - startTime; // Calculate duration in milliseconds
 
     if (response.status === 201 || response.status === 200) {
-      appInsights.trackDependencyData({
+      appInsights?.trackDependencyData({
         id: uuidv4(),
         target: url,
         name: `${method} ${url}`,
@@ -138,7 +138,7 @@ const makeRequest = async (
         return success(response.data, "");
       }
     } else {
-      appInsights.trackDependencyData({
+      appInsights?.trackDependencyData({
         id: uuidv4(),
         target: url,
         name: `${method} ${url}`,
@@ -156,7 +156,7 @@ const makeRequest = async (
   } catch (e) {
     const endTime = performance.now(); // End timing
     const duration = endTime - startTime; // Calculate duration in milliseconds
-    appInsights.trackDependencyData({
+    appInsights?.trackDependencyData({
       id: uuidv4(),
       target: url,
       name: `${method} ${url}`,
@@ -623,6 +623,10 @@ const makeHttpRequestV2 = async (
     let response;
     if (selectedAgent === "Cloud Agent") {
       const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
+      // eslint-disable-next-line no-console
+      console.log("constants ===> ", constants);
+      // eslint-disable-next-line no-console
+      console.log("proxyUrl ===> ", proxyUrl);
       response = await axios({
         data: { url, method, headers, body, contentType },
         url: proxyUrl,
@@ -733,7 +737,7 @@ const makeHttpRequestV2 = async (
         throw new Error("Error parsing response");
       }
 
-      appInsights.trackDependencyData({
+      appInsights?.trackDependencyData({
         id: uuidv4(),
         name: "Cloud Agent Duration Metric",
         duration: duration,
@@ -756,7 +760,7 @@ const makeHttpRequestV2 = async (
     }
 
     console.error("Request error:", e);
-    appInsights.trackDependencyData({
+    appInsights?.trackDependencyData({
       id: uuidv4(),
       name: "Browser Agent Duration Metric",
       duration: performance.now() - startTime,

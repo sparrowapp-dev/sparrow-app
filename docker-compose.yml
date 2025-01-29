@@ -61,7 +61,10 @@ services:
 
   # Sparrow Web
   sparrow-web:
-    image: sparrowapi/sparrow-web:v1
+    # image: sparrowapi/sparrow-web:v1
+    build:
+      context: . # Path where the Dockerfile is located
+      dockerfile: Dockerfile # Explicitly specifying the Dockerfile
     ports:
       - "1422:80"
     networks:
