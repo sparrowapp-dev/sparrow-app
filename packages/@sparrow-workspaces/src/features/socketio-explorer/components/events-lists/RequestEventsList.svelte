@@ -17,7 +17,7 @@
     style="font-size: 12px; font-weight: 500; margin-bottom: 4px;"
   >
     <div
-      class="position-relative  w-50 d-flex justify-content-between align-items-center"
+      class="position-relative w-50 d-flex justify-content-between align-items-center"
     >
       <div class="w-100">
         <Input
@@ -38,7 +38,7 @@
       </div>
     </div>
 
-    <div class=" ps-1 d-flex w-50  justify-content-between ">
+    <div class=" ps-1 d-flex w-50 justify-content-between">
       <div class="d-flex align-items-center">
         {#if true}
           <Switch
@@ -54,7 +54,7 @@
 
       <div class="pe-2">
         {#if index !== pairs.length - 1}
-          <Tooltip title={"Delete"} placement={"bottom-left"} distance={10}>
+          <Tooltip title={"Delete"} placement={"bottom-right"} distance={10}>
             <button
               class="bg-secondary-700 d-flex justify-content-center align-items-center border-0"
               style="width: 24px; height:16px;"

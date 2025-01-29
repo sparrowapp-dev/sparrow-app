@@ -27,6 +27,7 @@
     "./utils/navigation": "./src/utils/navigation.ts",
     "./utils/team.helper": "./src/utils/team.helper.ts",
     "./utils/importCollectionValidations": "./src/utils/importCollectionValidations.ts",
+    "./types/sidebar/sidebar-base":"./src/types/sidebar/sidebar-base.ts",
     "./types/workspace": "./src/types/workspace/http-request-tab.ts",
     "./types/workspace/collection-base": "./src/types/workspace/collection-base.ts",
     "./types/workspace/http-request-base": "./src/types/workspace/http-request-base.ts",
