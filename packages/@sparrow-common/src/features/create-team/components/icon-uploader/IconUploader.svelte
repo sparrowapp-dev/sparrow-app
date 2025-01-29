@@ -55,7 +55,7 @@
             : 'transparent'
           : 'var(--bg-ds-surface-600)'};
     "
-        class="sparrow-file-input w-100 px-auto bg-ds-surface-400 {isDragOver
+        class="sparrow-file-input p-2 w-100 px-auto bg-ds-surface-400 {isDragOver
           ? 'drag-over'
           : ''}"
         tabindex="0"
@@ -89,21 +89,21 @@
             <label for={inputId} class="d-flex justify-content-center">
               <NewUploadIcon />
             </label>
-            <label for={inputId} class="sparrow-choose-file-label ps-2"
-              >Drag & Drop or <span class="sparrow-upload-text"
+            <label for={inputId} class="sparrow-choose-file-label my-2 ps-2"
+              >Drag & Drop or <span class="sparrow-upload-text text-fs-14"
                 >Upload File</span
               > here</label
             >
-            <div for={inputId} class="d-flex justify-content-center">
-              <div class="file-type-container-one">
+            <div for={inputId} class="d-flex justify-content-center text-fs-12">
+              <div class="file-type-container-one pe-2 pt-1 pb-1">
                 <FileTypeIcon />
                 <span class="file-type-text">PNG</span>
               </div>
-              <div class="file-type-container-two">
+              <div class="file-type-container-two px-2 pt-1 pb-1">
                 <FileTypeIcon />
                 <span class="file-type-text">JPG</span>
               </div>
-              <div class="file-type-container-three">
+              <div class="ps-2 pt-1 pb-1">
                 <FileTypeIcon />
                 <span class="file-type-text">JPEG</span>
               </div>
@@ -163,20 +163,11 @@
 </div>
 
 <style lang="scss">
-  .sparrow-upload-container {
-  }
-  .upload-footer-container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 4px;
-  }
   .sparrow-choose-file-input-button {
     margin-top: 22px;
     margin-bottom: 22px;
   }
   .sparrow-file-input {
-    padding: 8px;
-    padding: 8px;
     height: 164px;
     min-width: 240px;
     max-width: 540px;
@@ -201,12 +192,6 @@
     border: 1px dashed var(--border-ds-primary-300) !important;
     background-color: var(--bg-ds-surface-500);
   }
-
-  .upload-max-file-text {
-    color: var(--text-ds-neutral-400);
-    font-weight: 400;
-    font-size: 12px;
-  }
   .sparrow-input-label {
     font-size: var(--base-text);
   }
@@ -217,37 +202,19 @@
   .sparrow-upload-text {
     color: var(--text-ds-primary-300);
     font-family: "Inter", sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 20.02px;
     text-align: center;
     cursor: pointer;
   }
   .file-type-text {
     color: var(--text-ds-neutral-400);
     font-family: "Inter", sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 18px;
     text-align: left;
   }
   .file-type-container-one {
-    padding-right: 8px;
-    padding-top: 3px;
-    padding-bottom: 3px;
     border-right: 1px solid var(--border-ds-surface-100);
   }
   .file-type-container-two {
-    padding-right: 8px;
-    padding-left: 8px;
-    padding-top: 3px;
-    padding-bottom: 3px;
     border-right: 1px solid var(--border-ds-surface-100);
-  }
-  .file-type-container-three {
-    padding-left: 8px;
-    padding-top: 3px;
-    padding-bottom: 3px;
   }
   .sparrow-choose-file-input::file-selector-button {
     background-color: transparent;
@@ -258,8 +225,6 @@
 
   .sparrow-choose-file-label {
     color: var(--text-ds-neutral-400);
-    margin-top: 8px;
-    margin-bottom: 8px;
   }
 
   .sparrow-input-image-preview > img {

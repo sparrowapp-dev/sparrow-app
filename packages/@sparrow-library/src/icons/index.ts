@@ -16,6 +16,7 @@ export { default as SyncIcon } from "./Sync.svelte";
 export { default as GithubIcon } from "./Github.svelte";
 export { default as DoubleArrowIcon } from "./DoubleArrow.svelte";
 export { default as NewUploadIcon } from "./NewUploadIcon.svelte";
+export { default as MessageTextIcon } from "./MessageTextIcon.svelte";
 export { default as FileTypeIcon } from "./FileTypeIcon.svelte";
 export { default as DiscordIcon } from "./Discord.svelte";
 export { default as LibraryIcon } from "./Library.svelte";

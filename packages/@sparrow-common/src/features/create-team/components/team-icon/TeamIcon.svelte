@@ -16,6 +16,7 @@
   import type { TeamForm } from "../../types";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
+  import MessageTextIcon from "../../../../../../@sparrow-library/src/icons/MessageTextIcon.svelte";
 
   /**
    * Exports
@@ -157,16 +158,22 @@
   <!-- 
     -- Error Messages 
   -->
-  <div class="Messages-container">
+  <div class="d-flex col justify-content-between">
     <div>
       {#if teamForm.file.showFileSizeError}
-        <p class="mb-2 text-fs-12 message-error-text">
-          {ICON_CONFIG.SIZE_EXCEED_ERROR_MESSAGE}
-        </p>
+        <div class="d-flex col gap-1">
+          <MessageTextIcon />
+          <p class="mb-2 text-fs-12 message-error-text">
+            {ICON_CONFIG.SIZE_EXCEED_ERROR_MESSAGE}
+          </p>
+        </div>
       {:else if teamForm.file.showFileTypeError}
-        <p class="mb-2 text-fs-12 message-error-text">
-          {ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
-        </p>
+        <div class="d-flex col gap-1">
+          <MessageTextIcon />
+          <p class="mb-2 text-fs-12 message-error-text">
+            {ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
+          </p>
+        </div>
         <!-- 
         -- Supportes File Types Button 
       -->
@@ -202,19 +209,11 @@
     font-weight: 400;
     line-height: 18px;
   }
-  .Messages-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-  }
   .message-error-text {
     color: var(--text-ds-danger-300);
     word-break: break-word;
   }
   .upload-max-file-content {
-    font-size: 12px;
-    font-size: "inter";
-    font-weight: 400;
     font-family: "Inter", sans-serif;
     line-height: 18px;
     white-space: nowrap;
