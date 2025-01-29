@@ -35,11 +35,7 @@
   import { OSDetector } from "@sparrow/common/utils";
 
   import { fade } from "svelte/transition";
-<<<<<<< HEAD
   import { TeamsViewModel } from "../teams-page/Teams.ViewModel";
-
-=======
->>>>>>> 9b302441a968fe6673179762e02b51c81a14a10f
   import { isGuestUserActive } from "@app/store/auth.store";
   import {
     type SidebarItemBaseInterface,
@@ -390,10 +386,6 @@ const setSelectedType =(value)=> {
       await _viewModel.switchAndCreateCollectionTab(workspaceId, collection);
       closeGlobalSearch();
       handlehideGlobalSearch(false);
-<<<<<<< HEAD
-
-=======
->>>>>>> 9b302441a968fe6673179762e02b51c81a14a10f
     } catch (error) {
       closeGlobalSearch();
       handlehideGlobalSearch(false);
@@ -438,14 +430,11 @@ const setSelectedType =(value)=> {
       );
 
       if (!isActiveWorkspace) {
-<<<<<<< HEAD
         // handlehideGlobalSearch(true);
         // const workspaceData = await _viewModel.getWorkspaceById(workspace._id);
         // handleSwitchWorkspaceModal(workspaceData.name, "Folder", workspace._id);
 
         // Create new tab for the workspace
-=======
->>>>>>> 9b302441a968fe6673179762e02b51c81a14a10f
         _viewModel.switchAndCreateWorkspaceTab(workspace);
         closeGlobalSearch();
         handlehideGlobalSearch(false);
@@ -553,11 +542,8 @@ const setSelectedType =(value)=> {
         recentWorkspace={_viewModel.getRecentWorkspace}
         recentEnvironment={_viewModel.getRecentEnvironment}
         recentTestflow={_viewModel.getRecentTestflow}
-<<<<<<< HEAD
         {selectedType}
-=======
         handleSearchNode={(...args) => _viewModel.searchNode(...args)}
->>>>>>> 9b302441a968fe6673179762e02b51c81a14a10f
       />
     </div>
   </div>
