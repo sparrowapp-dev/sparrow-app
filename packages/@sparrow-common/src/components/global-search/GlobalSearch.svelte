@@ -30,12 +30,9 @@
   export let recentTestflow;
   export let recentEnvironment;
   export let recentWorkspace;
-<<<<<<< HEAD
   export let selectedType;
-=======
   export let handleSearchNode;
   export let handlehideGlobalSearch;
->>>>>>> 9b302441a968fe6673179762e02b51c81a14a10f
 
   let workspaceDetailsMap: Record<
     string,
@@ -85,12 +82,7 @@
     filteredCollection.length = 0;
     filteredFolder.length = 0;
     filteredRequest.length = 0;
-
-<<<<<<< HEAD
-    searchNode(
-=======
     handleSearchNode(
->>>>>>> 9b302441a968fe6673179762e02b51c81a14a10f
       searchQuery,
       filteredCollection,
       filteredFolder,
