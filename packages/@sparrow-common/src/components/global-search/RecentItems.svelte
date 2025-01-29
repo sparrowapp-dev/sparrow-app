@@ -1,16 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { RxDB } from "../../../../../apps/@sparrow-desktop/src/database/database";
   import folderIcon from "../../../static/folderIcon.png";
   import environmentIcon from "../../../static/envLayer.png";
   import collectionIcon from "../../../static/collectionStack.png";
   import workspaceIcon from "../../../static/workspaceBoard.png";
-  import { WorkspaceRepository } from "../../../../../apps/@sparrow-desktop/src/repositories/workspace.repository";
-  import { EnvironmentRepository } from "../../../../../apps/@sparrow-desktop/src/repositories/environment.repository";
-  import { TabRepository } from "../../../../../apps/@sparrow-desktop/src/repositories/tab.repository";
   import keyCommand from "../../../static/keyCommand.png";
-  import { InitTab } from "@sparrow/common/factory";
-  import { moveNavigation } from "@sparrow/common/utils";
   import getIcon from "../../../static/getIcon.png";
   import hexIcon from "../../../static/iconHex.png";
   import postIcon from "../../../static/Post.png";
@@ -20,9 +14,7 @@
   import socketIoIcon from "../../../static/socketio.png";
   import webSocketIcon from "../../../static/WebSocket.png";
   import flowIcon from "../../../static/flowIcon.png";
-  import { TestflowRepository } from "../../../../../apps/@sparrow-desktop/src/repositories/testflow.repository";
   import type { EnvironmentDocument } from "@app/database/database";
-  import { filter } from "rxjs";
   import NoResults from "./NoResults.svelte";
 
   export let searchQuery = "";
@@ -43,10 +35,6 @@
   export let recentEnvironment;
   export let recentWorkspace;
 
-  let workspaceRepository = new WorkspaceRepository();
-  let environmentRepository = new EnvironmentRepository();
-  let tabRepository = new TabRepository();
-  let testflowRepository = new TestflowRepository();
   let filteredWorkspaces = [];
   let filteredEnvironments = [];
   let filteredTestflows = [];
@@ -59,14 +47,6 @@
     url?: string;
     method?: string;
   }
-  // $: console.log("the sleected type", selectedType);
-  // $: console.log("The search query: recnet ", searchQuery);
-  // $: console.log("filteredCollection is recent ", filteredCollection);
-  // $: console.log("filteredFolder s\is", filteredFolder);
-  // $: console.log("filteredRequest is", filteredRequest);
-  // $: console.log("filteredWorkspace is curr", filteredWorkspaces);
-  // $: console.log("filteredEnvironment is", filteredEnvironments);
-
   $: {
     updateWorkspaces(searchQuery);
     updateEnvironments(searchQuery);
