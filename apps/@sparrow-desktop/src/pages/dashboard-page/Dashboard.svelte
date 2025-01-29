@@ -34,9 +34,6 @@
   import { CreateWorkspace } from "@sparrow/teams/features";
 
   import { fade } from "svelte/transition";
-  // import GlobalSearch from "../../../../../packages/@sparrow-common/src/components/popup/global-search/GlobalSearch.svelte";
-  import { TeamsViewModel } from "../teams-page/Teams.ViewModel";
-
   import { isGuestUserActive } from "@app/store/auth.store";
   import {
     type SidebarItemBaseInterface,
@@ -221,8 +218,6 @@
     }
   };
 
-  $: console.log("hide state", hideGlobalSearch);
-
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
   });
@@ -257,7 +252,7 @@
       position: SidebarItemPositionBaseEnum.SECONDARY,
     },
   ];
-  // let mahi = { mahiSingh: "mahi" };
+
   const handleWorkspaceSwitch = async () => {
     await _viewModel.activateWorkspace(switchWorkspaceId);
     handlehideGlobalSearch(false);
@@ -277,7 +272,6 @@
         await _viewModel.checkActiveWorkspace(workspaceId);
       if (!isActiveWorkspace) {
         handlehideGlobalSearch(true);
-        console.log(`Workspace ${workspaceId} is not active.`);
         const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
         handleSwitchWorkspaceModal(workspaceData.name, "Request", workspaceId);
         return;
@@ -313,7 +307,6 @@
 
       if (!isActiveWorkspace) {
         handlehideGlobalSearch(true);
-        console.log(`Workspace ${workspaceId} is not active.`);
         const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
         handleSwitchWorkspaceModal(
           workspaceData.name,
@@ -321,15 +314,9 @@
           workspaceId,
         );
       }
-
       await _viewModel.switchAndCreateCollectionTab(workspaceId, collection);
       closeGlobalSearch();
       handlehideGlobalSearch(false);
-
-      // Add success notification
-      // notifications.success(
-      //   `Collection "${collection.name}" opened successfully.`,
-      // );
     } catch (error) {
       closeGlobalSearch();
       handlehideGlobalSearch(false);
@@ -348,7 +335,6 @@
         await _viewModel.checkActiveWorkspace(workspaceId);
       if (!isActiveWorkspace) {
         handlehideGlobalSearch(true);
-        console.log(`Workspace ${workspaceId} is not active.`);
         const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
         handleSwitchWorkspaceModal(workspaceData.name, "Folder", workspaceId);
       }
@@ -359,7 +345,6 @@
       );
       closeGlobalSearch();
       handlehideGlobalSearch(false);
-      // notifications.success(`Folder "${folder.name}" opened successfully.`);
     } catch (error) {
       closeGlobalSearch();
       handlehideGlobalSearch(false);
@@ -375,20 +360,9 @@
       );
 
       if (!isActiveWorkspace) {
-        // handlehideGlobalSearch(true);
-        console.log(`Workspace ${workspace._id} is not active.`);
-        // const workspaceData = await _viewModel.getWorkspaceById(workspace._id);
-        // handleSwitchWorkspaceModal(workspaceData.name, "Folder", workspace._id);
-
-        // Create new tab for the workspace
         _viewModel.switchAndCreateWorkspaceTab(workspace);
         closeGlobalSearch();
         handlehideGlobalSearch(false);
-        // Navigate and show success notification
-        // navigate("collections");
-        // notifications.success(
-        //   `Workspace "${workspace.name}" opened successfully.`,
-        // );
       }
 
       // Additional workspace opening logic here if needed
@@ -410,7 +384,6 @@
 
       if (!isActiveWorkspace) {
         handlehideGlobalSearch(true);
-        console.log(`Workspace ${environment.workspace} is not active.`);
         const workspaceData = await _viewModel.getWorkspaceById(
           environment.workspace,
         );
@@ -420,19 +393,14 @@
           environment.workspace,
         );
       }
-
       await _viewModel.switchAndCreateEnvironmentTab(environment);
       closeGlobalSearch();
       handlehideGlobalSearch(false);
-      // notifications.success(
-      //   `Environment "${environment.title}" opened successfully.`,
-      // );
     } catch (error) {
       closeGlobalSearch();
       handlehideGlobalSearch(false);
       console.error("Error opening environment:", error);
       notifications.error("Failed to open environment.");
-      // throw error;
     }
   };
 
@@ -444,7 +412,6 @@
 
       if (!isActiveWorkspace) {
         handlehideGlobalSearch(true);
-        console.log(`Workspace ${testflow.workspaceId} is not active.`);
         const workspaceData = await _viewModel.getWorkspaceById(
           testflow.workspaceId,
         );
@@ -454,14 +421,12 @@
           testflow.workspaceId,
         );
       }
-
       const existingTab = await _viewModel.getTabByID(testflow._id);
       if (existingTab?._data?.isActive) {
         handlehideGlobalSearch(false);
         closeGlobalSearch();
         return;
       }
-
       await _viewModel.switchAndCreateTestflowTab(testflow);
       closeGlobalSearch();
       handlehideGlobalSearch(false);
@@ -502,6 +467,7 @@
         recentWorkspace={_viewModel.getRecentWorkspace}
         recentEnvironment={_viewModel.getRecentEnvironment}
         recentTestflow={_viewModel.getRecentTestflow}
+        handleSearchNode={(...args) => _viewModel.searchNode(...args)}
       />
     </div>
   </div>

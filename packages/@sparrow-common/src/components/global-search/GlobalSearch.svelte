@@ -1,8 +1,7 @@
 <script lang="ts">
   import SearchBar from "./sub-components/SearchBar.svelte";
   import SearchSuggestions from "./sub-components/SearchSuggestions.svelte";
-  import type { SearchSuggestion } from "./types/types";
-  import { useTree } from "./CollectionList";
+  import type { SearchSuggestion } from "./sub-components/types/types";
   import type { CollectionDocument } from "@app/database/database";
   import { onMount } from "svelte";
   import {
@@ -31,6 +30,8 @@
   export let recentTestflow;
   export let recentEnvironment;
   export let recentWorkspace;
+  export let handleSearchNode;
+  export let handlehideGlobalSearch;
 
   let workspaceDetailsMap: Record<
     string,
@@ -76,18 +77,12 @@
     }
   });
 
-  const [, , searchNode] = useTree();
-
   const handleSearch = () => {
-    console.log("searching DB");
-
     filteredCollection.length = 0;
     filteredFolder.length = 0;
     filteredRequest.length = 0;
 
-    console.log("collection data is", collectionsData);
-
-    searchNode(
+    handleSearchNode(
       searchQuery,
       filteredCollection,
       filteredFolder,
@@ -97,9 +92,6 @@
       workspaceDetailsMap,
     );
   };
-
-  export let onClose = () => {};
-  export let handlehideGlobalSearch;
 
   const suggestions: SearchSuggestion[] = [
     {
@@ -143,7 +135,6 @@
         };
         return acc;
       }, {});
-      console.log("workspace details map", workspaceDetailsMap);
       handleSearch();
     } catch (error) {
       console.error("Error fetching workspace details:", error);
