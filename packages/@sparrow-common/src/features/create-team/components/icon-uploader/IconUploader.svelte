@@ -22,6 +22,7 @@
   export let iconHeight = 12;
   export let iconWidth = 12;
   export let disabled = false;
+  export let fileTypes = ["JPG", "PNG", "JPEG"];
   let isDragOver = false;
   let isFocused = false;
 
@@ -97,15 +98,19 @@
             <div for={inputId} class="d-flex justify-content-center text-fs-12">
               <div class="file-type-container-one pe-2 pt-1 pb-1">
                 <FileTypeIcon />
-                <span class="file-type-text">PNG</span>
+                <span class="file-type-text">{fileTypes[0]}</span>
               </div>
-              <div class="file-type-container-two px-2 pt-1 pb-1">
-                <FileTypeIcon />
-                <span class="file-type-text">JPG</span>
-              </div>
+              {#each fileTypes.slice(1, -1) as fileType, index}
+                <div class="file-type-container-two px-2 pt-1 pb-1" key={index}>
+                  <FileTypeIcon />
+                  <span class="file-type-text">{fileType}</span>
+                </div>
+              {/each}
               <div class="ps-2 pt-1 pb-1">
                 <FileTypeIcon />
-                <span class="file-type-text">JPEG</span>
+                <span class="file-type-text"
+                  >{fileTypes[fileTypes.length - 1]}</span
+                >
               </div>
             </div>
             <input

@@ -22,6 +22,7 @@
    * Exports
    */
   export let teamForm: TeamForm;
+  export let maxFileSizeText = 2;
 
   /**
    * Data
@@ -162,14 +163,14 @@
     <div>
       {#if teamForm.file.showFileSizeError}
         <div class="d-flex col gap-1">
-          <MessageTextIcon />
+          <MessageTextIcon visible={false} />
           <p class="mb-2 text-fs-12 message-error-text">
             {ICON_CONFIG.SIZE_EXCEED_ERROR_MESSAGE}
           </p>
         </div>
       {:else if teamForm.file.showFileTypeError}
         <div class="d-flex col gap-1">
-          <MessageTextIcon />
+          <MessageTextIcon visible={false} />
           <p class="mb-2 text-fs-12 message-error-text">
             {ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
           </p>
@@ -190,7 +191,7 @@
       <p
         class={`mb-2 text-fs-12 ${teamForm.file.showFileSizeError ? "upload-max-file-text-error" : "upload-max-file-text"}`}
       >
-        Max file size: 2MB
+        Max file size: {maxFileSizeText}MB
       </p>
     </div>
   </div>
