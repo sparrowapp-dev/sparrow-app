@@ -917,7 +917,7 @@
       <Button
         title={"Cancel"}
         textClassProp={"fs-6 px-2"}
-        type={"dark"}
+        type={"secondary"}
         onClick={() => {
           onClick(false);
         }}

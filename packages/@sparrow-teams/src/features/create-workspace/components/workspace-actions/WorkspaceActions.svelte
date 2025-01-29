@@ -30,7 +30,7 @@
   <Button
     disable={workspaceUnderSubmission}
     title={`Cancel`}
-    type="dark"
+    type="secondary"
     buttonClassProp={`me-2`}
     onClick={() => {
       handleModalState(false);

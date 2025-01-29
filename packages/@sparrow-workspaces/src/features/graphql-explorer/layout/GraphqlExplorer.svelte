@@ -177,7 +177,7 @@
         <div class="d-flex justify-content-between">
           <Button
             title="Save Request"
-            type="dark"
+            type="secondary"
             loader={false}
             buttonClassProp="ms-2"
             buttonStartIcon={floppyDisk}
