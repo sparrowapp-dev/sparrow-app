@@ -3,22 +3,22 @@
   export let workspaceName: string = "Domigo";
   export let onCancel: () => void;
   export let onContinue: () => void;
-  import crossIcon from "../../../../static/crossIcon.svg";
+  import crossIcon from "../../../static/crossIcon.svg";
 </script>
 
 <div class="modal">
   <div class="modal-header">
-   
-  <div class="header">
-   <h2 class="modal-title">Switch to {workspaceName}</h2>
-    <button class="close-button" on:click={onCancel} aria-label="Close modal">
-      <img src={crossIcon} alt="" class="close-icon" />
-    </button>
-   </div> 
-  <p class="modal-message">
-    The selected API request/folder/collection belongs to
-    the <span class="highlight">{workspaceName}</span> workspace.To access this you need to switch workspace. Do you want to continue?
-  </p>
+    <div class="header">
+      <h2 class="modal-title">Switch to {workspaceName}</h2>
+      <button class="close-button" on:click={onCancel} aria-label="Close modal">
+        <img src={crossIcon} alt="" class="close-icon" />
+      </button>
+    </div>
+    <p class="modal-message">
+      The selected API request/folder/collection belongs to the <span
+        class="highlight">{workspaceName}</span
+      > workspace.To access this you need to switch workspace. Do you want to continue?
+    </p>
   </div>
   <div class="modal-actions">
     <button class="cancel-button" on:click={onCancel} type="button">
@@ -31,7 +31,7 @@
 </div>
 
 <style>
-  .header{
+  .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -60,7 +60,6 @@
     align-items: center;
     justify-content: space-between;
     border-bottom: none;
-   
   }
 
   .modal-title {
@@ -92,7 +91,6 @@
   }
 
   .modal-message {
-  
     color: var(--colors-neutral-text-3, #cccccc);
     margin: 14px 0 0;
     font:
@@ -110,7 +108,6 @@
     padding-top: 16px;
     gap: 8px;
     justify-content: flex-end;
-   
   }
 
   .cancel-button,

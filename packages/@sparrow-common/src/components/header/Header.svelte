@@ -17,7 +17,7 @@
   import UserProfileModal, {
     type UserProfileObj,
   } from "./sub-component/UserProfileModal.svelte";
-  import { GlobalSearch } from "../../components/popup/global-search";
+  // import { GlobalSearch } from "../../components/popup/global-search";
   /**
    * environment list
    */
@@ -82,7 +82,7 @@
     localStorage.setItem("selectedAgent", tabId);
     multipleAgentvar = tabId;
   };
-const handleSearchClick = () => {
+  const handleSearchClick = () => {
     if (onSearchClick) {
       onSearchClick(); // Trigger the function passed from Dashboard
     }
@@ -183,8 +183,7 @@ const handleSearchClick = () => {
   };
 
   const handleViewGlobalSearch = () => {
-    isGlobalSearchOpen=true
-    
+    isGlobalSearchOpen = true;
   };
   export let user;
   export let onLogout;
@@ -387,7 +386,11 @@ const handleSearchClick = () => {
       </div>
     {/if}
 
-    <SearchBar placeholder="Search Sparrow..."  bind:searchQuery={searchQuery}  onClick={handleSearchClick}  />
+    <SearchBar
+      placeholder="Search Sparrow..."
+      bind:searchQuery
+      onClick={handleSearchClick}
+    />
 
     <!-- Multiple Agent Dropdown -->
     {#if isWebApp}
@@ -466,7 +469,7 @@ const handleSearchClick = () => {
       </Select>
     {/if}
     <!-- {#if !isWebApp} -->
-     
+
     <Select
       id={"environment-selector"}
       data={[

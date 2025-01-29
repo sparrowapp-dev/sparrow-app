@@ -1,6 +1,6 @@
 <script>
-  import searchIcon from "../../../../static/searchIcon.png";
-  
+  import searchIcon from "../../../static/searchIcon.png";
+
   export let searchQuery = "";
 </script>
 
@@ -27,7 +27,7 @@
     margin-top: 10px;
     align-items: center;
     justify-content: center;
-    color: #9B9DA1; 
+    color: #9b9da1;
     font-weight: 400;
     font-size: 12px;
     line-height: 18px;
