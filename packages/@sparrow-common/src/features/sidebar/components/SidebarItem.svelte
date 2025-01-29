@@ -2,13 +2,19 @@
   import { Link, Router } from "svelte-navigator";
   import { Tooltip } from "@sparrow/library/ui";
 
-  /**
-   * List of side bar Items
-   */
   export let item: SidebarItemObj;
   export let slidebarPlace;
 
   let isRouteActive = false;
+  let isPressed = false;
+
+  $: iconSrc = isRouteActive
+    ? item.selectedLogo || item.defaultLogo
+    : isPressed
+      ? item.selectedLogo || item.defaultLogo
+      : item.defaultLogo;
+
+  $: hoverIconSrc = item.hoveredLogo || item.defaultLogo;
 </script>
 
 <Tooltip
@@ -19,7 +25,6 @@
   <Router>
     <div
       class="sidebar-item-parent"
-      role="button"
       tabindex={item.disabled ? -1 : 0}
       on:keydown={() => {}}
       class:disabled={item.disabled}
@@ -41,16 +46,28 @@
       >
         <div
           class="sidebar-item"
-          style="--default-logo: url('{item.defaultLogo}'); --hovered-logo: url('{item.hoveredLogo ||
-            item.defaultLogo}'); --selected-logo: url('{item.selectedLogo ||
-            item.defaultLogo}');"
+          on:mousedown={() => {
+            if (!isRouteActive) {
+              isPressed = true;
+              iconSrc = item.selectedLogo || item.defaultLogo;
+            }
+          }}
+          on:mouseup={() => {
+            isPressed = false;
+          }}
+          on:mouseleave={() => {
+            if (!isRouteActive) {
+              iconSrc = item.defaultLogo;
+            }
+          }}
+          on:mouseenter={() => {
+            if (!isRouteActive && !isPressed) {
+              iconSrc = hoverIconSrc;
+            }
+          }}
         >
           <div class="d-flex" style="align-items: center;">
-            <img
-              class="sidebar-logo {isRouteActive ? 'selected' : ''}"
-              src={item.defaultLogo}
-              alt={item.heading}
-            />
+            <img class="sidebar-logo" src={iconSrc} alt={item.heading} />
           </div>
         </div>
       </Link>
@@ -62,16 +79,16 @@
   .delay-class {
     transition: top 250ms ease-in-out 150ms;
   }
+
   .sidebar-item-parent:focus {
     outline: none;
     border-radius: 4px;
     border: 2px solid var(--border-ds-primary-300) !important;
     background-color: var(--bg-ds-surface-500) !important;
   }
-
   .sidebar-item img {
-    height: 20px;
-    width: 20px;
+    height: 24px;
+    width: 24px;
   }
 
   .sidebar-item {
@@ -85,19 +102,18 @@
     background-color: var(--bg-ds-surface-500);
     opacity: 1;
   }
-  /* .sidebar-item:focus {
-    outline: none;
-    border: 2px solid var(--border-ds-primary-300) !important;
-    background-color: var(--bg-ds-surface-500) !important;
-  } */
+  .sidebar-item:active {
+    background-color: var(--bg-ds-pressed);
+  }
+
   .sidebar-item-parent.disabled {
     pointer-events: none !important;
     opacity: 0.3;
   }
-
   .sidebar-logo {
     content: var(--default-logo);
   }
+
   .sidebar-item:hover .sidebar-logo {
     content: var(--hovered-logo);
   }
