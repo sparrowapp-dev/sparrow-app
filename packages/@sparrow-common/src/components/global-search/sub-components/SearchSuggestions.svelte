@@ -15,7 +15,6 @@
     string,
     { teamName: string; workspaceName: string }
   > = {};
-  $: console.log("filtered workspace is", filteredWorkspace);
   export let checkActiveWorkspace;
   export let handleSwitchWorkspaceModal;
   export let handleGlobalSearchRequestNavigation;
