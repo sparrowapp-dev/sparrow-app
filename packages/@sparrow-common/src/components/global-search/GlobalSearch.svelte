@@ -5,12 +5,7 @@
   import { useTree } from "./CollectionList";
   import type { CollectionDocument } from "@app/database/database";
   import { onMount } from "svelte";
-  import folderIcon from "../../../static/folderIcon.png";
-  import environmentIcon from "../../../static/envLayer.png";
-  import collectionIcon from "../../../static/collectionStack.png";
-  import workspaceIcon from "../../../static/workspaceBoard.png";
-  import flowchartIcon from "../../../static/flowIcon.png";
-  import requestIcon from "../../../static/arrowSwap.png";
+  import {folderIcon, environmentIcon, collectionIcon, workspaceIcon, flowIcon, requestIcon} from "@sparrow/common/images"
 
   export let closeGlobalSearch;
   export let workspaceDocuments;
@@ -123,7 +118,7 @@
     {
       type: "flow",
       label: "Flows",
-      icon: flowchartIcon,
+      icon: flowIcon,
     },
     {
       type: "request",

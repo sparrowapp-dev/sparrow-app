@@ -1,19 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import folderIcon from "../../../static/folderIcon.png";
-  import environmentIcon from "../../../static/envLayer.png";
-  import collectionIcon from "../../../static/collectionStack.png";
-  import workspaceIcon from "../../../static/workspaceBoard.png";
-  import keyCommand from "../../../static/keyCommand.png";
-  import getIcon from "../../../static/getIcon.png";
-  import hexIcon from "../../../static/iconHex.png";
-  import postIcon from "../../../static/Post.png";
-  import deleteIcon from "../../../static/Delete.png";
-  import putIcon from "../../../static/Put.png";
-  import patchIcon from "../../../static/Patch.png";
-  import socketIoIcon from "../../../static/socketio.png";
-  import webSocketIcon from "../../../static/WebSocket.png";
-  import flowIcon from "../../../static/flowIcon.png";
+  import {folderIcon, environmentIcon, collectionIcon, workspaceIcon, keyCommand, getIcon, hexIcon, postIcon, putIcon, deleteIcon,patchIcon, socketIoIcon, webSocketIcon, flowIcon} from "@sparrow/common/images"
+ 
   import type { EnvironmentDocument } from "@app/database/database";
   import NoResults from "./NoResults.svelte";
 

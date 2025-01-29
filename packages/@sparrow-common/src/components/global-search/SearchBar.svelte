@@ -2,8 +2,7 @@
   let searchInput: HTMLInputElement;
   export let searchQuery = "";
   export let handleSearch = () => {};
-  import keyCommand from "../../../static/keyCommand.png";
-  import SearchIcon from "../../../static/Search.png";
+  import {keyCommand , SearchIcon} from "@sparrow/common/images";
 </script>
 
 <div class="search-bar">
