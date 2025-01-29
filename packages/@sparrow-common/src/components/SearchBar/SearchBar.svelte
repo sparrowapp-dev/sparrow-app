@@ -8,20 +8,19 @@
 <div class="container" on:click={onClick}>
   <div class="first">
     <div class="image-container">
-    <SearchIcon color="#82858A" class="image-container-img" />
-  </div>
+      <SearchIcon color="#82858A" class="image-container-img" />
+    </div>
 
-  <input type="text" class="input" {placeholder} bind:value={searchQuery} />
+    <input type="text" class="input" {placeholder} bind:value={searchQuery} />
   </div>
   <div class="keys">
     <span class="key">Ctrl</span>
-    <span class="key">A</span>
+    <span class="key">F</span>
   </div>
 </div>
 
 <style>
-
-  .first{
+  .first {
     display: flex;
     gap: 4px;
   }
@@ -34,11 +33,11 @@
     border-radius: 4px;
     display: flex;
     justify-content: space-between;
-  
+
     align-items: center;
     gap: 8px;
   }
-   .container:hover{
+  .container:hover {
     border: 1px solid var(--border-ds-neutral-200);
     background-color: var(--bg-ds-surface-500);
   }
@@ -57,7 +56,7 @@
   /* .input:hover{
     color:#D8D8D9;
   } */
-  
+
   .image-container-img {
     width: 100%;
     height: 100%;
@@ -75,20 +74,20 @@
     color: #82858a;
   }
 
-  .keys{
+  .keys {
     display: flex;
     gap: 2px;
   }
-   .key {
+  .key {
     border-radius: 4px;
     background-color: #181c26;
-    color: var(--Neutral-200, #B6B7B9);
+    color: var(--Neutral-200, #b6b7b9);
     padding: 2px 4px;
     font:
       400 12px Inter,
       sans-serif;
     line-height: 18px;
-  
+
     min-width: 24px;
     display: flex;
     align-items: center;
