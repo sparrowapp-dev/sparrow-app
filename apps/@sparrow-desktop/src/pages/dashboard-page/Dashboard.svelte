@@ -32,8 +32,10 @@
   import Teams from "../teams-page/Teams.svelte";
   import { Modal } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";
+  import { OSDetector } from "@sparrow/common/utils";
 
   import { fade } from "svelte/transition";
+  import { TeamsViewModel } from "../teams-page/Teams.ViewModel";
   import { isGuestUserActive } from "@app/store/auth.store";
   import {
     type SidebarItemBaseInterface,
@@ -94,6 +96,7 @@
   let currentWorkspaceName = "";
   let currentTeamName = "";
   let currentTeamId = "";
+  let selectedType = "";
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
@@ -141,7 +144,72 @@
   };
   let teamDocuments: Observable<TeamDocument[]>;
 
+  const decidingKey=(event)=>{
+ const os= new OSDetector();
+    if(os.getOS()=="macos"){
+      if(event.metaKey)return true;
+      else return false;
+    }
+    else{
+       if(event.ctrlKey)return true;
+      else return false;
+    }
+  }
+
+  $: console.log("hide global search", hideGlobalSearch);
+  $: console.log("open state", isGlobalSearchOpen);
+
+const handleGlobalKeyPress = (event, setGlobalSearch, setSelectedType) => {
+  if (decidingKey(event) && event.key.toLowerCase() === 'f' && !event.shiftKey) {
+    event.preventDefault();
+    setGlobalSearch(true);
+  } 
+  else if (decidingKey(event) && event.shiftKey) {  
+    switch (event.key.toLowerCase()) {
+      case 'w':
+        event.preventDefault();
+        setGlobalSearch(true);
+        setSelectedType('workspaces');
+        break;
+      case 'a':
+        event.preventDefault();
+        setGlobalSearch(true);
+        setSelectedType('requests');
+        break;
+      case 'c':
+        event.preventDefault();
+        setGlobalSearch(true);
+        setSelectedType('collections');
+        break;
+      case 'e':
+        event.preventDefault();
+        setGlobalSearch(true);
+        setSelectedType('environments');
+        break;
+      case 'f':
+        event.preventDefault();
+        setGlobalSearch(true);
+        setSelectedType('folders');
+        break;
+      default:
+        break;
+    }
+  }
+};
+
+ const setGlobalSearch=(value) =>{
+    isGlobalSearchOpen = value;
+  }
+
+const setSelectedType =(value)=> {
+    selectedType = value;
+  }
+
+
   onMount(async () => {
+     window.addEventListener("keydown", (event)=>{
+      handleGlobalKeyPress(event,setGlobalSearch,setSelectedType )
+  });
     _viewModel.getAllFeatures();
     const guestUser = await _viewModel.getGuestUser();
     isGuestUser = guestUser?.isGuestUser;
@@ -151,6 +219,7 @@
     workspaceDocuments = await _viewModel.workspaces();
     teamDocuments = await _viewModel.getTeams();
     collectionDocuments = await _viewModel.getCollectionList();
+
     // Disabling web socket for now due to issues in release_v1 deployment, can be enabled in future if required.
     // await _viewModel.connectWebSocket();
   });
@@ -173,14 +242,13 @@
 
   const WAIT_TIME_BEFORE_RESTART_IN_SECONDS = 5;
 
-  // Function to handle the click on the search bar
   const handleViewGlobalSearch = () => {
     isGlobalSearchOpen = true;
   };
 
-  // Function to close the GlobalSearch component
   const closeGlobalSearch = () => {
     isGlobalSearchOpen = false;
+    selectedType="";
   };
 
   onMount(async () => {
@@ -291,7 +359,6 @@
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
-      console.error("Error in global search API navigation:", error);
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     }
@@ -312,7 +379,9 @@
           workspaceData.name,
           "Collection",
           workspaceId,
+
         );
+        return;
       }
       await _viewModel.switchAndCreateCollectionTab(workspaceId, collection);
       closeGlobalSearch();
@@ -337,6 +406,7 @@
         handlehideGlobalSearch(true);
         const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
         handleSwitchWorkspaceModal(workspaceData.name, "Folder", workspaceId);
+        return;
       }
       await _viewModel.switchAndCreateFolderTab(
         workspaceId,
@@ -360,6 +430,11 @@
       );
 
       if (!isActiveWorkspace) {
+        // handlehideGlobalSearch(true);
+        // const workspaceData = await _viewModel.getWorkspaceById(workspace._id);
+        // handleSwitchWorkspaceModal(workspaceData.name, "Folder", workspace._id);
+
+        // Create new tab for the workspace
         _viewModel.switchAndCreateWorkspaceTab(workspace);
         closeGlobalSearch();
         handlehideGlobalSearch(false);
@@ -467,6 +542,7 @@
         recentWorkspace={_viewModel.getRecentWorkspace}
         recentEnvironment={_viewModel.getRecentEnvironment}
         recentTestflow={_viewModel.getRecentTestflow}
+        {selectedType}
         handleSearchNode={(...args) => _viewModel.searchNode(...args)}
       />
     </div>
@@ -604,6 +680,7 @@
     workspaceName={switchWorkspaceName}
     requestName={switchRequestName}
     handleSwitch={handleWorkspaceSwitch}
+    { handlehideGlobalSearch}
   />
 </Modal>
 

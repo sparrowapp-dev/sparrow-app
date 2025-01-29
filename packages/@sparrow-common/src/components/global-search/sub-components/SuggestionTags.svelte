@@ -1,15 +1,23 @@
 <script lang="ts">
   import type { SearchSuggestion } from "./types/types";
-
   export let suggestions: SearchSuggestion[];
   export let selectedType = "";
 
   const handleTagClick = (label: string) => {
-    if (selectedType === label) {
+    const normalizedSelected = selectedType.toLowerCase();
+    const normalizedLabel = label.toLowerCase();
+
+    if (normalizedSelected === normalizedLabel) {
       selectedType = "";
     } else {
       selectedType = label;
     }
+  };
+
+  $: isSelected = (label: string) => {
+    const normalizedSelected = selectedType.toLowerCase();
+    const normalizedLabel = label.toLowerCase();
+    return normalizedSelected === normalizedLabel;
   };
 </script>
 
@@ -18,12 +26,15 @@
     <button
       class="suggestion-tag"
       role="button"
-      class:selected={selectedType === suggestion.label}
+      class:selected={isSelected(suggestion.label)}
       tabindex="0"
       on:click={() => handleTagClick(suggestion.label)}
     >
       <div class="tag-icon-wrapper">
-        <img src={suggestion.icon} alt="" class="tag-icon" />
+        <svelte:component
+          this={suggestion.icon}
+          color="var(--icon-color)"
+        />
       </div>
       <span class="tag-label">{suggestion.label}</span>
     </button>
@@ -32,7 +43,7 @@
 
 <style>
   .tags-container {
-    border-bottom: 1px solid rgba(49, 53, 63, 1);
+    border-bottom: 1px solid var(--border-ds-surface-100);
     display: flex;
     width: 100%;
     align-items: center;
@@ -42,24 +53,26 @@
   }
 
   .suggestion-tag.selected {
-    border: 1px solid #6894f9;
-    background-color: #31353f;
+    border: 1px solid var(--border-ds-primary-300);
+    background-color: var(--bg-ds-surface-100);
   }
 
   .suggestion-tag {
     border: none;
     border-radius: 4px;
-    background-color: rgba(39, 41, 53, 1);
+    background-color: var(--bg-ds-surface-300);
     display: flex;
     align-items: center;
     gap: 4px;
     padding: 4px 8px 4px 6px;
     cursor: pointer;
     min-width: 72px;
+    --icon-color: var(--icon-ds-neutral-200);
   }
 
   .suggestion-tag:hover {
-    background-color: #31353f;
+    background-color: var(--bg-ds-surface-100);
+    --icon-color: var(--white-color);
   }
 
   .tag-icon-wrapper {
@@ -75,13 +88,12 @@
   }
 
   .tag-label {
-    color: var(--Neutral-200, #b6b7b9);
-    font:
-      500 12px Inter,
-      sans-serif;
+    color: var(--text-ds-neutral-300);
+    font: 500 12px Inter, sans-serif;
   }
+
   .suggestion-tag:hover .tag-label {
-    color: var(--Neutral-200, #ffffff);
+    color: var(--white-color);
   }
 
   @media (max-width: 991px) {
