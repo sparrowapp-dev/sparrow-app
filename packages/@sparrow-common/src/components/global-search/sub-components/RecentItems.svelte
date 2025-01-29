@@ -1,7 +1,21 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import {folderIcon, environmentIcon, collectionIcon, workspaceIcon, keyCommand, getIcon, hexIcon, postIcon, putIcon, deleteIcon,patchIcon, socketIoIcon, webSocketIcon, flowIcon} from "@sparrow/common/images"
- 
+  import {
+    folderIcon,
+    environmentIcon,
+    collectionIcon,
+    workspaceIcon,
+    keyCommand,
+    getIcon,
+    hexIcon,
+    postIcon,
+    putIcon,
+    deleteIcon,
+    patchIcon,
+    socketIoIcon,
+    webSocketIcon,
+    flowIcon,
+  } from "@sparrow/common/images";
   import type { EnvironmentDocument } from "@app/database/database";
   import NoResults from "./NoResults.svelte";
 

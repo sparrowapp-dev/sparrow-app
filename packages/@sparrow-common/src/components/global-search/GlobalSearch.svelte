@@ -1,11 +1,18 @@
 <script lang="ts">
-  import { SearchBar } from ".";
-  import { SearchSuggestions } from ".";
-  import type { SearchSuggestion } from "./types";
+  import SearchBar from "./sub-components/SearchBar.svelte";
+  import SearchSuggestions from "./sub-components/SearchSuggestions.svelte";
+  import type { SearchSuggestion } from "./types/types";
   import { useTree } from "./CollectionList";
   import type { CollectionDocument } from "@app/database/database";
   import { onMount } from "svelte";
-  import {folderIcon, environmentIcon, collectionIcon, workspaceIcon, flowIcon, requestIcon} from "@sparrow/common/images"
+  import {
+    folderIcon,
+    environmentIcon,
+    collectionIcon,
+    workspaceIcon,
+    flowIcon,
+    requestIcon,
+  } from "@sparrow/common/images";
 
   export let closeGlobalSearch;
   export let workspaceDocuments;
