@@ -152,7 +152,7 @@
 </script>
 
 <div class="recent-items-container">
-  {#if selectedType == ""}
+  {#if selectedType == "" && searchQuery === ""}
     <div class="recent-section">
       {#if filteredRequest.length > 0}
         <div class="section-header">
@@ -332,6 +332,204 @@
           </div>
         </div>
       </div>
+    {/if}
+  {:else if selectedType === "" && searchQuery !== ""}
+    {#if filteredRequest?.length > 0 || filteredCollection?.length > 0 || filteredFolder?.length > 0 || filteredWorkspaces?.length > 0 || filteredEnvironments?.length > 0 || filteredTestflows?.length > 0}
+      {#if filteredRequest?.length > 0}
+        <div class="section-header">
+          <span class="section-title">Requests</span>
+          <div class="keyboard-shortcut">
+            <div class="shortcut-key">
+              <img src={keyCommand} alt="" class="shortcut-icon" />
+            </div>
+            <span class="key">Shift</span>
+            <span class="key">A</span>
+          </div>
+        </div>
+        <div class="request-section">
+          {#each filteredRequest as request}
+            {@const details = getRequestDetails(request)}
+            <div
+              class="request-item"
+              on:click={() => {
+                handleGlobalSearchRequestNavigation(
+                  request.tree.id,
+                  request.workspaceId,
+                  request.collectionId,
+                  request.folderDetails?.id || "",
+                  request.tree,
+                );
+              }}
+            >
+              <div class="request-method">
+                <img
+                  src={methodIcons[details.method] || hexIcon}
+                  alt=""
+                  class="request-icon"
+                />
+              </div>
+              <div class="request-details">
+                <div class="request-header">
+                  <span class="request-title">{details.name}</span>
+                  <span class="request-path">{request.path}</span>
+                </div>
+                <span class="request-url">{details.url}</span>
+              </div>
+            </div>
+          {/each}
+        </div>
+      {/if}
+      {#if filteredCollection?.length > 0}
+        <div class="section-header">
+          <span class="section-title">Collection</span>
+          <div class="keyboard-shortcut">
+            <div class="shortcut-key">
+              <img src={keyCommand} alt="" class="shortcut-icon" />
+            </div>
+            <span class="key">Shift</span>
+            <span class="key">C</span>
+          </div>
+        </div>
+        {#each filteredCollection as collection}
+          <div
+            class="request-item"
+            on:click={() =>
+              handleGlobalSearchCollectionNavigation(
+                collection.workspaceId,
+                collection.tree,
+              )}
+          >
+            <div class="request-method">
+              <img src={collectionIcon} alt="" class="other-icon" />
+            </div>
+            <div class="request-details">
+              <div class="request-header">
+                <span class="request-title">{collection?.tree.name}</span>
+                <span class="request-path">{collection?.path}</span>
+              </div>
+            </div>
+          </div>
+        {/each}
+      {/if}
+      {#if filteredFolder?.length > 0}
+        <div class="section-header">
+          <span class="section-title">Folders</span>
+          <div class="keyboard-shortcut">
+            <div class="shortcut-key">
+              <img src={keyCommand} alt="" class="shortcut-icon" />
+            </div>
+            <span class="key">Shift</span>
+            <span class="key">F</span>
+          </div>
+        </div>
+        {#each filteredFolder as folder}
+          <div
+            class="request-item"
+            on:click={() =>
+              handleGlobalSearchFolderNavigation(
+                folder.workspaceId,
+                folder.collectionId,
+                folder.tree,
+              )}
+          >
+            <div class="request-method">
+              <img src={folderIcon} alt="" class="other-icon" />
+            </div>
+            <div class="request-details">
+              <div class="request-header">
+                <span class="request-title">{folder.tree.name}</span>
+                <span class="request-path">{folder.path}</span>
+              </div>
+            </div>
+          </div>
+        {/each}
+      {/if}
+      {#if filteredEnvironments?.length > 0}
+        <div class="section-header">
+          <span class="section-title">Recent Environment</span>
+          <div class="keyboard-shortcut">
+            <div class="shortcut-key">
+              <img src={keyCommand} alt="" class="shortcut-icon" />
+            </div>
+            <span class="key">Shift</span>
+            <span class="key">E</span>
+          </div>
+        </div>
+        {#each filteredEnvironments as environment}
+          <div
+            class="request-item"
+            on:click={() =>
+              handleGlobalSearchEnvironmentNavigation(environment)}
+          >
+            <div class="request-method">
+              <img src={environmentIcon} alt="" class="other-icon" />
+            </div>
+            <div class="request-details">
+              <div class="request-header">
+                <span class="request-title">{environment.title}</span>
+              </div>
+            </div>
+          </div>
+        {/each}
+      {/if}
+      {#if filteredTestflows?.length > 0}
+        <div class="section-header">
+          <span class="section-title">Test Flows</span>
+          <div class="keyboard-shortcut">
+            <div class="shortcut-key">
+              <img src={keyCommand} alt="" class="shortcut-icon" />
+            </div>
+            <span class="key">Shift</span>
+            <span class="key">T</span>
+          </div>
+        </div>
+        {#each filteredTestflows as testflow}
+          <div
+            class="request-item"
+            on:click={() => handleGlobalSearchTestflowNavgation(testflow)}
+          >
+            <div class="request-method">
+              <img src={flowIcon} alt="" class="other-icon" />
+            </div>
+            <div class="request-details">
+              <div class="request-header">
+                <span class="request-title">{testflow.name}</span>
+                <span class="request-path">{testflow.description || ""}</span>
+              </div>
+            </div>
+          </div>
+        {/each}
+      {/if}
+      {#if filteredWorkspaces?.length > 0}
+        <div class="section-header">
+          <span class="section-title">Recent Workspaces</span>
+          <div class="keyboard-shortcut">
+            <div class="shortcut-key">
+              <img src={keyCommand} alt="" class="shortcut-icon" />
+            </div>
+            <span class="key">Shift</span>
+            <span class="key">W</span>
+          </div>
+        </div>
+        {#each filteredWorkspaces as workspace}
+          <div
+            class="request-item"
+            on:click={() => handleGlobalSearchWorkspaceNavigation(workspace)}
+          >
+            <div class="request-method">
+              <img src={workspaceIcon} alt="" class="other-icon" />
+            </div>
+            <div class="request-details">
+              <div class="request-header">
+                <span class="request-title">{workspace.name}</span>
+                <span class="request-path">{workspace.team.teamName}</span>
+              </div>
+            </div>
+          </div>
+        {/each}
+      {/if}
+    {:else}
+      <NoResults {searchQuery} />
     {/if}
   {:else if selectedType.toLowerCase() == "workspaces"}
     {#if filteredWorkspaces.length > 0}
