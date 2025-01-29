@@ -38,6 +38,10 @@
     align-items: center;
     gap: 8px;
   }
+   .container:hover{
+    border: 1px solid var(--border-ds-neutral-200);
+    background-color: var(--bg-ds-surface-500);
+  }
   .input {
     border: none;
     outline: none;

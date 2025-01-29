@@ -5,12 +5,12 @@
   import type { CollectionDocument } from "@app/database/database";
   import { onMount } from "svelte";
   import {
-    folderIcon,
-    environmentIcon,
-    collectionIcon,
-    workspaceIcon,
-    flowIcon,
-    requestIcon,
+    FolderIcon,
+    EnvironmentIcon,
+    CollectionIcon,
+    WorkspaceIcon,
+    FlowIcon,
+    RequestIcon,
   } from "@sparrow/common/images";
 
   export let closeGlobalSearch;
@@ -30,6 +30,7 @@
   export let recentTestflow;
   export let recentEnvironment;
   export let recentWorkspace;
+  export let selectedType;
   export let handleSearchNode;
   export let handlehideGlobalSearch;
 
@@ -81,7 +82,6 @@
     filteredCollection.length = 0;
     filteredFolder.length = 0;
     filteredRequest.length = 0;
-
     handleSearchNode(
       searchQuery,
       filteredCollection,
@@ -97,32 +97,32 @@
     {
       type: "workspace",
       label: "Workspaces",
-      icon: workspaceIcon,
+      icon: WorkspaceIcon,
     },
     {
       type: "collection",
       label: "Collections",
-      icon: collectionIcon,
+      icon: CollectionIcon,
     },
     {
       type: "environment",
       label: "Environments",
-      icon: environmentIcon,
+      icon: EnvironmentIcon,
     },
     {
       type: "folder",
       label: "Folders",
-      icon: folderIcon,
+      icon: FolderIcon,
     },
     {
       type: "flow",
       label: "Flows",
-      icon: flowIcon,
+      icon: FlowIcon,
     },
     {
       type: "request",
       label: "Requests",
-      icon: requestIcon,
+      icon: RequestIcon,
     },
   ];
 
@@ -168,6 +168,7 @@
       {recentWorkspace}
       {recentEnvironment}
       {recentTestflow}
+      {selectedType}
     />
   {/if}
 </div>
@@ -175,7 +176,7 @@
 <style>
   .search-container {
     border-radius: var(--padding-padding-12, 12px);
-    border: 1px solid var(--Surface-100, #31353f);
+    border: 1px solid var(--bg-ds-surface-100);
     box-shadow: 0px 16px 32px 0px rgba(0, 0, 0, 0.4);
     display: flex;
     max-width: 630px;
@@ -183,7 +184,7 @@
     max-height: 540px;
     flex-direction: column;
     overflow: hidden;
-    background-color: #14181f;
+    background-color: var(--bg-ds-surface-700);
   }
 
   @media (max-width: 991px) {

@@ -1,10 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import {
-    folderIcon,
-    environmentIcon,
-    collectionIcon,
-    workspaceIcon,
+    FolderIcon,
+    EnvironmentIcon,
+    CollectionIcon,
+    WorkspaceIcon,
     keyCommand,
     getIcon,
     hexIcon,
@@ -14,7 +14,8 @@
     patchIcon,
     socketIoIcon,
     webSocketIcon,
-    flowIcon,
+    FlowIcon,
+    
   } from "@sparrow/common/images";
   import type { EnvironmentDocument } from "@app/database/database";
   import NoResults from "./NoResults.svelte";
@@ -223,7 +224,7 @@
             )}
         >
           <div class="request-method">
-            <img src={collectionIcon} alt="" class="other-icon" />
+           <CollectionIcon color="var(--icon-ds-neutral-200)" />
           </div>
           <div class="request-details">
             <div class="request-header">
@@ -256,7 +257,7 @@
             handleGlobalSearchEnvironmentNavigation(filteredEnvironments[0])}
         >
           <div class="request-method">
-            <img src={environmentIcon} alt="" class="other-icon" />
+            <EnvironmentIcon color="var(--icon-ds-neutral-200)" />
           </div>
           <div class="request-details">
             <div class="request-header">
@@ -290,7 +291,7 @@
             )}
         >
           <div class="request-method">
-            <img src={folderIcon} alt="" class="other-icon" />
+            <FolderIcon color="var(--icon-ds-neutral-200)" />
           </div>
           <div class="request-details">
             <div class="request-header">
@@ -320,7 +321,7 @@
             handleGlobalSearchWorkspaceNavigation(filteredWorkspaces[0])}
         >
           <div class="request-method">
-            <img src={workspaceIcon} alt="" class="other-icon" />
+            <WorkspaceIcon color="var(--icon-ds-neutral-200)" />
           </div>
           <div class="request-details">
             <div class="request-header">
@@ -549,7 +550,7 @@
           on:click={() => handleGlobalSearchWorkspaceNavigation(workspace)}
         >
           <div class="request-method">
-            <img src={workspaceIcon} alt="" class="other-icon" />
+            <WorkspaceIcon color="var(--icon-ds-neutral-200)" />
           </div>
           <div class="request-details">
             <div class="request-header">
@@ -589,7 +590,7 @@
             )}
         >
           <div class="request-method">
-            <img src={folderIcon} alt="" class="other-icon" />
+            <FolderIcon color="var(--icon-ds-neutral-200)" />
           </div>
           <div class="request-details">
             <div class="request-header">
@@ -626,7 +627,7 @@
             )}
         >
           <div class="request-method">
-            <img src={collectionIcon} alt="" class="other-icon" />
+            <CollectionIcon color="var(--icon-ds-neutral-200)" />
           </div>
           <div class="request-details">
             <div class="request-header">
@@ -645,7 +646,7 @@
         <span class="section-title">Recent Requests</span>
         <div class="keyboard-shortcut">
           <div class="shortcut-key">
-            <img src={keyCommand} alt="" class="shortcut-icon" />
+            <CollectionIcon color="var(--icon-ds-neutral-200)" />
           </div>
           <span class="key">Shift</span>
           <span class="key">A</span>
@@ -733,7 +734,7 @@
           on:click={() => handleGlobalSearchTestflowNavgation(testflow)}
         >
           <div class="request-method">
-            <img src={flowIcon} alt="" class="other-icon" />
+           <FlowIcon color="var(--icon-ds-neutral-200)" />
           </div>
           <div class="request-details">
             <div class="request-header">
@@ -770,7 +771,7 @@
   }
 
   .section-title {
-    color: var(--Neutral-500, #62656a);
+    color: var(--text-ds-neutral-500);
     font:
       400 12px Inter,
       sans-serif;
@@ -784,7 +785,7 @@
 
   .shortcut-key {
     border-radius: 4px;
-    background-color: #181c26;
+    background-color: var(--bg-ds-surface-600);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -795,8 +796,8 @@
 
   .key {
     border-radius: 4px;
-    background-color: #181c26;
-    color: var(--Neutral-100, #b6b7b9);
+    background-color: var(--bg-ds-surface-600);
+    color: var(--text-ds-neutral-200);
     padding: 2px 4px;
     font:
       400 12px Inter,
@@ -819,24 +820,24 @@
   }
 
   .request-item:hover {
-    background-color: #222630;
+    background-color: var(--bg-ds-surface-400);
   }
 
   .request-item:hover .request-title {
-    color: var(--Neutral-300, #ffffff);
+    color: var(--white-color);
   }
 
   .request-item:hover .request-path {
-    color: var(--Neutral-300, #9b9da1);
+    color: var( --text-ds-neutral-300);
   }
 
   .request-item:hover .request-url {
-    color: var(--Blue-300, #6894f9);
+    color: var(--text-ds-primary-300);
   }
 
   .request-method {
     border-radius: 2px;
-    background-color: rgba(29, 33, 43, 1);
+    background-color: var(--bg-ds-surface-500);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -844,13 +845,6 @@
     padding: 4px;
     min-height: 24px;
     gap: 8px;
-  }
-
-  .method-label {
-    color: rgba(105, 214, 150, 1);
-    font:
-      700 12px Roboto,
-      sans-serif;
   }
 
   .request-icon {
@@ -877,21 +871,21 @@
   }
 
   .request-title {
-    color: var(--Neutral-300, #9b9da1);
+    color: var(--text-ds-neutral-300);
     font:
       400 12px Inter,
       sans-serif;
   }
 
   .request-path {
-    color: var(--Neutral-500, #62656a);
+    color: var(--text-ds-neutral-500);
     font:
       400 12px Inter,
       sans-serif;
   }
 
   .request-url {
-    color: var(--Blue-300, #6894f9);
+    color: var(--text-ds-primary-300);
     font:
       400 12px Inter,
       sans-serif;
