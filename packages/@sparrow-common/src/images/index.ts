@@ -26,3 +26,4 @@ export { default as socketIoIcon } from "./Socketio.png";
 export { default as webSocketIcon } from "./WebSocket.png";
 export { default as workspaceIcon } from "./workspaceBoard.png";
 export { default as hexIcon } from "./iconHex.png";
+export { default as searchIcon24 } from "./searchIcon24.png";
