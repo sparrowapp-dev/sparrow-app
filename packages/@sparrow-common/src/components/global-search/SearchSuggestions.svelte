@@ -16,11 +16,26 @@
     { teamName: string; workspaceName: string }
   > = {};
   $: console.log("filtered workspace is", filteredWorkspace);
+  export let checkActiveWorkspace;
+  export let handleSwitchWorkspaceModal;
+  export let handleGlobalSearchRequestNavigation;
+  export let handleGlobalSearchCollectionNavigation;
+  export let handleGlobalSearchFolderNavigation;
+  export let handleGlobalSearchWorkspaceNavigation;
+  export let handleGlobalSearchEnvironmentNavigation;
+  export let handleGlobalSearchTestflowNavgation;
+  export let searchTestflow;
+  export let searchEnvironment;
+  export let searchWorkspace;
+  export let recentTestflow;
+  export let recentEnvironment;
+  export let recentWorkspace;
 </script>
 
 <div class="suggestions-container">
   <SuggestionTags {suggestions} bind:selectedType />
   <RecentItems
+    {handleSwitchWorkspaceModal}
     {searchQuery}
     {filteredCollection}
     {filteredFolder}
@@ -30,6 +45,19 @@
     {closeGlobalSearch}
     {handlehideGlobalSearch}
     {workspaceDetailsMap}
+    {checkActiveWorkspace}
+    {handleGlobalSearchRequestNavigation}
+    {handleGlobalSearchCollectionNavigation}
+    {handleGlobalSearchFolderNavigation}
+    {handleGlobalSearchWorkspaceNavigation}
+    {handleGlobalSearchEnvironmentNavigation}
+    {handleGlobalSearchTestflowNavgation}
+    {searchTestflow}
+    {searchWorkspace}
+    {searchEnvironment}
+    {recentWorkspace}
+    {recentEnvironment}
+    {recentTestflow}
   />
 </div>
 

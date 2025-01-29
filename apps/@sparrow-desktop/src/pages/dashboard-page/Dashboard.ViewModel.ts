@@ -1,15 +1,18 @@
 import { EnvironmentRepository } from "../../repositories/environment.repository";
 import { TeamRepository } from "../../repositories/team.repository";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
+import {TestflowRepository} from "../../repositories/testflow.repository";
+import {CollectionRepository} from "../../repositories/collection.repository";
 import { EnvironmentService } from "../../services/environment.service";
 import { TeamService } from "../../services/team.service";
 import { WorkspaceService } from "../../services/workspace.service";
-import { Sleep, throttle } from "@sparrow/common/utils";
+import { InitCollectionTab, InitEnvironmentTab, InitFolderTab, InitTestflowTab, moveNavigation, Sleep, throttle } from "@sparrow/common/utils";
 import { notifications } from "@sparrow/library/ui";
 import { isGuestUserActive, setUser, user } from "@app/store/auth.store";
 import { TabRepository } from "../../repositories/tab.repository";
 import {
   RxDB,
+  type EnvironmentDocument,
   type TeamDocument,
   type WorkspaceDocument,
 } from "../../database/database";
@@ -19,16 +22,18 @@ import { FeatureSwitchService } from "../../services/feature-switch.service";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { v4 as uuidv4 } from "uuid";
-import { TeamAdapter } from "../../adapter";
+import { GraphqlTabAdapter, RequestTabAdapter, SocketIoTabAdapter } from "../../adapter";
 import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import { InitWorkspaceTab } from "@sparrow/common/utils";
+import { SocketTabAdapter } from "@app/adapter/socket-tab";
+
 
 export class DashboardViewModel {
-  constructor() {}
+  constructor() { }
   private teamRepository = new TeamRepository();
   private workspaceRepository = new WorkspaceRepository();
   private teamService = new TeamService();
@@ -40,6 +45,8 @@ export class DashboardViewModel {
   private featureSwitchRepository = new FeatureSwitchRepository();
   private guestUserRepository = new GuestUserRepository();
   private aiAssistantWebSocketService = new AiAssistantWebSocketService();
+  private collectionRepository = new CollectionRepository();
+  private testflowRepository = new TestflowRepository();
 
   public getTeamData = async () => {
     return await this.teamRepository.getTeamData();
@@ -48,15 +55,15 @@ export class DashboardViewModel {
   public setOpenTeam = async (teamId) => {
     await this.teamRepository.setOpenTeam(teamId);
   };
-  
+
   /**
    * Get the active workspace
    * @returns - the active workspace
   */
- public getActiveWorkspace = () => {
-   return this.workspaceRepository.getActiveWorkspace();
+  public getActiveWorkspace = () => {
+    return this.workspaceRepository.getActiveWorkspace();
   };
- 
+
 
   /**
    * @description - get environment list from local db
@@ -71,6 +78,14 @@ export class DashboardViewModel {
   public workspaces = async (): Promise<Observable<WorkspaceDocument[]>> => {
     const workspaces = await this.workspaceRepository.getWorkspaces();
     return workspaces;
+  };
+
+  /**
+   * Get list of collections from current active workspace
+   * @returns :Observable<CollectionDocument[]> - the list of collection from current active workspace
+   */
+  public getCollectionList = () => {
+    return this.collectionRepository.getCollection();
   };
 
   /**
@@ -419,4 +434,209 @@ export class DashboardViewModel {
   public connectWebSocket = async () => {
     await this.aiAssistantWebSocketService.connectWebSocket();
   };
+
+  public getTabData = async (id: string) => {
+    return await this.tabRepository.getTabById(id);
+  }
+
+  public getWorkspaceById = async (id: string): Promise<WorkspaceDocument> => {
+    return await this.workspaceRepository.readWorkspace(id);
+  }
+
+  public getTabByID = async (id: string) => {
+    return await this.tabRepository.getTabById(id);
+  }
+
+  public switchAndCreateRequestTab = async (
+    workspaceId: string,
+    collectionId: string,
+    folderId: string,
+    tree: any
+  ) => {
+    switch (tree.type) {
+      case "GRAPHQL": {
+        const graphqlTabAdapter = new GraphqlTabAdapter();
+        const adaptedGraphql = graphqlTabAdapter.adapt(
+          workspaceId,
+          collectionId,
+          folderId,
+          tree,
+        );
+        await this.tabRepository.createTab(adaptedGraphql);
+        break;
+      }
+      case "WEBSOCKET": {
+        const socketTabAdapter = new SocketTabAdapter();
+        const adaptedSocket = socketTabAdapter.adapt(
+          workspaceId,
+          collectionId,
+          folderId,
+          tree,
+        );
+        await this.tabRepository.createTab(adaptedSocket);
+        break;
+      }
+      case "SOCKETIO": {
+        const socketIoTabAdapter = new SocketIoTabAdapter();
+        const adaptedSocketIo = socketIoTabAdapter.adapt(
+          workspaceId,
+          collectionId,
+          folderId,
+          tree,
+        );
+        await this.tabRepository.createTab(adaptedSocketIo);
+        break;
+      }
+      default: {
+
+
+        const requestTabAdapter = new RequestTabAdapter();
+        const adaptedRequest = requestTabAdapter.adapt(
+          workspaceId,
+          collectionId,
+          folderId,
+          tree,
+        );
+        await this.tabRepository.createTab(adaptedRequest);
+      }
+    }
+    moveNavigation("right");
+  }
+
+  public switchAndCreateCollectionTab = async (workspaceId: string, collection: any) => {
+    // Calculate collection stats
+    let totalFolder = 0;
+    let totalRequest = 0;
+
+    if (collection.items) {
+      collection.items.forEach((item: any) => {
+        if (
+          item.type === "REQUEST" ||
+          item.type === "GRAPHQL" ||
+          item.type === "SOCKETIO" ||
+          item.type === "WEBSOCKET"
+        ) {
+          totalRequest++;
+        } else {
+          totalFolder++;
+          totalRequest += item?.items?.length || 0;
+        }
+      });
+    }
+
+    const path = {
+      workspaceId: workspaceId,
+      collectionId: collection.id || "",
+      folderId: "",
+    };
+
+    const _collection = new InitCollectionTab(collection.id, workspaceId);
+    _collection.updateName(collection.name);
+    _collection.updateDescription(collection.description);
+    _collection.updatePath(path);
+    _collection.updateTotalRequests(totalRequest);
+    _collection.updateTotalFolder(totalFolder);
+    _collection.updateIsSave(true);
+
+    // Create the tab with the new collection
+    await this.tabRepository.createTab(_collection.getValue());
+
+    // Update UI
+    moveNavigation("right");
+  }
+
+  public switchAndCreateFolderTab = async (workspaceId: string,
+    collectionId: any,
+    folder: any) => {
+    const path = {
+      workspaceId: workspaceId,
+      collectionId: collectionId || "",
+      folderId: folder.id,
+      folderName: folder.name,
+    };
+
+    const sampleFolder = new InitFolderTab(folder.id, workspaceId);
+    sampleFolder.updateName(folder.name);
+    sampleFolder.updatePath(path);
+    sampleFolder.updateIsSave(true);
+
+    await this.tabRepository.createTab(sampleFolder.getValue());
+    moveNavigation("right");
+  }
+
+  public switchAndCreateWorkspaceTab = async (workspace: any) => {
+    const initWorkspaceTab = new InitWorkspaceTab(
+      workspace._id,
+      workspace._id,
+    );
+    initWorkspaceTab.updateName(workspace.name);
+
+    // Create tab and set active workspace
+    await this.tabRepository.createTab(
+      initWorkspaceTab.getValue(),
+      workspace._id,
+    );
+    await this.workspaceRepository.setActiveWorkspace(workspace._id);
+    moveNavigation("right");
+  }
+
+  public switchAndCreateEnvironmentTab = async (environment: any) => {
+    const initEnvironmentTab = new InitEnvironmentTab(
+      environment.id,
+      environment.workspace,
+    );
+
+    initEnvironmentTab.setName(environment.title);
+    initEnvironmentTab.setVariable(environment?.variable);
+
+    await this.tabRepository.createTab(initEnvironmentTab.getValue());
+    moveNavigation("right");
+  }
+
+  public switchAndCreateTestflowTab = async (testflow: any) => {
+    const path = {
+      workspaceId: testflow.workspaceId,
+      testflowId: testflow._id,
+      collectionId: testflow.collectionId || "",
+      folderId: testflow.folderId || "",
+    };
+
+    const tab = new InitTestflowTab(testflow._id, testflow.workspaceId);
+    tab.updateName(testflow.name);
+    tab.updateDescription(testflow.description || "");
+    tab.updatePath(path);
+    tab.setNodes(testflow.nodes);
+    tab.setEdges(testflow.edges);
+    tab.updateIsSave(true);
+
+    await this.tabRepository.createTab(tab.getValue());
+    moveNavigation("right");
+  }
+
+  public searchWorkspace = async (query: string): Promise<WorkspaceDocument[]> => { 
+    const workspaces = await this.workspaceRepository.searchWorkspaces(query);
+    return workspaces;
+  }
+
+  public searchEnvironment = async (query: string): Promise<EnvironmentDocument[]> => { 
+    const environments = await this.environmentRepository.searchEnvironments(query);
+    return environments;
+  }
+
+  public searchTestflow = async (query: string): Promise<any> => { 
+    const environments = await this.testflowRepository.searchTestflows(query);
+    return environments;
+  }
+
+  public getRecentWorkspace = async (): Promise<WorkspaceDocument[]> => { 
+    return this.workspaceRepository.getRecentWorkspaces();
+  }
+
+  public getRecentEnvironment = async (): Promise<EnvironmentDocument[]> => { 
+    return this.environmentRepository.getRecentEnvironments();
+  }
+
+  public getRecentTestflow = async (): Promise<any> => { 
+    return this.testflowRepository.getRecentTestflows();
+  }
 }

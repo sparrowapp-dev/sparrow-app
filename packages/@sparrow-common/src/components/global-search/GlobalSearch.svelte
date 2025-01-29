@@ -3,28 +3,37 @@
   import { SearchSuggestions } from ".";
   import type { SearchSuggestion } from "./types";
   import { useTree } from "./CollectionList";
-  import { CollectionRepository } from "../../../../../../apps/@sparrow-desktop/src/repositories/collection.repository";
-  import { WorkspaceRepository } from "../../../../../../apps/@sparrow-desktop/src/repositories/workspace.repository";
-  import type { CollectionDocument } from "../database/database";
-  import { Observable } from "rxjs";
+  import type { CollectionDocument } from "@app/database/database";
   import { onMount } from "svelte";
-  import folderIcon from "../../../../static/folderIcon.png";
-  import environmentIcon from "../../../../static/envLayer.png";
-  import collectionIcon from "../../../../static/collectionStack.png";
-  import workspaceIcon from "../../../../static/workspaceBoard.png";
-  import flowchartIcon from "../../../../static/flowIcon.png";
-  import requestIcon from "../../../../static/arrowSwap.png";
+  import folderIcon from "../../../static/folderIcon.png";
+  import environmentIcon from "../../../static/envLayer.png";
+  import collectionIcon from "../../../static/collectionStack.png";
+  import workspaceIcon from "../../../static/workspaceBoard.png";
+  import flowchartIcon from "../../../static/flowIcon.png";
+  import requestIcon from "../../../static/arrowSwap.png";
 
-  const collectionRepository = new CollectionRepository();
-  const workspaceRepository = new WorkspaceRepository();
   export let closeGlobalSearch;
+  export let workspaceDocuments;
+  export let collectionDocuments;
+  export let checkActiveWorkspace;
+  export let handleSwitchWorkspaceModal;
+  export let handleGlobalSearchRequestNavigation;
+  export let handleGlobalSearchCollectionNavigation;
+  export let handleGlobalSearchFolderNavigation;
+  export let handleGlobalSearchWorkspaceNavigation;
+  export let handleGlobalSearchEnvironmentNavigation;
+  export let handleGlobalSearchTestflowNavgation;
+  export let searchTestflow;
+  export let searchEnvironment;
+  export let searchWorkspace;
+  export let recentTestflow;
+  export let recentEnvironment;
+  export let recentWorkspace;
+
   let workspaceDetailsMap: Record<
     string,
     { teamName: string; workspaceName: string }
   > = {};
-  const collection: Observable<CollectionDocument[]> =
-  collectionRepository.getCollection();
-
 
   const getCollectionDocument = (elem: CollectionDocument) => {
     return {
@@ -53,7 +62,7 @@
   let collectionsData = [];
   let hideGlobalSearch = false;
 
-  collection.subscribe((value) => {
+  collectionDocuments.subscribe((value) => {
     if (value) {
       const collectionArr = value.map(
         (collectionDocument: CollectionDocument) => {
@@ -67,14 +76,14 @@
 
   const [, , searchNode] = useTree();
 
-  function handleSearch() {
+  const handleSearch = () => {
     console.log("searching DB");
 
     filteredCollection.length = 0;
     filteredFolder.length = 0;
     filteredRequest.length = 0;
 
-     console.log("collection data is", collectionsData);
+    console.log("collection data is", collectionsData);
 
     searchNode(
       searchQuery,
@@ -85,8 +94,7 @@
       "",
       workspaceDetailsMap,
     );
-   
-  }
+  };
 
   export let onClose = () => {};
   export let handlehideGlobalSearch;
@@ -126,8 +134,7 @@
 
   onMount(async () => {
     try {
-      const workspaceDocs = await workspaceRepository.getWorkspacesDocs();
-      workspaceDetailsMap = workspaceDocs.reduce((acc, workspace) => {
+      workspaceDetailsMap = workspaceDocuments.reduce((acc, workspace) => {
         acc[workspace._data._id] = {
           teamName: workspace._data.team.teamName,
           workspaceName: workspace._data.name,
@@ -143,19 +150,32 @@
 </script>
 
 <div class="search-container">
- {#if !hideGlobalSearch}
-  <SearchBar bind:searchQuery {handleSearch} />
-  <SearchSuggestions
-    {suggestions}
-    {searchQuery}
-    {filteredCollection}
-    {filteredFolder}
-    {filteredRequest}
-    {closeGlobalSearch}
-    {handlehideGlobalSearch}
-    {workspaceDetailsMap}
-    
-  />
+  {#if !hideGlobalSearch}
+    <SearchBar bind:searchQuery {handleSearch} />
+    <SearchSuggestions
+      {handleSwitchWorkspaceModal}
+      {suggestions}
+      {searchQuery}
+      {filteredCollection}
+      {filteredFolder}
+      {filteredRequest}
+      {closeGlobalSearch}
+      {handlehideGlobalSearch}
+      {workspaceDetailsMap}
+      {checkActiveWorkspace}
+      {handleGlobalSearchRequestNavigation}
+      {handleGlobalSearchCollectionNavigation}
+      {handleGlobalSearchFolderNavigation}
+      {handleGlobalSearchWorkspaceNavigation}
+      {handleGlobalSearchEnvironmentNavigation}
+      {handleGlobalSearchTestflowNavgation}
+      {searchTestflow}
+      {searchWorkspace}
+      {searchEnvironment}
+      {recentWorkspace}
+      {recentEnvironment}
+      {recentTestflow}
+    />
   {/if}
 </div>
 

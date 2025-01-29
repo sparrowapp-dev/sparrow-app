@@ -1,7 +1,9 @@
 <script lang="ts">
   import {
+    GlobalSearch,
     LoginBanner,
     LoginSignupConfirmation,
+    SwitchWorkspace,
   } from "@sparrow/common/components";
   import { Sidebar } from "@sparrow/common/features";
   import { Route, navigate } from "svelte-navigator";
@@ -11,7 +13,11 @@
   import { navigationState, user } from "@app/store/auth.store";
   import { Header } from "@sparrow/common/components";
   import { onDestroy, onMount } from "svelte";
-  import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
+  import type {
+    CollectionDocument,
+    TeamDocument,
+    WorkspaceDocument,
+  } from "@app/database/database";
   import type { Observable } from "rxjs";
   import HelpPage from "../help-page/HelpPage.svelte";
   import constants from "@app/constants/constants";
@@ -28,9 +34,8 @@
   import { CreateWorkspace } from "@sparrow/teams/features";
 
   import { fade } from "svelte/transition";
-  import GlobalSearch from "../../../../../packages/@sparrow-common/src/components/popup/global-search/GlobalSearch.svelte";
+  // import GlobalSearch from "../../../../../packages/@sparrow-common/src/components/popup/global-search/GlobalSearch.svelte";
   import { TeamsViewModel } from "../teams-page/Teams.ViewModel";
-  
 
   import { isGuestUserActive } from "@app/store/auth.store";
   import {
@@ -39,8 +44,7 @@
     SidebarItemIdEnum,
   } from "@sparrow/common/types/sidebar/sidebar-base";
 
-
-const _viewModel = new DashboardViewModel();
+  const _viewModel = new DashboardViewModel();
   let userId;
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
@@ -53,6 +57,7 @@ const _viewModel = new DashboardViewModel();
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.getActiveWorkspace();
   let workspaceDocuments: Observable<WorkspaceDocument[]>;
+  let collectionDocuments: Observable<CollectionDocument[]>;
 
   let currentEnvironment = {
     id: "none",
@@ -65,12 +70,27 @@ const _viewModel = new DashboardViewModel();
   let isGuestUser = false;
   let isWorkspaceModalOpen = false;
   let hideGlobalSearch = false;
+  let isSwitchWorkspaceModalOpen = false;
+  let switchWorkspaceName = "";
+  let switchRequestName = "";
+  let switchWorkspaceId = "";
 
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
   };
-  let handlehideGlobalSearch = (val:boolean) => {
+  let handlehideGlobalSearch = (val: boolean) => {
     hideGlobalSearch = val;
+  };
+
+  const handleSwitchWorkspaceModal = (
+    _workspaceName: string,
+    _requestName: string,
+    _workspaceId: string,
+  ) => {
+    isSwitchWorkspaceModalOpen = true;
+    switchWorkspaceName = _workspaceName;
+    switchRequestName = _requestName;
+    switchWorkspaceId = _workspaceId;
   };
 
   let currentWorkspaceId = "";
@@ -133,7 +153,8 @@ const _viewModel = new DashboardViewModel();
     }
     workspaceDocuments = await _viewModel.workspaces();
     teamDocuments = await _viewModel.getTeams();
-     // Disabling web socket for now due to issues in release_v1 deployment, can be enabled in future if required.
+    collectionDocuments = await _viewModel.getCollectionList();
+    // Disabling web socket for now due to issues in release_v1 deployment, can be enabled in future if required.
     // await _viewModel.connectWebSocket();
   });
 
@@ -200,8 +221,7 @@ const _viewModel = new DashboardViewModel();
     }
   };
 
-
-   $: console.log("hide state", hideGlobalSearch);
+  $: console.log("hide state", hideGlobalSearch);
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
@@ -238,23 +258,258 @@ const _viewModel = new DashboardViewModel();
     },
   ];
   // let mahi = { mahiSingh: "mahi" };
+  const handleWorkspaceSwitch = async () => {
+    await _viewModel.activateWorkspace(switchWorkspaceId);
+    handlehideGlobalSearch(false);
+    isSwitchWorkspaceModalOpen = false;
+    isGlobalSearchOpen = false;
+  };
+
+  const handleGlobalSearchRequestNavigation = async (
+    apiId: string,
+    workspaceId: string,
+    collectionId: string,
+    folderId: string,
+    tree: any,
+  ) => {
+    try {
+      const isActiveWorkspace =
+        await _viewModel.checkActiveWorkspace(workspaceId);
+      if (!isActiveWorkspace) {
+        handlehideGlobalSearch(true);
+        console.log(`Workspace ${workspaceId} is not active.`);
+        const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
+        handleSwitchWorkspaceModal(workspaceData.name, "Request", workspaceId);
+        return;
+      }
+      const existingTab = await _viewModel.getTabByID(apiId);
+      if (existingTab?._data?.isActive) {
+        closeGlobalSearch();
+        handlehideGlobalSearch(false);
+        return;
+      }
+      await _viewModel.switchAndCreateRequestTab(
+        workspaceId,
+        collectionId,
+        folderId,
+        tree,
+      );
+      closeGlobalSearch();
+      handlehideGlobalSearch(false);
+    } catch (error) {
+      console.error("Error in global search API navigation:", error);
+      closeGlobalSearch();
+      handlehideGlobalSearch(false);
+    }
+  };
+
+  const handleGlobalSearchCollectionNavigation = async (
+    workspaceId: string,
+    collection: any,
+  ) => {
+    try {
+      const isActiveWorkspace =
+        await _viewModel.checkActiveWorkspace(workspaceId);
+
+      if (!isActiveWorkspace) {
+        handlehideGlobalSearch(true);
+        console.log(`Workspace ${workspaceId} is not active.`);
+        const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
+        handleSwitchWorkspaceModal(
+          workspaceData.name,
+          "Collection",
+          workspaceId,
+        );
+      }
+
+      await _viewModel.switchAndCreateCollectionTab(workspaceId, collection);
+      closeGlobalSearch();
+      handlehideGlobalSearch(false);
+
+      // Add success notification
+      // notifications.success(
+      //   `Collection "${collection.name}" opened successfully.`,
+      // );
+    } catch (error) {
+      closeGlobalSearch();
+      handlehideGlobalSearch(false);
+      console.error("Error opening collection:", error);
+      notifications.error("Failed to open collection.");
+    }
+  };
+
+  const handleGlobalSearchFolderNavigation = async (
+    workspaceId: string,
+    collectionId: any,
+    folder: any,
+  ) => {
+    try {
+      const isActiveWorkspace =
+        await _viewModel.checkActiveWorkspace(workspaceId);
+      if (!isActiveWorkspace) {
+        handlehideGlobalSearch(true);
+        console.log(`Workspace ${workspaceId} is not active.`);
+        const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
+        handleSwitchWorkspaceModal(workspaceData.name, "Folder", workspaceId);
+      }
+      await _viewModel.switchAndCreateFolderTab(
+        workspaceId,
+        collectionId,
+        folder,
+      );
+      closeGlobalSearch();
+      handlehideGlobalSearch(false);
+      // notifications.success(`Folder "${folder.name}" opened successfully.`);
+    } catch (error) {
+      closeGlobalSearch();
+      handlehideGlobalSearch(false);
+      console.error("Error opening folder:", error);
+      notifications.error("Failed to open folder.");
+    }
+  };
+
+  const handleGlobalSearchWorkspaceNavigation = async (workspace: any) => {
+    try {
+      const isActiveWorkspace = await _viewModel.checkActiveWorkspace(
+        workspace._id,
+      );
+
+      if (!isActiveWorkspace) {
+        // handlehideGlobalSearch(true);
+        console.log(`Workspace ${workspace._id} is not active.`);
+        // const workspaceData = await _viewModel.getWorkspaceById(workspace._id);
+        // handleSwitchWorkspaceModal(workspaceData.name, "Folder", workspace._id);
+
+        // Create new tab for the workspace
+        _viewModel.switchAndCreateWorkspaceTab(workspace);
+        closeGlobalSearch();
+        handlehideGlobalSearch(false);
+        // Navigate and show success notification
+        // navigate("collections");
+        // notifications.success(
+        //   `Workspace "${workspace.name}" opened successfully.`,
+        // );
+      }
+
+      // Additional workspace opening logic here if needed
+      closeGlobalSearch();
+      handlehideGlobalSearch(false);
+    } catch (error) {
+      closeGlobalSearch();
+      handlehideGlobalSearch(false);
+      console.error("Error opening workspace:", error);
+      notifications.error("Failed to open workspace.");
+    }
+  };
+
+  const handleGlobalSearchEnvironmentNavigation = async (environment: any) => {
+    try {
+      const isActiveWorkspace = await _viewModel.checkActiveWorkspace(
+        environment.workspace,
+      );
+
+      if (!isActiveWorkspace) {
+        handlehideGlobalSearch(true);
+        console.log(`Workspace ${environment.workspace} is not active.`);
+        const workspaceData = await _viewModel.getWorkspaceById(
+          environment.workspace,
+        );
+        handleSwitchWorkspaceModal(
+          workspaceData.name,
+          "Environment",
+          environment.workspace,
+        );
+      }
+
+      await _viewModel.switchAndCreateEnvironmentTab(environment);
+      closeGlobalSearch();
+      handlehideGlobalSearch(false);
+      // notifications.success(
+      //   `Environment "${environment.title}" opened successfully.`,
+      // );
+    } catch (error) {
+      closeGlobalSearch();
+      handlehideGlobalSearch(false);
+      console.error("Error opening environment:", error);
+      notifications.error("Failed to open environment.");
+      // throw error;
+    }
+  };
+
+  const handleGlobalSearchTestflowNavgation = async (testflow: any) => {
+    try {
+      const isActiveWorkspace = await _viewModel.checkActiveWorkspace(
+        testflow.workspaceId,
+      );
+
+      if (!isActiveWorkspace) {
+        handlehideGlobalSearch(true);
+        console.log(`Workspace ${testflow.workspaceId} is not active.`);
+        const workspaceData = await _viewModel.getWorkspaceById(
+          testflow.workspaceId,
+        );
+        handleSwitchWorkspaceModal(
+          workspaceData.name,
+          "Testflow",
+          testflow.workspaceId,
+        );
+      }
+
+      const existingTab = await _viewModel.getTabByID(testflow._id);
+      if (existingTab?._data?.isActive) {
+        handlehideGlobalSearch(false);
+        closeGlobalSearch();
+        return;
+      }
+
+      await _viewModel.switchAndCreateTestflowTab(testflow);
+      closeGlobalSearch();
+      handlehideGlobalSearch(false);
+    } catch (error) {
+      console.error("Error opening testflow:", error);
+      closeGlobalSearch();
+      handlehideGlobalSearch(false);
+    }
+  };
 </script>
 
-
-   {#if (isGlobalSearchOpen && (!hideGlobalSearch))}
-    <div class="global-search-overlay" transition:fade={{ duration: 300 }}
-    on:mousedown|self={closeGlobalSearch} >
-      <div
-        class="global-search-container"
-        transition:fade={{ duration: 300, delay: 150 }}
-      >
-       <GlobalSearch {closeGlobalSearch} {handlehideGlobalSearch}/>
-      </div>
+{#if isGlobalSearchOpen && !hideGlobalSearch}
+  <div
+    class="global-search-overlay"
+    transition:fade={{ duration: 300 }}
+    on:mousedown|self={closeGlobalSearch}
+  >
+    <div
+      class="global-search-container"
+      transition:fade={{ duration: 300, delay: 150 }}
+    >
+      <GlobalSearch
+        {handleSwitchWorkspaceModal}
+        {closeGlobalSearch}
+        {handlehideGlobalSearch}
+        workspaceDocuments={$workspaceDocuments}
+        {collectionDocuments}
+        checkActiveWorkspace={_viewModel.checkActiveWorkspace}
+        {handleGlobalSearchRequestNavigation}
+        {handleGlobalSearchCollectionNavigation}
+        {handleGlobalSearchFolderNavigation}
+        {handleGlobalSearchWorkspaceNavigation}
+        {handleGlobalSearchEnvironmentNavigation}
+        {handleGlobalSearchTestflowNavgation}
+        searchWorkspace={_viewModel.searchWorkspace}
+        searchEnvironment={_viewModel.searchEnvironment}
+        searchTestflow={_viewModel.searchTestflow}
+        recentWorkspace={_viewModel.getRecentWorkspace}
+        recentEnvironment={_viewModel.getRecentEnvironment}
+        recentTestflow={_viewModel.getRecentTestflow}
+      />
     </div>
- 
-  {/if}
-  <div class="dashboard d-flex flex-column  {isGlobalSearchOpen ? 'blurred' : ''}" style="height: 100vh;"> 
-
+  </div>
+{/if}
+<div
+  class="dashboard d-flex flex-column {isGlobalSearchOpen ? 'blurred' : ''}"
+  style="height: 100vh;"
+>
   <Header
     environments={$environments?.filter((element) => {
       return element?.workspaceId === currentWorkspaceId;
@@ -274,7 +529,7 @@ const _viewModel = new DashboardViewModel();
     {user}
     isWebApp={false}
     onLogout={_viewModel.handleLogout}
-    isGlobalSearchOpen={isGlobalSearchOpen}
+    {isGlobalSearchOpen}
     onSearchClick={handleViewGlobalSearch}
   />
 
@@ -368,8 +623,26 @@ const _viewModel = new DashboardViewModel();
   />
 </Modal>
 
+<Modal
+  title={"Confirm Workspace Switch?"}
+  type={"primary"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isSwitchWorkspaceModalOpen}
+  handleModalState={(flag) => {
+    isSwitchWorkspaceModalOpen = flag;
+  }}
+>
+  <SwitchWorkspace
+    bind:isSwitchWorkspaceModalOpen
+    workspaceName={switchWorkspaceName}
+    requestName={switchRequestName}
+    handleSwitch={handleWorkspaceSwitch}
+  />
+</Modal>
+
 <style>
-    .dashboard {
+  .dashboard {
     transition: filter 300ms ease-out;
   }
 

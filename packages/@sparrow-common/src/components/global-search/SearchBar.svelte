@@ -2,19 +2,14 @@
   let searchInput: HTMLInputElement;
   export let searchQuery = "";
   export let handleSearch = () => {};
-  import keyCommand from "../../../../static/keyCommand.png";
-  import SearchIcon from "../../../../static/Search.png";
-
+  import keyCommand from "../../../static/keyCommand.png";
+  import SearchIcon from "../../../static/Search.png";
 </script>
 
 <div class="search-bar">
   <div class="search-input-wrapper">
     <div class="icon-wrapper">
-      <img
-        src={SearchIcon}
-        alt=""
-        class="search-icon"
-      />
+      <img src={SearchIcon} alt="" class="search-icon" />
     </div>
     <div class="input-wrapper">
       <label for="searchInput" class="visually-hidden">Search</label>
@@ -81,7 +76,7 @@
   .search-input {
     background: transparent;
     border: none;
-    color: var(--Neutral-500, #B6B7B9);
+    color: var(--Neutral-500, #b6b7b9);
     font:
       400 14px/1 Inter,
       sans-serif;

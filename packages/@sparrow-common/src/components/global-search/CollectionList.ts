@@ -1,6 +1,6 @@
 // import { setCollectionList } from "$lib/store/collection";
 
-import type { Collection } from "../../../interfaces/collection.interface";
+import type { Collection } from "../../interfaces/collection.interface";
 const selectMethodsStore = writable([]);
 const selectedMethodsCollectionStore = writable([]);
 const latestItemsStore = writable([]);
@@ -49,7 +49,6 @@ const getRequestUrl = (tree: any): string => {
   }
 };
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const helper = (
   tree: any,
   folderId: string,
@@ -95,7 +94,6 @@ const createPath: (path: string[]) => string = (path) => {
   return res;
 };
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const searchHelper = (
   tree: any,
   searchText: string,
@@ -294,7 +292,6 @@ const useTree = (): any[] => {
     collectionData: any[],
     workspacePath?: string,
     workspaceMap?: Record<string, { teamName: string; workspaceName: string }>,
-    
   ) => void = (
     searchText,
     collection,
