@@ -4,15 +4,16 @@
   export let isSwitchWorkspaceModalOpen;
   export let workspaceName = "name";
   export let requestName = "name";
-  export let  handlehideGlobalSearch;
+  export let handlehideGlobalSearch;
 </script>
 
 <!-- Section for the modal content -->
 <section>
   <div>
-    <p class="text" style="color: lightGray;">
-      The {requestName} belongs to the {workspaceName} workspace. To access this,
-      you need to switch workspace. Do you want to continue?
+    <p class="text" style="color: var(--text-secondary-1000); margin-top:5px;">
+      The {requestName} belongs to the
+      <span style="font-weight: 700;">{workspaceName}</span> workspace. To access
+      this, you need to switch workspace. Do you want to continue?
     </p>
   </div>
 
@@ -46,6 +47,6 @@
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
-    font:Inter, sans-serif;
+    font: Inter, sans-serif;
   }
 </style>
