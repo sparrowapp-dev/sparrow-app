@@ -321,12 +321,15 @@
       position: SidebarItemPositionBaseEnum.SECONDARY,
     },
   ];
+  let isDestroyOnGlobalSearch = false;
 
   const handleWorkspaceSwitch = async () => {
+    isDestroyOnGlobalSearch = true;
     await _viewModel.activateWorkspace(switchWorkspaceId);
     handlehideGlobalSearch(false);
     isSwitchWorkspaceModalOpen = false;
     isGlobalSearchOpen = false;
+    isDestroyOnGlobalSearch = false;
   };
 
   const handleGlobalSearchRequestNavigation = async (
@@ -350,6 +353,7 @@
         folderId,
         tree,
       );
+
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
@@ -598,7 +602,9 @@
     <section style="flex:1; overflow:hidden;">
       <!-- Route for Collections -->
       <Route path="/collections/*">
-        <CollectionsPage />
+        {#if !isDestroyOnGlobalSearch}
+          <CollectionsPage />
+        {/if}
       </Route>
 
       <!-- Route for Team and workspaces - Home Tab -->
