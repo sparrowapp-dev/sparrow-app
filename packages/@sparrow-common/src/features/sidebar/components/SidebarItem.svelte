@@ -61,7 +61,7 @@
             }
           }}
           on:mouseenter={() => {
-            if (!isRouteActive && !isPressed) {
+            if (!isRouteActive) {
               iconSrc = hoverIconSrc;
             }
           }}
