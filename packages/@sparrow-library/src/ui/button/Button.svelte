@@ -434,6 +434,10 @@
     color: var(--white-color);
     border-width: 0px;
   }
+  .custom-btn-primary:focus {
+    border: 2px solid var(--border-ds-primary-100);
+    outline: none;
+  }
   .custom-btn-primary:active {
     background-color: var(--bg-ds-primary-600);
     color: var(--white-color);
@@ -480,6 +484,10 @@
     background-color: var(--bg-ds-surface-400);
     color: var(--white-color);
     border-width: 0px;
+  }
+  .custom-btn-secondary:focus {
+    border: 2px solid var(--border-ds-primary-100);
+    outline: none;
   }
   .custom-btn-secondary-disable {
     background-color: var(--bg-ds-surface-700);

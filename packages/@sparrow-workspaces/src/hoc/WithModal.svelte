@@ -14,7 +14,7 @@
 
 <Modal
   title={"Save Changes?"}
-  type={"dark"}
+  type={"secondary"}
   width={"38%"}
   zIndex={1000}
   {isOpen}
