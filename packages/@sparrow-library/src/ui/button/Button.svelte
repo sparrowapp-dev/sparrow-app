@@ -290,7 +290,7 @@
     border-width: 0px;
   }
   .sparrow-icon-primary-btn:focus {
-    border: 2px solid var(--border-ds-primary-400);
+    border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
   .sparrow-icon-primary-btn-disable {
@@ -308,7 +308,7 @@
     border-width: 0px;
   }
   .sparrow-icon-secondary-btn:focus {
-    border: 2px solid var(--border-ds-primary-400);
+    border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
   .sparrow-icon-secondary-btn:active {
@@ -330,8 +330,7 @@
     border-width: 0px;
   }
   .sparrow-icon-danger-btn:focus {
-    // update the color to red
-    border: 2px solid var(--border-ds-primary-400);
+    border: 2px solid var(--border-ds-danger-200);
     outline: none;
   }
   .sparrow-icon-danger-btn:active {
@@ -352,7 +351,7 @@
     border-width: 0px;
   }
   .sparrow-outline-icon-primary:focus {
-    border: 2px solid var(--border-ds-primary-400);
+    border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
   .sparrow-outline-icon-primary:active {
@@ -395,8 +394,7 @@
     border-width: 0px;
   }
   .sparrow-outline-icon-danger:focus {
-    // color change to red
-    border: 2px solid var(--border-ds-primary-400);
+    border: 2px solid var(--border-ds-danger-200);
     outline: none;
   }
   .sparrow-outline-icon-danger:active {
@@ -421,7 +419,7 @@
     border: 0px;
   }
   .custom-btn-teritiary-icon-regular:focus {
-    border: 2px solid var(--border-ds-primary-400);
+    border: 2px solid var(--bor-border-ds-primary-300);
     outline: none;
   }
 
@@ -441,8 +439,7 @@
     border: 0px;
   }
   .custom-btn-teritiary-danger:focus {
-    // color chage to red
-    border: 2px solid var(--border-ds-primary-400);
+    border: 2px solid var(--border-ds-danger-200);
     outline: none;
   }
   .custom-btn-teritiary-icon-danger:active {
@@ -456,7 +453,7 @@
     border-width: 0px;
   }
   .custom-btn-primary {
-    background-color: var(--bg-primary-400);
+    background-color: var(--bg-ds-primary-400);
     color: var(--white-color);
     border-width: 0px;
   }
@@ -466,12 +463,13 @@
     border-width: 0px;
   }
   .custom-btn-primary:focus {
-    border: 2px solid var(--border-ds-primary-400);
+    border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
   .custom-btn-primary:active {
     background-color: var(--bg-ds-primary-600);
     color: var(--white-color);
+    border-width: 0px;
   }
   .custom-btn-primary-disable {
     background-color: var(--bg-ds-primary-700);
@@ -491,7 +489,7 @@
     border-width: 0px;
   }
   .custom-btn-outline-primary:focus {
-    border: 2px solid var(--border-ds-primary-400);
+    border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
   .custom-btn-outline-primary:active {
@@ -521,7 +519,7 @@
     border-width: 0px;
   }
   .custom-btn-secondary:focus {
-    border: 2px solid var(--border-ds-primary-100);
+    border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
   .custom-btn-secondary-disable {
@@ -541,7 +539,7 @@
     color: var(--white-color);
   }
   .custom-btn-outline-secondary:focus {
-    border: 2px solid var(--border-ds-primary-400);
+    border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
   .custom-btn-outline-secondary:active {
@@ -592,13 +590,13 @@
     border-width: 0px;
   }
   .custom-btn-danger:focus {
-    // color change to red
-    border: 2px solid var(--border-ds-primary-400);
+    border: 2px solid var(--border-ds-danger-200);
     outline: none;
   }
   .custom-btn-danger:active {
     background-color: var(--bg-ds-danger-600);
     color: var(--white-color);
+    border-width: 0px;
   }
   .custom-btn-danger-disable {
     background-color: var(--bg-ds-danger-700);
@@ -638,7 +636,7 @@
     border: 0px;
   }
   .custom-btn-teritiary-regular:focus {
-    border: 2px solid var(--border-ds-primary-400);
+    border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
   .custom-btn-teritiary-regular:active {
@@ -657,7 +655,7 @@
     border: 0px;
   }
   .custom-btn-teritiary-danger:focus {
-    border: 2px solid var(--border-ds-primary-400);
+    border: 2px solid var(--border-ds-danger-200);
     outline: none;
   }
   .custom-btn-teritiary-danger:active {
