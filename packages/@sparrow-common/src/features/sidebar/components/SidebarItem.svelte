@@ -102,9 +102,6 @@
     background-color: var(--bg-ds-surface-500);
     opacity: 1;
   }
-  .sidebar-item:active {
-    background-color: var(--bg-ds-pressed);
-  }
 
   .sidebar-item-parent.disabled {
     pointer-events: none !important;
