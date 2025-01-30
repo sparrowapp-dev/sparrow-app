@@ -31,13 +31,16 @@
   let isHover = false;
   let isDelayed = false;
 
+  /**
+   * Return the style for small or medium type of tooltip
+   */
   const getTypeStyles = () => {
     if (size === "small") {
       return {
         borderRadius: "4px",
         boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)",
         maxWidth: "220px",
-        titleClass: "",
+        titleClass: "small-txt",
       };
     }
     return {
@@ -371,11 +374,19 @@
   .subtext {
     margin-top: 4px;
     color: var(--text-ds-neutral-200);
+    font-weight: 400;
+    text-align: left;
+    padding-bottom: 8px;
   }
   .font-bold {
     font-weight: 600;
+    text-align: left;
+    padding-top: 6px;
   }
   .title-txt {
     color: var(--text-ds-neutral-50);
+  }
+  .small-txt {
+    font-weight: 400;
   }
 </style>

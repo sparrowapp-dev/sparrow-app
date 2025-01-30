@@ -289,6 +289,10 @@
     background-color: var(--bg-primary-600);
     border-width: 0px;
   }
+  .sparrow-icon-primary-btn:focus {
+    border: 2px solid var(--border-ds-primary-400);
+    outline: none;
+  }
   .sparrow-icon-primary-btn-disable {
     background-color: transparent;
     color: var(--text-ds-primary-600);
@@ -302,6 +306,10 @@
   .sparrow-icon-secondary-btn:hover {
     background-color: var(--bg-ds-surface-300);
     border-width: 0px;
+  }
+  .sparrow-icon-secondary-btn:focus {
+    border: 2px solid var(--border-ds-primary-400);
+    outline: none;
   }
   .sparrow-icon-secondary-btn:active {
     background-color: var(--bg-primary-600); //
@@ -321,6 +329,11 @@
     background-color: var(--bg-ds-danger-500);
     border-width: 0px;
   }
+  .sparrow-icon-danger-btn:focus {
+    // update the color to red
+    border: 2px solid var(--border-ds-primary-400);
+    outline: none;
+  }
   .sparrow-icon-danger-btn:active {
     background-color: var(--bg-ds-danger-600);
     border-width: 0px;
@@ -337,6 +350,10 @@
   .sparrow-outline-icon-primary:hover {
     background-color: var(--bg-primary-400);
     border-width: 0px;
+  }
+  .sparrow-outline-icon-primary:focus {
+    border: 2px solid var(--border-ds-primary-400);
+    outline: none;
   }
   .sparrow-outline-icon-primary:active {
     background-color: var(--bg-ds-primary-600);
@@ -377,6 +394,11 @@
     color: var(--white-color);
     border-width: 0px;
   }
+  .sparrow-outline-icon-danger:focus {
+    // color change to red
+    border: 2px solid var(--border-ds-primary-400);
+    outline: none;
+  }
   .sparrow-outline-icon-danger:active {
     background-color: var(--bg-ds-danger-600);
     color: var(--white-color);
@@ -398,6 +420,10 @@
     background-color: var(--bg-ds-surface-300);
     border: 0px;
   }
+  .custom-btn-teritiary-icon-regular:focus {
+    border: 2px solid var(--border-ds-primary-400);
+    outline: none;
+  }
 
   .custom-btn-teritiary-icon-regular-disable {
     background-color: transparent;
@@ -413,6 +439,11 @@
     background-color: var(--bg-ds-danger-500);
     color: var(--white-color);
     border: 0px;
+  }
+  .custom-btn-teritiary-danger:focus {
+    // color chage to red
+    border: 2px solid var(--border-ds-primary-400);
+    outline: none;
   }
   .custom-btn-teritiary-icon-danger:active {
     background-color: var(--bg-ds-danger-600);
@@ -435,7 +466,7 @@
     border-width: 0px;
   }
   .custom-btn-primary:focus {
-    border: 2px solid var(--border-ds-primary-100);
+    border: 2px solid var(--border-ds-primary-400);
     outline: none;
   }
   .custom-btn-primary:active {
@@ -458,6 +489,10 @@
     background-color: var(--bg-ds-primary-400);
     color: var(--white-color);
     border-width: 0px;
+  }
+  .custom-btn-outline-primary:focus {
+    border: 2px solid var(--border-ds-primary-400);
+    outline: none;
   }
   .custom-btn-outline-primary:active {
     background-color: var(--bg-ds-primary-600);
@@ -504,6 +539,10 @@
     background-color: var(--bg-ds-surface-300);
     border-width: 0px;
     color: var(--white-color);
+  }
+  .custom-btn-outline-secondary:focus {
+    border: 2px solid var(--border-ds-primary-400);
+    outline: none;
   }
   .custom-btn-outline-secondary:active {
     background-color: var(--bg-ds-surface-400);
@@ -552,6 +591,11 @@
     color: var(--white-color);
     border-width: 0px;
   }
+  .custom-btn-danger:focus {
+    // color change to red
+    border: 2px solid var(--border-ds-primary-400);
+    outline: none;
+  }
   .custom-btn-danger:active {
     background-color: var(--bg-ds-danger-600);
     color: var(--white-color);
@@ -593,6 +637,10 @@
     background-color: var(--bg-ds-surface-300);
     border: 0px;
   }
+  .custom-btn-teritiary-regular:focus {
+    border: 2px solid var(--border-ds-primary-400);
+    outline: none;
+  }
   .custom-btn-teritiary-regular:active {
     color: var(--text-ds-primary-300);
     background-color: var(--bg-ds-surface-400);
@@ -607,6 +655,10 @@
     background-color: var(--bg-ds-danger-500);
     color: var(--white-color);
     border: 0px;
+  }
+  .custom-btn-teritiary-danger:focus {
+    border: 2px solid var(--border-ds-primary-400);
+    outline: none;
   }
   .custom-btn-teritiary-danger:active {
     background-color: var(--bg-ds-danger-600);
