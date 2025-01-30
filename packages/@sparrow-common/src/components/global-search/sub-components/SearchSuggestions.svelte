@@ -21,6 +21,7 @@
   export let filteredWorkspaces;
   export let filteredTestflows;
   export let filteredEnvironments;
+  export let isWebApp = false;
 </script>
 
 <div class="suggestions-container">
@@ -44,6 +45,7 @@
     {handleGlobalSearchWorkspaceNavigation}
     {handleGlobalSearchEnvironmentNavigation}
     {handleGlobalSearchTestflowNavgation}
+    {isWebApp}
   />
 </div>
 
