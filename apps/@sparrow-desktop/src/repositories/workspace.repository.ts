@@ -437,11 +437,10 @@ export class WorkspaceRepository {
       .exec();
   };
 
-  public getRecentWorkspaces = async (limit: number = 5): Promise<WorkspaceDocument[]> => {
+  public getRecentWorkspaces = async (): Promise<WorkspaceDocument[]> => {
     return await RxDB.getInstance()
       .rxdb.workspace.find({
         sort: [{ updatedAt: 'desc' }],
-        limit: 3,
       })
       .exec();
   };

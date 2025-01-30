@@ -91,7 +91,7 @@
           </div>
         </div>
         <div class="request-section">
-          {#each filteredRequest as request}
+          {#each filteredRequest.slice(0, 3) as request}
             {@const details = getRequestDetails(request)}
             <div
               class="request-item"

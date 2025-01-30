@@ -179,11 +179,10 @@ export class EnvironmentRepository {
   };
 
 
-  public getRecentEnvironments = async (limit: number = 5): Promise<EnvironmentDocument[]> => {
+  public getRecentEnvironments = async (): Promise<EnvironmentDocument[]> => {
     return await RxDB.getInstance()
       .rxdb.environment.find({
         sort: [{ updatedAt: "desc" }],
-        limit: 3,
       })
       .exec();
   };

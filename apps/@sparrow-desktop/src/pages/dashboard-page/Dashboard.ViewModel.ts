@@ -916,9 +916,9 @@ export class DashboardViewModel {
       b.updatedAt.getTime() - a.updatedAt.getTime();
 
     return {
-      latestCollections: collections.sort(sortByDate).slice(0, 3),
-      latestFolders: folders.sort(sortByDate).slice(0, 3),
-      latestRequests: requests.sort(sortByDate).slice(0, 3),
+      latestCollections: collections.sort(sortByDate),
+      latestFolders: folders.sort(sortByDate),
+      latestRequests: requests.sort(sortByDate),
     };
   }
 
