@@ -3,10 +3,9 @@
   export let searchQuery = "";
 
   export let handleSearch = () => {};
-  import {keyCommand , SearchIcon} from "@sparrow/common/images";
+  import { keyCommand, SearchIcon } from "@sparrow/common/images";
   let hideKEY = false;
   $: hideKEY = searchQuery.trim().length > 0;
-  
 </script>
 
 <div class="search-bar">
@@ -22,26 +21,26 @@
         bind:value={searchQuery}
         on:input={handleSearch}
         class="search-input"
-        placeholder="Search"
+        placeholder="Search Sparrow"
         aria-label="Search"
         autocomplete="off"
       />
     </div>
   </div>
   {#if !hideKEY}
-  <div class="keyboard-shortcut">
-    <div class="shortcut-key">
-      <img src={keyCommand} alt="" class="shortcut-icon" />
+    <div class="keyboard-shortcut">
+      <div class="shortcut-key">
+        <img src={keyCommand} alt="" class="shortcut-icon" />
+      </div>
+      <span class="key">F</span>
     </div>
-    <span class="key">F</span>
-  </div>
   {/if}
 </div>
 
 <style>
   .search-bar {
     border-radius: 2px 2px 0 0;
-    background-color:var(--bg-ds-surface-700);
+    background-color: var(--bg-ds-surface-700);
     display: flex;
 
     width: 100%;
@@ -50,7 +49,6 @@
     padding: 10px 8px;
     border: 1px solid var(--bg-ds-surface-100);
   }
- 
 
   .search-input-wrapper {
     display: flex;
@@ -91,7 +89,6 @@
     width: 100%;
     caret-color: var(--text-ds-primary-300);
   }
-  
 
   .shortcut-icon {
     width: 16px;
