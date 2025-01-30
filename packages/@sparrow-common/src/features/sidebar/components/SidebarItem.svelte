@@ -2,13 +2,19 @@
   import { Link, Router } from "svelte-navigator";
   import { Tooltip } from "@sparrow/library/ui";
 
-  /**
-   * List of side bar Items
-   */
   export let item: SidebarItemObj;
   export let slidebarPlace;
 
   let isRouteActive = false;
+  let isPressed = false;
+
+  $: iconSrc = isRouteActive
+    ? item.selectedLogo || item.defaultLogo
+    : isPressed
+      ? item.selectedLogo || item.defaultLogo
+      : item.defaultLogo;
+
+  $: hoverIconSrc = item.hoveredLogo || item.defaultLogo;
 </script>
 
 <Tooltip
@@ -17,16 +23,22 @@
   zIndex={600}
 >
   <Router>
-    <div class="sidebar-item-parent" class:disabled={item.disabled}>
+    <div
+      class="sidebar-item-parent"
+      tabindex={item.disabled ? -1 : 0}
+      on:keydown={() => {}}
+      class:disabled={item.disabled}
+    >
       <Link
         class="delay-class"
+        tabindex={item.disabled ? -1 : 1}
         id={item.id}
         to={item.route}
         getProps={({ isCurrent, isPartiallyCurrent }) => {
           isRouteActive = isCurrent || isPartiallyCurrent;
           slidebarPlace(isRouteActive, item.id);
           return {
-            class: `d-flex mb-1 flex-column text-decoration-none align-items-center justify-content-center ${
+            class: `d-flex  flex-column text-decoration-none align-items-center justify-content-center ${
               item.disabled ? "disabled" : ""
             }`,
           };
@@ -34,16 +46,28 @@
       >
         <div
           class="sidebar-item"
-          style="--default-logo: url('{item.defaultLogo}'); --hovered-logo: url('{item.hoveredLogo ||
-            item.defaultLogo}'); --selected-logo: url('{item.selectedLogo ||
-            item.defaultLogo}');"
+          on:mousedown={() => {
+            if (!isRouteActive) {
+              isPressed = true;
+              iconSrc = item.selectedLogo || item.defaultLogo;
+            }
+          }}
+          on:mouseup={() => {
+            isPressed = false;
+          }}
+          on:mouseleave={() => {
+            if (!isRouteActive) {
+              iconSrc = item.defaultLogo;
+            }
+          }}
+          on:mouseenter={() => {
+            if (!isRouteActive && !isPressed) {
+              iconSrc = hoverIconSrc;
+            }
+          }}
         >
           <div class="d-flex" style="align-items: center;">
-            <img
-              class="sidebar-logo {isRouteActive ? 'selected' : ''}"
-              src={item.defaultLogo}
-              alt={item.heading}
-            />
+            <img class="sidebar-logo" src={iconSrc} alt={item.heading} />
           </div>
         </div>
       </Link>
@@ -55,9 +79,16 @@
   .delay-class {
     transition: top 250ms ease-in-out 150ms;
   }
+
+  .sidebar-item-parent:focus {
+    outline: none;
+    border-radius: 4px;
+    border: 2px solid var(--border-ds-primary-300) !important;
+    background-color: var(--bg-ds-surface-500) !important;
+  }
   .sidebar-item img {
-    height: 20px;
-    width: 20px;
+    height: 24px;
+    width: 24px;
   }
 
   .sidebar-item {
@@ -82,6 +113,9 @@
 
   .sidebar-item:hover .sidebar-logo {
     content: var(--hovered-logo);
+  }
+  .sidebar-item:active .sidebar-logo {
+    content: var(--selected-logo);
   }
 
   .sidebar-item .sidebar-logo.selected {
