@@ -25,6 +25,7 @@
   export let selectedType;
   export let handleSearchNode;
   export let handlehideGlobalSearch;
+  export let isWebApp = false;
 
   let workspaceDetailsMap: Record<
     string,
@@ -123,6 +124,7 @@
       {handleGlobalSearchEnvironmentNavigation}
       {handleGlobalSearchTestflowNavgation}
       {selectedType}
+      {isWebApp}
     />
   {/if}
 </div>

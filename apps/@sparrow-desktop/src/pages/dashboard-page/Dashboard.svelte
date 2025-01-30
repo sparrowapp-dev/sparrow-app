@@ -189,6 +189,11 @@
           setGlobalSearch(true);
           setSelectedType("folders");
           break;
+        case "t":
+          event.preventDefault();
+          setGlobalSearch(true);
+          setSelectedType("flows");
+          break;
         default:
           break;
       }
@@ -505,6 +510,7 @@
       transition:fade={{ duration: 300, delay: 150 }}
     >
       <GlobalSearch
+        isWebApp={false}
         {handleSwitchWorkspaceModal}
         {closeGlobalSearch}
         {handlehideGlobalSearch}
@@ -687,22 +693,5 @@
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
-  }
-
-  .global-search-content {
-    position: relative;
-    z-index: 1001;
-    filter: none;
-    pointer-events: auto;
-  }
-
-  .blur-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.2);
-    z-index: 10;
   }
 </style>

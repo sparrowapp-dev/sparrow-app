@@ -598,9 +598,7 @@ export class DashboardViewModel {
       collectionId: testflow.collectionId || "",
       folderId: testflow.folderId || "",
     };
-    console.log("sent testrflow", testflow)
     const testflowData = await this.testflowRepository.readTestflow(testflow._id);
-    console.log("testflow data-----", testflowData);
 
     const tab = new InitTestflowTab(testflow._id, testflow.workspaceId);
     tab.updateName(testflowData.name);

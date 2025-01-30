@@ -31,6 +31,7 @@
   export let filteredWorkspaces;
   export let filteredTestflows;
   export let filteredEnvironments;
+  export let isWebApp = false;
 
   const methodIcons = {
     GET: getIcon,
@@ -92,34 +93,36 @@
         </div>
         <div class="request-section">
           {#each filteredRequest.slice(0, 3) as request}
-            {@const details = getRequestDetails(request)}
-            <div
-              class="request-item"
-              on:click={() => {
-                handleGlobalSearchRequestNavigation(
-                  request.tree.id,
-                  request.workspaceId,
-                  request.collectionId,
-                  request.folderDetails?.id || "",
-                  request.tree,
-                );
-              }}
-            >
-              <div class="request-method">
-                <img
-                  src={methodIcons[details.method] || hexIcon}
-                  alt=""
-                  class="request-icon"
-                />
-              </div>
-              <div class="request-details">
-                <div class="request-header">
-                  <span class="request-title">{details.name}</span>
-                  <span class="request-path">{request.path}</span>
+            {#if !(isWebApp && request.tree.request.method === "GRAPHQL")}
+              {@const details = getRequestDetails(request)}
+              <div
+                class="request-item"
+                on:click={() => {
+                  handleGlobalSearchRequestNavigation(
+                    request.tree.id,
+                    request.workspaceId,
+                    request.collectionId,
+                    request.folderDetails?.id || "",
+                    request.tree,
+                  );
+                }}
+              >
+                <div class="request-method">
+                  <img
+                    src={methodIcons[details.method] || hexIcon}
+                    alt=""
+                    class="request-icon"
+                  />
                 </div>
-                <span class="request-url">{details.url}</span>
+                <div class="request-details">
+                  <div class="request-header">
+                    <span class="request-title">{details.name}</span>
+                    <span class="request-path">{request.path}</span>
+                  </div>
+                  <span class="request-url">{details.url}</span>
+                </div>
               </div>
-            </div>
+            {/if}
           {/each}
         </div>
       {:else}
@@ -302,34 +305,36 @@
         </div>
         <div class="request-section">
           {#each filteredRequest as request}
-            {@const details = getRequestDetails(request)}
-            <div
-              class="request-item"
-              on:click={() => {
-                handleGlobalSearchRequestNavigation(
-                  request.tree.id,
-                  request.workspaceId,
-                  request.collectionId,
-                  request.folderDetails?.id || "",
-                  request.tree,
-                );
-              }}
-            >
-              <div class="request-method">
-                <img
-                  src={methodIcons[details.method] || hexIcon}
-                  alt=""
-                  class="request-icon"
-                />
-              </div>
-              <div class="request-details">
-                <div class="request-header">
-                  <span class="request-title">{details.name}</span>
-                  <span class="request-path">{request.path}</span>
+            {#if !(isWebApp && request.tree.request.method === "GRAPHQL")}
+              {@const details = getRequestDetails(request)}
+              <div
+                class="request-item"
+                on:click={() => {
+                  handleGlobalSearchRequestNavigation(
+                    request.tree.id,
+                    request.workspaceId,
+                    request.collectionId,
+                    request.folderDetails?.id || "",
+                    request.tree,
+                  );
+                }}
+              >
+                <div class="request-method">
+                  <img
+                    src={methodIcons[details.method] || hexIcon}
+                    alt=""
+                    class="request-icon"
+                  />
                 </div>
-                <span class="request-url">{details.url}</span>
+                <div class="request-details">
+                  <div class="request-header">
+                    <span class="request-title">{details.name}</span>
+                    <span class="request-path">{request.path}</span>
+                  </div>
+                  <span class="request-url">{details.url}</span>
+                </div>
               </div>
-            </div>
+            {/if}
           {/each}
         </div>
       {/if}
@@ -607,33 +612,37 @@
       </div>
       <div class="request-section">
         {#each filteredRequest as request}
-          <div
-            class="request-item"
-            on:click={() => {
-              handleGlobalSearchRequestNavigation(
-                request.tree.id,
-                request.workspaceId,
-                request.collectionId,
-                request.folderDetails?.id || "",
-                request.tree,
-              );
-            }}
-          >
-            <div class="request-method">
-              <img
-                src={methodIcons[request.tree.request.method] || hexIcon}
-                alt=""
-                class="request-icon"
-              />
-            </div>
-            <div class="request-details">
-              <div class="request-header">
-                <span class="request-title">{request.tree.name}</span>
-                <span class="request-path">{request.path}</span>
+          {#if !(isWebApp && request.tree.request.method === "GRAPHQL")}
+            <div
+              class="request-item"
+              on:click={() => {
+                handleGlobalSearchRequestNavigation(
+                  request.tree.id,
+                  request.workspaceId,
+                  request.collectionId,
+                  request.folderDetails?.id || "",
+                  request.tree,
+                );
+              }}
+            >
+              <div class="request-method">
+                <img
+                  src={methodIcons[request.tree.request.method] || hexIcon}
+                  alt=""
+                  class="request-icon"
+                />
               </div>
-              <span class="request-url">{request.tree.request?.url || ""}</span>
+              <div class="request-details">
+                <div class="request-header">
+                  <span class="request-title">{request.tree.name}</span>
+                  <span class="request-path">{request.path}</span>
+                </div>
+                <span class="request-url"
+                  >{request.tree.request?.url || ""}</span
+                >
+              </div>
             </div>
-          </div>
+          {/if}
         {/each}
       </div>
     {:else}
@@ -786,6 +795,9 @@
 
   .request-item:hover .request-url {
     color: var(--text-ds-primary-300);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .request-method {
@@ -828,6 +840,8 @@
     font:
       400 12px Inter,
       sans-serif;
+    flex: 1 1 0;
+    max-width: fit-content;
   }
 
   .request-path {
@@ -835,6 +849,7 @@
     font:
       400 12px Inter,
       sans-serif;
+    flex: 2 1 0;
   }
 
   .request-url {
@@ -842,6 +857,11 @@
     font:
       400 12px Inter,
       sans-serif;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    max-width: 100%;
   }
   .section-top {
     display: flex;
@@ -852,5 +872,11 @@
     gap: 2px;
     display: flex;
     flex-direction: column;
+  }
+  .request-header span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 1;
   }
 </style>
