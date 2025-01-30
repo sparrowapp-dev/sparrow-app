@@ -160,7 +160,6 @@ export class EnvironmentRepository {
       return await RxDB.getInstance()
         .rxdb.environment.find({
           sort: [{ updatedAt: "desc" }],
-          limit: 3,
         })
         .exec();
     }
@@ -175,7 +174,6 @@ export class EnvironmentRepository {
             { workspaceId: { $regex: searchRegex } },
           ],
         },
-        limit: 3,
       })
       .exec();
   };
