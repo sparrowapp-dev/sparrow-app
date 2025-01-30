@@ -134,27 +134,6 @@
     }
   };
 
-  const handleUrlLength = (url: string) => {
-    if (url.length > 55) {
-      return `${url.slice(0, 10000)}...`;
-    }
-    return url;
-  };
-
-  const path = (path: string) => {
-    if (path.length > 60) {
-      return `${path.slice(0, 11100)}...`;
-    }
-    return path;
-  };
-
-  const handlenameLength = (name: string) => {
-    if (name.length > 30) {
-      return `${name.slice(0, 30)}...`;
-    }
-    return name;
-  };
-
   onMount(async () => {
     try {
       filteredWorkspaces = await recentWorkspace();
@@ -211,7 +190,7 @@
               <div class="request-details">
                 <div class="request-header">
                   <span class="request-title"
-                    >{handlenameLength(details.name)}</span
+                    >{(details.name)}</span
                   >
                   <span class="request-path">{request.path}</span>
                 </div>
@@ -394,7 +373,7 @@
               <div class="request-details">
                 <div class="request-header">
                   <span class="request-title"
-                    >{handlenameLength(details.name)}</span
+                    >{(details.name)}</span
                   >
                   <span class="request-path">{request.path}</span>
                 </div>
@@ -430,7 +409,7 @@
             <div class="request-details">
               <div class="request-header">
                 <span class="request-title"
-                  >{handlenameLength(collection?.tree.name)}</span
+                  >{(collection?.tree.name)}</span
                 >
                 <span class="request-path">{collection?.path}</span>
               </div>
@@ -465,7 +444,7 @@
             <div class="request-details">
               <div class="request-header">
                 <span class="request-title"
-                  >{handlenameLength(folder.tree.name)}</span
+                  >{(folder.tree.name)}</span
                 >
                 <span class="request-path">{folder.path}</span>
               </div>
@@ -496,7 +475,7 @@
             <div class="request-details">
               <div class="request-header">
                 <span class="request-title"
-                  >{handlenameLength(environment.title)}</span
+                  >{(environment.title)}</span
                 >
               </div>
             </div>
@@ -525,7 +504,7 @@
             <div class="request-details">
               <div class="request-header">
                 <span class="request-title"
-                  >{handlenameLength(testflow.name)}</span
+                  >{(testflow.name)}</span
                 >
                 <span class="request-path">{testflow.description || ""}</span>
               </div>
@@ -587,7 +566,7 @@
           <div class="request-details">
             <div class="request-header">
               <span class="request-title"
-                >{handlenameLength(workspace.name)}</span
+                >{(workspace.name)}</span
               >
               <span class="request-path">{workspace.team.teamName}</span>
             </div>
@@ -629,7 +608,7 @@
           <div class="request-details">
             <div class="request-header">
               <span class="request-title"
-                >{handlenameLength(folder.tree.name)}</span
+                >{(folder.tree.name)}</span
               >
               <span class="request-path">{folder.path}</span>
             </div>
@@ -668,7 +647,7 @@
           <div class="request-details">
             <div class="request-header">
               <span class="request-title"
-                >{handlenameLength(collection?.tree.name)}</span
+                >{(collection?.tree.name)}</span
               >
               <span class="request-path">{collection?.path}</span>
             </div>
@@ -747,7 +726,7 @@
           <div class="request-details">
             <div class="request-header">
               <span class="request-title"
-                >{handlenameLength(environment.title)}</span
+                >{(environment.title)}</span
               >
             </div>
           </div>
@@ -779,7 +758,7 @@
           <div class="request-details">
             <div class="request-header">
               <span class="request-title"
-                >{handlenameLength(testflow.name)}</span
+                >{(testflow.name)}</span
               >
               <span class="request-path">{testflow.description || ""}</span>
             </div>
@@ -920,8 +899,9 @@
     font:
       400 12px Inter,
       sans-serif;
-    flex: 2 1 0;
+    flex: 1 1 0;
     max-width: fit-content;
+    
   }
 
   .request-path {
