@@ -15,7 +15,6 @@
     socketIoIcon,
     webSocketIcon,
     FlowIcon,
-    
   } from "@sparrow/common/images";
   import type { EnvironmentDocument } from "@app/database/database";
   import NoResults from "./NoResults.svelte";
@@ -224,7 +223,7 @@
             )}
         >
           <div class="request-method">
-           <CollectionIcon color="var(--icon-ds-neutral-200)" />
+            <CollectionIcon color="var(--icon-ds-neutral-200)" />
           </div>
           <div class="request-details">
             <div class="request-header">
@@ -401,7 +400,7 @@
               )}
           >
             <div class="request-method">
-              <img src={collectionIcon} alt="" class="other-icon" />
+              <CollectionIcon color="var(--icon-ds-neutral-200)" />
             </div>
             <div class="request-details">
               <div class="request-header">
@@ -434,7 +433,7 @@
               )}
           >
             <div class="request-method">
-              <img src={folderIcon} alt="" class="other-icon" />
+              <FolderIcon color="var(--icon-ds-neutral-200)" />
             </div>
             <div class="request-details">
               <div class="request-header">
@@ -463,7 +462,7 @@
               handleGlobalSearchEnvironmentNavigation(environment)}
           >
             <div class="request-method">
-              <img src={environmentIcon} alt="" class="other-icon" />
+              <EnvironmentIcon color="var(--icon-ds-neutral-200)" />
             </div>
             <div class="request-details">
               <div class="request-header">
@@ -490,7 +489,7 @@
             on:click={() => handleGlobalSearchTestflowNavgation(testflow)}
           >
             <div class="request-method">
-              <img src={flowIcon} alt="" class="other-icon" />
+              <FlowIcon color="var(--icon-ds-neutral-200)" />
             </div>
             <div class="request-details">
               <div class="request-header">
@@ -518,7 +517,7 @@
             on:click={() => handleGlobalSearchWorkspaceNavigation(workspace)}
           >
             <div class="request-method">
-              <img src={workspaceIcon} alt="" class="other-icon" />
+              <WorkspaceIcon color="var(--icon-ds-neutral-200)" />
             </div>
             <div class="request-details">
               <div class="request-header">
@@ -704,7 +703,7 @@
           on:click={() => handleGlobalSearchEnvironmentNavigation(environment)}
         >
           <div class="request-method">
-            <img src={environmentIcon} alt="" class="other-icon" />
+            <EnvironmentIcon color="var(--icon-ds-neutral-200)" />
           </div>
           <div class="request-details">
             <div class="request-header">
@@ -734,7 +733,7 @@
           on:click={() => handleGlobalSearchTestflowNavgation(testflow)}
         >
           <div class="request-method">
-           <FlowIcon color="var(--icon-ds-neutral-200)" />
+            <FlowIcon color="var(--icon-ds-neutral-200)" />
           </div>
           <div class="request-details">
             <div class="request-header">
@@ -828,7 +827,7 @@
   }
 
   .request-item:hover .request-path {
-    color: var( --text-ds-neutral-300);
+    color: var(--text-ds-neutral-300);
   }
 
   .request-item:hover .request-url {
