@@ -343,13 +343,6 @@
         handlehideGlobalSearch(true);
         const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
         handleSwitchWorkspaceModal(workspaceData.name, "Request", workspaceId);
-        return;
-      }
-      const existingTab = await _viewModel.getTabByID(apiId);
-      if (existingTab?._data?.isActive) {
-        closeGlobalSearch();
-        handlehideGlobalSearch(false);
-        return;
       }
       await _viewModel.switchAndCreateRequestTab(
         workspaceId,
@@ -381,7 +374,6 @@
           "Collection",
           workspaceId,
         );
-        return;
       }
       await _viewModel.switchAndCreateCollectionTab(workspaceId, collection);
       closeGlobalSearch();
@@ -406,7 +398,6 @@
         handlehideGlobalSearch(true);
         const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
         handleSwitchWorkspaceModal(workspaceData.name, "Folder", workspaceId);
-        return;
       }
       await _viewModel.switchAndCreateFolderTab(
         workspaceId,
@@ -430,11 +421,6 @@
       );
 
       if (!isActiveWorkspace) {
-        // handlehideGlobalSearch(true);
-        // const workspaceData = await _viewModel.getWorkspaceById(workspace._id);
-        // handleSwitchWorkspaceModal(workspaceData.name, "Folder", workspace._id);
-
-        // Create new tab for the workspace
         await _viewModel.activateWorkspace(workspace._id);
         closeGlobalSearch();
         handlehideGlobalSearch(false);
@@ -496,12 +482,6 @@
           "Testflow",
           testflow.workspaceId,
         );
-      }
-      const existingTab = await _viewModel.getTabByID(testflow._id);
-      if (existingTab?._data?.isActive) {
-        handlehideGlobalSearch(false);
-        closeGlobalSearch();
-        return;
       }
       await _viewModel.switchAndCreateTestflowTab(testflow);
       closeGlobalSearch();

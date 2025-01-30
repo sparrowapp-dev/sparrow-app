@@ -465,7 +465,7 @@ export class DashboardViewModel {
           folderId,
           tree,
         );
-        await this.tabRepository.createTab(adaptedGraphql);
+        await this.tabRepository.createTab(adaptedGraphql, workspaceId);
         break;
       }
       case "WEBSOCKET": {
@@ -476,7 +476,7 @@ export class DashboardViewModel {
           folderId,
           tree,
         );
-        await this.tabRepository.createTab(adaptedSocket);
+        await this.tabRepository.createTab(adaptedSocket, workspaceId);
         break;
       }
       case "SOCKETIO": {
@@ -487,12 +487,10 @@ export class DashboardViewModel {
           folderId,
           tree,
         );
-        await this.tabRepository.createTab(adaptedSocketIo);
+        await this.tabRepository.createTab(adaptedSocketIo, workspaceId);
         break;
       }
       default: {
-
-
         const requestTabAdapter = new RequestTabAdapter();
         const adaptedRequest = requestTabAdapter.adapt(
           workspaceId,
@@ -500,7 +498,7 @@ export class DashboardViewModel {
           folderId,
           tree,
         );
-        await this.tabRepository.createTab(adaptedRequest);
+        await this.tabRepository.createTab(adaptedRequest, workspaceId);
       }
     }
     moveNavigation("right");
@@ -542,7 +540,7 @@ export class DashboardViewModel {
     _collection.updateIsSave(true);
 
     // Create the tab with the new collection
-    await this.tabRepository.createTab(_collection.getValue());
+    await this.tabRepository.createTab(_collection.getValue(), workspaceId);
 
     // Update UI
     moveNavigation("right");
@@ -563,7 +561,7 @@ export class DashboardViewModel {
     sampleFolder.updatePath(path);
     sampleFolder.updateIsSave(true);
 
-    await this.tabRepository.createTab(sampleFolder.getValue());
+    await this.tabRepository.createTab(sampleFolder.getValue(), workspaceId);
     moveNavigation("right");
   }
 
@@ -591,7 +589,7 @@ export class DashboardViewModel {
     initEnvironmentTab.setName(environment.title);
     initEnvironmentTab.setVariable(environment?.variable);
 
-    await this.tabRepository.createTab(initEnvironmentTab.getValue());
+    await this.tabRepository.createTab(initEnvironmentTab.getValue(), environment.workspace);
     moveNavigation("right");
   }
 
@@ -602,16 +600,20 @@ export class DashboardViewModel {
       collectionId: testflow.collectionId || "",
       folderId: testflow.folderId || "",
     };
+    console.log("sent testrflow", testflow)
+    const testflowData = await this.testflowRepository.readTestflow(testflow._id);
+    console.log("testflow data-----", testflowData);
 
     const tab = new InitTestflowTab(testflow._id, testflow.workspaceId);
-    tab.updateName(testflow.name);
-    tab.updateDescription(testflow.description || "");
+    tab.updateName(testflowData.name);
+    tab.updateDescription(testflowData.description || "");
     tab.updatePath(path);
-    tab.setNodes(testflow.nodes);
-    tab.setEdges(testflow.edges);
+    tab.setNodes(testflowData.nodes);
+    tab.setEdges(testflowData.edges);
     tab.updateIsSave(true);
 
-    await this.tabRepository.createTab(tab.getValue());
+    await new Sleep().setTime(100).exec();
+    await this.tabRepository.createTab(tab.getValue(), testflow.workspaceId);
     moveNavigation("right");
   }
 
