@@ -980,7 +980,7 @@ export class DashboardViewModel {
         (_value) => _value._data,
       );
 
-      let testflow = await this.getRecentWorkspace();
+      let testflow = await this.getRecentTestflow();
       testflow = testflow.map(
         (_value) => _value._data,
       );

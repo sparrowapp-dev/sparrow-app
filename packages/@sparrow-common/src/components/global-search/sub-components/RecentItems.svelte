@@ -258,6 +258,35 @@
         </div>
       </div>
     {/if}
+    {#if searchQuery == "" && filteredTestflows?.length > 0}
+      <div class="section-header">
+        <span class="section-title">Recent Test Flows</span>
+        <div class="keyboard-shortcut">
+          <div class="shortcut-key">
+            <img src={keyCommand} alt="" class="shortcut-icon" />
+          </div>
+          <span class="key">Shift</span>
+          <span class="key">T</span>
+        </div>
+      </div>
+      <div
+        class="request-item"
+        on:click={() =>
+          handleGlobalSearchTestflowNavgation(filteredTestflows[0])}
+      >
+        <div class="request-method">
+          <FlowIcon color="var(--icon-ds-neutral-200)" />
+        </div>
+        <div class="request-details">
+          <div class="request-header">
+            <span class="request-title">{filteredTestflows[0].name}</span>
+            <span class="request-path"
+              >{filteredTestflows[0].description || ""}</span
+            >
+          </div>
+        </div>
+      </div>
+    {/if}
   {:else if selectedType === "" && searchQuery !== ""}
     {#if filteredRequest?.length > 0 || filteredCollection?.length > 0 || filteredFolder?.length > 0 || filteredWorkspaces?.length > 0 || filteredEnvironments?.length > 0 || filteredTestflows?.length > 0}
       {#if filteredRequest?.length > 0}

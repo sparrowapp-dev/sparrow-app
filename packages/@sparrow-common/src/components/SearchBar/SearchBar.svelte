@@ -11,7 +11,13 @@
       <SearchIcon color="#82858A" class="image-container-img" />
     </div>
 
-    <input type="text" class="input" {placeholder} bind:value={searchQuery} />
+    <input
+      type="text"
+      class="input"
+      {placeholder}
+      bind:value={searchQuery}
+      maxlength="0"
+    />
   </div>
   <div class="keys">
     <span class="key">Ctrl</span>
