@@ -35,7 +35,6 @@
   import { OSDetector } from "@sparrow/common/utils";
 
   import { fade } from "svelte/transition";
-  import { TeamsViewModel } from "../teams-page/Teams.ViewModel";
   import { isGuestUserActive } from "@app/store/auth.store";
   import {
     type SidebarItemBaseInterface,
@@ -154,9 +153,6 @@
       else return false;
     }
   };
-
-  $: console.log("hide global search", hideGlobalSearch);
-  $: console.log("open state", isGlobalSearchOpen);
 
   const handleGlobalKeyPress = (event, setGlobalSearch, setSelectedType) => {
     if (
@@ -513,7 +509,6 @@
         {closeGlobalSearch}
         {handlehideGlobalSearch}
         workspaceDocuments={$workspaceDocuments}
-        {collectionDocuments}
         checkActiveWorkspace={_viewModel.checkActiveWorkspace}
         {handleGlobalSearchRequestNavigation}
         {handleGlobalSearchCollectionNavigation}
@@ -521,12 +516,6 @@
         {handleGlobalSearchWorkspaceNavigation}
         {handleGlobalSearchEnvironmentNavigation}
         {handleGlobalSearchTestflowNavgation}
-        searchWorkspace={_viewModel.searchWorkspace}
-        searchEnvironment={_viewModel.searchEnvironment}
-        searchTestflow={_viewModel.searchTestflow}
-        recentWorkspace={_viewModel.getRecentWorkspace}
-        recentEnvironment={_viewModel.getRecentEnvironment}
-        recentTestflow={_viewModel.getRecentTestflow}
         {selectedType}
         handleSearchNode={(...args) => _viewModel.searchNode(...args)}
       />

@@ -33,9 +33,7 @@ import { SocketTabAdapter } from "@app/adapter/socket-tab";
 
 
 export class DashboardViewModel {
-  private tree: any[];
   constructor() {
-    this.tree = [];
   }
   private teamRepository = new TeamRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -918,9 +916,9 @@ export class DashboardViewModel {
       b.updatedAt.getTime() - a.updatedAt.getTime();
 
     return {
-      latestCollections: collections.sort(sortByDate).slice(0, 3),
-      latestFolders: folders.sort(sortByDate).slice(0, 3),
-      latestRequests: requests.sort(sortByDate).slice(0, 3),
+      latestCollections: collections.sort(sortByDate),
+      latestFolders: folders.sort(sortByDate),
+      latestRequests: requests.sort(sortByDate),
     };
   }
 
@@ -935,16 +933,19 @@ export class DashboardViewModel {
    * @param workspaceMap - Map of workspace IDs to workspace details
    * @public
    */
-  public searchNode(
+  public async searchNode(
     searchText: string,
-    collection: any[],
-    folder: any[],
-    file: any[],
-    collectionData: any[],
-    workspacePath?: string,
     workspaceMap: Record<string, { teamName: string; workspaceName: string }> = {},
-  ): void {
-    this.tree = collectionData;
+  ) {
+    let collectionTree = await this.collectionRepository.getCollectionDocs();
+    const s = collectionTree.map((_t)=>{
+      return _t.toMutableJSON();
+    });
+
+    let newtree = s;
+    let collection = [];
+    let folder = [];
+    let file = [];
 
     if (searchText.trim() === "") {
       // Clear existing arrays before populating with latest items
@@ -953,7 +954,7 @@ export class DashboardViewModel {
       file.length = 0;
 
       // Get latest items and ensure they're properly sorted
-      const latestItems = this.getLatestItemsByType(this.tree, workspaceMap);
+      const latestItems = this.getLatestItemsByType(newtree, workspaceMap);
 
       // Ensure we're getting the most recently updated items
       if (latestItems.latestCollections.length > 0) {
@@ -966,23 +967,57 @@ export class DashboardViewModel {
         file.push(...latestItems.latestRequests);
       }
 
-      return;
+      let environment = await this.getRecentEnvironment();
+      environment = environment.map((_environment) => ({
+        title: _environment.name,
+        workspace: _environment.workspaceId,
+        id: _environment.id,
+        variable: _environment.variable,
+      }));
+
+      let workspace = await this.getRecentWorkspace();
+      workspace = workspace.map(
+        (_value) => _value._data,
+      );
+
+      let testflow = await this.getRecentTestflow();
+      testflow = testflow.map(
+        (_value) => _value._data,
+      );
+
+      return {collection, folder, file, workspace, testflow, environment};
     }
 
-    for (let i = 0; i < this.tree.length; i++) {
+    for (let i = 0; i < newtree.length; i++) {
       const path: string[] = [];
 
       this.searchHelper(
-        this.tree[i],
+        newtree[i],
         searchText,
         collection,
         folder,
         file,
-        this.tree[i].id,
+        newtree[i].id,
         path,
         {},
         workspaceMap,
       );
     }
+    let workspace = await this.searchWorkspace(searchText);
+    workspace = workspace.map((_value) => _value._data);
+
+    let testflow = await this.searchTestflow(searchText);
+    testflow = testflow.map((_value) => _value._data);
+
+    let environment = await this.searchEnvironment(searchText);
+    environment = environment.map((_environment) => ({
+      title: _environment.name,
+      workspace: _environment.workspaceId,
+      id: _environment.id,
+      variable: _environment.variable,
+    }));
+
+    return {collection, folder, file, workspace, testflow, environment};
+
   }
 }

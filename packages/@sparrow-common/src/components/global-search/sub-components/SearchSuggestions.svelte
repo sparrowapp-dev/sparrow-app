@@ -6,14 +6,9 @@
   export let filteredCollection = [];
   export let filteredFolder = [];
   export let filteredRequest = [];
-  export let filteredWorkspace = [];
   export let searchQuery = "";
   export let handlehideGlobalSearch;
   export let closeGlobalSearch;
-  export let workspaceDetailsMap: Record<
-    string,
-    { teamName: string; workspaceName: string }
-  > = {};
   export let checkActiveWorkspace;
   export let handleSwitchWorkspaceModal;
   export let handleGlobalSearchRequestNavigation;
@@ -22,13 +17,10 @@
   export let handleGlobalSearchWorkspaceNavigation;
   export let handleGlobalSearchEnvironmentNavigation;
   export let handleGlobalSearchTestflowNavgation;
-  export let searchTestflow;
-  export let searchEnvironment;
-  export let searchWorkspace;
-  export let recentTestflow;
-  export let recentEnvironment;
-  export let recentWorkspace;
   export let selectedType;
+  export let filteredWorkspaces;
+  export let filteredTestflows;
+  export let filteredEnvironments;
 </script>
 
 <div class="suggestions-container">
@@ -39,11 +31,12 @@
     {filteredCollection}
     {filteredFolder}
     {filteredRequest}
-    {filteredWorkspace}
+    {filteredWorkspaces}
+    {filteredTestflows}
+    {filteredEnvironments}
     {selectedType}
     {closeGlobalSearch}
     {handlehideGlobalSearch}
-    {workspaceDetailsMap}
     {checkActiveWorkspace}
     {handleGlobalSearchRequestNavigation}
     {handleGlobalSearchCollectionNavigation}
@@ -51,12 +44,6 @@
     {handleGlobalSearchWorkspaceNavigation}
     {handleGlobalSearchEnvironmentNavigation}
     {handleGlobalSearchTestflowNavgation}
-    {searchTestflow}
-    {searchWorkspace}
-    {searchEnvironment}
-    {recentWorkspace}
-    {recentEnvironment}
-    {recentTestflow}
   />
 </div>
 

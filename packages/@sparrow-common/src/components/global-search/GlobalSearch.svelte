@@ -2,7 +2,6 @@
   import SearchBar from "./sub-components/SearchBar.svelte";
   import SearchSuggestions from "./sub-components/SearchSuggestions.svelte";
   import type { SearchSuggestion } from "./sub-components/types/types";
-  import type { CollectionDocument } from "@app/database/database";
   import { onMount } from "svelte";
   import {
     FolderIcon,
@@ -15,7 +14,6 @@
 
   export let closeGlobalSearch;
   export let workspaceDocuments;
-  export let collectionDocuments;
   export let checkActiveWorkspace;
   export let handleSwitchWorkspaceModal;
   export let handleGlobalSearchRequestNavigation;
@@ -24,12 +22,6 @@
   export let handleGlobalSearchWorkspaceNavigation;
   export let handleGlobalSearchEnvironmentNavigation;
   export let handleGlobalSearchTestflowNavgation;
-  export let searchTestflow;
-  export let searchEnvironment;
-  export let searchWorkspace;
-  export let recentTestflow;
-  export let recentEnvironment;
-  export let recentWorkspace;
   export let selectedType;
   export let handleSearchNode;
   export let handlehideGlobalSearch;
@@ -39,58 +31,24 @@
     { teamName: string; workspaceName: string }
   > = {};
 
-  const getCollectionDocument = (elem: CollectionDocument) => {
-    return {
-      id: elem.id,
-      name: elem.name,
-      totalRequests: elem.totalRequests,
-      items: elem.items,
-      activeSync: elem.activeSync,
-      activeSyncUrl: elem.activeSyncUrl,
-      createdBy: elem.createdBy,
-      createdAt: elem.createdAt,
-      updatedBy: elem.updatedBy,
-      updatedAt: elem.updatedAt,
-      branches: elem.branches,
-      primaryBranch: elem.primaryBranch,
-      currentBranch: elem.currentBranch,
-      localRepositoryPath: elem.localRepositoryPath,
-      workspaceId: elem.workspaceId,
-    };
-  };
-
   let searchQuery = "";
   let filteredCollection = [];
   let filteredFolder = [];
   let filteredRequest = [];
-  let collectionsData = [];
+  let filteredTestflows = [];
+  let filteredWorkspaces = [];
+  let filteredEnvironments = [];
   let hideGlobalSearch = false;
 
-  collectionDocuments.subscribe((value) => {
-    if (value) {
-      const collectionArr = value.map(
-        (collectionDocument: CollectionDocument) => {
-          const collectionObj = getCollectionDocument(collectionDocument);
-          return collectionObj;
-        },
-      );
-      collectionsData = collectionArr;
-    }
-  });
-
-  const handleSearch = () => {
-    filteredCollection.length = 0;
-    filteredFolder.length = 0;
-    filteredRequest.length = 0;
-    handleSearchNode(
-      searchQuery,
-      filteredCollection,
-      filteredFolder,
-      filteredRequest,
-      collectionsData,
-      "",
-      workspaceDetailsMap,
-    );
+  const handleSearch = async () => {
+    const { collection, folder, file, workspace, testflow, environment } =
+      await handleSearchNode(searchQuery, workspaceDetailsMap);
+    filteredCollection = collection;
+    filteredFolder = folder;
+    filteredRequest = file;
+    filteredWorkspaces = workspace;
+    filteredTestflows = testflow;
+    filteredEnvironments = environment;
   };
 
   const suggestions: SearchSuggestion[] = [
@@ -152,9 +110,11 @@
       {filteredCollection}
       {filteredFolder}
       {filteredRequest}
+      {filteredWorkspaces}
+      {filteredTestflows}
+      {filteredEnvironments}
       {closeGlobalSearch}
       {handlehideGlobalSearch}
-      {workspaceDetailsMap}
       {checkActiveWorkspace}
       {handleGlobalSearchRequestNavigation}
       {handleGlobalSearchCollectionNavigation}
@@ -162,12 +122,6 @@
       {handleGlobalSearchWorkspaceNavigation}
       {handleGlobalSearchEnvironmentNavigation}
       {handleGlobalSearchTestflowNavgation}
-      {searchTestflow}
-      {searchWorkspace}
-      {searchEnvironment}
-      {recentWorkspace}
-      {recentEnvironment}
-      {recentTestflow}
       {selectedType}
     />
   {/if}
