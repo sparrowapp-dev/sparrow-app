@@ -66,6 +66,10 @@ export class CollectionRepository {
       .$;
   };
 
+  public getCollectionDocs = (): CollectionDocument[] => {
+      return RxDB.getInstance().rxdb?.collection.find().exec();
+    };
+
   // public updateCollection = async (
   //   collectionId,
   // ): Observable<CollectionDocument[]> => {};

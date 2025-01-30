@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import {
     FolderIcon,
     EnvironmentIcon,
@@ -16,7 +15,6 @@
     webSocketIcon,
     FlowIcon,
   } from "@sparrow/common/images";
-  import type { EnvironmentDocument } from "@app/database/database";
   import NoResults from "./NoResults.svelte";
 
   export let searchQuery = "";
@@ -30,66 +28,9 @@
   export let handleGlobalSearchWorkspaceNavigation;
   export let handleGlobalSearchEnvironmentNavigation;
   export let handleGlobalSearchTestflowNavgation;
-  export let searchTestflow;
-  export let searchEnvironment;
-  export let searchWorkspace;
-  export let recentTestflow;
-  export let recentEnvironment;
-  export let recentWorkspace;
-
-  let filteredWorkspaces = [];
-  let filteredEnvironments = [];
-  let filteredTestflows = [];
-
-  interface RecentItem {
-    title: string;
-    workspace: string;
-    collection?: string;
-    environment?: string;
-    url?: string;
-    method?: string;
-  }
-  $: {
-    updateWorkspaces(searchQuery);
-    updateEnvironments(searchQuery);
-    updateTestflows(searchQuery);
-  }
-
-  const updateWorkspaces = async (query: string) => {
-    try {
-      const workspaces = await searchWorkspace(query);
-      filteredWorkspaces = workspaces.map((workspace) => workspace._data);
-    } catch (error) {
-      console.error("Error fetching workspaces:", error);
-      filteredWorkspaces = [];
-    }
-  };
-
-  const updateEnvironments = async (query: string) => {
-    try {
-      const environments: EnvironmentDocument[] =
-        await searchEnvironment(query);
-      filteredEnvironments = environments.map((environment) => ({
-        title: environment.name,
-        workspace: environment.workspaceId,
-        id: environment.id,
-        variable: environment.variable,
-      }));
-    } catch (error) {
-      console.error("Error fetching environments:", error);
-      filteredEnvironments = [];
-    }
-  };
-
-  const updateTestflows = async (query: string) => {
-    try {
-      const testflows = await searchTestflow(query);
-      filteredTestflows = testflows.map((testflow) => testflow._data);
-    } catch (error) {
-      console.error("Error fetching testflows:", error);
-      filteredTestflows = [];
-    }
-  };
+  export let filteredWorkspaces;
+  export let filteredTestflows;
+  export let filteredEnvironments;
 
   const methodIcons = {
     GET: getIcon,
@@ -133,28 +74,12 @@
         };
     }
   };
-
-  onMount(async () => {
-    try {
-      filteredWorkspaces = await recentWorkspace();
-      filteredWorkspaces = filteredWorkspaces.map(
-        (workspace) => workspace._data,
-      );
-
-      const recentTestflows = await recentTestflow();
-      filteredTestflows = recentTestflows.map((testflow) => testflow._data);
-
-      const recentEnvironments = await recentEnvironment();
-    } catch (error) {
-      console.error("Error fetching recent workspaces:", error);
-    }
-  });
 </script>
 
 <div class="recent-items-container">
   {#if selectedType == "" && searchQuery === ""}
     <div class="recent-section">
-      {#if filteredRequest.length > 0}
+      {#if filteredRequest?.length > 0}
         <div class="section-header">
           <span class="section-title">Recent Requests</span>
           <div class="keyboard-shortcut">
@@ -532,7 +457,7 @@
       <NoResults {searchQuery} />
     {/if}
   {:else if selectedType.toLowerCase() == "workspaces"}
-    {#if filteredWorkspaces.length > 0}
+    {#if filteredWorkspaces?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Workspaces</span>
         <div class="keyboard-shortcut">
@@ -567,7 +492,7 @@
 
     <!-- Content for workspaces -->
   {:else if selectedType.toLowerCase() == "folders"}
-    {#if filteredFolder.length > 0}
+    {#if filteredFolder?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Folders</span>
         <div class="keyboard-shortcut">
@@ -605,7 +530,7 @@
 
     <!-- Content for folders -->
   {:else if selectedType.toLowerCase() == "collections"}
-    {#if filteredCollection.length > 0}
+    {#if filteredCollection?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Collection</span>
         <div class="keyboard-shortcut">
@@ -640,7 +565,7 @@
       <NoResults {searchQuery} />
     {/if}
   {:else if selectedType.toLowerCase() == "requests"}
-    {#if filteredRequest.length > 0}
+    {#if filteredRequest?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Requests</span>
         <div class="keyboard-shortcut">
@@ -686,7 +611,7 @@
       <NoResults {searchQuery} />
     {/if}
   {:else if selectedType.toLowerCase() == "environments"}
-    {#if filteredEnvironments.length > 0}
+    {#if filteredEnvironments?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Environment</span>
         <div class="keyboard-shortcut">
@@ -716,7 +641,7 @@
       <NoResults {searchQuery} />
     {/if}
   {:else if selectedType.toLowerCase() == "flows"}
-    {#if filteredTestflows.length > 0}
+    {#if filteredTestflows?.length > 0}
       <div class="section-header">
         <span class="section-title">Test Flows</span>
         <div class="keyboard-shortcut">
