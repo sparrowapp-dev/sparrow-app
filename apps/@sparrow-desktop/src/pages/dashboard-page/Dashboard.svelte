@@ -35,7 +35,6 @@
   import { OSDetector } from "@sparrow/common/utils";
 
   import { fade } from "svelte/transition";
-  import { TeamsViewModel } from "../teams-page/Teams.ViewModel";
   import { isGuestUserActive } from "@app/store/auth.store";
   import {
     type SidebarItemBaseInterface,
@@ -154,9 +153,6 @@
       else return false;
     }
   };
-
-  $: console.log("hide global search", hideGlobalSearch);
-  $: console.log("open state", isGlobalSearchOpen);
 
   const handleGlobalKeyPress = (event, setGlobalSearch, setSelectedType) => {
     if (

@@ -3,12 +3,14 @@
   export let placeholder = "Search Sparrow...";
   export let onClick = () => {};
   import { SearchIcon } from "@sparrow/library/assets";
+  let isHovered=false;
+  var color=isHovered?"#D8D8D9": "#82858a";
 </script>
 
-<div class="container" on:click={onClick}>
+<div class="container" on:click={onClick} on:mouseenter={()=>isHovered=true} on:mouseleave={()=>isHovered=false}>
   <div class="first">
     <div class="image-container">
-      <SearchIcon color="#82858A" class="image-container-img" />
+      <SearchIcon color=var(--white-color) class="image-container-img" />
     </div>
 
     <input type="text" class="input" {placeholder} bind:value={searchQuery} />
@@ -40,6 +42,7 @@
   .container:hover {
     border: 1px solid var(--border-ds-neutral-200);
     background-color: var(--bg-ds-surface-500);
+    
   }
   .input {
     border: none;

@@ -446,10 +446,6 @@ export class DashboardViewModel {
     return await this.workspaceRepository.readWorkspace(id);
   }
 
-  public getTabByID = async (id: string) => {
-    return await this.tabRepository.getTabById(id);
-  }
-
   public switchAndCreateRequestTab = async (
     workspaceId: string,
     collectionId: string,
