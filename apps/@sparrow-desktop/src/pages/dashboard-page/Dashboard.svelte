@@ -144,72 +144,73 @@
   };
   let teamDocuments: Observable<TeamDocument[]>;
 
-  const decidingKey=(event)=>{
- const os= new OSDetector();
-    if(os.getOS()=="macos"){
-      if(event.metaKey)return true;
+  const decidingKey = (event) => {
+    const os = new OSDetector();
+    if (os.getOS() == "macos") {
+      if (event.metaKey) return true;
+      else return false;
+    } else {
+      if (event.ctrlKey) return true;
       else return false;
     }
-    else{
-       if(event.ctrlKey)return true;
-      else return false;
-    }
-  }
+  };
 
   $: console.log("hide global search", hideGlobalSearch);
   $: console.log("open state", isGlobalSearchOpen);
 
-const handleGlobalKeyPress = (event, setGlobalSearch, setSelectedType) => {
-  if (decidingKey(event) && event.key.toLowerCase() === 'f' && !event.shiftKey) {
-    event.preventDefault();
-    setGlobalSearch(true);
-  } 
-  else if (decidingKey(event) && event.shiftKey) {  
-    switch (event.key.toLowerCase()) {
-      case 'w':
-        event.preventDefault();
-        setGlobalSearch(true);
-        setSelectedType('workspaces');
-        break;
-      case 'a':
-        event.preventDefault();
-        setGlobalSearch(true);
-        setSelectedType('requests');
-        break;
-      case 'c':
-        event.preventDefault();
-        setGlobalSearch(true);
-        setSelectedType('collections');
-        break;
-      case 'e':
-        event.preventDefault();
-        setGlobalSearch(true);
-        setSelectedType('environments');
-        break;
-      case 'f':
-        event.preventDefault();
-        setGlobalSearch(true);
-        setSelectedType('folders');
-        break;
-      default:
-        break;
+  const handleGlobalKeyPress = (event, setGlobalSearch, setSelectedType) => {
+    if (
+      decidingKey(event) &&
+      event.key.toLowerCase() === "f" &&
+      !event.shiftKey
+    ) {
+      event.preventDefault();
+      setGlobalSearch(true);
+    } else if (decidingKey(event) && event.shiftKey) {
+      switch (event.key.toLowerCase()) {
+        case "w":
+          event.preventDefault();
+          setGlobalSearch(true);
+          setSelectedType("workspaces");
+          break;
+        case "a":
+          event.preventDefault();
+          setGlobalSearch(true);
+          setSelectedType("requests");
+          break;
+        case "c":
+          event.preventDefault();
+          setGlobalSearch(true);
+          setSelectedType("collections");
+          break;
+        case "e":
+          event.preventDefault();
+          setGlobalSearch(true);
+          setSelectedType("environments");
+          break;
+        case "f":
+          event.preventDefault();
+          setGlobalSearch(true);
+          setSelectedType("folders");
+          break;
+        default:
+          break;
+      }
     }
-  }
-};
+  };
 
- const setGlobalSearch=(value) =>{
+  const setGlobalSearch = (value) => {
     isGlobalSearchOpen = value;
-  }
+  };
 
-const setSelectedType =(value)=> {
+  const setSelectedType = (value) => {
     selectedType = value;
-  }
-
+  };
 
   onMount(async () => {
-     window.addEventListener("keydown", (event)=>{
-      handleGlobalKeyPress(event,setGlobalSearch,setSelectedType )
-  });
+    window.addEventListener("keydown", (event) => {
+      handleGlobalKeyPress(event, setGlobalSearch, setSelectedType);
+    });
     _viewModel.getAllFeatures();
     const guestUser = await _viewModel.getGuestUser();
     isGuestUser = guestUser?.isGuestUser;
@@ -248,7 +249,7 @@ const setSelectedType =(value)=> {
 
   const closeGlobalSearch = () => {
     isGlobalSearchOpen = false;
-    selectedType="";
+    selectedType = "";
   };
 
   onMount(async () => {
@@ -379,7 +380,6 @@ const setSelectedType =(value)=> {
           workspaceData.name,
           "Collection",
           workspaceId,
-
         );
         return;
       }
@@ -435,11 +435,12 @@ const setSelectedType =(value)=> {
         // handleSwitchWorkspaceModal(workspaceData.name, "Folder", workspace._id);
 
         // Create new tab for the workspace
-        _viewModel.switchAndCreateWorkspaceTab(workspace);
+        await _viewModel.activateWorkspace(workspace._id);
         closeGlobalSearch();
         handlehideGlobalSearch(false);
       }
 
+      _viewModel.switchAndCreateWorkspaceTab(workspace);
       // Additional workspace opening logic here if needed
       closeGlobalSearch();
       handlehideGlobalSearch(false);
@@ -680,7 +681,7 @@ const setSelectedType =(value)=> {
     workspaceName={switchWorkspaceName}
     requestName={switchRequestName}
     handleSwitch={handleWorkspaceSwitch}
-    { handlehideGlobalSearch}
+    {handlehideGlobalSearch}
   />
 </Modal>
 

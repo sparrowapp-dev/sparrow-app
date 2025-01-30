@@ -579,7 +579,6 @@ export class DashboardViewModel {
       initWorkspaceTab.getValue(),
       workspace._id,
     );
-    await this.workspaceRepository.setActiveWorkspace(workspace._id);
     moveNavigation("right");
   }
 
