@@ -9,7 +9,7 @@ export { default as RequestIcon } from "./arrowSwap.svelte";
 export { default as CollectionIcon } from "./collectionStack.svelte";
 export { default as crossIcon } from "./crossIcon.svg";
 export { default as deleteIcon } from "./Delete.svg";
-export { default as EnvironmentIcon } from "./EnvLayer.svelte";
+export { default as EnvironmentIcon } from "./envLayer.svelte";
 export { default as FlowIcon } from "./flowIcon.svelte";
 export { default as FolderIcon } from "./folderIcon.svelte";
 export { default as getIcon } from "./Get.svg";
