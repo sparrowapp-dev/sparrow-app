@@ -331,6 +331,7 @@
     isSwitchWorkspaceModalOpen = false;
     isGlobalSearchOpen = false;
     isDestroyOnGlobalSearch = false;
+    navigate("/app/collections");
   };
 
   const handleGlobalSearchRequestNavigation = async (
@@ -354,6 +355,9 @@
         folderId,
         tree,
       );
+      if(isActiveWorkspace) { 
+        navigate("/app/collections");
+      }
 
       closeGlobalSearch();
       handlehideGlobalSearch(false);
@@ -381,6 +385,9 @@
         );
       }
       await _viewModel.switchAndCreateCollectionTab(workspaceId, collection);
+      if(isActiveWorkspace) { 
+        navigate("/app/collections");
+      }
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
@@ -409,6 +416,9 @@
         collectionId,
         folder,
       );
+      if(isActiveWorkspace) { 
+        navigate("/app/collections");
+      }
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
@@ -432,6 +442,7 @@
       }
 
       _viewModel.switchAndCreateWorkspaceTab(workspace);
+      navigate("/app/collections");
       // Additional workspace opening logic here if needed
       closeGlobalSearch();
       handlehideGlobalSearch(false);
@@ -461,6 +472,9 @@
         );
       }
       await _viewModel.switchAndCreateEnvironmentTab(environment);
+      if(isActiveWorkspace) { 
+        navigate("/app/collections");
+      }
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
@@ -489,6 +503,9 @@
         );
       }
       await _viewModel.switchAndCreateTestflowTab(testflow);
+      if(isActiveWorkspace) { 
+        navigate("/app/collections");
+      }
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {

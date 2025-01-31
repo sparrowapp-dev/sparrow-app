@@ -386,11 +386,13 @@
       </div>
     {/if}
 
-    <SearchBar
-      placeholder="Search Sparrow..."
-      bind:searchQuery
-      onClick={handleSearchClick}
-    />
+    {#if !isGuestUser}
+      <SearchBar
+        placeholder="Search Sparrow"
+        bind:searchQuery
+        onClick={handleSearchClick}
+      />
+    {/if}
 
     <!-- Multiple Agent Dropdown -->
     {#if isWebApp}
