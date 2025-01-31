@@ -1,7 +1,7 @@
 <script lang="ts">
   import search from "../../assets/search.svg";
   import crossIcon from "../../assets/crossicon.svg";
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
 
   // export let type: "text" | "password" | "search" = "text";
   /**
@@ -31,6 +31,7 @@
   }
 
   let imgStyleProp = "";
+  let enterPressed = false;
 
   switch (size) {
     case "medium":
@@ -56,29 +57,38 @@
 
   export let value = "";
 
-  /**
-   * Unique id for input
-   */
-
-  /**
-   * input states
-
-  const dispatch = createEventDispatcher();
-
-  /**
-   * blur input on Enter key press
-   * @param event - keyboard event
-   */
+  $: {
+    if (value.length <= 0) {
+      enterPressed = false;
+    }
+  }
   const onKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(id) as HTMLInputElement;
       inputField.blur();
     }
+    if (event.key === "Enter" && value.length > 0) {
+      enterPressed = true;
+    }
+    if (event.key !== "Enter" && value.length > 0) {
+      enterPressed = false;
+    }
+  };
+
+  const handleClick = () => {
+    if (value.length > 0) {
+      enterPressed = true;
+    }
   };
 
   function clearSearch() {
     value = ""; // Clear function call
+    enterPressed = false;
   }
+
+  onMount(() => {
+    window.addEventListener("click", handleClick);
+  });
 </script>
 
 <div class="input-wrapper" style={`${searchClassProp}`}>
@@ -89,7 +99,7 @@
     <input
       {id}
       type="text"
-      class={`${searchClassProp} ${value ? "has-text" : ""}`}
+      class={`${searchClassProp} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}`}
       style={` ${searchStyleProp} ${searchTextProp} outline:none; ::placeholder { color: var(--text-ds-neutral-300);};`}
       {value}
       placeholder={placeholderValue}
@@ -148,64 +158,69 @@
     padding-left: 30px;
     padding-right: 30px;
   }
-
+  // intial surface 700
   .custom-surface700 {
     background-color: var(--bg-ds-surface-400);
-    border: none; /* No border initially */
+    border: none;
     caret-color: var(--border-ds-primary-300);
+    // caret-shape: li;
   }
-
-  /* Focus state (initially 2px border) */
+  // when focused without text
   .custom-surface700:focus {
     background-color: var(--bg-ds-surface-300);
     outline: none;
     border: 2px solid var(--border-ds-primary-300);
   }
-
-  /* While typing (border becomes 1px) */
-  .custom-surface700.has-text:focus {
+  // during typing
+  .custom-surface700.has-text {
     border: 1px solid var(--border-ds-primary-300);
   }
-
-  /* When not focused and input is entered, remove border */
+  // when it have text but not foucsed
   .custom-surface700.has-text:not(:focus) {
     border: none;
   }
-  /* When  focused and input is entered, border 2px  */
-  .custom-surface700.has-text:focus {
+  // when it have text  and focused
+  .custom-surface700.entered:focus {
     border: 2px solid var(--border-ds-primary-300);
   }
-
-  /* When not focused but hovered, show gray border */
+  // when it have text and not focused
   .custom-surface700:not(:focus):hover {
     border: 1px solid var(--border-ds-neutral-300);
   }
 
   .custom-surface900 {
-    background-color: var(--bg-ds-surface-400);
-    border: none; /* No border initially */
+    background-color: var(--bg-ds-surface-600);
+    border: none;
     caret-color: var(--border-ds-primary-300);
   }
-
-  /* Focus state (initially 2px border) */
   .custom-surface900:focus {
     background-color: var(--bg-ds-surface-300);
     outline: none;
     border: 2px solid var(--border-ds-primary-300);
   }
 
-  /* While typing (border becomes 1px) */
-  .custom-surface900:focus:not(:placeholder-shown) {
+  .custom-surface900.has-text {
+    background-color: var(--bg-ds-surface-600);
     border: 1px solid var(--border-ds-primary-300);
   }
 
-  /* When not focused and input is entered, remove border */
-  .custom-surface900:not(:focus):not(:placeholder-shown) {
+  .custom-surface900.has-text:not(:focus) {
     border: none;
   }
-
-  /* When not focused but hovered, show gray border */
-  .custom-surface900:not(:focus):not(:placeholder-shown):hover {
+  .custom-surface900.entered {
+    background-color: var(--bg-ds-surface-600);
+    border: none;
+  }
+  .custom-surface900.entered:focus {
+    background-color: var(--bg-ds-surface-600);
+    border: 2px solid var(--border-ds-primary-300);
+  }
+  .custom-surface900.entered:hover {
+    background-color: var(--bg-ds-surface-500);
+    border: 1px solid var(--border-ds-neutral-300);
+  }
+  .custom-surface900:not(:focus):hover {
+    background-color: var(--bg-ds-surface-500);
     border: 1px solid var(--border-ds-neutral-300);
   }
 </style>
