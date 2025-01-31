@@ -55,6 +55,9 @@
   .suggestion-tag.selected {
     border: 1px solid var(--border-ds-primary-300);
     background-color: var(--bg-ds-surface-100);
+    --text-color:var(--white-color);
+    --icon-color:var(--white-color);
+    color:var(--white-color);
   }
 
   .suggestion-tag {
@@ -88,8 +91,12 @@
   }
 
   .tag-label {
-    color: var(--text-ds-neutral-300);
+    color: var(--text-ds-neutral-200);
     font: 500 12px Inter, sans-serif;
+    
+  }
+  .suggestion-tag.selected .tag-label {
+    color: var(--white-color);
   }
 
   .suggestion-tag:hover .tag-label {
