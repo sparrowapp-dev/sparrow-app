@@ -1,14 +1,9 @@
 <script lang="ts">
-  import search from "../../assets/search.svg";
+  import searchIcon from "../../assets/searchIcon.svg";
   import crossIcon from "../../assets/crossicon.svg";
   import { createEventDispatcher, onMount } from "svelte";
 
-  // export let type: "text" | "password" | "search" = "text";
-  /**
-   * placeholder - dummy text
-   */
-  export let placeholderValue = "placeholder";
-  export let placeholderColor = "gray";
+  export let placeholderValue = "Search";
 
   export let id = "";
   export let type: "surface700" | "surface900" | "other" = "other";
@@ -16,6 +11,8 @@
   export let searchStyleProp = "";
   export let searchTextProp = "";
   let searchClassProp = "";
+  export let customWidth = 200;
+
   const dispatch = createEventDispatcher();
 
   switch (type) {
@@ -37,21 +34,18 @@
     case "medium":
       imgStyleProp = "height:20px; width:20px";
       searchTextProp = "font-weight: 400; font-size: 12px; line-height: 18px;";
-      searchStyleProp =
-        "width: 220px; height: 28px; min-height: 28px; max-height: 28px; min-width: 198px; max-width: 320px; gap: 8px;   border-radius: 4px;";
+      searchStyleProp = `width: ${customWidth > 0 ? `${customWidth}px` : "auto"}; height: 28px; min-height: 28px; max-height: 28px; min-width: 198px; max-width: 320px; gap: 8px;   border-radius: 4px; `;
       break;
     case "large":
       imgStyleProp = "height:20px; width:20px";
       searchTextProp =
-        "font-weight: 400; font-size: 14px; line-height: 20.02px;";
-      searchStyleProp =
-        "width: 340px; height: 36px; min-height: 36px; max-height: 36px; padding: 2px 8px; border: 1px solid; border-radius: 6px;";
+        "font-weight: 400; font-size: 14px; line-height: 20.02px; ";
+      searchStyleProp = `width: ${customWidth > 0 ? `${customWidth}px` : "auto"}; height: 36px; min-height: 36px; max-height: 36px;   border-radius: 6px; `;
       break;
     default:
       imgStyleProp = "height:20px; width:20px";
       searchTextProp = "font-weight: 400; font-size: 12px; line-height: 18px;";
-      searchStyleProp =
-        "width: 220px; height: 28px; min-height: 28px; max-height: 28px; min-width: 198px; max-width: 320px; gap: 8px;   border-radius: 4px;";
+      searchStyleProp = `width: ${customWidth > 0 ? `${customWidth}px` : "auto"}; height: 28px; min-height: 28px; max-height: 28px; min-width: 198px; max-width: 320px; gap: 8px;   border-radius: 4px;`;
       break;
   }
 
@@ -94,7 +88,7 @@
 <div class="input-wrapper" style={`${searchClassProp}`}>
   <div class="icon-search">
     <div class="search-icon" style={`${imgStyleProp}`}>
-      <img src={search} />
+      <img src={searchIcon} />
     </div>
     <input
       {id}
@@ -109,12 +103,12 @@
       }}
       on:keydown={onKeyPress}
     />
+    {#if value !== ""}
+      <div class="crossIcon" on:click={clearSearch}>
+        <img src={crossIcon} />
+      </div>
+    {/if}
   </div>
-  {#if value !== ""}
-    <div class="crossIcon" on:click={clearSearch}>
-      <img src={crossIcon} />
-    </div>
-  {/if}
 </div>
 
 <style lang="scss">
@@ -123,7 +117,9 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
+    width: 100%;
+    margin-right: 4px;
   }
 
   .icon-search {
@@ -131,6 +127,8 @@
     align-items: center;
     flex-direction: row;
     justify-content: flex-start;
+    width: 100%;
+    position: relative;
   }
 
   .search-icon {
@@ -138,26 +136,29 @@
     height: 20px;
     width: 20px;
     left: 10px;
-    padding-right: 30px;
     pointer-events: none;
     display: flex;
     align-items: center;
   }
+
   .crossIcon {
     position: absolute;
     height: 20px;
     width: 20px;
-    right: 0px;
-    // pointer-events: none;
+    right: 10px;
     display: flex;
     align-items: center;
     cursor: pointer;
   }
 
   input {
+    width: 100%;
     padding-left: 30px;
     padding-right: 30px;
+    min-width: 0;
+    flex: 1;
   }
+
   // intial surface 700
   .custom-surface700 {
     background-color: var(--bg-ds-surface-400);

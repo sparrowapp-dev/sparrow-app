@@ -484,6 +484,7 @@
       <Search
         id="collection-list-search"
         type="surface700"
+        size="medium"
         bind:value={searchData}
         on:input={() => {
           handleSearch();
