@@ -11,7 +11,7 @@
 <div class="search-bar">
   <div class="search-input-wrapper">
     <div class="icon-wrapper">
-      <img src={SearchIcon} alt="" class="search-icon" />
+      <SearchIcon color="var(--search-icon-color)"/>
     </div>
     <div class="input-wrapper">
       <label for="searchInput" class="visually-hidden">Search</label>
@@ -42,14 +42,17 @@
     border-radius: 2px 2px 0 0;
     background-color: var(--bg-ds-surface-700);
     display: flex;
-
     width: 100%;
     align-items: center;
     justify-content: space-between;
     padding: 10px 8px;
     border: 1px solid var(--bg-ds-surface-100);
+    --search-icon-color:var(--text-ds-neutral-300)
   }
 
+  .search-bar:hover{
+     --search-icon-color:var(--text-ds-neutral-200);
+  }
   .search-input-wrapper {
     display: flex;
     gap: 8px;
@@ -81,13 +84,17 @@
   .search-input {
     background: transparent;
     border: none;
-    color: var(--bg-ds-neutral-500);
+    color: var(--text-ds-neutral-200);
     font:
       400 14px/1 Inter,
       sans-serif;
     outline: none;
     width: 100%;
     caret-color: var(--text-ds-primary-300);
+
+  }
+  .search-input::placeholder{
+    color:var(--text-ds-neutral-500);
   }
 
   .shortcut-icon {

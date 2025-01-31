@@ -2,6 +2,7 @@
   import type { SearchSuggestion } from "./types/types";
   export let suggestions: SearchSuggestion[];
   export let selectedType = "";
+  
 
   const handleTagClick = (label: string) => {
     const normalizedSelected = selectedType.toLowerCase();
@@ -55,6 +56,12 @@
   .suggestion-tag.selected {
     border: 1px solid var(--border-ds-primary-300);
     background-color: var(--bg-ds-surface-100);
+    --text-color:var(--white-color);
+    --icon-color:var(--white-color);
+
+  }
+  .suggestion-tag.selected{
+    color:var(--white-color);
   }
 
   .suggestion-tag {
@@ -88,11 +95,16 @@
   }
 
   .tag-label {
-    color: var(--text-ds-neutral-300);
+    color: var(--icon-color) , var(--text-ds-neutral-300);
     font: 500 12px Inter, sans-serif;
   }
 
+
   .suggestion-tag:hover .tag-label {
+    color: var(--white-color);
+  }
+
+   .suggestion-tag:selected .tag-label {
     color: var(--white-color);
   }
 
