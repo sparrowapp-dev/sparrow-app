@@ -3,12 +3,26 @@
   export let placeholder = "Search Sparrow...";
   export let onClick = () => {};
   import { SearchIcon } from "@sparrow/library/assets";
+  import { OSDetector } from "../../utils";
+  import { onMount } from "svelte";
+  let keyName="Ctrl";
+
+  const decidingKey = () => {
+    const os = new OSDetector();
+    if (os.getOS() == "macos") {
+       keyName = "Cmd";
+    }
+  };
+  onMount(()=>{
+    decidingKey();
+  })
+
 </script>
 
 <div class="container" on:click={onClick}>
   <div class="first">
     <div class="image-container">
-      <SearchIcon color="#82858A" class="image-container-img" />
+      <SearchIcon color=var(--icon-ds-neutral-400) class="image-container-img" />
     </div>
 
     <input
@@ -20,7 +34,7 @@
     />
   </div>
   <div class="keys">
-    <span class="key">Ctrl</span>
+    <span class="key">{keyName}</span>
     <span class="key">F</span>
   </div>
 </div>
@@ -50,7 +64,7 @@
   .input {
     border: none;
     outline: none;
-    color: #82858a;
+    color: var(--text-ds-neutral-400);
     font:
       400 12px Inter,
       sans-serif;
@@ -59,15 +73,15 @@
     width: 90px;
     height: 16px;
   }
-  /* .input:hover{
-    color:#D8D8D9;
-  } */
+  .input::placeholder {
+    color: var(--text-ds-neutral-400);
+  }
 
   .image-container-img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    color: #82858a;
+    color: var(--text-ds-neutral-400);;
   }
   .image-container {
     position: relative;
@@ -77,7 +91,7 @@
     width: 16px;
     height: 16px;
     padding: 2px;
-    color: #82858a;
+    color: var(--text-ds-neutral-400);
   }
 
   .keys {
@@ -87,7 +101,7 @@
   .key {
     border-radius: 4px;
     background-color: #181c26;
-    color: var(--Neutral-200, #b6b7b9);
+    color: var(--text-ds-neutral-200);
     padding: 2px 4px;
     font:
       400 12px Inter,
