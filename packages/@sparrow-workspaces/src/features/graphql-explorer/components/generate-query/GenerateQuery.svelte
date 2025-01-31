@@ -20,6 +20,7 @@
     id: string;
     isExpanded: boolean;
     isSelected: boolean;
+    isInputField: boolean;
     parentNodeId: string;
     parentNodeName: string;
     itemType: string;
@@ -30,6 +31,7 @@
     value: string;
     items?: QueryBuilder[];
     id: string;
+    isInputField: boolean;
     isExpanded: boolean;
     isSelected: boolean;
     parentNodeId: string;
@@ -174,6 +176,7 @@
           value,
           isExpanded,
           isSelected,
+          isInputField,
           parentNodeId,
           parentNodeName,
           items,
@@ -186,6 +189,7 @@
           value: value,
           isExpanded: isExpanded,
           isSelected: isSelected,
+          isInputField: isInputField,
           parentNodeId: parentNodeId,
           parentNodeName: parentNodeName,
           isLeafNode: items?.length ? false : true,
@@ -712,7 +716,7 @@
                       <span class="ellipsis">
                         {t.name}
                       </span>
-                      {#if t.isLeafNode && t.itemType === "inputField"}
+                      {#if t.isLeafNode && t.isInputField}
                         <span class="ms-3 text-fs-8 text-primary-300">
                           ARG
                         </span>
@@ -731,7 +735,7 @@
                     </span>
                   {/if}
                 </div>
-                {#if t.isLeafNode && t.itemType === "inputField" && t.isSelected}
+                {#if t.isLeafNode && t.isInputField && t.isSelected}
                   <div class="input-parent ps-4 pe-3 mb-2 position-relative">
                     <input
                       type="text"
