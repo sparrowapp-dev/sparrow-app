@@ -64,6 +64,7 @@
 
 <CollectionExplorer
   {userRole}
+  isWebApp={false}
   bind:tab
   bind:collection
   onUpdateDescription={_viewModel.handleUpdateDescription}

@@ -62,6 +62,7 @@
 </script>
 
 <FolderExplorer
+  isWebApp={false}
   bind:userRole
   bind:tab
   bind:folder

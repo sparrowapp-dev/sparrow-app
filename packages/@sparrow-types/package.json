@@ -1,14 +1,14 @@
 {
   "name": "@sparrow/types",
-  "version": "2.16.0",
+  "version": "2.17.0",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest",
-    "lint": "prettier --check . && eslint .",
-    "format": "prettier --write ."
+    "lint": "eslint . --fix",
+    "pretty": "prettier --write ."
   },
   "private": true,
   "main": "src/main.ts",
@@ -45,5 +45,11 @@
     "svelte-toasts": "^1.1.2",
     "uuid": "^9.0.1",
     "yup": "^1.2.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,svelte,css,json}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }

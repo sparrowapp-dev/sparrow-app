@@ -11,25 +11,16 @@
   } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   import { marked } from "marked";
-  import constants from "@app/constants/constants";
   import { Loader, Tooltip } from "@sparrow/library/ui";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import { notifications } from "@sparrow/library/ui";
-  import { open } from "@tauri-apps/plugin-shell";
   import { UpdatesTagType } from "../../../types/feedback";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   export let listChangeLog;
 
-  /**
-   * External URL for Sparrow's GitHub page.
-   */
-  const externalSparrowRealseNote = constants.SPARROW_GITHUB;
-
-  /**
-   * External URL for Sparrow's LinkedIn page.
-   */
-  const externalSparrowLinkedin = constants.SPARROW_LINKEDIN;
+  export let onReleaseNoteRedirect;
+  export let onLinkedInRedirect;
 
   /**
    * Type of events to filter.
@@ -302,7 +293,7 @@
                       </h3>
                       <Tooltip
                         title={"Copy link"}
-                        placement={"right"}
+                        placement={"right-center"}
                         distance={10}
                         show={true}
                         zIndex={701}
@@ -361,11 +352,7 @@
                         style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
                         class="mb-0"
                         on:click={async () => {
-                          const version =
-                            event.title.match(/v\d+\.\d+\.\d+/)[0];
-                          const releaseNoteUrl = `${externalSparrowRealseNote}/sparrow-app/releases/tag/${version}`;
-                          await open(releaseNoteUrl);
-                          MixpanelEvent(Events.Github_Updates);
+                          onReleaseNoteRedirect(event?.title);
                         }}
                       >
                         Github
@@ -379,10 +366,7 @@
                         <div
                           style="cursor:pointer;"
                           class="ps-2"
-                          on:click={async () => {
-                            await open(externalSparrowLinkedin);
-                            MixpanelEvent(Events.LinkedIn_Updates_Icon);
-                          }}
+                          on:click={onLinkedInRedirect}
                         >
                           <LinkedinIcon
                             height={"18px"}
@@ -441,7 +425,7 @@
                 </p>
                 <Tooltip
                   title={"Copy link"}
-                  placement={"right"}
+                  placement={"right-center"}
                   distance={10}
                   show={true}
                   zIndex={701}
@@ -481,12 +465,8 @@
                 <p
                   style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
                   class="mb-0"
-                  on:click={async () => {
-                    const version =
-                      selectedEvent.title.match(/v\d+\.\d+\.\d+/)[0];
-                    const releaseNoteUrl = `${externalSparrowRealseNote}/sparrow-app/releases/tag/${version}`;
-                    await open(releaseNoteUrl);
-                    MixpanelEvent(Events.Github_Updates);
+                  on:click={() => {
+                    onReleaseNoteRedirect(selectedEvent?.title);
                   }}
                 >
                   Github
@@ -499,10 +479,7 @@
                   <div
                     style="cursor:pointer;"
                     class="ps-2"
-                    on:click={async () => {
-                      await open(externalSparrowLinkedin);
-                      MixpanelEvent(Events.LinkedIn_Updates_Icon);
-                    }}
+                    on:click={onLinkedInRedirect}
                   >
                     <LinkedinIcon
                       height={"18px"}

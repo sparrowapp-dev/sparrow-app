@@ -346,17 +346,39 @@ class CollectionExplorerPage {
     ).getFullYear()}`;
     let totalRequests = 0;
     let totalFolders = 0;
+    let totalWebSocket = 0;
+    let totalSocketIo =0 ;
+    let totalGraphQl =0;
+
     if (collection?.items) {
       collection?.items.forEach((collectionItem: CollectionItemsDto) => {
         if (collectionItem.type === ItemType.REQUEST) {
           totalRequests++;
-        } else if (collectionItem.type === ItemType.FOLDER) {
+        }
+        else if(collectionItem.type === ItemType.WEB_SOCKET) {
+            totalWebSocket++;
+         }
+        else if(collectionItem.type === ItemType.SOCKET_IO){
+            totalSocketIo++;
+        } 
+        else if(collectionItem.type === ItemType.GRAPHQL){
+          totalGraphQl++;
+        }
+          else if (collectionItem.type === ItemType.FOLDER) {
           totalFolders++;
           if (collectionItem?.items)
             collectionItem.items.forEach((item: CollectionItemsDto) => {
               if (item.type === ItemType.REQUEST) {
                 totalRequests++;
               }
+              else if(item.type === ItemType.WEB_SOCKET){
+                totalWebSocket++;
+              }
+              else if(item.type === ItemType.SOCKET_IO){
+                totalSocketIo++;
+              }else if(item.type === ItemType.GRAPHQL){
+                totalGraphQl++;
+              }      
             });
         }
       });
@@ -387,8 +409,11 @@ class CollectionExplorerPage {
     // }
     return {
       isSynced,
-      totalFolders,
       totalRequests,
+      totalSocketIo,
+      totalWebSocket,
+      totalGraphQl,
+      totalFolders,
       lastUpdated,
     };
   };

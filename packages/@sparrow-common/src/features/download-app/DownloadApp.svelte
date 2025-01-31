@@ -1,24 +1,25 @@
 <script>
   import DownloadIconWeb from "./icons/DownloadIconWeb.svg";
   import { Button } from "@sparrow/library/ui";
-  import constants from "@app/constants/constants";
   import { createEventDispatcher, onMount } from "svelte";
 
-  const externalSparrowRealseNote = constants.SPARROW_GITHUB;
-  const externalSparrowDocs = constants.DOCS_URL;
+  export let onInstallRedirect;
+  export let onGithubRedirect;
+  export let onDocsRedirect;
 
   const dispatch = createEventDispatcher();
   let visible = false;
   onMount(() => {
-      visible = true;
+    visible = true;
   });
-  function openSparrowApp() {
-    window.open("https://sparrowapp.dev", "_blank");
+
+  const openSparrowApp = () => {
+    onInstallRedirect();
     dispatch("close");
-  }
+  };
   function closePopup() {
     visible = false;
-      dispatch("close");
+    dispatch("close");
   }
 </script>
 
@@ -41,10 +42,10 @@
     </div>
     <div class="d-flex justify-content-between">
       <p class="description">
-        Need help? Visit our <a href={externalSparrowDocs} target="_blank"
-          >Documentation</a
-        > <br /> Check out our
-        <a href={externalSparrowRealseNote} target="_blank">GitHub Page</a>
+        Need help? Visit our <a on:click={onDocsRedirect}>Documentation</a>
+        <br />
+        Check out our
+        <a on:click={onGithubRedirect}>GitHub Page</a>
       </p>
       <Button
         title="Install Sparrow Desktop"
