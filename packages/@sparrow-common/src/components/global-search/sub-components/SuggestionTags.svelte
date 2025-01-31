@@ -55,9 +55,9 @@
   .suggestion-tag.selected {
     border: 1px solid var(--border-ds-primary-300);
     background-color: var(--bg-ds-surface-100);
-    --text-color:var(--white-color);
-    --icon-color:var(--white-color);
-    color:var(--white-color);
+    --text-color:var(--text-ds-neutral-50);
+    --icon-color:var(--icon-ds-neutral-50);
+    color:var(--icon-ds-neutral-50);
   }
 
   .suggestion-tag {
@@ -96,7 +96,7 @@
     
   }
   .suggestion-tag.selected .tag-label {
-    color: var(--white-color);
+    color: var(--icon-ds-neutral-50);
   }
 
   .suggestion-tag:hover .tag-label {
