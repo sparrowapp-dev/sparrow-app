@@ -18,7 +18,7 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import Teams from "../Teams/Teams.svelte";
-  import { Modal } from "@sparrow/library/ui";
+  import { Modal, notifications } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";
   import { CreateTeam } from "@sparrow/common/features";
   import CollectionsPage from "../workspace-page/CollectionsPage.svelte";
@@ -272,6 +272,7 @@
     isSwitchWorkspaceModalOpen = false;
     isGlobalSearchOpen = false;
     isDestroyOnGlobalSearch = false;
+    navigate("/app/collections");
   };
   const handleGlobalSearchRequestNavigation = async (
     apiId: string,
@@ -294,6 +295,10 @@
         folderId,
         tree,
       );
+      if (isActiveWorkspace) {
+        navigate("/app/collections");
+      }
+
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
@@ -318,6 +323,9 @@
         );
       }
       await _viewModel.switchAndCreateCollectionTab(workspaceId, collection);
+      if (isActiveWorkspace) {
+        navigate("/app/collections");
+      }
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
@@ -345,6 +353,9 @@
         collectionId,
         folder,
       );
+      if (isActiveWorkspace) {
+        navigate("/app/collections");
+      }
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
@@ -365,6 +376,7 @@
         handlehideGlobalSearch(false);
       }
       _viewModel.switchAndCreateWorkspaceTab(workspace);
+      navigate("/app/collections");
       // Additional workspace opening logic here if needed
       closeGlobalSearch();
       handlehideGlobalSearch(false);
@@ -392,6 +404,9 @@
         );
       }
       await _viewModel.switchAndCreateEnvironmentTab(environment);
+      if (isActiveWorkspace) {
+        navigate("/app/collections");
+      }
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
@@ -418,6 +433,9 @@
         );
       }
       await _viewModel.switchAndCreateTestflowTab(testflow);
+      if (isActiveWorkspace) {
+        navigate("/app/collections");
+      }
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
