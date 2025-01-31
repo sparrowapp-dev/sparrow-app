@@ -424,6 +424,19 @@
       }
     });
   };
+
+  const formatVersion = (version) => {
+    try {
+      const parts = version.split(".");
+      const major = parts[0];
+      const minor = parts[1];
+      const patch = parts[2];
+
+      return patch === "0" ? `${major}.${minor}` : `${major}.${minor}.${patch}`;
+    } catch (error) {
+      return version;
+    }
+  };
 </script>
 
 {#if leftPanelController.leftPanelCollapse}
@@ -721,7 +734,9 @@
         <!--Disabling the version feature switch as it was just for testing purpose, can be used for implementation example-->
         <!-- {#if isAppVersionVisible} -->
         {#if !isWebApp}
-          <span class="text-fs-14 text-secondary-200 pe-2">v{appVersion}</span>
+          <span class="text-fs-14 text-secondary-200 pe-2"
+            >v{formatVersion(appVersion)}</span
+          >
         {/if}
 
         <!-- {/if} -->
