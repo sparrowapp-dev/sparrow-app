@@ -80,7 +80,7 @@
 <div class="recent-items-container">
   {#if selectedType == "" && searchQuery === ""}
     <div class="recent-section">
-      {#if filteredRequest?.length > 0}
+      {#if searchQuery == "" && filteredRequest?.length > 0}
         <div class="section-header">
           <span class="section-title">Recent Requests</span>
           <div class="keyboard-shortcut">
@@ -125,8 +125,8 @@
             {/if}
           {/each}
         </div>
-      {:else}
-        <NoResults {searchQuery} />
+        <!-- {:else}
+        <NoResults {searchQuery} /> -->
       {/if}
     </div>
 
@@ -566,7 +566,7 @@
   {:else if selectedType.toLowerCase() == "collections"}
     {#if filteredCollection?.length > 0}
       <div class="section-header">
-        <span class="section-title">Recent Collection</span>
+        <span class="section-title">Recent Collections</span>
         <div class="keyboard-shortcut">
           <div class="shortcut-key">
             <img src={keyCommand} alt="" class="shortcut-icon" />
@@ -651,7 +651,7 @@
   {:else if selectedType.toLowerCase() == "environments"}
     {#if filteredEnvironments?.length > 0}
       <div class="section-header">
-        <span class="section-title">Recent Environment</span>
+        <span class="section-title">Recent Environments</span>
         <div class="keyboard-shortcut">
           <div class="shortcut-key">
             <img src={keyCommand} alt="" class="shortcut-icon" />
@@ -681,7 +681,7 @@
   {:else if selectedType.toLowerCase() == "flows"}
     {#if filteredTestflows?.length > 0}
       <div class="section-header">
-        <span class="section-title">Test Flows</span>
+        <span class="section-title">Recent Test Flows</span>
         <div class="keyboard-shortcut">
           <div class="shortcut-key">
             <img src={keyCommand} alt="" class="shortcut-icon" />
