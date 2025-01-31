@@ -21,7 +21,7 @@
     "desktop-build-mac-universal": "yarn workspace @sparrow/desktop tauri build --target universal-apple-darwin --debug --verbose",
     "web-start": "yarn workspace @sparrow/web dev",
     "web-build": "yarn workspace @sparrow/web build",
-    "docker:up": "docker compose up -d",
+    "docker:up": "docker-compose build --no-cache && docker compose up -d --force-recreate",
     "docker:down": "docker compose down -v",
     "docker:up:mongo": "docker compose up mongo --build -d",
     "docker:up:kafka": "docker compose up kafka --build -d",
