@@ -1,5 +1,5 @@
 <script>
-  import {searchIcon} from "@sparrow/common/images";
+  import {searchIcon} from "../images";
 
   export let searchQuery = "";
 </script>

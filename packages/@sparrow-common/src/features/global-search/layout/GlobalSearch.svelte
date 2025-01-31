@@ -1,7 +1,7 @@
 <script lang="ts">
-  import SearchBar from "./sub-components/SearchBar.svelte";
-  import SearchSuggestions from "./sub-components/SearchSuggestions.svelte";
-  import type { SearchSuggestion } from "./sub-components/types/types";
+  import SearchBar from "../components/SearchBar.svelte";
+  import SearchSuggestions from "../components/SearchSuggestions.svelte";
+  import type { SearchSuggestion } from "../types/types";
   import { onMount } from "svelte";
   import {
     FolderIcon,
@@ -10,7 +10,7 @@
     WorkspaceIcon,
     FlowIcon,
     RequestIcon,
-  } from "@sparrow/common/images";
+  } from "../images";
 
   export let closeGlobalSearch;
   export let workspaceDocuments;

@@ -1,9 +1,7 @@
 <script lang="ts">
-  let searchInput: HTMLInputElement;
   export let searchQuery = "";
-
   export let handleSearch = () => {};
-  import { keyCommand, SearchIcon } from "@sparrow/common/images";
+  import { keyCommand, SearchIcon } from "../images";
   let hideKEY = false;
   $: hideKEY = searchQuery.trim().length > 0;
 </script>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { SearchSuggestion } from "./types/types";
+  import type { SearchSuggestion } from "../types/types.js";
   import SuggestionTags from "./SuggestionTags.svelte";
   import RecentItems from "./RecentItems.svelte";
   export let suggestions: SearchSuggestion[];

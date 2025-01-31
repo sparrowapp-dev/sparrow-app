@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { SearchSuggestion } from "./types/types";
+  import type { SearchSuggestion } from "../types/types";
   export let suggestions: SearchSuggestion[];
   export let selectedType = "";
 
