@@ -45,7 +45,7 @@
     gap: 4px;
   }
   .container {
-    width: 198px;
+    width: 208px;
     height: 30px;
     border: 1px solid #31353f;
     min-height: 30px;
