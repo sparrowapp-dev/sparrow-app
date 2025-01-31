@@ -95,6 +95,10 @@
   }
   .search-input::placeholder{
     color:var(--text-ds-neutral-500);
+    font-size: 14px;
+    font-weight: 400;
+    font:Inter, sans-serif;
+    line-height: 20px;
   }
 
   .shortcut-icon {

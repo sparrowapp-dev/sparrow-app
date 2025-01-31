@@ -3,7 +3,6 @@
   export let suggestions: SearchSuggestion[];
   export let selectedType = "";
   
-
   const handleTagClick = (label: string) => {
     const normalizedSelected = selectedType.toLowerCase();
     const normalizedLabel = label.toLowerCase();
@@ -37,7 +36,7 @@
           color="var(--icon-color)"
         />
       </div>
-      <span class="tag-label">{suggestion.label}</span>
+      <span class="tag-label" >{suggestion.label}</span>
     </button>
   {/each}
 </div>
@@ -56,14 +55,9 @@
   .suggestion-tag.selected {
     border: 1px solid var(--border-ds-primary-300);
     background-color: var(--bg-ds-surface-100);
-    --text-color:var(--white-color);
     --icon-color:var(--white-color);
 
   }
-  .suggestion-tag.selected{
-    color:var(--white-color);
-  }
-
   .suggestion-tag {
     border: none;
     border-radius: 4px;
@@ -95,8 +89,12 @@
   }
 
   .tag-label {
-    color: var(--icon-color) , var(--text-ds-neutral-300);
+    color: var(--text-ds-neutral-200);
     font: 500 12px Inter, sans-serif;
+  }
+
+  .suggestion-tag.selected .tag-label {
+    color: var(--white-color);
   }
 
 
@@ -104,9 +102,6 @@
     color: var(--white-color);
   }
 
-   .suggestion-tag:selected .tag-label {
-    color: var(--white-color);
-  }
 
   @media (max-width: 991px) {
     .tags-container {
