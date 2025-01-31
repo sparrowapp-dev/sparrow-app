@@ -47,7 +47,7 @@
   .container {
     width: 208px;
     height: 30px;
-    border: 1px solid #31353f;
+    border: 1px solid var(--border-ds-surface-100);
     min-height: 30px;
     padding: 8px;
     border-radius: 4px;
