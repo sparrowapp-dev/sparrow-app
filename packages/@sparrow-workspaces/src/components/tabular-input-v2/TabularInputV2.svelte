@@ -7,7 +7,7 @@
     KeyValuePairWithBase,
   } from "@sparrow/common/interfaces/request.interface";
   import type { KeyValueChecked } from "@sparrow/common/types/workspace";
-  
+ 
 /**
    * tabular pair entries
    */
@@ -248,17 +248,23 @@
                 </div>
               </div>
               {#if pairs.length - 1 != index && !disabled}
-                <div class="h-75 pe-1">
-                  <button
-                    class="bg-secondary-700 border-0"
-                    style="width:20px;"
-                    on:click={() => {
-                      deletePairs(index);
-                    }}
-                  >
-                    <img src={trashIcon} alt="" />
-                  </button>
-                </div>
+                <Tooltip
+                  title={"Delete"}
+                  placement={"bottom-right"}
+                  distance={10}
+                >
+                  <div class="h-75 pe-1">
+                    <button
+                      class="bg-secondary-700 border-0"
+                      style="width:20px;"
+                      on:click={() => {
+                        deletePairs(index);
+                      }}
+                    >
+                      <img class="trash-icon" src={trashIcon} alt="" />
+                    </button>
+                  </div>
+                </Tooltip>
               {:else}
                 <div class="h-75 pe-1">
                   <button
@@ -381,5 +387,9 @@
 
   .placeholder-color::placeholder {
     color: var(--text-secondary-300);
+  }
+
+  .trash-icon:hover {
+    background-color: var(--bg-secondary-500);
   }
 </style>

@@ -93,6 +93,19 @@
       activeIndex = $openTeam.teamId;
     }
   }
+
+  const formatVersion = (version) => {
+    try {
+      const parts = version.split(".");
+      const major = parts[0];
+      const minor = parts[1];
+      const patch = parts[2];
+
+      return patch === "0" ? `${major}.${minor}` : `${major}.${minor}.${patch}`;
+    } catch (error) {
+      return version;
+    }
+  };
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -215,7 +228,7 @@
 
                 <div class="d-flex align-items-center">
                   <span class="text-fs-14 text-secondary-200 pe-2"
-                    >v{version}</span
+                    >v{formatVersion(version)}</span
                   >
                   <WithButton
                     icon={DoubleArrowIcon}

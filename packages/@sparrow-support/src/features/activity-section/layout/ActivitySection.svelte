@@ -485,7 +485,7 @@
                     class="mx-1 text-fs-14 mb-0 text-center mt-3"
                     style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
                   >
-                    No Feedback yet
+                    No feedback yet
                   </p>
                 </div>
 
