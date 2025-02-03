@@ -1,9 +1,6 @@
 
 import {
-    Sidebar
-<<<<<<< HEAD
-  } from "@sparrow/common/components";
-=======
+    Sidebar,
   } from "@sparrow/common/features";
  
   import {
@@ -11,7 +8,6 @@ import {
     SidebarItemIdEnum,
   } from "@sparrow/common/types/sidebar/sidebar-base";  
 
->>>>>>> ad3ac3319d0871edac1fd0ab71b90d2766c3a599
 
 export default {
   title: 'Components/Navigation-rail',

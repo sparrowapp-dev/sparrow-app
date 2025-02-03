@@ -45,6 +45,8 @@ export default {
         "outline-icon-danger",
         "teritiary-icon-regular",
         "teritiary-icon-danger",
+        "link-primary",
+        "link-secondary",
         "other",
       ],
     },

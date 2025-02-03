@@ -10,15 +10,16 @@
   export let buttonClassProp = "";
   export let textClassProp = "";
   export let textStyleProp = "";
-  export let buttonStartIcon: string | undefined = undefined;
+
   export let buttonStartIconStyle = "";
-  export let buttonEndIcon: string | undefined = undefined;
+  export let buttonstartIcon;
+  export let buttonEndIcon;
   export let buttonEndIconStyle = "";
   export let allowChild = false;
   export let iconSize = 16;
   export let frontIconSize = 20;
   export let endIconSize = 20;
-  export let buttonIcon: string | undefined = undefined;
+  export let buttonIcon;
   export let size: "small" | "medium" | "large" | "other" = "medium";
   let buttonSize = 24;
   if (size === "small") {
@@ -53,6 +54,8 @@
     | "outline-icon-danger"
     | "teritiary-icon-regular"
     | "teritiary-icon-danger"
+    | "link-primary"
+    | "link-secondary"
     | "other";
   export let id = "";
   enum BtnType {
@@ -78,6 +81,8 @@
     TeritiaryDanger = "teritiary-danger",
     TeritiaryIconRegular = "teritiary-icon-regular",
     TeritiaryIconDanger = "teritiary-icon-danger",
+    LinkPrimary = "link-primary",
+    LinkSecondary = "link-secondary",
     Underline = "underline",
   }
 
@@ -160,6 +165,12 @@
         case BtnType.TeritiaryIconDanger:
           btnClass = "custom-btn-teritiary-icon-danger";
           break;
+        case BtnType.LinkPrimary:
+          btnClass = "custom-btn-link-primary";
+          break;
+        case BtnType.LinkSecondary:
+          btnClass = "custom-btn-link-secondary";
+          break;
         default:
           btnClass = "";
           break;
@@ -218,6 +229,12 @@
           break;
         case BtnType.Secondary:
           btnClass = "custom-btn-secondary-disable";
+        case BtnType.LinkPrimary:
+          btnClass = "custom-btn-link-primary-disable";
+          break;
+        case BtnType.LinkSecondary:
+          btnClass = "custom-btn-link-secondary-disable";
+          break;
         default:
           btnClass = "";
           break;
@@ -238,20 +255,22 @@
   }}
 >
   {#if type === "icon-primary" || type === "icon-secondary" || type === "icon-danger" || type === "outline-icon-danger" || type === "outline-icon-primary" || type === "outline-icon-secondary" || type === "teritiary-icon-regular" || type === "teritiary-icon-danger"}
-    <img
-      src={buttonIcon}
-      style={`height: ${iconSize}px; width: ${iconSize}px; border-radius: 50%; `}
-      alt="icon"
-    />
+    <span class="me-2">
+      {#if buttonIcon}
+        <svelte:component this={buttonIcon} style={buttonStyleProp} />
+      {/if}
+    </span>
   {/if}
-  {#if buttonStartIcon}
-    <img
-      src={buttonStartIcon}
-      class="me-2"
-      style={`${buttonStartIconStyle} height: ${frontIconSize}px; width: ${frontIconSize}px; border-radius: 50%; `}
-      alt="icon"
-    />
-  {/if}
+
+  <span class="me-2">
+    {#if buttonstartIcon}
+      <svelte:component
+        this={buttonstartIcon}
+        style={`${buttonStartIconStyle} height: ${frontIconSize}px; width: ${frontIconSize}px; border-radius: 50%;`}
+      />
+    {/if}
+  </span>
+
   {#if loader}
     <span class="mx-2 d-flex justify-content-center">
       <Spinner size={`${loaderSize}px`} />
@@ -261,15 +280,14 @@
       {title}
     </span>
   {/if}
-
-  {#if buttonEndIcon}
-    <img
-      src={buttonEndIcon}
-      class="ms-2"
-      style={`${buttonEndIconStyle} height: ${endIconSize}px; width: ${endIconSize}px; border-radius: 50%; `}
-      alt="icon"
-    />
-  {/if}
+  <span class="ms-2">
+    {#if buttonEndIcon}
+      <svelte:component
+        this={buttonEndIcon}
+        style={`${buttonEndIconStyle} height: ${endIconSize}px; width: ${endIconSize}px; border-radius: 50%;`}
+      />
+    {/if}
+  </span>
 </button>
 
 <style lang="scss">
@@ -289,7 +307,7 @@
     background-color: var(--bg-primary-600);
     border-width: 0px;
   }
-  .sparrow-icon-primary-btn:focus {
+  .sparrow-icon-primary-btn:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
@@ -307,7 +325,7 @@
     background-color: var(--bg-ds-surface-300);
     border-width: 0px;
   }
-  .sparrow-icon-secondary-btn:focus {
+  .sparrow-icon-secondary-btn:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
@@ -329,7 +347,7 @@
     background-color: var(--bg-ds-danger-500);
     border-width: 0px;
   }
-  .sparrow-icon-danger-btn:focus {
+  .sparrow-icon-danger-btn:focus-visible {
     border: 2px solid var(--border-ds-danger-200);
     outline: none;
   }
@@ -350,7 +368,7 @@
     background-color: var(--bg-primary-400);
     border-width: 0px;
   }
-  .sparrow-outline-icon-primary:focus {
+  .sparrow-outline-icon-primary:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
@@ -377,6 +395,11 @@
     background-color: var(--bg-ds-surface-400);
     border-width: 0px;
   }
+  .sparrow-outline-icon-secondary:focus-visible {
+    background-color: transparent;
+    color: var(--white-color);
+    border: 2px solid var(--border-ds-primary-300);
+  }
   .sparrow-outline-icon-secondary-disable {
     background-color: transparent;
     border-color: var(--border-ds-surface-50);
@@ -393,7 +416,7 @@
     color: var(--white-color);
     border-width: 0px;
   }
-  .sparrow-outline-icon-danger:focus {
+  .sparrow-outline-icon-danger:focus-visible {
     border: 2px solid var(--border-ds-danger-200);
     outline: none;
   }
@@ -418,7 +441,7 @@
     background-color: var(--bg-ds-surface-300);
     border: 0px;
   }
-  .custom-btn-teritiary-icon-regular:focus {
+  .custom-btn-teritiary-icon-regular:focus-visible {
     border: 2px solid var(--bor-border-ds-primary-300);
     outline: none;
   }
@@ -438,13 +461,13 @@
     color: var(--white-color);
     border: 0px;
   }
-  .custom-btn-teritiary-danger:focus {
+  .custom-btn-teritiary-danger:focus-visible {
     border: 2px solid var(--border-ds-danger-200);
     outline: none;
   }
   .custom-btn-teritiary-icon-danger:active {
     background-color: var(--bg-ds-danger-600);
-    color: var(--white-color);
+    color: var (--white-color);
     border: 0px;
   }
   .custom-btn-teritiary-icon-danger-disable {
@@ -462,7 +485,7 @@
     color: var(--white-color);
     border-width: 0px;
   }
-  .custom-btn-primary:focus {
+  .custom-btn-primary:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
@@ -488,7 +511,7 @@
     color: var(--white-color);
     border-width: 0px;
   }
-  .custom-btn-outline-primary:focus {
+  .custom-btn-outline-primary:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
@@ -518,7 +541,7 @@
     color: var(--white-color);
     border-width: 0px;
   }
-  .custom-btn-secondary:focus {
+  .custom-btn-secondary:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
@@ -538,7 +561,7 @@
     border-width: 0px;
     color: var(--white-color);
   }
-  .custom-btn-outline-secondary:focus {
+  .custom-btn-outline-secondary:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
@@ -559,6 +582,69 @@
     border-width: 0px;
   }
 
+  .custom-btn-link-primary {
+    background-color: transparent;
+    color: var(--text-ds-primary-300);
+    border-width: 0px;
+  }
+  .custom-btn-link-primary:hover {
+    background-color: transparent;
+    color: var(--text-ds-primary-300);
+    border-width: 0px;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+  .custom-btn-link-primary:focus-visible {
+    background-color: transparent;
+    color: var(--text-ds-primary-300);
+    border: 2px solid var(--border-ds-primary-300);
+  }
+  .custom-btn-link-primary:active {
+    background-color: transparent;
+    color: var(--bg-primary-400);
+    border-width: 0px;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+
+  .custom-btn-link-primary-disable {
+    background-color: transparent;
+    color: var(--text-ds-primary-600);
+    border-width: 0px;
+  }
+  .custom-btn-link-secondary {
+    background-color: transparent;
+    color: var(--text-ds-neutral-200);
+    border-width: 0px;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+  .custom-btn-link-secondary:hover {
+    background-color: transparent;
+    color: var(--white-color);
+    border-width: 0px;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+  .custom-btn-link-secondary:focus-visible {
+    background-color: transparent;
+    color: var(--text-ds-primary-300);
+    border: 2px solid var(--bg-ds-primary-300);
+    text-decoration: none;
+  }
+  .custom-btn-link-secondary:active {
+    background-color: transparent;
+    color: var(--text-ds-primary-300);
+    border-width: 0px;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+
+  .custom-btn-link-secondary-disable {
+    background-color: transparent;
+    color: var(--text-ds-primary-600);
+    border-width: 0px;
+  }
   .custom-btn-violet {
     background-color: var(--bg-tertiary-300);
     color: var(--white-color);
@@ -589,7 +675,7 @@
     color: var(--white-color);
     border-width: 0px;
   }
-  .custom-btn-danger:focus {
+  .custom-btn-danger:focus-visible {
     border: 2px solid var(--border-ds-danger-200);
     outline: none;
   }
@@ -619,7 +705,11 @@
     color: var(--white-color);
     border-width: 0px;
   }
-
+  .custom-btn-outline-danger:focus-visible {
+    background-color: transparent;
+    color: var(--text-ds-danger-300);
+    border: 2px solid var(--border-ds-danger-200);
+  }
   .custom-btn-transparent {
     background-color: transparent;
     color: var(--white-color);
@@ -635,7 +725,7 @@
     background-color: var(--bg-ds-surface-300);
     border: 0px;
   }
-  .custom-btn-teritiary-regular:focus {
+  .custom-btn-teritiary-regular:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
@@ -654,7 +744,7 @@
     color: var(--white-color);
     border: 0px;
   }
-  .custom-btn-teritiary-danger:focus {
+  .custom-btn-teritiary-danger:focus-visible {
     border: 2px solid var(--border-ds-danger-200);
     outline: none;
   }
