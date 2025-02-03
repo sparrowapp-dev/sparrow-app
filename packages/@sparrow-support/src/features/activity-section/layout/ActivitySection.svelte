@@ -211,8 +211,9 @@
           id="search-input"
           customWidth="300"
           placeholderValue="Search updates"
-          on:input={(e) => handleInputChange(e.target.value)}
           bind:value={searchTerm}
+          on:input={() => handleInputChange(searchTerm)}
+          onInputChange={handleInputChange}
         />
       </div>
     </div>
