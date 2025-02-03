@@ -23,6 +23,23 @@
    * Data
    */
   const inputId: string = "team-name-input";
+  $: defaultBorder =
+    !teamForm.name.value && teamForm.name.isTouched
+      ? "1px solid var(--border-ds-danger-300) !important"
+      : "transparent";
+  $: isHoveredBorder =
+    !teamForm.name.value && teamForm.name.isTouched
+      ? "1px solid var(--border-ds-danger-300) !important"
+      : "1px solid var(--border-ds-neutral-300)";
+
+  $: isFocusedBorder =
+    !teamForm.name.value && teamForm.name.isTouched
+      ? "2px solid var(--border-ds-danger-300) !important"
+      : "2px solid var(--border-ds-primary-300)";
+  $: afterTypingBorder =
+    !teamForm.name.value && teamForm.name.isTouched
+      ? "1px soild var(--border-ds-danger-300) !important"
+      : "transparent";
 </script>
 
 <div class="pb-4 mt-3">
@@ -37,7 +54,7 @@
   <!-- 
     -- Input 
   -->
-  <Input
+  <!-- <Input
     bind:value={teamForm.name.value}
     on:blur={() => {
       teamForm.name.isTouched = true;
@@ -61,6 +78,25 @@
     type={"text"}
     maxlength={NAME_CONFIG.MAX_TEXT_SIZE}
     placeholderColor={"var(--text-secondary-200)"}
+  /> -->
+  <NewInput
+    bind:value={teamForm.name.value}
+    on:blur={() => {
+      teamForm.name.isTouched = true;
+      teamForm.name.value = teamForm.name.value.trim();
+    }}
+    isEditIconRequired={false}
+    {defaultBorder}
+    {isHoveredBorder}
+    {isFocusedBorder}
+    {afterTypingBorder}
+    type={"text"}
+    maxlength={NAME_CONFIG.MAX_TEXT_SIZE}
+    height={"36px"}
+    id={inputId}
+    placeholder={NAME_CONFIG.PLACEHOLDER}
+    style="outline:none;"
+    class="text-fs-14 fw-normal py-2 px-1  border-radius-4"
   />
 
   <!-- 
