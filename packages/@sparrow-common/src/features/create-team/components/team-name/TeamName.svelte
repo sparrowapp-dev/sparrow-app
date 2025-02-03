@@ -13,6 +13,7 @@
    * Constants
    */
   import { NAME_CONFIG } from "../../constants";
+  import { NewInput } from "@sparrow/library/forms";
 
   /**
    * Exports
@@ -23,20 +24,20 @@
    * Data
    */
   const inputId: string = "team-name-input";
-  $: defaultBorder =
+  $: defaultBorderColor =
     !teamForm.name.value && teamForm.name.isTouched
       ? "1px solid var(--border-ds-danger-300) !important"
       : "transparent";
-  $: isHoveredBorder =
+  $: hoveredBorderColor =
     !teamForm.name.value && teamForm.name.isTouched
       ? "1px solid var(--border-ds-danger-300) !important"
       : "1px solid var(--border-ds-neutral-300)";
 
-  $: isFocusedBorder =
+  $: focusedBorderColor =
     !teamForm.name.value && teamForm.name.isTouched
       ? "2px solid var(--border-ds-danger-300) !important"
       : "2px solid var(--border-ds-primary-300)";
-  $: afterTypingBorder =
+  $: typedBorderColor =
     !teamForm.name.value && teamForm.name.isTouched
       ? "1px soild var(--border-ds-danger-300) !important"
       : "transparent";
@@ -86,10 +87,10 @@
       teamForm.name.value = teamForm.name.value.trim();
     }}
     isEditIconRequired={false}
-    {defaultBorder}
-    {isHoveredBorder}
-    {isFocusedBorder}
-    {afterTypingBorder}
+    {defaultBorderColor}
+    {hoveredBorderColor}
+    {focusedBorderColor}
+    {typedBorderColor}
     type={"text"}
     maxlength={NAME_CONFIG.MAX_TEXT_SIZE}
     height={"36px"}
@@ -98,6 +99,16 @@
     style="outline:none;"
     class="text-fs-14 fw-normal py-2 px-1  border-radius-4"
   />
+
+  <!-- defaultBorderColor={!teamForm.name.value && teamForm.name.isTouched
+    ? "1px solid var(--border-ds-danger-300) !important"
+    : "transparent"}
+  hoveredBorderColor={!teamForm.name.value && teamForm.name.isTouched
+    ? "1px solid var(--border-ds-danger-300) !important"
+    : "transparent"}
+  focusedBorderColor={!teamForm.name.value && teamForm.name.isTouched
+    ? "2px solid var(--border-ds-danger-300) !important"
+    : "transparent"} -->
 
   <!-- 
     -- Error Messages 

@@ -14,14 +14,16 @@
   let componentStyle = "";
   export { componentStyle as style };
   export let value = "";
-  export let defaultBorder: string = "1px solid var(--border-ds-neutral-300)";
-  export let isTypingBorder: string = "1px solid var(--border-ds-primary-300)";
-  export let isHoveredBorder: string = "1px solid var(--border-ds-neutral-300)";
-  export let isFocusedBorder: string = "2px solid var(--border-ds-primary-300)";
-  export let afterTypingBorder: string =
+  export let defaultBorderColor: string =
     "1px solid var(--border-ds-neutral-300)";
-  export let errorBorderColor = "1px solid var(--border-ds-danger-300)";
-  export let errorFocusedBorderColor = "2px solid var(--border-ds-danger-300)";
+  export let typingBorderColor: string =
+    "1px solid var(--border-ds-primary-300)";
+  export let hoveredBorderColor: string =
+    "1px solid var(--border-ds-neutral-300)";
+  export let focusedBorderColor: string =
+    "2px solid var(--border-ds-primary-300)";
+  export let typedBorderColor: string =
+    "1px solid var(--border-ds-neutral-300)";
   export let defaultBgColor = "var(--bg-ds-surface-400)";
   export let disabledBgColor = "var(--bg-ds-surface-600)";
   export let isEditIconRequired = true;
@@ -42,14 +44,14 @@
 
   // Reactive border logic (error only shown after user types and clears input)
   $: borderColor = isTyping
-    ? isTypingBorder
+    ? typingBorderColor
     : isFocused
-      ? isFocusedBorder
+      ? focusedBorderColor
       : isHovered
-        ? isHoveredBorder
+        ? hoveredBorderColor
         : hasInput
-          ? afterTypingBorder
-          : defaultBorder;
+          ? typedBorderColor
+          : defaultBorderColor;
 
   $: backgroundColor = disabled ? disabledBgColor : defaultBgColor;
 
@@ -83,14 +85,14 @@
       {value}
       class="w-100 {componentClass}"
       style={` 
-          ${componentStyle}
-          height: 100%;
-          ${type === "search" ? `padding-left:${height} !important;` : ""}
-          ${type === "text" && isEditIconRequired && isHovered ? "padding-right:35px !important;" : ""}
-          border: ${borderColor};
-          --placeholder-color: ${placeholderColor};
-          background-color: ${backgroundColor};
-        `}
+        ${componentStyle}
+        height: 100%;
+        ${type === "search" ? `padding-left:${height} !important;` : ""}
+        ${type === "text" && isEditIconRequired && isHovered ? "padding-right:35px !important;" : ""}
+        border: ${borderColor};
+        --placeholder-color: ${placeholderColor};
+        background-color: ${backgroundColor};
+      `}
       {disabled}
       on:focus={() => (isFocused = true)}
       on:blur={() => {
