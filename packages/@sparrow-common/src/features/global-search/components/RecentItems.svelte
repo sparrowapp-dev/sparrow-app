@@ -4,7 +4,6 @@
     EnvironmentIcon,
     CollectionIcon,
     WorkspaceIcon,
-    keyCommand,
     getIcon,
     hexIcon,
     postIcon,
@@ -45,8 +44,6 @@
     SOCKETIO: socketIoIcon,
     WEBSOCKET: webSocketIcon,
   };
-
-  $: config = searchConfigs[selectedType.toLowerCase()];
 
   const getRequestDetails = (request) => {
     switch (request.type) {
@@ -594,159 +591,4 @@
     margin-bottom: 12px;
   }
 
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 2px;
-    margin-bottom: 4px;
-  }
-
-  .section-title {
-    color: var(--text-ds-neutral-500);
-    font:
-      400 12px Inter,
-      sans-serif;
-  }
-
-  .keyboard-shortcut {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-  }
-
-  .shortcut-key {
-    border-radius: 4px;
-    background-color: var(--bg-ds-surface-600);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    padding: 4px;
-  }
-
-  .key {
-    border-radius: 4px;
-    background-color: var(--bg-ds-surface-600);
-    color: var(--text-ds-neutral-200);
-    padding: 2px 4px;
-    font:
-      400 12px Inter,
-      sans-serif;
-    line-height: 18px;
-    min-height: 24px;
-    min-width: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .request-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px;
-    margin-bottom: 2px;
-    cursor: pointer;
-  }
-
-  .request-item:hover {
-    background-color: var(--bg-ds-surface-400);
-  }
-
-  .request-item:hover .request-title {
-    color: var(--white-color);
-  }
-
-  .request-item:hover .request-path {
-    color: var(--text-ds-neutral-300);
-  }
-
-  .request-item:hover .request-url {
-    color: var(--text-ds-primary-300);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .request-method {
-    border-radius: 2px;
-    background-color: var(--bg-ds-surface-500);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    padding: 4px;
-    min-height: 24px;
-    gap: 8px;
-  }
-
-  .request-icon {
-    width: 20px;
-    height: 14px;
-  }
-  .other-icon {
-    width: 16px;
-    height: 16px;
-  }
-
-  .request-details {
-    display: flex;
-    flex-direction: column;
-    min-width: 240px;
-    flex: 1;
-    gap: 3px;
-  }
-
-  .request-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .request-title {
-    color: var(--text-ds-neutral-300);
-    font:
-      400 12px Inter,
-      sans-serif;
-    flex: 1 1 0;
-    max-width: fit-content;
-  }
-
-  .request-path {
-    color: var(--text-ds-neutral-500);
-    font:
-      400 12px Inter,
-      sans-serif;
-    flex: 2 1 0;
-  }
-
-  .request-url {
-    color: var(--text-ds-primary-300);
-    font:
-      400 12px Inter,
-      sans-serif;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    display: block;
-    max-width: 100%;
-  }
-  .section-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .request-section {
-    gap: 2px;
-    display: flex;
-    flex-direction: column;
-  }
-  .request-header span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex-shrink: 1;
-  }
 </style>
