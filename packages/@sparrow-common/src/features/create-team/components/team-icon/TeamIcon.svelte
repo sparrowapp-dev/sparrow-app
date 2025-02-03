@@ -16,7 +16,7 @@
   import type { TeamForm } from "../../types";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
-  import MessageTextIcon from "../../../../../../@sparrow-library/src/icons/MessageTextIcon.svelte";
+  import { MessageTextIcon } from "@sparrow/library/icons";
 
   /**
    * Exports
@@ -154,6 +154,7 @@
     inputPlaceholder={ICON_CONFIG.PLACEHOLDER}
     supportedFileTypes={ICON_CONFIG.FILE_TYPES}
     isError={teamForm.file.invalid}
+    fileName={teamForm.file.value?.name}
   />
 
   <!-- 

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { DeleteIcon, EditIcon } from "@sparrow/library/assets";
+  import { NewDeleteIcon, NewEditIcon } from "@sparrow/library/assets";
   import { base64ToURL, imageDataToURL } from "@sparrow/common/utils";
-  import FileTypeIcon from "../../../../../../@sparrow-library/src/icons/FileTypeIcon.svelte";
+  import { FileTypeIcon } from "@sparrow/library/icons";
   import { NewUploadIcon } from "@sparrow/library/icons";
 
   export let value: any = [];
@@ -23,6 +23,7 @@
   export let iconWidth = 12;
   export let disabled = false;
   export let fileTypes = ["JPG", "PNG", "JPEG"];
+  export let fileName: string = "";
   let isDragOver = false;
   let isFocused = false;
 
@@ -37,6 +38,9 @@
     supportedFileTypes: string[],
   ) => {
     onChange(event, maxFileSize, supportedFileTypes);
+  };
+  const truncateFileName = (name: string, length: number): string => {
+    return name.length > length ? name.substring(0, length) + ".." : name;
   };
 </script>
 
@@ -56,7 +60,7 @@
             : 'transparent'
           : 'var(--bg-ds-surface-600)'};
     "
-        class="sparrow-file-input p-2 w-100 px-auto bg-ds-surface-400 {isDragOver
+        class="sparrow-file-input text-fs-14 p-2 w-100 px-auto bg-ds-surface-400 {isDragOver
           ? 'drag-over'
           : ''}"
         tabindex="0"
@@ -132,29 +136,48 @@
   </div>
 
   {#if !Array.isArray(value) && value.size > 0}
-    <div class="sparrow-input-image-preview rounded d-flex gap-2">
-      {#if value.bufferString}
-        <img class="rounded p-2" src={base64ToURL(value)} alt="" />
-      {:else}
-        <img class="rounded p-2" src={imageDataToURL(value)} alt="" />
-      {/if}
-      <div class="align-items-end justify-content-end d-flex gap-2">
-        <button
-          on:click={editValue}
-          class="edit-btn border-0 p-1 rounded align-items-center justify-content-center d-flex"
+    <div
+      class="sparrow-input-image-preview d-flex gap-2 border-radius-4 align-items-center"
+    >
+      <div
+        class="sparrow-input-box d-flex col align-items-center justify-content-start"
+      >
+        <div class="d-flex align-items-center">
+          {#if value.bufferString}
+            <img
+              class="image-box rounded-circle border"
+              src={base64ToURL(value)}
+              alt="Profile Image"
+            />
+          {:else}
+            <img
+              class="image-box rounded-circle border"
+              src={imageDataToURL(value)}
+              alt="Profile Image"
+            />
+          {/if}
+        </div>
+        <span class="ms-1 file-name-text text-fs-12"
+          >{truncateFileName(fileName, 6)}</span
         >
-          <EditIcon height={12} width={12} />
-        </button>
-        <button
-          on:click={resetValue}
-          class="del-btn border-0 p-1 rounded align-items-center justify-content-center d-flex"
-        >
-          <DeleteIcon height={12} width={12} />
-        </button>
+        <div class="ms-auto d-flex">
+          <button
+            on:click={editValue}
+            class="edit-btn border-0 p-1 d-flex align-items-center justify-content-center"
+          >
+            <NewEditIcon height={16} width={16} />
+          </button>
+          <button
+            on:click={resetValue}
+            class="del-btn border-0 p-1 d-flex align-items-center justify-content-center"
+          >
+            <NewDeleteIcon height={14} width={14} />
+          </button>
+        </div>
       </div>
     </div>
     <input
-      class="sparrow-choose-file-input d-none overflow-hidden"
+      class="sparrow-choose-file-input text-fs-14 d-none overflow-hidden"
       type="file"
       id={inputId}
       placeholder={inputPlaceholder}
@@ -177,7 +200,6 @@
     min-width: 240px;
     max-width: 540px;
     border-radius: 4px;
-    font-size: var(--base-text);
     transition:
       border 0.2s ease-in-out,
       background-color 0.2s ease-in-out;
@@ -196,9 +218,6 @@
   .sparrow-file-input.drag-over {
     border: 1px dashed var(--border-ds-primary-300) !important;
     background-color: var(--bg-ds-surface-500);
-  }
-  .sparrow-input-label {
-    font-size: var(--base-text);
   }
   .sparrow-file-input:hover {
     border: 1px solid var(--border-ds-neutral-300);
@@ -223,9 +242,8 @@
   }
   .sparrow-choose-file-input::file-selector-button {
     background-color: transparent;
-    color: var(--primary-btn-color);
+    color: var(--bg-ds-neutral-400);
     border: 0;
-    font-size: var(--small-text);
   }
 
   .sparrow-choose-file-label {
@@ -236,20 +254,42 @@
     width: 80px;
     border: 1px solid #313233;
     height: 80px;
-    background-color: var(--bg-tertiary-300);
+    background-color: var(--bg-ds-surface-400);
   }
   .sparrow-input-image-preview {
-    .edit-btn,
-    .del-btn {
-      background-color: transparent;
-      height: 24px;
-      width: 24px;
-      display: flex;
-      align-items: center;
-    }
-    .edit-btn:hover,
-    .del-btn:hover {
-      background-color: var(--bg-tertiary-300);
-    }
+    height: 44px;
+    min-width: 240px;
+    max-width: 540px;
+    gap: 4px;
+    border-radius: 4px;
+    background-color: var(--bg-ds-surface-400);
+    padding: 8px;
+    padding-right: 80px;
+  }
+  .sparrow-input-box {
+    width: 100%;
+    max-width: 138px;
+    height: 28px;
+    border-radius: 30px;
+    background-color: var(--bg-ds-surface-100);
+    padding-left: 2px;
+  }
+
+  .image-box {
+    height: 24px;
+    width: 24px;
+  }
+  .file-name-text {
+    color: var(--text-ds-danger-300);
+    font-family: "Inter", sans-serif;
+    font-weight: 400px;
+  }
+
+  .edit-btn,
+  .del-btn {
+    background-color: transparent;
+    width: 28px;
+    height: 28px;
+    transition: background-color 0.3s ease;
   }
 </style>
