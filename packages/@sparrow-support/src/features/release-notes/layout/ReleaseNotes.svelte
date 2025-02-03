@@ -17,6 +17,7 @@
   import { UpdatesTagType } from "../../../types/feedback";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import { Search } from "@sparrow/library/forms";
   export let listChangeLog;
 
   export let onReleaseNoteRedirect;
@@ -188,36 +189,16 @@
     {#if showTimeline}
       <div class="d-flex justify-content-between page-funationality">
         <div class="" style="cursor:pointer">
-          <div class={`d-flex search-input-container rounded py-1 px-2 mb-4`}>
-            <SearchIcon
-              width={14}
-              height={14}
-              color={"var(--icon-secondary-200)"}
-              classProp={`my-auto me-3`}
-            />
-            <input
-              type="text"
+          <div class={`d-flex  rounded py-1 px-2 mb-4`}>
+            <Search
+              type="surface700"
+              customWidth={300}
               id="search-input"
-              class={`bg-transparent w-100 border-0 ms-1 my-auto`}
-              placeholder="Search updates"
+              placeholderValue="Search updates"
               on:input={handleInput}
               bind:value={searchQuery}
+              onInputChange={handleInput}
             />
-
-            {#if searchQuery.length != 0}
-              <div
-                class="clear-icon"
-                on:click={() => {
-                  clearSearch();
-                }}
-              >
-                <CrossIcon
-                  height="16px"
-                  width="12px"
-                  color="var(--icon-secondary-300)"
-                />
-              </div>
-            {/if}
           </div>
         </div>
 

@@ -19,6 +19,7 @@
   import { TeamMembers, TeamSettings } from "@sparrow/teams/features";
   import { CrossIcon, MoreOptions } from "@sparrow/library/icons";
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
+  import { Search } from "@sparrow/library/forms";
   export let isWebApp = false;
 
   export let isWebEnvironment: boolean;
@@ -356,35 +357,15 @@
           <div class="h-100 d-flex flex-column">
             {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
               <div class="pt-2">
-                <div
-                  class={`d-flex search-input-container rounded  align-items-center mb-4`}
-                >
-                  <div>
-                    <SearchIcon
-                      width={14}
-                      height={14}
-                      classProp={`my-auto me-3`}
-                      color={"var(--icon-secondary-200)"}
-                    />
-                  </div>
-                  <input
-                    type="text"
+                <div class={`d-flex  rounded  align-items-center mb-4`}>
+                  <Search
+                    type="surface700"
                     id="search-input"
-                    class={`bg-transparent w-100 border-0 my-auto ms-2 ellipsis`}
-                    placeholder="Search workspaces in {openTeam?.name}"
+                    size="large"
+                    placeholderValue="Search workspaces in {openTeam?.name}"
                     on:input={handleSearchInput}
                     bind:value={searchQuery}
                   />
-
-                  {#if hasText}
-                    <div class="clear-icon" on:click={clearSearchInput}>
-                      <CrossIcon
-                        height="16px"
-                        width="12px"
-                        color="var(--icon-secondary-300)"
-                      />
-                    </div>
-                  {/if}
                 </div>
               </div>
             {/if}

@@ -11,7 +11,8 @@
   export let searchStyleProp = "";
   export let searchTextProp = "";
   let searchClassProp = "";
-  export let customWidth = 200;
+  export let customWidth = 0;
+  export let onInputChange = (value) => {};
 
   const dispatch = createEventDispatcher();
 
@@ -34,13 +35,13 @@
     case "medium":
       imgStyleProp = "height:20px; width:20px";
       searchTextProp = "font-weight: 400; font-size: 12px; line-height: 18px;";
-      searchStyleProp = `width: ${customWidth > 0 ? `${customWidth}px` : "auto"}; height: 28px; min-height: 28px; max-height: 28px; min-width: 198px; max-width: 320px; gap: 8px;   border-radius: 4px; `;
+      searchStyleProp = `width: ${customWidth > 0 ? `${customWidth}px` : "auto"}; height: 28px; min-height: 28px; max-height: 28px;max-width: 320px; gap: 8px;   border-radius: 4px; `;
       break;
     case "large":
       imgStyleProp = "height:20px; width:20px";
       searchTextProp =
         "font-weight: 400; font-size: 14px; line-height: 20.02px; ";
-      searchStyleProp = `width: ${customWidth > 0 ? `${customWidth}px` : "auto"}; height: 36px; min-height: 36px; max-height: 36px;   border-radius: 6px; `;
+      searchStyleProp = `width: ${customWidth > 0 ? `${customWidth}px` : "auto"}; height: 36px; min-height: 36px; max-height: 36px; min-width: 340px; max-width:440px; border-radius: 6px; `;
       break;
     default:
       imgStyleProp = "height:20px; width:20px";
@@ -76,8 +77,9 @@
   };
 
   function clearSearch() {
-    value = ""; // Clear function call
+    value = "";
     enterPressed = false;
+    onInputChange(value);
   }
 
   onMount(() => {
@@ -94,7 +96,7 @@
       {id}
       type="text"
       class={`${searchClassProp} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}`}
-      style={` ${searchStyleProp} ${searchTextProp} outline:none; ::placeholder { color: var(--text-ds-neutral-300);};`}
+      style={` ${searchStyleProp} ${searchTextProp} color:white; outline:none; ::placeholder { color: var(--text-ds-neutral-300);};`}
       {value}
       placeholder={placeholderValue}
       on:input={(event) => {
@@ -119,7 +121,6 @@
     align-items: center;
     justify-content: flex-start;
     width: 100%;
-    margin-right: 4px;
   }
 
   .icon-search {
@@ -127,7 +128,6 @@
     align-items: center;
     flex-direction: row;
     justify-content: flex-start;
-    width: 100%;
     position: relative;
   }
 

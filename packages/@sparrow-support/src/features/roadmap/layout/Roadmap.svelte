@@ -8,6 +8,7 @@
     MessageIcon,
     StackIcon,
   } from "@sparrow/library/icons";
+  import { Search } from "@sparrow/library/forms";
   import { Loader } from "@sparrow/library/ui";
   import HelpInfoCard from "../../../components/HelpInfo-Card/HelpInfoCard.svelte";
   import { FeedbackType } from "@sparrow/support/types";
@@ -115,43 +116,22 @@
     <div class="d-flex justify-content-between page-funationality">
       <div
         style="margin-bottom: 37px;"
-        class={`d-flex  search-input-container rounded py-1 px-2 `}
+        class={`d-flex  rounded py-1 px-2 `}
         on:click={() => {
           MixpanelEvent(Events.Roadmap_Search);
         }}
       >
-        <SearchIcon
-          width={14}
-          height={14}
-          color={"var(--icon-secondary-200)"}
-          classProp={`my-auto ms-2`}
-        />
-        <input
-          type="text"
+        <Search
+          type="surface700"
+          size="large"
           id="search-input"
-          class={`bg-transparent w-100 border-0 ms-1 my-auto`}
-          placeholder="Search updates"
+          placeholderValue="Search updates"
           on:input={(e) => {
             searchTerm = e.target.value;
           }}
           bind:value={searchTerm}
+          onInputChange={searchTerm}
         />
-
-        {#if searchTerm.length != 0}
-          <div
-            style="cursor: pointer;"
-            class="clear-icon"
-            on:click={() => {
-              searchTerm = "";
-            }}
-          >
-            <CrossIcon
-              height="16px"
-              width="12px"
-              color="var(--icon-secondary-300)"
-            />
-          </div>
-        {/if}
       </div>
 
       <div class="filter">
