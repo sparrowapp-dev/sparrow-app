@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FolderIcon } from "../images";
+  import { FolderIcon } from "../../images";
 
   export let onClick = () => {};
   export let icon=FolderIcon;
@@ -88,5 +88,24 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     flex-shrink: 1;
+  }
+
+  .request-item:hover {
+    background-color: var(--bg-ds-surface-400);
+  }
+
+  .request-item:hover .request-title {
+    color: var(--white-color);
+  }
+
+  .request-item:hover .request-path {
+    color: var(--text-ds-neutral-300);
+  }
+
+  .request-item:hover .request-url {
+    color: var(--text-ds-primary-300);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>

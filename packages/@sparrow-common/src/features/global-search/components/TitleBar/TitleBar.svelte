@@ -3,7 +3,7 @@
     title: "",
     shortcutKeys: [],
   };
-  import { keyCommand } from "../images";
+  import { keyCommand } from "../../images";
 </script>
 
 <div class="section-header">
@@ -12,9 +12,11 @@
     <div class="shortcut-key">
       <img src={keyCommand} alt="" class="shortcut-icon" />
     </div>
+   {#if data.shortcutKeys}
     {#each data.shortcutKeys as key}
-      <span class="key">{key}</span>
+      <div class="key">{key}</div>
     {/each}
+   {/if}
   </div>
 </div>
 
@@ -64,4 +66,6 @@
     align-items: center;
     justify-content: center;
   }
+
+  
 </style>

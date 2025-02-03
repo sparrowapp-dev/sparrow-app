@@ -1,6 +1,6 @@
 <script lang="ts">
-  import SearchBar from "../components/SearchBar.svelte";
-  import SearchSuggestions from "../components/SearchSuggestions.svelte";
+  import SearchBar from "../components/SearchBar/SearchBar.svelte";
+  import SearchSuggestions from "../components/SearchSuggestions/SearchSuggestions.svelte";
   import type { SearchSuggestion } from "../types/types";
   import { onMount } from "svelte";
   import {
@@ -26,6 +26,7 @@
   export let handleSearchNode;
   export let handlehideGlobalSearch;
   export let isWebApp = false;
+ 
 
   let workspaceDetailsMap: Record<
     string,
@@ -40,6 +41,7 @@
   let filteredWorkspaces = [];
   let filteredEnvironments = [];
   let hideGlobalSearch = false;
+  let searchBarRef="";
 
   const handleSearch = async () => {
     const { collection, folder, file, workspace, testflow, environment } =
@@ -103,7 +105,7 @@
 
 <div class="search-container">
   {#if !hideGlobalSearch}
-    <SearchBar bind:searchQuery {handleSearch} />
+    <SearchBar bind:searchQuery {handleSearch} bind:searchBarRef />
     <SearchSuggestions
       {handleSwitchWorkspaceModal}
       {suggestions}
@@ -125,6 +127,7 @@
       {handleGlobalSearchTestflowNavgation}
       {selectedType}
       {isWebApp}
+      bind:searchBarRef
     />
   {/if}
 </div>

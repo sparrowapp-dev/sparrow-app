@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { SearchSuggestion } from "../types/types.js";
-  import SuggestionTags from "./SuggestionTags.svelte";
-  import RecentItems from "./RecentItems.svelte";
+  import type { SearchSuggestion } from "../../types/types.js";
+  import SuggestionTags from "../SuggestionTags/SuggestionTags.svelte";
+  import RecentItems from "../RecentItems/RecentItems.svelte";
   export let suggestions: SearchSuggestion[];
   export let filteredCollection = [];
   export let filteredFolder = [];
@@ -22,10 +22,11 @@
   export let filteredTestflows;
   export let filteredEnvironments;
   export let isWebApp = false;
+  export let searchBarRef;
 </script>
 
 <div class="suggestions-container">
-  <SuggestionTags {suggestions} bind:selectedType />
+  <SuggestionTags {suggestions} bind:selectedType bind:searchBarRef />
   <RecentItems
     {handleSwitchWorkspaceModal}
     {searchQuery}

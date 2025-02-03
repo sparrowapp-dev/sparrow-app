@@ -1,9 +1,15 @@
 <script lang="ts">
   export let searchQuery = "";
   export let handleSearch = () => {};
-  import { keyCommand, SearchIcon } from "../images";
+  export let searchBarRef;
+  import { keyCommand, SearchIcon } from "../../images";
+  import { onMount } from "svelte";
   let hideKEY = false;
   $: hideKEY = searchQuery.trim().length > 0;
+
+  onMount(() => {
+    searchBarRef.focus();
+  });
 </script>
 
 <div class="search-bar">
@@ -22,6 +28,7 @@
         placeholder="Search Sparrow"
         aria-label="Search"
         autocomplete="off"
+        bind:this={searchBarRef}
       />
     </div>
   </div>

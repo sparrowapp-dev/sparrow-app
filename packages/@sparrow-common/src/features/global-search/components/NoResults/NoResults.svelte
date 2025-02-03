@@ -1,5 +1,5 @@
 <script>
-  import {searchIcon} from "../images";
+  import {searchIcon} from "../../images";
 
   export let searchQuery = "";
 </script>
