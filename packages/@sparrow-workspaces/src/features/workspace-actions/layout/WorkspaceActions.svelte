@@ -2,7 +2,7 @@
   import { doubleAngleLeftIcon as doubleangleLeft } from "@sparrow/library/assets";
   import { FilterIcon } from "@sparrow/library/assets";
   import { plusWhiteIcon as plusIcon } from "@sparrow/library/assets";
-
+  import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import { Events, WorkspaceRole } from "@sparrow/common/enums";
   import { Dropdown } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
@@ -247,7 +247,7 @@
           },
         },
         {
-          name: "Add REST API",
+          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           icon: VectorIcon,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "12px",
@@ -330,7 +330,7 @@
           },
         },
         {
-          name: "Add REST API",
+          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           icon: VectorIcon,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "12px",
