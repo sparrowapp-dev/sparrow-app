@@ -17,12 +17,14 @@
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
   import { MessageTextIcon } from "@sparrow/library/icons";
+  import type { SvelteComponent } from "svelte";
 
   /**
    * Exports
    */
   export let teamForm: TeamForm;
   export let maxFileSizeText = 2;
+  export let iconComponent: typeof SvelteComponent;
 
   /**
    * Data
@@ -164,14 +166,22 @@
     <div>
       {#if teamForm.file.showFileSizeError}
         <div class="d-flex col gap-1">
-          <MessageTextIcon visible={false} />
+          {#if iconComponent}
+            {iconComponent}
+          {:else}
+            <MessageTextIcon visible={false} />
+          {/if}
           <p class="mb-2 text-fs-12 message-error-text">
             {ICON_CONFIG.SIZE_EXCEED_ERROR_MESSAGE}
           </p>
         </div>
       {:else if teamForm.file.showFileTypeError}
         <div class="d-flex col gap-1">
-          <MessageTextIcon visible={false} />
+          {#if iconComponent}
+            {iconComponent}
+          {:else}
+            <MessageTextIcon visible={false} />
+          {/if}
           <p class="mb-2 text-fs-12 message-error-text">
             {ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
           </p>
