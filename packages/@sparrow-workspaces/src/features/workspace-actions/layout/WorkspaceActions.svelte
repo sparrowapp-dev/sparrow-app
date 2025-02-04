@@ -484,8 +484,8 @@
       <Search
         id="collection-list-search"
         type="surface700"
-        size="medium"
-        customWidth={250}
+        size="small"
+        customWidth={"250px"}
         bind:value={searchData}
         on:input={() => {
           handleSearch();
@@ -493,7 +493,7 @@
           isExpandEnvironment = true;
           isExpandTestflow = true;
         }}
-        placeholderValue="{'Search'};"
+        placeholderValue={"Search"}
       />
       <div class="d-flex align-items-center justify-content-center d-none">
         <button

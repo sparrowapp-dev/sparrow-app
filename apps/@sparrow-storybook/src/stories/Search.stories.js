@@ -22,9 +22,8 @@ export default {
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const surface700 = {
   args: {
-    placeholderValue: "Search in surfa",
+    placeholderValue: "Search in surface700",
     type: "surface900",
-    PlaceholderValue: "kjfrkjbfkrejkjkb\n",
     size: "large",
     value: "",
     customWidth: 440,

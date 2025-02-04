@@ -209,7 +209,7 @@
         <Search
           type="surface700"
           id="search-input"
-          customWidth="300"
+          customWidth={"300px"}
           placeholderValue="Search updates"
           bind:value={searchTerm}
           on:input={() => handleInputChange(searchTerm)}

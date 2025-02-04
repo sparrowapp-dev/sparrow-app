@@ -147,7 +147,7 @@
               type="surface700"
               bind:value={search}
               on:input={() => {}}
-              customWidth={300}
+              customWidth={"300px"}
               placeholderValue="Search Variables"
             />
           </div>

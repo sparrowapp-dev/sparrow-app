@@ -192,7 +192,7 @@
           <div class={`d-flex  rounded py-1 px-2 mb-4`}>
             <Search
               type="surface700"
-              customWidth={300}
+              customWidth={"300px"}
               id="search-input"
               placeholderValue="Search updates"
               on:input={handleInput}
