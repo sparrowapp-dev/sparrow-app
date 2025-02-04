@@ -125,3 +125,5 @@ export { default as ThreeDotIcon } from "./ThreeDot.svelte";
 export { default as AiSparkleIconV2 } from "./AiSparkleV2.svelte";
 
 export { default as AiSparkleIconV3 } from "./AiSparkleV3.svelte";
+export { default as NewEditIcon } from "./newEdit.svelte";
+export { default as NewDeleteIcon } from "./newDelete.svelte";

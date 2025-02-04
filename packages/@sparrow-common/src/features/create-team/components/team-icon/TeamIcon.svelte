@@ -2,7 +2,8 @@
   /**
    * Components
    */
-  import { IconUploader, FileType } from "..";
+  import { FileType } from "..";
+  import { IconUploader } from "@sparrow/library/forms";
   import { OSDetector } from "@sparrow/common/utils";
 
   /**
