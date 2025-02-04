@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { plusWhiteIcon } from "../../assets";
   import Spinner from "../spinner/Spinner.svelte";
+  import { onMount, onDestroy } from "svelte";
 
   export let title = "";
   export let onClick: (e) => void;
@@ -31,6 +33,7 @@
   } else {
     buttonSize = 24;
   }
+  let color = "white";
   export let type:
     | "primary"
     | "secondary"
@@ -92,12 +95,24 @@
   $: {
     if (size === "small") {
       buttonSize = 24;
+      frontIconSize = 12;
+      endIconSize = 12;
+      iconSize = 12;
     } else if (size === "medium") {
       buttonSize = 36;
+      frontIconSize = 16;
+      endIconSize = 16;
+      iconSize = 16;
     } else if (size === "large") {
       buttonSize = 40;
+      frontIconSize = 20;
+      endIconSize = 20;
+      iconSize = 20;
     } else {
       buttonSize = 24;
+      frontIconSize = 24;
+      endIconSize = 24;
+      iconSize = 24;
     }
 
     if (!disable) {
@@ -255,21 +270,29 @@
   }}
 >
   {#if type === "icon-primary" || type === "icon-secondary" || type === "icon-danger" || type === "outline-icon-danger" || type === "outline-icon-primary" || type === "outline-icon-secondary" || type === "teritiary-icon-regular" || type === "teritiary-icon-danger"}
-    <span class="me-2">
-      {#if buttonIcon}
-        <svelte:component this={buttonIcon} style={buttonStyleProp} />
-      {/if}
-    </span>
+    {#if buttonIcon}
+      <span>
+        <svelte:component
+          this={buttonIcon}
+          style={buttonStyleProp}
+          useParentColor={true}
+        />
+      </span>
+    {/if}
   {/if}
 
-  <span class="me-2">
-    {#if buttonstartIcon}
+  {#if buttonstartIcon}
+    <span class="me-2">
       <svelte:component
         this={buttonstartIcon}
-        style={`${buttonStartIconStyle} height: ${frontIconSize}px; width: ${frontIconSize}px; border-radius: 50%;`}
+        style={`${buttonStartIconStyle} border-radius: 50%;`}
+        height={`${frontIconSize}px`}
+        width={`${frontIconSize}px`}
+        useParentColor={true}
+        {color}
       />
-    {/if}
-  </span>
+    </span>
+  {/if}
 
   {#if loader}
     <span class="mx-2 d-flex justify-content-center">
@@ -280,14 +303,18 @@
       {title}
     </span>
   {/if}
-  <span class="ms-2">
-    {#if buttonEndIcon}
+
+  {#if buttonEndIcon}
+    <span class="ms-2">
       <svelte:component
         this={buttonEndIcon}
-        style={`${buttonEndIconStyle} height: ${endIconSize}px; width: ${endIconSize}px; border-radius: 50%;`}
+        style={`${buttonEndIconStyle}  border-radius: 50%;`}
+        height={`${endIconSize}px`}
+        width={`${endIconSize}px`}
+        useParentColor={true}
       />
-    {/if}
-  </span>
+    </span>
+  {/if}
 </button>
 
 <style lang="scss">
@@ -298,79 +325,94 @@
   .sparrow-icon-primary-btn {
     background-color: var(--bg-primary-400);
     border-width: 0px;
+    color: var(--white-color);
   }
   .sparrow-icon-primary-btn:hover {
     background-color: var(--bg-ds-primary-300);
     border-width: 0px;
+    color: var(--white-color);
   }
   .sparrow-icon-primary-btn:active {
     background-color: var(--bg-primary-600);
     border-width: 0px;
+    color: var(--white-color);
   }
   .sparrow-icon-primary-btn:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
     outline: none;
+    color: var(--white-color);
   }
   .sparrow-icon-primary-btn-disable {
     background-color: transparent;
-    color: var(--text-ds-primary-600);
+    color: var(--text-ds-neutral-400);
     border-width: 1px;
     border-color: var(--border-ds-surface-400);
   }
   .sparrow-icon-secondary-btn {
     background-color: var(--bg-ds-surface-300);
     border-width: 0px;
+    color: var(--white-color);
   }
   .sparrow-icon-secondary-btn:hover {
     background-color: var(--bg-ds-surface-300);
     border-width: 0px;
+    color: var(--white-color);
   }
   .sparrow-icon-secondary-btn:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
     outline: none;
+    color: var(--white-color);
   }
   .sparrow-icon-secondary-btn:active {
     background-color: var(--bg-primary-600); //
     border-width: 0px;
+    color: var(--white-color);
   }
   .sparrow-icon-secondary-btn-disable {
     background-color: var(--bg-ds-surface-400);
-    color: var(--text-ds-neutral-500);
+    color: var(--text-ds-neutral-400);
     border-width: 1px;
     border-color: var(--bg-ds-surface-400);
   }
   .sparrow-icon-danger-btn {
     background-color: var(--bg-ds-danger-400);
     border-width: 0px;
+    color: var(--white-color);
   }
   .sparrow-icon-danger-btn:hover {
     background-color: var(--bg-ds-danger-500);
     border-width: 0px;
+    color: var(--white-color);
   }
   .sparrow-icon-danger-btn:focus-visible {
     border: 2px solid var(--border-ds-danger-200);
     outline: none;
+    color: var(--white-color);
   }
   .sparrow-icon-danger-btn:active {
     background-color: var(--bg-ds-danger-600);
     border-width: 0px;
+    color: var(--white-color);
   }
   .sparrow-icon-danger-btn-disable {
     background-color: var(--bg-ds-danger-700);
     border-width: 0px;
+    color: var(--text-ds-neutral-400);
   }
   .sparrow-outline-icon-primary {
     background-color: transparent;
-    border-width: 1px;
-    border-color: var(--border-ds-surface-500);
+    border: 1px solid var(--border-ds-surface-50);
+    color: var(--text-ds-primary-300);
   }
   .sparrow-outline-icon-primary:hover {
     background-color: var(--bg-primary-400);
     border-width: 0px;
+    color: var(--white-color);
   }
   .sparrow-outline-icon-primary:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
     outline: none;
+    color: var(--text-ds-primary-300);
   }
   .sparrow-outline-icon-primary:active {
     background-color: var(--bg-ds-primary-600);
@@ -379,21 +421,23 @@
   }
   .sparrow-outline-icon-primary-disable {
     background-color: transparent;
-    border-width: 1px;
-    border-color: var(--border-ds-surface-500);
+    border: 1px solid var(--border-ds-surface-50);
+    color: var(--text-ds-primary-600);
   }
   .sparrow-outline-icon-secondary {
     background-color: transparent;
-    border-color: var(--border-ds-surface-50);
-    border-width: 1px;
+    border: 1px solid var(--border-ds-surface-50);
+    color: var(--text-ds-neutral-100);
   }
   .sparrow-outline-icon-secondary:hover {
     background-color: var(--bg-ds-surface-300);
     border-width: 0px;
+    color: var(--white-color);
   }
   .sparrow-outline-icon-secondary:active {
     background-color: var(--bg-ds-surface-400);
     border-width: 0px;
+    color: var(--white-color);
   }
   .sparrow-outline-icon-secondary:focus-visible {
     background-color: transparent;
@@ -402,14 +446,13 @@
   }
   .sparrow-outline-icon-secondary-disable {
     background-color: transparent;
-    border-color: var(--border-ds-surface-50);
-    border-width: 1px;
+    border: 1px solid var(--border-ds-surface-50);
+    color: var(--text-ds-neutral-500);
   }
   .sparrow-outline-icon-danger {
     background-color: transparent;
     color: var(--text-ds-danger-300);
-    border-width: 1px;
-    border-color: var(--border-ds-surface-50);
+    border: 1px solid var(--border-ds-surface-50);
   }
   .sparrow-outline-icon-danger:hover {
     background-color: var(--bg-ds-danger-500);
@@ -419,6 +462,7 @@
   .sparrow-outline-icon-danger:focus-visible {
     border: 2px solid var(--border-ds-danger-200);
     outline: none;
+    color: var(--text-ds-danger-300);
   }
   .sparrow-outline-icon-danger:active {
     background-color: var(--bg-ds-danger-600);
@@ -427,13 +471,12 @@
   }
   .sparrow-outline-icon-danger-disable {
     background-color: transparent;
-    color: var(--text-ds-danger-700);
-    border-width: 1px;
-    border-color: var(--bg-ds-surface-400);
+    color: var(--text-ds-danger-600);
+    border: 1px solid var(--border-ds-surface-400);
   }
   .custom-btn-teritiary-icon-regular {
     background-color: transparent;
-    color: var(--white-color);
+    color: var(--text-ds-neutral-100);
     border: 0px;
   }
   .custom-btn-teritiary-icon-regular:hover {
@@ -444,8 +487,13 @@
   .custom-btn-teritiary-icon-regular:focus-visible {
     border: 2px solid var(--bor-border-ds-primary-300);
     outline: none;
+    color: var(--text-ds-neutral-100);
   }
-
+  .custom-btn-teritiary-icon-regular:active {
+    color: var(--text-ds-primary-300);
+    background-color: var(--bg-ds-surface-400);
+    border: 0px;
+  }
   .custom-btn-teritiary-icon-regular-disable {
     background-color: transparent;
     color: var(--text-ds-neutral-500);
@@ -463,6 +511,7 @@
   }
   .custom-btn-teritiary-danger:focus-visible {
     border: 2px solid var(--border-ds-danger-200);
+    color: var(--text-ds-danger-300);
     outline: none;
   }
   .custom-btn-teritiary-icon-danger:active {
@@ -472,8 +521,8 @@
   }
   .custom-btn-teritiary-icon-danger-disable {
     background-color: transparent;
-    color: var(--text-ds-danger-700);
-    border-width: 0px;
+    color: var(--text-ds-danger-600);
+    border: 0px;
   }
   .custom-btn-primary {
     background-color: var(--bg-ds-primary-400);
@@ -487,6 +536,7 @@
   }
   .custom-btn-primary:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
+    color: var(--white-color);
     outline: none;
   }
   .custom-btn-primary:active {
@@ -499,12 +549,10 @@
     color: var(--text-ds-neutral-400);
     border-width: 0px;
   }
-
   .custom-btn-outline-primary {
     background-color: transparent;
     color: var(--bg-ds-primary-300);
-    border-width: 1px;
-    border-color: var(--border-ds-surface-500);
+    border: 1px solid var(--border-ds-surface-50);
   }
   .custom-btn-outline-primary:hover {
     background-color: var(--bg-ds-primary-400);
@@ -513,6 +561,7 @@
   }
   .custom-btn-outline-primary:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
+    color: var(--text-ds-primary-300);
     outline: none;
   }
   .custom-btn-outline-primary:active {
@@ -523,8 +572,7 @@
   .custom-btn-outline-primary-disable {
     background-color: transparent;
     color: var(--text-ds-primary-600);
-    border-width: 1px;
-    border-color: var(--border-ds-surface-400);
+    border: 1px solid var(--border-ds-surface-400);
   }
   .custom-btn-secondary {
     background-color: var(--bg-ds-surface-300);
@@ -548,49 +596,42 @@
   .custom-btn-secondary-disable {
     background-color: var(--bg-ds-surface-700);
     color: var(--text-ds-neutral-400);
-    border-width: 0px;
+    border: 0px;
   }
   .custom-btn-outline-secondary {
     background-color: transparent;
-    border-color: var(--border-ds-surface-50);
-    border-width: 1px;
-    color: var(--white-color);
+    border: 1px solid var(--border-ds-surface-50);
+    color: var(--text-ds-neutral-100);
   }
   .custom-btn-outline-secondary:hover {
     background-color: var(--bg-ds-surface-300);
-    border-width: 0px;
+    border: 0px;
     color: var(--white-color);
   }
   .custom-btn-outline-secondary:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
+    color: var(--white-color);
     outline: none;
   }
   .custom-btn-outline-secondary:active {
     background-color: var(--bg-ds-surface-400);
-    border-width: 0px;
+    border: 0px;
     color: var(--white-color);
   }
   .custom-btn-outline-secondary-disable {
-    background-color: var(--bg-ds-surface-400);
     color: var(--text-ds-neutral-500);
-    border-width: 1px;
-    border-color: var(--bg-ds-surface-400);
+    background-color: transparent;
+    border: 1px solid var(--border-ds-surface-400);
   }
-  .custom-btn-dark {
-    background-color: var(--bg-tertiary-300);
-    color: var(--white-color);
-    border-width: 0px;
-  }
-
   .custom-btn-link-primary {
     background-color: transparent;
     color: var(--text-ds-primary-300);
-    border-width: 0px;
+    border: 0px;
   }
   .custom-btn-link-primary:hover {
     background-color: transparent;
     color: var(--text-ds-primary-300);
-    border-width: 0px;
+    border: 0px;
     text-decoration: underline;
     text-underline-offset: 5px;
   }
@@ -602,7 +643,7 @@
   .custom-btn-link-primary:active {
     background-color: transparent;
     color: var(--bg-primary-400);
-    border-width: 0px;
+    border: 0px;
     text-decoration: underline;
     text-underline-offset: 5px;
   }
@@ -615,14 +656,14 @@
   .custom-btn-link-secondary {
     background-color: transparent;
     color: var(--text-ds-neutral-200);
-    border-width: 0px;
+    border: 0px;
     text-decoration: underline;
     text-underline-offset: 5px;
   }
   .custom-btn-link-secondary:hover {
     background-color: transparent;
     color: var(--white-color);
-    border-width: 0px;
+    border: 0px;
     text-decoration: underline;
     text-underline-offset: 5px;
   }
@@ -635,7 +676,7 @@
   .custom-btn-link-secondary:active {
     background-color: transparent;
     color: var(--text-ds-primary-300);
-    border-width: 0px;
+    border: 0px;
     text-decoration: underline;
     text-underline-offset: 5px;
   }
@@ -643,83 +684,58 @@
   .custom-btn-link-secondary-disable {
     background-color: transparent;
     color: var(--text-ds-primary-600);
-    border-width: 0px;
-  }
-  .custom-btn-violet {
-    background-color: var(--bg-tertiary-300);
-    color: var(--white-color);
-    border-width: 0px;
-  }
-
-  .custom-btn-outline {
-    background-color: transparent;
-    border-width: 1px;
-  }
-  .custom-btn-underline {
-    background-color: transparent;
-    border-width: 0px;
-    text-decoration: underline;
-    text-underline-offset: 5px;
-  }
-
-  .custom-btn-dark:hover {
-    background-color: var(--bg-tertiary-100);
+    border: 0px;
   }
   .custom-btn-danger {
     background-color: var(--bg-ds-danger-500);
     color: var(--white-color);
-    border-width: 0px;
+    border: 0px;
   }
   .custom-btn-danger:hover {
     background-color: var(--bg-ds-danger-400);
     color: var(--white-color);
-    border-width: 0px;
+    border: 0px;
   }
   .custom-btn-danger:focus-visible {
     border: 2px solid var(--border-ds-danger-200);
+    color: var(--white-color);
     outline: none;
   }
   .custom-btn-danger:active {
     background-color: var(--bg-ds-danger-600);
     color: var(--white-color);
-    border-width: 0px;
+    border: 0px;
   }
   .custom-btn-danger-disable {
     background-color: var(--bg-ds-danger-700);
-    border-width: 0px;
+    border: 0px;
     color: var(--text-ds-neutral-400);
   }
   .custom-btn-outline-danger {
     background-color: transparent;
     color: var(--text-ds-danger-300);
-    border-width: 1px;
-    border-color: var(--border-ds-surface-50);
+    border: 1px solid var(--border-ds-surface-50);
   }
   .custom-btn-outline-danger:hover {
     background-color: var(--bg-ds-danger-500);
     color: var(--white-color);
-    border-width: 0px;
+    border: 0px;
   }
   .custom-btn-outline-danger:active {
     background-color: var(--bg-ds-danger-600);
     color: var(--white-color);
-    border-width: 0px;
+    border: 0px;
   }
   .custom-btn-outline-danger:focus-visible {
     background-color: transparent;
     color: var(--text-ds-danger-300);
     border: 2px solid var(--border-ds-danger-200);
   }
-  .custom-btn-transparent {
-    background-color: transparent;
-    color: var(--white-color);
-  }
   .custom-btn-teritiary-regular {
     background-color: transparent;
-    color: var(--white-color);
+    color: var(--text-ds-neutral-100);
     border: 0px;
   }
-
   .custom-btn-teritiary-regular:hover {
     color: var(--white-color);
     background-color: var(--bg-ds-surface-300);
@@ -727,6 +743,7 @@
   }
   .custom-btn-teritiary-regular:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
+    color: var(--text-ds-neutral-100);
     outline: none;
   }
   .custom-btn-teritiary-regular:active {
@@ -746,6 +763,7 @@
   }
   .custom-btn-teritiary-danger:focus-visible {
     border: 2px solid var(--border-ds-danger-200);
+    color: var(--text-ds-danger-300);
     outline: none;
   }
   .custom-btn-teritiary-danger:active {
@@ -756,18 +774,17 @@
   .custom-btn-teritiary-danger-disable {
     background-color: transparent;
     color: var(--text-ds-danger-700);
-    border-width: 0px;
+    border: 0px;
   }
 
   .custom-btn-outline-danger-disable {
     background-color: transparent;
     color: var(--text-ds-danger-700);
-    border-width: 1px;
-    border-color: var(--bg-ds-surface-400);
+    border: 1px solid var(--border-ds-surface-400);
   }
   .custom-btn-teritiary-regular-disable {
     background-color: transparent;
     color: var(--text-ds-neutral-500);
-    border-width: 0px;
+    border: 0px;
   }
 </style>

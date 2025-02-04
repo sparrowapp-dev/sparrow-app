@@ -47,6 +47,7 @@
     SocketIcon,
     SocketIoIcon,
     GraphIcon,
+    ArrowIcon,
   } from "@sparrow/library/icons";
   import { Options } from "@sparrow/library/ui";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
@@ -304,6 +305,7 @@
       textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
+      buttonstartIcon={ArrowIcon}
       loader={deleteLoader}
       onClick={() => {
         onItemDeleted("collection", {
