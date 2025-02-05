@@ -6,7 +6,7 @@
   export let type: "text" | "password" | "search" = "text";
   export let placeholder = "placeholder";
   export let placeholderColor = "gray";
-  export let height = "30px";
+  export let height = "36px";
   export let width = "auto";
   export let disabled = false;
   let componentClass = "";
@@ -63,14 +63,16 @@
   };
 
   const handleInputChange = (event: InputEvent) => {
-    isTyping = true;
-    value = event.target.value;
-    dispatch("input", value);
-    setTimeout(() => {
-      if (value === event.target.value) {
-        isTyping = false;
-      }
-    }, 2000);
+    if (typingBorderColor !== "transparent") {
+      isTyping = true;
+      value = event.target.value;
+      dispatch("input", value);
+      setTimeout(() => {
+        if (value === event.target.value) {
+          isTyping = false;
+        }
+      }, 2000);
+    }
   };
 </script>
 
@@ -83,10 +85,12 @@
       {type}
       {maxlength}
       {value}
+      {placeholder}
       class="w-100 {componentClass}"
       style={` 
         ${componentStyle}
-        height: 100%;
+        height: ${height};
+        width: ${width};
         ${type === "search" ? `padding-left:${height} !important;` : ""}
         ${type === "text" && isEditIconRequired && isHovered ? "padding-right:35px !important;" : ""}
         border: ${borderColor};
@@ -128,6 +132,8 @@
   input {
     caret-color: var(--border-ds-primary-300);
     border: 1px solid transparent;
+    min-width: 240px;
+    max-width: 540px;
   }
   input::placeholder {
     color: var(--placeholder-color);

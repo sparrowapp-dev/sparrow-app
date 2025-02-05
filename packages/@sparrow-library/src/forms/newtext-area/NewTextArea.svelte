@@ -10,7 +10,7 @@
   /**
    * Height & Width
    */
-  export let height = "30px";
+  export let height = "96px";
   export let width = "auto";
 
   /**
@@ -90,15 +90,17 @@
   const dispatch = createEventDispatcher();
 
   const handleInputChange = (event: InputEvent) => {
-    isTyping = true;
-    value = event.target.value;
-    dispatch("input", event.target.value);
+    if (typedBorderColor !== "transparent") {
+      isTyping = true;
+      value = event.target.value;
+      dispatch("input", event.target.value);
 
-    setTimeout(() => {
-      if (value === event.target.value) {
-        isTyping = false;
-      }
-    }, 3000);
+      setTimeout(() => {
+        if (value === event.target.value) {
+          isTyping = false;
+        }
+      }, 3000);
+    }
   };
 </script>
 
@@ -135,6 +137,8 @@
     scrollbar-width: none;
     caret-color: var(--border-primary-300);
     border: 1px solid transparent;
+    min-width: 240px;
+    max-width: 540px;
   }
   textarea::placeholder {
     color: var(--placeholder-color);

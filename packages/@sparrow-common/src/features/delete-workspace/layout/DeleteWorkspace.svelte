@@ -4,8 +4,8 @@
   // ---- document models
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   // ---- library
-  import { Input } from "@sparrow/library/forms";
   import { Button, IconFallback } from "@sparrow/library/ui";
+  import { NewInput } from "@sparrow/library/forms";
   export let isDeleteWorkspaceModalOpen = false;
   export let workspace: WorkspaceDocument;
   export let openTeam: TeamDocument;
@@ -14,6 +14,19 @@
   let inputName = "";
   let inputNameError = "";
   let loader: boolean = false;
+  $: defaultBorderColor = inputNameError
+    ? "1px solid var(--border-ds-danger-300) !important"
+    : "transparent";
+  $: hoveredBorderColor = inputNameError
+    ? "1px solid var(--border-ds-danger-300) !important"
+    : "1px solid var(--border-ds-neutral-300)";
+
+  $: focusedBorderColor = inputNameError
+    ? "2px solid var(--border-ds-danger-300) !important"
+    : "2px solid var(--border-ds-primary-300)";
+  $: typedBorderColor = inputNameError
+    ? "1px soild var(--border-ds-danger-300) !important"
+    : "1px soild var(----border-ds-primary-300)";
 </script>
 
 <div class="workspace-delete-confirmation">
@@ -32,26 +45,22 @@
   <!-- 
       -- Input 
     -->
-  <Input
+  <NewInput
     bind:value={inputName}
     height={"36px"}
     id={inputId}
     placeholder={"Workspace name"}
     class="text-fs-14 bg-tertiary-300 fw-normal px-2 border-radius-4"
     style="outline:none;"
-    defaultBorderColor={inputNameError
-      ? "var(--border-danger-200)"
-      : "var(--border-secondary-400)"}
-    hoveredBorderColor={inputNameError
-      ? "var(--border-danger-200)"
-      : "var(--border-secondary-400)"}
-    focusedBorderColor={inputNameError
-      ? "var(--border-danger-200)"
-      : "var(--border-secondary-400)"}
+    {defaultBorderColor}
+    {hoveredBorderColor}
+    {focusedBorderColor}
+    {typedBorderColor}
     isEditIconRequired={false}
     type={"text"}
     placeholderColor={"var(--text-secondary-200)"}
   />
+
   {#if inputNameError}
     <p class="error-text sparrow-fs-12">{inputNameError}</p>
   {/if}
@@ -83,7 +92,7 @@
         </p>
       </div>
     </div>
-    <div class="d-flex " >
+    <div class="d-flex">
       <Button
         title={"Cancel"}
         textStyleProp={"font-size: 16px"}

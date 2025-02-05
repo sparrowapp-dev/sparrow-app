@@ -1,6 +1,12 @@
 <script lang="ts">
   import { LeftIcon, SearchIcon } from "@sparrow/library/assets";
-  import { Input, Select, Textarea } from "@sparrow/library/forms";
+  import {
+    Input,
+    NewInput,
+    NewTextArea,
+    Select,
+    Textarea,
+  } from "@sparrow/library/forms";
   import {
     AttachmentIcon,
     CategoryIcon,
@@ -334,6 +340,11 @@
   const handleCommentInputValue = (e: InputEvent) => {
     commentValue = e.target.value;
   };
+  $: defaultBorderColor = "transparent";
+  $: hoveredBorderColor = "transparent";
+
+  $: focusedBorderColor = "transparent";
+  $: typedBorderColor = "transparent";
 </script>
 
 <div class="d-flex flex-row" style="margin-top: 51px; ">
@@ -642,7 +653,7 @@
           : 'mb-3'}"
         style="height: 137px; border-radius: 4px; color:#676A80; "
       >
-        <Input
+        <!-- <Input
           on:input={() => {
             if (feedbackSubject.length > 0) {
               isSubjectEmpty = false;
@@ -662,9 +673,25 @@
           disabled={false}
           placeholder="Subject"
           maxlength={200}
+        /> -->
+        <NewInput
+          id="feedback-subject"
+          width={"100%"}
+          type="text"
+          isEditIconRequired={false}
+          bind:value={feedbackSubject}
+          class="text-fs-20 bg-transparent ellipsis fw-normal px-2"
+          {defaultBorderColor}
+          {hoveredBorderColor}
+          {focusedBorderColor}
+          {typedBorderColor}
+          style="outline:none;"
+          disabled={false}
+          placeholder="Subject"
+          maxlength={200}
         />
         <hr style="margin:0px; padding-bottom:8px;" />
-        <Textarea
+        <!-- <Textarea
           width={"100%"}
           on:input={() => {
             if (feedbackDescription.length > 0) {
@@ -678,6 +705,28 @@
           defaultBorderColor="transparent"
           hoveredBorderColor="transparent"
           focusedBorderColor={"transparent"}
+          class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
+          style="outline:none;
+       "
+          disabled={false}
+          placeholder="Add short description"
+          maxlength={200}
+        /> -->
+        <NewTextArea
+          width={"100%"}
+          on:input={() => {
+            if (feedbackDescription.length > 0) {
+              isDescriptionEmpty = false;
+              isTextArea = false;
+            }
+          }}
+          id="feedback-description"
+          height={"90px"}
+          bind:value={feedbackDescription}
+          defaultBorderColor="transparent"
+          hoveredBorderColor="transparent"
+          focusedBorderColor="transparent"
+          typedBorderColor="transparent"
           class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;
        "
