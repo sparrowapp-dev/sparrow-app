@@ -32,6 +32,7 @@
   export let filteredTestflows;
   export let filteredEnvironments;
   export let isWebApp = false;
+  export let isGuestUser = false;
 
   const methodIcons = {
     GET: getIcon,
@@ -230,7 +231,7 @@
       </div>
     {/if}
 
-    {#if searchQuery == "" && filteredWorkspaces[0]}
+    {#if searchQuery == "" && filteredWorkspaces[0] && !isGuestUser}
       <div style="display:flex;flex-direction:column; gap:4px;">
         <div class="section-top">
           <span class="section-title">Recent Workspace</span>
@@ -459,7 +460,7 @@
           </div>
         {/each}
       {/if}
-      {#if filteredWorkspaces?.length > 0}
+      {#if filteredWorkspaces?.length > 0 && !isGuestUser}
         <div class="section-header">
           <span class="section-title">Workspaces</span>
           <div class="keyboard-shortcut">
@@ -490,7 +491,7 @@
     {:else}
       <NoResults {searchQuery} />
     {/if}
-  {:else if selectedType.toLowerCase() == "workspaces"}
+  {:else if selectedType.toLowerCase() == "workspaces" && !isGuestUser}
     {#if filteredWorkspaces?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Workspaces</span>
