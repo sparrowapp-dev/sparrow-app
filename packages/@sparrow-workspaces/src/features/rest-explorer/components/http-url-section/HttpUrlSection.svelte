@@ -68,7 +68,10 @@
       (event.metaKey || event.ctrlKey) &&
       event.code === "KeyS"
     ) {
+      event.preventDefault();
       handleSaveRequest();
+    } else if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
+      event.preventDefault();
     } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
       onSendButtonClicked(environmentVariables);
     }
