@@ -19,12 +19,13 @@
   import { onMount } from "svelte";
   import { MessageTextIcon } from "@sparrow/library/icons";
   import type { SvelteComponent } from "svelte";
+  import { UploadArea } from "@sparrow/library/ui";
 
   /**
    * Exports
    */
   export let teamForm: TeamForm;
-  export let maxFileSizeText = 2;
+  export let maxFileSizeText: number = 2;
   export let iconComponent: typeof SvelteComponent;
 
   /**
@@ -130,83 +131,32 @@
 </script>
 
 <div class="pb-1">
-  <!-- 
-    -- Title 
-  -->
-  <span class="text-fs-14 upload-file-title">{ICON_CONFIG.TITLE}</span>
-
-  <!-- 
-    -- Description 
-  -->
-  {#if !(!Array.isArray(teamForm.file.value) && teamForm.file.value.size > 0)}
-    <p class="mb-2 text-fs-12 upload-file-description">
-      {ICON_CONFIG.DESCRIPTION}
-    </p>
-  {/if}
-
-  <!-- 
-    -- Icon Uploader 
-  -->
-  <IconUploader
-    value={teamForm.file.value}
-    maxFileSize={ICON_CONFIG.MAX_FILE_SIZE_KB}
-    onChange={handleLogoInputChange}
-    resetValue={handleLogoReset}
-    editValue={handleLogoEdit}
-    inputId={iconUploaderId}
-    inputPlaceholder={ICON_CONFIG.PLACEHOLDER}
-    supportedFileTypes={ICON_CONFIG.FILE_TYPES}
-    isError={teamForm.file.invalid}
-    fileName={teamForm.file.value?.name}
-  />
-
-  <!-- 
-    -- Error Messages 
-  -->
-  <div class="d-flex col justify-content-between">
-    <div>
-      {#if teamForm.file.showFileSizeError}
-        <div class="d-flex col gap-1">
-          {#if iconComponent}
-            {iconComponent}
-          {:else}
-            <MessageTextIcon visible={false} />
-          {/if}
-          <p class="mb-2 text-fs-12 message-error-text">
-            {ICON_CONFIG.SIZE_EXCEED_ERROR_MESSAGE}
-          </p>
-        </div>
-      {:else if teamForm.file.showFileTypeError}
-        <div class="d-flex col gap-1">
-          {#if iconComponent}
-            {iconComponent}
-          {:else}
-            <MessageTextIcon visible={false} />
-          {/if}
-          <p class="mb-2 text-fs-12 message-error-text">
-            {ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
-          </p>
-        </div>
-        <!-- 
-        -- Supportes File Types Button 
-      -->
-        <div class="d-flex">
-          {#each ICON_CONFIG.FILE_TYPES as fileType (fileType)}
-            <span class="me-2">
-              <FileType {fileType} />
-            </span>
-          {/each}
-        </div>
-      {/if}
-    </div>
-    <div class="upload-max-file-content">
-      <p
-        class={`mb-2 text-fs-12 ${teamForm.file.showFileSizeError ? "upload-max-file-text-error" : "upload-max-file-text"}`}
-      >
-        Max file size: {maxFileSizeText}MB
-      </p>
-    </div>
-  </div>
+  <UploadArea
+    titleName={ICON_CONFIG.TITLE}
+    descriptionName={ICON_CONFIG.DESCRIPTION}
+    fileValue={teamForm.file.value}
+    fileSize={teamForm.file.value.size}
+    fileSizeError={teamForm.file.showFileSizeError}
+    fileSizeErrorMessage={ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
+    fileTypeError={teamForm.file.showFileTypeError}
+    fileTypeErrorMessage={ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
+    fileTypes={ICON_CONFIG.FILE_TYPES}
+    {maxFileSizeText}
+    {iconComponent}
+  >
+    <IconUploader
+      value={teamForm.file.value}
+      maxFileSize={ICON_CONFIG.MAX_FILE_SIZE_KB}
+      onChange={handleLogoInputChange}
+      resetValue={handleLogoReset}
+      editValue={handleLogoEdit}
+      inputId={iconUploaderId}
+      inputPlaceholder={ICON_CONFIG.PLACEHOLDER}
+      supportedFileTypes={ICON_CONFIG.FILE_TYPES}
+      isError={teamForm.file.invalid}
+      fileName={teamForm.file.value?.name}
+    />
+  </UploadArea>
 </div>
 
 <style lang="scss">
