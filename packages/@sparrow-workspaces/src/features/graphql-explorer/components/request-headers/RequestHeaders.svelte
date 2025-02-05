@@ -4,6 +4,7 @@
   import { createDeepCopy } from "@sparrow/common/utils/conversion.helper";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
+  import { Toggle } from "@sparrow/library/ui";
 
   export let environmentVariables = [];
   export let onHeadersChange;
@@ -57,8 +58,8 @@
   <div>
     {#if !isBulkEditActive}
       <div class="d-flex align-items-center py-3">
-        <span class="text-primary-300 fw-bold generated-para me-2">
-          Show auto-generated headers
+        <!-- <span class="text-primary-300 fw-bold generated-para me-2">
+          Show aud headers
         </span>
         <div class="form-check form-switch custom-switch">
           <input
@@ -69,7 +70,11 @@
             bind:checked={showGeneratedHeader}
           />
           <label class="slider" for="flexSwitchCheckDefault"></label>
-        </div>
+        </div> -->
+         <Toggle
+          bind:isActive={showGeneratedHeader}
+          label="Show auto-generated headers"
+         /> 
       </div>
     {/if}
   </div>
