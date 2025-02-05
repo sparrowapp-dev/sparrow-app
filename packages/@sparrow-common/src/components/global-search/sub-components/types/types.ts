@@ -8,6 +8,7 @@ export interface SearchSuggestion {
     | "request";
   label: string;
   icon: string;
+  show: boolean;
 }
 
 export interface RecentItem {
@@ -18,5 +19,3 @@ export interface RecentItem {
   icon?: string;
   method?: string;
 }
-
-
