@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   // Exports
   /**
    * Callback to update description
@@ -403,7 +404,9 @@
         </div>
         <div class="d-flex align-items-center gap-2">
           <span class="fs-4 highlighted-number">{totalRequests}</span>
-          <p style="font-size: 12px;" class="mb-0">REST</p>
+          <p style="font-size: 12px;" class="mb-0">
+            {HttpRequestDefaultNameBaseEnum.NAME}
+          </p>
         </div>
         {#if !isWebApp}
           <div>

@@ -3,6 +3,7 @@
   /**
    * The tab of the folder
    */
+  import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   export let tab: TabDocument;
   /**
    * The folder data from repository
@@ -160,7 +161,9 @@
     <div class="d-flex gap-4 mb-4 ps-2">
       <div class="d-flex align-items-center gap-2">
         <span class="fs-4 text-primary-300">{totalRequests}</span>
-        <p style="font-size: 12px;" class="mb-0">REST</p>
+        <p style="font-size: 12px;" class="mb-0">
+          {HttpRequestDefaultNameBaseEnum.NAME}
+        </p>
       </div>
       {#if !isWebApp}
         <div class="d-flex align-items-center gap-2">

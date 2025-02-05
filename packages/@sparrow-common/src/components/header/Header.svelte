@@ -17,6 +17,7 @@
   import UserProfileModal, {
     type UserProfileObj,
   } from "./sub-component/UserProfileModal.svelte";
+  // import { GlobalSearch } from "../../components/popup/global-search";
   /**
    * environment list
    */
@@ -53,10 +54,13 @@
 
   export let onSwitchWorkspace;
   export let onSwitchTeam;
+  export let onGlobalSearchToggle;
 
   export let isWebApp = false;
 
   export let isCreateTeamModalOpen;
+  export let searchQuery = "";
+  export let onSearchClick;
 
   /**
    * callback for Select component
@@ -78,7 +82,11 @@
     localStorage.setItem("selectedAgent", tabId);
     multipleAgentvar = tabId;
   };
-
+  const handleSearchClick = () => {
+    if (onSearchClick) {
+      onSearchClick(); // Trigger the function passed from Dashboard
+    }
+  };
   $: {
     if (multipleAgentvar) {
       localStorage.setItem("selectedAgent", multipleAgentvar);
@@ -173,6 +181,10 @@
   const handleViewWorkspaces = () => {
     navigate("/app/home");
   };
+
+  const handleViewGlobalSearch = () => {
+    isGlobalSearchOpen = true;
+  };
   export let user;
   export let onLogout;
 
@@ -182,6 +194,7 @@
   import { onMount } from "svelte";
   import { OSDetector } from "../../utils";
   import WindowAction from "./window-action/WindowAction.svelte";
+  import SearchBar from "../SearchBar/SearchBar.svelte";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",
@@ -193,6 +206,7 @@
   };
 
   let showProfileModal = false;
+  let searchValue = "";
 
   let appWindow;
 
@@ -372,6 +386,14 @@
       </div>
     {/if}
 
+    {#if !isGuestUser}
+      <SearchBar
+        placeholder="Search Sparrow"
+        bind:searchQuery
+        onClick={handleSearchClick}
+      />
+    {/if}
+
     <!-- Multiple Agent Dropdown -->
     {#if isWebApp}
       <Select
@@ -449,6 +471,7 @@
       </Select>
     {/if}
     <!-- {#if !isWebApp} -->
+
     <Select
       id={"environment-selector"}
       data={[

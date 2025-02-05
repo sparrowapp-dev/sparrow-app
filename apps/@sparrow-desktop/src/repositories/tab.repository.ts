@@ -646,7 +646,7 @@ export class TabRepository {
       })
       .exec();
   };
-  z;
+  
 
   /**
    * Retrieves a tab by its unique identifier.
