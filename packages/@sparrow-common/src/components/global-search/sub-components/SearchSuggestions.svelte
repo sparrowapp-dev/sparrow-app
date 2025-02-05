@@ -22,10 +22,12 @@
   export let filteredTestflows;
   export let filteredEnvironments;
   export let isWebApp = false;
+  export let isGuestUser = false;
+  export let searchBarRef;
 </script>
 
 <div class="suggestions-container">
-  <SuggestionTags {suggestions} bind:selectedType />
+  <SuggestionTags {suggestions} bind:selectedType bind:searchBarRef />
   <RecentItems
     {handleSwitchWorkspaceModal}
     {searchQuery}
@@ -46,6 +48,7 @@
     {handleGlobalSearchEnvironmentNavigation}
     {handleGlobalSearchTestflowNavgation}
     {isWebApp}
+    {isGuestUser}
   />
 </div>
 
