@@ -496,4 +496,8 @@ export class CollectionRepository {
   public clearCollections = async (): Promise<any> => {
     return RxDB.getInstance().rxdb.collection.find().remove();
   };
+
+  public getCollectionDocs = (): CollectionDocument[] => {
+    return RxDB.getInstance().rxdb?.collection.find().exec();
+  };
 }
