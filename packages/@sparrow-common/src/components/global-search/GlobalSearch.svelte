@@ -59,7 +59,7 @@
       type: "workspace",
       label: "Workspaces",
       icon: WorkspaceIcon,
-      show: isGuestUser ? false : true,
+      show: !isGuestUser,
     },
     {
       type: "collection",
