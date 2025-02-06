@@ -1,18 +1,24 @@
 <script lang="ts">
   export let badgeColor: "red" | "blue" | "gray" = "red";
   export let badgeSize: "small" | "medium" = "medium";
-  export let badgeNumberHeight: string = "18px";
-  export let badgeNumberWidth: string = "18px";
+  export let badgeContainerHeight: string = "18px";
+  export let inputNumberSize: string = "12px";
   export let badgeValue: boolean = false;
   export let inputValue: number = 1;
   export let maxValue: number = 999;
+
+  // Dynamic width based on input value
+  $: badgeContainerWidth = inputValue >= 100 ? "28px" : "18px";
+
+  // Dynamic border radius: 50% for 1-2 digits, 13px for 3+ digits
+  $: badgeBorderRadius = inputValue >= 100 ? "13px" : "50%";
 </script>
 
-<div class={`d-flex ${!badgeValue ? "p-1" : "p-1"}`}>
-  {#if badgeValue && inputValue < maxValue}
+<div class="d-flex p-1">
+  {#if badgeValue && inputValue <= maxValue}
     <span
       class="circle-bot {badgeColor}-color text-center"
-      style={`width: ${badgeNumberWidth}; height: ${badgeNumberHeight};`}
+      style={`width: ${badgeContainerWidth}; height: ${badgeContainerHeight}; font-size: ${inputNumberSize}; border-radius: ${badgeBorderRadius};`}
     >
       {inputValue}
     </span>
@@ -32,13 +38,12 @@
 
 <style>
   .circle-bot {
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
     font-weight: 400;
     text-align: center;
+    max-width: 40px;
   }
   .red-color {
     color: var(--white-color);

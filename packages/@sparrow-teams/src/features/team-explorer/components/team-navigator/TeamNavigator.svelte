@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Label, Tooltip } from "@sparrow/library/ui";
+  import { Tooltip } from "@sparrow/library/ui";
   import { BadgeIcon } from "@sparrow/library/icons";
   export let tabs = [];
   export let activeTeamTab: string;
@@ -31,14 +31,10 @@
             style="font-size: 12px; font-weight:700"
             ><span>{tab.name}</span>
             {#if tab.count}
-              <!-- <span class="ms-1"></span>
-              <Label number={tab.count} /> -->
               <BadgeIcon
                 badgeValue={true}
                 badgeColor="blue"
                 inputValue={tab.count}
-                badgeNumberHeight={"14px"}
-                badgeNumberWidth={"14px"}
               />
             {/if}
           </span>
