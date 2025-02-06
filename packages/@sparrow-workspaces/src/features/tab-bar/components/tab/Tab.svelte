@@ -14,6 +14,7 @@
 
   // ---- Interface
   import {
+    BadgeIcon,
     CrossIconV2,
     GraphIcon,
     SocketIcon,
@@ -178,10 +179,7 @@
     </button>
     {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
       {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
-        <span
-          class="m-1 opacity-1"
-          style="height: 6px; aspect-ratio: 1; background-color: var(--tab-unsave-icon); border-radius: 50%;"
-        />
+        <BadgeIcon badgeValue={false} badgeColor="red" badgeSize="medium" />
       {/if}
     {/if}
 
