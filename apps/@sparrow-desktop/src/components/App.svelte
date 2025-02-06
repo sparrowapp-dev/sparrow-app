@@ -2,6 +2,7 @@
   import { Router, Route } from "svelte-navigator";
   import "font-awesome/css/font-awesome.css";
   import { Toast } from "@sparrow/library/ui";
+  import { NewToast } from "@sparrow/library/ui";
   import Authguard from "../routing/Authguard.svelte";
   import Navigate from "../routing/Navigate.svelte";
   import Dashboard from "@app/pages/dashboard-page/Dashboard.svelte";
@@ -97,7 +98,8 @@
   </Authguard>
 </Router>
 
-<Toast />
+<!-- <Toast /> -->
+<NewToast />
 <svelte:window on:keydown={handleShortcuts} on:keyup={handleShortcuts} />
 
 <style>
