@@ -283,6 +283,7 @@ export class EnvironmentViewModel {
     if (isGuestUser) {
       this.environmentRepository.updateEnvironment(env.id, {
         name: newEnvironmentName,
+        updatedAt: new Date().toString(),
       });
       let currentTab = await this.tabRepository.getTabById(env.id);
       if (currentTab) {
@@ -302,6 +303,7 @@ export class EnvironmentViewModel {
     if (response.isSuccessful) {
       this.environmentRepository.updateEnvironment(env.id, {
         name: newEnvironmentName,
+        updatedAt: response.data.data.updatedAt,
       });
       let currentTab = await this.tabRepository.getTabById(env.id);
       if (currentTab) {
