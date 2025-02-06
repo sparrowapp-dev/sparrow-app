@@ -239,6 +239,7 @@ export class TestflowViewModel {
     if (isGuestUser) {
       this.testflowRepository.updateTestflow(testflow._id, {
         name: newTestflowName,
+        updatedAt: new Date().toString(),
       });
       const currentTab = await this.tabRepository.getTabById(testflow._id);
       if (currentTab) {
@@ -258,6 +259,8 @@ export class TestflowViewModel {
     if (response.isSuccessful) {
       this.testflowRepository.updateTestflow(testflow._id, {
         name: newTestflowName,
+        updatedAt: response.data.data.updatedAt,
+        updatedBy: response.data.data.updatedBy,
       });
       const currentTab = await this.tabRepository.getTabById(testflow._id);
       if (currentTab) {
