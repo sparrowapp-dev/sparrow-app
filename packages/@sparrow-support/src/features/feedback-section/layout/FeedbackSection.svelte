@@ -633,6 +633,7 @@
                         .fontColor}; border:0.2px solid {getColor(post?.status)
                         .fontColor}; "
                     >
+                    
                       {post.status
                         .split(" ")
                         .map(
