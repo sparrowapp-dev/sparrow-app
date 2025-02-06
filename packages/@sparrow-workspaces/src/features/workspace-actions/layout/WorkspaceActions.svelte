@@ -2,7 +2,7 @@
   import { doubleAngleLeftIcon as doubleangleLeft } from "@sparrow/library/assets";
   import { FilterIcon } from "@sparrow/library/assets";
   import { plusWhiteIcon as plusIcon } from "@sparrow/library/assets";
-
+  import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import { Events, WorkspaceRole } from "@sparrow/common/enums";
   import { Dropdown } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
@@ -247,7 +247,7 @@
           },
         },
         {
-          name: "Add REST API",
+          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           icon: VectorIcon,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "12px",
@@ -330,7 +330,7 @@
           },
         },
         {
-          name: "Add REST API",
+          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           icon: VectorIcon,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "12px",
@@ -423,6 +423,19 @@
         option.isHoverConstant = !option.isHoverConstant; // Toggle the value
       }
     });
+  };
+
+  const formatVersion = (version) => {
+    try {
+      const parts = version.split(".");
+      const major = parts[0];
+      const minor = parts[1];
+      const patch = parts[2];
+
+      return patch === "0" ? `${major}.${minor}` : `${major}.${minor}.${patch}`;
+    } catch (error) {
+      return version;
+    }
   };
 </script>
 
@@ -721,7 +734,9 @@
         <!--Disabling the version feature switch as it was just for testing purpose, can be used for implementation example-->
         <!-- {#if isAppVersionVisible} -->
         {#if !isWebApp}
-          <span class="text-fs-14 text-secondary-200 pe-2">v{appVersion}</span>
+          <span class="text-fs-14 text-secondary-200 pe-2"
+            >v{formatVersion(appVersion)}</span
+          >
         {/if}
 
         <!-- {/if} -->

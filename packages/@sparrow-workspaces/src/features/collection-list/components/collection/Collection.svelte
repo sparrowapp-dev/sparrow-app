@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
   export let onItemCreated: (entityType: string, args: any) => void;
   export let onItemDeleted: (entityType: string, args: any) => void;
@@ -268,7 +269,7 @@
     </div>
     <div class="d-flex gap-1">
       <span class="text-plusButton">{requestCount}</span>
-      <p>REST</p>
+      <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
     </div>
     {#if !isWebApp}
       <div class="d-flex gap-1">
@@ -391,7 +392,7 @@
             collection,
           });
         },
-        displayText: "Add REST API",
+        displayText: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
         disabled: false,
         hidden: false,
         icon: SyncIcon,
