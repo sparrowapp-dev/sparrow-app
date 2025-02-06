@@ -3,18 +3,34 @@
   export let onToggle: () => void = () => {};
   export let disabled: boolean = false;
   export let label = "";
-  export let textColor="";
-  export let textSize = "";
-  export let fontWeight = "";
-  export let fontFamily = "";
-  let toggleRef: any;
+  export let textColor = "var(--text-ds-primary-400)";
+  export let fontSize = "12px";
+  export let fontWeight = "700";
+  export let fontFamily = "Inter, sans-serif";
+  export let onChange: (event: Event) => void = () => {};
+  export let onClick: (event: MouseEvent) => void = () => {};
 
-  function handleToggle() {
-    if (disabled) return;
-    isActive = !isActive;
-    toggleRef.focus();
-    onToggle();
+  let inputRef: HTMLInputElement;
+
+  function handleChange(event: Event) {
+    if (disabled) {
+      event.preventDefault();
+      return;
+    }
+
+    const target = event.target as HTMLInputElement;
+    isActive = target.checked;
+    onChange(event);
   }
+
+  function handleClick(event: MouseEvent) {
+    if (disabled) {
+      event.preventDefault();
+      return;
+    }
+    onClick(event);
+  }
+
   const convertCasing = (sentence: string) => {
     let sen =
       sentence.charAt(0).toUpperCase() + sentence.slice(1).toLowerCase();
@@ -30,32 +46,35 @@
   class:hasLabel={label.length > 0}
   class:disabled
 >
-  {#if label.length > 0}
-    <label for="toggle" class="label-text" on:click={handleToggle}>
-      {convertCasing(label)}
-    </label>
-  {/if}
+  <label class="switch-label" class:disabled>
+    {#if label.length > 0}
+      <span
+        class="label-text"
+        style="font-size: {fontSize}; font-weight: {fontWeight}; font-family: {fontFamily}; color: {textColor}"
+      >
+        {convertCasing(label)}
+      </span>
+    {/if}
 
-  <div
-    class="toggle-container"
-    role="switch"
-    aria-checked={isActive}
-    on:click={handleToggle}
-    aria-disabled={disabled}
-    class:disabled
-    class:hasLabel={label.length > 0}
-    id="toggle"
-    aria-labelledby="toggle-label"
-    bind:this={toggleRef}
-  >
-    <div
-      class="toggle-track"
-      class:active={isActive}
-      tabindex={label.length > 0 ? -1 : 0}
-    >
-      <div class="toggle-knob" class:active={isActive}></div>
-    </div>
-  </div>
+    <span class="toggle-container" class:hasLabel={label.length > 0}>
+      <input
+        type="checkbox"
+        bind:this={inputRef}
+        checked={isActive}
+        on:change={handleChange}
+        on:click={handleClick}
+        {disabled}
+        aria-label={label}
+      />
+      <span
+        class="toggle-track"
+        class:active={isActive}
+        tabindex={label.length > 0 ? -1 : 0}
+      >
+        <span class="toggle-knob" class:active={isActive}></span>
+      </span>
+    </span>
+  </label>
 </div>
 
 <style>
@@ -63,28 +82,42 @@
     display: flex;
     gap: 8px;
     width: fit-content;
-    padding: 4px 0px;
+    padding: 2px 0px;
     border-radius: 4px;
     margin: 2px;
   }
-  .main-container.disabled .label-text {
-    color: var(--bg-ds-neutral-500);
+
+  .switch-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
   }
 
-  .main-container[tabindex="0"]:focus-visible {
-    box-shadow: 0 0 0 2px var(--bg-ds-primary-300) !important;
-    outline: none;
+  .switch-label.disabled {
+    cursor: not-allowed !important;
   }
-  .toggle-track[tabindex="0"]:focus-visible {
-    box-shadow: 0 0 0 2px var(--bg-ds-primary-300);
+
+  .main-container.disabled .label-text {
+    color: var(--bg-ds-neutral-500) !important;
+  }
+
+  .main-container.hasLabel[tabindex="0"]:focus-visible {
+    box-shadow: 0 0 0 2px var(--bg-ds-primary-300) ;
     outline: none;
   }
 
   .toggle-container {
     display: inline-block;
     width: 30px;
-    cursor: pointer;
+    position: relative;
     user-select: none;
+  }
+  input[type="checkbox"] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
   }
 
   .toggle-track {
@@ -94,43 +127,53 @@
     height: 16px;
     min-height: fit-content;
     transition: background-color 0.3s ease;
+    display: block;
   }
-  .toggle-container.disabled .toggle-track {
+
+.hasLabel input:focus-visible ~ .toggle-track {
+  box-shadow: none;
+  outline: none;
+}
+
+ .toggle-track[tabindex="0"]:focus-visible {
+    box-shadow: 0 0 0 2px var(--bg-ds-primary-300);
+    outline: none;
+  }
+
+  .switch-label.disabled .toggle-track {
     border: 1px solid var(--bg-ds-surface-100);
   }
 
   .label-text {
-    font-size: 12px;
-    color: var(--white-color);
     line-height: 18px;
-    font-weight: 500;
-    font: Inter, sans-serif;
     max-width: auto;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    cursor: pointer;
   }
-  .toggle-track.active {
+
+  input:checked ~ .toggle-track {
     background-color: var(--bg-ds-primary-400);
   }
-  .toggle-container:hover .toggle-track.active {
-    background-color: var(--bg-ds-primary-300);
-  }
-  .toggle-container:hover .toggle-track {
+
+  .switch-label:hover .toggle-track {
     background-color: var(--bg-ds-surface-100);
   }
-  .toggle-container.disabled .toggle-track.active {
-    background-color: var(--bg-ds-blue-700);
+
+  .switch-label:hover input:checked ~ .toggle-track {
+    background-color: var(--bg-ds-primary-300);
   }
-  .toggle-container.disabled .toggle-track {
+
+  .switch-label.disabled .toggle-track {
     background-color: var(--bg-ds-surface-500);
   }
-  .toggle-container.disabled .toggle-knob {
-    background-color: var(--bg-ds-neutral-300);
-  }
-  .toggle-container.disabled .toggle-track.active {
+
+  .switch-label.disabled input:checked ~ .toggle-track {
     background-color: var(--bg-ds-primary-700);
+  }
+
+  .switch-label.disabled .toggle-knob {
+    background-color: var(--bg-ds-neutral-300);
   }
 
   .toggle-knob {
@@ -143,10 +186,10 @@
     background-color: var(--bg-ds-neutral-50);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     transition: transform 0.15s ease-out;
+    display: block;
   }
 
-  .toggle-knob.active,
-  .toggle-container.disabled .toggle-knob.active {
+  input:checked ~ .toggle-track .toggle-knob {
     transform: translateX(14px);
   }
 </style>

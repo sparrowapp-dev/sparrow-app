@@ -58,20 +58,6 @@
   <div>
     {#if !isBulkEditActive}
       <div class="d-flex align-items-center py-3">
-        <!-- <span class="text-primary-300 fw-bold generated-para me-2">
-          Show auto-generated headers
-        </span>
-        <div class="form-check form-switch custom-switch">
-          <input
-            class="form-check-input"
-            type="checkbox"
-            role="switch"
-            id="flexSwitchCheckDefault"
-            bind:checked={showGeneratedHeader}
-          />
-          <label class="slider" for="flexSwitchCheckDefault"></label>
-        </div> -->
-        
        <Toggle
           bind:isActive={showGeneratedHeader}
           label="Show auto-generated headers"

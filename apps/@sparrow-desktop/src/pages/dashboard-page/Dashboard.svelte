@@ -42,8 +42,6 @@
     SidebarItemIdEnum,
   } from "@sparrow/common/types/sidebar/sidebar-base";
 
-  import { Toggle } from "@sparrow/library/ui";
-
   const _viewModel = new DashboardViewModel();
   let userId;
   const userUnsubscribe = user.subscribe(async (value) => {
@@ -550,13 +548,7 @@
 <div
   class="dashboard d-flex flex-column {isGlobalSearchOpen ? 'blurred' : ''}"
   style="height: 100vh;"
->
-
-<div style="">
-  <Toggle onToggle={()=>{
-  console.log("toggle fn");
-}}/>
-</div>
+> 
   <Header
     environments={$environments?.filter((element) => {
       return element?.workspaceId === currentWorkspaceId;
