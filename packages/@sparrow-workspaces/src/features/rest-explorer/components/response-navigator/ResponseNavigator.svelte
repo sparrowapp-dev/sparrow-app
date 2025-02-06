@@ -2,7 +2,7 @@
   import { Label } from "@sparrow/library/ui";
   import { type UpdateRequestStateType } from "@sparrow/workspaces/type";
   import { ResponseSectionEnum } from "@sparrow/common/types/workspace";
-  import { Navigator } from "../../../../components";
+  import { Navigator } from "@sparrow/library/ui";
   export let requestStateSection: string;
   export let onUpdateResponseState;
   export let responseHeadersLength = 0;
@@ -11,6 +11,8 @@
     name: string;
     id: ResponseSectionEnum;
     count: number;
+    disabled?: boolean;
+    icon?: string;
   }[] = [];
 
   /**
@@ -24,6 +26,7 @@
         name: "Headers",
         id: ResponseSectionEnum.HEADERS,
         count: _responseHeadersLength,
+        disabled: false,
       },
     ];
   };
