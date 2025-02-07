@@ -6,7 +6,7 @@
   export let count: number = 1;
   export let maxCount: number = 999;
   // Dynamic width based on input value
-  $: badgeContainerWidth = count >= 100 ? "28px" : "18px";
+  $: badgeContainerWidth = count >= 100 ? "28px" : "16px";
 
   // Dynamic border radius: 50% for 1-2 digits, 13px for 3+ digits
   $: badgeBorderRadius = count >= 100 ? "13px" : "50%";
@@ -16,7 +16,7 @@
   {#if !dot && count <= maxCount}
     <span
       class="circle-bot {badgeColor}-color text-center d-flex align-items-center justify-content-center fw-normal text-center"
-      style={`width: ${badgeContainerWidth}; height: 18px; font-size: ${size}; border-radius: ${badgeBorderRadius};`}
+      style={`width: ${badgeContainerWidth}; height: 16px; font-size: ${size}; border-radius: ${badgeBorderRadius};`}
     >
       {count}
     </span>
