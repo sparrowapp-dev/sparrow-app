@@ -179,7 +179,7 @@
   };
 
   const handleSearchInput = (event) => {
-    searchQuery = event.target.value.toLowerCase();
+    searchQuery = event.detail.toLowerCase();
     hasText = searchQuery.length > 0;
   };
   const clearSearchInput = () => {
@@ -359,10 +359,10 @@
               <div class="pt-2">
                 <div class={`d-flex  rounded  align-items-center mb-4`}>
                   <Search
-                    type="surface700"
+                    variant={"primary"}
                     id="search-input"
                     size="large"
-                    placeholderValue="Search workspaces in {openTeam?.name}"
+                    placeholder="Search workspaces in {openTeam?.name}"
                     on:input={handleSearchInput}
                     bind:value={searchQuery}
                   />

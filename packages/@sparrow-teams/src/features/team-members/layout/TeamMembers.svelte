@@ -71,9 +71,10 @@
     <div class={`d-flex  rounded mb-4 align-items-center`}>
       <div>
         <Search
+          variant="primary"
           size="large"
           id="search-input-team-member"
-          placeholderValue="Search people in {openTeam?.name}"
+          placeholder="Search people in {openTeam?.name}"
           bind:value={filterText}
         />
       </div>

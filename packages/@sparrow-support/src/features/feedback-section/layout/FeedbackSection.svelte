@@ -338,16 +338,15 @@
           }}
         >
           <Search
-            type="surface700"
+            variant="primary"
             size="small"
             id="search-input"
             customWidth={"300px"}
-            placeholderValue="Search updates"
+            placeholder="Search updates"
             bind:value={searchTerm}
             on:input={() => {
               handleInputChangeDebounced(searchTerm);
             }}
-            onInputChange={handleInputChangeDebounced}
           />
         </div>
       </div>

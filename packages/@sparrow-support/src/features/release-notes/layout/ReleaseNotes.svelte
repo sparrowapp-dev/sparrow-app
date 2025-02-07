@@ -78,7 +78,7 @@
    * @param {Event} e - The input event triggered when typing in the search field.
    */
   const handleInput = (e) => {
-    searchQuery = e.target.value;
+    searchQuery = e.detail;
     filterEvents();
   };
 
@@ -191,13 +191,12 @@
         <div class="" style="cursor:pointer">
           <div class={`d-flex  rounded py-1 px-2 mb-4`}>
             <Search
-              type="surface700"
+              variant="primary"
               customWidth={"300px"}
               id="search-input"
-              placeholderValue="Search updates"
+              placeholder="Search updates"
               on:input={handleInput}
               bind:value={searchQuery}
-              onInputChange={handleInput}
             />
           </div>
         </div>

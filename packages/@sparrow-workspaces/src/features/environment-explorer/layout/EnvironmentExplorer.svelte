@@ -144,11 +144,11 @@
           <div class="position-relative">
             <Search
               id={"environment-search"}
-              type="surface700"
+              variant={"primary"}
               bind:value={search}
               on:input={() => {}}
               customWidth={"300px"}
-              placeholderValue="Search Variables"
+              placeholder="Search Variables"
             />
           </div>
 

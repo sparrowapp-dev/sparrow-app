@@ -483,7 +483,7 @@
     >
       <Search
         id="collection-list-search"
-        type="surface700"
+        variant={"primary"}
         size="small"
         customWidth={"250px"}
         bind:value={searchData}
@@ -493,7 +493,7 @@
           isExpandEnvironment = true;
           isExpandTestflow = true;
         }}
-        placeholderValue={"Search"}
+        placeholder={"Search"}
       />
       <div class="d-flex align-items-center justify-content-center d-none">
         <button

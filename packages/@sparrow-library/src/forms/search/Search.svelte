@@ -3,12 +3,11 @@
   import crossIcon from "../../assets/crossicon.svg";
   import { createEventDispatcher, onMount } from "svelte";
 
-  export let placeholderValue = "Search";
+  export let placeholder = "Search";
   export let id = "";
-  export let type: "surface700" | "surface900" = "surface700";
+  export let variant: "primary" | "secondary" = "primary";
   export let size: "small" | "large" = "small";
   export let customWidth = "";
-  export let onInputChange = (value) => {};
   export let value = "";
 
   let searchStyleProp = "";
@@ -19,11 +18,11 @@
 
   const dispatch = createEventDispatcher();
 
-  switch (type) {
-    case "surface700":
+  switch (variant) {
+    case "primary":
       searchClassProp = "custom-surface700";
       break;
-    case "surface900":
+    case "secondary":
       searchClassProp = "custom-surface900";
       break;
     default:
@@ -75,11 +74,10 @@
     }
   };
 
-  function clearSearch() {
+  const clearSearch = () => {
     value = "";
     enterPressed = false;
-    onInputChange(value);
-  }
+  };
 
   onMount(() => {
     window.addEventListener("click", handleClick);
@@ -105,7 +103,7 @@
       class={`${searchClassProp} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}`}
       style={` ${searchStyleProp} ${searchTextProp} color:white; outline:none; ::placeholder { color: var(--text-ds-neutral-300);};`}
       {value}
-      placeholder={placeholderValue}
+      {placeholder}
       on:input={(event) => {
         value = event?.target?.value;
         dispatch("input", event?.target?.value);
@@ -118,7 +116,7 @@
         style={"height: 20px; width: 20px; right: 10px; cursor: pointer;"}
         on:click={clearSearch}
       >
-        <img src={crossIcon} />
+        <i class="icon icon-ic_fluent_access_time_20_filled"></i>
       </div>
     {/if}
   </div>

@@ -122,15 +122,11 @@
         }}
       >
         <Search
-          type="surface700"
+          variant="primary"
           size="large"
           id="search-input"
-          placeholderValue="Search updates"
-          on:input={(e) => {
-            searchTerm = e.target.value;
-          }}
+          placeholder="Search updates"
           bind:value={searchTerm}
-          onInputChange={searchTerm}
         />
       </div>
 

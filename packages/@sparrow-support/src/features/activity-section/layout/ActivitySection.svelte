@@ -207,13 +207,12 @@
     <div>
       <div class={`d-flex  rounded py-1 px-2 mb-2`}>
         <Search
-          type="surface700"
+          variant="primary"
           id="search-input"
           customWidth={"300px"}
-          placeholderValue="Search updates"
+          placeholder="Search updates"
           bind:value={searchTerm}
           on:input={() => handleInputChange(searchTerm)}
-          onInputChange={handleInputChange}
         />
       </div>
     </div>
