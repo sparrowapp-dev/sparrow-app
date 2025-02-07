@@ -165,9 +165,11 @@
     } else if (decidingKey(event) && event.shiftKey) {
       switch (event.key.toLowerCase()) {
         case "w":
-          event.preventDefault();
-          setGlobalSearch(true);
-          setSelectedType("workspaces");
+          if (!isGuestUser) {
+            event.preventDefault();
+            setGlobalSearch(true);
+            setSelectedType("workspaces");
+          }
           break;
         case "a":
           event.preventDefault();
@@ -527,6 +529,7 @@
       transition:fade={{ duration: 300, delay: 150 }}
     >
       <GlobalSearch
+        {isGuestUser}
         isWebApp={false}
         {handleSwitchWorkspaceModal}
         {closeGlobalSearch}
