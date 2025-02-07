@@ -99,7 +99,7 @@ export class TestflowViewModel {
       workspaceId: currentWorkspace._id,
       createdAt: new Date().toISOString(),
       createdBy: "",
-      updatedAt: "",
+      updatedAt: new Date().toISOString(),
       updatedBy: "",
     };
     const guestUser = await this.guestUserRepository.findOne({
