@@ -39,7 +39,7 @@
     max-width: 40px;
   }
   .danger-color {
-    color: var(--white-color);
+    color: var(--text-ds-neutral-100);
     background-color: var(--text-ds-danger-500);
   }
   .primary-color {
