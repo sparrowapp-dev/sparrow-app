@@ -31,7 +31,7 @@
             style="font-size: 12px; font-weight:700"
             ><span>{tab.name}</span>
             {#if tab.count}
-              <Badge dot={false} badgeColor="primary" count={tab.count} />
+              <Badge type={"count"} badgeColor="primary" count={tab.count} />
             {/if}
           </span>
         </button>

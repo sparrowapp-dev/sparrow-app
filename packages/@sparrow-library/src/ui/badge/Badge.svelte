@@ -1,7 +1,7 @@
 <script lang="ts">
   export let badgeColor: "danger" | "primary" | "neutral" = "danger";
   export let badgeSize: "small" | "medium" = "medium";
-  export let dot: boolean = true;
+  export const type: "dot" | "count" = "count";
   export let count: number = 1;
   export let maxCount: number = 999;
 
