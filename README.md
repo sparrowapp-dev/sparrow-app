@@ -120,6 +120,15 @@ yarn web-start
 
 The above command will start the app/web-app in development mode and watch for changes on local.
 
+### Default User for Login:
+
+Sparrow creates a default user to help you get started quickly and easily.
+
+**Login Credentials:**
+
+- **Email:** `dev@sparrow.com`
+- **Password:** `12345678@`
+
 ## <a name="self-host">👨‍💻 Self Host</a>
 
 [Click here](./docs/SELF_HOST.md) to Self Host Sparrow.
