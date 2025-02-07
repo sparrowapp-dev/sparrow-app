@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/teams",
-  "version": "2.16.0",
+  "version": "2.17.1",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",

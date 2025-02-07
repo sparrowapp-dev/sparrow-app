@@ -412,4 +412,38 @@ export class WorkspaceRepository {
       users: filteredUsers,
     });
   };
+
+  public searchWorkspaces = async (
+    searchQuery: string,
+  ): Promise<WorkspaceDocument[]> => {
+    if (!searchQuery.trim()) {
+      // If search query is empty, return recently updated workspaces
+      return await RxDB.getInstance()
+        .rxdb.workspace.find({
+          sort: [{ updatedAt: "desc" }],
+        })
+        .exec();
+    }
+
+    // If there's a search query, filter workspaces by name or description
+    const searchRegex = new RegExp(searchQuery, "i");
+    return await RxDB.getInstance()
+      .rxdb.workspace.find({
+        selector: {
+          $or: [
+            { name: { $regex: searchRegex } },
+            { description: { $regex: searchRegex } },
+          ],
+        },
+      })
+      .exec();
+  };
+
+  public getRecentWorkspaces = async (): Promise<WorkspaceDocument[]> => {
+    return await RxDB.getInstance()
+      .rxdb.workspace.find({
+        sort: [{ updatedAt: "desc" }],
+      })
+      .exec();
+  };
 }
