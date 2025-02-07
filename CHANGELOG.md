@@ -1,3 +1,20 @@
+# [2.18.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.17.0...v2.18.0) (2025-02-07)
+
+
+### Bug Fixes
+
+* fixed recent env and flow in edge [] ([0be7328](https://github.com/sparrowapp-dev/sparrow-app/commit/0be7328836f4549e4ff01f90a6a931d8449c4ab3))
+* fixed the reported bugs [] ([c440cf1](https://github.com/sparrowapp-dev/sparrow-app/commit/c440cf12ff400a85816bdbe508485d31e4116b88))
+* fixed the workspace show property [] ([835ab3d](https://github.com/sparrowapp-dev/sparrow-app/commit/835ab3da71028c394d81c55cd469f4c0bbfa9f9c))
+* http status code tooltip error ([2ec4a9a](https://github.com/sparrowapp-dev/sparrow-app/commit/2ec4a9a5ab367af1323fc0d14c84d658c683059b))
+* the REST to REST API in UI ([fa2352c](https://github.com/sparrowapp-dev/sparrow-app/commit/fa2352cea716cce17b890564eebe8a3e9872ad34))
+
+
+### Features
+
+* added global search in edge and fixed released issues [] ([8fcd087](https://github.com/sparrowapp-dev/sparrow-app/commit/8fcd087ab8879610b4388c535b7bd065ee09ece8))
+* upgraded sparrow version to v2.17.1 [] ([fa2c659](https://github.com/sparrowapp-dev/sparrow-app/commit/fa2c6595023ff65a9a44201176c9d06a7a28ac87))
+
 # [2.17.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.16.0...v2.17.0) (2025-01-31)
 
 
