@@ -305,7 +305,6 @@
       textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
-      buttonstartIcon={ArrowIcon}
       loader={deleteLoader}
       onClick={() => {
         onItemDeleted("collection", {
