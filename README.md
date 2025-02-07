@@ -78,7 +78,7 @@ After completing the required steps of setting up the app, follow one of the bel
 
 #### -> [METHOD 1] Docker Method
 
-- To install all services(mongo + kafka + api server + auth server) as docker containers, run:
+- To install all services(mongo + kafka + api server + auth server + proxy server) as docker containers, run:
 
   `yarn docker:up `
 
@@ -88,8 +88,13 @@ After completing the required steps of setting up the app, follow one of the bel
 
   - `yarn docker:mongo` - Runs only mongo in a docker container
   - `yarn docker:kafka` - Runs only kafka in a docker container
-  - `yarn docker:api` - Runs only the api server
-  - `yarn docker:auth` - Runs only the auth service
+  - `yarn docker:sparrow-api` - Runs only the api server
+  - `yarn docker:sparrow-auth` - Runs only the auth service
+  - `yarn docker:sparrow-proxy` - Runs only the proxy service
+
+  Points to remember:
+
+  - `Running yarn docker:up will also start web app on localhost:1422. You can comment it in docker compose if you want to run it locally.`
 
 #### -> [METHOD 2] Non-Docker Method
 
@@ -97,10 +102,13 @@ After completing the required steps of setting up the app, follow one of the bel
 
   - [Sparrow API](https://github.com/sparrowapp-dev/sparrow-api)
   - [Sparrow Auth](https://github.com/sparrowapp-dev/sparrow-app-auth)
+  - [Sparrow Proxy](https://github.com/sparrowapp-dev/sparrow-proxy-service)
 
-Point to remember: `Mongo and Kafka setup is included in Sparrow API setup.`
+  Points to remember:
 
-### Run The App
+  - `Mongo and Kafka setup is already included in Sparrow API setup.`
+
+### Run The App Locally
 
 ```bash
 # Run the desktop app in dev mode
@@ -110,9 +118,13 @@ yarn desktop-start
 yarn web-start
 ```
 
-The above command will start the app in development mode and watch for changes on local.
+The above command will start the app/web-app in development mode and watch for changes on local.
 
-## <a name="recommended-ide-setup">👨‍💻 Recommended IDE Setup</a>
+## <a name="self-host">👨‍💻 Self Host</a>
+
+[Click here](./docs/SELF_HOST.md) to Self Host Sparrow.
+
+## <a name="recommended-ide-setup"> 💻 Recommended IDE Setup</a>
 
 [VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
 

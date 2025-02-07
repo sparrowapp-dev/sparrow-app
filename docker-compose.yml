@@ -70,10 +70,7 @@ services:
 
   # Sparrow Web
   sparrow-web:
-    # image: sparrowapi/sparrow-web:v1
-    build:
-      context: . # Path where the Dockerfile is located
-      dockerfile: Sparrow-Web.Dockerfile # Explicitly specifying the Dockerfile
+    image: sparrowapi/sparrow-web:v1
       args:
         VITE_WEB_API_TIMEOUT: 7000
         VITE_WEB_API_URL: http://localhost:9000
