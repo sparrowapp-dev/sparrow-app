@@ -1,24 +1,31 @@
 <script lang="ts">
   export let badgeColor: "danger" | "primary" | "neutral" = "danger";
   export let badgeSize: "small" | "medium" = "medium";
-  export let size: string = "12px";
   export let dot: boolean = true;
   export let count: number = 1;
   export let maxCount: number = 999;
-  // Dynamic width based on input value
-  $: badgeContainerWidth = count >= 100 ? "28px" : "16px";
+
+  // Dynamic width based on count value
+  $: badgeContainerWidth =
+    count > maxCount
+      ? "40px"
+      : count >= 100
+        ? "28px"
+        : count >= 10
+          ? "18px"
+          : "16px";
 
   // Dynamic border radius: 50% for 1-2 digits, 13px for 3+ digits
   $: badgeBorderRadius = count >= 100 ? "13px" : "50%";
 </script>
 
 <div class="d-flex p-1">
-  {#if !dot && count <= maxCount}
+  {#if !dot}
     <span
       class="circle-bot {badgeColor}-color text-center d-flex align-items-center justify-content-center fw-normal text-center"
-      style={`width: ${badgeContainerWidth}; height: 16px; font-size: ${size}; border-radius: ${badgeBorderRadius};`}
+      style={`width: ${badgeContainerWidth}; height: 16px; font-size: 12px; border-radius: ${badgeBorderRadius};`}
     >
-      {count}
+      {count > maxCount ? "+999" : count}
     </span>
   {:else}
     <span
