@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { BadgeIcon } from "@sparrow/library/icons";
+  import { Badge } from "@sparrow/library/ui";
   export let tabs;
   export let currentTabId;
 
@@ -23,11 +23,7 @@
         <span class="d-flex align-items-center ps-1 pe-1"
           ><span>{tab.name}</span>
           {#if tab.count}
-            <BadgeIcon
-              badgeValue={true}
-              badgeColor="blue"
-              inputValue={tab.count}
-            />
+            <Badge dot={false} badgeColor="primary" count={tab.count} />
           {/if}
         </span>
       </button>

@@ -1,33 +1,31 @@
 <script lang="ts">
-  export let badgeColor: "red" | "blue" | "gray" = "red";
+  export let badgeColor: "danger" | "primary" | "neutral" = "danger";
   export let badgeSize: "small" | "medium" = "medium";
-  export let badgeContainerHeight: string = "18px";
-  export let inputNumberSize: string = "12px";
-  export let badgeValue: boolean = false;
-  export let inputValue: number = 1;
-  export let maxValue: number = 999;
-
+  export let size: string = "12px";
+  export let dot: boolean = true;
+  export let count: number = 1;
+  export let maxCount: number = 999;
   // Dynamic width based on input value
-  $: badgeContainerWidth = inputValue >= 100 ? "28px" : "18px";
+  $: badgeContainerWidth = count >= 100 ? "28px" : "18px";
 
   // Dynamic border radius: 50% for 1-2 digits, 13px for 3+ digits
-  $: badgeBorderRadius = inputValue >= 100 ? "13px" : "50%";
+  $: badgeBorderRadius = count >= 100 ? "13px" : "50%";
 </script>
 
 <div class="d-flex p-1">
-  {#if badgeValue && inputValue <= maxValue}
+  {#if !dot && count <= maxCount}
     <span
-      class="circle-bot {badgeColor}-color text-center"
-      style={`width: ${badgeContainerWidth}; height: ${badgeContainerHeight}; font-size: ${inputNumberSize}; border-radius: ${badgeBorderRadius};`}
+      class="circle-bot {badgeColor}-color text-center d-flex align-items-center justify-content-center fw-normal text-center"
+      style={`width: ${badgeContainerWidth}; height: 18px; font-size: ${size}; border-radius: ${badgeBorderRadius};`}
     >
-      {inputValue}
+      {count}
     </span>
   {:else}
     <span
       class="unsaved-indicator"
-      style="background-color: {badgeColor === 'blue'
+      style="background-color: {badgeColor === 'primary'
         ? 'var(--bg-ds-primary-400)'
-        : badgeColor === 'gray'
+        : badgeColor === 'neutral'
           ? 'var(--bg-ds-neutral-100)'
           : 'var(--text-ds-danger-400)'}; height: {badgeSize === 'small'
         ? '4px'
@@ -38,22 +36,17 @@
 
 <style>
   .circle-bot {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 400;
-    text-align: center;
     max-width: 40px;
   }
-  .red-color {
+  .danger-color {
     color: var(--white-color);
     background-color: var(--text-ds-danger-500);
   }
-  .blue-color {
+  .primary-color {
     color: var(--text-ds-primary-300);
     background-color: var(--bg-ds-surface-100);
   }
-  .gray-color {
+  .neutral-color {
     color: var(--text-ds-neutral-100);
     background-color: var(--bg-ds-surface-100);
   }

@@ -14,7 +14,6 @@
 
   // ---- Interface
   import {
-    BadgeIcon,
     CrossIconV2,
     GraphIcon,
     SocketIcon,
@@ -24,6 +23,7 @@
   } from "@sparrow/library/icons";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import { type Tab } from "@sparrow/common/types/workspace/tab";
+  import { Badge } from "@sparrow/library/ui";
   // ----
 
   // ------ Props ------
@@ -179,7 +179,7 @@
     </button>
     {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
       {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
-        <BadgeIcon badgeValue={false} badgeColor="red" badgeSize="medium" />
+        <Badge dot={true} badgeColor="primary" badgeSize="medium" />
       {/if}
     {/if}
 
