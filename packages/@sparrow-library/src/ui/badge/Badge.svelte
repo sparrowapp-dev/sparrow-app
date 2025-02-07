@@ -3,7 +3,7 @@
   export let size: "small" | "medium" = "medium";
   export let type: "dot" | "count" = "count";
   export let count: number = 1;
-  export let maxCount: number = 999;
+  const maxCount: number = 999;
 
   // Dynamic width based on count value
   $: badgeContainerWidth =
