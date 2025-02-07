@@ -179,7 +179,7 @@
     </button>
     {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
       {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
-        <Badge dot={true} badgeColor="primary" badgeSize="medium" />
+        <Badge dot={true} badgeColor="danger" badgeSize="medium" />
       {/if}
     {/if}
 
