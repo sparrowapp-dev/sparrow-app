@@ -23,7 +23,7 @@
         <span class="d-flex align-items-center ps-1 pe-1"
           ><span>{tab.name}</span>
           {#if tab.count}
-            <Badge type={"count"} badgeColor="primary" count={tab.count} />
+            <Badge type={"count"} variant="primary" count={tab.count} />
           {/if}
         </span>
       </button>
