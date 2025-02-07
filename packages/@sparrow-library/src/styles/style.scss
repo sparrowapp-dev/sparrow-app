@@ -957,7 +957,7 @@ $blue-50: #dbe5fe;
 $blue-100: #c2d4fd;
 $blue-200: #8aacfa;
 $blue-300: #6894f9;
-$blue-400: #316CF6;
+$blue-400: #316cf6;
 $blue-500: #2854b9;
 $blue-600: #1f418f;
 $blue-700: #18336f;
@@ -1042,7 +1042,7 @@ $cyan-800: #153139;
 $cyan-900: #0f2024;
 
 $neutral-50: #ffffff;
-$neutral-100: #D8D8D9;
+$neutral-100: #d8d8d9;
 $neutral-200: #b6b7b9;
 $neutral-300: #9b9da1;
 $neutral-400: #82858a;
@@ -1065,10 +1065,10 @@ $surface-900: #0b0c0f;
 
 // ---- Use this for colors
 // icon type will be used for Icon colors.
-// bg for Background Colors. 
-// text for Text Colors. 
-// border for Border Colors. 
-// Utility color will be used for all other unknown scenerios. 
+// bg for Background Colors.
+// text for Text Colors.
+// border for Border Colors.
+// Utility color will be used for all other unknown scenerios.
 :root {
   --bg-ds-primary-50: #{$blue-50};
   --bg-ds-primary-100: #{$blue-100};
@@ -1179,6 +1179,61 @@ $surface-900: #0b0c0f;
   --utility-ds-secondary-700: #{$purple-700};
   --utility-ds-secondary-800: #{$purple-800};
   --utility-ds-secondary-900: #{$purple-900};
+
+  --bg-ds-success-50: #{$green-50};
+  --bg-ds-success-100: #{$green-100};
+  --bg-ds-success-200: #{$green-200};
+  --bg-ds-success-300: #{$green-300};
+  --bg-ds-success-400: #{$green-400};
+  --bg-ds-success-500: #{$green-500};
+  --bg-ds-success-600: #{$green-600};
+  --bg-ds-success-700: #{$green-700};
+  --bg-ds-success-800: #{$green-800};
+  --bg-ds-success-900: #{$green-900};
+
+  --icon-ds-success-50: #{$green-50};
+  --icon-ds-success-100: #{$green-100};
+  --icon-ds-success-200: #{$green-200};
+  --icon-ds-success-300: #{$green-300};
+  --icon-ds-success-400: #{$green-400};
+  --icon-ds-success-500: #{$green-500};
+  --icon-ds-success-600: #{$green-600};
+  --icon-ds-success-700: #{$green-700};
+  --icon-ds-success-800: #{$green-800};
+  --icon-ds-success-900: #{$green-900};
+
+  --text-ds-success-50: #{$green-50};
+  --text-ds-success-100: #{$green-100};
+  --text-ds-success-200: #{$green-200};
+  --text-ds-success-300: #{$green-300};
+  --text-ds-success-400: #{$green-400};
+  --text-ds-success-500: #{$green-500};
+  --text-ds-success-600: #{$green-600};
+  --text-ds-success-700: #{$green-700};
+  --text-ds-success-800: #{$green-800};
+  --text-ds-success-900: #{$green-900};
+
+  --border-ds-success-50: #{$green-50};
+  --border-ds-success-100: #{$green-100};
+  --border-ds-success-200: #{$green-200};
+  --border-ds-success-300: #{$green-300};
+  --border-ds-success-400: #{$green-400};
+  --border-ds-success-500: #{$green-500};
+  --border-ds-success-600: #{$green-600};
+  --border-ds-success-700: #{$green-700};
+  --border-ds-success-800: #{$green-800};
+  --border-ds-success-900: #{$green-900};
+
+  --utility-ds-success-50: #{$green-50};
+  --utility-ds-success-100: #{$green-100};
+  --utility-ds-success-200: #{$green-200};
+  --utility-ds-success-300: #{$green-300};
+  --utility-ds-success-400: #{$green-400};
+  --utility-ds-success-500: #{$green-500};
+  --utility-ds-success-600: #{$green-600};
+  --utility-ds-success-700: #{$green-700};
+  --utility-ds-success-800: #{$green-800};
+  --utility-ds-success-900: #{$green-900};
 
   --bg-ds-danger-50: #{$red-50};
   --bg-ds-danger-100: #{$red-100};
