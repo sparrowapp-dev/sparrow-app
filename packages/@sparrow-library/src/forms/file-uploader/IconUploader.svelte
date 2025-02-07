@@ -137,7 +137,15 @@
 
   {#if !Array.isArray(value) && value.size > 0}
     <div
-      class="sparrow-input-image-preview d-flex gap-2 border-radius-4 align-items-center"
+      class="sparrow-input-image-preview d-flex gap-2 border-radius-4 align-items-center justify-content-center"
+      style="border: {isError ? '2px' : '1px'} dashed {isError
+        ? 'var(--border-ds-danger-300)'
+        : 'var(--border-ds-surface-100)'};
+      background-color: ${!disabled
+        ? isError && isFocused
+          ? 'var(--bg-ds-surface-400)'
+          : 'transparent'
+        : 'var(--bg-ds-surface-600)'};"
     >
       <div
         class="sparrow-input-box d-flex col align-items-center justify-content-start"
@@ -157,7 +165,11 @@
             />
           {/if}
         </div>
-        <span class="ms-1 file-name-text text-fs-12"
+        <span
+          class="ms-1 file-name-text text-fs-12"
+          style="color: {isError
+            ? 'var(--text-ds-danger-300)'
+            : 'var(--text-ds-neutral-50)'};"
           >{truncateFileName(fileName, 6)}</span
         >
         <div class="ms-auto d-flex">
@@ -257,14 +269,24 @@
     background-color: var(--bg-ds-surface-400);
   }
   .sparrow-input-image-preview {
-    height: 44px;
+    height: 164px;
     min-width: 240px;
     max-width: 540px;
     gap: 4px;
     border-radius: 4px;
+    border: 1px dashed var(--border-ds-surface-100);
     background-color: var(--bg-ds-surface-400);
-    padding: 8px;
-    padding-right: 80px;
+    transition:
+      border 0.2s ease-in-out,
+      background-color 0.2s ease-in-out;
+    &:hover {
+      border: 1px dashed var(--border-ds-neutral-300) !important;
+      cursor: pointer;
+    }
+    &:focus {
+      border: 1px dashed var(--border-ds-primary-300) !important;
+      background-color: var(--bg-ds-surface-500);
+    }
   }
   .sparrow-input-box {
     width: 100%;
@@ -280,7 +302,6 @@
     width: 24px;
   }
   .file-name-text {
-    color: var(--text-ds-danger-300);
     font-family: "Inter", sans-serif;
     font-weight: 400px;
   }
