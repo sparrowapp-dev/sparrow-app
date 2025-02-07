@@ -178,23 +178,6 @@
     background-color: var(--bg-ds-neutral-300);
   }
 
-  /* .toggle-knob {
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background-color: var(--bg-ds-neutral-50);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    transition: transform 0.15s ease-out;
-    display: block;
-  } */
-
-  /* input:checked ~ .toggle-track .toggle-knob {
-    transform: translateX(14px);
-  } */
-
   .toggle-knob {
   position: absolute;
   top: 2px;
@@ -204,9 +187,9 @@
   border-radius: 50%;
   background-color: var(--bg-ds-neutral-50);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: 
-    transform 0.15s ease-out,
-    width 0.15s ease-out;
+  transition:
+    transform 0.250s ease-out,
+    width 0.250s ease-out;
   display: block;
 }
 

@@ -276,20 +276,6 @@
         <div style="width:140px;" class="ms-3 d-flex align-items-center">
           <div class="w-100 d-flex">
             <div class="w-100 d-flex justify-content-end">
-             
-              
-                 <!-- <p
-                  class="text-nowrap text-primary-300 mb-0 me-0"
-                  style="font-size: 10px; font-weight:400;"
-                >
-                  Bulk Edit
-                </p> 
-
-                 <Switch
-                  bind:checked={bulkToggle}
-                  onClick={handleBulkTextUpdate}
-                  onChange={toggleBulkEdit}
-                /> -->
                  <Toggle
           bind:isActive={bulkToggle}
           label="Bulk Edit"
@@ -411,19 +397,6 @@
                   </div>
                 </div>
               {/if}
-
-                <!-- <p
-                  class="text-nowrap text-primary-300 mb-0"
-                  style="font-size: 10px; font-weight:400; margin-top:3px;"
-                >
-                  Bulk Edit
-                </p>
-
-                <Switch
-                  bind:checked={bulkToggle}
-                  onChange={toggleBulkEdit}
-                  onClick={handleBulkTextUpdate}
-                /> -->
             <div style="margin-right: 2px;">
                   <Toggle
                    bind:isActive={bulkToggle}

@@ -42,12 +42,6 @@
     <div class=" ps-1 d-flex w-50 justify-content-between">
       <div class="d-flex align-items-center">
         {#if true}
-          <!-- <Switch
-            checked={element.listen}
-            onChange={() => {
-              updateCheck(index);
-            }}
-          /> -->
             <Toggle
           bind:isActive={element.listen}
           onChange={updateCheck(index)}
