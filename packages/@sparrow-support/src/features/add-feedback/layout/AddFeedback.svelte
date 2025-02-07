@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Input, Select, Textarea } from "@sparrow/library/forms";
+  import { NewTextArea, Select } from "@sparrow/library/forms";
   import {
     AttachmentIcon,
     CategoryIcon,
@@ -11,6 +11,7 @@
   import { Tooltip } from "@sparrow/library/ui";
   import { Drop } from "@sparrow/support/components";
   import { FeedbackType } from "@sparrow/support/types";
+  import { NewInput } from "@sparrow/library/forms";
 
   export let onAddFeedback;
   export let onInputFeedback;
@@ -93,6 +94,11 @@
     });
     uploadFeedback.file.value = files;
   };
+  $: defaultBorderColor = "transparent";
+  $: hoveredBorderColor = "transparent";
+
+  $: focusedBorderColor = "transparent";
+  $: typedBorderColor = "transparent";
 </script>
 
 <div class=" w-100">
@@ -181,16 +187,6 @@
       <p class="error-message">Please select a feedback category.</p>
     {/if}
     <div style="">
-      <p
-        class="text-fs-14 mb-0"
-        style="color: var(--text-secondary-1000); font-weight: 400;"
-      >
-        Description
-      </p>
-      <p class="text-fs-12 text-secondary-200 mb-1">
-        {feedbackDescription.length} / 200
-      </p>
-
       <div
         class="p-2 bg-tertiary-300 {isDescriptionEmpty ||
         isSubjectEmpty ||
@@ -199,7 +195,12 @@
           : 'mb-3'}"
         style="height: 137px; border-radius: 4px; color:#676A80; "
       >
-        <Input
+        <NewInput
+          class="text-fs-20 bg-transparent ellipsis fw-normal px-2"
+          style="outline:none;"
+          disabled={false}
+          placeholder="Subject"
+          maxlength={200}
           on:input={() => {
             if (feedbackSubject.length > 0) {
               isSubjectEmpty = false;
@@ -207,21 +208,17 @@
             }
           }}
           id="feedback-subject"
+          {defaultBorderColor}
+          {hoveredBorderColor}
+          {focusedBorderColor}
+          {typedBorderColor}
           width={"100%"}
           type="text"
           isEditIconRequired={false}
           bind:value={feedbackSubject}
-          defaultBorderColor="transparent"
-          hoveredBorderColor="transparent"
-          focusedBorderColor={"transparent"}
-          class="text-fs-20 bg-transparent ellipsis fw-normal px-2"
-          style="outline:none;"
-          disabled={false}
-          placeholder="Subject"
-          maxlength={200}
         />
         <hr class="m-0 ms-2" style="padding-bottom:5px;" />
-        <Textarea
+        <NewTextArea
           on:input={() => {
             if (feedbackDescription.length > 0) {
               isDescriptionEmpty = false;
@@ -233,7 +230,8 @@
           bind:value={feedbackDescription}
           defaultBorderColor="transparent"
           hoveredBorderColor="transparent"
-          focusedBorderColor={"transparent"}
+          focusedBorderColor="transparent"
+          typedBorderColor="transparent"
           class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;
            "
@@ -242,18 +240,34 @@
           maxlength={200}
         />
       </div>
-
-      {#if isSubjectEmpty}
-        <p class="error-message">Enter a relevant subject for feedback.</p>
-      {/if}
-      {#if isDescriptionEmpty}
-        <p class="error-message">Enter a relevant description for feedback.</p>
-      {/if}
-      {#if isTextArea}
-        <p class="error-message">
-          Please enter subject and description for adding a feedback.
-        </p>
-      {/if}
+      <div class="d-flex col justify-content-between">
+        <div>
+          {#if isSubjectEmpty}
+            <p class="error-message">Enter a relevant subject for feedback.</p>
+          {/if}
+          {#if isDescriptionEmpty}
+            <p class="error-message">
+              Enter a relevant description for feedback.
+            </p>
+          {/if}
+          {#if isTextArea}
+            <p class="error-message">
+              Please enter subject and description for adding feedback.
+            </p>
+          {/if}
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <p
+            class="text-fs-14 mb-0 me-2"
+            style="color: var(--text-secondary-1000); font-weight: 400;"
+          >
+            Description
+          </p>
+          <p class="text-fs-12 text-secondary-200 mb-0">
+            {feedbackDescription.length} / 200
+          </p>
+        </div>
+      </div>
 
       <div class="drop-box mb-2" style="">
         <Drop

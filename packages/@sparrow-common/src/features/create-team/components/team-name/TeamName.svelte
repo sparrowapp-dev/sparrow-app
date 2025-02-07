@@ -13,6 +13,7 @@
    * Constants
    */
   import { NAME_CONFIG } from "../../constants";
+  import { NewInput } from "@sparrow/library/forms";
 
   /**
    * Exports
@@ -23,6 +24,23 @@
    * Data
    */
   const inputId: string = "team-name-input";
+  $: defaultBorderColor =
+    !teamForm.name.value && teamForm.name.isTouched
+      ? "1px solid var(--border-ds-danger-300) !important"
+      : "transparent";
+  $: hoveredBorderColor =
+    !teamForm.name.value && teamForm.name.isTouched
+      ? "1px solid var(--border-ds-danger-300) !important"
+      : "1px solid var(--border-ds-neutral-300)";
+
+  $: focusedBorderColor =
+    !teamForm.name.value && teamForm.name.isTouched
+      ? "2px solid var(--border-ds-danger-300) !important"
+      : "2px solid var(--border-ds-primary-300)";
+  $: typedBorderColor =
+    !teamForm.name.value && teamForm.name.isTouched
+      ? "1px soild var(--border-ds-danger-300) !important"
+      : "transparent";
 </script>
 
 <div class="pb-4 mt-3">
@@ -37,7 +55,7 @@
   <!-- 
     -- Input 
   -->
-  <Input
+  <!-- <Input
     bind:value={teamForm.name.value}
     on:blur={() => {
       teamForm.name.isTouched = true;
@@ -61,7 +79,36 @@
     type={"text"}
     maxlength={NAME_CONFIG.MAX_TEXT_SIZE}
     placeholderColor={"var(--text-secondary-200)"}
+  /> -->
+  <NewInput
+    bind:value={teamForm.name.value}
+    on:blur={() => {
+      teamForm.name.isTouched = true;
+      teamForm.name.value = teamForm.name.value.trim();
+    }}
+    isEditIconRequired={false}
+    {defaultBorderColor}
+    {hoveredBorderColor}
+    {focusedBorderColor}
+    {typedBorderColor}
+    type={"text"}
+    maxlength={NAME_CONFIG.MAX_TEXT_SIZE}
+    height={"36px"}
+    id={inputId}
+    placeholder={NAME_CONFIG.PLACEHOLDER}
+    style="outline:none;"
+    class="text-fs-14 fw-normal py-2 px-1  border-radius-4"
   />
+
+  <!-- defaultBorderColor={!teamForm.name.value && teamForm.name.isTouched
+    ? "1px solid var(--border-ds-danger-300) !important"
+    : "transparent"}
+  hoveredBorderColor={!teamForm.name.value && teamForm.name.isTouched
+    ? "1px solid var(--border-ds-danger-300) !important"
+    : "transparent"}
+  focusedBorderColor={!teamForm.name.value && teamForm.name.isTouched
+    ? "2px solid var(--border-ds-danger-300) !important"
+    : "transparent"} -->
 
   <!-- 
     -- Error Messages 
