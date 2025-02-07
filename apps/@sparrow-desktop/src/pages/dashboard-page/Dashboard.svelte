@@ -553,20 +553,6 @@
   class="dashboard d-flex flex-column {isGlobalSearchOpen ? 'blurred' : ''}"
   style="height: 100vh;"
 >
-  
-      <Tag type="cyan" text="Tag" />
-
-      <Tag type="purple" text="Tag" />
-
-      <Tag type="yellow" text="Tag" />
-
-      <Tag type="green" text="Tag" />
-
-      <Tag type="orange" text="Tag" />
-
-      <Tag type="grey" text="Tag" />
-
-      <Tag type="pink" text="Tag" />
   <Header
     environments={$environments?.filter((element) => {
       return element?.workspaceId === currentWorkspaceId;

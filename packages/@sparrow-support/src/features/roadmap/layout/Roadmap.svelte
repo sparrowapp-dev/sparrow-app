@@ -204,7 +204,7 @@
             style="width:100%; background-color: var(--bg-secondary-800); overflow: hidden; border:0.6px solid var(--border-secondary-300)"
           >
             <div
-              style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-secondary-870); height:32px;  color:{getColor(
+              style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-secondary-870); height:32px ;   color:{getColor(
                 status,
               ).fontColor}; border-bottom:0.5px solid {getColor(status)
                 .fontColor};"

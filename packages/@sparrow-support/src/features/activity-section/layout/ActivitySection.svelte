@@ -21,7 +21,7 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   import { FeedbackStatusType, FeedbackType } from "../../../types/feedback";
-  import { IconFallback, ImageModal } from "@sparrow/library/ui";
+  import { IconFallback, ImageModal, Tag } from "@sparrow/library/ui";
 
   import { ActivityStatusType, ActivityType } from "../../../types/activity";
   import { Spinner } from "@sparrow/library/ui";
@@ -425,18 +425,10 @@
                           <div
                             style="height: 16px; display: flex; align-items: center;"
                           >
-                            <span
-                              class="category mt-2"
-                              style="color:{getColor(post?.status)
-                                ?.fontColor}; border:0.2px solid {getColor(
-                                post?.status,
-                              )?.fontColor}; "
-                            >
-                              {post?.status
-                                ? post.status.charAt(0).toUpperCase() +
-                                  post.status.slice(1)
-                                : ""}
-                            </span>
+                             <Tag
+                      type={getColor(post?.status)}
+                      text={post.status}
+                    />
                           </div>
                         </div>
                         <div style="">
@@ -660,18 +652,10 @@
                           <div
                             style="height: 16px; display: flex; align-items: center;"
                           >
-                            <span
-                              class="category mt-2"
-                              style="color:{getColor(post?.status)
-                                .fontColor}; border:0.2px solid {getColor(
-                                post?.status,
-                              ).fontColor}; "
-                            >
-                              {post?.status
-                                ? post.status.charAt(0).toUpperCase() +
-                                  post.status.slice(1)
-                                : ""}
-                            </span>
+                             <Tag
+                      type={getColor(post?.status)}
+                      text={post.status}
+                    />
                           </div>
                         </div>
                         <div>

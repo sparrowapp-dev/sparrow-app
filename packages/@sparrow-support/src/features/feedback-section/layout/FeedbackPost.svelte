@@ -10,7 +10,7 @@
     StatusIcon,
   } from "@sparrow/library/icons";
 
-  import { Button, IconFallback, Loader, Modal } from "@sparrow/library/ui";
+  import { Button, IconFallback, Loader, Modal, Tag } from "@sparrow/library/ui";
   import { ImageModal } from "@sparrow/library/ui";
   import {
     CommentCard,
@@ -363,7 +363,7 @@
           style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
         >
           <span style="font-size: 18px; font-weight: 500;">{post?.title}</span>
-          <span
+          <!-- <span
             class="px-2"
             style="border:0.2px solid {getColor(post?.status)
               .fontColor}; color: {getColor(post?.status)
@@ -372,7 +372,11 @@
             {post?.status
               ? post?.status.charAt(0).toUpperCase() + post?.status.slice(1)
               : ""}
-          </span>
+          </span> -->
+          <Tag
+            type={getColor(post?.status)}
+            text={post?.status}
+            />
         </div>
 
         <div class="d-flex flex-row">

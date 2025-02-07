@@ -1,7 +1,14 @@
 <script lang="ts">
 export let type: 'cyan' | 'purple' | 'yellow' | 'green' | 'orange' | 'grey' | 'pink' = 'cyan';
 export let text: string = 'Tag';
-export let onClick: () => void = () => {};
+
+ const convertCasing = (sentence: string) => {
+    let sen =
+      sentence.charAt(0).toUpperCase() + sentence.slice(1).toLowerCase();
+    let total_words = sen.split(" ");
+    if (total_words.length > 5) sen = total_words.slice(0, 5).join(" ") + "...";
+    return sen;
+  };
 
 const colorPalette = {
     "cyan": {
@@ -55,9 +62,10 @@ const colorPalette = {
     font-weight: 500;
     font-family: Inter, sans-serif;
     width: fit-content;
-    max-width: 188px;"
-
-    on:click={onClick}
+    max-width: 188px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;"
     >
-    {text}
+    {convertCasing(text)}
 </button>
