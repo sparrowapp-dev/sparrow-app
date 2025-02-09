@@ -6,11 +6,10 @@
     NewWarningIcon,
     NewCloseIcon,
   } from "./icons";
-  export let title = "";
 </script>
 
 <ToastContainer width={"fit-content"} let:data>
-  {#if title !== ""}
+  {#if data.title !== undefined}
     <div
       class="d-flex position-relative custom-toast custom-toast-{data.type} toast"
     >
@@ -40,7 +39,7 @@
           </span>
         </div>
         <div class="d-flex row gap-1">
-          <p class="title">{title}</p>
+          <p class="data.title">{data.title}</p>
           <span class="description">{data.description}</span>
         </div>
       </div>
@@ -116,7 +115,6 @@
   .custom-toast {
     height: 68px;
     background-color: var(--bg-ds-surface-500);
-    box-shadow: 0px 16px 32px 0px rgba(0, 0, 0, 0.3);
   }
 
   .content-wrapper {
@@ -125,7 +123,6 @@
     padding: 12px;
   }
   .icon {
-    /* margin-right: 18px; */
     position: relative;
   }
 
@@ -218,23 +215,11 @@
       width: 0;
     }
   }
-
   .progress-bar {
     position: absolute;
     bottom: 0;
     left: 0;
-    height: 3px;
-    width: 100%;
-    border-radius: 0 0 0 8px;
-    transform-origin: left;
-    animation: progress linear forwards;
-    backdrop-filter: blur(4px);
-  }
-  .progress-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 3px;
+    height: 2px;
     width: 100%;
     border-radius: 0 0 0 8px;
     transform-origin: left;
@@ -243,19 +228,17 @@
   }
 
   .progress-bar-success {
-    background-color: var(--bg-ds-green-400);
-    /* box-shadow: 1px 1px 10px 4px rgba(16, 243, 133, 0.5); */
+    /* background-color: var(--bg-ds-green-400); */
+    background-color: #33cc7a;
   }
 
   .progress-bar-error {
     background-color: #eb5651;
-    /* box-shadow: 1px 1px 10px 4px rgba(240, 66, 72, 0.5); */
   }
   .progress-bar-warning {
     background-color: #ecc551;
-    /* box-shadow: 1px 1px 10px 4px rgba(0, 237, 123, 0.5); */
   }
-  .title {
+  .data.title {
     font-family: "Inter", sans-serif;
     font-size: 14px;
     font-weight: 500;
