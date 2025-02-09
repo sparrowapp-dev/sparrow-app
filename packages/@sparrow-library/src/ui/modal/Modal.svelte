@@ -7,7 +7,6 @@
 
   export let isOpen = false;
   export let title: string;
-  export let type: "primary" | "dark" | "danger" = "primary";
   export let canClose = true;
   export let icon = "";
   /**
@@ -19,6 +18,7 @@
    * Callback function to close the modal.
    */
   export let handleModalState: (flag: boolean) => void;
+  export let description: string;
 
   const trapTab = (event: KeyboardEvent) => {
     if (event.key === "Tab") {
@@ -68,9 +68,16 @@
           {#if icon === "warning"}
             <img src={warningIcon} height="26px" class="me-2" alt="" />
           {/if}
-          {#if title}
-            <h3 class="sparrow-modal-heading fw-normal ellipsis">{title}</h3>
-          {/if}
+          <div class="flex-column">
+            {#if title}
+              <h3 class="sparrow-modal-heading fw-normal ellipsis">{title}</h3>
+            {/if}
+            {#if description}
+              <h3 class="sparrow-modal-description fw-normal ellipsis">
+                {description}
+              </h3>
+            {/if}
+          </div>
         </div>
         {#if canClose}
           <button
@@ -123,26 +130,36 @@
   }
 
   .sparrow-modal-container-data {
-    background-color: var(--bg-tertiary-400);
-    border-radius: 6px;
+    background-color: var(--bg-ds-surface-600);
+    border-radius: 8px;
     padding: 30px 30px 20px 30px;
     position: relative;
   }
   .sparrow-modal-heading {
     font-size: 20px;
-    color: white;
+    color: var(--text-ds-neutral-50);
+    font-weight: 600;
+    line-height: 24px;
   }
 
   .sparrow-modal-close-icon-btn {
     background-color: transparent;
     position: absolute;
-    top: 2px;
-    right: 2px;
+    top: 24px;
+    right: 24px;
   }
   .sparrow-modal-close-icon-btn:hover {
     background-color: var(--bg-tertiary-300);
+    border-radius: 2px;
   }
   .sparrow-modal-close-icon-btn:active {
     background-color: var(--bg-danger-200);
+    border-radius: 2px;
+  }
+  .sparrow-modal-description {
+    font-size: 14px;
+    color: var(--text-ds-neutral-100);
+    font-weight: 400;
+    line-height: 20px;
   }
 </style>
