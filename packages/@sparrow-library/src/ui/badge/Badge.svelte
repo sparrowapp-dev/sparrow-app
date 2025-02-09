@@ -5,10 +5,10 @@
   export let count: number = 1;
   const maxCount: number = 999;
 
-  // Dynamic border radius: 50% for 1-2 digits, 13px for 3+ digits
+  let badgeBorderRadius: string;
   $: badgeBorderRadius = count >= 100 ? "13px" : "50%";
 
-  function getBadgeColor(color: string) {
+  function getBadgeColor(color: "danger" | "primary" | "neutral") {
     switch (color) {
       case "primary":
         return "var(--bg-ds-primary-400)";
@@ -18,7 +18,8 @@
         return "var(--text-ds-danger-400)";
     }
   }
-  function getBadgeSize(size: string) {
+
+  function getBadgeSize(size: "small" | "medium") {
     return size === "small" ? "4px" : "6px";
   }
 </script>
@@ -26,17 +27,15 @@
 <div class="d-flex p-1">
   {#if type === "count"}
     <span
-      class="circle-bot {variant}-color text-center d-flex align-items-center justify-content-center fw-normal text-center"
-      style={`min-width: 16px; max-width:40px width: auto; height: 16px; font-size: 12px; border-radius: ${badgeBorderRadius};`}
+      class="circle-bot {variant}-color text-center d-flex align-items-center justify-content-center fw-normal text-center px-1"
+      style={`min-width: 16px; max-width: 40px; width: auto; height: 16px; font-size: 12px; border-radius: ${badgeBorderRadius};`}
     >
       {count > maxCount ? "+999" : count}
     </span>
   {:else if type === "dot"}
     <span
       class="unsaved-indicator"
-      style="background-color:{getBadgeColor(variant)} height: {getBadgeSize(
-        size,
-      )}"
+      style={`background-color: ${getBadgeColor(variant)}; height: ${getBadgeSize(size)};`}
     />
   {/if}
 </div>
