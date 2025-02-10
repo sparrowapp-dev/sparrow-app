@@ -1,4 +1,5 @@
-import "@sparrow/library/styles"
+import "@sparrow/library/styles";
+import "@sparrow/library/fluent-icons";
 import App from "./components/App.svelte";
 import { RxDB } from "./database/database";
 import mixpanel from "mixpanel-browser";
