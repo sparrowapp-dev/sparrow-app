@@ -1,20 +1,15 @@
 <script lang="ts">
   import { ToastContainer } from "svelte-toasts";
-  import {
-    NewSuccessIcon,
-    NewErrorIcon,
-    NewWarningIcon,
-    NewCloseIcon,
-  } from "./icons";
+  import { SuccessIcon, ErrorIcon, WarningIcon, CloseIcon } from "./icons";
 
   const getIcon = (type: string) => {
     switch (type) {
       case "success":
-        return NewSuccessIcon;
+        return SuccessIcon;
       case "warning":
-        return NewWarningIcon;
+        return WarningIcon;
       default:
-        return NewErrorIcon;
+        return ErrorIcon;
     }
   };
 </script>
