@@ -11,8 +11,6 @@
     name: string;
     id: ResponseSectionEnum;
     count: number;
-    disabled?: boolean;
-    icon?: string;
   }[] = [];
 
   /**
@@ -26,7 +24,6 @@
         name: "Headers",
         id: ResponseSectionEnum.HEADERS,
         count: _responseHeadersLength,
-        disabled: true,
       },
     ];
   };
