@@ -1,5 +1,5 @@
 <script lang="ts">
-export let type: 'cyan' | 'purple' | 'yellow' | 'green' | 'orange' | 'grey' | 'pink' = 'gray';
+export let type: 'cyan' | 'purple' | 'yellow' | 'green' | 'orange' | 'grey' | 'pink' = 'grey';
 export let text: string = 'Tag';
 
  const convertCasing = (sentence: string) => {

@@ -57,17 +57,17 @@
     feedbackStatus = Object.values(statusMap);
   }
     
-  const getColor = (status) => {
+  const getFontandBgColor = (status) => {
     if ( status === "in progress") {
-      return { fontColor: "#DF77F9", backgroundColor: "#DF77F9" };
+      return { fontColor: "var(--text-primary-440)", };
     }
     if (status === "planned") {
-      return { fontColor: "#FFE47E", backgroundColor: "#171302" };
+      return { fontColor: "#FFE47E",};
     }
     if (status === "under review") {
-      return { fontColor: "#FBA574", backgroundColor: "#1C1405" };
+      return { fontColor: "#FBA574",};
     }
-    return { fontColor: "white", backgroundColor: "black" };
+    return { fontColor: "var(--text-ds-neutral-50)",};
   };
 
   /**
@@ -217,9 +217,9 @@
             style="width:100%; background-color: var(--bg-secondary-800); overflow: hidden; border:0.6px solid var(--border-secondary-300)"
           >
             <div
-              style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-secondary-870); height:32px ;   color:{getColor(
+              style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-secondary-870); height:32px ;   color:{getFontandBgColor(
                 status,
-              ).fontColor}; border-bottom:0.5px solid {getColor(status)
+              ).fontColor}; border-bottom:0.5px solid {getFontandBgColor(status)
                 .fontColor};"
             >
               {status
