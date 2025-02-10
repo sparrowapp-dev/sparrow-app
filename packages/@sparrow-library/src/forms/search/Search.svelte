@@ -2,6 +2,8 @@
   import searchIcon from "../../assets/searchIcon.svg";
   import crossIcon from "../../assets/crossicon.svg";
   import { createEventDispatcher, onMount } from "svelte";
+  import { DismissRegular } from "@sparrow/library/icons";
+  import { Search } from "@sparrow/library/icons";
 
   export let placeholder = "Search";
   export let id = "";
@@ -9,6 +11,8 @@
   export let size: "small" | "large" = "small";
   export let customWidth = "";
   export let value = "";
+  let color = "";
+  let iconSize = "16px";
 
   let searchStyleProp = "";
   let searchTextProp = "";
@@ -32,18 +36,21 @@
 
   switch (size) {
     case "small":
-      imgStyleProp = "height:20px; width:20px";
+      iconSize = "16px";
+      imgStyleProp = "height:20px; width:20px;";
       searchTextProp = "font-weight: 400; font-size: 12px; line-height: 18px;";
       searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 28px; min-height: 28px; max-height: 28px; max-width: 320px; gap: 8px; border-radius: 4px;`;
       break;
     case "large":
-      imgStyleProp = "height:20px; width:20px";
+      iconSize = "20px";
+      imgStyleProp = "height:20px; width:20px;";
       searchTextProp =
         "font-weight: 400; font-size: 14px; line-height: 20.02px;";
       searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 36px; min-height: 36px; max-height: 36px; min-width: 340px; max-width:440px; border-radius: 6px;`;
       break;
     default:
-      imgStyleProp = "height:20px; width:20px";
+      iconSize = "16px";
+      imgStyleProp = "height:20px; width:20px;";
       searchTextProp = "font-weight: 400; font-size: 12px; line-height: 18px;";
       searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 28px; min-height: 28px; max-height: 28px; min-width: 198px; max-width: 320px; gap: 8px; border-radius: 4px;`;
       break;
@@ -95,7 +102,7 @@
       class="position-absolute d-flex align-items-center"
       style={`height: 20px; width: 20px; left: 10px; pointer-events: none; ${imgStyleProp}`}
     >
-      <img src={searchIcon} />
+      <Search size={iconSize} />
     </div>
     <input
       {id}
@@ -113,10 +120,10 @@
     {#if value !== ""}
       <div
         class="position-absolute d-flex align-items-center"
-        style={"height: 20px; width: 20px; right: 10px; cursor: pointer;"}
+        style={`height: 20px; width: 20px; right: 10px; cursor: pointer; ${imgStyleProp} `}
         on:click={clearSearch}
       >
-        <i class="icon icon-ic_fluent_access_time_20_filled"></i>
+        <DismissRegular {color} size={iconSize} />
       </div>
     {/if}
   </div>
