@@ -425,10 +425,10 @@
                           <div
                             style="height: 16px; display: flex; align-items: center;"
                           >
-                             <Tag
-                      type={getColor(post?.status)}
-                      text={post.status}
-                    />
+                            <Tag
+                              type={getColor(post?.status)}
+                              text={post.status}
+                            />
                           </div>
                         </div>
                         <div style="">
@@ -652,10 +652,12 @@
                           <div
                             style="height: 16px; display: flex; align-items: center;"
                           >
-                             <Tag
-                      type={getColor(post?.status)}
-                      text={post.status}
-                    />
+                            <Tag
+                              type={getColor(post?.status)}
+                              text={post?.status
+                                ? post.status.charAt(0) + post.status.slice(1)
+                                : ""}
+                            />
                           </div>
                         </div>
                         <div>

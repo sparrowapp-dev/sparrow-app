@@ -57,7 +57,7 @@
     feedbackStatus = Object.values(statusMap);
   }
     
-  const getFontandBgColor = (status) => {
+  const getFontColor = (status) => {
     if ( status === "in progress") {
       return { fontColor: "var(--text-primary-440)", };
     }
@@ -217,9 +217,9 @@
             style="width:100%; background-color: var(--bg-secondary-800); overflow: hidden; border:0.6px solid var(--border-secondary-300)"
           >
             <div
-              style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-secondary-870); height:32px ;   color:{getFontandBgColor(
+              style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-secondary-870); height:32px ;   color:{getFontColor(
                 status,
-              ).fontColor}; border-bottom:0.5px solid {getFontandBgColor(status)
+              ).fontColor}; border-bottom:0.5px solid {getFontColor(status)
                 .fontColor};"
             >
               {status

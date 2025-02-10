@@ -41,7 +41,6 @@
     SidebarItemPositionBaseEnum,
     SidebarItemIdEnum,
   } from "@sparrow/common/types/sidebar/sidebar-base";
-  import { Tag } from "@sparrow/library/ui";
 
   const _viewModel = new DashboardViewModel();
   let userId;

@@ -363,16 +363,6 @@
           style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
         >
           <span style="font-size: 18px; font-weight: 500;">{post?.title}</span>
-          <!-- <span
-            class="px-2"
-            style="border:0.2px solid {getColor(post?.status)
-              .fontColor}; color: {getColor(post?.status)
-              .fontColor}; padding-bottom: 14px; border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
-          >
-            {post?.status
-              ? post?.status.charAt(0).toUpperCase() + post?.status.slice(1)
-              : ""}
-          </span> -->
           <Tag
             type={getColor(post?.status)}
             text={post?.status}
