@@ -7,7 +7,6 @@
   import { CodeMirrorInput } from "../";
   import { onMount } from "svelte";
   import { Tooltip } from "@sparrow/library/ui";
-  import { Switch } from "@sparrow/library/forms";
   import { ErrorInfoIcon, Information } from "@sparrow/library/icons";
   import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
   import LazyElement from "./LazyElement.svelte";

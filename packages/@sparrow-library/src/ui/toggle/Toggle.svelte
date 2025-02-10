@@ -1,6 +1,5 @@
 <script lang="ts">
   export let isActive: boolean = false;
-  export let onToggle: () => void = () => {};
   export let disabled: boolean = false;
   export let label = "";
   export let textColor = "var(--text-ds-primary-400)";

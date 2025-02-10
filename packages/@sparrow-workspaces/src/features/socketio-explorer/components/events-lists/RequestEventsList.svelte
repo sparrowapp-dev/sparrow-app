@@ -1,7 +1,7 @@
 <script lang="ts">
   import { trashIcon as trashIcon } from "@sparrow/library/assets";
   import { Tooltip } from "@sparrow/library/ui";
-  import { Input, Switch } from "@sparrow/library/forms";
+  import { Input } from "@sparrow/library/forms";
   import { Toggle } from "@sparrow/library/ui";
 
   export let element;
