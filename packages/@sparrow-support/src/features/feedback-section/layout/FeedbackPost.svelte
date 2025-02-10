@@ -788,7 +788,7 @@
     <div class="d-flex align-items-center justify-content-end">
       <div class="d-flex">
         <Button
-          type={"violet"}
+          type={"secondary"}
           title={"Cancel"}
           buttonClassProp={"me-2"}
           onClick={async () => {
@@ -808,7 +808,7 @@
           }}
         />
         <Button
-          type={"primary"}
+          type={"secondary"}
           title={"Save"}
           loader={isSaving}
           onClick={async () => {

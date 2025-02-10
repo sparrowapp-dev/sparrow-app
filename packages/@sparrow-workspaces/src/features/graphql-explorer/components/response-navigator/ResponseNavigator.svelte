@@ -9,7 +9,7 @@
   import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
   import { WithButtonV6 } from "../../../../hoc";
   import { CopyIcon, DownloadIcon2 } from "@sparrow/library/icons";
-  import { Navigator } from "../../../../components";
+  import { Navigator } from "@sparrow/library/ui";
   export let requestStateSection: string;
   export let onUpdateResponseState;
   export let responseHeadersLength = 0;

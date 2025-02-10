@@ -9,7 +9,8 @@
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { TeamRole } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
-  import TeamNavigator from "../components/team-navigator/TeamNavigator.svelte";
+  import { Navigator } from "@sparrow/library/ui";
+
   import {
     TeamTabsEnum,
     TeamViewEnum,
@@ -282,7 +283,7 @@
             {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER}
               <Button
                 title={`Invite`}
-                type={`dark`}
+                type={"secondary"}
                 textStyleProp={"font-size: var(--small-text)"}
                 onClick={() => {
                   isTeamInviteModalOpen = true;
@@ -311,14 +312,15 @@
         <!--Workspace, setting and members tab-->
 
         <div
-          class="teams-menu d-flex justify-content-between align-items-center"
+          class="teams-menu d-flex justify-content-between align-items-center position-relative"
         >
           <div
             class="teams-menu__left gap-4 align-items-center"
             style="padding-bottom: 4px;"
           >
-            <TeamNavigator
+            <Navigator
               tabs={teamTabs}
+              currentTabId={"Workspaces"}
               {onUpdateActiveTab}
               {activeTeamTab}
             />
