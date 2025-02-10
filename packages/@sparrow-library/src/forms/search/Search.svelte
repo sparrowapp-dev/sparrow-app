@@ -1,6 +1,6 @@
 <script lang="ts">
   import { SearchIcon } from "@sparrow/library/icons";
-  import { CrossIcon } from "@sparrow/library/icons";
+  import { CrossIcon2 } from "@sparrow/library/icons";
 
   import { createEventDispatcher, onMount } from "svelte";
 
@@ -132,7 +132,9 @@
         on:click={clearSearch}
       >
         <svelte:component
-          this={CrossIcon}
+          this={CrossIcon2}
+          width={"20px"}
+          height={"20px"}
           color={"var(--text-ds-neutral-100)"}
         />
       </div>

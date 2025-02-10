@@ -127,4 +127,4 @@ export {default as Search  } from "./SearchIcon.svelte";
 export {default as DismissRegular} from "./DismissRegular.svelte";
 
 export {default as SearchIcon} from "./SearchIcon.svelte";
-export {default as crossIcon} from "./CrossIcon.svelte";
+export {default as CrossIcon2} from "./CrossIcon.svelte";
