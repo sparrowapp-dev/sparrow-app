@@ -90,7 +90,7 @@
       {#if userRole === WorkspaceRole.WORKSPACE_ADMIN}
         <div class="d-flex gap-2 ms-3">
           <Button
-            type={"dark"}
+            type={"secondary"}
             title={"Delete Workspace"}
             textClassProp={"fs-12 "}
             textStyleProp={"font-weight:400; font-size:12px;"}

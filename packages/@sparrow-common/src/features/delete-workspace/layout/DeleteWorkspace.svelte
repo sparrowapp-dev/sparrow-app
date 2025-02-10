@@ -83,13 +83,13 @@
         </p>
       </div>
     </div>
-    <div class="d-flex " >
+    <div class="d-flex">
       <Button
         title={"Cancel"}
         textStyleProp={"font-size: 16px"}
         buttonClassProp={"me-2"}
         buttonStyleProp={"height: 36px;"}
-        type={"dark"}
+        type={"secondary"}
         onClick={async () => {
           inputNameError = "";
           isDeleteWorkspaceModalOpen = false;

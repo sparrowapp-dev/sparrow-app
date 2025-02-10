@@ -281,7 +281,7 @@
             {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER}
               <Button
                 title={`Invite`}
-                type={`dark`}
+                type={"secondary"}
                 textStyleProp={"font-size: var(--small-text)"}
                 onClick={() => {
                   isTeamInviteModalOpen = true;
