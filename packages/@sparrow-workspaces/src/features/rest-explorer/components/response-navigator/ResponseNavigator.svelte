@@ -2,7 +2,7 @@
   import { Label } from "@sparrow/library/ui";
   import { type UpdateRequestStateType } from "@sparrow/workspaces/type";
   import { ResponseSectionEnum } from "@sparrow/common/types/workspace";
-  import { Navigator } from "../../../../components";
+  import { Navigator } from "@sparrow/library/ui";
   export let requestStateSection: string;
   export let onUpdateResponseState;
   export let responseHeadersLength = 0;
