@@ -44,7 +44,9 @@
         {#if true}
             <Toggle
           bind:isActive={element.listen}
-          onChange={updateCheck(index)}
+          onChange={() => {
+              updateCheck(index);
+            }}
          /> 
         {:else}
           <div style="width: 24px;"></div>

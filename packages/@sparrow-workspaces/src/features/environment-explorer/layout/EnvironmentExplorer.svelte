@@ -3,6 +3,7 @@
   import { onMount } from "svelte";
   import type { EnvValuePair } from "@sparrow/common/interfaces/request.interface";
   import { QuickHelp } from "../components";
+  import { Search } from "@sparrow/library/forms";
   import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   import {
     PERMISSION_NOT_FOUND_TEXT,
@@ -141,18 +142,13 @@
         />
         <div class={`d-flex env-btn-container`}>
           <div class="position-relative">
-            <Input
+            <Search
               id={"environment-search"}
-              type="search"
+              variant={"primary"}
               bind:value={search}
               on:input={() => {}}
-              width={"300px"}
-              class="text-fs-12 rounded p-2 bg-secondary-600"
-              style="outline:none;"
+              customWidth={"300px"}
               placeholder="Search Variables"
-              defaultBorderColor="transparent"
-              hoveredBorderColor={"var(--border-primary-300)"}
-              focusedBorderColor={"var(--border-primary-300)"}
             />
           </div>
 

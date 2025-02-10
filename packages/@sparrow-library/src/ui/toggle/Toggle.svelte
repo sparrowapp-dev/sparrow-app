@@ -5,24 +5,19 @@
   export let textColor = "var(--text-ds-primary-400)";
   export let fontSize = "12px";
   export let fontWeight = "700";
-  export let fontFamily = "Inter, sans-serif";
-  export let onChange: (event: Event) => void = () => {};
+  export let onChange;
   export let onClick: (event: MouseEvent) => void = () => {};
 
   let inputRef: HTMLInputElement;
 
-  function handleChange(event: Event) {
+  const handleChange=(event: Event)=> {
     if (disabled) {
       event.preventDefault();
       return;
     }
-
-    const target = event.target as HTMLInputElement;
-    isActive = target.checked;
     onChange(event);
   }
-
-  function handleClick(event: MouseEvent) {
+  const handleClick=(event: MouseEvent)=> {
     if (disabled) {
       event.preventDefault();
       return;
@@ -49,7 +44,7 @@
     {#if label.length > 0}
       <span
         class="label-text"
-        style="font-size: {fontSize}; font-weight: {fontWeight}; font-family: {fontFamily}; color: {textColor}"
+        style="font-size: {fontSize}; font-weight: {fontWeight}; color: {textColor}"
       >
         {convertCasing(label)}
       </span>
