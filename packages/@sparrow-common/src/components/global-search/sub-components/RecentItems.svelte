@@ -521,7 +521,11 @@
       {/each}
     {:else}
       <div>
-        <NoResults {searchQuery} />
+        <NoResults
+          {searchQuery}
+          type="Custom"
+          customText="No workspaces found. Create one!"
+        />
       </div>
     {/if}
 
@@ -560,7 +564,11 @@
         </div>
       {/each}
     {:else}
-      <NoResults {searchQuery} />
+      <NoResults
+        {searchQuery}
+        type="Custom"
+        customText="No folders found. Add one!"
+      />
     {/if}
 
     <!-- Content for folders -->
@@ -597,7 +605,11 @@
         </div>
       {/each}
     {:else}
-      <NoResults {searchQuery} />
+      <NoResults
+        {searchQuery}
+        type="Custom"
+        customText="No collections found. Create one!"
+      />
     {/if}
   {:else if selectedType.toLowerCase() == "requests"}
     {#if filteredRequest?.length > 0}
@@ -647,7 +659,11 @@
         {/each}
       </div>
     {:else}
-      <NoResults {searchQuery} />
+      <NoResults
+        {searchQuery}
+        type="Custom"
+        customText="No requests found. Try one!"
+      />
     {/if}
   {:else if selectedType.toLowerCase() == "environments"}
     {#if filteredEnvironments?.length > 0}
@@ -677,7 +693,11 @@
         </div>
       {/each}
     {:else}
-      <NoResults {searchQuery} />
+      <NoResults
+        {searchQuery}
+        type="Custom"
+        customText="No environments found. Add one!"
+      />
     {/if}
   {:else if selectedType.toLowerCase() == "flows"}
     {#if filteredTestflows?.length > 0}
@@ -708,7 +728,11 @@
         </div>
       {/each}
     {:else}
-      <NoResults {searchQuery} />
+      <NoResults
+        {searchQuery}
+        type="Custom"
+        customText="No test flows found. Build one!"
+      />
     {/if}
   {/if}
 </div>
