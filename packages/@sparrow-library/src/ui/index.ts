@@ -16,4 +16,8 @@ export * from "./icon-fallback";
 export * from "./toast";
 export * from "./image-modal";
 export * from "./skeleton";
+<<<<<<< HEAD
 export * from "./tags";
+=======
+export * from "./badge";
+>>>>>>> fd0369cbce89d8594551b5b7338cbc0ed43ff854

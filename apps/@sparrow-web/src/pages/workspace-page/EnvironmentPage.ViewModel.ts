@@ -149,6 +149,7 @@ export class EnvironmentViewModel {
       type: "LOCAL",
       workspaceId: currentWorkspace._id,
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     const guestUser = await this.guestUserRepository.findOne({
