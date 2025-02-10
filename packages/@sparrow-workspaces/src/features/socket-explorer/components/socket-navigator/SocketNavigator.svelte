@@ -2,7 +2,7 @@
   import { type UpdateRequestStateType } from "@sparrow/workspaces/type";
   import { RequestSectionEnum } from "@sparrow/common/types/workspace";
   import { SocketSectionEnum } from "@sparrow/common/types/workspace/web-socket";
-  import { Navigator } from "../../../../components";
+  import { Navigator } from "@sparrow/library/ui";
   export let requestStateSection: string | undefined;
   export let paramsLength = 0;
   export let headersLength = 0;

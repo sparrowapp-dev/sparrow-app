@@ -31,7 +31,7 @@
       <Button
         title={"Cancel"}
         textClassProp={"fs-6"}
-        type={"dark"}
+        type={"secondary"}
         onClick={() => {
           onCancel(false);
         }}
@@ -42,7 +42,7 @@
         <Button
           title={"Discard Changes"}
           textClassProp={"fs-6"}
-          type={"dark"}
+          type={"secondary"}
           onClick={() => {
             onDiscard();
           }}

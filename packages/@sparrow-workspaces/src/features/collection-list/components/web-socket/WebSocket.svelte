@@ -153,7 +153,7 @@
       disable={deleteLoader}
       title={"Cancel"}
       textStyleProp={"font-size: var(--base-text)"}
-      type={"dark"}
+      type={"secondary"}
       loader={false}
       onClick={() => {
         isDeletePopup = false;

@@ -5,7 +5,7 @@
     ResponseSectionEnum,
   } from "@sparrow/common/types/workspace";
   import { onMount } from "svelte";
-  import { Navigator } from "../../../../components";
+  import { Navigator } from "@sparrow/library/ui";
   export let authParameterLength = 0;
   export let authHeaderLength = 0;
   export let paramsLength = 0;
