@@ -19,6 +19,7 @@
   import { TeamMembers, TeamSettings } from "@sparrow/teams/features";
   import { CrossIcon, MoreOptions } from "@sparrow/library/icons";
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
+  import Avatar from "../../../../../@sparrow-library/src/ui/avatar/Avatar.svelte";
   export let isWebApp = false;
 
   export let isWebEnvironment: boolean;
@@ -216,20 +217,26 @@
         >
           <h2 class="d-flex ellipsis overflow-visible team-title">
             {#if openTeam?.logo?.size}
-              <img
+              <!-- <img
                 class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
                 style="width: 40px !important; height: 40px !important; padding-top: 2px; display: flex; border-radius: 50%;"
                 src={base64ToURL(openTeam?.logo)}
                 alt=""
-              />{:else}
-              <div
+              /> -->
+              <Avatar
+                type={"image"}
+                size={"large"}
+                image={base64ToURL(openTeam?.logo)}/>
+              {:else}
+              <!-- <div
                 class={`text-defaultColor w-25 text-center my-auto align-items-center justify-content-center profile-circle bg-tertiary-750 border-secondary-300 border-2`}
                 style={`font-size: 24px; width: 40px !important; height: 40px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
               >
                 <span class="text-fs-24">
                   {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
                 </span>
-              </div>
+              </div> -->
+              <Avatar type={"letter"} size={"large"} letter={openTeam?.name[0] || ""} bgColor={"var(--bg-tertiary-750)"}/>
             {/if}
             <span
               class="ms-3 my-auto ellipsis overflow-hidden heading"

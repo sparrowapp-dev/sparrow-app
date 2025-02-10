@@ -1,7 +1,7 @@
 <script lang="ts">
   export let type: "person" | "letter" | "image" = "person";
   export let size: "small" | "medium" | "large" = "medium";
-  import { PersonIcon } from "../../assets";
+  import { PersonIcon } from "../../icons";
   export let image: any = null;
   export let letter: string = "";
   export let bgColor = "var(--bg-tertiary-800)";

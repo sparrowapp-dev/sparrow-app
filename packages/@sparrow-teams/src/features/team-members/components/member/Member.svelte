@@ -390,7 +390,7 @@
           <Avatar
             type={"letter"}
             size={"large"}
-            letter={ user?.name[0]?.toUpperCase()|| ""}
+            letter={ user?.name[0]|| ""}
             bgColor={"var(--bg-tertiary-700)"}/>
         <div class="name px-2" style="width: 80%;">
           <span style="font-size:12px;" class="text-whiteColor"
@@ -541,7 +541,7 @@
             src={base64ToURL(openTeam?.logo)}
             alt=""
           /> -->
-          <Avatar type={"image"} size={"large"} image={base64ToURL(openTeam?.logo)} bgColor={var(--)}/>
+          <Avatar type={"image"} size={"large"} image={base64ToURL(openTeam?.logo)} bgColor={"var(--bg-secondary-600)"}/>
         {:else}
           <!-- <IconFallback character={openTeam?.name[0]} /> -->
            <Avatar

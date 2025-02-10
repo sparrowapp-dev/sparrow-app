@@ -1,5 +1,5 @@
 <script>
-  import { List, Tooltip } from "@sparrow/library/ui";
+  import { List, Tooltip, Avatar } from "@sparrow/library/ui";
   import { PeopleIcon, PlusIcon } from "@sparrow/library/assets";
   import { base64ToURL } from "@sparrow/common/utils";
   export let isCreateTeamModalOpen;
@@ -54,12 +54,18 @@
         >
           <div class=" d-flex w-100 overflow-hidden">
             {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
-              <p
+              <!-- <p
                 class={`m-0 sparrow-fs-15 text-defaultColor me-2 align-items-center justify-content-center bg-transparent border-defaultColor `}
                 style={`padding-top: 2px; width: 25px !important; height: 25px !important; display: flex; border: 1px solid var(--defaultcolor); border-radius: 50%;  font-weight:700;`}
               >
                 {team.name[0] ? team.name[0].toUpperCase() : ""}
-              </p>
+              </p> -->
+                <Avatar
+                      type={"letter"}
+                      size={"small"}
+                      letter={team.name[0]}
+                      bgColor={"var(--bg-tertiary-700)"}
+                  />
             {:else}
               <img src={base64ToURL(team.logo)} alt="" />
             {/if}

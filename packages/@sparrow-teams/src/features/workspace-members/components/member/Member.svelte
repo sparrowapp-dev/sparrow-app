@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Select } from "@sparrow/library/forms";
   import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
-  import { Modal } from "@sparrow/library/ui";
+  import { Avatar, Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
 
   /**
@@ -201,14 +201,19 @@
   class="member-data-container d-flex align-items-center mb-2 w-100"
   style="height: 46px;"
 >
-  <div
+  <!-- <div
     class="rounded-5 me-2 border border-defaultColor d-flex justify-content-center align-items-center"
     style="height: 32px; width: 32px;"
   >
     <p class="mb-0">
       {user?.name[0]}
     </p>
-  </div>
+  </div> -->
+  <Avatar
+    type="letter"
+    size="medium"
+    letter={user?.name[0]}
+    bgColor="var(--bg-secondary-600)"/>
   <div
     class="d-flex flex-column"
     style="width:calc(100% - 100px); font-size:12px; "
