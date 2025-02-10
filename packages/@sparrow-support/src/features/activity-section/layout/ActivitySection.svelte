@@ -31,6 +31,7 @@
   import { ArrowOutwardIcon } from "@sparrow/library/icons";
   import { SparrowLogo } from "@sparrow/common/images";
   import { Upvote } from "../../../components";
+  import { Search } from "@sparrow/library/forms";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
@@ -204,37 +205,15 @@
     style="justify-content: space-between;"
   >
     <div>
-      <div class={`d-flex search-input-container rounded py-1 px-2 mb-2`}>
-        <SearchIcon
-          width={14}
-          height={14}
-          color={"var(--icon-secondary-200)"}
-          classProp={`my-auto me-1`}
-        />
-        <input
-          type="text"
+      <div class={`d-flex  rounded py-1 px-2 mb-2`}>
+        <Search
+          variant="primary"
           id="search-input"
-          class={`bg-transparent w-100 ms-1 border-0 my-auto`}
+          customWidth={"300px"}
           placeholder="Search updates"
-          on:input={(e) => handleInputChange(e.target.value)}
           bind:value={searchTerm}
+          on:input={() => handleInputChange(searchTerm)}
         />
-        {#if searchTerm.length != 0}
-          <div
-            style="cursor: pointer;"
-            class="clear-icon"
-            on:click={() => {
-              searchTerm = "";
-              applyAllFilters();
-            }}
-          >
-            <CrossIcon
-              height="16px"
-              width="12px"
-              color="var(--icon-secondary-300)"
-            />
-          </div>
-        {/if}
       </div>
     </div>
     <div class="d-flex" style="gap: 15px;">

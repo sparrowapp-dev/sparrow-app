@@ -2,6 +2,7 @@
   import { SearchIcon } from "@sparrow/library/assets";
   import { CrossIcon } from "@sparrow/library/icons";
   import { Member } from "../components";
+  import { Search } from "@sparrow/library/forms";
   export let openTeam;
   export let workspaces = [];
 
@@ -67,33 +68,17 @@
 
 <div class="py-2 h-100 d-flex flex-column">
   <section>
-    <div
-      class={`d-flex search-input-container rounded mb-4 align-items-center`}
-    >
+    <div class={`d-flex  rounded mb-4 align-items-center`}>
       <div>
-        <SearchIcon
-          width={14}
-          height={14}
-          classProp={`my-auto `}
-          color={"var(--icon-secondary-200)"}
+        <Search
+          variant="primary"
+          size="large"
+          id="search-input-team-member"
+          placeholder="Search people in {openTeam?.name}"
+          bind:value={filterText}
+          customWidth={"250px"}
         />
       </div>
-      <input
-        type="text"
-        id="search-input-team-member"
-        class={`bg-transparent ms-2 w-100 border-0 my-auto  ellipsis`}
-        placeholder="Search people in {openTeam?.name}"
-        bind:value={filterText}
-      />
-      {#if filterText !== ""}
-        <div class="clear-icon" on:click={handleEraseSearch}>
-          <CrossIcon
-            height="16px"
-            width="12px"
-            color="var(--icon-secondary-300)"
-          />
-        </div>
-      {/if}
     </div>
   </section>
   <section style="flex:1; overflow:auto;">
