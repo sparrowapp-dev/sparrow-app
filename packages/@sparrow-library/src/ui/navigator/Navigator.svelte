@@ -64,7 +64,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    max-width: 182px;
+
     min-width: 96px;
     text-align: center;
     border-radius: 4px;
@@ -79,7 +79,7 @@
   }
   .tab-container:hover {
     background-color: var(--bg-ds-surface-600);
-    color: var(--white-color);
+    color: var(--bg-ds-neutral-50);
   }
   .tab-container:focus-visible {
     background-color: var(--bg-ds-surface-900);
@@ -88,7 +88,7 @@
   }
   .tab-contianer:active {
     background-color: var(--bg-ds-surface-700);
-    color: var(--white-color);
+    color: var(--bg-ds-neutral-50);
   }
 
   .tab-container-disabled {
