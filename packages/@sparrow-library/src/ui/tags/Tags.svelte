@@ -1,10 +1,10 @@
 <script lang="ts">
-export let type: 'cyan' | 'purple' | 'yellow' | 'green' | 'orange' | 'grey' | 'pink' = 'cyan';
+export let type: 'cyan' | 'purple' | 'yellow' | 'green' | 'orange' | 'grey' | 'pink' = 'gray';
 export let text: string = 'Tag';
 
  const convertCasing = (sentence: string) => {
     let sen =
-      sentence.charAt(0).toUpperCase() + sentence.slice(1).toLowerCase();
+      sentence?.charAt(0).toUpperCase() + sentence.slice(1).toLowerCase();
     let total_words = sen.split(" ");
     if (total_words.length > 5) sen = total_words.slice(0, 5).join(" ") + "...";
     return sen;

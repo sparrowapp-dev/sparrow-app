@@ -8,7 +8,7 @@
     MessageIcon,
     StackIcon,
   } from "@sparrow/library/icons";
-  import { Loader } from "@sparrow/library/ui";
+  import { Loader, Tag } from "@sparrow/library/ui";
   import HelpInfoCard from "../../../components/HelpInfo-Card/HelpInfoCard.svelte";
   import { FeedbackType } from "@sparrow/support/types";
 
@@ -23,7 +23,7 @@
   export let setPostId;
 
   /** @type {Function} Returns color based on status. @param {string} status - Status to determine color. @returns {{ fontColor: string, backgroundColor: string }} */
-  export let getColor;
+
 
   let isLoading = false;
 
@@ -56,6 +56,19 @@
     // Convert the statusMap object to an array suitable for rendering in Svelte
     feedbackStatus = Object.values(statusMap);
   }
+    
+  const getColor = (status) => {
+    if ( status === "in progress") {
+      return { fontColor: "#DF77F9", backgroundColor: "#DF77F9" };
+    }
+    if (status === "planned") {
+      return { fontColor: "#FFE47E", backgroundColor: "#171302" };
+    }
+    if (status === "under review") {
+      return { fontColor: "#FBA574", backgroundColor: "#1C1405" };
+    }
+    return { fontColor: "white", backgroundColor: "black" };
+  };
 
   /**
    * @description - Filters the product statuses based on the search term and category type.
@@ -214,7 +227,7 @@
                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
                 .join(" ")}
             </div>
-
+            
             {#if filteredFeedbacks?.length == 0 && searchTerm === ""}
               <div
                 class=" d-flex align-items-center justify-content-center"
