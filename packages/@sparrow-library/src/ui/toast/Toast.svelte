@@ -43,7 +43,7 @@
       class="close-icon-large d-flex align-items-center justify-content-center"
     >
       <span data-notification-btn role="button" on:click={() => data.remove()}>
-        <NewCloseIcon />
+        <CloseIcon />
       </span>
     </div>
     {#if data.duration > 0}
