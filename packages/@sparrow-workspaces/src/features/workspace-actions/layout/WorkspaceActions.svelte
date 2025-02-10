@@ -499,7 +499,6 @@
         id="collection-list-search"
         variant={"primary"}
         size="small"
-        customWidth={"250px"}
         bind:value={searchData}
         on:input={() => {
           handleSearch();

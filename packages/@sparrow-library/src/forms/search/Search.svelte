@@ -38,20 +38,20 @@
       iconSize = "12px";
       imgStyleProp = "height:20px; width:20px;";
       searchTextProp = "font-weight: 400; font-size: 12px; line-height: 18px;";
-      searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 28px; min-height: 28px; max-height: 28px; max-width: 320px; gap: 8px; border-radius: 4px;`;
+      searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 28px; min-height: 28px; max-height: 28px;  gap: 8px; border-radius: 4px;`;
       break;
     case "large":
       iconSize = "12px";
       imgStyleProp = "height:20px; width:20px;";
       searchTextProp =
         "font-weight: 400; font-size: 14px; line-height: 20.02px;";
-      searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 36px; min-height: 36px; max-height: 36px; min-width: 340px; max-width:440px; border-radius: 6px;`;
+      searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 36px; min-height: 36px; max-height: 36px; min-width: 340px;  border-radius: 6px;`;
       break;
     default:
       iconSize = "12px";
       imgStyleProp = "height:20px; width:20px;";
       searchTextProp = "font-weight: 400; font-size: 12px; line-height: 18px;";
-      searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 28px; min-height: 28px; max-height: 28px; min-width: 198px; max-width: 320px; gap: 8px; border-radius: 4px;`;
+      searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 28px; min-height: 28px; max-height: 28px; min-width: 198px;  gap: 8px; border-radius: 4px;`;
       break;
   }
 
@@ -102,7 +102,7 @@
   style={`${searchClassProp} gap:10px`}
 >
   <div
-    class="d-flex align-items-center justify-content-start position-relative"
+    class={`d-flex align-items-center justify-content-start position-relative ${customWidth.length <= 0 ? "w-100" : ""} `}
   >
     <div
       class="position-absolute d-flex align-items-center"
