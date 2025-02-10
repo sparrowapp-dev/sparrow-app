@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { SearchIcon } from "@sparrow/library/assets";
-  import { CrossIcon } from "@sparrow/library/assets";
+  import { SearchIcon } from "@sparrow/library/icons";
+  import { CrossIcon } from "@sparrow/library/icons";
 
   import { createEventDispatcher, onMount } from "svelte";
 
@@ -108,7 +108,12 @@
       class="position-absolute d-flex align-items-center"
       style={`height: 20px; width: 20px; left: 10px; pointer-events: none; ${imgStyleProp}`}
     >
-      <svelte:component this={SearchIcon} width={iconSize} height={iconSize} />
+      <svelte:component
+        this={SearchIcon}
+        width={iconSize}
+        height={iconSize}
+        color={"var(--bg-ds-neutral-300)"}
+      />
     </div>
     <input
       {id}
@@ -126,7 +131,10 @@
         style={`height: 20px; width: 20px; right: 10px; cursor: pointer; ${imgStyleProp} `}
         on:click={clearSearch}
       >
-        <svelte:component this={CrossIcon} width={iconSize} height={iconSize} />
+        <svelte:component
+          this={CrossIcon}
+          color={"var(--text-ds-neutral-100)"}
+        />
       </div>
     {/if}
   </div>

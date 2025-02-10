@@ -1,5 +1,7 @@
 <script lang="ts">
-  export let color: string = "var(--bg-ds-neutral-100)";
+  export let color: string = "gray";
+  export let width = "16px";
+  export let height = "16px";
 </script>
 
 <svg
