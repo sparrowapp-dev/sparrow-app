@@ -49,7 +49,9 @@
           <span class="description">{data.description}</span>
         </div>
       </div>
-      <div class="close-icon-large">
+      <div
+        class="close-icon-large d-flex align-items-center justify-content-center"
+      >
         <span
           data-notification-btn
           role="button"
@@ -104,7 +106,7 @@
           <span class="description">{data.description}</span>
         </div>
       </div>
-      <div class="close-icon">
+      <div class="close-icon d-flex align-items-center justify-content-center">
         <span
           data-notification-btn
           role="button"
@@ -212,10 +214,11 @@
     color: var(--text-ds-neutral-100);
     width: 236px;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: normal;
   }
   :global(.toast-container) {
     z-index: 1000000 !important;
@@ -228,18 +231,12 @@
     top: -4px;
     right: 10px;
     width: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
   .close-icon-large {
     position: relative;
     top: -14px;
     right: 10px;
     width: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
   @keyframes progress {
     from {
@@ -280,6 +277,9 @@
     text-align: left;
     padding-left: 12px;
     padding-right: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     margin: 0;
   }
 </style>
