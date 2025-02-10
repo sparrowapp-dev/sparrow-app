@@ -1,5 +1,5 @@
 <script>
-  import { IconFallback } from "@sparrow/library/ui";
+  import { Avatar } from "@sparrow/library/ui";
   import { AddFeedback } from "../../../features/add-feedback";
   export let userInfo;
   export let onInputFeedback;
@@ -22,7 +22,12 @@
 >
   <div class="d-flex flex-row align-items-center" style="gap:20px;">
     <div class="" style="">
-      <IconFallback character={userInfo?.name?.charAt(0)} />
+      <!-- <IconFallback character={userInfo?.name?.charAt(0)} /> -->
+        <Avatar
+          type={"letter"}
+          size={"large"}
+          letter={userInfo?.name?.charAt(0)}
+          bgColor={"var(--text-secondary-500)"}/>
     </div>
     <div style="font-weight: 500px; font-size:19px;">
       Hey {userInfo?.name}, share your feedback

@@ -7,7 +7,7 @@
 
   import { Attachment } from "@sparrow/support/components";
   import { ImageModal } from "@sparrow/library/ui";
-  import { notifications } from "@sparrow/library/ui";
+  import { notifications ,Avatar} from "@sparrow/library/ui";
 
   /**
    * @description - The current comment being added or modified by the user.
@@ -200,13 +200,18 @@
 </script>
 
 <div class="comment">
-  <IconFallback
-    character={comment.author.name.charAt(0)}
+  <!-- <IconFallback
+    character={comment?.author?.name.charAt(0) || ""}
     width="34px"
     height="32px"
-    backgroundColor="#1C1D2B"
+    backgroundColor=""
     borderColor="#45494D"
-  />
+  /> -->
+   <Avatar
+      type={"letter"}
+      size={"large"}
+      letter={comment?.author?.name.charAt(0) || ""}
+      bgColor={"var(--text-secondary-600)"}/>
 
   <div class="comment-content">
     <div class="comment-author text-fs-14 mt-1">

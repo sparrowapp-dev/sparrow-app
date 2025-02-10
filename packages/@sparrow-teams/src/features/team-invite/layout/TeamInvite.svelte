@@ -366,14 +366,17 @@
         /> -->
         <Avatar
           type={"image"}
-          size={"small"}
-          Image={base64ToURL(teamLogo)}/>
+          size={"large"}
+          image={base64ToURL(teamLogo)}/>
       {:else}
         <span class="">
           <Avatar
             type={"letter"}
             size={"large"}
-            letter={teamName.charAt(0)}/>
+            letter={teamName.charAt(0)}
+             bgColor={"var(--bg-tertiary-800)"}/>
+           
+            <!-- <IconFallback character={teamName[0]} /> -->
         </span>
       {/if}
     </div>

@@ -10,7 +10,7 @@
   import { Button } from "@sparrow/library/ui";
   import { Profile } from "..";
   import { Select } from "@sparrow/library/forms";
-  import { IconFallback } from "@sparrow/library/ui";
+  import { IconFallback, Avatar } from "@sparrow/library/ui";
   export let user: userDetails;
   export let userType: TeamRole;
   export let openTeam;
@@ -283,7 +283,7 @@
       style=" margin-top:16px !important; margin-bottom:16px !important;"
     >
       <div class="d-flex align-items-center">
-        <div
+        <!-- <div
           class="d-flex align-items-center justify-content-center"
           style="width: 36px;
           border: 1px solid var(--border-color);
@@ -291,7 +291,13 @@
           border-radius: 50%;"
         >
           <span>{user.name[0].toUpperCase()}</span>
-        </div>
+        </div> -->
+        <Avatar
+          type={"letter"}
+          size={"large"}
+          letter={user.name[0].toUpperCase() || ""}
+          bgColor={"var(--bg-tertiary-700)"}/>
+          
         <div class="name px-2" style="width: 80%;">
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
@@ -324,13 +330,22 @@
     <div class="d-flex align-items-center ellipsis gap-2">
       <div style="width: 36px;">
         {#if openTeam?.logo?.size}
-          <img
+          <!-- <img
             class="team-icon me-2"
             src={base64ToURL(openTeam?.logo)}
             alt=""
-          />
+          /> -->
+           <Avatar
+          type={"image"}
+          size={"large"}
+          image={base64ToURL(openTeam?.logo)}/>
         {:else}
-          <IconFallback character={openTeam?.name[0]} />
+          <!-- <IconFallback character={openTeam?.name[0]} /> -->
+           <Avatar
+            type={"letter"}
+            size={"large"}
+            letter={openTeam?.name[0] || ""}
+            bgColor={"var(--bg-tertiary-700)"}/>
         {/if}
       </div>
       <p style="font-size:16px;" class="mb-0 ellipsis">{openTeam?.name}</p>
@@ -363,7 +378,7 @@
   <div style="font-size: 14px;" class="text-lightGray mb-1 mt-2">
     <div class="d-flex rounded mb-3">
       <div class=" d-flex align-items-center">
-        <div
+        <!-- <div
           class="d-flex align-items-center justify-content-center"
           style="width: 36px;
           border: 1px solid var(--border-color);
@@ -371,7 +386,12 @@
           border-radius: 50%;"
         >
           <span>{user.name[0].toUpperCase()}</span>
-        </div>
+        </div> -->
+          <Avatar
+            type={"letter"}
+            size={"large"}
+            letter={ user?.name[0]?.toUpperCase()|| ""}
+            bgColor={"var(--bg-tertiary-700)"}/>
         <div class="name px-2" style="width: 80%;">
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
@@ -395,14 +415,23 @@
     <div class="d-flex align-items-center ellipsis gap-2">
       <div style="width: 36px;">
         {#if openTeam?.logo?.size}
-          <img
+          <!-- <img
             class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
             style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
             src={base64ToURL(openTeam?.logo)}
             alt=""
-          />
+          /> -->
+          <Avatar
+            type={"image"}
+            size={"large"}
+            image={base64ToURL(openTeam?.logo)}/>
         {:else}
-          <IconFallback character={openTeam?.name[0]} />
+          <!-- <IconFallback character={openTeam?.name[0]} /> -->
+           <Avatar
+            type={"letter"}
+            size={"large"}
+            letter={openTeam?.name[0] || ""}
+            bgColor={"var(--bg-tertiary-700)"}/>
         {/if}
       </div>
       <p style="font-size:16px;" class="mb-0 ellipsis">{openTeam?.name}</p>
@@ -438,7 +467,7 @@
   <div style="font-size: 14px;" class="text-lightGray mb-1">
     <div class="d-flex rounded mb-3" style="padding-left: 0px !important;">
       <div class="d-flex align-items-center">
-        <div
+        <!-- <div
           class="d-flex align-items-center justify-content-center"
           style="width: 36px;
           border: 1px solid var(--border-color);
@@ -446,7 +475,13 @@
           border-radius: 50%;"
         >
           <span>{user.name[0].toUpperCase()}</span>
-        </div>
+        </div> -->
+        <Avatar
+          type={"letter"}
+          size={"large"}
+          letter={user.name[0] || ""}
+          bgColor={"var(--bg-tertiary-700)"}/>
+
         <div class="name px-2" style="width: 80%;">
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
@@ -500,14 +535,20 @@
     <div class="d-flex align-items-center ellipsis gap-2">
       <div style="width: 36px;">
         {#if openTeam?.logo?.size}
-          <img
+          <!-- <img
             class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
             style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
             src={base64ToURL(openTeam?.logo)}
             alt=""
-          />
+          /> -->
+          <Avatar type={"image"} size={"large"} image={base64ToURL(openTeam?.logo)} bgColor={var(--)}/>
         {:else}
-          <IconFallback character={openTeam?.name[0]} />
+          <!-- <IconFallback character={openTeam?.name[0]} /> -->
+           <Avatar
+            type={"letter"}
+            size={"large"}
+            letter={openTeam?.name[0] || ""}
+            bgColor={"var(--bg-tertiary-700)"}/>
         {/if}
       </div>
       <p style="font-size:16px;" class="mb-0 ellipsis">{openTeam?.name}</p>
@@ -576,9 +617,15 @@
       memberPopObj.isMemberInfoPopup = true;
     }}
   >
-    <div class="icon d-flex align-items-center justify-content-center">
+    <!-- <div class="icon d-flex align-items-center justify-content-center">
       <span>{user.name[0].toUpperCase()}</span>
-    </div>
+    </div> -->
+    <Avatar
+      type={"letter"}
+      size={"large"}
+      letter={user?.name?.charAt(0)}
+      bgColor={"var(--bg-secondary-600)"}/>
+
     <div class="name px-2">
       <span style="font-size:12px;" class="text-whiteColor"
         >{user.name} {owner ? "(You)" : ""}</span

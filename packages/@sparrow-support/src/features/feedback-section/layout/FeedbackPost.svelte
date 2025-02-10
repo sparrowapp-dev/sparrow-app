@@ -10,7 +10,7 @@
     StatusIcon,
   } from "@sparrow/library/icons";
 
-  import { Button, IconFallback, Loader, Modal } from "@sparrow/library/ui";
+  import { Button, Loader, Modal,Avatar} from "@sparrow/library/ui";
   import { ImageModal } from "@sparrow/library/ui";
   import {
     CommentCard,
@@ -380,13 +380,19 @@
             style="display: flex; flex-direction: column; gap: 1px; min-height:80px; width:calc(100% - 37px);"
           >
             <div style="display: flex; align-items: center; gap: 12px;">
-              <IconFallback
+              <!-- <IconFallback
                 character={post?.author?.name?.charAt(0)}
                 width="34px"
                 height="32px"
                 backgroundColor="var(--bg-tertiary-750)"
                 borderColor="var(--border-secondary-300)"
-              />
+              /> -->
+               <Avatar
+                type={"letter"}
+                size={"large"}
+                letter={post?.author?.name?.charAt(0)}
+                bgColor={"var(--text-secondary-600)"}/>
+
               <div style="font-size: 14px; font-weight: 500;">
                 {post?.author?.name}
               </div>

@@ -7,6 +7,7 @@
 
   import { ProfileWorkspace } from "./sub-profile";
   import { Select } from "@sparrow/library/forms";
+  import { Avatar } from "@sparrow/library/ui";
 
   export let user: userDetails;
   export let teamRole: TeamRole;
@@ -68,9 +69,15 @@
 <div>
   <div class="d-flex tile align-items-center justify-content-center">
     <div class="info d-flex align-items-center mt-2">
-      <div class="icon d-flex align-items-center justify-content-center">
+      <!-- <div class="icon d-flex align-items-center justify-content-center">
         <span style="mt-2">{user.name[0].toUpperCase()}</span>
-      </div>
+      </div> -->
+      <Avatar
+        type={"letter"}
+        size={"large"}
+        letter={user.name[0]}
+        bgColor={"var(--text-secondary-600)"}
+        />
 
       <div class="name px-2 ellipsis" style="width:80%">
         <span class="text-whiteColor sparrow-fs-12"

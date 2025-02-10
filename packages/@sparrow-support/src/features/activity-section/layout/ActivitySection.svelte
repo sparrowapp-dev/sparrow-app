@@ -21,7 +21,7 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   import { FeedbackStatusType, FeedbackType } from "../../../types/feedback";
-  import { IconFallback, ImageModal } from "@sparrow/library/ui";
+  import { Avatar, IconFallback, ImageModal } from "@sparrow/library/ui";
 
   import { ActivityStatusType, ActivityType } from "../../../types/activity";
   import { Spinner } from "@sparrow/library/ui";
@@ -514,13 +514,14 @@
                       on:mouseenter={() => (isHovering = comment.id)}
                       on:mouseleave={() => (isHovering = null)}
                     >
-                      <IconFallback
+                      <!-- <IconFallback
                         character={comment.author.name.charAt(0)}
                         width="34px"
                         height="32px"
                         backgroundColor="#1C1D2B"
                         borderColor="#45494D"
-                      />
+                      /> -->
+                      <Avatar type="letter" size="large" letter={comment?.author?.name?.charAt(0)} bgColor="var(--text-secondary-600)" />
                       <div class="comment-content">
                         <div
                           class="mt-1"
