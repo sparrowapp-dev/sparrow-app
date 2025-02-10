@@ -1,9 +1,8 @@
 <script lang="ts">
-  import searchIcon from "../../assets/searchIcon.svg";
-  import crossIcon from "../../assets/crossicon.svg";
+  import { SearchIcon } from "@sparrow/library/assets";
+  import { CrossIcon } from "@sparrow/library/assets";
+
   import { createEventDispatcher, onMount } from "svelte";
-  import { DismissRegular } from "@sparrow/library/icons";
-  import { Search } from "@sparrow/library/icons";
 
   export let placeholder = "Search";
   export let id = "";
@@ -36,20 +35,20 @@
 
   switch (size) {
     case "small":
-      iconSize = "16px";
+      iconSize = "12px";
       imgStyleProp = "height:20px; width:20px;";
       searchTextProp = "font-weight: 400; font-size: 12px; line-height: 18px;";
       searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 28px; min-height: 28px; max-height: 28px; max-width: 320px; gap: 8px; border-radius: 4px;`;
       break;
     case "large":
-      iconSize = "20px";
+      iconSize = "12px";
       imgStyleProp = "height:20px; width:20px;";
       searchTextProp =
         "font-weight: 400; font-size: 14px; line-height: 20.02px;";
       searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 36px; min-height: 36px; max-height: 36px; min-width: 340px; max-width:440px; border-radius: 6px;`;
       break;
     default:
-      iconSize = "16px";
+      iconSize = "12px";
       imgStyleProp = "height:20px; width:20px;";
       searchTextProp = "font-weight: 400; font-size: 12px; line-height: 18px;";
       searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 28px; min-height: 28px; max-height: 28px; min-width: 198px; max-width: 320px; gap: 8px; border-radius: 4px;`;
@@ -84,6 +83,13 @@
   const clearSearch = () => {
     value = "";
     enterPressed = false;
+    dispatch("input", value);
+  };
+
+  const handleInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    value = target.value;
+    dispatch("input", target.value);
   };
 
   onMount(() => {
@@ -93,7 +99,7 @@
 
 <div
   class="d-flex align-items-center justify-content-start w-100 position-relative"
-  style={`${searchClassProp}`}
+  style={`${searchClassProp} gap:10px`}
 >
   <div
     class="d-flex align-items-center justify-content-start position-relative"
@@ -102,7 +108,7 @@
       class="position-absolute d-flex align-items-center"
       style={`height: 20px; width: 20px; left: 10px; pointer-events: none; ${imgStyleProp}`}
     >
-      <Search size={iconSize} />
+      <svelte:component this={SearchIcon} width={iconSize} height={iconSize} />
     </div>
     <input
       {id}
@@ -111,10 +117,7 @@
       style={` ${searchStyleProp} ${searchTextProp} color:white; outline:none; ::placeholder { color: var(--text-ds-neutral-300);};`}
       {value}
       {placeholder}
-      on:input={(event) => {
-        value = event?.target?.value;
-        dispatch("input", event?.target?.value);
-      }}
+      on:input={handleInput}
       on:keydown={onKeyPress}
     />
     {#if value !== ""}
@@ -123,7 +126,7 @@
         style={`height: 20px; width: 20px; right: 10px; cursor: pointer; ${imgStyleProp} `}
         on:click={clearSearch}
       >
-        <DismissRegular {color} size={iconSize} />
+        <svelte:component this={CrossIcon} width={iconSize} height={iconSize} />
       </div>
     {/if}
   </div>

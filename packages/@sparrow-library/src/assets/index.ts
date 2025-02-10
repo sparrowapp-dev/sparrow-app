@@ -7,7 +7,7 @@ export { default as SaveIcon } from "./save.svelte";
 export { default as NotifyIcon } from "./notify.svelte";
 export { default as SettingIcon } from "./setting.svelte";
 export { default as SearchIcon } from "./search.svelte";
-export { default as CrossIcon } from "./crossicon.svelte";
+export { default as CrossIcon } from "./crossIcon.svelte";
 export { default as DoubleLeftIcon } from "./double-left.svelte";
 export { default as DoubleRightIcon } from "./double-right.svelte";
 export { default as LeftIcon } from "./left.svelte";
@@ -143,3 +143,5 @@ export { default as dot3Icon } from "./3dot.svg";
 export { default as gitBranchIcon } from "./git-branch.svg";
 export { default as copyIcon } from "./copy.svg";
 export { default as tickGreyIcon } from "./tick-grey.svg";
+
+
