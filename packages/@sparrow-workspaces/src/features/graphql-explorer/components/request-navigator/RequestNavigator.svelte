@@ -78,9 +78,9 @@
       onUpdateRequestState({
         requestNavigation: GraphqlRequestSectionTabEnum.HEADERS,
       });
-    } else if (event.altKey && event.code === "KeyS") {
+    } else if (event.altKey && event.code === "KeyV") {
       onUpdateRequestState({
-        requestNavigation: GraphqlRequestSectionTabEnum.Schema,
+        requestNavigation: GraphqlRequestSectionTabEnum.VARIABLES,
       });
     } else if (event.altKey && event.code === "KeyA") {
       onUpdateRequestState({

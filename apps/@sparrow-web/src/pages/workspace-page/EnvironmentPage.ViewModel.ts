@@ -149,6 +149,7 @@ export class EnvironmentViewModel {
       type: "LOCAL",
       workspaceId: currentWorkspace._id,
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     const guestUser = await this.guestUserRepository.findOne({
@@ -283,6 +284,7 @@ export class EnvironmentViewModel {
     if (isGuestUser) {
       this.environmentRepository.updateEnvironment(env.id, {
         name: newEnvironmentName,
+        updatedAt: new Date().toString(),
       });
       let currentTab = await this.tabRepository.getTabById(env.id);
       if (currentTab) {
@@ -302,6 +304,7 @@ export class EnvironmentViewModel {
     if (response.isSuccessful) {
       this.environmentRepository.updateEnvironment(env.id, {
         name: newEnvironmentName,
+        updatedAt: response.data.data.updatedAt,
       });
       let currentTab = await this.tabRepository.getTabById(env.id);
       if (currentTab) {

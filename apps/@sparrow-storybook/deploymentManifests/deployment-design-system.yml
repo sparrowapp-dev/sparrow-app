@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: sparrow-dev
+  labels:
+    app: storybook-design-system
+  name: storybook-design-system
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: storybook-design-system
+  template:
+    metadata:
+      labels:
+        app: storybook-design-system
+    spec:
+      containers:
+        - image: sparrowprod.azurecr.io/storybook-design-system:_BUILD__ID_
+          name: storybook-design-system
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 100m
+              memory: 600Mi
+            limits:
+              cpu: 500m
+              memory: 700Mi
+
+          # livenessProbe:
+          #   tcpSocket:
+          #     port: 1422
+          #   initialDelaySeconds: 15
+          #   periodSeconds: 5
+          #   timeoutSeconds: 5
+          #   failureThreshold: 3
+          #   successThreshold: 1
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: storybook-design-system-svc
+  namespace: sparrow-dev
+  labels:
+    run: storybook-design-system
+spec:
+  type: ClusterIP
+  selector:
+    app: storybook-design-system
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

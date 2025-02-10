@@ -2,6 +2,7 @@
   import type { SearchSuggestion } from "./types/types";
   export let suggestions: SearchSuggestion[];
   export let selectedType = "";
+  export let searchBarRef;
 
   const handleTagClick = (label: string) => {
     const normalizedSelected = selectedType.toLowerCase();
@@ -12,6 +13,7 @@
     } else {
       selectedType = label;
     }
+    searchBarRef.focus();
   };
 
   $: isSelected = (label: string) => {
@@ -23,21 +25,20 @@
 
 <div class="tags-container">
   {#each suggestions as suggestion}
-    <button
-      class="suggestion-tag"
-      role="button"
-      class:selected={isSelected(suggestion.label)}
-      tabindex="0"
-      on:click={() => handleTagClick(suggestion.label)}
-    >
-      <div class="tag-icon-wrapper">
-        <svelte:component
-          this={suggestion.icon}
-          color="var(--icon-color)"
-        />
-      </div>
-      <span class="tag-label">{suggestion.label}</span>
-    </button>
+    {#if suggestion?.show}
+      <button
+        class="suggestion-tag"
+        role="button"
+        class:selected={isSelected(suggestion.label)}
+        tabindex="0"
+        on:click={() => handleTagClick(suggestion.label)}
+      >
+        <div class="tag-icon-wrapper">
+          <svelte:component this={suggestion.icon} color="var(--icon-color)" />
+        </div>
+        <span class="tag-label">{suggestion.label}</span>
+      </button>
+    {/if}
   {/each}
 </div>
 
@@ -55,9 +56,9 @@
   .suggestion-tag.selected {
     border: 1px solid var(--border-ds-primary-300);
     background-color: var(--bg-ds-surface-100);
-    --text-color:var(--text-ds-neutral-50);
-    --icon-color:var(--icon-ds-neutral-50);
-    color:var(--icon-ds-neutral-50);
+    --text-color: var(--text-ds-neutral-50);
+    --icon-color: var(--icon-ds-neutral-50);
+    color: var(--icon-ds-neutral-50);
   }
 
   .suggestion-tag {
@@ -92,8 +93,9 @@
 
   .tag-label {
     color: var(--text-ds-neutral-200);
-    font: 500 12px Inter, sans-serif;
-    
+    font:
+      500 12px Inter,
+      sans-serif;
   }
   .suggestion-tag.selected .tag-label {
     color: var(--icon-ds-neutral-50);
