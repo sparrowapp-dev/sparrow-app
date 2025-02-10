@@ -21,25 +21,31 @@
               <div
                 class="bg-circle d-flex justify-content-center align-items-center"
               >
-                <NewSuccessIcon />
+                <div class="bg-cirle-success">
+                  <NewSuccessIcon />
+                </div>
               </div>
             {:else if data.type === "warning"}
               <div
                 class="bg-circle d-flex justify-content-center align-items-center"
               >
-                <NewWarningIcon />
+                <div class="bg-cirle-warning">
+                  <NewWarningIcon />
+                </div>
               </div>
             {:else}
               <div
                 class="bg-circle d-flex justify-content-center align-items-center"
               >
-                <NewErrorIcon />
+                <div class="bg-circle-error">
+                  <NewErrorIcon />
+                </div>
               </div>
             {/if}
           </span>
         </div>
         <div class="d-flex row gap-1">
-          <p class="data.title">{data.title}</p>
+          <p class="data-title text-fs-14">{data.title}</p>
           <span class="description">{data.description}</span>
         </div>
       </div>
@@ -71,19 +77,25 @@
               <div
                 class="bg-circle d-flex justify-content-center align-items-center"
               >
-                <NewSuccessIcon />
+                <div class="bg-cirle-success">
+                  <NewSuccessIcon />
+                </div>
               </div>
             {:else if data.type === "warning"}
               <div
                 class="bg-circle d-flex justify-content-center align-items-center"
               >
-                <NewWarningIcon />
+                <div class="bg-cirle-warning">
+                  <NewWarningIcon />
+                </div>
               </div>
             {:else}
               <div
                 class="bg-circle d-flex justify-content-center align-items-center"
               >
-                <NewErrorIcon />
+                <div class="bg-circle-error">
+                  <NewErrorIcon />
+                </div>
               </div>
             {/if}
           </span>
@@ -115,6 +127,8 @@
   .custom-toast {
     height: 68px;
     background-color: var(--bg-ds-surface-500);
+    box-shadow: 0px 16px 32px 0px #0000004d;
+    overflow: hidden;
   }
 
   .content-wrapper {
@@ -136,7 +150,6 @@
     border-radius: 50%;
     z-index: 1;
   }
-
   .icon-backdrop-success {
     background: radial-gradient(
       50% 50% at 50% 50%,
@@ -160,7 +173,28 @@
       rgba(29, 33, 43, 0) 100%
     );
   }
-
+  .bg-cirle-success {
+    position: relative;
+    padding: 2px;
+    width: 24;
+    height: 24;
+  }
+  .bg-cirle-warning {
+    position: relative;
+    left: 0.5px;
+    padding: 2px;
+    width: 24;
+    height: 24;
+    top: -2px;
+  }
+  .bg-circle-error {
+    position: relative;
+    padding: 2px;
+    width: 24;
+    height: 24;
+    top: -1px;
+    left: 0.5px;
+  }
   .bg-circle {
     background-color: var(--bg-ds-surface-100);
     border-radius: 50%;
@@ -230,6 +264,7 @@
   .progress-bar-success {
     /* background-color: var(--bg-ds-green-400); */
     background-color: #33cc7a;
+    /* box-shadow: 1px 1px 10px 4px rgba(0, 237, 123, 0.5); */
   }
 
   .progress-bar-error {
@@ -238,9 +273,8 @@
   .progress-bar-warning {
     background-color: #ecc551;
   }
-  .data.title {
+  .data-title {
     font-family: "Inter", sans-serif;
-    font-size: 14px;
     font-weight: 500;
     line-height: 20.02px;
     text-align: left;
