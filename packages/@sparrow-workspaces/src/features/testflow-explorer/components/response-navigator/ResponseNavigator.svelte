@@ -47,6 +47,5 @@
 </script>
 
 <div class="py-2">
-  <!-- Tabs -->
   <Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
 </div>

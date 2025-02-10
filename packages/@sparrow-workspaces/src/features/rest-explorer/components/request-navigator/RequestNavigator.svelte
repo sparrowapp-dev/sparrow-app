@@ -16,8 +16,6 @@
     name: string;
     id: RequestSectionEnum;
     count: number;
-    disabled?: boolean;
-    icon?: string;
   }[] = [];
 
   /**
@@ -40,14 +38,11 @@
         name: "Parameters",
         id: RequestSectionEnum.PARAMETERS,
         count: _paramsLength + _authParameterLength - 1,
-        disabled: false,
-        icon: ThreeDotIcon,
       },
       {
         name: "Body",
         id: RequestSectionEnum.REQUEST_BODY,
         count: 0,
-        disabled: false,
       },
       {
         name: "Headers",

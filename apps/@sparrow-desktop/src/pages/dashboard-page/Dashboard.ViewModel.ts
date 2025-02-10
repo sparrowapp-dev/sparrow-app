@@ -6,7 +6,15 @@ import { CollectionRepository } from "../../repositories/collection.repository";
 import { EnvironmentService } from "../../services/environment.service";
 import { TeamService } from "../../services/team.service";
 import { WorkspaceService } from "../../services/workspace.service";
-import { InitCollectionTab, InitEnvironmentTab, InitFolderTab, InitTestflowTab, moveNavigation, Sleep, throttle } from "@sparrow/common/utils";
+import {
+  InitCollectionTab,
+  InitEnvironmentTab,
+  InitFolderTab,
+  InitTestflowTab,
+  moveNavigation,
+  Sleep,
+  throttle,
+} from "@sparrow/common/utils";
 import { notifications } from "@sparrow/library/ui";
 import { isGuestUserActive, setUser, user } from "@app/store/auth.store";
 import { TabRepository } from "../../repositories/tab.repository";
@@ -22,7 +30,11 @@ import { FeatureSwitchService } from "../../services/feature-switch.service";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { v4 as uuidv4 } from "uuid";
-import { GraphqlTabAdapter, RequestTabAdapter, SocketIoTabAdapter } from "../../adapter";
+import {
+  GraphqlTabAdapter,
+  RequestTabAdapter,
+  SocketIoTabAdapter,
+} from "../../adapter";
 import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -31,10 +43,8 @@ import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.serv
 import { InitWorkspaceTab } from "@sparrow/common/utils";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
 
-
 export class DashboardViewModel {
-  constructor() {
-  }
+  constructor() {}
   private teamRepository = new TeamRepository();
   private workspaceRepository = new WorkspaceRepository();
   private teamService = new TeamService();
@@ -60,11 +70,10 @@ export class DashboardViewModel {
   /**
    * Get the active workspace
    * @returns - the active workspace
-  */
+   */
   public getActiveWorkspace = () => {
     return this.workspaceRepository.getActiveWorkspace();
   };
-
 
   /**
    * @description - get environment list from local db
@@ -438,21 +447,21 @@ export class DashboardViewModel {
 
   public getTabData = async (id: string) => {
     return await this.tabRepository.getTabById(id);
-  }
+  };
 
   public getWorkspaceById = async (id: string): Promise<WorkspaceDocument> => {
     return await this.workspaceRepository.readWorkspace(id);
-  }
+  };
 
   public getTabByID = async (id: string) => {
     return await this.tabRepository.getTabById(id);
-  }
+  };
 
   public switchAndCreateRequestTab = async (
     workspaceId: string,
     collectionId: string,
     folderId: string,
-    tree: any
+    tree: any,
   ) => {
     switch (tree.type) {
       case "GRAPHQL": {
@@ -500,9 +509,12 @@ export class DashboardViewModel {
       }
     }
     moveNavigation("right");
-  }
+  };
 
-  public switchAndCreateCollectionTab = async (workspaceId: string, collection: any) => {
+  public switchAndCreateCollectionTab = async (
+    workspaceId: string,
+    collection: any,
+  ) => {
     // Calculate collection stats
     let totalFolder = 0;
     let totalRequest = 0;
@@ -542,11 +554,13 @@ export class DashboardViewModel {
 
     // Update UI
     moveNavigation("right");
-  }
+  };
 
-  public switchAndCreateFolderTab = async (workspaceId: string,
+  public switchAndCreateFolderTab = async (
+    workspaceId: string,
     collectionId: any,
-    folder: any) => {
+    folder: any,
+  ) => {
     const path = {
       workspaceId: workspaceId,
       collectionId: collectionId || "",
@@ -561,13 +575,10 @@ export class DashboardViewModel {
 
     await this.tabRepository.createTab(sampleFolder.getValue(), workspaceId);
     moveNavigation("right");
-  }
+  };
 
   public switchAndCreateWorkspaceTab = async (workspace: any) => {
-    const initWorkspaceTab = new InitWorkspaceTab(
-      workspace._id,
-      workspace._id,
-    );
+    const initWorkspaceTab = new InitWorkspaceTab(workspace._id, workspace._id);
     initWorkspaceTab.updateName(workspace.name);
 
     // Create tab and set active workspace
@@ -576,7 +587,7 @@ export class DashboardViewModel {
       workspace._id,
     );
     moveNavigation("right");
-  }
+  };
 
   public switchAndCreateEnvironmentTab = async (environment: any) => {
     const initEnvironmentTab = new InitEnvironmentTab(
@@ -587,9 +598,12 @@ export class DashboardViewModel {
     initEnvironmentTab.setName(environment.title);
     initEnvironmentTab.setVariable(environment?.variable);
 
-    await this.tabRepository.createTab(initEnvironmentTab.getValue(), environment.workspace);
+    await this.tabRepository.createTab(
+      initEnvironmentTab.getValue(),
+      environment.workspace,
+    );
     moveNavigation("right");
-  }
+  };
 
   public switchAndCreateTestflowTab = async (testflow: any) => {
     const path = {
@@ -598,7 +612,9 @@ export class DashboardViewModel {
       collectionId: testflow.collectionId || "",
       folderId: testflow.folderId || "",
     };
-    const testflowData = await this.testflowRepository.readTestflow(testflow._id);
+    const testflowData = await this.testflowRepository.readTestflow(
+      testflow._id,
+    );
 
     const tab = new InitTestflowTab(testflow._id, testflow.workspaceId);
     tab.updateName(testflowData.name);
@@ -611,35 +627,39 @@ export class DashboardViewModel {
     await new Sleep().setTime(100).exec();
     await this.tabRepository.createTab(tab.getValue(), testflow.workspaceId);
     moveNavigation("right");
-  }
+  };
 
-  public searchWorkspace = async (query: string): Promise<WorkspaceDocument[]> => {
+  public searchWorkspace = async (
+    query: string,
+  ): Promise<WorkspaceDocument[]> => {
     const workspaces = await this.workspaceRepository.searchWorkspaces(query);
     return workspaces;
-  }
+  };
 
-  public searchEnvironment = async (query: string): Promise<EnvironmentDocument[]> => {
-    const environments = await this.environmentRepository.searchEnvironments(query);
+  public searchEnvironment = async (
+    query: string,
+  ): Promise<EnvironmentDocument[]> => {
+    const environments =
+      await this.environmentRepository.searchEnvironments(query);
     return environments;
-  }
+  };
 
   public searchTestflow = async (query: string): Promise<any> => {
     const environments = await this.testflowRepository.searchTestflows(query);
     return environments;
-  }
+  };
 
   public getRecentWorkspace = async (): Promise<WorkspaceDocument[]> => {
     return this.workspaceRepository.getRecentWorkspaces();
-  }
+  };
 
   public getRecentEnvironment = async (): Promise<EnvironmentDocument[]> => {
     return this.environmentRepository.getRecentEnvironments();
-  }
+  };
 
   public getRecentTestflow = async (): Promise<any> => {
     return this.testflowRepository.getRecentTestflows();
-  }
-
+  };
 
   /**
    * Gets the request URL based on the type of request in the tree node
@@ -695,7 +715,10 @@ export class DashboardViewModel {
     collectionId: string,
     path: string[],
     folderDetails: any,
-    workspaceMap: Record<string, { teamName: string; workspaceName: string }> = {},
+    workspaceMap: Record<
+      string,
+      { teamName: string; workspaceName: string }
+    > = {},
     currentWorkspaceId = tree.workspaceId,
   ): void {
     if (tree.workspaceId) {
@@ -708,23 +731,20 @@ export class DashboardViewModel {
 
     if (tree.name.toLowerCase().includes(searchText.toLowerCase())) {
       if (
-        (tree.type === ItemType.REQUEST ||
-          tree.type === ItemType.GRAPHQL ||
-          tree.type === ItemType.SOCKET_IO ||
-          tree.type === ItemType.WEB_SOCKET) &&
-        file.length < 3
+        tree.type === ItemType.REQUEST ||
+        tree.type === ItemType.GRAPHQL ||
+        tree.type === ItemType.SOCKET_IO ||
+        tree.type === ItemType.WEB_SOCKET
       ) {
         let currentFolderDetails =
           tree.folderId && tree.folderName
             ? { id: tree.folderId, name: tree.folderName }
             : tree.parentFolder
-              ? { id: tree.parentFolder.id, name: tree.parentFolder.name }
-              : folderDetails;
+            ? { id: tree.parentFolder.id, name: tree.parentFolder.name }
+            : folderDetails;
 
         const requestMethod =
-          tree.type === ItemType.REQUEST
-            ? tree.request?.method
-            : tree.type;
+          tree.type === ItemType.REQUEST ? tree.request?.method : tree.type;
 
         const requestData = {
           tree: JSON.parse(
@@ -748,7 +768,7 @@ export class DashboardViewModel {
         };
 
         file.push(requestData);
-      } else if (tree.type === ItemType.FOLDER && folder.length < 1) {
+      } else if (tree.type === ItemType.FOLDER) {
         folder.push({
           tree: JSON.parse(JSON.stringify(tree)),
           collectionId,
@@ -757,7 +777,6 @@ export class DashboardViewModel {
           workspaceId: currentWorkspaceId,
         });
       } else if (
-        collection.length < 1 &&
         tree.type !== ItemType.FOLDER &&
         !Object.values([
           ItemType.REQUEST,
@@ -824,7 +843,10 @@ export class DashboardViewModel {
    */
   private getLatestItemsByType(
     tree: any[],
-    workspaceMap: Record<string, { teamName: string; workspaceName: string }> = {},
+    workspaceMap: Record<
+      string,
+      { teamName: string; workspaceName: string }
+    > = {},
   ) {
     const collections: any[] = [];
     const folders: any[] = [];
@@ -850,9 +872,7 @@ export class DashboardViewModel {
       const workspaceId = node.workspaceId || currentWorkspaceId;
 
       const requestMethod =
-        node.type === ItemType.REQUEST
-          ? node.request?.method
-          : node.type;
+        node.type === ItemType.REQUEST ? node.request?.method : node.type;
 
       const itemData = {
         tree: JSON.parse(
@@ -933,10 +953,13 @@ export class DashboardViewModel {
    */
   public async searchNode(
     searchText: string,
-    workspaceMap: Record<string, { teamName: string; workspaceName: string }> = {},
+    workspaceMap: Record<
+      string,
+      { teamName: string; workspaceName: string }
+    > = {},
   ) {
     let collectionTree = await this.collectionRepository.getCollectionDocs();
-    const s = collectionTree.map((_t)=>{
+    const s = collectionTree.map((_t) => {
       return _t.toMutableJSON();
     });
 
@@ -974,16 +997,12 @@ export class DashboardViewModel {
       }));
 
       let workspace = await this.getRecentWorkspace();
-      workspace = workspace.map(
-        (_value) => _value._data,
-      );
+      workspace = workspace.map((_value) => _value._data);
 
       let testflow = await this.getRecentTestflow();
-      testflow = testflow.map(
-        (_value) => _value._data,
-      );
+      testflow = testflow.map((_value) => _value._data);
 
-      return {collection, folder, file, workspace, testflow, environment};
+      return { collection, folder, file, workspace, testflow, environment };
     }
 
     for (let i = 0; i < newtree.length; i++) {
@@ -1015,7 +1034,6 @@ export class DashboardViewModel {
       variable: _environment.variable,
     }));
 
-    return {collection, folder, file, workspace, testflow, environment};
-
+    return { collection, folder, file, workspace, testflow, environment };
   }
 }

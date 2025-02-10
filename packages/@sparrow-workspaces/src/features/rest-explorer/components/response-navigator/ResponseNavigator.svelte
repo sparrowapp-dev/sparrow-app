@@ -26,7 +26,7 @@
         name: "Headers",
         id: ResponseSectionEnum.HEADERS,
         count: _responseHeadersLength,
-        disabled: false,
+        disabled: true,
       },
     ];
   };

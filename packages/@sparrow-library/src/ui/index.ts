@@ -17,3 +17,5 @@ export * from "./toast";
 export * from "./image-modal";
 export * from "./skeleton";
 export * from "./Navigation";
+
+export * from "./badge";

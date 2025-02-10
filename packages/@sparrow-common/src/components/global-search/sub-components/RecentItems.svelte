@@ -32,6 +32,7 @@
   export let filteredTestflows;
   export let filteredEnvironments;
   export let isWebApp = false;
+  export let isGuestUser = false;
 
   const methodIcons = {
     GET: getIcon,
@@ -230,7 +231,7 @@
       </div>
     {/if}
 
-    {#if searchQuery == "" && filteredWorkspaces[0]}
+    {#if searchQuery == "" && filteredWorkspaces[0] && !isGuestUser}
       <div style="display:flex;flex-direction:column; gap:4px;">
         <div class="section-top">
           <span class="section-title">Recent Workspace</span>
@@ -459,7 +460,7 @@
           </div>
         {/each}
       {/if}
-      {#if filteredWorkspaces?.length > 0}
+      {#if filteredWorkspaces?.length > 0 && !isGuestUser}
         <div class="section-header">
           <span class="section-title">Workspaces</span>
           <div class="keyboard-shortcut">
@@ -490,7 +491,7 @@
     {:else}
       <NoResults {searchQuery} />
     {/if}
-  {:else if selectedType.toLowerCase() == "workspaces"}
+  {:else if selectedType.toLowerCase() == "workspaces" && !isGuestUser}
     {#if filteredWorkspaces?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Workspaces</span>
@@ -520,7 +521,11 @@
       {/each}
     {:else}
       <div>
-        <NoResults {searchQuery} />
+        <NoResults
+          {searchQuery}
+          type="Custom"
+          customText="No workspaces found. Create one!"
+        />
       </div>
     {/if}
 
@@ -559,7 +564,11 @@
         </div>
       {/each}
     {:else}
-      <NoResults {searchQuery} />
+      <NoResults
+        {searchQuery}
+        type="Custom"
+        customText="No folders found. Add one!"
+      />
     {/if}
 
     <!-- Content for folders -->
@@ -596,7 +605,11 @@
         </div>
       {/each}
     {:else}
-      <NoResults {searchQuery} />
+      <NoResults
+        {searchQuery}
+        type="Custom"
+        customText="No collections found. Create one!"
+      />
     {/if}
   {:else if selectedType.toLowerCase() == "requests"}
     {#if filteredRequest?.length > 0}
@@ -646,7 +659,11 @@
         {/each}
       </div>
     {:else}
-      <NoResults {searchQuery} />
+      <NoResults
+        {searchQuery}
+        type="Custom"
+        customText="No requests found. Try one!"
+      />
     {/if}
   {:else if selectedType.toLowerCase() == "environments"}
     {#if filteredEnvironments?.length > 0}
@@ -676,7 +693,11 @@
         </div>
       {/each}
     {:else}
-      <NoResults {searchQuery} />
+      <NoResults
+        {searchQuery}
+        type="Custom"
+        customText="No environments found. Add one!"
+      />
     {/if}
   {:else if selectedType.toLowerCase() == "flows"}
     {#if filteredTestflows?.length > 0}
@@ -707,7 +728,11 @@
         </div>
       {/each}
     {:else}
-      <NoResults {searchQuery} />
+      <NoResults
+        {searchQuery}
+        type="Custom"
+        customText="No test flows found. Build one!"
+      />
     {/if}
   {/if}
 </div>
