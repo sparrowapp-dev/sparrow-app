@@ -120,7 +120,7 @@
     width: 30px;
     height: 2px;
     border-radius: 2px;
-    background-color: var(--border-primary-400);
+    background-color: var(--bg-ds-primary-400);
     transition: 250ms ease-out;
     position: relative;
     bottom: 0;
