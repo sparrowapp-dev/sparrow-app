@@ -305,7 +305,7 @@
                       {#each event.types as tag}
                       <span class="mt-[6px]">  <Tag
                           type={getTagType(tag)}
-                          text={tag}/>
+                          text={tag || ""}/>
                       </span>
 
                       {/each}
@@ -439,7 +439,7 @@
                 {#each selectedEvent.types as tag}
                   <span class="mt-[6px]">  <Tag
                           type={getTagType(tag)}
-                          text={tag}/>
+                          text={tag || ""}/>
                     </span>
                 {/each}
               </div>

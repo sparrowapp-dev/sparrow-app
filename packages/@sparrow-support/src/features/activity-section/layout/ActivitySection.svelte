@@ -406,7 +406,7 @@
                           >
                             <Tag
                               type={getColor(post?.status)}
-                              text={post.status}
+                              text={post?.status ? post.status.charAt(0) + post.status.slice(1) : ""}
                             />
                           </div>
                         </div>

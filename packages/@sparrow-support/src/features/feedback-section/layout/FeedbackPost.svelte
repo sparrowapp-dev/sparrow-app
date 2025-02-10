@@ -365,7 +365,7 @@
           <span style="font-size: 18px; font-weight: 500;">{post?.title}</span>
           <Tag
             type={getColor(post?.status)}
-            text={post?.status}
+            text={post?.status || ""}
             />
         </div>
 

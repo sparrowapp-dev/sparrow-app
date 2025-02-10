@@ -608,7 +608,7 @@
                   >
                     <Tag
                       type={getColor(post?.status)}
-                      text={post.status}
+                      text={post?.status || "" }
                     />
                   </div>
                 </div>

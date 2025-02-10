@@ -221,7 +221,10 @@
           has marked this post as
           <Tag
            type={comment?.status}
-            text={comment?.status}
+            text={comment?.status
+              ? comment?.status.charAt(0) +
+                comment?.status.slice(1)
+              : ""}
             /> 
         </span>
       {/if}
