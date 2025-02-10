@@ -779,11 +779,10 @@ export class DashboardViewModel {
 
     if (tree.name.toLowerCase().includes(searchText.toLowerCase())) {
       if (
-        (tree.type === ItemType.REQUEST ||
-          tree.type === ItemType.GRAPHQL ||
-          tree.type === ItemType.SOCKET_IO ||
-          tree.type === ItemType.WEB_SOCKET) &&
-        file.length < 3
+        tree.type === ItemType.REQUEST ||
+        tree.type === ItemType.GRAPHQL ||
+        tree.type === ItemType.SOCKET_IO ||
+        tree.type === ItemType.WEB_SOCKET
       ) {
         let currentFolderDetails =
           tree.folderId && tree.folderName
@@ -817,7 +816,7 @@ export class DashboardViewModel {
         };
 
         file.push(requestData);
-      } else if (tree.type === ItemType.FOLDER && folder.length < 1) {
+      } else if (tree.type === ItemType.FOLDER) {
         folder.push({
           tree: JSON.parse(JSON.stringify(tree)),
           collectionId,
@@ -826,7 +825,6 @@ export class DashboardViewModel {
           workspaceId: currentWorkspaceId,
         });
       } else if (
-        collection.length < 1 &&
         tree.type !== ItemType.FOLDER &&
         !Object.values([
           ItemType.REQUEST,
