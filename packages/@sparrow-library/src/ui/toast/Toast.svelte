@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { ToastContainer } from "svelte-toasts";
   import {
     NewSuccessIcon,
@@ -6,133 +6,66 @@
     NewWarningIcon,
     NewCloseIcon,
   } from "./icons";
+
+  const getIcon = (type: string) => {
+    switch (type) {
+      case "success":
+        return NewSuccessIcon;
+      case "warning":
+        return NewWarningIcon;
+      default:
+        return NewErrorIcon;
+    }
+  };
 </script>
 
 <ToastContainer width={"fit-content"} let:data>
-  {#if data.title !== undefined}
-    <div
-      class="d-flex position-relative custom-toast custom-toast-{data.type} toast"
-    >
-      <div class="w-100 content-wrapper d-flex column gap-4">
-        <div class="d-flex">
-          <span class="icon">
-            <span class="icon-backdrop icon-backdrop-{data.type}" />
-            {#if data.type === "success"}
-              <div
-                class="bg-circle d-flex justify-content-center align-items-center"
-              >
-                <div class="bg-cirle-success">
-                  <NewSuccessIcon />
-                </div>
-              </div>
-            {:else if data.type === "warning"}
-              <div
-                class="bg-circle d-flex justify-content-center align-items-center"
-              >
-                <div class="bg-cirle-warning">
-                  <NewWarningIcon />
-                </div>
-              </div>
-            {:else}
-              <div
-                class="bg-circle d-flex justify-content-center align-items-center"
-              >
-                <div class="bg-circle-error">
-                  <NewErrorIcon />
-                </div>
-              </div>
-            {/if}
-          </span>
-        </div>
-        <div class="d-flex row gap-1">
+  <div
+    class="d-flex position-relative custom-toast custom-toast-{data.type} toast"
+    style="height: {data.title === undefined ? '68px' : '84px'};"
+  >
+    <div class="w-100 content-wrapper d-flex column gap-4">
+      <div class="d-flex">
+        <span class="icon">
+          <span class="icon-backdrop icon-backdrop-{data.type}" />
+          <div
+            class="bg-circle d-flex justify-content-center align-items-center"
+          >
+            <div class="bg-circle-{data.type}">
+              <svelte:component this={getIcon(data.type)} />
+            </div>
+          </div>
+        </span>
+      </div>
+      <div class="d-flex row gap-1">
+        {#if data.title !== undefined}
           <p class="data-title text-fs-14">{data.title}</p>
-          <span class="description">{data.description}</span>
-        </div>
+        {/if}
+        <span class="description">{data.description}</span>
       </div>
-      <div
-        class="close-icon-large d-flex align-items-center justify-content-center"
-      >
-        <span
-          data-notification-btn
-          role="button"
-          on:click={() => data.remove()}
-        >
-          <NewCloseIcon />
-        </span>
-      </div>
-      {#if data.duration > 0}
-        <div
-          class="progress-bar progress-bar-{data.type}"
-          style="animation-duration: {data.duration}ms;"
-        ></div>
-      {/if}
     </div>
-  {:else}
     <div
-      class="d-flex position-relative custom-toast custom-toast-{data.type} toast"
+      class="close-icon-large d-flex align-items-center justify-content-center"
     >
-      <div class="w-100 content-wrapper d-flex column gap-2">
-        <div class="d-flex">
-          <span class="icon">
-            <span class="icon-backdrop icon-backdrop-{data.type}" />
-            {#if data.type === "success"}
-              <div
-                class="bg-circle d-flex justify-content-center align-items-center"
-              >
-                <div class="bg-cirle-success">
-                  <NewSuccessIcon />
-                </div>
-              </div>
-            {:else if data.type === "warning"}
-              <div
-                class="bg-circle d-flex justify-content-center align-items-center"
-              >
-                <div class="bg-cirle-warning">
-                  <NewWarningIcon />
-                </div>
-              </div>
-            {:else}
-              <div
-                class="bg-circle d-flex justify-content-center align-items-center"
-              >
-                <div class="bg-circle-error">
-                  <NewErrorIcon />
-                </div>
-              </div>
-            {/if}
-          </span>
-        </div>
-        <div class="d-flex">
-          <span class="description">{data.description}</span>
-        </div>
-      </div>
-      <div class="close-icon d-flex align-items-center justify-content-center">
-        <span
-          data-notification-btn
-          role="button"
-          on:click={() => data.remove()}
-        >
-          <NewCloseIcon />
-        </span>
-      </div>
-      {#if data.duration > 0}
-        <div
-          class="progress-bar progress-bar-{data.type}"
-          style="animation-duration: {data.duration}ms;"
-        ></div>
-      {/if}
+      <span data-notification-btn role="button" on:click={() => data.remove()}>
+        <NewCloseIcon />
+      </span>
     </div>
-  {/if}
+    {#if data.duration > 0}
+      <div
+        class="progress-bar progress-bar-{data.type}"
+        style="animation-duration: {data.duration}ms;"
+      ></div>
+    {/if}
+  </div>
 </ToastContainer>
 
 <style>
   .custom-toast {
-    height: 68px;
     background-color: var(--bg-ds-surface-500);
     box-shadow: 0px 16px 32px 0px #0000004d;
     overflow: hidden;
   }
-
   .content-wrapper {
     display: flex;
     align-items: center;
@@ -141,7 +74,6 @@
   .icon {
     position: relative;
   }
-
   .icon-backdrop {
     position: absolute;
     top: 50%;
@@ -159,7 +91,6 @@
       rgba(29, 33, 43, 0) 100%
     );
   }
-
   .icon-backdrop-error {
     background: radial-gradient(
       50% 50% at 50% 50%,
@@ -167,7 +98,6 @@
       rgba(29, 33, 43, 0) 100%
     );
   }
-
   .icon-backdrop-warning {
     background: radial-gradient(
       50% 50% at 50% 50%,
@@ -175,36 +105,29 @@
       rgba(29, 33, 43, 0) 100%
     );
   }
-  .bg-cirle-success {
-    position: relative;
-    padding: 2px;
-    width: 24;
-    height: 24;
-  }
-  .bg-cirle-warning {
-    position: relative;
-    left: 0.5px;
-    padding: 2px;
-    width: 24;
-    height: 24;
-    top: -2px;
-  }
-  .bg-circle-error {
-    position: relative;
-    padding: 2px;
-    width: 24;
-    height: 24;
-    top: -1px;
-    left: 0.5px;
-  }
   .bg-circle {
     background-color: var(--bg-ds-surface-100);
     border-radius: 50%;
-    position: relative;
     height: 32px;
     width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-
+  .bg-circle-success,
+  .bg-circle-warning,
+  .bg-circle-error {
+    position: relative;
+    padding: 2px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    width: 24px;
+    height: 24px;
+  }
+  .bg-circle-warning {
+    top: -1px;
+  }
   .description {
     font-size: 12px;
     font-weight: 500;
@@ -220,17 +143,10 @@
     text-overflow: ellipsis;
     white-space: normal;
   }
-  :global(.toast-container) {
+  .toast-container {
     z-index: 1000000 !important;
     pointer-events: unset !important;
     padding: 0 !important;
-  }
-
-  .close-icon {
-    position: relative;
-    top: -4px;
-    right: 10px;
-    width: 24px;
   }
   .close-icon-large {
     position: relative;
@@ -257,13 +173,9 @@
     animation: progress linear forwards;
     backdrop-filter: blur(4px);
   }
-
   .progress-bar-success {
-    /* background-color: var(--bg-ds-green-400); */
     background-color: #33cc7a;
-    /* box-shadow: 1px 1px 10px 4px rgba(0, 237, 123, 0.5); */
   }
-
   .progress-bar-error {
     background-color: #eb5651;
   }
@@ -275,8 +187,7 @@
     font-weight: 500;
     line-height: 20.02px;
     text-align: left;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding: 0 12px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
