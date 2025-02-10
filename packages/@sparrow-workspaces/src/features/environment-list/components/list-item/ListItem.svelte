@@ -239,7 +239,7 @@
         }
       }}
     >
-      <button
+      <!-- <button
         class="p-0 m-0 ms-1 ps-4 me-2 border-0 bg-transparent"
         on:click|stopPropagation={() => {
           handleSelectEnvironment();
@@ -251,7 +251,12 @@
           height={20}
           selected={currentWorkspace?.environmentId === env.id}
         />
-      </button>
+      </button> -->
+      <RadioButton
+        buttonSize="medium"
+        selected={currentWorkspace?.environmentId === env.id}
+        handleClick={handleSelectEnvironment}
+      />
       {#if isRenaming}
         <input
           class="py-0 renameInputFieldCollection text-fs-12 w-100"
