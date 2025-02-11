@@ -3,6 +3,7 @@
     height: number = 24,
     color: string = "white",
     classProp: string = "";
+    
 </script>
 
 <svg

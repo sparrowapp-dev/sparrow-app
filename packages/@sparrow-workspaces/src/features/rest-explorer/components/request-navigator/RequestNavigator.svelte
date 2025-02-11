@@ -1,7 +1,7 @@
 <script lang="ts">
   import { type UpdateRequestStateType } from "@sparrow/workspaces/type";
   import { RequestSectionEnum } from "@sparrow/common/types/workspace";
-  import { Label } from "@sparrow/library/ui";
+
   import { Navigator } from "@sparrow/library/ui";
   export let requestStateSection: string;
   export let authParameterLength = 0;
