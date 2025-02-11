@@ -79,7 +79,7 @@
     onDragStart(index);
   }}
   class="tab-container d-inline-block position-relative pt-1 individual-tab"
-  style="width: {tabWidth}px; height:36px; padding:0 4px; margin-left:{index ===
+  style="width: {tabWidth}px; height:36px; padding-left:2.5px; justify-content:center; margin-left:{index ===
   0
     ? '4px'
     : ''}"
