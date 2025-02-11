@@ -3,7 +3,7 @@
   export let searchQuery = "";
 
   export let handleSearch = () => {};
-  import { keyCommand, SearchIcon } from "@sparrow/common/images";
+  import { SearchIcon } from "@sparrow/common/images";
   import { KeyboardShortcuts } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   export let searchBarRef;

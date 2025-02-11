@@ -4,7 +4,6 @@
     EnvironmentIcon,
     CollectionIcon,
     WorkspaceIcon,
-    keyCommand,
     getIcon,
     hexIcon,
     postIcon,
