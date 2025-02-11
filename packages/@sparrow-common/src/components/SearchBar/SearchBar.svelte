@@ -5,6 +5,7 @@
   import { SearchIcon } from "@sparrow/library/assets";
   import { OSDetector } from "../../utils";
   import { onMount } from "svelte";
+  import { KeyboardShortcuts } from "@sparrow/library/ui";
   let keyName="Ctrl";
 
   const decidingKey = () => {
@@ -34,8 +35,7 @@
     />
   </div>
   <div class="keys">
-    <span class="key">{keyName}</span>
-    <span class="key">F</span>
+    <KeyboardShortcuts keys={[keyName, "F"]} />
   </div>
 </div>
 
