@@ -22,9 +22,11 @@
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
 
   // ---- DB
-  import type { CollectionDocument } from "@app/database/database";
-  import { isGuestUserActive } from "@app/store/auth.store";
   import { SocketIcon } from "@sparrow/library/icons";
+  import type {
+    CollectionBaseInterface,
+    CollectionItemBaseInterface,
+  } from "@sparrow/common/types/workspace/collection-base";
 
   /**
    * Callback for Item Deleted
@@ -47,15 +49,15 @@
   /**
    * Whole Collection Document
    */
-  export let collection: CollectionDocument;
+  export let collection: CollectionBaseInterface;
   /**
    * Selected folder details
    */
-  export let folder: Folder;
+  export let folder: CollectionItemBaseInterface | null;
   /**
    * Selected API details
    */
-  export let api: Request;
+  export let api: CollectionItemBaseInterface;
   /**
    * Current Tab Path
    */
@@ -72,11 +74,6 @@
   let inputField: HTMLInputElement;
   let isRenaming = false;
   let deleteLoader: boolean = false;
-
-  let isGuestUser;
-  isGuestUserActive.subscribe((value) => {
-    isGuestUser = value;
-  });
 
   let requestTabWrapper: HTMLElement;
 
@@ -97,8 +94,9 @@
 
   let newRequestName: string = "";
 
-  const handleRenameInput = (event) => {
-    newRequestName = event.target.value.trim();
+  const handleRenameInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    newRequestName = target.value.trim();
   };
 
   const onRenameBlur = async () => {
@@ -115,7 +113,7 @@
     newRequestName = "";
   };
 
-  const onRenameInputKeyPress = (event) => {
+  const onRenameInputKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
         "renameInputFieldFile",
@@ -155,7 +153,7 @@
       disable={deleteLoader}
       title={"Cancel"}
       textStyleProp={"font-size: var(--base-text)"}
-      type={"dark"}
+      type={"secondary"}
       loader={false}
       onClick={() => {
         isDeletePopup = false;
@@ -296,13 +294,13 @@
     {/if}
   </button>
 
-  {#if api.id?.includes(UntrackedItems.UNTRACKED) && !isGuestUser}
+  {#if api.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
     <Tooltip
       title={"More"}
       show={!showMenu}
-      placement={"bottom"}
+      placement={"bottom-center"}
       zIndex={701}
       distance={17}
     >

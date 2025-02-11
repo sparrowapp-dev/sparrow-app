@@ -45,7 +45,7 @@
   /**
    * Selected folder details
    */
-  export let folder: CollectionItemBaseInterface;
+  export let folder: CollectionItemBaseInterface | null;
   /**
    * Selected graphql details
    */
@@ -144,7 +144,7 @@
       disable={deleteLoader}
       title={"Cancel"}
       textStyleProp={"font-size: var(--base-text)"}
-      type={"dark"}
+      type={"secondary"}
       loader={false}
       onClick={() => {
         isDeletePopup = false;
@@ -277,8 +277,7 @@
       />
     {:else}
       <div
-        class="api-name ellipsis {graphql?.isDeleted &&
-          'api-name-deleted'}"
+        class="api-name ellipsis {graphql?.isDeleted && 'api-name-deleted'}"
         style="font-size: 12px;"
       >
         {graphql.name}
@@ -292,7 +291,7 @@
     <Tooltip
       title={"More"}
       show={!showMenu}
-      placement={"bottom"}
+      placement={"bottom-center"}
       zIndex={701}
       distance={17}
     >

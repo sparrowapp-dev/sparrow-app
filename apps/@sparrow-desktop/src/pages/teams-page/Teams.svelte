@@ -94,6 +94,19 @@
       activeIndex = $openTeam.teamId;
     }
   }
+
+  const formatVersion = (version) => {
+    try {
+      const parts = version.split(".");
+      const major = parts[0];
+      const minor = parts[1];
+      const patch = parts[2];
+
+      return patch === "0" ? `${major}.${minor}` : `${major}.${minor}.${patch}`;
+    } catch (error) {
+      return version;
+    }
+  };
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -181,7 +194,7 @@
                 class="p-2 d-flex align-items-center justify-content-between"
                 style="z-index: 4;"
               >
-                <Tooltip title={"Star Us On GitHub"} placement={"top"}>
+                <Tooltip title={"Star Us On GitHub"} placement={"top-center"}>
                   <div
                     class=" px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
                       ? 'bg-secondary-600'
@@ -216,7 +229,7 @@
 
                 <div class="d-flex align-items-center">
                   <span class="text-fs-14 text-secondary-200 pe-2"
-                    >v{version}</span
+                    >v{formatVersion(version)}</span
                   >
                   <WithButton
                     icon={DoubleArrowIcon}

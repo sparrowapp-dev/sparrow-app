@@ -45,7 +45,7 @@
   /**
    * Selected folder details
    */
-  export let folder: CollectionItemBaseInterface;
+  export let folder: CollectionItemBaseInterface | null;
   /**
    * Selected socketIo details
    */
@@ -144,7 +144,7 @@
       disable={deleteLoader}
       title={"Cancel"}
       textStyleProp={"font-size: var(--base-text)"}
-      type={"dark"}
+      type={"secondary"}
       loader={false}
       onClick={() => {
         isDeletePopup = false;
@@ -291,7 +291,7 @@
     <Tooltip
       title={"More"}
       show={!showMenu}
-      placement={"bottom"}
+      placement={"bottom-center"}
       zIndex={701}
       distance={17}
     >

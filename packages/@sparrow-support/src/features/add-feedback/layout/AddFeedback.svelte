@@ -96,7 +96,7 @@
 </script>
 
 <div class=" w-100">
-  <Tooltip title="Feedback" placement="top" distance={13}>
+  <Tooltip title="Feedback" placement="top-center" distance={13}>
     <button
       on:click={() => {
         const res = onAddFeedback();
@@ -310,7 +310,7 @@
       <div></div>
       <div class="d-flex">
         <Button
-          type={"violet"}
+          type={"secondary"}
           title={"Cancel"}
           buttonClassProp={"me-2"}
           onClick={async () => {

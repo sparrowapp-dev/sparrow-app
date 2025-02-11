@@ -10,7 +10,6 @@
   import { environmentType } from "@sparrow/common/enums";
   import { SparrowIcon } from "@sparrow/library/icons";
   import { ArrowRightIcon } from "@sparrow/library/icons";
-  import constants from "@app/constants/constants";
   import type { WorkspaceDocument } from "@app/database/database";
   import { PlusIcon } from "@sparrow/library/icons";
   import { navigate } from "svelte-navigator";
@@ -18,11 +17,12 @@
   import UserProfileModal, {
     type UserProfileObj,
   } from "./sub-component/UserProfileModal.svelte";
+  // import { GlobalSearch } from "../../components/popup/global-search";
   /**
    * environment list
    */
   export let environments;
-
+  export let onMarketingRedirect = () => {};
   /**
    * selected environment
    */
@@ -54,10 +54,13 @@
 
   export let onSwitchWorkspace;
   export let onSwitchTeam;
+  export let onGlobalSearchToggle;
 
   export let isWebApp = false;
 
   export let isCreateTeamModalOpen;
+  export let searchQuery = "";
+  export let onSearchClick;
 
   /**
    * callback for Select component
@@ -79,7 +82,11 @@
     localStorage.setItem("selectedAgent", tabId);
     multipleAgentvar = tabId;
   };
-
+  const handleSearchClick = () => {
+    if (onSearchClick) {
+      onSearchClick(); // Trigger the function passed from Dashboard
+    }
+  };
   $: {
     if (multipleAgentvar) {
       localStorage.setItem("selectedAgent", multipleAgentvar);
@@ -138,7 +145,7 @@
         return false;
       })
       .reverse()
-      .slice(0, constants.WORKSPACE_LIMIT)
+      .slice(0, 5)
       .map((workspace) => {
         const workspaceObj = {
           id: workspace._id,
@@ -153,7 +160,7 @@
       description: currentTeamName,
     });
     const res = createSetFromArray(workspaces, "id");
-    if (res.length > constants.WORKSPACE_LIMIT) {
+    if (res.length > 5) {
       res.shift();
     }
     workspaceData = res;
@@ -174,6 +181,10 @@
   const handleViewWorkspaces = () => {
     navigate("/app/home");
   };
+
+  const handleViewGlobalSearch = () => {
+    isGlobalSearchOpen = true;
+  };
   export let user;
   export let onLogout;
 
@@ -183,6 +194,7 @@
   import { onMount } from "svelte";
   import { OSDetector } from "../../utils";
   import WindowAction from "./window-action/WindowAction.svelte";
+  import SearchBar from "../SearchBar/SearchBar.svelte";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",
@@ -194,6 +206,7 @@
   };
 
   let showProfileModal = false;
+  let searchValue = "";
 
   let appWindow;
 
@@ -373,6 +386,12 @@
       </div>
     {/if}
 
+    <SearchBar
+      placeholder="Search Sparrow"
+      bind:searchQuery
+      onClick={handleSearchClick}
+    />
+
     <!-- Multiple Agent Dropdown -->
     {#if isWebApp}
       <Select
@@ -431,9 +450,8 @@
               />
             </div>
           </div>
-          <a
-            href={constants.WEB_MARKETING_URL}
-            target="_blank"
+          <span
+            on:click={onMarketingRedirect}
             class="text-decoration-none d-flex align-items-center align-self-start gap-2 mt-1 download-btn"
           >
             <div class="gap-2 d-flex">
@@ -446,11 +464,12 @@
                 />
               </div>
             </div>
-          </a>
+          </span>
         </div>
       </Select>
     {/if}
     <!-- {#if !isWebApp} -->
+
     <Select
       id={"environment-selector"}
       data={[

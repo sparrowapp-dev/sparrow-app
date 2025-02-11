@@ -11,25 +11,17 @@
   } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   import { marked } from "marked";
-  import constants from "@app/constants/constants";
-  import { Loader, Tooltip } from "@sparrow/library/ui";
+  import { Loader, Tag, Tooltip } from "@sparrow/library/ui";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import { notifications } from "@sparrow/library/ui";
-  import { open } from "@tauri-apps/plugin-shell";
   import { UpdatesTagType } from "../../../types/feedback";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import { Search } from "@sparrow/library/forms";
   export let listChangeLog;
 
-  /**
-   * External URL for Sparrow's GitHub page.
-   */
-  const externalSparrowRealseNote = constants.SPARROW_GITHUB;
-
-  /**
-   * External URL for Sparrow's LinkedIn page.
-   */
-  const externalSparrowLinkedin = constants.SPARROW_LINKEDIN;
+  export let onReleaseNoteRedirect;
+  export let onLinkedInRedirect;
 
   /**
    * Type of events to filter.
@@ -86,7 +78,7 @@
    * @param {Event} e - The input event triggered when typing in the search field.
    */
   const handleInput = (e) => {
-    searchQuery = e.target.value;
+    searchQuery = e.detail;
     filterEvents();
   };
 
@@ -107,6 +99,12 @@
     if (tag === UpdatesTagType.NEW) return "tag-new";
     if (tag === UpdatesTagType.FIXED) return "tag-fixed";
     if (tag === UpdatesTagType.IMPROVED) return "tag-improved";
+    return "";
+  };
+   const getTagType = (tag) => {
+    if (tag === UpdatesTagType.NEW) return "cyan";
+    if (tag === UpdatesTagType.FIXED) return "pink";
+    if (tag === UpdatesTagType.IMPROVED) return "green";
     return "";
   };
 
@@ -197,36 +195,15 @@
     {#if showTimeline}
       <div class="d-flex justify-content-between page-funationality">
         <div class="" style="cursor:pointer">
-          <div class={`d-flex search-input-container rounded py-1 px-2 mb-4`}>
-            <SearchIcon
-              width={14}
-              height={14}
-              color={"var(--icon-secondary-200)"}
-              classProp={`my-auto me-3`}
-            />
-            <input
-              type="text"
+          <div class={`d-flex  rounded py-1 px-2 mb-4`}>
+            <Search
+              variant="primary"
+              customWidth={"300px"}
               id="search-input"
-              class={`bg-transparent w-100 border-0 ms-1 my-auto`}
               placeholder="Search updates"
               on:input={handleInput}
               bind:value={searchQuery}
             />
-
-            {#if searchQuery.length != 0}
-              <div
-                class="clear-icon"
-                on:click={() => {
-                  clearSearch();
-                }}
-              >
-                <CrossIcon
-                  height="16px"
-                  width="12px"
-                  color="var(--icon-secondary-300)"
-                />
-              </div>
-            {/if}
           </div>
         </div>
 
@@ -302,7 +279,7 @@
                       </h3>
                       <Tooltip
                         title={"Copy link"}
-                        placement={"right"}
+                        placement={"right-center"}
                         distance={10}
                         show={true}
                         zIndex={701}
@@ -326,9 +303,11 @@
                     </div>
                     <div class="tags" style="margin-top: 5px;">
                       {#each event.types as tag}
-                        <span class="text-fs-10 tag {getTagClass(tag)}">
-                          {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
-                        >
+                      <span class="mt-[6px]">  <Tag
+                          type={getTagType(tag)}
+                          text={tag || ""}/>
+                      </span>
+
                       {/each}
                     </div>
                     {#if event.plaintextDetails.split(" ").length > 20}
@@ -361,11 +340,7 @@
                         style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
                         class="mb-0"
                         on:click={async () => {
-                          const version =
-                            event.title.match(/v\d+\.\d+\.\d+/)[0];
-                          const releaseNoteUrl = `${externalSparrowRealseNote}/sparrow-app/releases/tag/${version}`;
-                          await open(releaseNoteUrl);
-                          MixpanelEvent(Events.Github_Updates);
+                          onReleaseNoteRedirect(event?.title);
                         }}
                       >
                         Github
@@ -379,10 +354,7 @@
                         <div
                           style="cursor:pointer;"
                           class="ps-2"
-                          on:click={async () => {
-                            await open(externalSparrowLinkedin);
-                            MixpanelEvent(Events.LinkedIn_Updates_Icon);
-                          }}
+                          on:click={onLinkedInRedirect}
                         >
                           <LinkedinIcon
                             height={"18px"}
@@ -441,7 +413,7 @@
                 </p>
                 <Tooltip
                   title={"Copy link"}
-                  placement={"right"}
+                  placement={"right-center"}
                   distance={10}
                   show={true}
                   zIndex={701}
@@ -465,9 +437,10 @@
               </div>
               <div class="tags">
                 {#each selectedEvent.types as tag}
-                  <span class="tag {getTagClass(tag)}">
-                    {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
-                  >
+                  <span class="mt-[6px]">  <Tag
+                          type={getTagType(tag)}
+                          text={tag || ""}/>
+                    </span>
                 {/each}
               </div>
 
@@ -481,12 +454,8 @@
                 <p
                   style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
                   class="mb-0"
-                  on:click={async () => {
-                    const version =
-                      selectedEvent.title.match(/v\d+\.\d+\.\d+/)[0];
-                    const releaseNoteUrl = `${externalSparrowRealseNote}/sparrow-app/releases/tag/${version}`;
-                    await open(releaseNoteUrl);
-                    MixpanelEvent(Events.Github_Updates);
+                  on:click={() => {
+                    onReleaseNoteRedirect(selectedEvent?.title);
                   }}
                 >
                   Github
@@ -499,10 +468,7 @@
                   <div
                     style="cursor:pointer;"
                     class="ps-2"
-                    on:click={async () => {
-                      await open(externalSparrowLinkedin);
-                      MixpanelEvent(Events.LinkedIn_Updates_Icon);
-                    }}
+                    on:click={onLinkedInRedirect}
                   >
                     <LinkedinIcon
                       height={"18px"}

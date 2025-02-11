@@ -2,6 +2,7 @@
   import type { WorkspaceDocument } from "@app/database/database";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import {
     VectorIcon,
     SocketIcon,
@@ -62,7 +63,7 @@
     {/if}
     <Card
       icon={VectorIcon}
-      label="REST API"
+      label={`${HttpRequestDefaultNameBaseEnum.NAME}`}
       iconColor="var(--text-primary-300)"
       iconSize={"18px"}
       onClick={() => {

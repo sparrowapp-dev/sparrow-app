@@ -3,6 +3,7 @@
   /**
    * The tab of the folder
    */
+  import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   export let tab: TabDocument;
   /**
    * The folder data from repository
@@ -37,15 +38,21 @@
   /**
    * Callback to get total number of requests in folder
    */
+
   export let getTotalRequests: (
     collection: CollectionDocument,
     tab: TabDocument,
-  ) => Promise<number>;
-
+  ) => Promise<{
+    totalRequests: number;
+    totalGraphQl: number;
+    totalSocketIo: number;
+    totalWebSocket: number;
+  }>;
   /**
    * Role of user in active workspace
    */
   export let userRole;
+  export let isWebApp = false;
 
   /**
    * Components
@@ -68,12 +75,21 @@
    * Local variables
    */
   let totalRequests: number = 0;
+  let totalGraphQl: number = 0;
+  let totalSocketIo: number = 0;
+  let totalWebSocket: number = 0;
 
   /**
    * Funciton to update total requests
    */
   const updateTotalRequests = async () => {
-    totalRequests = await getTotalRequests(collection, tab);
+    let res = await getTotalRequests(collection, tab);
+    if (res) {
+      totalRequests = res.totalRequests;
+      totalGraphQl = res.totalGraphQl;
+      totalSocketIo = res.totalSocketIo;
+      totalWebSocket = res.totalWebSocket;
+    }
   };
 
   /**
@@ -102,52 +118,66 @@
 
 <div class="main-container d-flex h-100" style="overflow:auto;">
   <div class="my-collection d-flex flex-column w-100 z-3">
-   
-      <div class="d-flex gap-2 mb-4">
-        <div class="d-flex flex-column flex-grow-1">
-          <input
-            type="text"
-            required
-            id="renameInputFieldFolder"
-            value={folder?.name || ""}
-            disabled={tab?.source === "SPEC" ||
-              userRole === WorkspaceRole.WORKSPACE_VIEWER}
-            class="bg-transparent input-outline border-0 text-left w-100 ps-2 py-0 text-fs-18"
-            maxlength={100}
-            on:blur={(event) => {
-              const newValue = event.target.value.trim();
-              const previousValue = folder.name;
-              if (newValue === "") {
-                resetInputField();
-              } else if (newValue !== previousValue) {
-                onRename(collection, folder, newValue);
-              }
-            }}
-            on:keydown={(event) => {
-              if (event.key === "Enter") {
-                onRenameInputKeyPress();
-              }
-            }}
-          />
-        </div>
-        <div class="d-flex flex-row">
-          <button
-            disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-              tab?.source === "SPEC"}
-            class="btn add-button rounded mx-1 border-0 text-align-right py-1"
-            style="max-height:60px; width:200px; margin-top: -2px;"
-            on:click={() => {
-              onCreateAPIRequest(collection, folder);
-            }}>New Request</button
-          >
-        </div>
+    <div class="d-flex gap-2 mb-4">
+      <div class="d-flex flex-column flex-grow-1">
+        <input
+          type="text"
+          required
+          id="renameInputFieldFolder"
+          value={folder?.name || ""}
+          disabled={tab?.source === "SPEC" ||
+            userRole === WorkspaceRole.WORKSPACE_VIEWER}
+          class="bg-transparent input-outline border-0 text-left w-100 ps-2 py-0 text-fs-18"
+          maxlength={100}
+          on:blur={(event) => {
+            const newValue = event.target.value.trim();
+            const previousValue = folder.name;
+            if (newValue === "") {
+              resetInputField();
+            } else if (newValue !== previousValue) {
+              onRename(collection, folder, newValue);
+            }
+          }}
+          on:keydown={(event) => {
+            if (event.key === "Enter") {
+              onRenameInputKeyPress();
+            }
+          }}
+        />
       </div>
-  
+      <div class="d-flex flex-row">
+        <button
+          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+            tab?.source === "SPEC"}
+          class="btn add-button rounded mx-1 border-0 text-align-right py-1"
+          style="max-height:60px; width:200px; margin-top: -2px;"
+          on:click={() => {
+            onCreateAPIRequest(collection, folder);
+          }}>New Request</button
+        >
+      </div>
+    </div>
 
     <div class="d-flex gap-4 mb-4 ps-2">
       <div class="d-flex align-items-center gap-2">
         <span class="fs-4 text-primary-300">{totalRequests}</span>
-        <p style="font-size: 12px;" class="mb-0">API Requests</p>
+        <p style="font-size: 12px;" class="mb-0">
+          {HttpRequestDefaultNameBaseEnum.NAME}
+        </p>
+      </div>
+      {#if !isWebApp}
+        <div class="d-flex align-items-center gap-2">
+          <span class="fs-4 text-primary-300">{totalGraphQl}</span>
+          <p style="font-size: 12px;" class="mb-0">GraphQL</p>
+        </div>
+      {/if}
+      <div class="d-flex align-items-center gap-2">
+        <span class="fs-4 text-primary-300">{totalWebSocket}</span>
+        <p style="font-size: 12px;" class="mb-0">WebSocket</p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="fs-4 text-primary-300">{totalSocketIo}</span>
+        <p style="font-size: 12px;" class="mb-0">Socket.IO</p>
       </div>
     </div>
     <div class="d-flex align-items-start ps-0 h-100">

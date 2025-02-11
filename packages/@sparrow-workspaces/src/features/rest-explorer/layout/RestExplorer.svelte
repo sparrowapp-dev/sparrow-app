@@ -112,6 +112,7 @@
   export let storeData: restExplorerData | undefined;
   export let isTourGuideOpen = false;
   export let isWebApp = false;
+  export let azureBlobCDN;
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -166,7 +167,7 @@
         <div class="d-flex justify-content-between">
           <Button
             title="Save Request"
-            type="dark"
+            type={"secondary"}
             loader={false}
             buttonClassProp="ms-2"
             buttonStartIcon={floppyDisk}
@@ -187,7 +188,7 @@
           <span class="position-relative" style="width:35px;"> </span>
           <Button
             title="Share"
-            type="dark"
+            type={"secondary"}
             buttonClassProp="ms-2"
             onClick={() => {}}
           />
@@ -493,21 +494,21 @@
           id: 1,
           heading: "Creating a Collection: Import existing or Start a new one",
           subheading: `Organize your APIs efficiently within "Collections" for streamlined API management and testing. Click the + Add Collection button in the side panel to create a collection. Choose 'Import Collection' to bring in existing API collections or create an empty Collection. `,
-          gif: `${CreateCollection}`,
+          gif: `${azureBlobCDN}${CreateCollection}`,
         },
         {
           id: 2,
           heading: "Sending an API Request",
           subheading:
             "In the request builder, input your API endpoint URL in the URL field. Click the 'Send' button to dispatch the request. Instantly see the server's response, which includes status codes, response time, and data.",
-          gif: `${SendingApiRequest}`,
+          gif: `${azureBlobCDN}${SendingApiRequest}`,
         },
         {
           id: 3,
           heading: "Advanced API Request with Detailed Inputs",
           subheading:
             "Enter the endpoint URL in the URL field. Utilize 'Parameters' tab for parameters, 'Body' tab to input data payloads, 'Headers' tab for custom headers, and 'Auth' tab to manage access credentials. After filling in the required fields, click 'Send' to execute the request and view the detailed server response.",
-          gif: `${AdvanceAPI}`,
+          gif: `${azureBlobCDN}${AdvanceAPI}`,
         },
       ]}
     />
@@ -538,9 +539,9 @@
     border-right: 0 !important;
   }
   :global(
-      .rest-splitter .splitpanes__splitter:active,
-      .rest-splitter .splitpanes__splitter:hover
-    ) {
+    .rest-splitter .splitpanes__splitter:active,
+    .rest-splitter .splitpanes__splitter:hover
+  ) {
     background-color: var(--bg-primary-200) !important;
   }
   .link {

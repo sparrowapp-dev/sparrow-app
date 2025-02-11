@@ -52,7 +52,10 @@
       (event.metaKey || event.ctrlKey) &&
       event.code === "KeyS"
     ) {
+      event.preventDefault();
       handleSaveRequest();
+    } else if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
+      event.preventDefault();
     } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
       onSendButtonClicked(environmentVariables);
     }
@@ -115,7 +118,7 @@
     />
   {/if}
 
-  <Tooltip title={"Save"} placement={"bottom"} distance={12} zIndex={10}>
+  <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
     <button
       class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
       on:click={() => {

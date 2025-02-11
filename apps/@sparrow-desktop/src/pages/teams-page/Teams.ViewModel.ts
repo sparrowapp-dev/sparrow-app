@@ -184,7 +184,7 @@ export class TeamsViewModel {
     initWorkspaceTab.updateName(res.name);
     await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
     await this.workspaceRepository.setActiveWorkspace(id);
-    navigate("/dashboard/collections");
+    navigate("collections");
   };
 
   /**
@@ -203,7 +203,7 @@ export class TeamsViewModel {
     await this.tabRepository.activeTab(api.id, api.path.workspaceId);
     await this.workspaceRepository.setActiveWorkspace(api.path.workspaceId);
     moveNavigation("right");
-    navigate("/dashboard/collections");
+    navigate("collections");
   };
 
   /**
@@ -354,4 +354,7 @@ export class TeamsViewModel {
       return;
     }
   };
+// 
+
+
 }

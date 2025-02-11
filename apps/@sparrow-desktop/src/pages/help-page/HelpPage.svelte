@@ -22,6 +22,8 @@
   import { ActivitySection } from "@sparrow/support/features";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import constants from "../../constants/constants";
+  import { open } from "@tauri-apps/plugin-shell";
 
   /**
    * @description - Prevents the default context menu from appearing on right-click.
@@ -83,23 +85,24 @@
    * @param {string} status - The status value to determine the colors for.
    * @returns {{ fontColor: string, backgroundColor: string }} An object containing the font and background colors.
    */
+     
   const getColor = (status) => {
     if (status === "new" || status === "open") {
-      return { fontColor: "#1193F0", backgroundColor: "#050938" };
+      return  "cyan";
     }
     if (status === "fixed" || status === "in progress") {
-      return { fontColor: "#DF77F9", backgroundColor: "#DF77F9" };
+      return  "purple"; 
     }
     if (status === "improved" || status === "complete") {
-      return { fontColor: "#69D696", backgroundColor: "#031B0D" };
+      return "green";
     }
     if (status === "planned") {
-      return { fontColor: "#FFE47E", backgroundColor: "#171302" };
+      return "yellow" ;
     }
     if (status === "under review") {
-      return { fontColor: "#FBA574", backgroundColor: "#1C1405" };
+      return "orange";
     }
-    return { fontColor: "white", backgroundColor: "black" };
+    return "grey";
   };
 
   /**
@@ -253,7 +256,19 @@
                 bind:isPostopenFromActivity
               />
             {:else if activeTab === "updates"}
-              <ReleaseNotes listChangeLog={_viewModel.listChangeLog} />
+              <ReleaseNotes
+                listChangeLog={_viewModel.listChangeLog}
+                onLinkedInRedirect={async () => {
+                  await open(constants.SPARROW_LINKEDIN);
+                  MixpanelEvent(Events.LinkedIn_Updates_Icon);
+                }}
+                onReleaseNoteRedirect={async (title) => {
+                  const version = title.match(/v\d+\.\d+\.\d+/)[0];
+                  const releaseNoteUrl = `${constants.SPARROW_GITHUB}/sparrow-app/releases/tag/${version}`;
+                  await open(releaseNoteUrl);
+                  MixpanelEvent(Events.Github_Updates);
+                }}
+              />
             {:else if activeTab === "roadmap"}
               <Roadmap
                 {setPostId}

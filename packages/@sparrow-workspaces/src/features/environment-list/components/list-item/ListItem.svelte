@@ -177,7 +177,7 @@
       disable={deleteEnvironmentLoader}
       title={"Cancel"}
       textStyleProp={"font-size: var(--base-text)"}
-      type={"dark"}
+      type={"secondary"}
       loader={false}
       onClick={() => {
         handleEnvironmentPopUpCancel(false);
@@ -279,7 +279,12 @@
     {#if env.id.includes(UntrackedItems.UNTRACKED)}
       <Spinner size={"15px"} />
     {:else if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
-      <Tooltip placement="bottom" title="More" distance={17} show={!showMenu}>
+      <Tooltip
+        placement="bottom-center"
+        title="More"
+        distance={17}
+        show={!showMenu}
+      >
         <button
           id={`show-more-environment-${env?.id}`}
           class="threedot-icon-container p-0 border-0 rounded d-flex justify-content-center align-items-center {showMenu

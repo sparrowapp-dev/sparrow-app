@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/support",
-  "version": "2.16.0",
+  "version": "2.17.1",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -61,7 +61,7 @@
   "lint-staged": {
     "*.{js,ts,svelte,css,json}": [
       "prettier --write",
-      "eslint --fix --ignore-pattern '!**/.lintstagedrc.json'"
+      "eslint --fix"
     ]
   }
 }
