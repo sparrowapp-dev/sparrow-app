@@ -4,6 +4,7 @@
 
   export let handleSearch = () => {};
   import { keyCommand, SearchIcon } from "@sparrow/common/images";
+  import { KeyboardShortcuts } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   export let searchBarRef;
   let hideKEY = false;
@@ -34,12 +35,7 @@
     </div>
   </div>
   {#if !hideKEY}
-    <div class="keyboard-shortcut">
-      <div class="shortcut-key">
-        <img src={keyCommand} alt="" class="shortcut-icon" />
-      </div>
-      <span class="key">F</span>
-    </div>
+    <KeyboardShortcuts keys={["cmd", "F"]} />
   {/if}
 </div>
 

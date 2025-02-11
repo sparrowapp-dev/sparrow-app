@@ -1,1 +1,1 @@
-export { default as Keyboard } from "./keyboardShortcut.svelte";
+export { default as KeyboardShortcuts } from "./keyboardShortcuts.svelte";

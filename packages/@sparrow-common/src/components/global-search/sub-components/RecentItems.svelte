@@ -16,6 +16,7 @@
     FlowIcon,
   } from "@sparrow/common/images";
   import NoResults from "./NoResults.svelte";
+  import { KeyboardShortcuts } from "@sparrow/library/ui";
 
   export let searchQuery = "";
   export let filteredCollection = [];
@@ -84,13 +85,7 @@
       {#if searchQuery == "" && filteredRequest?.length > 0}
         <div class="section-header">
           <span class="section-title">Recent Requests</span>
-          <div class="keyboard-shortcut">
-            <div class="shortcut-key">
-              <img src={keyCommand} alt="" class="shortcut-icon" />
-            </div>
-            <span class="key">Shift</span>
-            <span class="key">A</span>
-          </div>
+            <KeyboardShortcuts keys={["cmd","Shift", "A"]} />
         </div>
         <div class="request-section">
           {#each filteredRequest.slice(0, 3) as request}
@@ -135,13 +130,7 @@
       <div style="display:flex;flex-direction:column; gap:4px;">
         <div class="section-top">
           <span class="section-title">Recent Collection</span>
-          <div class="keyboard-shortcut">
-            <div class="shortcut-key">
-              <img src={keyCommand} alt="" class="shortcut-icon" />
-            </div>
-            <span class="key">Shift</span>
-            <span class="key">C</span>
-          </div>
+           <KeyboardShortcuts keys={["cmd","Shift", "C"]} />
         </div>
         <div
           class="request-item"
@@ -170,13 +159,7 @@
       <div style="display:flex;flex-direction:column; gap:4px;">
         <div class="section-top">
           <span class="section-title">Recent Environment</span>
-          <div class="keyboard-shortcut">
-            <div class="shortcut-key">
-              <img src={keyCommand} alt="" class="shortcut-icon" />
-            </div>
-            <span class="key">Shift</span>
-            <span class="key">E</span>
-          </div>
+           <KeyboardShortcuts keys={["cmd","Shift", "E"]} />
         </div>
 
         <div
@@ -200,13 +183,7 @@
       <div style="display:flex;flex-direction:column; gap:4px;">
         <div class="section-top">
           <span class="section-title">Recent Folder</span>
-          <div class="keyboard-shortcut">
-            <div class="shortcut-key">
-              <img src={keyCommand} alt="" class="shortcut-icon" />
-            </div>
-            <span class="key">Shift</span>
-            <span class="key">F</span>
-          </div>
+           <KeyboardShortcuts keys={["cmd","Shift", "F"]} />
         </div>
 
         <div
@@ -235,13 +212,7 @@
       <div style="display:flex;flex-direction:column; gap:4px;">
         <div class="section-top">
           <span class="section-title">Recent Workspace</span>
-          <div class="keyboard-shortcut">
-            <div class="shortcut-key">
-              <img src={keyCommand} alt="" class="shortcut-icon" />
-            </div>
-            <span class="key">Shift</span>
-            <span class="key">W</span>
-          </div>
+            <KeyboardShortcuts keys={["cmd","Shift", "W"]} />
         </div>
         <div
           class="request-item"
@@ -265,13 +236,7 @@
     {#if searchQuery == "" && filteredTestflows?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Test Flows</span>
-        <div class="keyboard-shortcut">
-          <div class="shortcut-key">
-            <img src={keyCommand} alt="" class="shortcut-icon" />
-          </div>
-          <span class="key">Shift</span>
-          <span class="key">T</span>
-        </div>
+         <KeyboardShortcuts keys={["cmd","Shift", "T"]} />
       </div>
       <div
         class="request-item"
@@ -296,13 +261,7 @@
       {#if filteredRequest?.length > 0}
         <div class="section-header">
           <span class="section-title">Requests</span>
-          <div class="keyboard-shortcut">
-            <div class="shortcut-key">
-              <img src={keyCommand} alt="" class="shortcut-icon" />
-            </div>
-            <span class="key">Shift</span>
-            <span class="key">A</span>
-          </div>
+           <KeyboardShortcuts keys={["cmd","Shift", "A"]} />
         </div>
         <div class="request-section">
           {#each filteredRequest as request}
@@ -342,13 +301,7 @@
       {#if filteredCollection?.length > 0}
         <div class="section-header">
           <span class="section-title">Collection</span>
-          <div class="keyboard-shortcut">
-            <div class="shortcut-key">
-              <img src={keyCommand} alt="" class="shortcut-icon" />
-            </div>
-            <span class="key">Shift</span>
-            <span class="key">C</span>
-          </div>
+           <KeyboardShortcuts keys={["cmd","Shift", "C"]} />
         </div>
         {#each filteredCollection as collection}
           <div
@@ -374,13 +327,7 @@
       {#if filteredFolder?.length > 0}
         <div class="section-header">
           <span class="section-title">Folders</span>
-          <div class="keyboard-shortcut">
-            <div class="shortcut-key">
-              <img src={keyCommand} alt="" class="shortcut-icon" />
-            </div>
-            <span class="key">Shift</span>
-            <span class="key">F</span>
-          </div>
+            <KeyboardShortcuts keys={["cmd","Shift", "F"]} />
         </div>
         {#each filteredFolder as folder}
           <div
@@ -407,13 +354,7 @@
       {#if filteredEnvironments?.length > 0}
         <div class="section-header">
           <span class="section-title">Environment</span>
-          <div class="keyboard-shortcut">
-            <div class="shortcut-key">
-              <img src={keyCommand} alt="" class="shortcut-icon" />
-            </div>
-            <span class="key">Shift</span>
-            <span class="key">E</span>
-          </div>
+            <KeyboardShortcuts keys={["cmd","Shift", "E"]} />
         </div>
         {#each filteredEnvironments as environment}
           <div
@@ -435,13 +376,7 @@
       {#if filteredTestflows?.length > 0}
         <div class="section-header">
           <span class="section-title">Test Flows</span>
-          <div class="keyboard-shortcut">
-            <div class="shortcut-key">
-              <img src={keyCommand} alt="" class="shortcut-icon" />
-            </div>
-            <span class="key">Shift</span>
-            <span class="key">T</span>
-          </div>
+            <KeyboardShortcuts keys={["cmd","Shift", "T"]} />
         </div>
         {#each filteredTestflows as testflow}
           <div
@@ -463,13 +398,7 @@
       {#if filteredWorkspaces?.length > 0 && !isGuestUser}
         <div class="section-header">
           <span class="section-title">Workspaces</span>
-          <div class="keyboard-shortcut">
-            <div class="shortcut-key">
-              <img src={keyCommand} alt="" class="shortcut-icon" />
-            </div>
-            <span class="key">Shift</span>
-            <span class="key">W</span>
-          </div>
+            <KeyboardShortcuts keys={["cmd","Shift", "W"]} />
         </div>
         {#each filteredWorkspaces as workspace}
           <div
@@ -495,13 +424,7 @@
     {#if filteredWorkspaces?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Workspaces</span>
-        <div class="keyboard-shortcut">
-          <div class="shortcut-key">
-            <img src={keyCommand} alt="" class="shortcut-icon" />
-          </div>
-          <span class="key">Shift</span>
-          <span class="key">W</span>
-        </div>
+          <KeyboardShortcuts keys={["cmd","Shift", "W"]} />
       </div>
       {#each filteredWorkspaces as workspace}
         <div
@@ -534,13 +457,7 @@
     {#if filteredFolder?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Folders</span>
-        <div class="keyboard-shortcut">
-          <div class="shortcut-key">
-            <img src={keyCommand} alt="" class="shortcut-icon" />
-          </div>
-          <span class="key">Shift</span>
-          <span class="key">F</span>
-        </div>
+           <KeyboardShortcuts keys={["cmd","Shift", "F"]} />
       </div>
       {#each filteredFolder as folder}
         <div
@@ -576,13 +493,7 @@
     {#if filteredCollection?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Collections</span>
-        <div class="keyboard-shortcut">
-          <div class="shortcut-key">
-            <img src={keyCommand} alt="" class="shortcut-icon" />
-          </div>
-          <span class="key">Shift</span>
-          <span class="key">C</span>
-        </div>
+          <KeyboardShortcuts keys={["cmd","Shift", "C"]} />
       </div>
       {#each filteredCollection as collection}
         <div
@@ -615,13 +526,7 @@
     {#if filteredRequest?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Requests</span>
-        <div class="keyboard-shortcut">
-          <div class="shortcut-key">
-            <CollectionIcon color="var(--icon-ds-neutral-200)" />
-          </div>
-          <span class="key">Shift</span>
-          <span class="key">A</span>
-        </div>
+          <KeyboardShortcuts keys={["cmd","Shift", "A"]} />
       </div>
       <div class="request-section">
         {#each filteredRequest as request}
@@ -669,13 +574,7 @@
     {#if filteredEnvironments?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Environments</span>
-        <div class="keyboard-shortcut">
-          <div class="shortcut-key">
-            <img src={keyCommand} alt="" class="shortcut-icon" />
-          </div>
-          <span class="key">Shift</span>
-          <span class="key">E</span>
-        </div>
+          <KeyboardShortcuts keys={["cmd","Shift", "E"]} />
       </div>
       {#each filteredEnvironments as environment}
         <div
@@ -703,13 +602,7 @@
     {#if filteredTestflows?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Test Flows</span>
-        <div class="keyboard-shortcut">
-          <div class="shortcut-key">
-            <img src={keyCommand} alt="" class="shortcut-icon" />
-          </div>
-          <span class="key">Shift</span>
-          <span class="key">T</span>
-        </div>
+          <KeyboardShortcuts keys={["cmd","Shift", "T"]} />
       </div>
       {#each filteredTestflows as testflow}
         <div
@@ -762,39 +655,6 @@
     font:
       400 12px Inter,
       sans-serif;
-  }
-
-  .keyboard-shortcut {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-  }
-
-  .shortcut-key {
-    border-radius: 4px;
-    background-color: var(--bg-ds-surface-600);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    padding: 4px;
-  }
-
-  .key {
-    border-radius: 4px;
-    background-color: var(--bg-ds-surface-600);
-    color: var(--text-ds-neutral-200);
-    padding: 2px 4px;
-    font:
-      400 12px Inter,
-      sans-serif;
-    line-height: 18px;
-    min-height: 24px;
-    min-width: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .request-item {

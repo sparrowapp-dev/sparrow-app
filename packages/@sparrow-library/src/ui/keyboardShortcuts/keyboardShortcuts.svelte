@@ -1,12 +1,18 @@
-<script>
-  export let numberOfKeys = 0;
-  export let keys = [];
+<script lang="ts">
+  export let keys: Array<string> = [];
+  import { CommandKey } from "../../icons";
 </script>
 
 <div class="keys">
-  {#if keys.size > 0}
+  {#if keys.length > 0}
     {#each keys as key}
-      <span class="key">{key}</span>
+      {#if key.toLowerCase() === "cmd"}
+        <span class="key">
+           <CommandKey />
+        </span>
+      {:else}
+        <span class="key">{key}</span>
+      {/if}
     {/each}
   {/if}
 </div>
@@ -21,8 +27,9 @@
     border-radius: 4px;
     background-color: var(--bg-ds-surface-500);
     color: var(--text-ds-neutral-100);
-    padding: 2px;
-    font: 400 12px;
+    padding: 2px 4px;
+    font-size: 12px;
+    font-weight: 400;
     line-height: 18px;
     display: flex;
     align-items: center;
