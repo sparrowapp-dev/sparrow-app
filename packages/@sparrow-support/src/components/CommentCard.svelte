@@ -1,6 +1,6 @@
 <script lang="ts">
   import { AttachmentIcon, CrossIcon } from "@sparrow/library/icons";
-  import { Button, IconFallback } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
   import { CommentCard } from "@sparrow/support/components";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -200,13 +200,6 @@
 </script>
 
 <div class="comment">
-  <!-- <IconFallback
-    character={comment?.author?.name.charAt(0) || ""}
-    width="34px"
-    height="32px"
-    backgroundColor=""
-    borderColor="#45494D"
-  /> -->
    <Avatar
       type={"letter"}
       size={"large"}

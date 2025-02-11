@@ -380,13 +380,6 @@
             style="display: flex; flex-direction: column; gap: 1px; min-height:80px; width:calc(100% - 37px);"
           >
             <div style="display: flex; align-items: center; gap: 12px;">
-              <!-- <IconFallback
-                character={post?.author?.name?.charAt(0)}
-                width="34px"
-                height="32px"
-                backgroundColor="var(--bg-tertiary-750)"
-                borderColor="var(--border-secondary-300)"
-              /> -->
                <Avatar
                 type={"letter"}
                 size={"large"}

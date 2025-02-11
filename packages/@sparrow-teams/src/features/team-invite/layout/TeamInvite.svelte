@@ -9,7 +9,7 @@
   } from "@sparrow/common/utils";
 
   import { TeamRole, WorkspaceRole } from "@sparrow/common/enums/team.enum";
-  import { Avatar, Button, IconFallback } from "@sparrow/library/ui";
+  import { Avatar, Button } from "@sparrow/library/ui";
 
   export let onInviteClick;
   export let workspaces;
@@ -375,8 +375,6 @@
             size={"large"}
             letter={teamName.charAt(0)}
              bgColor={"var(--bg-tertiary-800)"}/>
-           
-            <!-- <IconFallback character={teamName[0]} /> -->
         </span>
       {/if}
     </div>

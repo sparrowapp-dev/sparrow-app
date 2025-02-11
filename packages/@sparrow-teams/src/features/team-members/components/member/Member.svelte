@@ -10,7 +10,7 @@
   import { Button } from "@sparrow/library/ui";
   import { Profile } from "..";
   import { Select } from "@sparrow/library/forms";
-  import { IconFallback, Avatar } from "@sparrow/library/ui";
+  import { Avatar } from "@sparrow/library/ui";
   export let user: userDetails;
   export let userType: TeamRole;
   export let openTeam;
@@ -340,7 +340,6 @@
           size={"large"}
           image={base64ToURL(openTeam?.logo)}/>
         {:else}
-          <!-- <IconFallback character={openTeam?.name[0]} /> -->
            <Avatar
             type={"letter"}
             size={"large"}
@@ -426,7 +425,6 @@
             size={"large"}
             image={base64ToURL(openTeam?.logo)}/>
         {:else}
-          <!-- <IconFallback character={openTeam?.name[0]} /> -->
            <Avatar
             type={"letter"}
             size={"large"}
@@ -535,15 +533,8 @@
     <div class="d-flex align-items-center ellipsis gap-2">
       <div style="width: 36px;">
         {#if openTeam?.logo?.size}
-          <!-- <img
-            class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
-            style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-            src={base64ToURL(openTeam?.logo)}
-            alt=""
-          /> -->
           <Avatar type={"image"} size={"large"} image={base64ToURL(openTeam?.logo)} bgColor={"var(--bg-secondary-600)"}/>
         {:else}
-          <!-- <IconFallback character={openTeam?.name[0]} /> -->
            <Avatar
             type={"letter"}
             size={"large"}

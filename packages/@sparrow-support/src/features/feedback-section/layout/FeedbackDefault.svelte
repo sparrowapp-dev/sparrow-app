@@ -22,7 +22,6 @@
 >
   <div class="d-flex flex-row align-items-center" style="gap:20px;">
     <div class="" style="">
-      <!-- <IconFallback character={userInfo?.name?.charAt(0)} /> -->
         <Avatar
           type={"letter"}
           size={"large"}

@@ -8,7 +8,7 @@
   import { PeopleIcon } from "@sparrow/library/assets";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { TeamRole } from "@sparrow/common/enums";
-  import { Button } from "@sparrow/library/ui";
+  import { Avatar, Button } from "@sparrow/library/ui";
   import { Navigator } from "@sparrow/library/ui";
  
   import {
@@ -224,14 +224,16 @@
                 src={base64ToURL(openTeam?.logo)}
                 alt=""
               />{:else}
-              <div
+              <!-- <div
                 class={`text-defaultColor w-25 text-center my-auto align-items-center justify-content-center profile-circle bg-tertiary-750 border-secondary-300 border-2`}
                 style={`font-size: 24px; width: 40px !important; height: 40px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
               >
                 <span class="text-fs-24">
                   {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
                 </span>
-              </div>
+              </div> -->
+               
+           <Avatar type="letter" size="large" letter={openTeam?.name[0] ? openTeam?.name[0] : ""} bgColor="var(--bg-secondary-600)" />
             {/if}
             <span
               class="ms-3 my-auto ellipsis overflow-hidden heading"
