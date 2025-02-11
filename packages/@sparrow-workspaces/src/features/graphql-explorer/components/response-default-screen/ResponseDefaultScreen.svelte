@@ -9,8 +9,8 @@
   let altCommands: { [key: string]: string } = {};
   onMount(async () => {
     const platformName = await platform();
-    let controlKey = platformName === "macos" ? "cmd" : "ctrl";
-    let altKey = platformName === "macos" ? "option" : "alt";
+    let controlKey = platformName === "macos" ? "cmd" : "Ctrl";
+    let altKey = platformName === "macos" ? "option" : "Alt";
     ctrlCommands = {
       "Send Request": [controlKey, "Enter"],
       "New Request": [controlKey, "N"],

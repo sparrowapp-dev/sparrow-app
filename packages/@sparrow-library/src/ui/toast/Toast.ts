@@ -23,7 +23,7 @@ const success = (message: string, obj?: notifySetting) => {
   toasts.add({
     type: "success",
     description: message,
-    duration: obj?.duration ?? 4000,
+    duration: obj?.duration ?? 5000,
     theme: obj?.theme ?? "dark",
     placement: obj?.position ?? "bottom-right",
   });
@@ -33,7 +33,7 @@ const error = (message: string, obj?: notifySetting) => {
   toasts.add({
     type: "error",
     description: message,
-    duration: obj?.duration ?? 4000,
+    duration: obj?.duration ?? 5000,
     theme: obj?.theme ?? "dark",
     placement: obj?.position ?? "bottom-right",
   });
@@ -43,7 +43,7 @@ const info = (message: string, obj?: notifySetting) => {
   toasts.add({
     type: "info",
     description: message,
-    duration: obj?.duration ?? 4000,
+    duration: obj?.duration ?? 5000,
     theme: obj?.theme ?? "dark",
     placement: obj?.position ?? "bottom-right",
   });
@@ -53,7 +53,7 @@ const warning = (message: string, obj?: notifySetting) => {
   toasts.add({
     type: "warning",
     description: message,
-    duration: obj?.duration ?? 4000,
+    duration: obj?.duration ?? 5000,
     theme: obj?.theme ?? "dark",
     placement: obj?.position ?? "bottom-right",
   });
