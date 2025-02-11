@@ -9,7 +9,8 @@
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { TeamRole } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
-  import TeamNavigator from "../components/team-navigator/TeamNavigator.svelte";
+  import { Navigator } from "@sparrow/library/ui";
+ 
   import {
     TeamTabsEnum,
     TeamViewEnum,
@@ -19,11 +20,11 @@
   import { TeamMembers, TeamSettings } from "@sparrow/teams/features";
   import { CrossIcon, MoreOptions } from "@sparrow/library/icons";
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
-  import Avatar from "../../../../../@sparrow-library/src/ui/avatar/Avatar.svelte";
+  import { Search } from "@sparrow/library/forms";
   export let isWebApp = false;
-
+ 
   export let isWebEnvironment: boolean;
-
+ 
   /**
    * user ID
    */
@@ -44,14 +45,14 @@
    * Callback for updating active tab in team
    */
   export let onUpdateActiveTab;
-
+ 
   /**
    * Invite team toggler
    */
   export let isTeamInviteModalOpen;
-
+ 
   export let isLeaveTeamModelOpen;
-
+ 
   /**
    * Callback For creating workspace
    */
@@ -88,27 +89,27 @@
    * function to delete workspace
    */
   export let onDeleteWorkspace;
-
+ 
   /**
    * function to update team details
    */
   export let onUpdateTeam;
-
+ 
   /**
    * Flag to check if user is guest user
    */
   export let isGuestUser = false;
-
+ 
   export let onAddMember;
-
+ 
   export let openInDesktop;
-
+ 
   let selectedView: string = "Grid";
-
+ 
   const selectedViewSubscribe = workspaceView.subscribe((value) => {
     selectedView = value;
   });
-
+ 
   let userRole: string;
   const findUserType = () => {
     openTeam?.users.forEach((user) => {
@@ -117,7 +118,7 @@
       }
     });
   };
-
+ 
   const refreshTabs = () => {
     return [
       {
@@ -161,36 +162,36 @@
       previousTeamId = openTeam?.teamId;
     }
   }
-
+ 
   let isWorkspaceCreationInProgress = false;
   const handleCreateNewWorkspace = async () => {
     isWorkspaceCreationInProgress = true;
     await onCreateWorkspace(openTeam.teamId);
     isWorkspaceCreationInProgress = false;
   };
-
+ 
   let searchQuery = "";
   let hasText = false;
   let leaveButtonMenu: boolean = false;
-
+ 
   const handleLeaveTeam = () => {
     leaveButtonMenu = !leaveButtonMenu;
     isLeaveTeamModelOpen = true;
   };
-
+ 
   const handleSearchInput = (event) => {
-    searchQuery = event.target.value.toLowerCase();
+    searchQuery = event.detail.toLowerCase();
     hasText = searchQuery.length > 0;
   };
   const clearSearchInput = () => {
     searchQuery = "";
     hasText = false;
   };
-
+ 
   onDestroy(() => {
     selectedViewSubscribe();
   });
-
+ 
   const addButtonData = [
     {
       name: "Leave Team",
@@ -204,7 +205,7 @@
     }
   }
 </script>
-
+ 
 {#if openTeam}
   <div class="teams-content h-100 bg-secondary-850">
     <div
@@ -217,26 +218,20 @@
         >
           <h2 class="d-flex ellipsis overflow-visible team-title">
             {#if openTeam?.logo?.size}
-              <!-- <img
+              <img
                 class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
                 style="width: 40px !important; height: 40px !important; padding-top: 2px; display: flex; border-radius: 50%;"
                 src={base64ToURL(openTeam?.logo)}
                 alt=""
-              /> -->
-              <Avatar
-                type={"image"}
-                size={"large"}
-                image={base64ToURL(openTeam?.logo)}/>
-              {:else}
-              <!-- <div
+              />{:else}
+              <div
                 class={`text-defaultColor w-25 text-center my-auto align-items-center justify-content-center profile-circle bg-tertiary-750 border-secondary-300 border-2`}
                 style={`font-size: 24px; width: 40px !important; height: 40px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
               >
                 <span class="text-fs-24">
                   {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
                 </span>
-              </div> -->
-              <Avatar type={"letter"} size={"large"} letter={openTeam?.name[0] || ""} bgColor={"var(--bg-tertiary-750)"}/>
+              </div>
             {/if}
             <span
               class="ms-3 my-auto ellipsis overflow-hidden heading"
@@ -274,7 +269,7 @@
               {/if}
             {/if}
           </h2>
-
+ 
           <div class="d-flex align-items-end justify-content-end">
             {#if openTeam?.users?.length > 1 && !isGuestUser}
               <p class="d-flex my-auto ms-4 sparrow-fs-12">
@@ -288,7 +283,7 @@
             {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER}
               <Button
                 title={`Invite`}
-                type={`dark`}
+                type={"secondary"}
                 textStyleProp={"font-size: var(--small-text)"}
                 onClick={() => {
                   isTeamInviteModalOpen = true;
@@ -313,19 +308,20 @@
             {/if}
           </div>
         </div>
-
+ 
         <!--Workspace, setting and members tab-->
-
+ 
         <div
-          class="teams-menu d-flex justify-content-between align-items-center"
+          class="teams-menu d-flex justify-content-between align-items-center position-relative"
         >
           <div
             class="teams-menu__left gap-4 align-items-center"
             style="padding-bottom: 4px;"
           >
-            <TeamNavigator
+            <Navigator
               tabs={teamTabs}
-              {onUpdateActiveTab}
+              currentTabId={"Workspaces"}
+              onTabClick={onUpdateActiveTab}
               {activeTeamTab}
             />
           </div>
@@ -355,7 +351,7 @@
           </div>
         </div>
       </div>
-
+ 
       <div
         style="flex:1; overflow:auto; padding-left: 14px; padding-right:14px"
       >
@@ -363,35 +359,16 @@
           <div class="h-100 d-flex flex-column">
             {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
               <div class="pt-2">
-                <div
-                  class={`d-flex search-input-container rounded  align-items-center mb-4`}
-                >
-                  <div>
-                    <SearchIcon
-                      width={14}
-                      height={14}
-                      classProp={`my-auto me-3`}
-                      color={"var(--icon-secondary-200)"}
-                    />
-                  </div>
-                  <input
-                    type="text"
+                <div class={`d-flex  rounded  align-items-center mb-4`}>
+                  <Search
+                    variant={"primary"}
                     id="search-input"
-                    class={`bg-transparent w-100 border-0 my-auto ms-2 ellipsis`}
+                    size="large"
                     placeholder="Search workspaces in {openTeam?.name}"
                     on:input={handleSearchInput}
                     bind:value={searchQuery}
+                    customWidth={"300px"}
                   />
-
-                  {#if hasText}
-                    <div class="clear-icon" on:click={clearSearchInput}>
-                      <CrossIcon
-                        height="16px"
-                        width="12px"
-                        color="var(--icon-secondary-300)"
-                      />
-                    </div>
-                  {/if}
                 </div>
               </div>
             {/if}
@@ -459,7 +436,7 @@
     </div>
   </div>
 {/if}
-
+ 
 <style>
   .custom-tooltip {
     --bs-tooltip-bg: var(--bs-primary);
@@ -524,18 +501,18 @@
     border: 1px solid var(--border-primary-300);
     caret-color: var(--border-primary-300);
   }
-
+ 
   .search-input-container:focus-within {
     border-color: var(--border-primary-300);
     caret-color: var(--border-primary-300);
   }
-
+ 
   #search-input:focus {
     outline: none;
     border: none;
     box-shadow: none;
   }
-
+ 
   .clear-icon {
     position: absolute;
     right: 10px;
@@ -544,7 +521,7 @@
     cursor: pointer;
     font-size: 16px;
   }
-
+ 
   .moreOption-icon {
     height: 24px;
     width: 24px;

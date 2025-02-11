@@ -248,7 +248,7 @@
       disable={memberRemovePopupLoader}
       title={"Cancel"}
       textStyleProp={"font-size: var(--base-text)"}
-      type={"dark"}
+      type={"secondary"}
       loader={false}
       onClick={() => {
         handlePopup(false, "isMemberRemovePopup");
@@ -461,7 +461,7 @@
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberOwnershipPopup");
     confirmationText = "";
-    confirmationError="";
+    confirmationError = "";
   }}
 >
   <div style="font-size: 14px;" class="text-lightGray mb-1">
@@ -569,7 +569,6 @@
         } else {
           confirmationError = "";
           handleMemberOwnershipPopUpSuccess();
-          
         }
       }}
     />
@@ -584,7 +583,6 @@
   isOpen={memberPopObj.isMemberInfoPopup}
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberInfoPopup");
- 
   }}
 >
   <Profile
@@ -663,7 +661,6 @@
         isArrowIconRequired={!owner}
         headerFontSize={"10px"}
         borderRounded={"4px"}
-        
       />
     {:else}
       <Select
