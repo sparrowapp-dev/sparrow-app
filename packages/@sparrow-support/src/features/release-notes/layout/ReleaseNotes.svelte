@@ -11,7 +11,7 @@
   } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   import { marked } from "marked";
-  import { Loader, Tooltip } from "@sparrow/library/ui";
+  import { Loader, Tag, Tooltip } from "@sparrow/library/ui";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import { notifications } from "@sparrow/library/ui";
   import { UpdatesTagType } from "../../../types/feedback";
@@ -99,6 +99,12 @@
     if (tag === UpdatesTagType.NEW) return "tag-new";
     if (tag === UpdatesTagType.FIXED) return "tag-fixed";
     if (tag === UpdatesTagType.IMPROVED) return "tag-improved";
+    return "";
+  };
+   const getTagType = (tag) => {
+    if (tag === UpdatesTagType.NEW) return "cyan";
+    if (tag === UpdatesTagType.FIXED) return "pink";
+    if (tag === UpdatesTagType.IMPROVED) return "green";
     return "";
   };
 
@@ -297,9 +303,11 @@
                     </div>
                     <div class="tags" style="margin-top: 5px;">
                       {#each event.types as tag}
-                        <span class="text-fs-10 tag {getTagClass(tag)}">
-                          {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
-                        >
+                      <span class="mt-[6px]">  <Tag
+                          type={getTagType(tag)}
+                          text={tag || ""}/>
+                      </span>
+
                       {/each}
                     </div>
                     {#if event.plaintextDetails.split(" ").length > 20}
@@ -429,9 +437,10 @@
               </div>
               <div class="tags">
                 {#each selectedEvent.types as tag}
-                  <span class="tag {getTagClass(tag)}">
-                    {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
-                  >
+                  <span class="mt-[6px]">  <Tag
+                          type={getTagType(tag)}
+                          text={tag || ""}/>
+                    </span>
                 {/each}
               </div>
 

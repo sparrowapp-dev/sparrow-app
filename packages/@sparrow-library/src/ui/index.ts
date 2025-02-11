@@ -16,5 +16,6 @@ export * from "./toast";
 export * from "./image-modal";
 export * from "./skeleton";
 export * from "./toggle";
+export * from "./tags";
 export * from "./navigator";
 export * from "./badge";
