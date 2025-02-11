@@ -2,6 +2,7 @@
   // ---- Icon
   import { CrossIcon, CrossIcon as Crossicon } from "@sparrow/library/assets";
   import { BookIcon } from "@sparrow/library/assets";
+  import { CrossIcon2 } from "@sparrow/library/icons";
   // ----
 
   // ---- SVG
@@ -77,19 +78,23 @@
   on:dragstart={() => {
     onDragStart(index);
   }}
-  class="d-inline-block p-0 position-relative pt-1 individual-tab bg-transparent border-0"
-  style="width: {tabWidth}px; height:35px; margin-left:{index === 0
+  class="tab-container d-inline-block position-relative pt-1 individual-tab"
+  style="width: {tabWidth}px; height:36px; padding:0 4px; margin-left:{index ===
+  0
     ? '4px'
     : ''}"
   on:mousedown={handleMouseDown}
 >
   <div
-    class=" w-100 d-flex justify-content-between px-2 border-upper-radius h-100 align-items-center"
+    class="tab-item w-100 d-flex justify-content-between px-2 border-upper-radius h-100 align-items-center"
     style="margin-left: -1px;  background-color: {tab.isActive
-      ? 'var(--bg-secondary-850)'
-      : 'transparent'};"
+      ? 'var(--bg-ds-surface-900)'
+      : 'transparent'}; border-top : {tab.isActive
+      ? '2px solid var(--bg-ds-primary-400)'
+      : ''};  "
   >
     <button
+      tabindex={1}
       on:click={() => {
         if (!tab.isActive) {
           onTabSelected(tab.id);
@@ -191,7 +196,7 @@
       }}
       style="overflow:hidden; height: 18px; width:18px;"
     >
-      <CrossIconV2 height={"9px"} width={"9px"} />
+      <CrossIcon2 height={"16px"} width={"16px"} />
     </button>
     {#if !tab.isActive}
       <div
@@ -206,6 +211,16 @@
   * {
     transition: all 100ms;
   }
+  .tab-container {
+    background-color: var(--bg-ds-surface-700);
+    border: 0px;
+  }
+  .tab-container:focus-visible {
+    outline: none;
+    border-radius: 4px;
+    border: 2px solid var(--bg-ds-primary-300);
+  }
+
   .border-upper-radius {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
