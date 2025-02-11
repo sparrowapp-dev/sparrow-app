@@ -13,38 +13,38 @@ export let text: string = 'Tag';
 const colorPalette = {
     "cyan": {
         "text": "var(--text-ds-info-300)",
-        "bg": "var(--text-ds-info-900)",
-        "border": "var(--text-ds-info-700)"
+        "bg": "var(--bg-ds-info-900)",
+        "border": "var(--border-ds-info-700)"
     },
     "purple": {
         "text": "var(--text-ds-secondary-200)",
-        "border": "var(--text-ds-secondary-700)",
-        "bg": "var(--text-ds-secondary-900)"
+        "border": "var(---ds-secondary-700)",
+        "bg": "var(--border-ds-secondary-900)"
     },
     "yellow": {
         "bg": "var(--bg-ds-warning-900)",
-        "text": "var(--bg-ds-warning-300)",
-        "border": "var(--bg-ds-warning-700)"
+        "text": "var(--text-ds-warning-300)",
+        "border": "var(--border-ds-warning-700)"
     },
     "green": {
         "bg": "var(--bg-ds-success-900)",
-        "text": "var( --bg-ds-success-300)",
-        "border": "var(--bg-ds-success-700)"
+        "text": "var( --text-ds-success-300)",
+        "border": "var(--border-ds-success-700)"
     },
     "orange": {
         "bg": "var(--bg-ds-tertiary-900)",
-        "text": "var(--bg-ds-tertiary-300)",
-        "border": "var(--bg-ds-tertiary-700)"
+        "text": "var(--text-ds-tertiary-300)",
+        "border": "var(--border-ds-tertiary-700)"
     },
     "grey": {
         "bg": "var(--bg-ds-neutral-900)",
-        "text": "var(--bg-ds-neutral-300)",
-        "border": "var(--bg-ds-neutral-700)"
+        "text": "var(--text-ds-neutral-300)",
+        "border": "var(--border-ds-neutral-700)"
     },
     "pink": {
-        "bg": "var(--text-ds-accent-900)",
+        "bg": "var(--bg-ds-accent-900)",
         "text": "var(--text-ds-accent-300)",
-        "border": "var(--text-ds-accent-700)"
+        "border": "var(--border-ds-accent-700)"
     }
 }
 </script>
