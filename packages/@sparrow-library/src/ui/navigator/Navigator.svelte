@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Label } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   import { Badge } from "@sparrow/library/ui";
   export let tabs;

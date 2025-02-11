@@ -34,7 +34,7 @@
   /**
    * Width of each tab
    */
-  export let tabWidth: number;
+  export let tabWidth: number = 176;
   /**
    * Index of particular tab
    */
