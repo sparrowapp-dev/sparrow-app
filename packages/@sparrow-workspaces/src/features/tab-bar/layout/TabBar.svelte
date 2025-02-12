@@ -132,7 +132,7 @@
       class=" d-inline-block tab-scroller p-0 border-0 bg-transparent"
       bind:offsetWidth={scrollerWidth}
       id="tab-scroller"
-      style="overflow-x: auto; position:relative;  white-space: nowrap; max-width: calc(100% - 75px); "
+      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 75px); "
     >
       {#if tabList}
         {#each tabList as tab, index (tab.tabId)}
@@ -172,7 +172,7 @@
 
     <div
       class="d-flex ps-1 align-items-center justify-content-center my-auto"
-      style="height: 24px; "
+      style="height: 24px; gap:8px "
     >
       {#if tabList.length <= 0}
         <span style="color: var(--text-ds-neutral-300);"> New Request </span>
@@ -187,12 +187,12 @@
           on:click={onNewTabRequested}
           role="button"
           class="d-flex layout my-auto relative top-2 align-items-center border-radius-2 p-0 justify-content-center py-auto"
-          style="height:24px; width:24px; background-color: transparent; border:0px;  "
+          style="height:28px; width:28px; background-color: transparent; border:0px; border-left:1px solid var(--bg-ds-surface-100); border-top-left-radius:0px; border-bottom-left-radius:0px;  "
         >
           <PlusIcon
-            height={"22px"}
-            width={"22px"}
-            color="var(--text-secondary-200)"
+            height={"28px"}
+            width={"28px"}
+            color="var(--bg-ds-neutral-100)"
           />
         </button>
       </Tooltip>
