@@ -41,7 +41,6 @@
     SidebarItemPositionBaseEnum,
     SidebarItemIdEnum,
   } from "@sparrow/common/types/sidebar/sidebar-base";
-  import { Breadcrumbs } from "@sparrow/library/ui";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -553,7 +552,6 @@
   class="dashboard d-flex flex-column {isGlobalSearchOpen ? 'blurred' : ''}"
   style="height: 100vh;"
 > 
- <!-- <Breadcrumbs /> -->
 
   <Header
     environments={$environments?.filter((element) => {

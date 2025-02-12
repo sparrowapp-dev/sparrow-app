@@ -63,7 +63,6 @@
         }
         queryBuilder = calculateQueryBuilder(querySchema, operationSearch);
         breadcrum = calculateBreadcrumPath(queryBuilder, 5);
-        // debugger;
       }
     } catch (e) {
       querySchema = [];
