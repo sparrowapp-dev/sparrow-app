@@ -119,6 +119,7 @@
   export let onUpdateTestflow;
   export let onOpenTestflow;
   export let isWebApp = false;
+  export let isFirstCollectionExpand = false;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -629,6 +630,7 @@
           {searchData}
           {toggleExpandCollection}
           bind:isExpandCollection
+          bind:isFirstCollectionExpand
           {isWebApp}
         />
       </div>
