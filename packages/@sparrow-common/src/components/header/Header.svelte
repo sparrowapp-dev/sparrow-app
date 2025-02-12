@@ -188,13 +188,14 @@
   export let user;
   export let onLogout;
 
-  import { profileTabIcon as profile } from "@sparrow/library/assets";
+  import { BookIcon, profileTabIcon as profile } from "@sparrow/library/assets";
   import { profileHoveredIcon as hoveredProfile } from "@sparrow/library/assets";
   import { profileSelectedIcon as selectedProfile } from "@sparrow/library/assets";
   import { onMount } from "svelte";
   import { OSDetector } from "../../utils";
   import WindowAction from "./window-action/WindowAction.svelte";
   import SearchBar from "../SearchBar/SearchBar.svelte";
+  import { Chip } from "@sparrow/library/ui";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",
@@ -372,6 +373,16 @@
       {/if}
     </div>
   </div>
+
+  <Chip
+    startIcon={BookIcon}
+    endIcon={BookIcon}
+    label={"Label"}
+    type={"avatar-input"}
+    onClose={() => {}}
+    disabled={false}
+    id={"fr"}
+  />
 
   <div class="d-flex align-items-center no-drag" style="position: relative;">
     {#if isGuestUser && isLoginBannerActive === false}
