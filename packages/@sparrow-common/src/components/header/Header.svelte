@@ -373,7 +373,6 @@
     </div>
   </div>
 
-
   <div class="d-flex align-items-center no-drag" style="position: relative;">
     {#if isGuestUser && isLoginBannerActive === false}
       <PopupHint />
