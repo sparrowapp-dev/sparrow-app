@@ -324,7 +324,7 @@
       <div></div>
       <div class="d-flex">
         <Button
-          type={"violet"}
+          type={"secondary"}
           title={"Cancel"}
           buttonClassProp={"me-2"}
           onClick={async () => {

@@ -21,7 +21,7 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   import { FeedbackStatusType, FeedbackType } from "../../../types/feedback";
-  import { IconFallback, ImageModal } from "@sparrow/library/ui";
+  import { IconFallback, ImageModal, Tag } from "@sparrow/library/ui";
 
   import { ActivityStatusType, ActivityType } from "../../../types/activity";
   import { Spinner } from "@sparrow/library/ui";
@@ -31,6 +31,7 @@
   import { ArrowOutwardIcon } from "@sparrow/library/icons";
   import { SparrowLogo } from "@sparrow/common/images";
   import { Upvote } from "../../../components";
+  import { Search } from "@sparrow/library/forms";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
@@ -204,37 +205,15 @@
     style="justify-content: space-between;"
   >
     <div>
-      <div class={`d-flex search-input-container rounded py-1 px-2 mb-2`}>
-        <SearchIcon
-          width={14}
-          height={14}
-          color={"var(--icon-secondary-200)"}
-          classProp={`my-auto me-1`}
-        />
-        <input
-          type="text"
+      <div class={`d-flex  rounded py-1 px-2 mb-2`}>
+        <Search
+          variant="primary"
           id="search-input"
-          class={`bg-transparent w-100 ms-1 border-0 my-auto`}
+          customWidth={"300px"}
           placeholder="Search updates"
-          on:input={(e) => handleInputChange(e.target.value)}
           bind:value={searchTerm}
+          on:input={() => handleInputChange(searchTerm)}
         />
-        {#if searchTerm.length != 0}
-          <div
-            style="cursor: pointer;"
-            class="clear-icon"
-            on:click={() => {
-              searchTerm = "";
-              applyAllFilters();
-            }}
-          >
-            <CrossIcon
-              height="16px"
-              width="12px"
-              color="var(--icon-secondary-300)"
-            />
-          </div>
-        {/if}
       </div>
     </div>
     <div class="d-flex" style="gap: 15px;">
@@ -425,18 +404,10 @@
                           <div
                             style="height: 16px; display: flex; align-items: center;"
                           >
-                            <span
-                              class="category mt-2"
-                              style="color:{getColor(post?.status)
-                                ?.fontColor}; border:0.2px solid {getColor(
-                                post?.status,
-                              )?.fontColor}; "
-                            >
-                              {post?.status
-                                ? post.status.charAt(0).toUpperCase() +
-                                  post.status.slice(1)
-                                : ""}
-                            </span>
+                            <Tag
+                              type={getColor(post?.status)}
+                              text={post?.status ? post.status.charAt(0) + post.status.slice(1) : ""}
+                            />
                           </div>
                         </div>
                         <div style="">
@@ -660,18 +631,12 @@
                           <div
                             style="height: 16px; display: flex; align-items: center;"
                           >
-                            <span
-                              class="category mt-2"
-                              style="color:{getColor(post?.status)
-                                .fontColor}; border:0.2px solid {getColor(
-                                post?.status,
-                              ).fontColor}; "
-                            >
-                              {post?.status
-                                ? post.status.charAt(0).toUpperCase() +
-                                  post.status.slice(1)
+                            <Tag
+                              type={getColor(post?.status)}
+                              text={post?.status
+                                ? post.status.charAt(0) + post.status.slice(1)
                                 : ""}
-                            </span>
+                            />
                           </div>
                         </div>
                         <div>

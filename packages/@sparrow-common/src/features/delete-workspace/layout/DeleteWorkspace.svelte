@@ -98,7 +98,7 @@
         textStyleProp={"font-size: 16px"}
         buttonClassProp={"me-2"}
         buttonStyleProp={"height: 36px;"}
-        type={"dark"}
+        type={"secondary"}
         onClick={async () => {
           inputNameError = "";
           isDeleteWorkspaceModalOpen = false;

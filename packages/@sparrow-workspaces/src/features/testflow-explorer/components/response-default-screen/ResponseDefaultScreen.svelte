@@ -11,15 +11,16 @@
     let controlKey = platformName === "macos" ? "cmd" : "ctrl";
     let altKey = platformName === "macos" ? "option" : "alt";
     ctrlCommands = {
-      "Send Request": controlKey + " + Enter",
-      "New Request": controlKey + " + N",
-      "Save Request": controlKey + " + S",
+      "Send Request": [controlKey, "Enter"],
+      "New Request": [controlKey, "N"],
+      "Save Request": [controlKey, "S"],
     };
+
     altCommands = {
-      "Edit link": altKey + " + L",
-      "Add Parameter": altKey + " + P",
-      "Add Header": altKey + " + H",
-      "Edit Body": altKey + " + B",
+      "Edit link": [altKey, "L"],
+      "Add Parameter": [altKey, "P"],
+      "Add Header": [altKey, "H"],
+      "Edit Body": [altKey, "B"],
     };
   });
   let isExpandShortcuts = false;
@@ -52,9 +53,7 @@
             {key}
             {value}
             keyClassProp={"text-secondary-200"}
-            valueClassProp={"bg-secondary-400 text-secondary-150"}
             keyStyleProp={"width: 100px;"}
-            valueStyleProp={"width: 110px"}
             type="combo"
           />
         </div>
@@ -70,9 +69,7 @@
             {key}
             {value}
             keyClassProp={"text-secondary-200"}
-            valueClassProp={"bg-secondary-400 text-secondary-150"}
             keyStyleProp={"width: 100px;"}
-            valueStyleProp={"width: 110px"}
             type="combo"
           />
         </div>

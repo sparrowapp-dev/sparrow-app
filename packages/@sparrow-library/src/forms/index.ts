@@ -8,3 +8,4 @@ export { default as TextEditor } from "./text-editor/TextEditor.svelte";
 export { default as Switch } from "./Switch/Switch.svelte";
 export { default as NewInput } from "./newInput/NewInput.svelte";
 export { default as NewTextArea } from "./newtext-area/NewTextArea.svelte";
+export { default as Search } from "./search/Search.svelte";
