@@ -50,9 +50,9 @@ const colorPalette = {
 </script>
 
 <button style="
-    background-color: {colorPalette[type].bg};
-    color: {colorPalette[type].text};
-    border: 1px solid {colorPalette[type].border};
+    background-color: {colorPalette[type]?.bg};
+    color: {colorPalette[type]?.text};
+    border: 1px solid {colorPalette[type]?.border};
     border-radius: 2px;
     padding: 0px 4px;
     height: 18px;

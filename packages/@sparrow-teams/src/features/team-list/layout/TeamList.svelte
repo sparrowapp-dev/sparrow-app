@@ -55,12 +55,14 @@
         >
           <div class=" d-flex w-100 overflow-hidden">
             {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
-                <Avatar
+              <div class="me-2">
+                  <Avatar
                       type={"letter"}
                       size={"small"}
                       letter={team.name[0]}
                       bgColor={"var(--bg-tertiary-700)"}
                   />
+              </div>
             {:else}
               <img src={base64ToURL(team.logo)} alt="" />
             {/if}
