@@ -14,10 +14,11 @@
   import { Select } from "@sparrow/library/forms";
   import { CategoryIcon, StatusIcon } from "@sparrow/library/icons";
   import { FeedbackType, FeedbackStatusType } from "../../../types/feedback";
-  import { Loader } from "@sparrow/library/ui";
+  import { Loader, Tag } from "@sparrow/library/ui";
   import { Debounce } from "@sparrow/common/utils";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { Search } from "@sparrow/library/forms";
 
   /**
    * @description - Callback for inputting feedback.
@@ -331,44 +332,22 @@
     >
       <div>
         <div
-          class={`d-flex align-items-center search-input-container rounded py-1 px-2 mb-2`}
+          class={`d-flex align-items-center rounded py-1 px-2 mb-2`}
           on:click={() => {
             MixpanelEvent(Events.Feedback_Search);
           }}
         >
-          <SearchIcon
-            width={14}
-            height={14}
-            color={"var(--icon-secondary-200)"}
-            classProp={`my-auto me-1`}
-          />
-          <input
-            type="text"
+          <Search
+            variant="primary"
+            size="small"
             id="search-input"
-            class={`bg-transparent w-100 ms-1 border-0 my-auto`}
+            customWidth={"300px"}
             placeholder="Search updates"
-            on:input={(e) => {
-              handleInputChangeDebounced(e.target.value);
-            }}
             bind:value={searchTerm}
+            on:input={() => {
+              handleInputChangeDebounced(searchTerm);
+            }}
           />
-
-          {#if searchTerm.length != 0}
-            <div
-              style="cursor: pointer;"
-              class="clear-icon"
-              on:click={() => {
-                searchTerm = "";
-                handleInputChangeDebounced(searchTerm);
-              }}
-            >
-              <CrossIcon
-                height="16px"
-                width="12px"
-                color="var(--icon-secondary-300)"
-              />
-            </div>
-          {/if}
         </div>
       </div>
       <div class="d-flex" style="gap:15px;">
@@ -627,20 +606,10 @@
                   <div
                     style="height: 16px; display: flex; align-items: center;"
                   >
-                    <span
-                      class="category mt-2 text-fs-10"
-                      style="color:{getColor(post?.status)
-                        .fontColor}; border:0.2px solid {getColor(post?.status)
-                        .fontColor}; "
-                    >
-                      {post.status
-                        .split(" ")
-                        .map(
-                          (word) =>
-                            word.charAt(0).toUpperCase() + word.slice(1),
-                        )
-                        .join(" ")}
-                    </span>
+                    <Tag
+                      type={getColor(post?.status)}
+                      text={post?.status || "" }
+                    />
                   </div>
                 </div>
                 <div

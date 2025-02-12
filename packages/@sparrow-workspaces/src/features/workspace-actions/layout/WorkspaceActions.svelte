@@ -3,6 +3,7 @@
   import { FilterIcon } from "@sparrow/library/assets";
   import { plusWhiteIcon as plusIcon } from "@sparrow/library/assets";
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+  import { Search } from "@sparrow/library/forms";
   import { Events, WorkspaceRole } from "@sparrow/common/enums";
   import { Dropdown } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
@@ -494,12 +495,10 @@
     <div
       class="d-flex align-items-center justify-content-between ps-2 pt-3 pe-1 gap-1"
     >
-      <Input
+      <Search
         id="collection-list-search"
-        width={"100%"}
-        height={"33px"}
-        type="search"
-        searchIconColor={"var(--icon-secondary-170 )"}
+        variant={"primary"}
+        size="small"
         bind:value={searchData}
         on:input={() => {
           handleSearch();
@@ -507,12 +506,7 @@
           isExpandEnvironment = true;
           isExpandTestflow = true;
         }}
-        defaultBorderColor="transparent"
-        hoveredBorderColor="var(--border-primary-300)"
-        focusedBorderColor={"var(--border-primary-300)"}
-        class="text-fs-12 bg-tertiary-400 border-radius-2 ellipsis fw-normal px-2"
-        style="outline:none;"
-        placeholder="Search"
+        placeholder={"Search"}
       />
       <div class="d-flex align-items-center justify-content-center d-none">
         <button

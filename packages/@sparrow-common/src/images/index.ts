@@ -13,7 +13,6 @@ export { default as EnvironmentIcon } from "./envLayer.svelte";
 export { default as FlowIcon } from "./flowIcon.svelte";
 export { default as FolderIcon } from "./folderIcon.svelte";
 export { default as getIcon } from "./Get.svg";
-export { default as keyCommand } from "./keyCommand.png";
 export { default as patchIcon } from "./Patch.svg";
 export { default as postIcon } from "./Post.svg";
 export { default as putIcon } from "./Put.svg";

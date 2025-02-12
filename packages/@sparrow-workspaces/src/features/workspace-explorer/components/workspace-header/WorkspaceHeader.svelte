@@ -60,7 +60,7 @@
   >
     <div class="d-flex" style="justify-content: space-between;">
       <div
-        class="ellipsis w-100"
+        class="ellipsis w-auto"
         style="font-weight: 700; color:var(--text-secondary-100);"
       >
         <input
@@ -83,14 +83,14 @@
           id="renameInputFieldWorkspace"
           value={workspaceName}
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          class="bg-transparent input-outline border-0 text-fs-18 text-left w-100 ps-2 py-0"
+          class="bg-transparent input-outline border-0 text-fs-18 text-left w-auto ps-2 py-0"
           maxlength={100}
         />
       </div>
       {#if userRole === WorkspaceRole.WORKSPACE_ADMIN}
         <div class="d-flex gap-2 ms-3">
           <Button
-            type={"dark"}
+            type={"secondary"}
             title={"Delete Workspace"}
             textClassProp={"fs-12 "}
             textStyleProp={"font-weight:400; font-size:12px;"}

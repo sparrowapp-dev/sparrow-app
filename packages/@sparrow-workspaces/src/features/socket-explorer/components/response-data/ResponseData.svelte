@@ -1,6 +1,6 @@
 <script lang="ts">
   import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
-  import { Input } from "@sparrow/library/forms";
+  import { Input, Search } from "@sparrow/library/forms";
   import {
     ArrowInsertIcon,
     ArrowOutwardIcon,
@@ -161,20 +161,15 @@
     </div>
     <div class="d-flex {webSocket?.messages?.length ? 'visible' : 'invisible'}">
       <div class="w-100" style="margin-right:60px;">
-        <Input
+        <Search
           id="websocket-list-search"
-          width={"100%"}
-          height={"33px"}
-          type="search"
+          customWidth={"100%"}
+          variant="primary"
+          size="large"
           bind:value={searchData}
           on:input={(e) => {
             onSearchMessage(searchData);
           }}
-          defaultBorderColor="transparent"
-          hoveredBorderColor="var(--border-primary-300)"
-          focusedBorderColor={"var(--border-primary-300)"}
-          class="text-fs-12 bg-tertiary-400 border-radius-2 ellipsis fw-normal px-2"
-          style="outline:none;"
           placeholder="Search"
         />
       </div>
