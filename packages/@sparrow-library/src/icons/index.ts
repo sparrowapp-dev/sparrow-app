@@ -15,7 +15,7 @@ export { default as FolderIcon } from "./Folder.svelte";
 export { default as SyncIcon } from "./Sync.svelte";
 export { default as GithubIcon } from "./Github.svelte";
 export { default as DoubleArrowIcon } from "./DoubleArrow.svelte";
-export { default as NewUploadIcon } from "./NewUploadIcon.svelte";
+export { default as UploadIcon2 } from "./UploadIcon.svelte";
 export { default as MessageTextIcon } from "./MessageTextIcon.svelte";
 export { default as FileTypeIcon } from "./FileTypeIcon.svelte";
 export { default as DiscordIcon } from "./Discord.svelte";
@@ -125,5 +125,5 @@ export { default as ThreeDotIcon } from "./ThreeDot.svelte";
 export { default as AiSparkleIconV2 } from "./AiSparkleV2.svelte";
 
 export { default as AiSparkleIconV3 } from "./AiSparkleV3.svelte";
-export { default as NewEditIcon } from "./newEdit.svelte";
-export { default as NewDeleteIcon } from "./newDelete.svelte";
+export { default as EditIcon2 } from "./EditIcon.svelte";
+export { default as DeleteIcon } from "./DeleteIcon.svelte";

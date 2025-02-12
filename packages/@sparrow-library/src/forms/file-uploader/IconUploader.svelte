@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { NewDeleteIcon, NewEditIcon } from "@sparrow/library/icons";
+  import { DeleteIcon, EditIcon2 } from "@sparrow/library/icons";
   import { base64ToURL, imageDataToURL } from "@sparrow/common/utils";
   import { FileTypeIcon } from "@sparrow/library/icons";
-  import { NewUploadIcon } from "@sparrow/library/icons";
+  import { UploadIcon2 } from "@sparrow/library/icons";
 
   export let value: any = [];
   export let inputId: string;
@@ -92,7 +92,7 @@
         >
           <div class="d-flex text-center row justify-content-center">
             <label for={inputId} class="d-flex justify-content-center">
-              <NewUploadIcon />
+              <UploadIcon2 />
             </label>
             <label for={inputId} class="sparrow-choose-file-label my-2 ps-2"
               >Drag & Drop or <span class="sparrow-upload-text text-fs-14"
@@ -177,13 +177,13 @@
             on:click={editValue}
             class="edit-btn border-0 p-1 d-flex align-items-center justify-content-center"
           >
-            <NewEditIcon height={16} width={16} />
+            <EditIcon2 height={16} width={16} />
           </button>
           <button
             on:click={resetValue}
             class="del-btn border-0 p-1 d-flex align-items-center justify-content-center"
           >
-            <NewDeleteIcon height={14} width={14} />
+            <DeleteIcon height={14} width={14} />
           </button>
         </div>
       </div>
