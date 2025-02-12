@@ -283,15 +283,6 @@
       style=" margin-top:16px !important; margin-bottom:16px !important;"
     >
       <div class="d-flex align-items-center">
-        <!-- <div
-          class="d-flex align-items-center justify-content-center"
-          style="width: 36px;
-          border: 1px solid var(--border-color);
-          height: 36px;
-          border-radius: 50%;"
-        >
-          <span>{user.name[0].toUpperCase()}</span>
-        </div> -->
         <Avatar
           type={"letter"}
           size={"large"}
@@ -330,11 +321,6 @@
     <div class="d-flex align-items-center ellipsis gap-2">
       <div style="width: 36px;">
         {#if openTeam?.logo?.size}
-          <!-- <img
-            class="team-icon me-2"
-            src={base64ToURL(openTeam?.logo)}
-            alt=""
-          /> -->
            <Avatar
           type={"image"}
           size={"large"}
@@ -377,15 +363,6 @@
   <div style="font-size: 14px;" class="text-lightGray mb-1 mt-2">
     <div class="d-flex rounded mb-3">
       <div class=" d-flex align-items-center">
-        <!-- <div
-          class="d-flex align-items-center justify-content-center"
-          style="width: 36px;
-          border: 1px solid var(--border-color);
-          height: 36px;
-          border-radius: 50%;"
-        >
-          <span>{user.name[0].toUpperCase()}</span>
-        </div> -->
           <Avatar
             type={"letter"}
             size={"large"}
@@ -414,12 +391,6 @@
     <div class="d-flex align-items-center ellipsis gap-2">
       <div style="width: 36px;">
         {#if openTeam?.logo?.size}
-          <!-- <img
-            class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
-            style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-            src={base64ToURL(openTeam?.logo)}
-            alt=""
-          /> -->
           <Avatar
             type={"image"}
             size={"large"}
@@ -465,15 +436,6 @@
   <div style="font-size: 14px;" class="text-lightGray mb-1">
     <div class="d-flex rounded mb-3" style="padding-left: 0px !important;">
       <div class="d-flex align-items-center">
-        <!-- <div
-          class="d-flex align-items-center justify-content-center"
-          style="width: 36px;
-          border: 1px solid var(--border-color);
-          height: 36px;
-          border-radius: 50%;"
-        >
-          <span>{user.name[0].toUpperCase()}</span>
-        </div> -->
         <Avatar
           type={"letter"}
           size={"large"}
@@ -606,9 +568,6 @@
       memberPopObj.isMemberInfoPopup = true;
     }}
   >
-    <!-- <div class="icon d-flex align-items-center justify-content-center">
-      <span>{user.name[0].toUpperCase()}</span>
-    </div> -->
     <Avatar
       type={"letter"}
       size={"large"}

@@ -367,14 +367,15 @@
         <Avatar
           type={"image"}
           size={"large"}
-          image={base64ToURL(teamLogo)}/>
+          image={base64ToURL(teamLogo)}
+          />
       {:else}
         <span class="">
           <Avatar
             type={"letter"}
             size={"large"}
             letter={teamName.charAt(0)}
-             bgColor={"var(--bg-tertiary-800)"}/>
+             bgColor={"var(--bg-ds-surface-500)"}/>
         </span>
       {/if}
     </div>
