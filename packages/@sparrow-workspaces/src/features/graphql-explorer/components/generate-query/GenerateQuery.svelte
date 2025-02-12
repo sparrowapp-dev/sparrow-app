@@ -1,7 +1,7 @@
 <script lang="ts">
   import { WithSelect } from "../../../../hoc";
   import { AngleLeftIcon, ThreeDotIcon } from "@sparrow/library/icons";
-  import { Input } from "@sparrow/library/forms";
+  import { Input, Search } from "@sparrow/library/forms";
   import { trashIcon } from "@sparrow/library/assets";
   import { Dropdown } from "@sparrow/library/ui";
   import { GraphqlRequestOperationTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
@@ -522,24 +522,15 @@
         disabled={false}
       />
       <div class="ms-2" style="margin-top: -4px;">
-        <Input
+        <Search
           id="graphql-query-search"
-          width={"100%"}
-          height={"24px"}
-          type="search"
-          searchIconColor={"var(--icon-secondary-300 )"}
+          customWidth={"100%"}
+          variant="primary"
           bind:value={operationSearch}
           on:input={() => {
             updateOperationSearch(operationSearch);
           }}
-          defaultBorderColor="transparent"
-          hoveredBorderColor="var(--border-primary-300)"
-          focusedBorderColor={"var(--border-primary-300)"}
-          class="text-fs-12 bg-tertiary-750 border-radius-2 ellipsis fw-normal px-2"
-          placeholderColor={"var(--text-secondary-200)"}
-          style="outline:none;"
           placeholder="Search"
-          iconSize={"12px"}
         />
       </div>
     </div>

@@ -3,6 +3,7 @@
   import { onMount } from "svelte";
   import { SparrowLogo } from "@sparrow/common/images";
   import { OSDetector } from "@sparrow/common/utils";
+  import { KeyboardShortcuts } from "@sparrow/library/ui";
 
   export let isMainScreen = false;
   let platformName = "";
@@ -15,21 +16,22 @@
   onMount(async () => {
     platformName = osDetector.getOS();
 
-    const controlKey = platformName === "macos" ? "cmd" : "ctrl";
-    const altKey = platformName === "macos" ? "option" : "alt";
+    const controlKey = platformName === "macos" ? "cmd" : "Ctrl";
+    const altKey = platformName === "macos" ? "option" : "Alt";
 
-    ctrlCommands = {
-      "Send Request": `${controlKey} + Enter`,
-      "New Request": `${controlKey} + N`,
-      "Save Request": `${controlKey} + S`,
-    };
+ ctrlCommands = {
+  "Send Request": [`${controlKey}`, "Enter"],
+  "New Request": [`${controlKey}`, "N"],
+  "Save Request": [`${controlKey}`, "S"],
+};
 
-    altCommands = {
-      "Edit link": `${altKey} + L`,
-      "Add Parameter": `${altKey} + P`,
-      "Add Header": `${altKey} + H`,
-      "Edit Body": `${altKey} + B`,
-    };
+altCommands = {
+  "Edit link": [`${altKey}`, "L"],
+  "Add Parameter": [`${altKey}`, "P"],
+  "Add Header": [`${altKey}`, "H"],
+  "Edit Body": [`${altKey}`, "B"],
+};
+
   });
   let isExpandShortcuts = false;
 </script>
@@ -61,13 +63,10 @@
             {key}
             {value}
             keyClassProp={"text-secondary-200"}
-            valueClassProp={"bg-secondary-400 text-secondary-150"}
             keyStyleProp={"width: 100px;"}
-            valueStyleProp={"width: 110px"}
             type="combo"
           />
         </div>
-        <!-- <span class="me-3"></span> -->
       {/if}
     {/each}
     {#each Object.entries(altCommands) as [key, value]}
@@ -79,9 +78,7 @@
             {key}
             {value}
             keyClassProp={"text-secondary-200"}
-            valueClassProp={"bg-secondary-400 text-secondary-150"}
             keyStyleProp={"width: 100px;"}
-            valueStyleProp={"width: 110px"}
             type="combo"
           />
         </div>

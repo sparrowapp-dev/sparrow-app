@@ -321,7 +321,7 @@
             <Navigator
               tabs={teamTabs}
               currentTabId={"Workspaces"}
-              {onUpdateActiveTab}
+              onTabClick={onUpdateActiveTab}
               {activeTeamTab}
             />
           </div>

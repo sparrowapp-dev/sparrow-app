@@ -127,3 +127,4 @@ export { default as DismissRegular } from "./DismissRegular.svelte";
 
 export { default as SearchIcon } from "./SearchIcon.svelte";
 export { default as CrossIcon2 } from "./crossIcon.svelte";
+export { default as CommandKey } from "./Key.svelte";
