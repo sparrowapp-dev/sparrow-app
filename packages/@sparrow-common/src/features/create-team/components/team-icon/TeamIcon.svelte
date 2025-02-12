@@ -137,8 +137,9 @@
     fileValue={teamForm.file.value}
     fileSize={teamForm.file.value.size}
     fileSizeError={teamForm.file.showFileSizeError}
-    fileSizeErrorMessage={ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
+    fileSizeErrorMessage={ICON_CONFIG.SIZE_EXCEED_ERROR_MESSAGE}
     fileTypeError={teamForm.file.showFileTypeError}
+    fileTypeErrorMessage={ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
     fileTypes={ICON_CONFIG.FILE_TYPES}
     {maxFileSizeText}
     {iconComponent}
