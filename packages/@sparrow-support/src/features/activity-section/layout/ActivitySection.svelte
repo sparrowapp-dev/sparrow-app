@@ -32,6 +32,7 @@
   import { SparrowLogo } from "@sparrow/common/images";
   import { Upvote } from "../../../components";
   import { Search } from "@sparrow/library/forms";
+  import { Avatar } from "@sparrow/library/ui";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
@@ -485,13 +486,7 @@
                       on:mouseenter={() => (isHovering = comment.id)}
                       on:mouseleave={() => (isHovering = null)}
                     >
-                      <IconFallback
-                        character={comment.author.name.charAt(0)}
-                        width="34px"
-                        height="32px"
-                        backgroundColor="#1C1D2B"
-                        borderColor="#45494D"
-                      />
+                      <Avatar type="letter" size="large" letter={comment?.author?.name?.charAt(0)} bgColor="var(--text-secondary-600)" />
                       <div class="comment-content">
                         <div
                           class="mt-1"

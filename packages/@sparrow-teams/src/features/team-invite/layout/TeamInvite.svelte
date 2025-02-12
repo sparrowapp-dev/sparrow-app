@@ -7,6 +7,7 @@
     createDynamicComponents,
     validateEmail,
   } from "@sparrow/common/utils";
+  import { Avatar } from "@sparrow/library/ui";
 
   import { TeamRole, WorkspaceRole } from "@sparrow/common/enums/team.enum";
   import { Button, IconFallback } from "@sparrow/library/ui";
@@ -358,15 +359,17 @@
   <div class="d-flex align-items-center description ellipsis gap-2">
     <div class="d-flex align-items-center" style="width: 36px;">
       {#if teamLogo?.size}
-        <img
-          class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
-          style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-          src={base64ToURL(teamLogo)}
-          alt=""
-        />
+         <Avatar
+          type={"image"}
+          size={"large"}
+          image={base64ToURL(teamLogo)}/>
       {:else}
         <span class="">
-          <IconFallback character={teamName[0]} />
+           <Avatar
+            type={"letter"}
+            size={"large"}
+            letter={teamName.charAt(0)}
+             bgColor={"var(--bg-tertiary-800)"}/>
         </span>
       {/if}
     </div>
