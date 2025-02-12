@@ -95,8 +95,8 @@
 </script>
 
 <button
-  class="tab border-0 ps-3 py-0 pe-3 w-100 bg-blackColor d-flex"
-  style="cursor: default;"
+  class="tab border-0 ps-0 py-0 pe-3 w-100 d-flex"
+  style="cursor: default; background-color:var(--bg-ds-surface-700)"
   on:drop|preventDefault={(event) => {
     onDropEvent(event);
   }}
@@ -132,7 +132,7 @@
       class=" d-inline-block tab-scroller p-0 border-0 bg-transparent"
       bind:offsetWidth={scrollerWidth}
       id="tab-scroller"
-      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 75px); "
+      style="overflow-x: auto; position:relative;  white-space: nowrap; max-width: calc(100% - 75px); "
     >
       {#if tabList}
         {#each tabList as tab, index (tab.tabId)}
@@ -150,7 +150,7 @@
     </button>
     {#if scrolable}
       <div
-        class="d-inline-block my-auto ps-1 position-relative"
+        class="d-inline-block my-auto position-relative"
         style="height:24px;"
       >
         <button
@@ -169,10 +169,14 @@
         </button>
       </div>
     {/if}
+
     <div
       class="d-flex ps-1 align-items-center justify-content-center my-auto"
       style="height: 24px; "
     >
+      {#if tabList.length <= 0}
+        <span style="color: var(--text-ds-neutral-300);"> New Request </span>
+      {/if}
       <Tooltip
         title={"New"}
         placement={"bottom-center"}
@@ -182,8 +186,8 @@
         <button
           on:click={onNewTabRequested}
           role="button"
-          class="d-flex layout my-auto relative top-2 align-items-center border-radius-2 p-0 justify-content-center border-0 py-auto"
-          style="height:24px; width:24px; background-color: transparent;"
+          class="d-flex layout my-auto relative top-2 align-items-center border-radius-2 p-0 justify-content-center py-auto"
+          style="height:24px; width:24px; background-color: transparent; border:0px;  "
         >
           <PlusIcon
             height={"22px"}

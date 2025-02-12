@@ -78,18 +78,26 @@
   on:dragstart={() => {
     onDragStart(index);
   }}
-  class="tab-container d-inline-block position-relative pt-1 individual-tab"
-  style="width: {tabWidth}px; height:36px; padding-left:2.5px; justify-content:center; margin-left:{index ===
+  class="tab-container {tab.isActive
+    ? 'active'
+    : ''} d-inline-block pt-1 individual-tab"
+  style="width: {tabWidth}px; height:36px;  padding-left:2.5px; justify-content:center; margin-left:{index ===
   0
     ? '4px'
     : ''}"
   on:mousedown={handleMouseDown}
 >
+  {#if !tab.isActive}
+    <div
+      class="position-absolute"
+      style="height: 28px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 3px; right: 0;"
+    />
+  {/if}
   <div
     class="tab-item w-100 d-flex justify-content-between px-2 border-upper-radius h-100 align-items-center"
     style="margin-left: -1px;  background-color: {tab.isActive
       ? 'var(--bg-ds-surface-900)'
-      : 'transparent'}; border-top : {tab.isActive
+      : ''}; border-top : {tab.isActive
       ? '2px solid var(--bg-ds-primary-400)'
       : ''};  "
   >
@@ -198,12 +206,6 @@
     >
       <CrossIcon2 height={"16px"} width={"16px"} />
     </button>
-    {#if !tab.isActive}
-      <div
-        class="position-absolute"
-        style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
-      />
-    {/if}
   </div></button
 >
 
@@ -219,8 +221,106 @@
     outline: none;
     border-radius: 4px;
     border: 2px solid var(--bg-ds-primary-300);
+    background-color: var(--bg-ds-surface-700);
   }
 
+  .tab-container {
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 18px;
+    position: relative; /* Add this to establish positioning context */
+  }
+
+  .tab-item:hover {
+    background-color: var(--bg-ds-surface-300);
+  }
+
+  .tab-item:active {
+    background-color: var(--bg-ds-surface-500) !important;
+  }
+
+  .tab-container {
+    background-color: var(--bg-ds-surface-700);
+    border: 0px;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 18px;
+    position: relative;
+  }
+
+  .tab-container:hover:before {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: transparent;
+    left: -11px;
+    border-bottom-right-radius: 8px;
+    box-shadow: 8px 0 0 0 var(--bg-ds-surface-300);
+    top: 24px;
+    z-index: 0; /* Add this to ensure it appears above other elements */
+  }
+
+  .tab-container.active::before {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: transparent;
+    left: -11px;
+    border-bottom-right-radius: 8px;
+    box-shadow: 8px 0 0 0 var(--bg-ds-surface-900);
+    top: 24px;
+    z-index: 1; /* Add this to ensure it appears above other elements */
+  }
+
+  .tab-container.active::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: transparent;
+    right: -6px;
+    border-bottom-left-radius: 8px;
+    box-shadow: -8px 0 0 0 var(--bg-ds-surface-900);
+    top: 18px; /* Match the top value with ::before */
+    z-index: 1; /* Add this to ensure it appears above other elements */
+  }
+
+  .tab-container:hover::after {
+    content: "";
+    position: absolute; /* This was missing */
+    width: 12px;
+    height: 12px;
+    background-color: transparent;
+    right: -11px;
+    border-bottom-left-radius: 8px;
+    box-shadow: -8px 0 0 0 var(--bg-ds-surface-300);
+    top: 24px;
+    z-index: 1;
+  }
+  .tab-container:active::after {
+    content: "";
+    position: absolute; /* This was missing */
+    width: 12px;
+    height: 12px;
+    background-color: transparent;
+    right: -11px;
+    border-bottom-left-radius: 8px;
+    box-shadow: -8px 0 0 0 var(--bg-ds-surface-500);
+    top: 24px;
+  }
+  .tab-container.active::after {
+    content: "";
+    position: absolute; /* This was missing */
+    width: 12px;
+    height: 12px;
+    background-color: transparent;
+    right: -11px;
+    border-bottom-left-radius: 8px;
+    box-shadow: -8px 0 0 0 var(--bg-ds-surface-900);
+    top: 24px;
+  }
   .border-upper-radius {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
