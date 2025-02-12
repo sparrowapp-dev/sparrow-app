@@ -70,18 +70,21 @@
     on:blur={() => (focused = false)}
   >
     <div
-      class="d-flex align-items-center justify-content-center bg-circle bg-circle-{buttonSize}"
+      class="d-flex align-items-center justify-content-center"
       style={`gap:4px; border: ${borderColor}; ${
         labelText
           ? buttonSize === "medium"
-            ? `width:auto; max-width: 264px; border-radius: 4px; padding: 4px 8px 4px 4px; height:${buttonSize !== "medium" ? "28px" : "36px"}`
-            : `width:auto; max-width: 218px; border-radius: 4px; padding: 2px 8px 2px 4px; height:${buttonSize !== "medium" ? "28px" : "36px"}`
-          : `border-radius: 50%; padding: 0; height:${buttonSize !== "medium" ? "24px" : "28px"} width: auto; background-color: ${bgCircleColor};`
+            ? `width:auto; max-width: 264px; border-radius: 4px; padding: 4px 8px 4px 4px; height:36px;}`
+            : `width:auto; max-width: 218px; border-radius: 4px; padding: 2px 8px 2px 4px; height:28px;}`
+          : `border-radius: 50%; padding: 0; height:${buttonSize !== "medium" ? "24px" : "28px"}; width: ${buttonSize !== "medium" ? "24px" : "28px"}; background-color: ${bgCircleColor};`
       }`}
     >
       <span
         class="circle-internal d-flex align-items-center justify-content-center"
-        style={`background-color: ${labelText !== "" ? bgCircleColor : "transparent"}; border-radius: ${labelText !== "" ? "50%" : ""}; height: ${labelText !== "" ? (buttonSize === "medium" ? "28px" : buttonSize === "small" ? "24px" : "") : ""}; width: ${labelText !== "" ? (buttonSize === "medium" ? "28px" : buttonSize === "small" ? "24px" : "") : ""};`}
+        style={`background-color: ${labelText !== "" ? bgCircleColor : "transparent"}; 
+           border-radius: ${labelText !== "" ? "50%" : ""}; 
+           height: ${labelText !== "" ? (buttonSize === "medium" ? "28px" : "24px") : ""}; 
+           width: ${labelText !== "" ? (buttonSize === "medium" ? "28px" : "24px") : ""};`}
       >
         <SelectIcon
           height={buttonSize === "medium" ? 16 : 12}
@@ -111,17 +114,6 @@
       background-color 0.2s ease-in-out,
       border 0.2s ease-in-out;
   }
-
-  .bg-circle-small {
-    width: 24px;
-    height: 24px;
-  }
-
-  .bg-circle-medium {
-    width: 28px;
-    height: 28px;
-  }
-
   button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
