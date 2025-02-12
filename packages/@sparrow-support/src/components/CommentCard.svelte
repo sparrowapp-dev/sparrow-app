@@ -8,6 +8,7 @@
   import { Attachment } from "@sparrow/support/components";
   import { ImageModal } from "@sparrow/library/ui";
   import { notifications ,Avatar} from "@sparrow/library/ui";
+  import { Tag } from "@sparrow/library/ui";
 
   /**
    * @description - The current comment being added or modified by the user.
@@ -191,7 +192,8 @@
     }
 
     commentValue = "";
-    uploadReplyAttachment.file.value = [];
+    uploa
+    dReplyAttachment.file.value = [];
 
     await reloadComments();
     isReplying = false;
@@ -210,22 +212,18 @@
     <div class="comment-author text-fs-14 mt-1">
       {comment.author.name || ""}
       {#if comment.value === "" && comment.author?.isAdmin === true}
-        <span
+          <span
           class="text-fs-14"
           style="marign-start: 4px; color: var(--text-secondary-150); font-weight: 400;"
         >
           has marked this post as
-          <span
-            class="mb-0 ms-2 px-2"
-            style="border:0.2px solid {getColor(comment?.status)
-              .fontColor}; color: {getColor(comment?.status)
-              .fontColor};   border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
-          >
-            {comment?.status
-              ? comment?.status.charAt(0).toUpperCase() +
+          <Tag
+           type={comment?.status}
+            text={comment?.status
+              ? comment?.status.charAt(0) +
                 comment?.status.slice(1)
               : ""}
-          </span>
+            /> 
         </span>
       {/if}
     </div>
