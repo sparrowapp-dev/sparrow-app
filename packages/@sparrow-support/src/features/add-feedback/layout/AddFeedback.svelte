@@ -98,7 +98,7 @@
   $: hoveredBorderColor = "transparent";
 
   $: focusedBorderColor = "transparent";
-  $: typedBorderColor = "transparent";
+  $: typingBorderColor = "transparent";
 </script>
 
 <div class=" w-100">
@@ -211,7 +211,7 @@
           {defaultBorderColor}
           {hoveredBorderColor}
           {focusedBorderColor}
-          {typedBorderColor}
+          {typingBorderColor}
           width={"100%"}
           type="text"
           isEditIconRequired={false}

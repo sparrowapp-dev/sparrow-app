@@ -9,21 +9,18 @@
   export let height = "36px";
   export let width = "auto";
   export let disabled = false;
+  export let inputType: "small" | "medium" = "medium";
+
   let componentClass = "";
   export { componentClass as class };
   let componentStyle = "";
   export { componentStyle as style };
   export let value = "";
-  export let defaultBorderColor: string =
-    "1px solid var(--border-ds-neutral-300)";
-  export let typingBorderColor: string =
-    "1px solid var(--border-ds-primary-300)";
-  export let hoveredBorderColor: string =
-    "1px solid var(--border-ds-neutral-300)";
-  export let focusedBorderColor: string =
-    "2px solid var(--border-ds-primary-300)";
-  export let typedBorderColor: string =
-    "1px solid var(--border-ds-neutral-300)";
+  export let defaultBorderColor = "";
+  export let typingBorderColor = "1px solid var(--border-ds-primary-300)";
+  export let hoveredBorderColor = "1px solid var(--border-ds-neutral-300)";
+  export let focusedBorderColor = "2px solid var(--border-ds-primary-300)";
+  export let typedBorderColor = "1px solid var(--border-ds-neutral-300)";
   export let defaultBgColor = "var(--bg-ds-surface-400)";
   export let disabledBgColor = "var(--bg-ds-surface-600)";
   export let isEditIconRequired = true;
@@ -36,13 +33,9 @@
   let isFocused = false;
   let isTyping = false;
   let hasInput = false;
-
   const dispatch = createEventDispatcher();
 
-  // Watch input value changes and track if the user has entered text
   $: hasInput = value.length > 0;
-
-  // Reactive border logic (error only shown after user types and clears input)
   $: borderColor = isTyping
     ? typingBorderColor
     : isFocused
@@ -52,13 +45,12 @@
         : hasInput
           ? typedBorderColor
           : defaultBorderColor;
-
   $: backgroundColor = disabled ? disabledBgColor : defaultBgColor;
 
   const onKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(id) as HTMLInputElement;
-      inputField.blur();
+      inputField?.blur();
     }
   };
 
@@ -84,24 +76,27 @@
       {id}
       {type}
       {maxlength}
-      {value}
       {placeholder}
       class="w-100 {componentClass}"
-      style={` 
-        ${componentStyle}
-        height: ${height};
-        width: ${width};
-        ${type === "search" ? `padding-left:${height} !important;` : ""}
-        ${type === "text" && isEditIconRequired && isHovered ? "padding-right:35px !important;" : ""}
+      style={`
+        ${componentStyle};
+        height: ${inputType === "small" ? "28px" : height};
+        width: ${inputType === "small" ? "398px" : width};
+        gap: ${inputType === "small" ? "var(--gap-4)" : "inherit"};
+        border-radius: 4px;
+        border-width: ${inputType === "small" ? "1px" : "inherit"};
+        padding: ${inputType === "small" ? "2px 8px" : "inherit"};
+        ${type === "search" ? `padding-left: ${height} !important;` : ""}
+        ${type === "text" && isEditIconRequired && isHovered ? "padding-right: 35px !important;" : ""}
         border: ${borderColor};
         --placeholder-color: ${placeholderColor};
         background-color: ${backgroundColor};
       `}
       {disabled}
       on:focus={() => (isFocused = true)}
-      on:blur={() => {
+      on:blur={(event) => {
         isFocused = false;
-        dispatch("blur", event?.target?.value);
+        dispatch("blur", event.target?.value);
       }}
       on:input={handleInputChange}
       on:keydown={onKeyPress}
@@ -122,7 +117,7 @@
     {/if}
     {#if type === "text" && isHovered && isEditIconRequired && !disabled}
       <span class="position-absolute" style="top:2px; right: 10px">
-        <PencilIcon height={iconSize} width={iconSize} color={"white"} />
+        <PencilIcon height={iconSize} width={iconSize} color="white" />
       </span>
     {/if}
   </div>
