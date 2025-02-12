@@ -4,7 +4,6 @@
   import { ThreeDotIcon, AngleLeftIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
 
-
   interface BreadcrumbItem {
     id: string;
     name: string;
@@ -31,14 +30,21 @@
       {#if sectionIndex === 0}
         {#each section as item, itemIndex}
           <div style="display: flex; align-items: center;">
-            <Button
-              type="teritiary-regular"
+            <Tooltip 
               title={item.name}
+              placement="top-center"
               size="small"
-              textStyleProp="font-size:12px; color:var(--text-ds-neutral-100); font-weight:500; line-height:18px; max-width:120px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"
-              onClick={() => handleNavigation(item.id)}
-              buttonstartIcon={Icon}
-            />
+              show={true}
+            >
+              <Button
+                type="teritiary-regular"
+                title={item.name}
+                size="small"
+                textStyleProp="font-size:12px; color:{itemIndex === section.length - 1 ? 'var(--text-ds-neutral-500)' : 'var(--text-ds-neutral-100)'}; font-weight:500; line-height:18px; max-width:120px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"
+                onClick={() => handleNavigation(item.id)}
+                buttonstartIcon={Icon}
+              />
+            </Tooltip>
             {#if !(breadcrumbs.length === 1 && itemIndex === section.length - 1)}
               <span class="mx-1">
                 <AngleLeftIcon width="4.5px" height="8px" />
@@ -98,14 +104,21 @@
 
       {#if sectionIndex === 2}
         {#each section as item, itemIndex}
-          <Button
-            type="teritiary-regular"
+          <Tooltip 
             title={item.name}
+            placement="top-center"
             size="small"
-            textStyleProp="font-size:12px; color:{itemIndex === section.length - 1 ? 'var(--text-ds-neutral-500)' : 'var(--text-ds-neutral-100)'}; font-weight:500; line-height:18px;"
-            onClick={() => handleNavigation(item.id)}
-            buttonstartIcon={Icon}
-          />
+            show={true}
+          >
+            <Button
+              type="teritiary-regular"
+              title={item.name}
+              size="small"
+              textStyleProp="font-size:12px; color:{itemIndex === section.length - 1 ? 'var(--text-ds-neutral-500)' : 'var(--text-ds-neutral-100)'}; font-weight:500; line-height:18px;"
+              onClick={() => handleNavigation(item.id)}
+              buttonstartIcon={Icon}
+            />
+          </Tooltip>
           {#if itemIndex !== section.length - 1}
             <span class="mx-1" style="display: flex; align-items:center">
               <AngleLeftIcon width="4.5px" height="8px" />

@@ -62,7 +62,7 @@
           querySchema = JSON.parse(schema)?.Mutation?.items || [];
         }
         queryBuilder = calculateQueryBuilder(querySchema, operationSearch);
-        breadcrum = calculateBreadcrumPath(queryBuilder, 3);
+        breadcrum = calculateBreadcrumPath(queryBuilder, 5);
         // debugger;
       }
     } catch (e) {
