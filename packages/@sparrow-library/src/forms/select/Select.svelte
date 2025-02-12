@@ -430,7 +430,7 @@
       on:mouseup={() => {
         isClicked = false;
       }}
-      class="custom-class-btn select-btn
+      class="select-btn
       {selectBackgroundClass} 
       {extractHeaderHighlight(headerHighlight, isOpen, isHover, isClicked)}   
       {selectBorderClass} 
