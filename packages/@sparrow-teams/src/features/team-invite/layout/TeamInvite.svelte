@@ -10,7 +10,7 @@
   import { Avatar } from "@sparrow/library/ui";
 
   import { TeamRole, WorkspaceRole } from "@sparrow/common/enums/team.enum";
-  import { Button, IconFallback } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
 
   export let onInviteClick;
   export let workspaces;

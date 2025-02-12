@@ -21,7 +21,7 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   import { FeedbackStatusType, FeedbackType } from "../../../types/feedback";
-  import { IconFallback, ImageModal, Tag } from "@sparrow/library/ui";
+  import { ImageModal, Tag } from "@sparrow/library/ui";
 
   import { ActivityStatusType, ActivityType } from "../../../types/activity";
   import { Spinner } from "@sparrow/library/ui";
