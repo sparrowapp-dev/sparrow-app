@@ -15,16 +15,19 @@
   {disabled}
   class="{type} {isError
     ? 'error-chip'
-    : ''} d-inline-flex gap-3 align-items-center justify-content-center chip"
+    : ''} d-inline-flex gap-1 align-items-center justify-content-center chip"
 >
   {#if type === "input"}
-    <span class="">
-      <svelte:component this={startIcon} color={"var(--bg-ds-neutral-50)"} />
-    </span>
+    {#if startIcon}
+      <span class="">
+        <svelte:component this={startIcon} color={"var(--bg-ds-neutral-50)"} />
+      </span>
+    {/if}
 
     <span class="text-fs-12">
       {label}
     </span>
+
     <span
       class="cross-icon d-flex align-items-center justify-content-center"
       on:click={() => {
@@ -38,17 +41,21 @@
       />
     </span>
   {:else if type === "filter"}
-    <span class="">
-      <svelte:component this={startIcon} color={"var(--bg-ds-neutral-50)"} />
-    </span>
+    {#if startIcon}
+      <span class="">
+        <svelte:component this={startIcon} color={"var(--bg-ds-neutral-50)"} />
+      </span>
+    {/if}
 
     <span class="text-fs-12">
       {label}
     </span>
 
-    <span class="">
-      <svelte:component this={endIcon} color={"var(--bg-ds-neutral-50)"} />
-    </span>
+    {#if endIcon}
+      <span class="">
+        <svelte:component this={endIcon} color={"var(--bg-ds-neutral-50)"} />
+      </span>
+    {/if}
   {:else if type === "avatar-input"}
     <span class="avatar-icon d-flex align-items-center justify-content-center">
       <BoxIcon height={"24px"} width={"24px"} />
@@ -74,21 +81,21 @@
 
 <style>
   .chip {
-    all: unset;
     background-color: var(--bg-ds-surface-200);
     overflow: hidden;
-    padding: 2px;
+    padding: 2px 2px 2px 8px;
     height: 28px;
+    border: none;
   }
   .error-chip {
-    border: 2px solid var(--border-ds-danger-300) !important;
+    outline: 2px solid var(--border-ds-danger-300) !important;
     color: var(--text-ds-danger-300) !important;
   }
   .chip:hover {
     background-color: var(--bg-ds-surface-100);
   }
   .chip:focus {
-    border: 2px solid var(--border-ds-primary-300);
+    outline: 1px solid var(--border-ds-primary-300);
   }
   .chip:active {
     background-color: var(--bg-ds-surface-500);

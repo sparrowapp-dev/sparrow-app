@@ -211,16 +211,18 @@
   >
     <div id="input-email">
       {#each globalEmails as email}
-        <Chip
-          label={email.id}
-          type={"input"}
-          isError={email.isError}
-          onClose={() => {
-            removeElement(email.id);
-          }}
-          disabled={false}
-          id={email.id}
-        />
+        <span class="m-0 p-0 d-flex me-2">
+          <Chip
+            label={email.id}
+            type={"input"}
+            isError={email.isError}
+            onClose={() => {
+              removeElement(email.id);
+            }}
+            disabled={false}
+            id={email.id}
+          />
+        </span>
       {/each}
     </div>
     <input
@@ -401,7 +403,7 @@
     flex-wrap: wrap;
     background-color: var(--bg-tertiary-300);
     border: 1px solid;
-    padding: 3px 8px 3px 8px;
+    padding: 4px 8px;
     border: 1px solid var(--border-color);
     max-height: 100px;
     overflow-y: auto;
