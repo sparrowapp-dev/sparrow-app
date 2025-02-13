@@ -295,6 +295,7 @@
         description: "View Resources within a workspace.",
       },
     ]}
+    maxHeaderWidth={"100%"}
     onclick={handleDropdown}
     position={"absolute"}
     menuItem={"v2"}
