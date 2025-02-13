@@ -2,7 +2,6 @@
   // ---- Icon
   import { CrossIcon, CrossIcon as Crossicon } from "@sparrow/library/assets";
   import { BookIcon } from "@sparrow/library/assets";
-  import { CrossIcon2 } from "@sparrow/library/icons";
   // ----
 
   // ---- SVG
@@ -15,6 +14,7 @@
 
   // ---- Interface
   import {
+    CrossIcon2,
     CrossIconV2,
     GraphIcon,
     SocketIcon,
@@ -35,7 +35,7 @@
   /**
    * Width of each tab
    */
-  export let tabWidth: number = 176;
+  export let tabWidth: number;
   /**
    * Index of particular tab
    */
@@ -59,10 +59,11 @@
   /**
    * Callback function for drop over at a index
    * @param index - Index of Tab
+   *
+   *
    */
-  export let onDropOver: (index: number) => void;
-
   export let loader;
+  export let onDropOver: (index: number) => void;
 
   function handleMouseDown(event: MouseEvent) {
     if (event.button === 1) {
@@ -70,7 +71,6 @@
       onTabClosed(tab.id, tab);
     }
   }
-  let hideBadge = false;
 </script>
 
 <button
@@ -81,32 +81,24 @@
   on:dragstart={() => {
     onDragStart(index);
   }}
-  class="badge-container tab-container {tab.isActive
-    ? 'active'
-    : ''} d-inline-block pt-1 individual-tab"
-  style="width: {tabWidth}px; height:36px;  padding-left:1px; justify-content:center; margin-left:{index ===
-  0
+  tabindex="0"
+  class=" badge-container tab-container d-inline-block p-0 position-relative pt-1 individual-tab"
+  style="width: {tabWidth}px; height:35px; margin-left:{index === 0
     ? '4px'
     : ''}"
   on:mousedown={handleMouseDown}
 >
-  {#if !tab.isActive}
-    <div
-      class="position-absolute divider"
-      style="height: 28px; width: 1px; background-color: var(--bg-ds-surface-100); top: 3px; left: 1px;"
-    />
-  {/if}
-
   <div
+    tabindex="-1"
     class="tab-item w-100 d-flex justify-content-between px-2 border-upper-radius h-100 align-items-center"
-    style="margin-left: -1px;  background-color: {tab.isActive
-      ? 'var(--bg-ds-surface-900)'
-      : ''}; border-top : {tab.isActive
-      ? '2px solid var(--bg-ds-primary-400)'
-      : ''};  "
+    style=" margin-left: -1px;  background-color: {tab.isActive
+      ? 'var(--bg-secondary-850) !important'
+      : 'transparent'};  border-top : {tab.isActive
+      ? '2px solid var(--bg-primary-400)'
+      : '2px solid transparent'};"
   >
     <button
-      tabindex={1}
+      tabindex="-1"
       on:click={() => {
         if (!tab.isActive) {
           onTabSelected(tab.id);
@@ -114,15 +106,15 @@
       }}
       class="position-relative p-0 border-0 ellipsis"
       style="width: 100%;
-        text-align: left; font-weight:500;  background-color:transparent;"
+        text-align: left; font-weight:700; background-color:transparent;"
     >
       {#if loader}
-        <Spinner size={`16px`} />
+        <Spinner size={"16px"} />
       {:else if tab.type === TabTypeEnum.REQUEST}
         <span class="text-{getMethodStyle(tab?.property?.request?.method)}">
           <span
             class={!tab.isActive ? "request-icon" : ""}
-            style="font-size: 11px; height: 32px; font-weight: 500;"
+            style="font-size: 11px; height: 31px; font-weight: 500;"
             >{tab?.property?.request?.method || ""}</span
           >
         </span>
@@ -216,6 +208,12 @@
         color={"var(--bg-ds-neutral-50)"}
       />
     </button>
+    {#if !tab.isActive}
+      <div
+        class="position-absolute"
+        style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
+      />
+    {/if}
   </div></button
 >
 
@@ -223,174 +221,37 @@
   * {
     transition: all 100ms;
   }
+
   .badge-container:hover .badge {
     display: none;
   }
   .badge-container:hover .divider {
     display: none;
   }
-  .tab-container:active .badge {
-    display: none;
-  }
+
   .badge-container:focus .cross-icon-btn {
     display: none;
   }
   .badge-container:hover .cross-icon-btn {
     display: flex;
   }
-
-  .tab-container {
-    background-color: var(--bg-ds-surface-700);
-    border: 0px;
+  .cross-icon-btn {
+    display: none;
   }
-  .tab-container:focus-visible {
-    outline: none;
-    border-radius: 4px;
-    border: 2px solid var(--bg-ds-primary-300);
-    background-color: var(--bg-ds-surface-700);
-  }
-
-  .tab-container {
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 18px;
-    color: var(--bg-ds-neutral-300);
-    position: relative;
-  }
-
   .tab-item:hover {
-    background-color: var(--bg-ds-surface-300);
+    background-color: var(--bg-ds-surface-300) !important;
   }
-
   .tab-item:active {
     background-color: var(--bg-ds-surface-500) !important;
   }
-
   .tab-container {
-    background-color: var(--bg-ds-surface-700);
+    background-color: transparent;
     border: 0px;
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 18px;
-    position: relative;
-    display: inline-block;
   }
-
-  .tab-container:hover::before {
-    content: "";
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background-color: transparent;
-    left: -11px;
-    border-bottom-right-radius: 8px;
-    box-shadow: 8px 0 0 0 var(--bg-ds-surface-300);
-    top: 24px;
-    z-index: 0;
-  }
-  .tab-container:active::before {
-    content: "";
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background-color: transparent;
-    left: -11px;
-    border-bottom-right-radius: 8px;
-    box-shadow: 8px 0 0 0 var(--bg-ds-surface-500);
-    top: 24px;
-    z-index: 0;
-  }
-  .tab-container.active:active::before {
-    content: "";
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background-color: transparent;
-    left: -11px;
-    border-bottom-right-radius: 8px;
-    box-shadow: 8px 0 0 0 var(--bg-ds-surface-500);
-    top: 24px;
-    display: inline-block;
-    z-index: 1;
-  }
-  .tab-container.active::before {
-    content: "";
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background-color: transparent;
-    left: -11px;
-    border-bottom-right-radius: 8px;
-    box-shadow: 8px 0 0 0 var(--bg-ds-surface-900);
-    top: 24px;
-    display: inline-block;
-    z-index: 1;
-  }
-
-  .tab-container.active:active::after {
-    content: "";
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background-color: transparent;
-    right: -6px;
-    border-bottom-left-radius: 8px;
-    box-shadow: -8px 0 0 0 var(--bg-ds-surface-500);
-    top: 18px; /* Match the top value with ::before */
-    z-index: 1;
-  }
-  .tab-container.active::after {
-    content: "";
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background-color: transparent;
-    right: -6px;
-    border-bottom-left-radius: 8px;
-    box-shadow: -8px 0 0 0 var(--bg-ds-surface-900);
-    top: 18px; /* Match the top value with ::before */
-    z-index: 1;
-  }
-
-  .tab-container:hover::after {
-    content: "";
-    position: absolute; /* This was missing */
-    width: 12px;
-    height: 12px;
-    background-color: transparent;
-    right: -11px;
-    border-bottom-left-radius: 8px;
-    box-shadow: -8px 0 0 0 var(--bg-ds-surface-300);
-    top: 24px;
-    z-index: 1;
-  }
-  .tab-container:active::after {
-    content: "";
-    position: absolute; /* This was missing */
-    width: 12px;
-    height: 12px;
-    background-color: transparent;
-    right: -11px;
-    border-bottom-left-radius: 8px;
-    box-shadow: -8px 0 0 0 var(--bg-ds-surface-500);
-    top: 24px;
-  }
-  .tab-container.active::after {
-    content: "";
-    position: absolute; /* This was missing */
-    width: 12px;
-    height: 12px;
-    background-color: transparent;
-    right: -11px;
-    border-bottom-left-radius: 8px;
-    box-shadow: -8px 0 0 0 var(--bg-ds-surface-900);
-    top: 24px;
-  }
-  .tab-container:focus::before,
-  .tab-container:focus::after {
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-    box-shadow: none;
+  .tab-container:focus-visible {
+    border-radius: 4px;
+    outline: 2px solid var(--bg-ds-primary-300);
+    background-color: var(--bg-ds-surface-700);
   }
   .border-upper-radius {
     border-top-left-radius: 5px;
@@ -404,30 +265,27 @@
   }
 
   .request-icon {
-    font-weight: 500 !important;
+    font-weight: 400 !important;
   }
   .individual-tab:hover .request-icon {
-    /* color: inherit !important; */
+    color: inherit !important;
   }
   .request-text {
     font-weight: 500 !important;
     color: var(--text-ds-neutral-300) !important;
   }
   .individual-tab:hover .request-text {
-    color: var(--text-ds-neutral-300) !important;
+    color: var(--text-secondary-100) !important;
   }
-  .cross-icon-btn {
-    display: flex;
-  }
-  .cross-icon-btn:hover {
-    display: flex;
+
+  /* .cross-icon-btn:hover {
     background-color: var(--text-tertiary-300);
     border-radius: 2px;
-  }
+  } */
   .ellipsis {
-    color: var(--text-ds-neutral-300);
+    color: var(--text-secondary-100);
   }
   .ellipsis:hover {
-    color: var(--text-ds-neutral-300);
+    color: var(--text-secondary-100);
   }
 </style>

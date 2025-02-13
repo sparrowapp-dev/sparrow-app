@@ -96,7 +96,7 @@
 
 <button
   class="tab border-0 ps-0 py-0 pe-3 w-100 d-flex"
-  style="cursor: default; background-color:var(--bg-ds-surface-700)"
+  style="cursor: default; background-color:var(--bg-ds-surface-700); height:36px;"
   on:drop|preventDefault={(event) => {
     onDropEvent(event);
   }}
@@ -132,7 +132,7 @@
       class=" d-inline-block tab-scroller p-0 border-0 bg-transparent"
       bind:offsetWidth={scrollerWidth}
       id="tab-scroller"
-      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 75px); "
+      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 75px); height:36px"
     >
       {#if tabList}
         {#each tabList as tab, index (tab.tabId)}
