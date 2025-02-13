@@ -321,7 +321,7 @@
             <Navigator
               tabs={teamTabs}
               currentTabId={"Workspaces"}
-              {onUpdateActiveTab}
+              onTabClick={onUpdateActiveTab}
               {activeTeamTab}
             />
           </div>
@@ -367,7 +367,8 @@
                     placeholder="Search workspaces in {openTeam?.name}"
                     on:input={handleSearchInput}
                     bind:value={searchQuery}
-                    customWidth={"250px"}
+     
+                    customWidth={"450px"}
                   />
                 </div>
               </div>

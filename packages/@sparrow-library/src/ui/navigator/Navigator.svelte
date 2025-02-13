@@ -16,7 +16,24 @@
     }
   };
 
+  let allDisableState = false;
+  $: {
+    let tab1 = tabs;
+    for (let tab of tab1) {
+      if (tab.disabled) {
+        allDisableState = true;
+        break;
+      }
+    }
+  }
   onMount(() => {
+    let tab1 = tabs;
+    for (let tab of tab1) {
+      if (tab.disabled) {
+        allDisableState = true;
+        break;
+      }
+    }
     handleClick(currentTabId);
   });
 </script>
@@ -52,10 +69,12 @@
       </button>
     {/each}
   </div>
-  <div
-    class="slider"
-    style="left: {leftSliderDistance + 1}px; width:{sliderWidth - 2}px"
-  ></div>
+  {#if !allDisableState}
+    <div
+      class="slider"
+      style="left: {leftSliderDistance + 1}px; width:{sliderWidth - 2}px"
+    ></div>
+  {/if}
 </div>
 
 <style>
@@ -106,7 +125,7 @@
     line-height: 18px;
     min-height: 28px;
     border: 0px;
-    cursor: not-allowed;
+    cursor: default;
   }
 
   .icon {

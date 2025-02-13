@@ -25,7 +25,7 @@ jobs:
                 --build-arg VITE_WEB_ENABLE_MIX_PANEL=${{ vars.VITE_WEB_ENABLE_MIX_PANEL }} \
                 --build-arg VITE_WEB_MIX_PANEL_TOKEN=${{ vars.VITE_WEB_MIX_PANEL_TOKEN }} \
                 --build-arg VITE_WEB_SPARROW_SUPPORT_EMAIL=${{ vars.VITE_WEB_SPARROW_SUPPORT_EMAIL }} \
-                --build-arg VITE_WEB_AUTH_URL=${{ vars.VITE_WEB_AUTH_URL }} \
+                --build-arg VITE_WEB_AUTH_URL=${{ vars.VITE_WEB_AUTH_URL_DS }} \
                 --build-arg VITE_WEB_SPARROW_GITHUB=${{ vars.VITE_WEB_SPARROW_GITHUB }} \
                 --build-arg VITE_WEB_SPARROW_DOWNLOAD_LINK=${{ vars.VITE_WEB_SPARROW_DOWNLOAD_LINK }} \
                 --build-arg VITE_WEB_RELEASE_NOTES_API=${{ vars.VITE_WEB_RELEASE_NOTES_API }} \
