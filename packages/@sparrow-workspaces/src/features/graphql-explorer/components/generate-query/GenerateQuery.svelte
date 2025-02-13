@@ -535,11 +535,7 @@
         />
       </div>
     </div>
-    <Breadcrumbs
-      breadcrumbs={breadcrum}
-      onNavigate={navigateToBreadcrumPath}
-      icon={ThreeDotIcon}
-     />
+    <Breadcrumbs breadcrumbs={breadcrum} onNavigate={navigateToBreadcrumPath} />
   </div>
   <div class="" style="flex:1; overflow:auto;">
     <div
