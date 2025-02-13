@@ -38,13 +38,13 @@
   });
 </script>
 
-<div>
+<div tabindex={allDisableState ? -1 : 0}>
   <!-- Tabs -->
   <div class="d-flex">
     {#each tabs as tab}
       <button
         bind:this={tabElements[tab.id]}
-        tabindex="0"
+        tabindex={allDisableState ? -1 : 0}
         class={tab.disabled ? "tab-container-disabled" : "tab-container "}
         role="tab"
         on:click={() => {
@@ -72,7 +72,7 @@
   {#if !allDisableState}
     <div
       class="slider"
-      style="left: {leftSliderDistance + 1}px; width:{sliderWidth - 2}px"
+      style="left: {leftSliderDistance + 1}px; width:{sliderWidth - 1.5}px"
     ></div>
   {/if}
 </div>
@@ -104,6 +104,9 @@
     outline: none;
     border: 2px solid var(--border-ds-primary-300);
   }
+  /* .tab-container:focus-visible .slider {
+    left: calc(var(--left-distance) + 1px) !important;
+  } */
   .tab-contianer:active {
     background-color: var(--bg-ds-surface-700);
     color: var(--bg-ds-neutral-50);
