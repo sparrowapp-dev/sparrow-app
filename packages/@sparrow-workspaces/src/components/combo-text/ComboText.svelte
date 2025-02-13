@@ -2,12 +2,9 @@
   import { KeyboardShortcuts } from "@sparrow/library/ui";
 
   export let type: "combo" | "single" = "single";
-  export let comboContainerClassProp = "";
-  export let comboContainerStyleProp = "";
   export let key = "";
   export let value = "";
-  export let keyClassProp = "";
-  export let keyStyleProp = "";
+
 
    enum TextType {
     COMBO = "combo",
