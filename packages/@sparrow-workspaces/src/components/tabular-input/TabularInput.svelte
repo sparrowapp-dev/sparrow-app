@@ -7,6 +7,7 @@
   import { CodeMirrorInput } from "../";
   import { onMount } from "svelte";
   import { Tooltip } from "@sparrow/library/ui";
+  import { Checkbox } from "@sparrow/library/forms";
   import { ErrorInfoIcon, Information } from "@sparrow/library/icons";
   import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
   import LazyElement from "./LazyElement.svelte";
@@ -246,16 +247,13 @@
           : ''}"
         style="position:relative;"
       >
-        <div style="height:14px; width:14px;" class="me-3">
-          <label class="checkbox-parent">
-            <input
-              type="checkbox"
-              disabled={pairs.length === 1 || !isCheckBoxEditable}
-              bind:checked={controller}
-              on:input={handleCheckAll}
-            />
-            <span class="checkmark"></span>
-          </label>
+        <div style=" width:24px;" class="me-3">
+          <Checkbox
+            size="small"
+            disabled={pairs.length === 1 || !isCheckBoxEditable}
+            checked={controller}
+            on:input={handleCheckAll}
+          />
         </div>
 
         <div class="d-flex gap-0" style="width: calc(100% - 188px);">
@@ -275,6 +273,16 @@
         <div style="width:140px;" class="ms-3 d-flex align-items-center">
           <div class="w-100 d-flex">
             <div class="w-100 d-flex justify-content-end">
+<<<<<<< HEAD
+              <Toggle
+                bind:isActive={bulkToggle}
+                label="Bulk Edit"
+                fontSize="10px"
+                fontWeight="400"
+                onClick={handleBulkTextUpdate}
+                onChange={toggleBulkEdit}
+              />
+=======
               {#if isBulkEditRequired}
                 <Toggle
                   bind:isActive={bulkToggle}
@@ -285,6 +293,7 @@
                   onChange={toggleBulkEdit}
                 />
               {/if}
+>>>>>>> 16db21406a8c3c9b4b2d91b5941dab0cd3f044aa
             </div>
           </div>
         </div>
@@ -437,76 +446,5 @@
     padding-bottom: 3px;
     background-color: var(--bg-secondary-880);
     height: 26px;
-  }
-
-  /* The checkbox-parent */
-  .checkbox-parent {
-    display: block;
-    position: relative;
-    cursor: pointer;
-    font-size: 22px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-
-  /* Hide the browser's default checkbox */
-  .checkbox-parent input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* Create a custom checkbox */
-  .checkbox-parent .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 14px;
-    width: 14px;
-    border-radius: 3px;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* On mouse-over, add a grey background color */
-  /* .checkbox-parent:hover input ~ .checkmark {
-    background-color: #ccc;
-  } */
-
-  /* When the checkbox is checked, add a blue background */
-  .checkbox-parent input:checked ~ .checkmark {
-    border: none;
-    background-color: var(--bg-primary-300);
-  }
-
-  /* Create the checkmark/indicator (hidden when not checked) */
-  .checkbox-parent .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-  }
-
-  /* Show the checkmark when checked */
-  .checkbox-parent input:checked ~ .checkmark:after {
-    display: block;
-  }
-
-  /* Style the checkmark/indicator */
-  .checkbox-parent .checkmark:after {
-    left: 5px;
-    top: 2px;
-    width: 4px;
-    height: 8px;
-    border: solid var(--text-secondary-800);
-    border-width: 0 2px 2px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
   }
 </style>
