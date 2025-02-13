@@ -129,7 +129,7 @@
     border-radius: 4px;
     padding: 4px, 8px;
     gap: 4px;
-    background-color: var(--bg-ds-surface-900);
+    background-color: transparent;
     color: var(--text-ds-neutral-500);
     font-size: 12px;
     line-height: 18px;
