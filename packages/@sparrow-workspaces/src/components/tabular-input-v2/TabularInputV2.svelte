@@ -9,6 +9,7 @@
   import type { KeyValueChecked } from "@sparrow/common/types/workspace";
   import { partition } from "rxjs";
   import { Tooltip } from "@sparrow/library/ui";
+  import { Checkbox } from "@sparrow/library/forms";
 
   /**
    * tabular pair entries
@@ -137,19 +138,18 @@
   class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
 >
   <div class="d-flex gap-3 align-items-center w-100 pe-2" style="height: 26px;">
-    <div style="width:30px; margin-left: 0px;">
-      <label
+    <div style="width:24px; margin-left: 0px;">
+      <!-- <label
         class="container d-block position-relative"
         style={search !== "" ? "opacity:0!important ;" : null}
-      >
-        <input
-          type="checkbox"
-          disabled={pairs.length === 1 || disabled}
-          bind:checked={controller}
-          on:input={handleCheckAll}
-        />
-        <span class="checkmark"></span>
-      </label>
+      > -->
+      <Checkbox
+        disabled={pairs.length === 1 || disabled}
+        bind:checked={controller}
+        on:input={handleCheckAll}
+      />
+
+      <!-- </label> -->
     </div>
     <div
       class="d-flex pair-title bg-secondary-700 align-items-center w-100"
@@ -206,19 +206,19 @@
             <div
               class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
             >
-              <div style="width:30px;">
+              <div style="width:24px;">
                 {#if pairs.length - 1 != index}
-                  <label class="container d-block position-relative">
-                    <input
-                      type="checkbox"
-                      bind:checked={element.checked}
-                      on:input={() => {
-                        updateCheck(index);
-                      }}
-                      {disabled}
-                    />
-                    <span class="checkmark"></span>
-                  </label>
+                  <!-- <label class="container d-block position-relative">
+                    -->
+                  <Checkbox
+                    bind:checked={element.checked}
+                    on:input={() => {
+                      updateCheck(index);
+                    }}
+                    {disabled}
+                  />
+                  <!-- <span class="checkmark"></span>
+                  </label> -->
                 {/if}
               </div>
 
@@ -304,76 +304,6 @@
     border-bottom: 1px solid var(--border-secondary-500);
   }
 
-  /* The container */
-  .container {
-    padding-left: 35px;
-    margin-bottom: 12px;
-    cursor: pointer;
-    font-size: 22px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-
-  /* Hide the browser's default checkbox */
-  .container input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* Create a custom checkbox */
-  .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 14px;
-    width: 14px;
-    border-radius: 3px;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* On mouse-over, add a grey background color */
-  /* .container:hover input ~ .checkmark {
-    background-color: #ccc;
-  } */
-
-  /* When the checkbox is checked, add a blue background */
-  .container input:checked ~ .checkmark {
-    border: none;
-    background-color: var(--text-primary-300);
-  }
-
-  /* Create the checkmark/indicator (hidden when not checked) */
-  .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-  }
-
-  /* Show the checkmark when checked */
-  .container input:checked ~ .checkmark:after {
-    display: block;
-  }
-
-  /* Style the checkmark/indicator */
-  .container .checkmark:after {
-    left: 5px;
-    top: 2px;
-    width: 4px;
-    height: 8px;
-    border: solid var(--text-secondary-850);
-    border-width: 0 2px 2px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
-  }
   input[type="text"] {
     background-color: transparent;
     border: 0;

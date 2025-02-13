@@ -42,9 +42,8 @@
   class="w-100 pair-data-row px-3 d-flex align-items-center"
 >
   {#if isInView}
-    <div style="" class="me-3">
+    <div style=" width: 24px;" class="me-3">
       {#if pairs.length - 1 != index || !isInputBoxEditable}
-        <!-- checkbox should be visible to last row in readonly mode -->
         <Checkbox
           size={"small"}
           checked={element.checked}
@@ -129,79 +128,6 @@
     padding-bottom: 3px;
     height: calc(24px);
     background-color: var(--bg-secondary-700);
-  }
-
-  /* The checkbox-parent */
-  .checkbox-parent {
-    display: block;
-    position: relative;
-    padding-left: 35px;
-    margin-bottom: 12px;
-    cursor: pointer;
-    font-size: 22px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-
-  /* Hide the browser's default checkbox */
-  .checkbox-parent input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* Create a custom checkbox */
-  .checkbox-parent .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 14px;
-    width: 14px;
-    border-radius: 3px;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* On mouse-over, add a grey background color */
-  /* .checkbox-parent:hover input ~ .checkmark {
-    background-color: #ccc;
-  } */
-
-  /* When the checkbox is checked, add a blue background */
-  .checkbox-parent input:checked ~ .checkmark {
-    border: none;
-    background-color: var(--bg-primary-300);
-  }
-
-  /* Create the checkmark/indicator (hidden when not checked) */
-  .checkbox-parent .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-  }
-
-  /* Show the checkmark when checked */
-  .checkbox-parent input:checked ~ .checkmark:after {
-    display: block;
-  }
-
-  /* Style the checkmark/indicator */
-  .checkbox-parent .checkmark:after {
-    left: 5px;
-    top: 2px;
-    width: 4px;
-    height: 8px;
-    border: solid var(--text-secondary-800);
-    border-width: 0 2px 2px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
   }
 
   .skelton-parent {

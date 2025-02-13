@@ -1,7 +1,7 @@
 <script lang="ts">
   import { WithSelect } from "../../../../hoc";
   import { AngleLeftIcon, ThreeDotIcon } from "@sparrow/library/icons";
-  import { Input } from "@sparrow/library/forms";
+  import { Checkbox, Input } from "@sparrow/library/forms";
   import { trashIcon } from "@sparrow/library/assets";
   import { Dropdown } from "@sparrow/library/ui";
   import { GraphqlRequestOperationTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
@@ -699,10 +699,9 @@
                         );
                       }}
                     >
-                      <label class="checkbox-parent">
-                        <input type="checkbox" bind:checked={t.isSelected} />
-                        <span class="checkmark"></span>
-                      </label>
+                      <!-- <label class="checkbox-parent"> -->
+
+                      <Checkbox bind:checked={t.isSelected} />
                     </div>
 
                     <p
