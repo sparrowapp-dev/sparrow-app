@@ -20,3 +20,4 @@ export * from "./navigator";
 export * from "./badge";
 export * from "./keyboardShortcuts"
 export * from "./avatar"
+export * from "./chip";

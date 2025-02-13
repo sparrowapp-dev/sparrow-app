@@ -78,6 +78,7 @@
 
   export let isWebApp = false;
   export let activeTabType;
+  export let isFirstCollectionExpand = false;
 
   let collectionListDocument: CollectionDocument[];
 
@@ -340,6 +341,7 @@
                   collection={col}
                   {activeTabId}
                   {isWebApp}
+                  bind:isFirstCollectionExpand
                 />
               {/each}
             </List>

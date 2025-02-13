@@ -357,7 +357,7 @@
                     placeholder="Search workspaces in {openTeam?.name}"
                     on:input={handleSearchInput}
                     bind:value={searchQuery}
-                    customWidth={"250px"}
+                    customWidth={"450px"}
                   />
                 </div>
               </div>

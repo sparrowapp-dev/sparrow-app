@@ -108,8 +108,7 @@
       class="position-absolute d-flex align-items-center"
       style={`height: 20px; width: 20px; left: 10px; pointer-events: none; ${imgStyleProp}`}
     >
-      <svelte:component
-        this={SearchIcon}
+      <SearchIcon
         width={iconSize}
         height={iconSize}
         color={"var(--bg-ds-neutral-300)"}
