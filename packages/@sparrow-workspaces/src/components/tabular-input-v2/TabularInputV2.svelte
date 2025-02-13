@@ -139,17 +139,11 @@
 >
   <div class="d-flex gap-3 align-items-center w-100 pe-2" style="height: 26px;">
     <div style="width:24px; margin-left: 0px;">
-      <!-- <label
-        class="container d-block position-relative"
-        style={search !== "" ? "opacity:0!important ;" : null}
-      > -->
       <Checkbox
         disabled={pairs.length === 1 || disabled}
         bind:checked={controller}
         on:input={handleCheckAll}
       />
-
-      <!-- </label> -->
     </div>
     <div
       class="d-flex pair-title bg-secondary-700 align-items-center w-100"
@@ -208,8 +202,6 @@
             >
               <div style="width:24px;">
                 {#if pairs.length - 1 != index}
-                  <!-- <label class="container d-block position-relative">
-                    -->
                   <Checkbox
                     bind:checked={element.checked}
                     on:input={() => {
@@ -217,8 +209,6 @@
                     }}
                     {disabled}
                   />
-                  <!-- <span class="checkmark"></span>
-                  </label> -->
                 {/if}
               </div>
 

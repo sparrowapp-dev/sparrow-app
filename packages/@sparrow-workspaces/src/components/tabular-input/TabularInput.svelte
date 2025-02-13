@@ -247,16 +247,13 @@
           : ''}"
         style="position:relative;"
       >
-        <div style="" class="me-3">
-          <!-- <label class="checkbox-parent"> -->
+        <div style=" width:24px;" class="me-3">
           <Checkbox
             size="small"
             disabled={pairs.length === 1 || !isCheckBoxEditable}
             bind:checked={controller}
             on:input={handleCheckAll}
           />
-
-          <!-- </label> -->
         </div>
 
         <div class="d-flex gap-0" style="width: calc(100% - 188px);">

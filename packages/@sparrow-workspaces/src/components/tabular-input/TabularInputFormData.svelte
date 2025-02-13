@@ -213,14 +213,11 @@
     style="position:relative;"
   >
     <div style=" width:24px;" class="me-3">
-      <!-- <label class="checkbox-parent"> -->
       <Checkbox
         disabled={pairs.length === 1 || !isCheckBoxEditable}
         bind:checked={controller}
         on:input={handleCheckAll}
       />
-      <!-- <span class="checkmark"></span> -->
-      <!-- </label> -->
     </div>
 
     <div class="d-flex gap-0" style="width: calc(100% - 180px);">
@@ -263,7 +260,6 @@
         <div class="pair-data-row w-100 px-3 d-flex align-items-center">
           <div style=" width:24px;" class="me-3">
             {#if pairs.length - 1 != index || !isInputBoxEditable}
-              <!-- <label class="checkbox-parent"> -->
               <Checkbox
                 bind:checked={element.checked}
                 on:input={() => {
@@ -271,8 +267,6 @@
                 }}
                 disabled={!isCheckBoxEditable}
               />
-              <!-- <span class="checkmark"></span> -->
-              <!-- </label> -->
             {/if}
           </div>
 
