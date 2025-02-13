@@ -21,3 +21,4 @@ export * from "./navigator";
 export * from "./badge";
 export * from "./keyboardShortcuts";
 export * from "./breadcrumbs";
+export * from "./chip";
