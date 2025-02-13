@@ -36,6 +36,13 @@
     }
     handleClick(currentTabId);
   });
+
+  // Add reactive statement to watch currentTabId changes
+  $: {
+    if (currentTabId && Object.keys(tabElements).length > 0) {
+      handleClick(currentTabId);
+    }
+  }
 </script>
 
 <div tabindex={allDisableState ? -1 : 0}>

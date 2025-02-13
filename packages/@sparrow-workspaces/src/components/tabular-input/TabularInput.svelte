@@ -23,7 +23,7 @@
   export let onUpdateEnvironment;
   export let onToggleBulkEdit;
   export let isBulkEditActive = false;
-  export let isBulkEditRequired = false;
+  export let isBulkEditRequired = true;
   export let isBulkEditHeaderInfoRequired = false;
   export let isCheckBoxEditable = true;
   export let isTopHeaderRequired = true;
@@ -275,14 +275,16 @@
         <div style="width:140px;" class="ms-3 d-flex align-items-center">
           <div class="w-100 d-flex">
             <div class="w-100 d-flex justify-content-end">
-                 <Toggle
-          bind:isActive={bulkToggle}
-          label="Bulk Edit"
-          fontSize="10px"
-          fontWeight="400"
-          onClick={handleBulkTextUpdate}
-          onChange={toggleBulkEdit}
-         /> 
+              {#if isBulkEditRequired}
+                <Toggle
+                  bind:isActive={bulkToggle}
+                  label="Bulk Edit"
+                  fontSize="10px"
+                  fontWeight="400"
+                  onClick={handleBulkTextUpdate}
+                  onChange={toggleBulkEdit}
+                />
+              {/if}
             </div>
           </div>
         </div>
@@ -396,16 +398,16 @@
                   </div>
                 </div>
               {/if}
-            <div style="margin-right: 2px;">
-                  <Toggle
-                   bind:isActive={bulkToggle}
-                   label="Bulk Edit"
-                   fontSize="10px"
-                   fontWeight="400"
-                   onClick={handleBulkTextUpdate}
-                   onChange={toggleBulkEdit}
-            /> 
-            </div>
+              <div style="margin-right: 2px;">
+                <Toggle
+                  bind:isActive={bulkToggle}
+                  label="Bulk Edit"
+                  fontSize="10px"
+                  fontWeight="400"
+                  onClick={handleBulkTextUpdate}
+                  onChange={toggleBulkEdit}
+                />
+              </div>
             </div>
           {/if}
         </div>
