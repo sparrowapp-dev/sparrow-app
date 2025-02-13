@@ -251,7 +251,7 @@
           <Checkbox
             size="small"
             disabled={pairs.length === 1 || !isCheckBoxEditable}
-            bind:checked={controller}
+            checked={controller}
             on:input={handleCheckAll}
           />
         </div>

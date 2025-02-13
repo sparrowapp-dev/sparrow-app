@@ -582,7 +582,7 @@
                     style="width:calc(100% - 20px);"
                   >
                     <div
-                      style="height:14px; width:14px;"
+                      style=" width:24px;"
                       class="me-2"
                       on:click={(e) => {
                         e.preventDefault();
@@ -596,9 +596,7 @@
                         );
                       }}
                     >
-                      <!-- <label class="checkbox-parent"> -->
-
-                      <Checkbox bind:checked={t.isSelected} />
+                      <Checkbox checked={t.isSelected} />
                     </div>
 
                     <p

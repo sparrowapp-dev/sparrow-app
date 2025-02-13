@@ -215,7 +215,7 @@
     <div style=" width:24px;" class="me-3">
       <Checkbox
         disabled={pairs.length === 1 || !isCheckBoxEditable}
-        bind:checked={controller}
+        checked={controller}
         on:input={handleCheckAll}
       />
     </div>
@@ -261,7 +261,7 @@
           <div style=" width:24px;" class="me-3">
             {#if pairs.length - 1 != index || !isInputBoxEditable}
               <Checkbox
-                bind:checked={element.checked}
+                checked={element.checked}
                 on:input={() => {
                   updateCheck(index);
                 }}
