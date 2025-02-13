@@ -13,7 +13,7 @@
    * Constants
    */
   import { DESCRIPTION_CONFIG } from "../../constants";
-  import { NewTextArea } from "@sparrow/library/forms";
+  import { Textarea } from "@sparrow/library/forms";
   import { SvelteComponent } from "svelte";
 
   /**
@@ -43,7 +43,7 @@
   <!-- 
     -- Textarea 
   -->
-  <NewTextArea
+  <Textarea
     id={TEXTAREA_ID}
     bind:value={teamForm.description.value}
     placeholder={DESCRIPTION_CONFIG.PLACEHOLDER}

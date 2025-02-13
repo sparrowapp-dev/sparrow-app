@@ -30,10 +30,11 @@
           height={"20px"}
           class="text-fs-12 me-5 bg-secondary-600"
           style="outline:none; background-color:transparent;"
+          defaultBorderColor={"transparent"}
+          hoveredBorderColor={"1px solid var(--border-ds-neutral-300)"}
+          focusedBorderColor={"2px solid var(--border-ds-primary-300)"}
+          typedBorderColor={"transparent"}
           placeholder="Name"
-          defaultBorderColor="transparent"
-          hoveredBorderColor={"var(--border-primary-300)"}
-          focusedBorderColor={"var(--border-primary-300)"}
           isEditIconRequired={false}
         />
       </div>
@@ -42,12 +43,12 @@
     <div class=" ps-1 d-flex w-50 justify-content-between">
       <div class="d-flex align-items-center">
         {#if true}
-            <Toggle
-          bind:isActive={element.listen}
-          onChange={() => {
+          <Toggle
+            bind:isActive={element.listen}
+            onChange={() => {
               updateCheck(index);
             }}
-         /> 
+          />
         {:else}
           <div style="width: 24px;"></div>
         {/if}

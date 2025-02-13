@@ -10,7 +10,13 @@
     StatusIcon,
   } from "@sparrow/library/icons";
 
-  import { Button, IconFallback, Loader, Modal, Tag } from "@sparrow/library/ui";
+  import {
+    Button,
+    IconFallback,
+    Loader,
+    Modal,
+    Tag,
+  } from "@sparrow/library/ui";
   import { ImageModal } from "@sparrow/library/ui";
   import {
     CommentCard,
@@ -334,6 +340,11 @@
   const handleCommentInputValue = (e: InputEvent) => {
     commentValue = e.target.value;
   };
+  $: defaultBorderColor = "transparent";
+  $: hoveredBorderColor = "transparent";
+
+  $: focusedBorderColor = "transparent";
+  $: typingBorderColor = "transparent";
 </script>
 
 <div class="d-flex flex-row" style="margin-top: 51px; ">
@@ -363,10 +374,7 @@
           style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
         >
           <span style="font-size: 18px; font-weight: 500;">{post?.title}</span>
-          <Tag
-            type={getColor(post?.status)}
-            text={post?.status || ""}
-            />
+          <Tag type={getColor(post?.status)} text={post?.status || ""} />
         </div>
 
         <div class="d-flex flex-row">
@@ -648,11 +656,12 @@
           type="text"
           isEditIconRequired={false}
           bind:value={feedbackSubject}
-          defaultBorderColor="transparent"
-          hoveredBorderColor="transparent"
-          focusedBorderColor={"transparent"}
           class="text-fs-20 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;"
+          {defaultBorderColor}
+          {hoveredBorderColor}
+          {focusedBorderColor}
+          {typingBorderColor}
           disabled={false}
           placeholder="Subject"
           maxlength={200}
@@ -669,15 +678,16 @@
           id="feedback-description"
           height={"90px"}
           bind:value={feedbackDescription}
-          defaultBorderColor="transparent"
-          hoveredBorderColor="transparent"
-          focusedBorderColor={"transparent"}
           class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;
-       "
+     "
           disabled={false}
           placeholder="Add short description"
           maxlength={200}
+          defaultBorderColor="transparent"
+          hoveredBorderColor="transparent"
+          focusedBorderColor="transparent"
+          typedBorderColor="transparent"
         />
       </div>
 

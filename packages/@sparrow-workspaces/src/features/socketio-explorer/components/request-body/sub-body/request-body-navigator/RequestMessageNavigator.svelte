@@ -49,14 +49,14 @@
     bind:value={requestEventName}
     id="collection-list-search"
     width={"100%"}
-    height={"24px"}
-    type="teritiary"
+    height={"28px"}
+    type="text"
     on:input={() => {
       onUpdateRequestEventName(requestEventName);
     }}
-    defaultBorderColor="transparent"
-    hoveredBorderColor="var(--border-primary-300)"
-    focusedBorderColor={"var(--border-primary-300)"}
+    defaultBorderColor={"transparent"}
+    hoveredBorderColor={"1px solid var(--border-ds-neutral-300)"}
+    focusedBorderColor={"2px solid var(--border-ds-primary-300)"}
     class="text-fs-12 bg-tertiary-400 border-radius-2 ellipsis fw-normal px-2"
     style="outline:none;"
     placeholder="Event name"

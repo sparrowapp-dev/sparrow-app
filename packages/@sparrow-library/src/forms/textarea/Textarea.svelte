@@ -1,110 +1,134 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
+
   /**
-   * placeholder - dummy text
+   * Placeholder text
    */
   export let placeholder = "placeholder";
   export let placeholderColor = "gray";
+
   /**
-   * height
+   * Height & Width
    */
-  export let height = "30px";
-  /**
-   * width
-   */
+  export let height = "96px";
   export let width = "auto";
 
   /**
-   * identifies input is disabled or not
+   * Identifies if input is disabled
    */
   export let disabled = false;
+
   /**
-   * input class
+   * Input class
    */
-  let componentClass = "";
+  export let componentClass = "";
   export { componentClass as class };
 
   /**
-   * input style
+   * Input style
    */
-  let componentStyle = "";
+  export let componentStyle = "";
   export { componentStyle as style };
+
   /**
-   * input value
+   * Input value
    */
   export let value = "";
 
   /**
-   * border color
+   * Border colors
    */
-  export let defaultBorderColor = "transparent";
-  export let hoveredBorderColor = "red";
-  export let focusedBorderColor = "green";
+  export let defaultBorderColor: string = "";
+  export let typingBorderColor: string =
+    "1px solid var(--border-ds-primary-300)";
+  export let hoveredBorderColor: string =
+    "1px solid var(--border-ds-neutral-300)";
+  export let focusedBorderColor: string =
+    "2px solid var(--border-ds-primary-300)";
+  export let typedBorderColor: string =
+    "1px solid var(--border-ds-neutral-300)";
 
   /**
-   * max length that textarea holds
+   * Background colors
+   */
+  export let defaultBgColor = "var(--bg-ds-surface-400)";
+  export let disabledBgColor = "var(--bg-ds-surface-600)";
+
+  /**
+   * Maximum length for textarea
    */
   export let maxlength = 500;
 
   /**
-   * unique textarea id
+   * Unique textarea ID
    */
   export let id = "";
 
   /**
-   * input states
+   * Input states
    */
   let isHovered = false;
   let isFocused = false;
+  let isTyping = false;
+  let hasInput = false;
+  $: hasInput = value.length > 0;
+
+  // Reactive border logic
+  $: borderColor = isTyping
+    ? typingBorderColor
+    : isFocused
+      ? focusedBorderColor
+      : isHovered
+        ? hoveredBorderColor
+        : hasInput
+          ? typedBorderColor
+          : defaultBorderColor;
+
+  // Background color logic
+  $: backgroundColor = disabled ? disabledBgColor : defaultBgColor;
+
   const dispatch = createEventDispatcher();
 
-  const extractBorderHighlight = (_isHovered: boolean, _isFocused: boolean) => {
-    if (_isFocused) {
-      return focusedBorderColor;
-    } else if (_isHovered) {
-      if (disabled) return defaultBorderColor;
-      return hoveredBorderColor;
-    } else {
-      if (disabled) return defaultBorderColor;
-      return defaultBorderColor;
+  const handleInputChange = (event: InputEvent) => {
+    if (typedBorderColor !== "transparent") {
+      isTyping = true;
+      value = event.target.value;
+      dispatch("input", event.target.value);
+
+      setTimeout(() => {
+        if (value === event.target.value) {
+          isTyping = false;
+        }
+      }, 3000);
     }
   };
 </script>
 
 <div
   class="position-relative"
-  style="height:{height}; width: {width}; !important word-wrap: break-word;"
+  style="height:{height}; width: {width}; word-wrap: break-word;"
 >
   <textarea
-    on:mouseenter={() => {
-      isHovered = true;
-    }}
-    on:mouseleave={() => {
-      isHovered = false;
-    }}
-    on:focus={() => {
-      isFocused = true;
-    }}
-    on:blur={() => {
+    bind:value
+    {id}
+    {placeholder}
+    class="w-100 {componentClass}"
+    style="height: 100%; {componentStyle}
+             word-wrap: break-word;
+             overflow-wrap: break-word;
+             border: {borderColor};
+             --placeholder-color: {placeholderColor};
+             background-color: {backgroundColor};"
+    {disabled}
+    {maxlength}
+    on:mouseenter={() => (isHovered = true)}
+    on:mouseleave={() => (isHovered = false)}
+    on:focus={() => (isFocused = true)}
+    on:blur={(event) => {
       isFocused = false;
       dispatch("blur", event?.target?.value);
     }}
-    {value}
-    on:input={(event) => {
-      value = event?.target?.value;
-      dispatch("input", event?.target?.value);
-    }}
-    class="w-100 {componentClass}"
-    {placeholder}
-    {id}
-    style=" {componentStyle} height: 100%;
-       word-wrap: break-word;
-      overflow-wrap: break-word;  border-color:{extractBorderHighlight(
-      isHovered,
-      isFocused,
-    )}; --placeholder-color: {placeholderColor};"
-    {disabled}
-    {maxlength}
+    on:input={handleInputChange}
   />
 </div>
 
@@ -113,6 +137,8 @@
     scrollbar-width: none;
     caret-color: var(--border-primary-300);
     border: 1px solid transparent;
+    min-width: 240px;
+    max-width: 540px;
   }
   textarea::placeholder {
     color: var(--placeholder-color);

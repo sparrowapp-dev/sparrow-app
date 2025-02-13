@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { NewTextArea, Select } from "@sparrow/library/forms";
+  import { Textarea, Select } from "@sparrow/library/forms";
   import {
     AttachmentIcon,
     CategoryIcon,
@@ -11,7 +11,7 @@
   import { Tooltip } from "@sparrow/library/ui";
   import { Drop } from "@sparrow/support/components";
   import { FeedbackType } from "@sparrow/support/types";
-  import { NewInput } from "@sparrow/library/forms";
+  import { Input } from "@sparrow/library/forms";
 
   export let onAddFeedback;
   export let onInputFeedback;
@@ -195,7 +195,7 @@
           : 'mb-3'}"
         style="height: 137px; border-radius: 4px; color:#676A80; "
       >
-        <NewInput
+        <Input
           class="text-fs-20 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;"
           disabled={false}
@@ -218,7 +218,7 @@
           bind:value={feedbackSubject}
         />
         <hr class="m-0 ms-2" style="padding-bottom:5px;" />
-        <NewTextArea
+        <Textarea
           on:input={() => {
             if (feedbackDescription.length > 0) {
               isDescriptionEmpty = false;
@@ -234,7 +234,7 @@
           typedBorderColor="transparent"
           class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;
-           "
+         "
           disabled={false}
           placeholder="Add short description"
           maxlength={200}

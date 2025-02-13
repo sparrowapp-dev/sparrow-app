@@ -131,14 +131,17 @@
           on:blur={(e) => {
             handleCurrentEnvironmentNameChange(environmentName, "blur");
           }}
-          defaultBorderColor="transparent"
-          hoveredBorderColor={"var(--border-primary-300)"}
-          focusedBorderColor={"var(--border-primary-300)"}
-          class="text-fs-18 bg-transparent ellipsis fw-normal px-2"
+          defaultBorderColor={"transparent"}
+          hoveredBorderColor={"1px solid var(--border-ds-neutral-300)"}
+          focusedBorderColor={"2px solid var(--border-ds-primary-300)"}
+          typedBorderColor={"transparent"}
+          class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;"
           disabled={$currentEnvironment?.property?.environment?.type ==
             "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
           placeholder=""
+          inputType="medium"
+          isEditIconRequired={true}
         />
         <div class={`d-flex env-btn-container`}>
           <div class="position-relative">

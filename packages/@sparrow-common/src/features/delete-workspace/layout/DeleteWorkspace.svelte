@@ -5,7 +5,7 @@
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   // ---- library
   import { Button, IconFallback } from "@sparrow/library/ui";
-  import { NewInput } from "@sparrow/library/forms";
+  import { Input } from "@sparrow/library/forms";
   export let isDeleteWorkspaceModalOpen = false;
   export let workspace: WorkspaceDocument;
   export let openTeam: TeamDocument;
@@ -45,7 +45,7 @@
   <!-- 
       -- Input 
     -->
-  <NewInput
+  <Input
     bind:value={inputName}
     height={"36px"}
     id={inputId}
