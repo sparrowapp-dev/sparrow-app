@@ -9,7 +9,7 @@
     name: string;
   }
   export let breadcrumbs: BreadcrumbItem[][] = [];
-  export let Icon;
+  export let icon;
   export let onNavigate: (id: string) => void = () => {};
 
   let isBreadcrumDropdownVisible = false;
@@ -42,7 +42,7 @@
                 size="small"
                 textStyleProp="font-size:12px; color:{itemIndex === section.length - 1 ? 'var(--text-ds-neutral-500)' : 'var(--text-ds-neutral-100)'}; font-weight:500; line-height:18px; max-width:120px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"
                 onClick={() => handleNavigation(item.id)}
-                buttonstartIcon={Icon}
+                buttonstartIcon={icon}
               />
             </Tooltip>
             {#if !(breadcrumbs.length === 1 && itemIndex === section.length - 1)}
@@ -68,7 +68,7 @@
               name: item.name,
               color: "var(--text-secondary-100)",
               onclick: () => handleNavigation(item.id),
-              icon: Icon,
+              icon: icon,
             }))}
           >
             <button
@@ -116,7 +116,7 @@
               size="small"
               textStyleProp="font-size:12px; color:{itemIndex === section.length - 1 ? 'var(--text-ds-neutral-500)' : 'var(--text-ds-neutral-100)'}; font-weight:500; line-height:18px;"
               onClick={() => handleNavigation(item.id)}
-              buttonstartIcon={Icon}
+              buttonstartIcon={icon}
             />
           </Tooltip>
           {#if itemIndex !== section.length - 1}

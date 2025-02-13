@@ -538,6 +538,7 @@
     <Breadcrumbs
       breadcrumbs={breadcrum}
       onNavigate={navigateToBreadcrumPath}
+      icon={ThreeDotIcon}
      />
   </div>
   <div class="" style="flex:1; overflow:auto;">
