@@ -10,8 +10,6 @@
   // ----
 
   // ---- SVG
-  import { collectionNodesIcon as collectionAsset } from "@sparrow/library/assets";
-  import { folderTabIcon as folderTab } from "@sparrow/library/assets";
   import { folderIcon3 } from "@sparrow/library/assets";
   // ---- helper functions
   import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
@@ -149,7 +147,7 @@
           <SocketIcon
             height={"12px"}
             width={"16px"}
-            color={"var(--icon-primary-300)"}
+            color={"var(--bg-ds-primary-400)"}
           />
         </span>
       {:else if tab.type === TabTypeEnum.ENVIRONMENT}
@@ -192,28 +190,33 @@
         {tab.name}
       </span>
     </button>
-    {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
-      <div class="badge-container badge">
-        {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
-          <Badge type="dot" variant="danger" size="medium" />
-        {/if}
-      </div>
-    {/if}
+    <div style="align-items:center; justify-content:center;">
+      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
+        <div
+          class="badge-container badge"
+          style="width:18px ; height:18px ; align-items:center; justify-content:center;"
+        >
+          {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
+            <Badge type="dot" variant="danger" size="medium" />
+          {/if}
+        </div>
+      {/if}
 
-    <button
-      class="cross-icon-btn p-0 align-items-center justify-content-center {// toggle cross icon for inactive tabs
-      !tab.isActive ? 'inactive-close-btn' : ''} btn"
-      on:click={() => {
-        onTabClosed(tab.id, tab);
-      }}
-      style="overflow:hidden; height: 18px; width:18px;"
-    >
-      <CrossIcon2
-        height={"16px"}
-        width={"16px"}
-        color={"var(--bg-ds-neutral-50)"}
-      />
-    </button>
+      <button
+        class="cross-icon-btn p-0 align-items-center justify-content-center {// toggle cross icon for inactive tabs
+        !tab.isActive ? 'inactive-close-btn' : ''} btn"
+        on:click={() => {
+          onTabClosed(tab.id, tab);
+        }}
+        style="overflow:hidden; height: 18px; width:18px;"
+      >
+        <CrossIcon2
+          height={"16px"}
+          width={"16px"}
+          color={"var(--bg-ds-neutral-50)"}
+        />
+      </button>
+    </div>
     {#if !tab.isActive}
       <div
         class="position-absolute"
@@ -227,7 +230,9 @@
   * {
     transition: all 100ms;
   }
-
+  .badge {
+    display: flex;
+  }
   .badge-container:hover .badge {
     display: none;
   }

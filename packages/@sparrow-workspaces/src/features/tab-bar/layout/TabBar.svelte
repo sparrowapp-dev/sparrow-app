@@ -96,7 +96,7 @@
 
 <button
   class="tab border-0 ps-0 py-0 pe-3 w-100 d-flex"
-  style="cursor: default; background-color:var(--bg-ds-surface-700); height:36px;"
+  style="cursor: default; background-color:var(--bg-ds-surface-700); height:36px; padding-left:2px; padding-right:2px;"
   on:drop|preventDefault={(event) => {
     onDropEvent(event);
   }}
@@ -172,10 +172,14 @@
 
     <div
       class="d-flex ps-1 align-items-center justify-content-center my-auto"
-      style="height: 24px; gap:8px  "
+      style="height: 24px; gap:8px;  padding:4px 8px; "
     >
       {#if tabList.length <= 0}
-        <span style="color: var(--text-ds-neutral-300);"> New Request </span>
+        <span
+          style="color: var(--text-ds-neutral-300); font-size:12px; line-height:18px; font-weight:500;"
+        >
+          New Request
+        </span>
       {/if}
       <Tooltip
         title={"New"}
