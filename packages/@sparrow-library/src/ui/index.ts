@@ -11,7 +11,6 @@ export * from "./modal";
 export * from "./popover";
 export * from "./carousel";
 export * from "./table";
-export * from "./icon-fallback";
 export * from "./toast";
 export * from "./image-modal";
 export * from "./skeleton";
@@ -20,4 +19,5 @@ export * from "./tags";
 export * from "./navigator";
 export * from "./badge";
 export * from "./keyboardShortcuts"
+export * from "./avatar"
 export * from "./chip";
