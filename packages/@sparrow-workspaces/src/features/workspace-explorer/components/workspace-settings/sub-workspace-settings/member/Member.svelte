@@ -3,6 +3,7 @@
   import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
+  import {Avatar} from "@sparrow/library/ui";
 
   export let onRemoveUserFromWorkspace;
 
@@ -189,14 +190,13 @@
   class="member-data-container d-flex align-items-center mb-2 w-100"
   style="height: 46px;"
 >
-  <div
-    class="rounded-5 me-2 border border-defaultColor d-flex justify-content-center align-items-center"
-    style="height: 32px; width: 32px;"
-  >
-    <p class="mb-0">
-      {user?.name[0]}
-    </p>
-  </div>
+ <div class="me-2">
+      <Avatar
+    type="letter"
+    size="medium"
+    letter={user?.name[0]}
+    bgColor="var(--bg-secondary-600)"/>
+    </div>
   <div
     class="d-flex flex-column"
     style="width:calc(100% - 130px); font-size:12px; "

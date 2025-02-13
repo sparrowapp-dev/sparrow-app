@@ -7,10 +7,10 @@
   import { CodeMirrorInput } from "../";
   import { onMount } from "svelte";
   import { Tooltip } from "@sparrow/library/ui";
-  import { Switch } from "@sparrow/library/forms";
   import { ErrorInfoIcon, Information } from "@sparrow/library/icons";
   import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
   import LazyElement from "./LazyElement.svelte";
+  import { Toggle } from "@sparrow/library/ui";
 
   // exports
   export let keyValue: KeyValuePair[];
@@ -275,25 +275,14 @@
         <div style="width:140px;" class="ms-3 d-flex align-items-center">
           <div class="w-100 d-flex">
             <div class="w-100 d-flex justify-content-end">
-              <button
-                class="bg-transparent border-0 d-flex {!isBulkEditRequired
-                  ? 'invisible'
-                  : ''}"
-                style=""
-              >
-                <p
-                  class="text-nowrap text-primary-300 mb-0 me-0"
-                  style="font-size: 10px; font-weight:400;"
-                >
-                  Bulk Edit
-                </p>
-
-                <Switch
-                  bind:checked={bulkToggle}
-                  onClick={handleBulkTextUpdate}
-                  onChange={toggleBulkEdit}
-                />
-              </button>
+                 <Toggle
+          bind:isActive={bulkToggle}
+          label="Bulk Edit"
+          fontSize="10px"
+          fontWeight="400"
+          onClick={handleBulkTextUpdate}
+          onChange={toggleBulkEdit}
+         /> 
             </div>
           </div>
         </div>
@@ -342,7 +331,7 @@
         <!-- Bulk Edit Heading -->
         <div
           class="px-3 d-flex align-items-center"
-          style="justify-content: space-between; padding-top:3px; padding-bottom:3px; background-color: var(--bg-secondary-880)"
+          style="justify-content: space-between; background-color: var(--bg-secondary-880)"
         >
           <!-- Bulk Edit Text  -->
           <div class="d-flex align-items-center">
@@ -407,21 +396,16 @@
                   </div>
                 </div>
               {/if}
-
-              <button class="bg-transparent border-0 d-flex align-items-center">
-                <p
-                  class="text-nowrap text-primary-300 mb-0"
-                  style="font-size: 10px; font-weight:400; margin-top:3px;"
-                >
-                  Bulk Edit
-                </p>
-
-                <Switch
-                  bind:checked={bulkToggle}
-                  onChange={toggleBulkEdit}
-                  onClick={handleBulkTextUpdate}
-                />
-              </button>
+            <div style="margin-right: 2px;">
+                  <Toggle
+                   bind:isActive={bulkToggle}
+                   label="Bulk Edit"
+                   fontSize="10px"
+                   fontWeight="400"
+                   onClick={handleBulkTextUpdate}
+                   onChange={toggleBulkEdit}
+            /> 
+            </div>
             </div>
           {/if}
         </div>

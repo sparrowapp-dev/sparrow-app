@@ -16,18 +16,35 @@
     }
   };
 
+  let allDisableState = false;
+  $: {
+    let tab1 = tabs;
+    for (let tab of tab1) {
+      if (tab.disabled) {
+        allDisableState = true;
+        break;
+      }
+    }
+  }
   onMount(() => {
+    let tab1 = tabs;
+    for (let tab of tab1) {
+      if (tab.disabled) {
+        allDisableState = true;
+        break;
+      }
+    }
     handleClick(currentTabId);
   });
 </script>
 
-<div>
+<div tabindex={allDisableState ? -1 : 0}>
   <!-- Tabs -->
   <div class="d-flex">
     {#each tabs as tab}
       <button
         bind:this={tabElements[tab.id]}
-        tabindex="0"
+        tabindex={allDisableState ? -1 : 0}
         class={tab.disabled ? "tab-container-disabled" : "tab-container "}
         role="tab"
         on:click={() => {
@@ -52,10 +69,12 @@
       </button>
     {/each}
   </div>
-  <div
-    class="slider"
-    style="left: {leftSliderDistance + 1}px; width:{sliderWidth - 2}px"
-  ></div>
+  {#if !allDisableState}
+    <div
+      class="slider"
+      style="left: {leftSliderDistance + 1}px; width:{sliderWidth - 1.5}px"
+    ></div>
+  {/if}
 </div>
 
 <style>
@@ -69,7 +88,7 @@
     border-radius: 4px;
     padding: 4px, 8px;
     gap: 4px;
-    background-color: var(--bg-ds-surface-900);
+    background-color: transparent;
     color: var(--text-ds-neutral-100);
     font-size: 12px;
     line-height: 18px;
@@ -85,6 +104,9 @@
     outline: none;
     border: 2px solid var(--border-ds-primary-300);
   }
+  /* .tab-container:focus-visible .slider {
+    left: calc(var(--left-distance) + 1px) !important;
+  } */
   .tab-contianer:active {
     background-color: var(--bg-ds-surface-700);
     color: var(--bg-ds-neutral-50);
@@ -106,7 +128,7 @@
     line-height: 18px;
     min-height: 28px;
     border: 0px;
-    cursor: not-allowed;
+    cursor: default;
   }
 
   .icon {

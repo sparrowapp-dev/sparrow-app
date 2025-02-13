@@ -123,9 +123,11 @@ export { default as AiSparkleIconV2 } from "./AiSparkleV2.svelte";
 
 export { default as AiSparkleIconV3 } from "./AiSparkleV3.svelte";
 
-export {default as DismissRegular} from "./DismissRegular.svelte";
+export { default as DismissRegular } from "./DismissRegular.svelte";
 
-export {default as SearchIcon} from "./SearchIcon.svelte";
-export {default as CrossIcon2} from "./crossIcon.svelte";
+export { default as SearchIcon } from "./SearchIcon.svelte";
+export { default as CrossIcon2 } from "./crossIcon.svelte";
+export { default as CommandKey } from "./Key.svelte";
+export { default as PersonIcon } from "./Person.svelte";
 
 export {default as FolderIcon3} from "./FolderIcon.svelte"; 

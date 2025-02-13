@@ -45,13 +45,13 @@
       imgStyleProp = "height:20px; width:20px;";
       searchTextProp =
         "font-weight: 400; font-size: 14px; line-height: 20.02px;";
-      searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 36px; min-height: 36px; max-height: 36px; min-width: 340px;  border-radius: 6px;`;
+      searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 36px; min-height: 36px; max-height: 36px;   border-radius: 6px;`;
       break;
     default:
       iconSize = "12px";
       imgStyleProp = "height:20px; width:20px;";
       searchTextProp = "font-weight: 400; font-size: 12px; line-height: 18px;";
-      searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 28px; min-height: 28px; max-height: 28px; min-width: 198px;  gap: 8px; border-radius: 4px;`;
+      searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "auto"}; height: 28px; min-height: 28px; max-height: 28px;   gap: 8px; border-radius: 4px;`;
       break;
   }
 
@@ -108,8 +108,7 @@
       class="position-absolute d-flex align-items-center"
       style={`height: 20px; width: 20px; left: 10px; pointer-events: none; ${imgStyleProp}`}
     >
-      <svelte:component
-        this={SearchIcon}
+      <SearchIcon
         width={iconSize}
         height={iconSize}
         color={"var(--bg-ds-neutral-300)"}

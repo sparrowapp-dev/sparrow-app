@@ -10,7 +10,7 @@
     StatusIcon,
   } from "@sparrow/library/icons";
 
-  import { Button, IconFallback, Loader, Modal } from "@sparrow/library/ui";
+  import { Button, Avatar, Loader, Modal, Tag } from "@sparrow/library/ui";
   import { ImageModal } from "@sparrow/library/ui";
   import {
     CommentCard,
@@ -363,16 +363,10 @@
           style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
         >
           <span style="font-size: 18px; font-weight: 500;">{post?.title}</span>
-          <span
-            class="px-2"
-            style="border:0.2px solid {getColor(post?.status)
-              .fontColor}; color: {getColor(post?.status)
-              .fontColor}; padding-bottom: 14px; border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
-          >
-            {post?.status
-              ? post?.status.charAt(0).toUpperCase() + post?.status.slice(1)
-              : ""}
-          </span>
+          <Tag
+            type={getColor(post?.status)}
+            text={post?.status || ""}
+            />
         </div>
 
         <div class="d-flex flex-row">
@@ -380,13 +374,11 @@
             style="display: flex; flex-direction: column; gap: 1px; min-height:80px; width:calc(100% - 37px);"
           >
             <div style="display: flex; align-items: center; gap: 12px;">
-              <IconFallback
-                character={post?.author?.name?.charAt(0)}
-                width="34px"
-                height="32px"
-                backgroundColor="var(--bg-tertiary-750)"
-                borderColor="var(--border-secondary-300)"
-              />
+              <Avatar
+                type={"letter"}
+                size={"large"}
+                letter={post?.author?.name?.charAt(0)}
+                bgColor={"var(--text-secondary-600)"}/>
               <div style="font-size: 14px; font-weight: 500;">
                 {post?.author?.name}
               </div>

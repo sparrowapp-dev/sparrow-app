@@ -89,4 +89,6 @@
   };
 </script>
 
-<Navigator {tabs} {onTabClick} currentTabId={requestNavigation} />
+<div style="position: relative;">
+  <Navigator {tabs} {onTabClick} currentTabId={requestNavigation} />
+</div>
