@@ -1,7 +1,9 @@
-<script>
-  import {searchIcon} from "@sparrow/common/images";
+<script lang="ts">
+  import { searchIcon } from "@sparrow/common/images";
 
   export let searchQuery = "";
+  export let type: "Basic" | "Custom" = "Basic";
+  export let customText = "";
 </script>
 
 <div class="container">
@@ -9,7 +11,11 @@
     <img src={searchIcon} alt="" class="width:24px, height:24px" />
   </div>
   <div class="text-container">
-    <p>Nothing found for "{searchQuery}"</p>
+    {#if type === "Basic"}
+      <p>Nothing found for "{searchQuery}"</p>
+    {:else}
+      <p>{customText}</p>
+    {/if}
   </div>
 </div>
 

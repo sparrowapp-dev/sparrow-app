@@ -3,15 +3,21 @@
   export let searchQuery = "";
 
   export let handleSearch = () => {};
-  import { keyCommand, SearchIcon } from "@sparrow/common/images";
+  import { SearchIcon } from "@sparrow/common/images";
+  import { KeyboardShortcuts } from "@sparrow/library/ui";
+  import { onMount } from "svelte";
+  export let searchBarRef;
   let hideKEY = false;
   $: hideKEY = searchQuery.trim().length > 0;
+  onMount(() => {
+    searchBarRef.focus();
+  });
 </script>
 
 <div class="search-bar">
   <div class="search-input-wrapper">
     <div class="icon-wrapper">
-      <SearchIcon color="var(--search-icon-color)"/>
+      <SearchIcon color="var(--search-icon-color)" />
     </div>
     <div class="input-wrapper">
       <label for="searchInput" class="visually-hidden">Search</label>
@@ -24,16 +30,12 @@
         placeholder="Search Sparrow"
         aria-label="Search"
         autocomplete="off"
+        bind:this={searchBarRef}
       />
     </div>
   </div>
   {#if !hideKEY}
-    <div class="keyboard-shortcut">
-      <div class="shortcut-key">
-        <img src={keyCommand} alt="" class="shortcut-icon" />
-      </div>
-      <span class="key">F</span>
-    </div>
+    <KeyboardShortcuts keys={["cmd", "F"]} />
   {/if}
 </div>
 
@@ -48,11 +50,11 @@
     justify-content: space-between;
     padding: 10px 8px;
     border: 1px solid var(--bg-ds-surface-100);
-    --search-icon-color:var(--text-ds-neutral-300)
+    --search-icon-color: var(--text-ds-neutral-300);
   }
 
-   .search-bar:hover{
-     --search-icon-color:var(--text-ds-neutral-200);
+  .search-bar:hover {
+    --search-icon-color: var(--text-ds-neutral-200);
   }
 
   .search-input-wrapper {
@@ -94,11 +96,11 @@
     width: 100%;
     caret-color: var(--text-ds-primary-300);
   }
-  .search-input::placeholder{
-    color:var(--text-ds-neutral-500);
+  .search-input::placeholder {
+    color: var(--text-ds-neutral-500);
     font-size: 14px;
     font-weight: 400;
-    font:Inter, sans-serif;
+    font: Inter, sans-serif;
     line-height: 20px;
   }
   .shortcut-icon {
