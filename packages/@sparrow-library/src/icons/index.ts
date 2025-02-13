@@ -130,3 +130,4 @@ export { default as CrossIcon2 } from "./crossIcon.svelte";
 export { default as CommandKey } from "./Key.svelte";
 export { default as PersonIcon } from "./Person.svelte";
 
+export {default as FolderIcon3} from "./FolderIcon.svelte"; 
