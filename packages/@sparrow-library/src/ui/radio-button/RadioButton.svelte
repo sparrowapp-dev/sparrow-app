@@ -1,11 +1,16 @@
 <script>
   import { SelectIcon } from "./icons";
 
-  export let buttonSize = "medium";
   export let selected = false;
-  export let disabled = false;
-  export let handleClick = () => {};
+  export let inputText = "";
+  export let id = "";
+  export let name = "";
+  export let value = "";
+  export let group;
   export let labelText = "";
+  export let handleChange;
+  export let buttonSize = "medium";
+  export let disabled = false;
 
   let hover = false;
   let pressed = false;
@@ -25,7 +30,9 @@
   let focusedBorderCircleColor = "2px solid var(--border-ds-primary-300)";
   let disabledBorderCircleColor = "2px solid var(--border-ds-neutral-400)";
 
-  // Computed colors
+  // Use group value for selection state
+  $: selected = group === value;
+
   $: unSelectedColor = disabled
     ? disabledUnselectedColor
     : pressed || focused
@@ -38,7 +45,7 @@
     ? disabledSelectedColor
     : pressed || focused
       ? pressedSelectedColor
-      : selected
+      : hover
         ? hoverSelectedColor
         : defaultSelectedColor;
 
@@ -55,65 +62,81 @@
     : focused
       ? focusedBorderCircleColor
       : "none";
+
+  function handleClick() {
+    if (!disabled) {
+      group = value;
+      if (handleChange) {
+        handleChange({ target: { value } }); // Ensure correct event structure
+      }
+    }
+  }
 </script>
 
-<div class="d-flex justify-content-center align-items-center mx-1">
-  <button
-    class="border-0 bg-transparent"
+<div class="mx-1">
+  <input
+    bind:group
+    type="radio"
+    {id}
+    {name}
+    {value}
+    on:change={handleChange}
+    class="hidden"
     {disabled}
-    on:click|stopPropagation={handleClick}
+  />
+  <button
+    on:click={handleClick}
+    {disabled}
+    type="button"
+    on:focus={() => (focused = true)}
+    on:blur={() => (focused = false)}
     on:mouseenter={() => (hover = true)}
     on:mouseleave={() => (hover = false)}
     on:mousedown={() => (pressed = true)}
     on:mouseup={() => (pressed = false)}
-    on:focus={() => (focused = true)}
-    on:blur={() => (focused = false)}
+    style="background-color:transparent; border:none;"
   >
     <div
       class="d-flex align-items-center justify-content-center"
       style={`gap:4px; border: ${borderColor}; ${
         labelText
           ? buttonSize === "medium"
-            ? `width:auto; max-width: 264px; border-radius: 4px; padding: 4px 8px 4px 4px; height:36px;}`
-            : `width:auto; max-width: 218px; border-radius: 4px; padding: 2px 8px 2px 4px; height:28px;}`
+            ? `width:auto; max-width: 264px; border-radius: 4px; padding: 4px 8px 4px 4px; height:36px;`
+            : `width:auto; max-width: 218px; border-radius: 4px; padding: 2px 8px 2px 4px; height:28px;`
           : `border-radius: 50%; padding: 0; height:${buttonSize !== "medium" ? "24px" : "28px"}; width: ${buttonSize !== "medium" ? "24px" : "28px"}; background-color: ${bgCircleColor};`
       }`}
     >
       <span
         class="circle-internal d-flex align-items-center justify-content-center"
         style={`background-color: ${labelText !== "" ? bgCircleColor : "transparent"}; 
-           border-radius: ${labelText !== "" ? "50%" : ""}; 
-           height: ${labelText !== "" ? (buttonSize === "medium" ? "28px" : "24px") : ""}; 
-           width: ${labelText !== "" ? (buttonSize === "medium" ? "28px" : "24px") : ""};`}
+         border-radius: ${labelText !== "" ? "50%" : ""}; 
+         height: ${labelText !== "" ? (buttonSize === "medium" ? "28px" : "24px") : ""}; 
+         width: ${labelText !== "" ? (buttonSize === "medium" ? "28px" : "24px") : ""};`}
       >
         <SelectIcon
+          {selected}
           height={buttonSize === "medium" ? 16 : 12}
           width={buttonSize === "medium" ? 16 : 12}
-          {selected}
           {unSelectedColor}
           {selectedColor}
         />
       </span>
-      {#if labelText}
-        <div class="label-container-{buttonSize}">
-          <span
-            class="label-text-{buttonSize}"
-            style="color: var(--border-ds-neutral-50);">{labelText}</span
-          >
-        </div>
+      {#if inputText !== ""}
+        <span class={`label-text-${buttonSize}`}>{inputText}</span>
+      {/if}
+
+      {#if labelText !== ""}
+        <label for={id} class={`label-text-${buttonSize}`}>{labelText}</label>
       {/if}
     </div>
   </button>
 </div>
 
 <style>
-  .bg-circle {
-    border-radius: 100px;
-    padding: 4px;
-    transition:
-      background-color 0.2s ease-in-out,
-      border 0.2s ease-in-out;
+  .hidden {
+    display: none;
   }
+
   button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -128,7 +151,8 @@
   }
 
   .label-text-medium {
-    font-size: 14px;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
     font-weight: 500;
     line-height: 18px;
     max-width: 180px;

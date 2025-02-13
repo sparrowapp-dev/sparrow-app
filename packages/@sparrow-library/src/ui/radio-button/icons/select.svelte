@@ -1,11 +1,10 @@
 <script lang="ts">
-  export let width: number = 16,
-    height: number = 16,
-    classProp: string = "",
-    selectedColor = "#6894F9",
-    unSelectedColor = "#B6B7B9",
-    color: string = "#3670F7",
-    selected: boolean = false;
+  export let width: number = 16;
+  export let height: number = 16;
+  export let classProp: string = "";
+  export let selectedColor = "#6894F9";
+  export let unSelectedColor = "#B6B7B9";
+  export let selected: boolean = false;
 </script>
 
 {#if selected}
@@ -40,5 +39,6 @@
 <style>
   .select-icon {
     padding: 3px;
+    cursor: pointer;
   }
 </style>

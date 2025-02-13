@@ -255,7 +255,7 @@
       <RadioButton
         buttonSize="medium"
         selected={currentWorkspace?.environmentId === env.id}
-        handleClick={handleSelectEnvironment}
+        handleChange={handleSelectEnvironment}
       />
       {#if isRenaming}
         <input
