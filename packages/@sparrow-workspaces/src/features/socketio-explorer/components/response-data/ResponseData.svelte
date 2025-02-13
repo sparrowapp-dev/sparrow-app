@@ -208,8 +208,10 @@
       <div class="w-100" style="margin-right:60px;">
         <Search
           id="websocket-list-search"
-          variant="primary"
+
+          customWidth={"100%"}
           size="large"
+          variant="primary"
           bind:value={searchData}
           on:input={() => {
             onSearchMessage(searchData);

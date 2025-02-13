@@ -42,12 +42,12 @@
     <div class=" ps-1 d-flex w-50 justify-content-between">
       <div class="d-flex align-items-center">
         {#if true}
-            <Toggle
-          bind:isActive={element.listen}
-          onChange={() => {
+          <Toggle
+            isActive={element.listen}
+            onChange={() => {
               updateCheck(index);
             }}
-         /> 
+          />
         {:else}
           <div style="width: 24px;"></div>
         {/if}

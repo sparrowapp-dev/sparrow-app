@@ -23,6 +23,7 @@
    */
   export let userRole;
   export let isWebApp = false;
+  export let isFirstCollectionExpand = false;
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
   import {
@@ -189,6 +190,12 @@
     //   "isActiveSyncEnabled",
     // );
   });
+
+  $: {
+    if (isFirstCollectionExpand) {
+      visibility = true;
+    }
+  }
 
   let prevCurrentBranch = "";
   let prevBranches = "";
