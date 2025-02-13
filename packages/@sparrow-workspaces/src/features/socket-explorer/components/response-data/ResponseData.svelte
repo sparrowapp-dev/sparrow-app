@@ -163,6 +163,7 @@
       <div class="w-100" style="margin-right:60px;">
         <Search
           id="websocket-list-search"
+
           customWidth={"100%"}
           variant="primary"
           size="large"
