@@ -69,6 +69,8 @@
   export let loader;
   export let onDropOver: (index: number) => void;
 
+  export let listLength;
+
   function handleMouseDown(event: MouseEvent) {
     if (event.button === 1) {
       // Check if the middle button is pressed (button code 1)
@@ -217,9 +219,9 @@
         />
       </button>
     </div>
-    {#if !tab.isActive}
+    {#if !tab.isActive && listLength - 1 !== index}
       <div
-        class="position-absolute"
+        class="edgeLine position-absolute"
         style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
       />
     {/if}
@@ -237,6 +239,9 @@
     display: none;
   }
   .badge-container:hover .divider {
+    display: none;
+  }
+  .badge-container:hover .edgeLine {
     display: none;
   }
 
@@ -290,8 +295,8 @@
   }
 
   .cross-icon-btn:hover {
-    background-color: var(--text-tertiary-300);
-    border-radius: 2px;
+    /* background-color: var(--text-tertiary-300); */
+    /* border-radius: 2px; */
   }
   .ellipsis {
     color: var(--text-secondary-100);
