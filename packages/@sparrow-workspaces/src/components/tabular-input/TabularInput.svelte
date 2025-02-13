@@ -23,7 +23,7 @@
   export let onUpdateEnvironment;
   export let onToggleBulkEdit;
   export let isBulkEditActive = false;
-  export let isBulkEditRequired = true;
+  export let isBulkEditRequired = false;
   export let isBulkEditHeaderInfoRequired = false;
   export let isCheckBoxEditable = true;
   export let isTopHeaderRequired = true;
