@@ -24,7 +24,7 @@
   } from "@sparrow/library/icons";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import { type Tab } from "@sparrow/common/types/workspace/tab";
-  import { Badge } from "@sparrow/library/ui";
+  import { Badge, Spinner } from "@sparrow/library/ui";
   // ----
 
   // ------ Props ------
@@ -61,6 +61,8 @@
    * @param index - Index of Tab
    */
   export let onDropOver: (index: number) => void;
+
+  export let loader;
 
   function handleMouseDown(event: MouseEvent) {
     if (event.button === 1) {
@@ -114,7 +116,9 @@
       style="width: 100%;
         text-align: left; font-weight:500;  background-color:transparent;"
     >
-      {#if tab.type === TabTypeEnum.REQUEST}
+      {#if loader}
+        <Spinner size={`16px`} />
+      {:else if tab.type === TabTypeEnum.REQUEST}
         <span class="text-{getMethodStyle(tab?.property?.request?.method)}">
           <span
             class={!tab.isActive ? "request-icon" : ""}
