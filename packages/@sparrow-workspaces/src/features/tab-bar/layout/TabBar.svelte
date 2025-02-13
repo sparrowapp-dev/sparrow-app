@@ -140,6 +140,7 @@
             {tab}
             {onTabSelected}
             {onTabClosed}
+            listLength={tabList.length}
             {index}
             {tabWidth}
             {onDragStart}
@@ -194,8 +195,8 @@
           style="height:26px; width:28px; background-color: transparent; border:0px; border-left:1px solid var(--bg-ds-surface-100); border-top-left-radius:0px; border-bottom-left-radius:0px;   "
         >
           <PlusIcon
-            height={"28px"}
-            width={"28px"}
+            height={"21px"}
+            width={"21px"}
             color="var(--bg-ds-neutral-100)"
           />
         </button>
