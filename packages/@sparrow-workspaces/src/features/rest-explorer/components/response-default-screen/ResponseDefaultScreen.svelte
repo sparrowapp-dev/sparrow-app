@@ -57,9 +57,9 @@ altCommands = {
     {#each Object.entries(ctrlCommands) as [key, value]}
       {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
         <!-- <span class="me-3"></span> -->
-        <div class="px-4">
+        <div class="px-3 flex items-center">
           <ComboText
-            comboContainerClassProp={"d-flex align-items-center justify-content-between gap-2 mb-3"}
+            comboContainerClassProp={"d-flex align-items-center justify-content-center gap-1"}
             {key}
             {value}
             keyClassProp={"text-secondary-200"}
@@ -74,7 +74,7 @@ altCommands = {
         <!-- <span class="me-3"></span> -->
         <div class="px-4">
           <ComboText
-            comboContainerClassProp={"d-flex align-items-center justify-content-between gap-1 mb-3"}
+            comboContainerClassProp={"d-flex align-items-center justify-content-between gap-1"}
             {key}
             {value}
             keyClassProp={"text-secondary-200"}
@@ -87,7 +87,7 @@ altCommands = {
     {/each}
   </div>
   {#if !isExpandShortcuts}
-    <div class="d-flex justify-content-center pt-3">
+    <div class="d-flex justify-content-center pt-[10px]">
       <p
         class="text-primary-200 text-fs-12 cursor-pointer"
         on:click={() => {
