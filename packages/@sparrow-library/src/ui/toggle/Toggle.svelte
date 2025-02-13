@@ -5,7 +5,7 @@
   export let textColor = "var(--text-ds-primary-400)";
   export let fontSize = "12px";
   export let fontWeight = "700";
-  export let onChange;
+  export let onChange: (event: Event) => void = () => {};
   export let onClick: (event: MouseEvent) => void = () => {};
 
   let inputRef: HTMLInputElement;
@@ -15,6 +15,7 @@
       event.preventDefault();
       return;
     }
+    isActive = !isActive;
     onChange(event);
   }
   const handleClick=(event: MouseEvent)=> {

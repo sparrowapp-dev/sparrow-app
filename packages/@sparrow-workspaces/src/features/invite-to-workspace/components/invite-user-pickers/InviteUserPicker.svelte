@@ -5,6 +5,7 @@
   import { onDestroy, onMount } from "svelte";
   import { slide } from "svelte/transition";
   import type { List } from "../../types";
+  import { Avatar } from "@sparrow/library/ui";
 
   /**
    *  List of users
@@ -191,12 +192,11 @@
           >
             <div class="d-flex tile w-100 rounded align-items-center">
               <div class="info d-flex align-items-center w-100 ellipsis">
-                <div style="width: 10%;">
-                  <div
-                    class="icon d-flex align-items-center justify-content-center ellipsis"
-                  >
-                    <span>{user.name[0].toUpperCase()}</span>
-                  </div>
+                <div style="width: 10%;" class="me-2">
+                   
+                
+                  <Avatar type="letter" size="large" letter={user.name[0]} bgColor="var(--text-tertiary-500)" />
+                    
                 </div>
                 <div class="name pl-1 ellipsis" style="width: 90%;">
                   <span class="sparrow-fs-12 text-whiteColor w-100 ellipsis"

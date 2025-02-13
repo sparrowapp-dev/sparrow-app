@@ -101,6 +101,7 @@
   let isExpandCollection = false;
   let isExpandEnvironment = false;
   let isExpandTestflow = false;
+  let isFirstCollectionExpand = false;
 
   let localEnvironment;
   let globalEnvironment;
@@ -418,6 +419,8 @@
     if (value) {
       isWelcomePopupOpen = value;
       isExpandCollection = value;
+      isExpandEnvironment = value;
+      isFirstCollectionExpand = value;
     }
   });
 
@@ -484,6 +487,7 @@
           bind:isExpandCollection
           bind:isExpandEnvironment
           bind:isExpandTestflow
+          bind:isFirstCollectionExpand
           appVersion={version}
         />
       </Pane>
