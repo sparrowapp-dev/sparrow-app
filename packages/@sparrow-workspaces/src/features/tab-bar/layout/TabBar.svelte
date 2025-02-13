@@ -172,7 +172,7 @@
 
     <div
       class="d-flex ps-1 align-items-center justify-content-center my-auto"
-      style="height: 24px; gap:8px "
+      style="height: 24px; gap:8px  "
     >
       {#if tabList.length <= 0}
         <span style="color: var(--text-ds-neutral-300);"> New Request </span>
@@ -187,7 +187,7 @@
           on:click={onNewTabRequested}
           role="button"
           class="d-flex layout my-auto relative top-2 align-items-center border-radius-2 p-0 justify-content-center py-auto"
-          style="height:28px; width:28px; background-color: transparent; border:0px; border-left:1px solid var(--bg-ds-surface-100); border-top-left-radius:0px; border-bottom-left-radius:0px;  "
+          style="height:26px; width:28px; background-color: transparent; border:0px; border-left:1px solid var(--bg-ds-surface-100); border-top-left-radius:0px; border-bottom-left-radius:0px;   "
         >
           <PlusIcon
             height={"28px"}

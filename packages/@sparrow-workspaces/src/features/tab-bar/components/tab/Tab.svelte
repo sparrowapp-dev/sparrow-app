@@ -1,13 +1,18 @@
 <script lang="ts">
   // ---- Icon
-  import { CrossIcon, CrossIcon as Crossicon } from "@sparrow/library/assets";
+  import {
+    Collection,
+    CrossIcon,
+    CrossIcon as Crossicon,
+    folderIcon,
+  } from "@sparrow/library/assets";
   import { BookIcon } from "@sparrow/library/assets";
   // ----
 
   // ---- SVG
   import { collectionNodesIcon as collectionAsset } from "@sparrow/library/assets";
   import { folderTabIcon as folderTab } from "@sparrow/library/assets";
-
+  import { folderIcon3 } from "@sparrow/library/assets";
   // ---- helper functions
   import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
   // ----
@@ -25,6 +30,7 @@
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import { type Tab } from "@sparrow/common/types/workspace/tab";
   import { Badge, Spinner } from "@sparrow/library/ui";
+  import { SvelteComponent } from "svelte";
   // ----
 
   // ------ Props ------
@@ -121,15 +127,15 @@
       {:else if tab.type === TabTypeEnum.FOLDER}
         <span>
           <img
-            src={folderTab}
+            src={folderIcon3}
             alt="folder-tab"
-            style="width: 30px;heigh:24px;margin-right:5px;"
+            style="width: 16px;heigh:16px;margin-right:5px;"
           /></span
         >
       {:else if tab.type === TabTypeEnum.COLLECTION}
         <span>
           <img
-            src={collectionAsset}
+            src={Collection}
             alt="book"
             style="width: 19px;heigh:19px;margin-right:5px;"
           />
@@ -278,10 +284,10 @@
     color: var(--text-secondary-100) !important;
   }
 
-  /* .cross-icon-btn:hover {
+  .cross-icon-btn:hover {
     background-color: var(--text-tertiary-300);
     border-radius: 2px;
-  } */
+  }
   .ellipsis {
     color: var(--text-secondary-100);
   }
