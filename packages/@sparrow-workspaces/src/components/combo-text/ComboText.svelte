@@ -2,12 +2,9 @@
   import { KeyboardShortcuts } from "@sparrow/library/ui";
 
   export let type: "combo" | "single" = "single";
-  export let comboContainerClassProp = "";
-  export let comboContainerStyleProp = "";
   export let key = "";
   export let value = "";
-  export let keyClassProp = "";
-  export let keyStyleProp = "";
+
 
    enum TextType {
     COMBO = "combo",
@@ -15,9 +12,9 @@
   }
 </script>
 
-<div class={comboContainerClassProp} style={comboContainerStyleProp}>
+<div class={"d-flex align-items-center justify-content-center gap-1 mb-2"}  >
    {#if type === TextType.COMBO}
-    <p class={`${keyClassProp} shortcut-text mb-0 sparrow-fs-12`} style={keyStyleProp}>
+    <p class={`text-secondary-200 shortcut-text mb-0 sparrow-fs-12 w-auto`} style={"width: 100px;"}>
       {key}
     </p>
     <KeyboardShortcuts keys={value}  />

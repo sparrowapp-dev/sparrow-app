@@ -4,8 +4,8 @@
   // ---- document models
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   // ---- library
-  import { Button, IconFallback } from "@sparrow/library/ui";
   import { Input } from "@sparrow/library/forms";
+  import { Button, Avatar } from "@sparrow/library/ui";
   export let isDeleteWorkspaceModalOpen = false;
   export let workspace: WorkspaceDocument;
   export let openTeam: TeamDocument;
@@ -72,15 +72,19 @@
   >
     <div class="d-flex ellipsis">
       {#if openTeam?.logo?.size}
-        <img
-          class="text-center w-25 align-items-center me-2 justify-content-center profile-circle bg-dullBackground"
-          style="width: 25px !important; height: 25px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-          src={base64ToURL(openTeam?.logo)}
-          alt=""
+        <Avatar
+          type={"image"}
+          size={"large"}
+          image={base64ToURL(openTeam?.logo)}
         />
       {:else}
         <span class="me-2">
-          <IconFallback character={workspace?.team?.teamName[0] || ""} />
+          <Avatar
+            type={"letter"}
+            size={"large"}
+            letter={workspace?.team?.teamName[0] || ""}
+            bgColor={"var(--bg-tertiary-700)"}
+          />
         </span>
       {/if}
       <div class="d-flex align-items-center ellipsis">

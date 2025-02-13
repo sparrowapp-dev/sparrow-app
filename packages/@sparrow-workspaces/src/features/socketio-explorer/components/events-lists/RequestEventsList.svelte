@@ -44,7 +44,7 @@
       <div class="d-flex align-items-center">
         {#if true}
           <Toggle
-            bind:isActive={element.listen}
+            isActive={element.listen}
             onChange={() => {
               updateCheck(index);
             }}

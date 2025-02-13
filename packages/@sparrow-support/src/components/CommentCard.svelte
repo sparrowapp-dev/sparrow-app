@@ -1,6 +1,6 @@
 <script lang="ts">
   import { AttachmentIcon, CrossIcon } from "@sparrow/library/icons";
-  import { Button, IconFallback } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
   import { CommentCard } from "@sparrow/support/components";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -9,6 +9,7 @@
   import { ImageModal } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
   import { Tag } from "@sparrow/library/ui";
+  import { Avatar } from "@sparrow/library/ui";
 
   /**
    * @description - The current comment being added or modified by the user.
@@ -201,13 +202,11 @@
 </script>
 
 <div class="comment">
-  <IconFallback
-    character={comment.author.name.charAt(0)}
-    width="34px"
-    height="32px"
-    backgroundColor="#1C1D2B"
-    borderColor="#45494D"
-  />
+     <Avatar
+      type={"letter"}
+      size={"large"}
+      letter={comment?.author?.name.charAt(0) || ""}
+      bgColor={"var(--text-secondary-600)"}/>
 
   <div class="comment-content">
     <div class="comment-author text-fs-14 mt-1">
