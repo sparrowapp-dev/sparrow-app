@@ -273,16 +273,6 @@
         <div style="width:140px;" class="ms-3 d-flex align-items-center">
           <div class="w-100 d-flex">
             <div class="w-100 d-flex justify-content-end">
-<<<<<<< HEAD
-              <Toggle
-                bind:isActive={bulkToggle}
-                label="Bulk Edit"
-                fontSize="10px"
-                fontWeight="400"
-                onClick={handleBulkTextUpdate}
-                onChange={toggleBulkEdit}
-              />
-=======
               {#if isBulkEditRequired}
                 <Toggle
                   bind:isActive={bulkToggle}
@@ -293,7 +283,6 @@
                   onChange={toggleBulkEdit}
                 />
               {/if}
->>>>>>> 16db21406a8c3c9b4b2d91b5941dab0cd3f044aa
             </div>
           </div>
         </div>
