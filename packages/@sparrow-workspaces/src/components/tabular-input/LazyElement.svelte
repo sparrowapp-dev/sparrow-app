@@ -8,6 +8,7 @@
     ScrollDirection,
     Options,
   } from "svelte-inview";
+  import { Checkbox } from "@sparrow/library/forms";
 
   export let element;
   export let index;
@@ -41,20 +42,17 @@
   class="w-100 pair-data-row px-3 d-flex align-items-center"
 >
   {#if isInView}
-    <div style="height:14px; width:14px;" class="me-3">
+    <div style="" class="me-3">
       {#if pairs.length - 1 != index || !isInputBoxEditable}
         <!-- checkbox should be visible to last row in readonly mode -->
-        <label class="checkbox-parent">
-          <input
-            type="checkbox"
-            bind:checked={element.checked}
-            on:input={() => {
-              updateCheck(index);
-            }}
-            disabled={!isCheckBoxEditable}
-          />
-          <span class="checkmark"></span>
-        </label>
+        <Checkbox
+          size={"small"}
+          checked={element.checked}
+          on:input={() => {
+            updateCheck(index);
+          }}
+          disabled={!isCheckBoxEditable}
+        />
       {/if}
     </div>
 

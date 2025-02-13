@@ -3,26 +3,15 @@
 
   export let checked = false;
   export let disabled = false;
-  export let type: "button-checkbox" | "button-checkbox-text" =
-    "button-checkbox";
+  export let type: "button" | "button-text" = "button";
   export let size: "small" | "large" = "small";
   export let text = "";
 
   const dispatch = createEventDispatcher();
 
   const handleChange = (event: Event) => {
-    if (disabled) {
-      event.preventDefault();
-      return;
-    }
-
-    checked = !checked;
-    dispatch("change", { checked });
+    dispatch("input", { checked });
   };
-
-  if (checked) {
-    console.log("checked");
-  }
 
   $: containerClass = `custom-checkbox ${disabled ? "disabled" : ""} ${checked ? "checked" : ""} ${size} ${type}`;
 </script>
@@ -30,10 +19,9 @@
 <label class={containerClass} tabindex="0">
   <input
     type="checkbox"
-    {checked}
-    on:change={handleChange}
-    on:click={(e) => {}}
+    on:input={handleChange}
     {disabled}
+    {checked}
     aria-disabled={disabled}
   />
   <span
@@ -124,6 +112,15 @@
     transition: all 0.2s ease;
   }
 
+  .custom-checkbox:active .checkmark {
+    display: inline-block;
+    border-radius: 2px;
+    background-color: transparent;
+    position: relative;
+    border: 2px solid var(--border-ds-primary-300);
+    transition: all 0.2s ease;
+  }
+
   .checkmark.small {
     width: 12px;
     height: 12px;
@@ -137,6 +134,14 @@
   /* Normal checked state */
   .custom-checkbox input:checked + .checkmark {
     background-color: #4a7aff;
+    border: none;
+  }
+  .custom-checkbox input:checked + .checkmark:hover {
+    background-color: var(--bg-ds-primary-300);
+    border: none;
+  }
+  .custom-checkbox input:checked + .checkmark:active {
+    background-color: var(--bg-ds-primary-300);
     border: none;
   }
 
@@ -190,7 +195,4 @@
   }
 
   /* Hover states */
-  .custom-checkbox:not(.disabled) .checkmark:hover {
-    border-color: var(--white-color);
-  }
 </style>
