@@ -14,7 +14,7 @@
   import { Select } from "@sparrow/library/forms";
   import { CategoryIcon, StatusIcon } from "@sparrow/library/icons";
   import { FeedbackType, FeedbackStatusType } from "../../../types/feedback";
-  import { Loader } from "@sparrow/library/ui";
+  import { Loader, Tag } from "@sparrow/library/ui";
   import { Debounce } from "@sparrow/common/utils";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -606,20 +606,10 @@
                   <div
                     style="height: 16px; display: flex; align-items: center;"
                   >
-                    <span
-                      class="category mt-2 text-fs-10"
-                      style="color:{getColor(post?.status)
-                        .fontColor}; border:0.2px solid {getColor(post?.status)
-                        .fontColor}; "
-                    >
-                      {post.status
-                        .split(" ")
-                        .map(
-                          (word) =>
-                            word.charAt(0).toUpperCase() + word.slice(1),
-                        )
-                        .join(" ")}
-                    </span>
+                    <Tag
+                      type={getColor(post?.status)}
+                      text={post?.status || "" }
+                    />
                   </div>
                 </div>
                 <div

@@ -6,7 +6,7 @@
     RightIcon,
   } from "@sparrow/library/assets";
   import type { WorkspaceDocument } from "@app/database/database";
-  import { Button } from "@sparrow/library/ui";
+  import { Button, Spinner } from "@sparrow/library/ui";
   import { WorkspaceGrid } from "@sparrow/teams/compopnents";
   import { TeamSkeleton } from "../../images";
 
@@ -84,6 +84,14 @@
   const setPageWithinBounds = (newPage: number) => {
     currPage = Math.max(1, Math.min(newPage, totalPages));
   };
+
+  const handleClick = async () => {
+    if (!isWorkspaceCreationInProgress) {
+      isWorkspaceCreationInProgress = true;
+      await onCreateNewWorkspace();
+      isWorkspaceCreationInProgress = false;
+    }
+  };
 </script>
 
 <div class="h-100 pb-2">
@@ -100,19 +108,19 @@
             >
           {/if}
           {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
-            <Button
-              title="+ Add New Workspace"
-              type="other"
-              loader={isWorkspaceCreationInProgress}
-              disable={isWorkspaceCreationInProgress}
-              buttonClassProp="sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace"
-              buttonStyleProp="min-height: 132px;"
-              onClick={async () => {
-                isWorkspaceCreationInProgress = true;
-                await onCreateNewWorkspace();
-                isWorkspaceCreationInProgress = false;
-              }}
-            />
+            <div
+              class="sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace"
+              style="min-height: 132px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+              on:click={handleClick}
+            >
+              {#if isWorkspaceCreationInProgress}
+                <span>
+                  <Spinner size={`16px`} />
+                </span>
+              {:else}
+                <span>+ Add New Workspace</span>
+              {/if}
+            </div>
           {/if}
           {#each paginatedWorkspaces as workspace}
             <WorkspaceGrid

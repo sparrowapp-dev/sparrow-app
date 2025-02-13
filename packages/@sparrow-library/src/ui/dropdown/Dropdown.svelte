@@ -123,7 +123,7 @@
               />
             </span>
           {/if}
-          <p style="margin-bottom: 0;">{item.name}</p>
+          <p style="margin-bottom: 0;max-width:{minWidth}; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">{item.name}</p>
         </button>
       {/each}
     </div>

@@ -8,8 +8,8 @@
     MessageIcon,
     StackIcon,
   } from "@sparrow/library/icons";
-  import { Search } from "@sparrow/library/forms";
   import { Loader } from "@sparrow/library/ui";
+  import { Search } from "@sparrow/library/forms";
   import HelpInfoCard from "../../../components/HelpInfo-Card/HelpInfoCard.svelte";
   import { FeedbackType } from "@sparrow/support/types";
 
@@ -24,7 +24,7 @@
   export let setPostId;
 
   /** @type {Function} Returns color based on status. @param {string} status - Status to determine color. @returns {{ fontColor: string, backgroundColor: string }} */
-  export let getColor;
+
 
   let isLoading = false;
 
@@ -57,6 +57,19 @@
     // Convert the statusMap object to an array suitable for rendering in Svelte
     feedbackStatus = Object.values(statusMap);
   }
+    
+  const getFontColor = (status) => {
+    if ( status === "in progress") {
+      return { fontColor: "var(--text-primary-440)", };
+    }
+    if (status === "planned") {
+      return { fontColor: "#FFE47E",};
+    }
+    if (status === "under review") {
+      return { fontColor: "#FBA574",};
+    }
+    return { fontColor: "var(--text-ds-neutral-50)",};
+  };
 
   /**
    * @description - Filters the product statuses based on the search term and category type.
@@ -180,9 +193,9 @@
             style="width:100%; background-color: var(--bg-secondary-800); overflow: hidden; border:0.6px solid var(--border-secondary-300)"
           >
             <div
-              style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-secondary-870); height:32px;  color:{getColor(
+              style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-secondary-870); height:32px ;   color:{getFontColor(
                 status,
-              ).fontColor}; border-bottom:0.5px solid {getColor(status)
+              ).fontColor}; border-bottom:0.5px solid {getFontColor(status)
                 .fontColor};"
             >
               {status
@@ -190,7 +203,7 @@
                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
                 .join(" ")}
             </div>
-
+            
             {#if filteredFeedbacks?.length == 0 && searchTerm === ""}
               <div
                 class=" d-flex align-items-center justify-content-center"
