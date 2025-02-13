@@ -106,7 +106,7 @@
   >
     <div
       class="position-absolute d-flex align-items-center"
-      style={`height: 20px; width: 28px; left: 10px; right:10px; pointer-events: none; ${imgStyleProp}`}
+      style={`height: 20px; width: 20px; left: 10px; pointer-events: none; ${imgStyleProp}`}
     >
       <SearchIcon2
         width={"12px"}
