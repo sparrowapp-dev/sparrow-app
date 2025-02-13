@@ -94,12 +94,6 @@
       isTyping = true;
       value = event.target.value;
       dispatch("input", event.target.value);
-
-      setTimeout(() => {
-        if (value === event.target.value) {
-          isTyping = false;
-        }
-      }, 3000);
     }
   };
 </script>
@@ -122,7 +116,9 @@
     {disabled}
     {maxlength}
     on:mouseenter={() => (isHovered = true)}
-    on:mouseleave={() => (isHovered = false)}
+    on:mouseleave={() => {
+      (isHovered = false), (isTyping = false);
+    }}
     on:focus={() => (isFocused = true)}
     on:blur={(event) => {
       isFocused = false;

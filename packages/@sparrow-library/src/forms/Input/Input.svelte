@@ -59,11 +59,6 @@
 
     if (typingBorderColor !== "transparent") {
       isTyping = true;
-      setTimeout(() => {
-        if (value === target.value) {
-          isTyping = false;
-        }
-      }, 2000);
     }
   };
 </script>
@@ -72,7 +67,9 @@
   class="position-relative {componentClass}"
   style={`height: ${height}; width: ${width}; background-color: ${backgroundColor}; border: ${borderColor}; border-radius:4px`}
   on:mouseenter={() => (isHovered = true)}
-  on:mouseleave={() => (isHovered = false)}
+  on:mouseleave={() => {
+    (isHovered = false), (isTyping = false);
+  }}
 >
   <input
     {value}
