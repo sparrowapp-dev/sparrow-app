@@ -78,7 +78,8 @@
 
   $: {
     if (tabList) {
-      scrolable = tabList.length * 182 >= scrollerParent;
+      scrolable = tabList.length * 200 >= scrollerParent;
+
       getActiveTabType(tabList);
     }
   }
