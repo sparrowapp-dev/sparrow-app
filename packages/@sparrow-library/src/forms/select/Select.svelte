@@ -86,7 +86,9 @@
     | "violet"
     | "violet2"
     | "dark-violet"
-    | "dark-violet2" = "dark";
+    | "dark-violet2"
+    | "primary"
+    | "secondary" = "dark";
 
   /**
    * Determines the background state for the Select body.
@@ -220,6 +222,12 @@
     case "dark-violet2":
       selectBackgroundClass = "select-background-dark-violet2";
       break;
+    case "primary":
+      selectBackgroundClass = "select-background-primary";
+      break;
+    case "secondary":
+      selectBackgroundClass = "select-background-secondary";
+      break;
   }
 
   let selectBodyBackgroundClass = "";
@@ -305,6 +313,12 @@
         case "dark-violet2":
           x = "dark-violet2";
           break;
+        case "primary":
+          x = "primary";
+          break;
+        case "secondary":
+          x = "secondary";
+          break;
       }
       return `select-btn-state-clicked-${x}`;
     }
@@ -332,6 +346,12 @@
           break;
         case "dark-violet2":
           x = "dark-violet2";
+          break;
+        case "primary":
+          x = "primary";
+          break;
+        case "secondary":
+          x = "secondary";
           break;
       }
       return `select-btn-state-active-${x}`;
@@ -623,6 +643,12 @@
   .select-background-dark-violet2 {
     background-color: var(--bg-tertiary-500);
   }
+  .select-background-primary {
+    background-color: transparent;
+  }
+  .select-background-secondary {
+    background-color: var(--bg-ds-surface-600);
+  }
 
   // hover or open-body states
   .select-btn-state-active-transparent {
@@ -642,6 +668,12 @@
   }
   .select-btn-state-active-dark-violet2 {
     background-color: var(--bg-tertiary-600);
+  }
+  .select-btn-state-active-primary {
+    background-color: var(--bg-ds-surface-400);
+  }
+  .select-btn-state-active-secondary {
+    background-color: var(--bg-ds-surface-400);
   }
 
   // clicked states
@@ -663,6 +695,24 @@
 
   .select-btn-state-clicked-dark-violet2 {
     background-color: var(--bg-tertiary-700);
+  }
+  .select-btn-state-clicked-primary {
+    background-color: var(--bg-ds-surface-500);
+  }
+  .select-btn-state-clicked-secondary {
+    background-color: var(--bg-ds-surface-500);
+  }
+
+  // focused
+  .select-background-primary:focus-visible {
+    border: 2px solid var(--border-ds-primary-300);
+    outline: none;
+    background-color: transparent;
+  }
+  .select-background-secondary:focus-visible {
+    border: 2px solid var(--border-ds-primary-300);
+    outline: none;
+    background-color: var(--bg-ds-surface-600);
   }
   //////////////////////////
   .select-data {

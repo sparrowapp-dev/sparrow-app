@@ -177,7 +177,7 @@
       disable={deleteEnvironmentLoader}
       title={"Cancel"}
       textStyleProp={"font-size: var(--base-text)"}
-      type={"dark"}
+      type={"secondary"}
       loader={false}
       onClick={() => {
         handleEnvironmentPopUpCancel(false);

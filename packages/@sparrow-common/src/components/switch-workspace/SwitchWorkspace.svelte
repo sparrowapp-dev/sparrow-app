@@ -23,7 +23,7 @@
       <Button
         title={"Cancel"}
         textClassProp={"fs-6"}
-        type={"dark"}
+        type={"secondary"}
         onClick={() => {
           isSwitchWorkspaceModalOpen = false;
           handlehideGlobalSearch(false);
