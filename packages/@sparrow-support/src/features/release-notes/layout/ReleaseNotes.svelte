@@ -11,12 +11,13 @@
   } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   import { marked } from "marked";
-  import { Loader, Tooltip } from "@sparrow/library/ui";
+  import { Loader, Tag, Tooltip } from "@sparrow/library/ui";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import { notifications } from "@sparrow/library/ui";
   import { UpdatesTagType } from "../../../types/feedback";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
+  import { Search } from "@sparrow/library/forms";
   export let listChangeLog;
 
   export let onReleaseNoteRedirect;
@@ -77,7 +78,7 @@
    * @param {Event} e - The input event triggered when typing in the search field.
    */
   const handleInput = (e) => {
-    searchQuery = e.target.value;
+    searchQuery = e.detail;
     filterEvents();
   };
 
@@ -98,6 +99,12 @@
     if (tag === UpdatesTagType.NEW) return "tag-new";
     if (tag === UpdatesTagType.FIXED) return "tag-fixed";
     if (tag === UpdatesTagType.IMPROVED) return "tag-improved";
+    return "";
+  };
+   const getTagType = (tag) => {
+    if (tag === UpdatesTagType.NEW) return "cyan";
+    if (tag === UpdatesTagType.FIXED) return "pink";
+    if (tag === UpdatesTagType.IMPROVED) return "green";
     return "";
   };
 
@@ -188,36 +195,15 @@
     {#if showTimeline}
       <div class="d-flex justify-content-between page-funationality">
         <div class="" style="cursor:pointer">
-          <div class={`d-flex search-input-container rounded py-1 px-2 mb-4`}>
-            <SearchIcon
-              width={14}
-              height={14}
-              color={"var(--icon-secondary-200)"}
-              classProp={`my-auto me-3`}
-            />
-            <input
-              type="text"
+          <div class={`d-flex  rounded py-1 px-2 mb-4`}>
+            <Search
+              variant="primary"
+              customWidth={"300px"}
               id="search-input"
-              class={`bg-transparent w-100 border-0 ms-1 my-auto`}
               placeholder="Search updates"
               on:input={handleInput}
               bind:value={searchQuery}
             />
-
-            {#if searchQuery.length != 0}
-              <div
-                class="clear-icon"
-                on:click={() => {
-                  clearSearch();
-                }}
-              >
-                <CrossIcon
-                  height="16px"
-                  width="12px"
-                  color="var(--icon-secondary-300)"
-                />
-              </div>
-            {/if}
           </div>
         </div>
 
@@ -317,9 +303,11 @@
                     </div>
                     <div class="tags" style="margin-top: 5px;">
                       {#each event.types as tag}
-                        <span class="text-fs-10 tag {getTagClass(tag)}">
-                          {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
-                        >
+                      <span class="mt-[6px]">  <Tag
+                          type={getTagType(tag)}
+                          text={tag || ""}/>
+                      </span>
+
                       {/each}
                     </div>
                     {#if event.plaintextDetails.split(" ").length > 20}
@@ -449,9 +437,10 @@
               </div>
               <div class="tags">
                 {#each selectedEvent.types as tag}
-                  <span class="tag {getTagClass(tag)}">
-                    {tag.charAt(0).toUpperCase() + tag.slice(1)}</span
-                  >
+                  <span class="mt-[6px]">  <Tag
+                          type={getTagType(tag)}
+                          text={tag || ""}/>
+                    </span>
                 {/each}
               </div>
 

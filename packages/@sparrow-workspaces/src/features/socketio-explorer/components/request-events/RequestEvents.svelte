@@ -46,7 +46,7 @@
 
   const updateCheck = (index: number): void => {
     let filteredKeyValue = pairs.map((elem, i) => {
-      if (i === index) {
+        if (i === index) {
         elem.listen = !elem.listen;
       }
       return elem;

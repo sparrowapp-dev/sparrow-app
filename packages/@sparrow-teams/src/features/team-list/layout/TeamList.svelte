@@ -2,6 +2,7 @@
   import { List, Tooltip } from "@sparrow/library/ui";
   import { PeopleIcon, PlusIcon } from "@sparrow/library/assets";
   import { base64ToURL } from "@sparrow/common/utils";
+  import { Avatar } from "@sparrow/library/ui";
   export let isCreateTeamModalOpen;
   export let isGuestUser;
   export let setOpenTeam;
@@ -54,12 +55,14 @@
         >
           <div class=" d-flex w-100 overflow-hidden">
             {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
-              <p
-                class={`m-0 sparrow-fs-15 text-defaultColor me-2 align-items-center justify-content-center bg-transparent border-defaultColor `}
-                style={`padding-top: 2px; width: 25px !important; height: 25px !important; display: flex; border: 1px solid var(--defaultcolor); border-radius: 50%;  font-weight:700;`}
-              >
-                {team.name[0] ? team.name[0].toUpperCase() : ""}
-              </p>
+              <div class="me-2">
+                  <Avatar
+                      type={"letter"}
+                      size={"small"}
+                      letter={team.name[0]}
+                      bgColor={"var(--bg-tertiary-700)"}
+                  />
+              </div>
             {:else}
               <img src={base64ToURL(team.logo)} alt="" />
             {/if}

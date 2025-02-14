@@ -23,7 +23,7 @@
   <Button
     title={"Explore Myself"}
     textStyleProp={"font-size:16px; font-weight:400;"}
-    type={"dark"}
+    type={"secondary"}
     onClick={() => {
       onClickExplore();
     }}

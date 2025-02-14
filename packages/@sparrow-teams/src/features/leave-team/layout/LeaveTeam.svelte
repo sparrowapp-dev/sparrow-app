@@ -52,7 +52,7 @@
         disable={isLeavingTeam}
         title={"Cancel"}
         textClassProp={"fs-6"}
-        type={"dark"}
+        type={"secondary"}
         onClick={() => {
           handleModalState(false); // Close the modal
         }}
