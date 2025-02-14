@@ -2,13 +2,16 @@
   import { FolderIcon } from "../../images";
 
   export let onClick = () => {};
-  export let icon=FolderIcon;
+  export let icon = FolderIcon;
+  export let iconProps = { color: "red" };
   export let data = {};
+
+  $: console.log(iconProps);
 </script>
 
 <div class="request-item" on:click={() => onClick(data)}>
   <div class="request-method">
-     <svelte:component this={icon} color="var(--icon-ds-neutral-200)" />
+    <svelte:component this={icon} {...iconProps} />
   </div>
   <div class="request-details">
     <div class="request-header">
@@ -20,7 +23,7 @@
 </div>
 
 <style>
- .request-item {
+  .request-item {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -29,7 +32,7 @@
     cursor: pointer;
   }
 
-   .request-method {
+  .request-method {
     border-radius: 2px;
     background-color: var(--bg-ds-surface-500);
     display: flex;
@@ -39,6 +42,10 @@
     padding: 4px;
     min-height: 24px;
     gap: 8px;
+  }
+  .icon {
+    width: 16px;
+    height: 16px;
   }
 
   .request-details {

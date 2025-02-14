@@ -34,7 +34,7 @@
     >
       <div class="tag-icon-wrapper">
         <svelte:component
-          this={suggestion.icon}
+          this={suggestion?.icon}
           color="var(--icon-color)"
         />
       </div>

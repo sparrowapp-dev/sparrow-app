@@ -125,4 +125,5 @@ export { default as AiSparkleIconV3 } from "./AiSparkleV3.svelte";
 export { default as WorkspaceIcons } from "./Board.svelte";
 export { default as WorkspaceIcongs } from "./Board.svelte";
 export { default as FlowIcon } from "./flowIcon.svelte";
+export {default as CollectionIcongs} from "./collectionStack.svelte"
 // export { default as RequestIcon} from "./arrowSwap.svelte"

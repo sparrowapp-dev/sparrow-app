@@ -1,16 +1,15 @@
 <script lang="ts">
   import {
     getIcon,
-    // hexIcon,
+    // GraphIcon,
     putIcon,
     deleteIcon,
     patchIcon,
-    // socketIoIcon,
+    // SocketIoIcon,
     // webSocketIcon,
     postIcon
   } from "../../images";
-  import { CollectionIcon , FolderIcon ,StackIcon as EnvironmentIcon, SocketIoIcon as socketIoIcon , GraphIcon as hexIcon , SocketIcon as webSocketIcon, WorkspaceIcongs, FlowIcon, RequestIcon } from "@sparrow/library/icons";
-  import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
+  import { CollectionIcongs , FolderIcon , StackIcon, SocketIoIcon , GraphIcon , SocketIcon, WorkspaceIcongs, FlowIcon, RequestIcon } from "@sparrow/library/icons";
   import NoResults from "../NoResults/NoResults.svelte";
   export let searchQuery = "";
   export let filteredCollection = [];
@@ -26,9 +25,10 @@
   export let filteredWorkspaces;
   export let filteredTestflows;
   export let filteredEnvironments;
-  export let isWebApp = false;
+  export let isWebApp = false;SocketIcon
   import TitleBar from "../TitleBar/TitleBar.svelte";
   import ItemBar from "../ItemBar/ItemBar.svelte";
+  import Socket from "../../images/Socket.io.svelte";
 
   const methodIcons = {
     GET: getIcon,
@@ -36,9 +36,31 @@
     DELETE: deleteIcon,
     PUT: putIcon,
     PATCH: patchIcon,
-    SOCKETIO: socketIoIcon,
-    WEBSOCKET: webSocketIcon,
+    SOCKETIO: SocketIoIcon,
+    WEBSOCKET: SocketIcon,
   };
+  const getIconProps = (methodName) => {
+  switch (methodName) {
+    case "GET":
+      return { color: "var(--icon-ds-success-500)" };
+    case "POST":
+      return { color: "var(--icon-ds-primary-500)" };
+    case "DELETE":
+      return { color: "var(--icon-ds-danger-500)" };
+    case "PUT":
+      return { color: "var(--icon-ds-warning-500)" };
+    case "PATCH":
+      return { color: "var(--icon-ds-info-500)" };
+    case "SocketIO":
+      return { color: "red" };
+    case "WEBSOCKET":
+    case "GRAPHQL":
+      return { color: "var(--icon-ds-info-500)" };
+    default:
+      return { color: "var(--icon-ds-default-500)" }; // Default case
+  }
+};
+
 
   const getRequestDetails = (request) => {
     switch (request.type) {
@@ -101,7 +123,7 @@
       items: filteredCollection,
       title: searchQuery === "" ? "Recent Collections" : "Collections",
       shortcutKeys: ["Shift", "C"],
-      icon: CollectionIcon,
+      icon: CollectionIcongs,
       nav: (item) =>
         handleGlobalSearchCollectionNavigation(item.workspaceId, item.tree),
       getName: (item) => item.tree.name,
@@ -122,14 +144,14 @@
         ),
       getName: (item) => item.tree.name,
       getPath: (item) => item.path,
-      getIcon: (item) => methodIcons[item.tree.request.method] || hexIcon,
+      getIcon: (item) => methodIcons[item.tree.request.method] || GraphIcon,
       filter: (item) => !(isWebApp && item.tree.request.method === "GRAPHQL"),
     },
     environments: {
       items: filteredEnvironments,
       title: searchQuery === "" ? "Recent Environments" : "Environments",
       shortcutKeys: ["Shift", "E"],
-      icon: EnvironmentIcon,
+      icon: StackIcon,
       nav: (item) => handleGlobalSearchEnvironmentNavigation(item),
       getName: (item) => item.title,
       getPath: (item) => "",
@@ -231,7 +253,8 @@
                     path: item.path,
                     url: details.url,
                   }}
-                  icon={methodIcons[details.method] || hexIcon}
+                  icon={methodIcons[details.method] || GraphIcon}
+                  iconProps=getIconProps(details.method),
                   onClick={() =>
                   {
                     handleGlobalSearchRequestNavigation(
@@ -247,7 +270,7 @@
             {:else if section.key === "collections"}
               <ItemBar
                 data={{ name: item.tree.name, path: item.path }}
-                icon={CollectionIcon}
+                icon={CollectionIcongs}
                 onClick={() =>
                 {
                 handleGlobalSearchCollectionNavigation(
@@ -259,7 +282,7 @@
             {:else if section.key === "environments"}
               <ItemBar
                 data={{ name: item.title, path: "" }}
-                icon={EnvironmentIcon}
+                icon={StackIcon}
                 onClick={() => handleGlobalSearchEnvironmentNavigation(item)}
               />
             {:else if section.key === "folders"}
@@ -313,7 +336,7 @@
                       path: item.path,
                       url: details.url,
                     }}
-                    icon={methodIcons[details.method] || hexIcon}
+                    icon={methodIcons[details.method] || GraphIcon}
                     onClick={() =>
                       handleGlobalSearchRequestNavigation(
                         item.tree.id,
@@ -327,7 +350,7 @@
               {:else if section.key === "collections"}
                 <ItemBar
                   data={{ name: item.tree.name, path: item.path }}
-                  icon={CollectionIcon}
+                  icon={CollectionIcongs}
                   onClick={() =>
                     handleGlobalSearchCollectionNavigation(
                       item.workspaceId,
@@ -348,7 +371,7 @@
               {:else if section.key === "environments"}
                 <ItemBar
                   data={{ name: item.title, path: "" }}
-                  icon={EnvironmentIcon}
+                  icon={StackIcon}
                   onClick={() => handleGlobalSearchEnvironmentNavigation(item)}
                 />
               {:else if section.key === "flows"}
