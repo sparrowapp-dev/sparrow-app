@@ -1,6 +1,6 @@
 <script lang="ts">
   import { GraphqlRequestSectionTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
-  import { Navigator } from "../../../../components";
+  import { Navigator } from "@sparrow/library/ui";
   import { RefreshSchemaIcon } from "@sparrow/library/icons";
   export let requestStateSection: string;
   export let authHeaderLength = 0;

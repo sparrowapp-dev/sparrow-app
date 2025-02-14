@@ -143,3 +143,6 @@ export { default as dot3Icon } from "./3dot.svg";
 export { default as gitBranchIcon } from "./git-branch.svg";
 export { default as copyIcon } from "./copy.svg";
 export { default as tickGreyIcon } from "./tick-grey.svg";
+export {default as folderIcon3} from "./folderIcon3.svg";
+export {default as Collection}  from "./EmptyCollectionIcon.svg";
+

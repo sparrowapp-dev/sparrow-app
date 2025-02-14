@@ -897,7 +897,7 @@
         }}
         title={"+ Collection"}
         buttonClassProp={"btn mb-2"}
-        type={"teritiary"}
+        type={"outline-primary"}
         buttonStyleProp={"font-size: var(--base-text);"}
       />
     {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
@@ -907,7 +907,7 @@
         }}
         title={"+ Folder"}
         buttonClassProp={"btn mb-2"}
-        type={"teritiary"}
+        type={"outline-primary"}
         buttonStyleProp={"font-size: var(--base-text);"}
       />
     {/if}
@@ -917,7 +917,7 @@
       <Button
         title={"Cancel"}
         textClassProp={"fs-6 px-2"}
-        type={"dark"}
+        type={"secondary"}
         onClick={() => {
           onClick(false);
         }}
