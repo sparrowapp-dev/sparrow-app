@@ -7,11 +7,10 @@
     FolderIcon,
     EnvironmentIcon,
     CollectionIcon,
-    WorkspaceIcon,
-    FlowIcon,
-    RequestIcon,
   } from "../images";
-  import { folderIcon } from "@sparrow/library/assets";
+  import { folderIcon} from "@sparrow/library/assets";
+  import { FlowIcon ,RequestIcon, WorkspaceIcons} from "@sparrow/library/icons";
+
 
   export let closeGlobalSearch;
   export let workspaceDocuments;
@@ -59,7 +58,7 @@
     {
       type: "workspace",
       label: "Workspaces",
-      icon: WorkspaceIcon,
+      icon: WorkspaceIcons,
     },
     {
       type: "collection",
@@ -74,7 +73,7 @@
     {
       type: "folder",
       label: "Folders",
-      icon: FolderIcon,
+      icon: folderIcon,
     },
     {
       type: "flow",

@@ -122,6 +122,7 @@ export { default as ThreeDotIcon } from "./ThreeDot.svelte";
 export { default as AiSparkleIconV2 } from "./AiSparkleV2.svelte";
 
 export { default as AiSparkleIconV3 } from "./AiSparkleV3.svelte";
+export { default as WorkspaceIcons } from "./Board.svelte";
 export { default as WorkspaceIcongs } from "./Board.svelte";
 export { default as FlowIcon } from "./flowIcon.svelte";
 // export { default as RequestIcon} from "./arrowSwap.svelte"

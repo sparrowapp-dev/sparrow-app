@@ -12,5 +12,6 @@ export { default as Search } from "./Search.png";
 export { default as searchIcon } from "./searchIcon.png";
 export { default as socketIoIcon } from "./Socket.io.svelte";
 export { default as webSocketIcon } from "./WebSocket.svelte";
+
 export { default as hexIcon } from "./GraphQL.svelte";
 export { default as SearchIcon } from "./SearchIcon.svelte";
