@@ -16,7 +16,6 @@
   } from "@sparrow/common/images";
   import NoResults from "./NoResults.svelte";
   import { KeyboardShortcuts } from "@sparrow/library/ui";
-  import { onMount } from "svelte";
 
   export let searchQuery = "";
   export let filteredCollection = [];
