@@ -1,6 +1,5 @@
 <script>
   import { SelectIcon } from "./icons";
-
   export let selected = false;
   export let inputText = "";
   export let id = "";
@@ -14,7 +13,6 @@
 
   let hover = false;
   let pressed = false;
-  let focused = false;
 
   let defaultUnselectedColor = "var(--icon-ds-neutral-200)";
   let defaultSelectedColor = "var(--icon-ds-primary-400)";
@@ -24,18 +22,17 @@
   let pressedSelectedColor = "var(--icon-ds-primary-300)";
   let disabledUnselectedColor = "var(--icon-ds-neutral-500)";
   let disabledSelectedColor = "var(--icon-ds-primary-700)";
-  let pressedCircleColor = "var(--bg-ds-surface-400)";
-  let hoverCircleColor = "var(--bg-ds-surface-300)";
-  let disabledCircleColor = "transparent";
-  let focusedBorderCircleColor = "2px solid var(--border-ds-primary-300)";
-  let disabledBorderCircleColor = "2px solid var(--border-ds-neutral-400)";
+
+  let hoverdBgColor = "var(--bg-ds-surface-300)";
+  let pressedBgColor = "var(--bg-ds-surface-400)";
+  let defaultBgColor = "transparent";
 
   // Use group value for selection state
   $: selected = group === value;
 
   $: unSelectedColor = disabled
     ? disabledUnselectedColor
-    : pressed || focused
+    : pressed
       ? pressedUnselectedColor
       : hover
         ? hoverUnselectedColor
@@ -43,37 +40,31 @@
 
   $: selectedColor = disabled
     ? disabledSelectedColor
-    : pressed || focused
+    : pressed
       ? pressedSelectedColor
       : hover
         ? hoverSelectedColor
         : defaultSelectedColor;
 
   $: bgCircleColor = disabled
-    ? disabledCircleColor
-    : pressed || focused || selected
-      ? pressedCircleColor
+    ? defaultBgColor
+    : pressed
+      ? pressedBgColor
       : hover
-        ? hoverCircleColor
-        : "transparent";
-
-  $: borderColor = disabled
-    ? disabledBorderCircleColor
-    : focused
-      ? focusedBorderCircleColor
-      : "none";
+        ? hoverdBgColor
+        : defaultBgColor;
 
   function handleClick() {
     if (!disabled) {
       group = value;
       if (handleChange) {
-        handleChange({ target: { value } }); // Ensure correct event structure
+        handleChange({ target: { value } });
       }
     }
   }
 </script>
 
-<div class="mx-1">
+<div class="mx-1 d-flex justify-content-center">
   <input
     bind:group
     type="radio"
@@ -88,24 +79,14 @@
     on:click={handleClick}
     {disabled}
     type="button"
-    on:focus={() => (focused = true)}
-    on:blur={() => (focused = false)}
+    class="focus-visible-button"
+    style={`border:none; ${labelText === "" ? `height:${buttonSize !== "medium" ? "24px" : "28px"}; width: ${buttonSize !== "medium" ? "24px" : "28px"}; background-color:${bgCircleColor}; border-radius:50%;` : buttonSize === "medium" ? `width:auto; max-width: 264px; border-radius: 4px; padding: 4px 8px 4px 4px; height:36px;` : `width:auto; max-width: 218px; border-radius: 4px; padding: 2px 8px 2px 4px; height:28px;`}"`}
     on:mouseenter={() => (hover = true)}
     on:mouseleave={() => (hover = false)}
     on:mousedown={() => (pressed = true)}
     on:mouseup={() => (pressed = false)}
-    style="background-color:transparent; border:none;"
   >
-    <div
-      class="d-flex align-items-center justify-content-center"
-      style={`gap:4px; border: ${borderColor}; ${
-        labelText
-          ? buttonSize === "medium"
-            ? `width:auto; max-width: 264px; border-radius: 4px; padding: 4px 8px 4px 4px; height:36px;`
-            : `width:auto; max-width: 218px; border-radius: 4px; padding: 2px 8px 2px 4px; height:28px;`
-          : `border-radius: 50%; padding: 0; height:${buttonSize !== "medium" ? "24px" : "28px"}; width: ${buttonSize !== "medium" ? "24px" : "28px"}; background-color: ${bgCircleColor};`
-      }`}
-    >
+    <div class="d-flex align-items-center justify-content-center gap-1">
       <span
         class="circle-internal d-flex align-items-center justify-content-center"
         style={`background-color: ${labelText !== "" ? bgCircleColor : "transparent"}; 
@@ -137,9 +118,20 @@
     display: none;
   }
 
+  button {
+    background-color: transparent;
+  }
+
   button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    opacity: 0.8;
+  }
+
+  button:focus {
+    outline: none;
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--border-ds-primary-300);
   }
 
   .label-text-small {
@@ -156,5 +148,8 @@
     font-weight: 500;
     line-height: 18px;
     max-width: 180px;
+  }
+  .focus-visible-button:focus-visible {
+    outline: 2px solid var(--border-ds-primary-300);
   }
 </style>
