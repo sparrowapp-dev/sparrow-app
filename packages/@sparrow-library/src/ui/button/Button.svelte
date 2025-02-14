@@ -5,24 +5,19 @@
 
   export let title = "";
   export let onClick: (e) => void;
-  export let loaderSize = 16;
+
   export let disable = false;
   export let loader = false;
-  export let buttonStyleProp = "font-size: var(--base-text)";
-  export let buttonClassProp = "";
-  export let textClassProp = "";
-  export let textStyleProp = "";
 
-  export let buttonStartIconStyle = "";
+  export let buttonClassProp = "";
+
   export let startIcon;
   export let endIcon;
-  export let buttonEndIconStyle = "";
-  export let allowChild = false;
+
   export let iconSize = 16;
-  export let frontIconSize = 20;
-  export let endIconSize = 20;
+
   // export let buttonIcon;
-  export let size: "small" | "medium" | "large" | "other" = "medium";
+  export let size: "small" | "medium" | "large" = "medium";
   let buttonSize = 28;
   if (size === "small") {
     buttonSize = 28;
@@ -49,14 +44,6 @@
     | "outline-secondary"
     | "outline-danger"
     | "other"
-    // | "icon-primary"
-    // | "icon-secondary"
-    // | "icon-danger"
-    // | "outline-icon-primary"
-    // | "outline-icon-secondary"
-    // | "outline-icon-danger"
-    // | "teritiary-icon-regular"
-    // | "teritiary-icon-danger"
     | "link-primary"
     | "link-secondary"
     | "other";
@@ -216,7 +203,7 @@
   disabled={disable}
   style={` ${`flex:none; min-width:${buttonSize}px; white-space:nowrap; height: ${buttonSize}px; width:auto; border-radius: 4px;`}  `}
   class={`${buttonClassProp}  
-  ${type !== "other" ? `py-1 px-${title.length > 0 ? 3 : 2} gap-2 d-flex align-items-center justify-content-center` : ""} 
+ py-1 px-${title.length > 0 ? 3 : 2} gap-2 d-flex align-items-center justify-content-center
   ${btnClass}`}
   on:click={(e) => {
     onClick(e);
@@ -257,207 +244,7 @@
     position: relative;
     display: inline-block;
   }
-  .sparrow-icon-primary-btn {
-    background-color: var(--bg-ds-primary-400);
-    border-width: 0px;
-    color: var(--text-ds-neutral-50);
-  }
-  .sparrow-icon-primary-btn:hover {
-    background-color: var(--bg-ds-primary-300);
-    border-width: 0px;
-    color: var(--text-ds-neutral-50);
-  }
-  .sparrow-icon-primary-btn:active {
-    background-color: var(--bg-ds-primary-600);
-    border-width: 0px;
-    color: var(--text-ds-neutral-50);
-  }
-  .sparrow-icon-primary-btn:focus-visible {
-    border: 2px solid var(--border-ds-primary-300);
-    outline: none;
-    color: var(--text-ds-neutral-50);
-  }
-  .sparrow-icon-primary-btn-disable {
-    background-color: var(--bg-ds-primary-700);
-    color: var(--text-ds-neutral-400);
-    border: 0px;
-  }
-  .sparrow-icon-secondary-btn {
-    background-color: var(--bg-ds-surface-300);
-    border-width: 0px;
-    color: var(--text-ds-neutral-50);
-  }
-  .sparrow-icon-secondary-btn:hover {
-    background-color: var(--bg-ds-surface-100);
-    border-width: 0px;
-    color: var(--text-ds-neutral-50);
-  }
-  .sparrow-icon-secondary-btn:focus-visible {
-    border: 2px solid var(--border-ds-primary-300);
-    outline: none;
-    color: var(--text-ds-neutral-50);
-  }
-  .sparrow-icon-secondary-btn:active {
-    background-color: var(--bg-ds-surface-400);
-    border-width: 0px;
-    color: var(--text-ds-neutral-50);
-  }
-  .sparrow-icon-secondary-btn-disable {
-    background-color: var(--bg-ds-surface-400);
-    color: var(--text-ds-neutral-400);
-    border: 0px;
-  }
-  .sparrow-icon-danger-btn {
-    background-color: var(--bg-ds-danger-500);
-    border-width: 0px;
-    color: var(--text-ds-neutral-50);
-  }
-  .sparrow-icon-danger-btn:hover {
-    background-color: var(--bg-ds-danger-400);
-    border-width: 0px;
-    color: var(--text-ds-neutral-50);
-  }
-  .sparrow-icon-danger-btn:focus-visible {
-    border: 2px solid var(--border-ds-danger-200);
-    outline: none;
-    color: var(--text-ds-neutral-50);
-  }
-  .sparrow-icon-danger-btn:active {
-    background-color: var(--bg-ds-danger-600);
-    border-width: 0px;
-    color: var(--text-ds-neutral-50);
-  }
-  .sparrow-icon-danger-btn-disable {
-    background-color: var(--bg-ds-danger-700);
-    border-width: 0px;
-    color: var(--text-ds-neutral-400);
-  }
-  .sparrow-outline-icon-primary {
-    background-color: transparent;
-    border: 1px solid var(--border-ds-surface-50);
-    color: var(--text-ds-primary-300);
-  }
-  .sparrow-outline-icon-primary:hover {
-    background-color: var(--bg-ds-primary-400);
-    border-width: 0px;
-    color: var(--text-ds-neutral-50);
-  }
-  .sparrow-outline-icon-primary:focus-visible {
-    border: 2px solid var(--border-ds-primary-300);
-    outline: none;
-    color: var(--text-ds-primary-300);
-  }
-  .sparrow-outline-icon-primary:active {
-    background-color: var(--bg-ds-primary-600);
-    color: var(--text-ds-neutral-50);
-    border-width: 0px;
-  }
-  .sparrow-outline-icon-primary-disable {
-    background-color: transparent;
-    border: 1px solid var(--border-ds-surface-50);
-    color: var(--text-ds-primary-600);
-  }
-  .sparrow-outline-icon-secondary {
-    background-color: transparent;
-    border: 1px solid var(--border-ds-surface-50);
-    color: var(--text-ds-neutral-100);
-  }
-  .sparrow-outline-icon-secondary:hover {
-    background-color: var(--bg-ds-surface-300);
-    border-width: 0px;
-    color: var(--text-ds-neutral-50);
-  }
-  .sparrow-outline-icon-secondary:active {
-    background-color: var(--bg-ds-surface-400);
-    border-width: 0px;
-    color: var(--text-ds-neutral-50);
-  }
-  .sparrow-outline-icon-secondary:focus-visible {
-    background-color: transparent;
-    color: var(--text-ds-neutral-50);
-    outline: none;
-    border: 2px solid var(--border-ds-primary-300);
-  }
-  .sparrow-outline-icon-secondary-disable {
-    background-color: transparent;
-    border: 1px solid var(--border-ds-surface-50);
-    color: var(--text-ds-neutral-500);
-  }
-  .sparrow-outline-icon-danger {
-    background-color: transparent;
-    color: var(--text-ds-danger-300);
-    border: 1px solid var(--border-ds-surface-50);
-  }
-  .sparrow-outline-icon-danger:hover {
-    background-color: var(--bg-ds-danger-500);
-    color: var(--text-ds-neutral-50);
-    border-width: 0px;
-  }
-  .sparrow-outline-icon-danger:focus-visible {
-    border: 2px solid var(--border-ds-danger-200);
-    outline: none;
-    color: var(--text-ds-danger-300);
-  }
-  .sparrow-outline-icon-danger:active {
-    background-color: var(--bg-ds-danger-600);
-    color: var(--text-ds-neutral-50);
-    border-width: 0px;
-  }
-  .sparrow-outline-icon-danger-disable {
-    background-color: transparent;
-    color: var(--text-ds-danger-600);
-    border: 1px solid var(--border-ds-surface-400);
-  }
-  .custom-btn-teritiary-icon-regular {
-    background-color: transparent;
-    color: var(--text-ds-neutral-100);
-    border: 0px;
-  }
-  .custom-btn-teritiary-icon-regular:hover {
-    color: var(--text-ds-neutral-50);
-    background-color: var(--bg-ds-surface-300);
-    border: 0px;
-  }
-  .custom-btn-teritiary-icon-regular:focus-visible {
-    border: 2px solid var(--border-ds-primary-300);
-    outline: none;
-    color: var(--text-ds-neutral-100);
-  }
-  .custom-btn-teritiary-icon-regular:active {
-    color: var(--text-ds-primary-300);
-    background-color: var(--bg-ds-surface-400);
-    border: 0px;
-  }
-  .custom-btn-teritiary-icon-regular-disable {
-    background-color: transparent;
-    color: var(--text-ds-neutral-500);
-    border-width: 0px;
-  }
-  .custom-btn-teritiary-icon-danger {
-    background-color: transparent;
-    color: var(--text-ds-danger-300);
-    border: 0px;
-  }
-  .custom-btn-teritiary-icon-danger:hover {
-    background-color: var(--bg-ds-danger-500);
-    color: var(--text-ds-neutral-50);
-    border: 0px;
-  }
-  .custom-btn-teritiary-icon-danger:focus-visible {
-    outline: none;
-    border: 2px solid var(--border-ds-danger-200);
-    color: var(--text-ds-danger-300);
-  }
-  .custom-btn-teritiary-icon-danger:active {
-    background-color: var(--bg-ds-danger-600);
-    color: var(--text-ds-neutral-50);
-    border: 0px;
-  }
-  .custom-btn-teritiary-icon-danger-disable {
-    background-color: transparent;
-    color: var(--text-ds-danger-600);
-    border: 0px;
-  }
+
   .custom-btn-primary {
     background-color: var(--bg-ds-primary-400);
     color: var(--text-ds-neutral-50);
