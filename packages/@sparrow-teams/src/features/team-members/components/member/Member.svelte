@@ -283,11 +283,12 @@
       style=" margin-top:16px !important; margin-bottom:16px !important;"
     >
       <div class="d-flex align-items-center">
-          <Avatar
+        <Avatar
           type={"letter"}
           size={"large"}
           letter={user.name[0].toUpperCase() || ""}
-          bgColor={"var(--bg-tertiary-700)"}/>
+          bgColor={"var(--bg-tertiary-700)"}
+        />
 
         <div class="name px-2" style="width: 80%;">
           <span style="font-size:12px;" class="text-whiteColor"
@@ -321,19 +322,23 @@
     <div class="d-flex align-items-center ellipsis gap-2">
       <div style="width: 36px;">
         {#if openTeam?.logo?.size}
-           <Avatar
-          type={"image"}
-          size={"large"}
-          image={base64ToURL(openTeam?.logo)}/>
+          <Avatar
+            type={"image"}
+            size={"large"}
+            image={base64ToURL(openTeam?.logo)}
+          />
         {:else}
-           <Avatar
+          <Avatar
             type={"letter"}
             size={"large"}
             letter={openTeam?.name[0] || ""}
-            bgColor={"var(--bg-tertiary-700)"}/>
+            bgColor={"var(--bg-tertiary-700)"}
+          />
         {/if}
       </div>
-      <p style="font-size:16px;" class="mb-0 ellipsis">{openTeam?.name}</p>
+      <p style="font-size:16px; width:275px;" class="mb-0 ellipsis">
+        {openTeam?.name}
+      </p>
     </div>
 
     <Button
@@ -363,11 +368,12 @@
   <div style="font-size: 14px;" class="text-lightGray mb-1 mt-2">
     <div class="d-flex rounded mb-3">
       <div class=" d-flex align-items-center">
-         <Avatar
-            type={"letter"}
-            size={"large"}
-            letter={ user?.name[0]|| ""}
-            bgColor={"var(--bg-tertiary-700)"}/>
+        <Avatar
+          type={"letter"}
+          size={"large"}
+          letter={user?.name[0] || ""}
+          bgColor={"var(--bg-tertiary-700)"}
+        />
         <div class="name px-2" style="width: 80%;">
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
@@ -394,16 +400,20 @@
           <Avatar
             type={"image"}
             size={"large"}
-            image={base64ToURL(openTeam?.logo)}/>
+            image={base64ToURL(openTeam?.logo)}
+          />
         {:else}
-           <Avatar
+          <Avatar
             type={"letter"}
             size={"large"}
             letter={openTeam?.name[0] || ""}
-            bgColor={"var(--bg-tertiary-700)"}/>
+            bgColor={"var(--bg-tertiary-700)"}
+          />
         {/if}
       </div>
-      <p style="font-size:16px;" class="mb-0 ellipsis">{openTeam?.name}</p>
+      <p style="font-size:16px; width:275px;" class="mb-0 ellipsis">
+        {openTeam?.name}
+      </p>
     </div>
     <div>
       <Button
@@ -436,11 +446,12 @@
   <div style="font-size: 14px;" class="text-lightGray mb-1">
     <div class="d-flex rounded mb-3" style="padding-left: 0px !important;">
       <div class="d-flex align-items-center">
-           <Avatar
+        <Avatar
           type={"letter"}
           size={"large"}
           letter={user.name[0] || ""}
-          bgColor={"var(--bg-tertiary-700)"}/>
+          bgColor={"var(--bg-tertiary-700)"}
+        />
         <div class="name px-2" style="width: 80%;">
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
@@ -494,16 +505,24 @@
     <div class="d-flex align-items-center ellipsis gap-2">
       <div style="width: 36px;">
         {#if openTeam?.logo?.size}
-          <Avatar type={"image"} size={"large"} image={base64ToURL(openTeam?.logo)} bgColor={"var(--bg-secondary-600)"}/>
+          <Avatar
+            type={"image"}
+            size={"large"}
+            image={base64ToURL(openTeam?.logo)}
+            bgColor={"var(--bg-secondary-600)"}
+          />
         {:else}
-           <Avatar
+          <Avatar
             type={"letter"}
             size={"large"}
             letter={openTeam?.name[0] || ""}
-            bgColor={"var(--bg-tertiary-700)"}/>
+            bgColor={"var(--bg-tertiary-700)"}
+          />
         {/if}
       </div>
-      <p style="font-size:16px;" class="mb-0 ellipsis">{openTeam?.name}</p>
+      <p style="font-size:16px; width:275px;" class="mb-0 ellipsis">
+        {openTeam?.name}
+      </p>
     </div>
     <Button
       disable={memberOwnershipPopupLoader}
@@ -567,11 +586,12 @@
       memberPopObj.isMemberInfoPopup = true;
     }}
   >
-     <Avatar
+    <Avatar
       type={"letter"}
       size={"large"}
       letter={user?.name?.charAt(0)}
-      bgColor={"var(--bg-secondary-600)"}/>
+      bgColor={"var(--bg-secondary-600)"}
+    />
     <div class="name px-2">
       <span style="font-size:12px;" class="text-whiteColor"
         >{user.name} {owner ? "(You)" : ""}</span
