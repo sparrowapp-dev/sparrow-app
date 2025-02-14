@@ -24,6 +24,7 @@
   export let isWebApp = false;
   export let isGuestUser = false;
   export let searchBarRef;
+  export let osKeyName="Ctrl";
 </script>
 
 <div class="suggestions-container">
@@ -49,6 +50,7 @@
     {handleGlobalSearchTestflowNavgation}
     {isWebApp}
     {isGuestUser}
+    {osKeyName}
   />
 </div>
 

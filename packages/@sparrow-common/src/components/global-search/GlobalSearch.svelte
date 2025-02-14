@@ -11,6 +11,7 @@
     FlowIcon,
     RequestIcon,
   } from "@sparrow/common/images";
+  import { OSDetector } from "@sparrow/common/utils";
 
   export let closeGlobalSearch;
   export let workspaceDocuments;
@@ -42,6 +43,7 @@
   let filteredEnvironments = [];
   let hideGlobalSearch = false;
   let searchBarRef = "";
+  let osKeyName = "Ctrl";
 
   const handleSearch = async () => {
     const { collection, folder, file, workspace, testflow, environment } =
@@ -93,6 +95,13 @@
     },
   ];
 
+  const decidingKey = () => {
+    const os = new OSDetector();
+    if (os.getOS() == "macos") {
+      osKeyName = "Cmd";
+    }
+  };
+
   onMount(async () => {
     try {
       workspaceDetailsMap = workspaceDocuments.reduce((acc, workspace) => {
@@ -103,6 +112,7 @@
         return acc;
       }, {});
       handleSearch();
+      decidingKey();
     } catch (error) {
       console.error("Error fetching workspace details:", error);
     }
@@ -111,7 +121,7 @@
 
 <div class="search-container">
   {#if !hideGlobalSearch}
-    <SearchBar bind:searchQuery {handleSearch} bind:searchBarRef />
+    <SearchBar bind:searchQuery {handleSearch} bind:searchBarRef {osKeyName} />
     <SearchSuggestions
       bind:searchBarRef
       {handleSwitchWorkspaceModal}
@@ -135,6 +145,7 @@
       {selectedType}
       {isWebApp}
       {isGuestUser}
+      {osKeyName}
     />
   {/if}
 </div>

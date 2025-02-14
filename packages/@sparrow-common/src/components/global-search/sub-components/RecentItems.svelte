@@ -16,6 +16,7 @@
   } from "@sparrow/common/images";
   import NoResults from "./NoResults.svelte";
   import { KeyboardShortcuts } from "@sparrow/library/ui";
+  import { onMount } from "svelte";
 
   export let searchQuery = "";
   export let filteredCollection = [];
@@ -33,6 +34,7 @@
   export let filteredEnvironments;
   export let isWebApp = false;
   export let isGuestUser = false;
+  export let osKeyName="Ctrl";
 
   const methodIcons = {
     GET: getIcon,
@@ -84,7 +86,7 @@
       {#if searchQuery == "" && filteredRequest?.length > 0}
         <div class="section-header">
           <span class="section-title">Recent Requests</span>
-            <KeyboardShortcuts keys={["cmd","Shift", "A"]} />
+            <KeyboardShortcuts keys={[osKeyName,"Shift", "A"]} />
         </div>
         <div class="request-section">
           {#each filteredRequest.slice(0, 3) as request}
@@ -129,7 +131,7 @@
       <div style="display:flex;flex-direction:column; gap:4px;">
         <div class="section-top">
           <span class="section-title">Recent Collection</span>
-           <KeyboardShortcuts keys={["cmd","Shift", "C"]} />
+           <KeyboardShortcuts keys={[osKeyName,"Shift", "C"]} />
         </div>
         <div
           class="request-item"
@@ -158,7 +160,7 @@
       <div style="display:flex;flex-direction:column; gap:4px;">
         <div class="section-top">
           <span class="section-title">Recent Environment</span>
-           <KeyboardShortcuts keys={["cmd","Shift", "E"]} />
+           <KeyboardShortcuts keys={[osKeyName,"Shift", "E"]} />
         </div>
 
         <div
@@ -182,7 +184,7 @@
       <div style="display:flex;flex-direction:column; gap:4px;">
         <div class="section-top">
           <span class="section-title">Recent Folder</span>
-           <KeyboardShortcuts keys={["cmd","Shift", "F"]} />
+           <KeyboardShortcuts keys={[osKeyName,"Shift", "F"]} />
         </div>
 
         <div
@@ -211,7 +213,7 @@
       <div style="display:flex;flex-direction:column; gap:4px;">
         <div class="section-top">
           <span class="section-title">Recent Workspace</span>
-            <KeyboardShortcuts keys={["cmd","Shift", "W"]} />
+            <KeyboardShortcuts keys={[osKeyName,"Shift", "W"]} />
         </div>
         <div
           class="request-item"
@@ -235,7 +237,7 @@
     {#if searchQuery == "" && filteredTestflows?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Test Flows</span>
-         <KeyboardShortcuts keys={["cmd","Shift", "T"]} />
+         <KeyboardShortcuts keys={[osKeyName,"Shift", "T"]} />
       </div>
       <div
         class="request-item"
@@ -260,7 +262,7 @@
       {#if filteredRequest?.length > 0}
         <div class="section-header">
           <span class="section-title">Requests</span>
-           <KeyboardShortcuts keys={["cmd","Shift", "A"]} />
+           <KeyboardShortcuts keys={[osKeyName,"Shift", "A"]} />
         </div>
         <div class="request-section">
           {#each filteredRequest as request}
@@ -300,7 +302,7 @@
       {#if filteredCollection?.length > 0}
         <div class="section-header">
           <span class="section-title">Collection</span>
-           <KeyboardShortcuts keys={["cmd","Shift", "C"]} />
+           <KeyboardShortcuts keys={[osKeyName,"Shift", "C"]} />
         </div>
         {#each filteredCollection as collection}
           <div
@@ -326,7 +328,7 @@
       {#if filteredFolder?.length > 0}
         <div class="section-header">
           <span class="section-title">Folders</span>
-            <KeyboardShortcuts keys={["cmd","Shift", "F"]} />
+            <KeyboardShortcuts keys={[osKeyName,"Shift", "F"]} />
         </div>
         {#each filteredFolder as folder}
           <div
@@ -353,7 +355,7 @@
       {#if filteredEnvironments?.length > 0}
         <div class="section-header">
           <span class="section-title">Environment</span>
-            <KeyboardShortcuts keys={["cmd","Shift", "E"]} />
+            <KeyboardShortcuts keys={[osKeyName,"Shift", "E"]} />
         </div>
         {#each filteredEnvironments as environment}
           <div
@@ -375,7 +377,7 @@
       {#if filteredTestflows?.length > 0}
         <div class="section-header">
           <span class="section-title">Test Flows</span>
-            <KeyboardShortcuts keys={["cmd","Shift", "T"]} />
+            <KeyboardShortcuts keys={[osKeyName,"Shift", "T"]} />
         </div>
         {#each filteredTestflows as testflow}
           <div
@@ -397,7 +399,7 @@
       {#if filteredWorkspaces?.length > 0 && !isGuestUser}
         <div class="section-header">
           <span class="section-title">Workspaces</span>
-            <KeyboardShortcuts keys={["cmd","Shift", "W"]} />
+            <KeyboardShortcuts keys={[osKeyName,"Shift", "W"]} />
         </div>
         {#each filteredWorkspaces as workspace}
           <div
@@ -423,7 +425,7 @@
     {#if filteredWorkspaces?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Workspaces</span>
-          <KeyboardShortcuts keys={["cmd","Shift", "W"]} />
+          <KeyboardShortcuts keys={[osKeyName,"Shift", "W"]} />
       </div>
       {#each filteredWorkspaces as workspace}
         <div
@@ -456,7 +458,7 @@
     {#if filteredFolder?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Folders</span>
-           <KeyboardShortcuts keys={["cmd","Shift", "F"]} />
+           <KeyboardShortcuts keys={[osKeyName,"Shift", "F"]} />
       </div>
       {#each filteredFolder as folder}
         <div
@@ -492,7 +494,7 @@
     {#if filteredCollection?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Collections</span>
-          <KeyboardShortcuts keys={["cmd","Shift", "C"]} />
+          <KeyboardShortcuts keys={[osKeyName,"Shift", "C"]} />
       </div>
       {#each filteredCollection as collection}
         <div
@@ -525,7 +527,7 @@
     {#if filteredRequest?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Requests</span>
-          <KeyboardShortcuts keys={["cmd","Shift", "A"]} />
+          <KeyboardShortcuts keys={[osKeyName,"Shift", "A"]} />
       </div>
       <div class="request-section">
         {#each filteredRequest as request}
@@ -573,7 +575,7 @@
     {#if filteredEnvironments?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Environments</span>
-          <KeyboardShortcuts keys={["cmd","Shift", "E"]} />
+          <KeyboardShortcuts keys={[osKeyName,"Shift", "E"]} />
       </div>
       {#each filteredEnvironments as environment}
         <div
@@ -601,7 +603,7 @@
     {#if filteredTestflows?.length > 0}
       <div class="section-header">
         <span class="section-title">Recent Test Flows</span>
-          <KeyboardShortcuts keys={["cmd","Shift", "T"]} />
+          <KeyboardShortcuts keys={[osKeyName,"Shift", "T"]} />
       </div>
       {#each filteredTestflows as testflow}
         <div

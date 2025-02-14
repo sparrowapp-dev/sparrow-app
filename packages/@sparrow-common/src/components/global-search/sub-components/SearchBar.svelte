@@ -7,6 +7,7 @@
   import { KeyboardShortcuts } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   export let searchBarRef;
+  export let osKeyName = "Ctrl";
   let hideKEY = false;
   $: hideKEY = searchQuery.trim().length > 0;
   onMount(() => {
@@ -35,7 +36,7 @@
     </div>
   </div>
   {#if !hideKEY}
-    <KeyboardShortcuts keys={["cmd", "F"]} />
+    <KeyboardShortcuts keys={[ osKeyName , "F"]} />
   {/if}
 </div>
 
