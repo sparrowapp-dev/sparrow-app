@@ -122,3 +122,5 @@ export { default as ThreeDotIcon } from "./ThreeDot.svelte";
 export { default as AiSparkleIconV2 } from "./AiSparkleV2.svelte";
 
 export { default as AiSparkleIconV3 } from "./AiSparkleV3.svelte";
+
+export {default as PlusIcon2} from "./PlusIcon.svelte";

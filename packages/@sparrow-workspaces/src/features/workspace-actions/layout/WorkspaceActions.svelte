@@ -4,7 +4,8 @@
   import { plusWhiteIcon as plusIcon } from "@sparrow/library/assets";
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import { Events, WorkspaceRole } from "@sparrow/common/enums";
-  import { Dropdown } from "@sparrow/library/ui";
+  import { Dropdown, Button } from "@sparrow/library/ui";
+  import { PlusIcon2 } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
@@ -549,15 +550,24 @@
             show={!addButtonMenu}
             zIndex={10}
           >
-            <button
+            <!-- <button
               id="addButton"
               class="border-0 p-1 border-radius-2 add-button"
               on:click={() => {
                 addButtonMenu = !addButtonMenu;
               }}
-            >
+            > -->
+            <!--               
               <img src={plusIcon} alt="" />
-            </button>
+            </button> -->
+            <Button
+              type="icon-primary"
+              id="addButton"
+              buttonIcon={PlusIcon2}
+              on:click={() => {
+                addButtonMenu = !addButtonMenu;
+              }}
+            />
           </Tooltip>
         </Dropdown>
       {/if}
