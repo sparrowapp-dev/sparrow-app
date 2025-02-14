@@ -95,7 +95,7 @@
   }
 
   .request-item:hover .request-title {
-    color: var(--white-color);
+    color: var(--text-ds-neutral-50);
   }
 
   .request-item:hover .request-path {

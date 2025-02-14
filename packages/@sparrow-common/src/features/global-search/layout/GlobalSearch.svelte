@@ -11,6 +11,7 @@
     FlowIcon,
     RequestIcon,
   } from "../images";
+  import { folderIcon } from "@sparrow/library/assets";
 
   export let closeGlobalSearch;
   export let workspaceDocuments;

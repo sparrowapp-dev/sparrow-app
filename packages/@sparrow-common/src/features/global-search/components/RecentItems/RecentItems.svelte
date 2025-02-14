@@ -1,22 +1,17 @@
 <script lang="ts">
   import {
-    FolderIcon,
-    EnvironmentIcon,
-    CollectionIcon,
-    WorkspaceIcon,
     getIcon,
-    hexIcon,
-    postIcon,
+    // hexIcon,
     putIcon,
     deleteIcon,
     patchIcon,
-    socketIoIcon,
-    webSocketIcon,
-    FlowIcon,
-    RequestIcon,
+    // socketIoIcon,
+    // webSocketIcon,
+    postIcon
   } from "../../images";
+  import { CollectionIcon , FolderIcon ,StackIcon as EnvironmentIcon, SocketIoIcon as socketIoIcon , GraphIcon as hexIcon , SocketIcon as webSocketIcon, WorkspaceIcongs, FlowIcon, RequestIcon } from "@sparrow/library/icons";
+  import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
   import NoResults from "../NoResults/NoResults.svelte";
-  import type { SearchConfig } from "../../types/types";
   export let searchQuery = "";
   export let filteredCollection = [];
   export let filteredFolder = [];
@@ -83,7 +78,7 @@
       items: filteredWorkspaces,
       title: searchQuery === "" ? "Recent Workspaces" : "Workspaces",
       shortcutKeys: ["Shift", "W"],
-      icon: WorkspaceIcon,
+      icon: WorkspaceIcongs,
       nav: (item) => handleGlobalSearchWorkspaceNavigation(item),
       getName: (item) => item.name,
       getPath: (item) => item.team.teamName,
@@ -281,7 +276,7 @@
             {:else if section.key === "workspaces"}
               <ItemBar
                 data={{ name: item.name, path: item.team.teamName }}
-                icon={WorkspaceIcon}
+                icon={WorkspaceIcongs}
                 onClick={() => handleGlobalSearchWorkspaceNavigation(item)}
               />
             {:else if section.key === "flows"}
@@ -368,7 +363,7 @@
               {:else if section.key === "workspaces"}
                 <ItemBar
                   data={{ name: item.name, path: item.team.teamName }}
-                  icon={WorkspaceIcon}
+                  icon={WorkspaceIcongs}
                   onClick={() => handleGlobalSearchWorkspaceNavigation(item)}
                 />
               {/if}
