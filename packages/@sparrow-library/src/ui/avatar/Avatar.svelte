@@ -7,15 +7,15 @@
   export let bgColor = "var(--bg-tertiary-800)";
 </script>
 
-<div 
-  class="avatar {size} {type}" 
+<div
+  class="avatar {size} {type}"
   style="--avatar-bg-color: {bgColor};"
 >
   {#if type === "person"}
     <PersonIcon />
   {:else if type === "letter"}
-    {letter.charAt(0).toUpperCase()}
-  {:else if type === "image" && Image}
+    <span class="letter-content">{letter.charAt(0).toUpperCase()}</span>
+  {:else if type === "image" && image}
     <img src={image} alt="Avatar" class="avatar-image" />
   {/if}
 </div>
@@ -25,7 +25,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 100%;
+    position: relative;
   }
   .small {
     width: 24px;
@@ -50,6 +51,14 @@
     background-color: var(--avatar-bg-color, var(--bg-ds-secondary-400));
     color: var(--bg-ds-neutral-50);
     border: 2px solid var(--bg-ds-surface-50);
+  }
+  .letter-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding-top: 1px;
+    line-height: 1;
   }
   .image {
     object-fit: cover;
