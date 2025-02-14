@@ -214,9 +214,9 @@
 <button
   {id}
   disabled={disable}
-  style={` ${`min-width:${buttonSize}px; display: flex; flex-direction: row; justify-content: center; align-items: center; height: ${buttonSize}px; width:auto; border-radius: 4px;`} `}
+  style={` ${`flex:none; min-width:${buttonSize}px; white-space:nowrap; height: ${buttonSize}px; width:auto; border-radius: 4px;`}  `}
   class={`${buttonClassProp}  
-  ${type !== "other" ? `py-1 px-${title.length > 0 ? 3 : 2} gap-2 d-flex align-items-center` : ""} 
+  ${type !== "other" ? `py-1 px-${title.length > 0 ? 3 : 2} gap-2 d-flex align-items-center justify-content-center` : ""} 
   ${btnClass}`}
   on:click={(e) => {
     onClick(e);
