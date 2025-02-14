@@ -14,14 +14,14 @@
   export let textStyleProp = "";
 
   export let buttonStartIconStyle = "";
-  export let buttonstartIcon;
-  export let buttonEndIcon;
+  export let startIcon;
+  export let endIcon;
   export let buttonEndIconStyle = "";
   export let allowChild = false;
   export let iconSize = 16;
   export let frontIconSize = 20;
   export let endIconSize = 20;
-  export let buttonIcon;
+  // export let buttonIcon;
   export let size: "small" | "medium" | "large" | "other" = "medium";
   let buttonSize = 28;
   if (size === "small") {
@@ -49,14 +49,14 @@
     | "outline-secondary"
     | "outline-danger"
     | "other"
-    | "icon-primary"
-    | "icon-secondary"
-    | "icon-danger"
-    | "outline-icon-primary"
-    | "outline-icon-secondary"
-    | "outline-icon-danger"
-    | "teritiary-icon-regular"
-    | "teritiary-icon-danger"
+    // | "icon-primary"
+    // | "icon-secondary"
+    // | "icon-danger"
+    // | "outline-icon-primary"
+    // | "outline-icon-secondary"
+    // | "outline-icon-danger"
+    // | "teritiary-icon-regular"
+    // | "teritiary-icon-danger"
     | "link-primary"
     | "link-secondary"
     | "other";
@@ -92,26 +92,27 @@
   // define button variants
 
   let btnClass = "";
+  let fontSize = 12;
   $: {
     if (size === "small") {
-      buttonSize = 24;
-      frontIconSize = 12;
-      endIconSize = 12;
+      fontSize = 12;
+      buttonSize = 28;
+
       iconSize = 12;
     } else if (size === "medium") {
+      fontSize = 14;
       buttonSize = 36;
-      frontIconSize = 16;
-      endIconSize = 16;
+
       iconSize = 16;
     } else if (size === "large") {
+      fontSize = 16;
       buttonSize = 40;
-      frontIconSize = 20;
-      endIconSize = 20;
+
       iconSize = 20;
     } else {
-      buttonSize = 24;
-      frontIconSize = 24;
-      endIconSize = 24;
+      fontSize = 12;
+      buttonSize = 28;
+
       iconSize = 24;
     }
 
@@ -150,36 +151,14 @@
         case BtnType.TRANSPARENT:
           btnClass = "custom-btn-transparent";
           break;
-        case BtnType.IconPrimary:
-          btnClass = "sparrow-icon-primary-btn";
-          break;
-        case BtnType.IconSecondary:
-          btnClass = "sparrow-icon-secondary-btn";
-          break;
-        case BtnType.IconDanger:
-          btnClass = "sparrow-icon-danger-btn";
-          break;
-        case BtnType.OutlineIconPrimary:
-          btnClass = "sparrow-outline-icon-primary";
-          break;
-        case BtnType.OutlineIconSecondary:
-          btnClass = "sparrow-outline-icon-secondary";
-          break;
-        case BtnType.OutlineIconDanger:
-          btnClass = "sparrow-outline-icon-danger";
-          break;
+
         case BtnType.TeritiaryRegular:
           btnClass = "custom-btn-teritiary-regular";
           break;
         case BtnType.TeritiaryDanger:
           btnClass = "custom-btn-teritiary-danger";
           break;
-        case BtnType.TeritiaryIconRegular:
-          btnClass = "custom-btn-teritiary-icon-regular";
-          break;
-        case BtnType.TeritiaryIconDanger:
-          btnClass = "custom-btn-teritiary-icon-danger";
-          break;
+
         case BtnType.LinkPrimary:
           btnClass = "custom-btn-link-primary";
           break;
@@ -215,33 +194,7 @@
           btnClass = "custom-btn-teritiary-danger-disable";
           break;
         }
-        case BtnType.TeritiaryIconRegular:
-          btnClass = "custom-btn-teritiary-icon-regular-disable";
-          break;
-        case BtnType.TeritiaryIconDanger:
-          btnClass = "custom-btn-teritiary-icon-danger-disable";
-          break;
-        case BtnType.OutlineDanger:
-          btnClass = "custom-btn-outline-danger-disable";
-          break;
-        case BtnType.IconPrimary:
-          btnClass = "sparrow-icon-primary-btn-disable";
-          break;
-        case BtnType.IconSecondary:
-          btnClass = "sparrow-icon-secondary-btn-disable";
-          break;
-        case BtnType.IconDanger:
-          btnClass = "sparrow-icon-danger-btn-disable";
-          break;
-        case BtnType.OutlineIconPrimary:
-          btnClass = "sparrow-outline-icon-primary-disable";
-          break;
-        case BtnType.OutlineIconSecondary:
-          btnClass = "sparrow-outline-icon-secondary-disable";
-          break;
-        case BtnType.OutlineIconDanger:
-          btnClass = "sparrow-outline-icon-danger-disable";
-          break;
+
         case BtnType.Secondary:
           btnClass = "custom-btn-secondary-disable";
         case BtnType.LinkPrimary:
@@ -261,59 +214,41 @@
 <button
   {id}
   disabled={disable}
-  style={` ${`display: flex; flex-direction: row; justify-content: center; align-items: center; height: ${buttonSize}px; width:auto; border-radius: 4px;`} ${buttonStyleProp}`}
-  class={`${buttonClassProp}  ${
-    type !== "other" ? "py-1 px-3 d-flex align-items-center " : ""
-  } ${btnClass}`}
+  style={` ${`min-width:${buttonSize}px; display: flex; flex-direction: row; justify-content: center; align-items: center; height: ${buttonSize}px; width:auto; border-radius: 4px;`} `}
+  class={`${buttonClassProp}  
+  ${type !== "other" ? `py-1 px-${title.length > 0 ? 3 : 2} gap-2 d-flex align-items-center` : ""} 
+  ${btnClass}`}
   on:click={(e) => {
     onClick(e);
   }}
 >
-  {#if type === "icon-primary" || type === "icon-secondary" || type === "icon-danger" || type === "outline-icon-danger" || type === "outline-icon-primary" || type === "outline-icon-secondary" || type === "teritiary-icon-regular" || type === "teritiary-icon-danger"}
-    {#if buttonIcon}
-      <span>
-        <svelte:component
-          this={buttonIcon}
-          style={buttonStyleProp}
-          useParentColor={true}
-        />
-      </span>
-    {/if}
-  {/if}
-
-  {#if buttonstartIcon}
-    <span class="me-2">
-      <svelte:component
-        this={buttonstartIcon}
-        style={`${buttonStartIconStyle} border-radius: 50%;`}
-        height={`${frontIconSize}px`}
-        width={`${frontIconSize}px`}
-        useParentColor={true}
-        {color}
-      />
-    </span>
+  {#if startIcon}
+    <svelte:component
+      this={startIcon}
+      height={`${iconSize}px`}
+      width={`${iconSize}px`}
+      useParentColor={true}
+      {color}
+    />
   {/if}
 
   {#if loader}
-    <span class="mx-2 d-flex justify-content-center">
-      <Spinner size={`${loaderSize}px`} />
+    <span class="d-flex justify-content-center">
+      <Spinner size={`${iconSize}px`} />
     </span>
-  {:else if !loader && title !== ""}
-    <span class={textClassProp} style={textStyleProp}>
+  {:else if title}
+    <span style={` font-size:${fontSize}px; font-weight:500; `}>
       {title}
     </span>
   {/if}
 
-  {#if buttonEndIcon}
-    <span class="ms-2">
-      <svelte:component
-        this={buttonEndIcon}
-        style={`${buttonEndIconStyle}  border-radius: 50%;`}
-        height={`${endIconSize}px`}
-        width={`${endIconSize}px`}
-        useParentColor={true}
-      />
-    </span>
+  {#if endIcon}
+    <svelte:component
+      this={endIcon}
+      height={`${iconSize}px`}
+      width={`${iconSize}px`}
+      useParentColor={true}
+    />
   {/if}
 </button>
 

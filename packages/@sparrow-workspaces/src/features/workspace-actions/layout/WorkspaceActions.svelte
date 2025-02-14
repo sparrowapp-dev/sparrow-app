@@ -556,13 +556,11 @@
               <img src={plusIcon} alt="" />
             </button> -->
             <Button
-              type="icon-primary"
+              type="primary"
               id="addButton"
               size={"small"}
-              buttonClassProp={"px-1"}
-              buttonStyleProp={"height:28px;"}
-              buttonIcon={PlusIcon2}
-              on:click={() => {
+              startIcon={PlusIcon2}
+              onClick={() => {
                 addButtonMenu = !addButtonMenu;
               }}
             />
