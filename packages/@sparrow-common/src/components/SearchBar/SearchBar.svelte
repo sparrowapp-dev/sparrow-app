@@ -5,24 +5,27 @@
   import { SearchIcon } from "@sparrow/library/assets";
   import { OSDetector } from "../../utils";
   import { onMount } from "svelte";
-  let keyName="Ctrl";
+  import { KeyboardShortcuts } from "@sparrow/library/ui";
+  let keyName = "Ctrl";
 
   const decidingKey = () => {
     const os = new OSDetector();
     if (os.getOS() == "macos") {
-       keyName = "Cmd";
+      keyName = "Cmd";
     }
   };
-  onMount(()=>{
+  onMount(() => {
     decidingKey();
-  })
-
+  });
 </script>
 
 <div class="container" on:click={onClick}>
   <div class="first">
     <div class="image-container">
-      <SearchIcon color=var(--icon-ds-neutral-400) class="image-container-img" />
+      <SearchIcon
+        color="var(--icon-ds-neutral-400)"
+        class="image-container-img"
+      />
     </div>
 
     <input
@@ -34,8 +37,7 @@
     />
   </div>
   <div class="keys">
-    <span class="key">{keyName}</span>
-    <span class="key">F</span>
+    <KeyboardShortcuts keys={[keyName, "F"]} />
   </div>
 </div>
 
@@ -56,6 +58,7 @@
 
     align-items: center;
     gap: 8px;
+    margin-right: 6px;
   }
   .container:hover {
     border: 1px solid var(--border-ds-neutral-200);
@@ -81,7 +84,7 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    color: var(--text-ds-neutral-400);;
+    color: var(--text-ds-neutral-400);
   }
   .image-container {
     position: relative;

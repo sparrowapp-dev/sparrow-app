@@ -23,15 +23,15 @@
   export let endIconSize = 20;
   export let buttonIcon;
   export let size: "small" | "medium" | "large" | "other" = "medium";
-  let buttonSize = 24;
+  let buttonSize = 28;
   if (size === "small") {
-    buttonSize = 24;
+    buttonSize = 28;
   } else if (size === "medium") {
     buttonSize = 36;
   } else if (size === "large") {
     buttonSize = 40;
   } else {
-    buttonSize = 24;
+    buttonSize = 36;
   }
   let color = "white";
   export let type:
@@ -261,7 +261,7 @@
 <button
   {id}
   disabled={disable}
-  style={`${buttonStyleProp} ${`display: flex; flex-direction: row; justify-content: center; align-items: center; height: ${buttonSize}px; width:auto; border-radius: 4px;`}`}
+  style={` ${`display: flex; flex-direction: row; justify-content: center; align-items: center; height: ${buttonSize}px; width:auto; border-radius: 4px;`} ${buttonStyleProp}`}
   class={`${buttonClassProp}  ${
     type !== "other" ? "py-1 px-3 d-flex align-items-center " : ""
   } ${btnClass}`}

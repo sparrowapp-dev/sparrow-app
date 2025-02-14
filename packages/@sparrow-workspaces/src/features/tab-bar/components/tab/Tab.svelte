@@ -1,19 +1,23 @@
 <script lang="ts">
   // ---- Icon
-  import { CrossIcon, CrossIcon as Crossicon } from "@sparrow/library/assets";
+  import {
+    Collection,
+    CrossIcon,
+    CrossIcon as Crossicon,
+    folderIcon,
+  } from "@sparrow/library/assets";
   import { BookIcon } from "@sparrow/library/assets";
   // ----
 
   // ---- SVG
-  import { collectionNodesIcon as collectionAsset } from "@sparrow/library/assets";
-  import { folderTabIcon as folderTab } from "@sparrow/library/assets";
-
+  import { folderIcon3 } from "@sparrow/library/assets";
   // ---- helper functions
   import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
   // ----
 
   // ---- Interface
   import {
+    CrossIcon2,
     CrossIconV2,
     GraphIcon,
     SocketIcon,
@@ -23,7 +27,8 @@
   } from "@sparrow/library/icons";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import { type Tab } from "@sparrow/common/types/workspace/tab";
-  import { Badge } from "@sparrow/library/ui";
+  import { Badge, Spinner } from "@sparrow/library/ui";
+  import { SvelteComponent } from "svelte";
   // ----
 
   // ------ Props ------
@@ -58,8 +63,13 @@
   /**
    * Callback function for drop over at a index
    * @param index - Index of Tab
+   *
+   *
    */
+  export let loader;
   export let onDropOver: (index: number) => void;
+
+  export let listLength;
 
   function handleMouseDown(event: MouseEvent) {
     if (event.button === 1) {
@@ -77,19 +87,24 @@
   on:dragstart={() => {
     onDragStart(index);
   }}
-  class="d-inline-block p-0 position-relative pt-1 individual-tab bg-transparent border-0"
+  tabindex="0"
+  class=" badge-container tab-container d-inline-block p-0 position-relative pt-1 individual-tab"
   style="width: {tabWidth}px; height:35px; margin-left:{index === 0
     ? '4px'
     : ''}"
   on:mousedown={handleMouseDown}
 >
   <div
-    class=" w-100 d-flex justify-content-between px-2 border-upper-radius h-100 align-items-center"
-    style="margin-left: -1px;  background-color: {tab.isActive
-      ? 'var(--bg-secondary-850)'
-      : 'transparent'};"
+    tabindex="-1"
+    class="tab-item w-100 d-flex justify-content-between px-2 border-upper-radius h-100 align-items-center"
+    style=" margin-left: -1px;  background-color: {tab.isActive
+      ? 'var(--bg-secondary-850) !important'
+      : 'transparent'};  border-top : {tab.isActive
+      ? '2px solid var(--bg-primary-400)'
+      : '2px solid transparent'};"
   >
     <button
+      tabindex="-1"
       on:click={() => {
         if (!tab.isActive) {
           onTabSelected(tab.id);
@@ -99,7 +114,9 @@
       style="width: 100%;
         text-align: left; font-weight:700; background-color:transparent;"
     >
-      {#if tab.type === TabTypeEnum.REQUEST}
+      {#if loader}
+        <Spinner size={"16px"} />
+      {:else if tab.type === TabTypeEnum.REQUEST}
         <span class="text-{getMethodStyle(tab?.property?.request?.method)}">
           <span
             class={!tab.isActive ? "request-icon" : ""}
@@ -110,15 +127,15 @@
       {:else if tab.type === TabTypeEnum.FOLDER}
         <span>
           <img
-            src={folderTab}
+            src={folderIcon3}
             alt="folder-tab"
-            style="width: 30px;heigh:24px;margin-right:5px;"
+            style="width: 16px;heigh:16px;margin-right:5px;"
           /></span
         >
       {:else if tab.type === TabTypeEnum.COLLECTION}
         <span>
           <img
-            src={collectionAsset}
+            src={Collection}
             alt="book"
             style="width: 19px;heigh:19px;margin-right:5px;"
           />
@@ -132,7 +149,7 @@
           <SocketIcon
             height={"12px"}
             width={"16px"}
-            color={"var(--icon-primary-300)"}
+            color={"var(--bg-ds-primary-400)"}
           />
         </span>
       {:else if tab.type === TabTypeEnum.ENVIRONMENT}
@@ -169,33 +186,42 @@
         </span>
       {/if}
       <span
-        class="font-weight-normal ms-1 text-fs-12 {!tab.isActive
-          ? 'request-text'
-          : ''}"
-        style={`color:  var(--text-secondary-100)`}
+        class=" ms-1 text-fs-12 {!tab.isActive ? 'request-text' : ''}"
+        style={`font-weight:500; font-size:12px; line-height:18px;  color:  var(--text-ds-neutral-300)`}
       >
         {tab.name}
       </span>
     </button>
-    {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
-      {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
-        <Badge type={"dot"} variant="danger" size="medium" />
+    <div style="align-items:center; justify-content:center;">
+      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
+        <div
+          class="badge-container badge"
+          style="width:18px ; height:18px ; align-items:center; justify-content:center;"
+        >
+          {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
+            <Badge type="dot" variant="danger" size="medium" />
+          {/if}
+        </div>
       {/if}
-    {/if}
 
-    <button
-      class="cross-icon-btn p-0 d-flex align-items-center justify-content-center {// toggle cross icon for inactive tabs
-      !tab.isActive ? 'inactive-close-btn' : ''} btn"
-      on:click={() => {
-        onTabClosed(tab.id, tab);
-      }}
-      style="overflow:hidden; height: 18px; width:18px;"
-    >
-      <CrossIconV2 height={"9px"} width={"9px"} />
-    </button>
-    {#if !tab.isActive}
+      <button
+        class="cross-icon-btn p-0 align-items-center justify-content-center {// toggle cross icon for inactive tabs
+        !tab.isActive ? 'inactive-close-btn' : ''} btn"
+        on:click={() => {
+          onTabClosed(tab.id, tab);
+        }}
+        style="overflow:hidden; height: 18px; width:18px;"
+      >
+        <CrossIcon2
+          height={"16px"}
+          width={"16px"}
+          color={"var(--bg-ds-neutral-50)"}
+        />
+      </button>
+    </div>
+    {#if !tab.isActive && listLength - 1 !== index}
       <div
-        class="position-absolute"
+        class="edgeLine position-absolute"
         style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
       />
     {/if}
@@ -205,6 +231,43 @@
 <style>
   * {
     transition: all 100ms;
+  }
+  .badge {
+    display: flex;
+  }
+  .badge-container:hover .badge {
+    display: none;
+  }
+  .badge-container:hover .divider {
+    display: none;
+  }
+  .badge-container:hover .edgeLine {
+    display: none;
+  }
+
+  .badge-container:focus .cross-icon-btn {
+    display: none;
+  }
+  .badge-container:hover .cross-icon-btn {
+    display: flex;
+  }
+  .cross-icon-btn {
+    display: none;
+  }
+  .tab-item:hover {
+    background-color: var(--bg-ds-surface-300) !important;
+  }
+  .tab-item:active {
+    background-color: var(--bg-ds-surface-500) !important;
+  }
+  .tab-container {
+    background-color: transparent;
+    border: 0px;
+  }
+  .tab-container:focus-visible {
+    border-radius: 4px;
+    outline: 2px solid var(--bg-ds-primary-300);
+    background-color: var(--bg-ds-surface-700);
   }
   .border-upper-radius {
     border-top-left-radius: 5px;
@@ -224,16 +287,16 @@
     color: inherit !important;
   }
   .request-text {
-    font-weight: 400;
-    color: var(--text-secondary-100) !important;
+    font-weight: 500 !important;
+    color: var(--text-ds-neutral-300) !important;
   }
   .individual-tab:hover .request-text {
     color: var(--text-secondary-100) !important;
   }
 
   .cross-icon-btn:hover {
-    background-color: var(--text-tertiary-300);
-    border-radius: 2px;
+    /* background-color: var(--text-tertiary-300); */
+    /* border-radius: 2px; */
   }
   .ellipsis {
     color: var(--text-secondary-100);
