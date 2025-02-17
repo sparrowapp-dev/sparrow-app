@@ -16,8 +16,9 @@
   $: containerClass = `custom-checkbox ${disabled ? "disabled" : ""} ${checked ? "checked" : ""} ${size} ${type}`;
 </script>
 
-<label class={containerClass} tabindex="0">
+<label class={containerClass} tabindex={!disabled ? 0 : -1}>
   <input
+    tabindex={!disabled ? 0 : -1}
     type="checkbox"
     on:input={handleChange}
     {disabled}
@@ -25,6 +26,7 @@
     aria-disabled={disabled}
   />
   <span
+    tabindex={!disabled ? 0 : -1}
     class={`checkmark ${size} ${disabled ? "disabled" : ""} ${checked ? "checked" : ""}`}
   ></span>
   {#if type === "button-checkbox-text"}

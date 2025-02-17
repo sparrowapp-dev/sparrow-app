@@ -132,3 +132,4 @@ export { default as PersonIcon } from "./Person.svelte";
 
 export {default as FolderIcon3} from "./FolderIcon.svelte"; 
 export {default as SearchIcon2} from "./SearchIcon2.svelte";
+export {default as PlusIcon2} from "./PlusIcon.svelte";
