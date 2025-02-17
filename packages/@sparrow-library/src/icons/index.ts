@@ -125,24 +125,20 @@ export { default as AiSparkleIconV3 } from "./AiSparkleV3.svelte";
 export { default as WorkspaceIcons } from "./Board.svelte";
 export { default as WorkspaceIcongs } from "./Board.svelte";
 export { default as FlowIcon } from "./flowIcon.svelte";
-export {default as CollectionIcongs} from "./collectionStack.svelte"
-export { default as RequestIcon2} from "./arrowSwap.svelte"
+export { default as CollectionIcongs } from "./collectionStack.svelte";
+export { default as RequestIcon2 } from "./arrowSwap.svelte";
 
 export { default as DismissRegular } from "./DismissRegular.svelte";
-
 export { default as SearchIcon } from "./SearchIcon.svelte";
 export { default as CrossIcon2 } from "./crossIcon.svelte";
 export { default as CommandKey } from "./Key.svelte";
 export { default as PersonIcon } from "./Person.svelte";
-export {default as FolderIcon3} from "./FolderIcon.svelte"; 
-export {default as SearchIcon2} from "./SearchIcon2.svelte";
+export { default as FolderIcon3 } from "./FolderIcon.svelte";
+export { default as SearchIcon2 } from "./SearchIcon2.svelte";
 export { default as PlusIcon2 } from "./PlusIcon.svelte";
-
-export { default as FolderIcon4 } from "./FolderIcon4.svelte"; 
+export { default as FolderIcon4 } from "./FolderIcon4.svelte";
 export { default as getIcon } from "./Get.svelte";
 export { default as patchIcon } from "./Patch.svelte";
 export { default as postIcon } from "./Post.svelte";
 export { default as putIcon } from "./Put.svelte";
 export { default as deleteIcon } from "./Delete.svelte";
-// export { default as SearchIcon } from "./SearchIcon.svelte";
-// export { default as socketIoIcon } from "./Socket.io.svelte";

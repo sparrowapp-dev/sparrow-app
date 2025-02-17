@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SearchIcon as searchIcon } from "@sparrow/library/icons";
+  import { SearchIcon } from "@sparrow/library/icons";
 
   export let searchQuery = "";
   export let type: "Basic" | "Custom" = "Basic";
@@ -8,7 +8,7 @@
 
 <div class="container">
   <div style="display:flex; align-items:center; justify-content:center;">
-    <img src={searchIcon} alt="" class="width:24px, height:24px" />
+    <img src={SearchIcon} alt="" class="width:24px, height:24px" />
   </div>
   <div class="text-container">
     {#if type === "Basic"}
