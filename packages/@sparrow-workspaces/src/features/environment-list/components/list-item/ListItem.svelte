@@ -240,6 +240,7 @@
       }}
     >
       <RadioButton
+        class="p-0 m-0  ps-4 me-2"
         buttonSize="medium"
         selected={currentWorkspace?.environmentId === env.id}
         handleChange={() => handleSelectEnvironment()}

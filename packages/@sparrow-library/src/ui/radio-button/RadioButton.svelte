@@ -1,7 +1,6 @@
 <script lang="ts">
   import { SelectIcon } from "./icons";
   export let selected: boolean = false;
-  export let inputText: string = "";
   export let id: string = "";
   export let name: string = "";
   export let value: string = "";
@@ -13,6 +12,8 @@
   export let buttonSize: "small" | "medium" = "medium";
   export let disabled: boolean = false;
   export let singleSelect: boolean = false;
+  let componentClass = "";
+  export { componentClass as class };
 
   let hover: boolean = false;
   let pressed: boolean = false;
@@ -70,7 +71,7 @@
   }
 </script>
 
-<div class="mx-1 d-flex justify-content-center">
+<div class="d-flex justify-content-center {componentClass}">
   <input
     bind:group
     type="radio"
@@ -108,10 +109,6 @@
           {selectedColor}
         />
       </span>
-      {#if inputText !== ""}
-        <span class={`label-text-${buttonSize}`}>{inputText}</span>
-      {/if}
-
       {#if labelText !== ""}
         <label for={id} class={`label-text-${buttonSize}`}>{labelText}</label>
       {/if}
