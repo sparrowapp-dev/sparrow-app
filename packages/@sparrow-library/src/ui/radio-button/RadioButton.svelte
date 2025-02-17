@@ -1,34 +1,39 @@
-<script>
+<script lang="ts">
   import { SelectIcon } from "./icons";
-  export let selected = false;
-  export let inputText = "";
-  export let id = "";
-  export let name = "";
-  export let value = "";
-  export let group;
-  export let labelText = "";
-  export let handleChange;
-  export let buttonSize = "medium";
-  export let disabled = false;
+  export let selected: boolean = false;
+  export let inputText: string = "";
+  export let id: string = "";
+  export let name: string = "";
+  export let value: string = "";
+  export let group: string | undefined;
+  export let labelText: string = "";
+  export let handleChange:
+    | ((event?: { target: { value: string } }) => void)
+    | (() => void);
+  export let buttonSize: "small" | "medium" = "medium";
+  export let disabled: boolean = false;
+  export let singleSelect: boolean = false;
 
-  let hover = false;
-  let pressed = false;
+  let hover: boolean = false;
+  let pressed: boolean = false;
 
-  let defaultUnselectedColor = "var(--icon-ds-neutral-200)";
-  let defaultSelectedColor = "var(--icon-ds-primary-400)";
-  let hoverUnselectedColor = "var(--icon-ds-neutral-50)";
-  let hoverSelectedColor = "var(--icon-ds-primary-300)";
-  let pressedUnselectedColor = "var(--icon-ds-primary-300)";
-  let pressedSelectedColor = "var(--icon-ds-primary-300)";
-  let disabledUnselectedColor = "var(--icon-ds-neutral-500)";
-  let disabledSelectedColor = "var(--icon-ds-primary-700)";
+  const defaultUnselectedColor = "var(--icon-ds-neutral-200)";
+  const defaultSelectedColor = "var(--icon-ds-primary-400)";
+  const hoverUnselectedColor = "var(--icon-ds-neutral-50)";
+  const hoverSelectedColor = "var(--icon-ds-primary-300)";
+  const pressedUnselectedColor = "var(--icon-ds-primary-300)";
+  const pressedSelectedColor = "var(--icon-ds-primary-300)";
+  const disabledUnselectedColor = "var(--icon-ds-neutral-500)";
+  const disabledSelectedColor = "var(--icon-ds-primary-700)";
 
-  let hoverdBgColor = "var(--bg-ds-surface-300)";
-  let pressedBgColor = "var(--bg-ds-surface-400)";
-  let defaultBgColor = "transparent";
+  const hoverdBgColor = "var(--bg-ds-surface-300)";
+  const pressedBgColor = "var(--bg-ds-surface-400)";
+  const defaultBgColor = "transparent";
 
   // Use group value for selection state
-  $: selected = group === value;
+  $: if (!singleSelect) {
+    selected = group === value;
+  }
 
   $: unSelectedColor = disabled
     ? disabledUnselectedColor
@@ -54,12 +59,13 @@
         ? hoverdBgColor
         : defaultBgColor;
 
-  function handleClick() {
-    if (!disabled) {
+  function handleClick(): void {
+    if (disabled) return;
+    if (!singleSelect) {
       group = value;
-      if (handleChange) {
-        handleChange({ target: { value } });
-      }
+      handleChange?.({ target: { value } });
+    } else {
+      handleChange?.();
     }
   }
 </script>
@@ -80,7 +86,7 @@
     {disabled}
     type="button"
     class="focus-visible-button"
-    style={`border:none; ${labelText === "" ? `height:${buttonSize !== "medium" ? "24px" : "28px"}; width: ${buttonSize !== "medium" ? "24px" : "28px"}; background-color:${bgCircleColor}; border-radius:50%;` : buttonSize === "medium" ? `width:auto; max-width: 264px; border-radius: 4px; padding: 4px 8px 4px 4px; height:36px;` : `width:auto; max-width: 218px; border-radius: 4px; padding: 2px 8px 2px 4px; height:28px;`}"`}
+    style={`border:none; ${labelText === "" ? `height:${buttonSize !== "medium" ? "24px" : "28px"}; width: ${buttonSize !== "medium" ? "24px" : "28px"}; background-color:${bgCircleColor}; border-radius:50%;` : buttonSize === "medium" ? `width:auto; max-width: 264px; border-radius: 4px; padding: 4px 8px 4px 4px; height:36px;` : `width:auto; max-width: 218px; border-radius: 4px; padding: 2px 8px 2px 4px; height:28px;`}`}
     on:mouseenter={() => (hover = true)}
     on:mouseleave={() => (hover = false)}
     on:mousedown={() => (pressed = true)}
