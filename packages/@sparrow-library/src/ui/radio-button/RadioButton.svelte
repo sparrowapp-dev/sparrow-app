@@ -12,53 +12,64 @@
   export let buttonSize: "small" | "medium" = "medium";
   export let disabled: boolean = false;
   export let singleSelect: boolean = false;
+  export let variant: "primary" = "primary";
   let componentClass = "";
   export { componentClass as class };
 
   let hover: boolean = false;
   let pressed: boolean = false;
 
-  const defaultUnselectedColor = "var(--icon-ds-neutral-200)";
-  const defaultSelectedColor = "var(--icon-ds-primary-400)";
-  const hoverUnselectedColor = "var(--icon-ds-neutral-50)";
-  const hoverSelectedColor = "var(--icon-ds-primary-300)";
-  const pressedUnselectedColor = "var(--icon-ds-primary-300)";
-  const pressedSelectedColor = "var(--icon-ds-primary-300)";
-  const disabledUnselectedColor = "var(--icon-ds-neutral-500)";
-  const disabledSelectedColor = "var(--icon-ds-primary-700)";
+  const variants = {
+    primary: {
+      unselectedColors: {
+        default: "var(--icon-ds-neutral-200)",
+        hover: "var(--icon-ds-neutral-50)",
+        pressed: "var(--icon-ds-primary-300)",
+        disabled: "var(--icon-ds-neutral-500)",
+      },
+      selectedColors: {
+        default: "var(--icon-ds-primary-400)",
+        hover: "var(--icon-ds-primary-300)",
+        pressed: "var(--icon-ds-primary-300)",
+        disabled: "var(--icon-ds-primary-700)",
+      },
+      bgColors: {
+        default: "transparent",
+        hover: "var(--bg-ds-surface-300)",
+        pressed: "var(--bg-ds-surface-400)",
+      },
+    },
+  };
 
-  const hoverdBgColor = "var(--bg-ds-surface-300)";
-  const pressedBgColor = "var(--bg-ds-surface-400)";
-  const defaultBgColor = "transparent";
+  const currentVariant = variants[variant];
 
-  // Use group value for selection state
   $: if (!singleSelect) {
     selected = group === value;
   }
 
   $: unSelectedColor = disabled
-    ? disabledUnselectedColor
+    ? currentVariant.unselectedColors.disabled
     : pressed
-      ? pressedUnselectedColor
+      ? currentVariant.unselectedColors.pressed
       : hover
-        ? hoverUnselectedColor
-        : defaultUnselectedColor;
+        ? currentVariant.unselectedColors.hover
+        : currentVariant.unselectedColors.default;
 
   $: selectedColor = disabled
-    ? disabledSelectedColor
+    ? currentVariant.selectedColors.disabled
     : pressed
-      ? pressedSelectedColor
+      ? currentVariant.selectedColors.pressed
       : hover
-        ? hoverSelectedColor
-        : defaultSelectedColor;
+        ? currentVariant.selectedColors.hover
+        : currentVariant.selectedColors.default;
 
   $: bgCircleColor = disabled
-    ? defaultBgColor
+    ? currentVariant.bgColors.default
     : pressed
-      ? pressedBgColor
+      ? currentVariant.bgColors.pressed
       : hover
-        ? hoverdBgColor
-        : defaultBgColor;
+        ? currentVariant.bgColors.hover
+        : currentVariant.bgColors.default;
 
   function handleClick(): void {
     if (disabled) return;
@@ -151,8 +162,5 @@
     font-weight: 500;
     line-height: 18px;
     max-width: 180px;
-  }
-  .focus-visible-button:focus-visible {
-    outline: 2px solid var(--border-ds-primary-300);
   }
 </style>
