@@ -295,6 +295,7 @@
         description: "View Resources within a workspace.",
       },
     ]}
+    maxHeaderWidth={"100%"}
     onclick={handleDropdown}
     position={"absolute"}
     menuItem={"v2"}
@@ -347,17 +348,15 @@
   <div class="d-flex align-items-center description ellipsis gap-2">
     <div class="d-flex align-items-center" style="width: 36px;">
       {#if teamLogo?.size}
-         <Avatar
-          type={"image"}
-          size={"large"}
-          image={base64ToURL(teamLogo)}/>
+        <Avatar type={"image"} size={"large"} image={base64ToURL(teamLogo)} />
       {:else}
         <span class="">
-           <Avatar
+          <Avatar
             type={"letter"}
             size={"large"}
             letter={teamName.charAt(0)}
-             bgColor={"var(--bg-tertiary-800)"}/>
+            bgColor={"var(--bg-tertiary-800)"}
+          />
         </span>
       {/if}
     </div>
@@ -404,7 +403,7 @@
   .email-container {
     display: flex;
     flex-wrap: wrap;
-    background-color: var(--bg-tertiary-300);
+    background-color: var(--bg-ds-surface-400);
     border: 1px solid;
     padding: 4px 8px;
     border: 1px solid var(--border-color);

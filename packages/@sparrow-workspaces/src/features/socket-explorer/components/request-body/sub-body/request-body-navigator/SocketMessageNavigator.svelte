@@ -45,6 +45,7 @@
   </div>
   <Button
     title="Send"
+    size="small"
     buttonStyleProp="width: 48px; position: relative; top: 1px; height: 24px; font-size: 12px; padding: 11px !important; border-radius: 2px !important; "
     disable={webSocket?.status !== "connected" || !body}
     onClick={() => {

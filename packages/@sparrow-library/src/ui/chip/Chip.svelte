@@ -88,11 +88,13 @@
     border: none;
   }
   .error-chip {
-    outline: 2px solid var(--border-ds-danger-300) !important;
     color: var(--text-ds-danger-300) !important;
   }
   .chip:hover {
     background-color: var(--bg-ds-surface-100);
+  }
+  .error-chip:focus {
+    outline: 2px solid var(--border-ds-danger-300) !important;
   }
   .chip:focus {
     outline: 1px solid var(--border-ds-primary-300);

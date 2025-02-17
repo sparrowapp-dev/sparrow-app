@@ -1,7 +1,8 @@
 <script lang="ts">
   import { WithSelect } from "../../../../hoc";
   import { AngleLeftIcon, ThreeDotIcon } from "@sparrow/library/icons";
-  import { Input, Search } from "@sparrow/library/forms";
+  import { Search, Checkbox } from "@sparrow/library/forms";
+
   import { trashIcon } from "@sparrow/library/assets";
   import { Dropdown } from "@sparrow/library/ui";
   import { GraphqlRequestOperationTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
@@ -535,11 +536,7 @@
         />
       </div>
     </div>
-    <Breadcrumbs
-      breadcrumbs={breadcrum}
-      onNavigate={navigateToBreadcrumPath}
-      icon={ThreeDotIcon}
-     />
+    <Breadcrumbs breadcrumbs={breadcrum} onNavigate={navigateToBreadcrumPath} />
   </div>
   <div class="" style="flex:1; overflow:auto;">
     <div
@@ -585,7 +582,7 @@
                     style="width:calc(100% - 20px);"
                   >
                     <div
-                      style="height:14px; width:14px;"
+                      style=" width:24px;"
                       class="me-2"
                       on:click={(e) => {
                         e.preventDefault();
@@ -599,10 +596,7 @@
                         );
                       }}
                     >
-                      <label class="checkbox-parent">
-                        <input type="checkbox" bind:checked={t.isSelected} />
-                        <span class="checkmark"></span>
-                      </label>
+                      <Checkbox checked={t.isSelected} />
                     </div>
 
                     <p
