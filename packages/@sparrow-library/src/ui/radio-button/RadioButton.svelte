@@ -41,7 +41,7 @@
     },
   };
 
-  const currentVariant = variants[variant];
+  let currentVariant = variants[variant];
 
   $: if (!singleSelect) {
     selected = group === value;
