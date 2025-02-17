@@ -1,9 +1,17 @@
 <script lang="ts">
   import SearchBar from "../components/SearchBar/SearchBar.svelte";
-  import SearchSuggestions from "../components/SearchSuggestions/SearchSuggestions.svelte";
   import type { SearchSuggestion } from "../types/types";
   import { onMount } from "svelte";
-  import { FlowIcon ,RequestIcon2 , WorkspaceIcongs, FolderIcon4, StackIcon,CollectionIcongs} from "@sparrow/library/icons";
+  import {
+    FlowIcon,
+    RequestIcon2,
+    WorkspaceIcongs,
+    FolderIcon4,
+    StackIcon,
+    CollectionIcongs,
+  } from "@sparrow/library/icons";
+  import SuggestionTags from "../components/SuggestionTags/SuggestionTags.svelte";
+  import RecentItems from "../components/RecentItems/RecentItems.svelte";
 
   export let closeGlobalSearch;
   export let workspaceDocuments;
@@ -105,30 +113,31 @@
 <div class="search-container">
   {#if !hideGlobalSearch}
     <SearchBar bind:searchQuery {handleSearch} bind:searchBarRef />
-    <SearchSuggestions
-      bind:searchBarRef
-      {handleSwitchWorkspaceModal}
-      {suggestions}
-      {searchQuery}
-      {filteredCollection}
-      {filteredFolder}
-      {filteredRequest}
-      {filteredWorkspaces}
-      {filteredTestflows}
-      {filteredEnvironments}
-      {closeGlobalSearch}
-      {handlehideGlobalSearch}
-      {checkActiveWorkspace}
-      {handleGlobalSearchRequestNavigation}
-      {handleGlobalSearchCollectionNavigation}
-      {handleGlobalSearchFolderNavigation}
-      {handleGlobalSearchWorkspaceNavigation}
-      {handleGlobalSearchEnvironmentNavigation}
-      {handleGlobalSearchTestflowNavgation}
-      {selectedType}
-      {isWebApp}
-      {isGuestUser}
-    />
+    <div class="suggestions-container">
+      <SuggestionTags {suggestions} bind:selectedType bind:searchBarRef />
+      <RecentItems
+        {handleSwitchWorkspaceModal}
+        {searchQuery}
+        {filteredCollection}
+        {filteredFolder}
+        {filteredRequest}
+        {filteredWorkspaces}
+        {filteredTestflows}
+        {filteredEnvironments}
+        {selectedType}
+        {closeGlobalSearch}
+        {handlehideGlobalSearch}
+        {checkActiveWorkspace}
+        {handleGlobalSearchRequestNavigation}
+        {handleGlobalSearchCollectionNavigation}
+        {handleGlobalSearchFolderNavigation}
+        {handleGlobalSearchWorkspaceNavigation}
+        {handleGlobalSearchEnvironmentNavigation}
+        {handleGlobalSearchTestflowNavgation}
+        {isWebApp}
+        {isGuestUser}
+      />
+    </div>
   {/if}
 </div>
 
@@ -144,6 +153,16 @@
     flex-direction: column;
     overflow: hidden;
     background-color: var(--bg-ds-surface-700);
+  }
+  .suggestions-container {
+    background: var(--bg-ds-surface-700);
+    box-shadow: 0px 16px 32px 0px rgba(0, 0, 0, 0.4);
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    flex: 1;
+    gap: var(--gap-gap-4, 4px);
+    overflow-y: auto;
   }
 
   @media (max-width: 991px) {

@@ -3,7 +3,7 @@
 
   export let onClick = () => {};
   export let icon = FolderIcon;
-  export let iconProps = { color: "red", width: "24px", height: "24px" };
+  export let iconProps = { color: "var(--text-ds-neutral-200)" , width: "16px" , height: "16px" };
   export let data = {};
 
 </script>

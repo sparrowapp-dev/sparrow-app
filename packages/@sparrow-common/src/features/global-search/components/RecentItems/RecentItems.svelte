@@ -15,7 +15,7 @@
     patchIcon,
     postIcon,
   } from "@sparrow/library/icons";
-  import NoResults from "../NoResults/NoResults.svelte";
+  import NoResults from "./sub-components/NoResults.svelte";
   export let searchQuery = "";
   export let filteredCollection = [];
   export let filteredFolder = [];
@@ -32,8 +32,8 @@
   export let filteredEnvironments;
   export let isWebApp = false;
   SocketIcon;
-  import TitleBar from "../TitleBar/TitleBar.svelte";
-  import ItemBar from "../ItemBar/ItemBar.svelte";
+  import TitleBar from "./sub-components/TitleBar.svelte";
+  import ItemBar from "./sub-components/ItemBar.svelte";
 
   const methodIcons = {
     GET: getIcon,
@@ -49,27 +49,7 @@
     WEBSOCKET: "#3670f7",
     GRAPHQL: "#F15EB0",
   };
-  //   const getIconProps = (methodName) => {
-  //   switch (methodName) {
-  //     case "GET":
-  //       return { color: "var(--icon-ds-success-500)" };
-  //     case "POST":
-  //       return { color: "var(--icon-ds-primary-500)" };
-  //     case "DELETE":
-  //       return { color: "var(--icon-ds-danger-500)" };
-  //     case "PUT":
-  //       return { color: "var(--icon-ds-warning-500)" };
-  //     case "PATCH":
-  //       return { color: "var(--icon-ds-info-500)" };
-  //     case "SocketIO":
-  //       return { color: "red" };
-  //     case "WEBSOCKET":
-  //     case "GRAPHQL":
-  //       return { color: "var(--icon-ds-info-500)" };
-  //     default:
-  //       return { color: "var(--icon-ds-default-500)" }; // Default case
-  //   }
-  // };
+ 
 
   const getRequestDetails = (request) => {
     switch (request.type) {
@@ -155,6 +135,14 @@
       getPath: (item) => item.path,
       getIcon: (item) => methodIcons[item.tree.request.method] || GraphIcon,
       filter: (item) => !(isWebApp && item.tree.request.method === "GRAPHQL"),
+      getIconProps: (item) => {
+        const type = item.tree.request.method || "";
+        return {
+          width: "16px",
+          height: "16px",
+          color: methodIconsProps[type],
+        };
+      },
     },
     environments: {
       items: filteredEnvironments,
@@ -479,11 +467,7 @@
                 url: config.getUrl ? config.getUrl(item) : undefined,
               }}
               icon={config.getIcon ? config.getIcon(item) : config.icon}
-              iconProps={{
-                width: "16px",
-                height: "16px",
-                color: "var(--icon-ds-neutral-200)",
-              }}
+              iconProps={config.getIconProps ? config.getIconProps(item) : {color: "var(--text-ds-neutral-300)" , width: "16px" , height: "16px"}}
               onClick={() => config.nav(item)}
             />
           {/if}

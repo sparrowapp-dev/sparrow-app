@@ -3,7 +3,7 @@
     title: "",
     shortcutKeys: [],
   };
-  import { keyCommand } from "../../images";
+  import { keyCommand } from "../../../images";
 </script>
 
 <div class="d-flex align-items-center justify-content-between px-1 mb-1">
