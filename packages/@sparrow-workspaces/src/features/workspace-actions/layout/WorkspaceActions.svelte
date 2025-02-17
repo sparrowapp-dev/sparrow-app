@@ -5,7 +5,8 @@
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import { Search } from "@sparrow/library/forms";
   import { Events, WorkspaceRole } from "@sparrow/common/enums";
-  import { Dropdown } from "@sparrow/library/ui";
+  import { Dropdown, Button } from "@sparrow/library/ui";
+  import { PlusIcon2 } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
@@ -119,6 +120,7 @@
   export let onUpdateTestflow;
   export let onOpenTestflow;
   export let isWebApp = false;
+  export let isFirstCollectionExpand = false;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -543,15 +545,25 @@
             show={!addButtonMenu}
             zIndex={10}
           >
-            <button
+            <!-- <button
               id="addButton"
               class="border-0 p-1 border-radius-2 add-button"
               on:click={() => {
                 addButtonMenu = !addButtonMenu;
               }}
-            >
+            > -->
+            <!--               
               <img src={plusIcon} alt="" />
-            </button>
+            </button> -->
+            <Button
+              type="primary"
+              id="addButton"
+              size={"small"}
+              startIcon={PlusIcon2}
+              onClick={() => {
+                addButtonMenu = !addButtonMenu;
+              }}
+            />
           </Tooltip>
         </Dropdown>
       {/if}
@@ -629,6 +641,7 @@
           {searchData}
           {toggleExpandCollection}
           bind:isExpandCollection
+          bind:isFirstCollectionExpand
           {isWebApp}
         />
       </div>

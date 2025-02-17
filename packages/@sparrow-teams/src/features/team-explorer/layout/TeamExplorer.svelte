@@ -10,6 +10,7 @@
   import { TeamRole } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
   import { Navigator } from "@sparrow/library/ui";
+  import { Avatar } from "@sparrow/library/ui";
 
   import {
     TeamTabsEnum,
@@ -218,20 +219,18 @@
         >
           <h2 class="d-flex ellipsis overflow-visible team-title">
             {#if openTeam?.logo?.size}
-              <img
-                class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
-                style="width: 40px !important; height: 40px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-                src={base64ToURL(openTeam?.logo)}
-                alt=""
-              />{:else}
-              <div
-                class={`text-defaultColor w-25 text-center my-auto align-items-center justify-content-center profile-circle bg-tertiary-750 border-secondary-300 border-2`}
-                style={`font-size: 24px; width: 40px !important; height: 40px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
-              >
-                <span class="text-fs-24">
-                  {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
-                </span>
-              </div>
+              <Avatar
+                type="image"
+                size="large"
+                image={base64ToURL(openTeam?.logo)}
+              />
+            {:else}
+              <Avatar
+                type="letter"
+                size="large"
+                letter={openTeam?.name[0] ? openTeam?.name[0] : ""}
+                bgColor="var(--bg-secondary-600)"
+              />
             {/if}
             <span
               class="ms-3 my-auto ellipsis overflow-hidden heading"
@@ -319,7 +318,7 @@
             style="padding-bottom: 4px;"
           >
             <Navigator
-              tabs={teamTabs}
+              tabs={teamTabs.filter((tab) => tab.visible !== false)}
               currentTabId={"Workspaces"}
               onTabClick={onUpdateActiveTab}
               {activeTeamTab}

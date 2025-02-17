@@ -1,10 +1,12 @@
 <script lang="ts">
   import { WithSelect } from "../../../../hoc";
   import { AngleLeftIcon, ThreeDotIcon } from "@sparrow/library/icons";
-  import { Input, Search } from "@sparrow/library/forms";
+  import { Search, Checkbox } from "@sparrow/library/forms";
+
   import { trashIcon } from "@sparrow/library/assets";
   import { Dropdown } from "@sparrow/library/ui";
   import { GraphqlRequestOperationTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
+  import { Breadcrumbs } from "@sparrow/library/ui";
 
   export let schema;
   export let updateSchema;
@@ -61,7 +63,7 @@
           querySchema = JSON.parse(schema)?.Mutation?.items || [];
         }
         queryBuilder = calculateQueryBuilder(querySchema, operationSearch);
-        breadcrum = calculateBreadcrumPath(queryBuilder, 3);
+        breadcrum = calculateBreadcrumPath(queryBuilder, 5);
       }
     } catch (e) {
       querySchema = [];
@@ -534,103 +536,7 @@
         />
       </div>
     </div>
-    <div
-      class="py-3 ps-3 h-100 d-flex align-items-center overflow-auto"
-      style="white-space: nowrap;"
-    >
-      <p class="mb-0 text-secondary-200 text-fs-12">
-        {#each breadcrum as bread, index}
-          {#if index === 0}
-            {#each bread as slice, index}
-              {#if breadcrum.length === 1 && index === bread.length - 1}
-                <span
-                  class="bread-item-active"
-                  on:click={() => {
-                    navigateToBreadcrumPath(slice.id);
-                  }}
-                >
-                  {slice.name}
-                </span>
-              {:else}
-                <span
-                  class="bread-item"
-                  on:click={() => {
-                    navigateToBreadcrumPath(slice.id);
-                  }}
-                >
-                  {slice.name} <span class="px-3">/</span>
-                </span>
-              {/if}
-            {/each}
-          {/if}
-          {#if index === 1}
-            <span class="d-inline-block">
-              <Dropdown
-                buttonId="gql-breadcrum-dropdown"
-                bind:isMenuOpen={isBreadcrumDropdownVisible}
-                horizontalPosition="right"
-                minWidth={175}
-                options={breadcrum[1].map((item) => {
-                  return {
-                    name: item.name,
-                    color: "var(--text-secondary-100)",
-                    onclick: () => navigateToBreadcrumPath(item.id),
-                  };
-                })}
-              >
-                <button
-                  on:mouseenter={() => {
-                    isBreadcrumDropdownHovered = true;
-                  }}
-                  on:mouseleave={() => {
-                    isBreadcrumDropdownHovered = false;
-                  }}
-                  id="gql-breadcrum-dropdown"
-                  class="border-0 pt-0 border-radius-4 {isBreadcrumDropdownVisible
-                    ? 'bread-parent'
-                    : ''}"
-                  style="background-color: transparent; height:24px; width:24px;"
-                  on:click={() => {
-                    isBreadcrumDropdownVisible = !isBreadcrumDropdownVisible;
-                  }}
-                >
-                  <ThreeDotIcon
-                    color={isBreadcrumDropdownVisible ||
-                    isBreadcrumDropdownHovered
-                      ? "var(--icon-secondary-100)"
-                      : "var(--icon-secondary-950)"}
-                  />
-                </button>
-              </Dropdown>
-            </span>
-            <span class="px-3">/</span>
-          {/if}
-          {#if index === 2}
-            {#each bread as slice, index}
-              {#if index === bread.length - 1}
-                <span
-                  class="bread-item-active"
-                  on:click={() => {
-                    navigateToBreadcrumPath(slice.id);
-                  }}
-                >
-                  {slice.name}
-                </span>
-              {:else}
-                <span
-                  class="bread-item"
-                  on:click={() => {
-                    navigateToBreadcrumPath(slice.id);
-                  }}
-                >
-                  {slice.name} <span class="px-3">/</span>
-                </span>
-              {/if}
-            {/each}
-          {/if}
-        {/each}
-      </p>
-    </div>
+    <Breadcrumbs breadcrumbs={breadcrum} onNavigate={navigateToBreadcrumPath} />
   </div>
   <div class="" style="flex:1; overflow:auto;">
     <div
@@ -676,7 +582,7 @@
                     style="width:calc(100% - 20px);"
                   >
                     <div
-                      style="height:14px; width:14px;"
+                      style=" width:24px;"
                       class="me-2"
                       on:click={(e) => {
                         e.preventDefault();
@@ -690,10 +596,7 @@
                         );
                       }}
                     >
-                      <label class="checkbox-parent">
-                        <input type="checkbox" bind:checked={t.isSelected} />
-                        <span class="checkmark"></span>
-                      </label>
+                      <Checkbox checked={t.isSelected} />
                     </div>
 
                     <p

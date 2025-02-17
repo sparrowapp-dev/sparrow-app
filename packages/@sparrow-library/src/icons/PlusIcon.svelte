@@ -1,8 +1,12 @@
 <script>
-    export let height = "24px";
-    export let width = "24px";
-    export let color = "grey";
-  </script>
-<svg {width} {height} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M15 8.5C15 7.94687 14.5531 7.5 14 7.5C13.4469 7.5 13 7.94687 13 8.5V13H8.5C7.94687 13 7.5 13.4469 7.5 14C7.5 14.5531 7.94687 15 8.5 15H13V19.5C13 20.0531 13.4469 20.5 14 20.5C14.5531 20.5 15 20.0531 15 19.5V15H19.5C20.0531 15 20.5 14.5531 20.5 14C20.5 13.4469 20.0531 13 19.5 13H15V8.5Z" fill={color}/>
+  export let width = "24";
+  export let height = "24";
+  export let fill = "white";
+</script>
+
+<svg {width} {height} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <path
+    d="M13 6.5C13 5.94687 12.5531 5.5 12 5.5C11.4469 5.5 11 5.94687 11 6.5V11H6.5C5.94687 11 5.5 11.4469 5.5 12C5.5 12.5531 5.94687 13 6.5 13H11V17.5C11 18.0531 11.4469 18.5 12 18.5C12.5531 18.5 13 18.0531 13 17.5V13H17.5C18.0531 13 18.5 12.5531 18.5 12C18.5 11.4469 18.0531 11 17.5 11H13V6.5Z"
+    {fill}
+  />
 </svg>
