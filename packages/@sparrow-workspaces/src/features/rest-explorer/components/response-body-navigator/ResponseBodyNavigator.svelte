@@ -119,7 +119,7 @@
 
 <div class="d-flex flex-column align-items-start justify-content-between w-100">
   <div
-    class="response-container d-flex align-items-center pb-1 px-0 justify-content-between w-100 z-0 position-sticky"
+    class="response-container d-flex align-items-center pb-1 px-0 justify-content-between w-100 z-1 position-sticky"
     style="top:55.4px;  margin-top: -1px;"
   >
     <div class="d-flex gap-3 align-items-center justify-content-center">

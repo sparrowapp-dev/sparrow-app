@@ -113,7 +113,6 @@
   //* @param idCheck - Boolean indicating whether the ID is valid.
   // * @param id - The ID to process.
   const slidebarPlace = (idCheck: boolean, id: string) => {
-    console.log(idCheck, id);
     if (idCheck) {
       initialId = id;
       logPositions(id);
