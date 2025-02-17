@@ -7,7 +7,9 @@
 </script>
 
 <div class="d-flex align-items-center justify-content-between px-1 mb-1">
-  <span class="fs-6" style="color: var(--text-ds-neutral-500);">{data.title}</span>
+   <span class="" style="color: var(--text-ds-neutral-500); font-size: 12px;">
+  {data.title}
+</span>
   <div class="d-flex align-items-center gap-1">
     <div class="d-flex align-items-center justify-content-center rounded p-1" 
          style="width: 24px; height: 24px; background-color: var(--bg-ds-surface-600);">

@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { FolderIcon } from "../../images";
+  import {FolderIcon} from "@sparrow/library/icons";
 
   export let onClick = () => {};
   export let icon = FolderIcon;
-  export let iconProps = { color: "red" };
+  export let iconProps = { color: "red", width: "24px", height: "24px" };
   export let data = {};
 
-  $: console.log(iconProps);
 </script>
 
 <div class="request-item" on:click={() => onClick(data)}>

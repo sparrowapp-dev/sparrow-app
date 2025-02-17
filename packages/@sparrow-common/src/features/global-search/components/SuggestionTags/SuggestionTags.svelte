@@ -34,7 +34,7 @@
         on:click={() => handleTagClick(suggestion.label)}
       >
         <div class="tag-icon-wrapper">
-          <svelte:component this={suggestion.icon} color="var(--icon-color)" />
+          <svelte:component this={suggestion.icon} color="var(--icon-color)" width="16px" height="16px" />
         </div>
         <span class="tag-label">{suggestion.label}</span>
       </button>

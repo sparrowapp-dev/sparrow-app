@@ -3,8 +3,7 @@
   import SearchSuggestions from "../components/SearchSuggestions/SearchSuggestions.svelte";
   import type { SearchSuggestion } from "../types/types";
   import { onMount } from "svelte";
-  import { folderIcon} from "@sparrow/library/assets";
-  import { FlowIcon ,RequestIcon, WorkspaceIcongs, FolderIcon2, StackIcon,CollectionIcongs} from "@sparrow/library/icons";
+  import { FlowIcon ,RequestIcon2 , WorkspaceIcongs, FolderIcon4, StackIcon,CollectionIcongs} from "@sparrow/library/icons";
 
   export let closeGlobalSearch;
   export let workspaceDocuments;
@@ -70,7 +69,7 @@
     {
       type: "folder",
       label: "Folders",
-      icon: FolderIcon2,
+      icon: FolderIcon4,
       show: true,
     },
     {
@@ -82,7 +81,7 @@
     {
       type: "request",
       label: "Requests",
-      icon: RequestIcon,
+      icon: RequestIcon2,
       show: true,
     },
   ];

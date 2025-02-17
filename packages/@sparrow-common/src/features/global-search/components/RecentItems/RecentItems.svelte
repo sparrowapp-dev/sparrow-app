@@ -1,15 +1,20 @@
 <script lang="ts">
   import {
+    CollectionIcongs,
+    FolderIcon4 as FolderIcon,
+    StackIcon,
+    SocketIoIcon,
+    GraphIcon,
+    SocketIcon,
+    WorkspaceIcongs,
+    FlowIcon,
+    RequestIcon,
     getIcon,
-    // GraphIcon,
     putIcon,
     deleteIcon,
     patchIcon,
-    // SocketIoIcon,
-    // webSocketIcon,
-    postIcon
-  } from "../../images";
-  import { CollectionIcongs , FolderIcon , StackIcon, SocketIoIcon , GraphIcon , SocketIcon, WorkspaceIcongs, FlowIcon, RequestIcon } from "@sparrow/library/icons";
+    postIcon,
+  } from "@sparrow/library/icons";
   import NoResults from "../NoResults/NoResults.svelte";
   export let searchQuery = "";
   export let filteredCollection = [];
@@ -25,10 +30,10 @@
   export let filteredWorkspaces;
   export let filteredTestflows;
   export let filteredEnvironments;
-  export let isWebApp = false;SocketIcon
+  export let isWebApp = false;
+  SocketIcon;
   import TitleBar from "../TitleBar/TitleBar.svelte";
   import ItemBar from "../ItemBar/ItemBar.svelte";
-  import Socket from "../../images/Socket.io.svelte";
 
   const methodIcons = {
     GET: getIcon,
@@ -39,28 +44,32 @@
     SOCKETIO: SocketIoIcon,
     WEBSOCKET: SocketIcon,
   };
-  const getIconProps = (methodName) => {
-  switch (methodName) {
-    case "GET":
-      return { color: "var(--icon-ds-success-500)" };
-    case "POST":
-      return { color: "var(--icon-ds-primary-500)" };
-    case "DELETE":
-      return { color: "var(--icon-ds-danger-500)" };
-    case "PUT":
-      return { color: "var(--icon-ds-warning-500)" };
-    case "PATCH":
-      return { color: "var(--icon-ds-info-500)" };
-    case "SocketIO":
-      return { color: "red" };
-    case "WEBSOCKET":
-    case "GRAPHQL":
-      return { color: "var(--icon-ds-info-500)" };
-    default:
-      return { color: "var(--icon-ds-default-500)" }; // Default case
-  }
-};
-
+  const methodIconsProps = {
+    SOCKETIO: "#3670f7",
+    WEBSOCKET: "#3670f7",
+    GRAPHQL: "#F15EB0",
+  };
+  //   const getIconProps = (methodName) => {
+  //   switch (methodName) {
+  //     case "GET":
+  //       return { color: "var(--icon-ds-success-500)" };
+  //     case "POST":
+  //       return { color: "var(--icon-ds-primary-500)" };
+  //     case "DELETE":
+  //       return { color: "var(--icon-ds-danger-500)" };
+  //     case "PUT":
+  //       return { color: "var(--icon-ds-warning-500)" };
+  //     case "PATCH":
+  //       return { color: "var(--icon-ds-info-500)" };
+  //     case "SocketIO":
+  //       return { color: "red" };
+  //     case "WEBSOCKET":
+  //     case "GRAPHQL":
+  //       return { color: "var(--icon-ds-info-500)" };
+  //     default:
+  //       return { color: "var(--icon-ds-default-500)" }; // Default case
+  //   }
+  // };
 
   const getRequestDetails = (request) => {
     switch (request.type) {
@@ -254,16 +263,19 @@
                     url: details.url,
                   }}
                   icon={methodIcons[details.method] || GraphIcon}
-                  iconProps=getIconProps(details.method),
-                  onClick={() =>
-                  {
+                  iconProps={{
+                    width: "16px",
+                    height: "16px",
+                    color: methodIconsProps[details.method],
+                  }}
+                  onClick={() => {
                     handleGlobalSearchRequestNavigation(
                       item.tree.id,
                       item.workspaceId,
                       item.collectionId,
                       item.folderDetails?.id || "",
                       item.tree,
-                    )
+                    );
                   }}
                 />
               {/if}
@@ -271,24 +283,38 @@
               <ItemBar
                 data={{ name: item.tree.name, path: item.path }}
                 icon={CollectionIcongs}
-                onClick={() =>
-                {
-                handleGlobalSearchCollectionNavigation(
+                iconProps={{
+                  width: "16px",
+                  height: "16px",
+                  color: "var(--icon-ds-neutral-200)",
+                }}
+                onClick={() => {
+                  handleGlobalSearchCollectionNavigation(
                     item.workspaceId,
                     item.tree,
-                  )
+                  );
                 }}
               />
             {:else if section.key === "environments"}
               <ItemBar
                 data={{ name: item.title, path: "" }}
                 icon={StackIcon}
+                iconProps={{
+                  width: "16px",
+                  height: "16px",
+                  color: "var(--icon-ds-neutral-200)",
+                }}
                 onClick={() => handleGlobalSearchEnvironmentNavigation(item)}
               />
             {:else if section.key === "folders"}
               <ItemBar
                 data={{ name: item.tree.name, path: item.path }}
                 icon={FolderIcon}
+                iconProps={{
+                  width: "16px",
+                  height: "16px",
+                  color: "var(--icon-ds-neutral-200)",
+                }}
                 onClick={() =>
                   handleGlobalSearchFolderNavigation(
                     item.workspaceId,
@@ -300,6 +326,11 @@
               <ItemBar
                 data={{ name: item.name, path: item.team.teamName }}
                 icon={WorkspaceIcongs}
+                iconProps={{
+                  width: "16px",
+                  height: "16px",
+                  color: "var(--icon-ds-neutral-200)",
+                }}
                 onClick={() => handleGlobalSearchWorkspaceNavigation(item)}
               />
             {:else if section.key === "flows"}
@@ -309,93 +340,125 @@
                   path: item.description || "",
                 }}
                 icon={FlowIcon}
+                iconProps={{
+                  width: "16px",
+                  height: "16px",
+                  color: "var(--icon-ds-neutral-200)",
+                }}
                 onClick={() => handleGlobalSearchTestflowNavgation(item)}
               />
             {/if}
           {/each}
         {/if}
       {/each}
-    {:else}
-
-      {#if (filteredRequest && filteredRequest.length) || (filteredCollection && filteredCollection.length) || (filteredFolder && filteredFolder.length) || (filteredEnvironments && filteredEnvironments.length) || (filteredTestflows && filteredTestflows.length) || (filteredWorkspaces && filteredWorkspaces.length)}
-        {#each searchSections as section (section.key)}
-          {#if section.condition}
-            <TitleBar
-              data={{
-                title: selectedTypeMapping[section.key].title,
-                shortcutKeys: selectedTypeMapping[section.key].shortcutKeys,
-              }}
-            />
-            {#each section.items as item}
-              {#if section.key === "requests"}
-                {#if !(isWebApp && item.tree.request.method === "GRAPHQL")}
-                  {@const details = getRequestDetails(item)}
-                  <ItemBar
-                    data={{
-                      name: details.name,
-                      path: item.path,
-                      url: details.url,
-                    }}
-                    icon={methodIcons[details.method] || GraphIcon}
-                    onClick={() =>
-                      handleGlobalSearchRequestNavigation(
-                        item.tree.id,
-                        item.workspaceId,
-                        item.collectionId,
-                        item.folderDetails?.id || "",
-                        item.tree,
-                      )}
-                  />
-                {/if}
-              {:else if section.key === "collections"}
-                <ItemBar
-                  data={{ name: item.tree.name, path: item.path }}
-                  icon={CollectionIcongs}
-                  onClick={() =>
-                    handleGlobalSearchCollectionNavigation(
-                      item.workspaceId,
-                      item.tree,
-                    )}
-                />
-              {:else if section.key === "folders"}
-                <ItemBar
-                  data={{ name: item.tree.name, path: item.path }}
-                  icon={FolderIcon}
-                  onClick={() =>
-                    handleGlobalSearchFolderNavigation(
-                      item.workspaceId,
-                      item.collectionId,
-                      item.tree,
-                    )}
-                />
-              {:else if section.key === "environments"}
-                <ItemBar
-                  data={{ name: item.title, path: "" }}
-                  icon={StackIcon}
-                  onClick={() => handleGlobalSearchEnvironmentNavigation(item)}
-                />
-              {:else if section.key === "flows"}
+    {:else if (filteredRequest && filteredRequest.length) || (filteredCollection && filteredCollection.length) || (filteredFolder && filteredFolder.length) || (filteredEnvironments && filteredEnvironments.length) || (filteredTestflows && filteredTestflows.length) || (filteredWorkspaces && filteredWorkspaces.length)}
+      {#each searchSections as section (section.key)}
+        {#if section.condition}
+          <TitleBar
+            data={{
+              title: selectedTypeMapping[section.key].title,
+              shortcutKeys: selectedTypeMapping[section.key].shortcutKeys,
+            }}
+          />
+          {#each section.items as item}
+            {#if section.key === "requests"}
+              {#if !(isWebApp && item.tree.request.method === "GRAPHQL")}
+                {@const details = getRequestDetails(item)}
                 <ItemBar
                   data={{
-                    name: item.name,
-                    path: item.description || "",
+                    name: details.name,
+                    path: item.path,
+                    url: details.url,
                   }}
-                  icon={FlowIcon}
-                  onClick={() => handleGlobalSearchTestflowNavgation(item)}
-                />
-              {:else if section.key === "workspaces"}
-                <ItemBar
-                  data={{ name: item.name, path: item.team.teamName }}
-                  icon={WorkspaceIcongs}
-                  onClick={() => handleGlobalSearchWorkspaceNavigation(item)}
+                  icon={methodIcons[details.method] || GraphIcon}
+                  iconProps={{
+                    width: "16px",
+                    height: "16px",
+                    color: methodIconsProps[details.method],
+                  }}
+                  onClick={() =>
+                    handleGlobalSearchRequestNavigation(
+                      item.tree.id,
+                      item.workspaceId,
+                      item.collectionId,
+                      item.folderDetails?.id || "",
+                      item.tree,
+                    )}
                 />
               {/if}
-            {/each}
-          {/if}
-        {/each}
-      {:else}
-        <NoResults {searchQuery} />
-      {/if}
+            {:else if section.key === "collections"}
+              <ItemBar
+                data={{ name: item.tree.name, path: item.path }}
+                icon={CollectionIcongs}
+                iconProps={{
+                  width: "16px",
+                  height: "16px",
+                  color: "var(--icon-ds-neutral-200)",
+                }}
+                onClick={() =>
+                  handleGlobalSearchCollectionNavigation(
+                    item.workspaceId,
+                    item.tree,
+                  )}
+              />
+            {:else if section.key === "folders"}
+              <ItemBar
+                data={{ name: item.tree.name, path: item.path }}
+                icon={FolderIcon}
+                iconProps={{
+                  width: "16px",
+                  height: "16px",
+                  color: "var(--icon-ds-neutral-200)",
+                }}
+                onClick={() =>
+                  handleGlobalSearchFolderNavigation(
+                    item.workspaceId,
+                    item.collectionId,
+                    item.tree,
+                  )}
+              />
+            {:else if section.key === "environments"}
+              <ItemBar
+                data={{ name: item.title, path: "" }}
+                icon={StackIcon}
+                iconProps={{
+                  width: "16px",
+                  height: "16px",
+                  color: "var(--icon-ds-neutral-200)",
+                }}
+                onClick={() => handleGlobalSearchEnvironmentNavigation(item)}
+              />
+            {:else if section.key === "flows"}
+              <ItemBar
+                data={{
+                  name: item.name,
+                  path: item.description || "",
+                }}
+                icon={FlowIcon}
+                iconProps={{
+                  width: "16px",
+                  height: "16px",
+                  color: "var(--icon-ds-neutral-200)",
+                }}
+                onClick={() => handleGlobalSearchTestflowNavgation(item)}
+              />
+            {:else if section.key === "workspaces"}
+              <ItemBar
+                data={{ name: item.name, path: item.team.teamName }}
+                icon={WorkspaceIcongs}
+                iconProps={{
+                  width: "16px",
+                  height: "16px",
+                  color: "var(--icon-ds-neutral-200)",
+                }}
+                onClick={() => handleGlobalSearchWorkspaceNavigation(item)}
+              />
+            {/if}
+          {/each}
+        {/if}
+      {/each}
+    {:else}
+      <NoResults {searchQuery} />
     {/if}
   {:else if selectedType !== ""}
     {#if config}
@@ -416,6 +479,11 @@
                 url: config.getUrl ? config.getUrl(item) : undefined,
               }}
               icon={config.getIcon ? config.getIcon(item) : config.icon}
+              iconProps={{
+                width: "16px",
+                height: "16px",
+                color: "var(--icon-ds-neutral-200)",
+              }}
               onClick={() => config.nav(item)}
             />
           {/if}

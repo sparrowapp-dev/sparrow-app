@@ -21,6 +21,6 @@
     "src/**/*.js",
     "src/**/*.svelte",
     "static/global-search"
-  ],
+, "../@sparrow-library/src/icons/Socket.io.svelte", "../@sparrow-library/src/icons/Delete.svelte"  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { searchIcon } from "../../images";
+  import { SearchIcon as searchIcon } from "@sparrow/library/icons";
 
   export let searchQuery = "";
   export let type: "Basic" | "Custom" = "Basic";
