@@ -127,3 +127,14 @@ export { default as WorkspaceIcongs } from "./Board.svelte";
 export { default as FlowIcon } from "./flowIcon.svelte";
 export {default as CollectionIcongs} from "./collectionStack.svelte"
 // export { default as RequestIcon} from "./arrowSwap.svelte"
+
+export { default as DismissRegular } from "./DismissRegular.svelte";
+
+export { default as SearchIcon } from "./SearchIcon.svelte";
+export { default as CrossIcon2 } from "./crossIcon.svelte";
+export { default as CommandKey } from "./Key.svelte";
+export { default as PersonIcon } from "./Person.svelte";
+
+export {default as FolderIcon3} from "./FolderIcon.svelte"; 
+export {default as SearchIcon2} from "./SearchIcon2.svelte";
+export {default as PlusIcon2} from "./PlusIcon.svelte";

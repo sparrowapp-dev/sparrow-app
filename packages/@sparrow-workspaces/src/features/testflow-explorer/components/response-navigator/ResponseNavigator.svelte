@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { Label } from "@sparrow/library/ui";
   import { type UpdateRequestStateType } from "@sparrow/workspaces/type";
   import { ResponseSectionEnum } from "@sparrow/common/types/workspace";
   import { onMount } from "svelte";
-  import { Navigator } from "../../../../components";
+  import { Navigator } from "@sparrow/library/ui";
   export let requestStateSection: string;
   export let updateResponseNavigation;
   export let responseHeadersLength = 0;
@@ -46,7 +45,6 @@
   };
 </script>
 
-<div class="py-2">
-  <!-- Tabs -->
+<div class="py-2" style="position: relative;">
   <Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
 </div>

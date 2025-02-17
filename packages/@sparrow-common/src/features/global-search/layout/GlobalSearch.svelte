@@ -20,7 +20,7 @@
   export let handleSearchNode;
   export let handlehideGlobalSearch;
   export let isWebApp = false;
- 
+  export let isGuestUser = false;
 
   let workspaceDetailsMap: Record<
     string,
@@ -35,7 +35,7 @@
   let filteredWorkspaces = [];
   let filteredEnvironments = [];
   let hideGlobalSearch = false;
-  let searchBarRef="";
+  let searchBarRef = "";
 
   const handleSearch = async () => {
     const { collection, folder, file, workspace, testflow, environment } =
@@ -53,31 +53,37 @@
       type: "workspace",
       label: "Workspaces",
       icon: WorkspaceIcongs,
+      show: !isGuestUser,
     },
     {
       type: "collection",
       label: "Collections",
       icon: CollectionIcongs,
+      show: true,
     },
     {
       type: "environment",
       label: "Environments",
       icon: StackIcon,
+      show: true,
     },
     {
       type: "folder",
       label: "Folders",
       icon: FolderIcon2,
+      show: true,
     },
     {
       type: "flow",
       label: "Flows",
       icon: FlowIcon,
+      show: true,
     },
     {
       type: "request",
       label: "Requests",
       icon: RequestIcon,
+      show: true,
     },
   ];
 
@@ -101,6 +107,7 @@
   {#if !hideGlobalSearch}
     <SearchBar bind:searchQuery {handleSearch} bind:searchBarRef />
     <SearchSuggestions
+      bind:searchBarRef
       {handleSwitchWorkspaceModal}
       {suggestions}
       {searchQuery}
@@ -121,7 +128,7 @@
       {handleGlobalSearchTestflowNavgation}
       {selectedType}
       {isWebApp}
-      bind:searchBarRef
+      {isGuestUser}
     />
   {/if}
 </div>

@@ -283,7 +283,7 @@
           borderType={"none"}
           borderActiveType={"none"}
           headerHighlight={"hover-active"}
-          headerTheme={"transparent"}
+          headerTheme={"primary"}
           menuItem={"v2"}
           headerFontSize={"12px"}
           maxHeaderWidth={"215px"}
@@ -329,7 +329,7 @@
           borderType={"none"}
           borderActiveType={"none"}
           headerHighlight={"hover-active"}
-          headerTheme={"transparent"}
+          headerTheme={"primary"}
           menuItem={"v2"}
           headerFontSize={"12px"}
           maxHeaderWidth={"215px"}
@@ -386,13 +386,11 @@
       </div>
     {/if}
 
-    {#if !isGuestUser}
-      <SearchBar
-        placeholder="Search Sparrow"
-        bind:searchQuery
-        onClick={handleSearchClick}
-      />
-    {/if}
+    <SearchBar
+      placeholder="Search Sparrow"
+      bind:searchQuery
+      onClick={handleSearchClick}
+    />
 
     <!-- Multiple Agent Dropdown -->
     {#if isWebApp}
@@ -409,7 +407,7 @@
         borderType={"none"}
         borderActiveType={"none"}
         headerHighlight={"hover-active"}
-        headerTheme={"transparent"}
+        headerTheme={"primary"}
         menuItem={"v2"}
         headerFontSize={"12px"}
         maxHeaderWidth={"12px"}
@@ -500,8 +498,8 @@
       isDropIconFilled={true}
       borderType={"none"}
       borderActiveType={"none"}
-      headerHighlight={""}
-      headerTheme={"transparent"}
+      headerHighlight={"hover-active"}
+      headerTheme={"primary"}
       menuItem={"v2"}
       headerFontSize={"12px"}
       maxHeaderWidth={"185px"}

@@ -1,7 +1,8 @@
 <script lang="ts">
   import { trashIcon as trashIcon } from "@sparrow/library/assets";
   import { Tooltip } from "@sparrow/library/ui";
-  import { Input, Switch } from "@sparrow/library/forms";
+  import { Input } from "@sparrow/library/forms";
+  import { Toggle } from "@sparrow/library/ui";
 
   export let element;
   export let index;
@@ -41,8 +42,8 @@
     <div class=" ps-1 d-flex w-50 justify-content-between">
       <div class="d-flex align-items-center">
         {#if true}
-          <Switch
-            checked={element.listen}
+          <Toggle
+            isActive={element.listen}
             onChange={() => {
               updateCheck(index);
             }}

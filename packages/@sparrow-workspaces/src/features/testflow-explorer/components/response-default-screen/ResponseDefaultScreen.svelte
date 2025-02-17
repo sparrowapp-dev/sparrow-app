@@ -11,15 +11,16 @@
     let controlKey = platformName === "macos" ? "cmd" : "ctrl";
     let altKey = platformName === "macos" ? "option" : "alt";
     ctrlCommands = {
-      "Send Request": controlKey + " + Enter",
-      "New Request": controlKey + " + N",
-      "Save Request": controlKey + " + S",
+      "Send Request": [controlKey, "Enter"],
+      "New Request": [controlKey, "N"],
+      "Save Request": [controlKey, "S"],
     };
+
     altCommands = {
-      "Edit link": altKey + " + L",
-      "Add Parameter": altKey + " + P",
-      "Add Header": altKey + " + H",
-      "Edit Body": altKey + " + B",
+      "Edit link": [altKey, "L"],
+      "Add Parameter": [altKey, "P"],
+      "Add Header": [altKey, "H"],
+      "Edit Body": [altKey, "B"],
     };
   });
   let isExpandShortcuts = false;
@@ -46,15 +47,10 @@
     {#each Object.entries(ctrlCommands) as [key, value]}
       {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
         <!-- <span class="me-3"></span> -->
-        <div class="px-4">
+        <div class="px-">
           <ComboText
-            comboContainerClassProp={"d-flex align-items-center justify-content-between gap-2 mb-3"}
             {key}
             {value}
-            keyClassProp={"text-secondary-200"}
-            valueClassProp={"bg-secondary-400 text-secondary-150"}
-            keyStyleProp={"width: 100px;"}
-            valueStyleProp={"width: 110px"}
             type="combo"
           />
         </div>
@@ -66,13 +62,8 @@
         <!-- <span class="me-3"></span> -->
         <div class="px-4">
           <ComboText
-            comboContainerClassProp={"d-flex align-items-center justify-content-between gap-1 mb-3"}
             {key}
             {value}
-            keyClassProp={"text-secondary-200"}
-            valueClassProp={"bg-secondary-400 text-secondary-150"}
-            keyStyleProp={"width: 100px;"}
-            valueStyleProp={"width: 110px"}
             type="combo"
           />
         </div>
@@ -81,7 +72,7 @@
     {/each}
   </div>
   {#if !isExpandShortcuts}
-    <div class="d-flex justify-content-center pt-3">
+    <div class="d-flex justify-content-center">
       <p
         class="text-primary-200 text-fs-12 cursor-pointer"
         on:click={() => {
@@ -92,7 +83,7 @@
       </p>
     </div>
   {:else}
-    <div class="d-flex justify-content-center pt-3">
+    <div class="d-flex justify-content-center">
       <p
         class="text-primary-200 text-fs-12 cursor-pointer"
         on:click={() => {

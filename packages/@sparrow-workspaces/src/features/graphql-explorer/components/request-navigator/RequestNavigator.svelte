@@ -1,6 +1,6 @@
 <script lang="ts">
   import { GraphqlRequestSectionTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
-  import { Navigator } from "../../../../components";
+  import { Navigator } from "@sparrow/library/ui";
   import { RefreshSchemaIcon } from "@sparrow/library/icons";
   export let requestStateSection: string;
   export let authHeaderLength = 0;
@@ -78,9 +78,9 @@
       onUpdateRequestState({
         requestNavigation: GraphqlRequestSectionTabEnum.HEADERS,
       });
-    } else if (event.altKey && event.code === "KeyS") {
+    } else if (event.altKey && event.code === "KeyV") {
       onUpdateRequestState({
-        requestNavigation: GraphqlRequestSectionTabEnum.Schema,
+        requestNavigation: GraphqlRequestSectionTabEnum.VARIABLES,
       });
     } else if (event.altKey && event.code === "KeyA") {
       onUpdateRequestState({

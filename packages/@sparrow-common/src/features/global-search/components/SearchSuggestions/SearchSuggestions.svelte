@@ -22,6 +22,7 @@
   export let filteredTestflows;
   export let filteredEnvironments;
   export let isWebApp = false;
+  export let isGuestUser = false;
   export let searchBarRef;
 </script>
 
@@ -47,6 +48,7 @@
     {handleGlobalSearchEnvironmentNavigation}
     {handleGlobalSearchTestflowNavgation}
     {isWebApp}
+    {isGuestUser}
   />
 </div>
 
