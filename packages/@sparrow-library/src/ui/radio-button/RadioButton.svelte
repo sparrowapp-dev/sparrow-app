@@ -159,7 +159,6 @@
     font-family: "Inter", sans-serif;
     font-weight: 500;
     font-size: 12px;
-    line-height: 18px;
     max-width: 180px;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -174,7 +173,6 @@
     font-family: "Inter", sans-serif;
     font-size: 14px;
     font-weight: 500;
-    line-height: 18px;
     max-width: 220px;
     text-overflow: ellipsis;
     overflow: hidden;
