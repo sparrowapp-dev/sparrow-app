@@ -1,23 +1,22 @@
 <script lang="ts">
   import { SelectIcon } from "./icons";
+
   export let selected: boolean = false;
   export let id: string = "";
   export let name: string = "";
   export let value: string = "";
-  export let group: string | undefined;
+  export let group: string;
   export let labelText: string = "";
-  export let handleChange:
-    | ((event?: { target: { value: string } }) => void)
-    | (() => void);
+  export let handleChange: (event?: {
+    target?: { value: string };
+  }) => void = () => {};
   export let buttonSize: "small" | "medium" = "medium";
   export let disabled: boolean = false;
   export let singleSelect: boolean = false;
   export let variant: "primary" = "primary";
-  let componentClass = "";
-  export { componentClass as class };
 
-  let hover: boolean = false;
-  let pressed: boolean = false;
+  let hover = false;
+  let pressed = false;
 
   const variants = {
     primary: {
@@ -43,9 +42,7 @@
 
   let currentVariant = variants[variant];
 
-  $: if (!singleSelect) {
-    selected = group === value;
-  }
+  $: selected = group === value;
 
   $: unSelectedColor = disabled
     ? currentVariant.unselectedColors.disabled
@@ -79,73 +76,76 @@
     } else {
       handleChange?.();
     }
+    // Move focus to the div when input is clicked
+    document.getElementById(id + "-div")?.focus();
   }
 </script>
 
-<div class="d-flex justify-content-center {componentClass}">
+<div class="d-flex justify-content-center">
   <input
-    bind:group
     type="radio"
+    bind:group
     {id}
     {name}
     {value}
-    on:change={handleChange}
+    on:change={handleClick}
+    {disabled}
     class="hidden"
-    {disabled}
   />
-  <button
-    on:click={handleClick}
-    {disabled}
-    type="button"
-    class="focus-visible-button"
-    style={`border:none; ${labelText === "" ? `height:${buttonSize !== "medium" ? "24px" : "28px"}; width: ${buttonSize !== "medium" ? "24px" : "28px"}; background-color:${bgCircleColor}; border-radius:50%;` : buttonSize === "medium" ? `width:auto; max-width: 264px; border-radius: 4px; padding: 4px 8px 4px 4px; height:36px;` : `width:auto; max-width: 218px; border-radius: 4px; padding: 2px 8px 2px 4px; height:28px;`}`}
-    on:mouseenter={() => (hover = true)}
-    on:mouseleave={() => (hover = false)}
-    on:mousedown={() => (pressed = true)}
-    on:mouseup={() => (pressed = false)}
-  >
-    <div class="d-flex align-items-center justify-content-center gap-1">
-      <span
-        class="circle-internal d-flex align-items-center justify-content-center"
-        style={`background-color: ${labelText !== "" ? bgCircleColor : "transparent"}; 
-         border-radius: ${labelText !== "" ? "50%" : ""}; 
-         height: ${labelText !== "" ? (buttonSize === "medium" ? "28px" : "24px") : ""}; 
-         width: ${labelText !== "" ? (buttonSize === "medium" ? "28px" : "24px") : ""};`}
-      >
-        <SelectIcon
-          {selected}
-          height={buttonSize === "medium" ? 16 : 12}
-          width={buttonSize === "medium" ? 16 : 12}
-          {unSelectedColor}
-          {selectedColor}
-        />
-      </span>
-      {#if labelText !== ""}
-        <label for={id} class={`label-text-${buttonSize}`}>{labelText}</label>
-      {/if}
+  <label for={id}>
+    <div
+      id={id + "-div"}
+      class="focus-visible-button"
+      tabindex="0"
+      style={`border:none; ${labelText === "" ? `height:${buttonSize !== "medium" ? "24px" : "28px"}; width: ${buttonSize !== "medium" ? "24px" : "28px"}; background-color:${bgCircleColor}; border-radius:50%;` : buttonSize === "medium" ? `width:auto; max-width: 264px; border-radius: 4px; padding: 4px 8px 4px 4px; height:36px;` : `width:auto; max-width: 218px; border-radius: 4px; padding: 2px 8px 2px 4px; height:28px;`}`}
+      on:mouseenter={() => (hover = true)}
+      on:mouseleave={() => (hover = false)}
+      on:mousedown={() => (pressed = true)}
+      on:mouseup={() => (pressed = false)}
+    >
+      <div class="d-flex align-items-center gap-1">
+        <span
+          class="circle-internal d-flex align-items-center justify-content-center"
+          style={`background-color:${labelText ? bgCircleColor : "transparent"};
+                 border-radius: 50%;
+                 height: ${buttonSize === "medium" ? "28px" : "24px"};
+                 width: ${buttonSize === "medium" ? "28px" : "24px"};`}
+        >
+          <SelectIcon
+            {selected}
+            height={buttonSize === "medium" ? 16 : 12}
+            width={buttonSize === "medium" ? 16 : 12}
+            {unSelectedColor}
+            {selectedColor}
+          />
+        </span>
+        {#if labelText}
+          <span class={`label-text-${buttonSize}`}>{labelText}</span>
+        {/if}
+      </div>
     </div>
-  </button>
+  </label>
 </div>
 
 <style>
   .hidden {
-    display: none;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
   }
 
-  button {
-    background-color: transparent;
-  }
-
-  button:disabled {
+  .focus-visible-button:disabled {
     opacity: 0.8;
   }
 
-  button:focus {
+  .focus-visible-button:focus {
     outline: none;
   }
 
-  button:focus-visible {
+  .focus-visible-button:focus-visible {
     outline: 2px solid var(--border-ds-primary-300);
+    color: var(--text-ds-neutral-50);
   }
 
   .label-text-small {
@@ -154,13 +154,26 @@
     font-size: 12px;
     line-height: 18px;
     max-width: 180px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .label-text-small:hover {
+    color: var(--text-ds-neutral-50);
   }
 
   .label-text-medium {
     font-family: "Inter", sans-serif;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
     line-height: 18px;
-    max-width: 180px;
+    max-width: 220px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: var(--text-ds-neutral-200);
+    white-space: nowrap;
+  }
+  .label-text-medium:hover {
+    color: var(--text-ds-neutral-50);
   }
 </style>

@@ -239,13 +239,26 @@
         }
       }}
     >
-      <RadioButton
+      <button
+        class="p-0 m-0 ms-1 ps-4 me-2 border-0 bg-transparent"
+        on:click|stopPropagation={() => {
+          handleSelectEnvironment();
+        }}
+      >
+        <SelectIcon
+          classProp={`my-auto`}
+          width={20}
+          height={20}
+          selected={currentWorkspace?.environmentId === env.id}
+        />
+      </button>
+      <!-- <RadioButton
         class="p-0 m-0  ps-4 me-2"
         buttonSize="medium"
         selected={currentWorkspace?.environmentId === env.id}
         handleChange={() => handleSelectEnvironment()}
         singleSelect={true}
-      />
+      /> -->
       {#if isRenaming}
         <input
           class="py-0 renameInputFieldCollection text-fs-12 w-100"
