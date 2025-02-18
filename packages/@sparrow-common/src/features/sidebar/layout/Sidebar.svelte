@@ -113,7 +113,6 @@
   //* @param idCheck - Boolean indicating whether the ID is valid.
   // * @param id - The ID to process.
   const slidebarPlace = (idCheck: boolean, id: string) => {
-    console.log(idCheck, id);
     if (idCheck) {
       initialId = id;
       logPositions(id);
@@ -122,7 +121,7 @@
 </script>
 
 <div class={`sidebar ${componentClass}`}>
-  <div class="active-indicator" style="top:{divHeight + 2}px"></div>
+  <div class="active-indicator" style="top:{divHeight + 3.4}px"></div>
   <div class="primary-sidebar-items">
     {#each primarySidebarItems as item (item.route)}
       <div id={`sidebar-item-${item.id}`}>
@@ -171,7 +170,7 @@
     position: absolute;
     height: 38px;
     width: 2px;
-    left: 5px;
+    left: 4.5px;
     opacity: 1;
     transition: top 250ms ease-out;
     z-index: 10;

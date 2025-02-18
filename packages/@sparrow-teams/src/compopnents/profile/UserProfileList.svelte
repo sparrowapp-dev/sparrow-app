@@ -1,5 +1,6 @@
 <script lang="ts">
-  import UserProfileSM from "./UserProfileSM.svelte";
+  import { Avatar } from "@sparrow/library/ui";
+import UserProfileSM from "./UserProfileSM.svelte";
   import { onMount } from "svelte";
 
   export let users: any[];
@@ -29,27 +30,19 @@
 {#if users.length > 0}
   {#each generateUsersList(users) as user}
     {#if user && typeof user.name === "string" && user.name !== ""}
-      <UserProfileSM
-        classProp={classProp + user.class}
-        stypeProp={stypeProp + user.style}
-        {width}
-        {height}
-        {borderRadius}
-        username={user.name[0].toUpperCase()}
-        {userProfileUrl}
-      />
+      <Avatar
+        type="letter"
+        size="small"
+        letter={user.name[0]}
+        bgColor="var(--text-secondary-600)"
+    />
     {/if}
   {/each}
   {#if generateUsersList(users).length < users.length}
-    <UserProfileSM
-      classProp={classProp + `position-absolute bg-backgroundColor`}
-      stypeProp={stypeProp +
-        `margin-left: -${4 * maxProfiles}px; z-index: ${maxProfiles};`}
-      {width}
-      {height}
-      {borderRadius}
-      username={`+${users.length - generateUsersList(users).length}`}
-      {userProfileUrl}
-    />
+    <Avatar
+      type="letter"
+      size="small"
+      letter={`+${users.length - generateUsersList(users).length}`}
+      bgColor="var(--text-secondary-600)"/>
   {/if}
 {/if}

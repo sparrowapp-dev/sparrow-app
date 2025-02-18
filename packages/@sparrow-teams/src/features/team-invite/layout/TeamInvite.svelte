@@ -7,9 +7,10 @@
     createDynamicComponents,
     validateEmail,
   } from "@sparrow/common/utils";
+  import { Avatar } from "@sparrow/library/ui";
 
   import { TeamRole, WorkspaceRole } from "@sparrow/common/enums/team.enum";
-  import { Button, IconFallback } from "@sparrow/library/ui";
+  import { Button, Chip } from "@sparrow/library/ui";
 
   export let onInviteClick;
   export let workspaces;
@@ -43,16 +44,11 @@
   let workspaceError: boolean = false;
   let invalidEmails: string[] = [];
 
-  function removeElement(event: Event): void {
-    const email = event.target?.id;
-    const removeElement = document.getElementById(email) as HTMLElement;
-    const emailContainer = document.getElementById(
-      "input-email",
-    ) as HTMLElement;
-    emailContainer.removeChild(removeElement);
+  const removeElement = (email: string): void => {
     emailstoBeSentArr = emailstoBeSentArr.filter((e) => e != email);
     invalidEmails = invalidEmails.filter((e) => e != email);
-  }
+    globalEmails = globalEmails.filter((e) => e.id != email);
+  };
 
   /**
    * Checks if user already exist in team
@@ -76,6 +72,11 @@
     return false;
   };
 
+  let globalEmails: {
+    id: string;
+    isError: boolean;
+  }[] = [];
+
   const handleEmailOnAdd = async (email: string) => {
     email = email.replace(",", "");
     email = email.trim();
@@ -97,38 +98,11 @@
 
     if (!isValidEmail) {
       invalidEmails.push(email);
+      globalEmails = [...globalEmails, { id: email, isError: true }];
     } else {
       emailstoBeSentArr.push(email);
+      globalEmails = [...globalEmails, { id: email, isError: false }];
     }
-
-    const emailDiv: HTMLElement = createDynamicComponents(
-      "div",
-      `d-flex  email-container-item ps-2 me-1 justify-content-center rounded-1 align-items-center ${
-        !isValidEmail
-          ? "email-container-item-invalid"
-          : "email-container-item-valid"
-      }`,
-    );
-    const emailContentSpan = createDynamicComponents("span", `text-fs-12`);
-    const closeIconBtn = createDynamicComponents(
-      "img",
-      `bg-transparent email-container-img ${
-        !isValidEmail
-          ? "email-container-img-invalid"
-          : "email-container-img-valid"
-      }`,
-      [{ eventType: "click", eventHandler: removeElement }],
-    ) as HTMLImageElement;
-    emailDiv.id = email;
-    closeIconBtn.id = email;
-    closeIconBtn.src = closeIconWhite;
-    emailContentSpan.innerHTML = email;
-    emailDiv.appendChild(emailContentSpan);
-    emailDiv.appendChild(closeIconBtn);
-    const emailContainer: HTMLElement = document.getElementById(
-      "input-email",
-    ) as HTMLElement;
-    emailContainer.appendChild(emailDiv);
     currentEmailEntered = "";
     if (emailstoBeSentArr.length && !invalidEmails.length) {
       emailError = false;
@@ -236,7 +210,22 @@
       ? 'isError'
       : ''}"
   >
-    <div id="input-email"></div>
+    <div id="input-email">
+      {#each globalEmails as email}
+        <span class="m-0 p-0 d-flex me-2">
+          <Chip
+            label={email.id}
+            type={"input"}
+            isError={email.isError}
+            onClose={() => {
+              removeElement(email.id);
+            }}
+            disabled={false}
+            id={email.id}
+          />
+        </span>
+      {/each}
+    </div>
     <input
       id="input"
       placeholder="Enter email ID"
@@ -306,6 +295,7 @@
         description: "View Resources within a workspace.",
       },
     ]}
+    maxHeaderWidth={"100%"}
     onclick={handleDropdown}
     position={"absolute"}
     menuItem={"v2"}
@@ -358,15 +348,15 @@
   <div class="d-flex align-items-center description ellipsis gap-2">
     <div class="d-flex align-items-center" style="width: 36px;">
       {#if teamLogo?.size}
-        <img
-          class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
-          style="width: 36px !important; height: 36px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-          src={base64ToURL(teamLogo)}
-          alt=""
-        />
+        <Avatar type={"image"} size={"large"} image={base64ToURL(teamLogo)} />
       {:else}
         <span class="">
-          <IconFallback character={teamName[0]} />
+          <Avatar
+            type={"letter"}
+            size={"large"}
+            letter={teamName.charAt(0)}
+            bgColor={"var(--bg-tertiary-800)"}
+          />
         </span>
       {/if}
     </div>
@@ -413,9 +403,9 @@
   .email-container {
     display: flex;
     flex-wrap: wrap;
-    background-color: var(--bg-tertiary-300);
+    background-color: var(--bg-ds-surface-400);
     border: 1px solid;
-    padding: 3px 8px 3px 8px;
+    padding: 4px 8px;
     border: 1px solid var(--border-color);
     max-height: 100px;
     overflow-y: auto;

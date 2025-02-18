@@ -8,6 +8,8 @@
   } from "@sparrow/library/assets";
   import { RequestIcon } from "@sparrow/library/icons";
 
+  import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+
   // ---- Components
   import {
     Spinner,
@@ -209,7 +211,7 @@
     <div class="d-flex gap-3 sparrow-fs-12">
       <div class="d-flex gap-1">
         <span class="text-plusButton">{requestCount}</span>
-        <p>REST</p>
+        <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
       </div>
       {#if !isWebApp}
         <div class="d-flex gap-1">
@@ -233,7 +235,7 @@
         disable={deleteLoader}
         title={"Cancel"}
         textStyleProp={"font-size: var(--base-text)"}
-        type={"dark"}
+        type={"secondary"}
         loader={false}
         onClick={() => {
           isFolderPopup = false;
@@ -307,7 +309,7 @@
               folder: explorer,
             });
           },
-          displayText: "Add REST",
+          displayText: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           disabled: false,
           hidden:
             !collection.activeSync ||

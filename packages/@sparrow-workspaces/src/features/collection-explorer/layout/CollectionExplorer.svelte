@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   // Exports
   /**
    * Callback to update description
@@ -162,7 +163,7 @@
         disable={branchSwitchLoader}
         title={"Cancel"}
         textStyleProp={"font-size: var(--base-text)"}
-        type={"dark"}
+        type={"secondary"}
         loader={false}
         onClick={() => (isBranchSwitchPopupOpen = false)}
       />
@@ -320,7 +321,7 @@
               disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
                 refreshCollectionLoader}
               title={`Sync Collection`}
-              type="dark"
+              type={"secondary"}
               loader={refreshCollectionLoader}
               buttonClassProp={`me-2`}
               onClick={async () => {
@@ -403,7 +404,9 @@
         </div>
         <div class="d-flex align-items-center gap-2">
           <span class="fs-4 highlighted-number">{totalRequests}</span>
-          <p style="font-size: 12px;" class="mb-0">REST</p>
+          <p style="font-size: 12px;" class="mb-0">
+            {HttpRequestDefaultNameBaseEnum.NAME}
+          </p>
         </div>
         {#if !isWebApp}
           <div>

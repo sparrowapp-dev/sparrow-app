@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
   export let onItemCreated: (entityType: string, args: any) => void;
   export let onItemDeleted: (entityType: string, args: any) => void;
@@ -22,6 +23,7 @@
    */
   export let userRole;
   export let isWebApp = false;
+  export let isFirstCollectionExpand = false;
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
   import {
@@ -189,6 +191,12 @@
     // );
   });
 
+  $: {
+    if (isFirstCollectionExpand) {
+      visibility = true;
+    }
+  }
+
   let prevCurrentBranch = "";
   let prevBranches = "";
   $: {
@@ -267,7 +275,7 @@
     </div>
     <div class="d-flex gap-1">
       <span class="text-plusButton">{requestCount}</span>
-      <p>REST</p>
+      <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
     </div>
     {#if !isWebApp}
       <div class="d-flex gap-1">
@@ -291,7 +299,7 @@
       disable={deleteLoader}
       title={"Cancel"}
       textStyleProp={"font-size: var(--base-text)"}
-      type={"dark"}
+      type={"secondary"}
       loader={false}
       onClick={() => {
         isCollectionPopup = false;
@@ -389,7 +397,7 @@
             collection,
           });
         },
-        displayText: "Add REST API",
+        displayText: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
         disabled: false,
         hidden: false,
         icon: SyncIcon,

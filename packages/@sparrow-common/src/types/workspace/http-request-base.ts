@@ -46,6 +46,10 @@ export enum HttpRequestMethodBaseEnum {
   OPTIONS = "OPTIONS",
 }
 
+export enum HttpRequestDefaultNameBaseEnum {
+  NAME = "REST API",
+}
+
 export interface HttpRequestBaseInterface {
   method: string;
   operationId: string;

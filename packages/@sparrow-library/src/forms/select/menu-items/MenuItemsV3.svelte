@@ -1,4 +1,6 @@
 <script lang="ts">
+  import Avatar from "../../../ui/avatar/Avatar.svelte";
+
   export let list: {
     name: string;
     id: string;
@@ -51,14 +53,15 @@
       style="min-width: 20px;"
     >
       {#if list.logo == "" || list.logo == undefined}
-        <div
-          class={`m-0 text-defaultColor me-2 text-center align-items-center justify-content-center bg-transparent border-defaultColor`}
-          style={`font-size: 15px; padding-top: 2px; width: 20px !important; height: 20px !important; display: flex; border: 1px solid #45494D; border-radius: 50%;`}
-        >
-          {list.name[0] ? list.name[0].toUpperCase() : ""}
-        </div>
+        <Avatar
+          type="letter"
+          size="small"
+          letter={list.name[0] ? list.name[0] : ""}/>
       {:else}
-        <img class="w-100" style="border-radius: 50%; height:20px ; width:20px;  overflow:hidden !important; " src={list.logo} alt="sparrow-dropdown-img" />
+        <Avatar
+          type="image"
+          size="small"
+          src={list.logo}/> 
       {/if}
     </div>
     <p

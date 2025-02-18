@@ -5,6 +5,7 @@
   import { Button } from "@sparrow/library/ui";
   import { Tooltip } from "@sparrow/library/ui";
   import { Options } from "@sparrow/library/ui";
+  import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
   // ---- Helper functions
   import { getMethodStyle } from "@sparrow/common/utils/conversion.helper";
@@ -164,7 +165,7 @@
       disable={deleteLoader}
       title={"Cancel"}
       textStyleProp={"font-size: var(--base-text)"}
-      type={"dark"}
+      type={"secondary"}
       loader={false}
       onClick={() => {
         isDeletePopup = false;
@@ -211,7 +212,7 @@
             request: api,
           });
         },
-        displayText: "Open REST API",
+        displayText: `Open ${HttpRequestDefaultNameBaseEnum.NAME}`,
         disabled: false,
         hidden: false,
       },
@@ -220,7 +221,7 @@
           isRenaming = true;
           setTimeout(() => inputField.focus(), 100);
         },
-        displayText: "Rename REST API",
+        displayText: `Rename ${HttpRequestDefaultNameBaseEnum.NAME}`,
         disabled: false,
         hidden:
           !collection.activeSync ||

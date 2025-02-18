@@ -1,5 +1,6 @@
 <script lang="ts" context="module">
   import type { Observable } from "rxjs";
+  import { Avatar } from "@sparrow/library/ui";
 
   export type UserProfileObj = {
     heading: string;
@@ -109,12 +110,7 @@
       style="right:10px; top:47px; font-size: 12px; font-weight: 400; min-width: 200px; z-index: 500;"
     >
       <div class="d-flex align-items-center mb-2 px-1">
-        <div
-          class="rounded-5 me-2 border border-defaultColor d-flex justify-content-center align-items-center"
-          style="height: 32px; width: 32px;"
-        >
-          {user?.name[0]}
-        </div>
+        <Avatar type="letter" size="medium" letter={user?.name[0]} bgColor="var(--bg-tertiary-500)" />
         <div class="d-flex flex-column ms-1">
           <div class="ellipsis" style="max-width: 200px; ">
             {user?.name}
