@@ -97,19 +97,21 @@
       id={id + "-div"}
       class="focus-visible-button"
       tabindex="0"
-      style={`border:none; ${labelText === "" ? `height:${buttonSize !== "medium" ? "24px" : "28px"}; width: ${buttonSize !== "medium" ? "24px" : "28px"}; background-color:${bgCircleColor}; border-radius:50%;` : buttonSize === "medium" ? `width:auto; max-width: 264px; border-radius: 4px; padding: 4px 8px 4px 4px; height:36px;` : `width:auto; max-width: 218px; border-radius: 4px; padding: 2px 8px 2px 4px; height:28px;`}`}
+      style={`border:none; ${labelText === "" ? `height:${buttonSize !== "medium" ? "24px" : "28px"}; width:${buttonSize !== "medium" ? "24px" : "28px"}; background-color:${bgCircleColor}; border-radius:50%;` : buttonSize === "medium" ? `width:auto; max-width:264px; border-radius:4px; padding:4px 8px 4px 4px; height:36px;` : `width:auto; max-width:218px; border-radius:4px; padding:2px 8px 2px 4px; height:28px;`}`}
       on:mouseenter={() => (hover = true)}
       on:mouseleave={() => (hover = false)}
       on:mousedown={() => (pressed = true)}
-      on:mouseup={() => (pressed = false)}
+      on:mouseup={() => {
+        pressed = false;
+      }}
+      on:mouseleave={() => {
+        pressed = false;
+      }}
     >
       <div class="d-flex align-items-center gap-1">
         <span
-          class="circle-internal d-flex align-items-center justify-content-center"
-          style={`background-color:${labelText ? bgCircleColor : "transparent"};
-                 border-radius: 50%;
-                 height: ${buttonSize === "medium" ? "28px" : "24px"};
-                 width: ${buttonSize === "medium" ? "28px" : "24px"};`}
+          class="circle-internal d-flex align-items-center justify-content-center mx-auto"
+          style={`background-color:${labelText ? bgCircleColor : "transparent"}; border-radius: 50%; height: ${buttonSize === "medium" ? "28px" : "24px"}; width: ${buttonSize === "medium" ? "28px" : "24px"};`}
         >
           <SelectIcon
             {selected}
@@ -120,7 +122,9 @@
           />
         </span>
         {#if labelText}
-          <span class={`label-text-${buttonSize}`}>{labelText}</span>
+          <span class={`label-text-${buttonSize} ${pressed ? "pressed" : ""}`}
+            >{labelText}</span
+          >
         {/if}
       </div>
     </div>
@@ -145,7 +149,10 @@
 
   .focus-visible-button:focus-visible {
     outline: 2px solid var(--border-ds-primary-300);
-    color: var(--text-ds-neutral-50);
+  }
+  .focus-visible-button:focus-visible .label-text-medium,
+  .focus-visible-button:focus-visible .label-text-small {
+    color: var(--text-ds-neutral-50) !important;
   }
 
   .label-text-small {
@@ -158,6 +165,7 @@
     overflow: hidden;
     white-space: nowrap;
   }
+
   .label-text-small:hover {
     color: var(--text-ds-neutral-50);
   }
@@ -173,7 +181,12 @@
     color: var(--text-ds-neutral-200);
     white-space: nowrap;
   }
+
   .label-text-medium:hover {
+    color: var(--text-ds-neutral-50);
+  }
+
+  .label-text-medium.pressed {
     color: var(--text-ds-neutral-50);
   }
 </style>
