@@ -95,6 +95,7 @@
 />
 
 <tr
+  tabindex="0"
   class="position-relative workspace-list-item cursor-pointer ellipsis"
   on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
 >
@@ -143,7 +144,7 @@
               user.role === WorkspaceMemberRole.ADMIN ||
               user.role === WorkspaceMemberRole.EDITOR,
           )}
-          maxProfiles={3}
+          maxProfiles={2}
           classProp="position-absolute"
         />
       </div>
@@ -173,7 +174,8 @@
     {/if}
   </td>
 
-  <td class="tab-data rounded-end py-3">
+  <td class="tab-data rounded-end py-3"
+  >
     <button
       bind:this={workspaceTabWrapper}
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-relative {showMenu
@@ -182,6 +184,7 @@
       on:click={(e) => {
         rightClickContextMenu(e);
       }}
+      tabindex="-1"
     >
       <ThreeDotIcon />
     </button>
@@ -189,28 +192,39 @@
 </tr>
 
 <style>
+
   tr:hover {
-    background-color: var(--bg-tertiary-600);
+    background-color: var(--bg-ds-surface-600);
     cursor: pointer;
   }
+  tr:active {
+    background-color: var(--bg-ds-surface-600);
+    cursor: pointer;
+  }
+  tr[tabindex="0"]:focus {
+     outline: solid 2px var(--bg-ds-primary-300) !important;
+     outline-offset: -2px;
+     background-color: var(--bg-ds-surface-700);
+      border-radius: 8px;
+  }
+
   .workspace-list-item td {
     background-color: transparent;
   }
   .threedot-icon-container {
-    visibility: hidden;
+    visibility: visible;
     background-color: transparent;
     z-index: 2;
+    transform: rotate(90deg);
+    outline: none;
   }
   tr:hover .threedot-icon-container {
     visibility: visible;
   }
-  .threedot-active {
-    visibility: visible;
-    background-color: var(--bg-tertiary-190);
-  }
+
   .tab-data {
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 18px;
     vertical-align: middle;
   }
