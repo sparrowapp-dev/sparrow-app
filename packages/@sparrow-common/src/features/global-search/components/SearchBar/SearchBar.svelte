@@ -1,9 +1,7 @@
 <script lang="ts">
-  let searchInput: HTMLInputElement;
   export let searchQuery = "";
-
   export let handleSearch = () => {};
-  import { SearchIcon } from "@sparrow/common/images";
+  import { SearchIcon } from "@sparrow/library/icons";
   import { KeyboardShortcuts } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   export let searchBarRef;
