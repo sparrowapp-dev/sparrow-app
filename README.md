@@ -74,11 +74,13 @@ cp apps/@sparrow-desktop/.env.example apps/@sparrow-desktop/.env
 cp apps/@sparrow-web/.env.example apps/@sparrow-web/.env
 ```
 
-After completing the required steps of setting up the app, follow one of the below methods to setup the required services:
+> You can customize the environment variables in `.env` if required. Refer the [Environment Variable Guide](./docs/ENVIRONMENT_VARIABLE_GUIDE.md) to understand more.
+
+After completing the required steps of setting up the repository and env, follow one of the below methods to setup the required services:
 
 #### -> [METHOD 1] Docker Method
 
-- To install all services(mongo + kafka + api server + auth server + proxy server) as docker containers, run:
+- To install all services(mongo + kafka + api server + auth server + proxy server) as docker containers, and start the web app on port 1422, run:
 
   `yarn docker:up `
 
@@ -94,7 +96,7 @@ After completing the required steps of setting up the app, follow one of the bel
 
   Points to remember:
 
-  - `Running yarn docker:up will also start web app on localhost:1422. You can comment it in docker compose if you want to run it locally.`
+  - `Running yarn docker:up will also start web app on localhost:1422. You can comment it out in docker compose if you want to run the app locally.`
 
 #### -> [METHOD 2] Non-Docker Method
 
@@ -108,7 +110,7 @@ After completing the required steps of setting up the app, follow one of the bel
 
   - `Mongo and Kafka setup is already included in Sparrow API setup.`
 
-### Run The App Locally
+#### -> Run The App Locally
 
 ```bash
 # Run the desktop app in dev mode

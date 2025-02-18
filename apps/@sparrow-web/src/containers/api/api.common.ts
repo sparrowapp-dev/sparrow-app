@@ -623,10 +623,6 @@ const makeHttpRequestV2 = async (
     let response;
     if (selectedAgent === "Cloud Agent") {
       const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
-      // eslint-disable-next-line no-console
-      console.log("constants ===> ", constants);
-      // eslint-disable-next-line no-console
-      console.log("proxyUrl ===> ", proxyUrl);
       response = await axios({
         data: { url, method, headers, body, contentType },
         url: proxyUrl,

@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   # MongoDB
   mongo:
@@ -28,7 +26,7 @@ services:
 
   # Sparrow Api Server
   sparrow-api:
-    image: sparrowapi/sparrow-api:v3
+    image: sparrowapi/sparrow-api:v1
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -45,7 +43,7 @@ services:
 
   # Sparrow Auth Server
   sparrow-auth:
-    image: sparrowapi/sparrow-auth:v2
+    image: sparrowapi/sparrow-auth:v1
     ports:
       - "1421:80"
     volumes:
@@ -68,11 +66,13 @@ services:
     networks:
       - localnet
 
-  # Sparrow Web
+  # Sparrow Web App
   sparrow-web:
-    image: sparrowapi/sparrow-web:v1
+    build:
+      context: .
+      dockerfile: Sparrow-Web.Dockerfile
       args:
-        VITE_WEB_API_TIMEOUT: 7000
+        VITE_WEB_API_TIMEOUT: 5000
         VITE_WEB_API_URL: http://localhost:9000
         VITE_WEB_AUTH_URL: http://localhost:1421
         VITE_WEB_SOCKET_IO_API_URL: http://localhost:9001
@@ -86,14 +86,7 @@ services:
         VITE_WEB_SPARROW_DOCS: https://docs.sparrowapp.dev/docs/intro
         VITE_WEB_PROXY_SERVICE: http://localhost:3000
         VITE_WEB_ENABLE_MIX_PANEL: false
-        VITE_WEB_MIX_PANEL_TOKEN:
-        VITE_WEB_CANNY_URL:
-        VITE_WEB_RELEASE_NOTES_PAT_TOKEN:
-        VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING:
-        VITE_WEB_SPARROW_SUPPORT_EMAIL:
-        VITE_WEB_CANNY_API:
-        VITE_WEB_MARKETING_URL:
-        VITE_WEB_AZURE_CDN_URL:
+        VITE_WEB_MIX_PANEL_TOKEN: 
     ports:
       - "1422:80"
     networks:
