@@ -98,22 +98,13 @@
                 placement={"bottom-center"}
                 distance={10}
               >
-                <button
-                  class="trash-icon border-radius-2 d-flex justify-content-center align-items-center p-0 border-0"
-                  style="width: 24px; height:24px;"
-                  on:click={() => {
-                    deleteParam(index);
-                  }}
-                >
-                  <DeleteIcon2 />
-                </button>
-                <!-- <Button
+                <Button
                   buttonClassProp=""
                   size="extra-small"
                   type="teritiary-regular"
                   startIcon={DeleteIcon2}
                   onClick={() => deleteParam(index)}
-                /> -->
+                />
               </Tooltip>
             {/if}
           {/if}

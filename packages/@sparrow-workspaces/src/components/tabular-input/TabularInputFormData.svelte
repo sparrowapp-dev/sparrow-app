@@ -6,7 +6,7 @@
   import { crossIcon as close } from "@sparrow/library/assets";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "..";
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   import { Base64Converter } from "@sparrow/common/utils";
   import { Checkbox } from "@sparrow/library/forms";
@@ -222,13 +222,13 @@
 
     <div class="d-flex gap-0" style="width: calc(100% - 180px);">
       <div
-        class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
+        class="w-50 position-relative header-text"
         style="padding-left: 6px;"
       >
         Key
       </div>
       <div
-        class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
+        class="w-50 position-relative header-text"
         style="padding-left: 56px;"
       >
         Value
@@ -364,15 +364,15 @@
                   placement={"bottom-center"}
                   distance={10}
                 >
-                  <button
-                    class="trash-icon border-radius-2 d-flex justify-content-center align-items-center p-0 border-0"
-                    style="width: 24px; height:24px;"
-                    on:click={() => {
+                  <Button
+                    buttonClassProp=""
+                    size="extra-small"
+                    type="teritiary-regular"
+                    startIcon={DeleteIcon2}
+                    onClick={() => {
                       deleteParam(index);
                     }}
-                  >
-                    <DeleteIcon2 />
-                  </button>
+                  />
                 </Tooltip>
               {:else}
                 <div style="width:45px;" class="opacity:0;"></div>
@@ -414,5 +414,11 @@
   }
   .trash-icon:focus-visible {
     border: 2px solid var(--bg-ds-primary-300);
+  }
+  .header-text {
+    color: var(--text-ds-neutral-200);
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
   }
 </style>
