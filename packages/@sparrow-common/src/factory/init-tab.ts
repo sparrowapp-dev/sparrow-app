@@ -4,6 +4,7 @@ import {
   InitFolderTab,
   InitGraphqlTab,
   InitRequestTab,
+  InitSavedRequestTab,
   InitTestflowTab,
   InitWebSocketTab,
 } from "@sparrow/common/utils";
@@ -56,6 +57,14 @@ class InitTab {
    */
   public request = (_id: string, _workspaceId: string) => {
     return new InitRequestTab(_id, _workspaceId);
+  };
+
+  /**
+   * @param _id - request mongo document id
+   * @param _workspaceId - Workspace mongo id to which request belongs to
+   */
+  public savedRequest = (_id: string, _workspaceId: string) => {
+    return new InitSavedRequestTab(_id, _workspaceId);
   };
   /**
    * @param _id - collection mongo document id

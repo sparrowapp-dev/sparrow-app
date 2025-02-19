@@ -6,6 +6,7 @@ import type { WebSocketWrapper } from "./websocket-request-tab";
 import type { TFTabItemWrapperType } from "./testflow-tab";
 import type { SocketIoWrapper } from "./socket-io-request-tab";
 import type { GraphqlRequestWrapperTabInterface } from "./graphql-request-tab";
+import type { HttpRequestSavedWrapperTabInterface } from "./http-request-saved-tab"; 
 
 export enum TabTypeEnum {
   FOLDER = "FOLDER",
@@ -18,6 +19,7 @@ export enum TabTypeEnum {
   TESTFLOW = "TESTFLOW",
   SOCKET_IO = "SOCKETIO",
   GRAPHQL = "GRAPHQL",
+  SAVED_REQUEST = "SAVED_REQUEST"
 }
 export interface WorkspaceIdWrapper {
   workspaceId: string;
@@ -80,7 +82,8 @@ export interface Property
     Partial<WebSocketWrapper>,
     Partial<TFTabItemWrapperType>,
     Partial<SocketIoWrapper>,
-    Partial<GraphqlRequestWrapperTabInterface> {}
+    Partial<GraphqlRequestWrapperTabInterface>,
+    Partial<HttpRequestSavedWrapperTabInterface> {}
 
 export interface PropertyWrapper {
   property: Property;

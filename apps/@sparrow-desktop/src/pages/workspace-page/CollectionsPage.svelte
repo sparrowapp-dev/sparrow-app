@@ -45,7 +45,6 @@
   import type { TabDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { onMount } from "svelte";
-  import { ItemType } from "@sparrow/common/enums";
 
   import type {
     CollectionDocument,
@@ -75,6 +74,7 @@
 
   import { open } from "@tauri-apps/plugin-shell";
   import constants from "@app/constants/constants";
+  import RestExplorerSavedPage from "./sub-pages/RestExplorerSavedPage/RestExplorerSavedPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -513,31 +513,31 @@
           <div style="flex:1; overflow: hidden;">
             <Route>
               {#if true}
-                {#if $activeTab?.type === ItemType.REQUEST}
+                {#if $activeTab?.type === TabTypeEnum.REQUEST}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <RestExplorerPage bind:isTourGuideOpen tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.COLLECTION}
+                {:else if $activeTab?.type === TabTypeEnum.COLLECTION}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <CollectionExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.FOLDER}
+                {:else if $activeTab?.type === TabTypeEnum.FOLDER}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <FolderExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.ENVIRONMENT}
+                {:else if $activeTab?.type === TabTypeEnum.ENVIRONMENT}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <EnvironmentExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.WORKSPACE}
+                {:else if $activeTab?.type === TabTypeEnum.WORKSPACE}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WorkspaceExplorerPage
@@ -546,28 +546,34 @@
                       />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.WEB_SOCKET}
+                {:else if $activeTab?.type === TabTypeEnum.WEB_SOCKET}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WebSocketExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.TESTFLOW}
+                {:else if $activeTab?.type === TabTypeEnum.TESTFLOW}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <TestFlowExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.SOCKET_IO}
+                {:else if $activeTab?.type === TabTypeEnum.SOCKET_IO}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <SocketIoExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.GRAPHQL}
+                {:else if $activeTab?.type === TabTypeEnum.GRAPHQL}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <GraphqlExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
+                {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <RestExplorerSavedPage tab={$activeTab} />
                     </div>
                   </Motion>
                 {:else if !$tabList?.length}

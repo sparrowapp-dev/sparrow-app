@@ -113,6 +113,7 @@
   export let isTourGuideOpen = false;
   export let isWebApp = false;
   export let azureBlobCDN;
+  export let onSaveResponse;
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -385,8 +386,10 @@
                             <ResponseBodyNavigator
                               response={storeData?.response}
                               apiState={storeData?.response}
+                              path={$tab.path}
                               {onUpdateResponseState}
                               {onClearResponse}
+                              {onSaveResponse}
                               {isWebApp}
                             />
                           {/if}
