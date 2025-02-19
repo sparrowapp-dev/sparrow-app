@@ -2,13 +2,14 @@
   import { inview } from "svelte-inview";
   import { trashIcon as trashIcon } from "@sparrow/library/assets";
   import { CodeMirrorInput } from "../";
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
   import type {
     ObserverEventDetails,
     ScrollDirection,
     Options,
   } from "svelte-inview";
   import { Checkbox } from "@sparrow/library/forms";
+  import { DeleteIcon2 } from "@sparrow/library/icons";
 
   export let element;
   export let index;
@@ -98,14 +99,21 @@
                 distance={10}
               >
                 <button
-                  class="trash-icon bg-secondary-700 border-radius-2 d-flex justify-content-center align-items-center p-0 border-0"
-                  style="width: 16px; height:16px; "
+                  class="trash-icon border-radius-2 d-flex justify-content-center align-items-center p-0 border-0"
+                  style="width: 24px; height:24px;"
                   on:click={() => {
                     deleteParam(index);
                   }}
                 >
-                  <img src={trashIcon} style="height: 100%; width: 100%;" />
+                  <DeleteIcon2 />
                 </button>
+                <!-- <Button
+                  buttonClassProp=""
+                  size="extra-small"
+                  type="teritiary-regular"
+                  startIcon={DeleteIcon2}
+                  onClick={() => deleteParam(index)}
+                /> -->
               </Tooltip>
             {/if}
           {/if}
@@ -121,20 +129,29 @@
 <style>
   .pair-data-row:first-child {
     border-top: none !important;
-    height: 24px !important;
+    height: 28px !important;
   }
   .pair-data-row {
     padding-top: 3px;
     padding-bottom: 3px;
-    height: calc(24px);
-    background-color: var(--bg-secondary-700);
+    height: calc(28px);
+    background-color: var(--bg-ds-surface-600);
+    border-top: 1px solid var(--bg-ds-surface-400);
   }
-
+  .pair-data-row:hover {
+    background-color: var(--bg-ds-surface-500);
+  }
   .skelton-parent {
     display: flex;
     height: 24px;
     padding: 2px 20px 2px 0px;
     margin: 0px;
     gap: 10%;
+  }
+  .trash-icon {
+    background: transparent;
+  }
+  .trash-icon:hover {
+    background-color: var(--bg-ds-surface-300);
   }
 </style>

@@ -258,13 +258,13 @@
 
         <div class="d-flex gap-0" style="width: calc(100% - 188px);">
           <div
-            class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
+            class="w-50 position-relative header-text"
             style="padding-left: 6px;"
           >
             Key
           </div>
           <div
-            class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
+            class="w-50 position-relative header-text"
             style="padding-left: 68px;"
           >
             Value
@@ -277,7 +277,8 @@
                 <Toggle
                   bind:isActive={bulkToggle}
                   label="Bulk Edit"
-                  fontSize="10px"
+                  fontSize="12px"
+                  textColor="var(--text-ds-neutral-200)"
                   fontWeight="400"
                   onClick={handleBulkTextUpdate}
                   onChange={toggleBulkEdit}
@@ -430,10 +431,16 @@
 
 <style>
   .pair-header-row {
-    border-top: 0.5px solid var(--border-secondary-315);
+    /* border-top: 0.5px solid var(--border-secondary-315); */
     padding-top: 3px;
     padding-bottom: 3px;
-    background-color: var(--bg-secondary-880);
-    height: 26px;
+    background-color: var(--bg-ds-surface-400);
+    height: 28px;
+  }
+  .header-text {
+    color: var(--text-ds-neutral-200);
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
   }
 </style>

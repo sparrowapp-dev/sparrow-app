@@ -142,3 +142,4 @@ export { default as patchIcon } from "./Patch.svelte";
 export { default as postIcon } from "./Post.svelte";
 export { default as putIcon } from "./Put.svelte";
 export { default as deleteIcon } from "./Delete.svelte";
+export { default as DeleteIcon2 } from "./DeleteIcon2.svelte";

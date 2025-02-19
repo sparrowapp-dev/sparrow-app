@@ -1,6 +1,6 @@
 <script lang="ts">
   import { trashIcon as trashIcon } from "@sparrow/library/assets";
-  import { AttachmentIcon } from "@sparrow/library/icons";
+  import { AttachmentIcon, DeleteIcon2 } from "@sparrow/library/icons";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { invoke } from "@tauri-apps/api/core";
   import { crossIcon as close } from "@sparrow/library/assets";
@@ -327,7 +327,7 @@
             {/if}
           </div>
           <div
-            class="ms-3 d-flex align-items-center justify-content-between"
+            class="ms-3 d-flex align-items-center justify-content-between gap-1"
             style="width:40px;"
           >
             {#if pairs.length - 1 != index}
@@ -341,12 +341,12 @@
                   placement="bottom-center"
                 >
                   <button
-                    class="d-flex align-items-center justify-content-center bg-secondary-700 border-0 {isInputBoxEditable &&
+                    class="d-flex align-items-center justify-content-center border-0 {isInputBoxEditable &&
                     element.type == 'text' &&
                     element.value == ''
                       ? 'opacity-1'
                       : 'opacity-0 pe-none'}"
-                    style="width:16px; height:16px; padding:2px;"
+                    style="width:16px; height:16px; padding:2px; background:transparent;"
                     on:click={() => {
                       uploadFormFile(index);
                     }}
@@ -359,15 +359,19 @@
                   </button>
                 </Tooltip>
                 <!-- {/if} -->
-                <Tooltip title="Delete" placement="bottom-center">
+                <Tooltip
+                  title={"Delete"}
+                  placement={"bottom-center"}
+                  distance={10}
+                >
                   <button
-                    class="d-flex align-items-center p-0 justify-content-center bg-secondary-700 border-0"
-                    style="width:16px; height:16px;"
+                    class="trash-icon border-radius-2 d-flex justify-content-center align-items-center p-0 border-0"
+                    style="width: 24px; height:24px;"
                     on:click={() => {
                       deleteParam(index);
                     }}
                   >
-                    <img src={trashIcon} style="height:100%; width: 100%;" />
+                    <DeleteIcon2 />
                   </button>
                 </Tooltip>
               {:else}
@@ -383,20 +387,32 @@
 
 <style>
   .pair-header-row {
-    border-top: 0.5px solid var(--border-secondary-315);
     padding-top: 3px;
     padding-bottom: 3px;
-    background-color: var(--bg-secondary-880);
-    height: 26px;
+    background-color: var(--bg-ds-surface-400);
+    height: 28px;
   }
   .pair-data-row:first-child {
     border-top: none !important;
-    height: 24px !important;
+    height: 28px !important;
   }
   .pair-data-row {
     padding-top: 3px;
     padding-bottom: 3px;
-    height: calc(24px);
-    background-color: var(--bg-secondary-700);
+    height: calc(28px);
+    background-color: var(--bg-ds-surface-600);
+    border-top: 1px solid var(--bg-ds-surface-400);
+  }
+  .pair-data-row:hover {
+    background-color: var(--bg-ds-surface-500);
+  }
+  .trash-icon {
+    background: transparent;
+  }
+  .trash-icon:hover {
+    background-color: var(--bg-ds-surface-300);
+  }
+  .trash-icon:focus-visible {
+    border: 2px solid var(--bg-ds-primary-300);
   }
 </style>
