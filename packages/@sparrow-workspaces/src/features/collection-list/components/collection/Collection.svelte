@@ -49,6 +49,15 @@
     SocketIcon,
     SocketIoIcon,
     GraphIcon,
+    AngleRightIcon2,
+    AngleDownIcon,
+    DismissRegular,
+    AddRegular,
+    ChevronRightRegular,
+    ChevronDownRegular,
+    MoreHorizontalRegular,
+    FolderAddRegular,
+    ArrowSwapRegular,
   } from "@sparrow/library/icons";
   import { Options } from "@sparrow/library/ui";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
@@ -443,16 +452,21 @@
   />
 {/if}
 
-<button
+<div
+  tabindex="0"
   bind:this={collectionTabWrapper}
-  style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
-  class="btn-primary ps-4 mb-1 d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
+  style="height:32px; gap:4px; padding-left:14px; border-color: {showMenu
+    ? '#ff7878'
+    : ''} "
+  class="btn-primary mb-1 d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
     : ''}"
 >
   <button
+    tabindex="-1"
     class="d-flex ps-2 main-collection align-items-center bg-transparent border-0"
+    style="gap:4px;"
     on:contextmenu|preventDefault={rightClickContextMenu}
     on:click|preventDefault={() => {
       if (!isRenaming) {
@@ -468,7 +482,7 @@
       }
     }}
   >
-    <img
+    <!-- <img
       src={angleRight}
       class=""
       style="height:8px; width:8px; margin-right:8px; {visibility
@@ -478,13 +492,37 @@
       on:click|stopPropagation={() => {
         visibility = !visibility;
       }}
-    />
+    /> -->
+    {#if !visibility}
+      <!-- <span
+        style="height:24px; width:24px;  display: flex; align-items:center; justify-content:center;"
+      >
+        <AngleRightIcon2
+          width={"10px"}
+          height={"10px"}
+          color={"var(--bg-ds-neutral-50)"}
+        />
+      </span> -->
+      <Button
+        size="small"
+        type="teritiary-regular"
+        startIcon={ChevronRightRegular}
+      />
+    {:else}
+      <Button
+        title=""
+        size="small"
+        type="teritiary-regular"
+        startIcon={ChevronDownRegular}
+        onClick={() => {}}
+      />
+    {/if}
     {#if isRenaming}
       <input
         class="py-0 renameInputFieldCollection w-100"
         id="renameInputFieldCollection"
         type="text"
-        style="font-size: 12px;"
+        style="font-size: 12px; font-weight:500; line-height:18px; gap: 4px;"
         value={collection.name}
         maxlength={100}
         bind:this={inputField}
@@ -498,7 +536,10 @@
         class="collection-collection-name justify-content-center d-flex align-items-center py-1 mb-0 flex-column"
         style="height: 32px; text-align: left;"
       >
-        <p class="ellipsis w-100 mb-0 text-fs-12">
+        <p
+          class="ellipsis w-100 mb-0"
+          style="font-size: 12px; font-weight:500; line-height:18px; "
+        >
           {collection.name}
         </p>
         {#if collection.activeSync}
@@ -535,15 +576,15 @@
         show={!showAddItemMenu}
         zIndex={701}
       >
-        <button
-          id={`add-item-collection-${collection.id}`}
-          class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center {showAddItemMenu
-            ? 'add-item-active'
-            : ''}"
-          on:click={rightClickContextMenu2}
-        >
-          <img height="12px" width="12px" src={AddIcon} alt="AddIcon" />
-        </button>
+        <span class="add-icon-container">
+          <Button
+            id={`add-item-collection-${collection.id}`}
+            size="small"
+            type="teritiary-regular"
+            onClick={rightClickContextMenu2}
+            startIcon={AddRegular}
+          />
+        </span>
       </Tooltip>
 
       <Tooltip
@@ -553,16 +594,16 @@
         zIndex={701}
         show={!showMenu}
       >
-        <button
-          id={`show-more-collection-${collection.id}`}
-          class="threedot-icon-container border-0 p-0 ms-1 rounded d-flex justify-content-center align-items-center {showMenu
-            ? 'threedot-active'
-            : ''}"
-          style="transform: rotate(90deg);"
-          on:click={rightClickContextMenu}
-        >
-          <img src={threedotIcon} alt="threedotIcon" />
-        </button>
+        <span class="add-icon-container">
+          <Button
+            id={`show-more-collection-${collection.id}`}
+            size="small"
+            type="teritiary-regular"
+            startIcon={MoreHorizontalRegular}
+            onClick={rightClickContextMenu}
+          />
+        </span>
+
         <!-- </Tooltip> -->
       </Tooltip>
     {/if}
@@ -594,7 +635,7 @@
       </Tooltip>
     {/if}
   {/if}
-</button>
+</div>
 <!-- {console.log(collection.name, !collection?.activeSync, activeSyncLoad)} -->
 {#if !collection?.activeSync || activeSyncLoad}
   {#if !collection?.activeSync || isBranchSynced}
@@ -648,10 +689,9 @@
                   });
                 }}
               >
-                <FolderPlusIcon
-                  height="16px"
-                  width="16px"
-                  color="var(--request-arc)"
+                <FolderAddRegular
+                  size="16px"
+                  color="var(--bg-ds-neutral-300)"
                 />
               </div>
             </Tooltip>
@@ -672,10 +712,9 @@
                   });
                 }}
               >
-                <RequestIcon
-                  height="16px"
-                  width="16px"
-                  color="var(--request-arc)"
+                <ArrowSwapRegular
+                  size="16px"
+                  color="var(--bg-ds-neutral-300)"
                 />
               </div>
             </Tooltip>
@@ -840,6 +879,7 @@
   .my-button:hover .add-icon-container {
     visibility: visible;
   }
+
   .list-icons {
     width: 16px;
     height: 16px;
@@ -863,17 +903,13 @@
   }
   .add-icon-container {
     visibility: hidden;
-    background-color: transparent;
-    padding: 5px;
+    display: flex;
   }
   .add-icon-container:hover {
-    background-color: var(--bg-tertiary-500) !important;
-    border-radius: 4px;
-    padding: 5px;
   }
 
   .add-icon-container:active {
-    background-color: var(--bg-secondary-420) !important;
+    /* background-color: var(--bg-secondary-420) !important; */
   }
   .add-item-active {
     visibility: visible;
@@ -888,14 +924,24 @@
 
   .btn-primary {
     background-color: transparent;
-    color: var(--white-color);
+    color: var(--text-ds-neutral-50);
     padding-right: 5px;
     border-radius: 2px;
   }
 
   .btn-primary:hover {
-    background-color: var(--bg-tertiary-600);
-    color: var(--white-color);
+    background-color: var(--bg-ds-surface-500);
+    color: var(--text-ds-neutral-50);
+  }
+  .btn-primary:focus-visible {
+    background-color: var(--bg-ds-surface-500);
+    color: var(--text-ds-neutral-50);
+    outline: none;
+    border-radius: 4px;
+    border: 2px solid var(--bg-ds-primary-300) !important;
+  }
+  .btn-primary:focus-visible .add-icon-container {
+    visibility: visible;
   }
 
   .renameInputFieldCollection {
@@ -905,15 +951,16 @@
     padding-left: 0;
     outline: none;
     border-radius: 2px !important;
+    padding-left: 5px;
   }
   .renameInputFieldCollection:focus {
-    border: 1px solid var(--border-primary-300) !important;
+    border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-collection {
     width: calc(100% - 48px);
   }
   .active-collection-tab {
-    background-color: var(--bg-tertiary-400) !important;
+    background-color: var(--bg-ds-surface-500) !important;
   }
   .collection-collection-name {
     width: calc(100% - 10px);

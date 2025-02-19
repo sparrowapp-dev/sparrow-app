@@ -10,7 +10,11 @@
 
   // --- Icons
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
-  import { GraphIcon, SocketIoIcon } from "@sparrow/library/icons";
+  import {
+    GraphIcon,
+    MoreHorizontalRegular,
+    SocketIoIcon,
+  } from "@sparrow/library/icons";
 
   // --- Types
   import {
@@ -227,6 +231,7 @@
 {/if}
 
 <div
+  tabindex="0"
   bind:this={requestTabWrapper}
   class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {graphql.id ===
   activeTabId
@@ -278,7 +283,7 @@
     {:else}
       <div
         class="api-name ellipsis {graphql?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px;"
+        style="font-size: 12px; "
       >
         {graphql.name}
       </div>
@@ -295,18 +300,17 @@
       zIndex={701}
       distance={17}
     >
-      <button
-        id={`show-more-graphql-${graphql.id}`}
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
-        style="transform: rotate(90deg);"
-        on:click={(e) => {
-          rightClickContextMenu(e);
-        }}
-      >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
+      <span class="threedot-icon-container d-flex">
+        <Button
+          id={`show-more-graphql-${graphql.id}`}
+          size="small"
+          type="teritiary-regular"
+          startIcon={MoreHorizontalRegular}
+          onClick={(e) => {
+            rightClickContextMenu(e);
+          }}
+        />
+      </span>
     </Tooltip>
   {/if}
 </div>
@@ -367,23 +371,42 @@
 
   .threedot-active {
     visibility: visible;
-    background-color: var(--bg-tertiary-600);
+    // background-color: var(--bg-tertiary-600);
   }
-  .threedot-icon-container:hover {
-    background-color: var(--bg-tertiary-500);
-  }
+  // .threedot-icon-container:hover {
+  //   background-color: var(--bg-tertiary-500);
+  // }
 
   .btn-primary {
     background-color: transparent;
-    color: var(--white-color);
+    color: var(--bg-ds-neutral-50);
     padding-right: 5px;
     border-radius: 2px;
   }
 
   .btn-primary:hover {
-    background-color: var(--bg-tertiary-600);
-    color: var(--white-color);
-    border-radius: 2px;
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+  }
+  .btn-primary:hover .threedot-icon-container {
+    visibility: visible;
+  }
+
+  .btn-primary:active {
+    background-color: var(--bg-ds-surface-500);
+    border-radius: 4px;
+  }
+  .btn-primary:active .threedot-icon-container {
+    visibility: visible;
+  }
+  .btn-primary:focus-visible {
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+    outline: none;
+    border: 2px solid var(--bg-ds-primary-300);
+  }
+  .btn-primary:focus-visible .threedot-icon-container {
+    visibility: visible;
   }
 
   .btn-primary:hover {

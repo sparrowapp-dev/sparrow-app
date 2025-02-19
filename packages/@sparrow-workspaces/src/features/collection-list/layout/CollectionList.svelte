@@ -1,9 +1,12 @@
 <script lang="ts">
   import { Collection, EmptyCollection, SearchTree } from "../components";
-  import { doubleAngleLeftIcon as doubleangleLeft } from "@sparrow/library/assets";
+  import {
+    angleDownIcon,
+    doubleAngleLeftIcon as doubleangleLeft,
+  } from "@sparrow/library/assets";
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { WorkspaceRole } from "@sparrow/common/enums";
-  import { List } from "@sparrow/library/ui";
+  import { Button, List } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
@@ -17,7 +20,17 @@
     Request as RequestType,
   } from "@sparrow/common/interfaces/request.interface";
   import { onDestroy } from "svelte";
-  import { CollectionIcon } from "@sparrow/library/icons";
+  import {
+    AddRegular,
+    AngleDownIcon,
+    AngleLeftIcon,
+    AngleRightIcon,
+    AngleRightIcon2,
+    ChevronDownRegular,
+    ChevronRightRegular,
+    CollectionIcon,
+    StackRegular,
+  } from "@sparrow/library/icons";
   import { createDeepCopy } from "@sparrow/common/utils";
 
   import { PlusIcon } from "@sparrow/library/icons";
@@ -206,37 +219,49 @@
     style="margin-top:5px; flex:1;"
   >
     <div
-      class="d-flex align-items-center pe-2 border-radius-2"
-      style="cursor:pointer; justify-content: space-between; height:32px;
-      background-color: {isHovered
-        ? 'var(--dropdown-option-hover)'
-        : 'transparent'};"
+      tabindex="0"
+      class=" collection-container d-flex align-items-center pe-2 border-radius-2"
+      style="cursor:pointer; justify-content: space-between; height:32px;"
       on:mouseover={handleMouseOver}
       on:mouseout={handleMouseOut}
       on:click={toggleExpandCollection}
     >
       <div
-        class="d-flex align-items-center ps-3 p-2"
-        style="width: calc(100% - 30px);"
+        class=" d-flex align-items-center"
+        style="width: calc(100% - 30px); gap:4px; padding:2px 4px;"
       >
-        <img
-          src={angleRight}
-          class="me-3"
-          style="height:8px; width:4px; margin-right:8px; {isExpandCollection
-            ? 'transform:rotate(90deg);'
-            : 'transform:rotate(0deg);'}"
-          alt="angleRight"
-        />
-
-        <CollectionIcon
-          height={"12px"}
-          width={"12px"}
-          color={"var(--icon-secondary-130)"}
-        />
-
-        <p class="ms-2 mb-0 sparrow-fs-13" style="font-weight: 500;">
-          Collections
-        </p>
+        {#if !isExpandCollection}
+          <span style=" display: flex; ">
+            <Button
+              size="small"
+              type="teritiary-regular"
+              startIcon={ChevronRightRegular}
+            />
+          </span>
+        {:else}
+          <span style="   display: flex; ">
+            <Button
+              size="small"
+              type="teritiary-regular"
+              startIcon={ChevronDownRegular}
+            />
+          </span>
+        {/if}
+        <span
+          style="display: flex; align-items:center; justify-content:center; height:24px; "
+        >
+          <StackRegular size="16px" color="var(--bg-ds-neutral-300)" />
+        </span>
+        <span
+          style="display: flex; height:24px; gap:4px; align-items:center; padding:2px 4px; "
+        >
+          <p
+            class="sparrow-fs-13 mb-0"
+            style="font-weight: 500; font-size:12px; line-height:18px; color:var(--text-ds-neutral-50); "
+          >
+            Collections
+          </p>
+        </span>
       </div>
 
       {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
@@ -247,28 +272,24 @@
           show={isHovered}
           zIndex={701}
         >
-          <button
-            style="height: 24px; width:24px;"
-            class="add-icon-container border-0 p-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
-              ? 'collections-active'
-              : 'collections-inactive'}"
-            disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-            on:click|stopPropagation={() => {
-              isExpandCollection = true;
-              isGuestUser
-                ? onItemCreated("collection", {
-                    workspaceId: currentWorkspaceId,
-                    collection: collectionList,
-                  })
-                : showImportCollectionPopup();
-            }}
-          >
-            <PlusIcon
-              height={"22px"}
-              width={"22px"}
-              color={"var(--white-color)"}
+          <span style="display:flex;" class="add-icon-container">
+            <Button
+              size="small"
+              type="teritiary-regular"
+              startIcon={AddRegular}
+              disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+              onClick={(e) => {
+                e.stopPropagation();
+                isExpandCollection = true;
+                isGuestUser
+                  ? onItemCreated("collection", {
+                      workspaceId: currentWorkspaceId,
+                      collection: collectionList,
+                    })
+                  : showImportCollectionPopup();
+              }}
             />
-          </button>
+          </span>
         </Tooltip>
       {/if}
     </div>
@@ -377,6 +398,29 @@
 </div>
 
 <style>
+  .collection-container {
+    background-color: transparent;
+    margin-bottom: 2px;
+  }
+  .collection-container:hover {
+    background-color: var(--bg-ds-surface-500);
+  }
+  .collection-container:hover .add-icon-container {
+    visibility: visible;
+  }
+  .collection-container:focus-visible {
+    background-color: var(--bg-ds-surface-500);
+    outline: 2px solid var(--border-ds-primary-300);
+  }
+  .collection-container:focus-visible .add-icon-container {
+    visibility: visible;
+  }
+  .add-icon-container {
+    visibility: hidden;
+  }
+  .add-icon-container:hover {
+    visibility: visible;
+  }
   .collections-inactive {
     visibility: hidden;
   }

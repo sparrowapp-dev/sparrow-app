@@ -10,7 +10,7 @@
 
   // --- Icons
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
-  import { SocketIoIcon } from "@sparrow/library/icons";
+  import { MoreHorizontalRegular, SocketIoIcon } from "@sparrow/library/icons";
 
   // --- Types
   import {
@@ -227,14 +227,16 @@
 {/if}
 
 <div
+  tabindex="0"
   bind:this={requestTabWrapper}
   class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {socketIo.id ===
   activeTabId
     ? 'active-request-tab'
     : ''} "
-  style="height:32px;"
+  style="height:32px; gap:4px;"
 >
   <button
+    tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
       if (!isRenaming) {
@@ -246,7 +248,9 @@
         });
       }
     }}
-    style={folder?.id ? "padding-left: 46px;" : "padding-left: 30px;"}
+    style={folder?.id
+      ? "padding-left: 56px; gap:4px;"
+      : "padding-left: 30px; gap:4px;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {socketIo.id?.includes(
       UntrackedItems.UNTRACKED,
     )
@@ -295,18 +299,17 @@
       zIndex={701}
       distance={17}
     >
-      <button
-        id={`show-more-socket-io-${socketIo.id}`}
-        class="threedot-icon-container border-0 p-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
-        style="transform: rotate(90deg);"
-        on:click={(e) => {
-          rightClickContextMenu(e);
-        }}
-      >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
+      <span class="threedot-icon-container d-flex">
+        <Button
+          id={`show-more-socket-io-${socketIo.id}`}
+          size="small"
+          type="teritiary-regular"
+          startIcon={MoreHorizontalRegular}
+          onClick={(e) => {
+            rightClickContextMenu(e);
+          }}
+        />
+      </span>
     </Tooltip>
   {/if}
 </div>
@@ -319,18 +322,24 @@
   .api-method {
     font-size: 10px;
     font-weight: 500;
-    width: 48px !important;
-    height: 30px;
-    padding-left: 6px;
-    padding-right: 4px;
-    border-radius: 8px;
+    width: 30px !important;
+    height: 24px;
+    line-height: 18px;
+    color: var(--bg-ds-neutral-50);
+    border-radius: 4px;
     display: flex;
     align-items: center;
+    justify-content: center;
   }
   .api-name {
-    font-weight: 400;
+    height: 24px;
+    line-height: 18px;
+    font-weight: 500;
     width: calc(100% - 48px);
     text-align: left;
+    color: var(--bg-ds-neutral-50);
+    display: flex;
+    align-items: center;
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;
@@ -362,30 +371,44 @@
 
   .threedot-icon-container {
     visibility: hidden;
-    background-color: transparent;
   }
 
   .threedot-active {
     visibility: visible;
     background-color: var(--bg-tertiary-600);
   }
-  .threedot-icon-container:hover {
-    background-color: var(--bg-tertiary-500);
-  }
 
   .btn-primary {
     background-color: transparent;
-    color: var(--white-color);
+    color: var(--text-ds-neutral-50);
     padding-right: 5px;
     border-radius: 2px;
   }
-
   .btn-primary:hover {
-    background-color: var(--bg-tertiary-600);
-    color: var(--white-color);
-    border-radius: 2px;
+    background-color: var(--bg-ds-surface-400);
+    color: var(--text-ds-neutral-50);
+    border-radius: 4px;
+  }
+  .btn-primary:hover .threedot-icon-container {
+    visibility: visible;
+  }
+  .btn-primary:focus-visible {
+    background-color: var(--bg-ds-surface-400);
+    border: 2px solid var(--border-ds-primary-300);
+    outline: none;
+    border-radius: 4px;
+  }
+  .btn-primary:focus-visible .threedot-icon-container {
+    visibility: visible;
   }
 
+  .btn-primary:active {
+    background-color: var(--bg-ds-surface-500);
+    border-radius: 4px;
+  }
+  .btn-primary:active .threedot-icon-container {
+    visibility: visible;
+  }
   .btn-primary:hover {
     .delete-ticker {
       background-color: var(--border-color) !important;

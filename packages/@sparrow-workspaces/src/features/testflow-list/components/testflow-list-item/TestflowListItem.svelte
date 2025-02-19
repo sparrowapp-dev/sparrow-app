@@ -9,7 +9,11 @@
     Modal as Modal,
   } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";
-  import { TreeIcon } from "@sparrow/library/icons";
+  import {
+    FlowChartRegular,
+    MoreHorizontalRegular,
+    TreeIcon,
+  } from "@sparrow/library/icons";
   import {
     TFDefaultEnum,
     type TFDocumentType,
@@ -212,14 +216,16 @@
 
 <div style="" class="testflow-tab mb-1" bind:this={testflowTabWrapper}>
   <button
-    style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
-    class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 my-button {flow?._id ===
+    tabindex="0"
+    style="height:32px; gap:4px; border-color: {showMenu ? '#ff7878' : ''}"
+    class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between my-button {flow?._id ===
     activeTabId
       ? 'active-collection-tab'
       : ''}"
   >
     <div
       class="d-flex main-collection align-items-center ps-3"
+      style="gap:4px;"
       on:contextmenu|preventDefault={(e) => {
         rightClickContextMenu(e);
       }}
@@ -231,13 +237,9 @@
         }
       }}
     >
-      <button class="p-0 m-0 ms-1 ps-4 me-2 border-0 bg-transparent">
-        <TreeIcon
-          width={"12px"}
-          height={"12px"}
-          color={"var(--icon-secondary-130)"}
-        />
-      </button>
+      <span style="display: flex;">
+        <FlowChartRegular size={"16px"} color={"var(--bg-ds-neutral-300"} />
+      </span>
       {#if isRenaming}
         <input
           class="py-0 renameInputFieldCollection text-fs-12 w-100"
@@ -254,9 +256,9 @@
       {:else}
         <div
           class="collection-title d-flex align-items-center py-1 mb-0"
-          style="height: 36px;"
+          style="height: 32px; font-size:12px; font-weight:500; line-height:18px;"
         >
-          <p class="ellipsis w-100 me-4 mb-0 text-fs-12">
+          <p class="ellipsis w-100 me-4 mb-0">
             {flow.name}
           </p>
         </div>
@@ -271,20 +273,19 @@
         distance={17}
         show={!showMenu}
       >
-        <button
-          id={`show-more-testflow-${flow?._id}`}
-          class="threedot-icon-container p-0 border-0 rounded d-flex justify-content-center align-items-center {showMenu
-            ? 'threedot-active'
-            : ''}"
-          style="transform: rotate(90deg);"
-          on:click={(e) => {
-            rightClickContextMenu();
-          }}
-          disabled={loggedUserRoleInWorkspace ===
-            WorkspaceRole.WORKSPACE_VIEWER}
-        >
-          <img src={threedotIcon} alt="threedotIcon" />
-        </button>
+        <span class="threedot-icon-container d-flex">
+          <Button
+            id={`show-more-testflow-${flow?._id}`}
+            size="small"
+            type="teritiary-regular"
+            startIcon={MoreHorizontalRegular}
+            onClick={(e) => {
+              rightClickContextMenu();
+            }}
+            disable={loggedUserRoleInWorkspace ===
+              WorkspaceRole.WORKSPACE_VIEWER}
+          />
+        </span>
       </Tooltip>
     {/if}
   </button>
@@ -319,24 +320,52 @@
 
     .btn-primary {
       background-color: transparent;
-      color: var(--white-color);
+      color: var(--text-ds-neutral-50);
       padding-right: 5px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 18px;
+      border: 0;
     }
 
     .btn-primary:hover {
-      background-color: var(--bg-tertiary-300);
+      background-color: var(--bg-ds-surface-400);
+      border-radius: 4px;
+    }
+
+    .btn-primary:hover .threedot-icon-container {
+      visibility: visible;
+    }
+    .btn-primary:focus-visible {
+      background-color: var(--bg-ds-surface-400);
+      border-radius: 4px;
+      border: 2px solid var(--bg-ds-primary-300);
+      outline: none;
+    }
+    .btn-primary:focus-visible .threedot-icon-container {
+      visibility: visible;
+    }
+    .btn-primary:active {
+      background-color: var(--bg-ds-surface-500);
+      border-radius: 4px;
+    }
+    .btn-primary:active .threedot-icon-container {
+      visibility: visible;
     }
 
     .renameInputFieldCollection {
       border: none;
-      color: var(--white-color);
+      color: var(--text-ds-neutral-50);
       background-color: transparent;
-      padding-left: 0;
-      border-radius: 2px !important;
+      padding-left: 5px;
+      border-radius: 4px !important;
       outline: none !important;
+      font-size: 12px;
+      line-height: 18px;
+      font-weight: 500;
     }
     .renameInputFieldCollection:focus {
-      border: 1px solid var(--border-primary-300);
+      border: 1px solid var(--border-ds-primary-300);
     }
     .sub-folders {
       border-left: 1px solid var(--border-color);
@@ -345,7 +374,7 @@
       width: calc(100% - 24px);
     }
     .active-collection-tab {
-      background-color: var(--bg-tertiary-600) !important;
+      background-color: var(--bg-ds-surface-500) !important;
     }
     .collection-title {
       width: calc(100% - 30px);

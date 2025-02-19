@@ -8,6 +8,7 @@
   import { Options } from "@sparrow/library/ui";
   import { Tooltip } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";
+  import { MoreHorizontalRegular } from "@sparrow/library/icons";
 
   /**
    * current workspace to identify the selected environment
@@ -220,7 +221,8 @@
 
 <div style="" class="environment-tab mb-1" bind:this={environmentTabWrapper}>
   <button
-    style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
+    tabindex="0"
+    style="height:32px;gap:4px;  border-color: {showMenu ? '#ff7878' : ''}"
     class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 my-button {env?.id ===
     activeTabId
       ? 'active-collection-tab'
@@ -240,21 +242,23 @@
       }}
     >
       <button
-        class="p-0 m-0 ms-1 ps-4 me-2 border-0 bg-transparent"
+        class="border-0 bg-transparent"
+        style="width: 30px; height:24px; display:flex; align-items:center; justify-content:center; margin-left:24px;"
         on:click|stopPropagation={() => {
           handleSelectEnvironment();
         }}
       >
         <SelectIcon
           classProp={`my-auto`}
-          width={20}
-          height={20}
+          width={16}
+          height={16}
           selected={currentWorkspace?.environmentId === env.id}
         />
       </button>
       {#if isRenaming}
         <input
           class="py-0 renameInputFieldCollection text-fs-12 w-100"
+          style="font-size: 12px; font-weight:500; line-height:18px;"
           id="renameInputFieldEnvironment"
           type="text"
           value={env.name}
@@ -268,7 +272,7 @@
       {:else}
         <div
           class="collection-title d-flex align-items-center py-1 mb-0"
-          style="height: 36px;"
+          style="height: 32px; font-size:12px; font-weight:500; line-height:18px"
         >
           <p class="ellipsis w-100 me-4 mb-0 text-fs-12">
             {env.name}
@@ -285,20 +289,19 @@
         distance={17}
         show={!showMenu}
       >
-        <button
-          id={`show-more-environment-${env?.id}`}
-          class="threedot-icon-container p-0 border-0 rounded d-flex justify-content-center align-items-center {showMenu
-            ? 'threedot-active'
-            : ''}"
-          style=""
-          on:click={(e) => {
-            rightClickContextMenu(e);
-          }}
-          disabled={loggedUserRoleInWorkspace ===
-            WorkspaceRole.WORKSPACE_VIEWER}
-        >
-          <img class="threedot-icon" src={threedotIcon} alt="threedotIcon" />
-        </button>
+        <span class="threedot-icon-container d-flex">
+          <Button
+            id={`show-more-environment-${env?.id}`}
+            size="small"
+            type="teritiary-regular"
+            disable={loggedUserRoleInWorkspace ===
+              WorkspaceRole.WORKSPACE_VIEWER}
+            startIcon={MoreHorizontalRegular}
+            onClick={(e) => {
+              rightClickContextMenu(e);
+            }}
+          />
+        </span>
       </Tooltip>
     {/if}
   </button>
@@ -323,31 +326,45 @@
       background-color: transparent;
     }
 
-    .threedot-active {
-      visibility: visible;
-      background-color: var(--bg-secondary-400);
-    }
-    .threedot-icon-container:hover {
-      background-color: var(--bg-tertiary-500);
-    }
-
     .btn-primary {
       background-color: transparent;
-      color: var(--white-color);
+      color: var(--text-ds-neutral-50);
       padding-right: 5px;
     }
 
     .btn-primary:hover {
-      background-color: var(--bg-tertiary-300);
+      background-color: var(--bg-ds-surface-400);
+      border-radius: 4px;
+      color: var(--text-ds-neutral-50);
     }
 
+    .btn-primary:hover .threedot-icon-container {
+      visibility: visible;
+    }
+    .btn-primary:focus-visible {
+      background-color: var(--bg-ds-surface-400);
+      border: 2px solid var(--bg-ds-primary-300) !important;
+      outline: none;
+      border-radius: 4px;
+    }
+    .btn-primary:focus-visible .threedot-icon-container {
+      visibility: visible;
+    }
+    .btn-primary:active {
+      background-color: var(--bg-ds-surface-500);
+      border-radius: 4px;
+    }
+    .btn-primary:active .threedot-icon-container {
+      visibility: visible;
+    }
     .renameInputFieldCollection {
       border: none;
-      color: var(--white-color);
+      color: var(--text-ds-neutral-50);
       background-color: transparent;
-      padding-left: 0;
-      border-radius: 2px !important;
+      padding-left: 5px;
+      border-radius: 4px !important;
       outline: none !important;
+      border: 1px solid var(--border-ds-primary-300);
     }
     .renameInputFieldCollection:focus {
       border: 1px solid var(--border-primary-300);
@@ -359,7 +376,8 @@
       width: calc(100% - 24px);
     }
     .active-collection-tab {
-      background-color: var(--bg-tertiary-600) !important;
+      background-color: var(--bg-ds-surface-500) !important;
+      border-radius: 4px;
     }
     .collection-title {
       width: calc(100% - 30px);

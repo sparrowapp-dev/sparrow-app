@@ -6,7 +6,15 @@
     dot3Icon as threedotIcon,
     angleRightV2Icon as angleRight,
   } from "@sparrow/library/assets";
-  import { RequestIcon } from "@sparrow/library/icons";
+  import {
+    AngleDownIcon,
+    AngleRightIcon2,
+    ArrowSwapRegular,
+    ChevronDownRegular,
+    ChevronRightRegular,
+    MoreHorizontalRegular,
+    RequestIcon,
+  } from "@sparrow/library/icons";
 
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
@@ -385,15 +393,17 @@
   {#if explorer}
     {#if explorer.type === "FOLDER"}
       <div
+        tabindex="0"
         bind:this={folderTabWrapper}
-        style="height:32px;"
-        class="d-flex ps-3 align-items-center mb-1 justify-content-between my-button btn-primary {explorer.id ===
+        style="height:32px; "
+        class=" d-flex ps-3 align-items-center mb-1 justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
           : ''}"
       >
         <button
-          style="padding-left: 30px;"
+          tabindex="-1"
+          style="padding-left: 28px; gap:4px; height:32px;"
           class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={rightClickContextMenu}
           on:click|preventDefault={() => {
@@ -411,7 +421,7 @@
             }
           }}
         >
-          <img
+          <!-- <img
             src={angleRight}
             class="me-3"
             style="height:8px; width:4px; margin-right:8px; {expand
@@ -421,7 +431,39 @@
             on:click|stopPropagation={() => {
               expand = !expand;
             }}
-          />
+          /> -->
+          {#if !expand}
+            <span
+              on:click|stopPropagation={() => {
+                expand = !expand;
+              }}
+              style="  display: flex; "
+            >
+              <!-- <AngleRightIcon2
+                width={"10px"}
+                height={"10px"}
+                color={"var(--bg-ds-neutral-50)"}
+              /> -->
+              <Button
+                startIcon={ChevronRightRegular}
+                size="small"
+                type="teritiary-regular"
+              />
+            </span>
+          {:else}
+            <span
+              on:click|stopPropagation={() => {
+                expand = !expand;
+              }}
+              style="  display: flex;"
+            >
+              <Button
+                startIcon={ChevronDownRegular}
+                size="small"
+                type="teritiary-regular"
+              />
+            </span>
+          {/if}
           {#if expand}
             <div
               style="height:16px; width:16px;"
@@ -444,7 +486,7 @@
               class="py-0 renameInputFieldFolder w-100"
               id="renameInputFieldFolder"
               type="text"
-              style="font-size: 12px;"
+              style="font-size: 12px; padding-left:5px; font-weight:500; color : var(--text-ds-neutral-50); line-height:18px;"
               autofocus
               maxlength={100}
               value={explorer.name}
@@ -457,9 +499,13 @@
             <div
               class="folder-title d-flex align-items-center"
               style="cursor:pointer; font-size:12px;
-                      height: 36px;
-                      font-weight:400;
-                      margin-left:0px"
+                      height: 32px;
+                      font-weight:500;
+                      margin-left:0px;
+                      font-size:12px;
+                      color:var(--text-ds-neutral-50);
+                      line-height:18px;
+                      "
             >
               <p class="ellipsis mb-0" style="font-size: 12px;">
                 {explorer.name}
@@ -477,23 +523,22 @@
             zIndex={701}
             distance={13}
           >
-            <button
-              class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center"
-              on:click|preventDefault={() => {
-                expand = true;
-                onItemCreated("requestFolder", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                  folder: explorer,
-                });
-              }}
-            >
-              <RequestIcon
-                height="16px"
-                width="16px"
-                color="var(--white-color)"
+            <span class="threedot-icon-container d-flex">
+              <Button
+                size="small"
+                type="teritiary-regular"
+                startIcon={ArrowSwapRegular}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  expand = true;
+                  onItemCreated("requestFolder", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                    folder: explorer,
+                  });
+                }}
               />
-            </button>
+            </span>
           </Tooltip>
 
           <Tooltip
@@ -503,16 +548,15 @@
             distance={17}
             show={!showMenu}
           >
-            <button
-              id={`show-more-folder-${explorer.id}`}
-              class="threedot-icon-container border-0 p-0 rounded d-flex justify-content-center align-items-center {showMenu
-                ? 'threedot-active'
-                : ''}"
-              style="transform: rotate(90deg);"
-              on:click={rightClickContextMenu}
-            >
-              <img src={threedotIcon} alt="threedotIcon" />
-            </button>
+            <span class="threedot-icon-container rounded d-flex">
+              <Button
+                id={`show-more-folder-${explorer.id}`}
+                size="small"
+                type="teritiary-regular"
+                startIcon={MoreHorizontalRegular}
+                onClick={rightClickContextMenu}
+              />
+            </span>
           </Tooltip>
         {/if}
       </div>
@@ -629,14 +673,20 @@
 
 <style>
   .btn-primary {
-    color: var(--white-color);
+    color: var(--bg-ds-neutral-50);
     padding-right: 5px;
     border-radius: 8px;
   }
 
   .btn-primary:hover {
-    background-color: var(--border-color);
-    color: var(--white-color);
+    background-color: var(--bg-ds-surface-500) !important;
+    color: var(--bg-ds-neutral-50);
+  }
+  .btn-primary:focus-visible {
+    background-color: var(--bg-ds-surface-500);
+    outline: none;
+    border: 2px solid var(--border-ds-primary-300);
+    border-radius: 4px;
   }
   .list-icons {
     width: 16px;
@@ -697,10 +747,10 @@
     border-radius: 4px;
   }
 
-  .threedot-icon-container:hover {
+  /* .threedot-icon-container:hover {
     background-color: var(--bg-tertiary-500) !important;
     border-radius: 4px;
-  }
+  } */
 
   .add-icon-container:hover {
     background-color: var(--bg-tertiary-500) !important;
@@ -709,10 +759,33 @@
   }
 
   .btn-primary:hover {
-    border-radius: 2px;
-    background-color: var(--bg-tertiary-600);
-    color: var(--white-color);
+    border-radius: 4px;
+    background-color: var(--bg-ds-surface-400);
+    color: var(--text-ds-neutral-50);
   }
+
+  .btn-primary:hover .threedot-icon-container {
+    visibility: visible;
+  }
+  .btn-primary:active {
+    border-radius: 4px;
+    background-color: var(--bg-ds-surface-500);
+    color: var(--text-ds-neutral-50);
+  }
+  .btn-primary:active .threedot-icon-container {
+    visibility: visible;
+  }
+  .btn-primary:focus-visible {
+    border-radius: 4px;
+    background-color: var(--bg-ds-surface-400);
+    color: var(--text-ds-neutral-50);
+    outline: none;
+    border: 2px solid var(--bg-ds-primary-300);
+  }
+  .btn-primary:focus-visible .threedot-icon-container {
+    visibility: visible;
+  }
+
   .renameInputFieldFolder {
     border: none;
     background-color: transparent;
