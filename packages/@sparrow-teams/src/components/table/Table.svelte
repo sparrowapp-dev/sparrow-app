@@ -9,14 +9,12 @@
   export let contributorsCount = 0;
   export let headingDataSortable = "false";
   export let headerContentClassProp = "";
-  export let onSortToggle = (field: string) => {}; // New prop for sorting function
-  export let currentSortField = ""; // Current field being sorted
-  export let isAscending = true; // Direction of sort
+  export let onSortToggle = (field: string) => {};
 
- import ArrowSortRegular from "../../../../@sparrow-library/src/icons/ArrowSortRegular.svelte";
-  import { Button } from "@sparrow/library/ui";
+import {ArrowSortRegular} from "@sparrow/library/icons";
+import { Button } from "@sparrow/library/ui";
 
-  function handleSortClick(field: string) {
+  const handleSortClick=(field: string)=> {
     onSortToggle(field);
   }
 </script>
