@@ -1,6 +1,5 @@
 <script lang="ts">
   import {
-    GlobalSearch,
     LoginBanner,
     LoginSignupConfirmation,
     SwitchWorkspace,
@@ -32,6 +31,7 @@
   import { isGuestUserActive } from "@app/store/auth.store";
   import { OSDetector } from "@sparrow/common/utils";
   import { fade } from "svelte/transition";
+  import { GlobalSearch } from "@sparrow/common/features";
 
   const _viewModel = new DashboardViewModel();
   let userId;
