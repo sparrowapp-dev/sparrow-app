@@ -235,17 +235,17 @@
   });
 </script>
 
-<div class="outer-section">
+<div class="outer-section" style="margin-top:12px ;">
   {#if !isBulkEditActive}
     <section
-      class="mb-0 me-0 w-100 py-0 border-radius-2 section-layout"
-      style="overflow:hidden;"
+      class="mb-0 me-0 py-0 border-radius-4 section-layout"
+      style="overflow:hidden; width: 641px;"
     >
       <div
-        class="w-100 d-flex align-items-center px-3 pair-header-row {!isTopHeaderRequired
+        class=" d-flex align-items-center px-3 pair-header-row {!isTopHeaderRequired
           ? 'd-none'
           : ''}"
-        style="position:relative;"
+        style="position:relative; "
       >
         <div style=" width:24px;" class="me-3">
           <Checkbox

@@ -207,10 +207,10 @@
   style="overflow:hidden;"
 >
   <div
-    class="px-3 d-flex align-items-center w-100 pair-header-row {!isTopHeaderRequired
+    class="px-3 d-flex align-items-center pair-header-row {!isTopHeaderRequired
       ? 'd-none'
       : ''}"
-    style="position:relative;"
+    style="position:relative; width:641px;"
   >
     <div style=" width:24px;" class="me-3">
       <Checkbox
@@ -254,7 +254,7 @@
       </div>
     </div>
   </div>
-  <div class="w-100" style="display:block; position:relative;">
+  <div class="" style="display:block; position:relative; width:641px;">
     {#if pairs}
       {#each pairs as element, index}
         <div class="pair-data-row w-100 px-3 d-flex align-items-center">

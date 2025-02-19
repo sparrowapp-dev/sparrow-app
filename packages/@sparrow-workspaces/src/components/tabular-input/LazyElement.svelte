@@ -40,7 +40,7 @@
 <div
   use:inview={options}
   on:inview_change={handleChange}
-  class="w-100 pair-data-row px-3 d-flex align-items-center"
+  class="pair-data-row px-3 d-flex align-items-center"
 >
   {#if isInView}
     <div style=" width: 24px;" class="me-3">
@@ -98,13 +98,15 @@
                 placement={"bottom-center"}
                 distance={10}
               >
-                <Button
-                  buttonClassProp=""
-                  size="extra-small"
-                  type="teritiary-regular"
-                  startIcon={DeleteIcon2}
-                  onClick={() => deleteParam(index)}
-                />
+                <div class="delete-container">
+                  <Button
+                    buttonClassProp=""
+                    size="extra-small"
+                    type="teritiary-regular"
+                    startIcon={DeleteIcon2}
+                    onClick={() => deleteParam(index)}
+                  />
+                </div>
               </Tooltip>
             {/if}
           {/if}
@@ -121,16 +123,22 @@
   .pair-data-row:first-child {
     border-top: none !important;
     height: 28px !important;
+    width: 641px;
   }
   .pair-data-row {
     padding-top: 3px;
     padding-bottom: 3px;
     height: calc(28px);
+    width: 641px;
     background-color: var(--bg-ds-surface-600);
     border-top: 1px solid var(--bg-ds-surface-400);
   }
   .pair-data-row:hover {
     background-color: var(--bg-ds-surface-500);
+  }
+  .pair-data-row:hover .delete-container {
+    opacity: 1;
+    visibility: visible;
   }
   .skelton-parent {
     display: flex;
@@ -144,5 +152,12 @@
   }
   .trash-icon:hover {
     background-color: var(--bg-ds-surface-300);
+  }
+  .delete-container {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.1s ease-in-out,
+      visibility 0.1s;
   }
 </style>
