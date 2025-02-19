@@ -1,6 +1,10 @@
 <script lang="ts">
   import { trashIcon as trashIcon } from "@sparrow/library/assets";
-  import { AttachmentIcon, DeleteIcon2 } from "@sparrow/library/icons";
+  import {
+    AttachmentIcon,
+    DeleteIcon2,
+    DragIcon,
+  } from "@sparrow/library/icons";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { invoke } from "@tauri-apps/api/core";
   import { crossIcon as close } from "@sparrow/library/assets";
@@ -202,12 +206,13 @@
 </script>
 
 <input type="file" id="fileInput" style="display: none" />
+
 <div
-  class="mb-0 me-0 w-100 py-0 border-radius-2 section-layout"
-  style="overflow:hidden;"
+  class="mb-0 me-0 py-0 section-layout"
+  style="overflow:hidden; border-radius:4px; width:631px;"
 >
   <div
-    class="px-3 d-flex align-items-center pair-header-row {!isTopHeaderRequired
+    class="d-flex align-items-center pair-header-row {!isTopHeaderRequired
       ? 'd-none'
       : ''}"
     style="position:relative; width:641px;"
@@ -257,7 +262,14 @@
   <div class="" style="display:block; position:relative; width:641px;">
     {#if pairs}
       {#each pairs as element, index}
-        <div class="pair-data-row w-100 px-3 d-flex align-items-center">
+        <div class="pair-data-row w-100 px-2 d-flex align-items-center">
+          <div class="button-container">
+            <Button
+              size="extra-small"
+              type="teritiary-regular"
+              startIcon={DragIcon}
+            />
+          </div>
           <div style=" width:24px;" class="me-3">
             {#if pairs.length - 1 != index || !isInputBoxEditable}
               <Checkbox
@@ -341,7 +353,7 @@
                   placement="bottom-center"
                 >
                   <button
-                    class="d-flex align-items-center justify-content-center border-0 {isInputBoxEditable &&
+                    class="button-container d-flex align-items-center justify-content-center border-0 {isInputBoxEditable &&
                     element.type == 'text' &&
                     element.value == ''
                       ? 'opacity-1'
@@ -364,15 +376,17 @@
                   placement={"bottom-center"}
                   distance={10}
                 >
-                  <Button
-                    buttonClassProp=""
-                    size="extra-small"
-                    type="teritiary-regular"
-                    startIcon={DeleteIcon2}
-                    onClick={() => {
-                      deleteParam(index);
-                    }}
-                  />
+                  <div class="button-container">
+                    <Button
+                      buttonClassProp=""
+                      size="extra-small"
+                      type="teritiary-regular"
+                      startIcon={DeleteIcon2}
+                      onClick={() => {
+                        deleteParam(index);
+                      }}
+                    />
+                  </div>
                 </Tooltip>
               {:else}
                 <div style="width:45px;" class="opacity:0;"></div>
@@ -391,6 +405,8 @@
     padding-bottom: 3px;
     background-color: var(--bg-ds-surface-400);
     height: 28px;
+    padding-left: 36px;
+    padding-right: 1rem;
   }
   .pair-data-row:first-child {
     border-top: none !important;
@@ -420,5 +436,16 @@
     font-family: "Inter", sans-serif;
     font-weight: 500;
     font-size: 12px;
+  }
+  .pair-data-row:hover .button-container {
+    opacity: 1;
+    visibility: visible;
+  }
+  .button-container {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.1s ease-in-out,
+      visibility 0.1s;
   }
 </style>

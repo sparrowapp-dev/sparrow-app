@@ -9,7 +9,7 @@
     Options,
   } from "svelte-inview";
   import { Checkbox } from "@sparrow/library/forms";
-  import { DeleteIcon2 } from "@sparrow/library/icons";
+  import { DeleteIcon2, DragIcon } from "@sparrow/library/icons";
 
   export let element;
   export let index;
@@ -40,9 +40,17 @@
 <div
   use:inview={options}
   on:inview_change={handleChange}
-  class="pair-data-row px-3 d-flex align-items-center"
+  class="pair-data-row d-flex align-items-center"
+  style="padding-right:1rem; padding-left: 4px;"
 >
   {#if isInView}
+    <div class="button-container">
+      <Button
+        size="extra-small"
+        type="teritiary-regular"
+        startIcon={DragIcon}
+      />
+    </div>
     <div style=" width: 24px;" class="me-3">
       {#if pairs.length - 1 != index || !isInputBoxEditable}
         <Checkbox
@@ -98,7 +106,7 @@
                 placement={"bottom-center"}
                 distance={10}
               >
-                <div class="delete-container">
+                <div class="button-container">
                   <Button
                     buttonClassProp=""
                     size="extra-small"
@@ -136,7 +144,7 @@
   .pair-data-row:hover {
     background-color: var(--bg-ds-surface-500);
   }
-  .pair-data-row:hover .delete-container {
+  .pair-data-row:hover .button-container {
     opacity: 1;
     visibility: visible;
   }
@@ -153,7 +161,7 @@
   .trash-icon:hover {
     background-color: var(--bg-ds-surface-300);
   }
-  .delete-container {
+  .button-container {
     opacity: 0;
     visibility: hidden;
     transition:

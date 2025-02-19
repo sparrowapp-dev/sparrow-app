@@ -242,10 +242,10 @@
       style="overflow:hidden; width: 641px;"
     >
       <div
-        class=" d-flex align-items-center px-3 pair-header-row {!isTopHeaderRequired
+        class=" d-flex align-items-center pair-header-row {!isTopHeaderRequired
           ? 'd-none'
           : ''}"
-        style="position:relative; "
+        style="position:relative; padding-right:1rem; padding-left:32px;"
       >
         <div style=" width:24px;" class="me-3">
           <Checkbox
