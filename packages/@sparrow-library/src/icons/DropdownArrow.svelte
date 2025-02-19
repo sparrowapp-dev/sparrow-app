@@ -1,0 +1,20 @@
+<script lang="ts">
+  export let width: number = 10;
+  export let height: number = 6;
+  export let classProp: string = "";
+  export let fillColor: string = "#D8D8D9";
+</script>
+
+<svg
+  {width}
+  {height}
+  viewBox="0 0 10 6"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  class={classProp}
+>
+  <path
+    d="M0.146447 0.646447C0.341709 0.451184 0.658291 0.451184 0.853553 0.646447L5 4.79289L9.14645 0.646447C9.34171 0.451185 9.65829 0.451185 9.85355 0.646447C10.0488 0.841709 10.0488 1.15829 9.85355 1.35355L5.35355 5.85355C5.15829 6.04882 4.84171 6.04882 4.64645 5.85355L0.146447 1.35355C-0.0488155 1.15829 -0.0488155 0.841709 0.146447 0.646447Z"
+    fill={fillColor}
+  />
+</svg>

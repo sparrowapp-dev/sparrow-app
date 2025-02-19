@@ -4,12 +4,13 @@
   import { CollectionIcon, FolderIcon2 } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
-  import DropdownArrow from "../../icons/DropdownArrow.svelte";
+  import { DropdownArrow } from "@sparrow/library/icons";
   import { BackArrowIcon } from "../../icons";
   import {
     currentStep,
     isTestFlowTourGuideOpen,
   } from "../../../../stores/guide.tour";
+  import { Dropdown } from "@sparrow/library/ui";
   export let name;
   export let method;
   export let collections = [];
@@ -148,18 +149,19 @@
 
 <div class="dropdown" bind:this={dropdownRef}>
   <!-- <p>Select API Request</p> -->
-  <div on:click={() => (isOpen = !isOpen)} class="dropdown-header">
+  <!-- <div on:click={() => (isOpen = !isOpen)} class="dropdown-header d-flex">
     {#if $currentStep >= 6 && $isTestFlowTourGuideOpen}
       <div class="d-flex selected-container">
         <p class="method-container">
           <span class="text-{getMethodStyle('GET')}">
             <span
               class={"request-icon"}
-              style="font-size: 10px; font-weight: 500;">{"GET"}</span
+              style="font-size: 9px; font-weight: 600; text-align:center;"
+              >{"GET"}</span
             >
           </span>
         </p>
-        <p style="font-size: 10px; margin-left: 10px;" class="ellipsis">
+        <p style="font-size: 10px;margin-left: 10px;" class="ellipsis">
           {"Sample API"}
         </p>
       </div>
@@ -169,11 +171,11 @@
           <span class="text-{getMethodStyle(method)}">
             <span
               class={"request-icon"}
-              style="font-size: 10px; font-weight: 500;">{method || ""}</span
+              style="font-size: 9px; font-weight: 500;">{method || ""}</span
             >
           </span>
         </p>
-        <p style="font-size: 10px; margin-left: 10px;" class="ellipsis">
+        <p style="margin-left:10px;" class="ellipsis select-txt">
           {name}
         </p>
       </div>
@@ -184,10 +186,48 @@
       >
         <p class="select-txt">Select an API Request</p>
         <div style="margin-right: 10px;">
-          <DropdownArrow height={"8px"} width={"8px"} />
+          <DropdownArrow />
         </div>
       </div>
     {/if}
+  </div> -->
+
+  <div
+    class="dropdown-header d-flex justify-content-between align-items-center mx-auto"
+    on:click={() => (isOpen = !isOpen)}
+  >
+    <div
+      style="display: flex; align-items: center; padding: 5px 8px; gap: 6px;"
+    >
+      {#if $currentStep >= 6 && $isTestFlowTourGuideOpen}
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span
+            class="request-icon text-{getMethodStyle(method)}"
+            style="font-size: 9px; font-weight: 600; text-align: center;"
+          >
+            GET
+          </span>
+          <span class="select-txt">Sample API</span>
+        </div>
+      {:else if name || method}
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span
+            class="request-icon text-{getMethodStyle(method)}"
+            style="font-size: 9px; font-weight: 600; text-align: center;"
+          >
+            {method}
+          </span>
+          <span class="select-txt">{name}</span>
+        </div>
+      {:else}
+        <span class="select-txt-new">Select API Request</span>
+      {/if}
+    </div>
+    <div
+      style="display: flex; align-items: center; padding-right: 7px; padding-bottom:1px"
+    >
+      <DropdownArrow />
+    </div>
   </div>
   <div
     class="dropdown-options"
@@ -299,7 +339,7 @@
                   <span class="text-{getMethodStyle(data?.request?.method)}">
                     <span
                       class={"request-icon"}
-                      style="font-size: 10px; font-weight: 500;"
+                      style="font-size: 9px; font-weight: 600;"
                       >{data?.request?.method || ""}</span
                     >
                   </span>
@@ -339,27 +379,36 @@
 
 <style>
   .dropdown-header {
-    background-color: #3c3f52;
+    background-color: var(--bg-ds-surface-400);
     padding-top: 8px;
     padding-bottom: 8px;
-    border-radius: 3px;
-    width: 170px;
+    border-radius: 4px;
+    width: 206px;
+    height: 28px;
     cursor: pointer;
   }
   .dropdown-header p {
-    margin-bottom: 0;
+    margin: 0;
   }
   .select-txt {
-    font-size: 10px;
+    font-size: 12px;
     margin-left: 13px;
-    color: #999999;
-    /* align-self: center; */
+    color: var(--text-ds-neutral-50);
+    margin: 0;
+    margin-left: 5px;
+  }
+  .select-txt-new {
+    color: var(--text-ds-neutral-400);
+    margin: 0;
+    margin-left: 5px;
+    font-size: 12px;
   }
   .dropdown-options {
-    background-color: #3c3f52;
+    background-color: var(--bg-ds-surface-400);
     margin-top: 5px;
-    width: 170px;
+    width: 206px;
     padding-top: 4px;
+    margin: 4px auto auto 0px;
     padding-bottom: 4px;
     cursor: pointer;
     border-radius: 4px;
@@ -387,7 +436,7 @@
     overflow-y: auto;
     overflow-x: hidden;
   }
-  .method-container {
+  /* .method-container {
     background-color: #22232e;
     padding-left: 12px;
     padding-right: 12px;
@@ -395,6 +444,11 @@
     margin-left: 8px;
     border-radius: 3px;
     margin-top: 0px;
+  } */
+  .method-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .back-header {
     width: 100%;
