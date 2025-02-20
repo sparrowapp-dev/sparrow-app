@@ -12,6 +12,8 @@
     ArrowSwapRegular,
     ChevronDownRegular,
     ChevronRightRegular,
+    FolderOpenRegular,
+    FolderRegular,
     MoreHorizontalRegular,
     RequestIcon,
   } from "@sparrow/library/icons";
@@ -395,15 +397,15 @@
       <div
         tabindex="0"
         bind:this={folderTabWrapper}
-        style="height:32px; "
-        class=" d-flex ps-3 align-items-center mb-1 justify-content-between my-button btn-primary {explorer.id ===
+        style="height:32px; padding-left:23px; margin-bottom:2px; "
+        class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
           : ''}"
       >
         <button
           tabindex="-1"
-          style="padding-left: 28px; gap:4px; height:32px;"
+          style=" gap:4px; height:32px; "
           class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={rightClickContextMenu}
           on:click|preventDefault={() => {
@@ -446,7 +448,8 @@
               /> -->
               <Button
                 startIcon={ChevronRightRegular}
-                size="small"
+                size="extra-small"
+                customWidth={"24px"}
                 type="teritiary-regular"
               />
             </span>
@@ -459,26 +462,22 @@
             >
               <Button
                 startIcon={ChevronDownRegular}
-                size="small"
+                size="extra-small"
+                customWidth={"24px"}
                 type="teritiary-regular"
               />
             </span>
           {/if}
           {#if expand}
             <div
-              style="height:16px; width:16px;"
+              style="height:24px; width:30px;"
               class="d-flex align-items-center justify-content-center me-2"
             >
-              <img src={folderOpenIcon} alt="" class="pe-0 folder-icon" />
+              <FolderOpenRegular />
             </div>
           {:else}
-            <div class="d-flex me-2" style="height:16px; width:16px;">
-              <img
-                src={folderCloseIcon}
-                alt=""
-                style="height:16px; width:16px;"
-                class="folder-icon"
-              />
+            <div class="d-flex me-2" style="height:24px; width:30px;">
+              <FolderRegular />
             </div>
           {/if}
           {#if isRenaming}
@@ -525,7 +524,8 @@
           >
             <span class="threedot-icon-container d-flex">
               <Button
-                size="small"
+                size="extra-small"
+                customWidth={"24px"}
                 type="teritiary-regular"
                 startIcon={ArrowSwapRegular}
                 onClick={(e) => {
@@ -551,7 +551,8 @@
             <span class="threedot-icon-container rounded d-flex">
               <Button
                 id={`show-more-folder-${explorer.id}`}
-                size="small"
+                size="extra-small"
+                customWidth={"24px"}
                 type="teritiary-regular"
                 startIcon={MoreHorizontalRegular}
                 onClick={rightClickContextMenu}
@@ -561,7 +562,8 @@
         {/if}
       </div>
       <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-        <div class="sub-files">
+        <div class="sub-files position-relative">
+          <div class="box-line"></div>
           {#each explorer?.items || [] as exp}
             <svelte:self
               {userRole}
@@ -787,17 +789,26 @@
   }
 
   .renameInputFieldFolder {
+    height: 24px;
     border: none;
     background-color: transparent;
-    color: var(--white-color);
-    padding-left: 0;
+    color: var(--text-ds-neutral-50);
     outline: none;
-    border-radius: 2px !important;
+    border-radius: 4px !important;
+    padding: 4px 2px;
+    caret-color: var(--bg-ds-primary-300);
   }
   .renameInputFieldFolder:focus {
-    border: 1px solid var(--border-primary-300) !important;
+    border: 1px solid var(--border-ds-primary-300) !important;
   }
-  .sub-files {
+  .box-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 34px;
+    width: 1px;
+    background-color: var(--bg-ds-surface-100);
+    /* height: 100px; */
   }
 
   .main-folder {

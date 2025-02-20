@@ -455,17 +455,17 @@
 <div
   tabindex="0"
   bind:this={collectionTabWrapper}
-  style="height:32px; gap:4px; padding-left:14px; border-color: {showMenu
+  style="height:32px; gap:4px;  padding-left:9.5px; margin-bottom:2px; border-color: {showMenu
     ? '#ff7878'
     : ''} "
-  class="btn-primary mb-1 d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
+  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
     : ''}"
 >
   <button
     tabindex="-1"
-    class="d-flex ps-2 main-collection align-items-center bg-transparent border-0"
+    class="d-flex main-collection align-items-center bg-transparent border-0 gap:2px;"
     style="gap:4px;"
     on:contextmenu|preventDefault={rightClickContextMenu}
     on:click|preventDefault={() => {
@@ -504,14 +504,16 @@
         />
       </span> -->
       <Button
-        size="small"
+        size="extra-small"
+        customWidth={"24px"}
         type="teritiary-regular"
         startIcon={ChevronRightRegular}
       />
     {:else}
       <Button
         title=""
-        size="small"
+        size="extra-small"
+        customWidth={"24px"}
         type="teritiary-regular"
         startIcon={ChevronDownRegular}
         onClick={() => {}}
@@ -579,7 +581,8 @@
         <span class="add-icon-container">
           <Button
             id={`add-item-collection-${collection.id}`}
-            size="small"
+            size="extra-small"
+            customWidth={"24px"}
             type="teritiary-regular"
             onClick={rightClickContextMenu2}
             startIcon={AddRegular}
@@ -597,7 +600,8 @@
         <span class="add-icon-container">
           <Button
             id={`show-more-collection-${collection.id}`}
-            size="small"
+            size="extra-small"
+            customWidth={"24px"}
             type="teritiary-regular"
             startIcon={MoreHorizontalRegular}
             onClick={rightClickContextMenu}
@@ -640,36 +644,39 @@
 {#if !collection?.activeSync || activeSyncLoad}
   {#if !collection?.activeSync || isBranchSynced}
     <div
-      class="z-1"
-      style=" padding-left: 0; padding-right:0; display: {visibility
+      class="z-1 position-relative"
+      style=" padding-left: 0; padding-right:0;  display: {visibility
         ? 'block'
         : 'none'};"
     >
-      <div class="sub-folders ps-0">
-        {#each collection.items as explorer}
-          <Folder
-            {userRole}
-            {onItemCreated}
-            {onItemDeleted}
-            {onItemRenamed}
-            {onItemOpened}
-            {collection}
-            {userRoleInWorkspace}
-            {activeTabPath}
-            {explorer}
-            {activeTabType}
-            {activeTabId}
-            {searchData}
-            {isWebApp}
-          />
-        {/each}
+      <div class=" ps-0 pos position-relative">
+        <div class="box-line"></div>
+        <div class="">
+          {#each collection.items as explorer}
+            <Folder
+              {userRole}
+              {onItemCreated}
+              {onItemDeleted}
+              {onItemRenamed}
+              {onItemOpened}
+              {collection}
+              {userRoleInWorkspace}
+              {activeTabPath}
+              {explorer}
+              {activeTabType}
+              {activeTabId}
+              {searchData}
+              {isWebApp}
+            />
+          {/each}
+        </div>
         {#if !collection?.items?.length}
           <p class="text-fs-10 ps-4 ms-2 my-2 text-secondary-300">
             This collection is empty
           </p>
         {/if}
 
-        <div class="d-flex gap-2 ps-1 ms-4">
+        <div class="d-flex gap-2 ps-1 ms-2">
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
             <Tooltip
               title={"Add Folder"}
@@ -867,6 +874,10 @@
 {/if}
 
 <style>
+  .box-line {
+    visibility: none;
+  }
+
   .sync-button {
     background-color: transparent;
   }
@@ -930,15 +941,39 @@
   }
 
   .btn-primary:hover {
-    background-color: var(--bg-ds-surface-500);
+    background-color: var(--bg-ds-surface-400);
     color: var(--text-ds-neutral-50);
+    border-radius: 4px;
   }
+  .btn-primary:hover .add-icon-container {
+    visibility: visible;
+  }
+  .btn-primary:hover .box-line {
+    visibility: visible;
+  }
+
+  .box-line {
+    position: absolute;
+    top: 0;
+    bottom: 23px;
+    left: 20.5px;
+    width: 1px;
+    background-color: var(--bg-ds-surface-100);
+    z-index: 1;
+  }
+
   .btn-primary:focus-visible {
-    background-color: var(--bg-ds-surface-500);
+    background-color: var(--bg-ds-surface-400);
     color: var(--text-ds-neutral-50);
     outline: none;
     border-radius: 4px;
     border: 2px solid var(--bg-ds-primary-300) !important;
+  }
+  .btn-primary:active {
+    background-color: var(--bg-ds-surface-500);
+    color: var(--text-ds-neutral-50);
+    outline: none;
+    border-radius: 4px;
   }
   .btn-primary:focus-visible .add-icon-container {
     visibility: visible;
@@ -947,11 +982,12 @@
   .renameInputFieldCollection {
     border: none;
     background-color: transparent;
-    color: var(--white-color);
-    padding-left: 0;
+    color: var(--bg-ds-neutral-50);
+    height: 24px;
     outline: none;
-    border-radius: 2px !important;
-    padding-left: 5px;
+    border-radius: 4px !important;
+    padding: 4px 2px;
+    caret-color: var(--bg-ds-primary-300);
   }
   .renameInputFieldCollection:focus {
     border: 1px solid var(--border-ds-primary-300) !important;
@@ -961,6 +997,7 @@
   }
   .active-collection-tab {
     background-color: var(--bg-ds-surface-500) !important;
+    border-radius: 4px;
   }
   .collection-collection-name {
     width: calc(100% - 10px);
@@ -980,5 +1017,13 @@
 
   .shortcutIcon:hover {
     background: var(--right-border);
+  }
+  .sub-folders {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 40px;
+    width: 1px;
+    background-color: var(--bg-ds-surface-100);
   }
 </style>

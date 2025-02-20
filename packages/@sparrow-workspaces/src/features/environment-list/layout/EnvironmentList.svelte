@@ -175,7 +175,8 @@
       {#if !isExpandEnvironment}
         <span style="  display: flex; ">
           <Button
-            size="small"
+            size="extra-small"
+            customWidth={"24px"}
             type="teritiary-regular"
             startIcon={ChevronRightRegular}
           />
@@ -183,7 +184,8 @@
       {:else}
         <span style="display: flex; ">
           <Button
-            size="small"
+            size="extra-small"
+            customWidth={"24px"}
             type="teritiary-regular"
             startIcon={ChevronDownRegular}
           />
@@ -213,7 +215,8 @@
           <Button
             disabled={loggedUserRoleInWorkspace ===
               WorkspaceRole.WORKSPACE_VIEWER}
-            size="small"
+            size="extra-small"
+            customWidth={"24px"}
             type="teritiary-regular"
             onClick={(e) => {
               handleCreateEnvironment(e);
@@ -236,10 +239,10 @@
           <p
             tabindex="0"
             role="button"
-            class={`fw-normal mb-1   env-item text-fs-12 border-radius-2 my-1 ${
+            class={`fw-normal   env-item text-fs-12 border-radius-2  ${
               globalEnvironment[0]?.id === activeTabId && "active"
             }`}
-            style="height: 32px; display:flex; align-items:center; padding-left:35px;"
+            style="height: 32px; display:flex; align-items:center; padding-left:35px; margin-bottom:2px; position:relative;"
             on:click={() => {
               onOpenGlobalEnvironment(globalEnvironment[0]);
             }}
@@ -258,10 +261,11 @@
                 color={"var(--icon-secondary-130)"}
               />
             </span>
-            <span class="ms-1">{globalEnvironment[0]?.name}</span>
+            <span class="box-line"></span>
+            <span class="">{globalEnvironment[0]?.name}</span>
           </p>
         </div>
-        <hr class="mb-1 mt-1 ms-5 me-2" />
+        <hr class="m-0 ms-2 me-1 mt-1 mb-1" />
       {/if}
       {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !filteredLocalEnvironment?.length && !searchData}
         <div class={`pb-2 px-1`}>
@@ -295,30 +299,32 @@
         </div>
       {/if}
 
-      {#if filteredLocalEnvironment?.length}
-        <!-- <div class="mb-1 mt-0 ms-5 me-2" style="height: 1px; background-color:white"></div> -->
-
-        <List
-          bind:scrollList
-          height={"auto"}
-          overflowY={"auto"}
-          classProps={"pe-0"}
-          style={"flex:1;"}
-        >
-          {#each filteredLocalEnvironment as env}
-            <ListItem
-              bind:loggedUserRoleInWorkspace
-              {env}
-              {currentWorkspace}
-              {onDeleteEnvironment}
-              {onUpdateEnvironment}
-              {onOpenEnvironment}
-              {onSelectEnvironment}
-              {activeTabId}
-            />
-          {/each}
-        </List>
-      {/if}
+      <div class="position-relative">
+        {#if filteredLocalEnvironment?.length}
+          <!-- <div class="mb-1 mt-0 ms-5 me-2" style="height: 1px; background-color:white"></div> -->
+          <div class="box-line"></div>
+          <List
+            bind:scrollList
+            height={"auto"}
+            overflowY={"auto"}
+            classProps={"pe-0"}
+            style={"flex:1;"}
+          >
+            {#each filteredLocalEnvironment as env}
+              <ListItem
+                bind:loggedUserRoleInWorkspace
+                {env}
+                {currentWorkspace}
+                {onDeleteEnvironment}
+                {onUpdateEnvironment}
+                {onOpenEnvironment}
+                {onSelectEnvironment}
+                {activeTabId}
+              />
+            {/each}
+          </List>
+        {/if}
+      </div>
       {#if !filteredGlobalEnvironment?.length && !filteredLocalEnvironment?.length && searchData}
         <p
           class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
@@ -510,5 +516,15 @@
   .add-environment:hover {
     border: 1px solid var(--border-primary-300);
     border-radius: 2px;
+  }
+  .box-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 6.5px;
+    width: 1px;
+    background-color: var(--bg-ds-surface-100);
+    z-index: 10;
+    /* height: 100px; */
   }
 </style>

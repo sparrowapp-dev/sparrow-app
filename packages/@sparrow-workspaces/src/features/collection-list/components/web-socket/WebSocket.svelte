@@ -238,11 +238,11 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
-  class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {api.id ===
+  class="d-flex align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
     : ''} "
-  style="height:32px; gap:4px;"
+  style="height:32px; padding-left:3px; margin-bottom:2px; "
 >
   <button
     tabindex="-1"
@@ -258,8 +258,8 @@
       }
     }}
     style={folder?.id
-      ? "padding-left: 56px; gap:4px;"
-      : "padding-left: 28px; gap:4px;"}
+      ? "padding-left: 62.5px; gap:4px;"
+      : "padding-left: 48.5px; gap:4px;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
@@ -310,8 +310,10 @@
     >
       <span class="threedot-icon-container d-flex">
         <Button
+          tabindex={"-1"}
           id={`show-more-websocket-${api.id}`}
-          size="small"
+          size="extra-small"
+          customWidth={"24px"}
           type="teritiary-regular"
           startIcon={MoreHorizontalRegular}
           onClick={(e) => {
@@ -453,15 +455,16 @@
     pointer-events: none;
   }
   .renameInputFieldFile {
+    height: 24px;
     border: none;
     background-color: transparent;
-    color: var(--white-color);
-    padding-left: 0;
+    color: var(--text-ds-neutral-50);
+    padding: 4px 2px;
     outline: none;
-    border-radius: 2px !important;
+    border-radius: 4px !important;
   }
   .renameInputFieldFile:focus {
-    border: 1px solid var(--border-primary-300) !important;
+    border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
     width: calc(100% - 24px);

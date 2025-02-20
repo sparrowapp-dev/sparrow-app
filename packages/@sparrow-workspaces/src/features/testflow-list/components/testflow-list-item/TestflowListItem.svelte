@@ -166,8 +166,8 @@
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
-    style="font-size: 16px;"
+    class="d-flex align-items-center justify-content-end gap-3 rounded"
+    style="font-size: 16px; margin-bottom:2px;"
   >
     <Button
       disable={deleteTestflowLoader}
@@ -223,9 +223,10 @@
       ? 'active-collection-tab'
       : ''}"
   >
+    <!-- <div style="height: 32px; width:14px ;border-left:1px solid blue;"></div> -->
     <div
-      class="d-flex main-collection align-items-center ps-3"
-      style="gap:4px;"
+      class="d-flex main-collection align-items-center"
+      style="gap:4px; padding-left:35px; "
       on:contextmenu|preventDefault={(e) => {
         rightClickContextMenu(e);
       }}
@@ -237,7 +238,9 @@
         }
       }}
     >
-      <span style="display: flex;">
+      <span
+        style="display: flex; flex-direction:row; align-items:center; justify-content:center; height:24px; width:30px;"
+      >
         <FlowChartRegular size={"16px"} color={"var(--bg-ds-neutral-300"} />
       </span>
       {#if isRenaming}
@@ -276,7 +279,8 @@
         <span class="threedot-icon-container d-flex">
           <Button
             id={`show-more-testflow-${flow?._id}`}
-            size="small"
+            size="extra-small"
+            customWidth={"24px"}
             type="teritiary-regular"
             startIcon={MoreHorizontalRegular}
             onClick={(e) => {
@@ -329,7 +333,7 @@
     }
 
     .btn-primary:hover {
-      background-color: var(--bg-ds-surface-400);
+      background-color: var(--bg-ds-surface-400) !important;
       border-radius: 4px;
     }
 

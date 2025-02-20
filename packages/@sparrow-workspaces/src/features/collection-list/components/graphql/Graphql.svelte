@@ -233,13 +233,14 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
-  class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {graphql.id ===
+  class="d-flex align-items-center justify-content-between my-button btn-primary {graphql.id ===
   activeTabId
     ? 'active-request-tab'
     : ''} "
-  style="height:32px;"
+  style="height:32px; padding-left:3px;"
 >
   <button
+    tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
       if (!isRenaming) {
@@ -251,7 +252,9 @@
         });
       }
     }}
-    style={folder?.id ? "padding-left: 46px;" : "padding-left: 30px;"}
+    style={folder?.id
+      ? "padding-left: 62.5px; gap:4px;"
+      : "padding-left: 48.5px; gap:4px;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {graphql.id?.includes(
       UntrackedItems.UNTRACKED,
     )
@@ -302,8 +305,10 @@
     >
       <span class="threedot-icon-container d-flex">
         <Button
+          tabindex={"-1"}
           id={`show-more-graphql-${graphql.id}`}
-          size="small"
+          size="extra-small"
+          customWidth={"24px"}
           type="teritiary-regular"
           startIcon={MoreHorizontalRegular}
           onClick={(e) => {
@@ -445,19 +450,22 @@
   .rename-input-field-graphql {
     border: none;
     background-color: transparent;
-    color: var(--white-color);
-    padding-left: 0;
+    color: var(--text-ds-neutral-50);
+    padding: 4px 2px;
     outline: none;
     border-radius: 2px !important;
+    height: 24px;
+    font-size: 12px;
+    line-height: 18px;
   }
   .rename-input-field-graphql:focus {
-    border: 1px solid var(--border-primary-300) !important;
+    border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
     width: calc(100% - 24px);
   }
   .active-request-tab {
-    background-color: var(--bg-tertiary-400) !important;
+    background-color: var(--bg-ds-surface-500) !important;
     .delete-ticker {
       background-color: var(--selected-active-sidebar) !important;
     }

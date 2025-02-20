@@ -144,3 +144,5 @@ export {default as FlowChartRegular} from "./FlowChartRegular.svelte";
 export {default as LayerRegular} from "./LayerRegular.svelte";
 export {default as StackRegular} from "./StackRegular.svelte";
 export {default as FolderAddRegular } from "./FolderAddRegular.svelte";
+export {default as FolderRegular} from "./FolderRegular.svelte";
+export {default as FolderOpenRegular} from "./FolderOpenRegular.svelte";

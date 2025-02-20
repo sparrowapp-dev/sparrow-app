@@ -219,17 +219,23 @@
   on:contextmenu|preventDefault={handleSelectClick}
 />
 
-<div style="" class="environment-tab mb-1" bind:this={environmentTabWrapper}>
+<div
+  style="margin-bottom:2px;"
+  class="environment-tab"
+  bind:this={environmentTabWrapper}
+>
   <button
     tabindex="0"
-    style="height:32px;gap:4px;  border-color: {showMenu ? '#ff7878' : ''}"
+    style="height:32px;gap:4px; padding-left:34px;  border-color: {showMenu
+      ? '#ff7878'
+      : ''}"
     class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 my-button {env?.id ===
     activeTabId
       ? 'active-collection-tab'
       : ''}"
   >
     <div
-      class="d-flex main-collection align-items-center ps-3"
+      class="d-flex main-collection align-items-center"
       on:contextmenu|preventDefault={(e) => {
         rightClickContextMenu(e);
       }}
@@ -243,7 +249,7 @@
     >
       <button
         class="border-0 bg-transparent"
-        style="width: 30px; height:24px; display:flex; align-items:center; justify-content:center; margin-left:24px;"
+        style="width: 30px; height:24px; display:flex; align-items:center; justify-content:center; "
         on:click|stopPropagation={() => {
           handleSelectEnvironment();
         }}
@@ -272,7 +278,7 @@
       {:else}
         <div
           class="collection-title d-flex align-items-center py-1 mb-0"
-          style="height: 32px; font-size:12px; font-weight:500; line-height:18px"
+          style="height: 32px; font-size:12px; font-weight:500; line-height:18px "
         >
           <p class="ellipsis w-100 me-4 mb-0 text-fs-12">
             {env.name}
@@ -358,22 +364,24 @@
       visibility: visible;
     }
     .renameInputFieldCollection {
+      height: 24px;
       border: none;
       color: var(--text-ds-neutral-50);
       background-color: transparent;
-      padding-left: 5px;
+      padding: 4px 2px;
       border-radius: 4px !important;
       outline: none !important;
-      border: 1px solid var(--border-ds-primary-300);
+      caret-color: var(--bg-ds-primary-300);
     }
     .renameInputFieldCollection:focus {
-      border: 1px solid var(--border-primary-300);
+      border: 1px solid var(--border-ds-primary-300);
     }
     .sub-folders {
       border-left: 1px solid var(--border-color);
     }
     .main-collection {
       width: calc(100% - 24px);
+      gap: 4px;
     }
     .active-collection-tab {
       background-color: var(--bg-ds-surface-500) !important;

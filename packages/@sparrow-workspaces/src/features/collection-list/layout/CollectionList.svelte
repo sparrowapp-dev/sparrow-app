@@ -221,27 +221,29 @@
     <div
       tabindex="0"
       class=" collection-container d-flex align-items-center pe-2 border-radius-2"
-      style="cursor:pointer; justify-content: space-between; height:32px;"
+      style="cursor:pointer; justify-content: space-between; height:32px; margin-bottom:0;"
       on:mouseover={handleMouseOver}
       on:mouseout={handleMouseOut}
       on:click={toggleExpandCollection}
     >
       <div
         class=" d-flex align-items-center"
-        style="width: calc(100% - 30px); gap:4px; padding:2px 4px;"
+        style="width: calc(100% - 30px); gap:4px; padding:2px 4px; height:32px; "
       >
         {#if !isExpandCollection}
           <span style=" display: flex; ">
             <Button
-              size="small"
+              size="extra-small"
               type="teritiary-regular"
+              customWidth="24px"
               startIcon={ChevronRightRegular}
             />
           </span>
         {:else}
-          <span style="   display: flex; ">
+          <span style="   display: flex;  ">
             <Button
-              size="small"
+              size="extra-small"
+              customWidth="24px"
               type="teritiary-regular"
               startIcon={ChevronDownRegular}
             />
@@ -274,7 +276,8 @@
         >
           <span style="display:flex;" class="add-icon-container">
             <Button
-              size="small"
+              size="extra-small"
+              customWidth={"24px"}
               type="teritiary-regular"
               startIcon={AddRegular}
               disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
@@ -295,7 +298,10 @@
     </div>
 
     {#if isExpandCollection}
-      <div class="overflow-auto d-flex flex-column ms-2 me-0 pt-1 mb-2">
+      <div
+        class="overflow-auto position-relative d-flex flex-column ms-2 me-0 pt-1 mb-2"
+      >
+        <div class="box-line"></div>
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
             {#if collectionFilter.length > 0}
@@ -401,16 +407,20 @@
   .collection-container {
     background-color: transparent;
     margin-bottom: 2px;
+    border-radius: 2px;
   }
   .collection-container:hover {
-    background-color: var(--bg-ds-surface-500);
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
   }
   .collection-container:hover .add-icon-container {
     visibility: visible;
   }
   .collection-container:focus-visible {
     background-color: var(--bg-ds-surface-500);
-    outline: 2px solid var(--border-ds-primary-300);
+    outline: none;
+    border-radius: 4px;
+    border: 2px solid var(--border-ds-primary-300);
   }
   .collection-container:focus-visible .add-icon-container {
     visibility: visible;
@@ -526,5 +536,15 @@
   }
   .filter-active {
     background-color: var(--send-button) !important;
+  }
+  .box-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 6.5px;
+    width: 1px;
+    background-color: var(--bg-ds-surface-100);
+    z-index: 10;
+    /* height: 100px; */
   }
 </style>

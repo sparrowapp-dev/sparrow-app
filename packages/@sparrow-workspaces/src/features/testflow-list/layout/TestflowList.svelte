@@ -127,7 +127,7 @@
 
 <div
   class={`d-flex flex-column  h-100  bg-secondary-900 pt-0 px-1`}
-  style="font-weight: 500; gap:4px;"
+  style="font-weight: 500;margin-bottom:2px; "
 >
   <!-- 
   --  Testflow Header 
@@ -142,12 +142,13 @@
   >
     <div
       class="d-flex align-items-center"
-      style="width: calc(100% - 30px); gap:4px; padding:2px 4px;"
+      style="width: calc(100% - 30px); gap:4px; padding-left:3px;"
     >
       {#if !isExpandTestflow}
         <span style=" display: flex; ">
           <Button
-            size="small"
+            size="extra-small"
+            customWidth={"24px"}
             type="teritiary-regular"
             startIcon={ChevronRightRegular}
           />
@@ -155,7 +156,8 @@
       {:else}
         <span style="   display: flex; ">
           <Button
-            size="small"
+            size="extra-small"
+            customWidth={"24px"}
             type="teritiary-regular"
             startIcon={ChevronDownRegular}
           />
@@ -189,7 +191,8 @@
           : ''} add-icon-container d-flex"
       >
         <Button
-          size="small"
+          size="extra-small"
+          customWidth={"24px"}
           type="teritiary-regular"
           startIcon={AddRegular}
           onClick={(e) => {
@@ -202,11 +205,7 @@
   </div>
 
   {#if isExpandTestflow}
-    <div
-      style="flex:1;"
-      class="overflow-auto h-100 mt-1 ps-2"
-      bind:this={scrollDiv}
-    >
+    <div style="flex:1;" class="overflow-auto h-100 ps-2" bind:this={scrollDiv}>
       <!-- 
   --  Testflow Empty screen 
   -->
@@ -220,26 +219,24 @@
               Start with basic test cases to check core functions and build a
               strong testing foundation.
             </p>
-            <button
-              class=" w-100 add-testflow bg-transparent d-flex justify-content-center align-items-center border-radius-2"
-              style="color: var(--text-secondary-100);"
-              disabled={loggedUserRoleInWorkspace ===
-                WorkspaceRole.WORKSPACE_VIEWER}
-              on:click={async () => {
-                await onCreateTestflow();
-                MixpanelEvent(Events.Add_New_Flow);
-              }}
-            >
-              <PlusIcon
-                height={"22px"}
-                width={"22px"}
-                color={"var(--text-secondary-200)"}
+            <span class="  add-testflow d-flex">
+              <Button
+                size={"extra-small"}
+                type="teritiary-regular"
+                customWidth={"24px"}
+                startIcon={AddRegular}
+                disabled={loggedUserRoleInWorkspace ===
+                  WorkspaceRole.WORKSPACE_VIEWER}
+                onClick={async () => {
+                  await onCreateTestflow();
+                  MixpanelEvent(Events.Add_New_Flow);
+                }}
               />
               <span
                 style="color: var(--text-secondary-200)"
                 class="ps-2 fw-bold text-fs-12">Add {TFDefaultEnum.NAME}</span
               >
-            </button>
+            </span>
           </div>
         {/if}
       {/if}
@@ -247,30 +244,33 @@
       <!-- 
   --  Testflow List 
   -->
-      {#if filteredflows?.length > 0}
-        <List
-          bind:scrollList
-          height={"auto"}
-          overflowY={"auto"}
-          classProps={"pe-0"}
-          style={"flex:1;"}
-        >
-          {#each filteredflows as flow}
-            <TestflowListItem
-              bind:loggedUserRoleInWorkspace
-              {flow}
-              {currentWorkspace}
-              {onDeleteTestflow}
-              {onUpdateTestflow}
-              {onOpenTestflow}
-              {activeTabId}
-            />
-          {/each}
-        </List>
-      {/if}
+      <div class="position-relative">
+        {#if filteredflows?.length > 0}
+          <div class="box-line"></div>
+          <List
+            bind:scrollList
+            height={"auto"}
+            overflowY={"auto"}
+            classProps={"pe-0"}
+            style={"flex:1;"}
+          >
+            {#each filteredflows as flow}
+              <TestflowListItem
+                bind:loggedUserRoleInWorkspace
+                {flow}
+                {currentWorkspace}
+                {onDeleteTestflow}
+                {onUpdateTestflow}
+                {onOpenTestflow}
+                {activeTabId}
+              />
+            {/each}
+          </List>
+        {/if}
+      </div>
       {#if filteredflows?.length === 0 && searchData}
         <p
-          class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
+          class="mx-1 text-fs-12 mb-0 text-center"
           style="color: var(--text-secondary-550);  font-weight:300; letter-spacing: 0.5px;"
         >
           It seems we couldn't find the result matching your search query.
@@ -412,5 +412,15 @@
   }
   button:disabled {
     pointer-events: none !important;
+  }
+  .box-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 6.5px;
+    width: 1px;
+    background-color: var(--bg-ds-surface-100);
+    z-index: 10;
+    /* height: 100px; */
   }
 </style>
