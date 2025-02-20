@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { SearchSuggestion } from "./types/types";
+  import type { SearchSuggestion } from "../../types/types";
   export let suggestions: SearchSuggestion[];
   export let selectedType = "";
   export let searchBarRef;
@@ -34,7 +34,7 @@
         on:click={() => handleTagClick(suggestion.label)}
       >
         <div class="tag-icon-wrapper">
-          <svelte:component this={suggestion.icon} color="var(--icon-color)" />
+          <svelte:component this={suggestion.icon} color="var(--icon-color)" width="16px" height="16px" />
         </div>
         <span class="tag-label">{suggestion.label}</span>
       </button>
