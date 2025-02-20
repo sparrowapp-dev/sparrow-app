@@ -201,11 +201,11 @@
     background-color: var(--bg-ds-surface-600);
     cursor: pointer;
   }
-  tr[tabindex="0"]:focus {
+  tr[tabindex="0"]:focus-visible {
      outline: solid 2px var(--bg-ds-primary-300) !important;
      outline-offset: -2px;
      background-color: var(--bg-ds-surface-700);
-      border-radius: 8px;
+    border-radius: 8px;
   }
 
   .workspace-list-item td {
