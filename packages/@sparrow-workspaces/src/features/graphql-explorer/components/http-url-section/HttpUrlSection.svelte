@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { notifications } from "@sparrow/library/ui";
-  import { DropButton } from "@sparrow/workspaces/components";
+  import { Button, notifications } from "@sparrow/library/ui";
   import { CodeMirrorInput } from "../../../../components";
   import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
@@ -57,26 +56,18 @@
     } else if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
       event.preventDefault();
     } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
-      onSendButtonClicked(environmentVariables?.filtered || [])
+      onSendButtonClicked(environmentVariables?.filtered || []);
     }
   };
 
-  let isHovered = false;
 
-  function handleMouseEnter() {
-    isHovered = true;
-  }
-
-  function handleMouseLeave() {
-    isHovered = false;
-  }
 </script>
 
-<div class={`d-flex ${componentClass}`}>
+<div class={`d-flex ${componentClass}`} style="display: flex; gap: 6px;">
   <CodeMirrorInput
     bind:value={requestUrl}
     onUpdateInput={onUpdateRequestUrl}
-    placeholder={"Enter a URL"}
+    placeholder={"Enter URL here"}
     {theme}
     {onUpdateEnvironment}
     {environmentVariables}
@@ -86,11 +77,11 @@
   />
 
   <!-- Send button -->
-  <span class="ps-2"></span>
   {#if !isSendRequestInProgress}
-    <DropButton
-      title="Query"
-      type="default"
+    <Button
+      title={"Query"}
+      type={"primary"}
+      size="medium"
       onClick={() => {
         if (requestUrl === "") {
           const codeMirrorElement = document.querySelector(
@@ -109,50 +100,30 @@
       }}
     />
   {:else}
-    <DropButton
-      title="Cancel"
-      type="dark"
-      onClick={() => {
+  <Button title="Cancel"
+  type="secondary"
+  size="medium"
+  onClick={() => {
         onCancelButtonClicked();
-      }}
-    />
+      }}/>
   {/if}
 
   <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
-    <button
-      class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
-      on:click={() => {
+    <Button
+    type="secondary"
+    size="medium"
+    startIcon={DiskIcon}
+    onClick={() => {
         handleSaveRequest();
         MixpanelEvent(Events.Save_GraphQL_Request, {
           description: "Save GraphQL Request",
         });
-      }}
-      on:mouseenter={handleMouseEnter}
-      on:mouseleave={handleMouseLeave}
-      disabled={isSave || !isGraphqlEditable ? true : false}
-      style="background-color: {isSave || !isGraphqlEditable
-        ? 'var(--icon-secondary-550)'
-        : 'var(--bg-secondary-400)'}; color: white;"
-    >
-      <DiskIcon
-        height={22}
-        width={22}
-        color={isSave || !isGraphqlEditable
-          ? "var(--icon-secondary-380)"
-          : isHovered
-            ? "var(--icon-primary-200)"
-            : "var(--icon-secondary-100)"}
-      />
-    </button>
+      }}/>
   </Tooltip>
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
-  .save-disk {
-    padding: 7px;
-    background-color: var(--bg-secondary-400);
-  }
 
   .save-disk:disabled {
     background-color: var(--bg-secondary-550);

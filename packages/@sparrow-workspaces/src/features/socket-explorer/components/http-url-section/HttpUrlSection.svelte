@@ -5,8 +5,7 @@
     SaveRequestType,
     UpdateRequestUrlType,
   } from "@sparrow/workspaces/type";
-  import { notifications } from "@sparrow/library/ui";
-  import { DropButton } from "@sparrow/workspaces/components";
+  import { Button, notifications } from "@sparrow/library/ui";
   import { CodeMirrorInput } from "../../../../components";
   import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
@@ -48,22 +47,13 @@
     }
   };
 
-  let isHovered = false;
-
-  function handleMouseEnter() {
-    isHovered = true;
-  }
-
-  function handleMouseLeave() {
-    isHovered = false;
-  }
 </script>
 
-<div class={`d-flex ${componentClass}`}>
+<div class={`d-flex ${componentClass}`} style="display: flex; gap: 6px;">
   <CodeMirrorInput
     bind:value={requestUrl}
     onUpdateInput={onUpdateRequestUrl}
-    placeholder={"Enter a URL"}
+    placeholder={"Enter a URL here"}
     {theme}
     {onUpdateEnvironment}
     {environmentVariables}
@@ -73,10 +63,9 @@
   />
 
   <!-- Send button -->
-  <span class="ps-2"></span>
-  <DropButton
-    title={webSocket?.status === "connected" ? "Disconnect" : "Connect"}
-    type="default"
+  <Button
+  title={webSocket?.status === "connected" ? "Disconnect" : "Connect"}
+    type="primary"
     loader={webSocket?.status === "connecting" ||
       webSocket?.status === "disconnecting"}
     disable={webSocket?.status === "connecting" ||
@@ -101,29 +90,16 @@
     }}
   />
   <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
-    <button
-      class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
-      on:click={handleSaveRequest}
-      on:mouseenter={handleMouseEnter}
-      on:mouseleave={handleMouseLeave}
-      disabled={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
+
+     <Button
+    type="secondary"
+    size="medium"
+    startIcon={DiskIcon}
+    onClick={handleSaveRequest}
+    disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
         : false}
-      style="background-color: {isSave ||
-      userRole === WorkspaceRole.WORKSPACE_VIEWER
-        ? 'var(--icon-secondary-550)'
-        : 'var(--bg-secondary-400)'}; color: white;"
-    >
-      <DiskIcon
-        height={22}
-        width={22}
-        color={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
-          ? "var(--icon-secondary-380)"
-          : isHovered
-            ? "var(--icon-primary-200)"
-            : "var(--icon-secondary-100)"}
-      />
-    </button>
+        />
   </Tooltip>
 </div>
 

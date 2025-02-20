@@ -7,15 +7,18 @@ export class UrlInputTheme {
         height: "36px",
         width: "100%",
         flex: "1",
-        border: "1px solid var(--bg-secondary-600)",
         borderRadius: "0",
-        fontSize: "80%",
+        fontSize: "14px",
       },
       ".cm-content": {
         caretColor: "var(--white-color)",
         height: "100%",
         paddingTop: "7px",
-        backgroundColor: "var( --text-tertiary-750)",
+        backgroundColor: "var(--bg-ds-surface-600)",
+        "border-radius": "4px",
+      },
+      ".cm-content::placeholder": {
+        color: "red",
       },
       ".cm-panels": {
         backgroundColor: "var(--blackColor)",
@@ -30,7 +33,12 @@ export class UrlInputTheme {
         alignItems: "center",
       },
       ".cm-textfield": {
-        backgroundColor: "var(--background-color)",
+        backgroundColor: "red",
+      },
+      ".cm-placeholder": {
+        color: "var(--text-ds-neutral-400)",
+        "font-size": "14x",
+        "line-height": "20px",
       },
       ".cm-button": {
         backgroundColor: "var(--background-color)",
@@ -55,7 +63,7 @@ export class UrlInputTheme {
       },
       ".cm-foldPlaceholder": {
         color: "#8A9299",
-        fontSize: "12px",
+        fontSize: "30px",
         fontWeight: "400",
       },
       "&.cm-editor:hover": {
