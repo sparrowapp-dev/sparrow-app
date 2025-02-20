@@ -84,29 +84,31 @@
 
   let btnClass = "";
   let fontSize = 12;
+  let borderRadius = 4;
   $: {
-    if (size === "small") {
+    if (size === "extra-small") {
+      iconSize = 12;
+      buttonSize = 24;
+      borderRadius = 4;
+    } else if (size === "small") {
       fontSize = 12;
       buttonSize = 28;
-      iconSize = 12;
-    } else if (size === "extra-small") {
-      fontSize = 12;
-      buttonSize = 24;
+      borderRadius = 4;
       iconSize = 12;
     } else if (size === "medium") {
       fontSize = 14;
       buttonSize = 36;
-
+      borderRadius = 6;
       iconSize = 16;
     } else if (size === "large") {
       fontSize = 16;
       buttonSize = 40;
-
+      borderRadius = 4;
       iconSize = 20;
     } else {
       fontSize = 12;
       buttonSize = 28;
-
+      borderRadius = 6;
       iconSize = 24;
     }
 
@@ -209,7 +211,7 @@
   {tabindex}
   {id}
   disabled={disable}
-  style={` ${`flex:none; min-width:${buttonSize}px; white-space:nowrap; height: ${buttonSize}px; width: ${customWidth}; border-radius: 4px;`}  `}
+  style={` ${`flex:none; min-width:${buttonSize}px; white-space:nowrap; height: ${buttonSize}px; width: ${customWidth}; border-radius: ${borderRadius}px;`}  `}
   class={`${buttonClassProp}  
  py-1 px-${title.length > 0 ? 3 : 2} gap-2 d-flex align-items-center justify-content-center
   ${btnClass}`}

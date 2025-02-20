@@ -2,7 +2,7 @@
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
   import { SelectIcon } from "@sparrow/library/assets";
   import { UntrackedItems } from "@sparrow/common/enums/item-type.enum";
-  import { Spinner } from "@sparrow/library/ui";
+  import { RadioButton, Spinner } from "@sparrow/library/ui";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
   import { Options } from "@sparrow/library/ui";
@@ -261,6 +261,13 @@
           selected={currentWorkspace?.environmentId === env.id}
         />
       </button>
+      <!-- <RadioButton
+        class="p-0 m-0  ps-4 me-2"
+        buttonSize="medium"
+        selected={currentWorkspace?.environmentId === env.id}
+        handleChange={() => handleSelectEnvironment()}
+        singleSelect={true}
+      /> -->
       {#if isRenaming}
         <input
           class="py-0 renameInputFieldCollection text-fs-12 w-100"
