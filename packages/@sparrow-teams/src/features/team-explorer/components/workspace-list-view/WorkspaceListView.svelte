@@ -32,11 +32,8 @@
   export let onAddMember;
 
   let filterText = "";
-    let currentSortField = "updatedAt"; // Default sort field
-  let isAscending = false; // Default sort order (descending)
-  
-  
-
+  let currentSortField = "updatedAt";
+  let isAscending = false;
 
   let workspacePerPage: number = 10,
     currPage = 1;
@@ -51,26 +48,24 @@
 
   function handleSortToggle(field) {
     if (currentSortField === field) {
-      // If clicking on the same field, toggle the direction
       isAscending = !isAscending;
     } else {
-      // If clicking on a new field, set it as current and default to ascending
       currentSortField = field;
       isAscending = true;
     }
   }
 
-   $: sortedData = data
+  $: sortedData = data
     ? [...data].sort((a, b) => {
         const aValue = new Date(a._data[currentSortField]).getTime();
         const bValue = new Date(b._data[currentSortField]).getTime();
         return isAscending ? aValue - bValue : bValue - aValue;
       })
     : [];
-  
+
   $: filteredAndSortedData = sortedData
-    .filter((item) => 
-      item.name.toLowerCase().startsWith(filterText.toLowerCase())
+    .filter((item) =>
+      item.name.toLowerCase().startsWith(filterText.toLowerCase()),
     )
     .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage);
 </script>
@@ -81,35 +76,35 @@
     style="flex:1; overflow:auto;"
   >
     {#if !isGuestUser}
-       <Table
-  tableClassProps="table p-0 table-responsive w-100"
-  tableStyleProp="max-height: 100%; "
-  dataSearch="true"
-  tableHeaderClassProp="position-sticky top-0 z-2"
-  contributorsCount={openTeam?.users?.length}
-  headerObject={tableHeaderContent}    
-  onSortToggle={handleSortToggle}
-  currentSortField={currentSortField}
-  isAscending={isAscending}
->
-  <tbody class="overflow-y-auto position-relative z-0">
-    {#if data}
-      {#each filteredAndSortedData as list, index}
-        <Rows
-          {onAddMember}
-          {list}
-          activeTeam={openTeam}
-          onOpenCollection={onSwitchWorkspace}
-          {calculateTimeDifferenceInDays}
-          {isAdminOrOwner}
-          {onDeleteWorkspace}
-          {openInDesktop}
-          {isWebEnvironment}
-        />
-      {/each}
-    {/if}
-  </tbody>
-</Table>
+      <Table
+        tableClassProps="table p-0 table-responsive w-100"
+        tableStyleProp="max-height: 100%; "
+        dataSearch="true"
+        tableHeaderClassProp="position-sticky top-0 z-2"
+        contributorsCount={openTeam?.users?.length}
+        headerObject={tableHeaderContent}
+        onSortToggle={handleSortToggle}
+        {currentSortField}
+        {isAscending}
+      >
+        <tbody class="overflow-y-auto position-relative z-0">
+          {#if data}
+            {#each filteredAndSortedData as list, index}
+              <Rows
+                {onAddMember}
+                {list}
+                activeTeam={openTeam}
+                onOpenCollection={onSwitchWorkspace}
+                {calculateTimeDifferenceInDays}
+                {isAdminOrOwner}
+                {onDeleteWorkspace}
+                {openInDesktop}
+                {isWebEnvironment}
+              />
+            {/each}
+          {/if}
+        </tbody>
+      </Table>
     {/if}
     {#if isGuestUser}
       <table
