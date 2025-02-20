@@ -423,17 +423,6 @@
             }
           }}
         >
-          <!-- <img
-            src={angleRight}
-            class="me-3"
-            style="height:8px; width:4px; margin-right:8px; {expand
-              ? 'transform:rotate(90deg);'
-              : 'transform:rotate(0deg);'}"
-            alt="angleRight"
-            on:click|stopPropagation={() => {
-              expand = !expand;
-            }}
-          /> -->
           {#if !expand}
             <span
               on:click|stopPropagation={() => {
@@ -441,11 +430,6 @@
               }}
               style="  display: flex; "
             >
-              <!-- <AngleRightIcon2
-                width={"10px"}
-                height={"10px"}
-                color={"var(--bg-ds-neutral-50)"}
-              /> -->
               <Button
                 startIcon={ChevronRightRegular}
                 size="extra-small"
@@ -748,11 +732,6 @@
     background-color: var(--bg-tertiary-600);
     border-radius: 4px;
   }
-
-  /* .threedot-icon-container:hover {
-    background-color: var(--bg-tertiary-500) !important;
-    border-radius: 4px;
-  } */
 
   .add-icon-container:hover {
     background-color: var(--bg-tertiary-500) !important;

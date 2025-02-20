@@ -455,9 +455,7 @@
 <div
   tabindex="0"
   bind:this={collectionTabWrapper}
-  style="height:32px; gap:4px;  padding-left:9.5px; margin-bottom:2px; border-color: {showMenu
-    ? '#ff7878'
-    : ''} "
+  style="height:32px; gap:4px;  padding-left:9.5px; margin-bottom:2px; "
   class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
@@ -482,27 +480,7 @@
       }
     }}
   >
-    <!-- <img
-      src={angleRight}
-      class=""
-      style="height:8px; width:8px; margin-right:8px; {visibility
-        ? 'transform:rotate(90deg);'
-        : 'transform:rotate(0deg);'}"
-      alt="angleRight"
-      on:click|stopPropagation={() => {
-        visibility = !visibility;
-      }}
-    /> -->
     {#if !visibility}
-      <!-- <span
-        style="height:24px; width:24px;  display: flex; align-items:center; justify-content:center;"
-      >
-        <AngleRightIcon2
-          width={"10px"}
-          height={"10px"}
-          color={"var(--bg-ds-neutral-50)"}
-        />
-      </span> -->
       <Button
         size="extra-small"
         customWidth={"24px"}
@@ -565,11 +543,6 @@
   {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
-    <!-- <Tooltip
-      placement="bottom-center"
-      title="More options"
-      styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
-    > -->
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <Tooltip
         title={"Add Options"}
@@ -607,8 +580,6 @@
             onClick={rightClickContextMenu}
           />
         </span>
-
-        <!-- </Tooltip> -->
       </Tooltip>
     {/if}
 

@@ -163,15 +163,6 @@
       class="d-flex align-items-center"
       style="width: calc(100% - 30px); gap:4px; padding:2px 4px;"
     >
-      <!-- <img
-        src={angleRight}
-        class="me-3"
-        style="height:8px; width:4px; margin-right:8px; {isExpandEnvironment
-          ? 'transform:rotate(90deg);'
-          : 'transform:rotate(0deg);'}"
-        alt="angleRight"
-      /> -->
-
       {#if !isExpandEnvironment}
         <span style="  display: flex; ">
           <Button
