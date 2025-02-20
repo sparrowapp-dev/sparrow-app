@@ -159,3 +159,7 @@ export { default as patchIcon } from "./Patch.svelte";
 export { default as postIcon } from "./Post.svelte";
 export { default as putIcon } from "./Put.svelte";
 export { default as deleteIcon } from "./Delete.svelte";
+
+export {default as GraphqlIcon} from "./GraphQLIcon.svelte";
+export {default as WebSocketIcon} from "./WebSocketIcon.svelte";
+export {default as SocketIOIcon} from "./SocketIOICon.svelte";

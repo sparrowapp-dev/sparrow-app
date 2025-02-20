@@ -268,9 +268,9 @@
   >
     <span class="api-method"
       ><SocketIcon
-        height={"12px"}
-        width={"16px"}
-        color={"var(--icon-primary-300)"}
+        height={"9px"}
+        width={"12px"}
+        color={"var(--icon-ds-primary-400)"}
       /></span
     >
 
@@ -462,6 +462,7 @@
     padding: 4px 2px;
     outline: none;
     border-radius: 4px !important;
+    caret-color: var(--bg-ds-primary-300);
   }
   .renameInputFieldFile:focus {
     border: 1px solid var(--border-ds-primary-300) !important;

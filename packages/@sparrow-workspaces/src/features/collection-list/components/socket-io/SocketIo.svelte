@@ -259,9 +259,9 @@
   >
     <span class="api-method">
       <SocketIoIcon
-        height={"14px"}
-        width={"14px"}
-        color={"var(--icon-primary-300)"}
+        height={"12px"}
+        width={"12px"}
+        color={"var(--icon-ds-success-300)"}
       />
     </span>
 
@@ -342,6 +342,7 @@
     color: var(--bg-ds-neutral-50);
     display: flex;
     align-items: center;
+    caret-color: var(--bg-ds-primary-300);
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;

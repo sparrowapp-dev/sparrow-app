@@ -379,6 +379,7 @@
     display: flex;
     align-items: center;
     padding: 4px 2px;
+    caret-color: var(--bg-ds-primary-300);
   }
   .api-name:focus {
     border: 1px solid var(--bg-ds-primary-300) !important;
@@ -492,6 +493,7 @@
     outline: none;
     border-radius: 4px !important;
     border: 1px solid var(--bg-ds-primary-300);
+    caret-color: var(--bg-ds-primary-300);
   }
   .renameInputFieldFile:focus {
     border: 1px solid var(--border-ds-primary-300) !important;

@@ -359,14 +359,16 @@
 
     .renameInputFieldCollection {
       border: none;
+      height: 24px;
       color: var(--text-ds-neutral-50);
       background-color: transparent;
-      padding-left: 5px;
+      padding: 4px 2px;
       border-radius: 4px !important;
       outline: none !important;
       font-size: 12px;
       line-height: 18px;
       font-weight: 500;
+      caret-color: var(--bg-ds-primary-300);
     }
     .renameInputFieldCollection:focus {
       border: 1px solid var(--border-ds-primary-300);
