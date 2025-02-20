@@ -262,7 +262,7 @@
   <div class="" style="display:block; position:relative; width:641px;">
     {#if pairs}
       {#each pairs as element, index}
-        <div class="pair-data-row w-100 px-2 d-flex align-items-center">
+        <div class="pair-data-row w-100 d-flex align-items-center">
           <div class="button-container">
             <Button
               size="extra-small"
@@ -339,7 +339,7 @@
             {/if}
           </div>
           <div
-            class="ms-3 d-flex align-items-center justify-content-between gap-1"
+            class="ms-1 d-flex align-items-center justify-content-between gap-1"
             style="width:40px;"
           >
             {#if pairs.length - 1 != index}
@@ -405,7 +405,7 @@
     padding-bottom: 3px;
     background-color: var(--bg-ds-surface-400);
     height: 28px;
-    padding-left: 36px;
+    padding-left: 30px;
     padding-right: 1rem;
   }
   .pair-data-row:first-child {
@@ -415,6 +415,8 @@
   .pair-data-row {
     padding-top: 3px;
     padding-bottom: 3px;
+    padding-right: 20px;
+    padding-left: 2px;
     height: calc(28px);
     background-color: var(--bg-ds-surface-600);
     border-top: 1px solid var(--bg-ds-surface-400);
