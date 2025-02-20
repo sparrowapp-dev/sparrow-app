@@ -9,6 +9,12 @@
     FolderIcon4,
     StackIcon,
     CollectionIcongs,
+    WorkspaceRegular,
+    StackRegular,
+    LayerRegular,
+    FolderRegular,
+    FlowChartRegular,
+    ArrowSwapRegular,
   } from "@sparrow/library/icons";
   import SuggestionTags from "../components/SuggestionTags/SuggestionTags.svelte";
   import RecentItems from "../components/RecentItems/RecentItems.svelte";
@@ -59,37 +65,37 @@
     {
       type: "workspace",
       label: "Workspaces",
-      icon: WorkspaceIcongs,
+      icon: WorkspaceRegular,
       show: !isGuestUser,
     },
     {
       type: "collection",
       label: "Collections",
-      icon: CollectionIcongs,
+      icon: StackRegular,
       show: true,
     },
     {
       type: "environment",
       label: "Environments",
-      icon: StackIcon,
+      icon: LayerRegular,
       show: true,
     },
     {
       type: "folder",
       label: "Folders",
-      icon: FolderIcon4,
+      icon: FolderRegular,
       show: true,
     },
     {
       type: "flow",
       label: "Flows",
-      icon: FlowIcon,
+      icon: FlowChartRegular,
       show: true,
     },
     {
       type: "request",
       label: "Requests",
-      icon: RequestIcon2,
+      icon: ArrowSwapRegular,
       show: true,
     },
   ];
