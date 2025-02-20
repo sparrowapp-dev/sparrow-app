@@ -263,9 +263,9 @@
   >
     <span class="api-method">
       <GraphIcon
-        height={"14px"}
-        width={"14px"}
-        color={"var(--icon-danger-1100)"}
+        height={"12px"}
+        width={"12px"}
+        color={"var(--icon-ds-accent-400)"}
       />
     </span>
 
@@ -328,8 +328,8 @@
   .api-method {
     font-size: 10px;
     font-weight: 500;
-    width: 48px !important;
-    height: 30px;
+    width: 30px !important;
+    height: 24px;
     padding-left: 6px;
     padding-right: 4px;
     border-radius: 8px;
@@ -457,6 +457,7 @@
     height: 24px;
     font-size: 12px;
     line-height: 18px;
+    caret-color: var(--bg-ds-primary-300);
   }
   .rename-input-field-graphql:focus {
     border: 1px solid var(--border-ds-primary-300) !important;
