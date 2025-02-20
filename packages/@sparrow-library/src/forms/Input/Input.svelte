@@ -1,31 +1,26 @@
 <script lang="ts">
-  import { SearchIcon } from "@sparrow/library/assets";
   import { PencilIcon } from "@sparrow/library/icons";
   import { createEventDispatcher } from "svelte";
   let componentClass = "";
   export { componentClass as class };
   let componentStyle = "";
   export { componentStyle as style };
-
-  export let type: "text" | "password" | "search" = "text";
+  export let type: "text" | "password" = "text";
+  export let startIcon;
+  export let endIcon;
   export let placeholder = "placeholder";
-  export let placeholderColor = "gray";
-  export let height = "36px";
+  export let placeholderColor = "var(--icon-ds-neutral-400)";
+  export let size: "medium" | "small" = "medium";
   export let width = "auto";
   export let disabled = false;
   export let value = "";
-  export let defaultBorderColor = "transparent";
-  export let typingBorderColor = "1px solid var(--border-ds-primary-300)";
-  export let hoveredBorderColor = "1px solid var(--border-ds-neutral-300)";
-  export let focusedBorderColor = "2px solid var(--border-ds-primary-300)";
-  export let typedBorderColor = "";
-  export let defaultBgColor = "var(--bg-ds-surface-400)";
-  export let disabledBgColor = "var(--bg-ds-surface-600)";
   export let isEditIconRequired = true;
-  export let maxlength = 500;
-  export let searchIconColor = "var(--defaultcolor)";
+  export let maxlength = 300;
   export let iconSize = "14px";
   export let id = "";
+  export let isError: boolean = false;
+  export let blankInput: boolean = false;
+  export let variant: "primary" = "primary";
 
   let isHovered = false;
   let isFocused = false;
@@ -33,17 +28,54 @@
   let hasInput = false;
   const dispatch = createEventDispatcher();
 
+  // Define color variants
+  const variants = {
+    primary: {
+      normal: {
+        defaultBorderColor: "transparent",
+        typingBorderColor: "1px solid var(--border-ds-primary-300)",
+        hoveredBorderColor: "1px solid var(--border-ds-neutral-300)",
+        focusedBorderColor: "2px solid var(--border-ds-primary-300)",
+        typedBorderColor: "",
+      },
+      error: {
+        defaultBorderColor: "1px solid var(--border-ds-danger-300)",
+        typingBorderColor: "1px solid var(--border-ds-primary-300)",
+        hoveredBorderColor: "1px solid var(--border-ds-danger-300)",
+        focusedBorderColor: "2px solid var(--border-ds-danger-300)",
+        typedBorderColor: "",
+      },
+      bgColors: {
+        defaultBgColor: "var(--bg-ds-surface-400)",
+        disabledBgColor: "var(--bg-ds-surface-600)",
+      },
+    },
+  };
+
+  // Select colors based on variant and error state
+  let colors = isError ? variants[variant].error : variants[variant].normal;
+  let bgColors = variants[variant].bgColors;
+
   $: hasInput = value.length > 0;
-  $: borderColor = isTyping
-    ? typingBorderColor
-    : isFocused
-      ? focusedBorderColor
-      : isHovered
-        ? hoveredBorderColor
-        : hasInput
-          ? typedBorderColor
-          : defaultBorderColor;
-  $: backgroundColor = disabled ? disabledBgColor : defaultBgColor;
+  $: borderColor = isError
+    ? isFocused
+      ? variants[variant].error.focusedBorderColor
+      : variants[variant].error.defaultBorderColor
+    : blankInput
+      ? "transparent"
+      : isTyping
+        ? colors.typingBorderColor
+        : isFocused
+          ? colors.focusedBorderColor
+          : isHovered
+            ? colors.hoveredBorderColor
+            : hasInput
+              ? colors.typedBorderColor
+              : colors.defaultBorderColor;
+
+  $: backgroundColor = disabled
+    ? bgColors.disabledBgColor
+    : bgColors.defaultBgColor;
 
   const onKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
@@ -55,22 +87,29 @@
   const handleInputChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
     value = target.value;
+    isTyping = true;
+    isError = false;
     dispatch("input", value);
-
-    if (typingBorderColor !== "transparent") {
-      isTyping = true;
-    }
   };
 </script>
 
 <div
-  class="position-relative {componentClass}"
-  style={`height: ${height}; width: ${width}; background-color: ${backgroundColor}; border: ${borderColor}; border-radius:4px`}
+  class="position-relative {componentClass} d-flex justify-content-normal align-items-center"
+  style={`height: ${size === "medium" ? "36px" : "28px"}; width: ${width}; background-color: ${backgroundColor}; border: ${borderColor}; border-radius: 4px; padding:2px 8px;`}
   on:mouseenter={() => (isHovered = true)}
   on:mouseleave={() => {
-    (isHovered = false), (isTyping = false);
+    isHovered = false;
+    isTyping = false;
   }}
 >
+  {#if startIcon}
+    <svelte:component
+      this={startIcon}
+      height={`${iconSize}px`}
+      width={`${iconSize}px`}
+      useParentColor={true}
+    />
+  {/if}
   <input
     {value}
     {id}
@@ -78,13 +117,13 @@
     {placeholder}
     {maxlength}
     {disabled}
-    class="w-100"
-    style="{componentStyle} height: 100%;
-      {type === 'search' ? `padding-left: ${height} !important;` : ''}
-      {type === 'text' && isEditIconRequired && isHovered
+    class="w-100 input-{size}"
+    style="{componentStyle} {type === 'text' && isEditIconRequired && isHovered
       ? 'padding-right:35px !important;'
-      : ''}
-      --placeholder-color: {placeholderColor}; background-color: ${backgroundColor};"
+      : ''} --placeholder-color: {placeholderColor}; background-color: ${backgroundColor}; height:{size ===
+    'medium'
+      ? '20px'
+      : '18px'};"
     on:focus={() => (isFocused = true)}
     on:blur={(event) => {
       isFocused = false;
@@ -93,29 +132,21 @@
     on:input={handleInputChange}
     on:keydown={onKeyPress}
   />
-
-  {#if type === "search"}
-    <span
-      class="position-absolute d-flex align-items-center justify-content-center"
-      style="top: 0; left: 0; bottom: 0; width: {height};"
-    >
-      <span class="SearchIconClass" style="margin-top:1px;">
-        <SearchIcon
-          height={iconSize}
-          width={iconSize}
-          color={searchIconColor}
-        />
-      </span>
-    </span>
-  {/if}
-
   {#if type === "text" && isHovered && isEditIconRequired && !disabled}
     <span
       class="position-absolute"
-      style="top: {height === '36px' ? '4px' : '2px'}; right: 10px;"
+      style="top: {size === 'medium' ? '4px' : '2px'}; right: 10px;"
     >
       <PencilIcon height={iconSize} width={iconSize} color="white" />
     </span>
+  {/if}
+  {#if endIcon}
+    <svelte:component
+      this={endIcon}
+      height={`${iconSize}px`}
+      width={`${iconSize}px`}
+      useParentColor={true}
+    />
   {/if}
 </div>
 
@@ -125,8 +156,17 @@
     border: 1px solid transparent;
     min-width: 240px;
     max-width: 540px;
+    font-family: "Inter", sans-serif;
   }
   input::placeholder {
     color: var(--placeholder-color);
+  }
+  .input-small {
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .input-medium {
+    font-size: 14px;
+    font-weight: 400;
   }
 </style>

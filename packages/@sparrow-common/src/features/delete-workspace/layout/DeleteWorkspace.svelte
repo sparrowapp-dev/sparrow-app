@@ -14,19 +14,6 @@
   let inputName = "";
   let inputNameError = "";
   let loader: boolean = false;
-  $: defaultBorderColor = inputNameError
-    ? "1px solid var(--border-ds-danger-300) !important"
-    : "transparent";
-  $: hoveredBorderColor = inputNameError
-    ? "1px solid var(--border-ds-danger-300) !important"
-    : "1px solid var(--border-ds-neutral-300)";
-
-  $: focusedBorderColor = inputNameError
-    ? "2px solid var(--border-ds-danger-300) !important"
-    : "2px solid var(--border-ds-primary-300)";
-  $: typedBorderColor = inputNameError
-    ? "1px soild var(--border-ds-danger-300) !important"
-    : "1px soild var(----border-ds-primary-300)";
 </script>
 
 <div class="workspace-delete-confirmation">
@@ -47,18 +34,14 @@
     -->
   <Input
     bind:value={inputName}
-    height={"36px"}
+    size="medium"
     id={inputId}
     placeholder={"Workspace name"}
-    class="text-fs-14 bg-tertiary-300 fw-normal px-2 border-radius-4"
     style="outline:none;"
-    {defaultBorderColor}
-    {hoveredBorderColor}
-    {focusedBorderColor}
-    {typedBorderColor}
+    variant="primary"
+    isError={Boolean(inputNameError)}
     isEditIconRequired={false}
     type={"text"}
-    placeholderColor={"var(--text-secondary-200)"}
   />
 
   {#if inputNameError}

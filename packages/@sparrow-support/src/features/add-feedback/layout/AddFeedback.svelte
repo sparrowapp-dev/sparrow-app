@@ -94,11 +94,6 @@
     });
     uploadFeedback.file.value = files;
   };
-  $: defaultBorderColor = "transparent";
-  $: hoveredBorderColor = "transparent";
-
-  $: focusedBorderColor = "transparent";
-  $: typingBorderColor = "transparent";
 </script>
 
 <div class=" w-100">
@@ -208,10 +203,9 @@
             }
           }}
           id="feedback-subject"
-          {defaultBorderColor}
-          {hoveredBorderColor}
-          {focusedBorderColor}
-          {typingBorderColor}
+          variant="primary"
+          blankInput={true}
+          isError={false}
           width={"100%"}
           type="text"
           isEditIconRequired={false}

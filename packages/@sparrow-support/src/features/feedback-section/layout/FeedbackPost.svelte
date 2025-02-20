@@ -651,10 +651,9 @@
           bind:value={feedbackSubject}
           class="text-fs-20 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;"
-          {defaultBorderColor}
-          {hoveredBorderColor}
-          {focusedBorderColor}
-          {typingBorderColor}
+          variant="primary"
+          blankInput={true}
+          isError={false}
           disabled={false}
           placeholder="Subject"
           maxlength={200}
