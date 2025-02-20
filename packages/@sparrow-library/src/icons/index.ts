@@ -133,11 +133,12 @@ export { default as SearchIcon } from "./SearchIcon.svelte";
 export { default as CrossIcon2 } from "./crossIcon.svelte";
 export { default as CommandKey } from "./Key.svelte";
 export { default as PersonIcon } from "./Person.svelte";
-<<<<<<< HEAD
+
 
 export {default as FolderIcon3} from "./FolderIcon.svelte"; 
 export {default as SearchIcon2} from "./SearchIcon2.svelte";
 export {default as PlusIcon2} from "./PlusIcon.svelte";
+
 export {default as AngleDownIcon} from "./AngleDownIcon.svelte";
 export {default as AngleRightIcon2 } from "./AngleRightIcon2.svelte";
 export {default as AddRegular} from "./AddRegularIcon.svelte";
@@ -151,7 +152,7 @@ export {default as StackRegular} from "./StackRegular.svelte";
 export {default as FolderAddRegular } from "./FolderAddRegular.svelte";
 export {default as FolderRegular} from "./FolderRegular.svelte";
 export {default as FolderOpenRegular} from "./FolderOpenRegular.svelte";
-=======
+
 export { default as FolderIcon3 } from "./FolderIcon.svelte";
 export { default as SearchIcon2 } from "./SearchIcon2.svelte";
 export { default as PlusIcon2 } from "./PlusIcon.svelte";
@@ -161,4 +162,3 @@ export { default as patchIcon } from "./Patch.svelte";
 export { default as postIcon } from "./Post.svelte";
 export { default as putIcon } from "./Put.svelte";
 export { default as deleteIcon } from "./Delete.svelte";
->>>>>>> 7727586b61d33854772fb18e543efedb407c236b
