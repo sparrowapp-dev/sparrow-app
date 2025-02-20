@@ -644,12 +644,12 @@
 {#if !collection?.activeSync || activeSyncLoad}
   {#if !collection?.activeSync || isBranchSynced}
     <div
-      class="z-1 position-relative"
+      class="z-1"
       style=" padding-left: 0; padding-right:0;  display: {visibility
         ? 'block'
         : 'none'};"
     >
-      <div class=" ps-0 pos position-relative">
+      <div class=" ps-0 position-relative">
         <div class="box-line"></div>
         <div class="">
           {#each collection.items as explorer}

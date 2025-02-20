@@ -126,7 +126,7 @@
 </script>
 
 <div
-  class={`d-flex flex-column  h-100  bg-secondary-900 pt-0 px-1`}
+  class={`d-flex flex-column    bg-secondary-900 pt-0 px-1`}
   style="font-weight: 500;margin-bottom:2px; "
 >
   <!-- 
