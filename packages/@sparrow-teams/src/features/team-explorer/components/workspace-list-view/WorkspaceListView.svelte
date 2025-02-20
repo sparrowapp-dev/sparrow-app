@@ -10,8 +10,6 @@
   import { Table } from "@sparrow/teams/components";
   import { Rows } from "@sparrow/teams/compopnents";
   import { TeamSkeleton } from "../../images";
-  import { RequestIcon } from "@sparrow/library/icons";
-  import Request from "../../../../../../@sparrow-library/src/icons/Request.svelte";
 
   export let data: any;
   export let openTeam: TeamDocument;
