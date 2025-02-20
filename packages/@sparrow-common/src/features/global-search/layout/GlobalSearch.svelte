@@ -12,6 +12,7 @@
   } from "@sparrow/library/icons";
   import SuggestionTags from "../components/SuggestionTags/SuggestionTags.svelte";
   import RecentItems from "../components/RecentItems/RecentItems.svelte";
+  import { OSDetector } from "@sparrow/common/utils";
 
   export let closeGlobalSearch;
   export let workspaceDocuments;
@@ -28,6 +29,7 @@
   export let handlehideGlobalSearch;
   export let isWebApp = false;
   export let isGuestUser = false;
+  let osKeyName = "Ctrl";
 
   let workspaceDetailsMap: Record<
     string,
@@ -53,6 +55,13 @@
     filteredWorkspaces = workspace;
     filteredTestflows = testflow;
     filteredEnvironments = environment;
+  };
+
+  const decidingKey = () => {
+    const os = new OSDetector();
+    if (os.getOS() == "macos") {
+      osKeyName = "Cmd";
+    }
   };
 
   const suggestions: SearchSuggestion[] = [
@@ -104,6 +113,7 @@
         return acc;
       }, {});
       handleSearch();
+      decidingKey();
     } catch (error) {
       console.error("Error fetching workspace details:", error);
     }
@@ -112,7 +122,7 @@
 
 <div class="search-container">
   {#if !hideGlobalSearch}
-    <SearchBar bind:searchQuery {handleSearch} bind:searchBarRef />
+    <SearchBar bind:searchQuery {handleSearch} bind:searchBarRef {osKeyName} />
     <div class="suggestions-container">
       <SuggestionTags {suggestions} bind:selectedType bind:searchBarRef />
       <RecentItems
@@ -136,6 +146,7 @@
         {handleGlobalSearchTestflowNavgation}
         {isWebApp}
         {isGuestUser}
+        {osKeyName}
       />
     </div>
   {/if}
