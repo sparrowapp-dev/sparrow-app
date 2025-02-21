@@ -164,3 +164,7 @@ export { default as deleteIcon } from "./Delete.svelte";
 export {default as GraphqlIcon} from "./GraphQLIcon.svelte";
 export {default as WebSocketIcon} from "./WebSocketIcon.svelte";
 export {default as SocketIOIcon} from "./SocketIOICon.svelte";
+export {default as WorkspaceRegular} from "./WorkspaceRegular.svelte";
+
+
+

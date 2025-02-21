@@ -369,7 +369,7 @@
     line-height: 150%;
   }
   :global(.team-splitter .splitpanes__splitter) {
-    width: 2px !important;
+    width: 6px !important;
     height: auto !important;
     background-color: var(--bg-secondary-500) !important;
     border-left: 5px solid var(--border-secondary-900) !important;
