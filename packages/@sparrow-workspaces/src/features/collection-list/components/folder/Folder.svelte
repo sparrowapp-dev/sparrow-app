@@ -421,35 +421,20 @@
             }
           }}
         >
-          {#if !expand}
-            <span
-              on:click|stopPropagation={() => {
-                expand = !expand;
-              }}
-              style="  display: flex; "
-            >
-              <Button
-                startIcon={ChevronRightRegular}
-                size="extra-small"
-                customWidth={"24px"}
-                type="teritiary-regular"
-              />
-            </span>
-          {:else}
-            <span
-              on:click|stopPropagation={() => {
-                expand = !expand;
-              }}
-              style="  display: flex;"
-            >
-              <Button
-                startIcon={ChevronDownRegular}
-                size="extra-small"
-                customWidth={"24px"}
-                type="teritiary-regular"
-              />
-            </span>
-          {/if}
+          <span
+            on:click|stopPropagation={() => {
+              expand = !expand;
+            }}
+            style="  display: flex; "
+          >
+            <Button
+              startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
+              size="extra-small"
+              customWidth={"24px"}
+              type="teritiary-regular"
+            />
+          </span>
+
           {#if expand}
             <div
               style="height:24px; width:30px;"

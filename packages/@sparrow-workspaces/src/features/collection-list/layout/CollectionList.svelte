@@ -228,25 +228,17 @@
         class=" d-flex align-items-center"
         style="width: calc(100% - 30px); gap:4px; padding:2px 4px; height:32px; "
       >
-        {#if !isExpandCollection}
-          <span style=" display: flex; ">
-            <Button
-              size="extra-small"
-              type="teritiary-regular"
-              customWidth="24px"
-              startIcon={ChevronRightRegular}
-            />
-          </span>
-        {:else}
-          <span style="   display: flex;  ">
-            <Button
-              size="extra-small"
-              customWidth="24px"
-              type="teritiary-regular"
-              startIcon={ChevronDownRegular}
-            />
-          </span>
-        {/if}
+        <span style=" display: flex; ">
+          <Button
+            size="extra-small"
+            type="teritiary-regular"
+            customWidth="24px"
+            startIcon={!isExpandCollection
+              ? ChevronRightRegular
+              : ChevronDownRegular}
+          />
+        </span>
+
         <span
           style="display: flex; align-items:center; justify-content:center; height:24px; "
         >

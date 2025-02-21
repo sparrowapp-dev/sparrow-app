@@ -478,23 +478,12 @@
       }
     }}
   >
-    {#if !visibility}
-      <Button
-        size="extra-small"
-        customWidth={"24px"}
-        type="teritiary-regular"
-        startIcon={ChevronRightRegular}
-      />
-    {:else}
-      <Button
-        title=""
-        size="extra-small"
-        customWidth={"24px"}
-        type="teritiary-regular"
-        startIcon={ChevronDownRegular}
-        onClick={() => {}}
-      />
-    {/if}
+    <Button
+      size="extra-small"
+      customWidth={"24px"}
+      type="teritiary-regular"
+      startIcon={!visibility ? ChevronRightRegular : ChevronDownRegular}
+    />
     {#if isRenaming}
       <input
         class="py-0 renameInputFieldCollection w-100"

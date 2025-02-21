@@ -142,25 +142,17 @@
       class="d-flex align-items-center"
       style="width: calc(100% - 30px); gap:4px; padding-left:3px;"
     >
-      {#if !isExpandTestflow}
-        <span style=" display: flex; ">
-          <Button
-            size="extra-small"
-            customWidth={"24px"}
-            type="teritiary-regular"
-            startIcon={ChevronRightRegular}
-          />
-        </span>
-      {:else}
-        <span style="   display: flex; ">
-          <Button
-            size="extra-small"
-            customWidth={"24px"}
-            type="teritiary-regular"
-            startIcon={ChevronDownRegular}
-          />
-        </span>
-      {/if}
+      <span style=" display: flex; ">
+        <Button
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+          startIcon={!isExpandTestflow
+            ? ChevronRightRegular
+            : ChevronDownRegular}
+        />
+      </span>
+
       <span
         style=" display: flex;  align-items:center; justify-content:center;"
       >
