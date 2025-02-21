@@ -450,7 +450,7 @@
     color: var(--text-ds-neutral-50);
     padding: 4px 2px;
     outline: none;
-    border-radius: 2px !important;
+    border-radius: 4px !important;
     height: 24px;
     font-size: 12px;
     line-height: 18px;
