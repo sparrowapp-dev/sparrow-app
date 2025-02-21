@@ -154,6 +154,7 @@
     <Button
     title="Send"
       type="primary"
+      customWidth={"96px"}
       onClick={() => {
         if (requestUrl === "") {
           const codeMirrorElement = document.querySelector(
@@ -170,6 +171,7 @@
   {:else}
     <Button
     type="secondary"
+    customWidth={"96px"}
     title="Cancel"
     onClick={() => {
         onCancelButtonClicked();

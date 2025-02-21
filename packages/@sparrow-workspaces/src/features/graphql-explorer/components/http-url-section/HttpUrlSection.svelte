@@ -82,6 +82,7 @@
       title={"Query"}
       type={"primary"}
       size="medium"
+      customWidth={"96px"}
       onClick={() => {
         if (requestUrl === "") {
           const codeMirrorElement = document.querySelector(
@@ -102,6 +103,7 @@
   {:else}
   <Button title="Cancel"
   type="secondary"
+  customWidth={"96px"}
   size="medium"
   onClick={() => {
         onCancelButtonClicked();
@@ -131,4 +133,5 @@
   :global(.url-red-border) {
     border: 1px solid var(--border-danger-200) !important;
   }
+  
 </style>

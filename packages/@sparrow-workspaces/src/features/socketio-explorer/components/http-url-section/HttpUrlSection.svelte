@@ -68,6 +68,7 @@
   <!-- Send button -->
   <Button title={webSocket?.status === "connected" ? "Disconnect" : "Connect"}
   type={"primary"}
+  customWidth={"96px"}
   loader={webSocket?.status === "connecting" ||
       webSocket?.status === "disconnecting"}
     disable={webSocket?.status === "connecting" ||
