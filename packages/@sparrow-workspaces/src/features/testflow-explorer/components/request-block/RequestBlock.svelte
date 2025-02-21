@@ -1,25 +1,16 @@
 <script lang="ts">
   import { Handle, Position, type Node } from "@xyflow/svelte";
   import { ArrowSolid, DropdownArrow, ClockIcon1 } from "../../icons";
-  import PointerRightIcon from "../../icons/PointerRightIcon.svelte";
-  import {
-    ArrowRightIcon,
-    DotIcon,
-    ClockIcon,
-    ExclamationIcon,
-    CheckIcon2,
-    DropIcon,
-  } from "@sparrow/library/icons";
+  import { ArrowRightIcon, DotIcon, DropIcon } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
-  import { InfoIcon, ArrowIcon } from "../../icons";
+  import { ArrowIcon } from "../../icons";
   import {
     SwapArrowIcon,
     SuccessTestIcon,
     ThreeDotIcon,
     FailedTestIcon,
   } from "../../icons";
-  import { VectorIcon } from "@sparrow/library/icons";
   import { InfoIcon2 } from "@sparrow/library/icons";
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
   import type { CollectionDocument } from "@app/database/database";
@@ -197,7 +188,7 @@
     type="target"
     position={Position.Left}
     class="connecting-dot-left"
-    style="border:1px solid var(--border-ds-neutral-500); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
+    style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
   />
   <!-- <div class=" d-flex justify-content-between align-items-center px-3 py-2">
     <span class="text-fs-12 text-fs-10">
@@ -414,7 +405,7 @@
   <Handle
     type="source"
     position={Position.Right}
-    style="border:1px solid var(--border-ds-neutral-500); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
+    style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
   />
   <!-- Circular arrow button by clicking this a new block adds -->
   {#if !isDropHereVisible && isAddBlockVisible}

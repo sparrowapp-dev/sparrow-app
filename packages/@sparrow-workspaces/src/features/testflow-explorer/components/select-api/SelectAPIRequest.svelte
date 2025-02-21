@@ -1,16 +1,17 @@
 <script lang="ts">
   import { getMethodStyle } from "@sparrow/common/utils";
   import type { CollectionDocument } from "@app/database/database";
-  import { CollectionIcon, FolderIcon2 } from "@sparrow/library/icons";
+  import { CollectionIcon, FolderRegular } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
   import { DropdownArrow } from "@sparrow/library/icons";
   import { BackArrowIcon } from "../../icons";
+  import { CollectionStack2 } from "@sparrow/library/icons";
   import {
     currentStep,
     isTestFlowTourGuideOpen,
   } from "../../../../stores/guide.tour";
-  import { Dropdown } from "@sparrow/library/ui";
+  import { Button, Dropdown, Tooltip } from "@sparrow/library/ui";
   export let name;
   export let method;
   export let collections = [];
@@ -145,6 +146,16 @@
       showSampleApi = false;
     }
   }
+  let options = [
+    {
+      name: "collection",
+      icon: CollectionIcon,
+      color: "var(--bg-ds-neutral-300)",
+      onclick: () => {
+        handleSelectApi("SomeData");
+      },
+    },
+  ];
 </script>
 
 <div class="dropdown" bind:this={dropdownRef}>
@@ -193,8 +204,11 @@
   </div> -->
 
   <div
-    class="dropdown-header d-flex justify-content-between align-items-center mx-auto"
+    class="dropdown-header d-flex justify-content-between align-items-center mx-auto {isOpen
+      ? 'active'
+      : ''}"
     on:click={() => (isOpen = !isOpen)}
+    tabindex="0"
   >
     <div
       style="display: flex; align-items: center; padding: 5px 8px; gap: 6px;"
@@ -237,7 +251,7 @@
   >
     {#if selectedCollection}
       <div class="d-flex ellipsis back-header px-1">
-        <div
+        <!-- <div
           style="margin-left: 4px;"
           on:click={() => {
             if (selectedFolder) {
@@ -249,28 +263,47 @@
               ignoreClickOutside = true;
             }
           }}
-        >
-          <BackArrowIcon width="8px" height="8px" />
-        </div>
-        <div class="d-flex" style="margin-left: 4px; align-items:center;">
-          <CollectionIcon
-            height={"10px"}
-            width={"10px"}
-            color={"var(--icon-secondary-100)"}
+        ></div> -->
+        <Tooltip title={"Back"} placement={"top-center"} size="medium">
+          <Button
+            size="extra-small"
+            type="teritiary-regular"
+            startIcon={BackArrowIcon}
+            onClick={() => {
+              if (selectedFolder) {
+                arrayData = selectedCollection.items;
+                selectedFolder = null;
+              } else if (selectedCollection) {
+                arrayData = collections;
+                selectedCollection = null;
+                ignoreClickOutside = true;
+              }
+            }}
           />
-          <p class="ellipsis" style="margin-left: 4px; margin-bottom:0px">
+        </Tooltip>
+        <div
+          class="d-flex"
+          style="margin-left: 4px; align-items:center; margin-right:3px;"
+        >
+          <CollectionStack2 />
+          <p
+            class="ellipsis label-text"
+            style="margin-left: 4px; margin-bottom:0px"
+          >
             {selectedCollection.name}
           </p>
         </div>
         {#if selectedFolder}
           <p style="margin-bottom: 0px;"><span class="ms-1"></span>/</p>
-          <div class="d-flex" style="margin-left: 4px; align-items:center;">
-            <FolderIcon2
-              height={"10px"}
-              width={"10px"}
-              color={"var(--icon-secondary-100)"}
-            />
-            <p class="ellipsis" style="margin-left: 4px; margin-bottom:0px;">
+          <div
+            class="d-flex"
+            style="margin-left: 4px; align-items:center; margin-right:3px;"
+          >
+            <FolderRegular size={"16px"} />
+            <p
+              class="ellipsis label-text"
+              style="margin-left: 4px; margin-bottom:0px;"
+            >
               {selectedFolder.name}
             </p>
           </div>
@@ -282,7 +315,7 @@
         {#each dummyCollection as data}
           {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
             <div
-              class="d-flex align-items-center dropdown-single-option"
+              class="d-flex align-items-center dropdown-single-option px-2 py-1 gap-1"
               on:click|stopPropagation={() => {
                 handleSelectApi(data);
               }}
@@ -300,20 +333,12 @@
                     >
                   </span>
                 {:else if data?.type === "FOLDER"}
-                  <FolderIcon2
-                    height={"10px"}
-                    width={"10px"}
-                    color={"var(--icon-secondary-100)"}
-                  />
+                  <FolderRegular size={"16px"} />
                 {:else}
-                  <CollectionIcon
-                    height={"10px"}
-                    width={"10px"}
-                    color={"var(--icon-secondary-100)"}
-                  />
+                  <CollectionStack2 />
                 {/if}
               </div>
-              <p class="options-txt ellipsis">
+              <p class="options-txt ellipsis label-text">
                 {data.name}
               </p>
             </div>
@@ -326,7 +351,7 @@
         {#each arrayData as data}
           {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
             <div
-              class="d-flex align-items-center dropdown-single-option"
+              class="d-flex align-items-center dropdown-single-option x-2 py-1 gap-1"
               on:click|stopPropagation={() => {
                 handleSelectApi(data);
               }}
@@ -344,20 +369,12 @@
                     >
                   </span>
                 {:else if data?.type === "FOLDER"}
-                  <FolderIcon2
-                    height={"10px"}
-                    width={"10px"}
-                    color={"var(--icon-secondary-100)"}
-                  />
+                  <FolderRegular size={"16px"} />
                 {:else}
-                  <CollectionIcon
-                    height={"10px"}
-                    width={"10px"}
-                    color={"var(--icon-secondary-100)"}
-                  />
+                  <CollectionStack2 />
                 {/if}
               </div>
-              <p class="options-txt ellipsis">
+              <p class="options-txt ellipsis label-text">
                 {data.name}
               </p>
             </div>
@@ -386,6 +403,16 @@
     width: 206px;
     height: 28px;
     cursor: pointer;
+    outline: none;
+  }
+  .dropdown-header:hover {
+    border: 1px solid var(--border-ds-neutral-300);
+  }
+  .dropdown-header.active {
+    border: 1px solid var(--border-ds-primary-300);
+  }
+  .dropdown-header:focus-visible {
+    border: 2px solid var(--border-ds-primary-300);
   }
   .dropdown-header p {
     margin: 0;
@@ -404,17 +431,17 @@
     font-size: 12px;
   }
   .dropdown-options {
-    background-color: var(--bg-ds-surface-400);
+    background-color: var(--bg-ds-surface-600);
     margin-top: 5px;
     width: 206px;
     padding-top: 4px;
     margin: 4px auto auto 0px;
+    gap: 4px;
     padding-bottom: 4px;
     cursor: pointer;
     border-radius: 4px;
   }
   .options-txt {
-    font-size: 10px;
     margin-left: 6px;
   }
   .dropdown-single-option {
@@ -425,8 +452,11 @@
     padding-bottom: 6px;
   }
   .dropdown-single-option:hover {
-    background-color: #353646;
+    background-color: var(--bg-ds-surface-400);
     border-radius: 2px;
+  }
+  .dropdown-single-option:focus-visible {
+    border: 2px solid var(--border-ds-primary-300);
   }
   .dropdown-single-option p {
     margin-bottom: 0px;
@@ -453,6 +483,8 @@
   .back-header {
     width: 100%;
     padding-bottom: 4px;
+    border-bottom: 1px solid var(--bg-ds-surface-200);
+    margin-bottom: 2px;
   }
   .selected-container {
     align-items: center;
@@ -476,5 +508,11 @@
   }
   .selected {
     background-color: blue;
+  }
+  .label-text {
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--text-ds-neutral-50);
   }
 </style>
