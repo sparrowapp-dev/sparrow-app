@@ -3,7 +3,6 @@
   import { onMount } from "svelte";
   import { SparrowLogo } from "@sparrow/common/images";
   import { OSDetector } from "@sparrow/common/utils";
-  import { KeyboardShortcuts } from "@sparrow/library/ui";
 
   export let isMainScreen = false;
   let platformName = "";

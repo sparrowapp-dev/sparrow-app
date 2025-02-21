@@ -1,16 +1,23 @@
 <script lang="ts">
-  import SearchBar from "./sub-components/SearchBar.svelte";
-  import SearchSuggestions from "./sub-components/SearchSuggestions.svelte";
-  import type { SearchSuggestion } from "./sub-components/types/types";
+  import SearchBar from "../components/SearchBar/SearchBar.svelte";
+  import type { SearchSuggestion } from "../types/types";
   import { onMount } from "svelte";
   import {
-    FolderIcon,
-    EnvironmentIcon,
-    CollectionIcon,
-    WorkspaceIcon,
     FlowIcon,
-    RequestIcon,
-  } from "@sparrow/common/images";
+    RequestIcon2,
+    WorkspaceIcongs,
+    FolderIcon4,
+    StackIcon,
+    CollectionIcongs,
+    WorkspaceRegular,
+    StackRegular,
+    LayerRegular,
+    FolderRegular,
+    FlowChartRegular,
+    ArrowSwapRegular,
+  } from "@sparrow/library/icons";
+  import SuggestionTags from "../components/SuggestionTags/SuggestionTags.svelte";
+  import RecentItems from "../components/RecentItems/RecentItems.svelte";
 
   export let closeGlobalSearch;
   export let workspaceDocuments;
@@ -58,37 +65,37 @@
     {
       type: "workspace",
       label: "Workspaces",
-      icon: WorkspaceIcon,
+      icon: WorkspaceRegular,
       show: !isGuestUser,
     },
     {
       type: "collection",
       label: "Collections",
-      icon: CollectionIcon,
+      icon: StackRegular,
       show: true,
     },
     {
       type: "environment",
       label: "Environments",
-      icon: EnvironmentIcon,
+      icon: LayerRegular,
       show: true,
     },
     {
       type: "folder",
       label: "Folders",
-      icon: FolderIcon,
+      icon: FolderRegular,
       show: true,
     },
     {
       type: "flow",
       label: "Flows",
-      icon: FlowIcon,
+      icon: FlowChartRegular,
       show: true,
     },
     {
       type: "request",
       label: "Requests",
-      icon: RequestIcon,
+      icon: ArrowSwapRegular,
       show: true,
     },
   ];
@@ -112,30 +119,31 @@
 <div class="search-container">
   {#if !hideGlobalSearch}
     <SearchBar bind:searchQuery {handleSearch} bind:searchBarRef />
-    <SearchSuggestions
-      bind:searchBarRef
-      {handleSwitchWorkspaceModal}
-      {suggestions}
-      {searchQuery}
-      {filteredCollection}
-      {filteredFolder}
-      {filteredRequest}
-      {filteredWorkspaces}
-      {filteredTestflows}
-      {filteredEnvironments}
-      {closeGlobalSearch}
-      {handlehideGlobalSearch}
-      {checkActiveWorkspace}
-      {handleGlobalSearchRequestNavigation}
-      {handleGlobalSearchCollectionNavigation}
-      {handleGlobalSearchFolderNavigation}
-      {handleGlobalSearchWorkspaceNavigation}
-      {handleGlobalSearchEnvironmentNavigation}
-      {handleGlobalSearchTestflowNavgation}
-      {selectedType}
-      {isWebApp}
-      {isGuestUser}
-    />
+    <div class="suggestions-container">
+      <SuggestionTags {suggestions} bind:selectedType bind:searchBarRef />
+      <RecentItems
+        {handleSwitchWorkspaceModal}
+        {searchQuery}
+        {filteredCollection}
+        {filteredFolder}
+        {filteredRequest}
+        {filteredWorkspaces}
+        {filteredTestflows}
+        {filteredEnvironments}
+        {selectedType}
+        {closeGlobalSearch}
+        {handlehideGlobalSearch}
+        {checkActiveWorkspace}
+        {handleGlobalSearchRequestNavigation}
+        {handleGlobalSearchCollectionNavigation}
+        {handleGlobalSearchFolderNavigation}
+        {handleGlobalSearchWorkspaceNavigation}
+        {handleGlobalSearchEnvironmentNavigation}
+        {handleGlobalSearchTestflowNavgation}
+        {isWebApp}
+        {isGuestUser}
+      />
+    </div>
   {/if}
 </div>
 
@@ -145,12 +153,22 @@
     border: 1px solid var(--bg-ds-surface-100);
     box-shadow: 0px 16px 32px 0px rgba(0, 0, 0, 0.4);
     display: flex;
-    max-width: 630px;
-    width: 630px;
+    max-width: 650px;
+    width: 650px;
     max-height: 540px;
     flex-direction: column;
     overflow: hidden;
     background-color: var(--bg-ds-surface-700);
+  }
+  .suggestions-container {
+    background: var(--bg-ds-surface-700);
+    box-shadow: 0px 16px 32px 0px rgba(0, 0, 0, 0.4);
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    flex: 1;
+    gap: var(--gap-gap-4, 4px);
+    overflow-y: auto;
   }
 
   @media (max-width: 991px) {

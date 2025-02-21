@@ -97,7 +97,7 @@
   <div
     tabindex="-1"
     class="tab-item w-100 d-flex justify-content-between px-2 border-upper-radius h-100 align-items-center"
-    style=" margin-left: -1px;  background-color: {tab.isActive
+    style="   background-color: {tab.isActive
       ? 'var(--bg-secondary-850) !important'
       : 'transparent'};  border-top : {tab.isActive
       ? '2px solid var(--bg-primary-400)'
@@ -254,6 +254,9 @@
   .cross-icon-btn {
     display: none;
   }
+  .tab-item {
+    margin-left: -1px;
+  }
   .tab-item:hover {
     background-color: var(--bg-ds-surface-300) !important;
   }
@@ -262,12 +265,17 @@
   }
   .tab-container {
     background-color: transparent;
+    /* border: 2px solid transparent; */
     border: 0px;
   }
   .tab-container:focus-visible {
     border-radius: 4px;
-    outline: 2px solid var(--bg-ds-primary-300);
+    outline: none;
+    border: 2px solid var(--bg-ds-primary-300);
     background-color: var(--bg-ds-surface-700);
+  }
+  .tab-container:focus-visible .tab-item {
+    margin-left: 0px;
   }
   .border-upper-radius {
     border-top-left-radius: 5px;
@@ -291,7 +299,7 @@
     color: var(--text-ds-neutral-300) !important;
   }
   .individual-tab:hover .request-text {
-    color: var(--text-secondary-100) !important;
+    color: var(--text-ds-neutral-300) !important;
   }
 
   .cross-icon-btn:hover {
