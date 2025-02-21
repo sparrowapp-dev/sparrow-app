@@ -2,7 +2,7 @@
   export let startIcon;
   export let endIcon;
   export let label = "";
-  export let onClose = (id: string) => {};
+
   export let type: "labelLeftIcon" | "labelRightIcon" | "labelLeftRightIcon" =
     "labelLeftIcon";
   export let disabled = false;
@@ -15,9 +15,9 @@
   on:click={(e) => {
     onClick(e);
   }}
-  class="filter {isSelected
-    ? 'selected'
-    : ''} d-inline-flex gap-1 align-items-center justify-content-center"
+  class="filter {isSelected ? 'selected' : ''} {disabled
+    ? 'disabled'
+    : ''}  d-inline-flex gap-1 align-items-center justify-content-center"
 >
   {#if startIcon && type !== "labelRightIcon"}
     <span
@@ -75,5 +75,11 @@
     background-color: var(--bg-ds-surface-400);
     color: var(--text-ds-neutral-50);
     border: 1px solid var(--border-ds-primary-300);
+  }
+  .filter.disabled {
+    background-color: var(--bg-ds-surface-500);
+    color: var(--text-ds-neutral-500);
+    border: none;
+    border-radius: 4px;
   }
 </style>
