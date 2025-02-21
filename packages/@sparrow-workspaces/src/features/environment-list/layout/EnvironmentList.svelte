@@ -3,8 +3,6 @@
     PlusIcon,
     StackIcon,
     StackFilled,
-    AngleRightIcon2,
-    AngleDownIcon,
     ChevronRightRegular,
     ChevronDownRegular,
     AddRegular,

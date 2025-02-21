@@ -137,8 +137,7 @@ export { default as PersonIcon } from "./Person.svelte";
 
 
 
-export {default as AngleDownIcon} from "./AngleDownIcon.svelte";
-export {default as AngleRightIcon2 } from "./AngleRightIcon2.svelte";
+
 export {default as AddRegular} from "./AddRegularIcon.svelte";
 export {default as ChevronRightRegular} from "./ChevronRightRegular.svelte";
 export {default as MoreHorizontalRegular} from "./MoreHorizontalRegular.svelte";

@@ -25,6 +25,7 @@
     StackIcon,
     SocketIoIcon,
     GraphIcon,
+    ChevronDoubleRegular,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
@@ -747,8 +748,10 @@
         {/if}
 
         <!-- {/if} -->
-        <WithButton
-          icon={DoubleArrowIcon}
+        <Button
+          size="extra-small"
+          type="teritiary-regular"
+          startIcon={ChevronDoubleRegular}
           onClick={() => {
             leftPanelController.leftPanelCollapse =
               !leftPanelController.leftPanelCollapse;

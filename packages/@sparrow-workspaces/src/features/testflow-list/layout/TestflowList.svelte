@@ -1,8 +1,6 @@
 <script lang="ts">
   import {
     AddRegular,
-    AngleDownIcon,
-    AngleRightIcon2,
     ChevronDownRegular,
     ChevronRightRegular,
     PlusIcon,

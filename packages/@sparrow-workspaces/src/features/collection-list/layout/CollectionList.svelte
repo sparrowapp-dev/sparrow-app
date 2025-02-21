@@ -22,10 +22,8 @@
   import { onDestroy } from "svelte";
   import {
     AddRegular,
-    AngleDownIcon,
     AngleLeftIcon,
     AngleRightIcon,
-    AngleRightIcon2,
     ChevronDownRegular,
     ChevronRightRegular,
     CollectionIcon,

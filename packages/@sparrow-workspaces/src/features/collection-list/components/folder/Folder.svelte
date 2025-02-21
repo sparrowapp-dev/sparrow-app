@@ -7,8 +7,6 @@
     angleRightV2Icon as angleRight,
   } from "@sparrow/library/assets";
   import {
-    AngleDownIcon,
-    AngleRightIcon2,
     ArrowSwapRegular,
     ChevronDownRegular,
     ChevronRightRegular,

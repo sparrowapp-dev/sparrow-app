@@ -49,8 +49,6 @@
     SocketIcon,
     SocketIoIcon,
     GraphIcon,
-    AngleRightIcon2,
-    AngleDownIcon,
     DismissRegular,
     AddRegular,
     ChevronRightRegular,
