@@ -9,7 +9,7 @@
   import { CodeMirrorInput } from "../../../../components";
   import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
-  import { DiskIcon } from "@sparrow/library/icons";
+  import { SaveRegular } from "@sparrow/library/icons";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
@@ -97,7 +97,7 @@
     <Button
     type="secondary"
     size="medium"
-    startIcon={DiskIcon}
+    startIcon={SaveRegular}
     onClick={handleSaveRequest}
     disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true

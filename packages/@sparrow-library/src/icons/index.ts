@@ -149,4 +149,5 @@ export {default as LayerRegular} from "./LayerRegular.svelte";
 export {default as FolderRegular} from "./FolderRegular.svelte";
 export {default as FlowChartRegular} from "./FlowChartRegular.svelte";
 export {default as ArrowSwapRegular} from "./ArrowSwapRegular.svelte";
-export {default as AddRegular} from "./AddRegular.svelte";
+export { default as AddRegular } from "./AddRegular.svelte";
+export {default as SaveRegular} from "./SaveRegular.svelte";

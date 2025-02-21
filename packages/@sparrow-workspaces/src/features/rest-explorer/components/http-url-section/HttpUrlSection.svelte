@@ -12,7 +12,7 @@
   import { CodeMirrorInput } from "../../../../components";
   import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
-  import { DiskIcon } from "@sparrow/library/icons";
+  import { SaveRegular } from "@sparrow/library/icons";
   // import type { CancelRequestType } from "@workspaces/common/type/actions";
   let componentClass = "";
   export { componentClass as class };
@@ -202,7 +202,7 @@
     <Button
     type="secondary"
     size="medium"
-    startIcon={DiskIcon}
+    startIcon={SaveRegular}
     onClick={handleSaveRequest}
     disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true

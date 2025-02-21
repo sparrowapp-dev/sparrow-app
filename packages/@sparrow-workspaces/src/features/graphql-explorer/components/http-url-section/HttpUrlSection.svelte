@@ -3,7 +3,7 @@
   import { CodeMirrorInput } from "../../../../components";
   import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
-  import { DiskIcon } from "@sparrow/library/icons";
+  import {SaveRegular} from "@sparrow/library/icons";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
@@ -114,7 +114,7 @@
     <Button
     type="secondary"
     size="medium"
-    startIcon={DiskIcon}
+    startIcon={SaveRegular}
     onClick={() => {
         handleSaveRequest();
         MixpanelEvent(Events.Save_GraphQL_Request, {
