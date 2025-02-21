@@ -1,35 +1,41 @@
 <script lang="ts">
   import { PencilIcon } from "@sparrow/library/icons";
   import { createEventDispatcher } from "svelte";
-  let componentClass = "";
+
+  type Variant = "primary";
+  type Size = "medium" | "small";
+  type InputType = "text" | "password";
+
+  let componentClass: string = "";
   export { componentClass as class };
-  let componentStyle = "";
+
+  let componentStyle: string = "";
   export { componentStyle as style };
-  export let type: "text" | "password" = "text";
-  export let startIcon;
-  export let endIcon;
-  export let placeholder = "placeholder";
-  export let placeholderColor = "var(--icon-ds-neutral-400)";
-  export let size: "medium" | "small" = "medium";
-  export let width = "auto";
-  export let disabled = false;
-  export let value = "";
-  export let isEditIconRequired = true;
-  export let maxlength = 300;
-  export let iconSize = "14px";
-  export let id = "";
+
+  export let type: InputType = "text";
+  export let startIcon: any;
+  export let endIcon: any;
+  export let placeholder: string = "placeholder";
+  export let size: Size = "medium";
+  export let width: string = "auto";
+  export let disabled: boolean = false;
+  export let value: string = "";
+  export let isEditIconRequired: boolean = true;
+  export let maxlength: number = 300;
+  export let iconSize: string = "14px";
+  export let id: string = "";
   export let isError: boolean = false;
   export let blankInput: boolean = false;
-  export let variant: "primary" = "primary";
+  export let variant: Variant = "primary";
 
-  let isHovered = false;
-  let isFocused = false;
-  let isTyping = false;
-  let hasInput = false;
-  const dispatch = createEventDispatcher();
+  let isHovered: boolean = false;
+  let isFocused: boolean = false;
+  let isTyping: boolean = false;
+  let hasInput: boolean = false;
 
-  // Define color variants
-  const variants = {
+  const dispatch = createEventDispatcher<{ input: string; blur: string }>();
+
+  const variants: Record<Variant, any> = {
     primary: {
       normal: {
         defaultBorderColor: "transparent",
@@ -49,29 +55,32 @@
         defaultBgColor: "var(--bg-ds-surface-400)",
         disabledBgColor: "var(--bg-ds-surface-600)",
       },
+      placeholder: {
+        color: "var(--icon-ds-neutral-400)",
+      },
     },
   };
 
-  // Select colors based on variant and error state
   let colors = isError ? variants[variant].error : variants[variant].normal;
   let bgColors = variants[variant].bgColors;
 
   $: hasInput = value.length > 0;
-  $: borderColor = isError
-    ? isFocused
+  $: borderColor =
+    isError && isFocused
       ? variants[variant].error.focusedBorderColor
-      : variants[variant].error.defaultBorderColor
-    : blankInput
-      ? "transparent"
-      : isTyping
-        ? colors.typingBorderColor
-        : isFocused
-          ? colors.focusedBorderColor
-          : isHovered
-            ? colors.hoveredBorderColor
-            : hasInput
-              ? colors.typedBorderColor
-              : colors.defaultBorderColor;
+      : isError
+        ? variants[variant].error.defaultBorderColor
+        : blankInput
+          ? "transparent"
+          : isTyping
+            ? colors.typingBorderColor
+            : isFocused
+              ? colors.focusedBorderColor
+              : isHovered
+                ? colors.hoveredBorderColor
+                : hasInput
+                  ? colors.typedBorderColor
+                  : colors.defaultBorderColor || "none";
 
   $: backgroundColor = disabled
     ? bgColors.disabledBgColor
@@ -79,7 +88,7 @@
 
   const onKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
-      const inputField = document.getElementById(id) as HTMLInputElement;
+      const inputField = document.getElementById(id) as HTMLInputElement | null;
       inputField?.blur();
     }
   };
@@ -118,12 +127,13 @@
     {maxlength}
     {disabled}
     class="w-100 input-{size}"
-    style="{componentStyle} {type === 'text' && isEditIconRequired && isHovered
-      ? 'padding-right:35px !important;'
-      : ''} --placeholder-color: {placeholderColor}; background-color: ${backgroundColor}; height:{size ===
-    'medium'
-      ? '20px'
-      : '18px'};"
+    style={` ${componentStyle}; ${
+      type === "text" && isEditIconRequired && isHovered
+        ? "padding-right:35px !important;"
+        : ""
+    } --placeholder-color: ${variants[variant].placeholder.color}; background-color: ${backgroundColor}; height:${
+      size === "medium" ? "20px" : "18px"
+    };`}
     on:focus={() => (isFocused = true)}
     on:blur={(event) => {
       isFocused = false;
@@ -135,7 +145,7 @@
   {#if type === "text" && isHovered && isEditIconRequired && !disabled}
     <span
       class="position-absolute"
-      style="top: {size === 'medium' ? '4px' : '2px'}; right: 10px;"
+      style={`top: ${size === "medium" ? "4px" : "2px"}; right: 10px;`}
     >
       <PencilIcon height={iconSize} width={iconSize} color="white" />
     </span>
