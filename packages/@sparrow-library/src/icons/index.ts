@@ -144,3 +144,11 @@ export { default as putIcon } from "./Put.svelte";
 export { default as deleteIcon } from "./Delete.svelte";
 export { default as DeleteIcon2 } from "./DeleteIcon2.svelte";
 export { default as DragIcon } from "./DragIcon.svelte";
+
+export { default as WorkspaceRegular } from "./WorkspaceRegular.svelte";
+export { default as StackRegular } from "./StackRegular.svelte";
+export { default as LayerRegular } from "./LayerRegular.svelte";
+export { default as FolderRegular } from "./FolderRegular.svelte";
+export { default as FlowChartRegular } from "./FlowChartRegular.svelte";
+export { default as ArrowSwapRegular } from "./ArrowSwapRegular.svelte";
+export { default as AddRegular } from "./AddRegular.svelte";
