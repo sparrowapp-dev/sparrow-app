@@ -245,7 +245,7 @@
         class=" d-flex align-items-center pair-header-row {!isTopHeaderRequired
           ? 'd-none'
           : ''}"
-        style="position:relative; padding-right:1rem; padding-left:32px; border-top-left-radius: 4px; border-top-right-radius: 4px;"
+        style="position:relative; padding-right:1rem; padding-left:4px; border-top-left-radius: 4px; border-top-right-radius: 4px;"
       >
         <div style=" width:24px; margin-right:12px" class="">
           <Checkbox

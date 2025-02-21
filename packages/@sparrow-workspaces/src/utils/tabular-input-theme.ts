@@ -18,7 +18,7 @@ export class TabularInputTheme {
         padding: "4px",
       },
       ".cm-panels": {
-        backgroundColor: "var(-bg-ds-surface-400)",
+        backgroundColor: "var(--bg-ds-surface-400)",
         color: "var(--white-color)",
         zIndex: "1",
       },

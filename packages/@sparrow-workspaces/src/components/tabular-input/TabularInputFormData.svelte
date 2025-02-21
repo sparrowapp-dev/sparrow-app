@@ -262,14 +262,14 @@
   <div class="w-100" style="display:block; position:relative;">
     {#if pairs}
       {#each pairs as element, index}
-        <div class="pair-data-row w-100 d-flex align-items-center">
-          <div class="button-container">
+        <div class="pair-data-row w-100 d-flex align-items-center px-1">
+          <!-- <div class="button-container">
             <Button
               size="extra-small"
               type="teritiary-regular"
               startIcon={DragIcon}
             />
-          </div>
+          </div> -->
           <div style=" width:24px;" class="me-2">
             {#if pairs.length - 1 != index || !isInputBoxEditable}
               <Checkbox
@@ -405,7 +405,7 @@
     padding-bottom: 3px;
     background-color: var(--bg-ds-surface-400);
     height: 28px;
-    padding-left: 30px;
+    padding-left: 4px;
     padding-right: 1rem;
   }
   .pair-data-row:first-child {

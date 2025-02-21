@@ -1,6 +1,5 @@
 <script lang="ts">
   import { inview } from "svelte-inview";
-  import { trashIcon as trashIcon } from "@sparrow/library/assets";
   import { CodeMirrorInput } from "../";
   import { Button, Tooltip } from "@sparrow/library/ui";
   import type {
@@ -44,13 +43,13 @@
   style="padding-right:1rem; padding-left: 4px;"
 >
   {#if isInView}
-    <div class="button-container">
+    <!-- <div class="button-container">
       <Button
         size="extra-small"
         type="teritiary-regular"
         startIcon={DragIcon}
       />
-    </div>
+    </div> -->
     <div style=" width: 24px;" class="me-2">
       {#if pairs.length - 1 != index || !isInputBoxEditable}
         <Checkbox

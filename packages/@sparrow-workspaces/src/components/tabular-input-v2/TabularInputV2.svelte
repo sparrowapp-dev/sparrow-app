@@ -140,7 +140,7 @@
     class="d-flex align-items-center w-100 px-1 header-box"
     style="height: 28px; background-color:var(--bg-ds-surface-400); gap:11px;"
   >
-    <div style="width:24px; margin-left: 28px;">
+    <div style="width:24px; margin-left: 4px;">
       <Checkbox
         disabled={pairs.length === 1 || disabled}
         checked={controller}
@@ -154,7 +154,7 @@
       <p class="mb-0 w-50 header-text p-1">Variable</p>
       <p
         class="mb-0 w-50 header-text"
-        style="padding-left: 28px; padding-right:4px"
+        style="padding-left: 17px; padding-right:4px"
       >
         Value
       </p>
@@ -198,7 +198,7 @@
             .includes(search.toLowerCase()) ||
           element.value.toLowerCase().includes(search.toLowerCase())
             ? ''
-            : 'd-none'} value-pair-rows"
+            : 'd-none'} value-pair-rows px-1"
         >
           <div
             class="d-flex flex-column w-100 align-items-center justify-content-center"
@@ -209,13 +209,13 @@
               style="height: 28px;"
             >
               <div class="d-flex justify-content-center align-items-center">
-                <div class="button-container">
+                <!-- <div class="button-container">
                   <Button
                     size="extra-small"
                     type="teritiary-regular"
                     startIcon={DragIcon}
                   />
-                </div>
+                </div> -->
                 <div style="width:24px;">
                   {#if pairs.length - 1 != index}
                     <Checkbox
@@ -229,7 +229,7 @@
                 </div>
               </div>
 
-              <div class="d-flex gap-4 w-100">
+              <div class="d-flex w-100">
                 <div class="w-50 position-relative">
                   <input
                     type="text"
