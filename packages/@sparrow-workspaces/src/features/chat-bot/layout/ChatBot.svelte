@@ -68,11 +68,19 @@
 {#if $tab?.property?.request?.state?.isChatbotActive}
   <div
     style="position: fixed;
-    top:200px;
+    <!-- top: 200px; -->
+     top: calc(50vh - 267px);
     bottom: 80px;
     right:28px;
     z-index: 200;
     width: 320px;
+    height: 534px;
+    min-width: 320px;
+    max-width: 440px;
+    min-height: 240px;
+    max-height: 640px;
+    padding: 16px 12px 16px 12px;
+    gap:16px;
     "
   >
     <AIChatInterface

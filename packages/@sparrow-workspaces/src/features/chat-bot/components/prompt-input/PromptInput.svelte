@@ -18,6 +18,7 @@
   const handleMouseLeave = () => {
     isSendButtonHovered = false;
   };
+  let isSelected = false;
 </script>
 
 <div class="d-flex prompt-input p-3">
@@ -28,7 +29,7 @@
       on:input={() => {
         onUpdateAiPrompt(prompt);
       }}
-      class="w-100 pe-5 py-2 ps-2 border-radius-6 text-fs-12"
+      class="w-100 pe-5 py-2 ps-2 border-radius-6 text-fs-12 inputClass }"
       autofocus
       style="border:1px solid grey; outline: none; background-color: var(--bg-secondary-1100); border: 1px solid var(--border-tertiary-190); "
       {placeholder}
@@ -56,8 +57,8 @@
         on:mouseleave={handleMouseLeave}
       >
         <SendIcon
-          height={"16px"}
-          width={"16px"}
+          height={"14px"}
+          width={"14px"}
           color={isSendButtonHovered
             ? "var(--icon-primary-300)"
             : "var(--icon-secondary-100)"}
@@ -83,13 +84,13 @@
 
 <style>
   input::placeholder {
-    color: var(--text-secondary-250);
+    color: var(--text-ds-neutral-400);
   }
   input {
     border: 1px solid transparent;
   }
   input:focus {
     outline: none;
-    border: 1px solid var(--border-primary-300) !important;
+    border: 1px solid var(--border-ds-primary-300) !important;
   }
 </style>

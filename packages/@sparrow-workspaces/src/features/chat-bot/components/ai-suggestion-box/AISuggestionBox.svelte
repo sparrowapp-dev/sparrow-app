@@ -26,8 +26,8 @@
     display: flex;
     align-items: center;
     justify-content: end;
-    background-color: var(--bg-primary-700);
-    border: 1px solid var(--border-primary-300);
+    background-color: var(--bg-ds-surface-700);
+    border: 1px solid var(--border-ds-surface-100);
     border-radius: 4px;
     padding: 5px;
     height: 28px;

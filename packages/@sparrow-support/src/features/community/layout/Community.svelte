@@ -67,7 +67,7 @@
           style="margin: 0px; color:var(--text-secondary-50);"
         >
           <span><Ellipse color={"var(--icon-primary-300)"} /> </span><span
-            class="fw-bold">Markdown Support:</span
+            class="fw-bold"> Support:</span
           ><span class="text-fs-14" style="font-weight:400; "
             >Use markdown to format your messages and feedback.</span
           >

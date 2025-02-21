@@ -128,7 +128,7 @@
 
 <style>
   .chat-bot-toggler {
-    height: 42px;
+    height: px;
     width: 42px;
   }
 </style>

@@ -62,7 +62,7 @@
       >
         <div class="p-2">
           <SparrowAIIcon height={"28px"} width={"28px"} />
-          <span class="gradient-text">SparrowAI</span>
+          <span class="gradient-text">Sparrow</span>
         </div>
         <div
           on:click={() =>
@@ -171,8 +171,21 @@
 <style>
   .chat-box {
     background-color: var(--bg-tertiary-750);
-    border: 0.5px solid #5751fd;
-    border-radius: 10px;
+    border: 1px solid
+      var(
+        --border-ds-info-400,
+        var(--border-ds-primary-400, var(--border-ds-secondary-400))
+      );
+    border-radius: 8px;
+    /* position: fixed;
+    height: 590px;
+    min-width: 320px;
+    max-width: 440px;
+    min-height: 240px;
+    max-height: 640px;
+    padding: 16px 12px 16px 12px;
+    gap: 16px;
+    border-radius: 10px; */
   }
 
   .gradient-text {
