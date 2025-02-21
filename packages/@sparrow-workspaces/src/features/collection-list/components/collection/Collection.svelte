@@ -483,6 +483,10 @@
       customWidth={"24px"}
       type="teritiary-regular"
       startIcon={!visibility ? ChevronRightRegular : ChevronDownRegular}
+      onClick={(e) => {
+        stopPropagation(e);
+        visibility = !visibility;
+      }}
     />
     {#if isRenaming}
       <input
