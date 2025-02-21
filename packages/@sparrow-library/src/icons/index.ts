@@ -165,12 +165,6 @@ export {default as GraphqlIcon} from "./GraphQLIcon.svelte";
 export {default as WebSocketIcon} from "./WebSocketIcon.svelte";
 export {default as SocketIOIcon} from "./SocketIOICon.svelte";
 export {default as WorkspaceRegular} from "./WorkspaceRegular.svelte";
-export {default as StackRegular} from "./StackRegular.svelte";
-export {default as LayerRegular} from "./LayerRegular.svelte";
-export {default as FolderRegular} from "./FolderRegular.svelte";
-export {default as FlowChartRegular} from "./FlowChartRegular.svelte";
-export {default as ArrowSwapRegular} from "./ArrowSwapRegular.svelte";
-export { default as AddRegular } from "./AddRegular.svelte";
 export {default as SaveRegular} from "./SaveRegular.svelte";
 
 
