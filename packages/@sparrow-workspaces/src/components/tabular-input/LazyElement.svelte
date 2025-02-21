@@ -40,7 +40,7 @@
 <div
   use:inview={options}
   on:inview_change={handleChange}
-  class="pair-data-row d-flex align-items-center"
+  class="pair-data-row d-flex align-items-center w-100"
   style="padding-right:1rem; padding-left: 4px;"
 >
   {#if isInView}
@@ -51,7 +51,7 @@
         startIcon={DragIcon}
       />
     </div>
-    <div style=" width: 24px;" class="me-3">
+    <div style=" width: 24px;" class="me-2">
       {#if pairs.length - 1 != index || !isInputBoxEditable}
         <Checkbox
           size={"small"}
@@ -131,15 +131,18 @@
   .pair-data-row:first-child {
     border-top: none !important;
     height: 28px !important;
-    width: 641px;
+  }
+  .pair-data-row:last-child {
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
   }
   .pair-data-row {
     padding-top: 3px;
     padding-bottom: 3px;
     height: calc(28px);
-    width: 641px;
     background-color: var(--bg-ds-surface-600);
     border-top: 1px solid var(--bg-ds-surface-400);
+    transition: background-color 1ms ease;
   }
   .pair-data-row:hover {
     background-color: var(--bg-ds-surface-500);

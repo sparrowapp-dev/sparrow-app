@@ -235,19 +235,19 @@
   });
 </script>
 
-<div class="outer-section" style="margin-top:12px ;">
+<div class="outer-section" style="margin-top:12px;">
   {#if !isBulkEditActive}
     <section
-      class="mb-0 me-0 py-0 border-radius-4 section-layout"
-      style="overflow:hidden; width: 641px;"
+      class="mb-0 me-0 py-0 section-layout w-100"
+      style="overflow:hidden;"
     >
       <div
         class=" d-flex align-items-center pair-header-row {!isTopHeaderRequired
           ? 'd-none'
           : ''}"
-        style="position:relative; padding-right:1rem; padding-left:32px;"
+        style="position:relative; padding-right:1rem; padding-left:32px; border-top-left-radius: 4px; border-top-right-radius: 4px;"
       >
-        <div style=" width:24px;" class="me-3">
+        <div style=" width:24px; margin-right:12px" class="">
           <Checkbox
             size="small"
             disabled={pairs.length === 1 || !isCheckBoxEditable}
@@ -265,7 +265,7 @@
           </div>
           <div
             class="w-50 position-relative header-text"
-            style="padding-left: 68px;"
+            style="padding-left: 69px;"
           >
             Value
           </div>
@@ -328,7 +328,7 @@
   {:else}
     <!-- Bulk Edit section Start -->
     <section>
-      <div class="d-flex flex-column" style="font-size:12px;">
+      <div class="d-flex flex-column w-100" style="font-size:12px;">
         <!-- Bulk Edit Heading -->
         <div
           class="px-3 d-flex align-items-center"

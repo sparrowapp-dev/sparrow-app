@@ -208,16 +208,16 @@
 <input type="file" id="fileInput" style="display: none" />
 
 <div
-  class="mb-0 me-0 py-0 section-layout"
-  style="overflow:hidden; border-radius:4px; width:631px;"
+  class="mb-0 me-0 py-0 section-layout w-100"
+  style="overflow:hidden; border-radius:4px;"
 >
   <div
-    class="d-flex align-items-center pair-header-row {!isTopHeaderRequired
+    class="w-100 d-flex align-items-center pair-header-row {!isTopHeaderRequired
       ? 'd-none'
       : ''}"
-    style="position:relative; width:641px;"
+    style="position:relative; "
   >
-    <div style=" width:24px;" class="me-3">
+    <div style=" width:24px; margin-right:12px;" class="">
       <Checkbox
         disabled={pairs.length === 1 || !isCheckBoxEditable}
         checked={controller}
@@ -234,7 +234,7 @@
       </div>
       <div
         class="w-50 position-relative header-text"
-        style="padding-left: 56px;"
+        style="padding-left: 62px;"
       >
         Value
       </div>
@@ -259,7 +259,7 @@
       </div>
     </div>
   </div>
-  <div class="" style="display:block; position:relative; width:641px;">
+  <div class="w-100" style="display:block; position:relative;">
     {#if pairs}
       {#each pairs as element, index}
         <div class="pair-data-row w-100 d-flex align-items-center">
@@ -270,7 +270,7 @@
               startIcon={DragIcon}
             />
           </div>
-          <div style=" width:24px;" class="me-3">
+          <div style=" width:24px;" class="me-2">
             {#if pairs.length - 1 != index || !isInputBoxEditable}
               <Checkbox
                 checked={element.checked}
