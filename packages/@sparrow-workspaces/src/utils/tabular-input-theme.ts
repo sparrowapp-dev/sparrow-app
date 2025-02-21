@@ -66,8 +66,6 @@ export class TabularInputTheme {
       "&.cm-editor": {
         border: "1px solid transparent",
         borderRadius: "4px",
-        transition: "border 0.1s ease-in-out",
-
         "&.cm-focused": {
           border: "1px solid var(--border-ds-primary-300) !important",
           backgroundColor: "var(--bg-ds-surface-400)",
