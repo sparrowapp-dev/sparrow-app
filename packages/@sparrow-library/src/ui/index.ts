@@ -14,11 +14,12 @@ export * from "./table";
 export * from "./toast";
 export * from "./image-modal";
 export * from "./skeleton";
+export * from "./radio-button";
 export * from "./toggle";
 export * from "./tags";
 export * from "./navigator";
 export * from "./badge";
 export * from "./keyboardShortcuts";
 export * from "./breadcrumbs";
-export * from "./avatar"
+export * from "./avatar";
 export * from "./chip";

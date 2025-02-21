@@ -6,7 +6,7 @@
   import { Search } from "@sparrow/library/forms";
   import { Events, WorkspaceRole } from "@sparrow/common/enums";
   import { Dropdown, Button } from "@sparrow/library/ui";
-  import { PlusIcon2 } from "@sparrow/library/icons";
+  import { AddRegular, PlusIcon2 } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
@@ -559,7 +559,7 @@
               type="primary"
               id="addButton"
               size={"small"}
-              startIcon={PlusIcon2}
+              startIcon={AddRegular}
               onClick={() => {
                 addButtonMenu = !addButtonMenu;
               }}

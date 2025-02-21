@@ -111,7 +111,7 @@
   };
 </script>
 
-<div class="pb-2 d-flex">
+<div class="pb-2 d-flex" style="position: relative;">
   <Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
   <div
     class="d-flex flex-column align-items-start justify-content-between w-100"
