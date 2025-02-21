@@ -2,7 +2,7 @@
   import { trashIcon as trashIcon } from "@sparrow/library/assets";
   import {
     AttachmentIcon,
-    DeleteIcon2,
+    DeleteRegular,
     DragIcon,
   } from "@sparrow/library/icons";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
@@ -381,7 +381,7 @@
                       buttonClassProp=""
                       size="extra-small"
                       type="teritiary-regular"
-                      startIcon={DeleteIcon2}
+                      startIcon={DeleteRegular}
                       onClick={() => {
                         deleteParam(index);
                       }}

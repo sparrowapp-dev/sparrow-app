@@ -10,7 +10,7 @@
   import { partition } from "rxjs";
   import { Button, Tooltip } from "@sparrow/library/ui";
   import { Checkbox } from "@sparrow/library/forms";
-  import { DeleteIcon2, DragIcon } from "@sparrow/library/icons";
+  import { DeleteRegular, DragIcon } from "@sparrow/library/icons";
 
   /**
    * tabular pair entries
@@ -268,7 +268,7 @@
                       buttonClassProp=""
                       size="extra-small"
                       type="teritiary-regular"
-                      startIcon={DeleteIcon2}
+                      startIcon={DeleteRegular}
                       onClick={() => {
                         deletePairs(index);
                       }}

@@ -9,7 +9,7 @@
     Options,
   } from "svelte-inview";
   import { Checkbox } from "@sparrow/library/forms";
-  import { DeleteIcon2, DragIcon } from "@sparrow/library/icons";
+  import { DeleteRegular, DragIcon } from "@sparrow/library/icons";
 
   export let element;
   export let index;
@@ -111,7 +111,7 @@
                     buttonClassProp=""
                     size="extra-small"
                     type="teritiary-regular"
-                    startIcon={DeleteIcon2}
+                    startIcon={DeleteRegular}
                     onClick={() => deleteParam(index)}
                   />
                 </div>
