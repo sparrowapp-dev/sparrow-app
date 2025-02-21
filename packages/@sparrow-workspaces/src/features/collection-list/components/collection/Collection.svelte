@@ -541,6 +541,11 @@
   {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
+    <!-- <Tooltip
+      placement="bottom-center"
+      title="More options"
+      styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
+      > -->
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <Tooltip
         title={"Add Options"}
