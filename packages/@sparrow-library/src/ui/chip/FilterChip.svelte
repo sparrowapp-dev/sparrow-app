@@ -46,7 +46,7 @@
 <style lang="scss">
   .filter {
     border-radius: 4px;
-    padding: 2px 8px;
+    padding: 2px 8px 2px 6px;
     gap: 4px;
     background-color: var(--bg-ds-surface-400);
     color: var(--text-ds-neutral-100);

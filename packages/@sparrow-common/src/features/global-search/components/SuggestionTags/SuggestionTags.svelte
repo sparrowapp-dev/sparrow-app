@@ -29,6 +29,7 @@
   {#each suggestions as suggestion}
     {#if suggestion?.show}
       <FilterChip
+        disabled={true}
         type="labelLeftIcon"
         startIcon={suggestion.icon}
         label={suggestion.label}
