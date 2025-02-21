@@ -82,7 +82,6 @@
         contributorsCount={openTeam?.users?.length}
         headerObject={tableHeaderContent}
         onSortToggle={handleSortToggle}
-        {currentSortField}
         {isAscending}
       >
         <tbody class="overflow-y-auto position-relative z-0">

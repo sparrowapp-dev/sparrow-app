@@ -60,5 +60,9 @@ import { Button } from "@sparrow/library/ui";
     color: var(--text-ds-neutral-400);
     background-color: var(--bg-secondary-850);
     z-index: 999 !important;
+    text-align: center;
+  }
+  thead {
+   border-bottom: 0px solid var(--bg-ds-surface-900);
   }
 </style>

@@ -121,7 +121,7 @@
       e.stopPropagation();
       onOpenCollection(list._id);
     }}
-    class="tab-data py-3"
+    class="tab-data py-3 px-4"
   >
     {list?.collections?.length ? list.collections.length : 0}
   </td>
@@ -151,12 +151,12 @@
     </td>
   {/if}
 
-  <td
+  <td 
     on:click={(e) => {
       e.stopPropagation();
       onOpenCollection(list._id);
     }}
-    class="tab-data py-3"
+    class="tab-data py-3 px-4"
   >
     {calculateTimeDifferenceInDays(new Date(), new Date(list?.updatedAt))}
   </td>
@@ -196,6 +196,12 @@
   tr:hover {
     background-color: var(--bg-ds-surface-600);
     cursor: pointer;
+    border-bottom-color: transparent;
+  }
+  tr{
+    border-bottom-style: solid;
+    border-bottom-color:var(--bg-ds-surface-600);
+    border-bottom-width: 1px;
   }
   tr:active {
     background-color: var(--bg-ds-surface-600);
@@ -249,5 +255,8 @@
   }
   .open-desktop-btn:hover {
     background-color: var(--color-primary-dark);
+  }
+  tr{
+    border-radius: 8px;
   }
 </style>
