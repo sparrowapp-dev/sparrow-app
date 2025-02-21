@@ -18,7 +18,7 @@ export class UrlInputTheme {
         "border-radius": "4px",
       },
       ".cm-content::placeholder": {
-        color: "red",
+        color: "var(--background-color)",
       },
       ".cm-panels": {
         backgroundColor: "var(--blackColor)",
