@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { FilterChip } from "@sparrow/library/ui";
   import type { SearchSuggestion } from "../../types/types";
+
   export let suggestions: SearchSuggestion[];
   export let selectedType = "";
   export let searchBarRef;
@@ -26,18 +28,13 @@
 <div class="tags-container">
   {#each suggestions as suggestion}
     {#if suggestion?.show}
-      <button
-        class="suggestion-tag"
-        role="button"
-        class:selected={isSelected(suggestion.label)}
-        tabindex="0"
-        on:click={() => handleTagClick(suggestion.label)}
-      >
-        <div class="tag-icon-wrapper">
-          <svelte:component this={suggestion.icon} color="var(--icon-color)" width="16px" height="16px" />
-        </div>
-        <span class="tag-label">{suggestion.label}</span>
-      </button>
+      <FilterChip
+        type="labelLeftIcon"
+        startIcon={suggestion.icon}
+        label={suggestion.label}
+        isSelected={isSelected(suggestion.label)}
+        onClick={() => handleTagClick(suggestion.label)}
+      />
     {/if}
   {/each}
 </div>
