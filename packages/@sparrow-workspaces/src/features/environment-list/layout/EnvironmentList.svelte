@@ -148,7 +148,7 @@
 </script>
 
 <div
-  class={`d-flex flex-column  h-100  bg-secondary-900   pt-0 px-1`}
+  class={`d-flex flex-column  h-100     pt-0 px-1`}
   style="font-weight: 500;"
 >
   <div
@@ -252,11 +252,11 @@
                 color={"var(--icon-secondary-130)"}
               />
             </span>
-            <span class="box-line"></span>
+            <span class="box-line1"></span>
             <span class="">{globalEnvironment[0]?.name}</span>
           </p>
         </div>
-        <hr class="m-0 ms-2 me-1 mt-1 mb-1" />
+        <hr class="m-0 ms-4 me-1 mt-1 mb-1" />
       {/if}
       {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !filteredLocalEnvironment?.length && !searchData}
         <div class={`pb-2 px-1`}>
@@ -517,5 +517,15 @@
     background-color: var(--bg-ds-surface-100);
     z-index: 10;
     /* height: 100px; */
+  }
+  .box-line1 {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 6.5px;
+    width: 1px;
+    background-color: var(--bg-ds-surface-100);
+    z-index: 10;
+    height: 45px;
   }
 </style>

@@ -268,8 +268,8 @@
   >
     <span class="api-method"
       ><SocketIcon
-        height={"9px"}
-        width={"12px"}
+        height={"12px"}
+        width={"16px"}
         color={"var(--icon-ds-primary-400)"}
       /></span
     >
@@ -349,6 +349,7 @@
     text-align: left;
     display: flex;
     align-items: center;
+    padding: 4px 2px;
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;

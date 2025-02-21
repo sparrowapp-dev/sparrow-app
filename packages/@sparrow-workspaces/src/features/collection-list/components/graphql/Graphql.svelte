@@ -330,16 +330,19 @@
     font-weight: 500;
     width: 30px !important;
     height: 24px;
-    padding-left: 6px;
-    padding-right: 4px;
+
     border-radius: 8px;
     display: flex;
     align-items: center;
+    justify-content: center;
   }
   .api-name {
-    font-weight: 400;
+    font-weight: 500;
     width: calc(100% - 48px);
     text-align: left;
+    font-size: 12px;
+    line-height: 18px;
+    padding: 4px 2px;
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;

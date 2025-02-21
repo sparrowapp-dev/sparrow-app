@@ -136,6 +136,7 @@ export { default as PersonIcon } from "./Person.svelte";
 
 
 
+
 export {default as AngleDownIcon} from "./AngleDownIcon.svelte";
 export {default as AngleRightIcon2 } from "./AngleRightIcon2.svelte";
 export {default as AddRegular} from "./AddRegularIcon.svelte";
@@ -149,6 +150,7 @@ export {default as StackRegular} from "./StackRegular.svelte";
 export {default as FolderAddRegular } from "./FolderAddRegular.svelte";
 export {default as FolderRegular} from "./FolderRegular.svelte";
 export {default as FolderOpenRegular} from "./FolderOpenRegular.svelte";
+export {default as  ChevronDoubleRegular} from "./ChevronDoubleRegular.svelte";
 
 export { default as FolderIcon3 } from "./FolderIcon.svelte";
 export { default as SearchIcon2 } from "./SearchIcon2.svelte";

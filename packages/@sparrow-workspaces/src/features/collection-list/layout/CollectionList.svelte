@@ -193,7 +193,7 @@
 
 <div
   style="height:100%; overflow:hidden"
-  class={`sidebar d-flex flex-column bg-secondary-900 scroll px-1`}
+  class={`sidebar d-flex flex-column  scroll px-1`}
 >
   <div
     class="d-flex justify-content-between align-items-center align-self-stretch px-0 pt-3 d-none"
