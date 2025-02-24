@@ -1,7 +1,11 @@
 <script lang="ts">
   import { getMethodStyle } from "@sparrow/common/utils";
   import type { CollectionDocument } from "@app/database/database";
-  import { CollectionIcon, FolderRegular } from "@sparrow/library/icons";
+  import {
+    CollectionIcon,
+    DropdownUpArrow,
+    FolderRegular,
+  } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
   import { DropdownArrow } from "@sparrow/library/icons";
@@ -156,53 +160,22 @@
       },
     },
   ];
+  const truncateFolderName = (name: string) => {
+    if (name.length > 6) {
+      return name.substring(0, 4) + "...";
+    }
+    return name;
+  };
+  const truncateCollectionName = (name: string) => {
+    if (name.length > 14) {
+      return name.substring(0, 12) + "...";
+    }
+    return name;
+  };
 </script>
 
 <div class="dropdown" bind:this={dropdownRef}>
   <!-- <p>Select API Request</p> -->
-  <!-- <div on:click={() => (isOpen = !isOpen)} class="dropdown-header d-flex">
-    {#if $currentStep >= 6 && $isTestFlowTourGuideOpen}
-      <div class="d-flex selected-container">
-        <p class="method-container">
-          <span class="text-{getMethodStyle('GET')}">
-            <span
-              class={"request-icon"}
-              style="font-size: 9px; font-weight: 600; text-align:center;"
-              >{"GET"}</span
-            >
-          </span>
-        </p>
-        <p style="font-size: 10px;margin-left: 10px;" class="ellipsis">
-          {"Sample API"}
-        </p>
-      </div>
-    {:else if name || method}
-      <div class="d-flex selected-container">
-        <p class="method-container">
-          <span class="text-{getMethodStyle(method)}">
-            <span
-              class={"request-icon"}
-              style="font-size: 9px; font-weight: 500;">{method || ""}</span
-            >
-          </span>
-        </p>
-        <p style="margin-left:10px;" class="ellipsis select-txt">
-          {name}
-        </p>
-      </div>
-    {:else}
-      <div
-        class="d-flex"
-        style="justify-content: space-between; align-items:center"
-      >
-        <p class="select-txt">Select an API Request</p>
-        <div style="margin-right: 10px;">
-          <DropdownArrow />
-        </div>
-      </div>
-    {/if}
-  </div> -->
-
   <div
     class="dropdown-header d-flex justify-content-between align-items-center mx-auto {isOpen
       ? 'active'
@@ -240,7 +213,11 @@
     <div
       style="display: flex; align-items: center; padding-right: 7px; padding-bottom:1px"
     >
-      <DropdownArrow />
+      {#if isOpen}
+        <DropdownUpArrow />
+      {:else}
+        <DropdownArrow />
+      {/if}
     </div>
   </div>
   <div
@@ -251,19 +228,6 @@
   >
     {#if selectedCollection}
       <div class="d-flex ellipsis back-header px-1">
-        <!-- <div
-          style="margin-left: 4px;"
-          on:click={() => {
-            if (selectedFolder) {
-              arrayData = selectedCollection.items;
-              selectedFolder = null;
-            } else if (selectedCollection) {
-              arrayData = collections;
-              selectedCollection = null;
-              ignoreClickOutside = true;
-            }
-          }}
-        ></div> -->
         <Tooltip title={"Back"} placement={"top-center"} size="medium">
           <Button
             size="extra-small"
@@ -283,28 +247,30 @@
         </Tooltip>
         <div
           class="d-flex"
-          style="margin-left: 4px; align-items:center; margin-right:3px;"
+          style="margin-left: 2px; align-items:center; margin-right:2px;"
         >
           <CollectionStack2 />
           <p
             class="ellipsis label-text"
             style="margin-left: 4px; margin-bottom:0px"
           >
-            {selectedCollection.name}
+            {truncateCollectionName(selectedCollection.name)}
           </p>
         </div>
         {#if selectedFolder}
-          <p style="margin-bottom: 0px;"><span class="ms-1"></span>/</p>
+          <p style="margin-bottom: 0px; margin-top:4px;">
+            <span class="ms-1"></span>/
+          </p>
           <div
             class="d-flex"
-            style="margin-left: 4px; align-items:center; margin-right:3px;"
+            style="margin-left: 2px; align-items:center; margin-right:3px;"
           >
             <FolderRegular size={"16px"} />
             <p
               class="ellipsis label-text"
               style="margin-left: 4px; margin-bottom:0px;"
             >
-              {selectedFolder.name}
+              {truncateFolderName(selectedFolder.name)}
             </p>
           </div>
         {/if}
@@ -466,15 +432,6 @@
     overflow-y: auto;
     overflow-x: hidden;
   }
-  /* .method-container {
-    background-color: #22232e;
-    padding-left: 12px;
-    padding-right: 12px;
-    padding-bottom: 3px;
-    margin-left: 8px;
-    border-radius: 3px;
-    margin-top: 0px;
-  } */
   .method-container {
     display: flex;
     justify-content: center;

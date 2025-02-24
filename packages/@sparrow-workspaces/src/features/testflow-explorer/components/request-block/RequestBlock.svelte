@@ -338,18 +338,9 @@
         </span>
       </div>
       <!-- Response time -->
-      <div
-        class="d-flex align-items-center me-2 text-{checkIfRequestSucceed(
-          currentBlock,
-        )
-          ? 'getColor'
-          : 'deleteColor'}"
-        style="gap: 6px;"
-      >
+      <div class="d-flex align-items-center me-2" style="gap: 6px;">
         <div class="d-flex justify-content-center alin-items-center clock-icon">
-          <ClockIcon1
-            fill={checkIfRequestSucceed(currentBlock) ? "#33CC7A" : "#F37472"}
-          />
+          <ClockIcon1 fill={"#B6B7B9"} />
         </div>
         <span class="response-text">
           {parseTime.convertMilliseconds(currentBlock?.response?.time) || ""}
@@ -467,7 +458,7 @@
             class="dummy-dropdown d-flex align-items-center justify-content-between px-2 mb-0 text-fs-10 text-secondary-200"
           >
             <span> Select API Request </span>
-            <span><DropdownArrow height={"8px"} width={"8px"} /></span>
+            <span><DropdownArrow /></span>
           </p>
         </div>
       </div>
@@ -599,6 +590,9 @@
     font-family: "Inter", sans-serif;
     font-weight: 400;
     font-size: 12px;
+    color: var(--text-ds-neutral-200);
+    line-height: 18px;
+    margin-bottom: 2px;
   }
   .response-status-container {
     padding-bottom: 8px;
