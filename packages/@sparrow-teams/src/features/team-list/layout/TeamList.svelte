@@ -26,7 +26,12 @@
   <div
     class="sidebar-teams-header d-flex justify-content-between p-3 px-2 pb-0"
   >
-    <h6 class="teams-heading ms-2 px-1">Teams</h6>
+    <h6
+      class="teams-heading ms-2 px-1"
+      style="font-size: 14px; color:var(--bg-ds-neutral-300); line-height:20.02px; "
+    >
+      Teams
+    </h6>
     <div>
       <Tooltip title="New Team" placement={"bottom-center"} distance={10}>
         <Button

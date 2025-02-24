@@ -197,7 +197,8 @@
         {/if}
         {#if !$leftPanelCollapse}
           <div
-            class="d-flex flex-column sidebar h-100 d-flex flex-column justify-content-between bg-secondary-900"
+            class="d-flex flex-column sidebar h-100 d-flex flex-column justify-content-between"
+            style="background-color: var(--bg-ds-surface-700);"
           >
             <div style="flex:1; overflow:auto;">
               <!--Teams list-->
@@ -371,9 +372,9 @@
   :global(.team-splitter .splitpanes__splitter) {
     width: 6px !important;
     height: auto !important;
-    background-color: var(--bg-secondary-500) !important;
-    border-left: 5px solid var(--border-secondary-900) !important;
-    border-right: 0px solid var(--blackColor) !important;
+    background-color: var(--bg-ds-surface-700) !important;
+    border-left: 5px solid var(--border-ds-surface-700) !important;
+    border-right: 0px solid var(--border-ds-surface-700) !important;
     border-top: 0 !important;
     border-bottom: 0 !important;
   }

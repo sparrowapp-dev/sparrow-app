@@ -153,7 +153,8 @@
 
         {#if !$leftPanelCollapse}
           <div
-            class="d-flex flex-column sidebar h-100 d-flex flex-column justify-content-between bg-secondary-900"
+            class="d-flex flex-column sidebar h-100 d-flex flex-column justify-content-between"
+            style="background-color: var(--bg-ds-surface-700);"
           >
             <div style="flex:1; overflow:auto;">
               <!--Teams list-->
