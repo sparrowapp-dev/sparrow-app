@@ -1,18 +1,12 @@
-<script>
-  export let width = "6";
-  export let height = "10";
+<script lang="ts">
+  export let size = "16px";
   export let fill = "#D8D8D9";
 </script>
 
-<svg
-  {width}
-  {height}
-  viewBox="0 0 6 10"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    d="M1 2C1.55228 2 2 1.55228 2 1C2 0.447715 1.55228 0 1 0C0.447715 0 0 0.447715 0 1C0 1.55228 0.447715 2 1 2ZM1 6C1.55228 6 2 5.55228 2 5C2 4.44772 1.55228 4 1 4C0.447715 4 0 4.44772 0 5C0 5.55228 0.447715 6 1 6ZM2 9C2 9.55229 1.55228 10 1 10C0.447715 10 0 9.55229 0 9C0 8.44771 0.447715 8 1 8C1.55228 8 2 8.44771 2 9ZM5 2C5.55228 2 6 1.55228 6 1C6 0.447715 5.55228 0 5 0C4.44772 0 4 0.447715 4 1C4 1.55228 4.44772 2 5 2ZM6 5C6 5.55228 5.55228 6 5 6C4.44772 6 4 5.55228 4 5C4 4.44772 4.44772 4 5 4C5.55228 4 6 4.44772 6 5ZM5 10C5.55228 10 6 9.55229 6 9C6 8.44771 5.55228 8 5 8C4.44772 8 4 8.44771 4 9C4 9.55229 4.44772 10 5 10Z"
-    {fill}
-  />
-</svg>
+<i
+  class="icon-ic_fluent_re_order_dots_vertical_20_regular"
+  style="font-size:{size}; color:{fill}; display: flex; justify-content:center; align-items:center;"
+></i>
+
+<style>
+</style>
