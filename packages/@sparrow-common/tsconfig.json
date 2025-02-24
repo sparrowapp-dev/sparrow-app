@@ -20,7 +20,6 @@
     "src/**/*.ts",
     "src/**/*.js",
     "src/**/*.svelte",
-    "static/global-search"
-  ],
+    "static/global-search",],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
