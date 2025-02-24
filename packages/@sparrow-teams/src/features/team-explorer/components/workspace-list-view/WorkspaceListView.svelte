@@ -8,7 +8,7 @@
   import type { TeamDocument } from "@app/database/database";
   import { calculateTimeDifferenceInDays } from "../../../../utils/workspacetimeUtils";
   import { Table } from "@sparrow/teams/components";
-  import { Rows } from "@sparrow/teams/compopnents";
+  import { Rows } from "@sparrow/teams/components";
   import { TeamSkeleton } from "../../images";
 
   export let data: any;

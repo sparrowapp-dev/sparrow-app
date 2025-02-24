@@ -58,7 +58,7 @@ import { Button } from "@sparrow/library/ui";
     font-weight: 600;
     line-height: 18px;
     color: var(--text-ds-neutral-400);
-    background-color: var(--bg-secondary-850);
+    background-color: transparent;
     z-index: 999 !important;
     text-align: center;
   }

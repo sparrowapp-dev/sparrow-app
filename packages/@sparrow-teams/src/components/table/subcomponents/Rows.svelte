@@ -35,7 +35,7 @@
     e.preventDefault();
     setTimeout(() => {
       const mouseX = workspaceTabWrapper.getBoundingClientRect().right;
-      const mouseY = workspaceTabWrapper.getBoundingClientRect().top + 52;
+      const mouseY = workspaceTabWrapper.getBoundingClientRect().top + 60;
       pos = { x: mouseX, y: mouseY };
       showMenu = true;
     }, 100);
