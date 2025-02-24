@@ -115,7 +115,7 @@
         >
           <SelectIcon
             {selected}
-            size={buttonSize === "medium" ? "16px" : "12px"}
+            size={buttonSize === "medium" ? "20px" : "16px"}
             {unSelectedColor}
             {selectedColor}
           />
