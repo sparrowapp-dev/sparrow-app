@@ -165,7 +165,9 @@ export {default as GraphqlIcon} from "./GraphQLIcon.svelte";
 export {default as WebSocketIcon} from "./WebSocketIcon.svelte";
 export {default as SocketIOIcon} from "./SocketIOICon.svelte";
 export {default as WorkspaceRegular} from "./WorkspaceRegular.svelte";
-export {default as SaveRegular} from "./SaveRegular.svelte";
+export { default as SaveRegular } from "./SaveRegular.svelte";
+export { default as CaretDownFilled } from "./CaretDownFilled.svelte";
+export { default as CaretDownRegular } from "./CaretDownRegular.svelte";
 
 
 
