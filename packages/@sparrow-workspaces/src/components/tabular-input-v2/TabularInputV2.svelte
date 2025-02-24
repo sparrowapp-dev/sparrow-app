@@ -10,7 +10,7 @@
   import { partition } from "rxjs";
   import { Button, Tooltip } from "@sparrow/library/ui";
   import { Checkbox } from "@sparrow/library/forms";
-  import { DeleteRegular, DragIcon } from "@sparrow/library/icons";
+  import { DeleteRegular, ReOrderDotsRegular } from "@sparrow/library/icons";
 
   /**
    * tabular pair entries
@@ -213,7 +213,7 @@
                   <Button
                     size="extra-small"
                     type="teritiary-regular"
-                    startIcon={DragIcon}
+                    startIcon={ReOrderDotsRegular}
                   />
                 </div> -->
                 <div style="width:24px;">
