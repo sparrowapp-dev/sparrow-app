@@ -13,11 +13,11 @@
   import type { WorkspaceDocument } from "@app/database/database";
   import { PlusIcon } from "@sparrow/library/icons";
   import { navigate } from "svelte-navigator";
-  import PopupHint from "./sub-component/PopupHint.svelte";
   import { WorkspaceRegular } from "@sparrow/library/icons";
   import UserProfileModal, {
     type UserProfileObj,
   } from "./sub-component/UserProfileModal.svelte";
+  import { Tooltip } from "@sparrow/library/ui";
   // import { GlobalSearch } from "../../components/popup/global-search";
   /**
    * environment list
@@ -247,7 +247,7 @@
   class=" titlebar app-header ps-1 d-flex align-items-center justify-content-between"
   on:mousedown={handleMouseDown}
 >
-  <div class="d-flex ms-1 justify-content-cdenter align-items-center no-drag">
+  <div class="d-flex ms-2 justify-content-cdenter align-items-center no-drag">
     {#if isWebApp === false}
       {#if isWindows === false}
         <WindowAction isWindows={false} />
@@ -255,7 +255,7 @@
     {/if}
 
     {#if isGuestUser}
-      <div class="ms-3" style="margin-right:8px">
+      <div class="ms-2" style="margin-right:8px">
         <SparrowEdgeIcon
           height="25px"
           width="24px"
@@ -263,10 +263,10 @@
         />
       </div>
     {:else}
-      <div class="ms-3" style="margin-right:8px">
+      <div class="ms-2" style="margin-right:8px">
         <SparrowIcon
           height="17px"
-          width="17px"
+          width="16px"
           color="var(--primary-btn-color)"
         />
       </div>
@@ -384,24 +384,33 @@
     </div>
   </div>
 
-  <div class="d-flex align-items-center no-drag" style="position: relative;">
+  <div
+    class="d-flex align-items-center no-drag"
+    style="position: relative; display:flex; gap: 16px;"
+  >
     {#if isGuestUser && isLoginBannerActive === false}
-      <PopupHint />
-
-      <div
-        style="background-color:var(--bg-ds-surface-300); justify-content:center; align-items:center; margin-right:10px; margin-left:10px; border-radius:4px; min-width:72px"
-        class="join-container"
-        on:click={onLoginUser}
+      <Tooltip
+        placement="bottom-center"
+        title={"You are using Sparrow Edge"}
+        zIndex={600}
       >
-        <span class="join-txt"> Sign In for Enhanced Experience</span>
-      </div>
+        <div
+          style="background-color:var(--bg-ds-surface-300); justify-content:center; align-items:center; margin-left:10px; border-radius:4px; min-width:72px"
+          class="join-container"
+          on:click={onLoginUser}
+        >
+          <span class="join-txt"> Sign In for Enhanced Experience</span>
+        </div>
+      </Tooltip>
     {/if}
 
-    <SearchBar
-      placeholder="Search Sparrow"
-      bind:searchQuery
-      onClick={handleSearchClick}
-    />
+    <div>
+      <SearchBar
+        placeholder="Search Sparrow"
+        bind:searchQuery
+        onClick={handleSearchClick}
+      />
+    </div>
 
     <!-- Multiple Agent Dropdown -->
     {#if isWebApp}
@@ -510,7 +519,7 @@
       borderType={"none"}
       borderActiveType={"none"}
       headerHighlight={"hover-active"}
-      headerTheme={"primary"}
+      headerTheme={"secondary"}
       menuItem={"v2"}
       headerFontSize={"12px"}
       maxHeaderWidth={"185px"}
@@ -522,7 +531,7 @@
     <!-- {/if} -->
 
     {#if !isGuestUser}
-      <div class="ms-2 me-1">
+      <div class="">
         <UserProfileModal
           {isGuestUser}
           item={sidebarModalItem}

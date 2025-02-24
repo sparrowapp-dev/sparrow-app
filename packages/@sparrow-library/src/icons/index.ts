@@ -168,6 +168,7 @@ export {default as WorkspaceRegular} from "./WorkspaceRegular.svelte";
 export { default as SaveRegular } from "./SaveRegular.svelte";
 export { default as CaretDownFilled } from "./CaretDownFilled.svelte";
 export { default as CaretDownRegular } from "./CaretDownRegular.svelte";
+export { default as SignOutIconRegular} from "./SignOutRegular.svelte"
 
 
 
