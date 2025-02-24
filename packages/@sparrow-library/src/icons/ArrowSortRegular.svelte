@@ -3,11 +3,11 @@
   export let color = "";
   $: finalColor = color === "" ? "inherit" : color;
 </script>
-
+ 
 <i
-  class="icon-ic_fluent_dismiss_20_regular"
+  class="icon-ic_fluent_arrow_sort_20_regular"
   style="font-size:{size}; color:{finalColor}; display: flex; justify-content:center; align-items:center;"
 ></i>
-
+ 
 <style>
 </style>
