@@ -14,6 +14,7 @@
   import { PlusIcon } from "@sparrow/library/icons";
   import { navigate } from "svelte-navigator";
   import PopupHint from "./sub-component/PopupHint.svelte";
+  import { WorkspaceRegular } from "@sparrow/library/icons";
   import UserProfileModal, {
     type UserProfileObj,
   } from "./sub-component/UserProfileModal.svelte";
@@ -254,7 +255,7 @@
     {/if}
 
     {#if isGuestUser}
-      <div>
+      <div class="ms-3" style="margin-right:8px">
         <SparrowEdgeIcon
           height="25px"
           width="24px"
@@ -262,7 +263,7 @@
         />
       </div>
     {:else}
-      <div class="ms-3">
+      <div class="ms-3" style="margin-right:8px">
         <SparrowIcon
           height="17px"
           width="17px"
@@ -270,53 +271,61 @@
         />
       </div>
     {/if}
-    <div class="ms-2 no-drag">
+
+    <!-- <div >
+      <WorkspaceRegular />
+    </div> -->
+    <div class="no-drag" style="margin-left: 8px;">
       {#if isGuestUser}
-        <Select
-          id={"workspace-dropdown"}
-          data={guestData}
-          titleId={`${currentWorkspaceId}`}
-          onclick={() => {}}
-          minHeaderWidth={"212px"}
-          iconRequired={false}
-          isDropIconFilled={true}
-          borderType={"none"}
-          borderActiveType={"none"}
-          headerHighlight={"hover-active"}
-          headerTheme={"primary"}
-          menuItem={"v2"}
-          headerFontSize={"12px"}
-          maxHeaderWidth={"215px"}
-          headerFontWeight={700}
-          zIndex={200}
-          bodyTheme={"violet"}
-          borderRounded={"2px"}
-          position={"absolute"}
-          isHeaderCombined={true}
-          maxBodyHeight={"300px"}
-          placeholderText=" Team / Workspace  "
-        >
-          <div slot="pre-select" class="mb-2 px-1">
-            <div class="guest-user-text">
-              <span
-                >This version has limited features. Get started and unlock the
-                complete package.</span
+        <div style="display: flex;">
+          <Select
+            id={"workspace-dropdown"}
+            data={guestData}
+            titleId={`${currentWorkspaceId}`}
+            onclick={() => {}}
+            minHeaderWidth={"212px"}
+            isDropIconFilled={true}
+            borderType={"none"}
+            borderActiveType={"none"}
+            headerHighlight={"hover-active"}
+            headerTheme={"primary"}
+            menuItem={"v2"}
+            headerFontSize={"12px"}
+            maxHeaderWidth={"215px"}
+            headerFontWeight={700}
+            zIndex={200}
+            bodyTheme={"violet"}
+            borderRounded={"2px"}
+            position={"absolute"}
+            isHeaderCombined={true}
+            maxBodyHeight={"300px"}
+            placeholderText=" Team / Workspace  "
+            iconRequired={true}
+            icon={WorkspaceRegular}
+            iconColor={"var(--icon-ds-neutral-100)"}
+          >
+            <div slot="pre-select" class="mb-2 px-1">
+              <div class="guest-user-text">
+                <span
+                  >This version has limited features. Get started and unlock the
+                  complete package.</span
+                >
+              </div>
+              <div
+                on:click={onLoginUser}
+                class="btn d-flex justify-content-center align-items-center"
+                style="width:100%; height:26px; background-color:var(--bg-primary-300);"
               >
+                <button
+                  class="d-flex justify-content-center align-items-center"
+                  style="width:100%; height:100%; text-decoration:none; outline:none !important; background-color:transparent; border:none; font-size:12px; padding:0px;"
+                >
+                  Create an Account or Sign In
+                </button>
+              </div>
             </div>
-            <div
-              on:click={onLoginUser}
-              class="btn d-flex justify-content-center align-items-center"
-              style="width:100%; height:26px; background-color:var(--bg-primary-300);"
-            >
-              <button
-                class="d-flex justify-content-center align-items-center"
-                style="width:100%; height:100%; text-decoration:none; outline:none !important; background-color:transparent; border:none; font-size:12px; padding:0px;"
-              >
-                Create an Account or Sign In
-              </button>
-            </div>
-          </div>
-        </Select>
+          </Select>
+        </div>
       {:else if currentWorkspaceId}
         <Select
           id={"workspace-dropdown"}
@@ -324,7 +333,6 @@
           titleId={`${currentWorkspaceId}`}
           onclick={handleWorkspaceDropdown}
           minHeaderWidth={"185px"}
-          iconRequired={false}
           isDropIconFilled={true}
           borderType={"none"}
           borderActiveType={"none"}
@@ -339,18 +347,11 @@
           position={"absolute"}
           isHeaderCombined={true}
           maxBodyHeight={"300px"}
+          iconRequired={true}
+          icon={WorkspaceRegular}
+          iconColor={"var(--icon-ds-neutral-100)"}
         >
           <div slot="pre-select" class="pre-dropdown">
-            <div class="create-new-workspace" on:click={onCreateWorkspace}>
-              <span>Create New Workspace</span>
-              <div style="align-content: flex-end;">
-                <PlusIcon
-                  height="16px"
-                  width="16px"
-                  color="var(--icon-primary-300)"
-                />
-              </div>
-            </div>
             <div class="upper-underline"></div>
           </div>
           <div
@@ -367,6 +368,16 @@
             <div class="view-all-workspace" on:click={handleViewWorkspaces}>
               <span>View all Workspaces</span>
             </div>
+            <div class="create-new-workspace" on:click={onCreateWorkspace}>
+              <span>Create New Workspace</span>
+              <div style="align-content: flex-end;">
+                <PlusIcon
+                  height="16px"
+                  width="16px"
+                  color="var(--icon-primary-300)"
+                />
+              </div>
+            </div>
           </div>
         </Select>
       {/if}
@@ -378,7 +389,7 @@
       <PopupHint />
 
       <div
-        style="background-color:#313233; justify-content:center; align-items:center; margin-right:10px; margin-left:10px; border-radius:2px"
+        style="background-color:var(--bg-ds-surface-300); justify-content:center; align-items:center; margin-right:10px; margin-left:10px; border-radius:4px; min-width:72px"
         class="join-container"
         on:click={onLoginUser}
       >
@@ -534,7 +545,7 @@
 <style>
   header {
     height: 44px;
-    background-color: var(--bg-secondary-850);
+    background-color: var(--bg-ds-surface-700);
   }
 
   .description {
@@ -543,13 +554,15 @@
 
   .join-txt {
     font-size: 12px;
-    padding-left: 12px;
-    padding-right: 16px;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
+    font-weight: 500;
+    color: var(--text-ds-neutral-100);
   }
   .join-container {
     cursor: pointer;
@@ -620,11 +633,15 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    color: var(--text-primary-300);
+    color: var(--text-ds-neutral-100);
     cursor: pointer;
     font-size: 12px;
-    font-weight: 400;
+    font-weight: 500;
+    line-height: 18px;
     padding: 10px;
+  }
+  .create-new-workspace:hover {
+    background-color: var(--bg-tertiary-600);
   }
 
   .upper-underline {
