@@ -8,7 +8,7 @@
     Options,
   } from "svelte-inview";
   import { Checkbox } from "@sparrow/library/forms";
-  import { DeleteRegular, DragIcon } from "@sparrow/library/icons";
+  import { DeleteRegular, ReOrderDotsRegular } from "@sparrow/library/icons";
 
   export let element;
   export let index;
@@ -47,7 +47,7 @@
       <Button
         size="extra-small"
         type="teritiary-regular"
-        startIcon={DragIcon}
+        startIcon={ReOrderDotsRegular}
       />
     </div> -->
     <div style=" width: 24px;" class="me-2">

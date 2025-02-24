@@ -157,7 +157,7 @@ export { default as postIcon } from "./Post.svelte";
 export { default as putIcon } from "./Put.svelte";
 export { default as deleteIcon } from "./Delete.svelte";
 export { default as DeleteRegular } from "./DeleteRegular.svelte";
-export { default as DragIcon } from "./DragIcon.svelte";
+export { default as ReOrderDotsRegular } from "./ReOrderDotsRegular.svelte";
 
 export { default as GraphqlIcon } from "./GraphQLIcon.svelte";
 export { default as WebSocketIcon } from "./WebSocketIcon.svelte";

@@ -3,7 +3,7 @@
   import {
     AttachmentIcon,
     DeleteRegular,
-    DragIcon,
+    ReOrderDotsRegular,
   } from "@sparrow/library/icons";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { invoke } from "@tauri-apps/api/core";
@@ -267,7 +267,7 @@
             <Button
               size="extra-small"
               type="teritiary-regular"
-              startIcon={DragIcon}
+              startIcon={ReOrderDotsRegular}
             />
           </div> -->
           <div style=" width:24px;" class="me-2">
