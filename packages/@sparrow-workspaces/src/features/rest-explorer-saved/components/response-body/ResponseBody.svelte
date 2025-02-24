@@ -6,6 +6,7 @@
   } from "@sparrow/common/types/workspace";
   export let response;
   export let apiState;
+  export let onUpdateResponseBody;
 
   let language = apiState.bodyLanguage;
   $: {
@@ -45,9 +46,11 @@
       <Editor
         bind:lang={language}
         bind:value={response}
-        on:change={() => {}}
-        isEditable={false}
-        isFormatted={true}
+        on:change={(e) => {
+          onUpdateResponseBody(e.detail);
+        }}
+        isEditable={true}
+        isFormatted={false}
       />{/if}
   </div>
 </div>

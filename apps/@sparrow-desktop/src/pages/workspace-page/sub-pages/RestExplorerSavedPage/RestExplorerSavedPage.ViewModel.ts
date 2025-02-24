@@ -30,13 +30,10 @@ import { BehaviorSubject, Observable } from "rxjs";
 import {
   Events,
   ItemType,
-  ResponseStatusCode,
   UntrackedItems,
 } from "@sparrow/common/enums";
 import type { CreateDirectoryPostBody } from "@sparrow/common/dto";
 
-// ---- Service
-import { makeHttpRequestV2 } from "@app/containers/api/api.common";
 import {
   insertCollection,
   insertCollectionDirectory,
@@ -84,9 +81,6 @@ import {
   type StatePartial,
   type Conversation,
   MessageTypeEnum,
-  ResponseSectionEnum,
-  RequestDataTypeEnum,
-  ResponseFormatterEnum,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { RequestSavedTabAdapter } from "../../../../adapter/request-saved-tab";
@@ -413,6 +407,20 @@ export class RestExplorerSavedViewModel
 
   /**
    *
+   * @param _body - response body
+   */
+  public updateResponseBody = async (
+    _body: string
+  ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.savedRequest.responseBody = _body;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
+  /**
+   *
    * @param _path - request path
    */
   private updateRequestPath = async (_path: Path) => {
@@ -705,7 +713,7 @@ export class RestExplorerSavedViewModel
   /**
    * @description send request
    */
-  public sendRequest = async (environmentVariables = []) => {
+  public sendRequest = async () => {
     const progressiveTab : Tab = createDeepCopy(this._tab.getValue());
     const initRequestTab = new InitTab().request(UntrackedItems.UNTRACKED + uuidv4(), progressiveTab.path.workspaceId);
     initRequestTab.updateBody(progressiveTab.property.savedRequest?.body);
@@ -716,6 +724,11 @@ export class RestExplorerSavedViewModel
     initRequestTab.updateHeaders(progressiveTab.property.savedRequest?.headers);
     initRequestTab.updateAuth(progressiveTab.property.savedRequest.auth);
     initRequestTab.updateQueryParams(progressiveTab.property.savedRequest?.queryParams);
+    initRequestTab.updateState({
+      requestBodyLanguage: progressiveTab.property.savedRequest?.state?.requestBodyLanguage,
+      requestBodyNavigation: progressiveTab.property.savedRequest?.state?.requestBodyNavigation,
+      requestAuthNavigation: progressiveTab.property.savedRequest?.state?.requestAuthNavigation,    
+    });
     initRequestTab.updateIsSave(false);
     this.tabRepository.createTab(initRequestTab.getValue());
     moveNavigation("right");
@@ -1184,7 +1197,6 @@ export class RestExplorerSavedViewModel
   ) => {
     const componentData = this._tab.getValue();
     let userSource = {};
-    const _id = componentData.id;
     if (path.length > 0) {
       const requestSavedTabAdapter = new RequestSavedTabAdapter();
       const unadaptedRequest = requestSavedTabAdapter.unadapt(componentData);
