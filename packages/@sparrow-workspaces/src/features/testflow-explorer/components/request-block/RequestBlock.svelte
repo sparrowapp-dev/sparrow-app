@@ -1,23 +1,19 @@
 <script lang="ts">
   import { Handle, Position, type Node } from "@xyflow/svelte";
-  import { ArrowSolid, ClockIcon1 } from "../../icons";
+  import { ArrowSolid, ClockRegular } from "../../icons";
   import { ArrowRightIcon, DotIcon, DropIcon } from "@sparrow/library/icons";
   import { ChevronDownRegular } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import { ArrowIcon } from "../../icons";
-  import {
-    SwapArrowIcon,
-    SuccessTestIcon,
-    ThreeDotIcon,
-    FailedTestIcon,
-  } from "../../icons";
+  import { ArrowSwapRegular } from "@sparrow/library/icons";
+  import { CheckmarkCircle, MoreHorizontal, ErrorCircle } from "../../icons";
   import { InfoIcon2 } from "@sparrow/library/icons";
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { testFlowDataStore } from "../../../../features/testflow-explorer/store/testflow";
-  // import { ThreeDotIcon } from "@sparrow/library/assets";
+  // import { MoreHorizontal } from "@sparrow/library/assets";
   import { createDeepCopy } from "@sparrow/common/utils";
   import { ParseTime } from "@sparrow/common/utils";
   import type {
@@ -191,54 +187,6 @@
     class="connecting-dot-left"
     style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
   />
-  <!-- <div class=" d-flex justify-content-between align-items-center px-3 py-2">
-    <span class="text-fs-12 text-fs-10">
-      {#if !currentBlock}
-        <VectorIcon
-          height={"12px"}
-          width={"12px"}
-          color={"var(--icon-primary-300)"}
-        />
-      {:else if checkIfRequestSucceed(currentBlock)}
-        <CheckIcon2 height={"12px"} width={"12px"} color={"#69D696"} />
-      {:else}
-        <ExclamationIcon height={"12px"} width={"12px"} color="#FF7878" />
-      {/if}
-      <span class="ms-2">REST API Request</span>
-    </span>
-
-    <div
-      style="position: relative;"
-      class="ms-2 d-flex justify-content-center align-items-center moreOption-icon rounded"
-      tabindex="0"
-      on:click={() => {
-        moreOptionsMenu = !moreOptionsMenu;
-        event.stopPropagation();
-      }}
-      on:blur={() => {
-        moreOptionsMenu = false;
-      }}
-    >
-      <ThreeDotIcon />
-
-      {#if moreOptionsMenu}
-        <div
-          class="d-flex align-items-center justify-content-center"
-          style="z-index:1000; border-radius:2px; height:29px; width:96px; background-color:#22232E; position:absolute; top:27px; right:-75px;"
-        >
-          <div
-            class="d-flex align-items-center justify-content-start"
-            style="color:#FF4646; background-color: #2E2F3D; height:23px; width:90px; border-radius:2px;"
-            on:click={() => {
-              handleOpenModal();
-            }}
-          >
-            <p class="pb-0 mb-0 ps-1">Delete</p>
-          </div>
-        </div>
-      {/if}
-    </div>
-  </div> -->
   <div
     class="d-flex px-2 align-items-center"
     style="padding-top: 6px; padding-bottom:6px; height:36px; gap:4px"
@@ -249,11 +197,17 @@
     >
       <div class="status-icon">
         {#if !currentBlock}
-          <SwapArrowIcon />
+          <ArrowSwapRegular
+            size={"16px"}
+            color={"var(--icon-ds-neutral-200)"}
+          />
         {:else if checkIfRequestSucceed(currentBlock)}
-          <SuccessTestIcon />
+          <CheckmarkCircle
+            size={"16px"}
+            fillColor={"var(--icon-ds-success-400)"}
+          />
         {:else}
-          <FailedTestIcon />
+          <ErrorCircle size={"16px"} fillColor={"var(--icon-ds-danger-300)"} />
         {/if}
       </div>
       <span class="px-1" style="padding-top: 3px; padding-bottom:3px;">
@@ -272,7 +226,7 @@
         moreOptionsMenu = false;
       }}
     >
-      <ThreeDotIcon />
+      <MoreHorizontal size={"16px"} fillColor={"var(--icon-ds-neutral-100)"} />
 
       {#if moreOptionsMenu}
         <div
@@ -343,7 +297,7 @@
       <!-- Response time -->
       <div class="d-flex align-items-center me-2" style="gap: 6px;">
         <div class="d-flex justify-content-center alin-items-center clock-icon">
-          <ClockIcon1 fill={"var(--icon-ds-neutral-200)"} />
+          <ClockRegular fill={"var(--icon-ds-neutral-200)"} />
         </div>
         <span class="response-text">
           {parseTime.convertMilliseconds(currentBlock?.response?.time) || ""}
@@ -448,11 +402,11 @@
           class="d-flex justify-content-between align-items-center px-3 py-2"
         >
           <span class="text-fs-12 text-fs-10">
-            <SwapArrowIcon />
+            <ArrowSwapRegular />
             <span class="ms-2">REST API Request</span>
           </span>
           <div>
-            <ThreeDotIcon />
+            <MoreHorizontal />
           </div>
         </div>
         <hr class="my-0 base-line" />

@@ -8,8 +8,8 @@
   } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
-  import { DropdownArrow } from "@sparrow/library/icons";
-  import { BackArrowIcon } from "../../icons";
+  import { ChevronDownRegular } from "@sparrow/library/icons";
+  import { ChevronLeftRegular } from "@sparrow/library/icons";
   import { Stack2 } from "@sparrow/library/icons";
   import {
     currentStep,
@@ -214,9 +214,12 @@
       style="display: flex; align-items: center; padding-right: 7px; padding-bottom:1px"
     >
       {#if isOpen}
-        <ChevronUpRegular />
+        <ChevronUpRegular size={"16px"} color={"var(--icon-ds-neutral-100)"} />
       {:else}
-        <DropdownArrow />
+        <ChevronDownRegular
+          size={"16px"}
+          color={"var(--icon-ds-neutral-100)"}
+        />
       {/if}
     </div>
   </div>
@@ -232,7 +235,7 @@
           <Button
             size="extra-small"
             type="teritiary-regular"
-            startIcon={BackArrowIcon}
+            startIcon={ChevronLeftRegular}
             onClick={() => {
               if (selectedFolder) {
                 arrayData = selectedCollection.items;
