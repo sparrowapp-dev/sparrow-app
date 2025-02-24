@@ -209,24 +209,20 @@
               Start with basic test cases to check core functions and build a
               strong testing foundation.
             </p>
-            <span class="  add-testflow d-flex">
-              <Button
-                size={"extra-small"}
-                type="teritiary-regular"
-                customWidth={"24px"}
-                startIcon={AddRegular}
-                disabled={loggedUserRoleInWorkspace ===
-                  WorkspaceRole.WORKSPACE_VIEWER}
-                onClick={async () => {
-                  await onCreateTestflow();
-                  MixpanelEvent(Events.Add_New_Flow);
-                }}
-              />
-              <span
-                style="color: var(--text-secondary-200)"
-                class="ps-2 fw-bold text-fs-12">Add {TFDefaultEnum.NAME}</span
-              >
-            </span>
+
+            <Button
+              title={`Add ${TFDefaultEnum.NAME}`}
+              size={"small"}
+              type="outline-secondary"
+              customWidth={"100%"}
+              startIcon={AddRegular}
+              disabled={loggedUserRoleInWorkspace ===
+                WorkspaceRole.WORKSPACE_VIEWER}
+              onClick={async () => {
+                await onCreateTestflow();
+                MixpanelEvent(Events.Add_New_Flow);
+              }}
+            />
           </div>
         {/if}
       {/if}
