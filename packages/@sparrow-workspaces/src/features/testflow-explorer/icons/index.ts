@@ -8,4 +8,3 @@ export { default as ThreeDotIcon } from "./ThreeDotIcon.svelte";
 export { default as FailedTestIcon } from "./FailedTestIcon.svelte";
 export { default as SuccessTestIcon } from "./SuccessTestIcon.svelte";
 export { default as ClockIcon1 } from "./ClockIcon1.svelte";
-export { default as PointerRightIcon } from "./PointerRightIcon.svelte";

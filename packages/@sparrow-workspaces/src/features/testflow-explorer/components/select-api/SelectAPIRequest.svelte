@@ -3,14 +3,14 @@
   import type { CollectionDocument } from "@app/database/database";
   import {
     CollectionIcon,
-    DropdownUpArrow,
+    ChevronUpRegular,
     FolderRegular,
   } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
   import { DropdownArrow } from "@sparrow/library/icons";
   import { BackArrowIcon } from "../../icons";
-  import { CollectionStack2 } from "@sparrow/library/icons";
+  import { Stack2 } from "@sparrow/library/icons";
   import {
     currentStep,
     isTestFlowTourGuideOpen,
@@ -214,7 +214,7 @@
       style="display: flex; align-items: center; padding-right: 7px; padding-bottom:1px"
     >
       {#if isOpen}
-        <DropdownUpArrow />
+        <ChevronUpRegular />
       {:else}
         <DropdownArrow />
       {/if}
@@ -249,7 +249,7 @@
           class="d-flex"
           style="margin-left: 2px; align-items:center; margin-right:2px;"
         >
-          <CollectionStack2 />
+          <Stack2 />
           <p
             class="ellipsis label-text"
             style="margin-left: 4px; margin-bottom:0px"
@@ -301,7 +301,7 @@
                 {:else if data?.type === "FOLDER"}
                   <FolderRegular size={"16px"} />
                 {:else}
-                  <CollectionStack2 />
+                  <Stack2 />
                 {/if}
               </div>
               <p class="options-txt ellipsis label-text">
@@ -337,7 +337,7 @@
                 {:else if data?.type === "FOLDER"}
                   <FolderRegular size={"16px"} />
                 {:else}
-                  <CollectionStack2 />
+                  <Stack2 />
                 {/if}
               </div>
               <p class="options-txt ellipsis label-text">

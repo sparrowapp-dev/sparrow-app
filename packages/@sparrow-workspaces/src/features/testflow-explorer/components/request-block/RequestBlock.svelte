@@ -1,7 +1,8 @@
 <script lang="ts">
   import { Handle, Position, type Node } from "@xyflow/svelte";
-  import { ArrowSolid, DropdownArrow, ClockIcon1 } from "../../icons";
+  import { ArrowSolid, ClockIcon1 } from "../../icons";
   import { ArrowRightIcon, DotIcon, DropIcon } from "@sparrow/library/icons";
+  import { ChevronDownRegular } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import { ArrowIcon } from "../../icons";
@@ -460,7 +461,12 @@
             class="dummy-dropdown d-flex align-items-center justify-content-between px-2 mb-0 text-fs-10 text-secondary-200"
           >
             <span> Select API Request </span>
-            <span><DropdownArrow /></span>
+            <span
+              ><ChevronDownRegular
+                size={"16px"}
+                color={"var(--icon-ds-neutral-100)"}
+              /></span
+            >
           </p>
         </div>
       </div>
