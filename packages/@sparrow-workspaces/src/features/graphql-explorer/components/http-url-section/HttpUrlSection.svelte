@@ -115,12 +115,14 @@
     type="secondary"
     size="medium"
     startIcon={SaveRegular}
+    disable={isSave || !isGraphqlEditable ? true : false}
     onClick={() => {
         handleSaveRequest();
         MixpanelEvent(Events.Save_GraphQL_Request, {
           description: "Save GraphQL Request",
         });
-      }}/>
+      }}
+    />
   </Tooltip>
 </div>
 <svelte:window on:keydown={handleKeyPress} />

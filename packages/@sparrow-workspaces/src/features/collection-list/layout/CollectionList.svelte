@@ -291,7 +291,9 @@
       <div
         class="overflow-auto position-relative d-flex flex-column ms-2 me-0 pt-1 mb-2"
       >
-        <div class="box-line"></div>
+        {#if searchData.length !== 0}
+          <div class="box-line"></div>
+        {/if}
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
             {#if collectionFilter.length > 0}
