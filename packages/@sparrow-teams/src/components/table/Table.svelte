@@ -52,7 +52,7 @@ import { Button } from "@sparrow/library/ui";
 </table>
 
 <style>
-  .tab-head {
+   .tab-head {
     padding: 8px;
     font-size: 12px;
     font-weight: 600;

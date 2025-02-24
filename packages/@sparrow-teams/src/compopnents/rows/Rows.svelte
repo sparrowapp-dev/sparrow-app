@@ -142,9 +142,9 @@
         e.stopPropagation();
         onOpenCollection(list._id);
       }}
-      class="tab-data py-2"
+      class="tab-data py-2 "
     >
-      <div class="d-flex">
+      <div class="d-flex px-3">
         <UserProfileList
           width={24}
           height={25}
@@ -249,6 +249,7 @@
     font-weight: 500;
     line-height: 18px;
     vertical-align: middle;
+    padding-top: 10px;
   }
   .open-desktop-btn {
     /* position: absolute; */
