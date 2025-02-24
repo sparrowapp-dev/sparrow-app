@@ -1,9 +1,13 @@
 <script>
-  import { Button, List, Tooltip } from "@sparrow/library/ui";
+  import { Button, ButtonV2, List, Tooltip } from "@sparrow/library/ui";
   import { PeopleIcon, PlusIcon } from "@sparrow/library/assets";
   import { base64ToURL } from "@sparrow/common/utils";
   import { Avatar } from "@sparrow/library/ui";
-  import { PeopleFilled, PeopleRegular } from "@sparrow/library/icons";
+  import {
+    AddRegular,
+    PeopleFilled,
+    PeopleRegular,
+  } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   export let isCreateTeamModalOpen;
   export let isGuestUser;
@@ -25,15 +29,15 @@
     <h6 class="teams-heading ms-2 px-1">Teams</h6>
     <div>
       <Tooltip title="New Team" placement={"bottom-center"} distance={10}>
-        <button
-          class="new-team-btn d-flex align-items-center justify-content-center p-0 rounded border-0"
-          on:click={() => {
+        <Button
+          type="primary"
+          size="small"
+          startIcon={AddRegular}
+          disabled={isGuestUser}
+          onClick={() => {
             isCreateTeamModalOpen = true;
           }}
-          disabled={isGuestUser}
-        >
-          <PlusIcon height={"14px"} width={"14px"} />
-        </button>
+        />
       </Tooltip>
     </div>
   </div>
