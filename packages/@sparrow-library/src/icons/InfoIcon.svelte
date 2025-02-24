@@ -1,20 +1,13 @@
 <script lang="ts">
-  export let width: number = 14;
-  export let height: number = 14;
+  export let size = "16px";
   export let classProp: string = "";
   export let fillColor: string = "#82858A";
 </script>
 
-<svg
-  {width}
-  {height}
-  viewBox="0 0 14 14"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
-  class={classProp}
->
-  <path
-    d="M7.49902 6.49998C7.49902 6.22384 7.27517 5.99998 6.99902 5.99998C6.72288 5.99998 6.49902 6.22384 6.49902 6.49998V9.49998C6.49902 9.77612 6.72288 9.99998 6.99902 9.99998C7.27517 9.99998 7.49902 9.77612 7.49902 9.49998V6.49998ZM7.74807 4.50001C7.74807 4.91369 7.41271 5.24905 6.99903 5.24905C6.58535 5.24905 6.25 4.91369 6.25 4.50001C6.25 4.08633 6.58535 3.75098 6.99903 3.75098C7.41271 3.75098 7.74807 4.08633 7.74807 4.50001ZM7 0C3.13401 0 0 3.13401 0 7C0 10.866 3.13401 14 7 14C10.866 14 14 10.866 14 7C14 3.13401 10.866 0 7 0ZM1 7C1 3.68629 3.68629 1 7 1C10.3137 1 13 3.68629 13 7C13 10.3137 10.3137 13 7 13C3.68629 13 1 10.3137 1 7Z"
-    fill={fillColor}
-  />
-</svg>
+<i
+  class="icon-ic_fluent_info_20_regular {classProp}"
+  style="font-size:{size}; color:{fillColor}; display: flex; justify-content:center; align-items:center;"
+></i>
+
+<style>
+</style>

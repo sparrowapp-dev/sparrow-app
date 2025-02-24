@@ -1,18 +1,12 @@
-<script>
-  export let height = 5;
-  export let width = 4.5;
+<script lang="ts">
+  export let size = "20px";
   export let color = "#ffffff";
 </script>
 
-<svg
-  {width}
-  {height}
-  viewBox="0 0 16 16"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    d="M9.35355 4.14645C9.54882 4.34171 9.54882 4.65829 9.35355 4.85355L6.20711 8L9.35355 11.1464C9.54882 11.3417 9.54882 11.6583 9.35355 11.8536C9.15829 12.0488 8.84171 12.0488 8.64645 11.8536L5.14645 8.35355C4.95118 8.15829 4.95118 7.84171 5.14645 7.64645L8.64645 4.14645C8.84171 3.95118 9.15829 3.95118 9.35355 4.14645Z"
-    fill={color}
-  />
-</svg>
+<i
+  class="icon-ic_fluent_chevron_left_20_filled"
+  style="font-size:{size}; color:{color}; display: flex; justify-content:center; align-items:center;"
+></i>
+
+<style>
+</style>

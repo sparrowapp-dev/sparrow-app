@@ -246,7 +246,7 @@
       class="text-fs-12 text-fs-10 d-flex col align-items-center"
       style="gap: 4px;"
     >
-      <div class="px-1 py-1">
+      <div class="status-icon">
         {#if !currentBlock}
           <SwapArrowIcon />
         {:else if checkIfRequestSucceed(currentBlock)}
@@ -328,7 +328,9 @@
       >
         <div class="d-flex justify-content-center alin-items-center">
           <DotIcon
-            color={checkIfRequestSucceed(currentBlock) ? "#33CC7A" : "#F37472"}
+            color={checkIfRequestSucceed(currentBlock)
+              ? "var(--text-ds-success-400)"
+              : "var(--text-ds-danger-300)"}
             height={"6px"}
             width={"6px"}
           />
@@ -340,7 +342,7 @@
       <!-- Response time -->
       <div class="d-flex align-items-center me-2" style="gap: 6px;">
         <div class="d-flex justify-content-center alin-items-center clock-icon">
-          <ClockIcon1 fill={"#B6B7B9"} />
+          <ClockIcon1 fill={"var(--icon-ds-neutral-200)"} />
         </div>
         <span class="response-text">
           {parseTime.convertMilliseconds(currentBlock?.response?.time) || ""}
@@ -600,5 +602,11 @@
   }
   .clock-icon {
     margin-bottom: 2px;
+  }
+  .status-icon {
+    padding-top: 2px;
+    padding-bottom: 1px;
+    padding-left: 4px;
+    padding-right: 2px;
   }
 </style>
