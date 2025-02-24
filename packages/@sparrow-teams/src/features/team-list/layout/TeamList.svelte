@@ -1,8 +1,10 @@
 <script>
-  import { List, Tooltip } from "@sparrow/library/ui";
+  import { Button, List, Tooltip } from "@sparrow/library/ui";
   import { PeopleIcon, PlusIcon } from "@sparrow/library/assets";
   import { base64ToURL } from "@sparrow/common/utils";
   import { Avatar } from "@sparrow/library/ui";
+  import { PeopleFilled, PeopleRegular } from "@sparrow/library/icons";
+  import { onMount } from "svelte";
   export let isCreateTeamModalOpen;
   export let isGuestUser;
   export let setOpenTeam;
@@ -10,6 +12,9 @@
   export let disableNewInviteTag;
   export let modifyTeam;
   export let activeIndex;
+  onMount(() => {
+    console.log(teamList);
+  });
 </script>
 
 <!--Teams list-->
@@ -36,11 +41,13 @@
     <List height={"100%"} overflowY={"auto"} classProps={"px-2 py-1"}>
       {#each teamList.slice().reverse() as team, index}
         <button
-          class={`d-flex w-100 mb-1 
+          class={`sidebar-items d-flex w-100 mb-1 
         px-3 align-items-center justify-content-between rounded teams-outer border-0 ${
           team.teamId === activeIndex ? "active" : ""
         }`}
-          style={!isGuestUser ? "" : "pointer-events: none;"}
+          style={!isGuestUser
+            ? "gap:4px; padding:4px; padding-left:8px;"
+            : "pointer-events: none; gap:4px; padding:4px; padding-left:8px; "}
           on:click={async () => {
             await setOpenTeam(team.teamId);
             activeIndex = team.teamId;
@@ -53,22 +60,22 @@
             }
           }}
         >
-          <div class=" d-flex w-100 overflow-hidden">
+          <div class=" d-flex w-100 overflow-hidden" style="gap: 4px;">
             {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
-              <div class="me-2">
-                  <Avatar
-                      type={"letter"}
-                      size={"small"}
-                      letter={team.name[0]}
-                      bgColor={"var(--bg-tertiary-700)"}
-                  />
+              <div class="" style="height: 24px; width:24px;">
+                <Avatar
+                  type={"letter"}
+                  size={"small"}
+                  letter={team.name[0]}
+                  bgColor={"purple"}
+                />
               </div>
             {:else}
               <img src={base64ToURL(team.logo)} alt="" />
             {/if}
             <p
-              style="font-weight: 700;"
-              class="ellipsis ms-1 sparrow-fs-12 text-left teams-title overflow-hidden my-auto"
+              style="font-weight: 500; padding:4px 2px; font-size:12px; line-height:18px; "
+              class="ellipsis sparrow-fs-12 text-left teams-title overflow-hidden my-auto"
             >
               {team.name || ""}
             </p>
@@ -78,11 +85,13 @@
               NEW INVITE
             </p>
           {:else}
-            <PeopleIcon
-              color={team.teamId === activeIndex
-                ? "var(--sparrow-text-color)"
-                : "var(--defaultcolor)"}
-              classProp={team.users?.length <= 1 && "d-none"}
+            <Button
+              size="extra-small"
+              customWidth="24px"
+              type="teritiary-regular"
+              startIcon={team.teamId !== activeIndex
+                ? PeopleRegular
+                : PeopleFilled}
             />
           {/if}
         </button>
@@ -100,6 +109,7 @@
   .sidebar-teams-list::-webkit-scrollbar-button {
     color: var(--bg-secondary-330);
   }
+
   .teams-heading {
     margin-left: 5px;
     font-size: 14px;
@@ -111,23 +121,43 @@
     background-color: transparent;
   }
   .teams-outer.active {
-    background-color: var(--text-tertiary-750);
+    background-color: var(--bg-ds-surface-500);
+    border-radius: 4px;
+  }
+  .sidebar-items {
+    gap: 4px;
   }
   .new-team-btn {
     height: 20px;
     width: 20px;
     background-color: transparent;
+    border: none;
   }
   .new-team-btn:hover {
-    background-color: var(--border-color);
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+  }
+  .new-team-btn:active {
+    background-color: var(--bg-ds-surface-500);
+    border-radius: 4px;
+  }
+  .new-team-btn.active {
+    background-color: var(--bg-ds-surface-500);
+    border-radius: 4px;
+  }
+  .teams-outer:focus-visible {
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+    outline: 2px solid var(--bg-ds-primary-300);
   }
   .teams-outer:hover {
     background-color: var(--bg-tertiary-750);
   }
 
   .teams-outer:active {
-    background-color: var(--bg-secondary-320);
+    background-color: var(--bg-ds-surface-500);
   }
+
   .teams-outer img {
     width: 25px;
     height: 25px;

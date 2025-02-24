@@ -166,6 +166,6 @@ export {default as WebSocketIcon} from "./WebSocketIcon.svelte";
 export {default as SocketIOIcon} from "./SocketIOICon.svelte";
 export {default as WorkspaceRegular} from "./WorkspaceRegular.svelte";
 export {default as SaveRegular} from "./SaveRegular.svelte";
-
-
+export {default as PeopleRegular} from "./CommunityRegular.svelte";
+export {default as PeopleFilled} from "./CommunityFilled.svelte";
 
