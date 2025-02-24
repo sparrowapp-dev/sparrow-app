@@ -1,0 +1,107 @@
+services:
+  # MongoDB
+  mongo:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env.docker-setup
+    networks:
+      - localnet
+
+  # Kafka
+  kafka:
+    image: bitnami/kafka:3.4.1
+    hostname: kafka
+    ports:
+      - "9092:9092" # Broker listener
+      - "9093:9093" # Controller listener
+      - "9094:9094" # External listener
+    volumes:
+      - "kafka_data:/bitnami"
+    env_file:
+      - .env.docker-setup
+    networks:
+      - localnet
+
+  # Sparrow Api Server
+  sparrow-api:
+    image: sparrowapi/sparrow-api:v1
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+      - "9002:9002"
+    volumes:
+      - ./:/src
+    networks:
+      - localnet
+    depends_on:
+      - mongo
+      - kafka
+    env_file:
+      - .env.docker-setup
+
+  # Sparrow Auth Server
+  sparrow-auth:
+    image: sparrowapi/sparrow-auth:v1
+    ports:
+      - "1421:80"
+    volumes:
+      - ./:/src
+    networks:
+      - localnet
+    depends_on:
+      - sparrow-api
+      - mongo
+      - kafka
+    env_file:
+      - .env.docker-setup
+
+  # Sparrow Proxy Service
+  sparrow-proxy:
+    image: sparrowapi/sparrow-proxy-service:v1
+    platform: linux/amd64
+    ports:
+      - "3000:3000"
+    networks:
+      - localnet
+
+  # Sparrow Web App
+  sparrow-web:
+    build:
+      context: .
+      dockerfile: Sparrow-Web.Dockerfile
+      args:
+        VITE_WEB_API_TIMEOUT: 5000
+        VITE_WEB_API_URL: http://localhost:9000
+        VITE_WEB_AUTH_URL: http://localhost:1421
+        VITE_WEB_SOCKET_IO_API_URL: http://localhost:9001
+        VITE_WEB_SPARROW_OAUTH: http://localhost:9000/api/auth/google/callback
+        VITE_WEB_TERMS_OF_SERVICE: https://example.dev/termsandconditions
+        VITE_WEB_BASE_URL: http://localhost:9000
+        VITE_WEB_SPARROW_GITHUB: https://github.com/sparrowapp-dev
+        VITE_WEB_SPARROW_LINKEDIN: https://www.linkedin.com/showcase/sparrow-app/
+        VITE_WEB_SPARROW_DOWNLOAD_LINK: https://github.com/sparrowapp-dev/sparrow-app/releases
+        VITE_WEB_RELEASE_NOTES_API: https://api.github.com/repos/sparrowapp-dev/sparrow-app/releases
+        VITE_WEB_SPARROW_DOCS: https://docs.sparrowapp.dev/docs/intro
+        VITE_WEB_PROXY_SERVICE: http://localhost:3000
+        VITE_WEB_ENABLE_MIX_PANEL: false
+        VITE_WEB_MIX_PANEL_TOKEN: 
+    ports:
+      - "1422:80"
+    networks:
+      - localnet
+    depends_on:
+      - sparrow-proxy
+      - sparrow-api
+      - sparrow-auth
+      - mongo
+      - kafka
+
+volumes:
+  kafka_data:
+    driver: local
+
+networks:
+  localnet:
+    driver: bridge

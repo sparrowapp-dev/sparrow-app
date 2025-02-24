@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM node:20.8.1 as builder
+FROM node:20.8.1 AS builder
 
 # Set the working directory
 WORKDIR /app
@@ -42,7 +42,7 @@ ENV VITE_WEB_SPARROW_DOCS=$VITE_WEB_SPARROW_DOCS
 ENV VITE_WEB_PROXY_SERVICE=$VITE_WEB_PROXY_SERVICE
 ENV VITE_WEB_SOCKET_IO_API_URL=$VITE_WEB_SOCKET_IO_API_URL
 
-# Copy root-level files
+# Copy files and build the web app
 COPY package.json yarn.lock ./
 
 # Copy packages folder
@@ -59,7 +59,7 @@ WORKDIR /app/apps/@sparrow-web
 RUN yarn build
 
 # Stage 2: Serve
-FROM nginx:alpine as runner
+FROM nginx:alpine AS runner
 
 # Set working directory in Nginx
 WORKDIR /usr/share/nginx/html
