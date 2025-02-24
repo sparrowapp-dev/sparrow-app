@@ -200,6 +200,7 @@
             customWidth={"24px"}
             type="teritiary-regular"
             onClick={(e) => {
+              e.stopPropagation();
               handleCreateEnvironment(e);
             }}
             startIcon={AddRegular}
