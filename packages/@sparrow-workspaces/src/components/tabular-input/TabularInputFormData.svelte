@@ -1,7 +1,7 @@
 <script lang="ts">
   import { trashIcon as trashIcon } from "@sparrow/library/assets";
   import {
-    AttachmentIcon,
+    AttachRegular,
     DeleteRegular,
     ReOrderDotsRegular,
   } from "@sparrow/library/icons";
@@ -363,10 +363,9 @@
                       uploadFormFile(index);
                     }}
                   >
-                    <AttachmentIcon
-                      height={"12px"}
-                      width={"12px"}
-                      color={"var(--icon-secondary-200)"}
+                    <AttachRegular
+                      size={"16px"}
+                      color={"var(--icon-ds-neutral-100)"}
                     />
                   </button>
                 </Tooltip>
