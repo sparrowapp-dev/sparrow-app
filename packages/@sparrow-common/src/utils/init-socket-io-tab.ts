@@ -1,5 +1,6 @@
 import { type KeyValueChecked } from "@sparrow/common/types/workspace";
 import {
+  TabPersistenceTypeEnum,
   TabTypeEnum,
   type Path,
   type Tab,
@@ -31,6 +32,7 @@ class InitSocketIoTab {
       tabId: uuidv4(),
       name: "New " + SocketIORequestDefaultAliasBaseEnum.NAME,
       type: TabTypeEnum.SOCKET_IO,
+      tabType: TabPersistenceTypeEnum.PERMANENT,
       description: "",
       source: "USER",
       isDeleted: false,
@@ -103,6 +105,9 @@ class InitSocketIoTab {
   public updateId(_id: string) {
     this._tab.id = _id;
     return this;
+  }
+  public updateTabType(type: TabPersistenceTypeEnum) {
+    this._tab.tabType = type;
   }
   public updateName(_name: string) {
     this._tab.name = _name;

@@ -1,5 +1,9 @@
 import { v4 as uuidv4 } from "uuid";
-import { TabTypeEnum, type Path } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  TabTypeEnum,
+  type Path,
+} from "@sparrow/common/types/workspace/tab";
 import type { Tab } from "../types/workspace/tab";
 
 class InitWorkspaceTab {
@@ -15,6 +19,7 @@ class InitWorkspaceTab {
       tabId: uuidv4(),
       name: "My Workspace",
       type: TabTypeEnum.WORKSPACE,
+      tabType: TabPersistenceTypeEnum.PERMANENT,
       description: "",
       source: "USER",
       activeSync: false,
@@ -43,6 +48,9 @@ class InitWorkspaceTab {
   }
   public updateId(_id: string) {
     this._tab.id = _id;
+  }
+  public updateTabType(type: TabPersistenceTypeEnum) {
+    this._tab.tabType = type;
   }
   public updateName(_name: string) {
     this._tab.name = _name;

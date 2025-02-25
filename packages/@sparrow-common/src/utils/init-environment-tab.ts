@@ -1,4 +1,7 @@
-import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  TabTypeEnum,
+} from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
 
 class InitEnvironmentTab {
@@ -14,6 +17,7 @@ class InitEnvironmentTab {
       tabId: uuidv4(),
       name: "New Environment",
       type: TabTypeEnum.ENVIRONMENT,
+      tabType: TabPersistenceTypeEnum.PERMANENT,
       description: "",
       source: "USER",
       isDeleted: false,
@@ -55,6 +59,9 @@ class InitEnvironmentTab {
   public setId(_id: string) {
     this._tab.id = _id;
     return this;
+  }
+  public setTabType(type: TabPersistenceTypeEnum) {
+    this._tab.tabType = type;
   }
   public setEnvironmentId(_id: string) {
     this._tab.id = _id;

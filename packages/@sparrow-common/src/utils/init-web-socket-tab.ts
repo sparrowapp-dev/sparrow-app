@@ -1,5 +1,9 @@
 import { type KeyValueChecked } from "@sparrow/common/types/workspace";
-import { TabTypeEnum, type Path } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  TabTypeEnum,
+  type Path,
+} from "@sparrow/common/types/workspace/tab";
 import {
   SocketDataTypeEnum,
   SocketSectionEnum,
@@ -27,6 +31,7 @@ class InitWebSocketTab {
       tabId: uuidv4(),
       name: WebSocketDefault.NAME,
       type: TabTypeEnum.WEB_SOCKET,
+      tabType: TabPersistenceTypeEnum.PERMANENT,
       description: "",
       source: "USER",
       isDeleted: false,
@@ -91,6 +96,9 @@ class InitWebSocketTab {
   }
   public updateId(_id: string) {
     this._tab.id = _id;
+  }
+  public updateTabType(type: TabPersistenceTypeEnum) {
+    this._tab.tabType = type;
   }
   public updateName(_name: string) {
     this._tab.name = _name;

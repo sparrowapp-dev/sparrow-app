@@ -18,6 +18,7 @@ import {
   TabTypeEnum,
   type Tab,
   type Path,
+  TabPersistenceTypeEnum,
 } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
 
@@ -34,6 +35,7 @@ class InitRequestTab {
       tabId: uuidv4(),
       name: "New " + RequestDefault.NAME,
       type: TabTypeEnum.REQUEST,
+      tabType: TabPersistenceTypeEnum.PERMANENT,
       description: "",
       source: "USER",
       isDeleted: false,
@@ -169,6 +171,9 @@ class InitRequestTab {
   }
   public updateId(_id: string) {
     this._tab.id = _id;
+  }
+  public updateTabType(type: TabPersistenceTypeEnum) {
+    this._tab.tabType = type;
   }
   public updateName(_name: string) {
     this._tab.name = _name;

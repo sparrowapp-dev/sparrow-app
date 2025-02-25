@@ -11,6 +11,7 @@ import { GuideRepository } from "../../../../repositories/guide.repository";
 import { GuestUserRepository } from "../../../../repositories/guest-user.repository";
 import { TabRepository } from "../../../../repositories/tab.repository";
 import { Debounce, CompareArray } from "@sparrow/common/utils";
+import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -125,14 +126,18 @@ export class EnvironmentExplorerViewModel {
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: true,
+        tabType: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = true;
+      progressiveTab.tabType = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
+        tabType: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
+      progressiveTab.tabType = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };

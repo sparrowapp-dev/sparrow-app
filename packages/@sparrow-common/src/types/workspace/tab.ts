@@ -19,6 +19,11 @@ export enum TabTypeEnum {
   SOCKET_IO = "SOCKETIO",
   GRAPHQL = "GRAPHQL",
 }
+
+export enum TabPersistenceTypeEnum {
+  PERMANENT = "permanent",
+  TEMPORARY = "temporary",
+}
 export interface WorkspaceIdWrapper {
   workspaceId: string;
 }
@@ -43,6 +48,10 @@ export interface NameWrapper {
 }
 export interface TypeWrapper {
   type: TabTypeEnum;
+}
+
+export interface TabTypeWrapper {
+  tabType: TabPersistenceTypeEnum;
 }
 export interface IsDeletedWrapper {
   isDeleted: boolean;
@@ -100,4 +109,5 @@ export interface Tab
     TabIdWrapper,
     TimestampWrapper,
     TypeWrapper,
+    TabTypeWrapper,
     PropertyWrapper {}

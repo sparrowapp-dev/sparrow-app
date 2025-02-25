@@ -33,6 +33,7 @@ import type {
   CollectionBaseInterface as CollectionDto,
   CollectionItemBaseInterface as CollectionItemsDto,
 } from "@sparrow/common/types/workspace/collection-base";
+import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -101,7 +102,10 @@ class CollectionExplorerPage {
           collection.id as string,
           response.data,
         );
-        this.updateTab(this.tab.tabId as string, { name: newCollectionName });
+        this.updateTab(this.tab.tabId as string, {
+          name: newCollectionName,
+          tabType: TabPersistenceTypeEnum.PERMANENT,
+        });
         // notifications.success("Collection renamed successfully!");
       } else {
         notifications.error("Failed to rename collection. Please try again.");
@@ -119,7 +123,10 @@ class CollectionExplorerPage {
           collection.id as string,
           response.data.data,
         );
-        this.updateTab(this.tab.tabId as string, { name: newCollectionName });
+        this.updateTab(this.tab.tabId as string, {
+          name: newCollectionName,
+          tabType: TabPersistenceTypeEnum.PERMANENT,
+        });
         // notifications.success("Collection renamed successfully!");
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
@@ -347,38 +354,32 @@ class CollectionExplorerPage {
     let totalRequests = 0;
     let totalFolders = 0;
     let totalWebSocket = 0;
-    let totalSocketIo =0 ;
-    let totalGraphQl =0;
+    let totalSocketIo = 0;
+    let totalGraphQl = 0;
 
     if (collection?.items) {
       collection?.items.forEach((collectionItem: CollectionItemsDto) => {
         if (collectionItem.type === ItemType.REQUEST) {
           totalRequests++;
-        }
-        else if(collectionItem.type === ItemType.WEB_SOCKET) {
-            totalWebSocket++;
-         }
-        else if(collectionItem.type === ItemType.SOCKET_IO){
-            totalSocketIo++;
-        } 
-        else if(collectionItem.type === ItemType.GRAPHQL){
+        } else if (collectionItem.type === ItemType.WEB_SOCKET) {
+          totalWebSocket++;
+        } else if (collectionItem.type === ItemType.SOCKET_IO) {
+          totalSocketIo++;
+        } else if (collectionItem.type === ItemType.GRAPHQL) {
           totalGraphQl++;
-        }
-          else if (collectionItem.type === ItemType.FOLDER) {
+        } else if (collectionItem.type === ItemType.FOLDER) {
           totalFolders++;
           if (collectionItem?.items)
             collectionItem.items.forEach((item: CollectionItemsDto) => {
               if (item.type === ItemType.REQUEST) {
                 totalRequests++;
-              }
-              else if(item.type === ItemType.WEB_SOCKET){
+              } else if (item.type === ItemType.WEB_SOCKET) {
                 totalWebSocket++;
-              }
-              else if(item.type === ItemType.SOCKET_IO){
+              } else if (item.type === ItemType.SOCKET_IO) {
                 totalSocketIo++;
-              }else if(item.type === ItemType.GRAPHQL){
+              } else if (item.type === ItemType.GRAPHQL) {
                 totalGraphQl++;
-              }    
+              }
             });
         }
       });
@@ -551,6 +552,9 @@ class CollectionExplorerPage {
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
+    });
+    this.updateTab(this.tab.tabId as string, {
+      tabType: TabPersistenceTypeEnum.PERMANENT,
     });
     if (isGuestUser == true) {
       await this.collectionRepository.updateCollection(

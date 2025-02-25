@@ -31,6 +31,7 @@ import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { notifications } from "@sparrow/library/ui";
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { isGuestUserActive } from "@app/store/auth.store";
+import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class FolderExplorerPage {
@@ -50,16 +51,16 @@ class FolderExplorerPage {
    * @param data - Data to be updated on tab
    */
   private updateTab = async (_id: string, data: Tab) => {
-    this.tabRepository
-      .getTabList()
-      .subscribe((tabList) => {
+    const tabListData = await this.tabRepository.getTabList();
+    tabListData.subscribe((tabList) => {
+      if (tabList) {
         tabList.forEach((tab) => {
           if (tab.id === _id) {
             this.tabRepository.updateTab(tab?.tabId as string, data);
           }
         });
-      })
-      .unsubscribe();
+      }
+    });
   };
 
   /**
@@ -110,8 +111,12 @@ class FolderExplorerPage {
     collection: CollectionDocument,
     folder: Folder,
     newFolderName: string,
+    tab: TabDocument,
   ) => {
     if (newFolderName) {
+      await this.tabRepository.updateTab(tab.tabId, {
+        tabType: TabPersistenceTypeEnum.PERMANENT,
+      });
       let userSource = {};
       if (collection.activeSync && folder?.source === "USER") {
         userSource = {
@@ -126,7 +131,7 @@ class FolderExplorerPage {
         isGuestUser = value;
       });
       if (isGuestUser === true) {
-        this.updateTab(folder.id, { name: newFolderName });
+        this.tabRepository.updateTab(tab.tabId, { name: newFolderName });
         const res =
           await this.collectionRepository.readRequestOrFolderInCollection(
             collection.id,
@@ -152,7 +157,7 @@ class FolderExplorerPage {
       );
 
       if (response.isSuccessful) {
-        this.updateTab(folder.id, { name: newFolderName });
+        this.tabRepository.updateTab(tab.tabId, { name: newFolderName });
         this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           folder.id,
@@ -309,6 +314,9 @@ class FolderExplorerPage {
     newDescription: string,
   ) => {
     const updateObj = {};
+    this.tabRepository.updateTab(tab.tabId, {
+      tabType: TabPersistenceTypeEnum.PERMANENT,
+    });
     updateObj["description"] = newDescription;
     let userSource = {};
     if (tab?.activeSync && tab?.source === "USER") {
@@ -367,19 +375,19 @@ class FolderExplorerPage {
     tab: TabDocument,
   ) => {
     let totalRequests = 0;
-    let totalWebSocket =0;
-    let totalGraphQl =0; 
-    let totalSocketIo =0;
+    let totalWebSocket = 0;
+    let totalGraphQl = 0;
+    let totalSocketIo = 0;
     const folder = await this.getFolder(collection, tab.id);
     if (folder?.items) {
       folder.items.forEach((item: CollectionItemsDto) => {
         if (item.type === ItemType.REQUEST) {
           totalRequests++;
-        }else if(item.type === ItemType.SOCKET_IO){
+        } else if (item.type === ItemType.SOCKET_IO) {
           totalSocketIo++;
-        }else if(item.type === ItemType.GRAPHQL){
+        } else if (item.type === ItemType.GRAPHQL) {
           totalGraphQl++;
-        }else if(item.type === ItemType.WEB_SOCKET){
+        } else if (item.type === ItemType.WEB_SOCKET) {
           totalWebSocket++;
         }
       });
@@ -388,8 +396,8 @@ class FolderExplorerPage {
       totalGraphQl,
       totalRequests,
       totalSocketIo,
-      totalWebSocket
-    }
+      totalWebSocket,
+    };
   };
 
   /**

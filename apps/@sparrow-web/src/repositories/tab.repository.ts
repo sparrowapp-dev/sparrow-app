@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type TabDocument } from "../database/database";
 import type { Tab } from "@sparrow/common/types/workspace";
+import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import type { Observable } from "rxjs";
 
 export class TabRepository {
@@ -77,6 +78,22 @@ export class TabRepository {
         .exec()
     )?.length;
     tab.index = lastIndex;
+    if (tab.tabType === TabPersistenceTypeEnum.TEMPORARY) {
+      const tempTab = await this.rxdb
+        ?.findOne({
+          selector: {
+            "path.workspaceId": workspaceId,
+            tabType: TabPersistenceTypeEnum.TEMPORARY,
+          },
+        })
+        .exec();
+
+      if (tempTab) {
+        const tempTabIndex = tempTab.toMutableJSON().index;
+        await tempTab.remove(); // Remove the existing temporary tab
+        tab.index = tempTabIndex; // Assign the same index to the new tab
+      }
+    }
     await this.rxdb?.insert(tab);
   };
 

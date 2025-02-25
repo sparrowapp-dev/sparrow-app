@@ -68,7 +68,10 @@ import {
   CollectionItemTypeBaseEnum,
 } from "@sparrow/common/types/workspace/collection-base";
 import type { HttpRequestBaseInterface as RequestDto } from "@sparrow/common/types/workspace/http-request-base";
-import { type Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import { SocketTabAdapter } from "../../adapter/socket-tab";
 import type { CollectionDocType } from "../../models/collection.model";
 import type { GuideQuery } from "../../types/user-guide";
@@ -2041,6 +2044,7 @@ export default class CollectionsViewModel {
       folder?.id || "",
       request,
     );
+    adaptedRequest.tabType = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedRequest);
     moveNavigation("right");
   };
@@ -2063,6 +2067,7 @@ export default class CollectionsViewModel {
       folder?.id || "",
       _graphql,
     );
+    adaptedRequest.tabType = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedRequest);
     moveNavigation("right");
   };
@@ -2085,6 +2090,7 @@ export default class CollectionsViewModel {
       folder?.id || "",
       websocket,
     );
+    adaptedSocket.tabType = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedSocket);
     moveNavigation("right");
   };
@@ -2109,6 +2115,7 @@ export default class CollectionsViewModel {
       _folder?.id || "",
       _socketIo,
     );
+    adaptedSocketIo.tabType = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedSocketIo);
     moveNavigation("right");
   };
@@ -2132,6 +2139,7 @@ export default class CollectionsViewModel {
     sampleFolder.updateName(folder.name);
     sampleFolder.updatePath(path);
     sampleFolder.updateIsSave(true);
+    sampleFolder.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
 
     this.handleCreateTab(sampleFolder.getValue());
     moveNavigation("right");
@@ -2168,6 +2176,7 @@ export default class CollectionsViewModel {
     _collection.updateTotalRequests(totalRequest);
     _collection.updateTotalFolder(totalFolder);
     _collection.updateIsSave(true);
+    _collection.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
 
     this.tabRepository.createTab(_collection.getValue());
     moveNavigation("right");
@@ -5322,5 +5331,17 @@ export default class CollectionsViewModel {
       JSON.parse(data?.data?.body),
     );
     return response;
+  };
+
+  /**
+   * Update the tab type to permanent on double click
+   * @param tab tab data to make it permanent
+   */
+  public handleTabTypeChange = async (tab: Tab) => {
+    if (tab.tabType === TabPersistenceTypeEnum.TEMPORARY) {
+      await this.tabRepository.updateTab(tab.tabId, {
+        tabType: TabPersistenceTypeEnum.PERMANENT,
+      });
+    }
   };
 }

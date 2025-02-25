@@ -25,7 +25,10 @@
     StackIcon,
     TreeIcon,
   } from "@sparrow/library/icons";
-  import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+  import {
+    TabPersistenceTypeEnum,
+    TabTypeEnum,
+  } from "@sparrow/common/types/workspace/tab";
   import { type Tab } from "@sparrow/common/types/workspace/tab";
   import { Badge, Spinner } from "@sparrow/library/ui";
   import { SvelteComponent } from "svelte";
@@ -70,13 +73,16 @@
   export let onDropOver: (index: number) => void;
 
   export let listLength;
-
+  export let onDoubleClick: (tab: Tab) => void;
   function handleMouseDown(event: MouseEvent) {
     if (event.button === 1) {
       // Check if the middle button is pressed (button code 1)
       onTabClosed(tab.id, tab);
     }
   }
+  const handleDoubleClick = (tab: Tab) => {
+    onDoubleClick(tab);
+  };
 </script>
 
 <button
@@ -93,6 +99,7 @@
     ? '4px'
     : ''}"
   on:mousedown={handleMouseDown}
+  on:dblclick={() => handleDoubleClick(tab)}
 >
   <div
     tabindex="-1"
@@ -100,7 +107,9 @@
     style="   background-color: {tab.isActive
       ? 'var(--bg-secondary-850) !important'
       : 'transparent'};  border-top : {tab.isActive
-      ? '2px solid var(--bg-primary-400)'
+      ? tab?.tabType === TabPersistenceTypeEnum.TEMPORARY
+        ? '2px solid var(--bg-ds-neutral-300)'
+        : '2px solid var(--bg-primary-400)'
       : '2px solid transparent'};"
   >
     <button
@@ -187,7 +196,7 @@
       {/if}
       <span
         class=" ms-1 text-fs-12 {!tab.isActive ? 'request-text' : ''}"
-        style={`font-weight:500; font-size:12px; line-height:18px;  color:  var(--text-ds-neutral-300)`}
+        style={`font-weight:500; font-size:12px; line-height:18px;  color:  var(--text-ds-neutral-300); font-style: ${tab?.tabType === TabPersistenceTypeEnum.TEMPORARY ? "italic" : ""};`}
       >
         {tab.name}
       </span>

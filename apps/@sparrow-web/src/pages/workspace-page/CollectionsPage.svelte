@@ -538,6 +538,7 @@
             onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
             onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
             onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
+            onDoubleClick={_viewModel.handleTabTypeChange}
           />
           <div style="flex:1; overflow: hidden;">
             <Route>

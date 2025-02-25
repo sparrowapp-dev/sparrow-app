@@ -37,7 +37,11 @@ import {
   type KeyValue,
   type StatePartial,
 } from "@sparrow/common/types/workspace";
-import { type Path, type Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Path,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import { notifications } from "@sparrow/library/ui";
 import { CollectionService } from "../../../../services/collection.service";
 import { GuestUserRepository } from "../../../../repositories/guest-user.repository";
@@ -210,14 +214,18 @@ class SocketIoExplorerPageViewModel {
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: true,
+        tabType: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = true;
+      progressiveTab.tabType = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
+        tabType: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
+      progressiveTab.tabType = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
