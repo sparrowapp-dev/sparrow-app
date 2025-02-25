@@ -31,10 +31,10 @@
   <!-- 
     -- Title 
   -->
-  <label for={inputId} class="text-fs-14 pb-1 text-secondary-1000"
+  <!-- <label for={inputId} class="text-fs-14 pb-1 text-secondary-1000"
     >{NAME_CONFIG.TITLE}</label
   >
-  <span class="text-danger-200">*</span>
+  <span class="text-danger-200">*</span> -->
 
   <!-- 
     -- Input 
@@ -45,8 +45,13 @@
       teamForm.name.isTouched = true;
       teamForm.name.value = teamForm.name.value.trim();
     }}
+    headerLabel={true}
+    headerLabelText={NAME_CONFIG.TITLE}
+    inputValueRequired={true}
     isEditIconRequired={false}
     isError={ErrorValue}
+    helpLabel={true}
+    errorMessage={NAME_CONFIG.REQUIRED_ERROR_MESSAGE}
     type={"text"}
     variant={"primary"}
     maxlength={NAME_CONFIG.MAX_TEXT_SIZE}
@@ -59,9 +64,9 @@
   <!-- 
     -- Error Messages 
   -->
-  {#if !teamForm.name.value && teamForm.name.isTouched}
+  <!-- {#if !teamForm.name.value && teamForm.name.isTouched}
     <p class="mb-0 mt-1 text-fs-12 text-danger-200">
       {NAME_CONFIG.REQUIRED_ERROR_MESSAGE}
     </p>
-  {/if}
+  {/if} -->
 </div>
