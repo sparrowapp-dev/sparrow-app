@@ -47,10 +47,10 @@
         bind:lang={language}
         bind:value={response}
         on:change={(e) => {
-          onUpdateResponseBody(e.detail);
+          // onUpdateResponseBody(e.detail);
         }}
-        isEditable={true}
-        isFormatted={false}
+        isEditable={false}
+        isFormatted={true}
       />{/if}
   </div>
 </div>

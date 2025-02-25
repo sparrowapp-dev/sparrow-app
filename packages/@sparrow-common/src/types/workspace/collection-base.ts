@@ -11,7 +11,7 @@ export enum CollectionItemTypeBaseEnum {
   WEBSOCKET = "WEBSOCKET",
   SOCKETIO = "SOCKETIO",
   GRAPHQL = "GRAPHQL",
-  SAVED_REQUEST = "SAVED_REQUEST"
+  SAVED_REQUEST = "REQUEST_RESPONSE"
 }
 
 export interface CollectionItemBaseInterface {

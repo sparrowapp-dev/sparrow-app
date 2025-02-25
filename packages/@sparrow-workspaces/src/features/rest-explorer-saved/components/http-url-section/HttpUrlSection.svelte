@@ -45,15 +45,7 @@
    * @description - save request handler
    */
   const handleSaveRequest = async () => {
-    const x = await onSaveRequest();
-    if (
-      x.status === "error" &&
-      x.message === "request is not a part of any workspace or collection"
-    ) {
-      toggleSaveRequest(true);
-    } else if (x.status === "success") {
-      notifications.success("API request saved successfully.");
-    }
+    await onSaveRequest();
   };
 
   /**

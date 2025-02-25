@@ -98,7 +98,7 @@
     tabindex="-1"
     class="tab-item w-100 d-flex justify-content-between px-2 border-upper-radius h-100 align-items-center"
     style="   background-color: {tab.isActive
-      ? 'var(--bg-secondary-850) !important'
+      ? 'var(--bg-ds-surface-900) !important'
       : 'transparent'};  border-top : {tab.isActive
       ? '2px solid var(--bg-primary-400)'
       : '2px solid transparent'};"

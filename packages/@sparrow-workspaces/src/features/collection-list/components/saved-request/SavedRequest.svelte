@@ -12,8 +12,6 @@
 
   import { UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
 
-  // --- SVG
-  import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
   import { reloadSyncIcon } from "@sparrow/library/assets";
 
   import type {
@@ -21,14 +19,8 @@
     CollectionItemBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-  import {
-    ChevronDownRegular,
-    ChevronRightRegular,
-    MoreHorizontalRegular,
-  } from "@sparrow/library/icons";
-  import { SavedRequest } from "..";
+  import { MoreHorizontalRegular } from "@sparrow/library/icons";
 
-  let expand = false;
   /**
    * Callback for Item Deleted
    * @param entityType - type of item to delete like request/folder
@@ -68,7 +60,6 @@
    * Role of user in workspace
    */
   export let userRole;
-  export let activeTabType;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -112,6 +103,8 @@
     isRenaming = false;
     newRequestName = "";
   };
+
+  $: console.log("-------------------------", api);
 
   const onRenameInputKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
@@ -256,10 +249,6 @@
 
 <div
   tabindex="0"
-  draggable={activeTabType === "TESTFLOW" ? true : false}
-  on:dragstart={(event) => {
-    dragStart(event, collection);
-  }}
   bind:this={requestTabWrapper}
   class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
@@ -281,46 +270,34 @@
       }
     }}
     style={folder?.id
-      ? "padding-left: 70.5px; gap:4px;"
-      : "padding-left: 44.5px; gap:4px; "}
+      ? "padding-left: 110.5px; gap:4px;"
+      : "padding-left: 90.5px; gap:4px; "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
-    <!-- {#if api?.isDeleted && "activeSync"}
+    {#if api?.isDeleted && "activeSync"}
       <span
         class="delete-ticker position-absolute sparrow-fs-10 px-2 d-none"
         style="right: 0; background-color: var(--background-color); "
         >DELETED</span
       >
-    {/if} -->
-    <!-- {#if "actSync" && api?.source === "SPEC"}
+    {/if}
+    {#if "actSync" && api?.source === "SPEC"}
       <img src={reloadSyncIcon} class="ms-2 d-none" alt="" />
-    {/if} -->
-
-    <span
-      on:click|stopPropagation={() => {
-        expand = !expand;
-      }}
-      style="  display: flex; "
-    >
-      <Button
-        startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
-        size="extra-small"
-        customWidth={"24px"}
-        type="teritiary-regular"
-      />
-    </span>
+    {/if}
     <div
-      class="api-method text-{httpMethodUIStyle} {api?.isDeleted &&
-        'api-method-deleted'}"
-      style="font-size: 12px;"
+      class="api-method"
+      style="font-size: 12px; {Number(
+        api.requestResponse?.responseStatus.split(' ')[0],
+      ) >= 200 &&
+      Number(api.requestResponse?.responseStatus.split(' ')[0]) < 300
+        ? 'color:var(--text-ds-success-300);'
+        : 'color:var(--text-ds-danger-300);'}"
     >
-      {api.request?.method?.toUpperCase() === "DELETE"
-        ? "DEL"
-        : api.request?.method?.toUpperCase()}
+      {api.requestResponse?.responseStatus.split(" ")[0]}
     </div>
 
     {#if isRenaming}
@@ -349,7 +326,7 @@
 
   {#if api.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
-  {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+  {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER && false}
     <Tooltip
       title={"More"}
       show={!showMenu}
@@ -372,29 +349,6 @@
       </span>
     </Tooltip>
   {/if}
-</div>
-<div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-  <div class="sub-files position-relative">
-    <div
-      class="box-line"
-      style={folder?.id ? "left: 84.5px;" : "left: 58.5px;"}
-    ></div>
-    <!-- {#if } -->
-    {#each api?.items || [] as exp}
-      <div>
-        <SavedRequest
-          {userRole}
-          api={exp}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {folder}
-          {collection}
-          {activeTabId}
-        />
-      </div>
-    {/each}
-  </div>
 </div>
 
 <style lang="scss">
@@ -542,7 +496,7 @@
     border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
-    width: calc(100% - 24px);
+    width: calc(100% - 28px);
   }
   .active-request-tab {
     background-color: var(--bg-ds-surface-500) !important;
@@ -560,13 +514,5 @@
 
   .draggable:active {
     opacity: 0.9;
-  }
-  .box-line {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background-color: var(--bg-ds-surface-100);
-    z-index: 200;
   }
 </style>

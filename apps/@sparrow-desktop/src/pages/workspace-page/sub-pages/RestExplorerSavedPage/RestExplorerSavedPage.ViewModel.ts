@@ -1212,10 +1212,10 @@ export class RestExplorerSavedViewModel
             source: "USER",
           };
         }
-        // let isGuestUser;
-        // isGuestUserActive.subscribe((value) => {
-        //   isGuestUser = value;
-        // });
+        let isGuestUser;
+        isGuestUserActive.subscribe((value) => {
+          isGuestUser = value;
+        });
 
         // if (isGuestUser == true) {
         //   this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
@@ -1270,6 +1270,9 @@ export class RestExplorerSavedViewModel
         //   };
         //   return;
         // }
+        if (isGuestUser == true) {
+          return;
+        }
         const res = await this.collectionService.createSavedRequestInCollection({
           collectionId: collectionId,
           workspaceId: workspaceId,
