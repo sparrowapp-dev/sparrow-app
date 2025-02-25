@@ -158,11 +158,14 @@ export { default as putIcon } from "./Put.svelte";
 export { default as deleteIcon } from "./Delete.svelte";
 
 export { default as InfoIcon2 } from "./Info2.svelte";
-export { default as WorkspaceRegular } from "./WorkspaceRegular.svelte";
 export { default as Stack2 } from "./Stack2.svelte";
 export { default as ChevronUpRegular } from "./ChevronUpRegular.svelte";
+export { default as ChevronLeftRegular } from "./ChevronLeftRegular.svelte";
+export { default as ArrowSortRegular } from "./ArrowSortRegular.svelte";
 export { default as GraphqlIcon } from "./GraphQLIcon.svelte";
 export { default as WebSocketIcon } from "./WebSocketIcon.svelte";
 export { default as SocketIOIcon } from "./SocketIOICon.svelte";
+export { default as WorkspaceRegular } from "./WorkspaceRegular.svelte";
 export { default as SaveRegular } from "./SaveRegular.svelte";
-export { default as ChevronLeftRegular } from "./ChevronLeftRegular.svelte";
+export { default as CaretDownFilled } from "./CaretDownFilled.svelte";
+export { default as CaretDownRegular } from "./CaretDownRegular.svelte";
