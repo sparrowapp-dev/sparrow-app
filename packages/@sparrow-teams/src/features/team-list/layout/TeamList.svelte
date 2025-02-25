@@ -5,10 +5,11 @@
   import { Avatar } from "@sparrow/library/ui";
   import {
     AddRegular,
+    MoreHorizontalRegular,
     PeopleFilled,
     PeopleRegular,
   } from "@sparrow/library/icons";
-  import { onMount } from "svelte";
+
   export let isCreateTeamModalOpen;
   export let isGuestUser;
   export let setOpenTeam;
@@ -16,19 +17,17 @@
   export let disableNewInviteTag;
   export let modifyTeam;
   export let activeIndex;
-  onMount(() => {
-    console.log(teamList);
-  });
+  export let threeDotIconDisable = false;
 </script>
 
 <!--Teams list-->
 <section class="d-flex flex-column" style="max-height:33%;">
   <div
-    class="sidebar-teams-header d-flex justify-content-between p-3 px-2 pb-0"
+    class="sidebar-teams-header d-flex justify-content-between p-3 px-2 pb-0 mb-1"
   >
     <h6
       class="teams-heading ms-2 px-1"
-      style="font-size: 14px; color:var(--bg-ds-neutral-300); line-height:20.02px; "
+      style="font-size: 14px; color:var(--bg-ds-neutral-300); line-height:20.02px; display:flex;align-items:center; margin-bottom:0;"
     >
       Teams
     </h6>
@@ -76,11 +75,16 @@
                   type={"letter"}
                   size={"small"}
                   letter={team.name[0]}
-                  bgColor={"purple"}
+                  bgColor={"var(--bg-ds-secondary-400)"}
                 />
               </div>
             {:else}
-              <img src={base64ToURL(team.logo)} alt="" />
+              <!-- <img src={base64ToURL(team.logo)} alt="" /> -->
+              <Avatar
+                type={"image"}
+                size={"small"}
+                image={base64ToURL(team.logo)}
+              />
             {/if}
             <p
               style="font-weight: 500; padding:4px 2px; font-size:12px; line-height:18px; "
@@ -103,11 +107,22 @@
                 : PeopleFilled}
             />
           {/if}
+          {#if threeDotIconDisable}
+            <Button
+              size="extra-small"
+              customWidth={"24px"}
+              type="teritiary-regular"
+              startIcon={MoreHorizontalRegular}
+            />
+          {/if}
         </button>
       {/each}
     </List>
   </div>
-  <hr class="mb-0 pb-0" />
+  <hr
+    class=" pb-0"
+    style="margin-left: 10px; margin-top:12px; margin-bottom:12px;"
+  />
 </section>
 
 <style>
@@ -120,9 +135,10 @@
   }
 
   .teams-heading {
+    outline: none;
     margin-left: 5px;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 21px;
   }
   .teams-outer {
@@ -160,7 +176,7 @@
     outline: 2px solid var(--bg-ds-primary-300);
   }
   .teams-outer:hover {
-    background-color: var(--bg-tertiary-750);
+    background-color: var(--bg-ds-surface-400);
   }
 
   .teams-outer:active {
