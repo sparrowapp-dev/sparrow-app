@@ -1,3 +1,5 @@
+import type { HttpRequestSavedAddToBaseEnum, HttpRequestSavedMethodBaseEnum } from "./http-request-saved-base";
+
 export enum AuthTypeEnum {
     NO_AUTH = "No Auth",
     API_KEY = "API Key",
@@ -5,11 +7,6 @@ export enum AuthTypeEnum {
     BASIC_AUTH = "Basic Auth",
   }
   
-  export enum AuthSectionEnum {
-    HEADER = "Header",
-    QUERY_PARAMETER = "Query Parameter",
-    COOKIES = "Cookies",
-  }
   export enum RequestMethodEnum {
     GET = "GET",
     POST = "POST",
@@ -163,13 +160,13 @@ export enum AuthTypeEnum {
     authValue: string;
   }
   export interface AddtoWrapper {
-    addTo: AuthSectionEnum;
+    addTo: HttpRequestSavedAddToBaseEnum;
   }
   export interface BearerTokenWrapper {
     bearerToken: string;
   }
   export interface MethodWrapper {
-    method: RequestMethodEnum;
+    method: HttpRequestSavedMethodBaseEnum;
   }
   export interface UrlWrapper {
     url: string;
@@ -369,8 +366,8 @@ export enum AuthTypeEnum {
       UrlWrapper,
       AiWrapper,
       HeadersWrapper,
-        ResponseHeadersWrapper,
-        ResponseBodyWrapper,
-        ResponseDateWrapper,
-        ResponseStatusWrapper {}
+      ResponseHeadersWrapper,
+      ResponseBodyWrapper,
+      ResponseDateWrapper,
+      ResponseStatusWrapper {}
   

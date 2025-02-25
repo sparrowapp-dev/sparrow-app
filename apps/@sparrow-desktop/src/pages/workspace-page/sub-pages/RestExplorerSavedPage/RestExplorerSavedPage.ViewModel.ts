@@ -96,6 +96,7 @@ import type { Socket } from "socket.io-client";
 import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
 import { InitTab } from "@sparrow/common/factory";
+import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 
 export class RestExplorerSavedViewModel
   implements
@@ -991,13 +992,10 @@ export class RestExplorerSavedViewModel
    */
   public saveRequest = async () => {
     const componentData: RequestTab = this._tab.getValue();
-    const { folderId, collectionId, workspaceId } = componentData.path;
-
-    if (!workspaceId || !collectionId) {
-      return {
-        status: "error",
-        message: "request is not a part of any workspace or collection",
-      };
+    const { folderId, collectionId, workspaceId, requestId } = componentData.path;
+    if (componentData.id.startsWith("UNTRACKED-")) {
+      this.saveAsRequest();
+      return;
     }
     const _collection = await this.readCollection(collectionId);
     let userSource = {};
@@ -1182,139 +1180,120 @@ export class RestExplorerSavedViewModel
    * @param description - request description
    * @param type - save over all request or description only
    */
-  public saveAsRequest = async (
-    _workspaceMeta: {
-      id: string;
-      name: string;
-    },
-    path: {
-      name: string;
-      id: string;
-      type: string;
-    }[],
-    tabName: string,
-    description: string,
-  ) => {
+  public saveAsRequest = async () => {
+    // debugger;
+    // return;
     const componentData = this._tab.getValue();
+    const { folderId, collectionId, workspaceId, requestId } = componentData.path;
     let userSource = {};
-    if (path.length > 0) {
+    if (workspaceId && collectionId && requestId) {
       const requestSavedTabAdapter = new RequestSavedTabAdapter();
       const unadaptedRequest = requestSavedTabAdapter.unadapt(componentData);
-      let req = {
-        id: uuidv4(),
-        name: tabName,
-        description,
-        type: ItemType.REQUEST,
-        request: unadaptedRequest,
-        source: "USER",
-        isDeleted: false,
-        createdBy: "Guest User",
-        updatedBy: "Guest User",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      if (path[path.length - 1].type === ItemType.COLLECTION) {
-        /**
+      // let req = {
+      //   id: uuidv4(),
+      //   name: tabName,
+      //   description,
+      //   type: ItemType.REQUEST,
+      //   request: unadaptedRequest,
+      //   source: "USER",
+      //   isDeleted: false,
+      //   createdBy: "Guest User",
+      //   updatedBy: "Guest User",
+      //   createdAt: new Date().toISOString(),
+      //   updatedAt: new Date().toISOString(),
+      // };
+       /**
          * handle request at collection level
          */
-        const _collection = await this.readCollection(path[path.length - 1].id);
+        const _collection = await this.readCollection(collectionId);
         if (_collection?.activeSync) {
           userSource = {
             currentBranch: _collection?.currentBranch,
             source: "USER",
           };
         }
-        let isGuestUser;
-        isGuestUserActive.subscribe((value) => {
-          isGuestUser = value;
-        });
+        // let isGuestUser;
+        // isGuestUserActive.subscribe((value) => {
+        //   isGuestUser = value;
+        // });
 
-        if (isGuestUser == true) {
-          this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
-          const expectedPath = {
-            folderId: "",
-            folderName: "",
-            collectionId: path[path.length - 1].id,
-            workspaceId: _workspaceMeta.id,
-          };
-          if (
-            !componentData.path.workspaceId ||
-            !componentData.path.collectionId
-          ) {
-            /**
-             * Update existing request
-             */
-            this.updateRequestName(req.name);
-            this.updateRequestDescription(req.description);
-            this.updateRequestPath(expectedPath);
-            this.updateRequestId(req.id);
-            const progressiveTab = this._tab.getValue();
-            progressiveTab.isSaved = true;
-            this.tab = progressiveTab;
-            await this.tabRepository.updateTab(
-              progressiveTab.tabId,
-              progressiveTab,
-            );
-          } else {
-            /**
-             * Create new copy of the existing request
-             */
-            const initRequestTab = new InitRequestTab(req.id, "UNTRACKED-");
-            initRequestTab.updateName(req.name);
-            initRequestTab.updateDescription(req.description);
-            initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(req.request.url);
-            initRequestTab.updateMethod(req.request.method);
-            initRequestTab.updateBody(req.request.body);
-            initRequestTab.updateQueryParams(req.request.queryParams);
-            initRequestTab.updateAuth(req.request.auth);
-            initRequestTab.updateHeaders(req.request.headers);
+        // if (isGuestUser == true) {
+        //   this.addRequestOrFolderInCollection(path[path.length - 1].id, req);
+        //   const expectedPath = {
+        //     folderId: "",
+        //     folderName: "",
+        //     collectionId: path[path.length - 1].id,
+        //     workspaceId: _workspaceMeta.id,
+        //   };
+        //   if (
+        //     !componentData.path.workspaceId ||
+        //     !componentData.path.collectionId
+        //   ) {
+        //     /**
+        //      * Update existing request
+        //      */
+        //     this.updateRequestName(req.name);
+        //     this.updateRequestDescription(req.description);
+        //     this.updateRequestPath(expectedPath);
+        //     this.updateRequestId(req.id);
+        //     const progressiveTab = this._tab.getValue();
+        //     progressiveTab.isSaved = true;
+        //     this.tab = progressiveTab;
+        //     await this.tabRepository.updateTab(
+        //       progressiveTab.tabId,
+        //       progressiveTab,
+        //     );
+        //   } else {
+        //     /**
+        //      * Create new copy of the existing request
+        //      */
+        //     const initRequestTab = new InitRequestTab(req.id, "UNTRACKED-");
+        //     initRequestTab.updateName(req.name);
+        //     initRequestTab.updateDescription(req.description);
+        //     initRequestTab.updatePath(expectedPath);
+        //     initRequestTab.updateUrl(req.request.url);
+        //     initRequestTab.updateMethod(req.request.method);
+        //     initRequestTab.updateBody(req.request.body);
+        //     initRequestTab.updateQueryParams(req.request.queryParams);
+        //     initRequestTab.updateAuth(req.request.auth);
+        //     initRequestTab.updateHeaders(req.request.headers);
 
-            this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
-          }
-          return {
-            status: "success",
-            message: "success",
-            data: {
-              id: req.id,
-            },
-          };
-          return;
-        }
-        const res = await insertCollectionRequest({
-          collectionId: path[path.length - 1].id,
-          workspaceId: _workspaceMeta.id,
+        //     this.tabRepository.createTab(initRequestTab.getValue());
+        //     moveNavigation("right");
+        //   }
+        //   return {
+        //     status: "success",
+        //     message: "success",
+        //     data: {
+        //       id: req.id,
+        //     },
+        //   };
+        //   return;
+        // }
+        const res = await this.collectionService.createSavedRequestInCollection({
+          collectionId: collectionId,
+          workspaceId: workspaceId,
+          requestId: requestId,
+          folderId: folderId,
           ...userSource,
           items: {
-            name: tabName,
-            description,
-            type: ItemType.REQUEST,
-            request: unadaptedRequest,
+            name: componentData.name,
+            description: componentData.description,
+            type: CollectionItemTypeBaseEnum.SAVED_REQUEST,
+            requestResponse: unadaptedRequest,
           },
         });
         if (res.isSuccessful) {
-          this.addRequestOrFolderInCollection(
-            path[path.length - 1].id,
-            res.data.data,
-          );
-          const expectedPath = {
-            folderId: "",
-            folderName: "",
-            collectionId: path[path.length - 1].id,
-            workspaceId: _workspaceMeta.id,
-          };
-          if (
-            !componentData.path.workspaceId ||
-            !componentData.path.collectionId
-          ) {
+          // this.addRequestOrFolderInCollection(
+          //   path[path.length - 1].id,
+          //   res.data.data,
+          // );
             /**
              * Update existing request
              */
             await this.updateRequestName(res.data.data.name);
-            await this.updateRequestDescription(res.data.data.description);
-            await this.updateRequestPath(expectedPath);
-            await this.updateRequestId(res.data.data.id);
+            await this.updateRequestDescription(res.data?.data?.description  || "" );
+            await this.updateRequestId(res.data.data.id || "");
             const progressiveTab = this._tab.getValue();
             progressiveTab.isSaved = true;
             this.tab = progressiveTab;
@@ -1322,174 +1301,26 @@ export class RestExplorerSavedViewModel
               progressiveTab.tabId,
               progressiveTab,
             );
-          } else {
-            /**
-             * Create new copy of the existing request
-             */
-            const initRequestTab = new InitRequestTab(
-              res.data.data.id,
-              "UNTRACKED-",
-            );
-            initRequestTab.updateName(res.data.data.name);
-            initRequestTab.updateDescription(res.data.data.description);
-            initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(res.data.data.request.url);
-            initRequestTab.updateMethod(res.data.data.request.method);
-            initRequestTab.updateBody(res.data.data.request.body);
-            initRequestTab.updateQueryParams(res.data.data.request.queryParams);
-            initRequestTab.updateAuth(res.data.data.request.auth);
-            initRequestTab.updateHeaders(res.data.data.request.headers);
-
-            this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
-          }
-          return {
-            status: "success",
-            message: res.message,
-            data: {
-              id: res.data.data.id,
-            },
-          };
+          
+            notifications.success("success");
+            return;
+          // return {
+          //   status: "success",
+          //   message: res.message,
+          //   data: {
+          //     id: res.data.data.id,
+          //   },
+          // };
         } else {
-          return {
-            status: "error",
-            message: res.message,
-          };
+          notifications.error("failed");
+          return;
+          // return {
+          //   status: "error",
+          //   message: res.message,
+          // };
         }
-      } else if (path[path.length - 1].type === ItemType.FOLDER) {
-        /**
-         * handle request at folder level
-         */
-        const _collection = await this.readCollection(path[0].id);
-        if (_collection?.activeSync) {
-          userSource = {
-            currentBranch: _collection?.currentBranch,
-            source: "USER",
-          };
-        }
-        let isGuestUser;
-        isGuestUserActive.subscribe((value) => {
-          isGuestUser = value;
-        });
-
-        if (isGuestUser == true) {
-          this.addRequestInFolder(path[0].id, path[path.length - 1].id, req);
-          const expectedPath = {
-            folderId: path[path.length - 1].id,
-            folderName: path[path.length - 1].name,
-            collectionId: path[0].id,
-            workspaceId: _workspaceMeta.id,
-          };
-          if (
-            !componentData.path.workspaceId ||
-            !componentData.path.collectionId
-          ) {
-            await this.updateRequestName(req.name);
-            await this.updateRequestDescription(req.description);
-            await this.updateRequestPath(expectedPath);
-            await this.updateRequestId(req.id);
-            const progressiveTab = this._tab.getValue();
-            progressiveTab.isSaved = true;
-            this.tab = progressiveTab;
-            await this.tabRepository.updateTab(
-              progressiveTab.tabId,
-              progressiveTab,
-            );
-          } else {
-            const initRequestTab = new InitRequestTab(req.id, "UNTRACKED-");
-            initRequestTab.updateName(req.name);
-            initRequestTab.updateDescription(req.description);
-            initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(req.request.url);
-            initRequestTab.updateMethod(req.request.method);
-            initRequestTab.updateBody(req.request.body);
-            initRequestTab.updateQueryParams(req.request.queryParams);
-            initRequestTab.updateAuth(req.request.auth);
-            initRequestTab.updateHeaders(req.request.headers);
-            this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
-          }
-          return {
-            status: "success",
-            message: "success",
-            data: {
-              id: req.id,
-            },
-          };
-        }
-        const res = await insertCollectionRequest({
-          collectionId: path[0].id,
-          workspaceId: _workspaceMeta.id,
-          folderId: path[path.length - 1].id,
-          ...userSource,
-          items: {
-            id: path[path.length - 1].id,
-            name: path[path.length - 1].name,
-            type: ItemType.FOLDER,
-            items: {
-              name: tabName,
-              description,
-              type: ItemType.REQUEST,
-              request: unadaptedRequest,
-            },
-          },
-        });
-        if (res.isSuccessful) {
-          this.addRequestInFolder(
-            path[0].id,
-            path[path.length - 1].id,
-            res.data.data,
-          );
-          const expectedPath = {
-            folderId: path[path.length - 1].id,
-            folderName: path[path.length - 1].name,
-            collectionId: path[0].id,
-            workspaceId: _workspaceMeta.id,
-          };
-          if (
-            !componentData.path.workspaceId ||
-            !componentData.path.collectionId
-          ) {
-            this.updateRequestName(res.data.data.name);
-            this.updateRequestDescription(res.data.data.description);
-            this.updateRequestPath(expectedPath);
-            this.updateRequestId(res.data.data.id);
-            const progressiveTab = this._tab.getValue();
-            progressiveTab.isSaved = true;
-            this.tab = progressiveTab;
-            this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-          } else {
-            const initRequestTab = new InitRequestTab(
-              res.data.data.id,
-              "UNTRACKED-",
-            );
-            initRequestTab.updateName(res.data.data.name);
-            initRequestTab.updateDescription(res.data.data.description);
-            initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(res.data.data.request.url);
-            initRequestTab.updateMethod(res.data.data.request.method);
-            initRequestTab.updateBody(res.data.data.request.body);
-            initRequestTab.updateQueryParams(res.data.data.request.queryParams);
-            initRequestTab.updateAuth(res.data.data.request.auth);
-            initRequestTab.updateHeaders(res.data.data.request.headers);
-            this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
-          }
-          return {
-            status: "success",
-            message: res.message,
-            data: {
-              id: res.data.data.id,
-            },
-          };
-        } else {
-          return {
-            status: "error",
-            message: res.message,
-          };
-        }
-      }
-      MixpanelEvent(Events.SAVE_API_REQUEST);
+      
+      // MixpanelEvent(Events.SAVE_API_REQUEST);
     }
   };
 

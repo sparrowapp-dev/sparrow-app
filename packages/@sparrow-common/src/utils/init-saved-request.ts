@@ -1,5 +1,4 @@
 import {
-  AuthSectionEnum,
   AuthTypeEnum,
   RequestDataTypeEnum,
   RequestDatasetEnum,
@@ -12,13 +11,14 @@ import {
   type KeyValueChecked,
   FormDataTypeEnum,
   type StatePartial,
-} from "@sparrow/common/types/workspace";
+} from "@sparrow/common/types/workspace/http-request-saved-tab";
 import {
   TabTypeEnum,
   type Tab,
   type Path,
 } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
+import { HttpRequestSavedAddToBaseEnum, HttpRequestSavedMethodBaseEnum } from "../types/workspace/http-request-saved-base";
 
 export class InitSavedRequestTab {
   private _tab: Tab;
@@ -39,7 +39,7 @@ export class InitSavedRequestTab {
       activeSync: false,
       property: {
         savedRequest: {
-          method: RequestMethodEnum.GET,
+          method: HttpRequestSavedMethodBaseEnum.GET,
           body: {
             raw: "",
             urlencoded: [
@@ -139,7 +139,7 @@ export class InitSavedRequestTab {
             apiKey: {
               authKey: "",
               authValue: "",
-              addTo: AuthSectionEnum.HEADER,
+              addTo: HttpRequestSavedAddToBaseEnum.HEADER,
             },
           },
           ai: {
@@ -183,7 +183,7 @@ export class InitSavedRequestTab {
       this._tab.property.savedRequest.url = _url;
     }
   }
-  public updateMethod(_method: RequestMethodEnum) {
+  public updateMethod(_method: HttpRequestSavedMethodBaseEnum) {
     if (_method && this._tab.property.savedRequest) {
       this._tab.property.savedRequest.method = _method;
     }

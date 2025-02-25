@@ -1,42 +1,48 @@
-interface HttpRequestKeyValueCheckedWithBaseBaseInterface {
+interface HttpRequestSavedKeyValueCheckedWithBaseBaseInterface {
     key: string;
     value: string;
     checked: boolean;
     base: string;
   }
-  interface HttpRequestKeyValueCheckedBaseInterface {
+  interface HttpRequestSavedKeyValueCheckedBaseInterface {
     key: string;
     value: string;
     checked: boolean;
   }
   
-  interface HttpRequestBodyBaseInterface {
+  interface HttpRequestSavedBodyBaseInterface {
     raw?: string;
-    urlencoded?: HttpRequestKeyValueCheckedBaseInterface[];
+    urlencoded?: HttpRequestSavedKeyValueCheckedBaseInterface[];
     formdata?: {
-      text: HttpRequestKeyValueCheckedBaseInterface[];
-      file: HttpRequestKeyValueCheckedWithBaseBaseInterface[];
+      text: HttpRequestSavedKeyValueCheckedBaseInterface[];
+      file: HttpRequestSavedKeyValueCheckedWithBaseBaseInterface[];
     };
   }
   
-  interface HttpRequestBasicAuthBaseInterface {
+  interface HttpRequestSavedBasicAuthBaseInterface {
     username?: string;
     password?: string;
   }
   
-  interface HttpRequestApiKeyBaseInterface {
+  export enum HttpRequestSavedAddToBaseEnum {
+    HEADER = "Header",
+    QUERY_PARAMETER = "Query Parameter",
+    COOKIES = "Cookies",
+  }
+
+  interface HttpRequestSavedApiKeyBaseInterface {
     authKey: string;
     authValue: string;
-    addTo: string;
+    addTo: HttpRequestSavedAddToBaseEnum;
   }
   
-  interface HttpRequestAuthBaseInterface {
+  interface HttpRequestSavedAuthBaseInterface {
     bearerToken?: string;
-    basicAuth?: HttpRequestBasicAuthBaseInterface;
-    apiKey?: HttpRequestApiKeyBaseInterface;
+    basicAuth?: HttpRequestSavedBasicAuthBaseInterface;
+    apiKey?: HttpRequestSavedApiKeyBaseInterface;
   }
   
-  export enum HttpRequestMethodBaseEnum {
+  export enum HttpRequestSavedMethodBaseEnum {
     GET = "GET",
     POST = "POST",
     PUT = "PUT",
@@ -46,19 +52,40 @@ interface HttpRequestKeyValueCheckedWithBaseBaseInterface {
     OPTIONS = "OPTIONS",
   }
   
-  export enum HttpRequestDefaultNameBaseEnum {
+  export enum HttpRequestSavedDefaultNameBaseEnum {
     NAME = "REST API",
   }
+
+  export enum HttpRequestSavedBodyModeBaseEnum {
+    NONE = "none",
+    JSON = "application/json",
+    XML = "application/xml",
+    URLENCODED = "application/x-www-form-urlencoded",
+    FORMDATA = "multipart/form-data",
+    JAVASCRIPT = "application/javascript",
+    TEXT = "text/plain",
+    HTML = "text/html",}
+
+    export enum HttpRequestSavedAuthModeBaseEnum {
+      NO_AUTH = "No Auth",
+      API_KEY = "API Key",
+      BEARER_TOKEN = "Bearer Token",
+      BASIC_AUTH = "Basic Auth",
+    }
   
-  export interface HttpRequestBaseInterface {
-    method: string;
+  export interface HttpRequestSavedBaseInterface {
+    method: HttpRequestSavedMethodBaseEnum;
     operationId: string;
     url: string;
-    body: HttpRequestBodyBaseInterface[];
-    selectedRequestBodyType: string;
-    selectedRequestAuthType: string;
-    queryParams: HttpRequestKeyValueCheckedBaseInterface[];
-    auth: HttpRequestAuthBaseInterface;
-    headers: HttpRequestKeyValueCheckedBaseInterface[];
+    body: HttpRequestSavedBodyBaseInterface;
+    selectedRequestBodyType: HttpRequestSavedBodyModeBaseEnum;
+    selectedRequestAuthType: HttpRequestSavedAuthModeBaseEnum;
+    queryParams: HttpRequestSavedKeyValueCheckedBaseInterface[];
+    auth: HttpRequestSavedAuthBaseInterface;
+    headers: HttpRequestSavedKeyValueCheckedBaseInterface[];
+    responseBody?: string;
+    responseStatus: string;
+    responseDate: string;
+    responseHeaders?: HttpRequestSavedKeyValueCheckedBaseInterface[];
   }
   
