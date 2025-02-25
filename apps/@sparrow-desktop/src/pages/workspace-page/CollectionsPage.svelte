@@ -867,9 +867,10 @@
   :global(.collection-splitter .splitpanes__splitter) {
     width: 6px !important;
     height: auto !important;
-    background-color: var(--bg-secondary-500) !important;
-    border-left: 5px solid var(--border-secondary-900) !important;
-    border-right: 0px solid var(--blackColor) !important;
+
+    background-color: var(--bg-ds-surface-900) !important;
+    border-left: 5px solid var(--bg-ds-surface-700) !important;
+    border-right: 0px solid var(--bg-ds-surface-900) !important;
     border-top: 0 !important;
     border-bottom: 0 !important;
   }
@@ -877,7 +878,7 @@
       .collection-splitter .splitpanes__splitter:active,
       .collection-splitter .splitpanes__splitter:hover
     ) {
-    background-color: var(--bg-primary-200) !important;
+    background-color: var(--bg-ds-primary-300) !important;
   }
   .gradient-text {
     font-size: 18;

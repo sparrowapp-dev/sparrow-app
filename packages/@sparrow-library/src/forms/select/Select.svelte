@@ -3,10 +3,11 @@
   import { onDestroy, onMount } from "svelte";
   import { SearchIcon } from "@sparrow/library/assets";
   import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
-  import { GitBranchIcon, DownArrowIcon } from "@sparrow/library/assets";
+  import { GitBranchIcon } from "@sparrow/library/assets";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
-  import { ArrowIcon } from "@sparrow/library/icons";
   import MenuItemsV3 from "./menu-items/MenuItemsV3.svelte";
+  import { CaretDownRegular } from "@sparrow/library/icons";
+  import { CaretDownFilled } from "@sparrow/library/icons";
   /**
    * Determines id of the menu item.
    */
@@ -493,21 +494,10 @@
         class:select-logo-active={isOpen}
       >
         {#if isDropIconFilled}
-          <ArrowIcon
-            width={"12"}
-            height={"12"}
-            color={disabled || selectedRequest?.hide
-              ? "var( --icon-secondary-220)"
-              : "var(--sparrow-text-color)"}
-          />
+        <CaretDownFilled size={"16px"}/>
+       
         {:else}
-          <DownArrowIcon
-            width={"12"}
-            height={"12"}
-            color={disabled || selectedRequest?.hide
-              ? "var( --icon-secondary-220)"
-              : "var(--sparrow-text-color)"}
-          />
+          <CaretDownRegular size={"16px"}/>
         {/if}
       </span>
     </div>
