@@ -259,7 +259,7 @@
   activeTabId
     ? 'active-request-tab'
     : ''}"
-  style="height:32px; padding-left:3px; gap:4px"
+  style="height:32px; padding-left:3px; gap:4px;  margin-bottom: 2px;"
 >
   <button
     tabindex="-1"

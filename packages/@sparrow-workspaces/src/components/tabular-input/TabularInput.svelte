@@ -235,19 +235,19 @@
   });
 </script>
 
-<div class="outer-section">
+<div class="outer-section" style="margin-top:12px;">
   {#if !isBulkEditActive}
     <section
-      class="mb-0 me-0 w-100 py-0 border-radius-2 section-layout"
+      class="mb-0 me-0 py-0 section-layout w-100"
       style="overflow:hidden;"
     >
       <div
-        class="w-100 d-flex align-items-center px-3 pair-header-row {!isTopHeaderRequired
+        class=" d-flex align-items-center pair-header-row {!isTopHeaderRequired
           ? 'd-none'
           : ''}"
-        style="position:relative;"
+        style="position:relative; padding-right:1rem; padding-left:4px; border-top-left-radius: 4px; border-top-right-radius: 4px;"
       >
-        <div style=" width:24px;" class="me-3">
+        <div style=" width:24px; margin-right:12px" class="">
           <Checkbox
             size="small"
             disabled={pairs.length === 1 || !isCheckBoxEditable}
@@ -258,14 +258,14 @@
 
         <div class="d-flex gap-0" style="width: calc(100% - 188px);">
           <div
-            class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
+            class="w-50 position-relative header-text"
             style="padding-left: 6px;"
           >
             Key
           </div>
           <div
-            class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
-            style="padding-left: 68px;"
+            class="w-50 position-relative header-text"
+            style="padding-left: 69px;"
           >
             Value
           </div>
@@ -277,7 +277,8 @@
                 <Toggle
                   bind:isActive={bulkToggle}
                   label="Bulk Edit"
-                  fontSize="10px"
+                  fontSize="12px"
+                  textColor="var(--text-ds-neutral-200)"
                   fontWeight="400"
                   onClick={handleBulkTextUpdate}
                   onChange={toggleBulkEdit}
@@ -327,7 +328,7 @@
   {:else}
     <!-- Bulk Edit section Start -->
     <section>
-      <div class="d-flex flex-column" style="font-size:12px;">
+      <div class="d-flex flex-column w-100" style="font-size:12px;">
         <!-- Bulk Edit Heading -->
         <div
           class="px-3 d-flex align-items-center"
@@ -430,10 +431,16 @@
 
 <style>
   .pair-header-row {
-    border-top: 0.5px solid var(--border-secondary-315);
+    /* border-top: 0.5px solid var(--border-secondary-315); */
     padding-top: 3px;
     padding-bottom: 3px;
-    background-color: var(--bg-secondary-880);
-    height: 26px;
+    background-color: var(--bg-ds-surface-400);
+    height: 28px;
+  }
+  .header-text {
+    color: var(--text-ds-neutral-200);
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
   }
 </style>
