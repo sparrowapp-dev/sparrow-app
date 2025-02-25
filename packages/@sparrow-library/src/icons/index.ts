@@ -159,6 +159,7 @@ export { default as deleteIcon } from "./Delete.svelte";
 export { default as DeleteRegular } from "./DeleteRegular.svelte";
 export { default as ReOrderDotsRegular } from "./ReOrderDotsRegular.svelte";
 
+export { default as ArrowSortRegular } from "./ArrowSortRegular.svelte";
 export { default as GraphqlIcon } from "./GraphQLIcon.svelte";
 export { default as WebSocketIcon } from "./WebSocketIcon.svelte";
 export { default as SocketIOIcon } from "./SocketIOICon.svelte";

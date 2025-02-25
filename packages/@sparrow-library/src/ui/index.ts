@@ -10,7 +10,6 @@ export * from "./tooltip";
 export * from "./modal";
 export * from "./popover";
 export * from "./carousel";
-export * from "./table";
 export * from "./toast";
 export * from "./image-modal";
 export * from "./skeleton";
