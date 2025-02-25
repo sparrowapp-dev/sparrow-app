@@ -260,6 +260,7 @@
           </p>
           <Button
             title="Add Environment"
+            startIcon={AddRegular}
             type="outline-secondary"
             size="small"
             customWidth="100%"
