@@ -5,7 +5,7 @@
 </script>
 
 <i
-  class="icon-ic_fluent_delete_20_regular"
+  class="icon-ic_fluent_chevron_up_20_filled"
   style="font-size:{size}; color:{finalColor}; display: flex; justify-content:center; align-items:center;"
 ></i>
 
