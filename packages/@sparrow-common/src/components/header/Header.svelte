@@ -296,7 +296,7 @@
             borderActiveType={"none"}
             headerHighlight={"hover-active"}
             headerTheme={"primary"}
-            menuItem={"v4"}
+            menuItem={"v2"}
             headerFontSize={"12px"}
             maxHeaderWidth={"252px"}
             headerFontWeight={600}
@@ -311,6 +311,7 @@
             icon={WorkspaceRegular}
             iconColor={"var(--icon-ds-neutral-100)"}
             showDescription={false}
+            headerHeight={"28px"}
           >
             <div slot="pre-select" class="mb-2 px-1">
               <div class="guest-user-text">
@@ -346,7 +347,7 @@
           borderActiveType={"none"}
           headerHighlight={"hover-active"}
           headerTheme={"transparent"}
-          menuItem={"v4"}
+          menuItem={"v2"}
           headerFontSize={"12px"}
           maxHeaderWidth={"252px"}
           zIndex={200}
@@ -360,6 +361,7 @@
           iconColor={"var(--icon-ds-neutral-100)"}
           headerFontWeight={600}
           showDescription={false}
+          headerHeight={"28px"}
         >
           <div slot="pre-select" class="mb-1">
            <div class="workspacename"> {currentTeamName}</div>
@@ -437,7 +439,7 @@
         borderActiveType={"none"}
         headerHighlight={"hover-active"}
         headerTheme={"primary"}
-        menuItem={"v4"}
+        menuItem={"v2"}
         headerFontSize={"12px"}
         maxHeaderWidth={"12px"}
         zIndex={200}
@@ -447,6 +449,7 @@
         isHeaderCombined={false}
         maxBodyHeight={"296px"}
         minBodyWidth={"296px"}
+        headerHeight={"28px"}
       >
   
         <div
@@ -521,13 +524,14 @@
       borderActiveType={"none"}
       headerHighlight={"hover-active"}
       headerTheme={"transparent"}
-      menuItem={"v4"}
+      menuItem={"v2"}
       headerFontSize={"12px"}
       maxHeaderWidth={"185px"}
       zIndex={200}
       bodyTheme={"surface"}
       borderRounded={"2px"}
       position={"absolute"}
+      headerHeight={"28px"}
     />
     <!-- {/if} -->
 

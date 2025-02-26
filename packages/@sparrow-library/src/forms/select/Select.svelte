@@ -5,7 +5,6 @@
   import { GitBranchIcon } from "@sparrow/library/assets";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
   import MenuItemsV3 from "./menu-items/MenuItemsV3.svelte";
-  import MenuItemsV4 from "./menu-items/MenuItemsV4.svelte";
   import { CaretDownFilled } from "@sparrow/library/icons";
   /**
    * Determines id of the menu item.
@@ -53,7 +52,7 @@
   /**
    * Determines the dimensions of a Select.
    */
-  export let headerHeight = "28px";
+  export let headerHeight = "34px";
   export let maxBodyHeight = "200px";
   export let minHeaderWidth = "50px";
   export let maxHeaderWidth = "500px";
@@ -116,7 +115,7 @@
   /**
    * Determines versions of the Select menu.
    */
-  export let menuItem: "v1" | "v2" | "v3" | "v4" = "v1";
+  export let menuItem: "v1" | "v2" | "v3"  = "v1";
   /**
    * Determines icons used in Select header.
    */
@@ -580,15 +579,7 @@
             />
           {:else if menuItem === "v3"}
             <MenuItemsV3 {list} {selectedRequest} {getTextColor} />
-          {:else if menuItem === "v4"}
-            <MenuItemsV4
-              {list}
-              {selectedRequest}
-              {bodyTheme}
-              {getTextColor}
-              {highlightTickedItem}
-              {showDescription}
-            />
+          
           {/if}
         </div>
       {/each}
