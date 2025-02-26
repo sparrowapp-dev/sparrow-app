@@ -158,10 +158,9 @@ export { default as postIcon } from "./Post.svelte";
 export { default as putIcon } from "./Put.svelte";
 export { default as deleteIcon } from "./Delete.svelte";
 
-export { default as InfoIcon2 } from "./Info2.svelte";
-export { default as Stack2 } from "./Stack2.svelte";
+export { default as InfoRegular } from "./InfoRegular.svelte";
 export { default as ChevronUpRegular } from "./ChevronUpRegular.svelte";
-export { default as ChevronLeftRegular } from "./ChevronLeftRegular.svelte";
+export { default as ChevronLeftRegular } from "./ChevronLeftFilled.svelte";
 export { default as DeleteRegular } from "./DeleteRegular.svelte";
 export { default as ReOrderDotsRegular } from "./ReOrderDotsRegular.svelte";
 

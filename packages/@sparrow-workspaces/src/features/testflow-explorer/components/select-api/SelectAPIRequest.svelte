@@ -10,7 +10,7 @@
   import { onDestroy, onMount } from "svelte";
   import { ChevronDownRegular } from "@sparrow/library/icons";
   import { ChevronLeftRegular } from "@sparrow/library/icons";
-  import { Stack2 } from "@sparrow/library/icons";
+  import { StackRegular } from "@sparrow/library/icons";
   import {
     currentStep,
     isTestFlowTourGuideOpen,
@@ -252,7 +252,7 @@
           class="d-flex"
           style="margin-left: 2px; align-items:center; margin-right:2px;"
         >
-          <Stack2 size={"16px"} color={"var(--icon-ds-neutral-50)"} />
+          <StackRegular size={"16px"} color={"var(--icon-ds-neutral-50)"} />
           <p
             class="ellipsis label-text"
             style="margin-left: 4px; margin-bottom:0px"
@@ -304,7 +304,7 @@
                 {:else if data?.type === "FOLDER"}
                   <FolderRegular size={"16px"} />
                 {:else}
-                  <Stack2 />
+                  <StackRegular />
                 {/if}
               </div>
               <p class="options-txt ellipsis label-text">
@@ -340,7 +340,7 @@
                 {:else if data?.type === "FOLDER"}
                   <FolderRegular size={"16px"} />
                 {:else}
-                  <Stack2 />
+                  <StackRegular />
                 {/if}
               </div>
               <p class="options-txt ellipsis label-text">
