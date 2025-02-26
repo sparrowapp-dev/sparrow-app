@@ -7,13 +7,17 @@
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import { ArrowIcon } from "../../icons";
   import { ArrowSwapRegular } from "@sparrow/library/icons";
-  import { CheckmarkCircle, MoreHorizontal, ErrorCircle } from "../../icons";
-  import { InfoIcon2 } from "@sparrow/library/icons";
+  import {
+    CheckmarkCircleRegular,
+    MoreHorizontalRegular,
+    ErrorCircleRegular,
+  } from "../../icons";
+  import { InfoRegular } from "@sparrow/library/icons";
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { testFlowDataStore } from "../../../../features/testflow-explorer/store/testflow";
-  // import { MoreHorizontal } from "@sparrow/library/assets";
+  // import { MoreHorizontalRegular } from "@sparrow/library/assets";
   import { createDeepCopy } from "@sparrow/common/utils";
   import { ParseTime } from "@sparrow/common/utils";
   import type {
@@ -202,9 +206,15 @@
             color={"var(--icon-ds-neutral-200)"}
           />
         {:else if checkIfRequestSucceed(currentBlock)}
-          <CheckmarkCircle size={"16px"} color={"var(--icon-ds-success-400)"} />
+          <CheckmarkCircleRegular
+            size={"16px"}
+            color={"var(--icon-ds-success-400)"}
+          />
         {:else}
-          <ErrorCircle size={"16px"} color={"var(--icon-ds-danger-300)"} />
+          <ErrorCircleRegular
+            size={"16px"}
+            color={"var(--icon-ds-danger-300)"}
+          />
         {/if}
       </div>
       <span class="px-1" style="padding-top: 3px; padding-bottom:3px;">
@@ -223,7 +233,10 @@
         moreOptionsMenu = false;
       }}
     >
-      <MoreHorizontal size={"16px"} color={"var(--icon-ds-neutral-100)"} />
+      <MoreHorizontalRegular
+        size={"16px"}
+        color={"var(--icon-ds-neutral-100)"}
+      />
 
       {#if moreOptionsMenu}
         <div
@@ -259,7 +272,7 @@
     {#if !currentBlock}
       {#if req.name?.length > 0}
         <div class="d-flex run-txt-container">
-          <InfoIcon2 size={"16px"} color={"var(--icon-ds-neutral-400)"} />
+          <InfoRegular size={"16px"} color={"var(--icon-ds-neutral-400)"} />
           <p style="basic-text-message">Run the block to get response</p>
         </div>
       {/if}
@@ -403,7 +416,7 @@
             <span class="ms-2">REST API Request</span>
           </span>
           <div>
-            <MoreHorizontal />
+            <MoreHorizontalRegular />
           </div>
         </div>
         <hr class="my-0 base-line" />

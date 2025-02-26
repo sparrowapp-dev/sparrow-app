@@ -9,7 +9,7 @@
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
   import { ChevronDownRegular } from "@sparrow/library/icons";
-  import { ChevronLeftRegular } from "@sparrow/library/icons";
+  import { ChevronLeftFilled } from "@sparrow/library/icons";
   import { Stack2 } from "@sparrow/library/icons";
   import {
     currentStep,
@@ -235,7 +235,7 @@
           <Button
             size="extra-small"
             type="teritiary-regular"
-            startIcon={ChevronLeftRegular}
+            startIcon={ChevronLeftFilled}
             onClick={() => {
               if (selectedFolder) {
                 arrayData = selectedCollection.items;
