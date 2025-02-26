@@ -21,7 +21,7 @@
   let isSelected = false;
 </script>
 
-<div class="d-flex prompt-input p-3">
+<div class="d-flex prompt-input p-1">
   <div class="position-relative w-100">
     <input
       type=""
@@ -31,7 +31,7 @@
       }}
       class="w-100 pe-5 py-2 ps-2 border-radius-6 text-fs-12 inputClass }"
       autofocus
-      style="border:1px solid grey; outline: none; background-color: var(--bg-secondary-1100); border: 1px solid var(--border-tertiary-190); "
+      style="border:1px solid grey; outline: none; background-color: var(--bg-ds-surface-400); border: 1px solid var(--border-tertiary-190); height:36px; width:296px; min-width:240px; max-width:540px; gap:8"
       {placeholder}
       on:keydown={(event) => {
         if (event.key === "Enter" && prompt && !isResponseGenerating) {
@@ -59,9 +59,11 @@
         <SendIcon
           height={"14px"}
           width={"14px"}
-          color={isSendButtonHovered
-            ? "var(--icon-primary-300)"
-            : "var(--icon-secondary-100)"}
+          color={prompt.trim()
+            ? "white"
+            : isSendButtonHovered
+              ? "var(--icon-secondary-100)"
+              : "var(--border-ds-neutral-400)"}
         />
       </div>
     {:else}
@@ -92,5 +94,12 @@
   input:focus {
     outline: none;
     border: 1px solid var(--border-ds-primary-300) !important;
+  }
+  input:hover {
+    border: 1px solid var(--border-ds-primary-300) !important;
+  }
+  .p-3 {
+    /* padding: 4px 4px 4px 8px !important; */
+    /* gap: 8px; */
   }
 </style>

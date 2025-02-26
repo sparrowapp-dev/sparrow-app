@@ -1,6 +1,5 @@
 <script lang="ts">
   import {
-    GlobalSearch,
     LoginBanner,
     LoginSignupConfirmation,
     SwitchWorkspace,
@@ -41,6 +40,7 @@
     SidebarItemPositionBaseEnum,
     SidebarItemIdEnum,
   } from "@sparrow/common/types/sidebar/sidebar-base";
+  import { GlobalSearch } from "@sparrow/common/features";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -551,7 +551,8 @@
 <div
   class="dashboard d-flex flex-column {isGlobalSearchOpen ? 'blurred' : ''}"
   style="height: 100vh;"
->
+> 
+
   <Header
     environments={$environments?.filter((element) => {
       return element?.workspaceId === currentWorkspaceId;

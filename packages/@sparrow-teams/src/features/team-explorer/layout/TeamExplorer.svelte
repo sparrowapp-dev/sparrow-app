@@ -9,7 +9,9 @@
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { TeamRole } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
-  import TeamNavigator from "../components/team-navigator/TeamNavigator.svelte";
+  import { Navigator } from "@sparrow/library/ui";
+  import { Avatar } from "@sparrow/library/ui";
+
   import {
     TeamTabsEnum,
     TeamViewEnum,
@@ -19,6 +21,7 @@
   import { TeamMembers, TeamSettings } from "@sparrow/teams/features";
   import { CrossIcon, MoreOptions } from "@sparrow/library/icons";
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
+  import { Search } from "@sparrow/library/forms";
   export let isWebApp = false;
 
   export let isWebEnvironment: boolean;
@@ -178,7 +181,7 @@
   };
 
   const handleSearchInput = (event) => {
-    searchQuery = event.target.value.toLowerCase();
+    searchQuery = event.detail.toLowerCase();
     hasText = searchQuery.length > 0;
   };
   const clearSearchInput = () => {
@@ -216,20 +219,18 @@
         >
           <h2 class="d-flex ellipsis overflow-visible team-title">
             {#if openTeam?.logo?.size}
-              <img
-                class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
-                style="width: 40px !important; height: 40px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-                src={base64ToURL(openTeam?.logo)}
-                alt=""
-              />{:else}
-              <div
-                class={`text-defaultColor w-25 text-center my-auto align-items-center justify-content-center profile-circle bg-tertiary-750 border-secondary-300 border-2`}
-                style={`font-size: 24px; width: 40px !important; height: 40px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
-              >
-                <span class="text-fs-24">
-                  {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
-                </span>
-              </div>
+              <Avatar
+                type="image"
+                size="large"
+                image={base64ToURL(openTeam?.logo)}
+              />
+            {:else}
+              <Avatar
+                type="letter"
+                size="large"
+                letter={openTeam?.name[0] ? openTeam?.name[0] : ""}
+                bgColor="var(--bg-secondary-600)"
+              />
             {/if}
             <span
               class="ms-3 my-auto ellipsis overflow-hidden heading"
@@ -281,7 +282,7 @@
             {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER}
               <Button
                 title={`Invite`}
-                type={`dark`}
+                type={"secondary"}
                 textStyleProp={"font-size: var(--small-text)"}
                 onClick={() => {
                   isTeamInviteModalOpen = true;
@@ -310,15 +311,16 @@
         <!--Workspace, setting and members tab-->
 
         <div
-          class="teams-menu d-flex justify-content-between align-items-center"
+          class="teams-menu d-flex justify-content-between align-items-center position-relative"
         >
           <div
             class="teams-menu__left gap-4 align-items-center"
             style="padding-bottom: 4px;"
           >
-            <TeamNavigator
-              tabs={teamTabs}
-              {onUpdateActiveTab}
+            <Navigator
+              tabs={teamTabs.filter((tab) => tab.visible !== false)}
+              currentTabId={"Workspaces"}
+              onTabClick={onUpdateActiveTab}
               {activeTeamTab}
             />
           </div>
@@ -356,35 +358,16 @@
           <div class="h-100 d-flex flex-column">
             {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
               <div class="pt-2">
-                <div
-                  class={`d-flex search-input-container rounded  align-items-center mb-4`}
-                >
-                  <div>
-                    <SearchIcon
-                      width={14}
-                      height={14}
-                      classProp={`my-auto me-3`}
-                      color={"var(--icon-secondary-200)"}
-                    />
-                  </div>
-                  <input
-                    type="text"
+                <div class={`d-flex  rounded  align-items-center mb-4`}>
+                  <Search
+                    variant={"primary"}
                     id="search-input"
-                    class={`bg-transparent w-100 border-0 my-auto ms-2 ellipsis`}
+                    size="large"
                     placeholder="Search workspaces in {openTeam?.name}"
                     on:input={handleSearchInput}
                     bind:value={searchQuery}
+                    customWidth={"450px"}
                   />
-
-                  {#if hasText}
-                    <div class="clear-icon" on:click={clearSearchInput}>
-                      <CrossIcon
-                        height="16px"
-                        width="12px"
-                        color="var(--icon-secondary-300)"
-                      />
-                    </div>
-                  {/if}
                 </div>
               </div>
             {/if}

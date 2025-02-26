@@ -3,7 +3,7 @@
   "private": true,
   "author": "Sparrow",
   "description": "The Sparrow App is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and making you a better programmer.",
-  "version": "2.17.1",
+  "version": "2.18.0",
   "type": "module",
   "workspaces": [
     "./apps/@sparrow-web",
@@ -21,6 +21,13 @@
     "desktop-build-mac-universal": "yarn workspace @sparrow/desktop tauri build --target universal-apple-darwin --debug --verbose",
     "web-start": "yarn workspace @sparrow/web dev",
     "web-build": "yarn workspace @sparrow/web build",
+    "docker:up": "docker-compose build --no-cache && docker compose up -d --force-recreate",
+    "docker:down": "docker compose down -v",
+    "docker:up:mongo": "docker compose up mongo --build -d",
+    "docker:up:kafka": "docker compose up kafka --build -d",
+    "docker:up:api": "docker compose up sparrow-api --build -d",
+    "docker:up:auth": "docker compose up sparrow-auth --build -d",
+    "docker:up:proxy": "docker compose up sparrow-proxy --build -d",
     "storybook-start": "yarn workspace @sparrow/storybook storybook",
     "storybook-build": "yarn workspace @sparrow/storybook build-storybook",
     "desktop-lint": "yarn workspace @sparrow/desktop lint",
@@ -158,19 +165,19 @@
           "assets": [
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg",
-              "label": "Sparrow_2.17.1.dmg"
+              "label": "Sparrow_2.18.0.dmg"
             },
             {
               "path": "msi_files/*.exe",
-              "label": "Sparrow_2.17.1.exe"
+              "label": "Sparrow_2.18.0.exe"
             },
             {
               "path": "msi_files/*.msi",
-              "label": "Sparrow_2.17.1.msi"
+              "label": "Sparrow_2.18.0.msi"
             },
             {
               "path": "msi_files/*.zip",
-              "label": "Sparrow_2.17.1_x64_en-US.msi.zip"
+              "label": "Sparrow_2.18.0_x64_en-US.msi.zip"
             },
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz",

@@ -9,6 +9,7 @@
   import { Tooltip } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   import { Base64Converter } from "@sparrow/common/utils";
+  import { Checkbox } from "@sparrow/library/forms";
   export let keyValue: {
     key: string;
     value: string;
@@ -211,16 +212,12 @@
       : ''}"
     style="position:relative;"
   >
-    <div style="height:14px; width:14px;" class="me-3">
-      <label class="checkbox-parent">
-        <input
-          type="checkbox"
-          disabled={pairs.length === 1 || !isCheckBoxEditable}
-          bind:checked={controller}
-          on:input={handleCheckAll}
-        />
-        <span class="checkmark"></span>
-      </label>
+    <div style=" width:24px;" class="me-3">
+      <Checkbox
+        disabled={pairs.length === 1 || !isCheckBoxEditable}
+        checked={controller}
+        on:input={handleCheckAll}
+      />
     </div>
 
     <div class="d-flex gap-0" style="width: calc(100% - 180px);">
@@ -261,19 +258,15 @@
     {#if pairs}
       {#each pairs as element, index}
         <div class="pair-data-row w-100 px-3 d-flex align-items-center">
-          <div style="height:14px; width:14px;" class="me-3">
+          <div style=" width:24px;" class="me-3">
             {#if pairs.length - 1 != index || !isInputBoxEditable}
-              <label class="checkbox-parent">
-                <input
-                  type="checkbox"
-                  bind:checked={element.checked}
-                  on:input={() => {
-                    updateCheck(index);
-                  }}
-                  disabled={!isCheckBoxEditable}
-                />
-                <span class="checkmark"></span>
-              </label>
+              <Checkbox
+                checked={element.checked}
+                on:input={() => {
+                  updateCheck(index);
+                }}
+                disabled={!isCheckBoxEditable}
+              />
             {/if}
           </div>
 
@@ -405,78 +398,5 @@
     padding-bottom: 3px;
     height: calc(24px);
     background-color: var(--bg-secondary-700);
-  }
-
-  /* The checkbox-parent */
-  .checkbox-parent {
-    display: block;
-    position: relative;
-    /* padding-left: 35px;
-    margin-bottom: 12px; */
-    cursor: pointer;
-    font-size: 22px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-
-  /* Hide the browser's default checkbox */
-  .checkbox-parent input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* Create a custom checkbox */
-  .checkbox-parent .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 14px;
-    width: 14px;
-    border-radius: 3px;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* On mouse-over, add a grey background color */
-  /* .checkbox-parent:hover input ~ .checkmark {
-    background-color: #ccc;
-  } */
-
-  /* When the checkbox is checked, add a blue background */
-  .checkbox-parent input:checked ~ .checkmark {
-    border: none;
-    background-color: var(--text-primary-300);
-  }
-
-  /* Create the checkmark/indicator (hidden when not checked) */
-  .checkbox-parent .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-  }
-
-  /* Show the checkmark when checked */
-  .checkbox-parent input:checked ~ .checkmark:after {
-    display: block;
-  }
-
-  /* Style the checkmark/indicator */
-  .checkbox-parent .checkmark:after {
-    left: 5px;
-    top: 2px;
-    width: 4px;
-    height: 8px;
-    border: solid var(--text-secondary-850);
-    border-width: 0 2px 2px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
   }
 </style>

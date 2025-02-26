@@ -1,6 +1,6 @@
 <script lang="ts">
   import { AttachmentIcon, CrossIcon } from "@sparrow/library/icons";
-  import { Button, IconFallback } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
   import { CommentCard } from "@sparrow/support/components";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -8,6 +8,8 @@
   import { Attachment } from "@sparrow/support/components";
   import { ImageModal } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
+  import { Tag } from "@sparrow/library/ui";
+  import { Avatar } from "@sparrow/library/ui";
 
   /**
    * @description - The current comment being added or modified by the user.
@@ -200,34 +202,29 @@
 </script>
 
 <div class="comment">
-  <IconFallback
-    character={comment.author.name.charAt(0)}
-    width="34px"
-    height="32px"
-    backgroundColor="#1C1D2B"
-    borderColor="#45494D"
-  />
+     <Avatar
+      type={"letter"}
+      size={"large"}
+      letter={comment?.author?.name.charAt(0) || ""}
+      bgColor={"var(--text-secondary-600)"}/>
 
   <div class="comment-content">
     <div class="comment-author text-fs-14 mt-1">
       {comment.author.name || ""}
+      
       {#if comment.value === "" && comment.author?.isAdmin === true}
         <span
           class="text-fs-14"
           style="marign-start: 4px; color: var(--text-secondary-150); font-weight: 400;"
         >
           has marked this post as
-          <span
-            class="mb-0 ms-2 px-2"
-            style="border:0.2px solid {getColor(comment?.status)
-              .fontColor}; color: {getColor(comment?.status)
-              .fontColor};   border-radius: 2px; font-size:10px !important; align-text:center;  width:fit-content; height:12px;"
-          >
-            {comment?.status
-              ? comment?.status.charAt(0).toUpperCase() +
+          <Tag
+           type={comment?.status}
+            text={comment?.status
+              ? comment?.status.charAt(0) +
                 comment?.status.slice(1)
               : ""}
-          </span>
+            /> 
         </span>
       {/if}
     </div>

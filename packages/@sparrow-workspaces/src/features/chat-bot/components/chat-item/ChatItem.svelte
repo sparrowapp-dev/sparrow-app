@@ -4,8 +4,9 @@
   import { notifications } from "@sparrow/library/ui";
   import { copyIcon, tickIcon } from "../../assests";
   import { tick } from "svelte";
-
+  import ArrowSync from "../../../../../../@sparrow-library/src/icons/ArrowSync.svelte";
   import hljs from "highlight.js";
+  import { ThumbDislikeFilled } from "@sparrow/library/icons";
   import "highlight.js/styles/atom-one-dark.css";
   import {
     CopyIcon2,
@@ -14,12 +15,15 @@
     RefreshIcon,
     TickIcon,
   } from "@sparrow/library/icons";
+  import ThumbLikeFilled from "../../../../../../@sparrow-library/src/icons/ThumbLikeFilled.svelte";
   import { SparrowAIIcon } from "@sparrow/common/icons";
+  import CopyRegular from "../../../../../../@sparrow-library/src/icons/CopyRegular.svelte";
   import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
   import { MessageTypeEnum } from "@sparrow/common/types/workspace";
-
+  import { ThhumbLike } from "@sparrow/library/icons";
+  import ThumbDislike from "../../../../../../@sparrow-library/src/icons/ThumbDislike.svelte";
   export let message: string;
   export let messageId: string;
   export let type;
@@ -196,6 +200,22 @@
       cleanUpListeners();
     }
   });
+
+  let flag = false;
+  let flag2 = false;
+  function handleClick() {
+    flag = !flag;
+    if (flag2) {
+      flag2 = false;
+    }
+  }
+
+  function handleClickDislike() {
+    flag2 = !flag2;
+    if (flag) {
+      flag = false;
+    }
+  }
 </script>
 
 <div class="message-wrapper">
@@ -214,7 +234,7 @@
           border-radius: 8px; 
           padding: 8px; 
           margin-left: auto; 
-          margin-right: 0; 
+          margin-right: 5px; 
           max-width: 248px; 
           text-align: left;
           font-size:12px;
@@ -230,7 +250,7 @@
     -- RECIEVER
     -- 
     -->
-    <div class="recieve-item p-3">
+    <div class="recieve-item p-1">
       <div class="d-flex justify-content-between">
         <!-- <SparrowAIIcon height={"20px"} width={"20px"} /> -->
         <div class="d-flex gap-1 pb-2">
@@ -240,38 +260,6 @@
             -- LIKE / DISLIKE
             -- 
             -->
-            <!-- <Tooltip placement="top-center" title="Like" distance={13}>
-              <span
-                role="button"
-                class="action-button d-flex align-items-center justify-content-center border-radius-4"
-                on:click={() => {
-                  onToggleLike(messageId, true);
-                  MixpanelEvent(Events.AI_Like_Response);
-                }}
-              >
-                <LikeIcon
-                  height={"16px"}
-                  width={"16px"}
-                  color={isLiked ? "white" : "transparent"}
-                />
-              </span>
-            </Tooltip>
-            <Tooltip placement="top-center" title="Dislike" distance={13}>
-              <span
-                class="action-button d-flex align-items-center justify-content-center border-radius-4"
-                role="button"
-                on:click={() => {
-                  onToggleLike(messageId, false);
-                  MixpanelEvent(Events.AI_Dislike_Response);
-                }}
-              >
-                <DislikeIcon
-                  height={"16px"}
-                  width={"16px"}
-                  color={isDisliked ? "white" : "transparent"}
-                />
-              </span>
-            </Tooltip> -->
           {/if}
         </div>
       </div>
@@ -304,7 +292,7 @@
               {#if showTickIcon}
                 <TickIcon height={"14px"} width={"14px"} color={"grey"} />
               {:else}
-                <CopyIcon2 height={"14px"} width={"14px"} />
+                <CopyRegular height={"14px"} width={"14px"} />
               {/if}
             </button>
           </Tooltip>
@@ -315,13 +303,18 @@
               on:click={() => {
                 onToggleLike(messageId, true);
                 MixpanelEvent(Events.AI_Like_Response);
+                handleClick();
               }}
             >
-              <LikeIcon
-                height={"16px"}
-                width={"16px"}
-                color={isLiked ? "white" : "transparent"}
-              />
+              {#if !flag}
+                <ThhumbLike
+                  height={"16px"}
+                  width={"16px"}
+                  color={isLiked ? "white" : "white"}
+                />
+              {:else}
+                <ThumbLikeFilled height={"16px"} width={"16px"} />
+              {/if}
             </span>
           </Tooltip>
           <Tooltip placement="top-center" title="Dislike" distance={13}>
@@ -331,13 +324,18 @@
               on:click={() => {
                 onToggleLike(messageId, false);
                 MixpanelEvent(Events.AI_Dislike_Response);
+                handleClickDislike();
               }}
             >
-              <DislikeIcon
-                height={"16px"}
-                width={"16px"}
-                color={isDisliked ? "white" : "transparent"}
-              />
+              {#if !flag2}
+                <ThumbDislike
+                  height={"16px"}
+                  width={"16px"}
+                  color={isDisliked ? "white" : "white"}
+                />
+              {:else}
+                <ThumbDislikeFilled height={"16px"} width={"16px"} />
+              {/if}
             </span>
           </Tooltip>
           <Tooltip placement="top-center" title="Regenerate" distance={13}>
@@ -345,7 +343,7 @@
               class="action-button d-flex align-items-center justify-content-center border-radius-4"
               on:click={regenerateAiResponse}
             >
-              <RefreshIcon height={"16px"} width={"16px"} />
+              <ArrowSync height={"16px"} width={"16px"} />
             </button>
           </Tooltip>
         {/if}
@@ -372,14 +370,14 @@
   :global(.message-wrapper .markdown pre) {
     margin-bottom: 0;
   }
-
   :global(.message-wrapper .wrapper) {
-    border-radius: 4px !important;
+    border-radius: 8px !important;
     overflow: hidden !important;
-    margin-bottom: 10px;
+    /* margin-bottom: 10px; */
   }
   :global(.message-wrapper .hljs) {
     background: #000 !important;
+    border-bottom: 8px;
   }
   :global(.action-button) {
     height: 30px;
