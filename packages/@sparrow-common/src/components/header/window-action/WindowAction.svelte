@@ -1,14 +1,17 @@
 <script lang="ts">
   import {
     CrossIconV2,
+    DismissRegular,
     DoubleResizeIcon,
     ExpandIcon,
     MiniMizeIcon,
     SquareIcon,
+    SubtractIcon,
   } from "@sparrow/library/icons";
   import { invoke } from "@tauri-apps/api/core";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { onDestroy } from "svelte";
+  import { WindowMultipleIcon } from "@sparrow/library/icons";
 
   export let isWindows = true;
 
@@ -99,13 +102,7 @@
         on:mouseleave={handleMouseLeave}
         class="custom-header-button button-minus border-0 py-1 px-1"
       >
-        <MiniMizeIcon
-          height={"10"}
-          width={"10"}
-          color={hoveredButton === "minimize"
-            ? "white"
-            : "var(--text-secondary-200)"}
-        />
+        <SubtractIcon size={"16px"} color={"var(--icon-ds-neutral-50)"} />
       </button>
     </div>
 
@@ -118,20 +115,15 @@
         id="resize-button"
       >
         {#if isMaximizeWindow}
-          <DoubleResizeIcon
-            height={"10"}
-            width={"10"}
-            color={hoveredButton === "resize"
-              ? "white"
-              : "var(--text-secondary-200)"}
+          <WindowMultipleIcon
+            size={"16px"}
+            color={"var(--icon-ds-neutral-50)"}
           />
         {:else}
           <SquareIcon
             height={"10"}
             width={"10"}
-            color={hoveredButton === "resize"
-              ? "white"
-              : "var(--text-secondary-200)"}
+            color={"var(--icon-ds-neutral-50)"}
           />
         {/if}
       </button>
@@ -144,13 +136,7 @@
         on:mouseleave={handleMouseLeave}
         class="custom-header-button button-close border-0 py-1 px-1"
       >
-        <CrossIconV2
-          height={"10"}
-          width={"10"}
-          color={hoveredButton === "close"
-            ? "white"
-            : "var(--text-secondary-200)"}
-        />
+        <DismissRegular size={"16px"} color={"var(--icon-ds-neutral-50)"} />
       </button>
     </div>
   </div>
