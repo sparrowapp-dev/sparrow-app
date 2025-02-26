@@ -3,6 +3,7 @@
   import { UserProfileList } from "@sparrow/teams/compopnents";
   import { MenuView } from "@sparrow/teams/compopnents";
   import { TeamRole, WorkspaceMemberRole } from "@sparrow/common/enums";
+  import { Button } from "@sparrow/library/ui";
 
   export let list;
   export let activeTeam;
@@ -24,19 +25,22 @@
   let showMenu = false;
   let workspaceTabWrapper: HTMLElement;
 
+
   let menuItems = [];
   let noOfColumns = 180;
   let noOfRows = 3;
+
 
   const rightClickContextMenu = (e: MouseEvent) => {
     e.preventDefault();
     setTimeout(() => {
       const mouseX = workspaceTabWrapper.getBoundingClientRect().right;
-      const mouseY = workspaceTabWrapper.getBoundingClientRect().top + 30;
+      const mouseY = workspaceTabWrapper.getBoundingClientRect().top + 60;
       pos = { x: mouseX, y: mouseY };
       showMenu = true;
     }, 100);
   };
+
 
   $: {
     if (isAdminOrOwner) {
@@ -80,21 +84,26 @@
     }
   }
 
+
   function closeRightClickContextMenu() {
     showMenu = false;
   }
 </script>
 
+
 {#if showMenu}
   <MenuView xAxis={pos.x} yAxis={pos.y} {noOfRows} {noOfColumns} {menuItems} />
 {/if}
+
 
 <svelte:window
   on:click={closeRightClickContextMenu}
   on:contextmenu|preventDefault={closeRightClickContextMenu}
 />
 
+
 <tr
+  tabindex="0"
   class="position-relative workspace-list-item cursor-pointer ellipsis"
   on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
 >
@@ -104,7 +113,7 @@
       onOpenCollection(list._id);
     }}
     style="max-width: 15vw; padding-right: 10px;"
-    class="tab-data rounded-start py-3 overflow-hidden ellipsis"
+    class="tab-data rounded-start py-2 overflow-hidden ellipsis"
   >
     {list?.name}
     {#if list?.isNewInvite}
@@ -115,15 +124,17 @@
     {/if}
   </td>
 
+
   <td
     on:click={(e) => {
       e.stopPropagation();
       onOpenCollection(list._id);
     }}
-    class="tab-data py-3"
+    class="tab-data py-2 px-4"
   >
     {list?.collections?.length ? list.collections.length : 0}
   </td>
+
 
   {#if activeTeam?.users?.length > 1}
     <td
@@ -131,9 +142,9 @@
         e.stopPropagation();
         onOpenCollection(list._id);
       }}
-      class="tab-data py-3"
+      class="tab-data py-2 "
     >
-      <div class="d-flex">
+      <div class="d-flex px-3">
         <UserProfileList
           width={24}
           height={25}
@@ -143,24 +154,26 @@
               user.role === WorkspaceMemberRole.ADMIN ||
               user.role === WorkspaceMemberRole.EDITOR,
           )}
-          maxProfiles={3}
+          maxProfiles={2}
           classProp="position-absolute"
         />
       </div>
     </td>
   {/if}
 
+
   <td
     on:click={(e) => {
       e.stopPropagation();
       onOpenCollection(list._id);
     }}
-    class="tab-data py-3"
+    class="tab-data py-2 px-4"
   >
     {calculateTimeDifferenceInDays(new Date(), new Date(list?.updatedAt))}
   </td>
 
-  <td class="tab-data py-3 position-relative">
+
+  <td class="tab-data py-2 position-relative">
     {#if isWebEnvironment}
       <button
         class="open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
@@ -173,46 +186,70 @@
     {/if}
   </td>
 
-  <td class="tab-data rounded-end py-3">
-    <button
-      bind:this={workspaceTabWrapper}
-      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-relative {showMenu
-        ? 'threedot-active'
-        : ''}"
-      on:click={(e) => {
+
+  <td class="tab-data rounded-end py-2"
+  >
+  <div bind:this={workspaceTabWrapper} class="threedot-icon-container" style="display: flex; justify-content: center; align-items: center;"> 
+    <Button
+    type="teritiary-regular"
+    onClick={(e) => {
         rightClickContextMenu(e);
       }}
-    >
-      <ThreeDotIcon />
-    </button>
+      startIcon={ThreeDotIcon}
+    />
+  </div>
+    
+     
   </td>
 </tr>
 
+
 <style>
+
+
   tr:hover {
-    background-color: var(--bg-tertiary-600);
+    background-color: var(--bg-ds-surface-600);
+    cursor: pointer;
+    border-bottom-color: transparent;
+  }
+  tr{
+    border-bottom-style: solid;
+    border-bottom-color:var(--bg-ds-surface-600);
+    border-bottom-width: 1px;
+  }
+  tr:active {
+    background-color: var(--bg-ds-surface-700);
     cursor: pointer;
   }
+  tr[tabindex="0"]:focus-visible {
+     outline: solid 2px var(--bg-ds-primary-300) !important;
+     outline-offset: -2px;
+     background-color: var(--bg-ds-surface-700);
+    border-radius: 8px;
+  }
+
+
   .workspace-list-item td {
     background-color: transparent;
   }
   .threedot-icon-container {
-    visibility: hidden;
+    visibility: visible;
     background-color: transparent;
     z-index: 2;
+    transform: rotate(90deg);
+    outline: none;
   }
   tr:hover .threedot-icon-container {
     visibility: visible;
   }
-  .threedot-active {
-    visibility: visible;
-    background-color: var(--bg-tertiary-190);
-  }
+
+
   .tab-data {
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 18px;
     vertical-align: middle;
+    padding-top: 10px;
   }
   .open-desktop-btn {
     /* position: absolute; */
@@ -235,5 +272,8 @@
   }
   .open-desktop-btn:hover {
     background-color: var(--color-primary-dark);
+  }
+  tr{
+    border-radius: 8px;
   }
 </style>

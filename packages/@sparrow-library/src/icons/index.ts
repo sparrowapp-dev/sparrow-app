@@ -133,6 +133,20 @@ export { default as SearchIcon } from "./SearchIcon.svelte";
 export { default as CrossIcon2 } from "./crossIcon.svelte";
 export { default as CommandKey } from "./Key.svelte";
 export { default as PersonIcon } from "./Person.svelte";
+
+export { default as AddRegular } from "./AddRegularIcon.svelte";
+export { default as ChevronRightRegular } from "./ChevronRightRegular.svelte";
+export { default as MoreHorizontalRegular } from "./MoreHorizontalRegular.svelte";
+export { default as ChevronDownRegular } from "./ChevronDownRegular.svelte";
+export { default as ArrowSwapRegular } from "./ArrowSwapRegular.svelte";
+export { default as FlowChartRegular } from "./FlowChartRegular.svelte";
+export { default as LayerRegular } from "./LayerRegular.svelte";
+export { default as FolderAddRegular } from "./FolderAddRegular.svelte";
+export { default as FolderRegular } from "./FolderRegular.svelte";
+export { default as FolderOpenRegular } from "./FolderOpenRegular.svelte";
+export { default as ChevronDoubleLeftRegular } from "./ChevronDoubleLeftRegular.svelte";
+export { default as ChevronDoubleRightRegular } from "./ChevronDoubleRightRegular.svelte";
+
 export { default as FolderIcon3 } from "./FolderIcon.svelte";
 export { default as SearchIcon2 } from "./SearchIcon2.svelte";
 export { default as PlusIcon2 } from "./PlusIcon.svelte";
@@ -143,19 +157,29 @@ export { default as postIcon } from "./Post.svelte";
 export { default as putIcon } from "./Put.svelte";
 export { default as deleteIcon } from "./Delete.svelte";
 export {default as AIChatBotIcon } from "./AIChatBotIcon.svelte"
-export {default as WorkspaceRegular} from "./WorkspaceRegular.svelte";
 export {default as StackRegular} from "./StackRegular.svelte";
-export {default as LayerRegular} from "./LayerRegular.svelte";
-export {default as FolderRegular} from "./FolderRegular.svelte";
-export {default as FlowChartRegular} from "./FlowChartRegular.svelte";
-export {default as ArrowSwapRegular} from "./ArrowSwapRegular.svelte";
-export {default as AddRegular} from "./AddRegular.svelte";
 export {default as NavSparrow} from "./NavSparrow.svelte"
 export {default as CaretDown} from "./Caret.svelte"
 export {default as AISparcleWhite} from "./AISparcleWhite.svelte"
 export {default as CopyRegular} from "./CopyRegular.svelte"
 export {default as ThhumbLike} from "./ThumbLikeRegular.svelte"
-export {default as RhumbDislike} from "./ThumbDislike.svelte"
+export {default as ThumbDislike} from "./ThumbDislike.svelte"
 export {default as ArrowSync} from "./ArrowSync.svelte"
 export {default as ThumbLikeFilled} from "./ThumbLikeFilled.svelte"
 export {default as ThumbDislikeFilled} from "./ThumbDislikeFilled.svelte"
+export { default as DeleteRegular } from "./DeleteRegular.svelte";
+export { default as ReOrderDotsRegular } from "./ReOrderDotsRegular.svelte";
+
+export { default as ArrowSortRegular } from "./ArrowSortRegular.svelte";
+export { default as GraphqlIcon } from "./GraphQLIcon.svelte";
+export { default as WebSocketIcon } from "./WebSocketIcon.svelte";
+export { default as SocketIOIcon } from "./SocketIOICon.svelte";
+export { default as WorkspaceRegular } from "./WorkspaceRegular.svelte";
+export { default as SaveRegular } from "./SaveRegular.svelte";
+export { default as CaretDownFilled } from "./CaretDownFilled.svelte";
+export { default as CaretDownRegular } from "./CaretDownRegular.svelte";
+export { default as ChevronUpRegular } from "./ChevronUpRegular.svelte";
+export { default as AttachRegular } from "./AttachRegular.svelte";
+
+export { default as PeopleRegular } from "./CommunityRegular.svelte";
+export { default as PeopleFilled } from "./CommunityFilled.svelte";

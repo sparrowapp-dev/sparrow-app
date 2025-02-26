@@ -82,7 +82,7 @@
         </div> -->
         <Button
           type={"teritiary-regular"}
-          size="small"
+          size="medium"
           startIcon={DismissRegular}
           onClick={() =>
             onUpdateRequestState({

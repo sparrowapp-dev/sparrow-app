@@ -42,7 +42,6 @@
   import { EnvironmentViewModel } from "@app/pages/workspace-page/EnvironmentPage.ViewModel";
 
   // ---- helpers
-  import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   import type { TabDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { onMount } from "svelte";
@@ -50,7 +49,6 @@
 
   import type {
     CollectionDocument,
-    EnvironmentDocument,
     WorkspaceDocument,
   } from "@app/database/database";
   import type { GithubRepoDocType } from "../../models/github-repo.model";
@@ -65,9 +63,7 @@
   import TestFlowExplorerPage from "./sub-pages/TestflowExplorerPage/TestflowExplorerPage.svelte";
   import { TestflowViewModel } from "./Testflow.ViewModel";
   // import { version } from "../../../src-tauri/tauri.conf.json";
-  import { Button } from "@sparrow/library/ui";
   import { isUserFirstSignUp } from "@app/store/user.store";
-  import { WelcomeLogo } from "@sparrow/common/images";
   import { WelcomePopup } from "@sparrow/workspaces/features";
   import SocketIoExplorerPage from "./sub-pages/SocketIoExplorerPage/SocketIoExplorerPage.svelte";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
@@ -934,9 +930,9 @@
   :global(.collection-splitter .splitpanes__splitter) {
     width: 6px !important;
     height: auto !important;
-    background-color: var(--bg-secondary-500) !important;
-    border-left: 5px solid var(--border-secondary-900) !important;
-    border-right: 0px solid var(--blackColor) !important;
+    background-color: var(--bg-ds-surface-900) !important;
+    border-left: 5px solid var(--border-ds-surface-700) !important;
+    border-right: 0px solid var(--border-ds-surface-900) !important;
     border-top: 0 !important;
     border-bottom: 0 !important;
   }
@@ -944,7 +940,7 @@
     .collection-splitter .splitpanes__splitter:active,
     .collection-splitter .splitpanes__splitter:hover
   ) {
-    background-color: var(--bg-primary-200) !important;
+    background-color: var(--bg-ds-primary-300) !important;
   }
   .gradient-text {
     font-size: 18;

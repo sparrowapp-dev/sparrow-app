@@ -34,7 +34,7 @@
   </div>
   <div class="sidebar-teams-list" style="flex:1; overflow:auto;">
     <List height={"100%"} overflowY={"auto"} classProps={"px-2 py-1"}>
-      {#each teamList.slice().reverse() as team, index}
+      {#each teamList.slice().reverse() as team}
         <button
           class={`d-flex w-100 mb-1 
         px-3 align-items-center justify-content-between rounded teams-outer border-0 ${
@@ -56,12 +56,12 @@
           <div class=" d-flex w-100 overflow-hidden">
             {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
               <div class="me-2">
-                  <Avatar
-                      type={"letter"}
-                      size={"small"}
-                      letter={team.name[0]}
-                      bgColor={"var(--bg-tertiary-700)"}
-                  />
+                <Avatar
+                  type={"letter"}
+                  size={"small"}
+                  letter={team.name[0]}
+                  bgColor={"var(--bg-tertiary-700)"}
+                />
               </div>
             {:else}
               <img src={base64ToURL(team.logo)} alt="" />

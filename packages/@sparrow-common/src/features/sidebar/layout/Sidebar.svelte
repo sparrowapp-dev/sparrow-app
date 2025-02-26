@@ -156,6 +156,7 @@
     width: 54px;
     background-color: var(--bg-ds-surface-700);
     padding: 5px 0px 0px 0px;
+    border-right: 2px solid black;
   }
 
   .secondary-sidebar-items {

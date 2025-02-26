@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { plusWhiteIcon } from "../../assets";
-  import Spinner from "../spinner/Spinner.svelte";
-  import { onMount, onDestroy } from "svelte";
+  import { Spinner } from "../spinner/index";
 
   export let title = "";
   export let onClick: (e) => void;
@@ -211,7 +209,7 @@
   {tabindex}
   {id}
   disabled={disable}
-  style={`  ${`flex:none; transition:all 0.3s ease-in-out; margin-right:7px; min-width:${buttonSize}px; white-space:nowrap; height: ${buttonSize}px; width: ${customWidth}; border-radius: ${borderRadius}px;`} `}
+  style={` ${`flex:none; min-width:${buttonSize}px; white-space:nowrap; height: ${buttonSize}px; width: ${customWidth}; border-radius: ${borderRadius}px;`}  `}
   class={`${buttonClassProp}  
  py-1 px-${title.length > 0 ? 3 : 2} gap-2 d-flex align-items-center justify-content-center
   ${btnClass}`}
