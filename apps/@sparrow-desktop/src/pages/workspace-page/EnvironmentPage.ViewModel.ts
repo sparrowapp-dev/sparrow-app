@@ -12,6 +12,7 @@ import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { TabRepository } from "../../repositories/tab.repository";
 
 import { createDeepCopy } from "@sparrow/common/utils";
+import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 
 export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -333,6 +334,7 @@ export class EnvironmentViewModel {
       currentWorkspace._id,
     );
     initEnvironmentTab.setName(env.name).setVariable(env.variable);
+    initEnvironmentTab.setTabType(TabPersistenceTypeEnum.TEMPORARY);
 
     this.tabRepository.createTab(initEnvironmentTab.getValue());
   };

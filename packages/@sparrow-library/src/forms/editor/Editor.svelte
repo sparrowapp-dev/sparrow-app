@@ -104,6 +104,12 @@
 
   onMount(() => {
     initalizeCodeMirrorEditor(value);
+    // Attach keydown listener to prevent global search when inside CodeMirror
+    codeMirrorEditorDiv.addEventListener("keydown", (event) => {
+      if (event.ctrlKey && event.key.toLowerCase() === "f") {
+        event.stopPropagation();
+      }
+    });
   });
 
   // Run whenever component state changes

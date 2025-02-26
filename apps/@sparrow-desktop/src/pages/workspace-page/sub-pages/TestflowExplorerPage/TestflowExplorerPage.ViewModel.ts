@@ -19,7 +19,10 @@ import { TestflowRepository } from "../../../../repositories/testflow.repository
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { TestflowService } from "../../../../services/testflow.service";
 import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
-import { type Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import type {
   ENVDocumentType,
   ENVExtractVariableType,
@@ -221,8 +224,10 @@ export class TestflowExplorerPageViewModel {
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
