@@ -1,16 +1,16 @@
 <script lang="ts">
   import { getMethodStyle } from "@sparrow/common/utils";
   import {
-    CheckIcon2,
     CrossIcon,
-    ExclamationIcon,
     FlowChartRegular,
     HistoryIcon,
   } from "@sparrow/library/icons";
+  import CheckmarkCircle from "../../icons/CheckmarkCircle.svelte";
+  import ErrorCircle from "../../icons/ErrorCircle.svelte";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Accordion, Tooltip } from "@sparrow/library/ui";
   import { WithButtonV5 } from "@sparrow/workspaces/hoc";
   import { FormatTime } from "@sparrow/common/utils";
   import { ResponseStatusCode } from "@sparrow/common/enums";
@@ -34,6 +34,7 @@
       return true;
     return false;
   };
+  $: console.log(toggleHistoryDetails);
 </script>
 
 <div class="position-relative">
@@ -186,25 +187,83 @@
                       </p>
                     </div>
                     <div
-                      class="position-absolute bg-tertiary-750 d-flex align-items-center justify-content-center"
-                      style="height:14px; width:14px; top:0; left: -8px; border-radius:50%; overflow:hidden;
-                border: 1px solid var(--border-secondary-50);"
+                      class="status-icon-circle position-absolute d-flex align-items-center justify-content-center"
+                      style="top:0; left: -14px;  overflow:hidden;"
                     >
                       {#if history?.status === "pass"}
-                        <CheckIcon2
-                          height={"8px"}
-                          width={"8px"}
-                          color={"#69D696"}
+                        <CheckmarkCircle
+                          size={"16px"}
+                          fillColor={"var(--icon-ds-success-400)"}
                         />
                       {:else}
-                        <ExclamationIcon
-                          height={"8px"}
-                          width={"8px"}
-                          color="#FF7878"
+                        <ErrorCircle
+                          size={"16px"}
+                          fillColor="var(--icon-ds-danger-300)"
                         />
                       {/if}
                     </div>
                   </div>
+                {/each}
+              {/if}
+            </div>
+            <div>
+              {#if testflowStore?.history && testflowStore?.history.length > 0}
+                {#each testflowStore.history as history, ind}
+                  <Accordion position="left">
+                    <div
+                      class="d-flex justify-content-between mb-3"
+                      slot="accordion-field"
+                    >
+                      <span class="text-fs-8 fw-bold">
+                        {history.successRequests} Success | {history.failedRequests}
+                        Fail
+                      </span>
+                      <span class="text-fs-8" style="padding-right:2px;">
+                        {history.totalTime}
+                      </span>
+                    </div>
+                    <div slot="accordion-content">
+                      {#each history?.requests as request, index}
+                        {#if index <= 1 || (history.expand && index > 1)}
+                          <div
+                            class="d-flex mb-2 align-items-center"
+                            style="background-color: var(--bg-ds-surface-700);"
+                          >
+                            <span
+                              style="padding: 0px 2px; width: 30px;"
+                              class="bg-tertiary-190 text-center text-fs-6-important text-{getMethodStyle(
+                                request.method,
+                              )}">{request.method}</span
+                            >
+                            <span
+                              style="padding: 0px 2px; width: calc(100% - 90px);"
+                              class="px-1 text-fs-8 ellipsis"
+                              >{request.name}</span
+                            >
+                            <span
+                              style="padding: 0px 2px; width: 20px;"
+                              class="text-fs-8 bg-tertiary-190 text-center text-{checkIfRequestSucceed(
+                                request?.status,
+                              )
+                                ? 'getColor'
+                                : 'deleteColor'}"
+                              >{request.status === ResponseStatusCode.ERROR
+                                ? "ERR"
+                                : request.status.split(" ")[0]}</span
+                            >
+                            <span
+                              style="padding: 0px 2px; width: 40px; text-align: right;"
+                              class="text-fs-8 text-{checkIfRequestSucceed(
+                                request?.status,
+                              )
+                                ? 'getColor'
+                                : 'deleteColor'}">{request.time}</span
+                            >
+                          </div>
+                        {/if}
+                      {/each}
+                    </div>
+                  </Accordion>
                 {/each}
               {/if}
             </div>
@@ -258,5 +317,13 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .status-icon-circle {
+    width: 24px;
+    height: 24px;
+    padding: 4px;
+    border-radius: 50%;
+    background-color: var(--bg-ds-surface-500);
+    border: 1px solid var(--bg-ds-surface-500);
   }
 </style>
