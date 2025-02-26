@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SearchIcon } from "@sparrow/library/icons";
+  import { SearchIcon2 } from "@sparrow/library/icons";
   import { CrossIcon2 } from "@sparrow/library/icons";
 
   import { createEventDispatcher, onMount } from "svelte";
@@ -108,9 +108,9 @@
       class="position-absolute d-flex align-items-center"
       style={`height: 20px; width: 20px; left: 10px; pointer-events: none; ${imgStyleProp}`}
     >
-      <SearchIcon
-        width={iconSize}
-        height={iconSize}
+      <SearchIcon2
+        width={"12px"}
+        height={"12px"}
         color={"var(--bg-ds-neutral-300)"}
       />
     </div>

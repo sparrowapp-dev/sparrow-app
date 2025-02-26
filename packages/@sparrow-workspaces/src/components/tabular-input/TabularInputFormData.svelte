@@ -1,14 +1,19 @@
 <script lang="ts">
   import { trashIcon as trashIcon } from "@sparrow/library/assets";
-  import { AttachmentIcon } from "@sparrow/library/icons";
+  import {
+    AttachRegular,
+    DeleteRegular,
+    ReOrderDotsRegular,
+  } from "@sparrow/library/icons";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { invoke } from "@tauri-apps/api/core";
   import { crossIcon as close } from "@sparrow/library/assets";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "..";
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   import { Base64Converter } from "@sparrow/common/utils";
+  import { Checkbox } from "@sparrow/library/forms";
   export let keyValue: {
     key: string;
     value: string;
@@ -201,38 +206,35 @@
 </script>
 
 <input type="file" id="fileInput" style="display: none" />
+
 <div
-  class="mb-0 me-0 w-100 py-0 border-radius-2 section-layout"
-  style="overflow:hidden;"
+  class="mb-0 me-0 py-0 section-layout w-100"
+  style="overflow:hidden; border-radius:4px;"
 >
   <div
-    class="px-3 d-flex align-items-center w-100 pair-header-row {!isTopHeaderRequired
+    class="w-100 d-flex align-items-center pair-header-row {!isTopHeaderRequired
       ? 'd-none'
       : ''}"
-    style="position:relative;"
+    style="position:relative; "
   >
-    <div style="height:14px; width:14px;" class="me-3">
-      <label class="checkbox-parent">
-        <input
-          type="checkbox"
-          disabled={pairs.length === 1 || !isCheckBoxEditable}
-          bind:checked={controller}
-          on:input={handleCheckAll}
-        />
-        <span class="checkmark"></span>
-      </label>
+    <div style=" width:24px; margin-right:12px;" class="">
+      <Checkbox
+        disabled={pairs.length === 1 || !isCheckBoxEditable}
+        checked={controller}
+        on:input={handleCheckAll}
+      />
     </div>
 
     <div class="d-flex gap-0" style="width: calc(100% - 180px);">
       <div
-        class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
+        class="w-50 position-relative header-text"
         style="padding-left: 6px;"
       >
         Key
       </div>
       <div
-        class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
-        style="padding-left: 56px;"
+        class="w-50 position-relative header-text"
+        style="padding-left: 62px;"
       >
         Value
       </div>
@@ -260,20 +262,23 @@
   <div class="w-100" style="display:block; position:relative;">
     {#if pairs}
       {#each pairs as element, index}
-        <div class="pair-data-row w-100 px-3 d-flex align-items-center">
-          <div style="height:14px; width:14px;" class="me-3">
+        <div class="pair-data-row w-100 d-flex align-items-center px-1">
+          <!-- <div class="button-container">
+            <Button
+              size="extra-small"
+              type="teritiary-regular"
+              startIcon={ReOrderDotsRegular}
+            />
+          </div> -->
+          <div style=" width:24px;" class="me-2">
             {#if pairs.length - 1 != index || !isInputBoxEditable}
-              <label class="checkbox-parent">
-                <input
-                  type="checkbox"
-                  bind:checked={element.checked}
-                  on:input={() => {
-                    updateCheck(index);
-                  }}
-                  disabled={!isCheckBoxEditable}
-                />
-                <span class="checkmark"></span>
-              </label>
+              <Checkbox
+                checked={element.checked}
+                on:input={() => {
+                  updateCheck(index);
+                }}
+                disabled={!isCheckBoxEditable}
+              />
             {/if}
           </div>
 
@@ -334,7 +339,7 @@
             {/if}
           </div>
           <div
-            class="ms-3 d-flex align-items-center justify-content-between"
+            class="ms-1 d-flex align-items-center justify-content-between gap-1"
             style="width:40px;"
           >
             {#if pairs.length - 1 != index}
@@ -348,34 +353,39 @@
                   placement="bottom-center"
                 >
                   <button
-                    class="d-flex align-items-center justify-content-center bg-secondary-700 border-0 {isInputBoxEditable &&
+                    class="button-container d-flex align-items-center justify-content-center border-0 {isInputBoxEditable &&
                     element.type == 'text' &&
                     element.value == ''
                       ? 'opacity-1'
                       : 'opacity-0 pe-none'}"
-                    style="width:16px; height:16px; padding:2px;"
+                    style="width:16px; height:16px; padding:2px; background:transparent;"
                     on:click={() => {
                       uploadFormFile(index);
                     }}
                   >
-                    <AttachmentIcon
-                      height={"12px"}
-                      width={"12px"}
-                      color={"var(--icon-secondary-200)"}
+                    <AttachRegular
+                      size={"16px"}
+                      color={"var(--icon-ds-neutral-100)"}
                     />
                   </button>
                 </Tooltip>
                 <!-- {/if} -->
-                <Tooltip title="Delete" placement="bottom-center">
-                  <button
-                    class="d-flex align-items-center p-0 justify-content-center bg-secondary-700 border-0"
-                    style="width:16px; height:16px;"
-                    on:click={() => {
-                      deleteParam(index);
-                    }}
-                  >
-                    <img src={trashIcon} style="height:100%; width: 100%;" />
-                  </button>
+                <Tooltip
+                  title={"Delete"}
+                  placement={"bottom-center"}
+                  distance={10}
+                >
+                  <div class="button-container">
+                    <Button
+                      buttonClassProp=""
+                      size="extra-small"
+                      type="teritiary-regular"
+                      startIcon={DeleteRegular}
+                      onClick={() => {
+                        deleteParam(index);
+                      }}
+                    />
+                  </div>
                 </Tooltip>
               {:else}
                 <div style="width:45px;" class="opacity:0;"></div>
@@ -390,93 +400,53 @@
 
 <style>
   .pair-header-row {
-    border-top: 0.5px solid var(--border-secondary-315);
     padding-top: 3px;
     padding-bottom: 3px;
-    background-color: var(--bg-secondary-880);
-    height: 26px;
+    background-color: var(--bg-ds-surface-400);
+    height: 28px;
+    padding-left: 4px;
+    padding-right: 1rem;
   }
   .pair-data-row:first-child {
     border-top: none !important;
-    height: 24px !important;
+    height: 28px !important;
   }
   .pair-data-row {
     padding-top: 3px;
     padding-bottom: 3px;
-    height: calc(24px);
-    background-color: var(--bg-secondary-700);
+    padding-right: 20px;
+    padding-left: 2px;
+    height: calc(28px);
+    background-color: var(--bg-ds-surface-600);
+    border-top: 1px solid var(--bg-ds-surface-400);
   }
-
-  /* The checkbox-parent */
-  .checkbox-parent {
-    display: block;
-    position: relative;
-    /* padding-left: 35px;
-    margin-bottom: 12px; */
-    cursor: pointer;
-    font-size: 22px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  .pair-data-row:hover {
+    background-color: var(--bg-ds-surface-500);
   }
-
-  /* Hide the browser's default checkbox */
-  .checkbox-parent input {
-    position: absolute;
+  .trash-icon {
+    background: transparent;
+  }
+  .trash-icon:hover {
+    background-color: var(--bg-ds-surface-300);
+  }
+  .trash-icon:focus-visible {
+    border: 2px solid var(--bg-ds-primary-300);
+  }
+  .header-text {
+    color: var(--text-ds-neutral-200);
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+  }
+  .pair-data-row:hover .button-container {
+    opacity: 1;
+    visibility: visible;
+  }
+  .button-container {
     opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* Create a custom checkbox */
-  .checkbox-parent .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 14px;
-    width: 14px;
-    border-radius: 3px;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* On mouse-over, add a grey background color */
-  /* .checkbox-parent:hover input ~ .checkmark {
-    background-color: #ccc;
-  } */
-
-  /* When the checkbox is checked, add a blue background */
-  .checkbox-parent input:checked ~ .checkmark {
-    border: none;
-    background-color: var(--text-primary-300);
-  }
-
-  /* Create the checkmark/indicator (hidden when not checked) */
-  .checkbox-parent .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-  }
-
-  /* Show the checkmark when checked */
-  .checkbox-parent input:checked ~ .checkmark:after {
-    display: block;
-  }
-
-  /* Style the checkmark/indicator */
-  .checkbox-parent .checkmark:after {
-    left: 5px;
-    top: 2px;
-    width: 4px;
-    height: 8px;
-    border: solid var(--text-secondary-850);
-    border-width: 0 2px 2px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
+    visibility: hidden;
+    transition:
+      opacity 0.1s ease-in-out,
+      visibility 0.1s;
   }
 </style>

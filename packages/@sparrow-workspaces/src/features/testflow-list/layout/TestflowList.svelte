@@ -1,6 +1,13 @@
 <script lang="ts">
-  import { PlusIcon, TreeIcon } from "@sparrow/library/icons";
-  import { List, Tooltip } from "@sparrow/library/ui";
+  import {
+    AddRegular,
+    ChevronDownRegular,
+    ChevronRightRegular,
+    PlusIcon,
+    TreeIcon,
+    FlowChartRegular,
+  } from "@sparrow/library/icons";
+  import { Button, List, Tooltip } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { TestflowListItem } from "../components";
@@ -117,43 +124,48 @@
 </script>
 
 <div
-  class={`d-flex flex-column  h-100 env-sidebar bg-secondary-900 pt-0 px-1`}
-  style="font-weight: 500;"
+  class={`d-flex flex-column  pt-0 px-1`}
+  style="font-weight: 500;margin-bottom:2px; "
 >
   <!-- 
   --  Testflow Header 
   -->
   <div
-    class="d-flex align-items-center border-radius-2 me-0 mb-0 pe-2"
-    style="cursor:pointer; justify-content: space-between; height:32px;
-        background-color: {isHovered
-      ? 'var(--dropdown-option-hover)'
-      : 'transparent'}; "
+    tabindex="0"
+    class="d-flex align-items-center border-radius-2 me-0 mb-0 pe-2 env-sidebar"
+    style="cursor:pointer; justify-content: space-between; height:32px; gap:4px"
     on:mouseover={handleMouseOver}
     on:mouseout={handleMouseOut}
     on:click={toggleExpandTestflow}
   >
     <div
-      class="d-flex align-items-center ps-3 pe-1 py-1"
-      style="width: calc(100% - 30px);"
+      class="d-flex align-items-center"
+      style="width: calc(100% - 30px); gap:4px; padding-left:3px;"
     >
-      <img
-        src={angleRight}
-        class="me-3"
-        style="height:8px; width:4px; margin-right:8px; {isExpandTestflow
-          ? 'transform:rotate(90deg);'
-          : 'transform:rotate(0deg);'}"
-        alt="angleRight"
-      />
-      <TreeIcon
-        height={"12px"}
-        width={"12px"}
-        color={"var(--icon-secondary-130)"}
-      />
+      <span style=" display: flex; ">
+        <Button
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+          startIcon={!isExpandTestflow
+            ? ChevronRightRegular
+            : ChevronDownRegular}
+        />
+      </span>
 
-      <p class="ms-2 mb-0 sparrow-fs-13" style="font-weight: 500;">
-        Test Flows
-      </p>
+      <span
+        style=" display: flex;  align-items:center; justify-content:center;"
+      >
+        <FlowChartRegular size="16px" color="var(--bg-ds-neutral-300)" />
+      </span>
+      <span style="padding:2px 4px;">
+        <p
+          class=" mb-0 sparrow-fs-13"
+          style="font-weight: 500; font-size:12px; line-height:18px;   "
+        >
+          Test Flows
+        </p>
+      </span>
     </div>
 
     <Tooltip
@@ -163,30 +175,27 @@
       show={isHovered}
       zIndex={701}
     >
-      <button
-        style="height: 24px; width:24px;"
+      <span
         class="{loggedUserRoleInWorkspace === WorkspaceRole.WORKSPACE_VIEWER
           ? 'd-none'
-          : ''} add-icon-container border-0 rounded-1 d-flex p-0 justify-content-center align-items-center {isHovered
-          ? 'testflow-active'
-          : 'testflow-inactive'}"
-        on:click|stopPropagation={handleCreateTestflow}
+          : ''} add-icon-container d-flex"
       >
-        <PlusIcon
-          height={"22px"}
-          width={"22px"}
-          color={"var( --white-color)"}
+        <Button
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+          startIcon={AddRegular}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleCreateTestflow(e);
+          }}
         />
-      </button>
+      </span>
     </Tooltip>
   </div>
 
   {#if isExpandTestflow}
-    <div
-      style="flex:1;"
-      class="overflow-auto h-100 mt-1 ps-2"
-      bind:this={scrollDiv}
-    >
+    <div style="flex:1;" class="overflow-auto h-100 ps-2" bind:this={scrollDiv}>
       <!-- 
   --  Testflow Empty screen 
   -->
@@ -200,26 +209,20 @@
               Start with basic test cases to check core functions and build a
               strong testing foundation.
             </p>
-            <button
-              class=" w-100 add-testflow bg-transparent d-flex justify-content-center align-items-center border-radius-2"
-              style="color: var(--text-secondary-100);"
+
+            <Button
+              title={`Add ${TFDefaultEnum.NAME}`}
+              size={"small"}
+              type="outline-secondary"
+              customWidth={"100%"}
+              startIcon={AddRegular}
               disabled={loggedUserRoleInWorkspace ===
                 WorkspaceRole.WORKSPACE_VIEWER}
-              on:click={async () => {
+              onClick={async () => {
                 await onCreateTestflow();
                 MixpanelEvent(Events.Add_New_Flow);
               }}
-            >
-              <PlusIcon
-                height={"22px"}
-                width={"22px"}
-                color={"var(--text-secondary-200)"}
-              />
-              <span
-                style="color: var(--text-secondary-200)"
-                class="ps-2 fw-bold text-fs-12">Add {TFDefaultEnum.NAME}</span
-              >
-            </button>
+            />
           </div>
         {/if}
       {/if}
@@ -227,30 +230,33 @@
       <!-- 
   --  Testflow List 
   -->
-      {#if filteredflows?.length > 0}
-        <List
-          bind:scrollList
-          height={"auto"}
-          overflowY={"auto"}
-          classProps={"pe-0"}
-          style={"flex:1;"}
-        >
-          {#each filteredflows as flow}
-            <TestflowListItem
-              bind:loggedUserRoleInWorkspace
-              {flow}
-              {currentWorkspace}
-              {onDeleteTestflow}
-              {onUpdateTestflow}
-              {onOpenTestflow}
-              {activeTabId}
-            />
-          {/each}
-        </List>
-      {/if}
+      <div class="position-relative">
+        {#if filteredflows?.length > 0}
+          <div class="box-line"></div>
+          <List
+            bind:scrollList
+            height={"auto"}
+            overflowY={"auto"}
+            classProps={"pe-0"}
+            style={"flex:1;"}
+          >
+            {#each filteredflows as flow}
+              <TestflowListItem
+                bind:loggedUserRoleInWorkspace
+                {flow}
+                {currentWorkspace}
+                {onDeleteTestflow}
+                {onUpdateTestflow}
+                {onOpenTestflow}
+                {activeTabId}
+              />
+            {/each}
+          </List>
+        {/if}
+      </div>
       {#if filteredflows?.length === 0 && searchData}
         <p
-          class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
+          class="mx-1 text-fs-12 mb-0 text-center"
           style="color: var(--text-secondary-550);  font-weight:300; letter-spacing: 0.5px;"
         >
           It seems we couldn't find the result matching your search query.
@@ -261,6 +267,38 @@
 </div>
 
 <style lang="scss">
+  .add-icon-container {
+    visibility: hidden;
+  }
+  .env-sidebar {
+    background-color: transparent;
+    border-radius: 2px;
+    color: var(--text-ds-neutral-50);
+  }
+
+  .env-sidebar:hover {
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+  }
+  .env-sidebar:hover .add-icon-container {
+    visibility: visible;
+  }
+  .env-sidebar:focus-visible {
+    background-color: var(--bg-ds-surface-400);
+    outline: none;
+    border: 2px solid var(--border-ds-primary-300);
+    border-radius: 4px;
+  }
+  .env-sidebar:focus-visible .add-icon-container {
+    visibility: visible;
+  }
+  .env-sidebar:active {
+    background-color: var(--bg-ds-surface-500);
+    border-radius: 4px;
+  }
+  .env-sidebar:active .add-icon-container {
+    visibility: visible;
+  }
   .icon-default {
     display: inline;
   }
@@ -360,5 +398,15 @@
   }
   button:disabled {
     pointer-events: none !important;
+  }
+  .box-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 6.5px;
+    width: 1px;
+    background-color: var(--bg-ds-surface-100);
+    z-index: 10;
+    /* height: 100px; */
   }
 </style>

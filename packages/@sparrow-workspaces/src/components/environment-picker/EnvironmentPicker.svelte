@@ -135,7 +135,12 @@
     {#if filterData.filter((elem) => {
       return elem.type === "G";
     }).length > 0}
-      <p class="text-fs-12 mt-2 mb-2">GLOBAL VARIABLES</p>
+      <p
+        class="text-fs-12 mt-2 mb-2"
+        style="font-size: 12px; font-weight:500; line-height:18px;"
+      >
+        GLOBAL VARIABLES
+      </p>
     {/if}
 
     {#each filterData.filter((elem) => {
@@ -213,10 +218,26 @@
     -webkit-line-clamp: 1; /* Number of lines to show */
     text-overflow: ellipsis;
     white-space: normal; /* Use 'normal' instead of 'nowrap' */
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 18px;
+    color: var(--text-ds-neutral-50);
   }
+
   .env-item:hover {
-    background-color: var(--bg-tertiary-400);
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
   }
+  .env-item:active {
+    background-color: var(--bg-ds-surface-500);
+    border-radius: 4px;
+  }
+  .env-item:focus-visible {
+    border-radius: 4px;
+    border: 2px solid var(--border-ds-primary-300);
+    outline: none;
+  }
+
   .word-break {
     word-break: break-all;
   }

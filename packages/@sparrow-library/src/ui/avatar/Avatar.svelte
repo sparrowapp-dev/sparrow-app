@@ -52,7 +52,7 @@
     color: var(--bg-ds-neutral-50);
     border: 2px solid var(--bg-ds-surface-50);
   }
-   .letter-content {
+  .letter-content {
     position: absolute;
     top: 50%;
     left: 50%;

@@ -219,9 +219,18 @@
         >
           <h2 class="d-flex ellipsis overflow-visible team-title">
             {#if openTeam?.logo?.size}
-             <Avatar type="image" size="large" image={base64ToURL(openTeam?.logo)} />
-              {:else}
-              <Avatar type="letter" size="large" letter={openTeam?.name[0] ? openTeam?.name[0] : ""} bgColor="var(--bg-secondary-600)" />
+              <Avatar
+                type="image"
+                size="large"
+                image={base64ToURL(openTeam?.logo)}
+              />
+            {:else}
+              <Avatar
+                type="letter"
+                size="large"
+                letter={openTeam?.name[0] ? openTeam?.name[0] : ""}
+                bgColor="var(--bg-secondary-600)"
+              />
             {/if}
             <span
               class="ms-3 my-auto ellipsis overflow-hidden heading"
@@ -309,7 +318,7 @@
             style="padding-bottom: 4px;"
           >
             <Navigator
-              tabs={teamTabs}
+              tabs={teamTabs.filter((tab) => tab.visible !== false)}
               currentTabId={"Workspaces"}
               onTabClick={onUpdateActiveTab}
               {activeTeamTab}

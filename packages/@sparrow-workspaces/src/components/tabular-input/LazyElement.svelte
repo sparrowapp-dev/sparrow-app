@@ -1,13 +1,14 @@
 <script lang="ts">
   import { inview } from "svelte-inview";
-  import { trashIcon as trashIcon } from "@sparrow/library/assets";
   import { CodeMirrorInput } from "../";
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
   import type {
     ObserverEventDetails,
     ScrollDirection,
     Options,
   } from "svelte-inview";
+  import { Checkbox } from "@sparrow/library/forms";
+  import { DeleteRegular, ReOrderDotsRegular } from "@sparrow/library/icons";
 
   export let element;
   export let index;
@@ -38,23 +39,27 @@
 <div
   use:inview={options}
   on:inview_change={handleChange}
-  class="w-100 pair-data-row px-3 d-flex align-items-center"
+  class="pair-data-row d-flex align-items-center w-100"
+  style="padding-right:1rem; padding-left: 4px;"
 >
   {#if isInView}
-    <div style="height:14px; width:14px;" class="me-3">
+    <!-- <div class="button-container">
+      <Button
+        size="extra-small"
+        type="teritiary-regular"
+        startIcon={ReOrderDotsRegular}
+      />
+    </div> -->
+    <div style=" width: 24px;" class="me-2">
       {#if pairs.length - 1 != index || !isInputBoxEditable}
-        <!-- checkbox should be visible to last row in readonly mode -->
-        <label class="checkbox-parent">
-          <input
-            type="checkbox"
-            bind:checked={element.checked}
-            on:input={() => {
-              updateCheck(index);
-            }}
-            disabled={!isCheckBoxEditable}
-          />
-          <span class="checkmark"></span>
-        </label>
+        <Checkbox
+          size={"small"}
+          checked={element.checked}
+          on:input={() => {
+            updateCheck(index);
+          }}
+          disabled={!isCheckBoxEditable}
+        />
       {/if}
     </div>
 
@@ -100,15 +105,15 @@
                 placement={"bottom-center"}
                 distance={10}
               >
-                <button
-                  class="trash-icon bg-secondary-700 border-radius-2 d-flex justify-content-center align-items-center p-0 border-0"
-                  style="width: 16px; height:16px; "
-                  on:click={() => {
-                    deleteParam(index);
-                  }}
-                >
-                  <img src={trashIcon} style="height: 100%; width: 100%;" />
-                </button>
+                <div class="button-container">
+                  <Button
+                    buttonClassProp=""
+                    size="extra-small"
+                    type="teritiary-regular"
+                    startIcon={DeleteRegular}
+                    onClick={() => deleteParam(index)}
+                  />
+                </div>
               </Tooltip>
             {/if}
           {/if}
@@ -124,93 +129,45 @@
 <style>
   .pair-data-row:first-child {
     border-top: none !important;
-    height: 24px !important;
+    height: 28px !important;
+  }
+  .pair-data-row:last-child {
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
   }
   .pair-data-row {
     padding-top: 3px;
     padding-bottom: 3px;
-    height: calc(24px);
-    background-color: var(--bg-secondary-700);
+    height: calc(28px);
+    background-color: var(--bg-ds-surface-600);
+    border-top: 1px solid var(--bg-ds-surface-400);
+    transition: background-color 1ms ease;
   }
-
-  /* The checkbox-parent */
-  .checkbox-parent {
-    display: block;
-    position: relative;
-    padding-left: 35px;
-    margin-bottom: 12px;
-    cursor: pointer;
-    font-size: 22px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  .pair-data-row:hover {
+    background-color: var(--bg-ds-surface-500);
   }
-
-  /* Hide the browser's default checkbox */
-  .checkbox-parent input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
+  .pair-data-row:hover .button-container {
+    opacity: 1;
+    visibility: visible;
   }
-
-  /* Create a custom checkbox */
-  .checkbox-parent .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 14px;
-    width: 14px;
-    border-radius: 3px;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* On mouse-over, add a grey background color */
-  /* .checkbox-parent:hover input ~ .checkmark {
-    background-color: #ccc;
-  } */
-
-  /* When the checkbox is checked, add a blue background */
-  .checkbox-parent input:checked ~ .checkmark {
-    border: none;
-    background-color: var(--bg-primary-300);
-  }
-
-  /* Create the checkmark/indicator (hidden when not checked) */
-  .checkbox-parent .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-  }
-
-  /* Show the checkmark when checked */
-  .checkbox-parent input:checked ~ .checkmark:after {
-    display: block;
-  }
-
-  /* Style the checkmark/indicator */
-  .checkbox-parent .checkmark:after {
-    left: 5px;
-    top: 2px;
-    width: 4px;
-    height: 8px;
-    border: solid var(--text-secondary-800);
-    border-width: 0 2px 2px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
-  }
-
   .skelton-parent {
     display: flex;
     height: 24px;
     padding: 2px 20px 2px 0px;
     margin: 0px;
     gap: 10%;
+  }
+  .trash-icon {
+    background: transparent;
+  }
+  .trash-icon:hover {
+    background-color: var(--bg-ds-surface-300);
+  }
+  .button-container {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.1s ease-in-out,
+      visibility 0.1s;
   }
 </style>

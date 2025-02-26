@@ -136,6 +136,7 @@
     position: relative;
   }
   .sparrow-modal-heading {
+    width: 400px;
     font-size: 20px;
     color: var(--text-ds-neutral-50);
     font-weight: 600;

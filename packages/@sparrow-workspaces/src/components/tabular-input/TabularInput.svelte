@@ -7,6 +7,7 @@
   import { CodeMirrorInput } from "../";
   import { onMount } from "svelte";
   import { Tooltip } from "@sparrow/library/ui";
+  import { Checkbox } from "@sparrow/library/forms";
   import { ErrorInfoIcon, Information } from "@sparrow/library/icons";
   import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
   import LazyElement from "./LazyElement.svelte";
@@ -234,40 +235,37 @@
   });
 </script>
 
-<div class="outer-section">
+<div class="outer-section" style="margin-top:12px;">
   {#if !isBulkEditActive}
     <section
-      class="mb-0 me-0 w-100 py-0 border-radius-2 section-layout"
+      class="mb-0 me-0 py-0 section-layout w-100"
       style="overflow:hidden;"
     >
       <div
-        class="w-100 d-flex align-items-center px-3 pair-header-row {!isTopHeaderRequired
+        class=" d-flex align-items-center pair-header-row {!isTopHeaderRequired
           ? 'd-none'
           : ''}"
-        style="position:relative;"
+        style="position:relative; padding-right:1rem; padding-left:4px; border-top-left-radius: 4px; border-top-right-radius: 4px;"
       >
-        <div style="height:14px; width:14px;" class="me-3">
-          <label class="checkbox-parent">
-            <input
-              type="checkbox"
-              disabled={pairs.length === 1 || !isCheckBoxEditable}
-              bind:checked={controller}
-              on:input={handleCheckAll}
-            />
-            <span class="checkmark"></span>
-          </label>
+        <div style=" width:24px; margin-right:12px" class="">
+          <Checkbox
+            size="small"
+            disabled={pairs.length === 1 || !isCheckBoxEditable}
+            checked={controller}
+            on:input={handleCheckAll}
+          />
         </div>
 
         <div class="d-flex gap-0" style="width: calc(100% - 188px);">
           <div
-            class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
+            class="w-50 position-relative header-text"
             style="padding-left: 6px;"
           >
             Key
           </div>
           <div
-            class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
-            style="padding-left: 68px;"
+            class="w-50 position-relative header-text"
+            style="padding-left: 69px;"
           >
             Value
           </div>
@@ -275,14 +273,17 @@
         <div style="width:140px;" class="ms-3 d-flex align-items-center">
           <div class="w-100 d-flex">
             <div class="w-100 d-flex justify-content-end">
-                 <Toggle
-          bind:isActive={bulkToggle}
-          label="Bulk Edit"
-          fontSize="10px"
-          fontWeight="400"
-          onClick={handleBulkTextUpdate}
-          onChange={toggleBulkEdit}
-         /> 
+              {#if isBulkEditRequired}
+                <Toggle
+                  bind:isActive={bulkToggle}
+                  label="Bulk Edit"
+                  fontSize="12px"
+                  textColor="var(--text-ds-neutral-200)"
+                  fontWeight="400"
+                  onClick={handleBulkTextUpdate}
+                  onChange={toggleBulkEdit}
+                />
+              {/if}
             </div>
           </div>
         </div>
@@ -327,7 +328,7 @@
   {:else}
     <!-- Bulk Edit section Start -->
     <section>
-      <div class="d-flex flex-column" style="font-size:12px;">
+      <div class="d-flex flex-column w-100" style="font-size:12px;">
         <!-- Bulk Edit Heading -->
         <div
           class="px-3 d-flex align-items-center"
@@ -396,16 +397,16 @@
                   </div>
                 </div>
               {/if}
-            <div style="margin-right: 2px;">
-                  <Toggle
-                   bind:isActive={bulkToggle}
-                   label="Bulk Edit"
-                   fontSize="10px"
-                   fontWeight="400"
-                   onClick={handleBulkTextUpdate}
-                   onChange={toggleBulkEdit}
-            /> 
-            </div>
+              <div style="margin-right: 2px;">
+                <Toggle
+                  bind:isActive={bulkToggle}
+                  label="Bulk Edit"
+                  fontSize="10px"
+                  fontWeight="400"
+                  onClick={handleBulkTextUpdate}
+                  onChange={toggleBulkEdit}
+                />
+              </div>
             </div>
           {/if}
         </div>
@@ -430,81 +431,16 @@
 
 <style>
   .pair-header-row {
-    border-top: 0.5px solid var(--border-secondary-315);
+    /* border-top: 0.5px solid var(--border-secondary-315); */
     padding-top: 3px;
     padding-bottom: 3px;
-    background-color: var(--bg-secondary-880);
-    height: 26px;
+    background-color: var(--bg-ds-surface-400);
+    height: 28px;
   }
-
-  /* The checkbox-parent */
-  .checkbox-parent {
-    display: block;
-    position: relative;
-    cursor: pointer;
-    font-size: 22px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-
-  /* Hide the browser's default checkbox */
-  .checkbox-parent input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* Create a custom checkbox */
-  .checkbox-parent .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 14px;
-    width: 14px;
-    border-radius: 3px;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* On mouse-over, add a grey background color */
-  /* .checkbox-parent:hover input ~ .checkmark {
-    background-color: #ccc;
-  } */
-
-  /* When the checkbox is checked, add a blue background */
-  .checkbox-parent input:checked ~ .checkmark {
-    border: none;
-    background-color: var(--bg-primary-300);
-  }
-
-  /* Create the checkmark/indicator (hidden when not checked) */
-  .checkbox-parent .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-  }
-
-  /* Show the checkmark when checked */
-  .checkbox-parent input:checked ~ .checkmark:after {
-    display: block;
-  }
-
-  /* Style the checkmark/indicator */
-  .checkbox-parent .checkmark:after {
-    left: 5px;
-    top: 2px;
-    width: 4px;
-    height: 8px;
-    border: solid var(--text-secondary-800);
-    border-width: 0 2px 2px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
+  .header-text {
+    color: var(--text-ds-neutral-200);
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
   }
 </style>

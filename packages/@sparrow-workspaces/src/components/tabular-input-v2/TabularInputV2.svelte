@@ -8,7 +8,9 @@
   } from "@sparrow/common/interfaces/request.interface";
   import type { KeyValueChecked } from "@sparrow/common/types/workspace";
   import { partition } from "rxjs";
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
+  import { Checkbox } from "@sparrow/library/forms";
+  import { DeleteRegular, ReOrderDotsRegular } from "@sparrow/library/icons";
 
   /**
    * tabular pair entries
@@ -133,30 +135,29 @@
   };
 </script>
 
-<div
-  class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
->
-  <div class="d-flex gap-3 align-items-center w-100 pe-2" style="height: 26px;">
-    <div style="width:30px; margin-left: 0px;">
-      <label
-        class="container d-block position-relative"
-        style={search !== "" ? "opacity:0!important ;" : null}
-      >
-        <input
-          type="checkbox"
-          disabled={pairs.length === 1 || disabled}
-          bind:checked={controller}
-          on:input={handleCheckAll}
-        />
-        <span class="checkmark"></span>
-      </label>
+<div class="mb-0 me-0 w-100 ps-3 py-0 section-layout">
+  <div
+    class="d-flex align-items-center w-100 px-1 header-box"
+    style="height: 28px; background-color:var(--bg-ds-surface-400); gap:11px;"
+  >
+    <div style="width:24px; margin-left: 4px;">
+      <Checkbox
+        disabled={pairs.length === 1 || disabled}
+        checked={controller}
+        on:input={handleCheckAll}
+      />
     </div>
     <div
-      class="d-flex pair-title bg-secondary-700 align-items-center w-100"
+      class="d-flex pair-title align-items-center w-100"
       style="font-size: 12px; font-weight: 500;"
     >
-      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1">Variable</p>
-      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-4">Value</p>
+      <p class="mb-0 w-50 header-text p-1">Variable</p>
+      <p
+        class="mb-0 w-50 header-text"
+        style="padding-left: 17px; padding-right:4px"
+      >
+        Value
+      </p>
     </div>
     <div class="pe-1 d-flex">
       <button class="bg-transparent border-0 d-flex d-none" style="">
@@ -197,32 +198,38 @@
             .includes(search.toLowerCase()) ||
           element.value.toLowerCase().includes(search.toLowerCase())
             ? ''
-            : 'd-none'}"
+            : 'd-none'} value-pair-rows px-1"
         >
           <div
-            class="d-flex flex-column w-100"
-            style="padding-top: 1px; height:24px;"
+            class="d-flex flex-column w-100 align-items-center justify-content-center"
+            style="height:28px;"
           >
             <div
-              class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
+              class="d-flex w-100 px-1 align-items-center justify-content-center gap-2 pair-container"
+              style="height: 28px;"
             >
-              <div style="width:30px;">
-                {#if pairs.length - 1 != index}
-                  <label class="container d-block position-relative">
-                    <input
-                      type="checkbox"
-                      bind:checked={element.checked}
+              <div class="d-flex justify-content-center align-items-center">
+                <!-- <div class="button-container">
+                  <Button
+                    size="extra-small"
+                    type="teritiary-regular"
+                    startIcon={ReOrderDotsRegular}
+                  />
+                </div> -->
+                <div style="width:24px;">
+                  {#if pairs.length - 1 != index}
+                    <Checkbox
+                      checked={element.checked}
                       on:input={() => {
                         updateCheck(index);
                       }}
                       {disabled}
                     />
-                    <span class="checkmark"></span>
-                  </label>
-                {/if}
+                  {/if}
+                </div>
               </div>
 
-              <div class=" d-flex gap-0 w-100">
+              <div class="d-flex w-100">
                 <div class="w-50 position-relative">
                   <input
                     type="text"
@@ -243,28 +250,29 @@
                     on:input={() => {
                       updatePairs(index);
                     }}
-                    placeholder={"Add Value"}
+                    placeholder="Add Value"
                     class="w-100 text-fs-12 placeholder-color"
                     {disabled}
                   />
                 </div>
               </div>
+
               {#if pairs.length - 1 != index && !disabled}
                 <Tooltip
                   title={"Delete"}
                   placement={"bottom-right"}
                   distance={10}
                 >
-                  <div class="h-75 pe-1">
-                    <button
-                      class="bg-secondary-700 border-0"
-                      style="width:20px;"
-                      on:click={() => {
+                  <div class="button-container">
+                    <Button
+                      buttonClassProp=""
+                      size="extra-small"
+                      type="teritiary-regular"
+                      startIcon={DeleteRegular}
+                      onClick={() => {
                         deletePairs(index);
                       }}
-                    >
-                      <img class="trash-icon" src={trashIcon} alt="" />
-                    </button>
+                    />
                   </div>
                 </Tooltip>
               {:else}
@@ -272,7 +280,7 @@
                   <button
                     class="bg-backgroundColor border-0"
                     style="width:20px;"
-                  />
+                  ></button>
                 </div>
               {/if}
             </div>
@@ -296,102 +304,63 @@
 {/if}
 
 <style>
-  .pair-container:nth-child(odd) {
-    margin-top: -1px;
+  .header-box {
+    height: 28px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
   }
-  .section-layout {
-    border-top: 1px solid var(--border-secondary-500);
-    border-bottom: 1px solid var(--border-secondary-500);
-  }
-
-  /* The container */
-  .container {
-    padding-left: 35px;
-    margin-bottom: 12px;
-    cursor: pointer;
-    font-size: 22px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-
-  /* Hide the browser's default checkbox */
-  .container input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* Create a custom checkbox */
-  .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 14px;
-    width: 14px;
-    border-radius: 3px;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* On mouse-over, add a grey background color */
-  /* .container:hover input ~ .checkmark {
-    background-color: #ccc;
-  } */
-
-  /* When the checkbox is checked, add a blue background */
-  .container input:checked ~ .checkmark {
-    border: none;
-    background-color: var(--text-primary-300);
-  }
-
-  /* Create the checkmark/indicator (hidden when not checked) */
-  .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-  }
-
-  /* Show the checkmark when checked */
-  .container input:checked ~ .checkmark:after {
-    display: block;
-  }
-
-  /* Style the checkmark/indicator */
-  .container .checkmark:after {
-    left: 5px;
-    top: 2px;
-    width: 4px;
-    height: 8px;
-    border: solid var(--text-secondary-850);
-    border-width: 0 2px 2px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
-  }
-  input[type="text"] {
+  input {
     background-color: transparent;
     border: 0;
     outline: none;
-    height: 18px;
+    height: 26px;
+    border-radius: 4px;
     padding-left: 8px;
     padding-right: 8px;
   }
-  input[type="text"]:focus {
-    background-color: var(--bg-secondary-500);
-    outline: 1px solid var(--border-primary-300);
+  input {
+    background-color: transparent;
+    border: 1px solid transparent;
+    transition: border 0.1s ease-in-out;
   }
 
+  input:hover {
+    background-color: var(--bg-ds-surface-400);
+    border: 1px solid var(--border-ds-neutral-400);
+  }
+
+  input:focus {
+    background-color: var(--bg-ds-surface-400);
+    border: 1px solid var(--border-ds-primary-300) !important;
+  }
   .placeholder-color::placeholder {
-    color: var(--text-secondary-300);
+    color: var(--text-ds-neutral-400);
   }
-
-  .trash-icon:hover {
-    background-color: var(--bg-secondary-500);
+  .value-pair-rows {
+    background-color: var(--bg-ds-surface-600);
+    border-top: 1px solid var(--bg-ds-surface-400);
+  }
+  .value-pair-rows:hover .button-container {
+    opacity: 1;
+    visibility: visible;
+  }
+  .value-pair-rows:last-child {
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+  .value-pair-rows:hover {
+    background-color: var(--bg-ds-surface-500);
+  }
+  .header-text {
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+  }
+  .button-container {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.1s ease-in-out,
+      visibility 0.1s;
   }
 </style>

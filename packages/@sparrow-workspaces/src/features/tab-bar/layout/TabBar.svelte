@@ -61,6 +61,8 @@
 
   export let onChangeViewInRequest: (view: string) => void;
 
+  export let onDoubleClick: (tab) => void;
+
   let isTabSaved: boolean;
 
   let activeTabType: string;
@@ -78,7 +80,8 @@
 
   $: {
     if (tabList) {
-      scrolable = tabList.length * 182 >= scrollerParent;
+      scrolable = tabList.length * 200 >= scrollerParent;
+
       getActiveTabType(tabList);
     }
   }
@@ -95,8 +98,8 @@
 </script>
 
 <button
-  class="tab border-0 ps-3 py-0 pe-3 w-100 bg-blackColor d-flex"
-  style="cursor: default;"
+  class="tab border-0 ps-0 py-0 pe-3 w-100 d-flex"
+  style="cursor: default; background-color:var(--bg-ds-surface-700); height:36px; padding-left:2px; padding-right:2px;"
   on:drop|preventDefault={(event) => {
     onDropEvent(event);
   }}
@@ -132,7 +135,7 @@
       class=" d-inline-block tab-scroller p-0 border-0 bg-transparent"
       bind:offsetWidth={scrollerWidth}
       id="tab-scroller"
-      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 75px); "
+      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 75px); height:36px"
     >
       {#if tabList}
         {#each tabList as tab, index (tab.tabId)}
@@ -140,17 +143,19 @@
             {tab}
             {onTabSelected}
             {onTabClosed}
+            listLength={tabList.length}
             {index}
             {tabWidth}
             {onDragStart}
             {onDropOver}
+            {onDoubleClick}
           />
         {/each}
       {/if}
     </button>
     {#if scrolable}
       <div
-        class="d-inline-block my-auto ps-1 position-relative"
+        class="d-inline-block my-auto position-relative"
         style="height:24px;"
       >
         <button
@@ -169,10 +174,18 @@
         </button>
       </div>
     {/if}
+
     <div
       class="d-flex ps-1 align-items-center justify-content-center my-auto"
-      style="height: 24px; "
+      style="height: 24px; gap:8px;  padding:4px 8px; "
     >
+      {#if tabList.length <= 0}
+        <span
+          style="color: var(--text-ds-neutral-300); font-size:12px; line-height:18px; font-weight:500;"
+        >
+          New Request
+        </span>
+      {/if}
       <Tooltip
         title={"New"}
         placement={"bottom-center"}
@@ -182,13 +195,13 @@
         <button
           on:click={onNewTabRequested}
           role="button"
-          class="d-flex layout my-auto relative top-2 align-items-center border-radius-2 p-0 justify-content-center border-0 py-auto"
-          style="height:24px; width:24px; background-color: transparent;"
+          class="d-flex layout my-auto relative top-2 align-items-center border-radius-2 p-0 justify-content-center py-auto"
+          style="height:26px; width:28px; background-color: transparent; border:0px; border-left:1px solid var(--bg-ds-surface-100); border-top-left-radius:0px; border-bottom-left-radius:0px;   "
         >
           <PlusIcon
-            height={"22px"}
-            width={"22px"}
-            color="var(--text-secondary-200)"
+            height={"21px"}
+            width={"21px"}
+            color="var(--bg-ds-neutral-100)"
           />
         </button>
       </Tooltip>
