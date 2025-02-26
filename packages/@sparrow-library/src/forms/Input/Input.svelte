@@ -6,11 +6,10 @@
   export { componentClass as class };
   let componentStyle = "";
   export { componentStyle as style };
-  export let type: "text" | "password" = "text";
+  export let type: "text" = "text";
   export let startIcon;
   export let endIcon;
   export let placeholder = "placeholder";
-  export let placeholderColor = "var(--icon-ds-neutral-400)";
   export let size: "medium" | "small" = "medium";
   export let width = "auto";
   export let disabled = false;
@@ -151,7 +150,7 @@
     class="w-100 input-{size}"
     style="{componentStyle} {type === 'text' && isEditIconRequired && isHovered
       ? 'padding-right:35px !important;'
-      : ''} --placeholder-color: {placeholderColor}; background-color: ${backgroundColor}; height:{size ===
+      : ''} --placeholder-color: var(--icon-ds-neutral-400); background-color: ${backgroundColor}; height:{size ===
     'medium'
       ? '20px'
       : '18px'};"
@@ -166,9 +165,13 @@
   {#if type === "text" && isHovered && isEditIconRequired && !disabled}
     <span
       class="position-absolute"
-      style="top: {size === 'medium' ? '4px' : '2px'}; right: 10px;"
+      style="top: {size === 'medium' ? '3px' : ''}; right: 10px;"
     >
-      <PencilIcon height={iconSize} width={iconSize} color="white" />
+      <PencilIcon
+        height={size === "medium" ? "16px" : "12px"}
+        width={size === "medium" ? "16px" : "12px"}
+        color="white"
+      />
     </span>
   {/if}
   {#if endIcon}

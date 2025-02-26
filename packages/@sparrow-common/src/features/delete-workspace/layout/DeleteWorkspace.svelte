@@ -6,6 +6,7 @@
   // ---- library
   import { Input } from "@sparrow/library/forms";
   import { Button, Avatar } from "@sparrow/library/ui";
+  import { takeUntil } from "rxjs";
   export let isDeleteWorkspaceModalOpen = false;
   export let workspace: WorkspaceDocument;
   export let openTeam: TeamDocument;
@@ -25,28 +26,25 @@
       action cannot be undone.
     </p>
   </div>
-
-  <p class="confirm-header mb-1 sparrow-fs-14 text-secondary-1000">
-    Enter workspace name to confirm<span class="asterik">*</span>
-  </p>
   <!-- 
       -- Input 
     -->
   <Input
     bind:value={inputName}
+    headerLabel={true}
+    headerLabelText={"Enter workspace name to confirm"}
+    inputValueRequired={true}
+    errorMessage={inputNameError}
+    isError={Boolean(inputNameError)}
+    helpLabel={true}
     size="medium"
     id={inputId}
     placeholder={"Workspace name"}
     style="outline:none;"
     variant="primary"
-    isError={Boolean(inputNameError)}
     isEditIconRequired={false}
     type={"text"}
   />
-
-  {#if inputNameError}
-    <p class="error-text sparrow-fs-12">{inputNameError}</p>
-  {/if}
   <br />
 
   <div

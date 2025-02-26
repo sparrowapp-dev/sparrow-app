@@ -131,7 +131,8 @@
           on:blur={(e) => {
             handleCurrentEnvironmentNameChange(environmentName, "blur");
           }}
-          variant="primary"
+          variant={"primary"}
+          size="medium"
           isError={false}
           class="ellipsis"
           style="outline:none;"
