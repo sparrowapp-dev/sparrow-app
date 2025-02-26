@@ -1,11 +1,18 @@
 <script lang="ts">
+<<<<<<< HEAD
   export let size1 = "16px";
   export let color = "red";
   $: console.log("size-----", size1);
+=======
+  export let size = "20px";
+  export let color = "";
+  $: finalColor = color === "" ? "inherit" : color;
+>>>>>>> b362302354c8c8c39d740c18cc4c308d7568ae29
 </script>
 
 <i
   class="icon-ic_fluent_dismiss_20_regular"
+<<<<<<< HEAD
   style="color:{color}; line-height:1; display: inline-block;"
 ></i>
 
@@ -38,3 +45,10 @@
     color: #333;
   }
 </style>
+=======
+  style="font-size:{size}; color:{finalColor}; display: flex; justify-content:center; align-items:center;"
+></i>
+
+<style>
+</style>
+>>>>>>> b362302354c8c8c39d740c18cc4c308d7568ae29

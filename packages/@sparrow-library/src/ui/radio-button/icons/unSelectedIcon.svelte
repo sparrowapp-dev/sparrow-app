@@ -1,4 +1,5 @@
 <script lang="ts">
+<<<<<<< HEAD
   export let width: number = 16;
   export let height: number = 16;
   export let classProp: string = "";
@@ -22,6 +23,20 @@
 <style>
   .select-icon {
     padding: 3px;
+=======
+  export let size = "16px";
+  export let unSelectedColor: string = "#6894F9";
+  export let classProp: string = "";
+</script>
+
+<i
+  class="icon-ic_fluent_radio_button_20_regular {classProp} select-icon"
+  style="font-size:{size}; color:{unSelectedColor}; display: flex; justify-content:center; align-items:center;"
+></i>
+
+<style>
+  .select-icon {
+>>>>>>> b362302354c8c8c39d740c18cc4c308d7568ae29
     cursor: pointer;
   }
 </style>

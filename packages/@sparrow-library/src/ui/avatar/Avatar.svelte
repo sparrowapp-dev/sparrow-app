@@ -14,7 +14,11 @@
   {#if type === "person"}
     <PersonIcon />
   {:else if type === "letter"}
+<<<<<<< HEAD
     {letter.charAt(0).toUpperCase()}
+=======
+    {letter.toUpperCase()}
+>>>>>>> b362302354c8c8c39d740c18cc4c308d7568ae29
   {:else if type === "image" && Image}
     <img src={image} alt="Avatar" class="avatar-image" />
   {/if}

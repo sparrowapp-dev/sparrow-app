@@ -58,10 +58,17 @@
   <div>
     {#if !isBulkEditActive}
       <div class="d-flex align-items-center py-3">
+<<<<<<< HEAD
         <Toggle
           bind:isActive={showGeneratedHeader}
           label="Show auto-generated headers"
         />
+=======
+         <Toggle
+          bind:isActive={showGeneratedHeader}
+          label="Show auto-generated headers"
+         /> 
+>>>>>>> b362302354c8c8c39d740c18cc4c308d7568ae29
       </div>
     {/if}
   </div>

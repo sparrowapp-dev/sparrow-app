@@ -1,12 +1,16 @@
 <script lang="ts">
   import { trashIcon as trashIcon } from "@sparrow/library/assets";
-  import { AttachmentIcon } from "@sparrow/library/icons";
+  import {
+    AttachRegular,
+    DeleteRegular,
+    ReOrderDotsRegular,
+  } from "@sparrow/library/icons";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { invoke } from "@tauri-apps/api/core";
   import { crossIcon as close } from "@sparrow/library/assets";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "..";
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   import { Base64Converter } from "@sparrow/common/utils";
   import { Checkbox } from "@sparrow/library/forms";
@@ -202,17 +206,22 @@
 </script>
 
 <input type="file" id="fileInput" style="display: none" />
+
 <div
-  class="mb-0 me-0 w-100 py-0 border-radius-2 section-layout"
-  style="overflow:hidden;"
+  class="mb-0 me-0 py-0 section-layout w-100"
+  style="overflow:hidden; border-radius:4px;"
 >
   <div
-    class="px-3 d-flex align-items-center w-100 pair-header-row {!isTopHeaderRequired
+    class="w-100 d-flex align-items-center pair-header-row {!isTopHeaderRequired
       ? 'd-none'
       : ''}"
-    style="position:relative;"
+    style="position:relative; "
   >
+<<<<<<< HEAD
     <div style=" width:24px;" class="me-3">
+=======
+    <div style=" width:24px; margin-right:12px;" class="">
+>>>>>>> b362302354c8c8c39d740c18cc4c308d7568ae29
       <Checkbox
         disabled={pairs.length === 1 || !isCheckBoxEditable}
         checked={controller}
@@ -222,14 +231,14 @@
 
     <div class="d-flex gap-0" style="width: calc(100% - 180px);">
       <div
-        class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
+        class="w-50 position-relative header-text"
         style="padding-left: 6px;"
       >
         Key
       </div>
       <div
-        class="w-50 position-relative text-fs-12 text-secondary-200 fw-bold"
-        style="padding-left: 56px;"
+        class="w-50 position-relative header-text"
+        style="padding-left: 62px;"
       >
         Value
       </div>
@@ -257,8 +266,20 @@
   <div class="w-100" style="display:block; position:relative;">
     {#if pairs}
       {#each pairs as element, index}
+<<<<<<< HEAD
         <div class="pair-data-row w-100 px-3 d-flex align-items-center">
           <div style=" width:24px;" class="me-3">
+=======
+        <div class="pair-data-row w-100 d-flex align-items-center px-1">
+          <!-- <div class="button-container">
+            <Button
+              size="extra-small"
+              type="teritiary-regular"
+              startIcon={ReOrderDotsRegular}
+            />
+          </div> -->
+          <div style=" width:24px;" class="me-2">
+>>>>>>> b362302354c8c8c39d740c18cc4c308d7568ae29
             {#if pairs.length - 1 != index || !isInputBoxEditable}
               <Checkbox
                 checked={element.checked}
@@ -327,7 +348,7 @@
             {/if}
           </div>
           <div
-            class="ms-3 d-flex align-items-center justify-content-between"
+            class="ms-1 d-flex align-items-center justify-content-between gap-1"
             style="width:40px;"
           >
             {#if pairs.length - 1 != index}
@@ -341,34 +362,39 @@
                   placement="bottom-center"
                 >
                   <button
-                    class="d-flex align-items-center justify-content-center bg-secondary-700 border-0 {isInputBoxEditable &&
+                    class="button-container d-flex align-items-center justify-content-center border-0 {isInputBoxEditable &&
                     element.type == 'text' &&
                     element.value == ''
                       ? 'opacity-1'
                       : 'opacity-0 pe-none'}"
-                    style="width:16px; height:16px; padding:2px;"
+                    style="width:16px; height:16px; padding:2px; background:transparent;"
                     on:click={() => {
                       uploadFormFile(index);
                     }}
                   >
-                    <AttachmentIcon
-                      height={"12px"}
-                      width={"12px"}
-                      color={"var(--icon-secondary-200)"}
+                    <AttachRegular
+                      size={"16px"}
+                      color={"var(--icon-ds-neutral-100)"}
                     />
                   </button>
                 </Tooltip>
                 <!-- {/if} -->
-                <Tooltip title="Delete" placement="bottom-center">
-                  <button
-                    class="d-flex align-items-center p-0 justify-content-center bg-secondary-700 border-0"
-                    style="width:16px; height:16px;"
-                    on:click={() => {
-                      deleteParam(index);
-                    }}
-                  >
-                    <img src={trashIcon} style="height:100%; width: 100%;" />
-                  </button>
+                <Tooltip
+                  title={"Delete"}
+                  placement={"bottom-center"}
+                  distance={10}
+                >
+                  <div class="button-container">
+                    <Button
+                      buttonClassProp=""
+                      size="extra-small"
+                      type="teritiary-regular"
+                      startIcon={DeleteRegular}
+                      onClick={() => {
+                        deleteParam(index);
+                      }}
+                    />
+                  </div>
                 </Tooltip>
               {:else}
                 <div style="width:45px;" class="opacity:0;"></div>
@@ -383,20 +409,56 @@
 
 <style>
   .pair-header-row {
-    border-top: 0.5px solid var(--border-secondary-315);
     padding-top: 3px;
     padding-bottom: 3px;
-    background-color: var(--bg-secondary-880);
-    height: 26px;
+    background-color: var(--bg-ds-surface-400);
+    height: 28px;
+    padding-left: 4px;
+    padding-right: 1rem;
   }
   .pair-data-row:first-child {
     border-top: none !important;
-    height: 24px !important;
+    height: 28px !important;
   }
   .pair-data-row {
     padding-top: 3px;
     padding-bottom: 3px;
-    height: calc(24px);
-    background-color: var(--bg-secondary-700);
+    padding-right: 20px;
+    padding-left: 2px;
+    height: calc(28px);
+    background-color: var(--bg-ds-surface-600);
+    border-top: 1px solid var(--bg-ds-surface-400);
   }
+<<<<<<< HEAD
+=======
+  .pair-data-row:hover {
+    background-color: var(--bg-ds-surface-500);
+  }
+  .trash-icon {
+    background: transparent;
+  }
+  .trash-icon:hover {
+    background-color: var(--bg-ds-surface-300);
+  }
+  .trash-icon:focus-visible {
+    border: 2px solid var(--bg-ds-primary-300);
+  }
+  .header-text {
+    color: var(--text-ds-neutral-200);
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+  }
+  .pair-data-row:hover .button-container {
+    opacity: 1;
+    visibility: visible;
+  }
+  .button-container {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.1s ease-in-out,
+      visibility 0.1s;
+  }
+>>>>>>> b362302354c8c8c39d740c18cc4c308d7568ae29
 </style>

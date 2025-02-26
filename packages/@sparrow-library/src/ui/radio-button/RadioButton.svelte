@@ -115,8 +115,12 @@
         >
           <SelectIcon
             {selected}
+<<<<<<< HEAD
             height={buttonSize === "medium" ? 16 : 12}
             width={buttonSize === "medium" ? 16 : 12}
+=======
+            size={buttonSize === "medium" ? "20px" : "16px"}
+>>>>>>> b362302354c8c8c39d740c18cc4c308d7568ae29
             {unSelectedColor}
             {selectedColor}
           />
@@ -150,6 +154,13 @@
   .focus-visible-button:focus-visible {
     outline: 2px solid var(--border-ds-primary-300);
   }
+<<<<<<< HEAD
+=======
+
+  .focus-visible-button:focus-visible .circle-internal {
+    background-color: var(--bg-ds-surface-300) !important;
+  }
+>>>>>>> b362302354c8c8c39d740c18cc4c308d7568ae29
   .focus-visible-button:focus-visible .label-text-medium,
   .focus-visible-button:focus-visible .label-text-small {
     color: var(--text-ds-neutral-50) !important;

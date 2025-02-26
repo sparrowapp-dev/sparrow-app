@@ -36,6 +36,10 @@
       group={apiData.addTo}
       handleChange={handleOptionChange}
       labelText=" Add to Header "
+<<<<<<< HEAD
+=======
+      buttonSize="medium"
+>>>>>>> b362302354c8c8c39d740c18cc4c308d7568ae29
     />
   </div>
   <div class="radio text-fs-12 d-flex align-items-center">
@@ -46,6 +50,10 @@
       group={apiData.addTo}
       handleChange={handleOptionChange}
       labelText=" Add to Parameter "
+<<<<<<< HEAD
+=======
+      buttonSize="medium"
+>>>>>>> b362302354c8c8c39d740c18cc4c308d7568ae29
     />
   </div>
 </div>
