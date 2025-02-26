@@ -109,7 +109,7 @@
         : 'd-none'}"
       style="right:10px; top:47px; font-size: 12px; font-weight: 400; min-width: 200px; z-index: 500; display:flex; flex-direction:column;gap:4px; background-color:var(--bg-ds-surface-600);"
     >
-      <div class="align-items-center py-1 px-2" style="display: flex; gap:8px">
+      <div class="align-items-center py-1 px-2 profile-item" style="display: flex; gap:8px">
         <Avatar type="letter" size="small" letter={user?.name[0]} bgColor="var(--icon-ds-secondary-400)" />
         <div class="d-flex flex-column ms-1">
           <div class="ellipsis" style="max-width: 200px; font-weight: 500;">
@@ -141,10 +141,13 @@
   .modal-background {
     backdrop-filter: blur(75px);
     border-radius: 5px;
-    background-color: var(--bg-tertiary-700);
+    background-color: var(--bg-ds-surface-600);
   }
 
   .sign-out-button:hover {
-    background-color: var(--bg-tertiary-500) !important;
+    background-color: var(--bg-ds-surface-400) !important;
   } /* CardBody+BlurEffects */
+  .profile-item:hover{
+     background-color: var(--bg-ds-surface-400) !important;
+  }
 </style>

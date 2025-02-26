@@ -2,6 +2,7 @@
   /**
    * select option list
    */
+  import { CheckMarkIcon } from "@sparrow/library/icons";
   export let list: {
     name: string;
     id: string;
@@ -24,10 +25,10 @@
   export let selectedRequest: {
     id: string;
   };
+
   /**
    * Ticked mark icon
    */
-  export let tickIcon: any;
   export let getTextColor: (color: any) => {};
   /**
    * marks the tickmark is highlighted
@@ -37,38 +38,18 @@
   /**
    * body theme - background
    */
-  export let bodyTheme: string;
+  export let showDescription = true;
+
+  $: console.log(showDescription);
 
   let isMenuItemHover = false;
   let isMenuItemClicked = false;
 
   /**
    * @description - adds CSS class to menu item when hovered or clicked according to the theme
-   * @param _bodyTheme - identifies body theme for example dark, light, or violet
    * @param _isMenuItemHover - identifies if menu item is hovered
    * @param _isMenuItemClicked - identifies if menu item is clicked
    */
-  const extractHeaderHighlight = (
-    _bodyTheme: string,
-    _isMenuItemHover: boolean,
-    _isMenuItemClicked: boolean,
-  ) => {
-    if (_bodyTheme === "violet" && _isMenuItemClicked && _isMenuItemHover) {
-      return `select-clicked-highlight-violet-btn`;
-    } else if (
-      _bodyTheme === "dark" &&
-      _isMenuItemClicked &&
-      _isMenuItemHover
-    ) {
-      return `select-clicked-highlight-dark-btn`;
-    } else if (_bodyTheme === "violet" && _isMenuItemHover) {
-      return `select-hover-highlight-violet-btn`;
-    } else if (_bodyTheme === "dark" && _isMenuItemHover) {
-      return `select-hover-highlight-dark-btn`;
-    } else {
-      return "";
-    }
-  };
 
   /**
    * @description - add classes to ticked options
@@ -95,11 +76,13 @@
   on:mouseup={() => {
     isMenuItemClicked = false;
   }}
-  class="d-flex px-2 py-2 justify-content-between highlight border-radius-2 select-option-container {extractHeaderHighlight(
-    bodyTheme,
-    isMenuItemHover,
-    isMenuItemClicked,
-  )}"
+  class="d-flex px-2 justify-content-between border-radius-2 select-option-container"
+  style={isMenuItemHover
+    ? `background-color: var(--bg-ds-surface-400) `
+    : `background-color: var(--bg-ds-surface-600)`}
+  aria-selected={selectedRequest?.id === list.id}
+  role="option"
+  tabindex="0"
 >
   <div class="content-wrapper">
     <p
@@ -109,7 +92,7 @@
     >
       {list.name}
     </p>
-    {#if list.description}
+    {#if list.description && showDescription}
       <div class="description-wrapper">
         <small class="text-textColor description">{list.description}</small>
       </div>
@@ -117,16 +100,26 @@
   </div>
   {#if selectedRequest?.id === list.id}
     <span class="d-flex align-items-center justify-content-center tick-icon">
-      <img src={tickIcon} alt="" />
+      <CheckMarkIcon color="var(--text-primary-300)" size="medium" />
     </span>
   {/if}
 </div>
 
 <style>
-  .select-option-container {
-    width: 100%;
+  .select-option-container[tabindex="0"]:focus-visible {
+    outline: 2px solid var(--border-ds-primary-300) !important;
+    box-shadow: none !important;
+    outline-offset: -2px !important;
+    border-radius: 4px;
   }
-
+  .select-option-container:active {
+    background-color: var(--bg-ds-surface-700) !important;
+    color: var(--text-ds-neutral-50);
+    border-width: 0px;
+  }
+  .select-option-container {
+    padding: 7px 0px;
+  }
   .content-wrapper {
     flex: 1;
     min-width: 0;
@@ -139,6 +132,7 @@
 
   .description-wrapper {
     width: 100%;
+    color: var(--text-ds-neutral-300);
   }
 
   .description {
@@ -156,28 +150,20 @@
   .tick-icon {
     height: 16px;
     width: 16px;
-    flex-shrink: 0;
-    margin-left: 8px;
+    margin-right: 4px;
   }
 
   /* hover states */
   .select-hover-highlight-dark-btn {
     background-color: var(--dull-background-color);
   }
-  .select-hover-highlight-violet-btn {
-    background-color: var(--bg-tertiary-600);
-  }
-
   /* clicked states */
   .select-clicked-highlight-dark-btn {
     background-color: var(--bg-secondary-400);
   }
-  .select-clicked-highlight-violet-btn {
-    background-color: var(--bg-tertiary-700);
-  }
 
   .select-ticked-highlight-text {
-    color: var(--text-primary-300) !important;
+    color: var(--text-ds-primary-300) !important;
   }
 
   /* others */

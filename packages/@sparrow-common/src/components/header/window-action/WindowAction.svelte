@@ -1,14 +1,17 @@
 <script lang="ts">
   import {
     CrossIconV2,
+    DismissRegular,
     DoubleResizeIcon,
     ExpandIcon,
     MiniMizeIcon,
     SquareIcon,
+    SubtractIcon,
   } from "@sparrow/library/icons";
   import { invoke } from "@tauri-apps/api/core";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { onDestroy } from "svelte";
+  import { WindowMultipleIcon } from "@sparrow/library/icons";
 
   export let isWindows = true;
 
@@ -99,10 +102,9 @@
         on:mouseleave={handleMouseLeave}
         class="custom-header-button button-minus border-0 py-1 px-1"
       >
-        <MiniMizeIcon
-          height={"10"}
-          width={"10"}
-          color={hoveredButton === "minimize"
+        <SubtractIcon
+        size={"16px"}
+        color={hoveredButton === "minimize"
             ? "white"
             : "var(--text-secondary-200)"}
         />
@@ -118,12 +120,11 @@
         id="resize-button"
       >
         {#if isMaximizeWindow}
-          <DoubleResizeIcon
-            height={"10"}
-            width={"10"}
-            color={hoveredButton === "resize"
-              ? "white"
-              : "var(--text-secondary-200)"}
+          <WindowMultipleIcon
+          size={"16px"}
+          color={hoveredButton === "resize"
+            ? "white"
+            : "var(--text-secondary-200)"}
           />
         {:else}
           <SquareIcon
@@ -144,13 +145,11 @@
         on:mouseleave={handleMouseLeave}
         class="custom-header-button button-close border-0 py-1 px-1"
       >
-        <CrossIconV2
-          height={"10"}
-          width={"10"}
-          color={hoveredButton === "close"
+        <DismissRegular
+        size={"16px"}
+        color={hoveredButton === "close"
             ? "white"
-            : "var(--text-secondary-200)"}
-        />
+            : "var(--text-secondary-200)"}/>
       </button>
     </div>
   </div>

@@ -5,6 +5,8 @@
     SparrowEdgeIcon,
     StackIcon,
     CheckCircle,
+    ArrowRightRegular,
+    AddRegular,
   } from "@sparrow/library/icons";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { environmentType } from "@sparrow/common/enums";
@@ -17,7 +19,7 @@
   import UserProfileModal, {
     type UserProfileObj,
   } from "./sub-component/UserProfileModal.svelte";
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
   // import { GlobalSearch } from "../../components/popup/global-search";
   /**
    * environment list
@@ -112,14 +114,14 @@
       id: "Cloud Agent",
       displayName: "Cloud Agent",
       description:
-        "Send a request through Sparrow's secure cloud server. Only supports HTTP request.",
+        "Securely send request via Sparrow's cloud.",
     },
     {
       name: "Browser Agent",
       id: "Browser Agent",
       displayName: "Browser Agent",
       description:
-        "Run requests directly from your browser, ideal for local testing.",
+        "Run requests directly in your browser.",
     },
   ];
 
@@ -241,12 +243,17 @@
   });
 </script>
 
+
 <header
   bind:this={titlebar}
   id="titlebar"
-  class=" titlebar app-header ps-1 d-flex align-items-center justify-content-between"
+  class=" titlebar app-header ps-1 pe-1 d-flex align-items-center justify-content-between"
+  style="position:relative;"
   on:mousedown={handleMouseDown}
 >
+
+ <div class="gradient-ellipse"></div>
+
   <div class="d-flex ms-2 justify-content-cdenter align-items-center no-drag">
     {#if isWebApp === false}
       {#if isWindows === false}
@@ -265,8 +272,8 @@
     {:else}
       <div class="ms-2" style="margin-right:8px">
         <SparrowIcon
-          height="17px"
-          width="16px"
+          height="20px"
+          width="20px"
           color="var(--primary-btn-color)"
         />
       </div>
@@ -283,18 +290,18 @@
             data={guestData}
             titleId={`${currentWorkspaceId}`}
             onclick={() => {}}
-            minHeaderWidth={"212px"}
+            minHeaderWidth={"252px"}
             isDropIconFilled={true}
             borderType={"none"}
             borderActiveType={"none"}
             headerHighlight={"hover-active"}
             headerTheme={"primary"}
-            menuItem={"v2"}
+            menuItem={"v4"}
             headerFontSize={"12px"}
-            maxHeaderWidth={"215px"}
-            headerFontWeight={700}
+            maxHeaderWidth={"252px"}
+            headerFontWeight={600}
             zIndex={200}
-            bodyTheme={"violet"}
+            bodyTheme={"surface"}
             borderRounded={"2px"}
             position={"absolute"}
             isHeaderCombined={true}
@@ -303,6 +310,7 @@
             iconRequired={true}
             icon={WorkspaceRegular}
             iconColor={"var(--icon-ds-neutral-100)"}
+            showDescription={false}
           >
             <div slot="pre-select" class="mb-2 px-1">
               <div class="guest-user-text">
@@ -332,17 +340,17 @@
           data={workspaceData}
           titleId={`${currentWorkspaceId}`}
           onclick={handleWorkspaceDropdown}
-          minHeaderWidth={"185px"}
+          minHeaderWidth={"252px"}
           isDropIconFilled={true}
           borderType={"none"}
           borderActiveType={"none"}
           headerHighlight={"hover-active"}
-          headerTheme={"primary"}
-          menuItem={"v2"}
+          headerTheme={"transparent"}
+          menuItem={"v4"}
           headerFontSize={"12px"}
-          maxHeaderWidth={"215px"}
+          maxHeaderWidth={"252px"}
           zIndex={200}
-          bodyTheme={"violet"}
+          bodyTheme={"surface"}
           borderRounded={"2px"}
           position={"absolute"}
           isHeaderCombined={true}
@@ -350,32 +358,33 @@
           iconRequired={true}
           icon={WorkspaceRegular}
           iconColor={"var(--icon-ds-neutral-100)"}
+          headerFontWeight={600}
+          showDescription={false}
         >
-          <div slot="pre-select" class="pre-dropdown">
-            <div class="upper-underline"></div>
+          <div slot="pre-select" class="mb-1">
+           <div class="workspacename"> {currentTeamName}</div>
           </div>
           <div
             slot="post-select"
             class="post-dropdown"
             style="justify-content: center; align-items:center;"
           >
-            {#if workspaceData.length < 5}
-              <div class="recent-text-btn">
-                You will see your five most recent workspaces here.
-              </div>
-            {/if}
             <div class="lower-underline"></div>
             <div class="view-all-workspace" on:click={handleViewWorkspaces}>
               <span>View all Workspaces</span>
+              <Button
+              type="teritiary-regular"
+              startIcon={ArrowRightRegular}
+              size="small"/>
             </div>
+             <div class="lower-underline"></div>
             <div class="create-new-workspace" on:click={onCreateWorkspace}>
               <span>Create New Workspace</span>
               <div style="align-content: flex-end;">
-                <PlusIcon
-                  height="16px"
-                  width="16px"
-                  color="var(--icon-primary-300)"
-                />
+                <Button
+                  type="teritiary-regular"
+                  startIcon={AddRegular}
+                  size="small"/>
               </div>
             </div>
           </div>
@@ -399,7 +408,7 @@
           class="join-container"
           on:click={onLoginUser}
         >
-          <span class="join-txt"> Sign In for Enhanced Experience</span>
+          <span class="join-txt"> Sign in For Better Experience</span>
         </div>
       </Tooltip>
     {/if}
@@ -419,7 +428,7 @@
         data={multipleAgentData}
         titleId={`${multipleAgentvar}`}
         onclick={handleAgentDropdown}
-        minHeaderWidth={"262px"}
+        minHeaderWidth={"171px"}
         iconRequired={true}
         icon={CheckCircle}
         iconColor={"#69D696"}
@@ -428,63 +437,55 @@
         borderActiveType={"none"}
         headerHighlight={"hover-active"}
         headerTheme={"primary"}
-        menuItem={"v2"}
+        menuItem={"v4"}
         headerFontSize={"12px"}
         maxHeaderWidth={"12px"}
         zIndex={200}
-        bodyTheme={"violet"}
+        bodyTheme={"surface"}
         borderRounded={"2px"}
         position={"absolute"}
         isHeaderCombined={false}
-        maxBodyHeight={"279px"}
-        minBodyWidth={"240px"}
+        maxBodyHeight={"296px"}
+        minBodyWidth={"296px"}
       >
-        <div slot="pre-select" class="pre-dropdown">
-          <div
-            class="d-flex justify-content-between align-items-center select-agent"
-          >
-            <div>Select Sparrow Agent</div>
-          </div>
-          <div class="upper-underline"></div>
-        </div>
+  
         <div
           slot="post-select"
           class="post-dropdown d-flex justify-content-center align-items-center flex-column"
         >
           <div class="lower-underline"></div>
           <div class="download-area w-100">
-            <div
-              class="download-sparrow-button dowload-section d-flex flex-column justify-content-between"
-            >
-              <p class="download-text mb-1">Download Sparrow Desktop</p>
-              <span class="description text-fs-10">
-                Effortlessly test requests with the desktop app. No agents
-                required.
-              </span>
-            </div>
-            <div class="d-flex align-items-center">
-              <SparrowIcon
-                height="32px"
-                width="32px"
-                color="var(--primary-btn-color)"
-              />
-            </div>
+           <div
+  class="download-sparrow-button download-section d-flex align-items-center justify-content-between"
+  style="display: flex; gap: 12px; padding: 8px; border-radius: 6px; width: fit-content;"
+>
+  <SparrowIcon height="32px" width="32px" color="var(--primary-btn-color)" />
+
+  <div class="d-flex flex-column gap-1" style="line-height: 1;">
+    <p class="download-text" style="margin: 0; font-size: 12px; font-weight: 500; color: var(--text-ds-nuetral-50);">
+      Sparrow Desktop
+    </p>
+    <span class="description text-fs-10" style="font-size: 12px; color: gray;">
+      No agent needed.
+    </span>
+  </div>
+
+  <!-- Download Button -->
+
+  <Button
+  type="primary"
+  title="Download Now"
+  size="small"
+  onClick={onMarketingRedirect}
+  customWidth={"103px"}
+
+  />
+</div>
+
+
+
           </div>
-          <span
-            on:click={onMarketingRedirect}
-            class="text-decoration-none d-flex align-items-center align-self-start gap-2 mt-1 download-btn"
-          >
-            <div class="gap-2 d-flex">
-              <p>Download Now</p>
-              <div>
-                <ArrowRightIcon
-                  height="15px"
-                  width="11px"
-                  color="var(--icon-primary-300)"
-                />
-              </div>
-            </div>
-          </span>
+        
         </div>
       </Select>
     {/if}
@@ -511,7 +512,7 @@
       })}
       titleId={currentEnvironment?.id}
       onclick={handleDropdown}
-      minHeaderWidth={"185px"}
+      minHeaderWidth={"205px"}
       iconRequired={true}
       icon={StackIcon}
       iconColor={"var(--icon-primary-300)"}
@@ -519,12 +520,12 @@
       borderType={"none"}
       borderActiveType={"none"}
       headerHighlight={"hover-active"}
-      headerTheme={"secondary"}
-      menuItem={"v2"}
+      headerTheme={"transparent"}
+      menuItem={"v4"}
       headerFontSize={"12px"}
       maxHeaderWidth={"185px"}
       zIndex={200}
-      bodyTheme={"violet"}
+      bodyTheme={"surface"}
       borderRounded={"2px"}
       position={"absolute"}
     />
@@ -648,9 +649,12 @@
     font-weight: 500;
     line-height: 18px;
     padding: 10px;
+    background-color: var(--bg-ds-surface-600);
+    min-height: 28px;
+    padding:8px 6px;
   }
   .create-new-workspace:hover {
-    background-color: var(--bg-tertiary-600);
+    background-color: var(--bg-ds-surface-400);
   }
 
   .upper-underline {
@@ -662,36 +666,44 @@
   .lower-underline {
     width: 100%;
     height: 1px;
-    background-color: var(--bg-tertiary-300);
-    margin-top: 10px;
+    background-color: var(--bg-ds-surface-200);
   }
 
   .view-all-workspace {
     display: flex;
     align-items: center;
-    color: var(--text-secondary-200); /* Blue color */
+    justify-content: space-between;
+    color: var(--text-ds-neutral-100);
+    background-color: var(--bg-ds-surface-600);
     cursor: pointer;
-    padding: 10px;
     font-size: 12px;
-    font-weight: 400;
+    font-weight: 500;
+    min-height: 28px;
+    padding:8px 6px;
   }
 
   .view-all-workspace:hover {
-    background-color: var(--bg-tertiary-600);
+    background-color: var(--bg-ds-surface-400);
   }
 
   .post-dropdown {
     width: 100%;
   }
-  .pre-dropdown:hover {
-    background-color: var(--bg-tertiary-600);
-  }
-  .recent-text-btn {
+  .workspacename{
     font-size: 12px;
     font-weight: 400;
-    padding: 10px;
-    align-self: center;
-    color: var(--text-secondary-200);
-    text-align: center;
+    color: var(--text-ds-neutral-200);
+    padding: 7px  6px
   }
+  .gradient-ellipse {
+  position: absolute;
+  left: -20px;
+  bottom: 0;
+  width: 327px;
+  height: 77px;
+  background: radial-gradient(ellipse at 50% 80%, #3670F7 0%, transparent 60%);
+  opacity: 0.2;
+  pointer-events: none;
+  z-index: 1;
+}
 </style>

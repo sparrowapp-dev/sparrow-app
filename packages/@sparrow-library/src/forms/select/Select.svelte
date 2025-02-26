@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { tickIcon } from "./svgs";
   import { onDestroy, onMount } from "svelte";
   import { SearchIcon } from "@sparrow/library/assets";
   import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
   import { GitBranchIcon } from "@sparrow/library/assets";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
   import MenuItemsV3 from "./menu-items/MenuItemsV3.svelte";
-  import { CaretDownRegular } from "@sparrow/library/icons";
+  import MenuItemsV4 from "./menu-items/MenuItemsV4.svelte";
   import { CaretDownFilled } from "@sparrow/library/icons";
   /**
    * Determines id of the menu item.
@@ -54,7 +53,7 @@
   /**
    * Determines the dimensions of a Select.
    */
-  export let headerHeight = "34px";
+  export let headerHeight = "28px";
   export let maxBodyHeight = "200px";
   export let minHeaderWidth = "50px";
   export let maxHeaderWidth = "500px";
@@ -94,7 +93,7 @@
   /**
    * Determines the background state for the Select body.
    */
-  export let bodyTheme: "dark" | "blur" | "violet" = "dark";
+  export let bodyTheme: "dark" | "blur" | "violet" | "surface" = "dark";
 
   /**
    * Determines the background highlighting state for the Select header.
@@ -117,7 +116,7 @@
   /**
    * Determines versions of the Select menu.
    */
-  export let menuItem: "v1" | "v2" | "v3" = "v1";
+  export let menuItem: "v1" | "v2" | "v3" | "v4" = "v1";
   /**
    * Determines icons used in Select header.
    */
@@ -142,6 +141,7 @@
   export let position: "absolute" | "fixed" = "fixed";
   export let placeholderText = "";
   export let isHeaderCombined = false;
+  export let showDescription = true;
 
   export let isArrowIconRequired = true;
 
@@ -241,6 +241,10 @@
       break;
     case "violet":
       selectBodyBackgroundClass = "select-body-background-violet";
+      break;
+    case "surface":
+      selectBodyBackgroundClass = "select-body-background-surface";
+      break;
   }
 
   let bodyLeftDistance: number;
@@ -412,7 +416,6 @@
       }
     }}
     role="button"
-    tabindex="0"
     on:keydown={() => {}}
   >
     <div
@@ -482,7 +485,7 @@
               : getTextColor(selectedRequest?.color)}"
             style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; {disabled ||
             selectedRequest?.hide
-              ? 'color:var(--text-secondary-200) !important'
+              ? 'color:var(--bg-ds-nuetral-100) !important'
               : ''}"
           >
             {selectedRequest?.name}
@@ -493,12 +496,7 @@
         class="d-flex ps-2 {!isArrowIconRequired ? 'd-none' : ''}"
         class:select-logo-active={isOpen}
       >
-        {#if isDropIconFilled}
         <CaretDownFilled size={"16px"}/>
-       
-        {:else}
-          <CaretDownRegular size={"16px"}/>
-        {/if}
       </span>
     </div>
   </div>
@@ -507,7 +505,7 @@
     bind:this={selectBodyWrapper}
     class="select-data {position === 'fixed'
       ? 'position-fixed'
-      : 'position-absolute'}  {selectBodyBackgroundClass} p-1 border-radius-2
+      : 'position-absolute'} {selectBodyBackgroundClass}  border-radius-2
     {isOpen ? 'visible' : 'invisible'}"
     style="
       {isOpen
@@ -521,7 +519,8 @@
           Number(headerHeight.replace(/\D/g, '')) + 5
         }px;`}  right: {position === 'fixed'
       ? `${bodyRightDistance}px;`
-      : `0px;`} z-index:{zIndex};"
+      : `0px;`} z-index:{zIndex}; padding: 8px 6px;
+      "
   >
     <div
       on:click={() => {
@@ -529,6 +528,7 @@
       }}
       role="button"
       tabindex="0"
+      class="main-container"
       on:keydown={() => {}}
     >
       <slot name="pre-select" />
@@ -557,7 +557,7 @@
         return element.name.toLowerCase().includes(searchData.toLowerCase());
       }) as list}
         <div
-          class=" {list.hide ? 'd-none' : ''} {list?.disabled
+          class="{list.hide ? 'd-none' : ''} {list?.disabled
             ? 'disabled-option'
             : ''}"
           on:click={() => {
@@ -565,22 +565,30 @@
             onclick(list.id);
           }}
           role="button"
-          tabindex="0"
           on:keydown={() => {}}
         >
           {#if menuItem === "v1"}
-            <MenuItemsV1 {list} {selectedRequest} {tickIcon} {getTextColor} />
+            <MenuItemsV1 {list} {selectedRequest} {getTextColor} />
           {:else if menuItem === "v2"}
             <MenuItemsv2
               {list}
               {selectedRequest}
-              {tickIcon}
               {bodyTheme}
               {getTextColor}
               {highlightTickedItem}
+              {showDescription}
             />
           {:else if menuItem === "v3"}
-            <MenuItemsV3 {list} {selectedRequest} {tickIcon} {getTextColor} />
+            <MenuItemsV3 {list} {selectedRequest} {getTextColor} />
+          {:else if menuItem === "v4"}
+            <MenuItemsV4
+              {list}
+              {selectedRequest}
+              {bodyTheme}
+              {getTextColor}
+              {highlightTickedItem}
+              {showDescription}
+            />
           {/if}
         </div>
       {/each}
@@ -614,6 +622,7 @@
     width: auto;
     padding: 0 10px;
   }
+  
   // default states
   .select-background-transparent {
     background-color: transparent;
@@ -642,7 +651,7 @@
 
   // hover or open-body states
   .select-btn-state-active-transparent {
-    background-color: var(--bg-tertiary-700);
+    background-color: var(--bg-ds-surface-600);
   }
   .select-btn-state-active-dark {
     background-color: var(--bg-secondary-600);
@@ -663,12 +672,12 @@
     background-color: var(--bg-ds-surface-400);
   }
   .select-btn-state-active-secondary {
-    background-color: var(--bg-ds-surface-400);
+    background-color: var(--bg-ds-surface-600);
   }
 
   // clicked states
   .select-btn-state-clicked-transparent {
-    background-color: var(--bg-tertiary-700);
+    background-color: var(--bg-ds-surface-500);
   }
   .select-btn-state-clicked-dark {
     background-color: var(--bg-secondary-400);
@@ -682,7 +691,6 @@
   .select-btn-state-clicked-dark-violet {
     background-color: var(--bg-tertiary-700);
   }
-
   .select-btn-state-clicked-dark-violet2 {
     background-color: var(--bg-tertiary-700);
   }
@@ -694,39 +702,42 @@
   }
 
   // focused
+  .select-background-transparent:focus-visible {
+    border: 2px solid var(--border-ds-primary-300);
+    outline: none !important;
+    background-color: transparent;
+  }
   .select-background-primary:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
-    outline: none;
+    outline: none !important;
     background-color: transparent;
   }
   .select-background-secondary:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
-    outline: none;
-    background-color: var(--bg-ds-surface-600);
+    outline: none !important;
+    border-radius: 4px !important;
   }
-  //////////////////////////
-  .select-data {
-    color: white;
-    border: 1px solid rgb(44, 44, 44);
-    transition: 0.3s ease;
-    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-  }
+
   .select-body-background-dark {
-    background-color: var(--background-dropdown);
+    background-color: var(--background-dropdown) !important;
   }
   .select-body-background-violet {
-    background-color: var(--bg-tertiary-400);
+    background-color: var(--bg-tertiary-400) !important;
+  }
+  .select-body-background-surface {
+    background-color: var(--bg-ds-surface-600) !important;
   }
   .select-body-background-blur {
-    background: var(--background-hover);
+    background: var(--background-hover) !important;
     backdrop-filter: blur(2px);
   }
   .select-btn p,
   .select-data p {
     font-size: 12px;
     font-weight: 400;
+  }
+  .select-data{
+    background-color: var(--bg-ds-surface-600);
   }
   .select-active {
   }
@@ -791,5 +802,8 @@
     opacity: 0.6; /* Reduce opacity to visually indicate disabled state */
     color: lightgray; /* Change background color for visual differentiation */
     /* Add any other styles to indicate the disabled state */
+  }
+  .select-btn:hover{
+    background-color: var(--bg-ds-surface-400) !important;
   }
 </style>
