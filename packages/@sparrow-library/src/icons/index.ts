@@ -145,7 +145,8 @@ export { default as StackRegular } from "./StackRegular.svelte";
 export { default as FolderAddRegular } from "./FolderAddRegular.svelte";
 export { default as FolderRegular } from "./FolderRegular.svelte";
 export { default as FolderOpenRegular } from "./FolderOpenRegular.svelte";
-export { default as ChevronDoubleRegular } from "./ChevronDoubleRegular.svelte";
+export { default as ChevronDoubleLeftRegular } from "./ChevronDoubleLeftRegular.svelte";
+export { default as ChevronDoubleRightRegular } from "./ChevronDoubleRightRegular.svelte";
 
 export { default as FolderIcon3 } from "./FolderIcon.svelte";
 export { default as SearchIcon2 } from "./SearchIcon2.svelte";
@@ -161,6 +162,9 @@ export { default as InfoIcon2 } from "./Info2.svelte";
 export { default as Stack2 } from "./Stack2.svelte";
 export { default as ChevronUpRegular } from "./ChevronUpRegular.svelte";
 export { default as ChevronLeftRegular } from "./ChevronLeftRegular.svelte";
+export { default as DeleteRegular } from "./DeleteRegular.svelte";
+export { default as ReOrderDotsRegular } from "./ReOrderDotsRegular.svelte";
+
 export { default as ArrowSortRegular } from "./ArrowSortRegular.svelte";
 export { default as GraphqlIcon } from "./GraphQLIcon.svelte";
 export { default as WebSocketIcon } from "./WebSocketIcon.svelte";
@@ -169,3 +173,7 @@ export { default as WorkspaceRegular } from "./WorkspaceRegular.svelte";
 export { default as SaveRegular } from "./SaveRegular.svelte";
 export { default as CaretDownFilled } from "./CaretDownFilled.svelte";
 export { default as CaretDownRegular } from "./CaretDownRegular.svelte";
+export { default as AttachRegular } from "./AttachRegular.svelte";
+
+export { default as PeopleRegular } from "./CommunityRegular.svelte";
+export { default as PeopleFilled } from "./CommunityFilled.svelte";
