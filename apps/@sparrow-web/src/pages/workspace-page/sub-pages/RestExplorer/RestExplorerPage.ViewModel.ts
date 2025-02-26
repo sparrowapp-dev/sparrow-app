@@ -101,6 +101,7 @@ import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.w
 import type { Socket } from "socket.io-client";
 import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
 import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
+import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 
 class RestExplorerViewModel
   implements
@@ -357,14 +358,18 @@ class RestExplorerViewModel
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: true,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = true;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };

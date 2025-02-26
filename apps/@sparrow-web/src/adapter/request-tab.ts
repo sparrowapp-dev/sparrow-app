@@ -13,6 +13,7 @@ import {
   type Tab,
 } from "@sparrow/common/types/workspace";
 import { InitRequestTab } from "@sparrow/common/utils";
+import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 
 /**
  * @class - this class makes request tab compatible with backend server
@@ -49,6 +50,7 @@ export class RequestTabAdapter {
     adaptedRequest.updateAuth(request.request?.auth);
     adaptedRequest.updateHeaders(request.request?.headers);
     adaptedRequest.updatePath(path);
+    adaptedRequest.updateTabType(TabPersistenceTypeEnum.PERMANENT);
 
     // parsing body type
     const selectedRequestBodyType = request.request?.selectedRequestBodyType;
