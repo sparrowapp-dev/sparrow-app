@@ -3,7 +3,3 @@ export { default as DropdownArrow } from "./DropdownArrow.svelte";
 export { default as ArrowSolid } from "./ArrowSolid.svelte";
 export { default as BackArrowIcon } from "./BackArrow.svelte";
 export { default as InfoIcon } from "./Info.svelte";
-export { default as MoreHorizontalRegular } from "./MoreHorizontalRegular.svelte";
-export { default as ErrorCircleRegular } from "./ErrorCircleRegular.svelte";
-export { default as CheckmarkCircleRegular } from "./CheckmarkCircleRegular.svelte";
-export { default as ClockRegular } from "./ClockRegular.svelte";

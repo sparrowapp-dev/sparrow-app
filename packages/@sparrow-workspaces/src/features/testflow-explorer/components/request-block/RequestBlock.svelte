@@ -1,17 +1,21 @@
 <script lang="ts">
   import { Handle, Position, type Node } from "@xyflow/svelte";
-  import { ArrowSolid, ClockRegular } from "../../icons";
-  import { ArrowRightIcon, DotIcon, DropIcon } from "@sparrow/library/icons";
+  import { ArrowSolid } from "../../icons";
+  import {
+    ArrowRightIcon,
+    DotIcon,
+    DropIcon,
+    CheckmarkCircleRegular,
+    MoreHorizontalRegular,
+    ErrorCircleRegular,
+    ClockRegular,
+  } from "@sparrow/library/icons";
   import { ChevronDownRegular } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import { ArrowIcon } from "../../icons";
   import { ArrowSwapRegular } from "@sparrow/library/icons";
-  import {
-    CheckmarkCircleRegular,
-    MoreHorizontalRegular,
-    ErrorCircleRegular,
-  } from "../../icons";
+
   import { InfoRegular } from "@sparrow/library/icons";
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
   import type { CollectionDocument } from "@app/database/database";

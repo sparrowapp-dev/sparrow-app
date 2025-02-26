@@ -176,3 +176,6 @@ export { default as AttachRegular } from "./AttachRegular.svelte";
 
 export { default as PeopleRegular } from "./CommunityRegular.svelte";
 export { default as PeopleFilled } from "./CommunityFilled.svelte";
+export { default as ErrorCircleRegular } from "./ErrorCircleRegular.svelte";
+export { default as CheckmarkCircleRegular } from "./CheckmarkCircleRegular.svelte";
+export { default as ClockRegular } from "./ClockRegular.svelte";
