@@ -202,12 +202,9 @@
             color={"var(--icon-ds-neutral-200)"}
           />
         {:else if checkIfRequestSucceed(currentBlock)}
-          <CheckmarkCircle
-            size={"16px"}
-            fillColor={"var(--icon-ds-success-400)"}
-          />
+          <CheckmarkCircle size={"16px"} color={"var(--icon-ds-success-400)"} />
         {:else}
-          <ErrorCircle size={"16px"} fillColor={"var(--icon-ds-danger-300)"} />
+          <ErrorCircle size={"16px"} color={"var(--icon-ds-danger-300)"} />
         {/if}
       </div>
       <span class="px-1" style="padding-top: 3px; padding-bottom:3px;">
@@ -226,7 +223,7 @@
         moreOptionsMenu = false;
       }}
     >
-      <MoreHorizontal size={"16px"} fillColor={"var(--icon-ds-neutral-100)"} />
+      <MoreHorizontal size={"16px"} color={"var(--icon-ds-neutral-100)"} />
 
       {#if moreOptionsMenu}
         <div
@@ -262,7 +259,7 @@
     {#if !currentBlock}
       {#if req.name?.length > 0}
         <div class="d-flex run-txt-container">
-          <InfoIcon2 />
+          <InfoIcon2 size={"16px"} color={"var(--icon-ds-neutral-400)"} />
           <p style="basic-text-message">Run the block to get response</p>
         </div>
       {/if}
@@ -297,7 +294,7 @@
       <!-- Response time -->
       <div class="d-flex align-items-center me-2" style="gap: 6px;">
         <div class="d-flex justify-content-center alin-items-center clock-icon">
-          <ClockRegular fill={"var(--icon-ds-neutral-200)"} />
+          <ClockRegular size={"16px"} color={"var(--icon-ds-neutral-200)"} />
         </div>
         <span class="response-text">
           {parseTime.convertMilliseconds(currentBlock?.response?.time) || ""}

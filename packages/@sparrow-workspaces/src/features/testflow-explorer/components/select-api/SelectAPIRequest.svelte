@@ -252,7 +252,7 @@
           class="d-flex"
           style="margin-left: 2px; align-items:center; margin-right:2px;"
         >
-          <Stack2 />
+          <Stack2 size={"16px"} color={"var(--icon-ds-neutral-50)"} />
           <p
             class="ellipsis label-text"
             style="margin-left: 4px; margin-bottom:0px"
