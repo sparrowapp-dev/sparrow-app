@@ -49,7 +49,6 @@
     WEBSOCKET: "#3670f7",
     GRAPHQL: "#F15EB0",
   };
- 
 
   const getRequestDetails = (request) => {
     switch (request.type) {
@@ -467,13 +466,23 @@
                 url: config.getUrl ? config.getUrl(item) : undefined,
               }}
               icon={config.getIcon ? config.getIcon(item) : config.icon}
-              iconProps={config.getIconProps ? config.getIconProps(item) : {color: "var(--text-ds-neutral-300)" , width: "16px" , height: "16px"}}
+              iconProps={config.getIconProps
+                ? config.getIconProps(item)
+                : {
+                    color: "var(--text-ds-neutral-300)",
+                    width: "16px",
+                    height: "16px",
+                  }}
               onClick={() => config.nav(item)}
             />
           {/if}
         {/each}
       {:else}
-        <NoResults {searchQuery} />
+        <NoResults
+          {searchQuery}
+          type={searchQuery ? "Basic" : "Custom"}
+          customText="No results found. Get started by creating one!"
+        />
       {/if}
     {:else}
       <NoResults {searchQuery} />
