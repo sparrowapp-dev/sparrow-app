@@ -4,8 +4,9 @@
   import { notifications } from "@sparrow/library/ui";
   import { copyIcon, tickIcon } from "../../assests";
   import { tick } from "svelte";
-
+  import ArrowSync from "../../../../../../@sparrow-library/src/icons/ArrowSync.svelte";
   import hljs from "highlight.js";
+  import { ThumbDislikeFilled } from "@sparrow/library/icons";
   import "highlight.js/styles/atom-one-dark.css";
   import {
     CopyIcon2,
@@ -14,12 +15,15 @@
     RefreshIcon,
     TickIcon,
   } from "@sparrow/library/icons";
+  import ThumbLikeFilled from "../../../../../../@sparrow-library/src/icons/ThumbLikeFilled.svelte";
   import { SparrowAIIcon } from "@sparrow/common/icons";
+  import CopyRegular from "../../../../../../@sparrow-library/src/icons/CopyRegular.svelte";
   import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
   import { MessageTypeEnum } from "@sparrow/common/types/workspace";
-
+  import { ThhumbLike } from "@sparrow/library/icons";
+  import ThumbDislike from "../../../../../../@sparrow-library/src/icons/ThumbDislike.svelte";
   export let message: string;
   export let messageId: string;
   export let type;
@@ -29,9 +33,7 @@
   export let regenerateAiResponse;
   export let isLastRecieverMessage;
   export let status;
-
   let showTickIcon: boolean = false;
-
   /**
    * Decodes an HTML string by parsing it, processing <pre><code> elements, and wrapping them
    * in custom containers with additional copy paste functionality.
@@ -42,7 +44,6 @@
   const decodeMessage = (htmlString: string): string => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, "text/html");
-
     // Select all <pre> elements
     const codeElements = doc.querySelectorAll("pre > code");
     const preElements = Array.from(codeElements)
@@ -51,7 +52,6 @@
         return false;
       })
       .map((codeElem) => codeElem.parentElement);
-
     preElements.forEach((pre, index) => {
       if (pre) {
         // Create a new container div
@@ -71,16 +71,13 @@
         </button>
       </div>
         `;
-
         pre.parentNode?.insertBefore(container, pre);
         container.appendChild(pre);
       }
     });
-
     const serializer = new XMLSerializer();
     return serializer.serializeToString(doc);
   };
-
   /**
    * Handles the click event to copy code from a specified wrapper to the clipboard.
    *
@@ -130,7 +127,6 @@
       }
     }
   };
-
   /**
    * Handles the response copy to clipboard functionality.
    */
@@ -148,11 +144,8 @@
       console.error("Failed to copy response: ", err);
     }
   };
-
   let cleanUpListeners: () => void = () => {};
-
   let extractedMessage = "";
-
   /**
    * Embeds click listeners to copy code from dynamically inserted wrappers.
    * @returns A promise that resolves when the listeners are embedded.
@@ -160,13 +153,10 @@
   const embedListenerToCopyCode = async () => {
     extractedMessage = decodeMessage(await marked(message));
     // Add event listeners to all dynamically inserted wrappers
-
     setTimeout(() => {
       const wrappers = document.querySelectorAll(`.copy-code-${messageId}`);
-
       // Remove previous event listeners
       cleanUpListeners();
-
       cleanUpListeners = () => {
         wrappers.forEach((wrapper) => {
           wrapper.removeEventListener("click", handleCopyCode);
@@ -177,7 +167,6 @@
       });
     }, 200);
   };
-
   /**
    * Reactive statement to embed listeners for copying code when the message changes.
    */
@@ -186,7 +175,6 @@
       embedListenerToCopyCode();
     }
   }
-
   /**
    * Cleanup function to remove event listeners when the component is destroyed.
    */
@@ -196,6 +184,20 @@
       cleanUpListeners();
     }
   });
+  let flag = false;
+  let flag2 = false;
+  function handleClick() {
+    flag = !flag;
+    if (flag2) {
+      flag2 = false;
+    }
+  }
+  function handleClickDislike() {
+    flag2 = !flag2;
+    if (flag) {
+      flag = false;
+    }
+  }
 </script>
 
 <div class="message-wrapper">
@@ -206,7 +208,23 @@
     -->
   {#if type === MessageTypeEnum.SENDER}
     <div class="send-item">
-      <p class="my-4 px-3 text-fs-12">{@html message}</p>
+      <p
+        class="my-4 px-3 text-fs-12 text-item"
+        style="background-color: var(--bg-ds-surface-500); 
+          height: auto; 
+          width:fit-content;
+          border-radius: 8px; 
+          padding: 8px; 
+          margin-left: auto; 
+          margin-right: 5px; 
+          max-width: 248px; 
+          text-align: left;
+          font-size:12px;
+          weight:400;
+          line-height:18px"
+      >
+        {@html message}
+      </p>
     </div>
   {:else}
     <!--
@@ -214,9 +232,9 @@
     -- RECIEVER
     -- 
     -->
-    <div class="recieve-item p-3">
+    <div class="recieve-item p-1">
       <div class="d-flex justify-content-between">
-        <SparrowAIIcon height={"20px"} width={"20px"} />
+        <!-- <SparrowAIIcon height={"20px"} width={"20px"} /> -->
         <div class="d-flex gap-1 pb-2">
           {#if status}
             <!--
@@ -224,38 +242,6 @@
             -- LIKE / DISLIKE
             -- 
             -->
-            <Tooltip placement="top-center" title="Like" distance={13}>
-              <span
-                role="button"
-                class="action-button d-flex align-items-center justify-content-center border-radius-4"
-                on:click={() => {
-                  onToggleLike(messageId, true);
-                  MixpanelEvent(Events.AI_Like_Response);
-                }}
-              >
-                <LikeIcon
-                  height={"16px"}
-                  width={"16px"}
-                  color={isLiked ? "white" : "transparent"}
-                />
-              </span>
-            </Tooltip>
-            <Tooltip placement="top-center" title="Dislike" distance={13}>
-              <span
-                class="action-button d-flex align-items-center justify-content-center border-radius-4"
-                role="button"
-                on:click={() => {
-                  onToggleLike(messageId, false);
-                  MixpanelEvent(Events.AI_Dislike_Response);
-                }}
-              >
-                <DislikeIcon
-                  height={"16px"}
-                  width={"16px"}
-                  color={isDisliked ? "white" : "transparent"}
-                />
-              </span>
-            </Tooltip>
           {/if}
         </div>
       </div>
@@ -275,32 +261,74 @@
         -- 
         -->
         {#if isLastRecieverMessage}
+          <Tooltip
+            placement="top-center"
+            title={showTickIcon ? "Copied" : "Copy"}
+            distance={13}
+          >
+            <button
+              disabled={showTickIcon}
+              class="action-button d-flex align-items-center justify-content-center border-radius-4"
+              on:click={handleCopyResponse}
+            >
+              {#if showTickIcon}
+                <TickIcon height={"14px"} width={"14px"} color={"grey"} />
+              {:else}
+                <CopyRegular height={"14px"} width={"14px"} />
+              {/if}
+            </button>
+          </Tooltip>
+          <Tooltip placement="top-center" title="Like" distance={13}>
+            <span
+              role="button"
+              class="action-button d-flex align-items-center justify-content-center border-radius-4"
+              on:click={() => {
+                onToggleLike(messageId, true);
+                MixpanelEvent(Events.AI_Like_Response);
+                handleClick();
+              }}
+            >
+              {#if !flag}
+                <ThhumbLike
+                  height={"16px"}
+                  width={"16px"}
+                  color={isLiked ? "white" : "white"}
+                />
+              {:else}
+                <ThumbLikeFilled height={"16px"} width={"16px"} />
+              {/if}
+            </span>
+          </Tooltip>
+          <Tooltip placement="top-center" title="Dislike" distance={13}>
+            <span
+              class="action-button d-flex align-items-center justify-content-center border-radius-4"
+              role="button"
+              on:click={() => {
+                onToggleLike(messageId, false);
+                MixpanelEvent(Events.AI_Dislike_Response);
+                handleClickDislike();
+              }}
+            >
+              {#if !flag2}
+                <ThumbDislike
+                  height={"16px"}
+                  width={"16px"}
+                  color={isDisliked ? "white" : "white"}
+                />
+              {:else}
+                <ThumbDislikeFilled height={"16px"} width={"16px"} />
+              {/if}
+            </span>
+          </Tooltip>
           <Tooltip placement="top-center" title="Regenerate" distance={13}>
             <button
               class="action-button d-flex align-items-center justify-content-center border-radius-4"
               on:click={regenerateAiResponse}
             >
-              <RefreshIcon height={"16px"} width={"16px"} />
+              <ArrowSync height={"16px"} width={"16px"} />
             </button>
           </Tooltip>
         {/if}
-        <Tooltip
-          placement="top-center"
-          title={showTickIcon ? "Copied" : "Copy"}
-          distance={13}
-        >
-          <button
-            disabled={showTickIcon}
-            class="action-button d-flex align-items-center justify-content-center border-radius-4"
-            on:click={handleCopyResponse}
-          >
-            {#if showTickIcon}
-              <TickIcon height={"14px"} width={"14px"} color={"grey"} />
-            {:else}
-              <CopyIcon2 height={"14px"} width={"14px"} />
-            {/if}
-          </button>
-        </Tooltip>
       </div>
     </div>
   {/if}
@@ -309,9 +337,8 @@
 <style>
   .send-item,
   .recieve-item {
-    border-bottom: 1px solid var(--border-secondary-320);
+    /* border-bottom: 1px solid var(--border-secondary-320); */
   }
-
   :global(
     .message-wrapper .markdown p,
     .message-wrapper .markdown li,
@@ -324,14 +351,14 @@
   :global(.message-wrapper .markdown pre) {
     margin-bottom: 0;
   }
-
   :global(.message-wrapper .wrapper) {
-    border-radius: 4px !important;
+    border-radius: 8px !important;
     overflow: hidden !important;
-    margin-bottom: 10px;
+    /* margin-bottom: 10px; */
   }
   :global(.message-wrapper .hljs) {
     background: #000 !important;
+    border-bottom: 8px;
   }
   :global(.action-button) {
     height: 30px;
@@ -343,20 +370,16 @@
   :global(.action-button:hover) {
     background-color: var(--bg-tertiary-190);
   }
-
   button:disabled {
     background-color: inherit;
   }
-
   .error-message {
     background-color: var(--bg-danger-1200);
     border: 0.2px solid var(--border-danger-200);
   }
-
   :global(.tick-icon) {
     height: 16px;
   }
-
   :global(.copy-code-tooltip) {
     transition: 0.3s ease;
     font-weight: 400;
