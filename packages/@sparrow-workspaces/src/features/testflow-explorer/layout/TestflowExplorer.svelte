@@ -793,12 +793,12 @@
     {/if}
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 4}
-      <div style="position:absolute; top:232px; left:638px; z-index:1000;">
+      <div style="position:absolute; top:240px; left:620px; z-index:1000;">
         <TestFlowTourGuide
           title="Block Added! 👏 "
           description={`Now, just one more step—click on the dropdown to select an API. Don’t worry, we’ve provided a sample API in case you don’t have one ready in your collection.`}
           tipPosition="left-top"
-          pulsePosition={{ top: "8px", left: "-150px" }}
+          pulsePosition={{ top: "8px", left: "-140px" }}
           onNext={() => {
             currentStep.set(5);
           }}
@@ -810,12 +810,12 @@
     {/if}
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 5}
-      <div style="position:absolute; top:265px; left:632px; z-index:1000;">
+      <div style="position:absolute; top:280px; left:620px; z-index:1000;">
         <TestFlowTourGuide
           title="Sample API waiting...⏱️"
           description={`Ready for you to get selected and move ahead! Just choose it from the dropdown and you’re good to go.`}
           tipPosition="left-top"
-          pulsePosition={{ top: "10px", left: "-145px" }}
+          pulsePosition={{ top: "10px", left: "-140px" }}
           onNext={() => {
             currentStep.set(6);
           }}
