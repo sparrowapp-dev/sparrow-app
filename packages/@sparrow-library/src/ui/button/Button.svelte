@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Spinner } from "../spinner/index";
-
+  import { plusWhiteIcon } from "../../assets";
+  import { onMount, onDestroy } from "svelte";
   export let title = "";
   export let onClick: (e) => void;
 

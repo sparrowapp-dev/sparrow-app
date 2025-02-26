@@ -86,7 +86,7 @@
       >
         <tbody class="overflow-y-auto position-relative z-0">
           {#if data}
-            {#each filteredAndSortedData as list}
+            {#each filteredAndSortedData as list, index}
               <Rows
                 {onAddMember}
                 {list}

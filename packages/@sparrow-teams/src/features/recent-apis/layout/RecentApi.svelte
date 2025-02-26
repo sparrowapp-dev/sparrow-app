@@ -2,7 +2,7 @@
   import ApiListItem from "../../../components/api-list-items/ApiListItem.svelte";
   import { ItemType } from "@sparrow/common/enums/item-type.enum";
   import { List } from "@sparrow/library/ui";
-
+  import { onMount } from "svelte";
   export let tabList = [];
   export let collectionList;
   export let data;
@@ -34,7 +34,7 @@
 <div class="sidebar-recentapi-list" style="flex:1; overflow: auto;">
   {#if filteredApis?.length}
     <List height={"100%"} overflowY={"auto"} classProps={"px-2 py-0"}>
-      {#each filteredApis as api}
+      {#each filteredApis as api, index}
         <ApiListItem {api} {data} {onApiClick} {collectionList} />
       {/each}
     </List>

@@ -1,6 +1,6 @@
 <script lang="ts">
-  export const size = "16px";
-  export const color = "var(--icon-ds-neutral-50)";
+  export let size = "16px";
+  export let color = "var(--icon-ds-neutral-50)";
 </script>
 
 <i

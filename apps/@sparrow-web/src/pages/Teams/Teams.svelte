@@ -17,13 +17,13 @@
     RecentWorkspace,
     TeamList,
   } from "@sparrow/teams/features";
-
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import TeamExplorerPage from "../TeamExplorerPage/TeamExplorerPage.svelte";
   import { TeamsViewModel } from "./Teams.ViewModel";
   import { Modal, Tooltip, Dropdown, Button } from "@sparrow/library/ui";
   import { pagesMotion } from "../../constants";
   import { CreateTeam } from "@sparrow/common/features";
+  import { version } from "../../../package.json";
   import { LaunchDesktop } from "@sparrow/common/components";
 
   const _viewModel = new TeamsViewModel();
@@ -50,6 +50,8 @@
     DoubleArrowIcon,
     GithubIcon,
   } from "@sparrow/library/icons";
+  import { ListTeamNavigation } from "@sparrow/teams/features";
+  import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import constants from "../../constants/constants";
   import type { TeamDocType } from "src/models/team.model";
   import { WelcomePopUpWeb } from "@sparrow/common/components";

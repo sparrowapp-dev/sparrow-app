@@ -1,8 +1,14 @@
 <script>
-  import { List, Tooltip } from "@sparrow/library/ui";
+  import { Button, ButtonV2, List, Tooltip } from "@sparrow/library/ui";
   import { PeopleIcon, PlusIcon } from "@sparrow/library/assets";
   import { base64ToURL } from "@sparrow/common/utils";
   import { Avatar } from "@sparrow/library/ui";
+  import {
+    AddRegular,
+    MoreHorizontalRegular,
+    PeopleFilled,
+    PeopleRegular,
+  } from "@sparrow/library/icons";
   export let isCreateTeamModalOpen;
   export let isGuestUser;
   export let setOpenTeam;
@@ -10,6 +16,7 @@
   export let disableNewInviteTag;
   export let modifyTeam;
   export let activeIndex;
+  export let threeDotIconDisable = false;
 </script>
 
 <!--Teams list-->
