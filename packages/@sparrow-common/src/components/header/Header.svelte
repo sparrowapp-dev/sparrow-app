@@ -20,6 +20,7 @@
     type UserProfileObj,
   } from "./sub-component/UserProfileModal.svelte";
   import { Button, Tooltip } from "@sparrow/library/ui";
+  import {SparrowFilledLogo} from "./images/index";
   // import { GlobalSearch } from "../../components/popup/global-search";
   /**
    * environment list
@@ -113,15 +114,13 @@
       name: "Cloud Agent",
       id: "Cloud Agent",
       displayName: "Cloud Agent",
-      description:
-        "Securely send request via Sparrow's cloud.",
+      description: "Securely send request via Sparrow's cloud.",
     },
     {
       name: "Browser Agent",
       id: "Browser Agent",
       displayName: "Browser Agent",
-      description:
-        "Run requests directly in your browser.",
+      description: "Run requests directly in your browser.",
     },
   ];
 
@@ -243,7 +242,6 @@
   });
 </script>
 
-
 <header
   bind:this={titlebar}
   id="titlebar"
@@ -251,8 +249,7 @@
   style="position:relative;"
   on:mousedown={handleMouseDown}
 >
-
- <div class="gradient-ellipse"></div>
+  <div class="gradient-ellipse"></div>
 
   <div class="d-flex ms-2 justify-content-cdenter align-items-center no-drag">
     {#if isWebApp === false}
@@ -315,23 +312,18 @@
           >
             <div slot="pre-select" class="mb-2 px-1">
               <div class="guest-user-text">
-                <span
-                  >This version has limited features. Get started and unlock the
-                  complete package.</span
-                >
+                <div>
+                   <div style="font-weight: 500; font-size:12px;color:var(--text-ds-neutral-50);text-align:left"> No Account Connected</div>
+                  <div style="font-size:12px;color:var(--text-ds-neutral-300);text-align:left">Unlock the full experience getting started</div>
+                </div>
               </div>
-              <div
-                on:click={onLoginUser}
-                class="btn d-flex justify-content-center align-items-center"
-                style="width:100%; height:26px; background-color:var(--bg-primary-300);"
-              >
-                <button
-                  class="d-flex justify-content-center align-items-center"
-                  style="width:100%; height:100%; text-decoration:none; outline:none !important; background-color:transparent; border:none; font-size:12px; padding:0px;"
-                >
-                  Create an Account or Sign In
-                </button>
-              </div>
+
+              <Button
+                type="primary"
+                title="Create an Account or Sign In"
+                size="small"
+                onClick={onLoginUser}
+                customWidth={"100%"}/>
             </div>
           </Select>
         </div>
@@ -364,7 +356,7 @@
           headerHeight={"28px"}
         >
           <div slot="pre-select" class="mb-1">
-           <div class="workspacename"> {currentTeamName}</div>
+            <div class="workspacename">{currentTeamName}</div>
           </div>
           <div
             slot="post-select"
@@ -375,18 +367,20 @@
             <div class="view-all-workspace" on:click={handleViewWorkspaces}>
               <span>View all Workspaces</span>
               <Button
-              type="teritiary-regular"
-              startIcon={ArrowRightRegular}
-              size="small"/>
+                type="teritiary-regular"
+                startIcon={ArrowRightRegular}
+                size="small"
+              />
             </div>
-             <div class="lower-underline"></div>
+            <div class="lower-underline"></div>
             <div class="create-new-workspace" on:click={onCreateWorkspace}>
               <span>Create New Workspace</span>
               <div style="align-content: flex-end;">
                 <Button
                   type="teritiary-regular"
                   startIcon={AddRegular}
-                  size="small"/>
+                  size="small"
+                />
               </div>
             </div>
           </div>
@@ -451,44 +445,46 @@
         minBodyWidth={"296px"}
         headerHeight={"28px"}
       >
-  
         <div
           slot="post-select"
           class="post-dropdown d-flex justify-content-center align-items-center flex-column"
         >
           <div class="lower-underline"></div>
           <div class="download-area w-100">
-           <div
-  class="download-sparrow-button download-section d-flex align-items-center justify-content-between"
-  style="display: flex; gap: 12px; padding: 8px; border-radius: 6px; width: fit-content;"
->
-  <SparrowIcon height="32px" width="32px" color="var(--primary-btn-color)" />
+            <div
+              class="download-sparrow-button download-section d-flex align-items-center justify-content-between"
+              style="display: flex; gap: 12px; padding: 8px; border-radius: 6px; width: fit-content;"
+            >
+              <SparrowFilledLogo
+             
+                />
 
-  <div class="d-flex flex-column gap-1" style="line-height: 1;">
-    <p class="download-text" style="margin: 0; font-size: 12px; font-weight: 500; color: var(--text-ds-nuetral-50);">
-      Sparrow Desktop
-    </p>
-    <span class="description text-fs-10" style="font-size: 12px; color: gray;">
-      No agent needed.
-    </span>
-  </div>
+              <div class="d-flex flex-column gap-1" style="line-height: 1;">
+                <p
+                  class="download-text"
+                  style="margin: 0; font-size: 12px; font-weight: 500; color: var(--text-ds-nuetral-50);"
+                >
+                  Sparrow Desktop
+                </p>
+                <span
+                  class="description text-fs-10"
+                  style="font-size: 12px; color: gray;"
+                >
+                  No agent needed.
+                </span>
+              </div>
 
-  <!-- Download Button -->
+              <!-- Download Button -->
 
-  <Button
-  type="primary"
-  title="Download Now"
-  size="small"
-  onClick={onMarketingRedirect}
-  customWidth={"103px"}
-
-  />
-</div>
-
-
-
+              <Button
+                type="primary"
+                title="Download Now"
+                size="small"
+                onClick={onMarketingRedirect}
+                customWidth={"103px"}
+              />
+            </div>
           </div>
-        
         </div>
       </Select>
     {/if}
@@ -598,36 +594,6 @@
     text-align: center;
   }
 
-  .download-btn {
-    color: var(--text-primary-300);
-    padding: 0 0 0px 12px;
-    font-size: 14px;
-    display: flex;
-    gap: 10px;
-  }
-
-  .dowload-section {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    color: var(--text-secondary-100);
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 400;
-    padding: 10px;
-  }
-
-  .select-agent {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    color: var(--text-secondary-100);
-    cursor: pointer;
-    padding: 10px;
-    font-size: 12px;
-    font-weight: 400;
-  }
-
   .download-text {
     margin: 0;
   }
@@ -655,7 +621,7 @@
     padding: 10px;
     background-color: var(--bg-ds-surface-600);
     min-height: 28px;
-    padding:8px 6px;
+    padding: 8px 6px;
   }
   .create-new-workspace:hover {
     background-color: var(--bg-ds-surface-400);
@@ -683,7 +649,7 @@
     font-size: 12px;
     font-weight: 500;
     min-height: 28px;
-    padding:8px 6px;
+    padding: 8px 6px;
   }
 
   .view-all-workspace:hover {
@@ -693,21 +659,25 @@
   .post-dropdown {
     width: 100%;
   }
-  .workspacename{
+  .workspacename {
     font-size: 12px;
     font-weight: 400;
     color: var(--text-ds-neutral-200);
-    padding: 7px  6px
+    padding: 7px 6px;
   }
   .gradient-ellipse {
-  position: absolute;
-  left: -20px;
-  bottom: 0;
-  width: 327px;
-  height: 77px;
-  background: radial-gradient(ellipse at 50% 80%, #3670F7 0%, transparent 60%);
-  opacity: 0.2;
-  pointer-events: none;
-  z-index: 1;
-}
+    position: absolute;
+    left: -20px;
+    bottom: 0;
+    width: 327px;
+    height: 77px;
+    background: radial-gradient(
+      ellipse at 50% 80%,
+      #3670f7 0%,
+      transparent 60%
+    );
+    opacity: 0.2;
+    pointer-events: none;
+    z-index: 1;
+  }
 </style>

@@ -102,12 +102,7 @@
         on:mouseleave={handleMouseLeave}
         class="custom-header-button button-minus border-0 py-1 px-1"
       >
-        <SubtractIcon
-        size={"16px"}
-        color={hoveredButton === "minimize"
-            ? "white"
-            : "var(--text-secondary-200)"}
-        />
+        <SubtractIcon size={"16px"} color={"var(--icon-ds-neutral-50)"} />
       </button>
     </div>
 
@@ -121,18 +116,14 @@
       >
         {#if isMaximizeWindow}
           <WindowMultipleIcon
-          size={"16px"}
-          color={hoveredButton === "resize"
-            ? "white"
-            : "var(--text-secondary-200)"}
+            size={"16px"}
+            color={"var(--icon-ds-neutral-50)"}
           />
         {:else}
           <SquareIcon
             height={"10"}
             width={"10"}
-            color={hoveredButton === "resize"
-              ? "white"
-              : "var(--text-secondary-200)"}
+            color={"var(--icon-ds-neutral-50)"}
           />
         {/if}
       </button>
@@ -145,11 +136,7 @@
         on:mouseleave={handleMouseLeave}
         class="custom-header-button button-close border-0 py-1 px-1"
       >
-        <DismissRegular
-        size={"16px"}
-        color={hoveredButton === "close"
-            ? "white"
-            : "var(--text-secondary-200)"}/>
+        <DismissRegular size={"16px"} color={"var(--icon-ds-neutral-50)"} />
       </button>
     </div>
   </div>
