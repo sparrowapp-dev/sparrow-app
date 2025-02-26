@@ -76,7 +76,7 @@ import type { FeatureQuery } from "../../types/feature-switch";
 import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/utils";
 
 import { createDeepCopy } from "@sparrow/common/utils";
-import { GraphqlTabAdapter, SocketIoTabAdapter } from "../../adapter";
+import { GraphqlTabAdapter, RequestSavedTabAdapter, SocketIoTabAdapter } from "../../adapter";
 import type {
   SocketIORequestDeletePayloadDtoInterface,
   SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
@@ -2043,6 +2043,30 @@ export default class CollectionsViewModel {
     moveNavigation("right");
   };
 
+    /**
+   * Handles opening a request on a tab
+   * @param request : - The request going to be opened on tab
+   * @param path : - The path to the request
+   */
+    private handleOpenSavedRequest = (
+      workspaceId: string,
+      collection: CollectionDto,
+      folder: CollectionItemsDto,
+      _request: CollectionItemsDto,
+      _savedRequest: CollectionItemsDto,
+    ) => {
+      const requestSavedTabAdapter = new RequestSavedTabAdapter();
+      const adaptedRequest = requestSavedTabAdapter.adapt(
+        workspaceId || "",
+        collection?.id || "",
+        folder?.id || "",
+        _request?.id,
+        _savedRequest,
+      );
+      this.tabRepository.createTab(adaptedRequest);
+      moveNavigation("right");
+    };
+
   /**
    * Handles opening a request on a tab
    * @param request : - The request going to be opened on tab
@@ -3947,7 +3971,7 @@ export default class CollectionsViewModel {
 
   public handleOpenItem = async (
     entitytype: string,
-    args: CollectionArgsDto,
+    args: any,
   ) => {
     switch (entitytype) {
       case "collection":
@@ -3969,6 +3993,15 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
           args.request as CollectionItemsDto,
+        );
+        break;
+      case "saved_request":
+        this.handleOpenSavedRequest(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.request as CollectionItemsDto,
+          args.savedRequest as CollectionItemsDto,
         );
         break;
       case "websocket":
@@ -5286,4 +5319,129 @@ export default class CollectionsViewModel {
     );
     return response;
   };
+
+   /**
+   * Save Request
+   * @param saveDescriptionOnly - refers save overall request data or only description as a documentation purpose.
+   * @returns save status
+   */
+   public saveSavedRequest = async (componentData: Tab) : Promise<boolean> => {
+    const { folderId, collectionId, workspaceId, requestId } = componentData.path;
+    if (componentData.id.startsWith("UNTRACKED-")) {
+      return this.saveAsSavedRequest(componentData);
+    }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true)  return false;
+    const res = await this.collectionService.updateSavedRequestInCollection(componentData.id, {
+      collectionId: collectionId,
+      workspaceId: workspaceId,
+      requestId: requestId,
+      folderId: folderId,
+      description: componentData.description
+    });
+
+    if (res.isSuccessful) {
+      
+      if(folderId){
+        this.collectionRepository.updateSavedRequestInFolder(
+          collectionId,
+          folderId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description
+          },
+        );
+      }else{
+        this.collectionRepository.updateSavedRequestInCollection(
+          collectionId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description
+          },
+        );
+      }
+      notifications.success("Response saved successfully.");
+      return true;
+    } else {
+      notifications.error("Failed to save response. Please try again.");
+      return false;
+    }
+  };
+   /**
+   *
+   * @param _workspaceMeta - workspace meta data
+   * @param path - request stack path
+   * @param tabName - request name
+   * @param description - request description
+   * @param type - save over all request or description only
+   */
+   private saveAsSavedRequest = async (componentData : Tab) : Promise<boolean> => {
+    const { folderId, collectionId, workspaceId, requestId } = componentData.path;
+    let userSource = {};
+    if (workspaceId && collectionId && requestId) {
+      const requestSavedTabAdapter = new RequestSavedTabAdapter();
+      const unadaptedRequest = requestSavedTabAdapter.unadapt(componentData);
+       /**
+         * handle request at collection level
+         */
+        const _collection = await this.readCollection(collectionId);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
+        let isGuestUser;
+        isGuestUserActive.subscribe((value) => {
+          isGuestUser = value;
+        });
+
+        if (isGuestUser == true) {
+          return false;
+        }
+        const res = await this.collectionService.createSavedRequestInCollection({
+          collectionId: collectionId,
+          workspaceId: workspaceId,
+          requestId: requestId,
+          folderId: folderId,
+          ...userSource,
+          items: {
+            name: componentData.name,
+            description: componentData.description,
+            type: CollectionItemTypeBaseEnum.SAVED_REQUEST,
+            requestResponse: unadaptedRequest,
+          },
+        });
+        if (res.isSuccessful) {
+            if(folderId){
+              this.collectionRepository.addSavedRequestInFolder(
+                collectionId,
+                folderId,
+                requestId,
+                res.data.data,
+              );
+            }else{
+              this.collectionRepository.addSavedRequestInCollection(
+                collectionId,
+                requestId,
+                res.data.data,
+              );
+            }
+            
+            notifications.success("Response saved successfully.");
+            return true;
+        } else {
+          notifications.error("Failed to save response. Please try again.");
+          return false;
+        }
+    }
+    return false;
+  };
+
 }

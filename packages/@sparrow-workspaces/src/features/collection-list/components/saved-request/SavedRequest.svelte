@@ -61,6 +61,8 @@
    */
   export let userRole;
 
+  export let request;
+
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
   let noOfColumns = 180;
@@ -104,8 +106,6 @@
     newRequestName = "";
   };
 
-  $: console.log("-------------------------", api);
-
   const onRenameInputKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
@@ -114,25 +114,6 @@
       inputField.blur();
     }
   };
-
-  const dragStart = (event: DragEvent, collection: CollectionBaseInterface) => {
-    const data = {
-      workspaceId: collection.workspaceId,
-      collectionId: collection.id,
-      folderId: folder?.id ?? "",
-      requestId: api.id,
-      name: api.name,
-      method: api?.request?.method,
-    };
-    event.dataTransfer?.setData("text/plain", JSON.stringify(data));
-  };
-
-  let httpMethodUIStyle = "";
-  $: {
-    httpMethodUIStyle = getMethodStyle(
-      api?.request?.method as HttpRequestMethodBaseEnum,
-    );
-  }
 </script>
 
 <svelte:window
@@ -261,11 +242,12 @@
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
       if (!isRenaming) {
-        onItemOpened("request", {
+        onItemOpened("saved_request", {
           workspaceId: collection.workspaceId,
           collection,
           folder,
-          request: api,
+          request,
+          savedRequest: api,
         });
       }
     }}

@@ -222,19 +222,19 @@ export class RestExplorerSavedViewModel
   private compareRequestWithServerDebounced = async () => {
     let result = true;
     const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
-    const requestSavedTabAdapter = new RequestSavedTabAdapter();
-    const unadaptedRequest = requestSavedTabAdapter.unadapt(progressiveTab);
     let requestServer;
     if (progressiveTab.path.folderId) {
-      requestServer = await this.collectionRepository.readRequestInFolder(
+      requestServer = await this.collectionRepository.readSavedRequestInFolder(
         progressiveTab.path.collectionId,
         progressiveTab.path.folderId,
+        progressiveTab.path.requestId,
         progressiveTab.id,
       );
     } else {
       requestServer =
-        await this.collectionRepository.readRequestOrFolderInCollection(
+        await this.collectionRepository.readSavedRequestInCollection(
           progressiveTab.path.collectionId,
+          progressiveTab.path.requestId,
           progressiveTab.id,
         );
     }
@@ -243,113 +243,6 @@ export class RestExplorerSavedViewModel
     else if (requestServer.description !== progressiveTab.description) {
       result = false;
     }
-    // name
-    else if (requestServer.name !== progressiveTab.name) {
-      result = false;
-    }
-    // url
-    else if (
-      requestServer.request.url !== progressiveTab.property.savedRequest.url
-    ) {
-      result = false;
-    }
-    // method
-    else if (
-      requestServer.request.method !== progressiveTab.property.savedRequest.method
-    ) {
-      result = false;
-    }
-    // auth key
-    else if (
-      requestServer.request.auth.apiKey.authKey !==
-      progressiveTab.property.savedRequest.auth.apiKey.authKey
-    ) {
-      result = false;
-    }
-    // auth value
-    else if (
-      requestServer.request.auth.apiKey.authValue !==
-      progressiveTab.property.savedRequest.auth.apiKey.authValue
-    ) {
-      result = false;
-    }
-    // addTo
-    else if (
-      requestServer.request.auth.apiKey.addTo !==
-      progressiveTab.property.savedRequest.auth.apiKey.addTo
-    ) {
-      result = false;
-    }
-    // username
-    else if (
-      requestServer.request.auth.basicAuth.username !==
-      progressiveTab.property.savedRequest.auth.basicAuth.username
-    ) {
-      result = false;
-    }
-    // password
-    else if (
-      requestServer.request.auth.basicAuth.password !==
-      progressiveTab.property.savedRequest.auth.basicAuth.password
-    ) {
-      result = false;
-    }
-    // bearer tokem
-    else if (
-      requestServer.request.auth.bearerToken !==
-      progressiveTab.property.savedRequest.auth.bearerToken
-    ) {
-      result = false;
-    }
-    // raw code
-    else if (
-      requestServer.request.body.raw !==
-      progressiveTab.property.savedRequest.body.raw
-    ) {
-      result = false;
-    }
-    // url encode
-    else if (
-      !this.compareArray.init(
-        requestServer.request.body.urlencoded,
-        progressiveTab.property.savedRequest.body.urlencoded,
-      )
-    ) {
-      result = false;
-    }
-    // form data
-    else if (
-      !this.compareArray.init(
-        requestServer.request.body.formdata.text,
-        unadaptedRequest.body.formdata.text,
-      )
-    ) {
-      result = false;
-    } else if (
-      !this.compareArray.init(
-        requestServer.request.body.formdata.file,
-        unadaptedRequest.body.formdata.file,
-      )
-    ) {
-      result = false;
-    }
-    // headers
-    else if (
-      !this.compareArray.init(
-        requestServer.request.headers,
-        progressiveTab.property.savedRequest.headers,
-      )
-    ) {
-      result = false;
-    } else if (
-      !this.compareArray.init(
-        requestServer.request.queryParams,
-        progressiveTab.property.savedRequest.queryParams,
-      )
-    ) {
-      result = false;
-    }
-    // result
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: true,
@@ -997,122 +890,84 @@ export class RestExplorerSavedViewModel
       this.saveAsRequest();
       return;
     }
-    const _collection = await this.readCollection(collectionId);
-    let userSource = {};
-    if (_collection?.activeSync && componentData?.source === "USER") {
-      userSource = {
-        currentBranch: _collection?.currentBranch,
-        source: "USER",
-      };
-    }
-    const _id = componentData.id;
-
-    const requestSavedTabAdapter = new RequestSavedTabAdapter();
-    const unadaptedRequest = requestSavedTabAdapter.unadapt(componentData);
-    // Save overall api
-
-    const requestMetaData = {
-      id: _id,
-      name: componentData?.name,
-      description: componentData?.description,
-      type: ItemType.REQUEST,
-    };
-
-    let folderSource;
-    let itemSource;
-    if (folderId) {
-      folderSource = {
-        folderId: folderId,
-      };
-      itemSource = {
-        id: folderId,
-        type: ItemType.FOLDER,
-        items: {
-          ...requestMetaData,
-          request: unadaptedRequest,
-        },
-      };
-    } else {
-      itemSource = {
-        ...requestMetaData,
-        request: unadaptedRequest,
-      };
-    }
-
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
-    if (isGuestUser === true) {
-      const progressiveTab = this._tab.getValue();
-      const data = {
-        id: progressiveTab.id,
-        name: requestMetaData.name,
-        description: requestMetaData.description,
-        type: "REQUEST",
-        request: unadaptedRequest,
-        updatedAt: "",
-        updatedBy: "Guest User",
-      };
+    // if (isGuestUser === true) {
+    //   const progressiveTab = this._tab.getValue();
+    //   const data = {
+    //     id: progressiveTab.id,
+    //     name: requestMetaData.name,
+    //     description: requestMetaData.description,
+    //     type: "REQUEST",
+    //     request: unadaptedRequest,
+    //     updatedAt: "",
+    //     updatedBy: "Guest User",
+    //   };
 
-      progressiveTab.isSaved = true;
-      this.tab = progressiveTab;
-      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-      if (!folderId) {
-        this.collectionRepository.updateRequestOrFolderInCollection(
-          collectionId,
-          _id,
-          data,
-        );
-      } else {
-        this.collectionRepository.updateRequestInFolder(
-          collectionId,
-          folderId,
-          _id,
-          data,
-        );
-      }
-      return {
-        status: "success",
-        message: "",
-      };
-    }
-    const res = await updateCollectionRequest(_id, folderId, collectionId, {
+    //   progressiveTab.isSaved = true;
+    //   this.tab = progressiveTab;
+    //   await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    //   if (!folderId) {
+    //     this.collectionRepository.updateRequestOrFolderInCollection(
+    //       collectionId,
+    //       _id,
+    //       data,
+    //     );
+    //   } else {
+    //     this.collectionRepository.updateRequestInFolder(
+    //       collectionId,
+    //       folderId,
+    //       _id,
+    //       data,
+    //     );
+    //   }
+    //   return {
+    //     status: "success",
+    //     message: "",
+    //   };
+    // }
+    if (isGuestUser === true)  return;
+    const res = await this.collectionService.updateSavedRequestInCollection(componentData.id, {
       collectionId: collectionId,
       workspaceId: workspaceId,
-      ...folderSource,
-      ...userSource,
-      items: itemSource,
+      requestId: requestId,
+      folderId: folderId,
+      description: componentData.description
     });
 
     if (res.isSuccessful) {
+      notifications.success("Response saved successfully.");
       const progressiveTab = this._tab.getValue();
       progressiveTab.isSaved = true;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-      if (!folderId) {
-        this.collectionRepository.updateRequestOrFolderInCollection(
-          collectionId,
-          _id,
-          res.data.data,
-        );
-      } else {
-        this.collectionRepository.updateRequestInFolder(
+
+      if(folderId){
+        this.collectionRepository.updateSavedRequestInFolder(
           collectionId,
           folderId,
-          _id,
-          res.data.data,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description
+          },
+        );
+      }else{
+        this.collectionRepository.updateSavedRequestInCollection(
+          collectionId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description
+          },
         );
       }
-      return {
-        status: "success",
-        message: res.message,
-      };
+      return;
     } else {
-      return {
-        status: "error",
-        message: res.message,
-      };
+      notifications.error("Failed to save response. Please try again.");
+      return;
     }
   };
 
@@ -1181,27 +1036,12 @@ export class RestExplorerSavedViewModel
    * @param type - save over all request or description only
    */
   public saveAsRequest = async () => {
-    // debugger;
-    // return;
     const componentData = this._tab.getValue();
     const { folderId, collectionId, workspaceId, requestId } = componentData.path;
     let userSource = {};
     if (workspaceId && collectionId && requestId) {
       const requestSavedTabAdapter = new RequestSavedTabAdapter();
       const unadaptedRequest = requestSavedTabAdapter.unadapt(componentData);
-      // let req = {
-      //   id: uuidv4(),
-      //   name: tabName,
-      //   description,
-      //   type: ItemType.REQUEST,
-      //   request: unadaptedRequest,
-      //   source: "USER",
-      //   isDeleted: false,
-      //   createdBy: "Guest User",
-      //   updatedBy: "Guest User",
-      //   createdAt: new Date().toISOString(),
-      //   updatedAt: new Date().toISOString(),
-      // };
        /**
          * handle request at collection level
          */
@@ -1287,10 +1127,6 @@ export class RestExplorerSavedViewModel
           },
         });
         if (res.isSuccessful) {
-          // this.addRequestOrFolderInCollection(
-          //   path[path.length - 1].id,
-          //   res.data.data,
-          // );
             /**
              * Update existing request
              */
@@ -1304,26 +1140,27 @@ export class RestExplorerSavedViewModel
               progressiveTab.tabId,
               progressiveTab,
             );
-          
-            notifications.success("success");
+            if(folderId){
+              this.collectionRepository.addSavedRequestInFolder(
+                collectionId,
+                folderId,
+                requestId,
+                res.data.data,
+              );
+            }else{
+              this.collectionRepository.addSavedRequestInCollection(
+                collectionId,
+                requestId,
+                res.data.data,
+              );
+            }
+            
+            notifications.success("Response saved successfully.");
             return;
-          // return {
-          //   status: "success",
-          //   message: res.message,
-          //   data: {
-          //     id: res.data.data.id,
-          //   },
-          // };
         } else {
-          notifications.error("failed");
+          notifications.error("Failed to save response. Please try again.");
           return;
-          // return {
-          //   status: "error",
-          //   message: res.message,
-          // };
         }
-      
-      // MixpanelEvent(Events.SAVE_API_REQUEST);
     }
   };
 

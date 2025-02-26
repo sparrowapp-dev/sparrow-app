@@ -385,6 +385,7 @@
         <SavedRequest
           {userRole}
           api={exp}
+          request={api}
           {onItemRenamed}
           {onItemDeleted}
           {onItemOpened}

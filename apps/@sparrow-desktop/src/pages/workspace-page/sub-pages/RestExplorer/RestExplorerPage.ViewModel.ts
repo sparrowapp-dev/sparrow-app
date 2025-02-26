@@ -407,7 +407,7 @@ class RestExplorerViewModel
     savedRequestTab.updateMethod(progressiveTab.property.request?.method);
     savedRequestTab.updateHeaders(progressiveTab.property.request?.headers);
     savedRequestTab.updateAuth(progressiveTab.property.request?.auth);
-    // savedRequestTab.updateIsSave(false);
+    savedRequestTab.updateIsSave(false);
     savedRequestTab.updateState({requestBodyNavigation: progressiveTab.property.request?.state.requestBodyNavigation
       ,requestBodyLanguage: progressiveTab.property.request?.state.requestBodyLanguage,
       requestAuthNavigation: progressiveTab.property.request?.state.requestAuthNavigation

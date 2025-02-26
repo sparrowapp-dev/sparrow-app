@@ -82,3 +82,12 @@ export interface HttpRequestSavedCreateUpdatePayloadDtoInterface {
   };
   currentBranch?: string;
 }
+
+export interface HttpRequestSavedUpdatePayloadDtoInterface {
+  collectionId: string;
+  workspaceId: string;
+  folderId?: string;
+  requestId?: string;
+  name?: string;
+  description?: string;
+}

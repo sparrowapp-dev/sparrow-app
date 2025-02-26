@@ -75,6 +75,7 @@
   import { open } from "@tauri-apps/plugin-shell";
   import constants from "@app/constants/constants";
   import RestExplorerSavedPage from "./sub-pages/RestExplorerSavedPage/RestExplorerSavedPage.svelte";
+  import { remove } from "@tauri-apps/plugin-fs";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -192,6 +193,7 @@
         tab?.type === TabTypeEnum.ENVIRONMENT ||
         tab?.type === TabTypeEnum.TESTFLOW ||
         tab?.type === TabTypeEnum.SOCKET_IO ||
+        tab?.type === TabTypeEnum.SAVED_REQUEST ||
         tab?.type === TabTypeEnum.GRAPHQL) &&
       !tab?.isSaved
     ) {
@@ -247,6 +249,7 @@
       removeTab.type === TabTypeEnum.REQUEST ||
       removeTab.type === TabTypeEnum.WEB_SOCKET ||
       removeTab.type === TabTypeEnum.SOCKET_IO ||
+      removeTab.type === TabTypeEnum.SAVED_REQUEST ||
       removeTab.type === TabTypeEnum.GRAPHQL
     ) {
       if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
@@ -260,6 +263,13 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
             notifications.success("API request saved successfully.");
+          }
+        } else if (removeTab.type === TabTypeEnum.SAVED_REQUEST) {
+          const res = await _viewModel.saveSavedRequest(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
           }
         } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
           const res = await _viewModel.saveSocket(removeTab);

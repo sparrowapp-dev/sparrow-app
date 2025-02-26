@@ -130,32 +130,34 @@ export class RequestSavedTabAdapter {
     workspaceId: string,
     collectionId: string,
     folderId: string,
-    _request: CollectionItemBaseInterface,
+    _requestId: string,
+    _savedRequest: CollectionItemBaseInterface,
   ): Tab {
-    _request = createDeepCopy(_request);
-    const adaptedRequest = new InitTab().savedRequest(_request.id, workspaceId);
+    _savedRequest = createDeepCopy(_savedRequest);
+    const adaptedRequest = new InitTab().savedRequest(_savedRequest.id, workspaceId);
     const path = {
       workspaceId: workspaceId,
       collectionId: collectionId,
       folderId: folderId,
+      requestId: _requestId,
     };
-    adaptedRequest.updateName(_request.name);
-    adaptedRequest.updateDescription(_request.description);
-    adaptedRequest.updateMethod(_request.requestResponse?.method as HttpRequestSavedMethodBaseEnum);
-    adaptedRequest.updateUrl(_request.requestResponse?.url as string);
-    adaptedRequest.updateQueryParams(_request.requestResponse?.queryParams as KeyValueChecked[]);
-    adaptedRequest.updateAuth(_request.requestResponse?.auth as Auth);
-    adaptedRequest.updateResponseBody(_request.requestResponse?.responseBody as string);
-    adaptedRequest.updateResponseDate(_request.requestResponse?.responseDate as string);
-    adaptedRequest.updateResponseHeaders(_request.requestResponse?.responseHeaders as KeyValueChecked[]);
-    adaptedRequest.updateResponseStatus(_request.requestResponse?.responseStatus as string);
-    adaptedRequest.updateHeaders(_request.requestResponse?.headers as KeyValueChecked[]);
+    adaptedRequest.updateName(_savedRequest.name);
+    adaptedRequest.updateDescription(_savedRequest.description);
+    adaptedRequest.updateMethod(_savedRequest.requestResponse?.method as HttpRequestSavedMethodBaseEnum);
+    adaptedRequest.updateUrl(_savedRequest.requestResponse?.url as string);
+    adaptedRequest.updateQueryParams(_savedRequest.requestResponse?.queryParams as KeyValueChecked[]);
+    adaptedRequest.updateAuth(_savedRequest.requestResponse?.auth as Auth);
+    adaptedRequest.updateResponseBody(_savedRequest.requestResponse?.responseBody as string);
+    adaptedRequest.updateResponseDate(_savedRequest.requestResponse?.responseDate as string);
+    adaptedRequest.updateResponseHeaders(_savedRequest.requestResponse?.responseHeaders as KeyValueChecked[]);
+    adaptedRequest.updateResponseStatus(_savedRequest.requestResponse?.responseStatus as string);
+    adaptedRequest.updateHeaders(_savedRequest.requestResponse?.headers as KeyValueChecked[]);
     adaptedRequest.updatePath(path);
 
     // parsing body type
-    const selectedRequestBodyType = _request.requestResponse?.selectedRequestBodyType;
+    const selectedRequestBodyType = _savedRequest.requestResponse?.selectedRequestBodyType;
     if (selectedRequestBodyType) {
-      const bodyType = this.setBodyType(_request.requestResponse?.selectedRequestBodyType as HttpRequestSavedBodyModeBaseEnum);
+      const bodyType = this.setBodyType(_savedRequest.requestResponse?.selectedRequestBodyType as HttpRequestSavedBodyModeBaseEnum);
       adaptedRequest.updateState({
         requestBodyLanguage: bodyType.requestBodyLanguage,
         requestBodyNavigation: bodyType.requestBodyNavigation,
@@ -163,16 +165,16 @@ export class RequestSavedTabAdapter {
     }
 
     // parsing request auth
-    const selectedRequestAuthType = _request.requestResponse?.selectedRequestAuthType;
+    const selectedRequestAuthType = _savedRequest.requestResponse?.selectedRequestAuthType;
     if (selectedRequestAuthType) {
-      const AuthType = this.setAuthType(_request.requestResponse?.selectedRequestAuthType as HttpRequestSavedAuthModeBaseEnum);
+      const AuthType = this.setAuthType(_savedRequest.requestResponse?.selectedRequestAuthType as HttpRequestSavedAuthModeBaseEnum);
       adaptedRequest.updateState({
         requestAuthNavigation: AuthType.requestAuthNavigation,
       });
     }
 
     // parsing form data
-    const body = _request?.requestResponse?.body;
+    const body = _savedRequest?.requestResponse?.body;
     if (body) {
       const textData = body?.formdata?.text
         .filter((text) => {
@@ -220,8 +222,8 @@ export class RequestSavedTabAdapter {
       ];
       
       adaptedRequest.updateBody({
-        raw: _request.requestResponse?.body.raw,
-        urlencoded: _request.requestResponse?.body.urlencoded,
+        raw: _savedRequest.requestResponse?.body.raw,
+        urlencoded: _savedRequest.requestResponse?.body.urlencoded,
         formdata: formdata
       } as Body);
     }

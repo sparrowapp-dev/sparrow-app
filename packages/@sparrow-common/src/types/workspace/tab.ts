@@ -27,13 +27,16 @@ export interface WorkspaceIdWrapper {
 export interface CollectionIdWrapper {
   collectionId: string;
 }
+export interface RequestIdWrapper {
+  requestId: string;
+}
 export interface FolderIdWrapper {
   folderId: string;
 }
 export interface Path
   extends WorkspaceIdWrapper,
     CollectionIdWrapper,
-    FolderIdWrapper {}
+    FolderIdWrapper, RequestIdWrapper {}
 export interface DescriptionWrapper {
   description: string;
 }
