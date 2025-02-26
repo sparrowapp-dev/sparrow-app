@@ -5,7 +5,7 @@
   import { cubicIn, cubicOut } from "svelte/easing";
 
   export let position: "left" | "right" = "left";
-  export let labelText: string = "Accordion";
+  export let labelText: string = "";
   export let isOpen: boolean = false;
   export let varient: "primary" | "secondary" = "primary";
   export let disabled: boolean = false;
@@ -38,7 +38,9 @@
       class="d-flex justify-content-between align-items-center w-100"
       style={position === "right" ? "margin-left: 6px;" : "margin-right:6px"}
     >
-      <p class="label-text m-0">{labelText}</p>
+      {#if labelText !== ""}
+        <p class="label-text m-0">{labelText}</p>
+      {/if}
       <slot name="accordion-field" />
     </div>
 
@@ -56,7 +58,7 @@
   <!-- Accordion Content -->
   <div
     class={`p-3 accordion-content ${isOpen ? "open" : ""}`}
-    style={`${isOpen ? "border-bottom-right-radius: 6px; border-bottom-left-radius: 6px;" : ""}`}
+    style={`${isOpen ? "border-bottom-right-radius: 6px; border-bottom-left-radius: 6px; border: 1px solid var(--bg-ds-surface-400);" : ""}`}
     transition:fade={{
       duration: isOpen ? 300 : 250,
       easing: isOpen ? cubicOut : cubicIn,
