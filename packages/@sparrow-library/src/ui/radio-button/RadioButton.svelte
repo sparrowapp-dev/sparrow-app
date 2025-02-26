@@ -149,6 +149,10 @@
   .focus-visible-button:focus-visible {
     outline: 2px solid var(--border-ds-primary-300);
   }
+
+  .focus-visible-button:focus-visible .circle-internal {
+    background-color: var(--bg-ds-surface-300) !important;
+  }
   .focus-visible-button:focus-visible .label-text-medium,
   .focus-visible-button:focus-visible .label-text-small {
     color: var(--text-ds-neutral-50) !important;

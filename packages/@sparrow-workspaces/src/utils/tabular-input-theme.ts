@@ -5,7 +5,7 @@ export class TabularInputTheme {
   constructor() {
     this.theme = EditorView.theme({
       "&": {
-        height: "18px",
+        height: "27px",
         width: "100%",
         flex: "1",
         border: "1px solid transparent",
@@ -15,10 +15,10 @@ export class TabularInputTheme {
       ".cm-content": {
         caretColor: "var(--white-color)",
         height: "100%",
-        padding: "0",
+        padding: "4px",
       },
       ".cm-panels": {
-        backgroundColor: "var(--blackColor)",
+        backgroundColor: "var(--bg-ds-surface-400)",
         color: "var(--white-color)",
         zIndex: "1",
       },
@@ -59,14 +59,30 @@ export class TabularInputTheme {
         fontWeight: "400",
       },
       ".cm-placeholder": {
-        color: "var(--text-secondary-300)",
+        color: "var(--text-ds-neutral-400)",
         fontSize: "12px",
         fontWeight: "400",
       },
-      "&.cm-editor.cm-focused": {
-        border: "1px solid var(--border-primary-300)",
-        backgroundColor: "var(--bg-secondary-500)",
-        borderRadius: "0",
+      "&.cm-editor": {
+        border: "1px solid transparent",
+        borderRadius: "4px",
+        "&.cm-focused": {
+          border: "1px solid var(--border-ds-primary-300) !important",
+          backgroundColor: "var(--bg-ds-surface-400)",
+          borderRadius: "4px",
+        },
+
+        "&:hover": {
+          border: "1px solid var(--border-ds-neutral-300)",
+          backgroundColor: "var(--bg-ds-surface-400)",
+          borderRadius: "4px",
+        },
+
+        "&.cm-focus-invisible": {
+          border: "2px solid var(--border-ds-primary-300) !important",
+          borderRadius: "4px",
+          backgroundColor: "var(--bg-ds-surface-400)",
+        },
       },
       ".cm-scroller::-webkit-scrollbar": {
         display: "none",

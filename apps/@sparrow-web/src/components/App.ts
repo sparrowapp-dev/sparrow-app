@@ -1,5 +1,4 @@
 import constants from "../constants/constants";
-import { notifications } from "@sparrow/library/ui";
 import { navigate } from "svelte-navigator";
 import { jwtDecode, setAuthJwt, getAuthJwt } from "../utils/jwt";
 import { isGuestUserActive, setUser } from "../store/auth.store";
@@ -176,12 +175,12 @@ export async function handleLogin(url: string) {
   });
   // User login successfully
   if (event === "register") {
-    navigate("/app/collections");
+    navigate("/app/collections?first=true");
     _guideRepository.insert({ isActive: true, id: "environment-guide" });
     _guideRepository.insert({ isActive: true, id: "collection-guide" });
     isUserFirstSignUp.set(true);
   } else {
-    navigate("/app/collections");
+    navigate("/app/collections?first=false");
 
     _guideRepository.insert({ isActive: false, id: "environment-guide" });
     _guideRepository.insert({ isActive: false, id: "collection-guide" });
