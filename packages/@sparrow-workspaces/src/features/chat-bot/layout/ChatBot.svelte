@@ -126,7 +126,6 @@
         color="var(--icon-primary-300)"
       />
     </div>
-    <!-- <div class="d-flex flex-column align-items-end"> -->
     <div
       class="d-flex flex-column align-items-end"
       in:fade={{ duration: 400 }}
@@ -190,12 +189,6 @@
       MixpanelEvent(Events.AI_Chat_Initiation);
     }}
   >
-    <!-- <AiChatToggler
-      height="42px"
-      width="42px"
-      isChatBoxOpen={$tab?.property?.request?.state?.isChatbotActive}
-    /> -->
-
     <div class="chatten-box" on:click={toggleChat} tabindex="0">
       {#if !$tab?.property?.request?.state?.isChatbotActive}
         <AIChatBotIcon />

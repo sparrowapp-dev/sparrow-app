@@ -359,6 +359,10 @@
   :global(.message-wrapper .hljs) {
     background: #000 !important;
     border-bottom: 8px;
+    border: 1px solid var(--bg-ds-surface-500);
+    padding: 8px 0px 8px 8px;
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
   }
   :global(.action-button) {
     height: 30px;
