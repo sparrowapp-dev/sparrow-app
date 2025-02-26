@@ -50,8 +50,8 @@ export interface TypeWrapper {
   type: TabTypeEnum;
 }
 
-export interface TabTypeWrapper {
-  tabType: TabPersistenceTypeEnum;
+export interface PersistenceWrapper {
+  persistence: TabPersistenceTypeEnum;
 }
 export interface IsDeletedWrapper {
   isDeleted: boolean;
@@ -109,5 +109,5 @@ export interface Tab
     TabIdWrapper,
     TimestampWrapper,
     TypeWrapper,
-    TabTypeWrapper,
+    PersistenceWrapper,
     PropertyWrapper {}

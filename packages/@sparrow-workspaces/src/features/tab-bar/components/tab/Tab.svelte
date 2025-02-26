@@ -107,7 +107,7 @@
     style="   background-color: {tab.isActive
       ? 'var(--bg-secondary-850) !important'
       : 'transparent'};  border-top : {tab.isActive
-      ? tab?.tabType === TabPersistenceTypeEnum.TEMPORARY
+      ? tab?.persistence === TabPersistenceTypeEnum.TEMPORARY
         ? '2px solid var(--bg-ds-neutral-300)'
         : '2px solid var(--bg-primary-400)'
       : '2px solid transparent'};"
@@ -196,7 +196,7 @@
       {/if}
       <span
         class=" ms-1 text-fs-12 {!tab.isActive ? 'request-text' : ''}"
-        style={`font-weight:500; font-size:12px; line-height:18px;  color:  var(--text-ds-neutral-300); font-style: ${tab?.tabType === TabPersistenceTypeEnum.TEMPORARY ? "italic" : ""};`}
+        style={`font-weight:500; font-size:12px; line-height:18px;  color:  var(--text-ds-neutral-300); font-style: ${tab?.persistence === TabPersistenceTypeEnum.TEMPORARY ? "italic" : ""};`}
       >
         {tab.name}
       </span>

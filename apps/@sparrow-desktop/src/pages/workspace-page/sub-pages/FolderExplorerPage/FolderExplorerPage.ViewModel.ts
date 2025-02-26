@@ -115,7 +115,7 @@ class FolderExplorerPage {
   ) => {
     if (newFolderName) {
       await this.tabRepository.updateTab(tab.tabId, {
-        tabType: TabPersistenceTypeEnum.PERMANENT,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       let userSource = {};
       if (collection.activeSync && folder?.source === "USER") {
@@ -315,7 +315,7 @@ class FolderExplorerPage {
   ) => {
     const updateObj = {};
     this.tabRepository.updateTab(tab.tabId, {
-      tabType: TabPersistenceTypeEnum.PERMANENT,
+      persistence: TabPersistenceTypeEnum.PERMANENT,
     });
     updateObj["description"] = newDescription;
     let userSource = {};

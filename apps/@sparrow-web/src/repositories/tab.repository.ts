@@ -78,12 +78,12 @@ export class TabRepository {
         .exec()
     )?.length;
     tab.index = lastIndex;
-    if (tab.tabType === TabPersistenceTypeEnum.TEMPORARY) {
+    if (tab.persistence === TabPersistenceTypeEnum.TEMPORARY) {
       const tempTab = await this.rxdb
         ?.findOne({
           selector: {
             "path.workspaceId": workspaceId,
-            tabType: TabPersistenceTypeEnum.TEMPORARY,
+            persistence: TabPersistenceTypeEnum.TEMPORARY,
           },
         })
         .exec();

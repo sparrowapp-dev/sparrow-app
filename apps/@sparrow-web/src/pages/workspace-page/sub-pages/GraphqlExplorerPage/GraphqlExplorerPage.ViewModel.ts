@@ -267,18 +267,18 @@ class GraphqlExplorerViewModel {
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: true,
-        tabType: TabPersistenceTypeEnum.PERMANENT,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = true;
-      progressiveTab.tabType = TabPersistenceTypeEnum.PERMANENT;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
-        tabType: TabPersistenceTypeEnum.PERMANENT,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
-      progressiveTab.tabType = TabPersistenceTypeEnum.PERMANENT;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };

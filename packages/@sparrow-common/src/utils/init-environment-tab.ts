@@ -17,7 +17,7 @@ class InitEnvironmentTab {
       tabId: uuidv4(),
       name: "New Environment",
       type: TabTypeEnum.ENVIRONMENT,
-      tabType: TabPersistenceTypeEnum.PERMANENT,
+      persistence: TabPersistenceTypeEnum.PERMANENT,
       description: "",
       source: "USER",
       isDeleted: false,
@@ -61,7 +61,7 @@ class InitEnvironmentTab {
     return this;
   }
   public setTabType(type: TabPersistenceTypeEnum) {
-    this._tab.tabType = type;
+    this._tab.persistence = type;
   }
   public setEnvironmentId(_id: string) {
     this._tab.id = _id;

@@ -29,7 +29,7 @@ class InitGraphqlTab {
       tabId: uuidv4(),
       name: "New " + GraphqlRequestDefaultAliasBaseEnum.NAME,
       type: TabTypeEnum.GRAPHQL,
-      tabType: TabPersistenceTypeEnum.PERMANENT,
+      persistence: TabPersistenceTypeEnum.PERMANENT,
       description: "",
       source: "USER",
       isDeleted: false,
@@ -108,7 +108,7 @@ class InitGraphqlTab {
     return this;
   }
   public updateTabType(type: TabPersistenceTypeEnum) {
-    this._tab.tabType = type;
+    this._tab.persistence = type;
   }
   public updateName(_name: string) {
     this._tab.name = _name;

@@ -104,7 +104,7 @@ class CollectionExplorerPage {
         );
         this.updateTab(this.tab.tabId as string, {
           name: newCollectionName,
-          tabType: TabPersistenceTypeEnum.PERMANENT,
+          persistence: TabPersistenceTypeEnum.PERMANENT,
         });
         // notifications.success("Collection renamed successfully!");
       } else {
@@ -125,7 +125,7 @@ class CollectionExplorerPage {
         );
         this.updateTab(this.tab.tabId as string, {
           name: newCollectionName,
-          tabType: TabPersistenceTypeEnum.PERMANENT,
+          persistence: TabPersistenceTypeEnum.PERMANENT,
         });
         // notifications.success("Collection renamed successfully!");
       } else if (response.message === "Network Error") {
@@ -554,7 +554,7 @@ class CollectionExplorerPage {
       isGuestUser = value;
     });
     this.updateTab(this.tab.tabId as string, {
-      tabType: TabPersistenceTypeEnum.PERMANENT,
+      persistence: TabPersistenceTypeEnum.PERMANENT,
     });
     if (isGuestUser == true) {
       await this.collectionRepository.updateCollection(

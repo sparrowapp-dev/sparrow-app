@@ -38,7 +38,7 @@ export const tabSchemaLiteral = {
     type: {
       type: "string",
     },
-    tabType: {
+    persistence: {
       type: "string",
     },
     property: {

@@ -20,7 +20,7 @@ class InitFolderTab {
       tabId: uuidv4(),
       name: FolderDefault.NAME,
       type: TabTypeEnum.FOLDER,
-      tabType: TabPersistenceTypeEnum.PERMANENT,
+      persistence: TabPersistenceTypeEnum.PERMANENT,
       description: "",
       source: "USER",
       isDeleted: false,
@@ -55,7 +55,7 @@ class InitFolderTab {
     this._tab.id = _id;
   }
   public updateTabType(type: TabPersistenceTypeEnum) {
-    this._tab.tabType = type;
+    this._tab.persistence = type;
   }
   public updateName(_name: string) {
     this._tab.name = _name;

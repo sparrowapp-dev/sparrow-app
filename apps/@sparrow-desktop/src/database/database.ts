@@ -240,7 +240,7 @@ export class RxDB {
           },
           18: function (oldDoc: TabDocument) {
             if (oldDoc) {
-              oldDoc.tabType = "permanent";
+              oldDoc.persistence = "permanent";
             }
             return oldDoc;
           },

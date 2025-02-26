@@ -32,7 +32,7 @@ class InitSocketIoTab {
       tabId: uuidv4(),
       name: "New " + SocketIORequestDefaultAliasBaseEnum.NAME,
       type: TabTypeEnum.SOCKET_IO,
-      tabType: TabPersistenceTypeEnum.PERMANENT,
+      persistence: TabPersistenceTypeEnum.PERMANENT,
       description: "",
       source: "USER",
       isDeleted: false,
@@ -107,7 +107,7 @@ class InitSocketIoTab {
     return this;
   }
   public updateTabType(type: TabPersistenceTypeEnum) {
-    this._tab.tabType = type;
+    this._tab.persistence = type;
   }
   public updateName(_name: string) {
     this._tab.name = _name;

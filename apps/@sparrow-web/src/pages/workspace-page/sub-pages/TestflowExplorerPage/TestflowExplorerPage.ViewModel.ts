@@ -225,10 +225,10 @@ export class TestflowExplorerPageViewModel {
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
-        tabType: TabPersistenceTypeEnum.PERMANENT,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
-      progressiveTab.tabType = TabPersistenceTypeEnum.PERMANENT;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };

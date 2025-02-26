@@ -23,7 +23,7 @@ class InitTestflowTab {
       tabId: uuidv4(),
       name: TFDefaultEnum.NAME,
       type: TabTypeEnum.TESTFLOW,
-      tabType: TabPersistenceTypeEnum.PERMANENT,
+      persistence: TabPersistenceTypeEnum.PERMANENT,
       description: "",
       source: "USER",
       activeSync: false,
@@ -68,7 +68,7 @@ class InitTestflowTab {
     this._tab.id = _id;
   }
   public updateTabType(type: TabPersistenceTypeEnum) {
-    this._tab.tabType = type;
+    this._tab.persistence = type;
   }
   public updateName(_name: string) {
     this._tab.name = _name;

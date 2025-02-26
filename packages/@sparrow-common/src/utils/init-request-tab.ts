@@ -35,7 +35,7 @@ class InitRequestTab {
       tabId: uuidv4(),
       name: "New " + RequestDefault.NAME,
       type: TabTypeEnum.REQUEST,
-      tabType: TabPersistenceTypeEnum.PERMANENT,
+      persistence: TabPersistenceTypeEnum.PERMANENT,
       description: "",
       source: "USER",
       isDeleted: false,
@@ -173,7 +173,7 @@ class InitRequestTab {
     this._tab.id = _id;
   }
   public updateTabType(type: TabPersistenceTypeEnum) {
-    this._tab.tabType = type;
+    this._tab.persistence = type;
   }
   public updateName(_name: string) {
     this._tab.name = _name;

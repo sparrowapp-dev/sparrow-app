@@ -2042,7 +2042,7 @@ export default class CollectionsViewModel {
       folder?.id || "",
       request,
     );
-    adaptedRequest.tabType = TabPersistenceTypeEnum.TEMPORARY;
+    adaptedRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedRequest);
     moveNavigation("right");
   };
@@ -2065,7 +2065,7 @@ export default class CollectionsViewModel {
       folder?.id || "",
       _graphql,
     );
-    adaptedRequest.tabType = TabPersistenceTypeEnum.TEMPORARY;
+    adaptedRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedRequest);
     moveNavigation("right");
   };
@@ -2088,7 +2088,7 @@ export default class CollectionsViewModel {
       folder?.id || "",
       websocket,
     );
-    adaptedSocket.tabType = TabPersistenceTypeEnum.TEMPORARY;
+    adaptedSocket.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedSocket);
     moveNavigation("right");
   };
@@ -2113,7 +2113,7 @@ export default class CollectionsViewModel {
       _folder?.id || "",
       _socketIo,
     );
-    adaptedSocketIo.tabType = TabPersistenceTypeEnum.TEMPORARY;
+    adaptedSocketIo.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedSocketIo);
     moveNavigation("right");
   };
@@ -5301,9 +5301,9 @@ export default class CollectionsViewModel {
    * @param tab tab data to make it permanent
    */
   public handleTabTypeChange = async (tab: Tab) => {
-    if (tab.tabType === TabPersistenceTypeEnum.TEMPORARY) {
+    if (tab.persistence === TabPersistenceTypeEnum.TEMPORARY) {
       await this.tabRepository.updateTab(tab.tabId, {
-        tabType: TabPersistenceTypeEnum.PERMANENT,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
     }
   };
