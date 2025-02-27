@@ -317,7 +317,7 @@
     <div
       class="api-method text-{httpMethodUIStyle} {api?.isDeleted &&
         'api-method-deleted'}"
-      style="font-size: 12px;"
+      style="font-size: 9px;"
     >
       {api.request?.method?.toUpperCase() === "DELETE"
         ? "DEL"
@@ -407,8 +407,8 @@
     font-weight: 500;
   }
   .api-method {
-    font-size: 10px;
-    font-weight: 500;
+    font-size: 9px;
+    font-weight: 600;
     width: 30px !important;
     height: 24px;
     border-radius: 4px;
