@@ -2,15 +2,19 @@
   import { Events } from "@sparrow/common/enums";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { GenerateIcon, SendIcon } from "@sparrow/library/icons";
+
   export let placeholder = "";
   export let sendPrompt;
   export let prompt: string = "";
   export let onUpdateAiPrompt;
   export let isResponseGenerating;
+
   let isSendButtonHovered = false;
+
   const handleMouseEnter = () => {
     isSendButtonHovered = true;
   };
+
   const handleMouseLeave = () => {
     isSendButtonHovered = false;
   };
@@ -36,6 +40,7 @@
         }
       }}
     />
+
     {#if !isResponseGenerating}
       <div
         style="position:absolute; right:12px ; top: 50%; 
@@ -61,7 +66,21 @@
               : "var(--border-ds-neutral-400)"}
         />
       </div>
-    {:else}{/if}
+    {:else}
+      <!--Disabling it for now, will take stop generation when data streaming will be enabled.-->
+      <!-- <div
+        style="position:absolute; right:12px ; top: 50%; 
+    transform : translateY(-60%);
+  "
+        on:click={() => {}}
+      >
+        <GenerateIcon
+          height={"20px"}
+          width={"20px"}
+          color={"var(--icon-secondary-100)"}
+        />
+      </div> -->
+    {/if}
   </div>
 </div>
 
@@ -78,5 +97,9 @@
   }
   input:hover {
     border: 1px solid var(--border-ds-primary-300) !important;
+  }
+  .p-3 {
+    /* padding: 4px 4px 4px 8px !important; */
+    /* gap: 8px; */
   }
 </style>

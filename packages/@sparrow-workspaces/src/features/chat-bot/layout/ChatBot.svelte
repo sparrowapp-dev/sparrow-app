@@ -15,12 +15,12 @@
     CrossIcon,
     DismissRegular,
     CaretDown,
+    CaretDownFilled,
   } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
   import type { ScrollList } from "../types";
-  import Caret from "../../../../../@sparrow-library/src/icons/Caret.svelte";
   import { AISparcleWhite } from "@sparrow/library/icons";
   export let tab: Observable<RequestTab>;
   export let onUpdateAiPrompt;
@@ -28,7 +28,9 @@
   export let onUpdateRequestState;
   export let onGenerateAiResponse;
   export let onToggleLike;
+
   let scrollList: ScrollList;
+
   const sendPrompt = async (text: string) => {
     if (text) {
       onUpdateAiConversation([
@@ -51,11 +53,13 @@
       }, 10);
     }
   };
+
   onMount(() => {
     setTimeout(() => {
       if (scrollList) scrollList("bottom", -1, "auto");
     }, 10);
   });
+
   const regenerateAiResponse = async () => {
     const regenerateConversation =
       $tab?.property?.request?.ai?.conversations.slice(0, -1);
@@ -66,9 +70,7 @@
     );
   };
   let chatActive = false;
-  function toggleChat() {
-    chatActive = !chatActive;
-  }
+  const toggleChat = () => (chatActive = !chatActive);
 </script>
 
 {#if $tab?.property?.request?.state?.isChatbotActive}
@@ -126,6 +128,7 @@
         color="var(--icon-primary-300)"
       />
     </div>
+    <!-- <div class="d-flex flex-column align-items-end"> -->
     <div
       class="d-flex flex-column align-items-end"
       in:fade={{ duration: 400 }}
@@ -189,11 +192,17 @@
       MixpanelEvent(Events.AI_Chat_Initiation);
     }}
   >
+    <!-- <AiChatToggler
+      height="42px"
+      width="42px"
+      isChatBoxOpen={$tab?.property?.request?.state?.isChatbotActive}
+    /> -->
+
     <div class="chatten-box" on:click={toggleChat} tabindex="0">
       {#if !$tab?.property?.request?.state?.isChatbotActive}
         <AIChatBotIcon />
       {:else}
-        <Caret />
+        <CaretDownFilled />
       {/if}
     </div>
   </div>

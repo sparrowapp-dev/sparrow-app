@@ -4,7 +4,7 @@
   import { notifications } from "@sparrow/library/ui";
   import { copyIcon, tickIcon } from "../../assests";
   import { tick } from "svelte";
-  import ArrowSync from "../../../../../../@sparrow-library/src/icons/ArrowSync.svelte";
+  import { ArrowSyncRegular, ThumbLikeRegular } from "@sparrow/library/icons";
   import hljs from "highlight.js";
   import { ThumbDislikeFilled } from "@sparrow/library/icons";
   import "highlight.js/styles/atom-one-dark.css";
@@ -15,15 +15,16 @@
     RefreshIcon,
     TickIcon,
   } from "@sparrow/library/icons";
-  import ThumbLikeFilled from "../../../../../../@sparrow-library/src/icons/ThumbLikeFilled.svelte";
+  import {
+    ThumbLikeFilled,
+    CopyRegular,
+    ThumbDislikeRegular,
+  } from "@sparrow/library/icons";
   import { SparrowAIIcon } from "@sparrow/common/icons";
-  import CopyRegular from "../../../../../../@sparrow-library/src/icons/CopyRegular.svelte";
   import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
   import { MessageTypeEnum } from "@sparrow/common/types/workspace";
-  import { ThhumbLike } from "@sparrow/library/icons";
-  import ThumbDislike from "../../../../../../@sparrow-library/src/icons/ThumbDislike.svelte";
   export let message: string;
   export let messageId: string;
   export let type;
@@ -33,7 +34,9 @@
   export let regenerateAiResponse;
   export let isLastRecieverMessage;
   export let status;
+
   let showTickIcon: boolean = false;
+
   /**
    * Decodes an HTML string by parsing it, processing <pre><code> elements, and wrapping them
    * in custom containers with additional copy paste functionality.
@@ -44,6 +47,7 @@
   const decodeMessage = (htmlString: string): string => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, "text/html");
+
     // Select all <pre> elements
     const codeElements = doc.querySelectorAll("pre > code");
     const preElements = Array.from(codeElements)
@@ -52,6 +56,7 @@
         return false;
       })
       .map((codeElem) => codeElem.parentElement);
+
     preElements.forEach((pre, index) => {
       if (pre) {
         // Create a new container div
@@ -71,13 +76,16 @@
         </button>
       </div>
         `;
+
         pre.parentNode?.insertBefore(container, pre);
         container.appendChild(pre);
       }
     });
+
     const serializer = new XMLSerializer();
     return serializer.serializeToString(doc);
   };
+
   /**
    * Handles the click event to copy code from a specified wrapper to the clipboard.
    *
@@ -127,6 +135,7 @@
       }
     }
   };
+
   /**
    * Handles the response copy to clipboard functionality.
    */
@@ -144,8 +153,11 @@
       console.error("Failed to copy response: ", err);
     }
   };
+
   let cleanUpListeners: () => void = () => {};
+
   let extractedMessage = "";
+
   /**
    * Embeds click listeners to copy code from dynamically inserted wrappers.
    * @returns A promise that resolves when the listeners are embedded.
@@ -153,10 +165,13 @@
   const embedListenerToCopyCode = async () => {
     extractedMessage = decodeMessage(await marked(message));
     // Add event listeners to all dynamically inserted wrappers
+
     setTimeout(() => {
       const wrappers = document.querySelectorAll(`.copy-code-${messageId}`);
+
       // Remove previous event listeners
       cleanUpListeners();
+
       cleanUpListeners = () => {
         wrappers.forEach((wrapper) => {
           wrapper.removeEventListener("click", handleCopyCode);
@@ -167,6 +182,7 @@
       });
     }, 200);
   };
+
   /**
    * Reactive statement to embed listeners for copying code when the message changes.
    */
@@ -175,6 +191,7 @@
       embedListenerToCopyCode();
     }
   }
+
   /**
    * Cleanup function to remove event listeners when the component is destroyed.
    */
@@ -184,20 +201,19 @@
       cleanUpListeners();
     }
   });
+
   let flag = false;
   let flag2 = false;
-  function handleClick() {
+
+  const handleClick = () => {
     flag = !flag;
-    if (flag2) {
-      flag2 = false;
-    }
-  }
-  function handleClickDislike() {
+    if (flag2) flag2 = false;
+  };
+
+  const handleClickDislike = () => {
     flag2 = !flag2;
-    if (flag) {
-      flag = false;
-    }
-  }
+    if (flag) flag = false;
+  };
 </script>
 
 <div class="message-wrapper">
@@ -289,7 +305,7 @@
               }}
             >
               {#if !flag}
-                <ThhumbLike
+                <ThumbLikeRegular
                   height={"16px"}
                   width={"16px"}
                   color={isLiked ? "white" : "white"}
@@ -310,7 +326,7 @@
               }}
             >
               {#if !flag2}
-                <ThumbDislike
+                <ThumbDislikeRegular
                   height={"16px"}
                   width={"16px"}
                   color={isDisliked ? "white" : "white"}
@@ -325,7 +341,7 @@
               class="action-button d-flex align-items-center justify-content-center border-radius-4"
               on:click={regenerateAiResponse}
             >
-              <ArrowSync height={"16px"} width={"16px"} />
+              <ArrowSyncRegular height={"16px"} width={"16px"} />
             </button>
           </Tooltip>
         {/if}
@@ -339,6 +355,7 @@
   .recieve-item {
     /* border-bottom: 1px solid var(--border-secondary-320); */
   }
+
   :global(
     .message-wrapper .markdown p,
     .message-wrapper .markdown li,
@@ -358,11 +375,10 @@
   }
   :global(.message-wrapper .hljs) {
     background: #000 !important;
-    border-bottom: 8px;
-    border: 1px solid var(--bg-ds-surface-500);
     padding: 8px 0px 8px 8px;
-    border-bottom-right-radius: 8px;
+    border: 1px solid var(--bg-tertiary-190);
     border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
   }
   :global(.action-button) {
     height: 30px;
@@ -374,16 +390,20 @@
   :global(.action-button:hover) {
     background-color: var(--bg-tertiary-190);
   }
+
   button:disabled {
     background-color: inherit;
   }
+
   .error-message {
     background-color: var(--bg-danger-1200);
     border: 0.2px solid var(--border-danger-200);
   }
+
   :global(.tick-icon) {
     height: 16px;
   }
+
   :global(.copy-code-tooltip) {
     transition: 0.3s ease;
     font-weight: 400;

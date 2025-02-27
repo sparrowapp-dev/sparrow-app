@@ -162,9 +162,9 @@ export {default as NavSparrow} from "./NavSparrow.svelte"
 export {default as CaretDown} from "./Caret.svelte"
 export {default as AISparcleWhite} from "./AISparcleWhite.svelte"
 export {default as CopyRegular} from "./CopyRegular.svelte"
-export {default as ThhumbLike} from "./ThumbLikeRegular.svelte"
-export {default as ThumbDislike} from "./ThumbDislike.svelte"
-export {default as ArrowSync} from "./ArrowSync.svelte"
+export {default as ThumbLikeRegular} from "./ThumbLikeRegular.svelte"
+export {default as ThumbDislikeRegular} from "./ThumbDislikeRegular.svelte";
+export {default as ArrowSyncRegular} from "./ArrowSyncRegular.svelte"
 export {default as ThumbLikeFilled} from "./ThumbLikeFilled.svelte"
 export {default as ThumbDislikeFilled} from "./ThumbDislikeFilled.svelte"
 export { default as DeleteRegular } from "./DeleteRegular.svelte";
