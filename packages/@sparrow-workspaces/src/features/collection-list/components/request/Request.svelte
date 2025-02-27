@@ -69,6 +69,7 @@
    */
   export let userRole;
   export let activeTabType;
+  export let isWebApp;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -373,30 +374,32 @@
     </Tooltip>
   {/if}
 </div>
-<div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-  <div class="sub-files position-relative">
-    <div
-      class="box-line"
-      style={folder?.id ? "left: 84.5px;" : "left: 58.5px;"}
-    ></div>
-    <!-- {#if } -->
-    {#each api?.items || [] as exp}
-      <div>
-        <SavedRequest
-          {userRole}
-          api={exp}
-          request={api}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {folder}
-          {collection}
-          {activeTabId}
-        />
-      </div>
-    {/each}
+{#if !isWebApp}
+  <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
+    <div class="sub-files position-relative">
+      <div
+        class="box-line"
+        style={folder?.id ? "left: 84.5px;" : "left: 58.5px;"}
+      ></div>
+      <!-- {#if } -->
+      {#each api?.items || [] as exp}
+        <div>
+          <SavedRequest
+            {userRole}
+            api={exp}
+            request={api}
+            {onItemRenamed}
+            {onItemDeleted}
+            {onItemOpened}
+            {folder}
+            {collection}
+            {activeTabId}
+          />
+        </div>
+      {/each}
+    </div>
   </div>
-</div>
+{/if}
 
 <style lang="scss">
   .delete-ticker {
