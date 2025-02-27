@@ -7,10 +7,9 @@
   } from "@sparrow/library/assets";
   import type { TeamDocument } from "@app/database/database";
   import { calculateTimeDifferenceInDays } from "../../../../utils/workspacetimeUtils";
-  import { Table } from "@sparrow/library/ui";
-  import { Rows } from "@sparrow/teams/compopnents";
+  import { Table } from "@sparrow/teams/components";
+  import { Rows } from "@sparrow/teams/components";
   import { TeamSkeleton } from "../../images";
-  import { onMount } from "svelte";
 
   export let data: any;
   export let openTeam: TeamDocument;
@@ -31,6 +30,8 @@
   export let onAddMember;
 
   let filterText = "";
+  let currentSortField = "updatedAt";
+  let isAscending = false;
 
   let workspacePerPage: number = 10,
     currPage = 1;
@@ -42,6 +43,29 @@
     "",
     "",
   ];
+
+  function handleSortToggle(field) {
+    if (currentSortField === field) {
+      isAscending = !isAscending;
+    } else {
+      currentSortField = field;
+      isAscending = true;
+    }
+  }
+
+  $: sortedData = data
+    ? [...data].sort((a, b) => {
+        const aValue = new Date(a._data[currentSortField]).getTime();
+        const bValue = new Date(b._data[currentSortField]).getTime();
+        return isAscending ? aValue - bValue : bValue - aValue;
+      })
+    : [];
+
+  $: filteredAndSortedData = sortedData
+    .filter((item) =>
+      item.name.toLowerCase().startsWith(filterText.toLowerCase()),
+    )
+    .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage);
 </script>
 
 <div class="h-100 d-flex flex-column pb-2">
@@ -52,22 +76,17 @@
     {#if !isGuestUser}
       <Table
         tableClassProps="table p-0 table-responsive w-100"
-        tableStyleProp="max-height: 100%;"
+        tableStyleProp="max-height: 100%; "
         dataSearch="true"
         tableHeaderClassProp="position-sticky top-0 z-2"
         contributorsCount={openTeam?.users?.length}
         headerObject={tableHeaderContent}
+        onSortToggle={handleSortToggle}
+        {isAscending}
       >
         <tbody class="overflow-y-auto position-relative z-0">
           {#if data}
-            {#each data
-              .slice()
-              .reverse()
-              .filter((item) => item.name
-                  .toLowerCase()
-                  .startsWith(filterText.toLowerCase()))
-              .sort((a, b) => new Date(b._data.updatedAt).getTime() - new Date(a._data.updatedAt).getTime())
-              .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
+            {#each filteredAndSortedData as list, index}
               <Rows
                 {onAddMember}
                 {list}

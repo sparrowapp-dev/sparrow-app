@@ -1,5 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
-import { type Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import { TabTypeEnum, type Path } from "@sparrow/common/types/workspace/tab";
 import {
   TFDefaultEnum,
@@ -20,6 +23,7 @@ class InitTestflowTab {
       tabId: uuidv4(),
       name: TFDefaultEnum.NAME,
       type: TabTypeEnum.TESTFLOW,
+      persistence: TabPersistenceTypeEnum.PERMANENT,
       description: "",
       source: "USER",
       activeSync: false,
@@ -62,6 +66,9 @@ class InitTestflowTab {
   }
   public updateId(_id: string) {
     this._tab.id = _id;
+  }
+  public updateTabType(type: TabPersistenceTypeEnum) {
+    this._tab.persistence = type;
   }
   public updateName(_name: string) {
     this._tab.name = _name;

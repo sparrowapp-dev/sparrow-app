@@ -21,6 +21,11 @@ export enum TabTypeEnum {
   GRAPHQL = "GRAPHQL",
   SAVED_REQUEST = "SAVED_REQUEST"
 }
+
+export enum TabPersistenceTypeEnum {
+  PERMANENT = "permanent",
+  TEMPORARY = "temporary",
+}
 export interface WorkspaceIdWrapper {
   workspaceId: string;
 }
@@ -48,6 +53,10 @@ export interface NameWrapper {
 }
 export interface TypeWrapper {
   type: TabTypeEnum;
+}
+
+export interface PersistenceWrapper {
+  persistence: TabPersistenceTypeEnum;
 }
 export interface IsDeletedWrapper {
   isDeleted: boolean;
@@ -106,4 +115,5 @@ export interface Tab
     TabIdWrapper,
     TimestampWrapper,
     TypeWrapper,
+    PersistenceWrapper,
     PropertyWrapper {}

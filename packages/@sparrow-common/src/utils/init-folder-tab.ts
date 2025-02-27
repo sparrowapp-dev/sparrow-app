@@ -1,5 +1,9 @@
 import { FolderDefault } from "@sparrow/common/enums";
-import { type Path, TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+import {
+  type Path,
+  TabPersistenceTypeEnum,
+  TabTypeEnum,
+} from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
 import type { Tab } from "../types/workspace/tab";
 
@@ -16,6 +20,7 @@ class InitFolderTab {
       tabId: uuidv4(),
       name: FolderDefault.NAME,
       type: TabTypeEnum.FOLDER,
+      persistence: TabPersistenceTypeEnum.PERMANENT,
       description: "",
       source: "USER",
       isDeleted: false,
@@ -48,6 +53,9 @@ class InitFolderTab {
   }
   public updateId(_id: string) {
     this._tab.id = _id;
+  }
+  public updateTabType(type: TabPersistenceTypeEnum) {
+    this._tab.persistence = type;
   }
   public updateName(_name: string) {
     this._tab.name = _name;

@@ -8,7 +8,10 @@ import type { TFRxDocumentType } from "../../models/testflow.model";
 import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
 import { TestflowService } from "../../services/testflow.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import type { Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 
 import { createDeepCopy } from "@sparrow/common/utils";
 import {
@@ -296,6 +299,7 @@ export class TestflowViewModel {
     initTestflowTab.updateName(_testflow.name);
     initTestflowTab.setNodes(_testflow.nodes);
     initTestflowTab.setEdges(_testflow.edges);
+    initTestflowTab.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
     this.tabRepository.createTab(initTestflowTab.getValue());
   };
 

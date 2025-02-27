@@ -103,6 +103,7 @@ import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explore
 import { InitTab } from "@sparrow/common/factory";
 import { RequestSavedTabAdapter } from "@app/adapter";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
+import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 
 class RestExplorerViewModel
   implements
@@ -359,14 +360,18 @@ class RestExplorerViewModel
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: true,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = true;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
