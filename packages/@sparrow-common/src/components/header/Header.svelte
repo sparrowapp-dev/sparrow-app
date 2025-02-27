@@ -663,7 +663,11 @@
     font-size: 12px;
     font-weight: 400;
     color: var(--text-ds-neutral-200);
-    padding: 7px 6px;
+    padding: 7px 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
   }
   .gradient-ellipse {
     position: absolute;
