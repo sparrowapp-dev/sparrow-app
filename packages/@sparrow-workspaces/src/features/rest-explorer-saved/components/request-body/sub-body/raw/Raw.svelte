@@ -15,7 +15,7 @@
     bind:lang
     bind:value
     on:change={handleCodeMirrorChange}
-    isEditable={true}
+    isEditable={false}
     {isBodyBeautified}
     beautifySyntaxCallback={updateBeautifiedState}
   />

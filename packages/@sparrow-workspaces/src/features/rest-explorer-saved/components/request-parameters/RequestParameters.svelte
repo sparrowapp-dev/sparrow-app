@@ -43,5 +43,7 @@
     callback={handleParamsChange}
     {environmentVariables}
     {onUpdateEnvironment}
+    isCheckBoxEditable={false}
+    isInputBoxEditable={false}
   />
 </section>

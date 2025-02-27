@@ -116,7 +116,7 @@
           color: "patch",
         },
       ]}
-      borderRounded={"0px"}
+      borderRounded={"4px"}
       titleId={httpMethod}
       onclick={handleDropdown}
       borderHighlight={"active"}
@@ -132,8 +132,10 @@
       highlightTickedItem={false}
       headerFontSize={"12px"}
       headerHeight={"36px"}
+      disabled={true}
     />
   </div>
+  <div class="ps-2"></div>
 
   <CodeMirrorInput
     bind:value={requestUrl}
@@ -146,26 +148,10 @@
     class={"input-url"}
     {userRole}
     isFocusedOnMount={true}
+    disabled={true}
   />
 
-  <!-- Send button -->
   <span class="ps-2"></span>
-  <!-- <DropButton
-      title="Try"
-      type="default"
-      onClick={() => {
-        if (requestUrl === "") {
-          const codeMirrorElement = document.querySelector(
-            ".input-url .cm-editor",
-          );
-          if (codeMirrorElement) {
-            codeMirrorElement.classList.add("url-red-border");
-          }
-        } else {
-          onSendButtonClicked(environmentVariables);
-        }
-      }}
-    /> -->
   <Button
     title="Try"
     endIcon={ArrowUpRightRegular}
@@ -185,25 +171,6 @@
     }}
   />
   <span class="ps-2"></span>
-  <!-- Switch pane layout button -->
-  <!-- <ToggleButton
-    selectedToggleId={splitterDirection}
-    toggleButtons={[
-      {
-        name: "",
-        id: "vertical",
-        icon: tableColumnIcon,
-      },
-      {
-        name: "",
-        id: "horizontal",
-        icon: barIcon,
-      },
-    ]}
-    on:click={(e) => {
-      onUpdateRequestState({ requestSplitterDirection: e.detail });
-    }}
-  /> -->
   <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
     <Button
       type="secondary"
