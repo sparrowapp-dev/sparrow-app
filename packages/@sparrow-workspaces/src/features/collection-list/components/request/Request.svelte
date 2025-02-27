@@ -307,12 +307,14 @@
       }}
       style="  display: flex; "
     >
-      <Button
-        startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
-        size="extra-small"
-        customWidth={"24px"}
-        type="teritiary-regular"
-      />
+      {#if !isWebApp}
+        <Button
+          startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+        />
+      {/if}
     </span>
     <div
       class="api-method text-{httpMethodUIStyle} {api?.isDeleted &&

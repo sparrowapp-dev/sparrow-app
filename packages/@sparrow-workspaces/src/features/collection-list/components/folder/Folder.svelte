@@ -549,7 +549,10 @@
             />
           {/each}
           {#if !explorer?.items?.length}
-            <p class="text-fs-10 ps-5 my-2 text-secondary-300">
+            <p
+              class="text-fs-10 my-2 text-secondary-300"
+              style="padding-left: 90px;"
+            >
               This folder is empty
             </p>
           {/if}

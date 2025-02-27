@@ -105,6 +105,7 @@ export class RestExplorerSavedViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
+        t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
         this.authHeader = new ReduceAuthHeader(
           this._tab.getValue().property.savedRequest?.state,
@@ -191,10 +192,8 @@ export class RestExplorerSavedViewModel {
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
-        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
-      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
