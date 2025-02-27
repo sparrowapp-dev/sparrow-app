@@ -146,7 +146,7 @@
     }
   }
   const fetchRequestData = async () => {
-    parentRequest = await await onFetchParentRequest(
+    parentRequest = await onFetchParentRequest(
       $tab.path.collectionId,
       $tab.path.requestId,
       $tab.path.folderId,
