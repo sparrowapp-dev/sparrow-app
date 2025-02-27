@@ -493,7 +493,7 @@ class RestExplorerViewModel
     );
     savedRequestTab.updateBody(progressiveTab.property.request?.body);
     savedRequestTab.updateUrl(progressiveTab.property.request?.url);
-    savedRequestTab.updateName(progressiveTab.name + " - Copy");
+    savedRequestTab.updateName(progressiveTab.name + " - Response");
     savedRequestTab.updateDescription(progressiveTab.description);
     savedRequestTab.updateMethod(progressiveTab.property.request?.method);
     savedRequestTab.updateHeaders(progressiveTab.property.request?.headers);
