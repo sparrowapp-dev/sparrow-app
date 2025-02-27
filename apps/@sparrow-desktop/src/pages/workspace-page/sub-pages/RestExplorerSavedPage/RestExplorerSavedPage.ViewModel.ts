@@ -27,10 +27,7 @@ import { CollectionRepository } from "../../../../repositories/collection.reposi
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { EnvironmentRepository } from "../../../../repositories/environment.repository";
 import { BehaviorSubject, Observable } from "rxjs";
-import {
-  Events,
-  UntrackedItems,
-} from "@sparrow/common/enums";
+import { Events, UntrackedItems } from "@sparrow/common/enums";
 import type { CreateDirectoryPostBody } from "@sparrow/common/dto";
 
 import {
@@ -62,11 +59,13 @@ import type { GuideQuery } from "../../../../types/user-guide";
 import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.ws.service";
 import type { Socket } from "socket.io-client";
 import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
-import type { Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import { InitTab } from "@sparrow/common/factory";
 
-export class RestExplorerSavedViewModel
-{
+export class RestExplorerSavedViewModel {
   /**
    * Repository
    */
@@ -192,8 +191,10 @@ export class RestExplorerSavedViewModel
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
@@ -243,9 +244,7 @@ export class RestExplorerSavedViewModel
    *
    * @param _body - response body
    */
-  public updateResponseBody = async (
-    _body: string
-  ) => {
+  public updateResponseBody = async (_body: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.savedRequest.responseBody = _body;
     this.tab = progressiveTab;
@@ -548,8 +547,11 @@ export class RestExplorerSavedViewModel
    * @description send request
    */
   public sendRequest = async () => {
-    const progressiveTab : Tab = createDeepCopy(this._tab.getValue());
-    const initRequestTab = new InitTab().request(UntrackedItems.UNTRACKED + uuidv4(), progressiveTab.path.workspaceId);
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    const initRequestTab = new InitTab().request(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      progressiveTab.path.workspaceId,
+    );
     initRequestTab.updateBody(progressiveTab.property.savedRequest?.body);
     initRequestTab.updateUrl(progressiveTab.property.savedRequest?.url);
     initRequestTab.updateName(progressiveTab.name);
@@ -557,13 +559,19 @@ export class RestExplorerSavedViewModel
     initRequestTab.updateMethod(progressiveTab.property.savedRequest?.method);
     initRequestTab.updateHeaders(progressiveTab.property.savedRequest?.headers);
     initRequestTab.updateAuth(progressiveTab.property.savedRequest.auth);
-    initRequestTab.updateQueryParams(progressiveTab.property.savedRequest?.queryParams);
+    initRequestTab.updateQueryParams(
+      progressiveTab.property.savedRequest?.queryParams,
+    );
     initRequestTab.updateState({
-      requestBodyLanguage: progressiveTab.property.savedRequest?.state?.requestBodyLanguage,
-      requestBodyNavigation: progressiveTab.property.savedRequest?.state?.requestBodyNavigation,
-      requestAuthNavigation: progressiveTab.property.savedRequest?.state?.requestAuthNavigation,    
+      requestBodyLanguage:
+        progressiveTab.property.savedRequest?.state?.requestBodyLanguage,
+      requestBodyNavigation:
+        progressiveTab.property.savedRequest?.state?.requestBodyNavigation,
+      requestAuthNavigation:
+        progressiveTab.property.savedRequest?.state?.requestAuthNavigation,
     });
     initRequestTab.updateIsSave(false);
+    MixpanelEvent(Events.TRY_RESPONSE);
     this.tabRepository.createTab(initRequestTab.getValue());
     moveNavigation("right");
   };
@@ -825,19 +833,23 @@ export class RestExplorerSavedViewModel
    */
   public saveRequest = async () => {
     const componentData = this._tab.getValue();
-    const { folderId, collectionId, workspaceId, requestId } = componentData.path;
+    const { folderId, collectionId, workspaceId, requestId } =
+      componentData.path;
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
-    if (isGuestUser === true)  return;
-    const res = await this.collectionService.updateSavedRequestInCollection(componentData.id, {
-      collectionId: collectionId,
-      workspaceId: workspaceId,
-      requestId: requestId,
-      folderId: folderId,
-      description: componentData.description  
-    });
+    if (isGuestUser === true) return;
+    const res = await this.collectionService.updateSavedRequestInCollection(
+      componentData.id,
+      {
+        collectionId: collectionId,
+        workspaceId: workspaceId,
+        requestId: requestId,
+        folderId: folderId,
+        description: componentData.description,
+      },
+    );
 
     if (res.isSuccessful) {
       notifications.success("Response saved successfully.");
@@ -846,26 +858,27 @@ export class RestExplorerSavedViewModel
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
 
-      if(folderId){
+      if (folderId) {
         this.collectionRepository.updateSavedRequestInFolder(
           collectionId,
           folderId,
           requestId,
           componentData.id,
           {
-            description: componentData.description
+            description: componentData.description,
           },
         );
-      }else{
+      } else {
         this.collectionRepository.updateSavedRequestInCollection(
           collectionId,
           requestId,
           componentData.id,
           {
-            description: componentData.description
+            description: componentData.description,
           },
         );
       }
+      MixpanelEvent(Events.DOCUMENT_RESPONSE);
       return;
     } else {
       notifications.error("Failed to save response. Please try again.");
@@ -1286,9 +1299,11 @@ export class RestExplorerSavedViewModel
         const componentData = this._tab.getValue();
         const length =
           componentData?.property?.savedRequest?.ai?.conversations.length;
-        componentData.property.savedRequest.ai.conversations[length - 1].message =
-          componentData.property.savedRequest.ai.conversations[length - 1].message +
-          chunk;
+        componentData.property.savedRequest.ai.conversations[
+          length - 1
+        ].message =
+          componentData.property.savedRequest.ai.conversations[length - 1]
+            .message + chunk;
         await this.updateRequestAIConversation([
           ...componentData.property.savedRequest.ai.conversations,
         ]);
@@ -1411,9 +1426,11 @@ export class RestExplorerSavedViewModel
         // Check if the conversation already contains the messageId
         componentData = this._tab.getValue();
         const existingMessageIndex =
-          componentData.property.savedRequest.ai.conversations.findIndex((conv) => {
-            return conv.messageId === response.messageId;
-          });
+          componentData.property.savedRequest.ai.conversations.findIndex(
+            (conv) => {
+              return conv.messageId === response.messageId;
+            },
+          );
         if (existingMessageIndex === -1 && response?.status) {
           // If the messageId does not exist, add a new message entry
 
@@ -1559,7 +1576,8 @@ export class RestExplorerSavedViewModel
     if (progressiveTab?.property?.savedRequest?.state) {
       // Handles isChatbotGeneratingResponseClient state
       const isChatbotGeneratingResponseClient =
-        progressiveTab?.property?.savedRequest?.state?.isChatbotGeneratingResponse;
+        progressiveTab?.property?.savedRequest?.state
+          ?.isChatbotGeneratingResponse;
       const isChatbotGeneratingResponseServer =
         tab.property.savedRequest.state.isChatbotGeneratingResponse;
       if (
@@ -1572,7 +1590,8 @@ export class RestExplorerSavedViewModel
       // Handles isDocGenerating state
       const isDocGeneratingClient =
         progressiveTab?.property?.savedRequest?.state?.isDocGenerating;
-      const isDocGeneratingServer = tab.property.savedRequest.state.isDocGenerating;
+      const isDocGeneratingServer =
+        tab.property.savedRequest.state.isDocGenerating;
       if (isDocGeneratingServer !== isDocGeneratingClient) {
         progressiveTab.property.savedRequest.state.isDocGenerating =
           tab.property.savedRequest.state.isDocGenerating;
@@ -1597,6 +1616,28 @@ export class RestExplorerSavedViewModel
         progressiveTab.description = tab.description;
         this.tab = progressiveTab;
       }
+    }
+  };
+
+  public getRequestdata = async (
+    collectionId: string,
+    requestId: string,
+    folderId: string,
+  ) => {
+    let request;
+    if (folderId) {
+      request = await this.collectionRepository.readRequestInFolder(
+        collectionId,
+        folderId,
+        requestId,
+      );
+      return request;
+    } else {
+      request = await this.collectionRepository.readRequestOrFolderInCollection(
+        collectionId,
+        requestId,
+      );
+      return request;
     }
   };
 }
