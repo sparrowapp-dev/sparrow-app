@@ -245,6 +245,7 @@
       this={endIcon}
       height={`${iconSize}px`}
       width={`${iconSize}px`}
+      size={`${iconSize}px`}
       useParentColor={true}
     />
   {/if}
