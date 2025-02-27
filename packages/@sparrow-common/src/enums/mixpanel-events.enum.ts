@@ -118,4 +118,6 @@ export enum Events {
   Collection_GraphQL = "Collection_GraphQL",
   Send_GraphQL_Query = "Send_GraphQL_Query",
   Save_GraphQL_Request = "Save_GraphQL_Request",
+  DELETE_RESPONSE = "delete_response",
+  RENAME_RESPONSE = "rename_response",
 }
