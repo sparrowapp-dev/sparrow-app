@@ -182,3 +182,5 @@ export { default as PeopleFilled } from "./CommunityFilled.svelte";
 export { default as ErrorCircleRegular } from "./ErrorCircleRegular.svelte";
 export { default as CheckmarkCircleRegular } from "./CheckmarkCircleRegular.svelte";
 export { default as ClockRegular } from "./ClockRegular.svelte";
+export { default as CopyRegular } from "./CopyRegular.svelte";
+export { default as ArrowDownloadRegular} from "./ArrowDownloadRegular.svelte";

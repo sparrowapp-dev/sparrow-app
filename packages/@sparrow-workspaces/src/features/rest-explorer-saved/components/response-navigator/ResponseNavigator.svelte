@@ -5,6 +5,8 @@
   export let requestStateSection;
   export let onUpdateRequestState;
   export let responseHeadersLength = 0;
+  export let statusCodes;
+  export let date;
 
   let tabs: {
     name: string;
@@ -41,4 +43,24 @@
   };
 </script>
 
-<Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
+<div class="d-flex justify-content-between">
+  <Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
+  <div class="d-flex text-fs-12">
+    <div class="me-3">
+      <span class="me-1" style="color: var(--text-ds-neutral-300);"
+        >Status:</span
+      >
+      <span
+        style={Number(statusCodes.split(" ")[0]) >= 200 &&
+        Number(statusCodes.split(" ")[0]) < 300
+          ? "color:var(--text-ds-success-300);"
+          : "color:var(--text-ds-danger-300);"}
+      >
+        {statusCodes}
+      </span>
+    </div>
+    <div>
+      <span style="color: var(--text-ds-neutral-300);">{date}</span>
+    </div>
+  </div>
+</div>
