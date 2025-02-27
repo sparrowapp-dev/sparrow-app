@@ -10,7 +10,7 @@
   export let authParameter;
   export let onUpdateEnvironment;
 
-  let isBulkEditRequired = true;
+  let isBulkEditRequired = false;
   export let onUpdateRequestState;
 
   export let isBulkEditActive;

@@ -391,6 +391,7 @@
                               {onClearResponse}
                               {onSaveResponse}
                               {isWebApp}
+                              {isGuestUser}
                             />
                           {/if}
                           <div style="flex:1; overflow:auto;">

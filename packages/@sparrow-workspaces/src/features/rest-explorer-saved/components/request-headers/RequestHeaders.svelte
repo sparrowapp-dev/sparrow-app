@@ -16,7 +16,7 @@
 
   export let isBulkEditActive;
   export let onUpdateRequestState;
-  let isBulkEditRequired = true;
+  let isBulkEditRequired = false;
   let isBulkEditHeaderInfoRequired = true;
 
   //   let placeholderHeader=`Usage: Use bulk edit to manage multiple Headers quickly. Separate each entry with a new line.
