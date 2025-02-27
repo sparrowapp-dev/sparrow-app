@@ -94,11 +94,12 @@
 
   const onRenameBlur = async () => {
     if (newRequestName) {
-      await onItemRenamed("request", {
+      await onItemRenamed("saved_request", {
         workspaceId: collection.workspaceId,
         collection,
         folder: folder ? folder : { id: "" },
-        request: api,
+        request: request,
+        requestResponse: api,
         newName: newRequestName,
       });
     }
@@ -131,7 +132,7 @@
 >
   <div class="text-lightGray mb-1 sparrow-fs-14">
     <p>
-      Are you sure you want to delete this Request? <span
+      Are you sure you want to delete this response <span
         class="text-whiteColor fw-bold">"{api.name}"</span
       >
       will be removed and cannot be restored.
@@ -162,11 +163,12 @@
       loader={deleteLoader}
       onClick={() => {
         deleteLoader = true;
-        onItemDeleted("request", {
+        onItemDeleted("saved_request", {
           workspaceId: collection.workspaceId,
           collection,
-          request: api,
+          request: request,
           folder,
+          requestResponse: api,
         });
         deleteLoader = false;
         isDeletePopup = false;
@@ -186,14 +188,15 @@
     menuItems={[
       {
         onClick: () => {
-          onItemOpened("request", {
+          onItemOpened("saved_request", {
             workspaceId: collection.workspaceId,
             collection,
             folder,
-            request: api,
+            request: request,
+            savedRequest: api,
           });
         },
-        displayText: `Open ${HttpRequestDefaultNameBaseEnum.NAME}`,
+        displayText: `Open Response`,
         disabled: false,
         hidden: false,
       },
@@ -202,7 +205,7 @@
           isRenaming = true;
           setTimeout(() => inputField.focus(), 100);
         },
-        displayText: `Rename ${HttpRequestDefaultNameBaseEnum.NAME}`,
+        displayText: `Rename Response`,
         disabled: false,
         hidden:
           !collection.activeSync ||
@@ -308,7 +311,7 @@
 
   {#if api.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
-  {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER && false}
+  {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
     <Tooltip
       title={"More"}
       show={!showMenu}
