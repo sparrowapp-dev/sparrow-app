@@ -67,8 +67,8 @@ export class CollectionRepository {
   };
 
   public getCollectionDocs = (): CollectionDocument[] => {
-      return RxDB.getInstance().rxdb?.collection.find().exec();
-    };
+    return RxDB.getInstance().rxdb?.collection.find().exec();
+  };
 
   // public updateCollection = async (
   //   collectionId,
@@ -299,12 +299,11 @@ export class CollectionRepository {
     return response;
   };
 
-
-   /**
+  /**
    * @description
    * Read an API request within a folder.
    */
-   public readSavedRequestInCollection = async (
+  public readSavedRequestInCollection = async (
     collectionId: string,
     requestId: string,
     uuid: string,
@@ -319,18 +318,16 @@ export class CollectionRepository {
     let response: CollectionItemsDto | undefined;
     collection.toJSON().items.forEach((element) => {
       if (element.id === requestId) {
-            for (let i = 0; i < element?.items?.length; i++) {
-              if (element.items[i].id === uuid) {
-                response = element.items[i];
-                break;
-              }
-            }
+        for (let i = 0; i < element?.items?.length; i++) {
+          if (element.items[i].id === uuid) {
+            response = element.items[i];
+            break;
           }
-        
+        }
+      }
     });
     return response;
   };
-
 
   /**
    * @description
@@ -351,7 +348,7 @@ export class CollectionRepository {
     const items = createDeepCopy(collection.items);
     const updatedItems = items.map((element) => {
       if (element.id === folderId) {
-        if(!element?.items){
+        if (!element?.items) {
           element.items = [];
         }
         element.items.push(request);
@@ -364,11 +361,11 @@ export class CollectionRepository {
     });
   };
 
-   /**
+  /**
    * @description
    * Creates an API request within a folder.
    */
-   public addSavedRequestInFolder = async (
+  public addSavedRequestInFolder = async (
     collectionId: string,
     folderId: string,
     requestId: string,
@@ -384,9 +381,9 @@ export class CollectionRepository {
     const items = createDeepCopy(collection.items);
     const updatedItems = items.map((element) => {
       if (element.id === folderId) {
-        element.items.map((request)=>{
-          if(request.id === requestId){
-            if(!request?.items){
+        element.items.map((request) => {
+          if (request.id === requestId) {
+            if (!request?.items) {
               request.items = [];
             }
             request.items.push(savedRequest);
@@ -422,8 +419,8 @@ export class CollectionRepository {
     const items = createDeepCopy(collection.items);
     const updatedItems = items.map((element) => {
       if (element.id === folderId) {
-        element.items.map((request)=>{
-          if(request.id === requestId){
+        element.items.map((request) => {
+          if (request.id === requestId) {
             for (let i = 0; i < request.items.length; i++) {
               if (request.items[i].id === savedRequestId) {
                 request.items[i] = {
@@ -439,6 +436,41 @@ export class CollectionRepository {
       return element;
     });
     await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+  public deleteSavedRequestInFolder = async (
+    collectionId: string,
+    folderId: string,
+    requestId: string,
+    savedRequestId: string,
+  ) => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((folder) => {
+      if (folder.id === folderId) {
+        folder.items = folder.items.map((request) => {
+          if (request.id === requestId) {
+            request.items = request.items.filter(
+              (savedRequest) => savedRequest.id !== savedRequestId,
+            );
+          }
+          return request;
+        });
+      }
+      return folder;
+    });
+
+    collection.incrementalModify((value) => {
       value.items = [...updatedItems];
       return value;
     });
@@ -464,17 +496,15 @@ export class CollectionRepository {
     const items = createDeepCopy(collection.items);
     const updatedItems = items.map((element) => {
       if (element.id === requestId) {
-       
-            for (let i = 0; i < element.items.length; i++) {
-              if (element.items[i].id === savedRequestId) {
-                element.items[i] = {
-                  ...element.items[i],
-                  ...savedRequest,
-                };
-                break;
-              }
-            }
-  
+        for (let i = 0; i < element.items.length; i++) {
+          if (element.items[i].id === savedRequestId) {
+            element.items[i] = {
+              ...element.items[i],
+              ...savedRequest,
+            };
+            break;
+          }
+        }
       }
       return element;
     });
@@ -483,7 +513,40 @@ export class CollectionRepository {
       return value;
     });
   };
-  
+
+  public deleteSavedRequestInCollection = async (
+    collectionId: string,
+    requestId: string,
+    savedRequestId: string,
+  ) => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((request) => {
+      if (request.id === requestId) {
+        const deletedElement = request.items.filter((e) => {
+          if (e.id !== savedRequestId) {
+            return true;
+          } else {
+            return false;
+          }
+        });
+        request.items = deletedElement;
+      }
+      return request;
+    });
+
+    collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
 
   /**
    * @description
@@ -504,11 +567,10 @@ export class CollectionRepository {
     const items = createDeepCopy(collection.items);
     const updatedItems = items.map((element) => {
       if (element.id === requestId) {
-          if(!element?.items){
-            element.items = [];
-          }
-          element.items.push(savedRequest);
-      
+        if (!element?.items) {
+          element.items = [];
+        }
+        element.items.push(savedRequest);
       }
       return element;
     });
@@ -583,11 +645,11 @@ export class CollectionRepository {
     return response;
   };
 
-   /**
+  /**
    * @description
    * Read an API request within a folder.
    */
-   public readSavedRequestInFolder = async (
+  public readSavedRequestInFolder = async (
     collectionId: string,
     folderId: string,
     requestId: string,
@@ -603,8 +665,8 @@ export class CollectionRepository {
     let response: CollectionItemsDto | undefined;
     collection.toJSON().items.forEach((element) => {
       if (element.id === folderId) {
-        element.items.forEach((request)=>{
-          if(request.id === requestId){
+        element.items.forEach((request) => {
+          if (request.id === requestId) {
             for (let i = 0; i < request?.items?.length; i++) {
               if (request.items[i].id === uuid) {
                 response = request.items[i];
@@ -612,7 +674,7 @@ export class CollectionRepository {
               }
             }
           }
-        }); 
+        });
       }
     });
     return response;

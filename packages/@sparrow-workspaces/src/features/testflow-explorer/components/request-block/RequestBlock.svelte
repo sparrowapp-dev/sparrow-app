@@ -414,7 +414,7 @@
         <div
           class="d-flex justify-content-between align-items-center px-3 py-2"
         >
-          <span class="text-fs-12 text-fs-10">
+          <span class="text-fs-12 text-fs-10 d-flex justify-content-center">
             <ArrowSwapRegular />
             <span class="ms-2">REST API Request</span>
           </span>
