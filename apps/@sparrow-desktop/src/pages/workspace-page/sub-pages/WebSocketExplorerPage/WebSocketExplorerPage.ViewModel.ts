@@ -383,7 +383,6 @@ class RestExplorerViewModel {
    */
   public updateRequestState = async (_state: StatePartial) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    console.log("progressivetab----", progressiveTab);
     progressiveTab.property.websocket.state = {
       ...progressiveTab.property.websocket.state,
       ..._state,
