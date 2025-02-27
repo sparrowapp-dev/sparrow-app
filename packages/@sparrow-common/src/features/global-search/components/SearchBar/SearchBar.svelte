@@ -4,6 +4,7 @@
   import { SearchIcon } from "@sparrow/library/icons";
   import { KeyboardShortcuts } from "@sparrow/library/ui";
   import { onMount } from "svelte";
+  export let osKeyName = "Ctrl";
   export let searchBarRef;
   let hideKEY = false;
   $: hideKEY = searchQuery.trim().length > 0;
@@ -33,7 +34,7 @@
     </div>
   </div>
   {#if !hideKEY}
-    <KeyboardShortcuts keys={["cmd", "F"]} />
+    <KeyboardShortcuts keys={[osKeyName, "F"]} />
   {/if}
 </div>
 
@@ -42,7 +43,7 @@
     border-radius: 2px 2px 0 0;
     background-color: var(--bg-ds-surface-700);
     display: flex;
-
+    max-height: 44px;
     width: 100%;
     align-items: center;
     justify-content: space-between;
@@ -68,7 +69,7 @@
     align-items: center;
     justify-content: center;
     width: 24px;
-    padding: 2px;
+    padding: 4px;
   }
 
   .search-icon {
@@ -101,10 +102,6 @@
     font: Inter, sans-serif;
     line-height: 20px;
   }
-  .shortcut-icon {
-    width: 16px;
-    height: 16px;
-  }
 
   .visually-hidden {
     position: absolute;
@@ -115,38 +112,5 @@
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     border: 0;
-  }
-
-  .keyboard-shortcut {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-  }
-
-  .shortcut-key {
-    border-radius: 4px;
-    background-color: var(--bg-ds-surface-600);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    padding: 4px;
-  }
-
-  .key {
-    border-radius: 4px;
-    background-color: var(--bg-ds-surface-600);
-    color: var(--text-ds-neutral-200);
-    padding: 2px 4px;
-    font:
-      400 12px Inter,
-      sans-serif;
-    line-height: 18px;
-    min-height: 24px;
-    min-width: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 </style>
