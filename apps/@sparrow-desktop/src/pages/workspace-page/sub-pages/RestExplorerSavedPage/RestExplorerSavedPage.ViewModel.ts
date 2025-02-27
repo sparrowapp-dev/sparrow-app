@@ -631,6 +631,7 @@ export class RestExplorerSavedViewModel
         progressiveTab.property.savedRequest?.state?.requestAuthNavigation,
     });
     initRequestTab.updateIsSave(false);
+    MixpanelEvent(Events.TRY_RESPONSE);
     this.tabRepository.createTab(initRequestTab.getValue());
     moveNavigation("right");
   };
@@ -975,6 +976,7 @@ export class RestExplorerSavedViewModel
           },
         );
       }
+      MixpanelEvent(Events.DOCUMENT_RESPONSE);
       return;
     } else {
       notifications.error("Failed to save response. Please try again.");

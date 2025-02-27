@@ -120,4 +120,6 @@ export enum Events {
   Save_GraphQL_Request = "Save_GraphQL_Request",
   DELETE_RESPONSE = "delete_response",
   RENAME_RESPONSE = "rename_response",
+  TRY_RESPONSE = "try_response",
+  DOCUMENT_RESPONSE = "document_response",
 }
