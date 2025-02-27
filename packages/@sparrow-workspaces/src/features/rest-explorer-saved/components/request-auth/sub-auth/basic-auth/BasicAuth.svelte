@@ -33,6 +33,7 @@
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}
+        disabled={true}
       />
     </div>
   </div>
@@ -50,6 +51,7 @@
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}
+        disabled={true}
       />
     </div>
   </div>
