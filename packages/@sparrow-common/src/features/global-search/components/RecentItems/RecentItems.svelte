@@ -172,17 +172,17 @@
     {
       key: "collections",
       condition: filteredCollection && filteredCollection[0],
-      items: filteredCollection ? [filteredCollection[0]] : [],
+      items: filteredCollection ? filteredCollection.slice(0, 3) : [],
     },
     {
       key: "environments",
       condition: filteredEnvironments && filteredEnvironments[0],
-      items: filteredEnvironments ? [filteredEnvironments[0]] : [],
+      items: filteredEnvironments ? filteredEnvironments.slice(0, 3) : [],
     },
     {
       key: "folders",
       condition: filteredFolder && filteredFolder[0],
-      items: filteredFolder ? [filteredFolder[0]] : [],
+      items: filteredFolder ? filteredFolder.slice(0, 3) : [],
     },
     {
       key: "workspaces",
@@ -192,7 +192,7 @@
     {
       key: "flows",
       condition: filteredTestflows && filteredTestflows.length,
-      items: filteredTestflows ? filteredTestflows.slice(0, 1) : [],
+      items: filteredTestflows ? filteredTestflows.slice(0, 3) : [],
     },
   ];
 

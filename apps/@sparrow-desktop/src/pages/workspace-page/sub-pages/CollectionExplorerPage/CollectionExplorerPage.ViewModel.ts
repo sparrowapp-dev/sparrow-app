@@ -96,6 +96,7 @@ class CollectionExplorerPage {
         const response = {
           data: {
             name: newCollectionName,
+            updatedAt: new Date().toString(),
           },
         };
         await this.collectionRepository.updateCollection(
