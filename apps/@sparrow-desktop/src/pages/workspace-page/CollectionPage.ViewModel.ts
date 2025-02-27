@@ -5584,16 +5584,13 @@ export default class CollectionsViewModel {
   };
 
   /**
-   * Save Request
-   * @param saveDescriptionOnly - refers save overall request data or only description as a documentation purpose.
-   * @returns save status
+   * Saves saved http request
+   * @param componentData - refers overall saved request tab data.
+   * @returns status of the operation performed.
    */
   public saveSavedRequest = async (componentData: Tab): Promise<boolean> => {
     const { folderId, collectionId, workspaceId, requestId } =
       componentData.path;
-    if (componentData.id.startsWith("UNTRACKED-")) {
-      return this.saveAsSavedRequest(componentData);
-    }
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
@@ -5638,77 +5635,6 @@ export default class CollectionsViewModel {
       notifications.error("Failed to save response. Please try again.");
       return false;
     }
-  };
-  /**
-   *
-   * @param _workspaceMeta - workspace meta data
-   * @param path - request stack path
-   * @param tabName - request name
-   * @param description - request description
-   * @param type - save over all request or description only
-   */
-  private saveAsSavedRequest = async (componentData: Tab): Promise<boolean> => {
-    const { folderId, collectionId, workspaceId, requestId } =
-      componentData.path;
-    let userSource = {};
-    if (workspaceId && collectionId && requestId) {
-      const requestSavedTabAdapter = new RequestSavedTabAdapter();
-      const unadaptedRequest = requestSavedTabAdapter.unadapt(componentData);
-      /**
-       * handle request at collection level
-       */
-      const _collection = await this.readCollection(collectionId);
-      if (_collection?.activeSync) {
-        userSource = {
-          currentBranch: _collection?.currentBranch,
-          source: "USER",
-        };
-      }
-      let isGuestUser;
-      isGuestUserActive.subscribe((value) => {
-        isGuestUser = value;
-      });
-
-      if (isGuestUser == true) {
-        return false;
-      }
-      const res = await this.collectionService.createSavedRequestInCollection({
-        collectionId: collectionId,
-        workspaceId: workspaceId,
-        requestId: requestId,
-        folderId: folderId,
-        ...userSource,
-        items: {
-          name: componentData.name,
-          description: componentData.description,
-          type: CollectionItemTypeBaseEnum.SAVED_REQUEST,
-          requestResponse: unadaptedRequest,
-        },
-      });
-      if (res.isSuccessful) {
-        if (folderId) {
-          this.collectionRepository.addSavedRequestInFolder(
-            collectionId,
-            folderId,
-            requestId,
-            res.data.data,
-          );
-        } else {
-          this.collectionRepository.addSavedRequestInCollection(
-            collectionId,
-            requestId,
-            res.data.data,
-          );
-        }
-
-        notifications.success("Response saved successfully.");
-        return true;
-      } else {
-        notifications.error("Failed to save response. Please try again.");
-        return false;
-      }
-    }
-    return false;
   };
 
   /**
