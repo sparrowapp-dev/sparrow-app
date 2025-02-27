@@ -184,6 +184,7 @@
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
   onGenerateDocumentation={_viewModel.generateDocumentation}
   azureBlobCDN={constants.AZURE_CDN_URL}
+  onSaveResponse={_viewModel.saveResponse}
 />
 {#if !isGuestUser}
   <ChatBot
