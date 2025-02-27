@@ -33,7 +33,7 @@ export class InitSavedRequestTab {
       tabId: uuidv4(),
       name: "New Saved Request",
       type: TabTypeEnum.SAVED_REQUEST,
-      description: "",
+      description: "[]",
       source: "USER",
       isDeleted: false,
       activeSync: false,
