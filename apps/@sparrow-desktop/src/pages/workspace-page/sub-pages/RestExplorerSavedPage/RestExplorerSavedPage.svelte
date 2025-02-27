@@ -172,4 +172,5 @@
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
   onGenerateDocumentation={_viewModel.generateDocumentation}
   azureBlobCDN={constants.AZURE_CDN_URL}
+  onFetchParentRequest={_viewModel.getRequestdata}
 />

@@ -20,7 +20,7 @@
     type UserProfileObj,
   } from "./sub-component/UserProfileModal.svelte";
   import { Button, Tooltip } from "@sparrow/library/ui";
-  import {SparrowFilledLogo} from "./images/index";
+  import { SparrowFilledLogo } from "./images/index";
   // import { GlobalSearch } from "../../components/popup/global-search";
   /**
    * environment list
@@ -245,7 +245,7 @@
 <header
   bind:this={titlebar}
   id="titlebar"
-  class=" titlebar app-header ps-1 pe-1 d-flex align-items-center justify-content-between"
+  class=" titlebar app-header ps-1 d-flex align-items-center justify-content-between"
   style="position:relative;"
   on:mousedown={handleMouseDown}
 >
@@ -313,8 +313,16 @@
             <div slot="pre-select" class="mb-2 px-1">
               <div class="guest-user-text">
                 <div>
-                   <div style="font-weight: 500; font-size:12px;color:var(--text-ds-neutral-50);text-align:left"> No Account Connected</div>
-                  <div style="font-size:12px;color:var(--text-ds-neutral-300);text-align:left">Unlock the full experience getting started</div>
+                  <div
+                    style="font-weight: 500; font-size:12px;color:var(--text-ds-neutral-50);text-align:left"
+                  >
+                    No Account Connected
+                  </div>
+                  <div
+                    style="font-size:12px;color:var(--text-ds-neutral-300);text-align:left"
+                  >
+                    Unlock the full experience by getting started.
+                  </div>
                 </div>
               </div>
 
@@ -323,7 +331,8 @@
                 title="Create an Account or Sign In"
                 size="small"
                 onClick={onLoginUser}
-                customWidth={"100%"}/>
+                customWidth={"100%"}
+              />
             </div>
           </Select>
         </div>
@@ -455,9 +464,7 @@
               class="download-sparrow-button download-section d-flex align-items-center justify-content-between"
               style="display: flex; gap: 12px; padding: 8px; border-radius: 6px; width: fit-content;"
             >
-              <SparrowFilledLogo
-             
-                />
+              <SparrowFilledLogo />
 
               <div class="d-flex flex-column gap-1" style="line-height: 1;">
                 <p
@@ -532,7 +539,7 @@
     <!-- {/if} -->
 
     {#if !isGuestUser}
-      <div class="">
+      <div class={"pe-2"}>
         <UserProfileModal
           {isGuestUser}
           item={sidebarModalItem}
