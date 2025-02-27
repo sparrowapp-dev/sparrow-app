@@ -595,6 +595,7 @@
           {folder}
           {collection}
           {activeTabId}
+          {isWebApp}
         />
       </div>
     {:else if explorer.type === CollectionItemTypeBaseEnum.WEBSOCKET}
