@@ -395,7 +395,7 @@
       <div
         tabindex="0"
         bind:this={folderTabWrapper}
-        style="height:32px; padding-left:23px; margin-bottom:2px; "
+        style="height:32px; padding-left:48px; margin-bottom:2px; "
         class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
@@ -767,10 +767,10 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 34px;
+    left: 58.5px;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
-    /* height: 100px; */
+    z-index: 200;
   }
 
   .main-folder {

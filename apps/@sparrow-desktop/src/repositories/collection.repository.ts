@@ -299,6 +299,39 @@ export class CollectionRepository {
     return response;
   };
 
+
+   /**
+   * @description
+   * Read an API request within a folder.
+   */
+   public readSavedRequestInCollection = async (
+    collectionId: string,
+    requestId: string,
+    uuid: string,
+  ): Promise<CollectionItemsDto | undefined> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    let response: CollectionItemsDto | undefined;
+    collection.toJSON().items.forEach((element) => {
+      if (element.id === requestId) {
+            for (let i = 0; i < element?.items?.length; i++) {
+              if (element.items[i].id === uuid) {
+                response = element.items[i];
+                break;
+              }
+            }
+          }
+        
+    });
+    return response;
+  };
+
+
   /**
    * @description
    * Creates an API request within a folder.
@@ -318,7 +351,164 @@ export class CollectionRepository {
     const items = createDeepCopy(collection.items);
     const updatedItems = items.map((element) => {
       if (element.id === folderId) {
+        if(!element?.items){
+          element.items = [];
+        }
         element.items.push(request);
+      }
+      return element;
+    });
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+   /**
+   * @description
+   * Creates an API request within a folder.
+   */
+   public addSavedRequestInFolder = async (
+    collectionId: string,
+    folderId: string,
+    requestId: string,
+    savedRequest: any,
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((element) => {
+      if (element.id === folderId) {
+        element.items.map((request)=>{
+          if(request.id === requestId){
+            if(!request?.items){
+              request.items = [];
+            }
+            request.items.push(savedRequest);
+          }
+        });
+      }
+      return element;
+    });
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+  /**
+   * @description
+   * Creates an API request within a folder.
+   */
+  public updateSavedRequestInFolder = async (
+    collectionId: string,
+    folderId: string,
+    requestId: string,
+    savedRequestId: string,
+    savedRequest: any,
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((element) => {
+      if (element.id === folderId) {
+        element.items.map((request)=>{
+          if(request.id === requestId){
+            for (let i = 0; i < request.items.length; i++) {
+              if (request.items[i].id === savedRequestId) {
+                request.items[i] = {
+                  ...request.items[i],
+                  ...savedRequest,
+                };
+                break;
+              }
+            }
+          }
+        });
+      }
+      return element;
+    });
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+  /**
+   * @description
+   * Creates an API request within a folder.
+   */
+  public updateSavedRequestInCollection = async (
+    collectionId: string,
+    requestId: string,
+    savedRequestId: string,
+    savedRequest: any,
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((element) => {
+      if (element.id === requestId) {
+       
+            for (let i = 0; i < element.items.length; i++) {
+              if (element.items[i].id === savedRequestId) {
+                element.items[i] = {
+                  ...element.items[i],
+                  ...savedRequest,
+                };
+                break;
+              }
+            }
+  
+      }
+      return element;
+    });
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+  
+
+  /**
+   * @description
+   * Creates an API request within a folder.
+   */
+  public addSavedRequestInCollection = async (
+    collectionId: string,
+    requestId: string,
+    savedRequest: any,
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((element) => {
+      if (element.id === requestId) {
+          if(!element?.items){
+            element.items = [];
+          }
+          element.items.push(savedRequest);
+      
       }
       return element;
     });
@@ -388,6 +578,41 @@ export class CollectionRepository {
             break;
           }
         }
+      }
+    });
+    return response;
+  };
+
+   /**
+   * @description
+   * Read an API request within a folder.
+   */
+   public readSavedRequestInFolder = async (
+    collectionId: string,
+    folderId: string,
+    requestId: string,
+    uuid: string,
+  ): Promise<CollectionItemsDto | undefined> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    let response: CollectionItemsDto | undefined;
+    collection.toJSON().items.forEach((element) => {
+      if (element.id === folderId) {
+        element.items.forEach((request)=>{
+          if(request.id === requestId){
+            for (let i = 0; i < request?.items?.length; i++) {
+              if (request.items[i].id === uuid) {
+                response = request.items[i];
+                break;
+              }
+            }
+          }
+        }); 
       }
     });
     return response;

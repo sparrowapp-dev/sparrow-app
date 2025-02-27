@@ -100,6 +100,9 @@ import type { GuideQuery } from "../../../../types/user-guide";
 import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.ws.service";
 import type { Socket } from "socket.io-client";
 import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
+import { InitTab } from "@sparrow/common/factory";
+import { RequestSavedTabAdapter } from "@app/adapter";
+import type { Tab } from "@sparrow/common/types/workspace/tab";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 
 class RestExplorerViewModel
@@ -389,6 +392,59 @@ class RestExplorerViewModel
       name: "guestUser",
     });
     return response?.getLatest().toMutableJSON();
+  };
+
+
+
+  private formatDate = (date) => {
+    const options = { day: '2-digit', month: 'short', year: 'numeric' };
+    const formattedDate = date.toLocaleDateString('en-GB', options);
+  
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+    hours = hours % 12 || 12; // Convert 24h to 12h format
+  
+    return `(${formattedDate}, ${hours}:${minutes} ${ampm})`;
+  }
+
+  public saveResponse = async () => {
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    
+    // const response = await this.guestUserRepository.findOne({
+    //   name: "guestUser",
+    // });
+    // return response?.getLatest().toMutableJSON();
+    // new RequestSavedTabAdapter().adapt();
+    const savedRequestTab = new InitTab().savedRequest(UntrackedItems.UNTRACKED + uuidv4(), progressiveTab.path.workspaceId);
+    savedRequestTab.updateBody(progressiveTab.property.request?.body);
+    savedRequestTab.updateUrl(progressiveTab.property.request?.url);
+    savedRequestTab.updateName(progressiveTab.name + " - Copy");
+    savedRequestTab.updateDescription(progressiveTab.description);
+    savedRequestTab.updateMethod(progressiveTab.property.request?.method);
+    savedRequestTab.updateHeaders(progressiveTab.property.request?.headers);
+    savedRequestTab.updateAuth(progressiveTab.property.request?.auth);
+    savedRequestTab.updateIsSave(false);
+    savedRequestTab.updateState({requestBodyNavigation: progressiveTab.property.request?.state.requestBodyNavigation
+      ,requestBodyLanguage: progressiveTab.property.request?.state.requestBodyLanguage,
+      requestAuthNavigation: progressiveTab.property.request?.state.requestAuthNavigation
+    });
+    savedRequestTab.updatePath({...progressiveTab.path, requestId: progressiveTab.id});
+    savedRequestTab.updateQueryParams(progressiveTab.property.request?.queryParams);
+    restExplorerDataStore.update((restApiDataMap) => {
+      let data = restApiDataMap.get(progressiveTab?.tabId);
+      if (data) {
+        savedRequestTab.updateResponseBody(data.response.body);
+        savedRequestTab.updateResponseHeaders(data.response.headers);
+        savedRequestTab.updateResponseStatus(data.response.status);
+        savedRequestTab.updateResponseDate(this.formatDate(new Date()));
+        savedRequestTab.updateState({ responseBodyLanguage : data.response.bodyLanguage});
+      }
+      return restApiDataMap;
+    });
+    this.tabRepository.createTab(savedRequestTab.getValue());
+    moveNavigation("right");
   };
 
   /**

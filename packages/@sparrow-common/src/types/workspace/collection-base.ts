@@ -1,6 +1,7 @@
 import type { FolderBaseInterface } from "./folder-base";
 import type { GraphqlRequestBaseInterface } from "./graphql-request-base";
 import type { HttpRequestBaseInterface } from "./http-request-base";
+import type { HttpRequestSavedBaseInterface } from "./http-request-saved-base";
 import type { SocketIORequestBaseInterface } from "./socket-io-request-base";
 import type { WebsocketRequestBaseInterface } from "./websocket-request-base";
 
@@ -10,6 +11,7 @@ export enum CollectionItemTypeBaseEnum {
   WEBSOCKET = "WEBSOCKET",
   SOCKETIO = "SOCKETIO",
   GRAPHQL = "GRAPHQL",
+  SAVED_REQUEST = "REQUEST_RESPONSE"
 }
 
 export interface CollectionItemBaseInterface {
@@ -23,6 +25,7 @@ export interface CollectionItemBaseInterface {
   websocket?: WebsocketRequestBaseInterface;
   socketio?: SocketIORequestBaseInterface;
   graphql?: GraphqlRequestBaseInterface;
+  requestResponse?: HttpRequestSavedBaseInterface;
   folder?: FolderBaseInterface;
   createdAt: string;
   updatedAt: string;
