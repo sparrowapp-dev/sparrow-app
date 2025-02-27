@@ -19,7 +19,7 @@
   import { invoke } from "@tauri-apps/api/core";
   import { save } from "@tauri-apps/plugin-dialog";
   import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
-  import { CopyIcon, DownloadIcon2 } from "@sparrow/library/icons";
+  import { ArrowDownloadRegular, CopyRegular } from "@sparrow/library/icons";
 
   export let response;
   export let body;
@@ -225,7 +225,7 @@
         <!-- Copy button -->
         <Tooltip title={"Copy"}>
           <WithButtonV6
-            icon={CopyIcon}
+            icon={CopyRegular}
             onClick={handleCopy}
             disable={false}
             loader={false}
@@ -235,7 +235,7 @@
         {#if !isWebApp}
           <Tooltip title={"Export"}>
             <WithButtonV6
-              icon={DownloadIcon2}
+              icon={ArrowDownloadRegular}
               onClick={handleDownloaded}
               disable={false}
               loader={false}
@@ -244,7 +244,7 @@
         {:else}
           <Tooltip title={"Export"}>
             <WithButtonV6
-              icon={DownloadIcon2}
+              icon={ArrowDownloadRegular}
               onClick={() =>
                 handleDownloadResponse(
                   formatedBody,

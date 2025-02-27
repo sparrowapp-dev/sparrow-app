@@ -396,6 +396,19 @@ class RestExplorerViewModel
 
 
 
+  private formatDate = (date) => {
+    const options = { day: '2-digit', month: 'short', year: 'numeric' };
+    const formattedDate = date.toLocaleDateString('en-GB', options);
+  
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+    hours = hours % 12 || 12; // Convert 24h to 12h format
+  
+    return `(${formattedDate}, ${hours}:${minutes} ${ampm})`;
+  }
+
   public saveResponse = async () => {
     const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
     
@@ -425,7 +438,7 @@ class RestExplorerViewModel
         savedRequestTab.updateResponseBody(data.response.body);
         savedRequestTab.updateResponseHeaders(data.response.headers);
         savedRequestTab.updateResponseStatus(data.response.status);
-        savedRequestTab.updateResponseDate(new Date().toLocaleTimeString());
+        savedRequestTab.updateResponseDate(this.formatDate(new Date()));
         savedRequestTab.updateState({ responseBodyLanguage : data.response.bodyLanguage});
       }
       return restApiDataMap;
