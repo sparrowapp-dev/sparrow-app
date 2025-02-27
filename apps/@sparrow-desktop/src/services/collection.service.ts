@@ -40,7 +40,12 @@ import type {
 } from "@sparrow/common/types/workspace/graphql-request-dto";
 import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 import type { GraphqlRequestAuthModeBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
-import type { HttpRequestSavedCreateUpdateInFolderPayloadDtoInterface, HttpRequestSavedCreateUpdatePayloadDtoInterface, HttpRequestSavedUpdatePayloadDtoInterface } from "@sparrow/common/types/workspace/http-request-saved-dto";
+import type {
+  HttpRequestSavedCreateUpdateInFolderPayloadDtoInterface,
+  HttpRequestSavedCreateUpdatePayloadDtoInterface,
+  HttpRequestSavedDeletePayloadDtoInterface,
+  HttpRequestSavedUpdatePayloadDtoInterface,
+} from "@sparrow/common/types/workspace/http-request-saved-dto";
 
 export class CollectionService {
   constructor() {}
@@ -589,8 +594,7 @@ export class CollectionService {
   };
 
   public createSavedRequestInCollection = async (
-    _savedRequest:
-      HttpRequestSavedCreateUpdatePayloadDtoInterface,
+    _savedRequest: HttpRequestSavedCreateUpdatePayloadDtoInterface,
   ): Promise<
     HttpClientResponseInterface<
       HttpClientBackendResponseInterface<CollectionItemDtoInterface>
@@ -607,9 +611,9 @@ export class CollectionService {
     return response;
   };
 
-  public updateSavedRequestInCollection = async (_savedRequestId: string,
-    _savedRequest:
-    HttpRequestSavedUpdatePayloadDtoInterface,
+  public updateSavedRequestInCollection = async (
+    _savedRequestId: string,
+    _savedRequest: HttpRequestSavedUpdatePayloadDtoInterface,
   ): Promise<
     HttpClientResponseInterface<
       HttpClientBackendResponseInterface<CollectionItemDtoInterface>
@@ -617,6 +621,21 @@ export class CollectionService {
   > => {
     const response = await makeRequest(
       "PATCH",
+      `${this.apiUrl}/api/collection/response/${_savedRequestId}`,
+      {
+        body: _savedRequest,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public deleteSavedRequestInCollection = async (
+    _savedRequestId: string,
+    _savedRequest: HttpRequestSavedDeletePayloadDtoInterface,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
       `${this.apiUrl}/api/collection/response/${_savedRequestId}`,
       {
         body: _savedRequest,
