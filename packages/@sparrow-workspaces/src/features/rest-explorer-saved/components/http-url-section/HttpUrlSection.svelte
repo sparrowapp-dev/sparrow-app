@@ -8,12 +8,16 @@
     UpdateRequestMethodType,
     UpdateRequestUrlType,
   } from "@sparrow/workspaces/type";
-  import { notifications } from "@sparrow/library/ui";
+  import { Button, notifications } from "@sparrow/library/ui";
   import { DropButton } from "@sparrow/workspaces/components";
   import { CodeMirrorInput } from "../../../../components";
   import { UrlInputTheme } from "../../../../utils";
   import { Tooltip } from "@sparrow/library/ui";
-  import { DiskIcon } from "@sparrow/library/icons";
+  import {
+    ArrowUpRightRegular,
+    DiskIcon,
+    SaveRegular,
+  } from "@sparrow/library/icons";
   // import type { CancelRequestType } from "@workspaces/common/type/actions";
   let componentClass = "";
   export { componentClass as class };
@@ -146,8 +150,7 @@
 
   <!-- Send button -->
   <span class="ps-2"></span>
-  {#if !isSendRequestInProgress}
-    <DropButton
+  <!-- <DropButton
       title="Try"
       type="default"
       onClick={() => {
@@ -162,17 +165,26 @@
           onSendButtonClicked(environmentVariables);
         }
       }}
-    />
-  {:else}
-    <DropButton
-      title="Cancel"
-      type="dark"
-      onClick={() => {
-        onCancelButtonClicked();
-      }}
-    />
-  {/if}
-
+    /> -->
+  <Button
+    title="Try"
+    endIcon={ArrowUpRightRegular}
+    type="primary"
+    customWidth={"96px"}
+    onClick={() => {
+      if (requestUrl === "") {
+        const codeMirrorElement = document.querySelector(
+          ".input-url .cm-editor",
+        );
+        if (codeMirrorElement) {
+          codeMirrorElement.classList.add("url-red-border");
+        }
+      } else {
+        onSendButtonClicked(environmentVariables);
+      }
+    }}
+  />
+  <span class="ps-2"></span>
   <!-- Switch pane layout button -->
   <!-- <ToggleButton
     selectedToggleId={splitterDirection}
@@ -193,29 +205,15 @@
     }}
   /> -->
   <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
-    <button
-      class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
-      on:click={handleSaveRequest}
-      on:mouseenter={handleMouseEnter}
-      on:mouseleave={handleMouseLeave}
-      disabled={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
+    <Button
+      type="secondary"
+      size="medium"
+      startIcon={SaveRegular}
+      onClick={handleSaveRequest}
+      disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
         : false}
-      style="background-color: {isSave ||
-      userRole === WorkspaceRole.WORKSPACE_VIEWER
-        ? 'var(--icon-secondary-550)'
-        : 'var(--bg-secondary-400)'}; color: white;"
-    >
-      <DiskIcon
-        height={22}
-        width={22}
-        color={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
-          ? "var(--icon-secondary-380)"
-          : isHovered
-            ? "var(--icon-primary-200)"
-            : "var(--icon-secondary-100)"}
-      />
-    </button>
+    />
   </Tooltip>
 </div>
 <svelte:window on:keydown={handleKeyPress} />

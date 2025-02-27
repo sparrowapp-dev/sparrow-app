@@ -362,6 +362,8 @@
                       <ResponseNavigator
                         requestStateSection={$tab.property.savedRequest?.state
                           ?.responseNavigation}
+                        statusCodes={$tab.property.savedRequest?.responseStatus}
+                        date={$tab.property.savedRequest?.responseDate}
                         {onUpdateRequestState}
                         responseHeadersLength={$tab.property.savedRequest
                           ?.responseHeaders?.length || 0}
