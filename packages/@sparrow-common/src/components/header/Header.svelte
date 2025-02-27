@@ -314,7 +314,7 @@
               <div class="guest-user-text">
                 <div>
                    <div style="font-weight: 500; font-size:12px;color:var(--text-ds-neutral-50);text-align:left"> No Account Connected</div>
-                  <div style="font-size:12px;color:var(--text-ds-neutral-300);text-align:left">Unlock the full experience getting started</div>
+                  <div style="font-size:12px;color:var(--text-ds-neutral-300);text-align:left">Unlock the full experience by getting started.</div>
                 </div>
               </div>
 
@@ -532,7 +532,7 @@
     <!-- {/if} -->
 
     {#if !isGuestUser}
-      <div class="">
+      <div class={!isWindows ? "pe-1" : ""}>
         <UserProfileModal
           {isGuestUser}
           item={sidebarModalItem}
