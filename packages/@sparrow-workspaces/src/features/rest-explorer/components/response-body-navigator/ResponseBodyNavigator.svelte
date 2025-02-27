@@ -26,6 +26,7 @@
   export let onUpdateResponseState;
   export let onClearResponse;
   export let isWebApp = false;
+  export let isGuestUser;
   export let onSaveResponse;
   export let path;
 
@@ -224,7 +225,7 @@
             Clear
           </button>
         </div>
-        {#if path?.collectionId}
+        {#if path?.collectionId && !isGuestUser && !isWebApp}
           <!-- Save button -->
           <Button
             startIcon={SaveIcon}
