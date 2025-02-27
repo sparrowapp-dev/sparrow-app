@@ -245,7 +245,7 @@
 <header
   bind:this={titlebar}
   id="titlebar"
-  class=" titlebar app-header ps-1 pe-1 d-flex align-items-center justify-content-between"
+  class=" titlebar app-header ps-1 d-flex align-items-center justify-content-between"
   style="position:relative;"
   on:mousedown={handleMouseDown}
 >
@@ -532,7 +532,7 @@
     <!-- {/if} -->
 
     {#if !isGuestUser}
-      <div class={!isWindows ? "pe-1" : ""}>
+      <div class={!isWindows || isWebApp ? "pe-2" : ""}>
         <UserProfileModal
           {isGuestUser}
           item={sidebarModalItem}
