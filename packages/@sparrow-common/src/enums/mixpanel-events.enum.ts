@@ -122,4 +122,5 @@ export enum Events {
   RENAME_RESPONSE = "rename_response",
   TRY_RESPONSE = "try_response",
   DOCUMENT_RESPONSE = "document_response",
+  SAVE_RESPONSE = "save_response",
 }
