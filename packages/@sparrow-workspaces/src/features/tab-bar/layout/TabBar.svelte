@@ -61,6 +61,8 @@
 
   export let onChangeViewInRequest: (view: string) => void;
 
+  export let onDoubleClick: (tab) => void;
+
   let isTabSaved: boolean;
 
   let activeTabType: string;
@@ -146,6 +148,7 @@
             {tabWidth}
             {onDragStart}
             {onDropOver}
+            {onDoubleClick}
           />
         {/each}
       {/if}

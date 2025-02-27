@@ -14,7 +14,7 @@
 </script>
 
 <script lang="ts">
-  import { SignOutIcon } from "@sparrow/library/icons";
+  import { SignOutIconRegular } from "@sparrow/library/icons";
   import { afterUpdate, onMount } from "svelte";
   import { Tooltip } from "@sparrow/library/ui";
   /**
@@ -93,39 +93,41 @@
     >
       <div class="d-flex align-iems-center justify-content-center">
         {#if isHovered && item.hoveredLogo && !item.disabled}
-          <img src={item.hoveredLogo} alt={item.heading} />
+          <Avatar type="letter" size="small" letter={user?.name[0]} bgColor="var(--icon-ds-secondary-400)" />
         {:else if isRouteActive && item.selectedLogo}
-          <img src={item.selectedLogo} alt={item.heading} />
+          <Avatar type="letter" size="small" letter={user?.name[0]} bgColor="var(--icon-ds-secondary-400)" />
         {:else}
-          <img src={item.defaultLogo} alt={item.heading} />
+          <Avatar type="letter" size="small" letter={user?.name[0]} bgColor="var(--icon-ds-secondary-400)" />
         {/if}
       </div>
     </button>
 
     <div
       bind:this={modalElement}
-      class=" position-fixed d-flex flex-column modal-background ps-2 pe-2 pt-3 pb-2 {showProfileModal
+      class=" position-fixed d-flex flex-column modal-background p-1 {showProfileModal
         ? ''
         : 'd-none'}"
-      style="right:10px; top:47px; font-size: 12px; font-weight: 400; min-width: 200px; z-index: 500;"
+      style="right:10px; top:47px; font-size: 12px; font-weight: 400; min-width: 200px; z-index: 500; display:flex; flex-direction:column;gap:4px; background-color:var(--bg-ds-surface-600);"
     >
-      <div class="d-flex align-items-center mb-2 px-1">
-        <Avatar type="letter" size="medium" letter={user?.name[0]} bgColor="var(--bg-tertiary-500)" />
+      <div class="align-items-center py-1 px-2 profile-item" style="display: flex; gap:8px">
+        <Avatar type="letter" size="small" letter={user?.name[0]} bgColor="var(--icon-ds-secondary-400)" />
         <div class="d-flex flex-column ms-1">
-          <div class="ellipsis" style="max-width: 200px; ">
+          <div class="ellipsis" style="max-width: 200px; font-weight: 500;">
             {user?.name}
           </div>
-          <div style="max-width: 200px; " class="text-secondary-200 ellipsis">
+          <div style="max-width: 200px;color:var(--text-ds-neutral-300)" class="ellipsis">
             {user?.email}
           </div>
         </div>
       </div>
 
       <button
-        class="border-0 bg-transparent d-flex align-items-center px-2 py-1 sign-out-button"
-        style="border-radius: 3px;"
+        class="border-0 bg-transparent d-flex align-items-center sign-out-button"
+        style="border-radius: 3px;padding: 7px 12px;"
         on:click={onLogout}
-        ><SignOutIcon size={16} /> <span class="ms-2">Sign Out</span></button
+        >
+        <SignOutIconRegular size={"16px"} color="var(--icon-ds-nuetral-50)" />
+         <span class="ms-3">Sign Out</span></button
       >
     </div>
   </Tooltip>
@@ -136,25 +138,16 @@
     height: 20px;
     width: 20px;
   }
-
-  .sidebar-item {
-    position: relative;
-    height: 41px;
-    width: 41px;
-  }
-
-  .sidebar-item:hover {
-    background-color: var(--nav-bar-hover-background) !important;
-    opacity: 0.9;
-  }
-
   .modal-background {
     backdrop-filter: blur(75px);
     border-radius: 5px;
-    background-color: var(--bg-tertiary-700);
+    background-color: var(--bg-ds-surface-600);
   }
 
   .sign-out-button:hover {
-    background-color: var(--bg-tertiary-500) !important;
+    background-color: var(--bg-ds-surface-400) !important;
   } /* CardBody+BlurEffects */
+  .profile-item:hover{
+     background-color: var(--bg-ds-surface-400) !important;
+  }
 </style>
