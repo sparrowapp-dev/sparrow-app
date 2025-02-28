@@ -131,14 +131,15 @@
           on:blur={(e) => {
             handleCurrentEnvironmentNameChange(environmentName, "blur");
           }}
-          defaultBorderColor="transparent"
-          hoveredBorderColor={"var(--border-primary-300)"}
-          focusedBorderColor={"var(--border-primary-300)"}
-          class="text-fs-18 bg-transparent ellipsis fw-normal px-2"
+          variant={"primary"}
+          size="medium"
+          isError={false}
+          class="ellipsis"
           style="outline:none;"
           disabled={$currentEnvironment?.property?.environment?.type ==
             "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
           placeholder=""
+          isEditIconRequired={true}
         />
         <div class={`d-flex env-btn-container`}>
           <div class="position-relative">
