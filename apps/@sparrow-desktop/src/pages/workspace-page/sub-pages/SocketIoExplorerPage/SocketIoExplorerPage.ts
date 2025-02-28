@@ -93,6 +93,7 @@ class SocketIoExplorerPageViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
+        t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
       }, 0);
     }
@@ -214,18 +215,14 @@ class SocketIoExplorerPageViewModel {
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: true,
-        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = true;
-      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
-        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
-      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };

@@ -21,8 +21,14 @@
     CollectionItemBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-  import { MoreHorizontalRegular } from "@sparrow/library/icons";
+  import {
+    ChevronDownRegular,
+    ChevronRightRegular,
+    MoreHorizontalRegular,
+  } from "@sparrow/library/icons";
+  import { SavedRequest } from "..";
 
+  let expand = false;
   /**
    * Callback for Item Deleted
    * @param entityType - type of item to delete like request/folder
@@ -63,6 +69,7 @@
    */
   export let userRole;
   export let activeTabType;
+  export let isWebApp;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -275,24 +282,40 @@
       }
     }}
     style={folder?.id
-      ? "padding-left: 62.5px; gap:4px;"
-      : "padding-left: 48.5px; gap:4px; "}
+      ? "padding-left: 70.5px; gap:4px;"
+      : "padding-left: 44.5px; gap:4px; "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
-    {#if api?.isDeleted && "activeSync"}
+    <!-- {#if api?.isDeleted && "activeSync"}
       <span
         class="delete-ticker position-absolute sparrow-fs-10 px-2 d-none"
         style="right: 0; background-color: var(--background-color); "
         >DELETED</span
       >
-    {/if}
-    {#if "actSync" && api?.source === "SPEC"}
+    {/if} -->
+    <!-- {#if "actSync" && api?.source === "SPEC"}
       <img src={reloadSyncIcon} class="ms-2 d-none" alt="" />
-    {/if}
+    {/if} -->
+
+    <span
+      on:click|stopPropagation={() => {
+        expand = !expand;
+      }}
+      style="  display: flex; "
+    >
+      {#if !isWebApp}
+        <Button
+          startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+        />
+      {/if}
+    </span>
     <div
       class="api-method text-{httpMethodUIStyle} {api?.isDeleted &&
         'api-method-deleted'}"
@@ -353,6 +376,32 @@
     </Tooltip>
   {/if}
 </div>
+{#if !isWebApp}
+  <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
+    <div class="sub-files position-relative">
+      <div
+        class="box-line"
+        style={folder?.id ? "left: 84.5px;" : "left: 58.5px;"}
+      ></div>
+      <!-- {#if } -->
+      {#each api?.items || [] as exp}
+        <div>
+          <SavedRequest
+            {userRole}
+            api={exp}
+            request={api}
+            {onItemRenamed}
+            {onItemDeleted}
+            {onItemOpened}
+            {folder}
+            {collection}
+            {activeTabId}
+          />
+        </div>
+      {/each}
+    </div>
+  </div>
+{/if}
 
 <style lang="scss">
   .delete-ticker {
@@ -517,5 +566,13 @@
 
   .draggable:active {
     opacity: 0.9;
+  }
+  .box-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: var(--bg-ds-surface-100);
+    z-index: 200;
   }
 </style>

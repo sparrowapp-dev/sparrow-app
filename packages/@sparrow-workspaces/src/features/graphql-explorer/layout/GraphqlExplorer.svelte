@@ -243,7 +243,7 @@
               minSize={30}
               size={$tab.property.graphql?.state
                 ?.requestBuilderLeftSplitterWidthPercentage}
-              class="position-relative bg-secondary-850-important"
+              class="position-relative bg-transparent"
             >
               <div class="h-100">
                 <Splitpanes
@@ -264,7 +264,7 @@
                     minSize={30}
                     size={$tab.property.graphql?.state
                       ?.requestLeftSplitterWidthPercentage}
-                    class="position-relative bg-secondary-850-important"
+                    class="position-relative bg-transparent"
                   >
                     <!-- Request Pane -->
                     <div
@@ -333,7 +333,7 @@
                     minSize={30}
                     size={$tab.property.graphql?.state
                       ?.requestRightSplitterWidthPercentage}
-                    class="bg-secondary-850-important position-relative"
+                    class="bg-transparent position-relative"
                   >
                     <!-- Response Pane -->
                     <div
@@ -389,7 +389,7 @@
               minSize={30}
               size={$tab.property.graphql?.state
                 ?.requestBuilderRightSplitterWidthPercentage}
-              class="position-relative bg-secondary-850-important"
+              class="position-relative bg-transparent"
             >
               <div class="h-100 d-flex flex-column">
                 <div class="mb-2 pt-1">
@@ -473,24 +473,24 @@
 
 <style>
   .rest-explorer-layout {
-    background-color: var(--bg-secondary-850);
+    background-color: var(--bg-ds-surface-900);
   }
 
   :global(.graph-rest-splitter.splitpanes--vertical > .splitpanes__splitter) {
-    width: 10.5px !important;
+    width: 11px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
-    border-left: 5px solid var(--border-secondary-800) !important;
-    border-right: 5px solid var(--border-secondary-800) !important;
+    border-left: 5px solid var(--border-ds-surface-900) !important;
+    border-right: 5px solid var(--border-ds-surface-900) !important;
     border-top: 0 !important;
     border-bottom: 0 !important;
   }
   :global(.graph-rest-splitter.splitpanes--horizontal > .splitpanes__splitter) {
-    height: 10.5px !important;
+    height: 11px !important;
     width: 100% !important;
     background-color: var(--bg-secondary-500) !important;
-    border-top: 5px solid var(--border-secondary-800) !important;
-    border-bottom: 5px solid var(--border-secondary-800) !important;
+    border-top: 5px solid var(--border-ds-surface-900) !important;
+    border-bottom: 5px solid var(--border-ds-surface-900) !important;
     border-left: 0 !important;
     border-right: 0 !important;
   }
@@ -501,20 +501,20 @@
     background-color: var(--bg-primary-200) !important;
   }
   :global(.graph-ql-splitter.splitpanes--vertical > .splitpanes__splitter) {
-    width: 10.5px !important;
+    width: 11px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
-    border-left: 5px solid var(--border-secondary-800) !important;
-    border-right: 5px solid var(--border-secondary-800) !important;
+    border-left: 5px solid var(--border-ds-surface-900) !important;
+    border-right: 5px solid var(--border-ds-surface-900) !important;
     border-top: 0 !important;
     border-bottom: 0 !important;
   }
   :global(.graph-ql-splitter.splitpanes--horizontal > .splitpanes__splitter) {
-    height: 10.5px !important;
+    height: 11px !important;
     width: 100% !important;
     background-color: var(--bg-secondary-500) !important;
-    border-top: 5px solid var(--border-secondary-800) !important;
-    border-bottom: 5px solid var(--border-secondary-800) !important;
+    border-top: 5px solid var(--border-ds-surface-900) !important;
+    border-bottom: 5px solid var(--border-ds-surface-900) !important;
     border-left: 0 !important;
     border-right: 0 !important;
   }

@@ -3,7 +3,7 @@
   import Request from "./Request.svelte";
   import { collectionIconIcon as collectionIcon } from "@sparrow/library/assets";
   let folderExpand: boolean = false;
-  let collectionExpand: boolean = false;
+let collectionExpand: boolean = false;
 
   export let onItemOpened: (entityType: string, args: any) => void;
   export let workspaceId: string;

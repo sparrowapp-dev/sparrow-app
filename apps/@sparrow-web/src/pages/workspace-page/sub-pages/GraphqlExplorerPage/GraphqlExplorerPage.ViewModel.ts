@@ -104,6 +104,7 @@ class GraphqlExplorerViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
+        t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
         this.authHeader = new ReduceAuthHeader(
           this._tab.getValue().property?.graphql
@@ -267,18 +268,14 @@ class GraphqlExplorerViewModel {
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: true,
-        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = true;
-      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
-        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
-      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
