@@ -438,13 +438,13 @@
           {#if expand}
             <div
               style="height:24px; width:30px;"
-              class="d-flex align-items-center justify-content-center me-2"
+              class="d-flex align-items-center justify-content-center"
             >
-              <FolderOpenRegular />
+              <FolderOpenRegular color="var(--icon-ds-neutral-300)" />
             </div>
           {:else}
             <div class="d-flex me-2" style="height:24px; width:30px;">
-              <FolderRegular />
+              <FolderRegular color="var(--icon-ds-neutral-300)" />
             </div>
           {/if}
           {#if isRenaming}
@@ -778,7 +778,7 @@
   }
 
   .main-folder {
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
   }
   .active-folder-tab {
     background-color: var(--bg-tertiary-400) !important;
@@ -787,7 +787,7 @@
     border-radius: 2px;
   }
   .folder-title {
-    width: calc(100% - 40px);
+    width: calc(100% - 58px);
   }
   .folder-icon {
     width: 16px;

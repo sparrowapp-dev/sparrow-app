@@ -490,10 +490,10 @@
     />
     {#if isRenaming}
       <input
-        class="py-0 renameInputFieldCollection w-100"
+        class="py-0 renameInputFieldCollection w-100 ellipsis"
         id="renameInputFieldCollection"
         type="text"
-        style="font-size: 12px; font-weight:500; line-height:18px; gap: 4px;"
+        style="font-size: 12px; font-weight:500; line-height:18px; gap: 4px; "
         value={collection.name}
         maxlength={100}
         bind:this={inputField}
@@ -504,12 +504,12 @@
       />
     {:else}
       <div
-        class="collection-collection-name justify-content-center d-flex align-items-center py-1 mb-0 flex-column"
-        style="height: 32px; text-align: left;"
+        class="collection-collection-name justify-content-center d-flex py-1 mb-0 flex-column"
+        style="height: 32px; text-align: left; width:80%"
       >
         <p
-          class="ellipsis w-100 mb-0"
-          style="font-size: 12px; font-weight:500; line-height:18px; "
+          class="ellipsis mb-0"
+          style="font-size: 12px; font-weight:500; line-height:18px;  "
         >
           {collection.name}
         </p>
@@ -960,7 +960,7 @@
     border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-collection {
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
   }
   .active-collection-tab {
     background-color: var(--bg-ds-surface-500) !important;

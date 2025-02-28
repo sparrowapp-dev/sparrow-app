@@ -293,7 +293,7 @@
         class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
         style="font-size: 12px; font-weight:500; line-height:18px;"
       >
-        {api.name}
+        <p class="ellipsis m-0 p-0">{api.name}</p>
       </div>
     {/if}
   </button>
@@ -345,7 +345,7 @@
     font-size: 12px;
     height: 24px;
     line-height: 18px;
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
     text-align: left;
     display: flex;
     align-items: center;
@@ -469,7 +469,7 @@
     border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
-    width: calc(100% - 24px);
+    width: calc(100% - 28px);
   }
   .active-request-tab {
     background-color: var(--bg-tertiary-400) !important;

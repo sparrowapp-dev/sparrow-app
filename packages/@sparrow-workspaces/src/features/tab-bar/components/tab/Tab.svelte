@@ -336,9 +336,7 @@
     /* border-radius: 2px; */
   }
   .ellipsis {
-    color: var(--text-secondary-100);
-  }
-  .ellipsis:hover {
-    color: var(--text-secondary-100);
+    color: var(--text-ds-neutral-300);
+    font-size: 12px;
   }
 </style>
