@@ -322,6 +322,7 @@ const disconnectWebSocket = async (tab_id: string) => {
         !isEnableWebSocketCloud
       ) {
         socketInsta.close();
+        notifications.success("WebSocket disconnected successfully");
       } else {
         socketInsta?.emit(
           "sparrow_internal_disconnect",
@@ -1115,6 +1116,8 @@ const connectSocketIo = async (
  * @param _tabId - The ID of the tab for which the Socket.IO connection should be disconnected.
  */
 const disconnectSocketIo = async (_tabId: string): Promise<void> => {
+  console.log("in disconnectSocketIo() :>> ");
+
   let url = "";
   socketIoDataStore.update((socketIoDataMap) => {
     const wsData = socketIoDataMap.get(_tabId);
@@ -1137,6 +1140,9 @@ const disconnectSocketIo = async (_tabId: string): Promise<void> => {
         !isEnableSocketIoCloud
       ) {
         socketInsta?.disconnect();
+        notifications.success(
+          `${SocketIORequestDefaultAliasBaseEnum.NAME} disconnected successfully.`,
+        );
       } else {
         socketInsta?.emit(
           "sparrow_internal_disconnect",
