@@ -113,6 +113,7 @@
   export let isTourGuideOpen = false;
   export let isWebApp = false;
   export let azureBlobCDN;
+  export let onSaveResponse;
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -260,7 +261,7 @@
               minSize={30}
               size={$tab.property.request?.state
                 ?.requestLeftSplitterWidthPercentage}
-              class="position-relative bg-secondary-850-important"
+              class="position-relative bg-transparent"
             >
               <!-- Request Pane -->
               <div
@@ -348,7 +349,7 @@
               minSize={30}
               size={$tab.property.request?.state
                 ?.requestRightSplitterWidthPercentage}
-              class="bg-secondary-850-important position-relative"
+              class="bg-transparent position-relative"
             >
               <!-- Response Pane -->
               <div
@@ -385,9 +386,12 @@
                             <ResponseBodyNavigator
                               response={storeData?.response}
                               apiState={storeData?.response}
+                              path={$tab.path}
                               {onUpdateResponseState}
                               {onClearResponse}
+                              {onSaveResponse}
                               {isWebApp}
+                              {isGuestUser}
                             />
                           {/if}
                           <div style="flex:1; overflow:auto;">
@@ -517,30 +521,30 @@
 
 <style>
   .rest-explorer-layout {
-    background-color: var(--bg-secondary-850);
+    background-color: var(--bg-ds-surface-900);
   }
 
-  :global(.rest-splitter.splitpanes--vertical .splitpanes__splitter) {
-    width: 10.5px !important;
+  :global(.rest-splitter.splitpanes--vertical > .splitpanes__splitter) {
+    width: 11px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
-    border-left: 5px solid var(--border-secondary-800) !important;
-    border-right: 5px solid var(--border-secondary-800) !important;
+    border-left: 5px solid var(--border-ds-surface-900) !important;
+    border-right: 5px solid var(--border-ds-surface-900) !important;
     border-top: 0 !important;
     border-bottom: 0 !important;
   }
-  :global(.rest-splitter.splitpanes--horizontal .splitpanes__splitter) {
-    height: 10.5px !important;
+  :global(.rest-splitter.splitpanes--horizontal > .splitpanes__splitter) {
+    height: 11px !important;
     width: 100% !important;
     background-color: var(--bg-secondary-500) !important;
-    border-top: 5px solid var(--border-secondary-800) !important;
-    border-bottom: 5px solid var(--border-secondary-800) !important;
+    border-top: 5px solid var(--border-ds-surface-900) !important;
+    border-bottom: 5px solid var(--border-ds-surface-900) !important;
     border-left: 0 !important;
     border-right: 0 !important;
   }
   :global(
-    .rest-splitter .splitpanes__splitter:active,
-    .rest-splitter .splitpanes__splitter:hover
+    .rest-splitter > .splitpanes__splitter:active,
+    .rest-splitter > .splitpanes__splitter:hover
   ) {
     background-color: var(--bg-primary-200) !important;
   }

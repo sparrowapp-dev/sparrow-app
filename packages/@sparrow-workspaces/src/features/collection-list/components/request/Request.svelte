@@ -21,7 +21,14 @@
     CollectionItemBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+  import {
+    ChevronDownRegular,
+    ChevronRightRegular,
+    MoreHorizontalRegular,
+  } from "@sparrow/library/icons";
+  import { SavedRequest } from "..";
 
+  let expand = false;
   /**
    * Callback for Item Deleted
    * @param entityType - type of item to delete like request/folder
@@ -62,6 +69,7 @@
    */
   export let userRole;
   export let activeTabType;
+  export let isWebApp;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -248,19 +256,20 @@
 {/if}
 
 <div
+  tabindex="0"
   draggable={activeTabType === "TESTFLOW" ? true : false}
   on:dragstart={(event) => {
     dragStart(event, collection);
   }}
   bind:this={requestTabWrapper}
-  class="d-flex draggable align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {api.id ===
+  class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
-    : ''} "
-  style="height:32px;
-"
+    : ''}"
+  style="height:32px; padding-left:3px; gap:4px;  margin-bottom: 2px;"
 >
   <button
+    tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
       if (!isRenaming) {
@@ -272,27 +281,45 @@
         });
       }
     }}
-    style={folder?.id ? "padding-left: 46px;" : "padding-left: 30px;"}
+    style={folder?.id
+      ? "padding-left: 70.5px; gap:4px;"
+      : "padding-left: 44.5px; gap:4px; "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
-    {#if api?.isDeleted && "activeSync"}
+    <!-- {#if api?.isDeleted && "activeSync"}
       <span
         class="delete-ticker position-absolute sparrow-fs-10 px-2 d-none"
         style="right: 0; background-color: var(--background-color); "
         >DELETED</span
       >
-    {/if}
-    {#if "actSync" && api?.source === "SPEC"}
+    {/if} -->
+    <!-- {#if "actSync" && api?.source === "SPEC"}
       <img src={reloadSyncIcon} class="ms-2 d-none" alt="" />
-    {/if}
+    {/if} -->
+
+    <span
+      on:click|stopPropagation={() => {
+        expand = !expand;
+      }}
+      style="  display: flex; "
+    >
+      {#if !isWebApp && api?.items && api?.items?.length > 0}
+        <Button
+          startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+        />
+      {/if}
+    </span>
     <div
       class="api-method text-{httpMethodUIStyle} {api?.isDeleted &&
         'api-method-deleted'}"
-      style="font-size: 12px;"
+      style="font-size: 9px;"
     >
       {api.request?.method?.toUpperCase() === "DELETE"
         ? "DEL"
@@ -302,7 +329,7 @@
     {#if isRenaming}
       <input
         class="py-0 renameInputFieldFile"
-        style="font-size: 12px; width: calc(100% - 50px);"
+        style="font-size: 12px; width: calc(100% - 50px); "
         id="renameInputFieldFile"
         type="text"
         maxlength={100}
@@ -333,21 +360,48 @@
       zIndex={701}
       distance={17}
     >
-      <button
-        id={`show-more-api-${api.id}`}
-        class="threedot-icon-container border-0 p-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
-        style="transform: rotate(90deg);"
-        on:click={(e) => {
-          rightClickContextMenu(e);
-        }}
-      >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
+      <span class="threedot-icon-container d-flex">
+        <Button
+          tabindex={-1}
+          id={`show-more-api-${api.id}`}
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+          startIcon={MoreHorizontalRegular}
+          onClick={(e) => {
+            rightClickContextMenu(e);
+          }}
+        />
+      </span>
     </Tooltip>
   {/if}
 </div>
+{#if !isWebApp}
+  <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
+    <div class="sub-files position-relative">
+      <div
+        class="box-line"
+        style={folder?.id ? "left: 84.5px;" : "left: 58.5px;"}
+      ></div>
+      <!-- {#if } -->
+      {#each api?.items || [] as exp}
+        <div>
+          <SavedRequest
+            {userRole}
+            api={exp}
+            request={api}
+            {onItemRenamed}
+            {onItemDeleted}
+            {onItemOpened}
+            {folder}
+            {collection}
+            {activeTabId}
+          />
+        </div>
+      {/each}
+    </div>
+  </div>
+{/if}
 
 <style lang="scss">
   .delete-ticker {
@@ -355,20 +409,29 @@
     font-weight: 500;
   }
   .api-method {
-    font-size: 10px;
-    font-weight: 500;
-    width: 48px !important;
-    height: 30px;
-    padding-left: 6px;
-    padding-right: 4px;
-    border-radius: 8px;
+    font-size: 9px;
+    font-weight: 600;
+    width: 30px !important;
+    height: 24px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
+    justify-content: center;
   }
   .api-name {
-    font-weight: 400;
+    height: 24px;
+    line-height: 18px;
+    font-weight: 500;
     width: calc(100% - 48px);
     text-align: left;
+    color: var(--bg-ds-neutral-50);
+    display: flex;
+    align-items: center;
+    padding: 4px 2px;
+    caret-color: var(--bg-ds-primary-300);
+  }
+  .api-name:focus {
+    border: 1px solid var(--bg-ds-primary-300) !important;
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;
@@ -400,34 +463,44 @@
 
   .threedot-icon-container {
     visibility: hidden;
-    background-color: transparent;
-  }
-
-  .threedot-icon-container:active {
-    background-color: var(--bg-secondary-420) !important;
   }
 
   .threedot-active {
     visibility: visible;
     background-color: var(--bg-tertiary-600);
   }
-  .threedot-icon-container:hover {
-    background-color: var(--bg-tertiary-190);
-  }
 
   .btn-primary {
     background-color: transparent;
-    color: var(--white-color);
+    color: var(--bg-ds-neutral-50);
     padding-right: 5px;
     border-radius: 2px;
   }
-
   .btn-primary:hover {
-    background-color: var(--bg-tertiary-600);
-    color: var(--white-color);
-    border-radius: 2px;
+    background-color: var(--bg-ds-surface-400);
+    color: var(--text-ds-neutral-50);
+    border-radius: 4px;
   }
-
+  .btn-primary:hover .threedot-icon-container {
+    visibility: visible;
+  }
+  .btn-primary:active {
+    background-color: var(--bg-ds-surface-500);
+    color: var(--text-ds-neutral-50);
+    border-radius: 4px;
+  }
+  .btn-primary:focus-visible .threedot-icon-container {
+    visibility: visible;
+  }
+  .btn-primary:focus-visible {
+    border-radius: 4px;
+    background-color: var(--bg-ds-surface-400);
+    border: 2px solid var(--bg-ds-primary-300);
+    outline: none;
+  }
+  .btn-primary:focus-visible .threedot-icon-container {
+    visibility: visible;
+  }
   .btn-primary:hover {
     .delete-ticker {
       background-color: var(--border-color) !important;
@@ -462,26 +535,30 @@
     pointer-events: none;
   }
   .renameInputFieldFile {
-    border: none;
+    height: 24px;
     background-color: transparent;
-    color: var(--white-color);
-    padding-left: 0;
+    color: var(--bg-ds-neutral-50);
+    padding: 4px 2px;
     outline: none;
-    border-radius: 2px !important;
+    border-radius: 4px !important;
+    border: 1px solid var(--bg-ds-primary-300);
+    caret-color: var(--bg-ds-primary-300);
   }
   .renameInputFieldFile:focus {
-    border: 1px solid var(--border-primary-300) !important;
+    border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
     width: calc(100% - 24px);
   }
   .active-request-tab {
-    background-color: var(--bg-tertiary-400) !important;
+    background-color: var(--bg-ds-surface-500) !important;
+    border-radius: 4px;
     .delete-ticker {
       background-color: var(--selected-active-sidebar) !important;
     }
   }
   .active-request-tab:hover {
+    border-radius: 4px;
     .delete-ticker {
       background-color: var(--selected-active-sidebar) !important;
     }
@@ -489,5 +566,13 @@
 
   .draggable:active {
     opacity: 0.9;
+  }
+  .box-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: var(--bg-ds-surface-100);
+    z-index: 150;
   }
 </style>

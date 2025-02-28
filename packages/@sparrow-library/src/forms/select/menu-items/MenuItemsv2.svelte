@@ -2,6 +2,7 @@
   /**
    * select option list
    */
+  import { CheckMarkIcon } from "@sparrow/library/icons";
   export let list: {
     name: string;
     id: string;
@@ -24,6 +25,8 @@
   export let selectedRequest: {
     id: string;
   };
+
+  export let showDescription= true;
   /**
    * Ticked mark icon
    */
@@ -65,7 +68,11 @@
       return `select-hover-highlight-violet-btn`;
     } else if (_bodyTheme === "dark" && _isMenuItemHover) {
       return `select-hover-highlight-dark-btn`;
-    } else {
+    } 
+    else if (_bodyTheme === "surface" && _isMenuItemHover) {
+      return `select-hover-highlight-surface-btn`;
+    } 
+    else {
       return "";
     }
   };
@@ -100,6 +107,7 @@
     isMenuItemHover,
     isMenuItemClicked,
   )}"
+  tabindex="0"
 >
   <div class="content-wrapper">
     <p
@@ -109,15 +117,15 @@
     >
       {list.name}
     </p>
-    {#if list.description}
+    {#if list.description && showDescription}
       <div class="description-wrapper">
         <small class="text-textColor description">{list.description}</small>
       </div>
     {/if}
   </div>
   {#if selectedRequest?.id === list.id}
-    <span class="d-flex align-items-center justify-content-center tick-icon">
-      <img src={tickIcon} alt="" />
+     <span class="d-flex align-items-center justify-content-center tick-icon">
+      <CheckMarkIcon color="var(--text-primary-300)" size="medium" />
     </span>
   {/if}
 </div>
@@ -125,6 +133,16 @@
 <style>
   .select-option-container {
     width: 100%;
+   
+  }
+  .select-option-container:focus-visible {
+     outline: 2px solid var(--bg-ds-primary-300);
+     outline-offset: -2px;
+     border-radius:4px;
+  }
+
+  .select-option-container:active{
+    background-color: var(--bg-ds-surface-500);
   }
 
   .content-wrapper {
@@ -166,6 +184,9 @@
   }
   .select-hover-highlight-violet-btn {
     background-color: var(--bg-tertiary-600);
+  }
+  .select-hover-highlight-surface-btn{
+    background-color: var(--bg-ds-surface-400);
   }
 
   /* clicked states */

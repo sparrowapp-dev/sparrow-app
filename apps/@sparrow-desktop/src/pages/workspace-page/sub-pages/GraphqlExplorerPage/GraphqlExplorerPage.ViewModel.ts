@@ -46,7 +46,11 @@ import { v4 as uuidv4 } from "uuid";
 import type { GuideQuery } from "../../../../types/user-guide";
 import { graphqlExplorerDataStore } from "@sparrow/workspaces/features/graphql-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
-import type { Path, Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Path,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import {
   GraphqlRequestOperationTabEnum,
   type GraphqlRequestAuthTabInterface,
@@ -98,6 +102,7 @@ class GraphqlExplorerViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
+        t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
         this.authHeader = new ReduceAuthHeader(
           this._tab.getValue().property?.graphql

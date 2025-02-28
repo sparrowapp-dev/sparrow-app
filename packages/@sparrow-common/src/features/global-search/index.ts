@@ -1,0 +1,1 @@
+export { default as GlobalSearch} from "./layout/GlobalSearch.svelte";

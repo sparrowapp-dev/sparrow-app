@@ -37,7 +37,11 @@ import {
   type KeyValue,
   type StatePartial,
 } from "@sparrow/common/types/workspace";
-import { type Path, type Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Path,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import { notifications } from "@sparrow/library/ui";
 import { CollectionService } from "../../../../services/collection.service";
 import { GuestUserRepository } from "../../../../repositories/guest-user.repository";
@@ -89,6 +93,7 @@ class SocketIoExplorerPageViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
+        t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
       }, 0);
     }
