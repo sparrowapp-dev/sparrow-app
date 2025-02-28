@@ -45,3 +45,6 @@ vite.config.ts.timestamp*
 
 #pnpm lock
 pnpm-lock.yaml
+
+
+.eslintignore
