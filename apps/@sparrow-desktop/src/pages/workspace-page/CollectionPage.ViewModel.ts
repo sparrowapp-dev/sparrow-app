@@ -79,7 +79,11 @@ import type { FeatureQuery } from "../../types/feature-switch";
 import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/utils";
 
 import { createDeepCopy } from "@sparrow/common/utils";
-import { GraphqlTabAdapter, SocketIoTabAdapter } from "../../adapter";
+import {
+  GraphqlTabAdapter,
+  RequestSavedTabAdapter,
+  SocketIoTabAdapter,
+} from "../../adapter";
 import type {
   SocketIORequestDeletePayloadDtoInterface,
   SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
@@ -2052,6 +2056,31 @@ export default class CollectionsViewModel {
    * @param request : - The request going to be opened on tab
    * @param path : - The path to the request
    */
+  private handleOpenSavedRequest = (
+    workspaceId: string,
+    collection: CollectionDto,
+    folder: CollectionItemsDto,
+    _request: CollectionItemsDto,
+    _savedRequest: CollectionItemsDto,
+  ) => {
+    const requestSavedTabAdapter = new RequestSavedTabAdapter();
+    const adaptedRequest = requestSavedTabAdapter.adapt(
+      workspaceId || "",
+      collection?.id || "",
+      folder?.id || "",
+      _request?.id,
+      _savedRequest,
+    );
+    adaptedRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
+    this.tabRepository.createTab(adaptedRequest);
+    moveNavigation("right");
+  };
+
+  /**
+   * Handles opening a request on a tab
+   * @param request : - The request going to be opened on tab
+   * @param path : - The path to the request
+   */
   public handleOpenGraphqlTab = (
     workspaceId: string,
     collection: CollectionDto,
@@ -2307,6 +2336,140 @@ export default class CollectionsViewModel {
             name: newRequestName,
           });
           MixpanelEvent(Events.RENAME_REQUEST, {
+            source: "Collection list",
+          });
+        }
+      }
+    }
+  };
+
+  /**
+   * Handles renaming a saved request
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which the request is saved
+   * @param folder : - the folder in which the request is saved(if request if saved inside a folder)
+   * @param request : - the request in which the response is saved
+   * @param requestResponse : - the requestResponse which is going to be renamed.
+   * @param newRequestName : - the new name of the saved request
+   */
+  private handleRenameSavedRequest = async (
+    workspaceId: string,
+    collection: CollectionDto,
+    folder: CollectionItemsDto,
+    request: CollectionItemsDto,
+    requestResponse: CollectionItemsDto,
+    newRequestName: string,
+  ) => {
+    let userSource = {};
+    if (request.source === "USER") {
+      userSource = {
+        currentBranch: collection.currentBranch
+          ? collection.currentBranch
+          : collection.primaryBranch,
+        source: "USER",
+      };
+    }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (collection.id && workspaceId && !folder.id) {
+        const response =
+          await this.collectionRepository.readRequestOrFolderInCollection(
+            collection.id,
+            request.id,
+          );
+        const storage = request;
+        storage.name = newRequestName;
+        await this.collectionRepository.updateRequestOrFolderInCollection(
+          collection.id,
+          request.id,
+          response,
+        );
+        this.updateTab(requestResponse.id, {
+          name: newRequestName,
+        });
+        MixpanelEvent(Events.RENAME_REQUEST, {
+          source: "Collection list",
+        });
+      } else if (collection.id && workspaceId && folder.id) {
+        const response = await this.collectionRepository.readRequestInFolder(
+          collection.id,
+          folder.id,
+          request.id,
+        );
+        const storage = request;
+        storage.name = newRequestName;
+        await this.collectionRepository.updateRequestInFolder(
+          collection.id,
+          folder.id,
+          request.id,
+          response,
+        );
+        this.updateTab(requestResponse.id, {
+          name: newRequestName,
+        });
+        MixpanelEvent(Events.RENAME_REQUEST, {
+          source: "Collection list",
+        });
+      }
+      return;
+    }
+
+    if (newRequestName) {
+      if (collection.id && workspaceId && !folder.id) {
+        // const storage = request;
+        // storage.name = newRequestName;
+        const response =
+          await this.collectionService.updateSavedRequestInCollection(
+            requestResponse.id,
+            {
+              collectionId: collection.id,
+              workspaceId: workspaceId,
+              requestId: request.id,
+              name: newRequestName,
+            },
+          );
+        if (response.isSuccessful) {
+          this.collectionRepository.updateSavedRequestInCollection(
+            collection.id,
+            request.id,
+            requestResponse.id,
+            { name: newRequestName },
+          );
+          this.updateTab(requestResponse.id, {
+            name: newRequestName,
+          });
+          MixpanelEvent(Events.RENAME_RESPONSE, {
+            source: "Collection list",
+          });
+        }
+      } else if (collection.id && workspaceId && folder.id) {
+        const response =
+          await this.collectionService.updateSavedRequestInCollection(
+            requestResponse.id,
+            {
+              collectionId: collection.id,
+              workspaceId: workspaceId,
+              folderId: folder.id,
+              requestId: request.id,
+              name: newRequestName,
+            } as CreateApiRequestPostBody,
+          );
+        if (response.isSuccessful) {
+          this.collectionRepository.updateSavedRequestInFolder(
+            collection.id,
+            folder.id,
+            request.id,
+            requestResponse.id,
+            { name: newRequestName },
+          );
+          this.updateTab(requestResponse.id, {
+            name: newRequestName,
+          });
+          MixpanelEvent(Events.RENAME_RESPONSE, {
             source: "Collection list",
           });
         }
@@ -2994,6 +3157,105 @@ export default class CollectionsViewModel {
       return true;
     } else {
       notifications.error("Failed to delete API request. Plaease try again.");
+      return false;
+    }
+  };
+
+  /**
+   * Handle deleting request from repository as well as backend
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - The collection in which the request is saved
+   * @param request : - The request to be deleted
+   * @param folder : - The folder in which the request is saved(if is saved in a folder)
+   * @returns :void
+   */
+  private handleDeleteSavedRequest = async (
+    workspaceId: string,
+    collection: CollectionDto,
+    request: CollectionItemsDto,
+    folder: CollectionItemsDto,
+    requestResponse: CollectionItemsDto,
+  ): Promise<boolean> => {
+    let userSource = {};
+    if (collection.activeSync) {
+      userSource = {
+        currentBranch: collection.currentBranch,
+      };
+    }
+
+    let requestObject = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      requestId: request.id,
+      folderId: "",
+      ...userSource,
+    };
+
+    if (folder && collection.id && workspaceId) {
+      requestObject = {
+        ...requestObject,
+        folderId: folder.id,
+      };
+    }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (folder) {
+        await this.collectionRepository.deleteRequestInFolder(
+          collection.id,
+          folder.id,
+          request.id,
+        );
+        this.tabRepository.removeTab(request.id);
+      } else {
+        await this.collectionRepository.deleteRequestOrFolderInCollection(
+          collection.id,
+          request.id,
+        );
+        this.tabRepository.removeTab(request.id);
+      }
+
+      return true;
+    }
+    const response =
+      await this.collectionService.deleteSavedRequestInCollection(
+        requestResponse.id,
+        requestObject,
+      );
+
+    if (response.isSuccessful) {
+      if (
+        requestObject.folderId &&
+        requestObject.collectionId &&
+        requestObject.workspaceId
+      ) {
+        await this.collectionRepository.deleteSavedRequestInFolder(
+          requestObject.collectionId,
+          requestObject.folderId,
+          request.id,
+          requestResponse.id,
+        );
+      } else if (requestObject.workspaceId && requestObject.collectionId) {
+        await this.collectionRepository.deleteSavedRequestInCollection(
+          requestObject.collectionId,
+          request.id,
+          requestResponse.id,
+        );
+      }
+
+      notifications.success(`"${requestResponse.name}" Response deleted.`);
+      this.removeMultipleTabs([requestResponse.id]);
+      MixpanelEvent(Events.DELETE_RESPONSE, {
+        source: "Collection list",
+      });
+      return true;
+    } else {
+      notifications.error(
+        "Failed to delete saved response. Plaease try again.",
+      );
       return false;
     }
   };
@@ -3866,6 +4128,15 @@ export default class CollectionsViewModel {
           args.folder as CollectionItemsDto,
         );
         break;
+      case "saved_request":
+        this.handleDeleteSavedRequest(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.request as CollectionItemsDto,
+          args.folder as CollectionItemsDto,
+          args.requestResponse as CollectionItemsDto,
+        );
+        break;
     }
   };
 
@@ -3930,6 +4201,16 @@ export default class CollectionsViewModel {
           args.newName as string,
         );
         break;
+      case "saved_request":
+        this.handleRenameSavedRequest(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.request as CollectionItemsDto,
+          args.requestResponse as CollectionItemsDto,
+          args.newName as string,
+        );
+        break;
     }
   };
 
@@ -3954,10 +4235,7 @@ export default class CollectionsViewModel {
     return response;
   };
 
-  public handleOpenItem = async (
-    entitytype: string,
-    args: CollectionArgsDto,
-  ) => {
+  public handleOpenItem = async (entitytype: string, args: any) => {
     switch (entitytype) {
       case "collection":
         this.handleOpenCollection(
@@ -3978,6 +4256,15 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
           args.request as CollectionItemsDto,
+        );
+        break;
+      case "saved_request":
+        this.handleOpenSavedRequest(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.request as CollectionItemsDto,
+          args.savedRequest as CollectionItemsDto,
         );
         break;
       case "websocket":
@@ -5294,6 +5581,60 @@ export default class CollectionsViewModel {
       JSON.parse(data?.data?.response),
     );
     return response;
+  };
+
+  /**
+   * Saves saved http request
+   * @param componentData - refers overall saved request tab data.
+   * @returns status of the operation performed.
+   */
+  public saveSavedRequest = async (componentData: Tab): Promise<boolean> => {
+    const { folderId, collectionId, workspaceId, requestId } =
+      componentData.path;
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) return false;
+    const res = await this.collectionService.updateSavedRequestInCollection(
+      componentData.id,
+      {
+        collectionId: collectionId,
+        workspaceId: workspaceId,
+        requestId: requestId,
+        folderId: folderId,
+        description: componentData.description,
+      },
+    );
+
+    if (res.isSuccessful) {
+      if (folderId) {
+        this.collectionRepository.updateSavedRequestInFolder(
+          collectionId,
+          folderId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      } else {
+        this.collectionRepository.updateSavedRequestInCollection(
+          collectionId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      }
+      notifications.success("Response saved successfully.");
+      return true;
+    } else {
+      notifications.error("Failed to save response. Please try again.");
+      return false;
+    }
   };
 
   /**

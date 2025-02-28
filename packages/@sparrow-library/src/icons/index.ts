@@ -166,6 +166,10 @@ export {default as ThumbDislikeRegular} from "./ThumbDislikeRegular.svelte";
 export {default as ArrowSyncRegular} from "./ArrowSyncRegular.svelte"
 export {default as ThumbLikeFilled} from "./ThumbLikeFilled.svelte"
 export {default as ThumbDislikeFilled} from "./ThumbDislikeFilled.svelte"
+
+export { default as InfoRegular } from "./InfoRegular.svelte";
+export { default as ChevronUpRegular } from "./ChevronUpRegular.svelte";
+export { default as ChevronLeftRegular } from "./ChevronLeftFilled.svelte";
 export { default as DeleteRegular } from "./DeleteRegular.svelte";
 export { default as ReOrderDotsRegular } from "./ReOrderDotsRegular.svelte";
  
@@ -176,9 +180,16 @@ export { default as SocketIOIcon } from "./SocketIOICon.svelte";
 export { default as WorkspaceRegular } from "./WorkspaceRegular.svelte";
 export { default as SaveRegular } from "./SaveRegular.svelte";
 export { default as CaretDownFilled } from "./CaretDownFilled.svelte";
-export { default as CaretDownRegular } from "./CaretDownRegular.svelte";
-export { default as ChevronUpRegular } from "./ChevronUpRegular.svelte";
+export { default as SignOutIconRegular } from "./SignOutRegular.svelte";
+export { default as ArrowRightRegular } from "./ArrowRightRegular.svelte";
+export { default as CheckMarkIcon } from "./Checkmark.svelte";
+export { default as WindowMultipleIcon } from "./WindowMultiple.svelte";
+export { default as SubtractIcon } from "./SubtractRegular.svelte";
 export { default as AttachRegular } from "./AttachRegular.svelte";
-
 export { default as PeopleRegular } from "./CommunityRegular.svelte";
 export { default as PeopleFilled } from "./CommunityFilled.svelte";
+export { default as ErrorCircleRegular } from "./ErrorCircleRegular.svelte";
+export { default as CheckmarkCircleRegular } from "./CheckmarkCircleRegular.svelte";
+export { default as ClockRegular } from "./ClockRegular.svelte";
+export { default as ArrowDownloadRegular} from "./ArrowDownloadRegular.svelte";
+export { default as ArrowUpRightRegular } from "./ArrowUpRightRegular.svelte";

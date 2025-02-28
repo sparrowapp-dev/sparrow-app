@@ -395,7 +395,7 @@
       <div
         tabindex="0"
         bind:this={folderTabWrapper}
-        style="height:32px; padding-left:23px; margin-bottom:2px; "
+        style="height:32px; padding-left:48px; margin-bottom:2px; "
         class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
@@ -549,7 +549,10 @@
             />
           {/each}
           {#if !explorer?.items?.length}
-            <p class="text-fs-10 ps-5 my-2 text-secondary-300">
+            <p
+              class="text-fs-10 my-2 text-secondary-300"
+              style="padding-left: 90px;"
+            >
               This folder is empty
             </p>
           {/if}
@@ -595,6 +598,7 @@
           {folder}
           {collection}
           {activeTabId}
+          {isWebApp}
         />
       </div>
     {:else if explorer.type === CollectionItemTypeBaseEnum.WEBSOCKET}
@@ -767,10 +771,10 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 34px;
+    left: 58.5px;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
-    /* height: 100px; */
+    z-index: 200;
   }
 
   .main-folder {

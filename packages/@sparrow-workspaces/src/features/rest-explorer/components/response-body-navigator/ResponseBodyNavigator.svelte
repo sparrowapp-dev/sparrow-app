@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { downloadIcon } from "@sparrow/library/assets";
+  import { downloadIcon, SaveIcon } from "@sparrow/library/assets";
   import { copyIcon } from "@sparrow/library/assets";
   import {
     copyToClipBoard,
     handleDownloadResponse,
   } from "@sparrow/common/utils";
-  import { notifications, Tooltip } from "@sparrow/library/ui";
+  import { Button, notifications, Tooltip } from "@sparrow/library/ui";
   import {
     RequestDataType,
     ResponseFormatter,
@@ -19,13 +19,16 @@
   import { invoke } from "@tauri-apps/api/core";
   import { save } from "@tauri-apps/plugin-dialog";
   import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
-  import { CopyIcon, DownloadIcon2 } from "@sparrow/library/icons";
+  import { ArrowDownloadRegular, CopyRegular } from "@sparrow/library/icons";
 
   export let response;
   export let apiState;
   export let onUpdateResponseState;
   export let onClearResponse;
   export let isWebApp = false;
+  export let isGuestUser;
+  export let onSaveResponse;
+  export let path;
 
   let fileExtension: string;
   let formatedBody: string;
@@ -222,10 +225,22 @@
             Clear
           </button>
         </div>
+        {#if path?.collectionId && !isGuestUser && !isWebApp}
+          <!-- Save button -->
+          <Button
+            startIcon={SaveIcon}
+            onClick={onSaveResponse}
+            disable={false}
+            loader={false}
+            size={"small"}
+            title={"Save Response"}
+            type={"teritiary-regular"}
+          />
+        {/if}
         <!-- Copy button -->
-        <Tooltip title={"Copy"}>
+        <Tooltip title={"Copy"} placement={"bottom-center"}>
           <WithButtonV6
-            icon={CopyIcon}
+            icon={CopyRegular}
             onClick={handleCopy}
             disable={false}
             loader={false}
@@ -233,18 +248,18 @@
         </Tooltip>
         <!-- Download button -->
         {#if !isWebApp}
-          <Tooltip title={"Export"}>
+          <Tooltip title={"Export"} placement={"bottom-center"}>
             <WithButtonV6
-              icon={DownloadIcon2}
+              icon={ArrowDownloadRegular}
               onClick={handleDownloaded}
               disable={false}
               loader={false}
             />
           </Tooltip>
         {:else}
-          <Tooltip title={"Export"}>
+          <Tooltip title={"Export"} placement={"bottom-center"}>
             <WithButtonV6
-              icon={DownloadIcon2}
+              icon={ArrowDownloadRegular}
               onClick={() =>
                 handleDownloadResponse(
                   formatedBody,
