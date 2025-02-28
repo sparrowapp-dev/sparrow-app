@@ -617,7 +617,9 @@
         : 'none'};"
     >
       <div class=" ps-0 position-relative">
-        <div class="box-line"></div>
+        {#if collection?.items?.length > 0}
+          <div class="box-line"></div>
+        {/if}
         <div class="">
           {#each collection.items as explorer}
             <Folder
@@ -922,7 +924,7 @@
   .box-line {
     position: absolute;
     top: 0;
-    bottom: 23px;
+    bottom: 26px;
     left: 32.5px;
     width: 1px;
     background-color: var(--bg-ds-surface-100);

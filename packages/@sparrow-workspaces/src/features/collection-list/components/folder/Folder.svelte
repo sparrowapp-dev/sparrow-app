@@ -533,7 +533,9 @@
       </div>
       <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
         <div class="sub-files position-relative">
-          <div class="box-line"></div>
+          {#if explorer?.items?.length > 0}
+            <div class="box-line"></div>
+          {/if}
           {#each explorer?.items || [] as exp}
             <svelte:self
               {userRole}
