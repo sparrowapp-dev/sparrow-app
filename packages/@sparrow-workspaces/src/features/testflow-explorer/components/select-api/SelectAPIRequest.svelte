@@ -160,15 +160,15 @@
       },
     },
   ];
-  const truncateFolderName = (name: string) => {
-    if (name.length > 6) {
+  const truncateFolderName = (name: string, charLimit: number) => {
+    if (name.length > charLimit) {
       return name.substring(0, 4) + "...";
     }
     return name;
   };
-  const truncateCollectionName = (name: string) => {
-    if (name.length > 14) {
-      return name.substring(0, 12) + "...";
+  const truncateName = (name: string, charLimit: number) => {
+    if (name.length > charLimit) {
+      return name.substring(0, charLimit) + "...";
     }
     return name;
   };
@@ -204,7 +204,7 @@
           >
             {method}
           </span>
-          <span class="select-txt">{name}</span>
+          <span class="select-txt">{truncateName(name, 22)}</span>
         </div>
       {:else}
         <span class="select-txt-new">Select API Request</span>
@@ -257,7 +257,7 @@
             class="ellipsis label-text"
             style="margin-left: 4px; margin-bottom:0px"
           >
-            {truncateCollectionName(selectedCollection.name)}
+            {truncateName(selectedCollection.name, 12)}
           </p>
         </div>
         {#if selectedFolder}
@@ -273,7 +273,7 @@
               class="ellipsis label-text"
               style="margin-left: 4px; margin-bottom:0px;"
             >
-              {truncateFolderName(selectedFolder.name)}
+              {truncateFolderName(selectedFolder.name, 6)}
             </p>
           </div>
         {/if}
