@@ -37,7 +37,7 @@
           type="primary"
           size="small"
           startIcon={AddRegular}
-          disabled={isGuestUser}
+          disable={isGuestUser}
           onClick={() => {
             isCreateTeamModalOpen = true;
           }}

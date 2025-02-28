@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { downloadIcon } from "@sparrow/library/assets";
+  import { downloadIcon, SaveIcon } from "@sparrow/library/assets";
   import { copyIcon } from "@sparrow/library/assets";
   import {
     copyToClipBoard,
@@ -26,6 +26,8 @@
   export let onUpdateResponseState;
   export let onClearResponse;
   export let isWebApp = false;
+  export let onSaveResponse;
+  export let path;
 
   let fileExtension: string;
   let formatedBody: string;
@@ -222,8 +224,19 @@
             Clear
           </button>
         </div>
+        {#if path?.collectionId}
+          <!-- Save button -->
+          <Tooltip title={"Save"} placement={"top-center"}>
+            <WithButtonV6
+              icon={SaveIcon}
+              onClick={onSaveResponse}
+              disable={false}
+              loader={false}
+            />
+          </Tooltip>
+        {/if}
         <!-- Copy button -->
-        <Tooltip title={"Copy"}>
+        <Tooltip title={"Copy"} placement={"top-center"}>
           <WithButtonV6
             icon={CopyIcon}
             onClick={handleCopy}
@@ -233,7 +246,7 @@
         </Tooltip>
         <!-- Download button -->
         {#if !isWebApp}
-          <Tooltip title={"Export"}>
+          <Tooltip title={"Export"} placement={"top-right"}>
             <WithButtonV6
               icon={DownloadIcon2}
               onClick={handleDownloaded}

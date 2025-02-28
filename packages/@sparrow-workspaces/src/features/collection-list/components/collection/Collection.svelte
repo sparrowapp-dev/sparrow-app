@@ -453,7 +453,7 @@
 <div
   tabindex="0"
   bind:this={collectionTabWrapper}
-  style="height:32px; gap:4px;  padding-left:9.5px; margin-bottom:2px; "
+  style="height:32px; gap:4px;  padding-left:20.5px; margin-bottom:2px; "
   class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
@@ -923,7 +923,7 @@
     position: absolute;
     top: 0;
     bottom: 23px;
-    left: 20.5px;
+    left: 32.5px;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
     z-index: 1;

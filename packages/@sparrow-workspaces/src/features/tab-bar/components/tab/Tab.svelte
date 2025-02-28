@@ -105,7 +105,7 @@
     tabindex="-1"
     class="tab-item w-100 d-flex justify-content-between px-2 border-upper-radius h-100 align-items-center"
     style="   background-color: {tab.isActive
-      ? 'var(--bg-secondary-850) !important'
+      ? 'var(--bg-ds-surface-900) !important'
       : 'transparent'};  border-top : {tab.isActive
       ? tab?.persistence === TabPersistenceTypeEnum.TEMPORARY
         ? '2px solid var(--bg-ds-neutral-300)'
@@ -193,6 +193,26 @@
             color={"var(--icon-danger-1100)"}
           />
         </span>
+      {:else if tab.type === TabTypeEnum.SAVED_REQUEST}
+        <span>
+          <!-- <GraphIcon
+            height={"14px"}
+            width={"14px"}
+            color={"var(--icon-danger-1100)"}
+          /> -->
+          <span
+            class="text-fs-12"
+            style={Number(
+              tab?.property?.savedRequest?.responseStatus.split(" ")[0],
+            ) >= 200 &&
+            Number(tab?.property?.savedRequest?.responseStatus.split(" ")[0]) <
+              300
+              ? "color:var(--text-ds-success-300);"
+              : "color:var(--text-ds-danger-300);"}
+          >
+            {tab?.property?.savedRequest?.responseStatus.split(" ")[0]}
+          </span>
+        </span>
       {/if}
       <span
         class=" ms-1 text-fs-12 {!tab.isActive ? 'request-text' : ''}"
@@ -202,7 +222,7 @@
       </span>
     </button>
     <div style="align-items:center; justify-content:center;">
-      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
+      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
         <div
           class="badge-container badge"
           style="width:18px ; height:18px ; align-items:center; justify-content:center;"
