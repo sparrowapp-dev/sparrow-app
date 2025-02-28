@@ -347,7 +347,7 @@
     line-height: 18px;
     width: calc(100% - 48px);
     text-align: left;
-    display: flex;
+    // display: flex;
     align-items: center;
     padding: 4px 2px;
   }
