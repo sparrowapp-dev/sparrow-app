@@ -159,7 +159,6 @@ export { default as deleteIcon } from "./Delete.svelte";
 export {default as AIChatBotIcon } from "./AIChatBotIcon.svelte"
 export {default as StackRegular} from "./StackRegular.svelte";
 export {default as NavSparrow} from "./NavSparrow.svelte"
-export {default as CaretDown} from "./Caret.svelte"
 export {default as AISparcleWhite} from "./AISparcleWhite.svelte"
 export {default as CopyRegular} from "./CopyRegular.svelte"
 export {default as ThumbLikeRegular} from "./ThumbLikeRegular.svelte"
@@ -180,7 +179,6 @@ export { default as CaretDownFilled } from "./CaretDownFilled.svelte";
 export { default as CaretDownRegular } from "./CaretDownRegular.svelte";
 export { default as ChevronUpRegular } from "./ChevronUpRegular.svelte";
 export { default as AttachRegular } from "./AttachRegular.svelte";
- 
+
 export { default as PeopleRegular } from "./CommunityRegular.svelte";
 export { default as PeopleFilled } from "./CommunityFilled.svelte";
- 

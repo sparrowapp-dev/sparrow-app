@@ -14,7 +14,6 @@
     AIChatBotIcon,
     CrossIcon,
     DismissRegular,
-    CaretDown,
     CaretDownFilled,
   } from "@sparrow/library/icons";
   import { onMount } from "svelte";
