@@ -78,12 +78,15 @@
     data.onClick("0");
   }}
 >
-  <span
-    ><PlayArrow
-      height={"14px"}
-      width={"12px"}
-      color={"var(--bg-ds-neutral-50)"}
-    /><span class="ms-2 text-fs-12">Start</span>
+  <span>
+    <span style="opacity:{isAddBlockVisible ? '0.4' : '1'}">
+      <PlayArrow
+        height={"14px"}
+        width={"12px"}
+        color={"var(--bg-ds-neutral-50)"}
+      /><span class="ms-2 text-fs-12">Start</span>
+    </span>
+
     <Handle type="source" position={Position.Right} />
     {#if isAddBlockVisible}
       <div
