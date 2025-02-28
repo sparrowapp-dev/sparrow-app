@@ -36,7 +36,7 @@ class InitRequestTab {
       name: "New " + RequestDefault.NAME,
       type: TabTypeEnum.REQUEST,
       persistence: TabPersistenceTypeEnum.PERMANENT,
-      description: "",
+      description: "[]",
       source: "USER",
       isDeleted: false,
       activeSync: false,

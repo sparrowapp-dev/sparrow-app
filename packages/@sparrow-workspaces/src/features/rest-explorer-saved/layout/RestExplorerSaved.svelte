@@ -64,6 +64,7 @@
   import type { CancelRequestType } from "@workspaces/common/type/actions";
   import type { restExplorerData } from "../store/rest-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
+  import { ChevronRightRegular } from "@sparrow/library/icons";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -109,11 +110,13 @@
   export let isTourGuideOpen = false;
   export let isWebApp = false;
   export let azureBlobCDN;
+  export let onFetchParentRequest;
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
     isPopoverContainer = !isPopoverContainer;
   };
+  let parentRequest;
 
   onMount(async () => {
     const event = await onFetchCollectionGuide({
@@ -140,6 +143,18 @@
   $: {
     if (isTourGuideOpen) {
       isGuidePopup = true;
+    }
+  }
+  const fetchRequestData = async () => {
+    parentRequest = await onFetchParentRequest(
+      $tab.path.collectionId,
+      $tab.path.requestId,
+      $tab.path.folderId,
+    );
+  };
+  $: {
+    if ($tab.tabId) {
+      fetchRequestData();
     }
   }
   const toggleSaveRequest = (flag: boolean): void => {
@@ -237,8 +252,8 @@
       <div style="flex:1; overflow:auto;">
         {#if !isLoading}
           <Splitpanes
-            class="rest-splitter w-100 h-100"
-            id={"rest-splitter"}
+            class="rest-splitter-saved w-100 h-100"
+            id={"rest-splitter-saved"}
             horizontal={$requestSplitterDirection === "horizontal"
               ? true
               : false}
@@ -265,6 +280,15 @@
                   ? 'pb-1'
                   : 'pe-2'}"
               >
+                <div class="d-flex breadcrump-txt">
+                  <span class="parent-txt">{parentRequest?.name}</span>
+                  <ChevronRightRegular
+                    size={"12px"}
+                    color="var(--icon-ds-neutral-400)"
+                  />
+                  <span class="request-txt">{$tab.name}</span>
+                </div>
+                <div class="breadcrump-line" />
                 <RequestNavigator
                   requestStateSection={$tab.property.savedRequest?.state
                     ?.requestNavigation}
@@ -362,6 +386,8 @@
                       <ResponseNavigator
                         requestStateSection={$tab.property.savedRequest?.state
                           ?.responseNavigation}
+                        statusCodes={$tab.property.savedRequest?.responseStatus}
+                        date={$tab.property.savedRequest?.responseDate}
                         {onUpdateRequestState}
                         responseHeadersLength={$tab.property.savedRequest
                           ?.responseHeaders?.length || 0}
@@ -483,8 +509,8 @@
     background-color: var(--bg-ds-surface-900);
   }
 
-  :global(.rest-splitter.splitpanes--vertical .splitpanes__splitter) {
-    width: 10.5px !important;
+  :global(.rest-splitter-saved.splitpanes--vertical > .splitpanes__splitter) {
+    width: 11px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-left: 5px solid var(--border-ds-surface-900) !important;
@@ -492,8 +518,8 @@
     border-top: 0 !important;
     border-bottom: 0 !important;
   }
-  :global(.rest-splitter.splitpanes--horizontal .splitpanes__splitter) {
-    height: 10.5px !important;
+  :global(.rest-splitter-saved.splitpanes--horizontal > .splitpanes__splitter) {
+    height: 11px !important;
     width: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-top: 5px solid var(--border-ds-surface-900) !important;
@@ -502,8 +528,8 @@
     border-right: 0 !important;
   }
   :global(
-    .rest-splitter .splitpanes__splitter:active,
-    .rest-splitter .splitpanes__splitter:hover
+    .rest-splitter-saved > .splitpanes__splitter:active,
+    .rest-splitter-saved > .splitpanes__splitter:hover
   ) {
     background-color: var(--bg-primary-200) !important;
   }
@@ -511,5 +537,26 @@
     color: var(--text-primary-300);
     text-decoration: underline;
     cursor: pointer;
+  }
+  .parent-txt {
+    color: var(--text-ds-neutral-100);
+    font-size: 12px;
+    font-weight: 500;
+    padding-right: 10px;
+  }
+  .request-txt {
+    color: var(--text-ds-neutral-500);
+    font-size: 12px;
+    font-weight: 500;
+    padding-left: 10px;
+  }
+  .breadcrump-txt {
+    padding-left: 12px;
+    padding-bottom: 14px;
+  }
+  .breadcrump-line {
+    width: 100%;
+    border: 1px solid var(--border-ds-surface-50);
+    margin-bottom: 2px;
   }
 </style>

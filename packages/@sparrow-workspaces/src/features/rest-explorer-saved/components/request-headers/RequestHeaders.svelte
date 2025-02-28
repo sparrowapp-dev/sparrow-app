@@ -16,7 +16,7 @@
 
   export let isBulkEditActive;
   export let onUpdateRequestState;
-  let isBulkEditRequired = true;
+  let isBulkEditRequired = false;
   let isBulkEditHeaderInfoRequired = true;
 
   //   let placeholderHeader=`Usage: Use bulk edit to manage multiple Headers quickly. Separate each entry with a new line.
@@ -54,14 +54,16 @@
     callback={handleHeaderChange}
     {environmentVariables}
     {onUpdateEnvironment}
+    isCheckBoxEditable={false}
+    isInputBoxEditable={false}
   />
   <div>
     {#if !isBulkEditActive}
       <div class="d-flex align-items-center py-3">
-       <Toggle
+        <Toggle
           bind:isActive={showGeneratedHeader}
           label="Show auto-generated headers"
-         /> 
+        />
       </div>
     {/if}
   </div>
@@ -76,6 +78,7 @@
       {environmentVariables}
       {onUpdateEnvironment}
       onToggleBulkEdit={() => {}}
+      isCheckBoxEditable={false}
     />
   {/if}
 </section>

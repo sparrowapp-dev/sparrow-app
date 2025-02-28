@@ -32,6 +32,7 @@
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}
+        disabled={true}
       />
     </div>
   </div>

@@ -1,6 +1,11 @@
 import type { CollectionItemTypeBaseEnum } from "./collection-base";
 import type { CollectionSourceTypeDtoEnum } from "./collection-dto";
-import type { HttpRequestSavedAddToBaseEnum, HttpRequestSavedAuthModeBaseEnum, HttpRequestSavedBodyModeBaseEnum, HttpRequestSavedMethodBaseEnum } from "./http-request-saved-base";
+import type {
+  HttpRequestSavedAddToBaseEnum,
+  HttpRequestSavedAuthModeBaseEnum,
+  HttpRequestSavedBodyModeBaseEnum,
+  HttpRequestSavedMethodBaseEnum,
+} from "./http-request-saved-base";
 
 export interface HttpRequestSavedQueryParamsDtoInterface {
   key: string;
@@ -67,18 +72,17 @@ export interface HttpRequestSavedCreateUpdatePayloadDtoInterface {
   requestId?: string;
   // source?: HttpRequestSavedSourceDtoType;
   items?: {
-      id?: string;
-      name: string;
-      description?: string;
-      type: CollectionItemTypeBaseEnum.SAVED_REQUEST;
-      source?: CollectionSourceTypeDtoEnum;
-      requestResponse?: HttpRequestSavedMetaDataDtoInterface;
-      isDeleted?: boolean;
-      createdAt?: string;
-      updatedAt?: string;
-      createdBy?: string;
-      updatedBy?: string;
-    
+    id?: string;
+    name: string;
+    description?: string;
+    type: CollectionItemTypeBaseEnum.SAVED_REQUEST;
+    source?: CollectionSourceTypeDtoEnum;
+    requestResponse?: HttpRequestSavedMetaDataDtoInterface;
+    isDeleted?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+    createdBy?: string;
+    updatedBy?: string;
   };
   currentBranch?: string;
 }
@@ -90,4 +94,11 @@ export interface HttpRequestSavedUpdatePayloadDtoInterface {
   requestId?: string;
   name?: string;
   description?: string;
+}
+
+export interface HttpRequestSavedDeletePayloadDtoInterface {
+  collectionId: string;
+  workspaceId: string;
+  folderId?: string;
+  requestId?: string;
 }

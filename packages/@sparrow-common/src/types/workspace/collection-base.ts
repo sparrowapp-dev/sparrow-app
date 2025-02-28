@@ -11,7 +11,7 @@ export enum CollectionItemTypeBaseEnum {
   WEBSOCKET = "WEBSOCKET",
   SOCKETIO = "SOCKETIO",
   GRAPHQL = "GRAPHQL",
-  SAVED_REQUEST = "REQUEST_RESPONSE"
+  SAVED_REQUEST = "REQUEST_RESPONSE",
 }
 
 export interface CollectionItemBaseInterface {
@@ -68,6 +68,7 @@ export interface CollectionArgsBaseInterface {
   websocket?: CollectionItemBaseInterface;
   socketio?: CollectionItemBaseInterface;
   graphql?: CollectionItemBaseInterface;
+  requestResponse?: CollectionItemBaseInterface;
   newName?: string;
   importCurl?: string;
   deletedIds?: string[];
