@@ -5,7 +5,7 @@
 </script>
 
 <div
-  class="chat-bot-toggler bg-primary-300 d-flex align-items-center justify-content-center border-radius-4"
+  class="chat-bot-toggler d-flex align-items-center justify-content-center border-radius-4"
 >
   {#if !isChatBoxOpen}
     <svg

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { AISparkle } from "@sparrow/library/icons";
-
   export let title = "";
   export let onClick: (text: string) => void = () => {};
 </script>
@@ -26,8 +25,8 @@
     display: flex;
     align-items: center;
     justify-content: end;
-    background-color: var(--bg-primary-700);
-    border: 1px solid var(--border-primary-300);
+    background-color: var(--bg-ds-surface-700);
+    border: 1px solid var(--border-ds-surface-100);
     border-radius: 4px;
     padding: 5px;
     height: 28px;
@@ -39,9 +38,8 @@
     margin-bottom: 8px;
     right: 0;
   }
-
   .suggestion-button:hover {
-    background-color: var(--bg-primary-800);
+    /* background-color: var(--bg-primary-800); */
     box-shadow: 0px 0px 6px 0px var(--bg-primary-300);
   }
 </style>
