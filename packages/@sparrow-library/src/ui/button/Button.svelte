@@ -87,29 +87,29 @@
   let borderRadius = 4;
   $: {
     if (size === "extra-small") {
-      iconSize = 12;
+      iconSize = 16;
       buttonSize = 24;
       borderRadius = 4;
     } else if (size === "small") {
       fontSize = 12;
       buttonSize = 28;
       borderRadius = 4;
-      iconSize = 12;
+      iconSize = 16;
     } else if (size === "medium") {
       fontSize = 14;
       buttonSize = 36;
       borderRadius = 6;
-      iconSize = 16;
+      iconSize = 20;
     } else if (size === "large") {
       fontSize = 16;
       buttonSize = 40;
       borderRadius = 4;
-      iconSize = 20;
+      iconSize = 24;
     } else {
       fontSize = 12;
       buttonSize = 28;
-      borderRadius = 6;
-      iconSize = 24;
+      borderRadius = 4;
+      iconSize = 16;
     }
 
     if (!disable) {
