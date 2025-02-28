@@ -443,7 +443,10 @@
               <FolderOpenRegular color="var(--icon-ds-neutral-300)" />
             </div>
           {:else}
-            <div class="d-flex me-2" style="height:24px; width:30px;">
+            <div
+              class="d-flex align-items-center justify-content-center"
+              style="height:24px; width:30px;"
+            >
               <FolderRegular color="var(--icon-ds-neutral-300)" />
             </div>
           {/if}

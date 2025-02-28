@@ -229,6 +229,16 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
+  on:click|preventDefault={() => {
+    if (!isRenaming) {
+      onItemOpened("socket-io", {
+        workspaceId: collection.workspaceId,
+        collection,
+        folder,
+        socketio: socketIo,
+      });
+    }
+  }}
   class="d-flex align-items-center justify-content-between my-button btn-primary {socketIo.id ===
   activeTabId
     ? 'active-request-tab'
@@ -340,7 +350,7 @@
     width: calc(100% - 58px);
     text-align: left;
     color: var(--bg-ds-neutral-50);
-    display: flex;
+    // display: flex;
     align-items: center;
     caret-color: var(--bg-ds-primary-300);
     padding: 4px 2px;

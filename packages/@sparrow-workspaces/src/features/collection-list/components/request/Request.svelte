@@ -261,6 +261,16 @@
   on:dragstart={(event) => {
     dragStart(event, collection);
   }}
+  on:click|preventDefault={() => {
+    if (!isRenaming) {
+      onItemOpened("request", {
+        workspaceId: collection.workspaceId,
+        collection,
+        folder,
+        request: api,
+      });
+    }
+  }}
   bind:this={requestTabWrapper}
   class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
@@ -307,7 +317,7 @@
       }}
       style="  display: flex; "
     >
-      {#if !isWebApp}
+      {#if !isWebApp && api?.items && api?.items?.length > 0}
         <Button
           startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
           size="extra-small"
@@ -576,6 +586,6 @@
     bottom: 0;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
-    z-index: 200;
+    z-index: 150;
   }
 </style>

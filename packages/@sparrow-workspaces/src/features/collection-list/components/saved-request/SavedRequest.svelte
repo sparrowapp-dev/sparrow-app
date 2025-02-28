@@ -238,7 +238,7 @@
   activeTabId
     ? 'active-request-tab'
     : ''}"
-  style="height:32px; padding-left:3px; gap:4px"
+  style="height:32px; padding-left:3px; gap:4px; margin-bottom:2px;"
 >
   <button
     tabindex="-1"
@@ -358,7 +358,7 @@
     width: calc(100% - 48px);
     text-align: left;
     color: var(--bg-ds-neutral-50);
-    display: flex;
+    // display: flex;
     align-items: center;
     padding: 4px 2px;
     caret-color: var(--bg-ds-primary-300);

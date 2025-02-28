@@ -238,6 +238,16 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
+  on:click|preventDefault={() => {
+    if (!isRenaming) {
+      onItemOpened("websocket", {
+        workspaceId: collection.workspaceId,
+        collection,
+        folder,
+        websocket: api,
+      });
+    }
+  }}
   class="d-flex align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
@@ -347,7 +357,7 @@
     line-height: 18px;
     width: calc(100% - 58px);
     text-align: left;
-    display: flex;
+    // display: flex;
     align-items: center;
     padding: 4px 2px;
   }

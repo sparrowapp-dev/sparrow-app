@@ -233,6 +233,16 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
+  on:click|preventDefault={() => {
+    if (!isRenaming) {
+      onItemOpened("graphql", {
+        workspaceId: collection.workspaceId,
+        collection,
+        folder,
+        graphql: graphql,
+      });
+    }
+  }}
   class="d-flex align-items-center justify-content-between my-button btn-primary {graphql.id ===
   activeTabId
     ? 'active-request-tab'
