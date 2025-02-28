@@ -156,10 +156,7 @@ export { default as patchIcon } from "./Patch.svelte";
 export { default as postIcon } from "./Post.svelte";
 export { default as putIcon } from "./Put.svelte";
 export { default as deleteIcon } from "./Delete.svelte";
-export {default as AIChatBotIcon } from "./AIChatBotIcon.svelte"
 export {default as StackRegular} from "./StackRegular.svelte";
-export {default as NavSparrow} from "./NavSparrow.svelte"
-export {default as AISparcleWhite} from "./AISparcleWhite.svelte"
 export {default as CopyRegular} from "./CopyRegular.svelte"
 export {default as ThumbLikeRegular} from "./ThumbLikeRegular.svelte"
 export {default as ThumbDislikeRegular} from "./ThumbDislikeRegular.svelte";
@@ -193,3 +190,4 @@ export { default as CheckmarkCircleRegular } from "./CheckmarkCircleRegular.svel
 export { default as ClockRegular } from "./ClockRegular.svelte";
 export { default as ArrowDownloadRegular} from "./ArrowDownloadRegular.svelte";
 export { default as ArrowUpRightRegular } from "./ArrowUpRightRegular.svelte";
+export{default as SendRegular} from "./SendRegular.svelte";

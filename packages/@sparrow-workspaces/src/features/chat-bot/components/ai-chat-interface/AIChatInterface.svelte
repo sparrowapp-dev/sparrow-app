@@ -1,13 +1,6 @@
 <script lang="ts">
-  import { SparrowAIIcon } from "@sparrow/common/icons";
-  import { AIChatBotIcon } from "@sparrow/library/icons";
   import { AISuggestionBox, PromptInput, ChatItem } from "../";
-  import {
-    AISparkle,
-    CrossIcon,
-    DismissRegular,
-    AISparcleWhite,
-  } from "@sparrow/library/icons";
+  import { AISparkle, CrossIcon, DismissRegular } from "@sparrow/library/icons";
   import { cubicOut } from "svelte/easing";
   import { generatingImage } from "@sparrow/common/images";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -15,7 +8,7 @@
   import type { Conversation } from "@sparrow/common/types/workspace";
   import { fade, fly } from "svelte/transition";
   import { Button } from "@sparrow/library/ui";
-  import { NavSparrow } from "@sparrow/library/icons";
+  import { SparrowPrimaryIcon } from "@sparrow/common/icons";
   export let conversations: Conversation[] = [];
   export let prompt = "";
   export let onUpdateAiPrompt;
@@ -66,18 +59,9 @@
         in:fade={{ duration: 200 }}
       >
         <div class="p-2">
-          <NavSparrow height={"32px"} width={"32px"} />
+          <SparrowPrimaryIcon height={"32px"} width={"32px"} />
           <span class="gradient-text">Sparrow</span>
         </div>
-        <!-- <div
-          on:click={() =>
-            onUpdateRequestState({
-              isChatbotActive: false,
-            })}
-          class="close-btn d-flex align-items-center justify-content-center"
-        >
-          <CrossIcon height={"18px"} width={"18px"} color={"#8A9299"} />
-        </div> -->
         <Button
           type={"teritiary-regular"}
           size="medium"
@@ -192,7 +176,6 @@
     max-width: 440px;
     min-height: 240px;
     max-height: 640px;
-    /* padding: 8px; */
     isolation: isolate;
     gap: 16px;
   }
@@ -241,20 +224,11 @@
   .generating-img {
     position: absolute;
     top: -97%;
-    /* background-color: red; */
     background-color: var(--bg-ds-surface-700);
     width: 100%;
   }
-  ::-webkit-scrollbar {
-    /* width: 6px;  
-  height: 10px; */
-  }
-  ::-webkit-scrollbar-track {
-    /* background-color: var(--bg-ds-surface-100); */
-  }
-  /* Scrollbar handle (thumb) */
+
   ::-webkit-scrollbar-thumb {
     background-color: var(--bg-ds-surface-100);
-    /* border-radius: 8px; */
   }
 </style>

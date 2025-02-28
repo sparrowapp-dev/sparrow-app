@@ -125,14 +125,10 @@
     </svg>
   {/if}
 </div>
+
 <style>
   .chat-bot-toggler {
     height: 42px;
     width: 42px;
-    /* justify-content: center;
-    align-items: center; */
-  }
-  .chat-bot-toggler:hover {
-    /* background-color: red; */
   }
 </style>

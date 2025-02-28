@@ -10,8 +10,8 @@
     MessageTypeEnum,
     type RequestTab,
   } from "@sparrow/common/types/workspace";
+  import { SparrowSecondaryIcon } from "@sparrow/common/icons";
   import {
-    AIChatBotIcon,
     CrossIcon,
     DismissRegular,
     CaretDownFilled,
@@ -20,7 +20,6 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
   import type { ScrollList } from "../types";
-  import { AISparcleWhite } from "@sparrow/library/icons";
   export let tab: Observable<RequestTab>;
   export let onUpdateAiPrompt;
   export let onUpdateAiConversation;
@@ -68,27 +67,18 @@
       MixpanelEvent(Events.AI_Regenerate_Response),
     );
   };
-  let chatActive = false;
-  const toggleChat = () => (chatActive = !chatActive);
 </script>
 
 {#if $tab?.property?.request?.state?.isChatbotActive}
   <div
     class="started"
     style="position: fixed;
-    <!-- top: 200px; -->
      top: calc(50vh - 267px);
     bottom: 80px;
     right:28px;
     z-index: 200;
     width: 320px;
     height: 75vh;
-    <!-- min-width: 320px;
-    max-width: 440px;
-    min-height: 240px;
-    max-height: 640px;
-    padding: 16px 12px 16px 12px;
-    gap:16px; -->
     "
   >
     <AIChatInterface
@@ -191,15 +181,9 @@
       MixpanelEvent(Events.AI_Chat_Initiation);
     }}
   >
-    <!-- <AiChatToggler
-      height="42px"
-      width="42px"
-      isChatBoxOpen={$tab?.property?.request?.state?.isChatbotActive}
-    /> -->
-
-    <div class="chatten-box" on:click={toggleChat} tabindex="0">
+    <div class="chatten-box" tabindex="0">
       {#if !$tab?.property?.request?.state?.isChatbotActive}
-        <AIChatBotIcon />
+        <SparrowSecondaryIcon />
       {:else}
         <CaretDownFilled />
       {/if}
