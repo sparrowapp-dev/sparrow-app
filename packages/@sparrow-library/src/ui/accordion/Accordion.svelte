@@ -57,7 +57,7 @@
 
   <!-- Accordion Content -->
   <div
-    class={`p-3 accordion-content ${isOpen ? "open" : ""}`}
+    class={`accordion-content ${isOpen ? "open" : ""}`}
     style={`${isOpen ? "border-bottom-right-radius: 6px; border-bottom-left-radius: 6px; border: 1px solid var(--bg-ds-surface-400);" : ""}`}
     transition:fade={{
       duration: isOpen ? 300 : 250,
