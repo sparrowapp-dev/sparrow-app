@@ -253,7 +253,8 @@
             </button>
           </Tooltip>
         </div>
-
+      {/if}
+      {#if activeTabType === TabTypeEnum.REQUEST || activeTabType === TabTypeEnum.SAVED_REQUEST}
         <!-- Split button -->
         <div
           class="d-flex align-items-center ms-auto ps-1"
