@@ -12,7 +12,7 @@
   import { WithButtonV5 } from "@sparrow/workspaces/hoc";
   import { FormatTime } from "@sparrow/common/utils";
   import { ResponseStatusCode } from "@sparrow/common/enums";
-  import History from "../../icons/History.svelte";
+  import HistoryRegular from "../../icons/HistoryRegular.svelte";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   export let testflowStore;
   export let testflowName = "";
@@ -76,7 +76,7 @@
           <!-- HEADER -->
           <div class="d-flex align-items-center justify-content-between px-1">
             <div class="d-flex justify-content-center align-items-center">
-              <History />
+              <HistoryRegular />
               <span class="ms-2 header-title-text"> Run History </span>
             </div>
             <Button
