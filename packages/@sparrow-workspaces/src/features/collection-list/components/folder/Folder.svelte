@@ -272,7 +272,7 @@
     </div></Modal
   >
 
-  {#if showMenu}
+  {#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
     <Options
       xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
       yAxis={[

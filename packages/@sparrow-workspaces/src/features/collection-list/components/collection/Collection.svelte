@@ -332,7 +332,7 @@
   </div></Modal
 >
 
-{#if showMenu}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
     xAxis={collectionTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
