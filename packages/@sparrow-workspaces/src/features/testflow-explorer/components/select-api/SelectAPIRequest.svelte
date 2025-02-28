@@ -167,7 +167,7 @@
     return name;
   };
   const truncateName = (name: string, charLimit: number) => {
-    if (name.length > charLimit) {
+    if (name.length > charLimit + 2) {
       return name.substring(0, charLimit) + "...";
     }
     return name;
