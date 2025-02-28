@@ -340,7 +340,7 @@
     width: calc(100% - 48px);
     text-align: left;
     color: var(--bg-ds-neutral-50);
-    display: flex;
+    // display: flex;
     align-items: center;
     caret-color: var(--bg-ds-primary-300);
     padding: 4px 2px;
