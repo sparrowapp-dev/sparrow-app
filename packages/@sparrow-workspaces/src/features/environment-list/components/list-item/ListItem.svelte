@@ -387,7 +387,7 @@
       border-left: 1px solid var(--border-color);
     }
     .main-collection {
-      width: calc(100% - 24px);
+      width: calc(100% - 38px);
       gap: 4px;
     }
     .active-collection-tab {
