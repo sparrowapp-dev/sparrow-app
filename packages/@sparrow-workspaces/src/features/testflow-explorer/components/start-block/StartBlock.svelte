@@ -74,6 +74,7 @@
     : ""}
   class="start-block position-relative"
   on:click={() => {
+    if (isAddBlockVisible) return;
     MixpanelEvent(Events.Start_TestFlows);
     data.onClick("0");
   }}
