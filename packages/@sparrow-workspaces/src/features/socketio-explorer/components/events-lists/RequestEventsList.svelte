@@ -27,13 +27,12 @@
           bind:value={element.event}
           on:input={() => updateParam(index)}
           width={"100%"}
-          height={"20px"}
-          class="text-fs-12 me-5 bg-secondary-600"
+          variant="primary"
+          size="small"
+          class="me-5"
           style="outline:none; background-color:transparent;"
+          isError={false}
           placeholder="Name"
-          defaultBorderColor="transparent"
-          hoveredBorderColor={"var(--border-primary-300)"}
-          focusedBorderColor={"var(--border-primary-300)"}
           isEditIconRequired={false}
         />
       </div>
