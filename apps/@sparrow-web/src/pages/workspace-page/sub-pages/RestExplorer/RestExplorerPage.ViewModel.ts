@@ -802,6 +802,8 @@ class RestExplorerViewModel
               data.isSendRequestInProgress = false;
             }
             restApiDataMap.set(progressiveTab.tabId, data);
+          console.log("data ;>> ", data)
+
             return restApiDataMap;
           });
         }

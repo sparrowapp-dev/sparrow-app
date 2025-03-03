@@ -31,7 +31,7 @@
     SaveAsCollectionItem,
   } from "@sparrow/workspaces/features";
   import { WithModal } from "@sparrow/workspaces/hoc";
-  import { notifications } from "@sparrow/library/ui";
+  import { notifications, Options } from "@sparrow/library/ui";
   import { DownloadApp } from "@sparrow/common/features";
 
   // ---- Interface, enum & constants
@@ -96,6 +96,7 @@
   let isGuestUser = false;
   let userId = "";
   let userRole = "";
+  let isShowTabControlsMenu = false;
 
   let isExpandCollection = false;
   let isExpandEnvironment = false;
@@ -454,6 +455,18 @@
       }
     }, 500);
   };
+
+  function handleRightClick() {
+    isShowTabControlsMenu = true;
+    console.log("someone right clicked !");
+  }
+
+  $: {
+    setTimeout(() => {
+      console.log("handlddd");
+      handleRightClick();
+    }, 3000);
+  }
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -664,6 +677,43 @@
     }}
   />
 </Modal>
+
+{#if isShowTabControlsMenu}
+  {console.log("hiiiii")}
+  <Options
+    xAxis={200}
+    yAxis={[300, 335]}
+    zIndex={500}
+    menuItems={[
+      {
+        onClick: () => {
+          expand = true;
+          if (expand) {
+            // onItemOpened("folder", {
+            //   workspaceId: collection.workspaceId,
+            //   collection,
+            //   folder: explorer,
+            // });
+          }
+        },
+        displayText: "Close Tab",
+        disabled: false,
+        hidden: false,
+      },
+      {
+        onClick: () => {
+          expand = false;
+          // isRenaming = true;
+        },
+        displayText: "Duplicate Tab",
+        disabled: false,
+        hidden: false,
+      },
+    ]}
+    180
+  />
+{/if}
+
 {#if isAccessDeniedModalOpen}
   <Modal
     title="Access Denied"
@@ -682,7 +732,11 @@
   </Modal>
 {/if}
 
-<svelte:window on:keydown={handleKeyPress} />
+<svelte:window
+  on:keydown={handleKeyPress}
+  on:click={handleRightClick}
+  on:contextmenu|preventDefault={handleRightClick}
+/>
 <!-- <ImportCollection
     {collectionList}
     workspaceId={$currentWorkspace._id}
