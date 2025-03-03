@@ -1116,8 +1116,6 @@ const connectSocketIo = async (
  * @param _tabId - The ID of the tab for which the Socket.IO connection should be disconnected.
  */
 const disconnectSocketIo = async (_tabId: string): Promise<void> => {
-  console.log("in disconnectSocketIo() :>> ");
-
   let url = "";
   socketIoDataStore.update((socketIoDataMap) => {
     const wsData = socketIoDataMap.get(_tabId);
