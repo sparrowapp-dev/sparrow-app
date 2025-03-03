@@ -39,7 +39,6 @@
     right: 0;
   }
   .suggestion-button:hover {
-    /* background-color: var(--bg-primary-800); */
     box-shadow: 0px 0px 6px 0px var(--bg-primary-300);
   }
 </style>

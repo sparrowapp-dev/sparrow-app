@@ -50,6 +50,7 @@
 
     // Select all <pre> elements
     const codeElements = doc.querySelectorAll("pre > code");
+
     const preElements = Array.from(codeElements)
       .filter((elem) => {
         if (elem.innerHTML.trim()) return true;
@@ -64,19 +65,19 @@
         container.className = "wrapper";
         const lang = pre.querySelector("code")?.getAttribute("class");
         hljs.highlightBlock(pre.querySelector("code"));
+
         // Add content or value to the container div
         container.innerHTML = `
-      <div class="code-header bg-tertiary-300 ps-3 pe-2 py-1 d-flex align-items-center justify-content-between">
-        <span>${lang?.split("-")[1] ?? ""}</span>
-        <button role="button" class="position-relative copy-code-${messageId} action-button copy-code-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
-          <img src="${copyIcon}" id="${index}">
-          <button class="copy-code-tooltip z-1 d-flex align-items-center justify-content-center position-absolute invisible text-fs-12">Copy
-            <div class="copy-code-tooltip-square"></div>
+        <div class="code-header bg-tertiary-300 ps-3 pe-2 py-1 d-flex align-items-center justify-content-between">
+          <span>${lang?.split("-")[1] ?? ""}</span>
+          <button role="button" class="position-relative copy-code-${messageId} action-button copy-code-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
+            <img src="${copyIcon}" id="${index}">
+            <button class="copy-code-tooltip z-1 d-flex align-items-center justify-content-center position-absolute invisible text-fs-12">Copy
+              <div class="copy-code-tooltip-square"></div>
+            </button>
           </button>
-        </button>
-      </div>
-        `;
-
+        </div>
+          `;
         pre.parentNode?.insertBefore(container, pre);
         container.appendChild(pre);
       }
@@ -201,19 +202,6 @@
       cleanUpListeners();
     }
   });
-
-  let flag = false;
-  let flag2 = false;
-
-  const handleClick = () => {
-    flag = !flag;
-    if (flag2) flag2 = false;
-  };
-
-  const handleClickDislike = () => {
-    flag2 = !flag2;
-    if (flag) flag = false;
-  };
 </script>
 
 <div class="message-wrapper">
@@ -237,7 +225,8 @@
           text-align: left;
           font-size:12px;
           weight:400;
-          line-height:18px"
+          gap:10px;
+          "
       >
         {@html message}
       </p>
@@ -250,7 +239,6 @@
     -->
     <div class="recieve-item p-1">
       <div class="d-flex justify-content-between">
-        <!-- <SparrowAIIcon height={"20px"} width={"20px"} /> -->
         <div class="d-flex gap-1 pb-2">
           {#if status}
             <!--
@@ -288,9 +276,9 @@
               on:click={handleCopyResponse}
             >
               {#if showTickIcon}
-                <TickIcon height={"14px"} width={"14px"} color={"grey"} />
+                <TickIcon size={"14px"} color={"grey"} />
               {:else}
-                <CopyRegular height={"14px"} width={"14px"} />
+                <CopyRegular size={"16px"} />
               {/if}
             </button>
           </Tooltip>
@@ -301,17 +289,12 @@
               on:click={() => {
                 onToggleLike(messageId, true);
                 MixpanelEvent(Events.AI_Like_Response);
-                handleClick();
               }}
             >
-              {#if !flag}
-                <ThumbLikeRegular
-                  height={"16px"}
-                  width={"16px"}
-                  color={isLiked ? "white" : "white"}
-                />
+              {#if isLiked}
+                <ThumbLikeFilled size={"16px"} />
               {:else}
-                <ThumbLikeFilled height={"16px"} width={"16px"} />
+                <ThumbLikeRegular size={"16px"} />
               {/if}
             </span>
           </Tooltip>
@@ -322,17 +305,12 @@
               on:click={() => {
                 onToggleLike(messageId, false);
                 MixpanelEvent(Events.AI_Dislike_Response);
-                handleClickDislike();
               }}
             >
-              {#if !flag2}
-                <ThumbDislikeRegular
-                  height={"16px"}
-                  width={"16px"}
-                  color={isDisliked ? "white" : "white"}
-                />
+              {#if isDisliked}
+                <ThumbDislikeFilled size={"16px"} />
               {:else}
-                <ThumbDislikeFilled height={"16px"} width={"16px"} />
+                <ThumbDislikeRegular size={"16px"} />
               {/if}
             </span>
           </Tooltip>
@@ -341,7 +319,7 @@
               class="action-button d-flex align-items-center justify-content-center border-radius-4"
               on:click={regenerateAiResponse}
             >
-              <ArrowSyncRegular height={"16px"} width={"16px"} />
+              <ArrowSyncRegular size={"16px"} />
             </button>
           </Tooltip>
         {/if}
@@ -353,9 +331,7 @@
 <style>
   .send-item,
   .recieve-item {
-    /* border-bottom: 1px solid var(--border-secondary-320); */
   }
-
   :global(
     .message-wrapper .markdown p,
     .message-wrapper .markdown li,
@@ -371,7 +347,6 @@
   :global(.message-wrapper .wrapper) {
     border-radius: 8px !important;
     overflow: hidden !important;
-    /* margin-bottom: 10px; */
   }
   :global(.message-wrapper .hljs) {
     background: #000 !important;

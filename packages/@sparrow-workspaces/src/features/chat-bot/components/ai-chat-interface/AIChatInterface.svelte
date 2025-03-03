@@ -59,7 +59,7 @@
         in:fade={{ duration: 200 }}
       >
         <div class="p-2">
-          <SparrowPrimaryIcon height={"32px"} width={"32px"} />
+          <SparrowPrimaryIcon size={"32px"} />
           <span class="gradient-text">Sparrow</span>
         </div>
         <Button
@@ -171,7 +171,7 @@
     position: relative;
     background-color: var(--bg-ds-surface-700);
     border-radius: 8px;
-    padding: 16px 12px 16px 12px;
+    padding: 16px 3px 10px 4px;
     min-width: 320px;
     max-width: 440px;
     min-height: 240px;
@@ -223,11 +223,10 @@
   }
   .generating-img {
     position: absolute;
-    top: -97%;
+    top: -75%;
     background-color: var(--bg-ds-surface-700);
     width: 100%;
   }
-
   ::-webkit-scrollbar-thumb {
     background-color: var(--bg-ds-surface-100);
   }

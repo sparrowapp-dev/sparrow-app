@@ -9,18 +9,15 @@
   export let isResponseGenerating;
 
   let isSendButtonHovered = false;
-
   const handleMouseEnter = () => {
     isSendButtonHovered = true;
   };
-
   const handleMouseLeave = () => {
     isSendButtonHovered = false;
   };
-  let isSelected = false;
 </script>
 
-<div class="d-flex prompt-input p-1">
+<div class="d-flex p-3">
   <div class="position-relative w-100">
     <input
       type=""
@@ -30,7 +27,7 @@
       }}
       class="w-100 pe-5 py-2 ps-2 border-radius-6 text-fs-12 inputClass }"
       autofocus
-      style="border:1px solid grey; outline: none; background-color: var(--bg-ds-surface-400); border: 1px solid var(--border-tertiary-190); height:36px; width:296px; min-width:240px; max-width:540px; gap:8"
+      style="border:1px solid grey;outline: none; background-color: var(--bg-ds-surface-400); border: 1px solid var(--border-tertiary-190); height:36px; width:296px; min-width:240px; max-width:540px; gap:8;"
       {placeholder}
       on:keydown={(event) => {
         if (event.key === "Enter" && prompt && !isResponseGenerating) {
@@ -56,10 +53,9 @@
         on:mouseleave={handleMouseLeave}
       >
         <SendRegular
-          height={"14px"}
-          width={"14px"}
+          size={"14px"}
           color={prompt.trim()
-            ? "white"
+            ? "var(--white-color)"
             : isSendButtonHovered
               ? "var(--icon-secondary-100)"
               : "var(--border-ds-neutral-400)"}
