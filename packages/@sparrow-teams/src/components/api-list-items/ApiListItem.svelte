@@ -28,7 +28,10 @@
         class={`text-${getMethodStyle(api?.property?.request?.method)}`}
         style="font-weight: 600; font-size: 9px; line-height:13.5px; align-items:flex-start;"
       >
-        {api?.property?.request?.method}
+        <!-- {api?.property?.request?.method} -->
+        {api?.property?.request?.method?.toUpperCase() === "DELETE"
+          ? "DEL"
+          : api?.property?.request?.method?.toUpperCase()}
       </span>
     {:else if api?.type === TabTypeEnum.WEB_SOCKET}
       <span style="display: flex; align-items:flex-start;">
