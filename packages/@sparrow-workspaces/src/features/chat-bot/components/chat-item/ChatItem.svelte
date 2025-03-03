@@ -4,8 +4,9 @@
   import { notifications } from "@sparrow/library/ui";
   import { copyIcon, tickIcon } from "../../assests";
   import { tick } from "svelte";
-
+  import { ArrowSyncRegular, ThumbLikeRegular } from "@sparrow/library/icons";
   import hljs from "highlight.js";
+  import { ThumbDislikeFilled } from "@sparrow/library/icons";
   import "highlight.js/styles/atom-one-dark.css";
   import {
     CopyIcon2,
@@ -14,12 +15,16 @@
     RefreshIcon,
     TickIcon,
   } from "@sparrow/library/icons";
+  import {
+    ThumbLikeFilled,
+    CopyRegular,
+    ThumbDislikeRegular,
+  } from "@sparrow/library/icons";
   import { SparrowAIIcon } from "@sparrow/common/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
   import { MessageTypeEnum } from "@sparrow/common/types/workspace";
-
   export let message: string;
   export let messageId: string;
   export let type;
@@ -196,6 +201,19 @@
       cleanUpListeners();
     }
   });
+
+  let flag = false;
+  let flag2 = false;
+
+  const handleClick = () => {
+    flag = !flag;
+    if (flag2) flag2 = false;
+  };
+
+  const handleClickDislike = () => {
+    flag2 = !flag2;
+    if (flag) flag = false;
+  };
 </script>
 
 <div class="message-wrapper">
@@ -206,7 +224,23 @@
     -->
   {#if type === MessageTypeEnum.SENDER}
     <div class="send-item">
-      <p class="my-4 px-3 text-fs-12">{@html message}</p>
+      <p
+        class="my-4 px-3 text-fs-12 text-item"
+        style="background-color: var(--bg-ds-surface-500); 
+          height: auto; 
+          width:fit-content;
+          border-radius: 8px; 
+          padding: 8px; 
+          margin-left: auto; 
+          margin-right: 5px; 
+          max-width: 248px; 
+          text-align: left;
+          font-size:12px;
+          weight:400;
+          line-height:18px"
+      >
+        {@html message}
+      </p>
     </div>
   {:else}
     <!--
@@ -214,9 +248,9 @@
     -- RECIEVER
     -- 
     -->
-    <div class="recieve-item p-3">
+    <div class="recieve-item p-1">
       <div class="d-flex justify-content-between">
-        <SparrowAIIcon height={"20px"} width={"20px"} />
+        <!-- <SparrowAIIcon height={"20px"} width={"20px"} /> -->
         <div class="d-flex gap-1 pb-2">
           {#if status}
             <!--
@@ -224,38 +258,6 @@
             -- LIKE / DISLIKE
             -- 
             -->
-            <Tooltip placement="top-center" title="Like" distance={13}>
-              <span
-                role="button"
-                class="action-button d-flex align-items-center justify-content-center border-radius-4"
-                on:click={() => {
-                  onToggleLike(messageId, true);
-                  MixpanelEvent(Events.AI_Like_Response);
-                }}
-              >
-                <LikeIcon
-                  height={"16px"}
-                  width={"16px"}
-                  color={isLiked ? "white" : "transparent"}
-                />
-              </span>
-            </Tooltip>
-            <Tooltip placement="top-center" title="Dislike" distance={13}>
-              <span
-                class="action-button d-flex align-items-center justify-content-center border-radius-4"
-                role="button"
-                on:click={() => {
-                  onToggleLike(messageId, false);
-                  MixpanelEvent(Events.AI_Dislike_Response);
-                }}
-              >
-                <DislikeIcon
-                  height={"16px"}
-                  width={"16px"}
-                  color={isDisliked ? "white" : "transparent"}
-                />
-              </span>
-            </Tooltip>
           {/if}
         </div>
       </div>
@@ -275,32 +277,74 @@
         -- 
         -->
         {#if isLastRecieverMessage}
+          <Tooltip
+            placement="top-center"
+            title={showTickIcon ? "Copied" : "Copy"}
+            distance={13}
+          >
+            <button
+              disabled={showTickIcon}
+              class="action-button d-flex align-items-center justify-content-center border-radius-4"
+              on:click={handleCopyResponse}
+            >
+              {#if showTickIcon}
+                <TickIcon height={"14px"} width={"14px"} color={"grey"} />
+              {:else}
+                <CopyRegular height={"14px"} width={"14px"} />
+              {/if}
+            </button>
+          </Tooltip>
+          <Tooltip placement="top-center" title="Like" distance={13}>
+            <span
+              role="button"
+              class="action-button d-flex align-items-center justify-content-center border-radius-4"
+              on:click={() => {
+                onToggleLike(messageId, true);
+                MixpanelEvent(Events.AI_Like_Response);
+                handleClick();
+              }}
+            >
+              {#if !flag}
+                <ThumbLikeRegular
+                  height={"16px"}
+                  width={"16px"}
+                  color={isLiked ? "white" : "white"}
+                />
+              {:else}
+                <ThumbLikeFilled height={"16px"} width={"16px"} />
+              {/if}
+            </span>
+          </Tooltip>
+          <Tooltip placement="top-center" title="Dislike" distance={13}>
+            <span
+              class="action-button d-flex align-items-center justify-content-center border-radius-4"
+              role="button"
+              on:click={() => {
+                onToggleLike(messageId, false);
+                MixpanelEvent(Events.AI_Dislike_Response);
+                handleClickDislike();
+              }}
+            >
+              {#if !flag2}
+                <ThumbDislikeRegular
+                  height={"16px"}
+                  width={"16px"}
+                  color={isDisliked ? "white" : "white"}
+                />
+              {:else}
+                <ThumbDislikeFilled height={"16px"} width={"16px"} />
+              {/if}
+            </span>
+          </Tooltip>
           <Tooltip placement="top-center" title="Regenerate" distance={13}>
             <button
               class="action-button d-flex align-items-center justify-content-center border-radius-4"
               on:click={regenerateAiResponse}
             >
-              <RefreshIcon height={"16px"} width={"16px"} />
+              <ArrowSyncRegular height={"16px"} width={"16px"} />
             </button>
           </Tooltip>
         {/if}
-        <Tooltip
-          placement="top-center"
-          title={showTickIcon ? "Copied" : "Copy"}
-          distance={13}
-        >
-          <button
-            disabled={showTickIcon}
-            class="action-button d-flex align-items-center justify-content-center border-radius-4"
-            on:click={handleCopyResponse}
-          >
-            {#if showTickIcon}
-              <TickIcon height={"14px"} width={"14px"} color={"grey"} />
-            {:else}
-              <CopyIcon2 height={"14px"} width={"14px"} />
-            {/if}
-          </button>
-        </Tooltip>
       </div>
     </div>
   {/if}
@@ -309,7 +353,7 @@
 <style>
   .send-item,
   .recieve-item {
-    border-bottom: 1px solid var(--border-secondary-320);
+    /* border-bottom: 1px solid var(--border-secondary-320); */
   }
 
   :global(
@@ -324,14 +368,17 @@
   :global(.message-wrapper .markdown pre) {
     margin-bottom: 0;
   }
-
   :global(.message-wrapper .wrapper) {
-    border-radius: 4px !important;
+    border-radius: 8px !important;
     overflow: hidden !important;
-    margin-bottom: 10px;
+    /* margin-bottom: 10px; */
   }
   :global(.message-wrapper .hljs) {
     background: #000 !important;
+    padding: 8px 0px 8px 8px;
+    border: 1px solid var(--bg-tertiary-190);
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
   }
   :global(.action-button) {
     height: 30px;
