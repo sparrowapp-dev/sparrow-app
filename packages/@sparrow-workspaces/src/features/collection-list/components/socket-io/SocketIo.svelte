@@ -248,16 +248,6 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    on:click|preventDefault={() => {
-      if (!isRenaming) {
-        onItemOpened("socket-io", {
-          workspaceId: collection.workspaceId,
-          collection,
-          folder,
-          socketio: socketIo,
-        });
-      }
-    }}
     style={folder?.id
       ? "padding-left: 62.5px; gap:4px;"
       : "padding-left: 48.5px; gap:4px;"}

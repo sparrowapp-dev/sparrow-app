@@ -281,16 +281,6 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    on:click|preventDefault={() => {
-      if (!isRenaming) {
-        onItemOpened("request", {
-          workspaceId: collection.workspaceId,
-          collection,
-          folder,
-          request: api,
-        });
-      }
-    }}
     style={folder?.id
       ? "padding-left: 70.5px; gap:4px;"
       : "padding-left: 44.5px; gap:4px; "}
