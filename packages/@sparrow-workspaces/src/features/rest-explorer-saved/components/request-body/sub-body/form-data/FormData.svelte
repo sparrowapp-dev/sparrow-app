@@ -21,5 +21,7 @@
     {environmentVariables}
     {onUpdateEnvironment}
     {isWebApp}
+    isCheckBoxEditable={false}
+    isInputBoxEditable={false}
   />
 </section>

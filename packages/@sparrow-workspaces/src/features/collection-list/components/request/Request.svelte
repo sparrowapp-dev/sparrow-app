@@ -69,6 +69,7 @@
    */
   export let userRole;
   export let activeTabType;
+  export let isWebApp;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -306,17 +307,19 @@
       }}
       style="  display: flex; "
     >
-      <Button
-        startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
-        size="extra-small"
-        customWidth={"24px"}
-        type="teritiary-regular"
-      />
+      {#if !isWebApp && api?.items && api?.items?.length > 0}
+        <Button
+          startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+        />
+      {/if}
     </span>
     <div
       class="api-method text-{httpMethodUIStyle} {api?.isDeleted &&
         'api-method-deleted'}"
-      style="font-size: 12px;"
+      style="font-size: 9px;"
     >
       {api.request?.method?.toUpperCase() === "DELETE"
         ? "DEL"
@@ -373,30 +376,32 @@
     </Tooltip>
   {/if}
 </div>
-<div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-  <div class="sub-files position-relative">
-    <div
-      class="box-line"
-      style={folder?.id ? "left: 84.5px;" : "left: 58.5px;"}
-    ></div>
-    <!-- {#if } -->
-    {#each api?.items || [] as exp}
-      <div>
-        <SavedRequest
-          {userRole}
-          api={exp}
-          request={api}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {folder}
-          {collection}
-          {activeTabId}
-        />
-      </div>
-    {/each}
+{#if !isWebApp}
+  <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
+    <div class="sub-files position-relative">
+      <div
+        class="box-line"
+        style={folder?.id ? "left: 84.5px;" : "left: 58.5px;"}
+      ></div>
+      <!-- {#if } -->
+      {#each api?.items || [] as exp}
+        <div>
+          <SavedRequest
+            {userRole}
+            api={exp}
+            request={api}
+            {onItemRenamed}
+            {onItemDeleted}
+            {onItemOpened}
+            {folder}
+            {collection}
+            {activeTabId}
+          />
+        </div>
+      {/each}
+    </div>
   </div>
-</div>
+{/if}
 
 <style lang="scss">
   .delete-ticker {
@@ -404,8 +409,8 @@
     font-weight: 500;
   }
   .api-method {
-    font-size: 10px;
-    font-weight: 500;
+    font-size: 9px;
+    font-weight: 600;
     width: 30px !important;
     height: 24px;
     border-radius: 4px;
@@ -568,6 +573,6 @@
     bottom: 0;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
-    z-index: 200;
+    z-index: 150;
   }
 </style>

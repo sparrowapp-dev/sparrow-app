@@ -100,8 +100,8 @@
       <div style="flex:1; overflow:auto;">
         <!-- {#if !isLoading} -->
         <Splitpanes
-          class="rest-splitter w-100 h-100"
-          id={"rest-splitter"}
+          class="socketio-splitter w-100 h-100"
+          id={"socketio-splitter"}
           horizontal={false}
           dblClickSplitter={false}
           on:resize={(e) => {
@@ -263,8 +263,8 @@
     background-color: var(--bg-ds-surface-900);
   }
 
-  :global(.rest-splitter.splitpanes--vertical .splitpanes__splitter) {
-    width: 10.5px !important;
+  :global(.socketio-splitter.splitpanes--vertical > .splitpanes__splitter) {
+    width: 11px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-left: 5px solid var(--border-ds-surface-900) !important;
@@ -272,8 +272,8 @@
     border-top: 0 !important;
     border-bottom: 0 !important;
   }
-  :global(.rest-splitter.splitpanes--horizontal .splitpanes__splitter) {
-    height: 10.5px !important;
+  :global(.socketio-splitter.splitpanes--horizontal > .splitpanes__splitter) {
+    height: 11px !important;
     width: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-top: 5px solid var(--border-ds-surface-900) !important;
@@ -282,8 +282,8 @@
     border-right: 0 !important;
   }
   :global(
-    .rest-splitter .splitpanes__splitter:active,
-    .rest-splitter .splitpanes__splitter:hover
+    .socketio-splitter > .splitpanes__splitter:active,
+    .socketio-splitter > .splitpanes__splitter:hover
   ) {
     background-color: var(--bg-primary-200) !important;
   }

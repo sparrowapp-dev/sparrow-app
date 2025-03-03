@@ -182,7 +182,7 @@
           <SocketIoIcon
             height={"14px"}
             width={"14px"}
-            color={"var(--icon-primary-300)"}
+            color={"var(--icon-ds-success-300)"}
           />
         </span>
       {:else if tab.type === TabTypeEnum.GRAPHQL}
