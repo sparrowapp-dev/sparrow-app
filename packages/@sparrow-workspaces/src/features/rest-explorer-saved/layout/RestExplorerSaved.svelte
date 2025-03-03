@@ -50,8 +50,7 @@
     ResponseSectionEnum,
     type KeyValue,
   } from "@sparrow/common/types/workspace";
-  import { requestSplitterDirection } from "../../rest-explorer/store";
-  import { Popover } from "@sparrow/library/ui";
+  import { tabsSplitterDirection } from "../../../stores";
   import { onMount } from "svelte";
   import { Carousel, Modal } from "@sparrow/library/ui";
   import RequestDoc from "../components/request-doc/RequestDoc.svelte";
@@ -61,8 +60,6 @@
     SendingApiRequest,
   } from "@sparrow/workspaces/constants";
 
-  import type { CancelRequestType } from "@workspaces/common/type/actions";
-  import type { restExplorerData } from "../store/rest-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { ChevronRightRegular } from "@sparrow/library/icons";
 
@@ -72,7 +69,6 @@
   export let requestAuthParameter: Observable<KeyValue>;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
   export let onSendRequest: SendRequestType;
-  export let onCancelRequest: CancelRequestType;
   export let onUpdateRequestMethod: UpdateRequestMethodType;
   export let onUpdateRequestParams: UpdateParamsType;
   export let onUpdateRequestName: UpdateRequestNameType;
@@ -106,7 +102,7 @@
    * Role of user in active workspace
    */
   export let userRole;
-  export let storeData: restExplorerData | undefined;
+  export let storeData;
   export let isTourGuideOpen = false;
   export let isWebApp = false;
   export let azureBlobCDN;
@@ -213,9 +209,7 @@
         bind:userRole
         requestUrl={$tab.property.savedRequest?.url}
         httpMethod={$tab.property.savedRequest?.method}
-        isSendRequestInProgress={storeData?.isSendRequestInProgress}
         onSendButtonClicked={onSendRequest}
-        onCancelButtonClicked={onCancelRequest}
         {onUpdateEnvironment}
         {environmentVariables}
         {onUpdateRequestUrl}
@@ -232,9 +226,7 @@
           <Splitpanes
             class="rest-splitter-saved w-100 h-100"
             id={"rest-splitter-saved"}
-            horizontal={$requestSplitterDirection === "horizontal"
-              ? true
-              : false}
+            horizontal={$tabsSplitterDirection === "horizontal" ? true : false}
             dblClickSplitter={false}
             on:resize={(e) => {
               onUpdateRequestState({
@@ -253,7 +245,7 @@
             >
               <!-- Request Pane -->
               <div
-                class="h-100 d-flex flex-column position-relative {$requestSplitterDirection ===
+                class="h-100 d-flex flex-column position-relative {$tabsSplitterDirection ===
                 'horizontal'
                   ? 'pb-1'
                   : 'pe-2'}"
@@ -351,7 +343,7 @@
             >
               <!-- Response Pane -->
               <div
-                class="d-flex flex-column h-100 {$requestSplitterDirection ===
+                class="d-flex flex-column h-100 {$tabsSplitterDirection ===
                 'horizontal'
                   ? 'pt-1'
                   : 'ps-2'}"

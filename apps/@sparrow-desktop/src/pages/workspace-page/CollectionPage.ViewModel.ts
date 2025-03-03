@@ -49,7 +49,7 @@ import { type Observable } from "rxjs";
 import { InitRequestTab, InitWebSocketTab } from "@sparrow/common/utils";
 import { InitCollectionTab } from "@sparrow/common/utils";
 import { InitFolderTab } from "@sparrow/common/utils";
-import { requestSplitterDirection } from "@sparrow/workspaces/features/rest-explorer/store";
+import { tabsSplitterDirection } from "@sparrow/workspaces/stores";
 import {
   insertCollectionRequest,
   updateCollectionRequest,
@@ -4295,7 +4295,7 @@ export default class CollectionsViewModel {
   };
 
   public handleOnChangeViewInRequest = async (view: string) => {
-    requestSplitterDirection.set(view);
+    tabsSplitterDirection.set(view);
   };
 
   public importJSONObject = async (

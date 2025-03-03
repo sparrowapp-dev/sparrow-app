@@ -9,3 +9,5 @@ export {
   currentStep,
   isFirstTimeInTestFlow,
 } from "./guide.tour";
+
+export { tabsSplitterDirection } from "./tabs-view";

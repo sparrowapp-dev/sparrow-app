@@ -14,7 +14,7 @@
 
   // ---- Helper
   import { tabBarScroller } from "@sparrow/common/utils/navigation";
-  import { requestSplitterDirection } from "@sparrow/workspaces/features/rest-explorer/store";
+  import { tabsSplitterDirection } from "../../../stores";
   import { HelpIcon } from "@sparrow/library/assets";
   import {
     HorizontalGridIcon,
@@ -299,7 +299,7 @@
                   viewChange = !viewChange;
                 }}
               >
-                {#if $requestSplitterDirection === "horizontal"}
+                {#if $tabsSplitterDirection === "horizontal"}
                   <HorizontalGridIcon
                     color={"var(--icon-secondary-200)"}
                     height={12}
