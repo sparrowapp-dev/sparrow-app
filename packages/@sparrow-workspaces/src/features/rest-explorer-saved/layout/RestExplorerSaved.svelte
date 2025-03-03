@@ -50,8 +50,7 @@
     ResponseSectionEnum,
     type KeyValue,
   } from "@sparrow/common/types/workspace";
-  import { requestSplitterDirection } from "../store";
-  import { Popover } from "@sparrow/library/ui";
+  import { tabsSplitterDirection } from "../../../stores";
   import { onMount } from "svelte";
   import { Carousel, Modal } from "@sparrow/library/ui";
   import RequestDoc from "../components/request-doc/RequestDoc.svelte";
@@ -61,8 +60,6 @@
     SendingApiRequest,
   } from "@sparrow/workspaces/constants";
 
-  import type { CancelRequestType } from "@workspaces/common/type/actions";
-  import type { restExplorerData } from "../store/rest-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { ChevronRightRegular } from "@sparrow/library/icons";
 
@@ -72,7 +69,6 @@
   export let requestAuthParameter: Observable<KeyValue>;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
   export let onSendRequest: SendRequestType;
-  export let onCancelRequest: CancelRequestType;
   export let onUpdateRequestMethod: UpdateRequestMethodType;
   export let onUpdateRequestParams: UpdateParamsType;
   export let onUpdateRequestName: UpdateRequestNameType;
@@ -106,7 +102,7 @@
    * Role of user in active workspace
    */
   export let userRole;
-  export let storeData: restExplorerData | undefined;
+  export let storeData;
   export let isTourGuideOpen = false;
   export let isWebApp = false;
   export let azureBlobCDN;
@@ -213,9 +209,7 @@
         bind:userRole
         requestUrl={$tab.property.savedRequest?.url}
         httpMethod={$tab.property.savedRequest?.method}
-        isSendRequestInProgress={storeData?.isSendRequestInProgress}
         onSendButtonClicked={onSendRequest}
-        onCancelButtonClicked={onCancelRequest}
         {onUpdateEnvironment}
         {environmentVariables}
         {onUpdateRequestUrl}
@@ -225,38 +219,14 @@
         {isGuestUser}
       />
       <!--Disabling the Quick Help feature, will be taken up in next release-->
-      <div class="" style="margin-top: 10px;">
-        {#if isPopoverContainer}
-          <Popover
-            onClose={closeCollectionHelpText}
-            heading={`Welcome to Sparrow`}
-          >
-            <p class="mb-0 text-fs-12">
-              Your one-stop solution for API testing and management. Start
-              organizing your API requests into collections, utilize environment
-              variables, and streamline your development process. Get started
-              now by creating your first collection or exploring our features
-              <span
-                on:click={() => {
-                  isGuidePopup = true;
-                }}
-                class="link p-0 border-0"
-                style="font-size: 12px;"
-                >See how it works.
-              </span>
-            </p>
-          </Popover>
-        {/if}
-      </div>
+      <div class="" style="margin-top: 10px;"></div>
       <div class="pt-2"></div>
       <div style="flex:1; overflow:auto;">
         {#if !isLoading}
           <Splitpanes
             class="rest-splitter-saved w-100 h-100"
             id={"rest-splitter-saved"}
-            horizontal={$requestSplitterDirection === "horizontal"
-              ? true
-              : false}
+            horizontal={$tabsSplitterDirection === "horizontal" ? true : false}
             dblClickSplitter={false}
             on:resize={(e) => {
               onUpdateRequestState({
@@ -275,7 +245,7 @@
             >
               <!-- Request Pane -->
               <div
-                class="h-100 d-flex flex-column position-relative {$requestSplitterDirection ===
+                class="h-100 d-flex flex-column position-relative {$tabsSplitterDirection ===
                 'horizontal'
                   ? 'pb-1'
                   : 'pe-2'}"
@@ -373,7 +343,7 @@
             >
               <!-- Response Pane -->
               <div
-                class="d-flex flex-column h-100 {$requestSplitterDirection ===
+                class="d-flex flex-column h-100 {$tabsSplitterDirection ===
                 'horizontal'
                   ? 'pt-1'
                   : 'ps-2'}"
