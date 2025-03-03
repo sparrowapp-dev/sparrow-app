@@ -1,6 +1,6 @@
 <script lang="ts">
-  export let size = "16px";
-  export let color = "#FFFFFF";
+  export let size = "20px";
+  export let color = "";
   $: finalColor = color === "" ? "inherit" : color;
 </script>
 

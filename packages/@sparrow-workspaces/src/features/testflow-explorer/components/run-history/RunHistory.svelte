@@ -76,7 +76,7 @@
           <!-- HEADER -->
           <div class="d-flex align-items-center justify-content-between px-1">
             <div class="d-flex justify-content-center align-items-center">
-              <HistoryRegular />
+              <HistoryRegular size={"16px"} color={"#FFFFFF"} />
               <span class="ms-2 header-title-text"> Run History </span>
             </div>
             <Button
