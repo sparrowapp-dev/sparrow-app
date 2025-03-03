@@ -303,7 +303,11 @@
             width={"6px"}
           />
         </div>
-        <span class="response-text">
+        <span
+          class="response-text-{checkIfRequestSucceed(currentBlock)
+            ? 'success'
+            : 'fail'}"
+        >
           {currentBlock?.response?.status.split(" ")[0] || ""}
         </span>
       </div>
@@ -581,5 +585,11 @@
     padding-bottom: 1px;
     padding-left: 4px;
     padding-right: 2px;
+  }
+  .response-text-success {
+    color: var(--text-ds-success-400);
+  }
+  .response-text-fail {
+    color: var(--text-ds-danger-300);
   }
 </style>
