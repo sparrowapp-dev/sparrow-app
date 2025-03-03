@@ -160,17 +160,18 @@
       },
     },
   ];
-  const truncateFolderName = (name: string, charLimit: number) => {
-    if (name.length > charLimit) {
-      return name.substring(0, 4) + "...";
+
+  const truncateName = (
+    name: string,
+    charLimit: number,
+    isFolder: boolean = false,
+  ) => {
+    if (isFolder) {
+      return name.length > charLimit ? name.substring(0, 4) + "..." : name;
     }
-    return name;
-  };
-  const truncateName = (name: string, charLimit: number) => {
-    if (name.length > charLimit + 2) {
-      return name.substring(0, charLimit) + "...";
-    }
-    return name;
+    return name.length > charLimit + 2
+      ? name.substring(0, charLimit) + "..."
+      : name;
   };
 </script>
 
@@ -273,7 +274,7 @@
               class="ellipsis label-text"
               style="margin-left: 4px; margin-bottom:0px;"
             >
-              {truncateFolderName(selectedFolder.name, 6)}
+              {truncateName(selectedFolder.name, 6, true)}
             </p>
           </div>
         {/if}
