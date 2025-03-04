@@ -351,7 +351,7 @@
   :global(.message-wrapper .hljs) {
     background: #000 !important;
     padding: 8px 0px 8px 8px;
-    border: 1px solid var(--bg-tertiary-190);
+    border: 2px solid var(--border-ds-surface-400);
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
   }
@@ -363,7 +363,7 @@
     width: 30px;
   }
   :global(.action-button:hover) {
-    background-color: var(--bg-tertiary-190);
+    background-color: var(--border-ds-surface-400);
   }
 
   button:disabled {

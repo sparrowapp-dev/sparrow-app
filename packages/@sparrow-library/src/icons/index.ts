@@ -191,3 +191,4 @@ export { default as ClockRegular } from "./ClockRegular.svelte";
 export { default as ArrowDownloadRegular} from "./ArrowDownloadRegular.svelte";
 export { default as ArrowUpRightRegular } from "./ArrowUpRightRegular.svelte";
 export{default as SendRegular} from "./SendRegular.svelte";
+export { default as CircleSmallFilled } from "./CircleSmallFilled.svelte";

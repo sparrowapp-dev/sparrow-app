@@ -49,7 +49,7 @@ import { type Observable } from "rxjs";
 import { InitRequestTab, InitWebSocketTab } from "@sparrow/common/utils";
 import { InitCollectionTab } from "@sparrow/common/utils";
 import { InitFolderTab } from "@sparrow/common/utils";
-import { requestSplitterDirection } from "@sparrow/workspaces/features/rest-explorer/store";
+import { tabsSplitterDirection } from "@sparrow/workspaces/stores";
 import {
   insertCollectionRequest,
   updateCollectionRequest,
@@ -1880,7 +1880,7 @@ export default class CollectionsViewModel {
       });
     } else {
       // Show error notification and clean up by deleting the folder locally on failure.
-      notifications.error("Failed to create folder. Plaease try again.");
+      notifications.error("Failed to create folder. Please try again.");
       this.collectionRepository.deleteRequestOrFolderInCollection(
         collection.id,
         folder.id,
@@ -2995,7 +2995,7 @@ export default class CollectionsViewModel {
       });
       return true;
     } else {
-      notifications.error("Failed to delete API request. Plaease try again.");
+      notifications.error("Failed to delete API request. Please try again.");
       return false;
     }
   };
@@ -3087,7 +3087,7 @@ export default class CollectionsViewModel {
       });
       return true;
     } else {
-      notifications.error("Failed to delete WebSocket. Plaease try again.");
+      notifications.error("Failed to delete WebSocket. Please try again.");
       return false;
     }
   };
@@ -3151,7 +3151,7 @@ export default class CollectionsViewModel {
 
     if (!response?.isSuccessful) {
       notifications.error(
-        `Failed to delete ${SocketIORequestDefaultAliasBaseEnum.NAME}. Plaease try again.`,
+        `Failed to delete ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
       );
       return false;
     }
@@ -3237,7 +3237,7 @@ export default class CollectionsViewModel {
 
     if (!response?.isSuccessful) {
       notifications.error(
-        `Failed to delete ${GraphqlRequestDefaultAliasBaseEnum.NAME}. Plaease try again.`,
+        `Failed to delete ${GraphqlRequestDefaultAliasBaseEnum.NAME}. Please try again.`,
       );
       return false;
     }
@@ -4010,7 +4010,7 @@ export default class CollectionsViewModel {
   };
 
   public handleOnChangeViewInRequest = async (view: string) => {
-    requestSplitterDirection.set(view);
+    tabsSplitterDirection.set(view);
   };
 
   public importJSONObject = async (
