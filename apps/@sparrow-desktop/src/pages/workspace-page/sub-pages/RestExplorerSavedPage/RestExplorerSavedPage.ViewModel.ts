@@ -838,7 +838,36 @@ export class RestExplorerSavedViewModel {
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
-    if (isGuestUser === true) return;
+    if (isGuestUser === true) {
+      const progressiveTab = this._tab.getValue();
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+
+      if (folderId) {
+        this.collectionRepository.updateSavedRequestInFolder(
+          collectionId,
+          folderId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      } else {
+        this.collectionRepository.updateSavedRequestInCollection(
+          collectionId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      }
+      MixpanelEvent(Events.DOCUMENT_RESPONSE);
+      notifications.success("Response saved successfully.");
+      return;
+    }
     const res = await this.collectionService.updateSavedRequestInCollection(
       componentData.id,
       {

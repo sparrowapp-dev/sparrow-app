@@ -433,7 +433,39 @@ class RestExplorerViewModel
       });
 
       if (isGuestUser == true) {
-        return "";
+        const savedRequestId = uuidv4();
+        const savedRequestData = {
+          id: savedRequestId,
+          name: componentData.name,
+          description: componentData.description,
+          type: CollectionItemTypeBaseEnum.SAVED_REQUEST,
+          requestResponse: unadaptedRequest,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        const progressiveTab = this._tab.getValue();
+        progressiveTab.isSaved = true;
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        if (folderId) {
+          this.collectionRepository.addSavedRequestInFolder(
+            collectionId,
+            folderId,
+            requestId,
+            savedRequestData,
+          );
+        } else {
+          this.collectionRepository.addSavedRequestInCollection(
+            collectionId,
+            requestId,
+            savedRequestData,
+          );
+        }
+        notifications.success("Response saved successfully.");
+        return savedRequestId || "";
       }
       const res = await this.collectionService.createSavedRequestInCollection({
         collectionId: collectionId,
