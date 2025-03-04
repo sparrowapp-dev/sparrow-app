@@ -30,9 +30,15 @@
     TabTypeEnum,
   } from "@sparrow/common/types/workspace/tab";
   import { type Tab } from "@sparrow/common/types/workspace/tab";
-  import { Badge, Spinner } from "@sparrow/library/ui";
+  import { Badge, Spinner, Options } from "@sparrow/library/ui";
   import { SvelteComponent } from "svelte";
   // ----
+
+  // ------ Props ------
+  /**
+   * New tab with details
+   */
+  export let tabList;
 
   // ------ Props ------
   /**
@@ -74,14 +80,27 @@
 
   export let listLength;
   export let onDoubleClick: (tab: Tab) => void;
+  export let onRightClick: (tab: Tab) => void;
+  export let onClickCloseOtherTabs: (tabList: [], tabId: string) => void;
+  let noOfColumns = 180;
+  let showTabControlMenu = false;
+
   function handleMouseDown(event: MouseEvent) {
+    console.log("in handleMouseDown 1");
     if (event.button === 1) {
+      console.log("in handleMouseDown 2");
       // Check if the middle button is pressed (button code 1)
       onTabClosed(tab.id, tab);
     }
   }
   const handleDoubleClick = (tab: Tab) => {
     onDoubleClick(tab);
+  };
+
+  const handleRightClick = (tab: Tab) => {
+    showTabControlMenu = !showTabControlMenu;
+    // onRightClick(tab);
+    console.log("in handleRightClick() => ");
   };
 </script>
 
@@ -100,7 +119,59 @@
     : ''}"
   on:mousedown={handleMouseDown}
   on:dblclick={() => handleDoubleClick(tab)}
+  on:contextmenu|preventDefault={() => handleRightClick(tab)}
 >
+  {#if showTabControlMenu}
+    <!-- {console.log(tab)} -->
+    <Options
+      xAxis={200}
+      yAxis={[300 - 0, 300 + 5]}
+      zIndex={500}
+      menuItems={[
+        {
+          onClick: () => {
+            onTabClosed(tab.id, tab);
+          },
+          displayText: "Close Tab",
+          disabled: false,
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            console.log("fn :>> ", onClickCloseOtherTabs);
+            onClickCloseOtherTabs(tabList, tab.id);
+          },
+          displayText: "Close Other Tabs",
+          disabled: false,
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            onClickCloseOtherTabs(tabList, "");
+          },
+          displayText: "Close All Tabs",
+          hidden: false,
+        },
+        {
+          onClick: () => {},
+          displayText: "Force Close Other Tabs",
+          hidden: false,
+        },
+        {
+          onClick: () => {},
+          displayText: "Force Close All Tabs",
+          hidden: false,
+        },
+        {
+          onClick: () => {},
+          displayText: "Duplicate Tab",
+          hidden: false,
+        },
+      ]}
+      {noOfColumns}
+    />
+  {/if}
+
   <div
     tabindex="-1"
     class="tab-item w-100 d-flex justify-content-between px-2 border-upper-radius h-100 align-items-center"

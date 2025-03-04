@@ -31,7 +31,7 @@
     SaveAsCollectionItem,
   } from "@sparrow/workspaces/features";
   import { WithModal } from "@sparrow/workspaces/hoc";
-  import { notifications, Options } from "@sparrow/library/ui";
+  import { notifications } from "@sparrow/library/ui";
   import { DownloadApp } from "@sparrow/common/features";
 
   // ---- Interface, enum & constants
@@ -74,6 +74,7 @@
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import constants from "src/constants/constants";
+  // import Tab from "../../../../../packages/@sparrow-workspaces/src/features/tab-bar/components/tab/Tab.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -96,7 +97,6 @@
   let isGuestUser = false;
   let userId = "";
   let userRole = "";
-  let isShowTabControlsMenu = false;
 
   let isExpandCollection = false;
   let isExpandEnvironment = false;
@@ -204,6 +204,15 @@
     } else {
       _viewModel.handleRemoveTab(id);
     }
+  };
+
+  const closeTabExceptCurrentOne = (tabList: [], currentTabId: string) => {
+    console.log("in closeTabExceptCurrentOne :>>  ", tabList, closeTab);
+    tabList?.forEach((tab: Tab) => {
+      if (tab.id !== currentTabId) {
+        closeTab(tab.id, tab);
+      }
+    });
   };
 
   const handleClosePopupBackdrop = (flag: boolean) => {
@@ -431,6 +440,7 @@
   let isLaunchAppModalOpen = false;
 
   const launchSparrowWebApp = () => {
+    console.log("in launchSparrowWebApp() collectionPage.svelte :>> ");
     let appDetected = false;
 
     // Handle when window loses focus (app opens)
@@ -451,22 +461,11 @@
 
       // Only show popup if app wasn't detected
       if (!appDetected) {
+        console.log("App isn't detected !!!!");
         isLaunchAppModalOpen = true;
       }
     }, 500);
   };
-
-  function handleRightClick() {
-    isShowTabControlsMenu = true;
-    console.log("someone right clicked !");
-  }
-
-  $: {
-    setTimeout(() => {
-      console.log("handlddd");
-      handleRightClick();
-    }, 3000);
-  }
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -552,6 +551,7 @@
             onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
             onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
             onDoubleClick={_viewModel.handleTabTypeChange}
+            onClickCloseOtherTabs={closeTabExceptCurrentOne}
           />
           <div style="flex:1; overflow: hidden;">
             <Route>
@@ -677,43 +677,6 @@
     }}
   />
 </Modal>
-
-{#if isShowTabControlsMenu}
-  {console.log("hiiiii")}
-  <Options
-    xAxis={200}
-    yAxis={[300, 335]}
-    zIndex={500}
-    menuItems={[
-      {
-        onClick: () => {
-          expand = true;
-          if (expand) {
-            // onItemOpened("folder", {
-            //   workspaceId: collection.workspaceId,
-            //   collection,
-            //   folder: explorer,
-            // });
-          }
-        },
-        displayText: "Close Tab",
-        disabled: false,
-        hidden: false,
-      },
-      {
-        onClick: () => {
-          expand = false;
-          // isRenaming = true;
-        },
-        displayText: "Duplicate Tab",
-        disabled: false,
-        hidden: false,
-      },
-    ]}
-    180
-  />
-{/if}
-
 {#if isAccessDeniedModalOpen}
   <Modal
     title="Access Denied"
@@ -732,11 +695,7 @@
   </Modal>
 {/if}
 
-<svelte:window
-  on:keydown={handleKeyPress}
-  on:click={handleRightClick}
-  on:contextmenu|preventDefault={handleRightClick}
-/>
+<svelte:window on:keydown={handleKeyPress} />
 <!-- <ImportCollection
     {collectionList}
     workspaceId={$currentWorkspace._id}

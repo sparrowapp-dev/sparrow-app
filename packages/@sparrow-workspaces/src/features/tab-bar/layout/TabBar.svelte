@@ -63,6 +63,8 @@
 
   export let onDoubleClick: (tab) => void;
 
+  export let onClickCloseOtherTabs: (tabList: [], tabId: string) => void;
+
   let isTabSaved: boolean;
 
   let activeTabType: string;
@@ -95,6 +97,8 @@
   let scrollerWidth: number;
   let moreOption: boolean = false;
   let viewChange: boolean = false;
+
+  $: console.log("tabList ;>> ", tabList);
 </script>
 
 <button
@@ -141,6 +145,7 @@
         {#each tabList as tab, index (tab.tabId)}
           <Tab
             {tab}
+            {tabList}
             {onTabSelected}
             {onTabClosed}
             listLength={tabList.length}
@@ -149,6 +154,7 @@
             {onDragStart}
             {onDropOver}
             {onDoubleClick}
+            {onClickCloseOtherTabs}
           />
         {/each}
       {/if}
