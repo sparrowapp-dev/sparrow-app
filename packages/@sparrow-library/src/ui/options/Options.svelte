@@ -35,18 +35,14 @@
       }).length *
         itemHeight +
       containerPadding;
-
     const windowHeight = window.innerHeight;
     const windowWidth = window.innerWidth;
-
     mouseX = xAxis;
     mouseY = yAxis[1];
     const [xWidth, xTranslate] = calculateRightOptionWidth();
-
     if (windowHeight < yAxis[1] + dialogHeight) {
       mouseY = yAxis[0] - dialogHeight;
     }
-
     if (windowWidth < xAxis + xWidth) {
       mouseX = xAxis - xTranslate;
     }
@@ -63,7 +59,7 @@
 </script>
 
 <nav
-  style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:{zIndex}; backgrounColor: #80ced6"
+  style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:{zIndex};"
   in:scale={{ start: 0.8, duration: 400 }}
   out:scale={{ start: 0.8, duration: 400 }}
 >
