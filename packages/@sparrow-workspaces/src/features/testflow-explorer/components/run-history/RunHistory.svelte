@@ -291,11 +291,8 @@
     background: var(--bg-ds-surface-100);
     border-radius: 8px;
   }
-  /* .scroll-container::-webkit-scrollbar-button {
-    color: var(--bg-ds-surface-100);
-  } */
   .scroll-container::-webkit-scrollbar-button {
-    background-image: url("data:image/svg+xml,%3Csvg width='6' height='4' viewBox='0 0 6 4' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.0761497 3.38268C0.230931 3.75636 0.595567 4 1.00003 4H5.00003C5.40449 4 5.76913 3.75636 5.92391 3.38268C6.07869 3.00901 5.99313 2.57889 5.70714 2.29289L3.70714 0.292893C3.31661 -0.097631 2.68345 -0.097631 2.29292 0.292893L0.292922 2.29289C0.00692445 2.57889 -0.0786313 3.00901 0.0761497 3.38268Z' fill='%2331353F'/%3E%3C/svg%3E");
+    color: var(--bg-ds-surface-100);
   }
 
   /* Status Icon Styling */
