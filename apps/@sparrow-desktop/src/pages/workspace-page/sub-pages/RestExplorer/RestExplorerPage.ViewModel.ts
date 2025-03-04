@@ -451,14 +451,14 @@ class RestExplorerViewModel
           progressiveTab,
         );
         if (folderId) {
-          this.collectionRepository.addSavedRequestInFolder(
+          await this.collectionRepository.addSavedRequestInFolder(
             collectionId,
             folderId,
             requestId,
             savedRequestData,
           );
         } else {
-          this.collectionRepository.addSavedRequestInCollection(
+          await this.collectionRepository.addSavedRequestInCollection(
             collectionId,
             requestId,
             savedRequestData,

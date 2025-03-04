@@ -2376,27 +2376,27 @@ export default class CollectionsViewModel {
 
     if (isGuestUser === true) {
       if (collection.id && workspaceId && !folder.id) {
-        this.collectionRepository.updateSavedRequestInCollection(
+        await this.collectionRepository.updateSavedRequestInCollection(
           collection.id,
           request.id,
           requestResponse.id,
           { name: newRequestName },
         );
-        this.updateTab(requestResponse.id, {
+        await this.updateTab(requestResponse.id, {
           name: newRequestName,
         });
         MixpanelEvent(Events.RENAME_REQUEST, {
           source: "Collection list",
         });
       } else if (collection.id && workspaceId && folder.id) {
-        this.collectionRepository.updateSavedRequestInFolder(
+        await this.collectionRepository.updateSavedRequestInFolder(
           collection.id,
           folder.id,
           request.id,
           requestResponse.id,
           { name: newRequestName },
         );
-        this.updateTab(requestResponse.id, {
+        await this.updateTab(requestResponse.id, {
           name: newRequestName,
         });
         MixpanelEvent(Events.RENAME_REQUEST, {

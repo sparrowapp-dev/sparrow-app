@@ -845,7 +845,7 @@ export class RestExplorerSavedViewModel {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
 
       if (folderId) {
-        this.collectionRepository.updateSavedRequestInFolder(
+        await this.collectionRepository.updateSavedRequestInFolder(
           collectionId,
           folderId,
           requestId,
@@ -855,7 +855,7 @@ export class RestExplorerSavedViewModel {
           },
         );
       } else {
-        this.collectionRepository.updateSavedRequestInCollection(
+        await this.collectionRepository.updateSavedRequestInCollection(
           collectionId,
           requestId,
           componentData.id,
