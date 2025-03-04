@@ -2,39 +2,24 @@
   import { RequestMethod, WorkspaceRole } from "@sparrow/common/enums";
 
   import { Select } from "@sparrow/library/forms";
-  import type {
-    SaveRequestType,
-    SendRequestType,
-    UpdateRequestMethodType,
-    UpdateRequestUrlType,
-  } from "@sparrow/workspaces/type";
-  import { Button, notifications } from "@sparrow/library/ui";
-  import { DropButton } from "@sparrow/workspaces/components";
+  import { Button } from "@sparrow/library/ui";
   import { CodeMirrorInput } from "../../../../components";
   import { UrlInputTheme } from "../../../../utils";
   import { Tooltip } from "@sparrow/library/ui";
-  import {
-    ArrowUpRightRegular,
-    DiskIcon,
-    SaveRegular,
-  } from "@sparrow/library/icons";
-  // import type { CancelRequestType } from "@workspaces/common/type/actions";
+  import { ArrowUpRightRegular, SaveRegular } from "@sparrow/library/icons";
+
   let componentClass = "";
   export { componentClass as class };
 
   export let requestUrl: string;
   export let httpMethod: string;
-  export let isSendRequestInProgress: boolean;
-  export let onSendButtonClicked: SendRequestType;
-  export let onCancelButtonClicked: CancelRequestType;
-  export let onUpdateRequestUrl: UpdateRequestUrlType;
-  export let onUpdateRequestMethod: UpdateRequestMethodType;
-  export let toggleSaveRequest: (flag: boolean) => void;
-  export let onSaveRequest: SaveRequestType;
+  export let onSendButtonClicked;
+  export let onUpdateRequestUrl;
+  export let onUpdateRequestMethod;
+  export let onSaveRequest;
   export let environmentVariables;
   export let onUpdateEnvironment;
   export let isSave;
-  export let isGuestUser = false;
   /**
    * Role of user in active workspace
    */
