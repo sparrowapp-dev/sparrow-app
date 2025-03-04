@@ -24,7 +24,7 @@
    * @description - recalculates positions for element that overflows window
    */
   const calculateAdjustedAxis = () => {
-    const itemHeight = 38;
+    const itemHeight = 20;
     const containerPadding = 16;
     const dialogHeight =
       menuItems.filter((elem) => {
@@ -35,37 +35,21 @@
       }).length *
         itemHeight +
       containerPadding;
+
     const windowHeight = window.innerHeight;
     const windowWidth = window.innerWidth;
 
-    // Get overflow amounts
     mouseX = xAxis;
     mouseY = yAxis[1];
     const [xWidth, xTranslate] = calculateRightOptionWidth();
 
+    if (windowHeight < yAxis[1] + dialogHeight) {
+      mouseY = yAxis[0] - dialogHeight;
+    }
+
     if (windowWidth < xAxis + xWidth) {
       mouseX = xAxis - xTranslate;
     }
-
-    // ** change -Start
-    // Old Code -Keeping it for future reference
-    // if (windowHeight < yAxis[1] + dialogHeight) {
-    //   mouseY = yAxis[0] - dialogHeight;
-    // }
-
-    const verticalOverflow = yAxis[1] + dialogHeight - windowHeight;
-
-    if (verticalOverflow > 0) {
-      const offsetFromBottom = 0;
-      const adjustedY = yAxis[1] - verticalOverflow - offsetFromBottom;
-      if (adjustedY < 0)
-        mouseY = yAxis[0] - dialogHeight; // If still overflowing at top, flip to above
-      else {
-        mouseY = adjustedY;
-        mouseX += 25; // some horizontal offset as well
-      }
-    }
-    // ** change -End
   };
 
   $: {
@@ -79,7 +63,7 @@
 </script>
 
 <nav
-  style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:{zIndex};"
+  style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:{zIndex}; backgrounColor: #80ced6"
   in:scale={{ start: 0.8, duration: 400 }}
   out:scale={{ start: 0.8, duration: 400 }}
 >
