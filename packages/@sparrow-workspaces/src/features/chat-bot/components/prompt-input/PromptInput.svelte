@@ -17,7 +17,7 @@
   };
 </script>
 
-<div class="d-flex p-3">
+<div class="d-flex p-2">
   <div class="position-relative w-100">
     <input
       type=""
@@ -55,7 +55,7 @@
         <SendRegular
           size={"14px"}
           color={prompt.trim()
-            ? "var(--white-color)"
+            ? "var( --bg-ds-neutral-50)"
             : isSendButtonHovered
               ? "var(--icon-secondary-100)"
               : "var(--border-ds-neutral-400)"}

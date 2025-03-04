@@ -55,7 +55,7 @@
     <div class="d-flex h-100 flex-column">
       <div
         class="d-flex"
-        style="justify-content: space-between; align-items:center; height:32px; width:294.84px"
+        style="justify-content: space-between; align-items:center; height:32px; "
         in:fade={{ duration: 200 }}
       >
         <div class="p-2">
@@ -171,13 +171,12 @@
     position: relative;
     background-color: var(--bg-ds-surface-700);
     border-radius: 8px;
-    padding: 16px 3px 10px 4px;
+    padding: 16px 12px 16px 12px;
     min-width: 320px;
     max-width: 440px;
     min-height: 240px;
     max-height: 640px;
     isolation: isolate;
-    gap: 16px;
   }
   .chat-box::before {
     content: "";
@@ -225,7 +224,7 @@
     position: absolute;
     top: -75%;
     background-color: var(--bg-ds-surface-700);
-    width: 100%;
+    width: 95%;
   }
   ::-webkit-scrollbar-thumb {
     background-color: var(--bg-ds-surface-100);
