@@ -99,35 +99,38 @@
 
   let mouseX = 0;
   let mouseY = 0;
-  let selectedTabHTMLElement: HTMLElement | null;
   const handleRightClick = (event: MouseEvent, tab: Tab) => {
-    // const buttonElement = event.currentTarget as HTMLButtonElement; // Right-clicked button
-    // const childDiv = buttonElement.querySelector("div"); // Get the first child div
-
-    // if (childDiv instanceof HTMLElement) {
-    //   selectedTabHTMLElement = childDiv; // Store the div element
-    //   const rect = selectedTabHTMLElement.getBoundingClientRect();
-    //   console.log("Element position:", rect);
-    // }
-
-    // console.log("Right-clicked tab:", tab);
-    // console.log("Selected child div:", selectedTabHTMLElement);
-
-    // Store mouse coordinates
+    showTabControlMenu = !showTabControlMenu;
     mouseX = event.clientX;
     mouseY = event.clientY;
-    showTabControlMenu = !showTabControlMenu;
+
+    const tabbarElement = document.querySelector(".tabbar") as HTMLElement;
+
+    if (tabbarElement) {
+      const navbarElement = tabbarElement.querySelector(".navbar");
+      console.log("nav :>> ", navbarElement);
+      if (navbarElement) {
+        // console.log("Navbar is present inside Tabbar.");
+        navbarElement.remove();
+        // showTabControlMenu = true;
+      } else {
+        // console.log("Navbar is NOT present inside Tabbar.");
+        showTabControlMenu = true;
+      }
+    }
+
+    // showTabControlMenu = !showTabControlMenu;
 
     // Add event listener to close menu when clicking outside
-    setTimeout(() => {
-      window.addEventListener("click", handleOutsideClick);
-    }, 0);
+    // setTimeout(() => {
+    //   window.addEventListener("click", handleOutsideClick);
+    // }, 0);
   };
 
-  const handleOutsideClick = (event: MouseEvent) => {
-    showTabControlMenu = false;
-    window.removeEventListener("click", handleOutsideClick); // Remove event listener
-  };
+  // const handleOutsideClick = (event: MouseEvent) => {
+  //   showTabControlMenu = false;
+  //   window.removeEventListener("click", handleOutsideClick); // Remove event listener
+  // };
 </script>
 
 <button
@@ -361,6 +364,12 @@
     {/if}
   </div></button
 >
+<svelte:window
+  on:click={() => {
+    // console.log("tab :>> ", tab);
+    showTabControlMenu = false;
+  }}
+/>
 
 <style>
   * {
