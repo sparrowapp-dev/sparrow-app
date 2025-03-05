@@ -5583,7 +5583,30 @@ export default class CollectionsViewModel {
       isGuestUser = value;
     });
 
-    if (isGuestUser === true) return false;
+    if (isGuestUser === true) {
+      if (folderId) {
+        this.collectionRepository.updateSavedRequestInFolder(
+          collectionId,
+          folderId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      } else {
+        this.collectionRepository.updateSavedRequestInCollection(
+          collectionId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      }
+      notifications.success("Response saved successfully.");
+      return true;
+    }
     const res = await this.collectionService.updateSavedRequestInCollection(
       componentData.id,
       {
