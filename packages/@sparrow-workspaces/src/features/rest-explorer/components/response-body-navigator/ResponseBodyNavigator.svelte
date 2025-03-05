@@ -225,7 +225,7 @@
             Clear
           </button>
         </div>
-        {#if path?.collectionId && !isGuestUser && !isWebApp}
+        {#if path?.collectionId && !isWebApp}
           <!-- Save button -->
           <Button
             startIcon={SaveIcon}

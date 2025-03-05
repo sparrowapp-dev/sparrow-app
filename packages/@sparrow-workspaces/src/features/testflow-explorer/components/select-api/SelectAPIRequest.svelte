@@ -205,7 +205,7 @@
           >
             {method}
           </span>
-          <span class="select-txt">{truncateName(name, 22)}</span>
+          <span class="select-txt">{truncateName(name, 21)}</span>
         </div>
       {:else}
         <span class="select-txt-new">Select API Request</span>

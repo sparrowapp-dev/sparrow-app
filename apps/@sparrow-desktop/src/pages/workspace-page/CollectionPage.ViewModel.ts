@@ -2376,39 +2376,27 @@ export default class CollectionsViewModel {
 
     if (isGuestUser === true) {
       if (collection.id && workspaceId && !folder.id) {
-        const response =
-          await this.collectionRepository.readRequestOrFolderInCollection(
-            collection.id,
-            request.id,
-          );
-        const storage = request;
-        storage.name = newRequestName;
-        await this.collectionRepository.updateRequestOrFolderInCollection(
+        await this.collectionRepository.updateSavedRequestInCollection(
           collection.id,
           request.id,
-          response,
+          requestResponse.id,
+          { name: newRequestName },
         );
-        this.updateTab(requestResponse.id, {
+        await this.updateTab(requestResponse.id, {
           name: newRequestName,
         });
         MixpanelEvent(Events.RENAME_REQUEST, {
           source: "Collection list",
         });
       } else if (collection.id && workspaceId && folder.id) {
-        const response = await this.collectionRepository.readRequestInFolder(
+        await this.collectionRepository.updateSavedRequestInFolder(
           collection.id,
           folder.id,
           request.id,
+          requestResponse.id,
+          { name: newRequestName },
         );
-        const storage = request;
-        storage.name = newRequestName;
-        await this.collectionRepository.updateRequestInFolder(
-          collection.id,
-          folder.id,
-          request.id,
-          response,
-        );
-        this.updateTab(requestResponse.id, {
+        await this.updateTab(requestResponse.id, {
           name: newRequestName,
         });
         MixpanelEvent(Events.RENAME_REQUEST, {
@@ -3204,20 +3192,21 @@ export default class CollectionsViewModel {
 
     if (isGuestUser === true) {
       if (folder) {
-        await this.collectionRepository.deleteRequestInFolder(
-          collection.id,
-          folder.id,
+        await this.collectionRepository.deleteSavedRequestInFolder(
+          requestObject.collectionId,
+          requestObject.folderId,
           request.id,
+          requestResponse.id,
         );
-        this.tabRepository.removeTab(request.id);
+        this.tabRepository.removeTab(requestResponse.id);
       } else {
-        await this.collectionRepository.deleteRequestOrFolderInCollection(
-          collection.id,
+        await this.collectionRepository.deleteSavedRequestInCollection(
+          requestObject.collectionId,
           request.id,
+          requestResponse.id,
         );
-        this.tabRepository.removeTab(request.id);
+        this.tabRepository.removeTab(requestResponse.id);
       }
-
       return true;
     }
     const response =
@@ -5594,7 +5583,30 @@ export default class CollectionsViewModel {
       isGuestUser = value;
     });
 
-    if (isGuestUser === true) return false;
+    if (isGuestUser === true) {
+      if (folderId) {
+        this.collectionRepository.updateSavedRequestInFolder(
+          collectionId,
+          folderId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      } else {
+        this.collectionRepository.updateSavedRequestInCollection(
+          collectionId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      }
+      notifications.success("Response saved successfully.");
+      return true;
+    }
     const res = await this.collectionService.updateSavedRequestInCollection(
       componentData.id,
       {
