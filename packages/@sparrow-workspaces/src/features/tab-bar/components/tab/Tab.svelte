@@ -30,7 +30,7 @@
     TabTypeEnum,
   } from "@sparrow/common/types/workspace/tab";
   import { type Tab } from "@sparrow/common/types/workspace/tab";
-  import { Badge, Spinner, Options } from "@sparrow/library/ui";
+  import { Badge, Spinner, Options, Dropdown } from "@sparrow/library/ui";
   import { SvelteComponent } from "svelte";
   // ----
 
@@ -82,13 +82,13 @@
   export let onDoubleClick: (tab: Tab) => void;
   export let onRightClick: (tab: Tab) => void;
   export let onClickCloseOtherTabs: (tabList: [], tabId: string) => void;
+  export let onClickForceCloseTabs: (tabList: [], tabId: string) => void;
+  export let onClickDuplicateTab: (tabId: string) => void;
   let noOfColumns = 180;
   let showTabControlMenu = false;
 
   function handleMouseDown(event: MouseEvent) {
-    console.log("in handleMouseDown 1");
     if (event.button === 1) {
-      console.log("in handleMouseDown 2");
       // Check if the middle button is pressed (button code 1)
       onTabClosed(tab.id, tab);
     }
@@ -97,10 +97,36 @@
     onDoubleClick(tab);
   };
 
-  const handleRightClick = (tab: Tab) => {
+  let mouseX = 0;
+  let mouseY = 0;
+  let selectedTabHTMLElement: HTMLElement | null;
+  const handleRightClick = (event: MouseEvent, tab: Tab) => {
+    // const buttonElement = event.currentTarget as HTMLButtonElement; // Right-clicked button
+    // const childDiv = buttonElement.querySelector("div"); // Get the first child div
+
+    // if (childDiv instanceof HTMLElement) {
+    //   selectedTabHTMLElement = childDiv; // Store the div element
+    //   const rect = selectedTabHTMLElement.getBoundingClientRect();
+    //   console.log("Element position:", rect);
+    // }
+
+    // console.log("Right-clicked tab:", tab);
+    // console.log("Selected child div:", selectedTabHTMLElement);
+
+    // Store mouse coordinates
+    mouseX = event.clientX;
+    mouseY = event.clientY;
     showTabControlMenu = !showTabControlMenu;
-    // onRightClick(tab);
-    console.log("in handleRightClick() => ");
+
+    // Add event listener to close menu when clicking outside
+    setTimeout(() => {
+      window.addEventListener("click", handleOutsideClick);
+    }, 0);
+  };
+
+  const handleOutsideClick = (event: MouseEvent) => {
+    showTabControlMenu = false;
+    window.removeEventListener("click", handleOutsideClick); // Remove event listener
   };
 </script>
 
@@ -119,13 +145,14 @@
     : ''}"
   on:mousedown={handleMouseDown}
   on:dblclick={() => handleDoubleClick(tab)}
-  on:contextmenu|preventDefault={() => handleRightClick(tab)}
+  on:contextmenu|preventDefault={(event) => handleRightClick(event, tab)}
 >
+  <!-- <Dropdown>
+  </Dropdown> -->
   {#if showTabControlMenu}
-    <!-- {console.log(tab)} -->
     <Options
-      xAxis={200}
-      yAxis={[300 - 0, 300 + 5]}
+      xAxis={mouseX}
+      yAxis={[mouseY, mouseY + 20]}
       zIndex={500}
       menuItems={[
         {
@@ -138,7 +165,6 @@
         },
         {
           onClick: () => {
-            console.log("fn :>> ", onClickCloseOtherTabs);
             onClickCloseOtherTabs(tabList, tab.id);
           },
           displayText: "Close Other Tabs",
@@ -153,19 +179,27 @@
           hidden: false,
         },
         {
-          onClick: () => {},
+          onClick: () => {
+            onClickForceCloseTabs(tabList, tab.id);
+          },
           displayText: "Force Close Other Tabs",
           hidden: false,
         },
         {
-          onClick: () => {},
+          onClick: () => {
+            onClickForceCloseTabs(tabList, "");
+          },
           displayText: "Force Close All Tabs",
           hidden: false,
         },
         {
-          onClick: () => {},
+          onClick: () => {
+            onClickDuplicateTab(tab.id);
+          },
           displayText: "Duplicate Tab",
-          hidden: false,
+          hidden: !["REQUEST", "WEBSOCKET", "SOCKETIO", "GRAPHQL"].includes(
+            tab.type,
+          ),
         },
       ]}
       {noOfColumns}

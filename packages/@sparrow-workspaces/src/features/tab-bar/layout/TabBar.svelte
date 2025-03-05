@@ -64,6 +64,8 @@
   export let onDoubleClick: (tab) => void;
 
   export let onClickCloseOtherTabs: (tabList: [], tabId: string) => void;
+  export let onClickDuplicateTab: (tabId: string) => void;
+  export let onClickForceCloseTabs: (tabList: [], tabId: string) => void;
 
   let isTabSaved: boolean;
 
@@ -98,7 +100,7 @@
   let moreOption: boolean = false;
   let viewChange: boolean = false;
 
-  $: console.log("tabList ;>> ", tabList);
+  // $: console.log("tabList ;>> ", tabList);
 </script>
 
 <button
@@ -155,6 +157,8 @@
             {onDropOver}
             {onDoubleClick}
             {onClickCloseOtherTabs}
+            {onClickForceCloseTabs}
+            {onClickDuplicateTab}
           />
         {/each}
       {/if}

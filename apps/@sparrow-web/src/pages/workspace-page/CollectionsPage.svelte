@@ -42,7 +42,10 @@
   import { EnvironmentViewModel } from "@app/pages/workspace-page/EnvironmentPage.ViewModel";
 
   // ---- helpers
-  import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
+  import {
+    hasWorkpaceLevelPermission,
+    moveNavigation,
+  } from "@sparrow/common/utils";
   import type { TabDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { onMount } from "svelte";
@@ -74,8 +77,10 @@
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import constants from "src/constants/constants";
+  import { getAllCollectionDocuments } from "rxdb";
   // import Tab from "../../../../../packages/@sparrow-workspaces/src/features/tab-bar/components/tab/Tab.svelte";
 
+  import { Checkbox } from "@sparrow/library/forms";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -88,6 +93,12 @@
 
   let removeTab: Tab;
   let isPopupClosed: boolean = false;
+  let isForceCloseTabPopupOpen: boolean = false;
+  let tabsToForceClose: Tab[] = [];
+  let tabIdWhoRecivedForceClose: string;
+  let noOfNotSavedTabsWhileForClose = 0;
+
+  let isUserDontWantForceClosePopup: boolean = false;
   let isImportCollectionPopup: boolean = false;
   let isImportCurlPopup: boolean = false;
   let loader = false;
@@ -196,6 +207,7 @@
       !tab?.isSaved
     ) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
+        console.log("save *****");
         removeTab = tab;
         isPopupClosed = true;
       } else {
@@ -206,14 +218,70 @@
     }
   };
 
+  // ** Anish -- Change -start
+  const forceCloseTab = (tab: Tab, tabId: string) => {
+    if (
+      (tab?.type === TabTypeEnum.REQUEST ||
+        tab?.type === TabTypeEnum.WEB_SOCKET ||
+        tab?.type === TabTypeEnum.ENVIRONMENT ||
+        tab?.type === TabTypeEnum.TESTFLOW ||
+        tab?.type === TabTypeEnum.SOCKET_IO ||
+        tab?.type === TabTypeEnum.GRAPHQL) &&
+      !tab?.isSaved
+    ) {
+      if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
+        console.log("force close *****", tabList);
+        removeTab = tab;
+        isForceCloseTabPopupOpen = true;
+      } else {
+        _viewModel.handleRemoveTab(tabId);
+      }
+    } else {
+      _viewModel.handleRemoveTab(tabId);
+    }
+  };
+
+  const froceCloseExceptCurrentOne = (tabList: Tab[], currentTabId: string) => {
+    tabsToForceClose = tabList;
+    tabIdWhoRecivedForceClose = currentTabId;
+    // let currTab = tabList.filter((tab: Tab) => tab.id === currentTabId);
+    console.log("tablist ;>> ", tabList);
+
+    // console.log("in closeTabExceptCurrentOne :>>  ", tabList, closeTab);
+    tabList?.forEach((tab: Tab) => {
+      if (tab.id !== currentTabId) {
+        // forceCloseTab(tab, tab.id);
+        if (
+          (tab?.type === TabTypeEnum.REQUEST ||
+            tab?.type === TabTypeEnum.WEB_SOCKET ||
+            tab?.type === TabTypeEnum.ENVIRONMENT ||
+            tab?.type === TabTypeEnum.TESTFLOW ||
+            tab?.type === TabTypeEnum.SOCKET_IO ||
+            tab?.type === TabTypeEnum.GRAPHQL) &&
+          !tab?.isSaved
+        ) {
+          noOfNotSavedTabsWhileForClose += 1;
+          isForceCloseTabPopupOpen = true;
+        }
+      }
+    });
+  };
   const closeTabExceptCurrentOne = (tabList: [], currentTabId: string) => {
-    console.log("in closeTabExceptCurrentOne :>>  ", tabList, closeTab);
+    // console.log("in closeTabExceptCurrentOne :>>  ", tabList, closeTab);
     tabList?.forEach((tab: Tab) => {
       if (tab.id !== currentTabId) {
         closeTab(tab.id, tab);
       }
+      if (tab.id == currentTabId) {
+        moveNavigation("right");
+      }
     });
   };
+
+  const handleTabDuplication = (tabId: string) => {
+    _viewModel.createDuplicateTabByTabId(tabId);
+  };
+  // ** Anish -- Change -end
 
   const handleClosePopupBackdrop = (flag: boolean) => {
     isPopupClosed = flag;
@@ -222,6 +290,14 @@
   const handlePopupDiscard = () => {
     _viewModel.handleRemoveTab(removeTab.id);
     isPopupClosed = false;
+  };
+
+  const handleOnClickForceClose = () => {
+    _viewModel.handleRemoveTab(removeTab.id);
+    isForceCloseTabPopupOpen = false;
+  };
+  const handleForceCloseBackdrop = (flag: boolean) => {
+    isForceCloseTabPopupOpen = flag;
   };
 
   /**
@@ -258,6 +334,7 @@
       removeTab.type === TabTypeEnum.SOCKET_IO ||
       removeTab.type === TabTypeEnum.GRAPHQL
     ) {
+      console.log("Saving popup is of request type :>> ", removeTab);
       if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
         const id = removeTab?.id;
         loader = true;
@@ -552,6 +629,8 @@
             onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
             onDoubleClick={_viewModel.handleTabTypeChange}
             onClickCloseOtherTabs={closeTabExceptCurrentOne}
+            onClickForceCloseTabs={froceCloseExceptCurrentOne}
+            onClickDuplicateTab={handleTabDuplication}
           />
           <div style="flex:1; overflow: hidden;">
             <Route>
@@ -643,7 +722,109 @@
   </div>
 </Motion>
 
-<WithModal
+// *** anish
+{#if !isUserDontWantForceClosePopup && isForceCloseTabPopupOpen}
+  <Modal title={""} type={"dark"} zIndex={1000} isOpen={true}>
+    <div class="d-flex row gap-4">
+      <div class="d-flex row gap-2" style="width: 540px;">
+        <div class="force-close-popup-title">
+          <h4>Force Close!</h4>
+        </div>
+        <div class="force-close-popup-desc">
+          <p style="margin: 0px;">
+            {noOfNotSavedTabsWhileForClose} Tabs have unsaved changes. Force closing
+            will discard your edits, and you won’t be able to recover them. Are you
+            sure you want to proceed?
+          </p>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <Checkbox
+          size={"large"}
+          checked={false}
+          on:input={() => {
+            isUserDontWantForceClosePopup = true;
+          }}
+          disabled={false}
+        />
+        <p>I understand, don't show this agian.</p>
+      </div>
+      <div class="d-flex justify-content-end gap-2">
+        <Button
+          title="Don't Close"
+          size="medium"
+          type="secondary"
+          onClick={() => {
+            "click dont save";
+            handleForceCloseBackdrop(false);
+          }}
+        ></Button>
+        <Button
+          title="Force Close"
+          size="medium"
+          type="danger"
+          onClick={() => {
+            "click dont save";
+            // console.log("in closeTabExceptCurrentOne :>>  ", tabList, closeTab);
+            tabsToForceClose?.forEach((tab) => {
+              if (tab.id !== tabIdWhoRecivedForceClose) {
+                forceCloseTab(tab, tab.id);
+              }
+              // if (tab.id == currentTabId) {
+              //   moveNavigation("right");
+              // }
+            });
+          }}
+        ></Button>
+      </div>
+    </div>
+  </Modal>
+{/if}
+
+<Modal
+  title={"Unsaved Changes!"}
+  type={"dark"}
+  zIndex={1000}
+  isOpen={isPopupClosed}
+  handleModalState={handleClosePopupBackdrop}
+>
+  <div class="d-flex row gap-4">
+    <div class="d-flex row gap-2" style="width: 540px;">
+      <!-- <div class="force-close-popup-title">
+        <h4>Unsaved Changes!</h4>
+      </div> -->
+      <div class="force-close-popup-desc">
+        <p style="margin: 0px;">
+          Do you want to save changes in this tab “Name of the tab”? Changes
+          will be lost in case you choose not to save.
+        </p>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+      <Button
+        title="Don't Save"
+        size="medium"
+        type="secondary"
+        onClick={() => {
+          handlePopupDiscard();
+        }}
+      ></Button>
+      <Button
+        title="Save"
+        size="medium"
+        type="primary"
+        disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+        onClick={() => {
+          handlePopupSave();
+        }}
+      ></Button>
+    </div>
+  </div>
+</Modal>
+
+<!-- <WithModal
   isOpen={isPopupClosed}
   onModalStateChanged={handleClosePopupBackdrop}
   onSave={handlePopupSave}
@@ -652,7 +833,7 @@
   isSaveDisabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
   {loader}
   {isGuestUser}
-/>
+/> -->
 
 <Modal
   title={""}
@@ -967,5 +1148,19 @@
     background: linear-gradient(270deg, #6147ff 2.55%, #1193f0 31.48%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
+
+  .force-close-popup-title {
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    color: #ffffff;
+  }
+
+  .force-close-popup-desc {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #cccccc;
   }
 </style>
