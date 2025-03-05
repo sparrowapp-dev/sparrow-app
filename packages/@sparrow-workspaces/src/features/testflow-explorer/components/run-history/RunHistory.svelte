@@ -80,7 +80,7 @@
               <span class="ms-2 header-title-text"> Run History </span>
             </div>
             <Button
-              size={"small"}
+              size={"medium"}
               startIcon={DismissRegular}
               type={"teritiary-regular"}
               onClick={() => {

@@ -332,7 +332,7 @@
   </div></Modal
 >
 
-{#if showMenu}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
     xAxis={collectionTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -490,10 +490,10 @@
     />
     {#if isRenaming}
       <input
-        class="py-0 renameInputFieldCollection w-100"
+        class="py-0 renameInputFieldCollection w-100 ellipsis"
         id="renameInputFieldCollection"
         type="text"
-        style="font-size: 12px; font-weight:500; line-height:18px; gap: 4px;"
+        style="font-size: 12px; font-weight:500; line-height:18px; gap: 4px; "
         value={collection.name}
         maxlength={100}
         bind:this={inputField}
@@ -504,12 +504,12 @@
       />
     {:else}
       <div
-        class="collection-collection-name justify-content-center d-flex align-items-center py-1 mb-0 flex-column"
-        style="height: 32px; text-align: left;"
+        class="collection-collection-name justify-content-center d-flex py-1 mb-0 flex-column"
+        style="height: 32px; text-align: left; width:80%"
       >
         <p
-          class="ellipsis w-100 mb-0"
-          style="font-size: 12px; font-weight:500; line-height:18px; "
+          class="ellipsis mb-0"
+          style="font-size: 12px; font-weight:500; line-height:18px;  "
         >
           {collection.name}
         </p>
@@ -617,7 +617,9 @@
         : 'none'};"
     >
       <div class=" ps-0 position-relative">
-        <div class="box-line"></div>
+        {#if collection?.items?.length > 0}
+          <div class="box-line"></div>
+        {/if}
         <div class="">
           {#each collection.items as explorer}
             <Folder
@@ -638,7 +640,7 @@
           {/each}
         </div>
         {#if !collection?.items?.length}
-          <p class="text-fs-10 ps-4 ms-2 my-2 text-secondary-300">
+          <p class="text-fs-10 ps-5 ms-2 my-2 text-secondary-300">
             This collection is empty
           </p>
         {/if}
@@ -922,7 +924,7 @@
   .box-line {
     position: absolute;
     top: 0;
-    bottom: 23px;
+    bottom: 26px;
     left: 32.5px;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
@@ -960,7 +962,7 @@
     border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-collection {
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
   }
   .active-collection-tab {
     background-color: var(--bg-ds-surface-500) !important;

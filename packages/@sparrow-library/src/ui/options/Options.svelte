@@ -24,7 +24,7 @@
    * @description - recalculates positions for element that overflows window
    */
   const calculateAdjustedAxis = () => {
-    const itemHeight = 38;
+    const itemHeight = 20;
     const containerPadding = 16;
     const dialogHeight =
       menuItems.filter((elem) => {

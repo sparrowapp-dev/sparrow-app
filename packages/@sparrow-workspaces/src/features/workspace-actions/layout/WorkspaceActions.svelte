@@ -562,6 +562,7 @@
               type="primary"
               id="addButton"
               size={"small"}
+              customWidth={"28px"}
               startIcon={AddRegular}
               onClick={() => {
                 addButtonMenu = !addButtonMenu;

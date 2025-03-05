@@ -186,7 +186,8 @@ export { default as CheckmarkCircleRegular } from "./CheckmarkCircleRegular.svel
 export { default as ClockRegular } from "./ClockRegular.svelte";
 export { default as CircleSmallFilled } from "./CircleSmallFilled.svelte";
 export { default as CopyRegular } from "./CopyRegular.svelte";
-export { default as ArrowDownloadRegular } from "./ArrowDownloadRegular.svelte";
+
+export { default as ArrowDownloadRegular} from "./ArrowDownloadRegular.svelte";
 export { default as ArrowUpRightRegular } from "./ArrowUpRightRegular.svelte";
 export { default as ArrowUpFilled } from "./ArrowUpFilled.svelte";
 export { default as ArrowDownRegular } from "./ArrowDownRegular.svelte";
@@ -196,3 +197,10 @@ export { default as ArrowDownLeft } from "./ArrowDownLeft.svelte";
 export { default as BroomIcon } from "./BroomIcon.svelte";
 export { default as CheckmarkCircle } from "./CheckmarkCircle.svelte";
 export { default as ErrorCircleFilled } from "./ErrorCircleFilled.svelte";
+export { default as ArrowSyncRegular } from "./ArrowSyncRegular.svelte";
+export { default as ThumbLikeRegular } from "./ThumbLikeRegular.svelte";
+export { default as ThumbDislikeRegular } from "./ThumbDislikeRegular.svelte";
+export { default as ThumbLikeFilled } from "./ThumbLikeFilled.svelte";
+export { default as SendRegular } from "./SendRegular.svelte";
+export { default as ThumbDislikeFilled } from "./ThumbDislikeFilled.svelte";
+export {default as  GlobeRegular} from "./GlobeRegular.svelte";
