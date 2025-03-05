@@ -8,6 +8,7 @@
   import { Events } from "@sparrow/common/enums";
   import type { Conversation } from "@sparrow/common/types/workspace";
   import { fade, fly } from "svelte/transition";
+  import { SparrowPrimaryIcon } from "@sparrow/common/icons";
 
   export let conversations: Conversation[] = [];
   export let prompt = "";
@@ -61,8 +62,8 @@
         in:fade={{ duration: 200 }}
       >
         <div class="p-2">
-          <SparrowAIIcon height={"28px"} width={"28px"} />
-          <span class="gradient-text">SparrowAI</span>
+          <SparrowPrimaryIcon height={"32px"} width={"32px"} />
+          <span class="gradient-text">Sparrow</span>
         </div>
         <div
           on:click={() =>
@@ -170,11 +171,30 @@
 
 <style>
   .chat-box {
-    background-color: var(--bg-tertiary-750);
+    background-color: var(--bg-ds-surface-700);
     border: 0.5px solid #5751fd;
     border-radius: 10px;
   }
 
+  .chat-box::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: 8px;
+    background: linear-gradient(
+      90deg,
+      var(--border-ds-info-400) 0%,
+      var(--border-ds-primary-400) 50%,
+      var(--border-ds-secondary-400) 100%
+    );
+    -webkit-mask:
+      linear-gradient(white 0 0) content-box,
+      linear-gradient(white 0 0);
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
   .gradient-text {
     background: linear-gradient(to right, #158ff1, #5751fd);
     background-clip: text;
@@ -205,7 +225,10 @@
   .generating-img {
     position: absolute;
     top: -70%;
-    background-color: var(--bg-tertiary-750);
+    background-color: var(--bg-ds-surface-700);
     width: 100%;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--bg-ds-surface-100);
   }
 </style>
