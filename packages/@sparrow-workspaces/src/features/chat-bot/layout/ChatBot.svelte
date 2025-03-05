@@ -73,8 +73,8 @@
     bottom: 80px;
     right:28px;
     z-index: 200;
-    width: 320px;
-    height: 75vh;
+    
+    width:320px;
     "
   >
     <AIChatInterface

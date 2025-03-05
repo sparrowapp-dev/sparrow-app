@@ -237,7 +237,7 @@
     -- RECIEVER
     -- 
     -->
-    <div class="recieve-item p-1">
+    <div class="recieve-item py-1">
       <div class="d-flex justify-content-between">
         <div class="d-flex gap-1 pb-2">
           {#if status}

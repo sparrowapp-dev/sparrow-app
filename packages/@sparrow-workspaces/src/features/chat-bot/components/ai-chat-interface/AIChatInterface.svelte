@@ -58,7 +58,7 @@
         style="justify-content: space-between; align-items:center; height:32px; "
         in:fade={{ duration: 200 }}
       >
-        <div class="p-2">
+        <div class="py-2">
           <SparrowPrimaryIcon size={"32px"} />
           <span class="gradient-text">Sparrow</span>
         </div>
@@ -172,10 +172,10 @@
     background-color: var(--bg-ds-surface-700);
     border-radius: 8px;
     padding: 16px 12px 16px 12px;
-    min-width: 320px;
+    /* min-width: 320px;
     max-width: 440px;
     min-height: 240px;
-    max-height: 640px;
+    max-height: 640px; */
     isolation: isolate;
   }
   .chat-box::before {
