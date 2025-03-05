@@ -65,7 +65,7 @@
 >
   <div
     style={`width: ${noOfColumns}px`}
-    class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column border-radius-2 align-items-start justify-content-start text-whiteColor bg-tertiary-400"
+    class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column gap-1 border-radius-1 align-items-start justify-content-start text-whiteColor bg-yellow"
   >
     <ul class="p-1 w-100 mb-0">
       {#each menuItems as item}
@@ -104,10 +104,11 @@
     -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
     -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
     box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    background-color: var(--bg-ds-surface-600);
   }
 
   ul li button {
-    background-color: var(--bg-tertiary-400);
+    background-color: transparent;
     border-radius: 2px;
     transition: 0.2s ease;
   }
@@ -115,6 +116,6 @@
   ul li button:hover {
     color: var(--white-color);
     border-radius: 4px;
-    background-color: var(--bg-tertiary-600);
+    background-color: var(--bg-ds-surface-400);
   }
 </style>

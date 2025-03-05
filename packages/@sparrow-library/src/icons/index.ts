@@ -1,3 +1,5 @@
+import DeleteFilled from "./DeleteFilled.svelte";
+
 export { default as ClockIcon } from "./clock.svelte";
 export { default as DotIcon } from "./dot.svelte";
 export { default as BoxIcon } from "./box.svelte";
@@ -186,3 +188,11 @@ export { default as CircleSmallFilled } from "./CircleSmallFilled.svelte";
 export { default as CopyRegular } from "./CopyRegular.svelte";
 export { default as ArrowDownloadRegular } from "./ArrowDownloadRegular.svelte";
 export { default as ArrowUpRightRegular } from "./ArrowUpRightRegular.svelte";
+export { default as ArrowUpFilled } from "./ArrowUpFilled.svelte";
+export { default as ArrowDownRegular } from "./ArrowDownRegular.svelte";
+export { default as DeleteFilled} from "./DeleteFilled.svelte";
+export { default as ListIcon } from "./List.svelte";
+export { default as ArrowDownLeft } from "./ArrowDownLeft.svelte";
+export { default as BroomIcon } from "./BroomIcon.svelte";
+export { default as CheckmarkCircle } from "./CheckmarkCircle.svelte";
+export { default as ErrorCircleFilled } from "./ErrorCircleFilled.svelte";

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { copyToClipBoard } from "@sparrow/common/utils";
-  import { notifications } from "@sparrow/library/ui";
+  import { Button, notifications } from "@sparrow/library/ui";
   import {
     RequestDataType,
     ResponseFormatter,
@@ -10,12 +10,10 @@
   import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
   import js_beautify, { html_beautify } from "js-beautify";
   import {
-    WithButtonV4,
-    WithSelect,
     WithSelectV2,
   } from "@sparrow/workspaces/hoc";
   import { Tooltip } from "@sparrow/library/ui";
-  import { CopyIcon, DownloadIcon2 } from "@sparrow/library/icons";
+  import { ArrowDownloadRegular, CopyRegular } from "@sparrow/library/icons";
   import type { WebSocketMessage } from "../../store/websocket";
   import { save } from "@tauri-apps/plugin-dialog";
   import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
@@ -145,14 +143,15 @@
 </script>
 
 <div
-  class="d-flex flex-column align-items-start justify-content-between w-100 bg-tertiary-300 px-3 pt-1"
+  class="d-flex flex-column align-items-start justify-content-between w-100 px-3 pt-1"
+  
 >
   <div
     class="response-container d-flex align-items-center pb-1 px-0 justify-content-between w-100 z-1 position-sticky"
     style="top:55.4px;  margin-top: -1px;"
   >
     <div class="d-flex gap-3 align-items-center justify-content-center">
-      <span class="text-fs-12" style="color: var(--text-secondary-100);">
+      <span class="text-fs-12" style="color: var(--text-ds-nuetral-50);font-weight:600;line-height:18px">
         {MessageTransmitter}
       </span>
       <span class="">
@@ -187,23 +186,21 @@
     <div class="d-flex align-items-center gap-2">
       <!-- Copy button -->
       <Tooltip title={"Copy"}>
-        <WithButtonV4
-          icon={CopyIcon}
-          onClick={handleCopy}
-          disable={false}
-          loader={false}
-        />
+        <Button
+        type="teritiary-regular"
+        startIcon={CopyRegular}
+        onClick={handleCopy}
+        size="small"/>
       </Tooltip>
       <!-- Download button -->
 
       {#if !isWebApp}
         <Tooltip title={"Export"}>
-          <WithButtonV4
-            icon={DownloadIcon2}
-            onClick={handleDownloaded}
-            disable={false}
-            loader={false}
-          />
+           <Button
+        type="teritiary-regular"
+        startIcon={ArrowDownloadRegular}
+        onClick={handleDownloaded}
+        size="small"/>
         </Tooltip>
       {/if}
     </div>
