@@ -334,6 +334,11 @@
   const handleCommentInputValue = (e: InputEvent) => {
     commentValue = e.target.value;
   };
+  $: defaultBorderColor = "transparent";
+  $: hoveredBorderColor = "transparent";
+
+  $: focusedBorderColor = "transparent";
+  $: typingBorderColor = "transparent";
 </script>
 
 <div class="d-flex flex-row" style="margin-top: 51px; ">
@@ -363,10 +368,7 @@
           style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
         >
           <span style="font-size: 18px; font-weight: 500;">{post?.title}</span>
-          <Tag
-            type={getColor(post?.status)}
-            text={post?.status || ""}
-            />
+          <Tag type={getColor(post?.status)} text={post?.status || ""} />
         </div>
 
         <div class="d-flex flex-row">
@@ -378,7 +380,8 @@
                 type={"letter"}
                 size={"large"}
                 letter={post?.author?.name?.charAt(0)}
-                bgColor={"var(--text-secondary-600)"}/>
+                bgColor={"var(--text-secondary-600)"}
+              />
               <div style="font-size: 14px; font-weight: 500;">
                 {post?.author?.name}
               </div>
@@ -646,11 +649,11 @@
           type="text"
           isEditIconRequired={false}
           bind:value={feedbackSubject}
-          defaultBorderColor="transparent"
-          hoveredBorderColor="transparent"
-          focusedBorderColor={"transparent"}
           class="text-fs-20 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;"
+          variant="primary"
+          blankInput={true}
+          isError={false}
           disabled={false}
           placeholder="Subject"
           maxlength={200}
@@ -667,15 +670,16 @@
           id="feedback-description"
           height={"90px"}
           bind:value={feedbackDescription}
-          defaultBorderColor="transparent"
-          hoveredBorderColor="transparent"
-          focusedBorderColor={"transparent"}
           class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;
-       "
+     "
           disabled={false}
           placeholder="Add short description"
           maxlength={200}
+          defaultBorderColor="transparent"
+          hoveredBorderColor="transparent"
+          focusedBorderColor="transparent"
+          typedBorderColor="transparent"
         />
       </div>
 
