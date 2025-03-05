@@ -47,9 +47,9 @@
     WEBSOCKET: SocketIcon,
   };
   const methodIconsProps = {
-    SOCKETIO: "#3670f7",
-    WEBSOCKET: "#3670f7",
-    GRAPHQL: "#F15EB0",
+    SOCKETIO: "var(--icon-ds-success-300)",
+    WEBSOCKET: "var(--icon-ds-primary-400)",
+    GRAPHQL: "var(--icon-ds-accent-400)",
   };
 
   const getRequestDetails = (request) => {

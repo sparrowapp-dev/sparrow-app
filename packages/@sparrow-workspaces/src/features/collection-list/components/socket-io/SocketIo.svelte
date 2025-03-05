@@ -229,6 +229,16 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
+  on:click|preventDefault={() => {
+    if (!isRenaming) {
+      onItemOpened("socket-io", {
+        workspaceId: collection.workspaceId,
+        collection,
+        folder,
+        socketio: socketIo,
+      });
+    }
+  }}
   class="d-flex align-items-center justify-content-between my-button btn-primary {socketIo.id ===
   activeTabId
     ? 'active-request-tab'
@@ -238,16 +248,6 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    on:click|preventDefault={() => {
-      if (!isRenaming) {
-        onItemOpened("socket-io", {
-          workspaceId: collection.workspaceId,
-          collection,
-          folder,
-          socketio: socketIo,
-        });
-      }
-    }}
     style={folder?.id
       ? "padding-left: 62.5px; gap:4px;"
       : "padding-left: 48.5px; gap:4px;"}
@@ -284,7 +284,7 @@
         class="api-name ellipsis {socketIo?.isDeleted && 'api-name-deleted'} "
         style="font-size: 12px;"
       >
-        {socketIo.name}
+        <p class="ellipsis m-0 p-0">{socketIo.name}</p>
       </div>
     {/if}
   </button>
@@ -337,7 +337,7 @@
     height: 24px;
     line-height: 18px;
     font-weight: 500;
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
     text-align: left;
     color: var(--bg-ds-neutral-50);
     // display: flex;
@@ -460,7 +460,7 @@
     border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
-    width: calc(100% - 24px);
+    width: calc(100% - 28px);
   }
   .active-request-tab {
     background-color: var(--bg-tertiary-400) !important;
