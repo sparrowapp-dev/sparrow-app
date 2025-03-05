@@ -305,7 +305,6 @@ export default class CollectionsViewModel {
    * Create new tab with untracked id with updated Details
    */
   public createNewTabWithData = async (_limit = 5) => {
-    console.log("I am called !")
     if (_limit === 0) return;
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
     // isApiCreatedFirstTime.set(true);

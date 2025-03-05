@@ -219,52 +219,43 @@
   };
 
   // ** Anish -- Change -start
-  const forceCloseTab = (tab: Tab, tabId: string) => {
-    if (
-      (tab?.type === TabTypeEnum.REQUEST ||
-        tab?.type === TabTypeEnum.WEB_SOCKET ||
-        tab?.type === TabTypeEnum.ENVIRONMENT ||
-        tab?.type === TabTypeEnum.TESTFLOW ||
-        tab?.type === TabTypeEnum.SOCKET_IO ||
-        tab?.type === TabTypeEnum.GRAPHQL) &&
-      !tab?.isSaved
-    ) {
-      if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
-        console.log("force close *****", tabList);
-        removeTab = tab;
-        isForceCloseTabPopupOpen = true;
-      } else {
-        _viewModel.handleRemoveTab(tabId);
+  const forceCloseTab = (tabList: Tab[], currentTabId: string) => {
+    tabList?.forEach((tab: Tab) => {
+      if (tab.id !== currentTabId) {
+        _viewModel.handleRemoveTab(tab.id);
       }
-    } else {
-      _viewModel.handleRemoveTab(tabId);
-    }
+    });
   };
 
   const froceCloseExceptCurrentOne = (tabList: Tab[], currentTabId: string) => {
     tabsToForceClose = tabList;
     tabIdWhoRecivedForceClose = currentTabId;
-    // let currTab = tabList.filter((tab: Tab) => tab.id === currentTabId);
-    console.log("tablist ;>> ", tabList);
-
-    // console.log("in closeTabExceptCurrentOne :>>  ", tabList, closeTab);
+    console.log("in froceCloseExceptCurrentOne ;>> ", tabList);
+    noOfNotSavedTabsWhileForClose = 0;
     tabList?.forEach((tab: Tab) => {
       if (tab.id !== currentTabId) {
         // forceCloseTab(tab, tab.id);
         if (
           (tab?.type === TabTypeEnum.REQUEST ||
             tab?.type === TabTypeEnum.WEB_SOCKET ||
-            tab?.type === TabTypeEnum.ENVIRONMENT ||
-            tab?.type === TabTypeEnum.TESTFLOW ||
             tab?.type === TabTypeEnum.SOCKET_IO ||
             tab?.type === TabTypeEnum.GRAPHQL) &&
           !tab?.isSaved
         ) {
           noOfNotSavedTabsWhileForClose += 1;
-          isForceCloseTabPopupOpen = true;
         }
       }
     });
+
+    if (noOfNotSavedTabsWhileForClose > 0) {
+      if (isUserDontWantForceClosePopup) {
+        forceCloseTab(tabsToForceClose, tabIdWhoRecivedForceClose);
+        isForceCloseTabPopupOpen = false;
+        noOfNotSavedTabsWhileForClose = 0;
+        return;
+      }
+      isForceCloseTabPopupOpen = true;
+    } else forceCloseTab(tabList, currentTabId);
   };
   const closeTabExceptCurrentOne = (tabList: [], currentTabId: string) => {
     // console.log("in closeTabExceptCurrentOne :>>  ", tabList, closeTab);
@@ -292,11 +283,7 @@
     isPopupClosed = false;
   };
 
-  const handleOnClickForceClose = () => {
-    _viewModel.handleRemoveTab(removeTab.id);
-    isForceCloseTabPopupOpen = false;
-  };
-  const handleForceCloseBackdrop = (flag: boolean) => {
+  const handleForceClosePopupBackdrop = (flag: boolean) => {
     isForceCloseTabPopupOpen = flag;
   };
 
@@ -722,9 +709,14 @@
   </div>
 </Motion>
 
-// *** anish
-{#if !isUserDontWantForceClosePopup && isForceCloseTabPopupOpen}
-  <Modal title={""} type={"dark"} zIndex={1000} isOpen={true}>
+{#if isForceCloseTabPopupOpen}
+  <Modal
+    title={""}
+    type={"dark"}
+    zIndex={1000}
+    isOpen={true}
+    handleModalState={handleForceClosePopupBackdrop}
+  >
     <div class="d-flex row gap-4">
       <div class="d-flex row gap-2" style="width: 540px;">
         <div class="force-close-popup-title">
@@ -742,7 +734,7 @@
       <div class="d-flex gap-2">
         <Checkbox
           size={"large"}
-          checked={false}
+          bind:checked={isUserDontWantForceClosePopup}
           on:input={() => {
             isUserDontWantForceClosePopup = true;
           }}
@@ -757,7 +749,7 @@
           type="secondary"
           onClick={() => {
             "click dont save";
-            handleForceCloseBackdrop(false);
+            handleForceClosePopupBackdrop(false);
           }}
         ></Button>
         <Button
@@ -766,15 +758,9 @@
           type="danger"
           onClick={() => {
             "click dont save";
-            // console.log("in closeTabExceptCurrentOne :>>  ", tabList, closeTab);
-            tabsToForceClose?.forEach((tab) => {
-              if (tab.id !== tabIdWhoRecivedForceClose) {
-                forceCloseTab(tab, tab.id);
-              }
-              // if (tab.id == currentTabId) {
-              //   moveNavigation("right");
-              // }
-            });
+            forceCloseTab(tabsToForceClose, tabIdWhoRecivedForceClose);
+            isForceCloseTabPopupOpen = false;
+            noOfNotSavedTabsWhileForClose = 0;
           }}
         ></Button>
       </div>
