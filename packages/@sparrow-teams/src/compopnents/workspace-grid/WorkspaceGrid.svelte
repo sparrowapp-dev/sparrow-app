@@ -102,7 +102,7 @@
 <div class="workspace-card-outer w-100">
   <Card
     cardClassProp={"flex-grow-1 col-lg-3 col-md-10 mb-4 position-relative"}
-    cardStyleProp={"max-width: 47.5%; max-height: 32%;"}
+    cardStyleProp={"max-width: 32.8%; max-height: 32%;"}
   >
     <button
       bind:this={workspaceTabWrapper}

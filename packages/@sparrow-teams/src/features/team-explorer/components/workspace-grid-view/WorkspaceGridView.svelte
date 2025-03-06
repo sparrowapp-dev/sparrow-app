@@ -98,7 +98,7 @@
   <div class="d-flex flex-column h-100">
     {#if !isGuestUser}
       <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
-        <div class="d-flex flex-wrap gap-3 justify-content-between row-gap-0">
+        <div class="d-flex flex-wrap gap-3 row-gap-0">
           {#if searchQuery == "" && filteredWorkspaces.length === 0 && !isAdminOrOwner}
             <p class="not-found-text mx-auto mt-3">
               You don't have access to any workspace in this team.
@@ -212,7 +212,7 @@
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    max-width: 47.5%;
+    max-width: 32.8%;
     max-height: 32%;
     border-radius: 8px;
   }
