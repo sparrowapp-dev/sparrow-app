@@ -143,8 +143,7 @@
           placeholder=""
           height="36px"
           autofocus={isNewEnvironment}
-
-
+          isPencilIconRequired={false}
         />
         <div class={`d-flex env-btn-container`} style="gap: 6px;">
           <div class="position-relative">
@@ -154,7 +153,7 @@
               bind:value={search}
               on:input={() => {}}
               customWidth={"220px"}
-              placeholder="Search Variables"
+              placeholder="Search"
             />
           </div>
 
@@ -228,7 +227,7 @@
       </section>
     </div>
     {#if quickHelp}
-      <div class="quick-help h-100">
+      <div class="quick-help h-100" style="width:360px;">
         <QuickHelp
           closeQuickHelp={() => {
             quickHelp = false;

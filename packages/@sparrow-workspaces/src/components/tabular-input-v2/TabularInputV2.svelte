@@ -299,7 +299,7 @@
   return false;
 }).length === 0 && search !== ""}
   <p class="text-fs-12 mt-3 ps-2 no-data-found">
-    The variable <span style="color:var(--text-ds-neutral-100)">'{search}'</span> is not found in this environment.Add the variable or try searching in a different environment.
+    The variable <span style="color:var(--text-ds-neutral-100)">'{search}'</span> is not found in this environment. Add the variable or try searching in a different environment.
   </p>
 {/if}
 

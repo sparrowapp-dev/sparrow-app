@@ -28,8 +28,7 @@ const UsingVariables: string[] = [
   `To use variables in the REST API tool, start typing curly brackets and we
 will show you all the variables that you have defined.`,
   `
-All the global variables are marked with <span class="global-env-G">G</span>
-    . Where as all local variables within an environment are marked with
+All the global variables are marked with <span class="global-env-G">G</span>. Where as all local variables within an environment are marked with
     <span class="local-env-E">E</span>.`,
   `You can use variables in URL, query parameters, headers, authorization,
 request body or anywhere else while testing a REST API request.`,

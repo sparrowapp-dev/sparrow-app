@@ -54,6 +54,7 @@
 
   export let searchIconColor = "var(--defaultcolor)";
   export let iconSize = "14px";
+  export let isPencilIconRequired = true;
 
   /**
    * Unique id for input
@@ -166,7 +167,7 @@
       </span>
     </span>
   {/if}
-  {#if type === "text" && isHovered && isEditIconRequired && !disabled}
+  {#if type === "text" && isHovered && isEditIconRequired && !disabled && isPencilIconRequired}
     <span class="position-absolute" style="top:2px; right: 10px">
       <PencilIcon height={iconSize} width={iconSize} color={"white"} />
     </span>
