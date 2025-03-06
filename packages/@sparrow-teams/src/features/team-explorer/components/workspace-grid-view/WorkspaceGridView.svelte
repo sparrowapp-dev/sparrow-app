@@ -61,23 +61,23 @@
   // This will split workspaces into pages
   $: paginatedWorkspaces = (() => {
     if (currPage === 1) {
-      return filteredWorkspaces.slice(0, 5);
+      return filteredWorkspaces.slice(0, 8);
     } else {
-      const startIndex = 5 + (currPage - 2) * 6;
-      return filteredWorkspaces.slice(startIndex, startIndex + 6); //will check the start index based on current page
+      const startIndex = 8 + (currPage - 2) * 9;
+      return filteredWorkspaces.slice(startIndex, startIndex + 9); //will check the start index based on current page
     }
   })();
 
   // This will calculate the total number of pages
   $: totalPages = (() => {
     const total = filteredWorkspaces.length;
-    if (total <= 5) return 1;
-    return Math.ceil((total - 5) / 6) + 1;
+    if (total <= 8) return 1;
+    return Math.ceil((total - 8) / 9) + 1;
   })();
 
-  $: startIndex = currPage === 1 ? 1 : 5 + (currPage - 2) * 6 + 1;
+  $: startIndex = currPage === 1 ? 1 : 8 + (currPage - 2) * 9 + 1;
   $: endIndex = Math.min(
-    currPage === 1 ? 5 : startIndex + 5,
+    currPage === 1 ? 8 : startIndex + 8,
     filteredWorkspaces.length,
   );
 
@@ -98,7 +98,7 @@
   <div class="d-flex flex-column h-100">
     {#if !isGuestUser}
       <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
-        <div class="d-flex flex-wrap gap-3 row-gap-0">
+        <div class="d-flex flex-wrap" style="gap:16px">
           {#if searchQuery == "" && filteredWorkspaces.length === 0 && !isAdminOrOwner}
             <p class="not-found-text mx-auto mt-3">
               You don't have access to any workspace in this team.
@@ -109,7 +109,7 @@
           {/if}
           {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
             <div
-              class="sparrow-fs-16 col-lg-3 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace"
+              class="sparrow-fs-16 col-lg-3 col-md-10 flex-grow-1 py-0 add-new-workspace"
               style="min-height: 132px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
               on:click={handleClick}
               tabindex="0"

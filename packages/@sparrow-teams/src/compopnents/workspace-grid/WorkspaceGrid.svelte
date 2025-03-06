@@ -101,7 +101,7 @@
 
 <div class="workspace-card-outer w-100">
   <Card
-    cardClassProp={"flex-grow-1 col-lg-3 col-md-10 mb-4 position-relative"}
+    cardClassProp={"flex-grow-1 col-lg-3 col-md-10  position-relative"}
     cardStyleProp={"max-width: 32.8%; max-height: 32%;"}
   >
     <button
