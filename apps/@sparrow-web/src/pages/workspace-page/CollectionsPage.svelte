@@ -258,31 +258,20 @@
 
   const forceCloseTabsAsync = async (id: string, tab: Tab) => {
     return new Promise((resolve) => {
-      if (
-        (tab?.type === TabTypeEnum.REQUEST ||
-          tab?.type === TabTypeEnum.WEB_SOCKET ||
-          tab?.type === TabTypeEnum.SOCKET_IO ||
-          tab?.type === TabTypeEnum.GRAPHQL) &&
-        !tab?.isSaved
-      ) {
-        if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
-          removeTab = tab;
-          setTimeout(() => {
-            // Simulating a delay similar to waiting for a save action
-            _viewModel.handleRemoveTab(id);
-            resolve(0);
-          }, 300);
-        } else {
-          _viewModel.handleRemoveTab(id);
-          resolve(0);
-        }
-      } else {
+      removeTab = tab;
+      setTimeout(() => {
+        // Simulating a delay similar to waiting for a save action
         _viewModel.handleRemoveTab(id);
         resolve(0);
-      }
+      }, 300);
     });
   };
 
+  /**
+   * The closeTabSequentially() method works well incase we want to bulk close the tabs
+   * one by one. This function can also replace the above closeTab() function (will do so).
+   * So same function can be used for single tab close and multiple tab close.
+   */
   const closeTabSequentially = async (id: string, tab: Tab) => {
     if (
       (tab?.type === TabTypeEnum.REQUEST ||
@@ -297,6 +286,7 @@
         console.log("save ssss*****");
         removeTab = tab;
         isPopupClosed = true;
+
         // Wait for the save popup to be handled before continuing
         await new Promise<void>((resolve) => {
           const checkIfPopupClosed = setInterval(() => {
@@ -306,12 +296,18 @@
             }
           }, 300);
         });
-      } else {
-        _viewModel.handleRemoveTab(id);
+        return;
       }
-    } else {
-      _viewModel.handleRemoveTab(id);
     }
+
+    // Common delayed tab removal logic
+    removeTab = tab;
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        _viewModel.handleRemoveTab(id);
+        resolve();
+      }, 300);
+    });
   };
 
   const closeTabExceptCurrentOne = async (
@@ -336,6 +332,7 @@
   };
 
   const handlePopupDiscard = () => {
+    console.log("on discar :>> ", removeTab);
     _viewModel.handleRemoveTab(removeTab.id);
     isPopupClosed = false;
   };
@@ -775,13 +772,13 @@
   width={"40%"}
   handleModalState={handleForceClosePopupBackdrop}
 >
-  <div class="d-flex row gap-4">
-    <div class="d-flex row gap-2" style="width: 540px;">
+  <div class="d-flex row gap-4" style="width: 552px;">
+    <div class="d-flex row">
       <!-- <div class="force-close-popup-title">
         <h4>Force Close!</h4>
       </div> -->
-      <div class="popup-desc">
-        <p style="margin: 10px 0 0 0;">
+      <div class="popup-desc" style="margin-top: 15px;">
+        <p style="margin: 0">
           <span style="color: white;"
             >{noOfNotSavedTabsWhileForClose} Tabs
           </span> have unsaved changes. Force closing will discard your edits, and
@@ -795,13 +792,17 @@
         size={"large"}
         bind:checked={isUserDontWantForceClosePopup}
         on:input={() => {
-          isUserDontWantForceClosePopup = true;
+          isUserDontWantForceClosePopup = !isUserDontWantForceClosePopup;
         }}
         disabled={false}
       />
       <p style="margin: 0;">I understand, don't show this agian.</p>
     </div>
-    <div class="d-flex justify-content-end gap-2">
+    <!-- <div class="d-flex justify-content-end gap-2"> -->
+    <div
+      class="d-flex gap-2"
+      style="display: flex; width: max-content; margin-left: auto; margin-right: 15px; margin-bottom: 0px;"
+    >
       <Button
         title="Don't Close"
         size="medium"
@@ -828,20 +829,20 @@
 <!-- {/if} -->
 
 <Modal
-  title={"Unsaved Changes!"}
+  title={"Unsaved Changes!!"}
   type={"dark"}
   zIndex={1000}
   isOpen={isPopupClosed}
-  width={"35%"}
+  width={"38.5%"}
   handleModalState={handleClosePopupBackdrop}
 >
-  <div class="d-flex row gap-4">
-    <div class="d-flex row gap-2" style="width: 540px;">
+  <div class="d-flex row gap-2" style="width: 530px;">
+    <div class="d-flex row gap-2" style="width: 600px; height: 65px;">
       <!-- <div class="force-close-popup-title">
         <h4>Unsaved Changes!</h4>
       </div> -->
-      <div class="popup-desc" style="font-weight: 400;">
-        <p style="margin: 0px;">
+      <div class="popup-desc" style="font-weight: 400; margin-top: 15px; ">
+        <p style="margin: 0px; ">
           Do you want to save changes in this tab “<span style="color: white;">
             {!removeTab ? "New API" : removeTab.name}</span
           >”? Changes will be lost in case you choose not to save.
@@ -849,11 +850,15 @@
       </div>
     </div>
 
-    <div class="d-flex justify-content-end gap-2">
+    <div
+      class="d-flex gap-2"
+      style="display: flex; width: max-content; margin-left: auto; margin-right: 30px; margin-bottom: 10px;"
+    >
       <Button
         title="Don't Save"
         size="medium"
         type="secondary"
+        customWidth="95px"
         onClick={() => {
           handlePopupDiscard();
         }}
@@ -862,6 +867,7 @@
         title="Save"
         size="medium"
         type="primary"
+        customWidth="95px"
         disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
         onClick={() => {
           handlePopupSave();
