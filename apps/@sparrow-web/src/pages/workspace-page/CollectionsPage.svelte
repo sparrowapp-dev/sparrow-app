@@ -772,6 +772,7 @@
   type={"dark"}
   zIndex={1000}
   isOpen={isForceCloseTabPopupOpen}
+  width={"40%"}
   handleModalState={handleForceClosePopupBackdrop}
 >
   <div class="d-flex row gap-4">
@@ -779,16 +780,17 @@
       <!-- <div class="force-close-popup-title">
         <h4>Force Close!</h4>
       </div> -->
-      <div class="force-close-popup-desc">
-        <p style="margin: 0px;">
-          {noOfNotSavedTabsWhileForClose} Tabs have unsaved changes. Force closing
-          will discard your edits, and you won’t be able to recover them. Are you
-          sure you want to proceed?
+      <div class="popup-desc">
+        <p style="margin: 10px 0 0 0;">
+          <span style="color: white;"
+            >{noOfNotSavedTabsWhileForClose} Tabs
+          </span> have unsaved changes. Force closing will discard your edits, and
+          you won’t be able to recover them. Are you sure you want to proceed?
         </p>
       </div>
     </div>
 
-    <div class="d-flex gap-2">
+    <div class="d-flex align-items-center gap-2 popup-desc">
       <Checkbox
         size={"large"}
         bind:checked={isUserDontWantForceClosePopup}
@@ -797,7 +799,7 @@
         }}
         disabled={false}
       />
-      <p>I understand, don't show this agian.</p>
+      <p style="margin: 0;">I understand, don't show this agian.</p>
     </div>
     <div class="d-flex justify-content-end gap-2">
       <Button
@@ -830,6 +832,7 @@
   type={"dark"}
   zIndex={1000}
   isOpen={isPopupClosed}
+  width={"35%"}
   handleModalState={handleClosePopupBackdrop}
 >
   <div class="d-flex row gap-4">
@@ -837,10 +840,11 @@
       <!-- <div class="force-close-popup-title">
         <h4>Unsaved Changes!</h4>
       </div> -->
-      <div class="force-close-popup-desc">
+      <div class="popup-desc" style="font-weight: 400;">
         <p style="margin: 0px;">
-          {`Do you want to save changes in this tab “${removeTab.name}”? Changes
-          will be lost in case you choose not to save.`}
+          Do you want to save changes in this tab “<span style="color: white;">
+            {!removeTab ? "New API" : removeTab.name}</span
+          >”? Changes will be lost in case you choose not to save.
         </p>
       </div>
     </div>
@@ -1200,10 +1204,14 @@
     color: #ffffff;
   }
 
-  .force-close-popup-desc {
+  .popup-desc {
     font-family: "Inter", sans-serif;
     font-weight: 400;
-    font-size: 14px;
+    font-size: 15px;
     color: #cccccc;
+  }
+
+  .save-popup {
+    font-weight: 400;
   }
 </style>
