@@ -63,9 +63,9 @@
   in:scale={{ start: 0.8, duration: 400 }}
   out:scale={{ start: 0.8, duration: 400 }}
 >
-  <div
+   <div
     style={`width: ${noOfColumns}px`}
-    class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column gap-1 border-radius-1 align-items-start justify-content-start text-whiteColor bg-yellow"
+    class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column border-radius-2 align-items-start justify-content-start text-whiteColor bg-tertiary-400"
   >
     <ul class="p-1 w-100 mb-0">
       {#each menuItems as item}
@@ -108,7 +108,7 @@
   }
 
   ul li button {
-    background-color: transparent;
+    background-color: var(--bg-tertiary-400);
     border-radius: 2px;
     transition: 0.2s ease;
   }
@@ -116,6 +116,6 @@
   ul li button:hover {
     color: var(--white-color);
     border-radius: 4px;
-    background-color: var(--bg-ds-surface-400);
+    background-color: var(--bg-tertiary-600);
   }
 </style>
