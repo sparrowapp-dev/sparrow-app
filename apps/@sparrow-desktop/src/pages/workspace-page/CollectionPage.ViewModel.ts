@@ -176,6 +176,7 @@ export default class CollectionsViewModel {
           const collection = createDeepCopy(_collection);
           collection["workspaceId"] = workspaceId;
           collection["id"] = _collection._id;
+          if(!collection?.description) collection.description = "";
           delete collection._id;
           return collection;
         }),
