@@ -104,7 +104,6 @@
     -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
     -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
     box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-    background-color: var(--bg-ds-surface-600);
   }
 
   ul li button {
