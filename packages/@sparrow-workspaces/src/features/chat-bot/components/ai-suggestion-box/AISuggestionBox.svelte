@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AISparkle } from "@sparrow/library/icons";
+  import { SparkleFilled } from "@sparrow/library/icons";
 
   export let title = "";
   export let onClick: (text: string) => void = () => {};
@@ -11,7 +11,7 @@
     onClick(title);
   }}
 >
-  <AISparkle height={"20px"} width={"20px"} color={"var(--icon-primary-300)"} />
+  <SparkleFilled height={"20px"} width={"20px"} />
   <span class="title-txt">{title}</span>
 </div>
 
