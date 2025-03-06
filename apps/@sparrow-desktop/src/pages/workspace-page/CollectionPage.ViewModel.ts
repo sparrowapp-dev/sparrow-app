@@ -5590,6 +5590,48 @@ export default class CollectionsViewModel {
   };
 
   /**
+   * Handles saving a collection
+   */
+  public saveCollection = async (componentData : Tab ) => {
+    const progressiveTab = createDeepCopy(componentData);
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser == true) {
+      await this.collectionRepository.updateCollection(
+        progressiveTab.id,
+        {
+          description: progressiveTab.description,
+          name: progressiveTab.name,
+          auth: progressiveTab.property.collection.auth, 
+          selectedAuthType : progressiveTab.property.collection.state.collectionAuthNavigation
+        },
+      );
+      notifications.success(`The ‘${progressiveTab.name}’ collection saved successfully.`);
+      return true;
+    }
+    const response = await this.collectionService.updateCollectionData(
+      progressiveTab.id as string,
+      progressiveTab.path.workspaceId as string,
+      { description: progressiveTab.description, name: progressiveTab.name, auth: progressiveTab.property.collection.auth, 
+        selectedAuthType : progressiveTab.property.collection.state.collectionAuthNavigation
+       },
+    );
+    if (response.isSuccessful) {
+      this.collectionRepository.updateCollection(
+        progressiveTab.id as string,
+        response.data.data,
+      );
+      notifications.success(`The ‘${progressiveTab.name}’ collection saved successfully.`);
+      return true;
+    } else {
+      notifications.error("Failed to update description. Please try again.");
+    }
+    return false;
+    }
+
+  /**
    * Update the tab type to permanent on double click
    * @param tab tab data to make it permanent
    */

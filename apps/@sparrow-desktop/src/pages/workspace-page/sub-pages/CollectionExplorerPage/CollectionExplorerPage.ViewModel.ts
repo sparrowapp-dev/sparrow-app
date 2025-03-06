@@ -917,57 +917,6 @@ class CollectionExplorerPage {
   };
 
   /**
-   *
-   * @param collection - Collection in which description going to be updated
-   * @param newDescription - New description
-   */
-  // public handleUpdateDescription = async (
-  //   collection: CollectionDocument,
-  //   newDescription: string,
-  // ) => {
-  //   let isGuestUser;
-  //   isGuestUserActive.subscribe((value) => {
-  //     isGuestUser = value;
-  //   });
-  //   this.updateTab(this.tab.tabId as string, {
-  //     persistence: TabPersistenceTypeEnum.PERMANENT,
-  //   });
-  //   if (isGuestUser == true) {
-  //     await this.collectionRepository.updateCollection(
-  //       collection.id as string,
-  //       {
-  //         description: newDescription,
-  //       },
-  //     );
-  //     notifications.success("Description updated successfully.");
-  //     return;
-  //   }
-  //   const response = await this.collectionService.updateCollectionData(
-  //     collection.id as string,
-  //     collection.workspaceId as string,
-  //     { description: newDescription },
-  //   );
-  //   if (response.isSuccessful) {
-  //     this.collectionRepository.updateCollection(
-  //       collection.id as string,
-  //       response.data.data,
-  //     );
-  //     const res = {
-  //       data: { description: newDescription },
-  //     };
-  //     await this.collectionRepository.updateCollection(
-  //       collection.id as string,
-  //       res.data,
-  //     );
-  //     notifications.success("Description updated successfully.");
-  //   } else if (response.message === "Network Error") {
-  //     notifications.error(response.message);
-  //   } else {
-  //     notifications.error("Failed to update description. Please try again.");
-  //   }
-  // };
-
-  /**
    * Get workspace data through workspace id
    * @param workspaceId - id of workspace
    * @returns - workspace document

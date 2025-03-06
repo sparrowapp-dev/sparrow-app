@@ -7,17 +7,15 @@ import type { CollectionAuthBaseInterface, CollectionAuthTypeBaseEnum, Collectio
 import type { Auth } from "@sparrow/common/types/workspace/collection-tab";
   
   /**
-   * @class - this class makes request tab compatible with backend server
+   * @class - this class makes collection tab compatible with collection server
    */
   export class CollectionTabAdapter {
     constructor() {}
   
     /**
-     * @description - parse backend data to frontend compatible
+     * @description - parse server data to tab compatible
      * @param workspaceId - workspace id
-     * @param collectionId - collection id
-     * @param folderId - folder id
-     * @param request - request tab frontend data
+     * @param _collection - collection server data s
      * @returns
      */
     public adapt(
@@ -40,8 +38,8 @@ import type { Auth } from "@sparrow/common/types/workspace/collection-tab";
     }
   
     /**
-     * @description - parse frontend data to backend compatible
-     * @param requestTab - request backend data
+     * Parse tab data to server collection compatible
+     * @param _collectionTab - collection tab data
      * @returns
      */
     public unadapt(_collectionTab: Tab) : Partial<CollectionBaseInterface> {
