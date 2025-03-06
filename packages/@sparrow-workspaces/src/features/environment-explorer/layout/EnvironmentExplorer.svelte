@@ -285,9 +285,6 @@
   .env-panel {
     background-color: var(--bg-secondary-850);
   }
-  .env-header {
-    
-  }
   .env-heading {
     font-size: 18px;
     background-color: transparent;

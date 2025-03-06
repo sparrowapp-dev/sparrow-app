@@ -61,10 +61,7 @@
    */
   export let id = "";
 
-  /**
-   * Auto-focus input when mounted
-   */
-  export let autofocus = false;
+
 
   /**
    * input states
@@ -102,12 +99,6 @@
     }
   };
 
-  // Focus action for use with use:action directive
-  function focusOnMount(node: HTMLElement) {
-    if (autofocus && !disabled) {
-      node.focus();
-    }
-  }
 </script>
 
 <div
@@ -151,7 +142,6 @@
       focusedBorderColor,
     )}; --placeholder-color: {placeholderColor};"
     {disabled}
-    use:focusOnMount
   />
   {#if type === "search"}
     <span
