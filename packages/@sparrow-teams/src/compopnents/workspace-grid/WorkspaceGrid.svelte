@@ -208,8 +208,9 @@
     background-color: var(--bg-ds-surface-700);
   }
   .workspace-card:focus-visible {
-    border: 2px solid red;
+    border: 2px solid var(--border-ds-primary-300);
     background-color: var(--bg-ds-surface-600);
+    outline: none;
   }
   .workspace-card-outer:hover .workspace-card .teams-workspace__para,
   .workspace-card-outer:hover .workspace-card .teams-workspace__date {
