@@ -2173,8 +2173,6 @@ export default class CollectionsViewModel {
     _collection.updateDescription(collection.description);
     _collection.updatePath(path);
     // _collection.updateActiveSync(collection.activeSync);
-    _collection.updateTotalRequests(totalRequest);
-    _collection.updateTotalFolder(totalFolder);
     _collection.updateIsSave(true);
     _collection.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
 
