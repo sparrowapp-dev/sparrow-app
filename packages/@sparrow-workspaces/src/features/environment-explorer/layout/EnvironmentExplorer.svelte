@@ -48,6 +48,7 @@
   let quickHelp: boolean = false;
   let search = "";
   let environmentName = "";
+  export let isNewEnvironment = false;
   $: {
     if ($currentEnvironment) {
       environmentName = $currentEnvironment?.name;
@@ -141,6 +142,7 @@
             "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
           placeholder=""
           height="36px"
+          autofocus={isNewEnvironment}
 
 
         />
@@ -151,7 +153,7 @@
               variant={"primary"}
               bind:value={search}
               on:input={() => {}}
-              customWidth={"300px"}
+              customWidth={"220px"}
               placeholder="Search Variables"
             />
           </div>
