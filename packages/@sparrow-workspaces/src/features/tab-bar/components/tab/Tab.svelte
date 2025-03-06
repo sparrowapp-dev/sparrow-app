@@ -24,6 +24,8 @@
     SocketIoIcon,
     StackIcon,
     TreeIcon,
+    DismissCircle,
+    CopyIcon,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
@@ -164,6 +166,7 @@
           displayText: "Close Tab",
           disabled: false,
           hidden: false,
+          icon: DismissCircle,
         },
         {
           onClick: () => {
@@ -202,6 +205,7 @@
           hidden: !["REQUEST", "WEBSOCKET", "SOCKETIO", "GRAPHQL"].includes(
             tab.type,
           ),
+          icon: CopyIcon,
         },
       ]}
       {noOfColumns}
