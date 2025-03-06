@@ -238,6 +238,15 @@ export class RxDB {
             }
             return oldDoc;
           },
+          18: function (oldDoc: TabDocument) {
+            if (oldDoc) {
+              oldDoc.persistence = "permanent";
+            }
+            return oldDoc;
+          },
+          19: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       collection: {

@@ -135,7 +135,7 @@
             if (newValue === "") {
               resetInputField();
             } else if (newValue !== previousValue) {
-              onRename(collection, folder, newValue);
+              onRename(collection, folder, newValue, tab);
             }
           }}
           on:keydown={(event) => {

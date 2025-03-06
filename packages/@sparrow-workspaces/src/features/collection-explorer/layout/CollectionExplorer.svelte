@@ -425,7 +425,7 @@
           <p style="font-size: 12px;" class="mb-0">Socket.IO</p>
         </div>
       </div>
-      <div class="d-flex align-items-start ps-0 h-100">
+      <div class="d-flex align-items-start ps-0 h-100 z-0">
         <textarea
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
             collection?.activeSync}

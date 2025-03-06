@@ -49,6 +49,13 @@
     SocketIcon,
     SocketIoIcon,
     GraphIcon,
+    DismissRegular,
+    AddRegular,
+    ChevronRightRegular,
+    ChevronDownRegular,
+    MoreHorizontalRegular,
+    FolderAddRegular,
+    ArrowSwapRegular,
   } from "@sparrow/library/icons";
   import { Options } from "@sparrow/library/ui";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
@@ -325,7 +332,7 @@
   </div></Modal
 >
 
-{#if showMenu}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
     xAxis={collectionTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -443,16 +450,19 @@
   />
 {/if}
 
-<button
+<div
+  tabindex="0"
   bind:this={collectionTabWrapper}
-  style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
-  class="btn-primary ps-4 mb-1 d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
+  style="height:32px; gap:4px;  padding-left:20.5px; margin-bottom:2px; "
+  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
     : ''}"
 >
   <button
-    class="d-flex ps-2 main-collection align-items-center bg-transparent border-0"
+    tabindex="-1"
+    class="d-flex main-collection align-items-center bg-transparent border-0 gap:2px;"
+    style="gap:4px;"
     on:contextmenu|preventDefault={rightClickContextMenu}
     on:click|preventDefault={() => {
       if (!isRenaming) {
@@ -468,23 +478,22 @@
       }
     }}
   >
-    <img
-      src={angleRight}
-      class=""
-      style="height:8px; width:8px; margin-right:8px; {visibility
-        ? 'transform:rotate(90deg);'
-        : 'transform:rotate(0deg);'}"
-      alt="angleRight"
-      on:click|stopPropagation={() => {
+    <Button
+      size="extra-small"
+      customWidth={"24px"}
+      type="teritiary-regular"
+      startIcon={!visibility ? ChevronRightRegular : ChevronDownRegular}
+      onClick={(e) => {
+        stopPropagation(e);
         visibility = !visibility;
       }}
     />
     {#if isRenaming}
       <input
-        class="py-0 renameInputFieldCollection w-100"
+        class="py-0 renameInputFieldCollection w-100 ellipsis"
         id="renameInputFieldCollection"
         type="text"
-        style="font-size: 12px;"
+        style="font-size: 12px; font-weight:500; line-height:18px; gap: 4px; "
         value={collection.name}
         maxlength={100}
         bind:this={inputField}
@@ -495,10 +504,13 @@
       />
     {:else}
       <div
-        class="collection-collection-name justify-content-center d-flex align-items-center py-1 mb-0 flex-column"
-        style="height: 32px; text-align: left;"
+        class="collection-collection-name justify-content-center d-flex py-1 mb-0 flex-column"
+        style="height: 32px; text-align: left; width:80%"
       >
-        <p class="ellipsis w-100 mb-0 text-fs-12">
+        <p
+          class="ellipsis mb-0"
+          style="font-size: 12px; font-weight:500; line-height:18px;  "
+        >
           {collection.name}
         </p>
         {#if collection.activeSync}
@@ -526,7 +538,7 @@
       placement="bottom-center"
       title="More options"
       styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
-    > -->
+      > -->
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <Tooltip
         title={"Add Options"}
@@ -535,15 +547,16 @@
         show={!showAddItemMenu}
         zIndex={701}
       >
-        <button
-          id={`add-item-collection-${collection.id}`}
-          class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center {showAddItemMenu
-            ? 'add-item-active'
-            : ''}"
-          on:click={rightClickContextMenu2}
-        >
-          <img height="12px" width="12px" src={AddIcon} alt="AddIcon" />
-        </button>
+        <span class="add-icon-container">
+          <Button
+            id={`add-item-collection-${collection.id}`}
+            size="extra-small"
+            customWidth={"24px"}
+            type="teritiary-regular"
+            onClick={rightClickContextMenu2}
+            startIcon={AddRegular}
+          />
+        </span>
       </Tooltip>
 
       <Tooltip
@@ -553,17 +566,16 @@
         zIndex={701}
         show={!showMenu}
       >
-        <button
-          id={`show-more-collection-${collection.id}`}
-          class="threedot-icon-container border-0 p-0 ms-1 rounded d-flex justify-content-center align-items-center {showMenu
-            ? 'threedot-active'
-            : ''}"
-          style="transform: rotate(90deg);"
-          on:click={rightClickContextMenu}
-        >
-          <img src={threedotIcon} alt="threedotIcon" />
-        </button>
-        <!-- </Tooltip> -->
+        <span class="add-icon-container">
+          <Button
+            id={`show-more-collection-${collection.id}`}
+            size="extra-small"
+            customWidth={"24px"}
+            type="teritiary-regular"
+            startIcon={MoreHorizontalRegular}
+            onClick={rightClickContextMenu}
+          />
+        </span>
       </Tooltip>
     {/if}
 
@@ -594,41 +606,46 @@
       </Tooltip>
     {/if}
   {/if}
-</button>
+</div>
 <!-- {console.log(collection.name, !collection?.activeSync, activeSyncLoad)} -->
 {#if !collection?.activeSync || activeSyncLoad}
   {#if !collection?.activeSync || isBranchSynced}
     <div
       class="z-1"
-      style=" padding-left: 0; padding-right:0; display: {visibility
+      style=" padding-left: 0; padding-right:0;  display: {visibility
         ? 'block'
         : 'none'};"
     >
-      <div class="sub-folders ps-0">
-        {#each collection.items as explorer}
-          <Folder
-            {userRole}
-            {onItemCreated}
-            {onItemDeleted}
-            {onItemRenamed}
-            {onItemOpened}
-            {collection}
-            {userRoleInWorkspace}
-            {activeTabPath}
-            {explorer}
-            {activeTabType}
-            {activeTabId}
-            {searchData}
-            {isWebApp}
-          />
-        {/each}
+      <div class=" ps-0 position-relative">
+        {#if collection?.items?.length > 0}
+          <div class="box-line"></div>
+        {/if}
+        <div class="">
+          {#each collection.items as explorer}
+            <Folder
+              {userRole}
+              {onItemCreated}
+              {onItemDeleted}
+              {onItemRenamed}
+              {onItemOpened}
+              {collection}
+              {userRoleInWorkspace}
+              {activeTabPath}
+              {explorer}
+              {activeTabType}
+              {activeTabId}
+              {searchData}
+              {isWebApp}
+            />
+          {/each}
+        </div>
         {#if !collection?.items?.length}
-          <p class="text-fs-10 ps-4 ms-2 my-2 text-secondary-300">
+          <p class="text-fs-10 ps-5 ms-2 my-2 text-secondary-300">
             This collection is empty
           </p>
         {/if}
 
-        <div class="d-flex gap-2 ps-1 ms-4">
+        <div class="d-flex gap-2 ps-1 ms-2">
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
             <Tooltip
               title={"Add Folder"}
@@ -648,10 +665,9 @@
                   });
                 }}
               >
-                <FolderPlusIcon
-                  height="16px"
-                  width="16px"
-                  color="var(--request-arc)"
+                <FolderAddRegular
+                  size="16px"
+                  color="var(--bg-ds-neutral-300)"
                 />
               </div>
             </Tooltip>
@@ -672,10 +688,9 @@
                   });
                 }}
               >
-                <RequestIcon
-                  height="16px"
-                  width="16px"
-                  color="var(--request-arc)"
+                <ArrowSwapRegular
+                  size="16px"
+                  color="var(--bg-ds-neutral-300)"
                 />
               </div>
             </Tooltip>
@@ -828,6 +843,10 @@
 {/if}
 
 <style>
+  .box-line {
+    visibility: none;
+  }
+
   .sync-button {
     background-color: transparent;
   }
@@ -840,6 +859,7 @@
   .my-button:hover .add-icon-container {
     visibility: visible;
   }
+
   .list-icons {
     width: 16px;
     height: 16px;
@@ -863,17 +883,13 @@
   }
   .add-icon-container {
     visibility: hidden;
-    background-color: transparent;
-    padding: 5px;
+    display: flex;
   }
   .add-icon-container:hover {
-    background-color: var(--bg-tertiary-500) !important;
-    border-radius: 4px;
-    padding: 5px;
   }
 
   .add-icon-container:active {
-    background-color: var(--bg-secondary-420) !important;
+    /* background-color: var(--bg-secondary-420) !important; */
   }
   .add-item-active {
     visibility: visible;
@@ -888,32 +904,69 @@
 
   .btn-primary {
     background-color: transparent;
-    color: var(--white-color);
+    color: var(--text-ds-neutral-50);
     padding-right: 5px;
     border-radius: 2px;
   }
 
   .btn-primary:hover {
-    background-color: var(--bg-tertiary-600);
-    color: var(--white-color);
+    background-color: var(--bg-ds-surface-400);
+    color: var(--text-ds-neutral-50);
+    border-radius: 4px;
+  }
+  .btn-primary:hover .add-icon-container {
+    visibility: visible;
+  }
+  .btn-primary:hover .box-line {
+    visibility: visible;
+  }
+
+  .box-line {
+    position: absolute;
+    top: 0;
+    bottom: 26px;
+    left: 32.5px;
+    width: 1px;
+    background-color: var(--bg-ds-surface-100);
+    z-index: 1;
+  }
+
+  .btn-primary:focus-visible {
+    background-color: var(--bg-ds-surface-400);
+    color: var(--text-ds-neutral-50);
+    outline: none;
+    border-radius: 4px;
+    border: 2px solid var(--bg-ds-primary-300) !important;
+  }
+  .btn-primary:active {
+    background-color: var(--bg-ds-surface-500);
+    color: var(--text-ds-neutral-50);
+    outline: none;
+    border-radius: 4px;
+  }
+  .btn-primary:focus-visible .add-icon-container {
+    visibility: visible;
   }
 
   .renameInputFieldCollection {
     border: none;
     background-color: transparent;
-    color: var(--white-color);
-    padding-left: 0;
+    color: var(--bg-ds-neutral-50);
+    height: 24px;
     outline: none;
-    border-radius: 2px !important;
+    border-radius: 4px !important;
+    padding: 4px 2px;
+    caret-color: var(--bg-ds-primary-300);
   }
   .renameInputFieldCollection:focus {
-    border: 1px solid var(--border-primary-300) !important;
+    border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-collection {
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
   }
   .active-collection-tab {
-    background-color: var(--bg-tertiary-400) !important;
+    background-color: var(--bg-ds-surface-500) !important;
+    border-radius: 4px;
   }
   .collection-collection-name {
     width: calc(100% - 10px);
@@ -933,5 +986,13 @@
 
   .shortcutIcon:hover {
     background: var(--right-border);
+  }
+  .sub-folders {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 40px;
+    width: 1px;
+    background-color: var(--bg-ds-surface-100);
   }
 </style>

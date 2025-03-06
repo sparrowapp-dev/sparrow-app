@@ -2,6 +2,7 @@
   import ApiListItem from "../../../components/api-list-items/ApiListItem.svelte";
   import { ItemType } from "@sparrow/common/enums/item-type.enum";
   import { List } from "@sparrow/library/ui";
+  import { onMount } from "svelte";
 
   export let tabList = [];
   export let collectionList;
@@ -9,15 +10,26 @@
   export let onApiClick;
 
   // Helper to filter, sort by time, and get the top 5 APIs
+
   $: filteredApis = tabList
-    ?.filter((tab) => tab.type === ItemType.REQUEST)
+    ?.filter((tab) =>
+      [
+        ItemType.REQUEST,
+        ItemType.WEB_SOCKET,
+        ItemType.SOCKET_IO,
+        ItemType.GRAPHQL,
+      ].includes(tab.type),
+    )
     ?.sort((a, b) => new Date(b.time) - new Date(a.time)) // Sort descending by time
     ?.slice(0, 5)
-    ?.reverse(); // Get only the top 5
+    ?.reverse();
+  $: {
+    console.log(filteredApis);
+  }
 </script>
 
-<div class="d-flex justify-content-between p-3 pb-0">
-  <h6 class="teams-heading ms-2">Recent APIs</h6>
+<div class="d-flex justify-content-between pb-0" style="gap:8px;">
+  <h6 class="teams-heading">Recent APIs</h6>
 </div>
 
 <div class="sidebar-recentapi-list" style="flex:1; overflow: auto;">
@@ -31,7 +43,10 @@
     <p class="not-found-text px-2 ms-3">Recently opened APIs show up here.</p>
   {/if}
 </div>
-<hr class="mb-0 pb-0" />
+<hr
+  class=" pb-0"
+  style="margin-left: 10px; margin-top:12px; margin-bottom:12px;"
+/>
 
 <style>
   .sidebar-recentapi-list::-webkit-scrollbar-thumb {
@@ -42,10 +57,13 @@
     color: var(--bg-secondary-330);
   }
   .teams-heading {
-    margin-left: 5px;
+    margin-bottom: 0;
+    padding: 6px;
+    padding-left: 15px;
     font-size: 14px;
-    font-weight: 700;
-    line-height: 21px;
+    font-weight: 400;
+    line-height: 20.02px;
+    color: var(--text-ds-neutral-300);
   }
 
   .not-found-text {

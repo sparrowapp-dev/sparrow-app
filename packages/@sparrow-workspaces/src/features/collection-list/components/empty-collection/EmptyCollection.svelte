@@ -5,9 +5,9 @@
     workspaceLevelPermissions,
   } from "@sparrow/common/constants/permissions.constant";
   import { WorkspaceRole } from "@sparrow/common/enums";
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
   import { List } from "@sparrow/library/ui";
-  import { PlusIcon } from "@sparrow/library/icons";
+  import { AddRegular, PlusIcon } from "@sparrow/library/icons";
 
   export let userRoleInWorkspace: WorkspaceRole;
   export let onImportCollectionPopup: () => void;
@@ -40,46 +40,39 @@
         request directly.
       </p>
     {/if}
-    <div class="w-100 mt-0">
+    <div class="w-100 mt-2" style="display: flex; flex-direction:column; ">
       {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-        <button
-          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          class="bg-transparent w-100 mb-2 add-collection d-flex justify-content-center align-items-center border-radius-2"
-          style="color: var(--text-secondary-100);"
-          on:click={() => {
-            if (isGuestUser === true) {
-              onItemCreated("collection", {
-                workspaceId: currentWorkspaceId,
-                collection: collectionList,
-              });
-            } else {
-              onImportCollectionPopup();
-            }
-          }}
-        >
-          <PlusIcon
-            height={"22px"}
-            width={"22px"}
-            color={"var(--text-secondary-200)"}
-          />
-          <span
-            style="color: var(--text-secondary-200)"
-            class="ps-2 text-fs-12 fw-bold">Add Collection</span
-          >
-        </button>
+        <span class="mb-2">
+          <Button
+            title="Add Collection"
+            type="outline-secondary"
+            size="small"
+            customWidth="100%"
+            startIcon={AddRegular}
+            disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+            onClick={() => {
+              if (isGuestUser === true) {
+                onItemCreated("collection", {
+                  workspaceId: currentWorkspaceId,
+                  collection: collectionList,
+                });
+              } else {
+                onImportCollectionPopup();
+              }
+            }}
+          ></Button>
+        </span>
       {/if}
-      <p
-        class="import-curl w-100 d-flex justify-content-center align-items-center border-radius-2"
-        style="color: var(--text-secondary-100);"
-        role="button"
-        on:click={() => {
+
+      <Button
+        title="Import cURL"
+        onClick={() => {
           onImportCurlPopup();
         }}
-      >
-        <span style="color: var(--text-secondary-100)" class="ps-2 text-fs-12"
-          >Import cURL</span
-        >
-      </p>
+        type="primary"
+        size="small"
+        customWidth="100%"
+      />
     </div>
   </List>
 </div>

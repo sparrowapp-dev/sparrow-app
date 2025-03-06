@@ -46,7 +46,11 @@ import { v4 as uuidv4 } from "uuid";
 import type { GuideQuery } from "../../../../types/user-guide";
 import { graphqlExplorerDataStore } from "@sparrow/workspaces/features/graphql-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
-import type { Path, Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Path,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import {
   GraphqlRequestOperationTabEnum,
   type GraphqlRequestAuthTabInterface,
@@ -98,6 +102,7 @@ class GraphqlExplorerViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
+        t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
         this.authHeader = new ReduceAuthHeader(
           this._tab.getValue().property?.graphql
@@ -583,7 +588,8 @@ class GraphqlExplorerViewModel {
         inputType.inputFields,
         typeName,
         depth + 1,
-        "inputField",
+        "argument",
+        true,
       );
       processedTypes.delete(typeName);
       return result;
@@ -613,6 +619,7 @@ class GraphqlExplorerViewModel {
       parentName,
       depth = 0,
       defaultItemType = "field",
+      isInputField = false,
     ) {
       if (!fields || depth > maxDepthLength) return [];
 
@@ -621,12 +628,13 @@ class GraphqlExplorerViewModel {
         const typeName = resolveType(field.type);
         const isCustomType = !isScalarType(typeName);
 
-        let result = {
+        const result = {
           id: uuidv4(), // Add UUID to the top-level object
           name: fieldName,
           description: field.description,
           type: typeName,
           itemType: defaultItemType,
+          isInputField: isInputField,
           isSelected: false,
           isExpanded: false,
           value: getDefaultValue(typeName),
@@ -645,6 +653,7 @@ class GraphqlExplorerViewModel {
               type: argTypeName,
               description: arg.description,
               itemType: "argument",
+              isInputField: !isArgCustomType ? true : false,
               isSelected: false,
               isExpanded: false,
               defaultValue: arg.defaultValue,
@@ -727,12 +736,6 @@ class GraphqlExplorerViewModel {
           ? processFields(mutationType.fields, "Mutation").slice(0, 70)
           : [],
       },
-      // Disabling subscription for now as it's support is not provided
-      // Subscription: {
-      //   items: subscriptionType
-      //     ? processFields(subscriptionType.fields, "Subscription")
-      //     : [],
-      // },
     };
 
     return result;

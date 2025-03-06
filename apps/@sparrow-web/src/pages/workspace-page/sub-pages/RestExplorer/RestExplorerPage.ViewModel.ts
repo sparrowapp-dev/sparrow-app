@@ -101,6 +101,7 @@ import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.w
 import type { Socket } from "socket.io-client";
 import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
 import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
+import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 
 class RestExplorerViewModel
   implements
@@ -170,6 +171,7 @@ class RestExplorerViewModel
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
+        t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
         this.authHeader = new ReduceAuthHeader(
           this._tab.getValue().property.request?.state,

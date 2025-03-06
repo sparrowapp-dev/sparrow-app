@@ -9,9 +9,16 @@
     FolderIcon4,
     StackIcon,
     CollectionIcongs,
+    WorkspaceRegular,
+    StackRegular,
+    LayerRegular,
+    FolderRegular,
+    FlowChartRegular,
+    ArrowSwapRegular,
   } from "@sparrow/library/icons";
   import SuggestionTags from "../components/SuggestionTags/SuggestionTags.svelte";
   import RecentItems from "../components/RecentItems/RecentItems.svelte";
+  import { OSDetector } from "@sparrow/common/utils";
 
   export let closeGlobalSearch;
   export let workspaceDocuments;
@@ -28,6 +35,7 @@
   export let handlehideGlobalSearch;
   export let isWebApp = false;
   export let isGuestUser = false;
+  let osKeyName = "Ctrl";
 
   let workspaceDetailsMap: Record<
     string,
@@ -55,41 +63,48 @@
     filteredEnvironments = environment;
   };
 
+  const decidingKey = () => {
+    const os = new OSDetector();
+    if (os.getOS() == "macos") {
+      osKeyName = "Cmd";
+    }
+  };
+
   const suggestions: SearchSuggestion[] = [
     {
       type: "workspace",
       label: "Workspaces",
-      icon: WorkspaceIcongs,
+      icon: WorkspaceRegular,
       show: !isGuestUser,
     },
     {
       type: "collection",
       label: "Collections",
-      icon: CollectionIcongs,
+      icon: StackRegular,
       show: true,
     },
     {
       type: "environment",
       label: "Environments",
-      icon: StackIcon,
+      icon: LayerRegular,
       show: true,
     },
     {
       type: "folder",
       label: "Folders",
-      icon: FolderIcon4,
+      icon: FolderRegular,
       show: true,
     },
     {
       type: "flow",
       label: "Flows",
-      icon: FlowIcon,
+      icon: FlowChartRegular,
       show: true,
     },
     {
       type: "request",
       label: "Requests",
-      icon: RequestIcon2,
+      icon: ArrowSwapRegular,
       show: true,
     },
   ];
@@ -104,6 +119,7 @@
         return acc;
       }, {});
       handleSearch();
+      decidingKey();
     } catch (error) {
       console.error("Error fetching workspace details:", error);
     }
@@ -112,7 +128,7 @@
 
 <div class="search-container">
   {#if !hideGlobalSearch}
-    <SearchBar bind:searchQuery {handleSearch} bind:searchBarRef />
+    <SearchBar bind:searchQuery {handleSearch} bind:searchBarRef {osKeyName} />
     <div class="suggestions-container">
       <SuggestionTags {suggestions} bind:selectedType bind:searchBarRef />
       <RecentItems
@@ -136,6 +152,7 @@
         {handleGlobalSearchTestflowNavgation}
         {isWebApp}
         {isGuestUser}
+        {osKeyName}
       />
     </div>
   {/if}
@@ -147,8 +164,8 @@
     border: 1px solid var(--bg-ds-surface-100);
     box-shadow: 0px 16px 32px 0px rgba(0, 0, 0, 0.4);
     display: flex;
-    max-width: 630px;
-    width: 630px;
+    max-width: 650px;
+    width: 650px;
     max-height: 540px;
     flex-direction: column;
     overflow: hidden;

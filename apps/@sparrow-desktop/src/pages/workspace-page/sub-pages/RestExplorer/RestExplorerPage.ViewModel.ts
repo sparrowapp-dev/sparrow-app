@@ -100,6 +100,11 @@ import type { GuideQuery } from "../../../../types/user-guide";
 import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.ws.service";
 import type { Socket } from "socket.io-client";
 import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
+import { InitTab } from "@sparrow/common/factory";
+import { RequestSavedTabAdapter } from "@app/adapter";
+import type { Tab } from "@sparrow/common/types/workspace/tab";
+import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 
 class RestExplorerViewModel
   implements
@@ -169,6 +174,7 @@ class RestExplorerViewModel
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
+        t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
         this.authHeader = new ReduceAuthHeader(
           this._tab.getValue().property.request?.state,
@@ -384,6 +390,186 @@ class RestExplorerViewModel
       name: "guestUser",
     });
     return response?.getLatest().toMutableJSON();
+  };
+
+  private formatDate = (date) => {
+    const options = { day: "2-digit", month: "short", year: "numeric" };
+    const formattedDate = date.toLocaleDateString("en-GB", options);
+
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+
+    hours = hours % 12 || 12; // Convert 24h to 12h format
+
+    return `(${formattedDate}, ${hours}:${minutes} ${ampm})`;
+  };
+
+  /**
+   * Saves saved http request
+   * @param componentData - refers overall saved request tab data.
+   * @returns newly created saved request id.
+   */
+  private saveSavedRequest = async (componentData: Tab): Promise<string> => {
+    const { folderId, collectionId, workspaceId, requestId } =
+      componentData.path;
+    let userSource = {};
+    if (workspaceId && collectionId && requestId) {
+      const requestSavedTabAdapter = new RequestSavedTabAdapter();
+      const unadaptedRequest = requestSavedTabAdapter.unadapt(componentData);
+      /**
+       * handle request at collection level
+       */
+      const _collection = await this.readCollection(collectionId);
+      if (_collection?.activeSync) {
+        userSource = {
+          currentBranch: _collection?.currentBranch,
+          source: "USER",
+        };
+      }
+      let isGuestUser;
+      isGuestUserActive.subscribe((value) => {
+        isGuestUser = value;
+      });
+
+      if (isGuestUser == true) {
+        const savedRequestId = uuidv4();
+        const savedRequestData = {
+          id: savedRequestId,
+          name: componentData.name,
+          description: componentData.description,
+          type: CollectionItemTypeBaseEnum.SAVED_REQUEST,
+          requestResponse: unadaptedRequest,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        const progressiveTab = this._tab.getValue();
+        progressiveTab.isSaved = true;
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        if (folderId) {
+          await this.collectionRepository.addSavedRequestInFolder(
+            collectionId,
+            folderId,
+            requestId,
+            savedRequestData,
+          );
+        } else {
+          await this.collectionRepository.addSavedRequestInCollection(
+            collectionId,
+            requestId,
+            savedRequestData,
+          );
+        }
+        notifications.success("Response saved successfully.");
+        return savedRequestId || "";
+      }
+      const res = await this.collectionService.createSavedRequestInCollection({
+        collectionId: collectionId,
+        workspaceId: workspaceId,
+        requestId: requestId,
+        folderId: folderId,
+        ...userSource,
+        items: {
+          name: componentData.name,
+          description: componentData.description,
+          type: CollectionItemTypeBaseEnum.SAVED_REQUEST,
+          requestResponse: unadaptedRequest,
+        },
+      });
+      if (res.isSuccessful) {
+        const progressiveTab = this._tab.getValue();
+        progressiveTab.isSaved = true;
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        if (folderId) {
+          this.collectionRepository.addSavedRequestInFolder(
+            collectionId,
+            folderId,
+            requestId,
+            res.data.data,
+          );
+        } else {
+          this.collectionRepository.addSavedRequestInCollection(
+            collectionId,
+            requestId,
+            res.data.data,
+          );
+        }
+
+        notifications.success("Response saved successfully.");
+        return res?.data?.data?.id || "";
+      } else {
+        notifications.error("Failed to save response. Please try again.");
+        return "";
+      }
+    }
+    return "";
+  };
+
+  public saveResponse = async () => {
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+
+    const savedRequestTab = new InitTab().savedRequest(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      progressiveTab.path.workspaceId,
+    );
+    savedRequestTab.updateBody(progressiveTab.property.request?.body);
+    savedRequestTab.updateUrl(progressiveTab.property.request?.url);
+    savedRequestTab.updateName(progressiveTab.name + " - Response");
+    savedRequestTab.updateDescription(progressiveTab.description);
+    savedRequestTab.updateMethod(progressiveTab.property.request?.method);
+    savedRequestTab.updateHeaders(progressiveTab.property.request?.headers);
+    savedRequestTab.updateAuth(progressiveTab.property.request?.auth);
+    savedRequestTab.updateIsSave(true);
+    savedRequestTab.updateState({
+      requestBodyNavigation:
+        progressiveTab.property.request?.state.requestBodyNavigation,
+      requestBodyLanguage:
+        progressiveTab.property.request?.state.requestBodyLanguage,
+      requestAuthNavigation:
+        progressiveTab.property.request?.state.requestAuthNavigation,
+    });
+    savedRequestTab.updatePath({
+      ...progressiveTab.path,
+      requestId: progressiveTab.id,
+    });
+    savedRequestTab.updateQueryParams(
+      progressiveTab.property.request?.queryParams,
+    );
+    let responseCode = "";
+    restExplorerDataStore.update((restApiDataMap) => {
+      let data = restApiDataMap.get(progressiveTab?.tabId);
+      if (data) {
+        savedRequestTab.updateResponseBody(data.response.body);
+        savedRequestTab.updateResponseHeaders(data.response.headers);
+        savedRequestTab.updateResponseStatus(data.response.status);
+        savedRequestTab.updateResponseDate(this.formatDate(new Date()));
+        savedRequestTab.updateState({
+          responseBodyLanguage: data.response.bodyLanguage,
+        });
+        responseCode = data.response.status;
+      }
+      return restApiDataMap;
+    });
+    const savedRequestId = await this.saveSavedRequest(
+      savedRequestTab.getValue(),
+    );
+    if (savedRequestId) {
+      savedRequestTab.updateId(savedRequestId);
+      this.tabRepository.createTab(savedRequestTab.getValue());
+      MixpanelEvent(Events.SAVE_RESPONSE, {
+        type: "REST",
+        status_code: responseCode,
+      });
+      moveNavigation("right");
+    }
   };
 
   /**
