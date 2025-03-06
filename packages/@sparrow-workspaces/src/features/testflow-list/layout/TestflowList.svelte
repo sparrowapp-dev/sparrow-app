@@ -24,6 +24,8 @@
     isTestFlowTourGuideOpen,
     currentStep,
   } from "../../../stores/guide.tour";
+  import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
+  import DefaultTourGuide from "../../../components/default-tour-guide/DefaultTourGuide.svelte";
 
   /**
    * current workspace
@@ -121,11 +123,14 @@
       });
     }
   }
+  $: isExpandTestflow =
+    $isDefaultTourGuideOpen === true ? true : isExpandTestflow;
 </script>
 
 <div
   class={`d-flex flex-column  pt-0 px-1`}
   style="font-weight: 500;margin-bottom:2px; "
+  id="testflow-container"
 >
   <!-- 
   --  Testflow Header 
@@ -265,6 +270,22 @@
     </div>
   {/if}
 </div>
+{#if $isDefaultTourGuideOpen && $defaultCurrentStep == 3}
+  <DefaultTourGuide
+    targetId="testflow-container"
+    TitleName={"Test Flows"}
+    DescriptionContent={"Use Test Flow to automate testing for your API requests. Chain multiple requests, validate responses, and ensure your APIs work as expected."}
+    CardNumber={3}
+    TotalsCards={7}
+    onNext={() => {
+      defaultCurrentStep.set(4);
+      console.log($defaultCurrentStep);
+    }}
+    onClose={() => {
+      isDefaultTourGuideOpen.set(false);
+    }}
+  />
+{/if}
 
 <style lang="scss">
   .add-icon-container {

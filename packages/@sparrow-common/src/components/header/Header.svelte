@@ -1,12 +1,14 @@
 <script lang="ts">
   import { Select } from "@sparrow/library/forms";
   import {
-    CloudOffIcon,
     SparrowEdgeIcon,
     StackIcon,
     CheckCircle,
     ArrowRightRegular,
     AddRegular,
+    QuestionCirlceReqular,
+    DocumentRegular,
+    GiftReqular,
   } from "@sparrow/library/icons";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { environmentType } from "@sparrow/common/enums";
@@ -19,8 +21,14 @@
   import UserProfileModal, {
     type UserProfileObj,
   } from "./sub-component/UserProfileModal.svelte";
-  import { Button, Tooltip } from "@sparrow/library/ui";
+  import { Button, Dropdown, Tooltip } from "@sparrow/library/ui";
   import { SparrowFilledLogo } from "./images/index";
+  import {
+    defaultCurrentStep,
+    isDefaultTourGuideClose,
+    isDefaultTourGuideOpen,
+  } from "@sparrow/workspaces/stores";
+  import { DefaultTourGuide } from "@sparrow/workspaces/components";
   // import { GlobalSearch } from "../../components/popup/global-search";
   /**
    * environment list
@@ -65,6 +73,8 @@
   export let isCreateTeamModalOpen;
   export let searchQuery = "";
   export let onSearchClick;
+
+  let helpOptionsOpen = false;
 
   /**
    * callback for Select component
@@ -279,7 +289,7 @@
     <!-- <div >
       <WorkspaceRegular />
     </div> -->
-    <div class="no-drag" style="margin-left: 8px;">
+    <div class="no-drag" style="margin-left: 8px;" id="workspace-container">
       {#if isGuestUser}
         <div style="display: flex;">
           <Select
@@ -396,6 +406,23 @@
         </Select>
       {/if}
     </div>
+    {#if $isDefaultTourGuideOpen && $defaultCurrentStep === 5}
+      <DefaultTourGuide
+        targetId="workspace-container"
+        TitleName="Navigate Between Workspaces"
+        DescriptionContent="Work with multiple projects? Easily switch between workspaces to keep your API requests and collections organized."
+        CardNumber={5}
+        TotalsCards={7}
+        additionLeftValue={-30}
+        tipPosition="bottom-center"
+        onNext={() => {
+          defaultCurrentStep.set(6);
+        }}
+        onClose={() => {
+          isDefaultTourGuideOpen.set(false);
+        }}
+      />
+    {/if}
   </div>
 
   <div
@@ -497,49 +524,133 @@
     {/if}
     <!-- {#if !isWebApp} -->
 
-    <Select
-      id={"environment-selector"}
-      data={[
-        {
-          name: "Select Environment",
-          id: "none",
-          type: environmentType.LOCAL,
-          hide: true,
-        },
-        {
-          name: "None",
-          id: "none",
-          display: "none",
-          type: environmentType.LOCAL,
-        },
-        ...environments,
-      ].filter((elem) => {
-        return elem.type === environmentType.LOCAL;
-      })}
-      titleId={currentEnvironment?.id}
-      onclick={handleDropdown}
-      minHeaderWidth={"205px"}
-      iconRequired={true}
-      icon={StackIcon}
-      iconColor={"var(--icon-primary-300)"}
-      isDropIconFilled={true}
-      borderType={"none"}
-      borderActiveType={"none"}
-      headerHighlight={"hover-active"}
-      headerTheme={"transparent"}
-      menuItem={"v2"}
-      headerFontSize={"12px"}
-      maxHeaderWidth={"185px"}
-      zIndex={200}
-      bodyTheme={"surface"}
-      borderRounded={"2px"}
-      position={"absolute"}
-      headerHeight={"28px"}
-    />
+    <div id="environment-select-container">
+      <Select
+        id={"environment-selector"}
+        data={[
+          {
+            name: "Select Environment",
+            id: "none",
+            type: environmentType.LOCAL,
+            hide: true,
+          },
+          {
+            name: "None",
+            id: "none",
+            display: "none",
+            type: environmentType.LOCAL,
+          },
+          ...environments,
+        ].filter((elem) => {
+          return elem.type === environmentType.LOCAL;
+        })}
+        titleId={currentEnvironment?.id}
+        onclick={handleDropdown}
+        minHeaderWidth={"205px"}
+        iconRequired={true}
+        icon={StackIcon}
+        iconColor={"var(--icon-primary-300)"}
+        isDropIconFilled={true}
+        borderType={"none"}
+        borderActiveType={"none"}
+        headerHighlight={"hover-active"}
+        headerTheme={"transparent"}
+        menuItem={"v2"}
+        headerFontSize={"12px"}
+        maxHeaderWidth={"185px"}
+        zIndex={200}
+        bodyTheme={"surface"}
+        borderRounded={"2px"}
+        position={"absolute"}
+        headerHeight={"28px"}
+      />
+    </div>
+
+    {#if $isDefaultTourGuideOpen && $defaultCurrentStep === 4}
+      <DefaultTourGuide
+        targetId="environment-select-container"
+        TitleName="Switch Environments"
+        DescriptionContent="Need to test in a different environment? Use this menu to switch environments instantly."
+        CardNumber={4}
+        TotalsCards={7}
+        additionLeftValue={-150}
+        tipPosition="bottom-center"
+        onNext={() => {
+          defaultCurrentStep.set(5);
+        }}
+        onClose={() => {
+          isDefaultTourGuideOpen.set(false);
+        }}
+      />
+    {/if}
+
     <!-- {/if} -->
+    <div class="" id="question-container">
+      <Button
+        startIcon={QuestionCirlceReqular}
+        type="teritiary-regular"
+        size="medium"
+        iconSize={20}
+        onClick={() => (helpOptionsOpen = !helpOptionsOpen)}
+      />
+    </div>
+    {#if helpOptionsOpen}
+      <div class="question-option">
+        <Dropdown
+          buttonId="question-container"
+          horizontalPosition="left"
+          isMenuOpen={true}
+          options={[
+            {
+              name: "Documentation",
+              color: "var(--text-ds-neutral-50)",
+              icon: DocumentRegular,
+              iconSize: "12px",
+            },
+            {
+              name: "What’s New?",
+              color: "var(--text-ds-neutral-50)",
+              icon: GiftReqular,
+              iconSize: "12px",
+            },
+          ]}
+        />
+      </div>
+    {/if}
+    {#if $isDefaultTourGuideClose}
+      <DefaultTourGuide
+        targetId="question-container"
+        TitleName="Quick Help!"
+        DescriptionContent="Access documentation and stay up to date with the latest features and improvements."
+        TotalsCards={7}
+        additionLeftValue={-210}
+        tipPosition="bottom-center"
+        rightButtonName="Close"
+        onNext={() => {
+          isDefaultTourGuideClose.set(false);
+          isDefaultTourGuideOpen.set(false);
+        }}
+      />
+    {/if}
+    {#if $isDefaultTourGuideOpen && $defaultCurrentStep === 7}
+      <DefaultTourGuide
+        targetId="question-container"
+        TitleName="Quick Help!"
+        DescriptionContent="Access documentation and stay up to date with the latest features and improvements."
+        additionLeftValue={-210}
+        CardNumber={7}
+        TotalsCards={7}
+        tipPosition="bottom-center"
+        rightButtonName="Finish"
+        onNext={() => {
+          isDefaultTourGuideClose.set(false);
+          isDefaultTourGuideOpen.set(false);
+        }}
+      />
+    {/if}
 
     {#if !isGuestUser}
-      <div class={"pe-2"}>
+      <div class={"pe-1"}>
         <UserProfileModal
           {isGuestUser}
           item={sidebarModalItem}
@@ -560,6 +671,10 @@
 </header>
 
 <style>
+  .main-container {
+    min-height: 28px;
+    min-width: 96px;
+  }
   header {
     height: 44px;
     background-color: var(--bg-ds-surface-700);
@@ -690,5 +805,8 @@
     opacity: 0.2;
     pointer-events: none;
     z-index: 1;
+  }
+  .question-option {
+    position: absolute;
   }
 </style>

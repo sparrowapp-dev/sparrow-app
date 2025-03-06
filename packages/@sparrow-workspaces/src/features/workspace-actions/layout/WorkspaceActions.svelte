@@ -48,6 +48,8 @@
     isTestFlowTourGuideOpen,
   } from "../../../stores/guide.tour";
   import { TestFlowTourGuide } from "@sparrow/workspaces/components";
+  import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
+  import DefaultTourGuide from "../../../components/default-tour-guide/DefaultTourGuide.svelte";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import { LaunchDesktop } from "@sparrow/common/components";
@@ -533,43 +535,60 @@
       <!--  
         New dropdown button for adding new api, collection and import Curl
       -->
-      {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-        <Dropdown
-          zIndex={600}
-          buttonId="addButton"
-          bind:isBackgroundClickable
-          bind:isMenuOpen={addButtonMenu}
-          options={addButtonData}
-        >
-          <Tooltip
-            title={"Add Options"}
-            placement={"bottom-center"}
-            distance={12}
-            show={!addButtonMenu}
-            zIndex={10}
+      <div id="options-container">
+        {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+          <Dropdown
+            zIndex={600}
+            buttonId="addButton"
+            bind:isBackgroundClickable
+            bind:isMenuOpen={addButtonMenu}
+            options={addButtonData}
           >
-            <!-- <button
+            <Tooltip
+              title={"Add Options"}
+              placement={"bottom-center"}
+              distance={12}
+              show={!addButtonMenu}
+              zIndex={10}
+            >
+              <!-- <button
               id="addButton"
               class="border-0 p-1 border-radius-2 add-button"
               on:click={() => {
                 addButtonMenu = !addButtonMenu;
               }}
             > -->
-            <!--               
+              <!--               
               <img src={plusIcon} alt="" />
             </button> -->
-            <Button
-              type="primary"
-              id="addButton"
-              size={"small"}
-              customWidth={"28px"}
-              startIcon={AddRegular}
-              onClick={() => {
-                addButtonMenu = !addButtonMenu;
-              }}
-            />
-          </Tooltip>
-        </Dropdown>
+              <Button
+                type="primary"
+                id="addButton"
+                size={"small"}
+                startIcon={AddRegular}
+                onClick={() => {
+                  addButtonMenu = !addButtonMenu;
+                }}
+              />
+            </Tooltip>
+          </Dropdown>
+        {/if}
+      </div>
+      {#if $isDefaultTourGuideOpen && $defaultCurrentStep === 6}
+        <DefaultTourGuide
+          targetId="options-container"
+          TitleName="Add API Requests & More!"
+          DescriptionContent="Click here to create new requests (HTTP, GraphQL, WebSocket, Socket.IO) add & import collections, environments & test flows."
+          CardNumber={6}
+          TotalsCards={7}
+          tipPosition="right-center"
+          onNext={() => {
+            defaultCurrentStep.set(7);
+          }}
+          onClose={() => {
+            isDefaultTourGuideOpen.set(false);
+          }}
+        />
       {/if}
 
       {#if $isTestFlowTourGuideOpen && $currentStep == 1}
