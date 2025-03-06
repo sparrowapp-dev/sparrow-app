@@ -5,65 +5,66 @@
     environmentDropdown,
     environmentPicker,
   } from "@sparrow/workspaces/images";
+  import { Button } from "@sparrow/library/ui";
+  import { DismissRegular } from "@sparrow/library/icons";
   /**
    * callback which closes the quick help dialog
    */
   export let closeQuickHelp;
 </script>
 
-<div class="px-3 pt-4 pb-2 d-flex flex-column quick-container h-100">
-  <div class="d-flex justify-content-between">
+<div class="pt-3 d-flex flex-column quick-container h-100 gap-3" style="padding: 0px 24px 40px 12px;">
+  <div class="d-flex justify-content-between" style="padding:12px 4px 4px 0px;">
     <div>
-      <h4 class="head-title pb-3">Quick help</h4>
+      <h4 class="head-title">Quick help</h4>
     </div>
-    <div class="icon">
-      <img
-        src={cross}
-        role="button"
-        on:click={() => {
-          closeQuickHelp();
-        }}
-        alt="close"
-      />
-    </div>
+    <Button
+    type="outline-secondary"
+    startIcon={DismissRegular}
+    onClick={() => {
+      closeQuickHelp();
+    }}
+    size="small"
+    customWidth="28px"
+   />
   </div>
-  <div class="pe-1" style="flex:1; overflow:auto;">
-    <h6 class="heading-title">Environments</h6>
+  <div style="flex:1; overflow:auto;">
+    <h6 class="heading-title mb-2">Environments</h6>
     {#each QuickHelp.environments as env}
-      <p class="heading-para text-textColor">
+      <p class="heading-para">
         {env}
       </p>
     {/each}
 
-    <h6 class="heading-title">Variables</h6>
+    <h6 class="heading-title mb-2">Variables</h6>
     {#each QuickHelp.variables as variables}
-      <p class="heading-para text-textColor">
+      <p class="heading-para">
         {variables}
       </p>
     {/each}
 
-    <h6 class="heading-title">Variables Types</h6>
+    <h6 class="heading-title mb-2">Variables Types</h6>
     {#each QuickHelp.variablesTypes as types}
-      <p class="heading-para text-textColor">
+      <p class="heading-para">
         {types}
       </p>
     {/each}
 
-    <h6 class="heading-title">Using Variables in REST API tool</h6>
-    <p class="heading-para text-textColor">
+    <h6 class="heading-title mb-2">Using Variables in REST API tool</h6>
+    <p class="heading-para">
       {QuickHelp.usingVariables[0]}
     </p>
     <p><img class="w-100" src={environmentPicker} alt="" /></p>
-    <p class="heading-para text-textColor">
+    <p class="heading-para">
       {@html QuickHelp.usingVariables[1]}
     </p>
-    <p class="heading-para text-textColor">
+    <p class="heading-para">
       {QuickHelp.usingVariables[2]}
     </p>
 
-    <h6 class="heading-title">Switching Environments</h6>
+    <h6 class="heading-title mb-2">Switching Environments</h6>
     {#each QuickHelp.switchingEnvironments as switchEnv}
-      <p class="heading-para text-textColor">
+      <p class="heading-para">
         {switchEnv}
       </p>
     {/each}
@@ -87,12 +88,16 @@
 
     .heading-title {
       font-size: 16px;
+      font-weight: 500;
     }
     .heading-para {
       font-size: 12px;
+      color:var(--text-ds-neutral-400);
+      line-height: 18px;
     }
     .head-title {
-      font-size: 18px;
+      font-size: 20px;
+      font-weight: 600;
     }
     .icon {
       cursor: pointer;
