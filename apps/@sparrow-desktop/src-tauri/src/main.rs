@@ -77,6 +77,7 @@ use hyper_tls::HttpsConnector;
 use std::sync::Arc;
 use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::sync::Mutex;
+use tokio::time::timeout;
 use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
 
@@ -86,9 +87,11 @@ use rust_socketio::{
     asynchronous::{Client as SocketClient, ClientBuilder},
     Event as SocketIoEvent, Payload as SocketIoPayload, TransportType,
 };
-use tokio::sync::Mutex as SocketMutex;
 use tauri_plugin_os::platform;
+use tokio::sync::Mutex as SocketMutex;
 
+// 5 seconds timeout for websocket connection
+const SOCKET_TIMEOUT: Duration = Duration::from_secs(5);
 
 // MacOs Window Titlebar Config Imports
 #[cfg(target_os = "macos")]
@@ -101,7 +104,6 @@ extern crate cocoa;
 #[cfg(target_os = "macos")]
 use cocoa::appkit::{NSWindow, NSWindowButton, NSWindowStyleMask, NSWindowTitleVisibility};
 use tauri::{Runtime, WebviewWindow};
-
 
 pub trait WindowExt {
     fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool);
@@ -668,10 +670,13 @@ async fn connect_websocket(
         .map_err(|e| format!("Failed to build request: {}", e))?;
 
     // Send the HTTP request and await the response to check if upgrade to websocket is possible or not.
-    let response = client
-        .request(req)
-        .await
-        .map_err(|e| format!("Failed to request: {}", e))?;
+    let response_result = timeout(SOCKET_TIMEOUT, client.request(req)).await;
+
+    let response = match response_result {
+        Ok(Ok(response)) => response, // Successfully got a response
+        Ok(Err(e)) => return Err(format!("Request failed: {}", e)), // Request error
+        Err(_) => return Err("Request timed out".to_string()), // Timeout error
+    };
 
     // Check if the upgrade to WebSocket was successful
     if response.status() != 101 {

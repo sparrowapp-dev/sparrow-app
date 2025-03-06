@@ -570,16 +570,21 @@ const disconnectSocketIo = async (tab_id: string) => {
 const convertWebSocketUrl = (url: string) => {
   // Check if the URL starts with 'wss://'
   if (url.startsWith("wss://")) {
-    return "https:/" + url.slice(5); // Replace 'wss://' with 'https://'
+    return { httpUrl: "https:/" + url.slice(5), wsUrl: url }; // Replace 'wss://' with 'https://'
   }
 
   // Check if the URL starts with 'ws://'
-  if (url.startsWith("ws://")) {
-    return "http:/" + url.slice(4); // Replace 'ws://' with 'http://'
+  else if (url.startsWith("ws://")) {
+    return { httpUrl: "http:/" + url.slice(4), wsUrl: url };
   }
-
-  // If the URL does not start with 'wss://' or 'ws://', return it unchanged
-  return url;
+  // Just append 'http://' to the URL
+  else {
+    const isLocalHostUrl =
+      url.includes("localhost") || url.includes("127.0.0.1");
+    const httpUrl = isLocalHostUrl ? `http://${url}` : `https://${url}`;
+    const wsUrl = isLocalHostUrl ? `ws://${url}` : `wss://${url}`;
+    return { httpUrl, wsUrl };
+  }
 };
 
 /**
@@ -597,8 +602,8 @@ const connectWebSocket = async (
   tabId: string,
   requestHeaders: string,
 ) => {
-  const httpurl = convertWebSocketUrl(url);
-  console.table({ url, httpurl, tabId, requestHeaders });
+  const { httpUrl, wsUrl } = convertWebSocketUrl(url);
+  console.table({ wsUrl, httpUrl, tabId, requestHeaders });
   webSocketDataStore.update((webSocketDataMap) => {
     webSocketDataMap.set(tabId, {
       messages: [],
@@ -614,8 +619,8 @@ const connectWebSocket = async (
     return webSocketDataMap;
   });
   await invoke("connect_websocket", {
-    url: url,
-    httpurl: httpurl,
+    url: wsUrl,
+    httpurl: httpUrl,
     tabid: tabId,
     headers: requestHeaders,
   })
@@ -838,29 +843,40 @@ const makeHttpRequestV2 = async (
     if (signal?.aborted) {
       throw new Error(); // Ignore response if request was cancelled
     }
-
+    debugger;
     const endTime = performance.now();
     const duration = endTime - startTime;
 
     try {
       const responseBody = JSON.parse(data);
-      const apiResponse: Response = JSON.parse(responseBody.body) as Response;
-      console.table(apiResponse);
+      let parsedResponseBody;
+      try {
+        parsedResponseBody = JSON.parse(responseBody.body);
+      } catch (e) {
+        parsedResponseBody = {
+          body: responseBody.body,
+          status: "500",
+        };
+      }
+      console.table(parsedResponseBody);
 
       const appInsightData = {
         id: uuidv4(),
         name: "RPC Duration Metric",
         duration,
         success: true,
-        responseCode: parseInt(apiResponse.status),
+        responseCode:
+          typeof parsedResponseBody.status === "string"
+            ? parseInt(parsedResponseBody.status)
+            : parsedResponseBody.status,
         properties: {
           source: "frontend",
           type: "RPC_HTTP",
         },
       };
       appInsights.trackDependencyData(appInsightData);
-      console.log("api response : ", apiResponse);
-      return success(apiResponse);
+      console.log("api response : ", parsedResponseBody);
+      return success(parsedResponseBody);
     } catch (e) {
       console.error(e);
       throw new Error("Error parsing response");
