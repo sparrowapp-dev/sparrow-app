@@ -139,7 +139,6 @@
           disabled={$currentEnvironment?.property?.environment?.type ==
             "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
           placeholder=""
-          isEditIconRequired={true}
         />
         <div class={`d-flex env-btn-container`}>
           <div class="position-relative">

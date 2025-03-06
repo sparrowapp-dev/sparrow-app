@@ -47,9 +47,7 @@
     id={TEXTAREA_ID}
     bind:value={teamForm.description.value}
     placeholder={DESCRIPTION_CONFIG.PLACEHOLDER}
-    defaultBorderColor="transparent"
-    hoveredBorderColor="1px solid var(--border-ds-neutral-300)"
-    focusedBorderColor="2px solid var(--border-ds-primary-300)"
+    variant={"primary"}
     class="text-fs-14 bg-tertiary-300 fw-normal px-2 py-2 border-radius-4"
     style="outline:none;"
     disabled={false}

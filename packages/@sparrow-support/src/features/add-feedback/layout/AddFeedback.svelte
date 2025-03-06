@@ -208,7 +208,6 @@
           isError={false}
           width={"100%"}
           type="text"
-          isEditIconRequired={false}
           bind:value={feedbackSubject}
         />
         <hr class="m-0 ms-2" style="padding-bottom:5px;" />
@@ -222,13 +221,9 @@
           id="feedback-description"
           height={"90px"}
           bind:value={feedbackDescription}
-          defaultBorderColor="transparent"
-          hoveredBorderColor="transparent"
-          focusedBorderColor="transparent"
-          typedBorderColor="transparent"
           class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
-          style="outline:none;
-         "
+          style="outline:none;"
+          blankTextarea={true}
           disabled={false}
           placeholder="Add short description"
           maxlength={200}

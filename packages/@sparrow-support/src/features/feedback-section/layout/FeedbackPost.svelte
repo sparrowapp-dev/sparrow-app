@@ -647,7 +647,6 @@
           id="feedback-subject"
           width={"100%"}
           type="text"
-          isEditIconRequired={false}
           bind:value={feedbackSubject}
           class="text-fs-20 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;"
@@ -671,15 +670,11 @@
           height={"90px"}
           bind:value={feedbackDescription}
           class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
-          style="outline:none;
-     "
+          style="outline:none;"
+          blankTextarea={true}
           disabled={false}
           placeholder="Add short description"
           maxlength={200}
-          defaultBorderColor="transparent"
-          hoveredBorderColor="transparent"
-          focusedBorderColor="transparent"
-          typedBorderColor="transparent"
         />
       </div>
 

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { PencilIcon } from "@sparrow/library/icons";
   import { createEventDispatcher } from "svelte";
   import { Button } from "../../ui";
   let componentClass = "";
@@ -14,7 +13,6 @@
   export let width = "auto";
   export let disabled = false;
   export let value = "";
-  export let isEditIconRequired = true;
   export let maxlength = 300;
   export let id = "";
   export let isError: boolean = false;
@@ -148,7 +146,7 @@
     {maxlength}
     {disabled}
     class="w-100 input-{size}"
-    style="{componentStyle} {type === 'text' && isEditIconRequired && isHovered
+    style="{componentStyle} {type === 'text' && isHovered
       ? 'padding-right:35px !important;'
       : ''} --placeholder-color: var(--icon-ds-neutral-400); background-color: ${backgroundColor}; height:{size ===
     'medium'
@@ -162,18 +160,6 @@
     on:input={handleInputChange}
     on:keydown={onKeyPress}
   />
-  {#if type === "text" && isHovered && isEditIconRequired && !disabled}
-    <span
-      class="position-absolute"
-      style="top: {size === 'medium' ? '3px' : ''}; right: 10px;"
-    >
-      <PencilIcon
-        height={size === "medium" ? "16px" : "12px"}
-        width={size === "medium" ? "16px" : "12px"}
-        color="white"
-      />
-    </span>
-  {/if}
   {#if endIcon}
     <Button
       type="teritiary-regular"
@@ -195,8 +181,7 @@
       <div>
         <svelte:component
           this={helpIcon}
-          height={`16px`}
-          width={`16px`}
+          size={"16px"}
           useParentColor={true}
           color={isError
             ? "var(--icon-ds-danger-300)"

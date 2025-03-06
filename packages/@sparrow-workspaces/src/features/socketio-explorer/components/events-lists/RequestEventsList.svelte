@@ -33,7 +33,6 @@
           style="outline:none; background-color:transparent;"
           isError={false}
           placeholder="Name"
-          isEditIconRequired={false}
         />
       </div>
     </div>

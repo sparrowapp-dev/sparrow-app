@@ -42,7 +42,6 @@
     placeholder={"Workspace name"}
     style="outline:none;"
     variant="primary"
-    isEditIconRequired={false}
     type={"text"}
   />
   <br />

@@ -48,7 +48,6 @@
     headerLabel={true}
     headerLabelText={NAME_CONFIG.TITLE}
     inputValueRequired={true}
-    isEditIconRequired={false}
     isError={ErrorValue}
     helpLabel={true}
     errorMessage={NAME_CONFIG.REQUIRED_ERROR_MESSAGE}
