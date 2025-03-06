@@ -108,7 +108,6 @@
 
     if (tabbarElement) {
       const navbarElement = tabbarElement.querySelector(".navbar");
-      console.log("nav :>> ", navbarElement);
       if (navbarElement) {
         // console.log("Navbar is present inside Tabbar.");
         navbarElement.remove();

@@ -219,22 +219,13 @@
   };
 
   // ** Anish -- Change -start
-  const forceCloseTab = (tabList: Tab[], currentTabId: string) => {
-    tabList?.forEach((tab: Tab) => {
-      if (tab.id !== currentTabId) {
-        _viewModel.handleRemoveTab(tab.id);
-      }
-    });
-  };
-
   const froceCloseExceptCurrentOne = (tabList: Tab[], currentTabId: string) => {
     tabsToForceClose = tabList;
     tabIdWhoRecivedForceClose = currentTabId;
-    console.log("in froceCloseExceptCurrentOne ;>> ", tabList);
+
     noOfNotSavedTabsWhileForClose = 0;
     tabList?.forEach((tab: Tab) => {
       if (tab.id !== currentTabId) {
-        // forceCloseTab(tab, tab.id);
         if (
           (tab?.type === TabTypeEnum.REQUEST ||
             tab?.type === TabTypeEnum.WEB_SOCKET ||
@@ -249,7 +240,7 @@
 
     if (noOfNotSavedTabsWhileForClose > 0) {
       if (isUserDontWantForceClosePopup) {
-        forceCloseTab(tabsToForceClose, tabIdWhoRecivedForceClose);
+        forceCloseTab(tabList, currentTabId);
         isForceCloseTabPopupOpen = false;
         noOfNotSavedTabsWhileForClose = 0;
         return;
@@ -257,16 +248,82 @@
       isForceCloseTabPopupOpen = true;
     } else forceCloseTab(tabList, currentTabId);
   };
-  const closeTabExceptCurrentOne = (tabList: [], currentTabId: string) => {
-    // console.log("in closeTabExceptCurrentOne :>>  ", tabList, closeTab);
-    tabList?.forEach((tab: Tab) => {
+  const forceCloseTab = async (tabList: Tab[], currentTabId: string) => {
+    for (const tab of tabList) {
       if (tab.id !== currentTabId) {
-        closeTab(tab.id, tab);
+        await forceCloseTabsAsync(tab.id, tab);
       }
-      if (tab.id == currentTabId) {
-        moveNavigation("right");
+    }
+  };
+
+  const forceCloseTabsAsync = async (id: string, tab: Tab) => {
+    return new Promise((resolve) => {
+      if (
+        (tab?.type === TabTypeEnum.REQUEST ||
+          tab?.type === TabTypeEnum.WEB_SOCKET ||
+          tab?.type === TabTypeEnum.SOCKET_IO ||
+          tab?.type === TabTypeEnum.GRAPHQL) &&
+        !tab?.isSaved
+      ) {
+        if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
+          removeTab = tab;
+          setTimeout(() => {
+            // Simulating a delay similar to waiting for a save action
+            _viewModel.handleRemoveTab(id);
+            resolve(0);
+          }, 300);
+        } else {
+          _viewModel.handleRemoveTab(id);
+          resolve(0);
+        }
+      } else {
+        _viewModel.handleRemoveTab(id);
+        resolve(0);
       }
     });
+  };
+
+  const closeTabSequentially = async (id: string, tab: Tab) => {
+    if (
+      (tab?.type === TabTypeEnum.REQUEST ||
+        tab?.type === TabTypeEnum.WEB_SOCKET ||
+        tab?.type === TabTypeEnum.ENVIRONMENT ||
+        tab?.type === TabTypeEnum.TESTFLOW ||
+        tab?.type === TabTypeEnum.SOCKET_IO ||
+        tab?.type === TabTypeEnum.GRAPHQL) &&
+      !tab?.isSaved
+    ) {
+      if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
+        console.log("save ssss*****");
+        removeTab = tab;
+        isPopupClosed = true;
+        // Wait for the save popup to be handled before continuing
+        await new Promise<void>((resolve) => {
+          const checkIfPopupClosed = setInterval(() => {
+            if (!isPopupClosed) {
+              clearInterval(checkIfPopupClosed);
+              resolve();
+            }
+          }, 300);
+        });
+      } else {
+        _viewModel.handleRemoveTab(id);
+      }
+    } else {
+      _viewModel.handleRemoveTab(id);
+    }
+  };
+
+  const closeTabExceptCurrentOne = async (
+    tabList: Tab[],
+    currentTabId: string,
+  ) => {
+    for (let tab of tabList) {
+      if (tab.id !== currentTabId) {
+        // Wait for closeTab to finish before moving to the next tab
+        await closeTabSequentially(tab.id, tab);
+      }
+    }
   };
 
   const handleTabDuplication = (tabId: string) => {
@@ -709,64 +766,64 @@
   </div>
 </Motion>
 
-{#if isForceCloseTabPopupOpen}
-  <Modal
-    title={""}
-    type={"dark"}
-    zIndex={1000}
-    isOpen={true}
-    handleModalState={handleForceClosePopupBackdrop}
-  >
-    <div class="d-flex row gap-4">
-      <div class="d-flex row gap-2" style="width: 540px;">
-        <div class="force-close-popup-title">
-          <h4>Force Close!</h4>
-        </div>
-        <div class="force-close-popup-desc">
-          <p style="margin: 0px;">
-            {noOfNotSavedTabsWhileForClose} Tabs have unsaved changes. Force closing
-            will discard your edits, and you won’t be able to recover them. Are you
-            sure you want to proceed?
-          </p>
-        </div>
-      </div>
-
-      <div class="d-flex gap-2">
-        <Checkbox
-          size={"large"}
-          bind:checked={isUserDontWantForceClosePopup}
-          on:input={() => {
-            isUserDontWantForceClosePopup = true;
-          }}
-          disabled={false}
-        />
-        <p>I understand, don't show this agian.</p>
-      </div>
-      <div class="d-flex justify-content-end gap-2">
-        <Button
-          title="Don't Close"
-          size="medium"
-          type="secondary"
-          onClick={() => {
-            "click dont save";
-            handleForceClosePopupBackdrop(false);
-          }}
-        ></Button>
-        <Button
-          title="Force Close"
-          size="medium"
-          type="danger"
-          onClick={() => {
-            "click dont save";
-            forceCloseTab(tabsToForceClose, tabIdWhoRecivedForceClose);
-            isForceCloseTabPopupOpen = false;
-            noOfNotSavedTabsWhileForClose = 0;
-          }}
-        ></Button>
+<!-- {#if isForceCloseTabPopupOpen} -->
+<Modal
+  title={"Force Close!"}
+  type={"dark"}
+  zIndex={1000}
+  isOpen={isForceCloseTabPopupOpen}
+  handleModalState={handleForceClosePopupBackdrop}
+>
+  <div class="d-flex row gap-4">
+    <div class="d-flex row gap-2" style="width: 540px;">
+      <!-- <div class="force-close-popup-title">
+        <h4>Force Close!</h4>
+      </div> -->
+      <div class="force-close-popup-desc">
+        <p style="margin: 0px;">
+          {noOfNotSavedTabsWhileForClose} Tabs have unsaved changes. Force closing
+          will discard your edits, and you won’t be able to recover them. Are you
+          sure you want to proceed?
+        </p>
       </div>
     </div>
-  </Modal>
-{/if}
+
+    <div class="d-flex gap-2">
+      <Checkbox
+        size={"large"}
+        bind:checked={isUserDontWantForceClosePopup}
+        on:input={() => {
+          isUserDontWantForceClosePopup = true;
+        }}
+        disabled={false}
+      />
+      <p>I understand, don't show this agian.</p>
+    </div>
+    <div class="d-flex justify-content-end gap-2">
+      <Button
+        title="Don't Close"
+        size="medium"
+        type="secondary"
+        onClick={() => {
+          "click dont save";
+          handleForceClosePopupBackdrop(false);
+        }}
+      ></Button>
+      <Button
+        title="Force Close"
+        size="medium"
+        type="danger"
+        onClick={() => {
+          "click dont save";
+          forceCloseTab(tabsToForceClose, tabIdWhoRecivedForceClose);
+          isForceCloseTabPopupOpen = false;
+          noOfNotSavedTabsWhileForClose = 0;
+        }}
+      ></Button>
+    </div>
+  </div>
+</Modal>
+<!-- {/if} -->
 
 <Modal
   title={"Unsaved Changes!"}
@@ -782,8 +839,8 @@
       </div> -->
       <div class="force-close-popup-desc">
         <p style="margin: 0px;">
-          Do you want to save changes in this tab “Name of the tab”? Changes
-          will be lost in case you choose not to save.
+          {`Do you want to save changes in this tab “${removeTab.name}”? Changes
+          will be lost in case you choose not to save.`}
         </p>
       </div>
     </div>

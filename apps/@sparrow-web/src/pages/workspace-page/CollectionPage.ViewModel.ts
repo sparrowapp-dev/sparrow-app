@@ -529,17 +529,12 @@ export default class CollectionsViewModel {
     switch (originalTabType) {
       case TabTypeEnum.REQUEST:
         return this.createRESTDuplciateTab(tabId);
-        break;
       case TabTypeEnum.WEB_SOCKET:
         return this.createWebSocketDuplciateTab(tabId);
-        break;
       case TabTypeEnum.SOCKET_IO:
         return this.createSocketIODuplciateTab(tabId);
-        break;
       case TabTypeEnum.GRAPHQL:
         return this.createGraphQLDuplciateTab(tabId);
-        break;
-    
       default:
         break;
     }
