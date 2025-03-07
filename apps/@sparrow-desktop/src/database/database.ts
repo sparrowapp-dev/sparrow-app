@@ -59,6 +59,8 @@ import {
   TestflowSchema,
   type TFRxContainerType,
 } from "../models/testflow.model";
+import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
+import { CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 // import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 // addRxPlugin(RxDBDevModePlugin);
 
@@ -247,6 +249,27 @@ export class RxDB {
           19: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          20: function (oldDoc: TabDocument) {
+            if(oldDoc?.property?.collection){
+              oldDoc.property.collection.auth = {
+                bearerToken: "",
+                basicAuth: {
+                  username: "",
+                  password: "",
+                },
+                apiKey: {
+                  authKey: "",
+                  authValue: "",
+                  addTo: "Header",
+                },
+              }
+              oldDoc.property.collection.state = {
+                collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
+                collectionNavigation: CollectionNavigationTabEnum.OVERVIEW,
+              }
+            }
+            return oldDoc;
+          },
         },
       },
       collection: {
@@ -278,6 +301,9 @@ export class RxDB {
             return oldDoc;
           },
           9: function (oldDoc: CollectionDocument) {
+            return oldDoc;
+          },
+          10: function (oldDoc: CollectionDocument) {
             return oldDoc;
           },
         },
