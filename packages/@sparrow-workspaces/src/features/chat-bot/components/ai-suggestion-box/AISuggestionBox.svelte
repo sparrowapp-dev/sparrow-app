@@ -11,7 +11,16 @@
     onClick(title);
   }}
 >
-  <SparkleFilled height={"20px"} width={"20px"} />
+  <SparkleFilled
+    height="20px"
+    width="20px"
+    colors={[
+      "var(--icon-ds-info-400)",
+      "var(--icon-ds-primary-400)",
+      "var(--icon-ds-secondary-300)",
+    ]}
+  />
+
   <span class="title-txt">{title}</span>
 </div>
 
