@@ -38,12 +38,13 @@
   borderActiveType={"none"}
   borderHighlight={"hover-active"}
   headerHighlight={"hover-active"}
-  headerHeight={"24px"}
-  minBodyWidth={"150px"}
+  headerHeight={"28px"}
+  minBodyWidth={"104px"}
   borderRounded={"4px"}
-  headerTheme={"transparent"}
-  bodyTheme={"violet"}
+  headerTheme={"secondary"}
+  bodyTheme={"surface"}
   menuItem={"v2"}
-  headerFontSize={"10px"}
+  headerFontSize={"12px"}
   isDropIconFilled={true}
+  headerFontWeight={600}
 />
