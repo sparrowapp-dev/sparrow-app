@@ -93,7 +93,7 @@
         style="position: relative ;"
       >
         <!--Disabling the Quick Help feature, will be taken up in next release-->
-        {#if $currentEnvironment?.property?.environment?.type === environmentType.GLOBAL}
+        <!-- {#if $currentEnvironment?.property?.environment?.type === environmentType.GLOBAL}
           <button
             class="btn p-0"
             style="position: absolute; left:150px;  top:22.5px; border:none; z-index:5; curser:pointer;"
@@ -118,7 +118,7 @@
           >
             <HelpIcon height={"12.67px"} width={"12.67px"} />
           </button>
-        {/if}
+        {/if} -->
 
         <Input
           id={"environment-name"}

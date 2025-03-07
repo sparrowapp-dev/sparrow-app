@@ -121,13 +121,14 @@
   </div>
 {/if}
 <div
-  class="position-relative {componentClass} d-flex justify-content-normal align-items-center mb-1"
+  class="position-relative {componentClass} d-flex justify-content-normal align-items-center mb-1 main-container"
   style={`height: ${size === "medium" ? "36px" : "28px"}; width: ${width}; background-color: ${backgroundColor}; border: ${borderColor}; border-radius: 4px; padding:2px 8px;`}
   on:mouseenter={() => (isHovered = true)}
   on:mouseleave={() => {
     isHovered = false;
     isTyping = false;
   }}
+  tabindex={0}
 >
   {#if startIcon}
     <Button
@@ -200,6 +201,12 @@
 </div>
 
 <style>
+  .main-container {
+    outline: none;
+  }
+  .main-container:focus-visible {
+    border: 2px solid var(--border-ds-primary-300);
+  }
   input {
     caret-color: var(--border-ds-primary-300);
     border: 1px solid transparent;
