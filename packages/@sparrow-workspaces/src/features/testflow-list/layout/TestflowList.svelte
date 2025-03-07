@@ -25,6 +25,8 @@
     currentStep,
   } from "../../../stores/guide.tour";
 
+  import { isExpandTestflow } from "../../../../../../apps/@sparrow-web/src/store/ws.store";
+
   /**
    * current workspace
    */
@@ -61,7 +63,7 @@
 
   export let searchData = "";
 
-  export let isExpandTestflow = false;
+  // export let isExpandTestflow = false;
 
   export let toggleExpandTestflow;
 
@@ -96,8 +98,8 @@
   }
 
   async function handleCreateTestflow() {
-    if (!isExpandTestflow) {
-      isExpandTestflow = !isExpandTestflow;
+    if (!$isExpandTestflow) {
+      isExpandTestflow.update((value) => !value);
     }
     await onCreateTestflow();
     setTimeout(() => {
@@ -147,7 +149,7 @@
           size="extra-small"
           customWidth={"24px"}
           type="teritiary-regular"
-          startIcon={!isExpandTestflow
+          startIcon={!$isExpandTestflow
             ? ChevronRightRegular
             : ChevronDownRegular}
         />
@@ -194,7 +196,7 @@
     </Tooltip>
   </div>
 
-  {#if isExpandTestflow}
+  {#if $isExpandTestflow}
     <div style="flex:1;" class="overflow-auto h-100 ps-2" bind:this={scrollDiv}>
       <!-- 
   --  Testflow Empty screen 

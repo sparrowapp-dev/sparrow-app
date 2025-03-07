@@ -7,6 +7,11 @@
   import { Events, WorkspaceRole } from "@sparrow/common/enums";
   import { Dropdown, Button } from "@sparrow/library/ui";
   import { AddRegular, PlusIcon2 } from "@sparrow/library/icons";
+  import {
+    isExpandCollection,
+    isExpandEnvironment,
+    isExpandTestflow,
+  } from "../../../../../../apps/@sparrow-web/src/store/ws.store";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
@@ -136,9 +141,9 @@
     }
   });
 
-  export let isExpandCollection = false;
-  export let isExpandEnvironment = false;
-  export let isExpandTestflow = false;
+  // export let isExpandCollection = false;
+  // export let isExpandEnvironment = false;
+  // export let isExpandTestflow = false;
 
   let isGithubStarHover = false;
 
@@ -247,7 +252,7 @@
             } else {
               showImportCollectionPopup();
             }
-            isExpandCollection = true;
+            isExpandCollection.set(true);
           },
         },
         {
@@ -297,7 +302,7 @@
           iconColor: "var(--icon-secondary-130)",
           iconSize: "15px",
           onclick: () => {
-            isExpandEnvironment = true;
+            isExpandEnvironment.set(true);
             onCreateEnvironment();
           },
         },
@@ -310,7 +315,7 @@
           onclick: () => {
             onCreateTestflow();
             MixpanelEvent(Events.LeftPanel_Plus_Icon);
-            isExpandTestflow = true;
+            isExpandTestflow.set(true);
           },
           isHoverConstant: false,
         },
@@ -330,7 +335,7 @@
             } else {
               showImportCollectionPopup();
             }
-            isExpandCollection = true;
+            isExpandCollection.set(true);
           },
         },
         {
@@ -392,7 +397,7 @@
           iconColor: "var(--icon-secondary-130)",
           iconSize: "15px",
           onclick: () => {
-            isExpandEnvironment = true;
+            isExpandEnvironment.set(true);
             onCreateEnvironment();
           },
         },
@@ -404,21 +409,21 @@
           onclick: () => {
             onCreateTestflow();
             MixpanelEvent(Events.LeftPanel_Plus_Icon);
-            isExpandTestflow = true;
+            isExpandTestflow.set(true);
           },
           isHoverConstant: false,
         },
       ];
 
   const toggleExpandCollection = () => {
-    isExpandCollection = !isExpandCollection;
+    isExpandCollection.update((value) => !value);
   };
 
   const toggleExpandEnvironment = () => {
-    isExpandEnvironment = !isExpandEnvironment;
+    isExpandEnvironment.update((value) => !value);
   };
   const toggleExpandTestflow = () => {
-    isExpandTestflow = !isExpandTestflow;
+    isExpandTestflow.update((value) => !value);
   };
 
   const toggleTourGuideActive = () => {
@@ -505,9 +510,9 @@
         bind:value={searchData}
         on:input={() => {
           handleSearch();
-          isExpandCollection = true;
-          isExpandEnvironment = true;
-          isExpandTestflow = true;
+          isExpandCollection.set(true);
+          isExpandEnvironment.set(true);
+          isExpandTestflow.set(true);
         }}
         placeholder={"Search"}
       />
@@ -600,7 +605,7 @@
             onNext={() => {
               currentStep.set(3);
               onCreateTestflow();
-              isExpandTestflow = true;
+              isExpandTestflow.set(true);
               toggleTourGuideActive();
             }}
             onClose={() => {
@@ -619,7 +624,7 @@
       <!-----Collection Section------>
       <div
         class="ps-1"
-        style=" overflow:auto; {isExpandCollection ? 'flex:1;' : ''}"
+        style=" overflow:auto; {$isExpandCollection ? 'flex:1;' : ''}"
       >
         <CollectionList
           bind:scrollList
@@ -641,7 +646,6 @@
           {onBranchSwitched}
           {searchData}
           {toggleExpandCollection}
-          bind:isExpandCollection
           bind:isFirstCollectionExpand
           {isWebApp}
         />
@@ -653,7 +657,7 @@
 
       <div
         class="ps-1"
-        style=" overflow:auto; {isExpandEnvironment ? 'flex:1;' : ''}"
+        style=" overflow:auto; {$isExpandEnvironment ? 'flex:1;' : ''}"
       >
         <EnvironmentList
           loggedUserRoleInWorkspace={userRole}
@@ -668,7 +672,6 @@
           {searchData}
           {activeTabId}
           {toggleExpandEnvironment}
-          bind:isExpandEnvironment
         />
       </div>
 
@@ -678,7 +681,7 @@
 
       <div
         class="ps-1"
-        style=" overflow:auto; {isExpandTestflow ? 'flex:1;' : ''}"
+        style=" overflow:auto; {$isExpandTestflow ? 'flex:1;' : ''}"
       >
         <TestflowList
           testflows={$testflows}
@@ -691,7 +694,6 @@
           {searchData}
           {activeTabId}
           {toggleExpandTestflow}
-          bind:isExpandTestflow
         />
       </div>
 

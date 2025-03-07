@@ -33,6 +33,7 @@
 
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
+  import { isExpandCollection } from "../../../../../../apps/@sparrow-web/src/store/ws.store";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -83,7 +84,8 @@
 
   export let searchData: string = "";
 
-  export let isExpandCollection: boolean;
+  // export let isExpandCollection: boolean;
+  // let isExpandCollection = true;
 
   export let toggleExpandCollection;
 
@@ -233,7 +235,7 @@
             size="extra-small"
             type="teritiary-regular"
             customWidth="24px"
-            startIcon={!isExpandCollection
+            startIcon={!$isExpandCollection
               ? ChevronRightRegular
               : ChevronDownRegular}
           />
@@ -273,7 +275,7 @@
               disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
               onClick={(e) => {
                 e.stopPropagation();
-                isExpandCollection = true;
+                isExpandCollection.set(true);
                 isGuestUser
                   ? onItemCreated("collection", {
                       workspaceId: currentWorkspaceId,
@@ -287,7 +289,7 @@
       {/if}
     </div>
 
-    {#if isExpandCollection}
+    {#if $isExpandCollection}
       <div
         class="overflow-auto position-relative d-flex flex-column ms-2 me-0 pt-1 mb-2"
       >

@@ -18,6 +18,7 @@
   import { ListItem } from "../components";
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { Tooltip } from "@sparrow/library/ui";
+  import { isExpandEnvironment } from "../../../../../../apps/@sparrow-web/src/store/ws.store";
 
   /**
    * current workspace
@@ -63,7 +64,7 @@
 
   export let searchData;
 
-  export let isExpandEnvironment = false;
+  // export let isExpandEnvironment = false;
 
   export let toggleExpandEnvironment;
 
@@ -112,8 +113,8 @@
   }
 
   const handleCreateEnvironment = async () => {
-    if (!isExpandEnvironment) {
-      isExpandEnvironment = !isExpandEnvironment;
+    if (!$isExpandEnvironment) {
+      isExpandEnvironment.update((value) => !value);
     }
     await onCreateEnvironment(localEnvironment);
     setTimeout(() => {
@@ -166,7 +167,7 @@
           size="extra-small"
           customWidth={"24px"}
           type="teritiary-regular"
-          startIcon={!isExpandEnvironment
+          startIcon={!$isExpandEnvironment
             ? ChevronRightRegular
             : ChevronDownRegular}
         />
@@ -209,7 +210,7 @@
     {/if}
   </div>
 
-  {#if isExpandEnvironment}
+  {#if $isExpandEnvironment}
     <div
       style="flex:1; height:32px; "
       class="overflow-auto ps-2"
