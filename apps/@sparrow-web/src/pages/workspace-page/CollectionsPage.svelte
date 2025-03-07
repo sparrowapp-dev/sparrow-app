@@ -42,10 +42,6 @@
   import { EnvironmentViewModel } from "@app/pages/workspace-page/EnvironmentPage.ViewModel";
 
   // ---- helpers
-  import {
-    hasWorkpaceLevelPermission,
-    moveNavigation,
-  } from "@sparrow/common/utils";
   import type { TabDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { onMount } from "svelte";
@@ -77,8 +73,6 @@
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import constants from "src/constants/constants";
-  import { getAllCollectionDocuments } from "rxdb";
-  // import Tab from "../../../../../packages/@sparrow-workspaces/src/features/tab-bar/components/tab/Tab.svelte";
 
   import { Checkbox } from "@sparrow/library/forms";
   const _viewModel = new CollectionsViewModel();
@@ -93,12 +87,15 @@
 
   let removeTab: Tab;
   let isPopupClosed: boolean = false;
+
+  // Tab Controls Properties - st
   let isForceCloseTabPopupOpen: boolean = false;
   let tabsToForceClose: Tab[] = [];
   let tabIdWhoRecivedForceClose: string;
   let noOfNotSavedTabsWhileForClose = 0;
-
   let isUserDontWantForceClosePopup: boolean = false;
+  // Tab Controls Properties - st
+
   let isImportCollectionPopup: boolean = false;
   let isImportCurlPopup: boolean = false;
   let loader = false;
@@ -207,7 +204,6 @@
       !tab?.isSaved
     ) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
-        console.log("save *****");
         removeTab = tab;
         isPopupClosed = true;
       } else {
@@ -218,7 +214,7 @@
     }
   };
 
-  // ** Anish -- Change -start
+  // Methods for Tab Controls - start
   const froceCloseExceptCurrentOne = (tabList: Tab[], currentTabId: string) => {
     tabsToForceClose = tabList;
     tabIdWhoRecivedForceClose = currentTabId;
@@ -283,7 +279,7 @@
       !tab?.isSaved
     ) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
-        console.log("save ssss*****");
+        // console.log("save ssss*****");
         removeTab = tab;
         isPopupClosed = true;
 
@@ -325,7 +321,7 @@
   const handleTabDuplication = (tabId: string) => {
     _viewModel.createDuplicateTabByTabId(tabId);
   };
-  // ** Anish -- Change -end
+  // Methods for Tab Controls - End
 
   const handleClosePopupBackdrop = (flag: boolean) => {
     isPopupClosed = flag;
@@ -375,7 +371,7 @@
       removeTab.type === TabTypeEnum.SOCKET_IO ||
       removeTab.type === TabTypeEnum.GRAPHQL
     ) {
-      console.log("Saving popup is of request type :>> ", removeTab);
+      // console.log("Saving popup is of request type :>> ", removeTab);
       if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
         const id = removeTab?.id;
         loader = true;
@@ -558,7 +554,7 @@
   let isLaunchAppModalOpen = false;
 
   const launchSparrowWebApp = () => {
-    console.log("in launchSparrowWebApp() collectionPage.svelte :>> ");
+    // console.log("in launchSparrowWebApp() collectionPage.svelte :>> ");
     let appDetected = false;
 
     // Handle when window loses focus (app opens)
@@ -763,6 +759,7 @@
   </div>
 </Motion>
 
+<!-- Force Close Popup -->
 <!-- {#if isForceCloseTabPopupOpen} -->
 <Modal
   title={"Force Close!"}
@@ -828,6 +825,7 @@
 </Modal>
 <!-- {/if} -->
 
+<!-- Save Changes for API Popup -- New -->
 <Modal
   title={"Unsaved Changes!!"}
   type={"dark"}
@@ -877,6 +875,7 @@
   </div>
 </Modal>
 
+<!-- Save Changes for API Popup -- Old -->
 <!-- <WithModal
   isOpen={isPopupClosed}
   onModalStateChanged={handleClosePopupBackdrop}

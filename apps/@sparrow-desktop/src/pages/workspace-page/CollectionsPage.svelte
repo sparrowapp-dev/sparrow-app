@@ -76,6 +76,7 @@
   import constants from "@app/constants/constants";
   import RestExplorerSavedPage from "./sub-pages/RestExplorerSavedPage/RestExplorerSavedPage.svelte";
   import { remove } from "@tauri-apps/plugin-fs";
+  import { Checkbox } from "@sparrow/library/forms";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -89,6 +90,15 @@
 
   let removeTab: Tab;
   let isPopupClosed: boolean = false;
+
+  // Tab Controls Properties - st
+  let isForceCloseTabPopupOpen: boolean = false;
+  let tabsToForceClose: Tab[] = [];
+  let tabIdWhoRecivedForceClose: string;
+  let noOfNotSavedTabsWhileForClose = 0;
+  let isUserDontWantForceClosePopup: boolean = false;
+  // Tab Controls Properties - end
+
   let isImportCollectionPopup: boolean = false;
   let isImportCurlPopup: boolean = false;
   let loader = false;
@@ -208,8 +218,113 @@
     }
   };
 
+  // Methods for Tab Controls - start
+  const froceCloseExceptCurrentOne = (tabList: Tab[], currentTabId: string) => {
+    tabsToForceClose = tabList;
+    tabIdWhoRecivedForceClose = currentTabId;
+    noOfNotSavedTabsWhileForClose = 0;
+    tabList?.forEach((tab: Tab) => {
+      if (tab.id !== currentTabId) {
+        if (
+          (tab?.type === TabTypeEnum.REQUEST ||
+            tab?.type === TabTypeEnum.WEB_SOCKET ||
+            tab?.type === TabTypeEnum.SOCKET_IO ||
+            tab?.type === TabTypeEnum.GRAPHQL) &&
+          !tab?.isSaved
+        ) {
+          noOfNotSavedTabsWhileForClose += 1;
+        }
+      }
+    });
+    if (noOfNotSavedTabsWhileForClose > 0) {
+      if (isUserDontWantForceClosePopup) {
+        forceCloseTab(tabList, currentTabId);
+        isForceCloseTabPopupOpen = false;
+        noOfNotSavedTabsWhileForClose = 0;
+        return;
+      }
+      isForceCloseTabPopupOpen = true;
+    } else forceCloseTab(tabList, currentTabId);
+  };
+  const forceCloseTab = async (tabList: Tab[], currentTabId: string) => {
+    for (const tab of tabList) {
+      if (tab.id !== currentTabId) {
+        await forceCloseTabsAsync(tab.id, tab);
+      }
+    }
+  };
+  const forceCloseTabsAsync = async (id: string, tab: Tab) => {
+    return new Promise((resolve) => {
+      removeTab = tab;
+      setTimeout(() => {
+        // Simulating a delay similar to waiting for a save action
+        _viewModel.handleRemoveTab(id);
+        resolve(0);
+      }, 300);
+    });
+  };
+  /**
+   * The closeTabSequentially() method works well incase we want to bulk close the tabs
+   * one by one. This function can also replace the above closeTab() function (will do so).
+   * So same function can be used for single tab close and multiple tab close.
+   */
+  const closeTabSequentially = async (id: string, tab: Tab) => {
+    if (
+      (tab?.type === TabTypeEnum.REQUEST ||
+        tab?.type === TabTypeEnum.WEB_SOCKET ||
+        tab?.type === TabTypeEnum.ENVIRONMENT ||
+        tab?.type === TabTypeEnum.TESTFLOW ||
+        tab?.type === TabTypeEnum.SOCKET_IO ||
+        tab?.type === TabTypeEnum.GRAPHQL) &&
+      !tab?.isSaved
+    ) {
+      if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
+        console.log("save ssss*****");
+        removeTab = tab;
+        isPopupClosed = true;
+        // Wait for the save popup to be handled before continuing
+        await new Promise<void>((resolve) => {
+          const checkIfPopupClosed = setInterval(() => {
+            if (!isPopupClosed) {
+              clearInterval(checkIfPopupClosed);
+              resolve();
+            }
+          }, 300);
+        });
+        return;
+      }
+    }
+    // Common delayed tab removal logic
+    removeTab = tab;
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        _viewModel.handleRemoveTab(id);
+        resolve();
+      }, 300);
+    });
+  };
+  const closeTabExceptCurrentOne = async (
+    tabList: Tab[],
+    currentTabId: string,
+  ) => {
+    for (let tab of tabList) {
+      if (tab.id !== currentTabId) {
+        // Wait for closeTab to finish before moving to the next tab
+        await closeTabSequentially(tab.id, tab);
+      }
+    }
+  };
+  const handleTabDuplication = (tabId: string) => {
+    _viewModel.createDuplicateTabByTabId(tabId);
+  };
+  // Methods for Tab Controls - start
+
   const handleClosePopupBackdrop = (flag: boolean) => {
     isPopupClosed = flag;
+  };
+
+  const handleForceClosePopupBackdrop = (flag: boolean) => {
+    isForceCloseTabPopupOpen = flag;
   };
 
   const handlePopupDiscard = () => {
@@ -520,6 +635,9 @@
             onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
             onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
             onDoubleClick={_viewModel.handleTabTypeChange}
+            onClickCloseOtherTabs={closeTabExceptCurrentOne}
+            onClickForceCloseTabs={froceCloseExceptCurrentOne}
+            onClickDuplicateTab={handleTabDuplication}
           />
           <div style="flex:1; overflow: hidden;">
             <Route>
@@ -616,7 +734,124 @@
   </div>
 </Motion>
 
-<WithModal
+<!-- Force Close Popup -->
+<!-- {#if isForceCloseTabPopupOpen} -->
+<Modal
+  title={"Force Close!"}
+  type={"dark"}
+  zIndex={1000}
+  isOpen={isForceCloseTabPopupOpen}
+  width={"40%"}
+  handleModalState={handleForceClosePopupBackdrop}
+>
+  <div class="d-flex row gap-4" style="width: 552px;">
+    <div class="d-flex row">
+      <!-- <div class="force-close-popup-title">
+        <h4>Force Close!</h4>
+      </div> -->
+      <div class="popup-desc" style="margin-top: 15px;">
+        <p style="margin: 0">
+          <span style="color: white;"
+            >{noOfNotSavedTabsWhileForClose} Tabs
+          </span> have unsaved changes. Force closing will discard your edits, and
+          you won’t be able to recover them. Are you sure you want to proceed?
+        </p>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center gap-2 popup-desc">
+      <Checkbox
+        size={"large"}
+        bind:checked={isUserDontWantForceClosePopup}
+        on:input={() => {
+          isUserDontWantForceClosePopup = !isUserDontWantForceClosePopup;
+        }}
+        disabled={false}
+      />
+      <p style="margin: 0;">I understand, don't show this agian.</p>
+    </div>
+    <!-- <div class="d-flex justify-content-end gap-2"> -->
+    <div
+      class="d-flex gap-2"
+      style="display: flex; width: max-content; margin-left: auto; margin-right: 15px; margin-bottom: 0px;"
+    >
+      <Button
+        title="Don't Close"
+        size="medium"
+        type="secondary"
+        onClick={() => {
+          "click dont save";
+          handleForceClosePopupBackdrop(false);
+        }}
+      ></Button>
+      <Button
+        title="Force Close"
+        size="medium"
+        type="danger"
+        onClick={() => {
+          "click dont save";
+          forceCloseTab(tabsToForceClose, tabIdWhoRecivedForceClose);
+          isForceCloseTabPopupOpen = false;
+          noOfNotSavedTabsWhileForClose = 0;
+        }}
+      ></Button>
+    </div>
+  </div>
+</Modal>
+<!-- {/if} -->
+
+<!-- Save Changes for API Popup -- New -->
+<Modal
+  title={"Unsaved Changes!!"}
+  type={"dark"}
+  zIndex={1000}
+  isOpen={isPopupClosed}
+  width={"38.5%"}
+  handleModalState={handleClosePopupBackdrop}
+>
+  <div class="d-flex row gap-2" style="width: 530px;">
+    <div class="d-flex row gap-2" style="width: 600px; height: 65px;">
+      <!-- <div class="force-close-popup-title">
+        <h4>Unsaved Changes!</h4>
+      </div> -->
+      <div class="popup-desc" style="font-weight: 400; margin-top: 15px; ">
+        <p style="margin: 0px; ">
+          Do you want to save changes in this tab “<span style="color: white;">
+            {!removeTab ? "New API" : removeTab.name}</span
+          >”? Changes will be lost in case you choose not to save.
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="d-flex gap-2"
+      style="display: flex; width: max-content; margin-left: auto; margin-right: 30px; margin-bottom: 10px;"
+    >
+      <Button
+        title="Don't Save"
+        size="medium"
+        type="secondary"
+        customWidth="95px"
+        onClick={() => {
+          handlePopupDiscard();
+        }}
+      ></Button>
+      <Button
+        title="Save"
+        size="medium"
+        type="primary"
+        customWidth="95px"
+        disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+        onClick={() => {
+          handlePopupSave();
+        }}
+      ></Button>
+    </div>
+  </div>
+</Modal>
+
+<!-- Save Changes for API Popup -- Old -->
+<!-- <WithModal
   isOpen={isPopupClosed}
   onModalStateChanged={handleClosePopupBackdrop}
   onSave={handlePopupSave}
@@ -625,7 +860,7 @@
   isSaveDisabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
   {loader}
   {isGuestUser}
-/>
+/> -->
 
 <Modal
   title={""}
@@ -903,5 +1138,21 @@
     background: linear-gradient(270deg, #6147ff 2.55%, #1193f0 31.48%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
+
+  .force-close-popup-title {
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    color: #ffffff;
+  }
+  .popup-desc {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    color: #cccccc;
+  }
+  .save-popup {
+    font-weight: 400;
   }
 </style>

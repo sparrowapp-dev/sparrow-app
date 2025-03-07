@@ -38,7 +38,7 @@
 
   // ------ Props ------
   /**
-   * New tab with details
+   * List of tabs
    */
   export let tabList;
 

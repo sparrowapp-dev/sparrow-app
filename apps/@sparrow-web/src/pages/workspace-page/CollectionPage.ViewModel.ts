@@ -5443,7 +5443,6 @@ export default class CollectionsViewModel {
     const accessToken = localStorage.getItem("AUTH_TOKEN");
     const refreshToken = localStorage.getItem("REF_TOKEN");
     const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email}`;
-    console.log("in setupRedirect() , collectionPage.viewModel :>> ", sparrowRedirect)
     window.location.href = sparrowRedirect;
   };
 
