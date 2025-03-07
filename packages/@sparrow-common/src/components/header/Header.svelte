@@ -596,13 +596,15 @@
 
     <!-- {/if} -->
     <div class="" id="question-container">
-      <Button
-        startIcon={QuestionCirlceReqular}
-        type="teritiary-regular"
-        size="medium"
-        iconSize={20}
-        onClick={() => (helpOptionsOpen = !helpOptionsOpen)}
-      />
+      <Tooltip placement="bottom-right" title={"Quick Help"} zIndex={600}>
+        <Button
+          startIcon={QuestionCirlceReqular}
+          type="teritiary-regular"
+          size="medium"
+          iconSize={20}
+          onClick={() => (helpOptionsOpen = !helpOptionsOpen)}
+        />
+      </Tooltip>
     </div>
     {#if helpOptionsOpen}
       <div class="question-option">
