@@ -10,7 +10,7 @@
     MessageTypeEnum,
     type RequestTab,
   } from "@sparrow/common/types/workspace";
-  import { SparkleFilled } from "@sparrow/library/icons";
+  import { SparkleFilled } from "@sparrow/common/icons";
   import { SparrowSecondaryIcon } from "@sparrow/common/icons";
   import {
     CrossIcon,

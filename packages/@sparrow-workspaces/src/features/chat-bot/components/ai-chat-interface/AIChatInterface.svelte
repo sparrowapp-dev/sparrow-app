@@ -1,7 +1,8 @@
 <script lang="ts">
   import { SparrowAIIcon } from "@sparrow/common/icons";
   import { AISuggestionBox, PromptInput, ChatItem } from "../";
-  import { AISparkle, CrossIcon, SparkleFilled } from "@sparrow/library/icons";
+  import { AISparkle, CrossIcon } from "@sparrow/library/icons";
+  import { SparkleFilled } from "@sparrow/common/icons";
   import { cubicOut } from "svelte/easing";
   import { generatingImage } from "@sparrow/common/images";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";

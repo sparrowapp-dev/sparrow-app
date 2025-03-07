@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SparkleFilled } from "@sparrow/library/icons";
+  import { SparkleFilled } from "@sparrow/common/icons";
 
   export let title = "";
   export let onClick: (text: string) => void = () => {};
