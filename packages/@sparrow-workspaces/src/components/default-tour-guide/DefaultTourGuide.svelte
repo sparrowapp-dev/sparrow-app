@@ -108,6 +108,7 @@
   });
 </script>
 
+<div class="mainComponent"></div>
 <!-- Overlays for each direction -->
 <div class="overlay-top"></div>
 <div class="overlay-left"></div>
@@ -157,6 +158,15 @@
 
 <style>
   /* Overlay */
+  .mainComponent {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: transparent;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+  }
   .overlay-top {
     position: fixed;
     top: 0;
