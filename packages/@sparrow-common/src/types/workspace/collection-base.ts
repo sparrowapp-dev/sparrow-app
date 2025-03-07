@@ -39,6 +39,32 @@ interface Branch {
   name: string;
 }
 
+export enum CollectionAddToBaseEnum {
+  HEADER = "Header",
+  QUERY_PARAMETER = "Query Parameter",
+  COOKIES = "Cookies",
+}
+
+export enum CollectionAuthTypeBaseEnum {
+  NO_AUTH = "No Auth",
+  API_KEY = "API Key",
+  BEARER_TOKEN = "Bearer Token",
+  BASIC_AUTH = "Basic Auth",
+}
+
+export interface CollectionAuthBaseInterface  {
+  bearerToken: string;
+  basicAuth: {
+    username: string;
+    password: string;
+  },
+  apiKey: {
+    authKey: string;
+    authValue: string;
+    addTo: CollectionAddToBaseEnum.HEADER;
+  },
+}
+
 export interface CollectionBaseInterface {
   collectionId?: string;
   id: string;
@@ -51,6 +77,8 @@ export interface CollectionBaseInterface {
   activeSyncUrl?: string;
   localRepositoryPath?: string;
   workspaceId: string;
+  auth?: CollectionAuthBaseInterface,
+  selectedAuthType?: CollectionAuthTypeBaseEnum;
   branches?: Branch[];
   primaryBranch?: string;
   currentBranch?: string;

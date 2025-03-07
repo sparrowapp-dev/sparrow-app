@@ -322,6 +322,7 @@ const disconnectWebSocket = async (tab_id: string) => {
         !isEnableWebSocketCloud
       ) {
         socketInsta.close();
+        notifications.success("WebSocket disconnected successfully");
       } else {
         socketInsta?.emit(
           "sparrow_internal_disconnect",
@@ -1137,6 +1138,9 @@ const disconnectSocketIo = async (_tabId: string): Promise<void> => {
         !isEnableSocketIoCloud
       ) {
         socketInsta?.disconnect();
+        notifications.success(
+          `${SocketIORequestDefaultAliasBaseEnum.NAME} disconnected successfully.`,
+        );
       } else {
         socketInsta?.emit(
           "sparrow_internal_disconnect",

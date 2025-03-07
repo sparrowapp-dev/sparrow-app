@@ -49,7 +49,7 @@ import { type Observable } from "rxjs";
 import { InitRequestTab, InitWebSocketTab } from "@sparrow/common/utils";
 import { InitCollectionTab } from "@sparrow/common/utils";
 import { InitFolderTab } from "@sparrow/common/utils";
-import { requestSplitterDirection } from "@sparrow/workspaces/features/rest-explorer/store";
+import { tabsSplitterDirection } from "@sparrow/workspaces/stores";
 import {
   insertCollectionRequest,
   updateCollectionRequest,
@@ -2352,8 +2352,6 @@ export default class CollectionsViewModel {
     _collection.updateDescription(collection.description);
     _collection.updatePath(path);
     // _collection.updateActiveSync(collection.activeSync);
-    _collection.updateTotalRequests(totalRequest);
-    _collection.updateTotalFolder(totalFolder);
     _collection.updateIsSave(true);
     _collection.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
 
@@ -4189,7 +4187,7 @@ export default class CollectionsViewModel {
   };
 
   public handleOnChangeViewInRequest = async (view: string) => {
-    requestSplitterDirection.set(view);
+    tabsSplitterDirection.set(view);
   };
 
   public importJSONObject = async (

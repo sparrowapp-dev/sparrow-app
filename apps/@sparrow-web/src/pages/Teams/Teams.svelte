@@ -47,6 +47,7 @@
   import { user } from "src/store/auth.store";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import {
+    ChevronDoubleLeftRegular,
     ChevronDoubleRightRegular,
     DoubleArrowIcon,
     GithubIcon,
@@ -268,8 +269,19 @@
                   <!-- <span class="text-fs-14 text-secondary-200 pe-2"
                     >v{version}</span
                   > -->
-                  <WithButton
+                  <!-- <WithButton
                     icon={DoubleArrowIcon}
+                    onClick={() => {
+                      handleCollapseCollectionList();
+                    }}
+                    disable={false}
+                    loader={false}
+                  /> -->
+                  <Button
+                    type="teritiary-regular"
+                    size="extra-small"
+                    customWidth="24px"
+                    startIcon={ChevronDoubleLeftRegular}
                     onClick={() => {
                       handleCollapseCollectionList();
                     }}

@@ -49,7 +49,7 @@ import { type Observable } from "rxjs";
 import { InitRequestTab, InitWebSocketTab } from "@sparrow/common/utils";
 import { InitCollectionTab } from "@sparrow/common/utils";
 import { InitFolderTab } from "@sparrow/common/utils";
-import { requestSplitterDirection } from "@sparrow/workspaces/features/rest-explorer/store";
+import { tabsSplitterDirection } from "@sparrow/workspaces/stores";
 import {
   insertCollectionRequest,
   updateCollectionRequest,
@@ -85,6 +85,7 @@ import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/ut
 
 import { createDeepCopy } from "@sparrow/common/utils";
 import {
+  CollectionTabAdapter,
   GraphqlTabAdapter,
   RequestSavedTabAdapter,
   SocketIoTabAdapter,
@@ -182,6 +183,7 @@ export default class CollectionsViewModel {
           const collection = createDeepCopy(_collection);
           collection["workspaceId"] = workspaceId;
           collection["id"] = _collection._id;
+          if(!collection?.description) collection.description = "";
           delete collection._id;
           return collection;
         }),
@@ -832,15 +834,15 @@ export default class CollectionsViewModel {
   };
   /**
    * Generate available name of new collection like New collection 2 if New collection is already taken
-   * @param list :any[] - list of collections
-   * @param name :string - name to be chacked
-   * @returns :string - new unique name
+   * @param list - list of collections
+   * @param name  - name to be chacked
+   * @returns - new unique name
    */
-  private getNextCollection = (list: CollectionDto[], name: string) => {
+  private getNextCollection = (list: CollectionDocType[], name: string) => {
     const isNameAvailable: (proposedName: string) => boolean = (
       proposedName,
     ) => {
-      return list.some((element) => {
+      return list.some((element: CollectionDocType) => {
         return element.name === proposedName;
       });
     };
@@ -864,22 +866,14 @@ export default class CollectionsViewModel {
    * @param workspaceId :string
    */
   public handleCreateCollection = async (workspaceId: string) => {
-    let collectionList: CollectionDto[] = [];
-
-    await this.collectionRepository
-      .getCollection()
-      .subscribe(
-        (collections) =>
-          (collectionList = collections as unknown as CollectionDto[]),
-      )
-      .unsubscribe();
-    const updatedCollectionList = collectionList.filter(
-      (collection) => collection.workspaceId === workspaceId,
+    const collectionsRx = await this.collectionRepository.getCollectionsByWorkspaceId(workspaceId);
+    const collectionsDoc = collectionsRx.map(
+      (collection) => collection.toMutableJSON(),
     );
     const newCollection = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
       name: this.getNextCollection(
-        updatedCollectionList,
+        collectionsDoc,
         "New Collection",
       ) as string,
       items: [],
@@ -894,37 +888,25 @@ export default class CollectionsViewModel {
       response = await this.collectionService.addCollection({
         name: newCollection.name,
         workspaceId: workspaceId,
+        description:""
       });
 
       if (response.isSuccessful && response.data.data) {
         const res = response.data.data;
-        await this.addCollection({
+        await this.collectionRepository.addCollection({
           ...res,
           id: res._id,
           workspaceId: workspaceId,
+          description: ""
         });
-        const path = {
-          workspaceId: workspaceId,
-          collectionId: response.data.data._id,
-          folderId: "",
-        };
-
-        const initCollectionTab = new InitCollectionTab(
-          response.data.data._id,
-          workspaceId,
-        );
-
-        initCollectionTab.updateId(response.data.data._id);
-        initCollectionTab.updatePath(path);
-        initCollectionTab.updateName(response.data.data.name);
-
-        this.tabRepository.createTab(initCollectionTab.getValue());
+        const adaptCollection = new CollectionTabAdapter().adapt(workspaceId, {...response.data.data, id: response.data.data._id});
+        this.tabRepository.createTab(adaptCollection);
         moveNavigation("right");
 
         await this.workspaceRepository.updateCollectionInWorkspace(
           workspaceId,
           {
-            id: initCollectionTab.getValue().id,
+            id: response.data.data._id,
             name: newCollection.name,
           },
         );
@@ -939,7 +921,7 @@ export default class CollectionsViewModel {
       }
     } else {
       const collectionId = uuidv4();
-      const dt: CollectionDto = {
+      const dt = {
         id: collectionId,
         name: newCollection.name,
         workspaceId: workspaceId,
@@ -951,25 +933,14 @@ export default class CollectionsViewModel {
         updatedAt: newCollection.createdAt,
         updatedBy: "guestUser",
       };
-      await this.addCollection(dt);
-      const path = {
-        workspaceId: workspaceId,
-        collectionId: "",
-        folderId: "",
-      };
-      const initCollectionTab = new InitCollectionTab(
-        collectionId,
-        workspaceId,
-      );
-      initCollectionTab.updateId(collectionId);
-      initCollectionTab.updatePath(path);
-      initCollectionTab.updateName(newCollection.name);
-      this.tabRepository.createTab(initCollectionTab.getValue());
+      await this.collectionRepository.addCollection(dt);
+      const adaptCollection = new CollectionTabAdapter().adapt(workspaceId, dt);
+      this.tabRepository.createTab(adaptCollection);
       moveNavigation("right");
 
       await this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
-        id: initCollectionTab.getValue().id,
-        name: newCollection.name,
+        id: dt.id,
+        name: dt.name,
       });
       notifications.success("New Collection created successfully.");
     }
@@ -2355,36 +2326,8 @@ export default class CollectionsViewModel {
     workspaceId: string,
     collection: CollectionDto,
   ) => {
-    let totalFolder: number = 0;
-    let totalRequest: number = 0;
-    if (collection.items) {
-      collection.items.map((item: CollectionItemsDto) => {
-        if (item.type === CollectionItemTypeBaseEnum.REQUEST) {
-          totalRequest++;
-        } else {
-          totalFolder++;
-          totalRequest += (item?.items as unknown as CollectionItemsDto[])
-            ?.length;
-        }
-      });
-    }
-    const path = {
-      workspaceId: workspaceId,
-      collectionId: collection.id ?? "",
-      folderId: "",
-    };
-
-    const _collection = new InitCollectionTab(collection.id, workspaceId);
-    _collection.updateName(collection.name);
-    _collection.updateDescription(collection.description);
-    _collection.updatePath(path);
-    // _collection.updateActiveSync(collection.activeSync);
-    _collection.updateTotalRequests(totalRequest);
-    _collection.updateTotalFolder(totalFolder);
-    _collection.updateIsSave(true);
-    _collection.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
-
-    this.tabRepository.createTab(_collection.getValue());
+    const collectionTabAdapter = new CollectionTabAdapter().adapt(workspaceId, collection);
+    this.tabRepository.createTab(collectionTabAdapter);
     moveNavigation("right");
   };
   /**
@@ -2555,39 +2498,27 @@ export default class CollectionsViewModel {
 
     if (isGuestUser === true) {
       if (collection.id && workspaceId && !folder.id) {
-        const response =
-          await this.collectionRepository.readRequestOrFolderInCollection(
-            collection.id,
-            request.id,
-          );
-        const storage = request;
-        storage.name = newRequestName;
-        await this.collectionRepository.updateRequestOrFolderInCollection(
+        await this.collectionRepository.updateSavedRequestInCollection(
           collection.id,
           request.id,
-          response,
+          requestResponse.id,
+          { name: newRequestName },
         );
-        this.updateTab(requestResponse.id, {
+        await this.updateTab(requestResponse.id, {
           name: newRequestName,
         });
         MixpanelEvent(Events.RENAME_REQUEST, {
           source: "Collection list",
         });
       } else if (collection.id && workspaceId && folder.id) {
-        const response = await this.collectionRepository.readRequestInFolder(
+        await this.collectionRepository.updateSavedRequestInFolder(
           collection.id,
           folder.id,
           request.id,
+          requestResponse.id,
+          { name: newRequestName },
         );
-        const storage = request;
-        storage.name = newRequestName;
-        await this.collectionRepository.updateRequestInFolder(
-          collection.id,
-          folder.id,
-          request.id,
-          response,
-        );
-        this.updateTab(requestResponse.id, {
+        await this.updateTab(requestResponse.id, {
           name: newRequestName,
         });
         MixpanelEvent(Events.RENAME_REQUEST, {
@@ -3383,20 +3314,21 @@ export default class CollectionsViewModel {
 
     if (isGuestUser === true) {
       if (folder) {
-        await this.collectionRepository.deleteRequestInFolder(
-          collection.id,
-          folder.id,
+        await this.collectionRepository.deleteSavedRequestInFolder(
+          requestObject.collectionId,
+          requestObject.folderId,
           request.id,
+          requestResponse.id,
         );
-        this.tabRepository.removeTab(request.id);
+        this.tabRepository.removeTab(requestResponse.id);
       } else {
-        await this.collectionRepository.deleteRequestOrFolderInCollection(
-          collection.id,
+        await this.collectionRepository.deleteSavedRequestInCollection(
+          requestObject.collectionId,
           request.id,
+          requestResponse.id,
         );
-        this.tabRepository.removeTab(request.id);
+        this.tabRepository.removeTab(requestResponse.id);
       }
-
       return true;
     }
     const response =
@@ -4472,7 +4404,7 @@ export default class CollectionsViewModel {
   };
 
   public handleOnChangeViewInRequest = async (view: string) => {
-    requestSplitterDirection.set(view);
+    tabsSplitterDirection.set(view);
   };
 
   public importJSONObject = async (
@@ -5773,7 +5705,30 @@ export default class CollectionsViewModel {
       isGuestUser = value;
     });
 
-    if (isGuestUser === true) return false;
+    if (isGuestUser === true) {
+      if (folderId) {
+        this.collectionRepository.updateSavedRequestInFolder(
+          collectionId,
+          folderId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      } else {
+        this.collectionRepository.updateSavedRequestInCollection(
+          collectionId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      }
+      notifications.success("Response saved successfully.");
+      return true;
+    }
     const res = await this.collectionService.updateSavedRequestInCollection(
       componentData.id,
       {
@@ -5813,6 +5768,48 @@ export default class CollectionsViewModel {
       return false;
     }
   };
+
+  /**
+   * Handles saving a collection
+   */
+  public saveCollection = async (componentData : Tab ) => {
+    const progressiveTab = createDeepCopy(componentData);
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser == true) {
+      await this.collectionRepository.updateCollection(
+        progressiveTab.id,
+        {
+          description: progressiveTab.description,
+          name: progressiveTab.name,
+          auth: progressiveTab.property.collection.auth, 
+          selectedAuthType : progressiveTab.property.collection.state.collectionAuthNavigation
+        },
+      );
+      notifications.success(`The ‘${progressiveTab.name}’ collection saved successfully.`);
+      return true;
+    }
+    const response = await this.collectionService.updateCollectionData(
+      progressiveTab.id as string,
+      progressiveTab.path.workspaceId as string,
+      { description: progressiveTab.description, name: progressiveTab.name, auth: progressiveTab.property.collection.auth, 
+        selectedAuthType : progressiveTab.property.collection.state.collectionAuthNavigation
+       },
+    );
+    if (response.isSuccessful) {
+      this.collectionRepository.updateCollection(
+        progressiveTab.id as string,
+        response.data.data,
+      );
+      notifications.success(`The ‘${progressiveTab.name}’ collection saved successfully.`);
+      return true;
+    } else {
+      notifications.error("Failed to update description. Please try again.");
+    }
+    return false;
+    }
 
   /**
    * Update the tab type to permanent on double click
