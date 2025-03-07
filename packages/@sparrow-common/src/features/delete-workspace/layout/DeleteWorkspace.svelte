@@ -6,6 +6,7 @@
   // ---- library
   import { Input } from "@sparrow/library/forms";
   import { Button, Avatar } from "@sparrow/library/ui";
+  import { takeUntil } from "rxjs";
   export let isDeleteWorkspaceModalOpen = false;
   export let workspace: WorkspaceDocument;
   export let openTeam: TeamDocument;
@@ -25,36 +26,24 @@
       action cannot be undone.
     </p>
   </div>
-
-  <p class="confirm-header mb-1 sparrow-fs-14 text-secondary-1000">
-    Enter workspace name to confirm<span class="asterik">*</span>
-  </p>
   <!-- 
       -- Input 
     -->
   <Input
     bind:value={inputName}
-    height={"36px"}
+    headerLabel={true}
+    headerLabelText={"Enter workspace name to confirm"}
+    inputValueRequired={true}
+    errorMessage={inputNameError}
+    isError={Boolean(inputNameError)}
+    helpLabel={true}
+    size="medium"
     id={inputId}
     placeholder={"Workspace name"}
-    class="text-fs-14 bg-tertiary-300 fw-normal px-2 border-radius-4"
     style="outline:none;"
-    defaultBorderColor={inputNameError
-      ? "var(--border-danger-200)"
-      : "var(--border-secondary-400)"}
-    hoveredBorderColor={inputNameError
-      ? "var(--border-danger-200)"
-      : "var(--border-secondary-400)"}
-    focusedBorderColor={inputNameError
-      ? "var(--border-danger-200)"
-      : "var(--border-secondary-400)"}
-    isEditIconRequired={false}
+    variant="primary"
     type={"text"}
-    placeholderColor={"var(--text-secondary-200)"}
   />
-  {#if inputNameError}
-    <p class="error-text sparrow-fs-12">{inputNameError}</p>
-  {/if}
   <br />
 
   <div
@@ -63,17 +52,19 @@
   >
     <div class="d-flex ellipsis">
       {#if openTeam?.logo?.size}
-         <Avatar
+        <Avatar
           type={"image"}
           size={"large"}
-          image={base64ToURL(openTeam?.logo)}/>
+          image={base64ToURL(openTeam?.logo)}
+        />
       {:else}
         <span class="me-2">
-           <Avatar
+          <Avatar
             type={"letter"}
             size={"large"}
             letter={workspace?.team?.teamName[0] || ""}
-            bgColor={"var(--bg-tertiary-700)"}/>
+            bgColor={"var(--bg-tertiary-700)"}
+          />
         </span>
       {/if}
       <div class="d-flex align-items-center ellipsis">

@@ -42,26 +42,15 @@
     on:blur={() => {
       workspaceForm.name.isTouched = true;
     }}
-    height={"36px"}
+    size="medium"
+    variant="primary"
     id={inputId}
     placeholder={NAME_CONFIG.PLACEHOLDER}
-    class="text-fs-14 bg-tertiary-300 fw-normal px-2 border-radius-4"
     style="outline:none;"
-    defaultBorderColor={!workspaceForm.name.value.trim() &&
-    workspaceForm.name.isTouched
-      ? "var(--border-danger-200)"
-      : "transparent"}
-    hoveredBorderColor={!workspaceForm.name.value.trim() &&
-    workspaceForm.name.isTouched
-      ? "var(--border-danger-200)"
-      : "transparent"}
-    focusedBorderColor={!workspaceForm.name.value.trim() &&
-    workspaceForm.name.isTouched
-      ? "var(--border-danger-200)"
-      : "transparent"}
-    isEditIconRequired={false}
+    isError={Boolean(
+      !workspaceForm.name.value.trim() && workspaceForm.name.isTouched,
+    )}
     type={"text"}
-    placeholderColor={"var(--text-secondary-200)"}
   />
 
   <!-- 
