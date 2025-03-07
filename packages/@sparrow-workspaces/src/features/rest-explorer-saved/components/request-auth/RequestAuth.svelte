@@ -24,6 +24,10 @@
                 id: AuthType.NO_AUTH,
               },
               {
+                name: "Inherit Auth",
+                id: AuthType.INHERIT_AUTH,
+              },
+              {
                 name: "API Key",
                 id: AuthType.API_KEY,
               },

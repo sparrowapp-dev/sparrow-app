@@ -3,3 +3,5 @@ export { ReduceQueryParams } from "./reduce-query-params";
 export { ReduceRequestURL } from "./reduce-request-url";
 export { ReduceAuthHeader } from "./reduce-auth-header";
 export { ReduceAuthParameter } from "./reduce-auth-parameter";
+export { ReduceCollectionAuthHeader} from "./reduce-collection-auth-header";
+export { ReduceCollectionAuthParameter} from "./reduce-collection-auth-parameter";

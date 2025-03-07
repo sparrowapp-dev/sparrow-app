@@ -5,6 +5,8 @@ import {
   ReduceQueryParams,
   ReduceAuthHeader,
   ReduceAuthParameter,
+  ReduceCollectionAuthHeader,
+  ReduceCollectionAuthParameter,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import {
@@ -89,6 +91,7 @@ import {
   ResponseFormatterEnum,
   type HttpRequestCollectionLevelAuthTabInterface,
   type HttpRequestCollectionAuthTabInterface,
+  AuthTypeEnum,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { RequestTabAdapter } from "../../../../adapter/request-tab";
@@ -170,29 +173,34 @@ class RestExplorerViewModel
   });
   private _tab: BehaviorSubject<RequestTab> = new BehaviorSubject({});
   
-  private _collectionAuth = new BehaviorSubject< HttpRequestCollectionLevelAuthTabInterface>({
-    auth: {
-      bearerToken: "",
-      basicAuth: {
-        username: "",
-        password: "",
-      },
-      apiKey: {
-        authKey: "",
-        authValue: "",
-        addTo: CollectionAddToBaseEnum.HEADER,
-      },
-    },
-    collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH
-  });
+  private _collectionAuth = new BehaviorSubject< Partial<HttpRequestCollectionLevelAuthTabInterface>>({});
 
   private fetchCollection = async(_collectionId: string)=>{
     const collectionRx = await this.collectionRepository.readCollection(_collectionId);
     const collectionDoc = collectionRx?.toMutableJSON();
-    this.collectionAuth = {
-      auth : collectionDoc?.auth,
-      collectionAuthNavigation: collectionDoc?.selectedAuthType
-    } as HttpRequestCollectionLevelAuthTabInterface
+    if(collectionDoc?.auth){
+      this.collectionAuth = {
+        auth : collectionDoc?.auth,
+        collectionAuthNavigation: collectionDoc?.selectedAuthType
+      } as HttpRequestCollectionLevelAuthTabInterface
+    }
+    else{
+      this.collectionAuth = {
+        auth: {
+          bearerToken: "",
+          basicAuth: {
+            username: "",
+            password: "",
+          },
+          apiKey: {
+            authKey: "",
+            authValue: "",
+            addTo: CollectionAddToBaseEnum.HEADER,
+          },
+        },
+        collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH
+      }
+    }
   }
 
   public constructor(doc: TabDocument) {
@@ -203,15 +211,28 @@ class RestExplorerViewModel
         delete t.index;
         t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
-        this.authHeader = new ReduceAuthHeader(
-          this._tab.getValue().property.request?.state,
-          this._tab.getValue().property.request?.auth,
-        ).getValue();
-        this.authParameter = new ReduceAuthParameter(
-          this._tab.getValue().property.request?.state,
-          this._tab.getValue().property.request?.auth,
-        ).getValue();
-        this.fetchCollection(t.path.collectionId as string);
+        await this.fetchCollection(t.path.collectionId as string);
+        const m = this._tab.getValue() as Tab;
+        if(m.property.request?.state.requestAuthNavigation === AuthTypeEnum.INHERIT_AUTH){
+          this.authHeader = new ReduceCollectionAuthHeader(
+            this._collectionAuth.getValue().collectionAuthNavigation,
+            this._collectionAuth.getValue().auth,
+          ).getValue();
+          this.authParameter = new ReduceCollectionAuthParameter(
+            this._collectionAuth.getValue().collectionAuthNavigation,
+            this._collectionAuth.getValue().auth,
+          ).getValue();
+        }      
+        else{
+          this.authHeader = new ReduceAuthHeader(
+            this._tab.getValue().property.request?.state,
+            this._tab.getValue().property.request?.auth,
+          ).getValue();
+          this.authParameter = new ReduceAuthParameter(
+            this._tab.getValue().property.request?.state,
+            this._tab.getValue().property.request?.auth,
+          ).getValue();
+        }
       }, 0);
     }
   }
@@ -810,6 +831,27 @@ class RestExplorerViewModel
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    if(_state.requestAuthNavigation){
+      if(_state.requestAuthNavigation === AuthTypeEnum.INHERIT_AUTH){
+        this.authHeader = new ReduceCollectionAuthHeader(
+          this._collectionAuth.getValue().collectionAuthNavigation,
+          this._collectionAuth.getValue().auth,
+        ).getValue();
+        this.authParameter = new ReduceCollectionAuthParameter(
+          this._collectionAuth.getValue().collectionAuthNavigation,
+          this._collectionAuth.getValue().auth,
+        ).getValue();
+      }    else{
+        this.authHeader = new ReduceAuthHeader(
+          progressiveTab.property.request.state,
+          progressiveTab.property.request.auth,
+        ).getValue();
+        this.authParameter = new ReduceAuthParameter(
+          progressiveTab.property.request.state,
+          progressiveTab.property.request.auth,
+        ).getValue();
+      }
+    }
   };
 
   /**
