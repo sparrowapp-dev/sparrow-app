@@ -5,11 +5,12 @@
   import { CodeMirrorInput } from "@sparrow/workspaces/components";
   import { AuthInputTheme } from "@sparrow/workspaces/utils";
   import { RadioButton } from "@sparrow/library/ui";
-  export let apiData: ApiKey;
+  export let apiData;
   export let callback;
   export let environmentVariables;
   export let onUpdateEnvironment;
   const theme = new AuthInputTheme().build();
+  export let disabled = false;
 
   const handleAuthChange = () => {
     callback({ apiKey: apiData });
@@ -21,13 +22,8 @@
   };
 </script>
 
-<div>
-  <p class="text-secondary-300 text-fs-12 fw-normal">
-    The authorization header will be automatically generated when you send the
-    request.
-  </p>
-</div>
-<div class="pt-2 d-flex gap-3">
+<p class="text-fs-12">Add API Key to</p>
+<div class="d-flex gap-3">
   <div class="radio text-fs-12 d-flex align-items-center">
     <RadioButton
       id="radio-1"
@@ -35,8 +31,9 @@
       value={AuthSection.HEADER}
       group={apiData.addTo}
       handleChange={handleOptionChange}
-      labelText=" Add to Header "
+      labelText=" Header "
       buttonSize="medium"
+      {disabled}
     />
   </div>
   <div class="radio text-fs-12 d-flex align-items-center">
@@ -46,8 +43,9 @@
       value={AuthSection.QUERY_PARAMETER}
       group={apiData.addTo}
       handleChange={handleOptionChange}
-      labelText=" Add to Parameter "
+      labelText=" Parameter "
       buttonSize="medium"
+      {disabled}
     />
   </div>
 </div>
@@ -65,6 +63,7 @@
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}
+        {disabled}
       />
     </div>
   </div>
@@ -80,6 +79,7 @@
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}
+        {disabled}
       />
     </div>
   </div>

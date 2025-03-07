@@ -87,6 +87,8 @@ import {
   ResponseSectionEnum,
   RequestDataTypeEnum,
   ResponseFormatterEnum,
+  type HttpRequestCollectionLevelAuthTabInterface,
+  type HttpRequestCollectionAuthTabInterface,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { RequestTabAdapter } from "../../../../adapter/request-tab";
@@ -104,7 +106,7 @@ import { InitTab } from "@sparrow/common/factory";
 import { RequestSavedTabAdapter } from "@app/adapter";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
-import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+import { CollectionAddToBaseEnum, CollectionAuthTypeBaseEnum, CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 
 class RestExplorerViewModel
   implements
@@ -167,10 +169,35 @@ class RestExplorerViewModel
     value: "",
   });
   private _tab: BehaviorSubject<RequestTab> = new BehaviorSubject({});
+  
+  private _collectionAuth = new BehaviorSubject< HttpRequestCollectionLevelAuthTabInterface>({
+    auth: {
+      bearerToken: "",
+      basicAuth: {
+        username: "",
+        password: "",
+      },
+      apiKey: {
+        authKey: "",
+        authValue: "",
+        addTo: CollectionAddToBaseEnum.HEADER,
+      },
+    },
+    collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH
+  });
+
+  private fetchCollection = async(_collectionId: string)=>{
+    const collectionRx = await this.collectionRepository.readCollection(_collectionId);
+    const collectionDoc = collectionRx?.toMutableJSON();
+    this.collectionAuth = {
+      auth : collectionDoc?.auth,
+      collectionAuthNavigation: collectionDoc?.selectedAuthType
+    } as HttpRequestCollectionLevelAuthTabInterface
+  }
 
   public constructor(doc: TabDocument) {
     if (doc?.isActive) {
-      setTimeout(() => {
+      setTimeout(async() => {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
@@ -184,6 +211,7 @@ class RestExplorerViewModel
           this._tab.getValue().property.request?.state,
           this._tab.getValue().property.request?.auth,
         ).getValue();
+        this.fetchCollection(t.path.collectionId as string);
       }, 0);
     }
   }
@@ -202,6 +230,14 @@ class RestExplorerViewModel
 
   private set tab(value: RequestTab) {
     this._tab.next(value);
+  }
+
+  public get collectionAuth(): Observable<HttpRequestCollectionLevelAuthTabInterface> {
+    return this._collectionAuth.asObservable();
+  }
+
+  private set collectionAuth(value: HttpRequestCollectionLevelAuthTabInterface) {
+    this._collectionAuth.next(value);
   }
 
   public get authHeader(): Observable<{
@@ -443,13 +479,6 @@ class RestExplorerViewModel
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
-        const progressiveTab = this._tab.getValue();
-        progressiveTab.isSaved = true;
-        this.tab = progressiveTab;
-        await this.tabRepository.updateTab(
-          progressiveTab.tabId,
-          progressiveTab,
-        );
         if (folderId) {
           await this.collectionRepository.addSavedRequestInFolder(
             collectionId,
@@ -481,13 +510,6 @@ class RestExplorerViewModel
         },
       });
       if (res.isSuccessful) {
-        const progressiveTab = this._tab.getValue();
-        progressiveTab.isSaved = true;
-        this.tab = progressiveTab;
-        await this.tabRepository.updateTab(
-          progressiveTab.tabId,
-          progressiveTab,
-        );
         if (folderId) {
           this.collectionRepository.addSavedRequestInFolder(
             collectionId,

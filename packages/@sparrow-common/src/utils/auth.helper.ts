@@ -142,6 +142,9 @@ const setAuthType = (auth: string) => {
     case AuthType.BEARER_TOKEN:
       requestAuthNavigation = AuthType.BEARER_TOKEN;
       break;
+    case AuthType.INHERIT_AUTH:
+      requestAuthNavigation = AuthType.INHERIT_AUTH;
+    break;
   }
   return { requestAuthNavigation };
 };
@@ -161,6 +164,10 @@ const unsetAuthType = (auth: AuthTypeEnum | undefined) => {
     case AuthTypeEnum.BEARER_TOKEN:
       authType = AuthType.BEARER_TOKEN;
       break;
+    case AuthTypeEnum.INHERIT_AUTH:
+      authType = AuthType.INHERIT_AUTH;
+      break;
+        
   }
   return authType;
 };

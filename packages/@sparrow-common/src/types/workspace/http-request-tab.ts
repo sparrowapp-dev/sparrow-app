@@ -1,8 +1,11 @@
+import type { CollectionAddToBaseEnum, CollectionAuthBaseInterface, CollectionAuthTypeBaseEnum } from "./collection-base";
+
 export enum AuthTypeEnum {
   NO_AUTH = "No Auth",
   API_KEY = "API Key",
   BEARER_TOKEN = "Bearer Token",
   BASIC_AUTH = "Basic Auth",
+  INHERIT_AUTH = "Inherit Auth"
 }
 
 export enum AuthSectionEnum {
@@ -237,6 +240,17 @@ export interface Body extends RawWrapper, UrlEncodedWrapper, FormDataWrapper {}
 export interface BodyWrapper {
   body: Body;
 }
+
+export interface HttpRequestCollectionAuthTabInterface  {
+  auth: CollectionAuthBaseInterface
+}
+
+export interface HttpRequestCollectionAuthNavigationTabInterface {
+  collectionAuthNavigation : CollectionAuthTypeBaseEnum
+}
+
+export interface HttpRequestCollectionLevelAuthTabInterface extends HttpRequestCollectionAuthTabInterface,  HttpRequestCollectionAuthNavigationTabInterface {}
+
 
 export interface State
   extends RequestBodyLanguageWrapper,

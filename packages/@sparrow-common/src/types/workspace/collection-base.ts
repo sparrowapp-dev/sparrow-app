@@ -61,7 +61,7 @@ export interface CollectionAuthBaseInterface  {
   apiKey: {
     authKey: string;
     authValue: string;
-    addTo: CollectionAddToBaseEnum.HEADER;
+    addTo: CollectionAddToBaseEnum;
   },
 }
 

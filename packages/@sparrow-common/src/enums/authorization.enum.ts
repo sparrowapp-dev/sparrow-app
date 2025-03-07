@@ -3,6 +3,7 @@ export enum AuthType {
   API_KEY = "API Key",
   BEARER_TOKEN = "Bearer Token",
   BASIC_AUTH = "Basic Auth",
+  INHERIT_AUTH = "Inherit Auth"
 }
 
 export enum AuthSection {

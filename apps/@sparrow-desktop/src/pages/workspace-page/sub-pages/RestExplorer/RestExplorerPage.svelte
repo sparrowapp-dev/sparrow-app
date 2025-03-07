@@ -146,6 +146,7 @@
 <RestExplorer
   bind:collections={_viewModel.collection}
   bind:tab={_viewModel.tab}
+  bind:collectionAuth={_viewModel.collectionAuth}
   bind:requestAuthHeader={_viewModel.authHeader}
   bind:requestAuthParameter={_viewModel.authParameter}
   bind:userRole

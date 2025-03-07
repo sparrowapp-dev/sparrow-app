@@ -114,6 +114,7 @@
   export let isWebApp = false;
   export let azureBlobCDN;
   export let onSaveResponse;
+  export let collectionAuth;
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -324,6 +325,7 @@
                         .requestAuthNavigation}
                       {onUpdateRequestState}
                       auth={$tab.property.request.auth}
+                      collectionAuth={$collectionAuth}
                       {onUpdateRequestAuth}
                       {onUpdateEnvironment}
                       {environmentVariables}
