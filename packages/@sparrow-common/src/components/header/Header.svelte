@@ -250,6 +250,16 @@
       isWindows = false;
     }
   });
+
+  const redirectDocumentation = () => {
+    window.open("https://docs.sparrowapp.dev/docs/intro", "_blank");
+  };
+  const redirectNewFeatures = () => {
+    window.open(
+      "https://github.com/sparrowapp-dev/sparrow-app/releases",
+      "_blank",
+    );
+  };
 </script>
 
 <header
@@ -606,12 +616,18 @@
               color: "var(--text-ds-neutral-50)",
               icon: DocumentRegular,
               iconSize: "12px",
+              onclick: () => {
+                redirectDocumentation();
+              },
             },
             {
               name: "What’s New?",
               color: "var(--text-ds-neutral-50)",
               icon: GiftReqular,
               iconSize: "12px",
+              onclick: () => {
+                redirectNewFeatures();
+              },
             },
           ]}
         />
