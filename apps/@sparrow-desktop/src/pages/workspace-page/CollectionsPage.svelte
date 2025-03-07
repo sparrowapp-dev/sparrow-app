@@ -811,7 +811,7 @@
 
 <!-- Save Changes for API Popup -- New -->
 <Modal
-  title={"Unsaved Changes!!"}
+  title={"Unsaved Changes!"}
   type={"dark"}
   zIndex={1000}
   isOpen={isPopupClosed}
