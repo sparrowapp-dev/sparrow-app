@@ -9,7 +9,7 @@
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
   } from "@sparrow/common/constants/permissions.constant";
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
 
   import { TabularInputV2 } from "@sparrow/workspaces/components";
   import { Input } from "@sparrow/library/forms";
@@ -21,6 +21,7 @@
     SearchVariable,
   } from "@sparrow/workspaces/constants";
   import { WithButtonV3 } from "@sparrow/workspaces/hoc";
+  import { QuestionCircle, SaveRegular } from "@sparrow/library/icons";
   export let azureBlobCDN;
   /**
    * selected environmet to be shown on API
@@ -47,6 +48,7 @@
   let quickHelp: boolean = false;
   let search = "";
   let environmentName = "";
+  export let isNewEnvironment = false;
   $: {
     if ($currentEnvironment) {
       environmentName = $currentEnvironment?.name;
@@ -132,50 +134,60 @@
             handleCurrentEnvironmentNameChange(environmentName, "blur");
           }}
           defaultBorderColor="transparent"
-          hoveredBorderColor={"var(--border-primary-300)"}
-          focusedBorderColor={"var(--border-primary-300)"}
-          class="text-fs-18 bg-transparent ellipsis fw-normal px-2"
+          hoveredBorderColor={"var(--border-ds-primary-300)"}
+          focusedBorderColor={"var(--border-ds-primary-300)"}
+          class="text-fs-18 bg-transparent ellipsis fw-normal px-2 rounded-1 "
           style="outline:none;"
           disabled={$currentEnvironment?.property?.environment?.type ==
             "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
           placeholder=""
+          height="36px"
+          autofocus={isNewEnvironment}
+          isPencilIconRequired={false}
         />
-        <div class={`d-flex env-btn-container`}>
+        <div class={`d-flex env-btn-container`} style="gap: 6px;">
           <div class="position-relative">
             <Search
               id={"environment-search"}
               variant={"primary"}
               bind:value={search}
               on:input={() => {}}
-              customWidth={"300px"}
-              placeholder="Search Variables"
+              customWidth={"220px"}
+              placeholder="Search"
             />
           </div>
 
           <div class="position-relative">
             <Tooltip title="Save" placement="bottom-center" distance={10}>
-              <WithButtonV3
-                icon={SaveIcon}
-                onClick={onSaveEnvironment}
-                disable={$currentEnvironment?.property?.environment?.state
+              <Button
+              type="primary"
+              startIcon={SaveRegular}
+              title="Save"
+              onClick={onSaveEnvironment}
+              customWidth="72px"
+              size="small"
+              disable={$currentEnvironment?.property?.environment?.state
                   ?.isSaveInProgress ||
                   $currentEnvironment?.isSaved ||
                   userRole === WorkspaceRole.WORKSPACE_VIEWER}
-                loader={$currentEnvironment?.property?.environment?.state
-                  ?.isSaveInProgress}
-              />
+                  loader={
+                      $currentEnvironment?.property?.environment?.state
+                  ?.isSaveInProgress
+                  }/>
             </Tooltip>
           </div>
           <span>
             <Tooltip title="Help" placement="bottom-center" distance={10}>
-              <WithButtonV3
-                icon={HelpIcon}
-                onClick={() => {
+              <Button
+              type="secondary"
+              startIcon={QuestionCircle}
+              size="small"
+              customWidth="28px"
+              onClick={() => {
                   quickHelp = true;
                 }}
                 disable={false}
-                loader={false}
-              />
+                loader={false}/>
             </Tooltip>
           </span>
         </div>
@@ -205,7 +217,7 @@
           >
         {/if}
       </div>
-      <section class={`var-value-container pe-1`} style="flex:1;">
+      <section class={`var-value-container pe-1 mt-2`} style="flex:1;">
         <TabularInputV2
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
           keyValue={$currentEnvironment?.property?.environment?.variable}
@@ -215,7 +227,7 @@
       </section>
     </div>
     {#if quickHelp}
-      <div class="quick-help h-100">
+      <div class="quick-help h-100" style="width:360px;">
         <QuickHelp
           closeQuickHelp={() => {
             quickHelp = false;
@@ -272,9 +284,6 @@
 <style lang="scss">
   .env-panel {
     background-color: var(--bg-secondary-850);
-  }
-  .env-header {
-    padding: 20px 0px 10px 6px;
   }
   .env-heading {
     font-size: 18px;
@@ -335,7 +344,8 @@
     width: 280px;
   }
   .env-parent {
-    padding: 10px;
+    padding: 0px 12px;
+    margin-top: 24px;
   }
   .quick-help-active {
     width: calc(100% - 280px) !important;

@@ -135,7 +135,7 @@
   };
 </script>
 
-<div class="mb-0 me-0 w-100 ps-3 py-0 section-layout">
+<div class="mb-0 me-0 w-100 py-0 section-layout">
   <div
     class="d-flex align-items-center w-100 px-1 header-box"
     style="height: 28px; background-color:var(--bg-ds-surface-400); gap:11px;"
@@ -298,8 +298,8 @@
   }
   return false;
 }).length === 0 && search !== ""}
-  <p class="text-fs-12 mt-3 ps-2">
-    No such variable found in this environment. Please check the spelling.
+  <p class="text-fs-12 mt-3 ps-2 no-data-found">
+    The variable <span style="color:var(--text-ds-neutral-100)">'{search}'</span> is not found in this environment. Add the variable or try searching in a different environment.
   </p>
 {/if}
 
@@ -362,5 +362,10 @@
     transition:
       opacity 0.1s ease-in-out,
       visibility 0.1s;
+  }
+  .no-data-found {
+    text-align: center;
+    color: var(--text-ds-neutral-400);
+    line-height: 18px;
   }
 </style>
