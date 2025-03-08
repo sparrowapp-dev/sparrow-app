@@ -33,6 +33,8 @@
 
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
+  import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
+  import DefaultTourGuide from "../../../components/default-tour-guide/DefaultTourGuide.svelte";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -192,6 +194,7 @@
 <div
   style="height:100%; overflow:hidden"
   class={`sidebar d-flex flex-column  scroll px-1`}
+  id="collection-container"
 >
   <div
     class="d-flex justify-content-between align-items-center align-self-stretch px-0 pt-3 d-none"
@@ -291,7 +294,7 @@
       <div
         class="overflow-auto position-relative d-flex flex-column ms-2 me-0 pt-1 mb-2"
       >
-        {#if collectionListDocument?.length > 0 && searchData.length === 0}
+        {#if collectionListDocument?.length > 0}
           <div class="box-line"></div>
         {/if}
         {#if collectionListDocument?.length > 0}
@@ -394,6 +397,23 @@
     {/if}
   </div>
 </div>
+
+{#if $isDefaultTourGuideOpen && $defaultCurrentStep === 1}
+  <DefaultTourGuide
+    targetId="collection-container"
+    TitleName="Manage Your API Requests"
+    DescriptionContent="Easily access, add and organize your API requests here. Use this panel to create, edit, or delete requests with just a few clicks."
+    CardNumber={1}
+    TotalsCards={7}
+    tipPosition="right-center"
+    onNext={() => {
+      defaultCurrentStep.set(2);
+    }}
+    onClose={() => {
+      isDefaultTourGuideOpen.set(false);
+    }}
+  />
+{/if}
 
 <style>
   .collection-container {
