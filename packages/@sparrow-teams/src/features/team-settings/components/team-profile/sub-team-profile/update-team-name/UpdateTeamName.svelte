@@ -1,7 +1,6 @@
 <script lang="ts">
   import { TeamPropertyEnum } from "../../../../types";
   import { NAME_CONFIG } from "../../../../constants";
-
   export let teamName: string;
   export let onUpdateTeam: (property: TeamPropertyEnum) => void;
 
@@ -14,11 +13,16 @@
   };
 </script>
 
-<div class="d-flex pb-3">
+<div class="d-flex flex-column pb-3">
   <div class="title-width">
-    <p class="team-title mt-2 mb-0 fs-12 text-textColor">{NAME_CONFIG.TITLE}</p>
+    <p class="team-title mt-2 mb-0 fs-12 text-textColor">
+      {NAME_CONFIG.TITLE}
+    </p>
   </div>
-  <div class="container-width">
+  <div
+    class="container-width"
+    style="background-color: var(--bg-ds-surface-600); margin-top:8px;border-radius:4px"
+  >
     <input
       required
       type="text"
@@ -58,6 +62,6 @@
     width: 98px;
   }
   .container-width {
-    width: calc(100% - 98px);
+    width: 398px;
   }
 </style>

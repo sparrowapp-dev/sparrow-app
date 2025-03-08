@@ -1,6 +1,7 @@
 <script lang="ts">
   import { LockIcon } from "@sparrow/library/icons";
   import { TeamSettingsTabsEnum } from "../../types";
+  import { LockClosedRegular, PeopleFilled } from "@sparrow/library/icons";
 
   export let activeTeamSettingsTabId: string = "";
 
@@ -61,11 +62,9 @@
           {tab.name}
         </span>
         {#if tab.disabled}
-          <LockIcon
-            height={"14px"}
-            width={"14px"}
-            color={"var(--icon-secondary-400)"}
-          />
+          <LockClosedRegular size={"16px"} color={"var(--bg-ds-neutral-500)"} />
+        {:else}
+          <PeopleFilled size={"16px"} color={"var(--bg-ds-neutral-100)"} />
         {/if}
       </button>
     {/if}
