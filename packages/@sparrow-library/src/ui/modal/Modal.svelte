@@ -1,6 +1,6 @@
 <script lang="ts">
   import { CrossIcon } from "@sparrow/library/icons";
-
+  import { DismissRegular } from "@sparrow/library/icons";
   import { scale, fade } from "svelte/transition";
   import { downloadWarningIcon as warningIcon } from "@sparrow/library/assets";
   import { onDestroy } from "svelte";
@@ -85,7 +85,7 @@
             style="height: 30px; width:30px; "
             on:click={handleModalState(false)}
           >
-            <CrossIcon width="17px" height="17px" />
+            <DismissRegular size={"20px"} />
           </button>
         {/if}
       </div>
