@@ -24,15 +24,23 @@
     SocketIoIcon,
     StackIcon,
     TreeIcon,
+    DismissCircle,
+    CopyIcon,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
     TabTypeEnum,
   } from "@sparrow/common/types/workspace/tab";
   import { type Tab } from "@sparrow/common/types/workspace/tab";
-  import { Badge, Spinner } from "@sparrow/library/ui";
+  import { Badge, Spinner, Options, Dropdown } from "@sparrow/library/ui";
   import { SvelteComponent } from "svelte";
   // ----
+
+  // ------ Props ------
+  /**
+   * List of tabs
+   */
+  export let tabList;
 
   // ------ Props ------
   /**
@@ -74,6 +82,13 @@
 
   export let listLength;
   export let onDoubleClick: (tab: Tab) => void;
+  export let onRightClick: (tab: Tab) => void;
+  export let onClickCloseOtherTabs: (tabList: [], tabId: string) => void;
+  export let onClickForceCloseTabs: (tabList: [], tabId: string) => void;
+  export let onClickDuplicateTab: (tabId: string) => void;
+  let noOfColumns = 180;
+  let showTabControlMenu = false;
+
   function handleMouseDown(event: MouseEvent) {
     if (event.button === 1) {
       // Check if the middle button is pressed (button code 1)
@@ -83,6 +98,40 @@
   const handleDoubleClick = (tab: Tab) => {
     onDoubleClick(tab);
   };
+
+  let mouseX = 0;
+  let mouseY = 0;
+  const handleRightClick = (event: MouseEvent, tab: Tab) => {
+    showTabControlMenu = !showTabControlMenu;
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+
+    const tabbarElement = document.querySelector(".tabbar") as HTMLElement;
+
+    if (tabbarElement) {
+      const navbarElement = tabbarElement.querySelector(".navbar");
+      if (navbarElement) {
+        // console.log("Navbar is present inside Tabbar.");
+        navbarElement.remove();
+        // showTabControlMenu = true;
+      } else {
+        // console.log("Navbar is NOT present inside Tabbar.");
+        showTabControlMenu = true;
+      }
+    }
+
+    // showTabControlMenu = !showTabControlMenu;
+
+    // Add event listener to close menu when clicking outside
+    // setTimeout(() => {
+    //   window.addEventListener("click", handleOutsideClick);
+    // }, 0);
+  };
+
+  // const handleOutsideClick = (event: MouseEvent) => {
+  //   showTabControlMenu = false;
+  //   window.removeEventListener("click", handleOutsideClick); // Remove event listener
+  // };
 </script>
 
 <button
@@ -100,7 +149,69 @@
     : ''}"
   on:mousedown={handleMouseDown}
   on:dblclick={() => handleDoubleClick(tab)}
+  on:contextmenu|preventDefault={(event) => handleRightClick(event, tab)}
 >
+  <!-- <Dropdown>
+  </Dropdown> -->
+  {#if showTabControlMenu}
+    <Options
+      xAxis={mouseX}
+      yAxis={[mouseY, mouseY + 20]}
+      zIndex={500}
+      menuItems={[
+        {
+          onClick: () => {
+            onTabClosed(tab.id, tab);
+          },
+          displayText: "Close Tab",
+          disabled: false,
+          hidden: false,
+          icon: DismissCircle,
+        },
+        {
+          onClick: () => {
+            onClickCloseOtherTabs(tabList, tab.id);
+          },
+          displayText: "Close Other Tabs",
+          disabled: false,
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            onClickCloseOtherTabs(tabList, "");
+          },
+          displayText: "Close All Tabs",
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            onClickForceCloseTabs(tabList, tab.id);
+          },
+          displayText: "Force Close Other Tabs",
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            onClickForceCloseTabs(tabList, "");
+          },
+          displayText: "Force Close All Tabs",
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            onClickDuplicateTab(tab.id);
+          },
+          displayText: "Duplicate Tab",
+          hidden: !["REQUEST", "WEBSOCKET", "SOCKETIO", "GRAPHQL"].includes(
+            tab.type,
+          ),
+          icon: CopyIcon,
+        },
+      ]}
+      {noOfColumns}
+    />
+  {/if}
+
   <div
     tabindex="-1"
     class="tab-item w-100 d-flex justify-content-between px-2 border-upper-radius h-100 align-items-center"
@@ -256,6 +367,12 @@
     {/if}
   </div></button
 >
+<svelte:window
+  on:click={() => {
+    // console.log("tab :>> ", tab);
+    showTabControlMenu = false;
+  }}
+/>
 
 <style>
   * {
