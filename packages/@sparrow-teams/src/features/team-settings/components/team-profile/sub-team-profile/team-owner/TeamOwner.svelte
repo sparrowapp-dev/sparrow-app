@@ -28,6 +28,7 @@
   .title-width {
     width: 98px;
   }
+
   .container-width {
     border-radius: 4px;
     width: 398px;

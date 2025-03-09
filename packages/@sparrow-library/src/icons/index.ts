@@ -197,3 +197,4 @@ export {default as  GlobeRegular} from "./GlobeRegular.svelte";
 export {default as ArrowUploadFilled} from "./ArrowUploadFilled.svelte"
 export {default as EditRegular} from "./EditRegular.svelte";
 export {default as LockClosedRegular} from "./LockClosedRegular.svelte";
+export {default as SearchFilled} from "./SearchFilled.svelte";

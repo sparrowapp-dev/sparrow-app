@@ -43,7 +43,7 @@
 </div>
 <div class="desc" tabindex="0" style="width:72px">
   <button
-    style="background-color: var(--bg-ds-primary-400);border-width:0px;width:72px;height:28px;border-radius:4px;"
+    style="background-color: var(--bg-ds-primary-400); border-width:0px;width:72px;height:28px;border-radius:4px;"
     >Save</button
   >
 </div>

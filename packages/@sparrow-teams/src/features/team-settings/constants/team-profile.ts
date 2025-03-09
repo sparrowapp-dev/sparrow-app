@@ -1,5 +1,5 @@
 export const ICON_CONFIG = {
-  DESCRIPTION: `Upload or drag and drop your image. For best results, use a square image under 2 MB in size. Supported formats: .jpg, .jpeg, .png`,
+  DESCRIPTION: `Upload or drag and drop your image. For best results, use a square image under 2 MB in size. Supported formats: .jpg, .jpeg, .png .`,
   FILE_TYPES: [".jpg", ".jpeg", ".png"],
   MAX_FILE_SIZE_KB: 2048,
   SIZE_EXCEED_ERROR_MESSAGE: `The size of the file you are trying to upload is more than 2 MB.`,
@@ -17,7 +17,7 @@ export const NAME_CONFIG = {
 export const DESCRIPTION_CONFIG = {
   TITLE: `About`,
   MAX_TEXT_SIZE: 500,
-  PLACEHOLDER: `Tell us something about your team`,
+  PLACEHOLDER: `Add teams's description`,
 };
 
 export const OWNER_CONFIG = {
