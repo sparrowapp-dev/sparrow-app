@@ -395,8 +395,8 @@ class RestExplorerViewModel
     return response?.getLatest().toMutableJSON();
   };
 
-  private formatDate = (date) => {
-    const options = { day: "2-digit", month: "short", year: "numeric" };
+  private formatDate = (date: Date) => {
+    const options : Intl.DateTimeFormatOptions = { day: "2-digit", month: "short", year: "numeric" };
     const formattedDate = date.toLocaleDateString("en-GB", options);
 
     let hours = date.getHours();
@@ -889,10 +889,10 @@ class RestExplorerViewModel
    * @description clear response of a request
    */
   public clearResponse = async () => {
-    const response: Response = new InitRequestTab(
+    const response = new InitRequestTab(
       UntrackedItems.UNTRACKED,
       "UNTRACKED-",
-    ).getValue().property.request.response;
+    ).getValue().property.request?.response as Response;
     this.updateResponse(response);
   };
 
@@ -1482,11 +1482,10 @@ class RestExplorerViewModel
   ) => {
     const componentData = this._tab.getValue();
     let userSource = {};
-    const _id = componentData.id;
     if (path.length > 0) {
       const requestTabAdapter = new RequestTabAdapter();
       const unadaptedRequest = requestTabAdapter.unadapt(componentData);
-      let req = {
+      const req = {
         id: uuidv4(),
         name: tabName,
         description,

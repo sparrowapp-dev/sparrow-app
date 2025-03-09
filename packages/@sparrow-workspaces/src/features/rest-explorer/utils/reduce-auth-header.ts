@@ -1,13 +1,12 @@
 import {
-  type Auth,
   type KeyValue,
 } from "@sparrow/common/types/workspace";
-import { CollectionRequestAddToBaseEnum, type CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+import { CollectionRequestAddToBaseEnum, type CollectionAuthBaseInterface, type CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
 class ReduceAuthHeader {
   private authHeader: KeyValue;
-  constructor(_state: HttpRequestAuthTypeBaseEnum | CollectionAuthTypeBaseEnum, _auth: Auth) {
+  constructor(_state: HttpRequestAuthTypeBaseEnum | CollectionAuthTypeBaseEnum, _auth: CollectionAuthBaseInterface) {
     const authValue: { key: string; value: string } = {
       key: "",
       value: "",
@@ -36,7 +35,7 @@ class ReduceAuthHeader {
     }
     this.authHeader = authValue;
   }
-  public getValue() {
+  public getValue() : KeyValue {
     return this.authHeader;
   }
 }
