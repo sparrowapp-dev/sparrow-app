@@ -1,8 +1,6 @@
 import {
-  AuthTypeEnum,
   RequestDataTypeEnum,
   RequestDatasetEnum,
-  RequestMethodEnum,
   RequestSectionEnum,
   ResponseFormatterEnum,
   ResponseSectionEnum,
@@ -20,9 +18,10 @@ import {
 } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
 import {
-  HttpRequestSavedAddToBaseEnum,
+  HttpRequestSavedAuthModeBaseEnum,
   HttpRequestSavedMethodBaseEnum,
 } from "../types/workspace/http-request-saved-base";
+import { CollectionRequestAddToBaseEnum } from "../types/workspace/collection-base";
 
 export class InitSavedRequestTab {
   private _tab: Tab;
@@ -115,7 +114,7 @@ export class InitSavedRequestTab {
           state: {
             requestBodyLanguage: RequestDataTypeEnum.TEXT,
             requestBodyNavigation: RequestDatasetEnum.NONE,
-            requestAuthNavigation: AuthTypeEnum.NO_AUTH,
+            requestAuthNavigation: HttpRequestSavedAuthModeBaseEnum.NO_AUTH,
             requestNavigation: RequestSectionEnum.PARAMETERS,
             responseNavigation: ResponseSectionEnum.RESPONSE,
             responseBodyLanguage: RequestDataTypeEnum.TEXT,
@@ -144,7 +143,7 @@ export class InitSavedRequestTab {
             apiKey: {
               authKey: "",
               authValue: "",
-              addTo: HttpRequestSavedAddToBaseEnum.HEADER,
+              addTo: CollectionRequestAddToBaseEnum.HEADER,
             },
           },
           ai: {

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { Select } from "@sparrow/library/forms";
-  import { AuthSection } from "@sparrow/common/enums/authorization.enum";
   import type { ApiKey } from "@sparrow/common/interfaces/request.interface";
   import { CodeMirrorInput } from "@sparrow/workspaces/components";
   import { AuthInputTheme } from "@sparrow/workspaces/utils";
@@ -15,12 +13,6 @@
   };
 </script>
 
-<div>
-  <p class="text-secondary-300 text-fs-12 fw-normal">
-    The authorization header will be automatically generated when you send the
-    request.
-  </p>
-</div>
 <div class="d-flex flex-column w-100 ps-1 pt-4 pe-1">
   <div class="mb-3" style="font-size: 12px; font-weight:500">
     <p class=" mb-2 text-secondary-100">Key</p>

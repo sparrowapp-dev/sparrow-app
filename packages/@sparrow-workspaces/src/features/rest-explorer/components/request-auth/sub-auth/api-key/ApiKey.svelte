@@ -1,10 +1,8 @@
 <script lang="ts">
-  import { Select } from "@sparrow/library/forms";
-  import { AuthSection } from "@sparrow/common/enums/authorization.enum";
-  import type { ApiKey } from "@sparrow/common/interfaces/request.interface";
   import { CodeMirrorInput } from "@sparrow/workspaces/components";
   import { AuthInputTheme } from "@sparrow/workspaces/utils";
   import { RadioButton } from "@sparrow/library/ui";
+  import { CollectionRequestAddToBaseEnum } from "@sparrow/common/types/workspace/collection-base";
   export let apiData;
   export let callback;
   export let environmentVariables;
@@ -16,19 +14,19 @@
     callback({ apiKey: apiData });
   };
 
-  const handleOptionChange = (event) => {
+  const handleOptionChange = (event: any) => {
     apiData.addTo = event.target.value;
     callback({ apiKey: apiData });
   };
 </script>
 
-<p class="text-fs-12">Add API Key to</p>
+<p class="text-fs-12 fw-bold mb-2">Add API Key to</p>
 <div class="d-flex gap-3">
   <div class="radio text-fs-12 d-flex align-items-center">
     <RadioButton
       id="radio-1"
       name="radio"
-      value={AuthSection.HEADER}
+      value={CollectionRequestAddToBaseEnum.HEADER}
       group={apiData.addTo}
       handleChange={handleOptionChange}
       labelText=" Header "
@@ -40,7 +38,7 @@
     <RadioButton
       id="radio-2"
       name="radio"
-      value={AuthSection.QUERY_PARAMETER}
+      value={CollectionRequestAddToBaseEnum.QUERY_PARAMETER}
       group={apiData.addTo}
       handleChange={handleOptionChange}
       labelText=" Parameter "
