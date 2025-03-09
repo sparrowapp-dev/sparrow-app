@@ -14,10 +14,10 @@
   };
 </script>
 
-<div class="d-flex flex-column w-100 pt-2 pe-1">
+<div class="d-flex flex-column w-100">
   <div style="font-size: 12px; font-weight:500">
     <p class="mb-2 text-secondary-100">Token</p>
-    <div class="position-relative auth-input-container">
+    <div class="position-relative auth-input-container mb-3">
       <CodeMirrorInput
         bind:value={bearerToken}
         onUpdateInput={() => {

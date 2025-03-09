@@ -76,7 +76,7 @@ import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.w
 import type { Socket } from "socket.io-client";
 import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
-import { RequestSavedTabAdapter } from "@app/adapter";
+import { CollectionTabAdapter, RequestSavedTabAdapter } from "@app/adapter";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import {  CollectionAuthTypeBaseEnum, CollectionItemTypeBaseEnum, CollectionRequestAddToBaseEnum, type CollectionAuthBaseInterface } from "@sparrow/common/types/workspace/collection-base";
@@ -118,6 +118,10 @@ class RestExplorerViewModel
     value: "",
   });
   private _tab: BehaviorSubject<RequestTab> = new BehaviorSubject({});
+
+  public collectionSubscriber(_collectionId: string) {
+    return this.collectionRepository.subscribeCollection(_collectionId);
+  }
   
   private _collectionAuth = new BehaviorSubject< Partial<HttpRequestCollectionLevelAuthTabInterface>>({});
 
@@ -181,6 +185,13 @@ class RestExplorerViewModel
         }
       }, 0);
     }
+  }
+
+  public openCollection = async ()=>{
+    const collectionRx = await this.collectionRepository.readCollection(this._tab.getValue().path.collectionId);
+    const collectionDoc = collectionRx?.toMutableJSON();
+    const collectionTab = new CollectionTabAdapter().adapt(this._tab.getValue().path.workspaceId, collectionDoc);
+    this.tabRepository.createTab(collectionTab);
   }
 
   public get activeWorkspace() {

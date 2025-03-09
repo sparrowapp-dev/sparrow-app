@@ -98,6 +98,7 @@
   export let onUpdateEnvironment;
   export let environmentVariables;
   export let isGuestUser = false;
+  export let onOpenCollection;
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
@@ -115,6 +116,7 @@
   export let azureBlobCDN;
   export let onSaveResponse;
   export let collectionAuth;
+  export let collection;
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -329,6 +331,8 @@
                       {onUpdateRequestAuth}
                       {onUpdateEnvironment}
                       {environmentVariables}
+                      {collection}
+                      {onOpenCollection}
                     />
                   {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                     <RequestDoc

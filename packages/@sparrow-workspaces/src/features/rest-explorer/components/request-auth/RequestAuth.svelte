@@ -4,6 +4,8 @@
   import type { HttpRequestCollectionLevelAuthTabInterface } from "@sparrow/common/types/workspace";
   import { CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+  import { Button } from "@sparrow/library/ui";
+  import { OpenRegular } from "@sparrow/library/icons";
 
   export let auth;
   export let environmentVariables;
@@ -12,6 +14,8 @@
   export let onUpdateRequestState;
   export let onUpdateEnvironment;
   export let collectionAuth: HttpRequestCollectionLevelAuthTabInterface;
+  export let collection;
+  export let onOpenCollection;
 </script>
 
 <div class="d-flex flex-column w-100 h-100">
@@ -55,7 +59,7 @@
     </div>
   </div>
   <div>
-    <p class="text-secondary-300 text-fs-12 fw-normal">
+    <p class="text-fs-12 fw-normal" style="color:var(--text-ds-neutral-400)">
       The auth header will be automatically generated when you send the request.
     </p>
   </div>
@@ -115,6 +119,33 @@
           disabled={true}
         />
       {/if}
+      <p
+        class="text-fs-12 mb-1"
+        style="color:var(--text-ds-neutral-400); max-width:600px;"
+      >
+        The authorization setting is inherited from the collection '<span
+          style="color:var(--text-ds-neutral-100)">{collection.name}</span
+        >'. To make changes,
+      </p>
+      <p class="d-flex">
+        <span
+          class="pt-1 text-fs-12 me-1"
+          style="color:var(--text-ds-neutral-400)"
+        >
+          navigate to
+        </span>
+        <Button
+          type={"link-primary"}
+          onClick={() => {
+            onOpenCollection();
+          }}
+          title={collection?.name?.length > 25
+            ? collection?.name?.slice(0, 25) + "..."
+            : collection?.name || "Collection Not Found"}
+          size={"small"}
+          endIcon={OpenRegular}
+        />
+      </p>
     {/if}
   </section>
 </div>

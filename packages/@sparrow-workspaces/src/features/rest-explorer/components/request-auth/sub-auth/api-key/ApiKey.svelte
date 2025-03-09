@@ -21,7 +21,7 @@
 </script>
 
 <p class="text-fs-12 fw-bold mb-2">Add API Key to</p>
-<div class="d-flex gap-3">
+<div class="d-flex ps-1 gap-3 mb-2">
   <div class="radio text-fs-12 d-flex align-items-center">
     <RadioButton
       id="radio-1"
@@ -47,7 +47,7 @@
     />
   </div>
 </div>
-<div class="d-flex flex-column w-100 ps-1 pt-4 pe-1">
+<div class="d-flex flex-column w-100">
   <div class="mb-3" style="font-size: 12px; font-weight:500">
     <p class=" mb-2 text-secondary-100">Key</p>
 
@@ -89,7 +89,7 @@
   }
 
   .radio {
-    margin: 0.5rem;
+    /* margin: 0.5rem; */
     outline: none;
     position: relative;
   }
