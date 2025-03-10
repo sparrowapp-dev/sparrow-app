@@ -264,15 +264,17 @@
 
     if (noOfNotSavedTabsWhileForClose > 0) {
       if (isUserDontWantForceClosePopup) {
-        forceCloseTabs($tabList, currentTabId);
+        forceCloseTabs(currentTabId);
         isForceCloseTabPopupOpen = false;
         noOfNotSavedTabsWhileForClose = 0;
         return;
       }
       isForceCloseTabPopupOpen = true;
-    } else forceCloseTabs($tabList, currentTabId);
+    } else forceCloseTabs(currentTabId);
   };
   const forceCloseTabs = async (currentTabId: string) => {
+    console.log("curr :>> ", currentTabId);
+
     const savedTabs = [];
     const unSavedTabs = [];
     for (const tab of $tabList) {
@@ -282,6 +284,8 @@
       }
     }
 
+    console.log("sav :> ", savedTabs);
+    console.log("unSav :> ", unSavedTabs);
     const wsId = currentWOrkspaceValue._id;
     _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, savedTabs);
 

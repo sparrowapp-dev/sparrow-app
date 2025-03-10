@@ -267,13 +267,13 @@
     });
     if (noOfNotSavedTabsWhileForClose > 0) {
       if (isUserDontWantForceClosePopup) {
-        forceCloseTabs($tabList, currentTabId);
+        forceCloseTabs(currentTabId);
         isForceCloseTabPopupOpen = false;
         noOfNotSavedTabsWhileForClose = 0;
         return;
       }
       isForceCloseTabPopupOpen = true;
-    } else forceCloseTabs($tabList, currentTabId);
+    } else forceCloseTabs(currentTabId);
   };
   const forceCloseTabs = async (currentTabId: string) => {
     const savedTabs = [];
