@@ -150,7 +150,6 @@ export { default as StackRegular } from "./StackRegular.svelte";
 export { default as FolderAddRegular } from "./FolderAddRegular.svelte";
 export { default as FolderRegular } from "./FolderRegular.svelte";
 export { default as FolderOpenRegular } from "./FolderOpenRegular.svelte";
-export { default as ChevronDoubleRegular } from "./ChevronDoubleRegular.svelte";
 export { default as ChevronDoubleLeftRegular } from "./ChevronDoubleLeftRegular.svelte";
 export { default as ChevronDoubleRightRegular } from "./ChevronDoubleRightRegular.svelte";
 
@@ -177,7 +176,6 @@ export { default as SocketIOIcon } from "./SocketIOICon.svelte";
 export { default as WorkspaceRegular } from "./WorkspaceRegular.svelte";
 export { default as SaveRegular } from "./SaveRegular.svelte";
 export { default as CaretDownFilled } from "./CaretDownFilled.svelte";
-// export { default as CaretDownRegular } from "./CaretDownRegular.svelte";
 export { default as SignOutIconRegular } from "./SignOutRegular.svelte";
 export { default as ArrowRightRegular } from "./ArrowRightRegular.svelte";
 export { default as CheckMarkIcon } from "./Checkmark.svelte";
